@@ -46,31 +46,31 @@ COMMAND(CGQuest, "gquest")
         usage( pch );
     else if (arg_is_info( cmd ))
         doInfo( pch );
-    else if (arg_oneof( cmd, "progress", "прогресс" ))
+    else if (arg_is(cmd, "progress"))
         doProgress( pch );
-    else if (arg_oneof( cmd, "noexp", "безопыта" ))
+    else if (arg_is(cmd, "noexp"))
         doNoExp( pch, arguments );
-    else if (arg_oneof( cmd, "victory", "победа", "победы" ))
+    else if (arg_is(cmd, "victory"))
         doVictory( pch );
-    else if (arg_oneof( cmd, "stat", "статистика" ))
+    else if (arg_is(cmd, "stat"))
         doStat( pch );
     else if (pch->is_immortal( )) {
         if (arg_is_list( cmd ))
             doList( pch );
-        else if (arg_oneof( cmd, "start", "старт" ))
+        else if (arg_is(cmd, "start"))
             doStart( pch, arguments );
-        else if (arg_oneof( cmd, "stop", "стоп" ))
+        else if (arg_is(cmd, "stop"))
             doStop( pch, arguments );
-        else if (arg_oneof( cmd, "time", "время" ))
+        else if (arg_is(cmd, "time"))
             doTime( pch, arguments );
-        else if (arg_oneof( cmd, "talk", "сказать", "говорить" ))
+        else if (arg_is(cmd, "talk"))
             doTalk( pch, arguments );
-        else if (arg_oneof( cmd, "auto", "авто" ))
+        else if (arg_is(cmd, "auto"))
             doAuto( pch, arguments );
         else if (pch->isCoder( )) {
-            if (arg_oneof( cmd, "set", "установить" ))
+            if (arg_is(cmd, "set"))
                 doSet( pch, arguments );
-            else if (arg_oneof( cmd, "read", "прочесть" ))
+            else if (arg_is(cmd, "read"))
                 doRead( pch, arguments );
             else
                 usage( pch );

@@ -437,7 +437,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step add'
-    if (arg_oneof(cmd, "add", "добавить")) {
+    if (arg_is(cmd, "add")) {
         QuestStep::XMLPointer newStep(NEW);
         MOB_INDEX_DATA *pMob = AreaUtils::findFirstMob(q->pAreaIndex);
         RoomIndexData *pRoom = AreaUtils::findFirstRoom(q->pAreaIndex);
@@ -475,7 +475,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     cmd = args.getOneArgument();     
 
     // 'step 3 del'
-    if (arg_oneof(cmd, "del", "удалить")) {
+    if (arg_is(cmd, "del")) {
         q->steps.erase(q->steps.begin() + step);
         ch->pecho("Шаг %d удален. Не забудь почистить старые тригера ({y{hccs search %d{x).", 
                   step.getValue(), q->vnum.getValue());
@@ -484,7 +484,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step 3 up'
-    if (arg_oneof(cmd, "up", "вверх")) {
+    if (arg_is(cmd, "up")) {
         if (step == 0) {
             ch->pecho("Шаг %d и так самый первый в списке.", step.getValue());
             return false;
@@ -500,7 +500,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step 3 down'
-    if (arg_oneof(cmd, "down", "вниз")) {
+    if (arg_is(cmd, "down")) {
         if (step == q->steps.size() - 1) {
             ch->pecho("Шаг %d и так самый последний в списке.", step.getValue());
             return false;
@@ -516,7 +516,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step 3 info <string>'
-    if (arg_oneof(cmd, "info", "инфо")) {
+    if (arg_is(cmd, "info")) {
         if (args.empty()) {
             ch->pecho("Какое описание ты хочешь присвоить?");
             return false;
@@ -535,7 +535,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step 3 qp <num>'
-    if (arg_oneof(cmd, "qp", "кп")) {
+    if (arg_is(cmd, "qp")) {
         Integer::tryParse(thisStep->rewardQp, args);
         ch->pecho("Награда за шаг %d установлена в %d qp.", 
                    step.getValue(), thisStep->rewardQp.getValue());
@@ -544,7 +544,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step 3 gold <num>'
-    if (arg_oneof(cmd, "gold", "золото")) {
+    if (arg_is(cmd, "gold")) {
         Integer::tryParse(thisStep->rewardGold, args);
         ch->pecho("Награда за шаг %d установлена в %d золота.", 
                    step.getValue(), thisStep->rewardGold.getValue());
@@ -553,7 +553,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step 3 exp <num>'
-    if (arg_oneof(cmd, "exp", "экспа", "опыт")) {
+    if (arg_is(cmd, "exp")) {
         Integer::tryParse(thisStep->rewardExp, args);
         ch->pecho("Награда за шаг %d установлена в %d опыта.", 
                    step.getValue(), thisStep->rewardExp.getValue());
@@ -562,7 +562,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step 3 vnum <num>'
-    if (arg_oneof(cmd, "item", "vnum", "предмет", "внум")) {
+    if (arg_is(cmd, "item")) {
         Integer::tryParse(thisStep->rewardVnum, args);
         ch->pecho("Награда за шаг %d установлена в предмет %d.", 
                    step.getValue(), thisStep->rewardVnum.getValue());
@@ -574,10 +574,10 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
 
     DLString beginOrEnd = cmd;
     bool isBegin;
-    if (arg_oneof(beginOrEnd, "begin", "начало")) {
+    if (arg_is(beginOrEnd, "begin")) {
         isBegin = true;
         beginOrEnd = "begin";
-    } else if (arg_oneof(beginOrEnd, "end", "конец")) {
+    } else if (arg_is(beginOrEnd, "end")) {
         isBegin = false;
         beginOrEnd = "end";
     } else {
@@ -588,14 +588,14 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     DLString action = args.getOneArgument();
 
     // 'step 3 begin|end type mob|obj|room'
-    if (arg_oneof(action, "type", "тип")) {
+    if (arg_is(action, "type")) {
         DLString type = args.getOneArgument();
 
-        if (arg_oneof(type, "mob", "моб"))
+        if (arg_is(type, "mob"))
             type = "mob";
-        else if (arg_oneof(type, "obj", "обж", "предмет"))
+        else if (arg_is(type, "obj"))
             type = "obj";
-        else if (arg_oneof(type, "room", "комната"))
+        else if (arg_is(type, "room"))
             type = "room";
         else {
             ch->pecho("Допустимые значения для типа шага: mob, obj, room.");
@@ -622,7 +622,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step 3 begin|end vnum 4321'
-    if (arg_oneof(action, "vnum", "внум")) {
+    if (arg_is(action, "vnum")) {
         DLString vnumArg = args.getOneArgument();
         Integer vnum;
         if (!vnumArg.isNumber() || !Integer::tryParse(vnum, vnumArg)) {
@@ -650,7 +650,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step 3 begin|end trigger onSpeech'
-    if (arg_oneof(action, "triger", "trigger", "тригер", "триггер")) {
+    if (arg_is(action, "triger")) {
         DLString trigName = args.getOneArgument();        
         auto allTriggers = feniaTriggers->getTriggersForTarget(isBegin ? thisStep->beginType : thisStep->endType, "queststep");
 
@@ -680,7 +680,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     }
 
     // 'step 3 begin|end fenia [clear]'
-    if (arg_oneof(action, "fenia", "феня")) {
+    if (arg_is(action, "fenia")) {
         feniaTriggers->openEditor(ch, q, step, isBegin, args);
         return false;
     }
@@ -804,7 +804,7 @@ CMD(qedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online area quest editor.")
     }
 
     // Creating new quest - only via aedit
-    if (arg_oneof(cmd, "create", "создать")) {
+    if (arg_is(cmd, "create")) {
         ch->pecho("Зайди в редактор зоны ({y{hcaedit{x) и набери {y{hcquest create{x.");
         return;
     }

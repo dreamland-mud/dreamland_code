@@ -264,7 +264,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             stc("Справка с таким ID не найдена.\r\n", ch);
             return;
         }
-    } else if (arg_oneof(arg1, "save")) {        
+    } else if (arg_is(arg1, "save")) {        
         for (auto &ai: helpManager->getArticles()) {
             HelpArticle *a = const_cast<HelpArticle *>(*ai);
             LogStream::sendNotice() << "Saving help " << a->getID() << " " << a->getAllKeywordsString() << endl;
@@ -281,7 +281,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
 
         page_to_char(buf.str().c_str(), ch);
         return;
-    } else if (arg_oneof_strict(arg1, "search")) {
+    } else if (arg_is_strict(arg1, "search")) {
         ostringstream buf;
         const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + " {C%s{x\r\n";
 
@@ -304,7 +304,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         page_to_char(buf.str().c_str(), ch);
         return;
 
-    } else if (arg_oneof_strict(arg1, "label"))  {
+    } else if (arg_is_strict(arg1, "label"))  {
         // 'hedit label' - just show total counts
         if (arg2.empty()) {
             map<DLString, int> activeLabelCount;
@@ -345,7 +345,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         }
         return;
 
-    } else if (arg_oneof_strict(args, "create", "создать")) {
+    } else if (arg_is_strict(args, "create")) {
         for (auto &container: HelpLoader::getThis()->getElements()) {
             // Create a new empty node inside help.xml and properly register it.
             if (container->getName() == "help" && container.getDynamicPointer<HelpContainer>()) {

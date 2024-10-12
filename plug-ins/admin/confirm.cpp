@@ -86,7 +86,7 @@ COMMAND(Confirm, "confirm")
     }
     else if (arg_is_list( cmd ) && ch->is_immortal( )) 
     {
-        doList( ch, arg_oneof(arguments, "new") );
+        doList( ch, arg_is(arguments, "new") );
     }
     else if (arg_is_show( cmd ) && ch->is_immortal( ))
     {

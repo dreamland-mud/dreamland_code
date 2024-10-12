@@ -116,7 +116,7 @@ COMMAND(CQuest, "quest")
         doInfo(pch);
         return;
     }
-    else if (arg_oneof( cmd, "points", "очки" )) {
+    else if (arg_is(cmd, "points")) {
         doPoints( pch );
         return;
     }
@@ -124,11 +124,11 @@ COMMAND(CQuest, "quest")
         doTime( pch );
         return;
     }
-    else if (arg_oneof( cmd, "stat", "статистика" )) {
+    else if (arg_is(cmd, "stat")) {
         doStat( pch );
         return;
     }
-    else if (arg_oneof( cmd, "set", "установить" ) && pch->isCoder( )) {
+    else if (arg_is(cmd, "set") && pch->isCoder( )) {
         doSet( pch, arguments );
         return;
     } else if (arg_is_help( cmd )) {
@@ -141,9 +141,9 @@ COMMAND(CQuest, "quest")
     // Parse quest trading commands.
     if (arg_is_list( cmd ))
         qcmd = QCMD_LIST;
-    else if (arg_oneof( cmd, "buy", "купить" ))
+    else if (arg_is(cmd, "buy"))
         qcmd = QCMD_BUY;
-    else if (arg_oneof( cmd, "trouble", "вернуть" ))
+    else if (arg_is(cmd, "trouble"))
         qcmd = QCMD_TROUBLE;
 
     // Execute quest trading commands.
@@ -177,13 +177,13 @@ COMMAND(CQuest, "quest")
     }
    
     // Parse questor commands.
-    if (arg_oneof( cmd, "request", "попросить", "получить", "просить" )) 
+    if (arg_is(cmd, "request")) 
         qcmd = QCMD_REQUEST;
-    else if (arg_oneof( cmd, "complete", "сдать", "завершить" )) 
+    else if (arg_is(cmd, "complete")) 
         qcmd = QCMD_COMPLETE;
-    else if (arg_oneof( cmd, "cancel", "отменить" )) 
+    else if (arg_is(cmd, "cancel")) 
         qcmd = QCMD_CANCEL;
-    else if (arg_oneof( cmd, "find", "найти" )) 
+    else if (arg_is(cmd, "find")) 
         qcmd = QCMD_FIND;
 
     if (qcmd == QCMD_NONE) {

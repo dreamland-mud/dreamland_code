@@ -88,23 +88,23 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
         return;
     }
 
-    if (arg_oneof_strict(cmd, "flag", "флаг") && ch->isCoder()) {
+    if (arg_is_strict(cmd, "flag") && ch->isCoder()) {
         doFlag(ch, arguments);
         return;
     }
 
-    if (arg_oneof_strict(cmd, "save", "сохранить") && ch->isCoder()) {
+    if (arg_is_strict(cmd, "save") && ch->isCoder()) {
         thread->saveAllBuckets();
         ch->pecho("Ok.");
         return;
     }
 
     if (thread->canRead( ch )) {
-        if (arg_oneof( cmd, "read", "читать" )) {
+        if (arg_is(cmd, "read")) {
             doRead( ch, arguments );
             return;
         }
-        else if (arg_oneof( cmd, "copy", "копировать" ) && !arg_oneof_strict( cmd, "note.to" )) {
+        else if (arg_is(cmd, "copy") && !arg_is_strict( cmd, "note.to" )) {
             doCopy( ch, arguments );
             return;
         }
@@ -112,11 +112,11 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
             doList( ch, arguments );
             return;
         }
-        else if (arg_oneof( cmd, "catchup", "прочитаны" )) {
+        else if (arg_is(cmd, "catchup")) {
             doCatchup( ch );
             return;
         }
-        else if (arg_oneof( cmd, "uncatchup", "непрочитаны" )) {
+        else if (arg_is(cmd, "uncatchup")) {
             doUncatchup( ch, arguments );
             return;
         }
@@ -133,7 +133,7 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
     }
 
     if (thread->canRead( ch )) {
-        if (arg_oneof( cmd, "del", "delete", "удалить" )) {
+        if (arg_is(cmd, "del")) {
             doRemove( ch, arguments );
             return;
         }
@@ -147,7 +147,7 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
 
     attr = ch->getAttributes( ).getAttr<XMLAttributeNoteData>( "notedata" );
     
-    if (thread->canRead( ch ) && arg_oneof( cmd, "forward", "перенаправить" )) {
+    if (thread->canRead( ch ) && arg_is(cmd, "forward")) {
         doForward( ch, attr, arguments );
         return;
     }
@@ -163,15 +163,15 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
         doLineMinus( ch, attr );
         return;
     }
-    else if (arg_oneof( cmd, "subj", "тема" )) {
+    else if (arg_is(cmd, "subj")) {
         doSubject( ch, attr, arguments );
         return;
     }
-    else if (arg_oneof_strict( cmd, "note.to", "к" )) {
+    else if (arg_is_strict( cmd, "note.to" )) {
         doTo( ch, attr, arguments );
         return;
     }
-    else if (arg_oneof_strict( cmd, "note.from", "от" )) {
+    else if (arg_is_strict( cmd, "note.from" )) {
         if (doFrom( ch, attr, arguments ))
             return;
     }
@@ -183,7 +183,7 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
         if (doShow( ch, attr ))
             return;
     }
-    else if (arg_oneof( cmd, "post", "send", "послать", "отправить" )) {
+    else if (arg_is(cmd, "post")) {
         if (doPost( ch, attr ))
             return;
     }
@@ -378,7 +378,7 @@ void NoteCommand::doRead( PCharacter *ch, DLString &arguments ) const
     const Note *note;
     DLString arg = arguments.getOneArgument( );
     
-    if (arg.empty( ) || arg_oneof( arg, "next", "следующий", "дальше" )) {
+    if (arg.empty( ) || arg_is(arg, "next")) {
         note = thread->getNextUnreadNote( ch );
         
         if (note) 

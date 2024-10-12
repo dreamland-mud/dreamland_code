@@ -81,7 +81,7 @@ bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
         field.setBit( bit.getValue( ) );
     else if (arg_is_no(arg) || arg_is_switch_off(arg))
         field.removeBit( bit.getValue( ) );
-    else if (arg_oneof(arg, "toggle", "переключить"))
+    else if (arg_is(arg, "toggle"))
         field.toggleBit( bit.getValue( ) );
     else 
         return false;
@@ -233,22 +233,22 @@ COMMAND(ConfigCommand, "config")
         return;
     }
 
-    if (arg_oneof(arg1, "lang", "язык")) {
+    if (arg_is(arg1, "lang")) {
         config_lang(pch, arg2);
         return; 
     }
 
-    if (arg_oneof(arg1, "scroll", "экран", "буфер")) {
+    if (arg_is(arg1, "scroll")) {
         config_scroll(pch, arg2);
         return; 
     }
 
-    if (arg_oneof(arg1, "telegram", "телеграм")) {
+    if (arg_is(arg1, "telegram")) {
         config_telegram(pch, arg2);
         return;
     }
 
-    if (arg_oneof(arg1, "discord", "дискорд")) {
+    if (arg_is(arg1, "discord")) {
         config_discord(pch, arg2);
         return;
     }

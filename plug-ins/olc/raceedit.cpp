@@ -362,13 +362,13 @@ CMD(raceedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online race editor.")
         return;
     }
 
-    if (arg_oneof(cmd, "create", "создать")) {
+    if (arg_is(cmd, "create")) {
         DLString subcmd = args.getOneArgument();
 
         bool pc;
-        if (arg_oneof(subcmd, "pc", "игрок"))
+        if (arg_is(subcmd, "pc"))
             pc = true;
-        else if (arg_oneof(subcmd, "npc", "mob", "моб"))
+        else if (arg_is(subcmd, "npc"))
             pc = false;
         else {
             stc("Формат: raceedit create pc|npc <name>\r\n", ch);
@@ -443,11 +443,11 @@ CMD(raceedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online race editor.")
             }
         }
 
-        if (arg_has_oneof(args, "count", "mobs", "мобы") || args.empty()) 
+        if (arg_is(args, "count") || args.empty()) 
             sort(races.begin(), races.end(), RaceInfo::compareMobs);
-        else if (arg_has_oneof(args, "name", "имя"))
+        else if (arg_is(args, "name"))
             sort(races.begin(), races.end(), RaceInfo::compareName);
-        else if (arg_has_oneof(args, "rname", "russina", "русское"))
+        else if (arg_is(args, "rname"))
             sort(races.begin(), races.end(), RaceInfo::compareRusName);
 
         ch->send_to(fmt(0, "{C%-15s %-19s {Y%s{x\r\n", "Название", "По-русски", "Мобов"));

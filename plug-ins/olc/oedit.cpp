@@ -252,7 +252,7 @@ OEDIT(show)
 {
     OBJ_INDEX_DATA *pObj;
     int cnt = 0;
-    bool showWeb = !arg_oneof_strict(argument, "noweb");
+    bool showWeb = !arg_is_strict(argument, "noweb");
 
     EDIT_OBJ(ch, pObj);
 

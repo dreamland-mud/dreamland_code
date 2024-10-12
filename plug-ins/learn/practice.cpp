@@ -41,7 +41,7 @@ COMMAND(CPractice, "practice")
         
     if (argument.empty( ) || arg_is_all( argument ))
         pracShow( ch->getPC( ) );
-    else if (arg_oneof_strict( argument, "here", "здесь" ))
+    else if (arg_is_strict(argument, "here"))
         pracHere( ch->getPC( ) );
     else
         pracLearn( ch->getPC( ), argument );

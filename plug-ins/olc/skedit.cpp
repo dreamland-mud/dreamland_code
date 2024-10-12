@@ -293,7 +293,7 @@ SKEDIT(affect, "аффект", "создать обработчик аффект
 {
     DLString arg = argument;
 
-    if (arg_oneof(arg, "create", "создать")) {
+    if (arg_is(arg, "create")) {
         if (getAffect()) {
             stc("Обработчик аффекта уже определен.\r\n", ch);
             return false;
@@ -309,7 +309,7 @@ SKEDIT(affect, "аффект", "создать обработчик аффект
         return true;
     }
 
-    if (arg_oneof(arg, "del", "удалить")) {
+    if (arg_is(arg, "del")) {
         DefaultAffectHandler *ah = getAffect();     
         if (!ah) {
             stc("У этого умения и так нету аффекта.\r\n", ch);
@@ -338,7 +338,7 @@ SKEDIT(action, "действие", "создать команду для это�
     DLString args = argument;
     DLString argOne = args.getOneArgument();
 
-    if (arg_oneof(argOne, "create", "создать")) {
+    if (arg_is(argOne, "create")) {
         if (getCommand()) {
             stc("Команда для этого умения уже существует.\r\n", ch);
             return false;
@@ -367,7 +367,7 @@ SKEDIT(action, "действие", "создать команду для это�
         return true;
     }
 
-    if (arg_oneof(argOne, "del", "удалить")) {
+    if (arg_is(argOne, "del")) {
         DefaultSkillCommand *cmd = getCommand();
         if (!cmd) {
             stc("У этого умения и так нету команды.\r\n", ch);
@@ -395,7 +395,7 @@ SKEDIT(spell, "заклинание", "создать заклинание дл�
 {
     DLString arg = argument;
 
-    if (arg_oneof(arg, "create", "создать")) {
+    if (arg_is(arg, "create")) {
         if (getSpell()) {
             stc("Заклинание уже определено.\r\n", ch);
             return false;
@@ -411,7 +411,7 @@ SKEDIT(spell, "заклинание", "создать заклинание дл�
         return true;
     }
 
-    if (arg_oneof(arg, "delete", "удалить")) {
+    if (arg_is(arg, "delete")) {
         DefaultSpell *s = getSpell();        
         if (!s) {
             stc("У этого умения и так нету заклинаний.\r\n", ch);
@@ -429,7 +429,7 @@ SKEDIT(spell, "заклинание", "создать заклинание дл�
         return true;
     }
 
-    if (arg_oneof(arg, "tier", "крутость")) {
+    if (arg_is(arg, "tier")) {
         DefaultSpell *s = getSpell();        
         if (!checkSpell(s))
             return false;
@@ -486,19 +486,19 @@ SKEDIT(mob, "моб", "доступность умения для мобов")
     lastCmd.setValue(lastCmd + " " + cmd);
     lastArgs = args;
 
-    if (arg_oneof(cmd, "offense", "атаки")) {
+    if (arg_is(cmd, "offense")) {
         return flagBitsEdit(mob->offense);
     }
 
-    if (arg_oneof(cmd, "dice", "дайс")) {
+    if (arg_is(cmd, "dice")) {
         return numberEdit(0, 100, mob->dice);
     }
 
-    if (arg_oneof(cmd, "bonus", "бонус")) {
+    if (arg_is(cmd, "bonus")) {
         return numberEdit(0, 100, mob->bonus);
     }
 
-    if (arg_oneof(cmd, "class", "класс")) {
+    if (arg_is(cmd, "class")) {
         MobProfSkillData *pmob = dynamic_cast<MobProfSkillData *>(mob);
         if (!pmob) {
             stc("У этой конфигурации мобов нету поля для классов.\r\n", ch);
@@ -889,7 +889,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
     }
 
     // Creating new skill.
-    if (arg_oneof(cmd, "create", "создать")) {
+    if (arg_is(cmd, "create")) {
         DLString type = args.getOneArgument();
         BasicSkill::Pointer newSkill;
 
@@ -912,15 +912,15 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
             skillManager->unregistrate(Skill::Pointer(oldSkill));
         }
 
-        if (arg_oneof(type, "class", "класс")) {
+        if (arg_is(type, "class")) {
             newSkill = SkillAlloc::newClassSkill(args);
-        } else if (arg_oneof(type, "clan", "клан")) {
+        } else if (arg_is(type, "clan")) {
             newSkill = SkillAlloc::newClanSkill(args);
-        } else if (arg_oneof(type, "orden", "орден")) {
+        } else if (arg_is(type, "orden")) {
             newSkill = SkillAlloc::newOrdenSkill(args);
-        } else if (arg_oneof(type, "race", "раса")) {
+        } else if (arg_is(type, "race")) {
             newSkill = SkillAlloc::newRaceSkill(args);
-        } else if (arg_oneof(type, "other", "другое", "разное")) {
+        } else if (arg_is(type, "other")) {
             newSkill = SkillAlloc::newOtherSkill(args);
         } else {
             stc("Укажи вид нового умения: class, clan, race или other.\r\n", ch);
@@ -950,15 +950,15 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
         if (!args.empty()) {
             if (arg_is_all(args))
                 all = true;
-            else if (arg_oneof(args, "active", "активные"))
+            else if (arg_is(args, "active"))
                 active = true;
-            else if (arg_oneof(args, "passive", "пассивные"))
+            else if (arg_is(args, "passive"))
                 passive = true;
-            else if (arg_oneof(args, "magic", "магия"))
+            else if (arg_is(args, "magic"))
                 magic = true;
-            else if (arg_oneof(args, "prayer", "молитвы"))
+            else if (arg_is(args, "prayer"))
                 prayer = true;
-            else if (arg_oneof(args, "invalid"))
+            else if (arg_is(args, "invalid"))
                 invalid = true;
             else {
                 group = skillGroupManager->findUnstrict(args);

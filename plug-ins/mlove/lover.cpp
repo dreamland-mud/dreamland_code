@@ -41,9 +41,9 @@ COMMAND(Lover, "lover")
         usage( ch );
     else if (arg_is_list( cmd ))
         list( ch, arguments );
-    else if (arg_oneof( cmd, "add", "добавить" ))
+    else if (arg_is(cmd, "add"))
         add( ch, arguments );
-    else if (arg_oneof( cmd, "del", "удалить" ))
+    else if (arg_is(cmd, "del"))
         del( ch, arguments );
     else 
         usage( ch );

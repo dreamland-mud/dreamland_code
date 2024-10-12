@@ -43,7 +43,7 @@ CMDRUNP( listen )
 
     argument = one_argument( argument, arg );
 
-    if (!arg[0] || arg_oneof_strict( arg, "room", "комната" )) {
+    if (!arg[0] || arg_is_strict(arg, "room")) {
         bool rc = false;
 
         oldact("Ты прислушиваешься.", ch, 0, 0, TO_CHAR);
@@ -162,7 +162,7 @@ CMDRUNP( smell )
      * - room onSmell trigger, if returns true, overrides index data property
      * - smells from all affects are shown next (onSmellRoom)
      */
-    if (!arg[0] || arg_oneof_strict( arg, "room", "комната" )) {
+    if (!arg[0] || arg_is_strict(arg, "room")) {
         bool rc = false;
 
         oldact("Ты нюхаешь воздух.", ch, 0, 0, TO_CHAR);
@@ -187,7 +187,7 @@ CMDRUNP( smell )
         return;
     }
 
-    if (arg_oneof_strict( arg, "desc", "описание")) {
+    if (arg_is_strict(arg, "desc")) {
         if (ch->is_npc( ))
             return;
         
@@ -201,7 +201,7 @@ CMDRUNP( smell )
             return;
         }
 
-        if (arg_oneof_strict( argument, "clear", "очистить" )) {
+        if (arg_is_strict(argument, "clear")) {
             attr->setValue( "" );
             ch->pecho( "Теперь ты никак не пахнешь." );
             return;

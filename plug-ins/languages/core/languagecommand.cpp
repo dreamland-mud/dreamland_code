@@ -90,17 +90,17 @@ void LanguageCommand::run( Character *ach, const DLString &constArguments )
         return;
     }
         
-    if (arg_oneof( arg, "sense", "смысл" )) {
+    if (arg_is(arg, "sense")) {
         doIdent( ch, arguments );
         return;
     }
 
-    if (arg_oneof( arg, "forget", "забыть" )) {
+    if (arg_is(arg, "forget")) {
         doForget( ch, arguments );
         return;
     }
 
-    if (arg_oneof( arg, "remember", "запомнить" )) {
+    if (arg_is(arg, "remember")) {
         doRemember( ch, arguments );
         return;
     }

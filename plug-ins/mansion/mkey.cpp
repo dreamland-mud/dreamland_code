@@ -33,11 +33,11 @@ COMMAND(MKey, "mkey")
     }
     
     if (ch->is_immortal( )) {
-        if (arg_oneof( cmd, "give", "grant", "дать" )) {
+        if (arg_is(cmd, "give")) {
             doGrant( ch, arguments );
             return;
         }
-        else if (arg_oneof( cmd, "remove", "забрать" )) {
+        else if (arg_is(cmd, "remove")) {
             doRemove( ch, arguments );
             return;
         }
@@ -47,7 +47,7 @@ COMMAND(MKey, "mkey")
         }
     }
     
-    if (arg_is_list( cmd ) || arg_oneof( cmd, "buy", "купить" )) {
+    if (arg_is_list( cmd ) || arg_is(cmd, "buy")) {
         MansionKeyMaker::Pointer maker;
 
         maker = find_people_behavior<MansionKeyMaker>( ch->in_room );

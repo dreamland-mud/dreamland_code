@@ -59,7 +59,7 @@ bool help_subcommand(PCharacter *ch, const DLString &argument, HelpPointer &help
         return true;
     }
 
-    if (arg_oneof(arg, "create", "создать")) {
+    if (arg_is(arg, "create")) {
         if (help && help->getID() > 0) {
             ptc(ch, "Справка уже существует, используй команду {y{hchelp{x для редактирования.\r\n");
             return false;

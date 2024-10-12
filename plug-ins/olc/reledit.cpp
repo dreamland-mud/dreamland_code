@@ -300,7 +300,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         return;
     }
 
-    if (arg_oneof(cmd, "create", "создать")) {
+    if (arg_is(cmd, "create")) {
         static RegExp namePattern("^[a-z ]{2,}$", true);
         if (args.empty() || !namePattern.match(args)) {
             stc("Укажите английское название религии маленькими буквами.\r\n", ch);
@@ -331,7 +331,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         return;
     }
 
-    if (arg_oneof(cmd, "mark", "знак")) {
+    if (arg_is(cmd, "mark")) {
         ch->send_to(fmt(0, 
             "{C%-15s %-17s %-6s %s{x\r\n", "Название", "Русское имя", "VNUM", "Описание"));        
 

@@ -130,7 +130,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         }
 
         // Found "sortby" argument, check if it's "sortby <criteria>".
-        if (arg_oneof(t, "sortby", "сортировать")) {
+        if (arg_is(t, "sortby")) {
             if (criteria) {
                 buf << "Критерий сортировки не может быть задан дважды." << endl;
                 return false;
@@ -138,11 +138,11 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
 
             if (i != tokens.size() - 1) {
                 DLString nextToken = tokens[i+1];
-                if (arg_oneof( nextToken, "name", "имя" ))
+                if (arg_is(nextToken, "name"))
                     criteria = SkillInfo::cmp_by_name;
-                else if (arg_oneof( nextToken, "level", "уровень" ))
+                else if (arg_is(nextToken, "level"))
                     criteria = SkillInfo::cmp_by_level;
-                else if (arg_oneof( nextToken, "learned", "изучено" ))
+                else if (arg_is(nextToken, "learned"))
                     criteria = SkillInfo::cmp_by_learned;
                 else {
                     buf << "Неправильный критерий сортировки '" << nextToken << "', допустимые значения: 'имя', 'уровень' или 'изучено'" << endl;
@@ -158,22 +158,22 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         }
 
         // Skill type specifiers:
-        if (arg_oneof(t, "skills", "навыки")) {
+        if (arg_is(t, "skills")) {
             fPassive = fActive = true;
             i++;
             continue;
         }
-        if (arg_oneof(t, "spells", "заклинания")) {
+        if (arg_is(t, "spells")) {
             fSpell = true;
             i++;
             continue;
         }
-        if (arg_oneof(t, "passive", "пассивные")) {
+        if (arg_is(t, "passive")) {
             fPassive = true;
             i++;
             continue;
         }
-        if (arg_oneof(t, "active", "commands", "команды", "активные")) {
+        if (arg_is(t, "active")) {
             fActive = true;
             i++;
             continue;

@@ -704,7 +704,7 @@ CMDRUNP(searcher)
         return;
     }
 
-    if (arg_oneof(arg, "pets")) {
+    if (arg_is(arg, "pets")) {
         if (task.dumpPets())
             ch->pecho("Created /tmp/db_pets.json file.");
         else
@@ -713,7 +713,7 @@ CMDRUNP(searcher)
         return;
     }
 
-    if (arg_oneof(arg, "armor")) {
+    if (arg_is(arg, "armor")) {
         if (task.dumpArmor()) 
             ch->pecho("Created /tmp/db_armor.json file.");
         else
@@ -722,7 +722,7 @@ CMDRUNP(searcher)
         return;
     }
 
-    if (arg_oneof(arg, "magic")) {
+    if (arg_is(arg, "magic")) {
         if (task.dumpMagic()) 
             ch->pecho("Created /tmp/db_magic.json file.");
         else
@@ -731,7 +731,7 @@ CMDRUNP(searcher)
         return;
     }
     
-    if (arg_oneof(arg, "weapon")) {
+    if (arg_is(arg, "weapon")) {
         if (task.dumpWeapon()) 
             ch->pecho("Created /tmp/db_weapon.json file.");
         else
@@ -740,7 +740,7 @@ CMDRUNP(searcher)
         return;
     }
 
-    if (arg_oneof(arg, "query")) {
+    if (arg_is(arg, "query")) {
 
         if (args.empty()) {
             ch->pecho("Usage: searcher q <query string>\nSee 'help searcher' for details.");
@@ -817,7 +817,7 @@ CMDRUNP(searcher)
         return;
     }
 
-    if (arg_oneof(arg, "wquery")) {
+    if (arg_is(arg, "wquery")) {
 
         if (args.empty()) {
             ch->pecho("Usage: searcher wq <query string>\nSee 'help searcher' for details.");
@@ -900,7 +900,7 @@ CMDRUNP(searcher)
         return;
     }
 
-    if (arg_oneof(arg, "squery")) {
+    if (arg_is(arg, "squery")) {
 
         if (args.empty()) {
             ch->pecho("Usage: searcher sq <query string>\nSee 'help searcher' for details.");
@@ -972,7 +972,7 @@ CMDRUNP(searcher)
         return;
     }
 
-    if (arg_oneof(arg, "mquery")) {
+    if (arg_is(arg, "mquery")) {
 
         if (args.empty()) {
             ch->pecho("Usage: searcher mq <query string>\nSee 'help searcher' for details.");

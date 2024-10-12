@@ -52,7 +52,7 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
 
     arg = argument.getOneArgument( );
     
-    if (arg_oneof(arg, "revert", "sell", "продать")) {
+    if (arg_is(arg, "revert")) {
         if (client->train < 1) {
             tell_act( client, ch, "У тебя нет тренировочных сессий." );
             return;
@@ -66,7 +66,7 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
         return;
     }
 
-    if (arg_oneof(arg, "convert", "buy", "купить")) {
+    if (arg_is(arg, "convert")) {
         if (client->practice < 10) {
             tell_act( client, ch, "У тебя недостаточно практик -- надо 10." );
             return;
@@ -234,8 +234,8 @@ CMDRUN( train )
         return;
     }
     
-    if (arg_oneof(argument, "revert", "sell", "продать")
-        || arg_oneof(argument, "buy", "купить")
+    if (arg_is(argument, "revert")
+        || arg_is(argument, "buy")
         || (argument.strPrefix("convert") && argument != "con"))
 
     {

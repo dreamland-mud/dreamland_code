@@ -194,7 +194,7 @@ CMDRUNP( replay )
     }
 
     // Display private messages only.
-    if (arg_oneof( arg, "личные", "персональные", "private", "personal" )) {
+    if (arg_is(arg, "private")) {
         ostringstream buf;
 
         if (!replay_history_private( buf, pch, limit )) {
@@ -209,7 +209,7 @@ CMDRUNP( replay )
     }
 
     // Display public messages only.
-    if (arg_oneof( arg, "общие", "публичные", "public" )) {
+    if (arg_is(arg, "public")) {
         ostringstream buf;
 
         if (!replay_history_public( buf, pch, limit )) {
@@ -224,7 +224,7 @@ CMDRUNP( replay )
     }
 
     // Display nearby messages and socials.
-    if (arg_oneof( arg, "рядом", "nearby" )) {
+    if (arg_is(arg, "nearby")) {
         ostringstream buf;
 
         if (!replay_history_near( buf, pch, limit )) {

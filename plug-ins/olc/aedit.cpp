@@ -268,7 +268,7 @@ AEDIT(quest, "квест", "редактировать квесты в зоне"
     }
 
     // 'quest create' 'quest create 2300'
-    if (arg_oneof(arg, "create", "создать")) {
+    if (arg_is(arg, "create")) {
         DLString argVnum = args.getOneArgument();
         Integer vnum;
 
@@ -311,7 +311,7 @@ AEDIT(quest, "квест", "редактировать квесты в зоне"
     }   
 
     // 'quest delete 2300'
-    if (arg_oneof(arg, "del", "удалить")) {
+    if (arg_is(arg, "del")) {
         arg = args.getOneArgument();
         AreaQuest *q = arg_areaquest(arg, original);
 
@@ -383,7 +383,7 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
         return false;
     }
 
-    if (arg_oneof(arg, "create", "создать")) {
+    if (arg_is(arg, "create")) {
         AreaHelp *ahelp = area_selfhelp(original);
         if (!ahelp) {
             ch->pecho("Не найдена автоматическая справка по этой зоне, что-то поломалось.");

@@ -107,7 +107,7 @@ CMDADM( ireward )
         return;
     }
 
-    if (arg_oneof(qpStr, "удалить", "del")) {
+    if (arg_is(qpStr, "del")) {
         pci->getAttributes().eraseAttribute(ATTRNAME);
         PCharacterManager::saveMemory(pci);
         ch->pecho("Удалены все награды.");

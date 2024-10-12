@@ -973,7 +973,7 @@ CMDRUNP(report)
 
     vector<Skill::Pointer> skills, skillsFight, spells, passives;
     ostringstream result;
-    bool showAll = arg_oneof(arg, "all", "все", "full", "полный");
+    bool showAll = arg_is(arg, "all");
     bool shown = false;
     bool noCarry = pet->canCarryNumber( ) == 0;
     noCarry |= !pet->wearloc.isSet(wear_wield);
@@ -1567,23 +1567,23 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     }
    
-    if (arg_oneof(arg, "hp", "здоровье", "hp")) {
+    if (arg_is(arg, "hp")) {
         ch->pecho("Здоровье %d из %d.", ch->hit, ch->max_hit);
         return;
     } 
-    if (arg_oneof(arg, "mana", "мана", "энергия")) {
+    if (arg_is(arg, "mana")) {
         ch->pecho("Мана %d из %d.", ch->mana, ch->max_mana);
         return;
     } 
-    if (arg_oneof(arg, "moves", "движение", "шаги")) {
+    if (arg_is(arg, "moves")) {
         ch->pecho("Шагов %d из %d.", ch->move, ch->max_move);
         return;
     } 
-    if (arg_oneof(arg, "level", "уровень")) {
+    if (arg_is(arg, "level")) {
         ch->pecho("Уровень %d.", ch->getRealLevel());
         return;
     } 
-    if (arg_oneof(arg, "race", "раса")) {
+    if (arg_is(arg, "race")) {
         if (ch->getRace()->isPC()) {
             PCRace::Pointer pcRace = ch->getRace()->getPC(); 
             ch->pecho("Ты %N1.", GET_SEX(ch,
@@ -1593,39 +1593,39 @@ static void do_score_args(Character *ch, const DLString &arg)
         }
         return;
     } 
-    if (arg_oneof(arg, "sex", "gender", "пол")) {   
-        ch->pecho("Пол %s.", GET_SEX(ch, "потерян", "мужской", "женский"));
+    if (arg_is(arg, "sex")) {   
+        ch->pecho("Пол %s.", GET_SEX(ch, "мужской", "потерян", "женский"));
         return;
     }
-    if (arg_oneof(arg, "class", "класс", "profession", "профессия")) {
+    if (arg_is(arg, "class")) {
         ch->pecho("Ты %N1.", ch->getProfession()->getRusName().c_str());
         return;
     } 
-    if (arg_oneof(arg, "align", "натура")) {
+    if (arg_is(arg, "align")) {
         ch->pecho("У тебя %s натура.", align_name_short(ch, Grammar::MultiGender::FEMININE));
         return;
     } 
-    if (arg_oneof(arg, "ethos", "этос")) {
+    if (arg_is(arg, "ethos")) {
         ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos, '1').c_str());
         return;
     } 
-    if (arg_oneof(arg, "hometown", "дом")) {
+    if (arg_is(arg, "hometown")) {
         Room *room = get_room_instance(pch->getHometown()->getAltar());
         ch->pecho("Твой дом - %s.", room ? room->areaName().c_str() : "потерян");
         return;
     } 
-    if (arg_oneof(arg, "religion", "религия")) {
+    if (arg_is(arg, "religion")) {
         if (ch->getReligion() == god_none)
             ch->pecho("Ты не определил%Gось|ся|ась с выбором религии.", ch);
         else
             ch->pecho("Религия %s.", ch->getReligion()->getRussianName().ruscase('1').c_str());
         return;
     } 
-    if (arg_oneof(arg, "practice", "практики")) {
+    if (arg_is(arg, "practice")) {
         ch->pecho("Практик %d.", pch->practice);
         return;
     } 
-    if (arg_oneof(arg, "train", "тренировки")) {
+    if (arg_is(arg, "train")) {
         ch->pecho("Тренировки %d.", pch->train);
         return;
     } 
@@ -1633,58 +1633,58 @@ static void do_score_args(Character *ch, const DLString &arg)
         ch->pecho("Используй команды {y{hcквест время{x и {y{hcквест очки{x.");
         return;
     } 
-    if (arg_oneof(arg, "wimpy", "трусость")) {
+    if (arg_is(arg, "wimpy")) {
         ch->pecho("Трусость %d.", ch->wimpy);
         return;
     } 
-    if (arg_oneof(arg, "death", "смертей", "смерть")) {
+    if (arg_is(arg, "death")) {
         ch->pecho("Смертей %d.", pch->death);
         return;
     } 
-    if (arg_oneof(arg, "position", "положение", "позиция")) {
+    if (arg_is(arg, "position")) {
         ch->pecho(msgtable_lookup(msg_positions, ch->position));
         return;
     }
-    if (arg_oneof(arg, "gold", "золото")) {
+    if (arg_is(arg, "gold")) {
         ch->pecho("Золота %d.", ch->gold);
         return;
     } 
-    if (arg_oneof(arg, "silver", "серебро")) {
+    if (arg_is(arg, "silver")) {
         ch->pecho("Серебра %d.", ch->silver);
         return;
     } 
-    if (arg_oneof(arg, "weight", "вес")) {
+    if (arg_is(arg, "weight")) {
         ch->pecho("Вес %d из %d.", ch->getCarryWeight()/10, ch->canCarryWeight()/10);
         return;
     } 
-    if (arg_oneof(arg, "items", "вещи")) {
+    if (arg_is(arg, "items")) {
         ch->pecho("Вещи %d из %d.", ch->carry_number, ch->canCarryNumber());
         return;
     } 
-    if (arg_oneof(arg, "exp", "опыт")) {
+    if (arg_is(arg, "exp")) {
         ch->pecho("Опыта до уровня %d.", pch->getExpToLevel());
         return;
     }
-    if (arg_oneof(arg, "age", "возраст")) {
+    if (arg_is(arg, "age")) {
         ch->pecho("Возраст %d.", pch->age.getYears());
         return;
     }
 
-    if (arg_oneof(arg, "hr", "точность")) {
+    if (arg_is(arg, "hr")) {
         ch->pecho("Точность %d.", ch->hitroll);
         return;
     } 
-    if (arg_oneof(arg, "dr", "урон")) {
+    if (arg_is(arg, "dr")) {
         ch->pecho("Урон %d.", ch->damroll);
         return;
     } 
-    if (arg_oneof(arg, "ac", "класс брони", "защита")) {
+    if (arg_is(arg, "ac")) {
         ch->pecho("Защита от уколов %d, ударов %d, разрезов %d, экзотики %d.", 
                     GET_AC(ch, AC_PIERCE), GET_AC(ch, AC_BASH),
                     GET_AC(ch, AC_SLASH), GET_AC(ch, AC_EXOTIC));
         return;
     }
-    if (arg_oneof(arg, "saves", "спассбросок", "защита от заклинаний")) {
+    if (arg_is(arg, "saves")) {
         ch->pecho("Защита от заклинаний %d.", ch->saving_throw);
         return;
     }
@@ -2211,23 +2211,23 @@ private:
 
         // Reduce "help skill bash" to just "help bash".
         if (!argRest.empty()) {
-            if (arg_oneof(arg1, "умение", "навык", "skill")) {
+            if (arg_is(arg1, "skill")) {
                 preferredLabels.insert("skill");
                 preferredLabels.insert("spell");
             }
-            else if (arg_oneof(arg1, "заклинание", "spell"))
+            else if (arg_is(arg1, "spell"))
                 preferredLabels.insert("spell");
-            else if (arg_oneof(arg1, "класс", "class"))
+            else if (arg_is(arg1, "class"))
                 preferredLabels.insert("class");
-            else if (arg_oneof(arg1, "раса", "race"))
+            else if (arg_is(arg1, "race"))
                 preferredLabels.insert("race");
-            else if (arg_oneof(arg1, "команда", "command"))
+            else if (arg_is(arg1, "command"))
                 preferredLabels.insert("cmd");
-            else if (arg_oneof(arg1, "зона", "area", "zone"))
+            else if (arg_is(arg1, "area"))
                 preferredLabels.insert("area");
-            else if (arg_oneof(arg1, "религия", "religion"))
+            else if (arg_is(arg1, "religion"))
                 preferredLabels.insert("religion");
-            else if (arg_oneof(arg1, "клан", "clan"))
+            else if (arg_is(arg1, "clan"))
                 preferredLabels.insert("clan");
         }
     }

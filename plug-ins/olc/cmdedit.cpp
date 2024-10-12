@@ -297,7 +297,7 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
         return;
     }
 
-    if (arg_oneof(cmd, "ua")) {
+    if (arg_is(cmd, "ua")) {
         ostringstream buf;
 
         for (auto &cmd: commandManager->getCommands()) {
@@ -317,7 +317,7 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
     }
 
     // Creating new command
-    if (arg_oneof(cmd, "create", "создать")) {
+    if (arg_is(cmd, "create")) {
         DLString name = args.getOneArgument().toLower();
         CommandElement::Pointer newCommand;        
 

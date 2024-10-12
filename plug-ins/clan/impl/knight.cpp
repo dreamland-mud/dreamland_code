@@ -373,21 +373,21 @@ COMMAND(COrden, "orden")
     {
         orgs->doList(pch);
     }
-    else if (arg_oneof(cmd, "induct", "принять"))
+    else if (arg_is(cmd, "induct"))
     {
         if (arg_is_self(arg))
             orgs->doSelfInduct(pch, arguments);
         else
             orgs->doInduct(pch, arg);
     }
-    else if (arg_oneof(cmd, "remove", "выгнать", "уйти"))
+    else if (arg_is(cmd, "remove"))
     {
         if (arg_is_self(arg))
             orgs->doSelfRemove(pch);
         else
             orgs->doRemove(pch, arg);
     }
-    else if (arg_oneof(cmd, "member", "члены"))
+    else if (arg_is(cmd, "member"))
     {
         orgs->doMembers(pch, arg);
     }

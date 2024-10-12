@@ -250,13 +250,13 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         areas.push_back(pArea);
     }
 
-    if (arg_has_oneof(arg, "vnum", "внум")) 
+    if (arg_is(arg, "vnum")) 
         sort(areas.begin(), areas.end(), area_cmp_vnum);
-    else if (arg_has_oneof(arg, "name", "имя"))
+    else if (arg_is(arg, "name"))
         sort(areas.begin(), areas.end(), area_cmp_name);
-    else if (arg_has_oneof(arg, "file", "файл"))
+    else if (arg_is(arg, "file"))
         sort(areas.begin(), areas.end(), area_cmp_filename);
-    else if (arg_has_oneof(arg, "flag", "флаг") && !args.empty())
+    else if (arg_is(arg, "flag") && !args.empty())
         flagName = args;
     else if (!arg.empty()) {
         ch->pecho("Формат:\r\nalist - список всех арий\r\nalist vnum|name|file - список арий, отсортированный по критерию");

@@ -96,7 +96,7 @@ CMDRUNP( description )
         return;
     }
 
-    if (arg_oneof( arg, "paste", "вставить" )) {
+    if (arg_is(arg, "paste")) {
         if (!ch->getPC( )) 
             return;
 

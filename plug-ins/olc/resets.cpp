@@ -362,7 +362,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     // Randomize exits.
-    if (arg_oneof(arg1, "void", "пустота")) {
+    if (arg_is(arg1, "void")) {
         RoomIndexData *pRoom = ch->in_room->pIndexData;
 
         for (auto &reset: pRoom->resets) {
@@ -383,7 +383,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     // Syntax: search <vnum>, search rand_stat, search <vnum> rand_stat
-    if (arg_oneof(arg1, "search", "поиск")) {
+    if (arg_is(arg1, "search")) {
         ostringstream buf;
         DLString args = argument;
         DLString argVnum = args.getOneArgument();
@@ -449,7 +449,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
 
-        if (arg_oneof(arg2, "flag", "флаг")) {
+        if (arg_is(arg2, "flag")) {
             int insert_loc = find_reset(pRoom, arg1);
             if (insert_loc < 0) {
                 stc("Reset with this number not found.\r\n", ch);
@@ -477,7 +477,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         argument = one_argument(argument, arg3);
         argument = one_argument(argument, arg4);
 
-        if (arg_oneof(arg2, "rand", "ранд")) {
+        if (arg_is(arg2, "rand")) {
             int insert_loc = find_reset(pRoom, arg1);
             if (insert_loc < 0) {
                 stc("Reset with this number not found.\r\n", ch);
@@ -515,7 +515,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
 
-        if (arg_oneof(arg2, "tier", "тиер")) {
+        if (arg_is(arg2, "tier")) {
             int insert_loc = find_reset(pRoom, arg1);
             if (insert_loc < 0) {
                 stc("Reset with this number not found.\r\n", ch);
@@ -537,7 +537,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
 
-        if (arg_oneof(arg2, "wearloc", "слот")) {
+        if (arg_is(arg2, "wearloc")) {
             int insert_loc = find_reset(pRoom, arg1);
             if (insert_loc < 0) {
                 stc("Reset with this number not found.\r\n", ch);

@@ -435,7 +435,7 @@ SKILL_RUNP( manacles )
         // Well let's look for action
         argument =  one_argument( argument, arg );
 
-        if ( arg[0] == '\0' || arg_oneof_strict( arg, "check", "проверка" ))
+        if ( arg[0] == '\0' || arg_is_strict(arg, "check"))
         {
 
                 oldact_p("$c1 бросает быстрый взгляд на твои руки.",
@@ -472,7 +472,7 @@ SKILL_RUNP( manacles )
                 }
         
         } else
-        if (arg_oneof_strict( arg, "manacles.remove", "снять" ))
+        if (arg_is_strict(arg, "manacles.remove"))
         {
                 if ( victim->isAffected(gsn_manacles) )
                 {
@@ -495,7 +495,7 @@ SKILL_RUNP( manacles )
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
                 }
         }
-        else if (arg_oneof_strict( arg, "manacles.place", "заковать" ))
+        else if (arg_is_strict(arg, "manacles.place"))
         {
                 int success = 0;
                 int duration;
@@ -1035,7 +1035,7 @@ SKILL_RUNP( suspect )
 
                 return;
         }
-        else if (arg_oneof_strict( arg, "suspect.off", "отменить" ))
+        else if (arg_is_strict(arg, "suspect.off"))
         {
                 if ( !victim->isAffected(gsn_suspect) )
                 {
@@ -1152,7 +1152,7 @@ SKILL_RUNP( jail )
         // Well let's look for action
         argument =  one_argument( argument, arg );
 
-        if ( arg[0] == '\0' || arg_oneof_strict( arg, "check", "проверка" ))
+        if ( arg[0] == '\0' || arg_is_strict(arg, "check"))
         {
 
                 oldact_p("$c1 пристально смотрит на ТЕБЯ.",
@@ -1189,7 +1189,7 @@ SKILL_RUNP( jail )
                 }
         
         } 
-        else if (arg_oneof_strict( arg, "jail.remove", "освободить" ))
+        else if (arg_is_strict(arg, "jail.remove"))
         {
                 if ( victim->isAffected(gsn_jail) )
                 {
@@ -1212,7 +1212,7 @@ SKILL_RUNP( jail )
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
                 }
         }
-        else if (arg_oneof_strict( arg, "jail.place", "приговорить" ))
+        else if (arg_is_strict(arg, "jail.place"))
         {
                 int duration;
 
@@ -1322,7 +1322,7 @@ SKILL_RUNP( dismiss )
 
         argument =  one_argument( argument, arg );
 
-        if ( arg[0] == '\0' || arg_oneof_strict( arg, "check", "проверка" ))
+        if ( arg[0] == '\0' || arg_is_strict(arg, "check"))
         {
 
                 oldact_p("$c1 роется в твоем личном деле.",
@@ -1356,7 +1356,7 @@ SKILL_RUNP( dismiss )
                 }
         
         } 
-        else if (arg_oneof_strict( arg, "dismiss.remove", "вернуть" ))
+        else if (arg_is_strict(arg, "dismiss.remove"))
         {
                 if ( victim->isAffected(gsn_dismiss) )
                 {
@@ -1374,7 +1374,7 @@ SKILL_RUNP( dismiss )
                         ch->pecho("Расслабься. Все на своих местах и пашут как кони!");
                 }
         }
-        else if (arg_oneof_strict( arg, "dismiss.place", "лишить" ))
+        else if (arg_is_strict(arg, "dismiss.place"))
         {
                 int duration;
 

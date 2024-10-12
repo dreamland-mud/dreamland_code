@@ -36,7 +36,7 @@ CMDADM( profile )
 
     PCMemoryInterface *pcm = PCharacterManager::find(playerName);
 
-    if (arg_oneof(arg, "recover")) {
+    if (arg_is(arg, "recover")) {
         if (pcm && pcm->isOnline()) {
             ch->pecho("Персонаж сейчас в мире, не могу перезаписать профайлы.");
             return;
@@ -51,7 +51,7 @@ CMDADM( profile )
         return;
     }
 
-    if (arg_oneof(arg, "unremort")) {
+    if (arg_is(arg, "unremort")) {
         if (pcm && pcm->isOnline()) {
             ch->pecho("Персонаж сейчас в мире, не могу перезаписать профайлы.");
             return;
@@ -73,7 +73,7 @@ CMDADM( profile )
         return;
     }
 
-    if (arg_oneof(arg, "undelete")) {
+    if (arg_is(arg, "undelete")) {
         if (pcm && pcm->isOnline()) {
             ch->pecho("Персонаж сейчас в мире, не могу перезаписать профайлы.");
             return;
@@ -88,7 +88,7 @@ CMDADM( profile )
         return;
     }
 
-    if (arg_oneof(arg, "buildplot")) {
+    if (arg_is(arg, "buildplot")) {
         if (!dreamland->hasOption(DL_BUILDPLOT)) {
             ch->pecho("Эту команду разумнее использовать на стройплощадке.");
             return;
@@ -128,7 +128,7 @@ CMDADM( profile )
         return;
     }
 
-    if (arg_oneof(arg, "backup")) {
+    if (arg_is(arg, "backup")) {
         if (pcm->isOnline()) {
             ch->pecho("Персонаж в мире, сохраняю.");
             pcm->getPlayer()->save();

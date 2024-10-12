@@ -33,11 +33,11 @@ COMMAND(CTwit, "twit")
 
     if (cmd.empty( ))
         doUsage( pch );
-    else if (arg_oneof( cmd, "add", "добавить" ))
+    else if (arg_is(cmd, "add"))
         doAdd( pch, arguments );
     else if (arg_is_list( cmd ))
         doList( pch );
-    else if (arg_oneof( cmd, "del", "удалить" ))
+    else if (arg_is(cmd, "del"))
         doRemove( pch, arguments );
     else
         doUsage( pch );

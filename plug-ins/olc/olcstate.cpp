@@ -895,7 +895,7 @@ bool OLCState::editor(const char *argument, DLString &original, editor_flags fla
     if (arg_is_copy(command)) 
         return editorCopy(original);
 
-    if (arg_oneof_strict(command, "pastedone")) {
+    if (arg_is_strict(command, "pastedone")) {
         bool rc = editorPaste(original, flags);
         if (rc)
             handle(ch->desc, "done");
@@ -1094,7 +1094,7 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
         return editorWeb(JsonUtils::asString(target), lastCmd + " " + bhvNameWithUnderscore + " " + propName + " paste", ED_NO_NEWLINE);
     }
 
-    if (arg_oneof(propValue, "del", "удалить")) {
+    if (arg_is(propValue, "del")) {
         props[bhvName].removeMember(propName);
         ptc(ch, "Свойство %s поведения %s удалено.\r\n", propName.c_str(), bhvName.c_str());
         return true;

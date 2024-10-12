@@ -329,23 +329,26 @@ CMDRUNP( affects )
     if (HAS_SHADOW(ch))
         output.push_front( ShadowAffectOutput( ch->getPC( )->shadow, flags ) );
 
-    if (arg_has_oneof( argument, "time", "время" ))
-        output.sort( __aff_sort_time__ );
-    
-    if (arg_has_oneof( argument, "name", "имя" ))
-        output.sort( __aff_sort_name__ );
+    DLString words = argument;
+    for (auto &word: words.split(" ")) {
+        if (arg_is( word, "time" ))
+            output.sort( __aff_sort_time__ );
+        
+        if (arg_is( word, "name" ))
+            output.sort( __aff_sort_name__ );
 
-    if (arg_has_oneof( argument, "descend", "убыв" ))
-        output.reverse( );
+        if (arg_is( word, "descend" ))
+            output.reverse( );
 
-    if (arg_has_oneof( argument, "short", "brief", "кратко" ))
-        REMOVE_BIT(flags, FSHOW_LINES);
+        if (arg_is( word, "short" ))
+            REMOVE_BIT(flags, FSHOW_LINES);
 
-    if (arg_has_oneof( argument, "nocolor", "безцвета" ))
-        REMOVE_BIT(flags, FSHOW_COLOR);
+        if (arg_is( word, "nocolor" ))
+            REMOVE_BIT(flags, FSHOW_COLOR);
 
-    if (arg_has_oneof( argument, "noempty" ))
-        REMOVE_BIT(flags, FSHOW_EMPTY);
+        if (arg_is( word, "noempty" ))
+            REMOVE_BIT(flags, FSHOW_EMPTY);
+    }
 
     for (o = output.begin( ); o != output.end( ); o++) 
         o->show_affect( buf, flags );

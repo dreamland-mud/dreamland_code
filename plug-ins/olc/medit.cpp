@@ -348,7 +348,7 @@ void OLCStateMobile::statePrompt(Descriptor *d)
 // Mobile Editor Functions.
 MEDIT(show)
 {
-    bool showWeb = !arg_oneof_strict(argument, "noweb");
+    bool showWeb = !arg_is_strict(argument, "noweb");
     Race *race = raceManager->findExisting(mob.race);
 
     ptc(ch, "{GName: [{x%s{G] %s\n\r", 

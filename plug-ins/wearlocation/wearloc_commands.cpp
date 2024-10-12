@@ -68,10 +68,10 @@ CMDRUNP( wear )
     }
     
     if (arg_is_to( argTo ) || arg_is_in( argTo ) || arg_is_on(argTo)) {
-        if (arg_oneof( argVict, "волосы", "hair" )) {
+        if (arg_is(argVict, "hair")) {
             fHair = true;
         }
-        else if (arg_oneof(argVict, "хвост", "tail")) {
+        else if (arg_is(argVict, "tail")) {
             fTail = true;
         }
         else if (( victim = get_char_room( ch, argVict  ) ) == 0) {

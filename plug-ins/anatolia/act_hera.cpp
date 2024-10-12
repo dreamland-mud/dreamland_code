@@ -371,7 +371,7 @@ CMDRUNP( auction )
                 return;
         }
         
-        if (arg_oneof_strict( arg1, "talk", "реклама", "говорить" ))
+        if (arg_is_strict(arg1, "talk"))
         {
             if ( ch != auction->seller ) {
                 ch->pecho("Ты ничего не выставлял%Gо||а на аукцион -- рекламировать тебе нечего.", ch);
@@ -387,7 +387,7 @@ CMDRUNP( auction )
             return;
         }
         
-        if (ch->is_immortal() && arg_oneof_strict( arg1, "stop", "стоп" ))
+        if (ch->is_immortal() && arg_is_strict(arg1, "stop"))
         {
                 if (auction->item == 0)
                 {
@@ -410,7 +410,7 @@ CMDRUNP( auction )
                 }
         }
 
-        if (arg_oneof_strict( arg1, "bet", "ставка" ))
+        if (arg_is_strict(arg1, "bet"))
         {
                 if (auction->item != 0)
                 {

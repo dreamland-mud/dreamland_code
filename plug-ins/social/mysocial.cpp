@@ -42,7 +42,7 @@ COMMAND(MySocial, "mysocial")
         usage( ch );
     else if (name.empty( )) 
         ch->pecho( "Укажи имя социала." );
-    else if (arg_oneof( cmd, "del", "удалить" ))
+    else if (arg_is(cmd, "del"))
         doDelete( ch, attr, name );
     else if (arg_is_show( cmd ))
         doShow( ch, attr, name );
@@ -61,53 +61,53 @@ COMMAND(MySocial, "mysocial")
 
         social->setName( name );
         
-        if (arg_oneof( cmd, "ru", "рус" ))
+        if (arg_is(cmd, "ru"))
         {
             social->setRussianName( arg );
         }
-        else if (arg_oneof( cmd, "noarg_other", "безцели_другие" ))
+        else if (arg_is(cmd, "noarg_other"))
         {
             if (hasMeOnly( ch, arg )) 
                 social->setNoargOther( arg );
             else
                 return;
         }
-        else if (arg_oneof( cmd, "noarg_me", "безцели_я" ))
+        else if (arg_is(cmd, "noarg_me"))
         {
             if (hasNoVariables( ch, arg ))
                 social->setNoargMe( arg );
             else
                 return;
         }
-        else if (arg_oneof( cmd, "auto_me", "насебя_я" ))
+        else if (arg_is(cmd, "auto_me"))
         {
             if (hasNoVariables( ch, arg ))
                 social->setAutoMe( arg );
             else
                 return;
         }
-        else if (arg_oneof( cmd, "auto_other", "насебя_другие" ))
+        else if (arg_is(cmd, "auto_other"))
         {
             if (hasMeOnly( ch, arg ))
                 social->setAutoOther( arg );
             else
                 return;
         }
-        else if (arg_oneof( cmd, "arg_victim", "нацель_жертва" ))
+        else if (arg_is(cmd, "arg_victim"))
         {
             if (hasMeOnly( ch, arg ))
                 social->setArgVictim( arg );
             else
                 return;
         }
-        else if (arg_oneof( cmd, "arg_me", "нацель_я" ))
+        else if (arg_is(cmd, "arg_me"))
         {
             if (hasVictOnly( ch, arg ))
                 social->setArgMe( arg );
             else
                 return;
         }
-        else if (arg_oneof( cmd, "arg_other", "нацель_другие" ))
+        else if (arg_is(cmd, "arg_other"))
         {
             if (hasBoth( ch, arg ))
                 social->setArgOther( arg );

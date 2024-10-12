@@ -26,7 +26,7 @@ bool Koschey::command( Character *victim, const DLString &cmdName, const DLStrin
     if (victim->is_npc( ))
         return false;
 
-    if (arg_oneof(cmdName, "buy", "купить")) {
+    if (arg_is(cmdName, "buy")) {
         doBuy( victim, cmdArgs.quote( ) );
         return true;
     }
@@ -36,7 +36,7 @@ bool Koschey::command( Character *victim, const DLString &cmdName, const DLStrin
         return true;
     }
 
-    if (arg_oneof(cmdName, "sell", "продать") || arg_oneof("value", "цена")) {
+    if (arg_is(cmdName, "sell") || arg_is(cmdName, "value")) {
         tell_dim( victim, ch, "Мне твое жалкое добро ни к чему." );
         return true;
     }

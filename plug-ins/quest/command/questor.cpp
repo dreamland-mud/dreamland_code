@@ -582,7 +582,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         return;
     }
 
-    if (arg_oneof_strict(arg, "any", "любое", "любой")) {
+    if (arg_is_strict(arg, "any")) {
         try {
             QuestManager::getThis( )->generate( client, ch );
             attr->setStartTime();

@@ -206,13 +206,13 @@ COMMAND(NoteHooks, "webdump")
         return;
     }
 
-    if (arg_oneof(name, "news", "changes")) {
+    if (arg_is(name, "news")) {
         webDumpNews();
         ch->pecho("Все новости и изменения сохранены в %s.", NEWS_EXPORT_PATH.c_str());
         return;
     }
 
-    if (arg_oneof(name, "story")) {
+    if (arg_is(name, "story")) {
         webDumpOldStories();
         ch->pecho("Старые истории сохранены в %s.", STORY_OLD_EXPORT_PATH.c_str());
 

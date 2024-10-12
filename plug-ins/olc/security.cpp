@@ -226,7 +226,7 @@ CMD(olcvnum, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         }
 
         // Create a <playername.are> area with 100 vnums and grant permissions to the player.
-        if (arg_oneof(arg2, "create", "создать")) {
+        if (arg_is(arg2, "create")) {
             DLString filename = victim->getName().toLower() + ".are";
             AreaIndexData *area = get_area_index(filename);
             if (area) {

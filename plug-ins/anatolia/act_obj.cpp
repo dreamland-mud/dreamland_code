@@ -586,7 +586,7 @@ CMDRUNP( get )
     }
 
     argContainer = arguments.getOneArgument();
-    if (arg_is_from( argContainer ) || arg_oneof_strict( argContainer, "за", "by" ))
+    if (arg_is_from( argContainer ) || arg_is_strict(argContainer, "by"))
         argContainer = arguments.getOneArgument( );
 
 

@@ -99,26 +99,26 @@ COMMAND(CClan, "clan")
         DLString argument = constArguments;
         DLString argumentOne = argument.getOneArgument( );
         
-        if (arg_is_list( argumentOne ) || arg_oneof( argumentOne, "info", "инфо" ))
+        if (arg_is_list( argumentOne ) || arg_is(argumentOne, "info"))
             clanList( pc );
-        else if (arg_oneof( argumentOne, "count", "счет", "количество" )) 
+        else if (arg_is(argumentOne, "count")) 
             clanCount( pc );
-        else if( arg_oneof( argumentOne, "bank", "банк" ) )
+        else if( arg_is(argumentOne, "bank") )
             clanBank( pc, argument );
-        else if( arg_oneof( argumentOne, "remove", "выгнать", "уйти" ) )
+        else if( arg_is(argumentOne, "remove") )
             clanRemove( pc, argument );
-        else if( arg_oneof( argumentOne, "level", "уровень" ) )
+        else if( arg_is(argumentOne, "level") )
             clanLevel( pc, argument );
-        else if( arg_oneof( argumentOne, "member", "члены", "состав" ) )
+        else if( arg_is(argumentOne, "member") )
             clanMember( pc, argument );
-        else if( arg_oneof( argumentOne, "petition", "петиция", "прошение" ) )
+        else if( arg_is(argumentOne, "petition") )
             clanPetition( pc, argument );
-        else if( arg_oneof( argumentOne, "diplomacy", "дипломатия" ) )
+        else if( arg_is(argumentOne, "diplomacy") )
             clanDiplomacy( pc, argument );
         else if (pc->is_immortal( )) {
-            if (arg_oneof( argumentOne, "scan", "осмотр" ))
+            if (arg_is(argumentOne, "scan"))
                 clanScan( pc );
-            else if (arg_oneof( argumentOne, "induct", "принять" ))
+            else if (arg_is(argumentOne, "induct"))
                 clanInduct( pc, argument );
             else
                 usage( pc );
@@ -341,9 +341,9 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     else
         clan = &*pc->getClan( );
 
-    if (arg_oneof( argumentOne, "deposit", "насчет", "положить" ))    
+    if (arg_is(argumentOne, "deposit"))    
         mode = CB_MODE_DEPOSIT;
-    else if (arg_oneof( argumentOne, "withdraw", "сосчета", "снять" )) 
+    else if (arg_is(argumentOne, "withdraw")) 
         mode = CB_MODE_WITHDRAW;
     else {
         pc->pecho("Можно задать только режим 'положить' или 'снять'.");
@@ -376,13 +376,13 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
         return;
     }
     
-    if (arg_oneof( argumentOne, "qp", "кп" ))    
+    if (arg_is(argumentOne, "qp"))    
         currency = CB_CURR_QP;
-    else if (arg_oneof( argumentOne, "gold", "золото" )) 
+    else if (arg_is(argumentOne, "gold")) 
         currency = CB_CURR_GOLD;
-    else if (arg_oneof( argumentOne, "silver", "серебро" )) 
+    else if (arg_is(argumentOne, "silver")) 
         currency = CB_CURR_SILVER;
-    else if (arg_oneof( argumentOne, "diamond", "бриллианты" )) 
+    else if (arg_is(argumentOne, "diamond")) 
         currency = CB_CURR_DIAMOND;
     else
     {
@@ -412,7 +412,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
 
     if (!argumentOne.empty( )) // Has a destination
     {
-        if (arg_oneof( argumentOne, "clan", "клану" )) {
+        if (arg_is(argumentOne, "clan")) {
             argumentOne = argument.getOneArgument( );
             acc_clan = cm->findUnstrict( argumentOne );
 
@@ -426,7 +426,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
                 return;
             }
         }
-        else if (arg_oneof( argumentOne, "character", "персонажу" )) {
+        else if (arg_is(argumentOne, "character")) {
             argumentOne = argument.getOneArgument( );
             vch = get_char_world( pc, argumentOne.c_str( ) );
 
@@ -1054,13 +1054,13 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
     
     if (!argumentOne.empty( )) {
         
-        if (arg_oneof( argumentOne, "date", "дата", "время" ))
+        if (arg_is(argumentOne, "date"))
             members.sort( __member_cmp_date__ );
-        else if (arg_oneof( argumentOne, "name", "имя" )) 
+        else if (arg_is(argumentOne, "name")) 
             ;
-        else if (arg_oneof( argumentOne, "level", "уровень" ))
+        else if (arg_is(argumentOne, "level"))
             members.sort( __member_cmp_level__ );
-        else if (arg_oneof( argumentOne, "clanlevel", "клануровень" ))
+        else if (arg_is(argumentOne, "clanlevel"))
             members.sort( __member_cmp_clanlevel__ );
         else {
             clanMemberHelp( pc );
@@ -1138,10 +1138,10 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
         if (arg_is_list( argumentOne )) {
             clanPetitionList( pc );
             return; 
-        } else if (arg_oneof( argumentOne, "accept", "принять" )) {
+        } else if (arg_is(argumentOne, "accept")) {
             clanPetitionAccept( pc, argumentTwo );
             return;
-        } else if (arg_oneof( argumentOne, "reject", "отклонить" )) {
+        } else if (arg_is(argumentOne, "reject")) {
             clanPetitionReject( pc, argumentTwo );
             return;
         }
@@ -1396,9 +1396,9 @@ void CClan::clanDiplomacy( PCharacter *pc, DLString& argument )
 
     if (argumentOne.empty( )) 
         clanDiplomacyShow( pc );        
-    else if (arg_oneof( argumentOne, "proposition", "предложения" ))
+    else if (arg_is(argumentOne, "proposition"))
         clanDiplomacyProp( pc );
-    else if (arg_oneof( argumentOne, "set", "установить" ))
+    else if (arg_is(argumentOne, "set"))
         clanDiplomacySet( pc, argument );
     else if (arg_is_list( argumentOne ))
         clanDiplomacyList( pc );

@@ -128,7 +128,7 @@ BEDIT(affect, "аффект", "создать или редактировать 
     Skill *existingSkill = skillManager->findExisting(bhv->getName());
     BasicSkill::Pointer skill = existingSkill ? dynamic_cast<BasicSkill *>(existingSkill) : 0;
 
-    if (arg_oneof(args, "create", "создать")) {
+    if (arg_is(args, "create")) {
         if (skill) {
             ptc(ch, "Умение '%s' уже существует, используй команду {y{hcaffect{x для редактирования.\r\n", skill->getName().c_str());
             return false;
@@ -298,7 +298,7 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
         return;
     }
 
-    if (arg_oneof(cmd, "create", "создать")) {
+    if (arg_is(cmd, "create")) {
         static RegExp namePattern("^[a-z ]{2,}$", true);
         if (args.empty() || !namePattern.match(args)) {
             stc("Укажите английское название поведения маленькими буквами.\r\n", ch);

@@ -32,7 +32,7 @@ COMMAND(Unread, "unread")
         doSpool( pch, true );
         doUnfinished( pch );
     }
-    else if (arg_oneof( args, "next", "следующий", "дальше" ))
+    else if (arg_is(args, "next"))
         doNext( pch );
 }
 
