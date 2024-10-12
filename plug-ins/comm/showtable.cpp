@@ -243,7 +243,7 @@ CMDRUN( wizhelp )
         if (cmd->getLevel( ) <  LEVEL_HERO)
             continue;
 
-        buf << fmt( 0, "{c%-12s {x: %-45s ",
+        buf << fmt( 0, "{c%-12s {x: %-45s\n",
                         cmd->getName( ).c_str( ),
                         cmd->getHint( ).c_str( ));        
     }

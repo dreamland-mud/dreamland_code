@@ -23,6 +23,9 @@ CONFIGURABLE_LOADED(grammar, synonyms)
 // Synonyms lookup by keyword. True if for keyword "help" arg is one of "?", "help", "h", "довідка" etc.
 bool arg_is(const DLString &arg, const DLString &keyword)
 {
+    if (arg.empty())
+        return false;
+
     if (arg.strPrefix(keyword))
         return true;
 
@@ -40,6 +43,9 @@ bool arg_is(const DLString &arg, const DLString &keyword)
 // Exact synonym lookup.
 bool arg_is_strict(const DLString &arg, const DLString &keyword)
 {
+    if (arg.empty())
+        return false;
+
     if (arg == keyword)
         return true;
 

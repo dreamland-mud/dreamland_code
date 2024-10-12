@@ -270,7 +270,7 @@ COMMAND(ConfigCommand, "config")
 
 
 /*-------------------------------------------------------------------------
- * 'scroll' command 
+ * 'config lang'  
  *------------------------------------------------------------------------*/
 static void config_lang(PCharacter *ch, const DLString &constArguments)
 {
@@ -279,11 +279,11 @@ static void config_lang(PCharacter *ch, const DLString &constArguments)
     DLString lang; 
 
     // TODO improve
-    if (arg_oneof(arg, "english", "английский"))
+    if (arg_is(arg, "en"))
         lang = "en";
-    else if (arg_oneof(arg, "ukrainian", "украинский"))
+    else if (arg_is(arg, "ua"))
         lang = "ua";
-    else if (arg_oneof(arg, "russian", "русский"))
+    else if (arg_is(arg, "ru"))
         lang = "ru";
     else {
         ch->pecho("Укажи язык: англ, укр или рус.");
@@ -307,6 +307,9 @@ static void config_lang_print(PCharacter *ch)
                     langname.c_str());
 }
 
+/*-------------------------------------------------------------------------
+ * 'config scroll'  
+ *------------------------------------------------------------------------*/
 static void config_scroll_print(PCharacter *ch)
 {
     DLString lines(ch->lines);
