@@ -472,7 +472,7 @@ SKILL_RUNP( manacles )
                 }
         
         } else
-        if (arg_oneof_strict( arg, "remove", "снять" ))
+        if (arg_oneof_strict( arg, "manacles.remove", "снять" ))
         {
                 if ( victim->isAffected(gsn_manacles) )
                 {
@@ -495,7 +495,7 @@ SKILL_RUNP( manacles )
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
                 }
         }
-        else if (arg_oneof_strict( arg, "place", "заковать" ))
+        else if (arg_oneof_strict( arg, "manacles.place", "заковать" ))
         {
                 int success = 0;
                 int duration;
@@ -1035,7 +1035,7 @@ SKILL_RUNP( suspect )
 
                 return;
         }
-        else if (arg_oneof_strict( arg, "off", "отменить" ))
+        else if (arg_oneof_strict( arg, "suspect.off", "отменить" ))
         {
                 if ( !victim->isAffected(gsn_suspect) )
                 {
@@ -1189,7 +1189,7 @@ SKILL_RUNP( jail )
                 }
         
         } 
-        else if (arg_oneof_strict( arg, "remove", "освободить" ))
+        else if (arg_oneof_strict( arg, "jail.remove", "освободить" ))
         {
                 if ( victim->isAffected(gsn_jail) )
                 {
@@ -1212,7 +1212,7 @@ SKILL_RUNP( jail )
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
                 }
         }
-        else if (arg_oneof_strict( arg, "place", "приговорить" ))
+        else if (arg_oneof_strict( arg, "jail.place", "приговорить" ))
         {
                 int duration;
 
@@ -1356,7 +1356,7 @@ SKILL_RUNP( dismiss )
                 }
         
         } 
-        else if (arg_oneof_strict( arg, "remove", "вернуть" ))
+        else if (arg_oneof_strict( arg, "dismiss.remove", "вернуть" ))
         {
                 if ( victim->isAffected(gsn_dismiss) )
                 {
@@ -1374,7 +1374,7 @@ SKILL_RUNP( dismiss )
                         ch->pecho("Расслабься. Все на своих местах и пашут как кони!");
                 }
         }
-        else if (arg_oneof_strict( arg, "place", "лишить" ))
+        else if (arg_oneof_strict( arg, "dismiss.place", "лишить" ))
         {
                 int duration;
 

@@ -187,7 +187,7 @@ CMDRUNP( smell )
         return;
     }
 
-    if (arg_oneof_strict( arg, "description", "описание")) {
+    if (arg_oneof_strict( arg, "desc", "описание")) {
         if (ch->is_npc( ))
             return;
         

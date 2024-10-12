@@ -331,7 +331,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         return;
     }
 
-    if (arg_oneof(cmd, "tattoo", "татуировка") || arg_oneof(cmd, "mark", "знак")) {
+    if (arg_oneof(cmd, "mark", "знак")) {
         ch->send_to(fmt(0, 
             "{C%-15s %-17s %-6s %s{x\r\n", "Название", "Русское имя", "VNUM", "Описание"));        
 

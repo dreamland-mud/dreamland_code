@@ -1567,7 +1567,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     }
    
-    if (arg_oneof(arg, "hitpoints", "здоровье", "hp")) {
+    if (arg_oneof(arg, "hp", "здоровье", "hp")) {
         ch->pecho("Здоровье %d из %d.", ch->hit, ch->max_hit);
         return;
     } 
@@ -1601,7 +1601,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         ch->pecho("Ты %N1.", ch->getProfession()->getRusName().c_str());
         return;
     } 
-    if (arg_oneof(arg, "alignment", "натура")) {
+    if (arg_oneof(arg, "align", "натура")) {
         ch->pecho("У тебя %s натура.", align_name_short(ch, Grammar::MultiGender::FEMININE));
         return;
     } 
@@ -1661,7 +1661,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         ch->pecho("Вещи %d из %d.", ch->carry_number, ch->canCarryNumber());
         return;
     } 
-    if (arg_oneof(arg, "experience", "опыт")) {
+    if (arg_oneof(arg, "exp", "опыт")) {
         ch->pecho("Опыта до уровня %d.", pch->getExpToLevel());
         return;
     }
@@ -1670,15 +1670,15 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     }
 
-    if (arg_oneof(arg, "hitroll", "точность")) {
+    if (arg_oneof(arg, "hr", "точность")) {
         ch->pecho("Точность %d.", ch->hitroll);
         return;
     } 
-    if (arg_oneof(arg, "damroll", "урон")) {
+    if (arg_oneof(arg, "dr", "урон")) {
         ch->pecho("Урон %d.", ch->damroll);
         return;
     } 
-    if (arg_oneof(arg, "armor class", "класс брони", "защита")) {
+    if (arg_oneof(arg, "ac", "класс брони", "защита")) {
         ch->pecho("Защита от уколов %d, ударов %d, разрезов %d, экзотики %d.", 
                     GET_AC(ch, AC_PIERCE), GET_AC(ch, AC_BASH),
                     GET_AC(ch, AC_SLASH), GET_AC(ch, AC_EXOTIC));

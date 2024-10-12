@@ -116,11 +116,7 @@ COMMAND(CClan, "clan")
         else if( arg_oneof( argumentOne, "diplomacy", "дипломатия" ) )
             clanDiplomacy( pc, argument );
         else if (pc->is_immortal( )) {
-            if (arg_oneof( argumentOne, "rating", "рейтинг" ))
-                clanRating( pc );
-            else if(arg_oneof( argumentOne, "status", "статус" ))
-                clanStatus( pc );
-            else if (arg_oneof( argumentOne, "scan", "осмотр" ))
+            if (arg_oneof( argumentOne, "scan", "осмотр" ))
                 clanScan( pc );
             else if (arg_oneof( argumentOne, "induct", "принять" ))
                 clanInduct( pc, argument );
@@ -1400,7 +1396,7 @@ void CClan::clanDiplomacy( PCharacter *pc, DLString& argument )
 
     if (argumentOne.empty( )) 
         clanDiplomacyShow( pc );        
-    else if (arg_oneof( argumentOne, "prop", "предложения" ))
+    else if (arg_oneof( argumentOne, "proposition", "предложения" ))
         clanDiplomacyProp( pc );
     else if (arg_oneof( argumentOne, "set", "установить" ))
         clanDiplomacySet( pc, argument );

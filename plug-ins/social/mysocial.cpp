@@ -61,7 +61,7 @@ COMMAND(MySocial, "mysocial")
 
         social->setName( name );
         
-        if (arg_oneof( cmd, "rus", "рус" ))
+        if (arg_oneof( cmd, "ru", "рус" ))
         {
             social->setRussianName( arg );
         }

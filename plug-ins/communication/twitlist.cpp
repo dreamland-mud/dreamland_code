@@ -37,7 +37,7 @@ COMMAND(CTwit, "twit")
         doAdd( pch, arguments );
     else if (arg_is_list( cmd ))
         doList( pch );
-    else if (arg_oneof( cmd, "remove", "удалить" ))
+    else if (arg_oneof( cmd, "del", "удалить" ))
         doRemove( pch, arguments );
     else
         doUsage( pch );

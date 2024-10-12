@@ -2,7 +2,7 @@
  *
  * ruffina, 2004
  */
-#include "dlstring.h"
+#include "logstream.h"
 #include "dl_strings.h"
 #include "jsoncpp/json/value.h"
 #include "arg_utils.h"
@@ -29,8 +29,10 @@ bool arg_is(const DLString &arg, const DLString &keyword)
     if (arg.strPrefix(keyword))
         return true;
 
-    if (!synonyms.isMember(keyword))
+    if (!synonyms.isMember(keyword)) {
+        LogStream::sendError() << "arg_is: unknown keyword " << keyword << endl;
         return false;
+    }
 
     for (auto &synon: synonyms[keyword]) {
         if (arg.strPrefix(synon.asString()))
@@ -49,8 +51,10 @@ bool arg_is_strict(const DLString &arg, const DLString &keyword)
     if (arg == keyword)
         return true;
 
-    if (!synonyms.isMember(keyword))
+    if (!synonyms.isMember(keyword)) {
+        LogStream::sendError() << "arg_is_strict: unknown keyword " << keyword << endl;
         return false;
+    }
 
     for (auto &synon: synonyms[keyword]) {
         if (arg == synon.asString())

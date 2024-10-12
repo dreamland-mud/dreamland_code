@@ -311,7 +311,7 @@ AEDIT(quest, "квест", "редактировать квесты в зоне"
     }   
 
     // 'quest delete 2300'
-    if (arg_oneof(arg, "delete", "удалить")) {
+    if (arg_oneof(arg, "del", "удалить")) {
         arg = args.getOneArgument();
         AreaQuest *q = arg_areaquest(arg, original);
 

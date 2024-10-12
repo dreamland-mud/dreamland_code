@@ -413,7 +413,7 @@ COMMAND(CDarkLeague, "darkleague")
         else
             orgs->doRemove(pch, arg);
     }
-    else if (arg_oneof(cmd, "members", "члены"))
+    else if (arg_oneof(cmd, "member", "члены"))
     {
         orgs->doMembers(pch, arg);
     }

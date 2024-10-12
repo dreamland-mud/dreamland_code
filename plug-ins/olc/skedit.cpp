@@ -309,7 +309,7 @@ SKEDIT(affect, "аффект", "создать обработчик аффект
         return true;
     }
 
-    if (arg_oneof(arg, "delete", "удалить")) {
+    if (arg_oneof(arg, "del", "удалить")) {
         DefaultAffectHandler *ah = getAffect();     
         if (!ah) {
             stc("У этого умения и так нету аффекта.\r\n", ch);
@@ -367,7 +367,7 @@ SKEDIT(action, "действие", "создать команду для это�
         return true;
     }
 
-    if (arg_oneof(argOne, "delete", "удалить")) {
+    if (arg_oneof(argOne, "del", "удалить")) {
         DefaultSkillCommand *cmd = getCommand();
         if (!cmd) {
             stc("У этого умения и так нету команды.\r\n", ch);
@@ -429,7 +429,7 @@ SKEDIT(spell, "заклинание", "создать заклинание дл�
         return true;
     }
 
-    if (arg_oneof(arg, "tiers", "крутость")) {
+    if (arg_oneof(arg, "tier", "крутость")) {
         DefaultSpell *s = getSpell();        
         if (!checkSpell(s))
             return false;

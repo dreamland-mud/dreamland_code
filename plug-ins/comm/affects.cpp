@@ -335,7 +335,7 @@ CMDRUNP( affects )
     if (arg_has_oneof( argument, "name", "имя" ))
         output.sort( __aff_sort_name__ );
 
-    if (arg_has_oneof( argument, "desc", "убыв" ))
+    if (arg_has_oneof( argument, "descend", "убыв" ))
         output.reverse( );
 
     if (arg_has_oneof( argument, "short", "brief", "кратко" ))

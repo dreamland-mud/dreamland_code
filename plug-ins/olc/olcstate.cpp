@@ -1094,7 +1094,7 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
         return editorWeb(JsonUtils::asString(target), lastCmd + " " + bhvNameWithUnderscore + " " + propName + " paste", ED_NO_NEWLINE);
     }
 
-    if (arg_oneof(propValue, "delete", "удалить")) {
+    if (arg_oneof(propValue, "del", "удалить")) {
         props[bhvName].removeMember(propName);
         ptc(ch, "Свойство %s поведения %s удалено.\r\n", propName.c_str(), bhvName.c_str());
         return true;

@@ -421,79 +421,6 @@ static Object * create_arrow( int color, int level )
 
 SKILL_RUNP( makearrow )
 {
-    Skill *arrowSkill;
-    int count,mana,wait;
-    char arg[MAX_INPUT_LENGTH];
-
-    if (ch->is_npc())
-        return;
-
-    if (!gsn_make_arrow->usable( ch )) {
-        ch->pecho("Ты не умеешь изготавливать стрелы.");
-        return;
-    }
-
-    if (!RoomUtils::isNature(ch->in_room))
-    {
-        ch->pecho("В этой местности тебе не удается найти древесины для изготовления стрел.");
-        return;
-    }
-
-    mana = gsn_make_arrow->getMana(ch);
-    wait = gsn_make_arrow->getBeats(ch);
-
-    argument = one_argument(argument, arg);
-    
-    if (arg[0] == '\0')        {
-        arrowSkill = &*gsn_make_arrow;
-    }
-    else { 
-        if (arg_oneof(arg, "green", "зеленая", "зеленые"))
-            arrowSkill = &*gsn_green_arrow;
-        else if (arg_oneof(arg, "red", "красная", "красные"))
-            arrowSkill = &*gsn_red_arrow;
-        else if (arg_oneof(arg, "white", "белая", "белые"))
-            arrowSkill = &*gsn_white_arrow;
-        else if (arg_oneof(arg, "blue", "голубая", "голубые"))
-            arrowSkill = &*gsn_blue_arrow;
-        else {
-            ch->pecho("Можно изготовить только зеленые, красные, белые или голубые стрелы.");
-            return;
-        }
-
-        if (!arrowSkill->usable( ch )) {
-            ch->pecho("Ты не умеешь изготавливать такие стрелы.");
-            return;
-        }
-
-        mana += arrowSkill->getMana(ch);
-        wait += arrowSkill->getBeats(ch);
-    }
-
-    ch->pecho("Ты сосредотачиваешься на изготовлении стрел!");
-    oldact("$c1 сосредотачивается на изготовлении стрел!",ch,0,0,TO_ROOM);
-
-    if (number_percent() > arrowSkill->getEffective( ch )) {
-        ch->pecho("Неудача. Придется еще попрактиковаться...");
-        arrowSkill->improve( ch, false );
-        return;
-    }
-    
-    int slevel = skill_level(*gsn_make_arrow, ch);
-    count = slevel / 5;
-
-    for (int i = 0; i < count; i++) {
-        if (number_percent( ) > gsn_make_arrow->getEffective( ch )) {
-            ch->pecho("Ты пытаешься изготовить стрелу... но она ломается.");
-            gsn_make_arrow->improve( ch, false );
-            continue;
-        }
-
-        ch->pecho("Ты изготавливаешь стрелу.");
-        obj_to_char( create_arrow( arrowSkill->getIndex( ), slevel ), ch );
-    }
-
-    arrowSkill->improve( ch, true );
 }
 
 
@@ -504,44 +431,6 @@ SKILL_RUNP( makearrow )
 
 SKILL_RUNP(makebow)
 {
-    Object *bow;
- 
-    if (ch->is_npc())
-        return;
-
-    if (!gsn_make_bow->usable(ch)) {
-        ch->pecho("Ты не знаешь как изготовить лук.");
-        return;
-    }
-
-    if (!RoomUtils::isNature(ch->in_room))
-    {
-        ch->pecho("В этой местности тебе не удается найти древесины для изготовления лука.");
-        return;
-    }
-
-    if (number_percent() > gsn_make_bow->getEffective(ch)) {
-        ch->pecho("Ты пытаешься изготовить лук... но он ломается.");
-        gsn_make_bow->improve(ch, false);
-        return;
-    }
-    ch->pecho("Ты изготавливаешь лук.");
-    gsn_make_bow->improve(ch, true);
-
-    bow = create_object(get_obj_index(OBJ_VNUM_RANGER_BOW), ch->getModifyLevel());
-    bow->level = ch->getModifyLevel();
-
-    WeaponGenerator()
-        .item(bow)
-        .skill(gsn_make_arrow)
-        .valueTier(3)
-        .hitrollTier(IS_GOOD(ch) ? 2 : 3)
-        .damrollTier(IS_EVIL(ch) ? 2 : 3)
-        .assignValues()
-        .assignHitroll()
-        .assignDamroll();
-
-    obj_to_char(bow, ch);
 }
 
 

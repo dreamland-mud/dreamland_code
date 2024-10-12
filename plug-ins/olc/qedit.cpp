@@ -475,7 +475,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     cmd = args.getOneArgument();     
 
     // 'step 3 del'
-    if (arg_oneof(cmd, "delete", "удалить")) {
+    if (arg_oneof(cmd, "del", "удалить")) {
         q->steps.erase(q->steps.begin() + step);
         ch->pecho("Шаг %d удален. Не забудь почистить старые тригера ({y{hccs search %d{x).", 
                   step.getValue(), q->vnum.getValue());

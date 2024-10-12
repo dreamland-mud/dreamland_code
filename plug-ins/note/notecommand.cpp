@@ -104,7 +104,7 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
             doRead( ch, arguments );
             return;
         }
-        else if (arg_oneof( cmd, "copy", "копировать" ) && !arg_oneof_strict( cmd, "к" )) {
+        else if (arg_oneof( cmd, "copy", "копировать" ) && !arg_oneof_strict( cmd, "note.to" )) {
             doCopy( ch, arguments );
             return;
         }
@@ -133,7 +133,7 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
     }
 
     if (thread->canRead( ch )) {
-        if (arg_oneof( cmd, "remove", "delete", "удалить" )) {
+        if (arg_oneof( cmd, "del", "delete", "удалить" )) {
             doRemove( ch, arguments );
             return;
         }
@@ -163,15 +163,15 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
         doLineMinus( ch, attr );
         return;
     }
-    else if (arg_oneof( cmd, "subject", "тема" )) {
+    else if (arg_oneof( cmd, "subj", "тема" )) {
         doSubject( ch, attr, arguments );
         return;
     }
-    else if (arg_oneof_strict( cmd, "to", "к" ) || arg_oneof( cmd, "кому" )) {
+    else if (arg_oneof_strict( cmd, "note.to", "к" )) {
         doTo( ch, attr, arguments );
         return;
     }
-    else if (arg_oneof_strict( cmd, "from", "от" )) {
+    else if (arg_oneof_strict( cmd, "note.from", "от" )) {
         if (doFrom( ch, attr, arguments ))
             return;
     }
