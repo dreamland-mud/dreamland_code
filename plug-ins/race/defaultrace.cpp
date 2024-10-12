@@ -183,7 +183,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
 
     for (int sn = 0; sn < skillManager->size( ); sn++) {
         Skill *skill = skillManager->find( sn );
-        DLString sname = "{sR" + skill->getRussianName( ) + "{sE" + skill->getName( ) + "{sx";
+        DLString sname = skill->getRussianName( );
         PCharacter dummy;
         dummy.setRace( race->getName( ) );
         dummy.setLevel( 100 );
