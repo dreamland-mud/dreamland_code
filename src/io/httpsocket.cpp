@@ -134,7 +134,7 @@ HttpSocketTask::handleRequest()
 
     LogStream::sendError() << "body='" << request.body << "'" << endl;
 #endif
-    notice("Servlet %s %s %s", request.method.c_str(), request.uri.c_str(), request.body.c_str());
+    LogStream::sendNotice() << "Servlet " << request.method << " " << request.uri << " " << request.body << endl;
     ServletManager::getThis()->handle(request, response);
 }
 

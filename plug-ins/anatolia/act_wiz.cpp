@@ -2702,53 +2702,6 @@ CMDWIZP( noaffect )
     }
 }
 
-CMDWIZP( reboot )
-{
-  char arg[MAX_INPUT_LENGTH];
-
-  argument = one_argument(argument,arg);
-
- if (arg[0] == '\0')
-    {
-      ch->pecho("Usage: reboot now");
-      ch->pecho("Usage: reboot <ticks to reboot>");
-      ch->pecho("Usage: reboot cancel");
-      ch->pecho("Usage: reboot status");
-      return;
-    }
-
-    if (is_name(arg,"cancel"))
-     {
-      dreamland->setRebootCounter( -1 );
-      ch->pecho("Reboot canceled.");
-      return;
-    }
-
-    if (is_name(arg, "now"))
-     {
-      reboot_anatolia();
-      return;
-    }
-
-    if (is_name(arg, "status"))
-    {
-      if (dreamland->getRebootCounter( ) == -1)
-        ch->pecho("Automatic rebooting is inactive.");
-      else
-        ch->pecho("Reboot in %i minutes.", dreamland->getRebootCounter( ));
-      return;
-    }
-
-    if (is_number(arg))
-    {
-     dreamland->setRebootCounter( atoi(arg) );
-     ch->pecho("Мир Мечты будет ПЕРЕЗАГРУЖЕН через %i тиков!",dreamland->getRebootCounter( ));
-     return;
-    }
-
-    run(ch, str_empty);
-}
-
 
 CMDWIZP( olevel )
 {

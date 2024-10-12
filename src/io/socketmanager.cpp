@@ -204,6 +204,8 @@ ServerSocketTask::createSocket(unsigned short port)
         throw Exception(os.str());
     }
 
+    LogStream::sendNotice() << "Created server socket on port " << port << endl;
+
     return sock;
 }
 

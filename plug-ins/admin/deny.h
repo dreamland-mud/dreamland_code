@@ -21,12 +21,14 @@ public:
         Deny( );
 
         virtual void run( Character *, const DLString & );
+
+        static void action(const DLString &args, ostringstream &buf);
         
 private:
-        void doShow( Character *, PCMemoryInterface * );
-        void doRemove( Character *, PCMemoryInterface * );
-        void doPlace( Character *, PCMemoryInterface *, const DLString & );
-        void doUsage( Character * );
+        static void doShow( PCMemoryInterface *vict, ostringstream &buf );
+        static void doRemove( PCMemoryInterface *vict, ostringstream &buf );
+        static void doPlace( PCMemoryInterface *vict, const DLString &arg, ostringstream &buf );
+        static void doUsage( ostringstream &buf );
 
         static const DLString COMMAND_NAME;
 };

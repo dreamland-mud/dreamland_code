@@ -14,12 +14,13 @@
 #include "autoflags.h"
 #include "ban.h"
 #include "descriptor.h"
+#include "act.h"
 #include "def.h"
 
 /*----------------------------------------------------------------------------
  * 'ban' command
  *---------------------------------------------------------------------------*/
-void CBan::doShow( Character* ch, const Ban & rec)
+void CBan::doShow( const Ban & rec, ostringstream &buf )
 {
     time_t exp = rec.expire.getTime();
     
@@ -29,12 +30,12 @@ void CBan::doShow( Character* ch, const Ban & rec)
     
     int flag = rec.flags.getValue();
     
-    ch->pecho(
+    buf << fmt(0, 
             "Host: %s\r\n"
             "Created by: %s\r\n"
             "Flag: %s\r\n"
             "Expires: %s\r\n"
-            "Comment: %s",
+            "Comment: %s\r\n",
                 rec.pattern.getValue().c_str(),
                 rec.responsible.getValue().c_str(),
                 ban_flags.names( flag ).c_str( ),
@@ -43,7 +44,7 @@ void CBan::doShow( Character* ch, const Ban & rec)
             );
 }
 
-void CBan::doBan( Character* ch, const DLString & constArguments)
+void CBan::doBan( const DLString & constArguments, ostringstream &buf )
 {
     bool changed = false;
     DLString arguments = constArguments, patt;
@@ -57,7 +58,7 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
         unsigned int n = patt.toInt();
 
         if(n >= bm->size()) {
-            ch->pecho("ban index out of range");
+            buf << "Ban index out of range." << endl;
             return;
         }
         
@@ -70,7 +71,7 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
             }
 
         if(it == bm->end()) {
-            rec.responsible.setValue( ch->getName( ) );
+            rec.responsible.setValue( "" );
             rec.pattern.setValue( patt );
             rec.flags.setValue( BAN_ALL );
             rec.expire = Date(0);
@@ -82,10 +83,10 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
 
         if(arg.strPrefix("none") || arg.strPrefix("off")) {
             if(it == bm->end())
-                ch->pecho("not baned");
+                buf << "Not banned" << endl;
             else {
                 bm->erase(it);
-                ch->pecho("ban deleted");
+                buf << "Ban deleted" << endl;
                 bm->save();
             }
             return;
@@ -115,7 +116,7 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
                 }
 
                 if(exp == 0) {
-                    ch->pecho("oops... error parsing time");
+                    buf << "Oops... error parsing time" << endl;
                     return;
                 }
             }
@@ -125,22 +126,22 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
             rec.comment.setValue(arguments.getOneArgument());
             changed = true;
         } else {
-            ch->pecho("unknown option %s", arg.c_str( ));
-            doUsage( ch );
+            buf << fmt(0, "Unknown option %s", arg.c_str( )) << endl;
+            doUsage( buf );
             return;
         }
     }
 
     if(!changed && it == bm->end()) {
-        ch->pecho("not baned");
+        buf << "Not banned" << endl;
         return;
     }
 
-    doShow(ch, rec);
+    doShow(rec, buf);
     
     if(changed) {
         if(it == bm->end()) {
-            ch->pecho("new ban");
+            buf << "New ban" << endl;
             bm->push_back(rec);
         } else {
             *it = rec;
@@ -150,38 +151,47 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
     }
 }
 
-COMMAND(CBan, "ban")
+void CBan::action(const DLString &constArguments, ostringstream &buf)
 {
     DLString arguments = constArguments, patt;
     
     if (arguments.empty( )) {
-        ch->pecho("Pattern missing");
-        doUsage( ch );
+        doUsage( buf );
         return;
     }
     
     patt = arguments.getOneArgument( );
 
     if(patt.strPrefix("list")) {
-        doList( ch );
+        doList( buf );
     }
     else if (patt.strPrefix("kick")) {
-        doKick( ch );
+        doKick( buf );
     } else {
-        doBan(ch, constArguments);
-    }
+        doBan(constArguments, buf);
+    }     
 }
 
-void CBan::doUsage( Character *ch )
+COMMAND(CBan, "ban")
 {
-    ch->pecho( 
+    ostringstream buf;
+
+    CBan::action(constArguments, buf);
+    ch->send_to(buf);
+}
+
+void CBan::doUsage( ostringstream &buf )
+{
+   buf 
+    << 
         "Использование: \r\n"
         "ban list                      - список банов\r\n"       
-        "ban {<pattern>|<index>}       - подробности про бан\r\n"
-        "ban {<pattern>|<index>} [off|none|all|player|newbie|confirm|communicate] [expire <timespec>] [comment <reason>] - добавить/изменить/удалить бан");
+        "ban {{<pattern>|<index>}       - подробности про бан\r\n"
+        "ban {{<pattern>|<index>} [off|none|all|player|newbie|confirm|communicate] [expire <timespec>] [comment <reason>] - добавить/изменить/удалить бан"
+    << endl;
 }
 
-void CBan::doKick( Character *ch )
+void CBan::doKick( ostringstream &buf )
 {
     ostringstream ostr;
     Descriptor *d, *d_next;
@@ -196,21 +206,21 @@ void CBan::doKick( Character *ch )
         }
     }
     
-    ch->pecho( "%d descriptors kicked.", cnt );
+   buf << fmt(0, "%d descriptors kicked.", cnt ) << endl;
 }
 
-void CBan::doList( Character *ch )
+void CBan::doList(ostringstream &buf)
 {
     BanManager::iterator it;
     BanManager *bm = BanManager::getThis();
     int i;
     
     if(bm->empty()) {
-        ch->pecho("Nothing is banned. Strange...");
+        buf << "Nothing is banned. Strange..." << endl;
         return;
     }
 
-    ch->pecho(" # | pattern                        | flags    | until          | comment");
+   buf << " # | pattern                        | flags    | until          | comment" << endl;
 
     for(i=0, it = bm->begin(); it != bm->end(); it++, i++) {
         const Date &until = it->expire;
@@ -222,11 +232,11 @@ void CBan::doList( Character *ch )
         
         int flag = it->flags.getValue();
         
-        ch->pecho("%2d | %-30s | %-8s | %-14s | %-10.10s", i,
+       buf << fmt(0, "%2d | %-30s | %-8s | %-14s | %-10.10s", i,
                 it->pattern.getValue().c_str(), 
                 ban_flags.names( flag ).c_str( ),
                 untmsg.c_str(),
-                it->comment.getValue().c_str());
+                it->comment.getValue().c_str()) << endl;
     }
 }
 

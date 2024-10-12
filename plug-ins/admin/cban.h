@@ -23,14 +23,16 @@ public:
 
     virtual void run( Character *, const DLString & );
     
+    static void action(const DLString &args, ostringstream &buf);
+    
 private:
-    void doList( Character * );
-    void doSet( Character *, const DLString & );
-    void doDel( Character *, const DLString & );
-    void doUsage( Character * );
-    void doBan( Character *, const DLString & );
-    void doShow( Character *, const Ban & );
-    void doKick( Character * );
+    static void doList( ostringstream &buf );
+    static void doSet( const DLString &args, ostringstream &buf  );
+    static void doDel( const DLString &args, ostringstream &buf  );
+    static void doUsage( ostringstream &buf );
+    static void doBan( const DLString &args, ostringstream &buf  );
+    static void doShow( const Ban &ban, ostringstream &buf );
+    static void doKick( ostringstream &buf );
 
     static const DLString COMMAND_NAME;
 };

@@ -13,20 +13,21 @@
 
 #include "wiznet.h"
 #include "interp.h"
+#include "act.h"
 #include "merc.h"
 #include "def.h"
 
 /*----------------------------------------------------------------------------
  * 'deny' command
  *---------------------------------------------------------------------------*/
-COMMAND(Deny, "deny")
+void Deny::action(const DLString &constArguments, ostringstream &buf)
 {
     PCMemoryInterface *pcm;
     DLString name;
     DLString argument = constArguments;
     
     if (argument.empty( )) {
-        doUsage( ch );
+        doUsage( buf );
         return;
     }
     
@@ -34,39 +35,50 @@ COMMAND(Deny, "deny")
     pcm = PCharacterManager::find( name );
     
     if (!pcm) {
-        ch->pecho( "Victim '%s' not found, misspelled name?", name.c_str( ) );
+        buf << fmt(0,  "Victim '%s' not found, misspelled name?", name.c_str( )) << endl;
         return;
     }
     
     try {
         if (argument.empty( )) 
-            doShow( ch, pcm );
+            doShow( pcm, buf );
         else if (argument == "off") 
-            doRemove( ch, pcm );
+            doRemove( pcm, buf );
         else
-            doPlace( ch, pcm, argument );
+            doPlace( pcm, argument, buf );
             
     } catch (Exception e) {
-        ch->pecho( "%s", e.what( ) );
+        buf << e.what() << endl;
     }
 }
 
-void Deny::doShow( Character *ch, PCMemoryInterface *pcm )
+COMMAND(Deny, "deny")
+{
+    ostringstream buf;
+
+    if (!ch->isCoder())
+        return;
+
+    Deny::action(constArguments, buf);
+    ch->send_to(buf);
+}
+
+void Deny::doShow( PCMemoryInterface *pcm, ostringstream &buf )
 {
     XMLAttributeDeny::Pointer attr;
     
     attr = pcm->getAttributes( ).findAttr<XMLAttributeDeny>( "deny" );
     
     if (attr) 
-        ch->pecho( "Access for {W%s{x is denied {W%s{x by {W%s{x.",
+       buf << fmt(0, "Access for {W%s{x is denied {W%s{x by {W%s{x.\r\n",
                     pcm->getName( ).c_str( ),
                     attr->getUntilString( false ).c_str( ),
                     attr->getResponsible( ).c_str( ) );
     else
-        ch->pecho( "Access for {W%s{x is NOT denied.", pcm->getName( ).c_str( ) );
+        buf << fmt(0, "Access for {W%s{x is NOT denied.\r\n", pcm->getName( ).c_str( ) );
 }
 
-void Deny::doRemove( Character *ch, PCMemoryInterface *pcm )
+void Deny::doRemove( PCMemoryInterface *pcm, ostringstream &buf )
 {
     XMLAttributeDeny::Pointer attr;
     
@@ -77,21 +89,16 @@ void Deny::doRemove( Character *ch, PCMemoryInterface *pcm )
         pcm->getAttributes( ).eraseAttribute( "deny" );
         PCharacterManager::saveMemory( pcm );
         
-        ch->pecho("Ok.");
+        buf << "Ok." << endl;
     }
     else
-        ch->pecho( "Access for {W%s{x is NOT denied.", pcm->getName( ).c_str( ) );
+       buf << fmt(0, "Access for {W%s{x is NOT denied.\r\n", pcm->getName( ).c_str( ) );
 }
 
-void Deny::doPlace( Character *ch, PCMemoryInterface *pcm, const DLString & argument )
+void Deny::doPlace( PCMemoryInterface *pcm, const DLString & argument, ostringstream &buf )
 {
     XMLAttributeDeny::Pointer attr;
     int time;
-    
-    if (ch->get_trust( ) < pcm->get_trust( )) {
-        ch->pecho("Фигушки.");
-        return;
-    }
     
     if (argument == "forever")
         time = -1;
@@ -100,19 +107,21 @@ void Deny::doPlace( Character *ch, PCMemoryInterface *pcm, const DLString & argu
     
     attr = pcm->getAttributes( ).getAttr<XMLAttributeDeny>( "deny" );
     attr->setTime( time );
-    attr->setResponsible( ch->getName( ) );
+    attr->setResponsible( "" );
     attr->start( pcm );
     
-    ch->pecho("Ok.");
+    buf << "Ok." << endl;
 }
 
-void Deny::doUsage( Character *ch )
+void Deny::doUsage( ostringstream &buf )
 {
-    ch->pecho( 
+   buf 
+        << 
         "Использование: \r\n"
         "deny <name>         - показать, кто и на какой срок поденаил чара\r\n"
         "deny <name> off     - снять deny\r\n"
-        "deny <name> <time>  - запретить доступ на время <time>" );
+        "deny <name> <time>  - запретить доступ на время <time>"
+        << endl;
 }
 
 /*----------------------------------------------------------------------------

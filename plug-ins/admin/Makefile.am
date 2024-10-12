@@ -13,7 +13,8 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/help \
 -I$(top_srcdir)/plug-ins/communication \
--I$(top_srcdir)/plug-ins/iomanager
+-I$(top_srcdir)/plug-ins/iomanager \
+-I$(top_srcdir)/plug-ins/servlets
 
 libadmin_la_LIBADD = \
 ../descriptor/libdescriptor.la \
@@ -25,7 +26,10 @@ libadmin_la_LIBADD = \
 ../iomanager/libiomanager.la \
 ../system/libsystem.la \
 ../anatolia/core/libanatoliacore.la \
-../communication/libcommunication.la
+../communication/libcommunication.la \
+../servlets/libservlets.la \
+-ljsoncpp
+
 
 libadmin_la_SOURCES = \
 impl.cpp \
@@ -38,7 +42,9 @@ nochannel.cpp \
 nopost.cpp \
 socket.cpp \
 reward.cpp \
-confirm.cpp 
+confirm.cpp \
+reboot.cpp \
+adminservlet.cpp
 
 libplugin_command_la_LIBADD = \
 ../descriptor/libdescriptor.la \
