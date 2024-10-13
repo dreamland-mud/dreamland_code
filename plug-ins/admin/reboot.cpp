@@ -61,6 +61,11 @@ void reboot_action(const DLString& constArguments, ostringstream& buf)
         return;
     }
 
+    if (arg == "abort") {
+        abort();
+        return;
+    }
+
     if (arg.isNumber())
     {
         dreamland->setRebootCounter(arg.toInt());
