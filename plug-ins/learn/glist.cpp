@@ -18,7 +18,6 @@ GROUP(clan);
 CMDRUN( glist )
 {
     ostringstream buf;
-    SkillGroup *group;
     HelpArticle::Pointer help;
     DLString argument = constArguments;
     
@@ -29,12 +28,10 @@ CMDRUN( glist )
         buf << "Все группы:" << endl << endl;;
         
         for (int gn = 0; gn < skillGroupManager->size( ); gn++) {
-            group = skillGroupManager->find( gn );
+            SkillGroup *group = skillGroupManager->find( gn );
 
             if (group->isValid() && group->visible(ch))
-                buf << fmt( 0, "    %-17s   %-25s",
-                            group->getName( ).c_str( ),
-                            group->getRussianName( ).c_str( ) )
+                buf << fmt( 0, "    {g{hg%N1{x", group->getNameFor(ch).c_str())
                     << endl;
         }
 
@@ -43,7 +40,7 @@ CMDRUN( glist )
             << endl;
     }
     else {
-        group = skillGroupManager->findUnstrict( argument );
+        SkillGroup *group = skillGroupManager->findUnstrict( argument );
         
         if (!group) {
             ch->pecho("Неправильно указана группа.");

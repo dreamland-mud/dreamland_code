@@ -26,7 +26,7 @@
 #include "feniaskillaction.h"
 #include "defaultspell.h"
 #include "command.h"
-
+#include "player_utils.h"
 #include "fight.h"
 #include "affectflags.h"
 #include "commandflags.h"
@@ -313,6 +313,27 @@ void BasicSkill::setName( const DLString &name )
 const DLString & BasicSkill::getRussianName( ) const
 {
     return name.get(RU);
+}
+
+bool BasicSkill::matchesStrict( const DLString &str ) const 
+{
+    return name.matchesStrict(str);
+}
+
+bool BasicSkill::matchesUnstrict( const DLString &str ) const 
+{
+    return name.matchesUnstrict(str);
+}
+
+bool BasicSkill::matchesSubstring( const DLString &str ) const 
+{
+    return name.matchesSubstring(str);
+}
+
+
+const DLString& BasicSkill::getNameFor( Character *ch ) const
+{
+    return name.get(Player::lang(ch));
 }
 
 AffectHandlerPointer BasicSkill::getAffect( ) const 

@@ -12,7 +12,7 @@
 #include "pcharacter.h"
 #include "pcrace.h"
 
-
+#include "player_utils.h"
 #include "math_utils.h"
 #include "poliglot.h"
 
@@ -38,6 +38,26 @@ HelpArticlePointer Language::getSkillHelp( ) const
 const DLString & Language::getRussianName( ) const
 {
     return name.get(RU);
+}
+
+bool Language::matchesStrict( const DLString &str ) const 
+{
+    return name.matchesStrict(str);
+}
+
+bool Language::matchesUnstrict( const DLString &str ) const 
+{
+    return name.matchesUnstrict(str);
+}
+
+bool Language::matchesSubstring( const DLString &str ) const 
+{
+    return name.matchesSubstring(str);
+}
+
+const DLString& Language::getNameFor( Character *ch ) const
+{
+    return name.get(Player::lang(ch));
 }
 
 bool Language::visible( CharacterMemoryInterface * ch ) const

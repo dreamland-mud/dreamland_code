@@ -38,7 +38,7 @@ public:
     virtual bool available( Character * ) const;
     virtual void show( PCharacter *, ostringstream & ) const;
     virtual int getPracticer( ) const;
-    const DLString& getNameFor( Character * ) const;
+    virtual const DLString& getNameFor( Character * ) const;
 
 protected:
     DLString elementName;

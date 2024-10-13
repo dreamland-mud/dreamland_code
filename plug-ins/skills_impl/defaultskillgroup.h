@@ -30,11 +30,14 @@ public:
     virtual const DLString & getName( ) const;
     virtual void setName( const DLString & );
     inline virtual bool isValid( ) const;
-    virtual bool matchesUnstrict( const DLString & ) const;
+    virtual bool matchesStrict( const DLString &str ) const;
+    virtual bool matchesUnstrict( const DLString &str ) const;
+    virtual bool matchesSubstring( const DLString &str ) const;
+    virtual const DLString& getNameFor( Character * ) const;
     virtual void loaded( );
     virtual void unloaded( );
     
-    virtual const DLString &getRussianName( ) const;
+    virtual const DLString &getRussianName( ) const;    
     virtual bool visible( Character * ) const;
     virtual bool available( Character * ) const;
     virtual void show( PCharacter *, ostringstream & ) const;

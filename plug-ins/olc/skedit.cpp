@@ -182,9 +182,12 @@ void OLCStateSkill::show( PCharacter *ch )
     MobSkillData *mob = r->getMobSkillData();
 
     ptc(ch, "Умение:      {C%s\r\n", r->getName().c_str());
-    ptc(ch, "По-русски:   {C%s{x %s {D(russian help){x\r\n",
-            r->getRussianName().c_str(), 
-            web_edit_button(ch, "russian", "web").c_str());
+    ptc(ch, "УкИмя:       {C%s{x %s {D(uaname help){x\r\n",
+            r->name[UA].c_str(),
+            web_edit_button(ch, "uaname", "web").c_str());
+    ptc(ch, "РуИмя:       {C%s{x %s {D(runame help){x\r\n",
+            r->name[RU].c_str(),
+            web_edit_button(ch, "runame", "web").c_str());
     ptc(ch, "Группы:      {C%s {D(group){x\r\n", r->getGroups().toString().c_str());
     ptc(ch, "Задержка:    {C%d{w пульсов {D(beats){x\r\n", r->getBeats());
     ptc(ch, "Цена, очки:  {C%d мана {D(mana) {C%d шаги {D(move){x \r\n", r->getMana(), r->move.getValue());
@@ -250,18 +253,18 @@ void OLCStateSkill::show( PCharacter *ch )
         ptc(ch, "УкрИмя:      {Y%s{x %s {D(ukrname help){x\r\n",
                 c->name[UA].c_str(),
                 web_edit_button(ch, "ukrname", "web").c_str());
-        ptc(ch, "РуИмя:       {Y%s{x %s {D(runame help){x\r\n",
+        ptc(ch, "РусИмя:      {Y%s{x %s {D(rusname help){x\r\n",
                 c->name[RU].c_str(),
-                web_edit_button(ch, "runame", "web").c_str());
+                web_edit_button(ch, "rusname", "web").c_str());
         ptc(ch, "Синонимы:    {Y%s{x %s {D(aliases help){x\r\n",
                 c->aliases[EN].c_str(),
                 web_edit_button(ch, "aliases", "web").c_str());
         ptc(ch, "УкрСинонимы: {Y%s{x %s {D(ukraliases help){x\r\n",
                 c->aliases[UA].c_str(),
                 web_edit_button(ch, "ukraliases", "web").c_str());
-        ptc(ch, "РуСинонимы:  {Y%s{x %s {D(rualiases help){x\r\n",
+        ptc(ch, "РусСинонимы: {Y%s{x %s {D(rusaliases help){x\r\n",
                 c->aliases[RU].c_str(),
-                web_edit_button(ch, "rualiases", "web").c_str());
+                web_edit_button(ch, "rusaliases", "web").c_str());
         ptc(ch, "Аргумент:    {Y%s {D(argtype){x\r\n", c->argtype.name().c_str());
         ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", c->position.name().c_str());
         ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n", c->extra.names().c_str());
@@ -635,7 +638,7 @@ SKEDIT(ukrname, "укримя", "украинское имя команды")
     return checkCommand(c) && editor(argument, c->name[UA], ED_NO_NEWLINE) && commandUpdate(c);
 }
 
-SKEDIT(runame, "руимя", "русское имя команды")
+SKEDIT(rusname, "русимя", "русское имя команды")
 {
     DefaultSkillCommand *c = getCommand();
     return checkCommand(c) && editor(argument, c->name[RU], ED_NO_NEWLINE) && commandUpdate(c);
@@ -653,7 +656,7 @@ SKEDIT(ukraliases, "укрсинонимы", "список украинских 
     return checkCommand(c) && editor(argument, c->aliases[UA], ED_NO_NEWLINE) && commandUpdate(c);
 }
 
-SKEDIT(rualiases, "русинонимы", "список русских синонимов для команды")
+SKEDIT(rusaliases, "руссинонимы", "список русских синонимов для команды")
 {
     DefaultSkillCommand *c = getCommand();
     return checkCommand(c) && editor(argument, c->aliases[RU], ED_NO_NEWLINE) && commandUpdate(c);
@@ -665,10 +668,14 @@ SKEDIT(hint, "подсказка", "краткое описание команд
     return checkCommand(c) && editor(argument, c->hint[RU], ED_NO_NEWLINE);
 }
 
-SKEDIT(russian, "русское", "русское имя умения")
+SKEDIT(uaname, "укимя", "украинское имя умения")
 {
-    BasicSkill *r = getOriginal();
-    return editor(argument, r->name[RU], ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->name[UA], ED_NO_NEWLINE);
+}
+
+SKEDIT(runame, "руимя", "русское имя умения")
+{    
+    return editor(argument, getOriginal()->name[RU], ED_NO_NEWLINE);
 }
 
 SKEDIT(allow, "доступно", "ограничения по классу, клану, расе")
@@ -900,7 +907,6 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
                 continue;
             }
 
-//            skill->name[RU] = skill->nameRus;
             buf << skill->name[EN] << " : " << skill->name[RU] << endl;
             skill->save();
         }
@@ -1179,9 +1185,12 @@ void OLCStateSkillGroup::show(PCharacter *ch)
     DefaultSkillGroup *g = getOriginal();
 
     ptc(ch, "Группа:      {C%s\r\n", g->getName().c_str());
-    ptc(ch, "Русское:     {C%s{x  %s {D(russian help){x\r\n",
-            g->getRussianName().c_str(), 
-            web_edit_button(ch, "russian", "web").c_str());
+    ptc(ch, "УкИмя:       {C%s{x %s {D(uaname help){x\r\n",
+            g->name[UA].c_str(),
+            web_edit_button(ch, "uaname", "web").c_str());
+    ptc(ch, "РуИмя:       {C%s{x %s {D(runame help){x\r\n",
+            g->name[RU].c_str(),
+            web_edit_button(ch, "runame", "web").c_str());
     ptc(ch, "Скрыта:      {C%s {D(hidden){x\r\n", 
             g->hidden ? "yes" : "no");
 
@@ -1248,8 +1257,13 @@ GREDIT(help, "справка", "создать или посмотреть сп�
     return help_subcommand(ch, argument, group->help, postCreateAction);
 }
 
-GREDIT(russian, "русское", "русское название группы")
+GREDIT(uaname, "укимя", "украинское имя группы")
 {
+    return editor(argument, getOriginal()->name[UA], ED_NO_NEWLINE);
+}
+
+GREDIT(runame, "руимя", "русское имя группы")
+{    
     return editor(argument, getOriginal()->name[RU], ED_NO_NEWLINE);
 }
 

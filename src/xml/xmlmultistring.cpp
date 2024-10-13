@@ -1,6 +1,7 @@
 #include "xmlmultistring.h"
 #include "exception.h"
 #include "string_utils.h"
+#include "dl_strings.h"
 
 const DLString ATTR_LANG = "l";
 
@@ -119,3 +120,57 @@ bool XMLMultiString::toXML(XMLNode::Pointer& parent) const
     return true;
 }
 
+
+
+bool XMLMultiString::matchesStrict( const DLString &str ) const 
+{
+    if (str.empty())
+        return false;
+
+    DLString lstr = str.toLower();
+
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
+        if (get(lang).toLower() == lstr)
+            return true;
+    }
+
+    return false;
+}
+
+bool XMLMultiString::matchesUnstrict( const DLString &str ) const 
+{
+    if (str.empty())
+        return false;
+
+    DLString lstr = str.toLower();
+
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
+        DLString lname = get(lang).toLower();
+
+        if (lname.find('|') != DLString::npos)
+            lname = lname.ruscase('1');
+
+        if (is_name(lstr.c_str(), lname.c_str()))
+            return true;
+    }
+    
+    return false;
+}
+
+bool XMLMultiString::matchesSubstring( const DLString &str ) const 
+{
+    if (str.empty())
+        return false;
+
+    DLString lstr = str.toLower();
+
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
+        if (lstr.strPrefix(get(lang).toLower()))
+            return true;
+    }
+
+    return false;
+}

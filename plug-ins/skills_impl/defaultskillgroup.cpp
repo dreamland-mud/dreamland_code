@@ -16,7 +16,7 @@
 #include "loadsave.h"
 #include "areahelp.h"
 #include "merc.h"
-
+#include "player_utils.h"
 #include "def.h"
 
 GROUP(clan);
@@ -60,6 +60,11 @@ void DefaultSkillGroup::setName( const DLString &name )
 const DLString &DefaultSkillGroup::getRussianName( ) const
 {
     return name.get(RU);
+}
+
+const DLString& DefaultSkillGroup::getNameFor( Character *ch ) const
+{
+    return name.get(Player::lang(ch));
 }
 
 int DefaultSkillGroup::getPracticer( ) const
@@ -172,19 +177,18 @@ char DefaultSkillGroup::getSkillColor( Skill *skill, PCharacter *ch ) const
     return 'w';
 }
 
-bool DefaultSkillGroup::matchesUnstrict( const DLString &str ) const
+bool DefaultSkillGroup::matchesStrict( const DLString &str ) const 
 {
-    if (!getName().empty( ) 
-        && str.strPrefix( getName() ))    
-    {
-        return true;
-    }
+    return name.matchesStrict(str);
+}
 
-    if (!name.get(RU).empty() && str.strPrefix(name.get(RU)))
-    {
-        return true;
-    }
+bool DefaultSkillGroup::matchesUnstrict( const DLString &str ) const 
+{
+    return name.matchesUnstrict(str);
+}
 
-    return false;
+bool DefaultSkillGroup::matchesSubstring( const DLString &str ) const 
+{
+    return name.matchesSubstring(str);
 }
 

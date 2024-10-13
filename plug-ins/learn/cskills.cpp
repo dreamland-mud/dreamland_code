@@ -227,7 +227,7 @@ void AllSkillsList::make( Character *ch )
             continue;
 
         // Start collecting skill details.
-        info.name = skill->getNameFor( ch );
+        info.name = skill->getNameFor( ch ).ruscase('1');
         info.real = skill->getEffective( ch );
         info.spell = spell && spell->isCasted();
         info.passive = skill->isPassive();
@@ -326,7 +326,7 @@ void AllSkillsList::display( std::ostream & buf )
         if (info.level != prevLevel) {
             if (!firstColumn) {
                 firstColumn = true;
-                buf << "                    |         |" << endl;
+                buf << "                   |         |" << endl;
             }
 
             buf << fmt(0, "  %3d  |", info.level );
@@ -370,7 +370,7 @@ void AllSkillsList::display( std::ostream & buf )
     }
 
     if (!firstColumn) 
-        buf << "                    |         |" << endl;
+        buf << "                   |         |" << endl;
 
     buf << fmt(0, 
         "Также используй фильтры "
@@ -409,7 +409,7 @@ CMDRUN( skills )
     AllSkillsList slist;
     std::basic_ostringstream<char> buf;
     
-    slist.mycmd = "" + getRussianName() + "";
+    slist.mycmd = getRussianName();
 
     if (!slist.parse( argument, buf, ch )) {
         ch->send_to( buf );

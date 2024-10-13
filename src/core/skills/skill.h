@@ -37,7 +37,7 @@ public:
     virtual const DLString& getName( ) const;
     virtual bool isValid( ) const;
     
-    const DLString& getNameFor( Character * ) const;
+    virtual const DLString& getNameFor( Character * ) const;
     virtual const DLString &getRussianName( ) const;
     virtual GlobalBitvector & getGroups();
     bool hasGroup(unsigned int group);

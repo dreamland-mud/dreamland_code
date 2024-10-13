@@ -79,13 +79,14 @@ void XMLTableLoader::readAll( bool fVerbose )
             
             dbNode = dir.nextXML( );
 
+            LogStream::sendNotice() << "attempt to load " << dbNode.getKey() << endl;
             basic_istringstream<char> xmlStream( dbNode.getXML( ) );
             element.fromStream( xmlStream );
 
             element->setName( dbNode.getKey( ) );
             elements.push_back( element );
             
-            if (fVerbose)
+//            if (fVerbose)
                 LogStream::sendNotice( ) << "read '" << element->getName( ) << ".xml'" << endl;
         }
     } 

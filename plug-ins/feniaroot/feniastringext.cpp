@@ -179,7 +179,7 @@ NMI_INVOKE(FeniaString, isName, "(arg): является ли слова из ar
     return isName( args.front().toString().c_str() );
 }
 
-NMI_INVOKE(FeniaString, is_name, "(arg): являются ли слова из arg подсловами в строке")
+NMI_INVOKE(FeniaString, is_name, "(arg): являются ли слова из этой строки подсловами в arg")
 {
     if (args.empty())
         throw NotEnoughArgumentsException();

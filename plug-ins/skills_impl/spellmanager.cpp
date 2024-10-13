@@ -95,8 +95,6 @@ void SpellManager::unregistrate( Spell::Pointer spell )
 
 Spell::Pointer SpellManager::lookup( const DLString &name, Character *ch )
 {
-    StringList argList(name);
-
     // First do basic lookup by string prefix, so that 'c word' matches 'c word of recall' first,
     // and not 'holy word' (as per priority file).
     for (SpellList::iterator i = spells.begin( ); i != spells.end( ); i++) {
@@ -104,7 +102,7 @@ Spell::Pointer SpellManager::lookup( const DLString &name, Character *ch )
         
         if (!(*i)->isCasted( ))
             continue;
-        if (!name.strPrefix(skill->getName()) && !name.strPrefix(skill->getRussianName()))
+        if (!skill->matchesSubstring(name))
             continue;
         if (!skill->available(ch))
             continue;
@@ -118,8 +116,7 @@ Spell::Pointer SpellManager::lookup( const DLString &name, Character *ch )
         
         if (!(*i)->isCasted( ))
             continue;
-        if (!StringList(skill->getName()).superListOf(argList)
-             && !StringList(skill->getRussianName()).superListOf(argList))
+        if (!skill->matchesUnstrict(name))
             continue;
         if (!skill->available(ch))
             continue;

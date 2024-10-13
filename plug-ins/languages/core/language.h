@@ -96,6 +96,10 @@ public:
     
     virtual const DLString & getName( ) const;
     virtual const DLString & getRussianName( ) const;
+    virtual bool matchesStrict( const DLString &str ) const;
+    virtual bool matchesUnstrict( const DLString &str ) const;
+    virtual bool matchesSubstring( const DLString &str ) const;
+    virtual const DLString& getNameFor( Character * ) const;
     virtual AffectHandler::Pointer getAffect( );
     virtual Spell::Pointer getSpell( ) const;
     virtual HelpArticlePointer getSkillHelp( ) const;

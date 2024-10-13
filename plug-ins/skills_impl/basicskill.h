@@ -38,6 +38,10 @@ public:
     virtual const DLString & getName( ) const;
     virtual void setName( const DLString & );
     virtual const DLString &getRussianName( ) const;
+    virtual const DLString& getNameFor( Character * ) const;
+    virtual bool matchesStrict( const DLString &str ) const;
+    virtual bool matchesUnstrict( const DLString &str ) const;
+    virtual bool matchesSubstring( const DLString &str ) const;
 
     virtual SpellPointer getSpell( ) const;
     virtual AffectHandlerPointer getAffect( ) const;

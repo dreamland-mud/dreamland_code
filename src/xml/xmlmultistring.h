@@ -27,6 +27,10 @@ public:
     bool toXML(XMLNode::Pointer& parent) const;
     void fromXML(const XMLNode::Pointer& parent);
     const DLString &get(lang_t lang) const;
+
+    bool matchesStrict( const DLString &str ) const;
+    bool matchesUnstrict( const DLString &str ) const;
+    bool matchesSubstring( const DLString &str ) const;    
 };
 
 #endif

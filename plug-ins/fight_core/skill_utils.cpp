@@ -304,24 +304,17 @@ int skill_lookup(const DLString &constName, Character *ch)
     // Strict lookup: always return an exact match available for ch.
     for (i = 0; i < skillManager->size(); i++) {
         skill = skillManager->find(i);
-        if (skill->getName() == name || skill->getRussianName() == name) {
+        if (skill->matchesStrict(name))
             if (!ch || skill->available(ch))
                 return i;
-        }
     }
 
     // Unstrict lookup by partial name , e.g. 'cur po' for 'cure poison'.
-    StringList argList(name);
-
     for (i = 0; i < skillManager->size(); i++) {
         skill = skillManager->find(i);
-
-        if (StringList(skill->getName()).superListOf(argList)
-             || StringList(skill->getRussianName()).superListOf(argList))
-        {
+        if (skill->matchesUnstrict(name))
             if (!ch || skill->available(ch))
                 return i;
-        }
     }
 
     // Nothing found for ch, try again without specifying target character.

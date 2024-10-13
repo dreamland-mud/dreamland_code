@@ -118,18 +118,18 @@ void OLCStateCommand::show( PCharacter *ch )
     ptc(ch, "УкрИмя:      {Y%s{x %s {D(ukrname help){x\r\n",
             c->name[UA].c_str(),
             web_edit_button(ch, "ukrname", "web").c_str());
-    ptc(ch, "РуИмя:       {Y%s{x %s {D(runame help){x\r\n",
+    ptc(ch, "РусИмя:      {Y%s{x %s {D(rusname help){x\r\n",
             c->name[RU].c_str(),
-            web_edit_button(ch, "runame", "web").c_str());
+            web_edit_button(ch, "rusname", "web").c_str());
     ptc(ch, "Синонимы:    {Y%s{x %s {D(aliases help){x\r\n",
             c->aliases[EN].c_str(),
             web_edit_button(ch, "aliases", "web").c_str());
     ptc(ch, "УкрСинонимы: {Y%s{x %s {D(ukraliases help){x\r\n",
             c->aliases[UA].c_str(),
             web_edit_button(ch, "ukraliases", "web").c_str());
-    ptc(ch, "РуСинонимы:  {Y%s{x %s {D(rualiases help){x\r\n",
+    ptc(ch, "РусСинонимы: {Y%s{x %s {D(rusaliases help){x\r\n",
             c->aliases[RU].c_str(),
-            web_edit_button(ch, "rualiases", "web").c_str());
+            web_edit_button(ch, "rusaliases", "web").c_str());
     ptc(ch, "Уровень:     {Y%d {D(level){x\r\n", c->level.getValue());
     ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", c->position.name().c_str());
     ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n", c->extra.names().c_str());
@@ -214,7 +214,7 @@ CMDEDIT(ukrname, "укримя", "украинское имя команды")
     return editor(argument, c->name[UA], ED_NO_NEWLINE) && commandUpdate(c);
 }
 
-CMDEDIT(runame, "руимя", "русское имя команды")
+CMDEDIT(rusname, "русимя", "русское имя команды")
 {
     ::Command  *c = getOriginal();
     return editor(argument, c->name[RU], ED_NO_NEWLINE) && commandUpdate(c);
@@ -233,7 +233,7 @@ CMDEDIT(ukraliases, "укрсинонимы", "список украинских
 }
 
 // Edit Russian aliases for the command, re-register with CommandManager if changed
-CMDEDIT(rualiases, "русинонимы", "список русских синонимов для команды")
+CMDEDIT(rusaliases, "руссинонимы", "список русских синонимов для команды")
 {
     ::Command  *c = getOriginal();
     return editor(argument, c->aliases[RU], ED_NO_NEWLINE) && commandUpdate(c);
