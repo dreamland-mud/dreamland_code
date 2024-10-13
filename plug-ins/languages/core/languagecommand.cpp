@@ -66,7 +66,7 @@ void LanguageCommand::run( Character *ach, const DLString &constArguments )
     }
 
     if (arg.empty( )) {
-        ch->pecho( "Что ты хочешь произнести на %^N6?", language->nameRus.getValue( ).c_str( ) );
+        ch->pecho( "Что ты хочешь произнести на %^N6?", language->name.get(RU).c_str( ) );
         return;
     }
     
@@ -81,7 +81,7 @@ void LanguageCommand::run( Character *ach, const DLString &constArguments )
     }
     
     if (!available( ch )) {
-        ch->pecho( "Ты не умеешь разговаривать на %^N6.", language->nameRus.getValue( ).c_str( ) );
+        ch->pecho( "Ты не умеешь разговаривать на %^N6.", language->name.get(RU).c_str( ) );
         return;
     }
 
@@ -171,7 +171,7 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
                 victim->pecho( "%^C1 что-то произносит, указывая в твою сторону.", ch );
             else 
                 victim->pecho( "%^C1 изрекает на %^N6, указывая в твою сторону: '{C%s{x'",
-                               ch, language->nameRus.getValue( ).c_str( ), arg1.c_str( ) );
+                               ch, language->name.get(RU).c_str( ), arg1.c_str( ) );
         }
     }
 
@@ -189,7 +189,7 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
             rch->pecho( "%^C1 что-то бормочет на странном языке.", ch );
         else 
             rch->pecho( "%^C1 изрекает на %^N6 '{C%s{x'", 
-                        ch, language->nameRus.getValue( ).c_str( ), arg1.c_str( ) );
+                        ch, language->name.get(RU).c_str( ), arg1.c_str( ) );
     }
     
     if (word.empty( ) || !effect) {
@@ -230,7 +230,7 @@ void LanguageCommand::doList( PCharacter *ch ) const
     const LanguageManager::Words &words = languageManager->getWords( );
     LanguageManager::Words::const_iterator i;
     
-    ch->pecho( "Текущий словарный запас для языка {c%N1{x: ", language->nameRus.getValue( ).c_str( ) );
+    ch->pecho( "Текущий словарный запас для языка {c%N1{x: ", language->name.get(RU).c_str( ) );
         
     for (i = words.begin( ); i != words.end( ); i++) {
         const Word & w = i->second;
@@ -305,12 +305,12 @@ bool LanguageCommand::showDreams( PCharacter *ch ) const
     }
 
     if (buf.str( ).empty( )) {
-        ch->pecho( "Тебе ни разу ничего не снилось на %N6.", language->nameRus.getValue( ).c_str( ) );
+        ch->pecho( "Тебе ни разу ничего не снилось на %N6.", language->name.get(RU).c_str( ) );
         return true;
     }
 
     buf << endl;
-    ch->pecho( "Тебе приснились и запомнились слова на %N6: ", language->nameRus.getValue( ).c_str( ) );
+    ch->pecho( "Тебе приснились и запомнились слова на %N6: ", language->name.get(RU).c_str( ) );
     ch->send_to( buf );
     return true;
 }
@@ -398,7 +398,7 @@ void LanguageCommand::doIdent( PCharacter *ch, DLString &arguments ) const
         chance = language->getLearned( ch );
     
     if (chance < Language::SKILL_SENSE || number_percent( ) > chance) {
-        ch->pecho( "Тайный смысл слов %^N2 ускользает от тебя.", language->nameRus.getValue( ).c_str( ) );
+        ch->pecho( "Тайный смысл слов %^N2 ускользает от тебя.", language->name.get(RU).c_str( ) );
         return;
     }
 

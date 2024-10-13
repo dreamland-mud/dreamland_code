@@ -149,7 +149,7 @@ char skill_learned_colour(const Skill *skill, PCharacter *ch)
 DLString print_names_for(const Skill *skill, Character *ch)
 {
     bool rus = ch->getConfig( ).ruskills;
-    const char *format = "'{%c%s{%c' или '{%c%s{%c'";
+    const char *format = "'{%c%N1{%c' или '{%c%N1{%c'";
 
     if (rus)
         return fmt(0, format, 

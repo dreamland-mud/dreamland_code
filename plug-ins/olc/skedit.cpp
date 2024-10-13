@@ -668,7 +668,7 @@ SKEDIT(hint, "подсказка", "краткое описание команд
 SKEDIT(russian, "русское", "русское имя умения")
 {
     BasicSkill *r = getOriginal();
-    return editor(argument, r->nameRus, ED_NO_NEWLINE);
+    return editor(argument, r->name[RU], ED_NO_NEWLINE);
 }
 
 SKEDIT(allow, "доступно", "ограничения по классу, клану, расе")
@@ -888,6 +888,27 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
         return;
     }
 
+    if (arg_is(cmd, "save")) {
+        ostringstream buf;
+
+        for (int i = 0; i < skillManager->size(); i++) {
+            Skill *sk = skillManager->find(i);
+            BasicSkill *skill = dynamic_cast<BasicSkill *>(sk);
+
+            if (!skill) {
+                buf << "Skipping " << sk->getName() << endl;
+                continue;
+            }
+
+//            skill->name[RU] = skill->nameRus;
+            buf << skill->name[EN] << " : " << skill->name[RU] << endl;
+            skill->save();
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
     // Creating new skill.
     if (arg_is(cmd, "create")) {
         DLString type = args.getOneArgument();
@@ -1068,6 +1089,25 @@ CMD(gredit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill group editor.")
         return;
     }
 
+    if (arg_is(cmd, "save")) {
+        ostringstream buf;
+
+        for (int i = 0; i < skillGroupManager->size(); i++) {
+            SkillGroup* gr = skillGroupManager->find(i);
+            DefaultSkillGroup* group = dynamic_cast<DefaultSkillGroup*>(gr);
+            if (!group) {
+                buf << "Skipping " << gr->getName() << endl;
+                continue;
+            }
+             
+            buf << group->getName() << " : " << group->getRussianName() << endl;
+            group->save();
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
     DLString arg = DLString(argument).toLower().stripWhiteSpace();    
 
     SkillGroup *group = skillGroupManager->findUnstrict(arg);
@@ -1210,7 +1250,7 @@ GREDIT(help, "справка", "создать или посмотреть сп�
 
 GREDIT(russian, "русское", "русское название группы")
 {
-    return editor(argument, getOriginal()->nameRus, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->name[RU], ED_NO_NEWLINE);
 }
 
 GREDIT(self, "себе", "сообщения кастеру при произнесении заклинаний этой группы")

@@ -74,7 +74,7 @@ public:
 
     static GlobalBitvector zeroGroups;
 protected:
-    DLString name;
+    DLString elementName;
 };
 
 #endif

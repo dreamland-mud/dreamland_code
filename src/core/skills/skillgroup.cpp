@@ -14,7 +14,7 @@ SkillGroup::SkillGroup( )
 {
 }
 
-SkillGroup::SkillGroup( const DLString &n ) : name( n )
+SkillGroup::SkillGroup( const DLString &name ) : elementName( name )
 {
 }
 
@@ -24,7 +24,7 @@ SkillGroup::~SkillGroup( )
 
 const DLString &SkillGroup::getName( ) const
 {
-    return name;
+    return elementName;
 }
 
 bool SkillGroup::isValid( ) const

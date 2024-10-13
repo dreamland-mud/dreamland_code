@@ -73,14 +73,14 @@ LanguageException::LanguageException( const Language &lang, const DLString &msg 
 {
 }
 
-Language::Language( const DLString &n ) : Skill( n )
+Language::Language( const DLString &name ) : Skill( name )
 {
-    this->name = n;
+    this->elementName = name;
 }
 
 const DLString & Language::getName( ) const
 {
-    return Skill::getName( );
+    return Skill::getName();
 }
 
 void Language::initialization( )
@@ -144,7 +144,7 @@ Word Language::createGlobalWord( ) const
         word.effect = effectName;
         word.count  = findEffect( effectName )->getFrequency( );
         word.dictum = createDictum( );
-        word.lang   = name;
+        word.lang   = getName();
     }
 
     return word;
@@ -159,7 +159,7 @@ Word Language::createPersonalWord( ) const
         word.effect = effectName;
         word.count  = 2 * findEffect( effectName )->getFrequency( );
         word.dictum = createDictum( );
-        word.lang   = name;
+        word.lang   = getName();
     }
 
     return word;

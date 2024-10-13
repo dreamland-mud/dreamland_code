@@ -13,7 +13,7 @@
 #include "xmlpointer.h"
 #include "xmlflags.h"
 #include "xmlstring.h"
-
+#include "xmlmultistring.h"
 #include "skill.h"
 #include "affecthandler.h"
 #include "spell.h"
@@ -140,8 +140,7 @@ protected:
     static const DLString CATEGORY;
 
     XML_VARIABLE XMLPointerNoEmpty<LanguageCommand> command;
-    XML_VARIABLE XMLString  nameRus;
-    XML_VARIABLE XMLStringNoEmpty nameRusNoCase;
+    XML_VARIABLE XMLMultiString name;
     XML_VARIABLE XMLInteger beats;
     XML_VARIABLE XMLInteger minAlign, maxAlign;
     XML_VARIABLE Races    races;

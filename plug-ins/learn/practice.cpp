@@ -99,7 +99,7 @@ void CPractice::pracShow( PCharacter *ch )
         PCSkillData &data = ch->getSkillData( sn );
         
         info.percent = data.learned;
-        info.name = skill->getNameFor( ch );
+        info.name = skill->getNameFor( ch ).ruscase('1');
         info.adept = skill->getAdept( ch );
         info.maximum = skill->getMaximum( ch );
 
@@ -206,7 +206,7 @@ void CPractice::pracHere( PCharacter *ch )
             info.help_id = 0;
 
         info.percent = ch->getSkillData( sn ).learned;
-        info.name = skill->getNameFor( ch );
+        info.name = skill->getNameFor( ch ).ruscase('1');
         info.adept = skill->getAdept( ch );
         info.maximum = skill->getMaximum( ch );
 
@@ -264,7 +264,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     }
 
     if (!skill->available(ch)) {
-        ch->pecho("Умение {W%s{x тебе не доступно.", skill->getNameFor(ch).c_str());
+        ch->pecho("Умение {W%N1{x тебе не доступно.", skill->getNameFor(ch).c_str());
         return;
     }
 

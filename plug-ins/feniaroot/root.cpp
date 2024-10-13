@@ -416,8 +416,6 @@ NMI_INVOKE(Root, div, "(A, B): A/B, A и B рациональные числа (
 {
     float a = argnum2float(args, 1);
     float b = argnum2float(args, 2);
-    int a_int = (int)a;
-    int b_int = (int)b;
 
     if (b == 0.0)
         throw Scripting::Exception("Division by zero");

@@ -15,7 +15,7 @@ GROUP(none);
 static void print_see_also(Skill *skill, PCharacter *ch, ostream &buf) 
 {
     // 'См. также справка|help травы|herbs' - с гипер-ссылкой на справку.
-    buf << endl << "См. также {Wсправка {hh" << skill->getNameFor(ch) << "{x." << endl;
+    buf << endl << "См. также {Wсправка {hh" << skill->getNameFor(ch).ruscase('1') << "{x." << endl;
 }
   
 

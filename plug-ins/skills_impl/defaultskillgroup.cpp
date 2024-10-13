@@ -46,9 +46,20 @@ void DefaultSkillGroup::unloaded( )
     skillGroupManager->unregistrate( Pointer( this ) );
 }
 
+const DLString & DefaultSkillGroup::getName( ) const
+{
+    return name.get(EN);
+}
+
+void DefaultSkillGroup::setName( const DLString &name ) 
+{
+    this->elementName = name;
+    this->name[EN] = name;
+}
+
 const DLString &DefaultSkillGroup::getRussianName( ) const
 {
-    return nameRus.getFullForm( );
+    return name.get(RU);
 }
 
 int DefaultSkillGroup::getPracticer( ) const
@@ -163,15 +174,13 @@ char DefaultSkillGroup::getSkillColor( Skill *skill, PCharacter *ch ) const
 
 bool DefaultSkillGroup::matchesUnstrict( const DLString &str ) const
 {
-    if (!name.empty( ) 
-        && str.strPrefix( name ))    
+    if (!getName().empty( ) 
+        && str.strPrefix( getName() ))    
     {
         return true;
     }
 
-    if (!nameRus.getFullForm( ).empty( ) 
-        && is_name( str.c_str( ),
-                    nameRus.decline( '7' ).c_str( ) ))
+    if (!name.get(RU).empty() && str.strPrefix(name.get(RU)))
     {
         return true;
     }

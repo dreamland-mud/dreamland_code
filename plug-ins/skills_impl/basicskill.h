@@ -13,6 +13,7 @@
 #include "xmltableelement.h"
 #include "xmlrussianstring.h"
 #include "xmlflags.h"
+#include "xmlmultistring.h"
 
 #include "skill.h"
 #include "affecthandler.h"
@@ -82,7 +83,7 @@ public:
     /** Print out info about mobs-practicers for this skill. */
     DLString printPracticers(PCharacter *ch) const;
 
-    XML_VARIABLE XMLStringNoEmpty nameRus;
+    XML_VARIABLE XMLMultiString name;
     XML_VARIABLE XMLRussianString dammsg;
     XML_VARIABLE XMLIntegerNoEmpty beats;
     XML_VARIABLE XMLIntegerNoEmpty mana;

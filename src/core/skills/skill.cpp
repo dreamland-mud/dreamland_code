@@ -16,7 +16,7 @@ GlobalBitvector Skill::zeroGroups;
 Skill::Skill( )
 {
 }
-Skill::Skill( const DLString &n ) : name( n )
+Skill::Skill( const DLString &name ) : elementName( name )
 {
 }
 Skill::~Skill( )
@@ -24,7 +24,7 @@ Skill::~Skill( )
 }
 const DLString& Skill::getName( ) const
 {
-    return name;
+    return elementName;
 }
 bool Skill::isValid( ) const
 {

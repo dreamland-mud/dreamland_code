@@ -37,10 +37,7 @@ HelpArticlePointer Language::getSkillHelp( ) const
 
 const DLString & Language::getRussianName( ) const
 {
-    if (!nameRusNoCase.empty( ))
-        return nameRusNoCase;
-    else
-        return nameRus;
+    return name.get(RU);
 }
 
 bool Language::visible( CharacterMemoryInterface * ch ) const
@@ -248,7 +245,7 @@ void Language::improve( Character *ch, bool, Character *victim, int, int ) const
     PCSkillData &data = pch->getSkillData( getIndex( ) );
 
     data.learned++;
-    ch->pecho( "Ты совершенствуешь свои познания в %^N6.", nameRus.getValue( ).c_str( ) );
+    ch->pecho( "Ты совершенствуешь свои познания в %^N6.", name.get(RU).c_str() );
 }
 
 AffectHandler::Pointer Language::getAffect( ) 

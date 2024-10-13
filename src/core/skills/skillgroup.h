@@ -41,7 +41,7 @@ public:
     const DLString& getNameFor( Character * ) const;
 
 protected:
-    DLString name;
+    DLString elementName;
 };
     
 

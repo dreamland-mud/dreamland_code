@@ -301,16 +301,20 @@ int BasicSkill::getEffective( Character *ch ) const
 
 const DLString & BasicSkill::getName( ) const
 {
-    return Skill::getName( );
+    return name.get(EN);
 }
+
 void BasicSkill::setName( const DLString &name ) 
 {
-    this->name = name;
+    this->name[EN] = name;
+    this->elementName = name;
 }
+
 const DLString & BasicSkill::getRussianName( ) const
 {
-    return nameRus;
+    return name.get(RU);
 }
+
 AffectHandlerPointer BasicSkill::getAffect( ) const 
 {
     return affect;

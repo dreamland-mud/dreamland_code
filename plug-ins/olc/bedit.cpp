@@ -141,7 +141,7 @@ BEDIT(affect, "аффект", "создать или редактировать 
             return false;
         }
 
-        skill->nameRus.setValue(bhv->getRussianName().ruscase('1'));
+        skill->name[RU] = bhv->getRussianName().ruscase('1');
         skill->help->setLevel(MAX_LEVEL);
 
         DefaultAffectHandler::Pointer ah(NEW);

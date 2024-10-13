@@ -12,6 +12,7 @@
 #include "xmltableelement.h"
 #include "xmlinteger.h"
 #include "xmlrussianstring.h"
+#include "xmlmultistring.h"
 #include "xmlglobalbitvector.h"
 #include "skillgrouphelp.h"
 #include "skillgroup.h"
@@ -26,8 +27,8 @@ public:
     
     DefaultSkillGroup( );
     
-    inline virtual const DLString & getName( ) const;
-    inline virtual void setName( const DLString & );
+    virtual const DLString & getName( ) const;
+    virtual void setName( const DLString & );
     inline virtual bool isValid( ) const;
     virtual bool matchesUnstrict( const DLString & ) const;
     virtual void loaded( );
@@ -39,7 +40,7 @@ public:
     virtual void show( PCharacter *, ostringstream & ) const;
     virtual int getPracticer( ) const;
 
-    XML_VARIABLE XMLRussianString    nameRus;
+    XML_VARIABLE XMLMultiString name;
     XML_VARIABLE XMLBoolean          hidden;
     XML_VARIABLE XMLBoolean          autoHelp;
     XML_VARIABLE XMLPointer<SkillGroupHelp> help;
@@ -54,15 +55,6 @@ protected:
     virtual char getSkillColor( Skill *, PCharacter * ) const;
 };
 
-inline const DLString & DefaultSkillGroup::getName( ) const
-{
-    return SkillGroup::getName( );
-}
-
-inline void DefaultSkillGroup::setName( const DLString &name ) 
-{
-    this->name = name;
-}
 
 inline bool DefaultSkillGroup::isValid( ) const
 {
