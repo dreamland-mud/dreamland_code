@@ -117,6 +117,11 @@ CMDRUNP( delete )
     
     pch = ch->getPC( );
 
+    if (pch->getAttributes().isAvailable("nodelete")) {
+        pch->pecho("Твой персонаж могут удалить только Боги.");
+        return;
+    }
+
     if (pch->confirm_delete)
     {
         if (!password_check( pch, argument ))
