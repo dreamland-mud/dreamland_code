@@ -28,7 +28,7 @@ bool XMLRussianString::toXML( XMLNode::Pointer& parent ) const
     node->setType( XMLNode::XML_TEXT );
     node->setCData( getFullForm() );
     
-    if (mg != MultiGender::MASCULINE)
+    if (mg != MultiGender::UNDEF)
         parent->insertAttribute( ATTRIBUTE_GRAMMAR, mg.toString() );
 
     parent->appendChild( node );
