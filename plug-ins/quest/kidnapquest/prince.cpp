@@ -10,7 +10,7 @@
 #include "dreamland.h"
 #include "act.h"
 #include "magic.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "fight.h"
 
 #include "player_utils.h"

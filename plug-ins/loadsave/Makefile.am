@@ -7,6 +7,7 @@ $(INCLUDES_SRC) \
 -I/usr/include/jsoncpp \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
+-I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/system 
 
 libloadsave_la_SOURCES = \
@@ -38,11 +39,16 @@ itemevents.cpp \
 areautils.cpp \
 roomutils.cpp \
 itemutils.cpp \
-charutils.cpp \
+char_weight.cpp \
+char_body.cpp \
 religionutils.cpp \
 areaquestutils.cpp \
 xmlattributeareaquest.cpp \
-behavior_utils.cpp
+behavior_utils.cpp \
+stats_apply.cpp \
+player_exp.cpp \
+player_account.cpp \
+money_utils.cpp
 
 libloadsave_la_MOC = \
 objectbehaviormanager.h \
@@ -53,6 +59,7 @@ libloadsave_la_LIBADD = \
 ../system/libsystem.la \
 ../system/libscheduler_task_round.la \
 ../output/liboutput.la \
+../interpret/libinterpret.la \
 -ljsoncpp
 
 affectflags.cpp: affectflags.conf affectflags.h

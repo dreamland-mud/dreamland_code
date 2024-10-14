@@ -19,6 +19,12 @@
  * Well known object virtual numbers.
  * Defined in #OBJECTS.
  */
+#define OBJ_VNUM_SILVER_ONE            1
+#define OBJ_VNUM_GOLD_ONE              2
+#define OBJ_VNUM_GOLD_SOME             3
+#define OBJ_VNUM_SILVER_SOME           4
+#define OBJ_VNUM_COINS                 5
+
 #define OBJ_VNUM_GRAVE                    9
 #define OBJ_VNUM_CORPSE_NPC             10
 #define OBJ_VNUM_CORPSE_PC             11
@@ -31,6 +37,8 @@
 #define OBJ_VNUM_BRAINS                     17
 
 #define OBJ_VNUM_POTION_VIAL             42
+
+#define OBJ_VNUM_CORK 19 
 
 #define OBJ_VNUM_STEAK               27
 

@@ -14,6 +14,8 @@
 #include "weapons.h"
 #include "attacks.h"
 #include "damageflags.h"
+#include "follow_utils.h"
+#include "wearloc_utils.h"
 
 class Character;
 class PCharacter;
@@ -70,5 +72,13 @@ typedef pair<int, time_t> kill_stat_t; // store total kills and last kill timest
 typedef map<int, kill_stat_t> vnum_stat_t; // maps mob vnum to its kill data (total counter and last kill timestamp)
 typedef map<DLString, vnum_stat_t> player_kill_stat_t; // maps player name to kill statistics for each mob vnum
 extern player_kill_stat_t player_kill_stat;
+
+
+// Invader's shadow life
+#define        SHADOW_ACTIVE                50        
+#define SHADOW(ch)            (HAS_SHADOW(ch) && number_percent() > SHADOW_ACTIVE)
+#define HALF_SHADOW(ch)            (HAS_SHADOW(ch) && number_percent() > SHADOW_ACTIVE/2)
+#define HAS_SHADOW(ch)            (!(ch)->is_npc() && (ch)->getPC()->shadow >= 0)
+
 
 #endif

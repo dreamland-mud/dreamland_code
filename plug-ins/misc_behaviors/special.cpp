@@ -69,7 +69,7 @@
 #include "object.h"
 
 #include "dreamland.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "merc.h"
 
 #include "act.h"
@@ -79,7 +79,11 @@
 
 #include "fight.h"
 #include "save.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "def.h"
 #include "vnum.h"
   

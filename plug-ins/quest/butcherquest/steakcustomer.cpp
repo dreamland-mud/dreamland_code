@@ -11,7 +11,7 @@
 #include "object.h"
 
 #include "vnum.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "act.h"
 
 #include "def.h"

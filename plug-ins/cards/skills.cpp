@@ -18,7 +18,7 @@
 
 #include "dreamland.h"
 #include "magic.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "fight.h"
 #include "damage_impl.h"
 #include "onehit_weapon.h"

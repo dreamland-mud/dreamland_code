@@ -18,7 +18,6 @@ communication \
 fight_core \
 movement \
 wearlocation \
-anatolia \
 admin \
 traverse \
 fight \

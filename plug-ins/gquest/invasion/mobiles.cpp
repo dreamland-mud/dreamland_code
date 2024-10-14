@@ -15,7 +15,7 @@
 #include "npcharacter.h"
 
 #include "act.h"
-#include "handler.h"
+#include "loadsave.h"
 
 /*--------------------------------------------------------------------------
  * Invasion Mobile 

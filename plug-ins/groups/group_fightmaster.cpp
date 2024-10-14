@@ -19,7 +19,11 @@
 #include "skillcommandtemplate.h"
 #include "skillmanager.h"
 
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "affect.h"
 #include "commonattributes.h"
 
@@ -35,7 +39,7 @@
 #include "damage.h"
 #include "def.h"
 #include "fight.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "interp.h"
 #include "magic.h"
 #include "material.h"
@@ -44,7 +48,7 @@
 #include "morphology.h"
 #include "onehit.h"
 #include "onehit_weapon.h"
-#include "charutils.h"
+
 #include "skill_utils.h"
 #include "roomutils.h"
 #include "vnum.h"
@@ -222,11 +226,11 @@ SKILL_APPLY(parry)
     // TODO: damage_to_obj is called here with a chance
     // destroyWeapon( );
 
-    if ( number_percent() >  gsn_parry->getEffective( victim ) && CharUtils::hasLegs(victim))
+    if ( number_percent() >  gsn_parry->getEffective( victim ) && Char::hasLegs(victim))
     {
         /* size  and weight */
-        chance += min(ch->canCarryWeight( ), ch->carry_weight) / 25;
-        chance -= min(victim->canCarryWeight( ), victim->carry_weight) / 20;
+        chance += min(Char::canCarryWeight(ch), ch->carry_weight) / 25;
+        chance -= min(Char::canCarryWeight(victim), victim->carry_weight) / 20;
 
         if (ch->size < victim->size)
             chance += (ch->size - victim->size) * 25;
@@ -545,11 +549,11 @@ SKILL_APPLY(crossblock)
     // TODO call damage_to_obj for the wield
     // destroyWeapon( );
 
-    if ( number_percent() >  gsn_cross_block->getEffective( victim ) && CharUtils::hasLegs(victim))
+    if ( number_percent() >  gsn_cross_block->getEffective( victim ) && Char::hasLegs(victim))
     {
         /* size  and weight */
-        chance += min(ch->canCarryWeight( ), ch->carry_weight) / 25;
-        chance -= min(victim->canCarryWeight( ), victim->carry_weight) / 10;
+        chance += min(Char::canCarryWeight(ch), ch->carry_weight) / 25;
+        chance -= min(Char::canCarryWeight(victim), victim->carry_weight) / 10;
 
         if (ch->size < victim->size)
             chance += (ch->size - victim->size) * 25;

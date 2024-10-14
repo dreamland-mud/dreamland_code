@@ -194,11 +194,6 @@ public:
     time_t getLastFightTime( ) const;
     bool is_adrenalined( ) const;
 
-    // carrying capacity (implemented in anatolia_core)
-    int canCarryNumber( ); 
-    int canCarryWeight( );
-    int getCarryWeight( ) const;
-
     // misc
     virtual bool is_vampire( ) const = 0;
     virtual bool is_mirror( ) const = 0;

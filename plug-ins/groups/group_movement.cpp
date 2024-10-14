@@ -35,7 +35,11 @@
 #include "magic.h"
 #include "fight.h"
 #include "damage.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "interp.h"
 #include "clanreference.h"
 
@@ -43,7 +47,7 @@
 #include "stats_apply.h"
 #include "merc.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "effects.h"
 #include "act.h"
 #include "vnum.h"

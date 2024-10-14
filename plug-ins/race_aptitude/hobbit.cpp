@@ -15,12 +15,16 @@
 #include "race.h"
 
 #include "dreamland.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "magic.h"
 #include "fight.h"
 #include "damage.h"
 #include "stats_apply.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "merc.h"
 
@@ -102,7 +106,7 @@ SKILL_RUNP( searchstones )
     for (int i = 0; i < count; i++) {
         stone = create_stone( mlevel );
 
-        if (ch->getCarryWeight( ) + stone->getWeight( ) > ch->canCarryWeight( )) {
+        if (Char::getCarryWeight(ch) + stone->getWeight( ) > Char::canCarryWeight(ch)) {
             ch->pecho( "Ты не в силах удержать %1$O4 и роняешь %1$P2.", stone );
             obj_to_room( stone, ch->in_room );
             break;

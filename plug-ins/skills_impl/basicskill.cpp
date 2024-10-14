@@ -11,7 +11,7 @@
 #include "register-impl.h"
 #include "lex.h"
 #include "feniamanager.h"
-
+#include "player_exp.h"
 #include "stringlist.h"
 #include "dlscheduler.h"
 #include "pcharacter.h"
@@ -234,7 +234,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         xp += 98 * getRating( pch );
     }
     
-    pch->gainExp( xp );
+    Player::gainExp(pch, xp);
 }
 
 int BasicSkill::getAdept( PCharacter *ch ) const

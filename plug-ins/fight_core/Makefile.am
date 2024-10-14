@@ -22,7 +22,6 @@ fight_exception.cpp \
 damage.cpp \
 damage_impl.cpp \
 character.cpp \
-stats_apply.cpp \
 weapons.cpp \
 weapontier.cpp \
 weaponaffixes.cpp \
@@ -33,7 +32,9 @@ material.cpp \
 fight_safe.cpp \
 immunity.cpp \
 follow_utils.cpp \
-skill_utils.cpp 
+skill_utils.cpp \
+fight_extract.cpp \
+item_progs.cpp
 
 libfight_core_la_LIBADD = \
 ../output/liboutput.la \

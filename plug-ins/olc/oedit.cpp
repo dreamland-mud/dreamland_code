@@ -39,7 +39,7 @@
 #include "act.h"
 #include "behavior.h"
 
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 
 #include "olc.h"
 #include "security.h"

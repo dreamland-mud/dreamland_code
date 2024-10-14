@@ -17,12 +17,12 @@
 
 #include "dreamland.h"
 #include "interp.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "directions.h"
 #include "merc.h"
 #include "fight.h"
 #include "act.h"
-
+#include "fight_extract.h"
 #include "save.h"
 
 #include "roomtraverse.h"

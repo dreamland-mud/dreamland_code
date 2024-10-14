@@ -11,7 +11,7 @@
 #include "room.h"
 
 #include "act.h"
-#include "../../anatolia/handler.h"
+#include "loadsave.h"
 #include "merc.h"
 
 #include "def.h"

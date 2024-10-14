@@ -18,7 +18,7 @@
 
 #include "merc.h"
 #include "act.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "save.h"
 #include "def.h"
 

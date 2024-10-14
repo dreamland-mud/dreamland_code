@@ -16,10 +16,11 @@
 #include "desire.h"
 #include "affect.h"
 #include "commandtemplate.h"
-
+#include "desire.h"
 #include "raceflags.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "magic.h"
+#include "fight_extract.h"
 #include "damage_impl.h"
 #include "skill_utils.h"
 #include "fight.h"
@@ -35,11 +36,14 @@ GSN(manacles);
 GSN(poison);
 DESIRE(full);
 DESIRE(hunger);
+DESIRE(thirst);
+DESIRE(bloodlust);
 RACE(fish);
 RACE(mouse);
 RACE(rat);
 RACE(rodent);
 PROF(druid);
+
 
 static bool oprog_eat( Object *obj, Character *ch )
 {
@@ -327,5 +331,34 @@ CMDRUNP( quaff )
 }
 
 
+// код прочистки желудка "двухпальцевым методом" ,)
+static void mprog_vomit( Character *ch )
+{
+    FENIA_VOID_CALL( ch, "Vomit", "C", ch );
+    FENIA_NDX_VOID_CALL( ch->getNPC( ), "Vomit", "CC", ch, ch );
 
+    for (Object *obj = ch->carrying; obj; obj = obj->next_content) {
+        FENIA_VOID_CALL( obj, "Vomit", "C", ch );
+        FENIA_NDX_VOID_CALL( obj, "Vomit", "OC", obj, ch );
+    }
+}
+
+CMDRUNP( vomit )
+{
+    if (!ch->is_npc( )) {
+        if (desire_bloodlust->applicable( ch->getPC( ) )) {
+            ch->pecho("Вампирам это, увы, недоступно.");
+            return;
+        }
+        
+        desire_full->vomit( ch->getPC( ) );
+        desire_hunger->vomit( ch->getPC( ) );
+        desire_thirst->vomit( ch->getPC( ) );
+    }
+
+    ch->recho("%1$^C1 засовыва%1$nет|ют пальцы в рот и начина%1$nет|ют блевать.", ch);
+	ch->pecho("Ты прочищаешь свой желудок двухпальцевым методом.");
+
+    mprog_vomit( ch );
+}
 

@@ -17,10 +17,10 @@
 #include "core/object.h"
 
 #include "skillreference.h"
-
+#include "wearloc_utils.h"
 #include "act.h"
 #include "interp.h"
-#include "../../anatolia/handler.h"
+#include "loadsave.h"
 #include "merc.h"
 
 #include "vnum.h"

@@ -21,11 +21,11 @@
 #include "npcharacter.h"
 #include "dreamland.h"
 #include "fight.h"
-#include "charutils.h"
+
 #include "move_utils.h"
 #include "skill_utils.h"
 #include "merc.h"
-#include "handler.h"
+#include "loadsave.h"
 
 #include "act.h"
 #include "interp.h"
@@ -87,8 +87,8 @@ SKILL_RUNP( tail )
     /* modifiers */
 
     /* size  and weight */
-    chance += min(ch->canCarryWeight( ), ch->carry_weight) / 200;
-    chance -= min(victim->canCarryWeight( ), victim->carry_weight) / 250;
+    chance += min(Char::canCarryWeight(ch), ch->carry_weight) / 200;
+    chance -= min(Char::canCarryWeight(victim), victim->carry_weight) / 250;
 
 
     if (ch->size < victim->size)
@@ -125,7 +125,7 @@ SKILL_RUNP( tail )
     
         victim->setWaitViolence( number_bits( 2 ) + 1 );
 
-        if (CharUtils::hasLegs(victim))
+        if (Char::hasLegs(victim))
             victim->position = POS_RESTING;
             
         damage_tail = ch->damroll +

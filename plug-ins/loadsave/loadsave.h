@@ -6,11 +6,17 @@
 #define __LOADSAVE_H__
 
 #include <list>
+#include "grammar_entities.h"
+#include "grammar_entities_impl.h"
 #include "dlstring.h"
 #include "arg_utils.h"
 #include "affectflags.h"
 #include "itemflags.h"
 #include "compatflags.h"
+#include "char_weight.h"
+#include "char_body.h"
+#include "money_utils.h"
+#include "itemutils.h"
 
 using namespace std;
 
@@ -111,9 +117,12 @@ Object *        get_obj_room_type( Character *ch, int type );
 Object *        get_obj_room_type( Room *room, int type );
 Object *        get_obj_list_type( Character *ch, int type, Object *list );
 Object *        get_obj_list_type( Character *ch, const DLString &cArg, int type, Object *list );
+Object * get_obj_list_vnum( Character *ch, int vnum, Object *list );
 int                count_obj_in_obj( Object *container );
 int                count_obj_in_obj( Object *container, int itype );
 Object *        get_obj_wear_carry( Character *ch, const DLString &cArgument, Character *looker = 0 );
+Object * get_key_carry( Character *ch, int vnum );
+
 bool can_see_god(Character *ch, Character *god);
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
 long long get_arg_id( const DLString &cArgument );
@@ -123,6 +132,7 @@ Object *find_pit_in_room(int roomVnum);
 
 bool eyes_blinded( Character *ch );
 bool eyes_darkened( Character *ch );
+void eyes_blinded_msg( Character *ch );
 
 #define IS_WEAPON_STAT(obj,stat)(IS_SET((obj)->value4(),(stat)))
 

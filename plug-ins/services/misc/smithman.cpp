@@ -16,9 +16,9 @@
 #include "npcharacter.h"
 
 #include "merc.h"
-
+#include "wearloc_utils.h"
 #include "interp.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "arg_utils.h"
 #include "act.h"
 #include "def.h"

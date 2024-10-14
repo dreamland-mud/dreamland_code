@@ -37,7 +37,7 @@
 #include "vnum.h"
 #include "clanreference.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "fight.h"
 #include "magic.h"
 #include "def.h"
@@ -190,7 +190,10 @@ VOID_SPELL(EyesOfTiger)::run( Character *ch, Character *victim, int sn, int leve
                 return;
         }
         
-        do_look_auto( ch, victim->in_room );
+        Room *was_in = ch->in_room;
+        ch->in_room = victim->in_room;
+        interpret_raw(ch, "look", "auto");
+        ch->in_room = was_in;
 }
 
 

@@ -1,6 +1,7 @@
 #include "doors.h"
 #include "directions.h"
 #include "character.h"
+#include "core/object.h"
 #include "room.h"
 #include "act.h"
 #include "merc.h"
@@ -61,5 +62,32 @@ void open_door ( Character *ch, int door )
             return;
 
     open_door_extra( ch, door, ch->in_room->exit[door] );
+}
+
+bool open_portal( Character *ch, Object *obj )
+{
+    if ( !IS_SET(obj->value1(), EX_ISDOOR) )
+    {
+            ch->pecho( "Ты не можешь сделать этого." );
+            return false;
+    }
+
+    if ( !IS_SET(obj->value1(), EX_CLOSED) )
+    {
+            ch->pecho( "Это уже открыто." );
+            return false;
+    }
+
+    if ( IS_SET(obj->value1(), EX_LOCKED) )
+    {
+            ch->pecho( "Здесь заперто." );
+            return false;
+    }
+
+    obj->value1(obj->value1() & ~EX_CLOSED);
+    oldact("Ты открываешь $o4.",ch,obj,0,TO_CHAR);
+    oldact("$c1 открывает $o4.",ch,obj,0,TO_ROOM);
+
+    return true;
 }
 

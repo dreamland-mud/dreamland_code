@@ -26,7 +26,11 @@
 #include "object.h"
 #include "core/behavior/behavior_utils.h"
 
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 
 
 #include "magic.h"
@@ -39,7 +43,7 @@
 #include "merc.h"
 #include "act.h"
 #include "interp.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "def.h"
 #include "skill_utils.h"
 

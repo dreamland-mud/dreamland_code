@@ -12,7 +12,7 @@
 
 #include "merc.h"
 #include "act.h"
-#include "handler.h"
+#include "loadsave.h"
 
 #include "magic.h"
 #include "def.h"

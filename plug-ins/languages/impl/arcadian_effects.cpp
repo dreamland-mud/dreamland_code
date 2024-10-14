@@ -20,7 +20,7 @@
 #include "fight.h"
 #include "damage.h"
 #include "act.h"
-#include "../../anatolia/handler.h"
+#include "loadsave.h"
 #include "effects.h"
 
 #include "vnum.h"

@@ -26,7 +26,7 @@
 #include "act.h"
 #include "skillreference.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "merc.h"
 #include "descriptor.h"
 #include "def.h"

@@ -18,9 +18,9 @@
 #include "fight.h"
 #include "damage.h"
 #include "act.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "effects.h"
-
+#include "fight_extract.h"
 #include "vnum.h"
 #include "def.h"
 

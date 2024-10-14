@@ -8,8 +8,7 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/descriptor \
--I$(top_srcdir)/plug-ins/output \
--I$(top_srcdir)/plug-ins/alignment
+-I$(top_srcdir)/plug-ins/output
 
 libiomanager_la_SOURCES = \
 iomanager.cpp \

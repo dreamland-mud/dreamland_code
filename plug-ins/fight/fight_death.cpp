@@ -29,6 +29,7 @@
 #include "core/object.h"
 #include "religion.h"
 #include "playerattributes.h"
+#include "player_account.h"
 #include "room.h"
 #include "affect.h"
 #include "liquid.h"
@@ -43,7 +44,8 @@
 #include "areaquestutils.h"
 #include "desire.h"
 #include "act.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
+#include "fight_extract.h"
 #include "merc.h"
 #include "damage.h"
 #include "fight.h"
@@ -54,10 +56,6 @@ using namespace std;
 
 // Temporary kill statistics.
 player_kill_stat_t player_kill_stat;
-
-
-void nuke_pets( PCharacter *ch, int flags );
-void notify_referers( Character *ch, int flags );
 
 // A set of PK looting rules defined in fight/loot.json.
 Json::Value loot;
@@ -150,7 +148,7 @@ protected:
             }
             else {
                 killer->pecho("{WТы методично обдираешь все вещи с трупа:{x");
-                do_get_all_raw( killer, corpse );
+                interpret_raw(killer, "get", "all %lld", corpse->getID());
             }
         }
     }
@@ -168,8 +166,9 @@ protected:
                     killer->pecho("{WТы пытаешься осмотреть труп, но почему-то не находишь его.{x");
                 return;
             }
-            else
-                oprog_examine( corpse, killer );    
+            else {
+                interpret_raw(killer, "look", "in %lld", corpse->getID());
+            }
         }
     }
 
@@ -182,7 +181,7 @@ protected:
             Object *money = get_obj_list_type( killer, ITEM_MONEY, corpse->contains );
 
             if (money)
-                do_get_raw( killer, money, corpse );
+                interpret_raw(killer, "get", "%lld %lld", money->getID(), corpse->getID());
         }
     }
 
@@ -222,7 +221,6 @@ protected:
  * death penalties
  *-----------------------------------------------------------------------------------------*/
 PROF(samurai);
-void delete_player( PCharacter * );
 
 class PlayerDeleteTask : public SchedulerTask {
 public:
@@ -243,7 +241,8 @@ public:
         infonet(pvict, 0, "{CТихий голос из $o2: ", msg.c_str());
         send_to_discord_stream(":ghost: " + msg);
         send_telegram(msg.c_str());
-        delete_player( pvict );
+
+        Player::quitAndDelete( pvict );
     }
     virtual int getPriority( ) const
     {
@@ -571,7 +570,7 @@ static void corpse_money( Object *corpse, Character *ch )
     if (ch->gold <= 0 && ch->silver <= 0)
         return;
     
-    money = create_money( ch->gold, ch->silver );
+    money = Money::create( ch->gold, ch->silver );
 
     if (corpse)
         obj_to_obj( money, corpse );
@@ -743,47 +742,6 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     return obj;
 }
 
-static void reset_dead_player( PCharacter *victim )
-{
-    for (auto &paf: victim->affected.clone())
-        affect_remove( victim, paf );
-
-    victim->affected_by    = 0;
-    victim->detection    = 0;
-    victim->armor.clear( );
-    victim->armor.fill( 100 );
-    victim->position    = POS_STANDING;
-    victim->hit        = victim->max_hit / 10;
-    victim->mana    = victim->max_mana / 10;
-    victim->move    = victim->max_move;
-    victim->shadow = -1;
-    victim->parts = victim->getRace()->getParts();
-
-    for (int i = 0; i < desireManager->size( ); i++)
-        desireManager->find( i )->reset( victim );
-}
-
-/*
- * Extract мертвого игрока
- */
-static void extract_dead_player( PCharacter *ch, int flags )
-{
-    Room *altar;
-    
-    nuke_pets( ch, flags );
-    follower_die(ch);
-
-    undig( ch );
-    ch->dismount( );
-    
-    if (( altar = get_room_instance( ch->getHometown( )->getAltar( ) ) )) {
-        char_from_room( ch );
-        char_to_room( ch, altar );
-    }
-
-    notify_referers( ch, flags );
-}
-
 static void killed_npc_gain( Character *killer, NPCharacter *victim )
 {
     victim->getNPC( )->pIndexData->killed++;
@@ -918,8 +876,6 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
 
     // Reset player and move them to the altar.    
     extract_dead_player( victim->getPC( ), FEXTRACT_COUNT );
-    
-    reset_dead_player( victim->getPC( ) );
     
     loyalty_gain( ch, victim );
 

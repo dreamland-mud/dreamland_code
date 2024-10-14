@@ -20,11 +20,11 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "object.h"
-
+#include "fight_extract.h"
 #include "act.h"
 
 #include "merc.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "descriptor.h"
 #include "vnum.h"
 #include "def.h"

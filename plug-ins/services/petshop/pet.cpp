@@ -17,11 +17,13 @@
 #include "occupations.h"
 #include "interp.h"
 #include "act.h"
-#include "../../anatolia/handler.h"
+#include "loadsave.h"
 #include "merc.h"
-
+#include "fight_extract.h"
+#include "follow_utils.h"
+#include "wearloc_utils.h"
 #include "def.h"
-#include "charutils.h"
+
 #include "skill_utils.h"
 #include "roomutils.h"
 #include "move_utils.h"
@@ -71,7 +73,7 @@ bool Pet::area( )
         msg = msg + fmt(0, "улета%1$nет|ют ", ch);
     else if (RoomUtils::isWater(ch->in_room))
         msg = msg + fmt(0, "уплыва%1$nет|ют ", ch);
-    else if (!CharUtils::hasLegs(ch))
+    else if (!Char::hasLegs(ch))
         msg = msg + fmt(0, "уполза%1$nет|ют ", ch);
     else
         msg = msg + fmt(0, "уход%1$nит|ят ", ch);

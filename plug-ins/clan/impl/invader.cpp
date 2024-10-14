@@ -28,13 +28,11 @@
 #include "object.h"
 #include "room.h"
 #include "affect.h"
-
+#include "interp.h"
 #include "act.h"
-
 #include "merc.h"
-
 #include "fight.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "vnum.h"
 #include "clanreference.h"
 #include "magic.h"
@@ -203,7 +201,10 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, const DLString &args, int sn, int
                       ch);
     }
 
-    do_look_auto(ch, victim->in_room);
+    Room *was_in = ch->in_room;
+    ch->in_room = victim->in_room;
+    interpret_raw(ch, "look", "auto");
+    ch->in_room = was_in;
 }
 
 SPELL_DECL(ShadowCloak);

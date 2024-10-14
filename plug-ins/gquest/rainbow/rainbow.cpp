@@ -30,7 +30,7 @@
 
 #include "act.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "save.h"
 #include "merc.h"
 #include "descriptor.h"

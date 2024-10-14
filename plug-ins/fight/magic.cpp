@@ -74,9 +74,12 @@
 
 #include "magic.h"
 #include "clanreference.h"
-
-#include "act_move.h"
-#include "../anatolia/handler.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
+#include "loadsave.h"
 #include "interp.h"
 #include "vnum.h"
 #include "fight_exception.h"

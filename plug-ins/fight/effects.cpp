@@ -63,9 +63,9 @@
 #include "desire.h"
 #include "act.h"
 
-#include "charutils.h"
+
 #include "fight.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "material.h"
 #include "magic.h"
 #include "def.h"
@@ -352,7 +352,7 @@ void fire_effect(void *vo, Character *source, short level, int dam, int target, 
 
         /* chance of blindness */
         if (!IS_AFFECTED(victim,AFF_BLIND) 
-            && CharUtils::hasEyes(victim)
+            && Char::hasEyes(victim)
             && !saves_spell(effect_level, victim, DAM_FIRE, 0, dam_flag))
         {
             Affect af;

@@ -5,13 +5,12 @@
 
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "act_move.h"
 #include "exitsmovement.h"
 #include "portalmovement.h"
 #include "loadsave.h"
 #include "interp.h"
 #include "act.h"
-
+#include "doors.h"
 #include "wanderer.h"
 
 Wanderer::Wanderer( )

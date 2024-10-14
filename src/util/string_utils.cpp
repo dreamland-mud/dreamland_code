@@ -74,5 +74,18 @@ bool String::lessCase( const DLString &a, const DLString& b )
         return false;
 }
 
+bool String::isEmpty( const char *arg )
+{
+    DLString descr;
 
+    if (arg == 0 || arg[0] == 0)
+        return true;
 
+    descr = arg;
+    descr.colourstrip( );
+    
+    if (descr.empty( ))
+        return true;
+
+    return false;
+}

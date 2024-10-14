@@ -23,7 +23,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
-
+#include "fight.h"
 #include "descriptor.h"
 #include "comm.h"
 
@@ -31,8 +31,8 @@
 #include "occupations.h"
 #include "shoptrader.h"
 #include "move_utils.h"
-#include "act_lock.h"
-#include "handler.h"
+#include "keyhole.h"
+#include "loadsave.h"
 #include "act.h"
 #include "merc.h"
 

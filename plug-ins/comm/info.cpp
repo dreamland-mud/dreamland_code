@@ -13,7 +13,7 @@
 #include "xmlpcstringeditor.h"
 #include "websocketrpc.h"
 #include "interp.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "vnum.h"
 #include "arg_utils.h"
 

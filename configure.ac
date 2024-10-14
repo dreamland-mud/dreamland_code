@@ -214,8 +214,6 @@ plug-ins/mansion/Makefile \
 plug-ins/feniaroot/Makefile \
 plug-ins/web/Makefile \
 plug-ins/remort/Makefile \
-plug-ins/anatolia/Makefile \
-plug-ins/anatolia/core/Makefile \
 plug-ins/note/Makefile \
 plug-ins/cards/Makefile \
 plug-ins/services/Makefile \

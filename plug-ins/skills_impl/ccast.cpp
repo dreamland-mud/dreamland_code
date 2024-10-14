@@ -23,7 +23,7 @@
 #include "interp.h"
 #include "merc.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "def.h"
 
 #include "logstream.h"

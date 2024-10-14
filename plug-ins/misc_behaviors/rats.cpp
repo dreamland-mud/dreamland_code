@@ -12,11 +12,11 @@
 #include "room.h"
 #include "npcharacter.h"
 
-
+#include "fight_extract.h"
 #include "save.h"
 #include "act.h"
 #include "merc.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "move_utils.h"
 #include "vnum.h"
 

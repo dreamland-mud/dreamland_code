@@ -20,15 +20,19 @@
 #include <object.h>
 #include <affect.h>
 #include "room.h"
-
+#include "fight_extract.h"
 #include "comm.h"
 #include "merc.h"
 #include "act.h"
 #include "interp.h"
 #include "clanreference.h"
 #include "profession.h"
-#include "../anatolia/handler.h"
-#include "act_move.h"
+#include "loadsave.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "update_areas.h"
 #include "websocketrpc.h"
 

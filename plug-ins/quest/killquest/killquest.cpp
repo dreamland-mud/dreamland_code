@@ -13,7 +13,7 @@
 #include "npcharacter.h"
 #include "room.h"
 
-#include "handler.h"
+#include "loadsave.h"
 
 #include "merc.h"
 #include "act.h"

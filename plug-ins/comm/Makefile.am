@@ -33,7 +33,38 @@ groupchannel.cpp \
 following.cpp \
 drop.cpp \
 fly.cpp \
-help.cpp
+help.cpp \
+score.cpp \
+title.cpp \
+report.cpp \
+prompt.cpp \
+compare.cpp \
+where.cpp \
+demand.cpp \
+wimpy.cpp \
+account.cpp \
+auction.cpp \
+quit.cpp \
+scan.cpp \
+bodyposition.cpp \
+move.cpp \
+use.cpp \
+give.cpp \
+put.cpp \
+search.cpp \
+get.cpp \
+exits.cpp \
+look.cpp \
+read.cpp \
+examine.cpp \
+inventory.cpp \
+equipment.cpp \
+open.cpp \
+close.cpp \
+lock.cpp \
+unlock.cpp \
+wizard.cpp \
+set.cpp
 
 libcomm_la_MOC = \
 configs.h \

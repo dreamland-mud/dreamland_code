@@ -16,7 +16,7 @@
 #include "weapongenerator.h"
 #include "exitsmovement.h"
 #include "movetypes.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "interp.h"
 #include "fight.h"
 #include "act.h"

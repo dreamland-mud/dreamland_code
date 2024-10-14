@@ -14,7 +14,7 @@
 
 #include "merc.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "def.h"
 
 /*--------------------------------------------------------------------------

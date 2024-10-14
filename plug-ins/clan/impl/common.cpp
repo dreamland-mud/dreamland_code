@@ -14,7 +14,7 @@
 #include "hometown.h"
 
 #include "act.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "merc.h"
 
 #include "def.h"

@@ -20,12 +20,12 @@
 #include "room.h"
 #include "object.h"
 #include "bonus.h"
-
+#include "player_exp.h"
 #include "alignment.h"
 #include "wiznet.h"
 #include "merc.h"
 #include "xmlkillingattribute.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "bonus.h"
 #include "fight.h"
 #include "act.h"
@@ -315,7 +315,7 @@ void group_gain( Character *ch, Character *victim, Character *realKiller )
         
         xp = xp_compute( gch, victim, mobcount, players.size( ), leader, base_exp_bonus );
         gch->pecho( "Ты получаешь {C%1$d{x очк%1$Iо|а|ов опыта за убийство %2$#C2.", xp, victim );
-        gch->gainExp( xp );
+        Player::gainExp(gch, xp);
         
         apply_align_changes( gch );
     }

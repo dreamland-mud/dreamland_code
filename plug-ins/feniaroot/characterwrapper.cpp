@@ -36,17 +36,22 @@
 #include "interp.h"
 #include "comm.h"
 #include "save.h"
-
+#include "player_exp.h"
 #include "fight.h"
 #include "skill_utils.h"
 #include "immunity.h"
 #include "magic.h"
 #include "movement.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "merc.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "alignment.h"
 #include "wiznet.h"
+#include "fight_extract.h"
 #include "xmlattributecoder.h"
 #include "xmlattributerestring.h"
 #include "commonattributes.h"
@@ -938,19 +943,19 @@ NMI_GET( CharacterWrapper, wearloc, "названия всех слотов эк
 NMI_GET( CharacterWrapper, max_carry_weight, "макс вес, который может нести персонаж, 0 для петов, 100500 для богов")
 {
     checkTarget( );
-    return target->canCarryWeight();
+    return Char::canCarryWeight(target);
 }
 
 NMI_GET( CharacterWrapper, max_carry_number, "макс кол-во вещей, которое может нести персонаж, 0 для петов, 1000 для богов")
 {
     checkTarget( );
-    return target->canCarryNumber();
+    return Char::canCarryNumber(target);
 }
 
 NMI_GET(CharacterWrapper, carry_weight, "вес, который несет персонаж")
 {
     checkTarget();
-    return target->getCarryWeight();
+    return Char::getCarryWeight(target);
 }
 
 
@@ -1661,7 +1666,7 @@ NMI_INVOKE( CharacterWrapper, gainExp, "(exp): добавляет exp очков
         throw Scripting::NotEnoughArgumentsException( );
     
     CHK_NPC
-    target->getPC()->gainExp(i->toNumber());
+    Player::gainExp(target->getPC(), i->toNumber());
 
     return Register();
 }
@@ -2245,7 +2250,7 @@ NMI_INVOKE(CharacterWrapper, can_drop_obj, "(obj): может ли избави�
 {
     checkTarget( );
     ::Object *obj = arg2item( get_unique_arg( args ) );
-    return ::can_drop_obj(target, obj, false);
+    return Item::canDrop(target, obj, false);
 }
 
 NMI_INVOKE( CharacterWrapper, mortality, "(): включает-выключает бессмертие для кодеров" )
@@ -2448,7 +2453,13 @@ NMI_INVOKE( CharacterWrapper, add_pet, "(pet): добавить пета нам 
 NMI_INVOKE( CharacterWrapper, look_auto, "(room): вывести описание комнаты room, будто там набрали look" )
 {
     checkTarget( );
-    do_look_auto( target, arg2room( get_unique_arg( args ) ) );
+    Room *room = arg2room( get_unique_arg( args ) );
+
+    Room *was_in = target->in_room;
+    target->in_room = room;
+    interpret_raw(target, "look", "auto");
+    target->in_room = was_in;
+
     return Register( );
 }
 

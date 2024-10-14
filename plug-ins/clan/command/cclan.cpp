@@ -20,8 +20,8 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "clanreference.h"
-
-#include "handler.h"
+#include "wearloc_utils.h"
+#include "loadsave.h"
 #include "infonet.h"
 #include "messengers.h"
 #include "act.h"

@@ -20,7 +20,7 @@
 #include "room.h"
 #include "searcher_val.h"    
 #include "profiler.h"
-
+#include "string_utils.h"
 #include "websocketrpc.h"
 #include "dreamland.h"
 #include "merc.h"
@@ -28,13 +28,11 @@
 #include "comm.h"
 #include "weapontier.h"
 #include "weapons.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 
 #include "def.h"
 
 static IconvMap koi2utf("koi8-u", "utf-8");
-
-bool is_empty_descr( const char *arg );
 
 GSN(none);
 
@@ -999,7 +997,7 @@ CMDRUNP(searcher)
 
                 if (searcher_parse(pMob, args.c_str())) {
                     DLString name = russian_case(pMob->short_descr, '1');
-                    if (is_empty_descr(pMob->description))
+                    if (String::isEmpty(pMob->description))
                         name = "{R*{x" + name;
 
                     DLString line = 

@@ -26,13 +26,17 @@
 #include "affect.h"
 #include "magic.h"
 #include "fight.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 
 
 #include "merc.h"
 
 #include "occupations.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "vnum.h"
 #include "def.h"

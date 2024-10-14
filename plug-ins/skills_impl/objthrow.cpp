@@ -13,21 +13,26 @@
  *    Andreyanov Aleksandr {Manwe}                                         *
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
+#include <string.h>
 #include "objthrow.h"
 
 #include "skill.h"
-
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "room.h"
 #include "object.h"
 #include "affect.h"
 
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 
 #include "fight.h"
 #include "damage.h"
-#include "handler.h"
+#include "loadsave.h"
+#include "wearloc_utils.h"
 #include "effects.h"
 #include "magic.h"
 #include "clanreference.h"
@@ -295,4 +300,54 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     if (victim->is_npc( ) && victim->getNPC( )->behavior)
         victim->getNPC( )->behavior->shot( ch, door );
 }
+
+Character * find_char( Character *ch, const char *cArgument, int door, int *range, ostringstream &errbuf )
+{
+    char argument[MAX_STRING_LENGTH];
+    char arg[MAX_INPUT_LENGTH];
+    EXIT_DATA *pExit, *bExit;
+    Room *dest_room, *back_room;
+    Character *target;
+    int number = 0, opdoor;
+    
+    strcpy( argument, cArgument );
+    number = number_argument(argument,arg);
+    dest_room = ch->in_room;
+
+    // Look for target in the same room only if a non-ranged lookup is requested.
+    if (door == -1 && (target = get_char_room(ch,dest_room,arg,&number)) != 0)
+        return target;
+
+    opdoor = dirs[door].rev;
+
+    while (*range > 0)
+    {
+        *range = *range - 1;
+        /* find target room */
+        back_room = dest_room;
+
+        if ( (pExit = dest_room->exit[door]) == 0
+            || !ch->can_see( pExit )
+            || (dest_room = pExit->u1.to_room ) == 0
+            || IS_SET(pExit->exit_info,EX_CLOSED) )
+            break;
+
+        if ( (bExit = dest_room->exit[opdoor]) == 0
+            || bExit->u1.to_room != back_room)
+        {
+            errbuf << "Ты не сможешь добраться до них через односторонний проход." << endl;
+            return 0;
+        }
+
+        if ((target = get_char_room(ch,dest_room,arg,&number)) != 0 )
+            return target;
+    }
+    
+    errbuf << "Ты не видишь " << dirs[door].where << " никого с таким именем." << endl;
+    return 0;
+}
+        
+
+
+
 

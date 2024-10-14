@@ -14,6 +14,7 @@
 // MOC_SKIP_END
 #include "pluginwrapperimpl.h"
 
+class Object;
 
 class ObjectWrapper : public PluginWrapperImpl<ObjectWrapper>
 {

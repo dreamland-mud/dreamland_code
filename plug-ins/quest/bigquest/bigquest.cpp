@@ -9,7 +9,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "roomutils.h"
-#include "../../anatolia/handler.h"
+#include "loadsave.h"
 
 #include "merc.h"
 #include "act.h"

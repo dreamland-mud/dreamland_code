@@ -8,7 +8,7 @@
 #include "npcharacter.h"
 
 #include "object.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"

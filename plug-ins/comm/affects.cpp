@@ -8,8 +8,9 @@
 #include "autoflags.h"
 #include "affectflags.h"
 #include "profflags.h"
+#include "fight.h"
 #include "mudtags.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "def.h"
 

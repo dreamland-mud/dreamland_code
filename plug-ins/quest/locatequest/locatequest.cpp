@@ -18,7 +18,7 @@
 #include "room.h"
 #include "player_utils.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "save.h"
 

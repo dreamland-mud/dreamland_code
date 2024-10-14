@@ -24,7 +24,7 @@
 #include "occupations.h"
 #include "act.h"
 #include "merc.h"
-#include "../../anatolia/handler.h"
+#include "loadsave.h"
 
 
 #include "cquest.h"

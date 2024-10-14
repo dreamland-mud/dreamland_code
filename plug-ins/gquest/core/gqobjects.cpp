@@ -3,7 +3,7 @@
 #include "globalquest.h"
 #include "core/object.h"
 #include "character.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "merc.h"
 #include "def.h"
 

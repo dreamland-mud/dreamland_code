@@ -1,5 +1,5 @@
-#ifndef PLAYER_UTILS_H
-#define PLAYER_UTILS_H
+#ifndef PLAYER_UTILS_SYSTEM_H
+#define PLAYER_UTILS_SYSTEM_H
 
 #include "xmlmultistring.h"
 

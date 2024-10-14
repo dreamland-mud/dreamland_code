@@ -13,6 +13,7 @@
 #include "occupations.h"
 #include "player_utils.h"
 #include "pcharacter.h"
+#include "fight_extract.h"
 #include "save.h"
 #include "merc.h"
 #include "def.h"

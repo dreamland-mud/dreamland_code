@@ -20,13 +20,13 @@
 #include "affect.h"
 #include "skillcommand.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "onehit_weapon.h"
 #include "damage_impl.h"
 #include "fight.h"
 #include "magic.h"
-
+#include "interp.h"
 #include "immunity.h"
 #include "merc.h"
 

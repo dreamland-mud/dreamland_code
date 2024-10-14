@@ -112,4 +112,14 @@ void interpret_raw( Character *ch, const char *cmd, const char *format, ... )
 //        LogStream::sendWarning( ) << "No command '" << cmd << "' for raw interpret!" << endl;
 }
 
+void do_yell( Character *ch, const char *argument )
+{
+    interpret_raw( ch, "yell", argument );
+}
+
+void do_say( Character *ch, const char *argument )
+{
+    interpret_raw( ch, "say", argument );
+}
+
 

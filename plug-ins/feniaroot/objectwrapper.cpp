@@ -32,7 +32,7 @@
 #include "nativeext.h"
 #include "wrap_utils.h"
 #include "subr.h"
-#include "../anatolia/handler.h"
+#include "item_progs.h"
 #include "fenia_utils.h"
 #include "drink_utils.h"
 #include "material.h"

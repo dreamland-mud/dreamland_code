@@ -22,7 +22,11 @@
 #include "npcharacter.h"
 #include "object.h"
 
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 
 #include "skill_utils.h"
 
@@ -32,7 +36,7 @@
 #include "onehit_weapon.h"
 #include "chance.h"
 #include "merc.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "def.h"
 #include "stats_apply.h"

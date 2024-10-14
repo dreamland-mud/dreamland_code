@@ -25,7 +25,6 @@ libadmin_la_LIBADD = \
 ../loadsave/libloadsave.la \
 ../iomanager/libiomanager.la \
 ../system/libsystem.la \
-../anatolia/core/libanatoliacore.la \
 ../communication/libcommunication.la \
 ../servlets/libservlets.la \
 -ljsoncpp

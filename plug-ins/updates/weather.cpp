@@ -27,7 +27,7 @@
 #include "dreamland.h"
 #include "descriptor.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "messengers.h"
 #include "merc.h"

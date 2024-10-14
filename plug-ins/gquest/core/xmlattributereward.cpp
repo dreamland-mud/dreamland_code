@@ -10,7 +10,7 @@
 #include "gqchannel.h"
 #include "globalquestinfo.h"
 #include "globalquestmanager.h"
-
+#include "player_exp.h"
 #include "class.h"
 #include "pcharacter.h"
 #include "descriptor.h"
@@ -80,7 +80,7 @@ void XMLAttributeReward::reward( PCharacter *ch )
         
         c = r->experience;
         if (c > 0) {
-            ch->gainExp( c );
+            Player::gainExp(ch, c);
             buf << fmt(0, "%s%s%4d %sочк%s опыта\r\n",
                      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
                      GET_COUNT(c, "о", "а", "ов"));

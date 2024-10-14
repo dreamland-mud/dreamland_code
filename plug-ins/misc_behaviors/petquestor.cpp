@@ -5,7 +5,8 @@
 #include "petquestor.h"
 #include "npcharacter.h"
 #include "save.h"
-#include "handler.h"
+#include "fight_extract.h"
+#include "loadsave.h"
 #include "def.h"
 
 PetQuestor::PetQuestor( )

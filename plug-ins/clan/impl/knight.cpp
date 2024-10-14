@@ -40,8 +40,12 @@
 
 #include "fight.h"
 #include "weapongenerator.h"
-#include "act_move.h"
-#include "handler.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
+#include "loadsave.h"
 #include "magic.h"
 #include "def.h"
 

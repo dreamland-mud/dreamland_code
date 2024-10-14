@@ -40,7 +40,7 @@
 #include "dlscheduler.h"
 #include "character.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 #include "behavior.h"
 #include "merc.h"
 

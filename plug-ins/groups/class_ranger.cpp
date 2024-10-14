@@ -39,7 +39,11 @@
 
 #include "dreamland.h"
 
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 
 #include "magic.h"
 #include "fight.h"
@@ -51,7 +55,7 @@
 #include "damage_impl.h"
 #include "vnum.h"
 #include "merc.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "save.h"
 #include "act.h"
 #include "interp.h"

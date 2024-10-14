@@ -16,7 +16,7 @@
 #include "raceflags.h"
 #include "magic.h"
 #include "fight.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "stats_apply.h"
 
 #include "act.h"

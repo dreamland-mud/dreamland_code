@@ -26,6 +26,7 @@
 #include "object.h"
 #include "room.h"
 #include "affect.h"
+#include "fight_extract.h"
 
 #include "dreamland.h"
 #include "fight.h"
@@ -39,10 +40,14 @@
 
 
 #include "vnum.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "save.h"
 #include "interp.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "act.h"
 
 #include "ruler.h"

@@ -28,7 +28,7 @@
 #include "effects.h"
 #include "defaultspell.h"
 #include "dl_math.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "dreamland.h"
 #include "vnum.h"
 #include "merc.h"

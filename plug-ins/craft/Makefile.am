@@ -40,7 +40,6 @@ $(LIBADD_AI) \
 ../ed/libcoreed.la \
 ../updates/libupdates.la \
 ../wearlocation/libwearlocation.la \
-../anatolia/libcmd_wizard.la \
 ../skills_impl/libskills_impl.la \
 ../clan/core/libclan_core.la \
 ../quest/core/libquest_core.la \

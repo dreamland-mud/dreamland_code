@@ -11,7 +11,7 @@
 #include "arg_utils.h"
 #include "act.h"
 
-#include "handler.h"
+#include "loadsave.h"
 
 /*--------------------------------------------------------------------------
  * QuestMaster

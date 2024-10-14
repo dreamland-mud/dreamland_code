@@ -38,7 +38,6 @@ INCLUDES_ANATOLIA= \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/iomanager \
--I$(top_srcdir)/plug-ins/alignment \
 -I$(top_srcdir)/plug-ins/command \
 -I$(top_srcdir)/plug-ins/help \
 -I$(top_srcdir)/plug-ins/fight_core \
@@ -46,7 +45,6 @@ INCLUDES_ANATOLIA= \
 -I$(top_srcdir)/plug-ins/race \
 -I$(top_srcdir)/plug-ins/movement \
 -I$(top_srcdir)/plug-ins/occupations \
--I$(top_srcdir)/plug-ins/anatolia/core \
 -I$(top_srcdir)/plug-ins/anatolia
 
 INCLUDES_FIGHT = \
@@ -71,14 +69,12 @@ $(top_builddir)/plug-ins/loadsave/libloadsave.la \
 $(top_builddir)/plug-ins/iomanager/libiomanager.la \
 $(top_builddir)/plug-ins/movement/libmovement.la \
 $(top_builddir)/plug-ins/wearlocation/libwearlocation.la \
-$(top_builddir)/plug-ins/fight_core/libfight_core.la \
-$(top_builddir)/plug-ins/anatolia/core/libanatoliacore.la 
+$(top_builddir)/plug-ins/fight_core/libfight_core.la 
 
 LIBADD_ANATOLIA = \
 $(LIBADD_ANATOLIA_CORE) \
 $(top_builddir)/plug-ins/command/libcommand.la \
 $(top_builddir)/plug-ins/help/libhelp.la \
-$(top_builddir)/plug-ins/anatolia/libanatolia.la \
 $(top_builddir)/plug-ins/occupations/liboccupations.la \
 $(top_builddir)/plug-ins/race/librace.la 
 

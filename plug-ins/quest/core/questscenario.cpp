@@ -10,7 +10,7 @@
 #include "npcharacter.h"
 #include "pcharacter.h"
 
-#include "../../anatolia/handler.h"
+#include "loadsave.h"
 
 #include "merc.h"
 #include "def.h"

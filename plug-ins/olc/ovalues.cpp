@@ -13,7 +13,7 @@
 #include "skillmanager.h"
 #include "loadsave.h"
 #include "recipeflags.h"
-#include "act_lock.h"
+#include "keyhole.h"
 #include "weapons.h"
 #include "liquid.h"
 #include "weapontier.h"

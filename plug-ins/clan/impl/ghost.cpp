@@ -20,8 +20,8 @@
 #include "skillreference.h"
 #include "act.h"
 
-#include "handler.h"
-
+#include "loadsave.h"
+#include "interp.h"
 #include "magic.h"
 #include "merc.h"
 #include "def.h"

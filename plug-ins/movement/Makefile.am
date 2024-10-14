@@ -26,7 +26,8 @@ doors.cpp \
 walkment.cpp \
 transfermovement.cpp \
 recallmovement.cpp \
-jumpmovement.cpp
+jumpmovement.cpp \
+keyhole.cpp
 
 libmovement_la_LIBADD = \
 ../output/liboutput.la \

@@ -15,7 +15,7 @@
 #include "fight.h"
 #include "fenia_utils.h"
 #include "interp.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "magic.h"
 #include "merc.h"
 

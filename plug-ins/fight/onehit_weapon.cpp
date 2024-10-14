@@ -20,7 +20,7 @@
 #include "clanreference.h"
 
 #include "fight.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "math_utils.h"
 
 #include "effects.h"

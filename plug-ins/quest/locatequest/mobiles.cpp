@@ -14,7 +14,7 @@
 
 #include "act.h"
 #include "interp.h"
-#include "handler.h"
+#include "loadsave.h"
 
 #include "def.h"
 

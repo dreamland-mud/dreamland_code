@@ -18,7 +18,7 @@
 #include "wrap_utils.h"
 #include "subr.h"
 #include "fight.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "damageflags.h"
 #include "merc.h"
 #include "schedulerwrapper.h"

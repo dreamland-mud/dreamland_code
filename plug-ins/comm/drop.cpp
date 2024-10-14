@@ -4,17 +4,16 @@
 #include "roomutils.h"
 #include "material.h"
 #include "act.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "commandtemplate.h"
 #include "damageflags.h"
 #include "save.h"
+#include "wearloc_utils.h"
 #include "dreamland.h"
 #include "merc.h"
 #include "def.h"
 
-bool can_drop_obj( Character *ch, Object *obj, bool verbose );
 bool oprog_drop( Object *obj, Character *ch );
-bool parse_money_arguments( Character *ch, const char *arg, int amount, int &gold, int &silver );
 
 #define DROP_OBJ_NORMAL  0
 #define DROP_OBJ_EXTRACT 1
@@ -84,13 +83,13 @@ CMDRUNP( drop )
         amount   = atoi(arg);
         argument = one_argument( argument, arg );
 
-        if (!parse_money_arguments( ch, arg, amount, gold, silver ))
+        if (!Money::parse( ch, arg, amount, gold, silver ))
             return;
 
         ch->silver -= silver;
         ch->gold -= gold;
-        get_money_here( ch->in_room->contents, gold, silver );
-        obj = create_money( gold, silver );
+        Money::dematerialize( ch->in_room->contents, gold, silver );
+        obj = Money::create( gold, silver );
 
         if ( RoomUtils::isWater( ch->in_room ) )
         {
@@ -127,7 +126,7 @@ CMDRUNP( drop )
             return;
         }
 
-        if (can_drop_obj( ch, obj, true )) 
+        if (Item::canDrop( ch, obj, true )) 
             drop_obj( ch, obj );
     }
     else { /* 'drop all' or 'drop all.obj', drop all.'obj names' */
@@ -150,7 +149,7 @@ CMDRUNP( drop )
                 continue;
             if (obj->wear_loc != wear_none)
                 continue;
-            if (!can_drop_obj( ch, obj, true ))
+            if (!Item::canDrop( ch, obj, true ))
                 continue;
 
             found = true;

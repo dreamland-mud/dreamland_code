@@ -10,7 +10,11 @@
 #include "character.h"
 #include "core/object.h"
 #include "room.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "itemflags.h"
 #include "merc.h"
 

@@ -27,7 +27,7 @@
 #include "material-table.h"
 #include "material.h"
 #include "fight.h"
-
+#include "loadsave.h"
 #include "fenia/exceptions.h"
 #include "nativeext.h"
 #include "regcontainer.h"
@@ -41,7 +41,6 @@
 #include "calendar_utils.h"
 #include "skill_utils.h"
 #include "xmlattributerestring.h"
-#include "handler.h"
 #include "clanarea.h"
 
 #include "profflags.h"

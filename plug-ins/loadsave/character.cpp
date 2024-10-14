@@ -16,6 +16,9 @@
 CLAN(none);
 WEARLOC(stuck_in);
 WEARLOC(hold_leg);
+GSN(fire_breath);
+GSN(sand_storm);
+GSN(dirt_kicking);
 
 /****************************************************************************
  * visibility of things 
@@ -223,4 +226,26 @@ bool eyes_darkened( Character *ch )
 
     return true;
 }
+
+void eyes_blinded_msg( Character *ch )
+{
+    if (!IS_AFFECTED(ch, AFF_BLIND))
+        return;
+
+    for (auto &paf: ch->affected.findAllWithBits(&affect_flags, AFF_BLIND)) {
+        if (paf->type == gsn_fire_breath)
+            ch->pecho( "Твои глаза слезятся из-за дыма, и ты ничего не видишь." );
+        else if (paf->type == gsn_sand_storm)
+            ch->pecho( "Песок в глазах мешает тебе что-либо разглядеть." );
+        else if (paf->type == gsn_dirt_kicking)
+            ch->pecho( "Ты ничего не видишь из-за пыли, попавшей в глаза." );
+        else
+            continue;
+
+        return;
+    }
+
+    ch->pecho( "Твои глаза слепы, ты ничего не видишь!" );
+}
+
 

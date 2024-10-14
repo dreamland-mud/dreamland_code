@@ -14,12 +14,16 @@
 #include "skillreference.h"
 
 #include "dreamland.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "fight.h"
 #include "skill_utils.h"
 
 #include "stats_apply.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "interp.h"
 #include "magic.h"
@@ -405,7 +409,7 @@ bool BasicMobileBehavior::doScavenge( )
     if (!target)
         return false;
 
-    do_get_raw( ch, target );
+    interpret_raw(ch, "get", "%lld", target->getID());
 
     if (target->carried_by != ch)
         return false;
@@ -506,7 +510,7 @@ bool BasicMobileBehavior::doPickWeapon( )
                 choice = obj;
     
     if (choice && !mprog_cant_scavenge(ch, choice)) {
-        do_get_raw( ch, choice );
+        interpret_raw(ch, "get", "%lld", choice->getID());
         return true;
     }
     

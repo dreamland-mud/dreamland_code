@@ -24,7 +24,11 @@
 #include "npcharacter.h"
 #include "object.h"
 
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 
 
 #include "magic.h"
@@ -34,11 +38,11 @@
 #include "material.h"
 #include "fight.h"
 #include "vnum.h"
-#include "charutils.h"
+
 #include "stats_apply.h"
 #include "merc.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "interp.h"
 #include "def.h"
@@ -146,7 +150,7 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
                 oldact("{R$c1 ВЫБИ$gЛО|Л|ЛА {xу тебя оружие, и оно упало на землю!{x", ch, 0, victim, TO_VICT );
                 obj_to_room( obj, victim->in_room );
                 if (victim->is_npc() && victim->wait == 0 && victim->can_see(obj))
-                        do_get_raw(victim, obj);
+                        interpret_raw(victim, "get", "%lld", obj->getID());
         }
 
         if ( (obj2 = get_eq_char(victim, wear_second_wield)) != 0)
@@ -575,7 +579,7 @@ SKILL_RUNP( lash )
     if (!whip || whip->item_type != ITEM_WEAPON || whip->value0() != WEAPON_WHIP) 
     {
         ch->pecho( "Возьми в руки хлыст." );
-        if(IS_CHARMED(ch) && ch->master->getPC() && ch->canCarryNumber( ) > 0)
+        if(IS_CHARMED(ch) && ch->master->getPC() && Char::canCarryNumber(ch) > 0)
         ch->master->pecho("Для этого умения твоему последователю потребуется вооружиться хлыстом.");
         return;
     }
@@ -614,7 +618,7 @@ SKILL_RUNP( lash )
         return;
     }
 
-    if (!CharUtils::hasLegs(victim)) {
+    if (!Char::hasLegs(victim)) {
         ch->pecho("Но у %C2 нету ног!", victim);
         return;
     }

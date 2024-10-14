@@ -6,7 +6,7 @@
 #include "npcharacter.h"
 #include "skillreference.h"
 #include "skill.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "move_utils.h"
 #include "exitsmovement.h"
 #include "magic.h"

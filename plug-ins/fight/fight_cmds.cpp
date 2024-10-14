@@ -22,13 +22,17 @@
 #include "object.h"
 #include "room.h"
 
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "interp.h"
 
 #include "merc.h"
 #include "stats_apply.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "fight.h"
 #include "act.h"
 #include "def.h"

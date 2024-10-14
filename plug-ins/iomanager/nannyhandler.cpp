@@ -629,5 +629,5 @@ public:
 
 };
 
-PluginInitializer<DescriptionLoaderPlugin> intDescLoader;
+PluginInitializer<DescriptionLoaderPlugin> initDescLoader;
 

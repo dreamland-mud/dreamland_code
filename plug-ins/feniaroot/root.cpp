@@ -36,7 +36,7 @@
 #include "roomutils.h"
 #include "merc.h"
 #include "damageflags.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "calendar_utils.h"
 #include "material-table.h"
 #include "stats_apply.h"
@@ -533,7 +533,7 @@ NMI_INVOKE(Root, create_money, "(gold, silver): создает объект-де
     int gold = argnum2number(args, 1);
     int silver = argnum2number(args, 2);
     return wrap(
-        create_money(gold, silver));
+        Money::create(gold, silver));
 }
 
 inline bool 

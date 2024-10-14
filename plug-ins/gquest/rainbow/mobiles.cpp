@@ -20,9 +20,13 @@
 #include "object.h"
 
 #include "act.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "fight.h"
-#include "handler.h"
+#include "loadsave.h"
 
 #include "merc.h"
 #include "def.h"

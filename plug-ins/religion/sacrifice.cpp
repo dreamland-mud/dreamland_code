@@ -23,7 +23,7 @@
 #include "dreamland.h"
 #include "fight.h"
 
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "interp.h"
 #include "itemflags.h"
 #include "loadsave.h"
@@ -501,7 +501,7 @@ static bool can_sacrifice( Character *ch, Object *obj, bool needSpam )
         return false;
     }
 
-    if ( IS_SET(obj->item_type,ITEM_FURNITURE) && count_users(obj) > 0 ) {
+    if ( IS_SET(obj->item_type,ITEM_FURNITURE) && Item::countUsers(obj) > 0 ) {
         if (needSpam) 
             ch->pecho( "%1$^O1 в данный момент использу%1$nется|ются.", obj );
         return false;

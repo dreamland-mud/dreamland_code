@@ -29,8 +29,8 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "nannyhandler.h"
-
-#include "handler.h"
+#include "fight_extract.h"
+#include "loadsave.h"
 #include "act.h"
 #include "vnum.h"
 #include "def.h"

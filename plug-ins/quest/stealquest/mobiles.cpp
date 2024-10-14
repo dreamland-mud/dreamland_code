@@ -10,10 +10,10 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
-
+#include "wearloc_utils.h"
 #include "act.h"
 #include "interp.h"
-#include "handler.h"
+#include "loadsave.h"
 
 #include "def.h"
 

@@ -3,7 +3,7 @@
 #include "room.h"
 #include "core/object.h"
 #include "wearlocation.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "olcstate.h"
 #include "olc.h"
 #include "directions.h"
@@ -14,6 +14,7 @@
 #include "interp.h"
 #include "comm.h"
 #include "update_areas.h"
+#include "wearloc_utils.h"
 #include "merc.h"
 
 #include "def.h"

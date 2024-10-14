@@ -773,6 +773,24 @@ Object * get_obj_wear_carry( Character *ch, const DLString &cArgument, Character
     return 0;
 }
 
+Object * get_key_carry( Character *ch, int vnum )
+{
+    Object *key, *ring;
+    
+    if (( key = get_obj_carry_vnum( ch, vnum ) ))
+        return key;
+
+    for (ring = get_obj_carry_type( ch, ITEM_KEYRING );
+         ring;
+         ring = get_obj_list_type( ch, ITEM_KEYRING, ring->next_content ))
+    {
+        if (( key = get_obj_list_vnum( ch, vnum, ring->contains ) ))
+            return key;
+    }
+
+    return NULL;
+}
+
 // Return true if immortal's config allows them to be seen.
 bool can_see_god(Character *ch, Character *god)
 {

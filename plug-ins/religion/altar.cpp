@@ -20,7 +20,7 @@
 
 #include "dreamland.h"
 #include "loadsave.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "fight.h"
 #include "save.h"
 #include "interp.h"

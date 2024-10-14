@@ -37,7 +37,6 @@
 #include "def.h"
 #include "magic.h"
 
-WEARLOC(hold);
 PROF(vampire);
 GSN(none);
 GSN(poison);

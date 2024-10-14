@@ -26,11 +26,10 @@
 #include "merc.h"
 
 #include "act.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "interp.h"
 #include "save.h"
 #include "vnum.h"
-
 #include "fight.h"
 #include "def.h"
 

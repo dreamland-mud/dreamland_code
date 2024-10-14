@@ -13,10 +13,10 @@
 #include "wiznet.h"
 #include "skill_utils.h"
 #include "merc.h"
-#include "../../anatolia/handler.h"
+#include "loadsave.h"
 #include "act.h"
-
-
+#include "wearloc_utils.h"
+#include "player_exp.h"
 #include "clan.h"
 #include "clantypes.h"
 #include "player_utils.h"
@@ -159,7 +159,7 @@ void Questor::giveReward(PCharacter *client, Quest::Pointer &quest, QuestReward:
     client->gold += r->gold;
 
     if (r->exp > 0) {
-        client->gainExp( r->exp );
+        Player::gainExp(client, r->exp);
     }
     else {
         client->addQuestPoints(r->points);

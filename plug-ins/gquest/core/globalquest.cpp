@@ -23,8 +23,8 @@
 
 #include "act.h"
 #include "move_utils.h"
-
-#include "handler.h"
+#include "fight_extract.h"
+#include "loadsave.h"
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"

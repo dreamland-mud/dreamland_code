@@ -88,13 +88,17 @@
 #include "dreamland.h"
 #include "interp.h"
 #include "stats_apply.h"
-
-#include "act_move.h"
+#include "fight_extract.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "descriptor.h"
 #include "fight.h"
 #include "damage_impl.h"
 #include "magic.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "save.h"
 #include "wiznet.h"
 #include "act.h"
@@ -137,7 +141,6 @@ CONFIGURABLE_LOADED(config, update)
  * Local functions.
  */
 void aggr_update( );
-void auction_update( );
 void room_affect_update( );
 void check_reboot( );
 
@@ -211,6 +214,28 @@ void room_saving( void )
 
     saving_position = i_max;
 }
+
+static void reboot_anatolia( void )
+{
+        Descriptor *d,*d_next;
+        
+        LogStream::sendNotice( ) << "Rebooting DREAM LAND." << endl;
+
+        for ( d = descriptor_list; d != 0; d = d_next )
+        {
+                d_next = d->next;
+                d->send("Мир Мечты уходит на перезагрузку ПРЯМО СЕЙЧАС!\n");
+
+                if (d->character && d->connected == CON_PLAYING)
+                        d->character->getPC( )->save();
+
+                d->close();
+        }
+        dreamland->shutdown( );
+
+        return;
+}
+
 
 bool is_bright_for_vampire( Character *ch )
 {
@@ -1154,9 +1179,6 @@ void update_handler( void )
 
         heavy = true;
     }
-
-    LastLogStream::send( ) <<  "Auction update"  << endl;
-    auction_update( );
 
     if (--pulse_area <= 0)
     {

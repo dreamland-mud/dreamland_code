@@ -34,11 +34,15 @@
 
 
 #include "vnum.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "save.h"
 #include "interp.h"
 #include "act.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "def.h"
 
 RELIG(alala);

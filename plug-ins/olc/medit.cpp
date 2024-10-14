@@ -20,7 +20,7 @@
 #include "comm.h"
 #include "merc.h"
 #include "interp.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "act.h"
 #include "json_utils_ext.h"
 

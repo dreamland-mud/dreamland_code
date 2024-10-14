@@ -16,7 +16,7 @@
 
 #include "merc.h"
 #include "arg_utils.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "save.h"
 #include "def.h"
 

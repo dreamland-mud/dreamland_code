@@ -43,7 +43,7 @@
 #include "merc.h"
 
 #include "act.h"
-#include "../../anatolia/handler.h"
+#include "loadsave.h"
 #include "interp.h"
 #include "def.h"
 #include "skill_utils.h"
@@ -55,8 +55,6 @@ PROF(druid);
 
 using std::min;
 using std::max;
-
-DLString get_obj_name_hint(Object *obj);
 
 /*
  * Local functions
@@ -223,13 +221,13 @@ CMDRUN( buy )
         return;
     }
 
-    if ( ch->carry_number + number * obj->getNumber( ) > ch->canCarryNumber( ) )
+    if ( ch->carry_number + number * obj->getNumber( ) > Char::canCarryNumber(ch) )
     {
         ch->pecho("Ты не можешь нести так много вещей.");
         return;
     }
 
-    if (ch->getCarryWeight() + number * obj->getWeight() > ch->canCarryWeight())
+    if (Char::getCarryWeight(ch) + number * obj->getWeight() > Char::canCarryWeight(ch))
     {
         ch->pecho("Ты не можешь нести такую тяжесть.");
         return;
@@ -364,7 +362,7 @@ CMDRUN( sell )
         return;
     }
 
-    if ( !can_drop_obj( ch, obj ) )
+    if ( !Item::canDrop( ch, obj ) )
     {
         ch->pecho("Ты не можешь избавиться от этого.");
         return;
@@ -458,14 +456,14 @@ CMDRUN( sell )
     ch->gold     += gold;
     ch->silver   += silver;
 
-    if ( ch->getCarryWeight( ) > ch->canCarryWeight( ) )
+    if ( Char::getCarryWeight(ch) > Char::canCarryWeight(ch) )
     {
         ch->gold = gold_old;
         ch->silver = silver_old;
         oldact_p("$c1 пытается дать тебе деньги, но ты не можешь их удержать.",
         keeper, 0, ch, TO_VICT,POS_RESTING );
         oldact("$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
-        obj_to_room( create_money( gold, silver ), ch->in_room );
+        obj_to_room( Money::create( gold, silver ), ch->in_room );
     }
 
     if ( obj->item_type == ITEM_TRASH || IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) )
@@ -529,7 +527,7 @@ CMDRUN( list )
         webManipManager->decorateShopItem( buf, si.obj->getShortDescr( '1' ), si.obj, ch );
 
         if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
-            buf << get_obj_name_hint(si.obj);
+            buf << " (" << Syntax::label_en(si.obj->getName()) << ")";
 
         buf << endl;
     }
@@ -569,7 +567,7 @@ static bool value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Point
         return false;
     }
 
-    if (!can_drop_obj( ch, obj )) {
+    if (!Item::canDrop( ch, obj )) {
         if (verbose)
             ch->pecho("Ты не сможешь избавиться от %O2.", obj);
         return false;

@@ -210,9 +210,6 @@ public:
     int getExpToLevel( );
     int getBaseExp( );
     int getExpPerLevel( int lvl = -1, int remorts = -1 );
-    // (implemented in anatolia_core)
-    void gainExp( int ); 
-    void advanceLevel( );
     
     // trust and immortality
     virtual bool isCoder( ) const;

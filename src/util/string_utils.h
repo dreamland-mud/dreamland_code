@@ -21,6 +21,9 @@ namespace String {
     bool hasCyrillic(const DLString &str);
 
     bool lessCase( const DLString &a, const DLString& b );
+
+    /** True if arg is empty ignoring colours. */
+    bool isEmpty(const char *arg);
 }
 
 #endif

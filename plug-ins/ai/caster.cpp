@@ -16,7 +16,11 @@
 #include "magic.h"
 #include "act.h"
 #include "interp.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "merc.h"
 
 #include "def.h"

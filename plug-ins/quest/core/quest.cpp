@@ -21,7 +21,7 @@
 #include "object.h"
 #include "dlscheduler.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "wiznet.h"
 #include "merc.h"
 #include "act.h"

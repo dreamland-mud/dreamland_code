@@ -11,7 +11,6 @@
 	<node>plugin_command</node>
 	<node>remort</node>
 	<node>admin</node>
-	<node>cmd_wizard</node>
 	<node>desire</node>
 	<node>liquid</node>
 	<node>comm</node>

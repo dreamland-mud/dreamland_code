@@ -16,7 +16,7 @@
 #include "occupations.h"
 #include "fight.h"
 #include "magic.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "merc.h"
 
 #include "def.h"

@@ -12,7 +12,7 @@
 #include "act.h"
 #include "interp.h"
 
-#include "handler.h"
+#include "loadsave.h"
 #include "merc.h"
 #include "def.h"
 

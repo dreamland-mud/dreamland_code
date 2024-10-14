@@ -20,7 +20,7 @@
 #include "merc.h"
 #include "save.h"
 #include "act.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "vnum.h"
 #include "def.h"
 
@@ -310,10 +310,10 @@ bool StealQuest::checkItem( PCharacter *pch, Object *obj )
         return false;
 
     // Hands almost full: may not be possible to give the item back.
-    if (victim->carry_number >= victim->canCarryNumber( ))
+    if (victim->carry_number >= Char::canCarryNumber(victim))
         return false;
 
-    if (victim->getCarryWeight( ) >= victim->canCarryWeight( ))
+    if (Char::getCarryWeight(victim) >= Char::canCarryWeight(victim))
         return false;
 
     return ItemQuestModel::checkItem( pch, obj );
@@ -352,10 +352,10 @@ bool StealQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
     if (isThief( mob ))
         return false;
         
-    if (mob->carry_number > mob->canCarryNumber( ))
+    if (mob->carry_number > Char::canCarryNumber(mob))
         return false;
 
-    if (mob->getCarryWeight( ) > mob->canCarryWeight( ))
+    if (Char::getCarryWeight(mob) > Char::canCarryWeight(mob))
         return false;
 
     return true;
@@ -412,7 +412,7 @@ void StealQuest::fillChest( PCharacter *pch, Object *chest )
         if (( obj = StealQuestRegistrator::getThis( )->bonuses.randomItem( ) ))
             obj_to_obj( obj, chest );
 
-    obj_to_obj( create_money( 
+    obj_to_obj( Money::create( 
                     number_range( 0, pch->getModifyLevel( ) ), 
                     number_range( 0, 1000 ) ), chest );
 

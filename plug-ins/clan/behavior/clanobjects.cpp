@@ -16,11 +16,15 @@
 #include "descriptor.h"
 
 #include "interp.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "infonet.h"
 #include "messengers.h"
 #include "act.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 #include "def.h"
 
 PROF(none);

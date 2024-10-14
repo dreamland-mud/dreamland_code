@@ -4,6 +4,7 @@
 #include "weapongenerator.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
+#include "player_exp.h"
 #include "act.h"
 #include "merc.h"
 #include "vnum.h"
@@ -160,7 +161,7 @@ void BandaItem::getByHero( PCharacter *ch )
         obj->getRoom()->echo(POS_RESTING, quest->getScenario().msgJoin.c_str());
         ch->pecho("Он вспыхивает и исчезает, оставив на своем месте {C1000{x очков опыта.");
         ch->recho("Он ярко вспыхивает и исчезает.");
-        ch->gainExp(1000);
+        Player::gainExp(ch, 1000);
         quest->destroyItems<BandaItem>();
         quest->wiznet("", "easter egg");
         return;

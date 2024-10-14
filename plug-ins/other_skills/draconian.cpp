@@ -7,7 +7,11 @@
 #include "affect.h"
 #include "magic.h"
 #include "fight.h"
-#include "act_move.h"
+#include "movetypes.h"
+#include "directions.h"
+#include "terrains.h"
+#include "move_utils.h"
+#include "doors.h"
 
 #include "effects.h"
 #include "damage.h"

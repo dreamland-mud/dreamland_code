@@ -10,7 +10,7 @@
 #include "skillmanager.h"
 #include "pcharacter.h"
 #include "act.h"
-#include "handler.h"
+#include "loadsave.h"
 #include "merc.h"
 
 CMDRUN( teach )

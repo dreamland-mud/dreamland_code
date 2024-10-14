@@ -25,17 +25,17 @@
 #include "roomutils.h"
 #include "clanreference.h"
 #include "areabehaviorplugin.h"
-
+#include "fight_extract.h"
 #include "dreamland.h"
 #include "debug_utils.h"
 #include "fight.h"
 #include "weapongenerator.h"
 #include "material.h"
 #include "immunity.h"
-#include "../anatolia/handler.h"
+#include "loadsave.h"
 #include "skill_utils.h"
 #include "move_utils.h"
-#include "charutils.h"
+
 #include "profflags.h"
 #include "act.h"
 
@@ -135,11 +135,11 @@ void UndefinedOneHit::protectPrayer( )
 bool UndefinedOneHit::checkHands( )
 {
     //TO-DO: provide better logic later, allow blobs, beasts etc. to hit without hands
-    if (CharUtils::lostWearloc(ch, wear_hands))
+    if (Char::lostWearloc(ch, wear_hands))
         return false;
 
     WearlocationReference &attackingHand = secondary ? wear_wrist_l : wear_wrist_r;
-    if (CharUtils::lostWearloc(ch, attackingHand))
+    if (Char::lostWearloc(ch, attackingHand))
         return false;
 
     return true;

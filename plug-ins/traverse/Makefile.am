@@ -22,8 +22,6 @@ libtraverse_la_LIBADD = \
 ../help/libhelp.la \
 ../interpret/libinterpret.la \
 ../loadsave/libloadsave.la \
-../anatolia/core/libanatoliacore.la \
-../anatolia/libanatolia.la \
 ../movement/libmovement.la \
 ../fight_core/libfight_core.la 
 
