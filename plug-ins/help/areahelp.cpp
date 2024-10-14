@@ -48,11 +48,6 @@ DLString AreaHelp::getTitle(const DLString &label) const
 
     buf << "Зона {c" << area->getName() << "{x";
 
-    if (strlen(area->credits) > 0 
-            && str_str(area->credits, area->getName().c_str()) == 0
-            && str_str(area->getName().c_str(), area->credits) == 0)
-        buf << " ({c" << area->credits << "{x)";
-
     return buf.str();
 }
 
@@ -110,6 +105,13 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 
     if (IS_SET(area->area_flag, AREA_SAFE|AREA_EASY|AREA_HARD|AREA_DEADLY))
         in << "Уровень опасности: " << area_danger_long(area) << endl;
+
+    if (strlen(area->credits) > 0 
+            && str_str(area->credits, area->getName().c_str()) == 0
+            && str_str(area->getName().c_str(), area->credits) == 0)
+    {
+        in << "{DТакже известна как: " << area->credits << "{x" << endl;
+    }
 
     in << endl;
 

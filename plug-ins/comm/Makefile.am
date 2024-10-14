@@ -32,7 +32,8 @@ affects.cpp \
 groupchannel.cpp \
 following.cpp \
 drop.cpp \
-fly.cpp
+fly.cpp \
+help.cpp
 
 libcomm_la_MOC = \
 configs.h \
