@@ -1040,7 +1040,7 @@ SKILL_RUNP( suspect )
 
                 return;
         }
-        else if (arg_is_strict(arg, "suspect.off"))
+        else if (arg_is_strict(arg, "off"))
         {
                 if ( !victim->isAffected(gsn_suspect) )
                 {

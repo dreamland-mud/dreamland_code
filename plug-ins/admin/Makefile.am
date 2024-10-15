@@ -50,6 +50,7 @@ libplugin_command_la_LIBADD = \
 ../interpret/libinterpret.la \
 ../output/liboutput.la \
 ../help/libhelp.la \
+../system/libsystem.la \
 ../command/libcommand.la \
 ../iomanager/libiomanager.la
 

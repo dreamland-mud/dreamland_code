@@ -49,7 +49,8 @@ configurable.cpp \
 json_utils_ext.cpp \
 xmlkillingattribute.cpp \
 alignment.cpp \
-player_utils.cpp
+player_utils.cpp \
+arg_utils.cpp
 
 libsystem_la_MOC = \
 schedulertaskattributemanager.h \

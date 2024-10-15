@@ -98,7 +98,7 @@ CMDADM( codesource )
         }
     }
     
-    if (cmd.empty( ) || cmd.strPrefix( "help" )) {
+    if (cmd.empty( ) || arg_is_help(cmd)) {
         ostringstream buf;
         
         buf << "Синтаксис команды {Wcodesource{x:" << endl
@@ -129,7 +129,7 @@ CMDADM( codesource )
         return;
     }
 
-    if(cmd.strPrefix("list")) {
+    if(arg_is_list(cmd)) {
         ostringstream buf;
         CodeSource::Manager::iterator i;
 
@@ -156,7 +156,7 @@ CMDADM( codesource )
         return;
     }
 
-    if(cmd.strPrefix("search")) {
+    if(arg_is(cmd, "search")) {
         ostringstream buf;
         CodeSource::Manager::iterator i;
         static DLString highlight("{R");
@@ -187,7 +187,7 @@ CMDADM( codesource )
         return;
     }
     
-    if(cmd.strPrefix("copy")) {
+    if(arg_is_copy(cmd)) {
         id_t csid;
         if (!cs_by_number(pch, args, csid))
             return;
@@ -200,7 +200,7 @@ CMDADM( codesource )
         return;
     }
     
-    if(cmd.strPrefix("read")) {
+    if(arg_is(cmd, "read")) {
         id_t csid;
         if (!cs_by_number(pch, args, csid))
             return;
@@ -224,7 +224,7 @@ CMDADM( codesource )
         return;
     }
     
-    if(cmd.strPrefix("save")) {
+    if(arg_is(cmd, "save")) {
         if (!pch->isCoder( )) {
             ch->pecho("Check your privilege.");
             return;
@@ -263,7 +263,7 @@ CMDADM( codesource )
         return;
     }
 
-    if(cmd.strPrefix("show")) {
+    if(arg_is_show(cmd)) {
         XMLAttributeCodeSource::Pointer csa = pch->getAttributes( 
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
@@ -294,13 +294,13 @@ CMDADM( codesource )
         return;
     }
     
-    if(cmd.strPrefix("clear")) {
+    if(arg_is_clear(cmd)) {
         pch->getAttributes( ).eraseAttribute( "codesource" );
         ch->pecho("Ok.");
         return;
     }
     
-    if(cmd.strPrefix("paste")) {
+    if(arg_is_paste(cmd)) {
         XMLAttributeCodeSource::Pointer csa = pch->getAttributes( 
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
@@ -319,7 +319,7 @@ CMDADM( codesource )
         return;
     }
 
-    if(cmd.strPrefix("load")) {
+    if(arg_is(cmd, "load")) {
         if (!pch->isCoder( )) {
             ch->pecho("This is not for you.");
             return;
@@ -343,7 +343,7 @@ CMDADM( codesource )
         return;
     }
 
-    if(cmd.strPrefix("eval") || cmd.strPrefix("post")) {
+    if(arg_is(cmd, "eval") || arg_is(cmd, "post")) {
         XMLAttributeCodeSource::Pointer csa = pch->getAttributes( 
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
@@ -383,7 +383,7 @@ CMDADM( codesource )
         return;
     }
     
-    if(cmd.strPrefix("web")) {
+    if(arg_is(cmd, "web")) {
         std::vector<DLString> parms;
         
         if(!args.empty()) {

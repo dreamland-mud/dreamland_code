@@ -82,7 +82,7 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
         }
     }
     
-    if (cmd.strPrefix( "dump" ) && ch->isCoder( )) {
+    if (arg_is(cmd, "dump") && ch->isCoder( )) {
         thread->dump( );
         ch->pecho( "Ok." );
         return;

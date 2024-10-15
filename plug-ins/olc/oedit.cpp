@@ -891,11 +891,11 @@ OEDIT(copy)
         COPY_ERROR
     } mode;
     
-    if (arg1.strPrefix("desc"))
+    if (arg_is(arg1, "desc"))
         mode = COPY_DESC;
-    else if (arg1.strPrefix("param"))
+    else if (arg_is(arg1, "param"))
         mode = COPY_PARAM;
-    else if (arg1.strPrefix("behaviors"))
+    else if (arg_is(arg1, "behavior"))
         mode = COPY_BHV;
     else 
         mode = COPY_ERROR;

@@ -36,9 +36,9 @@ COMMAND(CCard, "card")
     
     if (cmd.empty( )) 
         usage( pch );
-    else if (cmd.strPrefix( "mob" )) 
+    else if (arg_is(cmd, "mob")) 
         doMob( pch, arguments );
-    else if (cmd.strPrefix( "char" )) 
+    else if (arg_is(cmd, "char" )) 
         doChar( pch, arguments );
     else if (arg_is_list( cmd )) 
         doList( pch, arguments );

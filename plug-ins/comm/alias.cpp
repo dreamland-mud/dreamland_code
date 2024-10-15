@@ -12,7 +12,7 @@
 #include "xmlstring.h"
 #include "class.h"
 #include "so.h"
-
+#include "commandtemplate.h"
 #include "interpretlayer.h"
 #include "commandinterpreter.h"
 #include "commandplugin.h"
@@ -29,6 +29,8 @@
 #include "comm.h"
 
 #include "def.h"
+
+const unsigned int MAX_ALIASES = 1000;
 
 /*-----------------------------------------------------------------------------
  * XMLAttributeAliases
@@ -49,206 +51,118 @@ public:
 
 const DLString XMLAttributeAliases::TYPE = "XMLAttributeAliases";
 
-/*-----------------------------------------------------------------------------
- * SkippingCommand
- *----------------------------------------------------------------------------*/
-class SkippingCommand : public InterpretLayer, public CommandPlugin
-{
-public:
-
-    virtual bool process( InterpretArguments &iargs )
-    {
-        if (getName( ).strPrefix( iargs.line ))
-            iargs.advance( );
-
-        return true;
-    }
-
-
-protected:
-
-    virtual void initialization( )
-    {
-        CommandPlugin::initialization( );
-        InterpretLayer::initialization( );
-    }
-
-    virtual void destruction( )
-    {
-        InterpretLayer::destruction( );
-        CommandPlugin::destruction( );
-    }
-};
 
 /*-----------------------------------------------------------------------------
  * 'alias' command 
  *----------------------------------------------------------------------------*/
-class CAlias : public SkippingCommand {
-public:
-    typedef ::Pointer<CAlias> Pointer;
+CMDRUN(alias) 
+{
+    PCharacter *pch;
+    XMLAttributeAliases::Pointer aliases;
+    XMLAttributeAliases::iterator i;
+    DLString argument = constArguments, arg;
+    
+    if (ch->is_npc( )) 
+        return;
+    
+    arg = argument.getOneArgument( );
+    
+    pch = ch->getPC( );
+    aliases = pch->getAttributes( ).getAttr<XMLAttributeAliases>( "aliases" );
+    
+    if (arg.empty( )) {
+        ostringstream buf;
+        
+        if (aliases->empty( )) {
+            pch->pecho("Не определен ни один синоним.");
+            return;
+        }
 
-    CAlias( ) 
-    {
-        this->name[EN] = COMMAND_NAME;
+        buf << "Определенные синонимы:" << endl;
+        
+        for (i = aliases->begin( ); i != aliases->end( ); i++)
+            buf << "    " << i->first << ":  " << i->second << "{x" << endl;
+
+        pch->send_to( buf );
+        return;
     }
-
-    virtual int properOrder( Character *ch ) const
-    {
-        if (IS_CHARMED(ch))
-            return RC_ORDER_ERROR;
-        else
-            return RC_ORDER_OK;
+    
+    if (arg_is_strict(arg, "flush")) {
+        aliases->clear( );
+        pch->pecho("Все синонимы удалены.");
+        return;
     }
-
-    virtual void run( Character* ch, const DLString& cArgument )
-    {
-        PCharacter *pch;
-        XMLAttributeAliases::Pointer aliases;
-        XMLAttributeAliases::iterator i;
-        DLString argument = cArgument, arg;
-        
-        if (ch->is_npc( )) 
-            return;
-        
-        arg = argument.getOneArgument( );
-        
-        pch = ch->getPC( );
-        aliases = pch->getAttributes( ).getAttr<XMLAttributeAliases>( "aliases" );
-        
-        if (arg.empty( )) {
-            ostringstream buf;
-            
-            if (aliases->empty( )) {
-                pch->pecho("Не определен ни один синоним.");
-                return;
-            }
-
-            buf << "Определенные синонимы:" << endl;
-            
-            for (i = aliases->begin( ); i != aliases->end( ); i++)
-                buf << "    " << i->first << ":  " << i->second << "{x" << endl;
-
-            pch->send_to( buf );
-            return;
-        }
-        
-        if (arg == "flush" || arg == "очистить") {
-            aliases->clear( );
-            pch->pecho("Все синонимы удалены.");
-            return;
-        }
-        
-        if (argument.empty( )) {
-            i = aliases->find( arg );
-            
-            if (i != aliases->end( ))
-                pch->pecho( "%s означает '%s{x'.", arg.c_str( ), i->second.getValue( ).c_str( ) );
-            else
-                pch->pecho("Этот синоним не задан.");
-
-            return;
-        }
-
-        if (argument == "delete"
-                || argument == "alias")
-        {
-            pch->pecho("Этим командам нельзя присвоить синоним!");
-            return;
-        }
-        
+    
+    if (argument.empty( )) {
         i = aliases->find( arg );
+        
+        if (i != aliases->end( ))
+            pch->pecho( "%s означает '%s{x'.", arg.c_str( ), i->second.getValue( ).c_str( ) );
+        else
+            pch->pecho("Этот синоним не задан.");
 
-        if (i != aliases->end( )) // redefine an alias
-        {
-            i->second.setValue( argument );
-            pch->pecho( "%s меняет свое значение на '%s{x'.", arg.c_str( ), argument.c_str( ) );
-            return;
-        }
-
-        if (aliases->size( ) >= MAX_ALIASES)
-        {
-            pch->pecho( "Извините, Вы превысили лимит синонимов (%d).", MAX_ALIASES );
-            return;
-        }
-
-        // make a new alias
-        (**aliases) [arg] = argument;
-
-        pch->pecho( "%s теперь будет означать '%s{x'.", arg.c_str( ), argument.c_str( ) );
+        return;
     }
 
-protected:
-    virtual void putInto( )
+    i = aliases->find( arg );
+
+    if (i != aliases->end( )) // redefine an alias
     {
-        interp->put( this, CMDP_SUBST_ALIAS, 1 );
+        i->second.setValue( argument );
+        pch->pecho( "%s меняет свое значение на '%s{x'.", arg.c_str( ), argument.c_str( ) );
+        return;
     }
 
-private:
-    static const DLString COMMAND_NAME;
-    static const unsigned int MAX_ALIASES;
-};
+    if (aliases->size( ) >= MAX_ALIASES)
+    {
+        pch->pecho( "Лимит синонимов (%d) уже превышен.", MAX_ALIASES );
+        return;
+    }
+
+    // make a new alias
+    (**aliases) [arg] = argument;
+
+    pch->pecho( "%s теперь будет означать '%s{x'.", arg.c_str( ), argument.c_str( ) );
+}
 
 
-const DLString CAlias::COMMAND_NAME = "alias";
-const unsigned int CAlias::MAX_ALIASES = 1000;
 
 /*-----------------------------------------------------------------------------
  * 'unalias' command 
  *----------------------------------------------------------------------------*/
-class CUnalias : public SkippingCommand {
-public:
-    typedef ::Pointer<CUnalias> Pointer;
+CMDRUN(unalias)
+{
+    PCharacter *pch;
+    XMLAttributeAliases::Pointer aliases;
+    XMLAttributeAliases::iterator i;
+
+    DLString argument = constArguments;
+    DLString arg = argument.getOneArgument( );
     
-    CUnalias( ) 
-    {
-        this->name[EN] = COMMAND_NAME;
+    if (ch->is_npc( )) 
+        return;
+    
+    pch = ch->getPC( );
+    aliases = pch->getAttributes( ).getAttr<XMLAttributeAliases>( "aliases" );
+    
+    if (arg.empty( )) {
+        pch->pecho("Какой синоним удалить?");
+        return;
     }
-
-    virtual void run( Character* ch, const DLString& cArgument ) 
+    
+    i = aliases->find( arg );
+    
+    if (i != aliases->end( ))
     {
-        PCharacter *pch;
-        XMLAttributeAliases::Pointer aliases;
-        XMLAttributeAliases::iterator i;
-
-        DLString argument = cArgument;
-        DLString arg = argument.getOneArgument( );
-        
-        if (ch->is_npc( )) 
-            return;
-        
-        pch = ch->getPC( );
-        aliases = pch->getAttributes( ).getAttr<XMLAttributeAliases>( "aliases" );
-        
-        if (arg.empty( )) {
-            pch->pecho("Какой синоним удалить?");
-            return;
-        }
-        
-        i = aliases->find( arg );
-        
-        if (i != aliases->end( ))
-        {
-            pch->pecho("Синоним удален.");
-            aliases->erase( i );
-        }
-        else
-        {
-            pch->pecho("Синоним с таким именем не задан.");
-        }
+        pch->pecho("Синоним удален.");
+        aliases->erase( i );
     }
-
-protected:
-
-    virtual void putInto( )
+    else
     {
-        interp->put( this, CMDP_SUBST_ALIAS, 2 );
+        pch->pecho("Синоним с таким именем не задан.");
     }
-        
-private:
-    static const DLString COMMAND_NAME;
-};
+}
 
-const DLString CUnalias::COMMAND_NAME = "unalias";
 
 /*-----------------------------------------------------------------------------
  * SubstituteAliasInterpretLayer 
@@ -369,9 +283,6 @@ extern "C"
         Plugin::registerPlugin<SubstituteAliasInterpretLayer>( ppl );
         Plugin::registerPlugin<ChoicesInterpretLayer>( ppl );
         
-        Plugin::registerPlugin<CAlias>( ppl );
-        Plugin::registerPlugin<CUnalias>( ppl );
-            
         Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeAliases> >( ppl );
                 
         return ppl;

@@ -75,7 +75,7 @@ void LanguageCommand::run( Character *ach, const DLString &constArguments )
         return;
     }
 
-    if (arg.strPrefix( "init" ) && ch->isCoder( )) {
+    if (arg_is(arg, "init") && ch->isCoder( )) {
         doInit( ch, arguments );
         return;
     }
@@ -85,7 +85,7 @@ void LanguageCommand::run( Character *ach, const DLString &constArguments )
         return;
     }
 
-    if (arg_is_list( arg ) || arg.strPrefix( "known" )) {
+    if (arg_is_list( arg )) {
         doKnown( ch );
         return;
     }

@@ -10,7 +10,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 
-
+#include "arg_utils.h"
 #include "autoflags.h"
 #include "ban.h"
 #include "descriptor.h"
@@ -81,7 +81,7 @@ void CBan::doBan( const DLString & constArguments, ostringstream &buf )
     while(!arguments.empty( )) {
         DLString arg = arguments.getOneArgument();
 
-        if(arg.strPrefix("none") || arg.strPrefix("off")) {
+        if(arg_is_strict(arg, "off")) {
             if(it == bm->end())
                 buf << "Not banned" << endl;
             else {
@@ -90,26 +90,26 @@ void CBan::doBan( const DLString & constArguments, ostringstream &buf )
                 bm->save();
             }
             return;
-        } else if(arg.strPrefix("newbie")) {
+        } else if(arg_is(arg, "newbie")) {
             rec.flags.setValue(BAN_NEWBIES);
             changed = true;
-        } else if(arg.strPrefix("player")) {
+        } else if(arg_is(arg, "player")) {
             rec.flags.setValue(BAN_PLAYER);
             changed = true;
-        } else if(arg.strPrefix("confirm")) {
+        } else if(arg_is(arg, "confirm")) {
             rec.flags.setValue(BAN_CONFIRM);
             changed = true;
-        } else if(arg.strPrefix("communicate")) {
+        } else if(arg_is(arg, "communicate")) {
             rec.flags.setValue(BAN_COMMUNICATE);
             changed = true;
-        } else if(arg.strPrefix("all")) {
+        } else if(arg_is_all(arg)) {
             rec.flags.setValue(BAN_ALL);
             changed = true;
-        } else if(arg.strPrefix("expire")) {
+        } else if(arg_is(arg, "expire")) {
             DLString sexp = arguments.getOneArgument();
             int exp = 0;
             
-            if(!sexp.strPrefix("never")) {
+            if(!arg_is(sexp, "never")) {
                 try {
                     exp = Date::getSecondFromString(sexp);
                 } catch(...) {
@@ -122,7 +122,7 @@ void CBan::doBan( const DLString & constArguments, ostringstream &buf )
             }
             rec.expire = Date(exp ? exp + time(0) : 0);
             changed = true;
-        } else if(arg.strPrefix("comment") || arg.strPrefix("reason")) {
+        } else if(arg_is(arg, "comment")) {
             rec.comment.setValue(arguments.getOneArgument());
             changed = true;
         } else {
@@ -162,10 +162,10 @@ void CBan::action(const DLString &constArguments, ostringstream &buf)
     
     patt = arguments.getOneArgument( );
 
-    if(patt.strPrefix("list")) {
+    if(arg_is_list(patt)) {
         doList( buf );
     }
-    else if (patt.strPrefix("kick")) {
+    else if (arg_is(patt, "kick")) {
         doKick( buf );
     } else {
         doBan(constArguments, buf);
@@ -185,9 +185,10 @@ void CBan::doUsage( ostringstream &buf )
    buf 
     << 
         "Использование: \r\n"
-        "ban list                      - список банов\r\n"       
+        "ban list                      - список банов\r\n"    
+        "ban kick                      - отсоединить всех забаненых\n"   
         "ban {{<pattern>|<index>}       - подробности про бан\r\n"
-        "ban {{<pattern>|<index>} [off|none|all|player|newbie|confirm|communicate] [expire <timespec>] [comment <reason>] - добавить/изменить/удалить бан"
+        "ban {{<pattern>|<index>} [off|all|player|newbie|confirm|communicate] [expire <timespec>] [comment <reason>] - добавить/изменить/удалить бан"
     << endl;
 }
 

@@ -16,6 +16,7 @@
 #include "dlscheduler.h"
 #include "merc.h"
 #include "comm.h"
+#include "arg_utils.h"
 #include "descriptor.h"
 #include "act.h"
 #include "def.h"
@@ -61,18 +62,20 @@ COMMAND(CPlugin, "plugin")
 
     if (arg.empty( ))
         usage( ch );
-    else if (arg.strPrefix( "list" ))
+    else if (arg_is_list(arg))
         doList( ch );
-    else if (arg.strPrefix( "reload" ))
+    else if (arg_is(arg, "reload" ))
         doReload( ch, arguments.getOneArgument( ) );
-    else if(arg.strPrefix( "load" )) {
+    else if(arg_is(arg, "load")) {
         PluginManager *manager = PluginManager::getThis( );
         manager->setReloadOneRequest(arguments, 1);
         ch->pecho( "Requesting load for plugin [%s].", arg.c_str( ) );
-    } else if(arg.strPrefix( "unload" )) {
+
+    } else if(arg_is(arg, "unload")) {
         PluginManager *manager = PluginManager::getThis( );
         manager->setReloadOneRequest(arguments, 2);
         ch->pecho( "Requesting unload for plugin [%s].", arg.c_str( ) );
+
     } else
         usage( ch );
 }
@@ -112,15 +115,15 @@ void CPlugin::doReload( Character *ch, DLString arg )
     
     if (arg.empty( ))
         usage( ch );
-    else if (arg == "all") {
+    else if (arg_is_all(arg)) {
         manager->setReloadAllRequest( );
         ch->pecho("Requesting plugins reload.");
 
-    } else if (arg == "most") {
+    } else if (arg_is_strict(arg, "most")) {
         manager->setReloadNonCriticalRequest( );
         ch->pecho("Requesting reload of all plugins except for [descriptor].");
 
-    } else if (arg == "changed") {
+    } else if (arg_is_strict(arg, "changed")) {
         manager->setReloadChangedRequest( );
         ch->pecho("Requesting changed plugins reload.");
 

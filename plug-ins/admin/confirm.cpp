@@ -58,29 +58,23 @@ COMMAND(Confirm, "confirm")
     if (cmd.empty( )) {
         usage( ch );
     }
-    else if (cmd.strPrefix( "request" ) 
-             || cmd.strPrefix( "попросить" )) 
+    else if (arg_is(cmd, "request")) 
     {
         doRequest( ch );
     }
-    else if (cmd.strPrefix( "review" ) 
-             || cmd.strPrefix( "обновить" )) 
+    else if (arg_is(cmd, "review")) 
     {
         doReview( ch );
     }
-    else if ((cmd.strPrefix( "accept" ) 
-              || cmd.strPrefix( "принять" )) && ch->is_immortal( ))
+    else if (arg_is(cmd, "accept") && ch->is_immortal( ))
     {
         doAccept( ch, arguments );
     }
-    else if ((cmd.strPrefix( "remove" ) 
-             || cmd.strPrefix( "reject" ) 
-             || cmd.strPrefix( "отклонить" )) && ch->is_immortal( ))
+    else if ((arg_is(cmd, "reject") || arg_is(cmd, "remove")) && ch->is_immortal( ))
     {
         doReject( ch, arguments );
     }
-    else if ((cmd.strPrefix( "delete" ) 
-              || cmd.strPrefix( "удалить" )) && ch->is_immortal( ))
+    else if (arg_is(cmd, "del") && ch->is_immortal( ))
     {
         doDelete( ch, arguments );
     }

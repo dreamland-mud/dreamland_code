@@ -56,11 +56,11 @@ COMMAND(HomeRecall, "homerecall")
    
     if (arg_is_list( cmd ))
         doList( pch );
-    else if (cmd.strPrefix( "set" ))
+    else if (arg_is(cmd, "set"))
         doSet( pch, arguments );
     else if (arg_is_show( cmd ))
         doShow( pch, arguments );
-    else if (cmd.strPrefix( "remove" ))
+    else if (arg_is(cmd, "del"))
         doRemove( pch, arguments );
     else if (arg_is_help( cmd )) 
         doUsage( pch ); 

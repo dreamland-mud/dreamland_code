@@ -94,7 +94,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
         ostringstream buf;
 
         // Handle 'quest complete exp' syntax.
-        bool fExpReward = (!arg.empty( ) && (arg.strPrefix( "experience" ) || arg.strPrefix("опыт")));
+        bool fExpReward = arg_is(arg, "exp");
         if (fExpReward)
             reward->points = 0;
         else

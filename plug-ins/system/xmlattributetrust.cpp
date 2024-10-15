@@ -7,6 +7,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "clanreference.h"
+#include "arg_utils.h"
 
 XMLAttributeTrust::XMLAttributeTrust( )
                     : all( false ), 
@@ -68,7 +69,7 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
         return false;
     }
     
-    if (cmd.strPrefix( "list" ) || cmd.strPrefix( "список" )) {
+    if (arg_is_list(cmd)) {
         if (all) {
             buf << "разрешено всем";
             
@@ -91,9 +92,9 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
         return true;
     }
 
-    if (cmd.strPrefix( "allow" ) || cmd.strPrefix( "разрешить" ))
+    if (arg_is(cmd, "allow"))
         fAllow = true;
-    else if (cmd.strPrefix( "deny" ) || cmd.strPrefix( "запретить" ))
+    else if (arg_is(cmd, "deny"))
         fAllow = false;
     else {
         buf << "Укажи одно из действий: список, разрешить или запретить.";
@@ -106,7 +107,7 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
         return false;
     }
     
-    if (args == "all" || args == "все" || args == "всем") {
+    if (arg_is_all(args)) {
         if (fAllow)
             buf << "отныне разрешено всем (кроме тех, кому запрещено явно).";
         else

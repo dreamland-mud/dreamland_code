@@ -1123,11 +1123,11 @@ MEDIT(copy)
         COPY_ERROR
     } mode;
     
-    if (arg1.strPrefix("desc"))
+    if (arg_is(arg1, "desc"))
         mode = COPY_DESC;
-    else if (arg1.strPrefix("param"))
+    else if (arg_is(arg1, "param"))
         mode = COPY_PARAM;
-    else if (arg1.strPrefix("behaviors"))
+    else if (arg_is(arg1, "behavior"))
         mode = COPY_BHV;
     else 
         mode = COPY_ERROR;
@@ -1169,104 +1169,6 @@ MEDIT(copy)
                 original->vnum, 
                 russian_case( original->short_descr, '1' ).c_str( ) );
     return true;
-}
-
-MEDIT(average)
-{
-    DLString arg = DLString(argument).getOneArgument();
-    bool fAll, fDone;
-    int delta, minLevel, maxLevel;
-    int hitBonus = 0, hitType = 0, hitNumber = 0;
-    int manaBonus = 0, manaType = 0, manaNumber = 0;
-    int hitroll = 0, damBonus = 0, damType = 0, damNumber = 0;
-    int ac0 = 0, ac1 = 0, ac2 = 0, ac3 = 0;
-    int total;
-    
-    if (mob.level == 0) {
-        ch->pecho("Please set non-zero mob level.");
-        return false;
-    }
-    
-    delta = mob.level / 20;
-    minLevel = max( 1, mob.level - delta );
-    maxLevel = mob.level + delta;
-    total = 0;
-
-    for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[iHash]; pMob; pMob = pMob->next) {
-            if (IS_SET(pMob->area->area_flag, AREA_NOQUEST|AREA_HIDDEN|AREA_SYSTEM))
-                continue;
-            if (pMob->vnum == 3174) // old jew
-                continue;
-            if (pMob->level > maxLevel || pMob->level < minLevel)
-                continue;
-
-            total++;
-
-            hitBonus += pMob->hit[DICE_BONUS];
-            hitType += pMob->hit[DICE_TYPE];
-            hitNumber += pMob->hit[DICE_NUMBER];
-            manaBonus += pMob->mana[DICE_BONUS];
-            manaType += pMob->mana[DICE_TYPE];
-            manaNumber += pMob->mana[DICE_NUMBER];
-            hitroll += pMob->hitroll;
-            damBonus += pMob->damage[DICE_BONUS];
-            damType += pMob->damage[DICE_TYPE];
-            damNumber += pMob->damage[DICE_NUMBER];
-            ac0 += pMob->ac[0];
-            ac1 += pMob->ac[1];
-            ac2 += pMob->ac[2];
-            ac3 += pMob->ac[3];
-        }
-    
-    if (total == 0) {
-        ch->pecho("No mobiles found in level range %d-%d.", minLevel, maxLevel);
-        return false;
-    }
-     
-    fAll = (arg.empty() || arg == "all");
-    fDone = false;
-
-    if (fAll || arg == "hit" || arg == "hp") {
-        mob.hit[DICE_BONUS] = hitBonus / total;
-        mob.hit[DICE_TYPE] = hitType / total;
-        mob.hit[DICE_NUMBER] = hitNumber / total;
-        fDone = true;
-    }
-    if (fAll || arg.strPrefix("mana")) {
-        mob.mana[DICE_BONUS] = manaBonus / total;
-        mob.mana[DICE_TYPE] = manaType / total;
-        mob.mana[DICE_NUMBER] = manaNumber / total;
-        fDone = true;
-    }
-    if (fAll || (arg.strPrefix("hitroll") && arg.size() > 3)) {
-        mob.hitroll = hitroll / total;
-        fDone = true;
-    }
-    if (fAll || arg.strPrefix("damage")) {
-        mob.damage[DICE_BONUS] = damBonus / total;
-        mob.damage[DICE_TYPE] = damType / total;
-        mob.damage[DICE_NUMBER] = damNumber / total;
-        fDone = true;
-    }
-    if (fAll || arg.strPrefix("armor") || arg == "ac") {
-        mob.ac[0] = ac0 / total;
-        mob.ac[1] = ac1 / total;
-        mob.ac[2] = ac2 / total;
-        mob.ac[3] = ac3 / total;
-        fDone = true;
-    }
-    
-    if (fDone) {
-        ch->pecho("Average values assigned.\r\n");
-        return true;
-    }
-    else {
-        ch->pecho("Syntax: \r\n"
-                    "   average hp|mana|hitroll|damage|ac -- setup one param\r\n"
-                    "   average [all] -- setup all parameters");
-        return false;
-    }
 }
 
 CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
