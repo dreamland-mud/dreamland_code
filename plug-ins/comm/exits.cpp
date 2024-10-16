@@ -68,7 +68,25 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
     if (!found)
         buf << (cfg.ruexits ? " нет" : " none");
             
-    buf << "]{x" << endl;
+
+    StringList extras;
+    for (auto &eexit: targetRoom->extra_exits) {
+        if (ch->can_see(eexit)) {
+            DLString kw_en = Syntax::label_en(eexit->keyword);
+            DLString kw_ru = Syntax::label_ru(eexit->keyword);
+            DLString nameRus = ""; //russian_case(eexit->short_desc_from, '1'); -- not always makes sense
+            nameRus = nameRus.empty() ? (kw_ru.empty() ? kw_en : kw_ru) : nameRus;
+            DLString cmd = kw_ru.empty() ? "войти " + kw_en : "войти " + kw_ru;
+        
+            extras.push_back(web_cmd(ch, cmd, nameRus));
+        }
+    }
+
+    if (!extras.empty())
+        buf << " | " << extras.join(", ");
+
+    buf << "]{x";
+    buf << endl;
     ch->send_to( buf );
 }
 
@@ -88,13 +106,13 @@ CMDRUNP( exits )
         return;
     }
 
+    found = false;
+    cfg = ch->getConfig( );
+
     if (cfg.holy)
         buf << "Видимые выходы из комнаты " << ch->in_room->vnum << ":" << endl;
     else
         buf << "Видимые выходы:" << endl;
-
-    found = false;
-    cfg = ch->getConfig( );
 
     for (door = 0; door <= 5; door++)
     {
@@ -145,15 +163,14 @@ CMDRUNP( exits )
 
     for (auto &eexit: ch->in_room->extra_exits) {
         if (ch->can_see(eexit)) {
-            DLString name = Syntax::label_en(eexit->keyword);
+            DLString kw_en = Syntax::label_en(eexit->keyword);
+            DLString kw_ru = Syntax::label_ru(eexit->keyword);
             DLString nameRus = russian_case(eexit->short_desc_from, '1');
-            DLString cmd = (cfg.rucommands ? "войти $1" : "enter $1");
+            nameRus = nameRus.empty() ? (kw_ru.empty() ? kw_en : kw_ru) : nameRus;
+            DLString cmd = kw_ru.empty() ? "войти " + kw_en : "войти " + kw_ru;
 
             buf <<  "    ";
-            if (!nameRus.empty())
-                buf << "{C" << web_cmd(ch, cmd, nameRus) << "{x ";
-            if (!name.empty())
-                buf << "(" << name << ")";
+            buf << "{C" << web_cmd(ch, cmd, nameRus) << "{x ";
             buf << endl;
             found = true;
         }
