@@ -16,6 +16,18 @@
 /*---------------------------------------------------------------------------
  * 'exits' command 
  *--------------------------------------------------------------------------*/
+static DLString cmd_extra_exit(Character *ch, EXTRA_EXIT_DATA *eexit, bool prefereShortDescr)
+{
+    DLString kw_en = Syntax::label_en(eexit->keyword);
+    DLString kw_ru = Syntax::label_ru(eexit->keyword);
+
+    DLString nameRus = prefereShortDescr ? russian_case(eexit->short_desc_from, '1') : "";
+    nameRus = nameRus.empty() ? (kw_ru.empty() ? kw_en : kw_ru) : nameRus;
+
+    DLString cmd = kw_ru.empty() ? "войти " + kw_en : "войти " + kw_ru;        
+    return web_cmd(ch, cmd, nameRus);
+}
+
 static DLString cmd_exit(Character *ch, int door, EXIT_DATA *pexit)
 {
     DLString cmd;
@@ -23,11 +35,11 @@ static DLString cmd_exit(Character *ch, int door, EXIT_DATA *pexit)
     DLString ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
 
     if (IS_SET(pexit->exit_info, EX_LOCKED))
-        return (cfg.rucommands? "отпереть " : "unlock ") + ename;
+        return "отпереть " + ename + " | " + ename;
 
     if (IS_SET(pexit->exit_info, EX_CLOSED))
-        return (cfg.rucommands ? "открыть " : "open ") + ename;
-
+        return  "открыть " + ename + " | " + ename;
+        
     return ename;
 }
 
@@ -70,17 +82,9 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
             
 
     StringList extras;
-    for (auto &eexit: targetRoom->extra_exits) {
-        if (ch->can_see(eexit)) {
-            DLString kw_en = Syntax::label_en(eexit->keyword);
-            DLString kw_ru = Syntax::label_ru(eexit->keyword);
-            DLString nameRus = ""; //russian_case(eexit->short_desc_from, '1'); -- not always makes sense
-            nameRus = nameRus.empty() ? (kw_ru.empty() ? kw_en : kw_ru) : nameRus;
-            DLString cmd = kw_ru.empty() ? "войти " + kw_en : "войти " + kw_ru;
-        
-            extras.push_back(web_cmd(ch, cmd, nameRus));
-        }
-    }
+    for (auto &eexit: targetRoom->extra_exits)
+        if (ch->can_see(eexit))
+            extras.push_back(cmd_extra_exit(ch, eexit, false));
 
     if (!extras.empty())
         buf << " | " << extras.join(", ");
@@ -127,7 +131,7 @@ CMDRUNP( exits )
         ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
         cmd = cmd_exit(ch, door, pexit);
 
-        if (!IS_SET(pexit->exit_info, EX_CLOSED))
+        if (!IS_SET(pexit->exit_info, EX_CLOSED|EX_LOCKED))
         {
             buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - ";
 
@@ -144,7 +148,8 @@ CMDRUNP( exits )
         else {
             ename = "*" + ename + "*";
             buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - "
-                << russian_case(direction_doorname(pexit), '1') << " (закрыто)";
+                << russian_case(direction_doorname(pexit), '1') 
+                << " (" << (IS_SET(pexit->exit_info, EX_LOCKED) ? "заперто" : "закрыто") << ")";
 
             if (cfg.holy)
                 buf << " (room " << room->vnum << ")";
@@ -163,15 +168,7 @@ CMDRUNP( exits )
 
     for (auto &eexit: ch->in_room->extra_exits) {
         if (ch->can_see(eexit)) {
-            DLString kw_en = Syntax::label_en(eexit->keyword);
-            DLString kw_ru = Syntax::label_ru(eexit->keyword);
-            DLString nameRus = russian_case(eexit->short_desc_from, '1');
-            nameRus = nameRus.empty() ? (kw_ru.empty() ? kw_en : kw_ru) : nameRus;
-            DLString cmd = kw_ru.empty() ? "войти " + kw_en : "войти " + kw_ru;
-
-            buf <<  "    ";
-            buf << "{C" << web_cmd(ch, cmd, nameRus) << "{x ";
-            buf << endl;
+            buf <<  "    {C" << cmd_extra_exit(ch, eexit, true) << "{x " << endl;
             found = true;
         }
     }
