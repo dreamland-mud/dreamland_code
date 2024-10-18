@@ -11,7 +11,7 @@
 #include "xmlstringlist.h"
 #include "xmltableelement.h"
 #include "xmlinteger.h"
-#include "xmlrussianstring.h"
+#include "xmlinflectedstring.h"
 #include "xmlmultistring.h"
 #include "xmlglobalbitvector.h"
 #include "skillgrouphelp.h"

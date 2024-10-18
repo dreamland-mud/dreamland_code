@@ -282,7 +282,7 @@ void PCharacterMemory::setRemorts( const Remorts& remorts )
     this->remorts = remorts;
 }
 
-const RussianString& PCharacterMemory::getRussianName( ) const 
+const InflectedString& PCharacterMemory::getRussianName( ) const 
 {
     return russianName;
 }
@@ -381,7 +381,7 @@ Noun::Pointer PCharacterMemory::toNoun( const DLObject *forWhom, int flags ) con
         rname = getName( );
         
     if (wch && !cfg.runames)
-        return RussianString::Pointer( NEW, getName( ), mg );
+        return InflectedString::Pointer( NEW, getName( ), mg );
     else
-        return RussianString::Pointer( NEW, rname, mg );
+        return InflectedString::Pointer( NEW, rname, mg );
 }

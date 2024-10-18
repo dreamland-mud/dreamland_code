@@ -13,7 +13,7 @@
 #include "merc.h"
 #include "mobilebehavior.h"
 #include "profession.h"
-#include "russianstring.h"
+#include "inflectedstring.h"
 
 class NPCharacter : public Character {
 XML_OBJECT;
@@ -83,7 +83,7 @@ protected:
     XMLMultiString description;
     XMLMultiString short_descr;
     XMLMultiString long_descr;
-    RussianString::Pointer cachedNoun;
+    InflectedString::Pointer cachedNoun;
     
 public:    
     int                group;

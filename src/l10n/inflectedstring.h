@@ -1,4 +1,4 @@
-/* $Id: russianstring.h,v 1.1.2.6 2009/10/11 18:35:37 rufina Exp $
+/* $Id: inflectedstring.h,v 1.1.2.6 2009/10/11 18:35:37 rufina Exp $
  *
  * ruffina, Dream Land, 2007
  */
@@ -8,15 +8,15 @@
 #include "noun.h"
 #include "nounholder.h"
 
-class RussianString : public Grammar::NounHolder,
+class InflectedString : public Grammar::NounHolder,
                       public Grammar::Noun 
 {
 public:   
-    typedef ::Pointer<RussianString> Pointer;
+    typedef ::Pointer<InflectedString> Pointer;
 
-    RussianString();
-    RussianString(const DLString &ff);
-    RussianString(const DLString &ff, const Grammar::MultiGender &mg);
+    InflectedString();
+    InflectedString(const DLString &ff);
+    InflectedString(const DLString &ff, const Grammar::MultiGender &mg);
 
     virtual DLString decline(const Grammar::Case &c) const;
     virtual Grammar::Gender getGender() const;

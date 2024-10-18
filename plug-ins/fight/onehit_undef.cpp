@@ -295,7 +295,7 @@ void UndefinedOneHit::damEffectVorpal()
 
 void UndefinedOneHit::message( )
 {
-    RussianString noun(attack_table[attack].noun,
+    InflectedString noun(attack_table[attack].noun,
                        attack_table[attack].gender);
 
     if (immune) {

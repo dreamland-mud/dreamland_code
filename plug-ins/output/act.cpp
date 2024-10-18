@@ -14,7 +14,7 @@
 #include "profiler.h"
 #include "noun.h"
 #include "grammar_entities_impl.h"
-#include "russianstring.h"
+#include "inflectedstring.h"
 
 #include "npcharacter.h"
 #include "pcharacter.h"
@@ -177,7 +177,7 @@ private:
         char *string;
         Character *ch;
         Object *obj;
-        RussianString *rstr;
+        InflectedString *rstr;
         const Skill *skill;
     } arg_t;
     arg_t args[MAXARGS], d;

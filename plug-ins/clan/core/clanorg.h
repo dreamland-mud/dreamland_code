@@ -5,7 +5,7 @@
 #ifndef __CLANORG_H__
 #define __CLANORG_H__
 
-#include "xmlrussianstring.h"
+#include "xmlinflectedstring.h"
 #include "xmlmap.h"
 #include "xmlstring.h"
 
@@ -44,7 +44,7 @@ public:
     static void delAttr( PCMemoryInterface * );
     static bool hasAttr( PCMemoryInterface * );
     
-    XML_VARIABLE XMLRussianString name;
+    XML_VARIABLE XMLInflectedString name;
     
     static const DLString ATTR_NAME;
 };

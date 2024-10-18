@@ -374,7 +374,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             
             {
                 DLString names = DLString( pObj->name );
-                RussianString rshortd(pObj->short_descr, pObj->gram_gender );
+                InflectedString rshortd(pObj->short_descr, pObj->gram_gender );
                 DLString shortd = rshortd.decline( '7' ).colourStrip( );
                 if (!arg_contains_someof( shortd, pObj->name )) {
                     rcnt ++;
@@ -430,7 +430,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 continue;
             
             {
-                RussianString rshortd(pMob->short_descr, MultiGender(pMob->sex, pMob->gram_number));
+                InflectedString rshortd(pMob->short_descr, MultiGender(pMob->sex, pMob->gram_number));
                 DLString shortd = rshortd.decline( '7' ).colourStrip( ).toLower();
                 if (!arg_contains_someof( shortd, pMob->player_name )) {
                     rcnt ++;

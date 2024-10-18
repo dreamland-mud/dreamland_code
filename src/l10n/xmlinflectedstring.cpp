@@ -1,16 +1,16 @@
-/* $Id: xmlrussianstring.cpp,v 1.1.2.5 2009/11/08 17:33:28 rufina Exp $
+/* $Id: xmlinflectedstring.cpp,v 1.1.2.5 2009/11/08 17:33:28 rufina Exp $
  *
  * ruffina, Dream Land, 2007
  */
 #include <string.h>
 #include "grammar_entities_impl.h"
-#include "xmlrussianstring.h"
+#include "xmlinflectedstring.h"
 
 using namespace Grammar;
 
-const DLString XMLRussianString::ATTRIBUTE_GRAMMAR = "mg";
+const DLString XMLInflectedString::ATTRIBUTE_GRAMMAR = "mg";
 
-void XMLRussianString::fromXML( const XMLNode::Pointer& parent ) 
+void XMLInflectedString::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLNode::Pointer node = parent->getFirstNode( );
     
@@ -21,7 +21,7 @@ void XMLRussianString::fromXML( const XMLNode::Pointer& parent )
         setFullForm(node->getCData( ));
 }
 
-bool XMLRussianString::toXML( XMLNode::Pointer& parent ) const
+bool XMLInflectedString::toXML( XMLNode::Pointer& parent ) const
 {
     XMLNode::Pointer node( NEW );
     

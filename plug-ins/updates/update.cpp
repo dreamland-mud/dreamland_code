@@ -1310,7 +1310,7 @@ struct LightVampireDamage : public Damage {
 
         if(!msg.empty()) oldact( msg.c_str( ), ch, 0, 0, TO_CHAR );
 
-        RussianString sunlight("солнечный свет", MultiGender::MASCULINE);
+        InflectedString sunlight("солнечный свет", MultiGender::MASCULINE);
         if (dam == 0)
             msgRoom( "%2$^O1\6%3$C2", dam, sunlight, ch);
         else

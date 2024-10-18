@@ -6,7 +6,7 @@
 #include "damageflags.h"
 
 #include "logstream.h"
-#include "russianstring.h"
+#include "inflectedstring.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -97,7 +97,7 @@ int SkillDamage::msgNoSpamBit( )
 
 void SkillDamage::message( )
 {
-    const RussianString &attack = skillManager->find(sn)->getDammsg( );
+    const InflectedString &attack = skillManager->find(sn)->getDammsg( );
 
     if (immune) {
         if (ch == victim) {

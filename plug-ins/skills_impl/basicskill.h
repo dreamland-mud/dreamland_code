@@ -11,7 +11,7 @@
 #include "xmlinteger.h"
 #include "xmlstring.h"
 #include "xmltableelement.h"
-#include "xmlrussianstring.h"
+#include "xmlinflectedstring.h"
 #include "xmlflags.h"
 #include "xmlmultistring.h"
 
@@ -53,7 +53,7 @@ public:
     virtual int getHealthPenalty() const;
     virtual int getMovesPenalty() const;
     virtual int getManaPenalty() const;
-    virtual const RussianString &getDammsg( ) const;
+    virtual const InflectedString &getDammsg( ) const;
     virtual int getRating( PCharacter * ) const;
     virtual bool isPassive() const;
     virtual bool isValid( ) const
@@ -88,7 +88,7 @@ public:
     DLString printPracticers(PCharacter *ch) const;
 
     XML_VARIABLE XMLMultiString name;
-    XML_VARIABLE XMLRussianString dammsg;
+    XML_VARIABLE XMLInflectedString dammsg;
     XML_VARIABLE XMLIntegerNoEmpty beats;
     XML_VARIABLE XMLIntegerNoEmpty mana;
     XML_VARIABLE XMLIntegerNoEmpty move;

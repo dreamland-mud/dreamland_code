@@ -20,7 +20,7 @@
 #include "objectbehavior.h"
 #include "wearlocation.h"
 #include "nounholder.h"
-#include "russianstring.h"
+#include "inflectedstring.h"
 #include "affectlist.h"
 
 class Character;
@@ -53,7 +53,7 @@ protected:
     XMLMultiString   description;
     char * material;
     DLString owner;
-    RussianString::Pointer cachedNoun;
+    InflectedString::Pointer cachedNoun;
     int                  value  [5];
 
 public:

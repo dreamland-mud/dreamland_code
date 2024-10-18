@@ -147,7 +147,7 @@ void CachedNoun::update( PCharacter *ch )
     
     /* plain english name */
     if (!name) {
-        name = RussianString::Pointer( NEW, ch->getName( ), mg );
+        name = InflectedString::Pointer( NEW, ch->getName( ), mg );
     }
     else {
         name->setFullForm( ch->getName( ) );
@@ -160,7 +160,7 @@ void CachedNoun::update( PCharacter *ch )
         rname = ch->getName( );
     
     if (!russian) {
-        russian = RussianString::Pointer( NEW, rname, mg );
+        russian = InflectedString::Pointer( NEW, rname, mg );
     }
     else {
         russian->setFullForm( rname );
@@ -169,7 +169,7 @@ void CachedNoun::update( PCharacter *ch )
     
     /* vampire as visible to non-vampires */
     if (!vampire) {
-        vampire = RussianString::Pointer( NEW, vampireName, mg );
+        vampire = InflectedString::Pointer( NEW, vampireName, mg );
     }
     else {
         vampire->setGender( mg );
@@ -179,7 +179,7 @@ void CachedNoun::update( PCharacter *ch )
     DLString v2name = vampireName + " [" + ch->getName( ) + "]";
 
     if (!vampire2) {
-        vampire2 = RussianString::Pointer( NEW, v2name, mg );
+        vampire2 = InflectedString::Pointer( NEW, v2name, mg );
     }
     else {
         vampire2->setFullForm( v2name );
@@ -188,7 +188,7 @@ void CachedNoun::update( PCharacter *ch )
     
     /* immortals under wizinvis */
     if (!immortal) {
-        immortal = RussianString::Pointer( NEW, immortalName, mg );
+        immortal = InflectedString::Pointer( NEW, immortalName, mg );
     }
     else {
         immortal->setGender( mg );
@@ -212,7 +212,7 @@ void CachedNoun::update( PCharacter *ch )
     rprt << rname;
 
     if (!pretitle) {
-        pretitle = RussianString::Pointer( NEW, prt, mg );
+        pretitle = InflectedString::Pointer( NEW, prt, mg );
     }
     else {
         pretitle->setFullForm( prt );
@@ -220,7 +220,7 @@ void CachedNoun::update( PCharacter *ch )
     }
 
     if (!pretitleRussian) {
-        pretitleRussian = RussianString::Pointer( NEW, rprt, mg );
+        pretitleRussian = InflectedString::Pointer( NEW, rprt, mg );
     }
     else {
         pretitleRussian->setFullForm( rprt );
@@ -585,7 +585,7 @@ void PCharacter::setRemorts( const Remorts& remorts )
 {
     this->remorts = remorts;
 }
-const RussianString& PCharacter::getRussianName( ) const 
+const InflectedString& PCharacter::getRussianName( ) const 
 {
     return russianName;
 }

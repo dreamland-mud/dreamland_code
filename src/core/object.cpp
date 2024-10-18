@@ -370,7 +370,7 @@ void Object::updateCachedNoun( )
         ? pIndexData->gram_gender : gram_gender;
 
     if (!cachedNoun) { 
-        cachedNoun = RussianString::Pointer( NEW, 
+        cachedNoun = InflectedString::Pointer( NEW, 
                                              getShortDescr( ), 
                                              g );
     }

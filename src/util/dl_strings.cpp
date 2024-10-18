@@ -8,7 +8,7 @@
 #include "dl_ctype.h"
 #include "flexer.h"
 #include "grammar_entities_impl.h"
-#include "russianstring.h"
+#include "inflectedstring.h"
 
 /*
  * str_cmp: a case-insensitive version of strcmp().
@@ -231,7 +231,7 @@ DLString russian_case( const DLString &description, char gram_case )
 
 DLString russian_case_all_forms(const DLString &string)
 {
-    RussianString rs(string);
+    InflectedString rs(string);
     return rs.decline(Grammar::Case::MAX).colourStrip();
 }
 

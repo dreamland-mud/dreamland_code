@@ -9,7 +9,7 @@
 
 #include "socialbase.h"
 
-#include "russianstring.h"
+#include "inflectedstring.h"
 #include "character.h"
 #include "room.h"
 
@@ -90,7 +90,7 @@ int SocialBase::dispatch( const InterpretArguments &iargs )
 
 static const void *victimOrSelf(Character *ch, Character *victim)
 {
-    static RussianString self("с||ебя||ебя||ебе||ебя||обой||ебе");
+    static InflectedString self("с||ебя||ебя||ебе||ебя||обой||ебе");
     if (ch == victim)
         return &self;
     else

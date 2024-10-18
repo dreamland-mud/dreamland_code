@@ -19,7 +19,7 @@ class AffectHandler;
 class SkillGroupReference;
 class SkillCommand;
 class HelpArticle;
-class RussianString;
+class InflectedString;
 
 typedef ::Pointer<Spell> SpellPointer;
 typedef ::Pointer<SkillCommand> SkillCommandPointer;
@@ -51,7 +51,7 @@ public:
     virtual int getHealthPenalty() const;
     virtual int getMovesPenalty() const;
     virtual int getManaPenalty() const;
-    virtual const RussianString &getDammsg( ) const;
+    virtual const InflectedString &getDammsg( ) const;
     virtual bool isPassive() const;
 
     virtual bool visible( CharacterMemoryInterface * ) const;

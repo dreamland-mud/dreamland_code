@@ -1,4 +1,4 @@
-/* $Id: xmlrussianstring.h,v 1.1.2.2 2009/10/11 18:35:37 rufina Exp $
+/* $Id: xmlinflectedstring.h,v 1.1.2.2 2009/10/11 18:35:37 rufina Exp $
  *
  * ruffina, Dream Land, 2007
  */
@@ -6,9 +6,9 @@
 #define XMLRUSSIANSTRING_H
 
 #include "xmlnode.h"
-#include "russianstring.h"
+#include "inflectedstring.h"
 
-class XMLRussianString : public RussianString {
+class XMLInflectedString : public InflectedString {
 public:
     static const DLString ATTRIBUTE_GRAMMAR;
 

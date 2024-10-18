@@ -399,7 +399,7 @@ int BasicSkill::getManaPenalty() const
     return manaPenalty;
 }
 
-const RussianString &BasicSkill::getDammsg( ) const
+const InflectedString &BasicSkill::getDammsg( ) const
 {
     return dammsg;
 }

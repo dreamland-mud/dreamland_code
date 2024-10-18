@@ -1,0 +1,38 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../dreamland_world"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.tcc": "cpp",
+			"istream": "cpp",
+			"sstream": "cpp",
+			"array": "cpp",
+			"atomic": "cpp",
+			"cwchar": "cpp",
+			"string": "cpp",
+			"exception": "cpp",
+			"iterator": "cpp",
+			"initializer_list": "cpp",
+			"iosfwd": "cpp",
+			"new": "cpp",
+			"stdexcept": "cpp",
+			"tuple": "cpp",
+			"type_traits": "cpp",
+			"utility": "cpp",
+			"system_error": "cpp",
+			"string_view": "cpp",
+			"unordered_map": "cpp",
+			"unordered_set": "cpp",
+			"deque": "cpp",
+			"list": "cpp",
+			"vector": "cpp",
+			"bitset": "cpp"
+		}
+	}
+}

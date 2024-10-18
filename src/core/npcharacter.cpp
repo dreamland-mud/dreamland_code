@@ -205,7 +205,7 @@ void NPCharacter::updateCachedNoun( )
     DLString fullForm = getShortDescr(LANG_RU);
 
     if (!cachedNoun) {
-        cachedNoun = RussianString::Pointer( 
+        cachedNoun = InflectedString::Pointer( 
                         NEW, 
                         fullForm, 
                         MultiGender( getSex( ), pIndexData->gram_number) );

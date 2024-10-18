@@ -1,63 +1,63 @@
-/* $Id: russianstring.cpp,v 1.1.2.7 2009/11/08 17:33:28 rufina Exp $
+/* $Id: inflectedstring.cpp,v 1.1.2.7 2009/11/08 17:33:28 rufina Exp $
  *
  * ruffina, Dream Land, 2007
  */
 #include "grammar_entities_impl.h"
-#include "russianstring.h"
+#include "inflectedstring.h"
 
 using namespace Grammar;
 
-RussianString::RussianString()
+InflectedString::InflectedString()
 {
     fillCachedForms();
 }
 
-RussianString::RussianString(const DLString &ff)
+InflectedString::InflectedString(const DLString &ff)
                   : fullForm(ff)
 {
     fillCachedForms();
 }
 
-RussianString::RussianString(const DLString &ff, const MultiGender &mg)
+InflectedString::InflectedString(const DLString &ff, const MultiGender &mg)
                   : fullForm(ff), mg(mg)
 {
     fillCachedForms();
 }
 
-Gender RussianString::getGender() const
+Gender InflectedString::getGender() const
 {
     return mg.toGender();
 }
 
-Number RussianString::getNumber() const
+Number InflectedString::getNumber() const
 {
     return mg.toNumber();
 }
 
-const DLString &RussianString::getFullForm() const
+const DLString &InflectedString::getFullForm() const
 {
     return fullForm;
 }
 
-NounHolder::NounPointer RussianString::toNoun(const DLObject *, int) const
+NounHolder::NounPointer InflectedString::toNoun(const DLObject *, int) const
 {
-    RussianString::Pointer me(this);
+    InflectedString::Pointer me(this);
     link();
     return me;
 }
 
-void RussianString::setFullForm(const DLString &ff)
+void InflectedString::setFullForm(const DLString &ff)
 {
     fullForm = ff;
     fillCachedForms();
 }
 
-void RussianString::setGender(const MultiGender &mg) 
+void InflectedString::setGender(const MultiGender &mg) 
 {
     this->mg = mg;
 }
 
-void RussianString::fillCachedForms()
+void InflectedString::fillCachedForms()
 {
     cachedForms.clear();
     cachedForms.resize(Case::MAX + 1);
@@ -69,7 +69,7 @@ void RussianString::fillCachedForms()
     }
 }
 
-DLString RussianString::decline(const Case &c) const
+DLString InflectedString::decline(const Case &c) const
 {
     return cachedForms[c];
 }

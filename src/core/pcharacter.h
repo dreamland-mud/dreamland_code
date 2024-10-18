@@ -20,7 +20,7 @@
 #include "xmlglobalarray.h"
 #include "xmltimestamp.h"
 
-#include "xmlrussianstring.h"
+#include "xmlinflectedstring.h"
 
 #include "pcmemoryinterface.h"
 #include "xmlattributes.h"
@@ -75,13 +75,13 @@ struct CachedNoun {
     void update( PCharacter * );
     void clear( );
 
-    RussianString::Pointer name;
-    RussianString::Pointer russian;
-    RussianString::Pointer vampire;
-    RussianString::Pointer vampire2;
-    RussianString::Pointer immortal;
-    RussianString::Pointer pretitle;
-    RussianString::Pointer pretitleRussian;
+    InflectedString::Pointer name;
+    InflectedString::Pointer russian;
+    InflectedString::Pointer vampire;
+    InflectedString::Pointer vampire2;
+    InflectedString::Pointer immortal;
+    InflectedString::Pointer pretitle;
+    InflectedString::Pointer pretitleRussian;
 };
 
 /**
@@ -164,7 +164,7 @@ public:
     virtual void setAttributes( const XMLAttributes& attributes ) ;
     virtual const XMLAttributes& getAttributes( ) const ;
             
-    virtual const RussianString& getRussianName( ) const ;
+    virtual const InflectedString& getRussianName( ) const ;
     virtual void setRussianName( const DLString& ) ;
 
     virtual Remorts& getRemorts( ) ;
@@ -245,7 +245,7 @@ private:
     XML_VARIABLE XMLAttributes attributes;
     XML_VARIABLE Remorts remorts;
     XML_VARIABLE XMLIntegerNoEmpty trust;
-    XML_VARIABLE XMLRussianString russianName;
+    XML_VARIABLE XMLInflectedString russianName;
 
     XML_VARIABLE XMLStringNoEmpty title;
     XML_VARIABLE XMLStringNoEmpty pretitle;

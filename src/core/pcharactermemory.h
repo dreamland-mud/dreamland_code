@@ -18,7 +18,7 @@
 #include "xmlshort.h"
 #include "xmllong.h"
 #include "xmlvariablecontainer.h"
-#include "xmlrussianstring.h"
+#include "xmlinflectedstring.h"
 #include "nounholder.h"
 
 #include "xmlattributes.h"
@@ -130,7 +130,7 @@ public:
     virtual Remorts& getRemorts( ) ;
     virtual void setRemorts( const Remorts& remorts ) ;
 
-    virtual const RussianString& getRussianName( ) const ;
+    virtual const InflectedString& getRussianName( ) const ;
     virtual void setRussianName( const DLString& name ) ;
 
     virtual bool isOnline( ) const;
@@ -175,7 +175,7 @@ private:
     XML_VARIABLE XMLInteger trust;
     XML_VARIABLE XMLInteger questpoints;
     XML_VARIABLE XMLInteger security;
-    XML_VARIABLE XMLRussianString russianName;
+    XML_VARIABLE XMLInflectedString russianName;
     XML_VARIABLE PCSkills skills;
     XML_VARIABLE PCBonuses bonuses;
     XML_VARIABLE XMLInteger start_room;

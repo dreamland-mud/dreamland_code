@@ -89,27 +89,27 @@ DLString SocialHelp::getTitle(const DLString &label) const
     return HelpArticle::getTitle(label);
 }
 
-static const RussianString & object_name()
+static const InflectedString & object_name()
 {
-    static RussianString obj("кинжал||а|у||ом|е");
+    static InflectedString obj("кинжал||а|у||ом|е");
     return obj;
 }
 
 // Tranforms player info into structure that 'format' functions would understand:
 // russian name with cases and gender.
-static RussianString russian_string(PCMemoryInterface *pc)
+static InflectedString russian_string(PCMemoryInterface *pc)
 {
     MultiGender mg = MultiGender(pc->getSex(), Number::SINGULAR);
     if (pc->getRussianName().getFullForm().empty())
-        return RussianString(pc->getName(), mg);
+        return InflectedString(pc->getName(), mg);
     else
-        return RussianString(pc->getRussianName().getFullForm(), mg);
+        return InflectedString(pc->getRussianName().getFullForm(), mg);
 }
 
 // Finds random registered player and returns its name+gender.
-static RussianString player_name()
+static InflectedString player_name()
 {
-    static RussianString empty;
+    static InflectedString empty;
     PCharacterMemoryList::const_iterator i;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM();
     int totalFound = 0;
@@ -150,10 +150,10 @@ void SocialHelp::getRawText( Character *ch, ostringstream &buf ) const
         << social->getShortDesc() << endl << endl
         << "Вот как этот социал виден тебе и окружающим, когда он применен..." << endl;
 
-    RussianString me = russian_string(ch->getPC());
-    RussianString vict1 = player_name();
-    RussianString vict2 = player_name();
-    const RussianString &obj = object_name();
+    InflectedString me = russian_string(ch->getPC());
+    InflectedString vict1 = player_name();
+    InflectedString vict2 = player_name();
+    const InflectedString &obj = object_name();
 
     if (!social->getAutoMe().empty()) {
         buf << endl

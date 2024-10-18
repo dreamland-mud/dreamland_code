@@ -20,7 +20,7 @@ verb.cpp \
 pronouns.cpp \
 ru_pronouns.cpp \
 flexer.cpp \
-russianstring.cpp \
-xmlrussianstring.cpp 
+inflectedstring.cpp \
+xmlinflectedstring.cpp 
 
 AM_CPPFLAGS += $(src_INCLUDES)

@@ -2,7 +2,7 @@
  *
  * ruffina, 2004
  */
-#include "russianstring.h"
+#include "inflectedstring.h"
 #include "skill.h"
 #include "spell.h"
 #include "affecthandler.h"
@@ -85,9 +85,9 @@ int Skill::getManaPenalty() const
 {
     return 0;
 }
-const RussianString &Skill::getDammsg( ) const
+const InflectedString &Skill::getDammsg( ) const
 {
-    static RussianString dammsg("тупость");
+    static InflectedString dammsg("тупость");
     return dammsg;
 }
 bool Skill::isPassive() const

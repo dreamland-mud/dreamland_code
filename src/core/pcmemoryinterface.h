@@ -17,7 +17,7 @@
 #include "xmlmultistring.h"
 
 class DLString;
-class RussianString;
+class InflectedString;
 class Date;
 class RaceReference;
 class RemortBonuses;
@@ -124,7 +124,7 @@ public:
     virtual Remorts& getRemorts( )  = 0;
     virtual void setRemorts( const Remorts& )  = 0;
 
-    virtual const RussianString& getRussianName( ) const  = 0;
+    virtual const InflectedString& getRussianName( ) const  = 0;
     virtual void setRussianName( const DLString& )  = 0;
 
     virtual bool isOnline( ) const = 0;
