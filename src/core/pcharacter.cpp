@@ -271,7 +271,7 @@ void PCharacter::init( )
     title.setValue( "" );
     pretitle.setValue( "" );
     russianPretitle.setValue( "" );
-    description.setValue( "" );
+    description.clear();
     skills.clear( );
     bonuses.clear();
     security = 0;
@@ -611,14 +611,23 @@ void PCharacter::setLoyalty(int value)
     this->loyalty = value;        
 }
 
-void PCharacter::setDescription( const DLString& d )
+void PCharacter::setDescription( const DLString& d, lang_t lang )
 {
-    description = d;
+    description[lang] = d;
 }
-const char * PCharacter::getDescription( ) const
+const char * PCharacter::getDescription( lang_t lang ) const
 {
-    return description.c_str( );
+    return description.get(lang).c_str( );
 }
+const XMLMultiString & PCharacter::getDescription( ) const
+{
+    return description;
+}
+void PCharacter::setDescription( const XMLMultiString &description )
+{
+    this->description = description;
+} 
+
 const DLString& PCharacter::getPretitle( ) const 
 {
     return pretitle.getValue( );

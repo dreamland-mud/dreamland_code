@@ -41,18 +41,19 @@ public:
     void init(RoomIndexData *);
     RoomIndexData *compat(int vnum);
 
-    XML_VARIABLE XMLStringNoEmpty name, description;
+    XML_VARIABLE XMLMultiString name;
+    XML_VARIABLE XMLMultiString description;
     XML_VARIABLE XMLFlagsNoEmpty flags;
     XML_VARIABLE XMLEnumeration sector;
     XML_VARIABLE XMLStringNoEmpty clan, guilds;
     XML_VARIABLE XMLMapBase<XMLExitDir> exits;
-    XML_VARIABLE XMLMapBase<XMLExtraExit> extraExits;
-    //XML_VARIABLE XMLMapBase<XMLString> extraDescr;
-    XML_VARIABLE XMLListBase<XMLExtraDescr> extraDescr;
+    XML_VARIABLE XMLMapBase<XMLExtraExit> extraExits; // replace with a list after 1st convertation
+    XML_VARIABLE XMLListBase<XMLExtraDescr> extraDescr; // compat
+    XML_VARIABLE XMLListBase<XMLExtraDescription> extraDescriptions;
     XML_VARIABLE XMLIntegerNoDef<100> manaRate, healRate;
     XML_VARIABLE XMLStringNoEmpty liquid;
-    XML_VARIABLE XMLStringNoEmpty smell;
-    XML_VARIABLE XMLStringNoEmpty sound;
+    XML_VARIABLE XMLMultiString smell;
+    XML_VARIABLE XMLMultiString sound;
     XML_VARIABLE XMLResetList resets;
     XML_VARIABLE XMLStringNode behavior;
     XML_VARIABLE XMLGlobalBitvector behaviors;

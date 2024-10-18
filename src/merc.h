@@ -97,7 +97,6 @@ class AreaQuest;
 struct extra_exit_data;
 struct mob_index_data;
 struct obj_index_data;
-struct extra_descr_data;
 
 #define        MAX_KEY_HASH                 1024
 
@@ -126,9 +125,6 @@ RoomIndexData *        get_room_index        ( int vnum );
 Room * get_room_instance(int vnum);
 AreaIndexData * get_area_index(const DLString &filename);
 
-char *        get_extra_descr        ( const char *name, extra_descr_data *ed );
-extra_descr_data *new_extra_descr( );
-void free_extra_descr( extra_descr_data * );
 
 char *        str_dup                ( const char *str );
 void        free_string        ( char *pstr );
@@ -176,7 +172,6 @@ void        free_string        ( char *pstr );
  * Structure types.
  */
 
-typedef struct        extra_descr_data        EXTRA_DESCR_DATA;
 typedef struct        obj_index_data                OBJ_INDEX_DATA;
 typedef struct        mob_index_data                MOB_INDEX_DATA;
 typedef struct        exit_data                EXIT_DATA;
@@ -351,10 +346,16 @@ struct        mob_index_data
     int                group;
     int                count;
     int                killed;
+
+    // Replace player_name with multi-lang keywords.
+    XMLMultiString keyword;
     char *                player_name;
-    char *                short_descr;
-    char *                long_descr;
-    char *                description;
+
+    XMLMultiString   short_descr;
+    XMLMultiString   long_descr;
+    XMLMultiString   description;
+    XMLMultiString smell;
+
     int                act;
     int                affected_by;
     int                detection;
@@ -388,26 +389,45 @@ struct        mob_index_data
     XMLDocumentPointer behavior;
     Scripting::Object *wrapper;
     AreaIndexData *                area;
-    DLString smell;
     ClanReference clan;
 
     int getSize() const;
 
     /** Return props value for the key (props[key] or props["xxx"][key]). */
     DLString getProperty(const DLString &key) const;
+
+    const char * getDescription( lang_t lang ) const;
+    const char * getShortDescr( lang_t lang ) const;
+    const char * getLongDescr( lang_t lang ) const;
 };
 
 
 /*
  * Extra description data for a room or object.
  */
-struct        extra_descr_data
-{
-    EXTRA_DESCR_DATA *next;        /* Next in list                     */
-    char *keyword;              /* Keyword in look/examine          */
-    char *description;          /* What to see                      */
+struct ExtraDescription {
+    // Keyword in look/examine
+    XMLMultiString keyword; 
+
+    // What to see
+    XMLMultiString description; 
 };
 
+struct ExtraDescrList: public list<ExtraDescription *> {
+    /** Return extra descr that matches the given keyword. */
+    ExtraDescription *find(const DLString &keyword) const;
+
+    ExtraDescription *findUnstrict(const DLString &keyword) const;
+
+    /** 
+     * Remove matching descr from list and free its memory. 
+     * Returns true if found.
+     */
+    bool findAndDestroy(const DLString &keyword);
+
+    /** Destroy all elements and clear the list. */
+    void deallocate();
+};
 
 typedef list<Object *> ObjectList;
 
@@ -420,11 +440,16 @@ struct        obj_index_data
     virtual ~obj_index_data();
 
     OBJ_INDEX_DATA *        next;
-    EXTRA_DESCR_DATA *        extra_descr;
+    ExtraDescrList extraDescriptions;
     AffectList        affected;
-    char *                name;
-    char *                short_descr;
-    char *                description;
+
+    // Replace 'name' with multi-lang keywords.
+    XMLMultiString keyword;
+    XMLMultiString   short_descr;
+    XMLMultiString   description;
+    XMLMultiString smell;
+    XMLMultiString sound;
+
     int                vnum;
     int                reset_num;
     char *                material;
@@ -442,8 +467,6 @@ struct        obj_index_data
     XMLDocumentPointer behavior;
     Scripting::Object *wrapper;
     AreaIndexData *                area;
-    DLString smell;
-    DLString sound;
     ObjectList instances;
 
     GlobalBitvector behaviors;
@@ -451,6 +474,9 @@ struct        obj_index_data
 
     /** Return props value for the key (props[key] or props["xxx"][key]). */
     DLString getProperty(const DLString &key) const;
+
+    const char * getDescription( lang_t lang ) const;
+    const char * getShortDescr( lang_t lang ) const;
 };
 
 
@@ -468,9 +494,11 @@ struct        exit_data
         int                exit_info;
         int                exit_info_default;
         int                key;
-        char *                keyword;
-        char *                description;
-        char *          short_descr;
+
+        XMLMultiString keyword;
+        XMLMultiString short_descr;
+        XMLMultiString description;
+
         EXIT_DATA *        next;
         int                orig_door;
         int                level;
@@ -497,19 +525,20 @@ struct        extra_exit_data
         int                                exit_info_default;
         int                key;
         int                                max_size_pass;
-        char *                keyword;
-        char *                short_desc_from;
-        char *                short_desc_to;
-        char *                description;
-        char *                room_description;
+
+
+        XMLMultiString keyword;
+        XMLMultiString short_desc_from;
+        XMLMultiString short_desc_to;
+        XMLMultiString description;
+        XMLMultiString room_description;
+
         int                level;
 
-        DLString msgLeaveRoom;
-        DLString msgLeaveSelf;
-        DLString msgEntryRoom;
-        DLString msgEntrySelf;
-        Grammar::MultiGender gender_from;
-        Grammar::MultiGender gender_to;
+        XMLMultiString msgLeaveRoom;
+        XMLMultiString msgLeaveSelf;
+        XMLMultiString msgEntryRoom;
+        XMLMultiString msgEntrySelf;
 
         /** Resolve u1 from a virtual number to the real room. */
         void resolve(); 

@@ -48,11 +48,11 @@ public:
 
 protected:
     long long ID;
-    char              *  name;
+    XMLMultiString keyword;
+    XMLMultiString   short_descr;
+    XMLMultiString   description;
+    char * material;
     DLString owner;
-    char              *  short_descr;
-    char              *  description;
-    char              *  material;
     RussianString::Pointer cachedNoun;
     int                  value  [5];
 
@@ -65,7 +65,7 @@ public:
     DLString pocket;
     Object            *  on;
     Character          *  carried_by;
-    EXTRA_DESCR_DATA  *  extra_descr;
+    ExtraDescrList extraDescriptions;
     AffectList  affected;
     OBJ_INDEX_DATA    *  pIndexData;
     Room              *  in_room;
@@ -136,16 +136,16 @@ public:
     inline long long getID( ) const;
     inline void setID( long long );
 
-    inline const char * getRealName( ) const;
-    inline const char * getRealShortDescr( ) const;
-    inline const char * getRealDescription( ) const;
-    inline const char * getRealMaterial( ) const;
-    inline const DLString & getOwner( ) const;
+    const char * getRealName( ) const;
+    const char * getRealShortDescr( ) const;
+    const char * getRealDescription( ) const;
+    const char * getRealMaterial( ) const;
+    const DLString & getOwner( ) const;
 
-    inline const char * getName( ) const;
-    inline const char * getShortDescr( ) const;
-    inline const char * getDescription( ) const;
-    inline const char * getMaterial( ) const;
+    const char * getName( ) const;
+    const char * getShortDescr( ) const;
+    const char * getDescription( ) const;
+    const char * getMaterial( ) const;
 
     void updateCachedNoun( );
 
@@ -213,18 +213,6 @@ void Object::setID( long long id )
     ID = id;
 }
 
-inline const char * Object::getRealName( ) const
-{
-    return name;
-}
-inline const char * Object::getRealShortDescr( ) const
-{
-    return short_descr;
-}
-inline const char * Object::getRealDescription( ) const
-{
-    return description;
-}
 inline const char * Object::getRealMaterial( ) const
 {
     return material;
@@ -234,18 +222,6 @@ inline const DLString & Object::getOwner( ) const
     return owner;
 }
 
-inline const char * Object::getName( ) const
-{
-    return name ? name : pIndexData->name;    
-}
-inline const char * Object::getShortDescr( ) const
-{
-    return short_descr ? short_descr : pIndexData->short_descr;
-}
-inline const char * Object::getDescription( ) const
-{
-    return description ? description : pIndexData->description;
-}
 inline const char * Object::getMaterial( ) const
 {
     return material ? material : pIndexData->material;

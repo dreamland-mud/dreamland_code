@@ -180,11 +180,7 @@ obj_index_data::obj_index_data()
                 : behaviors(behaviorManager)
 {
     next = NULL;
-    extra_descr = NULL;
     area = NULL;
-    name = str_dup("no name");
-    short_descr = str_dup("(no short description)");
-    description = str_dup("(no description)");
     vnum = 0;
     reset_num = 0;
     material = str_dup("none");
@@ -218,6 +214,17 @@ DLString obj_index_data::getProperty(const DLString &key) const
     return jsonValue;
 }
 
+const char * obj_index_data::getDescription( lang_t lang ) const
+{
+    return description.get(lang).c_str();
+}
+
+const char * obj_index_data::getShortDescr( lang_t lang ) const
+{
+    return short_descr.get(lang).c_str();
+}
+
+
 mob_index_data::mob_index_data( ) 
                      : practicer( skillGroupManager ), 
                        religion( religionManager ),
@@ -233,9 +240,6 @@ mob_index_data::mob_index_data( )
     count = 0;
     killed = 0;
     player_name = str_dup("no name");
-    short_descr = str_dup("(no short description)");
-    long_descr = str_dup("(no long description)\n\r");
-    description = str_empty;
     act = ACT_IS_NPC;
     affected_by = 0;
     detection = 0;
@@ -285,6 +289,21 @@ DLString mob_index_data::getProperty(const DLString &key) const
     return jsonValue;
 }
 
+const char * mob_index_data::getDescription( lang_t lang ) const
+{
+    return description.get(lang).c_str();
+}
+
+const char * mob_index_data::getShortDescr( lang_t lang ) const
+{
+    return short_descr.get(lang).c_str();
+}
+
+const char * mob_index_data::getLongDescr( lang_t lang ) const
+{
+    return long_descr.get(lang).c_str();
+}
+
 int mob_index_data::getSize() const
 {
     return size == NO_FLAG ? raceManager->find(race)->getSize() : size;
@@ -293,23 +312,6 @@ int mob_index_data::getSize() const
 auction_data::auction_data( )
                      : item( NULL ), seller( NULL ), buyer( NULL )
 {
-}
-
-EXTRA_DESCR_DATA *new_extra_descr(void)
-{
-    static EXTRA_DESCR_DATA ed_zero;
-    EXTRA_DESCR_DATA *ed;
-    
-    ed = new EXTRA_DESCR_DATA;
-    *ed = ed_zero;
-    return ed;
-}
-
-void free_extra_descr(EXTRA_DESCR_DATA *ed)
-{
-    free_string(ed->keyword);
-    free_string(ed->description);
-    delete ed;
 }
 
 void exit_data::resolve()
@@ -328,16 +330,10 @@ extra_exit_data::extra_exit_data()
       max_size_pass(0), level(0)
 {
     u1.to_room = 0;
-    keyword = description = room_description = short_desc_to = short_desc_from = str_empty;
 }
 
 extra_exit_data::~extra_exit_data()
 {
-    free_string(keyword);
-    free_string(short_desc_from);
-    free_string(short_desc_to);
-    free_string(description);
-    free_string(room_description);
 }
 
 void extra_exit_data::resolve()
@@ -360,17 +356,44 @@ reset_data::reset_data()
 
 }      
 
-/*
- * Get an extra description from a list.
- */
-char *get_extra_descr( const char *name, EXTRA_DESCR_DATA *ed )
+ExtraDescription * ExtraDescrList::find(const DLString &kw) const
 {
-    for ( ; ed != 0; ed = ed->next )
-    {
-        if ( is_name( name, ed->keyword ) )
-            return ed->description;
+    for (const auto &ed: *this) {
+        if (ed->keyword.matchesStrict(kw))
+            return ed;
     }
+
     return 0;
+}
+
+ExtraDescription * ExtraDescrList::findUnstrict(const DLString &kw) const
+{
+    for (const auto &ed: *this) {
+        if (ed->keyword.matchesUnstrict(kw))
+            return ed;
+    }
+
+    return 0;
+}
+
+
+bool ExtraDescrList::findAndDestroy(const DLString &kw)
+{
+    ExtraDescription *ed = find(kw);
+    if (!ed)
+        return false;
+
+    remove(ed);
+    delete ed;
+    return true;
+}
+
+void ExtraDescrList::deallocate()
+{
+    for(iterator pos = begin(); pos != end(); ++pos)
+        delete( *pos );
+
+    clear();
 }
 
 

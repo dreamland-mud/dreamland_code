@@ -20,7 +20,7 @@
 
 #include "wrapperbase.h"
 #include "feniamanager.h"
-
+#include "string_utils.h"
 #include "objectbehavior.h"
 #include "object.h"
 #include "affect.h"
@@ -34,11 +34,10 @@ const DLString Object::TYPE = "Object";
 
 Object::Object( ) :
                 ID( 0 ),
-                name( 0 ),
-                short_descr( 0 ), description( 0 ), material( 0 ), 
+                material( 0 ), 
                 next( 0 ), prev( 0 ),
                 next_content( 0 ), contains( 0 ), in_obj( 0 ), on( 0 ),
-                carried_by( 0 ), extra_descr( 0 ), pIndexData( 0 ),
+                carried_by( 0 ), pIndexData( 0 ),
                 in_room( 0 ),
                 item_type( 0 ),
                 extra_flags( 0 ), wear_flags( 0 ), 
@@ -57,20 +56,15 @@ Object::Object( ) :
 
 void Object::extract( )
 {
-        EXTRA_DESCR_DATA* ed_next;
-        
         affected.deallocate();
 
-        for( EXTRA_DESCR_DATA* ed = extra_descr; ed != 0; ed = ed_next )
-        {
-                ed_next = ed->next;
-                free_extra_descr(ed);
-        }
+        extraDescriptions.deallocate();
+
+        keyword.clear();
+        short_descr.clear();
+        description.clear();
         
         free_string( material );
-        free_string( name );
-        free_string( description );
-        free_string( short_descr );
         free_string( killer );
         free_string( from );
         
@@ -81,14 +75,10 @@ void Object::extract( )
         in_obj = 0;
         on = 0;
         carried_by = 0;
-        extra_descr = 0;
         pIndexData = 0;
         in_room = 0;
         pocket = "";
         owner = "";
-        name = 0;
-        short_descr = 0;
-        description = 0;
         cachedNoun.clear( );
         item_type = 0;
         extra_flags = 0;
@@ -121,21 +111,11 @@ void Object::extract( )
 
 Object::~Object( )
 {
-    EXTRA_DESCR_DATA *ed, *ed_next;
-
     affected.deallocate();
 
-        for (ed = extra_descr; ed != 0; ed = ed_next )
-        {
-                ed_next = ed->next;
-                free_extra_descr(ed);
-        }
-    
-    free_string( material );
-    free_string( name );
-    free_string( description );
-    free_string( short_descr );
+    extraDescriptions.deallocate();
 
+    free_string( material );
     free_string( killer );
     free_string( from );
 }
@@ -222,59 +202,45 @@ bool Object::may_float(void)
 
 void Object::addExtraDescr( const DLString &keys, const DLString &value )
 {
-    EXTRA_DESCR_DATA *ed = 0;
-    
-    for (ed = extra_descr; ed; ed = ed->next)
-        if (keys == ed->keyword)
-            break;
+    extraDescriptions.findAndDestroy(keys);
 
-    if (ed) {
-        free_string( ed->description );
-    }
-    else {
-        ed = new_extra_descr( );
-        ed->keyword = str_dup( keys.c_str( ) );
-        ed->next = extra_descr;
-        extra_descr = ed;
-    }
+    ExtraDescription *ed = new ExtraDescription;
+    ed->keyword[LANG_DEFAULT] = keys;
+    ed->description[LANG_DEFAULT] = value;
 
-    ed->description = str_dup( value.c_str( ) );
+    extraDescriptions.push_back(ed);
 }
 
 
 /*
  * String fields set/get methods
  */
-void Object::setName( const char *s )
+void Object::setName( const char *str )
 {
-    if (name)
-        free_string( name );
-
-    name = str_dup( s );
+    keyword.fromMixedString(str);
 }
+
 void Object::setShortDescr(const DLString &s)
 {
     setShortDescr(s.c_str());
 }
+
 void Object::setShortDescr( const char *s )
 {
-    if (short_descr)
-        free_string( short_descr );
-
-    short_descr = str_dup( s );
+    short_descr[LANG_DEFAULT] = s;
     updateCachedNoun( );
 }
+
 void Object::setDescription( const DLString &s )
 {
     setDescription(s.c_str());
 }
+
 void Object::setDescription( const char *s )
 {
-    if (description)
-        free_string( description );
-
-    description = str_dup( s );
+    description[LANG_DEFAULT] = s;
 }
+
 void Object::setMaterial( const char *s )
 {
     if (material)
@@ -557,4 +523,34 @@ list<Object *> Object::getItems()
         items.push_back(obj);
 
     return items;
+}
+
+
+const char * Object::getRealName( ) const
+{
+    return keyword.get(LANG_DEFAULT).c_str();
+}
+const char * Object::getRealShortDescr( ) const
+{
+    return short_descr.get(LANG_DEFAULT).c_str();
+}
+const char * Object::getRealDescription( ) const
+{
+    return description.get(LANG_DEFAULT).c_str();
+}
+
+const char * Object::getName( ) const
+{
+    const DLString &myname = keyword.get(LANG_DEFAULT);
+    return myname.empty() ? pIndexData->keyword.get(LANG_DEFAULT).c_str() : myname.c_str();
+}
+const char * Object::getShortDescr( ) const
+{
+    const DLString &myshort = short_descr.get(LANG_DEFAULT);
+    return myshort.empty() ? pIndexData->short_descr.get(LANG_DEFAULT).c_str() : myshort.c_str();
+}
+const char * Object::getDescription( ) const
+{
+    const DLString &mydesc = description.get(LANG_DEFAULT);
+    return mydesc.empty() ? pIndexData->description.get(LANG_DEFAULT).c_str() : mydesc.c_str();
 }

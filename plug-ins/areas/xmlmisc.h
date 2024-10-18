@@ -13,6 +13,7 @@
 #include "xmlstring.h"
 #include "xmlvariablecontainer.h"
 #include "xmlglobalbitvector.h"
+#include "xmlmultistring.h"
 
 class XMLOptionalString : public XMLString {
 public:
@@ -64,6 +65,13 @@ struct XMLDice {
     int number, type, bonus;
 };
 
+struct XMLExtraDescription : public XMLVariableContainer {
+XML_OBJECT
+public:
+    XML_VARIABLE XMLMultiString keyword;
+    XML_VARIABLE XMLMultiString description;
+};
+
 struct XMLExtraDescr : public XMLStringNoEmpty {
     bool toXML( XMLNode::Pointer& ) const;
     void fromXML( const XMLNode::Pointer& ) ;
@@ -98,7 +106,8 @@ XML_OBJECT
 public:
     XMLExitBase( );
 
-    XML_VARIABLE XMLStringNoEmpty description;
+    XML_VARIABLE XMLMultiString keyword;
+    XML_VARIABLE XMLMultiString description;
     XML_VARIABLE XMLFlagsNoEmpty flags;
     XML_VARIABLE XMLIntegerNoDef<-1> key;
     XML_VARIABLE XMLIntegerNoDef<-1> target;
@@ -112,8 +121,7 @@ public:
     void init(const exit_data *);
     exit_data *compat( );
 
-    XML_VARIABLE XMLStringNoEmpty keyword;
-    XML_VARIABLE XMLStringNoEmpty short_descr;
+    XML_VARIABLE XMLMultiString short_descr;
 };
 
 struct extra_exit_data;
@@ -126,11 +134,10 @@ public:
     void init(const extra_exit_data *);
     extra_exit_data *compat( );
     
-    XML_VARIABLE XMLStringNoEmpty short_desc_from, short_desc_to, room_description;
+    XML_VARIABLE XMLMultiString short_desc_from, short_desc_to, room_description;
     XML_VARIABLE XMLEnumeration max_size_pass;
-    XML_VARIABLE XMLStringNoEmpty msgLeaveRoom, msgLeaveSelf;
-    XML_VARIABLE XMLStringNoEmpty msgEntryRoom, msgEntrySelf;
-    XML_VARIABLE XMLStringNoEmpty gender_from, gender_to;
+    XML_VARIABLE XMLMultiString msgLeaveRoom, msgLeaveSelf;
+    XML_VARIABLE XMLMultiString msgEntryRoom, msgEntrySelf;
 };
 
 #endif

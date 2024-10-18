@@ -89,8 +89,10 @@ public:
     virtual const DLString& getLastAccessHost( ) const ;
     virtual void setLastAccessHost( const DLString& lastAccessHost ) ;
 
-    virtual const char * getDescription( ) const;
-    virtual void setDescription( const DLString& ); 
+    virtual void setDescription( const DLString&, lang_t lang );
+    virtual const char * getDescription( lang_t lang ) const;
+    virtual const XMLMultiString & getDescription( ) const;
+    virtual void setDescription( const XMLMultiString & ); 
 
     virtual const DLString& getRussianPretitle( ) const ;
     virtual void setRussianPretitle( const DLString& ) ;
@@ -156,7 +158,7 @@ private:
     XML_VARIABLE XMLStringNoEmpty title;
     XML_VARIABLE XMLStringNoEmpty pretitle;
     XML_VARIABLE XMLStringNoEmpty russianPretitle;
-    XML_VARIABLE XMLString description;
+    XML_VARIABLE XMLMultiString description;
     XML_VARIABLE XMLShort level;
     XML_VARIABLE XMLClanReference petition;
     XML_VARIABLE XMLClanReference clan;

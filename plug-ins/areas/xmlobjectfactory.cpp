@@ -10,6 +10,7 @@
 #include "grammar_entities_impl.h"
 #include "merc.h"
 #include "json_utils_ext.h"
+#include "string_utils.h"
 
 
 XMLObjectFactory::XMLObjectFactory( ) : 
@@ -21,9 +22,12 @@ XMLObjectFactory::XMLObjectFactory( ) :
 void
 XMLObjectFactory::init(const obj_index_data *obj)
 {
-    name.setValue(obj->name);
-    short_descr.setValue(obj->short_descr);
-    description.setValue(obj->description);
+    keyword = obj->keyword;
+    short_descr = obj->short_descr;
+    description = obj->description;
+    sound = obj->sound;
+    smell = obj->smell;
+
     material.setValue(obj->material);
     type.type = obj->item_type;
     copy(obj->value, obj->value+5, type.v);
@@ -40,17 +44,15 @@ XMLObjectFactory::init(const obj_index_data *obj)
         affects.push_back(aff);
     }
 
-    EXTRA_DESCR_DATA *pEd;
-    for (pEd = obj->extra_descr; pEd; pEd = pEd->next) {
-        extraDescr.push_back(XMLExtraDescr( ));
-        extraDescr.back( ).keyword = pEd->keyword;
-        extraDescr.back( ).setValue(pEd->description);
+    for (auto &ed: obj->extraDescriptions) {
+        extraDescriptions.push_back(XMLExtraDescription());
+        extraDescriptions.back().keyword = ed->keyword;
+        extraDescriptions.back().description = ed->description;
     }
 
     gender.setValue(obj->gram_gender.toString());
     limit.setValue(obj->limit);
-    sound.setValue(obj->sound);    
-    smell.setValue(obj->smell);
+
 
     if(!obj->behavior.isEmpty( ))
         behavior.setNode(obj->behavior->getFirstNode( ));
@@ -73,9 +75,13 @@ XMLObjectFactory::compat( )
 void
 XMLObjectFactory::compat(obj_index_data *obj)
 {
-    obj->name = str_dup(name.getValue( ).c_str( ));
-    obj->short_descr = str_dup(short_descr.getValue( ).c_str( ));
-    obj->description = str_dup(description.getValue( ).c_str( ));
+    if (!name.getValue().empty() && keyword.empty())
+        obj->keyword.fromMixedString(name);
+    else
+        obj->keyword = keyword;
+
+    obj->short_descr = short_descr;
+    obj->description = description;
     obj->material = str_dup(material.getValue( ).c_str( ));
     obj->item_type = type.type;
     copy(type.v, type.v + 5, obj->value);
@@ -95,18 +101,22 @@ XMLObjectFactory::compat(obj_index_data *obj)
 
     XMLListBase<XMLExtraDescr>::reverse_iterator eit;
     for(eit = extraDescr.rbegin( ); eit != extraDescr.rend( ); eit++) {
-        EXTRA_DESCR_DATA *ed = new_extra_descr();
-        ed->keyword = str_dup(eit->keyword.c_str( ));
-        ed->description = str_dup(eit->getValue( ).c_str( ));
-        ed->next = obj->extra_descr;
-        obj->extra_descr = ed;
+        ExtraDescription *ed = new ExtraDescription();
+        ed->keyword.fromMixedString(eit->keyword);
+
+        if (String::hasCyrillic(eit->getValue()))
+            ed->description[RU] = eit->getValue();
+        else
+            ed->description[EN] = eit->getValue();
+
+        obj->extraDescriptions.push_back(ed);
     }
 
     obj->gram_gender = Grammar::MultiGender(gender.getValue( ).c_str( ));
     obj->limit = limit.getValue( );
 
-    obj->sound = sound.getValue( );
-    obj->smell = smell.getValue( );
+    obj->sound = sound;
+    obj->smell = smell;
 
     if(behavior.getNode( )) {
         obj->behavior.construct( );

@@ -42,10 +42,12 @@ XMLMobileFactory::init(const mob_index_data *mob)
 {
     Race *mobrace = raceManager->find(mob->race);
 
-    player_name.setValue(mob->player_name);
-    short_descr.setValue(mob->short_descr);
-    long_descr.setValue(mob->long_descr);
-    description.setValue(mob->description);
+    keyword = mob->keyword;
+    short_descr = mob->short_descr;
+    long_descr = mob->long_descr;
+    description = mob->description;
+    smell = mob->smell;
+
     race.setValue(mob->race);
     act.setRealBase(mob->act, mobrace->getAct( ));
     aff.setRealBase(mob->affected_by, mobrace->getAff( ));
@@ -103,8 +105,6 @@ XMLMobileFactory::init(const mob_index_data *mob)
 
     clan.assign(mob->clan);
 
-    smell.setValue(mob->smell);
-
     if(!mob->behavior.isEmpty( ))
         behavior.setNode(mob->behavior->getFirstNode( ));
 
@@ -124,13 +124,18 @@ XMLMobileFactory::compat( )
 void
 XMLMobileFactory::compat(mob_index_data *mob)
 {
-
     Race *mobrace = raceManager->find(race.getValue( ).c_str( ));
 
-    mob->player_name = str_dup(player_name.getValue( ).c_str( ));
-    mob->short_descr = str_dup(short_descr.getValue( ).c_str( ));
-    mob->long_descr = str_dup(long_descr.getValue( ).c_str( ));
-    mob->description = str_dup(description.getValue( ).c_str( ));
+    if (!player_name.empty() && keyword.empty())
+        mob->keyword.fromMixedString(player_name);
+    else
+        mob->keyword = keyword;
+
+    mob->short_descr = short_descr;
+    mob->long_descr = long_descr;
+    mob->description = description;
+    mob->smell = smell;
+
     mob->race = str_dup(race.getValue( ).c_str( ));
     mob->act = act.get(mobrace->getAct( )) | ACT_IS_NPC;
     mob->affected_by = aff.get(mobrace->getAff( ));
@@ -191,9 +196,6 @@ XMLMobileFactory::compat(mob_index_data *mob)
     if(!gram_number.getValue( ).empty( ))
         mob->gram_number = Grammar::Number(gram_number.getValue( ).c_str( ));
  
-    if(!smell.getValue( ).empty( ))
-        mob->smell = smell.getValue( );
-
     mob->clan = clan;
     
     if(behavior.getNode( )) {

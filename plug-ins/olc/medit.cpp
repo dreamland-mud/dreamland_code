@@ -15,7 +15,7 @@
 #include <affect.h>
 #include "room.h"
 #include "skillgroup.h"
-
+#include "string_utils.h"
 #include "websocketrpc.h"
 #include "comm.h"
 #include "merc.h"
@@ -1171,6 +1171,45 @@ MEDIT(copy)
     return true;
 }
 
+static DLString format_longdescr(const char *descr, DLString &hint)
+{
+    // Remove (keywords) and 1 preceding space.
+    ostringstream buf;
+    bool skipChar = false;
+
+    for (const char *d = descr; *d; d++) {
+        // Ignore extra space just before the ( bracket.
+        if (*d == ' ' && *(d+1) == '(') 
+            continue;
+        // Start ignoring everything after a ( bracket.
+        if (*d == '(' && (isalpha(*(d+1)) || (*(d+1) == '{' && isalpha(*(d+3))))) {
+            skipChar = true;
+            continue;
+        }
+        // Stop ignoring once bracket is closed.
+        if (*d == ')' && skipChar) {
+            skipChar = false;
+            continue;
+        }
+        // Skip everything while inside the brackets.
+        if (skipChar) {
+            hint << *d;
+            continue;
+        }
+
+        // Normal output outside of brackets. 
+        buf << *d;
+    }
+
+    DLString longd = buf.str();
+
+    DLString::size_type i = longd.find_last_not_of("\n");
+    if (i != DLString::npos)
+        longd.erase(i+1);
+
+    return longd;
+}
+
 CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
         "Online mob editor.")
 {
@@ -1182,7 +1221,77 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     argument = one_argument(argument, arg1);
 
-    if (is_number(arg1)) {
+    if (arg_is(arg1, "save")) {
+        ostringstream buf;
+
+        for (int i = MAX_KEY_HASH-1; i >=0; i--)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+            DLString hint;
+
+            pMob->keyword[RU].clear();
+            pMob->keyword[EN].clear();
+
+            if (String::hasCyrillic(pMob->long_descr)) {
+                pMob->roomDescription[RU] = format_longdescr(pMob->long_descr, hint);
+                hint.colourstrip();
+                hint.toLower();
+                pMob->keyword[EN] = hint + " ";
+            } 
+
+            DLString names = pMob->player_name;
+            for (auto &name: names.split(" ")) {
+                name.colourstrip();
+                name.toLower();
+
+                if (String::hasCyrillic(name)) {
+                    if (pMob->keyword[RU].find(name) == DLString::npos)
+                        pMob->keyword[RU] << name << " ";
+
+                } else {
+                    if (pMob->keyword[EN].find(name) == DLString::npos)
+                        pMob->keyword[EN] << name << " ";
+                }
+            }
+
+            pMob->keyword[RU].stripRightWhiteSpace();
+            pMob->keyword[EN].stripRightWhiteSpace();
+
+            pMob->name[RU] = pMob->short_descr;
+
+            {
+                StringList keywords;
+                for (auto &name: pMob->keyword[RU].split(" "))
+                    keywords.addUnique(name);
+
+                for (int i = 0; i < 6; i++)
+                    for (auto &name: russian_case(pMob->short_descr, '1' + i).split(" "))
+                        keywords.addUnique(name.toLower().colourStrip());
+
+                StringList longs;
+                for (auto &name: pMob->roomDescription[RU].split(" "))
+                    longs.addUnique(name.toLower().colourStrip());
+
+                bool found = false;
+                for (auto &longName: longs)
+                    for (auto &kw: keywords)
+                        if (kw.strPrefix(longName)) {
+                            found = true;
+                            break;
+                        }
+
+                if (!found)
+                    buf << fmt(0, "[%6d] {Y%20.20N1{x {g%20.20s{x %s\r\n",
+                                pMob->vnum,
+                                pMob->short_descr,
+                                pMob->keyword[RU].c_str(),
+                                pMob->roomDescription[RU].c_str());
+            }
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+
+    } else if (is_number(arg1)) {
         value = atoi(arg1);
         if (!(pMob = get_mob_index(value))) {
             stc("OLCStateMobile:  That vnum does not exist.\n\r", ch);

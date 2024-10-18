@@ -38,18 +38,20 @@ public:
     virtual short getModifyLevel( ) const;
 
     // set-get methods for string fields
-    virtual void setDescription( const DLString& );
-    virtual const char * getDescription( ) const;
-    void setShortDescr( const DLString& );
-    void setShortDescr( const char * );
-    inline const char * getShortDescr( ) const;
-    void setLongDescr( const char * );
-    void setLongDescr( const DLString& );
-    inline const char * getLongDescr( ) const;
+    virtual void setDescription( const DLString&, lang_t lang );
+    virtual const char * getDescription( lang_t lang ) const;
+    virtual const XMLMultiString & getDescription( ) const;
+    virtual void setDescription( const XMLMultiString & );     
+    void setShortDescr( const DLString&, lang_t lang );
+    void setShortDescr( const char *, lang_t lang );
+    const char * getShortDescr( lang_t lang ) const;
+    void setLongDescr( const char *, lang_t lang );
+    void setLongDescr( const DLString&, lang_t lang );
+    const char * getLongDescr( lang_t lang ) const;
     
-    inline const char * getRealShortDescr( ) const;
-    inline const char * getRealLongDescr( ) const;
-    inline const char * getRealDescription( ) const;
+    const char * getRealShortDescr( lang_t lang ) const;
+    const char * getRealLongDescr( lang_t lang ) const;
+    const char * getRealDescription( lang_t lang ) const;
 
     // name and sex formatting
     virtual DLString getNameP( char gram_case ) const;
@@ -78,14 +80,14 @@ public:
     int reset_room;
     
 protected:    
-    char *  description;
-    char *  short_descr;
-    char *  long_descr;
+    XMLMultiString description;
+    XMLMultiString short_descr;
+    XMLMultiString long_descr;
     RussianString::Pointer cachedNoun;
     
 public:    
     int                group;
-    int        off_flags;
+    int                off_flags;
     int                damage[3];
     int                start_pos;
     int                default_pos;
@@ -98,24 +100,5 @@ public:
     PCharacter                *switchedFrom;
 };
 
-inline const char * NPCharacter::getShortDescr( ) const
-{
-    return short_descr ? short_descr : pIndexData->short_descr;
-}
-inline const char * NPCharacter::getLongDescr( ) const
-{
-    return long_descr ? long_descr : pIndexData->long_descr;
-}
-inline const char * NPCharacter::getRealShortDescr( ) const
-{
-    return short_descr;
-}
-inline const char * NPCharacter::getRealLongDescr( ) const
-{
-    return long_descr;
-}
-inline const char * NPCharacter::getRealDescription( ) const
-{
-    return description;
-}
+
 #endif

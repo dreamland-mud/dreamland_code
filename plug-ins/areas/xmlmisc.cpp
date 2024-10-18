@@ -286,13 +286,12 @@ XMLExitBase::XMLExitBase() : flags(0, &exit_flags)
 void 
 XMLExitDir::init(const exit_data *ex)
 {
-    keyword.setValue(ex->keyword);
-    if (ex->short_descr)
-        short_descr.setValue(ex->short_descr);
-    description.setValue(ex->description);
+    keyword = ex->keyword;
+    short_descr = ex->short_descr;
+    description = ex->description;
+
     flags.setValue(ex->exit_info_default);
-    //if(ex->key > 0)
-        key.setValue(ex->key);
+    key.setValue(ex->key);
 
     Room *to_room = get_room_instance(ex->u1.vnum);
     target.setValue(to_room ? to_room->vnum : -1);
@@ -303,9 +302,9 @@ XMLExitDir::compat( )
 {
     EXIT_DATA *pexit = new EXIT_DATA;
     
-    pexit->keyword = str_dup(keyword.getValue( ).c_str( ));
-    pexit->short_descr = str_dup(short_descr.c_str());
-    pexit->description = str_dup(description.getValue( ).c_str( ));
+    pexit->keyword = keyword;
+    pexit->short_descr = short_descr;
+    pexit->description = description;
     pexit->exit_info_default = pexit->exit_info = flags.getValue( );
     pexit->key = key.getValue( );
     pexit->u1.vnum = target.getValue( );
@@ -322,23 +321,21 @@ XMLExtraExit::XMLExtraExit( ) : max_size_pass(SIZE_GARGANTUAN, &size_table)
 void 
 XMLExtraExit::init(const extra_exit_data *ex)
 {
-    description.setValue(ex->description);
+    description = ex->description;
     flags.setValue(ex->exit_info_default);
     key.setValue(ex->key);
 
     Room *to_room = get_room_instance(ex->u1.vnum);
     target.setValue(to_room ? to_room->vnum : -1);
 
-    short_desc_from.setValue(ex->short_desc_from);
-    short_desc_to.setValue(ex->short_desc_to);
-    room_description.setValue(ex->room_description);
+    short_desc_from = (ex->short_desc_from);
+    short_desc_to = (ex->short_desc_to);
+    room_description = (ex->room_description);
     max_size_pass.setValue(ex->max_size_pass);
-    gender_from.setValue(ex->gender_from.toString());
-    gender_to.setValue(ex->gender_to.toString());
-    msgLeaveRoom.setValue(ex->msgLeaveRoom);
-    msgLeaveSelf.setValue(ex->msgLeaveSelf);
-    msgEntryRoom.setValue(ex->msgEntryRoom);
-    msgEntrySelf.setValue(ex->msgEntrySelf);
+    msgLeaveRoom = (ex->msgLeaveRoom);
+    msgLeaveSelf = (ex->msgLeaveSelf);
+    msgEntryRoom = (ex->msgEntryRoom);
+    msgEntrySelf = (ex->msgEntrySelf);
 }
 
 extra_exit_data *
@@ -346,21 +343,20 @@ XMLExtraExit::compat( )
 {
     EXTRA_EXIT_DATA *peexit = new EXTRA_EXIT_DATA;
     
-    peexit->description = str_dup(description.getValue( ).c_str( ));
+    peexit->keyword = keyword;
+    peexit->description = description;
     peexit->exit_info_default = peexit->exit_info = flags.getValue( );
     peexit->key = key.getValue( );
     peexit->u1.vnum = target.getValue( );
 
-    peexit->short_desc_from = str_dup( short_desc_from.getValue( ).c_str( ));
-    peexit->short_desc_to = str_dup( short_desc_to.getValue( ).c_str( ));
-    peexit->room_description = str_dup( room_description.getValue( ).c_str( ));
+    peexit->short_desc_from = short_desc_from;
+    peexit->short_desc_to = short_desc_to;
+    peexit->room_description = room_description;
     peexit->max_size_pass = max_size_pass.getValue( );
-    peexit->gender_from = Grammar::MultiGender(gender_from.getValue().c_str());
-    peexit->gender_to = Grammar::MultiGender(gender_to.getValue().c_str());
-    peexit->msgEntryRoom = msgEntryRoom.getValue();
-    peexit->msgEntrySelf = msgEntrySelf.getValue();
-    peexit->msgLeaveRoom = msgLeaveRoom.getValue();
-    peexit->msgLeaveSelf = msgLeaveSelf.getValue();
+    peexit->msgEntryRoom = msgEntryRoom;
+    peexit->msgEntrySelf = msgEntrySelf;
+    peexit->msgLeaveRoom = msgLeaveRoom;
+    peexit->msgLeaveSelf = msgLeaveSelf;
 
     return peexit;
 }

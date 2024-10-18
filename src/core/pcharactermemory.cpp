@@ -77,15 +77,25 @@ void PCharacterMemory::setLastAccessHost( const DLString& lastAccessHost )
         this->lastAccessHost.setValue( lastAccessHost );
 }
 
-const char * PCharacterMemory::getDescription( ) const
+void PCharacterMemory::setDescription( const DLString& d, lang_t lang )
 {
-    return description.c_str();
+    description[lang] = d;
 }
 
-void PCharacterMemory::setDescription( const DLString &description )
+const char * PCharacterMemory::getDescription( lang_t lang ) const
 {
-    this->description = description; 
+    return description.get(lang).c_str( );
 }
+
+const XMLMultiString & PCharacterMemory::getDescription( ) const
+{
+    return description;
+}
+
+void PCharacterMemory::setDescription( const XMLMultiString &description )
+{
+    this->description = description;
+} 
 
 const DLString& PCharacterMemory::getPretitle( ) const 
 {

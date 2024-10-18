@@ -186,8 +186,10 @@ public:
     virtual void setTitle( const DLString& );
     virtual const DLString & getTitle( ) const;
     
-    virtual void setDescription( const DLString& );
-    virtual const char * getDescription( ) const;
+    virtual void setDescription( const DLString&, lang_t lang );
+    virtual const char * getDescription( lang_t lang ) const;
+    virtual const XMLMultiString & getDescription( ) const;
+    virtual void setDescription( const XMLMultiString & ); 
     
     // name and sex formatting
     virtual DLString getNameP( char gram_case ) const;
@@ -248,7 +250,7 @@ private:
     XML_VARIABLE XMLStringNoEmpty title;
     XML_VARIABLE XMLStringNoEmpty pretitle;
     XML_VARIABLE XMLStringNoEmpty russianPretitle;
-    XML_VARIABLE XMLString description;
+    XML_VARIABLE XMLMultiString description;
     XML_VARIABLE PCSkills skills;
     XML_VARIABLE PCBonuses bonuses;
     XML_VARIABLE XMLInteger security;

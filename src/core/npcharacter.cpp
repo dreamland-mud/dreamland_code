@@ -36,9 +36,6 @@ PROF(none);
 
 NPCharacter::NPCharacter( ) :
                 reset_room(0),
-                description( 0 ),
-                short_descr( 0 ),
-                long_descr( 0 ),
                 behavior( MobileBehavior::NODE_NAME )
 {
     init( );
@@ -58,12 +55,9 @@ void NPCharacter::init( )
     pIndexData = 0;
     zone = 0;
 
-    free_string( description );
-    description = 0;
-    free_string(short_descr);
-    short_descr = 0;
-    free_string(long_descr);
-    long_descr = 0;
+    description.clear();
+    long_descr.clear();
+    short_descr.clear();
     cachedNoun.clear( );
         
     group = 0;
@@ -120,39 +114,73 @@ short NPCharacter::getModifyLevel( ) const
 /************************************************************************
  * set-get methods for string fields
  ************************************************************************/
-void NPCharacter::setDescription( const DLString& d )
+void NPCharacter::setDescription( const DLString& d, lang_t lang )
 {
-    if (description)
-        free_string( description );
-
-    description = str_dup( d.c_str( ) );
+    description[lang] = d;
 }
-const char * NPCharacter::getDescription( ) const
-{
-    return description ? description : pIndexData->description;
-}
-void NPCharacter::setShortDescr( const char *d )
-{
-    if (short_descr)
-        free_string( short_descr );
 
-    short_descr = str_dup( d );
+const char * NPCharacter::getDescription( lang_t lang ) const
+{
+    const DLString &mydesc = description.get(lang);
+    return mydesc.empty() ? pIndexData->description.get(lang).c_str() : mydesc.c_str();
+}
+
+const XMLMultiString & NPCharacter::getDescription( ) const
+{
+    return description;
+}
+
+void NPCharacter::setDescription( const XMLMultiString &description )
+{
+    this->description = description;
+} 
+
+const char * NPCharacter::getShortDescr( lang_t lang ) const
+{
+    const DLString &myshort = short_descr.get(lang);
+    return myshort.empty() ? pIndexData->short_descr.get(lang).c_str() : myshort.c_str();
+}
+
+const char * NPCharacter::getLongDescr( lang_t lang ) const
+{
+    const DLString &mylong = long_descr.get(lang);
+    return mylong.empty() ? pIndexData->long_descr.get(lang).c_str() : mylong.c_str();
+}
+
+const char * NPCharacter::getRealShortDescr( lang_t lang ) const
+{
+    return short_descr.get(lang).c_str();
+}
+
+const char * NPCharacter::getRealLongDescr( lang_t lang ) const
+{
+    return long_descr.get(lang).c_str();
+}
+
+const char * NPCharacter::getRealDescription( lang_t lang ) const
+{
+    return description.get(lang).c_str();;
+}
+
+void NPCharacter::setShortDescr( const char *d, lang_t lang )
+{
+    short_descr[lang] = d;
     updateCachedNoun( );
 }
-void NPCharacter::setLongDescr( const char *d )
-{
-    if (long_descr)
-        free_string( long_descr );
 
-    long_descr = str_dup( d );
-}
-void NPCharacter::setShortDescr( const DLString& d )
+void NPCharacter::setLongDescr( const char *d, lang_t lang )
 {
-    setShortDescr( d.c_str( ) );
+    long_descr[lang] = d;
 }
-void NPCharacter::setLongDescr( const DLString& d )
+
+void NPCharacter::setShortDescr( const DLString& d, lang_t lang )
 {
-    setLongDescr( d.c_str( ) );
+    setShortDescr( d.c_str( ), lang );
+}
+
+void NPCharacter::setLongDescr( const DLString& d, lang_t lang )
+{
+    setLongDescr( d.c_str( ), lang );
 }
 
 /*****************************************************************************
@@ -174,7 +202,7 @@ Noun::Pointer NPCharacter::toNoun( const DLObject *forWhom, int flags ) const
 
 void NPCharacter::updateCachedNoun( )
 {
-    DLString fullForm = getShortDescr();
+    DLString fullForm = getShortDescr(LANG_RU);
 
     if (!cachedNoun) {
         cachedNoun = RussianString::Pointer( 
@@ -197,7 +225,7 @@ DLString NPCharacter::getNameP( char gram_case ) const
         // Summoned creatures may contain master's name in their short descr, hence
         // their name is handled differently, with the last part of the short descr removed.
         if (behavior && behavior->hasSpecialName()) {
-            StringList names(getShortDescr());
+            StringList names(getShortDescr(LANG_RU));
             names.pop_back();
             fullForm = russian_case_all_forms(names.toString());
         } else {
@@ -270,4 +298,6 @@ PlayerConfig NPCharacter::getConfig( ) const
     else
         return PlayerConfig();
 }
+
+
 

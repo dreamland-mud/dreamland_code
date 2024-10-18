@@ -12,6 +12,7 @@
 #include "xmljsonvalue.h"
 #include "xmlglobalbitvector.h"
 #include "xmlitemtype.h"
+#include "xmlmultistring.h"
 #include "clanreference.h"
 
 struct mob_index_data;
@@ -25,7 +26,10 @@ public:
     void compat(mob_index_data *);
     mob_index_data *compat( );
     
-    XML_VARIABLE XMLStringNoEmpty player_name, short_descr, long_descr, description;
+    XML_VARIABLE XMLStringNoEmpty player_name; // compat
+    XML_VARIABLE XMLMultiString keyword, short_descr, long_descr, description;
+    XML_VARIABLE XMLMultiString smell;
+
     XML_VARIABLE XMLString race;
     XML_VARIABLE XMLFlagsDiff act, aff;
     XML_VARIABLE XMLIntegerNoEmpty alignment, group, level, hitroll;
@@ -45,8 +49,7 @@ public:
     XML_VARIABLE XMLGlobalBitvector religion;
     XML_VARIABLE XMLGlobalBitvector affects;
     XML_VARIABLE XMLGlobalBitvector behaviors;
-    XML_VARIABLE XMLStringNoEmpty gram_number;
-    XML_VARIABLE XMLStringNoEmpty smell;
+    XML_VARIABLE XMLStringNoEmpty gram_number; // TODO
     XML_VARIABLE XMLClanReference clan;
 
     XML_VARIABLE XMLStringNode behavior;

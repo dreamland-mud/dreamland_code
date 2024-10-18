@@ -10,8 +10,8 @@
 #include "wearlocation.h"
 #include "behavior.h"
 #include "json_utils_ext.h"
+#include "string_utils.h"
 #include "merc.h"
-
 #include "def.h"
 
 CLAN(none);
@@ -152,8 +152,10 @@ XMLRoom::XMLRoom() :
 void 
 XMLRoom::init(RoomIndexData *room)
 {
-    name.setValue(room->name);
-    description.setValue(room->description);
+    name = (room->name);
+    description = (room->description);
+    smell = room->smell;
+    sound = room->sound;
     flags.setValue(room->room_flags);
     sector.setValue(room->sector_type);
 
@@ -173,13 +175,12 @@ XMLRoom::init(RoomIndexData *room)
     }
 
     for(auto &peexit: room->extra_exits)
-        extraExits[peexit->keyword].init(peexit);
+        extraExits[peexit->keyword.get(EN)].init(peexit);
 
-    EXTRA_DESCR_DATA *pEd;
-    for (pEd = room->extra_descr; pEd; pEd = pEd->next) {
-        extraDescr.push_back(XMLExtraDescr( ));
-        extraDescr.back( ).keyword = pEd->keyword;
-        extraDescr.back( ).setValue(pEd->description);
+    for (auto &ed: room->extraDescriptions) {
+        extraDescriptions.push_back(XMLExtraDescription( ));
+        extraDescriptions.back( ).keyword = ed->keyword;
+        extraDescriptions.back( ).description = ed->description;
     }
 
     manaRate.setValue(room->mana_rate);
@@ -205,8 +206,8 @@ XMLRoom::compat(int vnum)
     room = new RoomIndexData;
 
     room->vnum = vnum;
-    room->name = str_dup(name.getValue( ).c_str( ));
-    room->description = str_dup(description.getValue( ).c_str( ));
+    room->name = name;
+    room->description = description;
     room->room_flags = flags.getValue( );
     room->sector_type = sector.getValue( );
     room->mana_rate = manaRate.getValue( );
@@ -236,17 +237,20 @@ XMLRoom::compat(int vnum)
     XMLMapBase<XMLExtraExit>::reverse_iterator eeit;
     for(eeit = extraExits.rbegin( ); eeit != extraExits.rend( ); eeit++) {
         EXTRA_EXIT_DATA *peexit = eeit->second.compat( );
-        peexit->keyword = str_dup(eeit->first.c_str( ));
         room->extra_exits.push_front(peexit);
     }
 
     XMLListBase<XMLExtraDescr>::reverse_iterator edit;
     for(edit = extraDescr.rbegin( ); edit != extraDescr.rend( ); edit++) {
-        EXTRA_DESCR_DATA *pEd = new_extra_descr( );
-        pEd->keyword = str_dup(edit->keyword.c_str( ));
-        pEd->description = str_dup(edit->getValue( ).c_str( ));
-        pEd->next = room->extra_descr;
-        room->extra_descr = pEd;
+        ExtraDescription *pEd = new ExtraDescription();
+
+        pEd->keyword.fromMixedString(edit->keyword);
+        if (String::hasCyrillic(edit->getValue()))
+            pEd->description[RU] = edit->getValue();
+        else
+            pEd->description[EN] = edit->getValue();
+
+        room->extraDescriptions.push_back(pEd);
     }
 
     if(!liquid.getValue( ).empty( ))

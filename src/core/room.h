@@ -16,6 +16,8 @@
 #include "liquid.h"
 #include "roombehavior.h"
 #include "affectlist.h"
+#include "xmlmultistring.h"
+#include "merc.h"
 
 struct AreaIndexData;
 struct Area;
@@ -63,12 +65,15 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
 
     Room * create(); // Implemented in loadsave plugin.
 
-    extra_descr_data *        extra_descr;
+    ExtraDescrList extraDescriptions;
     exit_data *        exit        [6];
     ExtraExitList extra_exits;
 
-    char *        name;
-    char *        description;
+    XMLMultiString name;
+    XMLMultiString description;
+    XMLMultiString smell;
+    XMLMultiString sound;
+
     int         vnum;
     int         room_flags;
     int         sector_type;
@@ -77,8 +82,6 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     ClanReference clan;
     GlobalBitvector guilds;
     LiquidReference liquid;
-    DLString smell;
-    DLString sound;
     ::Pointer<XMLDocument> behavior;
     GlobalBitvector behaviors;
     Json::Value props;
@@ -123,7 +126,7 @@ public:
     bool hasExits() const;
     
     /** Shorthand to return prototype's extra descriptions. */
-    inline extra_descr_data *getExtraDescr();
+    inline const ExtraDescrList & getExtraDescr() const;
 
     /** Shorthand to return prototype's room name. */
     inline const char *getName() const;
@@ -197,19 +200,19 @@ inline void Room::setID( long long id )
     ID = id;
 }
 
-inline extra_descr_data * Room::getExtraDescr()
+inline const ExtraDescrList & Room::getExtraDescr() const
 {
-    return pIndexData->extra_descr;
+    return pIndexData->extraDescriptions;
 }
 
 inline const char * Room::getName() const
 {
-    return pIndexData->name;
+    return pIndexData->name.get(LANG_DEFAULT).c_str();
 }
 
 inline const char * Room::getDescription() const
 {
-    return pIndexData->description;
+    return pIndexData->description.get(LANG_DEFAULT).c_str();
 }
 
 inline AreaIndexData *Room::areaIndex() const

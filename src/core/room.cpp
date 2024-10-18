@@ -24,11 +24,13 @@ LIQ(none);
 extra_exit_data *ExtraExitList::find(const DLString &keyword) const
 {
     for (auto &eexit: *this) {
-        if (is_name(keyword.c_str(), eexit->keyword))
+        if (eexit->keyword.matchesUnstrict(keyword))
             return eexit;
 
-        DLString short_descr = russian_case_all_forms(eexit->short_desc_from);
-        if (is_name(keyword.c_str(), short_descr.c_str()))
+        if (eexit->short_desc_from.matchesUnstrict(keyword))
+            return eexit;
+
+        if (eexit->short_desc_to.matchesUnstrict(keyword))
             return eexit;
     }
 
@@ -47,9 +49,7 @@ bool ExtraExitList::findAndDestroy(const DLString &keyword)
 }
 
 RoomIndexData::RoomIndexData()
-        : extra_descr(0),
-          name(&str_empty[0]), description(&str_empty[0]), 
-          vnum(0), room_flags(0),
+        : vnum(0), room_flags(0),
           sector_type(0), heal_rate(100), mana_rate(100),
           clan( clan_none ),  guilds( professionManager ),
           liquid( liq_none ), behaviors(behaviorManager), areaIndex(0), room(0)

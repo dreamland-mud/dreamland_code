@@ -14,6 +14,7 @@
 #define PCMEMORYINTERFACE_H
 
 #include "dlobject.h"
+#include "xmlmultistring.h"
 
 class DLString;
 class RussianString;
@@ -65,8 +66,10 @@ public:
 
     virtual int get_trust( ) const = 0;
 
-    virtual const char * getDescription( ) const  = 0;
-    virtual void setDescription( const DLString& )  = 0; 
+    virtual const char * getDescription( lang_t lang ) const  = 0;
+    virtual void setDescription( const DLString&, lang_t lang )  = 0; 
+    virtual const XMLMultiString & getDescription( ) const  = 0;
+    virtual void setDescription( const XMLMultiString & )  = 0; 
 
     virtual PCharacter * getPlayer( ) = 0;
     virtual NPCharacter * getMobile( ) = 0;
