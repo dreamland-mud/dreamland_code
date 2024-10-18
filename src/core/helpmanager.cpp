@@ -23,7 +23,7 @@ HelpArticle::HelpArticle( )
 
 DLString HelpArticle::getText( Character * ) const
 {
-    return text.get(RU);
+    return text.get(LANG_DEFAULT);
 }
 
 int HelpArticle::getLevel( ) const
@@ -48,7 +48,7 @@ int HelpArticle::getID() const
 
 DLString HelpArticle::getTitle(const DLString &label) const 
 {
-    const DLString &t = title.get(RU);
+    const DLString &t = title.get(LANG_DEFAULT);
 
     if (!t.empty())
         return t;
@@ -87,13 +87,16 @@ void HelpArticle::refreshKeywords()
 {
     keywordsAll.clear();
     keywordsAll.insert(keywordsAuto.begin(), keywordsAuto.end());
-    keywordsAll.fromString(keyword[EN]);
-    keywordsAll.fromString(keyword[RU]);
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        keywordsAll.fromString(keyword.get((lang_t)l));
+    }
 
     keywordsAllString = keywordsAll.toString().toUpper();
 
-    aka.fromString(extra[EN]);
-    aka.fromString(extra[RU]);
+    aka.clear();
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        aka.fromString(extra.get((lang_t)l));
+    }
 }
 
 bool HelpArticle::visible( Character *ch ) const
