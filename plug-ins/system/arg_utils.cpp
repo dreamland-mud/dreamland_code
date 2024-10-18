@@ -251,7 +251,7 @@ bool arg_is_alldot( const DLString &arg )
         return true;
 
     list<DLString> splitByDot = arg.split(".");
-    if (splitByDot.size() == 1)
+    if (splitByDot.size() <= 1)
         return false;
     
     DLString argBeforeDot = splitByDot.front();
