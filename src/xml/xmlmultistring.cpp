@@ -1,6 +1,7 @@
 #include "xmlmultistring.h"
 #include "exception.h"
 #include "string_utils.h"
+#include "stringlist.h"
 #include "dl_strings.h"
 
 const DLString ATTR_LANG = "l";
@@ -150,7 +151,7 @@ bool XMLMultiString::matchesUnstrict( const DLString &str ) const
         DLString lname = get(lang).toLower();
 
         if (lname.find('|') != DLString::npos)
-            lname = lname.ruscase('1');
+            lname = russian_case_all_forms(lname);
 
         if (is_name(lstr.c_str(), lname.c_str()))
             return true;
@@ -173,4 +174,19 @@ bool XMLMultiString::matchesSubstring( const DLString &str ) const
     }
 
     return false;
+}
+
+void XMLMultiString::fromMixedString(const DLString &str)
+{
+    StringList words(str);
+    StringList en, ru;
+
+    for (auto &word: words) 
+        if (String::hasCyrillic(word))
+            ru.push_back(word);
+        else
+            en.push_back(word);
+
+    (*this)[EN] = en.toString();
+    (*this)[RU] = ru.toString();
 }
