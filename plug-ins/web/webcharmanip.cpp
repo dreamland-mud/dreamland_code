@@ -201,10 +201,10 @@ WEBMANIP_RUN(decorateMobile)
             manips.addLocal("practice", "здесь");
 
         if (mob_has_occupation(victim, OCC_HEALER)) 
-            manips.addLocal("heal", "");
+            manips.addLocal("service", "");
 
         if (mob_has_occupation(victim, OCC_SMITHMAN)) 
-            manips.addLocal("smith", "");
+            manips.addLocal("service", "");
 
         if (mob_has_occupation(victim, OCC_SHOPPER)) 
             manips.addLocal("list", "");
