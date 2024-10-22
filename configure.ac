@@ -219,7 +219,6 @@ plug-ins/cards/Makefile \
 plug-ins/services/Makefile \
 plug-ins/services/core/Makefile \
 plug-ins/services/command/Makefile \
-plug-ins/services/misc/Makefile \
 plug-ins/services/petshop/Makefile \
 plug-ins/services/shop/Makefile \
 plug-ins/communication/Makefile \
