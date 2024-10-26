@@ -514,13 +514,13 @@ DLString BasicSkill::printPracticers(PCharacter *ch) const
         buf << pad << "Это " << what << " можно выучить у ";
         
         auto p = practicers.begin();
-        buf << "{g" << russian_case((*p)->short_descr, '2') << "{x "
+        buf << "{g" << (*p)->short_descr.get(LANG_RU).ruscase('2') << "{x "
                 << "(зона {g{hh" << (*p)->area->getName() << "{x)";
 
         // For multi-groups show two teachers only.
         if (practicers.size() > 1) {
             p++;
-            buf << " или у {g" << russian_case((*p)->short_descr, '2') << "{x "
+            buf << " или у {g" << (*p)->short_descr.get(LANG_RU).ruscase('2') << "{x "
                     << "(зона {g{hh" << (*p)->area->getName() << "{x)";
         }
                     

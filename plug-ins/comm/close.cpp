@@ -180,8 +180,8 @@ CMDRUNP( close )
         }
 
         SET_BIT(peexit->exit_info, EX_CLOSED);
-        oldact("$c1 закрывает $N4.", ch, 0, peexit->short_desc_from, TO_ROOM);
-        oldact("Ты закрываешь $N4.", ch, 0, peexit->short_desc_from, TO_CHAR);
+        oldact("$c1 закрывает $N4.", ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_ROOM);
+        oldact("Ты закрываешь $N4.", ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_CHAR);
 
         return;
     }        

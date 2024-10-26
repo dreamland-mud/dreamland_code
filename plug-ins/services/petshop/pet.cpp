@@ -178,7 +178,7 @@ void Pet::config( PCharacter *client, NPCharacter *pet ) const
     pet->setDescription( fmt(0, 
              "%s\r\nТы понимаешь, что %s будет защищать и следовать за {C%s{x до самой смерти.\n\r",     
              pet->getNPC( )->pIndexData->description, 
-             pet->getNameP( '1' ).c_str( ), client->getNameP( '5' ).c_str( ) ) );
+             pet->getNameP( '1' ).c_str( ), client->getNameP( '5' ).c_str( ) ), LANG_DEFAULT );
 }
 
 NPCharacter * Pet::create( PCharacter *client ) const

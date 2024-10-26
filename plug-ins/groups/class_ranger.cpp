@@ -412,9 +412,11 @@ static Object * create_arrow( int color, int level )
         arrow->value2(4 + level / 10);
     }
 
-    arrow->setName( fmt(0, arrow->getName( ), str_name ).c_str());
-    arrow->setShortDescr( fmt(0, arrow->getShortDescr( ), str_short ));        
-    arrow->setDescription( fmt(0, arrow->getDescription( ), str_long ));        
+    arrow->timer = Date::SECOND_IN_WEEK;
+
+    arrow->setKeyword( fmt(0, arrow->getKeyword( ).toString().c_str(), str_name ).c_str());
+    arrow->setShortDescr( fmt(0, arrow->getShortDescr(LANG_DEFAULT).c_str(), str_short ), LANG_DEFAULT);        
+    arrow->setDescription( fmt(0, arrow->getDescription(LANG_DEFAULT).c_str(), str_long ), LANG_DEFAULT);        
     
     return arrow;
 }

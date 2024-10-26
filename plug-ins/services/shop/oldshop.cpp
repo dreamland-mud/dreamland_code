@@ -132,7 +132,7 @@ ShopStock get_stock_keeper( ShopTrader::Pointer trader, Character *client, const
         if (!IS_OBJ_STAT( obj, ITEM_INVENTORY )) {
             while (obj->next_content
                     &&  obj->pIndexData == obj->next_content->pIndexData
-                    &&  !str_cmp( obj->getShortDescr( ), obj->next_content->getShortDescr( ) ))
+                    && obj->getShortDescr('1', LANG_DEFAULT) == obj->next_content->getShortDescr('1', LANG_DEFAULT))
             {
                 obj = obj->next_content;
                 count++;
@@ -185,7 +185,7 @@ CMDRUN( buy )
         for ( t_obj = obj->next_content; count < number && t_obj; t_obj = t_obj->next_content )
         {
             if ( t_obj->pIndexData == obj->pIndexData
-                && !str_cmp( t_obj->getShortDescr( ), obj->getShortDescr( ) ) )
+                && obj->getShortDescr('1', LANG_DEFAULT) == t_obj->getShortDescr('1', LANG_DEFAULT))
             {
                 count++;
             }
@@ -524,10 +524,10 @@ CMDRUN( list )
             buf << fmt(0, "[ {Y%3d{x |%3d %5d %6d ] ",
                     i+1, si.obj->level, si.cost, si.count );
 
-        webManipManager->decorateShopItem( buf, si.obj->getShortDescr( '1' ), si.obj, ch );
+        webManipManager->decorateShopItem( buf, si.obj->getShortDescr( '1', LANG_DEFAULT ), si.obj, ch );
 
         if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
-            buf << " (" << Syntax::label_en(si.obj->getName()) << ")";
+            buf << " (" << Syntax::label_en(si.obj->getKeyword()) << ")";
 
         buf << endl;
     }
@@ -551,7 +551,7 @@ CMDRUN( list )
     }
 
     if(counter>1){
-        DLString mobName = Syntax::noun(lastShopper->getShortDescr());
+        DLString mobName = Syntax::noun(lastShopper->getShortDescr(LANG_DEFAULT));
         hint_fmt(ch, "Внимание остальных продавцов в этом месте можно привлечь. Например, {y{hcпривлечь %1$N4{x", mobName.c_str());
     }
 }
@@ -693,7 +693,7 @@ int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer t
         if( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) )
             for( obj2 = keeper->carrying; obj2; obj2 = obj2->next_content ) {
                 if( obj->pIndexData == obj2->pIndexData &&
-                    !str_cmp( obj->getShortDescr( ), obj2->getShortDescr( ) ) )
+                    obj->getShortDescr('1', LANG_DEFAULT) == obj2->getShortDescr('1', LANG_DEFAULT))
                 {
                     cost /= 2;
                 }
@@ -791,7 +791,7 @@ void obj_to_keeper( Object *obj, NPCharacter *ch )
         t_obj_next = t_obj->next_content;
 
         if (obj->pIndexData == t_obj->pIndexData
-            &&  !str_cmp(obj->getShortDescr( ), t_obj->getShortDescr( )))
+            && obj->getShortDescr('1', LANG_DEFAULT) == t_obj->getShortDescr('1', LANG_DEFAULT))
         {
             if (IS_OBJ_STAT(t_obj,ITEM_INVENTORY))
             {
@@ -848,7 +848,7 @@ Object *get_obj_keeper( Character *ch, ShopTrader::Pointer trader, const DLStrin
                 /* skip other objects of the same name */
                 while( obj->next_content &&
                         obj->pIndexData == obj->next_content->pIndexData &&
-                        !str_cmp( obj->getShortDescr( ), obj->next_content->getShortDescr( ) ) )
+                        obj->getShortDescr('1', LANG_DEFAULT) == obj->next_content->getShortDescr('1', LANG_DEFAULT))
                     obj = obj->next_content;
                 
                 if( item == item_number )  
@@ -876,7 +876,7 @@ Object *get_obj_keeper( Character *ch, ShopTrader::Pointer trader, const DLStrin
                     /* skip other objects of the same name */
                     while( obj->next_content &&
                             obj->pIndexData == obj->next_content->pIndexData &&
-                            !str_cmp( obj->getShortDescr( ), obj->next_content->getShortDescr( ) ) )
+                            obj->getShortDescr('1', LANG_DEFAULT) == obj->next_content->getShortDescr('1', LANG_DEFAULT))
                         obj = obj->next_content;
                 
                 if(id || ++count == number ) 

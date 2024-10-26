@@ -10,7 +10,7 @@
 #include "gqchannel.h"
 
 #include "skillmanager.h"
-#include "object.h"
+#include "core/object.h"
 #include "room.h"
 #include "roomutils.h"
 #include "npcharacter.h"
@@ -176,7 +176,8 @@ void RainbowDefaultScenario::onGivePiece( PCharacter *hero, NPCharacter *mob ) c
 void RainbowDefaultScenario::dressItem( Object *obj, int number ) const
 {
     DLString name = pieces[number].getValue( );
-    obj->setShortDescr( fmt(0, "%s %s", name.c_str( ), obj->getShortDescr( ) ));
+    DLString shortDescr = name + " " + obj->getShortDescr(LANG_DEFAULT);
+    obj->setShortDescr(shortDescr, LANG_DEFAULT);
 }
 
 /*--------------------------------------------------------------------------
@@ -268,6 +269,6 @@ bool RainbowSinsScenario::checkMobile( NPCharacter *ch ) const
 void RainbowSinsScenario::dressItem( Object *obj, int number ) const
 {
     DLString name = pieces[number].getValue( );
-    obj->setShortDescr( name.c_str( ) );
+    obj->setShortDescr( name, LANG_DEFAULT );
 }
 

@@ -155,6 +155,6 @@ bool mlove_accepts(Character *ch, Character *victim)
     XMLAttributeLovers::Pointer attr =
         victim->getPC()->getAttributes().findAttr<XMLAttributeLovers>("lovers");
     
-    return attr && attr->lovers.isPresent(ch->getName()); 
+    return attr && attr->lovers.isPresent(ch->getPC()->getName()); 
 }
 

@@ -479,11 +479,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
 static bool obj_is_diamond( Object *obj )
 {
     if (obj->pIndexData->vnum == OBJ_VNUM_DIAMOND
-        && obj->wear_loc == wear_none
-        && obj->getRealName( ) == 0
-        && obj->getRealShortDescr( ) == 0
-        && obj->getRealDescription( ) == 0)
-        
+        && obj->wear_loc == wear_none)        
         return true;
     else
         return false;

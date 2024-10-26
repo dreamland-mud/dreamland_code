@@ -216,8 +216,8 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
     p.level = pObj->level;
     p.limit = pObj->limit;
     
-    p.name = russian_case_all_forms(pObj->short_descr) + " " + pObj->name;
-    p.ed = (pObj->extra_descr != NULL);
+    p.name = russian_case_all_forms(pObj->short_descr[RU]) + " " + pObj->keyword.toString();
+    p.ed = !pObj->extraDescriptions.empty();
     p.extra = extra_flags.names(pObj->extra_flags);
 
     bitstring_t wear = pObj->wear_flags;
@@ -352,7 +352,7 @@ bool searcher_parse(struct mob_index_data *pMob, const char *args)
 
     p.init();
 
-    p.name = russian_case_all_forms(pMob->short_descr) + " " + pMob->player_name;
+    p.name = pMob->short_descr.toString() + " " + pMob->keyword.toString();
     p.vnum = pMob->vnum;
     p.level = pMob->level;
     p.hr = pMob->hitroll;

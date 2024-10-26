@@ -83,22 +83,22 @@ MobIndexWrapper::getTarget( ) const
 NMI_GET( MobIndexWrapper, name, "имена, на которые откликается моб") 
 { 
     checkTarget( ); 
-    return target->player_name;
+    return target->keyword.toString();
 }
 NMI_GET( MobIndexWrapper, short_descr, "имя, которое видно когда моб совершает действия") 
 { 
     checkTarget( ); 
-    return target->short_descr;
+    return target->short_descr.get(LANG_DEFAULT);
 }
 NMI_GET( MobIndexWrapper, long_descr, "как моба видно в комнате") 
 { 
     checkTarget( ); 
-    return target->long_descr;
+    return target->long_descr.get(LANG_DEFAULT);
 }
 NMI_GET( MobIndexWrapper, description, "описание, видное если посмотреть на моба") 
 { 
     checkTarget( ); 
-    return target->description;
+    return target->description.get(LANG_DEFAULT);
 }
 NMI_GET( MobIndexWrapper, count, "кол-во экземпляров мобов этого прототипа") 
 { 

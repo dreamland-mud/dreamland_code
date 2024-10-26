@@ -21,7 +21,7 @@ static DLString cmd_extra_exit(Character *ch, EXTRA_EXIT_DATA *eexit, bool prefe
     DLString kw_en = Syntax::label_en(eexit->keyword);
     DLString kw_ru = Syntax::label_ru(eexit->keyword);
 
-    DLString nameRus = prefereShortDescr ? russian_case(eexit->short_desc_from, '1') : "";
+    DLString nameRus = prefereShortDescr ? eexit->short_desc_from.get(LANG_DEFAULT).ruscase('1') : "";
     nameRus = nameRus.empty() ? (kw_ru.empty() ? kw_en : kw_ru) : nameRus;
 
     DLString cmd = kw_ru.empty() ? "войти " + kw_en : "войти " + kw_ru;        

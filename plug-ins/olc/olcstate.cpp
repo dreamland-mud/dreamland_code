@@ -11,8 +11,10 @@
 #include "olcstate.h"
 #include "olc.h"
 #include "sedit.h"
+#include "eeedit.h"
 #include "pcharacter.h"
 #include "behavior.h"
+#include "room.h"
 #include "security.h"
 #include "interp.h"
 #include "arg_utils.h"
@@ -927,33 +929,28 @@ bool OLCState::editor(const char *argument, DLString &original, editor_flags fla
     return true;
 }
 
-static EXTRA_DESCR_DATA *safe_extra_descr(PCharacter *ch, const char *keyword, EXTRA_DESCR_DATA *&list)
+static ExtraDescription * safe_extra_descr(PCharacter *ch, const char *keyword, ExtraDescrList &list)
 {
-    EXTRA_DESCR_DATA *ed;
-
-    for (ed = list; ed; ed = ed->next)
-        if (is_name(keyword, ed->keyword))
-            break;
+    ExtraDescription *ed = list.findUnstrict(keyword);
 
     if (!ed) {
-        ed = new_extra_descr();
-        ed->keyword = str_dup(keyword);
-        ed->description = str_empty;
-        ed->next = list;
-        list = ed;
+        ed = new ExtraDescription();
+        ed->keyword = keyword;
+        list.push_back(ed);
         ptc(ch, "Создано новое экстра-описание [%s].\r\n", keyword);
     }
 
     return ed;
 }
 
-bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
+bool OLCState::extraDescrEdit(ExtraDescrList &list)
 {
     char buf[MAX_STRING_LENGTH];
     PCharacter *ch = owner->character->getPC();
     const char *cmd = lastCmd.c_str();
     char command[MAX_INPUT_LENGTH];
     char *keyword;
+    lang_t lang = DLString("ua").strPrefix(lastCmd) ? UA : (DLString("ru").strPrefix(lastCmd) ? RU : EN);
 
     strcpy(buf, lastArgs.c_str());
     keyword = one_argument(buf, command);
@@ -969,46 +966,31 @@ bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
 
     if (arg_is_copy(command)) {
         return editorCopy(
-                    safe_extra_descr(ch, keyword, list)->description);
+                    safe_extra_descr(ch, keyword, list)->description[lang]);
     }
 
     if (arg_is_paste(command)) {
         return editorPaste(
-                    safe_extra_descr(ch, keyword, list)->description);
+                    safe_extra_descr(ch, keyword, list)->description[lang]);
     }
 
     if (arg_is_web(command)) {
         return editorWeb(
-                    safe_extra_descr(ch, keyword, list)->description,
+                    safe_extra_descr(ch, keyword, list)->description[lang],
                     lastCmd + " paste " + keyword);
     }
 
     if (is_name(command, "set")) {
         return sedit(
-                    safe_extra_descr(ch, keyword, list)->description);
+                    safe_extra_descr(ch, keyword, list)->description[lang]);
     }
 
     if (is_name(command, "delete")) {
-        EXTRA_DESCR_DATA *ed;
-        EXTRA_DESCR_DATA *ped = NULL;
-
-        for (ed = list; ed; ed = ed->next) {
-            if (is_name(keyword, ed->keyword))
-                break;
-            ped = ed;
-        }
-    
-        if (!ed) {
+        bool found = list.findAndDestroy(keyword);
+        if (!found) {
             stc("Экстра-описание с таким ключом не найдено.\n\r", ch);
             return false;
         }
-
-        if (!ped)
-            list = ed->next;
-        else
-            ped->next = ed->next;
-
-        free_extra_descr(ed);
 
         stc("Экстра-описание удалено.\n\r", ch);
         return true;

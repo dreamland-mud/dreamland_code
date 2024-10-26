@@ -18,7 +18,6 @@ public:
 
     virtual ~NounHolder();
     virtual NounPointer toNoun(const DLObject *forWhom = 0, int flags = 0) const = 0;
-    virtual void updateCachedNoun( );
 };
 
 }

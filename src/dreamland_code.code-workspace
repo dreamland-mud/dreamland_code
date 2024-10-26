@@ -32,7 +32,10 @@
 			"deque": "cpp",
 			"list": "cpp",
 			"vector": "cpp",
-			"bitset": "cpp"
+			"bitset": "cpp",
+			"memory": "cpp",
+			"functional": "cpp",
+			"thread": "cpp"
 		}
 	}
 }

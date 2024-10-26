@@ -82,7 +82,7 @@ CMDADM(finger)
             << "{gAll hosts:{x Use 'finger " << playerName << " ip'" << endl;
 
         str << "{gDescription:{x" << endl
-            << pci->getDescription();
+            << pci->getDescription(LANG_DEFAULT);
 
         ch->send_to(str);
         return;

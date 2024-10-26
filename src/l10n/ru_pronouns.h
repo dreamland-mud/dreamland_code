@@ -6,6 +6,7 @@
 #define RU_PRONOUNS_H
 
 #include "pronouns.h"
+#include "inflectedstring.h"
 
 namespace Grammar {
 
@@ -13,8 +14,8 @@ extern const IndefinitePronoun::AnimacyCases ru_indefinite_pronouns;
 extern const PersonalPronoun::Persons ru_personal_pronouns;
 extern const PosessivePronoun::PosessionGenders ru_posessive_pronouns;
 
-extern const IndefiniteNoun::Pointer somebody;
-extern const IndefiniteNoun::Pointer something;
+extern const InflectedString::Pointer somebody;
+extern const InflectedString::Pointer something;
 
 }
 

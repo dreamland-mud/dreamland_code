@@ -127,7 +127,7 @@ COMMAND(COrder, "order")
     rc = iargs.pCommand->dispatchOrder(iargs);
     if (rc != RC_DISPATCH_OK) {        
         DLString victName = victim->is_npc() ? 
-              Syntax::noun(victim->getNPC()->getShortDescr()) 
+              Syntax::noun(victim->getNPC()->getShortDescr(LANG_DEFAULT)) 
             : victim->getNameP('1');
 
         switch (rc) {

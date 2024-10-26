@@ -114,7 +114,6 @@ void Character::init( )
 {
     ID = 0;
     dead = false;
-    name = "";
     level = 0;
     clan.assign( clan_none );
     sex = SEX_NEUTRAL;
@@ -213,7 +212,7 @@ void Character::init( )
 void Character::extract( )
 {
     if (carrying)
-        throw Exception( getName( ) + " extract: inventory not empty" );
+        throw Exception( getNameP('1') + " extract: inventory not empty" );
     
     affected.deallocate();
 
@@ -224,15 +223,6 @@ void Character::extract( )
  * set-get methods inherited from CharacterMemoryInterface
  * with some additional methods needed
  *****************************************************************************/
-const DLString& Character::getName( ) const 
-{
-    return name.getValue( );
-}
-void Character::setName( const DLString& name ) 
-{
-    this->name.setValue( name );
-    updateCachedNoun( );
-}
 short Character::getLevel( ) const 
 {
     return level.getValue( );
@@ -279,15 +269,6 @@ void Character::setRace( const RaceReference & race )
 {
     this->race.assign( race );
 }
-short Character::getSex( ) const 
-{
-    return sex.getValue( );
-}
-void Character::setSex( short sex ) 
-{
-    this->sex.setValue( sex );
-    updateCachedNoun( );
-}
 
 int Character::getAlignment( ) const
 {
@@ -327,11 +308,6 @@ const GlobalBitvector & Character::getWearloc( )
 /*****************************************************************************
  * name and sex formatting
  *****************************************************************************/
-const char* Character::getNameC( ) const
-{
-    return getName( ).c_str( );
-}
-
 DLString Character::sees( const Character *ch, char needcase ) const  
 {
     return ch->toNoun( this, FMT_INVIS )->decline( needcase );

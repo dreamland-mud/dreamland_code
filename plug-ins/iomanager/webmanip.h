@@ -16,7 +16,7 @@ class Character;
 class PCharacter;
 class NPCharacter;
 struct ManipCommandArgs;
-struct extra_descr_data;
+struct ExtraDescrList;
 
 class WebManipCommand : public virtual Plugin {
 public:    
@@ -45,7 +45,7 @@ public:
         void decorateItem( ostringstream &buf, const DLString &descr, Object *item, Character *, const DLString &pocket, int combined ) const;
         void decorateShopItem( ostringstream &buf, const DLString &descr, Object *item, Character * ) const;
         void decoratePocket( ostringstream &buf, const DLString &pocket, Object *container, Character *ch ) const;
-        void decorateExtraDescr( ostringstream &buf, const char *desc, extra_descr_data *ed, Character *ch ) const;
+        void decorateExtraDescr( ostringstream &buf, const char *desc, const ExtraDescrList &edList, Character *ch ) const;
         void decorateCharacter( ostringstream &buf, const DLString &descr, Character *victim, Character *ch ) const;
 
 protected:        
@@ -105,15 +105,15 @@ struct PocketManipArgs : public ManipCommandArgs {
 };
 
 struct ExtraDescrManipArgs : public ManipCommandArgs {
-    ExtraDescrManipArgs(Character *target, const char *desc, extra_descr_data *ed)
+    ExtraDescrManipArgs(Character *target, const char *desc, const ExtraDescrList& edList)
             : ManipCommandArgs(target)
     {
         this->desc = desc;
-        this->ed = ed;
+        this->edList = &edList;
     }
 
     const char *desc;
-    extra_descr_data *ed;
+    const ExtraDescrList *edList;
 };
 
 struct PlayerManipArgs : public ManipCommandArgs {

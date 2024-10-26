@@ -244,7 +244,8 @@ XMLRoom::compat(int vnum)
     for(edit = extraDescr.rbegin( ); edit != extraDescr.rend( ); edit++) {
         ExtraDescription *pEd = new ExtraDescription();
 
-        pEd->keyword.fromMixedString(edit->keyword);
+        pEd->keyword = edit->keyword;
+        
         if (String::hasCyrillic(edit->getValue()))
             pEd->description[RU] = edit->getValue();
         else

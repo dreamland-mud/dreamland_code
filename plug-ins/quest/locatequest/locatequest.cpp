@@ -48,7 +48,7 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
     try {
         scenName = LocateQuestRegistrator::getThis( )->getRandomScenario( pch );
         customer = getRandomClient( pch );
-        customerName = customer->getShortDescr( );
+        customerName = customer->getShortDescr(LANG_DEFAULT);
         customerRoom = customer->in_room->getName();
         customerArea = customer->in_room->areaName();
 

@@ -141,8 +141,8 @@ bool CardPackBehavior::use( Character *user, const char *args )
     
         card = create_object( pCardIndex, 0 );
         card->timer = (1 + myAttr->getLevel( )) * 3 * 60 * 60;
-        card->setShortDescr( fmt(0, card->getShortDescr( ), victim->getNameP( '2' ).c_str( )) );
-        card->setName( fmt(0, card->getName( ), victim->getName( ).c_str( )).c_str() );
+        card->setShortDescr( fmt(0, card->getShortDescr(LANG_DEFAULT).c_str(), victim->getNameP( '2' ).c_str( )), LANG_DEFAULT );
+        card->setKeyword( fmt(0, card->getKeyword( ).toString().c_str(), victim->getName( ).c_str( )).c_str() );
         
         CardBehavior::Pointer bhv( NEW );
         bhv->setObj( card );
@@ -492,7 +492,7 @@ DLString CardBehavior::extraDescription( Character *ch, const DLString &args )
     PCMemoryInterface *victMemory;
     
     if (ch->is_npc( ) 
-            || !is_name( args.c_str( ), obj->getName( ) )
+            || !obj->getKeyword().matchesUnstrict(args)
             || gsn_card_vision->getLearned( ch ) <= 1)
         return DLString::emptyString;
 

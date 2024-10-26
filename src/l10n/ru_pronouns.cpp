@@ -69,10 +69,13 @@ const PosessivePronoun::PosessionGenders ru_posessive_pronouns =
   },
 };
 
-const IndefiniteNoun::Pointer 
-    somebody(NEW, IndefiniteNoun(ru_indefinite_pronouns, Animacy::PERSON));
+const MultiGender masculineSingular(Gender::MASCULINE);
+const MultiGender neutralSingular(Gender::NEUTER);
 
-const IndefiniteNoun::Pointer 
-    something(NEW, IndefiniteNoun(ru_indefinite_pronouns, Animacy::ITEM));
+const InflectedString::Pointer 
+    somebody(NEW, InflectedString("|некто|кого-то|кому-то|кого-то|кем-то|ком-то", masculineSingular));
+
+const InflectedString::Pointer 
+    something(NEW, InflectedString("|нечто|чего-то|чему-то|что-то|чем-то|чем-то", neutralSingular));
 
 }

@@ -103,7 +103,7 @@ void Wearlocation::display( Character *, Wearlocation::DisplayList & )
 
 DLString Wearlocation::displayName(Character *ch, Object *obj)
 {
-    return obj->getShortDescr('1');
+    return obj->getShortDescr('1', LANG_DEFAULT); // TODO displayName should take lang argument
 }
 
 DLString Wearlocation::displayLocation(Character *ch, Object *obj)

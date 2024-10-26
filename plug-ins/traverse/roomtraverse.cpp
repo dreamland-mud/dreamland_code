@@ -53,9 +53,9 @@ void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf )
 
         DLString kw;
         if (road.type == Road::PORTAL)
-            kw = Syntax::label(road.value.portal->getName());
+            kw = Syntax::label_ru(road.value.portal->getKeyword());
         else if (road.type == Road::EEXIT)
-            kw = Syntax::label(road.value.eexit->keyword);
+            kw = Syntax::label_ru(road.value.eexit->keyword);
 
         commands.push_back("{hcвойти " + kw);
     }

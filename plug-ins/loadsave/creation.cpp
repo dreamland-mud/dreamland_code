@@ -44,18 +44,18 @@ WEARLOC(stuck_in);
 RELIG(chronos);
 PROF(mobile);
 
-typedef void (NPCharacter::*SetterMethod)(const DLString &);
+typedef void (NPCharacter::*SetterMethod)(const DLString &, lang_t);
 /** Override proto descriptions if there's some formatting present. */
-static void override_description(NPCharacter *mob, const char *cProtoField, SetterMethod method)
+static void override_description(NPCharacter *mob, const XMLMultiString &cProtoField, SetterMethod method, lang_t lang)
 {
-    DLString protoField(cProtoField);
+    DLString protoField = cProtoField.get(lang);
 
     if (protoField.find("%1") == DLString::npos)
         return;
 
-    DLString result = fmt(0, cProtoField, mob);
+    DLString result = fmt(0, protoField.c_str(), mob);
     if (result != protoField)
-        (mob->*method)(result);
+        (mob->*method)(result, lang);
 }
 
 // Refresh race (and proto) affects on a character. Called when a character is created or periodically from char_update().
@@ -108,9 +108,6 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
 
     mob->pIndexData = pMobIndex;
     race = raceManager->find(pMobIndex->race);
-
-    DLString name(pMobIndex->player_name);
-    mob->setName(name);
 
     mob->spec_fun = pMobIndex->spec_fun;
 
@@ -181,12 +178,16 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
     mob->material = str_dup(pMobIndex->material);
     mob->extracted = false;
 
-    mob->updateCachedNoun();
+    // Override descriptions with formatting symbols that depend on NPC sex.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        override_description(mob, pMobIndex->keyword, &NPCharacter::setKeyword, lang);
+        override_description(mob, pMobIndex->short_descr, &NPCharacter::setShortDescr, lang);
+        override_description(mob, pMobIndex->long_descr, &NPCharacter::setLongDescr, lang);
+        override_description(mob, pMobIndex->description, &NPCharacter::setDescription, lang);
+    }
 
-    override_description(mob, pMobIndex->player_name, &NPCharacter::setName);
-    override_description(mob, pMobIndex->short_descr, &NPCharacter::setShortDescr);
-    override_description(mob, pMobIndex->long_descr, &NPCharacter::setLongDescr);
-    override_description(mob, pMobIndex->description, &NPCharacter::setDescription);
+    mob->updateCachedNouns();
 
     // Configure perm stats, they can be further adjusted in a global onInit.
     // Race and class modifications are applied on-the-fly inside NPCharacter::getCurrStat
@@ -305,81 +306,6 @@ void create_mob_affects(NPCharacter *mob)
     }
 }
 
-/* duplicate a mobile exactly -- except inventory */
-void clone_mobile(NPCharacter *parent, NPCharacter *clone)
-{
-    int i;
-
-    if (parent == 0 || clone == 0)
-        return;
-
-    /* start fixing values */
-    DLString name(parent->getNameC());
-    clone->setName(name);
-
-    if (parent->getRealShortDescr())
-        clone->setShortDescr(parent->getShortDescr());
-    if (parent->getRealLongDescr())
-        clone->setLongDescr(parent->getLongDescr());
-    if (parent->getRealDescription())
-        clone->setDescription(parent->getDescription());
-
-    clone->group = parent->group;
-    clone->setSex(parent->getSex());
-    clone->setRace(parent->getRace()->getName());
-    clone->setLevel(parent->getRealLevel());
-    clone->setClan(parent->getClan());
-    clone->timer = parent->timer;
-    clone->wait = parent->wait;
-    clone->hit = parent->hit;
-    clone->max_hit = parent->max_hit;
-    clone->mana = parent->mana;
-    clone->max_mana = parent->max_mana;
-    clone->move = parent->move;
-    clone->max_move = parent->max_move;
-    clone->gold = parent->gold;
-    clone->silver = parent->silver;
-    clone->exp = parent->exp;
-    clone->act = parent->act;
-    clone->comm = parent->comm;
-    clone->imm_flags = parent->imm_flags;
-    clone->res_flags = parent->res_flags;
-    clone->vuln_flags = parent->vuln_flags;
-    clone->invis_level = parent->invis_level;
-    clone->affected_by = parent->affected_by;
-    clone->detection = parent->detection;
-    clone->position = parent->position;
-    clone->saving_throw = parent->saving_throw;
-    clone->alignment = parent->alignment;
-    clone->hitroll = parent->hitroll;
-    clone->damroll = parent->damroll;
-    clone->wimpy = parent->wimpy;
-    clone->form = parent->form;
-    clone->parts = parent->parts;
-    clone->size = parent->size;
-    clone->material = str_dup(parent->material);
-    clone->extracted = parent->extracted;
-    clone->off_flags = parent->off_flags;
-    clone->dam_type = parent->dam_type;
-    clone->start_pos = parent->start_pos;
-    clone->default_pos = parent->default_pos;
-    clone->spec_fun = parent->spec_fun;
-
-    for (i = 0; i < 4; i++)
-        clone->armor[i] = parent->armor[i];
-
-    for (i = 0; i < stat_table.size; i++) {
-        clone->perm_stat[i] = parent->perm_stat[i];
-        clone->mod_stat[i] = parent->mod_stat[i];
-    }
-
-    for (i = 0; i < 3; i++)
-        clone->damage[i] = parent->damage[i];
-
-    /* now add the affects */
-    for (auto &paf : parent->affected)
-        affect_to_char(clone, paf);
-}
 
 /*
  * Create an object with modifying the count
@@ -414,7 +340,7 @@ Object *create_object_org(OBJ_INDEX_DATA *pObjIndex, short level, bool Count)
 
     obj->pIndexData = pObjIndex;
     obj->in_room = 0;
-    obj->updateCachedNoun();
+    obj->updateCachedNouns();
 
     pObjIndex->instances.push_back(obj);
 
@@ -494,18 +420,19 @@ Object *create_object_org(OBJ_INDEX_DATA *pObjIndex, short level, bool Count)
 void clone_object(Object *parent, Object *clone)
 {
     int i;
-    EXTRA_DESCR_DATA *ed, *ed_new;
 
     if (parent == 0 || clone == 0)
         return;
 
     /* start fixing the object */
-    if (parent->getRealName())
-        clone->setName(parent->getName());
-    if (parent->getRealShortDescr())
-        clone->setShortDescr(parent->getShortDescr());
-    if (parent->getRealDescription())
-        clone->setDescription(parent->getDescription());
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        clone->setKeyword(parent->getRealKeyword(lang), lang);
+        clone->setShortDescr(parent->getRealShortDescr(lang), lang);
+        clone->setDescription(parent->getRealDescription(lang), lang);
+    }
+        
     if (parent->getRealMaterial())
         clone->setMaterial(parent->getMaterial());
     clone->setOwner(parent->getOwner());
@@ -530,15 +457,6 @@ void clone_object(Object *parent, Object *clone)
 
     for (auto &paf : parent->affected)
         affect_to_obj(clone, paf);
-
-    /* extended desc */
-    for (ed = parent->extra_descr; ed != 0; ed = ed->next) {
-        ed_new = new_extra_descr();
-        ed_new->keyword = str_dup(ed->keyword);
-        ed_new->description = str_dup(ed->description);
-        ed_new->next = clone->extra_descr;
-        clone->extra_descr = ed_new;
-    }
 
     JsonUtils::copy(clone->props, parent->props);
 }

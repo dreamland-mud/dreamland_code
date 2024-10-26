@@ -4,6 +4,8 @@
  */
 #include "grammar_entities_impl.h"
 #include "inflectedstring.h"
+#include "flexer.h"
+#include "logstream.h"
 
 using namespace Grammar;
 
@@ -64,12 +66,12 @@ void InflectedString::fillCachedForms()
     cachedForms[Case::MAX] = "";
 
     for (int c = Case::NOMINATIVE; c < Case::MAX; c++) {
-        cachedForms[c] = Noun::decline(Case(c));
+        cachedForms[c] = Flexer::flex(fullForm, c + 1);        
         cachedForms[Case::MAX] << cachedForms[c] << " ";
     }
 }
 
-DLString InflectedString::decline(const Case &c) const
+const DLString& InflectedString::decline(const Case &c) const
 {
     return cachedForms[c];
 }

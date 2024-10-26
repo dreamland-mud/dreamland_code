@@ -19,7 +19,7 @@
 #include "mobilebehavior.h"
 #include "core/behavior/behavior_utils.h"
 #include "skillreference.h"
-#include "object.h"
+#include "core/object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
@@ -99,7 +99,7 @@ struct ItemManipList : public ManipList {
     // addAll methods will create commands in the format: 
     // get все.'item names'[ <container>[:<pocket>]]
     void addAll( const DLString &cmdName, Object *obj1, Object *obj2 = NULL ) {
-        DLString args = "все.'" + DLString(obj1->getName( )) + "'";
+        DLString args = "все.'" + obj1->getKeyword(LANG_RU) + "'";
         if (obj2) {
             args += " " + DLString( obj2->getID( ) ); 
         }
@@ -107,7 +107,7 @@ struct ItemManipList : public ManipList {
     }
 
     void addAll( const DLString &cmdName, Object *obj1, Object *obj2, const DLString &pocket ) {
-        DLString args = "все.'" + DLString(obj1->getName( )) + "'";
+        DLString args = "все.'" + obj1->getKeyword(LANG_RU) + "'";
         args += " ";
         args += (obj2 == target ? THIS : DLString( obj2->getID( ) ));
         args += ":" + pocket;

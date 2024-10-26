@@ -10,7 +10,4 @@ NounHolder::~NounHolder()
 {
 }
 
-void NounHolder::updateCachedNoun( )
-{
-}
 

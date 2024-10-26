@@ -236,6 +236,7 @@ bool ExitsMovement::checkVisibility( Character *wch )
     return Walkment::checkVisibility( wch );
 }
 
+// Return 'true' if wch can't enter an extra exit with this EN keyword
 static bool rprog_cant_walk( Room *room, Character *wch, const char *eename )
 {
     FENIA_CALL(room, "CantWalk", "Cs", wch, eename);
@@ -244,7 +245,7 @@ static bool rprog_cant_walk( Room *room, Character *wch, const char *eename )
 
 bool ExitsMovement::checkExitFlags( Character *wch )
 {
-    if (peexit && rprog_cant_walk( from_room, wch, peexit->keyword ))
+    if (peexit && rprog_cant_walk( from_room, wch, peexit->keyword.get(LANG_EN).c_str() ))
         return false;
 
     if (MOUNTED(wch))
@@ -385,6 +386,7 @@ void ExitsMovement::setWaitstate( )
     ch->setWait( waittime );
 }
 
+// TODO all movement messages should be multi-lingual based on the looker lang config
 void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
 {
     ostringstream buf;
@@ -400,9 +402,9 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
     
     if (peexit) {
         if (fLeaving)
-            buf << peexit->msgLeaveRoom;
+            buf << peexit->msgLeaveRoom.get(LANG_DEFAULT);
         else
-            buf << peexit->msgEntryRoom;
+            buf << peexit->msgEntryRoom.get(LANG_DEFAULT);
     }
     else {
         int mt = adjustMovetype( wch );
@@ -502,7 +504,7 @@ void ExitsMovement::msgEcho( Character *victim, Character *wch, const char *msg 
                        (RIDDEN(wch) ? wch->mount : wch),
                        (MOUNTED(wch) ? wch->mount : wch),
                        wch, 
-                       peexit ? peexit->short_desc_from : direction_doorname(pexit),
+                       peexit ? peexit->short_desc_from.get(LANG_DEFAULT).c_str() : direction_doorname(pexit),
                        boat );
 }
 

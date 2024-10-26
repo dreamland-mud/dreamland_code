@@ -110,11 +110,13 @@ bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool
  * Show long description for objects and mobiles, with 
  * English names in brackets removed for screenreaders.
  */
-static DLString format_longdescr_to_char(const char *descr, Character *ch)
+static DLString format_longdescr_to_char(const DLString &longdescr, Character *ch)
 {
     if (!uses_screenreader(ch))
-        return descr;
+        return longdescr;
 
+    const char *descr = longdescr.c_str();
+    
     // Remove (keywords) and 1 preceding space.
     ostringstream buf;
     bool skipChar = false;
@@ -157,7 +159,7 @@ static void format_screenreader_flags(Object *obj, ostringstream &buf, Character
         return;
     }
 
-    DLString myshort = obj->getShortDescr();
+    DLString myshort = obj->getShortDescr(LANG_DEFAULT);
     if (myshort.find('{') != DLString::npos)
         buf << "(Яркое) ";
 }
@@ -196,11 +198,11 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     Wearlocation *wearloc = obj->wear_loc.getElement();
 
     // Hide items without short description inside object lists.
-    if (fShort && String::isEmpty( obj->getShortDescr( ) ))
+    if (fShort && obj->getShortDescr(LANG_DEFAULT).empty())
             return "";
     
     // Hide items without long description on the floor.
-    if (!fShort && String::isEmpty( obj->getDescription( ) ))
+    if (!fShort && obj->getDescription(LANG_DEFAULT).empty())
         return "";
     
 #define FMT(cond, buf, ch, lng, color, letter)        \
@@ -256,7 +258,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
                 buf << " [" << obj->get_cond_alias( ) << "]";
 
         if (showHint)
-            buf << " (" << Syntax::label_en(obj->getName()) << ")";
+            buf << " (" << Syntax::label_en(obj->getKeyword()) << ")";
     }
     else
     {
@@ -270,7 +272,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             msg << "{" << CLR_OBJ(ch) << "{1" << "%1$^O1" << "{2";
 
             if (showHint)
-                msg << " (" << Syntax::label_en(obj->getName()) << ")";
+                msg << " (" << Syntax::label_en(obj->getKeyword()) << ")";
 
             msg << " ";
 
@@ -283,7 +285,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             buf << fmt( ch, msg.c_str( ), obj, liq.c_str( ) );
         }
         else {
-            DLString longd = format_longdescr_to_char(obj->getDescription(), ch);  
+            DLString longd = format_longdescr_to_char(obj->getDescription(LANG_DEFAULT), ch);  
             buf << "{" << CLR_OBJROOM(ch) << longd << "{x";
         }
     }
@@ -516,11 +518,11 @@ static void show_char_position( Character *ch, Character *victim,
             if (!rc.empty( ))
                 buf << rc;
             else if (IS_SET(furniture_flag, atFlag)) 
-                buf << "возле " << victim->on->getShortDescr( '2' );
+                buf << "возле " << victim->on->getShortDescr( '2', LANG_DEFAULT );
             else if (IS_SET(furniture_flag, onFlag))
-                buf << "на " << victim->on->getShortDescr( '6' );
+                buf << "на " << victim->on->getShortDescr( '6', LANG_DEFAULT );
             else
-                buf << "в " << victim->on->getShortDescr( '6' );
+                buf << "в " << victim->on->getShortDescr( '6', LANG_DEFAULT );
         }
         else
             buf << "здесь";
@@ -562,16 +564,14 @@ static bool can_show_long_descr(NPCharacter *nVict)
 {
     if (nVict->position == nVict->start_pos 
             && !nVict->on
-            && nVict->getLongDescr( ) 
-            && nVict->getLongDescr( )[0])
+            && !nVict->getLongDescr(LANG_DEFAULT).empty()) 
     {
         return true;
     }
 
     if (nVict->position == POS_STANDING
         && !nVict->on
-        && nVict->getRealLongDescr()
-        && nVict->getRealLongDescr()[0])
+        && !nVict->getRealLongDescr(LANG_DEFAULT).empty())
     {
         return true;
     }
@@ -687,7 +687,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
 
     if (nVict) 
         if (can_show_long_descr(nVict)) {
-            DLString longd = format_longdescr_to_char(nVict->getLongDescr(), ch);
+            DLString longd = format_longdescr_to_char(nVict->getLongDescr(LANG_DEFAULT), ch);
             buf << "{" << CLR_MOB(ch);
             webManipManager->decorateCharacter(buf, longd, victim, ch);
             buf << "{x";
@@ -722,7 +722,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
 
     if (nVict && !ch->is_npc()) {
         if (!ch->getConfig().rucommands || IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
-            buf << "(" << Syntax::label_en(nVict->getName()) << ") ";
+            buf << "(" << Syntax::label_en(nVict->getKeyword()) << ") ";
     }
 
     switch (victim->position.getValue( )) {
@@ -879,7 +879,7 @@ static void show_char_description( Character *ch, Character *vict )
         return;  
     }
 
-    const char *dsc = vict->getDescription( );
+    const char *dsc = vict->getDescription(LANG_DEFAULT).c_str();
 
     if ((vict->is_npc( ) && dsc) || (!vict->is_npc( ) && dsc[0])) {
         ch->send_to( dsc );
@@ -1135,10 +1135,10 @@ struct ExtraDescList : public list<EDInfo> {
                 push_back( EDInfo( arg, desc, obj, 0 ) );
                 
             size_type mySize = size( );
-            putDescriptions( obj->extra_descr, obj, 0 );
+            putDescriptions( obj->extraDescriptions, obj, 0 );
 
             if (size( ) == mySize)
-                putDescriptions( obj->pIndexData->extra_descr, obj, 0 );
+                putDescriptions( obj->pIndexData->extraDescriptions, obj, 0 );
             
             if (size( ) == startSize)
                 putDefaultDescription( obj );
@@ -1147,22 +1147,22 @@ struct ExtraDescList : public list<EDInfo> {
     
     void putDefaultDescription( Object *obj )
     {
-        if (is_name( arg, obj->getName( ) )) {
-            const char *defaultDescr;
+        if (obj->getKeyword().matchesUnstrict(arg)) {
+            DLString defaultDescr;
             if (obj->in_room)
-                defaultDescr = obj->getDescription( );
+                defaultDescr = obj->getDescription(LANG_DEFAULT);
             else
                 defaultDescr = "Ты не видишь здесь ничего особенного.";
                 
-            push_back( EDInfo( obj->getName( ), defaultDescr, obj, 0 ) );
+            push_back( EDInfo( obj->getKeyword( ).toString(), defaultDescr, obj, 0 ) );
         }
     }
 
-    void putDescriptions( EXTRA_DESCR_DATA *ed, Object *obj, Room *room )
+    void putDescriptions( const ExtraDescrList &edList, Object *obj, Room *room )
     {
-        for (; ed; ed = ed->next)
-            if (is_name( arg, ed->keyword ))
-                push_back( EDInfo( ed->keyword, ed->description, obj, room ) );
+        for (auto &ed: edList)
+            if (is_name( arg, ed->keyword.c_str() ))
+                push_back( EDInfo( ed->keyword, ed->description.get(LANG_DEFAULT), obj, room ) );
     }
     
     bool output( )
@@ -1173,7 +1173,7 @@ struct ExtraDescList : public list<EDInfo> {
 
         for (count = 1, i = begin( ); i != end( ); i++, count++)
             if (count == number) {
-                EXTRA_DESCR_DATA *sourceEdList = i->source ? i->source->pIndexData->extra_descr : i->sourceRoom->getExtraDescr();
+                const ExtraDescrList &sourceEdList = i->source ? i->source->pIndexData->extraDescriptions : i->sourceRoom->getExtraDescr();
                 buf << "{x";
                 webManipManager->decorateExtraDescr( buf, i->description.c_str( ), sourceEdList, ch );
                 buf << endl;
@@ -1255,7 +1255,7 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
 
         for (auto &peexit: room->extra_exits)
             if (ch->can_see( peexit ))
-                rbuf << rprog_eexit_descr(room, peexit, ch, peexit->room_description);
+                rbuf << rprog_eexit_descr(room, peexit, ch, peexit->room_description.get(LANG_DEFAULT));
 
         buf << rprog_descr( room, ch, rbuf.str( ) );
     }
@@ -1337,8 +1337,8 @@ static bool do_look_direction( Character *ch, const char *arg1 )
             return true;
     }
 
-    if ( pexit->description != 0 && pexit->description[0] != '\0' ) {
-            ch->send_to( pexit->description);
+    if (!pexit->description.empty()) {
+            ch->send_to( pexit->description.get(LANG_DEFAULT));
             ch->pecho("");
     }
     else
@@ -1358,7 +1358,7 @@ static void do_look_object( Character *ch, Object *obj )
 {
         ostringstream buf;
             
-        buf << "Ты смотришь на {c" << obj->getShortDescr( '4' ) << "{x."
+        buf << "Ты смотришь на {c" << obj->getShortDescr( '4', LANG_DEFAULT ) << "{x."
             << " Это {W" << item_table.message(obj->item_type) << "{x";
 
 
@@ -1373,35 +1373,37 @@ static void do_look_object( Character *ch, Object *obj )
         buf << "." << endl;
         ch->send_to( buf.str( ) );
 
-        DLString desc = oprog_extra_descr( obj, ch, obj->getName( ) );
+        DLString desc = oprog_extra_descr( obj, ch, obj->getKeyword().toString().c_str() );
+        DLString keywords = obj->getKeyword().toString();
+
         if (desc.empty( )) { 
-            for (EXTRA_DESCR_DATA *ed = obj->extra_descr; ed; ed = ed->next) 
-                if (arg_contains_someof( ed->keyword, obj->getName( ) )) {
-                    desc = ed->description;
+            for (auto &ed: obj->extraDescriptions)
+                if (arg_contains_someof( ed->keyword, keywords.c_str() )) {
+                    desc = ed->description.get(LANG_DEFAULT);
                     break;
                 }
         }
 
         if (desc.empty( )) { 
-            for (EXTRA_DESCR_DATA *ed = obj->pIndexData->extra_descr; ed; ed = ed->next) 
-                if (arg_contains_someof( ed->keyword, obj->getName( ) )) {
-                    desc = ed->description;
+            for (auto &ed: obj->pIndexData->extraDescriptions)
+                if (arg_contains_someof( ed->keyword, keywords.c_str() )) {
+                    desc = ed->description.get(LANG_DEFAULT);
                     break;
                 }
         }
 
         if (desc.empty( )) {
             if (obj->in_room)
-                desc = obj->getDescription( );
+                desc = obj->getDescription(LANG_DEFAULT);
             else
                 desc = "Ты не видишь здесь ничего особенного.";
         }            
 
         ostringstream descBuf;
-        webManipManager->decorateExtraDescr( descBuf, desc.c_str( ), obj->pIndexData->extra_descr, ch );
+        webManipManager->decorateExtraDescr( descBuf, desc.c_str( ), obj->pIndexData->extraDescriptions, ch );
         ch->send_to( descBuf );
 
-        oprog_look( obj, ch, obj->getName( ) );
+        oprog_look( obj, ch, keywords.c_str() );
 }
 
 static bool do_look_extraexit( Character *ch, const char *arg3 )
@@ -1411,24 +1413,22 @@ static bool do_look_extraexit( Character *ch, const char *arg3 )
     if (!peexit)
         return false;
 
-    if ( peexit->description != 0
-            && peexit->description[0] != '\0'
+    if (!peexit->description.empty()
             && ch->can_see( peexit ) )
-            ch->send_to( peexit->description);
+            ch->send_to( peexit->description.get(LANG_DEFAULT));
     else
             ch->pecho( "Здесь нет ничего особенного." );
     
-    if (peexit->short_desc_from != 0
-        && peexit->short_desc_from[0] != '\0'
+    if (!peexit->short_desc_from.empty()
         && ch->can_see( peexit ) )
     {
             if ( IS_SET(peexit->exit_info, EX_CLOSED) )
             {
-                ch->pecho( "%1$N1: тут закрыто.", peexit->short_desc_from );
+                ch->pecho( "%1$N1: тут закрыто.", peexit->short_desc_from.get(LANG_DEFAULT).c_str() );
             }
             else if ( IS_SET(peexit->exit_info, EX_ISDOOR) )
             {
-                ch->pecho( "%1$N1: тут открыто.", peexit->short_desc_from );
+                ch->pecho( "%1$N1: тут открыто.", peexit->short_desc_from.get(LANG_DEFAULT).c_str()  );
             }
     }
     

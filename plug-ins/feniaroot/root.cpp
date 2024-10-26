@@ -209,18 +209,6 @@ NMI_SET( Root, options, "глобальные флаги (.tables.dreamland_flag
         arg2flag(arg, dreamland_flags));
 }
 
-NMI_INVOKE( Root, get_obj_world , "(name): ищет в мире предмет с указанным именем")
-{
-    ::Object *obj;
-    const char *name = args.front( ).toString( ).c_str( );
-    
-    for (obj = object_list; obj; obj = obj->next)
-        if (is_name( name, obj->getName( )))
-            return WrapperManager::getThis( )->getWrapper(obj); 
-
-    return Register( );
-}
-
 NMI_INVOKE( Root, get_obj_world_unique , "(vnum, ch): ищет в мире предмет с этим внумом, принадлежащий ch")
 {
     int vnum = argnum2number(args, 1);

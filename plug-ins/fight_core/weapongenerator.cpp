@@ -429,7 +429,7 @@ WeaponGenerator& WeaponGenerator::randomizeStats()
     .assignColours();
 
     notice("rand_stat: created item %s [%d] [%lld] tier %s affixes [%s]",
-            obj->getShortDescr('1').c_str(),
+            obj->getShortDescr('1', LANG_DEFAULT).c_str(),
             obj->pIndexData->vnum, obj->getID(), 
             obj->getProperty("tier").c_str(),
             obj->getProperty("affixes").c_str());
@@ -453,7 +453,7 @@ WeaponGenerator& WeaponGenerator::randomizeAll()
         .assignColours();
 
     notice("rand_all: created item %s [%d] [%lld] tier %s affixes [%s] level %d",
-            obj->getShortDescr('1').c_str(),
+            obj->getShortDescr('1', LANG_DEFAULT).c_str(),
             obj->pIndexData->vnum, obj->getID(), 
             obj->getProperty("tier").c_str(), 
             obj->getProperty("affixes").c_str(),
@@ -490,7 +490,7 @@ void WeaponGenerator::setName() const
     StringList mynames(nameConfig["name"].asString());
     mynames.addUnique(wclass);
     mynames.addUnique(weapon_class.message(obj->value0()));
-    obj->setName(mynames.join(" ").c_str());
+    obj->setKeyword(mynames.join(" ").c_str());
 }
 
 void WeaponGenerator::setShortDescr() const
@@ -519,7 +519,7 @@ void WeaponGenerator::setShortDescr() const
     if (!randomNoun.empty())
         myshort += " " + randomNoun; // боли
 
-    obj->setShortDescr(myshort.c_str());
+    obj->setShortDescr(myshort, LANG_RU);
 
     obj->setProperty("eqName", nameConfig["short"].asString()); // 'буздыган' in sheath wearloc
 }
@@ -529,7 +529,7 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
     // Config item names and gram gender. 
     setName();
     setShortDescr();
-    obj->setDescription(nameConfig["long"].asCString());
+    obj->setDescription(nameConfig["long"].asCString(), LANG_RU);
 
     // Set up provided material or default.
     obj->setMaterial(findMaterial().c_str());
@@ -540,13 +540,13 @@ const WeaponGenerator & WeaponGenerator::assignColours() const
 {
     DLString colour = weapon_tier_table[valTier-1].colour;
 
-    DLString myshort = obj->getShortDescr();
+    DLString myshort = obj->getShortDescr(LANG_RU);
     if (obj->getProperty("eqName").empty())
         obj->setProperty("eqName", myshort);
 
     if (!colour.empty()) {
         myshort = "{" + colour + myshort.colourStrip() + "{x";
-        obj->setShortDescr(myshort.c_str());
+        obj->setShortDescr(myshort, LANG_RU);
     }
 
     return *this;

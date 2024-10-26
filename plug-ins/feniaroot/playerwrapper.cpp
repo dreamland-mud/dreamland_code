@@ -233,12 +233,12 @@ NMI_SET(PlayerWrapper, ethos, "этос")
 
 NMI_GET(PlayerWrapper, description, "описание персонажа")
 {
-    return getTarget()->getDescription();
+    return getTarget()->getDescription(LANG_DEFAULT);
 }
 
 NMI_SET(PlayerWrapper, description, "описание персонажа")
 {
-    getTarget()->setDescription(arg2string(arg));
+    getTarget()->setDescription(arg2string(arg), LANG_DEFAULT);
     save();
 }
 

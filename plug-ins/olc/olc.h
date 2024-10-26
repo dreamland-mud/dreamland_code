@@ -28,14 +28,6 @@ DLString show_enum_array(const EnumerationArray &array);
 DLString show_enum_array_web(const EnumerationArray &array);
 void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json::Value &props);
 
-// Prototypes
-// mem.c - memory prototypes.
-EXIT_DATA *new_exit();
-void free_exit(EXIT_DATA * pExit);
-EXTRA_DESCR_DATA *new_extra_descr();
-void free_extra_descr(EXTRA_DESCR_DATA * pExtra);
-MOB_INDEX_DATA *new_mob_index();
-
 #define stc(t, c) (c)->send_to((t))
 
 const char * get_skill_name( int sn, bool verbose = true );

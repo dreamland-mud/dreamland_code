@@ -16,39 +16,21 @@
 #include "loadsave.h"
 #include "vnum.h"
 #include "arg_utils.h"
-
+#include "string_utils.h"
 #include "def.h"
 
-static list<DLString> desc_to_list(const char *text)
-{
-    char buf[MAX_STRING_LENGTH];
-    list<DLString> result;
 
-    if (!text || !text[0])
-        return result;
-
-    istringstream is(text);
-    while (is.getline(buf, sizeof(buf)))
-        result.push_back(buf);
-
-    return result;
-}
-
-static DLString desc_from_list(list<DLString> &lines)
-{
-    ostringstream buf;
-
-    for (auto &l: lines)
-        buf << l << endl;
-
-    return buf.str();
-}
+// TODO edit multi-language description, consider auto-translate to other languages. Same as with the rest of user input.
 
 static void desc_show( Character *ch )
 {
         if (ch->desc) {
             ch->pecho("Твое описание:");
-            ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(Отсутствует).\n\r");
+            DLString text = ch->getDescription(LANG_DEFAULT);
+            if (text.empty())
+                ch->desc->send("(Отсутствует).\n\r");
+            else
+                ch->desc->send(text.c_str());
         }
 }
 
@@ -80,13 +62,8 @@ CMDRUNP( description )
         if (!ch->getPC( )) 
             return;
 
-        if (!ch->getDescription( ) || !ch->getDescription( )[0]) {
-                ch->pecho("Твое описание пусто, копировать в буфер нечего.");
-                return;
-        }        
-
         ch->getPC( )->getAttributes().getAttr<XMLAttributeEditorState>("edstate") 
-            ->regs[0].split(ch->getDescription( )); 
+            ->regs[0].split(ch->getDescription(LANG_DEFAULT)); 
 
         if (!is_websock(ch)) {
                 ch->pecho("Описание скопировано в буфер редактора, однако пользоваться редактором можно только изнутри веб-клиента.");
@@ -110,7 +87,7 @@ CMDRUNP( description )
             return;
         }
 
-        ch->setDescription( str.c_str( ));
+        ch->setDescription(str, LANG_DEFAULT);
         ch->pecho( "Новое описание вставлено из буфера редактора." );
         desc_show( ch );
         interpret_raw(ch, "confirm", "review");
@@ -125,13 +102,7 @@ CMDRUNP( description )
 
     if (argument[0] == '-')
     {
-        if (!ch->getDescription() || !ch->getDescription()[0])
-        {
-            ch->pecho("Нет ничего для удаления.");
-            return;
-        }
-
-        list<DLString> lines = desc_to_list(ch->getDescription());
+        list<DLString> lines = String::toLines(ch->getDescription(LANG_DEFAULT));
         if (lines.empty()) {
             ch->pecho("Нет ничего для удаления.");
             return;
@@ -139,7 +110,7 @@ CMDRUNP( description )
 
         lines.pop_back();
 
-        ch->setDescription(desc_from_list(lines));
+        ch->setDescription(String::fromLines(lines), LANG_DEFAULT);
         desc_show(ch);
         interpret_raw(ch, "confirm", "review");
         return;
@@ -147,7 +118,7 @@ CMDRUNP( description )
 
     if (argument[0] == '+')
     {
-        list<DLString> lines = desc_to_list(ch->getDescription());
+        list<DLString> lines = String::toLines(ch->getDescription(LANG_DEFAULT));
 
         argument++;
         while (dl_isspace(*argument))
@@ -155,13 +126,13 @@ CMDRUNP( description )
 
         lines.push_back(argument);
 
-        DLString text = desc_from_list(lines);
+        DLString text = String::fromLines(lines);
         if (text.size() > MAX_STRING_LENGTH) {
             ch->pecho("Слишком длинное описание.");
             return;
         }
 
-        ch->setDescription(text);
+        ch->setDescription(text, LANG_DEFAULT);
         desc_show(ch);
         interpret_raw(ch, "confirm", "review");
         return;

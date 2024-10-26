@@ -35,7 +35,7 @@
 #include "loadsave.h"
 #include "skill_utils.h"
 #include "move_utils.h"
-
+#include "string_utils.h"
 #include "profflags.h"
 #include "act.h"
 
@@ -581,10 +581,12 @@ void UndefinedOneHit::damEffectMasterSword( )
     if (!IS_WEAPON_STAT(katana, WEAPON_KATANA))
         return;
     
-    if (!katana->extra_descr || !katana->extra_descr->description)
+    if (katana->extraDescriptions.empty())
         return;
     
-    if (strstr(katana->extra_descr->description, ch->getNameC()) == 0)
+    // TODO check all descriptions or make it an owner
+    DLString edText = katana->extraDescriptions.front()->description.get(LANG_DEFAULT);
+    if (!String::contains(edText, ch->getNameC()) && !String::contains(edText, ch->getNameP('2')))
         return;
 
     if (immune_check( victim, dam_type, dam_flag ) == RESIST_IMMUNE)

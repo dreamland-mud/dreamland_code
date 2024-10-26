@@ -214,8 +214,8 @@ static void create_pool( Object *out, int amount )
 		room->echo( POS_RESTING, "На земле образуется лужа %N2.", liqShort.c_str( ) );
 	}
 	
-    pool->setShortDescr( fmt(0, pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( )) );
-    pool->setDescription( fmt(0, pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( )) );
+    pool->setShortDescr( fmt(0, pool->pIndexData->short_descr.get(LANG_DEFAULT).c_str(), liqShort.ruscase( '2' ).c_str( )), LANG_DEFAULT );
+    pool->setDescription( fmt(0, pool->pIndexData->description.get(LANG_DEFAULT).c_str(), liqShort.ruscase( '2' ).c_str( )), LANG_DEFAULT );
 	// Don't set material to liquid name -- those don't exist in the materials list
 	// Use "drink" material for unspecified liquid types (set by default in OBJ_VNUM_POOL, vnum 75)
     // pool->setMaterial( liqName.c_str() );        
@@ -351,8 +351,7 @@ void pour_out( Character *ch, Object * out, Character *victim )
             victim->pecho( "Ты чувствуешь влагу на теле." );
 
             if (!IS_AFFECTED(victim, AFF_SLEEP))
-                interpret_raw( ch, "wake", 
-                               get_char_name_list( victim, ch->in_room->people, ch ).c_str( ) );
+                interpret_raw( ch, "wake", "%lld", victim->getID());
         }
     }
     

@@ -7,6 +7,7 @@
 
 #include "noun.h"
 #include "nounholder.h"
+#include "lang.h"
 
 class InflectedString : public Grammar::NounHolder,
                       public Grammar::Noun 
@@ -18,7 +19,7 @@ public:
     InflectedString(const DLString &ff);
     InflectedString(const DLString &ff, const Grammar::MultiGender &mg);
 
-    virtual DLString decline(const Grammar::Case &c) const;
+    virtual const DLString &decline(const Grammar::Case &c) const;
     virtual Grammar::Gender getGender() const;
     virtual Grammar::Number getNumber() const; 
     virtual const DLString &getFullForm() const;

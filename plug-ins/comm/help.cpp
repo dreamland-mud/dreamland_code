@@ -282,7 +282,7 @@ CMDRUNP( help )
                 return;
             }
             ch->pecho("Нет подсказки по данному слову.");
-            bugTracker->reportNohelp( ch, origArgument.c_str( ) );
+            bugTracker->reportNohelp( ch->getPC(), origArgument.c_str( ) );
             return;
         }
 
@@ -303,7 +303,7 @@ CMDRUNP( help )
         }
         
         ch->pecho("Нет подсказки по данному слову.");
-        bugTracker->reportNohelp( ch, origArgument.c_str( ) );
+        bugTracker->reportNohelp( ch->getPC(), origArgument.c_str( ) );
         return;
     }
 

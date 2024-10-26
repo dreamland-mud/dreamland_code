@@ -83,7 +83,7 @@ protected:
         if (IS_SET(obj->extra_flags, ITEM_NOSAC|ITEM_NOPURGE))
             return;
 
-        if (is_name("book", obj->getName())) {
+        if (obj->getKeyword().matchesUnstrict("book")) {
             bookNoItemType(obj);
             return;
         }
@@ -445,7 +445,7 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
     attr->attempts++;
 
     Offering offering(drelig, altar);
-    LogStream::sendNotice() << ch->getName() << " sacrifices altar to " << drelig->getName() << ", total " << offering.getSum() << endl;
+    LogStream::sendNotice() << ch->getNameC() << " sacrifices altar to " << drelig->getName() << ", total " << offering.getSum() << endl;
     if (offering.smites()) {
         ch->pecho("{R%^N1 гневается на тебя за попытку принести в жертву %s!{x",
                        rname, offering.getSmiteMessage().c_str());

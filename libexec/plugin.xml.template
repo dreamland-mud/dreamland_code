@@ -44,7 +44,6 @@
 	<node>generic_notes</node>
 	<node>languages_impl</node>
 	<node>religion</node>
-	<node>services_misc</node>
 	<node>services_petshop</node>
 	<node>services_shop</node>
 	<node>web</node>

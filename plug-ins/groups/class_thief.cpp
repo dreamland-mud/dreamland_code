@@ -650,9 +650,9 @@ SKILL_RUNP( forge )
 
         dup = create_object( key->pIndexData, 0 );
         dup->gram_gender = Grammar::MultiGender::MASCULINE;
-        dup->setName( fmt(0, DUP_NAMES, key->getName( )).c_str() );
-        dup->setShortDescr( fmt(0, DUP_SHORT, key->getShortDescr( '2' ).c_str( ) ));
-        dup->setDescription( fmt(0, DUP_LONG, key->getShortDescr( '2' ).c_str( ) ));
+        dup->setKeyword( fmt(0, DUP_NAMES, key->getKeyword( ).toString().c_str()) );
+        dup->setShortDescr( fmt(0, DUP_SHORT, key->getShortDescr( '2', LANG_DEFAULT ).c_str( ) ), LANG_DEFAULT);
+        dup->setDescription( fmt(0, DUP_LONG, key->getShortDescr( '2', LANG_DEFAULT ).c_str( ) ), LANG_DEFAULT);
         dup->setMaterial( blank->getMaterial( ) );
         dup->wear_flags  = blank->wear_flags;
         dup->extra_flags = blank->extra_flags;
@@ -677,7 +677,7 @@ SKILL_RUNP( forge )
         static const char * LOCK_NAMES = "отмычка lockpick";
         static const char * LOCK_SHORT = "фирменн|ая|ой|ой|ую|ой|ой отмычк|а|и|е|у|ой|е %1$#^C2";
         static const char * LOCK_LONG  = "Фирменная отмычка (lockpick) %1$#^C2 оставлена тут хозя%1$#Gином|ином|йкой.";
-        static const char * LOCK_EXTRA = "Эта отмычка из 'Фирменного набора %1$#^C2' подходит для замка\n";
+        static const char * LOCK_EXTRA = "Эта отмычка из 'Фирменного набора %1$#^C2' подходит для замка:\n%2$N2\n";
 
         if (!keyhole->isLockable( )) {
             ch->pecho( "Здесь нет замочной скважины." );
@@ -701,13 +701,14 @@ SKILL_RUNP( forge )
         oldact("$o1 в твоих умелых руках постепенно превращается в отмычку для $N2.", ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
         oldact("$c1 проделывает манипуляции с $o5.", ch, blank, 0, TO_ROOM );
 
-//        blank->setOwner( ch->getName( ).c_str( ) );
+        // TODO multi-language descriptions
         blank->gram_gender = Grammar::MultiGender::FEMININE;
-        blank->setName( LOCK_NAMES );
-        blank->setShortDescr( fmt( 0, LOCK_SHORT, ch ).c_str( ) );
-        blank->setDescription( fmt( 0, LOCK_LONG, ch ).c_str( ) );
-        blank->addExtraDescr( blank->getName( ), fmt( 0, LOCK_EXTRA, ch ) );
-        keyhole->record( blank );
+        blank->setKeyword( LOCK_NAMES );
+        blank->setShortDescr( fmt( 0, LOCK_SHORT, ch ), LANG_DEFAULT );
+        blank->setDescription( fmt( 0, LOCK_LONG, ch ), LANG_DEFAULT );
+        DLString keyholeKeywords =  blank->getKeyword( ).toString();
+        DLString keyholeDescr = fmt(0, LOCK_EXTRA, ch, keyhole->getDescription().c_str());
+        blank->addExtraDescr(keyholeKeywords, keyholeDescr, LANG_DEFAULT );
 
         blank->value0(keyhole->getLockType( ));
         blank->value1(50 + gsn_key_forgery->getEffective( ch ) / 2);

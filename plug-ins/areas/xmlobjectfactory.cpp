@@ -102,11 +102,12 @@ XMLObjectFactory::compat(obj_index_data *obj)
     XMLListBase<XMLExtraDescr>::reverse_iterator eit;
     for(eit = extraDescr.rbegin( ); eit != extraDescr.rend( ); eit++) {
         ExtraDescription *ed = new ExtraDescription();
-        ed->keyword.fromMixedString(eit->keyword);
+        ed->keyword = eit->keyword;
 
         if (String::hasCyrillic(eit->getValue()))
             ed->description[RU] = eit->getValue();
         else
+            // some weird not yet translated extras
             ed->description[EN] = eit->getValue();
 
         obj->extraDescriptions.push_back(ed);

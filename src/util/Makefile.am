@@ -9,6 +9,7 @@ src_INCLUDES = \
 -I$(srcdir)/../lang \
 -I$(srcdir)/../regex \
 -I$(srcdir)/../l10n \
+-I$(srcdir)/../xml \
 -I$(top_srcdir)
 
 AM_LFLAGS =  -olex.yy.c

@@ -10,16 +10,16 @@
 #include "occupations.h"
 
 #include "grammar_entities_impl.h"
-#include "object.h"
+#include "core/object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
+#include "wearloc_utils.h"
 #include "merc.h"
 #include "interp.h"
 #include "act.h"
 #include "def.h"
 
-WEARLOC(none);
 int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader );
 
 /*----------------------------------------------------------------------
@@ -57,8 +57,8 @@ MixedEntry::MixedEntry( Pet::Pointer pet, Character *client )
 {
     level = pet->getLevel( client );
     cost = pet->toSilver( client );
-    short_descr = pet->getChar( )->getNPC( )->getShortDescr( );
-    name = pet->getChar( )->getName( );
+    short_descr = pet->getChar( )->getNPC( )->getShortDescr(LANG_DEFAULT);
+    name = pet->getChar( )->getNPC()->getKeyword().toString();
     this->pet = true;
 }
 
@@ -66,8 +66,8 @@ MixedEntry::MixedEntry( Object *obj, int cost )
 {
     level = obj->level;
     this->cost = cost;
-    short_descr = obj->getShortDescr( );
-    name = obj->getName( );
+    short_descr = obj->getShortDescr(LANG_DEFAULT);
+    name = obj->getKeyword().toString();
     pet = false;
 }
 

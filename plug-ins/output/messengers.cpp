@@ -1,4 +1,4 @@
-#include "json/json.h"
+#include "jsoncpp/json/json.h"
 #include "logstream.h"
 #include "grammar_entities_impl.h"
 #include "string_utils.h"
@@ -292,7 +292,7 @@ void send_discord_confirm(PCharacter *ch)
         << ch->getProfession( )->getName( )
         << ", clan " << ch->getClan( )->getShortName( )
         << endl
-        << ch->getDescription() << endl;
+        << ch->getDescription(LANG_DEFAULT) << endl;
 
     Json::Value body;
     body["username"] = koi2utf("Всевидящее Око Руфины");

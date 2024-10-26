@@ -181,27 +181,13 @@ NMI_GET( RoomWrapper, area, "экземпляр AreaIndex для этой ком
 NMI_GET(RoomWrapper, smell, "строка с запахом комнаты")
 {
     checkTarget();
-    return target->pIndexData->smell;
-}
-
-NMI_SET(RoomWrapper, smell, "строка с запахом комнаты")
-{
-    checkTarget();
-    target->pIndexData->smell = arg.toString();
-    target->areaIndex()->changed = true;
+    return target->pIndexData->smell.get(LANG_DEFAULT);
 }
 
 NMI_GET(RoomWrapper, sound, "строка со звуком в комнате")
 {
     checkTarget();
-    return target->pIndexData->sound;
-}
-
-NMI_SET(RoomWrapper, sound, "строка со звуком в комнате")
-{
-    checkTarget();
-    target->pIndexData->sound = arg.toString();
-    target->areaIndex()->changed = true;
+    return target->pIndexData->sound.get(LANG_DEFAULT);
 }
 
 NMI_GET(RoomWrapper, ppl, "список (List) всех чаров в комнате")
@@ -549,7 +535,7 @@ NMI_INVOKE( RoomWrapper, exitKeyword, "(номер выхода, имя экст
     if (!resolve_exits(args, target, pExit, pExtraExit))
         throw Scripting::IllegalArgumentException();
 
-    return pExtraExit ? pExtraExit->keyword : pExit->keyword;
+    return pExtraExit ? pExtraExit->keyword.toString() : pExit->keyword.toString();
 }
 
 NMI_INVOKE( RoomWrapper, exitShortDescr, "(номер выхода, имя экстра/выхода): название выхода с падежами" )
@@ -561,7 +547,7 @@ NMI_INVOKE( RoomWrapper, exitShortDescr, "(номер выхода, имя эк�
     if (!resolve_exits(args, target, pExit, pExtraExit))
         throw Scripting::IllegalArgumentException();
 
-    DLString desc = pExtraExit ? pExtraExit->short_desc_from : pExit->short_descr;
+    DLString desc = pExtraExit ? pExtraExit->short_desc_from.get(LANG_DEFAULT) : pExit->short_descr.get(LANG_DEFAULT);
     if (desc.empty())
         desc = "двер|ь|и|и|ь|ью|и";
 

@@ -207,7 +207,7 @@ void auction_update (void)
             else
             {
                 talk_auction(fmt(0, "%s{Y: ставок не получено -- %s{x.", 
-                        auction->item->getShortDescr( '1' ).c_str( ),
+                        auction->item->getShortDescr( '1', LANG_DEFAULT ).c_str( ),
                         ((auction->going == 1) ? "раз" : "два")).c_str());
 
                 if (auction->startbet != 0)
@@ -345,7 +345,7 @@ CMDRUNP( auction )
                         }
                         ch->pecho(
                                 "Лот: '%s{x'. Тип: %s. Экстра флаги: %s.\n\rВес: %d. Стоимость: %d. Уровень: %d.",
-                                obj->getShortDescr( '1' ).c_str( ),
+                                obj->getShortDescr( '1', LANG_DEFAULT ).c_str( ),
                                 item_table.message(obj->item_type).c_str( ), 
                                 extra_flags.messages( obj->extra_flags, true).c_str( ),
                                 obj->weight / 10, obj->cost, obj->level );
@@ -416,7 +416,7 @@ CMDRUNP( auction )
                 else /* stop the auction */
                 {
                         talk_auction(fmt(0, "Продажа остановлена Богами. Лот '%s{Y' конфискован{x.",
-                                auction->item->getShortDescr( '1' ).c_str( )).c_str());
+                                auction->item->getShortDescr( '1', LANG_DEFAULT ).c_str( )).c_str());
                         obj_to_char(auction->item, auction->seller);
                         auction->item = 0;
                         auction->seller = 0;
@@ -486,7 +486,7 @@ CMDRUNP( auction )
                         auction->pulse = PULSE_AUCTION; /* start the auction over again */
 
                         talk_auction(fmt(0, "На %s{Y получена новая ставка: %d золот%s{x.\n\r",
-                                auction->item->getShortDescr( '4' ).c_str( ),newbet,
+                                auction->item->getShortDescr( '4', LANG_DEFAULT ).c_str( ),newbet,
                                 GET_COUNT(newbet,"ая монета","ые монеты","ых монет")).c_str());
                         return;
 

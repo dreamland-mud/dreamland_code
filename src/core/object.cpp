@@ -15,6 +15,7 @@
 #include "noun.h"
 #include "grammar_entities_impl.h"
 #include "ru_pronouns.h"
+#include "string_utils.h"
 #include "json_utils.h"
 #include "fenia/register-impl.h"
 
@@ -60,9 +61,9 @@ void Object::extract( )
 
         extraDescriptions.deallocate();
 
-        keyword.clear();
-        short_descr.clear();
-        description.clear();
+        keyword.clearValues();
+        short_descr.clearValues();
+        description.clearValues();
         
         free_string( material );
         free_string( killer );
@@ -79,7 +80,7 @@ void Object::extract( )
         in_room = 0;
         pocket = "";
         owner = "";
-        cachedNoun.clear( );
+        cachedNouns.clear( );
         item_type = 0;
         extra_flags = 0;
         wear_flags = 0;
@@ -200,45 +201,80 @@ bool Object::may_float(void)
     }
 }
 
-void Object::addExtraDescr( const DLString &keys, const DLString &value )
+// Add or update extra descr value for this exact keywords in given language
+ExtraDescription * Object::addExtraDescr( const DLString &keys, const DLString &value, lang_t lang )
 {
-    extraDescriptions.findAndDestroy(keys);
+    ExtraDescription *ed = extraDescriptions.find(keys);
 
-    ExtraDescription *ed = new ExtraDescription;
-    ed->keyword[LANG_DEFAULT] = keys;
-    ed->description[LANG_DEFAULT] = value;
+    if (!ed) {
+        ed = new ExtraDescription;
+        extraDescriptions.push_back(ed);
+    }
 
+    ed->keyword = keys;
+    ed->description[lang] = value;
+    return ed;
+}
+
+const DLString& Object::getExtraDescr(const DLString& keys, lang_t lang)
+{
+    ExtraDescription *ed = extraDescriptions.find(keys);
+    if (ed)
+        return ed->description.get(lang);
+
+    return DLString::emptyString;
+}
+
+ExtraDescription* Object::getProperDescription()
+{
+    return extraDescriptions.find(keyword.toString());
+}
+
+ExtraDescription* Object::addProperDescription()
+{    
+    ExtraDescription *ed = getProperDescription();
+    if (ed)
+        return ed;
+    
+    ed = new ExtraDescription();
+    ed->keyword = keyword.toString();
     extraDescriptions.push_back(ed);
+    return ed;
+}
+
+void Object::clearProperDescription()
+{
+    extraDescriptions.findAndDestroy(keyword.toString());
 }
 
 
 /*
  * String fields set/get methods
  */
-void Object::setName( const char *str )
+void Object::setKeyword( const DLString &str, lang_t lang )
+{
+    keyword[lang] = str;
+}
+
+void Object::setKeyword(const DLString& str)
 {
     keyword.fromMixedString(str);
 }
 
-void Object::setShortDescr(const DLString &s)
+void Object::setKeyword(const XMLMultiString &str)
 {
-    setShortDescr(s.c_str());
+    keyword = str;
 }
 
-void Object::setShortDescr( const char *s )
+void Object::setShortDescr(const DLString &str, lang_t lang)
 {
-    short_descr[LANG_DEFAULT] = s;
-    updateCachedNoun( );
+    short_descr[lang] = str;
+    updateCachedNoun(lang);
 }
 
-void Object::setDescription( const DLString &s )
+void Object::setDescription( const DLString &str, lang_t lang )
 {
-    setDescription(s.c_str());
-}
-
-void Object::setDescription( const char *s )
-{
-    description[LANG_DEFAULT] = s;
+    description[lang] = str;
 }
 
 void Object::setMaterial( const char *s )
@@ -253,13 +289,9 @@ void Object::setOwner( const DLString &newOwner )
     this->owner = newOwner;
 }
 
-DLString Object::getFirstName( ) const
+DLString Object::getShortDescr( char gram_case, lang_t lang )
 {
-    return DLString( getName( ) ).getOneArgument( );
-}
-DLString Object::getShortDescr( char gram_case )
-{
-    return toNoun( )->decline( gram_case );
+    return toNoun( )->decline( gram_case ); // TODO toNoun should take 'lang' argument
 }
 
 static bool is_anti_align( Character *ch, int flags )
@@ -361,22 +393,29 @@ Noun::Pointer Object::toNoun( const DLObject *forWhom, int flags ) const
             return something;
     }
     
-    return cachedNoun;
+    // TODO toNoun takes lang parameter from 'forWhom'
+    return cachedNouns.find(LANG_DEFAULT)->second;
 }
 
-void Object::updateCachedNoun( )
+void Object::updateCachedNouns()
+{
+    for (int l = LANG_MIN; l < LANG_MAX; l++)
+        updateCachedNoun((lang_t)l);
+}
+
+void Object::updateCachedNoun(lang_t lang)
 {
     MultiGender g = gram_gender == MultiGender::UNDEF 
         ? pIndexData->gram_gender : gram_gender;
 
-    if (!cachedNoun) { 
-        cachedNoun = InflectedString::Pointer( NEW, 
-                                             getShortDescr( ), 
+    if (cachedNouns.find(lang) == cachedNouns.end()) { 
+        cachedNouns[lang] = InflectedString::Pointer( NEW, 
+                                             getShortDescr(lang), 
                                              g );
     }
     else {
-        cachedNoun->setFullForm( getShortDescr( ) );
-        cachedNoun->setGender( g );
+        cachedNouns[lang]->setFullForm( getShortDescr(lang) );
+        cachedNouns[lang]->setGender( g );
     }
 }
 
@@ -420,7 +459,7 @@ static bool get_value0_from_proto(const Object *obj)
     switch (obj->item_type) {
         case ITEM_WEAPON: 
             // Always grab weapon's class from the proto, unless it's a restring (e.g. cleric's mace).
-            return !obj->getRealShortDescr() && obj->getProperty("tier").empty();
+            return !obj->getRealShortDescr(LANG_DEFAULT).empty() && obj->getProperty("tier").empty();
         default:
             return false;
     }
@@ -433,7 +472,7 @@ static bool get_value1_from_proto(const Object *obj)
             // Bypass object dices and return those from proto if the weapon is not enchanted, not
             // dynamically created (ranger staff, bow, arrow, stone) and not restringed (cleric's mace).
             // TODO: deprecated?
-            return !obj->getRealShortDescr() 
+            return !obj->getRealShortDescr(LANG_DEFAULT).empty() 
                     && obj->level == obj->pIndexData->level
                     && obj->getProperty("tier").empty();
         default:
@@ -451,7 +490,7 @@ static bool get_value3_from_proto(const Object *obj)
     switch (obj->item_type) {
         case ITEM_WEAPON: 
             // Grab weapon damage type (pierce, slash) from proto unless it's a restring (e.g. cleric's mace).
-            return !obj->getRealShortDescr() && obj->getProperty("tier").empty();
+            return !obj->getRealShortDescr(LANG_DEFAULT).empty() && obj->getProperty("tier").empty();
         default:
             return false;
     }
@@ -525,32 +564,32 @@ list<Object *> Object::getItems()
     return items;
 }
 
-
-const char * Object::getRealName( ) const
+const DLString & Object::getRealKeyword( lang_t lang ) const
 {
-    return keyword.get(LANG_DEFAULT).c_str();
-}
-const char * Object::getRealShortDescr( ) const
-{
-    return short_descr.get(LANG_DEFAULT).c_str();
-}
-const char * Object::getRealDescription( ) const
-{
-    return description.get(LANG_DEFAULT).c_str();
+    return keyword.get(lang);
 }
 
-const char * Object::getName( ) const
+const DLString & Object::getRealShortDescr( lang_t lang ) const
 {
-    const DLString &myname = keyword.get(LANG_DEFAULT);
-    return myname.empty() ? pIndexData->keyword.get(LANG_DEFAULT).c_str() : myname.c_str();
+    return short_descr.get(lang);
 }
-const char * Object::getShortDescr( ) const
+
+const DLString & Object::getRealDescription( lang_t lang ) const
 {
-    const DLString &myshort = short_descr.get(LANG_DEFAULT);
-    return myshort.empty() ? pIndexData->short_descr.get(LANG_DEFAULT).c_str() : myshort.c_str();
+    return description.get(lang);
 }
-const char * Object::getDescription( ) const
+
+const DLString & Object::getKeyword( lang_t lang ) const
 {
-    const DLString &mydesc = description.get(LANG_DEFAULT);
-    return mydesc.empty() ? pIndexData->description.get(LANG_DEFAULT).c_str() : mydesc.c_str();
+    return String::firstNonEmpty(keyword, pIndexData->keyword, lang);
+}
+
+const DLString & Object::getShortDescr( lang_t lang ) const
+{
+    return String::firstNonEmpty(short_descr, pIndexData->short_descr, lang);
+}
+
+const DLString & Object::getDescription( lang_t lang ) const
+{
+    return String::firstNonEmpty(description, pIndexData->description, lang);
 }

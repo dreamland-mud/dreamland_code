@@ -239,7 +239,6 @@ mob_index_data::mob_index_data( )
     group = 0;
     count = 0;
     killed = 0;
-    player_name = str_dup("no name");
     act = ACT_IS_NPC;
     affected_by = 0;
     detection = 0;
@@ -359,7 +358,7 @@ reset_data::reset_data()
 ExtraDescription * ExtraDescrList::find(const DLString &kw) const
 {
     for (const auto &ed: *this) {
-        if (ed->keyword.matchesStrict(kw))
+        if (kw == ed->keyword)
             return ed;
     }
 
@@ -369,7 +368,7 @@ ExtraDescription * ExtraDescrList::find(const DLString &kw) const
 ExtraDescription * ExtraDescrList::findUnstrict(const DLString &kw) const
 {
     for (const auto &ed: *this) {
-        if (ed->keyword.matchesUnstrict(kw))
+        if (is_name(kw.c_str(), ed->keyword.c_str()))
             return ed;
     }
 

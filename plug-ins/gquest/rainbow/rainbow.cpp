@@ -256,7 +256,7 @@ void RainbowGQuest::progress( std::ostringstream &ostr ) const
         
         if (cnt > 0) {
             ostr << fmt(0, "%s%-15s %s%-4d%s",
-                         GQChannel::NORMAL, ch->getName( ).c_str( ),         
+                         GQChannel::NORMAL, ch->getNameP('1').c_str( ),         
                          GQChannel::BOLD, cnt, GQChannel::NORMAL)
                  << endl;
         }

@@ -126,7 +126,7 @@ void OLCStateHelp::show( PCharacter *ch ) const
     DLString entext = text.get(EN);
     DLString uatext = text.get(UA);
     DLString rutext = text.get(RU);
-    ptc(ch, "{WТекст, EN{x: %s{W...{x\r\n%s\r\n", web_edit_button(ch, "entext", "web").c_str(), String::truncate(entext, 200).c_str());
+    ptc(ch, "{WТекст, EN{x: %s{W...{x\r\n%s\r\n", web_edit_button(ch, "text", "web").c_str(), String::truncate(entext, 200).c_str());
     ptc(ch, "{WТекст, UA{x: %s{W...{x\r\n%s\r\n", web_edit_button(ch, "uatext", "web").c_str(), String::truncate(uatext, 200).c_str());
     ptc(ch, "{WТекст, RU{x: %s{W...{x\r\n%s\r\n", web_edit_button(ch, "rutext", "web").c_str(), String::truncate(rutext, 200).c_str());
 

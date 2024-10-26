@@ -119,21 +119,19 @@ NMI_GET( ObjectWrapper, vnum , "номер прототипа предмета �
 NMI_GET( ObjectWrapper, short_descr , "описание, видимое в инвентаре и при манипуляциях")
 {
     checkTarget( );
-    return Register( target->getShortDescr( ) );
+    return Register( target->getShortDescr(LANG_DEFAULT) );
 }
 
 NMI_SET( ObjectWrapper, short_descr , "описание, видимое в инвентаре и при манипуляциях")
 {
-    DLString d = arg.toString( );
-    
     checkTarget( );
-    target->setShortDescr( d.c_str( ) );
+    target->setShortDescr(arg.toString(), LANG_DEFAULT );
 }
 
 NMI_GET( ObjectWrapper, real_short_descr , "описание без учета restring-а")
 {
     checkTarget( );
-    return Register( target->getRealShortDescr( ) );
+    return Register( target->getRealShortDescr(LANG_DEFAULT) );
 }
 
 NMI_GET( ObjectWrapper, gender , "грамматический род и число (n, m, f, p или null)")
@@ -156,7 +154,7 @@ NMI_SET( ObjectWrapper, gender , "грамматический род и чис�
     }
 
     target->gram_gender = mg;
-    target->updateCachedNoun();
+    target->updateCachedNouns();
 }
 
 NMI_GET( ObjectWrapper, special, "обладает ли прототип предмета сложным поведением (через феню или код)")
@@ -168,15 +166,13 @@ NMI_GET( ObjectWrapper, special, "обладает ли прототип пре�
 NMI_GET( ObjectWrapper, description , "описание, видимое на земле")
 {
     checkTarget( );
-    return Register( target->getDescription( ) );
+    return Register( target->getDescription(LANG_DEFAULT) );
 }
 
 NMI_SET( ObjectWrapper, description , "описание, видимое на земле")
 {
-    DLString d = arg.toString( );
-
     checkTarget( );
-    target->setDescription( d.c_str( ) );
+    target->setDescription( arg.toString(), LANG_DEFAULT );
 }
 
 NMI_GET( ObjectWrapper, material, "материалы (.Material), из которых сделан предмет")
@@ -210,15 +206,13 @@ NMI_SET( ObjectWrapper, weight, "вес предмета")
 NMI_GET( ObjectWrapper, name , "имена предмета, на которые он откликается")
 {
     checkTarget( );
-    return Register( target->getName( ) );
+    return Register( target->getKeyword().toString() );
 }
 
 NMI_SET( ObjectWrapper, name , "имена предмета, на которые он откликается")
 {
-    DLString d = arg.toString( );
-
     checkTarget( );
-    target->setName( d.c_str() );
+    target->setKeyword( arg.toString() );
 }
 
 NMI_GET( ObjectWrapper, pocket, "название кармана, в котором лежит предмет, или пустая строка")
@@ -596,60 +590,31 @@ NMI_INVOKE( ObjectWrapper, extract , "(): полностью уничтожит�
 
 NMI_INVOKE( ObjectWrapper, get_extra_descr , "(key): найти экстра-описание с ключевым словом key")
 {
-    char *desc;
-    
     checkTarget();
     
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
 
 
-    DLString d = args.front().toString( );
-    desc = ::get_extra_descr(d.c_str( ), target->pIndexData->extra_descr);
-    if (desc != 0)
-        return desc;
+    DLString key = args.front().toString( );
+    ExtraDescription *ed = target->pIndexData->extraDescriptions.findUnstrict(key);
+    if (ed)
+        return ed->description.get(LANG_DEFAULT);
 
-    return ::get_extra_descr(d.c_str( ), target->extra_descr);
+    ed = target->extraDescriptions.findUnstrict(key);
+    if (ed)
+        return ed->description.get(LANG_DEFAULT);
+
+    return Register();
 }
 
 NMI_INVOKE( ObjectWrapper, set_extra_descr , "(key, text): установить экстра-описание text по ключевому слову key")
 {
     checkTarget();
+    DLString keyword = argnum2string(args, 1);
+    DLString description = argnum2string(args, 2);
 
-    RegisterList::const_iterator i = args.begin();
-
-    if(i == args.end())
-        throw Scripting::NotEnoughArgumentsException( );
-
-    DLString name = i->toString();
-
-    i++;
-    
-    if(i == args.end())
-        throw Scripting::NotEnoughArgumentsException( );
-
-    DLString text;
-    
-    if(i->type == Register::STRING)
-        text = i->toString();
-
-    EXTRA_DESCR_DATA **ed, *ned;
-    
-    for(ed = &target->extra_descr; *ed; )
-        if(!str_cmp((*ed)->keyword, name.c_str())) {
-            EXTRA_DESCR_DATA *n = (*ed)->next;
-            
-            free_extra_descr(*ed);
-            *ed = n;
-        } else
-            ed = &(*ed)->next;
-    
-    ned = new_extra_descr();
-    ned->next = target->extra_descr;
-    ned->keyword = str_dup(name.c_str());
-    ned->description = str_dup(text.c_str());
-    target->extra_descr = ned;
-    
+    target->addExtraDescr(keyword, description, LANG_DEFAULT);    
     return Register( );
 }
 

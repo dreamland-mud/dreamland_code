@@ -807,7 +807,6 @@ void Gangsters::populateLair( )
 bool Gangsters::isPoliceman( Character *ch ) 
 {
     NPCharacter *mob;
-    char *name;
     
     if (!ch->is_npc( ))
         return false;
@@ -819,14 +818,10 @@ bool Gangsters::isPoliceman( Character *ch )
          mob->spec_fun.name == "spec_patrolman")
         return true;
     
-    name = mob->pIndexData->player_name;
-
-    if (is_name("guard", name) || is_name("guardian", name) ||
-        is_name("shiriff", name) || is_name("bodyguard", name) ||
-        is_name("cityguard", name) || is_name("стражник", name)  ||
-        is_name("шериф", name)  || is_name("охранник", name)  ||
-        is_name("телохранитель", name))
-        return true;
+    list<const char *> guardNames {"guard", "guardian", "shiriff", "bodyguard", "cityguard", "стражник", "охранник", "шериф", "телохранитель"};
+    for (auto &name: guardNames)
+        if (mob->pIndexData->keyword.matchesUnstrict(name))
+            return true;
 
     return false;
 }

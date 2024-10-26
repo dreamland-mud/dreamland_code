@@ -35,6 +35,7 @@ public:
 private:
     virtual void statePrompt( Descriptor * );
 
+    RoomIndexData *getOriginal();
     void default_door_names(PCharacter *, int);
     static void create_exit(RoomIndexData *sourceIndex, int door, RoomIndexData *destIndex);
     static void delete_exit(RoomIndexData *pRoom, int door);

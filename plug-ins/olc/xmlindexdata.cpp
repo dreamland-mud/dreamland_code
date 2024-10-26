@@ -49,7 +49,7 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
     count            = mob.count;
     dam_type         = mob.dam_type;
     default_pos      = mob.default_pos;
-    description      = str_dup(mob.description);
+    description      = mob.description;
     detection        = mob.detection;
     form             = mob.form;
     group            = mob.group;
@@ -57,11 +57,11 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
     imm_flags        = mob.imm_flags;
     killed           = mob.killed;
     level            = mob.level;
-    long_descr       = str_dup(mob.long_descr);
+    long_descr       = mob.long_descr;
     material         = str_dup(mob.material);
     off_flags        = mob.off_flags;
     parts            = mob.parts;
-    player_name      = str_dup(mob.player_name);
+    keyword          = mob.keyword;
     practicer        = mob.practicer;
     religion         = mob.religion;
     affects          = mob.affects;
@@ -69,7 +69,7 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
     res_flags        = mob.res_flags;
     sex              = mob.sex;
     gram_number      = mob.gram_number;
-    short_descr      = str_dup(mob.short_descr);
+    short_descr      = mob.short_descr;
     size             = mob.size;
     spec_fun         = mob.spec_fun;
     start_pos        = mob.start_pos;
@@ -92,10 +92,6 @@ XMLMobIndexData::~XMLMobIndexData()
 void
 XMLMobIndexData::clear()
 {
-    free_string(player_name);
-    free_string(short_descr);
-    free_string(long_descr);
-    free_string(description);
     free_string(material);
     free_string(race);
 }
@@ -133,9 +129,9 @@ XMLObjIndexData::XMLObjIndexData()
 
 XMLObjIndexData::XMLObjIndexData(const obj_index_data &original)
 {
-    name         = str_dup(original.name);
-    short_descr  = str_dup(original.short_descr);
-    description  = str_dup(original.description);
+    keyword = original.keyword;
+    short_descr = original.short_descr;
+    description = original.description;
     vnum         = original.vnum;
     reset_num    = original.reset_num;
     material     = str_dup(original.material);
@@ -165,18 +161,9 @@ XMLObjIndexData::~XMLObjIndexData()
 void
 XMLObjIndexData::clear()
 {
-    EXTRA_DESCR_DATA *pExtra, *pExtraNext;
-
-    free_string(name);
-    free_string(short_descr);
-    free_string(description);
-
     affected.deallocate();
 
-    for (pExtra = extra_descr; pExtra; pExtra = pExtraNext) {
-        pExtraNext = pExtra->next;
-        free_extra_descr(pExtra);
-    }
+    extraDescriptions.deallocate();
 }
 
 void

@@ -2,11 +2,13 @@
 #define STRING_UTILS_H
 
 #include "dlstring.h"
+#include "lang.h"
+
+class XMLMultiString;
 
 namespace String {
     /** Caseless comparison of two strings. */
     bool equalLess(const DLString &a, const DLString &b);
-
 
     /** Truncates the string to give size. */
     DLString &truncate(DLString &str, size_t size);
@@ -24,6 +26,24 @@ namespace String {
 
     /** True if arg is empty ignoring colours. */
     bool isEmpty(const char *arg);
+
+    /** Returns first non-empty string for given language. */
+    const DLString & firstNonEmpty(const XMLMultiString &a, const XMLMultiString &b, lang_t lang);
+
+    /** Adds new line to the existing text and return result. */
+    DLString addLine(const DLString &text, const DLString &line);
+
+    /** Remove last line from the text. */
+    DLString delLine(const DLString &text);
+
+    /** Shorthand to see if this substring contained within the string. */
+    bool contains(const DLString &bigString, const DLString &smallString);
+
+    /** Split string into lines. */
+    std::list<DLString> toLines(const DLString &text);
+
+    /** Combine string from lines. */
+    DLString fromLines(const std::list<DLString> &lines);
 }
 
 #endif

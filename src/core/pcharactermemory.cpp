@@ -30,7 +30,7 @@ const DLString& PCharacterMemory::getName( ) const
         return name.getValue( );
 }
 
-DLString PCharacterMemory::getNameP(char gram_case) const
+const DLString &PCharacterMemory::getNameP(char gram_case) const
 {
     if (russianName.getFullForm().empty())
         return name;
@@ -82,9 +82,9 @@ void PCharacterMemory::setDescription( const DLString& d, lang_t lang )
     description[lang] = d;
 }
 
-const char * PCharacterMemory::getDescription( lang_t lang ) const
+const DLString & PCharacterMemory::getDescription( lang_t lang ) const
 {
-    return description.get(lang).c_str( );
+    return description.get(lang);
 }
 
 const XMLMultiString & PCharacterMemory::getDescription( ) const

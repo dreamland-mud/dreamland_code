@@ -106,14 +106,14 @@ void DefaultClan::makeMonument( Character *ch, Character *killer ) const
     obj->timer = 24 * 24 * 2; // 48 real life hour
     
     obj->setDescription( 
-            fmt( NULL, monument.getValue( ).c_str( ), ch, killer ).c_str( ) );
+            fmt( NULL, monument.getValue( ).c_str( ), ch, killer ), LANG_DEFAULT );
 
-    DLString nameFormat = monumentName + " " + obj->getName();
+    DLString nameFormat = monumentName + " " + obj->getKeyword().toString();
     DLString monumentName = fmt(0, nameFormat.c_str(), ch->getNameC(), killer->getNameC());
-    obj->setName(monumentName.c_str());
+    obj->setKeyword(monumentName.c_str(), LANG_DEFAULT);
 
-    DLString monumentDescr = fmt(0, obj->getShortDescr( ), ch->getNameP( '3' ).c_str( ), killer->getNameP( '2').c_str( ) );
-    obj->setShortDescr(monumentDescr);
+    DLString monumentDescr = fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), ch->getNameP( '3' ).c_str( ), killer->getNameP( '2').c_str( ) );
+    obj->setShortDescr(monumentDescr, LANG_DEFAULT);
             
     obj_to_room( obj, ch->in_room );
 }

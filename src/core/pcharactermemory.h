@@ -20,7 +20,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlinflectedstring.h"
 #include "nounholder.h"
-
+#include "xmlmultistring.h"
 #include "xmlattributes.h"
 #include "pcmemoryinterface.h"
 #include "remortdata.h"
@@ -48,7 +48,7 @@ public:
     
     // CharacterMemoryInterface
     virtual const DLString& getName( ) const ;
-    virtual DLString getNameP(char gram_case) const;
+    virtual const DLString &getNameP(char gram_case) const;
     virtual const char * getNameC( ) const;
     virtual void setName( const DLString& name ) ;
 
@@ -90,7 +90,7 @@ public:
     virtual void setLastAccessHost( const DLString& lastAccessHost ) ;
 
     virtual void setDescription( const DLString&, lang_t lang );
-    virtual const char * getDescription( lang_t lang ) const;
+    virtual const DLString & getDescription( lang_t lang ) const;
     virtual const XMLMultiString & getDescription( ) const;
     virtual void setDescription( const XMLMultiString & ); 
 

@@ -61,7 +61,7 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
                     if (pMob && pReset->rand == RAND_NONE) {
                         // Return success
                         pArea = pRoom->areaIndex;
-                        where = russian_case(pMob->short_descr, '1');
+                        where = russian_case(pMob->short_descr[RU], '1');
                         return true;
                     }
                 }
@@ -70,7 +70,7 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
                 if (pReset->arg1 == vnum && pReset->rand == RAND_NONE) { 
                     // Object is on the floor, return success.
                     pArea = pRoom->areaIndex;
-                    where = pRoom->name;
+                    where = pRoom->name[RU];
                     return true;
                 }
                 break; 
@@ -81,7 +81,7 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
                     if (in && pReset->rand == RAND_NONE) {
                         // Return success.
                         pArea = pRoom->areaIndex;
-                        where = pRoom->name;
+                        where = pRoom->name[RU];
                         return true;
                     }
                 }
@@ -102,7 +102,7 @@ static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLStrin
             case 'M':
                 if (pReset->arg1 == pMob->vnum) {
                     pArea = pRoom->areaIndex;
-                    where = pRoom->name;
+                    where = pRoom->name[RU];
                     return true;
                 }
             }
@@ -236,7 +236,7 @@ public:
 
             Json::Value pet;
             pet["vnum"] = pMob->vnum;
-            pet["name"] = russian_case(pMob->short_descr, '1').colourStrip();
+            pet["name"] = russian_case(pMob->short_descr[RU], '1').colourStrip();
             pet["level"] = (type == "LevelAdaptivePet" || type == "Rat" ? -1 : pMob->level);
             pet["act"] = act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_SAGE|ACT_NOWHERE));
             pet["aff"] = affect_flags.names(REMOVE_BIT(pMob->affected_by, AFF_INFRARED));
@@ -294,7 +294,7 @@ public:
             DLString itemtype = item_table.message( pObj->item_type );
             
             // Format object name.
-            DLString name = russian_case(pObj->short_descr, '1').toLower( );
+            DLString name = russian_case(pObj->short_descr[RU], '1').toLower( );
             csv_escape( name );
         
             // Find all bonuses.
@@ -459,7 +459,7 @@ public:
             int ave = weapon_ave(pObj);
             
             // Format object name.
-            DLString name = russian_case(pObj->short_descr, '1').toLower( );
+            DLString name = russian_case(pObj->short_descr[RU], '1').toLower( );
             csv_escape( name );
         
             // Find all bonuses.
@@ -630,7 +630,7 @@ public:
             }
 
             // Format object name.
-            DLString name = russian_case(pObj->short_descr, '1').toLower( );
+            DLString name = russian_case(pObj->short_descr[RU], '1').toLower( );
             csv_escape( name );
 
             // Find item resets and ignore items without resets and from clan areas.
@@ -771,7 +771,7 @@ CMDRUNP(searcher)
                                     pObj->level, 
                                     p.itemtype.c_str(),
                                     p.wear.substr(0, 10).c_str(),
-                                    russian_case(pObj->short_descr, '1').c_str(),
+                                    russian_case(pObj->short_descr[RU], '1').c_str(),
                                     anti.join("").c_str(),
                                     aff.c_str(),
                                     (p.hr != 0 ? "C": "w"), p.hr, 
@@ -851,7 +851,7 @@ CMDRUNP(searcher)
                                     pObj->vnum,
                                     pObj->level, 
                                     p.wclass.c_str(),
-                                    russian_case(pObj->short_descr, '1').c_str(),
+                                    russian_case(pObj->short_descr[RU], '1').c_str(),
                                     p.d1, p.d2, p.ave, 
                                     p.damage.c_str(),
                                     (p.hr != 0 ? "C": "w"), p.hr, 
@@ -934,7 +934,7 @@ CMDRUNP(searcher)
                                     pObj->vnum,
                                     pObj->level, 
                                     p.itemtype.c_str(),
-                                    russian_case(pObj->short_descr, '1').c_str(),
+                                    russian_case(pObj->short_descr[RU], '1').c_str(),
                                     p.power, p.charges, p.spells.c_str());
 
                     DLString where;
@@ -996,8 +996,8 @@ CMDRUNP(searcher)
                     continue;
 
                 if (searcher_parse(pMob, args.c_str())) {
-                    DLString name = russian_case(pMob->short_descr, '1');
-                    if (String::isEmpty(pMob->description))
+                    DLString name = russian_case(pMob->short_descr[RU], '1');
+                    if (pMob->description[RU].empty())
                         name = "{R*{x" + name;
 
                     DLString line = 

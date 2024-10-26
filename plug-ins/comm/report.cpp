@@ -274,7 +274,7 @@ CMDRUNP(report)
     if (shown) {
 
         if (!showAll) {
-            DLString petName = Syntax::noun(pet->getShortDescr());
+            DLString petName = Syntax::noun(pet->getShortDescr(LANG_DEFAULT));
             result << fmt(0, "Напиши {y{hcприказать %1$N3 рапорт все{x, и я расскажу, что ещё я умею делать.", 
                              petName.c_str())
                    << endl;

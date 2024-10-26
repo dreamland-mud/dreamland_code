@@ -14,8 +14,9 @@
 #define PCMEMORYINTERFACE_H
 
 #include "dlobject.h"
-#include "xmlmultistring.h"
+#include "lang.h"
 
+class XMLMultiString;
 class DLString;
 class InflectedString;
 class Date;
@@ -35,10 +36,8 @@ class PCMemoryInterface;
 
 class CharacterMemoryInterface : public virtual DLObject {
 public:
-    virtual const DLString& getName( ) const  = 0;
-    virtual DLString getNameP(char gram_case) const  = 0;
+    virtual const DLString & getNameP(char gram_case) const  = 0;
     virtual const char * getNameC( ) const = 0;
-    virtual void setName( const DLString& )  = 0;
 
     virtual short getLevel( ) const  = 0;
     virtual void setLevel( short )  = 0;
@@ -66,7 +65,7 @@ public:
 
     virtual int get_trust( ) const = 0;
 
-    virtual const char * getDescription( lang_t lang ) const  = 0;
+    virtual const DLString & getDescription( lang_t lang ) const  = 0;
     virtual void setDescription( const DLString&, lang_t lang )  = 0; 
     virtual const XMLMultiString & getDescription( ) const  = 0;
     virtual void setDescription( const XMLMultiString & )  = 0; 
@@ -81,6 +80,9 @@ public:
  */
 class PCMemoryInterface : public virtual CharacterMemoryInterface {
 public:
+    virtual const DLString& getName( ) const  = 0;
+    virtual void setName( const DLString& )  = 0;
+
     virtual const DLString& getPassword( ) const  = 0;
     virtual void setPassword( const DLString& )  = 0;
 

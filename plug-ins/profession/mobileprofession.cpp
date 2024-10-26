@@ -124,6 +124,6 @@ GlobalBitvector MobileProfession::toVector( CharacterMemoryInterface *mem ) cons
 void MobileProfession::checkTarget( CharacterMemoryInterface *ch ) const 
 {
     if (ch->getPCM())
-        throw Exception( ch->getName( ) + " has mobile profession!" );
+        throw Exception( ch->getPCM()->getName( ) + " has mobile profession!" );
 }
 

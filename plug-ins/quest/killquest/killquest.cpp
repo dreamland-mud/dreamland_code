@@ -61,7 +61,7 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
     pRoom = victim->in_room;
     roomName.setValue( pRoom->getName() );
     areaName.setValue( pRoom->areaName() );
-    mobName.setValue( victim->getShortDescr( ) );
+    mobName.setValue( victim->getShortDescr(LANG_DEFAULT) );
 
     wiznet( "", "%s [%d] Lev %d, Qmode %d",
                  victim->getNameP('1').c_str( ),

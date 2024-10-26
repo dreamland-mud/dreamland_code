@@ -47,7 +47,7 @@ void MobileMemory::remember( Character *wch )
     if (wch->is_npc( ))
         return;
 
-    (*this)[wch->getName( )] = dreamland->getCurrentTime( );
+    (*this)[wch->getPC()->getName( )] = dreamland->getCurrentTime( );
 }
 
 bool MobileMemory::forget( Character *wch )
@@ -57,7 +57,7 @@ bool MobileMemory::forget( Character *wch )
     if (wch->is_npc( ))
         return false;
 
-    if (( i = find( wch->getName( ) )) != end( )) {
+    if (( i = find( wch->getPC()->getName( ) )) != end( )) {
         erase( i );
         return true;
     }
@@ -70,7 +70,7 @@ bool MobileMemory::memorized( Character *wch )
     if (wch->is_npc( ))
         return false;
     else
-        return find( wch->getName( ) ) != end( );
+        return find( wch->getPC()->getName( ) ) != end( );
 }
 
 void MobileMemory::poll( int diff )
@@ -159,7 +159,7 @@ void BasicMobileBehavior::clearLastFought( )
 
 bool BasicMobileBehavior::isLastFought( Character *wch )
 {
-    return !wch->is_npc( ) && wch->getName( ) == lastFought.getValue( );
+    return !wch->is_npc( ) && wch->getPC()->getName( ) == lastFought.getValue( );
 }
 
 void BasicMobileBehavior::rememberFought(Character *victim)
@@ -171,7 +171,7 @@ void BasicMobileBehavior::setLastFought( Character *wch )
 {
     if (!wch->is_npc( )) {
         ch->last_fought = wch;        
-        lastFought = wch->getName( );
+        lastFought = wch->getPC()->getName( );
         lostTrack = false;
         
         if (!IS_SET(ch->act, ACT_NOTRACK)) {

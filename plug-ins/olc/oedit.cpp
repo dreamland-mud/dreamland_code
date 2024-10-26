@@ -109,25 +109,16 @@ void OLCStateObject::copyParameters( OBJ_INDEX_DATA *original )
 
 void OLCStateObject::copyDescriptions( OBJ_INDEX_DATA *original )
 {
-    EXTRA_DESCR_DATA *ed, **my_ed = &obj.extra_descr;
-    list<EXTRA_DESCR_DATA *> edlist;
-
-    for(ed = original->extra_descr; ed; ed = ed->next)
-        edlist.push_back(ed);
-   
-    while(!edlist.empty()) {
-        ed = edlist.back();
-        edlist.pop_back();
-        *my_ed = new_extra_descr();
-        (*my_ed)->keyword = str_dup(ed->keyword);
-        (*my_ed)->description = str_dup(ed->description);
-        my_ed = &(*my_ed)->next;
+    for (auto &ed: original->extraDescriptions) {
+        ExtraDescription *myed = new ExtraDescription();
+        myed->keyword = ed->keyword;
+        myed->description = ed->description;
+        obj.extraDescriptions.push_back(myed);
     }
-    *my_ed = 0;
 
-    obj.name         = str_dup(original->name);
-    obj.short_descr  = str_dup(original->short_descr);
-    obj.description  = str_dup(original->description);
+    obj.keyword      = original->keyword;
+    obj.short_descr  = original->short_descr;
+    obj.description  = original->description;
     obj.smell        = original->smell;
     obj.sound        = original->sound;
     obj.material     = str_dup(original->material);
@@ -154,13 +145,10 @@ void OLCStateObject::commit()
         obj_index_hash[iHash] = original;
     }
     
-    EXTRA_DESCR_DATA *ed, *ed_next;
-    for(ed = original->extra_descr; ed; ed = ed_next) {
-        ed_next = ed->next;
-        free_extra_descr(ed);
-    }
-    original->extra_descr = obj.extra_descr;
-    obj.extra_descr = 0;
+    original->extraDescriptions.deallocate();
+    for (auto &ed: obj.extraDescriptions)
+        original->extraDescriptions.push_back(ed);        
+    obj.extraDescriptions.clear();
     
     original->affected.deallocate();
     original->affected.assign(obj.affected.begin(), obj.affected.end());
@@ -198,19 +186,11 @@ void OLCStateObject::commit()
                     o->valueByIndex(i, obj.value[i]);
         }
     
-    free_string(original->name);
-    original->name         = obj.name;
-    obj.name = 0;
-    free_string(original->short_descr);
-    original->short_descr  = obj.short_descr;
-    obj.short_descr = 0;
-    free_string(original->description);
-    original->description  = obj.description;
-    obj.description = 0;
+    original->keyword = obj.keyword;
+    original->short_descr = obj.short_descr;
+    original->description = obj.description;
     original->sound        = obj.sound;
-    obj.sound.clear( );
     original->smell        = obj.smell;
-    obj.smell.clear( );
     original->vnum         = obj.vnum;
     original->reset_num    = obj.reset_num;
     free_string(original->material);
@@ -237,7 +217,7 @@ void OLCStateObject::commit()
 
     for(o = object_list; o; o = o->next)
         if(o->pIndexData == original) {
-            o->updateCachedNoun( );
+            o->updateCachedNouns( );
             eventBus->publish(ItemEditedEvent(o));
         }
     
@@ -256,58 +236,48 @@ OEDIT(show)
 
     EDIT_OBJ(ch, pObj);
 
-    ptc(ch, "Name:        [%s] %s\n\rArea:        [%5d] %s\n\r",
-              pObj->name,
-              web_edit_button(showWeb, ch, "name", "web").c_str(),
-              !pObj->area ? -1 : pObj->area->vnum,
-              !pObj->area ? "No Area" : pObj->area->getName().c_str());
-
-
-    ptc(ch, "Vnum:        [%7d]\n\r", pObj->vnum);
-
-    ptc(ch, "Type:        [%s] {D(? item_table){x\n\r",
-              item_table.name(pObj->item_type).c_str());
-
-    ptc(ch, "Level:       [%5d]\n\r", pObj->level);
-    
-    ptc(ch, "Limit:       [%5d]\n\r", pObj->limit);
-
-    ptc(ch, "Wear flags:  [%s] {D(? wear_flags){x\n\r",
-              wear_flags.names(pObj->wear_flags).c_str());
-
-    ptc(ch, "Extra flags: [%s] {D(? extra_flags){x\n\r",
-              extra_flags.names(pObj->extra_flags).c_str());
-
-    ptc(ch, "Material:    [%s] {D(? material){x\n\r", pObj->material);
-
-    ptc(ch, "Smell: [%s]\n\r", pObj->smell.c_str( ));
-
-    ptc(ch, "Sound: [%s]\n\r", pObj->sound.c_str( ));
-
-    ptc(ch, "Condition:   [%5d]\n\r", pObj->condition);
-
-    ptc(ch, "Gender:      [%1s]\n\r", pObj->gram_gender.toString());
-
-    ptc(ch, "Weight:      [%5d]\n\r", pObj->weight);
+    ptc(ch, "Vnum:     [%7d]\n\r", pObj->vnum);
+    ptc(ch, "Area:     [%5d] %s\n\r", pObj->area->vnum, pObj->area->getName().c_str());
+    ptc(ch, "Name EN:  [%s] %s\n\r", pObj->keyword[EN].c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());
+    ptc(ch, "Name UA:  [%s] %s\n\r", pObj->keyword[UA].c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());
+    ptc(ch, "Name RU:  [%s] %s\n\r", pObj->keyword[RU].c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());
+    ptc(ch, "Short EN: [%s] %s\n\r", pObj->short_descr[EN].c_str(), web_edit_button(showWeb, ch, "short", "web").c_str());
+    ptc(ch, "Short UA: [%s] %s\n\r", pObj->short_descr[UA].c_str(), web_edit_button(showWeb, ch, "uashort", "web").c_str());
+    ptc(ch, "Short RU: [%s] %s\n\r", pObj->short_descr[RU].c_str(), web_edit_button(showWeb, ch, "rushort", "web").c_str());
+    ptc(ch, "Long EN:  [%s] %s\n\r", pObj->description[EN].c_str(), web_edit_button(showWeb, ch, "long", "web").c_str());
+    ptc(ch, "Long UA:  [%s] %s\n\r", pObj->description[UA].c_str(), web_edit_button(showWeb, ch, "ualong", "web").c_str());
+    ptc(ch, "Long RU:  [%s] %s\n\r", pObj->description[RU].c_str(), web_edit_button(showWeb, ch, "rulong", "web").c_str());
+    ptc(ch, "Type:     [%s] {D(? item_table){x\n\r", item_table.name(pObj->item_type).c_str());
+    ptc(ch, "Level:    [%5d]\n\r", pObj->level);    
+    ptc(ch, "Limit:    [%5d]\n\r", pObj->limit);
+    ptc(ch, "Wear:     [%s] {D(? wear_flags){x\n\r", wear_flags.names(pObj->wear_flags).c_str());
+    ptc(ch, "Extra:    [%s] {D(? extra_flags){x\n\r", extra_flags.names(pObj->extra_flags).c_str());
+    ptc(ch, "Material: [%s] {D(? material){x\n\r", pObj->material);
+    ptc(ch, "Smell EN: [%s]\n\r", pObj->smell[EN].c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str());
+    ptc(ch, "Smell UA: [%s]\n\r", pObj->smell[UA].c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str());
+    ptc(ch, "Smell RU: [%s]\n\r", pObj->smell[RU].c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());
+    ptc(ch, "Sound EN: [%s]\n\r", pObj->sound[EN].c_str(), web_edit_button(showWeb, ch, "sound", "web").c_str());
+    ptc(ch, "Sound UA: [%s]\n\r", pObj->sound[UA].c_str(), web_edit_button(showWeb, ch, "uasound", "web").c_str());
+    ptc(ch, "Sound RU: [%s]\n\r", pObj->sound[RU].c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());
+    ptc(ch, "Condition:[%5d]\n\r", pObj->condition);
+    ptc(ch, "Gender:   [%1s]\n\r", pObj->gram_gender.toString());
+    ptc(ch, "Weight:   [%5d]\n\r", pObj->weight);
     
     if (!pObj->behaviors.isSet(bhv_random_weapon))
-        ptc(ch, "Cost:        [%5d]\n\r", pObj->cost);
+        ptc(ch, "Cost:     [%5d]\n\r", pObj->cost);
 
-    if (pObj->extra_descr) {
-        EXTRA_DESCR_DATA *ed;
+    if (!pObj->extraDescriptions.empty()) {
 
-        stc("Extra desc: ", ch);
-
-        for (ed = pObj->extra_descr; ed; ed = ed->next) {
-            ptc(ch, "[%s] %s ", ed->keyword, web_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
+        ptc(ch, "Extra desc: {D(ed help){x\n\r");
+        for (auto &ed: pObj->extraDescriptions) {
+            ptc(ch, "    EN [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
+            ptc(ch, "    UA [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "uaed web", ed->keyword).c_str());
+            ptc(ch, "    RU [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "rued web", ed->keyword).c_str());
         }
 
-        stc(" {D(ed help){x\n\r", ch);
+    } else {
+        ptc(ch, "Extra desc: (none) {D(ed help){x\r\n");
     }
-
-    ptc(ch, "Short desc:  %s %s\n\rLong desc: %s\n\r     %s\n\r",
-              pObj->short_descr, web_edit_button(showWeb, ch, "short", "web").c_str(),
-              web_edit_button(showWeb, ch, "long", "web").c_str(), pObj->description);
 
     for (auto &paf: pObj->affected) {
         if (cnt == 0) {
@@ -383,7 +353,7 @@ OEDIT(fenia)
 
 OEDIT(where)
 {
-    ptc(ch, "%s находится:\r\n", DLString( obj.short_descr ).ruscase('1').c_str( ));
+    ch->pecho("%N1 находится:", obj.getShortDescr(LANG_DEFAULT));
     
     for (Object *o = object_list; o; o = o->next) {
         Character *wch;
@@ -407,15 +377,16 @@ OEDIT(where)
                     room->getName(), 
                     room->areaName().c_str());
         else if (o->in_obj)
-            ptc(ch, "[%5d]   внутри %s в %s (%s)\r\n", 
+            ptc(ch, "[%5d]   внутри %N2 в %s (%s)\r\n", 
                     room->vnum,
-                    o->in_obj->getShortDescr('2').c_str( ),
+                    o->in_obj->getShortDescr(LANG_DEFAULT).c_str( ),
                     room->getName(),
                     room->areaName().c_str());
     }
 
     return true;
 }
+
 // Need to issue warning if flag isn't valid. -- does so now -- Hugin.
 OEDIT(addaffect)
 {
@@ -590,55 +561,77 @@ OEDIT(random)
 
 OEDIT(name)
 {
-    OBJ_INDEX_DATA *pObj;
+    return editor(argument, obj.keyword[EN], ED_NO_NEWLINE);
+}
 
-    EDIT_OBJ(ch, pObj);
+OEDIT(uaname)
+{
+    return editor(argument, obj.keyword[UA], ED_NO_NEWLINE);
+}
 
-    return editor(argument, pObj->name, ED_NO_NEWLINE);
+OEDIT(runame)
+{
+    return editor(argument, obj.keyword[RU], ED_NO_NEWLINE);
 }
 
 OEDIT(short)
 {
-    OBJ_INDEX_DATA *pObj;
+    return editor(argument, obj.short_descr[EN], ED_NO_NEWLINE);
+}
 
-    EDIT_OBJ(ch, pObj);
+OEDIT(uashort)
+{
+    return editor(argument, obj.short_descr[UA], ED_NO_NEWLINE);
+}
 
-    return editor(argument, pObj->short_descr, ED_NO_NEWLINE);
+OEDIT(rushort)
+{
+    return editor(argument, obj.short_descr[RU], ED_NO_NEWLINE);
 }
 
 OEDIT(long)
 {
-    return editor(argument, obj.description, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+    return editor(argument, obj.description[EN], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+}
+
+OEDIT(ualong)
+{
+    return editor(argument, obj.description[UA], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+}
+
+OEDIT(rulong)
+{
+    return editor(argument, obj.description[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
 }
 
 OEDIT(sound)
 {
-    if (!*argument) {
-        if(sedit(obj.sound)) {
-            stc("Sound set\n\r", ch);
-            return true;
-        } else
-            return false;
-    }
-    
-    obj.sound = argument;
-    stc("Sound set\n\r", ch);
-    return false;
+    return editor(argument, obj.sound[EN], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+}
+
+OEDIT(uasound)
+{
+    return editor(argument, obj.sound[UA], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+}
+
+OEDIT(rusound)
+{
+    return editor(argument, obj.sound[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
 }
 
 OEDIT(smell)
 {
-    if (!*argument) {
-        if(sedit(obj.smell)) {
-            stc("Smell set\n\r", ch);
-            return true;
-        } else
-            return false;
-    }
-    
-    obj.smell = argument;
-    stc("Smell set\n\r", ch);
-    return false;
+    return editor(argument, obj.smell[EN], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+}
+
+OEDIT(uasmell)
+{
+    return editor(argument, obj.smell[UA], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+}
+
+OEDIT(rusmell)
+{
+    return editor(argument, obj.smell[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
 }
 
 OEDIT(props)
@@ -724,20 +717,12 @@ OEDIT(v4)
 
 OEDIT(weight)
 {
-    OBJ_INDEX_DATA *pObj;
-
-    EDIT_OBJ(ch, pObj);
-
-    return numberEdit(0, 10000, pObj->weight);
+    return numberEdit(0, 10000, obj.weight);
 }
 
 OEDIT(cost)
 {
-    OBJ_INDEX_DATA *pObj;
-
-    EDIT_OBJ(ch, pObj);
-
-    return numberEdit(0, 1000000, pObj->cost);
+    return numberEdit(0, 1000000, obj.cost);
 }
 
 OEDIT(create)
@@ -777,26 +762,18 @@ OEDIT(create)
 
 OEDIT(ed)
 {
-    OBJ_INDEX_DATA *pObj;
-
-    EDIT_OBJ(ch, pObj);
-
-    return extraDescrEdit(pObj->extra_descr);
+    return extraDescrEdit(obj.extraDescriptions);
 }
 
 OEDIT(extra)
 {
-    OBJ_INDEX_DATA *pObj;
-    EDIT_OBJ(ch, pObj);
-    return flagBitsEdit(extra_flags, pObj->extra_flags);
+    return flagBitsEdit(extra_flags, obj.extra_flags);
 }
 
 
 OEDIT(wear)
 {
-    OBJ_INDEX_DATA *pObj;
-    EDIT_OBJ(ch, pObj);
-    return flagBitsEdit(wear_flags, pObj->wear_flags);
+    return flagBitsEdit(wear_flags, obj.wear_flags);
 }
 
 OEDIT(type)
@@ -841,36 +818,22 @@ OEDIT(material)
 
 OEDIT(level)
 {
-    OBJ_INDEX_DATA *pObj;
-
-    EDIT_OBJ(ch, pObj);
-
-    return numberEdit(0, 120, pObj->level);
+    return numberEdit(0, 120, obj.level);
 }
 
 OEDIT(limit)
 {
-    OBJ_INDEX_DATA *pObj;
-
-    EDIT_OBJ(ch, pObj);
-
-    return numberEdit(-1, 100, pObj->limit);
+    return numberEdit(-1, 100, obj.limit);
 }
 
 OEDIT(gender)
 {
-    OBJ_INDEX_DATA *pObj;
-
-    EDIT_OBJ(ch, pObj);
-
-    return genderEdit(pObj->gram_gender);
+    return genderEdit(obj.gram_gender);
 }
 
 OEDIT(condition)
 {
-    OBJ_INDEX_DATA *pObj;
-    EDIT_OBJ(ch, pObj);
-    return numberEdit(0, 100, pObj->condition); 
+    return numberEdit(0, 100, obj.condition); 
 }
 
 /*
@@ -932,10 +895,10 @@ OEDIT(copy)
         return false;
     }
     
-    ch->pecho("All %s copied from vnum %d (%s).",
+    ch->pecho("All %s copied from vnum %d (%N1).",
                 report.c_str( ),
                 original->vnum, 
-                russian_case( original->short_descr, '1' ).c_str( ) );
+                original->getShortDescr(LANG_DEFAULT));
     return true;
 }
 
@@ -948,9 +911,9 @@ OEDIT(list)
     
     EDIT_OBJ(ch, pObj);
     
-    buffer << fmt(0, "Resets for object [{W%d{x] ({g%s{x):\n\r",
+    buffer << fmt(0, "Resets for object [{W%d{x] ({g%N1{x):\n\r",
             pObj->vnum, 
-            russian_case(pObj->short_descr, '1').c_str( ));
+            pObj->getShortDescr(LANG_DEFAULT));
     
     cnt = 0;
     for (auto &r: roomIndexMap) {
@@ -1127,7 +1090,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         if (obji) {
             pArea->changed = true;
             SET_BIT(obji->extra_flags, ITEM_DELETED);
-            ptc(ch, "[%u] (%s) помечен к удалению.\n\r", obji->vnum, russian_case(obji->short_descr, '1').c_str());
+            ptc(ch, "[%u] (%N1) помечен к удалению.\n\r", obji->vnum, obji->getShortDescr(LANG_DEFAULT));
         }
         else
             ptc(ch, "Предмет %d не найден.\n\r", value);

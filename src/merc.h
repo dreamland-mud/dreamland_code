@@ -201,7 +201,6 @@ typedef struct  auction_data            AUCTION_DATA;
 #define        PK_THIEF                (E)
 
 #define PK_MIN_LEVEL 5
-#define        MAX_OBJ_LOOT_KILLER        3
 
 #define        GHOST_TIME                3  * PULSE_MOBILE
 
@@ -229,9 +228,6 @@ typedef struct  auction_data            AUCTION_DATA;
 #define FIGHT_DELAY_TIME           20 // в секундах!
 /*---------------------------------------------------------------------------*/
 
-
-
-#undef ANATOLIA_MACHINE
 
 #define PULSE_MOBILE                  (dreamland->getPulseMobile( ))
 #define PULSE_TICK                  (dreamland->getPulseTick( ))
@@ -349,7 +345,6 @@ struct        mob_index_data
 
     // Replace player_name with multi-lang keywords.
     XMLMultiString keyword;
-    char *                player_name;
 
     XMLMultiString   short_descr;
     XMLMultiString   long_descr;
@@ -406,8 +401,8 @@ struct        mob_index_data
  * Extra description data for a room or object.
  */
 struct ExtraDescription {
-    // Keyword in look/examine
-    XMLMultiString keyword; 
+    // Keyword in look/examine, contains keywords in all languages.
+    DLString keyword; 
 
     // What to see
     XMLMultiString description; 

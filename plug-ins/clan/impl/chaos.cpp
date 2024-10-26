@@ -423,12 +423,13 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 
                 mch = create_mobile( get_mob_index(MOB_VNUM_MIRROR_IMAGE) );
                 SET_BIT(mch->affected_by ,AFF_SNEAK);
-                mch->setShortDescr( short_buf );
-                mch->setLongDescr( long_buf );
+                // TODO copy all descriptions
+                mch->setShortDescr( short_buf, LANG_DEFAULT );
+                mch->setLongDescr( long_buf, LANG_DEFAULT );
                 mch->setDescription( tmp_vict->getDescription( ) );
                 
                 DLString name( tmp_vict->getNameC() );
-                mch->setName( name );
+                mch->setKeyword( name, LANG_DEFAULT );
                 
                 mch->setSex( tmp_vict->getSex( ) );
 

@@ -47,7 +47,7 @@ bool QuestEntity::ourHero( Character *ch ) const
 {
     return ch != NULL
            && !ch->is_npc( ) 
-           && heroName == ch->getName( );
+           && heroName == ch->getPC()->getName( );
 }
 
 bool QuestEntity::ourHeroGroup( Character *ch ) const

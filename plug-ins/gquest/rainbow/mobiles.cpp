@@ -74,7 +74,7 @@ bool RainbowMob::specIdle( )
     if (!wch)
         return false;
      
-    log("RainbowMob: [" << number << "] to " << wch->getName( ));
+    log("RainbowMob: [" << number << "] to " << wch->getNameC( ));
     gq->getScenario( )->onGivePiece( wch->getPC( ), ch );
     
     obj = gq->createPiece( number ); 
@@ -104,7 +104,7 @@ bool RainbowMob::death( Character *killer )
     
     if (killer) {
         wch = gq->getActor( killer );
-        log("RainbowMob: [" << number << "] killed by " << wch->getName( ));
+        log("RainbowMob: [" << number << "] killed by " << wch->getNameC( ));
         
         if (!wch->is_npc( )) {
             wch->getPC( )->getAttributes( ).getAttr<XMLEmptyAttribute>( gq->getQuestID( ) );

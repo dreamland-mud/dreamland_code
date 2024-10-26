@@ -4,6 +4,7 @@
  */
 #include "grammar_entities_impl.h"
 #include "pronouns.h"
+#include "logstream.h"
 
 using namespace Grammar;
 
@@ -21,7 +22,7 @@ PersonalPronoun::~PersonalPronoun()
 {
 }
 
-DLString PersonalPronoun::decline(const Noun &who, const Person &p, const Case &c) const 
+const DLString& PersonalPronoun::decline(const Noun &who, const Person &p, const Case &c) const 
 {
     return persons [Person(who.getMultiGender(), p)] [c];
 }
@@ -36,7 +37,7 @@ PosessivePronoun::~PosessivePronoun()
 {
 }
 
-DLString PosessivePronoun::decline(const Noun &item, const Noun &owner, const Person &p, const Case &c) const 
+const DLString& PosessivePronoun::decline(const Noun &item, const Noun &owner, const Person &p, const Case &c) const 
 {
     return posessions
             [item.getMultiGender()]
@@ -53,7 +54,7 @@ IndefinitePronoun::~IndefinitePronoun()
 {
 }
     
-DLString IndefinitePronoun::decline(const Case &c, const Animacy &a) const
+const DLString& IndefinitePronoun::decline(const Case &c, const Animacy &a) const
 {
     return acases[a][c];
 }
@@ -73,7 +74,7 @@ Number IndefiniteNoun::getNumber() const
     return Number::SINGULAR;
 }
 
-DLString IndefiniteNoun::decline(const Case &c) const
+const DLString& IndefiniteNoun::decline(const Case &c) const
 {
     return ipron.decline(c, a);
 }

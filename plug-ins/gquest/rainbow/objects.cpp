@@ -29,11 +29,11 @@ void RainbowPiece::get( Character *ch )
     if (ch->is_npc( ))
         return;
     
-    log("RainbowPiece: [" << number << "] by " << ch->getName( ));
+    log("RainbowPiece: [" << number << "] by " << ch->getNameC( ));
 
     if (gq->countPieces( ch ) == gq->getScenario( )->getPiecesCount( )) {
         gq->getScenario( )->onQuestFinish( ch->getPC( ) );
-        gq->winnerName = ch->getName( );
+        gq->winnerName = ch->getNameC( );
         gq->state = RainbowGQuest::ST_FINISHED;
         gq->scheduleDestroy( );
     }

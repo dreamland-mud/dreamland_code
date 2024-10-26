@@ -19,7 +19,6 @@
 #include "corder.h"
 #include "configs.h"
 #include "run.h"
-#include "whois.h"
 #include "writing.h"
 #include "eating.h"
 #include "so.h"
@@ -36,7 +35,6 @@ extern "C"
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSpeedWalk> >( ppl );
 
                 Plugin::registerPlugin<COrder>( ppl );
-                Plugin::registerPlugin<Whois>( ppl );
                 Plugin::registerPlugin<CWrite>( ppl );
                 
                 Plugin::registerPlugin<CEat>( ppl );

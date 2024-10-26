@@ -185,8 +185,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
             "[v4] Коэф. снижения веса: [%d]\n\r",
             obj->value[0],
             container_flags.names(obj->value[1]).c_str(),
-            (obj->value[2] > 0 && get_obj_index(obj->value[2])) ? get_obj_index(obj->value[2])->short_descr
-            : "none",
+            (obj->value[2] > 0 && get_obj_index(obj->value[2])) ? get_obj_index(obj->value[2])->getShortDescr(LANG_DEFAULT) : "none",
             obj->value[2],
             obj->value[3],
             obj->value[4]);

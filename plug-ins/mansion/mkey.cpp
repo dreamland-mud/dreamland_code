@@ -182,14 +182,14 @@ void MKey::doShow( Character *ch, DLString &arguments )
         OBJ_INDEX_DATA *pKeyIndex = get_obj_index( vnum );
 
         if (!pKeyIndex) {
-            LogStream::sendError( ) << "Wrong key vnum " << vnum << " for character " << ch->getName( ) << endl;
+            LogStream::sendError( ) << "Wrong key vnum " << vnum << " for character " << ch->getNameC( ) << endl;
             continue;
         }
         
-        ch->pecho( "[%-4d] %-25s [%s]", 
+        ch->pecho( "[%-4d] %-25N1 [%s]", 
                     vnum, 
-                    russian_case( pKeyIndex->short_descr, '1' ).c_str( ),
-                    pKeyIndex->name );
+                    pKeyIndex->getShortDescr(LANG_DEFAULT),
+                    pKeyIndex->keyword.toString().c_str() );
     }
 }
 
@@ -235,10 +235,10 @@ void MansionKeyMaker::toStream( Character *client, ostringstream &buf )
         OBJ_INDEX_DATA *pKeyIndex = get_obj_index( vnum );
 
         if (!pKeyIndex) 
-            LogStream::sendError( ) << "Wrong key vnum " << vnum << " for character " << client->getName( ) << endl;
+            LogStream::sendError( ) << "Wrong key vnum " << vnum << " for character " << client->getNameC( ) << endl;
         else        
-            buf << "     * " << russian_case( pKeyIndex->short_descr, '1' )
-                << " ({c" << pKeyIndex->name << "{x)" << endl;
+            buf << "     * " << russian_case( pKeyIndex->getShortDescr(LANG_DEFAULT), '1' )
+                << " ({c" << pKeyIndex->keyword.toString() << "{x)" << endl;
     }
 }
 
@@ -322,7 +322,7 @@ int MansionKeyMaker::findKeyVnum( PCharacter *client, const DLString& arg )
         if (!pKeyIndex)
             continue;
 
-        if (!is_name( arg.c_str( ), pKeyIndex->name )) 
+        if (pKeyIndex->keyword.matchesUnstrict(arg))
             continue;
         
         return i->getValue( );

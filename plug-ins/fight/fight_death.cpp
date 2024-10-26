@@ -207,8 +207,7 @@ protected:
         if (IS_SET(killer->act, PLR_AUTOLOOT) && corpse->contains)
             return;
 
-        interpret_raw( killer, "sacrifice", 
-                       get_obj_name_list( corpse, corpse->in_room->contents, killer ).c_str( ) );
+        interpret_raw( killer, "sacrifice", "%lld", corpse->getID());
     }
 
     Character *killer;
@@ -469,8 +468,9 @@ static Object * corpse_create( Character *ch )
     corpse->from = str_dup( name.c_str( ) );
     corpse->cost = 0;
     corpse->level = ch->getRealLevel( );
-    corpse->setShortDescr( fmt(0, corpse->getShortDescr( ), name.c_str( )) ); 
-    corpse->setDescription( fmt(0, corpse->getDescription( ), name.c_str( ) )); 
+    // TODO multi-language corpse descriptions
+    corpse->setShortDescr( fmt(0, corpse->getShortDescr(LANG_DEFAULT).c_str(), name.c_str( )), LANG_DEFAULT ); 
+    corpse->setDescription( fmt(0, corpse->getDescription(LANG_DEFAULT).c_str(), name.c_str( )), LANG_DEFAULT ); 
 
     if (IS_SET(ch->form, FORM_EDIBLE))
         corpse->value0((1 << ch->size) - 1);
@@ -693,8 +693,8 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
         body_vnum = ch->is_npc( ) ? ch->getNPC( )->pIndexData->vnum : 0;
     }
     else if (corpse) {
-        body_name = corpse->getShortDescr( '1' ).replaces( "труп ", "" );
-        if (body_name.size( ) == corpse->getShortDescr( '1' ).size( ))
+        body_name = corpse->getShortDescr( '1', LANG_DEFAULT ).replaces( "труп ", "" );
+        if (body_name.size( ) == corpse->getShortDescr( '1', LANG_DEFAULT ).size( ))
             body_name = "";
         
         if (corpse->value3()) {
@@ -716,15 +716,15 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     
     // Format body part name, adding owner name to its description, e.g. "отрезанная рука Керрада"
     // If there're no format symbols in the body part names, just concatenate owner name to it.
-    if (str_str(obj->getShortDescr(), "%"))
-        obj->setShortDescr( fmt(0, obj->getShortDescr(), body_name.c_str()));
+    if (str_str(obj->getShortDescr(LANG_DEFAULT).c_str(), "%"))
+        obj->setShortDescr( fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), body_name.c_str()), LANG_DEFAULT);
     else
-        obj->setShortDescr(obj->getShortDescr() + DLString::SPACE + body_name);
+        obj->setShortDescr(obj->getShortDescr(LANG_DEFAULT) + DLString::SPACE + body_name, LANG_DEFAULT);
 
-    if (str_str(obj->getDescription(), "%"))
-        obj->setDescription(fmt(0, obj->getDescription(), body_name.c_str()));
+    if (str_str(obj->getDescription(LANG_DEFAULT).c_str(), "%"))
+        obj->setDescription(fmt(0, obj->getDescription(LANG_DEFAULT).c_str(), body_name.c_str()), LANG_DEFAULT);
     else
-        obj->setDescription(obj->getDescription() + DLString::SPACE + body_name);
+        obj->setDescription(obj->getDescription(LANG_DEFAULT) + DLString::SPACE + body_name, LANG_DEFAULT);
 
     obj->from = str_dup(body_name.c_str());
     obj->level = body_level;
@@ -748,7 +748,7 @@ static void killed_npc_gain( Character *killer, NPCharacter *victim )
 
     if (killer && !killer->is_npc()) {
         int vnum = victim->getNPC()->pIndexData->vnum;
-        DLString playerName = killer->getName();
+        DLString playerName = killer->getPC()->getName();
 
         auto &kill_stat = player_kill_stat[playerName][vnum];
         kill_stat.first++; // total counter

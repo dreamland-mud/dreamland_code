@@ -8,7 +8,7 @@
 #include "dlfileop.h"
 #include "dlfilestream.h"
 #include "dldirectory.h"
-#include "character.h"
+#include "pcharacter.h"
 #include "room.h"
 #include "dreamland.h"
 
@@ -25,13 +25,13 @@ BugTracker::~BugTracker( )
     bugTracker = NULL;
 }
 
-void BugTracker::reportMessage(const DLString &msgType, Character *ch, const DLString &message) const
+void BugTracker::reportMessage(const DLString &msgType, PCharacter *ch, const DLString &message) const
 {
     reportMessage(msgType, ch->getName(), message, ch->in_room->vnum);
 
 }
 
-void BugTracker::reportNohelp( Character *ch, const DLString &txt ) const
+void BugTracker::reportNohelp( PCharacter *ch, const DLString &txt ) const
 {
     reportMessage("nohelp", ch, txt);
 }

@@ -35,7 +35,7 @@
 #include "doors.h"
 #include "update_areas.h"
 #include "websocketrpc.h"
-
+#include "string_utils.h"
 #include "redit.h"
 #include "eeedit.h"
 #include "olc.h"
@@ -185,10 +185,10 @@ REDIT(mlist, "мсписок", "список всех мобов в данной
 
     for (vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++) {
         if ((pMobIndex = get_mob_index(vnum)) != NULL) {
-            if (fAll || is_name(arg, pMobIndex->player_name)) {
+            if (fAll || mob_index_has_name(pMobIndex, arg)) {
                 found = true;
                 buf1 << fmt( 0, "[%5d] ", pMobIndex->vnum );
-                buf1 << fmt( 0,  "%-17.17s{x ", russian_case(pMobIndex->short_descr, '1').c_str( ));
+                buf1 << fmt( 0,  "%-17.17N1{x ", pMobIndex->getShortDescr(LANG_DEFAULT));
                 if (++col % 3 == 0)
                     buf1 << endl;
             }
@@ -230,12 +230,12 @@ REDIT(olist, "псписок", "список всех предметов в да
     for (vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++) {
         if ((pObjIndex = get_obj_index(vnum))) {
             if (fAll 
-                || is_name(arg, pObjIndex->name)
+                || obj_index_has_name(pObjIndex, arg)
                 || item_table.value( arg ) == pObjIndex->item_type) 
             {
                 found = true;
                 buf1 << fmt( 0, "[%5d] ", pObjIndex->vnum);
-                buf1 << fmt( 0, "%-30.30s{x ", russian_case(pObjIndex->short_descr, '1').c_str( ));
+                buf1 << fmt( 0, "%-30.30N1{x ", pObjIndex->getShortDescr(LANG_DEFAULT));
                 if (++col % 2 == 0)
                     buf1 << endl;
             }
@@ -260,74 +260,56 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     Object *obj;
     Character *rch;
     int door;
-    bool fcnt;
 
-    ptc(ch, "Description: %s\n\r%s", 
-        web_edit_button(showWeb, ch, "desc", "web").c_str(), pRoom->description);
+    auto &text = pRoom->description;
+    DLString entext = text.get(EN);
+    DLString uatext = text.get(UA);
+    DLString rutext = text.get(RU);
 
-    ptc(ch, "Name:       [{W%s{x] %s\n\rArea:       [{W%5d{x] %s\n\r",
-              pRoom->name, web_edit_button(showWeb, ch, "name", "web").c_str(),
-              pRoom->areaIndex->vnum, pRoom->areaIndex->getName().c_str());
+    ptc(ch, "Desc EN: %s\n\r%s{W...{x", web_edit_button(showWeb, ch, "desc", "web").c_str(), String::truncate(entext, 300).c_str());
+    ptc(ch, "Desc UA: %s\n\r%s{W...{x", web_edit_button(showWeb, ch, "uadesc", "web").c_str(), String::truncate(uatext, 300).c_str());
+    ptc(ch, "Desc RU: %s\n\r%s{W...{x", web_edit_button(showWeb, ch, "rudesc", "web").c_str(), String::truncate(rutext, 300).c_str());
+    ptc(ch, "Name EN:    [{W%s{x] %s\n\r", pRoom->name.get(EN).c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());   
+    ptc(ch, "Name UA:    [{W%s{x] %s\n\r", pRoom->name.get(UA).c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());   
+    ptc(ch, "Name RU:    [{W%s{x] %s\n\r", pRoom->name.get(RU).c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());   
+    ptc(ch, "Area:       [{W%5d{x] %s\n\r", pRoom->areaIndex->vnum, pRoom->areaIndex->getName().c_str());
     ptc(ch, "Vnum:       [{W%u{x]\n\r", pRoom->vnum);
-    ptc(ch, "Clan:       [{W%s{x] ", pRoom->clan->getName( ).c_str( ));
-    ptc(ch, "Guilds: [{W%s{x]\n\r", pRoom->guilds.toString().c_str());
-    ptc(ch, "Sector:     [{W%s{x] {D(? sector_table){x ",
-              sector_table.name(pRoom->sector_type).c_str());
-    ptc(ch, "Liquid: [{W%s{x] {D(? liquid){x\n\r", pRoom->liquid->getName( ).c_str( ));
-    ptc(ch, "Smell:      [{W%s{x] %s {D(smell){x\n\r", 
-            pRoom->smell.c_str(),
-            web_edit_button(showWeb, ch, "smell", "web").c_str());
-    ptc(ch, "Sound:      [{W%s{x] %s {D(sound){x\n\r", 
-            pRoom->sound.c_str(),
-            web_edit_button(showWeb, ch, "sound", "web").c_str());
-        
-    ptc(ch, "Flags:      [{W%s{x] {D(? room_flags){x\n\r",
-              room_flags.names(pRoom->room_flags).c_str());
-    ptc(ch, "Health:     [{W%d{x]%%\n\rMana:       [{W%d{x]%%\n\r",
-              pRoom->heal_rate, pRoom->mana_rate);
+    ptc(ch, "Clan:       [{W%s{x]\r\n", pRoom->clan->getName( ).c_str( ));
+    ptc(ch, "Guilds:     [{W%s{x]\n\r", pRoom->guilds.toString().c_str());
+    ptc(ch, "Sector:     [{W%s{x] {D(? sector_table){x\r\n", sector_table.name(pRoom->sector_type).c_str());
+    ptc(ch, "Liquid:     [{W%s{x] {D(? liquid){x\n\r", pRoom->liquid->getName( ).c_str( ));
+    ptc(ch, "Smell EN:   [{W%s{x] %s\n\r", pRoom->smell.get(EN).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str());   
+    ptc(ch, "Smell UA:   [{W%s{x] %s\n\r", pRoom->smell.get(UA).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str());   
+    ptc(ch, "Smell RU:   [{W%s{x] %s\n\r", pRoom->smell.get(RU).c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());   
+    ptc(ch, "Sound EN:   [{W%s{x] %s\n\r", pRoom->sound.get(EN).c_str(), web_edit_button(showWeb, ch, "sound", "web").c_str());   
+    ptc(ch, "Sound UA:   [{W%s{x] %s\n\r", pRoom->sound.get(UA).c_str(), web_edit_button(showWeb, ch, "uasound", "web").c_str());   
+    ptc(ch, "Sound RU:   [{W%s{x] %s\n\r", pRoom->sound.get(RU).c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());           
+    ptc(ch, "Flags:      [{W%s{x] {D(? room_flags){x\n\r", room_flags.names(pRoom->room_flags).c_str());
+    ptc(ch, "Health:     [{W%d{x]%%\r\n", pRoom->heal_rate);
+    ptc(ch, "Mana:       [{W%d{x]%%\n\r", pRoom->mana_rate);
     
-    if (pRoom->extra_descr) {
-        EXTRA_DESCR_DATA *ed;
+    if (!pRoom->extraDescriptions.empty()) {
 
-        stc("Extra desc: ", ch);
-        for (ed = pRoom->extra_descr; ed; ed = ed->next) {
-            ptc(ch, "[%s] %s ", ed->keyword, web_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
+        ptc(ch, "Extra desc: {D(ed help){x}\r\n");
+        for (auto &ed: pRoom->extraDescriptions) {
+            ptc(ch, "    EN [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
+            ptc(ch, "    UA [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "uaed web", ed->keyword).c_str());
+            ptc(ch, "    RU [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "rued web", ed->keyword).c_str());
         }
-        stc("{D(ed help){x\n\r", ch);
+        
+    } else {
+        ptc(ch, "Extra desc: (none) {D(ed help){x}\r\n");
     }
 
     if (!pRoom->extra_exits.empty()) {
-        stc("Extra exits: {D(eexit help){x\r\n            ", ch);
+        ptc(ch, "Extra exits: {D(eexit help){x\r\n");
         for(auto &eed: pRoom->extra_exits) {
-            ptc(ch, "[%s] %s ", eed->keyword, web_edit_button(showWeb, ch, "eexit set", eed->keyword).c_str());
+            ptc(ch, "  [%s] %s\r\n", eed->keyword.toString().c_str(), web_edit_button(showWeb, ch, "eexit set", eed->keyword.get(EN)).c_str());
         }
-        stc("{x\n\r", ch);
+        
+    } else {
+        ptc(ch, "Extra exits: (none) {D(eexit help){x\r\n");
     }
-    
-    stc("Characters: [{W", ch);
-    fcnt = false;
-    for (rch = pRoom->room->people; rch; rch = rch->next_in_room) {
-        DLString names = rch->getNameC();
-        ptc(ch, "%s ", names.getOneArgument().c_str());
-        fcnt = true;
-    }
-
-    if (fcnt)
-        stc("{x]\n\r", ch);
-    else
-        stc("none{x]\n\r", ch);
-
-    stc("Objects:    [{W", ch);
-    fcnt = false;
-    for (obj = pRoom->room->contents; obj; obj = obj->next_content) {
-        ptc(ch, "%s ", obj->getFirstName().c_str());
-        fcnt = true;
-    }
-
-    if (fcnt)
-        stc("{x]\n\r", ch);
-    else
-        stc("none{x]\n\r", ch);
 
     stc("Exits:      {D(north help){x\r\n", ch);
 
@@ -351,17 +333,17 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
             ptc(ch, "            Default flags: [{W%s{x]\n\r", 
                       exit_flags.names(pexit->exit_info_default).c_str());
 
-            if (pexit->keyword && pexit->keyword[0] != '\0') {
-                ptc(ch, "            Keywords:      [{W%s{x]\n\r", pexit->keyword);
-            }
+            ptc(ch, "            Keywords EN:   [{W%s{x]\n\r", pexit->keyword.get(EN).c_str());
+            ptc(ch, "            Keywords UA:   [{W%s{x]\n\r", pexit->keyword.get(UA).c_str());
+            ptc(ch, "            Keywords RU:   [{W%s{x]\n\r", pexit->keyword.get(RU).c_str());
 
-            if (pexit->short_descr && pexit->short_descr[0] != '\0') {
-                ptc(ch, "            Short desc:    [{W%s{x]\n\r", pexit->short_descr);
-            }
+            ptc(ch, "            Short desc EN: [{W%s{x]\n\r", pexit->short_descr.get(EN).c_str());
+            ptc(ch, "            Short desc UA: [{W%s{x]\n\r", pexit->short_descr.get(UA).c_str());
+            ptc(ch, "            Short desc RU: [{W%s{x]\n\r", pexit->short_descr.get(RU).c_str());
 
-            if (pexit->description && pexit->description[0] != '\0') {
-                stc(pexit->description, ch);
-            }
+            ptc(ch, "            Description EN:\r\n%s\r\n", pexit->description.get(EN).c_str());            
+            ptc(ch, "            Description UA:\r\n%s\r\n", pexit->description.get(UA).c_str());            
+            ptc(ch, "            Description RU:\r\n%s\r\n", pexit->description.get(RU).c_str());            
         }
     }
 
@@ -446,12 +428,10 @@ void OLCStateRoom::delete_exit(RoomIndexData *pRoom, int door)
 {
     // FIXME rework to delete all instances.
     if (pRoom->exit[door]) {
-        free_exit(pRoom->exit[door]);
         pRoom->exit[door] = NULL;
     }
 
     if (pRoom->room->exit[door]) {
-        free_exit(pRoom->room->exit[door]);
         pRoom->room->exit[door] = NULL;
     }
 }
@@ -460,8 +440,8 @@ void OLCStateRoom::create_exit(RoomIndexData *sourceIndex, int door, RoomIndexDa
 {
     // FIXME rework to link all instances.
     if (!sourceIndex->exit[door]) {
-        sourceIndex->exit[door] = new_exit();
-        sourceIndex->room->exit[door] = new_exit();
+        sourceIndex->exit[door] = new exit_data();
+        sourceIndex->room->exit[door] = new exit_data();
     }
 
     sourceIndex->exit[door]->u1.vnum = destIndex->vnum;
@@ -470,17 +450,31 @@ void OLCStateRoom::create_exit(RoomIndexData *sourceIndex, int door, RoomIndexDa
     sourceIndex->room->exit[door]->orig_door = door;
 }
 
+RoomIndexData* OLCStateRoom::getOriginal()
+{
+    PCharacter *ch = owner->character->getPC();
+    return ch->in_room->pIndexData;
+}
+
 void OLCStateRoom::default_door_names(PCharacter *ch, int door)
 {
     RoomIndexData *pRoom;
-
     EDIT_ROOM(ch, pRoom);
 
-    if (!pRoom->exit[door]->keyword || !pRoom->exit[door]->keyword[0])
-        change_exit(ch, "name 'door дверь'", door);   
+    // TODO externalize translations
+    auto &kw = pRoom->exit[door]->keyword;
+    if (kw.empty()) {
+        kw[EN] = "door";
+        kw[RU] = "дверь";
+        kw[UA] = "двері";
+    }
 
-    if (!pRoom->exit[door]->short_descr || !pRoom->exit[door]->short_descr[0])
-        change_exit(ch, "short двер|ь|и|и|ь|ью|и", door);
+    auto &sd = pRoom->exit[door]->short_descr;
+    if (sd.empty()) {
+        sd[EN] = "door";
+        sd[RU] = "двер|ь|и|и|ь|ью|и";
+        sd[UA] = "двер|і|ей|ям|і|ями|ях";
+    }
 }
 
 bool 
@@ -534,16 +528,22 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
     if (arg_is_help(command)) {
         const char *name = dirs[door].name;
         ptc(ch, "Syntax:\r\n%s <флаги>        - установить флаги выхода ({y{hcolchelp exit{x)\r\n", name);
-        ptc(ch, "%s delete         - удалить выход с обеих сторон\r\n", name);
-        ptc(ch, "%s unlink         - удалить выход только с этой стороны\r\n", name);
-        ptc(ch, "%s link <vnum>    - создать двусторонний выход в указанную комнату\r\n", name);
-        ptc(ch, "%s room <vnum>    - создать односторонний выход в указанную комнату\r\n", name);
-        ptc(ch, "%s dig <vnum>     - вырыть новую комнату %s, с внумом vnum\r\n", name, dirs[door].leave);
-        ptc(ch, "%s dig next       - вырыть новую комнату %s, со следующим свободным внумом\r\n", name, dirs[door].leave);
-        ptc(ch, "%s key <vnum>     - установить ключ, флаги и имена дверей по умолчанию\r\n", name);
-        ptc(ch, "%s name <string>  - задать ключевые слова для двери\r\n", name);        
-        ptc(ch, "%s short <string> - задать название для двери с падежами\r\n", name);        
-        ptc(ch, "%s desc           - войти в редактор описания того, что видно по look <dir>\r\n", name);        
+        ptc(ch, "%s delete           - удалить выход с обеих сторон\r\n", name);
+        ptc(ch, "%s unlink           - удалить выход только с этой стороны\r\n", name);
+        ptc(ch, "%s link <vnum>      - создать двусторонний выход в указанную комнату\r\n", name);
+        ptc(ch, "%s room <vnum>      - создать односторонний выход в указанную комнату\r\n", name);
+        ptc(ch, "%s dig <vnum>       - вырыть новую комнату %s, с внумом vnum\r\n", name, dirs[door].leave);
+        ptc(ch, "%s dig next         - вырыть новую комнату %s, со следующим свободным внумом\r\n", name, dirs[door].leave);
+        ptc(ch, "%s key <vnum>       - установить ключ, флаги и имена дверей по умолчанию\r\n", name);
+        ptc(ch, "%s name <string>    - задать ключевые слова для двери, EN\r\n", name);        
+        ptc(ch, "%s uaname <string>  - задать ключевые слова для двери, UA\r\n", name);        
+        ptc(ch, "%s runame <string>  - задать ключевые слова для двери, RU\r\n", name);        
+        ptc(ch, "%s short <string>   - задать название для двери, EN\r\n", name);        
+        ptc(ch, "%s uashort <string> - задать название для двери с падежами, UA\r\n", name);        
+        ptc(ch, "%s rushort <string> - задать название для двери с падежами, RU\r\n", name);        
+        ptc(ch, "%s desc             - войти в редактор описания того, что видно по look <dir>, EN\r\n", name);        
+        ptc(ch, "%s uadesc           - войти в редактор описания того, что видно по look <dir>, UA\r\n", name);        
+        ptc(ch, "%s rudesc           - войти в редактор описания того, что видно по look <dir>, RU\r\n", name);
         ptc(ch, "%s copy           - скопировать флаги,имена,ключ на дверь с другой стороны\r\n", name);
         return false;
     }
@@ -599,22 +599,17 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         dst->exit_info = dst->exit_info_default;
         dsti->exit_info_default = srci->exit_info_default;
         dsti->exit_info = dsti->exit_info_default;
+        dst->keyword = src->keyword;
+        dsti->keyword = srci->keyword;
 
-        free_string(dst->keyword);
-        dst->keyword = str_dup(src->keyword);
-        free_string(dsti->keyword);
-        dsti->keyword = str_dup(srci->keyword);
-
-        free_string(dst->short_descr);
-        dst->short_descr = str_dup(src->short_descr);
-        free_string(dsti->short_descr);
-        dsti->short_descr = str_dup(srci->short_descr);
+        dst->short_descr = src->short_descr;
+        dsti->short_descr = srci->short_descr;
 
         dst->key = dsti->key = src->key;
 
         ptc(ch, "У выхода на {g%s{x в комнате [{W%d{x] {W%s{x установлены:\r\n", dirs[rev].name, to_room->vnum, to_room->getName());
         ptc(ch, "    флаги выхода: {g%s{x\r\n", exit_flags.names(dst->exit_info_default).c_str());
-        ptc(ch, "    имена: '{g%s{x', '{g%s{x'\r\n", dst->keyword, dst->short_descr);
+        ptc(ch, "    имена: '{g%s{x', '{g%s{x'\r\n", dst->keyword.toString().c_str(), dst->short_descr.toString().c_str());
         ptc(ch, "    ключ: {W%d{x\r\n", dst->key);
         return true;
     }   
@@ -739,14 +734,13 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         }
 
         if (pKey->item_type != ITEM_KEY) {
-            ptc(ch, "Item %d [%s] is not a key.\r\n", pKey->vnum, russian_case(pKey->short_descr, '1').c_str());
+            ch->pecho("Item %d [%N1] is not a key.", pKey->vnum, pKey->getShortDescr(LANG_DEFAULT));
             return false;
         }
 
         pRoom->exit[door]->key = value;
         pRoom->room->exit[door]->key = value;
-        ptc(ch, "Exit key set to {W%d{x [{W%s{x].\r\n",
-            pKey->vnum, russian_case(pKey->short_descr, '1').c_str());
+        ch->pecho("Exit key set to {W%d{x [{W%N1{x].", pKey->vnum, pKey->getShortDescr(LANG_DEFAULT));
 
         bitstring_t newflags = 0;
 
@@ -766,7 +760,9 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         return true;
     }
 
-    if (!str_cmp(command, "name")) {
+    DLString cmd = command;
+
+    if (DLString("name").strSuffix(cmd)) {
         if (arg[0] == '\0') {
             stc("Syntax:  [direction] name [string]\n\r", ch);
             return false;
@@ -777,16 +773,15 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
             return false;
         }
 
-        free_string(pRoom->exit[door]->keyword);
-        pRoom->exit[door]->keyword = str_dup(arg);
-        free_string(pRoom->room->exit[door]->keyword);
-        pRoom->room->exit[door]->keyword = str_dup(arg);
+        lang_t lang = cmd == "name" ? EN : (cmd == "uaname" ? UA : RU);
+        pRoom->exit[door]->keyword[lang] = arg;
+        pRoom->room->exit[door]->keyword[lang] = arg;
 
         ptc(ch, "Exit name set to {g%s{x.\n\r", arg);
         return true;
     }
 
-    if (!str_cmp(command, "short")) {
+    if (DLString("short").strSuffix(cmd)) {
         if (arg[0] == '\0') {
             stc("Syntax:  [direction] short [string]\n\r", ch);
             return false;
@@ -797,26 +792,28 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
             return false;
         }
 
-        free_string(pRoom->exit[door]->short_descr);
-        pRoom->exit[door]->short_descr = str_dup(arg);
-        free_string(pRoom->room->exit[door]->short_descr);
-        pRoom->room->exit[door]->short_descr = str_dup(arg);
+        lang_t lang = cmd == "short" ? EN : (cmd == "uashort" ? UA : RU);
+
+        pRoom->exit[door]->short_descr[lang] = arg;
+        pRoom->room->exit[door]->short_descr[lang] = arg;
 
         ptc(ch, "Exit short description set to {g%s{x.\n\r", arg);
         return true;
     }
 
-    if (!str_prefix(command, "description")) {
+    if (DLString("desc").strSuffix(cmd)) {
         if (arg[0] == '\0') {
             if (!pRoom->exit[door]) {
                 stc("REdit:  Door doesn't exist.\n\r", ch);
                 return false;
             }
-            if(!sedit(pRoom->exit[door]->description))
+
+            lang_t lang = cmd == "desc" ? EN : (cmd == "uadesc" ? UA : RU);
+
+            if(!sedit(pRoom->exit[door]->description[lang]))
                 return false;
 
-            free_string(pRoom->room->exit[door]->description);
-            pRoom->room->exit[door]->description = str_dup(pRoom->exit[door]->description);
+            pRoom->room->exit[door]->description[lang] = pRoom->exit[door]->description[lang];
 
             stc("REdit:  exit description set.\n\r", ch);
             return true;
@@ -830,11 +827,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
 
 REDIT(ed, "экстра", "редактор экстра-описаний (ed help)")
 {
-    RoomIndexData *pRoom;
-
-    EDIT_ROOM(ch, pRoom);
-
-    return extraDescrEdit(pRoom->extra_descr);
+    return extraDescrEdit(getOriginal()->extraDescriptions);
 }
 
 RoomIndexData *
@@ -907,12 +900,22 @@ REDIT(create, "создать", "создать комнату с указанн
 
 REDIT(name, "имя", "установить название комнаты")
 {
-    RoomIndexData *pRoom;
-
-    EDIT_ROOM(ch, pRoom);
-
-    return editor(argument, pRoom->name, (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->name[EN], (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
 }
+
+REDIT(uaname, "укимя", "установить название комнаты")
+{
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->name[UA], (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
+}
+
+REDIT(runame, "руимя", "установить название комнаты")
+{
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->name[RU], (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
+}
+
 
 REDIT(clan, "клан", "установить клановую принадлежность или clear")
 {
@@ -984,34 +987,31 @@ REDIT(liquid, "жидкость", "установить жидкость для 
 
 REDIT(eexit, "экстравыход", "редактор экстра-выходов (eexit help)")
 {
-    RoomIndexData *pRoom;
-    char command[MAX_INPUT_LENGTH];
+    RoomIndexData *pRoom = getOriginal();
+    DLString args = argument;
+    DLString command = args.getOneArgument();
 
-    EDIT_ROOM(ch, pRoom);
-    
-    argument = one_argument(argument, command);
-
-    if (command[0] == '\0' || argument[0] == '\0') {
+    if (command.empty() || arg_is_help(command)) {
         stc("Syntax:  eexit set <keyword>\n\r", ch);
         stc("         eexit delete <keyword>\n\r", ch);
         return false;
     }
 
-    if (is_name(command, "set")) {
-        OLCStateExtraExit::Pointer eedp(NEW, pRoom, argument);
+    if (arg_is(command, "set")) {
+        OLCStateExtraExit::Pointer eedp(NEW, pRoom, args);
         eedp->attach(ch);
         eedp->show(ch);
         return false;
     }
 
-    if (is_name(command, "delete")) {    
-        if (!pRoom->extra_exits.findAndDestroy(argument)) {
+    if (arg_is(command, "delete")) {    
+        if (!pRoom->extra_exits.findAndDestroy(args)) {
             stc("REdit:  Extra exit keyword not found.\n\r", ch);
             return false;
         }
 
         // FIXME: need to destroy exit in all instances.
-        pRoom->room->extra_exits.findAndDestroy(argument);
+        pRoom->room->extra_exits.findAndDestroy(args);
         stc("Extra exit deleted.\n\r", ch);
         return true;
     }
@@ -1022,29 +1022,56 @@ REDIT(eexit, "экстравыход", "редактор экстра-выход
 
 REDIT(desc, "описание", "войти в редактор описания комнаты (desc help)")
 {
-    RoomIndexData *pRoom;
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->description[EN]);
+}
 
-    EDIT_ROOM(ch, pRoom);
+REDIT(uadesc, "укописание", "войти в редактор описания комнаты (desc help)")
+{
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->description[UA]);
+}
 
-    return editor(argument, pRoom->description);
+REDIT(rudesc, "руописание", "войти в редактор описания комнаты (desc help)")
+{
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->description[RU]);
 }
 
 REDIT(sound, "звук", "войти в редактор звука комнаты (sound help)")
 {
-    RoomIndexData *pRoom;
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->sound[EN]);
+}
 
-    EDIT_ROOM(ch, pRoom);
+REDIT(uasound, "укзвук", "войти в редактор звука комнаты (sound help)")
+{
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->sound[UA]);
+}
 
-    return editor(argument, pRoom->sound);
+REDIT(rusound, "рузвук", "войти в редактор звука комнаты (sound help)")
+{
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->sound[RU]);
 }
 
 REDIT(smell, "запах", "войти в редактор запаха комнаты (smell help)")
 {
-    RoomIndexData *pRoom;
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->smell[EN]);
+}
 
-    EDIT_ROOM(ch, pRoom);
+REDIT(uasmell, "укзапах", "войти в редактор запаха комнаты (smell help)")
+{
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->smell[UA]);
+}
 
-    return editor(argument, pRoom->smell);
+REDIT(rusmell, "рузапах", "войти в редактор запаха комнаты (smell help)")
+{
+    RoomIndexData *pRoom = getOriginal();
+    return editor(argument, pRoom->smell[RU]);
 }
 
 REDIT(heal, "здоровье", "установить скорость восстановления здоровья и шагов в комнате (100-400)")
@@ -1084,7 +1111,7 @@ REDIT(mana, "мана", "установить скорость восстано�
 static bool redit_purge_obj(PCharacter *ch, Object *obj) 
 {
     if (!OLCState::can_edit(ch, obj->pIndexData->vnum)) {
-        ptc(ch, "У тебя недостаточно прав для уничтожения %s.\n\r", obj->getShortDescr('2').c_str());
+        ch->pecho("У тебя недостаточно прав для уничтожения %O2.", obj);
         return false;
     }
     
@@ -1103,7 +1130,7 @@ static bool redit_purge_mob(PCharacter *ch, Character *vch)
     
     mob = vch->getNPC();
     if (!OLCState::can_edit(ch, mob->pIndexData->vnum)) {
-        ptc(ch, "У тебя недостаточно прав для уничтожения %s.\n\r", mob->getNameP('2').c_str());
+        ch->pecho("У тебя недостаточно прав для уничтожения %C2.", mob);
         return false;
     }
 

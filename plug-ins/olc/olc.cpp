@@ -354,109 +354,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     if (!ch->isCoder( ))
         return;
 
-    if (arg == "objname") {
-        int cnt = 0, hcnt = 0, rcnt = 0;
-        ostringstream buf, hbuf, rbuf;
-
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
-            DLString longd = pObj->description;
-            longd.colourstrip( );
-
-            static RegExp pattern_rus("[а-я]");
-            static RegExp pattern_longd("^.*\\(([-a-z ]+)\\).*$");
-            
-            if (!pattern_rus.match( longd )) 
-                continue;
-
-            if (IS_SET(pObj->area->area_flag, AREA_NOQUEST|AREA_WIZLOCK|AREA_HIDDEN))
-                continue;
-            
-            {
-                DLString names = DLString( pObj->name );
-                InflectedString rshortd(pObj->short_descr, pObj->gram_gender );
-                DLString shortd = rshortd.decline( '7' ).colourStrip( );
-                if (!arg_contains_someof( shortd, pObj->name )) {
-                    rcnt ++;
-                    rbuf << pObj->vnum << ": [" << rshortd.decline( '1' ) << "] [" << pObj->name << "]" <<  endl;
-                }
-            }
-            if (!pattern_longd.match( longd )) {
-                buf << pObj->vnum << ": [" << longd << "] [" << pObj->name << "]" <<  endl;
-                cnt++;
-            } else {
-                RegExp::MatchVector matches = pattern_longd.subexpr( longd.c_str( ) );
-                if (matches.size( ) < 1) {
-                    buf << pObj->vnum << ": [" << longd << "] [" << pObj->short_descr << "]" <<  endl;
-                    cnt++;
-                } else {
-                    
-                    DLString hint = matches.front( );
-                    if (!is_name( hint.c_str( ), pObj->name )) {
-                        hbuf << fmt(0, "%6d : [%35s] hint [{G%10s{x] [{W%s{x]\r\n",
-                                pObj->vnum, longd.c_str( ), hint.c_str( ), pObj->name );
-                        hcnt++;
-                    }
-                }
-            }
-        }
-
-//        ch->pecho("Найдено %d длинных имен предметов без подсказок (пустых).", cnt);
-//        page_to_char( buf.str( ).c_str( ), ch );
-//        ch->pecho("Найдено %d несоответствий подсказок в длинном имени предметов.", hcnt);
-//        page_to_char( hbuf.str( ).c_str( ), ch );
-        ch->pecho("Найдено %d предметов где в short descr не встречаются имена.", rcnt);
-        page_to_char( rbuf.str( ).c_str( ), ch );
-        return;
-    }
-
-    if (arg == "mobname") {
-        int cnt = 0, hcnt = 0, rcnt = 0;
-        ostringstream buf, hbuf, rbuf;
-
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
-            DLString names = DLString(pMob->player_name).toLower();
-            DLString longd = trim(pMob->long_descr).toLower();
-            longd.colourstrip( );
-
-            static RegExp pattern_rus("[а-я]");
-            static RegExp pattern_longd("^.*\\(([-a-z ]+)\\).*$");
-            
-            if (!pattern_rus.match( longd )) 
-                continue;
-
-            if (IS_SET(pMob->area->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
-                continue;
-            
-            {
-                InflectedString rshortd(pMob->short_descr, MultiGender(pMob->sex, pMob->gram_number));
-                DLString shortd = rshortd.decline( '7' ).colourStrip( ).toLower();
-                if (!arg_contains_someof( shortd, pMob->player_name )) {
-                    rcnt ++;
-                    rbuf << pMob->vnum << ": [" << rshortd.decline( '1' ) << "] [" << pMob->player_name << "]" <<  endl;
-                }
-            }
-
-            RegExp::MatchVector matches = pattern_longd.subexpr( longd.c_str( ) );
-            if (matches.size( ) < 1) {
-                buf << pMob->vnum << ": [" << longd << "] [" << pMob->short_descr << "]" <<  endl;
-                cnt++;
-            } else {
-                
-                DLString hint = matches.front( );
-                if (!is_name(hint.c_str(), names.c_str())) {
-                    hbuf << fmt(0, "%6d : [%35s] hint [{G%10s{x] [{W%s{x]\r\n",
-                            pMob->vnum, longd.c_str( ), hint.c_str( ), pMob->player_name );
-                    hcnt++;
-                }
-            }
-        }
-
-        ch->pecho("\r\n{RНайдено %d несоответствий подсказок в длинном имени моба.{x", hcnt);
-        page_to_char( hbuf.str( ).c_str( ), ch );
-        return;
-    }
 
     if (arg == "maxhelp") {
         ch->pecho("Max help ID is %d, next free id is %d.", 
@@ -611,7 +508,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             DLString vnum = pMob->vnum;
             DLString line = 
                 "[" + web_cmd(ch, "medit $1", "%5d") + "] "
-                + "%-18.18s {g" 
+                + "%-18.18N1 {g" 
                 + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
                 + "%10s %10s {C["
                 + web_cmd(ch, "abc size clear " + vnum, "clear") + "{C]   {G["
@@ -619,7 +516,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 + "\n\r";
 
             buf << fmt(0, line.c_str(),
-                pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race,
                 size_table.name(raceSize).c_str(), size_table.name(mobSize).c_str());
 
             cnt++;
@@ -656,7 +553,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             bitstring_t dels = ~mobParts & raceParts;
             DLString line = 
                 "[" + web_cmd(ch, "medit $1", "%5d") + "] "
-                + "%-18.18s {g" 
+                + "%-18.18N1 {g" 
                 + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
                 + (adds ? "[{G%s{x " : "%s")
                 + (adds ? web_cmd(ch, "abc reset part " + vnum + " add", "reset") + "]{x" : "")
@@ -667,7 +564,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 
             if (cnt <= maxlines)
                 buf << fmt(0, line.c_str(),
-                    pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                    pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race,
                     part_flags.names(adds).c_str(), part_flags.names(dels).c_str());
 
             cnt++;
@@ -705,7 +602,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             bitstring_t dels = ~mobAff & raceAff;
             DLString line = 
                 "[" + web_cmd(ch, "medit $1", "%5d") + "] "
-                + "%-18.18s {g" 
+                + "%-18.18N1 {g" 
                 + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
                 + (adds ? "[{G%s{x " : "%s")
                 + (adds ? web_cmd(ch, "abc reset aff " + vnum + " add", "reset") + "]{x" : "")
@@ -716,7 +613,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 
             if (cnt <= maxlines)
                 buf << fmt(0, line.c_str(),
-                    pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                    pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race,
                     affect_flags.names(adds).c_str(), affect_flags.names(dels).c_str());
 
             cnt++;
@@ -754,7 +651,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             bitstring_t dels = ~mobForm & raceForm;
             DLString line = 
                 "[" + web_cmd(ch, "medit $1", "%5d") + "] "
-                + "%-18.18s {g" 
+                + "%-18.18N1 {g" 
                 + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
                 + (adds ? "[{G%s{x " : "%s")
                 + (adds ? web_cmd(ch, "abc reset form " + vnum + " add", "reset") + "]{x" : "")
@@ -765,7 +662,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 
             if (cnt <= maxlines)
                 buf << fmt(0, line.c_str(),
-                    pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                    pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race,
                     form_flags.names(adds).c_str(), 
                     form_flags.names(dels).c_str());
 

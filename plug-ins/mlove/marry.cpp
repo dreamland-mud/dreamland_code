@@ -48,7 +48,7 @@ COMMAND(Marry, "marry")
         return;
     }
 
-    if (ch->getName( ) == brideName1 || ch->getName( ) == brideName2) {
+    if (ch->getPC()->getName( ) == brideName1 || ch->getPC()->getName( ) == brideName2) {
         ch->pecho("Попроси кого-то помочь тебе.");
         return;
     }
@@ -71,12 +71,12 @@ COMMAND(Marry, "marry")
     ch->send_to( buf );
 
     buf.str( "" );
-    buf << ch->getName( ) << " объявляет вас мужем и женой!" << endl;
+    buf << ch->getNameP('1') << " объявляет вас мужем и женой!" << endl;
     bride1->send_to( buf );
     bride2->send_to( buf );
 
     buf.str( "" );
-    buf << ch->getName( ) << " объявляет " << brideName1 << " и " << brideName2 << " мужем и женой!" << endl;
+    buf << ch->getNameP('1') << " объявляет " << brideName1 << " и " << brideName2 << " мужем и женой!" << endl;
     
     for (Character *wch = ch->in_room->people; wch; wch = wch->next_in_room) {
         if (!wch->is_npc( ) && wch != ch && wch != bride1 && wch != bride2)

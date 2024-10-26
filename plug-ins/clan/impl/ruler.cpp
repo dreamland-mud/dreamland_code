@@ -1790,7 +1790,7 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    stalker->behavior.getDynamicPointer<Stalker>( )->setVictimName( victim->getName( ) );
+    stalker->behavior.getDynamicPointer<Stalker>( )->setVictimName( victim->getNameC( ) );
 
         if ( victim->isAffected(gsn_suspect ) )
         {
@@ -1906,7 +1906,7 @@ void Stalker::clantalk( const char *msg )
 
 bool Stalker::ourVictim( Character *vch )
 {
-    return !vch->is_npc( ) && vch->getName( ) == victimName.getValue( );
+    return !vch->is_npc( ) && vch->getNameC( ) == victimName.getValue( );
 }
 
 void Stalker::attackVictim( Character *vch )

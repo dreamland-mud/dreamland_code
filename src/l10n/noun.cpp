@@ -5,6 +5,7 @@
 #include "grammar_entities_impl.h"
 #include "noun.h"
 #include "flexer.h"
+#include "logstream.h"
 
 using namespace Grammar;
 
@@ -15,7 +16,13 @@ Noun::~Noun()
 {
 }
 
-DLString Noun::normal() const
+const DLString& Grammar::Noun::decline(const Case& c) const
+{
+    LogStream::sendNotice() << "Noun::decline(" << c << ")" << endl;
+    return DLString::emptyString;
+}
+
+const DLString &Noun::normal() const
 {
     return decline(Case::NOMINATIVE);
 }
@@ -25,8 +32,4 @@ MultiGender Noun::getMultiGender() const
     return MultiGender(getGender(), getNumber());
 }
 
-DLString Noun::decline(const Case &c) const
-{
-    return Flexer::flex(getFullForm(), c + 1);
-}
 

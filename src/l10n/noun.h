@@ -19,10 +19,10 @@ public:
     
     virtual Gender getGender() const = 0;
     virtual Number getNumber() const = 0;
-    virtual DLString decline(const Case &c) const;
+    virtual const DLString &decline(const Case &c) const;
     virtual const DLString &getFullForm() const = 0;
     
-    DLString normal() const;
+    const DLString& normal() const;
     MultiGender getMultiGender() const;
 };
 

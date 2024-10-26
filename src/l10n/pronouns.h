@@ -28,7 +28,7 @@ public:
     PersonalPronoun();
     virtual ~PersonalPronoun();
 
-    DLString decline(const Noun &who, const Person &p, const Case &c) const;
+    const DLString& decline(const Noun &who, const Person &p, const Case &c) const;
 
 private:
     const Persons &persons;
@@ -43,7 +43,7 @@ public:
     PosessivePronoun();
     virtual ~PosessivePronoun();
 
-    DLString decline(const Noun &item, const Noun &owner, const Person &p, const Case &c) const;
+    const DLString& decline(const Noun &item, const Noun &owner, const Person &p, const Case &c) const;
 
 private:
     const PosessionGenders &posessions;
@@ -57,7 +57,7 @@ public:
     IndefinitePronoun(const AnimacyCases &acases);
     virtual ~IndefinitePronoun();
 
-    DLString decline(const Case &c, const Animacy &a) const;
+    const DLString& decline(const Case &c, const Animacy &a) const;
 
 private:
     const AnimacyCases &acases;
@@ -71,7 +71,7 @@ public:
 
     virtual Gender getGender() const;
     virtual Number getNumber() const;
-    virtual DLString decline(const Case &c) const;
+    virtual const DLString & decline(const Case &c) const;
     virtual const DLString &getFullForm() const;
 
 protected:

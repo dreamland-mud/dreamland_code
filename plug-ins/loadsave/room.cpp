@@ -25,24 +25,22 @@ extra_exit_data * extra_exit_data::create()
 {
     EXTRA_EXIT_DATA *peexit = new EXTRA_EXIT_DATA;
 
-    peexit->description = str_dup(description);
+    peexit->description = description;
     peexit->exit_info_default = peexit->exit_info = exit_info_default;
     peexit->key = key;
     peexit->u1.vnum = u1.vnum;
     peexit->level = level;
 
-    peexit->keyword = str_dup(keyword);
-    peexit->short_desc_from = str_dup(short_desc_from);
-    peexit->short_desc_to = str_dup(short_desc_to);
-    peexit->room_description = str_dup(room_description);
+    peexit->keyword = keyword;
+    peexit->short_desc_from = short_desc_from;
+    peexit->short_desc_to = short_desc_to;
+    peexit->room_description = room_description;
     peexit->max_size_pass = max_size_pass;
 
     peexit->msgEntryRoom = msgEntryRoom;
     peexit->msgLeaveRoom = msgLeaveRoom;
     peexit->msgEntrySelf = msgEntrySelf;
     peexit->msgLeaveSelf = msgLeaveSelf;
-    peexit->gender_from = gender_from;
-    peexit->gender_to = gender_to;
     
     return peexit;
 }        
@@ -51,9 +49,9 @@ exit_data *exit_data::create()
 {
     EXIT_DATA *pexit = new EXIT_DATA;
 
-    pexit->keyword = str_dup(keyword);
-    pexit->short_descr = str_dup(short_descr);
-    pexit->description = str_dup(description);
+    pexit->keyword = keyword;
+    pexit->short_descr = short_descr;
+    pexit->description = description;
     pexit->exit_info_default = pexit->exit_info = exit_info_default;
     pexit->key = key;
     pexit->u1.vnum = u1.vnum; 

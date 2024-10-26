@@ -301,6 +301,39 @@ void fwrite_char( PCharacter *ch, FILE *fp )
         fprintf( fp, "End\n\n" );
 }
 
+// Write out non-empty values for multi-language string.
+static void fwrite_multistring(FILE *fp, const DLString &label, const XMLMultiString &field)
+{
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        const DLString &fieldValue = field.get(lang);
+        DLString langName = lang2attr(lang);
+
+        if (!fieldValue.empty()) {
+            fprintf(fp, "%s %s %s~\n", 
+                    label.c_str(),
+                    langName.c_str(),
+                    fieldValue.c_str());
+        }
+    }
+}
+
+// Write out key/value pairs for each language.
+static void fwrite_multistring(FILE *fp, const DLString &label, const DLString &key, const XMLMultiString &valueField)
+{
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        const DLString &value = valueField.get(lang);
+        DLString langName = lang2attr(lang);
+
+        fprintf(fp, "%s %s %s~ %s~\n", 
+                label.c_str(),
+                langName.c_str(),
+                key.c_str(),
+                value.c_str());
+    }
+}
+
 /* write a pet */
 void fwrite_pet( NPCharacter *pet, FILE *fp)
 {
@@ -314,12 +347,10 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
             fprintf(fp,"Room %d\n", pet->in_room->vnum);
             
         fprintf( fp, "Id   %s\n", id_to_string(pet->getID()).c_str() );
-        if (pet->getRealShortDescr( ))
-                fprintf(fp,"ShD  %s~\n", pet->getShortDescr( ));
-        if (pet->getRealLongDescr( ))
-                fprintf(fp,"LnD  %s~\n", pet->getLongDescr( ));
-        if (pet->getRealDescription( ))
-                fprintf(fp,"Desc %s~\n", pet->getDescription( ));
+        fwrite_multistring(fp, "Keyword", pet->getRealKeyword());
+        fwrite_multistring(fp, "ShortDesc", pet->getRealShortDescr());
+        fwrite_multistring(fp, "LongDesc", pet->getRealLongDescr());
+        fwrite_multistring(fp, "Description", pet->getRealDescription());
 
         if (pet->getRace( )->getName( ) != pet->pIndexData->race) 
                 fprintf(fp,"Race %s~\n", pet->getRace( )->getName( ).c_str( ));
@@ -413,23 +444,19 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
 
         fprintf(fp,"Vnum %d\n",mob->pIndexData->vnum);
 
-        fprintf(fp,"Name %s~\n", mob->getNameC() );
-
         fprintf( fp, "Id   %s\n", id_to_string(mob->getID()).c_str() );
         
+        fwrite_multistring(fp, "Keyword", mob->getRealKeyword());
+        fwrite_multistring(fp, "ShortDesc", mob->getRealShortDescr());
+        fwrite_multistring(fp, "LongDesc", mob->getRealLongDescr());
+        fwrite_multistring(fp, "Description", mob->getRealDescription());
+
         fprintf( fp, "Room %d\n", mob->in_room->vnum );
 
         if ( mob->zone )
                 fprintf( fp, "RZone %s~\n", mob->zone->area_file->file_name );
         if (mob->reset_room != 0)
             fprintf(fp, "RRoom %d\n", mob->reset_room); 
-
-        if (mob->getRealShortDescr( ))
-            fprintf(fp,"ShD  %s~\n", mob->getShortDescr( ));
-        if (mob->getRealLongDescr( ))
-            fprintf(fp,"LnD  %s~\n", mob->getLongDescr( ));
-        if (mob->getRealDescription( ))
-            fprintf(fp,"Desc %s~\n", mob->getDescription( ));
 
         if (mob->getRace( )->getName( ) != mob->pIndexData->race) 
                 fprintf(fp,"Race %s~\n", mob->getRace( )->getName( ).c_str( ));
@@ -564,8 +591,6 @@ void fwrite_obj( Character *ch, Object *obj, FILE *fp, int iNest )
 
 void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
 {
-        EXTRA_DESCR_DATA *ed;
-
     /*
      * Slick recursion to write lists backwards,
      *   so loading them will load in forwards order.
@@ -627,12 +652,11 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 /* these data are only used if they do not match the defaults */
                 if (obj->getRealMaterial( ))
                     fprintf( fp, "Material %s~\n",  obj->getMaterial( ));
-                if (obj->getRealName( ))
-                    fprintf( fp, "Name %s~\n",        obj->getName( )            );
-                if (obj->getRealShortDescr( ))
-                    fprintf( fp, "ShD  %s~\n",        obj->getShortDescr( ) );
-                if (obj->getRealDescription( ))
-                    fprintf( fp, "Desc %s~\n",        obj->getDescription( )  );
+
+                fwrite_multistring(fp, "Keyword", obj->getRealKeyword());
+                fwrite_multistring(fp, "ShortDesc", obj->getRealShortDescr());
+                fwrite_multistring(fp, "Description", obj->getRealDescription());
+
                 if (!obj->getOwner().empty())
                     fprintf( fp, "Ownr %s~\n",        obj->getOwner().c_str());
 
@@ -693,9 +717,8 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 for (auto &paf: obj->affected)
                     fwrite_affect( "Affect", fp, paf );
 
-                for ( ed = obj->extra_descr; ed != 0; ed = ed->next )
-                {
-                        fprintf( fp, "ExDe %s~ %s~\n", ed->keyword, ed->description );
+                for (auto &ed: obj->extraDescriptions) {
+                    fwrite_multistring(fp, "ExtraDesc", ed->keyword, ed->description);
                 }
 
                 if (!obj->props.empty()) {
@@ -715,18 +738,9 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
         }
         catch(const Exception &e)
         {
-                if ( obj != 0 && obj->pIndexData != 0 )
-                {
-                        bug("{RSave_object: filling {Cvnum %d %s{R FAILED!!!!!!!!", obj->pIndexData->vnum, obj->getName( ));
-                }
-                else if ( obj !=0 && obj->getName( ) != 0 )
-                {
-                       bug("{RSave_object: filling {C%s{R FAILED!!!!!!!!", obj->getName( ) );
-                }
-                else
-                {
-                        bug("{RSave_object: filling{R FAILED!!!!!!!!" );
-                }
+            DLString objId = !obj ? "-" : DLString(obj->getID());
+            DLString objVnum = !obj ? "-" : (!obj->pIndexData ? "-" : DLString(obj->pIndexData->vnum));
+            LogStream::sendError() << "fwrite_obj: " << objId << " " << objVnum << e.what() << endl;
         }
 
         return;
@@ -766,7 +780,44 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                                     break;                                \
                                 }
 
-void fread_char_raw( PCharacter *ch, FILE *fp )
+// Read historical name/keyword fields that could be a mix of EN and RU words
+static XMLMultiString fread_mixed_multistring(FILE *fp)
+{
+    char *value = fread_string( fp );
+    DLString valueString( value );
+    free_string(value);
+    
+    XMLMultiString multi;
+    multi.fromMixedString(valueString);
+    return multi;
+}
+
+// Read new format with 'lang' attribute in it
+static void fread_multistring(FILE *fp, DLString &valueString, lang_t &lang)
+{
+    DLString langString(fread_word(fp));
+    lang = attr2lang(langString);
+
+    char *value = fread_string(fp);
+    valueString = value;
+    free_string(value);
+}
+
+static void fread_multistring(FILE *fp, DLString &keyString, DLString &valueString, lang_t &lang)
+{
+    DLString langString(fread_word(fp));
+    lang = attr2lang(langString);
+
+    char *value = fread_string(fp);
+    keyString = value;
+    free_string(value);
+
+    value = fread_string(fp);
+    valueString = value;
+    free_string(value);
+}
+
+static void fread_char_raw( PCharacter *ch, FILE *fp )
 {
     const char *word="End";
     bool fMatch = true;
@@ -881,7 +932,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             
             if (!str_cmp( word, "Description" ) || !str_cmp( word, "Desc" )) {
                 char *word = fread_string( fp );
-                ch->setDescription( word );
+                ch->setDescription( word, LANG_DEFAULT );
                 free_string( word );
                 fMatch = true;
             }
@@ -1121,6 +1172,8 @@ void fread_pet( PCharacter *ch, FILE *fp )
     NPCharacter *pet;
     bool fMatch;
     int percent;
+    DLString value;
+    lang_t lang;
     bitstring_t create_flags = FCREATE_NOAFFECTS | FCREATE_NOCOUNT;
 
     /* first entry had BETTER be the vnum or we barf */
@@ -1225,11 +1278,18 @@ void fread_pet( PCharacter *ch, FILE *fp )
 
                 if (!str_cmp( word, "Desc" )) {
                     char *word = fread_string( fp );
-                    pet->setDescription( word );
+                    pet->setDescription( word, LANG_DEFAULT );
                     free_string( word );
                     fMatch = true;
                     break;
                 }
+                if (!str_cmp(word, "Description")) {
+                    fread_multistring(fp, value, lang);
+                    pet->setDescription(value, lang);
+                    fMatch = true;
+                    break;
+                }
+
                  break;
 
              case 'E':
@@ -1284,8 +1344,16 @@ void fread_pet( PCharacter *ch, FILE *fp )
             }
 
             break;
+        case 'K':
+            if (!str_cmp(word, "Keyword")) {
+                fread_multistring(fp, value, lang);
+                pet->setKeyword(value, lang);
+                fMatch = true;
+                break;
+            }
+            break;
 
-             case 'L':
+        case 'L':
              KEYSKIP( "LogO" );
             if( !str_cmp( word, "Levl" ) )
             {
@@ -1295,23 +1363,26 @@ void fread_pet( PCharacter *ch, FILE *fp )
             }
             if (!str_cmp( word, "LnD" )) {
                 char *word = fread_string( fp );
-                pet->setLongDescr( word );
+                pet->setLongDescr( word, LANG_DEFAULT );
                 fMatch = true;
                 free_string( word );
+                break;
+            }
+            if (!str_cmp(word, "LongDesc")) {
+                fread_multistring(fp, value, lang);
+                pet->setLongDescr(value, lang);
+                fMatch = true;
                 break;
             }
                 break;
 
             case 'N':
-                                if ( !str_cmp( word, "Name" ) )
-                                {
-                                    char *nm = fread_string( fp );
-                                    DLString name( nm );
-                                    free_string(nm);
-                                    pet->setName( name );
-                                    fMatch = true;
-                                    break;
-                                }
+                if ( !str_cmp( word, "Name" ) )
+                {
+                    pet->setKeyword(fread_mixed_multistring(fp));
+                    fMatch = true;
+                    break;
+                }
                  break;
 
             case 'P':
@@ -1343,9 +1414,15 @@ void fread_pet( PCharacter *ch, FILE *fp )
 
             if (!str_cmp( word, "ShD" )) {
                 char *word = fread_string( fp );
-                pet->setShortDescr( word );
+                pet->setShortDescr( word, LANG_DEFAULT );
                 fMatch = true;
                 free_string( word );
+                break;
+            }
+            if (!str_cmp(word, "ShortDesc")) {
+                fread_multistring(fp, value, lang);
+                pet->setShortDescr(value, lang);
+                fMatch = true;
                 break;
             }
             if( !str_cmp( word, "Sex" ) )
@@ -1382,6 +1459,8 @@ NPCharacter * fread_mob( FILE *fp )
     const char *word;
     NPCharacter *mob;
     bool fMatch;
+    DLString value;
+    lang_t lang;
     bitstring_t create_flags = FCREATE_NOAFFECTS | FCREATE_NOCOUNT;
 
     // first entry had BETTER be the vnum or we barf
@@ -1499,11 +1578,18 @@ NPCharacter * fread_mob( FILE *fp )
 
                     if (!str_cmp( word, "Desc" )) {
                         char *word = fread_string( fp );
-                        mob->setDescription( word );
+                        mob->setDescription( word, LANG_DEFAULT );
                         free_string( word );
                         fMatch = true;
                         break;
                     }
+                    if (!str_cmp(word, "Description")) {
+                        fread_multistring(fp, value, lang);
+                        mob->setDescription(value, lang);
+                        fMatch = true;
+                        break;
+                    }
+
                     break;
 
             case 'E':
@@ -1555,6 +1641,15 @@ NPCharacter * fread_mob( FILE *fp )
 
                     break;
 
+            case 'K':
+                if (!str_cmp(word, "Keyword")) {
+                    fread_multistring(fp, value, lang);
+                    mob->setKeyword(value, lang);
+                    fMatch = true;
+                    break;
+                }
+                break;
+
             case 'L':
                     if ( !str_cmp( word, "Levl" ) )
                     {
@@ -1565,26 +1660,26 @@ NPCharacter * fread_mob( FILE *fp )
 
                     if (!str_cmp( word, "LnD" )) {
                         char *word = fread_string( fp );
-                        mob->setLongDescr( word );
+                        mob->setLongDescr( word, LANG_DEFAULT );
                         fMatch = true;
                         free_string( word );
                         break;
                     }
+                    if (!str_cmp(word, "LongDesc")) {
+                        fread_multistring(fp, value, lang);
+                        mob->setLongDescr(value, lang);
+                        fMatch = true;
+                        break;
+                    }
+
                     break;
 
             case 'N':
                     if ( !str_cmp( word, "Name" ) )
                     {
-                            char *nm = fread_string( fp );
-                            DLString name( nm );
-                            free_string(nm);
-                            // For non-renamed mobs, update their name from index data,
-                            // as it can be translated or altered at this point.
-                            if (is_name(name.c_str(), mob->pIndexData->player_name))
-                                name = mob->pIndexData->player_name;
-                            mob->setName( name );
-                            fMatch = true;
-                            break;
+                        mob->setKeyword(fread_mixed_multistring(fp));
+                        fMatch = true;
+                        break;
                     }
                     break;
 
@@ -1651,11 +1746,18 @@ NPCharacter * fread_mob( FILE *fp )
                     }
                     if (!str_cmp( word, "ShD" )) {
                         char *word = fread_string( fp );
-                        mob->setShortDescr( word );
+                        mob->setShortDescr( word, LANG_DEFAULT );
                         fMatch = true;
                         free_string( word );
                         break;
                     }
+                    if (!str_cmp(word, "ShortDesc")) {
+                        fread_multistring(fp, value, lang);
+                        mob->setShortDescr(value, lang);
+                        fMatch = true;
+                        break;
+                    }
+
                     break;
 
             case 'T':
@@ -1774,6 +1876,8 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
     bool fPersonal;
     int wear_loc = -1;
     int vnum = 0;
+    DLString value;
+    lang_t lang;
     AffectList affectsOldStyle;
 
     fVnum = false;
@@ -1856,13 +1960,20 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     break;
 
             case 'D':
-                    if (!str_cmp( word, "Description" ) || !str_cmp( word, "Desc" )) {
+                    if (!str_cmp( word, "Desc" )) {
                         char *word = fread_string( fp );
-                        obj->setDescription( word );
+                        obj->setDescription( word, LANG_DEFAULT );
                         free_string( word );
                         fMatch = true;
                         break;
                     }
+                    if (!str_cmp(word, "Description")) {
+                        fread_multistring(fp, value, lang);
+                        obj->setDescription(value, lang);
+                        fMatch = true;
+                        break;
+                    }
+
                     break;
 
             case 'E':
@@ -1876,17 +1987,24 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     KEY( "ExtraFlags",        obj->extra_flags,        fread_number( fp ) );
                     KEY( "ExtF",        obj->extra_flags,        fread_number( fp ) );
 
-                    if ( !str_cmp( word, "ExtraDescr" ) || !str_cmp(word,"ExDe"))
+                    if (!str_cmp(word,"ExDe"))
                     {
-                            EXTRA_DESCR_DATA *ed;
-
-                            ed = new_extra_descr();
-
-                            ed->keyword                = fread_string( fp );
-                            ed->description                = fread_string( fp );
-                            ed->next                = obj->extra_descr;
-                            obj->extra_descr        = ed;
-                            fMatch = true;
+                        char *kw = fread_string(fp);
+                        char *value = fread_string(fp);
+                        obj->addExtraDescr(kw, value, LANG_DEFAULT);
+                        free_string(kw);
+                        free_string(value);
+                        fMatch = true;
+                        break;
+                    }
+                    if (!str_cmp(word,"ExtraDesc"))
+                    {
+                        DLString keyword, description;
+                        lang_t lang;
+                        fread_multistring(fp, keyword, description, lang);
+                        obj->addExtraDescr(keyword, description, lang);
+                        fMatch = true;
+                        break;
                     }
 
                     if ( !str_cmp( word, "End" ) )
@@ -1960,7 +2078,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
             case 'G':
                     if (!str_cmp( word, "Gender" )) {
                         obj->gram_gender.fromString(fread_word( fp ));
-                        obj->updateCachedNoun();
+                        obj->updateCachedNouns();
                         fMatch = true;
                         break;
                     }
@@ -1978,6 +2096,14 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     }
 
                     break;
+            case 'K':
+                if (!str_cmp(word, "Keyword")) {
+                    fread_multistring(fp, value, lang);
+                    obj->setKeyword(value, lang);
+                    fMatch = true;
+                    break;
+                }
+                break;
 
             case 'L':
                     KEY( "Level",        obj->level,                fread_number( fp ) );
@@ -2000,10 +2126,8 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
             case 'N':
                     if (!str_cmp( word, "Name" )) {
-                        char *word = fread_string( fp );
-                        obj->setName( word );
+                        obj->setKeyword(fread_mixed_multistring(fp));
                         fMatch = true;
-                        free_string( word );
                         break;
                     }
 
@@ -2077,13 +2201,20 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     break;
 
             case 'S':
-                    if (!str_cmp( word, "ShortDescr" ) || !str_cmp( word, "ShD" )) {
+                    if (!str_cmp( word, "ShD" )) {
                         char *word = fread_string( fp );
-                        obj->setShortDescr( word );
+                        obj->setShortDescr( word, LANG_DEFAULT );
                         fMatch = true;
                         free_string( word );
                         break;
                     }
+                    if (!str_cmp(word, "ShortDesc")) {
+                        fread_multistring(fp, value, lang);
+                        obj->setShortDescr(value, lang);
+                        fMatch = true;
+                        break;
+                    }
+
 
                     if ( !str_cmp( word, "Spell" ) )
                     {

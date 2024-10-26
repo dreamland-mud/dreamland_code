@@ -58,8 +58,6 @@
 
 #define OBJ_VNUM_HUNTER_PIT           110
 
-bool obj_index_has_name( OBJ_INDEX_DATA *pObj, const DLString &arg );
-
 GSN(hunter_pit);
 GSN(hunter_beacon);
 GSN(hunter_snare);
@@ -167,15 +165,17 @@ HunterEquip::HunterEquip( )
 
 void HunterEquip::config( PCharacter *wch )
 {
-    obj->setShortDescr( fmt(0, obj->getShortDescr( ), wch->getNameP('2').c_str()));
+    obj->setShortDescr( fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), wch->getNameP('2').c_str()), LANG_DEFAULT);
     obj->setOwner( wch->getNameC() );
     obj->from = str_dup( wch->getNameC() );
     obj->level = wch->getRealLevel( );
     obj->cost = 0;
     
-    if (obj->pIndexData->extra_descr) {
-        DLString ed = fmt(0, obj->pIndexData->extra_descr->description, wch->getNameP('1').c_str());
-        obj->addExtraDescr( obj->pIndexData->extra_descr->keyword, ed );
+    if (!obj->pIndexData->extraDescriptions.empty()) {
+        ExtraDescription *&ed = obj->pIndexData->extraDescriptions.front();
+        const DLString &patternText = ed->description.get(LANG_DEFAULT);
+        DLString edText = fmt(0, patternText.c_str(), wch->getNameP('1').c_str());
+        obj->addExtraDescr( ed->keyword, edText, LANG_DEFAULT );
     }
 }   
 
@@ -713,7 +713,7 @@ bool HunterTrapObject::visible( const Character *ch )
     if (ch->is_npc( ))
         return false;
     
-    if (ch->getName( ) == ownerName.getValue( ))
+    if (ch->getNameC( ) == ownerName.getValue( ))
         return true;
 
     if (ch->isAffected(gsn_detect_trap))
@@ -798,12 +798,12 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
     obj_to_room( obj, ch->in_room );
     REMOVE_BIT( obj->wear_flags, ITEM_TAKE );
     obj->timer = ch->getPC( )->getClanLevel( ) * 5;
-    obj->setDescription( activeDescription.getValue( ).c_str( ) );
+    obj->setDescription( activeDescription.getValue( ), LANG_DEFAULT );
     
     activated = true;
     victimName = victim->getName( );
     quality = gsn_hunter_beacon->getEffective( ch );
-    ownerName = ch->getName( );
+    ownerName = ch->getNameC( );
     ownerLevel = ch->getModifyLevel( );
     charges = number_range( 1, ch->getPC( )->getClanLevel( ) );
     
@@ -824,7 +824,7 @@ void HunterBeaconTrap::greet( Character *victim )
     if (victim->is_npc( ) || victim->is_immortal( ))
         return;
     
-    if (victimName.getValue( ) != victim->getName( ))
+    if (victimName.getValue( ) != victim->getNameC( ))
         return;
         
     if (checkPrevent( victim ))
@@ -957,10 +957,10 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
     obj_to_room( obj, ch->in_room );
     obj->timer = 24 * 60;
     REMOVE_BIT( obj->wear_flags, ITEM_TAKE );
-    obj->setDescription( activeDescription.getValue( ).c_str( ) );
+    obj->setDescription( activeDescription.getValue( ), LANG_DEFAULT );
     
     activated = true;
-    ownerName = ch->getName( );
+    ownerName = ch->getNameC( );
     ownerLevel = ch->getModifyLevel( );
     quality = gsn_hunter_snare->getEffective( ch );
 
@@ -997,7 +997,7 @@ void HunterSnareTrap::greet( Character *victim )
     obj_to_char( obj, victim );
     equip_char( victim, obj, wear_hold_leg );
     SET_BIT(obj->wear_flags, ITEM_TAKE);
-    obj->setDescription( fmt(0, "Разломанный %s лежит тут.", obj->getShortDescr( '1' ).c_str( )) );
+    obj->setDescription( fmt(0, "Разломанный %s лежит тут.", obj->getShortDescr( '1', LANG_DEFAULT ).c_str( )), LANG_DEFAULT );
     obj->timer = 24;
     activated = false;
     
@@ -1384,10 +1384,10 @@ void HunterPitTrap::unsetReady( )
 void HunterPitTrap::setReady( Character *ch )
 {
     activated = true;
-    ownerName = ch->getName( );
+    ownerName = ch->getNameC( );
     ownerLevel = ch->getModifyLevel( );
     quality = gsn_hunter_pit->getEffective( ch );
-    obj->setDescription( activeDescription.getValue( ).c_str( ) );
+    obj->setDescription( activeDescription.getValue( ), LANG_DEFAULT );
     obj->timer = 60 * 24;
 }
 
@@ -1398,12 +1398,12 @@ Object * HunterPitTrap::getSteaks( )
 
 bool HunterPitTrap::isOwner( Character *ch ) const
 {
-    return !ch->is_npc( ) && ownerName.getValue( ) == ch->getName( );
+    return !ch->is_npc( ) && ownerName.getValue( ) == ch->getNameC( );
 }
 
 void HunterPitTrap::setOwner( Character *ch )
 {
-    ownerName = ch->getName( );
+    ownerName = ch->getNameC( );
 }
 
 int HunterPitTrap::getQuality( ) const
@@ -1420,7 +1420,7 @@ void HunterPitTrap::setDescription( )
 {
     obj->setDescription( 
             fmt(0, "В земле вырыта яма %s размера.", 
-            size_table.message(URANGE( SIZE_TINY, getSize( ), SIZE_GARGANTUAN ), '2' ).c_str( )) );
+            size_table.message(URANGE( SIZE_TINY, getSize( ), SIZE_GARGANTUAN ), '2' ).c_str( )), LANG_DEFAULT );
 }
 
 /*

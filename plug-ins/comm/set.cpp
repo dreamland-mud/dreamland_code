@@ -436,7 +436,7 @@ void oset( Character* ch, char* argument )
             }
             
             obj->gram_gender = mg;
-            obj->updateCachedNoun();
+            obj->updateCachedNouns();
             ch->pecho("%1$^O1 {Wизмене{Cн%1$Gо||а|ы.{x", obj);
 
         } else if ( !str_cmp( arg2, "personal") )

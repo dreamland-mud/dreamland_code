@@ -104,9 +104,9 @@ void OLCStateReligion::show( PCharacter *ch )
         r->flags.getValue() != 0 ? r->flags.names().c_str() : "-");
 
     OBJ_INDEX_DATA *tattoo = r->tattooVnum == 0 ? 0 : get_obj_index(r->tattooVnum);
-    ptc(ch, "Знак:              {C%d{x [{W%s{x] {D(tattoo help){x\r\n",
+    ptc(ch, "Знак:              {C%d{x [{W%N1{x] {D(tattoo help){x\r\n",
         r->tattooVnum.getValue(), 
-        tattoo ? russian_case(tattoo->short_descr, '1').c_str() : "none");
+        tattoo ? tattoo->getShortDescr(LANG_DEFAULT) : "none");
 
     if (r->help)
         ptc(ch, "Справка: %s {D(hedit %d){x\r\n",
@@ -198,8 +198,8 @@ RELEDIT(mark, "знак", "установить vnum знака религии")
     }
 
     getOriginal()->tattooVnum = vnum.getValue();
-    ptc(ch, "Знак этой религии теперь %d: %s.\r\n", 
-            vnum, russian_case(tattoo->short_descr, '1').c_str());
+    ptc(ch, "Знак этой религии теперь %d: %N1.\r\n", 
+            vnum, tattoo->getShortDescr(LANG_DEFAULT));
 
     if (tattoo->item_type != ITEM_TATTOO) 
         stc("Осторожно, этот предмет не имеет тип 'mark'!\r\n", ch);
@@ -339,7 +339,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
            "{W" + web_cmd(ch, "reledit $1", "%-15s") 
                 + "{w %-17s {W"
                 + web_cmd(ch, "oedit $1", "%-6d")
-                + "{x %s"
+                + "{x %N1"
                 + "{x\r\n";         
         const DLString lineFormatNoTattoo = 
             web_cmd(ch, "reledit $1", "%-15s") 
@@ -360,7 +360,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
                         rel->getShortDescr().c_str(),
                         rel->getRussianName().ruscase('1').c_str(),
                         pObj->vnum,
-                        russian_case(pObj->short_descr, '1').c_str()));
+                        pObj->getShortDescr(LANG_DEFAULT)));
             else
                 ch->send_to(fmt(0, lineFormatNoTattoo.c_str(),
                         rel->getShortDescr().c_str(),

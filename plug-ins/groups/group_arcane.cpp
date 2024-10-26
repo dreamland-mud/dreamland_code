@@ -61,7 +61,7 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
         return;
     }
 
-    DLString so = Morphology::preposition_with(scroll->getShortDescr());
+    DLString so = Morphology::preposition_with(scroll->getShortDescr(LANG_DEFAULT));
     
     if (t->error != 0) {
         switch (t->error) {

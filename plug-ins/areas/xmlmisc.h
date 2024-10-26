@@ -68,7 +68,7 @@ struct XMLDice {
 struct XMLExtraDescription : public XMLVariableContainer {
 XML_OBJECT
 public:
-    XML_VARIABLE XMLMultiString keyword;
+    XML_VARIABLE XMLString keyword;
     XML_VARIABLE XMLMultiString description;
 };
 

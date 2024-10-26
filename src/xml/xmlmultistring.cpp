@@ -1,35 +1,15 @@
+#include <sstream>
 #include "xmlmultistring.h"
 #include "exception.h"
 #include "string_utils.h"
 #include "stringlist.h"
 #include "dl_strings.h"
+#include "grammar_entities_impl.h"
+
+using namespace std;
+using namespace Grammar;
 
 const DLString ATTR_LANG = "l";
-
-// TODO move to separate utils file
-static lang_t attr2lang(const DLString langAttr)
-{
-    if (langAttr == "en")
-        return EN;
-
-    if (langAttr == "ua")
-        return UA;
-
-    if (langAttr == "ru")
-        return RU;
-
-    return LANG_DEFAULT;
-}
-
-static DLString lang2attr(lang_t lang)
-{
-    switch (lang) {
-        case EN: return "en";
-        case UA: return "ua";
-        case RU: return "ru";
-        default: return "en";
-    }
-}
 
 XMLMultiString::XMLMultiString()
 {
@@ -128,11 +108,13 @@ bool XMLMultiString::matchesStrict( const DLString &str ) const
     if (str.empty())
         return false;
 
-    DLString lstr = str.toLower();
+    DLString lstr = str.toLower().colourStrip();
 
     for (int i = LANG_MIN; i < LANG_MAX; i++) {
         lang_t lang = (lang_t)i;
-        if (get(lang).toLower() == lstr)
+        DLString lname = get(lang).toLower().colourStrip();
+
+        if (lname == lstr)
             return true;
     }
 
@@ -144,11 +126,11 @@ bool XMLMultiString::matchesUnstrict( const DLString &str ) const
     if (str.empty())
         return false;
 
-    DLString lstr = str.toLower();
+    DLString lstr = str.toLower().colourStrip();
 
     for (int i = LANG_MIN; i < LANG_MAX; i++) {
         lang_t lang = (lang_t)i;
-        DLString lname = get(lang).toLower();
+        DLString lname = get(lang).toLower().colourStrip();
 
         if (lname.find('|') != DLString::npos)
             lname = russian_case_all_forms(lname);
@@ -165,11 +147,13 @@ bool XMLMultiString::matchesSubstring( const DLString &str ) const
     if (str.empty())
         return false;
 
-    DLString lstr = str.toLower();
+    DLString lstr = str.toLower().colourStrip();
 
     for (int i = LANG_MIN; i < LANG_MAX; i++) {
         lang_t lang = (lang_t)i;
-        if (lstr.strPrefix(get(lang).toLower()))
+        DLString lname = get(lang).toLower().colourStrip();
+
+        if (lstr.strPrefix(lname))
             return true;
     }
 
@@ -189,4 +173,34 @@ void XMLMultiString::fromMixedString(const DLString &str)
 
     (*this)[EN] = en.toString();
     (*this)[RU] = ru.toString();
+}
+
+StringList XMLMultiString::getAllForms() const
+{
+    StringList forms;
+
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
+        DLString lname = get(lang).toLower();
+
+        if (lname.find('|') != DLString::npos) {
+            for (int gcase = Case::NOMINATIVE; gcase < Case::MAX; gcase++)
+                forms.push_back(lname.ruscase('1' + gcase));
+        } else {
+            forms.push_back(lname);
+        }
+    }
+
+    return forms;
+}
+
+DLString XMLMultiString::toString() const
+{
+    return getAllForms().join(" ");
+}
+
+void XMLMultiString::clearValues() 
+{
+    for (auto &i: *this)
+        i.second.clear();
 }

@@ -185,10 +185,10 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
 
             if (matches) {
                 found = true;
-                line = "M[" + web_cmd(ch, "medit $1", "%5d") + "] %-24.24s{x %2d-%2d {g%s{x\n\r";
+                line = "M[" + web_cmd(ch, "medit $1", "%5d") + "] %-24.24N1{x %2d-%2d {g%s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1, 
-                        russian_case(pMob->short_descr, '1').colourStrip( ).c_str( ),
+                        pMob->getShortDescr(LANG_DEFAULT),
                         pReset->arg2, 
                         pReset->arg4,
                         pReset->flags.names().c_str());
@@ -211,11 +211,11 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
 
             if (matches) {
                 found = true;
-                line = "O[" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24s{x %s{x\n\r";
+                line = "O[" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24N1{x %s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1, 
                         get_item_colour(pObj, pReset),
-                        russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
+                        pObj->getShortDescr(LANG_DEFAULT),
                         show_reset_rand(ch, iReset+1, pReset, pObj, pRoom).c_str());
             }
             break;
@@ -238,11 +238,11 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
                     buf << "        ";
 
                 found = true;
-                line = "         [" + web_cmd(ch, "oedit $1", "%5d") + "] {%c%-24.24s %2d-%2d %s{x\n\r";
+                line = "         [" + web_cmd(ch, "oedit $1", "%5d") + "] {%c%-24.24N1{x %2d-%2d %s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1,
                         get_item_colour(pObj, pReset),
-                        russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
+                        pObj->getShortDescr(LANG_DEFAULT),
                         pReset->arg2,
                         pReset->arg4,
                         show_reset_rand(ch, iReset+1, pReset, pObj, pRoom).c_str());
@@ -265,11 +265,11 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
 
             if (matches) {
                 found = true;
-                line = "         [" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24s %s %s{x\n\r";
+                line = "         [" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24N1{x %s %s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1,
                         get_item_colour(pObj, pReset),
-                        russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
+                        pObj->getShortDescr(LANG_DEFAULT),
                         show_reset_wearloc(ch, iReset+1, pReset, pObj, pRoom).c_str(),
                         show_reset_rand(ch, iReset+1, pReset, pObj, pRoom).c_str());
             }
@@ -302,7 +302,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
     }
 
     if (found) {        
-        result << "Resets for room [{C" << web_cmd(ch, "redit $1", pRoom->vnum) << "{x] {W" << pRoom->name << "{x:" << endl;
+        result << "Resets for room [{C" << web_cmd(ch, "redit $1", pRoom->vnum) << "{x] {W" << pRoom->name.get(LANG_DEFAULT) << "{x:" << endl;
         result << buf.str();
     }
 }

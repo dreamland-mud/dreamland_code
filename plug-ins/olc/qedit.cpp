@@ -89,8 +89,7 @@ static DLString show_step_target(PCharacter *ch, const DLString &type, const Int
             return buf.str();
         }
 
-        buf << "{w[{W" << web_cmd(ch, "medit $1", vnum.toString()) << "{w] "
-            << russian_case(pMob->short_descr, '1');
+        buf << "{w[{W" << web_cmd(ch, "medit $1", vnum.toString()) << "{w] " << russian_case(pMob->short_descr[RU], '1');
         return buf.str();
     }
 
@@ -101,8 +100,7 @@ static DLString show_step_target(PCharacter *ch, const DLString &type, const Int
             return buf.str();
         }
 
-        buf << "{w[{W" << web_cmd(ch, "oedit $1", vnum.toString()) << "{w] "
-            << russian_case(pObj->short_descr, '1');
+        buf << "{w[{W" << web_cmd(ch, "oedit $1", vnum.toString()) << "{w] " << russian_case(pObj->short_descr[RU], '1');
         return buf.str();
     }
 
@@ -113,8 +111,7 @@ static DLString show_step_target(PCharacter *ch, const DLString &type, const Int
             return buf.str();
         }
 
-        buf << "{w[{W" << web_cmd(ch, "redit $1", vnum.toString()) << "{w] "
-            << pRoom->name;
+        buf << "{w[{W" << web_cmd(ch, "redit $1", vnum.toString()) << "{w] " << pRoom->name[RU];
 
         return buf.str();
     }
@@ -231,8 +228,7 @@ static DLString show_step_reward(PCharacter *ch, const QuestStep::Pointer &step)
         if (!pObj)
             buf << step->rewardVnum << " {Rне найден{x";
         else
-            buf << "{w[{W" << web_cmd(ch, "oedit $1", step->rewardVnum.toString()) << "{w] "
-                << russian_case(pObj->short_descr, '1');
+            buf << "{w[{W" << web_cmd(ch, "oedit $1", step->rewardVnum.toString()) << "{w] " << russian_case(pObj->short_descr[RU], '1');
     }
 
     return buf.str();

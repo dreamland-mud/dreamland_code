@@ -96,16 +96,16 @@ void QuestItemAppearence::dress( Object *obj ) const
         obj->gram_gender.fromString(gender.c_str());
 
     if (!name.empty( ))
-        obj->setName( (name + " " + obj->pIndexData->name).c_str( ) );
+        obj->setKeyword(name + " " + obj->pIndexData->keyword.toString());
         
     if (!shortDesc.empty( ))
-        obj->setShortDescr( shortDesc.c_str( ) );
+        obj->setShortDescr( shortDesc, LANG_DEFAULT);
         
     if (!desc.empty( ))
-        obj->setDescription( desc.c_str( ) );
+        obj->setDescription( desc, LANG_DEFAULT );
 
     if (!extraDesc.empty( ))
-        obj->addExtraDescr( obj->getName( ), extraDesc );
+        obj->addProperDescription()->description[LANG_DEFAULT] = extraDesc;
 
     if (!material.empty())
         obj->setMaterial(material.c_str());
@@ -123,10 +123,10 @@ QuestMobileAppearence::QuestMobileAppearence( )
 
 void QuestMobileAppearence::dress( NPCharacter *mob ) const
 {
-    mob->setName( name + " " + mob->pIndexData->player_name );
-    mob->setShortDescr( shortDesc );
-    mob->setLongDescr( longDesc + "\r\n" );
-    mob->setDescription( desc + "\r\n" );
+    mob->setKeyword( name + " " + mob->pIndexData->keyword.toString() );
+    mob->setShortDescr( shortDesc, LANG_RU );
+    mob->setLongDescr( longDesc + "\r\n", LANG_RU );
+    mob->setDescription( desc + "\r\n", LANG_RU );
     mob->setSex( sex.getValue( ) ); 
 
     if (race.getName() != "none") {
@@ -173,11 +173,10 @@ Object * VnumList::randomItem( )
 
 bool NameList::hasName( NPCharacter *mob )
 {
-    DLString arg;
-    DLString names = mob->pIndexData->player_name;
+    StringList names = mob->pIndexData->keyword.getAllForms();
 
-    while (!( arg = names.getOneArgument( ) ).empty( ))
-        if (hasElement( arg ))
+    for (auto &name: names)
+        if (hasElement( name ))
             return true;
         
     return false;

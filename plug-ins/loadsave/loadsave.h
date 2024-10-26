@@ -38,7 +38,6 @@ NPCharacter *        create_mobile        ( mob_index_data *pMobIndex );
 NPCharacter *        create_mobile_nocount( mob_index_data * );
 NPCharacter *        create_mobile_org( mob_index_data *pMobIndex, int flags );
 void create_mob_affects(NPCharacter *mob);
-void                clone_mobile        ( NPCharacter *parent, NPCharacter *clone);
 Object *        create_object        ( obj_index_data *pObjIndex, short level );
 Object *        create_object_nocount ( obj_index_data *pObjIndex, short level );
 Object *        create_object_org (obj_index_data *pObjIndex,short level,bool Count);
@@ -102,11 +101,9 @@ Object *        get_obj_wear        ( Character *ch, const DLString & );
 Object *        get_obj_here        ( Character *ch, const DLString & );
 Object *        get_obj_here        ( Character *ch, char *argument );
 Object *        get_obj_world        ( Character *ch, char *argument );
-DLString        get_obj_name_list( Object *target, Object *list, Character *ch );
 Object *        get_obj_world_unique( int vnum, Character *ch );
 list<Object *>        get_objlist_world_unique( int vnum, Character *ch );
 Object *        get_obj_room_unique( Room *room, int itype, Character *ch );
-DLString         get_char_name_list( Character *target, Character *list, Character *ch );
 Object *        get_obj_room( Character *ch, const char *argument );
 Object *        get_obj_room( Character *ch, const DLString & );
 Object *        get_obj_wear_victim( Character *victim, const DLString &cArg, Character *ch );
@@ -124,6 +121,8 @@ Object *        get_obj_wear_carry( Character *ch, const DLString &cArgument, Ch
 Object * get_key_carry( Character *ch, int vnum );
 
 bool can_see_god(Character *ch, Character *god);
+bool mob_index_has_name( mob_index_data *pMob, const DLString &arg );
+bool obj_index_has_name( obj_index_data *pObj, const DLString &arg );
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
 long long get_arg_id( const DLString &cArgument );
 bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long long id );

@@ -104,7 +104,6 @@ void DefaultSpell::unsetSkill( )
 
 void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
 {
-    char arg[MAX_STRING_LENGTH];                                            
     int sn;
     
     if (!spt)
@@ -135,7 +134,6 @@ void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
 
 bool DefaultSpell::apply( Character *ch, SpellTargetPointer spt, int level )
 {
-    char arg[MAX_STRING_LENGTH];      
     bool rc;                                      
     
     if (!spt)
@@ -469,7 +467,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         EXTRA_EXIT_DATA *peexit = ch->in_room->extra_exits.find(arg.c_str());
 
         if (peexit && ch->can_see(peexit)) {
-            result->extraExit = peexit->keyword;
+            result->extraExit = peexit->keyword.get(LANG_EN);
             result->doorOrExtraExit = result->extraExit;
             return result;
         }

@@ -63,6 +63,14 @@ void Character::pecho( const DLString &line )
     }
 }
 
+void Character::pecho(const XMLMultiString &line)
+{
+    const lang_t lang = LANG_DEFAULT; // TODO take from player config
+    // TODO output non-empty fallback string
+    pecho(line.get(lang));
+}
+
+
 void Character::pecho( const char *f, ... )
 {
     va_list av;

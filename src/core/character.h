@@ -101,17 +101,12 @@ public:
     virtual NPCharacter * getMobile( );
     
     // set-get methods inherited from CharacterMemoryInterface
-    virtual const DLString& getName( ) const ;
-    virtual void setName( const DLString& ) ;
 
     virtual short getLevel( ) const ;
     virtual void setLevel( short ) ;
 
     virtual ReligionReference & getReligion( ) ;
     virtual void setReligion( const ReligionReference & );
-
-    virtual short getSex( ) const ;
-    virtual void setSex( short ) ;
 
     virtual int getAlignment( ) const;
     virtual void setAlignment( int );
@@ -142,7 +137,6 @@ public:
     virtual short getModifyLevel( ) const = 0;
 
     // name and sex formatting
-    virtual const char * getNameC( ) const;
     DLString sees( const Character *whomsee, char needcase = '1' ) const;
     DLString seeName( const Character *whomsee, char needcase = '1' ) const;
 
@@ -151,6 +145,7 @@ public:
     void send_to( const DLString& );
     void send_to( ostringstream& );
     void vpecho( const char *, va_list );
+    void pecho(const XMLMultiString &line);
     void pecho( const DLString &line );
     void pecho( const char *, ... );
     void pecho( int pos, const char *, ... );
@@ -209,7 +204,6 @@ public:
 protected:
     XML_VARIABLE XMLLongLong ID;
     bool dead;
-    XML_VARIABLE XMLString name;
     XML_VARIABLE XMLShort level;
     XML_VARIABLE XMLClanReference clan;
     XML_VARIABLE XMLProfessionReference profession;

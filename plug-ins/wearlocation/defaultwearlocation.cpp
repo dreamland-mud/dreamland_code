@@ -210,7 +210,7 @@ bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
         return false;
     }
     
-    if (!obj->getRealShortDescr( ) && obj->wasAntiAligned( ch )) {
+    if (obj->getRealShortDescr( ).empty() && obj->wasAntiAligned( ch )) {
         echo_master(ch, "Твоя натура все еще не позволяет тебе носить %O4, сперва нужно изменить внешний вид этой вещи.", obj);
         ch->recho("%1$^C1 безуспешно пытается надеть %2$O4.", ch, obj);
         return false;

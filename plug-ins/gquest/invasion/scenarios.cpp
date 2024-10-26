@@ -138,7 +138,7 @@ void InvasionBubblesMob::actDeath( Character *killer )
     DLString s;
     ostringstream buf;
 
-    s = ch->getNPC( )->getShortDescr( );
+    s = ch->getNPC( )->getShortDescr(LANG_DEFAULT);
     
     if (s.length( ) >= 2 && s.at( 0 ) == '{')
         buf << fmt(0, "{%c", s.at( 1 ));

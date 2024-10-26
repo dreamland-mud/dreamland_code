@@ -50,6 +50,7 @@ long long get_arg_id( const DLString &cArgument )
 // Doppel is already applied.
 static bool char_has_name(Character *target, const DLString &arg)
 {
+    // TODO getNameP doesn't return all languages. Make PC/NPC specific? 
     return is_name(arg.c_str(), target->getNameP('7').c_str());
 }
 
@@ -263,40 +264,6 @@ Object *get_obj_list( Character *ch, const DLString &cArg, Object *list, DLStrin
         }
 
         return 0;
-}
-
-DLString get_obj_name_list( Object *target, Object *list, Character *ch )
-{
-    Object *obj;
-    int count;
-
-    for (obj = list, count = 1; 
-         obj && obj != target; 
-         obj = obj->next_content) 
-    {
-        if (obj->getName( ) == target->getName( ))
-            if (ch->can_see( obj ) || ch->can_hear( obj ))
-                count++;
-    }
-
-    return DLString( count ) + "." + target->getName( );
-}
-
-DLString get_char_name_list( Character *target, Character *list, Character *ch )
-{
-    Character *rch;
-    int count;
-
-    for (rch = list, count = 1; 
-         rch && rch != target; 
-         rch = rch->next_in_room) 
-    {
-        if (rch->getName( ) == target->getName( ))
-            if (ch->can_see( rch ))
-                count++;
-    }
-
-    return DLString( count ) + "." + target->getName( );
 }
 
 Object * get_obj_carry( Character *ch, const DLString & constArgument )
@@ -808,23 +775,26 @@ bool can_see_god(Character *ch, Character *god)
     return true;
 }
 
+bool mob_index_has_name( mob_index_data *pMob, const DLString &arg )
+{
+    return pMob->short_descr.matchesUnstrict(arg) || pMob->keyword.matchesUnstrict(arg);
+}
+
 bool obj_index_has_name( OBJ_INDEX_DATA *pObj, const DLString &arg )
 {
-    DLString allnames = russian_case_all_forms(pObj->short_descr) + " " + pObj->name;    
-    return is_name(arg.c_str(), allnames.c_str());
+    return pObj->short_descr.matchesUnstrict(arg) || pObj->keyword.matchesUnstrict(arg);
 }
 
 /** Return true if character can access object by the name. */
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch )
 {
-    // First try matching by obj names.
-    if (is_name( arg.c_str( ), obj->getName( ) ))
+    // First try matching by obj keywords.
+    if (obj->getKeyword().matchesUnstrict(arg))
         return true;
 
     // Then try to match by short descr, all grammatical cases, no colours.
-    for (int gcase = Grammar::Case::NONE; gcase < Grammar::Case::MAX; gcase++)    
-        if (is_name( arg.c_str( ), obj->getShortDescr( gcase ).c_str( ) ))
-            return true;
+    if (obj->getShortDescr().matchesUnstrict(arg))
+        return true;
         
     // No match.
     return false;

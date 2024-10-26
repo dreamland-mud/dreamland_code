@@ -72,7 +72,7 @@ void NannyHandler::close( Descriptor *d )
         }
         
         PCharacterManager::quit( ch->getPC( ) );
-        LogStream::sendWarning( ) << "Closing nanny link to " << ch->getName( ) << '.' << endl;
+        LogStream::sendWarning( ) << "Closing nanny link to " << ch->getPC()->getName( ) << '.' << endl;
         mprog_extract( ch, true );
         ddeallocate( ch );
         d->character = NULL;
@@ -189,7 +189,7 @@ int NannyHandler::handle(Descriptor *d, char *arg)
 void NannyHandler::prompt( Descriptor *d )
 {
     if (d->character 
-        && !d->character->getName( ).empty( )
+        && !d->character->getPC()->getName( ).empty( )
         && d->echo)
     {
         d->character->send_to( "{R>{x ");
@@ -393,10 +393,10 @@ NMI_INVOKE( NannyHandler, reanimate, "" )
         FeniaManager::wrapperManager->getTarget( args.front( ), ch );
         FeniaManager::wrapperManager->getTarget( args.back( ), twin );
         
-        while (( d = descriptor_find_named( ch->desc, ch->getName( ) ) ))
+        while (( d = descriptor_find_named( ch->desc, ch->getPC()->getName( ) ) ))
             d->close( );
 
-        if (!PCharacterManager::findPlayer( ch->getName( ) ))
+        if (!PCharacterManager::findPlayer( ch->getPC()->getName( ) ))
             return false;
         
         d = ch->desc;
@@ -422,7 +422,7 @@ NMI_INVOKE( NannyHandler, checkBan, "" )
     if (banManager->check( d, BAN_ALL ))
         return "banall";
 
-    if (( pci = PCharacterManager::find( ch->getName( ) ) )) {
+    if (( pci = PCharacterManager::find( ch->getPC()->getName( ) ) )) {
         if (pci->getAttributes( ).isAvailable( "deny" ))
             return "deny";
 

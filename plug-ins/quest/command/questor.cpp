@@ -405,10 +405,10 @@ void QuestScrollBehavior::createDescription( PCharacter *ch )
     }
 
     if (bufSkill.str( ).empty( ))
-        obj->addExtraDescr( obj->getName( ), bufEmpty.str( ) );
+        obj->addProperDescription()->description[LANG_DEFAULT] = bufEmpty.str();
     else {
         bufInfo << bufSkill.str( ) << "." << endl;
-        obj->addExtraDescr( obj->getName( ), bufInfo.str( ) );
+        obj->addProperDescription()->description[LANG_DEFAULT] = bufInfo.str();
     }
 }
 
@@ -425,9 +425,11 @@ void QuestScrollBehavior::setOwner( PCharacter *pch )
 
 bool QuestScrollBehavior::isOwner( Character *ch ) const
 {
-    return !(ownerName.getValue( ) != ch->getName( ) 
-            || ownerID.getValue( ) != ch->getID( )
-            || ch->is_npc( ));
+    if (ch->is_npc())
+        return false;
+
+    return !(ownerName.getValue( ) != ch->getPC()->getName( ) 
+            || ownerID.getValue( ) != ch->getID( ));
 }
 
 bool QuestScrollBehavior::hasTrigger( const DLString &t )
@@ -522,10 +524,8 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         return;
     }
     
-    if (client->getDescription( )) {
-        descr = client->getDescription( );
-        descr.stripWhiteSpace( );
-    }
+    descr = client->getDescription(LANG_DEFAULT);
+    descr.stripWhiteSpace( );
 
     if (!IS_SET( client->act, PLR_CONFIRMED )) {
         if (attr->getAllVictoriesCount() > 20) {

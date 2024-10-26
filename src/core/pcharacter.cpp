@@ -131,101 +131,124 @@ void XMLPlayerAge::fromXML( const XMLNode::Pointer &parent )
 void CachedNoun::clear( )
 {
     name.clear( );
-    russian.clear( );
     vampire.clear( );
     vampire2.clear( );
     immortal.clear( );
     pretitle.clear( );
-    pretitleRussian.clear( );
+    allForms.clear();
 }
 
 void CachedNoun::update( PCharacter *ch )
 {
-    static const DLString vampireName = "{DСоздани|е|я|ю|е|ем|и ночи{x";
-    static const DLString immortalName = "{CБожеств|о{x|а{x|у{x|о{x|ом{x|е{x";
+    // TODO externalise translations
+    map<lang_t, DLString> vampireNames = {
+        {LANG_EN, "{DChild of the Night{x"},
+        {LANG_RU, "{DСоздани|е|я|ю|е|ем|и ночи{x"},
+        {LANG_UA, "{DСтворінн|я|я|ю|я|ям|і ночі{x"}
+    };
+    map<lang_t, DLString> immortalNames = {
+        {LANG_EN, "{CImmortal{x"},
+        {LANG_RU, "{CБожеств|о{x|а{x|у{x|о{x|ом{x|е{x"},
+        {LANG_UA, "{CБожеств|о{x|а{x|у{x|о{x|ом{x|і{x"}        
+    };
     MultiGender mg( ch->getSex( ), Number::SINGULAR );
-    
+
     /* plain english name */
-    if (!name) {
-        name = InflectedString::Pointer( NEW, ch->getName( ), mg );
-    }
+    if (name.find(LANG_EN) == name.end())
+        name[LANG_EN] = InflectedString::Pointer( NEW, ch->getName( ), mg );
     else {
-        name->setFullForm( ch->getName( ) );
-        name->setGender( mg );
+        name[LANG_EN]->setFullForm( ch->getName( ) );
+        name[LANG_EN]->setGender( mg );
     }
-    
+
     /* russian name if set. defaults to english */
     DLString rname = ch->getRussianName( ).getFullForm( );
     if (rname.empty( ))
         rname = ch->getName( );
     
-    if (!russian) {
-        russian = InflectedString::Pointer( NEW, rname, mg );
-    }
+    if (name.find(LANG_RU) == name.end())
+        name[LANG_RU] = InflectedString::Pointer( NEW, rname, mg );
     else {
-        russian->setFullForm( rname );
-        russian->setGender( mg );
+        name[LANG_RU]->setFullForm( rname );
+        name[LANG_RU]->setGender( mg );
     }
-    
-    /* vampire as visible to non-vampires */
-    if (!vampire) {
-        vampire = InflectedString::Pointer( NEW, vampireName, mg );
-    }
-    else {
-        vampire->setGender( mg );
-    }
-    
-    /* vampire as visible to immortals */
-    DLString v2name = vampireName + " [" + ch->getName( ) + "]";
 
-    if (!vampire2) {
-        vampire2 = InflectedString::Pointer( NEW, v2name, mg );
-    }
+    /* UA name if set, defaults to previous values */
+    /* TODO add a way to set this name. */
+    DLString uaname = rname;
+    if (name.find(LANG_UA) == name.end())
+        name[LANG_UA] = InflectedString::Pointer( NEW, uaname, mg );
     else {
-        vampire2->setFullForm( v2name );
-        vampire2->setGender( mg );
+        name[LANG_UA]->setFullForm( uaname );
+        name[LANG_UA]->setGender( mg );
     }
-    
-    /* immortals under wizinvis */
-    if (!immortal) {
-        immortal = InflectedString::Pointer( NEW, immortalName, mg );
+
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        /* vampire as visible to non-vampires */
+        if (vampire.find(lang) == vampire.end()) {
+            vampire[lang] = InflectedString::Pointer( NEW, vampireNames[lang], mg );
+        }
+        else {
+            vampire[lang]->setGender( mg );
+        }
+        
+        /* vampire as visible to immortals */
+        DLString v2name = vampireNames[lang] + " [" + name[lang]->getFullForm() + "]";
+
+        if (vampire2.find(lang) == vampire2.end()) {
+            vampire2[lang] = InflectedString::Pointer( NEW, v2name, mg );
+        }
+        else {
+            vampire2[lang]->setFullForm( v2name );
+            vampire2[lang]->setGender( mg );
+        }
+        
+        /* immortals under wizinvis */
+        if (immortal.find(lang) == immortal.end()) {
+            immortal[lang] = InflectedString::Pointer( NEW, immortalNames[lang], mg );
+        }
+        else {
+            immortal[lang]->setGender( mg );
+        }
     }
-    else {
-        immortal->setGender( mg );
-    }
-    
-    /* english name with pretitle, russian name with russian or english pretitle */
-    DLString prt, rprt;
+
+    /* names with pretitles */
     bool colored = ch->getRemorts( ).pretitle;
-    
-    if (!ch->getPretitle( ).empty()) {
-        prt << (colored ? ch->getPretitle( ) : ch->getPretitle( ).colourStrip( )) << " ";
+    map<lang_t, DLString> pretitles;
+
+    pretitles[LANG_EN] = colored ? ch->getPretitle() : ch->getPretitle().colourStrip();
+    pretitles[LANG_RU] = colored ? ch->getRussianPretitle() : ch->getRussianPretitle().colourStrip();
+    pretitles[LANG_RU] = pretitles[LANG_RU].empty() ? pretitles[LANG_EN] : pretitles[LANG_RU];
+    // TODO add a way to set UA pretitle, get rid of separate getPretitle, getRusPretitle calls
+    pretitles[LANG_UA] = pretitles[LANG_RU];
+
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        DLString nameAndPretitle;
+
+        nameAndPretitle = pretitles[lang] + " " + name[lang]->getFullForm();
+
+        if (pretitle.find(lang) == pretitle.end()) 
+            pretitle[lang] = InflectedString::Pointer( NEW, nameAndPretitle, mg );
+        else {
+            pretitle[lang]->setFullForm(nameAndPretitle);
+            pretitle[lang]->setGender(mg);
+        }
     }
 
-    if (!ch->getRussianPretitle( ).empty()) {
-        rprt << (colored ? ch->getRussianPretitle( ) : ch->getRussianPretitle( ).colourStrip( )) << " "; 
-    } else {
-        rprt << prt;
+    /* set form with all cases */
+    StringList forms;
+
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        DLString allCases = name[lang]->decline('7');
+        if (!allCases.empty())
+            forms.push_back(allCases);
     }
 
-    prt << ch->getName( );
-    rprt << rname;
-
-    if (!pretitle) {
-        pretitle = InflectedString::Pointer( NEW, prt, mg );
-    }
-    else {
-        pretitle->setFullForm( prt );
-        pretitle->setGender( mg );
-    }
-
-    if (!pretitleRussian) {
-        pretitleRussian = InflectedString::Pointer( NEW, rprt, mg );
-    }
-    else {
-        pretitleRussian->setFullForm( rprt );
-        pretitleRussian->setGender( mg );
-    }
+    allForms = forms.join(" ");
 }
 
 /**************************************************************************
@@ -254,6 +277,7 @@ void PCharacter::init( )
 {
     Character::init( );
 
+    name = "";
     password = "";
     lastAccessTime.setTime( 0 );
     lastAccessHost = "";
@@ -271,7 +295,7 @@ void PCharacter::init( )
     title.setValue( "" );
     pretitle.setValue( "" );
     russianPretitle.setValue( "" );
-    description.clear();
+    description.clearValues();
     skills.clear( );
     bonuses.clear();
     security = 0;
@@ -454,15 +478,38 @@ bool PCharacter::nodeFromXML( const XMLNode::Pointer& child )
 /**************************************************************************
  * set-get methods inherited from PCMemoryInterface
  **************************************************************************/
+const DLString& PCharacter::getName( ) const 
+{
+    return name.getValue( );
+}
+
+void PCharacter::setName( const DLString& name ) 
+{
+    this->name.setValue( name );
+    updateCachedNoun( );
+}
+
+const char * PCharacter::getNameC( ) const
+{
+    return name.c_str();
+}
+
+short PCharacter::getSex( ) const 
+{
+    return sex.getValue( );
+}
+
+void PCharacter::setSex( short sex ) 
+{
+    this->sex.setValue( sex );
+    updateCachedNoun( );
+}
+
 bool PCharacter::isOnline( ) const
 {
     return true;
 }
 
-const DLString& PCharacter::getName( ) const 
-{
-    return Character::getName( );
-}
 const DLString& PCharacter::getPassword( ) const 
 {
     return password.getValue( );
@@ -557,10 +604,6 @@ void PCharacter::setClanLevel( short clanLevel )
 {
     this->clanLevel.setValue( clanLevel );
 }
-short PCharacter::getSex( ) const 
-{
-    return Character::getSex( );
-}
 XMLAttributes& PCharacter::getAttributes( ) 
 {
     return attributes;
@@ -615,9 +658,9 @@ void PCharacter::setDescription( const DLString& d, lang_t lang )
 {
     description[lang] = d;
 }
-const char * PCharacter::getDescription( lang_t lang ) const
+const DLString & PCharacter::getDescription( lang_t lang ) const
 {
-    return description.get(lang).c_str( );
+    return description.get(lang);
 }
 const XMLMultiString & PCharacter::getDescription( ) const
 {
@@ -664,6 +707,8 @@ using namespace Grammar;
 
 Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
 {
+    // TODO derive lang param from 'forWhom'
+    lang_t lang = LANG_DEFAULT;
     const Character *wch = dynamic_cast<const Character *>(forWhom);
     PlayerConfig cfg = wch ? wch->getConfig( ) : PlayerConfig();
     
@@ -673,30 +718,24 @@ Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
     if (IS_SET(flags, FMT_INVIS) && wch) {
         if (!wch->can_see( this )) {
             if (is_immortal( ))
-                return cachedNoun.immortal;
+                return cachedNoun.immortal.find(lang)->second;
             else
                 return somebody;
         }
                 
         if (is_vampire( ) && !wch->is_vampire( )) {
             if (cfg.holy) 
-                return cachedNoun.vampire2;
+                return cachedNoun.vampire2.find(lang)->second;
             else
-                return cachedNoun.vampire;
+                return cachedNoun.vampire.find(lang)->second;
         }
     }
     
     if (IS_SET(flags, FMT_PRETITLE)) {
-        if (wch && !cfg.runames)
-            return cachedNoun.pretitle;
-        else
-            return cachedNoun.pretitleRussian;
+        return cachedNoun.pretitle.find(lang)->second;
     }
     
-    if (wch && !cfg.runames)
-        return cachedNoun.name;
-    else
-        return cachedNoun.russian;
+    return cachedNoun.name.find(lang)->second;
 }
 
 void PCharacter::updateCachedNoun( )
@@ -704,16 +743,13 @@ void PCharacter::updateCachedNoun( )
     cachedNoun.update( this );
 }
 
-DLString PCharacter::getNameP( char gram_case ) const
+const DLString &PCharacter::getNameP( char gram_case ) const
 {
-    ostringstream buf;
-
-    buf << cachedNoun.russian->decline( gram_case );
-    
+    // TODO special name for the case
     if (gram_case == '7')
-        buf << " " << getName( );
-
-    return buf.str( );
+        return cachedNoun.allForms;
+    else
+        return cachedNoun.name.find(LANG_DEFAULT)->second->decline(gram_case);
 }
 
 /**************************************************************************

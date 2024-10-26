@@ -2,22 +2,10 @@
 #define XMLMULTISTRING_H
 
 #include <map>
-#include "dlstring.h"
 #include "xmlnode.h"
 #include "xmlvariable.h"
-
-// quick fix
-typedef enum {
-    LANG_MIN = 0,
-    LANG_EN = 0,
-    LANG_RU = 1,
-    LANG_UA = 2,
-    EN = LANG_EN,
-    RU = LANG_RU,
-    UA = LANG_UA,
-    LANG_MAX = 3,
-    LANG_DEFAULT = RU
-} lang_t;
+#include "stringlist.h"
+#include "lang.h"
 
 /** XML representation of a string defined in several different languages. */
 class XMLMultiString : public std::map<lang_t, DLString> {
@@ -33,6 +21,13 @@ public:
     bool matchesSubstring( const DLString &str ) const;    
 
     void fromMixedString(const DLString &str);
+
+    StringList getAllForms() const;
+
+    // Return a space-separated string of all language entries
+    DLString toString() const;
+
+    void clearValues();
 };
 
 #endif

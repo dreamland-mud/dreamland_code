@@ -172,7 +172,7 @@ CMDRUNP( smell )
             rc = true;
 
         if (!rc) {
-            DLString smell = ch->in_room->pIndexData->smell;
+            auto &smell = ch->in_room->pIndexData->smell;
             if (!smell.empty()) {
                 ch->pecho(smell);
                 rc = true;

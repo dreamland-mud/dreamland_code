@@ -19,7 +19,7 @@
 #include "xmlflags.h"
 #include "xmlglobalarray.h"
 #include "xmltimestamp.h"
-
+#include "xmlmultistring.h"
 #include "xmlinflectedstring.h"
 
 #include "pcmemoryinterface.h"
@@ -75,13 +75,12 @@ struct CachedNoun {
     void update( PCharacter * );
     void clear( );
 
-    InflectedString::Pointer name;
-    InflectedString::Pointer russian;
-    InflectedString::Pointer vampire;
-    InflectedString::Pointer vampire2;
-    InflectedString::Pointer immortal;
-    InflectedString::Pointer pretitle;
-    InflectedString::Pointer pretitleRussian;
+    map<lang_t, InflectedString::Pointer> name;
+    map<lang_t, InflectedString::Pointer> vampire;
+    map<lang_t, InflectedString::Pointer> vampire2;
+    map<lang_t, InflectedString::Pointer> immortal;
+    map<lang_t, InflectedString::Pointer> pretitle;
+    DLString allForms;
 };
 
 /**
@@ -120,9 +119,11 @@ public:
     virtual bool nodeFromXML( const XMLNode::Pointer & );
  
     // set-get methods inherited from PCMemoryInterface
-    virtual bool isOnline( ) const;
-
     virtual const DLString& getName( ) const ;
+    virtual void setName( const DLString& ) ;
+    virtual const char * getNameC( ) const;
+
+    virtual bool isOnline( ) const;
 
     virtual const DLString& getPassword( ) const ;
     virtual void setPassword( const DLString& ) ;
@@ -159,6 +160,7 @@ public:
     int addQuestPoints(int);
 
     virtual short getSex( ) const ;
+    virtual void setSex( short ) ;
 
     virtual XMLAttributes& getAttributes( ) ;
     virtual void setAttributes( const XMLAttributes& attributes ) ;
@@ -187,14 +189,14 @@ public:
     virtual const DLString & getTitle( ) const;
     
     virtual void setDescription( const DLString&, lang_t lang );
-    virtual const char * getDescription( lang_t lang ) const;
+    virtual const DLString & getDescription( lang_t lang ) const;
     virtual const XMLMultiString & getDescription( ) const;
     virtual void setDescription( const XMLMultiString & ); 
     
     // name and sex formatting
-    virtual DLString getNameP( char gram_case ) const;
+    virtual const DLString &getNameP( char gram_case ) const;
     virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
-    virtual void updateCachedNoun( );
+    void updateCachedNoun();
 
     // visibility of things
     bool canSeeLevel( PCharacter * );
@@ -235,6 +237,7 @@ public:
     Character *body();
 
 private:
+    XML_VARIABLE XMLString name;
     XML_VARIABLE XMLString password; 
     XML_VARIABLE XMLDate lastAccessTime;
     XML_VARIABLE XMLString lastAccessHost;

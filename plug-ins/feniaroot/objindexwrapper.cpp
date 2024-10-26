@@ -96,19 +96,19 @@ NMI_GET( ObjIndexWrapper, material, "название материала, из �
 NMI_GET( ObjIndexWrapper, description, "описание, видимое на земле") 
 { 
     checkTarget( ); 
-    return Register( target->description );
+    return Register( target->description.get(LANG_DEFAULT) );
 }
 
 NMI_GET( ObjIndexWrapper, name, "имена предмета, на которые он откликается") 
 { 
     checkTarget( ); 
-    return Register( target->name);
+    return Register( target->keyword.toString());
 }
 
 NMI_GET( ObjIndexWrapper, short_descr, "описание, видимое в инвентаре и при манипуляциях") 
 { 
     checkTarget( ); 
-    return Register( target->short_descr);
+    return Register( target->short_descr.get(LANG_DEFAULT));
 }
 
 NMI_GET( ObjIndexWrapper, limit , "максимальное кол-во экземпляров существующих одновременно или -1") 

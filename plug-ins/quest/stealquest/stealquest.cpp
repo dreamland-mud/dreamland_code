@@ -81,20 +81,20 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
         throw e;
     }
 
-    name = victim->getShortDescr( );
+    name = victim->getShortDescr(LANG_DEFAULT);
     name.upperFirstCharacter( );
     victimName = name;
     victimRoom = victim->in_room->getName();
     victimArea = victim->in_room->areaName();
     
-    name = thief->getShortDescr( );
+    name = thief->getShortDescr(LANG_DEFAULT);
     name.upperFirstCharacter( );
     thiefName = name;
     thiefArea = thief->in_room->areaName();
     thiefRoom = thief->in_room->getName();
     thiefSex = thief->getSex( );
 
-    itemName = item->getShortDescr( );
+    itemName = item->getShortDescr(LANG_DEFAULT);
     itemWear.assign( item->wear_loc );
     chestRoom = getRoomHint( hideaway );
 
@@ -133,7 +133,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     
     wiznet( "", "thief [%s] [%d], obj [%s], victim [%s] [%d], chest [%d], mode %d",
                 thief->getNameP( '1' ).c_str(), thief->in_room->vnum,
-                item->getShortDescr( '1' ).c_str( ),
+                item->getShortDescr( '1', LANG_DEFAULT ).c_str( ),
                 victim->getNameP( '1' ).c_str(), victim->in_room->vnum,
                 (hideaway ? hideaway->vnum : 0),
                 mode.getValue( ) );
@@ -146,7 +146,7 @@ void StealQuest::clear( Object *obj )
     if (obj) {
         if (obj->carried_by 
             && obj->carried_by->is_npc( )
-            && victimName ^ obj->carried_by->getNPC( )->getShortDescr( ))
+            && victimName ^ obj->carried_by->getNPC( )->getShortDescr(LANG_DEFAULT))
         {
             save_mobs( obj->carried_by->in_room );
         }

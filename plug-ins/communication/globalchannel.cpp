@@ -260,7 +260,7 @@ void GlobalChannel::triggers( Character *ch, const DLString &msg ) const
         && getLog( ) != LOG_NEVER
         && (!ch->desc || ch->desc->echo))
     {
-        LogStream::sendNotice( ) << "channel [" << getName( ) << "] " << ch->getName( ) << ": " << msg << endl;
+        LogStream::sendNotice( ) << "channel [" << getName( ) << "] " << ch->getNameP('1') << ": " << msg << endl;
     }
     
     if (!msg.empty() && hook) {

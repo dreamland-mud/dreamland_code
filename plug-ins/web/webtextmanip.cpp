@@ -43,10 +43,10 @@ static const char * consume_keyword(const char *desc, DLString &keyword)
 // Returns all extra description keywords matching given one.
 // In the absense of unique numeric IDs for extra descriptions,
 // this is used to identify an extra descr as exactly as possible.
-static DLString unique_keyword_id(EXTRA_DESCR_DATA *ed, const DLString &keyword)
+static DLString unique_keyword_id(const ExtraDescrList *const &edList, const DLString &keyword)
 {
-    for (; ed; ed = ed->next)
-        if (is_name( keyword.c_str( ), ed->keyword ))
+    for (auto &ed: *edList)
+        if (is_name( keyword.c_str( ), ed->keyword.c_str() ))
             return ed->keyword;
 
     return DLString::emptyString;
@@ -63,7 +63,7 @@ WEBMANIP_RUN(decorateExtraDescr)
 {
     const ExtraDescrManipArgs &myArgs = static_cast<const ExtraDescrManipArgs &>( args );
     const char *desc = myArgs.desc;
-    extra_descr_data *ed = myArgs.ed;
+    const ExtraDescrList * const&edList = myArgs.edList;
     const char *d;
 
     for (d = desc; *d; ++d) {
@@ -84,7 +84,7 @@ WEBMANIP_RUN(decorateExtraDescr)
 
         // Found something that may be a description keyword. 
         // Look if matching extra description exists.
-        DLString unique = unique_keyword_id(ed, keyword);
+        DLString unique = unique_keyword_id(edList, keyword);
         if (unique.empty( )) {
             // False alarm, move along.
             buf << "(" << keyword << ")";

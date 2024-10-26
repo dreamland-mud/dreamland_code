@@ -890,7 +890,7 @@ bool spec_assassinater( NPCharacter *ch )
         }
 
         do_say( ch, msg.c_str() );
-        interpret_raw( ch, "assassinate", victim->getName( ).c_str( ) );
+        interpret_raw( ch, "assassinate", victim->getNameC( ));
         return true;
 }
 

@@ -207,7 +207,7 @@ void GangMember::greet( Character *mob )
         return;
     
     if ((isLastFought( mob ) 
-         || (!mob->is_npc( ) && mob->getName( ) == fighting.getValue( )))
+         || (!mob->is_npc( ) && mob->getPC()->getName( ) == fighting.getValue( )))
         && ch->can_see( mob ) 
         && state == STAT_NORMAL) 
     {
@@ -460,7 +460,7 @@ bool GangMember::canAttack( Character *mob )
 PCharacter * GangMember::getFightingRoom( Room *const pRoomIndex )
 {
     for (Character *vch = pRoomIndex->people; vch; vch = vch->next_in_room) 
-        if (!vch->is_npc( ) && vch->getName( ) == fighting)
+        if (!vch->is_npc( ) && vch->getPC()->getName( ) == fighting)
             return vch->getPC( );
 
     return NULL;

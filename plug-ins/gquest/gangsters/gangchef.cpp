@@ -36,7 +36,7 @@ bool GangChef::death( Character *killer )
         gquest->state = Gangsters::ST_BROKEN;                
     } else {
         gquest->state = Gangsters::ST_CHEF_KILLED;                
-        gquest->chefKiller = killer->getName( );
+        gquest->chefKiller = killer->getNameC( );
         createBounty(killer);
     }
     

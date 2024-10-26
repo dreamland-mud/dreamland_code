@@ -152,3 +152,22 @@ DLString Syntax::label_ru(const DLString &names)
 
     return DLString::emptyString;
 }
+
+
+DLString Syntax::label_en(const XMLMultiString &str)
+{
+    DLString label = str.get(LANG_EN);
+    if (label.empty())
+        label = str.get(LANG_RU);
+        
+    return label.getOneArgument();
+}
+
+DLString Syntax::label_ru(const XMLMultiString &str)
+{
+    DLString label = str.get(LANG_EN);
+    if (label.empty())
+        label = str.get(LANG_RU);
+    
+    return label.getOneArgument();
+}

@@ -1195,8 +1195,8 @@ void OLCStateSkillGroup::show(PCharacter *ch)
             g->hidden ? "yes" : "no");
 
     MOB_INDEX_DATA *pMob = get_mob_index(g->getPracticer());
-    ptc(ch, "Учитель:     {g%s{x [%d] {D(practicer){x\r\n",
-             (pMob ? russian_case(pMob->short_descr, '1').c_str() : "-"),
+    ptc(ch, "Учитель:     {g%N1{x [%d] {D(practicer){x\r\n",
+             (pMob ? pMob->getShortDescr(LANG_DEFAULT) : "-"),
              g->getPracticer());
     ptc(ch, "Боги:        {g%s {D(gods){x\r\n",
         g->gods.empty() ? "-": g->gods.toString().c_str());

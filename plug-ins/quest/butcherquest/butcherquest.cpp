@@ -36,7 +36,7 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     findVictims( pch, games );
     pGameIndex  = getRandomMobIndex( games );
     raceName    = pGameIndex->race;
-    raceRusName = pGameIndex->short_descr;
+    raceRusName = pGameIndex->short_descr.get(LANG_DEFAULT);
     areaName    = pGameIndex->area->getName();
     
     if (Player::isNewbie(pch))

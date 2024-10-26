@@ -9,7 +9,7 @@
 #include "commandplugin.h"
 
 class Object;
-struct extra_descr_data;
+struct ExtraDescription;
 
 class CWrite : public CommandPlugin {
 XML_OBJECT
@@ -24,13 +24,6 @@ private:
     void writeOnWall( Character *, Object *, DLString & );
     void writeOnPaper( Character *, Object *, DLString & );
     void usage( Character * );
-
-    extra_descr_data * descFind( Object *, const DLString & );
-    extra_descr_data * descAdd( Object *, const DLString & );
-    void descFree( Object *, const DLString & );
-    
-    void lineAdd( extra_descr_data *, const DLString & );
-    bool lineDel( extra_descr_data * );
 
     Object * findNail( Character * );
     

@@ -5,6 +5,7 @@
 #include "configurable.h"
 #include "dreamland.h"
 #include "dlfilestream.h"
+#include "string_utils.h"
 #include "iconvmap.h"
 
 static IconvMap utf2koi("utf-8", "koi8-u//IGNORE");
@@ -120,7 +121,7 @@ std::list<Configurable::Pointer> ConfigurableRegistry::getAll(const DLString &pa
         return all;
 
     for (auto &e: elements)
-        if (e.first.find(path) != DLString::npos)
+        if (String::contains(e.first, path))
             all.push_back(e.second);
 
     return all;

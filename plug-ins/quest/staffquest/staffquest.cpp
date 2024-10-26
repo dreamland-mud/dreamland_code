@@ -40,7 +40,7 @@ void StaffQuest::create( PCharacter *pch, NPCharacter *questman )
 
     areaName = eyed->in_room->areaName();
     roomName = eyed->in_room->getName();
-    objName  = eyed->getShortDescr( );
+    objName  = eyed->getShortDescr(LANG_DEFAULT);
     
     time = number_range( 15, 25 ); 
     setTime( pch, time );

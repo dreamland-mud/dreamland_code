@@ -131,7 +131,8 @@ DLString MsgFormatter::run()
     bool alternative;
     char cvt;
     DLString rc, s;
-    
+    DLString noun;
+
     /*keep compiller happy*/
     i = 0;
     left = false;
@@ -295,11 +296,13 @@ again:
                 int cs, sx, nounFlags;
             case 'C':
                 nounFlags = (!alternative && to) ? FMT_INVIS|FMT_DOPPEL : 0;
-                s += argNoun(nounFlags)->decline(*f);
+                noun = argNoun(nounFlags)->decline(*f);
+                s += noun;
                 break;
             case 'O':
                 nounFlags = (alternative ? 0 : FMT_INVIS);
-                s += argNoun(nounFlags)->decline(*f);
+                noun = argNoun(nounFlags)->decline(*f);
+                s += noun;
                 break;
             case 'N':
                 s += russian_case( argStr(), *f );

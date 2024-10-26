@@ -20,17 +20,17 @@ const DLString XMLAttributeRestring::TYPE = "XMLAttributeRestring";
 void XMLItemRestring::dress( ::Object *obj, PCharacter *ch ) const
 {
     if (!name.empty( ))
-        obj->setName( name.c_str( ) );
+        obj->setKeyword( name.c_str( ) );
 
     if (!shortDescr.empty( ))
-        obj->setShortDescr( fmt( 0, shortDescr.c_str( ), ch ).c_str( ) );
+        obj->setShortDescr( fmt( 0, shortDescr.c_str( ), ch ), LANG_DEFAULT);
 
     if (!longDescr.empty( ))
-        obj->setDescription( fmt( 0, longDescr.c_str( ), ch ).c_str( ) );
+        obj->setDescription( fmt( 0, longDescr.c_str( ), ch ), LANG_DEFAULT );
 
     if (!description.empty( ))
-        obj->addExtraDescr( obj->getName( ), 
-                            fmt( 0, description.c_str( ), ch ) );
+        obj->addExtraDescr( obj->getKeyword( ).toString(), 
+                            fmt( 0, description.c_str( ), ch ), LANG_DEFAULT );
 }
 
 Scripting::Register XMLAttributeRestring::toRegister() const

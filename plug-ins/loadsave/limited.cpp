@@ -186,7 +186,7 @@ bool limit_purge( Object *obj )
 
     DLString where;
     if (obj->carried_by)
-        where = obj->carried_by->getName( );
+        where = obj->carried_by->getID();
     else if (obj->in_room)
         where =  "room #" + DLString(obj->in_room->vnum);
     else

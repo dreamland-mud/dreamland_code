@@ -10,7 +10,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlstring.h"
 
-class Character;
+class PCharacter;
 
 class BugTracker : public OneAllocate, 
                    public XMLConfigurablePlugin, 
@@ -21,8 +21,8 @@ public:
     BugTracker( );
     virtual ~BugTracker( );
     
-    void reportNohelp( Character *ch, const DLString &txt ) const;
-    void reportMessage(const DLString &msgType, Character *ch, const DLString &message) const;
+    void reportNohelp( PCharacter *ch, const DLString &txt ) const;
+    void reportMessage(const DLString &msgType, PCharacter *ch, const DLString &message) const;
     void reportMessage(const DLString &msgType, const DLString &authorName, const DLString &message, const DLString &location = DLString::emptyString) const;
 
 protected:

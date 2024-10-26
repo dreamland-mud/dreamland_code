@@ -80,8 +80,8 @@ bool MagicItemUsage::use( Object *obj, Character *user, Character *target ) cons
         if (wearlocationManager->find( wearloc )->wear( obj, F_WEAR_REPLACE|F_WEAR_VERBOSE ) != RC_WEAR_OK) 
             return false;
 
-    objName = get_obj_name_list( obj, user->carrying, user );
-    targetName = get_char_name_list( target, user->in_room->people, user );
+    objName = DLString(obj->getID());
+    targetName = DLString(target->getID());
 
     switch (argType) {
         case ARG_OBJ:

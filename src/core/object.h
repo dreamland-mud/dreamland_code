@@ -53,7 +53,7 @@ protected:
     XMLMultiString   description;
     char * material;
     DLString owner;
-    InflectedString::Pointer cachedNoun;
+    map<lang_t, InflectedString::Pointer> cachedNouns;
     int                  value  [5];
 
 public:
@@ -121,7 +121,6 @@ public:
     Character * getCarrier( );
     Room * getRoom( );
     list<Object *> getItems();
-    void addExtraDescr( const DLString &keys, const DLString &value );
     bool mustDisappear( Character * );
     bool isAntiAligned( Character * ) const;
     bool wasAntiAligned( Character * ) const;
@@ -132,33 +131,46 @@ public:
     
     bool isAffected( int ) const;
 
-
     inline long long getID( ) const;
     inline void setID( long long );
 
-    const char * getRealName( ) const;
-    const char * getRealShortDescr( ) const;
-    const char * getRealDescription( ) const;
+    ExtraDescription * addExtraDescr( const DLString &keys, const DLString &value, lang_t lang );
+    const DLString &getExtraDescr(const DLString &keys, lang_t lang);
+    ExtraDescription * getProperDescription();
+    ExtraDescription * addProperDescription();
+    void clearProperDescription();
+    
+    const DLString & getRealKeyword( lang_t lang ) const;
+    const DLString & getRealShortDescr( lang_t lang ) const;
+    const DLString & getRealDescription( lang_t lang ) const;
     const char * getRealMaterial( ) const;
     const DLString & getOwner( ) const;
 
-    const char * getName( ) const;
-    const char * getShortDescr( ) const;
-    const char * getDescription( ) const;
+    const XMLMultiString & getRealKeyword() const;     
+    const XMLMultiString & getRealShortDescr() const;
+    const XMLMultiString & getRealDescription() const;
+
+    const XMLMultiString &getKeyword() const;
+    const XMLMultiString &getShortDescr() const;
+    const XMLMultiString &getDescription() const;
+    const DLString & getKeyword( lang_t lang ) const;
+    const DLString & getShortDescr( lang_t lang ) const;
+    const DLString & getDescription( lang_t lang ) const;
     const char * getMaterial( ) const;
 
-    void updateCachedNoun( );
+    void updateCachedNouns();
+    void updateCachedNoun(lang_t lang);
 
     void setOwner( const DLString & );
-    void setName( const char * );
-    void setShortDescr( const char * );
-    void setShortDescr( const DLString & );
-    void setDescription( const char * );
-    void setDescription( const DLString & );
+    void setKeyword( const DLString &, lang_t lang);
+    void setKeyword(const DLString &);
+    void setKeyword(const XMLMultiString &);
+    void setShortDescr( const DLString &, lang_t lang );
+    void setDescription( const DLString &, lang_t lang );
     void setMaterial( const char * );
     
-    DLString getFirstName( ) const;
-    DLString getShortDescr( char );
+    DLString getShortDescr( char gcase, lang_t lang );
+
     bool hasOwner( const Character * ) const;
 
     /** Return value of a given property or an empty string if not found. */
@@ -220,6 +232,36 @@ inline const char * Object::getRealMaterial( ) const
 inline const DLString & Object::getOwner( ) const
 {
     return owner;
+}
+
+inline const XMLMultiString& Object::getRealKeyword() const
+{
+    return keyword;
+}
+
+inline const XMLMultiString& Object::getRealShortDescr() const
+{
+    return short_descr;
+}
+
+inline const XMLMultiString& Object::getRealDescription() const
+{
+    return description;
+}
+
+inline const XMLMultiString & Object::getKeyword() const
+{
+    return keyword;
+}
+
+inline const XMLMultiString& Object::getShortDescr() const
+{
+    return short_descr;
+}
+
+inline const XMLMultiString& Object::getDescription() const
+{
+    return description;
 }
 
 inline const char * Object::getMaterial( ) const

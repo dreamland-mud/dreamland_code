@@ -91,7 +91,7 @@
 #include "interp.h"
 #include "clan.h"
 #include "liquid.h"
-
+#include "morphology.h"
 #include "playerattributes.h"
 #include "player_exp.h"
 
@@ -209,7 +209,7 @@ CMDWIZP( limited )
                                                 obj->in_room->getName(), obj->in_room->vnum);
                                 if ( obj->in_obj != 0 )
                                         ch->pecho( "Внутри %-20s [%d]",
-                                                obj->in_obj->getShortDescr( '1' ).c_str( ),
+                                                obj->in_obj->getShortDescr( '1', LANG_DEFAULT ).c_str( ),
                                                 obj->in_obj->pIndexData->vnum);
                         }
                 ch->pecho("  %d сейчас в игре, а еще %d в профилях игроков.",
@@ -225,7 +225,7 @@ CMDWIZP( limited )
                 if (obj_index->limit > 0 && obj_index->limit < 100)
                 {
                     struct limit_info info;
-                    info.description = obj_index->short_descr;
+                    info.description = obj_index->short_descr.get(LANG_DEFAULT);
                     info.level = obj_index->level;
                     info.vnum = obj_index->vnum;
                     info.limit = obj_index->limit;
@@ -440,7 +440,8 @@ CMDWIZP( transfer )
             &&   d->character != ch
             &&   ch->can_see( d->character ) )
             {
-                DLString cmd = d->character->getName() + " " + arg2;
+                DLString cmd;
+                cmd << d->character->getNameC() << " " << arg2;
                 run( ch, cmd.c_str() );
             }
         }
@@ -832,12 +833,10 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
     b << "Описание:" << endl << r->getDescription();
 
-    if ( r->getExtraDescr() != 0 )
+    if (!r->getExtraDescr().empty())
     {
-        EXTRA_DESCR_DATA *ed;
-
         b << "Ключевые слова экстра-описания: ";
-        for ( ed = r->getExtraDescr(); ed; ed = ed->next )
+        for (auto &ed: r->getExtraDescr())
         {
             b << "[" << ed->keyword << "] ";
         }
@@ -853,7 +852,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
     b << endl << "Объекты: ";
     for (obj = r->contents; obj; obj = obj->next_content)
-        b << "[" << obj->getFirstName() << "] ";
+        b << "[" << Syntax::label_ru(obj->getKeyword()) << "] ";
     b << endl;
 
     b << "Выходы:" << endl;
@@ -880,14 +879,14 @@ static void format_affect(Affect *paf, ostringstream &buf)
         {
             ostringstream tbuf;
 
-            if (pexit->keyword && pexit->keyword[0] != '\0')
-                tbuf << fmt(0, "Имена: [{W%s{x]  ", pexit->keyword);
+            if (!pexit->keyword.empty())
+                tbuf << fmt(0, "Имена: [{W%s{x]  ", Syntax::label_ru(pexit->keyword).c_str());
 
-            if (pexit->short_descr && pexit->short_descr[0] != '\0')
-                tbuf << fmt(0, "Краткое: [{W%s{x]  ", russian_case(pexit->short_descr, '1').c_str());
+            if (!pexit->short_descr.empty())
+                tbuf << fmt(0, "Краткое: [{W%s{x]  ", pexit->short_descr.get(LANG_DEFAULT).ruscase('1').c_str());
 
-            if (pexit->description && pexit->description[0] != '\0')
-                tbuf << "Описание: " << pexit->description;
+            if (!pexit->description.empty())
+                tbuf << "Описание: " << pexit->description.get(LANG_DEFAULT);
 
             if (!tbuf.str().empty())
                 b << tbuf.str() << endl;
@@ -938,7 +937,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
                 return;
         }
 
-        buf << fmt(0, "Name(s): %s\n\r", obj->getName( ) );
+        buf << fmt(0, "Name(s): %s\n\r", obj->getKeyword( ).toString().c_str() );
 
         buf << fmt(0, "Vnum: %d  Лимит: %d  Тип: %s  Ресеты: %d\n\r",
                 obj->pIndexData->vnum, obj->pIndexData->limit,
@@ -969,7 +968,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
         buf << fmt(0, "В комнате: %d  Внутри: %s  В руках у: %s  Надето на: %s\n\r",
                 obj->in_room == 0 ? 0 : obj->in_room->vnum,
-                obj->in_obj  == 0 ? "(none)" : obj->in_obj->getShortDescr( '1' ).c_str( ),
+                obj->in_obj  == 0 ? "(none)" : obj->in_obj->getShortDescr( '1', LANG_DEFAULT ).c_str( ),
                 obj->carried_by == 0 ? "(none)" :
                         ch->can_see(obj->carried_by) ? obj->carried_by->getNameC() : "someone",
                 obj->wear_loc->getName( ).c_str( ) );
@@ -1076,33 +1075,25 @@ static void format_affect(Affect *paf, ostringstream &buf)
                 break;
         }
 
-        if ( obj->extra_descr != 0 )
+        if (!obj->extraDescriptions.empty())
         {
-                EXTRA_DESCR_DATA *ed;
+                buf << "Ключевые слова экстра-описаний: ";
 
-                buf << "Ключевые слова экстра-описаний: '";
-
-                for ( ed = obj->extra_descr; ed != 0; ed = ed->next )
+                for (auto &ed: obj->extraDescriptions)
                 {
-                       buf << ed->keyword;
-                        if ( ed->next != 0 )
-                                buf << " ";
+                       buf << "[" << ed->keyword << "] ";
                 }
 
                 buf << endl;
         }
 
-        if ( obj->pIndexData->extra_descr != 0 )
+        if (!obj->pIndexData->extraDescriptions.empty())
         {
-                EXTRA_DESCR_DATA *ed;
+                buf << "Оригинал экстра-описания: ";
 
-                buf << "Оригинал экстра-описания: '";
-
-                for ( ed = obj->pIndexData->extra_descr; ed != 0; ed = ed->next )
+                for (auto &ed: obj->pIndexData->extraDescriptions)
                 {
-                       buf << ed->keyword;
-                        if ( ed->next != 0 )
-                            buf << " ";
+                       buf << "[" << ed->keyword << "] ";
                 }
 
                 buf << endl;
@@ -1156,7 +1147,9 @@ static bool has_nopost(Character *ch)
     PCharacter *pc = victim->is_npc( ) ? 0 : victim->getPC( ); // no switched data
     NPCharacter *npc = victim->getNPC( );
     
-    buf << "Имя: [" << victim->getNameC() << "] ";
+    DLString name = victim->toNoun()->decline('1');
+
+    buf << "Имя: [" << name.c_str() << "] ";
     if (pc)
         buf << "Шорт: [" << pc->getRussianName( ).normal( ) << "] ";
     if (npc)
@@ -1309,8 +1302,8 @@ static bool has_nopost(Character *ch)
     buf << endl;
     
     if (npc) {
-        buf << "Шорт: " << npc->getShortDescr( ) << endl
-            << "Длинное описание: "  << npc->getLongDescr( );
+        buf << "Шорт: " << npc->getShortDescr(LANG_DEFAULT) << endl
+            << "Длинное описание: "  << npc->getLongDescr(LANG_DEFAULT);
 
         const char *spec_fun_name = spec_name(*npc->spec_fun);
         if (spec_fun_name != 0)
@@ -1392,7 +1385,6 @@ CMDWIZP( vnum )
 {
     char arg[MAX_INPUT_LENGTH];
     int nMatch;
-    bool fAll;
     bool found;
 
     one_argument( argument, arg );
@@ -1402,7 +1394,6 @@ CMDWIZP( vnum )
         return;
     }
 
-    fAll        = false; /* !str_cmp( arg, "all" ); */
     found        = false;
     nMatch        = 0;
 
@@ -1410,12 +1401,12 @@ CMDWIZP( vnum )
         for(MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) 
         {
             nMatch++;
-            if ( fAll || is_name( argument, pMob->player_name ) )
+            if (mob_index_has_name(pMob, arg))
             {
                 found = true;
-                ch->pecho("[%5d] %s",
+                ch->pecho("[%5d] %N1",
                     pMob->vnum, 
-                    russian_case( pMob->short_descr, '1' ).c_str( ) );
+                    pMob->getShortDescr(LANG_DEFAULT));
             }
         }   
 
@@ -1431,7 +1422,6 @@ CMDWIZP( vnum )
 {
     char arg[MAX_INPUT_LENGTH];
     int nMatch;
-    bool fAll;
     bool found;
 
     one_argument( argument, arg );
@@ -1441,7 +1431,6 @@ CMDWIZP( vnum )
         return;
     }
 
-    fAll        = false; /* !str_cmp( arg, "all" ); */
     found        = false;
     nMatch        = 0;
 
@@ -1449,12 +1438,12 @@ CMDWIZP( vnum )
         for(OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) 
         {
             nMatch++;
-            if ( fAll || is_name( argument, pObj->name ) )
+            if (obj_index_has_name(pObj, arg))
             {
                 found = true;
-                ch->pecho("[%5d] %s",
+                ch->pecho("[%5d] %N1",
                     pObj->vnum, 
-                    russian_case( pObj->short_descr, '1' ).c_str( ) );
+                    pObj->getShortDescr(LANG_DEFAULT));
             }
         }
 
@@ -1477,9 +1466,9 @@ CMDWIZP( vnum )
     for (int i=0; i<MAX_KEY_HASH; i++)
         for(OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) 
             if (pObj->item_type == type) {
-                buf << fmt(0, "[%5d] %s\n",
+                buf << fmt(0, "[%5d] %N1\n",
                                  pObj->vnum,
-                                 russian_case( pObj->short_descr, '1' ).c_str( ) );
+                                pObj->getShortDescr(LANG_DEFAULT));
             }
 
     if (buf.str( ).empty( ))
@@ -1540,7 +1529,7 @@ CMDWIZP( owhere )
                 continue;
         }
         else {
-            if (!is_name( argument, obj->getName( ) ))
+            if (!obj_has_name(obj, argument, 0))
                 continue;
         }
 
@@ -1553,21 +1542,21 @@ CMDWIZP( owhere )
 
         if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by)
                 && in_obj->carried_by->in_room != 0 )
-                buffer << fmt(0, "%3d) %s в руках у %s [Комната %d]\n\r",
+                buffer << fmt(0, "%3d) %N1 в руках у %s [Комната %d]\n\r",
                         number,
-                        obj->getShortDescr( '1' ).c_str( ),
+                        obj->getShortDescr( LANG_DEFAULT ).c_str( ),
                         ch->sees(in_obj->carried_by, '2').c_str(),
                         in_obj->carried_by->in_room->vnum );
         else if ( in_obj->in_room != 0 && ch->can_see(in_obj->in_room) )
-                buffer << fmt(0, "%3d) %s на полу в %s [Комната %d]\n\r",
+                buffer << fmt(0, "%3d) %N1 на полу в %s [Комната %d]\n\r",
                         number,
-                        obj->getShortDescr( '1' ).c_str( ),
+                        obj->getShortDescr( LANG_DEFAULT ).c_str( ),
                         in_obj->in_room->getName(),
                         in_obj->in_room->vnum );
         else
-               buffer << fmt(0, "%3d) %s черт его знает где.\n\r",
+               buffer << fmt(0, "%3d) %N1 черт его знает где.\n\r",
                         number,
-                        obj->getShortDescr( '1' ).c_str( ) );
+                        obj->getShortDescr(LANG_DEFAULT).c_str( ) );
 
     
         if ( number >= max_found )
@@ -2006,7 +1995,7 @@ CMDWIZP( load )
     wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), "%C1 loads %O4.", ch, obj );
     
     LogStream::sendNotice( ) 
-        << ch->getName( ) << " loads obj vnum " << obj->pIndexData->vnum
+        << ch->getNameC( ) << " loads obj vnum " << obj->pIndexData->vnum
         << " id " << obj->getID( ) << endl;
 
     return;
@@ -2736,7 +2725,7 @@ CMDWIZP( olevel )
         if ( obj->level != atoi(level) )
             continue;
 
-        if ( name[0] != '\0' && !is_name(name, obj->getName( ) ) )
+        if ( name[0] != '\0' && !is_name(name, obj->getKeyword().toString().c_str() ) )
             continue;
 
         found = true;
@@ -2746,15 +2735,15 @@ CMDWIZP( olevel )
 
         if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by)
         &&   in_obj->carried_by->in_room != 0)
-            buffer << fmt(0, "%3d) [%d] %s is carried by %s [Room %d]\n\r",
-                number, obj->pIndexData->vnum, obj->getShortDescr('1').c_str( ),ch->sees(in_obj->carried_by, '5').c_str(),
+            buffer << fmt(0, "%3d) [%d] %N1 is carried by %s [Room %d]\n\r",
+                number, obj->pIndexData->vnum, obj->getShortDescr(LANG_DEFAULT).c_str( ),ch->sees(in_obj->carried_by, '5').c_str(),
                 in_obj->carried_by->in_room->vnum );
         else if (in_obj->in_room != 0 && ch->can_see(in_obj->in_room))
-            buffer << fmt(0, "%3d) [%d] %s is in %s [Room %d]\n\r",
-                number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ),in_obj->in_room->getName(),
+            buffer << fmt(0, "%3d) [%d] %N1 is in %s [Room %d]\n\r",
+                number, obj->pIndexData->vnum,obj->getShortDescr(LANG_DEFAULT ).c_str( ),in_obj->in_room->getName(),
                 in_obj->in_room->vnum);
         else
-            buffer << fmt(0, "%3d) [%d]%s is somewhere\n\r",number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ));
+            buffer << fmt(0, "%3d) [%d] %N1 is somewhere\n\r",number, obj->pIndexData->vnum,obj->getShortDescr(LANG_DEFAULT).c_str( ));
 
         if (number >= max_found)
             break;

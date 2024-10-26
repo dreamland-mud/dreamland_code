@@ -21,12 +21,11 @@ corder.cpp \
 impl.cpp \
 run.cpp \
 showtable.cpp \
-whois.cpp \
 who.cpp \
 writing.cpp \
 eating.cpp \
 communication.cpp \
-info.cpp \
+description.cpp \
 senses.cpp \
 affects.cpp \
 groupchannel.cpp \
@@ -70,7 +69,6 @@ libcomm_la_MOC = \
 configs.h \
 corder.h \
 run.h \
-whois.h \
 writing.h \
 groupchannel.h \
 eating.h

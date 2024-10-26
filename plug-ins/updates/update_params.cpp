@@ -66,15 +66,13 @@ void CharacterParamsUpdateTask::run( Character *ch )
     if (ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE))
         return;
 
-    DLString name = ch->getNameC();
-
     try {
         gainHitPoint( ch );
         gainMana( ch );
         gainMove( ch );
     }
     catch (const VictimDeathException &) {
-        LogStream::sendNotice() << "Victim killed in update params task: " << name << endl;
+        LogStream::sendNotice() << "Victim killed in update params task: " << ch->getNameP('1') << endl;
     }
 }
 

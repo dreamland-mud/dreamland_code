@@ -28,7 +28,7 @@
 #include "object.h"
 #include "desire.h"
 #include "damage.h"
-
+#include "string_utils.h"
 
 #include "movetypes.h"
 #include "directions.h"
@@ -301,11 +301,10 @@ SKILL_RUNP( katana )
                     .assignStartingHitroll()
                     .assignStartingDamroll();
 
-                DLString ed = fmt(0, katana->pIndexData->extra_descr->description,ch->getNameC() );
-                katana->extra_descr = new_extra_descr();
-                katana->extra_descr->keyword =str_dup(katana->pIndexData->extra_descr->keyword );
-                katana->extra_descr->description = str_dup( ed.c_str() );
-                katana->extra_descr->next = 0;
+                // TODO update descriptions for all 3 languages
+                DLString patternText = katana->pIndexData->extraDescriptions.front()->description.get(LANG_DEFAULT);
+                DLString edText = fmt(0, patternText.c_str(), ch->getNameP('2').c_str());
+                katana->addProperDescription()->description[LANG_DEFAULT] = edText;
         
                 obj_to_char(katana, ch);
                 gsn_katana->improve( ch, true );
@@ -343,9 +342,8 @@ void SamuraiGuildmaster::give( Character *victim, Object *obj )
         return;
     }
     
-    if (!obj->extra_descr 
-        || !obj->extra_descr->description
-        || !strstr(obj->extra_descr->description, victim->getNameC()))
+    const DLString &edText = obj->extraDescriptions.empty() ? DLString::emptyString : obj->extraDescriptions.front()->description.get(LANG_DEFAULT);
+    if (!String::contains(edText, victim->getNameC()) && !String::contains(edText, victim->getNameP('2')))    
     {
         say_act( victim, ch, "Иероглифы на этом оружии говорят о том, что оно было изготовлено кем-то другим, а не тобой, $c1." );
         giveBack( victim, obj );
@@ -470,12 +468,12 @@ bool Katana::canEquip( Character *ch )
 }
 void Katana::wear( Character *ch )
 {
+    const DLString &edText = obj->extraDescriptions.empty() ? DLString::emptyString : obj->extraDescriptions.front()->description.get(LANG_DEFAULT);
+
   if (IS_WEAPON_STAT(obj,WEAPON_KATANA)
-        && obj->extra_descr
-        && obj->extra_descr->description
-        && strstr( obj->extra_descr->description, ch->getNameC() ) != 0)
+        && (String::contains(edText, ch->getNameC()) || String::contains(edText, ch->getNameP('2'))))
   {
-    if (obj->getRealShortDescr())
+    if (!obj->getRealShortDescr().empty())
         ch->pecho("Ты ощущаешь %O4 как часть себя!", obj);
     else
         ch->pecho("Ты ощущаешь СВОЮ катану, как часть себя!");

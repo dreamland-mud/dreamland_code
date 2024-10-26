@@ -8,7 +8,7 @@
 
 #include "olcstate.h"
 #include "xmlinteger.h"
-#include "xmlstring.h"
+#include "xmlmultistring.h"
 
 class OLCStateExtraExit : public OLCStateTemplate<OLCStateExtraExit>,
                           public virtual OLCState
@@ -26,13 +26,11 @@ public:
     void show(PCharacter *ch);
 
     XML_VARIABLE XMLInteger room, to_room, info, key;
-    XML_VARIABLE XMLInteger max_size_pass;
-    XML_VARIABLE XMLString keyword, short_desc_from, short_desc_to;
-    XML_VARIABLE XMLString description, room_description;
-    XML_VARIABLE XMLString msgLeaveRoom, msgLeaveSelf;
-    XML_VARIABLE XMLString msgEntryRoom, msgEntrySelf;
-    XML_VARIABLE XMLString gender_from, gender_to;
-
+    XML_VARIABLE XMLEnumeration max_size_pass;
+    XML_VARIABLE XMLMultiString keyword, short_desc_from, short_desc_to;
+    XML_VARIABLE XMLMultiString description, room_description;
+    XML_VARIABLE XMLMultiString msgLeaveRoom, msgLeaveSelf;
+    XML_VARIABLE XMLMultiString msgEntryRoom, msgEntrySelf;
     
     template <typename T>
     bool cmd( PCharacter *, char * );

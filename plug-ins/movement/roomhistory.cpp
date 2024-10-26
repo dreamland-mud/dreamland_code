@@ -23,7 +23,7 @@ void RoomHistory::record( Character *ch, int door )
 
     erase( );
     push_front( RoomHistoryEntry( 
-        ch->getName( ), ch->getPC()->getRussianName().getFullForm(), door ) );
+        ch->getPC()->getName( ), ch->getPC()->getRussianName().getFullForm(), door ) );
 }
 
 void RoomHistory::erase( )
@@ -37,7 +37,7 @@ int RoomHistory::went( Character *ch ) const
     if (ch->is_npc( ))
         return -1;
     else {
-        DLString arg( ch->getName( ) );
+        DLString arg( ch->getPC()->getName( ) );
 
         return went( arg, true );
     }
@@ -79,7 +79,7 @@ bool RoomHistory::traverse( Room *start, Character *ch ) const
           h != room->history.end( ) && room && ch->in_room != room; 
          h++)
     {
-        if (h->name == ch->getName( )) {
+        if (h->name == ch->getPC()->getName( )) {
             if (room->exit[h->went]) 
                 room = room->exit[h->went]->u1.to_room;
             else

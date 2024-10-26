@@ -132,24 +132,13 @@ bool BadNames::nameRussian( const DLString &name ) const
  */
 bool BadNames::nameMobiles( const DLString &name ) const
 {
-    extern MOB_INDEX_DATA *mob_index_hash[MAX_KEY_HASH];
     MOB_INDEX_DATA *pMobIndex;
     int iHash;
-    char mobname[MAX_STRING_LENGTH], player_name[MAX_STRING_LENGTH];
 
     for ( iHash = 0; iHash < MAX_KEY_HASH; iHash++ ) {
         for ( pMobIndex  = mob_index_hash[iHash]; pMobIndex != 0; pMobIndex  = pMobIndex->next ) {
-            strcpy( player_name, pMobIndex->player_name );
-
-            for ( ; ; ) {
-                strcpy( player_name, one_argument( player_name, mobname ) );
-                
-                if (mobname[0] == 0)
-                    break;
-                
-                if ( !str_cmp( name.c_str( ), mobname ) )
-                    return false;
-            }
+            if (pMobIndex->keyword.matchesStrict(name))
+                return false;
         }
     }
 

@@ -407,40 +407,54 @@ NMI_GET( CharacterWrapper, short_descr, "короткое описание мо�
 {
     checkTarget( );
     CHK_PC
-    return Register( target->getNPC()->getShortDescr( ) );
+    return Register( target->getNPC()->getShortDescr(LANG_DEFAULT) );
 }
 
 NMI_SET( CharacterWrapper, short_descr, "короткое описание моба" )
 {
     checkTarget( );
     CHK_PC
-    target->getNPC()->setShortDescr( arg.toString( ) );
+    target->getNPC()->setShortDescr( arg.toString( ), LANG_DEFAULT );
 }
 
 NMI_GET( CharacterWrapper, long_descr, "длинное описание моба" )
 {
     checkTarget( );
     CHK_PC
-    return Register( target->getNPC()->getLongDescr( ) );
+    return Register( target->getNPC()->getLongDescr(LANG_DEFAULT) );
 }
 
 NMI_SET( CharacterWrapper, long_descr, "длинное описание моба" )
 {
     checkTarget( );
     CHK_PC
-    target->getNPC()->setLongDescr( arg.toString( ) );
+    target->getNPC()->setLongDescr( arg.toString( ), LANG_DEFAULT );
+}
+
+NMI_GET( CharacterWrapper, keyword, "ключевые слова моба" )
+{
+    checkTarget( );
+    CHK_PC
+    return Register( target->getNPC()->getKeyword().toString() );
+}
+
+NMI_SET( CharacterWrapper, keyword, "ключевые слова моба" )
+{
+    checkTarget( );
+    CHK_PC
+    target->getNPC()->setKeyword( arg.toString( ) );
 }
 
 NMI_GET( CharacterWrapper, description, "то что видно по look mob" )
 {
     checkTarget( );
-    return Register( target->getDescription( ) );
+    return Register( target->getDescription(LANG_DEFAULT) );
 }
 
 NMI_SET( CharacterWrapper, description, "то что видно по look mob" )
 {
     checkTarget( );
-    target->setDescription( arg.toString( ) );
+    target->setDescription( arg.toString( ), LANG_DEFAULT );
 }
 
 NMI_GET( CharacterWrapper, spec_fun, "спец-процедура") 
@@ -487,7 +501,7 @@ NMI_GET( CharacterWrapper, trust, "уровень привилегий" )
     checkTarget( );
     
     if (!target->is_npc( ) && target->getLevel( ) == 0) { // may be not loaded yet
-        if (( pci = PCharacterManager::find( target->getName( ) ) ))
+        if (( pci = PCharacterManager::find( target->getPC()->getName( ) ) ))
             return pci->get_trust( );
         else
             return 0;
@@ -531,7 +545,7 @@ NMI_GET( CharacterWrapper, password, "пароль: deprecated" )
     checkTarget( );
     CHK_NPC
 
-    if (( pci = PCharacterManager::find( target->getName( ) ) ))
+    if (( pci = PCharacterManager::find( target->getPC()->getName( ) ) ))
         return pci->getPassword( );
     else
         return target->getPC( )->getPassword( );
@@ -1094,18 +1108,16 @@ NMI_GET( CharacterWrapper, russianName, "русские имена с падеж
 NMI_SET( CharacterWrapper, name, "имя" )
 {
     checkTarget( );
-    target->setName( arg.toString( ) );
+    if (target->is_npc())
+        target->getNPC()->setKeyword(arg.toString());
+    else
+        target->getPC()->setName(arg.toString());
 }
 
 NMI_GET( CharacterWrapper, name, "имя" )
 {
     checkTarget( );
-    return target->getName( );
-}
-NMI_GET( CharacterWrapper, names, "имя персонажа или короткое описание моба с падежами" )
-{
-    checkTarget( );
-    return target->toNoun()->getFullForm();
+    return target->getNameC( );
 }
 
 NMI_GET( CharacterWrapper, race, "раса (структура .Race)" )
@@ -1392,15 +1404,7 @@ NMI_INVOKE( CharacterWrapper, is_npc, "(): true для мобов, false для 
 NMI_INVOKE( CharacterWrapper, getName, "(): имя игрока или список имен моба" )
 {
     checkTarget( );
-    return Register( target->getName() );
-}
-
-NMI_INVOKE( CharacterWrapper, setName, "(name): устанавливает имена моба" )
-{
-    checkTarget( );
-    CHK_PC
-    target->setName( args2string( args ) );
-    return Register( );
+    return Register( target->getNameC() );
 }
 
 NMI_INVOKE( CharacterWrapper, seeName, "(ch[, case]): как мы видим имя и претитул ch в падеже case") 

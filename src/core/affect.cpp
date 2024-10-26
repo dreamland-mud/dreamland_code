@@ -58,7 +58,7 @@ AffectSource::AffectSource(Character *ch)
         ownerVnum = ch->getNPC()->pIndexData->vnum;
     } else {
         type = AFFSRC_PLAYER;
-        ownerName = ch->getName();
+        ownerName = ch->getPC()->getName();
     }
 
     ownerID = ch->getID();

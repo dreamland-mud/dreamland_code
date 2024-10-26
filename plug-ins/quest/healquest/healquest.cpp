@@ -74,7 +74,7 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
 
     assign<PatientBehavior>( patient );
     save_mobs( patient->in_room );
-    mobName  = patient->getShortDescr( );
+    mobName  = patient->getShortDescr(LANG_DEFAULT);
     roomName = patient->in_room->getName();
     areaName = patient->in_room->areaName();
 

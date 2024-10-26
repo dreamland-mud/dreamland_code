@@ -38,8 +38,8 @@ void open_door_extra ( Character *ch, int door, void *pexit )
             : ((EXIT_DATA *) pexit)->exit_info, EX_CLOSED);
 
     if ( eexit ) {
-        oldact("$c1 открывает $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_ROOM );
-        oldact("Ты открываешь $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_CHAR );
+        oldact("$c1 открывает $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from.get(LANG_DEFAULT).c_str(), 0, TO_ROOM );
+        oldact("Ты открываешь $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from.get(LANG_DEFAULT).c_str(), 0, TO_CHAR );
     }
     else {
         const char *doorname = direction_doorname((EXIT_DATA *) pexit);

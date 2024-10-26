@@ -211,28 +211,30 @@ void PersonalQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharact
 {
     obj->setOwner( client->getNameC() );
 
+    const DLString &patterText = obj->getShortDescr(LANG_DEFAULT);
+
     switch (gender.getValue( )) {
     default:
     case SEX_NEUTRAL:
-        obj->setShortDescr( fmt(0, obj->getShortDescr( ),
+        obj->setShortDescr( fmt(0, patterText.c_str(),
             IS_GOOD(client)    ? "Священн|ое|ого|ому|ое|ым|ом" :
             IS_NEUTRAL(client) ? "Мерцающ|ее|его|ему|ее|им|ем" :
                                       "Дьявольск|ое|ого|ому|ое|им|ом", 
-            client->getNameP( '2' ).c_str()));
+            client->getNameP( '2' ).c_str()), LANG_DEFAULT);
         break;
     case SEX_MALE:
-        obj->setShortDescr( fmt(0, obj->getShortDescr( ),
+        obj->setShortDescr( fmt(0, patterText.c_str(),
             IS_GOOD(client)    ? "Священн|ый|ого|ому|ый|ым|ом" :
             IS_NEUTRAL(client) ? "Мерцающ|ий|его|ему|ий|им|ем" :
                                  "Дьявольск|ий|ого|ому|ий|им|ом", 
-            client->getNameP( '2' ).c_str()));
+            client->getNameP( '2' ).c_str()), LANG_DEFAULT);
         break;
     case SEX_FEMALE:
-        obj->setShortDescr( fmt(0, obj->getShortDescr( ),
+        obj->setShortDescr( fmt(0, patterText.c_str(),
             IS_GOOD(client)    ? "Священн|ая|ой|ой|ую|ой|ой" :
             IS_NEUTRAL(client) ? "Мерцающ|ая|ей|ей|ую|ей|ей" :
                                  "Дьявольск|ая|ой|ой|ую|ой|ой", 
-            client->getNameP( '2' ).c_str()));
+            client->getNameP( '2' ).c_str()), LANG_DEFAULT);
         break;
     }
 
@@ -373,13 +375,13 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     obj_to_char( keyring, client );
     
     keyring->setOwner( girth->getOwner( ) );
-    keyring->setShortDescr( girth->getShortDescr( ) );
+    keyring->setShortDescr( girth->getShortDescr(LANG_DEFAULT), LANG_DEFAULT );
     
-    if (girth->getRealDescription( ))
-        keyring->setDescription( girth->getRealDescription( ) );
+    if (!girth->getRealDescription(LANG_DEFAULT).empty())
+        keyring->setDescription( girth->getRealDescription(LANG_DEFAULT), LANG_DEFAULT );
         
-    if (girth->getRealName( ))
-        keyring->setName( girth->getRealName( ) );
+    if (!girth->getRealKeyword( ).empty())
+        keyring->setKeyword( girth->getRealKeyword( ) );
         
     if (girth->getRealMaterial( ))
         keyring->setMaterial( girth->getRealMaterial( ) );
@@ -391,8 +393,8 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     for (auto &paf: girth->affected)
         affect_to_obj( keyring, paf );
 
-    for (EXTRA_DESCR_DATA *ed = girth->extra_descr; ed != 0; ed = ed->next)
-        keyring->addExtraDescr( ed->keyword, ed->description );
+    for (auto &ed: girth->extraDescriptions)
+        keyring->addExtraDescr( ed->keyword, ed->description.get(LANG_DEFAULT), LANG_DEFAULT );
 
     waist = &*girth->wear_loc;
     waist->unequip( girth );
@@ -557,8 +559,8 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
         tattooVnum = OBJ_VNUM_TATTOO;
 
     obj = create_object( get_obj_index( tattooVnum ), 0 );
-    obj->setName( fmt(0, obj->getName( ), leader).c_str() );
-    obj->setShortDescr( fmt(0, obj->getShortDescr( ), leader) );
+    obj->setKeyword( fmt(0, obj->getKeyword( ).toString().c_str(), leader) );
+    obj->setShortDescr( fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), leader), LANG_DEFAULT );
 
     obj_to_char( obj, client );
     oldact("$C1 наносит тебе $o4!", client, obj, tattoer, TO_CHAR );

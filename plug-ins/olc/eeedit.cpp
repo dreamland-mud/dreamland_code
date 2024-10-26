@@ -35,13 +35,15 @@
 OLC_STATE(OLCStateExtraExit);
 
 OLCStateExtraExit::OLCStateExtraExit( )
+                     : max_size_pass(SIZE_MEDIUM, &size_table)
 {
 }
 
 OLCStateExtraExit::OLCStateExtraExit( RoomIndexData *pRoom, const DLString &name )
+                         : OLCStateExtraExit()
 {
     room.setValue(pRoom->vnum);
-    keyword.setValue(name); 
+    keyword.fromMixedString(name);
     
     EXTRA_EXIT_DATA *eexit = pRoom->extra_exits.find(name);
     
@@ -55,23 +57,16 @@ OLCStateExtraExit::OLCStateExtraExit( RoomIndexData *pRoom, const DLString &name
     key.setValue( eexit->key );
 
     max_size_pass.setValue( eexit->max_size_pass );
-    gender_from.setValue(eexit->gender_from.toString());
-    gender_to.setValue(eexit->gender_to.toString());
-    msgLeaveRoom.setValue(eexit->msgLeaveRoom);
-    msgLeaveSelf.setValue(eexit->msgLeaveSelf);
-    msgEntryRoom.setValue(eexit->msgEntryRoom);
-    msgEntrySelf.setValue(eexit->msgEntrySelf);
+    msgLeaveRoom = eexit->msgLeaveRoom;
+    msgLeaveSelf = eexit->msgLeaveSelf;
+    msgEntryRoom = eexit->msgEntryRoom;
+    msgEntrySelf = eexit->msgEntrySelf;
     
-    if(eexit->keyword)
-        keyword.setValue( eexit->keyword );
-    if(eexit->short_desc_from)
-        short_desc_from.setValue( eexit->short_desc_from );
-    if(eexit->short_desc_to)
-        short_desc_to.setValue( eexit->short_desc_to );
-    if(eexit->description)
-        description.setValue( eexit->description );
-    if(eexit->room_description)
-        room_description.setValue( eexit->room_description );
+    keyword = eexit->keyword;
+    short_desc_from = eexit->short_desc_from;
+    short_desc_to = eexit->short_desc_to;
+    description = eexit->description;
+    room_description = eexit->room_description;
 }
 
 OLCStateExtraExit::~OLCStateExtraExit( )
@@ -88,7 +83,7 @@ OLCStateExtraExit::commit( )
 
     pRoom->areaIndex->changed = true;
 
-    EXTRA_EXIT_DATA *eexit = pRoom->extra_exits.find(keyword);
+    EXTRA_EXIT_DATA *eexit = pRoom->extra_exits.find(keyword.toString());
     
     if(!eexit) {
         eexit = new EXTRA_EXIT_DATA;
@@ -102,26 +97,19 @@ OLCStateExtraExit::commit( )
     eexit->key = key.getValue( );
     eexit->max_size_pass = max_size_pass.getValue( );
 
-    free_string(eexit->keyword);
-    free_string(eexit->short_desc_from);
-    free_string(eexit->short_desc_to);
-    free_string(eexit->description);
-    free_string(eexit->room_description);
 
-    eexit->keyword = str_dup( keyword.getValue( ).c_str( ) );
-    eexit->short_desc_from = str_dup( short_desc_from.getValue( ).c_str( ) );
-    eexit->short_desc_to = str_dup( short_desc_to.getValue( ).c_str( ) );
-    eexit->description = str_dup( description.getValue( ).c_str( ) );
-    eexit->room_description = str_dup( room_description.getValue( ).c_str( ) );
+    eexit->keyword = keyword;
+    eexit->short_desc_from = short_desc_from;
+    eexit->short_desc_to = short_desc_to;
+    eexit->description = description;
+    eexit->room_description = room_description;
     eexit->msgEntryRoom = msgEntryRoom;
     eexit->msgEntrySelf = msgEntrySelf;
     eexit->msgLeaveRoom = msgLeaveRoom;
     eexit->msgLeaveSelf = msgLeaveSelf;
-    eexit->gender_from = Grammar::MultiGender(gender_from.getValue().c_str());
-    eexit->gender_to = Grammar::MultiGender(gender_to.getValue().c_str());
 
     // FIXME: need to update all instances
-    pRoom->room->extra_exits.findAndDestroy(keyword);
+    pRoom->room->extra_exits.findAndDestroy(keyword.toString());
     EXTRA_EXIT_DATA *eexit0 = eexit->create();
     eexit0->resolve();
     pRoom->room->extra_exits.push_front(eexit0);
@@ -136,7 +124,67 @@ OLCStateExtraExit::changed( PCharacter *ch )
 void 
 OLCStateExtraExit::statePrompt( Descriptor *d )
 {
-    d->send("Editing extra exit> ");
+    d->send("Extra exit> ");
+}
+
+void OLCStateExtraExit::show(PCharacter *ch)
+{
+    OBJ_INDEX_DATA *pKey = key > 0 ? get_obj_index(key) : 0;
+    RoomIndexData *target = get_room_index(to_room);
+
+    ptc(ch, "Name EN:    [{W%s{x] %s {D(name help){x\n",   keyword.get(EN).c_str(), web_edit_button(ch, "name", "web").c_str());
+    ptc(ch, "Name UA:    [{W%s{x] %s {D(uaname help){x\n", keyword.get(UA).c_str(), web_edit_button(ch, "uaname", "web").c_str());
+    ptc(ch, "Name RU:    [{W%s{x] %s {D(runame help){x\n", keyword.get(RU).c_str(), web_edit_button(ch, "runame", "web").c_str());
+    ptc(ch, "Flags:      [{W%s{x] {D(? exit_flags){x\n", exit_flags.names(info.getValue( )).c_str());
+    ptc(ch, "Size:       [{W%s{x] {D(? size){x\n", size_table.name(max_size_pass.getValue( )).c_str());
+
+    if (pKey)
+        ch->pecho("Key:        [{W%d{x] ({G%N1{x)", pKey->vnum, pKey->getShortDescr(LANG_DEFAULT));
+    else
+        ptc(ch, "Key:        []\n");
+
+    if (target)
+        ptc(ch, "Target:     [{W%d{x] ({G%s{x)\n", target->vnum, target->name.get(LANG_DEFAULT).c_str());
+    else
+        ptc(ch, "Target:     none\n");
+
+    ptc(ch, "Desc EN: %s {D(desc help){x\n%s\n",   web_edit_button(ch, "desc", "web").c_str(), description[EN].c_str());
+    ptc(ch, "Desc UA: %s {D(uadesc help){x\n%s\n", web_edit_button(ch, "uadesc", "web").c_str(), description[UA].c_str());
+    ptc(ch, "Desc RU: %s {D(rudesc help){x\n%s\n", web_edit_button(ch, "rudesc", "web").c_str(), description[RU].c_str());
+
+    ptc(ch, "Room EN: %s {D(room help){x\n%s\n",   web_edit_button(ch, "room", "web").c_str(), room_description[EN].c_str());
+    ptc(ch, "Room UA: %s {D(uaroom help){x\n%s\n", web_edit_button(ch, "uaroom", "web").c_str(), room_description[UA].c_str());
+    ptc(ch, "Room RU: %s {D(ruroom help){x\n%s\n", web_edit_button(ch, "ruroom", "web").c_str(), room_description[RU].c_str());
+
+    ptc(ch, "Short from EN: %s  %s{D(from help){x\n",   short_desc_from[EN].c_str(), web_edit_button(ch, "from", "web").c_str());
+    ptc(ch, "Short from UA: %s  %s{D(uafrom help){x\n", short_desc_from[UA].c_str(), web_edit_button(ch, "uafrom", "web").c_str());
+    ptc(ch, "Short from RU: %s  %s{D(rufrom help){x\n", short_desc_from[RU].c_str(), web_edit_button(ch, "rufrom", "web").c_str());
+
+    ptc(ch, "Short to EN:   %s  %s{D(to help){x\n",   short_desc_to[EN].c_str(), web_edit_button(ch, "to", "web").c_str());
+    ptc(ch, "Short to UA:   %s  %s{D(uato help){x\n", short_desc_to[UA].c_str(), web_edit_button(ch, "uato", "web").c_str());
+    ptc(ch, "Short to RU:   %s  %s{D(ruto help){x\n", short_desc_to[RU].c_str(), web_edit_button(ch, "ruto", "web").c_str());
+
+    ptc(ch, "Leave room EN: %s  %s{D(leaveroom help){x\n", msgLeaveRoom[EN].c_str(), web_edit_button(ch, "leaveroom", "web").c_str());
+    ptc(ch, "Leave room UA: %s  %s{D(ruleaveroom help){x\n", msgLeaveRoom[UA].c_str(), web_edit_button(ch, "ualeaveroom", "web").c_str());
+    ptc(ch, "Leave room RU: %s  %s{D(ualeaveroom help){x\n", msgLeaveRoom[RU].c_str(), web_edit_button(ch, "ruleaveroom", "web").c_str());
+
+    ptc(ch, "Leave self EN: %s  %s{D(leaveself help){x\n", msgLeaveSelf[EN].c_str(), web_edit_button(ch, "leaveself", "web").c_str());
+    ptc(ch, "Leave self UA: %s  %s{D(ualeaveself help){x\n", msgLeaveSelf[UA].c_str(), web_edit_button(ch, "ualeaveself", "web").c_str());
+    ptc(ch, "Leave self RU: %s  %s{D(ruleaveself help){x\n", msgLeaveSelf[RU].c_str(), web_edit_button(ch, "ruleaveself", "web").c_str());
+
+    ptc(ch, "Entry room EN: %s  %s{D(entryroom help){x\n", msgEntryRoom[EN].c_str(), web_edit_button(ch, "entryroom", "web").c_str());
+    ptc(ch, "Entry room UA: %s  %s{D(uaentryroom help){x\n", msgEntryRoom[UA].c_str(), web_edit_button(ch, "uaentryroom", "web").c_str());
+    ptc(ch, "Entry room RU: %s  %s{D(ruentryroom help){x\n", msgEntryRoom[RU].c_str(), web_edit_button(ch, "ruentryroom", "web").c_str());
+
+    ptc(ch, "Entry self EN: %s  %s{D(entryself help){x\n", msgEntrySelf[EN].c_str(), web_edit_button(ch, "entryself", "web").c_str());
+    ptc(ch, "Entry self UA: %s  %s{D(uaentryself help){x\n", msgEntrySelf[UA].c_str(), web_edit_button(ch, "uaentryself", "web").c_str());
+    ptc(ch, "Entry self RU: %s  %s{D(ruentryself help){x\n", msgEntrySelf[RU].c_str(), web_edit_button(ch, "ruentryself", "web").c_str());
+}
+
+EEEDIT(show)
+{
+    show(ch);
+    return false;
 }
 
 EEEDIT(flags)
@@ -146,133 +194,142 @@ EEEDIT(flags)
 
 EEEDIT(size)
 {
-    int value;
-    
-    value = size_table.value( argument);
-
-    if (value != NO_FLAG) {
-        max_size_pass.setValue( value );
-        stc("Size set.\n\r", ch);
-        return true;
-    }
-
-    stc("unknow size\r\n", ch);
-    return false;
-}
-
-EEEDIT(show)
-{
-    show(ch);
-    return false;
-}
-
-void OLCStateExtraExit::show(PCharacter *ch)
-{
-    OBJ_INDEX_DATA *obj;
-    RoomIndexData *r;
-
-    ptc(ch, "{CDescription:{x %s {D(desc help){x\n%s\n", 
-        web_edit_button(ch, "desc", "web").c_str(), description.getValue( ).c_str( ));
-    ptc(ch, "{CRoom desc:{x %s {D(rdesc help){x\n%s\n", 
-        web_edit_button(ch, "rdesc", "web").c_str(), room_description.getValue( ).c_str( ));
-    ptc(ch, "Name:       [{W%s{x]\n", keyword.getValue( ).c_str( ));
-    ptc(ch, "Flags:      [{W%s{x] {D(? exit_flags){x\n", 
-            exit_flags.names(info.getValue( )).c_str());
-    
-    if(key.getValue( ) > 0 && (obj = get_obj_index(key.getValue( ))))
-        ptc(ch, "Key:        [{W%d{x] ({G%s{x)\n", 
-                key.getValue( ), 
-                russian_case(obj->short_descr, '1').c_str( ));
-    else
-        ptc(ch, "Key:        []\n");
-
-    r = get_room_index(to_room.getValue( ));
-    if (r)
-        ptc(ch, "Target:     [{W%d{x] ({G%s{x)\n", 
-                r->vnum, r->name);
-    else
-        ptc(ch, "Target:     none\n");
-
-    ptc(ch, "Size:       [{W%s{x] {D(? size){x\n", 
-            size_table.name(max_size_pass.getValue( )).c_str());
-
-    ptc(ch, "Short desc leave: %s  %s{D(shortleave help){x Gender: %s {D(genderleave){x\n",
-              short_desc_from.c_str(), web_edit_button(ch, "shortleave", "web").c_str(),
-              gender_from.c_str());
-
-    ptc(ch, "Short desc entry: %s  %s{D(shortentry help){x Gender: %s {D(genderentry){x\n",
-              short_desc_to.c_str(), web_edit_button(ch, "shortentry", "web").c_str(),
-              gender_to.c_str());
-
-    ptc(ch, "{GLeave room:{x %s  %s{D(leaveroom help){x\n", 
-            msgLeaveRoom.c_str(), web_edit_button(ch, "leaveroom", "web").c_str());
-
-    ptc(ch, "{GLeave self:{x %s  %s{D(leaveself help){x\n", 
-            msgLeaveSelf.c_str(), web_edit_button(ch, "leaveself", "web").c_str());
-
-    ptc(ch, "{GEntry room:{x %s  %s{D(entryroom help){x\n", 
-            msgEntryRoom.c_str(), web_edit_button(ch, "entryroom", "web").c_str());
-
-    ptc(ch, "{GEntry self:{x %s  %s{D(entryself help){x\n", 
-            msgEntrySelf.c_str(), web_edit_button(ch, "entryself", "web").c_str());
-
+    return flagValueEdit(max_size_pass);
 }
 
 EEEDIT(desc)
 {
-    return editor(argument, description);      
+    return editor(argument, description[EN]);      
 }
 
-EEEDIT(rdesc)
+EEEDIT(uadesc)
 {
-    return editor(argument, room_description);
+    return editor(argument, description[UA]);      
+}
+
+EEEDIT(rudesc)
+{
+    return editor(argument, description[RU]);      
+}
+
+EEEDIT(room)
+{
+    return editor(argument, room_description[EN]);
+}
+
+EEEDIT(uaroom)
+{
+    return editor(argument, room_description[UA]);
+}
+
+EEEDIT(ruroom)
+{
+    return editor(argument, room_description[RU]);
 }
 
 EEEDIT(name)
 {
-    keyword = argument;
-    stc("Keyword set.\n\r", ch);
-    return true;
+    return editor(argument, keyword[EN], (editor_flags)(ED_NO_NEWLINE));     
 }
 
-EEEDIT(shortleave)
+EEEDIT(uaname)
 {
-    return editor(argument, short_desc_from, (editor_flags)(ED_NO_NEWLINE));      
+    return editor(argument, keyword[UA], (editor_flags)(ED_NO_NEWLINE));     
 }
 
-EEEDIT(shortentry)
+EEEDIT(runame)
 {
-    return editor(argument, short_desc_to, (editor_flags)(ED_NO_NEWLINE));      
+    return editor(argument, keyword[RU], (editor_flags)(ED_NO_NEWLINE));     
+}
+
+EEEDIT(from)
+{
+    return editor(argument, short_desc_from[EN], (editor_flags)(ED_NO_NEWLINE));      
+}
+
+EEEDIT(uafrom)
+{
+    return editor(argument, short_desc_from[UA], (editor_flags)(ED_NO_NEWLINE));      
+}
+
+EEEDIT(rufrom)
+{
+    return editor(argument, short_desc_from[RU], (editor_flags)(ED_NO_NEWLINE));      
+}
+
+EEEDIT(to)
+{
+    return editor(argument, short_desc_to[EN], (editor_flags)(ED_NO_NEWLINE));      
+}
+
+EEEDIT(uato)
+{
+    return editor(argument, short_desc_to[UA], (editor_flags)(ED_NO_NEWLINE));      
+}
+
+EEEDIT(ruto)
+{
+    return editor(argument, short_desc_to[RU], (editor_flags)(ED_NO_NEWLINE));      
 }
 
 EEEDIT(leaveroom)
 {
-    return editor(argument, msgLeaveRoom, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+    return editor(argument, msgLeaveRoom[EN], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+}
+
+EEEDIT(ualeaveroom)
+{
+    return editor(argument, msgLeaveRoom[UA], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+}
+
+EEEDIT(ruleaveroom)
+{
+    return editor(argument, msgLeaveRoom[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
 EEEDIT(leaveself)
 {
-    return editor(argument, msgLeaveSelf, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+    return editor(argument, msgLeaveSelf[EN], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+}
+
+EEEDIT(ualeaveself)
+{
+    return editor(argument, msgLeaveSelf[UA], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+}
+
+EEEDIT(ruleaveself)
+{
+    return editor(argument, msgLeaveSelf[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
 EEEDIT(entryroom)
 {
-    return editor(argument, msgEntryRoom, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+    return editor(argument, msgEntryRoom[EN], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+}
+
+EEEDIT(uaentryroom)
+{
+    return editor(argument, msgEntryRoom[UA], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+}
+
+EEEDIT(ruentryroom)
+{
+    return editor(argument, msgEntryRoom[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
 EEEDIT(entryself)
 {
-    return editor(argument, msgEntrySelf, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+    return editor(argument, msgEntrySelf[EN], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
-EEEDIT(genderleave)
+EEEDIT(uaentryself)
 {
-    return genderEdit(gender_from);
+    return editor(argument, msgEntrySelf[UA], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
-EEEDIT(genderentry)
+EEEDIT(ruentryself)
 {
-    return genderEdit(gender_to);
+    return editor(argument, msgEntrySelf[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
 EEEDIT(key)

@@ -120,7 +120,7 @@ static bool create_log_entry(InterpretArguments &iargs)
     }
 
     DLString ip = iargs.ch->getPC()->getLastAccessHost();
-    bool unique = XMLAttributeLastHost::isUnique(iargs.ch->getName(), ip);
+    bool unique = XMLAttributeLastHost::isUnique(iargs.ch->getPC()->getName(), ip);
     log["ip"] = unique ? "new" : "old";
 
     try {

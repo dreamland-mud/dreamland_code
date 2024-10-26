@@ -115,12 +115,10 @@ int find_exit( Character *ch, const char *arg, int flags )
             if (!IS_SET( pexit->exit_info, EX_ISDOOR ) && IS_SET(flags, FEX_DOOR))
                 continue;
 
-            if (pexit->keyword && is_name( arg, pexit->keyword ))
+            if (pexit->keyword.matchesUnstrict(arg))
                 return d;
             
-            if (pexit->short_descr 
-                  && (is_name(arg, russian_case(pexit->short_descr, '1').c_str())
-                      || is_name(arg, russian_case(pexit->short_descr, '4').c_str())))
+            if (pexit->short_descr.matchesUnstrict(arg))
                 return d;
 
             if (!str_prefix(arg, "дверь") || !str_prefix(arg, "door"))
@@ -159,11 +157,12 @@ int find_exit( Character *ch, const char *arg, int flags )
     return door;
 }
 
+// TODO should take lang argument
 const char * direction_doorname(EXIT_DATA *pexit)
 {
-    if (!pexit || !pexit->short_descr || !pexit->short_descr[0])
+    if (!pexit || pexit->short_descr.get(LANG_DEFAULT).empty())
         return "дверь";
-    return pexit->short_descr;
+    return pexit->short_descr.get(LANG_DEFAULT).c_str();
 }
 
 exit_data *direction_reverse(Room *room, int door)

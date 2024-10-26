@@ -215,9 +215,10 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
         wcontainer->wordUsed( word, ch );
         language->improve( ch, true );
         ch->getAttributes( ).getAttr<XMLAttributeLanguageHints>( "languageHints" )->addWord(word, true);
+
         wiznet( WIZ_LANGUAGE, 0, 0, "%^C1 изрекает слово '%s' (%s) на %s.", 
                 ch, word.toStr( ), word.effect.getValue( ).c_str( ),
-                (obj ? obj->getShortDescr( '4' ).c_str( ) :
+                (obj ? obj->getShortDescr( '4', LANG_DEFAULT ).c_str( ) :
                        !victim || victim == ch ? "себя" : 
                                                  victim->getNameP( '4' ).c_str( ) ));
     }

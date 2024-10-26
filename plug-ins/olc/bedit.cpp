@@ -239,9 +239,9 @@ BEDIT(list, "список", "показать все сущности с эти�
     int lineCount = 0;
 
     for (auto vnum: myVnums) {
-        DLString name = (target == INDEX_MOB ? get_mob_index(vnum)->short_descr 
-            : (target == INDEX_ROOM ? get_room_index(vnum)->name 
-                : get_obj_index(vnum)->short_descr));
+        DLString name = (target == INDEX_MOB ? get_mob_index(vnum)->short_descr[RU]
+            : (target == INDEX_ROOM ? get_room_index(vnum)->name[RU]
+                : get_obj_index(vnum)->short_descr[RU]));
 
         buf << fmt(0, lineFormat.c_str(), vnum, name.c_str());
 

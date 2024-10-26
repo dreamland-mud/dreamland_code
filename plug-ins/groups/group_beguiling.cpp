@@ -38,6 +38,7 @@
 #include "occupations.h"
 #include "loadsave.h"
 #include "act.h"
+#include "string_utils.h"
 #include "vnum.h"
 #include "def.h"
 
@@ -53,7 +54,7 @@ PROF(none);
  */
 void MagicJar::get( Character *ch )
 {
-    if (!ch->is_npc( ) && strstr(obj->getName( ), ch->getNameC()) != 0) {
+    if (!ch->is_npc( ) && String::contains(obj->getKeyword().toString(), ch->getPC()->getName())) {
         oldact("Вот это удача!",ch,obj,0,TO_CHAR);
         extract_obj(obj);
     }
@@ -70,7 +71,7 @@ bool MagicJar::extract( bool fCount )
         if (wch->is_npc()) 
             continue;
 
-        if (strstr(obj->getName( ),wch->getNameC()) != 0)
+        if (String::contains(obj->getKeyword().toString(), wch->getPC()->getName()))
         {
             if (IS_SET( wch->act, PLR_NO_EXP )) {
                 REMOVE_BIT(wch->act,PLR_NO_EXP);
@@ -154,15 +155,14 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     jar->from = str_dup(ch->getNameC());
     jar->level = ch->getRealLevel( );
 
-    jar->setName( fmt(0, jar->getName( ), victim->getNameC()).c_str());
-    jar->setShortDescr( fmt(0, jar->getShortDescr( ), victim->getNameC()));
-    jar->setDescription( fmt(0, jar->getDescription( ), victim->getNameC()));
+    // TODO setup all languages
+    jar->setKeyword( fmt(0, jar->getKeyword( ).toString().c_str(), victim->getNameC()));
+    jar->setShortDescr( fmt(0, jar->getShortDescr(LANG_DEFAULT).c_str(), victim->getNameC()), LANG_DEFAULT);
+    jar->setDescription( fmt(0, jar->getDescription(LANG_DEFAULT).c_str(), victim->getNameC()), LANG_DEFAULT);
 
-    DLString descr = fmt(0, jar->pIndexData->extra_descr->description, victim->getNameC() );
-    jar->extra_descr = new_extra_descr();
-    jar->extra_descr->keyword = str_dup( jar->pIndexData->extra_descr->keyword );
-    jar->extra_descr->description = str_dup( descr.c_str() );
-    jar->extra_descr->next = 0;
+    const DLString &patternText = jar->pIndexData->extraDescriptions.front()->description.get(LANG_DEFAULT);
+    DLString edText = fmt(0, patternText.c_str(), victim->getNameC());
+    jar->addProperDescription()->description[LANG_DEFAULT] = edText;
 
     jar->level = ch->getRealLevel( );
     jar->cost = 0;

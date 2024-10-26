@@ -81,8 +81,7 @@ bool BasicMobileBehavior::healRanger( Character *patient )
         || patient->isAffected( gsn_plague )
         || number_percent( ) > HEALTH(patient))
     {
-        interpret_raw( ch, "herbs", 
-                       get_char_name_list( patient, ch->in_room->people, ch ).c_str( ) );
+        interpret_raw( ch, "herbs", "%lld", patient->getID());
         return true;
     }
 

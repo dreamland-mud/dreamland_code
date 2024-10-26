@@ -4,6 +4,7 @@
  */
 #include "globalregistryelement.h"
 #include "dl_strings.h"
+#include "string_utils.h"
 
 GlobalRegistryElement::GlobalRegistryElement( )
          : index( -1 )
@@ -54,10 +55,10 @@ bool GlobalRegistryElement::matchesSubstring( const DLString &str ) const
     if (str.empty() || getName().empty())
         return false;
 
-    if (getName().find(str) != DLString::npos)
+    if (String::contains(getName(), str))
         return true;
 
-    if (getRussianName().find(str) != DLString::npos)
+    if (String::contains(getRussianName(), str))
         return true;
 
     return false;

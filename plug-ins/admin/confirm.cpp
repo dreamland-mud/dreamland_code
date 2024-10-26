@@ -105,8 +105,8 @@ void Confirm::doRequest( Character *ch )
     if (ch->desc && banManager->checkVerbose( ch->desc, BAN_CONFIRM )) 
         return;
     
-    if (ch->getDescription( )) {
-        descr = ch->getDescription( );
+    if (!ch->getDescription(LANG_DEFAULT).empty()) {
+        descr = ch->getDescription(LANG_DEFAULT);
         descr.stripWhiteSpace( );
     }
     
@@ -383,7 +383,7 @@ void Confirm::doShow( Character *ch, DLString& argument )
             buf << "Reason: " << attr->reason.getValue( ) << endl;
     }
 
-    buf << endl << pci->getDescription() << endl;
+    buf << endl << pci->getDescription(LANG_DEFAULT) << endl;
     buf << "{G[{x" << web_cmd(ch, "confirm accept " + pci->getName(), "Подтвердить") << "{G] "
         << "{R[{x" << web_cmd(ch, "confirm reject " + pci->getName() + " Прочти 'справка описание'", "Отклонить") << "{R]{x"
         << endl;

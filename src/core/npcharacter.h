@@ -38,25 +38,39 @@ public:
     virtual short getModifyLevel( ) const;
 
     // set-get methods for string fields
+    void setKeyword(const DLString &, lang_t lang);
+    void setKeyword(const XMLMultiString &);
+    void setKeyword(const DLString &);
+    const DLString & getKeyword(lang_t lang) const;
+    const XMLMultiString & getKeyword() const;
     virtual void setDescription( const DLString&, lang_t lang );
-    virtual const char * getDescription( lang_t lang ) const;
+    virtual const DLString & getDescription( lang_t lang ) const;
     virtual const XMLMultiString & getDescription( ) const;
     virtual void setDescription( const XMLMultiString & );     
     void setShortDescr( const DLString&, lang_t lang );
-    void setShortDescr( const char *, lang_t lang );
-    const char * getShortDescr( lang_t lang ) const;
-    void setLongDescr( const char *, lang_t lang );
+    const DLString & getShortDescr( lang_t lang ) const;
     void setLongDescr( const DLString&, lang_t lang );
-    const char * getLongDescr( lang_t lang ) const;
-    
-    const char * getRealShortDescr( lang_t lang ) const;
-    const char * getRealLongDescr( lang_t lang ) const;
-    const char * getRealDescription( lang_t lang ) const;
+    const DLString & getLongDescr( lang_t lang ) const;
+
+    const DLString & getRealKeyword(lang_t lang) const;     
+    const DLString & getRealShortDescr( lang_t lang ) const;
+    const DLString & getRealLongDescr( lang_t lang ) const;
+    const DLString & getRealDescription( lang_t lang ) const;
+
+    const XMLMultiString & getRealKeyword() const;     
+    const XMLMultiString & getRealShortDescr() const;
+    const XMLMultiString & getRealLongDescr() const;
+    const XMLMultiString & getRealDescription() const;
+
+    virtual short getSex( ) const ;
+    virtual void setSex( short ) ;
 
     // name and sex formatting
-    virtual DLString getNameP( char gram_case ) const;
+    virtual const char * getNameC( ) const;
+    virtual const DLString &getNameP( char gram_case ) const;
     virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
-    virtual void updateCachedNoun( );
+    void updateCachedNouns();
+    void updateCachedNoun(lang_t lang);
     
     // stats
     virtual int getCurrStat( int );
@@ -80,10 +94,12 @@ public:
     int reset_room;
     
 protected:    
+    XMLMultiString keyword;
     XMLMultiString description;
     XMLMultiString short_descr;
     XMLMultiString long_descr;
-    InflectedString::Pointer cachedNoun;
+    map<lang_t, InflectedString::Pointer> cachedNouns;
+    DLString cachedAllForms;
     
 public:    
     int                group;

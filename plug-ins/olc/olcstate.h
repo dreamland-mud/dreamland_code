@@ -26,6 +26,7 @@ class Descriptor;
 struct AreaIndexData;
 class GlobalBitvector;
 class XMLJsonValue;
+class ExtraDescription;
 
 typedef enum {
     ED_NO_FLAG=0,
@@ -119,7 +120,7 @@ protected:
     bool genderEdit(Grammar::MultiGender &field);
     bool genderEdit(XMLString &field);
     bool stringListEdit(XMLStringList &values);
-    bool extraDescrEdit(EXTRA_DESCR_DATA *&list);
+    bool extraDescrEdit(ExtraDescrList &list);
     bool editorCopy(const DLString &original);
     bool editorCopy(const char *field);
     bool editorPaste(DLString &original, editor_flags flags = ED_NO_FLAG);

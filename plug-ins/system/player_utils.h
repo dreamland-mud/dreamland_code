@@ -1,7 +1,8 @@
 #ifndef PLAYER_UTILS_SYSTEM_H
 #define PLAYER_UTILS_SYSTEM_H
 
-#include "xmlmultistring.h"
+#include "lang.h"
+#include "dlstring.h"
 
 class PCharacter;
 class PCMemoryInterface;

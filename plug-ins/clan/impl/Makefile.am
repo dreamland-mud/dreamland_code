@@ -8,7 +8,6 @@ plugin_INCLUDES = \
 -I$(srcdir)/../core \
 -I$(srcdir)/../command \
 -I$(srcdir)/../behavior \
--I$(top_srcdir)/plug-ins/services/misc \
 -I$(top_srcdir)/plug-ins/services/core \
 -I$(top_srcdir)/plug-ins/services/petshop \
 -I$(top_srcdir)/plug-ins/questreward \
@@ -47,7 +46,6 @@ libclan_impl_la_LIBADD = \
 $(LIBADD_AI) \
 ../../skills_impl/libskills_impl.la \
 ../../services/core/libservices_core.la \
-../../services/misc/libservices_misc.la \
 ../../services/petshop/libservices_petshop.la \
 ../../questreward/libquestreward.la \
 ../core/libclan_core.la \

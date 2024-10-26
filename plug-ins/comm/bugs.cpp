@@ -10,6 +10,9 @@
 
 CMDRUNP( nohelp )
 {
+    if (ch->is_npc())
+        return;
+
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
@@ -17,12 +20,15 @@ CMDRUNP( nohelp )
         return;
     }
 
-    bugTracker->reportMessage(getName(), ch, txt);
+    bugTracker->reportMessage(getName(), ch->getPC(), txt);
     ch->pecho("Записано.");
 }
 
 CMDRUNP( bug )
 {
+    if (ch->is_npc())
+        return;
+
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
@@ -30,12 +36,15 @@ CMDRUNP( bug )
         return;
     }
 
-    bugTracker->reportMessage(getName(), ch, txt);
+    bugTracker->reportMessage(getName(), ch->getPC(), txt);
     ch->pecho( "Ошибка записана.");
 }
 
 CMDRUNP( typo )
 {
+    if (ch->is_npc())
+        return;
+
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
@@ -43,12 +52,15 @@ CMDRUNP( typo )
         return;
     }
 
-    bugTracker->reportMessage(getName(), ch, txt);
+    bugTracker->reportMessage(getName(), ch->getPC(), txt);
     ch->pecho( "Опечатка записана.");
 }
 
 CMDRUNP( idea )
 {
+    if (ch->is_npc())
+        return;
+
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
@@ -61,7 +73,7 @@ CMDRUNP( idea )
     send_to_discord_stream(":bulb: [**Идейка** " + txt);
     send_telegram("[Идейка " + txt);
     
-    bugTracker->reportMessage("idea", ch, txt);
+    bugTracker->reportMessage("idea", ch->getPC(), txt);
     ch->pecho( "Идейка записана.");
 }
 
@@ -77,8 +89,8 @@ static void bugtracker_servlet(HttpRequest &request, HttpResponse &response)
     if (!servlet_parse_params(request, response, params))
         return;
 
-//    if (!servlet_auth_bot(params, response)) 
-//        return;
+    if (!servlet_auth_bot(params, response)) 
+        return;
 
     // Ensure the TG/Discord user is linked to a real player.
     PCMemoryInterface *player = servlet_find_player(params, response);

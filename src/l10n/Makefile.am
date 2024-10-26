@@ -21,6 +21,7 @@ pronouns.cpp \
 ru_pronouns.cpp \
 flexer.cpp \
 inflectedstring.cpp \
-xmlinflectedstring.cpp 
+xmlinflectedstring.cpp \
+lang.cpp
 
 AM_CPPFLAGS += $(src_INCLUDES)

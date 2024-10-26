@@ -108,10 +108,10 @@ void OLCStateMobile::copyBehaviors(MOB_INDEX_DATA *original)
 
 void OLCStateMobile::copyDescriptions( MOB_INDEX_DATA *original )
 {
-    mob.player_name      = str_dup(original->player_name);
-    mob.short_descr      = str_dup(original->short_descr);
-    mob.long_descr       = str_dup(original->long_descr);
-    mob.description      = str_dup(original->description);
+    mob.keyword = original->keyword;
+    mob.short_descr = original->short_descr;
+    mob.long_descr = original->long_descr;
+    mob.description = original->description;
     mob.material         = str_dup(original->material);
     mob.smell            = original->smell;
 }
@@ -172,7 +172,7 @@ void OLCStateMobile::commit()
     if(!original) {
         int iHash;
         
-        original = new_mob_index();
+        original = new mob_index_data;
 
         original->vnum = mob.vnum;
         original->area = mob.area;
@@ -199,8 +199,8 @@ void OLCStateMobile::commit()
             if(victim->group == original->group)
                 victim->group = mob.group;
 
-            if(!strcmp(victim->getNameC(), original->player_name))
-                victim->setName(DLString(mob.player_name));
+            if(victim->getKeyword().toString() == original->keyword.toString())
+                victim->setKeyword(mob.keyword);
 
             if(victim->act == original->act)
                 victim->act = mob.act;
@@ -270,18 +270,10 @@ void OLCStateMobile::commit()
         }
     }
 
-    free_string(original->player_name);
-    original->player_name      = mob.player_name;
-    mob.player_name = 0;
-    free_string(original->short_descr);
-    original->short_descr      = mob.short_descr;
-    mob.short_descr = 0;
-    free_string(original->long_descr);
-    original->long_descr       = mob.long_descr;
-    mob.long_descr = 0;
-    free_string(original->description);
-    original->description      = mob.description;
-    mob.description = 0;
+    original->keyword = mob.keyword;
+    original->short_descr = mob.short_descr;
+    original->long_descr = mob.long_descr;
+    original->description = mob.description;
     original->spec_fun.name    = mob.spec_fun.name;
     original->spec_fun.func    = spec_lookup( mob.spec_fun.name.c_str() );
     original->vnum             = mob.vnum;
@@ -331,7 +323,7 @@ void OLCStateMobile::commit()
         NPCharacter *victim = wch->getNPC();
 
         if (victim && victim->pIndexData == original) 
-            victim->updateCachedNoun( );
+            victim->updateCachedNouns( );
     }
 
     original->behaviors.clear();
@@ -351,12 +343,17 @@ MEDIT(show)
     bool showWeb = !arg_is_strict(argument, "noweb");
     Race *race = raceManager->findExisting(mob.race);
 
-    ptc(ch, "{GName: [{x%s{G] %s\n\r", 
-        mob.player_name, web_edit_button(showWeb, ch, "name", "web").c_str());
+    ptc(ch, "{GName EN:  [{x%s{G]{x %s\n\r", mob.keyword.get(EN).c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());
+    ptc(ch, "{GName UA:  [{x%s{G]{x %s\n\r", mob.keyword.get(UA).c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());
+    ptc(ch, "{GName RU:  [{x%s{G]{x %s\n\r", mob.keyword.get(RU).c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());
 
-    ptc(ch, "{GShort desc: {x%s %s\n\r{GLong descr: %s{x\n\r%s",
-        mob.short_descr, web_edit_button(showWeb, ch, "short", "web").c_str(),
-        web_edit_button(showWeb, ch, "long", "web").c_str(), mob.long_descr);        
+    ptc(ch, "{GShort EN: [{x%s{G]{x %s\n\r", mob.short_descr.get(EN).c_str(), web_edit_button(showWeb, ch, "short", "web").c_str());
+    ptc(ch, "{GShort UA: [{x%s{G]{x %s\n\r", mob.short_descr.get(UA).c_str(), web_edit_button(showWeb, ch, "uashort", "web").c_str());
+    ptc(ch, "{GShort RU: [{x%s{G]{x %s\n\r", mob.short_descr.get(RU).c_str(), web_edit_button(showWeb, ch, "rushort", "web").c_str());
+
+    ptc(ch, "{GLong EN:  [{x%s{G]{x %s\n\r", mob.long_descr.get(EN).c_str(), web_edit_button(showWeb, ch, "long", "web").c_str());        
+    ptc(ch, "{GLong UA:  [{x%s{G]{x %s\n\r", mob.long_descr.get(UA).c_str(), web_edit_button(showWeb, ch, "ualong", "web").c_str());        
+    ptc(ch, "{GLong RU:  [{x%s{G]{x %s\n\r", mob.long_descr.get(RU).c_str(), web_edit_button(showWeb, ch, "rulong", "web").c_str());        
     
     ptc(ch, "{CLevel {Y%3d  {CVnum: [{Y%u{C]  Area: [{Y%5d{C] {G%s{x\n\r",
         mob.level, mob.vnum,
@@ -422,7 +419,10 @@ MEDIT(show)
     ptc(ch, "Religion: [{G%s{x] {D(reledit list){x\n\r", mob.religion.toString().c_str());
     if (mob.clan != clan_none)
         ptc(ch, "Clan: [{G%s{x] {D(? clan){x\n\r", mob.clan->getName().c_str());
-    ptc(ch, "Smell:     %s\n\r", mob.smell.c_str( ));
+
+    ptc(ch, "Smell EN: [%s] %s\n\r", mob.smell.get(EN).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str());
+    ptc(ch, "Smell UA: [%s] %s\n\r", mob.smell.get(UA).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str());
+    ptc(ch, "Smell RU: [%s] %s\n\r", mob.smell.get(RU).c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());
 
     ptc(ch, "Description: %s\n\r%s", web_edit_button(showWeb, ch, "desc", "web").c_str(), mob.description);
 
@@ -608,7 +608,7 @@ MEDIT(shop)
 
 MEDIT(where)
 {
-    ptc(ch, "%s находится в:\r\n", DLString( mob.short_descr ).ruscase('1').c_str( ));
+    ch->pecho("%N1 находится в: ", mob.getShortDescr(LANG_DEFAULT));
 
     for (Character *wch = char_list; wch; wch = wch->next) {
         if (!wch->is_npc( ))
@@ -673,22 +673,32 @@ MEDIT(level)
 
 MEDIT(desc)
 {
-    return editor(argument, mob.description);
+    return editor(argument, mob.description[EN]);
+}
+
+MEDIT(uadesc)
+{
+    return editor(argument, mob.description[UA]);
+}
+
+MEDIT(rudesc)
+{
+    return editor(argument, mob.description[RU]);
 }
 
 MEDIT(smell)
 {
-    if (!*argument) {
-        if(sedit(mob.smell)) {
-            stc("Smell set\n\r", ch);
-            return true;
-        } else
-            return false;
-    }
+    return editor(argument, mob.smell[EN]);
+}
 
-    mob.smell = argument;
-    stc("Smell set\n\r", ch);
-    return false;
+MEDIT(uasmell)
+{
+    return editor(argument, mob.smell[UA]);
+}
+
+MEDIT(rusmell)
+{
+    return editor(argument, mob.smell[RU]);
 }
 
 MEDIT(oldbehavior)
@@ -757,17 +767,47 @@ MEDIT(clan)
 
 MEDIT(long)
 {
-    return editor(argument, mob.long_descr, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_ADD_NEWLINE));
+    return editor(argument, mob.long_descr[EN], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_ADD_NEWLINE));
+}
+
+MEDIT(ualong)
+{
+    return editor(argument, mob.long_descr[UA], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_ADD_NEWLINE));
+}
+
+MEDIT(rulong)
+{
+    return editor(argument, mob.long_descr[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_ADD_NEWLINE));
 }
 
 MEDIT(short)
 {
-    return editor(argument, mob.short_descr, ED_NO_NEWLINE);
+    return editor(argument, mob.short_descr[EN], ED_NO_NEWLINE);
+}
+
+MEDIT(uashort)
+{
+    return editor(argument, mob.short_descr[UA], ED_NO_NEWLINE);
+}
+
+MEDIT(rushort)
+{
+    return editor(argument, mob.short_descr[RU], ED_NO_NEWLINE);
 }
 
 MEDIT(name)
 {
-    return editor(argument, mob.player_name, ED_NO_NEWLINE);
+    return editor(argument, mob.keyword[EN], ED_NO_NEWLINE);
+}
+
+MEDIT(uaname)
+{
+    return editor(argument, mob.keyword[UA], ED_NO_NEWLINE);
+}
+
+MEDIT(runame)
+{
+    return editor(argument, mob.keyword[RU], ED_NO_NEWLINE);
 }
 
 
@@ -1049,9 +1089,9 @@ MEDIT(list)
     RoomIndexData *pRoom;
     ostringstream buffer;
     
-    buffer << fmt(0, "Resets for mobile [{W%d{x] ({g%s{x):\n\r",
+    buffer << fmt(0, "Resets for mobile [{W%d{x] ({g%N1{x):\n\r",
             mob.vnum, 
-            russian_case(mob.short_descr, '1').c_str( ));
+            mob.getShortDescr(LANG_DEFAULT));
     
     cnt = 0;
     for (auto &r: roomIndexMap) {
@@ -1061,7 +1101,7 @@ MEDIT(list)
                 case 'M':
                     if(pReset->arg1 == mob.vnum) {
                         buffer << fmt(0, "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
-                                pReset->command, pRoom->vnum, pRoom->name);
+                                pReset->command, pRoom->vnum, pRoom->name.get(LANG_DEFAULT).c_str());
                         cnt++;
                     }
             }
@@ -1164,10 +1204,10 @@ MEDIT(copy)
         return false;
     }
     
-    ch->pecho("All %s copied from vnum %d (%s).",
+    ch->pecho("All %s copied from vnum %d (%N1).",
                 report.c_str( ),
                 original->vnum, 
-                russian_case( original->short_descr, '1' ).c_str( ) );
+                original->getShortDescr(LANG_DEFAULT));
     return true;
 }
 
@@ -1221,77 +1261,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     argument = one_argument(argument, arg1);
 
-    if (arg_is(arg1, "save")) {
-        ostringstream buf;
-
-        for (int i = MAX_KEY_HASH-1; i >=0; i--)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
-            DLString hint;
-
-            pMob->keyword[RU].clear();
-            pMob->keyword[EN].clear();
-
-            if (String::hasCyrillic(pMob->long_descr)) {
-                pMob->roomDescription[RU] = format_longdescr(pMob->long_descr, hint);
-                hint.colourstrip();
-                hint.toLower();
-                pMob->keyword[EN] = hint + " ";
-            } 
-
-            DLString names = pMob->player_name;
-            for (auto &name: names.split(" ")) {
-                name.colourstrip();
-                name.toLower();
-
-                if (String::hasCyrillic(name)) {
-                    if (pMob->keyword[RU].find(name) == DLString::npos)
-                        pMob->keyword[RU] << name << " ";
-
-                } else {
-                    if (pMob->keyword[EN].find(name) == DLString::npos)
-                        pMob->keyword[EN] << name << " ";
-                }
-            }
-
-            pMob->keyword[RU].stripRightWhiteSpace();
-            pMob->keyword[EN].stripRightWhiteSpace();
-
-            pMob->name[RU] = pMob->short_descr;
-
-            {
-                StringList keywords;
-                for (auto &name: pMob->keyword[RU].split(" "))
-                    keywords.addUnique(name);
-
-                for (int i = 0; i < 6; i++)
-                    for (auto &name: russian_case(pMob->short_descr, '1' + i).split(" "))
-                        keywords.addUnique(name.toLower().colourStrip());
-
-                StringList longs;
-                for (auto &name: pMob->roomDescription[RU].split(" "))
-                    longs.addUnique(name.toLower().colourStrip());
-
-                bool found = false;
-                for (auto &longName: longs)
-                    for (auto &kw: keywords)
-                        if (kw.strPrefix(longName)) {
-                            found = true;
-                            break;
-                        }
-
-                if (!found)
-                    buf << fmt(0, "[%6d] {Y%20.20N1{x {g%20.20s{x %s\r\n",
-                                pMob->vnum,
-                                pMob->short_descr,
-                                pMob->keyword[RU].c_str(),
-                                pMob->roomDescription[RU].c_str());
-            }
-        }
-
-        page_to_char(buf.str().c_str(), ch);
-        return;
-
-    } else if (is_number(arg1)) {
+    if (is_number(arg1)) {
         value = atoi(arg1);
         if (!(pMob = get_mob_index(value))) {
             stc("OLCStateMobile:  That vnum does not exist.\n\r", ch);

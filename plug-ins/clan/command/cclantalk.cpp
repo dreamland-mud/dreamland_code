@@ -117,7 +117,7 @@ COMMAND(CClanTalk, "cb")
     if (dreamland->hasOption( DL_LOG_COMM ))
         LogStream::sendNotice( ) 
             << "[" << ch->getClan( )->getShortName( ) << "] " 
-            << ch->getName( ) << ": " << argument << endl;
+            << ch->getNameP('1') << ": " << argument << endl;
 
     if (!ch->isAffected(gsn_deafen)) {
         ostringstream msgBuf;

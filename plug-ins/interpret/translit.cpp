@@ -1,7 +1,7 @@
 #include <sstream>
 #include "dl_ctype.h"
 #include "dlstring.h"
-#include "xmlmultistring.h"
+#include "lang.h"
 
 static char en2ua(char c0)
 {

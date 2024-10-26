@@ -10,7 +10,7 @@
 
 #include "regexp.h"
 
-#include "object.h"
+#include "core/object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 
@@ -60,7 +60,7 @@ bool InvasionHelper::death( Character *killer )
         Character *wch;
 
         wch = gq->getActor( killer );
-        log("InvasionHelper killed by " << wch->getName( ));
+        log("InvasionHelper killed by " << wch->getNameC( ));
         
         if (!wch->is_npc( )) {
             XMLAttributeInvasion::Pointer attr;

@@ -275,25 +275,25 @@ bool Keyhole::findLockpick( )
     return true;
 }
 
+// Remember the door name on this key/lockpick after successful use
+// TODO multi-language descriptions
 void Keyhole::record( Object *obj )
 {
     char *ed_text;
-    DLString edText, edEntry;
-    
-    if (obj->getOwner().empty() || ch->getName( ) != obj->getOwner( ))
-        return;
+    DLString edEntry = getDescription().ruscase('2');
+    DLString edKey = obj->getKeyword( ).toString();
+    DLString edText = obj->getExtraDescr(edKey, LANG_DEFAULT);
 
-    if (!( ed_text = get_extra_descr( obj->getName( ), obj->extra_descr ) ))
-        return;
+    if (edText.empty()) {
+        edText = "Подходит для открытия:\n";
+    }
     
-    edText  = ed_text;
-    edEntry = getDescription( ).ruscase( '2' );
-   
     if (edText.find( edEntry ) != DLString::npos)
         return;
 
-    obj->addExtraDescr( obj->getName( ), 
-                        edText + "       " + edEntry + "\n" );
+    obj->addExtraDescr(edKey, 
+                       edText + edEntry + "\n",
+                       LANG_DEFAULT );
 }
 
 bool Keyhole::doLore( ostringstream &buf )
@@ -399,7 +399,8 @@ DLString ItemKeyhole::getDescription( )
 {
     DLString buf;
 
-    buf << obj->getShortDescr( );
+    // TODO multi-langage descriptions
+    buf << obj->getShortDescr(LANG_DEFAULT);
     if (obj->getCarrier( ) == 0)
         buf << " из '" << obj->getRoom()->getName() << "'";
 
@@ -563,16 +564,16 @@ void ExtraExitKeyhole::setLockFlags(int flags)
 
 void ExtraExitKeyhole::msgTryPickSelf( )
 {
-    oldact("Ты осторожно поворачиваешь $o4 в замочной скважине $N2.", ch, lockpick, peexit->short_desc_from, TO_CHAR );
+    oldact("Ты осторожно поворачиваешь $o4 в замочной скважине $N2.", ch, lockpick, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_CHAR );
 }
 void ExtraExitKeyhole::msgTryPickOther( )
 {
-    oldact("$c1 ковыряется в замке $N2.", ch, 0, peexit->short_desc_from, TO_ROOM );
+    oldact("$c1 ковыряется в замке $N2.", ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_ROOM );
 }
 
 DLString ExtraExitKeyhole::getDescription( )
 {
-    return peexit->short_desc_from;
+    return peexit->short_desc_from.get(LANG_DEFAULT);
 }
 int ExtraExitKeyhole::getKey( )
 {

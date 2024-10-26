@@ -161,7 +161,7 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
                 EXTRA_EXIT_DATA *peexit = actor->in_room->extra_exits.find(argAll.c_str());
 
                 if (peexit && actor->can_see(peexit)) {
-                    target.extraExit = peexit->keyword;
+                    target.extraExit = peexit->keyword.get(LANG_EN);
                     target.doorOrExtraExit = target.extraExit;
                     return true;
                 }

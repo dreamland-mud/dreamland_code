@@ -130,12 +130,16 @@ struct VarArgFormatter : public MsgFormatter {
         va_copy(this->av, av);
         argcnt = 0;
         
-//        if (to && !to->getPC())
-//            return DLString::emptyString;
+        DLString result;
 
-        DLString s = run();
+        try {
+            result = run();
+        } catch (const Exception &ex) {
+            LogStream::sendNotice() << "MsgFormatter [" << format << "] exception: " << ex.what() << endl;
+        }
+        
         va_end(av);
-        return s;
+        return result;
     }
 protected:    
     virtual void nextArg() {
@@ -166,8 +170,20 @@ protected:
         return d.skill;
     }
     virtual Grammar::Noun::Pointer argNoun(int nounFlags) {
-        return dynamic_cast<const Grammar::NounHolder *>(d.obj)->toNoun(to, nounFlags);
+        if (!d.obj)
+            throw Exception("Null obj or char");
+
+        const Grammar::NounHolder *holder = dynamic_cast<const Grammar::NounHolder *>(d.obj);
+        if (!holder)
+            throw Exception("Cannot cast obj or char to noun holder");
+
+        Grammar::Noun::Pointer noun = holder->toNoun(to, nounFlags);
+        if (!noun)
+            throw Exception("Null noun after conversion");
+
+        return noun;
     }
+    
 private:
     typedef union {
         char c;

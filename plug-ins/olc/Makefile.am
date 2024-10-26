@@ -15,7 +15,6 @@ cmdedit.cpp \
 medit.cpp \
 oedit.cpp \
 eeedit.cpp \
-mem.cpp \
 olc_act.cpp \
 olc_impl.cpp \
 olc_save.cpp \

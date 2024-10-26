@@ -54,7 +54,7 @@ COMMAND(Divorce, "divorce")
         return;
     }
 
-    if (ch->getName( ) == brideName1 || ch->getName( ) == brideName2) {
+    if (ch->getPC()->getName( ) == brideName1 || ch->getPC()->getName( ) == brideName2) {
         ch->pecho("Попроси кого-то помочь тебе.");
         return;
     }

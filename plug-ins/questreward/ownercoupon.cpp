@@ -63,7 +63,7 @@ bool OwnerCoupon::use( Character *ch, const char *arg )
     item->behavior->setObj( item );
         
     LogStream::sendNotice( ) 
-        << ch->getName( ) << " personalizes " << item->getShortDescr( '1' ) 
+        << ch->getPC()->getName( ) << " personalizes " << item->getShortDescr( '1', LANG_DEFAULT ) 
         << " [vnum " << item->pIndexData->vnum << " ID " << item->getID( ) << "] "
         << " using " << (obj->getOwner().empty() ? obj->getOwner().c_str() : "nobody") 
         << "'s coupon [ID " << obj->getID( ) << "]" << endl;

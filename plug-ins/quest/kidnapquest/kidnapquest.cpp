@@ -46,14 +46,14 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
         kingVnum = king->pIndexData->vnum;
         kingRoom = king->in_room->getName();
         kingArea = king->in_room->areaName();
-        kingName = king->getShortDescr( );
+        kingName = king->getShortDescr(LANG_DEFAULT);
 
         room = findRefuge( pch, king );
         princeArea = room->areaName();
         princeRoom = room->getName();
 
         prince = createPrince( king, room );
-        princeName = prince->getShortDescr( );
+        princeName = prince->getShortDescr(LANG_DEFAULT);
 
     } catch (const QuestCannotStartException &e) {
         destroy( );
