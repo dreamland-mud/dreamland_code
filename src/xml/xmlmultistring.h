@@ -28,6 +28,7 @@ public:
     DLString toString() const;
 
     void clearValues();
+    bool emptyValues() const;
 };
 
 #endif

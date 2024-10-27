@@ -204,3 +204,12 @@ void XMLMultiString::clearValues()
     for (auto &i: *this)
         i.second.clear();
 }
+
+bool XMLMultiString::emptyValues() const
+{
+    for (auto &i: *this)
+        if (!i.second.empty())
+            return false;
+
+    return true;
+}
