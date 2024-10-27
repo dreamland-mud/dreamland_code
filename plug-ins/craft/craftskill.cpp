@@ -191,7 +191,7 @@ void CraftSkill::improve( Character *ch, bool success, Character *victim, int da
         if (number_percent( ) >= chance)
             return;
             
-        pch->pecho("{GТеперь ты гораздо лучше владеешь искусством '%K'!{x", thiz);
+        pch->pecho("{GТеперь ты гораздо лучше владеешь искусством '%K1'!{x", thiz);
 
         data.learned++;
     }
@@ -206,7 +206,7 @@ void CraftSkill::improve( Character *ch, bool success, Character *victim, int da
         if (number_percent( ) >= chance)
             return;
 
-        pch->pecho("{GТы учишься на своих ошибках, и твое умение '%K' совершенствуется.{x", thiz);
+        pch->pecho("{GТы учишься на своих ошибках, и твое умение '%K1' совершенствуется.{x", thiz);
         
         data.learned += number_range( 1, wis_mod );
         data.learned = min( (int)data.learned, getMaximum( pch ) );
@@ -219,7 +219,7 @@ void CraftSkill::improve( Character *ch, bool success, Character *victim, int da
         xp += data.learned / 4;
 
     if (data.learned >= getMaximum( pch )) {
-        pch->pecho("{WТеперь ты {Cмастерски{W владеешь искусством {C%K{W!{x", thiz);
+        pch->pecho("{WТеперь ты {Cмастерски{W владеешь искусством {C%K1{W!{x", thiz);
         
         xp += 98 * getRating( pch );
     }

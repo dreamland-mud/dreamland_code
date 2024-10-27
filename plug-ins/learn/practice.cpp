@@ -270,7 +270,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
 
     if (!skill->canPractice( ch, buf )) {
         if (buf.str().empty())
-            ch->pecho("Ты не можешь выучить умение {W%K{x.", skill);
+            ch->pecho("Ты не можешь выучить умение {W%K1{x.", skill);
         else
             ch->send_to(buf);
         return;
@@ -293,7 +293,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     adept = skill->getAdept( ch );
 
     if (learned >= adept) {
-        ch->pecho("Ты уже слишком хорошо владеешь умением {W%K{x, практиковаться бессмысленно.", skill);
+        ch->pecho("Ты уже слишком хорошо владеешь умением {W%K1{x, практиковаться бессмысленно.", skill);
         ch->pecho("Чтобы овладеть умением еще лучше, просто применяй его почаще.");  
         return;
     }
@@ -302,16 +302,16 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     
     skill->practice( ch );
 
-    ch->pecho("%^C1 обучает тебя умению {W%K{x.", teacher, skill);
-    teacher->pecho("Ты обучаешь %C4 умению {W%K{x.", ch, skill);
-    ch->recho(teacher, "%^C1 обучает %C4 умению {W%K{x.", teacher, ch, skill);
+    ch->pecho("%^C1 обучает тебя умению {W%K1{x.", teacher, skill);
+    teacher->pecho("Ты обучаешь %C4 умению {W%K1{x.", ch, skill);
+    ch->recho(teacher, "%^C1 обучает %C4 умению {W%K1{x.", teacher, ch, skill);
     
     if (learned < adept)
-        ch->pecho( "Ты теперь знаешь умение {W%K{x на %d процентов.", skill, learned );
+        ch->pecho( "Ты теперь знаешь умение {W%K1{x на %d процентов.", skill, learned );
     else {
-        ch->pecho("Теперь ты хорошо владеешь умением {W%K{x.", skill);
+        ch->pecho("Теперь ты хорошо владеешь умением {W%K1{x.", skill);
         ch->pecho( "Дальше практиковать не получится, просто начни применять его почаще." );        
-        ch->recho("%^C1 теперь хорошо владеет умением {W%K{x.", ch, skill);
+        ch->recho("%^C1 теперь хорошо владеет умением {W%K1{x.", ch, skill);
     }
 }
 

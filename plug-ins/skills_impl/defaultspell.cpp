@@ -728,7 +728,7 @@ bool DefaultSpell::checkPosition( Character *ch ) const
 {
     if (ch->position < position.getValue( )) {
         const Skill *theSkill = skill.getPointer();
-        ch->pecho("Заклинание '%K' нельзя использовать во время сражения.", theSkill);
+        ch->pecho("Заклинание '%K1' нельзя использовать во время сражения.", theSkill);
         return false;
     }
     

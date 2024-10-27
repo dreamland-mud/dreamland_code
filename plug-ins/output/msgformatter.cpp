@@ -257,10 +257,6 @@ again:
                 s += DLString(argStr()).getOneArgument();
                 state = 0;
                 break;
-            case 'K':
-                s += argSkill()->getNameFor(to);
-                state = 0;
-                break;
             case 'c': 
                 s += argChar();
                 state = 0;
@@ -270,6 +266,7 @@ again:
             case 'P':
             case 'T':
             case 'O':
+            case 'K':
             case 'N':
             case 'p':
                 cvt = *f;
@@ -306,6 +303,9 @@ again:
                 break;
             case 'N':
                 s += russian_case( argStr(), *f );
+                break;
+            case 'K':
+                s += argSkill()->getNameFor(to).ruscase(*f);
                 break;
             case 'P':
                 cs = URANGE(0, *f - '1', (int)(sizeof(pronoun)/sizeof(*pronoun) - 1));
