@@ -12,7 +12,7 @@ static bool fix_title( PCharacter *ch, DLString &title )
     if (DLString( "{" ).strSuffix( title )
         && !DLString( "{{" ).strSuffix( title ))
     {
-        String::truncate(title, title.length( ) - 1 );
+        title = String::truncate(title, title.length( ) - 1 );
     }
 
     title.replaces( "{/", "" );

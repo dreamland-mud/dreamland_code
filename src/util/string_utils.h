@@ -11,7 +11,13 @@ namespace String {
     bool equalLess(const DLString &a, const DLString &b);
 
     /** Truncates the string to give size. */
-    DLString &truncate(DLString &str, size_t size);
+    DLString truncate(const DLString &str, size_t size);
+
+    /** Truncate the string, remove ending newline and add ellipsis. */
+    DLString ellipsis(const DLString &str, size_t size);
+
+    /** Remove line feed characters from the end. */
+    DLString stripEOL(const DLString &str);
 
     /** True if string contains ї or similar. */
     bool hasUaSymbol(const DLString &str);

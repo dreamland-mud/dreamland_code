@@ -129,7 +129,7 @@ private:
         DLString kw = keyword;
 
         if (arg.length() > 3 && arg.length() < kw.length())
-            String::truncate(kw, arg.length());
+            kw = String::truncate(kw, arg.length());
 
         return levenshtein(arg, kw, 1, 1, 1, 1);
     }

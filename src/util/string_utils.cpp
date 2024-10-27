@@ -2,6 +2,7 @@
 #include "string_utils.h"
 #include "dl_ctype.h"
 #include "xmlmultistring.h"
+#include "logstream.h"
 
 using namespace std;
 
@@ -17,10 +18,36 @@ bool String::equalLess(const DLString &a, const DLString &b)
     return true;
 }
 
-DLString &String::truncate(DLString &str, size_t size)
+DLString String::truncate(const DLString &constString, size_t size)
 {
-    if (str.length( ) > size)
-        str.erase( size );
+    DLString str = constString;
+
+    if (str.length() > size)
+        str.erase(size);
+
+    return str;
+}
+
+DLString String::ellipsis(const DLString& constString, size_t size)
+{
+    DLString str = truncate(constString, size);
+    bool addEllipsis = constString.size() != str.size();
+
+    str = stripEOL(str);
+
+    if (addEllipsis)
+        str << "...";
+
+    return str;
+}
+
+DLString String::stripEOL(const DLString& constString)
+{
+    DLString str = constString;
+
+    auto lf_pos = str.find_last_not_of('\n');
+    if (lf_pos != DLString::npos)
+        str.erase(lf_pos + 1);
 
     return str;
 }

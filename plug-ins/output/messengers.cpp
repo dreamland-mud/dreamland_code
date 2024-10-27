@@ -143,7 +143,7 @@ static DLString discord_string(const DLString &source)
 
     // Discord 'description' field has a limit of 2000 characters (in UTF encoding).
     if (dest.size() > 1000) {
-        String::truncate(dest, 995);
+        dest = String::truncate(dest, 995);
         dest << "\n...";
     }
 

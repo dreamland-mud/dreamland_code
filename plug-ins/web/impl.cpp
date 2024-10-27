@@ -206,8 +206,7 @@ Json::Value GroupWebPromptListener::jsonGroupMember( Character *ch, Character *g
     else  hit_clr = "1";
 
     DLString sees = ch->sees( gch, '1' ).colourStrip( );
-    String::truncate(sees, 10);
-    json["sees"] = sees;
+    json["sees"] = String::truncate(sees, 10);;
     json["hit"] = gch->hit.getValue( );
     json["max_hit"] = gch->max_hit.getValue( );
     json["health"] = hit;
