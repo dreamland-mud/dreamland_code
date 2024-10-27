@@ -112,7 +112,7 @@ CMDRUNP(report)
     DLString arg = args.getOneArgument();
 
     if (!ch->is_npc() || !IS_CHARMED(ch)) {
-        say_fmt("У меня %3d/%4d жизни (hp) %5d/%6d энергии (mana) %7d/%8d движения (mv).", ch, 0,
+        say_fmt("У меня %2$d/%3$d жизни, %4$d/%5$d энергии, %6$d/%7$d движения.", ch,
                 ch->hit.getValue(), ch->max_hit.getValue(),
                 ch->mana.getValue(), ch->max_mana.getValue(),
                 ch->move.getValue(), ch->max_move.getValue());

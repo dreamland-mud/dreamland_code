@@ -243,15 +243,20 @@ void tell_fmt( const char *msg, ... )
 void say_fmt( const char *msg, ... )
 {
     va_list ap, ap0;
-    ostringstream buf;
+    ostringstream toRoom, toChar;
     typedef union { Character *ch; } arg_t;
     arg_t teller;
     
-    buf << "%1$^C1 произносит '{g" << msg << "{x'";
+    toRoom << "%1$^C1 произносит '{g" << msg << "{x'";
+    toChar << "Ты произносишь '{g" << msg << "{x'";
+
     va_start( ap, msg );
     va_copy( ap0, ap );
     teller = va_arg(ap, arg_t);
-    teller.ch->vecho( POS_RESTING, TO_ALL, NULL, buf.str( ).c_str( ), ap0 );
+
+    teller.ch->vecho(POS_RESTING, TO_ROOM, 0, toRoom.str().c_str(), ap0);
+    teller.ch->vecho(POS_RESTING, TO_CHAR, 0, toChar.str().c_str(), ap0);
+
     va_end( ap );
     va_end( ap0 );
 }
