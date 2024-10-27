@@ -72,10 +72,12 @@ const PosessivePronoun::PosessionGenders ru_posessive_pronouns =
 const MultiGender masculineSingular(Gender::MASCULINE);
 const MultiGender neutralSingular(Gender::NEUTER);
 
-const InflectedString::Pointer 
-    somebody(NEW, InflectedString("|некто|кого-то|кому-то|кого-то|кем-то|ком-то", masculineSingular));
+// TODO remove previous implementation. Add multi-language support.
 
 const InflectedString::Pointer 
-    something(NEW, InflectedString("|нечто|чего-то|чему-то|что-то|чем-то|чем-то", neutralSingular));
+    somebody(NEW, InflectedString({"некто", "кого-то", "кому-то", "кого-то", "кем-то", "ком-то"}, masculineSingular));
+
+const InflectedString::Pointer 
+    something(NEW, InflectedString({"нечто", "чего-то", "чему-то", "что-то", "чем-то", "чем-то"}, neutralSingular));
 
 }

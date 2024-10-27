@@ -26,6 +26,20 @@ InflectedString::InflectedString(const DLString &ff, const MultiGender &mg)
     fillCachedForms();
 }
 
+InflectedString::InflectedString(const std::vector<DLString>& cases, const Grammar::MultiGender& mg)
+{
+    this->mg = mg;
+
+    cachedForms.resize(Case::MAX + 1);
+    cachedForms[Case::MAX] = "";
+   
+    for (size_t i = 0; i < cases.size(); i++) {
+        cachedForms[Case::NOMINATIVE + i] = cases[i];
+        cachedForms[Case::MAX] << cases[i] << " "; 
+        fullForm << "|" << cases[i];
+    }
+}
+
 Gender InflectedString::getGender() const
 {
     return mg.toGender();

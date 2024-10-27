@@ -5,6 +5,7 @@
 #ifndef RUSSIANSTRING_H
 #define RUSSIANSTRING_H
 
+#include <vector>
 #include "noun.h"
 #include "nounholder.h"
 #include "lang.h"
@@ -18,6 +19,7 @@ public:
     InflectedString();
     InflectedString(const DLString &ff);
     InflectedString(const DLString &ff, const Grammar::MultiGender &mg);
+    InflectedString(const std::vector<DLString> &cases, const Grammar::MultiGender &mg);
 
     virtual const DLString &decline(const Grammar::Case &c) const;
     virtual Grammar::Gender getGender() const;
