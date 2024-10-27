@@ -38,7 +38,9 @@ CLAN(flowers);
 
 bool is_safe(Character *ch, Character *victim)
 {
-    if (!is_safe_nomessage(ch, victim))
+    bool verbose = true;
+
+    if (!is_safe_nomessage(ch, victim, verbose))
         return false;
 
     if (ch && victim) {
@@ -52,12 +54,13 @@ bool is_safe(Character *ch, Character *victim)
     return true;
 }
 
-static bool mprog_safe( Character *ch, Character *victim ) 
+static bool mprog_safe( Character *ch, Character *victim, bool verbose ) 
 {
-    FENIA_CALL( ch, "Safe", "CC", ch, victim );
-    FENIA_NDX_CALL( ch->getNPC( ), "Safe", "CCC", ch, ch, victim );
-    FENIA_CALL( victim, "Safe", "CC", ch, victim );
-    FENIA_NDX_CALL( victim->getNPC( ), "Safe", "CCC", victim, ch, victim );
+    int v = verbose;	
+    FENIA_CALL( ch, "Safe", "CCi", ch, victim, v );
+    FENIA_NDX_CALL( ch->getNPC( ), "Safe", "CCCi", ch, ch, victim, v );
+    FENIA_CALL( victim, "Safe", "CCi", ch, victim, v );
+    FENIA_NDX_CALL( victim->getNPC( ), "Safe", "CCCi", victim, ch, victim, v );
     return false;
 }        
 
@@ -74,7 +77,7 @@ static bool is_in_pk_range( int cml, int vml, int non_wanted )
     return false;
 }
 
-bool is_safe_nomessage(Character *ch, Character *victim )
+bool is_safe_nomessage(Character *ch, Character *victim, bool verbose )
 {
     if (!ch || !victim)
         return true;
@@ -88,7 +91,7 @@ bool is_safe_nomessage(Character *ch, Character *victim )
         return false;
     }
 
-    if (mprog_safe( ch, victim ))
+    if (mprog_safe( ch, victim, verbose ))
         return true;
     /* мертвi бджоли не гудуть */
     if (victim->isDead( ) || ch->isDead( ))
