@@ -639,8 +639,11 @@ static void corpse_fill( Object *corpse, Character *ch, int flags = 0 )
 
 static void corpse_reequip( Character *victim )
 {
-    for (Object *obj = victim->carrying; obj; obj = obj->next_content)
-        obj->wear_loc->equip( obj );
+    for (Object *obj = victim->carrying; obj; obj = obj->next_content) {
+        Wearlocation *wearloc = obj->wear_loc.getElement();
+        wearloc->unequip(obj);
+        wearloc->equip( obj );
+    }
 }
 
 
