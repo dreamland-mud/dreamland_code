@@ -28,7 +28,7 @@ int SchedulerTaskRoundCharacter::getPriority( ) const
 
 void SchedulerTaskRoundCharacter::run( )
 {
-    ProfilerBlock profiler("SchedulerTaskRoundCharacter", 50);
+    ProfilerBlock profiler("SchedulerTaskRoundCharacter", 100);
     
     Character *ch, *ch_next;
     
