@@ -22,6 +22,7 @@
 #include "commandbase.h"
 #include "playerattributes.h"
 #include "objectbehavior.h"
+#include "areaquestutils.h"
 #include "core/behavior/behavior_utils.h"
 #include "room.h"
 #include "skillreference.h"
@@ -40,6 +41,7 @@ const char * sunlight_ru [4] = { "темно", "светает", "светло",
 
 static bool rprog_command( Room *room, Character *actor, const DLString &cmdName, const DLString &cmdArgs )
 {
+    aquest_trigger(room, actor, "Command", "Css", actor, cmdName.c_str(), cmdArgs.c_str());	
     FENIA_CALL(room, "Command", "Css", actor, cmdName.c_str( ), cmdArgs.c_str( ));
     BEHAVIOR_CALL(room, command, actor, cmdName, cmdArgs);
     return false;
