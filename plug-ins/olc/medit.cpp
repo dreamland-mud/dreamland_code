@@ -343,94 +343,103 @@ MEDIT(show)
     bool showWeb = !arg_is_strict(argument, "noweb");
     Race *race = raceManager->findExisting(mob.race);
 
-    ptc(ch, "{GName EN:  [{x%s{G]{x %s\n\r", mob.keyword.get(EN).c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());
-    ptc(ch, "{GName UA:  [{x%s{G]{x %s\n\r", mob.keyword.get(UA).c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());
-    ptc(ch, "{GName RU:  [{x%s{G]{x %s\n\r", mob.keyword.get(RU).c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());
-
-    ptc(ch, "{GShort EN: [{x%s{G]{x %s\n\r", mob.short_descr.get(EN).c_str(), web_edit_button(showWeb, ch, "short", "web").c_str());
-    ptc(ch, "{GShort UA: [{x%s{G]{x %s\n\r", mob.short_descr.get(UA).c_str(), web_edit_button(showWeb, ch, "uashort", "web").c_str());
-    ptc(ch, "{GShort RU: [{x%s{G]{x %s\n\r", mob.short_descr.get(RU).c_str(), web_edit_button(showWeb, ch, "rushort", "web").c_str());
-
-    ptc(ch, "{GLong EN:  [{x%s{G]{x %s\n\r", mob.long_descr.get(EN).c_str(), web_edit_button(showWeb, ch, "long", "web").c_str());        
-    ptc(ch, "{GLong UA:  [{x%s{G]{x %s\n\r", mob.long_descr.get(UA).c_str(), web_edit_button(showWeb, ch, "ualong", "web").c_str());        
-    ptc(ch, "{GLong RU:  [{x%s{G]{x %s\n\r", mob.long_descr.get(RU).c_str(), web_edit_button(showWeb, ch, "rulong", "web").c_str());        
-    
-    ptc(ch, "{CLevel {Y%3d  {CVnum: [{Y%u{C]  Area: [{Y%5d{C] {G%s{x\n\r",
-        mob.level, mob.vnum,
+    ptc(ch, "{CVnum: [{Y%u{C]  Area: [{Y%5d{C] {G%s{x\n\r",
+        mob.vnum,
         !mob.area ? -1 : mob.area->vnum,
         !mob.area ? "No Area" : mob.area->getName().c_str());
 
-    ptc(ch, "Race [{G%s{x] {D(? race){x Sex: [{G%s{x] {D(? sex_table){x Number: [{G%s{x]\n\r",
+    ptc(ch, "{GName EN:{x  [{W%s{w]{x %s\n\r", mob.keyword.get(EN).c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());
+    ptc(ch, "{GName UA:{x  [{W%s{w]{x %s\n\r", mob.keyword.get(UA).c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());
+    ptc(ch, "{GName RU:{x  [{W%s{w]{x %s\n\r", mob.keyword.get(RU).c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());
+
+    ptc(ch, "{GShort EN:{x [{W%s{w]{x %s\n\r", mob.short_descr.get(EN).c_str(), web_edit_button(showWeb, ch, "short", "web").c_str());
+    ptc(ch, "{GShort UA:{x [{W%s{w]{x %s\n\r", mob.short_descr.get(UA).c_str(), web_edit_button(showWeb, ch, "uashort", "web").c_str());
+    ptc(ch, "{GShort RU:{x [{W%s{w]{x %s\n\r", mob.short_descr.get(RU).c_str(), web_edit_button(showWeb, ch, "rushort", "web").c_str());
+
+    ptc(ch, "{GLong EN:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(EN)).c_str(), web_edit_button(showWeb, ch, "long", "web").c_str());        
+    ptc(ch, "{GLong UA:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(UA)).c_str(), web_edit_button(showWeb, ch, "ualong", "web").c_str());        
+    ptc(ch, "{GLong RU:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(RU)).c_str(), web_edit_button(showWeb, ch, "rulong", "web").c_str());        
+    
+    ptc(ch, "{CLevel{x:       [{W%3d{x]\n\r", mob.level);
+
+    ptc(ch, "{CRace{x:        [{W%s{x] {D(? race){x Sex: [{W%s{x] {D(? sex_table){x Number: [{W%s{x]\n\r",
         mob.race, 
         sex_table.name( mob.sex ).c_str( ),
         mob.gram_number == Grammar::Number::PLURAL ? "plural" : "singular");
 
-    ptc(ch, "{GHit dice:{x    [%6dd%-5d+%6d]\n\r",
+    ptc(ch, "{CHit dice:{x    [{W%6dd%-5d+%6d{x]\n\r",
         mob.hit[DICE_NUMBER],
         mob.hit[DICE_TYPE],
         mob.hit[DICE_BONUS]);
 
-    ptc(ch, "{RDamage dice:{x [%6dd%-5d+%6d]\n\r",
+    ptc(ch, "{CDamage dice:{x [{W%6dd%-5d+%6d{x]\n\r",
         mob.damage[DICE_NUMBER],
         mob.damage[DICE_TYPE],
         mob.damage[DICE_BONUS]);
 
-    ptc(ch, "{CMana dice:{x   [%6dd%-5d+%6d]\n\r",
+    ptc(ch, "{CMana dice:{x   [{W%6dd%-5d+%6d{x]\n\r",
         mob.mana[DICE_NUMBER],
         mob.mana[DICE_TYPE],
         mob.mana[DICE_BONUS]);
 
-    ptc(ch, "Wealth:[%10d]   Align:  [%5d]\n\r",
+    ptc(ch, "{CWealth:{x      [{W%10d{x]  {CAlign{x: [{W%5d{x]\n\r",
         mob.wealth, mob.alignment);
 
-    ptc(ch, "Hitroll:[%5d] Damage:[%10s] {D(? weapon_flags){x\n\r",
+    ptc(ch, "{CHitroll:{x     [{W%5d{x]  {CDamage{x: [{W%10s{x] {D(? weapon_flags){x\n\r",
         mob.hitroll, weapon_flags.name(mob.dam_type).c_str( ));
 
-    ptc(ch, "Armor: [pierce: %d  bash: %d  slash: %d  magic: %d] {D(? ac_type){x\n\r",
+    ptc(ch, "{CArmor{x:       [{Wpierce: %d  bash: %d  slash: %d  magic: %d{x] {D(? ac_type){x\n\r",
         mob.ac[AC_PIERCE], mob.ac[AC_BASH],
         mob.ac[AC_SLASH], mob.ac[AC_EXOTIC]);
 
-    ptc(ch, "Act: [{R%s{x] {D(? act_flags){x\n\r", act_flags.names(mob.act).c_str());
+    ptc(ch, "{CAct{x:         [{W%s{x] {D(? act_flags){x\n\r", act_flags.names(mob.act).c_str());
 
-    ptc(ch, "Aff: [{D%s{x] {D(oaff){x\n\r", affect_flags.names(mob.affected_by).c_str());
-    ptc(ch, "Affects: [{C%s{x] {D(aff){x\n\r", mob.affects.toString().c_str());
-    ptc(ch, "Det: [{M%s{x] {D(? detect_flags){x\n\r", detect_flags.names(mob.detection).c_str());
+    ptc(ch, "{CAff:{x         [{W%s{x] {D(oaff){x\n\r", affect_flags.names(mob.affected_by).c_str());
+    ptc(ch, "{CAffects:{x     [{W%s{x] {D(aff){x\n\r", mob.affects.toString().c_str());
+    ptc(ch, "{CDet:{x         [{W%s{x] {D(? detect_flags){x\n\r", detect_flags.names(mob.detection).c_str());
 
-    ptc(ch, "Pos   : starting [{Y%s{x]  default [{Y%s{x] {D(? position_table){x\n\r",
+    ptc(ch, "{CPosition:{x    starting [{W%s{x]  default [{W%s{x] {D(? position_table){x\n\r",
         position_table.name(mob.start_pos).c_str(),
         position_table.name(mob.default_pos).c_str());
 
-    ptc(ch, "Imm:  [{W%s{x] {D(? imm_flags){x\n\r", imm_flags.names(mob.imm_flags).c_str());
-    ptc(ch, "Res:  [{Y%s{x] {D(? res_flags){x\n\r", res_flags.names(mob.res_flags).c_str());
-    ptc(ch, "Vuln: [{y%s{x] {D(? vuln_flags){x\n\r", vuln_flags.names(mob.vuln_flags).c_str());
-    ptc(ch, "Off:  [{M%s{x] {D(? off_flags){x\n\r", off_flags.names(mob.off_flags).c_str());
-    ptc(ch, "Size: [{G%s{x] (расовый {g%s{x) {D(? size_table){x\n\r", 
+    ptc(ch, "{CImm:{x         [{W%s{x] {D(? imm_flags){x\n\r", imm_flags.names(mob.imm_flags).c_str());
+    ptc(ch, "{CRes:{x         [{W%s{x] {D(? res_flags){x\n\r", res_flags.names(mob.res_flags).c_str());
+    ptc(ch, "{CVuln:{x        [{W%s{x] {D(? vuln_flags){x\n\r", vuln_flags.names(mob.vuln_flags).c_str());
+    ptc(ch, "{COff:{x         [{W%s{x] {D(? off_flags){x\n\r", off_flags.names(mob.off_flags).c_str());
+    ptc(ch, "{CSize:{x        [{W%s{x] (расовый {g%s{x) {D(? size_table){x\n\r", 
         size_table.name(mob.size).c_str(), 
         race ? race->getSize().name().c_str() : "-");
 
-    ptc(ch, "Material: [%s] {D(? material){x\n\r", mob.material);
-    ptc(ch, "Form:     [%s] {D(? form_flags){x\n\r", form_flags.names(mob.form).c_str());
-    ptc(ch, "Parts:    [%s] {D(? part_flags){x\n\r", part_flags.names(mob.parts).c_str());
+    ptc(ch, "{CMaterial:{x    [{W%s{x] {D(? material){x\n\r", mob.material);
+    ptc(ch, "{CForm:{x        [{W%s{x] {D(? form_flags){x\n\r", form_flags.names(mob.form).c_str());
+    ptc(ch, "{CParts:{x       [{W%s{x] {D(? part_flags){x\n\r", part_flags.names(mob.parts).c_str());
 
     if (!mob.spec_fun.name.empty())
-        ptc(ch, "Spec fun: [%s] {D(? spec){x\n\r", mob.spec_fun.name.c_str());
-    ptc(ch, "Group:    [%d]\n\r", mob.group);
-    ptc(ch, "Practicer:[{G%s{x] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
-    ptc(ch, "Religion: [{G%s{x] {D(reledit list){x\n\r", mob.religion.toString().c_str());
+        ptc(ch, "{CSpec fun:{x    [{W%s{x] {D(? spec){x\n\r", mob.spec_fun.name.c_str());
+    ptc(ch, "{CGroup:{x       [{W%d{x]\n\r", mob.group);
+    ptc(ch, "{CPracticer:{x   [{W%s{x] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
+    ptc(ch, "{CReligion:{x    [{W%s{x] {D(reledit list){x\n\r", mob.religion.toString().c_str());
     if (mob.clan != clan_none)
-        ptc(ch, "Clan: [{G%s{x] {D(? clan){x\n\r", mob.clan->getName().c_str());
+        ptc(ch, "{CClan:{x        [{W%s{x] {D(? clan){x\n\r", mob.clan->getName().c_str());
 
-    ptc(ch, "Smell EN: [%s] %s\n\r", mob.smell.get(EN).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str());
-    ptc(ch, "Smell UA: [%s] %s\n\r", mob.smell.get(UA).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str());
-    ptc(ch, "Smell RU: [%s] %s\n\r", mob.smell.get(RU).c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());
+    ptc(ch, "{GSmell:{x       [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
+          String::stripEOL(mob.smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
+          String::stripEOL(mob.smell.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
+          String::stripEOL(mob.smell.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());   
 
-    ptc(ch, "Description: %s\n\r%s", web_edit_button(showWeb, ch, "desc", "web").c_str(), mob.description);
+    const size_t descSize = 100;
+    DLString entext = String::ellipsis(mob.description.get(EN), descSize);
+    DLString uatext = String::ellipsis(mob.description.get(UA), descSize);
+    DLString rutext = String::ellipsis(mob.description.get(RU), descSize);
+    ptc(ch, "{GDesc EN:{x %s\n%s\n", web_edit_button(showWeb, ch, "desc", "web").c_str(), entext.c_str());
+    ptc(ch, "{GDesc UA:{x %s\n%s\n", web_edit_button(showWeb, ch, "uadesc", "web").c_str(), uatext.c_str());
+    ptc(ch, "{GDesc RU:{x %s\n%s\n", web_edit_button(showWeb, ch, "rudesc", "web").c_str(), rutext.c_str());
 
     if (mob.behavior) {
         try {
             std::basic_ostringstream<char> ostr;
             mob.behavior->save( ostr );
-            ptc(ch, "Legacy behavior: {D(oldbehavior{x)\r\n%s\r\n", ostr.str( ).c_str( ));
+            ptc(ch, "Legacy behavior: {D(oldbehavior{x)\r\n%s", ostr.str( ).c_str( ));
             
         } catch (const ExceptionXMLError &e) {
             ptc(ch, "Legacy behavior is BUGGY.\r\n");

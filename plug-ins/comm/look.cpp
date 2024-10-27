@@ -1337,7 +1337,7 @@ static bool do_look_direction( Character *ch, const char *arg1 )
             return true;
     }
 
-    if (!pexit->description.empty()) {
+    if (!pexit->description.get(LANG_DEFAULT).empty()) {
             ch->send_to( pexit->description.get(LANG_DEFAULT));
             ch->pecho("");
     }

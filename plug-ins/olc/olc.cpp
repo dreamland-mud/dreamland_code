@@ -340,7 +340,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             else
                 buf = &abuf;
             for (auto &eexit: room->extra_exits) {
-                (*buf) << fmt(0, lineFormat.c_str(), room->vnum, room->getName(), eexit->keyword) << endl;
+                (*buf) << fmt(0, lineFormat.c_str(), room->vnum, room->getName(), eexit->keyword.toString().c_str()) << endl;
             }
         }
         

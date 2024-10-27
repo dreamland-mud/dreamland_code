@@ -35,7 +35,7 @@
 OLC_STATE(OLCStateExtraExit);
 
 OLCStateExtraExit::OLCStateExtraExit( )
-                     : max_size_pass(SIZE_MEDIUM, &size_table)
+                     : max_size_pass(SIZE_GARGANTUAN, &size_table)
 {
 }
 

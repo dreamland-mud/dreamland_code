@@ -251,17 +251,17 @@ inline const XMLMultiString& Object::getRealDescription() const
 
 inline const XMLMultiString & Object::getKeyword() const
 {
-    return keyword;
+    return keyword.emptyValues() ? pIndexData->keyword : keyword;
 }
 
 inline const XMLMultiString& Object::getShortDescr() const
 {
-    return short_descr;
+    return short_descr.emptyValues() ? pIndexData->short_descr : short_descr;
 }
 
 inline const XMLMultiString& Object::getDescription() const
 {
-    return description;
+    return description.emptyValues() ? pIndexData->description : description;
 }
 
 inline const char * Object::getMaterial( ) const

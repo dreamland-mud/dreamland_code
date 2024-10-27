@@ -25,7 +25,7 @@
 #include "room.h"
 #include "skillgroup.h"
 #include "eventbus.h"
-
+#include "string_utils.h"
 #include "json_utils_ext.h"
 #include "itemevents.h"
 #include "oedit.h"
@@ -146,8 +146,12 @@ void OLCStateObject::commit()
     }
     
     original->extraDescriptions.deallocate();
-    for (auto &ed: obj.extraDescriptions)
-        original->extraDescriptions.push_back(ed);        
+    for (auto &ed: obj.extraDescriptions) {
+        ExtraDescription *myed = new ExtraDescription();
+        myed->keyword = ed->keyword;
+        myed->description = ed->description;
+        original->extraDescriptions.push_back(myed);        
+    }
     obj.extraDescriptions.clear();
     
     original->affected.deallocate();
@@ -236,11 +240,12 @@ OEDIT(show)
 
     EDIT_OBJ(ch, pObj);
 
-    ptc(ch, "Vnum:     [%7d]\n\r", pObj->vnum);
-    ptc(ch, "Area:     [%5d] %s\n\r", pObj->area->vnum, pObj->area->getName().c_str());
-    ptc(ch, "Name EN:  [%s] %s\n\r", pObj->keyword[EN].c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());
-    ptc(ch, "Name UA:  [%s] %s\n\r", pObj->keyword[UA].c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());
-    ptc(ch, "Name RU:  [%s] %s\n\r", pObj->keyword[RU].c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());
+    ptc(ch, "Vnum:     [{W%d{x] Area: [{W%d{x] {W%s{x\n\r", pObj->vnum, pObj->area->vnum, pObj->area->getName().c_str());
+    ptc(ch, "Name:     [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
+            pObj->keyword[EN].c_str(), web_edit_button(showWeb, ch, "name", "web").c_str(),
+            pObj->keyword[UA].c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str(),
+            pObj->keyword[RU].c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());
+
     ptc(ch, "Short EN: [%s] %s\n\r", pObj->short_descr[EN].c_str(), web_edit_button(showWeb, ch, "short", "web").c_str());
     ptc(ch, "Short UA: [%s] %s\n\r", pObj->short_descr[UA].c_str(), web_edit_button(showWeb, ch, "uashort", "web").c_str());
     ptc(ch, "Short RU: [%s] %s\n\r", pObj->short_descr[RU].c_str(), web_edit_button(showWeb, ch, "rushort", "web").c_str());
@@ -253,12 +258,15 @@ OEDIT(show)
     ptc(ch, "Wear:     [%s] {D(? wear_flags){x\n\r", wear_flags.names(pObj->wear_flags).c_str());
     ptc(ch, "Extra:    [%s] {D(? extra_flags){x\n\r", extra_flags.names(pObj->extra_flags).c_str());
     ptc(ch, "Material: [%s] {D(? material){x\n\r", pObj->material);
-    ptc(ch, "Smell EN: [%s]\n\r", pObj->smell[EN].c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str());
-    ptc(ch, "Smell UA: [%s]\n\r", pObj->smell[UA].c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str());
-    ptc(ch, "Smell RU: [%s]\n\r", pObj->smell[RU].c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());
-    ptc(ch, "Sound EN: [%s]\n\r", pObj->sound[EN].c_str(), web_edit_button(showWeb, ch, "sound", "web").c_str());
-    ptc(ch, "Sound UA: [%s]\n\r", pObj->sound[UA].c_str(), web_edit_button(showWeb, ch, "uasound", "web").c_str());
-    ptc(ch, "Sound RU: [%s]\n\r", pObj->sound[RU].c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());
+    ptc(ch, "Smell:    [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
+          String::stripEOL(pObj->smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
+          String::stripEOL(pObj->smell.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
+          String::stripEOL(pObj->smell.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());   
+    ptc(ch, "Sound:    [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
+          String::stripEOL(pObj->sound.get(EN)).c_str(), web_edit_button(showWeb, ch, "sound", "web").c_str(),   
+          String::stripEOL(pObj->sound.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasound", "web").c_str(),   
+          String::stripEOL(pObj->sound.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());   
+
     ptc(ch, "Condition:[%5d]\n\r", pObj->condition);
     ptc(ch, "Gender:   [%1s]\n\r", pObj->gram_gender.toString());
     ptc(ch, "Weight:   [%5d]\n\r", pObj->weight);
@@ -761,6 +769,16 @@ OEDIT(create)
 }
 
 OEDIT(ed)
+{
+    return extraDescrEdit(obj.extraDescriptions);
+}
+
+OEDIT(uaed)
+{
+    return extraDescrEdit(obj.extraDescriptions);
+}
+
+OEDIT(rued)
 {
     return extraDescrEdit(obj.extraDescriptions);
 }

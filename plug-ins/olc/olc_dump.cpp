@@ -3,6 +3,8 @@
  * ruffina, 2004
  */
 
+#include <string>
+#include "iconvmap.h"
 #include "xmlroom.h"
 #include "xmlobjectfactory.h"
 #include "xmlmobilefactory.h"
@@ -16,8 +18,16 @@
 #include "room.h"
 #include "object.h"
 #include "npcharacter.h"
-
 #include "def.h"
+
+static IconvMap utf2koi("utf-8", "koi8-u");
+
+static void send_to_char(Character *ch, ostringstream &os)
+{
+    DLString dump = utf2koi(os.str());
+
+    page_to_char(dump.c_str(), ch);
+}
 
 void
 dump_obj(Character *ch, OBJ_INDEX_DATA *o)
@@ -28,7 +38,7 @@ dump_obj(Character *ch, OBJ_INDEX_DATA *o)
     it.init(o);
     it.toStream(os);
 
-    page_to_char(os.str( ).c_str( ), ch);
+    send_to_char(ch, os);
 }
 
 void
@@ -40,7 +50,7 @@ dump_mob(Character *ch, MOB_INDEX_DATA *m)
     it.init(m);
     it.toStream(os);
 
-    page_to_char(os.str( ).c_str( ), ch);
+    send_to_char(ch, os);
 }
 
 void
@@ -52,7 +62,7 @@ dump_room(Character *ch, RoomIndexData *r)
     it.init(r);
     it.toStream(os);
 
-    page_to_char(os.str( ).c_str( ), ch);
+    send_to_char(ch, os);
 }
 
 CMD(olcdump, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
@@ -77,7 +87,7 @@ CMD(olcdump, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
     
-    ch->pecho("nothng here like that");
+    ch->pecho("nothing here like that");
 }
 
 

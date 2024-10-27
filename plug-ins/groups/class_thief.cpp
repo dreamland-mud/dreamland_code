@@ -639,8 +639,8 @@ SKILL_RUNP( forge )
             return;
         }
 
-    int chance;
-    chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch));    
+        int chance;
+        chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch));    
         
         if (number_percent( ) >= chance) {
             oldact("Тебе не удалось точно передать рисунок бороздок $o2.", ch, key, 0, TO_CHAR );

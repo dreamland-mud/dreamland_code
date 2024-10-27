@@ -473,7 +473,7 @@ void Katana::wear( Character *ch )
   if (IS_WEAPON_STAT(obj,WEAPON_KATANA)
         && (String::contains(edText, ch->getNameC()) || String::contains(edText, ch->getNameP('2'))))
   {
-    if (!obj->getRealShortDescr().empty())
+    if (!obj->getRealShortDescr().emptyValues())
         ch->pecho("Ты ощущаешь %O4 как часть себя!", obj);
     else
         ch->pecho("Ты ощущаешь СВОЮ катану, как часть себя!");

@@ -950,7 +950,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
         }
 
         buf << fmt(0, "Шорт: %s\n\rДлинное описание: %s\n\r",
-                obj->getShortDescr( ), obj->getDescription( ) );
+                obj->getShortDescr(LANG_DEFAULT).c_str(), obj->getDescription(LANG_DEFAULT).c_str() );
 
         buf << fmt(0, "Владелец: %s\n\r", obj->getOwner().empty() ? "nobody" : obj->getOwner().c_str());
 
@@ -1147,9 +1147,7 @@ static bool has_nopost(Character *ch)
     PCharacter *pc = victim->is_npc( ) ? 0 : victim->getPC( ); // no switched data
     NPCharacter *npc = victim->getNPC( );
     
-    DLString name = victim->toNoun()->decline('1');
-
-    buf << "Имя: [" << name.c_str() << "] ";
+    buf << "Имя: [" << victim->getNameC() << "] ";
     if (pc)
         buf << "Шорт: [" << pc->getRussianName( ).normal( ) << "] ";
     if (npc)
@@ -1305,6 +1303,7 @@ static bool has_nopost(Character *ch)
         buf << "Шорт: " << npc->getShortDescr(LANG_DEFAULT) << endl
             << "Длинное описание: "  << npc->getLongDescr(LANG_DEFAULT);
 
+        buf << "Все имена: " << npc->getNameP('7') << endl;
         const char *spec_fun_name = spec_name(*npc->spec_fun);
         if (spec_fun_name != 0)
             buf << "Спец-процедура " << spec_fun_name << "." << endl;

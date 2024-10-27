@@ -24,6 +24,9 @@ LIQ(none);
 extra_exit_data *ExtraExitList::find(const DLString &keyword) const
 {
     for (auto &eexit: *this) {
+        if (eexit->keyword.toString() == keyword)
+            return eexit;
+            
         if (eexit->keyword.matchesUnstrict(keyword))
             return eexit;
 

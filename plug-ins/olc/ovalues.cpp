@@ -33,6 +33,7 @@ static int skill_lookup( const DLString &name )
 void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 {
     bool random;
+    OBJ_INDEX_DATA *pKey;
 
     switch (obj->item_type) {
     default:
@@ -177,16 +178,17 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         break;
 
     case ITEM_CONTAINER:
-        ptc(ch,
+        pKey = obj->value[2] > 0 ? get_obj_index(obj->value[2]) : 0;
+        ch->pecho(
             "[v0] Вместимость:[%d кг]\n\r"
             "[v1] Флаги:      [%s] {D(? container_flags){x\n\r"
-            "[v2] Ключ:        %s [%d]\n\r"
+            "[v2] Ключ:       [%d] %N1\n\r"
             "[v3] Макс. вес:  [%d]\n\r"
             "[v4] Коэф. снижения веса: [%d]\n\r",
             obj->value[0],
             container_flags.names(obj->value[1]).c_str(),
-            (obj->value[2] > 0 && get_obj_index(obj->value[2])) ? get_obj_index(obj->value[2])->getShortDescr(LANG_DEFAULT) : "none",
             obj->value[2],
+            pKey ? pKey->getShortDescr(LANG_DEFAULT) : "none",
             obj->value[3],
             obj->value[4]);
         break;

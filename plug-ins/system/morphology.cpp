@@ -165,9 +165,9 @@ DLString Syntax::label_en(const XMLMultiString &str)
 
 DLString Syntax::label_ru(const XMLMultiString &str)
 {
-    DLString label = str.get(LANG_EN);
+    DLString label = str.get(LANG_RU);
     if (label.empty())
-        label = str.get(LANG_RU);
+        label = str.get(LANG_EN);
     
     return label.getOneArgument();
 }

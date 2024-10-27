@@ -257,54 +257,51 @@ REDIT(olist, "псписок", "список всех предметов в да
 void
 OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
 {
-    Object *obj;
-    Character *rch;
     int door;
+    const size_t descSize = 300;
 
     auto &text = pRoom->description;
-    DLString entext = text.get(EN);
-    DLString uatext = text.get(UA);
-    DLString rutext = text.get(RU);
+    DLString entext = String::ellipsis(text.get(EN), descSize);
+    DLString uatext = String::ellipsis(text.get(UA), descSize);
+    DLString rutext = String::ellipsis(text.get(RU), descSize);
 
-    ptc(ch, "Desc EN: %s\n\r%s{W...{x", web_edit_button(showWeb, ch, "desc", "web").c_str(), String::truncate(entext, 300).c_str());
-    ptc(ch, "Desc UA: %s\n\r%s{W...{x", web_edit_button(showWeb, ch, "uadesc", "web").c_str(), String::truncate(uatext, 300).c_str());
-    ptc(ch, "Desc RU: %s\n\r%s{W...{x", web_edit_button(showWeb, ch, "rudesc", "web").c_str(), String::truncate(rutext, 300).c_str());
-    ptc(ch, "Name EN:    [{W%s{x] %s\n\r", pRoom->name.get(EN).c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());   
-    ptc(ch, "Name UA:    [{W%s{x] %s\n\r", pRoom->name.get(UA).c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());   
-    ptc(ch, "Name RU:    [{W%s{x] %s\n\r", pRoom->name.get(RU).c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());   
-    ptc(ch, "Area:       [{W%5d{x] %s\n\r", pRoom->areaIndex->vnum, pRoom->areaIndex->getName().c_str());
-    ptc(ch, "Vnum:       [{W%u{x]\n\r", pRoom->vnum);
-    ptc(ch, "Clan:       [{W%s{x]\r\n", pRoom->clan->getName( ).c_str( ));
-    ptc(ch, "Guilds:     [{W%s{x]\n\r", pRoom->guilds.toString().c_str());
-    ptc(ch, "Sector:     [{W%s{x] {D(? sector_table){x\r\n", sector_table.name(pRoom->sector_type).c_str());
-    ptc(ch, "Liquid:     [{W%s{x] {D(? liquid){x\n\r", pRoom->liquid->getName( ).c_str( ));
-    ptc(ch, "Smell EN:   [{W%s{x] %s\n\r", pRoom->smell.get(EN).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str());   
-    ptc(ch, "Smell UA:   [{W%s{x] %s\n\r", pRoom->smell.get(UA).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str());   
-    ptc(ch, "Smell RU:   [{W%s{x] %s\n\r", pRoom->smell.get(RU).c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());   
-    ptc(ch, "Sound EN:   [{W%s{x] %s\n\r", pRoom->sound.get(EN).c_str(), web_edit_button(showWeb, ch, "sound", "web").c_str());   
-    ptc(ch, "Sound UA:   [{W%s{x] %s\n\r", pRoom->sound.get(UA).c_str(), web_edit_button(showWeb, ch, "uasound", "web").c_str());   
-    ptc(ch, "Sound RU:   [{W%s{x] %s\n\r", pRoom->sound.get(RU).c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());           
-    ptc(ch, "Flags:      [{W%s{x] {D(? room_flags){x\n\r", room_flags.names(pRoom->room_flags).c_str());
-    ptc(ch, "Health:     [{W%d{x]%%\r\n", pRoom->heal_rate);
-    ptc(ch, "Mana:       [{W%d{x]%%\n\r", pRoom->mana_rate);
+    ptc(ch, "Vnum:    [{W%u{x]  Area: [{W%5d{x] %s\n\r", pRoom->vnum, pRoom->areaIndex->vnum, pRoom->areaIndex->getName().c_str());
+    ptc(ch, "Desc EN: %s\n%s\n", web_edit_button(showWeb, ch, "desc", "web").c_str(), entext.c_str());
+    ptc(ch, "Desc UA: %s\n%s\n", web_edit_button(showWeb, ch, "uadesc", "web").c_str(), uatext.c_str());
+    ptc(ch, "Desc RU: %s\n%s\n", web_edit_button(showWeb, ch, "rudesc", "web").c_str(), rutext.c_str());
+    ptc(ch, "Name EN: [{W%s{x] %s\n\r", pRoom->name.get(EN).c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());   
+    ptc(ch, "Name UA: [{W%s{x] %s\n\r", pRoom->name.get(UA).c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());   
+    ptc(ch, "Name RU: [{W%s{x] %s\n\r", pRoom->name.get(RU).c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());   
+    ptc(ch, "Clan:    [{W%s{x]  Guilds: [{W%s{x]\n", pRoom->clan->getName( ).c_str( ), pRoom->guilds.toString().c_str());
+    ptc(ch, "Sector:  [{W%s{x] {D(? sector_table){x  Liquid: [{W%s{x] {D(? liquid){x\n\r", 
+            sector_table.name(pRoom->sector_type).c_str(), pRoom->liquid->getName().c_str());
+    ptc(ch, "Smell:   [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
+          String::stripEOL(pRoom->smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
+          String::stripEOL(pRoom->smell.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
+          String::stripEOL(pRoom->smell.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());   
+    ptc(ch, "Sound:   [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
+          String::stripEOL(pRoom->sound.get(EN)).c_str(), web_edit_button(showWeb, ch, "sound", "web").c_str(),   
+          String::stripEOL(pRoom->sound.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasound", "web").c_str(),   
+          String::stripEOL(pRoom->sound.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());   
+    ptc(ch, "Flags:   [{W%s{x] {D(? room_flags){x\n\r", room_flags.names(pRoom->room_flags).c_str());
+    ptc(ch, "Health:  [{W%d{x]%%  Mana: [{W%d{x]%%\r\n", pRoom->heal_rate,  pRoom->mana_rate);
     
     if (!pRoom->extraDescriptions.empty()) {
-
-        ptc(ch, "Extra desc: {D(ed help){x}\r\n");
+        ptc(ch, "Extra desc: {D(ed help){x\r\n");
         for (auto &ed: pRoom->extraDescriptions) {
-            ptc(ch, "    EN [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
-            ptc(ch, "    UA [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "uaed web", ed->keyword).c_str());
-            ptc(ch, "    RU [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "rued web", ed->keyword).c_str());
+            ptc(ch, "    EN [{W%s{x] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
+            ptc(ch, "    UA [{W%s{x] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "uaed web", ed->keyword).c_str());
+            ptc(ch, "    RU [{W%s{x] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "rued web", ed->keyword).c_str());
         }
         
     } else {
-        ptc(ch, "Extra desc: (none) {D(ed help){x}\r\n");
+        ptc(ch, "Extra desc: (none) {D(ed help){x\r\n");
     }
 
     if (!pRoom->extra_exits.empty()) {
         ptc(ch, "Extra exits: {D(eexit help){x\r\n");
         for(auto &eed: pRoom->extra_exits) {
-            ptc(ch, "  [%s] %s\r\n", eed->keyword.toString().c_str(), web_edit_button(showWeb, ch, "eexit set", eed->keyword.get(EN)).c_str());
+            ptc(ch, "    [{W%s{x] %s\r\n", eed->keyword.toString().c_str(), web_edit_button(showWeb, ch, "eexit set", eed->keyword.get(EN)).c_str());
         }
         
     } else {
@@ -319,31 +316,38 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
         if ((pexit = pRoom->exit[door])) {
             Room *to_room = get_room_instance(pexit->u1.vnum);
 
-            ptc(ch, "-{G%-5s{x ->   [{W%5u{x] %s\n\r",
+            ptc(ch, "-{G%-5s{x ->   [{W%5u{x] {g%s{x\n\r",
                       DLString(dirs[door].name).capitalize( ).c_str( ),
                       to_room ? to_room->vnum : 0,
                       to_room ? to_room->getName() : "");
 
             if(pexit->key > 0)
-                ptc(ch, "            Key: [{W%7u{x]\n\r", pexit->key);
+                ptc(ch, "            Key:        [{W%7u{x]\n\r", pexit->key);
             
-            ptc(ch, "            Exit flags:    [{W%s{x] {D(? exit_flags){x\n\r",
+            ptc(ch, "            Exit flags: [{W%s{x] {D(? exit_flags){x\n\r",
                       exit_flags.names(pexit->exit_info).c_str());
 
-            ptc(ch, "            Default flags: [{W%s{x]\n\r", 
-                      exit_flags.names(pexit->exit_info_default).c_str());
+            ptc(ch, "            Keywords:   [{W%s{x] [{W%s{x] [{W%s{x]\n\r", 
+                    pexit->keyword.get(EN).c_str(),
+                    pexit->keyword.get(UA).c_str(),
+                    pexit->keyword.get(RU).c_str());
 
-            ptc(ch, "            Keywords EN:   [{W%s{x]\n\r", pexit->keyword.get(EN).c_str());
-            ptc(ch, "            Keywords UA:   [{W%s{x]\n\r", pexit->keyword.get(UA).c_str());
-            ptc(ch, "            Keywords RU:   [{W%s{x]\n\r", pexit->keyword.get(RU).c_str());
+            ptc(ch, "            Short desc: [{W%s{x] [{W%s{x] [{W%s{x]\n\r", 
+                    pexit->short_descr.get(EN).c_str(),
+                    pexit->short_descr.get(UA).c_str(),
+                    pexit->short_descr.get(RU).c_str());
 
-            ptc(ch, "            Short desc EN: [{W%s{x]\n\r", pexit->short_descr.get(EN).c_str());
-            ptc(ch, "            Short desc UA: [{W%s{x]\n\r", pexit->short_descr.get(UA).c_str());
-            ptc(ch, "            Short desc RU: [{W%s{x]\n\r", pexit->short_descr.get(RU).c_str());
+            if (pexit->description.emptyValues())
+                ptc(ch, "            Description: [] [] []\n");
+            else {
+                DLString entext = String::stripEOL(pexit->description.get(EN));
+                DLString uatext = String::stripEOL(pexit->description.get(UA));
+                DLString rutext = String::stripEOL(pexit->description.get(RU));
 
-            ptc(ch, "            Description EN:\r\n%s\r\n", pexit->description.get(EN).c_str());            
-            ptc(ch, "            Description UA:\r\n%s\r\n", pexit->description.get(UA).c_str());            
-            ptc(ch, "            Description RU:\r\n%s\r\n", pexit->description.get(RU).c_str());            
+                ptc(ch, "            Description EN: %s\n", entext.c_str());            
+                ptc(ch, "            Description UA: %s\n", uatext.c_str());            
+                ptc(ch, "            Description RU: %s\n", rutext.c_str());            
+            }
         }
     }
 
@@ -351,7 +355,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
         try {
             std::basic_ostringstream<char> ostr;
             pRoom->behavior->save( ostr );
-            ptc(ch, "Legacy behavior: {D(oldbehavior{x)\r\n{W%s{x\r\n", ostr.str( ).c_str( ));
+            ptc(ch, "Legacy behavior: {D(oldbehavior{x)\r\n{W%s{x", ostr.str( ).c_str( ));
             
         } catch (const ExceptionXMLError &e) {
             ptc(ch, "Legacy behavior is BUGGY.\r\n");
@@ -527,7 +531,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
 
     if (arg_is_help(command)) {
         const char *name = dirs[door].name;
-        ptc(ch, "Syntax:\r\n%s <флаги>        - установить флаги выхода ({y{hcolchelp exit{x)\r\n", name);
+        ptc(ch, "Syntax:\r\n%s <флаги>          - установить флаги выхода ({y{hcolchelp exit{x)\r\n", name);
         ptc(ch, "%s delete           - удалить выход с обеих сторон\r\n", name);
         ptc(ch, "%s unlink           - удалить выход только с этой стороны\r\n", name);
         ptc(ch, "%s link <vnum>      - создать двусторонний выход в указанную комнату\r\n", name);
@@ -544,7 +548,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         ptc(ch, "%s desc             - войти в редактор описания того, что видно по look <dir>, EN\r\n", name);        
         ptc(ch, "%s uadesc           - войти в редактор описания того, что видно по look <dir>, UA\r\n", name);        
         ptc(ch, "%s rudesc           - войти в редактор описания того, что видно по look <dir>, RU\r\n", name);
-        ptc(ch, "%s copy           - скопировать флаги,имена,ключ на дверь с другой стороны\r\n", name);
+        ptc(ch, "%s copy             - скопировать флаги,имена,ключ на дверь с другой стороны\r\n", name);
         return false;
     }
 
@@ -826,6 +830,16 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
 }
 
 REDIT(ed, "экстра", "редактор экстра-описаний (ed help)")
+{
+    return extraDescrEdit(getOriginal()->extraDescriptions);
+}
+
+REDIT(uaed, "экстра", "редактор экстра-описаний (ed help)")
+{
+    return extraDescrEdit(getOriginal()->extraDescriptions);
+}
+
+REDIT(rued, "экстра", "редактор экстра-описаний (ed help)")
 {
     return extraDescrEdit(getOriginal()->extraDescriptions);
 }

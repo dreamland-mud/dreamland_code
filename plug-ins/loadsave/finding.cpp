@@ -789,6 +789,9 @@ bool obj_index_has_name( OBJ_INDEX_DATA *pObj, const DLString &arg )
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch )
 {
     // First try matching by obj keywords.
+    if (is_name(arg.c_str(), obj->getKeyword().toString().c_str()))
+        return true;
+
     if (obj->getKeyword().matchesUnstrict(arg))
         return true;
 

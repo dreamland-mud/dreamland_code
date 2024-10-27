@@ -269,13 +269,14 @@ void NPCharacter::updateCachedNouns()
             // their name is handled differently, with the last part of the short descr removed.
             if (behavior && behavior->hasSpecialName()) {
                 StringList names(getShortDescr(lang));
-                names.pop_back();
-                DLString nameNoMaster = names.join(" ");
+                if (!names.empty()) {
+                    names.pop_back();
+                    DLString nameNoMaster = names.join(" ");
+                    allCases = russian_case_all_forms(nameNoMaster);
+                }
 
-                allCases = russian_case_all_forms(nameNoMaster);
-                
             } else {
-                allCases = toNoun()->decline('7').colourStrip();
+                allCases = cachedNouns[lang]->decline('7').colourStrip();
             }
     
             if (!allCases.empty())
