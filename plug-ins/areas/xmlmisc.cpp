@@ -321,6 +321,7 @@ XMLExtraExit::XMLExtraExit( ) : max_size_pass(SIZE_GARGANTUAN, &size_table)
 void 
 XMLExtraExit::init(const extra_exit_data *ex)
 {
+    keyword = ex->keyword;
     description = ex->description;
     flags.setValue(ex->exit_info_default);
     key.setValue(ex->key);

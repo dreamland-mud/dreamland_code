@@ -126,7 +126,7 @@ XMLMobileFactory::compat(mob_index_data *mob)
 {
     Race *mobrace = raceManager->find(race.getValue( ).c_str( ));
 
-    if (!player_name.empty() && keyword.empty())
+    if (!player_name.empty())
         mob->keyword.fromMixedString(player_name);
     else
         mob->keyword = keyword;

@@ -175,7 +175,7 @@ XMLRoom::init(RoomIndexData *room)
     }
 
     for(auto &peexit: room->extra_exits)
-        extraExits[peexit->keyword.get(EN)].init(peexit);
+        extraExits[peexit->keyword.toString()].init(peexit);
 
     for (auto &ed: room->extraDescriptions) {
         extraDescriptions.push_back(XMLExtraDescription( ));
@@ -237,6 +237,10 @@ XMLRoom::compat(int vnum)
     XMLMapBase<XMLExtraExit>::reverse_iterator eeit;
     for(eeit = extraExits.rbegin( ); eeit != extraExits.rend( ); eeit++) {
         EXTRA_EXIT_DATA *peexit = eeit->second.compat( );
+
+        if (peexit->keyword.emptyValues())
+            peexit->keyword.fromMixedString(eeit->first);
+            
         room->extra_exits.push_front(peexit);
     }
 
@@ -252,6 +256,13 @@ XMLRoom::compat(int vnum)
             pEd->description[EN] = edit->getValue();
 
         room->extraDescriptions.push_back(pEd);
+    }
+
+    for (auto &ed: extraDescriptions) {
+        ExtraDescription *newed = new ExtraDescription();
+        newed->keyword = ed.keyword;
+        newed->description = ed.description;
+        room->extraDescriptions.push_back(newed);
     }
 
     if(!liquid.getValue( ).empty( ))

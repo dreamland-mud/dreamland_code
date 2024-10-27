@@ -47,7 +47,7 @@ public:
     XML_VARIABLE XMLEnumeration sector;
     XML_VARIABLE XMLStringNoEmpty clan, guilds;
     XML_VARIABLE XMLMapBase<XMLExitDir> exits;
-    XML_VARIABLE XMLMapBase<XMLExtraExit> extraExits; // replace with a list after 1st convertation
+    XML_VARIABLE XMLMapBase<XMLExtraExit> extraExits; // TODO replace with a list after 1st convertation
     XML_VARIABLE XMLListBase<XMLExtraDescr> extraDescr; // compat
     XML_VARIABLE XMLListBase<XMLExtraDescription> extraDescriptions;
     XML_VARIABLE XMLIntegerNoDef<100> manaRate, healRate;

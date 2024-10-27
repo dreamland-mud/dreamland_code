@@ -75,7 +75,7 @@ XMLObjectFactory::compat( )
 void
 XMLObjectFactory::compat(obj_index_data *obj)
 {
-    if (!name.getValue().empty() && keyword.empty())
+    if (!name.getValue().empty())
         obj->keyword.fromMixedString(name);
     else
         obj->keyword = keyword;
@@ -111,6 +111,13 @@ XMLObjectFactory::compat(obj_index_data *obj)
             ed->description[EN] = eit->getValue();
 
         obj->extraDescriptions.push_back(ed);
+    }
+
+    for (auto &ed: extraDescriptions) {
+        ExtraDescription *newed = new ExtraDescription();
+        newed->keyword = ed.keyword;
+        newed->description = ed.description;
+        obj->extraDescriptions.push_back(newed);
     }
 
     obj->gram_gender = Grammar::MultiGender(gender.getValue( ).c_str( ));
