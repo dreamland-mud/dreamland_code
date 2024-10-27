@@ -229,7 +229,7 @@ void fix_resets()
         case 'D':
             pRoomIndex = get_room_index( pReset->arg1 );
 
-            notice("...checking D reset arg1=%d arg2=%d arg3=%d. Found room %s", pReset->arg1, pReset->arg2, pReset->arg3, pRoomIndex->name);
+            notice("...checking D reset arg1=%d arg2=%d arg3=%d. Found room %s", pReset->arg1, pReset->arg2, pReset->arg3, pRoomIndex->name.get(LANG_DEFAULT).c_str());
 
             
             if ( pReset->arg2 == DIR_SOMEWHERE ) {

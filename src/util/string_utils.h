@@ -10,13 +10,13 @@ namespace String {
     /** Caseless comparison of two strings. */
     bool equalLess(const DLString &a, const DLString &b);
 
-    /** Truncates the string to give size. */
+    /** Truncates the string to given size. */
     DLString truncate(const DLString &str, size_t size);
 
-    /** Truncate the string, remove ending newline and add ellipsis. */
+    /** Truncate the string, remove trailing newline and add ellipsis. */
     DLString ellipsis(const DLString &str, size_t size);
 
-    /** Remove line feed characters from the end. */
+    /** Remove line feed characters from the end of string. */
     DLString stripEOL(const DLString &str);
 
     /** True if string contains ї or similar. */

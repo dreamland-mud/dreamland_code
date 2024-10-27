@@ -944,7 +944,7 @@ OEDIT(list)
                 case 'P':
                     if(pReset->arg1 == pObj->vnum) {
                         buffer << fmt(0, "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
-                                pReset->command, pRoom->vnum, pRoom->name);
+                                pReset->command, pRoom->vnum, pRoom->name.get(LANG_DEFAULT).c_str());
                         cnt++;
                     }
             }
