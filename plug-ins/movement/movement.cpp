@@ -39,6 +39,7 @@ Movement::Movement( Character *ch )
     this->from_room = ch->in_room;
     this->to_room = NULL;
     this->movetype = MOVETYPE_WALK;
+    this->doLook = true;
 }
     
 int Movement::move( )
@@ -121,7 +122,8 @@ void Movement::place( Character *wch )
             wch->pecho("Ты попадаешь в зону '{c{hh%s{x'.\r\n", to_room->areaName().c_str());
     }
  
-    interpret_raw( wch, "look", "move" );
+    if (doLook)
+        interpret_raw( wch, "look", "move" );
 
     msgOnMove( wch, false );
 }

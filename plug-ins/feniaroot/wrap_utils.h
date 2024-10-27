@@ -51,6 +51,7 @@ int args2door(const RegisterList &args);
 Wearlocation * arg2wearloc( const Register & );
 ::Object * arg2item( const Register & );
 Room * arg2room( const Register & );
+Room *argnum2room(const RegisterList &args, int num);
 Character * arg2character( const Register & );
 PCharacter * arg2player( const Register & );
 Character * args2character( const RegisterList & );

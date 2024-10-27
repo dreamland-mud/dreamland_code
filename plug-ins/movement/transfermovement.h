@@ -26,5 +26,10 @@ protected:
     const char *msgRoomEnter, *msgSelfEnter;
 };
 
+class SilentTransferMovement : public TransferMovement {
+public:
+    SilentTransferMovement(Character *, Room *);
+};
+
 
 #endif

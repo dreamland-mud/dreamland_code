@@ -127,6 +127,12 @@ Room * arg2room( const Register &reg )
     return wrapper_cast<RoomWrapper>( reg )->getTarget( );
 }
 
+Room *argnum2room(const RegisterList &args, int num)
+{
+    const Register &reg = argnum(args, num);
+    return arg2room(reg);
+}
+
 Character * arg2character( const Register &reg )
 {
     return wrapper_cast<CharacterWrapper>( reg )->getTarget( );

@@ -41,11 +41,11 @@
 #include "skill_utils.h"
 #include "immunity.h"
 #include "magic.h"
-#include "movement.h"
 #include "movetypes.h"
 #include "directions.h"
 #include "terrains.h"
 #include "move_utils.h"
+#include "transfermovement.h"
 #include "doors.h"
 #include "merc.h"
 #include "loadsave.h"
@@ -1380,6 +1380,16 @@ NMI_INVOKE( CharacterWrapper, transfer, "(room,actor,msgRoomLeave,msgSelfLeave,m
     return Register( );
 }
 
+NMI_INVOKE(CharacterWrapper, transfer_silent, "(room): перенестись в комнату room, без сообщений и look")
+{
+    checkTarget();
+
+    Room *room = argnum2room(args, 1);
+    SilentTransferMovement(target, room).move();
+
+    return Register();
+}
+
 NMI_INVOKE( CharacterWrapper, char_to_room, "(room): поместить в комнату room")
 {
     checkTarget( );
@@ -2681,16 +2691,39 @@ NMI_INVOKE(CharacterWrapper, giveBack, "(vict,obj): вернуть персон�
     return Register();
 }
 
-NMI_INVOKE(CharacterWrapper, attribute, "(name): вернуть аттрибут с данным именем, в виде строки или структуры, либо null")
+NMI_INVOKE(CharacterWrapper, attribute, "(name[,value]): установить или вернуть аттрибут с данным именем")
 {
     checkTarget();
     CHK_NPC
-    DLString name = args2string(args);
+    DLString name = argnum2string(args, 1);
+    auto &attrs = target->getPC()->getAttributes();
+    bool exists = attrs.isAvailable(name);
 
-    if (!target->getPC()->getAttributes().isAvailable(name))
+    // Setting a new attribute
+    if (args.size() > 1) {
+        if (exists)
+            throw Scripting::Exception("Attribute " + name + " already exists");
+
+        Register value = args.back();
+
+        // Determine attribute type from the value type: either an empty attr, a string or an integer attribute
+        if (value.type == Register::NONE)
+            attrs.getAttr<XMLEmptyAttribute>(name);
+        else if (value.type == Register::NUMBER)
+            attrs.getAttr<XMLIntegerAttribute>(name)->setValue(value.toNumber());
+        else if (value.type == Register::STRING)
+            attrs.getAttr<XMLStringAttribute>(name)->setValue(value.toString());
+        else
+            throw Scripting::Exception("Invalid attribute value for " + name);
+
+        return value;
+    }
+
+    if (!exists)
         return Register();
 
-    XMLAttribute::Pointer attr = target->getPC()->getAttributes().find(name)->second;
+    // Return existing attribute value
+    XMLAttribute::Pointer attr = attrs.find(name)->second;
     return attr->toRegister();
 }
 

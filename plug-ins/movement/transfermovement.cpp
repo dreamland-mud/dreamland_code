@@ -14,6 +14,15 @@
 #include "def.h"
 
 /*
+ * SilentTransferMovement
+ */
+SilentTransferMovement::SilentTransferMovement(Character *ch, Room *to_room)
+              : TransferMovement(ch, 0, to_room, 0, 0, 0, 0)
+{
+    this->doLook = false;
+}
+
+/*
  * TransferMovement
  */
 TransferMovement::TransferMovement( Character *ch, Character *actor, Room *to_room,

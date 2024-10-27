@@ -54,6 +54,7 @@ protected:
     Room * to_room;
     int movetype;
     int rc;
+    bool doLook;
 };
 
 #endif
