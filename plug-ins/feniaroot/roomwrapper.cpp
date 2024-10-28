@@ -34,7 +34,7 @@
 #include "wrap_utils.h"
 #include "nativeext.h"
 #include "subr.h"
-
+#include "update_areas.h"
 #include "roomtraverse.h"
 #include "def.h"
 
@@ -735,6 +735,13 @@ NMI_INVOKE( RoomWrapper, count_enemies, "(ch): кол-во персонажей,
         count++;
 
     return Register(count);
+}
+
+NMI_INVOKE( RoomWrapper, reset, "(): выполнить redit reset")
+{
+    checkTarget();
+    reset_room(target, FRESET_ALWAYS);
+    return Register();
 }
 
 /*---------------------------------------------------------
