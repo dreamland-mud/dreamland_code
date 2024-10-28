@@ -13,7 +13,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
-
+#include "fenia_utils.h"
 #include "command.h"
 #include "commandmanager.h"
 #include "mobilebehavior.h"
@@ -26,8 +26,8 @@
 #include "fight.h"
 #include "descriptor.h"
 #include "comm.h"
-
-#include "attract.h"
+#include "behavior.h"
+#include "occupations.h"
 #include "occupations.h"
 #include "shoptrader.h"
 #include "move_utils.h"
@@ -240,27 +240,28 @@ static bool has_trade_triggers( Object *obj, Character *ch )
     return get_cost( keeper, obj, false, trader ) > 0;
 }
 
-static bool has_trigger_listen( Object *obj )
+static bool has_trigger_listen( Object *obj, const StringSet &triggers )
 {
     // See if it has a sound defined in the area file.
-    if (!obj->pIndexData->sound.empty( ))
+    if (!obj->pIndexData->sound.emptyValues( ))
         return true;
 
     // See if wrappers for this item or its index data has a onListen function defined.
-    FENIA_HAS_TRIGGER(obj, "Listen");
-    FENIA_NDX_HAS_TRIGGER(obj, "Listen");
+    if (triggers.count("listen") > 0)
+        return true;
+
     return IS_OBJ_STAT(obj, ITEM_HUM);
 }
 
-static bool has_trigger_smell( Object *obj )
+static bool has_trigger_smell( Object *obj, const StringSet &triggers )
 {
     // See if it has a smell defined in the area file.
-    if (!obj->pIndexData->smell.empty( ))
+    if (!obj->pIndexData->smell.emptyValues( ))
         return true;
 
     // See if wrappers for this item or its index data has a onSmell function defined.
-    FENIA_HAS_TRIGGER(obj, "Smell");
-    FENIA_NDX_HAS_TRIGGER(obj, "Smell");
+    if (triggers.count("smell") > 0)
+        return true;
 
     if (obj->item_type == ITEM_DRINK_CON && obj->value1() > 0)
         return true;
@@ -268,27 +269,15 @@ static bool has_trigger_smell( Object *obj )
     return false;
 }
 
-static bool has_trigger_use( Object *obj )
+static bool has_trigger_use( Object *obj, const StringSet &triggers )
 {
-    // See if wrappers for this item or its index data has a onUse function defined.
-    FENIA_HAS_TRIGGER(obj, "Use");
-    FENIA_NDX_HAS_TRIGGER(obj, "Use");
-    
-    // See if item's behavior declares itself as handling 'use' command.
-    if (obj_has_trigger( obj, "use" ))
-        return true;
-
-    return false;
+    return triggers.count("use") > 0;
 }
 
-static bool has_trigger_examine( Object *obj )
+static bool has_trigger_examine( Object *obj, const StringSet &triggers )
 {
     // See if wrappers for this item or its index data has a onExamine function defined.
-    FENIA_HAS_TRIGGER(obj, "Examine");
-    FENIA_NDX_HAS_TRIGGER(obj, "Examine");
-    
-    // See if item's behavior declares itself as handling 'examine' command.
-    if (obj_has_trigger( obj, "examine" ))
+    if (triggers.count("examine") > 0)
         return true;
 
     // Rely on item types that typically allow examining.
@@ -320,6 +309,7 @@ WEBMANIP_RUN(decorateItem)
     Character *ch = myArgs.target;
     const DLString &pocket = myArgs.pocket;
     int combined = myArgs.combined;
+    StringSet triggers = trigger_labels(item);
 
     ItemManipList manips( item, descr );
     bitstring_t wear = item->wear_flags;
@@ -418,18 +408,18 @@ WEBMANIP_RUN(decorateItem)
         if (has_trigger_unlock( item, ch ))
             manips.add( "unlock" );
 
-        if (has_trigger_examine( item ))
+        if (has_trigger_examine( item, triggers ))
             manips.add( "examine" );
 
         manips.add( "look" );
 
-        if (has_trigger_smell( item ))
+        if (has_trigger_smell( item, triggers ))
             manips.add( "smell" );
 
-        if (has_trigger_listen( item ))
+        if (has_trigger_listen( item, triggers ))
             manips.add( "listen" );
 
-        if (has_trigger_use( item ))
+        if (has_trigger_use( item, triggers ))
             manips.add( "use" );
 
         if (item->wear_loc == wear_none && gsn_lore->usable( ch )) 
@@ -503,18 +493,18 @@ WEBMANIP_RUN(decorateItem)
         if (has_trigger_unlock( item, ch ))
             manips.add( "unlock" );
 
-        if (has_trigger_examine( item ))
+        if (has_trigger_examine( item , triggers))
             manips.add( "examine" );
 
         manips.add( "look" );
 
-        if (has_trigger_smell( item ))
+        if (has_trigger_smell( item, triggers ))
             manips.add( "smell" );
 
-        if (has_trigger_listen( item ))
+        if (has_trigger_listen( item, triggers ))
             manips.add( "listen" );
 
-        if (has_trigger_use( item ))
+        if (has_trigger_use( item, triggers ))
             manips.add( "use" );
     }
     // Inside a container:

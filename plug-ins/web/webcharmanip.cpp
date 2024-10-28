@@ -26,7 +26,7 @@
 #include "descriptor.h"
 #include "comm.h"
 
-#include "attract.h"
+#include "occupations.h"
 #include "occupations.h"
 #include "shoptrader.h"
 #include "lover.h"

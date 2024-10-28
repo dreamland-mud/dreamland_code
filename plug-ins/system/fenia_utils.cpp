@@ -4,6 +4,11 @@
 #include "reglist.h"
 #include "logstream.h"
 #include "regcontainer.h"
+#include "core/object.h"
+#include "behavior.h"
+#include "fenia_utils.h"
+#include "merc.h"
+#include "def.h"
 
 /**
  * Invoke Fenia function defined in .tmp.trigger_handler,
@@ -107,5 +112,57 @@ bool fenia_trigger(Register &rc, const DLString &trigName, const Scripting::Regi
 
 }
 
+DLString trigger_type(const DLString& constTrigger)
+{
+    static DLString ON_ID = "on";
+    static DLString POST_ID = "post";
+    DLString trig = constTrigger;
+
+    if (ON_ID.strPrefix(trig))
+        trig = trig.substr(ON_ID.size());
+    else if (POST_ID.strPrefix(trig))
+        trig = trig.substr(POST_ID.size());
+
+    return trig;
+}
+
+
+StringSet trigger_labels(Object* obj)
+{
+    StringSet triggers, misc;
+    StringSet result;
+
+    // Collect all onXXX, postXXX triggers defined on object itself
+    WrapperBase *objWrapper = get_wrapper(obj->wrapper);
+    if (objWrapper)
+        objWrapper->collectTriggers(triggers, misc);
     
+    // Collect all onXXX, postXXX triggers defined on index data.
+    WrapperBase *ndxWrapper = get_wrapper(obj->pIndexData->wrapper);
+    if (ndxWrapper)
+        ndxWrapper->collectTriggers(triggers, misc);
+
+    // Collect all triggers defined on each of the behaviors.
+    for (auto &b: obj->pIndexData->behaviors.toSet()) {
+        WrapperBase *bhvWrapper = behaviorManager->find(b)->getWrapper();
+        if (bhvWrapper)
+            bhvWrapper->collectTriggers(triggers, misc);
+    }
+
+    for (auto &t: triggers) {
+        result.insert(
+            trigger_type(t).toLower());
+    }
+
+    // Check for common triggers from legacy behaviors
+    if (obj->behavior) {
+        static list<DLString> legacyTriggers = {"use", "examine", "command"};
+        for (auto &legacy: legacyTriggers)
+            if (obj->behavior->hasTrigger(legacy))
+                result.insert(legacy);    
+    }
+
+    LogStream::sendNotice() << "labels " << result.toString() << " for " << obj->getShortDescr('1', LANG_DEFAULT) << endl;
+    return result;
+}
 

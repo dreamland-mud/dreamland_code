@@ -157,12 +157,6 @@ NMI_SET( ObjectWrapper, gender , "грамматический род и чис�
     target->updateCachedNouns();
 }
 
-NMI_GET( ObjectWrapper, special, "обладает ли прототип предмета сложным поведением (через феню или код)")
-{
-    checkTarget( );
-    return Register( obj_is_special(target) );
-}
-
 NMI_GET( ObjectWrapper, description , "описание, видимое на земле")
 {
     checkTarget( );
