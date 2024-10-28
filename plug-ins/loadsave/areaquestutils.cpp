@@ -15,6 +15,8 @@
 #include "xmlattributeareaquest.h"
 #include "fenia_utils.h"
 #include "dreamland.h"
+#include "merc.h"
+#include "def.h"
 
 using namespace Scripting;
 using namespace std;
@@ -136,6 +138,10 @@ static DLString aqprog_canstart(PCharacter *ch, AreaQuest *q)
 // Return true if player can satisfy all requirements at some point in life
 bool aquest_can_participate_ever(PCMemoryInterface *pci, AreaQuest *q) 
 {
+    // Exclude onboarding quests
+    if (q->flags.isSet(AQUEST_ONBOARDING))
+        return false;
+
     // Wrong align?
     if (q->align != 0 && !q->align.isSetBitNumber(ALIGNMENT(pci)))
         return false;
@@ -181,8 +187,8 @@ bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuest
             return false;
     }
 
-    // Standard 1 hour delay after 'q cancel'
-    if (qdata.timecancel > 0) {
+    // Standard 1 hour delay after 'q cancel' for non-onboarding quests
+    if (qdata.timecancel > 0 && !q->flags.isSet(AQUEST_ONBOARDING)) {
         if (dreamland->getCurrentTime() - qdata.timecancel < Date::SECOND_IN_HOUR)
             return false;
     }
@@ -333,8 +339,6 @@ static bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLStr
                     LogStream::sendError() << "aquest: begin/end trigger type mismatch " 
                         << q->vnum << ", " << endMethod->methodName << ", " << nextBeginMethod->methodName << endl;
             }
-
-            // TODO add wiznet for all misfires and player progression throughout the quest
 
             continue;
         }
