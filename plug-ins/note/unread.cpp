@@ -12,8 +12,11 @@
 #include "so.h"
 #include "class.h"
 #include "pcharacter.h"
+#include "hometown.h"
 #include "descriptor.h"
 #include "arg_utils.h"
+
+HOMETOWN(moehewa);
 
 /*-----------------------------------------------------------------------------
  * 'unread' command 
@@ -118,6 +121,7 @@ void UnreadListener::run( int oldState, int newState, Descriptor *d )
     if (!d->character || !( ch = d->character->getPC( ) ))
         return;
     
+    // For newly created char, reset their 'lastread' counters to 2 months back
     if (oldState == CON_CREATE_DONE && ch->getRemorts( ).size( ) == 0) {
         time_t stamp;
         XMLAttributeLastRead::Pointer attr;
@@ -130,9 +134,16 @@ void UnreadListener::run( int oldState, int newState, Descriptor *d )
         for (i = th.begin( ); i != th.end( ); i++) 
             if (i->second->canRead( ch )) 
                 attr->setStamp( *i->second, stamp );
-            
+        
+        return;
     }
-    else if (newState == CON_PLAYING) {
+
+    // Don't spam newbies in onboarding zone
+    if (ch->getHometown() == home_moehewa)
+        return;
+
+    // Do 'unread' for everyone on login
+    if (newState == CON_PLAYING) {
         Unread::doSpool( ch, false );
         Unread::doUnfinished( ch );
     }
