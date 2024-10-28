@@ -240,7 +240,6 @@ plug-ins/religion/Makefile \
 plug-ins/desire/Makefile \
 plug-ins/fight/Makefile \
 plug-ins/updates/Makefile \
-plug-ins/occupations/Makefile \
 plug-ins/output/Makefile \
 plug-ins/help/Makefile \
 plug-ins/craft/Makefile \

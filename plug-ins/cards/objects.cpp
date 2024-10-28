@@ -183,7 +183,7 @@ CardBehavior::CardBehavior( )
 
 bool CardBehavior::hasTrigger( const DLString &t )
 {
-    return (t == "use" || t == "examine" || t == "shake");
+    return (t == "use" || t == "examine" || t == "command");
 }
 
 /*

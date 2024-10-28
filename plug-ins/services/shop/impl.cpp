@@ -6,7 +6,6 @@
 #include "mobilebehaviorplugin.h"
 #include "commandtemplate.h"
 
-#include "repairman.h"
 #include "shoptrader.h"
 
 extern "C"
@@ -15,7 +14,6 @@ extern "C"
     {
         SO::PluginList ppl;
         
-        Plugin::registerPlugin<MobileBehaviorRegistrator<Repairman> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ShopTrader> >( ppl );
         
         return ppl;

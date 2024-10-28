@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "feniatriggers.h"
+#include "fenia_utils.h"
 #include "wrapperbase.h"
 #include "fenia/register-impl.h"
 #include "fenia/codesource.h"
@@ -85,21 +86,6 @@ void FeniaTriggerLoader::loadFolder(const DLString &indexType)
     indexTriggers[indexType] = triggers;
 
     LogStream::sendNotice() << "OLC Fenia loaded " << triggers.size() << " triggers of type " << indexType << endl;
-}
-
-// Return 'Use' for 'onUse' or 'postUse'.
-DLString triggerType(const DLString &name) 
-{
-    DLString key = name;
-    static const DLString ON("on");
-    static const DLString POST("post");
-
-    if (ON.strPrefix(key))
-        key = key.substr(ON.size());
-    else if (POST.strPrefix(key))
-        key = key.substr(POST.size());
-
-    return key;
 }
 
 // Return true for strings like Aaaaa.
@@ -334,7 +320,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
 
     // Fenia field not found, try to open the editor with trigger example.
     if (retval.type == Register::NONE) {
-        DLString trigType = triggerType(methodName);
+        DLString trigType = trigger_type(methodName);
         if (trigType == methodName) {
             ch->pecho("Название триггера должно начинаться с 'on' или 'post'.");
             return false;

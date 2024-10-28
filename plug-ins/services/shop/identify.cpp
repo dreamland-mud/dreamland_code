@@ -6,7 +6,7 @@
 #include "spelltarget.h"
 #include "pcharacter.h"
 #include "core/object.h"
-#include "attract.h"
+#include "occupations.h"
 #include "loadsave.h"
 
 #include "act.h"

@@ -47,7 +47,8 @@ behavior_utils.cpp \
 stats_apply.cpp \
 player_exp.cpp \
 player_account.cpp \
-money_utils.cpp
+money_utils.cpp \
+occupations.cpp
 
 libloadsave_la_MOC = \
 objectbehaviormanager.h \

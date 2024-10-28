@@ -6,9 +6,10 @@
 #define __SHOPTRADER_H__
 
 #include "trader.h"
-#include "repairman.h"
+#include "basicmobilebehavior.h"
+#include "xmlflags.h"
 
-class ShopTrader :  public Repairman {
+class ShopTrader :  public virtual BasicMobileDestiny {
 XML_OBJECT
 public:
     typedef ::Pointer<ShopTrader> Pointer;

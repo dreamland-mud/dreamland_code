@@ -20,7 +20,7 @@
 #include "subr.h"
 #include "native.h"
 
-#include "attract.h"
+#include "occupations.h"
 #include "occupations.h"
 #include "act.h"
 #include "merc.h"

@@ -9,7 +9,6 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/iomanager \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/fight_core \
--I$(top_srcdir)/plug-ins/occupations \
 -I$(top_srcdir)/plug-ins/interpret
 
 libmovement_la_SOURCES = \
@@ -37,7 +36,6 @@ libmovement_la_LIBADD = \
 ../system/libsystem.la \
 ../system/libscheduler_task_round.la \
 ../interpret/libinterpret.la \
-../occupations/liboccupations.la \
 ../fight_core/libfight_core.la
 
 include $(top_srcdir)/plug-ins/Makefile.inc

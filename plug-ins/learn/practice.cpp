@@ -20,7 +20,7 @@
 #include "pcharacter.h"
 #include "room.h"
 
-#include "attract.h"
+#include "occupations.h"
 #include "occupations.h"
 #include "skill_utils.h"
 #include "comm.h"

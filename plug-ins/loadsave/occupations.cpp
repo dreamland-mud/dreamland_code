@@ -4,7 +4,6 @@
  */
 #include "occupations.h"
 
-#include "npcharacter.h"
 #include "room.h"
 #include "object.h"
 #include "behavior.h"
@@ -85,21 +84,19 @@ bool mob_has_occupation( NPCharacter *mob, int occType )
            && IS_SET(mob->behavior->getOccupation( ), (1 << occType) );
 }
 
-bool obj_has_trigger( Object *obj, const DLString& trigger )
+NPCharacter * find_attracted_mob( Character *ch, int occType )
 {
-    return obj->behavior && obj->behavior->hasTrigger( trigger );
-}
-
-bool obj_is_special(Object *obj)
-{
-    FENIA_NDX_HAS_TRIGGER(obj, "Use");
-    FENIA_NDX_HAS_TRIGGER(obj, "Equip");
-    FENIA_NDX_HAS_TRIGGER(obj, "Fight");
-    FENIA_NDX_HAS_TRIGGER(obj, "Spec");
+    PCharacter *pch = ch->getPC();
+    NPCharacter *mob = NULL;
     
-    return obj_has_trigger(obj, "use")
-        || obj_has_trigger(obj, "fight")
-        || obj_has_trigger(obj, "equip")
-        || obj_has_trigger(obj, "spec");
+    for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
+        if (( mob = rch->getNPC( ) )
+            && mob->behavior 
+            && IS_SET(mob->behavior->getOccupation( ), (1 << occType)))
+        {
+            return mob;
+        }
+
+    return NULL;
 }
 

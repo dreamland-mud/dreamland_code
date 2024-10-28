@@ -75,7 +75,6 @@ LIBADD_ANATOLIA = \
 $(LIBADD_ANATOLIA_CORE) \
 $(top_builddir)/plug-ins/command/libcommand.la \
 $(top_builddir)/plug-ins/help/libhelp.la \
-$(top_builddir)/plug-ins/occupations/liboccupations.la \
 $(top_builddir)/plug-ins/race/librace.la 
 
 LIBADD_FIGHT = \

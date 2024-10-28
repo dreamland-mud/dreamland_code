@@ -12,7 +12,7 @@
 
 #include "commandtemplate.h"
 #include "hometown.h"
-#include "attract.h"
+#include "occupations.h"
 #include "occupations.h"
 #include "core/behavior/behavior_utils.h"
 #include "pcharacter.h"

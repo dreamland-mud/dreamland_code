@@ -9,7 +9,6 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/alignment \
 -I$(top_srcdir)/plug-ins/iomanager \
 -I$(top_srcdir)/plug-ins/loadsave \
--I$(top_srcdir)/plug-ins/occupations \
 -I$(top_srcdir)/plug-ins/interpret \
 -I/usr/include/jsoncpp
 
@@ -42,7 +41,6 @@ libfight_core_la_LIBADD = \
 ../iomanager/libiomanager.la \
 ../loadsave/libloadsave.la \
 ../system/libsystem.la \
-../occupations/liboccupations.la \
 ../system/libscheduler_task_round.la \
 ../interpret/libinterpret.la \
 -ljsoncpp

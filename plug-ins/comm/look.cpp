@@ -50,7 +50,7 @@
 #include "comm.h"
 #include "weapontier.h"
 #include "directions.h"
-#include "attract.h"
+#include "occupations.h"
 #include "player_utils.h"
 #include "occupations.h"
 #include "terrains.h"

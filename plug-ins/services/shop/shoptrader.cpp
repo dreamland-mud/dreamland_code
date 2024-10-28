@@ -13,7 +13,7 @@
 #include "pcharacter.h"
 #include "object.h"
 #include "player_utils.h"
-#include "attract.h"
+#include "occupations.h"
 #include "act.h"
 #include "interp.h"
 #include "loadsave.h"
@@ -39,24 +39,18 @@ ShopTrader::ShopTrader( )
 
 int ShopTrader::getOccupation( )
 {
-    return Repairman::getOccupation( ) | (1 << OCC_SHOPPER);
+    return (1 << OCC_SHOPPER);
 }
 
 void ShopTrader::load( DLString str )
 {
-    if (str == "spec_repairman") {
-        for (int i = 0; i < item_table.size; i++)        
-            repairs.setBitNumber( i );
-    }
-    else {
-        for (int i = 0; i < 5; i++) 
-            buys.setBitNumber( str.getOneArgument( ).toInt( ) );
-        
-        profitBuy  = str.getOneArgument( ).toInt( );
-        profitSell = str.getOneArgument( ).toInt( );
-        openHour   = str.getOneArgument( ).toInt( );
-        closeHour  = str.getOneArgument( ).toInt( );
-    }
+    for (int i = 0; i < 5; i++) 
+        buys.setBitNumber( str.getOneArgument( ).toInt( ) );
+    
+    profitBuy  = str.getOneArgument( ).toInt( );
+    profitSell = str.getOneArgument( ).toInt( );
+    openHour   = str.getOneArgument( ).toInt( );
+    closeHour  = str.getOneArgument( ).toInt( );
 }
 
 

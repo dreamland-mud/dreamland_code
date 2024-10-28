@@ -2,14 +2,12 @@ lib_LTLIBRARIES = libservices_shop.la
 
 
 libservices_shop_la_SOURCES = \
-repairman.cpp \
 oldshop.cpp \
 shoptrader.cpp \
 identify.cpp \
 impl.cpp
 
 libservices_shop_la_MOC = \
-repairman.h \
 shoptrader.h
 
 

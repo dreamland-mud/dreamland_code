@@ -423,7 +423,7 @@ CMDRUN( split )
 }
 
 CMDRUN( nofollow )
-{
+{   
     if (ch->is_npc())
         return;
 

@@ -6,7 +6,7 @@
 #include "mixedpetshop.h"
 #include "shoptrader.h"
 
-#include "attract.h"
+#include "occupations.h"
 #include "occupations.h"
 
 #include "grammar_entities_impl.h"

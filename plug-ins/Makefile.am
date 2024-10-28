@@ -13,7 +13,6 @@ profession \
 race \
 hometown \
 bonus \
-occupations \
 communication \
 fight_core \
 movement \

@@ -25,7 +25,7 @@
 
 #include "class.h"
 
-#include "attract.h"
+#include "occupations.h"
 #include "occupations.h"
 #include "webmanip.h"
 #include "wearloc_utils.h"
@@ -538,22 +538,7 @@ CMDRUN( list )
         tell_dim(ch, keeper, "Сегодня в моем магазине невероятно низкие цены.");
     tell_dim( ch, keeper, "Скажи мне название товара, и я расскажу всё, что о нем знаю, за 1%% от стоимости." );
 
-    int counter = 0;
-    NPCharacter *mob = NULL;
-    NPCharacter *lastShopper = NULL;
-    for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room){
-        if (( mob = rch->getNPC( ) )
-            && mob_has_occupation(mob, OCC_SHOPPER))
-        {
-            counter++;
-            lastShopper = mob;
-        }
-    }
-
-    if(counter>1){
-        DLString mobName = Syntax::noun(lastShopper->getShortDescr(LANG_DEFAULT));
-        hint_fmt(ch, "Внимание остальных продавцов в этом месте можно привлечь. Например, {y{hcпривлечь %1$N4{x", mobName.c_str());
-    }
+    // TODO when moved to Fenia, all shoppers in the room will react to the list command
 }
 
 /*----------------------------------------------------------------------------
