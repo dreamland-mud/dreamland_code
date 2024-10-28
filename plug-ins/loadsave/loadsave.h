@@ -27,6 +27,7 @@ class Character;
 class PCharacter;
 class NPCharacter;
 class FlagTable;
+class BehaviorReference;
 
 struct mob_index_data;
 struct obj_index_data;
@@ -128,6 +129,7 @@ long long get_arg_id( const DLString &cArgument );
 bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long long id );
 Object *find_pit_for_obj(Object *obj);
 Object *find_pit_in_room(int roomVnum);
+NPCharacter * find_mob_with_behavior( Room *room, BehaviorReference &bhv );
 
 bool eyes_blinded( Character *ch );
 bool eyes_darkened( Character *ch );

@@ -4,7 +4,6 @@ lib_LTLIBRARIES = libservices_shop.la
 libservices_shop_la_SOURCES = \
 oldshop.cpp \
 shoptrader.cpp \
-identify.cpp \
 impl.cpp
 
 libservices_shop_la_MOC = \

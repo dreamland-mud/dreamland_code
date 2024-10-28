@@ -40,8 +40,9 @@
 
 GSN(lore);
 GSN(steal);
+BHV(sage);
+BHV(blacksmith);
 
-NPCharacter * find_mob_with_act( Room *room, bitstring_t act );
 int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader );
 
 /*
@@ -381,13 +382,11 @@ WEBMANIP_RUN(decorateItem)
                     manips.addAll( "drop", item );
             }
 
-            if (find_attracted_mob( ch, OCC_REPAIRMAN )) {
-                manips.addLocal( "repair" );
-                manips.addLocal( "estimate" );
-            }
+            if (find_mob_with_behavior( ch->in_room, bhv_blacksmith ))
+                manips.addLocal( "service" );
 
-            if (find_mob_with_act( ch->in_room, ACT_SAGE )) 
-                manips.addLocal( "identify" );
+            if (find_mob_with_behavior( ch->in_room, bhv_sage )) 
+                manips.addLocal( "service" );
 
             if (has_trade_triggers( item, ch )) {
                 manips.addLocal( "sell" );

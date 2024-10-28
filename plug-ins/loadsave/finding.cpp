@@ -15,7 +15,7 @@
 #include "room.h"
 #include "clan.h"
 #include "skillreference.h"
-
+#include "behavior.h"
 #include "descriptor.h"
 #include "act.h"
 #include "merc.h"
@@ -855,11 +855,13 @@ bool text_match_with_highlight(const DLString &text, const DLString &args, ostri
     return found;
 }
 
-NPCharacter * find_mob_with_act( Room *room, bitstring_t act )
+NPCharacter * find_mob_with_behavior( Room *room, BehaviorReference &bhv )
 {    
     for (Character* rch = room->people; rch != 0; rch = rch->next_in_room )
-       if (rch->is_npc() && IS_SET(rch->act, act))
+       if (rch->is_npc() && rch->getNPC()->pIndexData->behaviors.isSet(bhv))
           return rch->getNPC( );
+
     return NULL;
 }
+
 

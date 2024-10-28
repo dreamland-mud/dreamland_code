@@ -238,7 +238,7 @@ public:
             pet["vnum"] = pMob->vnum;
             pet["name"] = russian_case(pMob->short_descr[RU], '1').colourStrip();
             pet["level"] = (type == "LevelAdaptivePet" || type == "Rat" ? -1 : pMob->level);
-            pet["act"] = act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_SAGE|ACT_NOWHERE));
+            pet["act"] = act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_NOWHERE));
             pet["aff"] = affect_flags.names(REMOVE_BIT(pMob->affected_by, AFF_INFRARED));
             pet["off"] = off_flags.names(REMOVE_BIT(pMob->off_flags, ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE|OFF_FADE));
             pet["area"] = aname;

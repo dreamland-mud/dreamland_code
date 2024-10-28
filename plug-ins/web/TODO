@@ -13,16 +13,16 @@
 (звездочкой помечено сделанное)
 
 Предмет, наброски:
-    инвентарь:        drop,wear,eat,drink,pour out,look,examine,use,lore,identify,take all,recite,quaff
+    инвентарь:        drop,wear,eat,drink,pour out,look,examine,use,lore,take all,recite,quaff
     в контейнере:     take
     экипировка:       remove,look,use[zap,brandish]
-    пол:              take,look,examine,use[recite],lore,identify,[sacrifice],fill 'first drink_con',drink,enter,take all,sit|rest|sleep
+    пол:              take,look,examine,use[recite],lore,[sacrifice],fill 'first drink_con',drink,enter,take all,sit|rest|sleep
     чужой инвентарь:  steal
     чужой экип:       take
 
 Необходимо:
 *все команды: понимают id предметов и чаров
-*steal,lore,identify: рисуются если навык доступен
+*steal,lore: рисуются если навык доступен
 *eat,drink,pour ot,enter,fill,take all,sit|rest|sleep: рисуются для определенных типов предметов
 *sit|rest|sleep: в завис от флагов мебели
 
@@ -44,7 +44,7 @@ Bugs:
 *look предмет: если нет описаний,показывать что за предмет, куда надевается
 *fill: наполняет сосуд в руках
 *repair|estimate: у оружейника
-*identify: у мудреца
+*sevice: у мудреца
 *auction: инвентарь
 *take by: в чужом инвентаре
 * sell|value: у продавца
@@ -124,7 +124,7 @@ PC глобально (who, webclient who, scan, where):
 
 =================================================
 Комната, наброски:
-- у спец-мобов: identify, list, smith, quest *, -- хотя мб лучше просто на мобах? В магазинах животных продавец не обязателен, можно и на комнате.
+- у спец-мобов: service, list, quest *, -- хотя мб лучше просто на мобах? В магазинах животных продавец не обязателен, можно и на комнате.
 - raffects
 - exits, scan
 * тыкать на все экстраописания и описания экстра-выходов

@@ -475,7 +475,7 @@ bool VictimQuestModel::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     if (!checkMobile( pch, mob ))
         return false;
 
-    if (IS_SET( mob->act,  ACT_NOTRACK | ACT_SAGE ))
+    if (IS_SET( mob->act,  ACT_NOTRACK  ))
         return false;
 
     if (IS_SET( mob->imm_flags, IMM_SPELL|IMM_WEAPON ))
