@@ -16,6 +16,9 @@
 #include "characterwrapper.h"
 #include "structwrappers.h"
 #include "wrap_utils.h"
+#include "areaquest.h"
+#include "areaquestutils.h"
+#include "xmlattributeareaquest.h"
 #include "lasthost.h"
 #include "merc.h"
 #include "def.h"
@@ -457,6 +460,44 @@ NMI_GET(PlayerWrapper, quest, "статистика побед в авто кв�
     if (!statAttr)
         return Register();
     return statAttr->toRegister(player, "questdata");
+}
+
+NMI_GET(PlayerWrapper, aquest, "статистика побед в арийных квестах, без учета квестов онбординга")
+{
+    PCMemoryInterface *player = getTarget();
+    Register victoryReg = Register::handler<IdContainer>();
+    IdContainer *victory = victoryReg.toHandler().getDynamicPointer<IdContainer>();
+    int victoriesThisLife = 0;
+    int victoriesTotal = 0;
+    int availableThisLife = 0;
+    int availableTotal = 0;
+
+    for (auto &q: areaQuests) {
+        AreaQuest *quest = q.second;
+
+        if (quest->flags.isSet(AQUEST_ONBOARDING))
+            continue;
+
+        availableTotal++;
+
+        if (aquest_can_participate_ever(player, quest))
+            availableThisLife++;
+
+        AreaQuestData &qdata = aquest_data(player, quest->vnum.toString());
+
+        if (qdata.total > 0)
+            victoriesTotal++;
+
+        if (qdata.thisLife > 0)
+            availableThisLife++;
+    }
+
+    victory->setField(IdRef("victoriesTotal"), victoriesTotal);
+    victory->setField(IdRef("victoriesThisLife"), victoriesThisLife);
+    victory->setField(IdRef("availableTotal"), availableTotal);
+    victory->setField(IdRef("availableThisLife"), availableThisLife);
+
+    return victoryReg;
 }
 
 NMI_GET(PlayerWrapper, attributes, "Array всех аттрибутов, ключ - имя аттрибута, значение - Map с полями аттрибута либо пустая строка")
