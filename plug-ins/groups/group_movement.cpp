@@ -166,7 +166,7 @@ protected:
             point = ch->leader->getPC( )->getHometown( )->getRecall( );
 
         if (!( to_room = get_room_instance( point ) )) {
-            ch->pecho( "Ты окончательно заблудил%1$Gось|ся|ась.", ch );
+            ch->pecho( "Команда 'возврат' сейчас недоступна тебе.", ch );
             return false;
         }
         

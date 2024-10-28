@@ -94,7 +94,7 @@ bool DrunkDesire::isActive( PCharacter *ch )
 bool DrunkDesire::canDrink( PCharacter *ch )
 {
     if (isActive( ch )) {
-        ch->pecho( "Ты проносишь мимо рта.. *ИК*" );
+        ch->pecho( "Ты проносишь мимо рта... *ИК*" );
         return false;
     }
 
