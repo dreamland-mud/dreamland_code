@@ -27,7 +27,7 @@ static const char * occ_names [] =
     "quest_trader",
     "quest_master",
     "healer",
-    "smithman",
+    "blacksmith",
     "trainer",
     "clanguard",
     "adept",
