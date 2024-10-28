@@ -12,7 +12,7 @@
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "object.h"
-
+#include "player_utils.h"
 #include "attract.h"
 #include "act.h"
 #include "interp.h"
@@ -93,6 +93,9 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
     ostringstream buf;
     Object *obj  = get_obj_keeper( client, this, args );
 
+    if (client->is_npc())
+        return;
+
     if (!obj) {
         if (verbose)
             tell_dim( client, ch, "Я не продаю этого - используй 'список{x'." );
@@ -107,7 +110,7 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
     }
 
     int itemCost = get_cost( ch, obj, true, this );
-    int serviceCost = itemCost / 100;
+    int serviceCost = Player::isNewbie(client->getPC()) ? 0 : itemCost / 100;
     if ((client->silver + client->gold * 100) < serviceCost) {
         tell_dim( client, ch, "Я не справочная контора. Будут деньги, тогда и возвращайся." );
         return;
