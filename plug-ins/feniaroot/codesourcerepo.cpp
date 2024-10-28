@@ -41,7 +41,7 @@ CodeSourceRepo::CodeSourceRepo()
     subjPatterns.push_back(
         RegExp::Pointer(NEW, "^([a-z]+)/([-0-9.a-zA-Z_ :]+)$", true));
     subjPatterns.push_back(
-        RegExp::Pointer(NEW, "^([a-z]+)/([-0-9.a-zA-Z_ :]+)/([-0-9.a-zA-Z_ :]+)$", true));
+        RegExp::Pointer(NEW, "^([a-z]+/[-0-9.a-zA-Z_ :]+)/([-0-9.a-zA-Z_ :]+)$", true));
 }
 
 CodeSourceRepo::~CodeSourceRepo() 
@@ -89,24 +89,29 @@ void CodeSourceRepo::save(Scripting::CodeSource &cs)
         return;
     }
 
-    fs::path path = dreamland->getFeniaScriptDir().getAbsolutePath().c_str();
+    try {
+        fs::path path = dreamland->getFeniaScriptDir().getAbsolutePath().c_str();
 
-    if (isPublic) {
-        // Re-add "public" folder part as folderName won't have it
-        path /= "public";
-    } 
+        if (isPublic) {
+            // Re-add "public" folder part as folderName won't have it
+            path /= "public";
+        } 
 
-    path /= folderName.c_str();
-    fs::create_directories(path);
+        path /= folderName.c_str();
+        fs::create_directories(path);
 
-    path /= fileName.c_str();
-    ofstream os(path);
-    os << koi2utf(cs.content);
+        path /= fileName.c_str();
+        ofstream os(path);
+        os << koi2utf(cs.content);
 
-    if (!os) {
-        LogStream::sendSystem() << "CS repo: error saving codesource " << cs.name << endl;
-    } else 
-        LogStream::sendNotice() << "CS repo: saved " << cs.name << endl;
+        if (!os) {
+            LogStream::sendSystem() << "CS repo: error saving codesource " << cs.name << endl;
+        } else 
+            LogStream::sendNotice() << "CS repo: saved " << cs.name << endl;
+
+    } catch (const std::exception &e) {
+        LogStream::sendSystem() << "CS repo: " << e.what() << endl;
+    }
 }
 
 void CodeSourceRepo::saveAll() 
