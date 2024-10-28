@@ -383,10 +383,10 @@ WEBMANIP_RUN(decorateItem)
             }
 
             if (find_mob_with_behavior( ch->in_room, bhv_blacksmith ))
-                manips.addLocal( "service" );
+                manips.addLocal( "service", "починка $" );
 
             if (find_mob_with_behavior( ch->in_room, bhv_sage )) 
-                manips.addLocal( "service" );
+                manips.addLocal( "service", "опознание $" );
 
             if (has_trade_triggers( item, ch )) {
                 manips.addLocal( "sell" );

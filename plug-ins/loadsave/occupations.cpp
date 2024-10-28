@@ -84,6 +84,14 @@ bool mob_has_occupation( NPCharacter *mob, int occType )
            && IS_SET(mob->behavior->getOccupation( ), (1 << occType) );
 }
 
+bool mob_has_behavior(NPCharacter *mob, BehaviorReference& bhv)
+{
+    if (mob->pIndexData->behaviors.isSet(bhv))
+        return true;
+
+    return false;
+}
+
 NPCharacter * find_attracted_mob( Character *ch, int occType )
 {
     PCharacter *pch = ch->getPC();

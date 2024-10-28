@@ -9,6 +9,7 @@
 #include "pcharacter.h"
 
 class Object;
+class BehaviorReference;
 
 enum {
     OCC_NONE = 0,
@@ -28,6 +29,7 @@ enum {
 
 bool mob_has_occupation( NPCharacter *, const char * );
 bool mob_has_occupation( NPCharacter *, int );
+bool mob_has_behavior(NPCharacter *, BehaviorReference &bhv);
 
 NPCharacter * find_attracted_mob( Character *, int );
 

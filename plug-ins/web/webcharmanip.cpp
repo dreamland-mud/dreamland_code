@@ -18,6 +18,7 @@
 #include "commandmanager.h"
 #include "mobilebehavior.h"
 #include "core/behavior/behavior_utils.h"
+#include "behavior.h"
 #include "object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -27,7 +28,6 @@
 #include "comm.h"
 
 #include "occupations.h"
-#include "occupations.h"
 #include "shoptrader.h"
 #include "lover.h"
 #include "move_utils.h"
@@ -35,8 +35,11 @@
 #include "loadsave.h"
 #include "act.h"
 #include "merc.h"
-
 #include "def.h"
+
+BHV(healer);
+BHV(enchanter);
+BHV(blacksmith);
 
 /*
  * Hold the list of all commands and their arguments that are applicable
@@ -200,10 +203,9 @@ WEBMANIP_RUN(decorateMobile)
         if (mob_has_occupation(victim, OCC_PRACTICER)) 
             manips.addLocal("practice", "здесь");
 
-        if (mob_has_occupation(victim, OCC_HEALER)) 
-            manips.addLocal("service", "");
-
-        if (mob_has_occupation(victim, OCC_SMITHMAN)) 
+        if (mob_has_behavior(victim, bhv_healer)
+            || mob_has_behavior(victim, bhv_blacksmith)
+            || mob_has_behavior(victim, bhv_enchanter))
             manips.addLocal("service", "");
 
         if (mob_has_occupation(victim, OCC_SHOPPER)) 
