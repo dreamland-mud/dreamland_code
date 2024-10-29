@@ -7,7 +7,7 @@
 #include "jsoncpp/json/value.h"
 #include "arg_utils.h"
 #include "configurable.h"
-
+#include "lang.h"
 
 Json::Value synonyms;
 CONFIGURABLE_LOADED(grammar, synonyms)
@@ -266,6 +266,19 @@ bool arg_is_all( const DLString &arg )
 bool arg_is_clear( const DLString &arg )
 {
     return arg_is(arg, "clear");
+}
+
+// True if arg is 'en', 'ua' etc.
+bool arg_is_lang(const DLString &arg)
+{
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        if (arg == lang2attr(lang))
+            return true;
+    }
+
+    return false;
 }
 
 /** Remove surrounding quotes from an argument. */

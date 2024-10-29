@@ -208,7 +208,7 @@ static DLString aquest_title(const Integer &questId)
 
     AreaQuest *q = get_area_quest(questId.toString());
     if (q)
-        return q->title;
+        return q->title.get(LANG_DEFAULT);
 
     return "{Rне найден{x";
 }
@@ -272,7 +272,9 @@ static void show_step(PCharacter *ch, AreaQuest *q, int s)
         buf << "{D[" << web_cmd(ch, "step  " + stepNum + " down", "вниз") << "]{w ";
 
     buf << endl
-        << "{WИнфо{w:    " << step->info << " " << web_edit_button(ch, "step " + stepNum + " info", "web") << endl
+        << "{WИнфо{w:    [" << step->info[RU] << "] " << web_edit_button(ch, "step " + stepNum + " ruinfo", "web")
+        << "  [" << step->info[EN] << "] " << web_edit_button(ch, "step " + stepNum + " info", "web") 
+        << "  [" << step->info[UA] << "] " << web_edit_button(ch, "step " + stepNum + " uainfo", "web") << endl
         << "{WНаграда{w: " << show_step_reward(ch, step) << endl
         << "{WНачало{w:  тип " << menu_step_type(s, step->beginType, "begin") << "{w, "
         << "триггер " << menu_step_trigger(s, step->beginType, step->beginTrigger, "begin") << "{w, "
@@ -328,12 +330,14 @@ void OLCStateAreaQuest::show( PCharacter *ch )
     ptc(ch, "Квест {C%d{x зоны {W%s{x {x\r\n", 
              q->vnum.getValue(), area->getName().c_str());
 
-    ptc(ch, "Титул:         {C%s{x %s {D(title help){x\r\n",
-            q->title.c_str(),
-            web_edit_button(ch, "title", "web").c_str());
-    ptc(ch, "Описание:      %s {D(desc help){x\r\n%s",
-            web_edit_button(ch, "desc", "web").c_str(),
-            q->description.c_str());
+    ptc(ch, "Титул EN:      {C%s{x %s {D(title help){x\n\r", q->title.get(EN).c_str(), web_edit_button(ch, "name", "web").c_str());   
+    ptc(ch, "Титул UA:      {C%s{x %s {D(uatitle help){x\n\r", q->title.get(UA).c_str(), web_edit_button(ch, "uaname", "web").c_str());   
+    ptc(ch, "Титул RU:      {C%s{x %s {D(rutitle help){x\n\r", q->title.get(RU).c_str(), web_edit_button(ch, "runame", "web").c_str());   
+
+    ptc(ch, "Описание EN:   %s {D(desc help){x\r\n{W%s{x", web_edit_button(ch, "desc", "web").c_str(), q->description[EN].c_str());
+    ptc(ch, "Описание UA:   %s {D(uadesc help){x\r\n{W%s{x", web_edit_button(ch, "uadesc", "web").c_str(), q->description[UA].c_str());
+    ptc(ch, "Описание RU:   %s {D(rudesc help){x\r\n{W%s{x", web_edit_button(ch, "rudesc", "web").c_str(), q->description[RU].c_str());
+
     ptc(ch, "Мин. уровень:  {c%d {D(minlevel){x\r\n", q->minLevel.getValue());
     ptc(ch, "Макс. уровень: {c%d {D(maxlevel){x\r\n", q->maxLevel.getValue());
     ptc(ch, "Натура:        {c%s{x {D(? align){x\r\n",
@@ -511,21 +515,23 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         return true;
     }
 
-    // 'step 3 info <string>'
-    if (arg_is(cmd, "info")) {
-        if (args.empty()) {
+    // 'step 3 info'
+    if (DLString("info").strSuffix(cmd)) {
+        lang_t lang = cmd == "info" ? EN : (cmd == "uainfo" ? UA : (cmd == "ruinfo" ? RU : LANG_MAX));
+        if (args.empty() || lang == LANG_MAX) {
             ch->pecho("Какое описание ты хочешь присвоить?");
             return false;
         }
 
-        // Execute 'step 3 paste' rather than 'step paste' when web editor returns
-        lastCmd << " " << stepArg;
-        return editor(args.c_str(), thisStep->info, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+        // Execute 'step 3 en paste' rather than 'step paste' when web editor returns
+        lastCmd << " " << stepArg << " " << lang2attr(lang);
+        return editor(args.c_str(), thisStep->info[lang], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
     }
 
-    // 'step 3 paste'
-    if (arg_is_paste(cmd)) {
-        editorPaste(thisStep->info, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+    // 'step 3 en paste'
+    if (arg_is_lang(cmd) && arg_is_paste(args)) {
+        lang_t lang = attr2lang(cmd);
+        editorPaste(thisStep->info[lang], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
         show_step(ch, q, step);
         return true;
     }
@@ -688,7 +694,19 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
 AQEDIT(title, "титул", "название квеста")
 {
     AreaQuest *q = getOriginal();
-    return editor(argument, q->title, ED_NO_NEWLINE);
+    return editor(argument, q->title[EN], ED_NO_NEWLINE);
+}
+
+AQEDIT(uatitle, "уктитул", "название квеста")
+{
+    AreaQuest *q = getOriginal();
+    return editor(argument, q->title[UA], ED_NO_NEWLINE);
+}
+
+AQEDIT(rutitle, "рутитул", "название квеста")
+{
+    AreaQuest *q = getOriginal();
+    return editor(argument, q->title[RU], ED_NO_NEWLINE);
 }
 
 AQEDIT(minlevel, "минуровень", "нижний уровень игрока")
@@ -733,8 +751,19 @@ AQEDIT(perday, "задень", "ограничить выполнение одн
 AQEDIT(desc, "описание", "редактор описания квеста (desc help)")
 {
     AreaQuest *q = getOriginal();
+    return editor(argument, q->description[EN]);
+}
 
-    return editor(argument, q->description);
+AQEDIT(uadesc, "укописание", "редактор описания квеста (uadesc help)")
+{
+    AreaQuest *q = getOriginal();
+    return editor(argument, q->description[UA]);
+}
+
+AQEDIT(rudesc, "руописание", "редактор описания квеста (rudesc help)")
+{
+    AreaQuest *q = getOriginal();
+    return editor(argument, q->description[RU]);
 }
 
 AQEDIT(flags, "флаги", "флаги квеста (? areaquest_flags)")
@@ -762,7 +791,7 @@ AQEDIT(prereq, "предыдущий", "номер предыдущего кве
         return false;
     }
     
-    ch->pecho("Предыдущий квест в цепочке теперь [%d] %s.", prereqId.getValue(), prereq->title.c_str());
+    ch->pecho("Предыдущий квест в цепочке теперь [%d] %s.", prereqId.getValue(), prereq->title.get(LANG_DEFAULT).c_str());
     q->prereq.setValue(prereqId);
     return true;
 }
@@ -832,7 +861,8 @@ CMD(qedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online area quest editor.")
                 limits = "*";
 
             DLString qnameColour = aq->flags.isSet(AQUEST_HIDDEN) ? "{D" : "{w";
-            DLString qname =  aq->flags.isSet(AQUEST_HIDDEN) ? aq->title.colourStrip() : aq->title;
+            DLString qtitle = aq->title.get(LANG_DEFAULT);
+            DLString qname =  aq->flags.isSet(AQUEST_HIDDEN) ? qtitle.colourStrip() : qtitle;
 
             ch->pecho(lineFormat.c_str(),
                        q.first,

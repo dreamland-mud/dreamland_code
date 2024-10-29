@@ -71,7 +71,7 @@ DLString AreaHelp::getTitle(const DLString &label) const
 
 static void format_area_quest(AreaQuest *q, ostringstream &qbuf)
 {
-    qbuf << "{Y%A%{x " << q->description
+    qbuf << "{Y%A%{x " << q->description.get(LANG_DEFAULT)
             << "  " << "Уровни: ";
 
     // Restrictions by level and align

@@ -11,6 +11,7 @@
 #include "xmlglobalbitvector.h"
 #include "wrappertarget.h"
 #include "xmlpointer.h"
+#include "xmlmultistring.h"
 
 class AreaIndexData;
 
@@ -44,7 +45,7 @@ public:
     XML_VARIABLE XMLString endTrigger;
 
     // 'quest info' output for this step
-    XML_VARIABLE XMLString info; 
+    XML_VARIABLE XMLMultiString info; 
 
     // step rewards or 0
     XML_VARIABLE XMLInteger rewardGold, rewardQp, rewardExp, rewardVnum;
@@ -67,8 +68,8 @@ public:
     virtual long long getID() const;
 
     XML_VARIABLE XMLInteger vnum;
-    XML_VARIABLE XMLString title;
-    XML_VARIABLE XMLString description;
+    XML_VARIABLE XMLMultiString title;
+    XML_VARIABLE XMLMultiString description;
     XML_VARIABLE XMLInteger minLevel, maxLevel;
     XML_VARIABLE XMLInteger limitPerLife;
     XML_VARIABLE XMLBoolean oncePerDay;

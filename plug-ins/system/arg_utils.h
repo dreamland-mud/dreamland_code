@@ -40,6 +40,7 @@ bool        arg_is_money( const DLString &arg );
 bool        arg_is_alldot( const DLString &arg );
 bool        arg_is_all( const DLString &arg );
 bool        arg_is_clear( const DLString &arg );
+bool        arg_is_lang(const DLString &arg);
 DLString arg_unquote(const DLString &arg);
 
 #endif

@@ -75,13 +75,13 @@ AreaQuestWrapper::getTarget( ) const
 NMI_GET( AreaQuestWrapper, title, "название квеста") 
 { 
     checkTarget( ); 
-    return Register( target->title );
+    return Register( target->title.get(LANG_DEFAULT) );
 }
 
 NMI_GET( AreaQuestWrapper, description, "описание квеста") 
 { 
     checkTarget( ); 
-    return Register( target->description );
+    return Register( target->description.get(LANG_DEFAULT) );
 }
 
 NMI_GET( AreaQuestWrapper, vnum, "номер квеста") 
@@ -211,7 +211,7 @@ NMI_INVOKE( AreaQuestWrapper, info, "(ch): вернет строку с подс
     if (!info.empty())
         return info;
 
-    return target->steps[qdata.step]->info;
+    return target->steps[qdata.step]->info.get(LANG_DEFAULT);
 }
 
 NMI_INVOKE( AreaQuestWrapper, canParticipate, "(ch): персонаж ch удовлетряет всем условиям для начала квеста" ) 

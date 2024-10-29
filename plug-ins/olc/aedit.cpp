@@ -213,7 +213,7 @@ AEDIT(show, "показать", "показать все поля")
         for (auto &q: original->quests) {
             buf << fmt(0, lineFormatQuestEdit.c_str(), 
                     q->vnum.getValue(), 
-                    q->title.c_str(),
+                    q->title.get(LANG_DEFAULT).c_str(),
                     q->steps.size(), q->steps.size(),
                     q->minLevel.getValue(), q->maxLevel.getValue());
         }
