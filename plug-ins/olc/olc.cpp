@@ -319,7 +319,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         mbuf << endl << "Экстравыходы в особняках и пригородах:" << endl;
         cbuf << endl << "Экстравыходы в кланах:" << endl;
 
-        const DLString lineFormat = "[" + web_cmd(ch, "goto $1", "%5d") + "] %-35s{x [{C%s{x]";
+        const DLString lineFormat = "[" + web_cmd(ch, "goto $1", "%5d") + "] [%15s] [{Y%30s{x] [{G%30s{x]";
         for (auto &room: roomInstances) {
             ostringstream *buf;
             if (IS_SET(room->room_flags, ROOM_MANSION) 
@@ -330,7 +330,11 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             else
                 buf = &abuf;
             for (auto &eexit: room->extra_exits) {
-                (*buf) << fmt(0, lineFormat.c_str(), room->vnum, room->getName(), String::toString(eexit->keyword).c_str()) << endl;
+                (*buf) << fmt(0, lineFormat.c_str(), 
+                                room->vnum, 
+                                room->areaIndex()->area_file->file_name,
+                                eexit->short_desc_from[RU].c_str(),                           
+                                eexit->short_desc_to[RU].c_str()) << endl;
             }
         }
         

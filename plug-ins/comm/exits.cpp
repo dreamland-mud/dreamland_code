@@ -11,7 +11,8 @@
 #include "def.h"
 
 #define MILD(ch)     (IS_SET((ch)->comm, COMM_MILDCOLOR))
-#define CLR_AEXIT(ch)        (MILD(ch) ? "w" : "C")
+#define CLR_EXIT0(ch)        (MILD(ch) ? "w" : "c")
+#define CLR_EXIT1(ch)        (MILD(ch) ? "W" : "C")
 
 /*---------------------------------------------------------------------------
  * 'exits' command 
@@ -24,7 +25,7 @@ static DLString cmd_extra_exit(Character *ch, EXTRA_EXIT_DATA *eexit, bool prefe
     DLString nameRus = prefereShortDescr ? eexit->short_desc_from.get(LANG_DEFAULT).ruscase('1') : "";
     nameRus = nameRus.empty() ? (kw_ru.empty() ? kw_en : kw_ru) : nameRus;
 
-    DLString cmd = kw_ru.empty() ? "войти " + kw_en : "войти " + kw_ru;        
+    DLString cmd = kw_ru.empty() ? "идти " + kw_en : "идти " + kw_ru;        
     return web_cmd(ch, cmd, nameRus);
 }
 
@@ -53,11 +54,13 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
     PlayerConfig cfg;
     Room *room;
     bool found;
+    auto clr0 = CLR_EXIT0(ch);
+    auto clr1 = CLR_EXIT1(ch);
 
     if (eyes_blinded( ch )) 
         return;
 
-    buf << "{" << CLR_AEXIT(ch) << "[" << web_cmd(ch, "выходы", "Выходы") << ":";
+    buf << "{" << clr0 << "[{" << clr1 << web_cmd(ch, "выходы", "Выходы") << "{" << clr0 << ":{" << clr1;
     found = false;
     cfg = ch->getConfig( );
 
@@ -87,9 +90,9 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
             extras.push_back(cmd_extra_exit(ch, eexit, false));
 
     if (!extras.empty())
-        buf << " | " << extras.join(", ");
+        buf << " {" << clr0 << "| {" << clr1 << extras.join(", ");
 
-    buf << "]{x";
+    buf << "{" << clr0 << "]{x";
     buf << endl;
     ch->send_to( buf );
 }
