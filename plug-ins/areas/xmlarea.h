@@ -33,12 +33,14 @@ public:
     virtual bool toXML( XMLNode::Pointer& ) const;
     virtual void fromXML( const XMLNode::Pointer& );
     
-    XML_VARIABLE XMLStringNoEmpty name, credits, authors, altname, translator, speedwalk;
+    XML_VARIABLE XMLMultiString name, altname;
+    XML_VARIABLE XMLStringNoEmpty credits; // compat field
+    XML_VARIABLE XMLStringNoEmpty authors, translator, speedwalk;
+    XML_VARIABLE XMLMultiString resetMessage;
     XML_VARIABLE XMLIntegerNoEmpty security;
     XML_VARIABLE XMLInteger vnumHigh, vnumLow;
     XML_VARIABLE XMLInteger levelHigh, levelLow;
     XML_VARIABLE XMLFlagsNoEmpty flags;
-    XML_VARIABLE XMLOptionalString resetMessage;
     XML_VARIABLE XMLStringNode behavior;
     bool loaded;
 };

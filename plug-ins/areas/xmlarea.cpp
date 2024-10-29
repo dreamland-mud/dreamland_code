@@ -11,7 +11,7 @@
 #include "fileformatexception.h"
 #include "room.h"
 #include "merc.h"
-
+#include "string_utils.h"
 #include "dreamland.h"
 #include "def.h"
 
@@ -46,12 +46,12 @@ XMLAreaHeader::fromXML(const XMLNode::Pointer &parent)
 void
 XMLAreaHeader::init(AreaIndexData *a)
 {
-    if(a->name) name.setValue(a->name);
-    if(a->credits) credits.setValue(a->credits);
-    if(a->authors) authors.setValue(a->authors);
-    if(a->altname) altname.setValue(a->altname);
-    if(a->translator) translator.setValue(a->translator);
-    if(a->speedwalk) speedwalk.setValue(a->speedwalk);
+    name = a->name;
+    altname = a->altname;
+    authors = a->authors;
+    translator = a->translator;
+    speedwalk = a->speedwalk;
+    resetMessage = a->resetMessage;
 
     security.setValue(a->security);
     
@@ -62,13 +62,6 @@ XMLAreaHeader::init(AreaIndexData *a)
     levelHigh.setValue(a->high_range);
     
     flags.setValue(a->area_flag);
-    
-    if(a->resetmsg) {
-        resetMessage.setValue(a->resetmsg);
-        resetMessage.set(true);
-    } else {
-        resetMessage.set(false);
-    }
     
     if(a->behavior) {
         XMLNode::Pointer node(NEW);
@@ -92,12 +85,15 @@ XMLAreaHeader::compat(area_file *areaFile)
     areaFile->area = a;
     a->area_file = areaFile;
 
-    a->name = str_dup(name.getValue( ).c_str( ));
-    a->credits = str_dup(credits.getValue( ).c_str( ));
-    a->authors = str_dup(authors.getValue( ).c_str( ));
-    a->altname = str_dup(altname.getValue( ).c_str( ));
-    a->translator = str_dup(translator.getValue( ).c_str( ));
-    a->speedwalk= str_dup(speedwalk.getValue( ).c_str( ));
+    a->name = name;
+    if (!credits.empty())
+        a->name[LANG_EN] = credits;
+
+    a->altname = altname;
+    a->authors = authors;
+    a->translator = translator;
+    a->speedwalk= speedwalk;
+    a->resetMessage = resetMessage;
 
     a->security = security.getValue( );
     
@@ -108,12 +104,7 @@ XMLAreaHeader::compat(area_file *areaFile)
     a->high_range = levelHigh.getValue( );
     
     a->area_flag = flags.getValue( );
-    
-    if(resetMessage.set( ))
-        a->resetmsg = str_dup(resetMessage.getValue( ).c_str( ));
-    else
-        a->resetmsg = 0;
-        
+            
     if(behavior.getNode( )) {
         a->behavior.fromXML(behavior.getNode( ));
         if(a->behavior)
@@ -142,18 +133,10 @@ XMLArea::init(area_file *af)
     HelpArticles::iterator h;
     for (h = area->helps.begin( ); h != area->helps.end( ); h++) {
         AreaHelp *ahelp = h->getDynamicPointer<AreaHelp>();
-        if (ahelp && ahelp->persistent) {
+        if (ahelp) {
             XMLAreaHelp help;
 
-            help.level = ahelp->getLevel();
-            help.id = ahelp->getID();
-            help.labels = ahelp->labels.persistent.toString();
-
-            help.title = ahelp->title;
-            help.extra = ahelp->extra;
-            help.keyword = ahelp->keyword;
-            help.text = ahelp->text;
-
+            help.init(ahelp);
             helps.push_back(help); 
         }
     }
@@ -192,44 +175,19 @@ XMLArea::load_helps(AreaIndexData *a)
     bool selfHelpExists = false;
 
     for (h = helps.begin( ); h != helps.end( ); h++) {
-        AreaHelp::Pointer help(NEW);
-        DLString aname(a->getName());
-        aname.colourstrip();
-
-        help->areafile = a->area_file;
-        help->selfHelp = is_name(aname.c_str(), h->keyword.get(RU).c_str()) || is_name(aname.c_str(), h->keyword.get(EN).c_str());
-        help->persistent = true;
-        help->keyword = h->keyword;
-        help->title = h->title;
-        help->extra = h->extra;
-        help->text = h->text;
-        help->refreshKeywords();
-
-        help->setLevel(h->level);
-        help->setID(h->id);
-        help->labels.addPersistent(h->labels);
+        AreaHelp::Pointer help = h->compat();
+        help->setAreaIndex(a);
         helpManager->registrate(help);
-        if (help->selfHelp) {
+
+        if (help->selfHelp)
             selfHelpExists = true;
-            help->labels.addTransient("area");
-        }
+
         XMLPersistent<HelpArticle> phelp(help.getPointer());
         a->helps.push_back(phelp);
     }
 
     if (!selfHelpExists) {
-        AreaHelp::Pointer help(NEW);
-        help->areafile = a->area_file;
-        help->selfHelp = true;
-        help->persistent = false;
-        help->addAutoKeyword(a->getName().colourStrip().quote());
-        help->addAutoKeyword(DLString(a->credits).colourStrip().quote());
-        help->text[RU] = "    ";
-        help->labels.addTransient("area");
-        helpManager->registrate(help);
-
-        XMLPersistent<HelpArticle> phelp(help.getPointer());
-        a->helps.push_back(phelp);
+        LogStream::sendError() << "XMLArea: no help found for " << a->getName() << endl;
     }
 }
 

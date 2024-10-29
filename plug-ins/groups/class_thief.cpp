@@ -44,7 +44,7 @@
 #include "chance.h"
 #include "exitsmovement.h"
 #include "keyhole.h"
-
+#include "string_utils.h"
 #include "save.h"
 
 #include "magic.h"
@@ -650,7 +650,8 @@ SKILL_RUNP( forge )
 
         dup = create_object( key->pIndexData, 0 );
         dup->gram_gender = Grammar::MultiGender::MASCULINE;
-        dup->setKeyword( fmt(0, DUP_NAMES, key->getKeyword( ).toString().c_str()) );
+        DLString kw = String::toString(key->getKeyword());
+        dup->setKeyword( fmt(0, DUP_NAMES, kw.c_str()) );
         dup->setShortDescr( fmt(0, DUP_SHORT, key->getShortDescr( '2', LANG_DEFAULT ).c_str( ) ), LANG_DEFAULT);
         dup->setDescription( fmt(0, DUP_LONG, key->getShortDescr( '2', LANG_DEFAULT ).c_str( ) ), LANG_DEFAULT);
         dup->setMaterial( blank->getMaterial( ) );
@@ -706,9 +707,8 @@ SKILL_RUNP( forge )
         blank->setKeyword( LOCK_NAMES );
         blank->setShortDescr( fmt( 0, LOCK_SHORT, ch ), LANG_DEFAULT );
         blank->setDescription( fmt( 0, LOCK_LONG, ch ), LANG_DEFAULT );
-        DLString keyholeKeywords =  blank->getKeyword( ).toString();
         DLString keyholeDescr = fmt(0, LOCK_EXTRA, ch, keyhole->getDescription().c_str());
-        blank->addExtraDescr(keyholeKeywords, keyholeDescr, LANG_DEFAULT );
+        blank->addProperDescription()->description[LANG_DEFAULT] = keyholeDescr;
 
         blank->value0(keyhole->getLockType( ));
         blank->value1(50 + gsn_key_forgery->getEffective( ch ) / 2);

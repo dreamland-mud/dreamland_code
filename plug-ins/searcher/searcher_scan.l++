@@ -15,6 +15,7 @@
 #include "grammar_entities_impl.h"
 #include "searcher_val.h"    
 #include "searcher_parse.h++"
+#include "string_utils.h"
 #include "skillreference.h"
 #include "pcharacter.h"
 #include "affect.h"
@@ -216,7 +217,7 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
     p.level = pObj->level;
     p.limit = pObj->limit;
     
-    p.name = russian_case_all_forms(pObj->short_descr[RU]) + " " + pObj->keyword.toString();
+    p.name = russian_case_all_forms(pObj->short_descr[RU]) + " " + String::toString(pObj->keyword);
     p.ed = !pObj->extraDescriptions.empty();
     p.extra = extra_flags.names(pObj->extra_flags);
 
@@ -352,7 +353,7 @@ bool searcher_parse(struct mob_index_data *pMob, const char *args)
 
     p.init();
 
-    p.name = pMob->short_descr.toString() + " " + pMob->keyword.toString();
+    p.name = String::toString(pMob->short_descr) + " " + String::toString(pMob->keyword);
     p.vnum = pMob->vnum;
     p.level = pMob->level;
     p.hr = pMob->hitroll;

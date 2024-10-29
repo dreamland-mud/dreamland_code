@@ -9,7 +9,7 @@
 #include "core/object.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
-
+#include "string_utils.h"
 #include "loadsave.h"
 
 #include "merc.h"
@@ -96,7 +96,7 @@ void QuestItemAppearence::dress( Object *obj ) const
         obj->gram_gender.fromString(gender.c_str());
 
     if (!name.empty( ))
-        obj->setKeyword(name + " " + obj->pIndexData->keyword.toString());
+        obj->setKeyword(name + " " + String::toString(obj->pIndexData->keyword));
         
     if (!shortDesc.empty( ))
         obj->setShortDescr( shortDesc, LANG_DEFAULT);
@@ -123,7 +123,7 @@ QuestMobileAppearence::QuestMobileAppearence( )
 
 void QuestMobileAppearence::dress( NPCharacter *mob ) const
 {
-    mob->setKeyword( name + " " + mob->pIndexData->keyword.toString() );
+    mob->setKeyword( name + " " + String::toString(mob->pIndexData->keyword));
     mob->setShortDescr( shortDesc, LANG_RU );
     mob->setLongDescr( longDesc + "\r\n", LANG_RU );
     mob->setDescription( desc + "\r\n", LANG_RU );
@@ -173,7 +173,7 @@ Object * VnumList::randomItem( )
 
 bool NameList::hasName( NPCharacter *mob )
 {
-    StringList names = mob->pIndexData->keyword.getAllForms();
+    StringList names = String::getAllForms(mob->pIndexData->keyword);
 
     for (auto &name: names)
         if (hasElement( name ))

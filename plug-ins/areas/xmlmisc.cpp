@@ -24,41 +24,6 @@ using namespace std;
 GSN(none);
 
 /*********************************************************************
- * XMLOptionalString
- *********************************************************************/
-XMLOptionalString::XMLOptionalString( ) : _set(false)
-{
-}
-
-void
-XMLOptionalString::set(bool b)
-{
-    _set = b;
-}
-
-bool
-XMLOptionalString::set( ) const
-{
-    return _set;
-}
-
-void 
-XMLOptionalString::fromXML(const XMLNode::Pointer &parent)
-{
-    set(true);
-    XMLString::fromXML(parent);
-}
-
-bool
-XMLOptionalString::toXML(XMLNode::Pointer &parent) const
-{
-    if(!set( ))
-        return false;
-    
-    return XMLString::toXML(parent);
-}
-
-/*********************************************************************
  * XMLArmor
  *********************************************************************/
 XMLArmor::XMLArmor( )

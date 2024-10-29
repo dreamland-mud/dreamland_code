@@ -10,6 +10,7 @@
 #include "xmlinteger.h"
 #include "xmlstring.h"
 #include "xmlflags.h"
+#include "xmlmultistring.h"
 
 class OLCStateArea : public OLCStateTemplate<OLCStateArea>,
                      public virtual OLCState
@@ -30,8 +31,9 @@ public:
     XML_VARIABLE XMLInteger vnum, security;
     XML_VARIABLE XMLInteger low_range, high_range, min_vnum, max_vnum;
     XML_VARIABLE XMLFlags area_flag;
-    XML_VARIABLE XMLString file_name, name, credits, resetmsg, authors, altname, translator, speedwalk;
+    XML_VARIABLE XMLString file_name, authors, translator, speedwalk;
     XML_VARIABLE XMLString behavior;
+    XML_VARIABLE XMLMultiString name, altname, resetMessage;
 
     template <typename T>
     bool cmd(PCharacter *ch, char *argument);

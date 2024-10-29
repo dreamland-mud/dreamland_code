@@ -107,7 +107,7 @@ NMI_GET( AreaWrapper, filename, "название файла зоны" )
 
 NMI_GET( AreaWrapper, name, "имя зоны (как видно по 'where')" ) 
 {
-    return Scripting::Register( getTarget()->name );
+    return Scripting::Register( getTarget()->name.get(LANG_DEFAULT) );
 }
 
 NMI_GET( AreaWrapper, area_flag, "флаги зоны (таблица .tables.area_flags)" ) 
@@ -204,22 +204,22 @@ NMI_GET( HometownWrapper, areaname, "полное название арии" )
         return Scripting::Register( DLString::emptyString );
 }
 
-NMI_GET( HometownWrapper, altname, "альтернативное название арии" ) 
+NMI_GET( HometownWrapper, altname, "OBSOLETE: альтернативное название арии" ) 
 {
     Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-        return Scripting::Register( room->areaIndex()->altname );
+        return Scripting::Register( room->areaIndex()->altname.get(RU) );
     else
         return Scripting::Register( DLString::emptyString );
 }
 
-NMI_GET( HometownWrapper, credits, "оригинальное англ название арии" ) 
+NMI_GET( HometownWrapper, credits, "OBSOLETE: оригинальное англ название арии" ) 
 {
     Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-        return Scripting::Register( room->areaIndex()->credits );
+        return Scripting::Register( room->areaIndex()->name.get(EN) );
     else
         return Scripting::Register( DLString::emptyString );
 }

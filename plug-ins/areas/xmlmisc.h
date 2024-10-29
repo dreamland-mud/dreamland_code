@@ -15,20 +15,6 @@
 #include "xmlglobalbitvector.h"
 #include "xmlmultistring.h"
 
-class XMLOptionalString : public XMLString {
-public:
-    XMLOptionalString( );
-
-    bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) ;
-
-    void set(bool);
-    bool set( ) const;
-
-private:
-    bool _set;
-};
-
 struct XMLArmor {
     XMLArmor( );
 

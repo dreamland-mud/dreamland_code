@@ -1154,7 +1154,7 @@ struct ExtraDescList : public list<EDInfo> {
             else
                 defaultDescr = "Ты не видишь здесь ничего особенного.";
                 
-            push_back( EDInfo( obj->getKeyword( ).toString(), defaultDescr, obj, 0 ) );
+            push_back( EDInfo(String::toString(obj->getKeyword()), defaultDescr, obj, 0 ) );
         }
     }
 
@@ -1373,8 +1373,8 @@ static void do_look_object( Character *ch, Object *obj )
         buf << "." << endl;
         ch->send_to( buf.str( ) );
 
-        DLString desc = oprog_extra_descr( obj, ch, obj->getKeyword().toString().c_str() );
-        DLString keywords = obj->getKeyword().toString();
+        DLString desc = oprog_extra_descr( obj, ch, String::toString(obj->getKeyword()).c_str() );
+        DLString keywords = String::toString(obj->getKeyword());
 
         if (desc.empty( )) { 
             for (auto &ed: obj->extraDescriptions)

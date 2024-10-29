@@ -8,6 +8,8 @@
 #include "xmlstring.h"
 #include "xmlvariablecontainer.h"
 #include "xmlmultistring.h"
+#include "areahelp.h"
+
 
 class XMLAreaHelp : public DLString, public XMLVariableContainer {
 XML_OBJECT
@@ -17,6 +19,9 @@ public:
     XMLAreaHelp();
     virtual bool toXML( XMLNode::Pointer& ) const;
     virtual void fromXML( const XMLNode::Pointer& ) ;
+
+    void init(AreaHelp *);
+    AreaHelp::Pointer compat() const;
 
     XML_VARIABLE XMLMultiString keyword;
     XML_VARIABLE XMLMultiString title;

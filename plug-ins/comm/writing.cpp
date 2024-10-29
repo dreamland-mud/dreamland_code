@@ -121,7 +121,7 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
     keyword.stripWhiteSpace( );
 
     if (arg_is_strict(keyword, "face")) {
-        keyword = paper->getKeyword().toString();
+        keyword = String::toString(paper->getKeyword());
         fFace = true;
     }
 
@@ -194,7 +194,7 @@ Object * CWrite::findNail( Character *ch )
     if (!nail)
         return NULL;
 
-    DLString objname = nail->getKeyword().toString();
+    DLString objname = String::toString(nail->getKeyword());
     // TODO move to synonms
     if (is_name( "гвоздь", objname.c_str() ) || is_name( "nail", objname.c_str() ))
         return nail;

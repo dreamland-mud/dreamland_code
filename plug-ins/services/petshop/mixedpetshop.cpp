@@ -7,8 +7,7 @@
 #include "shoptrader.h"
 
 #include "occupations.h"
-#include "occupations.h"
-
+#include "string_utils.h"
 #include "grammar_entities_impl.h"
 #include "core/object.h"
 #include "pcharacter.h"
@@ -58,7 +57,7 @@ MixedEntry::MixedEntry( Pet::Pointer pet, Character *client )
     level = pet->getLevel( client );
     cost = pet->toSilver( client );
     short_descr = pet->getChar( )->getNPC( )->getShortDescr(LANG_DEFAULT);
-    name = pet->getChar( )->getNPC()->getKeyword().toString();
+    name = String::toString(pet->getChar( )->getNPC()->getKeyword());
     this->pet = true;
 }
 
@@ -67,7 +66,7 @@ MixedEntry::MixedEntry( Object *obj, int cost )
     level = obj->level;
     this->cost = cost;
     short_descr = obj->getShortDescr(LANG_DEFAULT);
-    name = obj->getKeyword().toString();
+    name = String::toString(obj->getKeyword());
     pet = false;
 }
 

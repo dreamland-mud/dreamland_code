@@ -70,7 +70,7 @@ void HelpArticle::addAutoKeyword(const DLString &keyword)
 void HelpArticle::addAutoKeyword(const std::list<DLString> &keywords)
 {
     for (auto &k: keywords)
-        keywordsAuto.insert(k.toUpper());
+        keywordsAuto.insert(k.toUpper().quote());
 
     refreshKeywords();
 }
@@ -78,7 +78,7 @@ void HelpArticle::addAutoKeyword(const std::list<DLString> &keywords)
 void HelpArticle::addAutoKeyword(const StringSet &keywords)
 {
     for (auto &k: keywords)
-        keywordsAuto.insert(k.toUpper());
+        keywordsAuto.insert(k.toUpper().quote());
 
     refreshKeywords();
 }

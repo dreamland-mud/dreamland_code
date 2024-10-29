@@ -781,7 +781,7 @@ void reset_room(Room *pRoom, int flags)
  */
 void reset_area( Area *pArea, int flags )
 {
-    const char *resetmsg;
+    DLString resetmsg;
     static const char *default_resetmsg = "Ты слышишь мелодичный перезвон колокольчиков.";        
 
     for (map<int, Room *>::iterator i = pArea->rooms.begin( ); i != pArea->rooms.end( ); i++)
@@ -790,8 +790,9 @@ void reset_area( Area *pArea, int flags )
     if (pArea->pIndexData->behavior) 
         pArea->pIndexData->behavior->update( );
 
-    if (pArea->pIndexData->resetmsg)
-        resetmsg = pArea->pIndexData->resetmsg;
+    // TODO format for each player
+    if (!pArea->pIndexData->resetMessage[LANG_DEFAULT].empty())
+        resetmsg = pArea->pIndexData->resetMessage[LANG_DEFAULT];
     else
         resetmsg = default_resetmsg;
 

@@ -3,6 +3,7 @@
 #include "dl_ctype.h"
 #include "xmlmultistring.h"
 #include "logstream.h"
+#include "grammar_entities_impl.h"
 
 using namespace std;
 
@@ -197,3 +198,57 @@ DLString String::fromLines(const std::list<DLString>& lines)
 
     return buf.str();
 }
+
+DLString String::join(const std::list<DLString>& list, const DLString& delim)
+{
+    ostringstream buf;
+
+    for (auto i = list.begin(); i != list.end(); i++) {
+        if (i != list.begin())
+            buf << delim;
+
+        buf << *i;
+    }
+
+    return buf.str();
+}
+
+StringList String::getAllForms(const XMLMultiString& multiString)
+{
+    StringList forms;
+
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
+        DLString lname = multiString.get(lang).toLower();
+
+        if (lname.find('|') != DLString::npos) {
+            for (int gcase = Case::NOMINATIVE; gcase < Case::MAX; gcase++)
+                forms.push_back(lname.ruscase('1' + gcase));
+        } else {
+            forms.push_back(lname);
+        }
+    }
+
+    return forms;
+}
+
+DLString String::toString(const XMLMultiString& multiString)
+{
+    return getAllForms(multiString).join(" ");
+}
+
+std::list<DLString> String::toNormalizedList(const XMLMultiString& multiString)
+{
+    std::list<DLString> result;
+
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
+        const DLString &value = multiString.get(lang);
+        
+        if (!value.empty())
+            result.push_back(value.ruscase('1').colourStrip());
+    }
+
+    return result;
+}
+

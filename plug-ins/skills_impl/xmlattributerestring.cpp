@@ -10,6 +10,7 @@
 #include "skillmanager.h"
 #include "core/object.h"
 #include "pcharacter.h"
+#include "string_utils.h"
 #include "act.h"
 
 using namespace Scripting;
@@ -29,8 +30,7 @@ void XMLItemRestring::dress( ::Object *obj, PCharacter *ch ) const
         obj->setDescription( fmt( 0, longDescr.c_str( ), ch ), LANG_DEFAULT );
 
     if (!description.empty( ))
-        obj->addExtraDescr( obj->getKeyword( ).toString(), 
-                            fmt( 0, description.c_str( ), ch ), LANG_DEFAULT );
+        obj->addProperDescription()->description[LANG_DEFAULT] = fmt( 0, description.c_str( ), ch );
 }
 
 Scripting::Register XMLAttributeRestring::toRegister() const

@@ -189,7 +189,7 @@ void MKey::doShow( Character *ch, DLString &arguments )
         ch->pecho( "[%-4d] %-25N1 [%s]", 
                     vnum, 
                     pKeyIndex->getShortDescr(LANG_DEFAULT),
-                    pKeyIndex->keyword.toString().c_str() );
+                    String::toString(pKeyIndex->keyword).c_str() );
     }
 }
 
@@ -238,7 +238,7 @@ void MansionKeyMaker::toStream( Character *client, ostringstream &buf )
             LogStream::sendError( ) << "Wrong key vnum " << vnum << " for character " << client->getNameC( ) << endl;
         else        
             buf << "     * " << russian_case( pKeyIndex->getShortDescr(LANG_DEFAULT), '1' )
-                << " ({c" << pKeyIndex->keyword.toString() << "{x)" << endl;
+                << " ({c" << String::toString(pKeyIndex->keyword) << "{x)" << endl;
     }
 }
 

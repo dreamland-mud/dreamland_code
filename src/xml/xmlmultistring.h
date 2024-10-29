@@ -22,11 +22,6 @@ public:
 
     void fromMixedString(const DLString &str);
 
-    StringList getAllForms() const;
-
-    // Return a space-separated string of all language entries
-    DLString toString() const;
-
     void clearValues();
     bool emptyValues() const;
 };

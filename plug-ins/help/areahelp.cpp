@@ -7,7 +7,7 @@
 #include "areabehaviorplugin.h"
 #include "regexp.h"
 #include "merc.h"
-
+#include "string_utils.h"
 #include "dl_strings.h"
 #include "act.h"
 #include "def.h"
@@ -16,6 +16,24 @@
  * AreaHelp 
  *------------------------------------------------------------------*/
 const DLString AreaHelp::TYPE = "AreaHelp";
+
+void AreaHelp::setAreaIndex(AreaIndexData *pArea)
+{
+    DLString aname = pArea->name.get(RU).ruscase('1').colourStrip();
+
+    areafile = pArea->area_file;
+    
+    addAutoKeyword(String::toNormalizedList(pArea->name));
+    addAutoKeyword(String::toNormalizedList(pArea->altname));
+    refreshKeywords();
+
+    // Quick check to distinguish help about this area from helps about other topics
+    // TODO: mark such help with a non-transient 'area' label?
+    selfHelp = is_name(aname.c_str(), keyword.get(RU).c_str());
+
+    if (selfHelp) 
+        labels.addTransient("area");
+}
 
 void AreaHelp::save() const
 {
@@ -95,7 +113,7 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 
     in << "автор {y" << area->authors << "{x";
 
-    if (str_cmp(area->translator, ""))
+    if (!area->translator.empty())
         in << ", перевод {y" << area->translator << "{x";
 
     // This bit is going to be replaced with a link to the map by the webclient.
@@ -106,12 +124,14 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
     if (IS_SET(area->area_flag, AREA_SAFE|AREA_EASY|AREA_HARD|AREA_DEADLY))
         in << "Уровень опасности: " << area_danger_long(area) << endl;
 
-    if (strlen(area->credits) > 0 
-            && str_str(area->credits, area->getName().c_str()) == 0
-            && str_str(area->getName().c_str(), area->credits) == 0)
-    {
-        in << "{DТакже известна как: " << area->credits << "{x" << endl;
-    }
+    // Make a list of all alternative names excluding the main one.
+    list<DLString> altnames = String::toNormalizedList(area->altname);
+    list<DLString> names = String::toNormalizedList(area->name);
+    names.splice(names.end(), altnames);
+    names.remove(area->getName().colourStrip());
+
+    if (!names.empty())
+        in << "{DТакже известна как: " << String::join(names, ", ") << "{x" << endl;
 
     in << endl;
 
@@ -129,7 +149,7 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
             in << "{yЗадания{x:" << endl << qbuf.str() << endl;
     }
 
-    if (str_cmp(area->speedwalk, "")) {
+    if (!area->speedwalk.empty()) {
         in << "{yКак добраться{x: ";
 
         // For speedwalks that only contain run path, surround it with {hs tags.
@@ -147,7 +167,7 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
     }
 }
 
-/** Get self-help article for this area, either a real one or automatically created. */
+/** Get self-help article for this area. */
 AreaHelp * area_selfhelp(AreaIndexData *area)
 {
     for (auto &article: area->helps) {

@@ -13,7 +13,7 @@
 #include "act.h"
 #include "merc.h"
 #include "loadsave.h"
-
+#include "string_utils.h"
 #include "vnum.h"
 #include "def.h"
 
@@ -108,7 +108,7 @@ void DefaultClan::makeMonument( Character *ch, Character *killer ) const
     obj->setDescription( 
             fmt( NULL, monument.getValue( ).c_str( ), ch, killer ), LANG_DEFAULT );
 
-    DLString nameFormat = monumentName + " " + obj->getKeyword().toString();
+    DLString nameFormat = monumentName + " " + String::toString(obj->getKeyword());
     DLString monumentName = fmt(0, nameFormat.c_str(), ch->getNameC(), killer->getNameC());
     obj->setKeyword(monumentName.c_str(), LANG_DEFAULT);
 

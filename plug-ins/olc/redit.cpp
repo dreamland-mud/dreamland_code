@@ -301,7 +301,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     if (!pRoom->extra_exits.empty()) {
         ptc(ch, "Extra exits: {D(eexit help){x\r\n");
         for(auto &eed: pRoom->extra_exits) {
-            ptc(ch, "    [{W%s{x] %s\r\n", eed->keyword.toString().c_str(), web_edit_button(showWeb, ch, "eexit set", eed->keyword.get(EN)).c_str());
+            ptc(ch, "    [{W%s{x] %s\r\n", String::toString(eed->keyword).c_str(), web_edit_button(showWeb, ch, "eexit set", eed->keyword.get(EN)).c_str());
         }
         
     } else {
@@ -613,7 +613,9 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
 
         ptc(ch, "У выхода на {g%s{x в комнате [{W%d{x] {W%s{x установлены:\r\n", dirs[rev].name, to_room->vnum, to_room->getName());
         ptc(ch, "    флаги выхода: {g%s{x\r\n", exit_flags.names(dst->exit_info_default).c_str());
-        ptc(ch, "    имена: '{g%s{x', '{g%s{x'\r\n", dst->keyword.toString().c_str(), dst->short_descr.toString().c_str());
+        ptc(ch, "    имена: '{g%s{x', '{g%s{x'\r\n", 
+                    String::toString(dst->keyword).c_str(), 
+                    String::toString(dst->short_descr).c_str());
         ptc(ch, "    ключ: {W%d{x\r\n", dst->key);
         return true;
     }   

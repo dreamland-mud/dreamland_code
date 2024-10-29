@@ -937,7 +937,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
                 return;
         }
 
-        buf << fmt(0, "Name(s): %s\n\r", obj->getKeyword( ).toString().c_str() );
+        buf << fmt(0, "Name(s): %s\n\r", String::toString(obj->getKeyword()).c_str() );
 
         buf << fmt(0, "Vnum: %d  Лимит: %d  Тип: %s  Ресеты: %d\n\r",
                 obj->pIndexData->vnum, obj->pIndexData->limit,
@@ -1151,7 +1151,7 @@ static bool has_nopost(Character *ch)
     if (pc)
         buf << "Шорт: [" << pc->getRussianName( ).normal( ) << "] ";
     if (npc)
-        buf << "Родная зона: " << (npc->zone ? npc->zone->name : "?");
+        buf << "Родная зона: " << (npc->zone ? npc->zone->getName() : "?");
     buf << endl;
     
     if (npc)
@@ -2724,7 +2724,7 @@ CMDWIZP( olevel )
         if ( obj->level != atoi(level) )
             continue;
 
-        if ( name[0] != '\0' && !is_name(name, obj->getKeyword().toString().c_str() ) )
+        if ( name[0] != '\0' && !is_name(name, String::toString(obj->getKeyword()).c_str() ) )
             continue;
 
         found = true;

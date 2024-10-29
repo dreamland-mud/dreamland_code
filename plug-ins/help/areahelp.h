@@ -7,6 +7,8 @@
 
 #include "markuphelparticle.h"
 
+class AreaIndexData;
+
 class AreaHelp : public MarkupHelpArticle {
 XML_OBJECT
 public:
@@ -18,8 +20,9 @@ public:
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
     
+    void setAreaIndex(AreaIndexData *);
+
     bool selfHelp;
-    bool persistent;
 };
 
 inline const DLString & AreaHelp::getType( ) const

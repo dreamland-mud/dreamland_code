@@ -25,7 +25,7 @@
 #include "merc.h"
 #include "interp.h"
 #include "websocketrpc.h"
-
+#include "string_utils.h"
 
 #include "olc.h"
 #include "security.h"
@@ -83,7 +83,7 @@ OLCStateExtraExit::commit( )
 
     pRoom->areaIndex->changed = true;
 
-    EXTRA_EXIT_DATA *eexit = pRoom->extra_exits.find(keyword.toString());
+    EXTRA_EXIT_DATA *eexit = pRoom->extra_exits.find(String::toString(keyword));
     
     if(!eexit) {
         eexit = new EXTRA_EXIT_DATA;
@@ -109,7 +109,7 @@ OLCStateExtraExit::commit( )
     eexit->msgLeaveSelf = msgLeaveSelf;
 
     // FIXME: need to update all instances
-    pRoom->room->extra_exits.findAndDestroy(keyword.toString());
+    pRoom->room->extra_exits.findAndDestroy(String::toString(keyword));
     EXTRA_EXIT_DATA *eexit0 = eexit->create();
     eexit0->resolve();
     pRoom->room->extra_exits.push_front(eexit0);

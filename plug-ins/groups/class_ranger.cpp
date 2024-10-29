@@ -36,7 +36,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "core/object.h"
-
+#include "string_utils.h"
 #include "dreamland.h"
 
 #include "movetypes.h"
@@ -414,7 +414,8 @@ static Object * create_arrow( int color, int level )
 
     arrow->timer = Date::SECOND_IN_WEEK;
 
-    arrow->setKeyword( fmt(0, arrow->getKeyword( ).toString().c_str(), str_name ).c_str());
+    DLString kw = String::toString(arrow->getKeyword());
+    arrow->setKeyword( fmt(0, kw.c_str(), str_name ).c_str());
     arrow->setShortDescr( fmt(0, arrow->getShortDescr(LANG_DEFAULT).c_str(), str_short ), LANG_DEFAULT);        
     arrow->setDescription( fmt(0, arrow->getDescription(LANG_DEFAULT).c_str(), str_long ), LANG_DEFAULT);        
     

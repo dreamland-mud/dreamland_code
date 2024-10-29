@@ -142,7 +142,8 @@ bool CardPackBehavior::use( Character *user, const char *args )
         card = create_object( pCardIndex, 0 );
         card->timer = (1 + myAttr->getLevel( )) * 3 * 60 * 60;
         card->setShortDescr( fmt(0, card->getShortDescr(LANG_DEFAULT).c_str(), victim->getNameP( '2' ).c_str( )), LANG_DEFAULT );
-        card->setKeyword( fmt(0, card->getKeyword( ).toString().c_str(), victim->getName( ).c_str( )).c_str() );
+        DLString kw = String::toString(card->getKeyword());
+        card->setKeyword(fmt(0, kw.c_str(), victim->getNameC()));
         
         CardBehavior::Pointer bhv( NEW );
         bhv->setObj( card );

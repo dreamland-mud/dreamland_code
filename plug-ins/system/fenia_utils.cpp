@@ -162,7 +162,6 @@ StringSet trigger_labels(Object* obj)
                 result.insert(legacy);    
     }
 
-    LogStream::sendNotice() << "labels " << result.toString() << " for " << obj->getShortDescr('1', LANG_DEFAULT) << endl;
     return result;
 }
 

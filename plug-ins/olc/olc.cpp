@@ -237,8 +237,8 @@ static bool area_cmp_vnum(const AreaIndexData *a, const AreaIndexData *b)
 
 static bool area_cmp_name(const AreaIndexData *a, const AreaIndexData *b) 
 {
-    DLString name1 = DLString(a->name).colourStrip();
-    DLString name2 = DLString(b->name).colourStrip();
+    DLString name1 = a->getName().colourStrip();
+    DLString name2 = b->getName().colourStrip();
     return name1.compareRussian(name2) < 0;
 }
 
@@ -308,16 +308,6 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 }
 
-static DLString trim(const DLString& str, const string& chars = "\t\n\v\f\r ")
-{
-    DLString line = str;
-    line.erase(line.find_last_not_of(chars) + 1);
-    line.erase(0, line.find_first_not_of(chars));
-    return line;
-}
-
-
-
 CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 {
     DLString args = argument;
@@ -340,7 +330,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             else
                 buf = &abuf;
             for (auto &eexit: room->extra_exits) {
-                (*buf) << fmt(0, lineFormat.c_str(), room->vnum, room->getName(), eexit->keyword.toString().c_str()) << endl;
+                (*buf) << fmt(0, lineFormat.c_str(), room->vnum, room->getName(), String::toString(eexit->keyword).c_str()) << endl;
             }
         }
         

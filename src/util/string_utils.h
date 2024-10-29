@@ -1,8 +1,9 @@
 #ifndef STRING_UTILS_H
 #define STRING_UTILS_H
 
-#include "dlstring.h"
+#include <list>
 #include "lang.h"
+#include "stringlist.h"
 
 class XMLMultiString;
 
@@ -50,6 +51,17 @@ namespace String {
 
     /** Combine string from lines. */
     DLString fromLines(const std::list<DLString> &lines);
+
+    DLString join(const std::list<DLString> &list, const DLString &delim);
+
+    // Return a list of all entries in all cases
+    StringList getAllForms(const XMLMultiString &);
+
+    // Return a space-separated string of all language entries, in all cases
+    DLString toString(const XMLMultiString &);
+
+    // Return a list of all entries in nominative case and without colours
+    std::list<DLString> toNormalizedList(const XMLMultiString &);
 }
 
 #endif

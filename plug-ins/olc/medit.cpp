@@ -199,7 +199,7 @@ void OLCStateMobile::commit()
             if(victim->group == original->group)
                 victim->group = mob.group;
 
-            if(victim->getKeyword().toString() == original->keyword.toString())
+            if(String::toString(victim->getKeyword()) == String::toString(original->keyword))
                 victim->setKeyword(mob.keyword);
 
             if(victim->act == original->act)

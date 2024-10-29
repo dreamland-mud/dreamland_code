@@ -5,6 +5,7 @@ class AreaIndexData;
 class PCMemoryInterface;
 struct mob_index_data;
 class RoomIndexData;
+class AreaHelp;
 
 namespace AreaUtils {
     // Create a "playername.area" zone for this player, with 100 vnums by default.
@@ -16,6 +17,9 @@ namespace AreaUtils {
     mob_index_data * findFirstMob(AreaIndexData *pArea);
 
     RoomIndexData * findFirstRoom(AreaIndexData *pArea);
+
+    // Create self-help article for this area.
+    AreaHelp * createHelp(AreaIndexData* pArea);
 
 };
 

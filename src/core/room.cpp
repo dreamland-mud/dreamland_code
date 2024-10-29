@@ -14,6 +14,7 @@
 #include "affect.h"
 #include "object.h"
 #include "character.h"
+#include "string_utils.h"
 #include "merc.h"
 #include "def.h"
 
@@ -24,7 +25,7 @@ LIQ(none);
 extra_exit_data *ExtraExitList::find(const DLString &keyword) const
 {
     for (auto &eexit: *this) {
-        if (eexit->keyword.toString() == keyword)
+        if (String::toString(eexit->keyword) == keyword)
             return eexit;
             
         if (eexit->keyword.matchesUnstrict(keyword))

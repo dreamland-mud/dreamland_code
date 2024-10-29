@@ -136,13 +136,10 @@ new_area_file(const char *name)
 }
 
 AreaIndexData::AreaIndexData()
-    : name(&str_empty[0]), altname(&str_empty[0]),
-      authors(&str_empty[0]), credits(&str_empty[0]),
-      translator(&str_empty[0]), speedwalk(&str_empty[0]),
+    : 
       low_range(0), high_range(0),
       min_vnum(0), max_vnum(0),
       count(0),
-      resetmsg(0),
       area_flag(0),
       behavior(AreaBehavior::NODE_NAME),
       security(9), vnum(0), changed(false),
@@ -167,7 +164,7 @@ Area * AreaIndexData::create()
 
 DLString AreaIndexData::getName(char gcase) const
 {
-    return russian_case(name, gcase);
+    return name.get(LANG_DEFAULT).ruscase(gcase);
 }
 
 Area::Area()

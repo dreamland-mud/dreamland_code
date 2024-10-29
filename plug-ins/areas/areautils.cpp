@@ -3,8 +3,9 @@
 #include "areautils.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "areahelp.h"
+#include "string_utils.h"
 #include "merc.h"
-
 #include "def.h"
 
 #define SANDBOX_VNUM_START 100000
@@ -40,8 +41,8 @@ AreaIndexData * AreaUtils::createFor(PCMemoryInterface *player)
     areaIndexes.push_back(a);
 
     DLString areaname = "Зон|а|ы|е|у|ой|е " + player->getNameP('2');
-    a->name = str_dup(areaname.c_str());
-    a->authors = str_dup(player->getNameP('1').c_str());
+    a->name[RU] = areaname;
+    a->authors = player->getNameP('1');
     a->security = 9;
     a->low_range = 1;
     a->high_range = 100;
@@ -50,6 +51,10 @@ AreaIndexData * AreaUtils::createFor(PCMemoryInterface *player)
 
     a->create();
     a->changed = true;
+
+    AreaHelp::Pointer help = createHelp(a);
+    XMLPersistent<HelpArticle> phelp(help.getPointer());
+    a->helps.push_back(phelp);
 
     return a;
 }
@@ -71,4 +76,22 @@ RoomIndexData * AreaUtils::findFirstRoom(AreaIndexData *pArea)
         return 0;
         
     return pArea->roomIndexes.begin()->second;    
+}
+
+AreaHelp * AreaUtils::createHelp(AreaIndexData *pArea)
+{
+    AreaHelp::Pointer ahelp(NEW);    
+
+    DLString aname = pArea->getName().colourStrip().quote();
+    ahelp->keyword[RU] = aname;
+    ahelp->setAreaIndex(pArea);
+
+    ahelp->setID(
+        helpManager->getLastID() + 1
+    );
+    
+    helpManager->unregistrate(AreaHelp::Pointer(ahelp));
+    helpManager->registrate(AreaHelp::Pointer(ahelp));
+    
+    return *ahelp;
 }

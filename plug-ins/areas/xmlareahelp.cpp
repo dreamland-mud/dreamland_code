@@ -8,8 +8,8 @@
 #include "so.h"
 #include "plugininitializer.h"
 #include "mocregistrator.h"
+#include "string_utils.h"
 #include "merc.h"
-
 #include "def.h"
 
 
@@ -47,6 +47,33 @@ void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent )
     parent->getAttribute(HelpArticle::ATTRIBUTE_ID, id);
 }
 
+void XMLAreaHelp::init(AreaHelp *ahelp)
+{
+    level = ahelp->getLevel();
+    id = ahelp->getID();
+    labels = ahelp->labels.persistent.toString();
+
+    title = ahelp->title;
+    extra = ahelp->extra;
+    keyword = ahelp->keyword;
+    text = ahelp->text;
+}
+
+AreaHelp::Pointer XMLAreaHelp::compat() const
+{
+    AreaHelp::Pointer help(NEW);
+
+    help->keyword = keyword;
+    help->title = title;
+    help->extra = extra;
+    help->text = text;
+    help->setLevel(level);
+    help->setID(id);
+    help->labels.addPersistent(labels);
+
+    return help;
+}
+
 
 class AreaHelpLifetimePlugin : public Plugin {
 public:
@@ -57,26 +84,11 @@ public:
         for(auto &area: areaIndexes) {
             HelpArticles::iterator a;
             HelpArticles &articles = area->helps;
-            DLString aname(area->getName());
-            aname.colourstrip();
-            
+        
             for (a = articles.begin( ); a != articles.end( ); a++) {
                 a->recover();
                 AreaHelp *help = a->getDynamicPointer<AreaHelp>();
-                help->areafile = area->area_file;
-                if (help->keyword.get(RU).empty()) {
-                    help->persistent = false;
-                    help->selfHelp = true;
-                    help->addAutoKeyword(aname.quote());
-                    help->addAutoKeyword(DLString(area->credits).colourStrip().quote());
-                }
-                else {
-                    help->persistent = true;
-                    help->selfHelp = is_name(aname.c_str(), (*a)->getAllKeywordsString().c_str());
-                }
-                if (help->selfHelp) 
-                    help->labels.addTransient("area");
-                
+                help->setAreaIndex(area);                
                 helpManager->registrate( *a );
             }
         }
@@ -94,19 +106,6 @@ public:
             }
         }
 
-    }
-
-    // Used for debugging
-    static void toStream(XMLPersistent<HelpArticle> &a) 
-    {
-        XMLNode::Pointer node( NEW );
-        XMLDocument::Pointer root( NEW );
-
-        if (a.toXML( node )) {
-            node->setName( "helps" );
-            root->appendChild( node );
-            root->save( LogStream::sendNotice() );
-        }
     }
 };
 

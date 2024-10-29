@@ -16,6 +16,7 @@ plugin_INCLUDES = $(INCLUDES_SRC) \
 
 libareas_la_SOURCES = \
 fixarea.cpp \
+areautils.cpp \
 load_xml.cpp \
 xmlareahelp.cpp \
 xmlitemtype.cpp \

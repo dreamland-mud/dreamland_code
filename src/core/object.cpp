@@ -227,7 +227,7 @@ const DLString& Object::getExtraDescr(const DLString& keys, lang_t lang)
 
 ExtraDescription* Object::getProperDescription()
 {
-    return extraDescriptions.find(getKeyword().toString());
+    return extraDescriptions.find(String::toString(getKeyword()));
 }
 
 ExtraDescription* Object::addProperDescription()
@@ -237,14 +237,14 @@ ExtraDescription* Object::addProperDescription()
         return ed;
     
     ed = new ExtraDescription();
-    ed->keyword = getKeyword().toString();
+    ed->keyword = String::toString(getKeyword());
     extraDescriptions.push_back(ed);
     return ed;
 }
 
 void Object::clearProperDescription()
 {
-    extraDescriptions.findAndDestroy(getKeyword().toString());
+    extraDescriptions.findAndDestroy(String::toString(getKeyword()));
 }
 
 

@@ -80,13 +80,13 @@ static void vnumck()
         MOB_INDEX_DATA *mob;
         OBJ_INDEX_DATA *obj;
         RoomIndexData *room;
-        char *aname = (*i)->name;
+        DLString aname = (*i)->getName();
         int l = (*i)->min_vnum, h = (*i)->max_vnum, hashi;
         int minused = 0xFFFFL, maxused = 0;
         
         if(l > h)
             throw FileFormatException(
-                "%s: min vnum is higher then max.", aname);
+                "%s: min vnum is higher then max.", aname.c_str());
         
         for (auto &r: roomIndexMap) {
             room = r.second;
@@ -96,7 +96,7 @@ static void vnumck()
             if(room->vnum < l || room->vnum > h)
                 throw FileFormatException(
                         "%s: room %d out of allocated range.", 
-                        aname, room->vnum);
+                        aname.c_str(), room->vnum);
             
             if(minused > room->vnum)
                 minused = room->vnum;
@@ -112,7 +112,7 @@ static void vnumck()
                 if(mob->vnum < l || mob->vnum > h)
                     throw FileFormatException(
                             "%s: mob %d out of allocated range.",
-                            aname, mob->vnum);
+                            aname.c_str(), mob->vnum);
                 
                 if(minused > mob->vnum)
                     minused = mob->vnum;
@@ -128,7 +128,7 @@ static void vnumck()
                 if(obj->vnum < l || obj->vnum > h)
                     throw FileFormatException(
                             "%s: obj %d out of allocated range.",
-                            aname, obj->vnum);
+                            aname.c_str(), obj->vnum);
                 
                 if(minused > obj->vnum)
                     minused = obj->vnum;
@@ -146,7 +146,7 @@ static void vnumck()
             if(h > next_l) {
                 throw FileFormatException(
                         "%s: NEGATIVE GAP(%d)! Area is intersected with %s!",  
-                        aname, next_l - h, (*i)->name);
+                        aname.c_str(), next_l - h, (*i)->name);
             }
         }
     }

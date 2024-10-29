@@ -588,18 +588,17 @@ struct AreaIndexData {
 
     DLString getName(char gcase = '1') const;
 
-    char *name;
-    char *altname;
-    char *authors;
-    char *credits;
-    char *translator;
-    char *speedwalk;
+    XMLMultiString name; // main area name in all languages
+    XMLMultiString altname; // alternative names for this area
+    DLString authors;
+    DLString translator;
+    DLString speedwalk;
     int low_range;
     int high_range;
     int min_vnum;
     int max_vnum;
     unsigned long count;
-    char *resetmsg;
+    XMLMultiString resetMessage;
     int area_flag;
     struct area_file *area_file;
     XMLPersistentStreamable<AreaBehavior> behavior;

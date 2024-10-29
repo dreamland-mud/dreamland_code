@@ -435,7 +435,7 @@ NMI_GET( CharacterWrapper, keyword, "ключевые слова моба" )
 {
     checkTarget( );
     CHK_PC
-    return Register( target->getNPC()->getKeyword().toString() );
+    return Register( String::toString(target->getNPC()->getKeyword()) );
 }
 
 NMI_SET( CharacterWrapper, keyword, "ключевые слова моба" )

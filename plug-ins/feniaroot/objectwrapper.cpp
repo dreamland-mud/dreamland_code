@@ -200,7 +200,7 @@ NMI_SET( ObjectWrapper, weight, "вес предмета")
 NMI_GET( ObjectWrapper, name , "имена предмета, на которые он откликается")
 {
     checkTarget( );
-    return Register( target->getKeyword().toString() );
+    return Register( String::toString(target->getKeyword()) );
 }
 
 NMI_SET( ObjectWrapper, name , "имена предмета, на которые он откликается")

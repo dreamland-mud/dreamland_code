@@ -76,7 +76,7 @@ AreaIndexWrapper::getTarget( ) const
 NMI_GET( AreaIndexWrapper, name, "название зоны со всеми падежами") 
 { 
     checkTarget( ); 
-    return Register( target->name);
+    return Register( target->name.get(LANG_DEFAULT));
 }
 
 NMI_GET( AreaIndexWrapper, filename, "название файла зоны") 

@@ -14,7 +14,7 @@
 #include "object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-
+#include "string_utils.h"
 #include "merc.h"
 #include "wearloc_utils.h"
 #include "arg_utils.h"
@@ -559,7 +559,7 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
         tattooVnum = OBJ_VNUM_TATTOO;
 
     obj = create_object( get_obj_index( tattooVnum ), 0 );
-    obj->setKeyword( fmt(0, obj->getKeyword( ).toString().c_str(), leader) );
+    obj->setKeyword( fmt(0, String::toString(obj->getKeyword( )).c_str(), leader) );
     obj->setShortDescr( fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), leader), LANG_DEFAULT );
 
     obj_to_char( obj, client );

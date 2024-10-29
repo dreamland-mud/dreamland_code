@@ -175,7 +175,7 @@ XMLRoom::init(RoomIndexData *room)
     }
 
     for(auto &peexit: room->extra_exits)
-        extraExits[peexit->keyword.toString()].init(peexit);
+        extraExits[String::toString(peexit->keyword)].init(peexit);
 
     for (auto &ed: room->extraDescriptions) {
         extraDescriptions.push_back(XMLExtraDescription( ));

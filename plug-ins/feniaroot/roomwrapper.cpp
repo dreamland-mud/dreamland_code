@@ -20,6 +20,7 @@
 #include "profiler.h"
 #include "behavior.h"
 #include "json_utils_ext.h"
+#include "string_utils.h"
 
 #include "structwrappers.h"
 #include "areaindexwrapper.h"
@@ -535,7 +536,7 @@ NMI_INVOKE( RoomWrapper, exitKeyword, "(номер выхода, имя экст
     if (!resolve_exits(args, target, pExit, pExtraExit))
         throw Scripting::IllegalArgumentException();
 
-    return pExtraExit ? pExtraExit->keyword.toString() : pExit->keyword.toString();
+    return pExtraExit ? String::toString(pExtraExit->keyword) : String::toString(pExit->keyword);
 }
 
 NMI_INVOKE( RoomWrapper, exitShortDescr, "(номер выхода, имя экстра/выхода): название выхода с падежами" )

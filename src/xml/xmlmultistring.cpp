@@ -175,30 +175,6 @@ void XMLMultiString::fromMixedString(const DLString &str)
     (*this)[RU] = ru.toString();
 }
 
-StringList XMLMultiString::getAllForms() const
-{
-    StringList forms;
-
-    for (int i = LANG_MIN; i < LANG_MAX; i++) {
-        lang_t lang = (lang_t)i;
-        DLString lname = get(lang).toLower();
-
-        if (lname.find('|') != DLString::npos) {
-            for (int gcase = Case::NOMINATIVE; gcase < Case::MAX; gcase++)
-                forms.push_back(lname.ruscase('1' + gcase));
-        } else {
-            forms.push_back(lname);
-        }
-    }
-
-    return forms;
-}
-
-DLString XMLMultiString::toString() const
-{
-    return getAllForms().join(" ");
-}
-
 void XMLMultiString::clearValues() 
 {
     for (auto &i: *this)

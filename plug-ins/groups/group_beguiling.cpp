@@ -31,10 +31,7 @@
 #include "terrains.h"
 #include "move_utils.h"
 #include "doors.h"
-
-
 #include "merc.h"
-
 #include "occupations.h"
 #include "loadsave.h"
 #include "act.h"
@@ -54,7 +51,7 @@ PROF(none);
  */
 void MagicJar::get( Character *ch )
 {
-    if (!ch->is_npc( ) && String::contains(obj->getKeyword().toString(), ch->getPC()->getName())) {
+    if (!ch->is_npc( ) && String::contains(String::toString(obj->getKeyword()), ch->getPC()->getName())) {
         oldact("Вот это удача!",ch,obj,0,TO_CHAR);
         extract_obj(obj);
     }
@@ -71,7 +68,7 @@ bool MagicJar::extract( bool fCount )
         if (wch->is_npc()) 
             continue;
 
-        if (String::contains(obj->getKeyword().toString(), wch->getPC()->getName()))
+        if (String::contains(String::toString(obj->getKeyword()), wch->getPC()->getName()))
         {
             if (IS_SET( wch->act, PLR_NO_EXP )) {
                 REMOVE_BIT(wch->act,PLR_NO_EXP);
@@ -156,7 +153,9 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     jar->level = ch->getRealLevel( );
 
     // TODO setup all languages
-    jar->setKeyword( fmt(0, jar->getKeyword( ).toString().c_str(), victim->getNameC()));
+
+    DLString kw = String::toString(jar->getKeyword());
+    jar->setKeyword( fmt(0, kw.c_str(), victim->getNameC()));
     jar->setShortDescr( fmt(0, jar->getShortDescr(LANG_DEFAULT).c_str(), victim->getNameC()), LANG_DEFAULT);
     jar->setDescription( fmt(0, jar->getDescription(LANG_DEFAULT).c_str(), victim->getNameC()), LANG_DEFAULT);
 

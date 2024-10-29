@@ -7,6 +7,7 @@
 #include "directions.h"
 #include "save.h"
 #include "skill_utils.h"
+#include "string_utils.h"
 #include "loadsave.h"
 #include "act.h"
 #include "vnum.h"
@@ -281,7 +282,7 @@ void Keyhole::record( Object *obj )
 {
     char *ed_text;
     DLString edEntry = getDescription().ruscase('2');
-    DLString edKey = obj->getKeyword( ).toString();
+    DLString edKey = String::toString(obj->getKeyword( ));
     DLString edText = obj->getExtraDescr(edKey, LANG_DEFAULT);
 
     if (edText.empty()) {

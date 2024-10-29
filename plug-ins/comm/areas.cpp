@@ -74,12 +74,7 @@ CMDRUNP( areas )
 
         // Filter areas by name.
         if (!args.empty( )) {
-            DLString aname = DLString( pArea->getName() );
-            DLString altname = DLString( pArea->altname );
-            DLString acredits = DLString( pArea->credits );
-            if (!is_name( args.c_str( ), aname.c_str( ) ) 
-                    && !is_name( args.c_str( ), acredits.c_str( ) )
-                    && !is_name( args.c_str( ), altname.c_str( ) ))
+            if (!pArea->name.matchesUnstrict(args) && !pArea->altname.matchesUnstrict(args))
                 continue;
         }
         

@@ -10,6 +10,7 @@
 #include "json_utils_ext.h"
 #include "loadsave.h"
 #include "behavior.h"
+#include "string_utils.h"
 
 #include "objindexwrapper.h"
 #include "affectwrapper.h"
@@ -102,7 +103,7 @@ NMI_GET( ObjIndexWrapper, description, "описание, видимое на з
 NMI_GET( ObjIndexWrapper, name, "имена предмета, на которые он откликается") 
 { 
     checkTarget( ); 
-    return Register( target->keyword.toString());
+    return Register( String::toString(target->keyword));
 }
 
 NMI_GET( ObjIndexWrapper, short_descr, "описание, видимое в инвентаре и при манипуляциях") 

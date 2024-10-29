@@ -94,7 +94,6 @@ bool mob_has_behavior(NPCharacter *mob, BehaviorReference& bhv)
 
 NPCharacter * find_attracted_mob( Character *ch, int occType )
 {
-    PCharacter *pch = ch->getPC();
     NPCharacter *mob = NULL;
     
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)

@@ -12,6 +12,7 @@
 #include "loadsave.h"
 #include "pet.h"
 #include "behavior.h"
+#include "string_utils.h"
 
 #include "mobindexwrapper.h"
 #include "wrappermanager.h"
@@ -83,7 +84,7 @@ MobIndexWrapper::getTarget( ) const
 NMI_GET( MobIndexWrapper, name, "имена, на которые откликается моб") 
 { 
     checkTarget( ); 
-    return target->keyword.toString();
+    return String::toString(target->keyword);
 }
 NMI_GET( MobIndexWrapper, short_descr, "имя, которое видно когда моб совершает действия") 
 { 

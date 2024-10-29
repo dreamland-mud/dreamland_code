@@ -17,6 +17,7 @@
 #include "websocketrpc.h"
 #include "merc.h"
 #include "arg_utils.h"
+#include "areautils.h"
 #include "update_areas.h"
 #include "interp.h"
 #include "act.h"
@@ -35,26 +36,20 @@ OLCStateArea::OLCStateArea(AreaIndexData *original) : area_flag(0, &area_flags)
     if (original) {
         if(original->area_file->file_name)
             file_name = original->area_file->file_name;
-        if(original->name)
-            name      = original->name;
-        if(original->name)
-            credits   = original->credits;
+
+        name = original->name;
+        altname = original->altname;
+        resetMessage = original->resetMessage;
+        authors = original->authors;
+        translator = original->translator;
+        speedwalk = original->speedwalk;
+
         low_range = original->low_range;
         high_range= original->high_range;
         min_vnum  = original->min_vnum;
         max_vnum  = original->max_vnum;
-        if(original->resetmsg)
-            resetmsg  = original->resetmsg;
         area_flag.setValue( original->area_flag );
         security  = original->security;
-        if(original->authors)
-            authors = original->authors;
-        if(original->altname)
-            altname = original->altname;
-        if (original->translator)
-            translator = original->translator;
-        if (original->speedwalk)
-            speedwalk = original->speedwalk;
         vnum      = original->vnum;
 
         if (original->behavior) 
@@ -70,18 +65,12 @@ OLCStateArea::OLCStateArea(AreaIndexData *original) : area_flag(0, &area_flags)
         top_area++;
         vnum = top_area - 1;
 
-        name = "New area";
+        name[RU] = "Новая зона";
         security = 9;
-        authors = "None";
-        translator = "None";
-        speedwalk = "";
-        altname = "";
         min_vnum = 0;
         max_vnum = 0;
         low_range = 0;
         high_range = 0;
-        credits = "None";
-        resetmsg = "";
         file_name.setValue( DLString( "area" ) + DLString( vnum ) + ".are" );
     }
 }
@@ -106,28 +95,20 @@ void OLCStateArea::commit()
     else {
         free_string(original->area_file->file_name);
         original->area_file->file_name = str_dup( file_name.getValue( ).c_str( ) );
-        free_string(original->name);
-        free_string(original->credits);
-        free_string(original->resetmsg);
-        free_string(original->authors);
-        free_string(original->altname);
-        free_string(original->translator);
-        free_string(original->speedwalk);
     }
 
-    original->name      = str_dup( name.getValue( ).c_str( ) );
-    original->credits   = str_dup( credits.getValue( ).c_str( ) );
+    original->name = name;
+    original->altname = altname;
+    original->authors = authors;
+    original->translator = translator;
+    original->speedwalk = speedwalk;
+    original->resetMessage = resetMessage;
     original->low_range = low_range;
     original->high_range= high_range;
     original->min_vnum  = min_vnum;
     original->max_vnum  = max_vnum;
-    original->resetmsg  = str_dup( resetmsg.getValue( ).c_str( ) );
     original->area_flag = area_flag;
     original->security  = security;
-    original->authors = str_dup( authors.getValue( ).c_str( ) );
-    original->altname = str_dup( altname.getValue( ).c_str( ) );
-    original->translator = str_dup( translator.getValue( ).c_str( ) );
-    original->speedwalk = str_dup( speedwalk.getValue( ).c_str( ) );
     original->vnum = vnum;
     original->changed = true;
 
@@ -142,11 +123,17 @@ void OLCStateArea::commit()
 
     // FIXME update all instances
     original->area->area_flag = area_flag;
+
+    if (original->helps.empty()) {
+        AreaHelp::Pointer help = AreaUtils::createHelp(original);
+        XMLPersistent<HelpArticle> phelp(help.getPointer());
+        original->helps.push_back(phelp);
+    }
 }
 
 void OLCStateArea::statePrompt(Descriptor *d) 
 {
-    d->send( "Editing area> " );
+    d->send( "Area> " );
 }
 
 bool OLCStateArea::checkOverlap(int lower, int upper)
@@ -177,19 +164,22 @@ AEDIT(show, "показать", "показать все поля")
     AreaIndexData *original = get_area_data(vnum);
     Area *instance = original ? original->area : 0;
 
-    ptc(ch, "Name:       [%5d] %s %s\n\r", 
-        vnum.getValue( ), name.getValue( ).c_str( ),
-        web_edit_button(ch, "name", "web").c_str());
-    ptc(ch, "File:       [%s]\n\r", file_name.getValue( ).c_str( ));
-    ptc(ch, "Vnums:      [%u-%u]\n\r", min_vnum.getValue( ), max_vnum.getValue( ));
-    ptc(ch, "Levels:     [%u-%u]\n\r", low_range.getValue( ), high_range.getValue( ));
-    ptc(ch, "Security:   [%d]\n\r", security.getValue( ));
-    ptc(ch, "Authors:    [%s]\n\r", authors.getValue( ).c_str( ));
-    ptc(ch, "Credits:    [%s]\n\r", credits.getValue( ).c_str( ));
-    ptc(ch, "Translator: [%s]\n\r", translator.getValue( ).c_str( ));
-    ptc(ch, "Speedwalk:  [%s]\n\r", speedwalk.getValue( ).c_str( ));
-    ptc(ch, "Message:    [%s]\n\r", resetmsg.getValue( ).c_str( ));
-    ptc(ch, "Flags:      [%s] {D(? area_flags{w)\n\r", area_flags.names(area_flag).c_str());
+    ptc(ch, "Area:       [{C%5d{x]\n\r", vnum.getValue( ));
+    ptc(ch, "Name EN:    [{W%s{x] %s\n\r", name.get(EN).c_str(), web_edit_button(ch, "name", "web").c_str());   
+    ptc(ch, "Name UA:    [{W%s{x] %s\n\r", name.get(UA).c_str(), web_edit_button(ch, "uaname", "web").c_str());   
+    ptc(ch, "Name RU:    [{W%s{x] %s\n\r", name.get(RU).c_str(), web_edit_button(ch, "runame", "web").c_str());   
+    ptc(ch, "Authors:    [{W%s{x]\n\r", authors.getValue( ).c_str( ));
+    ptc(ch, "Translator: [{W%s{x]\n\r", translator.getValue( ).c_str( ));
+    ptc(ch, "File:       [{W%s{x]\n\r", file_name.getValue( ).c_str( ));
+    ptc(ch, "Vnums:      [{W%u-%u{x]\n\r", min_vnum.getValue( ), max_vnum.getValue( ));
+    ptc(ch, "Levels:     [{W%u-%u{x]\n\r", low_range.getValue( ), high_range.getValue( ));
+    ptc(ch, "Flags:      [{W%s{x] {D(? area_flags{w)\n\r", area_flags.names(area_flag).c_str());
+    ptc(ch, "Security:   [{W%d{x]\n\r", security.getValue( ));
+    ptc(ch, "Speedwalk:  [{W%s{x]\n\r", speedwalk.getValue( ).c_str( ));
+    ptc(ch, "Message:    [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
+          String::stripEOL(resetMessage.get(EN)).c_str(), web_edit_button(ch, "message", "web").c_str(),   
+          String::stripEOL(resetMessage.get(UA)).c_str(), web_edit_button(ch, "uamessage", "web").c_str(),   
+          String::stripEOL(resetMessage.get(RU)).c_str(), web_edit_button(ch, "rumessage", "web").c_str());   
 
     if (instance)
         ptc(ch, "{DMain instance: empty [%s], age [%d], players [%d], flags [%s], rooms count [%d]{x\n\r",
@@ -208,13 +198,10 @@ AEDIT(show, "показать", "показать все поля")
                     +  web_edit_button(ch, "hedit", DLString(article->getID()))
                     + " {D(hedit " + DLString(article->getID()) + "){x\r\n";
 
-        if (!buf.empty())
-            ch->pecho("Helps:\r\n" + buf);
-        else
-            ch->pecho("Helps:      (none) ({y{hchelp create{hx {Dto add area help{w)");
+        ch->pecho("Helps:\r\n" + buf);
 
     } else {
-        ptc(ch, "Helps:      {Dno helps for the new area, save and use {yhelp create{x\r\n");
+        ptc(ch, "Helps:      {Dno helps for the new area, save first\r\n");
     }
 
     if (original) {
@@ -347,92 +334,6 @@ AEDIT(quest, "квест", "редактировать квесты в зоне"
     return false;
 }
 
-
-AEDIT(helps, "справка", "создать или посмотреть справку по зоне")
-{
-    DLString arg = argument;
-    AreaIndexData *original = get_area_data(vnum);
-
-    if (!original) {
-        stc("Сперва сохрани новую арию.", ch);
-        return false;
-    }
-
-    if (arg.empty()) {
-        stc("Статьи справки, объявленные внутри этой зоны: \r\n", ch);
-        bool hasHelp = false;
-
-        for (auto &article: original->helps) {
-            if (article->getID() > 0) {
-                ch->pecho(
-                    "    [{C" + article->getAllKeywordsString() + "{x] "
-                    +  web_edit_button(ch, "hedit", DLString(article->getID()))
-                    + " {D(hedit " + DLString(article->getID()) + "){x");
-
-                hasHelp = true;
-            }
-        }
-
-        if (!hasHelp)
-            ch->pecho("    (нет)");
-
-        AreaHelp *ahelp = area_selfhelp(original);
-        if (!ahelp || !ahelp->persistent)
-            ch->pecho("Используй {y{hchelp create{x для создания справки по зоне.");
-
-        return false;
-    }
-
-    if (arg_is(arg, "create")) {
-        AreaHelp *ahelp = area_selfhelp(original);
-        if (!ahelp) {
-            ch->pecho("Не найдена автоматическая справка по этой зоне, что-то поломалось.");
-            return false;
-        }
-
-        if (ahelp->persistent) {
-            ch->pecho("Справка по этой зоне уже существет, запускаю редактор.");
-        } else {
-
-            ch->pecho("Превращаю автоматическую справку по зоне в постоянную.");
-            ahelp->persistent = true;
-
-            DLString aname = DLString(original->name).colourStrip().quote();
-            DLString acredits = DLString(original->credits).colourStrip().quote();
-            StringSet kwd_en, kwd_ru;
-
-            if (String::hasCyrillic(aname))
-                kwd_ru.fromString(aname);
-            else
-                kwd_en.fromString(aname);
-
-            if (String::hasCyrillic(acredits))
-                kwd_ru.fromString(acredits);
-            else
-                kwd_en.fromString(acredits);
-
-            ahelp->keyword[RU] = kwd_ru.toString();
-            ahelp->keyword[EN] = kwd_en.toString();
-            ahelp->refreshKeywords();
-
-            ahelp->setID(
-                help_next_free_id()
-            );
-            helpManager->unregistrate(AreaHelp::Pointer(ahelp));
-            helpManager->registrate(AreaHelp::Pointer(ahelp));
-        }
-
-        OLCStateHelp::Pointer hedit(NEW, ahelp);
-        hedit->attach(ch);
-        hedit->show(ch);
-
-        return true;
-    }
-
-    stc("Использование: helps, helps create\r\n", ch);
-    return false;
-}
-
 AEDIT(reset, "сбросить", "сбросить арию, обновив всех мобов, предметы и двери")
 {
     AreaIndexData *original = get_area_data(vnum);
@@ -458,57 +359,39 @@ AEDIT(create, "создать", "создать новую арию")
     return false;
 }
 
-AEDIT(name, "имя", "установить имя (то, что видно по команде 'зоны' и 'где')")
+AEDIT(name, "имя", "установить имя зоны")
 {
-    return editor(argument, name, (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
+    return editor(argument, name[EN], (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
 }
 
-
-AEDIT(credits, "копирайт", "установить исходное имя (для переведенных зон)")
+AEDIT(uaname, "укимя", "установить имя зоны")
 {
-    if (!*argument) {
-        stc("Синтаксис:   credits [$credits]\n\r", ch);
-        return false;
-    }
-
-    credits = argument;
-
-    stc("Копирайт установлен.\n\r", ch);
-    return true;
+    return editor(argument, name[UA], (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
 }
 
-AEDIT(message, "сообщение", "установить сообщение, видимое при сбросе арии (мелодичный перезвон колокольчиков)")
-{        
-    if (!*argument) {
-        stc("Синтаксис:   message [resetmsg]\n\r", ch);
-        return false;
-    }
+AEDIT(runame, "ruимя", "установить имя зоны")
+{
+    return editor(argument, name[RU], (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
+}
 
-    resetmsg = argument;
+AEDIT(message, "сообщение", "установить сообщение, видимое при сбросе зоны")
+{
+    return editor(argument, resetMessage[EN], (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
+}
 
-    stc("Resetmsg установлен.\n\r", ch);
-    return true;
+AEDIT(uamessage, "уксообщение", "установить сообщение, видимое при сбросе зоны")
+{
+    return editor(argument, resetMessage[UA], (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
+}
+
+AEDIT(rumessage, "русообщение", "установить сообщение, видимое при сбросе зоны")
+{
+    return editor(argument, resetMessage[RU], (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
 }
 
 AEDIT(flags, "флаги", "установить или сбросить флаги арии (? area_flags)")
 {
-    bitstring_t value;
-
-    if (!*argument) {
-        stc("Синтаксис:   flag [$areaflags]\n\r", ch);
-        return false;
-    }
-
-    value = area_flags.bitstring( argument );
-
-    if (value == NO_FLAG) {
-        stc("No such area flag.\n\r", ch);
-        return false;
-    }
-    
-    area_flag.toggleBit( value );
-    stc("Flag toggled.\n\r", ch);
-    return true;
+    return flagBitsEdit(area_flag);
 }
 
 AEDIT(file, "файл", "установить имя файла, в который сохраняется ария")
