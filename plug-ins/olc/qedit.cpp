@@ -272,9 +272,9 @@ static void show_step(PCharacter *ch, AreaQuest *q, int s)
         buf << "{D[" << web_cmd(ch, "step  " + stepNum + " down", "вниз") << "]{w ";
 
     buf << endl
-        << "{WИнфо{w:    [" << step->info[RU] << "] " << web_edit_button(ch, "step " + stepNum + " ruinfo", "web")
-        << "  [" << step->info[EN] << "] " << web_edit_button(ch, "step " + stepNum + " info", "web") 
-        << "  [" << step->info[UA] << "] " << web_edit_button(ch, "step " + stepNum + " uainfo", "web") << endl
+        << "{WИнфо{w:    EN [" << step->info[EN] << "] " << web_edit_button(ch, "step " + stepNum + " info", "web")
+        << "  UA [" << step->info[UA] << "] " << web_edit_button(ch, "step " + stepNum + " uainfo", "web") 
+        << "  RU [" << step->info[RU] << "] " << web_edit_button(ch, "step " + stepNum + " ruinfo", "web") << endl
         << "{WНаграда{w: " << show_step_reward(ch, step) << endl
         << "{WНачало{w:  тип " << menu_step_type(s, step->beginType, "begin") << "{w, "
         << "триггер " << menu_step_trigger(s, step->beginType, step->beginTrigger, "begin") << "{w, "
