@@ -19,8 +19,8 @@
 #include "clanreference.h"
 #include "pcharacter.h"
 #include "room.h"
-
-#include "occupations.h"
+#include "../loadsave/behavior_utils.h"
+#include "areaquestutils.h"
 #include "occupations.h"
 #include "skill_utils.h"
 #include "comm.h"
@@ -31,6 +31,22 @@
 #include "def.h"
 
 CLAN(battlerager);
+
+static bool mprog_cant_teach( PCharacter *client, NPCharacter *teacher, const char *skillName )
+{
+    if (behavior_trigger(teacher, "CantTeach", "CCs", teacher, client, skillName))
+        return true;
+
+    FENIA_CALL( teacher, "CantTeach", "Cs", client, skillName );
+    FENIA_NDX_CALL( teacher, "CantTeach", "CCs", teacher, client, skillName );
+    return false;
+}
+
+static void mprog_teach( PCharacter *client, NPCharacter *teacher, const char *skillName )
+{
+    aquest_trigger(teacher, client, "Teach", "CCs", teacher, client, skillName);
+    behavior_trigger(teacher, "Teach", "CCs", teacher, client, skillName);
+}
 
 COMMAND(CPractice, "practice")
 {
@@ -170,11 +186,11 @@ void CPractice::pracHere( PCharacter *ch )
 {
     std::basic_ostringstream<char> buf;
     Character *teacher;
-    bool found = false;
     const char *patternNoHelp = "%-27s ";
     const char *patternHelp = "{hh%d%-27s{hx ";
     const char *patternLearned = "изучено на %s%d%%{x";
     PracInfo info;
+    bool found = false;
 
     if (!( teacher = findTeacher( ch ) ))
         if (!( teacher = findPracticer( ch ) )) {
@@ -234,14 +250,11 @@ void CPractice::pracHere( PCharacter *ch )
         page_to_char( buf.str( ).c_str( ), ch );
     else
         ch->pecho("Тебе нечему научиться у %C2.", teacher );
+
+    if (teacher->is_npc())
+        mprog_teach(ch, teacher->getNPC(), "here");
 }
 
-static bool mprog_cant_teach( PCharacter *client, NPCharacter *teacher, const char *skillName )
-{
-    FENIA_CALL( teacher, "CantTeach", "Cs", client, skillName );
-    FENIA_NDX_CALL( teacher, "CantTeach", "CCs", teacher, client, skillName );
-    return false;
-}
 
 void CPractice::pracLearn( PCharacter *ch, DLString &arg )
 {
@@ -312,6 +325,10 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
         ch->pecho("Теперь ты хорошо владеешь умением {W%K1{x.", skill);
         ch->pecho( "Дальше практиковать не получится, просто начни применять его почаще." );        
         ch->recho("%^C1 теперь хорошо владеет умением {W%K1{x.", ch, skill);
+    }
+
+    if (teacher->is_npc()) {
+        mprog_teach(ch, teacher->getNPC(), skill->getName().c_str());
     }
 }
 

@@ -13,8 +13,9 @@
 #include "commandtemplate.h"
 #include "hometown.h"
 #include "occupations.h"
-#include "occupations.h"
 #include "core/behavior/behavior_utils.h"
+#include "../loadsave/behavior_utils.h"
+#include "areaquestutils.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
@@ -29,9 +30,20 @@ HOMETOWN(frigate);
 
 static bool mprog_cant_train( PCharacter *client, NPCharacter *trainer )
 {
+    if (behavior_trigger(trainer, "CantTrain", "CC", trainer, client))
+        return true;
+
+    // TODO will become obsolete after 'bedit trainer' with 'maxTrainLevel' property
     FENIA_CALL( trainer, "CantTrain", "C", client );
     FENIA_NDX_CALL( trainer, "CantTrain", "CC", trainer, client );
     return false;
+}
+
+static void mprog_train(PCharacter *client, NPCharacter *trainer, bitnumber_t stat)
+{
+    const char *statname = stat_table.fields[stat].name;
+    aquest_trigger(trainer, client, "Train", "CCs", trainer, client, statname);
+    behavior_trigger(trainer, "Train", "CCs", trainer, client, statname);
 }
 
 Trainer::Trainer( )
@@ -155,6 +167,8 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 
     oldact("Ты повышаешь {W$N4{x!", client, 0, stat_table.fields[stat].message, TO_CHAR );
     oldact("$c1 повышает {W$N4!{x", client, 0, stat_table.fields[stat].message, TO_ROOM );
+
+    mprog_train(client, ch, stat);
 }
 
 
