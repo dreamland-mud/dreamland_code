@@ -3,6 +3,7 @@
  * ruffina, Dream Land, 2004
  */
 #include "flagtable.h"
+#include "dl_strings.h"
 
 /*----------------------------------------------------------------------
  * FlagTable
@@ -20,6 +21,10 @@ int FlagTable::index( const DLString &arg, bool strict ) const
         else {
             if (arg.strPrefix( fields[i].name ))
                 return i;
+            if (arg.strPrefix(russian_case(fields[i].message, '1')))
+		return i;
+            if (arg.strPrefix(russian_case(fields[i].message, '4')))
+		return i;
         }
 
     return NO_FLAG;

@@ -25,6 +25,7 @@ static IdRef ID_NAME("name");
 static IdRef ID_NAMES("names");
 static IdRef ID_MESSAGE("message");
 static IdRef ID_MESSAGES("messages");
+static IdRef ID_FIND("find");
 
     
 TableWrapper::TableWrapper() : table(0)
@@ -60,6 +61,36 @@ TableWrapper::getField(const Register &key)
 
     if ((key == ID_TABNAME).toBoolean()) {
         return FlagTableRegistry::getName(table);
+    }
+
+    // List of all values for this table    
+    if ((key == ID_VALUES).toBoolean()) {
+        RegList::Pointer values(NEW);
+
+        for (int i = 0; i < table->size; i++) {
+            Bitstring flag;
+                        
+            if (table->enumerated)
+                flag.setValue(table->fields[i].value);
+            else
+                flag.setBitNumber(table->fields[i].value);
+
+            values->push_back(
+                Register((int)flag.getValue()));
+        }
+            
+        return ::wrap(values);
+    }
+
+    // List of all names for this table
+    if ((key == ID_NAMES).toBoolean()) {
+        RegList::Pointer names(NEW);
+
+        for (int i = 0; i < table->size; i++)
+            names->push_back(
+                Register(table->fields[i].name));
+            
+        return ::wrap(names);
     }
 
     const DLString &flag = Lex::getThis()->getName(key.toIdentifier());
@@ -122,6 +153,15 @@ TableWrapper::callMethod(const Register &key, const RegisterList &args)
             return table->message(value, gcase);
         else
             return table->messages(value, true, gcase);
+    }
+
+    // Unstrict lookup by string
+    if ((key == ID_FIND).toBoolean()) {
+        const DLString &arg = argnum2string(args, 1);
+        if (table->enumerated)
+            return table->value(arg.c_str(), false);
+        else
+            return (int)table->bitstring(arg.c_str(), false);
     }
 
     throw Scripting::Exception("no such method in this object");
