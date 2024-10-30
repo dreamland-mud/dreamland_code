@@ -150,7 +150,7 @@ const DLString& NPCharacter::getKeyword(lang_t lang) const
 
 const XMLMultiString& NPCharacter::getKeyword() const
 {
-    return keyword;
+    return keyword.emptyValues() ? pIndexData->keyword : keyword;;
 }
 
 void NPCharacter::setDescription( const DLString& d, lang_t lang )
@@ -165,7 +165,7 @@ const DLString & NPCharacter::getDescription( lang_t lang ) const
 
 const XMLMultiString & NPCharacter::getDescription( ) const
 {
-    return description;
+    return description.emptyValues() ? pIndexData->description : description;;
 }
 
 void NPCharacter::setDescription( const XMLMultiString &description )
@@ -232,7 +232,7 @@ void NPCharacter::setShortDescr( const DLString& d, lang_t lang )
 void NPCharacter::setLongDescr( const DLString& d, lang_t lang )
 {
     long_descr[lang] = d;
-}
+}c
 
 /*****************************************************************************
  * name and sex formatting
