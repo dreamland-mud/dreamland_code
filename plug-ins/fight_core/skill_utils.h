@@ -10,6 +10,7 @@ class PCharacter;
 class PCSkillData;
 class XMLSkillReference;
 class Object;
+class Bonus;
 
 /**
  * Return true if this skill is a temporary one for the character
@@ -78,5 +79,8 @@ extern const char *SKILL_INFO_PAD;
 short get_wear_level( Character *ch, Object *obj );
 
 int skill_lookup(const DLString &constName, Character *ch);
+
+bool bonus_check_and_report(Bonus &bonus, Character *ch);
+
 
 #endif

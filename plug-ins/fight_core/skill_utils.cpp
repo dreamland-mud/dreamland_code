@@ -10,6 +10,7 @@
 #include "core/object.h"
 #include "calendar_utils.h"
 #include "skill.h"
+#include "bonus.h"
 #include "affectflags.h"
 #include "damageflags.h"
 #include "dreamland.h"
@@ -322,4 +323,19 @@ int skill_lookup(const DLString &constName, Character *ch)
         return skill_lookup(constName, 0);
 
     return -1;
+}
+
+bool bonus_check_and_report(Bonus &bonus, Character *ch)
+{
+    if (ch->is_npc())
+        return false;
+
+    if (!bonus.isActive(ch->getPC(), time_info))
+        return false;
+
+    ostringstream buf;
+    bonus.reportAction(ch->getPC(), buf);
+    ch->send_to(buf);
+    
+    return true;
 }

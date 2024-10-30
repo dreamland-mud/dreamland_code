@@ -2,13 +2,19 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "commandtemplate.h"
+#include "skillreference.h"
+#include "bonus.h"
 #include "loadsave.h"
 #include "directions.h"
 #include "websocketrpc.h"
 #include "morphology.h"
+#include "skill_utils.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+
+GSN(perception);
+BONUS(thief_skills);
 
 #define MILD(ch)     (IS_SET((ch)->comm, COMM_MILDCOLOR))
 #define CLR_EXIT0(ch)        (MILD(ch) ? "w" : "c")
@@ -44,6 +50,27 @@ static DLString cmd_exit(Character *ch, int door, EXIT_DATA *pexit)
     return ename;
 }
 
+
+static bool check_perception(Character *ch)
+{
+    if (!gsn_perception->usable(ch))
+        return false;
+
+    int chance = gsn_perception->getEffective(ch) + skill_level_bonus(*gsn_perception, ch);
+
+    if (bonus_check_and_report(*bonus_thief_skills, ch))
+        chance += number_range(20, 25);
+
+    if (number_percent() < URANGE(1, chance, 100)) {
+        gsn_perception->improve(ch, true);
+        return true;
+
+    } else {
+        gsn_perception->improve(ch, false);
+        return false;
+    }
+}
+
 void show_exits_to_char( Character *ch, Room *targetRoom )
 {
     ostringstream buf;
@@ -56,6 +83,7 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
     bool found;
     auto clr0 = CLR_EXIT0(ch);
     auto clr1 = CLR_EXIT1(ch);
+    int hiddenExits = 0;
 
     if (eyes_blinded( ch )) 
         return;
@@ -69,8 +97,13 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
             continue;
         if (!( room = pexit->u1.to_room ))
             continue;
-        if (!ch->can_see( room ))
+        // Check for room visibility separately, so we don't spam "there are hidden exits" for immortal rooms
+        if (!ch->can_see(room))
             continue;
+        if (!ch->can_see(pexit)) {
+            hiddenExits++;
+            continue;
+        }
 
         ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
         cmd = cmd_exit(ch, door, pexit);
@@ -85,9 +118,18 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
             
 
     StringList extras;
-    for (auto &eexit: targetRoom->extra_exits)
-        if (ch->can_see(eexit))
-            extras.push_back(cmd_extra_exit(ch, eexit, false));
+    for (auto &eexit: targetRoom->extra_exits) {
+        if (!(room = eexit->u1.to_room))
+            continue;
+        if (!ch->can_see(room))
+            continue;
+        if (!ch->can_see(eexit)) {
+            hiddenExits++;
+            continue;
+        }
+
+        extras.push_back(cmd_extra_exit(ch, eexit, false));
+    }
 
     if (!extras.empty())
         buf << " {" << clr0 << "| {" << clr1 << extras.join(", ");
@@ -95,6 +137,10 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
     buf << "{" << clr0 << "]{x";
     buf << endl;
     ch->send_to( buf );
+
+    if (hiddenExits > 0 && check_perception(ch)) {
+        ch->pecho("Интуиция подсказывает тебе, что тут есть невидимые выходы.");
+    }
 }
 
 CMDRUNP( exits )
@@ -107,6 +153,7 @@ CMDRUNP( exits )
     PlayerConfig cfg;
     bool found;
     int door;
+    int hiddenExits = 0;
 
     if (eyes_blinded( ch )) {
         oldact("Ты ослепле$gно|н|на и не видишь ничего вокруг себя!", ch, 0, 0, TO_CHAR );
@@ -129,6 +176,10 @@ CMDRUNP( exits )
             continue;
         if (!ch->can_see( room ))
             continue;
+        if (!ch->can_see(pexit)) {
+            hiddenExits++;
+            continue;
+        }
 
         found = true;   
         ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
@@ -170,15 +221,26 @@ CMDRUNP( exits )
     buf.str("");
 
     for (auto &eexit: ch->in_room->extra_exits) {
-        if (ch->can_see(eexit)) {
-            buf <<  "    {C" << cmd_extra_exit(ch, eexit, true) << "{x " << endl;
-            found = true;
+        if (!(room = eexit->u1.to_room))
+            continue;
+        if (!ch->can_see(room))
+            continue;
+        if (!ch->can_see(eexit)) {
+            hiddenExits++;
+            continue;
         }
+
+        buf <<  "    {C" << cmd_extra_exit(ch, eexit, true) << "{x " << endl;
+        found = true;
     }
 
     if (found) {
         ch->pecho("\r\nДополнительные выходы:");
         ch->send_to(buf);
+    }
+
+    if (hiddenExits > 0 && check_perception(ch)) {
+        ch->pecho("Интуиция подсказывает тебе, что тут есть невидимые выходы.");
     }
 }
 
