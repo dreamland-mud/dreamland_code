@@ -27,7 +27,7 @@ struct FuzzySearch {
         arg.toLower();
 
         // For short user input, only look for very exact matches (distance 1).
-        min_distance = arg.length() > 5 ? 3 : arg.length() > 2 ? 2 : 1;
+        min_distance = arg.length() > 5 ? 4 : arg.length() > 2 ? 2 : 1;
 
         candidates.resize(min_distance + 1);
 
@@ -124,14 +124,10 @@ private:
     int getDistance(const DLString &keyword)
     {
         // Return Levenshtein distance between user input and the keyword. 
-        // The keyword is cut to match the input size (unless input is too short already),
-        // this allows for prefix matches.
         DLString kw = keyword;
 
-        if (arg.length() > 3 && arg.length() < kw.length())
-            kw = String::truncate(kw, arg.length());
-
-        return levenshtein(arg, kw, 1, 1, 1, 1);
+        int lv = levenshtein(arg, kw, 1, 2, 1, 1);
+        return lv;
     }
 
     DLString arg;
