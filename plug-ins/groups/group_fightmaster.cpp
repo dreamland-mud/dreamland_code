@@ -518,6 +518,14 @@ SKILL_APPLY(crossblock)
         chance = ( int )( chance * 0.5 );
     }
 
+    if (RoomUtils::isNature(victim->in_room) 
+        && gsn_forest_fighting->usable(victim)
+        && (number_percent() < gsn_forest_fighting->getEffective( victim ))) 
+    {
+        chance = ( int )( chance * 1.2 );
+        gsn_forest_fighting->improve( victim, true, ch );
+    }
+
     if ( number_percent( ) >= chance + ( skill_level(*gsn_cross_block, victim) - ch->getModifyLevel() ) )
         return false;
 
