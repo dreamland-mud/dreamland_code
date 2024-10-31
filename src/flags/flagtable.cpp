@@ -13,19 +13,26 @@ int FlagTable::index( const DLString &arg, bool strict ) const
     if (arg.empty( ))
         return NO_FLAG;
 
-    for (int i = 0; i < size; i++) 
-        if (strict) {
+    // Quick strict search 
+    if (strict) {
+        for (int i = 0; i < size; i++) 
             if (arg ^ fields[i].name)
                 return i;
-        } 
-        else {
-            if (arg.strPrefix( fields[i].name ))
+
+        return NO_FLAG;
+    }
+
+    // Match against all name and message entries in all cases
+    // TODO after l10n all cases should be cached
+    for (int i = 0; i < size; i++) {
+        if (arg.strPrefix( fields[i].name ))
+            return i;
+
+        std::list<DLString> cases = russian_cases(fields[i].message);
+        for (auto &msg: cases)
+            if (arg.strPrefix(msg))
                 return i;
-            if (arg.strPrefix(russian_case(fields[i].message, '1')))
-		return i;
-            if (arg.strPrefix(russian_case(fields[i].message, '4')))
-		return i;
-        }
+    }
 
     return NO_FLAG;
 }

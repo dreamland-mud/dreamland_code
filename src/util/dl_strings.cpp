@@ -235,6 +235,18 @@ DLString russian_case_all_forms(const DLString &string)
     return rs.decline(Grammar::Case::MAX).colourStrip();
 }
 
+std::list<DLString> russian_cases(const DLString &str)
+{
+    InflectedString inflected(str);
+    std::list<DLString> cases;
+
+    for (int c = Case::NOMINATIVE; c < Case::MAX; c++) {
+        cases.push_back(inflected.decline(c));
+    }
+
+    return cases;
+}
+
 /*
  * Finds the first occurrence of the substring needle(ct) in the
  * string haystack(cs), case insensitive.
