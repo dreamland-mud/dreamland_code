@@ -9,13 +9,7 @@
 #include "npcharacter.h"
 #include "room.h"
 
-// Invoke 'trigType' trigger on all elements of 'behaviors' array, with args passed in the 'ap' var args.
-// Returns a list of all non-null result registers.
-static list<Register> behavior_trigger_with_result(
-	GlobalBitvector &behaviors, 
-	const DLString &trigType, 
-	const char *fmt, 
-	va_list ap)
+list<Register> behavior_trigger_with_result(GlobalBitvector &behaviors, const DLString &trigType, const RegisterList &trigArgs)
 {
 	list<Scripting::Register> regList;
 
@@ -23,11 +17,6 @@ static list<Register> behavior_trigger_with_result(
 		return regList;
 
 	try {
-		RegisterList trigArgs;
-
-		// Collect all arguments
-		WrapperBase::triggerArgs(trigArgs, fmt, ap);
-
 		// Execute onXXX, postXXX triggers fro all behaviors associated with this item.
 		for (int &bhvIndex: behaviors.toArray()) {
 			Behavior *bhv = behaviorManager->find(bhvIndex);
@@ -53,25 +42,37 @@ static list<Register> behavior_trigger_with_result(
 	return regList;
 }
 
-static bool reglist_to_bool(list<Register> &regList)
-{
-	for (auto &reg: regList)
-		if (reg.toBoolean())
-			return true;
 
-	return false;
+// Invoke 'trigType' trigger on all elements of 'behaviors' array, with args passed in the 'ap' var args.
+// Returns a list of all non-null result registers.
+static list<Register> behavior_trigger_with_result(
+	GlobalBitvector &behaviors, 
+	const DLString &trigType, 
+	const char *fmt, 
+	va_list ap)
+{
+	list<Scripting::Register> regList;
+
+	if (behaviors.empty())
+		return regList;
+
+	try {
+		RegisterList trigArgs;
+
+		// Collect all arguments
+		WrapperBase::triggerArgs(trigArgs, fmt, ap);
+
+		return behavior_trigger_with_result(behaviors, trigType, trigArgs);
+
+	} catch (const ::Exception &e) {
+        // On error, complain to the logs and to all immortals in the game.
+		DLString methodId = "behavior on" + trigType;
+        FeniaManager::getThis()->croak(0, Scripting::Register(methodId), e);
+    }
+
+	return regList;
 }
 
-static DLString reglist_to_str(list<Register> &regList)
-{
-	ostringstream buf;
-
-	for (auto &reg: regList)
-		if (reg.type == Register::STRING)
-			buf << reg.toString();
-
-	return buf.str();
-}
 
 DLString behavior_trigger_str(Room *room, const DLString &trigType, const char *fmt, ...) 
 {

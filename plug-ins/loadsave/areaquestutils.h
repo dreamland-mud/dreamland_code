@@ -13,7 +13,12 @@ class Room;
 class AreaQuest;
 class Integer;
 class AreaQuestData;
+class WrapperBase;
+namespace Scripting {
+    class RegisterList;
+}
 
+bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLString &trigType, const Scripting::RegisterList &progArgs);
 bool aquest_trigger(Character *mob, Character *ch, const DLString &trigType, const char *fmt, ...);
 bool aquest_trigger(::Object *obj, Character *ch, const DLString &trigType, const char *fmt, ...);
 bool aquest_trigger(Room *room, Character *ch, const DLString &trigType, const char *fmt, ...);

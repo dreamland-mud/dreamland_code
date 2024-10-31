@@ -257,7 +257,7 @@ static MethodLabel * aquest_method_for_step_and_stage(MethodsByStep &methodsBySt
 /** Main 'brains' for running Fenia triggers for area quests. Return true if at least one trigger on this mob/obj/room
  * was successful.
  */
-static bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLString &trigType, const RegisterList &progArgs)
+bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLString &trigType, const RegisterList &progArgs)
 {
     bool calledOnce = false;
     MethodsByQuest methodsForQuest = aquest_find_methods(wrapperBase, trigType);

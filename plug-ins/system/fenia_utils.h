@@ -23,5 +23,12 @@ StringSet trigger_labels(Object *obj);
 // Return name of this trigger w/o 'on' or 'post' prefix
 DLString trigger_type(const DLString &constTrigger);
 
+// See if this list has a bool entry.
+bool reglist_to_bool(const list<Scripting::Register> &regList);
+
+// Collect all string entries from the list.
+DLString reglist_to_str(const list<Scripting::Register> &regList);
+
+
 #endif
 

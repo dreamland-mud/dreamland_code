@@ -165,3 +165,23 @@ StringSet trigger_labels(Object* obj)
     return result;
 }
 
+
+bool reglist_to_bool(const list<Register> &regList)
+{
+	for (auto &reg: regList)
+		if (reg.toBoolean())
+			return true;
+
+	return false;
+}
+
+DLString reglist_to_str(const list<Register> &regList)
+{
+	ostringstream buf;
+
+	for (auto &reg: regList)
+		if (reg.type == Register::STRING)
+			buf << reg.toString();
+
+	return buf.str();
+}

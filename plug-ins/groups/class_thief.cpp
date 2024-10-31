@@ -78,27 +78,6 @@ GSN(steal);
 
 BONUS(thief_skills);
 
-static bool mprog_steal_fail( Character *victim, Character *thief )
-{
-    FENIA_CALL( victim, "StealFail", "C", thief );
-    FENIA_NDX_CALL( victim->getNPC( ), "StealFail", "CC", victim, thief );
-    return false;
-}
-
-static bool mprog_steal_item( Character *victim, Character *thief, Object *obj )
-{
-    FENIA_CALL( victim, "StealItem", "CO", thief, obj );
-    FENIA_NDX_CALL( victim->getNPC( ), "StealItem", "CCO", victim, thief, obj );
-    return false;
-}
-
-static bool mprog_steal_money( Character *victim, Character *thief, int gold, int silver )
-{
-    FENIA_CALL( victim, "StealMoney", "Cii", thief, gold, silver );
-    FENIA_NDX_CALL( victim->getNPC( ), "StealMoney", "CCii", victim, thief, gold, silver );
-    return false;
-}
-
 /*----------------------------------------------------------------------------
  * Backstab
  *---------------------------------------------------------------------------*/

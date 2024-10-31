@@ -39,6 +39,7 @@
 #include "player_exp.h"
 #include "fight.h"
 #include "skill_utils.h"
+#include "areaquestutils.h"
 #include "immunity.h"
 #include "magic.h"
 #include "movetypes.h"
@@ -70,12 +71,14 @@
 #include "mobindexwrapper.h"
 #include "structwrappers.h"
 #include "affectwrapper.h"
+#include "areaquestwrapper.h"
 #include "xmleditorinputhandler.h"
 #include "reglist.h"
 #include "regcontainer.h"
 #include "nativeext.h"
 #include "idcontainer.h"
 #include "fenia_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "wrap_utils.h"
 #include "subr.h"
 #include "def.h"
@@ -2816,6 +2819,60 @@ NMI_INVOKE(CharacterWrapper, behaviorMethod, "(methodName, args...): вызва�
     throw Scripting::Exception(methodName + " behavior method not supported yet");
 }
 
+// Call aquest trigger if applicable for this target.
+static bool call_aquest_trigger(CharacterWrapper *wrapper, const DLString &trigName, const RegisterList &trigArgs)
+{
+    Character *target = wrapper->getTarget();
+
+    if (!target->is_npc())
+        return false;
+
+    // Assume first argument is the PC quest doer
+    CharacterWrapper *chWrap = wrapper_cast<CharacterWrapper>(trigArgs.front());
+    if (!chWrap)
+        return false;
+
+    Character *ch = chWrap->getTarget();
+    if (ch->is_npc())
+        return false;
+
+    return aquest_trigger(wrapper, ch->getPC(), trigName, trigArgs);
+}
+
+// Call behavior triggers if applicable for this target.
+static bool call_behavior_trigger(CharacterWrapper *wrapper, const DLString &trigName, const RegisterList &trigArgs)
+{
+    Character *target = wrapper->getTarget();
+
+    if (!target->is_npc())
+        return false;
+
+    GlobalBitvector &behaviors = target->getNPC()->pIndexData->behaviors;
+    if (behaviors.empty())
+        return false;
+
+    // Make this mob a first argument
+    RegisterList behaviorTrigArgs = trigArgs;
+    behaviorTrigArgs.push_front(Register(wrapper->getSelf()));
+
+    auto results = behavior_trigger_with_result(behaviors, trigName, behaviorTrigArgs);
+    return reglist_to_bool(results);
+}
+
+// Call normal onXXX, postXXX Fenia triggers on the target.
+static Register call_fenia_trigger(CharacterWrapper *wrapper, const DLString &trigName, const RegisterList &trigArgs)
+{
+    Character *target = wrapper->getTarget();
+
+    // If it's a mob, access its mob index data wrapper.
+    WrapperBase *proto = target->is_npc() ? get_wrapper(target->getNPC()->pIndexData->wrapper) : 0;
+
+    // Helper function will invoke onDeath, postDeath triggers on character and proto.
+    Register result(false);
+    fenia_trigger(result, trigName, trigArgs, wrapper, proto);
+    return result;
+}
+
 NMI_INVOKE(CharacterWrapper, trigger, "(trigName, trigArgs...): вызвать триггер у персонажа или прототипа")
 {
     checkTarget();
@@ -2825,13 +2882,17 @@ NMI_INVOKE(CharacterWrapper, trigger, "(trigName, trigArgs...): вызвать �
     RegisterList trigArgs = args;
     trigArgs.pop_front();
 
-    // If it's a mob, access its mob index data wrapper.
-    WrapperBase *proto = target->is_npc() ? get_wrapper(target->getNPC()->pIndexData->wrapper) : 0;
+    // 1. area quests
+    call_aquest_trigger(this, trigName, trigArgs);
 
-    // Helper function will invoke onDeath, postDeath triggers on character and proto.
-    Register result(false);
-    fenia_trigger(result, trigName, trigArgs, this, proto);
-    return result;
+    // 2. behaviors
+    if (call_behavior_trigger(this, trigName, trigArgs))
+        return true;
+
+    // 3. onXXX, postXXX triggers
+    return call_fenia_trigger(this, trigName, trigArgs);
+
+    // 4. legacy C++ behaviors: but hopefully wont' be needed from Fenia
 }
 
 NMI_INVOKE(CharacterWrapper, menu, "([number, action]): очистить меню или установить пункт number с действием action")
