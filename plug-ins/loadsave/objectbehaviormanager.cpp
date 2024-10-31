@@ -80,7 +80,7 @@ void ObjectBehaviorManager::clear( Object *obj )
 
 void ObjectBehaviorManager::parse( OBJ_INDEX_DATA * pObjIndex, FILE *fp ) {
     char letter;
-    char *word;
+    DLString word;
     std::basic_istringstream<char> istr;
     XMLDocument::Pointer doc( NEW );
     
@@ -90,7 +90,7 @@ void ObjectBehaviorManager::parse( OBJ_INDEX_DATA * pObjIndex, FILE *fp ) {
     if (letter != '<') 
         return;
         
-    word = fread_string( fp );
+    word = fread_dlstring( fp );
 
     try {
         istr.str( word );
@@ -102,12 +102,11 @@ void ObjectBehaviorManager::parse( OBJ_INDEX_DATA * pObjIndex, FILE *fp ) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
         
-    free_string( word );
 }
 
 void ObjectBehaviorManager::parse( Object * obj, FILE *fp ) {
     char letter;
-    char *word;
+    DLString word;
     
     if (feof( fp ))
         return;
@@ -118,7 +117,7 @@ void ObjectBehaviorManager::parse( Object * obj, FILE *fp ) {
     if (letter != '<') 
         return;
     
-    word = fread_string( fp );
+    word = fread_dlstring( fp );
     
     try {
         std::basic_istringstream<char> istr( word );
@@ -130,8 +129,6 @@ void ObjectBehaviorManager::parse( Object * obj, FILE *fp ) {
     } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
-        
-    free_string( word );
 }
 
 void ObjectBehaviorManager::save( const OBJ_INDEX_DATA *pObjIndex, FILE *fp ) {

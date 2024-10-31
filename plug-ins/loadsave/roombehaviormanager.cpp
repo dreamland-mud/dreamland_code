@@ -16,7 +16,7 @@
 void RoomBehaviorManager::parse( RoomIndexData * pRoom, FILE *fp ) 
 {
     char letter;
-    char *word;
+    DLString word;
     istringstream istr;
 
     letter = fread_letter( fp );
@@ -25,7 +25,7 @@ void RoomBehaviorManager::parse( RoomIndexData * pRoom, FILE *fp )
     if (letter != '<') 
         return;
         
-    word = fread_string( fp );
+    word = fread_dlstring( fp );
 
     try {
         istr.str( word );
@@ -35,8 +35,6 @@ void RoomBehaviorManager::parse( RoomIndexData * pRoom, FILE *fp )
     } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
-        
-    free_string( word );
 }
 
 void RoomBehaviorManager::save( const RoomIndexData *pRoom, FILE *fp ) 

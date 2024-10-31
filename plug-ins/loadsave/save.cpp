@@ -650,8 +650,8 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                     fprintf( fp, "Pocket %s~\n", obj->pocket.c_str( ) );
 
                 /* these data are only used if they do not match the defaults */
-                if (obj->getRealMaterial( ))
-                    fprintf( fp, "Material %s~\n",  obj->getMaterial( ));
+                if (!obj->getRealMaterial( ).empty())
+                    fprintf( fp, "Material %s~\n",  obj->getMaterial( ).c_str());
 
                 fwrite_multistring(fp, "Keyword", obj->getRealKeyword());
                 fwrite_multistring(fp, "ShortDesc", obj->getRealShortDescr());
@@ -775,7 +775,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
 #define KEYV( literal, field, value )                                        \
                                 if ( !str_cmp( word, literal ) )        \
                                 {                                        \
-                                    field.setValue(value);              \
+                                    field = value;                        \
                                     fMatch = true;                        \
                                     break;                                \
                                 }
@@ -783,9 +783,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
 // Read historical name/keyword fields that could be a mix of EN and RU words
 static XMLMultiString fread_mixed_multistring(FILE *fp)
 {
-    char *value = fread_string( fp );
-    DLString valueString( value );
-    free_string(value);
+    DLString valueString = fread_dlstring( fp );
     
     XMLMultiString multi;
     multi.fromMixedString(valueString);
@@ -798,9 +796,7 @@ static void fread_multistring(FILE *fp, DLString &valueString, lang_t &lang)
     DLString langString(fread_word(fp));
     lang = attr2lang(langString);
 
-    char *value = fread_string(fp);
-    valueString = value;
-    free_string(value);
+    valueString = fread_dlstring(fp);
 }
 
 static void fread_multistring(FILE *fp, DLString &keyString, DLString &valueString, lang_t &lang)
@@ -808,13 +804,9 @@ static void fread_multistring(FILE *fp, DLString &keyString, DLString &valueStri
     DLString langString(fread_word(fp));
     lang = attr2lang(langString);
 
-    char *value = fread_string(fp);
-    keyString = value;
-    free_string(value);
+    keyString = fread_dlstring(fp);
 
-    value = fread_string(fp);
-    valueString = value;
-    free_string(value);
+    valueString = fread_dlstring(fp);
 }
 
 static void fread_char_raw( PCharacter *ch, FILE *fp )
@@ -884,16 +876,16 @@ static void fread_char_raw( PCharacter *ch, FILE *fp )
             break;
 
         case 'B':
-            KEY( "Bamfin",        ch->bamfin,        fread_string( fp ) );
+            KEYV( "Bamfin",        ch->bamfin,        fread_dlstring( fp ) );
             KEY( "Banks",       ch->bank_s,     fread_number( fp ) );
             KEY( "Bankg",       ch->bank_g,     fread_number( fp ) );
-            KEY( "Bamfout",        ch->bamfout,        fread_string( fp ) );
-            KEY( "Bin",                ch->bamfin,        fread_string( fp ) );
-            KEY( "Bout",        ch->bamfout,        fread_string( fp ) );
+            KEYV( "Bamfout",        ch->bamfout,        fread_dlstring( fp ) );
+            KEYV( "Bin",                ch->bamfin,        fread_dlstring( fp ) );
+            KEYV( "Bout",        ch->bamfout,        fread_dlstring( fp ) );
             KEY( "Bless",        dummy,        fread_number( fp ) );
 
             if(!str_cmp(word, "BatlePrompt") || !str_cmp(word, "BatleProm")) {
-                ch->batle_prompt = fread_string(fp);
+                ch->batle_prompt = fread_dlstring(fp);
                 fMatch = true;
                 break;
             }
@@ -931,9 +923,8 @@ static void fread_char_raw( PCharacter *ch, FILE *fp )
                 KEY( "Detect",        ch->detection,                fread_flag(fp)     );
             
             if (!str_cmp( word, "Description" ) || !str_cmp( word, "Desc" )) {
-                char *word = fread_string( fp );
+                DLString word = fread_dlstring( fp );
                 ch->setDescription( word, LANG_DEFAULT );
-                free_string( word );
                 fMatch = true;
             }
             break;
@@ -1004,9 +995,7 @@ static void fread_char_raw( PCharacter *ch, FILE *fp )
         case 'N':
             if ( !str_cmp( word, "Name" ) )
             {
-                char *nm = fread_string( fp );
-                DLString name( nm );
-                free_string(nm);
+                DLString name = fread_dlstring( fp );
                 ch->setName( name );
                 fMatch = true;
                 break;
@@ -1029,15 +1018,14 @@ static void fread_char_raw( PCharacter *ch, FILE *fp )
                 break;
             }
             if (!str_cmp( word, "Pass" )) {
-                char *pwd = fread_string( fp );
+                DLString pwd = fread_dlstring( fp );
                 password_set( ch, pwd );
-                free_string( pwd );
                 fMatch = true;
                 break;
             }
             
             if(!str_cmp(word, "Prompt") || !str_cmp(word, "Prom")) {
-                ch->prompt = fread_string(fp);
+                ch->prompt = fread_dlstring(fp);
                 fMatch = true;
                 break;
             }
@@ -1111,9 +1099,8 @@ static void fread_char_raw( PCharacter *ch, FILE *fp )
 
             if ( !str_cmp( word, "Title" )  || !str_cmp( word, "Titl"))
             {
-                char *word = fread_string( fp );
+                DLString word = fread_dlstring( fp );
                 ch->setTitle( word );
-                free_string( word );
                 fMatch = true;
                 break;
             }
@@ -1258,13 +1245,12 @@ void fread_pet( PCharacter *ch, FILE *fp )
                  KEY( "Comm",        pet->comm,                fread_flag(fp));
 
                 if (!str_cmp(word, "Clan")) {
-                    char *word = fread_string(fp);
+                    DLString word = fread_dlstring(fp);
                     Clan *clan = clanManager->findExisting(word);
                     if (clan)
                         pet->setClan(clan->getName());
 
                     fMatch = true;
-                    free_string( word );
                     break;
                 }
 
@@ -1277,9 +1263,8 @@ void fread_pet( PCharacter *ch, FILE *fp )
                  KEY( "Detect",        pet->detection,                fread_flag(fp));
 
                 if (!str_cmp( word, "Desc" )) {
-                    char *word = fread_string( fp );
+                    DLString word = fread_dlstring( fp );
                     pet->setDescription( word, LANG_DEFAULT );
-                    free_string( word );
                     fMatch = true;
                     break;
                 }
@@ -1362,10 +1347,9 @@ void fread_pet( PCharacter *ch, FILE *fp )
                     break;
             }
             if (!str_cmp( word, "LnD" )) {
-                char *word = fread_string( fp );
+                DLString word = fread_dlstring( fp );
                 pet->setLongDescr( word, LANG_DEFAULT );
                 fMatch = true;
-                free_string( word );
                 break;
             }
             if (!str_cmp(word, "LongDesc")) {
@@ -1392,9 +1376,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
         case 'R':
             if ( !str_cmp( word, "Race" ) )
             {
-                    char *rnm = fread_string(fp);
-                    pet->setRace( rnm );
-                    free_string(rnm);
+                    pet->setRace( fread_dlstring(fp) );
                     fMatch = true;
                 break;
             } else if (!str_cmp( word, "Room" )) {
@@ -1413,10 +1395,8 @@ void fread_pet( PCharacter *ch, FILE *fp )
             KEY( "Silv",        pet->silver,            fread_number( fp ) );
 
             if (!str_cmp( word, "ShD" )) {
-                char *word = fread_string( fp );
-                pet->setShortDescr( word, LANG_DEFAULT );
+                pet->setShortDescr( fread_dlstring(fp), LANG_DEFAULT );
                 fMatch = true;
-                free_string( word );
                 break;
             }
             if (!str_cmp(word, "ShortDesc")) {
@@ -1435,9 +1415,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
 
             case 'W':
                 if (!str_cmp(word, "Wearloc")) {
-                    char *str = fread_string(fp);
-                    pet->wearloc.fromString(str);
-                    free_string(str);
+                    pet->wearloc.fromString(fread_dlstring(fp));
                     fMatch = true;
                     break;
                 }
@@ -1558,13 +1536,11 @@ NPCharacter * fread_mob( FILE *fp )
                     }
 
                     if (!str_cmp(word, "Clan")) {
-                        char *word = fread_string(fp);
-                        Clan *clan = clanManager->findExisting(word);
+                        Clan *clan = clanManager->findExisting(fread_dlstring(fp));
                         if (clan)
                             mob->setClan(clan->getName());
 
                         fMatch = true;
-                        free_string( word );
                         break;
                     }
 
@@ -1577,9 +1553,7 @@ NPCharacter * fread_mob( FILE *fp )
                     KEY( "Detect",        mob->detection,                fread_flag(fp));
 
                     if (!str_cmp( word, "Desc" )) {
-                        char *word = fread_string( fp );
-                        mob->setDescription( word, LANG_DEFAULT );
-                        free_string( word );
+                        mob->setDescription( fread_dlstring(fp), LANG_DEFAULT );
                         fMatch = true;
                         break;
                     }
@@ -1659,10 +1633,8 @@ NPCharacter * fread_mob( FILE *fp )
                     }
 
                     if (!str_cmp( word, "LnD" )) {
-                        char *word = fread_string( fp );
-                        mob->setLongDescr( word, LANG_DEFAULT );
+                        mob->setLongDescr( fread_dlstring(fp), LANG_DEFAULT );
                         fMatch = true;
-                        free_string( word );
                         break;
                     }
                     if (!str_cmp(word, "LongDesc")) {
@@ -1700,19 +1672,14 @@ NPCharacter * fread_mob( FILE *fp )
 
                     if ( !str_cmp( word, "Race" ) )
                     {
-                            char *rnm = fread_string(fp);
-                            mob->setRace( rnm );
-                            free_string(rnm);
-
+                            mob->setRace( fread_dlstring(fp) );
                             fMatch = true;
                             break;
                     }
 
                     if ( !str_cmp( word, "RZone" ) )
                     {
-                            char *rznm = fread_string( fp );
-                            DLString zoneName(rznm);
-                            free_string(rznm);
+                            DLString zoneName = fread_dlstring( fp );
                             AreaIndexData *pArea = get_area_index(zoneName);
                             if (pArea) {
                                 mob->zone = pArea;
@@ -1745,10 +1712,8 @@ NPCharacter * fread_mob( FILE *fp )
                             break;
                     }
                     if (!str_cmp( word, "ShD" )) {
-                        char *word = fread_string( fp );
-                        mob->setShortDescr( word, LANG_DEFAULT );
+                        mob->setShortDescr( fread_dlstring(fp), LANG_DEFAULT );
                         fMatch = true;
-                        free_string( word );
                         break;
                     }
                     if (!str_cmp(word, "ShortDesc")) {
@@ -1770,9 +1735,7 @@ NPCharacter * fread_mob( FILE *fp )
 
             case 'W':
                 if (!str_cmp(word, "Wearloc")) {
-                    char *str = fread_string(fp);
-                    mob->wearloc.fromString(str);
-                    free_string(str);
+                    mob->wearloc.fromString(fread_dlstring(fp));
                     fMatch = true;
                     break;
                 }
@@ -1961,9 +1924,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
             case 'D':
                     if (!str_cmp( word, "Desc" )) {
-                        char *word = fread_string( fp );
-                        obj->setDescription( word, LANG_DEFAULT );
-                        free_string( word );
+                        obj->setDescription( fread_dlstring(fp), LANG_DEFAULT );
                         fMatch = true;
                         break;
                     }
@@ -1989,11 +1950,9 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
                     if (!str_cmp(word,"ExDe"))
                     {
-                        char *kw = fread_string(fp);
-                        char *value = fread_string(fp);
+                        DLString kw = fread_dlstring(fp);
+                        DLString value = fread_dlstring(fp);
                         obj->addExtraDescr(kw, value, LANG_DEFAULT);
-                        free_string(kw);
-                        free_string(value);
                         fMatch = true;
                         break;
                     }
@@ -2117,10 +2076,8 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
             case 'M':
                     if (!str_cmp( word, "Material" )) {
-                        char *word = fread_string( fp );
-                        obj->setMaterial( word );
+                        obj->setMaterial( fread_dlstring(fp) );
                         fMatch = true;
-                        free_string( word );
                     }
                     break;
 
@@ -2163,16 +2120,14 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     }
 
                     if (!str_cmp( word, "Ownr" )) {
-                        char *word = fread_string( fp );
-                        obj->setOwner( word );
+                        obj->setOwner( fread_dlstring(fp) );
                         fMatch = true;
-                        free_string( word );
                     }
 
                     break;
 
             case 'P':
-                    KEY( "Pocket", obj->pocket, fread_string( fp ) );
+                    KEYV( "Pocket", obj->pocket, fread_dlstring( fp ) );
                     KEYSKIP( "Pit" );
 
                     if (!str_cmp(word, "Props")) {
@@ -2202,10 +2157,8 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
             case 'S':
                     if (!str_cmp( word, "ShD" )) {
-                        char *word = fread_string( fp );
-                        obj->setShortDescr( word, LANG_DEFAULT );
+                        obj->setShortDescr( fread_dlstring(fp), LANG_DEFAULT );
                         fMatch = true;
-                        free_string( word );
                         break;
                     }
                     if (!str_cmp(word, "ShortDesc")) {

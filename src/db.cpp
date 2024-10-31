@@ -369,37 +369,3 @@ AreaIndexData * get_area_index(const DLString &filename)
     return 0;
 }
 
-/*
- * Free a string.
- * Null is legal here to simplify callers.
- */
-void free_string( char *pstr )
-{
-    if (pstr == 0 || pstr == str_empty)
-        return;
-
-    free(pstr);
-    return;
-}
-
-
-
-/*
- * Duplicate a string into dynamic memory.
- * Null is legal here to simplify callers.
- */
-char *str_dup( const char *str )
-{
-    char *str_new;
-
-    if ( !str || !*str )
-        return &str_empty[0];
-
-    str_new = (char *)malloc(strlen(str) + 1);
-    strcpy( str_new, str );
-    return str_new;
-}
-
-
-
-

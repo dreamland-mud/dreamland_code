@@ -14,7 +14,7 @@
 
 void AreaBehaviorManager::parse( AreaIndexData * pArea, FILE *fp ) {
     char letter;
-    char *word;
+    DLString word;
     
     letter = fread_letter( fp );
     ungetc( letter, fp );
@@ -22,7 +22,7 @@ void AreaBehaviorManager::parse( AreaIndexData * pArea, FILE *fp ) {
     if (letter != '<') 
         return;
         
-    word = fread_string( fp );
+    word = fread_dlstring( fp );
 
     try {
         std::basic_istringstream<char> istr( word );
@@ -34,7 +34,6 @@ void AreaBehaviorManager::parse( AreaIndexData * pArea, FILE *fp ) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
         
-    free_string( word );
 }
 
 void AreaBehaviorManager::save( const AreaIndexData *pArea, FILE *fp ) {

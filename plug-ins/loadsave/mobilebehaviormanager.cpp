@@ -104,7 +104,7 @@ void MobileBehaviorManager::assignBasic( NPCharacter *mob )
 
 void MobileBehaviorManager::parse( MOB_INDEX_DATA * pMobIndex, FILE *fp ) {
     char letter;
-    char *word;
+    DLString word;
     std::basic_istringstream<char> istr;
     XMLDocument::Pointer doc( NEW );
    
@@ -117,7 +117,7 @@ void MobileBehaviorManager::parse( MOB_INDEX_DATA * pMobIndex, FILE *fp ) {
     if (letter != '<') 
         return;
         
-    word = fread_string( fp );
+    word = fread_dlstring( fp );
 
     try {
         istr.str( word );
@@ -128,13 +128,11 @@ void MobileBehaviorManager::parse( MOB_INDEX_DATA * pMobIndex, FILE *fp ) {
     } catch (Exception e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
-        
-    free_string( word );
 }
 
 void MobileBehaviorManager::parse( NPCharacter * mob, FILE *fp ) {
     char letter;
-    char *word;
+    DLString word;
     
     if (feof( fp ))
         return;
@@ -145,7 +143,7 @@ void MobileBehaviorManager::parse( NPCharacter * mob, FILE *fp ) {
     if (letter != '<') 
         return;
     
-    word = fread_string( fp );
+    word = fread_dlstring( fp );
 
     try {
         std::basic_istringstream<char> istr( word );
@@ -161,8 +159,6 @@ void MobileBehaviorManager::parse( NPCharacter * mob, FILE *fp ) {
     } catch (Exception e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
-        
-    free_string( word );
 }
 
 void MobileBehaviorManager::save( const MOB_INDEX_DATA *pMobIndex, FILE *fp ) {

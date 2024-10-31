@@ -108,7 +108,7 @@ void QuestItemAppearence::dress( Object *obj ) const
         obj->addProperDescription()->description[LANG_DEFAULT] = extraDesc;
 
     if (!material.empty())
-        obj->setMaterial(material.c_str());
+        obj->setMaterial(material);
 
     SET_BIT( obj->wear_flags, wear.getValue( ) );
     SET_BIT( obj->extra_flags, extra.getValue( ) );

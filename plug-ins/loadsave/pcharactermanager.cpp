@@ -121,8 +121,7 @@ static void load_OBJECT( FILE *pfile, const DLString &playerName )
                 if (letter != '<')
                     ungetc( letter, pfile );
                 else {
-                    char * xml = fread_string( pfile );
-                    free_string( xml );
+                    DLString xml = fread_dlstring( pfile );
                 }
             }
 
@@ -147,10 +146,8 @@ static void load_OBJECT( FILE *pfile, const DLString &playerName )
         }
 
         if (!strcmp(word, "ExDe")) {
-            char *buf = fread_string(pfile); // extra keyword
-            free_string(buf);
-            buf = fread_string(pfile); // extra description
-            free_string(buf);
+            DLString buf = fread_dlstring(pfile); // extra keyword
+            buf = fread_dlstring(pfile); // extra description
             break;
         }
         
@@ -218,17 +215,14 @@ static void load_PLAYER( PCharacter *pc, FILE *pfile )
                 case 'N':
                     if ( !strcmp( word0, "Name" ) )
                     {
-                        char *nm = fread_string( pfile ) ;
-                        DLString name( nm );
-                        free_string(nm);
+                        DLString name = fread_dlstring( pfile ) ;
                         pc->setName( name );
                     }
                     break;
                 case 'P':
                     if (!strcmp( word0, "Pass" )) {
-                        char *pwd = fread_string( pfile );
+                        DLString pwd = fread_dlstring( pfile );
                         password_set( pc, pwd );
-                        free_string( pwd );
                     }
                     break;
                 }

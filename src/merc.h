@@ -126,10 +126,6 @@ Room * get_room_instance(int vnum);
 AreaIndexData * get_area_index(const DLString &filename);
 
 
-char *        str_dup                ( const char *str );
-void        free_string        ( char *pstr );
-
-
 /* RT ASCII conversions -- used so we can have letters in this file */
 
 #define IS_SET(flag, bit)        ((flag) & (bit))

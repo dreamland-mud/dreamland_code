@@ -383,7 +383,7 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     if (!girth->getRealKeyword( ).empty())
         keyring->setKeyword( girth->getRealKeyword( ) );
         
-    if (girth->getRealMaterial( ))
+    if (!girth->getRealMaterial( ).empty())
         keyring->setMaterial( girth->getRealMaterial( ) );
 
     keyring->extra_flags = girth->extra_flags;

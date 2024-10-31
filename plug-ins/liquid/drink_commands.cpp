@@ -218,7 +218,7 @@ static void create_pool( Object *out, int amount )
     pool->setDescription( fmt(0, pool->pIndexData->description.get(LANG_DEFAULT).c_str(), liqShort.ruscase( '2' ).c_str( )), LANG_DEFAULT );
 	// Don't set material to liquid name -- those don't exist in the materials list
 	// Use "drink" material for unspecified liquid types (set by default in OBJ_VNUM_POOL, vnum 75)
-    // pool->setMaterial( liqName.c_str() );        
+    // pool->setMaterial( liqName );        
         
     pool->timer += time;
     pool->value0(max( 1, amount )); // Puddle can't be "broader" than its contents

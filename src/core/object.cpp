@@ -267,9 +267,9 @@ void Object::setDescription( const DLString &str, lang_t lang )
     description[lang] = str;
 }
 
-void Object::setMaterial( const char *s )
+void Object::setMaterial( const DLString &material )
 {
-    material = s;
+    this->material = material;
 }
 
 void Object::setOwner( const DLString &newOwner )

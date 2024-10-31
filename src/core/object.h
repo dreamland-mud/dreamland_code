@@ -143,7 +143,7 @@ public:
     const DLString & getRealKeyword( lang_t lang ) const;
     const DLString & getRealShortDescr( lang_t lang ) const;
     const DLString & getRealDescription( lang_t lang ) const;
-    const char * getRealMaterial( ) const;
+    const DLString & getRealMaterial( ) const;
     const DLString & getOwner( ) const;
 
     const XMLMultiString & getRealKeyword() const;     
@@ -156,7 +156,7 @@ public:
     const DLString & getKeyword( lang_t lang ) const;
     const DLString & getShortDescr( lang_t lang ) const;
     const DLString & getDescription( lang_t lang ) const;
-    const char * getMaterial( ) const;
+    const DLString & getMaterial( ) const;
 
     void updateCachedNouns();
     void updateCachedNoun(lang_t lang);
@@ -167,7 +167,7 @@ public:
     void setKeyword(const XMLMultiString &);
     void setShortDescr( const DLString &, lang_t lang );
     void setDescription( const DLString &, lang_t lang );
-    void setMaterial( const char * );
+    void setMaterial( const DLString & );
     
     DLString getShortDescr( char gcase, lang_t lang );
 
@@ -225,9 +225,9 @@ void Object::setID( long long id )
     ID = id;
 }
 
-inline const char * Object::getRealMaterial( ) const
+inline const DLString & Object::getRealMaterial( ) const
 {
-    return material.c_str();
+    return material;
 }
 inline const DLString & Object::getOwner( ) const
 {
@@ -264,9 +264,9 @@ inline const XMLMultiString& Object::getDescription() const
     return description.emptyValues() ? pIndexData->description : description;
 }
 
-inline const char * Object::getMaterial( ) const
+inline const DLString & Object::getMaterial( ) const
 {
-    return !material.empty() ? material.c_str() : pIndexData->material.c_str();
+    return !material.empty() ? material : pIndexData->material;
 }
 
 inline void Object::value0(int v)

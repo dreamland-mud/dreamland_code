@@ -180,11 +180,11 @@ NMI_SET(ObjectWrapper, material, "материалы (.Material), из кото�
     checkTarget();
 
     if (arg.type == Register::STRING) {
-        target->setMaterial(arg.toString().c_str());
+        target->setMaterial(arg.toString());
 
     } else if (arg.type == Register::OBJECT) {
         MaterialWrapper *mw = wrapper_cast<MaterialWrapper>(arg);
-        target->setMaterial(mw->names.c_str());
+        target->setMaterial(mw->names);
 
     } else {
         throw CustomException("Object material can be either a string or a .Material structure");

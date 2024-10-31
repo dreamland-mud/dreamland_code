@@ -432,7 +432,7 @@ void clone_object(Object *parent, Object *clone)
         clone->setDescription(parent->getRealDescription(lang), lang);
     }
         
-    if (parent->getRealMaterial())
+    if (!parent->getRealMaterial().empty())
         clone->setMaterial(parent->getMaterial());
     clone->setOwner(parent->getOwner());
 

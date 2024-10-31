@@ -532,7 +532,7 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
     obj->setDescription(nameConfig["long"].asCString(), LANG_RU);
 
     // Set up provided material or default.
-    obj->setMaterial(findMaterial().c_str());
+    obj->setMaterial(findMaterial());
     return *this;
 }
 

@@ -954,7 +954,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
         buf << fmt(0, "Владелец: %s\n\r", obj->getOwner().empty() ? "nobody" : obj->getOwner().c_str());
 
-        buf << fmt(0, "Материал: %s\n\r", obj->getMaterial( ));
+        buf << fmt(0, "Материал: %s\n\r", obj->getMaterial( ).c_str());
 
         buf << fmt(0, "Берется в: %s\n\rЭкстра флаги: %s\n\r",
                 wear_flags.messages(obj->wear_flags, true).c_str( ), 

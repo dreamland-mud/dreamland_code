@@ -52,12 +52,12 @@ material_parse( const char *materials,  vector<const material_t *> &result )
 static void 
 material_parse( Object *obj,  vector<const material_t *> &result )
 {
-    material_parse(obj->getMaterial(), result);
+    material_parse(obj->getMaterial().c_str(), result);
 }
 
 bool material_is_typed( Object *obj, int type )
 {
-    return material_is_typed(obj->getMaterial(), type);
+    return material_is_typed(obj->getMaterial().c_str(), type);
 }
 
 bool material_is_typed( const char *materials, int type )
@@ -75,7 +75,7 @@ bool material_is_typed( const char *materials, int type )
 
 bool material_is_flagged( Object *obj, int flags )
 {
-    return material_is_flagged(obj->getMaterial(), flags);
+    return material_is_flagged(obj->getMaterial().c_str(), flags);
 }
 
 bool material_is_flagged( const char *materials, int flags )
@@ -93,7 +93,7 @@ bool material_is_flagged( const char *materials, int flags )
 
 int material_swims( Object *obj )
 {
-    return material_swims(obj->getMaterial());
+    return material_swims(obj->getMaterial().c_str());
 }
 
 int material_swims( const char *materials )
@@ -116,7 +116,7 @@ int material_swims( const char *materials )
 
 int material_burns( Object *obj )
 {
-    return material_burns(obj->getMaterial());
+    return material_burns(obj->getMaterial().c_str());
 }
 
 int material_burns( const char *materials )
@@ -137,7 +137,7 @@ int material_burns( const char *materials )
 
 int material_rho( Object *obj )
 {
-    return material_rho(obj->getMaterial());
+    return material_rho(obj->getMaterial().c_str());
 }
 
 int material_rho( const char *materials )
@@ -159,7 +159,7 @@ int material_rho( const char *materials )
 
 int material_hardness( Object *obj )
 {
-    return material_hardness(obj->getMaterial());
+    return material_hardness(obj->getMaterial().c_str());
 }
 
 int material_hardness( const char *materials )
@@ -185,7 +185,7 @@ int material_hardness( const char *materials )
 
 DLString material_rname(Object *obj) 
 {
-    return material_rname(obj->getMaterial());
+    return material_rname(obj->getMaterial().c_str());
 }
 
 DLString material_rname(const char *materials)
