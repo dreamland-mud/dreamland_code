@@ -11,8 +11,8 @@
 #include "religion.h"
 #include "behavior.h"
 #include "race.h"
+#include "string_utils.h"
 #include "merc.h"
-
 #include "def.h"
 
 XMLMobileFactory::XMLMobileFactory( ) : 
@@ -37,6 +37,43 @@ XMLMobileFactory::XMLMobileFactory( ) :
 {
 }
 
+DLString format_longdescr(const DLString &longdescr)
+{
+    const char *descr = longdescr.c_str();
+    // Remove (keywords) and 1 preceding space.
+    ostringstream buf;
+    DLString hint;
+    bool skipChar = false;
+
+    for (const char *d = descr; *d; d++) {
+        // Ignore extra space just before the ( bracket.
+        if (*d == ' ' && *(d+1) == '(') 
+            continue;
+        // Start ignoring everything after a ( bracket.
+        if (*d == '(' && (isalpha(*(d+1)) || (*(d+1) == '{' && isalpha(*(d+3))))) {
+            skipChar = true;
+            continue;
+        }
+        // Stop ignoring once bracket is closed.
+        if (*d == ')' && skipChar) {
+            skipChar = false;
+            continue;
+        }
+        // Skip everything while inside the brackets.
+        if (skipChar) {
+            hint << *d;
+            continue;
+        }
+
+        // Normal output outside of brackets. 
+        buf << *d;
+    }
+
+    DLString result = String::stripEOL(buf.str());
+    result.stripRightWhiteSpace();
+    return result;
+}
+
 void
 XMLMobileFactory::init(const mob_index_data *mob)
 {
@@ -46,6 +83,7 @@ XMLMobileFactory::init(const mob_index_data *mob)
     short_descr = mob->short_descr;
     long_descr = mob->long_descr;
     description = mob->description;
+    
     smell = mob->smell;
 
     race.setValue(mob->race);
@@ -133,6 +171,7 @@ XMLMobileFactory::compat(mob_index_data *mob)
 
     mob->short_descr = short_descr;
     mob->long_descr = long_descr;
+    mob->long_descr[RU] = format_longdescr(long_descr[RU]);
     mob->description = description;
     mob->smell = smell;
 

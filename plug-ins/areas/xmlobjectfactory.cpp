@@ -12,6 +12,7 @@
 #include "json_utils_ext.h"
 #include "string_utils.h"
 
+DLString format_longdescr(const DLString &longdescr);
 
 XMLObjectFactory::XMLObjectFactory( ) : 
     extra_flags(0, &::extra_flags), wear_flags(0, &::wear_flags), 
@@ -82,6 +83,8 @@ XMLObjectFactory::compat(obj_index_data *obj)
 
     obj->short_descr = short_descr;
     obj->description = description;
+    obj->description[RU] = format_longdescr(description[RU]);
+
     obj->material = str_dup(material.getValue( ).c_str( ));
     obj->item_type = type.type;
     copy(type.v, type.v + 5, obj->value);

@@ -105,43 +105,26 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief );
 static void show_people_to_char( Character *list, Character *ch, bool fShowMount = true );
 bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool fShowEmpty );
 
-
 /*
- * Show long description for objects and mobiles, with 
- * English names in brackets removed for screenreaders.
+ * For long descriptions on the floor: show EN or RU hint depending on player's config.
+ * For short descr: only show EN hint if configured. We assume that all mobs and items react to short descrs.
+ * Screenreaders historically didn't use hints but that can be adjusted based on feedback.
  */
-static DLString format_longdescr_to_char(const DLString &longdescr, Character *ch)
+static void format_hint(ostringstream &buf, const XMLMultiString &keyword, const DLString &shortDesc, Character *ch, bool fLong)
 {
-    if (!uses_screenreader(ch))
-        return longdescr;
+    DLString hint;
 
-    const char *descr = longdescr.c_str();
-    
-    // Remove (keywords) and 1 preceding space.
-    ostringstream buf;
-    bool skipChar = false;
-    for (const char *d = descr; *d; d++) {
-        // Ignore extra space just before the ( bracket.
-        if (*d == ' ' && *(d+1) == '(') 
-            continue;
-        // Start ignoring everything after a ( bracket.
-        if (*d == '(' && isalpha(*(d+1))) {
-            skipChar = true;
-            continue;
-        }
-        // Stop ignoring once bracket is closed.
-        if (*d == ')' && skipChar) {
-            skipChar = false;
-            continue;
-        }
-        // Skip everything while inside the brackets.
-        if (skipChar)
-            continue;
-        // Normal output outside of brackets. 
-        buf << *d;
-    }
+    if (uses_screenreader(ch))
+        return;
 
-    return buf.str();
+    if (!ch->is_npc() && ch->getPC()->config.isSet(CONFIG_OBJNAME_HINT))
+        hint = Syntax::label_en(keyword);
+    else if (fLong)
+        hint = Syntax::noun(shortDesc).ruscase('1');
+    else
+        return;
+
+    buf << " {D[" << hint << "]{x";
 }
 
 // Translate colour coding (tier, unusual item) into auras when screenreader is on or colours are off.
@@ -247,8 +230,6 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     }
 #undef FMT
     
-    bool showHint = !ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT);
-
     if (fShort)
     {
         buf << "{" << CLR_OBJ(ch) << wearloc->displayName(ch, obj) << "{x";
@@ -257,8 +238,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             if (obj->condition <= 99 )
                 buf << " [" << obj->get_cond_alias( ) << "]";
 
-        if (showHint)
-            buf << " (" << Syntax::label_en(obj->getKeyword()) << ")";
+        format_hint(buf, obj->getKeyword(), obj->getShortDescr(LANG_DEFAULT), ch, false);
     }
     else
     {
@@ -266,15 +246,10 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
                 && RoomUtils::isWater(obj->in_room)
                 && !IS_SET(obj->extra_flags, ITEM_WATER_STAND)) 
         {
-            DLString msg;
+            ostringstream msg;
             DLString liq = obj->in_room->getLiquid()->getShortDescr();
 
-            msg << "{" << CLR_OBJ(ch) << "{1" << "%1$^O1" << "{2";
-
-            if (showHint)
-                msg << " (" << Syntax::label_en(obj->getKeyword()) << ")";
-
-            msg << " ";
+            msg << "{" << CLR_OBJ(ch) << "{1" << "%1$^O1" << "{2 ";
 
             switch(dice(1,3)) {
             case 1: msg << "тихо круж%1$nится|атся на %2$N6.";break;
@@ -282,11 +257,15 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             case 3: msg << "намока%1$nет|ют от %2$N2.";break;
             }
 
-            buf << fmt( ch, msg.c_str( ), obj, liq.c_str( ) );
+            msg << "{x";
+            format_hint(msg, obj->getKeyword(), obj->getShortDescr(LANG_DEFAULT), ch, false);
+
+            buf << fmt( ch, msg.str().c_str( ), obj, liq.c_str( ) );
         }
         else {
-            DLString longd = format_longdescr_to_char(obj->getDescription(LANG_DEFAULT), ch);  
+            DLString longd = obj->getDescription(LANG_DEFAULT);
             buf << "{" << CLR_OBJROOM(ch) << longd << "{x";
+            format_hint(buf, obj->getKeyword(), obj->getShortDescr(LANG_DEFAULT), ch, true);
         }
     }
 
@@ -687,10 +666,15 @@ static void show_char_to_char_0( Character *victim, Character *ch )
 
     if (nVict) 
         if (can_show_long_descr(nVict)) {
-            DLString longd = format_longdescr_to_char(nVict->getLongDescr(LANG_DEFAULT), ch);
+            ostringstream longd;
+
+            longd << nVict->getLongDescr(LANG_DEFAULT) << "{x";
+            format_hint(longd, nVict->getKeyword(), nVict->getShortDescr(LANG_DEFAULT), ch, true);
+                  
             buf << "{" << CLR_MOB(ch);
-            webManipManager->decorateCharacter(buf, longd, victim, ch);
-            buf << "{x";
+            webManipManager->decorateCharacter(buf, longd.str(), victim, ch);
+            buf << "{x" << endl;
+
             show_char_blindness( ch, victim, buf );
             ch->send_to( buf);
             return;
@@ -718,12 +702,13 @@ static void show_char_to_char_0( Character *victim, Character *ch )
         }
     }
 
-    buf << " {2";
+    buf << "{2";
 
-    if (nVict && !ch->is_npc()) {
-        if (!ch->getConfig().rucommands || IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
-            buf << "(" << Syntax::label_en(nVict->getKeyword()) << ") ";
+    if (nVict) {
+        format_hint(buf, nVict->getKeyword(), nVict->getShortDescr(LANG_DEFAULT), ch, false);
     }
+
+    buf << " ";
 
     switch (victim->position.getValue( )) {
     case POS_DEAD:     
