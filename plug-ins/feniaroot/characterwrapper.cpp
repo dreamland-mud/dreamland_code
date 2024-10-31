@@ -694,13 +694,7 @@ NMI_SET( CharacterWrapper, ambushing, "строка, на кого сидим в
 {
     checkTarget();
     DLString str = arg2string(arg);
-
-    if (str.empty()) {
-        free_string(target->ambushing);
-        target->ambushing = &str_empty[0]; 
-    } else {
-        target->ambushing = str_dup(str.c_str());
-    }
+    target->ambushing = str;
 }
 
 NMI_GET( CharacterWrapper, neutral, "true если персонаж нейтральный" )

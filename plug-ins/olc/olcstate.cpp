@@ -268,19 +268,6 @@ OLCState::sedit(XMLString &original)
 }
 
 bool
-OLCState::sedit(char *&original)
-{
-    DLString orig = original;
-    
-    if(!sedit(orig))
-        return false;
-    
-    free_string(original);
-    original = str_dup(orig.c_str( ));
-    return true;
-}
-
-bool
 OLCState::xmledit(XMLDocument::Pointer &xml)
 {
     ostringstream os;
@@ -782,18 +769,6 @@ bool OLCState::editorPaste(DLString &original, editor_flags flags)
     return true;
 }
 
-bool OLCState::editorPaste(char *&field, editor_flags flags)
-{
-    DLString original = field ? field : DLString::emptyString;
-    editorPaste(original, flags);
-
-    if (field)
-        free_string(field);
-
-    field = str_dup(original.c_str());
-    return true;
-}
-
 bool OLCState::editor(const char *argument, InflectedString &russian, editor_flags flags)
 {
     DLString original = russian.getFullForm();
@@ -839,18 +814,6 @@ bool OLCState::editor(const char *argument, XMLJsonValue &value, editor_flags fl
 
     JsonUtils::fromString(text, value);
 
-    return true;
-}
-
-bool OLCState::editor(const char *argument, char *&field, editor_flags flags)
-{
-    DLString original = field;
-    
-    if (!editor(argument, original, flags))
-        return false;
-    
-    free_string(field);
-    field = str_dup(original.c_str());
     return true;
 }
 

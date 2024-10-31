@@ -465,7 +465,7 @@ static Object * corpse_create( Character *ch )
         corpse->setOwner( ch->getNameC() );
     }
 
-    corpse->from = str_dup( name.c_str( ) );
+    corpse->from = name;
     corpse->cost = 0;
     corpse->level = ch->getRealLevel( );
     // TODO multi-language corpse descriptions
@@ -529,11 +529,11 @@ static void corpse_looting( Object *corpse, Character *ch, Character *killer )
     list<Object *> items = corpse->getItems();
 
     if (IS_SET(ch->act, PLR_WANTED)) {
-        corpse->killer = str_dup( "!anybody!" );
+        corpse->killer = "!anybody!";
         corpse->count = items.size() * loot["wantedCountCoeff"].asFloat();
     }
     else {
-        corpse->killer = str_dup( killer->getNameC() );
+        corpse->killer = killer->getNameC();
         corpse->count = loot["maxTotalCount"].asInt();
     }
 
@@ -622,8 +622,7 @@ static void corpse_fill( Object *corpse, Character *ch, int flags = 0 )
             obj_from_char( obj );
 
             if (corpse) {
-                free_string(obj->from);
-                obj->from = str_dup(worn.c_str());
+                obj->from = worn;
                 obj_to_obj( obj, corpse );
             } else 
                 obj_to_room( obj, ch->in_room );
@@ -729,7 +728,7 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     else
         obj->setDescription(obj->getDescription(LANG_DEFAULT) + DLString::SPACE + body_name, LANG_DEFAULT);
 
-    obj->from = str_dup(body_name.c_str());
+    obj->from = body_name;
     obj->level = body_level;
 
     if (obj->item_type == ITEM_FOOD) {

@@ -494,14 +494,14 @@ SKILL_RUNP( ambush )
 
     if ( arg[0] == '\0' )
     {
-            if ( ch->ambushing[0] == '\0' )
+            if (ch->ambushing.empty())
             {
                     ch->pecho("Засаду кому?");
                     return;
             }
             else
             {
-                    ch->pecho("Ты сидишь в засаде на %s.", ch->ambushing);
+                    ch->pecho("Ты сидишь в засаде на '%s'.", ch->ambushing.c_str());
                     return;
             }
     }
@@ -514,7 +514,7 @@ SKILL_RUNP( ambush )
                     return;
             }
             ch->pecho("Ты готовишься к засаде.");
-            ch->ambushing = str_dup(arg);
+            ch->ambushing = arg;
             return;
     }
 
@@ -567,7 +567,7 @@ SKILL_APPLY( ambush )
 {
     Character *vch, *vch_next;
 
-    if (ch->ambushing[0] == '\0')
+    if (ch->ambushing.empty())
         return false;
     if (!IS_AWAKE(ch))
         return false;
@@ -583,10 +583,10 @@ SKILL_APPLY( ambush )
                 && ch->can_see(vch)
                 && !vch->can_see(ch)
                 && !is_safe_nomessage(ch,vch)
-                && is_name(ch->ambushing, vch->getNameC()))
+                && is_name(ch->ambushing.c_str(), vch->getNameC()))
         {
             ch->pecho( "{YТЫ ВЫСКАКИВАЕШЬ ИЗ ЗАСАДЫ!{x" );
-            run( ch, ch->ambushing );
+            run( ch, const_cast<char *>(ch->ambushing.c_str()) );
             return true;
         }
     }
@@ -636,7 +636,7 @@ SKILL_RUNP( camouflage )
         if ( IS_AFFECTED(ch, AFF_CAMOUFLAGE) )
         {
                 REMOVE_BIT(ch->affected_by, AFF_CAMOUFLAGE);
-                ch->ambushing = &str_empty[0];
+                ch->ambushing.clear();
         }
 
         if ( ch->is_npc()

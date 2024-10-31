@@ -175,7 +175,7 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
     mob->form = pMobIndex->form;
     mob->parts = pMobIndex->parts;
     mob->size = pMobIndex->getSize();
-    mob->material = str_dup(pMobIndex->material);
+    mob->material = pMobIndex->material;
     mob->extracted = false;
 
     // Override descriptions with formatting symbols that depend on NPC sex.
@@ -359,7 +359,6 @@ Object *create_object_org(OBJ_INDEX_DATA *pObjIndex, short level, bool Count)
     obj->value4(pObjIndex->value[4]);
     obj->weight = pObjIndex->weight;
     obj->extracted = false;
-    obj->from = str_dup(""); /* used with body parts */
     obj->condition = pObjIndex->condition;
 
     if (level == 0)
@@ -447,7 +446,7 @@ void clone_object(Object *parent, Object *clone)
 
     clone->pocket = parent->pocket;
     clone->timer = parent->timer;
-    clone->from = str_dup(parent->from);
+    clone->from = parent->from;
     clone->extracted = parent->extracted;
 
     for (i = 0; i < 5; i++)

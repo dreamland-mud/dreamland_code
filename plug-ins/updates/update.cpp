@@ -1225,7 +1225,7 @@ void aggr_update( )
 
         check_bloodthirst( ch );
 
-        if (ch->ambushing[0]) {
+        if (!ch->ambushing.empty()) {
             gsn_ambush->getCommand( )->apply( ch );
             gsn_bonedagger->getCommand( )->apply( ch );
         }

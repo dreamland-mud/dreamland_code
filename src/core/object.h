@@ -51,7 +51,7 @@ protected:
     XMLMultiString keyword;
     XMLMultiString   short_descr;
     XMLMultiString   description;
-    char * material;
+    DLString material;
     DLString owner;
     map<lang_t, InflectedString::Pointer> cachedNouns;
     int                  value  [5];
@@ -80,11 +80,11 @@ public:
     int              condition;
     int              timer;
     time_t           timestamp;
-    char              *  from;
+    DLString from;
     bool                extracted;
     int                  water_float;
 
-    char              *  killer;  // for corpse
+    DLString killer;  // for corpse
     int                  count;
     Grammar::MultiGender gram_gender;
 
@@ -227,7 +227,7 @@ void Object::setID( long long id )
 
 inline const char * Object::getRealMaterial( ) const
 {
-    return material;
+    return material.c_str();
 }
 inline const DLString & Object::getOwner( ) const
 {
@@ -266,7 +266,7 @@ inline const XMLMultiString& Object::getDescription() const
 
 inline const char * Object::getMaterial( ) const
 {
-    return material ? material : pIndexData->material;
+    return !material.empty() ? material.c_str() : pIndexData->material.c_str();
 }
 
 inline void Object::value0(int v)

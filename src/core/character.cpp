@@ -89,8 +89,6 @@ Character::Character( )
                 mod_stat( &stat_table ),
                 form(0, &form_flags),
                 parts(0, &part_flags),
-                material( &str_empty[0] ),
-                ambushing( &str_empty[0] ),
                 trap( 0, &trap_flags )
 {
 }
@@ -102,9 +100,6 @@ Character::~Character(void)
 
     if (!affected.empty())
         LogStream::sendFatal() << "~Character: affected not empty" << endl;
-
-    free_string(material);
-    free_string(ambushing);
 }
 
 /****************************************************************************
@@ -192,16 +187,14 @@ void Character::init( )
     form = 0;
     parts = 0;
     size = 0;
-    free_string(material);
-    material = &str_empty[0];
+    material.clear();
 
     endur = 0;
     
     riding = false;
     mount =  0;
 
-    free_string(ambushing);
-    ambushing = &str_empty[0];
+    ambushing.clear();
 
     death_ground_delay = 0;
     trap.clear( );

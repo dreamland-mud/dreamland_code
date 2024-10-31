@@ -454,7 +454,7 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
         fprintf( fp, "Room %d\n", mob->in_room->vnum );
 
         if ( mob->zone )
-                fprintf( fp, "RZone %s~\n", mob->zone->area_file->file_name );
+                fprintf( fp, "RZone %s~\n", mob->zone->area_file->file_name.c_str() );
         if (mob->reset_room != 0)
             fprintf(fp, "RRoom %d\n", mob->reset_room); 
 

@@ -167,7 +167,7 @@ void HunterEquip::config( PCharacter *wch )
 {
     obj->setShortDescr( fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), wch->getNameP('2').c_str()), LANG_DEFAULT);
     obj->setOwner( wch->getNameC() );
-    obj->from = str_dup( wch->getNameC() );
+    obj->from = wch->getNameC();
     obj->level = wch->getRealLevel( );
     obj->cost = 0;
     

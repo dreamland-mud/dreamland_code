@@ -40,7 +40,7 @@ CMDADM( socket )
     count = 0;
 
     for (d = descriptor_list; d; d = d->next) {
-        const char *myHost, *myIP;
+        DLString myHost, myIP;
         const char * state;
         DLString logon;
         DLString idle;
@@ -86,7 +86,7 @@ CMDADM( socket )
         count++;
         
         if (!d->via.empty( )) {
-            myHost = d->via.back( ).second.c_str( );
+            myHost = d->via.back( ).second;
             myIP = inet_ntoa(d->via.back( ).first);
         }
         else {
@@ -113,7 +113,7 @@ CMDADM( socket )
                         idle.c_str(),
                         client.c_str(),
                         name.c_str( ),
-                        (!*myHost) ? myIP : myHost,
+                        myHost.empty() ? myIP.c_str() : myHost.c_str(),
                         extraInfo.c_str());
     }
 

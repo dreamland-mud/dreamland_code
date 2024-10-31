@@ -149,7 +149,7 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
 
     jar        = create_object(get_obj_index(OBJ_VNUM_MAGIC_JAR), 0);
 //    jar->setOwner(ch->getNameC());
-    jar->from = str_dup(ch->getNameC());
+    jar->from = ch->getNameC();
     jar->level = ch->getRealLevel( );
 
     // TODO setup all languages

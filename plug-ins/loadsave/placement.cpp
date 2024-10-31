@@ -430,11 +430,7 @@ void undig( Character *ch )
     char_from_room( ch ); 
     char_to_room( ch, ch->was_in_room ); 
     ch->was_in_room = 0; 
-
-    if (ch->ambushing && ch->ambushing[0]) {
-        free_string( ch->ambushing );
-        ch->ambushing = &str_empty[0]; 
-    }
+    ch->ambushing.clear();
 
     if (ch->position < POS_RESTING)
         ch->position = POS_RESTING;
@@ -453,11 +449,7 @@ void undig_earthquake( Character *ch )
     char_from_room( ch ); 
     char_to_room( ch, ch->was_in_room ); 
     ch->was_in_room = 0; 
-
-    if (ch->ambushing && ch->ambushing[0]) {
-        free_string( ch->ambushing );
-        ch->ambushing = &str_empty[0]; 
-    }
+    ch->ambushing.clear();
 
     oldact_p("Землятрясение заставляет тебя выбраться из могилы.", ch, 0, 0, TO_CHAR, POS_DEAD); 
     oldact("Земля раскалывается, обнаруживая лежавш$gое|его|ую в ней $c2!", ch, 0, 0, TO_ROOM); 
@@ -531,7 +523,7 @@ void strip_camouflage( Character *ch )
             bool showMessages = ch->affected.findAllWithBits(&affect_flags, AFF_CAMOUFLAGE).empty();
             affect_bit_strip(ch, &affect_flags, AFF_CAMOUFLAGE, true);
             REMOVE_BIT(ch->affected_by, AFF_CAMOUFLAGE);
-            ch->ambushing = &str_empty[0];
+            ch->ambushing.clear();
 
             // TODO remove messages once camouflage is added via an affect.
             if (showMessages) {

@@ -289,7 +289,7 @@ public:
     XMLFlags   form;
     XMLFlags        parts;
     int        size;
-    char*        material;
+    DLString        material;
     
     // hunt data 
     int         endur;
@@ -298,7 +298,8 @@ public:
     bool        riding;        
     Character *        mount;
 
-    char        *ambushing;
+    // Ambushing target for rangers and vampires
+    DLString ambushing;
     
     // traps
     int        death_ground_delay;

@@ -41,7 +41,7 @@ void AreaBehaviorPlugin::destruction( ) {
 bool area_is_mansion(AreaIndexData *area)
 {
     // TODO remove obsolete check after flag is set everywhere.
-    if (!str_prefix("ht", area->area_file->file_name))
+    if (!DLString("ht").strPrefix(area->area_file->file_name))
         return true;
 
     return IS_SET(area->area_flag, AREA_MANSION);

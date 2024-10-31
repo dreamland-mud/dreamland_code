@@ -110,7 +110,6 @@ AreaVector areaInstances;
 
 AreaIndexVector areaIndexes;
 
-CLAN(none);
 MOB_INDEX_DATA *        mob_index_hash                [MAX_KEY_HASH];
 OBJ_INDEX_DATA *        obj_index_hash                [MAX_KEY_HASH];
 RoomIndexMap roomIndexMap;
@@ -127,7 +126,7 @@ new_area_file(const char *name)
 {
     struct area_file *rc = new area_file;
 
-    rc->file_name = str_dup(name);
+    rc->file_name = name;
         
     rc->next = area_file_list;
     area_file_list = rc;
@@ -179,7 +178,7 @@ obj_index_data::obj_index_data()
     area = NULL;
     vnum = 0;
     reset_num = 0;
-    material = str_dup("none");
+    material = "none";
     item_type = ITEM_TRASH;
     extra_flags = 0;
     wear_flags = 0;
@@ -220,89 +219,6 @@ const char * obj_index_data::getShortDescr( lang_t lang ) const
     return short_descr.get(lang).c_str();
 }
 
-
-mob_index_data::mob_index_data( ) 
-                     : practicer( skillGroupManager ), 
-                       religion( religionManager ),
-                       affects(skillManager),
-                       behaviors(behaviorManager),
-                       wrapper ( 0 ),
-                       clan(clan_none)
-
-{
-    next = NULL;
-    vnum = 0;
-    group = 0;
-    count = 0;
-    killed = 0;
-    act = ACT_IS_NPC;
-    affected_by = 0;
-    detection = 0;
-    alignment = 0;
-    level = 0;
-    hitroll = 0;
-    hit[DICE_NUMBER] = 0;
-    hit[DICE_TYPE] = 0;
-    hit[DICE_BONUS] = 0;
-    mana[DICE_NUMBER] = 0;
-    mana[DICE_TYPE] = 0;
-    mana[DICE_BONUS] = 0;
-    damage[DICE_NUMBER] = 0;
-    damage[DICE_TYPE] = 0;
-    damage[DICE_BONUS] = 0;
-    ac[AC_PIERCE] = 0;
-    ac[AC_BASH] = 0;
-    ac[AC_SLASH] = 0;
-    ac[AC_EXOTIC] = 0;
-    dam_type = 0;
-    off_flags = 0;
-    imm_flags = 0;
-    res_flags = 0;
-    vuln_flags = 0;
-    start_pos = POS_STANDING;
-    default_pos = POS_STANDING;
-    sex = 0;
-    race = str_dup("human");
-    wealth = 0;
-    form = 0;
-    parts = 0;
-    size = SIZE_MEDIUM;
-    material = str_dup("none");
-    area = NULL;
-}
-
-mob_index_data::~mob_index_data()
-{
-    
-}
-
-DLString mob_index_data::getProperty(const DLString &key) const
-{
-    // Look in props on index data: props[key] or props["blablah"][key]
-    DLString jsonValue;
-    JsonUtils::findValue(props, key, jsonValue);
-    return jsonValue;
-}
-
-const char * mob_index_data::getDescription( lang_t lang ) const
-{
-    return description.get(lang).c_str();
-}
-
-const char * mob_index_data::getShortDescr( lang_t lang ) const
-{
-    return short_descr.get(lang).c_str();
-}
-
-const char * mob_index_data::getLongDescr( lang_t lang ) const
-{
-    return long_descr.get(lang).c_str();
-}
-
-int mob_index_data::getSize() const
-{
-    return size == NO_FLAG ? raceManager->find(race)->getSize() : size;
-}
 
 auction_data::auction_data( )
                      : item( NULL ), seller( NULL ), buyer( NULL )
@@ -392,28 +308,6 @@ void ExtraDescrList::deallocate()
 }
 
 
-
-/*
- * Translates mob virtual number to its mob index struct.
- * Hash table lookup.
- */
-MOB_INDEX_DATA *get_mob_index( int vnum )
-{
-    MOB_INDEX_DATA *pMobIndex;
-
-    for ( pMobIndex  = mob_index_hash[vnum % MAX_KEY_HASH];
-          pMobIndex != 0;
-          pMobIndex  = pMobIndex->next )
-    {
-        if ( pMobIndex->vnum == vnum )
-            return pMobIndex;
-    }
-#if 0
-    if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
-        throw FileFormatException( "get_mob_index: vnum %d not found on world startup", vnum );
-#endif
-    return 0;
-}
 
 
 

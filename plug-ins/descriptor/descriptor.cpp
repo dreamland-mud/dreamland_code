@@ -42,10 +42,6 @@ Descriptor::Descriptor()
 
 Descriptor::~Descriptor()
 {
-    if(host)
-        free_string( host );
-    if(realip)
-        free_string( realip );
     if(outbuf)
         free(outbuf);
 }
@@ -371,7 +367,7 @@ Descriptor::writeRaw(const unsigned char *txt, int length)
 const char * Descriptor::getRealHost( ) const
 {
     if (via.empty( ))
-        return host;
+        return host.c_str();
     else
         return via.back( ).second.c_str( );
 }

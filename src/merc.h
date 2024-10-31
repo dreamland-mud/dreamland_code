@@ -84,6 +84,9 @@
 #include "dl_ctype.h"
 #include "logstream.h"
 
+
+#include "mobilefactory.h"
+
 class NPCharacter;
 class Character;
 class Object;
@@ -95,14 +98,12 @@ class AreaBehavior;
 typedef ::Pointer<XMLDocument> XMLDocumentPointer;
 class AreaQuest;
 struct extra_exit_data;
-struct mob_index_data;
 struct obj_index_data;
 
 #define        MAX_KEY_HASH                 1024
 
 extern char str_empty[1];
 
-extern mob_index_data         * mob_index_hash          [MAX_KEY_HASH];
 extern obj_index_data         * obj_index_hash          [MAX_KEY_HASH];
 
 extern int        top_area; // Keep tracks of all areas loaded; used to assign area's vnum field.
@@ -111,7 +112,7 @@ extern int        top_area; // Keep tracks of all areas loaded; used to assign a
 struct area_file {
     struct area_file *next;
     struct AreaIndexData *area;
-    char *file_name;
+    DLString file_name;
 };
 
 extern struct area_file * area_file_list;
@@ -119,7 +120,6 @@ struct area_file * new_area_file(const char *name);
 // MOC_SKIP_END
 
 
-mob_index_data *        get_mob_index        ( int vnum );
 obj_index_data *        get_obj_index        ( int vnum );
 RoomIndexData *        get_room_index        ( int vnum );
 Room * get_room_instance(int vnum);
@@ -173,7 +173,6 @@ void        free_string        ( char *pstr );
  */
 
 typedef struct        obj_index_data                OBJ_INDEX_DATA;
-typedef struct        mob_index_data                MOB_INDEX_DATA;
 typedef struct        exit_data                EXIT_DATA;
 typedef struct        extra_exit_data        EXTRA_EXIT_DATA;
 typedef struct        kill_data                KILL_DATA;
@@ -284,11 +283,6 @@ struct        weather_data
 
 
 
-/* dice */
-#define DICE_NUMBER                        0
-#define DICE_TYPE                        1
-#define DICE_BONUS                        2
-
 /*
  * Directions.
  * Used in #ROOMS.
@@ -326,76 +320,6 @@ struct  auction_data
     int      going;  /* 1,2, sold */
     int      pulse;  /* how many pulses (.25 sec) until another call-out ? */
 };
-
-/*
- * Prototype for a mob.
- * This is the in-memory version of #MOBILES.
- */
-struct        mob_index_data
-{
-    mob_index_data( );
-    virtual ~mob_index_data();
-
-    MOB_INDEX_DATA *        next;
-    ProgWrapper<SPEC_FUN> spec_fun;
-    int                vnum;
-    int                group;
-    int                count;
-    int                killed;
-
-    // Replace player_name with multi-lang keywords.
-    XMLMultiString keyword;
-
-    XMLMultiString   short_descr;
-    XMLMultiString   long_descr;
-    XMLMultiString   description;
-    XMLMultiString smell;
-
-    int                act;
-    int                affected_by;
-    int                detection;
-    int                alignment;
-    int                level;
-    int                hitroll;
-    int                        hit[3];
-    int                        mana[3];
-    int                damage[3];
-    int                ac[4];
-    int                 dam_type;
-    int                off_flags;
-    int                imm_flags;
-    int                res_flags;
-    int                vuln_flags;
-    int                start_pos;
-    int                default_pos;
-    int                sex;
-    char *                race;
-    int                wealth;
-    int                form;
-    int                parts;
-    int                size;
-    char *                material;
-    GlobalBitvector     practicer;
-    GlobalBitvector religion;
-    GlobalBitvector affects;
-    GlobalBitvector behaviors;
-    Json::Value props;
-    Grammar::Number     gram_number;
-    XMLDocumentPointer behavior;
-    Scripting::Object *wrapper;
-    AreaIndexData *                area;
-    ClanReference clan;
-
-    int getSize() const;
-
-    /** Return props value for the key (props[key] or props["xxx"][key]). */
-    DLString getProperty(const DLString &key) const;
-
-    const char * getDescription( lang_t lang ) const;
-    const char * getShortDescr( lang_t lang ) const;
-    const char * getLongDescr( lang_t lang ) const;
-};
-
 
 /*
  * Extra description data for a room or object.
@@ -447,7 +371,7 @@ struct        obj_index_data
 
     int                vnum;
     int                reset_num;
-    char *                material;
+    DLString material;
     int                item_type;
     int               extra_flags;
     int               wear_flags;

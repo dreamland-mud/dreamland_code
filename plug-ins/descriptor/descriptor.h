@@ -134,8 +134,8 @@ public:
     Character *                character;
     int                        control;
     bool                echo;
-    char *                host;
-    char *                realip;
+    DLString host;
+    DLString realip;
     int                descriptor;
     int                connected;
     bool                fcommand;

@@ -903,17 +903,17 @@ SKILL_RUNP( bonedagger )
     one_argument( argument, arg );
     
     if (arg[0] == '\0') {
-        if (ch->ambushing[0] == '\0') {
+        if (ch->ambushing.empty()) {
             ch->pecho("Чью тень ты хочешь подкараулить?");
             return;
         }
         else  {
-            ch->pecho("Ты ждешь, когда некто '{R%s{x' отбросит тень на твою могилу.", ch->ambushing);
+            ch->pecho("Ты ждешь, когда некто '{R%s{x' отбросит тень на твою могилу.", ch->ambushing.c_str());
             return;
         }
     }
 
-    ch->ambushing = str_dup( arg );
+    ch->ambushing = arg;
     run( ch, str_empty );
 }
 
@@ -923,7 +923,7 @@ SKILL_APPLY( bonedagger )
     Character *vch;
     Room *room = ch->was_in_room;
     
-    if (!DIGGED(ch) || !ch->ambushing || ch->ambushing[0] == 0)
+    if (!DIGGED(ch) || ch->ambushing.empty())
         return false;
     
     if (room->light <= 0) {
@@ -941,7 +941,7 @@ SKILL_APPLY( bonedagger )
         if (is_safe_nomessage( vch, ch ))
             continue;
         
-        if (!is_name( ch->ambushing, vch->getNameC() ))
+        if (!is_name( ch->ambushing.c_str(), vch->getNameC() ))
             continue;
 
         break;

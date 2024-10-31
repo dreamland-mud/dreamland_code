@@ -121,7 +121,7 @@ void OLCStateObject::copyDescriptions( OBJ_INDEX_DATA *original )
     obj.description  = original->description;
     obj.smell        = original->smell;
     obj.sound        = original->sound;
-    obj.material     = str_dup(original->material);
+    obj.material     = original->material;
     obj.gram_gender  = original->gram_gender;
 }
 
@@ -197,9 +197,7 @@ void OLCStateObject::commit()
     original->smell        = obj.smell;
     original->vnum         = obj.vnum;
     original->reset_num    = obj.reset_num;
-    free_string(original->material);
     original->material     = obj.material;
-    obj.material = 0;
     
     original->behavior     = obj.behavior;
     obj.behavior = 0; 
@@ -257,7 +255,7 @@ OEDIT(show)
     ptc(ch, "Limit:    [%5d]\n\r", pObj->limit);
     ptc(ch, "Wear:     [%s] {D(? wear_flags){x\n\r", wear_flags.names(pObj->wear_flags).c_str());
     ptc(ch, "Extra:    [%s] {D(? extra_flags){x\n\r", extra_flags.names(pObj->extra_flags).c_str());
-    ptc(ch, "Material: [%s] {D(? material){x\n\r", pObj->material);
+    ptc(ch, "Material: [%s] {D(? material){x\n\r", pObj->material.c_str());
     ptc(ch, "Smell:    [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
           String::stripEOL(pObj->smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
           String::stripEOL(pObj->smell.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
@@ -818,20 +816,7 @@ OEDIT(type)
 // TODO: check against hard-coded list of materials.
 OEDIT(material)
 {
-    OBJ_INDEX_DATA *pObj;
-
-    EDIT_OBJ(ch, pObj);
-
-    if (argument[0] == '\0') {
-        stc("Syntax:  material [string]\n\r", ch);
-        return false;
-    }
-
-    free_string(pObj->material);
-    pObj->material = str_dup(argument);
-
-    stc("Material set.\n\r", ch);
-    return true;
+    return editor(argument, obj.material, ED_NO_NEWLINE);
 }
 
 OEDIT(level)

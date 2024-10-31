@@ -44,7 +44,8 @@ dlpluginmanager.cpp \
 bonus.cpp \
 eventbus.cpp \
 areaquest.cpp \
-behavior.cpp
+behavior.cpp \
+mobilefactory.cpp
 
 libcore_la_MOC = \
 affect.h \

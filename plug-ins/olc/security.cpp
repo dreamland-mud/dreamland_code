@@ -231,13 +231,13 @@ CMD(olcvnum, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             AreaIndexData *area = get_area_index(filename);
             if (area) {
                 ch->pecho("Зона '%s' (%s) для этого персонажа уже существует. Используй {y{hcaedit %d{x для редактирования.",
-                            area->name, area->area_file->file_name, area->vnum);
+                            area->name, area->area_file->file_name.c_str(), area->vnum);
                 return;
             }
 
             area = AreaUtils::createFor(victim);
             ch->pecho("Создана зона '%s' (%s), диапазон внумов %d-%d. Используй {y{hcaedit %d{x для редактирования.",
-                        area->name, area->area_file->file_name, area->min_vnum, area->max_vnum, area->vnum);
+                        area->name, area->area_file->file_name.c_str(), area->min_vnum, area->max_vnum, area->vnum);
 
             attr = victim->getAttributes( ).getAttr<XMLAttributeOLC>( "olc" );
             attr->vnums.push_back(XMLVnumRange(area->min_vnum, area->max_vnum, 9));

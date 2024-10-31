@@ -35,7 +35,6 @@ const DLString Object::TYPE = "Object";
 
 Object::Object( ) :
                 ID( 0 ),
-                material( 0 ), 
                 next( 0 ), prev( 0 ),
                 next_content( 0 ), contains( 0 ), in_obj( 0 ), on( 0 ),
                 carried_by( 0 ), pIndexData( 0 ),
@@ -45,9 +44,8 @@ Object::Object( ) :
                 wear_loc( wear_none ),
                 weight( 0 ), cost( 0 ), level( 0 ), condition( 0 ),
                 timer( 0 ), timestamp( -1 ),
-                from( &str_empty[0] ),
                 extracted( 0 ), water_float( 0 ),
-                killer( &str_empty[0] ), count( 0 ),
+                count( 0 ),
                 gram_gender(MultiGender::UNDEF),
                 behavior( ObjectBehavior::NODE_NAME ),
                 reset_obj(0), reset_mob(0), reset_room(0)
@@ -64,10 +62,6 @@ void Object::extract( )
         keyword.clearValues();
         short_descr.clearValues();
         description.clearValues();
-        
-        free_string( material );
-        free_string( killer );
-        free_string( from );
         
         next = 0;
         prev = 0;
@@ -89,13 +83,13 @@ void Object::extract( )
         cost = 0;
         level = 0;
         condition = 0;
-        material = 0;
+        material.clear();
         timer = 0;
         timestamp = -1;
-        from = &str_empty[0];
+        from.clear();
         extracted = true;
         water_float = 0;
-        killer = &str_empty[0];
+        killer.clear();
         count = 0;
         gram_gender = MultiGender::UNDEF;
         props.clear();
@@ -115,10 +109,6 @@ Object::~Object( )
     affected.deallocate();
 
     extraDescriptions.deallocate();
-
-    free_string( material );
-    free_string( killer );
-    free_string( from );
 }
 
 Character * Object::getCarrier( ) {
@@ -279,11 +269,9 @@ void Object::setDescription( const DLString &str, lang_t lang )
 
 void Object::setMaterial( const char *s )
 {
-    if (material)
-        free_string( material );
-
-    material = str_dup( s );
+    material = s;
 }
+
 void Object::setOwner( const DLString &newOwner )
 {
     this->owner = newOwner;

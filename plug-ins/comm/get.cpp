@@ -159,11 +159,10 @@ bool oprog_can_fetch_corpse_pc( Character *ch, Object *container, Object *obj, b
     if (container->hasOwner( ch ))
         return true;
         
-    if (!container->killer)
+    if (container->killer.empty())
         return true;
 
-    if (str_cmp( ch->getNameC(), container->killer ) 
-        && str_cmp( "!anybody!", container->killer )) 
+    if (container->killer != ch->getNameC() && container->killer != "!anybody!")
     {
         if (verbose)
             ch->pecho("Это не твоя добыча.");

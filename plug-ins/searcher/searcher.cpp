@@ -1005,7 +1005,7 @@ CMDRUNP(searcher)
                                     pMob->vnum,
                                     pMob->level, 
                                     name.c_str(),
-                                    pMob->race,
+                                    pMob->race.c_str(),
                                     searcher_param_class(pMob).c_str(),
                                     searcher_param_sex(pMob).c_str(),
                                     weapon_flags.name(pMob->dam_type).c_str(),

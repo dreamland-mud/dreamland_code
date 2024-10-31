@@ -37,15 +37,8 @@ WrapperHandler::handle(Descriptor *d, char *arg)
         return -1;
     }
     
-    if (d->realip)
-        free_string(d->realip);
-    
-    d->realip = str_dup( ip );
-    
-    if (d->host)
-        free_string(d->host);
-    
-    d->host = str_dup( ip  );
+    d->realip = ip;
+    d->host = ip;
 
     d->send("Got wrapper response.\n\r");
     

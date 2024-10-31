@@ -58,14 +58,14 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
     killed           = mob.killed;
     level            = mob.level;
     long_descr       = mob.long_descr;
-    material         = str_dup(mob.material);
+    material         = mob.material;
     off_flags        = mob.off_flags;
     parts            = mob.parts;
     keyword          = mob.keyword;
     practicer        = mob.practicer;
     religion         = mob.religion;
     affects          = mob.affects;
-    race             = str_dup(mob.race);
+    race             = mob.race;
     res_flags        = mob.res_flags;
     sex              = mob.sex;
     gram_number      = mob.gram_number;
@@ -92,8 +92,6 @@ XMLMobIndexData::~XMLMobIndexData()
 void
 XMLMobIndexData::clear()
 {
-    free_string(material);
-    free_string(race);
 }
 
 
@@ -134,7 +132,7 @@ XMLObjIndexData::XMLObjIndexData(const obj_index_data &original)
     description = original.description;
     vnum         = original.vnum;
     reset_num    = original.reset_num;
-    material     = str_dup(original.material);
+    material     = original.material;
     item_type    = original.item_type;
     extra_flags  = original.extra_flags;
     wear_flags   = original.wear_flags;

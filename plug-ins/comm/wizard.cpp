@@ -1324,7 +1324,7 @@ static bool has_nopost(Character *ch)
         << "Когда: " << Date::getTimeAsString( victim->getLastFightTime( ) ) 
         << endl;
     
-    if (victim->ambushing[0])
+    if (!victim->ambushing.empty())
         buf << "В засаде на: [" << victim->ambushing << "]" << endl;
     
     if (npc && !npc->pIndexData->practicer.empty( ))

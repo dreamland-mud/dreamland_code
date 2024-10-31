@@ -227,7 +227,7 @@ CMD(edit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
 static bool area_cmp_filename(const AreaIndexData *a, const AreaIndexData *b)
 {
-    return strcmp(a->area_file->file_name, b->area_file->file_name) < 0;
+    return a->area_file->file_name < b->area_file->file_name;
 }
 
 static bool area_cmp_vnum(const AreaIndexData *a, const AreaIndexData *b)
@@ -303,7 +303,7 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 String::truncate(areaName, 29).c_str(),
                 colorAreaVnums,
                 pArea->min_vnum, pArea->max_vnum,
-                pArea->area_file->file_name,
+                pArea->area_file->file_name.c_str(),
                 hedit.c_str()));
     }
 }
@@ -323,7 +323,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         for (auto &room: roomInstances) {
             ostringstream *buf;
             if (IS_SET(room->room_flags, ROOM_MANSION) 
-                    || !str_prefix("ht", room->areaIndex()->area_file->file_name))
+                    || DLString("ht").strPrefix(room->areaIndex()->area_file->file_name))
                 buf = &mbuf;
             else if (room->pIndexData->clan != clan_none)
                 buf = &cbuf;
@@ -332,7 +332,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             for (auto &eexit: room->extra_exits) {
                 (*buf) << fmt(0, lineFormat.c_str(), 
                                 room->vnum, 
-                                room->areaIndex()->area_file->file_name,
+                                room->areaIndex()->area_file->file_name.c_str(),
                                 eexit->short_desc_from[RU].c_str(),                           
                                 eexit->short_desc_to[RU].c_str()) << endl;
             }

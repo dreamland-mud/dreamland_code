@@ -130,8 +130,8 @@ void init_descriptor( int control )
     dnew->oob_proto = 0;
 
     const char *realip = inet_ntoa(sock.sin_addr);
-    dnew->realip        = str_dup(realip); 
-    dnew->host          = str_dup(realip); 
+    dnew->realip        = realip; 
+    dnew->host          = realip; 
     LogStream::sendNotice( ) << "New descriptor " << dnew->realip << endl;
 
     if (banManager->checkVerbose( dnew, BAN_ALL )) {

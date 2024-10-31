@@ -136,7 +136,7 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             /* Save changed areas. */
             if (pArea->changed) {
                 if (save_xmlarea(pArea->area_file, ch)) {
-                    ptc(ch, "%24s - '%s'\n\r", pArea->getName().c_str(), pArea->area_file->file_name);
+                    ptc(ch, "%24s - '%s'\n\r", pArea->getName().c_str(), pArea->area_file->file_name.c_str());
                     success = true;
                 } 
             }

@@ -175,7 +175,7 @@ XMLMobileFactory::compat(mob_index_data *mob)
     mob->description = description;
     mob->smell = smell;
 
-    mob->race = str_dup(race.getValue( ).c_str( ));
+    mob->race = mobrace->getName();
     mob->act = act.get(mobrace->getAct( )) | ACT_IS_NPC;
     mob->affected_by = aff.get(mobrace->getAff( ));
     mob->alignment = alignment.getValue( );
@@ -212,7 +212,7 @@ XMLMobileFactory::compat(mob_index_data *mob)
     mob->parts = parts.get(mobrace->getParts( ));
 
     mob->size = size.getValue( );
-    mob->material = str_dup(material.getValue( ).c_str( ));
+    mob->material = material;
 
     mob->detection = detection.get(mobrace->getDet( ));
 

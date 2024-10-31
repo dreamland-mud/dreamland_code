@@ -85,7 +85,7 @@ XMLObjectFactory::compat(obj_index_data *obj)
     obj->description = description;
     obj->description[RU] = format_longdescr(description[RU]);
 
-    obj->material = str_dup(material.getValue( ).c_str( ));
+    obj->material = material;
     obj->item_type = type.type;
     copy(type.v, type.v + 5, obj->value);
     obj->level = level.getValue( );

@@ -34,8 +34,7 @@ OLCStateArea::OLCStateArea() : vnum( -1 ), area_flag(0, &area_flags)
 OLCStateArea::OLCStateArea(AreaIndexData *original) : area_flag(0, &area_flags)
 {
     if (original) {
-        if(original->area_file->file_name)
-            file_name = original->area_file->file_name;
+        file_name = original->area_file->file_name;
 
         name = original->name;
         altname = original->altname;
@@ -93,8 +92,7 @@ void OLCStateArea::commit()
         original->create();
     }
     else {
-        free_string(original->area_file->file_name);
-        original->area_file->file_name = str_dup( file_name.getValue( ).c_str( ) );
+        original->area_file->file_name = file_name;
     }
 
     original->name = name;

@@ -112,7 +112,7 @@ void OLCStateMobile::copyDescriptions( MOB_INDEX_DATA *original )
     mob.short_descr = original->short_descr;
     mob.long_descr = original->long_descr;
     mob.description = original->description;
-    mob.material         = str_dup(original->material);
+    mob.material         = original->material;
     mob.smell            = original->smell;
 }
 
@@ -138,7 +138,7 @@ void OLCStateMobile::copyParameters( MOB_INDEX_DATA *original )
     mob.default_pos      = original->default_pos;
     mob.sex              = original->sex;
     mob.gram_number      = original->gram_number;
-    mob.race             = str_dup(original->race);
+    mob.race             = original->race;
     mob.wealth           = original->wealth;
     mob.form             = original->form;
     mob.parts            = original->parts;
@@ -299,16 +299,12 @@ void OLCStateMobile::commit()
     original->default_pos      = mob.default_pos;
     original->sex              = mob.sex;
     original->gram_number      = mob.gram_number;
-    free_string( original->race );
     original->race             = mob.race;
-    mob.race = 0;
     original->wealth           = mob.wealth;
     original->form             = mob.form;
     original->parts            = mob.parts;
     original->size             = mob.size;
-    free_string(original->material);
     original->material         = mob.material;
-    mob.material = 0;
     original->behavior         = mob.behavior;
     mob.behavior = 0;    
     original->practicer.clear( );
@@ -363,7 +359,7 @@ MEDIT(show)
     ptc(ch, "{CLevel{x:       [{W%3d{x]\n\r", mob.level);
 
     ptc(ch, "{CRace{x:        [{W%s{x] {D(? race){x Sex: [{W%s{x] {D(? sex_table){x Number: [{W%s{x]\n\r",
-        mob.race, 
+        mob.race.c_str(), 
         sex_table.name( mob.sex ).c_str( ),
         mob.gram_number == Grammar::Number::PLURAL ? "plural" : "singular");
 
@@ -410,7 +406,7 @@ MEDIT(show)
         size_table.name(mob.size).c_str(), 
         race ? race->getSize().name().c_str() : "-");
 
-    ptc(ch, "{CMaterial:{x    [{W%s{x] {D(? material){x\n\r", mob.material);
+    ptc(ch, "{CMaterial:{x    [{W%s{x] {D(? material){x\n\r", mob.material.c_str());
     ptc(ch, "{CForm:{x        [{W%s{x] {D(? form_flags){x\n\r", form_flags.names(mob.form).c_str());
     ptc(ch, "{CParts:{x       [{W%s{x] {D(? part_flags){x\n\r", part_flags.names(mob.parts).c_str());
 
@@ -942,16 +938,7 @@ MEDIT(vuln)
 
 MEDIT(material)
 {
-    if (argument[0] == '\0') {
-        stc("Syntax:  material [string]\n\r", ch);
-        return false;
-    }
-
-    free_string(mob.material);
-    mob.material = str_dup(argument);
-
-    stc("Material set.\n\r", ch);
-    return true;
+    return editor(argument, mob.material, ED_NO_NEWLINE);
 }
 
 MEDIT(off)
@@ -997,8 +984,7 @@ MEDIT(race)
             mob.parts &= ~old_race->getParts( );
 */            
 
-            free_string( mob.race );
-            mob.race = str_dup( race->getName( ).c_str( ) );
+            mob.race = race->getName();
 
 /*
             mob.off_flags |= race->getOff( );

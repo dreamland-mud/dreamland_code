@@ -334,7 +334,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
         std::vector<DLString> parms(2);
         // Create codesource subject.
         parms[0] = fmt(0, "areas/%s/%s/%d.%s", 
-                        indexData.getArea()->area_file->file_name, 
+                        indexData.getArea()->area_file->file_name.c_str(), 
                         indexData.getIndexType(),
                         indexData.getVnum(),
                         methodName.c_str());   
@@ -694,7 +694,7 @@ vector<DLString> FeniaTriggerLoader::createQuestStepParams(
 
     // Create codesource subject.
     parms[0] = fmt(0, "areas/%s/%s/%s.%s", 
-                    pArea->area_file->file_name, 
+                    pArea->area_file->file_name.c_str(), 
                     type.c_str(),
                     vnum.c_str(),
                     methodId.c_str());   
