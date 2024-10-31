@@ -592,7 +592,7 @@ struct AreaIndexData {
     XMLMultiString altname; // alternative names for this area
     DLString authors;
     DLString translator;
-    DLString speedwalk;
+    XMLMultiString speedwalk;
     int low_range;
     int high_range;
     int min_vnum;

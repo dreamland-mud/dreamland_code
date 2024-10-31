@@ -35,8 +35,8 @@ public:
     
     XML_VARIABLE XMLMultiString name, altname;
     XML_VARIABLE XMLStringNoEmpty credits; // compat field
-    XML_VARIABLE XMLStringNoEmpty authors, translator, speedwalk;
-    XML_VARIABLE XMLMultiString resetMessage;
+    XML_VARIABLE XMLStringNoEmpty authors, translator;
+    XML_VARIABLE XMLMultiString speedwalk, resetMessage;
     XML_VARIABLE XMLIntegerNoEmpty security;
     XML_VARIABLE XMLInteger vnumHigh, vnumLow;
     XML_VARIABLE XMLInteger levelHigh, levelLow;

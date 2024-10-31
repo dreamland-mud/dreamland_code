@@ -175,8 +175,11 @@ AEDIT(show, "показать", "показать все поля")
     ptc(ch, "Levels:     [{W%u-%u{x]\n\r", low_range.getValue( ), high_range.getValue( ));
     ptc(ch, "Flags:      [{W%s{x] {D(? area_flags{w)\n\r", area_flags.names(area_flag).c_str());
     ptc(ch, "Security:   [{W%d{x]\n\r", security.getValue( ));
-    ptc(ch, "Speedwalk:  [{W%s{x]\n\r", speedwalk.getValue( ).c_str( ));
-    ptc(ch, "Message:    [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
+    ptc(ch, "Speedwalk:  EN [{W%s{x] %s  UA [{W%s{x] %s  RU [{W%s{x] %s\n\r", 
+          String::stripEOL(speedwalk.get(EN)).c_str(), web_edit_button(ch, "speedwalk", "web").c_str(),   
+          String::stripEOL(speedwalk.get(UA)).c_str(), web_edit_button(ch, "uaspeedwalk", "web").c_str(),   
+          String::stripEOL(speedwalk.get(RU)).c_str(), web_edit_button(ch, "ruspeedwalk", "web").c_str());   
+    ptc(ch, "Message:    EN [{W%s{x] %s  UA [{W%s{x] %s  RU [{W%s{x] %s\n\r", 
           String::stripEOL(resetMessage.get(EN)).c_str(), web_edit_button(ch, "message", "web").c_str(),   
           String::stripEOL(resetMessage.get(UA)).c_str(), web_edit_button(ch, "uamessage", "web").c_str(),   
           String::stripEOL(resetMessage.get(RU)).c_str(), web_edit_button(ch, "rumessage", "web").c_str());   
@@ -389,6 +392,21 @@ AEDIT(rumessage, "русообщение", "установить сообщен�
     return editor(argument, resetMessage[RU], (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
 }
 
+AEDIT(speedwalk, "маршрут", "установить маршрут, как добраться от Рыночной Площади")
+{
+    return editor(argument, speedwalk[EN], (editor_flags)(ED_NO_NEWLINE));
+}
+
+AEDIT(uaspeedwalk, "укмаршрут", "установить маршрут, как добраться от Рыночной Площади")
+{
+    return editor(argument, speedwalk[UA], (editor_flags)(ED_NO_NEWLINE));
+}
+
+AEDIT(ruspeedwalk, "румаршрут", "установить маршрут, как добраться от Рыночной Площади")
+{
+    return editor(argument, speedwalk[RU], (editor_flags)(ED_NO_NEWLINE));
+}
+
 AEDIT(flags, "флаги", "установить или сбросить флаги арии (? area_flags)")
 {
     return flagBitsEdit(area_flag);
@@ -498,21 +516,6 @@ AEDIT(translator, "переводчик", "установить имена пе�
     return true;
 }
 
-AEDIT(speedwalk, "маршрут", "установить маршрут, как добраться от Рыночной Площади")
-{
-    if (!*argument) {
-        stc("Syntax:  speedwalk <run from MSM>\n\r", ch);
-        stc("Syntax:  speedwalk none\n\r", ch);
-        return false;
-    }
-
-    if (!str_cmp(argument, "none"))
-        speedwalk = "";
-    else
-        speedwalk = argument;
-
-    return true;
-}
 
 AEDIT(vnums, "внумы", "устаноить диапазон внумов (нижний верхний)")
 {

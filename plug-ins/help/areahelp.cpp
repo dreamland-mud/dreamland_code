@@ -121,9 +121,6 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 
     in << endl;
 
-    if (IS_SET(area->area_flag, AREA_SAFE|AREA_EASY|AREA_HARD|AREA_DEADLY))
-        in << "Уровень опасности: " << area_danger_long(area) << endl;
-
     // Make a list of all alternative names excluding the main one.
     list<DLString> altnames = String::toNormalizedList(area->altname);
     list<DLString> names = String::toNormalizedList(area->name);
@@ -132,6 +129,9 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 
     if (!names.empty())
         in << "{DТакже известна как: " << String::join(names, ", ") << "{x" << endl;
+
+    if (IS_SET(area->area_flag, AREA_SAFE|AREA_EASY|AREA_HARD|AREA_DEADLY))
+        in << "Уровень опасности: " << area_danger_long(area) << endl;
 
     in << endl;
 
@@ -149,20 +149,22 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
             in << "{yЗадания{x:" << endl << qbuf.str() << endl;
     }
 
-    if (!area->speedwalk.empty()) {
+    if (!area->speedwalk.emptyValues()) {
+        const DLString &speedwalk = area->speedwalk.get(LANG_DEFAULT);
+
         in << "{yКак добраться{x: ";
 
         // For speedwalks that only contain run path, surround it with {hs tags.
         RegExp simpleSpeedwalkRE("^[0-9nsewud]+$");
-        if (simpleSpeedwalkRE.match(area->speedwalk))
-            in << "{y{hs" << area->speedwalk << "{x" << endl;
+        if (simpleSpeedwalkRE.match(speedwalk))
+            in << "{y{hs" << speedwalk << "{x" << endl;
         else
-            in << area->speedwalk << endl;
+            in << speedwalk << endl;
 
         // If 'speedwalk' field contains something resembling a run path,
         // and not just text, explain the starting point.
         RegExp speedwalkRE("[0-9]?[nsewud]+");
-        if (speedwalkRE.match(area->speedwalk))
+        if (speedwalkRE.match(speedwalk))
            in << "{D(все пути ведут от Рыночной Площади Мидгаарда, если не указано иначе){x" << endl;
     }
 }

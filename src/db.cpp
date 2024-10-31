@@ -114,7 +114,6 @@ CLAN(none);
 MOB_INDEX_DATA *        mob_index_hash                [MAX_KEY_HASH];
 OBJ_INDEX_DATA *        obj_index_hash                [MAX_KEY_HASH];
 RoomIndexMap roomIndexMap;
-char *                        string_hash                [MAX_KEY_HASH];
 
 char                        str_empty        [1];
 
