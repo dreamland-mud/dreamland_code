@@ -56,7 +56,7 @@ void AreaQuestCleanupPlugin::run( int oldState, int newState, Descriptor *d )
                 aquestData.cancel();
                 wiznet(WIZ_QUEST, 0, 0, "Auto-cancelled obsolete area quest %s for %s", questId.c_str(), pch->getNameC());
 
-            } else if (!aquest->flags.isSet(AQUEST_ONBOARDING)) {
+            } else if (!aquest->flags.isSet(AQUEST_ONBOARDING|AQUEST_NOEXPIRE)) {
                 // Make the player type 'quest cancel <num>', to allow onCancel triggers to run.
                 pch->pecho("\r\n{yЗадание {Y%s{y будет отменено из-за неактивности.{x", aquest->title.get(LANG_DEFAULT).c_str());
 

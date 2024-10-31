@@ -16,6 +16,9 @@
 
 CLAN(none);
 
+MOB_INDEX_DATA * mob_index_hash[1024];
+
+
 mob_index_data::mob_index_data( ) 
                      : practicer( skillGroupManager ), 
                        religion( religionManager ),
@@ -112,7 +115,7 @@ MOB_INDEX_DATA *get_mob_index( int vnum )
     }
 
     if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
-	LogStream::sendError() << "get_mob_index: vnum " << vnum << " not found on world startup" << endl;
+	    LogStream::sendError() << "get_mob_index: vnum " << vnum << " not found on world startup" << endl;
 
     return 0;
 }

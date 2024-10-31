@@ -15,7 +15,6 @@ struct mob_index_data;
 class AreaIndexData;
 
 typedef struct mob_index_data MOB_INDEX_DATA;
-typedef ::Pointer<XMLDocument> XMLDocumentPointer;
 
 /* dice */
 #define DICE_NUMBER 0
@@ -75,7 +74,7 @@ struct mob_index_data
     GlobalBitvector behaviors;
     Json::Value props;
     Grammar::Number     gram_number;
-    XMLDocumentPointer behavior;
+    XMLDocument::Pointer behavior;
     Scripting::Object *wrapper;
     AreaIndexData *                area;
     ClanReference clan;
@@ -91,7 +90,7 @@ struct mob_index_data
 };
 
 
-// A global hash table mapping mob virtual number to the mob index struct.
+// Global hash table mapping mob virtual number to the mob index struct.
 extern mob_index_data  * mob_index_hash[1024];
 
 /*

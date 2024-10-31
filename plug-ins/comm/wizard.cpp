@@ -470,7 +470,6 @@ CMDWIZP( transfer )
         }
         
 
-/*        if ( !location->isOwner(ch) && location ->isPrivate( ) */
         if ( location ->isPrivate( )
         &&  ch->get_trust() < MAX_LEVEL)
         {
@@ -804,8 +803,6 @@ static void format_affect(Affect *paf, ostringstream &buf)
     {
         ostringstream tbuf;
 
-        if (r->owner && r->owner[0])
-            tbuf << "Владелец: " << r->owner << "  ";
         if (r->pIndexData->clan != clan_none)
             tbuf << "Клан: " << r->pIndexData->clan->getShortName() << "  ";
         if (!r->pIndexData->guilds.empty())
@@ -1725,7 +1722,7 @@ CMDWIZP( snoop )
         return;
     }
 
-    if (!victim->in_room->isOwner(ch) && ch->in_room != victim->in_room
+    if (ch->in_room != victim->in_room
     &&  victim->in_room->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
     {
         ch->pecho("Этот игрок сейчас в приватной комнате.");
@@ -2367,8 +2364,7 @@ CMDWIZP( force )
             return;
         }
 
-            if (!victim->in_room->isOwner(ch)
-        &&  ch->in_room != victim->in_room
+            if (ch->in_room != victim->in_room
         &&  victim->in_room->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
             {
             ch->pecho("Этот персонаж сейчас в приватной комнате.");

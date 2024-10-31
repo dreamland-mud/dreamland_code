@@ -986,7 +986,7 @@ static void fread_char_raw( PCharacter *ch, FILE *fp )
         case 'L':
             KEY( "LastLevel",        ch->last_level, fread_number( fp ) );
             KEY( "LLev",        ch->last_level, fread_number( fp ) );
-            KEYV( "LogO",        ch->last_logoff, fread_number( fp ) );
+            KEYSKIP( "LogO" );
             KEYSKIP( "LastTime" );
             break;
         case 'M':

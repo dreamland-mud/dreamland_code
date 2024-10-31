@@ -5,7 +5,6 @@
 #include "room.h"
 
 #include "fenia/register-impl.h"
-
 #include "behavior.h"
 #include "skill.h"
 #include "skillmanager.h"
@@ -14,6 +13,8 @@
 #include "affect.h"
 #include "object.h"
 #include "character.h"
+#include "dlscheduler.h"
+#include "dreamland.h"
 #include "string_utils.h"
 #include "merc.h"
 #include "def.h"
@@ -22,35 +23,12 @@ CLAN(none);
 PROF(none);
 LIQ(none);
 
-extra_exit_data *ExtraExitList::find(const DLString &keyword) const
-{
-    for (auto &eexit: *this) {
-        if (String::toString(eexit->keyword) == keyword)
-            return eexit;
-            
-        if (eexit->keyword.matchesUnstrict(keyword))
-            return eexit;
+RoomSet roomAffected;
 
-        if (eexit->short_desc_from.matchesUnstrict(keyword))
-            return eexit;
+RoomVector roomInstances;
 
-        if (eexit->short_desc_to.matchesUnstrict(keyword))
-            return eexit;
-    }
+RoomIndexMap roomIndexMap;
 
-    return 0;
-}
-
-bool ExtraExitList::findAndDestroy(const DLString &keyword)
-{
-    extra_exit_data *eexit = find(keyword);
-    if (!eexit)
-        return false;
-
-    remove(eexit);
-    delete eexit;
-    return true;
-}
 
 RoomIndexData::RoomIndexData()
         : vnum(0), room_flags(0),
@@ -71,7 +49,6 @@ Room::Room( ) :
                 position( -1 ),
                 people( 0 ), contents( 0 ),
                 area( 0 ),
-                owner(&str_empty[0]),
                 vnum( 0 ), room_flags( 0 ), 
                 light( 0 ),
                 affected_by( 0 ),
@@ -93,14 +70,6 @@ int Room::getHealRate() const
 int Room::getManaRate() const
 {
     return pIndexData->mana_rate + mod_mana_rate;
-}
-
-bool Room::isOwner( Character *ch ) const
-{
-    if (owner == 0 || owner[0] == '\0')
-        return false;
-
-    return is_name( ch->getNameC(), owner );
 }
 
 bool Room::hasExits() const
@@ -215,3 +184,26 @@ LiquidReference & Room::getLiquid()
 
     return liquid;
 }
+
+
+RoomIndexData *get_room_index( int vnum )
+{
+    auto r = roomIndexMap.find(vnum);
+    if (r != roomIndexMap.end())
+        return r->second;
+
+    if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
+	    LogStream::sendError() << "get_room_index: vnum " << vnum << " not found on world startup" << endl;
+
+    return 0;
+}
+
+// FIXME: should look up by vnum and instance.
+Room *get_room_instance(int vnum)
+{
+    RoomIndexData *pRoomIndex = get_room_index(vnum);
+    if (pRoomIndex)
+        return pRoomIndex->room;
+    return 0;
+}
+

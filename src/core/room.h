@@ -17,14 +17,28 @@
 #include "roombehavior.h"
 #include "affectlist.h"
 #include "xmlmultistring.h"
-#include "merc.h"
+#include "extradescription.h"
+#include "exits.h"
+#include "resets.h"
 
 struct AreaIndexData;
 struct Area;
-struct extra_descr_data;
-struct exit_data;
-struct extra_exit_data;
 struct reset_data;
+class Room;
+class RoomIndexData;
+
+typedef set<Room *> RoomSet;
+/** A small collection of rooms with affects on them, to avoid going through the whole list in updates. */
+extern RoomSet roomAffected;
+
+typedef map<int, RoomIndexData *> RoomIndexMap;
+/** Map of all room prototypes by vnum, for quick access. */
+extern RoomIndexMap roomIndexMap;
+
+typedef vector<Room *> RoomVector;
+/** List of all room instances. */
+extern RoomVector roomInstances;
+
 
 struct RoomHistoryEntry {
     RoomHistoryEntry( DLString n, DLString rn, int w )
@@ -45,19 +59,6 @@ struct RoomHistory : public list<RoomHistoryEntry> {
     void toStream( ostringstream & ) const;
     static const unsigned int MAX_SIZE;
 };
-
-struct ExtraExitList: public list<extra_exit_data *> {
-    /** Return an exit that matches the given keyword. */
-    extra_exit_data *find(const DLString &keyword) const;
-
-    /** 
-     * Remove matching exit from list and free its memory. 
-     * Returns true if found.
-     */
-    bool findAndDestroy(const DLString &keyword);
-};
-
-typedef vector<reset_data *> ResetList;
 
 struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     RoomIndexData();
@@ -99,7 +100,6 @@ class Room : public virtual DLObject, public WrapperTarget {
 public:
     Room( );
 
-    bool isOwner( Character *ch ) const;
     bool isPrivate( ) const;
     int  getCapacity( ) const;
     bool isCommon( );
@@ -160,7 +160,6 @@ public:
     Area *area;
     exit_data *   exit[6];
     ExtraExitList extra_exits;
-    char *     owner;
     int        vnum;
     int        room_flags;
     int        light;
@@ -225,4 +224,14 @@ inline AreaIndexData *Room::areaIndex() const
  */
 
 #define IS_ROOM_AFFECTED(room, sn)         (IS_SET((room)->affected_by, (sn)))
+
+/*
+ * Translates room virtual number to its room index struct.
+ * Hash table lookup.
+ */
+RoomIndexData * get_room_index( int vnum );
+
+/** Looks up default room instance by vnum. (FIXME) */
+Room * get_room_instance(int vnum);
+
 #endif

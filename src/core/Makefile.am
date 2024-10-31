@@ -45,7 +45,13 @@ bonus.cpp \
 eventbus.cpp \
 areaquest.cpp \
 behavior.cpp \
-mobilefactory.cpp
+mobilefactory.cpp \
+objectfactory.cpp \
+area.cpp \
+extradescription.cpp \
+exits.cpp \
+resets.cpp \
+auction.cpp
 
 libcore_la_MOC = \
 affect.h \
