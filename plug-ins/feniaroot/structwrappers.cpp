@@ -1433,6 +1433,17 @@ NMI_GET(SkillWrapper, spellType, "вид заклинания (.tables.spell_typ
     return spell ? spell->getSpellType() : 0;
 }
 
+NMI_GET(SkillWrapper, helpId, "ID статьи справки или 0")
+{
+    int help_id = 0;
+    Skill *skill = getTarget();
+
+    if (skill->getSkillHelp())
+        help_id = skill->getSkillHelp()->getID();
+
+    return max(0, help_id);
+}
+
 NMI_GET(SkillWrapper, groups, "список названий групп умения")
 {
     RegList::Pointer rc(NEW);
