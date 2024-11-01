@@ -1512,6 +1512,14 @@ NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]): вернуть разуче�
     return Register(ch->getSkillData(sn).learned);
 }
 
+NMI_INVOKE( SkillWrapper, practice, "(ch): разучить умение, потратив 1 практику" )
+{
+    PCharacter *ch = args2player(args); 
+    Skill *skill = getTarget();
+    skill->practice(ch);
+    return Register();
+}
+
 NMI_INVOKE( SkillWrapper, effective, "(ch): узнать процент раскачки у персонажа" )
 {
     Character *ch = args2character(args);
