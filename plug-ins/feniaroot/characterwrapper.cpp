@@ -593,6 +593,46 @@ NMI_GET( CharacterWrapper, craftProfessions, "map из названия->уро�
     return Register( obj );
 }
 
+NMI_GET(CharacterWrapper, perm_stat, "массив постоянных параметров персонажа")
+{
+    checkTarget();
+    Register statsReg = Register::handler<RegContainer>();
+    RegContainer *stats = statsReg.toHandler().getDynamicPointer<RegContainer>();
+
+    for (auto i = 0; i < stat_table.size; i++)
+        stats->setField(i, target->perm_stat[i]);
+        
+    return statsReg;
+}
+
+NMI_GET(CharacterWrapper, curr_stat, "массив параметров с учетом вещей")
+{
+    checkTarget();
+    Register statsReg = Register::handler<RegContainer>();
+    RegContainer *stats = statsReg.toHandler().getDynamicPointer<RegContainer>();
+
+    for (auto i = 0; i < stat_table.size; i++)
+        stats->setField(i, target->getCurrStat(i));
+        
+    return statsReg;
+}
+
+NMI_GET(CharacterWrapper, max_train, "массив максимально возможных значений параметров")
+{
+    checkTarget();
+    Register statsReg = Register::handler<RegContainer>();
+    RegContainer *stats = statsReg.toHandler().getDynamicPointer<RegContainer>();
+
+    for (auto i = 0; i < stat_table.size; i++)
+        if (target->is_npc())
+            stats->setField(i, MAX_STAT);
+        else
+            stats->setField(i, target->getPC()->getMaxTrain(i));
+        
+    return statsReg;
+}
+
+
 #define CONDITION(type, api) \
 NMI_GET( CharacterWrapper, cond_##type, api ) \
 { \
