@@ -1505,6 +1505,18 @@ NMI_INVOKE( SkillWrapper, adept, "(ch): вернуть максимальное 
     return getTarget()->getAdept(ch);
 }
 
+NMI_INVOKE( SkillWrapper, rating, "(ch): сложность прокачки этого умения для персонажа, 1 по умолчанию, >1 для более сложных" )
+{
+    PCharacter *ch = args2player(args); 
+    Skill *skill = getTarget();
+    BasicSkill *basicSkill = dynamic_cast<BasicSkill *>(skill);
+
+    if (basicSkill)
+        return basicSkill->getRating(ch);
+    else
+        return 1;
+}
+
 NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]): вернуть разученность или установить ее в percent" )
 {
     PCharacter *ch = args2player(args); 
