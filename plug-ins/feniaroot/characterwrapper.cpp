@@ -2860,40 +2860,48 @@ NMI_INVOKE(CharacterWrapper, behaviorMethod, "(methodName, args...): вызва�
 }
 
 // Call aquest trigger if applicable for this target.
-static bool call_aquest_trigger(CharacterWrapper *wrapper, const DLString &trigName, const RegisterList &trigArgs)
+static bool call_aquest_trigger(CharacterWrapper *mobWrapper, const DLString &trigName, const RegisterList &trigArgs)
 {
-    Character *target = wrapper->getTarget();
+    Character *mob = mobWrapper->getTarget();
 
-    if (!target->is_npc())
+    if (!mob->is_npc())
+        return false;
+
+    WrapperBase *indexWrapper = get_wrapper(mob->getNPC()->pIndexData->wrapper);
+    if (!indexWrapper)
         return false;
 
     // Assume first argument is the PC quest doer
-    CharacterWrapper *chWrap = wrapper_cast<CharacterWrapper>(trigArgs.front());
-    if (!chWrap)
+    CharacterWrapper *playerWrapper = wrapper_cast<CharacterWrapper>(trigArgs.front());
+    if (!playerWrapper)
         return false;
 
-    Character *ch = chWrap->getTarget();
-    if (ch->is_npc())
+    Character *player = playerWrapper->getTarget();
+    if (player->is_npc())
         return false;
 
-    return aquest_trigger(wrapper, ch->getPC(), trigName, trigArgs);
+    // Mob on whom the quest trigger is invoked should be the first argument
+    RegisterList questTrigArgs = trigArgs;
+    questTrigArgs.push_front(Register(mobWrapper->getSelf()));
+
+    return aquest_trigger(indexWrapper, player->getPC(), trigName, questTrigArgs);
 }
 
 // Call behavior triggers if applicable for this target.
-static bool call_behavior_trigger(CharacterWrapper *wrapper, const DLString &trigName, const RegisterList &trigArgs)
+static bool call_behavior_trigger(CharacterWrapper *mobWrapper, const DLString &trigName, const RegisterList &trigArgs)
 {
-    Character *target = wrapper->getTarget();
+    Character *mob = mobWrapper->getTarget();
 
-    if (!target->is_npc())
+    if (!mob->is_npc())
         return false;
 
-    GlobalBitvector &behaviors = target->getNPC()->pIndexData->behaviors;
+    GlobalBitvector &behaviors = mob->getNPC()->pIndexData->behaviors;
     if (behaviors.empty())
         return false;
 
     // Make this mob a first argument
     RegisterList behaviorTrigArgs = trigArgs;
-    behaviorTrigArgs.push_front(Register(wrapper->getSelf()));
+    behaviorTrigArgs.push_front(Register(mobWrapper->getSelf()));
 
     auto results = behavior_trigger_with_result(behaviors, trigName, behaviorTrigArgs);
     return reglist_to_bool(results);
