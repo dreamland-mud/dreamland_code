@@ -46,8 +46,9 @@ void AreaQuestCleanupPlugin::run( int oldState, int newState, Descriptor *d )
     for (auto &aquestDataPair: **areaQuestAttr) {
         const DLString &questId = aquestDataPair.first;
         AreaQuestData &aquestData = aquestDataPair.second;
+        int latestInteraction = max(aquestData.timeupdate, aquestData.timestart);
 
-        if (aquestData.questActive() && aquestData.timestart < cutoffTime) {
+        if (aquestData.questActive() && latestInteraction < cutoffTime) {
 
             AreaQuest *aquest = get_area_quest(questId);
 

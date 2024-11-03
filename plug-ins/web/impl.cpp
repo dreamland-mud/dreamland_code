@@ -1141,7 +1141,7 @@ Json::Value AreaQuestWebPromptListener::jsonAreaQuest( Descriptor *d, Character 
         strip_colors_and_tags(quest->title.get(LANG_DEFAULT), buf);
         buf << "\"" << ": ";     
 
-        aq["t"] = "Задание в зоне " + quest->pAreaIndex->getName();   
+        aq["t"] = "Задание в зоне " + quest->pAreaIndex->getName().colourStrip();   
     } else {
         aq["t"] = "Обучение";
     }

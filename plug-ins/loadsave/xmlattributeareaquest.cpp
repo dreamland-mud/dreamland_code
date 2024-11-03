@@ -28,6 +28,7 @@ void AreaQuestData::handleRemort()
     thisLife = 0; 
     step = -1; 
     timestart = 0; 
+    timeupdate = 0;
     timeend = 0; 
     timecancel = 0;
 }
@@ -46,6 +47,7 @@ void AreaQuestData::start()
 {
     step = 0;
     timestart = dreamland->getCurrentTime();
+    timeupdate = timestart;
     timeend = 0;
     timecancel = 0;
 }
@@ -62,12 +64,14 @@ void AreaQuestData::cancel()
 {
     step = -1;
     timestart = 0;
+    timeupdate = 0;
     timecancel = dreamland->getCurrentTime();
 }
 
 void AreaQuestData::advance() 
 {
     step++;
+    timeupdate = dreamland->getCurrentTime();
 }		
 
 void AreaQuestData::rollback() 
@@ -85,6 +89,7 @@ Scripting::Register AreaQuestData::toRegister() const
     step->setField(IdRef("step"), (int)this->step);
     step->setField(IdRef("thisLife"), (int)thisLife);
     step->setField(IdRef("timestart"), (int)timestart);
+    step->setField(IdRef("timeupdate"), (int)timeupdate);
     step->setField(IdRef("timeend"), (int)timeend);
     step->setField(IdRef("timecancel"), (int)timecancel);
     step->setField(IdRef("total"), (int)total);

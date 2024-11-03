@@ -179,9 +179,9 @@ DLString aquest_find_latest(PCMemoryInterface* ch)
         if (!aq.second.questActive())
             continue;
             
-        int timestart = aq.second.timestart;
-        if (timestart >= latestQuestTime) {
-            latestQuestTime = timestart;
+        int timeupdate = aq.second.timeupdate;
+        if (timeupdate >= latestQuestTime) {
+            latestQuestTime = timeupdate;
             latestQuestId = aq.first;
         }
     }
