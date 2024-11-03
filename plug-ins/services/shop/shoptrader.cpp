@@ -39,7 +39,7 @@ ShopTrader::ShopTrader( )
 
 int ShopTrader::getOccupation( )
 {
-    return (1 << OCC_SHOPPER);
+    return BasicMobileDestiny::getOccupation( ) | (1 << OCC_SHOPPER);
 }
 
 void ShopTrader::load( DLString str )
