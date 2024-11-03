@@ -844,9 +844,11 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
     if (mprog_death( victim, ch ))
         return;
 
-    // From this point on the death has certainly happened.
+    // Last chance for the global onDeath handler to interrupt the death.
+    if (gprog("onDeath", "CCisi", victim, ch, -1, label.c_str(), damtype))
+        return;
 
-    gprog("onDeath", "CCisi", victim, ch, -1, label.c_str(), damtype);
+    // From this point on the death has certainly happened.
 
     DeathPenalties(ch, victim).run();
 

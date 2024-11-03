@@ -10,6 +10,8 @@
 #include "merc.h"
 #include "def.h"
 
+using namespace Scripting;
+
 /**
  * Invoke Fenia function defined in .tmp.trigger_handler,
  * passing two arguments:
@@ -18,17 +20,17 @@
  */
 bool gprog(const DLString &trigName, const char *fmt, ...)
 {
-    static Scripting::IdRef ID_TMP("tmp"), ID_TRIG_HNDL("trigger_handler");
+    static IdRef ID_TMP("tmp"), ID_TRIG_HNDL("trigger_handler");
 
     if (!FeniaManager::wrapperManager)
         return false;
 
     try {
         va_list ap;
-        Scripting::RegisterList registerList;
+        RegisterList registerList;
         // Locate trigger_handler function; exception is thrown if not found.
-        Scripting::Register tmp = *Scripting::Context::root[ID_TMP];
-        Scripting::Register trigger_handler = *tmp[ID_TRIG_HNDL];
+        Register tmp = *Context::root[ID_TMP];
+        Register trigger_handler = *tmp[ID_TRIG_HNDL];
 
         if (trigger_handler.type != Register::FUNCTION)
             return false;
@@ -49,17 +51,21 @@ bool gprog(const DLString &trigName, const char *fmt, ...)
         listObj->setHandler(list);
 
         // Collect two trigger_handler arguments into RegisterList.
-        Scripting::RegisterList args;
+        RegisterList args;
         args.push_front(trigName);
         args.push_back(listObj);
 
-        // Invoke trigger handler ignoring its result.
-        trigger_handler.toFunction()->invoke(tmp, args);
-        return true;
+        // Invoke trigger handler, 'true' result is meaningful for some trigger types.
+        Register result = trigger_handler.toFunction()->invoke(tmp, args);
+        if (result.type == Register::NUMBER)
+            return result.toBoolean();
+
+        return false;
+
     }
     catch (const ::Exception &e) {
         // On error, complain to the logs and to all immortals in the game.
-        FeniaManager::getThis()->croak(0, Scripting::Register(trigName), e);
+        FeniaManager::getThis()->croak(0, Register(trigName), e);
         return false;
     }
 }
@@ -127,7 +133,7 @@ DLString trigger_type(const DLString& constTrigger)
 }
 
 
-StringSet trigger_labels(Object* obj)
+StringSet trigger_labels(::Object* obj)
 {
     StringSet triggers, misc;
     StringSet result;
