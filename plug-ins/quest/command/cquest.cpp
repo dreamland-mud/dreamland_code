@@ -74,19 +74,15 @@ static bool gprog_quest( PCharacter *ch, const DLString &cmd, const DLString &ar
         regList.push_back(Scripting::Register(arg));
         return tmpQuest[ID_CMD]( regList ).toBoolean( );
     }
-    catch (const Scripting::Exception &e) {
-        LogStream::sendWarning( ) << "quest: " << e.what( ) << endl;
-        return false;
-    } 
     catch (const Exception &ex) {
-        LogStream::sendError( ) << "quest: " << ex.what( ) << endl;
+        FeniaManager::getThis()->croak(0, Scripting::Register(".tmp.quest"), ex);
         return false;
     } 
 }
 
 static void see_also( PCharacter *pch )
 {
-    pch->pecho( "Смотри также {yквест ?{x для списка всех возможных действий." );
+    pch->pecho( "Смотри также {y{hcквест ?{x для списка всех возможных действий." );
 }
 
 COMMAND(CQuest, "quest")
@@ -302,23 +298,15 @@ void CQuest::doSummary( PCharacter *ch, const DLString &arguments )
         return;
     }
 
-    // Some space between fenia quest list and its footer:
-    if (feniaquest && !autoquest)
-        ch->pecho("");
-
-    // Fenia quest list footer:
-    if (feniaquest)
-        ch->pecho("{WКоманды{x: 'квест {Dномер{x' для подробностей, 'квест отмен {Dномер{x' для отмены задания.");
-
     // Space between fenia quests and questor's quest:
     if (feniaquest && autoquest)
-        ch->pecho("");
+        ch->pecho("{x");
 
     // Questor's quest and footer:
     if (autoquest) {
-        ch->pecho("{YЗадание квестора{x");
+        ch->pecho("{WЗадание квестора{x");
         ch->send_to(buf);
-        ch->pecho("{WКоманды{x: 'квест сдать', 'квест найти', 'квест отменить'.");
+        ch->pecho("{wКоманды{x: {y{hcквест сдать{x, {y{hcквест сдать опыт{x, {y{hcквест найти{x, {y{hcквест отменить{x.");
     }
 }
 
