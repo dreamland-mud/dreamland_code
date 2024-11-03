@@ -35,7 +35,8 @@
 #include "pcharacter.h"
 #include "follow_utils.h"
 #include "string_utils.h"
-
+#include "areaquestutils.h"
+#include "xmlattributeareaquest.h"
 #include "directions.h"
 #include "loadsave.h"
 #include "weather.h"
@@ -52,6 +53,7 @@
 static const DLString EXITS = "exits";
 static const DLString ROOM = "room";
 static const DLString ZONE = "zone";
+static const DLString SECTOR = "sect";
 static const DLString GROUP = "group";
 static const DLString TIME = "time";
 static const DLString DATE = "date";
@@ -67,8 +69,10 @@ static const DLString PARAM2 = "p2";
 static const DLString PERM_STAT = "ps";
 static const DLString CURR_STAT = "cs";
 static const DLString QUESTOR = "q";
+static const DLString AREAQUEST = "aq";
 
 CLAN(none);
+LIQ(none);
 
 GSN(anathema);
 GSN(armor);
@@ -170,6 +174,13 @@ static string json_to_string( const Json::Value &value )
     return writer.write( value );
 }    
 
+static void strip_colors_and_tags(const DLString &source, ostringstream &destBuf)
+{
+    mudtags_convert(source.c_str(), destBuf, 
+        TAGS_CONVERT_VIS|TAGS_ENFORCE_RAW|
+        TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR);
+}
+
 /*-------------------------------------------------------------------------
  * GroupWebPromptListener
  *------------------------------------------------------------------------*/
@@ -266,7 +277,9 @@ protected:
         Json::Value jsonRoom( Descriptor *d, Character *ch );
         Json::Value jsonZone( Descriptor *d, Character *ch );
         Json::Value jsonExits( Descriptor *d, Character *ch );
+        Json::Value jsonSector( Descriptor *d, Character *ch );
         bool canSeeLocation( Character *ch );
+        DLString sectorIcon(int sector);
 };
 
 void LocationWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &json )
@@ -277,6 +290,36 @@ void LocationWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &
     attr->updateIfNew( ROOM, jsonRoom( d, ch ), prompt ); 
     attr->updateIfNew( ZONE, jsonZone( d, ch ), prompt ); 
     attr->updateIfNew( EXITS, jsonExits( d, ch ), prompt ); 
+    attr->updateIfNew( SECTOR, jsonSector( d, ch ), prompt ); 
+}
+
+DLString LocationWebPromptListener::sectorIcon(int sector)
+{
+    switch (sector) {
+        case SECT_INSIDE:
+            return "f6d9"; // dungeon
+        case SECT_CITY:
+            return "f015"; // house
+        case SECT_FIELD:
+            return "f18c"; // pagelines
+        case SECT_FOREST:
+            return "f1bb"; // tree
+        case SECT_HILLS:
+            return "e52d"; // mound
+        case SECT_MOUNTAIN:
+            return "e52f"; // mountain-sun
+        case SECT_WATER_SWIM:
+        case SECT_WATER_NOSWIM:
+            return "f773"; // water
+        case SECT_AIR:
+            return "f72e"; // wind
+        case SECT_DESERT:
+            return "f76f"; // tornado
+        case SECT_UNDERWATER:
+            return "f578"; // fish
+        default:
+            return "3f"; // question
+    }
 }
 
 bool LocationWebPromptListener::canSeeLocation( Character *ch )
@@ -304,6 +347,34 @@ Json::Value LocationWebPromptListener::jsonZone( Descriptor *d, Character *ch )
         return Json::Value( );
 
     return Json::Value( DLString( ch->in_room->areaName() ).colourStrip( ) );
+}
+
+Json::Value LocationWebPromptListener::jsonSector( Descriptor *d, Character *ch )
+{
+    if (!canSeeLocation( ch ))
+        return Json::Value( );
+
+    Json::Value sect;
+    int sector = ch->in_room->getSectorType();
+    sect["i"] = sectorIcon(sector);
+
+    ostringstream buf;
+    LiquidReference &liq = ch->in_room->getLiquid();
+    bool indoors = IS_SET(ch->in_room->room_flags, ROOM_INDOORS);
+
+    if (indoors)
+        buf << "(";
+
+    buf <<  sector_table.message(sector);
+                    
+    if (liq_none != liq)
+        buf << ", " << liq->getShortDescr().ruscase('1').colourStrip();
+
+    if (indoors)
+        buf << ")";
+
+    sect["n"] = buf.str();
+    return sect;
 }
 
 Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
@@ -1020,6 +1091,69 @@ Json::Value QuestorWebPromptListener::jsonQuestor( Descriptor *d, Character *ch 
     return q;
 }
 
+/*-------------------------------------------------------------------------
+ * AreaQuestWebPromptListener
+ *------------------------------------------------------------------------*/
+class AreaQuestWebPromptListener : public WebPromptListener {
+public:
+        typedef ::Pointer<AreaQuestWebPromptListener> Pointer;
+
+        virtual void run( Descriptor *, Character *, Json::Value &json );
+protected:
+        Json::Value jsonAreaQuest( Descriptor *d, Character *ch );
+};
+
+void AreaQuestWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &json )
+{
+    WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
+    Json::Value &prompt = json["args"][0];
+
+    attr->updateIfNew( AREAQUEST, jsonAreaQuest( d, ch ), prompt ); 
+}
+
+Json::Value AreaQuestWebPromptListener::jsonAreaQuest( Descriptor *d, Character *ch )
+{
+    Json::Value aq;
+    PCharacter *pch = ch->getPC( );
+    if (!pch)
+        return aq;
+
+    // Show nothing if there's no active area quest.
+    DLString latestQuestId = aquest_find_latest(pch);
+    if (latestQuestId.empty())
+        return aq;
+
+    AreaQuest *quest = get_area_quest(latestQuestId);
+    // Some odd broken quest in the player attrs.
+    if (!quest)
+        return aq;
+
+    AreaQuestData &qdata = aquest_data(pch, latestQuestId);
+    int step = qdata.step;
+    if (step >= (int)quest->steps.size())
+        return aq;
+
+    ostringstream buf;
+
+    // Add quest title to info for non-newbie zones; different windowlet title for onboarding
+    if (!quest->flags.isSet(AQUEST_ONBOARDING)) {
+        buf << "\"";
+        strip_colors_and_tags(quest->title.get(LANG_DEFAULT), buf);
+        buf << "\"" << ": ";     
+
+        aq["t"] = "Задание в зоне " + quest->pAreaIndex->getName();   
+    } else {
+        aq["t"] = "Обучение";
+    }
+
+    // Current step info
+    strip_colors_and_tags(quest->steps[step]->info.get(LANG_DEFAULT), buf);
+
+    aq["i"] = buf.str();
+
+    return aq;
+}
+
 
 /*-------------------------------------------------------------------------
  * WebPromptDescriptorStateListener
@@ -1143,6 +1277,7 @@ extern "C"
         Plugin::registerPlugin<AffectsWebPromptListener>( ppl );
         Plugin::registerPlugin<ParamsWebPromptListener>( ppl );
         Plugin::registerPlugin<QuestorWebPromptListener>( ppl );
+        Plugin::registerPlugin<AreaQuestWebPromptListener>( ppl );
         Plugin::registerPlugin<WebPromptDescriptorStateListener>( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<WebPromptAttribute> >( ppl );
         

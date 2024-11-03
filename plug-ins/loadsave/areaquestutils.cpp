@@ -166,6 +166,29 @@ bool aquest_can_participate_ever(PCMemoryInterface *pci, AreaQuest *q)
     return true;        
 }
 
+DLString aquest_find_latest(PCMemoryInterface* ch)
+{
+    auto areaQuestAttr = ch->getAttributes().findAttr<XMLAttributeAreaQuest>("areaquest");
+    if (!areaQuestAttr)
+        return DLString::emptyString;
+
+    int latestQuestTime = 0;
+    DLString latestQuestId;
+
+    for (auto aq: **areaQuestAttr) {
+        if (!aq.second.questActive())
+            continue;
+            
+        int timestart = aq.second.timestart;
+        if (timestart >= latestQuestTime) {
+            latestQuestTime = timestart;
+            latestQuestId = aq.first;
+        }
+    }
+
+    return latestQuestId;
+}
+
 // Return true if ch passes all requirements to participate in this quest
 bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuestData &qdata) 
 {

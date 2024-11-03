@@ -435,6 +435,12 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
     prompt["args"][0]["area"] = DLString(
             ch->in_room ? ch->in_room->areaIndex()->area_file->file_name : "");
 
+    if (ch->fighting) {
+        prompt["args"][0]["fight"] = HEALTH(ch->fighting);
+    } else {
+        prompt["args"][0]["fight"] = 0;
+    }
+    
     // Call various web prompt handlers to write out complex stuff defined in other plugins,
     // such as group information, weather, time etc.
     WebPromptManager::getThis( )->handle( d, ch, prompt );
