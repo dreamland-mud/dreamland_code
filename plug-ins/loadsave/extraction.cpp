@@ -76,7 +76,7 @@ void extract_obj_1( Object *obj, bool count, const char *not_used )
         // Remove obj from all locations, showing an optional message.
         if (obj->in_room != 0) {
             if (!message.empty())
-                obj->in_room->echo(POS_RESTING, message.c_str(), obj);
+                obj->in_room->echo(POS_RESTING, message.c_str(), obj, obj->in_room->getLiquid()->getShortDescr().c_str());
             obj_from_room(obj);
 
         } else if (obj->carried_by != 0) {

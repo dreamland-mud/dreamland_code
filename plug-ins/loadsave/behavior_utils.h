@@ -9,7 +9,6 @@ class Character;
 class Room;
 class DLString;
 class GlobalBitvector;
-class Scripting::RegisterList;
 
 /** Directly call a trigger with arguments defined for these behaviors. */
 list<Scripting::Register> behavior_trigger_with_result(GlobalBitvector &behaviors, const DLString &trigType, const Scripting::RegisterList &trigArgs);

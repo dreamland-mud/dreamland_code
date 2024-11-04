@@ -607,6 +607,7 @@ void water_float_update( )
     ProfilerBlock profiler("water_float_update", 100);
     Object *obj_next;
     Object *obj;
+    list<Object *> extracted; // Keep track of all items that are about to die this round.
 
     for (obj = object_list; obj != 0; obj = obj_next) {
         obj_next = obj->next;
@@ -658,13 +659,20 @@ void water_float_update( )
                     || obj->item_type == ITEM_CORPSE_PC
                     || obj->item_type == ITEM_CONTAINER)
             {
-                obj->in_room->echo( POS_RESTING, "%1$^O1 тон%1$nет|ут в %2$N6, оставляя лишь несколько пузырьков.", obj, obj->in_room->getLiquid()->getShortDescr( ).c_str( ) );
+                obj->setProperty("extract", "%1$^O1 тон%1$nет|ут в %2$N6, оставляя лишь несколько пузырьков.");
             }
             else
-                obj->in_room->echo( POS_RESTING, "%1$^O1 тон%1$nет|ут в %2$N6.", obj, obj->in_room->getLiquid()->getShortDescr( ).c_str( ) );
+                obj->setProperty("extract",  "%1$^O1 тон%1$nет|ут в %2$N6.");
 
-            extract_obj( obj );
+            extracted.push_back(obj);
         }
+    }
+
+    // Do the extract now that it's safe and we don't have to worry about obj->next->next
+    // pointer becoming invalid.
+    while (!extracted.empty()) {
+        extract_obj(extracted.front());
+        extracted.pop_front();
     }
 }
 
