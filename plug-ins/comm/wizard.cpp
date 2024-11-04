@@ -367,18 +367,6 @@ CMDWIZP( poofin )
             return;
     }
 
-    if ( strstr(argument,ch->getNameC()) == 0 
-            && strstr(argument,ch->getNameP( '1' ).c_str()) == 0 
-            && strstr(argument,ch->getNameP( '2' ).c_str()) == 0 
-            && strstr(argument,ch->getNameP( '3' ).c_str()) == 0 
-            && strstr(argument,ch->getNameP( '4' ).c_str()) == 0 
-            && strstr(argument,ch->getNameP( '5' ).c_str()) == 0 
-            && strstr(argument,ch->getNameP( '6' ).c_str()) == 0 )
-    {
-            ch->pecho("Неплохо бы включить в poofin свое имя.");
-            return;
-    }
-
     ch->getPC( )->bamfin = argument;
     ch->pecho("Твое сообщение poofin теперь: %s",ch->getPC( )->bamfin.c_str( ));
 }
@@ -393,18 +381,6 @@ CMDWIZP( poofout )
     if (argument[0] == '\0')
     {
             ch->pecho("Твое сообщение poofout: %s",ch->getPC( )->bamfout.c_str( ));
-            return;
-    }
-
-    if ( strstr(argument,ch->getNameC()) == 0 
-            && strstr(argument,ch->getNameP( '1' ).c_str()) == 0 
-            && strstr(argument,ch->getNameP( '2' ).c_str()) == 0 
-            && strstr(argument,ch->getNameP( '3' ).c_str()) == 0 
-            && strstr(argument,ch->getNameP( '4' ).c_str()) == 0 
-            && strstr(argument,ch->getNameP( '5' ).c_str()) == 0 
-            && strstr(argument,ch->getNameP( '6' ).c_str()) == 0 )
-    {
-            ch->pecho("Неплохо бы включить в poofout свое имя.");
             return;
     }
 
@@ -1298,7 +1274,7 @@ static bool has_nopost(Character *ch)
     
     if (npc) {
         buf << "Шорт: " << npc->getShortDescr(LANG_DEFAULT) << endl
-            << "Длинное описание: "  << npc->getLongDescr(LANG_DEFAULT);
+            << "Длинное описание: "  << npc->getLongDescr(LANG_DEFAULT) << endl;
 
         buf << "Все имена: " << npc->getNameP('7') << endl;
         const char *spec_fun_name = spec_name(*npc->spec_fun);

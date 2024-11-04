@@ -247,35 +247,3 @@ std::list<DLString> russian_cases(const DLString &str)
     return cases;
 }
 
-/*
- * Finds the first occurrence of the substring needle(ct) in the
- * string haystack(cs), case insensitive.
- */
-const char *str_str(const char *cs, const char *ct) 
-{
-    const char *s;
-    const char *t;
-
-    if (!cs || !ct)
-        return NULL;
-
-    while (*cs) {
-        t = ct;
-
-        while (*cs && (dl_tolower(*cs) != dl_tolower(*t)))
-            cs++;
-
-        s = cs;
-
-        while (*t && *cs && (dl_tolower(*cs) == dl_tolower(*t))) {
-            t++;
-            cs++;
-        }
-
-        if (!*t)
-            return s;
-
-    }
-    return NULL;
-}
-

@@ -23,6 +23,5 @@ bool        is_number        ( const char *arg );
 int        number_argument        ( char *argument, char *arg );
 int        mult_argument        ( char *argument, char *arg );
 char *        one_argument        ( char *argument, char *arg_first );
-const char *  str_str(const char *cs, const char *ct);
 
 #endif

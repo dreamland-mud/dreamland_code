@@ -20,7 +20,7 @@
 #include "register-impl.h"
 #include "lex.h"
 #include "fenia_utils.h"
-
+#include "string_utils.h"
 #include "core/behavior/behavior_utils.h"
 #include "schedulertask.h"
 #include "dlscheduler.h"
@@ -718,12 +718,12 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     
     // Format body part name, adding owner name to its description, e.g. "отрезанная рука Керрада"
     // If there're no format symbols in the body part names, just concatenate owner name to it.
-    if (str_str(obj->getShortDescr(LANG_DEFAULT).c_str(), "%"))
+    if (String::contains(obj->getShortDescr(LANG_DEFAULT), "%"))
         obj->setShortDescr( fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), body_name.c_str()), LANG_DEFAULT);
     else
         obj->setShortDescr(obj->getShortDescr(LANG_DEFAULT) + DLString::SPACE + body_name, LANG_DEFAULT);
 
-    if (str_str(obj->getDescription(LANG_DEFAULT).c_str(), "%"))
+    if (String::contains(obj->getDescription(LANG_DEFAULT), "%"))
         obj->setDescription(fmt(0, obj->getDescription(LANG_DEFAULT).c_str(), body_name.c_str()), LANG_DEFAULT);
     else
         obj->setDescription(obj->getDescription(LANG_DEFAULT) + DLString::SPACE + body_name, LANG_DEFAULT);
