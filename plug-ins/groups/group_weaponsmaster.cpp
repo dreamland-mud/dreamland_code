@@ -216,7 +216,7 @@ SKILL_RUNP( disarm )
         argument = one_argument(argument,arg);
         if ( !ch->is_npc() && arg[0] != '\0' )
         {
-                if (is_name(arg,"second") )
+                if (arg_is(arg, "second"))
                         disarm_second = 1;
                 else
                         disarm_second = 0;

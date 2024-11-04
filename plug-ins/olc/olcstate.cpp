@@ -943,12 +943,12 @@ bool OLCState::extraDescrEdit(ExtraDescrList &list)
                     lastCmd + " paste " + keyword);
     }
 
-    if (is_name(command, "set")) {
+    if (arg_is(command, "set")) {
         return sedit(
                     safe_extra_descr(ch, keyword, list)->description[lang]);
     }
 
-    if (is_name(command, "delete")) {
+    if (arg_is(command, "delete")) {
         bool found = list.findAndDestroy(keyword);
         if (!found) {
             stc("Экстра-описание с таким ключом не найдено.\n\r", ch);
