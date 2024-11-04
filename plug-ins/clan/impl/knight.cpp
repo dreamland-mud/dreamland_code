@@ -196,7 +196,7 @@ SKILL_RUNP(guard)
     victim = vict->getPC();
     pch = ch->getPC();
 
-    if (!str_cmp(arg, "none") || !str_cmp(arg, "self") || victim == pch)
+    if (arg_is_self(arg) || victim == pch)
     {
         if (pch->guarding == 0)
         {

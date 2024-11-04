@@ -43,7 +43,7 @@ static void load_PET( FILE *pfile )
     MOB_INDEX_DATA *pFidoIndex = get_mob_index( MOB_VNUM_FIDO );
 
     word = feof(pfile) ? "End" : fread_word(pfile);
-    if (!str_cmp(word,"Vnum"))
+    if (!strcmp(word,"Vnum"))
     {
             int vnum;
         MOB_INDEX_DATA *pPetIndex;

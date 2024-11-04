@@ -2548,7 +2548,7 @@ NMI_INVOKE( CharacterWrapper, hasOccupation, "(): моб имеет заняти
     CHK_PC
 
     DLString occName = args2string( args );
-    return mob_has_occupation( target->getNPC( ), occName.c_str( ) );
+    return mob_has_occupation( target->getNPC( ), occName );
 }
 
 NMI_INVOKE( CharacterWrapper, switchTo, "(mob): вселиться в тело моба" )

@@ -153,17 +153,17 @@ void        load_room_objects( Room *room, char * path, bool remove_after )
 
                 word++;
 
-                if ( !str_cmp( word, "OBJECT" ) )
+                if ( !strcmp( word, "OBJECT" ) )
                 {
                         fread_obj ( NULL, room, fp );
                         has_objects = true;
                 }
-                else if ( !str_cmp( word, "O"      ) )
+                else if ( !strcmp( word, "O"      ) )
                 {
                         fread_obj  ( NULL, room, fp );
                         has_objects = true;
                 }
-                else if ( !str_cmp( word, "END"      ) ) break;
+                else if ( !strcmp( word, "END"      ) ) break;
                 else
                 {
                         bug( "Load_room_obj: bad section.", 0 );
@@ -294,7 +294,7 @@ void load_room_mobiles( Room *room, char *path, bool remove_after )
                     }
 
                     word = fread_word( fp );
-                    if ( !str_cmp( word, "MOBILE" ) )
+                    if ( !strcmp( word, "MOBILE" ) )
                     {
                             ch = 0;
                             ch = fread_mob  ( fp );
@@ -302,17 +302,17 @@ void load_room_mobiles( Room *room, char *path, bool remove_after )
                             continue;
                     }
                     
-                    if ( !str_cmp( word, "OBJECT" ) ) {
+                    if ( !strcmp( word, "OBJECT" ) ) {
                         fread_obj  ( ch, NULL, fp );
                         continue;
                     }
                     
-                    if ( !str_cmp( word, "O"      ) ) {
+                    if ( !strcmp( word, "O"      ) ) {
                         fread_obj  ( ch, NULL, fp );
                         continue;
                     }
                     
-                    if ( !str_cmp( word, "End"    ) ) {
+                    if ( !strcmp( word, "End"    ) ) {
                             break;
                     }
                     

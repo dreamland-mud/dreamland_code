@@ -956,7 +956,7 @@ OEDIT(oldbehavior)
         return true;
     }
 
-    if (!str_cmp( argument, "clear" )) {        
+    if (arg_is_clear(argument)) {        
         obj.behavior.clear( );
         stc("Старое поведение очищено.\r\n", ch);
         return true;
@@ -1031,8 +1031,8 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         oe->attach(ch);
         oe->findCommand(ch, "show")->entryPoint(ch, "");
         return;
-    } else if (!str_cmp(arg1, "create")) {
-        if (!str_cmp(argument, "next")) {
+    } else if (arg_is_strict(arg1, "create")) {
+        if (arg_is_strict(argument, "next")) {
             value = next_obj_index(ch, ch->in_room->pIndexData);
             if (value < 0) {
                 ch->pecho("Все внумы в этой зоне уже заняты!");
@@ -1067,7 +1067,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         OLCStateObject::Pointer oe(NEW, value);
         oe->attach(ch);
         return;
-    } else if (!str_cmp(arg1, "delete")) {
+    } else if (arg_is_strict(arg1, "delete")) {
         OBJ_INDEX_DATA *obji = NULL;
 
         value = atoi(argument);
@@ -1099,7 +1099,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             ptc(ch, "Предмет %d не найден.\n\r", value);
         return;
 
-    } else if(!str_cmp(arg1, "show")) {
+    } else if(arg_is_strict(arg1, "show")) {
         if(!*argument || !is_number(argument)) {
             stc("Syntax: oedit show <vnum>\n\r", ch);
             return;
@@ -1117,7 +1117,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
         OLCStateObject::Pointer(NEW, pObj)->findCommand(ch, "show")->entryPoint(ch, "noweb");
         return;
-    } else if (!str_cmp(arg1, "load")) {
+    } else if (arg_is_strict(arg1, "load")) {
         if(!*argument || !is_number(argument)) {
             stc("Syntax: oedit load <vnum>\n\r", ch);
             return;

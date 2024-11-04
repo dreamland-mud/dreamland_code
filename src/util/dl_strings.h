@@ -9,7 +9,6 @@
 
 class DLString;
 
-int     str_cmp( const char *astr, const char *bstr );
 bool        str_prefix        ( const char *astr, const char *bstr );
 bool        is_name( const char *arg1, const char *arg2 );
 

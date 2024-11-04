@@ -35,10 +35,10 @@ static const char * occ_names [] =
     0
 };
 
-static int occ_name2type( const char *name )
+static int occ_name2type( const DLString &name )
 {
     for (int i = 0; occ_names[i]; i++)
-        if (!str_cmp( name, occ_names[i] ))
+        if (name == occ_names[i])
             return i;
 
     return -1;
@@ -57,7 +57,7 @@ static const char * occ_type2name(int occType)
   Alternatively, it checks for a corresponding property on mob's prototype to exist.
   This alternative check would allow to eventually move from C++ behaviors to Fenia-defined triggers.
 */ 
-bool mob_has_occupation( NPCharacter *mob, const char *occName )
+bool mob_has_occupation( NPCharacter *mob, const DLString &occName )
 {
     int occType = occ_name2type( occName );
 

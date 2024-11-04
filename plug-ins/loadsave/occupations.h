@@ -27,7 +27,7 @@ enum {
     OCC_MAX,
 };
 
-bool mob_has_occupation( NPCharacter *, const char * );
+bool mob_has_occupation( NPCharacter *, const DLString & );
 bool mob_has_occupation( NPCharacter *, int );
 bool mob_has_behavior(NPCharacter *, BehaviorReference &bhv);
 

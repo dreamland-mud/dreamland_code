@@ -639,7 +639,7 @@ MEDIT(spec)
     }
 
 
-    if (!str_cmp(argument, "none")) {
+    if (arg_is_clear(argument)) {
         mob.spec_fun.name = "";
 
         stc("Spec removed.\n\r", ch);
@@ -709,8 +709,9 @@ MEDIT(rusmell)
 MEDIT(oldbehavior)
 {
     DLString type;
+    DLString arg = argument;
 
-    if (!*argument) {
+    if (arg.empty()) {
         if(!xmledit(mob.behavior))
             return false;
 
@@ -719,7 +720,7 @@ MEDIT(oldbehavior)
     }
 
     if (mob.behavior) {
-        if (!str_cmp( argument, "clear" )) {
+        if (arg_is_clear(arg)) {
             mob.behavior.clear( );
             stc("Поведение очищено.\r\n", ch);
             return true;
@@ -729,23 +730,23 @@ MEDIT(oldbehavior)
         return false;
     }
 
-    if (!str_cmp( argument, "shopper" )) {
+    if (arg == "shopper") {
         static const DLString shopperType( "ShopTrader" );
         type = shopperType;
     }
-    else if (!str_cmp( argument, "pet" )) {
+    else if (arg == "pet") {
         static const DLString petType( "Pet" );
         type = petType;
     }
-    else if (!str_cmp( argument, "leveladaptivepet" )) {
+    else if (arg == "leveladaptivepet") {
         static const DLString petType( "LevelAdaptivePet" );
         type = petType;
     }
-    else if (!str_cmp( argument, "trainer" )) {
+    else if (arg == "trainer") {
         static const DLString trainerType( "Trainer" );
         type = trainerType;
     }
-    else if (!str_cmp( argument, "savedcreature" )) {
+    else if (arg == "savedcreature") {
         static const DLString savedCreatureType( "SavedCreature" );
         type = savedCreatureType;
     }
@@ -1239,8 +1240,8 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         me->findCommand(ch, "show")->entryPoint(ch, "");
         return;
     }
-    else if (!str_cmp(arg1, "create")) {
-        if (!str_cmp(argument, "next")) {
+    else if (arg_is_strict(arg1, "create")) {
+        if (arg_is_strict(argument, "next")) {
             value = next_mob_index(ch, ch->in_room->pIndexData);
             if (value < 0) {
                 ch->pecho("Все внумы в этой зоне уже заняты!");
@@ -1275,7 +1276,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         OLCStateMobile::Pointer me(NEW, value);
         me->attach(ch);
         return;
-    } else if(!str_cmp(arg1, "show")) {
+    } else if(arg_is_strict(arg1, "show")) {
         if(!*argument || !is_number(argument)) {
             stc("Syntax: medit show <vnum>\n\r", ch);
             return;
@@ -1293,7 +1294,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
         OLCStateMobile::Pointer(NEW, pMob)->findCommand(ch, "show")->entryPoint(ch, "noweb");
         return;
-    } else if (!str_cmp(arg1, "load")) {
+    } else if (arg_is_strict(arg1, "load")) {
         if(!*argument || !is_number(argument)) {
             stc("Syntax: medit load <vnum>\n\r", ch);
             return;
@@ -1317,7 +1318,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         oldact("Ты создаешь $C4!", ch, 0, mob, TO_CHAR);
         return;
 
-    } else if (!str_cmp(arg1, "convert")) {
+    } else if (arg_is_strict(arg1, "convert")) {
         // One-off conversion of affect bits. To be removed once migration is finished.
         int cnt = 0;
 

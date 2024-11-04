@@ -70,13 +70,11 @@ struct S_SET_MOB {
 };
 
 void mset( Character*, char* );
-void oset( Character*, char* );
 void sset( Character*, char* );
 void hset( Character*, char* );
 
 T_SET tab_set[] = {
   { "char",        mset,        "Изменить характеристики игрока"        },
-  { "obj",        oset,        "Изменить характеристики предмета"        },
   { "skill",        sset,        "Изменить skills/spells"                },
   { "help",        hset,        "Это то, что на экране"                        },
   { NULL,        NULL,        NULL,                                        }
@@ -378,135 +376,6 @@ void chg_mob_attr( Character* ch, char* argument )
     PCharacterManager::saveMemory( pcm );
 }
 
-void oset( Character* ch, char* argument ) 
-{
-        char arg1 [MAX_INPUT_LENGTH];
-        char arg2 [MAX_INPUT_LENGTH];
-        char arg3 [MAX_INPUT_LENGTH];
-        Object *obj;
-        int value = 0;
-
-        argument = one_argument( argument, arg1 );
-        argument = one_argument( argument, arg2 );
-        strcpy( arg3, argument );
-
-        if ( arg1[0] == '\0' || arg2[0] == '\0' || arg3[0] == '\0' )
-        {
-                ch->pecho("Syntax:");
-                ch->pecho("  set obj <object> <field> <value> [<value>]");
-                ch->pecho("  Field being one of:");
-                ch->pecho("    cost level material owner timer timestamp");
-                ch->pecho("    weight gender personal property");
-                return;
-        }
-
-        if ( ( obj = get_obj_world( ch, arg1 ) ) == 0 )
-        {
-                ch->pecho("Nothing like that in heaven or earth.");
-                return;
-        }
-
-        // Snarf the value (which need not be numeric).
-        if ( !str_cmp( arg2, "material") )
-        {
-            obj->setMaterial( arg3 );
-        }
-        else if (!str_cmp(arg2, "property")) {
-            DLString value = arg3;
-            DLString key = value.getOneArgument();
-
-            if (value.empty()) {
-                ch->pecho("Syntax: set obj <object> property <key> <value>");
-                return;
-            }
-
-            obj->setProperty(key, value);
-        }
-        else
-        if ( !str_cmp( arg2, "owner") )
-        {
-            obj->setOwner( arg3 );
-        }
-        else if (!str_cmp(arg2, "gender")) {
-            MultiGender mg(MultiGender::UNDEF);
-            mg.fromString(arg3);
-            if (mg == MultiGender::UNDEF) {
-              ch->pecho("Неправильное значение грам. рода, используй: neutral, female, male, plural или первые буквы n f m p.");
-              return;
-            }
-            
-            obj->gram_gender = mg;
-            obj->updateCachedNouns();
-            ch->pecho("%1$^O1 {Wизмене{Cн%1$Gо||а|ы.{x", obj);
-
-        } else if ( !str_cmp( arg2, "personal") )
-        {
-            const DLString behaviorName = "PersonalQuestReward";
-
-            if (obj->behavior && obj->behavior->getType() == behaviorName) {
-                // Strip already existing personal item behavior.
-                ch->pecho("Удаляю поведение %s с предмета %O1.", behaviorName.c_str(), obj);
-                ObjectBehaviorManager::clear(obj);
-
-            } else {
-                // Allocate and assign new behavior and all related flags.
-                PCMemoryInterface *owner = PCharacterManager::find(arg3);
-                if (!owner) {
-                    ch->pecho("Персонаж не найден, укажи имя полностью.");
-                    return;
-                }
-
-                ch->pecho("Устанавливаю поведение %s и владельца %s на предмет %O1.",
-                          behaviorName.c_str(), arg3, obj);
-
-                ObjectBehaviorManager::assign(obj, behaviorName);
-                if (!obj->behavior) {
-                    ch->pecho("Произошла ошибка, проверь логи.");
-                    return;
-                }
-
-                obj->setOwner(owner->getName());
-                SET_BIT(obj->extra_flags, ITEM_NOPURGE|ITEM_NOSAC|ITEM_BURN_PROOF|ITEM_NOSELL);
-                obj->setMaterial( "platinum" );
-            }
-        }
-        else if (!str_cmp(arg2, "timestamp")) {
-            obj->timestamp = atol(arg3);
-        }
-        else
-        {
-                value = atoi( arg3 );
-
-                if ( !str_prefix( arg2, "level" ) )
-                {
-                        obj->level = value;
-                }
-                else        
-                if ( !str_prefix( arg2, "weight" ) )
-                {
-                        obj->weight = value;
-                }
-                else
-                if ( !str_prefix( arg2, "cost" ) )
-                {
-                        obj->cost = value;
-                }
-                else
-                if ( !str_prefix( arg2, "timer" ) )
-                {
-                        obj->timer = value;
-                }
-                else
-                {
-                        // Generate usage message.
-                        oset( ch, str_empty );
-                        return;
-                }
-        }
-
-        save_items_at_holder( obj );
-}
-
 void sset( Character *ch, char *argument )
 {
     char arg1 [MAX_INPUT_LENGTH];
@@ -545,7 +414,7 @@ void sset( Character *ch, char *argument )
         return;
     }
 
-    fAll = !str_cmp( arg2, "all" );
+    fAll = arg_is_all(arg2);
     
     if (!fAll) {
         sn   = SkillManager::getThis( )->unstrictLookup( arg2, victim );
@@ -559,7 +428,7 @@ void sset( Character *ch, char *argument )
     /*
      * Snarf the value.
      */
-    if ( !str_cmp(arg3,"?") && !fAll )
+    if (arg_oneof(arg3, "?") && !fAll )
     {
        ch->pecho("Текущее значение: %d", victim->getPC( )->getSkillData( sn ).learned.getValue( ) );
        return;

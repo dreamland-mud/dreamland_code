@@ -123,8 +123,8 @@ void do_ostat                ( Character *, char * );
 void do_mfind                ( Character *, char * );
 void do_ofind                ( Character *, char * );
 void do_tfind                ( Character *, char * );
-void do_mload                ( Character *, char * );
-void do_oload                ( Character *, char * );
+void do_mload                ( Character *, const DLString &);
+void do_oload                ( Character *, const DLString & );
 
 RELIG(none);
 GSN(none);
@@ -407,7 +407,7 @@ CMDWIZP( transfer )
         return;
     }
 
-    if ( !str_cmp( arg1, "all" ) )
+    if (arg_is_all(arg1))
     {
         for ( d = descriptor_list; d != 0; d = d->next )
         {
@@ -590,20 +590,20 @@ CMDWIZP( stat )
         return;
    }
 
-   if (!str_cmp(arg,"room"))
+   if (arg_is_strict(arg, "room"))
    {
         do_rstat(ch,string);
         return;
    }
 
-   if (!str_cmp(arg,"obj"))
+   if (arg_is_strict(arg, "obj"))
    {
         do_ostat(ch,string);
         return;
    }
     
-    fChar = !str_cmp(arg,"char");
-    fMob = !str_cmp(arg,"mob");
+    fChar = arg_is_strict(arg, "char");
+    fMob = arg_is_strict(arg, "mob");
 
     if (fChar || fMob) {
         if (!string[0]) {
@@ -1330,19 +1330,17 @@ CMDWIZP( vnum )
         return;
     }
     
-    if (!str_cmp(arg, "type")) {
+    if (arg_is_strict(arg, "type")) {
         do_tfind(ch, string);
         return;
     }
 
-    if (!str_cmp(arg,"obj"))
-    {
+    if (arg_is_strict(arg, "obj")) {
         do_ofind(ch,string);
          return;
     }
 
-    if (!str_cmp(arg,"mob") || !str_cmp(arg,"char"))
-    {
+    if (arg_is_strict(arg, "char") || arg_is_strict(arg, "mob")) {
         do_mfind(ch,string);
         return;
     }
@@ -1852,49 +1850,48 @@ CMDWIZP( return )
 
 CMDWIZP( load )
 {
-   char arg[MAX_INPUT_LENGTH];
+   DLString args = argument;
+   DLString arg = args.getOneArgument();
 
-    argument = one_argument(argument,arg);
-
-    if (arg[0] == '\0')
-    {
+    if (arg.empty()) {
         ch->pecho("Формат:");
         ch->pecho("  load mob <vnum>");
         ch->pecho("  load obj <vnum> <level>");
         return;
     }
 
-    if (!str_cmp(arg,"mob") || !str_cmp(arg,"char"))
+    if (arg_is_strict(arg, "mob") || arg_is_strict(arg, "char"))
     {
-        do_mload(ch,argument);
+        do_mload(ch, args);
         return;
     }
 
-    if (!str_cmp(arg,"obj"))
+    if (arg_is_strict(arg, "obj"))
     {
-        do_oload(ch,argument);
+        do_oload(ch, args);
         return;
     }
+
     /* echo syntax */
-    run(ch, str_empty);
+    run(ch, DLString::emptyString);
 }
 
 
-/* NOTCOMMAND */ void do_mload( Character *ch, char *argument )
+/* NOTCOMMAND */ void do_mload( Character *ch, const DLString &cArgs )
 {
-        char arg[MAX_INPUT_LENGTH];
+        DLString args = cArgs;
+        DLString arg = args.getOneArgument();
         MOB_INDEX_DATA *pMobIndex;
         Character *victim;
 
-        one_argument( argument, arg );
 
-        if ( arg[0] == '\0' || !is_number(arg) )
+        if (arg.empty() || !arg.isNumber())
         {
                 ch->pecho("Формат: load mob <vnum>.");
                 return;
         }
 
-        if ( ( pMobIndex = get_mob_index( atoi( arg ) ) ) == 0 )
+        if ( ( pMobIndex = get_mob_index(arg.toInt()) ) == 0 )
         {
                 ch->pecho("Моба с таким внумом не найдено.");
                 return;
@@ -1917,17 +1914,16 @@ CMDWIZP( load )
 
 
 
-/* NOTCOMMAND */ void do_oload( Character *ch, char *argument )
+/* NOTCOMMAND */ void do_oload( Character *ch, const DLString &cArgs )
 {
-    char arg1[MAX_INPUT_LENGTH] ,arg2[MAX_INPUT_LENGTH];
+    DLString args = cArgs;
+    DLString arg1 = args.getOneArgument();
+    DLString arg2 = args.getOneArgument();
     OBJ_INDEX_DATA *pObjIndex;
     Object *obj;
     short level;
 
-    argument = one_argument( argument, arg1 );
-    one_argument( argument, arg2 );
-
-    if ( arg1[0] == '\0' || !is_number(arg1))
+    if (arg1.empty() || !arg1.isNumber())
     {
         ch->pecho("Формат: load obj <vnum> <level>.");
         return;
@@ -1935,14 +1931,14 @@ CMDWIZP( load )
 
     level = ch->get_trust(); /* default */
 
-    if ( arg2[0] != '\0')  /* load with a level */
+    if (!arg2.empty())  /* load with a level */
     {
-        if (!is_number(arg2))
+        if (!arg2.isNumber())
         {
           ch->pecho("Формат: oload <vnum> <level>.");
           return;
         }
-        level = atoi(arg2);
+        level = arg2.toInt();
         if (level < 0 || level > ch->get_trust())
         {
           ch->pecho("Уровень не может быть ниже нуля или выше твоего.");
@@ -1950,7 +1946,7 @@ CMDWIZP( load )
         }
     }
 
-    if ( ( pObjIndex = get_obj_index( atoi( arg1 ) ) ) == 0 )
+    if ( ( pObjIndex = get_obj_index( arg1.toInt() ) ) == 0 )
     {
         ch->pecho("Объект с таким внумом не найден.");
         return;
@@ -2051,7 +2047,7 @@ CMDWIZP( restore )
     Descriptor *d;
 
     one_argument( argument, arg );
-    if (arg[0] == '\0' || !str_cmp(arg,"room"))
+    if (arg[0] == '\0' || arg_is_strict(arg, "room"))
     {
     /* cure room */
             
@@ -2078,7 +2074,7 @@ CMDWIZP( restore )
 
     }
 
-    if ( ch->get_trust() >=  MAX_LEVEL - 5 && !str_cmp(arg,"all"))
+    if ( ch->get_trust() >=  MAX_LEVEL - 5 && arg_is_all(arg))
     {
     /* cure all */
             
@@ -2272,52 +2268,6 @@ CMDWIZP( force )
             vch_next = vch->next;
 
             if ( !vch->is_npc() && vch->get_trust() < ch->get_trust() )
-            {
-                vch->pecho(msg, vch->sees(ch, '1').c_str(), argument);
-                interpret( vch, argument );
-            }
-        }
-    }
-    else if (!str_cmp(arg,"players"))
-    {
-        Character *vch;
-        Character *vch_next;
-
-        if (ch->get_trust() < MAX_LEVEL - 2)
-        {
-            ch->pecho("У тебя пока не хватает прав на такое принуждение.");
-            return;
-        }
-
-        for ( vch = char_list; vch != 0; vch = vch_next )
-        {
-            vch_next = vch->next;
-
-            if ( !vch->is_npc() && vch->get_trust() < ch->get_trust()
-            &&         vch->getRealLevel( ) < LEVEL_HERO)
-            {
-                vch->pecho(msg, vch->sees(ch, '1').c_str(), argument);
-                interpret( vch, argument );
-            }
-        }
-    }
-    else if (!str_cmp(arg,"gods"))
-    {
-        Character *vch;
-        Character *vch_next;
-
-        if (ch->get_trust() < MAX_LEVEL - 2)
-        {
-            ch->pecho("У тебя пока не хватает прав на такое принуждение.");
-            return;
-        }
-
-        for ( vch = char_list; vch != 0; vch = vch_next )
-        {
-            vch_next = vch->next;
-
-            if ( !vch->is_npc() && vch->get_trust() < ch->get_trust()
-            &&   vch->getRealLevel( ) >= LEVEL_HERO)
             {
                 vch->pecho(msg, vch->sees(ch, '1').c_str(), argument);
                 interpret( vch, argument );

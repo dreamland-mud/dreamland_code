@@ -256,15 +256,15 @@ bool PCharacter::load( )
         }
 
         word = fread_word( fp );
-        if ( !str_cmp( word, "PLAYER" ) ) {
+        if ( !strcmp( word, "PLAYER" ) ) {
             PCharacterManager::load( this );
             fread_char( this, fp );
         }
-        else if ( !str_cmp( word, "OBJECT" ) ) fread_obj  ( this, NULL, fp );
-        else if ( !str_cmp( word, "O"      ) ) fread_obj  ( this, NULL, fp );
-        else if ( !str_cmp( word, "PET"    ) ) fread_pet  ( this, fp );
-        else if ( !str_cmp( word, "MLT"    ) ) fread_mlt  ( this, fp );
-        else if ( !str_cmp( word, "End"    ) ) break;
+        else if ( !strcmp( word, "OBJECT" ) ) fread_obj  ( this, NULL, fp );
+        else if ( !strcmp( word, "O"      ) ) fread_obj  ( this, NULL, fp );
+        else if ( !strcmp( word, "PET"    ) ) fread_pet  ( this, fp );
+        else if ( !strcmp( word, "MLT"    ) ) fread_mlt  ( this, fp );
+        else if ( !strcmp( word, "End"    ) ) break;
         else
         {
             LogStream::sendError( ) 

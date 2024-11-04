@@ -31,7 +31,6 @@ affects.cpp \
 groupchannel.cpp \
 following.cpp \
 drop.cpp \
-fly.cpp \
 help.cpp \
 score.cpp \
 title.cpp \

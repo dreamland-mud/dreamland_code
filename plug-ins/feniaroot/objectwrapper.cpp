@@ -191,11 +191,6 @@ NMI_SET(ObjectWrapper, material, "материалы (.Material), из кото�
     }
 }
 
-NMI_SET( ObjectWrapper, weight, "вес предмета")
-{
-    checkTarget( );
-    target->weight = arg.toNumber( );
-}
 
 NMI_GET( ObjectWrapper, name , "имена предмета, на которые он откликается")
 {
@@ -291,6 +286,18 @@ NMI_SET( ObjectWrapper, timer, "через сколько тиков исчез�
 {
     checkTarget( );
     target->timer = arg.toNumber( );
+}
+
+NMI_GET( ObjectWrapper, timestamp, "реальное время в секундах, когда исчезнет лимит")
+{
+    checkTarget( );
+    return Register((int)target->timestamp);
+}
+
+NMI_SET( ObjectWrapper, timestamp, "реальное время в секундах, когда исчезнет лимит")
+{
+    checkTarget( );
+    target->timestamp = arg.toNumber( );
 }
 
 NMI_GET( ObjectWrapper, water_float, "время плавания")
@@ -415,6 +422,12 @@ NMI_GET( ObjectWrapper, weight, "вес предмета")
 {
     checkTarget( );
     return Register( target->weight );
+}
+
+NMI_SET( ObjectWrapper, weight, "вес предмета")
+{
+    checkTarget( );
+    target->weight = arg.toNumber( );
 }
 
 NMI_GET( ObjectWrapper, ave, "среднее повреждение оружия или 0")

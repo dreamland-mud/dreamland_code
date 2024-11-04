@@ -278,8 +278,9 @@ void ClanGuard::actGreet( PCharacter *wch )
 /*--------------------------------------------------------------------------
  * clan guard speech programm 
  *-------------------------------------------------------------------------*/
-void ClanGuard::speech( Character *wch, const char *speech )
+void ClanGuard::speech( Character *wch, const char *cspeech )
 {
+    DLString speech = cspeech;
     Object * obj;
     ClanArea::Pointer clanArea = getClanArea( );
     
@@ -291,7 +292,7 @@ void ClanGuard::speech( Character *wch, const char *speech )
             
     obj = NULL;
 
-    if (!str_cmp( speech, "I need key" )) {
+    if (speech ^ "I need key") {
         if (clanArea->keyVnum > 0) {
             if (wch->getClan( ) != ch->getClan( )) {
                 do_say(ch, "ЭТОГО ты не получишь!");
@@ -304,7 +305,7 @@ void ClanGuard::speech( Character *wch, const char *speech )
             oldact("Ты снимаешь с шеи $o4.", ch, obj, 0, TO_CHAR );
         }
     }
-    else if (!str_cmp( speech, "I need invitation" ) || !str_cmp(speech, "Мне нужно приглашение")) {
+    else if (speech ^ "I need invitation" || speech ^ "Мне нужно приглашение") {
         if (clanArea->invitationVnum > 0) {
             if (wch->getClan( ) != ch->getClan( )) {
                 do_say(ch, "Я не обязан приглашать тебя в свой клан!");
@@ -316,7 +317,7 @@ void ClanGuard::speech( Character *wch, const char *speech )
             actGiveInvitation( wch->getPC( ), obj );            
         }
     }
-    else if (!str_cmp( speech, "I need book" )) {
+    else if (speech ^ "I need book") {
         if (clanArea->bookVnum > 0) {
             if (wch->getClan( ) != ch->getClan( )) {
                 do_say(ch, "Эта книга не для твоих глаз!");

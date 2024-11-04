@@ -180,7 +180,7 @@ REDIT(mlist, "мсписок", "список всех мобов в данной
 
     one_argument(argument, arg);
     pArea = ch->in_room->areaIndex();
-    fAll = !str_cmp(arg, "all");
+    fAll = arg_is_all(arg);
     found = false;
 
     for (vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++) {
@@ -224,7 +224,7 @@ REDIT(olist, "псписок", "список всех предметов в да
 
     one_argument(argument, arg);
     pArea = ch->in_room->areaIndex();
-    fAll = !str_cmp(arg, "all");
+    fAll = arg_is_all(arg);
     found = false;
 
     for (vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++) {
@@ -381,7 +381,7 @@ REDIT(oldbehavior, "старповедение", "редактирование �
         return true;
     }
 
-    if (!str_cmp( argument, "clear" )) {        
+    if (arg_is_clear(argument)) {        
         pRoom->behavior.clear( );
         stc("Поведение очищено.\r\n", ch);
         return true;
@@ -552,7 +552,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         return false;
     }
 
-    if (!str_cmp(command, "delete")) {
+    if (arg_is_strict(command, "delete")) {
         int rev;
 
         if (!pRoom->exit[door] || !pRoom->room->exit[door]) {
@@ -579,7 +579,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         return true;
     }
 
-    if (!str_cmp(command, "copy")) {
+    if (arg_is_strict(command, "copy")) {
         int rev;
 
         if (!pRoom->exit[door]) {
@@ -620,7 +620,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         return true;
     }   
 
-    if (!str_cmp(command, "unlink")) {
+    if (arg_is_strict(command, "unlink")) {
         if (!pRoom->exit[door] || !pRoom->room->exit[door]) {
             stc("REdit:  Cannot delete a null exit.\n\r", ch);
             return false;
@@ -633,7 +633,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         return true;
     }
 
-    if (!str_cmp(command, "link")) {
+    if (arg_is_strict(command, "link")) {
         RoomIndexData *pRemoteRoom;
 
         if (arg[0] == '\0' || !is_number(arg)) {
@@ -670,7 +670,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         return true;
     }
 
-    if (!str_cmp(command, "dig")) {
+    if (arg_is_strict(command, "dig")) {
         if (arg[0] == '\0') {
             stc("Syntax: [direction] dig (<vnum> | next)\n\r", ch);
             return false;
@@ -685,7 +685,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         return true;
     }
 
-    if (!str_cmp(command, "room")) {
+    if (arg_is_strict(command, "room")) {
         RoomIndexData *pRemoteRoom;
 
         if (arg[0] == '\0' || !is_number(arg)) {
@@ -707,7 +707,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         return true;
     }
 
-    if (!str_cmp(command, "key")) {
+    if (arg_is_strict(command, "key")) {
         if (arg[0] == '\0' || (!is_number(arg) && !arg_is_clear(arg))) {
             stc("Syntax:  [direction] key [vnum]\n\r", ch);
             stc("         [direction] key clear\n\r", ch);
@@ -855,7 +855,7 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
 
     EDIT_ROOM(ch, pRoom);
 
-    if(!str_cmp(argument, "next")) {
+    if(arg_is_strict(argument, "next")) {
         value = next_room(ch, pRoom);
         if (value < 0) {
             ch->pecho("Все внумы в этой зоне уже заняты!");
@@ -946,7 +946,7 @@ REDIT(clan, "клан", "установить клановую принадле�
         return false;
     }
 
-    if (!str_cmp(argument, "clear")) {
+    if (arg_is_clear(argument)) {
         pRoom->clan.assign(clan_none);
         stc("Clan cleared.\n\r", ch);
         return true;
@@ -977,7 +977,7 @@ REDIT(guilds, "гильдии", "установить гильдию для кл
         return false;
     }
     
-    if (!str_cmp(argument, "clear")) {
+    if (arg_is_clear(argument)) {
         pRoom->guilds.clear();
         stc("All guilds cleared.\n\r", ch);
         return true;
@@ -1172,13 +1172,13 @@ static bool redit_purge(Room *pRoom, PCharacter *ch, char *argument)
         return false;
     }
     
-    if (!str_cmp(arg, "all")) {
+    if (arg_is_all(arg)) {
         fObj = true;
         fMob = true;
-    } else if (!str_cmp(arg, "mobs")) {
+    } else if (arg_is_strict(arg, "mob")) {
         fObj = false;
         fMob = true;
-    } else if (!str_cmp(arg, "objs")) {
+    } else if (arg_is_strict(arg, "obj")) {
         fObj = true;
         fMob = false;
     } else {
@@ -1293,7 +1293,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     pRoom = ch->in_room->pIndexData;
 
-    if (!str_cmp(arg1, "show")) {
+    if (arg_is_strict(arg1, "show")) {
         if(*argument && is_number(argument))
             pRoom2 = get_room_index(atoi(argument));
         else
@@ -1311,7 +1311,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         OLCStateRoom::show(ch, pRoom2, false);
         return;
         
-    } else if (!str_cmp(arg1, "reset")) {
+    } else if (arg_is_strict(arg1, "reset")) {
 // TODO call single method from inside and outside of redit. But conflicts with "reset" command
         if (!OLCState::can_edit(ch, pRoom->vnum)) {
             stc("У тебя недостаточно прав для редактирования комнат.\n\r", ch);
@@ -1322,7 +1322,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         stc("Room reset.\n\r", ch);
         return;
         
-    } else if (!str_cmp(arg1, "goto")) {
+    } else if (arg_is_strict(arg1, "goto")) {
 // TODO call single method from inside and outside of redit
         if (!is_number(argument)) {
             stc("Syntax: redit goto <vnum>\n\r", ch);
@@ -1345,7 +1345,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                        "%1$^C1 внезапно вырастает из-под земли." );
         return;
         
-    } else if (!str_cmp(arg1, "purge")) {
+    } else if (arg_is_strict(arg1, "purge")) {
         if (!OLCState::can_edit(ch, pRoom->vnum)) {
             stc("У тебя недостаточно прав для редактирования этой комнаты.\n\r", ch);
             return;
@@ -1354,7 +1354,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         redit_purge(pRoom->room, ch, argument);
         return;
 
-    } else if (!str_cmp(arg1, "create")) {
+    } else if (arg_is_strict(arg1, "create")) {
 // TODO call single method from inside and outside of redit
         if (argument[0] == '\0') {
             stc("Syntax: redit create <vnum>\n\r", ch);

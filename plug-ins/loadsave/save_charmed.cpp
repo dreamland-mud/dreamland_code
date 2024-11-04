@@ -145,7 +145,7 @@ static void load_one_creature( const DLString &path )
             }
 
             word = fread_word( fp );
-            if ( !str_cmp( word, "MOBILE" ) )
+            if ( !strcmp( word, "MOBILE" ) )
             {
                 ch = 0;
                 ch = fread_mob( fp );
@@ -161,17 +161,17 @@ static void load_one_creature( const DLString &path )
                 continue;
             }
             
-            if ( !str_cmp( word, "OBJECT" ) ) {
+            if ( !strcmp( word, "OBJECT" ) ) {
                 fread_obj  ( ch, NULL, fp );
                 continue;
             }
             
-            if ( !str_cmp( word, "O"      ) ) {
+            if ( !strcmp( word, "O"      ) ) {
                 fread_obj  ( ch, NULL, fp );
                 continue;
             }
             
-            if ( !str_cmp( word, "End"    ) ) 
+            if ( !strcmp( word, "End"    ) ) 
                 break;
             
             LogStream::sendError( ) << "bad section: " << word << endl;

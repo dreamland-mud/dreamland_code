@@ -11,28 +11,6 @@
 #include "inflectedstring.h"
 
 /*
- * str_cmp: a case-insensitive version of strcmp().
- * Returns: 0 if equal, > 0 if arg1 > arg2, or < 0 if arg1 < arg2.
- *
- * Scan until strings are found different or we reach the end of both.
- */
-int str_cmp( const char *astr, const char *bstr )
-{
-    int chk;
-
-    if (!astr || !bstr)
-        return 0;
-
-    for ( ; *astr || *bstr; astr++, bstr++ )
-    {
-        if ((chk = dl_tolower(*astr) - dl_tolower(*bstr)) != 0)
-            return chk;
-    }
-
-    return 0;
-}
-
-/*
  * Compare strings, case insensitive, for prefix matching.
  * Return true if astr not a prefix of bstr
  *   (compatibility with historical functions).

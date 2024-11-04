@@ -99,7 +99,7 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     // Save the world, only authorized areas
-    if (!str_cmp("world", arg1)) {
+    if (arg_is_strict(arg1, "world")) {
         save_xmlarea_list();
         struct area_file *afile;
         bool success = true;
@@ -122,7 +122,7 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     // Save changed areas, only authorized areas
-    if (!str_cmp("changed", arg1)) {
+    if (arg_is_strict(arg1, "changed")) {
         save_xmlarea_list();
 
         stc("Saved zones:\n\r", ch);
@@ -147,13 +147,13 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     // Save the area.lst file
-    if (!str_cmp(arg1, "list")) {
+    if (arg_is_strict(arg1, "list")) {
         save_xmlarea_list();
         return;
     }
 
     // Save area being edited, if authorized
-    if (!str_cmp(arg1, "area")) {
+    if (arg_is_strict(arg1, "area")) {
         pArea = ch->in_room->areaIndex();
 
         if (!pArea || !OLCState::can_edit(ch, pArea)) {

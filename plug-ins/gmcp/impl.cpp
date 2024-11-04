@@ -42,9 +42,9 @@ bool GMCPCommand::isSupported(Descriptor *d) const
     return d && IS_SET(d->oob_proto, OOB_GMCP);
 }
 
-void GMCPCommand::checkSupport(Descriptor *d, const char *proto) const {
+void GMCPCommand::checkSupport(Descriptor *d, const string &proto) const {
 
-    if (d && !str_cmp(PROTO_NAME, proto))
+    if (d && proto == PROTO_NAME)
         SET_BIT(d->oob_proto, OOB_GMCP);
 }
 

@@ -434,7 +434,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     if (is_number(arg1)) {
         RoomIndexData *pRoom = ch->in_room->pIndexData;
 
-        if (!str_cmp(arg2, "delete")) {
+        if (arg_is_strict(arg2, "delete")) {
             int insert_loc = find_reset(pRoom, arg1);
 
             if (insert_loc < 0) {
@@ -511,8 +511,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             }
 
             pRoom->areaIndex->changed = true;
-            if (str_cmp(arg4, "quiet"))
-                __do_resets(ch, const_cast<char *>(""));
+            __do_resets(ch, const_cast<char *>(""));
             return;
         }
 
@@ -533,8 +532,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             pReset->bestTier = tier;
             ptc(ch, "Best tier for reset {W%d{x set to {g%d{x.\r\n", insert_loc+1, tier);
             pRoom->areaIndex->changed = true;
-            if (str_cmp(arg4, "quiet"))
-                __do_resets(ch, const_cast<char *>(""));
+            __do_resets(ch, const_cast<char *>(""));
             return;
         }
 
@@ -571,8 +569,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             }
 
             pRoom->areaIndex->changed = true;
-            if (str_cmp(arg4, "quiet"))
-                __do_resets(ch, const_cast<char *>(""));
+            __do_resets(ch, const_cast<char *>(""));
             return;
         }
 
@@ -580,9 +577,9 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         argument = one_argument(argument, arg6);
         argument = one_argument(argument, arg7);
 
-        if ((!str_cmp(arg2, "mob") && is_number(arg3))
-                 || (!str_cmp(arg2, "obj") && is_number(arg3))) {
-            if (!str_cmp(arg2, "mob")) {
+        if ((arg_is_strict(arg2, "mob") && is_number(arg3))
+                 || (arg_is_strict(arg2, "obj") && is_number(arg3))) {
+            if (arg_is_strict(arg2, "mob")) {
                 pReset = new reset_data();
                 pReset->command = 'M';
                 if (get_mob_index(is_number(arg3) ? atoi(arg3) : 1) == NULL) {
@@ -594,7 +591,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 pReset->arg3 = ch->in_room->vnum;
                 pReset->arg4 = is_number(arg5) ? atoi(arg5) : 1;        /* Min # */
             }
-            else if (!str_cmp(arg2, "obj")) {
+            else if (arg_is_strict(arg2, "obj")) {
                 pReset = new reset_data();
                 pReset->arg1 = atoi(arg3);
                 if (!str_prefix(arg4, "inside")) {
@@ -609,7 +606,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                     pReset->arg4 = is_number(arg7) ? atoi(arg7) : 1;
                     pReset->vnums.push_back(pReset->arg1);
                 }
-                else if (!str_cmp(arg4, "room")) {
+                else if (arg_is_strict(arg4, "room")) {
                     pReset = new reset_data();
                     pReset->command = 'O';
                     if (get_obj_index(atoi(arg3)) == NULL) {

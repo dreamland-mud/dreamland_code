@@ -490,8 +490,8 @@ AEDIT(authors, "авторы", "установить имена создател
         return false;
     }
 
-    if (!str_cmp(argument, "none"))
-        authors = "none";
+    if (arg_is_clear(argument))
+        authors = "";
     else
         authors = argument;
 
@@ -506,8 +506,8 @@ AEDIT(translator, "переводчик", "установить имена пе�
         return false;
     }
 
-    if (!str_cmp(argument, "none"))
-        translator = "none";
+    if (arg_is_clear(argument))
+        translator = "";
     else
         translator = argument;
 
@@ -665,7 +665,7 @@ AEDIT(behavior, "поведение", "запустить строковый р�
         return true;
     }
 
-    if (!str_cmp( argument, "clear" )) {
+    if (arg_is_clear(argument)) {
         behavior.clear( );
         stc("Поведение очищено.\r\n", ch);
         return true;
@@ -726,7 +726,7 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         }
     }
     else {
-        if (!str_cmp(arg, "create")) {
+        if (arg_is_strict(arg, "create")) {
             if (ch->getSecurity() < 10) {
                 stc("Insuficiente seguridad para crear areas.\n\r", ch);
                 return;

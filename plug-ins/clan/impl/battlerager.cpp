@@ -415,18 +415,19 @@ static bool has_curse(Character *wch)
     return false;
 }
 
-void ClanHealerBattlerager::speech( Character *wch, const char *speech )
+void ClanHealerBattlerager::speech( Character *wch, const char *cspeech )
 {
-    if (!speech[0])
+    if (!cspeech[0])
         return;
 
-
-    if (str_cmp( speech, "aid me wiseman" ) && str_cmp( speech, "помоги мне" )) {
-        if (is_name("wiseman", speech) || is_name("aid", speech) || is_name("help", speech)
-        || is_name("помоги", speech) || is_name("лекарь", speech))
-    {
-        do_say(ch, "Скажи {1{yпомоги мне{2, если тебе нужна помощь.");
-    }
+    DLString speech = DLString(cspeech).toLower();
+    
+    if (speech != "aid me wiseman" && speech != "помоги мне") {
+        if (is_name("wiseman", cspeech) || is_name("aid", cspeech) || is_name("help", cspeech)
+            || is_name("помоги", cspeech) || is_name("лекарь", cspeech))
+        {
+            do_say(ch, "Скажи {1{yпомоги мне{2, если тебе нужна помощь.");
+        }
         return;
     }
     

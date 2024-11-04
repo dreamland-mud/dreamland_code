@@ -1426,6 +1426,8 @@ static bool do_look_extraexit( Character *ch, const char *arg3 )
  *-------------------------------------------------------------------------*/
 CMDRUNP( look )
 {
+    static const DLString ARG_AUTO = "auto";
+    static const DLString ARG_MOVE = "move";
     char arg1 [MAX_INPUT_LENGTH];
     char arg2 [MAX_INPUT_LENGTH];
     char arg3 [MAX_INPUT_LENGTH];
@@ -1449,8 +1451,8 @@ CMDRUNP( look )
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
     number = number_argument(arg1,arg3);
-    fAuto = !str_cmp( arg1, "auto" );
-    fMove = !str_cmp( arg1, "move" );
+    fAuto = ARG_AUTO == arg1;
+    fMove = ARG_MOVE == arg1;
     fBrief = !ch->is_npc( ) && IS_SET(ch->comm, COMM_BRIEF);
     fShowMount = true;
 

@@ -14,7 +14,7 @@
 
 struct GMCPCommand : public OutOfBandCommand {
     bool isSupported(Descriptor *d) const;
-    void checkSupport(Descriptor *d, const char *proto) const;
+    void checkSupport(Descriptor *d, const string &proto) const;
 
     static void send(Descriptor *d, const string &package, const string &message, const string &data);
 };

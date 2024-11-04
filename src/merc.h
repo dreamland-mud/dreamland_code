@@ -58,6 +58,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <string>
+#include <string.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
