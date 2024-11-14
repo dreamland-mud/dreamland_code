@@ -79,7 +79,7 @@
 #include "core/object.h"
 #include "liquid.h"
 #include "desire.h"
-
+#include "player_account.h"
 #include "update.h"
 #include "update_areas.h"
 #include "weather.h"
@@ -95,6 +95,7 @@
 #include "move_utils.h"
 #include "doors.h"
 #include "descriptor.h"
+#include "nannyhandler.h"
 #include "fight.h"
 #include "damage_impl.h"
 #include "magic.h"
@@ -511,17 +512,54 @@ void char_update_prog( )
     }
 }
 
+void char_update_lostlink()
+{
+    list<Character *> newbiesToQuit;
+    for (Character *ch = newbie_list; ch; ch = ch->next) {
+        if (ch->desc == 0)
+            newbiesToQuit.push_back(ch);
+    }
+
+    for (auto &ch: newbiesToQuit)
+        NannyHandler::extractNewbie(ch);
+
+    int lostlink_timer = config["lostlink"].asInt();
+
+    if (lostlink_timer < 0)
+        return;
+
+    list<Character *> playersToQuit;
+    for (Character *ch = char_list; ch != 0; ch = ch->next) {
+        if (ch->desc)
+            continue;
+
+        if (ch->is_npc() || ch->getPC()->switchedTo)
+            continue;
+
+        if (ch->getPC()->isCoder())
+            continue;
+
+        if (lostlink_timer == 0) {
+            playersToQuit.push_back(ch);
+            continue;
+        }
+
+        if (ch->timer > lostlink_timer) {
+            playersToQuit.push_back(ch);
+            continue;
+        }
+    }
+
+    for (auto &ch: playersToQuit)
+        Player::quit(ch->getPC());
+}
+
 void char_update_autosave()
 {
-    /*
-     * Autosave and autoquit.
-     * Check that these chars still exist.
-     */
     ProfilerBlock profiler("char_update_autosave", 100);
 
     static time_t last_save_time = -1;
     int autoquit_timer = config["autoquit"].asInt();
-    int lostlink_timer = config["lostlink"].asInt();
 
     if (last_save_time == -1 || dreamland->getCurrentTime( ) - last_save_time > 60)
     {
@@ -542,17 +580,8 @@ void char_update_autosave()
             if (pch->isCoder())
                 continue;
 
-            if (autoquit_timer > 0 && pch->timer > autoquit_timer) {
-                pch->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "auto" );
-                interpret_raw(pch, "quit", "");
-                continue;
-            }
-
-            if (lostlink_timer > 0 && !pch->desc && pch->timer > lostlink_timer) {
-                pch->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "auto" );
-                interpret_raw(pch, "quit", "");
-                continue;
-            }
+            if (autoquit_timer > 0 && pch->timer > autoquit_timer)
+                Player::quit(pch);
         }
     }
 }
@@ -1120,6 +1149,8 @@ void update_handler( void )
         LastLogStream::send( ) <<  "Room affects update"  << endl;
         room_affect_update( );
     }
+
+    char_update_lostlink();
 
     // Stagger tick updates across 4 pulses, just before the current tick ends.
     if (--pulse_point    <= 0)

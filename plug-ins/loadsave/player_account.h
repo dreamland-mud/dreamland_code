@@ -5,6 +5,8 @@ class PCharacter;
 
 namespace Player {
     void quitAndDelete(PCharacter *victim);
+
+    void quit(PCharacter *ch);
 };
 
 #endif

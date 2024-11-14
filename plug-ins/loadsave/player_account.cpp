@@ -12,3 +12,9 @@ void Player::quitAndDelete( PCharacter *victim )
     interpret_raw( victim, "quit", "" );
     PCharacterManager::pfDelete( name );
 }
+
+void Player::quit(PCharacter *pch)
+{
+    pch->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "auto" );
+    interpret_raw(pch, "quit", "");
+}

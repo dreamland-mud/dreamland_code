@@ -49,32 +49,37 @@ bool password_check( PCMemoryInterface *pci, const DLString &input );
 
 using namespace std;
 
+void NannyHandler::extractNewbie(Character *ch)
+{
+    ::Object *obj, *obj_next;
+    
+    if (ch->in_room)
+        char_from_room( ch );
+
+    char_from_list( ch, &newbie_list );
+    
+    for (obj = ch->carrying; obj != 0; obj = obj_next) {
+        obj_next = obj->next_content;
+        extract_obj_1( obj, true );
+    }
+
+    for (Character *wch = char_list; wch != 0; wch = wch->next) {
+        if (wch->reply == ch)
+            wch->reply = 0;
+    }
+    
+    PCharacterManager::quit( ch->getPC( ) );
+    mprog_extract( ch, true );
+    ddeallocate( ch );
+}
+
 void NannyHandler::close( Descriptor *d )
 {
     Character *ch = d->character;
 
     if (ch) {
-        ::Object *obj, *obj_next;
-        
-        if (ch->in_room)
-            char_from_room( ch );
-
-        char_from_list( ch, &newbie_list );
-        
-        for (obj = ch->carrying; obj != 0; obj = obj_next) {
-            obj_next = obj->next_content;
-            extract_obj_1( obj, true );
-        }
-
-        for (Character *wch = char_list; wch != 0; wch = wch->next) {
-            if (wch->reply == ch)
-                wch->reply = 0;
-        }
-        
-        PCharacterManager::quit( ch->getPC( ) );
         LogStream::sendWarning( ) << "Closing nanny link to " << ch->getPC()->getName( ) << '.' << endl;
-        mprog_extract( ch, true );
-        ddeallocate( ch );
+        extractNewbie(ch);
         d->character = NULL;
     }
 }

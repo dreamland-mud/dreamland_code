@@ -181,7 +181,7 @@ CMDRUNP( quit )
         pch->hit = std::max( 1, (int)pch->hit );
     }
     
-    if (!pch->is_immortal( ) && !fAuto && !fForced) {
+    if (!pch->is_immortal( ) && !fForced) {
         if (IS_VIOLENT(pch)) {
             pch->pecho("У тебя слишком много адреналина в крови.");
             return;

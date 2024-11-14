@@ -43,6 +43,8 @@ public:
     void doCodepage( Descriptor *, char * );
     void doInterpret( Descriptor *, char * );
 
+    static void extractNewbie(Character *ch);
+
 private:
     static PCharacter * getPlayer( const Scripting::RegisterList & );
     static PCharacter * getPlayer( const Scripting::Register & );
