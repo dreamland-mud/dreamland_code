@@ -11,12 +11,10 @@
 
 #include "skillmanager.h"                                                       
 #include "commandmanager.h"
-
+#include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "pcrace.h"
-
 #include "merc.h"
-
 #include "def.h"
 
 /*--------------------------------------------------------------------
@@ -140,12 +138,17 @@ Word Language::createGlobalWord( ) const
     Word word;
     DLString effectName = getRandomEffectName( true );
     
-    if (!effectName.empty( )) {
-        word.effect = effectName;
-        word.count  = findEffect( effectName )->getFrequency( );
-        word.dictum = createDictum( );
-        word.lang   = getName();
-    }
+    if (effectName.empty())
+        return word;
+
+    DLString dictum = createDictum();
+    if (wordAlreadyExists(dictum))
+        return word;
+
+    word.effect = effectName;
+    word.count  = findEffect( effectName )->getFrequency( );
+    word.dictum = dictum;
+    word.lang   = getName();
 
     return word;
 }
@@ -154,15 +157,37 @@ Word Language::createPersonalWord( ) const
 {
     Word word;
     DLString effectName = getRandomEffectName( false );
-    
-    if (!effectName.empty( )) {
-        word.effect = effectName;
-        word.count  = 2 * findEffect( effectName )->getFrequency( );
-        word.dictum = createDictum( );
-        word.lang   = getName();
-    }
+
+    if (effectName.empty())
+        return word;
+
+    DLString dictum = createDictum();
+    if (wordAlreadyExists(dictum))
+        return word;
+
+    word.effect = effectName;
+    word.count  = 2 * findEffect( effectName )->getFrequency( );
+    word.dictum = dictum;
+    word.lang   = getName();
 
     return word;
+}
+
+bool Language::wordAlreadyExists(const DLString &dictum) const
+{
+    Word dummy;
+
+    if (languageManager->findWord(dummy, this, dictum))
+        return true;
+
+    for (auto pcm: PCharacterManager::getPCM()) {
+        const auto &attr = pcm.second->getAttributes().findAttr<XMLAttributeLanguage>("language");
+        
+        if (attr && attr->findWord(dummy, this, dictum))
+            return true;
+    }
+    
+    return false;
 }
 
 WordEffect::Pointer Language::findEffect( const DLString &name ) const

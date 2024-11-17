@@ -135,6 +135,7 @@ public:
 protected:
     Word createGlobalWord( ) const;
     Word createPersonalWord( ) const;
+    bool wordAlreadyExists(const DLString &) const;
     DLString getRandomEffectName( bool ) const;
     virtual void dream( const Word &, PCharacter * ) const = 0;
     const RaceLangInfo * getRaceInfo( CharacterMemoryInterface * ) const;
