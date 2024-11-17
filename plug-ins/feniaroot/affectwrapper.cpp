@@ -54,7 +54,7 @@ AffectWrapper::AffectWrapper( const RegisterList &args )
         return;
 
     if (++i != args.end())
-        throw Scripting::TooManyArgumentsException();
+        throw Scripting::TooManyArgumentsException(DLString("type, level, duration, total 3"), DLString(args.size()));
 }
 
 AffectWrapper::AffectWrapper(Affect &af)

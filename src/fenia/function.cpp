@@ -76,9 +76,12 @@ Function::invoke(Scope &sroot, Register thiz, RegisterList const &args)
     sroot.addVar(ID_THIS);
     sroot.setVar(ID_THIS, thiz);
 
+    DLString expected = argNames->toString();
+    DLString actual(args.size());
+
     for(;ani != argNames->end();ani++, ali++) {
         if(ali == args.end())
-            throw NotEnoughArgumentsException();
+            throw NotEnoughArgumentsException(expected, actual);
         else {
             sroot.addVar(*ani);
             sroot.setVar(*ani, *ali);
@@ -87,7 +90,7 @@ Function::invoke(Scope &sroot, Register thiz, RegisterList const &args)
     
     if(ali != args.end()) {
         /* XXX - should place 'em in `argv' vector*/
-        throw TooManyArgumentsException();
+        throw TooManyArgumentsException(expected, actual);
     }
     
     BTPushNode bt;
@@ -111,6 +114,18 @@ void
 Function::finalize()
 {
     source.source->functions.erase(id);
+}
+
+DLString ArgNames::toString() const
+{
+    ostringstream buf;
+
+    for (auto &n: *this) {
+        buf << Lex::getThis()->getName(n) << ", ";
+    }
+
+    buf << "total " << size();
+    return buf.str();
 }
 
 }

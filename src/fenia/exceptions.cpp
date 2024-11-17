@@ -64,7 +64,17 @@ NotImplementedException::~NotImplementedException( ) throw()
 {
 }
 
+NotEnoughArgumentsException::NotEnoughArgumentsException(const DLString &expected, const DLString & actual) throw()
+           : Exception("Not enough arguments: expected " + expected + ", but got only " + actual)
+{
+}
+
 NotEnoughArgumentsException::~NotEnoughArgumentsException( ) throw() 
+{
+}
+
+TooManyArgumentsException::TooManyArgumentsException(const DLString &expected, const DLString & actual) throw()
+           : Exception("Too many arguments: expected only " + expected + ", but got " + actual)
 {
 }
 

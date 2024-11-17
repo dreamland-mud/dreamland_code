@@ -44,6 +44,7 @@ public:
 class NotEnoughArgumentsException : public Exception {
 public:
     NotEnoughArgumentsException() throw() : Exception("Not enough arguments") { }
+    NotEnoughArgumentsException(const DLString &expected, const DLString & actual) throw();
 
     virtual ~NotEnoughArgumentsException( ) throw() ;
 };
@@ -51,6 +52,7 @@ public:
 class TooManyArgumentsException : public Exception { 
 public:
     TooManyArgumentsException() throw() : Exception("Too many arguments") { }
+    TooManyArgumentsException(const DLString &expected, const DLString & actual) throw();
 
     virtual ~TooManyArgumentsException( ) throw() ;
 };

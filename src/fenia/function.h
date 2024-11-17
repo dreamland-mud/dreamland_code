@@ -36,6 +36,7 @@ class Scope;
 class ArgNames : public vector<Lex::id_t>, public DLObject {
 public:
     typedef ::Pointer<ArgNames> Pointer;
+    DLString toString() const;
 };
 
 

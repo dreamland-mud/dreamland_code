@@ -33,14 +33,14 @@ struct RegFormatter : public MsgFormatter {
         RegisterList::const_iterator ipos = args.begin();
         
         if(ipos == args.end())
-            throw Scripting::NotEnoughArgumentsException( );
+            throw Scripting::NotEnoughArgumentsException("format, at least 1", "0");
         
         this->constFormat = ipos++->toString( );
         this->format = constFormat.c_str( );
 
         argc = args.size() - 1;
         if (argc >= MAXARGS)
-            throw Scripting::TooManyArgumentsException();
+            throw Scripting::TooManyArgumentsException(DLString(MAXARGS), DLString(argc));
         
         copy(ipos, args.end(), argv);
         argcnt = 0;
@@ -51,13 +51,13 @@ struct RegFormatter : public MsgFormatter {
 protected:
     virtual void nextArg() {
         if(argcnt < 0 || argcnt >= argc)
-            throw Scripting::NotEnoughArgumentsException( );
+            throw Scripting::NotEnoughArgumentsException(DLString(argc), DLString(argcnt));
 
         d = argv[argcnt++];
     }
     virtual void shiftArg(int i) {
         if(i < 0 || i > argc)
-            throw Scripting::NotEnoughArgumentsException( );
+            throw Scripting::NotEnoughArgumentsException(DLString(argc), DLString(i));
             
         d = argv[i-1];
         argcnt = i;
