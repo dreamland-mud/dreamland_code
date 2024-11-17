@@ -145,7 +145,7 @@ bool Note::parseRecipient( PCharacter *ch, const DLString &cArguments, ostringst
 
         if (( clan = findClan( arg ) )) 
         {
-            ostr << "члены клана {" << clan->getColor( ) << clan->getShortName( ) << "{x";
+            ostr << "члены клана {" << clan->getColor( ) << clan->getRussianName( ).ruscase('1') << "{x";
         }
         else if (( race = findRace( arg ) )) 
         {
@@ -157,7 +157,7 @@ bool Note::parseRecipient( PCharacter *ch, const DLString &cArguments, ostringst
         }
         else if (( pci = PCharacterManager::find( arg ) ))
         {
-            ostr << "{W" << pci->getName( ) << "{x";
+            ostr << "{W" << pci->getNameP('1') << "{x";
         }
         
         if (!ostr.str( ).empty( )) {

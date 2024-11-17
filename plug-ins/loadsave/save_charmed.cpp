@@ -171,7 +171,7 @@ static void load_one_creature( const DLString &path )
                 continue;
             }
             
-            if ( !strcmp( word, "End"    ) ) 
+            if ( !strcmp( word, "END"    ) ) 
                 break;
             
             LogStream::sendError( ) << "bad section: " << word << endl;

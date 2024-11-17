@@ -89,7 +89,7 @@ void Lover::add( Character* ch, DLString arguments)
         ch->getPC( )->getAttributes( ).getAttr<XMLAttributeLovers>( "lovers" )->
                             lovers.put( pci->getName( ) );
 
-        str << "Ты отдаешь свое сердце "<<  pci->getName( ) << "." << endl;
+        str << "Ты отдаешь свое сердце "<<  pci->getNameP('3') << "." << endl;
     }
     else {
         str << "Таких нет." << endl;

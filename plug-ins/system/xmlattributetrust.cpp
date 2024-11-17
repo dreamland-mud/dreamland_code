@@ -126,14 +126,14 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
                 playersDeny.remove( pci->getName( ) );
             else
                 playersAllow.add( pci->getName( ) );
-            buf << "отныне разрешено персонажу " << pci->getName( ) << ".";
+            buf << "отныне разрешено персонажу " << pci->getNameP('1') << ".";
         }
         else {
             if (all)
                 playersDeny.add( pci->getName( ) );
             else
                 playersAllow.remove( pci->getName( ) );
-            buf << "отныне запрещено персонажу " << pci->getName( ) << ".";
+            buf << "отныне запрещено персонажу " << pci->getNameP('1') << ".";
         }
         return true;
     }
@@ -144,14 +144,14 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
                 clansDeny.remove( *clan );
             else
                 clansAllow.set( *clan );
-            buf << "отныне разрешено членам клана " << clan->getShortName( ) << ".";
+            buf << "отныне разрешено членам клана " << clan->getRussianName( ).ruscase('1') << ".";
         }
         else {
             if (all)
                 clansDeny.set( *clan );
             else
                 clansAllow.remove( *clan );
-            buf << "отныне запрещено членам клана " << clan->getShortName( ) << ".";
+            buf << "отныне запрещено членам клана " << clan->getRussianName( ).ruscase('1') << ".";
         }
         return true; 
     }

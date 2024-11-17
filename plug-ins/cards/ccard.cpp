@@ -92,10 +92,9 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     card = attributes->findAttr<XMLAttributeCards>( "cards" );
     
     if (!card)
-        ch->pecho( "%s не состоит в Колоде.", pci->getName( ).c_str( ) );
+        ch->pecho( "%C1 не состоит в Колоде.", pci );
     else
-        ch->pecho( "%s - это %s из Колоды.", 
-                    pci->getName( ).c_str( ), card->getFace( '1' ).c_str( ) );
+        ch->pecho( "%C1 - это %s из Колоды.", pci, card->getFace( '1' ).c_str( ) );
 
 
     arg = arguments.getOneArgument( );
@@ -128,8 +127,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
         card->setSuit( card->getRandomSuit( ) );
 
     PCharacterManager::saveMemory( pci );
-    ch->pecho( "%s становится %s.", 
-                pci->getName( ).c_str( ), card->getFace( '5' ).c_str( ) );
+    ch->pecho( "%C1 становится %s.", pci, card->getFace( '5' ).c_str( ) );
      
 }
 

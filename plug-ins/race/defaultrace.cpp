@@ -81,7 +81,7 @@ DLString RaceHelp::getTitle(const DLString &label) const
 
     // Default title if not set explicitly.
     if (title.get(RU).empty() && race)
-        return "Раса {c" + race->getMltName().ruscase('1') + "{x, {c" + race->getName() + "{x";
+        return "Раса {c" + race->getMltName().ruscase('1') + "{x";
 
     return HelpArticle::getTitle(label);
 }

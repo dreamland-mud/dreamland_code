@@ -138,12 +138,11 @@ DLString SkillHelp::getTitle(const DLString &label) const
     // Default title if not set explicitly.
     if (title.get(RU).empty()) {
         DLString title = (skill_is_spell(*skill) ? "Заклинание {c" : "Умение {c")
-            + skill->getRussianName() + "{x, {c" + skill->getName() + "{x";
+            + skill->getRussianName() + "{x";
 
         if (skill->getCommand() && !skill->getCommand()->getRussianName().empty())
             title += " и команда {c" 
-                + skill->getCommand()->getRussianName() + "{x, {c" 
-                + skill->getCommand()->getName() + "{x";
+                + skill->getCommand()->getRussianName() + "{x";
 
         return title;
     }

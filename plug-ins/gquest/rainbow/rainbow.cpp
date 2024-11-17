@@ -325,7 +325,7 @@ void RainbowGQuest::rewardWinner( )
 
     GlobalQuestManager::getThis( )->rewardChar( pci, r );
 
-    getScenario( )->printWinnerMsgOther( pci->getName( ), buf );
+    getScenario( )->printWinnerMsgOther( pci->getRussianName().getFullForm(), buf );
 
     GQChannel::gecho( getDisplayName(), buf.str( ), pci->getPlayer() );
 

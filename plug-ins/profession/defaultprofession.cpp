@@ -187,7 +187,7 @@ DLString ProfessionHelp::getTitle(const DLString &label) const
 
     // Default title if not set explicitly.
     if (title.get(RU).empty() && prof)
-        return "Класс {c" + prof->getRusName().ruscase('1') + "{x, {c" + prof->getName() + "{x";
+        return "Класс {c" + prof->getRusName().ruscase('1') + "{x";
 
     return HelpArticle::getTitle(label);
 }

@@ -261,7 +261,7 @@ CMDRUNP( quit )
             && pch->in_room->pIndexData->clan != clan_none 
             && pch->getClan() != pch->in_room->pIndexData->clan)
     {
-        if (!fAuto && !fForced) {
+        if (!fForced) {
             pch->pecho("Ты не можешь этого сделать -- здесь не твоя территория!");
             return;
         }

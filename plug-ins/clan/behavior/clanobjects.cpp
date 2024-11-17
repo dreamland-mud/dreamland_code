@@ -169,7 +169,7 @@ bool ClanAltar::fetch( Character *ch, Object *item )
     if (clan->getData( ))
         clan->getData( )->unsetItem( item );
 
-    DLString what = fmt(0, "{WКлан %s утратил свою святыню.{x", clanArea->getClan()->getShortName().c_str());
+    DLString what = fmt(0, "{WКлан %N1 утратил свою святыню.{x", clanArea->getClan()->getRussianName().c_str());
     infonet(0, 0, "{CЕхидный голос из $o2: ", what.c_str());
     send_discord_clan(what);
     send_telegram(what);

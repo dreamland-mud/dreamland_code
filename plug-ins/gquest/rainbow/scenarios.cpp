@@ -135,7 +135,7 @@ void RainbowDefaultScenario::printTime( ostringstream& buf ) const
 
 void RainbowDefaultScenario::printWinnerMsgOther( const DLString &name, ostringstream& buf ) const 
 {
-    buf << GQChannel::BOLD << name << GQChannel::NORMAL
+    buf << GQChannel::BOLD << name.ruscase('1') << GQChannel::NORMAL
         << " зажигает {Yр{Rа{Mд{Gу{Bг{Cу{x " << GQChannel::NORMAL 
         << "над Миром!";
 }
@@ -217,7 +217,7 @@ void RainbowSinsScenario::printTime( ostringstream& buf ) const
 
 void RainbowSinsScenario::printWinnerMsgOther( const DLString &name, ostringstream& buf ) const 
 {
-    buf << GQChannel::BOLD << name << GQChannel::NORMAL
+    buf << GQChannel::BOLD << name.ruscase('4') << GQChannel::NORMAL
         << " приняли на адскую должность!";
 }
 

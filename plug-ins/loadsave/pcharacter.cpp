@@ -264,7 +264,7 @@ bool PCharacter::load( )
         else if ( !strcmp( word, "O"      ) ) fread_obj  ( this, NULL, fp );
         else if ( !strcmp( word, "PET"    ) ) fread_pet  ( this, fp );
         else if ( !strcmp( word, "MLT"    ) ) fread_mlt  ( this, fp );
-        else if ( !strcmp( word, "End"    ) ) break;
+        else if ( !strcmp( word, "END"    ) ) break;
         else
         {
             LogStream::sendError( ) 

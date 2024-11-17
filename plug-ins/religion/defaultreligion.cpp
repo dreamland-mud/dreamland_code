@@ -75,7 +75,7 @@ DLString ReligionHelp::getTitle(const DLString &label) const
 
     // Default title if not set explicitly.
     if (title.get(RU).empty() && religion)
-        return "Религия {c" + religion->getRussianName().ruscase('1') + "{x, {c" + religion->getName().upperFirstCharacter() + "{x";
+        return "Религия {c" + religion->getRussianName().ruscase('1') + "{x";
 
     return HelpArticle::getTitle(label);
 }

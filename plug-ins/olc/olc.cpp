@@ -313,6 +313,81 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     DLString args = argument;
     DLString arg = args.getOneArgument();
 
+    if (arg == "ed") {
+        int cnt = 0;
+        ostringstream buf;
+
+        for (auto &r: roomIndexMap) {
+            int vnum = r.first;
+            RoomIndexData *pRoom = r.second;
+            DLString rdesc = pRoom->description[LANG_DEFAULT];
+            if (rdesc.empty())
+                rdesc = pRoom->description[EN];
+
+            rdesc = rdesc.toLower().colourStrip();
+
+            StringList descrs;
+
+            for (auto &ed: pRoom->extraDescriptions) {
+                DLString desc = String::stripEOL(ed->description.get(LANG_DEFAULT));
+                descrs.push_back(desc.toLower());
+            }
+
+            for (int door = 0; door < DIR_SOMEWHERE; door++) {
+                EXIT_DATA *pExit = pRoom->exit[door];
+
+                if (pExit && !pExit->description.get(LANG_DEFAULT).empty())
+                    descrs.push_back(pExit->description.get(LANG_DEFAULT));
+            }
+
+            for (auto &eexit: pRoom->extra_exits) {
+                const DLString &ee_rdesc = eexit->room_description.get(LANG_DEFAULT);
+                const DLString &ee_desc = eexit->description.get(LANG_DEFAULT);
+                if (!ee_rdesc.empty())
+                    descrs.push_back(ee_rdesc);
+                if (!ee_desc.empty())
+                    descrs.push_back(ee_desc);
+            }
+                
+            for (auto &ed: pRoom->extraDescriptions) {
+                bool foundRoom = false;
+                bool foundOther = false;
+
+                if (ed->keyword.strPrefix("owner"))
+                    continue;
+
+                XMLMultiString mlKeyword;
+                mlKeyword.fromMixedString(ed->keyword);
+
+                for (auto &kw: mlKeyword[RU].split(" ")) {
+                    DLString k1 = kw.toLower();
+                    DLString k2 = kw.substr(0, kw.size() - 2);
+
+                    if (String::contains(rdesc, k1) || String::contains(rdesc, k2))
+                        foundRoom = true;
+
+                    for (auto &desc: descrs)
+                        if (String::contains(desc, k1) || String::contains(desc, k2))
+                            foundOther = true;
+                }
+
+                if (!foundRoom && !foundOther) {
+                    buf << fmt(0, "[{W%6d{x] [{y%-13s{x] [{g%s{x] not found\n", 
+                        vnum, 
+                        pRoom->areaIndex->area_file->file_name.c_str(),
+                        ed->keyword.c_str());
+                    cnt++;
+                }
+            }
+
+        }
+
+        buf << "{GTotal: " << cnt << "{x" << endl;
+        page_to_char(buf.str().c_str(), ch);
+
+        return;
+    }
+
     if (arg == "eexit") {
         ostringstream abuf, cbuf, mbuf;
         abuf << endl << "Экстравыходы везде:" << endl;

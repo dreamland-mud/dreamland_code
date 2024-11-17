@@ -300,7 +300,7 @@ void InvasionGQuest::rewardLeader( )
             pci = leaders.back( );
             leaders.pop_back( );
 
-            buf << " " << pci->getName( );
+            buf << " " << pci->getNameP('1');
             if (!leaders.empty( ))
                 buf << ",";
 
