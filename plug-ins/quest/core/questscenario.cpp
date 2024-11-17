@@ -125,8 +125,8 @@ void QuestMobileAppearence::dress( NPCharacter *mob ) const
 {
     mob->setKeyword( name + " " + String::toString(mob->pIndexData->keyword));
     mob->setShortDescr( shortDesc, LANG_RU );
-    mob->setLongDescr( longDesc + "\r\n", LANG_RU );
-    mob->setDescription( desc + "\r\n", LANG_RU );
+    mob->setLongDescr( longDesc, LANG_RU );
+    mob->setDescription( desc, LANG_RU );
     mob->setSex( sex.getValue( ) ); 
 
     if (race.getName() != "none") {

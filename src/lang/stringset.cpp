@@ -2,6 +2,7 @@
  *
  * ruffina, Dream Land, 2004
  */
+#include <sstream>
 #include "stringset.h"
 #include "logstream.h"
 #include "integer.h"
@@ -47,6 +48,19 @@ bool StringSet::containsAny(const StringSet &other) const
             return true;
             
     return false;
+}
+
+DLString StringSet::join(const DLString &delim) const
+{
+    ostringstream buf;
+
+    for (const_iterator i = begin(); i != end(); i++) {
+        if (i != begin())
+            buf << delim;
+        buf << *i;
+    }
+
+    return buf.str();
 }
 
 void NumberSet::fromStringSet( const StringSet &str )

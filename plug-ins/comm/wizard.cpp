@@ -1273,7 +1273,8 @@ static bool has_nopost(Character *ch)
     buf << endl;
     
     if (npc) {
-        buf << "Шорт: " << npc->getShortDescr(LANG_DEFAULT) << endl
+        buf << "Ключевые слова: " << String::toString(npc->getKeyword()) << endl
+            << "Шорт: " << npc->getShortDescr(LANG_DEFAULT) << endl
             << "Длинное описание: "  << npc->getLongDescr(LANG_DEFAULT) << endl;
 
         buf << "Все имена: " << npc->getNameP('7') << endl;

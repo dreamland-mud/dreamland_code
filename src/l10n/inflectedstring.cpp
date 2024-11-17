@@ -6,6 +6,7 @@
 #include "inflectedstring.h"
 #include "flexer.h"
 #include "logstream.h"
+#include "stringset.h"
 
 using namespace Grammar;
 
@@ -28,6 +29,7 @@ InflectedString::InflectedString(const DLString &ff, const MultiGender &mg)
 
 InflectedString::InflectedString(const std::vector<DLString>& cases, const Grammar::MultiGender& mg)
 {
+    StringSet allCases;
     this->mg = mg;
 
     cachedForms.resize(Case::MAX + 1);
@@ -35,9 +37,11 @@ InflectedString::InflectedString(const std::vector<DLString>& cases, const Gramm
    
     for (size_t i = 0; i < cases.size(); i++) {
         cachedForms[Case::NOMINATIVE + i] = cases[i];
-        cachedForms[Case::MAX] << cases[i] << " "; 
+        allCases.insert(cases[i]);
         fullForm << "|" << cases[i];
     }
+
+    cachedForms[Case::MAX] = allCases.join(" ");
 }
 
 Gender InflectedString::getGender() const
@@ -75,14 +79,18 @@ void InflectedString::setGender(const MultiGender &mg)
 
 void InflectedString::fillCachedForms()
 {
+    StringSet allCases;
+
     cachedForms.clear();
     cachedForms.resize(Case::MAX + 1);
     cachedForms[Case::MAX] = "";
 
     for (int c = Case::NOMINATIVE; c < Case::MAX; c++) {
         cachedForms[c] = Flexer::flex(fullForm, c + 1);        
-        cachedForms[Case::MAX] << cachedForms[c] << " ";
+        allCases.insert(cachedForms[c]);
     }
+
+    cachedForms[Case::MAX] = allCases.join(" ");
 }
 
 const DLString& InflectedString::decline(const Case &c) const

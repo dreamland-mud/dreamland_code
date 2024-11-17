@@ -131,6 +131,7 @@ void NPCharacter::setSex( short sex )
 void NPCharacter::setKeyword(const DLString& kw, lang_t lang)
 {
     keyword[lang] = kw;
+    updateCachedNouns();
 }
 
 void NPCharacter::setKeyword(const XMLMultiString &keyword)
@@ -141,6 +142,7 @@ void NPCharacter::setKeyword(const XMLMultiString &keyword)
 void NPCharacter::setKeyword(const DLString &str)
 {
     keyword.fromMixedString(str);
+    updateCachedNouns();
 }
 
 const DLString& NPCharacter::getKeyword(lang_t lang) const
@@ -226,7 +228,7 @@ const XMLMultiString& NPCharacter::getRealDescription() const
 void NPCharacter::setShortDescr( const DLString& d, lang_t lang )
 {
     short_descr[lang] = d;
-    updateCachedNoun(lang);
+    updateCachedNouns();
 }
 
 void NPCharacter::setLongDescr( const DLString& d, lang_t lang )
@@ -282,7 +284,7 @@ void NPCharacter::updateCachedNouns()
             if (!allCases.empty())
                 forms.push_back(allCases);
 
-            kw = pIndexData->keyword.find(lang)->second;
+            kw = getKeyword(lang);
             if (!kw.empty())
                 forms.push_back(kw);
         }

@@ -24,6 +24,9 @@ public:
 
     /** Check if this set contains any element of the other set. */
     bool containsAny(const StringSet &other) const;
+
+    /** Concatenates all elements of the list using delimiter. */
+    DLString join(const DLString &delim) const;
 };
 
 class NumberSet : public std::set<int> {
