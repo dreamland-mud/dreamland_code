@@ -16,8 +16,8 @@
 #include "lasthost.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
-#include "character.h"
 #include "race.h"
+#include "room.h"
 #include "clanreference.h"
 #include "comm.h"
 #include "merc.h"
@@ -68,8 +68,15 @@ CMDADM(finger)
             << "{gHome:{x " << pci->getHometown()->getName() << "  "
             << endl;
 
+        int rvnum = pci->getStartRoom();
+        RoomIndexData *pRoom = get_room_index(rvnum);
+        DLString rname = pRoom ? pRoom->name.get(LANG_DEFAULT) : "";
+        DLString aname = pRoom ? pRoom->areaIndex->area_file->file_name : "";
+
         str << "{gRemorts:{x " << pci->getRemorts().size() << "  "
-            << "{gQuest points:{x " << pci->getQuestPoints() << std::endl;
+            << "{gQuest points:{x " << pci->getQuestPoints() << " "
+            << "{gRoom:{x [" << rvnum << "] [" << rname << "] [" << aname << "]"
+            << endl;
 
         if (pci->getClan() != clan_none || pci->getPetition() != clan_none)
             str << "{gClan:{x " << pci->getClan()->getShortName() << "  "
