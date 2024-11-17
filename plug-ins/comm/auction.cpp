@@ -153,27 +153,28 @@ static int parsebet (const int currentbet, const DLString &constArgument)
 {
     int newbet = 0;          
     DLString args(constArgument);
+    args.stripWhiteSpace();
 
     try {
         if (args.size() > 0) {
             if (isdigit(args.at(0))) {
-                newbet = args.stripWhiteSpace().toInt();       
+                newbet = args.toInt();       
 
             } else if (args.at(0) == '+') {
-                if (args.size() == 1) {
-                    newbet = (currentbet * 125) / 100; 
-                } else {
-                    DLString percentString = args.substr(1);                    
-                    newbet = (currentbet * (100 + percentString.stripWhiteSpace().toInt())) / 100; 
-                }
+                int percent = 25;
+
+                if (args.size() > 1)
+                    percent = DLString(args.substr(1)).toInt();
+
+                newbet = (currentbet * (100 + percent)) / 100; 
 
             } else if (args.at(0) == '*' || args.at(0) == 'x') {
-                if (args.size() == 1) {
-                    newbet = currentbet * 2;
-                } else {
-                    DLString percentString = args.substr(1);                    
-                    newbet = currentbet * percentString.stripWhiteSpace().toInt();
-                }
+                int coef = 2;
+
+                if (args.size() > 1)
+                    coef = DLString(args.substr(1)).toInt();
+
+                newbet = currentbet * coef;
             }
         }
         
@@ -453,7 +454,8 @@ CMDRUNP( auction )
                                 return;
                         }
 
-                        newbet = parsebet (auction->bet, argument);
+                        int currentbet = max(auction->bet, auction->startbet);
+                        newbet = parsebet(currentbet, argument);
 
                         if ((auction->startbet != 0) && (newbet < (auction->startbet + 1)))
                         {

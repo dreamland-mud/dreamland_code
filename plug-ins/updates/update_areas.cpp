@@ -96,7 +96,7 @@ void area_update( int flags )
 
             areasToReset.push_front(AreaResetEvent(pArea, flags));
 
-            wiznet( WIZ_RESETS, 0, 0, "%s has been market for reset.", pArea->pIndexData->getName().c_str() );
+            wiznet( WIZ_RESETS, 0, 0, "%s has been marked for reset.", pArea->pIndexData->getName().c_str() );
         }
     }
 }
