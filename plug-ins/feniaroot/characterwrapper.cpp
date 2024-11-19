@@ -2283,6 +2283,18 @@ NMI_INVOKE(CharacterWrapper, list_obj_world, "(arg): поиск по миру в
     return wrap(rc);
 }
 
+NMI_INVOKE(CharacterWrapper, get_obj_inventory_vnum, "(vnum): поиск по внуму предмета в инвентаре" )
+{
+    checkTarget( );
+
+    int vnum = args2number( args );
+
+    for (::Object *obj = target->carrying; obj; obj = obj->next_content)
+        if (obj->wear_loc == wear_none && obj->pIndexData->vnum == vnum)
+            return wrap( obj );
+
+    return Register( );
+}
 
 NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "(vnum): поиск по внуму предмета в инвентаре или экипировке" )
 {
