@@ -27,6 +27,8 @@ public:
 
     virtual void setSelf( Scripting::Object * );
     virtual void extract( bool );
+    virtual bool targetExists() const;
+
     void setTarget( Character * );
     void checkTarget( ) const ;
     Character *getTarget( ) const;

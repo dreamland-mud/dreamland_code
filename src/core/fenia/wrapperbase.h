@@ -39,6 +39,7 @@ public:
     virtual void setSelf( Scripting::Object * );
     virtual Scripting::Object *getSelf() const { return self; }
     virtual void extract( bool );
+    virtual bool targetExists() const;
 
     bool call( Register id, const char *fmt, ... );
     bool vcall( Register &rc, const Register &key, const char *fmt, va_list ap);

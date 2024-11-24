@@ -12,6 +12,7 @@
 #include "dreamland.h"
 #include "native.h"
 #include "register-impl.h"
+#include "wrapperbase.h"
 
 int PlugLock::cnt = 0;
 
@@ -63,11 +64,31 @@ FeniaProcess::after()
     speendown( );
 }
 
+// Before invoking postponed function, check that all mobs/objs/players in the arguments are still online and not extracted.
+static bool validate_arguments(const XMLRegisterList &args) 
+{
+    for (auto &arg: args) {
+        if (arg.type == Register::OBJECT) {
+            Scripting::Object *obj = arg.toObject();
+            WrapperBase *wrap = obj->hasHandler() ? obj->getHandler().getDynamicPointer<WrapperBase>() : NULL;
+            if (wrap && !wrap->targetExists())
+                return false;
+        }
+    }
+
+    return true;
+}
+
 void
 FeniaProcess::process() 
 {
     try {
         RegisterList rl;
+
+        if (!validate_arguments(args)) {
+            LogStream::sendWarning() << "FeniaProcess: thread '" << name  << "' won't be started, arg is no longer valid" << endl;
+            return;
+        }
 
         rl.assign(args.begin(), args.end());
         fun.toFunction()->invoke(thiz, rl);

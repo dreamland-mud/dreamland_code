@@ -132,6 +132,23 @@ void CharacterWrapper::extract( bool count )
     GutsContainer::extract( count );
 }
 
+bool CharacterWrapper::targetExists() const
+{
+    if (!target)
+        return false;
+        
+    if (zombie)
+        return false;
+    
+    if (target->isDead())
+        return false;
+
+    if (target->getID() == 0)
+        return false;
+
+    return true;
+}
+
 void CharacterWrapper::setTarget( ::Character *target )
 {
     this->target = target;

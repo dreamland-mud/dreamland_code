@@ -73,6 +73,18 @@ void ObjectWrapper::extract( bool count )
     GutsContainer::extract( count );
 }
 
+bool ObjectWrapper::targetExists() const
+{
+    if (!target)
+        return false;
+    if (zombie)
+        return false;
+    if (target->extracted || target->getID() == 0)
+        return false;
+
+    return true;
+}
+
 void ObjectWrapper::setTarget( ::Object *target )
 {
     this->target = target;

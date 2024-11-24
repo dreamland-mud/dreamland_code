@@ -62,6 +62,11 @@ void WrapperBase::extract( bool count )
     }
 }
 
+bool WrapperBase::targetExists() const
+{
+    return true;
+}
+
 WrapperBase *
 get_wrapper(Scripting::Object *obj)
 {
