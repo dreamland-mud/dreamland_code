@@ -235,8 +235,8 @@ CMDRUNP( unlock )
                 return;
         }
 
-        ch->pecho("Ты отпираешь %O5 и открываешь %N4.", key, peexit->short_desc_from);
-        ch->recho("%^C1 отпирает %O5 и открывает %N4.", ch, key, peexit->short_desc_from);
+        ch->pecho("Ты отпираешь %O5 и открываешь %N4.", key, peexit->short_desc_from.get(LANG_DEFAULT).c_str());
+        ch->recho("%^C1 отпирает %O5 и открывает %N4.", ch, key, peexit->short_desc_from.get(LANG_DEFAULT).c_str());
 
         REMOVE_BIT(peexit->exit_info, EX_LOCKED | EX_CLOSED);
 
