@@ -521,3 +521,13 @@ NMI_GET(PlayerWrapper, player, "экземпляр персонажа, если 
     else
         return Register();
 }
+
+NMI_INVOKE(PlayerWrapper, restring, "(skill,key,names,short,long,extra): установить аттрибут для рестринга результатов заклинаний")
+{
+    PCMemoryInterface *pci = getTarget();
+
+    args2restringAttribute(args, pci);
+    save();
+
+    return Register();
+}

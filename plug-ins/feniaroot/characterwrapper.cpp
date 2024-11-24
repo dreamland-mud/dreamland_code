@@ -2831,28 +2831,9 @@ NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long,extra): ус
     checkTarget( );
     CHK_NPC
 
-    Skill *skill = argnum2skill(args, 1);
-    DLString key = argnum2string(args, 2);
-    DLString objName = argnum2string(args, 3);
-    DLString objShort = argnum2string(args, 4);
-    DLString objLong = argnum2string(args, 5);
-    DLString objExtra = argnum2string(args, 6);
-
-    XMLAttributeRestring::Pointer attr = target->getPC( )->getAttributes( ).getAttr<XMLAttributeRestring>(skill->getName());
-    XMLAttributeRestring::iterator r = attr->find( key );
-    if (r != attr->end( )) {
-        r->second.name = objName;
-        r->second.shortDescr = objShort;
-        r->second.longDescr = objLong;
-        r->second.description = objExtra;
-    } else {
-        (**attr)[key].name = objName;
-        (**attr)[key].shortDescr = objShort;
-        (**attr)[key].longDescr = objLong;
-        (**attr)[key].description = objExtra;
-    }
-
+    args2restringAttribute(args, target->getPC());
     target->getPC( )->save( );
+    
     return Register( );
 }
 
