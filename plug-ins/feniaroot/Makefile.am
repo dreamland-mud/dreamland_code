@@ -28,6 +28,7 @@ reglistext.cpp \
 tableswrapper.cpp \
 affectwrapper.cpp \
 structwrappers.cpp \
+skillwrapper.cpp  \
 areaindexwrapper.cpp \
 spellwrapper.cpp \
 affecthandlerwrapper.cpp \
@@ -47,6 +48,7 @@ root.h \
 affectwrapper.h \
 commandwrapper.h \
 structwrappers.h \
+skillwrapper.h \
 objectwrapper.h \
 objindexwrapper.h \
 roomwrapper.h \

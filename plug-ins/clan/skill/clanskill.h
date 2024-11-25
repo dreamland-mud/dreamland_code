@@ -45,14 +45,9 @@ public:
     virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
     virtual DLString accessToString() const;
 
-    virtual const DLString & getCategory( ) const
-    {
-        return CATEGORY;
-    }
+    virtual int getCategory( ) const;
 
 protected:
-    static const DLString CATEGORY;
-    
     const SkillClanInfo *getClanInfo( CharacterMemoryInterface * ) const;
 
     XML_VARIABLE MobSkillData mob;

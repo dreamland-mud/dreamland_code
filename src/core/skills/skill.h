@@ -70,7 +70,7 @@ public:
     
     virtual void show( PCharacter *, std::ostream & ) const;
 
-    virtual const DLString& getCategory( ) const;
+    virtual int getCategory( ) const;
 
     static GlobalBitvector zeroGroups;
 protected:

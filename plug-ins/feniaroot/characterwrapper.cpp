@@ -2382,32 +2382,71 @@ NMI_INVOKE( CharacterWrapper, save, "(): сохранить профайл на 
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, skills, "([origin]): список названий доступных скилов, всех или с данным происхождением (.tables.skill_origin_table)" )
+NMI_INVOKE( CharacterWrapper, skills, "([origin[,category]]): список названий доступных скилов, всех или с данным происхождением (.tables.skill_origin_table) и категориями (.tables.skill_category_flags)" )
 {
     checkTarget();
     CHK_NPC
 
     RegList::Pointer list(NEW);
-    int origin = args.empty() ? NO_FLAG : argnum2flag(args, 1, skill_origin_table);
+    int origin = args.size() > 0 ?   argnum2flag(args, 1, skill_origin_table) : NO_FLAG;
+    Bitstring category = args.size() > 1 ? argnum2flag(args, 2, skill_category_flags) : NO_FLAG;
     
     for (int sn = 0; sn < skillManager->size(); sn++) {
         Skill *skill = skillManager->find(sn);
-        // Choose only permanent skills available at any level, or active temporary skills.
-        if (!skill->visible(target))
+        if (!skill->available(target))
             continue;
 
         PCSkillData &data = target->getPC()->getSkillData(sn);
+
         // Filter by requested origin (fenia, religion, etc) or return all.
         if (origin != NO_FLAG && data.origin != origin)
+            continue;
+
+        // Filter by requested category, or all.
+        if (category != NO_FLAG && !category.isSet(skill->getCategory()))
             continue;
 
         list->push_back(Register(skill->getName()));
     }
 
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+    return ::wrap(list);
 }
+
+NMI_INVOKE( CharacterWrapper, skillsInfo, "(): список структур для доступных скилов")
+{
+    checkTarget();
+    CHK_NPC
+
+    RegList::Pointer list(NEW);
+    PCharacter *pch = target->getPC();
+    
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        Skill *skill = skillManager->find(sn);
+        if (!skill->available(target))
+            continue;
+
+        PCSkillData &data = pch->getSkillData(sn);
+        Register infoReg = Register::handler<IdContainer>();
+        IdContainer *info = infoReg.toHandler().getDynamicPointer<IdContainer>();
+
+        info->setField(IdRef("learned"), data.learned.getValue());
+        info->setField(IdRef("name"), skill->getNameFor( pch ).ruscase('1'));
+        info->setField(IdRef("adept"), skill->getAdept( pch ));
+        info->setField(IdRef("maximum"), skill->getMaximum(pch));
+        info->setField(IdRef("origin"), data.origin.getValue());
+        info->setField(IdRef("category"), skill->getCategory());
+
+        if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
+            info->setField(IdRef("help_id"), skill->getSkillHelp()->getID());
+        else
+            info->setField(IdRef("help_id"), 0);
+
+        list->push_back(infoReg);
+    }
+
+    return ::wrap(list);
+}
+
 
 NMI_INVOKE( CharacterWrapper, updateSkills, "(): освежить разученность умений (при входе в мир)" )
 {

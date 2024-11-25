@@ -17,6 +17,7 @@
 #include "characterwrapper.h"
 #include "objectwrapper.h"
 #include "structwrappers.h"
+#include "skillwrapper.h"
 #include "playerwrapper.h"
 #include "msgformatter.h"
 

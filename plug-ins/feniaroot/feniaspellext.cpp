@@ -8,6 +8,7 @@
 #include "characterwrapper.h"
 #include "objectwrapper.h"
 #include "structwrappers.h"
+#include "skillwrapper.h"
 #include "feniamanager.h"
 
 #include "skillreference.h"

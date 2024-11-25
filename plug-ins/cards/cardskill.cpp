@@ -18,7 +18,6 @@
 #include "act.h"
 #include "def.h"
 
-const DLString CardSkill::CATEGORY = "Умения Колоды";
 GROUP(card_pack);
 static GlobalBitvector cardGroups(skillGroupManager, group_card_pack);
 
@@ -103,6 +102,11 @@ void CardSkill::show( PCharacter *ch, std::ostream & buf ) const
     }
     
     buf << "." << endl; 
+}
+
+int CardSkill::getCategory() const
+{
+    return SKILL_CAT_CARDS;
 }
 
 

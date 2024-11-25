@@ -55,6 +55,7 @@
 #include "playerwrapper.h"
 #include "mobindexwrapper.h"
 #include "structwrappers.h"
+#include "skillwrapper.h"
 #include "objindexwrapper.h"
 #include "areaindexwrapper.h"
 #include "spellwrapper.h"

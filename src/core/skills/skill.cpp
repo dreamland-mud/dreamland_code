@@ -10,6 +10,8 @@
 #include "skillgroup.h"
 #include "character.h"
 #include "helpmanager.h"
+#include "merc.h"
+#include "def.h"
 
 GlobalBitvector Skill::zeroGroups;
 
@@ -129,11 +131,12 @@ int Skill::getAdept( PCharacter * ) const
 void Skill::improve( Character *, bool, Character *victim, int dam_type, int dam_flags ) const
 {
 }
-const DLString & Skill::getCategory( ) const
+
+int Skill::getCategory( ) const
 {
-    static DLString category = "under construction";
-    return category;
+    return SKILL_CAT_OTHER;
 }
+
 bool Skill::canPractice( PCharacter *, std::ostream & ) const
 {
     return false;

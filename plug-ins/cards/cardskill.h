@@ -30,16 +30,11 @@ public:
 
     virtual void show( PCharacter *, std::ostream & ) const; 
 
-    virtual const DLString & getCategory( ) const
-    {
-        return CATEGORY;
-    }
+    virtual int getCategory( ) const;
 
 protected:
     static bool isCard( CharacterMemoryInterface * );
     static int findCardLevel( CharacterMemoryInterface * );
-
-    static const DLString CATEGORY;
 
     XML_VARIABLE XMLString  hint;
     XML_VARIABLE XMLInteger cardLevel;

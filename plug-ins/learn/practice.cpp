@@ -88,21 +88,17 @@ struct PracInfo {
 };
 
 typedef std::vector<PracInfo> PracInfoList;
-typedef std::map<DLString, PracInfoList> PracCategoryMap;
+typedef std::map<bitnumber_t, PracInfoList> PracCategoryMap;
 
 
 void CPractice::pracShow( PCharacter *ch )
 {
-    std::basic_ostringstream<char> buf;
-    PracCategoryMap cmap;
-    PracCategoryMap::iterator cm_iter;
-    PracInfo info;
-    DLString category;
+    ostringstream buf;
+    PracCategoryMap categoryMap;
     bool fRussian = ch->getConfig( ).ruskills;
     
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         Skill *skill = SkillManager::getThis( )->find( sn );
-        category = skill->getCategory( );
 
         if (!skill->available( ch ))
             continue;
@@ -113,7 +109,8 @@ void CPractice::pracShow( PCharacter *ch )
             continue;
 
         PCSkillData &data = ch->getSkillData( sn );
-        
+
+        PracInfo info;
         info.percent = data.learned;
         info.name = skill->getNameFor( ch ).ruscase('1');
         info.adept = skill->getAdept( ch );
@@ -124,31 +121,21 @@ void CPractice::pracShow( PCharacter *ch )
         else
             info.help_id = 0;
 
-        cm_iter = cmap.find( category );
-
-        if (cm_iter == cmap.end( )) {
-            PracInfoList list;
-
-            list.push_back( info );
-            cmap[category] = list;
-            
-        } else
-            cm_iter->second.push_back( info );
+        categoryMap[skill->getCategory()].push_back(info);
     }
 
     const char *patternNoHelp = (fRussian ? "%s%-27s %s%3d%%{x" : "%s%-16s%s%3d%%{x");
     const char *patternHelp = (fRussian ? "%s{hh%d%-27s{hx %s%3d%%{x" : "%s{hh%d%-16s{hx%s%3d%%{x");
     const int columns = (fRussian ? 2 : 3);
+    int count = 0;
 
-    for (cm_iter = cmap.begin( ); cm_iter != cmap.end( ); cm_iter++) {
-        unsigned int i;
+    for (auto &c: categoryMap) {
+        bitnumber_t category = c.first;
+        DLString categoryName = skill_category_flags.messages(category).upperFirstCharacter();
+
+        buf << "{W" << categoryName << ":{x" << endl;
         
-        category = cm_iter->first;
-        category.upperFirstCharacter( );
-        buf << "{W" << category << ":{x" << endl;
-        
-        for (i = 0; i < cm_iter->second.size( ); i++) {
-            info = cm_iter->second[i];
+        for (auto &info: c.second) {
             
             if (info.help_id > 0)
                 buf << fmt(0, patternHelp,
@@ -165,12 +152,14 @@ void CPractice::pracShow( PCharacter *ch )
                                 info.percent );
 
             buf << "     ";
-            
-            if ((i + 1) % columns == 0)
+
+            count++;
+
+            if (count % columns == 0)
                 buf << endl;
         }
 
-        if (i % columns)
+        if (count % columns)
             buf << endl;
             
         buf << endl;

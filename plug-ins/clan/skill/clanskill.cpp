@@ -18,8 +18,6 @@
 
 #include "def.h"
 
-const DLString ClanSkill::CATEGORY = "Клановые умения";
-
 ClanSkill::ClanSkill( )
             : group(skillGroupManager)
 {
@@ -291,4 +289,9 @@ DLString ClanSkill::accessToString() const
     }
 
     return result.join(", ");
+}
+
+int ClanSkill::getCategory() const
+{
+    return SKILL_CAT_CLAN;
 }

@@ -16,7 +16,6 @@
 #include "math_utils.h"
 #include "poliglot.h"
 
-const DLString Language::CATEGORY = "Древние языки";
 const int Language::SKILL_ADEPT  = 50;
 const int Language::SKILL_SENSE  = 75;
 const int Language::SKILL_NATIVE = 100;
@@ -284,5 +283,10 @@ int Language::getBeats(Character *ch) const
 int Language::getMana( ) const
 {
     return 0;
+}
+
+int Language::getCategory( ) const
+{
+    return SKILL_CAT_LANGUAGE;
 }
 

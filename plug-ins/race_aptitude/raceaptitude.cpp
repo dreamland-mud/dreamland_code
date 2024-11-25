@@ -19,7 +19,6 @@
 #include "merc.h"
 #include "def.h"
 
-const DLString RaceAptitude::CATEGORY = "Уникальные способности";
 
 RaceAptitude::RaceAptitude( ) 
                 : group(skillGroupManager)
@@ -196,4 +195,9 @@ DLString RaceAptitude::accessToString() const
     }
 
     return result.join(", ");
+}
+
+int RaceAptitude::getCategory() const
+{
+    return SKILL_CAT_RACE;
 }

@@ -25,8 +25,6 @@
 GSN(learning);
 BONUS(learning);
 
-const DLString CraftSkill::CATEGORY = "Умения дополнительных профессий";
-
 CraftSkill::CraftSkill( )
                 : group(skillGroupManager)
 {
@@ -35,6 +33,11 @@ CraftSkill::CraftSkill( )
 GlobalBitvector & CraftSkill::getGroups( ) 
 {
     return group;
+}
+
+int CraftSkill::getCategory( ) const
+{
+    return SKILL_CAT_CRAFT;
 }
 
 bool CraftSkill::visible( CharacterMemoryInterface *ch ) const

@@ -28,8 +28,6 @@ PROF(none);
 PROF(vampire);
 GROUP(none);
 
-const DLString GenericSkill::CATEGORY = "Классовые умения";
-
 GenericSkill::GenericSkill( ) 
                 : group(skillGroupManager),
                   raceBonuses(raceManager),
@@ -505,4 +503,9 @@ DLString GenericSkill::skillRacesList() const
     }
 
     return result.join("{x, {D");
+}
+
+int GenericSkill::getCategory( ) const
+{
+    return SKILL_CAT_CLASS;
 }

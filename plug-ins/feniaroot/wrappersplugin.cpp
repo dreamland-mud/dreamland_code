@@ -25,6 +25,7 @@
 #include "tableswrapper.h"
 #include "validatetask.h"
 #include "structwrappers.h"
+#include "skillwrapper.h"
 #include "feniaskillaction.h"
 #include "commandmanager.h"
 #include "wrappedcommand.h"

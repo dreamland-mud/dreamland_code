@@ -2,6 +2,7 @@
 
 #include "skillcommandwrapper.h"
 #include "structwrappers.h"
+#include "skillwrapper.h"
 #include "wrappermanager.h"
 #include "reglist.h"
 #include "register-impl.h"

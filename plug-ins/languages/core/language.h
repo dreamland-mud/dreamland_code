@@ -118,10 +118,7 @@ public:
     virtual void practice( PCharacter * ) const;
     virtual void show( PCharacter *, std::ostream & ) const; 
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
-    virtual const DLString & getCategory( ) const
-    {
-        return CATEGORY;
-    }
+    virtual int getCategory( ) const;
     virtual bool isValid( ) const
     {
         return true;
@@ -141,8 +138,6 @@ protected:
     const RaceLangInfo * getRaceInfo( CharacterMemoryInterface * ) const;
     const ClassLangInfo * getClassInfo( CharacterMemoryInterface * ) const;
     WordContainer * locateWord( Word &, PCharacter *, const DLString & ) const;
-
-    static const DLString CATEGORY;
 
     XML_VARIABLE XMLPointerNoEmpty<LanguageCommand> command;
     XML_VARIABLE XMLMultiString name;

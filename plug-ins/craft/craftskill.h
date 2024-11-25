@@ -31,13 +31,9 @@ public:
 
     virtual void show( PCharacter *, std::ostream & ) const; 
 
-    virtual const DLString & getCategory( ) const
-    {
-        return CATEGORY;
-    }
+    virtual int getCategory( ) const;
 
 protected:
-    static const DLString CATEGORY;
 
     XML_VARIABLE XMLGlobalBitvector group;
     XML_VARIABLE CraftProfessions subprofessions;

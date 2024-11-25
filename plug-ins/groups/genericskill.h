@@ -52,10 +52,7 @@ public:
 
     virtual void show( PCharacter *, ostream & buf ) const;
 
-    virtual const DLString & getCategory( ) const
-    {
-        return CATEGORY;
-    }
+    virtual int getCategory( ) const;
 
     bool isProfessional() const;
     bool checkAlignEthos(Character *) const;
@@ -67,8 +64,6 @@ public:
     DLString skillRacesList() const;
 
 protected:
-    static const DLString CATEGORY;                                             
-    
     bool availableForAll( ) const;
     const SkillClassInfo * getClassInfo( CharacterMemoryInterface * ) const;
     bool hasRaceBonus( CharacterMemoryInterface * ) const;
