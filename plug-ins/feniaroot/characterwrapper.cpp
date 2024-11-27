@@ -2425,16 +2425,29 @@ NMI_INVOKE( CharacterWrapper, skillsInfo, "(): список структур д�
         if (!skill->available(target))
             continue;
 
+        Spell::Pointer spell = skill->getSpell();    
         PCSkillData &data = pch->getSkillData(sn);
         Register infoReg = Register::handler<IdContainer>();
         IdContainer *info = infoReg.toHandler().getDynamicPointer<IdContainer>();
+        bool isSpell = spell && spell->isCasted();
+        bool isPrayer = spell && spell->isCasted() && spell->isPrayer(pch);
+        bool isPassive = skill->isPassive();
+        bool isActive = !isSpell && !isPassive;
+        const DLString &cmdName = skill->getCommand() ? skill->getCommand()->getNameFor(pch) : "";
 
         info->setField(IdRef("learned"), data.learned.getValue());
+        info->setField(IdRef("effective"), skill->getEffective(pch));
+        info->setField(IdRef("spell"), isSpell);
+        info->setField(IdRef("prayer"), isPrayer);
+        info->setField(IdRef("passive"), isPassive);
+        info->setField(IdRef("active"), isActive);
+        info->setField(IdRef("cmdname"), cmdName);
         info->setField(IdRef("name"), skill->getNameFor( pch ).ruscase('1'));
         info->setField(IdRef("adept"), skill->getAdept( pch ));
         info->setField(IdRef("maximum"), skill->getMaximum(pch));
         info->setField(IdRef("origin"), data.origin.getValue());
         info->setField(IdRef("category"), skill->getCategory());
+        info->setField(IdRef("groups"), skill->getGroups().toString());
 
         if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
             info->setField(IdRef("help_id"), skill->getSkillHelp()->getID());
