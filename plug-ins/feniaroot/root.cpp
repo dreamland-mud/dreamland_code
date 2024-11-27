@@ -1189,7 +1189,7 @@ NMI_INVOKE( Root, Material, "(names): конструктор для матери
 NMI_INVOKE( Root, Spell , "(name): находит заклинание с заданным именем")
 {
     Skill *skill = args2skill(args);
-    if (!skill || !skill->getSpell())
+    if (!skill->getSpell())
         throw Scripting::Exception("Spell not found: " + arg2string(args));
 
     return WrapperManager::getThis( )->getWrapper(skill->getSpell().getPointer());
@@ -1199,7 +1199,7 @@ NMI_INVOKE( Root, Spell , "(name): находит заклинание с зад
 NMI_INVOKE( Root, AffectHandler , "(name): находит обработчик аффекта с заданным именем")
 {
     Skill *skill = args2skill(args);
-    if (!skill || !skill->getAffect())
+    if (!skill->getAffect())
         throw Scripting::Exception("AffectHandler not found: " + arg2string(args));
 
     return WrapperManager::getThis( )->getWrapper(skill->getAffect().getPointer());
@@ -1208,7 +1208,10 @@ NMI_INVOKE( Root, AffectHandler , "(name): находит обработчик �
 NMI_INVOKE( Root, SkillCommand , "(name): находит команду для умения с заданным именем")
 {
     Skill *skill = args2skill(args);
-    if (!skill || !skill->getCommand())
+    // Skill::getCommand() return a dummy command so it's never empty.
+    // Should avoid trying to create a wrapper for the dummy command though.
+    Command *cmd = skill->getCommand().getDynamicPointer<Command>();
+    if (!cmd)
         throw Scripting::Exception("SkillCommand not found: " + arg2string(args));
 
     return WrapperManager::getThis( )->getWrapper(skill->getCommand().getPointer());
