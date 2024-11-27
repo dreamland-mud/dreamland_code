@@ -610,17 +610,14 @@ NMI_INVOKE( ObjectWrapper, extract , "(): полностью уничтожит�
 NMI_INVOKE( ObjectWrapper, get_extra_descr , "(key): найти экстра-описание с ключевым словом key")
 {
     checkTarget();
-    
-    if (args.empty( ))
-        throw Scripting::NotEnoughArgumentsException( );
+    DLString key = args2string(args);    
+    ExtraDescription *ed;
 
-
-    DLString key = args.front().toString( );
-    ExtraDescription *ed = target->pIndexData->extraDescriptions.findUnstrict(key);
+    ed = target->extraDescriptions.findUnstrict(key);
     if (ed)
         return ed->description.get(LANG_DEFAULT);
 
-    ed = target->extraDescriptions.findUnstrict(key);
+    ed = target->pIndexData->extraDescriptions.findUnstrict(key);
     if (ed)
         return ed->description.get(LANG_DEFAULT);
 
