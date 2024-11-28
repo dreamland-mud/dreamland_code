@@ -35,6 +35,7 @@
 #include "pcharacter.h"
 #include "follow_utils.h"
 #include "string_utils.h"
+#include "player_menu.h"
 #include "areaquestutils.h"
 #include "xmlattributeareaquest.h"
 #include "directions.h"
@@ -1146,8 +1147,12 @@ Json::Value AreaQuestWebPromptListener::jsonAreaQuest( Descriptor *d, Character 
         aq["t"] = "Обучение";
     }
 
-    // Current step info
     strip_colors_and_tags(quest->steps[step]->info.get(LANG_DEFAULT), buf);
+
+    // TODO show full menu in the windowlet (needs newline and {hc handling)
+    if (Player::menuAvailable(pch)) {
+        buf << endl << "Выбери вариант ответа из списка.";
+    }
 
     aq["i"] = buf.str();
 

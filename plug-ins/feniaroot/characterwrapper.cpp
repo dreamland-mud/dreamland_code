@@ -56,6 +56,7 @@
 #include "xmlattributecoder.h"
 #include "xmlattributerestring.h"
 #include "commonattributes.h"
+#include "player_menu.h"
 #include "pet.h"
 #include "recipeflags.h"
 #include "damageflags.h"
@@ -134,6 +135,8 @@ void CharacterWrapper::extract( bool count )
 
 bool CharacterWrapper::targetExists() const
 {
+    return true;
+    
     if (!target)
         return false;
         
@@ -3005,19 +3008,27 @@ NMI_INVOKE(CharacterWrapper, trigger, "(trigName, trigArgs...): вызвать �
     // 4. legacy C++ behaviors: but hopefully wont' be needed from Fenia
 }
 
-NMI_INVOKE(CharacterWrapper, menu, "([number, action]): очистить меню или установить пункт number с действием action")
+NMI_INVOKE(CharacterWrapper, menu, "([number, action[, number, action]]): очистить или установить пункты меню number с действием action")
 {
     checkTarget( );
     CHK_NPC
 
     if (args.empty()) {
-        target->getPC()->getAttributes().eraseAttribute("menu");
+        Player::menuClear(target->getPC());
         return Register();
     }
 
-    DLString number = argnum2string(args, 1);
-    DLString action = argnum2string(args, 2);
-    set_map_attribute_value(target->getPC(), "menu", number, action);
+    // Numbers and actions count need to match.
+    if (args.size() % 2 != 0)
+        throw Scripting::Exception("Menu expects EVEN number of arguments");
+
+    for (auto a = args.begin(); a != args.end(); a++) {
+        DLString choice = arg2number(*a++);
+        DLString action = arg2string(*a);
+        Player::menuSet(target->getPC(), choice, action);
+    }
+
+    Player::menuPrint(target->getPC());
     return Register();
 }
 

@@ -22,7 +22,6 @@
 #include "pcharacter.h"
 #include "playerattributes.h"
 #include "commonattributes.h"
-
 #include "merc.h"
 #include "descriptor.h"
 #include "loadsave.h"
@@ -217,60 +216,6 @@ public:
     }
 };
 
-
-
-/*-----------------------------------------------------------------------------
- * ChoicesInterpretLayer 
- *----------------------------------------------------------------------------*/
-/**
- * An interpret layer handling command input consisting only of a single number,
- * to represent menu choices. Substitute number input by player with a corresponding
- * command from the "menu" attribute.
- */
-class ChoicesInterpretLayer : public InterpretLayer {
-public:
-
-    virtual void putInto( )
-    {
-        // Put this before any other layers such as socials, common commands, 
-        // but after command line has been split and sanitized.
-        interp->put( this, CMDP_FIND, CMD_PRIO_FIRST + 1 );
-    }
-
-    virtual bool process( InterpretArguments &iargs )
-    {
-        Character *ch = iargs.d ? iargs.d->character : 0;
-        Integer choice;
- 
-        if (!ch || ch->is_npc())
-            return true;
-
-        // Input is something other than ^[0-9]+$
-        if (!iargs.cmdArgs.empty() || !Integer::tryParse(choice, iargs.cmdName)) {
-            return true;
-        }
-
-        if (!ch->getPC()->getAttributes().isAvailable("menu"))
-            return true;
-
-        // This choice is not from the latest menu.
-        DLString menuAction = get_map_attribute_value(ch->getPC(), "menu", choice.toString());
-        if (menuAction.empty()) {
-            ch->pecho("Такого выбора не было в меню.");            
-            return false;
-        }
-
-        // Substitute input command with remembered menu option, re-parse arguments.
-        iargs.line = menuAction;
-        iargs.splitLine();
-
-        if (ch->isCoder())
-            ch->pecho("Отладка: результат замены %s (%s).", iargs.cmdName.c_str(), iargs.cmdArgs.c_str());
-        
-        return true;
-    }
-};
-
 /*-----------------------------------------------------------------------------
  * libalias initialization 
  *----------------------------------------------------------------------------*/
@@ -281,7 +226,6 @@ extern "C"
         SO::PluginList ppl;
 
         Plugin::registerPlugin<SubstituteAliasInterpretLayer>( ppl );
-        Plugin::registerPlugin<ChoicesInterpretLayer>( ppl );
         
         Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeAliases> >( ppl );
                 

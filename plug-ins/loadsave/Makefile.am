@@ -47,6 +47,7 @@ stats_apply.cpp \
 player_exp.cpp \
 player_account.cpp \
 money_utils.cpp \
+player_menu.cpp \
 occupations.cpp
 
 libloadsave_la_MOC = \

@@ -75,6 +75,8 @@ void ObjectWrapper::extract( bool count )
 
 bool ObjectWrapper::targetExists() const
 {
+    return true;
+    
     if (!target)
         return false;
     if (zombie)
