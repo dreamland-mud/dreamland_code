@@ -11,6 +11,7 @@
 #include "wrappertarget.h"
 #include "wrapperbase.h"
 #include "interp.h"
+#include "areaquestutils.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"
@@ -22,6 +23,7 @@ GSN(curl);
  *-------------------------------------------------------------------*/
 static bool mprog_wake(Character *ch, Character *waker)
 {
+    aquest_trigger(ch, waker, "Wake", "CC", ch, waker);
     FENIA_CALL(ch, "Wake", "C", waker);
     FENIA_NDX_CALL(ch->getNPC(), "Wake", "CC", ch, waker);
     return false;
