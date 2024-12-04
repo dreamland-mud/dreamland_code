@@ -36,4 +36,13 @@ protected:
     virtual Pointer<Grammar::Noun> argNoun(int nounFlags = 0) = 0;
 };
 
+/*
+ * Utility macros.
+ */
+#define        GET_SEX(ch, male, neutral, female) ((ch->getSex( ) == SEX_MALE) ? (male) : \
+                                       ((ch->getSex( ) == SEX_NEUTRAL) ? (neutral) : \
+                                       (female)))
+#define        GET_COUNT(var, s1, s2, s3) (((var % 10) == 1 && (var % 100) != 11) ? (s1) : (((var % 10) > 1 && (var % 10) < 5 && ((var % 100) < 11 || (var % 100) > 15)) ? (s2) : (s3)))
+
+
 #endif

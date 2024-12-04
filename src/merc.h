@@ -118,12 +118,6 @@
 
 
 /*
- * Structure types.
- */
-
-
-
-/*
  * String and memory management parameters.
  */
 #define MAX_STRING_LENGTH         4608
@@ -133,12 +127,6 @@
 /*
  * death and player killing
  */
-#define PK_SLAIN                (A)
-#define        PK_KILLER                (B)
-#define        PK_VIOLENT                (C)
-#define PK_GHOST                (D)
-#define        PK_THIEF                (E)
-
 #define PK_MIN_LEVEL 5
 
 #define        GHOST_TIME                3  * PULSE_MOBILE
@@ -172,38 +160,12 @@
 #define PULSE_TICK                  (dreamland->getPulseTick( ))
 
 
-
 /* general align */
 #define ALIGN_NONE                -1
 #define ALIGN_GOOD                1000
 #define ALIGN_NEUTRAL                0
 #define ALIGN_EVIL                -1000
 
-
-
-
-/*
- * Directions.
- * Used in #ROOMS.
- */
-#define DIR_NORTH                      0
-#define DIR_EAST                      1
-#define DIR_SOUTH                      2
-#define DIR_WEST                      3
-#define DIR_UP                              4
-#define DIR_DOWN                      5
-#define DIR_SOMEWHERE                        6
-
-
-/*
- * Utility macros.
- */
-#define URANGE(a, b, c)                ((b) < (a) ? (a) : ((b) > (c) ? (c) : (b)))
-
-#define        GET_SEX(ch, male, neutral, female) ((ch->getSex( ) == SEX_MALE) ? (male) : \
-                                       ((ch->getSex( ) == SEX_NEUTRAL) ? (neutral) : \
-                                       (female)))
-#define        GET_COUNT(var, s1, s2, s3) (((var % 10) == 1 && (var % 100) != 11) ? (s1) : (((var % 10) > 1 && (var % 10) < 5 && ((var % 100) < 11 || (var % 100) > 15)) ? (s2) : (s3)))
 
 /*
  * Character macros.
@@ -233,14 +195,5 @@
  * Object macros.
  */
 #define IS_OBJ_STAT(obj, stat)        (IS_SET((obj)->extra_flags, (stat)))
-
-
-/*
- * Global variables.
- */
-
-
-
-
 
 #endif

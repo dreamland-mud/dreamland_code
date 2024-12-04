@@ -234,4 +234,17 @@ RoomIndexData * get_room_index( int vnum );
 /** Looks up default room instance by vnum. (FIXME) */
 Room * get_room_instance(int vnum);
 
+
+/*
+ * Directions.
+ */
+#define DIR_NORTH                     0
+#define DIR_EAST                      1
+#define DIR_SOUTH                     2
+#define DIR_WEST                      3
+#define DIR_UP                        4
+#define DIR_DOWN                      5
+#define DIR_SOMEWHERE                 6
+
+
 #endif

@@ -17,5 +17,10 @@ int        dice                ( int number, int size );
 int        interpolate        ( short level, int value_00, int value_32 );
 void    init_mm( );
 
+/*
+ * Utility macros.
+ */
+#define URANGE(a, b, c)                ((b) < (a) ? (a) : ((b) > (c) ? (c) : (b)))
+
 #endif
 
