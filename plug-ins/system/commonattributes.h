@@ -10,6 +10,7 @@
 #include "xmlinteger.h"
 #include "xmlattribute.h"
 #include "xmlmap.h"
+#include "playerattributes.h"
 
 class XMLEmptyAttribute: public virtual XMLAttribute {
 public:
@@ -29,7 +30,7 @@ public:
     static const DLString TYPE;
 };
 
-class XMLStringAttribute: public virtual XMLAttribute, public XMLStringVariable {
+class XMLStringAttribute: public virtual XMLAttribute, public XMLStringVariable, public RemortAttribute {
 public:
     typedef ::Pointer<XMLStringAttribute> Pointer;
 
