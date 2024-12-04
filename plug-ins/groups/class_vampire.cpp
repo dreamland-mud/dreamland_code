@@ -914,7 +914,7 @@ SKILL_RUNP( bonedagger )
     }
 
     ch->ambushing = arg;
-    run( ch, str_empty );
+    run( ch, const_cast<char *>("") );
 }
 
 SKILL_APPLY( bonedagger )

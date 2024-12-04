@@ -54,6 +54,11 @@ GSN(deafen);
 GSN(doppelganger);
 RELIG(none);
 
+// Global char list
+Character * char_list;
+// Gllobal newbie list
+Character * newbie_list = 0;
+
 PlayerConfig::PlayerConfig( )
 {
     holy = color = false;

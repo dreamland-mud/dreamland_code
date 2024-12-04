@@ -327,4 +327,15 @@ inline void Character::setDead( )
 }
 
 
+/**
+ * Global list of all characters
+ */
+extern Character * char_list;
+
+/**
+ * Global list of all nanny characters
+ */
+extern Character * newbie_list;
+
+
 #endif

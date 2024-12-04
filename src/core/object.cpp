@@ -31,6 +31,9 @@
 
 WEARLOC(none);
 
+// Global list of all objects
+Object * object_list;
+
 const DLString Object::TYPE = "Object";
 
 Object::Object( ) :

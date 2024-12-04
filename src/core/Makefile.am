@@ -51,7 +51,8 @@ area.cpp \
 extradescription.cpp \
 exits.cpp \
 resets.cpp \
-auction.cpp
+auction.cpp \
+calendar.cpp
 
 libcore_la_MOC = \
 affect.h \

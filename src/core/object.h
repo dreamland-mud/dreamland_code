@@ -319,5 +319,10 @@ inline int Object::value4() const
     return itemOrProtoValue(4);
 }
 
+/**
+ * Global list of all items
+ */
+extern Object * object_list;
+
 
 #endif

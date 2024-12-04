@@ -168,5 +168,5 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
         return;
     }
-    __do_asave(ch, str_empty);
+    __do_asave(ch, const_cast<char *>(""));
 }

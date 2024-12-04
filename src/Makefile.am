@@ -63,7 +63,6 @@ process/libprocess.la \
 #
 libdreamland_impl_la_SOURCES = \
 autoflags.cpp \
-db.cpp \
 dreamland.cpp 
 
 libdreamland_impl_la_MOC = \

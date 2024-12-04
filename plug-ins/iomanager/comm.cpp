@@ -181,7 +181,7 @@ void page_to_char( const char *txt, Character *ch )
     mudtags_convert( txt, out, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR, ch );
     
     d->handle_input.push_front(new PagerHandler(out.str( ).c_str( )));
-    d->handle_input.front()->handle(d, str_empty);
+    d->handle_input.front()->handle(d, const_cast<char *>(""));
 }
 
 char *get_multi_command(Descriptor *d, char *argument)
