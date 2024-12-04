@@ -38,7 +38,10 @@ public:
         virtual bool save( );
         virtual void delete_( Character * ); 
         virtual bool canSteal( Character * );
-        virtual bool canEquip( Character * );                        
+        virtual bool canEquip( Character * );      
+
+protected:
+        bool checkOwnership(Character *);                          
 };
 
 #endif

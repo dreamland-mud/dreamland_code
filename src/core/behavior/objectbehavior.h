@@ -55,7 +55,6 @@ public:
     virtual DLString extraDescription( Character *ch, const DLString & );
     virtual bool visible( const Character * );
 
-    virtual bool isLevelAdaptive( ); 
     virtual bool mayFloat( ); 
     virtual bool canSteal( Character * ); 
     virtual bool canLock( Character * ); 

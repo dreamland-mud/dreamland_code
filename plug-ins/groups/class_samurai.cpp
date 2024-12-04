@@ -453,19 +453,32 @@ void SamuraiGuildmaster::doOwner( Character *victim, Object *katana )
  */
 bool Katana::canEquip( Character *ch )
 {
+    if (!BasicObjectBehavior::canEquip(ch))
+        return false;
+
     if (!ch->is_immortal() && ch->getProfession( ) != prof_samurai) {
         oldact( "$o1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
         oldact( "$o1 выпадает из рук $c2.", ch, obj, 0, TO_ROOM );
         ch->pecho("Катаны -- только для самураев.");
-        unequip_char( ch, obj );
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
         return false;
     }
 
     return true;    
-
 }
+
+void Katana::get( Character *ch )
+{
+    BasicObjectBehavior::get(ch);
+
+    if (obj->carried_by != ch)
+        return;
+
+    if (obj->hasOwner(ch))
+        oldact_p("{BМерцающая аура окружает лезвие $o2.{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
+}
+
 void Katana::wear( Character *ch )
 {
     const DLString &edText = obj->extraDescriptions.empty() ? DLString::emptyString : obj->extraDescriptions.front()->description.get(LANG_DEFAULT);
@@ -486,27 +499,16 @@ bool Katana::mayFloat( )
 }
 
 /*
- * OwnedKatana
+ * OwnedKatana: legacy behavior
  */
 void OwnedKatana::get( Character *ch )
 {
-  if (ch->is_immortal())
-      return;
-    
-  if (obj->hasOwner( ch ))
-  {
-    oldact_p("{BМерцающая аура окружает лезвие $o2.{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
-    return;
-  }
+    BasicObjectBehavior::get(ch);
 
-  oldact("$o1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
-  oldact("$o1 выпадает из рук $c2.", ch, obj, 0, TO_ROOM );
+    if (obj->carried_by != ch)
+        return;
 
-  obj_from_char( obj );
-  obj_to_room( obj, ch->in_room );
+    if (obj->hasOwner(ch))
+        oldact_p("{BМерцающая аура окружает лезвие $o2.{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
 }
 
-bool OwnedKatana::isLevelAdaptive( ) 
-{
-   return true; 
-}

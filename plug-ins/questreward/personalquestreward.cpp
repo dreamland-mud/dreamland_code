@@ -54,8 +54,3 @@ bool PersonalQuestReward::hourly()
     return true;
 }
 
-bool PersonalQuestReward::isLevelAdaptive( ) 
-{
-   return true; 
-}
-

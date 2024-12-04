@@ -17,7 +17,6 @@ public:
         
         virtual void get( Character * );
         virtual bool hourly();
-        virtual bool isLevelAdaptive( ); 
 };
 
 #endif

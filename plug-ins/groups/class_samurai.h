@@ -17,6 +17,7 @@ public:
     virtual void wear( Character * );
     virtual bool mayFloat( ); 
     virtual bool canEquip( Character * );
+    virtual void get( Character * );
 };
 
 class OwnedKatana : public Katana {
@@ -25,7 +26,6 @@ public:
     typedef ::Pointer<OwnedKatana> Pointer;
 
     virtual void get( Character * );
-    virtual bool isLevelAdaptive( ); 
 };
 
 class SamuraiGuildmaster : public virtual BasicMobileDestiny {

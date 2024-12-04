@@ -212,11 +212,16 @@ bool BasicObjectBehavior::canSteal(Character *)
 /** Owned items can't be picked up from the floor or container */
 void BasicObjectBehavior::get( Character *ch ) 
 { 
-    canEquip(ch);
+    checkOwnership(ch);
 }
 
 /** Owned items can't be equipped */
 bool BasicObjectBehavior::canEquip(Character *ch) 
+{
+    return checkOwnership(ch);
+}
+
+bool BasicObjectBehavior::checkOwnership(Character *ch)
 {
     if (obj->getOwner().empty())
         return true;

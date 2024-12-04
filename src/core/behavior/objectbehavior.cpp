@@ -129,10 +129,6 @@ DLString ObjectBehavior::extraDescription( Character *ch, const DLString &args )
     return DLString::emptyString;
 }
 
-bool ObjectBehavior::isLevelAdaptive( ) {
-    return false;
-}
-
 bool ObjectBehavior::mayFloat( ) {
     return false;
 }
