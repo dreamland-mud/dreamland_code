@@ -742,7 +742,7 @@ CMDRUNP(wake)
         else
         {
             undig(ch);
-            interpret_raw(ch, "stand", argument);
+            interpret_raw(ch, "stand");
         }
 
         return;
@@ -776,7 +776,7 @@ CMDRUNP(wake)
     oldact("$c1 будит $C4.", ch, 0, victim, TO_NOTVICT);
     oldact_p("$c1 будит тебя.", ch, 0, victim, TO_VICT, POS_SLEEPING);
 
-    interpret_raw(victim, "stand", argument);    
+    interpret_raw(victim, "stand");    
     mprog_wake(victim, ch);
 }
 
