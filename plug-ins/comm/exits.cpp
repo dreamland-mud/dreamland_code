@@ -42,10 +42,10 @@ static DLString cmd_exit(Character *ch, int door, EXIT_DATA *pexit)
     DLString ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
 
     if (IS_SET(pexit->exit_info, EX_LOCKED))
-        return "отпереть " + ename + " | " + ename;
+        return "отпереть " + ename;
 
     if (IS_SET(pexit->exit_info, EX_CLOSED))
-        return  "открыть " + ename + " | " + ename;
+        return  "открыть " + ename;
         
     return ename;
 }
