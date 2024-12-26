@@ -461,6 +461,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 
         if (arg.empty()) {
             buf << "Укажи название двери или выхода, например: {yворота{x, {yвосток{x или {yю{x.";
+            result->error = TARGET_ERR_EXIT_NOT_FOUND;
             return result;
         }
                          
