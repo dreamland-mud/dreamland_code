@@ -51,7 +51,7 @@ static int get_door_argument( const RegisterList &args )
 }
 
 /** Populate either exit or extra exit data based on exit number or keyword. Return false if not found. */
-static bool resolve_exits(const RegisterList &args, Room *room, EXIT_DATA *&pExit, EXTRA_EXIT_DATA *&pExtraExit)
+static void resolve_exits(const RegisterList &args, Room *room, EXIT_DATA *&pExit, EXTRA_EXIT_DATA *&pExtraExit)
 {
     pExit = 0;
     pExtraExit = 0;
@@ -68,7 +68,8 @@ static bool resolve_exits(const RegisterList &args, Room *room, EXIT_DATA *&pExi
         pExit = room->exit[door];
     }
 
-    return pExtraExit != 0 || pExit != 0;
+    if (pExtraExit == 0 && pExit == 0)
+        throw Scripting::Exception("Exit not found: " + arg.toString() + " in room " + DLString(room->vnum));
 }
 
 /** Find an exit and change exit flags on it. */
@@ -77,8 +78,7 @@ static void update_door_flags( Room *room, const RegisterList &args, int flags, 
     EXIT_DATA *pExit;
     EXTRA_EXIT_DATA *pExtraExit;
 
-    if (!resolve_exits(args, room, pExit, pExtraExit))
-        throw Scripting::IllegalArgumentException();
+    resolve_exits(args, room, pExit, pExtraExit);
 
     int &exit_info = pExtraExit ? pExtraExit->exit_info : pExit->exit_info;
     if (fSet)
@@ -521,8 +521,7 @@ NMI_INVOKE( RoomWrapper, getExitFlags, "(номер выхода, имя экс�
     EXTRA_EXIT_DATA *pExtraExit;
     
     checkTarget();
-    if (!resolve_exits(args, target, pExit, pExtraExit))
-        throw Scripting::IllegalArgumentException();
+    resolve_exits(args, target, pExit, pExtraExit);
 
     return pExtraExit ? pExtraExit->exit_info : pExit->exit_info;
 }
@@ -533,8 +532,7 @@ NMI_INVOKE( RoomWrapper, exitKeyword, "(номер выхода, имя экст
     EXTRA_EXIT_DATA *pExtraExit;
     
     checkTarget();
-    if (!resolve_exits(args, target, pExit, pExtraExit))
-        throw Scripting::IllegalArgumentException();
+    resolve_exits(args, target, pExit, pExtraExit);
 
     return pExtraExit ? String::toString(pExtraExit->keyword) : String::toString(pExit->keyword);
 }
@@ -545,8 +543,7 @@ NMI_INVOKE( RoomWrapper, exitShortDescr, "(номер выхода, имя эк�
     EXTRA_EXIT_DATA *pExtraExit;
     
     checkTarget();
-    if (!resolve_exits(args, target, pExit, pExtraExit))
-        throw Scripting::IllegalArgumentException();
+    resolve_exits(args, target, pExit, pExtraExit);
 
     DLString desc = pExtraExit ? pExtraExit->short_desc_from.get(LANG_DEFAULT) : pExit->short_descr.get(LANG_DEFAULT);
     if (desc.empty())
