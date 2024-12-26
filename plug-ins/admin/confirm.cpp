@@ -133,12 +133,10 @@ void Confirm::doReview( Character *ch )
 
     attr = get_confirm_attr(ch->getPC());
     
-    // Messaging player here only created confusion.
-    // ch->pecho( "\n{RТвое новое описание отправлено Бессмертным на рассмотрение.{x" );
     wiznet( WIZ_CONFIRM, 0, 0,
             "%^C1 редактирует описание персонажа ({y{hcconfirm show %s{x).", ch, ch->getNameC() );    
 
-    send_discord_confirm(ch->getPC());
+    //send_discord_confirm(ch->getPC());
 
     attr->update( ch->getPC() ); 
     PCharacterManager::saveMemory( ch->getPC( ) );
