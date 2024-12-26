@@ -489,7 +489,7 @@ NMI_GET(PlayerWrapper, aquest, "статистика побед в арийны�
             victoriesTotal++;
 
         if (qdata.thisLife > 0)
-            availableThisLife++;
+            victoriesThisLife++;
     }
 
     victory->setField(IdRef("victoriesTotal"), victoriesTotal);
