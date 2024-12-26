@@ -16,7 +16,7 @@
 #include "pcharactermanager.h"
 #include "dreamland.h"
 #include "merc.h"
-
+#include "msgformatter.h"
 #include "interp.h"
 #include "comm.h"
 #include "descriptor.h"

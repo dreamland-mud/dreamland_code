@@ -7,6 +7,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "arg_utils.h"
+#include "msgformatter.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"

@@ -19,6 +19,7 @@
 #include "mudtags.h"
 #include "string_utils.h"
 #include "char_weight.h"
+#include "msgformatter.h"
 #include "dreamland.h"
 #include "merc.h"
 #include "def.h"

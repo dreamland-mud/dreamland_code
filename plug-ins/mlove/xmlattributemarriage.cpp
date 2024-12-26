@@ -10,6 +10,7 @@
 #include "reglist.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
+#include "msgformatter.h"
 #include "merc.h"
 #include "def.h"
 

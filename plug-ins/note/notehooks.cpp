@@ -14,6 +14,7 @@
 #include "dreamland.h"
 #include "infonet.h"
 #include "messengers.h"
+#include "msgformatter.h"
 #include "descriptor.h"
 #include "arg_utils.h"
 #include "dl_strings.h"

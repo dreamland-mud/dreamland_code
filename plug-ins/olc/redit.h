@@ -9,6 +9,7 @@
 #include "olcstate.h"
 #include "xmlindexdata.h"
 
+
 class OLCStateRoom : public OLCStateTemplate<OLCStateRoom>,
                      public virtual OLCState
 {
@@ -28,6 +29,7 @@ public:
     bool change_exit(PCharacter *, const char *, int);
     static RoomIndexData *redit_create(PCharacter *, char *);
     static void show(PCharacter *ch, RoomIndexData *, bool showWeb);
+    static void move(PCharacter *ch, RoomIndexData *roomToMove, AreaIndexData *targetArea);
 
     XML_VARIABLE XMLInteger originalRoom;
     XML_VARIABLE XMLInteger room;

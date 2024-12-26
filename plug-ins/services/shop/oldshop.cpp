@@ -41,7 +41,7 @@
 #include "arg_utils.h"
 #include "skill_utils.h"
 #include "merc.h"
-
+#include "msgformatter.h"
 #include "act.h"
 #include "loadsave.h"
 #include "interp.h"

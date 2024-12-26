@@ -14,6 +14,7 @@
 #include "class.h"
 #include "pcharacter.h"
 #include "descriptor.h"
+#include "msgformatter.h"
 #include "act.h"
 
 XMLReward::XMLReward( )

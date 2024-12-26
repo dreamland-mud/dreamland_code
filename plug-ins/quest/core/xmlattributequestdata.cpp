@@ -11,7 +11,7 @@
 #include "pcharactermanager.h"
 #include "dreamland.h"
 #include "wiznet.h"
-
+#include "msgformatter.h"
 #include "merc.h"
 #include "def.h"
 

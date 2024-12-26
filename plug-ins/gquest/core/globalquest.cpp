@@ -20,7 +20,7 @@
 #include "pcharactermanager.h"
 #include "clan.h"
 #include "npcharacter.h"
-
+#include "msgformatter.h"
 #include "act.h"
 #include "move_utils.h"
 #include "fight_extract.h"

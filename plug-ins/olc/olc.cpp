@@ -155,16 +155,6 @@ ptc(Character *ch, const char *fmt, ...)
 }
 
 
-/** Find area with given vnum. */
-AreaIndexData *get_area_data(int vnum)
-{
-    for(auto &pArea: areaIndexes) {
-        if (pArea->vnum == vnum)
-            return pArea;
-    }
-    return 0;
-}
-
 /** Get next available help ID to use. Can potentially result in duplicates if a plugin 
     containing some helps is unloaded when this function is being called.  */
 int help_next_free_id()

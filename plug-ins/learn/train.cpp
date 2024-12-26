@@ -19,7 +19,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
-
+#include "msgformatter.h"
 #include "merc.h"
 #include "loadsave.h"
 #include "act.h"

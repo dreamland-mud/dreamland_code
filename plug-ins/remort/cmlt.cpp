@@ -25,7 +25,7 @@
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
 #include "pcrace.h"
-
+#include "msgformatter.h"
 #include "merc.h"
 #include "comm.h"
 #include "loadsave.h"

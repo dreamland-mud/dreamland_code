@@ -10,8 +10,8 @@
 #include "object.h"
 #include "act.h"
 #include "interp.h"
+#include "msgformatter.h"
 #include "merc.h"
-
 #include "def.h"
 
 #define KS KidnapBidonScenario

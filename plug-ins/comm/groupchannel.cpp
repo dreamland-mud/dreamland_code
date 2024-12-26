@@ -9,7 +9,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "loadsave.h"
-
+#include "msgformatter.h"
 #include "follow_utils.h"
 #include "act.h"
 

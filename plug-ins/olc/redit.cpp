@@ -36,6 +36,7 @@
 #include "update_areas.h"
 #include "websocketrpc.h"
 #include "string_utils.h"
+#include "areautils.h"
 #include "redit.h"
 #include "eeedit.h"
 #include "olc.h"
@@ -1222,6 +1223,45 @@ REDIT(purge, "уничтожить", "очистить комнату, унич�
     return false;
 }
 
+REDIT(move, "переместить", "переместить комнату в новую зону")
+{
+    RoomIndexData *roomToMove = getOriginal();
+    AreaIndexData *targetArea = AreaUtils::lookup(argument);
+
+    if (!targetArea) {
+        ptc(ch, "Зона '%s' не найдена.\r\n", argument);
+        return false;
+    }
+
+    if (!OLCState::can_edit(ch, targetArea)) {
+        ptc(ch, "У тебя недостаточно прав для редактирования зоны %d (%s).\n\r", targetArea->vnum, targetArea->getName().c_str());
+        return false;
+    }
+    
+    move(ch, roomToMove, targetArea);
+    return true;
+}
+
+void OLCStateRoom::move(PCharacter* ch, RoomIndexData* roomToMove, AreaIndexData* targetArea)
+{
+    // 1. Check if target area has a free vnum, grab it (new util AreaUtils::xxx)
+    // 2. Create new room index with this vnum and its first instance (new util in RoomUtils::create)
+    // 3. Copy source room desc, eds, behavior, flags, props, sector, guilds, ... (externalise OLCStateRoom::copy into RoomUtils)
+    // 4. Create same number of exits, duplicate source exit names, flags, vnums, keys (see if a new util can be added)
+    // 5. For target rooms, re-point their exits to the newly created room
+    // 6. Do the same for extra exits (again, create an util)
+    // 7. Delete source room exits, extra exits, extra descriptions etc: from index and instance
+    // 8. Transfer ch to the new room
+    // 9. Remove instance from room_list and affected room lists
+    // 10. Remove index from all maps/area/lists
+    // 11. Delete the instance
+    // 12. Delete the index
+
+    
+}
+
+
+
 REDIT(commands, "команды", "показать список встроенных команд redit")
 {
     do_commands(ch);
@@ -1303,6 +1343,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             stc("Нет такой комнаты.\n\r", ch);
             return;
         }
+
         if (!OLCState::can_edit(ch, pRoom2->vnum)) {
             stc("У тебя недостаточно прав для редактирования комнат.\n\r", ch);
             return;
@@ -1310,7 +1351,49 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         
         OLCStateRoom::show(ch, pRoom2, false);
         return;
-        
+    } else if (arg_is_strict(arg1, "move")) {
+        // 'redit move <vnum> <area file or vnum>'
+        DLString args = argument;
+        DLString arg2 = args.getOneArgument();
+        DLString arg3 = args.getOneArgument();
+        Integer rvnum;
+        AreaIndexData *pArea;
+
+        if (arg2.empty() || arg3.empty()) {
+            stc("Использование: redit move <vnum> <area file or vnum>\r\n", ch);
+            return;
+        }
+
+        if (!Integer::tryParse(rvnum, arg2)) {
+            stc("Укажи внум комнаты, которую нужно переместить.\r\n", ch);
+            return;
+        }        
+
+        pRoom2 = get_room_index(rvnum);
+        if (!pRoom2) {
+            stc("Нет такой комнаты.\n\r", ch);
+            return;
+        }
+
+        if (!OLCState::can_edit(ch, pRoom2->vnum)) {
+            ptc(ch, "У тебя недостаточно прав для редактирования комнаты %d.\n\r", pRoom2->vnum);
+            return;
+        }
+
+        pArea = AreaUtils::lookup(arg3);
+        if (!pArea) {
+            ptc(ch, "Зона '%s' не найдена.\r\n", arg3.c_str());
+            return;
+        }
+
+        if (!OLCState::can_edit(ch, pArea)) {
+            ptc(ch, "У тебя недостаточно прав для редактирования зоны %d (%s).\n\r", pArea->vnum, pArea->getName().c_str());
+            return;
+        }
+
+        OLCStateRoom::move(ch, pRoom2, pArea);
+        return;
+
     } else if (arg_is_strict(arg1, "reset")) {
 // TODO call single method from inside and outside of redit. But conflicts with "reset" command
         if (!OLCState::can_edit(ch, pRoom->vnum)) {
@@ -1384,6 +1467,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         stc("       redit create next|<vnum>\r\n", ch);
         stc("       redit [vnum]\r\n", ch);
         stc("       redit goto <vnum>\r\n", ch);
+        stc("       redit move <vnum> <area file or vnum>\r\n", ch);
         return;
     }
     

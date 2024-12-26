@@ -80,7 +80,7 @@ OLCStateArea::~OLCStateArea()
 
 void OLCStateArea::commit() 
 {
-    AreaIndexData *original = get_area_data(vnum);
+    AreaIndexData *original = AreaUtils::getByVnum(vnum);
     
     if(!original) {
         original = new AreaIndexData;
@@ -151,7 +151,7 @@ bool OLCStateArea::checkOverlap(int lower, int upper)
 
 void OLCStateArea::changed( PCharacter *ch )
 {
-    AreaIndexData *original = get_area_data(vnum);    
+    AreaIndexData *original = AreaUtils::getByVnum(vnum);    
     if (original)
         original->changed = true;
 }
@@ -159,7 +159,7 @@ void OLCStateArea::changed( PCharacter *ch )
 // Area Editor Functions.
 AEDIT(show, "показать", "показать все поля")
 {
-    AreaIndexData *original = get_area_data(vnum);
+    AreaIndexData *original = AreaUtils::getByVnum(vnum);
     Area *instance = original ? original->area : 0;
 
     ptc(ch, "Area:       [{C%5d{x]\n\r", vnum.getValue( ));
@@ -246,7 +246,7 @@ static AreaQuest * arg_areaquest(const DLString &arg, AreaIndexData *pArea)
 
 AEDIT(quest, "квест", "редактировать квесты в зоне")
 {
-    AreaIndexData *original = get_area_data(vnum);
+    AreaIndexData *original = AreaUtils::getByVnum(vnum);
     DLString args = argument;
     DLString arg = args.getOneArgument();
 
@@ -337,7 +337,7 @@ AEDIT(quest, "квест", "редактировать квесты в зоне"
 
 AEDIT(reset, "сбросить", "сбросить арию, обновив всех мобов, предметы и двери")
 {
-    AreaIndexData *original = get_area_data(vnum);
+    AreaIndexData *original = AreaUtils::getByVnum(vnum);
 
     if (original) {
         // FIXME reset either all instances or the current one.
@@ -719,7 +719,7 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     argument = one_argument(argument, arg);
     if (is_number(arg)) {
         value = atoi(arg);
-        pArea = get_area_data(value);
+        pArea = AreaUtils::getByVnum(value);
         if (!pArea) {
             stc("That area vnum does not exist.\n\r", ch);
             return;

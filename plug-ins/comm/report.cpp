@@ -16,6 +16,7 @@
 #include "comm.h"
 #include "interp.h"
 #include "loadsave.h"
+#include "msgformatter.h"
 #include "damageflags.h"
 #include "profflags.h"
 #include "merc.h"

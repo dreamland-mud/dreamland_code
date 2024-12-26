@@ -10,8 +10,8 @@
 #include "xmlarea.h"
 #include "dreamland.h"
 #include "room.h"
+#include "areautils.h"
 #include "merc.h"
-
 #include "def.h"
 
 void
@@ -82,7 +82,7 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     // Snarf the value (which need not be numeric)
     value = atoi(arg1);
-    if (!(pArea = get_area_data(value)) && is_number(arg1)) {
+    if (!(pArea = AreaUtils::getByVnum(value)) && is_number(arg1)) {
         stc("That area does not exist.\n\r", ch);
         return;
     }

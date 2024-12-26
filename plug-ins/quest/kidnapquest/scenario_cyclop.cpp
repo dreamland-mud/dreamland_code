@@ -11,7 +11,7 @@
 #include "object.h"
 #include "act.h"
 #include "interp.h"
-
+#include "msgformatter.h"
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"

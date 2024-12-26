@@ -6,7 +6,7 @@
 
 #include "pcharacter.h"
 #include "npcharacter.h"
-
+#include "msgformatter.h"
 #include "dreamland.h"
 
 /*----------------------------------------------------------------------

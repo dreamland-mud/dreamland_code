@@ -4,6 +4,7 @@
 #include "loadsave.h"
 #include "money_utils.h"
 #include "arg_utils.h"
+#include "msgformatter.h"
 #include "act.h"
 
 void Money::dematerialize( Object *list, int &gold, int &silver )

@@ -8,9 +8,8 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
-
+#include "msgformatter.h"
 #include "interp.h"
-
 #include "act.h"
 #include "merc.h"
 #include "def.h"

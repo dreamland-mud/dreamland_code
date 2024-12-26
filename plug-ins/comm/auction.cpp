@@ -83,6 +83,7 @@
 #include "vnum.h"
 #include "def.h"
 #include "messengers.h"
+#include "msgformatter.h"
 
 GSN(identify);
 

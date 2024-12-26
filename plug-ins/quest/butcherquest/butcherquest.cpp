@@ -15,7 +15,7 @@
 #include "room.h"
 #include "roomutils.h"
 #include "race.h"
-
+#include "msgformatter.h"
 #include "merc.h"
 #include "act.h"
 #include "loadsave.h"

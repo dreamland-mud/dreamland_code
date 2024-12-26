@@ -33,7 +33,7 @@
 #include "interp.h"
 #include "act.h"
 #include "loadsave.h"
-
+#include "msgformatter.h"
 #include "merc.h"
 #include "def.h"
 

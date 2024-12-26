@@ -6,7 +6,7 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "npcharacter.h"
-
+#include "msgformatter.h"
 #include "object.h"
 #include "loadsave.h"
 #include "act.h"

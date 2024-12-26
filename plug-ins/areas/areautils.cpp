@@ -95,3 +95,38 @@ AreaHelp * AreaUtils::createHelp(AreaIndexData *pArea)
     
     return *ahelp;
 }
+
+AreaIndexData* AreaUtils::getByVnum(int vnum)
+{
+    for(auto &pArea: areaIndexes) {
+        if (pArea->vnum == vnum)
+            return pArea;
+    }
+
+    return 0;
+}
+
+AreaIndexData* AreaUtils::getByFileName(const DLString& filename)
+{
+    for(auto &pArea: areaIndexes) {
+        if (pArea->area_file->file_name == filename)
+            return pArea;        
+    }
+
+    for(auto &pArea: areaIndexes) {
+        if (filename.strPrefix(pArea->area_file->file_name))
+            return pArea;        
+    }
+
+    return nullptr;
+}
+
+AreaIndexData* AreaUtils::lookup(const DLString& arg)
+{
+    Integer avnum;
+
+    AreaIndexData *pArea =
+        Integer::tryParse(avnum, arg) ? getByVnum(avnum) : getByFileName(arg);
+
+    return pArea;
+}

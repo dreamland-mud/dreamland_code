@@ -12,8 +12,8 @@
 #include "act.h"
 #include "clanreference.h"
 #include "interp.h"
+#include "msgformatter.h"
 #include "merc.h"
-
 #include "def.h"
 
 #define KS KidnapUrchinScenario

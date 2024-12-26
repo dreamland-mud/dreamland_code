@@ -16,7 +16,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
-
+#include "msgformatter.h"
 #include "merc.h"
 #include "loadsave.h"
 #include "save.h"

@@ -36,9 +36,7 @@
 #include "alignment.h"
 #include "clanreference.h"
 #include "merc.h"
-
-
-
+#include "msgformatter.h"
 #include "vnum.h"
 #include "loadsave.h"
 #include "save.h"

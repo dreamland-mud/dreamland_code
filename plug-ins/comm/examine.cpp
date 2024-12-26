@@ -9,6 +9,7 @@
 #include "keyhole.h"
 #include "terrains.h"
 #include "wearloc_utils.h"
+#include "msgformatter.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"

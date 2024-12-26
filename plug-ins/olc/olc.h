@@ -20,8 +20,6 @@
                 "     (Port a ROM 2.4 - Nov 2, 1996)\n\r"
 #define OLC_CREDITS "     Original by Surreality(cxw197psu.edu) and Locke(lockelm.com)"
 
-AreaIndexData *get_area_data(int vnum);
-
 bool show_help(Character * ch, const char *argument);
 int help_next_free_id();
 DLString show_enum_array(const EnumerationArray &array);

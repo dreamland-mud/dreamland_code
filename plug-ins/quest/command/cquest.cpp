@@ -19,7 +19,7 @@
 #include "lex.h"
 #include "subr.h"
 #include "native.h"
-
+#include "msgformatter.h"
 #include "occupations.h"
 #include "occupations.h"
 #include "act.h"

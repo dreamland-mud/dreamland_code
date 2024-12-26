@@ -17,7 +17,7 @@
 #include "object.h"
 #include "room.h"
 #include "player_utils.h"
-
+#include "msgformatter.h"
 #include "loadsave.h"
 #include "act.h"
 #include "save.h"

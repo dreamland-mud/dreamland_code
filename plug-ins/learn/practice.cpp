@@ -25,6 +25,7 @@
 #include "skill_utils.h"
 #include "comm.h"
 #include "loadsave.h"
+#include "msgformatter.h"
 
 #include "merc.h"
 #include "act.h"

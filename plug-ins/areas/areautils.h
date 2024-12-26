@@ -6,6 +6,7 @@ class PCMemoryInterface;
 struct mob_index_data;
 class RoomIndexData;
 class AreaHelp;
+class DLString;
 
 namespace AreaUtils {
     // Create a "playername.area" zone for this player, with 100 vnums by default.
@@ -20,6 +21,15 @@ namespace AreaUtils {
 
     // Create self-help article for this area.
     AreaHelp * createHelp(AreaIndexData* pArea);
+
+    // Find area with given vnum
+    AreaIndexData *getByVnum(int vnum);
+
+    // Find area with given file name 
+    AreaIndexData *getByFileName(const DLString &filename);
+
+    // Find area by vnum or file name
+    AreaIndexData *lookup(const DLString &arg);
 
 };
 

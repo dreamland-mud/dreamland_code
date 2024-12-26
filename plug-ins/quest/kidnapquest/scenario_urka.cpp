@@ -9,7 +9,7 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "act.h"
-
+#include "msgformatter.h"
 #include "interp.h"
 #include "merc.h"
 #include "def.h"

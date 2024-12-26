@@ -57,6 +57,7 @@
 #include "move_utils.h"
 #include "keyhole.h"
 #include "loadsave.h"
+#include "msgformatter.h"
 #include "../loadsave/behavior_utils.h"
 #include "morphology.h"
 #include "act.h"

@@ -25,7 +25,7 @@
 #include "fight.h"
 #include "act.h"
 #include "skillreference.h"
-
+#include "msgformatter.h"
 #include "loadsave.h"
 #include "merc.h"
 #include "descriptor.h"

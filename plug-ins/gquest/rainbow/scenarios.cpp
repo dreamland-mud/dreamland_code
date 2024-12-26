@@ -17,7 +17,7 @@
 #include "pcharacter.h"
 #include "affect.h"
 
-
+#include "msgformatter.h"
 #include "act.h"
 #include "loadsave.h"
 #include "movetypes.h"

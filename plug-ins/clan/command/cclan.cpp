@@ -33,7 +33,7 @@
 #include "clanorg.h"
 #include "cclan.h"
 #include "xmlattributeinduct.h"
-
+#include "msgformatter.h"
 #include "def.h"
 
 CLAN(none);

@@ -37,7 +37,7 @@
 
 #include "merc.h"
 #include "vnum.h"
-
+#include "msgformatter.h"
 #include "fight.h"
 #include "weapongenerator.h"
 #include "movetypes.h"
