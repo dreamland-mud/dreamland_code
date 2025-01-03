@@ -23,6 +23,10 @@ BONUS(thief_skills);
 /*---------------------------------------------------------------------------
  * 'exits' command 
  *--------------------------------------------------------------------------*/
+/**
+ * Return a webclient command to interact with the extra exit.
+ * If the short description is not set (or not preferred by the caller), the keyword is used.
+ */
 static DLString cmd_extra_exit(Character *ch, EXTRA_EXIT_DATA *eexit, bool prefereShortDescr)
 {
     DLString kw_en = Syntax::label_en(eexit->keyword);
@@ -35,6 +39,9 @@ static DLString cmd_extra_exit(Character *ch, EXTRA_EXIT_DATA *eexit, bool prefe
     return web_cmd(ch, cmd, nameRus);
 }
 
+/**
+ * Return a webclient command to interact with the exit.
+ */
 static DLString cmd_exit(Character *ch, int door, EXIT_DATA *pexit)
 {
     DLString cmd;
@@ -50,7 +57,9 @@ static DLString cmd_exit(Character *ch, int door, EXIT_DATA *pexit)
     return ename;
 }
 
-
+/**  
+ * Check if the player has a chance to perceive hidden exits.
+ */
 static bool check_perception(Character *ch)
 {
     if (!gsn_perception->usable(ch))
@@ -71,6 +80,10 @@ static bool check_perception(Character *ch)
     }
 }
 
+/**
+ * Show exits from the room to the player, in the format:
+ * [Exits: north east south west up down | extra1 extra2]
+ */
 void show_exits_to_char( Character *ch, Room *targetRoom )
 {
     ostringstream buf;

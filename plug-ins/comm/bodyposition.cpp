@@ -33,7 +33,7 @@ static DLString oprog_msg(Object *obj, const char *tag)
 {
     DLString msg;
     Scripting::IdRef ID_MSG(tag);
-    Scripting::Register regObj, regObjIndex, reg;
+    Scripting::Register regObj, regObjIndex;
 
     if (!FeniaManager::wrapperManager)
         return msg;
@@ -41,23 +41,22 @@ static DLString oprog_msg(Object *obj, const char *tag)
     regObj = FeniaManager::wrapperManager->getWrapper(obj);
     regObjIndex = FeniaManager::wrapperManager->getWrapper(obj->pIndexData);
 
-    try
-    {
-        reg = *regObj[ID_MSG];
-        if (reg.type != Scripting::Register::NONE)
-            msg = reg.toString();
-
-        if (msg.empty())
+    auto getMessage = [&](const Scripting::Register &reg) -> DLString {
+        try
         {
-            reg = *regObjIndex[ID_MSG];
             if (reg.type != Scripting::Register::NONE)
-                msg = reg.toString();
+                return reg.toString();
         }
-    }
-    catch (const Exception &e)
-    {
-        LogStream::sendWarning() << e.what() << endl;
-    }
+        catch (const Exception &e)
+        {
+            LogStream::sendWarning() << e.what() << endl;
+        }
+        return DLString::emptyString;
+    };
+
+    msg = getMessage(*regObj[ID_MSG]);
+    if (msg.empty())
+        msg = getMessage(*regObjIndex[ID_MSG]);
 
     return msg;
 }
