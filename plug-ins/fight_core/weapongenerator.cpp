@@ -573,6 +573,8 @@ const WeaponGenerator & WeaponGenerator::assignTimers() const
 
 const WeaponGenerator & WeaponGenerator::assignFlags() const
 {
+    obj->setProperty("tier", valTier);
+
     SET_BIT(obj->extra_flags, extraFlags.getValue());
     SET_BIT(obj->extra_flags, weapon_tier_table[valTier-1].extra.getValue());
     obj->value4(weaponFlags.getValue());
@@ -584,8 +586,6 @@ const WeaponGenerator & WeaponGenerator::assignFlags() const
 
     // Set standardized cost in silver.
     obj->cost = 5 * (WORST_TIER + 1 - valTier) * obj->level;
-
-    obj->setProperty("tier", valTier);
     return *this;
 }
 

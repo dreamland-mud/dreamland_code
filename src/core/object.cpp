@@ -18,10 +18,9 @@
 #include "string_utils.h"
 #include "json_utils.h"
 #include "fenia/register-impl.h"
-
+#include "skillreference.h"
 #include "wrapperbase.h"
 #include "feniamanager.h"
-#include "string_utils.h"
 #include "objectbehavior.h"
 #include "object.h"
 #include "affect.h"
@@ -29,7 +28,10 @@
 
 #include "def.h"
 
+GSN(compound);
 WEARLOC(none);
+
+#define OBJ_VNUM_WEAPON_STUB 104 // random weapon prototype for rand_all
 
 // Global list of all objects
 Object * object_list;
@@ -445,12 +447,53 @@ void Object::setProperty(const DLString &key, const DLString &subkey, const DLSt
     props[key][subkey] = value;
 }
 
+/**
+ * How weapon values can be changed:
+ * 1) 'compound' prayer - value0, value3.
+ * Has a 'compound' affect.
+ * 
+ * 2) 'randomize all' - value0, value1, value2, value3, value4
+ * 'tier' property contains numeric value of the tier.
+ * vnum is OBJ_VNUM_WEAPON_STUB.
+ * 
+ * 3) 'randomize stats' - value1, value2, value4 
+ * 'tier' property contains numeric value of the tier.
+ * 
+ * 4) ranger AI arrows: value1, value2
+ * Has a 'make arrow' affect. Level is not equal to proto level. 
+ * 
+ * 5) hunter weapons: value1, value2
+ * Level is not equal to proto level. Has affect of type -1.
+ * 
+ * 6) quest weapon: value1, value2
+ * Level is not equal to proto level. Has affect of type -1.
+ * 
+ * 7) Fenia .generateWeapon()
+ * Has affect with skill name or 'none'. Level is not equal to proto level.
+ * 
+ * 8) 'katana': value1, value2
+ * Has 'katana' affect. Level is not equal to proto level.
+ * 
+ * 9) 'search stones': value1, value2
+ * Has 'search stones' affect. Level is not equal to proto level.
+ * 
+ */
+
+
 static bool get_value0_from_proto(const Object *obj)
 {
     switch (obj->item_type) {
         case ITEM_WEAPON: 
-            // Always grab weapon's class from the proto, unless it's a restring (e.g. cleric's mace).
-            return !obj->getRealShortDescr(LANG_DEFAULT).empty() && obj->getProperty("tier").empty();
+            // value0 (weapon type) is changed on 'rand_all' weapons
+            if (obj->pIndexData->vnum == OBJ_VNUM_WEAPON_STUB)
+                return false;
+
+            // value0 is changed on cleric's maces (compound prayer)
+            if (obj->isAffected(gsn_compound))
+                return false;
+
+            return true;
+
         default:
             return false;
     }
@@ -460,12 +503,17 @@ static bool get_value1_from_proto(const Object *obj)
 {
     switch (obj->item_type) {
         case ITEM_WEAPON: 
-            // Bypass object dices and return those from proto if the weapon is not enchanted, not
-            // dynamically created (ranger staff, bow, arrow, stone) and not restringed (cleric's mace).
-            // TODO: deprecated?
-            return !obj->getRealShortDescr(LANG_DEFAULT).empty() 
-                    && obj->level == obj->pIndexData->level
-                    && obj->getProperty("tier").empty();
+            // value1 and value2 (dices) are changed on rand_stat and rand_all weapons
+            if (!obj->getProperty("tier").empty())
+                return false;
+
+            // Weapon dices are changed on all generated weapons. 
+            // Typical tell: item level is changed and there's an affect.
+            if (obj->level != obj->pIndexData->level && !obj->affected.empty())
+                return false;
+
+            return true;
+
         default:
             return false;
     }
@@ -480,8 +528,16 @@ static bool get_value3_from_proto(const Object *obj)
 {
     switch (obj->item_type) {
         case ITEM_WEAPON: 
-            // Grab weapon damage type (pierce, slash) from proto unless it's a restring (e.g. cleric's mace).
-            return !obj->getRealShortDescr(LANG_DEFAULT).empty() && obj->getProperty("tier").empty();
+            // value3 (weapon damage type) is changed on 'rand_all' weapons
+            if (obj->pIndexData->vnum == OBJ_VNUM_WEAPON_STUB)
+                return false;
+                
+            // value3 is changed on cleric's maces (compound prayer)
+            if (obj->isAffected(gsn_compound))
+                return false;
+
+            return true;
+
         default:
             return false;
     }
@@ -489,7 +545,17 @@ static bool get_value3_from_proto(const Object *obj)
 
 static bool get_value4_from_proto(const Object *obj)
 {
-    return false;
+    switch (obj->item_type) {
+        case ITEM_WEAPON: 
+            // value4 (weapon flags) is changed on rand_stat and rand_all weapons
+            if (!obj->getProperty("tier").empty())
+                return false;
+
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 bool Object::getsValueFromProto(int index) const
