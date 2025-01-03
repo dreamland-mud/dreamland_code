@@ -357,7 +357,6 @@ NMI_GET(PlayerWrapper, ips, "массив (.Array), ключ - IP адес, зн
     return ipsReg;
 }
 
-
 NMI_GET(PlayerWrapper, alts, "массив (.Array), ключ - IP, значение - Array из имен альтов и количества их заходов с этого IP")
 {
     PCMemoryInterface *player = getTarget();
@@ -367,15 +366,16 @@ NMI_GET(PlayerWrapper, alts, "массив (.Array), ключ - IP, значен
     auto myLastHostAttr = player->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");  
     if (!myLastHostAttr)
         return altsReg;
+        
     auto myHosts = myLastHostAttr->getHosts();  
     
     std::map<DLString, std::map<DLString, int> > loginsByHostByPlayer;
 
     // Collect stats about matching IPs for all players
     const PCharacterMemoryList &players = PCharacterManager::getPCM();    
-    for (auto p: players) {
+    for (const auto &p: players) {
         PCMemoryInterface *alt = p.second;
-        DLString altName = p.first;
+        const DLString &altName = p.first;
 
         if (altName == player->getName())
             continue;
@@ -385,8 +385,8 @@ NMI_GET(PlayerWrapper, alts, "массив (.Array), ключ - IP, значен
             continue;
 
         // For each player, count how many times they logged in from the same IP addresses as the target player
-        for (auto h: altLastHostAttr->getHosts()) {
-            DLString altHost = h.first;
+        for (const auto &h: altLastHostAttr->getHosts()) {
+            const DLString &altHost = h.first;
             int altLogins = h.second.getValue();
 
             if (myHosts.find(altHost) != myHosts.end())
@@ -395,15 +395,15 @@ NMI_GET(PlayerWrapper, alts, "массив (.Array), ключ - IP, значен
     }
 
     // Populate Fenia array
-    for (auto &lhp: loginsByHostByPlayer) {
+    for (const auto &lhp: loginsByHostByPlayer) {
         Register loginsByPlayerReg = Register::handler<RegContainer>();
         RegContainer *loginsByPlayerContainer = loginsByPlayerReg.toHandler().getDynamicPointer<RegContainer>();
         
-        DLString altHost = lhp.first;
-        auto &loginsByPlayer = lhp.second;
+        const DLString &altHost = lhp.first;
+        const auto &loginsByPlayer = lhp.second;
 
-        for (auto &lp: loginsByPlayer) {
-            DLString altName = lp.first;
+        for (const auto &lp: loginsByPlayer) {
+            const DLString &altName = lp.first;
             int altLogins = lp.second;
             loginsByPlayerContainer->setField(altName, altLogins);
         }
@@ -413,7 +413,6 @@ NMI_GET(PlayerWrapper, alts, "массив (.Array), ключ - IP, значен
 
     return altsReg;
 }
-
 
 NMI_GET(PlayerWrapper, start_room, "vnum комнаты, в которой зайдут в мир")
 {
