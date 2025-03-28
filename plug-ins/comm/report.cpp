@@ -265,9 +265,9 @@ CMDRUNP(report)
     }
 
     if (IS_SET(pet->act, ACT_RIDEABLE))
-        result << "На мне можно {y{hh1376ездить верхом{x! ";
+        result << "На мне можно {y{hh227ездить верхом{x! ";
     if (can_fly(pet))
-        result << "Я умею {hh1018летать{x. ";
+        result << "Я умею {hh575летать{x. ";
     if (!pet->master->getPC()->pet || pet->master->getPC()->pet != pet)
         result << "Мне можно {hh1024дать{x вещи и приказать их {hh990надеть{x. ";
     result << "Мне можно приказать {hh1020спать{x и другие стандартные команды." << endl;
