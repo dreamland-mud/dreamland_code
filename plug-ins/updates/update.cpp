@@ -641,6 +641,11 @@ void water_float_update( )
     for (obj = object_list; obj != 0; obj = obj_next) {
         obj_next = obj->next;
 
+        if (!obj->pIndexData) {
+            LogStream::sendError() << "water_float_update aborted" << endl;
+            continue;
+        }
+
         try {
             if (oprog_spec( obj ))
                 continue;
