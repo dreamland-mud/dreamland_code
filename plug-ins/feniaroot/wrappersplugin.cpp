@@ -151,7 +151,7 @@ static void dumpTables(Json::Value &apiDump)
             if (table->enumerated)
                 entry["value"] = fields[i].value;
             else
-                entry["value"] = table->bitstring(fields[i].name);
+                entry["value"] = static_cast<Json::Value::UInt64>(table->bitstring(fields[i].name));
 
             tableEntries.append(entry);
         }

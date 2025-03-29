@@ -32,12 +32,12 @@ namespace Scripting {
 class Object : public XMLVariable {
 public:
     typedef uint32_t id_t;
-    struct selectId : public unary_function<Object, id_t> {
-        const id_t &operator () (const Object &o) {
+    struct selectId  {
+        const id_t &operator () (const Object &o) const {
             return o.getId();
         }
     };
-    typedef rb_tree<id_t, Object, selectId, less<id_t> > Map;
+    typedef rb_tree<id_t, Object, selectId, std::less<id_t> > Map;
     class Manager;
 
     struct NotRecoveredException : public Exception {

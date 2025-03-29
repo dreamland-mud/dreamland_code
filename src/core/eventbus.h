@@ -5,6 +5,7 @@
 #include <typeindex>
 #include <map>
 #include <list>
+#include <string>
 #include "oneallocate.h"
 
 using namespace std;

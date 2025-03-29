@@ -91,7 +91,7 @@ static bool create_log_entry(InterpretArguments &iargs)
     Json::Value log;
     log["time"] = Date::getTimeAsString(dreamland->getCurrentTime());
 
-    log["ch"]["id"] = iargs.ch->getID();
+    log["ch"]["id"] = static_cast<Json::Value::UInt64>(iargs.ch->getID());
     log["ch"]["lvl"] = iargs.ch->getLevel();
     log["ch"]["remort"] = (int)iargs.ch->getPC()->getRemorts().size();
     log["ch"]["room"] = iargs.ch->in_room->vnum;

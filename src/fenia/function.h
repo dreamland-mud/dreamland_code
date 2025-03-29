@@ -44,13 +44,14 @@ class Function {
 public:
     typedef uint32_t id_t;
 
-    struct selectId : public unary_function<Function, id_t> {
-        const id_t &operator () (const Function &f) {
-            return f.getId();
+    struct selectId {
+        const id_t& operator()(const Function& f) const {
+           return f.getId();
         }
     };
-    typedef rb_tree<id_t, Function, selectId, less<id_t> > Map;
-    
+
+    typedef rb_tree<id_t, Function, selectId, std::less<id_t>> Map;
+
     Function(id_t i);
     virtual ~Function( );
 

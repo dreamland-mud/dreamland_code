@@ -237,9 +237,10 @@ DefaultBufferHandler::write( Descriptor *d, const char *txt )
 
     length = strlen(txt);
 
-    char txt_buf[length];
-    strcpy(txt_buf, txt);
-    char *txt_ptr = txt_buf;
+
+    std::unique_ptr<char[]> txt_buf(new char[length + 1]);
+    strcpy(txt_buf.get(), txt);
+    char *txt_ptr = txt_buf.get();
 
     const unsigned char *to = russian_codepages[codepage].to;
 
