@@ -4,6 +4,7 @@
  */
 #include <iconv.h>
 #include <string.h>
+#include <memory>
 
 #include "defaultbufferhandler.h"
 #include "logstream.h"
