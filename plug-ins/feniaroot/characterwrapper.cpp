@@ -2907,7 +2907,7 @@ NMI_INVOKE(CharacterWrapper, hasBehavior, "(bhvName): true если среди �
     return Register(target->getNPC()->pIndexData->behaviors.isSet(bhv->getIndex()));
 }
 
-NMI_INVOKE(CharacterWrapper, behaviorMethod, "(methodName, args...): вызвать метод MobileBehavior с аргументами")
+NMI_INVOKE(CharacterWrapper, behaviorMethod, "(methodName[, args...]): вызвать метод MobileBehavior с аргументами")
 {
     checkTarget();
     CHK_PC
@@ -2920,6 +2920,12 @@ NMI_INVOKE(CharacterWrapper, behaviorMethod, "(methodName, args...): вызва�
             target->getNPC()->behavior->shot(attacker, door);
         return Register();
     }
+
+	if (methodName == "flee") {
+        if (target->getNPC()->behavior)
+            target->getNPC()->behavior->flee();
+        return Register();
+	}
 
     throw Scripting::Exception(methodName + " behavior method not supported yet");
 }
