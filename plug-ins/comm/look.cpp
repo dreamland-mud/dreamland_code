@@ -428,17 +428,6 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
     page_to_char(output.str( ).c_str( ), ch);
 }
 
-static void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf)
-{
-    ostringstream buf;
-
-    for (auto &paf: room->affected.findAllWithHandler())
-        if (paf->type->getAffect())
-            paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, ch), paf, buf);
-
-    if (!buf.str().empty())
-        mainBuf << endl << buf.str();
-}
 
 /*
  * Display PK-flags
@@ -1232,21 +1221,33 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         ostringstream rbuf;
         const char *dsc = room->getDescription();
 
+        // Get room description in current language, treat first '.' as space (legacy format)
         if (*dsc == '.')
             ++dsc;
         else
             rbuf << " ";
         
+        // Decorate "(sign)" with web tags for extra descriptions.
         webManipManager->decorateExtraDescr( rbuf, dsc, room->getExtraDescr(), ch );
 
+        // Append room_description fields of all extra exits or their Fenia onExtraExitDescr overrides
         for (auto &peexit: room->extra_exits)
             if (ch->can_see( peexit ))
                 rbuf << rprog_eexit_descr(room, peexit, ch, peexit->room_description.get(LANG_DEFAULT));
 
-        buf << rprog_descr( room, ch, rbuf.str( ) );
-    }
+        // Allow onDescr Fenia room trigger to override room description.
+        DLString roomDescription = rprog_descr( room, ch, rbuf.str( ) );
 
-    show_room_affects_to_char(room, ch, buf);
+        // Allow onDescr affect handlers to override room description. 
+        for (auto &paf: room->affected.findAllWithHandler()) {
+            auto ah = paf->type->getAffect();
+            if (ah)
+                roomDescription = ah->onDescr(SpellTarget::Pointer(NEW, ch), paf, roomDescription);
+        }
+
+        // Append resulting room description to the main output buffer.
+        buf << roomDescription;
+    }
 
     if (ch->getPC( ) && IS_SET(ch->getPC( )->act, PLR_AUTOEXIT))
     {

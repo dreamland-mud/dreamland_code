@@ -43,7 +43,7 @@ public:
     bool onSmell(const SpellTarget::Pointer &target, Affect *paf, Character *victim);
     bool onSaves(const SpellTarget::Pointer &target, Affect *paf, Character *victim, int &saves, int dam_type);
     bool onStopfol(const SpellTarget::Pointer &target, Affect *paf);
-    bool onDescr(const SpellTarget::Pointer &target, Affect *paf, ostringstream &buf);
+    DLString onDescr(const SpellTarget::Pointer &target, Affect *paf, const DLString &description);
     bool onShow(const SpellTarget::Pointer &target, Affect *paf, Character *looker, ostringstream &buf);
     bool onUpdateHit(const SpellTarget::Pointer &target, Affect *paf);
     /** Called when a character with this affect in the configuration is refreshed inside char update. */

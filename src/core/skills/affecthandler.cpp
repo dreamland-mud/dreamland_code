@@ -344,21 +344,19 @@ bool AffectHandler::onStopfol(const SpellTarget::Pointer &target, Affect *paf)
     return false;
 }
 
-static DLString afprog_descr(AffectHandler *ah, Character *ch, Affect *paf)
-{
-    FENIA_STR_CALL(ah, "Descr", "CA", ch, paf);
-    return DLString::emptyString;
-}
-
-bool AffectHandler::onDescr(const SpellTarget::Pointer &target, Affect *paf, ostringstream &buf) 
+DLString AffectHandler::onDescr(const SpellTarget::Pointer &target, Affect *paf, const DLString &description) 
 {
     Character *ch = target->victim;
-    DLString d = afprog_descr(this, ch, paf);
-    if (!d.empty())
-        buf << d;
-    else
-        toStream(buf, paf);
-    return false;
+
+    // Return overridden description unless the trigger's result is an empty string.
+    FENIA_STR_CALL(this, "Descr", "CAs", ch, paf, description.c_str());
+
+    // Call legacy affect handler that could append a new line to the description.
+    ostringstream buf;
+    buf << description;
+    toStream(buf, paf);
+
+    return buf.str();
 }
 
 static DLString afprog_show(AffectHandler *ah, Object *obj, Character *looker, Affect *paf)
