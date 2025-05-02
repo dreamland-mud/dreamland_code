@@ -28,6 +28,7 @@ class PCharacter;
 class NPCharacter;
 class FlagTable;
 class BehaviorReference;
+class GlobalRegistryBase;
 
 struct mob_index_data;
 struct obj_index_data;
