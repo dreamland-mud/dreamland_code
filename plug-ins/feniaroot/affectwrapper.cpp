@@ -173,7 +173,7 @@ NMI_GET(AffectWrapper, bitvectorTable, "таблица для флагов, ко
 
 NMI_SET(AffectWrapper, where, "на какую таблицу применен bitvector или на что воздействует global (.tables.affwhere_flags)")
 {
-    int where = arg.toNumber();
+    int where = arg2flag(arg, affwhere_flags);
 
     switch (where) {
         case TO_LOCATIONS:
@@ -191,6 +191,11 @@ NMI_SET(AffectWrapper, where, "на какую таблицу применен b
         default:
             throw Scripting::Exception("Accepted values for 'where' field are: wearlocations, liquids, skills, skill_groups");
     }
+}
+
+NMI_GET(AffectWrapper, where, "на какую таблицу применен bitvector или на что воздействует global (.tables.affwhere_flags)")
+{
+    return affect_table_to_where(target.bitvector.getTable(), target.global.getRegistry());
 }
 
 NMI_SET( AffectWrapper, global, "список значений для where=locations (слоты экипировки), liquids (жидкости), skills, skill groups" ) 
