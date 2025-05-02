@@ -10,7 +10,6 @@
 #include "racechannel.h"
 #include "roomchannel.h"
 #include "personalchannel.h"
-#include "twitlist.h"
 #include "channels.h"
 #include "replay.h"
 #include "so.h"
@@ -45,7 +44,6 @@ extern "C"
         SO::PluginList ppl;
     
         Plugin::registerPlugin<RegMocPlugin>( ppl );
-        Plugin::registerPlugin<CTwit>( ppl );
         Plugin::registerPlugin<ChannelsCommand>( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<ReplayAttribute> >( ppl );
         

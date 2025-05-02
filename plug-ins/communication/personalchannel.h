@@ -22,7 +22,6 @@ protected:
     virtual Character * findListener( Character *, const DLString & ) const;
     virtual void triggers( Character *, Character *, const DLString & ) const;
     
-    virtual bool checkIgnore( Character *, Character * ) const;
     virtual bool checkAFK( Character *, Character *, const DLString & ) const;
     virtual bool checkAutoStore( Character *, Character *, const DLString & ) const;
     virtual bool checkDisconnect( Character *, Character *, const DLString & ) const;

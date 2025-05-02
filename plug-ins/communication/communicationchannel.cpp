@@ -3,7 +3,6 @@
  * ruffina, 2004
  */
 #include "communicationchannel.h"
-#include "twitlist.h"
 
 #include "commandmanager.h"
 #include "skillreference.h"
@@ -22,7 +21,7 @@ GSN(garble);
  *-----------------------------------------------------------------------*/
 CommunicationChannel::CommunicationChannel( ) 
             :   off( 0, &comm_flags ),
-                ignore( false ), garble( false ), isolate( false ), deafen( false ), hook(false), ooc(false),
+                garble( false ), isolate( false ), deafen( false ), hook(false), ooc(false),
                 positionOther( 0, &position_table )
 {
 }
@@ -45,17 +44,6 @@ bool CommunicationChannel::saveCommand() const
 bool CommunicationChannel::canHear( Character *ch ) const
 {
     return ch->get_trust( ) >= trustHear.getValue( );
-}
-
-bool CommunicationChannel::checkIgnore( Character *ch, Character *victim ) const
-{
-    if (!ignore)
-        return false;
-        
-    if (victim->is_npc( ) || ch->is_npc())
-        return false;
-
-    return talker_is_ignored(victim->getPC(), ch->getPC());
 }
 
 void CommunicationChannel::applyGarble( Character *ch, DLString &msg ) const

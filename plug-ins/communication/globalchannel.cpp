@@ -185,9 +185,6 @@ bool GlobalChannel::isGlobalListener( Character *ch, Character *victim ) const
     if (deafenOther && victim->isAffected(gsn_deafen ))
         return false;
 
-    if (checkIgnore( ch, victim ))
-        return false;
-    
     if (checkIsolator( ch, victim ))
         return false;
 

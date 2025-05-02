@@ -48,16 +48,6 @@ void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLSt
     victim->reply = ch;
 }
 
-bool PersonalChannel::checkIgnore( Character *ch, Character *victim ) const
-{
-    if (CommunicationChannel::checkIgnore( ch, victim )) {
-        oldact_p("$E не желает тебя слышать.", ch, 0, victim, TO_CHAR, position );
-        return true;
-    }
-
-    return false;
-}
-
 bool PersonalChannel::checkAFK( Character *ch, Character *victim, const DLString &msg ) const
 {
     if (!IS_SET(victim->comm, COMM_AFK))
@@ -218,9 +208,6 @@ bool PersonalChannel::canTalkPersonally( Character *ch ) const
  */
 bool PersonalChannel::isPersonalListener( Character *ch, Character *victim, const DLString &msg ) const
 {
-    if (checkIgnore( ch, victim )) 
-        return false;
-
     if (checkPosition( ch, victim ))
         return false;
     

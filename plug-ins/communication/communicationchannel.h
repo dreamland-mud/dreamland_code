@@ -23,7 +23,6 @@ public:
     bool canHear( Character * ) const;
 
 protected:
-    virtual bool checkIgnore( Character *, Character * ) const;
     virtual bool checkIsolator( Character *, Character * ) const;
 
     virtual void applyGarble( Character *, DLString & ) const;
@@ -34,7 +33,7 @@ protected:
     virtual void postOutput( Character *outputTo, const DLString &message ) const;
 
     XML_VARIABLE XMLFlagsNoEmpty off;
-    XML_VARIABLE XMLBooleanNoFalse ignore, garble, isolate, deafen, hook, ooc;
+    XML_VARIABLE XMLBooleanNoFalse garble, isolate, deafen, hook, ooc;
     XML_VARIABLE XMLIntegerNoEmpty trustSpeak, trustHear;
     XML_VARIABLE XMLEnumeration positionOther;
 };
