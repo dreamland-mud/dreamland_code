@@ -2415,6 +2415,19 @@ NMI_INVOKE( CharacterWrapper, skills, "([origin[,category]]): список на�
     return ::wrap(list);
 }
 
+NMI_INVOKE( CharacterWrapper, skillLookup, "(arg): нестрогий поиск скила по имени; сперва ищет среди доступных; возвращает его англ имя или null" )
+{
+    checkTarget();
+    DLString skillArg = args2string(args);
+    int skillIndex = skill_lookup(skillArg, target);
+
+    if (skillIndex == -1)
+        return Register();
+
+    Skill *skill = skillManager->find(skillIndex);
+    return skill->getName();
+}
+
 NMI_INVOKE( CharacterWrapper, skillsInfo, "(): список структур для доступных скилов")
 {
     checkTarget();
