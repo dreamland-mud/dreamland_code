@@ -24,16 +24,18 @@
 
 bool omprog_give( Object *obj, Character *ch, Character *victim )
 {
-    aquest_trigger(obj, ch, "Give", "OCC", obj, ch, victim);
+    if (aquest_trigger(obj, ch, "Give", "OCC", obj, ch, victim))
+        return true;
     if (obj->carried_by != victim)
         return true;
 
-    aquest_trigger(victim, ch, "Give", "CCO", victim, ch, obj);
+    if (aquest_trigger(victim, ch, "Give", "CCO", victim, ch, obj))
+        return true;
     if (obj->carried_by != victim)
         return true;
 
     if (behavior_trigger(victim, "Give", "CCO", victim, ch, obj))
-        return true;
+        return true;        
     if (obj->carried_by != victim)
         return true;
 
