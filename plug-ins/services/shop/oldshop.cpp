@@ -36,7 +36,7 @@
 #include "core/object.h"
 #include "room.h"
 #include "bonus.h"
-
+#include "areaquestutils.h"
 #include "dreamland.h"
 #include "arg_utils.h"
 #include "skill_utils.h"
@@ -89,6 +89,7 @@ bool can_afford(Character *ch, int gold, int silver, int number)
 static bool  
 mprog_sell( Character *ch, Character *buyer, Object *obj, int cost, int number )
 {
+    aquest_trigger(ch, buyer, "Sell", "CCOii", ch, buyer, obj, cost, number);
     FENIA_CALL( ch, "Sell", "COii", buyer, obj, cost, number );
     FENIA_NDX_CALL( ch->getNPC( ), "Sell", "CCOii", ch, buyer, obj, cost, number );
     return false;
