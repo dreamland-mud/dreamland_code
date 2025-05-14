@@ -222,7 +222,7 @@ NMI_INVOKE( AreaQuestWrapper, canParticipate, "(ch): персонаж ch удо�
     return Register(aquest_can_participate(pci, target, qdata));
 }
 
-NMI_INVOKE( AreaQuestWrapper, canParticipateEver, "(ch): персонаж ch на каком-то из уровней удовлетрит условиям квеста" ) 
+NMI_INVOKE( AreaQuestWrapper, canParticipateEver, "(ch): персонаж ch на каком-то из уровней удовлетворит условиям квеста" ) 
 {
     checkTarget();
     PCMemoryInterface *pci = argnum2memory(args, 1);
