@@ -54,6 +54,72 @@ Gangsters::~Gangsters( )
     thisClass = NULL;
 }
 
+static Room *findRecallRoom( PCMemoryInterface *pci )
+{
+    int recallVnum;
+    Room *recall;
+
+    if (!pci)
+        return NULL;
+
+    recallVnum = pci->getClan( )->getRecallVnum( );
+    if (recallVnum > 0)
+        recall = get_room_instance( recallVnum );
+    else
+        recall = get_room_instance( pci->getHometown( )->getRecall( ) );
+
+    if (!recall)
+        recall = get_room_instance( ROOM_VNUM_TEMPLE );
+
+    return recall;
+}
+
+static Room *findChefKillerRoomAfterKill( Gangsters *gquest, Room *lair, const DLString &killerName )
+{
+    PCharacter *killer;
+
+    if (!gquest || killerName.empty( ))
+        return NULL;
+
+    killer = PCharacterManager::findPlayer( killerName );
+    if (killer) {
+        if (killer->in_room == lair)
+            gquest->exorcism( killer );
+
+        return killer->in_room;
+    }
+
+    return findRecallRoom( PCharacterManager::find( killerName ) );
+}
+
+static void moveChefCorpseToKillerRoom( Gangsters *gquest, Room *lair, const DLString &killerName )
+{
+    Object *obj;
+    Room *targetRoom;
+    int chefVnum;
+
+    if (!lair)
+        return;
+
+    targetRoom = findChefKillerRoomAfterKill( gquest, lair, killerName );
+    if (!targetRoom)
+        return;
+
+    chefVnum = GangstersInfo::getThis( )->vnumChef;
+
+    for (obj = lair->contents; obj; obj = obj->next_content) {
+        if (obj->pIndexData->vnum != OBJ_VNUM_CORPSE_NPC)
+            continue;
+
+        if (obj->value3( ) != chefVnum)
+            continue;
+
+        obj_from_room( obj );
+        obj_to_room( obj, targetRoom );
+        return;
+    }
+}
+
 void Gangsters::create( const Config& )  
 {
     AreaList areaList;
@@ -142,6 +208,7 @@ void Gangsters::cleanup( bool performance )
 {
     Character *ch, *ch_next;
     Object *obj, *obj_next;
+    Room *lair;
     
     for (obj = object_list; obj; obj = obj_next) {
         obj_next = obj->next;
@@ -184,7 +251,12 @@ void Gangsters::cleanup( bool performance )
         extract_char( ch );
     }
     
-    wipeRoom( get_room_instance( GangstersInfo::getThis( )->vnumLair ) );
+    lair = get_room_instance( GangstersInfo::getThis( )->vnumLair );
+
+    if (state == ST_CHEF_KILLED)
+        moveChefCorpseToKillerRoom( this, lair, chefKiller.getValue( ) );
+
+    wipeRoom( lair );
 }
 
 void Gangsters::destroy( ) 
