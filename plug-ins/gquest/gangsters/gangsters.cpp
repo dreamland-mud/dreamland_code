@@ -33,6 +33,7 @@
 #include "interp.h"
 #include "act.h"
 #include "loadsave.h"
+#include "vnum.h"
 #include "msgformatter.h"
 #include "merc.h"
 #include "def.h"
@@ -92,11 +93,10 @@ static Room *findChefKillerRoomAfterKill( Gangsters *gquest, Room *lair, const D
     return findRecallRoom( PCharacterManager::find( killerName ) );
 }
 
-static void moveChefCorpseToKillerRoom( Gangsters *gquest, Room *lair, const DLString &killerName )
+static void moveChefCorpseToKillerRoom( Gangsters *gquest, Room *lair, const DLString &killerName, int chefVnum )
 {
     Object *obj;
     Room *targetRoom;
-    int chefVnum;
 
     if (!lair)
         return;
@@ -104,8 +104,6 @@ static void moveChefCorpseToKillerRoom( Gangsters *gquest, Room *lair, const DLS
     targetRoom = findChefKillerRoomAfterKill( gquest, lair, killerName );
     if (!targetRoom)
         return;
-
-    chefVnum = GangstersInfo::getThis( )->vnumChef;
 
     for (obj = lair->contents; obj; obj = obj->next_content) {
         if (obj->pIndexData->vnum != OBJ_VNUM_CORPSE_NPC)
@@ -254,7 +252,7 @@ void Gangsters::cleanup( bool performance )
     lair = get_room_instance( GangstersInfo::getThis( )->vnumLair );
 
     if (state == ST_CHEF_KILLED)
-        moveChefCorpseToKillerRoom( this, lair, chefKiller.getValue( ) );
+        moveChefCorpseToKillerRoom( this, lair, chefKiller.getValue( ), GangstersInfo::getThis( )->vnumChef );
 
     wipeRoom( lair );
 }
