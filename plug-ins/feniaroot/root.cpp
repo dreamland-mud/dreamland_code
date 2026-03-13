@@ -1,4 +1,4 @@
-/* $Id: root.cpp,v 1.1.4.35.6.25 2009/11/08 17:46:27 rufina Exp $
+8/* $Id: root.cpp,v 1.1.4.35.6.25 2009/11/08 17:46:27 rufina Exp $
  *
  * ruffina, 2004
  */
@@ -1426,7 +1426,8 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats]): применить 
             .item(obj)
             .alignment(ch->alignment)
             .player(ch->getPC())
-            .randomTier(bestTier)
+            // The tier is already decided by caller (Fenia), do not roll it again.
+            .tier(bestTier)
             .randomizeAll();
     }
         
