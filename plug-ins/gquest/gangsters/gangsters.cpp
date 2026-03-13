@@ -289,7 +289,7 @@ void Gangsters::report( std::ostringstream &buf, PCharacter *ch ) const
         printRemainedTime( buf );
         buf << "." << endl;
     }
-}
+}4
 
 void Gangsters::progress( std::ostringstream &buf ) const
 {
