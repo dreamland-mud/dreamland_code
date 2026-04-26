@@ -673,7 +673,6 @@ void reset_room(Room *pRoom, int flags)
             }
 
             obj = create_object( pObjIndex, 0 );
-            obj->cost = 0;
             obj->reset_room = pRoom->vnum;
             obj_to_room( obj, pRoom );
             eventBus->publish(ItemResetEvent(obj, pReset));
