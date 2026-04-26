@@ -81,8 +81,13 @@ void extract_obj_1( Object *obj, bool count, const char *not_used )
 
         } else if (obj->carried_by != 0) {
             Character *carrier = obj->carried_by;
-            bool echoAround = (obj->wear_loc == wear_float);
-            
+            // Echo to room when:
+            //   * floating items (the original case -- they hover above the carrier)
+            //   * limited items (others in the room should know a unique just dropped
+            //     out of the world; they may want to track it for repop or react ICly)
+            bool echoAround = (obj->wear_loc == wear_float)
+                || (obj->pIndexData && obj->pIndexData->limit > 0);
+
             obj_from_char(obj);
 
             if (!message.empty()) {
