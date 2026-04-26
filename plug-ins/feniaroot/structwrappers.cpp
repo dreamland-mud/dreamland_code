@@ -956,6 +956,38 @@ NMI_GET( ClanWrapper, bookVnum , "vnum секретной книги (или 0)"
         return Register( clanArea->bookVnum );
 }
 
+NMI_GET( ClanWrapper, gold, "золотых монет в банке клана" )
+{
+    Clan *clan = clanManager->find( name );
+    if (!clan->getData( ) || !clan->getData( )->getBank( ))
+        return Register( 0 );
+    return Register( clan->getData( )->getBank( )->gold.getValue( ) );
+}
+
+NMI_GET( ClanWrapper, silver, "серебряных монет в банке клана" )
+{
+    Clan *clan = clanManager->find( name );
+    if (!clan->getData( ) || !clan->getData( )->getBank( ))
+        return Register( 0 );
+    return Register( clan->getData( )->getBank( )->silver.getValue( ) );
+}
+
+NMI_GET( ClanWrapper, diamonds, "бриллиантов в банке клана" )
+{
+    Clan *clan = clanManager->find( name );
+    if (!clan->getData( ) || !clan->getData( )->getBank( ))
+        return Register( 0 );
+    return Register( clan->getData( )->getBank( )->diamonds.getValue( ) );
+}
+
+NMI_GET( ClanWrapper, questpoints, "квестовых единиц в банке клана" )
+{
+    Clan *clan = clanManager->find( name );
+    if (!clan->getData( ) || !clan->getData( )->getBank( ))
+        return Register( 0 );
+    return Register( clan->getData( )->getBank( )->questpoints.getValue( ) );
+}
+
 static const char *diplomacy_names [] = {
     "alliance",
     "peace",
