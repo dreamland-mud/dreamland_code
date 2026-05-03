@@ -39,6 +39,7 @@ wrap_utils.cpp \
 feniacroaker.cpp \
 commandtableloader.cpp \
 codesourcerepo.cpp \
+evalservlet.cpp \
 behaviorwrapper.cpp \
 behaviorloader.cpp \
 playerwrapper.cpp
@@ -83,11 +84,13 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/languages/core \
 -I$(top_srcdir)/plug-ins/services/petshop \
 -I/usr/include/jsoncpp \
+-I$(top_srcdir)/plug-ins/servlets \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
 
 libfeniaroot_la_LIBADD = \
 $(LIBADD_AI) \
+../servlets/libservlets.la \
 ../liquid/libliquid.la \
 ../ed/lib/libed.la \
 ../ed/libcoreed.la \

@@ -192,6 +192,8 @@ bool CodeSourceRepo::read(const DLString &csName)
 
         cs.eval();
 
+        LogStream::sendNotice() << "CS repo: read and eval " << csName << " [" << cs.getId() << "]" << endl;
+
     } catch(const ::Exception& e) {
         LogStream::sendError() << "CS repo: read " << csName << ": " << e.what() << endl;
         return false;

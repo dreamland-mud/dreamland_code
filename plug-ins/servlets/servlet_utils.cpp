@@ -67,7 +67,7 @@ bool servlet_auth_bot(Json::Value &params, HttpResponse &response)
     DLString token = read_token();
 
     if (myToken.empty() || token.empty() || myToken != token) {
-        LogStream::sendError() << "Servlet token " << myToken << ", expected " << token << endl;
+        LogStream::sendError() << "Servlet auth failed: invalid or missing token" << endl;
         response.status = 403;
         response.message = "Unathorized";
         response.body = "Invalid token";
