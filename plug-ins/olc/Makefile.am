@@ -30,7 +30,8 @@ fedit.cpp \
 raceedit.cpp \
 qedit.cpp \
 bedit.cpp \
-reditservlet.cpp
+reditservlet.cpp \
+capturebufferhandler.cpp
 
 libolc_la_MOC = \
 redit.h \

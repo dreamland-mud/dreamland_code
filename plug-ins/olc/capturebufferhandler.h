@@ -12,9 +12,8 @@ class CaptureBufferHandler : public BufferHandler {
 public:
     typedef ::Pointer<CaptureBufferHandler> Pointer;
 
-    virtual void write(Descriptor *d, const char *txt) {
-        captured << txt;
-    }
+    virtual ~CaptureBufferHandler();
+    virtual void write(Descriptor *d, const char *txt);
 
     DLString getString() const { return captured.str(); }
 
