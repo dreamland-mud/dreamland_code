@@ -1426,7 +1426,8 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats]): применить 
             .item(obj)
             .alignment(ch->alignment)
             .player(ch->getPC())
-            .randomTier(bestTier)
+            // The tier is already decided by caller (Fenia), do not roll it again.
+            .tier(bestTier)
             .randomizeAll();
     }
         
