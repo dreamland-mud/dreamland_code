@@ -29,7 +29,8 @@ feniatriggers.cpp \
 fedit.cpp \
 raceedit.cpp \
 qedit.cpp \
-bedit.cpp
+bedit.cpp \
+reditservlet.cpp
 
 libolc_la_MOC = \
 redit.h \
@@ -64,6 +65,7 @@ $(INCLUDES_FIGHT) \
 -I$(top_srcdir)/plug-ins/social \
 -I$(top_srcdir)/plug-ins/ed \
 -I$(top_srcdir)/plug-ins/ed/lib \
+-I$(top_srcdir)/plug-ins/servlets \
 $(INCLUDES_SRC) 
 
 
@@ -77,6 +79,7 @@ $(LIBADD_FIGHT) \
 ../skills_impl/libskills_impl.la \
 ../updates/libupdates.la \
 ../social/libsocial.la \
+../servlets/libservlets.la \
 -ljsoncpp
 
 olcflags.cpp: olcflags.conf olcflags.h
