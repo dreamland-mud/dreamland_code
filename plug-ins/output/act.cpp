@@ -83,16 +83,66 @@ DLString act_to_fmt(const char *s)
         buf << actChar_to_fmtChar(*s);
         ++s;
     }
-    
-    // слово 'люди' пишется с большой буквы
-    DLString rc = buf.str();
-    DLString r = rc.colourStrip();
-    if (r.length() > 2 && r.at(0) == '%' && isdigit(r.at(1)) && r.at(2) == '$') {
-        DLString::size_type i = rc.find_first_of('$');
-        rc = rc.substr(0, i+1) + "^" + rc.substr(i+1);
+
+    // Капитализируем %N$ подстановки в начале каждого предложения:
+    // в начале строки, после '!', '?', или одиночной '.' (не ellipsis).
+    // Раньше капитализировалась только самая первая подстановка, из-за чего
+    // фразы вида "$c1 ... . $C1 ..." рендерились со второй частью с маленькой
+    // буквы.
+    DLString src = buf.str();
+    DLString out;
+    out.reserve(src.size() + 8);
+
+    bool capitalize_next = true;
+    for (size_t i = 0; i < src.size(); ) {
+        char c = src[i];
+
+        // Цветовые коды {X — пропускаем, флаг не сбрасываем.
+        if (c == '{' && i + 1 < src.size()) {
+            out += c;
+            out += src[i+1];
+            i += 2;
+            continue;
+        }
+
+        // %N$ подстановка — точка вставки ^.
+        if (capitalize_next && c == '%' && i + 2 < src.size()
+            && isdigit((unsigned char)src[i+1]) && src[i+2] == '$') {
+            out += '%';
+            out += src[i+1];
+            out += '$';
+            if (i + 3 >= src.size() || src[i+3] != '^')
+                out += '^';
+            i += 3;
+            capitalize_next = false;
+            continue;
+        }
+
+        if (c == '!' || c == '?') {
+            capitalize_next = true;
+            out += c;
+            ++i;
+            continue;
+        }
+        if (c == '.') {
+            // ellipsis (две и более '.') — НЕ начало предложения.
+            capitalize_next = !(i > 0 && src[i-1] == '.');
+            out += c;
+            ++i;
+            continue;
+        }
+        if (isspace((unsigned char)c)) {
+            out += c;
+            ++i;
+            continue;
+        }
+
+        out += c;
+        capitalize_next = false;
+        ++i;
     }
-        
-    return rc;
+
+    return out;
 }
 
 void oldact( const char *format, Character *ch, const void *arg1,
