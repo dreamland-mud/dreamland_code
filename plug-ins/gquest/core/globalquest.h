@@ -26,8 +26,10 @@ struct AreaIndexData;
 
 
 class GlobalQuest : public SchedulerTask, public XMLVariableContainer {
-XML_OBJECT    
+XML_OBJECT
 public:
+    static const int DEFAULT_MIN_LEVEL = 11;
+
     typedef ::Pointer<GlobalQuest> Pointer;
     typedef vector<NPCharacter *> MobileList;
     typedef vector<Object *> ObjectList;

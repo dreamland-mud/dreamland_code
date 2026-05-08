@@ -144,9 +144,9 @@ bool GlobalQuest::isLevelOK( Character *ch ) const
     
     if (ch->is_npc( ))
         return false;
-   
+
     if (!hasLevels( ))
-        return true;
+        return level >= DEFAULT_MIN_LEVEL;
 
     if (level >= getMinLevel( ) && level <= getMaxLevel( ))
         return true;

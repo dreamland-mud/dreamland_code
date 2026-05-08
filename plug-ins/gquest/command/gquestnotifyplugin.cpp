@@ -51,11 +51,11 @@ void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d )
             << GQChannel::NORMAL << " (для ";
             
         if (gq->hasLevels( ))
-            buf << GQChannel::BOLD << gq->getMinLevel( ) 
+            buf << GQChannel::BOLD << gq->getMinLevel( )
                 << "-" << gq->getMaxLevel( ) << GQChannel::NORMAL;
         else
-            buf << "всех";
-        
+            buf << GQChannel::BOLD << GlobalQuest::DEFAULT_MIN_LEVEL << "+" << GQChannel::NORMAL;
+
         buf << " уровней)" << endl;
     }
 
