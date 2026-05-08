@@ -61,6 +61,14 @@ bool GangstersInfo::canHear( PCharacter *ch ) const
     return true;
 }
 
+bool GangstersInfo::canParticipate( PCharacter *ch ) const
+{
+    if (ch->getRealLevel( ) < 10)
+        return false;
+
+    return GlobalQuestInfo::canParticipate( ch );
+}
+
 GlobalQuest::Pointer GangstersInfo::getQuestInstance( ) const
 {
     return Gangsters::Pointer( NEW, QUEST_ID );
