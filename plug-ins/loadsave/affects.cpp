@@ -94,6 +94,14 @@ void affect_remove_obj( Object *obj, Affect *paf, bool verbose )
     AffectManager::getThis()->extract(paf);
 }
 
+int obj_weapon_flags(const Object *obj)
+{
+    int flags = obj->value4();
+    for (auto &paf: obj->affected.findAllWithBits(&weapon_type2, -1))
+        flags |= paf->bitvector.getValue();
+    return flags;
+}
+
 void affect_to_obj( Object *obj, const Affect *paf )
 {
     // Remove old affects given by this object to the carrier.
