@@ -43,7 +43,8 @@ socket.cpp \
 reward.cpp \
 confirm.cpp \
 reboot.cpp \
-adminservlet.cpp
+adminservlet.cpp \
+forceservlet.cpp
 
 libplugin_command_la_LIBADD = \
 ../descriptor/libdescriptor.la \

@@ -27,6 +27,7 @@ const char *MSG_EOL = "\r\n";
 void
 DefaultBufferHandlerPlugin::initialization()
 {
+    Class::regMoc<OutputEntry>();
     Class::regMoc<DefaultBufferHandler>();
 
     Descriptor *d;
@@ -46,6 +47,7 @@ DefaultBufferHandlerPlugin::destruction()
             d->buffer_handler.backup( );
     
     Class::unregMoc<DefaultBufferHandler>();
+    Class::unregMoc<OutputEntry>();
 }
 
 DefaultBufferHandler::DefaultBufferHandler()
@@ -226,12 +228,28 @@ DefaultBufferHandler::read( Descriptor *d )
     return true;
 }
 
+long long DefaultBufferHandler::getCurrentSeq() const
+{
+    return seqCounter.getValue();
+}
+
 // TODO use convert method.
 void 
 DefaultBufferHandler::write( Descriptor *d, const char *txt ) 
 {
     int size, length;
     int i;
+
+    // Capture raw output into the ring buffer with a monotonic sequence number.
+    {
+        OutputEntry entry;
+        entry.seq = ++seqCounter;
+        entry.text = txt;
+        outputLog.push_back(entry);
+        if ((int)outputLog.size() > MAX_OUTPUT_LINES)
+            outputLog.erase(outputLog.begin(),
+                            std::next(outputLog.begin(), outputLog.size() - MAX_OUTPUT_LINES));
+    }
 
     if( d->snoop_by )
         d->snoop_by->send( txt );

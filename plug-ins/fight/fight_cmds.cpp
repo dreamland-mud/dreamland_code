@@ -152,31 +152,6 @@ CMDRUN( murder )
 
 
 
-CMDRUN( flee )
-{
-    if (ch->fighting == 0) {
-        if ( ch->position == POS_FIGHTING )
-            ch->position = POS_STANDING;
-
-        ch->pecho("Ты ни с кем не сражаешься.");
-        return;
-    }
-
-    if (ch->getProfession( ) == prof_samurai
-        && ch->getRealLevel( ) > 10
-        && number_percent( ) < min( ch->getRealLevel( ) - 10, 90 ))
-    {
-        ch->pecho("Это будет слишком большим позором для тебя!");
-        return;
-    }
-    if (ch->detection.isSet(ADET_IMMOBILIZED)) {
-        ch->pecho("Ты обездвижен{Sfа{Sx и не можешь сбежать!");
-        return; 
-    }
-    
-    FleeMovement( ch ).move( );
-}
-
 CMDRUN( slay )
 {
     Character *victim;

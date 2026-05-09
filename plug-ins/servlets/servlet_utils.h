@@ -16,6 +16,7 @@ DLString servlet_find_username(Json::Value &params, HttpResponse &response);
 bool servlet_get_arg(const Json::Value &params, const DLString &argName, DLString &argValue);
 bool servlet_get_arg(const Json::Value &params, HttpResponse &response, const DLString &argName, DLString &argValue);
 void servlet_response_200(HttpResponse &response, const DLString &text);
+void servlet_response_400(HttpResponse &response, const DLString &text);
 void servlet_response_404(HttpResponse &response, const DLString &text);
 void servlet_response_200_json(HttpResponse &response, const Json::Value &payload);
 

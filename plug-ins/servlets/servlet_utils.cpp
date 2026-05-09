@@ -134,9 +134,7 @@ bool servlet_get_arg(const Json::Value &params, const DLString &argName, DLStrin
 bool servlet_get_arg(const Json::Value &params, HttpResponse &response, const DLString &argName, DLString &argValue)
 {
     if (!servlet_get_arg(params, argName, argValue)) {
-        response.status = 400;
-        response.message = "Bad request";
-        response.body = "Required parameter args." + argName + " not found";
+        servlet_response_400(response, "Required parameter args." + argName + " not found");
         return false;
     }
 
@@ -147,6 +145,13 @@ void servlet_response_200(HttpResponse &response, const DLString &text)
 {
     response.status = 200;
     response.message = "OK"; 
+    response.body = text;
+}
+
+void servlet_response_400(HttpResponse &response, const DLString &text)
+{
+    response.status = 400;
+    response.message = "Bad request";
     response.body = text;
 }
 

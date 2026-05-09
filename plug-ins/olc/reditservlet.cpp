@@ -106,17 +106,13 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
     int vnum = vnumStr.toInt();
     RoomIndexData *pRoom = get_room_index(vnum);
     if (!pRoom) {
-        response.status = 404;
-        response.message = "Not found";
-        response.body = "Room vnum " + vnumStr + " not found";
+        servlet_response_404(response, "Room vnum " + vnumStr + " not found");
         return;
     }
 
     Room *roomInstance = get_room_instance(vnum);
     if (!roomInstance) {
-        response.status = 404;
-        response.message = "Not found";
-        response.body = "Room instance for vnum " + vnumStr + " not found";
+        servlet_response_404(response, "Room instance for vnum " + vnumStr + " not found");
         return;
     }
 
@@ -149,9 +145,7 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
         CommandBase::Pointer cmd = sr->findCommand(ch, subcmd);
         if (!cmd) {
             servlet_cleanup_char(ch);
-            response.status = 400;
-            response.message = "Bad request";
-            response.body = "Unknown redit subcommand: " + subcmd;
+            servlet_response_400(response, "Unknown redit subcommand: " + subcmd);
             return;
         }
 
