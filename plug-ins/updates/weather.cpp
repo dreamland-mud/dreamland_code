@@ -30,6 +30,9 @@
 #include "loadsave.h"
 #include "act.h"
 #include "messengers.h"
+#include "screenreader.h"
+#include "calendar_utils.h"
+#include "bonus.h"
 #include "merc.h"
 #include "def.h"
 
@@ -635,21 +638,102 @@ protected:
         if (m == month_table_size - 1)
             buf << endl;
     }
+
+    // Plain-text calendar for screenreader users. Lists today's date, the
+    // bonuses currently in effect (with days remaining for time-bound ones
+    // like altar bonuses), and the next 35 days of upcoming bonuses.
+    void draw_screenreader(ostringstream &out)
+    {
+        long today = day_of_epoch(time_info);
+
+        out << fmt(0, "Сегодня -- %d число месяца %s, год %d.",
+                   time_info.day + 1,
+                   month_table[time_info.month].name,
+                   time_info.year)
+            << endl << endl;
+
+        // Active bonuses today.
+        ostringstream active;
+        for (int bn = 0; bn < bonusManager->size(); bn++) {
+            Bonus *bonus = bonusManager->find(bn);
+            if (!bonus->isActive(ch, time_info))
+                continue;
+
+            active << "  -- " << bonus->getRussianName();
+
+            PCBonusData &data = ch->getBonuses().get(bn);
+            if (data.start <= today && today <= data.end) {
+                long days_left = data.end - today;
+                int end_day   = data.end % 35;
+                int end_month = (data.end / 35) % 17;
+                if (days_left == 0) {
+                    active << " (до конца дня)";
+                } else {
+                    active << fmt(0, ": осталось %1$d дн%1$Iень|я|ей (до %2$d числа месяца %3$s)",
+                                  (int)days_left, end_day + 1, month_table[end_month].name);
+                }
+            } else {
+                active << " (общий, действует сегодня для всех)";
+            }
+            active << "." << endl;
+        }
+
+        if (active.tellp() > 0)
+            out << "Активные бонусы:" << endl << active.str() << endl;
+        else
+            out << "Сегодня нет активных бонусов." << endl << endl;
+
+        // Upcoming bonuses in the next 35 days.
+        ostringstream upcoming;
+        for (int bn = 0; bn < bonusManager->size(); bn++) {
+            Bonus *bonus = bonusManager->find(bn);
+            if (bonus->isActive(ch, time_info))
+                continue;
+
+            for (int days_ahead = 1; days_ahead <= 35; days_ahead++) {
+                long fut = today + days_ahead;
+                struct time_info_data future_ti;
+                future_ti.day   = fut % 35;
+                future_ti.month = (fut / 35) % 17;
+                future_ti.year  = fut / (35 * 17);
+                future_ti.hour  = time_info.hour;
+
+                if (!bonus->isActive(ch, future_ti))
+                    continue;
+
+                upcoming << "  -- " << bonus->getRussianName()
+                         << fmt(0, ": через %1$d дн%1$Iень|я|ей (%2$d числа месяца %3$s)",
+                                days_ahead,
+                                future_ti.day + 1,
+                                month_table[future_ti.month].name)
+                         << "." << endl;
+                break;
+            }
+        }
+
+        if (upcoming.tellp() > 0)
+            out << "Ближайшие бонусы:" << endl << upcoming.str();
+    }
 };
 
 CMDRUN( calendar )
 {
     if (ch->is_npc())
         return;
- 
-    ostringstream buf;
-    Calendar calendar(ch->getPC()); 
 
-    calendar.draw(buf); // TO-DO (RUFFINA): Let's find more accessible display for visually impaired and color-blind
-    buf << "{WУсловные обозначения цветом{x: " << endl
-        << "         {RX{x: сегодня, {cX{x: больше опыта за убийства, {bX{x: меньше расход маны," << endl        
-        << "         {GX{x: быстрее прокачка умений, {DX{x: низкие цены, {MX{x: удачнее воровские навыки," << endl
-        << "         {gX{x: существа быстрее улучшают параметры" << endl;
+    PCharacter *pch = ch->getPC();
+    ostringstream buf;
+    Calendar calendar(pch);
+
+    if (uses_screenreader(pch)) {
+        calendar.draw_screenreader(buf);
+    } else {
+        calendar.draw(buf);
+        buf << "{WУсловные обозначения цветом{x: " << endl
+            << "         {RX{x: сегодня, {cX{x: больше опыта за убийства, {bX{x: меньше расход маны," << endl
+            << "         {GX{x: быстрее прокачка умений, {DX{x: низкие цены, {MX{x: удачнее воровские навыки," << endl
+            << "         {gX{x: существа быстрее улучшают параметры" << endl;
+    }
     ch->send_to(buf);
 }
 
