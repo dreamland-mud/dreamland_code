@@ -64,7 +64,7 @@ CMDRUNP( where )
 
     if (arg.empty( ) || fPKonly)
     {
-        ch->pecho( "Ты находишься в местности {W{hh%s{x. Недалеко от тебя:",
+        ch->pecho( "Ты находишься в зоне {W{hh%s{x. Недалеко от тебя:",
                      ch->in_room->areaName().c_str() );
         found = false;
 
