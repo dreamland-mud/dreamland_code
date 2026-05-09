@@ -16,7 +16,7 @@ const char * movedanger_names [] = {
 const struct movetype_t movetypes [] = {
  { MOVETYPE_SWIMMING,   MOVETYPE_NORMAL,    1, false, "swimming",  "плыть",    "приплы%1$Gло|л|ла|ли",           "уплы%1$Gло|л|ла|ли",
  },
- { MOVETYPE_WATER_WALK, MOVETYPE_NORMAL,    1, false, "waterwalk", "идти",     "пришлепа%1$Gло|ел|ла|ли по воде", "ушлепа%1$Gло|ел|ла|ли по воде",
+ { MOVETYPE_WATER_WALK, MOVETYPE_NORMAL,    1, false, "waterwalk", "идти",     "пришлепа%1$Gло|л|ла|ли по воде", "ушлепа%1$Gло|л|ла|ли по воде",
  },
  { MOVETYPE_SLINK,      MOVETYPE_MORESAFE,  3, true,  "slink",     "ползти",   "приполз%1$Gло||ла|ли",            "уполз%1$Gло||ла|ли",
  },
