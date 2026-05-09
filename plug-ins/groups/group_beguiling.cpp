@@ -119,7 +119,7 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
 
     if (victim->is_npc())
         {
-        ch->pecho("Душа этого противника неподвластна тебе!.");
+        ch->pecho("Душа этого противника неподвластна тебе!");
         return;
         }
 
