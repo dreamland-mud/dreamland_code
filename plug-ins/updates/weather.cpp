@@ -571,74 +571,6 @@ struct Calendar {
         out << buf.str();
     }
 
-protected:
-    PCharacter *ch;
-    ostringstream buf;
-
-    void draw_divider()
-    {
-        buf << "{D--------------------+--------------------+--------------------+--------------------" << endl;
-    }
-
-    char day_color(int day, int month)
-    {
-        struct time_info_data ti;
-        ti.day = day;
-        ti.month = month;
-        ti.year = time_info.year;
-
-        if (day == time_info.day && month == time_info.month)
-            return 'R';
-        
-        for (int bn = 0; bn < bonusManager->size(); bn++) {
-            Bonus *bonus = bonusManager->find(bn);
-            if (bonus->isActive(ch, ti))
-                return bonus->getColor();
-        }
-        return 'x';
-    }
-
-    void draw_day(int day, int month)
-    {
-        char color = day_color(day, month);
-        if (color != 'x')
-            buf << "{" << color;
-
-        buf << fmt(0, "%2d", day+1);
-
-        if (color != 'x')
-            buf << "{x";
-
-        if (day%7 != 6)
-            buf << " ";
-    }
-
-    void draw_week(int week, int month)
-    {
-        for (int day = 0; day < 7; day++) 
-            draw_day((week*7+day), month);
-
-        if ((month+1)%4 != 0)
-            buf << "{D|{x";
-
-        if (month == month_table_size - 1)
-            buf << endl;
-    }
-
-    void draw_month_name(int m)
-    {
-        const month_info &month = month_table[m];
-        buf << " {" << season_table[month.season].color << fmt(0, "%-18s", month.name);
-
-        if ((m+1)%4 != 0)
-            buf << "{D|{x";
-        else
-            buf << "{x" << endl;
-
-        if (m == month_table_size - 1)
-            buf << endl;
-    }
-
     // Plain-text calendar for screenreader users. Lists today's date, the
     // bonuses currently in effect (with days remaining for time-bound ones
     // like altar bonuses), and the next 35 days of upcoming bonuses.
@@ -713,6 +645,74 @@ protected:
 
         if (upcoming.tellp() > 0)
             out << "Ближайшие бонусы:" << endl << upcoming.str();
+    }
+
+protected:
+    PCharacter *ch;
+    ostringstream buf;
+
+    void draw_divider()
+    {
+        buf << "{D--------------------+--------------------+--------------------+--------------------" << endl;
+    }
+
+    char day_color(int day, int month)
+    {
+        struct time_info_data ti;
+        ti.day = day;
+        ti.month = month;
+        ti.year = time_info.year;
+
+        if (day == time_info.day && month == time_info.month)
+            return 'R';
+        
+        for (int bn = 0; bn < bonusManager->size(); bn++) {
+            Bonus *bonus = bonusManager->find(bn);
+            if (bonus->isActive(ch, ti))
+                return bonus->getColor();
+        }
+        return 'x';
+    }
+
+    void draw_day(int day, int month)
+    {
+        char color = day_color(day, month);
+        if (color != 'x')
+            buf << "{" << color;
+
+        buf << fmt(0, "%2d", day+1);
+
+        if (color != 'x')
+            buf << "{x";
+
+        if (day%7 != 6)
+            buf << " ";
+    }
+
+    void draw_week(int week, int month)
+    {
+        for (int day = 0; day < 7; day++) 
+            draw_day((week*7+day), month);
+
+        if ((month+1)%4 != 0)
+            buf << "{D|{x";
+
+        if (month == month_table_size - 1)
+            buf << endl;
+    }
+
+    void draw_month_name(int m)
+    {
+        const month_info &month = month_table[m];
+        buf << " {" << season_table[month.season].color << fmt(0, "%-18s", month.name);
+
+        if ((m+1)%4 != 0)
+            buf << "{D|{x";
+        else
+            buf << "{x" << endl;
+
+        if (m == month_table_size - 1)
+            buf << endl;
     }
 };
 
