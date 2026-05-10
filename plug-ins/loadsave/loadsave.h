@@ -137,14 +137,7 @@ bool eyes_blinded( Character *ch );
 bool eyes_darkened( Character *ch );
 void eyes_blinded_msg( Character *ch );
 
-// Returns the weapon flag bitvector merged from value4() and any TO_WEAPON
-// (weapon_type2) affects on the object. Spells like envenom, poison,
-// hunger_weapon and winters_touch add their flags as bitvector affects;
-// callers reading IS_WEAPON_STAT must see them, otherwise combat branches
-// for poison/vampiric/flaming/etc. silently no-op for spell-affected weapons.
-int obj_weapon_flags(const Object *obj);
-
-#define IS_WEAPON_STAT(obj,stat)(IS_SET(obj_weapon_flags(obj),(stat)))
+#define IS_WEAPON_STAT(obj,stat)(IS_SET((obj)->value4(),(stat)))
 
 #define IS_PIT(obj)        (obj->item_type == ITEM_CONTAINER \
                             && IS_SET(obj->value1(), CONT_PIT))
