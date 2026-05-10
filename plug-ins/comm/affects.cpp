@@ -259,7 +259,7 @@ struct PermanentAffects {
         print("Ты обладаешь сопротивляемостью к", my_res, imm_flags, '3');
         print("Ты уязвим%1$Gо||а к", my_vuln, imm_flags, '3');
         print("Ты способ%1$Gно|ен|на обнаружить", my_det, detect_flags, '4');
-        print("Ты под воздействием", my_aff, affect_flags, '2', "{Y", "{x");
+        print("Ты под воздействием", my_aff, affect_flags, '2');
 
         if (ch->getProfession()->getFlags().isSet(PROF_DIVINE) && ch->getReligion() == god_none)
             ch->pecho("У тебя {rштраф{x на все молитвы, пока ты не выберешь себе {hh1религию{x.");
@@ -289,36 +289,12 @@ struct PermanentAffects {
     }
 
 private:
-    void print(const char *messagePrefix, const int &my_flags, const FlagTable &my_table, char gcase,
-               const char *colorOpen = "", const char *colorClose = "") const {
+    void print(const char *messagePrefix, const int &my_flags, const FlagTable &my_table, char gcase) const {
         if (my_flags == 0)
             return;
 
-        ostringstream buf;
-        buf << messagePrefix << " ";
-
-        if (colorOpen[0] == '\0') {
-            buf << my_table.messages(my_flags, true, gcase);
-        } else {
-            // Per-name highlight: iterate flags, wrap each name in color codes,
-            // join with plain ", " so commas keep the default colour.
-            bool first = true;
-            Bitstring b(my_flags);
-            for (int i = 0; i <= my_table.max; i++) {
-                if (!b.isSetBitNumber(i) || my_table.reverse[i] == NO_FLAG)
-                    continue;
-                DLString name = my_table.message(i, gcase);
-                if (name.empty())
-                    continue;
-                if (!first)
-                    buf << ", ";
-                buf << colorOpen << name << colorClose;
-                first = false;
-            }
-        }
-
-        buf << ".";
-        DLString message = buf.str();
+        StringList names = my_table.toStringList(my_flags, gcase);
+        DLString message = DLString(messagePrefix) + " " + names.wrap("{Y", "{x").join(", ") + ".";
         ch->pecho(message.c_str(), ch);
     }
 

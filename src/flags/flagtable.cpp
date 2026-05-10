@@ -4,6 +4,7 @@
  */
 #include "flagtable.h"
 #include "dl_strings.h"
+#include "stringlist.h"
 
 /*----------------------------------------------------------------------
  * FlagTable
@@ -109,6 +110,27 @@ DLString FlagTable::messages( bitstring_t bits, bool comma, char gcase ) const
         }
 
     return buf;
+}
+
+StringList FlagTable::toStringList( bitstring_t bits, char gcase ) const
+{
+    StringList result;
+
+    if (bits == NO_FLAG)
+        return result;
+
+    Bitstring b( bits );
+
+    for (int i = 0; i <= max; i++)
+        if (b.isSetBitNumber( i ) && reverse[i] != NO_FLAG) {
+            const char *msg = fields[reverse[i]].message;
+            if (!msg)
+                msg = fields[reverse[i]].name;
+
+            result.push_back( DLString(msg).ruscase( gcase ) );
+        }
+
+    return result;
 }
 
 DLString FlagTable::name( bitnumber_t value ) const

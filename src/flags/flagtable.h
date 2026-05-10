@@ -8,6 +8,8 @@
 #include "dlstring.h"
 #include "bitstring.h"
 
+class StringList;
+
 const int NO_FLAG   = -99;
 
 /*
@@ -25,13 +27,14 @@ struct FlagTable {
     const int size;
     const int max;
     const bool enumerated;
-    
+
     int index( const DLString &arg, bool strict = true ) const;
     bitstring_t bitstring( const DLString &arg, bool strict = true ) const;
     bitnumber_t value( const DLString &arg, bool strict = true ) const;
 
     DLString names( bitstring_t ) const;
     DLString messages( bitstring_t, bool comma = false, char gcase = '1' ) const;
+    StringList toStringList( bitstring_t bits, char gcase = '1' ) const;
 
     DLString name( bitnumber_t value ) const;
     DLString message( bitnumber_t value, char gcase = '1' ) const;
