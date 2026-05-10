@@ -543,19 +543,13 @@ static bool get_value3_from_proto(const Object *obj)
     }
 }
 
-static bool get_value4_from_proto(const Object *obj)
+static bool get_value4_from_proto(const Object *)
 {
-    switch (obj->item_type) {
-        case ITEM_WEAPON: 
-            // value4 (weapon flags) is changed on rand_stat and rand_all weapons
-            if (!obj->getProperty("tier").empty())
-                return false;
-
-            return true;
-
-        default:
-            return false;
-    }
+    // Always read value4 from the instance. TO_WEAPON affects (envenom,
+    // poison, hunger_weapon, winters_touch, ...) OR their bits into
+    // obj->value[4] via affect_to_obj; reading from the prototype hides
+    // those bits and silently no-ops combat branches like vampiric/poison.
+    return false;
 }
 
 bool Object::getsValueFromProto(int index) const

@@ -284,15 +284,6 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             af.sources.add(wield);
             affect_join( victim, &af );
         }
-
-        // weaken the poison if it's temporary
-        if ( poison != 0 )
-        {
-            poison->level = max(0,poison->level - 2);
-            poison->duration = max(0,poison->duration - 1);
-            if ( poison->level == 0 || poison->duration == 0 )
-                oldact("Яд с $o2 скоро исчезнет.",ch,wield,0,TO_CHAR);
-        }
     }
 
     if (IS_WEAPON_STAT(wield,WEAPON_VAMPIRIC))
