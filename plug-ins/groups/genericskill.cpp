@@ -427,7 +427,7 @@ bool SkillClassInfo::visible( ) const
 bool GenericSkill::accessFromString(const DLString &newValue, ostringstream &errBuf)
 {
     auto values = newValue.split(";");
-    DLString classValues = values.front().stripWhiteSpace();
+    DLString classValues = values.empty() ? DLString::emptyString : values.front().stripWhiteSpace();
     DLString raceBonusValues = values.size() > 1 ? values.back().stripWhiteSpace() : DLString::emptyString;
 
     map<DLString, int> newClasses = parseAccessTokens(classValues, professionManager, errBuf);
