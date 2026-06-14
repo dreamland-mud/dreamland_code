@@ -120,6 +120,7 @@ void Character::init( )
     race.assign( race_none );
     religion.assign( god_none );
     last_fight_time = 0;
+    adrenaline_pending = false;
 
     extracted = false;
     reply = 0;

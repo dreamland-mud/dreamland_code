@@ -211,6 +211,7 @@ protected:
     XML_VARIABLE XMLRaceReference race;
     XML_VARIABLE XMLReligionReference religion;
     time_t                        last_fight_time;
+    bool                          adrenaline_pending; // armed by setLastFightTime, fires one "calmed down" line when adrenaline decays
 
 public:
     bool extracted;

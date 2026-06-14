@@ -48,11 +48,13 @@ time_t Character::getLastFightDelay( ) const
 void Character::setLastFightTime( )
 {
     last_fight_time = dreamland->getCurrentTime( );
+    adrenaline_pending = true;
 }
 
 void Character::unsetLastFightTime( )
 {
     last_fight_time = -1;
+    adrenaline_pending = false; // death/reset: suppress the "calmed down" line
 }
 
 time_t Character::getLastFightTime( ) const
