@@ -740,7 +740,7 @@ NMI_INVOKE( CharacterWrapper, flydown, "опуститься на землю б�
     if (is_flying(target)) {
         target->posFlags.setBit( POS_FLY_DOWN );
         target->pecho( "Ты перестаешь летать." );
-        target->recho( "%^C1 перестает летать.", target ); 
+        target->recho( "%1$^C1 переста%1$nет|ют летать.", target );
         return Register(true);
     }
 
