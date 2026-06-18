@@ -195,6 +195,12 @@ void violence_update()
                     ch->pecho("Гул в твоей голове затихает.");
                     REMOVE_BIT(ch->affected_by, AFF_WEAK_STUN);
                 }
+
+                if (ch->adrenaline_pending && !ch->is_adrenalined())
+                {
+                    ch->pecho("Адреналин в твоей крови улегся, и ты успокаиваешься.");
+                    ch->adrenaline_pending = false;
+                }
                 continue;
             }
 
