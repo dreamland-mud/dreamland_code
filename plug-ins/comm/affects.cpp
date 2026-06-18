@@ -290,10 +290,12 @@ struct PermanentAffects {
 
 private:
     void print(const char *messagePrefix, const int &my_flags, const FlagTable &my_table, char gcase) const {
-        if (my_flags != 0) {
-            DLString message = DLString(messagePrefix) + " " + my_table.messages(my_flags, true, gcase) + ".";
-            ch->pecho(message.c_str(), ch);
-        }
+        if (my_flags == 0)
+            return;
+
+        StringList names = my_table.toStringList(my_flags, gcase);
+        DLString message = DLString(messagePrefix) + " " + names.wrap("{Y", "{x").join(", ") + ".";
+        ch->pecho(message.c_str(), ch);
     }
 
     Character *ch;
