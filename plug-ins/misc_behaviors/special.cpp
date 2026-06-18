@@ -609,9 +609,12 @@ bool spec_mayor( NPCharacter *ch )
         return false;
 
     if (!cabinet)
-        cabinet = get_room_instance( 3138 );
+        cabinet = get_room_instance( 16545 );
 
-    room = cabinet; 
+    if (!cabinet)
+        return false;
+
+    room = cabinet;
     
     for (int i = 0; i < pos; i++) {
         int door = path[i] - '0';
