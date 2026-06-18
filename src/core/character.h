@@ -211,9 +211,10 @@ protected:
     XML_VARIABLE XMLRaceReference race;
     XML_VARIABLE XMLReligionReference religion;
     time_t                        last_fight_time;
-    bool                          adrenaline_pending; // armed by setLastFightTime, fires one "calmed down" line when adrenaline decays
 
 public:
+    // public: cleared directly by the free function violence_update() in plug-ins/fight
+    bool                          adrenaline_pending; // armed by setLastFightTime, fires one "calmed down" line when adrenaline decays
     bool extracted;
     Character*                         reply;
     Character*                         next;
