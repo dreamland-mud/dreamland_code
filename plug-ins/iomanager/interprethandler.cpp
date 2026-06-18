@@ -30,6 +30,7 @@
 #include "websocketrpc.h"
 #include "wiznet.h"
 #include "act.h"
+#include "merc.h"
 
 #include "def.h"
 
@@ -434,6 +435,9 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
     prompt["args"][0]["vnum"] = ch->in_room ? ch->in_room->vnum : 0;
     prompt["args"][0]["area"] = DLString(
             ch->in_room ? ch->in_room->areaIndex()->area_file->file_name : "");
+    // Player sex lets the web map resolve gender (flexer) switches in room text to the
+    // viewer's own form ("neutral"/"male"/"female"/"either"); see mudjs flexer.js.
+    prompt["args"][0]["sex"] = sex_table.name( ch->getSex( ) );
 
     if (ch->fighting) {
         prompt["args"][0]["fight"] = HEALTH(ch->fighting);
