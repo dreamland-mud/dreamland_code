@@ -85,8 +85,34 @@ void InflectedString::fillCachedForms()
     cachedForms.resize(Case::MAX + 1);
     cachedForms[Case::MAX] = "";
 
+    // Per-case explicit forms: a leading '=' switches off Flexer's stem+suffix
+    // model and treats the remainder as 6 pipe-separated full case forms (in
+    // NOMINATIVE..PREPOSITIONAL order). Use for words Flexer can't encode --
+    // e.g. UA vowel alternation (=віл|вола|волові|вола|волом|волі), sg/pl
+    // suppletion, or any irregular morphology. Missing trailing forms are
+    // padded with the last given form.
+    if (!fullForm.empty() && fullForm.at(0) == '=') {
+        DLString rest = DLString(fullForm.substr(1));
+        std::list<DLString> parts = rest.split("|");
+        std::vector<DLString> forms(parts.begin(), parts.end());
+
+        for (int c = Case::NOMINATIVE; c < Case::MAX; c++) {
+            size_t idx = static_cast<size_t>(c - Case::NOMINATIVE);
+            if (idx < forms.size())
+                cachedForms[c] = forms[idx];
+            else if (!forms.empty())
+                cachedForms[c] = forms.back();
+            else
+                cachedForms[c] = DLString::emptyString;
+            allCases.insert(cachedForms[c]);
+        }
+
+        cachedForms[Case::MAX] = allCases.join(" ");
+        return;
+    }
+
     for (int c = Case::NOMINATIVE; c < Case::MAX; c++) {
-        cachedForms[c] = Flexer::flex(fullForm, c + 1);        
+        cachedForms[c] = Flexer::flex(fullForm, c + 1);
         allCases.insert(cachedForms[c]);
     }
 
