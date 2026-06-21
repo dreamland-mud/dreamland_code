@@ -11,7 +11,6 @@
 #include "affecthandlertemplate.h"
 #include "commandtemplate.h"
 
-#include "class_vampire.h"
 #include "so.h"
 
 extern "C"
@@ -20,11 +19,7 @@ extern "C"
         {
             SO::PluginList ppl;
 
-            Plugin::registerPlugin<MobileBehaviorRegistrator<VampireGuildmaster> >( ppl );
-        
-            
             return ppl;
         }
-        
-}
 
+}
