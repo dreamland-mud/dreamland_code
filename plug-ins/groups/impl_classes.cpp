@@ -11,7 +11,6 @@
 #include "affecthandlertemplate.h"
 #include "commandtemplate.h"
 
-#include "class_samurai.h"
 #include "class_vampire.h"
 #include "so.h"
 
@@ -21,9 +20,6 @@ extern "C"
         {
             SO::PluginList ppl;
 
-            Plugin::registerPlugin<MobileBehaviorRegistrator<SamuraiGuildmaster> >( ppl );
-            Plugin::registerPlugin<ObjectBehaviorRegistrator<Katana> >( ppl );
-            Plugin::registerPlugin<ObjectBehaviorRegistrator<OwnedKatana> >( ppl );
             Plugin::registerPlugin<MobileBehaviorRegistrator<VampireGuildmaster> >( ppl );
         
             

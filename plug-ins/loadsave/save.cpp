@@ -1808,15 +1808,14 @@ void fread_mlt( PCharacter *ch, FILE *fp ) {
 
 static void convert_personal( Object *obj )
 {
-    AllocateClass::Pointer pointer;
-    ObjectBehavior::Pointer behavior;
- 
-    if (obj->pIndexData->vnum == OBJ_VNUM_KATANA_SWORD) 
-        pointer = Class::allocateClass( "OwnedKatana" );
-    else
-        pointer = Class::allocateClass( "PersonalQuestReward" );
-        
-    behavior = pointer.getDynamicPointer<ObjectBehavior>( );
+    // Katanas are now born complete from the craft pipeline -- ownership is the
+    // owner field plus the proto's 'master samurai' Fenia behavior, so a legacy
+    // 'personal' katana needs no per-instance C++ behavior. Leave it as loaded.
+    if (obj->pIndexData->vnum == OBJ_VNUM_KATANA_SWORD)
+        return;
+
+    AllocateClass::Pointer pointer = Class::allocateClass( "PersonalQuestReward" );
+    ObjectBehavior::Pointer behavior = pointer.getDynamicPointer<ObjectBehavior>( );
     obj->behavior.setPointer( *behavior );
     obj->behavior->setObj( obj );
 
