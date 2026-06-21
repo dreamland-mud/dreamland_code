@@ -6,42 +6,12 @@
 #ifndef CLASS_SAMURAI_H 
 #define CLASS_SAMURAI_H 
 
-#include "basicmobilebehavior.h"
-#include "objectbehaviormanager.h"
-
-class Katana : public BasicObjectBehavior {
-XML_OBJECT
-public:
-    typedef ::Pointer<Katana> Pointer;
-
-    virtual void wear( Character * );
-    virtual bool mayFloat( ); 
-    virtual bool canEquip( Character * );
-    virtual void get( Character * );
-};
-
-class OwnedKatana : public Katana {
-XML_OBJECT
-public:
-    typedef ::Pointer<OwnedKatana> Pointer;
-
-    virtual void get( Character * );
-};
-
-class SamuraiGuildmaster : public virtual BasicMobileDestiny {
-XML_OBJECT
-public:
-        typedef ::Pointer<SamuraiGuildmaster> Pointer;
-    
-        virtual void give( Character *, Object * );
-        virtual void tell( Character *, const char * );
-
-protected:
-        void giveBack( Character *, Object * );
-        void doFirstEnchant( Character *, Object * );
-        void doOwner( Character *, Object * );
-        bool checkPrice( Character *, int );
-};
+// The Katana / OwnedKatana object behaviors and the SamuraiGuildmaster mob
+// behavior were retired 2026-06-21. Their scenarios moved to the Fenia
+// 'master samurai' behavior (dreamland_fenia behaviors/master samurai), attached
+// to the Midgaard guildmaster (3171), the New Thalos weaponsmaster (9594) and the
+// katana (98). A katana is now born complete from the craft pipeline (utils/craft
+// craftKatana) -- ownership is the owner field plus that behavior, not a C++ class.
 
 #endif
 
