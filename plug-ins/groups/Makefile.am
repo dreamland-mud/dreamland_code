@@ -62,10 +62,7 @@ class_ranger.cpp \
 class_samurai.cpp \
 class_thief.cpp \
 class_vampire.cpp \
-class_warrior.cpp 
-
-libclass_skills_la_MOC = \
-class_vampire.h
+class_warrior.cpp
 
 libclass_skills_la_LIBADD = \
 $(libgroup_skills_la_LIBADD) \
