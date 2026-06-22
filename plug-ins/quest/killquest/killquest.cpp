@@ -19,6 +19,9 @@
 #include "act.h"
 #include "save.h"
 #include "def.h"
+#include "behavior.h"
+
+BHV(cityguard);
 
 KillQuest::KillQuest( )
 {
@@ -185,7 +188,7 @@ bool KillQuest::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
 
     // Exclude guards from territories protected by law.
     if (IS_SET(mob->in_room->area->area_flag, AREA_HOMETOWN))
-        if (mob->spec_fun.name == "spec_guard")
+        if (mob->pIndexData->behaviors.isSet(bhv_cityguard))
             return false;
 
     level_diff = mob->getRealLevel( ) - pch->getModifyLevel( );

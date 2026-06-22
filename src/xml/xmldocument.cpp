@@ -60,11 +60,10 @@ void XMLDocument::emit( const XMLNode &node, ostream& ostr, int space, bool& cda
                 for( std::string::const_iterator ipos = str.begin( );ipos != str.end( );ipos++ ) {
                     char ch = *ipos;
                     switch( ch ) {
+                    // Only & and < must be escaped in XML text content; emit ', ", >
+                    // raw so asave does not churn area/help files away from canonical ASCII.
                     case '&':   ostr << "&amp;";        break;
-                    case '\'':  ostr << "&apos;";        break;
-                    case '>':   ostr << "&gt;";        break;
                     case '<':   ostr << "&lt;";        break;
-                    case '"':   ostr << "&quot;";        break;
                     default:    ostr << ch;
                     }
                 }
