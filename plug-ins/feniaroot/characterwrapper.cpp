@@ -589,12 +589,14 @@ NMI_GET( CharacterWrapper, remort_count, "кол-во ремортов" )
 }
 
 // --- Remort service bindings ----------------------------------------------------
-// Expose the remort economy so a Fenia behavior (mob 'koschei', later 'remort
-// witch') can drive the player-facing dialogue, while the canonical remort data
-// model -- its caps, currency and the hp/mana recompute -- stays here in C++.
-// These mirror plug-ins/remort/remortbonuses_impl.cpp and the former VictoryPrice.
+// Expose the remort economy so a Fenia behavior (mobs 'koschei' and 'baba yaga')
+// can drive the player-facing dialogue, while the canonical remort data model --
+// its caps, currencies and the hp/mana recompute -- stays here in C++. These are
+// now the only home of that logic: the old C++ service-trade framework
+// (RemortBonus / LifePrice / VictoryPrice in plug-ins/remort) was removed once
+// both NPCs migrated to Fenia.
 
-// Quest victories needed to earn one bonus life (former VictoryPrice::COUNT_PER_LIFE).
+// Quest victories needed to earn one bonus life (was VictoryPrice::COUNT_PER_LIFE).
 static const int VICTORY_COUNT_PER_LIFE = 500;
 
 // Map a stat alias ("str".."con") to its stat_table index, or -1 if not a stat.
@@ -619,6 +621,28 @@ static int remort_bonus_max( PCharacter *pch, const DLString &kind )
     int stat = remort_stat_index( kind );
     if (stat >= 0)
         return MAX_STAT_REMORT - pch->getMaxStat( stat );
+
+    return 0;
+}
+
+// How much of a remort bonus kind the player currently holds -- the sellable
+// amount -- mirroring RemortBonus::bonusBought / IntegerRemortBonus::bonusField.
+static int remort_bonus_have( PCharacter *pch, const DLString &kind )
+{
+    Remorts &rem = pch->getRemorts( );
+
+    if (kind == "hp")
+        return rem.hp.getValue( );
+    if (kind == "mana")
+        return rem.mana.getValue( );
+    if (kind == "level")
+        return rem.level.getValue( );
+    if (kind == "pretitle")
+        return rem.pretitle ? 1 : 0;
+
+    int stat = remort_stat_index( kind );
+    if (stat >= 0)
+        return rem.stats[stat].getValue( );
 
     return 0;
 }
@@ -720,6 +744,108 @@ NMI_INVOKE( CharacterWrapper, remortBonusApply, "(kind[, amount]): выдать 
         if (stat < 0)
             return Register( 0 );
         rem.stats[stat] += amount;
+    }
+
+    pch->save( );
+    return Register( amount );
+}
+
+// Remort life points -- the currency Baba Yaga (Fenia 'baba yaga' behavior)
+// trades in. Mirror the former LifePrice over getRemorts().points: a getter,
+// spend (deduct on buy) and refund (induct on sell-back).
+NMI_GET( CharacterWrapper, lifePoints, "ремортные очки жизни, доступные для обмена у Бабы Яги" )
+{
+    checkTarget( );
+    CHK_NPC
+    return Register( target->getPC( )->getRemorts( ).points.getValue( ) );
+}
+
+NMI_INVOKE( CharacterWrapper, spendLifePoints, "(n): списать n очков жизни (покупка у Бабы Яги), вернуть true при успехе" )
+{
+    checkTarget( );
+    CHK_NPC
+    int n = argnum2number( args, 1 );
+    if (n <= 0)
+        return Register( false );
+
+    Remorts &rem = target->getPC( )->getRemorts( );
+    if (rem.points.getValue( ) < n)
+        return Register( false );
+
+    rem.points -= n;
+    target->getPC( )->save( );
+    return Register( true );
+}
+
+NMI_INVOKE( CharacterWrapper, refundLifePoints, "(n): вернуть n очков жизни (продажа бонуса Бабе Яге)" )
+{
+    checkTarget( );
+    CHK_NPC
+    int n = argnum2number( args, 1 );
+    if (n <= 0)
+        return Register( false );
+
+    target->getPC( )->getRemorts( ).points += n;
+    target->getPC( )->save( );
+    return Register( true );
+}
+
+NMI_INVOKE( CharacterWrapper, remortBonusRemove, "(kind[, amount]): снять ранее купленный ремортный бонус kind, вернуть фактически снятое кол-во" )
+{
+    checkTarget( );
+    CHK_NPC
+    PCharacter *pch = target->getPC( );
+    DLString kind = argnum2string( args, 1 );
+    int amount = args.size( ) > 1 ? argnum2number( args, 2 ) : 1;
+
+    int have = remort_bonus_have( pch, kind );
+    if (have <= 0 || amount <= 0)
+        return Register( 0 );
+    if (amount > have)
+        amount = have;
+
+    Remorts &rem = pch->getRemorts( );
+
+    if (kind == "pretitle") {
+        rem.pretitle = false;
+        amount = 1;
+    }
+    else if (kind == "level") {
+        rem.level -= amount;
+    }
+    else if (kind == "hp" || kind == "mana") {
+        // Mirror AppliedRemortBonus::bonusSell: drop the current per-level
+        // contribution, decrement the stored bonus, re-apply -- per-level hp/mana
+        // depends on the cumulative total.
+        bool isHp = (kind == "hp");
+        for (int i = 1; i <= pch->getRealLevel( ); i++)
+            if (isHp) {
+                pch->max_hit  -= rem.getHitPerLevel( i );
+                pch->perm_hit -= rem.getHitPerLevel( i );
+            } else {
+                pch->max_mana  -= rem.getManaPerLevel( i );
+                pch->perm_mana -= rem.getManaPerLevel( i );
+            }
+
+        if (isHp)
+            rem.hp -= amount;
+        else
+            rem.mana -= amount;
+
+        for (int i = 1; i <= pch->getRealLevel( ); i++)
+            if (isHp) {
+                pch->max_hit  += rem.getHitPerLevel( i );
+                pch->perm_hit += rem.getHitPerLevel( i );
+            } else {
+                pch->max_mana  += rem.getManaPerLevel( i );
+                pch->perm_mana += rem.getManaPerLevel( i );
+            }
+    }
+    else {
+        int stat = remort_stat_index( kind );
+        if (stat < 0)
+            return Register( 0 );
+        rem.stats[stat] -= amount;
     }
 
     pch->save( );
