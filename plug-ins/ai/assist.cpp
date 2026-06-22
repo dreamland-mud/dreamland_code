@@ -34,8 +34,11 @@
 #include "roomtraverse.h"
 
 #include "def.h"
+#include "behavior.h"
 
 GSN(garble);
+
+BHV(cityguard);
 
 
 /*
@@ -100,8 +103,8 @@ bool BasicMobileBehavior::canAssistOffense( Character *fch, Character *victim )
         return true;
     
     // Guards, patrolmen and guard assistants always assist each other
-    if ( (ch->spec_fun.name == "spec_guard" || ch->spec_fun.name == "spec_patrolman" || IS_SET(ch->off_flags, ASSIST_GUARD)) && 
-         (mob->spec_fun.name == "spec_guard" || mob->spec_fun.name == "spec_patrolman" || IS_SET(mob->off_flags, ASSIST_GUARD)) )
+    if ( (ch->pIndexData->behaviors.isSet(bhv_cityguard) || IS_SET(ch->off_flags, ASSIST_GUARD)) && 
+         (mob->pIndexData->behaviors.isSet(bhv_cityguard) || IS_SET(mob->off_flags, ASSIST_GUARD)) )
         return true;
 
     if (IS_SET(ch->off_flags, ASSIST_ALIGN) && ALIGNMENT(ch) == ALIGNMENT(mob))

@@ -225,77 +225,6 @@ bool spec_ogre_member( NPCharacter *ch)
     return true;
 }
 
-bool spec_patrolman(NPCharacter *ch)
-{
-    Character *vch,*victim = 0;
-    Object *obj;
-    int count = 0;
-
-    if (!IS_AWAKE(ch) || IS_AFFECTED(ch,AFF_CALM) || ch->in_room == 0
-    ||  IS_CHARMED(ch) || ch->fighting != 0)
-        return false;
-
-    /* look for a fight in the room */
-    for (vch = ch->in_room->people; vch != 0; vch = vch->next_in_room)
-    {
-        if (vch == ch)
-            continue;
-
-        if (vch->fighting != 0)  /* break it up! */
-        {
-            if (number_range(0,count) == 0)
-                victim = ( vch->getModifyLevel() > vch->fighting->getModifyLevel() )
-                    ? vch : vch->fighting;
-            count++;
-        }
-    }
-
-    if (victim == 0 || (victim->is_npc() && *victim->getNPC()->spec_fun == *ch->spec_fun))
-        return false;
-
-    if (((obj = get_eq_char(ch,wear_neck_1)) != 0
-    &&   obj->pIndexData->vnum == OBJ_VNUM_WHISTLE)
-    ||  ((obj = get_eq_char(ch,wear_neck_2)) != 0
-    &&   obj->pIndexData->vnum == OBJ_VNUM_WHISTLE))
-    {
-        oldact("Ты со всей силы свистишь в $o4.",ch,obj,0,TO_CHAR);
-        oldact_p("$c1 свистит в $o1, {W***ФРРРРРРРРРРРРРРРР***{x",
-               ch,obj,0,TO_ROOM,POS_RESTING);
-
-            for ( vch = char_list; vch != 0; vch = vch->next )
-            {
-            if ( vch->in_room == 0 )
-                    continue;
-
-            if (vch->in_room != ch->in_room
-            &&  vch->in_room->area == ch->in_room->area)
-                    vch->pecho("До тебя доносится пронзительный свист.");
-            }
-    }
-
-    switch (number_range(0,6))
-    {
-        default: break;
-        case 0: do_yell( ch, "А ну, прекр-р-р-ратить скопление!");
-                break;
-        case 1: do_say( ch, "Виновато, конечно, общество, но что уж тут поделаешь?");
-                break;
-        case 2: do_say( ch, "Чертова шпана нас всех в гроб загонит.");
-                break;
-        case 3: do_yell( ch, "Сержант Петренко. Предъявите ваши документы!");
-                break;
-        case 4: oldact("$c1 вытаскивает дубинку и принимается за работу.",ch,0,victim,TO_ALL);
-                break;
-        case 5: oldact("$c1 обреченно вздыхает и продолжает останавливать драку.",ch,0,victim,TO_ALL);
-                break;
-        case 6: do_say( ch, "А ну угомонились, хулиганье!");
-                break;
-    }
-
-    multi_hit( ch , victim , "murder" );
-    return true;
-}
-        
 /*
  * Core procedure for dragons.
  */
@@ -768,11 +697,6 @@ bool spec_thief( NPCharacter *ch )
     return false;
 }
 
-bool spec_guard( NPCharacter *ch )
-{
-    return false;
-}
-
 bool spec_nasty( NPCharacter *ch )
 {
     Character *victim, *v_next;
@@ -1046,7 +970,6 @@ struct  spec_type    local_spec_table[] =
     {        "spec_cast_judge",                spec_cast_judge                },
     {        "spec_executioner",                spec_executioner        },
     {        "spec_fido",                        spec_fido                },
-    {        "spec_guard",                        spec_guard                },
     {        "spec_janitor",                        spec_janitor                },
     {        "spec_mayor",                        spec_mayor                },
     {        "spec_poison",                        spec_poison                },
@@ -1054,7 +977,6 @@ struct  spec_type    local_spec_table[] =
     {        "spec_nasty",                        spec_nasty                },
     {        "spec_troll_member",                spec_troll_member        },
     {        "spec_ogre_member",                spec_ogre_member        },
-    {        "spec_patrolman",                spec_patrolman                },
     {   "spec_assassinater",            spec_assassinater        },
     {        "spec_captain",                        spec_captain                },
     {        0,                                0                        }

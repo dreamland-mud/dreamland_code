@@ -37,7 +37,9 @@
 #include "msgformatter.h"
 #include "merc.h"
 #include "def.h"
+#include "behavior.h"
 
+BHV(cityguard);
 
 Gangsters* Gangsters::thisClass = NULL;
 
@@ -884,8 +886,7 @@ bool Gangsters::isPoliceman( Character *ch )
     mob = ch->getNPC();
 
     if (IS_SET( mob->off_flags, ASSIST_GUARD ) ||
-         mob->spec_fun.name == "spec_guard" || 
-         mob->spec_fun.name == "spec_patrolman")
+         mob->pIndexData->behaviors.isSet(bhv_cityguard))
         return true;
     
     list<const char *> guardNames {"guard", "guardian", "shiriff", "bodyguard", "cityguard", "стражник", "охранник", "шериф", "телохранитель"};
