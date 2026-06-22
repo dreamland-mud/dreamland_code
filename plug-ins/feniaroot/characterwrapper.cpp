@@ -588,6 +588,144 @@ NMI_GET( CharacterWrapper, remort_count, "кол-во ремортов" )
     return Register( (int)target->getPC( )->getRemorts( ).size( ) );
 }
 
+// --- Remort service bindings ----------------------------------------------------
+// Expose the remort economy so a Fenia behavior (mob 'koschei', later 'remort
+// witch') can drive the player-facing dialogue, while the canonical remort data
+// model -- its caps, currency and the hp/mana recompute -- stays here in C++.
+// These mirror plug-ins/remort/remortbonuses_impl.cpp and the former VictoryPrice.
+
+// Quest victories needed to earn one bonus life (former VictoryPrice::COUNT_PER_LIFE).
+static const int VICTORY_COUNT_PER_LIFE = 500;
+
+// Map a stat alias ("str".."con") to its stat_table index, or -1 if not a stat.
+static int remort_stat_index( const DLString &kind )
+{
+    for (int i = 0; i < stat_table.size; i++)
+        if (kind == stat_table.fields[i].name)
+            return i;
+    return -1;
+}
+
+// Remaining headroom for a remort bonus kind, mirroring RemortBonus::bonusMaximum.
+static int remort_bonus_max( PCharacter *pch, const DLString &kind )
+{
+    if (kind == "hp" || kind == "mana")
+        return 0xffff;
+    if (kind == "level")
+        return 3 - pch->getRemorts( ).level;
+    if (kind == "pretitle")
+        return pch->getRemorts( ).pretitle ? 0 : 1;
+
+    int stat = remort_stat_index( kind );
+    if (stat >= 0)
+        return MAX_STAT_REMORT - pch->getMaxStat( stat );
+
+    return 0;
+}
+
+NMI_GET( CharacterWrapper, victoriesSpendable, "квестовые победы, доступные для обмена на ремортные бонусы" )
+{
+    checkTarget( );
+    CHK_NPC
+    XMLAttributeStatistic::Pointer attr
+        = target->getPC( )->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" );
+    if (!attr)
+        return Register( 0 );
+
+    // Cap so that bonuses from victories plus from remorts never exceed MAX_BONUS_LIFES.
+    int bonusLifesLeft = Remorts::MAX_BONUS_LIFES - target->getPC( )->getRemorts( ).countBonusLifes( );
+    int avail = bonusLifesLeft * VICTORY_COUNT_PER_LIFE;
+    int questVictories = attr->getBonusVictoriesCount( );
+    if (questVictories < avail)
+        avail = questVictories;
+
+    int spendable = avail - attr->getWasted( );
+    return Register( spendable < 0 ? 0 : spendable );
+}
+
+NMI_INVOKE( CharacterWrapper, spendVictories, "(n): списать n квестовых побед (необратимо), вернуть true при успехе" )
+{
+    checkTarget( );
+    CHK_NPC
+    int n = argnum2number( args, 1 );
+    if (n <= 0)
+        return Register( false );
+
+    XMLAttributeStatistic::Pointer attr
+        = target->getPC( )->getAttributes( ).getAttr<XMLAttributeStatistic>( "questdata" );
+    attr->setWasted( attr->getWasted( ) + n );
+    target->getPC( )->save( );
+    return Register( true );
+}
+
+NMI_INVOKE( CharacterWrapper, remortBonusMax, "(kind): сколько ещё бонуса kind (str..con|hp|mana|level|pretitle) можно получить" )
+{
+    checkTarget( );
+    CHK_NPC
+    return Register( remort_bonus_max( target->getPC( ), argnum2string( args, 1 ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, remortBonusApply, "(kind[, amount]): выдать перманентный ремортный бонус kind, вернуть фактически выданное кол-во" )
+{
+    checkTarget( );
+    CHK_NPC
+    PCharacter *pch = target->getPC( );
+    DLString kind = argnum2string( args, 1 );
+    int amount = args.size( ) > 1 ? argnum2number( args, 2 ) : 1;
+
+    int room = remort_bonus_max( pch, kind );
+    if (room <= 0 || amount <= 0)
+        return Register( 0 );
+    if (amount > room)
+        amount = room;
+
+    Remorts &rem = pch->getRemorts( );
+
+    if (kind == "pretitle") {
+        rem.pretitle = true;
+        amount = 1;
+    }
+    else if (kind == "level") {
+        rem.level += amount;
+    }
+    else if (kind == "hp" || kind == "mana") {
+        // Mirror AppliedRemortBonus: drop the current per-level contribution, bump the
+        // stored bonus, re-apply -- per-level hp/mana depends on the cumulative total.
+        bool isHp = (kind == "hp");
+        for (int i = 1; i <= pch->getRealLevel( ); i++)
+            if (isHp) {
+                pch->max_hit  -= rem.getHitPerLevel( i );
+                pch->perm_hit -= rem.getHitPerLevel( i );
+            } else {
+                pch->max_mana  -= rem.getManaPerLevel( i );
+                pch->perm_mana -= rem.getManaPerLevel( i );
+            }
+
+        if (isHp)
+            rem.hp += amount;
+        else
+            rem.mana += amount;
+
+        for (int i = 1; i <= pch->getRealLevel( ); i++)
+            if (isHp) {
+                pch->max_hit  += rem.getHitPerLevel( i );
+                pch->perm_hit += rem.getHitPerLevel( i );
+            } else {
+                pch->max_mana  += rem.getManaPerLevel( i );
+                pch->perm_mana += rem.getManaPerLevel( i );
+            }
+    }
+    else {
+        int stat = remort_stat_index( kind );
+        if (stat < 0)
+            return Register( 0 );
+        rem.stats[stat] += amount;
+    }
+
+    pch->save( );
+    return Register( amount );
+}
+
 NMI_GET( CharacterWrapper, altar, "vnum комнаты-алтаря в родном городе персонажа" )
 {
     checkTarget( );
