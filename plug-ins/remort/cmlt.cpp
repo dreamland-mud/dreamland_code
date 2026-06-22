@@ -16,7 +16,6 @@
 #include "cmlt.h"
 #include "commonattributes.h"
 #include "xmlattributestatistic.h"
-#include "victorybonus.h"
 
 #include "class.h"
 
