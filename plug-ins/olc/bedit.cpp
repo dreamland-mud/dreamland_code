@@ -82,6 +82,12 @@ void OLCStateBehavior::changed(PCharacter *ch)
     isChanged = true;
 }
 
+// Display one affect removal message read-only; it is edited from skedit.
+static void show_affect_message(const char *prefix, PCharacter *ch, const DLString &message)
+{
+    ptc(ch, "%s: {G%s{x\r\n", prefix, message.empty() ? "-" : message.c_str());
+}
+
 void OLCStateBehavior::show( PCharacter *ch )
 {
     DefaultBehavior *bhv = getOriginal();
@@ -110,7 +116,34 @@ void OLCStateBehavior::show( PCharacter *ch )
     DLString propsString = JsonUtils::toString(bhv->props);
     ch->desc->send(propsString.c_str());
 
-    feniaTriggers->showTriggers(ch, bhv->getWrapper(), "behavior", bhv->target.name());    
+    feniaTriggers->showTriggers(ch, bhv->getWrapper(), "behavior", bhv->target.name());
+
+    // A behavior may carry an affect, stored as a same-named skill (see the 'affect'
+    // command). Mirror skedit's affect block here so it is visible without leaving bedit.
+    Skill *affectSkill = skillManager->findExisting(bhv->getName());
+    BasicSkill *affectBasic = affectSkill ? dynamic_cast<BasicSkill *>(affectSkill) : 0;
+    DefaultAffectHandler *a = (affectBasic && affectBasic->affect)
+        ? affectBasic->affect.getDynamicPointer<DefaultAffectHandler>() : 0;
+
+    if (a) {
+        ptc(ch, ".............{GАффект{x.................\r\n");
+        ptc(ch, "Умение:      {G%s{x %s {D(affect или skedit %s){x\r\n",
+                affectBasic->getName().c_str(),
+                web_edit_button(ch, "skedit", affectBasic->getName()).c_str(),
+                affectBasic->getName().c_str());
+        ptc(ch, "Отменяется:  {G%s{x\r\n", a->cancelled ? "yes" : "no");
+        ptc(ch, "Снимается:   {G%s{x\r\n", a->dispelled ? "yes" : "no");
+        show_affect_message("Спадает с тебя    ", ch, a->removeCharSelf);
+        show_affect_message("Спадает с соседа  ", ch, a->removeCharOthers);
+        show_affect_message("Спадает с предмета", ch, a->removeObj);
+        show_affect_message("Спадает с комнаты ", ch, a->removeRoom);
+        feniaTriggers->showTriggers(ch, a->getWrapper(), "affect");
+    } else if (affectSkill != 0) {
+        ptc(ch, "Аффект:          {G%s{x без обработчика {D(affect){x\r\n",
+                affectSkill->getName().c_str());
+    } else {
+        ptc(ch, "Аффект:          нет {D(affect create){x\r\n");
+    }
 
     ptc(ch, "\r\nКоманды: {y{hccommands{x, {y{hcshow{x, {y{hclist{x, {y{hcaffect{x, {y{hcdone{x\r\n");
 }
@@ -128,11 +161,11 @@ BEDIT(affect, "аффект", "создать или редактировать 
     Skill *existingSkill = skillManager->findExisting(bhv->getName());
     BasicSkill::Pointer skill = existingSkill ? dynamic_cast<BasicSkill *>(existingSkill) : 0;
 
-    if (arg_is(args, "create")) {
+    if (arg_is(args, "create") || arg_is(args, "add")) {
         if (skill) {
             ptc(ch, "Умение '%s' уже существует, используй команду {y{hcaffect{x для редактирования.\r\n", skill->getName().c_str());
             return false;
-        } 
+        }
 
         skill = SkillAlloc::newOtherSkill(bhv->getName());
 
@@ -334,10 +367,10 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
         auto usage = behavior_usage();
 
         ch->send_to(
-            fmt(0, "{C%-20s %-25s %4s %5s{x\r\n", "Название", "", "Тип", "Всего"));
+            fmt(0, "{C%-22s %-25s %4s %5s{x\r\n", "Название", "Русское имя", "Тип", "Всего"));
 
-        const DLString lineFormat = 
-            "{W" + web_cmd(ch, "bedit $1", "%-20s") + "{w %-25.25s %4s %5d{x\r\n";
+        const DLString lineFormat =
+            "{W" + web_cmd(ch, "bedit $1", "%-22s") + "{x %-25.25s {c%4s{x {y%5d{x\r\n";
 
         list<DefaultBehavior *> output;
 
