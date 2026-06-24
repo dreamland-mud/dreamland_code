@@ -14,6 +14,7 @@ struct movetype_t {
     bool sneak;
     const char * name;
     const char * rname;
+    const char * uaname;
     const char * enter;
     const char * leave;
 };
