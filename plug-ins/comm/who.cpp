@@ -230,7 +230,7 @@ static DLString who_cmd_flags(PCharacter *victim)
     if (IS_SET( victim->act, PLR_WANTED))  buf << "{RW";
     if (victim->isAffected(gsn_manacles)) buf << "{mM";
     if (victim->isAffected(gsn_jail ))   buf << "{mJ";
-    if (!IS_SET( victim->act, PLR_CONFIRMED )) buf << "{gU";
+    if (!IS_SET( victim->act, PLR_CONFIRMED ) && victim->getRemorts( ).size( ) == 0) buf << "{gU";
     if (attrs->isAvailable("nochannel"))   buf << "{mN";
     if (attrs->isAvailable( "nopost" ))    buf << "{mP";
     if (attrs->isAvailable( "teacher" ))   buf << "{gT";

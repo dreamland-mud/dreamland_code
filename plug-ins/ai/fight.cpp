@@ -150,7 +150,11 @@ bool BasicMobileBehavior::doWimpy( )
     
     if (!mustFlee( ))
         return false;
-    
+
+    // A seated charmie must stand up before it can flee (movement gates flee on standing).
+    if (ch->position == POS_SITTING || ch->position == POS_RESTING)
+        interpret_raw( ch, "stand" );
+
     interpret_raw( ch, "flee" );
     clearLastFought( );
 
