@@ -152,7 +152,11 @@ Character * Quest::getActor( Character *ch )
 
     if (ch->is_mirror( ) && ch->doppel)
         return getActor( ch->doppel );
-    
+
+    // A player possessing a mob via switch acts as themselves.
+    if (ch->is_npc( ) && ch->getNPC( )->switchedFrom)
+        return getActor( ch->getNPC( )->switchedFrom );
+
     if (!ch->is_npc( ) && !IS_CHARMED(ch))
         return ch;
     
