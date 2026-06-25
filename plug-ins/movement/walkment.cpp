@@ -643,9 +643,25 @@ void Walkment::moveFollowers( Character *wch )
         if (fch->master == wch && fch->position == POS_STANDING)
             followers.push_back( fch );
 
-    for (f = followers.begin( ); f != followers.end( ); f++) 
-        if ((*f)->in_room == from_room)
-            moveOneFollower( wch, *f );
+    for (f = followers.begin( ); f != followers.end( ); f++)
+        if ((*f)->in_room == from_room) {
+            fch = *f;
+            moveOneFollower( wch, fch );
+
+            // A charmed pet that can't enter the destination sector (air/water) used
+            // to be left behind silently -- warn its owner why (trello 501).
+            if (fch->in_room == from_room && IS_CHARMED(fch) && wch->getPC( )) {
+                int sect = to_room->getSectorType( );
+                if (sect == SECT_AIR)
+                    wch->pecho("%1$^C1 не может взлететь и последовать за тобой.", fch);
+                else if (sect == SECT_UNDERWATER)
+                    wch->pecho("%1$^C1 не может нырнуть и последовать за тобой.", fch);
+                else if (sect == SECT_WATER_NOSWIM)
+                    wch->pecho("%1$^C1 не умеет плавать и не может последовать за тобой.", fch);
+                else
+                    wch->pecho("%1$^C1 не может последовать за тобой.", fch);
+            }
+        }
 }
 
 bool Walkment::canHear( Character *victim, Character *wch )
