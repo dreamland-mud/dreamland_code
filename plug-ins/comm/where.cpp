@@ -1,4 +1,5 @@
 #include "character.h"
+#include "pcharacter.h"
 #include "room.h"
 #include "commandtemplate.h"
 #include "wrappertarget.h"
