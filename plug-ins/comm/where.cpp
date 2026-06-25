@@ -74,8 +74,13 @@ CMDRUNP( where )
                 continue;
             if (( victim = d->character ) == 0)
                 continue;
-            if (victim->is_npc( ))
-                continue;
+            // a player possessing a mob via switch shows up as their own (vulnerable) body
+            if (victim->is_npc( )) {
+                if (victim->getPC( ))
+                    victim = victim->getPC( );
+                else
+                    continue;
+            }
             if (!victim->in_room || victim->in_room->area != ch->in_room->area)
                 continue;
             if (IS_SET(victim->in_room->room_flags, ROOM_NOWHERE))
