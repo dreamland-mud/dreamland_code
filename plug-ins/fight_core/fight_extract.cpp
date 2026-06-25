@@ -132,9 +132,18 @@ void extract_char( Character *ch, bool count )
 
     stop_fighting( ch, true );
 
+    // Summoned/temporary creatures (timer-limited) drop their real gear on the
+    // ground when they vanish, instead of it disappearing with them (trello 553/733).
+    bool dropGear = npc && ch->in_room && ch->timer > 0 && !char_is_nodrop( ch );
+
     for (obj = ch->carrying; obj != 0; obj = obj_next) {
         obj_next = obj->next_content;
-        extract_obj_1( obj, count );
+        if (dropGear && !IS_SET(obj->extra_flags, ITEM_NOSAVEDROP)) {
+            obj_from_char( obj );
+            obj_to_room( obj, ch->in_room );
+        }
+        else
+            extract_obj_1( obj, count );
     }
     
     undig( ch );
