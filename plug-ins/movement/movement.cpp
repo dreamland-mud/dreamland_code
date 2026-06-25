@@ -135,11 +135,11 @@ static void rafprog_leave( Room *room, Character *ch )
             paf->type->getAffect()->onLeave(SpellTarget::Pointer(NEW, room), paf, ch);
 }
 
-static void rafprog_entry( Room *room, Character *ch, const char *movetype )
+static void rafprog_entry( Room *room, Character *ch, const char *movetype, int danger )
 {
     for (auto &paf: room->affected.findAllWithHandler())
         if (paf->type->getAffect())
-            paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, room), paf, ch, movetype);
+            paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, room), paf, ch, movetype, danger);
 }
 
 static void rprog_leave(Room *from_room, Character *walker, Room *to_room, const char *movetype)
@@ -267,7 +267,7 @@ void Movement::callProgsFinish( Character *wch )
 
         mprog_entry( wch );
         rprog_greet( to_room, wch, from_room, movetypes[movetype].name );
-        rafprog_entry( to_room, wch, movetypes[movetype].name );
+        rafprog_entry( to_room, wch, movetypes[movetype].name, movetypes[movetype].danger );
         afprog_entry( wch );
         rprog_dive( wch, movetypes[movetype].danger );
 

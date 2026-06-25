@@ -36,7 +36,7 @@ public:
     bool onSpec(const SpellTarget::Pointer &target, Affect *paf);
     bool onPourOut(const SpellTarget::Pointer &target, Affect *paf, Character *actor, Object *out, const char *liqname, int amount);
     bool onUpdate(const SpellTarget::Pointer &target, Affect *paf);
-    bool onEntry(const SpellTarget::Pointer &target, Affect *paf, Character *walker = 0, const char *movetype = "");
+    bool onEntry(const SpellTarget::Pointer &target, Affect *paf, Character *walker = 0, const char *movetype = "", int danger = 2);
     bool onLeave(const SpellTarget::Pointer &target, Affect *paf, Character *walker);
     bool onDispel(const SpellTarget::Pointer &target, Affect *paf);
     bool onLook(const SpellTarget::Pointer &target, Affect *paf, Character *victim);
