@@ -791,7 +791,7 @@ void Damage::msgEcho(Character *to, const char *fmt, va_list va)
     const char *v;
     char damVs[256], damVp[256];
     
-    if(!to->is_npc() && IS_SET(to->getPC()->config, CONFIG_NEWDAMAGE)) {
+    if(to->getPC() && IS_SET(to->getPC()->config, CONFIG_NEWDAMAGE)) {
         msgNewFormat(true, damVs);
         msgNewFormat(false, damVp);
     } else {
@@ -817,7 +817,7 @@ void Damage::msgEcho(Character *to, const char *fmt, va_list va)
 
     // show explicit damage numbers for old damage config
     // not for newbies -- not enabled by default
-    if(!to->is_npc() && !IS_SET(to->getPC()->config, CONFIG_NEWDAMAGE))
+    if(to->getPC() && !IS_SET(to->getPC()->config, CONFIG_NEWDAMAGE))
          buf << " {D[{Y%1$d{D]{x";
 
     to->vpecho(buf.str().c_str(), va);
