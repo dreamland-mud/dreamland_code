@@ -229,12 +229,12 @@ bool AffectHandler::onUpdate(const SpellTarget::Pointer &target, Affect *paf)
     return false;
 }
 
-bool AffectHandler::onEntry(const SpellTarget::Pointer &target, Affect *paf, Character *walker) 
+bool AffectHandler::onEntry(const SpellTarget::Pointer &target, Affect *paf, Character *walker, const char *movetype) 
 {
     AffectHandler *ah = this;
     switch (target->type) {
         case SpellTarget::ROOM:
-            FENIA_CALL(ah, "EntryRoom", "RAC", target->room, paf, walker);
+            FENIA_CALL(ah, "EntryRoom", "RACs", target->room, paf, walker, movetype);
             entry(target->room, walker, paf);
             break;
 
