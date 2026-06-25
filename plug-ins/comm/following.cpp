@@ -79,6 +79,11 @@ CMDRUN( follow )
         return;
     }
 
+    if ( ch->is_npc( ) && ch->getNPC( )->switchedFrom ) {
+        ch->pecho("Находясь в чужом теле, ты не можешь ни за кем следовать.");
+        return;
+    }
+
     if ( IS_CHARMED(ch)) {
         oldact("Но тебе хочется следовать за $C5!", ch, 0, ch->master, TO_CHAR);
         return;
@@ -122,6 +127,11 @@ CMDRUN( group )
     Character *victim;
     DLString argument = constArguments;
     DLString arg = argument.getOneArgument( );
+
+    if ( ch->is_npc( ) && ch->getNPC( )->switchedFrom ) {
+        ch->pecho("Находясь в чужом теле, ты не можешь распоряжаться группой.");
+        return;
+    }
 
     if (arg.empty( ))
     {
