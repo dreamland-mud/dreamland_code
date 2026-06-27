@@ -2,6 +2,7 @@
 *.bin
 *.in
 !/admin/*.in
+.claude-index/
 *.diff
 *.log
 *.swp
