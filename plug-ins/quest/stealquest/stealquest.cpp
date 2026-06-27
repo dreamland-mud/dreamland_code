@@ -23,6 +23,9 @@
 #include "loadsave.h"
 #include "vnum.h"
 #include "def.h"
+#include "behavior.h"
+
+BHV(thief);
 
 StealQuest::StealQuest( )
              : item( NULL )
@@ -366,7 +369,7 @@ bool StealQuest::isThief( NPCharacter *mob )
     if (IS_SET( mob->act, ACT_THIEF ))
         return true;
 
-    if (mob->spec_fun.name == "spec_thief")
+    if (mob->pIndexData->behaviors.isSet(bhv_thief))
         return true;
   
     if (StealQuestRegistrator::getThis( )->thiefs.hasName( mob ))
