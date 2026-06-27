@@ -10,6 +10,7 @@
 #include "skill.h"
 #include "mobilebehaviormanager.h"
 #include "objectbehaviormanager.h"
+#include "behavior.h"
 #include "occupations.h"
 #include "player_utils.h"
 #include "pcharacter.h"
@@ -25,6 +26,8 @@ GSN(detect_invis);
 GSN(truesight);
 GSN(acute_vision);
 GSN(improved_detect);
+
+BHV(cutthroat);
 
 // Check if room has at least one normal exit leading somewhere.
 static bool room_has_exits(Room *room)
@@ -52,7 +55,7 @@ bool RoomQuestModel::mobileCanAggress(PCharacter *pch, NPCharacter *mob)
     if (IS_AFFECTED( mob, AFF_BLOODTHIRST ))
         return true;
 
-    if (mob->spec_fun.name == "spec_nasty")
+    if (mob->pIndexData->behaviors.isSet(bhv_cutthroat))
         return true;
 
     return false;
