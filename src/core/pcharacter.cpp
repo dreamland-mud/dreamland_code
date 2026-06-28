@@ -228,7 +228,10 @@ void CachedNoun::update( PCharacter *ch )
         lang_t lang = (lang_t)l;
         DLString nameAndPretitle;
 
-        nameAndPretitle = pretitles[lang] + " " + name[lang]->getFullForm();
+        if (pretitles[lang].empty())
+            nameAndPretitle = name[lang]->getFullForm();
+        else
+            nameAndPretitle = pretitles[lang] + " " + name[lang]->getFullForm();
 
         if (pretitle.find(lang) == pretitle.end()) 
             pretitle[lang] = InflectedString::Pointer( NEW, nameAndPretitle, mg );
