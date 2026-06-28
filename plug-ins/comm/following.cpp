@@ -398,7 +398,7 @@ CMDRUN( split )
     {
         ch->pecho(
             "Ты делишь %d золот%s. Ты получаешь %d золота.",
-             amount_gold,GET_COUNT(amount_silver,"ую монету","ые монеты","ых монет"),
+             amount_gold,GET_COUNT(amount_gold,"ую монету","ые монеты","ых монет"),
              share_gold + extra_gold);
     }
 
@@ -411,7 +411,7 @@ CMDRUN( split )
     else if (share_silver == 0)
     {
        msgGroup = fmt(0, "$c1 делит %d золот%s. Ты получаешь %d золота.",
-                amount_gold,GET_COUNT(amount_silver,"ую монету","ые монеты","ых монет"),
+                amount_gold,GET_COUNT(amount_gold,"ую монету","ые монеты","ых монет"),
                 share_gold);
     }
     else
