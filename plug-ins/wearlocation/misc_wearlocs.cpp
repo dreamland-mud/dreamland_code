@@ -44,6 +44,57 @@ void StuckInWearloc::unequip( Character *ch, Object *obj )
 }
 
 /*
+ * Pulling a lodged missile (arrow, caltrap shard...) back out of the wound
+ * hurts -- and a blinded character can't reliably find the shaft to grab it.
+ */
+static const DLString STUCK_MSG_SELF = "{RТы со стоном выдергиваешь %2$O4 из раны.{x";
+static const DLString STUCK_MSG_ROOM = "%1$^C1 со стоном выдергивает %2$O4 из раны.";
+
+const DLString &StuckInWearloc::getMsgSelfRemove( Object * ) const
+{
+    return STUCK_MSG_SELF;
+}
+
+const DLString &StuckInWearloc::getMsgRoomRemove( Object * ) const
+{
+    return STUCK_MSG_ROOM;
+}
+
+bool StuckInWearloc::canRemove( Character *ch, Object *obj, int flags )
+{
+    if (!DefaultWearlocation::canRemove( ch, obj, flags ))
+        return false;
+
+    // Blinded, you fumble for the shaft and rarely grab it on the first try.
+    if (!ch->is_immortal( ) && IS_AFFECTED(ch, AFF_BLIND) && number_percent( ) < 50) {
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->pecho("Ничего не видя, ты никак не можешь нащупать и выдернуть %1$O4.", obj);
+        return false;
+    }
+
+    return true;
+}
+
+bool StuckInWearloc::remove( Object *obj, int flags )
+{
+    Character *ch = obj->carried_by;
+
+    // Base remove dispatches canRemove (the blind check above) and prints the
+    // wound-flavoured messages on success.
+    if (!DefaultWearlocation::remove( obj, flags ))
+        return false;
+
+    // The wound bites back: lose a chunk of hp, capped at hit-1 so it can never
+    // kill on the spot. Gods don't bleed for testing.
+    if (ch != 0 && !ch->is_immortal( )) {
+        int dam = URANGE( 0, ch->hit - 1, ch->max_hit / 20 + obj->level / 4 );
+        ch->hit -= dam;
+    }
+
+    return true;
+}
+
+/*
  * horse part of centaurs
  */
 
