@@ -61,7 +61,7 @@ DLString ReligionUtils::godName(Character *ch)
                     cnt++;
                 }
             }
-            if (cnt == 1 && only && only != god_none)
+            if (cnt == 1 && only)
                 return only->getRussianName();
         }
         return gods;
