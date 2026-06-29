@@ -9,13 +9,19 @@
 #include "xmlmap.h"
 
 class StuckInWearloc : public DefaultWearlocation {
-XML_OBJECT    
+XML_OBJECT
 public:
     typedef ::Pointer<StuckInWearloc> Pointer;
 
     virtual bool equip( Character *ch, Object *obj );
     virtual void unequip( Character *ch, Object *obj );
+    virtual bool remove( Object *obj, int flags );
+    virtual bool canRemove( Character *ch, Object *obj, int flags );
     virtual bool givesAffects() const { return false; }
+
+protected:
+    virtual const DLString &getMsgSelfRemove(Object *obj) const;
+    virtual const DLString &getMsgRoomRemove(Object *obj) const;
 };
 
 class ShieldWearloc : public DefaultWearlocation {
