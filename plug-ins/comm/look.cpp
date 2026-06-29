@@ -29,6 +29,7 @@
 #include "commandmanager.h"
 #include "mobilebehavior.h"
 #include "core/behavior/behavior_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "skill.h"
 #include "affecthandler.h"
 #include "spelltarget.h"
@@ -1057,6 +1058,9 @@ static void show_people_to_char( Character *list, Character *ch, bool fShowMount
  *--------------------------------------------------------------------------*/
 static bool oprog_look( Object *obj, Character *ch, const char *keyword )
 {
+    if (behavior_trigger( obj, "Look", "OCs", obj, ch, keyword ))
+        return true;
+
     FENIA_CALL( obj, "Look", "Cs", ch, keyword );
     FENIA_NDX_CALL( obj, "Look", "OCs", obj, ch, keyword );
     return false;
