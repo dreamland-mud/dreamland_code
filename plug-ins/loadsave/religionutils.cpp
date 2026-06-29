@@ -1,5 +1,7 @@
 #include "religionutils.h"
 #include "pcharacter.h"
+#include "npcharacter.h"
+#include "mobilefactory.h"
 #include "religion.h"
 #include "dl_math.h"
 #include "commonattributes.h"
@@ -46,8 +48,24 @@ DLString ReligionUtils::godName(Character *ch)
 {
     static const char *gods = "бог|и|ов|ам|ов|ами|ах";
 
-    if (ch->is_npc())
+    if (ch->is_npc()) {
+        // A mob prays to its own deity when its prototype names exactly one
+        // religion (the medit religion field); otherwise the generic plural.
+        MOB_INDEX_DATA *pMob = ch->getNPC()->pIndexData;
+        if (pMob) {
+            Religion *only = 0;
+            int cnt = 0;
+            for (int r = 0; r < religionManager->size() && cnt < 2; r++) {
+                if (pMob->religion.isSet(r)) {
+                    only = religionManager->find(r);
+                    cnt++;
+                }
+            }
+            if (cnt == 1 && only && only != god_none)
+                return only->getRussianName();
+        }
         return gods;
+    }
 
     if (ch->getReligion() != god_none)
         return ch->getReligion()->getRussianName();
