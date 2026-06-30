@@ -18,7 +18,7 @@ struct Enumeration : public FlagTableWrapper, public Integer {
     inline Enumeration( int, const FlagTable * );
 
     inline DLString name( ) const;
-    inline DLString message( char gcase = '1' ) const;
+    inline DLString message( char gcase = '1', lang_t lang = LANG_DEFAULT ) const;
 
     static const Enumeration emptyEnumeration;
 };

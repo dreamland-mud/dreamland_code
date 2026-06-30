@@ -13,7 +13,7 @@ struct Flags : public FlagTableWrapper, public Bitstring {
     inline Flags( bitstring_t, const FlagTable * );
 
     inline DLString names( ) const;
-    inline DLString messages( bool comma = false, char gcase = '1' ) const;
+    inline DLString messages( bool comma = false, char gcase = '1', lang_t lang = LANG_DEFAULT ) const;
     inline void setBits(const DLString &names);
 
     static const Flags emptyFlags;

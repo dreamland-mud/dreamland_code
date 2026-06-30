@@ -27,10 +27,10 @@ inline DLString Flags::names( ) const
         return DLString::emptyString;
 }
 
-inline DLString Flags::messages( bool comma, char gcase ) const
+inline DLString Flags::messages( bool comma, char gcase, lang_t lang ) const
 {
     if (table)
-        return table->messages( getValue( ), comma, gcase );
+        return table->messages( getValue( ), comma, gcase, lang );
     else
         return DLString::emptyString;
 }
