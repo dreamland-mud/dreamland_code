@@ -210,14 +210,14 @@ bool SheathWearloc::displayFlags(Character *ch, Object *obj)
  * Sheath wearloc shows shortened item name for auto-generated weapons, stored during
  * generation as eqName property. Prefixes and suffixes are hidden.
  */
-DLString SheathWearloc::displayName(Character *ch, Object *obj)
+DLString SheathWearloc::displayName(Character *ch, Object *obj, lang_t lang)
 {
     DLString eqName = obj->getProperty("eqName");
 
     if (!eqName.empty())
         return eqName.ruscase('1');
 
-    return DefaultWearlocation::displayName(ch, obj);
+    return DefaultWearlocation::displayName(ch, obj, lang);
 }
 
 /**

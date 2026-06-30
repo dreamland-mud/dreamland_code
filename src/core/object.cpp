@@ -284,7 +284,15 @@ void Object::setOwner( const DLString &newOwner )
 
 DLString Object::getShortDescr( char gram_case, lang_t lang )
 {
-    return toNoun( )->decline( gram_case ); // TODO toNoun should take 'lang' argument
+    // Decline the cached noun for the requested language. Per-language nouns are
+    // all built by updateCachedNouns(); fall back to the default language when the
+    // requested one has no value, so callers passing LANG_DEFAULT behave exactly
+    // as before and only viewer-language callers see the localized form.
+    auto it = cachedNouns.find( lang );
+    if (it == cachedNouns.end() || it->second->getFullForm().empty())
+        it = cachedNouns.find( LANG_DEFAULT );
+
+    return it->second->decline( gram_case );
 }
 
 static bool is_anti_align( Character *ch, int flags )

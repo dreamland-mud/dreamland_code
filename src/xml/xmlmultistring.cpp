@@ -21,8 +21,22 @@ const DLString &XMLMultiString::get(lang_t lang) const
 {
     if (lang < LANG_MIN || lang >= LANG_MAX)
         return DLString::emptyString;
-        
+
     return find(lang)->second;
+}
+
+const DLString &XMLMultiString::getForLang(lang_t lang) const
+{
+    const DLString &value = get(lang);
+    if (!value.empty())
+        return value;
+
+    // Fall back so a missing translation never reaches the player as a blank.
+    const DLString &ru = get(RU);
+    if (!ru.empty())
+        return ru;
+
+    return get(EN);
 }
 
 // Translate:

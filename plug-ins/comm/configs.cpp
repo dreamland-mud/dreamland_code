@@ -302,7 +302,7 @@ static void config_lang_print(PCharacter *ch)
 
     ch->pecho( "  {%s%-14s {%s%5s {xнабери {y{hcрежим язык{x для установки",
                     CLR_NAME(ch),
-                    "язык команд",
+                    "язык",
                     CLR_YES(ch),
                     langname.c_str());
 }
