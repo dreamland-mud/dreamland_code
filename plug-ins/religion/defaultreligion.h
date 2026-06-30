@@ -99,6 +99,7 @@ public:
 // Fields are public to simplify online editing.
     XML_VARIABLE XMLString  shortDescr;
     XML_VARIABLE XMLString  nameRus, nameRusFemale;
+    XML_VARIABLE XMLStringNoEmpty  nameUa, nameUaFemale;
     XML_VARIABLE XMLString  description;
     XML_VARIABLE XMLFlags   align, ethos;
     XML_VARIABLE XMLGlobalBitvector  races;
