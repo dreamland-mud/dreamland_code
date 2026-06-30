@@ -8,6 +8,7 @@
 
 #include "xmltableloaderplugin.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "race.h"
 #include "liquid.h"
 #include "object.h"
@@ -198,10 +199,24 @@ const DLString &DefaultReligion::getRussianName( ) const
 
 const DLString& DefaultReligion::getNameFor( Character *looker ) const
 {
-    if (looker && looker->getSex() == SEX_FEMALE && !nameRusFemale.empty())
-        return nameRusFemale;
-        
-    if (looker && looker->getConfig( ).ruskills) 
+    lang_t lang = looker ? Player::displayLang( looker ) : LANG_EN;
+
+    // Worshipper-gendered title (only the atheist 'none' religion uses these).
+    // Prefer the UA female form for a UA viewer, otherwise the RU female form.
+    // Applies regardless of language, matching the legacy behavior.
+    if (looker && looker->getSex( ) == SEX_FEMALE) {
+        if (lang == LANG_UA && !nameUaFemale.empty( ))
+            return nameUaFemale;
+        if (!nameRusFemale.empty( ))
+            return nameRusFemale;
+    }
+
+    // UA: own name when present, else fall back to the RU name below.
+    if (lang == LANG_UA && !nameUa.empty( ))
+        return nameUa;
+
+    // RU (and UA fallback) get the declinable russian name; EN gets the latin one.
+    if (lang != LANG_EN)
         return nameRus;
 
     return shortDescr;
