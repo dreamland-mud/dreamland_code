@@ -89,6 +89,9 @@ public:
     virtual const DLString & getNeuterName( ) const;
     virtual const DLString & getFemaleName( ) const;
     virtual const DLString & getMltName( ) const;
+    virtual const DLString & getMaleNameUa( ) const;
+    virtual const DLString & getFemaleNameUa( ) const;
+    virtual const DLString & getMltNameUa( ) const;
     virtual DLString getNameFor( Character *looker, Character *me ) const;
 
     XML_VARIABLE XMLFlagsNoEmpty         det;
@@ -105,10 +108,13 @@ public:
 
     XML_VARIABLE XMLGlobalBitvector      hunts, donates;
 
-    XML_VARIABLE XMLStringNoEmpty  nameMale; 
-    XML_VARIABLE XMLStringNoEmpty  nameFemale; 
-    XML_VARIABLE XMLStringNoEmpty  nameNeuter; 
-    XML_VARIABLE XMLStringNoEmpty  nameMlt; 
+    XML_VARIABLE XMLStringNoEmpty  nameMale;
+    XML_VARIABLE XMLStringNoEmpty  nameFemale;
+    XML_VARIABLE XMLStringNoEmpty  nameNeuter;
+    XML_VARIABLE XMLStringNoEmpty  nameMlt;
+    XML_VARIABLE XMLStringNoEmpty  nameMaleUa;
+    XML_VARIABLE XMLStringNoEmpty  nameFemaleUa;
+    XML_VARIABLE XMLStringNoEmpty  nameMltUa;
 
     XML_VARIABLE XMLPointerNoEmpty<RaceHelp> help;
 };

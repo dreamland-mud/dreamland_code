@@ -5,6 +5,7 @@
 #include "defaultpcrace.h"
 #include "profession.h"
 #include "character.h"
+#include "player_utils.h"
 #include "merc.h"
 #include "def.h"
 
@@ -53,7 +54,8 @@ int DefaultPCRace::getMaxAlign( ) const
 
 DLString DefaultPCRace::getWhoNameFor( Character *looker, Character *owner ) const
 {
-    if (!looker || !looker->getConfig( ).rucommands) 
+    // EN (and no viewer) get the latin who-tag; UA reuses the RU tag.
+    if (!looker || Player::displayLang( looker ) == LANG_EN)
         return nameWho;
 
     if (!owner || owner->getSex( ) == SEX_MALE)
@@ -64,16 +66,24 @@ DLString DefaultPCRace::getWhoNameFor( Character *looker, Character *owner ) con
 
 DLString DefaultPCRace::getScoreNameFor( Character *looker, Character *owner ) const
 {
-    if (!looker || !looker->getConfig( ).rucommands) 
+    lang_t lang = looker ? Player::displayLang( looker ) : LANG_EN;
+
+    if (lang == LANG_EN)
         return name;
+
+    bool male = (!owner || owner->getSex( ) == SEX_MALE);
+
+    // UA: gendered nominative from the UA field; fall back to RU when absent.
+    if (lang == LANG_UA) {
+        const DLString &ua = male ? getMaleNameUa( ) : getFemaleNameUa( );
+        if (!ua.empty( ))
+            return ua.ruscase( '1' );
+    }
 
     if (!nameScore.empty( ))
         return nameScore;
 
-    if (!owner || owner->getSex( ) == SEX_MALE)
-        return nameMale.ruscase( '1' );
-
-    return nameFemale.ruscase( '1' );
-}   
+    return (male ? nameMale : nameFemale).ruscase( '1' );
+}
 
 
