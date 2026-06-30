@@ -8,6 +8,7 @@
 #include "stringlist.h"
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "skillmanager.h"
 #include "skill.h"
 #include "skillgroup.h"
@@ -336,6 +337,10 @@ const DLString & DefaultProfession::getMltName( ) const
 {
     return mltName.getValue( );
 }
+const DLString & DefaultProfession::getUaName( ) const
+{
+    return uaName.getValue( );
+}
 int DefaultProfession::getWeapon( ) const
 {
     return weapon.getValue( );
@@ -419,17 +424,26 @@ GlobalBitvector DefaultProfession::toVector( CharacterMemoryInterface * ) const
 
 DLString DefaultProfession::getNameFor( Character *ch, const Grammar::Case &c ) const
 {
-    if (ch && ch->getConfig( ).rucommands)
-        return getRusName( ).ruscase( c );
-    else
+    // No viewer -> canonical English name, as before.
+    lang_t lang = ch ? Player::displayLang( ch ) : LANG_EN;
+
+    if (lang == LANG_UA && !getUaName( ).empty( ))
+        return getUaName( ).ruscase( c );
+
+    if (lang == LANG_EN)
         return getName( );
+
+    // LANG_RU, or a UA viewer for a class with no UA name yet -> Russian.
+    return getRusName( ).ruscase( c );
 }
 
 DLString DefaultProfession::getWhoNameFor( Character *ch ) const
 {
-    if (ch && ch->getConfig( ).rucommands)
-        return whoNameRus;
-    else
+    // EN viewers (and no-viewer) get the latin who-tag; UA reuses the RU 3-char
+    // tag (CLASSES.md).
+    lang_t lang = ch ? Player::displayLang( ch ) : LANG_EN;
+    if (lang == LANG_EN)
         return whoName;
+    return whoNameRus;
 }
 

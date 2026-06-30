@@ -44,6 +44,27 @@ lang_t Player::lang(Character *ch)
     return LANG_DEFAULT;
 }
 
+lang_t Player::displayLang(Character *ch)
+{
+    if (!ch)
+        return LANG_DEFAULT;
+
+    if (ch->is_npc()) {
+        if (ch->getNPC()->switchedFrom)
+            return displayLang(ch->getNPC()->switchedFrom);
+        else
+            return LANG_DEFAULT;
+    }
+
+    // An explicit 'config lang' choice wins over everything.
+    auto langAttr = ch->getPC()->getAttributes().findAttr<XMLStringAttribute>("lang");
+    if (langAttr && !langAttr->getValue().empty())
+        return lang(ch);
+
+    // Never set a language: keep the historical ru/en commands behavior.
+    return ch->getConfig().rucommands ? LANG_RU : LANG_EN;
+}
+
 DLString Player::title(PCMemoryInterface *pcm)
 {
     ostringstream out;
