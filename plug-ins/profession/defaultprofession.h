@@ -147,6 +147,7 @@ public:
     
     virtual const DLString &getRusName( ) const;
     virtual const DLString &getMltName( ) const;
+    virtual const DLString &getUaName( ) const;
     virtual DLString getNameFor( Character *, const Grammar::Case & = Grammar::Case::NONE ) const;
     virtual DLString getWhoNameFor( Character * ) const;
     virtual int  getWeapon( ) const;
@@ -171,7 +172,7 @@ public:
     virtual int getMaxAlign( ) const;
 
 protected:
-    XML_VARIABLE XMLString  whoName, whoNameRus, rusName, mltName;
+    XML_VARIABLE XMLString  whoName, whoNameRus, rusName, mltName, uaName;
     XML_VARIABLE XMLInteger weapon;
     XML_VARIABLE XMLInteger skillAdept;
     XML_VARIABLE XMLIntegerNoEmpty parentAdept;
