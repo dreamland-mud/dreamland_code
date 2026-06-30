@@ -69,6 +69,7 @@
 
 #include "npcharacter.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "race.h"
 #include "object.h"
 #include "dlscheduler.h"
@@ -347,9 +348,9 @@ CMDRUNP( auction )
                         }
                         ch->pecho(
                                 "Лот: '%s{x'. Тип: %s. Экстра флаги: %s.\n\rВес: %d. Стоимость: %d. Уровень: %d.",
-                                obj->getShortDescr( '1', LANG_DEFAULT ).c_str( ),
-                                item_table.message(obj->item_type).c_str( ), 
-                                extra_flags.messages( obj->extra_flags, true).c_str( ),
+                                obj->getShortDescr( '1', Player::displayLang(ch) ).c_str( ),
+                                item_table.message(obj->item_type, '1', Player::displayLang(ch)).c_str( ),
+                                extra_flags.messages( obj->extra_flags, true, '1', Player::displayLang(ch)).c_str( ),
                                 obj->weight / 10, obj->cost, obj->level );
 
                         {        

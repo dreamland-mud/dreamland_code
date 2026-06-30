@@ -7,6 +7,7 @@
 
 #include "dlstring.h"
 #include "bitstring.h"
+#include "lang.h"
 
 class StringList;
 
@@ -33,11 +34,11 @@ struct FlagTable {
     bitnumber_t value( const DLString &arg, bool strict = true ) const;
 
     DLString names( bitstring_t ) const;
-    DLString messages( bitstring_t, bool comma = false, char gcase = '1' ) const;
-    StringList toStringList( bitstring_t bits, char gcase = '1' ) const;
+    DLString messages( bitstring_t, bool comma = false, char gcase = '1', lang_t lang = LANG_DEFAULT ) const;
+    StringList toStringList( bitstring_t bits, char gcase = '1', lang_t lang = LANG_DEFAULT ) const;
 
     DLString name( bitnumber_t value ) const;
-    DLString message( bitnumber_t value, char gcase = '1' ) const;
+    DLString message( bitnumber_t value, char gcase = '1', lang_t lang = LANG_DEFAULT ) const;
 };
 
 #endif

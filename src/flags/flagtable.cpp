@@ -3,12 +3,45 @@
  * ruffina, Dream Land, 2004
  */
 #include "flagtable.h"
+#include "flagtableregistry.h"
+#include "flagmessagestore.h"
 #include "dl_strings.h"
 #include "stringlist.h"
 
 /*----------------------------------------------------------------------
  * FlagTable
  *---------------------------------------------------------------------*/
+
+// Resolve the raw (un-declined) message pad for one field in the requested
+// language: the external store (requested lang, then RU) wins, otherwise the
+// in-binary RU message, otherwise the bare EN name. With an empty store this
+// returns exactly what the historical code did, so behaviour is preserved
+// until messages are externalized into config/flagmessages.json.
+static DLString resolveMessagePad( const FlagTable *table, const FlagTable::Field &field, lang_t lang )
+{
+    const FlagMessageStore &store = FlagMessageStore::shared( );
+
+    if (!store.empty( )) {
+        const DLString &tableName = FlagTableRegistry::getName( table );
+        if (!tableName.empty( )) {
+            const DLString &ext = store.get( tableName, field.name, lang );
+            if (!ext.empty( ))
+                return ext;
+
+            if (lang != LANG_RU) {
+                const DLString &ru = store.get( tableName, field.name, LANG_RU );
+                if (!ru.empty( ))
+                    return ru;
+            }
+        }
+    }
+
+    if (field.message)
+        return field.message;
+
+    return field.name;
+}
+
 int FlagTable::index( const DLString &arg, bool strict ) const
 {
     if (arg.empty( ))
@@ -89,30 +122,26 @@ DLString FlagTable::names( bitstring_t bits ) const
     return buf;
 }
 
-DLString FlagTable::messages( bitstring_t bits, bool comma, char gcase ) const
+DLString FlagTable::messages( bitstring_t bits, bool comma, char gcase, lang_t lang ) const
 {
     if (bits == NO_FLAG)
         return DLString::emptyString;
 
     DLString buf;
     Bitstring b( bits );
-    
+
     for (int i = 0; i <= max; i++)
         if (b.isSetBitNumber( i ) && reverse[i] != NO_FLAG) {
             if (!buf.empty( ))
                 buf << (comma ? ", " : " ");
 
-            const char *msg = fields[reverse[i]].message;
-            if (!msg)
-                msg = fields[reverse[i]].name;
-
-            buf << DLString(msg).ruscase( gcase );
+            buf << resolveMessagePad( this, fields[reverse[i]], lang ).ruscase( gcase );
         }
 
     return buf;
 }
 
-StringList FlagTable::toStringList( bitstring_t bits, char gcase ) const
+StringList FlagTable::toStringList( bitstring_t bits, char gcase, lang_t lang ) const
 {
     StringList result;
 
@@ -123,11 +152,7 @@ StringList FlagTable::toStringList( bitstring_t bits, char gcase ) const
 
     for (int i = 0; i <= max; i++)
         if (b.isSetBitNumber( i ) && reverse[i] != NO_FLAG) {
-            const char *msg = fields[reverse[i]].message;
-            if (!msg)
-                msg = fields[reverse[i]].name;
-
-            result.push_back( DLString(msg).ruscase( gcase ) );
+            result.push_back( resolveMessagePad( this, fields[reverse[i]], lang ).ruscase( gcase ) );
         }
 
     return result;
@@ -141,17 +166,12 @@ DLString FlagTable::name( bitnumber_t value ) const
         return fields[reverse[value]].name;
 }
 
-DLString FlagTable::message( bitnumber_t value, char gcase ) const
+DLString FlagTable::message( bitnumber_t value, char gcase, lang_t lang ) const
 {
     if (value < 0 || value > max || reverse[value] == NO_FLAG)
         return DLString::emptyString;
-    
-    auto &field = fields[reverse[value]];
-    
-    if (field.message)
-        return DLString(field.message).ruscase(gcase);
 
-    return field.name;
+    return resolveMessagePad( this, fields[reverse[value]], lang ).ruscase( gcase );
 }
 
 

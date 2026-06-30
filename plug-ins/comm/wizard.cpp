@@ -76,6 +76,7 @@
 #include "mobilebehavior.h"
 #include "objectbehavior.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "save.h"
 #include "merc.h"
 #include "descriptor.h"
@@ -930,8 +931,8 @@ static void format_affect(Affect *paf, ostringstream &buf)
         buf << fmt(0, "Материал: %s\n\r", obj->getMaterial( ).c_str());
 
         buf << fmt(0, "Берется в: %s\n\rЭкстра флаги: %s\n\r",
-                wear_flags.messages(obj->wear_flags, true).c_str( ), 
-                extra_flags.messages(obj->extra_flags, true).c_str( ) );
+                wear_flags.messages(obj->wear_flags, true, '1', Player::displayLang(ch)).c_str( ),
+                extra_flags.messages(obj->extra_flags, true, '1', Player::displayLang(ch)).c_str( ) );
 
         buf << fmt(0, "Число: %d/%d  Вес: %d/%d/%d (десятые доли фунта)\n\r",1,
                 obj->getNumber( ), obj->weight, obj->getWeight( ), obj->getTrueWeight( ) );

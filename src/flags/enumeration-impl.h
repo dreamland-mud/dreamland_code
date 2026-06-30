@@ -24,9 +24,9 @@ inline DLString Enumeration::name( ) const
     return (table ? table->name( getValue( ) ) : DLString::emptyString);
 }
 
-inline DLString Enumeration::message( char gcase ) const
+inline DLString Enumeration::message( char gcase, lang_t lang ) const
 {
-    return (table ? table->message( getValue( ) , gcase ) : DLString::emptyString);
+    return (table ? table->message( getValue( ) , gcase, lang ) : DLString::emptyString);
 }
 
 /*----------------------------------------------------------------------

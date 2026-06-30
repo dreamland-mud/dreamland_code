@@ -6,11 +6,49 @@
 #include "stringset.h"
 #include "stringlist.h"
 #include "dl_ctype.h"
+#include "flagmessagestore.h"
 
 Json::Value rules;
 CONFIGURABLE_LOADED(grammar, rules)
 {
     rules = value;
+}
+
+// Externalized per-language flag-table messages (bits.conf Variant 2), defined
+// in config/flagmessages.json. Shape:
+//   { "<table>": { "<flag>": { "en": "...", "ru": "...", "ua": "..." } } }
+// Every entry is optional; a missing (table, flag, lang) falls back inside
+// FlagTable to the RU entry, then to the in-binary message, so a partial file
+// is always safe. See flagmessagestore.h.
+CONFIGURABLE_LOADED(config, flagmessages)
+{
+    static const struct { const char *key; lang_t lang; } LANGS[] = {
+        { "en", LANG_EN }, { "ru", LANG_RU }, { "ua", LANG_UA },
+    };
+
+    FlagMessageStore &store = FlagMessageStore::shared( );
+    store.clear( );
+
+    for (const auto &tableName: value.getMemberNames( )) {
+        const Json::Value &flags = value[tableName];
+        if (!flags.isObject( ))
+            continue;
+
+        for (const auto &flagName: flags.getMemberNames( )) {
+            const Json::Value &langs = flags[flagName];
+            if (!langs.isObject( ))
+                continue;
+
+            for (const auto &L: LANGS) {
+                const Json::Value &pad = langs[L.key];
+                if (pad.isString( ))
+                    store.set( tableName, flagName, L.lang, pad.asString( ) );
+            }
+        }
+    }
+
+    LogStream::sendNotice( ) << "flagmessages: loaded " << value.getMemberNames( ).size( )
+                             << " flag tables into the message store." << endl;
 }
 
 static vector<DLString> split(const DLString &s, char delim)
