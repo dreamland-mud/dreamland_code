@@ -181,6 +181,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
 {
     std::ostringstream buf;
     Wearlocation *wearloc = obj->wear_loc.getElement();
+    lang_t lang = Player::lang(ch);
 
     // Hide items without short description inside object lists.
     if (fShort && obj->getShortDescr(LANG_DEFAULT).empty())
@@ -234,7 +235,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     
     if (fShort)
     {
-        buf << "{" << CLR_OBJ(ch) << wearloc->displayName(ch, obj) << "{x";
+        buf << "{" << CLR_OBJ(ch) << wearloc->displayName(ch, obj, lang) << "{x";
 
         if (obj->pIndexData->vnum > 5)        /* money, gold, etc */
             if (obj->condition <= 99 )
@@ -265,7 +266,9 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             buf << fmt( ch, msg.str().c_str( ), obj, liq.c_str( ) );
         }
         else {
-            DLString longd = obj->getDescription(LANG_DEFAULT);
+            DLString longd = obj->getDescription(lang);
+            if (longd.empty())
+                longd = obj->getDescription(LANG_DEFAULT);
             buf << "{" << CLR_OBJROOM(ch) << longd << "{x";
             format_hint(buf, obj->getKeyword(), obj->getShortDescr(LANG_DEFAULT), ch, true);
         }
@@ -477,22 +480,23 @@ static void show_char_position( Character *ch, Character *victim,
                          ostringstream &buf )
 {
     int furniture_flag = 0;
+    lang_t lang = Player::lang(ch);
     if (!MOUNTED(victim)) {
         buf << verb << " ";
 
         if (victim->on != 0) {
             furniture_flag = Item::furnitureFlags(victim->on);
-            
+
             DLString rc = oprog_show_where( victim->on, victim, ch );
 
             if (!rc.empty( ))
                 buf << rc;
-            else if (IS_SET(furniture_flag, atFlag)) 
-                buf << "возле " << victim->on->getShortDescr( '2', LANG_DEFAULT );
+            else if (IS_SET(furniture_flag, atFlag))
+                buf << "возле " << victim->on->getShortDescr( '2', lang );
             else if (IS_SET(furniture_flag, onFlag))
-                buf << "на " << victim->on->getShortDescr( '6', LANG_DEFAULT );
+                buf << "на " << victim->on->getShortDescr( '6', lang );
             else
-                buf << "в " << victim->on->getShortDescr( '6', LANG_DEFAULT );
+                buf << "в " << victim->on->getShortDescr( '6', lang );
         }
         else
             buf << "здесь";
@@ -658,8 +662,12 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     if (nVict) 
         if (can_show_long_descr(nVict)) {
             ostringstream longd;
+            lang_t lang = Player::lang(ch);
+            DLString mlong = nVict->getLongDescr(lang);
+            if (mlong.empty())
+                mlong = nVict->getLongDescr(LANG_DEFAULT);
 
-            longd << nVict->getLongDescr(LANG_DEFAULT) << "{x";
+            longd << mlong << "{x";
             format_hint(longd, nVict->getKeyword(), nVict->getShortDescr(LANG_DEFAULT), ch, true);
                   
             buf << "{" << CLR_MOB(ch);
@@ -855,7 +863,11 @@ static void show_char_description( Character *ch, Character *vict )
         return;  
     }
 
-    const char *dsc = vict->getDescription(LANG_DEFAULT).c_str();
+    lang_t lang = Player::lang(ch);
+    const DLString *descRef = &vict->getDescription(lang);
+    if (descRef->empty())
+        descRef = &vict->getDescription(LANG_DEFAULT);
+    const char *dsc = descRef->c_str();
 
     if ((vict->is_npc( ) && dsc) || (!vict->is_npc( ) && dsc[0])) {
         ch->send_to( dsc );
@@ -1203,14 +1215,15 @@ static DLString rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Characte
 static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMount )
 {
     ostringstream buf;
+    lang_t lang = Player::lang(ch);
 
     if (eyes_darkened( ch )) {
         ch->pecho( "Здесь слишком темно... " );
         show_people_to_char( room->people, ch, fShowMount );
         return;
     }
-    
-    buf << "{" << CLR_RNAME(ch) << room->getName() << "{x";
+
+    buf << "{" << CLR_RNAME(ch) << room->getName(lang) << "{x";
 
     if (ch->getConfig( ).holy) 
         buf << " {" << CLR_RVNUM(ch) << "[Room " << room->vnum
@@ -1223,7 +1236,7 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
     if (!fBrief)
     {
         ostringstream rbuf;
-        const char *dsc = room->getDescription();
+        const char *dsc = room->getDescription(lang);
 
         // Get room description in current language, treat first '.' as space (legacy format)
         if (*dsc == '.')
@@ -1237,7 +1250,7 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         // Append room_description fields of all extra exits or their Fenia onExtraExitDescr overrides
         for (auto &peexit: room->extra_exits)
             if (ch->can_see( peexit ))
-                rbuf << rprog_eexit_descr(room, peexit, ch, peexit->room_description.get(LANG_DEFAULT));
+                rbuf << rprog_eexit_descr(room, peexit, ch, peexit->room_description.getForLang(lang));
 
         // Allow onDescr Fenia room trigger to override room description.
         DLString roomDescription = rprog_descr( room, ch, rbuf.str( ) );
@@ -1272,7 +1285,7 @@ static void do_look_move( Character *ch, bool fBrief )
         if (eyes_darkened( ch ))
             ch->pecho( "Здесь слишком темно... " );
         else
-            ch->pecho( "{W%s{x", ch->in_room->getName() );
+            ch->pecho( "{W%s{x", ch->in_room->getName(Player::lang(ch)) );
         return;
     }
 
@@ -1328,8 +1341,9 @@ static bool do_look_direction( Character *ch, const char *arg1 )
             return true;
     }
 
-    if (!pexit->description.get(LANG_DEFAULT).empty()) {
-            ch->send_to( pexit->description.get(LANG_DEFAULT));
+    lang_t lang = Player::lang(ch);
+    if (!pexit->description.getForLang(lang).empty()) {
+            ch->send_to( pexit->description.getForLang(lang));
             ch->pecho("");
     }
     else
@@ -1348,8 +1362,9 @@ static bool do_look_direction( Character *ch, const char *arg1 )
 static void do_look_object( Character *ch, Object *obj )
 {
         ostringstream buf;
-            
-        buf << "Ты смотришь на {c" << obj->getShortDescr( '4', LANG_DEFAULT ) << "{x."
+        lang_t lang = Player::lang(ch);
+
+        buf << "Ты смотришь на {c" << obj->getShortDescr( '4', lang ) << "{x."
             << " Это {W" << item_table.message(obj->item_type) << "{x";
 
 
@@ -1367,28 +1382,31 @@ static void do_look_object( Character *ch, Object *obj )
         DLString desc = oprog_extra_descr( obj, ch, String::toString(obj->getKeyword()).c_str() );
         DLString keywords = String::toString(obj->getKeyword());
 
-        if (desc.empty( )) { 
+        if (desc.empty( )) {
             for (auto &ed: obj->extraDescriptions)
                 if (arg_contains_someof( ed->keyword, keywords.c_str() )) {
-                    desc = ed->description.get(LANG_DEFAULT);
-                    break;
-                }
-        }
-
-        if (desc.empty( )) { 
-            for (auto &ed: obj->pIndexData->extraDescriptions)
-                if (arg_contains_someof( ed->keyword, keywords.c_str() )) {
-                    desc = ed->description.get(LANG_DEFAULT);
+                    desc = ed->description.getForLang(lang);
                     break;
                 }
         }
 
         if (desc.empty( )) {
-            if (obj->in_room)
-                desc = obj->getDescription(LANG_DEFAULT);
+            for (auto &ed: obj->pIndexData->extraDescriptions)
+                if (arg_contains_someof( ed->keyword, keywords.c_str() )) {
+                    desc = ed->description.getForLang(lang);
+                    break;
+                }
+        }
+
+        if (desc.empty( )) {
+            if (obj->in_room) {
+                desc = obj->getDescription(lang);
+                if (desc.empty())
+                    desc = obj->getDescription(LANG_DEFAULT);
+            }
             else
                 desc = "Ты не видишь здесь ничего особенного.";
-        }            
+        }
 
         ostringstream descBuf;
         webManipManager->decorateExtraDescr( descBuf, desc.c_str( ), obj->pIndexData->extraDescriptions, ch );
@@ -1404,22 +1422,24 @@ static bool do_look_extraexit( Character *ch, const char *arg3 )
     if (!peexit)
         return false;
 
+    lang_t lang = Player::lang(ch);
+
     if (!peexit->description.empty()
             && ch->can_see( peexit ) )
-            ch->send_to( peexit->description.get(LANG_DEFAULT));
+            ch->send_to( peexit->description.getForLang(lang));
     else
             ch->pecho( "Здесь нет ничего особенного." );
-    
+
     if (!peexit->short_desc_from.empty()
         && ch->can_see( peexit ) )
     {
             if ( IS_SET(peexit->exit_info, EX_CLOSED) )
             {
-                ch->pecho( "%1$N1: тут закрыто.", peexit->short_desc_from.get(LANG_DEFAULT).c_str() );
+                ch->pecho( "%1$N1: тут закрыто.", peexit->short_desc_from.getForLang(lang).c_str() );
             }
             else if ( IS_SET(peexit->exit_info, EX_ISDOOR) )
             {
-                ch->pecho( "%1$N1: тут открыто.", peexit->short_desc_from.get(LANG_DEFAULT).c_str()  );
+                ch->pecho( "%1$N1: тут открыто.", peexit->short_desc_from.getForLang(lang).c_str()  );
             }
     }
     

@@ -131,8 +131,14 @@ public:
     /** Shorthand to return prototype's room name. */
     inline const char *getName() const;
 
+    /** Prototype's room name in the given language (falls back to RU/EN when empty). */
+    inline const char *getName(lang_t lang) const;
+
     /** Shorthand to return prototype's room description. */
     inline const char *getDescription() const;
+
+    /** Prototype's room description in the given language (falls back to RU/EN when empty). */
+    inline const char *getDescription(lang_t lang) const;
 
     /** Calculate current heal rate (100% is the default). */
     int getHealRate() const;
@@ -209,9 +215,19 @@ inline const char * Room::getName() const
     return pIndexData->name.get(LANG_DEFAULT).c_str();
 }
 
+inline const char * Room::getName(lang_t lang) const
+{
+    return pIndexData->name.getForLang(lang).c_str();
+}
+
 inline const char * Room::getDescription() const
 {
     return pIndexData->description.get(LANG_DEFAULT).c_str();
+}
+
+inline const char * Room::getDescription(lang_t lang) const
+{
+    return pIndexData->description.getForLang(lang).c_str();
 }
 
 inline AreaIndexData *Room::areaIndex() const

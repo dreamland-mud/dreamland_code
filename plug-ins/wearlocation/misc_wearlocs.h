@@ -51,7 +51,7 @@ public:
 
     virtual bool matches( Character *ch );
     virtual bool displayFlags(Character *ch, Object *obj);
-    virtual DLString displayName(Character *ch, Object *obj);
+    virtual DLString displayName(Character *ch, Object *obj, lang_t lang);
     virtual DLString displayLocation(Character *ch, Object *obj);
     
     virtual void onFight(Character *ch, Object *obj);

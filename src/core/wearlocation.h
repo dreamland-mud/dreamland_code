@@ -10,6 +10,7 @@
 #include "globalregistry.h"
 #include "globalreference.h"
 #include "xmlglobalreference.h"
+#include "lang.h"
 
 #define WEARLOC( name ) static WearlocationReference wear_##name( #name )
 
@@ -56,8 +57,8 @@ public:
     virtual void display( Character *, DisplayList & );
     /** Checks if item auras need to be shown for this location. */
     virtual bool displayFlags(Character *ch, Object *obj) { return true; }
-    /** Formats item name to show for this location. */
-    virtual DLString displayName(Character *ch, Object *obj);
+    /** Formats item name to show for this location, in the viewer's language. */
+    virtual DLString displayName(Character *ch, Object *obj, lang_t lang);
     /** Formats location name itself depending on the item. */
     virtual DLString displayLocation(Character *ch, Object *obj);
 
