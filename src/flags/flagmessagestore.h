@@ -23,11 +23,10 @@
 
 class FlagMessageStore {
 public:
-    static FlagMessageStore & shared( )
-    {
-        static FlagMessageStore instance;
-        return instance;
-    }
+    // Defined out-of-line (in flagtable.cpp) so the single instance lives in one
+    // shared object -- an inline function-local static can otherwise be
+    // duplicated per .so, splitting the store between the loader and the reader.
+    static FlagMessageStore & shared( );
 
     bool empty( ) const { return store.empty( ); }
     void clear( ) { store.clear( ); }
