@@ -15,6 +15,7 @@
 #include "skill.h"
 #include "skillmanager.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "wearlocation.h"
 #include "alignment.h"
 #include "logstream.h"
@@ -374,19 +375,35 @@ const DLString & DefaultRace::getMltName( ) const
 {
     return nameMlt.getValue( );
 }
+const DLString & DefaultRace::getMaleNameUa( ) const
+{
+    return nameMaleUa.getValue( );
+}
+const DLString & DefaultRace::getFemaleNameUa( ) const
+{
+    return nameFemaleUa.getValue( );
+}
+const DLString & DefaultRace::getMltNameUa( ) const
+{
+    return nameMltUa.getValue( );
+}
 DLString DefaultRace::getNameFor( Character *looker, Character *me ) const
 {
-    if (looker && me && looker->getConfig( ).rucommands) {
+    lang_t lang = looker ? Player::displayLang( looker ) : LANG_EN;
+
+    // RU and UA show a gendered name; UA prefers its own field, falling back to RU.
+    if (lang != LANG_EN && me) {
+        bool ua = (lang == LANG_UA);
         if (me->toNoun()->getNumber() == Number::PLURAL)
-            return getMltName();
+            return (ua && !getMltNameUa().empty()) ? getMltNameUa() : getMltName();
         if (me->getSex( ) == SEX_MALE)
-            return getMaleName( );
+            return (ua && !getMaleNameUa().empty()) ? getMaleNameUa() : getMaleName();
         if (me->getSex( ) == SEX_FEMALE)
-            return getFemaleName( );
+            return (ua && !getFemaleNameUa().empty()) ? getFemaleNameUa() : getFemaleName();
         if (me->getSex( ) == SEX_NEUTRAL)
-            return getNeuterName( );
+            return (ua && !getMaleNameUa().empty()) ? getMaleNameUa() : getNeuterName();
     }
-    
+
     return getName( );
 }
 
