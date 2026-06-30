@@ -12,6 +12,14 @@
  * FlagTable
  *---------------------------------------------------------------------*/
 
+// Single store instance for the whole process, regardless of which shared
+// object touches it (the JSON loader lives in a plug-in, the readers here).
+FlagMessageStore & FlagMessageStore::shared( )
+{
+    static FlagMessageStore instance;
+    return instance;
+}
+
 // Resolve the raw (un-declined) message pad for one field in the requested
 // language: the external store (requested lang, then RU) wins, otherwise the
 // in-binary RU message, otherwise the bare EN name. With an empty store this
@@ -28,7 +36,8 @@ static DLString resolveMessagePad( const FlagTable *table, const FlagTable::Fiel
             if (!ext.empty( ))
                 return ext;
 
-            if (lang != LANG_RU) {
+            // UA with no own entry falls back to RU before the in-binary message.
+            if (lang == LANG_UA) {
                 const DLString &ru = store.get( tableName, field.name, LANG_RU );
                 if (!ru.empty( ))
                     return ru;
@@ -36,6 +45,14 @@ static DLString resolveMessagePad( const FlagTable *table, const FlagTable::Fiel
         }
     }
 
+    // EN: the flag's own name is already English, so it IS the EN message unless
+    // an explicit "en" override was supplied above. Never fall through to the RU
+    // message for an EN viewer, so the JSON only needs to carry "ua".
+    if (lang == LANG_EN)
+        return field.name;
+
+    // RU, and the ultimate fallback for any language: the in-binary RU message,
+    // then the bare name.
     if (field.message)
         return field.message;
 
