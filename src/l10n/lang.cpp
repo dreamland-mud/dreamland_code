@@ -23,3 +23,12 @@ DLString lang2attr(lang_t lang)
         default: return "en";
     }
 }
+
+const char * lmsg(lang_t lang, const char *en, const char *ru, const char *ua)
+{
+    switch (lang) {
+        case LANG_EN: return en;
+        case LANG_UA: return ua;
+        default:      return ru;
+    }
+}

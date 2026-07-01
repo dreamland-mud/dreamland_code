@@ -53,23 +53,35 @@ static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
 
 static bool oprog_examine_drink_container( Object *obj, Character *ch, const DLString& )
 {
+    lang_t lang = Player::lang(ch);
+
     if (IS_SET(obj->value3(), DRINK_CLOSED)) {
-        ch->pecho("Эта емкость закрыта.");
+        ch->pecho(lmsg(lang,
+            "This container is closed.",
+            "Эта емкость закрыта.",
+            "Ця посудина закрита."));
         return true;
     }
 
     if (obj->value1() <= 0) {
-        ch->pecho( "Тут пусто." );
+        ch->pecho(lmsg(lang, "It is empty.", "Тут пусто.", "Тут порожньо."));
         return true;
     }
 
-    ch->pecho( "%s наполнен жидкостью %s цвета.",
-                obj->value1() < obj->value0() / 4 ? 
-                    "Меньше, чем до половины" :
-                    obj->value1() < 3 * obj->value0() / 4 ? 
-                        "До половины"  : 
-                        "Чуть более, чем наполовину",
-                liquidManager->find( obj->value2() )->getColor( Player::lang(ch) ).ruscase( '2' ).c_str( )
+    const char *level = lmsg(lang,
+            obj->value1() < obj->value0() / 4 ? "Less than half" :
+                obj->value1() < 3 * obj->value0() / 4 ? "Half" : "A bit over half",
+            obj->value1() < obj->value0() / 4 ? "Меньше, чем до половины" :
+                obj->value1() < 3 * obj->value0() / 4 ? "До половины" : "Чуть более, чем наполовину",
+            obj->value1() < obj->value0() / 4 ? "Менш ніж наполовину" :
+                obj->value1() < 3 * obj->value0() / 4 ? "Наполовину" : "Трохи більше половини");
+
+    ch->pecho( lmsg(lang,
+                "%s filled with %s liquid.",
+                "%s наполнен жидкостью %s цвета.",
+                "%s наповнений рідиною %s кольору."),
+                level,
+                liquidManager->find( obj->value2() )->getColor( lang ).ruscase( '2' ).c_str( )
               );
     return true;
 }

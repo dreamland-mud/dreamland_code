@@ -258,9 +258,18 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             msg << "{" << CLR_OBJ(ch) << "{1" << "%1$^O1" << "{2 ";
 
             switch(dice(1,3)) {
-            case 1: msg << "тихо круж%1$nится|атся на %2$N6.";break;
-            case 2: msg << "плыв%1$nет|ут по %2$N3.";break;
-            case 3: msg << "намока%1$nет|ют от %2$N2.";break;
+            case 1: msg << lmsg(lang,
+                "floats quietly on %2$N6.",
+                "тихо круж%1$nится|атся на %2$N6.",
+                "тихо кружля%1$nє|ють на %2$N6.");break;
+            case 2: msg << lmsg(lang,
+                "drifts along %2$N3.",
+                "плыв%1$nет|ут по %2$N3.",
+                "пли%1$nве|вуть по %2$N3.");break;
+            case 3: msg << lmsg(lang,
+                "soaks in %2$N2.",
+                "намока%1$nет|ют от %2$N2.",
+                "намока%1$nє|ють від %2$N2.");break;
             }
 
             msg << "{x";
