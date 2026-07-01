@@ -253,7 +253,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
                 && !IS_SET(obj->extra_flags, ITEM_WATER_STAND)) 
         {
             ostringstream msg;
-            DLString liq = obj->in_room->getLiquid()->getShortDescr();
+            DLString liq = obj->in_room->getLiquid()->getShortDescr(lang);
 
             msg << "{" << CLR_OBJ(ch) << "{1" << "%1$^O1" << "{2 ";
 

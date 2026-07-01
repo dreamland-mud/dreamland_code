@@ -44,6 +44,7 @@
 #include "stats_apply.h"
 #include "dl_math.h"
 #include "dl_ctype.h"
+#include "player_utils.h"
 #include "mudtags.h"
 #include "merc.h"
 #include "autoflags.h"
@@ -369,7 +370,7 @@ Json::Value LocationWebPromptListener::jsonSector( Descriptor *d, Character *ch 
     buf <<  sector_table.message(sector);
                     
     if (liq_none != liq)
-        buf << ", " << liq->getShortDescr().ruscase('1').colourStrip();
+        buf << ", " << liq->getShortDescr(Player::lang(ch)).ruscase('1').colourStrip();
 
     if (indoors)
         buf << ")";

@@ -36,12 +36,12 @@ bool Liquid::isValid( ) const
     return false;
 }
 
-const DLString &Liquid::getShortDescr( ) const
+const DLString &Liquid::getShortDescr( lang_t ) const
 {
     return DLString::emptyString;
 }
 
-const DLString &Liquid::getColor( ) const
+const DLString &Liquid::getColor( lang_t ) const
 {
     return DLString::emptyString;
 }

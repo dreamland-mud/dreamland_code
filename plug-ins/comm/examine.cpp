@@ -7,6 +7,7 @@
 #include "wrapperbase.h"
 #include "core/behavior/behavior_utils.h"
 #include "keyhole.h"
+#include "player_utils.h"
 #include "terrains.h"
 #include "wearloc_utils.h"
 #include "msgformatter.h"
@@ -68,7 +69,7 @@ static bool oprog_examine_drink_container( Object *obj, Character *ch, const DLS
                     obj->value1() < 3 * obj->value0() / 4 ? 
                         "До половины"  : 
                         "Чуть более, чем наполовину",
-                liquidManager->find( obj->value2() )->getColor( ).ruscase( '2' ).c_str( )
+                liquidManager->find( obj->value2() )->getColor( Player::lang(ch) ).ruscase( '2' ).c_str( )
               );
     return true;
 }

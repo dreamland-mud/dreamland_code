@@ -30,6 +30,7 @@
 #include "save.h"
 #include "interp.h"
 #include "fight.h"
+#include "player_utils.h"
 #include "act.h"
 #include "merc.h"
 
@@ -125,7 +126,7 @@ CMDRUN( fill )
     else
         liq = liq_water.getElement();
 
-    const char *liqname = liq->getShortDescr().c_str();
+    const char *liqname = liq->getShortDescr(Player::lang(ch)).c_str();
 
     if (obj->value1() > 0 && obj->value2() != liq->getIndex()) {
         ch->pecho("Ты пытаешься наполнить %O4 %N5, но туда уже налита другая жидкость.", 
@@ -337,15 +338,15 @@ void pour_out( Character *ch, Object * out, Character *victim )
     }
     
     if (ch == victim) {
-        ch->pecho( msgSelf.c_str( ), ch, victim, out, liquid->getShortDescr( ).c_str( ) );
+        ch->pecho( msgSelf.c_str( ), ch, victim, out, liquid->getShortDescr( Player::lang(ch) ).c_str( ) );
         ch->recho( msgOther.c_str( ), ch, victim, out, liquid->getShortDescr( ).c_str( ) );
     }
     else {
-        ch->pecho( msgChar.c_str( ), ch, victim, out, liquid->getShortDescr( ).c_str( ) );
+        ch->pecho( msgChar.c_str( ), ch, victim, out, liquid->getShortDescr( Player::lang(ch) ).c_str( ) );
         ch->recho( victim, msgRoom.c_str( ), ch, victim, out, liquid->getShortDescr( ).c_str( ) );
 
         if (IS_AWAKE(victim)) {
-            victim->pecho( msgVict.c_str( ), ch, victim, out, liquid->getShortDescr( ).c_str( ) );
+            victim->pecho( msgVict.c_str( ), ch, victim, out, liquid->getShortDescr( Player::lang(victim) ).c_str( ) );
         }
         else if (sips >= 5) {
             victim->pecho( "Ты чувствуешь влагу на теле." );
@@ -470,7 +471,7 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
     in->value2(out->value2());
 
     Liquid *liq = liquidManager->find( out->value2() );
-    const char *liqShort = liq->getShortDescr( ).c_str( );
+    const char *liqShort = liq->getShortDescr( Player::lang(ch) ).c_str( );
 
     if (vch == 0) {
         ch->pecho( "Ты наливаешь %N4 из %O2 в %O4.", liqShort, out, in );
@@ -727,7 +728,7 @@ CMDRUN( drink )
             if (!desireManager->find( i )->canDrink( ch->getPC( ) ))
                 return;
     
-    DLString buf = liquid->getShortDescr( ).ruscase( '4' );
+    DLString buf = liquid->getShortDescr( Player::lang(ch) ).ruscase( '4' );
 
     if (obj) {
         oldact("$c1 пьет $T из $o2.", ch,obj,buf.c_str( ),TO_ROOM );
@@ -808,7 +809,7 @@ bool oprog_smell_liquid(Liquid *liq, Character *sniffer)
         else
             return false;
 
-        sniffer->pecho( msg.c_str( ), liq->getShortDescr( ).c_str( ) );
+        sniffer->pecho( msg.c_str( ), liq->getShortDescr( Player::lang(sniffer) ).c_str( ) );
         return true;
 }
 
