@@ -9,6 +9,7 @@
 #include "logstream.h"
 #include "pcharacter.h"
 #include "descriptor.h"
+#include "dl_ctype.h"
 #include "merc.h"
 
 #include "def.h"
@@ -20,7 +21,9 @@ static const char * consume_keyword(const char *desc, DLString &keyword)
 {
     const char *d;
     for (d = desc; *d && *d != ')'; ++d) {
-        if (!isspace(*d) && !isalpha(*d) && *d != '-') {
+        // dl_isalpha also recognises koi8-u cyrillic, so (вывеска) markers
+        // decorate for the web-client the same way ASCII (sign) ones do.
+        if (!isspace(*d) && !dl_isalpha(*d) && *d != '-') {
             // Doesn't look like part of a keyword anymore, interrupt.
             break;
         }

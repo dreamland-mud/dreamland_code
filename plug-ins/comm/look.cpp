@@ -47,6 +47,7 @@
 #include "fight.h"
 #include "screenreader.h"
 #include "stringlist.h"
+#include "dl_ctype.h"
 #include "descriptor.h"
 #include "webmanip.h"
 #include "websocketrpc.h"
@@ -1214,43 +1215,70 @@ static DLString rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Characte
     return descr;
 }
 
-// Collect the extra-descr keywords marked with (parentheses) in a description
-// that resolve to a real extra description, so screenreader / colourless clients
-// can be told what is examinable. Mirrors the (sign) parsing decorateExtraDescr uses.
-static void collect_look_targets( const char *desc, const ExtraDescrList &edList, StringList &out )
+// Pick a keyword to show from an extra-descr's space-separated, multi-language
+// keyword blob, favouring the reader's language: Latin for EN, words with
+// Ukrainian-specific letters for UA, Cyrillic-without-Ukrainian-marks for RU.
+// Falls back to the first word when nothing matches the reader's script.
+static DLString pick_display_keyword( const DLString &keywords, lang_t lang )
 {
-    for (const char *d = desc; *d; ++d) {
-        if (*d != '(')
-            continue;
+    DLString firstWord, firstLatin, firstCyr, firstUkr, firstRus;
 
-        DLString keyword;
-        const char *e;
-        for (e = d + 1; *e && *e != ')'; ++e) {
-            if (!isspace((unsigned char)*e) && !isalpha((unsigned char)*e) && *e != '-')
-                break;
-            keyword += *e;
+    const char *p = keywords.c_str( );
+    while (*p) {
+        while (*p && isspace((unsigned char)*p))
+            ++p;
+        const char *start = p;
+        while (*p && !isspace((unsigned char)*p))
+            ++p;
+        if (p == start)
+            break;
+
+        DLString w;
+        w.assign( start, p - start );
+        if (firstWord.empty( ))
+            firstWord = w;
+
+        bool cyr = false, ukr = false;
+        for (auto c: w) {
+            if (dl_is_cyrillic( c )) cyr = true;
+            if (dl_is_ukr_specific( c )) ukr = true;
         }
 
-        // Advance past a matched ')'; otherwise move on by one to avoid re-scanning.
-        if (*e == ')')
-            d = e;
-
-        if (*e != ')' || keyword.empty())
-            continue;
-
-        for (auto &ed: edList) {
-            if (is_name( keyword.c_str( ), ed->keyword.c_str( ) )) {
-                out.addUnique( keyword );
-                break;
+        if (!cyr) {
+            if (firstLatin.empty( )) firstLatin = w;
+        } else {
+            if (firstCyr.empty( )) firstCyr = w;
+            if (ukr) {
+                if (firstUkr.empty( )) firstUkr = w;
+            } else {
+                if (firstRus.empty( )) firstRus = w;
             }
         }
     }
+
+    switch (lang) {
+        case LANG_EN:
+            if (!firstLatin.empty( )) return firstLatin;
+            break;
+        case LANG_UA:
+            if (!firstUkr.empty( )) return firstUkr;
+            if (!firstCyr.empty( )) return firstCyr;
+            break;
+        default: // LANG_RU and anything else
+            if (!firstRus.empty( )) return firstRus;
+            if (!firstCyr.empty( )) return firstCyr;
+            break;
+    }
+
+    return firstWord;
 }
 
 // Announce examinable extra descriptions after a room description, for players
 // who can't perceive the inline "(keyword)" hint: screenreader users and those
-// browsing without colour.
-static DLString look_targets_hint( Character *ch, const char *desc, const ExtraDescrList &edList, lang_t lang )
+// browsing without colour. Driven by the room's extra-descr list rather than the
+// (parentheses) markers, so it also lists "secret" extras whose keyword is
+// deliberately absent from the visible text.
+static DLString look_targets_hint( Character *ch, const ExtraDescrList &edList, lang_t lang )
 {
     if (ch->is_npc( ))
         return DLString::emptyString;
@@ -1258,7 +1286,11 @@ static DLString look_targets_hint( Character *ch, const char *desc, const ExtraD
         return DLString::emptyString;
 
     StringList targets;
-    collect_look_targets( desc, edList, targets );
+    for (auto &ed: edList) {
+        DLString kw = pick_display_keyword( ed->keyword, lang );
+        if (!kw.empty( ))
+            targets.addUnique( kw );
+    }
     if (targets.empty( ))
         return DLString::emptyString;
 
@@ -1327,7 +1359,7 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
 
         // For screenreader / colourless clients, list the examinable extras
         // (empty for everyone else).
-        buf << look_targets_hint( ch, dsc, room->getExtraDescr(), lang );
+        buf << look_targets_hint( ch, room->getExtraDescr(), lang );
     }
 
     if (ch->getPC( ) && IS_SET(ch->getPC( )->act, PLR_AUTOEXIT))

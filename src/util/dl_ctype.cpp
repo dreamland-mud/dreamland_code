@@ -43,6 +43,7 @@ bool dl_is_rus_specific(char c)
     switch (c) {
         case 'ё': case 'ы': case 'э': case 'ъ':
         case 'Ё': case 'Ы': case 'Э': case 'Ъ':
+            return true;
         default:
             return false;
     }
