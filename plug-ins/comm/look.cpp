@@ -16,6 +16,7 @@
 #include <list>
 #include <sstream>
 #include <iomanip>
+#include <cctype>
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -45,6 +46,7 @@
 #include "desire.h"
 #include "fight.h"
 #include "screenreader.h"
+#include "stringlist.h"
 #include "descriptor.h"
 #include "webmanip.h"
 #include "websocketrpc.h"
@@ -1212,6 +1214,64 @@ static DLString rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Characte
     return descr;
 }
 
+// Collect the extra-descr keywords marked with (parentheses) in a description
+// that resolve to a real extra description, so screenreader / colourless clients
+// can be told what is examinable. Mirrors the (sign) parsing decorateExtraDescr uses.
+static void collect_look_targets( const char *desc, const ExtraDescrList &edList, StringList &out )
+{
+    for (const char *d = desc; *d; ++d) {
+        if (*d != '(')
+            continue;
+
+        DLString keyword;
+        const char *e;
+        for (e = d + 1; *e && *e != ')'; ++e) {
+            if (!isspace((unsigned char)*e) && !isalpha((unsigned char)*e) && *e != '-')
+                break;
+            keyword += *e;
+        }
+
+        // Advance past a matched ')'; otherwise move on by one to avoid re-scanning.
+        if (*e == ')')
+            d = e;
+
+        if (*e != ')' || keyword.empty())
+            continue;
+
+        for (auto &ed: edList) {
+            if (is_name( keyword.c_str( ), ed->keyword.c_str( ) )) {
+                out.addUnique( keyword );
+                break;
+            }
+        }
+    }
+}
+
+// Announce examinable extra descriptions after a room description, for players
+// who can't perceive the inline "(keyword)" hint: screenreader users and those
+// browsing without colour.
+static DLString look_targets_hint( Character *ch, const char *desc, const ExtraDescrList &edList, lang_t lang )
+{
+    if (ch->is_npc( ))
+        return DLString::emptyString;
+    if (!uses_screenreader( ch ) && ch->getPC( )->getConfig( ).color)
+        return DLString::emptyString;
+
+    StringList targets;
+    collect_look_targets( desc, edList, targets );
+    if (targets.empty( ))
+        return DLString::emptyString;
+
+    DLString label;
+    switch (lang) {
+        case LANG_EN: label = "You can look at: "; break;
+        case LANG_UA: label = "Можна подивитися: "; break;
+        default:      label = "Можно посмотреть: "; break;
+    }
+
+    return DLString("\n") + label + targets.join(", ") + ".";
+}
+
 static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMount )
 {
     ostringstream buf;
@@ -1264,6 +1324,10 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
 
         // Append resulting room description to the main output buffer.
         buf << roomDescription;
+
+        // For screenreader / colourless clients, list the examinable extras
+        // (empty for everyone else).
+        buf << look_targets_hint( ch, dsc, room->getExtraDescr(), lang );
     }
 
     if (ch->getPC( ) && IS_SET(ch->getPC( )->act, PLR_AUTOEXIT))
