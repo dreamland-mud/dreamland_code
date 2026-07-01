@@ -69,12 +69,14 @@ Object * Money::create( int gold, int silver )
     }
     else if (silver == 0)
     {
-        // TODO short descrs in all languages
         obj = create_object( get_obj_index( OBJ_VNUM_GOLD_SOME ), 0 );
         DLString moneyArg;
         moneyArg << gold << " золот|" << GET_COUNT( gold, "ая|ой|ой|ую|ой|ой", "ые|ых|ым|ые|ыми|ых", "ых|ых|ым|ых|ыми|ых" )
         << " монет|" << GET_COUNT(gold, "а|ы|е|у|ой|е", "ы||ам|ы|ами|ах", "||ам||ами|ах");
         obj->setShortDescr( moneyArg, LANG_RU );
+        // Fill the other languages so a non-RU viewer sees a count, not a raw "%d".
+        { DLString s; s << gold << " gold coins"; obj->setShortDescr( s, LANG_EN ); }
+        { DLString s; s << gold << " золотих монет"; obj->setShortDescr( s, LANG_UA ); }
         obj->value1(gold);
         obj->cost               = 100 * gold;
         obj->weight                = gold/5;
@@ -86,6 +88,8 @@ Object * Money::create( int gold, int silver )
         moneyArg << silver << " серебрян|" << GET_COUNT(silver, "ая|ой|ой|ую|ой|ой", "ые|ых|ым|ые|ыми|ых", "ых|ых|ым|ых|ыми|ых")
         << " монет|" << GET_COUNT(silver, "а|ы|е|у|ой|е", "ы||ам|ы|ами|ах", "||ам||ами|ах");
         obj->setShortDescr( moneyArg, LANG_RU );
+        { DLString s; s << silver << " silver coins"; obj->setShortDescr( s, LANG_EN ); }
+        { DLString s; s << silver << " срібних монет"; obj->setShortDescr( s, LANG_UA ); }
         obj->value0(silver);
         obj->cost               = silver;
         obj->weight                = silver/20;
@@ -99,6 +103,8 @@ Object * Money::create( int gold, int silver )
         << " и " << silver << " серебрян|" << GET_COUNT(silver, "ая|ой|ой|ую|ой|ой", "ые|ых|ым|ые|ыми|ых", "ых|ых|ым|ых|ыми|ых")
         << " монет|" << GET_COUNT(silver, "а|ы|е|у|ой|е", "ы||ам|ы|ами|ах", "||ам||ами|ах");
         obj->setShortDescr( moneyArg, LANG_RU );
+        { DLString s; s << silver << " silver and " << gold << " gold coins"; obj->setShortDescr( s, LANG_EN ); }
+        { DLString s; s << silver << " срібних та " << gold << " золотих монет"; obj->setShortDescr( s, LANG_UA ); }
         obj->value0(silver);
         obj->value1(gold);
         obj->cost                = 100 * gold + silver;

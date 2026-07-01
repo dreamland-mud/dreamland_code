@@ -68,6 +68,7 @@ public:
     // name and sex formatting
     virtual const char * getNameC( ) const;
     virtual const DLString &getNameP( char gram_case ) const;
+    virtual const DLString &getNameP( char gram_case, lang_t lang ) const;
     virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
     void updateCachedNouns();
     void updateCachedNoun(lang_t lang);

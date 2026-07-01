@@ -755,6 +755,22 @@ const DLString &PCharacter::getNameP( char gram_case ) const
         return cachedNoun.name.find(LANG_DEFAULT)->second->decline(gram_case);
 }
 
+const DLString &PCharacter::getNameP( char gram_case, lang_t lang ) const
+{
+    if (gram_case == '7')
+        return cachedNoun.allForms;
+
+    // Player names carry a per-language cached noun; fall back to the default
+    // language when the requested one isn't present.
+    auto i = cachedNoun.name.find(lang);
+    if (i == cachedNoun.name.end())
+        i = cachedNoun.name.find(LANG_DEFAULT);
+    if (i == cachedNoun.name.end())
+        return getNameP(gram_case);
+
+    return i->second->decline(gram_case);
+}
+
 /**************************************************************************
  *  pc skills 
  **************************************************************************/

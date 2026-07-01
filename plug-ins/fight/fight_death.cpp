@@ -468,9 +468,15 @@ static Object * corpse_create( Character *ch )
     corpse->from = name;
     corpse->cost = 0;
     corpse->level = ch->getRealLevel( );
-    // TODO multi-language corpse descriptions
-    corpse->setShortDescr( fmt(0, corpse->getShortDescr(LANG_DEFAULT).c_str(), name.c_str( )), LANG_DEFAULT ); 
-    corpse->setDescription( fmt(0, corpse->getDescription(LANG_DEFAULT).c_str(), name.c_str( )), LANG_DEFAULT ); 
+    // Substitute the victim's name into the corpse short descr and description
+    // for every language, using the name declined in that same language, so a
+    // viewer sees a clean single-language corpse instead of a raw "%s".
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        DLString lname = ch->getNameP('2', lang);
+        corpse->setShortDescr( fmt(0, corpse->getShortDescr(lang).c_str(), lname.c_str()), lang );
+        corpse->setDescription( fmt(0, corpse->getDescription(lang).c_str(), lname.c_str()), lang );
+    }
 
     if (IS_SET(ch->form, FORM_EDIBLE))
         corpse->value0((1 << ch->size) - 1);
@@ -718,15 +724,23 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     
     // Format body part name, adding owner name to its description, e.g. "отрезанная рука Керрада"
     // If there're no format symbols in the body part names, just concatenate owner name to it.
-    if (String::contains(obj->getShortDescr(LANG_DEFAULT), "%"))
-        obj->setShortDescr( fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), body_name.c_str()), LANG_DEFAULT);
-    else
-        obj->setShortDescr(obj->getShortDescr(LANG_DEFAULT) + DLString::SPACE + body_name, LANG_DEFAULT);
+    // Do this per language: when the owner character is known, use its name declined
+    // in that language; for parts guessed from an existing corpse, reuse the derived
+    // (default-language) name across all languages.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        DLString nm = ch ? ch->getNameP('2', lang) : body_name;
 
-    if (String::contains(obj->getDescription(LANG_DEFAULT), "%"))
-        obj->setDescription(fmt(0, obj->getDescription(LANG_DEFAULT).c_str(), body_name.c_str()), LANG_DEFAULT);
-    else
-        obj->setDescription(obj->getDescription(LANG_DEFAULT) + DLString::SPACE + body_name, LANG_DEFAULT);
+        if (String::contains(obj->getShortDescr(lang), "%"))
+            obj->setShortDescr( fmt(0, obj->getShortDescr(lang).c_str(), nm.c_str()), lang);
+        else
+            obj->setShortDescr(obj->getShortDescr(lang) + DLString::SPACE + nm, lang);
+
+        if (String::contains(obj->getDescription(lang), "%"))
+            obj->setDescription(fmt(0, obj->getDescription(lang).c_str(), nm.c_str()), lang);
+        else
+            obj->setDescription(obj->getDescription(lang) + DLString::SPACE + nm, lang);
+    }
 
     obj->from = body_name;
     obj->level = body_level;

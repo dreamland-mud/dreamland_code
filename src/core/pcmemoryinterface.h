@@ -37,6 +37,10 @@ class PCMemoryInterface;
 class CharacterMemoryInterface : public virtual DLObject {
 public:
     virtual const DLString & getNameP(char gram_case) const  = 0;
+    // Declined name in a specific language. The default ignores 'lang' (for names
+    // that aren't localized, e.g. remembered players); NPCharacter/PCharacter
+    // override to pick the requested language from their cached per-lang nouns.
+    virtual const DLString & getNameP(char gram_case, lang_t) const { return getNameP(gram_case); }
     virtual const char * getNameC( ) const = 0;
 
     virtual short getLevel( ) const  = 0;
