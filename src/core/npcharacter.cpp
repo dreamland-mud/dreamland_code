@@ -323,6 +323,22 @@ const DLString & NPCharacter::getNameP( char gram_case ) const
     return toNoun()->decline(gram_case);
 }
 
+const DLString & NPCharacter::getNameP( char gram_case, lang_t lang ) const
+{
+    if (gram_case == '7')
+        return cachedAllForms;
+
+    // cachedNouns is populated for every language at creation (updateCachedNouns);
+    // fall back to the default language if the requested one is somehow absent.
+    auto i = cachedNouns.find(lang);
+    if (i == cachedNouns.end())
+        i = cachedNouns.find(LANG_DEFAULT);
+    if (i == cachedNouns.end())
+        return getNameP(gram_case);
+
+    return i->second->decline(gram_case);
+}
+
 /****************************************************************************
  * trust and immortality 
  ****************************************************************************/

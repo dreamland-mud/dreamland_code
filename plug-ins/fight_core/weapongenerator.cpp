@@ -520,6 +520,10 @@ void WeaponGenerator::setShortDescr() const
         myshort += " " + randomNoun; // боли
 
     obj->setShortDescr(myshort, LANG_RU);
+    // Random weapon names are generated in Russian only; mirror into the other
+    // languages so a non-RU viewer sees the name, not the prototype placeholder.
+    obj->setShortDescr(myshort, LANG_EN);
+    obj->setShortDescr(myshort, LANG_UA);
 
     obj->setProperty("eqName", nameConfig["short"].asString()); // 'буздыган' in sheath wearloc
 }
@@ -530,6 +534,8 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
     setName();
     setShortDescr();
     obj->setDescription(nameConfig["long"].asCString(), LANG_RU);
+    obj->setDescription(nameConfig["long"].asCString(), LANG_EN);
+    obj->setDescription(nameConfig["long"].asCString(), LANG_UA);
 
     // Set up provided material or default.
     obj->setMaterial(findMaterial());
@@ -548,6 +554,12 @@ const WeaponGenerator & WeaponGenerator::assignColours() const
         myshort = "{" + colour + myshort.colourStrip() + "{x";
         obj->setShortDescr(myshort, LANG_RU);
     }
+
+    // Keep the other languages in sync with the final (coloured) Russian name;
+    // this also covers the re-stat path, which doesn't regenerate the name.
+    DLString finalShort = obj->getShortDescr(LANG_RU);
+    obj->setShortDescr(finalShort, LANG_EN);
+    obj->setShortDescr(finalShort, LANG_UA);
 
     return *this;
 }
