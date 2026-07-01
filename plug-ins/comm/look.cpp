@@ -1144,7 +1144,7 @@ struct ExtraDescList : public list<EDInfo> {
         if (obj->getKeyword().matchesUnstrict(arg)) {
             DLString defaultDescr;
             if (obj->in_room)
-                defaultDescr = obj->getDescription(LANG_DEFAULT);
+                defaultDescr = obj->getDescription(Player::lang(ch));
             else
                 defaultDescr = "Ты не видишь здесь ничего особенного.";
                 
@@ -1156,7 +1156,7 @@ struct ExtraDescList : public list<EDInfo> {
     {
         for (auto &ed: edList)
             if (is_name( arg, ed->keyword.c_str() ))
-                push_back( EDInfo( ed->keyword, ed->description.get(LANG_DEFAULT), obj, room ) );
+                push_back( EDInfo( ed->keyword, ed->description.getForLang(Player::lang(ch)), obj, room ) );
     }
     
     bool output( )
