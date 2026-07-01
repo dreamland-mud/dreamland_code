@@ -9,6 +9,7 @@
 #include "xmlinteger.h"
 #include "xmlboolean.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlflags.h"
 #include "xmlglobalarray.h"
 #include "xmltableelement.h"
@@ -29,15 +30,15 @@ public:
     virtual void loaded( );
     virtual void unloaded( );
     
-    virtual const DLString &getShortDescr( ) const;
-    virtual const DLString &getColor( ) const;
+    virtual const DLString &getShortDescr( lang_t lang = LANG_DEFAULT ) const;
+    virtual const DLString &getColor( lang_t lang = LANG_DEFAULT ) const;
     virtual int getSipSize( ) const;
     virtual GlobalArray & getDesires( );
     virtual const Flags & getFlags( ) const;
 
 protected:
-    XML_VARIABLE XMLStringNoEmpty    shortDescr;
-    XML_VARIABLE XMLStringNoEmpty    color;
+    XML_VARIABLE XMLMultiString      shortDescr;
+    XML_VARIABLE XMLMultiString      color;
     XML_VARIABLE XMLIntegerNoEmpty   sipSize;
     XML_VARIABLE XMLGlobalArray      desires;
     XML_VARIABLE XMLFlagsNoEmpty     flags;

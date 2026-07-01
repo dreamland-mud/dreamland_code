@@ -29,13 +29,13 @@ void DefaultLiquid::unloaded( )
     liquidManager->unregistrate( Pointer( this ) );
 }
 
-const DLString & DefaultLiquid::getShortDescr( ) const
+const DLString & DefaultLiquid::getShortDescr( lang_t lang ) const
 {
-    return shortDescr.getValue( );
+    return shortDescr.getForLang( lang );
 }
-const DLString & DefaultLiquid::getColor( ) const
+const DLString & DefaultLiquid::getColor( lang_t lang ) const
 {
-    return color.getValue( );
+    return color.getForLang( lang );
 }
 int DefaultLiquid::getSipSize( ) const
 {

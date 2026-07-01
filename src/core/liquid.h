@@ -11,6 +11,7 @@
 #include "globalreference.h"
 #include "xmlglobalreference.h"
 #include "bitstring.h"
+#include "lang.h"
 
 #define LIQ( name ) static LiquidReference liq_##name( #name )
 
@@ -32,8 +33,8 @@ public:
     virtual const DLString &getRussianName( ) const;
     virtual bool isValid( ) const;
     
-    virtual const DLString &getShortDescr( ) const;
-    virtual const DLString &getColor( ) const;
+    virtual const DLString &getShortDescr( lang_t lang = LANG_DEFAULT ) const;
+    virtual const DLString &getColor( lang_t lang = LANG_DEFAULT ) const;
     virtual int getSipSize( ) const;
     virtual GlobalArray & getDesires( );
     virtual const Flags & getFlags( ) const;
