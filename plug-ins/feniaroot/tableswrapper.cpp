@@ -149,10 +149,20 @@ TableWrapper::callMethod(const Register &key, const RegisterList &args)
         char gcase = igcase + '0';
         int value = argnum2flag(args, 1, *table);
 
+        // Optional 3rd arg: the viewer's language (0=en, 1=ru, 2=ua), normally
+        // passed as ch.displayLang so identify/empathize render per-viewer.
+        // Absent or out of range keeps the historical RU/default behavior.
+        lang_t lang = LANG_DEFAULT;
+        if (args.size() > 2) {
+            int l = argnum2number(args, 3);
+            if (l >= LANG_MIN && l < LANG_MAX)
+                lang = (lang_t)l;
+        }
+
         if (table->enumerated)
-            return table->message(value, gcase);
+            return table->message(value, gcase, lang);
         else
-            return table->messages(value, true, gcase);
+            return table->messages(value, true, gcase, lang);
     }
 
     // Unstrict lookup by string
