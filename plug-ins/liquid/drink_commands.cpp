@@ -126,12 +126,19 @@ CMDRUN( fill )
     else
         liq = liq_water.getElement();
 
-    const char *liqname = liq->getShortDescr(Player::lang(ch)).c_str();
+    lang_t lang = Player::lang(ch);
+    const char *liqname = liq->getShortDescr(lang).c_str();
 
     if (obj->value1() > 0 && obj->value2() != liq->getIndex()) {
-        ch->pecho("Ты пытаешься наполнить %O4 %N5, но туда уже налита другая жидкость.", 
+        ch->pecho(lmsg(lang,
+            "You try to fill %O4 with %N5, but it already holds a different liquid.",
+            "Ты пытаешься наполнить %O4 %N5, но туда уже налита другая жидкость.",
+            "Ти намагаєшся наповнити %O4 %N5, але там уже налита інша рідина."),
                   obj, liqname);
-        ch->pecho("Ее придется сначала вылить.", obj);
+        ch->pecho(lmsg(lang,
+            "You will have to pour it out first.",
+            "Ее придется сначала вылить.",
+            "Її доведеться спершу вилити."), obj);
 		return;
     }
 
@@ -141,10 +148,16 @@ CMDRUN( fill )
     }    
     
     if (source) {
-        ch->pecho( "Ты наполняешь %O4 %N5 из %O2.", obj, liqname, source );
+        ch->pecho( lmsg(lang,
+            "You fill %O4 with %N5 from %O2.",
+            "Ты наполняешь %O4 %N5 из %O2.",
+            "Ти наповнюєш %O4 %N5 з %O2."), obj, liqname, source );
         ch->recho( "%^C1 наполняет %O4 %N5 из %O2.",ch, obj, liqname, source );
     } else {
-        ch->pecho("Ты зачерпываешь %N4 и наполняешь %O4.", liqname, obj);
+        ch->pecho( lmsg(lang,
+            "You scoop up %N4 and fill %O4.",
+            "Ты зачерпываешь %N4 и наполняешь %O4.",
+            "Ти зачерпуєш %N4 і наповнюєш %O4."), liqname, obj);
         ch->recho("%^C1 зачерпывает %N4 и наполняет %O4.", ch, liqname, obj);
     }
 
@@ -304,36 +317,71 @@ void pour_out( Character *ch, Object * out, Character *victim )
     amount = out->value1();
     sips = max( 1, amount / liquid->getSipSize( ) );
 
-    if (out->value1() == 0) {
-        msgChar = "Ты опрокидываешь на %2$C4 %3$O4, однако оттуда не выливается ни капли.";
-        msgVict = "%1$^C1 переворачивает над тобой %3$O4, однако оттуда не выливается ни капли.";
-        msgRoom = "%1$^C1 переворачивает над %2$C5 %3$O4, однако оттуда не выливается ни капли.";
+    lang_t lch = Player::lang(ch);
+    lang_t lv = Player::lang(victim);
 
-        msgSelf = "Ты опрокидываешь на себя %3$O4, однако оттуда не выливается ни капли.";
+    if (out->value1() == 0) {
+        msgChar = lmsg(lch,
+            "You tip %3$O4 over %2$C4, but not a drop comes out.",
+            "Ты опрокидываешь на %2$C4 %3$O4, однако оттуда не выливается ни капли.",
+            "Ти перекидаєш %3$O4 на %2$C4, проте звідти не виливається ані краплі.");
+        msgVict = lmsg(lv,
+            "%1$^C1 tips %3$O4 over you, but not a drop comes out.",
+            "%1$^C1 переворачивает над тобой %3$O4, однако оттуда не выливается ни капли.",
+            "%1$^C1 перекидає над тобою %3$O4, проте звідти не виливається ані краплі.");
+        msgSelf = lmsg(lch,
+            "You tip %3$O4 over yourself, but not a drop comes out.",
+            "Ты опрокидываешь на себя %3$O4, однако оттуда не выливается ни капли.",
+            "Ти перекидаєш на себе %3$O4, проте звідти не виливається ані краплі.");
+        msgRoom = "%1$^C1 переворачивает над %2$C5 %3$O4, однако оттуда не выливается ни капли.";
         msgOther= "Приговаривая 'ну котеночек, ну еще капельку', %1$C1 переворачивает и трясет над головой %3$O4.";
     }
     else if (sips < 2) {
-        msgChar = "Ты брызгаешь на %2$C4 %4$N5 из %3$O2.";
-        msgVict = "%1$^C1 брызгает на тебя %4$N5 из %3$O2.";
+        msgChar = lmsg(lch,
+            "You splash %2$C4 with %4$N5 from %3$O2.",
+            "Ты брызгаешь на %2$C4 %4$N5 из %3$O2.",
+            "Ти бризкаєш на %2$C4 %4$N5 з %3$O2.");
+        msgVict = lmsg(lv,
+            "%1$^C1 splashes you with %4$N5 from %3$O2.",
+            "%1$^C1 брызгает на тебя %4$N5 из %3$O2.",
+            "%1$^C1 бризкає на тебе %4$N5 з %3$O2.");
+        msgSelf = lmsg(lch,
+            "You splash yourself with %4$N5 from %3$O2.",
+            "Ты брызгаешь на себя %4$N5 из %3$O2.",
+            "Ти бризкаєш на себе %4$N5 з %3$O2.");
         msgRoom = "%1$^C1 брызгает на %2$C4 %4$N5 из %3$O2.";
-
-        msgSelf = "Ты брызгаешь на себя %4$N5 из %3$O2.";
         msgOther= "%1$^C1 брызгает на себя %4$N5 из %3$O2.";
     }
     else if (sips < 25) {
-        msgChar = "Ты выливаешь на %2$C4 %4$N4 из %3$O2.";
-        msgVict = "%1$^C1 выливает на тебя %4$N4 из %3$O2.";
+        msgChar = lmsg(lch,
+            "You pour %4$N4 over %2$C4 from %3$O2.",
+            "Ты выливаешь на %2$C4 %4$N4 из %3$O2.",
+            "Ти виливаєш %4$N4 на %2$C4 з %3$O2.");
+        msgVict = lmsg(lv,
+            "%1$^C1 pours %4$N4 over you from %3$O2.",
+            "%1$^C1 выливает на тебя %4$N4 из %3$O2.",
+            "%1$^C1 виливає %4$N4 на тебе з %3$O2.");
+        msgSelf = lmsg(lch,
+            "You pour %4$N4 over yourself from %3$O2.",
+            "Ты выливаешь на себя %4$N4 из %3$O2.",
+            "Ти виливаєш %4$N4 на себе з %3$O2.");
         msgRoom = "%1$^C1 выливает на %2$C4 %4$N4 из %3$O2.";
-
-        msgSelf = "Ты выливаешь на себя %4$N4 из %3$O2.";
         msgOther= "%1$^C1 выливает на себя %4$N4 из %3$O2.";
     }
     else {
-        msgChar = "Ты опрокидываешь на %2$C4 %3$O4, с ног до головы обливая %2$P2 %4$N5!";
-        msgVict = "%1$^C1 опрокидывает на тебя %3$O4, с ног до головы обливая тебя %4$N5!";
+        msgChar = lmsg(lch,
+            "You upend %3$O4 over %2$C4, drenching %2$C4 from head to toe with %4$N5!",
+            "Ты опрокидываешь на %2$C4 %3$O4, с ног до головы обливая %2$P2 %4$N5!",
+            "Ти перекидаєш %3$O4 на %2$C4, з ніг до голови обливаючи %2$C4 %4$N5!");
+        msgVict = lmsg(lv,
+            "%1$^C1 upends %3$O4 over you, drenching you from head to toe with %4$N5!",
+            "%1$^C1 опрокидывает на тебя %3$O4, с ног до головы обливая тебя %4$N5!",
+            "%1$^C1 перекидає на тебе %3$O4, з ніг до голови обливаючи тебе %4$N5!");
+        msgSelf = lmsg(lch,
+            "You upend %3$O4 over yourself, drenching yourself from head to toe with %4$N5!",
+            "Ты опрокидываешь на себя %3$O4, с ног до головы обливаясь %4$N5!",
+            "Ти перекидаєш на себе %3$O4, з ніг до голови обливаючись %4$N5!");
         msgRoom = "%1$^C1 опрокидывает на %2$C4 %3$O4, с ног до головы обливая %2$P2 %4$N5!";
-
-        msgSelf = "Ты опрокидываешь на себя %3$O4, с ног до головы обливаясь %4$N5!";
         msgOther= "%1$^C1 опрокидывает на себя %3$O4, с ног до головы обливаясь %4$N5!";
     }
     
@@ -349,7 +397,10 @@ void pour_out( Character *ch, Object * out, Character *victim )
             victim->pecho( msgVict.c_str( ), ch, victim, out, liquid->getShortDescr( Player::lang(victim) ).c_str( ) );
         }
         else if (sips >= 5) {
-            victim->pecho( "Ты чувствуешь влагу на теле." );
+            victim->pecho( lmsg(lv,
+                "You feel wetness on your skin.",
+                "Ты чувствуешь влагу на теле.",
+                "Ти відчуваєш вологу на тілі.") );
 
             if (!IS_AFFECTED(victim, AFF_SLEEP))
                 interpret_raw( ch, "wake", "%lld", victim->getID());
@@ -471,20 +522,33 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
     in->value2(out->value2());
 
     Liquid *liq = liquidManager->find( out->value2() );
-    const char *liqShort = liq->getShortDescr( Player::lang(ch) ).c_str( );
+    lang_t lang = Player::lang(ch);
+    const char *liqShort = liq->getShortDescr( lang ).c_str( );
 
     if (vch == 0) {
-        ch->pecho( "Ты наливаешь %N4 из %O2 в %O4.", liqShort, out, in );
+        ch->pecho( lmsg(lang,
+            "You pour %N4 from %O2 into %O4.",
+            "Ты наливаешь %N4 из %O2 в %O4.",
+            "Ти наливаєш %N4 з %O2 у %O4."), liqShort, out, in );
         ch->recho( "%^C1 наливает %N4 из %O2 в %O4.", ch, liqShort, out, in );
     }
     else {
         if (vch != ch) {
-            ch->pecho( "Ты наливаешь %N4 для %C2.", liqShort, vch );
-            vch->pecho( "%^C1 наливает тебе %N4.", ch, liqShort );
+            ch->pecho( lmsg(lang,
+                "You pour %N4 for %C2.",
+                "Ты наливаешь %N4 для %C2.",
+                "Ти наливаєш %N4 для %C2."), liqShort, vch );
+            vch->pecho( lmsg(Player::lang(vch),
+                "%^C1 pours you %N4.",
+                "%^C1 наливает тебе %N4.",
+                "%^C1 наливає тобі %N4."), ch, liq->getShortDescr( Player::lang(vch) ).c_str( ) );
             ch->recho( vch, "%^C1 наливает %N4 для %C2.", ch, liqShort, vch );
         }
         else {
-            ch->pecho( "Ты наливаешь себе %N4.", liqShort );
+            ch->pecho( lmsg(lang,
+                "You pour yourself %N4.",
+                "Ты наливаешь себе %N4.",
+                "Ти наливаєш собі %N4."), liqShort );
             ch->recho( "%^C1 наливает себе %N4.", ch, liqShort );
         }
     }
@@ -728,14 +792,21 @@ CMDRUN( drink )
             if (!desireManager->find( i )->canDrink( ch->getPC( ) ))
                 return;
     
-    DLString buf = liquid->getShortDescr( Player::lang(ch) ).ruscase( '4' );
+    lang_t lang = Player::lang(ch);
+    DLString buf = liquid->getShortDescr( lang ).ruscase( '4' );
 
     if (obj) {
         oldact("$c1 пьет $T из $o2.", ch,obj,buf.c_str( ),TO_ROOM );
-        oldact("Ты пьешь $T из $o2.", ch,obj,buf.c_str( ),TO_CHAR );
+        oldact(lmsg(lang,
+            "You drink $T from $o2.",
+            "Ты пьешь $T из $o2.",
+            "Ти п'єш $T з $o2."), ch,obj,buf.c_str( ),TO_CHAR );
     } else {
         oldact("$c1 зачерпывает и пьет $T.", ch, 0, buf.c_str( ),TO_ROOM );
-        oldact("Ты зачерпываешь и пьешь $T.", ch, 0, buf.c_str( ),TO_CHAR );
+        oldact(lmsg(lang,
+            "You scoop up and drink $T.",
+            "Ты зачерпываешь и пьешь $T.",
+            "Ти зачерпуєш і п'єш $T."), ch, 0, buf.c_str( ),TO_CHAR );
     }
 
     if (ch->fighting != 0)
@@ -797,19 +868,32 @@ CMDRUN( drink )
 bool oprog_smell_liquid(Liquid *liq, Character *sniffer)
 {
         DLString msg;
+        lang_t lang = Player::lang(sniffer);
 
         if (liq->getFlags( ).isSet( LIQF_LIQUOR ))
-            msg = "Тебе в нос ударяет резкий запах %1$N2.";
+            msg = lmsg(lang,
+                "A sharp reek of %1$N2 hits your nose.",
+                "Тебе в нос ударяет резкий запах %1$N2.",
+                "Тобі в ніс б'є різкий запах %1$N2.");
         else if (liq->getFlags( ).isSet( LIQF_WINE ))
-            msg = "Ты улавливаешь аромат %1$N2.";
+            msg = lmsg(lang,
+                "You catch the aroma of %1$N2.",
+                "Ты улавливаешь аромат %1$N2.",
+                "Ти вловлюєш аромат %1$N2.");
         else if (liq->getFlags( ).isSet( LIQF_BEER ))
-            msg = "Пахнет %1$N5.";
+            msg = lmsg(lang,
+                "It smells of %1$N5.",
+                "Пахнет %1$N5.",
+                "Пахне %1$N5.");
         else if (liq->getIndex() != liq_water)
-            msg = "Ты чувствуешь запах %1$N2.";
+            msg = lmsg(lang,
+                "You smell %1$N2.",
+                "Ты чувствуешь запах %1$N2.",
+                "Ти відчуваєш запах %1$N2.");
         else
             return false;
 
-        sniffer->pecho( msg.c_str( ), liq->getShortDescr( Player::lang(sniffer) ).c_str( ) );
+        sniffer->pecho( msg.c_str( ), liq->getShortDescr( lang ).c_str( ) );
         return true;
 }
 
