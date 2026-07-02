@@ -18,6 +18,8 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
+#include "player_utils.h"
+#include "lang.h"
 #include "commandinterpreter.h"
 #include "commandbase.h"
 #include "playerattributes.h"
@@ -438,6 +440,9 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
     // Player sex lets the web map resolve gender (flexer) switches in room text to the
     // viewer's own form ("neutral"/"male"/"female"/"either"); see mudjs flexer.js.
     prompt["args"][0]["sex"] = sex_table.name( ch->getSex( ) );
+    // Player display language (from 'config language') lets the web map pick room and
+    // area names in the viewer's language; mudjs reads b.lang ("en"/"ru"/"ua").
+    prompt["args"][0]["lang"] = lang2attr( Player::displayLang( ch ) ).c_str( );
 
     if (ch->fighting) {
         prompt["args"][0]["fight"] = HEALTH(ch->fighting);
