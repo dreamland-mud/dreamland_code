@@ -183,6 +183,34 @@ NMI_SET( ObjectWrapper, description , "описание, видимое на з�
     target->setDescription( arg.toString(), LANG_DEFAULT );
 }
 
+NMI_INVOKE( ObjectWrapper, getDescr, "(lang): описание на земле на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    return Register( target->getDescription( argnum2lang(args, 1) ) );
+}
+
+NMI_INVOKE( ObjectWrapper, setDescr, "(text, lang): установить описание на земле для языка lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    DLString text = argnum2string( args, 1 );
+    target->setDescription( text, argnum2lang(args, 2) );
+    return Register( );
+}
+
+NMI_INVOKE( ObjectWrapper, getShort, "(lang): короткое описание на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    return Register( target->getShortDescr( argnum2lang(args, 1) ) );
+}
+
+NMI_INVOKE( ObjectWrapper, setShort, "(text, lang): установить короткое описание для языка lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    DLString text = argnum2string( args, 1 );
+    target->setShortDescr( text, argnum2lang(args, 2) );
+    return Register( );
+}
+
 NMI_GET( ObjectWrapper, material, "материалы (.Material), из которых сделан предмет")
 {
     checkTarget( );

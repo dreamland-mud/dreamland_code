@@ -446,6 +446,13 @@ NMI_SET( CharacterWrapper, short_descr, "короткое описание мо�
     target->getNPC()->setShortDescr( arg.toString( ), LANG_DEFAULT );
 }
 
+NMI_INVOKE( CharacterWrapper, getShort, "(lang): короткое описание моба на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    CHK_PC
+    return Register( target->getNPC()->getShortDescr( argnum2lang(args, 1) ) );
+}
+
 NMI_GET( CharacterWrapper, long_descr, "длинное описание моба" )
 {
     checkTarget( );

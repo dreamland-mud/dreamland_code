@@ -330,6 +330,16 @@ DLString argnum2string(const RegisterList &args, int num)
     return argnum(args, num).toString();
 }
 
+lang_t argnum2lang(const RegisterList &args, int num)
+{
+    if ((int)args.size() >= num) {
+        int l = argnum2number(args, num);
+        if (l >= LANG_MIN && l < LANG_MAX)
+            return (lang_t)l;
+    }
+    return LANG_DEFAULT;
+}
+
 Skill * arg2skill( const Register &r )
 {
     Skill *skill;
