@@ -388,7 +388,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
     if (arg_is(arg, "sex")) {   
-        ch->pecho("Пол %s.", GET_SEX(ch, "мужской", "потерян", "женский"));
+        ch->pecho("Пол %s.", ch->getSex( ) == 0 ? "потерян" : sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) ).c_str( ));
         return;
     }
     if (arg_is(arg, "class")) {
@@ -568,7 +568,7 @@ CMDRUNP( score )
             CLR_FRAME,
 
             CLR_CAPT,
-            ch->getSex( ) == 0 ? "потерян" : ch->getSex( ) == SEX_MALE ? "мужской" : "женский",
+            ch->getSex( ) == 0 ? "потерян" : sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) ).c_str( ),
             CLR_BAR,
             CLR_CAPT,
             ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS), pch->getMaxStat(STAT_WIS),
