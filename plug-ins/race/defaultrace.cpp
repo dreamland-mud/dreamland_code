@@ -131,7 +131,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
             if (stat != 0) {
                 if (found) 
                     in << ", ";
-                in << (stat > 0 ? "+" : "") << stat << " к " << stat_table.message( i, '3' );
+                in << (stat > 0 ? "+" : "") << stat << " к " << stat_table.message( i, '3', Player::displayLang(ch) );
                 found = true;
             }
         }
@@ -139,7 +139,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
             in << "без изменений";
         in << endl;
     }
-    in << "{cРазмер{x      : " << size_table.message( r->getSize( ) ) << endl; 
+    in << "{cРазмер{x      : " << size_table.message( r->getSize( ), '1', Player::displayLang(ch) ) << endl;
     
     in << "{cКлассы{x      : любой";
     bool found = false;
