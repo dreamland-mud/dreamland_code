@@ -368,7 +368,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 
                 bool indoors = IS_SET(ch->in_room->room_flags, ROOM_INDOORS);
                 out << (indoors ? "(" : "")
-                    << "{" << sector_type_color(sector) <<  sector_table.message(sector);
+                    << "{" << sector_type_color(sector) <<  sector_table.message(sector, '1', Player::displayLang(ch));
                     
                 if (liq_none != liq)
                     out << "{D|{x" << liq->getShortDescr().ruscase('1');

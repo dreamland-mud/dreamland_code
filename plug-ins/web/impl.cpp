@@ -367,7 +367,7 @@ Json::Value LocationWebPromptListener::jsonSector( Descriptor *d, Character *ch 
     if (indoors)
         buf << "(";
 
-    buf <<  sector_table.message(sector);
+    buf <<  sector_table.message(sector, '1', Player::displayLang(ch));
                     
     if (liq_none != liq)
         buf << ", " << liq->getShortDescr(Player::lang(ch)).ruscase('1').colourStrip();
