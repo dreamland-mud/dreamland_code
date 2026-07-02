@@ -219,7 +219,7 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
         if (stat != 0) {
             if (found) 
                 in << ", ";
-            in << (stat > 0 ? "+" : "") << stat << " к " << stat_table.message( i, '3' );
+            in << (stat > 0 ? "+" : "") << stat << " к " << stat_table.message( i, '3', Player::displayLang(ch) );
             found = true;
         }
     }

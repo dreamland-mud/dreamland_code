@@ -127,8 +127,8 @@ CMDRUNP( oscore )
         buf << "Уровень доверия к тебе составляет " << ch->get_trust( ) << "." << endl;
 
     buf << "{wРаса:{W " << ch->getRace( )->getNameFor( ch, ch ).ruscase('1')
-    << "  {wРазмер:{W " << size_table.message( ch->size )    
-        << "  {wПол:{W " << sex_table.message( ch->getSex( ) )
+    << "  {wРазмер:{W " << size_table.message( ch->size, '1', Player::displayLang(ch) )
+        << "  {wПол:{W " << sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) )
         << "  {wКласс:{W " << ch->getProfession( )->getNameFor( ch );
     
     if (!ch->is_npc( ))
@@ -400,7 +400,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
     if (arg_is(arg, "ethos")) {
-        ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos, '1').c_str());
+        ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos, '1', Player::displayLang(ch)).c_str());
         return;
     } 
     if (arg_is(arg, "hometown")) {
@@ -513,7 +513,7 @@ CMDRUNP( score )
     name << ch->seeName( ch, '1' ) << "{x ";
     mudtags_convert(title.c_str( ), name, TAGS_CONVERT_VIS, ch);
 
-    DLString ethos = ethos_table.message( ch->ethos, '1' );
+    DLString ethos = ethos_table.message( ch->ethos, '1', Player::displayLang(ch) );
 
     // Output one piece of the score if there is an argument provided.
     DLString arg = argument;
