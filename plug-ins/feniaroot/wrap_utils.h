@@ -11,6 +11,7 @@
 #include "globalbitvector.h"
 #include "stringset.h"
 #include "reglist.h"
+#include "lang.h"
 
 using Scripting::Register;
 using Scripting::RegisterList;
@@ -77,6 +78,9 @@ PCMemoryInterface * argnum2memory(const RegisterList &args, int num);
 int argnum2number(const RegisterList &args, int num);
 int argnum2boolean(const RegisterList &args, int num);
 DLString argnum2string(const RegisterList &args, int num);
+// Read argument 'num' as a language id (0=en, 1=ru, 2=ua); absent or out of
+// range yields LANG_DEFAULT. Mirrors the optional lang arg on .tables.X.messages.
+lang_t argnum2lang(const RegisterList &args, int num);
 Skill * argnum2skill(const RegisterList &args, int num);
 int arg2flag(const Register &arg, const FlagTable &table);
 int argnum2flag(const RegisterList &args, int num, const FlagTable &table);
