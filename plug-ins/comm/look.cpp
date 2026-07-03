@@ -1475,8 +1475,8 @@ static void do_look_object( Character *ch, Object *obj )
 
         for (int i = 0; i < wearlocationManager->size( ); i++) {
             Wearlocation *loc = wearlocationManager->find( i );
-            if (loc->matches( obj ) && !loc->getPurpose().empty()) {
-                buf << ", " << loc->getPurpose( ).toLower( );
+            if (loc->matches( obj ) && !loc->getPurpose(lang).empty()) {
+                buf << ", " << loc->getPurpose( lang ).toLower( );
                 break;
             }
         }

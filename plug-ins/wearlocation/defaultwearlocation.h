@@ -7,6 +7,7 @@
 
 #include "xmlinteger.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlboolean.h"
 #include "xmlflags.h"
 #include "xmlenumeration.h"
@@ -33,7 +34,7 @@ public:
     virtual void unloaded( );
     
     inline virtual const DLString & getRibName( ) const;
-    inline virtual const DLString & getPurpose( ) const;
+    inline virtual const DLString & getPurpose( lang_t lang = LANG_DEFAULT ) const;
     inline virtual int getDestroyChance( ) const;
     inline virtual int getOrderWear( ) const;
     inline virtual int getOrderDisplay( ) const;
@@ -86,9 +87,9 @@ protected:
     XML_VARIABLE XMLBoolean            needRib;
     XML_VARIABLE XMLIntegerNoEmpty     orderWear, orderDisplay;
     XML_VARIABLE XMLBoolean            displayAlways;
-    XML_VARIABLE XMLStringNoEmpty      msgDisplay;
+    XML_VARIABLE XMLMultiString        msgDisplay;
     XML_VARIABLE XMLStringNoEmpty      ribName;
-    XML_VARIABLE XMLStringNoEmpty      purpose;
+    XML_VARIABLE XMLMultiString        purpose;
     XML_VARIABLE XMLIntegerNoEmpty     destroyChance;
 };
 
@@ -96,9 +97,9 @@ inline const DLString &DefaultWearlocation::getRibName( ) const
 {
     return ribName.getValue( );
 }
-inline const DLString &DefaultWearlocation::getPurpose( ) const
+inline const DLString &DefaultWearlocation::getPurpose( lang_t lang ) const
 {
-    return purpose.getValue( );
+    return purpose.getForLang( lang );
 }
 inline int DefaultWearlocation::getOrderWear( ) const
 {
