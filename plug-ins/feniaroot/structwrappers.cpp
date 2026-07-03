@@ -23,6 +23,7 @@
 #include "clan.h"
 #include "clantypes.h"
 #include "wearlocation.h"
+#include "player_utils.h"
 #include "spelltarget.h"
 #include "material-table.h"
 #include "material.h"
@@ -104,9 +105,15 @@ NMI_GET( AreaWrapper, filename, "название файла зоны" )
     return Scripting::Register( filename );
 }
 
-NMI_GET( AreaWrapper, name, "имя зоны (как видно по 'where')" ) 
+NMI_GET( AreaWrapper, name, "имя зоны (как видно по 'where')" )
 {
     return Scripting::Register( getTarget()->name.get(LANG_DEFAULT) );
+}
+
+NMI_INVOKE( AreaWrapper, nameFor, "(ch): имя зоны на языке зрителя ch (EN/RU/UA, откат на дефолт)" )
+{
+    Character *ch = args2character(args);
+    return Scripting::Register( getTarget()->name.getForLang(Player::displayLang(ch)) );
 }
 
 NMI_GET( AreaWrapper, area_flag, "флаги зоны (таблица .tables.area_flags)" ) 
@@ -193,12 +200,23 @@ NMI_GET( HometownWrapper, recall, "vnum комнаты возврата (recall)
     return Scripting::Register( hometownManager->find( name )->getRecall( ) );
 }
 
-NMI_GET( HometownWrapper, areaname, "полное название арии" ) 
+NMI_GET( HometownWrapper, areaname, "полное название арии" )
 {
     Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
         return Scripting::Register( room->areaName() );
+    else
+        return Scripting::Register( DLString::emptyString );
+}
+
+NMI_INVOKE( HometownWrapper, areanameFor, "(ch): полное название арии на языке зрителя ch (EN/RU/UA)" )
+{
+    Character *ch = args2character(args);
+    Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
+
+    if (room && room->area)
+        return Scripting::Register( room->area->name.getForLang(Player::displayLang(ch)) );
     else
         return Scripting::Register( DLString::emptyString );
 }
