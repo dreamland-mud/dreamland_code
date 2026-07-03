@@ -9,6 +9,7 @@
 #include "xmlinteger.h"
 #include "xmlboolean.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlflags.h"
 #include "xmlenumeration.h"
 #include "xmltableelement.h"
@@ -61,12 +62,13 @@ protected:
     XML_VARIABLE XMLInteger activeLimit;     
     XML_VARIABLE XMLInteger minValue, maxValue; 
 
-    XML_VARIABLE XMLString what;    
+    XML_VARIABLE XMLMultiString what;
 
-    XML_VARIABLE XMLString  msgStop, msgStart;
-    XML_VARIABLE XMLString  msgActive;
-    XML_VARIABLE XMLString  msgDamageSelf, msgDamageRoom;
-    XML_VARIABLE XMLString  msgReport;
+    XML_VARIABLE XMLMultiString  msgStop, msgStart;
+    XML_VARIABLE XMLMultiString  msgActive;
+    XML_VARIABLE XMLMultiString  msgDamageSelf;
+    XML_VARIABLE XMLString       msgDamageRoom;
+    XML_VARIABLE XMLMultiString  msgReport;
 };
 
 inline const DLString & DefaultDesire::getName( ) const
