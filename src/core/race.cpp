@@ -118,6 +118,18 @@ const DLString & Race::getMltName( ) const
 {
     return DLString::emptyString;
 }
+const DLString & Race::getMaleNameUa( ) const
+{
+    return DLString::emptyString;
+}
+const DLString & Race::getFemaleNameUa( ) const
+{
+    return DLString::emptyString;
+}
+const DLString & Race::getMltNameUa( ) const
+{
+    return DLString::emptyString;
+}
 
 DLString Race::getNameFor( Character *, Character * ) const
 {

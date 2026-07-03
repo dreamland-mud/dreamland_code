@@ -293,9 +293,14 @@ NMI_GET( ProfessionWrapper, name, "английское название" )
     return professionManager->find( name )->getName( );
 }
 
-NMI_GET( ProfessionWrapper, nameRus, "русское название с падежами" ) 
+NMI_GET( ProfessionWrapper, nameRus, "русское название с падежами" )
 {
     return professionManager->find( name )->getRusName( );
+}
+
+NMI_GET( ProfessionWrapper, nameUa, "украинское название с падежами (пусто, если нет - откати на nameRus)" )
+{
+    return professionManager->find( name )->getUaName( );
 }
 
 NMI_GET( ProfessionWrapper, nameMlt, "русское название во множ.числе с падежами" ) 
@@ -487,7 +492,7 @@ NMI_GET( RaceWrapper, nameFemale, "русское название в женск
     return raceManager->find( name )->getFemaleName( );
 }
 
-NMI_INVOKE( RaceWrapper, nameRus, "(ch): русское название в зависимости от пола и числа персонажа ch, с падежами" ) 
+NMI_INVOKE( RaceWrapper, nameRus, "(ch): русское название в зависимости от пола и числа персонажа ch, с падежами" )
 {
     Character *ch = args2character(args);
     Race *race = raceManager->find(name);
@@ -502,6 +507,19 @@ NMI_INVOKE( RaceWrapper, nameRus, "(ch): русское название в за
         return race->getNeuterName();
 
     return race->getMaleName();
+}
+
+NMI_INVOKE( RaceWrapper, nameUa, "(ch): украинское название по полу и числу ch (пусто, если нет - откати на nameRus)" )
+{
+    Character *ch = args2character(args);
+    Race *race = raceManager->find(name);
+
+    if (ch->toNoun()->getNumber() == Number::PLURAL)
+        return race->getMltNameUa();
+    if (ch->getSex( ) == SEX_FEMALE)
+        return race->getFemaleNameUa();
+
+    return race->getMaleNameUa();
 }
 
 NMI_GET( RaceWrapper, hpBonus, "бонус на здоровья при создании персонажа этой расы" ) 
@@ -866,9 +884,14 @@ NMI_GET( ClanWrapper, name, "английское название" )
 {
     return clanManager->find( name )->getName( );
 }
-NMI_GET( ClanWrapper, nameRus, "русское название с цветами и падежами" ) 
+NMI_GET( ClanWrapper, nameRus, "русское название с цветами и падежами" )
 {
     return clanManager->find( name )->getRussianName( );
+}
+
+NMI_GET( ClanWrapper, nameUa, "украинское название с цветами и падежами (пусто, если нет - откати на nameRus)" )
+{
+    return clanManager->find( name )->getUkrainianName( );
 }
 NMI_GET( ClanWrapper, index, "внутренний порядковый номер" ) 
 {
@@ -1235,9 +1258,14 @@ NMI_GET( ReligionWrapper, name, "английское название с мал
     return getTarget()->getName( );
 }
 
-NMI_GET( ReligionWrapper, nameRus, "русское название с падежами" ) 
+NMI_GET( ReligionWrapper, nameRus, "русское название с падежами" )
 {
     return getTarget()->getRussianName( );
+}
+
+NMI_GET( ReligionWrapper, nameUa, "украинское название с падежами (пусто, если нет - откати на nameRus)" )
+{
+    return getTarget()->getNameUa( );
 }
 
 NMI_GET( ReligionWrapper, shortDescr, "английское название с большой буквы" ) 

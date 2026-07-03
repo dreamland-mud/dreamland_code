@@ -74,6 +74,7 @@ public:
     
     virtual const DLString & getName( ) const;
     virtual const DLString &getRussianName( ) const;
+    virtual const DLString &getNameUa( ) const;
     virtual void setName( const DLString & );
     virtual bool isValid( ) const;
     virtual int getSex() const;
