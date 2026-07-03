@@ -26,6 +26,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "pcharactermemory.h"
+#include "xmlstring.h"
 #include "pcrace.h"
 #include "affect.h"
 #include "object.h"
@@ -708,18 +709,42 @@ const DLString & PCharacter::getTitle( ) const
  *****************************************************************************/
 using namespace Grammar;
 
-// Defined in plug-ins/system (libsystem); resolved at load like the other
-// core->plugin symbols this file already references (Scripting::*). Forward-
-// declared here to avoid pulling the plug-ins/system include path into core.
-namespace Player { lang_t displayLang(Character *ch); }
+// Mirror plug-ins/system Player::displayLang WITHOUT depending on libsystem: the
+// launcher links only the core libs, so core cannot reference Player:: or the
+// plugin-side XMLStringAttribute type. We read the same 'lang' attribute through
+// its core XMLStringVariable base. An explicit 'config lang' (ua/ru/en) wins;
+// otherwise fall back to the legacy rucommands flag. Keep in sync with
+// Player::lang / Player::displayLang.
+static lang_t viewerLang( const Character *wch )
+{
+    if (!wch)
+        return LANG_DEFAULT;
+
+    if (wch->is_npc( )) {
+        if (wch->getNPC( )->switchedFrom)
+            return viewerLang( wch->getNPC( )->switchedFrom );
+        return LANG_DEFAULT;
+    }
+
+    auto langAttr = const_cast<Character *>( wch )->getPC( )
+                        ->getAttributes( ).findAttr<XMLStringVariable>( "lang" );
+    if (langAttr && !langAttr->getValue( ).empty( )) {
+        const DLString &v = langAttr->getValue( );
+        if (v == "ua") return LANG_UA;
+        if (v == "ru") return LANG_RU;
+        if (v == "en") return LANG_EN;
+    }
+
+    return wch->getConfig( ).rucommands ? LANG_RU : LANG_EN;
+}
 
 Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
 {
     const Character *wch = dynamic_cast<const Character *>(forWhom);
     // Render in the viewer's own display language (EN/RU/UA). CachedNoun::update
-    // populates every name/pretitle map for all languages, so find(lang) below is
-    // always safe; a null / non-character viewer falls back to the default (RU).
-    lang_t lang = wch ? Player::displayLang(const_cast<Character *>(wch)) : LANG_DEFAULT;
+    // populates every name/pretitle map for all languages, so the find(lang)
+    // lookups below are always safe.
+    lang_t lang = viewerLang( wch );
     PlayerConfig cfg = wch ? wch->getConfig( ) : PlayerConfig();
     
     if (IS_SET(flags, FMT_DOPPEL))
