@@ -5,6 +5,7 @@
 #include "xmltableelement.h"
 #include "xmllist.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlboolean.h"
 #include "xmlglobalbitvector.h"
 
@@ -37,10 +38,10 @@ protected:
     XML_VARIABLE XMLString color;
     XML_VARIABLE XMLString legend;
     XML_VARIABLE XMLString shortDescr;
-    XML_VARIABLE XMLString msgTodayReligion;
-    XML_VARIABLE XMLString msgTodayGlobal;
-    XML_VARIABLE XMLString msgActionReligion;
-    XML_VARIABLE XMLString msgActionGlobal;
+    XML_VARIABLE XMLMultiString msgTodayReligion;
+    XML_VARIABLE XMLMultiString msgTodayGlobal;
+    XML_VARIABLE XMLMultiString msgActionReligion;
+    XML_VARIABLE XMLMultiString msgActionGlobal;
     XML_VARIABLE XMLString globalDay;
     XML_VARIABLE XMLString globalMonth;
     XML_VARIABLE XMLBoolean religious;

@@ -1,5 +1,7 @@
 #include "defaultbonus.h"
 #include "pcharacter.h"
+#include "player_utils.h"
+#include "lang.h"
 #include "calendar_utils.h"
 #include "act.h"
 #include "merc.h"
@@ -74,22 +76,26 @@ bool DefaultBonus::isActive(PCharacter *ch, const struct time_info_data &ti) con
 
 void DefaultBonus::reportAction(PCharacter *ch, ostringstream &buf) const
 {
+    lang_t lang = ch ? Player::lang(ch) : LANG_DEFAULT;
+
     if (activeForPlayer(ch, time_info)) {
-        if (!msgActionReligion.empty())
-            buf << fmt(0, msgActionReligion.c_str(), ch->getReligion()->getRussianName().c_str()) << endl;
+        if (!msgActionReligion.getForLang(lang).empty())
+            buf << fmt(0, msgActionReligion.getForLang(lang).c_str(), ch->getReligion()->getNameFor(ch).c_str()) << endl;
         return;
     }
 
-    if (!msgActionGlobal.empty())
-        buf << msgActionGlobal << endl;
+    if (!msgActionGlobal.getForLang(lang).empty())
+        buf << msgActionGlobal.getForLang(lang) << endl;
 }
 
 void DefaultBonus::reportTime(PCharacter *ch, ostringstream &buf) const
 {
+    lang_t lang = ch ? Player::lang(ch) : LANG_DEFAULT;
+
     if (activeForPlayer(ch, time_info))
-        buf << fmt(0, msgTodayReligion.c_str(), ch->getReligion()->getRussianName().c_str());
+        buf << fmt(0, msgTodayReligion.getForLang(lang).c_str(), ch->getReligion()->getNameFor(ch).c_str());
     else
-        buf << msgTodayGlobal;
+        buf << msgTodayGlobal.getForLang(lang);
     buf << endl;
 }
 
@@ -130,11 +136,27 @@ bool DefaultBonus::activeForPlayer(PCharacter *ch, const struct time_info_data &
 
 void ExperienceBonus::reportAction(PCharacter *ch, ostringstream &buf) const
 {
-    if (activeForPlayer(ch, time_info))
-        buf << fmt(0, "{c%^N1 дарит тебе больше опыта.{x", ch->getReligion()->getRussianName().c_str());
-    else
-        buf << fmt(0, "{cСегодня %s благосклонны к тебе, даруя тебе больше опыта.{x", 
-                       IS_GOOD(ch) ? "силы добра" : IS_NEUTRAL(ch) ? "нейтральные силы" : "силы зла");
+    lang_t lang = ch ? Player::lang(ch) : LANG_DEFAULT;
+
+    if (activeForPlayer(ch, time_info)) {
+        buf << fmt(0, lmsg(lang,
+                       "{c%^N1 grants you more experience.{x",
+                       "{c%^N1 дарит тебе больше опыта.{x",
+                       "{c%^N1 дарує тобі більше досвіду.{x"),
+                   ch->getReligion()->getNameFor(ch).c_str());
+    }
+    else {
+        const char *side = IS_GOOD(ch)
+            ? lmsg(lang, "the forces of good", "силы добра", "сили добра")
+            : IS_NEUTRAL(ch)
+            ? lmsg(lang, "the neutral forces", "нейтральные силы", "нейтральні сили")
+            : lmsg(lang, "the forces of evil", "силы зла", "сили зла");
+        buf << fmt(0, lmsg(lang,
+                       "{cToday %s favour you, granting you more experience.{x",
+                       "{cСегодня %s благосклонны к тебе, даруя тебе больше опыта.{x",
+                       "{cСьогодні %s прихильні до тебе, даруючи тобі більше досвіду.{x"),
+                   side);
+    }
     buf << endl;
 }
 
