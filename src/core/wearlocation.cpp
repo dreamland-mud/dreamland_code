@@ -46,7 +46,7 @@ const DLString &Wearlocation::getRibName( ) const
     return DLString::emptyString;
 }
 
-const DLString &Wearlocation::getPurpose( ) const
+const DLString &Wearlocation::getPurpose( lang_t lang ) const
 {
     return DLString::emptyString;
 }

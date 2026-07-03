@@ -5,6 +5,7 @@
 #include "logstream.h"
 #include "defaultwearlocation.h"
 #include "wearloc_codes.h"
+#include "player_utils.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -510,5 +511,5 @@ void DefaultWearlocation::display( Character *ch, Wearlocation::DisplayList &eq 
 
 DLString DefaultWearlocation::displayLocation(Character *ch, Object *obj)
 {
-    return msgDisplay;
+    return msgDisplay.getForLang( Player::lang( ch ) );
 }
