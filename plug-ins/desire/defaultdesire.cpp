@@ -4,6 +4,7 @@
  */
 #include "defaultdesire.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "liquid.h"
 #include "room.h"
 #include "skillreference.h"
@@ -100,21 +101,23 @@ void DefaultDesire::report( PCharacter *ch, ostringstream &buf )
 
     if (!applicable(ch))
         return;
-        
-    if (msgReport.empty())
+
+    lang_t lang = Player::lang( ch );
+
+    if (msgReport.getForLang(lang).empty())
         return;
 
     // Show simple text message when the desire is activated, e.g. "You're hungry."
     if (isActive(ch)) {
-        buf << fmt( NULL, msgReport.c_str( ), ch );
+        buf << fmt( NULL, msgReport.getForLang(lang).c_str( ), ch );
         return;
     }
 
-    if (what.empty())
+    if (what.getForLang(lang).empty())
         return;
 
     // Draw player desire status as progress bar or percents.
-    buf << what << " ";
+    buf << what.getForLang(lang) << " ";
 
     if (uses_screenreader(ch))
         buf << showPercent(ch);
@@ -181,6 +184,8 @@ void DefaultDesire::gain( PCharacter *ch, int value )
     if (!ch->desc)
         return;
 
+    lang_t lang = Player::lang( ch );
+
     wasActive = isActive( ch );
     oldDesire = ch->desires[getIndex( )];
     desire = URANGE( (int)minValue, oldDesire + value, (int)maxValue );
@@ -193,8 +198,8 @@ void DefaultDesire::gain( PCharacter *ch, int value )
 
     // Too hungry or thirsty, inflict some damage.
     if (desire == damageLimit && !isNewbie) {
-        if (!msgDamageSelf.empty( ))
-            ch->pecho( msgDamageSelf.c_str( ) );
+        if (!msgDamageSelf.getForLang(lang).empty( ))
+            ch->pecho( msgDamageSelf.getForLang(lang).c_str( ) );
         if (!msgDamageRoom.empty( ))
             ch->recho( msgDamageRoom.c_str( ), ch );
         damage( ch );
@@ -203,19 +208,19 @@ void DefaultDesire::gain( PCharacter *ch, int value )
 
     // Was hungry but now satisfied, print stop message.
     if (wasActive != isActive( ch ) && wasActive) {
-        ptc( ch, msgStop );
+        ptc( ch, msgStop.getForLang(lang) );
         return;
     }
-    
+
     // Feel hunger for the first time, print start message.
     if (wasActive != isActive( ch )) {
-        ptc( ch, msgStart );
+        ptc( ch, msgStart.getForLang(lang) );
         return;
     }
 
     // Still feeling hungry, report about it.
     if (isActive( ch )) {
-        ptc( ch, msgActive );
+        ptc( ch, msgActive.getForLang(lang) );
         return;
     }
 }
