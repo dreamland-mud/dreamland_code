@@ -708,11 +708,18 @@ const DLString & PCharacter::getTitle( ) const
  *****************************************************************************/
 using namespace Grammar;
 
+// Defined in plug-ins/system (libsystem); resolved at load like the other
+// core->plugin symbols this file already references (Scripting::*). Forward-
+// declared here to avoid pulling the plug-ins/system include path into core.
+namespace Player { lang_t displayLang(Character *ch); }
+
 Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
 {
-    // TODO derive lang param from 'forWhom'
-    lang_t lang = LANG_DEFAULT;
     const Character *wch = dynamic_cast<const Character *>(forWhom);
+    // Render in the viewer's own display language (EN/RU/UA). CachedNoun::update
+    // populates every name/pretitle map for all languages, so find(lang) below is
+    // always safe; a null / non-character viewer falls back to the default (RU).
+    lang_t lang = wch ? Player::displayLang(const_cast<Character *>(wch)) : LANG_DEFAULT;
     PlayerConfig cfg = wch ? wch->getConfig( ) : PlayerConfig();
     
     if (IS_SET(flags, FMT_DOPPEL))
