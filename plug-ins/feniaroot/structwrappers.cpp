@@ -215,8 +215,8 @@ NMI_INVOKE( HometownWrapper, areanameFor, "(ch): полное название �
     Character *ch = args2character(args);
     Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
-    if (room && room->area)
-        return Scripting::Register( room->area->name.getForLang(Player::displayLang(ch)) );
+    if (room && room->areaIndex())
+        return Scripting::Register( room->areaIndex()->name.getForLang(Player::displayLang(ch)) );
     else
         return Scripting::Register( DLString::emptyString );
 }
