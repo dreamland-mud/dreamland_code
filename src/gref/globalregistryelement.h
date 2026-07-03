@@ -18,6 +18,7 @@ public:
     
     virtual const DLString &getName( ) const = 0;
     virtual const DLString &getRussianName( ) const;
+    virtual const DLString &getUkrainianName( ) const;
     
     virtual bool matchesStrict( const DLString &str ) const;
     virtual bool matchesUnstrict( const DLString &str ) const;

@@ -38,6 +38,7 @@ public:
     virtual bool isValid( ) const;
 
     virtual const DLString &getRusName( ) const;
+    virtual const DLString &getUaName( ) const;
     virtual const DLString &getMltName( ) const;
     virtual DLString getNameFor( Character *, const Grammar::Case & = Grammar::Case::NONE ) const;
     virtual DLString getWhoNameFor( Character * ) const;

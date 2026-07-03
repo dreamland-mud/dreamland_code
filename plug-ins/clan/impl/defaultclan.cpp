@@ -172,7 +172,11 @@ void DefaultClan::setName( const DLString &name )
 }
 const DLString &DefaultClan::getRussianName( ) const
 {
-    return nameRus; 
+    return nameRus;
+}
+const DLString &DefaultClan::getUkrainianName( ) const
+{
+    return nameUa;
 }
 const DLString &DefaultClan::getShortName( ) const
 {

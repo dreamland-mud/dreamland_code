@@ -65,6 +65,10 @@ const DLString & Profession::getRusName( ) const
 {
     return DLString::emptyString;
 }
+const DLString & Profession::getUaName( ) const
+{
+    return DLString::emptyString;
+}
 const DLString & Profession::getMltName( ) const
 {
     return DLString::emptyString;

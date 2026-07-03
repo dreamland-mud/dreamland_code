@@ -58,6 +58,9 @@ public:
     virtual const DLString & getFemaleName( ) const;
     virtual const DLString & getNeuterName( ) const;
     virtual const DLString & getMltName( ) const;
+    virtual const DLString & getMaleNameUa( ) const;
+    virtual const DLString & getFemaleNameUa( ) const;
+    virtual const DLString & getMltNameUa( ) const;
     virtual DLString getNameFor( Character *looker, Character *me ) const;
 
 protected:

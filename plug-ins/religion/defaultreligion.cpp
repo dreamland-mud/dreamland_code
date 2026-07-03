@@ -196,6 +196,10 @@ const DLString &DefaultReligion::getRussianName( ) const
 {
     return nameRus;
 }
+const DLString &DefaultReligion::getNameUa( ) const
+{
+    return nameUa;
+}
 
 const DLString& DefaultReligion::getNameFor( Character *looker ) const
 {
