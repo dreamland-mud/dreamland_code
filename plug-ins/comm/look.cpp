@@ -709,7 +709,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
             && victim->position == POS_STANDING 
             && ch->on == 0)
         {
-            buf << Player::title(pVict);
+            buf << Player::title(pVict, Player::displayLang(ch));
         }
     }
 

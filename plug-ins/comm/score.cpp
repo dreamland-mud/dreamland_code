@@ -114,7 +114,7 @@ CMDRUNP( oscore )
 
     buf << fmt( 0, "Ты {W%1$s%2$s{x, уровень {C%3$d{w",
                    ch->seeName( ch, '1' ).c_str( ),
-                   ch->is_npc( ) ? "" : Player::title(ch->getPC( )).c_str( ),
+                   ch->is_npc( ) ? "" : Player::title(ch->getPC( ), Player::displayLang(ch)).c_str( ),
                    ch->getRealLevel( ));
     
     if (!ch->is_npc( ))
@@ -509,7 +509,7 @@ CMDRUNP( score )
     DLString profName = ch->getProfession( )->getNameFor( ch );
 
     ostringstream name;
-    DLString title = Player::title(pch);
+    DLString title = Player::title(pch, Player::displayLang(ch));
     name << ch->seeName( ch, '1' ) << "{x ";
     mudtags_convert(title.c_str( ), name, TAGS_CONVERT_VIS, ch);
 
