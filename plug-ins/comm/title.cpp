@@ -43,7 +43,7 @@ CMDRUNP( title )
     if (arg.empty( ) || arg_is_show( arg )) {
         ostringstream buf;
         const DLString &title = pch->getTitle( );
-        DLString parsed = Player::title(pch);
+        DLString parsed = Player::title(pch, Player::displayLang(pch));
         parsed.stripWhiteSpace( );
         
         if (parsed.empty( )) {
@@ -71,7 +71,7 @@ CMDRUNP( title )
 
     pch->setTitle( arg );
 
-    pch->pecho("Теперь ты {W%C1{x%s{x", pch, Player::title(pch).c_str());
+    pch->pecho("Теперь ты {W%C1{x%s{x", pch, Player::title(pch, Player::displayLang(pch)).c_str());
 }
 
 static bool fix_pretitle( PCharacter *ch, DLString &title )

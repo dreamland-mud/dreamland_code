@@ -327,7 +327,7 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
         descr = victim->toNoun( ch )->decline('1');
 
     webManipManager->decorateCharacter( buf, descr, victim, ch );
-    buf << "{x " << Player::title(victim) << "{x" << endl;
+    buf << "{x " << Player::title(victim, Player::displayLang(ch)) << "{x" << endl;
 
     return buf.str( );
 }

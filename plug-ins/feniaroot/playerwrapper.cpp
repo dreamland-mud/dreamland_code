@@ -283,6 +283,11 @@ NMI_GET(PlayerWrapper, parsedTitle, "титул персонажа как мы �
     return Player::title(getTarget());
 }
 
+NMI_INVOKE(PlayerWrapper, parsedTitleFor, "(viewer): титул как его видит зритель viewer -- auto-титул в языке зрителя, custom-титул как задан")
+{
+    return Player::title(getTarget(), Player::displayLang(arg2character(get_unique_arg(args))));
+}
+
 NMI_GET(PlayerWrapper, questpoints, "квестовые очки")
 {
     return getTarget()->getQuestPoints();
