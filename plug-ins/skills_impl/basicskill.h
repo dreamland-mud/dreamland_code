@@ -39,6 +39,8 @@ public:
     virtual void setName( const DLString & );
     virtual const DLString &getRussianName( ) const;
     virtual const DLString& getNameFor( Character * ) const;
+    virtual const DLString & getWebColumn( ) const;
+    virtual DLString getWebLabel( lang_t lang ) const;
     virtual bool matchesStrict( const DLString &str ) const;
     virtual bool matchesUnstrict( const DLString &str ) const;
     virtual bool matchesSubstring( const DLString &str ) const;
@@ -88,6 +90,8 @@ public:
     DLString printPracticers(PCharacter *ch) const;
 
     XML_VARIABLE XMLMultiString name;
+    XML_VARIABLE XMLMultiString webLabel;     // affect-panel short label, per language
+    XML_VARIABLE XMLStringNoEmpty webColumn;  // pro|det|trv|enh|mal|cln; empty = auto-classified
     XML_VARIABLE XMLInflectedString dammsg;
     XML_VARIABLE XMLIntegerNoEmpty beats;
     XML_VARIABLE XMLIntegerNoEmpty mana;
