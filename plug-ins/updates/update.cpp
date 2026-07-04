@@ -410,8 +410,12 @@ void char_update( )
             }
         }
 
-        // Reset native sneak outside of battle.
-        if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
+        // Reset native sneak outside of battle. Only announce/re-arm while the
+        // character is actually upright -- otherwise a sitting/resting elf whose
+        // sneak bit got stripped (e.g. by per-tick damage) is spammed with "you
+        // try to move stealthily" every tick. Line 431 keeps the raw bit set
+        // silently regardless, so gating here loses no gameplay.
+        if ( !(ch->fighting) && ch->position > POS_SITTING && !IS_AFFECTED(ch,AFF_SNEAK)
                 && (ch->getRace( )->getAff( ).isSet( AFF_SNEAK )) && !MOUNTED(ch) )
         {
             ch->pecho("Ты пытаешься двигаться незаметно.");
@@ -419,8 +423,8 @@ void char_update( )
             room_to_save( ch );
         }
 
-        // Reset native hide outside of battle.
-        if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_HIDE)
+        // Reset native hide outside of battle (upright only, same reasoning).
+        if ( !(ch->fighting) && ch->position > POS_SITTING && !IS_AFFECTED(ch,AFF_HIDE)
                 && (ch->getRace( )->getAff( ).isSet( AFF_HIDE )) && !MOUNTED(ch) )
         {
             ch->pecho("Ты прячешься обратно в тень.");
