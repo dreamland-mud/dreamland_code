@@ -3,6 +3,8 @@
  * ruffina, 2018
  */
 #include <jsoncpp/json/json.h>
+#include <map>
+#include <set>
 #include "webprompt.h"
 #include "logstream.h"
 #include "schedulertaskroundplugin.h"
@@ -49,6 +51,8 @@
 #include "merc.h"
 #include "autoflags.h"
 #include "profflags.h"
+#include "configurable.h"
+#include "xmlmultistring.h"
 #include "so.h"
 #include "def.h"
 
@@ -73,99 +77,8 @@ static const DLString CURR_STAT = "cs";
 static const DLString QUESTOR = "q";
 static const DLString AREAQUEST = "aq";
 
-CLAN(none);
 LIQ(none);
 
-GSN(anathema);
-GSN(armor);
-GSN(bandage);
-GSN(bark_skin);
-GSN(bat_swarm);
-GSN(benediction);
-GSN(berserk);
-GSN(black_feeble);
-GSN(bless);
-GSN(blindness);
-GSN(bloodthirst);
-GSN(bonedagger);
-GSN(calm);
-GSN(caltraps);
-GSN(charm_person);
-GSN(concentrate);
-GSN(confuse);
-GSN(corruption);
-GSN(curse);
-GSN(dark_shroud);
-GSN(demonic_mantle);
-GSN(detect_trap);
-GSN(disgrace);
-GSN(dismiss);
-GSN(doppelganger);
-GSN(dragon_skin);
-GSN(endure);
-GSN(enhanced_armor);
-GSN(entangle);
-GSN(evolve_lion);
-GSN(faerie_fire);
-GSN(fly);
-GSN(frenzy);
-GSN(garble);
-GSN(giant_strength);
-GSN(golden_aura);
-GSN(haste);
-GSN(hide);
-GSN(holy_armor);
-GSN(improved_invis);
-GSN(inspire);
-GSN(invisibility);
-GSN(jail);
-GSN(learning);
-GSN(liturgy);
-GSN(magic_concentrate);
-GSN(magic_jar);
-GSN(manacles);
-GSN(meld_into_stone);
-GSN(mental_block);
-GSN(mirror);
-GSN(nerve);
-GSN(pass_door);
-GSN(plague);
-GSN(poison);
-GSN(prevent);
-GSN(protection_cold);
-GSN(protection_evil);
-GSN(protection_good);
-GSN(protection_heat);
-GSN(protection_negative);
-GSN(protective_shield);
-GSN(rainbow_shield);
-GSN(randomizer);
-GSN(resistance);
-GSN(ruler_aura);
-GSN(sanctuary);
-GSN(scream);
-GSN(sebat);
-GSN(shield);
-GSN(slice);
-GSN(slow);
-GSN(sneak);
-GSN(shadow_shroud);
-GSN(soul_lust);
-GSN(spellbane);
-GSN(spell_resistance);
-GSN(stardust);
-GSN(stone_skin);
-GSN(stuck_arrow);
-GSN(suspect);
-GSN(tiger_power);
-GSN(transform);
-GSN(trophy);
-GSN(truesight);
-GSN(vampire);
-GSN(vampiric_bite);
-GSN(warcry);
-GSN(weaken);
-GSN(web);
 
 extern void help_save_ids();
 static IconvMap koi2utf("koi8-u", "utf-8");
@@ -536,7 +449,79 @@ void CalendarWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &
 
 /*-------------------------------------------------------------------------
  * AffectsWebPromptListener
+ *
+ * Fully data-driven affect panel. Each active affect goes into one of six columns
+ * (pro/det/trv/enh/mal/cln) and renders with a short, viewer-language label. Column
+ * and label come from the skill profile fields <webColumn>/<webLabel> (dreamland_world
+ * skills), or from config/affectpanel.json for raw engine bits (detects, item/racial
+ * affects with no spell). An affect whose skill sets no <webColumn> still shows --
+ * auto-classified offensive->mal, else ->enh -- so new affects are never silently
+ * missing; run scripts/lint-affect-labels.py to find those still on the auto-fallback.
  *------------------------------------------------------------------------*/
+
+// config/affectpanel.json -> column -> raw-bit key -> per-language label.
+static std::map<DLString, std::map<DLString, XMLMultiString> > affectPanelStore;
+
+CONFIGURABLE_LOADED(config, affectpanel)
+{
+    static const struct { const char *key; lang_t lang; } LANGS[] = {
+        { "en", LANG_EN }, { "ru", LANG_RU }, { "ua", LANG_UA },
+    };
+
+    affectPanelStore.clear( );
+
+    for (const auto &col: value.getMemberNames( )) {
+        const Json::Value &keys = value[col];
+        if (!keys.isObject( ))
+            continue;
+
+        for (const auto &key: keys.getMemberNames( )) {
+            const Json::Value &langs = keys[key];
+            if (!langs.isObject( ))
+                continue;
+
+            XMLMultiString ms;
+            for (const auto &L: LANGS) {
+                const Json::Value &s = langs[L.key];
+                if (s.isString( ))
+                    ms[L.lang] = s.asString( );
+            }
+            affectPanelStore[col][key] = ms;
+        }
+    }
+
+    LogStream::sendNotice( ) << "affectpanel: loaded raw-bit labels for "
+                             << affectPanelStore.size( ) << " columns." << endl;
+}
+
+// True if some active spell/skill affect owns this bit -- then the curated skill loop
+// renders it, and the raw columns below must stay silent to avoid a duplicate. Raw
+// columns therefore surface only bits granted without a spell (equipment, race).
+static bool bitOwnedBySpell( Character *ch, const FlagTable *table, bitstring_t bit )
+{
+    for (auto &paf: ch->affected) {
+        if (paf->bitvector.getTable( ) != table)
+            continue;
+        if (paf->bitvector.isSet( bit ))
+            return true;
+    }
+    return false;
+}
+
+static DLString affectPanelLabel( const DLString &col, const char *key, lang_t lang )
+{
+    std::map<DLString, std::map<DLString, XMLMultiString> >::const_iterator c = affectPanelStore.find( col );
+    if (c == affectPanelStore.end( ))
+        return DLString::emptyString;
+
+    std::map<DLString, XMLMultiString>::const_iterator k = c->second.find( key );
+    if (k == c->second.end( ))
+        return DLString::emptyString;
+
+    return k->second.getForLang( lang );
+}
+
+// Which detect bits belong to an affect with zero duration (about to expire -> yellow).
 static Bitstring zero_affect_bitstring( const FlagTable *table, AffectList &list, const Bitstring &bits )
 {
     Bitstring zero;
@@ -544,54 +529,124 @@ static Bitstring zero_affect_bitstring( const FlagTable *table, AffectList &list
     for (auto &paf: list) {
         if (paf->duration != 0)
             continue;
-        if (paf->bitvector.getTable() != table)
+        if (paf->bitvector.getTable( ) != table)
             continue;
 
         if (bits.isSet( paf->bitvector ))
-            zero.setBit( paf->bitvector & bits.getValue( ) ); 
+            zero.setBit( paf->bitvector & bits.getValue( ) );
     }
 
     return zero;
 }
 
-static DLString aff_to_string( const Bitstring &b )
+// Auto-fallback panel label when a skill has no curated <webLabel>: the first word of
+// the skill's own (already trilingual) name, capped to fit the widget.
+static DLString webAbbrev( const DLString &name )
 {
-    DLString s;
-
-    if (b.isSet( AFF_INFRARED ))
-        s += "r";
-
-    return s;
+    DLString word = name;
+    string::size_type sp = word.find( ' ' );
+    if (sp != string::npos)
+        word = word.substr( 0, sp ).c_str( );
+    if (word.size( ) > 10)
+        word = word.substr( 0, 10 ).c_str( );
+    return word;
 }
 
-static DLString det_to_string( const Bitstring &b )
+// Accumulates affects into columns, de-duplicating by (column, label) so a skill
+// affect and its raw-bit fallback never render twice.
+struct AffectPanelColumns {
+    Json::Value cols;
+    std::map<DLString, std::set<DLString> > seen;
+
+    void add( const DLString &col, const DLString &label, bool expiring )
+    {
+        if (col.empty( ) || col == "none" || label.empty( ))
+            return;
+        if (!seen[col].insert( label ).second)
+            return;
+
+        Json::Value o;
+        o["n"] = label.c_str( );
+        o["x"] = expiring ? 1 : 0;
+        cols[col].append( o );
+    }
+};
+
+// Detect column: purely flag-based (ch->detection + AFF_INFRARED), labels from the store.
+static void addDetectColumn( AffectPanelColumns &pc, Character *ch, lang_t lang )
 {
-    DLString s;
+    static const struct { bitstring_t bit; const char *key; } DETS[] = {
+        { DETECT_HIDDEN,      "hidden" },
+        { DETECT_INVIS,       "invis" },
+        { DETECT_IMP_INVIS,   "imp_invis" },
+        { DETECT_FADE,        "fade" },
+        { ACUTE_VISION,       "acute" },
+        { DETECT_EVIL,        "evil" },
+        { DETECT_GOOD,        "good" },
+        { DETECT_UNDEAD,      "undead" },
+        { DETECT_MAGIC,       "magic" },
+        { DETECT_OBSERVATION, "observation" },
+        { DETECT_LIFE,        "life" },
+    };
 
-    if (b.isSet( DETECT_HIDDEN ))
-        s += "h";
-    if (b.isSet( DETECT_INVIS ))
-        s += "i";
-    if (b.isSet( DETECT_IMP_INVIS ))
-        s += "w";
-    if (b.isSet( DETECT_FADE ))
-        s += "f";
-    if (b.isSet( ACUTE_VISION ))
-        s += "a";
-    if (b.isSet( DETECT_EVIL ))
-        s += "e";
-    if (b.isSet( DETECT_GOOD ))
-        s += "g";
-    if (b.isSet( DETECT_UNDEAD ))
-        s += "u";
-    if (b.isSet( DETECT_MAGIC ))
-        s += "m";
-    if (b.isSet( DETECT_OBSERVATION ))
-        s += "o";
-    if (b.isSet( DETECT_LIFE ))
-        s += "l";
+    if (IS_AFFECTED( ch, AFF_INFRARED ) && !bitOwnedBySpell( ch, &affect_flags, AFF_INFRARED ))
+        pc.add( DETECT, affectPanelLabel( DETECT, "infrared", lang ), false );
 
-    return s;
+    static bitstring_t reported_det =
+        DETECT_HIDDEN|DETECT_INVIS|DETECT_IMP_INVIS|DETECT_FADE|ACUTE_VISION|
+        DETECT_EVIL|DETECT_GOOD|DETECT_UNDEAD|DETECT_MAGIC|DETECT_OBSERVATION|DETECT_LIFE;
+    Bitstring zeroDetects = zero_affect_bitstring( &detect_flags, ch->affected, reported_det );
+    Bitstring detection( ch->detection );
+
+    for (const auto &e: DETS) {
+        if (!detection.isSet( e.bit ))
+            continue;
+        if (bitOwnedBySpell( ch, &detect_flags, e.bit ))
+            continue;
+        pc.add( DETECT, affectPanelLabel( DETECT, e.key, lang ), zeroDetects.isSet( e.bit ) );
+    }
+}
+
+// Raw affect-flag fallbacks: effects set on the character without an owning spell
+// (from equipment or race). Labels come from config/affectpanel.json.
+static void addAffFallbacks( AffectPanelColumns &pc, Character *ch, lang_t lang )
+{
+    static const struct { const char *col; bitstring_t bit; const char *key; } AFFS[] = {
+        { "trv", AFF_INVISIBLE,    "invisible" },
+        { "trv", AFF_IMP_INVIS,    "imp_invis" },
+        { "trv", AFF_HIDE,         "hide" },
+        { "trv", AFF_SNEAK,        "sneak" },
+        { "trv", AFF_FLYING,       "flying" },
+        { "trv", AFF_PASS_DOOR,    "pass_door" },
+        { "trv", AFF_FADE,         "fade" },
+        { "trv", AFF_CAMOUFLAGE,   "camouflage" },
+        { "pro", AFF_SANCTUARY,    "sanctuary" },
+        { "pro", AFF_PROTECT_EVIL, "protect_evil" },
+        { "pro", AFF_PROTECT_GOOD, "protect_good" },
+        { "enh", AFF_REGENERATION, "regeneration" },
+        { "enh", AFF_HASTE,        "haste" },
+        { "mal", AFF_BLIND,        "blind" },
+        { "mal", AFF_POISON,       "poison" },
+        { "mal", AFF_PLAGUE,       "plague" },
+        { "mal", AFF_CORRUPTION,   "corruption" },
+        { "mal", AFF_FAERIE_FIRE,  "faerie_fire" },
+        { "mal", AFF_CHARM,        "charm" },
+        { "mal", AFF_CURSE,        "curse" },
+        { "mal", AFF_WEAKEN,       "weaken" },
+        { "mal", AFF_SLOW,         "slow" },
+        { "mal", AFF_SCREAM,       "scream" },
+        { "mal", AFF_SLEEP,        "sleep" },
+        { "mal", AFF_BLOODTHIRST,  "bloodthirst" },
+    };
+
+    for (const auto &e: AFFS) {
+        if (IS_AFFECTED( ch, e.bit ) && !bitOwnedBySpell( ch, &affect_flags, e.bit ))
+            pc.add( e.col, affectPanelLabel( e.col, e.key, lang ), false );
+    }
+
+    if ((IS_AFFECTED( ch, AFF_STUN ) && !bitOwnedBySpell( ch, &affect_flags, AFF_STUN ))
+        || (IS_AFFECTED( ch, AFF_WEAK_STUN ) && !bitOwnedBySpell( ch, &affect_flags, AFF_WEAK_STUN )))
+        pc.add( MALAD, affectPanelLabel( MALAD, "stun", lang ), false );
 }
 
 class AffectsWebPromptListener : public WebPromptListener {
@@ -599,400 +654,50 @@ public:
         typedef ::Pointer<AffectsWebPromptListener> Pointer;
 
         virtual void run( Descriptor *, Character *, Json::Value &json );
-protected:
-        Json::Value jsonDetect( Descriptor *d, Character *ch );
-        Json::Value jsonEnhance( Descriptor *d, Character *ch );
-        Json::Value jsonProtect( Descriptor *d, Character *ch );
-        Json::Value jsonTravel( Descriptor *d, Character *ch );
-        Json::Value jsonMalad( Descriptor *d, Character *ch );
-        Json::Value jsonClan( Descriptor *d, Character *ch );
 };
 
 void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &json )
 {
     WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
     Json::Value &prompt = json["args"][0];
+    lang_t lang = Player::displayLang( ch );
 
-    attr->updateIfNew( DETECT, jsonDetect( d, ch ), prompt ); 
-    attr->updateIfNew( ENHANCE, jsonEnhance( d, ch ), prompt ); 
-    attr->updateIfNew( PROTECT, jsonProtect( d, ch ), prompt ); 
-    attr->updateIfNew( TRAVEL, jsonTravel( d, ch ), prompt ); 
-    attr->updateIfNew( MALAD, jsonMalad( d, ch ), prompt ); 
-    attr->updateIfNew( CLAN, jsonClan( d, ch ), prompt ); 
-}
+    AffectPanelColumns pc;
 
-static void mark_affect( Character *ch, DLString &output, bitstring_t bit, char marker )
-{    
-    if (IS_AFFECTED(ch, bit) && output.find( marker ) == DLString::npos)
-        output += marker;
-}
-
-Json::Value AffectsWebPromptListener::jsonMalad( Descriptor *d, Character *ch )
-{
-    DLString active, zero;
-    
+    // 1) Skill-applied affects: column + label from the skill profile, else auto-derived.
     for (auto &paf: ch->affected) {
-        char m;
-        
-        if (paf->type == gsn_blindness) 
-           m = 'b';
-        else if (paf->type == gsn_poison)
-           m = 'p';
-        else if (paf->type == gsn_plague)
-           m = 'P';
-        else if (paf->type == gsn_corruption)
-           m = 'C';
-        else if (paf->type == gsn_faerie_fire)
-           m = 'f';
-        else if (paf->type == gsn_charm_person)
-           m = 'W';
-        else if (paf->type == gsn_curse)
-           m = 'c';
-        else if (paf->type == gsn_weaken)
-           m = 'w';
-        else if (paf->type == gsn_slow)
-           m = 's';
-        else if (paf->type == gsn_scream)
-           m = 'S';
-        else if (paf->type == gsn_bloodthirst)
-           m = 'B';
-        else if (paf->type == gsn_slice)
-           m = 'i';
-        else if (paf->type == gsn_stuck_arrow)
-           m = 'I';
-        else if (paf->type == gsn_magic_jar)
-           m = 'j';
-        else if (paf->type == gsn_anathema)
-           m = 'a';
-        else if (paf->type == gsn_nerve)
-           m = 'n';
-        else if (paf->type == gsn_web)
-           m = 'e';
-        else if (paf->type == gsn_bonedagger)
-           m = 'r';
-        else if (paf->type == gsn_entangle)
-           m = 'E';
-        else if (paf->type == gsn_vampiric_bite)
-           m = 'y';
-        else if (paf->type == gsn_caltraps)
-           m = 'A';
-        else
+        Skill *skill = paf->type.getElement( );
+        if (skill == 0)
             continue;
 
-        if (active.find( m ) != DLString::npos)
-            continue;
+        DLString col = skill->getWebColumn( );
+        SpellPointer spell = skill->getSpell( );
 
-        active += m;
+        if (col.empty( )) {
+            // Not curated: show only real castable spells (skip internal/tracking affects);
+            // auto-classify offensive -> maladictions, everything else -> the enhance bucket.
+            if (!spell || !spell->isCasted( ))
+                continue;
+            col = (spell->getSpellType( ) == SPELL_OFFENSIVE) ? MALAD : ENHANCE;
+        }
 
-        if (paf->duration == 0)
-            zero += m;
+        DLString label = skill->getWebLabel( lang );
+        if (label.empty( ))
+            label = webAbbrev( skill->getNameFor( ch ) );
+
+        pc.add( col, label, paf->duration == 0 );
     }
 
-    mark_affect( ch, active, AFF_BLIND, 'b' );
-    mark_affect( ch, active, AFF_POISON, 'p' );
-    mark_affect( ch, active, AFF_PLAGUE, 'P' );
-    mark_affect( ch, active, AFF_CORRUPTION, 'C' );
-    mark_affect( ch, active, AFF_FAERIE_FIRE, 'f' );
-    mark_affect( ch, active, AFF_CHARM, 'W' );
-    mark_affect( ch, active, AFF_CURSE, 'c' );
-    mark_affect( ch, active, AFF_WEAKEN, 'w' );
-    mark_affect( ch, active, AFF_SLOW, 's' );
-    mark_affect( ch, active, AFF_SCREAM, 'S' );
-    mark_affect( ch, active, AFF_SLEEP, 'l' );
-    if (!ch->isAffected(gsn_bloodthirst))
-        mark_affect( ch, active, AFF_BLOODTHIRST, 'B' );
-    mark_affect( ch, active, AFF_STUN|AFF_WEAK_STUN, 'T' );
+    // 2) Detect column and 3) raw affect-flag fallbacks (no owning spell).
+    addDetectColumn( pc, ch, lang );
+    addAffFallbacks( pc, ch, lang );
 
-    if (active.empty( ))
-        return Json::Value( );
-
-    Json::Value mal;
-    mal["a"] = active;
-    mal["z"] = zero;
-    return mal;
-}
-
-Json::Value AffectsWebPromptListener::jsonClan( Descriptor *d, Character *ch )
-{
-    DLString active, zero;
-    
-    for (auto &paf: ch->affected) {
-        char m;
-        
-        if (paf->type == gsn_resistance) 
-           m = 'r';
-        else if (paf->type == gsn_spellbane)
-           m = 's';
-        else if (paf->type == gsn_bloodthirst)
-           m = 'B';
-        else if (paf->type == gsn_bandage)
-           m = 'b';
-        else if (paf->type == gsn_trophy)
-           m = 't';
-        else if (paf->type == gsn_truesight)
-           m = 'T';
-        else if (paf->type == gsn_detect_trap)
-           m = 'd';
-        else if (paf->type == gsn_evolve_lion)
-           m = 'e';
-        else if (paf->type == gsn_prevent)
-           m = 'p';
-        else if (paf->type == gsn_transform)
-           m = 'f';
-        else if (paf->type == gsn_golden_aura)
-           m = 'g';
-        else if (paf->type == gsn_holy_armor)
-           m = 'h';
-        else if (paf->type == gsn_shadow_shroud || paf->type == gsn_soul_lust)
-           m = 'S';
-        else if (paf->type == gsn_doppelganger)
-           m = 'D';
-        else if (paf->type == gsn_mirror)
-           m = 'm';
-        else if (paf->type == gsn_randomizer)
-           m = 'R';
-        else if (paf->type == gsn_disgrace)
-           m = 'i';
-        else if (paf->type == gsn_garble)
-           m = 'G';
-        else if (paf->type == gsn_confuse)
-           m = 'c';
-        else if (paf->type == gsn_manacles)
-           m = 'M';
-        else if (paf->type == gsn_suspect)
-           m = 'u';
-        else if (paf->type == gsn_jail)
-           m = 'j';
-        else if (paf->type == gsn_dismiss)
-           m = 'J';
-        else if (paf->type == gsn_ruler_aura)
-           m = 'A';
-        else
-            continue;
-
-        if (active.find( m ) != DLString::npos)
-            continue;
-
-        active += m;
-
-        if (paf->duration == 0)
-            zero += m;
-    }
-
-    if (active.empty( ))
-        return Json::Value( );
-
-    Json::Value cln;
-    cln["a"] = active;
-    cln["z"] = zero;
-    return cln;
-}
-
-Json::Value AffectsWebPromptListener::jsonTravel( Descriptor *d, Character *ch )
-{
-    DLString active, zero;
-    
-    for (auto &paf: ch->affected) {
-        char m;
-        
-        if (paf->type == gsn_invisibility) 
-           m = 'i';
-        else if (paf->type == gsn_improved_invis)
-           m = 'I';
-        else if (paf->type == gsn_hide)
-           m = 'h';
-        else if (paf->type == gsn_sneak)
-           m = 's';
-        else if (paf->type == gsn_fly)
-           m = 'f';
-        else if (paf->type == gsn_pass_door)
-           m = 'p';
-        else if (paf->type == gsn_mental_block)
-           m = 'm';
-        else
-            continue;
-
-        if (active.find( m ) != DLString::npos)
-            continue;
-
-        active += m;
-
-        if (paf->duration == 0)
-            zero += m;
-    }
-
-    mark_affect( ch, active, AFF_INVISIBLE, 'i' );
-    mark_affect( ch, active, AFF_IMP_INVIS, 'I' );
-    mark_affect( ch, active, AFF_HIDE, 'h' );
-    mark_affect( ch, active, AFF_SNEAK, 's' );
-    mark_affect( ch, active, AFF_FLYING, 'f' );
-    mark_affect( ch, active, AFF_PASS_DOOR, 'p' );
-    mark_affect( ch, active, AFF_FADE, 'F' );
-    mark_affect( ch, active, AFF_CAMOUFLAGE, 'c' );
-
-    if (active.empty( ))
-        return Json::Value( );
-
-    Json::Value trv;
-    trv["a"] = active;
-    trv["z"] = zero;
-    return trv;
-}
-
-Json::Value AffectsWebPromptListener::jsonProtect( Descriptor *d, Character *ch )
-{
-    DLString active, zero;
-    
-    for (auto &paf: ch->affected) {
-        char m;
-
-        if (paf->type == gsn_stardust) 
-           m = 'z';
-        else if (paf->type == gsn_dark_shroud)
-           m = 'd';
-        else if (paf->type == gsn_protective_shield)
-           m = 'p';
-        else if (paf->type == gsn_protection_evil)
-           m = 'e';
-        else if (paf->type == gsn_protection_good)
-           m = 'g';
-        else if (paf->type == gsn_spell_resistance)
-           m = 'm';
-        else if (paf->type == gsn_liturgy)
-           m = 'P';
-        else if (paf->type == gsn_protection_negative)
-           m = 'n';
-        else if (paf->type == gsn_armor)
-           m = 'a';
-        else if (paf->type == gsn_enhanced_armor)
-           m = 'A';
-        else if (paf->type == gsn_shield)
-           m = 'S';
-        else if (paf->type == gsn_dragon_skin)
-           m = 'D';
-        else if (paf->type == gsn_stone_skin)
-           m = 'k';
-        else if (paf->type == gsn_meld_into_stone)
-           m = 'r';
-        else if (paf->type == gsn_protection_cold)
-           m = 'c';
-        else if (paf->type == gsn_protection_heat)
-           m = 'h';
-        else if (paf->type == gsn_bat_swarm)
-           m = 'b';
-        else if (paf->type == gsn_rainbow_shield)
-           m = 'R';
-        else if (paf->type == gsn_demonic_mantle)
-           m = 'M';
-        else if (paf->type == gsn_black_feeble)
-           m = 'F';
-        else if (paf->type == gsn_endure)
-           m = 'E';
-        else if (paf->type == gsn_sebat)
-           m = 'Z';
-        else if (paf->type == gsn_bark_skin)
-           m = 'B';
-        else
-          continue;
-        
-        if (active.find( m ) != DLString::npos)
-            continue;
-
-        active += m;
-
-        if (paf->duration == 0)
-            zero += m;
-    }
-
-    mark_affect( ch, active, AFF_SANCTUARY, 's' );
-    mark_affect( ch, active, AFF_PROTECT_EVIL, 'e' );
-    mark_affect( ch, active, AFF_PROTECT_GOOD, 'g' );
-
-    if (active.empty( ))
-        return Json::Value( );
-
-    Json::Value pro;
-    pro["a"] = active;
-    pro["z"] = zero;
-    return pro;
-}
-
-Json::Value AffectsWebPromptListener::jsonEnhance( Descriptor *d, Character *ch )
-{
-    DLString active, zero;
-    
-    for (auto &paf: ch->affected) {
-        char m;
-
-        if (paf->type == gsn_haste) 
-           m = 'h';
-        else if (paf->type == gsn_giant_strength)
-           m = 'g';
-        else if (paf->type == gsn_learning)
-           m = 'l';
-        else if (paf->type == gsn_magic_concentrate)
-           m = 'm';
-        else if (paf->type == gsn_bless) 
-           m = 'b';
-        else if (paf->type == gsn_frenzy)
-           m = 'f';
-        else if (paf->type == gsn_benediction)
-           m = 'B';
-        else if (paf->type == gsn_inspire)
-           m = 'i';
-        else if (paf->type == gsn_calm)
-           m = 'c';
-        else if (paf->type == gsn_concentrate)
-           m = 'C';
-        else if (paf->type == gsn_berserk)
-           m = 'z';
-        else if (paf->type == gsn_warcry)
-           m = 'w';
-        else if (paf->type == gsn_tiger_power)
-           m = 't';
-        else if (paf->type == gsn_vampire)
-           m = 'v';
-        else
-          continue;
-        
-        if (active.find( m ) != DLString::npos)
-            continue;
-
-        active += m;
-
-        if (paf->duration == 0)
-            zero += m;
-    }
-
-    mark_affect( ch, active, AFF_REGENERATION, 'r' );
-    mark_affect( ch, active, AFF_HASTE,        'h' );
-
-    if (active.empty( ))
-        return Json::Value( );
-
-    Json::Value enh;
-    enh["a"] = active;
-    enh["z"] = zero;
-    return enh;
-}
-
-Json::Value AffectsWebPromptListener::jsonDetect( Descriptor *d, Character *ch )
-{
-    static bitstring_t reported_affdet = AFF_INFRARED;
-    static bitstring_t reported_det = 
-            DETECT_HIDDEN|DETECT_INVIS|DETECT_IMP_INVIS|DETECT_FADE|ACUTE_VISION|DETECT_EVIL|DETECT_GOOD|DETECT_UNDEAD|DETECT_MAGIC|DETECT_OBSERVATION|DETECT_LIFE;
-
-    DLString active = aff_to_string( Bitstring( ch->affected_by & reported_affdet ) );
-    active += det_to_string( Bitstring( ch->detection ) ); 
-    
-    if (active.empty( ))
-        return Json::Value( );
-
-    Json::Value det;
-    det["a"] = active;
-    Bitstring zeroDetects = zero_affect_bitstring( &detect_flags, ch->affected, reported_det );
-    det["z"] = det_to_string( zeroDetects );
-    return det;
+    attr->updateIfNew( DETECT,  pc.cols[DETECT],  prompt );
+    attr->updateIfNew( ENHANCE, pc.cols[ENHANCE], prompt );
+    attr->updateIfNew( PROTECT, pc.cols[PROTECT], prompt );
+    attr->updateIfNew( TRAVEL,  pc.cols[TRAVEL],  prompt );
+    attr->updateIfNew( MALAD,   pc.cols[MALAD],   prompt );
+    attr->updateIfNew( CLAN,    pc.cols[CLAN],    prompt );
 }
 
 /*-------------------------------------------------------------------------

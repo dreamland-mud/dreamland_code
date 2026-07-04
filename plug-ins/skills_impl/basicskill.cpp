@@ -336,6 +336,16 @@ const DLString& BasicSkill::getNameFor( Character *ch ) const
     return name.get(Player::lang(ch));
 }
 
+const DLString & BasicSkill::getWebColumn( ) const
+{
+    return webColumn;
+}
+
+DLString BasicSkill::getWebLabel( lang_t lang ) const
+{
+    return webLabel.getForLang(lang);
+}
+
 AffectHandlerPointer BasicSkill::getAffect( ) const 
 {
     return affect;

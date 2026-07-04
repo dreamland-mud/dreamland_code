@@ -40,6 +40,14 @@ const DLString &Skill::getRussianName( ) const
 {
     return DLString::emptyString;
 }
+const DLString & Skill::getWebColumn( ) const
+{
+    return DLString::emptyString;
+}
+DLString Skill::getWebLabel( lang_t ) const
+{
+    return DLString::emptyString;
+}
 GlobalBitvector & Skill::getGroups()
 {
     zeroGroups.setRegistry(skillGroupManager);

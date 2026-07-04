@@ -9,6 +9,7 @@
 
 #include "globalregistryelement.h"
 #include "globalbitvector.h"
+#include "lang.h"
 
 class Character;
 class PCharacter;
@@ -41,6 +42,10 @@ public:
     virtual const DLString &getRussianName( ) const;
     virtual GlobalBitvector & getGroups();
     bool hasGroup(unsigned int group);
+    // Affect-panel presentation (web client). Base returns empty: an affect only shows
+    // in the panel if its skill sets webColumn, or the builder auto-classifies it.
+    virtual const DLString & getWebColumn( ) const;
+    virtual DLString getWebLabel( lang_t lang ) const;
     virtual SpellPointer getSpell( ) const;
     virtual AffectHandlerPointer getAffect( ) const;
     virtual SkillCommandPointer getCommand( ) const;
