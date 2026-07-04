@@ -481,10 +481,10 @@ CONFIGURABLE_LOADED(config, affectpanel)
                 continue;
 
             XMLMultiString ms;
-            for (const auto &L: LANGS) {
-                const Json::Value &s = langs[L.key];
+            for (const auto &le: LANGS) {
+                const Json::Value &s = langs[le.key];
                 if (s.isString( ))
-                    ms[L.lang] = s.asString( );
+                    ms[le.lang] = s.asString( );
             }
             affectPanelStore[col][key] = ms;
         }
