@@ -89,6 +89,9 @@ public:
 
 protected:
     XML_VARIABLE XMLString title;
+    // Ukrainization: localized constant title; empty falls back to title (RU).
+    XML_VARIABLE XMLString titleUa;
+    XML_VARIABLE XMLString titleEn;
 };
 
 /*

@@ -302,8 +302,12 @@ const DLString & ProfessionTitlesByLevel::build( const PCMemoryInterface *pcm, l
     return female ? pair.female.getValue( ) : pair.male.getValue( );
 }
 
-const DLString & ProfessionTitlesByConstant::build( const PCMemoryInterface *pcm, lang_t ) const
+const DLString & ProfessionTitlesByConstant::build( const PCMemoryInterface *pcm, lang_t lang ) const
 {
+    if (lang == LANG_UA && !titleUa.getValue( ).empty( ))
+        return titleUa.getValue( );
+    if (lang == LANG_EN && !titleEn.getValue( ).empty( ))
+        return titleEn.getValue( );
     return title.getValue( );
 }
 
