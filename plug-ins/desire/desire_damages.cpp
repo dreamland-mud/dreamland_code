@@ -17,8 +17,11 @@ HungerDamage::HungerDamage( Character *ch, int dam )
 
 void HungerDamage::message( )
 {
-    msgRoom( "От голода %2$C1\6себя", dam, ch );
-    msgChar( "От голода ты\5себя", dam );
+    // No \5/\6 damage-verb markers here: those expand to combat verbs from the
+    // attack table (СОКРУШАЕШЬ/РАСЧЛЕНЯЕШЬ at high dam), which read absurdly for
+    // starvation. Hunger just weakens -- and canDamage() never lets it kill.
+    msgRoom( "%2$^C1 слабеет от голода", dam, ch );
+    msgChar( "Ты слабеешь от голода", dam );
 }
 
 bool HungerDamage::canDamage()
