@@ -110,7 +110,10 @@ NMI_GET( AreaWrapper, name, "имя зоны (как видно по 'where')" )
     return Scripting::Register( getTarget()->name.get(LANG_DEFAULT) );
 }
 
-NMI_INVOKE( AreaWrapper, nameFor, "(ch): имя зоны на языке зрителя ch (EN/RU/UA, откат на дефолт)" )
+// NB: method tag must be unique across ALL wrappers -- 'nameFor' already exists
+// on SkillWrapper and the shared nmi:: tag makes the registrations collide, so
+// this one is 'nameForLang'.
+NMI_INVOKE( AreaWrapper, nameForLang, "(ch): имя зоны на языке зрителя ch (EN/RU/UA, откат на дефолт)" )
 {
     Character *ch = args2character(args);
     return Scripting::Register( getTarget()->name.getForLang(Player::displayLang(ch)) );
