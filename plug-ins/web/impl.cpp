@@ -521,24 +521,6 @@ static DLString affectPanelLabel( const DLString &col, const char *key, lang_t l
     return k->second.getForLang( lang );
 }
 
-// Which detect bits belong to an affect with zero duration (about to expire -> yellow).
-static Bitstring zero_affect_bitstring( const FlagTable *table, AffectList &list, const Bitstring &bits )
-{
-    Bitstring zero;
-
-    for (auto &paf: list) {
-        if (paf->duration != 0)
-            continue;
-        if (paf->bitvector.getTable( ) != table)
-            continue;
-
-        if (bits.isSet( paf->bitvector ))
-            zero.setBit( paf->bitvector & bits.getValue( ) );
-    }
-
-    return zero;
-}
-
 // Auto-fallback panel label when a skill has no curated <webLabel>: the first word of
 // the skill's own (already trilingual) name, capped to fit the widget.
 static DLString webAbbrev( const DLString &name )
@@ -558,7 +540,9 @@ struct AffectPanelColumns {
     Json::Value cols;
     std::map<DLString, std::set<DLString> > seen;
 
-    void add( const DLString &col, const DLString &label, bool expiring )
+    // duration: remaining ticks; -1 = permanent. The client colors by it
+    // (permanent = cyan, a couple ticks = yellow, 1 tick = red, else column base).
+    void add( const DLString &col, const DLString &label, int duration )
     {
         if (col.empty( ) || col == "none" || label.empty( ))
             return;
@@ -567,7 +551,7 @@ struct AffectPanelColumns {
 
         Json::Value o;
         o["n"] = label.c_str( );
-        o["x"] = expiring ? 1 : 0;
+        o["d"] = duration;
         cols[col].append( o );
     }
 };
@@ -590,20 +574,18 @@ static void addDetectColumn( AffectPanelColumns &pc, Character *ch, lang_t lang 
     };
 
     if (IS_AFFECTED( ch, AFF_INFRARED ) && !bitOwnedBySpell( ch, &affect_flags, AFF_INFRARED ))
-        pc.add( DETECT, affectPanelLabel( DETECT, "infrared", lang ), false );
+        pc.add( DETECT, affectPanelLabel( DETECT, "infrared", lang ), -1 );
 
-    static bitstring_t reported_det =
-        DETECT_HIDDEN|DETECT_INVIS|DETECT_IMP_INVIS|DETECT_FADE|ACUTE_VISION|
-        DETECT_EVIL|DETECT_GOOD|DETECT_UNDEAD|DETECT_MAGIC|DETECT_OBSERVATION|DETECT_LIFE;
-    Bitstring zeroDetects = zero_affect_bitstring( &detect_flags, ch->affected, reported_det );
     Bitstring detection( ch->detection );
 
+    // Raw detect bits reaching here are not owned by any spell paf -> equipment/racial,
+    // i.e. permanent for as long as they apply. Duration -1 renders them cyan.
     for (const auto &e: DETS) {
         if (!detection.isSet( e.bit ))
             continue;
         if (bitOwnedBySpell( ch, &detect_flags, e.bit ))
             continue;
-        pc.add( DETECT, affectPanelLabel( DETECT, e.key, lang ), zeroDetects.isSet( e.bit ) );
+        pc.add( DETECT, affectPanelLabel( DETECT, e.key, lang ), -1 );
     }
 }
 
@@ -639,14 +621,15 @@ static void addAffFallbacks( AffectPanelColumns &pc, Character *ch, lang_t lang 
         { "mal", AFF_BLOODTHIRST,  "bloodthirst" },
     };
 
+    // Not owned by any spell paf -> equipment/racial -> permanent (cyan).
     for (const auto &e: AFFS) {
         if (IS_AFFECTED( ch, e.bit ) && !bitOwnedBySpell( ch, &affect_flags, e.bit ))
-            pc.add( e.col, affectPanelLabel( e.col, e.key, lang ), false );
+            pc.add( e.col, affectPanelLabel( e.col, e.key, lang ), -1 );
     }
 
     if ((IS_AFFECTED( ch, AFF_STUN ) && !bitOwnedBySpell( ch, &affect_flags, AFF_STUN ))
         || (IS_AFFECTED( ch, AFF_WEAK_STUN ) && !bitOwnedBySpell( ch, &affect_flags, AFF_WEAK_STUN )))
-        pc.add( MALAD, affectPanelLabel( MALAD, "stun", lang ), false );
+        pc.add( MALAD, affectPanelLabel( MALAD, "stun", lang ), -1 );
 }
 
 class AffectsWebPromptListener : public WebPromptListener {
@@ -685,7 +668,7 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
         if (label.empty( ))
             label = webAbbrev( skill->getNameFor( ch ) );
 
-        pc.add( col, label, paf->duration == 0 );
+        pc.add( col, label, paf->duration );
     }
 
     // 2) Detect column and 3) raw affect-flag fallbacks (no owning spell).

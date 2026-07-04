@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+#
+# pre-push: compile the C++ engine locally (Docker, incremental) before pushing,
+# so a syntax / macro / type error is caught here in ~seconds instead of ~11 min
+# later on drone CI (and never reaches master red).
+#
+# Uses ../Ukrainization/localdev/build.sh --fast --no-restart (incremental build +
+# install into the local dlserver container, but does NOT restart the local game).
+# Self-skips when Docker or the dlserver container is unavailable, so a machine
+# without the local dev setup can still push (drone remains the backstop).
+#
+# Bypass a single push with:  git push --no-verify
+#
+# Install (once, on a machine that has the local dev container):
+#   ln -sf ../../scripts/hooks/pre-push .git/hooks/pre-push
+#
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+BUILD="$REPO_ROOT/../Ukrainization/localdev/build.sh"
+
+if ! command -v docker >/dev/null 2>&1 || ! docker inspect dlserver >/dev/null 2>&1; then
+  echo "[pre-push] Docker/dlserver not available -- skipping local build check (drone will verify)." >&2
+  exit 0
+fi
+
+if [ ! -x "$BUILD" ]; then
+  echo "[pre-push] $BUILD not found/executable -- skipping build check." >&2
+  exit 0
+fi
+
+echo "[pre-push] compiling C++ before push (build.sh --fast --no-restart)..." >&2
+if "$BUILD" --fast --no-restart; then
+  echo "[pre-push] C++ build OK -- pushing." >&2
+  exit 0
+fi
+
+echo "" >&2
+echo "[pre-push] C++ BUILD FAILED -- push aborted." >&2
+echo "[pre-push] Fix the errors above, or bypass with: git push --no-verify" >&2
+exit 1
