@@ -82,7 +82,12 @@ void PlayerAge::modifyYears( int mod )
 
 int PlayerAge::getTime( ) const
 {
-    return played + (int)(dreamland->getCurrentTime( ) - logon);
+    // An APPLY_AGE item can drive displayed play-time negative (age below the
+    // base 17). Clamp the display; 'played' itself stays intact so removing the
+    // item restores the real value. getTrueTime() is deliberately unclamped --
+    // it feeds exp/level/remort and is never touched by APPLY_AGE.
+    int t = played + (int)(dreamland->getCurrentTime( ) - logon);
+    return t < 0 ? 0 : t;
 }
 
 int PlayerAge::getTrueTime( ) const
