@@ -69,7 +69,7 @@ protected:
     
     void saveDrops( Character *ch );
 
-    virtual const DLString &getMsgSelfWear(Object *obj) const;
+    virtual const DLString &getMsgSelfWear(Character *ch, Object *obj) const;
     virtual const DLString &getMsgSelfRemove(Object *obj) const;
     virtual const DLString &getMsgRoomWear(Object *obj) const;
     virtual const DLString &getMsgRoomRemove(Object *obj) const;
@@ -78,9 +78,15 @@ protected:
     XML_VARIABLE XMLFlagsNoEmpty       itemWear;
     XML_VARIABLE XMLWearlocationReference conflict;
     XML_VARIABLE XMLWearlocationReference pair;
-    XML_VARIABLE XMLStringNoEmpty      msgSelfWear, msgRoomWear;
+    // Ukrainization (card 2567): per-player self-messages are language-aware
+    // (getForLang resolves the wearer's lang, bare RU auto-loads as l="ru").
+    // The msgRoom* broadcasts stay single-string RU -- room echoes reach a
+    // mixed-language audience, localized separately (or not at all).
+    XML_VARIABLE XMLMultiString        msgSelfWear;
+    XML_VARIABLE XMLStringNoEmpty      msgRoomWear;
     XML_VARIABLE XMLStringNoEmpty      msgSelfRemove, msgRoomRemove;
-    XML_VARIABLE XMLStringNoEmpty      msgSelfNoRib, msgRoomNoRib;
+    XML_VARIABLE XMLMultiString        msgSelfNoRib;
+    XML_VARIABLE XMLStringNoEmpty      msgRoomNoRib;
     XML_VARIABLE XMLStringNoEmpty      msgSelfConflict;
     XML_VARIABLE XMLIntegerNoEmpty     waitstateRemove;
     XML_VARIABLE XMLIntegerNoEmpty     armorCoef;

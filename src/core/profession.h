@@ -13,6 +13,7 @@
 #include "xmlglobalreference.h"
 #include "bitstring.h"
 #include "grammar_entities.h"
+#include "lang.h"
 
 #define PROF( name ) static ProfessionReference prof_##name( #name )
 
@@ -51,7 +52,7 @@ public:
     virtual int  getPoints( ) const;
     virtual int  getWearModifier( int ) const;
     virtual int getStat( bitnumber_t, Character * = NULL ) const;
-    virtual const DLString & getTitle( const PCMemoryInterface * ) const;
+    virtual const DLString & getTitle( const PCMemoryInterface *, lang_t lang = LANG_DEFAULT ) const;
     virtual GlobalBitvector toVector( CharacterMemoryInterface * = NULL ) const;
     virtual Flags getFlags( CharacterMemoryInterface * = NULL ) const;
     

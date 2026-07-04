@@ -275,20 +275,34 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
  *------------------------------------------------------------------*/
 const DLString ProfessionTitlesByLevel::TYPE = "ProfessionTitlesByLevel";
 
-const DLString & ProfessionTitlesByLevel::build( const PCMemoryInterface *pcm ) const
+const DLString & ProfessionTitlesByLevel::build( const PCMemoryInterface *pcm, lang_t lang ) const
 {
     unsigned int level = pcm->getLevel( );
 
     if (level >= size( ))
         return DLString::emptyString;
-        
-    const ProfessionTitlePair &pair = (*this)[level]; 
 
-    return (pcm->getSex( ) == SEX_FEMALE 
-                ? pair.female.getValue( ) : pair.male.getValue( ));
+    const ProfessionTitlePair &pair = (*this)[level];
+
+    bool female = (pcm->getSex( ) == SEX_FEMALE);
+
+    // Prefer the requested language; an empty localized field falls back to the
+    // RU male/female below, so partially-translated tables never show blanks.
+    if (lang == LANG_UA) {
+        const DLString &ua = female ? pair.femaleUa.getValue( ) : pair.maleUa.getValue( );
+        if (!ua.empty( ))
+            return ua;
+    }
+    else if (lang == LANG_EN) {
+        const DLString &en = female ? pair.femaleEn.getValue( ) : pair.maleEn.getValue( );
+        if (!en.empty( ))
+            return en;
+    }
+
+    return female ? pair.female.getValue( ) : pair.male.getValue( );
 }
 
-const DLString & ProfessionTitlesByConstant::build( const PCMemoryInterface *pcm ) const
+const DLString & ProfessionTitlesByConstant::build( const PCMemoryInterface *pcm, lang_t ) const
 {
     return title.getValue( );
 }
@@ -379,9 +393,9 @@ int DefaultProfession::getStat( bitnumber_t s, Character * ) const
     return stats[s];
 }
 
-const DLString & DefaultProfession::getTitle( const PCMemoryInterface *pcm ) const
+const DLString & DefaultProfession::getTitle( const PCMemoryInterface *pcm, lang_t lang ) const
 {
-    return titles->build( pcm );
+    return titles->build( pcm, lang );
 }
 
 const Flags & DefaultProfession::getSex( ) const

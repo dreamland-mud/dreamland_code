@@ -255,7 +255,7 @@ const DLString &SheathWearloc::getMsgRoomRemove(Object *obj) const
     return getConfig(obj).msgRoomRemove;
 }
 
-const DLString &SheathWearloc::getMsgSelfWear(Object *obj) const
+const DLString &SheathWearloc::getMsgSelfWear(Character *, Object *obj) const
 {
     return getConfig(obj).msgSelfWear;
 }

@@ -22,7 +22,7 @@ namespace Player {
      */
     lang_t displayLang(Character *ch);
 
-    DLString title(PCMemoryInterface *pcm);
+    DLString title(PCMemoryInterface *pcm, lang_t lang = LANG_DEFAULT);
 }
 
 #endif

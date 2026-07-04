@@ -416,9 +416,9 @@ void DefaultWearlocation::triggersOnWear( Character *ch, Object *obj )
     oprog_wear( obj, ch );
 }
 
-const DLString &DefaultWearlocation::getMsgSelfWear(Object *obj) const
+const DLString &DefaultWearlocation::getMsgSelfWear(Character *ch, Object *obj) const
 {
-    return msgSelfWear;
+    return msgSelfWear.getForLang( Player::lang( ch ) );
 }
 
 const DLString &DefaultWearlocation::getMsgRoomWear(Object *obj) const
@@ -430,7 +430,7 @@ bool DefaultWearlocation::wearAtomic( Character *ch, Object *obj, int flags )
 {
     if (canWear( ch, flags )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho( getMsgSelfWear(obj).c_str(), ch, obj );
+            ch->pecho( getMsgSelfWear(ch, obj).c_str(), ch, obj );
             ch->recho( getMsgRoomWear(obj).c_str( ), ch, obj );
         }
 
@@ -469,7 +469,7 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 
     if (!matches( ch ) && !pair->matches( ch )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho( msgSelfNoRib.c_str( ), ch, obj );
+            ch->pecho( msgSelfNoRib.getForLang( Player::lang( ch ) ).c_str( ), ch, obj );
             if (!msgRoomNoRib.empty())
                 ch->recho( msgRoomNoRib.c_str( ), ch, obj );
             else

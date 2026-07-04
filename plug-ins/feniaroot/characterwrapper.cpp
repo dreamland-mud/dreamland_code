@@ -1775,14 +1775,14 @@ NMI_INVOKE( CharacterWrapper, getParsedTitle, "DEPRECATED" )
 {
     checkTarget();
     CHK_NPC
-    return Player::title(target->getPC());
+    return Player::title(target->getPC(), Player::displayLang(target));
 }
 
 NMI_GET( CharacterWrapper, parsedTitle, "титул персонажа как мы его видим" )
 {
     checkTarget();
     CHK_NPC
-    return Player::title(target->getPC());
+    return Player::title(target->getPC(), Player::displayLang(target));
 }
 
 NMI_INVOKE( CharacterWrapper, can_see_mob, "(ch): видим ли персонажа ch" )

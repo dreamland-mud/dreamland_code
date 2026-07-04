@@ -57,7 +57,7 @@ public:
     virtual void onFight(Character *ch, Object *obj);
 
 protected:
-    virtual const DLString &getMsgSelfWear(Object *obj) const;
+    virtual const DLString &getMsgSelfWear(Character *ch, Object *obj) const;
     virtual const DLString &getMsgSelfRemove(Object *obj) const;
     virtual const DLString &getMsgRoomWear(Object *obj) const;
     virtual const DLString &getMsgRoomRemove(Object *obj) const;
