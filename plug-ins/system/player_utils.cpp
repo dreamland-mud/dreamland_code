@@ -65,7 +65,7 @@ lang_t Player::displayLang(Character *ch)
     return ch->getConfig().rucommands ? LANG_RU : LANG_EN;
 }
 
-DLString Player::title(PCMemoryInterface *pcm)
+DLString Player::title(PCMemoryInterface *pcm, lang_t lang)
 {
     ostringstream out;
     const char *str = pcm->getTitle( ).c_str( );
@@ -105,7 +105,7 @@ DLString Player::title(PCMemoryInterface *pcm)
                 break;
                 
             case 'a':
-                out << pcm->getProfession( )->getTitle(pcm);
+                out << pcm->getProfession( )->getTitle(pcm, lang);
                 break;
             }
         }

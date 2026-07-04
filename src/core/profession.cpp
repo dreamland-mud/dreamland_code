@@ -113,7 +113,7 @@ int Profession::getStat( bitnumber_t, Character * ) const
 {
     return 0;
 }
-const DLString & Profession::getTitle( const PCMemoryInterface * ) const
+const DLString & Profession::getTitle( const PCMemoryInterface *, lang_t ) const
 {
     return DLString::emptyString;
 }

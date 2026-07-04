@@ -73,8 +73,8 @@ inline const DLString & ClassSkillHelp::getType( ) const
 class ProfessionTitles : public virtual XMLPolymorphVariable {
 public:
     typedef ::Pointer<ProfessionTitles> Pointer;
-    
-    virtual const DLString & build( const PCMemoryInterface * ) const = 0;
+
+    virtual const DLString & build( const PCMemoryInterface *, lang_t lang = LANG_DEFAULT ) const = 0;
 };
 
 /*
@@ -84,8 +84,8 @@ class ProfessionTitlesByConstant : public ProfessionTitles, public XMLVariableCo
 XML_OBJECT
 public:
     typedef ::Pointer<ProfessionTitlesByConstant> Pointer;
-    
-    virtual const DLString & build( const PCMemoryInterface * ) const;
+
+    virtual const DLString & build( const PCMemoryInterface *, lang_t lang = LANG_DEFAULT ) const;
 
 protected:
     XML_VARIABLE XMLString title;
@@ -98,9 +98,16 @@ class ProfessionTitlePair : public XMLVariableContainer {
 XML_OBJECT
 public:
     typedef ::Pointer<ProfessionTitlePair> Pointer;
-    
+
     XML_VARIABLE XMLString male;
     XML_VARIABLE XMLString female;
+    // Ukrainization (card 2567): per-language title variants. When the requested
+    // language's field is empty, build() falls back to male/female (RU), so
+    // untranslated levels render exactly as before -- zero regression.
+    XML_VARIABLE XMLString maleUa;
+    XML_VARIABLE XMLString femaleUa;
+    XML_VARIABLE XMLString maleEn;
+    XML_VARIABLE XMLString femaleEn;
 };
 
 typedef XMLVectorBase<ProfessionTitlePair> ProfessionTitlePairVector;
@@ -113,8 +120,8 @@ class ProfessionTitlesByLevel : public ProfessionTitles,
 {
 public:
     typedef ::Pointer<ProfessionTitlesByLevel> Pointer;
-    
-    virtual const DLString & build( const PCMemoryInterface * ) const;
+
+    virtual const DLString & build( const PCMemoryInterface *, lang_t lang = LANG_DEFAULT ) const;
 
     virtual const DLString & getType( ) const
     {
@@ -159,7 +166,7 @@ public:
     virtual int  getPoints( ) const;
     virtual int getStat( bitnumber_t, Character * = NULL ) const;
     virtual int  getWearModifier( int ) const;
-    virtual const DLString & getTitle( const PCMemoryInterface * ) const;
+    virtual const DLString & getTitle( const PCMemoryInterface *, lang_t lang = LANG_DEFAULT ) const;
     virtual GlobalBitvector toVector( CharacterMemoryInterface * = NULL ) const;
     virtual Flags getFlags( CharacterMemoryInterface * = NULL ) const;
     
