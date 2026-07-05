@@ -106,7 +106,10 @@ msgtable_t msg_positions = {
 };
 
 
-CMDRUNP( oscore )
+// Classic linear ("prose") score -- a comprehensive, screen-reader-friendly
+// dump of every stat. Used as the fall-through body for the accessible 'score'
+// command and for NPCs; players normally get the Fenia panel or score_ascii.
+static void score_prose( Character *ch )
 {
     ostringstream buf;
     Room *room = 0;
@@ -489,7 +492,9 @@ static void do_score_args(Character *ch, const DLString &arg)
 
 #define MILD(ch)     (IS_SET((ch)->comm, COMM_MILDCOLOR))
 
-CMDRUNP( score )
+// The classic framed ("ASCII-art") score. Player-only: the caller must guard
+// is_npc() first, because pch is dereferenced throughout.
+static void score_ascii( Character *ch )
 {
     int ekle=0;
     PCharacter *pch = ch->getPC( );
@@ -498,10 +503,8 @@ CMDRUNP( score )
     const char *CLR_BAR   = MILD(ch) ? "{D" : "{C";
     const char *CLR_CAPT  = MILD(ch) ? "{g" : "{R";
 
-    if (ch->is_npc( )) {
-        interpret_raw( ch, "oscore" );
-        return;
-    }
+    // Players only: NPC and single-parameter paths are handled by the CMDRUNP
+    // wrappers before they reach this renderer.
     
     XMLAttributeTimer::Pointer qd = pch->getAttributes( ).findAttr<XMLAttributeTimer>( "questdata" );
     int age = pch->age.getYears( );
@@ -515,12 +518,6 @@ CMDRUNP( score )
 
     DLString ethos = ethos_table.message( ch->ethos, '1', Player::displayLang(ch) );
 
-    // Output one piece of the score if there is an argument provided.
-    DLString arg = argument;
-    if (!arg.empty()) {
-        do_score_args(ch, arg);
-        return;
-    }
 
     ch->pecho( 
 "%s\n\r"
@@ -781,6 +778,46 @@ CMDRUNP( score )
 
     if (IS_SET(ch->comm, COMM_SHOW_AFFECTS))
         interpret_raw( ch, "affects", "noempty");
+}
+
+
+/*
+ * 'oscore' -- the classic detailed score. Players get the framed ASCII layout;
+ * NPCs get the linear prose. A single parameter (e.g. 'oscore saves') prints
+ * just that field. The accessible 'score' (Fenia command/score) delegates its
+ * own parameter form here, so 'score saves' keeps working.
+ */
+CMDRUNP( oscore )
+{
+    DLString arg = argument;
+    if (!arg.empty( )) {
+        do_score_args( ch, arg );
+        return;
+    }
+
+    if (ch->is_npc( )) {
+        score_prose( ch );
+        return;
+    }
+
+    score_ascii( ch );
+}
+
+/*
+ * 'score' proper is the accessible panel implemented in Fenia
+ * (command/score/runFunc). This native handler only fires as a fall-through
+ * (an NPC, or if the Fenia command is ever unavailable): render the linear
+ * prose score, honouring a single-parameter query as before.
+ */
+CMDRUNP( score )
+{
+    DLString arg = argument;
+    if (!arg.empty( )) {
+        do_score_args( ch, arg );
+        return;
+    }
+
+    score_prose( ch );
 }
 
 
