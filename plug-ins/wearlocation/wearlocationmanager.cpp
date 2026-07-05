@@ -31,14 +31,14 @@ static bool compareForDisplay( int a, int b)
            <= wearlocationManager->find( b )->getOrderDisplay( );
 }
 
-void WearlocationManager::display( Character *ch, Wearlocation::DisplayList &eq )
+void WearlocationManager::display( Character *ch, Wearlocation::DisplayList &eq, lang_t lang )
 {
     SortedIndexes order;
     SortedIndexes::iterator o;
-    
+
     sortIndexes( order, compareForDisplay );
-    
+
     for (o = order.begin( ); o != order.end( ); o++)
-        find( *o )->display( ch, eq );
+        find( *o )->display( ch, eq, lang );
 }
 

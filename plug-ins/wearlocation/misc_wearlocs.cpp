@@ -223,9 +223,9 @@ DLString SheathWearloc::displayName(Character *ch, Object *obj, lang_t lang)
 /**
  * Sheath wearloc looks different depending on item type or item proto properties.
  */
-DLString SheathWearloc::displayLocation(Character *ch, Object *obj)
+DLString SheathWearloc::displayLocation(Character *ch, Object *obj, lang_t lang)
 {
-    return getConfig(obj).msgDisplay;
+    return getConfig(obj).msgDisplay.getForLang(lang);
 }
 
 void SheathWearloc::onFight(Character *ch, Object *obj)

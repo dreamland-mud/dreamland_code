@@ -495,21 +495,23 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 /*-------------------------------------------------------------------
  * display 
  *------------------------------------------------------------------*/
-void DefaultWearlocation::display( Character *ch, Wearlocation::DisplayList &eq )
+void DefaultWearlocation::display( Character *ch, Wearlocation::DisplayList &eq, lang_t lang )
 {
     bool found = false;
 
     for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content)
         if (obj->wear_loc == this) {
-            eq.push_back( make_pair( displayLocation(ch, obj), obj ) ); 
+            eq.push_back( make_pair( displayLocation(ch, obj, lang), obj ) );
             found = true;
         }
 
     if (!found && displayAlways && matches( ch ))
-        eq.push_back( make_pair( displayLocation(ch, NULL), (Object *)NULL ) );
+        eq.push_back( make_pair( displayLocation(ch, NULL, lang), (Object *)NULL ) );
 }
 
-DLString DefaultWearlocation::displayLocation(Character *ch, Object *obj)
+DLString DefaultWearlocation::displayLocation(Character *ch, Object *obj, lang_t lang)
 {
-    return msgDisplay.getForLang( Player::lang( ch ) );
+    // 'lang' is the viewer's language; the slot label must NOT depend on the
+    // equipment owner's own config (ch here is that owner).
+    return msgDisplay.getForLang( lang );
 }

@@ -1002,7 +1002,9 @@ bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool
     bool naked = true;
     Character *        vict = (victim->is_mirror( ) ? victim->getDoppel( ) : victim);
 
-    wearlocationManager->display( vict, eq );
+    // vict is the equipment owner (whose items we iterate), but slot labels must
+    // render in the VIEWER's language (ch), not the owner's config.
+    wearlocationManager->display( vict, eq, Player::lang(ch) );
     
     for (e = eq.begin( ); e != eq.end( ); e++) {
         DLString objName, wearName = e->first;

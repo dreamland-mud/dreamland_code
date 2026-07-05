@@ -37,7 +37,9 @@ XML_OBJECT
 public:
     typedef ::Pointer<SheathConfig> Pointer;
 
-    XML_VARIABLE XMLString msgDisplay;
+    // Trilingual (sheath.xml already carries l="en"/"ru"/"ua"): a plain XMLString
+    // would collapse to a single loaded value and show it to every viewer.
+    XML_VARIABLE XMLMultiString msgDisplay;
     XML_VARIABLE XMLString msgRoomWear;
     XML_VARIABLE XMLString msgSelfWear;
     XML_VARIABLE XMLString msgRoomRemove;
@@ -52,8 +54,8 @@ public:
     virtual bool matches( Character *ch );
     virtual bool displayFlags(Character *ch, Object *obj);
     virtual DLString displayName(Character *ch, Object *obj, lang_t lang);
-    virtual DLString displayLocation(Character *ch, Object *obj);
-    
+    virtual DLString displayLocation(Character *ch, Object *obj, lang_t lang);
+
     virtual void onFight(Character *ch, Object *obj);
 
 protected:

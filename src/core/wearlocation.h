@@ -53,14 +53,16 @@ public:
     virtual  int wear( Object *obj, int flags );
     virtual bool wearAtomic( Character *ch, Object *obj, int flags );
 
-    /** Add location_name/item_name pair to the display list. */
-    virtual void display( Character *, DisplayList & );
+    /** Add location_name/item_name pair to the display list. 'lang' is the
+     *  VIEWER's language; ch is the equipment OWNER (whose items we iterate). */
+    virtual void display( Character *, DisplayList &, lang_t lang );
     /** Checks if item auras need to be shown for this location. */
     virtual bool displayFlags(Character *ch, Object *obj) { return true; }
     /** Formats item name to show for this location, in the viewer's language. */
     virtual DLString displayName(Character *ch, Object *obj, lang_t lang);
-    /** Formats location name itself depending on the item. */
-    virtual DLString displayLocation(Character *ch, Object *obj);
+    /** Formats location name itself depending on the item, in the viewer's
+     *  language ('lang'). ch is the owner and must NOT be used for language. */
+    virtual DLString displayLocation(Character *ch, Object *obj, lang_t lang);
 
     virtual  int canWear( Character *ch, Object *obj, int flags );
     virtual bool canWear( Character *ch, int flags );
@@ -89,7 +91,7 @@ public:
     virtual ~WearlocationManager( );
     
     int wear( Object *, int );
-    void display( Character *, Wearlocation::DisplayList & );
+    void display( Character *, Wearlocation::DisplayList &, lang_t lang );
 
     inline static WearlocationManager *getThis( );
 
