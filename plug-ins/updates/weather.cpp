@@ -54,7 +54,13 @@ const char * sunlight_en [4] = {
     "sunrise",
     "light",
     "sunset"
-};    
+};
+const char * sunlight_ua [4] = {
+    "темно",
+    "світає",
+    "світло",
+    "сутінки"
+};
 
 const struct season_info season_table [4] = {
     { SEASON_WINTER, "winter", "зима",  "зим|а|ы|е|у|ой|е",  "зимнего",   'C' },
@@ -69,26 +75,28 @@ struct month_info {
     int sunrise;
     int sunset;
     int season;
+    const char *name_en;
+    const char *name_ua;
 };
 
 const struct month_info month_table [17] = {
-  { "Зимы",                   -12,    7, 17, SEASON_WINTER },
-  { "Зимнего Волка",          -14,    7, 18, SEASON_WINTER },
-  { "Холодного Гиганта",      -14,    7, 18, SEASON_WINTER },
-  { "Древних Воинств",        -12,    7, 19, SEASON_WINTER },   
-  { "Великих Битв",            -8,    6, 19, SEASON_SPRING },
-  { "Весны",                   -4,    5, 19, SEASON_SPRING }, 
-  { "Природы",                  0,    5, 21, SEASON_SPRING },
-  { "Тщетности",                4,    5, 22, SEASON_SPRING },  
-  { "Дракона",                  8,    4, 22, SEASON_SUMMER },
-  { "Солнца",                  12,    4, 22, SEASON_SUMMER },
-  { "Жары",                    16,    5, 21, SEASON_SUMMER },    
-  { "Битвы",                   12,    5, 20, SEASON_SUMMER },   
-  { "Темноты",                  8,    6, 20, SEASON_AUTUMN },
-  { "Тени",                     4,    6, 19, SEASON_AUTUMN },
-  { "Длинных Теней",            0,    7, 18, SEASON_AUTUMN },         
-  { "Абсолютной Темноты",      -4,    8, 17, SEASON_AUTUMN },   
-  { "Великого Зла",            -8,    8, 17, SEASON_WINTER },
+  { "Зимы",                   -12,    7, 17, SEASON_WINTER, "Winter",        "Зими" },
+  { "Зимнего Волка",          -14,    7, 18, SEASON_WINTER, "Winter Wolf",   "Зимового Вовка" },
+  { "Холодного Гиганта",      -14,    7, 18, SEASON_WINTER, "Frost Giant",   "Морозного Велетня" },
+  { "Древних Воинств",        -12,    7, 19, SEASON_WINTER, "Ancient Hosts", "Древніх Воїнств" },
+  { "Великих Битв",            -8,    6, 19, SEASON_SPRING, "Great Battles", "Великих Битв" },
+  { "Весны",                   -4,    5, 19, SEASON_SPRING, "Spring",        "Весни" },
+  { "Природы",                  0,    5, 21, SEASON_SPRING, "Nature",        "Природи" },
+  { "Тщетности",                4,    5, 22, SEASON_SPRING, "Futility",      "Марноти" },
+  { "Дракона",                  8,    4, 22, SEASON_SUMMER, "Dragon",        "Дракона" },
+  { "Солнца",                  12,    4, 22, SEASON_SUMMER, "Sun",           "Сонця" },
+  { "Жары",                    16,    5, 21, SEASON_SUMMER, "Heat",          "Спеки" },
+  { "Битвы",                   12,    5, 20, SEASON_SUMMER, "Battle",        "Битви" },
+  { "Темноты",                  8,    6, 20, SEASON_AUTUMN, "Darkness",      "Темряви" },
+  { "Тени",                     4,    6, 19, SEASON_AUTUMN, "Shadow",        "Тіні" },
+  { "Длинных Теней",            0,    7, 18, SEASON_AUTUMN, "Long Shadows",  "Довгих Тіней" },
+  { "Абсолютной Темноты",      -4,    8, 17, SEASON_AUTUMN, "Total Darkness","Цілковитої Темряви" },
+  { "Великого Зла",            -8,    8, 17, SEASON_WINTER, "Great Evil",    "Великого Зла" },
 };
 
 const int month_table_size = sizeof(month_table) / sizeof(month_info);
@@ -257,6 +265,19 @@ DLString sunlight( )
     return DLString::emptyString;
 }
 
+DLString sunlight( lang_t lang )
+{
+    if (weather_info.sunlight >= SUN_DARK && weather_info.sunlight <= SUN_SET) {
+        switch (lang) {
+            case LANG_EN: return sunlight_en[weather_info.sunlight];
+            case LANG_UA: return sunlight_ua[weather_info.sunlight];
+            default:      return sunlight_ru[weather_info.sunlight];
+        }
+    }
+
+    return DLString::emptyString;
+}
+
 /*
  * Weather change.
  */
@@ -347,15 +368,40 @@ void weather_update( )
 
 DLString time_of_day( )
 {
-    if ((time_info.hour > 16) && (time_info.hour < 24)) 
+    if ((time_info.hour > 16) && (time_info.hour < 24))
         return "вечера";
-    if (time_info.hour < 4) 
+    if (time_info.hour < 4)
         return "ночи";
-    if ((time_info.hour > 3) && (time_info.hour < 12)) 
+    if ((time_info.hour > 3) && (time_info.hour < 12))
         return "утра";
-    if ((time_info.hour > 11) && (time_info.hour < 17)) 
+    if ((time_info.hour > 11) && (time_info.hour < 17))
         return "дня";
     return DLString::emptyString;
+}
+
+DLString time_of_day( lang_t lang )
+{
+    // RU/UA use a genitive daypart ("5 утра"); EN pairs the 12h clock with am/pm ("5 am").
+    bool morning = (time_info.hour > 3)  && (time_info.hour < 12); // утра
+    bool day     = (time_info.hour > 11) && (time_info.hour < 17); // дня
+    bool evening = (time_info.hour > 16) && (time_info.hour < 24); // вечера
+    bool night   = (time_info.hour < 4);                           // ночи
+
+    if (lang == LANG_EN) {
+        if (morning || night) return "am";
+        if (day || evening)   return "pm";
+        return DLString::emptyString;
+    }
+
+    if (lang == LANG_UA) {
+        if (evening) return "вечора";
+        if (night)   return "ночі";
+        if (morning) return "ранку";
+        if (day)     return "дня";
+        return DLString::emptyString;
+    }
+
+    return time_of_day();
 }
 
 int hour_of_day( )
@@ -366,6 +412,16 @@ int hour_of_day( )
 DLString calendar_month( )
 {
     return month_table[time_info.month].name;
+}
+
+DLString calendar_month( lang_t lang )
+{
+    const month_info &month = month_table[time_info.month];
+    switch (lang) {
+        case LANG_EN: return month.name_en;
+        case LANG_UA: return month.name_ua;
+        default:      return month.name;
+    }
 }
 
 void make_date( ostringstream &buf )

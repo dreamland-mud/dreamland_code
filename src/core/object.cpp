@@ -138,16 +138,16 @@ Room * Object::getRoom( ) {
 }
 
 /* object condition aliases */
-const char *Object::get_cond_alias( void )
+const char *Object::get_cond_alias( lang_t lang )
 {
  const char *stat;
 
- if      ( condition >  99 ) stat = "{Cотл.{x";
- else if ( condition >= 80 ) stat = "{cхор.{x";
- else if ( condition >= 60 ) stat = "{Yнорм.{x";
- else if ( condition >= 40 ) stat = "{yср.{x";
- else if ( condition >= 20 ) stat = "{Rпл.{x";
- else                        stat = "{rуж.{x";
+ if      ( condition >  99 ) stat = lmsg(lang, "{Cexc.{x",  "{Cотл.{x",  "{Cвідм.{x");
+ else if ( condition >= 80 ) stat = lmsg(lang, "{cgood{x",  "{cхор.{x",  "{cдобр.{x");
+ else if ( condition >= 60 ) stat = lmsg(lang, "{Ynorm.{x", "{Yнорм.{x", "{Yнорм.{x");
+ else if ( condition >= 40 ) stat = lmsg(lang, "{yavg.{x",  "{yср.{x",   "{yсер.{x");
+ else if ( condition >= 20 ) stat = lmsg(lang, "{Rpoor{x",  "{Rпл.{x",   "{Rпог.{x");
+ else                        stat = lmsg(lang, "{rterr.{x", "{rуж.{x",   "{rжах.{x");
 
  return stat;
 }

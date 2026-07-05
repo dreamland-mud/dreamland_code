@@ -16,6 +16,7 @@
 #define __WEATHER_H__
 
 #include <sstream>
+#include "lang.h"
 using namespace std;
 
 class DLString;
@@ -25,9 +26,12 @@ void weather_update( );
 void weather_init( );
 void make_date( ostringstream & );
 DLString time_of_day( );
+DLString time_of_day( lang_t lang );
 int hour_of_day( );
 DLString sunlight( );
+DLString sunlight( lang_t lang );
 DLString calendar_month( );
+DLString calendar_month( lang_t lang );
 
 enum{
     SEASON_WINTER = 0,

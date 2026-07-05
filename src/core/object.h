@@ -115,7 +115,7 @@ public:
 
     int getWeightMultiplier( ) const;
 
-    const char *get_cond_alias(void);
+    const char *get_cond_alias(lang_t lang = LANG_DEFAULT);
     int floating_time(void);
     bool may_float(void);
     Character * getCarrier( );

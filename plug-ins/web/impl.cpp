@@ -367,37 +367,39 @@ Json::Value CalendarWebPromptListener::jsonWeather( Descriptor *d, Character *ch
     if (!canSeeWeather( ch ))
         return Json::Value( );
 
+    lang_t lang = Player::displayLang( ch );
+
     // Небо (ясное|облачное|дождливое|во вспышках молний)
     // ->     ясно   облачно  дождь    гроза
     // и дует (теплый южный | холодный северный) ветер
     // ->      теплый        холодный          ветер
     switch (weather_info.sky) {
-        case SKY_CLOUDY:    
-            msg = "облачно";
+        case SKY_CLOUDY:
+            msg = lmsg(lang, "cloudy", "облачно", "хмарно");
             icon_day = "day-cloudy";
             icon_night = "night-alt-cloudy";
             break;
         case SKY_CLOUDLESS:
-            msg = "ясно";
+            msg = lmsg(lang, "clear", "ясно", "ясно");
             icon_day = "day-sunny";
             icon_night = "night-clear";
             break;
         case SKY_RAINING:
-            msg = "дождь";
+            msg = lmsg(lang, "rain", "дождь", "дощ");
             icon_day = "day-showers";
             icon_night = "night-alt-showers";
             break;
         case SKY_LIGHTNING:
-            msg = "гроза";
+            msg = lmsg(lang, "storm", "гроза", "гроза");
             icon_day = "day-lightning";
             icon_night = "night-alt-lightning";
             break;
     }
-    
+
     if (weather_info.change >= 0)
-        msg += ", теплый ветер";
+        msg += lmsg(lang, ", warm wind", ", теплый ветер", ", теплий вітер");
     else
-        msg += ", холодный ветер";
+        msg += lmsg(lang, ", cold wind", ", холодный ветер", ", холодний вітер");
 
     DLString sl = sunlight( );
     if (sl == "светло" || sl == "светает") 
@@ -419,7 +421,7 @@ Json::Value CalendarWebPromptListener::jsonDate( Descriptor *d, Character *ch )
 
     Json::Value date;
     date["d"] = time_info.day + 1;
-    date["m"] = calendar_month( );
+    date["m"] = calendar_month( Player::displayLang( ch ) );
     date["y"] = time_info.year;
     return date;
 }
@@ -430,10 +432,11 @@ Json::Value CalendarWebPromptListener::jsonTime( Descriptor *d, Character *ch )
         return Json::Value( );
 
     Json::Value time;
+    lang_t lang = Player::displayLang( ch );
     time["h"] = hour_of_day( );
-    time["tod"] = time_of_day( );
+    time["tod"] = time_of_day( lang );
     if (canSeeSunlight( ch ))
-        time["l"] = sunlight( );
+        time["l"] = sunlight( lang );
     return time;
 }    
 
@@ -823,24 +826,29 @@ Json::Value AreaQuestWebPromptListener::jsonAreaQuest( Descriptor *d, Character 
     if (step >= (int)quest->steps.size())
         return aq;
 
+    lang_t lang = Player::displayLang( ch );
+
     ostringstream buf;
 
     // Add quest title to info for non-newbie zones; different windowlet title for onboarding
     if (!quest->flags.isSet(AQUEST_ONBOARDING)) {
         buf << "\"";
-        strip_colors_and_tags(quest->title.get(LANG_DEFAULT), buf);
-        buf << "\"" << ": ";     
+        strip_colors_and_tags(quest->title.getForLang(lang), buf);
+        buf << "\"" << ": ";
 
-        aq["t"] = "Задание в зоне " + quest->pAreaIndex->getName().colourStrip();   
+        aq["t"] = lmsg(lang, "Quest in ", "Задание в зоне ", "Завдання в зоні ")
+                  + quest->pAreaIndex->name.getForLang(lang).colourStrip();
     } else {
-        aq["t"] = "Обучение";
+        aq["t"] = lmsg(lang, "Training", "Обучение", "Навчання");
     }
 
-    strip_colors_and_tags(quest->steps[step]->info.get(LANG_DEFAULT), buf);
+    strip_colors_and_tags(quest->steps[step]->info.getForLang(lang), buf);
 
     // TODO show full menu in the windowlet (needs newline and {hc handling)
     if (Player::menuAvailable(pch)) {
-        buf << endl << "Выбери вариант ответа из списка.";
+        buf << endl << lmsg(lang, "Choose an option from the list.",
+                                  "Выбери вариант ответа из списка.",
+                                  "Обери варіант відповіді зі списку.");
     }
 
     aq["i"] = buf.str();
