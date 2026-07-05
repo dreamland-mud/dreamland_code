@@ -88,6 +88,7 @@ GSN(jail);
 GSN(dark_shroud);
 GSN(peek);
 GSN(curl);
+GSN(corrosion);
 RELIG(godiva);
 PROF(druid);
 
@@ -149,7 +150,7 @@ static void format_screenreader_flags(Object *obj, ostringstream &buf, Character
 
     DLString myshort = obj->getShortDescr(LANG_DEFAULT);
     if (myshort.find('{') != DLString::npos)
-        buf << "(Яркое) ";
+        buf << lmsg(Player::lang(ch), "(Bright) ", "(Яркое) ", "(Яскраве) ");
 }
 
 // Display aura if the item can be looted from PC corpse
@@ -164,7 +165,7 @@ static void format_loot_mark(Object *obj, ostringstream &buf, Character *ch)
     if (obj->in_obj->hasOwner( ch ))
         return;
 
-    buf << "({cДобыча{x) "; 
+    buf << lmsg(Player::lang(ch), "({cLoot{x) ", "({cДобыча{x) ", "({cЗдобич{x) ");
 }
 
 static void oprog_show(Object *obj, Character *ch, ostringstream &buf)
@@ -210,28 +211,41 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
         FMT( true, buf, ch, "", "{x", "[" );
         
         FMT( IS_OBJ_STAT(obj, ITEM_INVIS), buf, ch,
-            "({DНевидимо{x) ", "{D", "Н" );
+            lmsg(lang, "({DInvisible{x) ", "({DНевидимо{x) ", "({DНевидимо{x) "),
+            "{D", lmsg(lang, "I", "Н", "Н") );
             
         FMT( CAN_DETECT(ch, DETECT_EVIL) && IS_OBJ_STAT(obj, ITEM_EVIL), buf, ch,
-            "({RКрасная Аура{x) ", "{R", "З" );
+            lmsg(lang, "({RRed aura{x) ", "({RКрасная аура{x) ", "({RЧервона аура{x) "),
+            "{R", lmsg(lang, "N", "З", "З") );
             
         FMT( CAN_DETECT(ch, DETECT_GOOD) && IS_OBJ_STAT(obj,ITEM_BLESS), buf, ch,
-            "({CГолубая Аура{x) ", "{C", "Б" );
+            lmsg(lang, "({CBlue aura{x) ", "({CГолубая аура{x) ", "({CБлакитна аура{x) "),
+            "{C", lmsg(lang, "B", "Б", "Б") );
                 
         if (obj->item_type == ITEM_PORTAL) {
             FMT( CAN_DETECT(ch, DETECT_MAGIC) && IS_OBJ_STAT(obj, ITEM_MAGIC), buf, ch, 
-                "(Магическое) ", "{w", "М" );
+                lmsg(lang, "(Magic) ", "(Магическое) ", "(Магічне) "),
+                "{w", lmsg(lang, "M", "М", "М") );
         } else {
             FMT( CAN_DETECT(ch, DETECT_MAGIC) && IS_OBJ_STAT(obj, ITEM_MAGIC), buf, ch,
-                "(Заколдовано) ", "{w", "М" );
+                lmsg(lang, "(Enchanted) ", "(Заколдовано) ", "(Зачакловано) "),
+                "{w", lmsg(lang, "M", "М", "М") );
         }
 
         FMT( IS_OBJ_STAT(obj, ITEM_GLOW), buf, ch,
-            "({MПылает{x) ", "{M", "П" ); 
+            lmsg(lang, "({MGlowing{x) ", "({MПылает{x) ", "({MПалає{x) "),
+            "{M", lmsg(lang, "G", "П", "П") );
 
         FMT( IS_OBJ_STAT(obj, ITEM_HUM), buf, ch,   
-            "({cВибрирует{x) ", "{c", "В" );
+            lmsg(lang, "({cVibrating{x) ", "({cВибрирует{x) ", "({cВібрує{x) "),
+            "{c", lmsg(lang, "V", "В", "В") );
     
+        // Corrosion is an object affect (gsn_corrosion), not an extra-flag; show it
+        // as a bit marker like the others, visible to everyone (no detect gate).
+        FMT( obj->isAffected(gsn_corrosion), buf, ch,
+            lmsg(lang, "({yCorrosion{x) ", "({yКоррозия{x) ", "({yКорозія{x) "),
+            "{y", lmsg(lang, "C", "К", "К") );
+
         FMT( true, buf, ch, "", "{x", "] " );
     }
 #undef FMT
