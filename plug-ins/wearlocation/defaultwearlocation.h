@@ -50,8 +50,8 @@ public:
     virtual  int wear( Object *obj, int flags );
     virtual bool wearAtomic( Character *ch, Object *obj, int flags );
 
-    virtual void display( Character *, DisplayList & );
-    virtual DLString displayLocation(Character *ch, Object *obj);
+    virtual void display( Character *, DisplayList &, lang_t lang );
+    virtual DLString displayLocation(Character *ch, Object *obj, lang_t lang);
 
     virtual int canWear( Character *ch, Object *obj, int flags );
     virtual bool canWear( Character *ch, int flags );

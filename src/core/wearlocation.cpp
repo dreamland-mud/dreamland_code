@@ -97,7 +97,7 @@ int Wearlocation::wear( Object *obj, int flags )
 {
     return -1;
 }
-void Wearlocation::display( Character *, Wearlocation::DisplayList & )
+void Wearlocation::display( Character *, Wearlocation::DisplayList &, lang_t )
 {
 }
 
@@ -106,9 +106,9 @@ DLString Wearlocation::displayName(Character *ch, Object *obj, lang_t lang)
     return obj->getShortDescr('1', lang);
 }
 
-DLString Wearlocation::displayLocation(Character *ch, Object *obj)
+DLString Wearlocation::displayLocation(Character *ch, Object *obj, lang_t lang)
 {
-    return DLString::emptyString;    
+    return DLString::emptyString;
 }
 
 bool Wearlocation::wearAtomic( Character *ch, Object *obj, int flags )
