@@ -256,7 +256,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
 
         if (obj->pIndexData->vnum > 5)        /* money, gold, etc */
             if (obj->condition <= 99 )
-                buf << " [" << obj->get_cond_alias( ) << "]";
+                buf << " [" << obj->get_cond_alias( lang ) << "]";
 
         format_hint(buf, obj->getKeyword(), obj->getShortDescr(LANG_DEFAULT), ch, false);
     }

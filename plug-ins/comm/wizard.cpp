@@ -1080,7 +1080,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
         format_affect(paf, buf);
 
 
-    buf << fmt(0, "Состояние : %d (%s) ", obj->condition, obj->get_cond_alias() );        
+    buf << fmt(0, "Состояние : %d (%s) ", obj->condition, obj->get_cond_alias( Player::lang(ch) ) );
     
     if (obj->behavior) {        
         buf << fmt(0, "Поведение: [%s]\r\n", obj->behavior->getType( ).c_str( ));
