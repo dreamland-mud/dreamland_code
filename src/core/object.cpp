@@ -394,8 +394,15 @@ Noun::Pointer Object::toNoun( const DLObject *forWhom, int flags ) const
             return something;
     }
     
-    // TODO toNoun takes lang parameter from 'forWhom'
-    return cachedNouns.find(LANG_DEFAULT)->second;
+    // Render the object's name in the viewer's display language (shared with
+    // PCharacter::toNoun via viewerLang). Many objects carry only a RU
+    // short_descr, and getShortDescr()/cachedNouns do no cross-lang fallback, so
+    // drop back to LANG_DEFAULT when the viewer-lang name is empty -- otherwise
+    // %O would render blank for an EN/UA viewer.
+    lang_t lang = viewerLang( wch );
+    if (getShortDescr(lang).empty())
+        lang = LANG_DEFAULT;
+    return cachedNouns.find(lang)->second;
 }
 
 void Object::updateCachedNouns()

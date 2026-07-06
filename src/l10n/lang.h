@@ -24,5 +24,14 @@ DLString lang2attr(lang_t lang);
  *  callers can pass ru==ua when a UA variant isn't ready yet). */
 const char * lmsg(lang_t lang, const char *en, const char *ru, const char *ua);
 
+class Character;
+
+/** Resolve the display language (EN/RU/UA) of viewer 'wch': an explicit
+ *  'config lang' wins, else the legacy rucommands flag; a switched immortal
+ *  NPC uses its own language, plain NPCs/null use LANG_DEFAULT. Core-only (no
+ *  libsystem / Player:: dependency), so both PCharacter::toNoun and
+ *  Object::toNoun share this one implementation. Defined in core/pcharacter.cpp. */
+lang_t viewerLang(const Character *wch);
+
 
 #endif
