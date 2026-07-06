@@ -68,8 +68,11 @@
 #include "areaquestwrapper.h"
 #include "behaviorwrapper.h"
 #include "codesource.h"
+#include "context.h"
+#include "nodes.h"
 #include "subr.h"
 #include "fenia/handler.h"
+#include "multimessagewrapper.h"
 #include "wrap_utils.h"
 
 #include "def.h"
@@ -130,9 +133,49 @@ NMI_INVOKE( Root, Affect, "([skill[,level,duration,location,mod,where,bits]]): �
 
 DLString regfmt(Character *to, const RegisterList &argv);
 
-NMI_INVOKE( Root, fmt, "(args): отформатировать строку, см. статью вики про функции вывода") 
+NMI_INVOKE( Root, fmt, "(args): отформатировать строку, см. статью вики про функции вывода")
 {
     return regfmt( NULL, args );
+}
+
+/*----------------------------------------------------------------------------
+ * Trilinguality: ._(ru) -- wrap a hard-coded Russian phrase into a MultiMessage
+ * that the output path (regfmt) resolves to each recipient's language.
+ * The originating script FILE is captured here from the interpreter call stack
+ * so the translation catalog can be keyed by (FILE, ru). See Trello 2594.
+ *--------------------------------------------------------------------------*/
+static DLString currentFeniaFile( )
+{
+    using namespace Scripting;
+
+    // Walk the current node-trace back to the innermost node that carries a
+    // source, mirroring CodeSourceRef::operator<< and BTPushNode::print. The
+    // trace is parent-linked (see context.h NodeTrace), not a `next` list.
+    if (Context::current == 0)
+        return DLString::emptyString;
+
+    for (NodeTrace *nt = Context::current->nodeTrace; nt != 0; nt = nt->parent) {
+        if (nt->node == 0)
+            continue;
+        CodeSource::Pointer cs = nt->node->source.source;
+        if (cs)
+            return cs->name;
+    }
+
+    return DLString::emptyString;
+}
+
+NMI_INVOKE( Root, _, "(msg): пометить русскую строку msg как переводимую (мультиязычное сообщение)")
+{
+    DLString ru = args.front( ).toString( );
+    DLString file = currentFeniaFile( );
+
+    MultiMessageWrapper::Pointer w( NEW );
+    w->init( ru, file );
+
+    Scripting::Object *obj = &Scripting::Object::manager->allocate( );
+    obj->setHandler( w );
+    return Register( obj );
 }
 
 NMI_INVOKE( Root, print , "(msg): вывести строку msg в системные логи") 

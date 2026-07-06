@@ -20,6 +20,7 @@
 #include "skillwrapper.h"
 #include "playerwrapper.h"
 #include "msgformatter.h"
+#include "multimessagewrapper.h"
 
 #include "def.h"
 
@@ -35,8 +36,20 @@ struct RegFormatter : public MsgFormatter {
         
         if(ipos == args.end())
             throw Scripting::NotEnoughArgumentsException("format, at least 1", "0");
-        
-        this->constFormat = ipos++->toString( );
+
+        // Trilinguality: if the format arg is a MultiMessage (produced by Fenia
+        // ._(ru)), resolve it to the recipient's display language now; otherwise
+        // it is a plain string as before. Only OBJECT registers can carry a
+        // handler -- toHandler() throws on a STRING, which is the common case,
+        // so gate on the type first. See Trello 2594.
+        MultiMessageWrapper *mmw = 0;
+        if (ipos->type == Register::OBJECT)
+            mmw = ipos->toHandler( ).getDynamicPointer<MultiMessageWrapper>( );
+        if (mmw != 0)
+            this->constFormat = mmw->getMulti( ).getMessage( to );
+        else
+            this->constFormat = ipos->toString( );
+        ipos++;
         this->format = constFormat.c_str( );
 
         argc = args.size() - 1;
