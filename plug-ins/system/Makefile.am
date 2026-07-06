@@ -45,6 +45,7 @@ fenia_utils.cpp \
 math_utils.cpp \
 calendar_utils.cpp \
 morphology.cpp \
+translations.cpp \
 configurable.cpp \
 json_utils_ext.cpp \
 xmlkillingattribute.cpp \

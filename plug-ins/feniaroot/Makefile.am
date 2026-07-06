@@ -42,7 +42,8 @@ codesourcerepo.cpp \
 evalservlet.cpp \
 behaviorwrapper.cpp \
 behaviorloader.cpp \
-playerwrapper.cpp
+playerwrapper.cpp \
+multimessagewrapper.cpp
 
 libfeniaroot_la_MOC = \
 root.h \

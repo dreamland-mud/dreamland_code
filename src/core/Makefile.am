@@ -11,6 +11,7 @@ src_INCLUDES = $(INCLUDES_SRC)
 AM_CPPFLAGS = -Wall
 
 libcore_la_SOURCES = \
+multimessage.cpp \
 affect.cpp \
 affectlist.cpp \
 affectmanager.cpp \
