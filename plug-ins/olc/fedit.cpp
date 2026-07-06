@@ -16,6 +16,11 @@
 extern void help_save_ids();
 bool text_match_with_highlight(const DLString &text, const DLString &args, ostringstream &matchBuf);
 
+// Pushing a huge file into the in-client web editor crashes the client (the
+// translations catalog hit 450 KB and froze the mudjs tab). Above this size the
+// web editor is refused with a hint to edit the file on disk instead.
+static const size_t FEDIT_WEB_MAX = 200 * 1024;
+
 OLC_STATE(OLCStateFile);
 
 OLCStateFile::OLCStateFile() : isChanged(false)
@@ -88,6 +93,15 @@ FEDIT(show, "показать", "показать все поля")
 
 FEDIT(text, "текст", "редактировать текст справки")
 {
+    DLString cmdArgs = argument;
+    if (arg_is_web(cmdArgs.getOneArgument()) && text.size() > FEDIT_WEB_MAX) {
+        ch->pecho("Файл слишком большой (%d КБ) для редактора в клиенте -- он завесит окно.",
+                  (int)(text.size() / 1024));
+        ch->pecho("Редактируй его на диске и перезагрузи через {y{hcplug reload most{x,");
+        ch->pecho("либо разбей на файлы помельче (для translations -- по подсистемам).");
+        return false;
+    }
+
     return editor(argument, text, (editor_flags)(ED_JSON|ED_CALL_DONE));
 }
 
