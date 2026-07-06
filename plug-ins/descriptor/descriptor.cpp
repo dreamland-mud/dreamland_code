@@ -125,7 +125,13 @@ Descriptor::writeWebSock(unsigned char opcode, const unsigned char *txt, int len
         *(unsigned short*)(hdr+2) = htons((unsigned short)length);
         hdrLen = 4;
     } else {
-        *(uint64_t*)(hdr+2) = htonll(length);
+        // Payload >= 64 KiB: RFC 6455 requires the 7-bit length field == 127,
+        // signalling an 8-byte extended length. Omitting it left hdr[1] as
+        // garbage (uninitialised, possibly with the mask bit set), so the client
+        // mis-framed the message and dropped the connection -- any frame this
+        // large (e.g. a big `fedit` webedit payload) disconnected the client.
+        hdr[1] = 127;
+        *(uint64_t*)(hdr+2) = htonll((uint64_t)length);
         hdrLen = 10;
     }
     if(writeFd(hdr, hdrLen) < 0)
