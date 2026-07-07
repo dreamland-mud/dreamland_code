@@ -621,13 +621,15 @@ NMI_INVOKE( RoomWrapper, echoAround, "(fmt, args): выводит отформа
 NMI_INVOKE(RoomWrapper, zecho, "(msg): выведет сообщение msg для всех в этой арии" )
 {
     Character *wch;
-    DLString msg = args2string(args);
-    
+
     checkTarget( );
-    
-    for (wch = char_list; wch; wch = wch->next) 
-        if (wch->in_room->area == target->area) 
-            wch->pecho(msg);
+
+    // regfmt() per-recipient so a ._() MultiMessage resolves to each viewer's
+    // language (mirrors echo/echoAround/gecho); args2string() cast the arg to a
+    // string up front and threw "Invalid cast: got 'OBJECT'" on a ._() wrapper.
+    for (wch = char_list; wch; wch = wch->next)
+        if (wch->in_room != 0 && wch->in_room->area == target->area)
+            wch->pecho(regfmt(wch, args));
 
     return Register( );
 }
