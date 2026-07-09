@@ -2736,6 +2736,11 @@ NMI_INVOKE( CharacterWrapper, skillsInfo, "(): список структур д�
         info->setField(IdRef("active"), isActive);
         info->setField(IdRef("cmdname"), cmdName);
         info->setField(IdRef("name"), skill->getNameFor( pch ).ruscase('1'));
+        // Canonical (English) name for stable .Skill() lookups from Fenia: the
+        // localized `name` above can't be resolved back for language skills whose
+        // Russian names aren't indexed in the skill matcher (breaks prac lists in
+        // the RU locale). Consumers should look skills up by `sysname`, not `name`.
+        info->setField(IdRef("sysname"), skill->getName());
         info->setField(IdRef("adept"), skill->getAdept( pch ));
         info->setField(IdRef("maximum"), skill->getMaximum(pch));
         info->setField(IdRef("origin"), data.origin.getValue());
