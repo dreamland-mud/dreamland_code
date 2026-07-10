@@ -45,7 +45,7 @@ public:
         void decorateItem( ostringstream &buf, const DLString &descr, Object *item, Character *, const DLString &pocket, int combined ) const;
         void decorateShopItem( ostringstream &buf, const DLString &descr, Object *item, Character * ) const;
         void decoratePocket( ostringstream &buf, const DLString &pocket, Object *container, Character *ch ) const;
-        void decorateExtraDescr( ostringstream &buf, const char *desc, const ExtraDescrList &edList, Character *ch ) const;
+        void decorateExtraDescr( ostringstream &buf, const char *desc, const ExtraDescrList &edList, Character *ch, bool decorateExits = false ) const;
         void decorateCharacter( ostringstream &buf, const DLString &descr, Character *victim, Character *ch ) const;
 
 protected:        
@@ -105,15 +105,19 @@ struct PocketManipArgs : public ManipCommandArgs {
 };
 
 struct ExtraDescrManipArgs : public ManipCommandArgs {
-    ExtraDescrManipArgs(Character *target, const char *desc, const ExtraDescrList& edList)
+    ExtraDescrManipArgs(Character *target, const char *desc, const ExtraDescrList& edList, bool decorateExits = false)
             : ManipCommandArgs(target)
     {
         this->desc = desc;
         this->edList = &edList;
+        this->decorateExits = decorateExits;
     }
 
     const char *desc;
     const ExtraDescrList *edList;
+    // When set, a (keyword) marker that matches no extra description falls back
+    // to a *visible* room exit, decorated as a clickable 'look' for web clients.
+    bool decorateExits;
 };
 
 struct PlayerManipArgs : public ManipCommandArgs {

@@ -1361,8 +1361,9 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         else
             rbuf << " ";
         
-        // Decorate "(sign)" with web tags for extra descriptions.
-        webManipManager->decorateExtraDescr( rbuf, dsc, room->getExtraDescr(), ch );
+        // Decorate "(sign)" with web tags for extra descriptions, and "(door)"
+        // markers that name a visible exit with clickable 'look' tags.
+        webManipManager->decorateExtraDescr( rbuf, dsc, room->getExtraDescr(), ch, /*decorateExits=*/true );
 
         // Append room_description fields of all extra exits or their Fenia onExtraExitDescr overrides
         for (auto &peexit: room->extra_exits)
@@ -1464,7 +1465,12 @@ static bool do_look_direction( Character *ch, const char *arg1 )
 
     lang_t lang = Player::lang(ch);
     if (!pexit->description.getForLang(lang).empty()) {
-            ch->send_to( pexit->description.getForLang(lang));
+            // Decorate "(sign)" markers in the exit description for web clients,
+            // resolving them against the room's extra descriptions -- so (runes)
+            // carved on a door become clickable, same as markers in the room body.
+            ostringstream ebuf;
+            webManipManager->decorateExtraDescr( ebuf, pexit->description.getForLang(lang).c_str( ), ch->in_room->getExtraDescr( ), ch, /*decorateExits=*/true );
+            ch->send_to( ebuf );
             ch->pecho("");
     }
     else
