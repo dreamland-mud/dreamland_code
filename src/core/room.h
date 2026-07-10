@@ -17,6 +17,7 @@
 #include "roombehavior.h"
 #include "affectlist.h"
 #include "xmlmultistring.h"
+#include "multimessage.h"
 #include "extradescription.h"
 #include "exits.h"
 #include "resets.h"
@@ -121,6 +122,9 @@ public:
 
     void vecho( int, const char *, va_list ) const;
     void echo( int, const char *, ... ) const;
+    /* Trilinguality (Trello 2594, Phase 4): resolve per room occupant's lang. */
+    void vecho( int, const MultiMessage &, va_list ) const;
+    void echo( int, const MultiMessage &, ... ) const;
     list<Character*> getPeople( );
     
     bool hasExits() const;

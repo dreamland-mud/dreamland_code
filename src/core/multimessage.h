@@ -5,6 +5,7 @@
 #define MULTIMESSAGE_H
 
 #include "dlstring.h"
+#include "lang.h"
 
 class Character;
 
@@ -22,13 +23,25 @@ public:
     /** The message in `ch`'s display language (RU fallback -> never blank). */
     const DLString & getMessage(const Character *ch) const;
 
+    /** The message in an explicit language (RU fallback -> never blank). Used by
+     *  the per-language resolver caches in the act/vecho output path. */
+    const DLString & getMessage(lang_t lang) const;
+
     const DLString & getRu() const { return ru; }
     const DLString & getFile() const { return file; }
     bool empty() const { return ru.empty(); }
 
+    /* Whether the message carries `$`-style act codes ($n/$e/...) that must be
+     * run through act_to_fmt AFTER per-language resolution. Set only by the C++
+     * oldact overloads; plain output (pecho/recho) and the Fenia path leave it
+     * false. Kept on the message so a single vecho path handles both. */
+    void setActCodes(bool v) { actCodes = v; }
+    bool hasActCodes() const { return actCodes; }
+
 private:
     DLString ru;
     DLString file;
+    bool actCodes = false;
 };
 
 #endif
