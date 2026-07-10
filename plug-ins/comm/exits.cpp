@@ -12,6 +12,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(perception);
 BONUS(thief_skills);
@@ -101,7 +102,7 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
     if (eyes_blinded( ch )) 
         return;
 
-    buf << "{" << clr0 << "[{" << clr1 << web_cmd(ch, "выходы", "Выходы") << "{" << clr0 << ":{" << clr1;
+    buf << "{" << clr0 << "[{" << clr1 << web_cmd(ch, "выходы", l(ch, "Выходы")) << "{" << clr0 << ":{" << clr1;
     found = false;
     cfg = ch->getConfig( );
 
@@ -152,7 +153,7 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
     ch->send_to( buf );
 
     if (hiddenExits > 0 && check_perception(ch)) {
-        ch->pecho("Интуиция подсказывает тебе, что тут есть невидимые выходы.");
+        ch->pecho("%s", l(ch, "Интуиция подсказывает тебе, что тут есть невидимые выходы."));
     }
 }
 
@@ -177,9 +178,9 @@ CMDRUNP( exits )
     cfg = ch->getConfig( );
 
     if (cfg.holy)
-        buf << "Видимые выходы из комнаты " << ch->in_room->vnum << ":" << endl;
+        buf << l(ch, "Видимые выходы из комнаты ") << ch->in_room->vnum << ":" << endl;
     else
-        buf << "Видимые выходы:" << endl;
+        buf << l(ch, "Видимые выходы:") << endl;
 
     for (door = 0; door <= 5; door++)
     {
@@ -203,7 +204,7 @@ CMDRUNP( exits )
             buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - ";
 
             if (room->isDark( ) && !cfg.holy && !IS_AFFECTED(ch, AFF_INFRARED ))
-                buf << "Дорога ведет в темноту и неизвестность...";
+                buf << l(ch, "Дорога ведет в темноту и неизвестность...");
             else
                 buf << room->getName();
 
@@ -216,7 +217,7 @@ CMDRUNP( exits )
             ename = "*" + ename + "*";
             buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - "
                 << russian_case(direction_doorname(pexit), '1') 
-                << " (" << (IS_SET(pexit->exit_info, EX_LOCKED) ? "заперто" : "закрыто") << ")";
+                << " (" << (IS_SET(pexit->exit_info, EX_LOCKED) ? l(ch, "заперто") : l(ch, "закрыто")) << ")";
 
             if (cfg.holy)
                 buf << " (room " << room->vnum << ")";
@@ -226,7 +227,7 @@ CMDRUNP( exits )
     }
 
     if (!found)
-        buf << "    нет" << endl;
+        buf << "    " << l(ch, "нет") << endl;
 
     ch->send_to( buf );
 
@@ -248,12 +249,12 @@ CMDRUNP( exits )
     }
 
     if (found) {
-        ch->pecho("\r\nДополнительные выходы:");
+        ch->pecho("\r\n%s", l(ch, "Дополнительные выходы:"));
         ch->send_to(buf);
     }
 
     if (hiddenExits > 0 && check_perception(ch)) {
-        ch->pecho("Интуиция подсказывает тебе, что тут есть невидимые выходы.");
+        ch->pecho("%s", l(ch, "Интуиция подсказывает тебе, что тут есть невидимые выходы."));
     }
 }
 
