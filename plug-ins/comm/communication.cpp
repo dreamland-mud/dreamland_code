@@ -18,17 +18,18 @@
 #include "arg_utils.h"
 #include "comm.h"
 #include "def.h"
+#include "l10n.h"
 
 CMDRUNP( deaf )
 {
         if (IS_SET(ch->comm,COMM_DEAF))
         {
-                ch->pecho("Ты опять можешь говорить с кем-либо.");
+                ch->pecho(_("Ты опять можешь говорить с кем-либо."));
                 REMOVE_BIT(ch->comm,COMM_DEAF);
         }
         else
         {
-                ch->pecho("С этого момента ты не хочешь ни с кем говорить.");
+                ch->pecho(_("С этого момента ты не хочешь ни с кем говорить."));
                 SET_BIT(ch->comm,COMM_DEAF);
         }
 }
@@ -37,12 +38,12 @@ CMDRUNP( quiet )
 {
         if (IS_SET(ch->comm,COMM_QUIET))
         {
-                ch->pecho("Режим полного молчания выключен.");
+                ch->pecho(_("Режим полного молчания выключен."));
                 REMOVE_BIT(ch->comm,COMM_QUIET);
         }
         else
         {
-                ch->pecho("С этого момента ты будешь слышать только то, что произносят в комнате.");
+                ch->pecho(_("С этого момента ты будешь слышать только то, что произносят в комнате."));
                 SET_BIT(ch->comm,COMM_QUIET);
         }
 }
@@ -113,7 +114,7 @@ static void replay_summary( PCharacter *ch )
 
 static void replay_hint( PCharacter *ch )
 {
-    ch->pecho( "Также смотри {hc{yпрослушать ?{x." );
+    ch->pecho( _("Также смотри {hc{yпрослушать ?{x.") );
 }
 
 static void replay_help( PCharacter *ch )
@@ -141,7 +142,7 @@ CMDRUNP( replay )
     int limit = DEFAULT_REPLAY_SIZE;
 
     if (ch->is_npc( )) {
-        ch->pecho("Ты не можешь использовать команду replay.");
+        ch->pecho(_("Ты не можешь использовать команду replay."));
         return;
     }
 
@@ -152,10 +153,10 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (ReplayAttribute::playAndErase( buf, pch )) {
-            pch->pecho( "Сообщения, полученные за время твоего отсутствия или боя:" );
+            pch->pecho( _("Сообщения, полученные за время твоего отсутствия или боя:") );
             pch->send_to( buf );
         } else {
-            pch->pecho( "Все сообщения, полученные за время отсутствия, уже прочитаны." );
+            pch->pecho( _("Все сообщения, полученные за время отсутствия, уже прочитаны.") );
         }
 
         replay_hint( pch );
@@ -183,9 +184,9 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (!replay_history_all( buf, pch, limit )) {
-            pch->pecho( "За последнее время никто ничего не говорил." );
+            pch->pecho( _("За последнее время никто ничего не говорил.") );
         } else {
-            pch->pecho( "Все запомненные сообщения в хронологическом порядке:" );
+            pch->pecho( _("Все запомненные сообщения в хронологическом порядке:") );
             page_to_char( buf.str( ).c_str( ), pch );
         }
 
@@ -198,9 +199,9 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (!replay_history_private( buf, pch, limit )) {
-            pch->pecho( "За последнее время тебе никто ничего не говорил." );
+            pch->pecho( _("За последнее время тебе никто ничего не говорил.") );
         } else {
-            pch->pecho( "Запомненные личные сообщения:" );
+            pch->pecho( _("Запомненные личные сообщения:") );
             page_to_char( buf.str( ).c_str( ), pch );
         }
 
@@ -213,9 +214,9 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (!replay_history_public( buf, pch, limit )) {
-            pch->pecho( "За последнее время никто ничего не говорил в общих каналах." );
+            pch->pecho( _("За последнее время никто ничего не говорил в общих каналах.") );
         } else {
-            pch->pecho( "Запомненные сообщения в общих каналах:" );
+            pch->pecho( _("Запомненные сообщения в общих каналах:") );
             page_to_char( buf.str( ).c_str( ), pch );
         }
 
@@ -228,9 +229,9 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (!replay_history_near( buf, pch, limit )) {
-            pch->pecho( "Рядом с тобой ничего не происходило." );
+            pch->pecho( _("Рядом с тобой ничего не происходило.") );
         } else {
-            pch->pecho( "Запомненные сообщения рядом с тобой:" );
+            pch->pecho( _("Запомненные сообщения рядом с тобой:") );
             page_to_char( buf.str( ).c_str( ), pch );
         }
 
@@ -240,7 +241,7 @@ CMDRUNP( replay )
 
 
     // Argument not recognized.
-    pch->pecho( "Неправильный параметр." );
+    pch->pecho( _("Неправильный параметр.") );
     replay_summary( pch ); 
 }
 
@@ -250,13 +251,13 @@ CMDRUNP( afk )
     PCharacter *pch = ch->getPC( );
     
     if (ch->is_npc( )) {
-        ch->pecho("Вдали от чего?!");
+        ch->pecho(_("Вдали от чего?!"));
         return;
     }
     
     if (IS_SET(pch->comm,COMM_AFK))
     {
-        pch->pecho("Режим AFK выключен.");
+        pch->pecho(_("Режим AFK выключен."));
         pch->getAttributes().handleEvent(AfkArguments(pch, false));
         REMOVE_BIT(pch->comm,COMM_AFK);
         pch->getAttributes( ).eraseAttribute( "afk" );        
@@ -267,10 +268,10 @@ CMDRUNP( afk )
         
         if (argument[0] != '\0') {
             pch->getAttributes( ).getAttr<XMLStringAttribute>( "afk" )->setValue( argument );
-            pch->pecho("Ты в режиме AFK: {c%s.{x", argument);
+            pch->pecho(_("Ты в режиме AFK: {c%s.{x"), argument);
         }
         else
-            pch->pecho("Режим AFK включен.");
+            pch->pecho(_("Режим AFK включен."));
 
         pch->getAttributes().handleEvent(AfkArguments(pch, true));
     }

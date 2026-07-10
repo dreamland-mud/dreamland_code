@@ -67,6 +67,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 #define MILD(ch)     (IS_SET((ch)->comm, COMM_MILDCOLOR))
 
@@ -490,7 +491,7 @@ static void show_char_blindness(Character* ch, Character* victim, ostringstream&
         if (victim->fighting == ch)
             buf << "{x...вслепую размахивая во все стороны.{x" << endl;
         else
-            buf << fmt(ch, "{x...%1$P1 выгляд%1$nит|ят слеп%1$Gым|ым|ой|ыми и дезориентированн%1$Gым|ым|ой|ыми.{x", victim) << endl;
+            buf << fmt(ch, _("{x...%1$P1 выгляд%1$nит|ят слеп%1$Gым|ым|ой|ыми и дезориентированн%1$Gым|ым|ой|ыми.{x"), victim) << endl;
     }
 }
 
@@ -630,25 +631,25 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     }
 
     if (RIDDEN(victim))
-        buf << fmt(ch, "({1{gОседлан%Gо||а{2)", victim);
+        buf << fmt(ch, _("({1{gОседлан%Gо||а{2)"), victim);
 
     if (IS_AFFECTED(victim, AFF_INVISIBLE))
-        buf << fmt(ch, "({1{DНевидим%Gо||а{2)", victim);
+        buf << fmt(ch, _("({1{DНевидим%Gо||а{2)"), victim);
 
     if (IS_AFFECTED(victim, AFF_IMP_INVIS))
-        buf << fmt(ch, "({1{bОчень невидим%Gо||а{2)", victim);
+        buf << fmt(ch, _("({1{bОчень невидим%Gо||а{2)"), victim);
 
     if (IS_AFFECTED(victim, AFF_HIDE))
-        buf << fmt(ch, "({1{DУкрыт%Gо||а{2)", victim);
+        buf << fmt(ch, _("({1{DУкрыт%Gо||а{2)"), victim);
 
     if (IS_AFFECTED(victim, AFF_FADE))
-        buf << fmt(ch, "({1{DСпрятан%Gо||а{2)", victim);
+        buf << fmt(ch, _("({1{DСпрятан%Gо||а{2)"), victim);
 
     if (IS_AFFECTED(victim, AFF_CAMOUFLAGE))
-        buf << fmt(ch, "({1{GЗамаскирован%Gо||а{2)", victim);
+        buf << fmt(ch, _("({1{GЗамаскирован%Gо||а{2)"), victim);
 
     if (IS_AFFECTED(victim, AFF_CHARM))
-        buf << fmt(ch, "({1{mОчарован%Gо||а{2)", victim);
+        buf << fmt(ch, _("({1{mОчарован%Gо||а{2)"), victim);
 
     if (CAN_DETECT(ch, DETECT_UNDEAD)) {
         bool npcUndead = victim->is_npc() && 
@@ -659,7 +660,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     }
 
     if (IS_AFFECTED(victim, AFF_PASS_DOOR))
-        buf << fmt(ch, "({1{wПр{Dо{wзр{Dа{wч%Gно|ен|на{2)", victim);
+        buf << fmt(ch, _("({1{wПр{Dо{wзр{Dа{wч%Gно|ен|на{2)"), victim);
 
     if (IS_AFFECTED(victim, AFF_FAERIE_FIRE))
         buf << "({MРозовая Аура{x)";
@@ -861,19 +862,19 @@ static void show_char_wounds( Character *ch, Character *victim, ostringstream &b
     if (percent >= 100)
         buf << "{C в прекрасном состоянии";
     else if (percent >= 90)
-        buf << fmt(ch, "{B име%1$nет|ют несколько царапин", victim);
+        buf << fmt(ch, _("{B име%1$nет|ют несколько царапин"), victim);
     else if (percent >= 75)
-        buf << fmt(ch, "{B име%1$nет|ют несколько маленьких ран и синяков", victim);
+        buf << fmt(ch, _("{B име%1$nет|ют несколько маленьких ран и синяков"), victim);
     else if (percent >= 50)
-        buf << fmt(ch, "{G име%1$nет|ют довольно много ран", victim);
+        buf << fmt(ch, _("{G име%1$nет|ют довольно много ран"), victim);
     else if (percent >=  30)
-        buf << fmt(ch, "{Y име%1$nет|ют несколько больших, опасных ран и царапин", victim);
+        buf << fmt(ch, _("{Y име%1$nет|ют несколько больших, опасных ран и царапин"), victim);
     else if (percent >= 15)
-        buf << fmt(ch, "{M выгляд%1$nит|ят сильно поврежденн%1$Gым|ым|ой|ыми", victim);
+        buf << fmt(ch, _("{M выгляд%1$nит|ят сильно поврежденн%1$Gым|ым|ой|ыми"), victim);
     else if (percent >= 0 )
         buf << "{R в ужасном состоянии";
     else
-        buf << fmt(ch, "{R истека%1$nет|ют кровью", victim);
+        buf << fmt(ch, _("{R истека%1$nет|ют кровью"), victim);
 
     buf << ".{x" << endl;
 }
@@ -884,7 +885,7 @@ static void show_char_description( Character *ch, Character *vict )
         ostringstream buf;
         buf << "Монстр в своем ужасающем обличии. Нечисть и порождение тьмы." << endl
             << "Пара ярко-красных глаз и ослепительно острых клыков сверкают на фоне обсидиановой, почти черной, как ночь, кожи." << endl
-            << fmt(0,"Огромное и мускулистое тело ночно%1$Gго|го|й хищни%1$Gка|ка|цы, обрамленное крыльями, какие есть у летучих мышей, замерло в ожидании.\n\r",vict);
+            << fmt(0,_("Огромное и мускулистое тело ночно%1$Gго|го|й хищни%1$Gка|ка|цы, обрамленное крыльями, какие есть у летучих мышей, замерло в ожидании.\n\r"),vict);
         ch->send_to(buf);
         return;  
     }
@@ -907,14 +908,14 @@ static void show_char_description( Character *ch, Character *vict )
                                     pcRace->getMaleName( ).c_str( ),
                                     pcRace->getFemaleName( ).c_str( ));
         if (ch == vict)
-            oldact("Ты выглядишь как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
+            oldact(_("Ты выглядишь как обычн$Gое|ый|ая $n1."), ch, rname, vict, TO_CHAR );
         else
-            oldact("$E выглядит как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
+            oldact(_("$E выглядит как обычн$Gое|ый|ая $n1."), ch, rname, vict, TO_CHAR );
 
         return;
     }
     
-    oldact("Ты не видишь ничего особенного в $Z.", ch, 0, vict, TO_CHAR );
+    oldact(_("Ты не видишь ничего особенного в $Z."), ch, 0, vict, TO_CHAR );
 }
 
 static void show_char_sexrace( Character *ch, Character *vict, ostringstream &buf )
@@ -976,16 +977,16 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
     naked = show_char_equip( ch, victim, buf, false );
 
     if (ch != victim && victim->getReligion() == god_godiva && !ch->is_immortal()) {
-        ch->pecho("\r\n{DПризрачное покрывало окутывает %1$C4, скрывая %1$P2 экипировку от твоего взора.{x", victim);
+        ch->pecho(_("\r\n{DПризрачное покрывало окутывает %1$C4, скрывая %1$P2 экипировку от твоего взора.{x"), victim);
         return;
     }
     if (victim->getProfession( ) == prof_druid && victim->isAffected(gsn_shapeshift)) {
-        ch->pecho("\r\nБоевая трансформация скрывает экипировку от твоего взора.");
+        ch->pecho(_("\r\nБоевая трансформация скрывает экипировку от твоего взора."));
         return;
     }
 
     if (!naked) {
-        oldact("\r\n$C1 использует: ", ch, 0, victim, TO_CHAR );
+        oldact(_("\r\n$C1 использует: "), ch, 0, victim, TO_CHAR );
         ch->send_to( buf );
     }
             
@@ -999,7 +1000,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
                 || ch->is_immortal()))
 
     {
-        ch->pecho( "\n\rТы заглядываешь в инвентарь: " );
+        ch->pecho( _("\n\rТы заглядываешь в инвентарь: ") );
         gsn_peek->improve( ch, true );
         show_list_to_char( victim->is_mirror() ?
                 vict->carrying : victim->carrying, ch, true, true );
@@ -1079,14 +1080,14 @@ static void show_people_to_char( Character *list, Character *ch, bool fShowMount
 // TODO invis & hide checks
         else if (!rch->is_immortal( )) {
             if (rch->in_room->isDark( ) && IS_AFFECTED(rch, AFF_INFRARED ))
-                ch->pecho( "{WТы видишь взгляд {Rпылающих красных глаз{W, следящих за ТОБОЙ!{x" );
+                ch->pecho( _("{WТы видишь взгляд {Rпылающих красных глаз{W, следящих за ТОБОЙ!{x") );
                 
             life_count++;
         }
     }
 
     if (life_count && CAN_DETECT(ch, DETECT_LIFE))
-        ch->pecho( "Ты чувствуешь присутствие %d жизненн%s форм%s в комнате.",
+        ch->pecho( _("Ты чувствуешь присутствие %d жизненн%s форм%s в комнате."),
                     life_count,
                     GET_COUNT(life_count, "ой", "ых", "ых"),
                     GET_COUNT(life_count, "ы", "", ""));
@@ -1335,7 +1336,7 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
     lang_t lang = Player::lang(ch);
 
     if (eyes_darkened( ch )) {
-        ch->pecho( "Здесь слишком темно... " );
+        ch->pecho( _("Здесь слишком темно... ") );
         show_people_to_char( room->people, ch, fShowMount );
         return;
     }
@@ -1405,7 +1406,7 @@ static void do_look_move( Character *ch, bool fBrief )
 {
     if (!ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "speedwalk" )) {
         if (eyes_darkened( ch ))
-            ch->pecho( "Здесь слишком темно... " );
+            ch->pecho( _("Здесь слишком темно... ") );
         else
             ch->pecho( "{W%s{x", ch->in_room->getName(Player::lang(ch)) );
         return;
@@ -1434,11 +1435,11 @@ static void do_look_character( Character *ch, Character *victim )
 {
     if (victim->can_see( ch )) {
         if (ch == victim)
-            oldact("$c1 смотрит на себя.",ch,0,0,TO_ROOM);
+            oldact(_("$c1 смотрит на себя."),ch,0,0,TO_ROOM);
         else
         {
-            oldact("$c1 смотрит на тебя.", ch, 0, victim, TO_VICT);
-            oldact("$c1 смотрит на $C4.",  ch, 0, victim, TO_NOTVICT);
+            oldact(_("$c1 смотрит на тебя."), ch, 0, victim, TO_VICT);
+            oldact(_("$c1 смотрит на $C4."),  ch, 0, victim, TO_NOTVICT);
         }
     }
 
@@ -1459,7 +1460,7 @@ static bool do_look_direction( Character *ch, const char *arg1 )
 
     if ( ( pexit = ch->in_room->exit[door] ) == 0 )
     {
-            ch->pecho( "Ничего особенного тут." );
+            ch->pecho( _("Ничего особенного тут.") );
             return true;
     }
 
@@ -1474,12 +1475,12 @@ static bool do_look_direction( Character *ch, const char *arg1 )
             ch->pecho("");
     }
     else
-            ch->pecho( "Здесь нет ничего особенного." );
+            ch->pecho( _("Здесь нет ничего особенного.") );
 
     if ( IS_SET(pexit->exit_info, EX_CLOSED) )
-        oldact("$N1: тут закрыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
+        oldact(_("$N1: тут закрыто."), ch, 0, direction_doorname(pexit), TO_CHAR);
     else if ( IS_SET(pexit->exit_info, EX_ISDOOR) )
-        oldact("$N1: тут открыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
+        oldact(_("$N1: тут открыто."), ch, 0, direction_doorname(pexit), TO_CHAR);
     
     DoorKeyhole( ch, ch->in_room, door ).doExamine( );
     return true;
@@ -1555,18 +1556,18 @@ static bool do_look_extraexit( Character *ch, const char *arg3 )
             && ch->can_see( peexit ) )
             ch->send_to( peexit->description.getForLang(lang));
     else
-            ch->pecho( "Здесь нет ничего особенного." );
+            ch->pecho( _("Здесь нет ничего особенного.") );
 
     if (!peexit->short_desc_from.empty()
         && ch->can_see( peexit ) )
     {
             if ( IS_SET(peexit->exit_info, EX_CLOSED) )
             {
-                ch->pecho( "%1$N1: тут закрыто.", peexit->short_desc_from.getForLang(lang).c_str() );
+                ch->pecho( _("%1$N1: тут закрыто."), peexit->short_desc_from.getForLang(lang).c_str() );
             }
             else if ( IS_SET(peexit->exit_info, EX_ISDOOR) )
             {
-                ch->pecho( "%1$N1: тут открыто.", peexit->short_desc_from.getForLang(lang).c_str()  );
+                ch->pecho( _("%1$N1: тут открыто."), peexit->short_desc_from.getForLang(lang).c_str()  );
             }
     }
     
@@ -1592,12 +1593,12 @@ CMDRUNP( look )
         return;
 
     if (ch->position < POS_SLEEPING) {
-        ch->pecho( "Ты не видишь ничего, кроме звезд!" );
+        ch->pecho( _("Ты не видишь ничего, кроме звезд!") );
         return;
     }
 
     if (ch->position == POS_SLEEPING) {
-        ch->pecho( "Ты ничего не видишь, ты спишь!" );
+        ch->pecho( _("Ты ничего не видишь, ты спишь!") );
         return;
     }
     
@@ -1611,7 +1612,7 @@ CMDRUNP( look )
 
     if (eyes_blinded( ch )) {
         if (fAuto || fMove)
-            ch->pecho( "Ты не можешь видеть вещи!" );
+            ch->pecho( _("Ты не можешь видеть вещи!") );
         else
             eyes_blinded_msg( ch );
 
@@ -1634,7 +1635,7 @@ CMDRUNP( look )
     }
 
     if (eyes_darkened( ch )) {
-        ch->pecho( "Тебе не удается ничего разглядеть в кромешной темноте." );
+        ch->pecho( _("Тебе не удается ничего разглядеть в кромешной темноте.") );
         return;
     }
     
@@ -1663,7 +1664,7 @@ CMDRUNP( look )
     if (do_look_direction( ch, arg1 ))
         return;
 
-    ch->pecho( "Ты не видишь этого тут." );
+    ch->pecho( _("Ты не видишь этого тут.") );
 }
 
 

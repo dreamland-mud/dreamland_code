@@ -3,6 +3,7 @@
 #include "profession.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 PROF(samurai);
 
@@ -18,7 +19,7 @@ CMDRUNP( wimpy )
 
     if ((ch->getProfession() == prof_samurai) && (ch->getRealLevel() >= 10))
     {
-        ch->pecho("Стыдись! Это будет слишком большим позором для самурая.");
+        ch->pecho(_("Стыдись! Это будет слишком большим позором для самурая."));
         if (ch->wimpy != 0) 
             ch->wimpy = 0;
         return;
@@ -30,19 +31,19 @@ CMDRUNP( wimpy )
 
     if ( wimpy < 0 )
     {
-        ch->pecho("Твоя отвага превосходит твою мудрость.");
+        ch->pecho(_("Твоя отвага превосходит твою мудрость."));
         return;
     }
 
     if ( wimpy > ch->max_hit/2 )
     {
-        ch->pecho("Это будет слишком большим позором для тебя.");
+        ch->pecho(_("Это будет слишком большим позором для тебя."));
         return;
     }
 
     ch->wimpy        = wimpy;
 
-    ch->pecho("Ты попытаешься убежать при %d очков жизни.", wimpy );
+    ch->pecho(_("Ты попытаешься убежать при %d очков жизни."), wimpy );
 }
 
 

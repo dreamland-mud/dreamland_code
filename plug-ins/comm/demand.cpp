@@ -15,6 +15,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(gratitude);
 PROF(anti_paladin);
@@ -30,7 +31,7 @@ CMDRUNP(request)
 
     if (ch->isAffected(gsn_gratitude))
     {
-        ch->pecho("Подожди немного.");
+        ch->pecho(_("Подожди немного."));
         return;
     }
 
@@ -42,25 +43,25 @@ CMDRUNP(request)
 
     if (arg1[0] == '\0' || arg2[0] == '\0')
     {
-        ch->pecho("Что и у кого ты хочешь попросить?");
+        ch->pecho(_("Что и у кого ты хочешь попросить?"));
         return;
     }
 
     if ((victim = get_char_room(ch, arg2)) == 0)
     {
-        ch->pecho("Здесь таких нет.");
+        ch->pecho(_("Здесь таких нет."));
         return;
     }
 
     if (!victim->is_npc())
     {
-        ch->pecho("На игроков такие штучки не пройдут. Просто поговори с ними!");
+        ch->pecho(_("На игроков такие штучки не пройдут. Просто поговори с ними!"));
         return;
     }
 
     if (victim->position <= POS_SLEEPING)
     {
-        oldact("$C1 не в состоянии выполнить твою просьбу.", ch, 0, victim, TO_CHAR);
+        oldact(_("$C1 не в состоянии выполнить твою просьбу."), ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -129,19 +130,19 @@ CMDRUNP(request)
 
     if (ch->carry_number + obj->getNumber() > Char::canCarryNumber(ch))
     {
-        ch->pecho("Твои руки полны.");
+        ch->pecho(_("Твои руки полны."));
         return;
     }
 
     if (Char::getCarryWeight(ch) + obj->getWeight() > Char::canCarryWeight(ch))
     {
-        ch->pecho("Ты не можешь нести такой вес.");
+        ch->pecho(_("Ты не можешь нести такой вес."));
         return;
     }
 
     if (!ch->can_see(obj))
     {
-        ch->pecho("Ты не видишь этого.");
+        ch->pecho(_("Ты не видишь этого."));
         return;
     }
     if (!victim->can_see(ch))
@@ -160,7 +161,7 @@ CMDRUNP(request)
 
     if (obj->pIndexData->vnum == 520) // Knight's key
     {
-        ch->pecho("Извини, он не отдаст тебе это.");
+        ch->pecho(_("Извини, он не отдаст тебе это."));
         return;
     }
 
@@ -171,7 +172,7 @@ CMDRUNP(request)
 
     if (obj->pIndexData->limit >= 0 && obj->isAntiAligned(ch))
     {
-        ch->pecho("%2$^s не позволяют тебе завладеть %1$O5.",
+        ch->pecho(_("%2$^s не позволяют тебе завладеть %1$O5."),
             obj,
             IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
         return;
@@ -180,9 +181,9 @@ CMDRUNP(request)
 
     obj_from_char(obj);
     obj_to_char(obj, ch);
-    oldact("$c1 просит $o4 у $C2.", ch, obj, victim, TO_NOTVICT);
-    oldact("Ты просишь $o4 у $C2.", ch, obj, victim, TO_CHAR);
-    oldact("$c1 просит $o4 у тебя.", ch, obj, victim, TO_VICT);
+    oldact(_("$c1 просит $o4 у $C2."), ch, obj, victim, TO_NOTVICT);
+    oldact(_("Ты просишь $o4 у $C2."), ch, obj, victim, TO_CHAR);
+    oldact(_("$c1 просит $o4 у тебя."), ch, obj, victim, TO_VICT);
 
     omprog_give(obj, victim, ch);
 
@@ -191,7 +192,7 @@ CMDRUNP(request)
     ch->hit -= 3 * (ch->getModifyLevel() / 2);
     ch->hit = max((int)ch->hit, 0);
 
-    oldact("Ты чувствуешь благодарность за доверие $C2.", ch, 0, victim, TO_CHAR);
+    oldact(_("Ты чувствуешь благодарность за доверие $C2."), ch, 0, victim, TO_CHAR);
     postaffect_to_char(ch, gsn_gratitude, ch->getModifyLevel() / 10);
 }
 
@@ -213,42 +214,42 @@ CMDRUNP(demand)
 
     if (ch->getProfession() != prof_anti_paladin)
     {
-        ch->pecho("Ты никого не запугаешь своим видом.");
+        ch->pecho(_("Ты никого не запугаешь своим видом."));
         return;
     }
 
     if (arg1[0] == '\0' || arg2[0] == '\0')
     {
-        ch->pecho("Потребовать что и у кого?");
+        ch->pecho(_("Потребовать что и у кого?"));
         return;
     }
 
     if ((victim = get_char_room(ch, arg2)) == 0)
     {
-        ch->pecho("Таких тут нет.");
+        ch->pecho(_("Таких тут нет."));
         return;
     }
 
     if (!victim->is_npc()) {
-        ch->pecho("Просто убей и отбери.");
+        ch->pecho(_("Просто убей и отбери."));
         return;
     }
 
     if (IS_SET(victim->act, ACT_NODEMAND)) {
-        oldact("$C1 не подчинится твоему требованию.", ch, 0, victim, TO_CHAR);
+        oldact(_("$C1 не подчинится твоему требованию."), ch, 0, victim, TO_CHAR);
         return;
     }
 
     if (victim->position <= POS_SLEEPING)
     {
-        oldact("$C1 не в состоянии исполнить твой приказ.", ch, 0, victim, TO_CHAR);
+        oldact(_("$C1 не в состоянии исполнить твой приказ."), ch, 0, victim, TO_CHAR);
         return;
     }
 
     if (victim->getNPC()->behavior
         && IS_SET(victim->getNPC()->behavior->getOccupation(), (1 << OCC_SHOPPER)))
     {
-        ch->pecho("Хочешь -- купи!");
+        ch->pecho(_("Хочешь -- купи!"));
         return;
     }
 
@@ -286,19 +287,19 @@ CMDRUNP(demand)
 
     if (ch->carry_number + obj->getNumber() > Char::canCarryNumber(ch))
     {
-        ch->pecho("Твои руки полны.");
+        ch->pecho(_("Твои руки полны."));
         return;
     }
 
     if (Char::getCarryWeight(ch) + obj->getWeight() > Char::canCarryWeight(ch))
     {
-        ch->pecho("Ты не сможешь нести такую тяжесть.");
+        ch->pecho(_("Ты не сможешь нести такую тяжесть."));
         return;
     }
 
     if (!ch->can_see(obj))
     {
-        oldact("Ты не видишь этого.", ch, 0, victim, TO_CHAR);
+        oldact(_("Ты не видишь этого."), ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -321,21 +322,21 @@ CMDRUNP(demand)
 
     if (obj->pIndexData->limit >= 0 && obj->isAntiAligned(ch))
     {
-        ch->pecho("%2$^s не позволяют тебе завладеть %1$O5.",
+        ch->pecho(_("%2$^s не позволяют тебе завладеть %1$O5."),
             obj,
             IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
         return;
     }
 
-    oldact("$c1 требует $o4 у $C2.", ch, obj, victim, TO_NOTVICT);
-    oldact("Ты требуешь $o4 у $C2.", ch, obj, victim, TO_CHAR);
-    oldact("$c1 требует у тебя $o4.", ch, obj, victim, TO_VICT);
+    oldact(_("$c1 требует $o4 у $C2."), ch, obj, victim, TO_NOTVICT);
+    oldact(_("Ты требуешь $o4 у $C2."), ch, obj, victim, TO_CHAR);
+    oldact(_("$c1 требует у тебя $o4."), ch, obj, victim, TO_VICT);
 
     obj_from_char(obj);
     obj_to_char(obj, ch);
 
     omprog_give(obj, victim, ch);
 
-    ch->pecho("Твое могущество повергает всех в трепет.");
+    ch->pecho(_("Твое могущество повергает всех в трепет."));
 }
 

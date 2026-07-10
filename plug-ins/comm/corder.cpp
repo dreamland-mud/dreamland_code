@@ -24,6 +24,7 @@
 #include "merc.h"
 #include "def.h"
 #include "morphology.h"
+#include "l10n.h"
 
 static bool mprog_cantorder(Character *victim, Character *master, const char *cmdName, const char *cmdArgs)
 {
@@ -50,22 +51,22 @@ COMMAND(COrder, "order")
     argOrder = argument;
     
     if (!ch->getPC()) {
-        ch->pecho("Эта команда не для тебя.");
+        ch->pecho(_("Эта команда не для тебя."));
         return;
     }
 
     if (argTarget.empty( ) || argOrder.empty( )) {
-        ch->pecho( "Приказать кому и что?" );
+        ch->pecho( _("Приказать кому и что?") );
         return;
     }
 
     if (IS_CHARMED(ch)) {
-        ch->pecho( "Ты можешь только принимать приказы, а не отдавать их." );
+        ch->pecho( _("Ты можешь только принимать приказы, а не отдавать их.") );
         return;
     }
     
     if (arg_is_all(argTarget)) {
-        ch->pecho( "Ты не можешь отдать приказ всем сразу." );
+        ch->pecho( _("Ты не можешь отдать приказ всем сразу.") );
         return;
     }
     
@@ -75,19 +76,19 @@ COMMAND(COrder, "order")
         // Check if it's an order for non-charmed mob that follows you, e.g. a knight horse.
         Character *followerSameRoom = get_char_room(ch, argTarget, FFIND_FOLLOWER | FFIND_INVISIBLE); 
         if (followerSameRoom) {
-            ch->pecho("%1$^C1 следу%1$nет|ют за тобой, но не подчиня%1$nется|ются твоим приказам.", followerSameRoom);
+            ch->pecho(_("%1$^C1 следу%1$nет|ют за тобой, но не подчиня%1$nется|ются твоим приказам."), followerSameRoom);
             return;
         }
 
         // See if we have a group member elsewhere in the world.
         Character *followerWorld = get_char_world(ch, argTarget, FFIND_FOLLOWER | FFIND_INVISIBLE);
         if (followerWorld) {
-            ch->pecho("Твой последователь должен быть рядом с тобой.");
+            ch->pecho(_("Твой последователь должен быть рядом с тобой."));
             if (ch->getPC()->pet && followerWorld->getNPC() && ch->getPC()->pet == followerWorld->getNPC()) {
                 interpret_raw(ch, "gtell", "где ты?");
             }
         } else {
-            ch->pecho("Среди твоих последователей такого нет.");
+            ch->pecho(_("Среди твоих последователей такого нет."));
         }
 
         return;
@@ -97,7 +98,7 @@ COMMAND(COrder, "order")
     interpretOrder( victim, iargs, argOrder );
 
     if (!iargs.pCommand) {
-        ch->pecho("Похоже, такой команды не существует.");
+        ch->pecho(_("Похоже, такой команды не существует."));
         return;
     }
 
@@ -107,16 +108,16 @@ COMMAND(COrder, "order")
         switch (rc) {
             default:
             case RC_ORDER_ERROR:
-                ch->pecho("Эту команду невозможно приказать.");
+                ch->pecho(_("Эту команду невозможно приказать."));
                 break;
             case RC_ORDER_NOT_FIGHTING:
-                ch->pecho("Эту команду можно приказать только в бою.");
+                ch->pecho(_("Эту команду можно приказать только в бою."));
                 break;
             case RC_ORDER_NOT_PLAYER:
-                ch->pecho("Эту команду можно приказать только игрокам.");
+                ch->pecho(_("Эту команду можно приказать только игрокам."));
                 break;
             case RC_ORDER_NOT_THIEF:
-                ch->pecho("Эту команду можно приказать только ворам.");
+                ch->pecho(_("Эту команду можно приказать только ворам."));
                 break;                
         }
 
@@ -132,28 +133,28 @@ COMMAND(COrder, "order")
 
         switch (rc) {
             case RC_DISPATCH_AFK:
-                victim->master->pecho("%1$^C1 не сможет выполнить эту команду, находясь в режиме AFK ('отошел').", victim);
+                victim->master->pecho(_("%1$^C1 не сможет выполнить эту команду, находясь в режиме AFK ('отошел')."), victim);
                 break;
 
             case RC_DISPATCH_PENALTY:
-                victim->master->pecho("%1$^C1 наказан%1$Gо||а богами и не может выполнить эту команду.", victim);
+                victim->master->pecho(_("%1$^C1 наказан%1$Gо||а богами и не может выполнить эту команду."), victim);
                 break;
 
             case RC_DISPATCH_GHOST:
-                victim->master->pecho("%^C1 все еще призрак и не сможет выполнить эту команду.", victim);
+                victim->master->pecho(_("%^C1 все еще призрак и не сможет выполнить эту команду."), victim);
                 break;
 
             case RC_DISPATCH_SPELLOUT:
-                victim->master->pecho("Эту команду необходимо указывать полностью.");
+                victim->master->pecho(_("Эту команду необходимо указывать полностью."));
                 break;
 
             case RC_DISPATCH_STUN:
-                victim->master->pecho("%1$^C1 оглушен%1$Gо||а и ни на что не реагирует, подожди немного.", victim);
+                victim->master->pecho(_("%1$^C1 оглушен%1$Gо||а и ни на что не реагирует, подожди немного."), victim);
                 break;
 
             case RC_DISPATCH_POSITION:
                 victim->master->pecho(
-                    "%1$#^C1 %3$sне может ходить и выполнять некоторые команды. Напиши {y{hcприказать %2$N3 встать{x.",
+                    _("%1$#^C1 %3$sне может ходить и выполнять некоторые команды. Напиши {y{hcприказать %2$N3 встать{x."),
                     victim, 
                     victName.c_str(), 
                     victim->position == POS_SLEEPING ? "спит и " : (victim->position == POS_RESTING || victim->position == POS_SITTING) ? "сидит и " : "");
@@ -161,7 +162,7 @@ COMMAND(COrder, "order")
 
             case RC_DISPATCH_NOT_HERE:
             default:
-                victim->master->pecho("Эта команда недоступна здесь и сейчас.");
+                victim->master->pecho(_("Эта команда недоступна здесь и сейчас."));
                 break;
         }
 
@@ -169,7 +170,7 @@ COMMAND(COrder, "order")
     }
 
     // Display exact message as typed by the master.
-    victim->pecho("%^C1 приказывает тебе '%s'.", ch, argOrder.c_str());
+    victim->pecho(_("%^C1 приказывает тебе '%s'."), ch, argOrder.c_str());
 
     if (mprog_cantorder(victim, ch, iargs.cmdName.c_str(), iargs.cmdArgs.c_str())) {
         // All failure messages to the master should be displayed inside the trigger.

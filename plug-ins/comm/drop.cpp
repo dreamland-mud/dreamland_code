@@ -12,6 +12,7 @@
 #include "dreamland.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 bool oprog_drop( Object *obj, Character *ch );
 
@@ -23,8 +24,8 @@ static int drop_obj( Character *ch, Object *obj )
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
 
-    ch->pecho( "Ты бросаешь %1$O4.", obj );
-    oldact("$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
+    ch->pecho( _("Ты бросаешь %1$O4."), obj );
+    oldact(_("$c1 бросает $o4."), ch, obj, 0, TO_ROOM );
 
     if (oprog_drop( obj, ch ))
         return DROP_OBJ_EXTRACT;
@@ -35,13 +36,13 @@ static int drop_obj( Character *ch, Object *obj )
         && obj->pIndexData->limit <= 0
         && material_swims( obj ) == SWIM_NEVER)
     {
-        ch->recho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->getLiquid()->getShortDescr( ).c_str( ) );
-        ch->pecho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->getLiquid()->getShortDescr( ).c_str( ) );
+        ch->recho( _("%1$^O1 тон%1$nет|ут в %2$N6."), obj, ch->in_room->getLiquid()->getShortDescr( ).c_str( ) );
+        ch->pecho( _("%1$^O1 тон%1$nет|ут в %2$N6."), obj, ch->in_room->getLiquid()->getShortDescr( ).c_str( ) );
     }
     else if (IS_OBJ_STAT(obj, ITEM_MELT_DROP))
     {
-        ch->recho( "%1$^O1 превраща%1$nется|ются в ничто и исчеза%1$nет|ют.", obj );
-        ch->pecho( "%1$^O1 превраща%1$nется|ются в ничто и исчеза%1$nет|ют.", obj );
+        ch->recho( _("%1$^O1 превраща%1$nется|ются в ничто и исчеза%1$nет|ют."), obj );
+        ch->pecho( _("%1$^O1 превраща%1$nется|ются в ничто и исчеза%1$nет|ют."), obj );
     }
     else if (!RoomUtils::isWater( ch->in_room ) 
              && ch->in_room->getSectorType() != SECT_AIR
@@ -50,8 +51,8 @@ static int drop_obj( Character *ch, Object *obj )
              && material_is_flagged( obj, MAT_FRAGILE )
              && chance( 40 ))
     {
-        ch->recho( "%1$^O1 пада%1$nет|ют и разбива%1$nется|ются на мелкие осколки.", obj );
-        ch->pecho( "%1$^O1 пада%1$nет|ют и разбива%1$nется|ются на мелкие осколки.", obj );
+        ch->recho( _("%1$^O1 пада%1$nет|ют и разбива%1$nется|ются на мелкие осколки."), obj );
+        ch->pecho( _("%1$^O1 пада%1$nет|ют и разбива%1$nется|ются на мелкие осколки."), obj );
     }
     else
         return DROP_OBJ_NORMAL;
@@ -71,7 +72,7 @@ CMDRUNP( drop )
 
     if ( arg[0] == '\0' )
     {
-        ch->pecho("Бросить что?");
+        ch->pecho(_("Бросить что?"));
         return;
     }
 
@@ -94,8 +95,8 @@ CMDRUNP( drop )
         if ( RoomUtils::isWater( ch->in_room ) )
         {
             extract_obj( obj );
-            oldact("Монеты падают и тонут в $n6.", ch, ch->in_room->getLiquid()->getShortDescr( ).c_str( ), 0, TO_ROOM);
-            oldact("Монеты падают и тонут в $n6.", ch, ch->in_room->getLiquid()->getShortDescr( ).c_str( ), 0, TO_CHAR);
+            oldact(_("Монеты падают и тонут в $n6."), ch, ch->in_room->getLiquid()->getShortDescr( ).c_str( ), 0, TO_ROOM);
+            oldact(_("Монеты падают и тонут в $n6."), ch, ch->in_room->getLiquid()->getShortDescr( ).c_str( ), 0, TO_CHAR);
         }
         else
         {
@@ -103,13 +104,13 @@ CMDRUNP( drop )
 
             if (obj->value0() == 1 || obj->value1() == 1)
             {
-                oldact("$c1 бросает монетку.", ch, 0, 0, TO_ROOM);
-                ch->pecho( "Ты бросаешь монетку." );
+                oldact(_("$c1 бросает монетку."), ch, 0, 0, TO_ROOM);
+                ch->pecho( _("Ты бросаешь монетку.") );
             }
             else
             {
-                oldact("$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM);
-                ch->pecho( "Ты бросаешь несколько монет." );
+                oldact(_("$c1 бросает несколько монет."), ch, 0, 0, TO_ROOM);
+                ch->pecho( _("Ты бросаешь несколько монет.") );
             }
          
         }
@@ -122,7 +123,7 @@ CMDRUNP( drop )
         /* 'drop obj' */
         if ( ( obj = get_obj_carry( ch, arg ) ) == 0 )
         {
-            ch->pecho("У тебя нет этого.");
+            ch->pecho(_("У тебя нет этого."));
             return;
         }
 
@@ -160,9 +161,9 @@ CMDRUNP( drop )
 
         if (!found) {
             if (arg[3] == '\0')
-                oldact("У тебя ничего нет.", ch, 0, arg, TO_CHAR );
+                oldact(_("У тебя ничего нет."), ch, 0, arg, TO_CHAR );
             else
-                oldact("У тебя нет $T.", ch, 0, is_number(&arg[4]) ? "этого":&arg[4], TO_CHAR );
+                oldact(_("У тебя нет $T."), ch, 0, is_number(&arg[4]) ? "этого":&arg[4], TO_CHAR );
         }
         else {
             save_items( ch->in_room );

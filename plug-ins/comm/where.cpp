@@ -11,6 +11,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 static void format_where( Character *ch, Character *victim )
 {
@@ -45,12 +46,12 @@ CMDRUNP( where )
     ch->setWaitViolence( 1 );
 
     if (eyes_blinded( ch )) {
-        ch->pecho( "Ты не можешь видеть вещи!" );
+        ch->pecho( _("Ты не можешь видеть вещи!") );
         return;
     }
     
     if (eyes_darkened( ch )) {
-        ch->pecho( "Ты ничего не видишь! Слишком темно!" );
+        ch->pecho( _("Ты ничего не видишь! Слишком темно!") );
         return;
     }
 
@@ -65,7 +66,7 @@ CMDRUNP( where )
 
     if (arg.empty( ) || fPKonly)
     {
-        ch->pecho( "Ты находишься в зоне {W{hh%s{x. Недалеко от тебя:",
+        ch->pecho( _("Ты находишься в зоне {W{hh%s{x. Недалеко от тебя:"),
                      ch->in_room->areaName().c_str() );
         found = false;
 
@@ -96,7 +97,7 @@ CMDRUNP( where )
         }
 
         if (!found)
-            ch->pecho("Никого.");
+            ch->pecho(_("Никого."));
     }
     else
     {
@@ -117,7 +118,7 @@ CMDRUNP( where )
         }
 
         if (!found)
-            oldact("Ты не находишь $T.", ch, 0, arg.c_str(), TO_CHAR);
+            oldact(_("Ты не находишь $T."), ch, 0, arg.c_str(), TO_CHAR);
     }
 }
 

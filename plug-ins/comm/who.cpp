@@ -30,6 +30,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "def.h"
+#include "l10n.h"
 
 static const DLString WHO = "who";
 
@@ -356,12 +357,12 @@ CMDRUN(who)
     int max_total = Descriptor::getMaxOnline() + Descriptor::getMaxOffline();
 
     if (online_count > 0)
-        buf << fmt(0, "Сейчас в мире {W%1$d{w игрок%1$I|а|ов:", online_count) << endl;
+        buf << fmt(0, _("Сейчас в мире {W%1$d{w игрок%1$I|а|ов:"), online_count) << endl;
     for (const auto &victim: online)
         buf << who_cmd_format_char(pch, victim, arguments);
 
     if (offline_count > 0)
-        buf << endl << fmt(0, "Еще {W%1$d{w игрок%1$I|а|ов слыш%1$Iит|ат|ат общие каналы:", offline_count) << endl;
+        buf << endl << fmt(0, _("Еще {W%1$d{w игрок%1$I|а|ов слыш%1$Iит|ат|ат общие каналы:"), offline_count) << endl;
     for (const auto &victim: offline)
         buf << who_cmd_format_offline(pch, victim);
 

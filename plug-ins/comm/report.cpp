@@ -21,6 +21,7 @@
 #include "profflags.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 using namespace std;
 
@@ -180,7 +181,7 @@ CMDRUNP(report)
             passives.push_back(skill);
     }
 
-    result << fmt(0, "%1$^C1 говорит тебе \'{G%N2, я %d уровня, у меня %d/%d жизни и %d/%d маны.{x\'",
+    result << fmt(0, _("%1$^C1 говорит тебе \'{G%N2, я %d уровня, у меня %d/%d жизни и %d/%d маны.{x\'"),
                pet,
                GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"),
                pet->getModifyLevel(),
@@ -276,7 +277,7 @@ CMDRUNP(report)
 
         if (!showAll) {
             DLString petName = Syntax::noun(pet->getShortDescr(LANG_DEFAULT));
-            result << fmt(0, "Напиши {y{hcприказать %1$N3 рапорт все{x, и я расскажу, что ещё я умею делать.", 
+            result << fmt(0, _("Напиши {y{hcприказать %1$N3 рапорт все{x, и я расскажу, что ещё я умею делать."), 
                              petName.c_str())
                    << endl;
         }

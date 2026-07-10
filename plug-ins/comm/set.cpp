@@ -42,6 +42,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(none);
 PROF(none);
@@ -107,7 +108,7 @@ static PCharacter *get_player(Character *ch, char **argument)
   *argument = one_argument(*argument, buf);
 
   if (!buf[0] || !(victim = get_char_world(ch, buf, FFIND_PLR_ONLY))) {
-    ch->pecho("Игрок с таким именем не найден.");
+    ch->pecho(_("Игрок с таким именем не найден."));
     return NULL;
   }
   return victim->getPC();
@@ -126,7 +127,7 @@ CMDWIZP( set )
           tab_set[i].func( ch, argument );
           return;
         } else {
-          ch->pecho("Извините, но данная возможность находится в стадии разработки.");
+          ch->pecho(_("Извините, но данная возможность находится в стадии разработки."));
           return;
         }
       }
@@ -162,7 +163,7 @@ void mset(Character *ch, char *argument)
                     tab_set_mob[i].func(ch, argument);
                     return;
                 } else {
-                    ch->pecho("Извините, но данная возможность находится в стадии разработки.");
+                    ch->pecho(_("Извините, но данная возможность находится в стадии разработки."));
                     return;
                 }
             }
@@ -180,7 +181,7 @@ void chg_mob_questt( Character* ch, char* argument ) {
   if( ( victim = get_player( ch, &argument ) ) ) {
     XMLAttributeTimer::Pointer qd = victim->getPC( )->getAttributes( ).findAttr<XMLAttributeTimer>( "questdata" );        
     if (!qd) {
-        ch->pecho("Это сейчас невозможно.");
+        ch->pecho(_("Это сейчас невозможно."));
         return;
     }
 
@@ -195,22 +196,22 @@ void chg_mob_questt( Character* ch, char* argument ) {
 
         if (victim->getPC( )->getAttributes( ).isAvailable( "quest" )) {
             if( adv_value < 2 || adv_value > 60 ) {
-                ch->pecho("Значение должно лежать в пределах 2...60.");
+                ch->pecho(_("Значение должно лежать в пределах 2...60."));
                 return;
             }
         }
         else {
             if( adv_value < 0 || adv_value > 60 ) {
-                ch->pecho("Значение должно лежать в пределах 0...60.");
+                ch->pecho(_("Значение должно лежать в пределах 0...60."));
                 return;
             }
         }
 
         qd->setTime( adv_value );
-        ch->pecho("Текущее значение: %d",  adv_value );
+        ch->pecho(_("Текущее значение: %d"),  adv_value );
         return;
     } else {
-      ch->pecho("Ошибочные данные.");
+      ch->pecho(_("Ошибочные данные."));
     }
   }
 }
@@ -222,7 +223,7 @@ void chg_mob_help(Character *ch, char *argument)
 
     buf << "Синтаксис:" << endl;
     while (tab_set_mob[i].name) {
-        buf << fmt(0, "  {Cset{x mob {y%-8s{x {C<{xназвание{C>{x %s%s {C[{x %s {C]{x\n\r",
+        buf << fmt(0, _("  {Cset{x mob {y%-8s{x {C<{xназвание{C>{x %s%s {C[{x %s {C]{x\n\r"),
                 tab_set_mob[i].name,
                 tab_set_mob[i].inc_dec ? "[+/-]" : "     ",
                 IS_SET(tab_set_mob[i].DS, S_V) &&
@@ -242,10 +243,10 @@ void chg_mob_killer( Character* ch, char* argument ) {
   if( ( victim = get_player( ch, &argument ) ) ) {
     if( IS_KILLER( victim )) {
       REMOVE_KILLER( victim );
-      ch->pecho("Флаг {RKILLER{x убран.");
+      ch->pecho(_("Флаг {RKILLER{x убран."));
     } else {
       set_killer( victim );
-      ch->pecho("Флаг {RKILLER{x выставлен.");
+      ch->pecho(_("Флаг {RKILLER{x выставлен."));
     }
   }
 }
@@ -256,10 +257,10 @@ void chg_mob_violent( Character* ch, char* argument ) {
   if( ( victim = get_player( ch, &argument ) ) ) {
     if( IS_VIOLENT( victim ) ) {
       REMOVE_VIOLENT( victim );
-      ch->pecho("Флаг {BVIOLENT{x убран.");
+      ch->pecho(_("Флаг {BVIOLENT{x убран."));
     } else {
       set_violent( victim );
-      ch->pecho("Флаг {BVIOLENT{x выставлен.");
+      ch->pecho(_("Флаг {BVIOLENT{x выставлен."));
     }
   }
 }
@@ -270,10 +271,10 @@ void chg_mob_slain( Character* ch, char* argument ) {
   if( ( victim = get_player( ch, &argument ) ) ) {
     if( IS_SLAIN( victim )) {
       REMOVE_SLAIN( victim );
-      ch->pecho("Флаг {DSLAIN{x убран.");
+      ch->pecho(_("Флаг {DSLAIN{x убран."));
     } else {
       set_slain( victim );
-      ch->pecho("Флаг {DSLAIN{x выставлен.");
+      ch->pecho(_("Флаг {DSLAIN{x выставлен."));
     }
   }
 }
@@ -286,13 +287,13 @@ void chg_mob_qp( Character* ch, char* argument )
     DLString qpArg = arguments.getOneArgument();
 
     if (playerName.empty() || qpArg.empty()) {
-        ch->pecho("Укажите имя персонажа и кол-во qp.");
+        ch->pecho(_("Укажите имя персонажа и кол-во qp."));
         return;
     }
 
     pcm = PCharacterManager::find( playerName );
     if (!pcm) {
-        ch->pecho("Персонаж не найден, укажите имя полностью.");
+        ch->pecho(_("Персонаж не найден, укажите имя полностью."));
         return;
     }
 
@@ -303,7 +304,7 @@ void chg_mob_qp( Character* ch, char* argument )
       if (Integer::tryParse(qpDelta, qpArg)) {
           pcm->setQuestPoints(qpNow + qpDelta);
           PCharacterManager::saveMemory( pcm );
-          ch->pecho("Персонажу %s изменено кол-во квестовых единиц с %d на %d, разница %d.",
+          ch->pecho(_("Персонажу %s изменено кол-во квестовых единиц с %d на %d, разница %d."),
                      pcm->getName().c_str(), qpNow, pcm->getQuestPoints(), qpDelta);
           return;
       }
@@ -312,13 +313,13 @@ void chg_mob_qp( Character* ch, char* argument )
       if (Integer::tryParse(qpValue, qpArg)) {
           pcm->setQuestPoints(qpValue);
           PCharacterManager::saveMemory( pcm );
-          ch->pecho("Персонажу %s изменено кол-во квестовых единиц с %d на %d.",
+          ch->pecho(_("Персонажу %s изменено кол-во квестовых единиц с %d на %d."),
                       pcm->getName().c_str(), qpNow, pcm->getQuestPoints());
           return;
       }
     }
 
-    ch->pecho("Использование: set char questp имя_персонажа [+|-]число");
+    ch->pecho(_("Использование: set char questp имя_персонажа [+|-]число"));
 }
 
 void chg_mob_attr( Character* ch, char* argument ) 
@@ -334,12 +335,12 @@ void chg_mob_attr( Character* ch, char* argument )
     pcm = PCharacterManager::find( playerName );
 
     if (!pcm) {
-        ch->pecho("Игрок не найден, укажите имя полностью.");
+        ch->pecho(_("Игрок не найден, укажите имя полностью."));
         return;
     }
 
     if (attrName.empty( )) {
-        ch->pecho( "Укажите  название аттрибута." );
+        ch->pecho( _("Укажите  название аттрибута.") );
         return;
     }
     
@@ -350,26 +351,26 @@ void chg_mob_attr( Character* ch, char* argument )
 
     if (attrs->isAvailable( attrName )) {
         if (!iAttr && !sAttr && !eAttr) {
-            ch->pecho( "Аттрибут '%s' нельзя удалить этой командой.", attrName.c_str( ) );
+            ch->pecho( _("Аттрибут '%s' нельзя удалить этой командой."), attrName.c_str( ) );
             return;
         }
         else {
             attrs->eraseAttribute( attrName );
-            ch->pecho("Аттрибут '%s' удален.", attrName.c_str( ));
+            ch->pecho(_("Аттрибут '%s' удален."), attrName.c_str( ));
         }
     }
     else if (attrValue.empty( )) {
         attrs->getAttr<XMLEmptyAttribute>( attrName );
-        ch->pecho("Аттрибут '%s' установлен.", attrName.c_str( ));
+        ch->pecho(_("Аттрибут '%s' установлен."), attrName.c_str( ));
     }
     else if (attrValue.isNumber( )) {
         attrs->getAttr<XMLIntegerAttribute>( attrName )->setValue( attrValue.toInt( ) );
-        ch->pecho("Численный аттрибут '%s' со значением '%s' установлен.", 
+        ch->pecho(_("Численный аттрибут '%s' со значением '%s' установлен."), 
                 attrName.c_str( ), attrValue.c_str( ));
     }
     else {
         attrs->getAttr<XMLStringAttribute>( attrName )->setValue( attrValue );
-        ch->pecho("Строковый аттрибут '%s' со значением '%s' установлен.", 
+        ch->pecho(_("Строковый аттрибут '%s' со значением '%s' установлен."), 
                 attrName.c_str( ), attrValue.c_str( ));
     }
 
@@ -394,17 +395,17 @@ void sset( Character *ch, char *argument )
     if ( arg1[0] == '\0' || arg2[0] == '\0' || arg3[0] == '\0' )
     {
         ch->pecho("Syntax:");
-        ch->pecho("  set skill {y<имя>{x <spell или skill> <число>");
-        ch->pecho("  set skill {y<имя>{x <spell или skill> ?");
-        ch->pecho("  set skill {y<имя>{x all <число>");
-        ch->pecho("  set skill {y<имя>{x <временное умение> off");
+        ch->pecho(_("  set skill {y<имя>{x <spell или skill> <число>"));
+        ch->pecho(_("  set skill {y<имя>{x <spell или skill> ?"));
+        ch->pecho(_("  set skill {y<имя>{x all <число>"));
+        ch->pecho(_("  set skill {y<имя>{x <временное умение> off"));
         ch->pecho("   (use the name of the skill, not the number)");
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg1 ) ) == NULL )
     {
-        ch->pecho("Нет тут такого.");
+        ch->pecho(_("Нет тут такого."));
         return;
     }
 
@@ -430,7 +431,7 @@ void sset( Character *ch, char *argument )
      */
     if (arg_oneof(arg3, "?") && !fAll )
     {
-       ch->pecho("Текущее значение: %d", victim->getPC( )->getSkillData( sn ).learned.getValue( ) );
+       ch->pecho(_("Текущее значение: %d"), victim->getPC( )->getSkillData( sn ).learned.getValue( ) );
        return;
     }
 
@@ -438,11 +439,11 @@ void sset( Character *ch, char *argument )
     if (arg_is_switch_off(arg3)) {
         PCSkillData &data = victim->getPC( )->getSkillData( sn );
         if (!data.isTemporary())
-            ch->pecho("Это умение не является временным для персонажа.");
+            ch->pecho(_("Это умение не является временным для персонажа."));
         else {
             data.clear();
             victim->getPC()->save();
-            ch->pecho("Временное умение удалено.");
+            ch->pecho(_("Временное умение удалено."));
         }
         return;
     }
@@ -456,7 +457,7 @@ void sset( Character *ch, char *argument )
     value = atoi( arg3 );
     if ( value < 0 || value > 100 )
     {
-        ch->pecho("Значение должно лежать в пределах %d...%d.", 0, 100 );
+        ch->pecho(_("Значение должно лежать в пределах %d...%d."), 0, 100 );
         return;
     }
 
@@ -470,7 +471,7 @@ void sset( Character *ch, char *argument )
     else
     {
         victim->getPC( )->getSkillData( sn ).learned = value;
-        ch->pecho("Текущее значение: %d", value );
+        ch->pecho(_("Текущее значение: %d"), value );
     }
     
     victim->getPC( )->updateSkills( );

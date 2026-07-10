@@ -109,6 +109,7 @@
 #include "doors.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 using std::min;
 
@@ -184,16 +185,16 @@ CMDWIZP( limited )
                 OBJ_INDEX_DATA *obj_index = get_obj_index( atoi(argument) );
                 if ( obj_index == 0 )
                 {
-                        ch->pecho("Формат: limited <vnum>.");
+                        ch->pecho(_("Формат: limited <vnum>."));
                         return;
                 }
                 if ( obj_index->limit == -1 )
                 {
-                        ch->pecho("Это не лимит.");
+                        ch->pecho(_("Это не лимит."));
                         return;
                 }
                 nMatch = 0;
-                ch->pecho( "%-35s [%5d]  Лимит: %3d  Собрано: %3d",
+                ch->pecho( _("%-35s [%5d]  Лимит: %3d  Собрано: %3d"),
                         obj_index->short_descr,
                         obj_index->vnum,
                         obj_index->limit,
@@ -203,17 +204,17 @@ CMDWIZP( limited )
                         if ( obj->pIndexData->vnum == obj_index->vnum )
                         {
                                 if ( obj->carried_by != 0 && ch->can_see( obj->carried_by ) )
-                                        ch->pecho( "У %-30s",
+                                        ch->pecho( _("У %-30s"),
                                                 obj->carried_by->getNameC());
                                 if ( obj->in_room != 0 )
-                                        ch->pecho("В комнате %-20s [%d]",
+                                        ch->pecho(_("В комнате %-20s [%d]"),
                                                 obj->in_room->getName(), obj->in_room->vnum);
                                 if ( obj->in_obj != 0 )
-                                        ch->pecho( "Внутри %-20s [%d]",
+                                        ch->pecho( _("Внутри %-20s [%d]"),
                                                 obj->in_obj->getShortDescr( '1', LANG_DEFAULT ).c_str( ),
                                                 obj->in_obj->pIndexData->vnum);
                         }
-                ch->pecho("  %d сейчас в игре, а еще %d в профилях игроков.",
+                ch->pecho(_("  %d сейчас в игре, а еще %d в профилях игроков."),
                         ingameCount, obj_index->count-ingameCount);
                 return;
         }
@@ -238,7 +239,7 @@ CMDWIZP( limited )
 
         limits.sort(limit_compare);
         for (list<limit_info>::const_iterator l = limits.begin(); l != limits.end(); l++)
-            ch->pecho( "[%3d] %-33^N1 [%5d]  Лимит: %3d  Собрано: %3d В игре : %3d",
+            ch->pecho( _("[%3d] %-33^N1 [%5d]  Лимит: %3d  Собрано: %3d В игре : %3d"),
                     l->level,
                     l->description.c_str(),
                     l->vnum,
@@ -246,7 +247,7 @@ CMDWIZP( limited )
                     l->count,
                     l->inGame );
         
-        ch->pecho( "\n\rВсего лимитов: %d из %d.", limits.size(), nMatch );
+        ch->pecho( _("\n\rВсего лимитов: %d из %d."), limits.size(), nMatch );
 }
 
 CMDWIZP( wiznet )
@@ -261,12 +262,12 @@ CMDWIZP( wiznet )
         {
                 if (IS_SET(ch->getPC( )->wiznet,WIZ_ON))
                 {
-                        ch->pecho("Визнет отключен. Уф.");
+                        ch->pecho(_("Визнет отключен. Уф."));
                         REMOVE_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 }
                 else
                 {
-                        ch->pecho("Визнет включен, добро пожаловать в мир спама!");
+                        ch->pecho(_("Визнет включен, добро пожаловать в мир спама!"));
                         SET_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 }
 
@@ -275,14 +276,14 @@ CMDWIZP( wiznet )
 
         if (!str_prefix(argument,"on"))
         {
-                ch->pecho("Визнет включен, добро пожаловать в мир спама!");
+                ch->pecho(_("Визнет включен, добро пожаловать в мир спама!"));
                 SET_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 return;
         }
 
         if (!str_prefix(argument,"off"))
         {
-                ch->pecho("Визнет отключен. Уф.");
+                ch->pecho(_("Визнет отключен. Уф."));
                 REMOVE_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 return;
         }
@@ -304,7 +305,7 @@ CMDWIZP( wiznet )
 
                 strcat(buf,"\n\r");
 
-                ch->pecho("Статус Визнета:");
+                ch->pecho(_("Статус Визнета:"));
                 ch->send_to(buf);
                 return;
         }
@@ -325,7 +326,7 @@ CMDWIZP( wiznet )
 
                 strcat(buf,"\n\r");
 
-                ch->pecho("Доступные тебе опции Визнета:");
+                ch->pecho(_("Доступные тебе опции Визнета:"));
                 ch->send_to(buf);
 
                 return;
@@ -335,20 +336,20 @@ CMDWIZP( wiznet )
 
         if ( flag == -1 || ch->get_trust() < wiznet_table[flag].level )
         {
-                ch->pecho("Такой опции Визнета нет, или тебе она пока недоступна.");
+                ch->pecho(_("Такой опции Визнета нет, или тебе она пока недоступна."));
                 return;
         }
 
         if ( IS_SET(ch->getPC( )->wiznet,wiznet_table[flag].flag) )
         {
-                ch->pecho("Ты больше не следишь за %s через Визнет.",
+                ch->pecho(_("Ты больше не следишь за %s через Визнет."),
                            wiznet_table[flag].name);
                 REMOVE_BIT(ch->getPC( )->wiznet,wiznet_table[flag].flag);
                 return;
         }
         else
         {
-                ch->pecho("Ты теперь отслеживаешь %s через Визнет.",
+                ch->pecho(_("Ты теперь отслеживаешь %s через Визнет."),
                            wiznet_table[flag].name);
                 SET_BIT(ch->getPC( )->wiznet,wiznet_table[flag].flag);
                 return;
@@ -364,12 +365,12 @@ CMDWIZP( poofin )
 
     if (argument[0] == '\0')
     {
-            ch->pecho("Твое сообщение poofin: %s",ch->getPC( )->bamfin.c_str( ));
+            ch->pecho(_("Твое сообщение poofin: %s"),ch->getPC( )->bamfin.c_str( ));
             return;
     }
 
     ch->getPC( )->bamfin = argument;
-    ch->pecho("Твое сообщение poofin теперь: %s",ch->getPC( )->bamfin.c_str( ));
+    ch->pecho(_("Твое сообщение poofin теперь: %s"),ch->getPC( )->bamfin.c_str( ));
 }
 
 
@@ -381,13 +382,13 @@ CMDWIZP( poofout )
 
     if (argument[0] == '\0')
     {
-            ch->pecho("Твое сообщение poofout: %s",ch->getPC( )->bamfout.c_str( ));
+            ch->pecho(_("Твое сообщение poofout: %s"),ch->getPC( )->bamfout.c_str( ));
             return;
     }
 
     ch->getPC( )->bamfout = argument;
 
-    ch->pecho("Твое сообщение poofout теперь %s",ch->getPC( )->bamfout.c_str( ));
+    ch->pecho(_("Твое сообщение poofout теперь %s"),ch->getPC( )->bamfout.c_str( ));
 }
 
 
@@ -404,7 +405,7 @@ CMDWIZP( transfer )
 
     if ( arg1[0] == '\0' )
     {
-        ch->pecho("Перенести кого и куда?");
+        ch->pecho(_("Перенести кого и куда?"));
         return;
     }
 
@@ -428,7 +429,7 @@ CMDWIZP( transfer )
 
     if ( ( victim = get_char_world( ch, arg1 ) ) == 0 )
     {
-        ch->pecho("Таких сейчас в мире нет.");
+        ch->pecho(_("Таких сейчас в мире нет."));
         return;
     }
     /*
@@ -442,7 +443,7 @@ CMDWIZP( transfer )
     {
         if ( ( location = find_location( ch, arg2 ) ) == 0 )
         {
-            ch->pecho("Цель не найдена.");
+            ch->pecho(_("Цель не найдена."));
             return;
         }
         
@@ -450,13 +451,13 @@ CMDWIZP( transfer )
         if ( location ->isPrivate( )
         &&  ch->get_trust() < MAX_LEVEL)
         {
-            ch->pecho("Комната приватная и сейчас занята.");
+            ch->pecho(_("Комната приватная и сейчас занята."));
             return;
         }
     }
     
     if (victim->desc && victim->desc->connected != CON_PLAYING) {
-        ch->pecho("Плохая идея.");
+        ch->pecho(_("Плохая идея."));
         return;
     }
 
@@ -465,7 +466,7 @@ CMDWIZP( transfer )
                   (ch != victim ? "%2$^C1 переносит тебя в столбе {Cбожественной энергии!{x" : NULL),
                   "%1$^C1 внезапно прибывает в столбе {Cбожественной энергии!{x" );
 
-    ch->pecho("%1$^C1 прибывает в столбе {Cбожественной энергии!{x", victim);
+    ch->pecho(_("%1$^C1 прибывает в столбе {Cбожественной энергии!{x"), victim);
 }
 
 
@@ -482,19 +483,19 @@ CMDWIZP( at )
 
     if ( arg[0] == '\0' || argument[0] == '\0' )
     {
-        ch->pecho("Рядом с кем? Сделать что?");
+        ch->pecho(_("Рядом с кем? Сделать что?"));
         return;
     }
 
     if ( ( location = find_location( ch, arg ) ) == 0 )
     {
-        ch->pecho("Цель не найдена.");
+        ch->pecho(_("Цель не найдена."));
         return;
     }
 
     if ( location ->isPrivate( ) &&  ch->get_trust() < MAX_LEVEL)
     {
-        ch->pecho("Комната приватная и сейчас занята.");
+        ch->pecho(_("Комната приватная и сейчас занята."));
         return;
     }
 
@@ -534,13 +535,13 @@ CMDWIZP( goto )
 
     if ( argument[0] == '\0' )
     {
-        ch->pecho("Переместиться куда?");
+        ch->pecho(_("Переместиться куда?"));
         return;
     }
 
     if ( ( location = find_location( ch, argument ) ) == 0 )
     {
-        ch->pecho("Цель не найдена: %s.", argument );
+        ch->pecho(_("Цель не найдена: %s."), argument );
         return;
     }
 
@@ -552,7 +553,7 @@ CMDWIZP( goto )
                 if (!pch->bamfout.empty( ))
                     oldact("$t", ch, pch->bamfout.c_str( ), rch, TO_VICT );
                 else
-                    oldact("$c1 исчезает в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
+                    oldact(_("$c1 исчезает в столбе {Cбожественной энергии.{x"), ch, 0, rch, TO_VICT );
             }
     }
     
@@ -564,7 +565,7 @@ CMDWIZP( goto )
                 if (!pch->bamfin.empty( ))
                     oldact("$t", ch, pch->bamfin.c_str( ), rch, TO_VICT );
                 else
-                    oldact("$c1 внезапно появляется в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
+                    oldact(_("$c1 внезапно появляется в столбе {Cбожественной энергии.{x"), ch, 0, rch, TO_VICT );
             }
     }
 }
@@ -583,7 +584,7 @@ CMDWIZP( stat )
    string = one_argument(argument, arg);
    if ( arg[0] == '\0')
    {
-        ch->pecho("Формат:");
+        ch->pecho(_("Формат:"));
         ch->pecho("  stat <name>");
         ch->pecho("  stat obj <name>");
         ch->pecho("  stat mob <name>");
@@ -608,13 +609,13 @@ CMDWIZP( stat )
 
     if (fChar || fMob) {
         if (!string[0]) {
-           ch->pecho("Stat на кого?");
+           ch->pecho(_("Stat на кого?"));
            return;
         }
         
         victim =  fChar ? get_player_world( ch, string ) : get_char_world( ch, string );
         if (!victim) {
-            ch->pecho("%s с именем %s не найден.", fMob ? "Персонаж" : "Игрок", string);
+            ch->pecho(_("%s с именем %s не найден."), fMob ? "Персонаж" : "Игрок", string);
             return;
         }
         
@@ -645,13 +646,13 @@ CMDWIZP( stat )
     return;
   }
 
-  ch->pecho("С таким именем ничего не найдено.");
+  ch->pecho(_("С таким именем ничего не найдено."));
 }
 
 static void format_affect_duration(Affect *paf, ostringstream &buf)
 {
     if (paf->duration >= 0)
-        buf << fmt(0, " в течение %1$d час%1$Iа|ов|ов", paf->duration);
+        buf << fmt(0, _(" в течение %1$d час%1$Iа|ов|ов"), paf->duration);
     else
         buf << " постоянно";    
 }
@@ -771,7 +772,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
     r = ( arg[0] == '\0' ) ? ch->in_room : find_location( ch, arg );
     if ( r == 0 )
     {
-        ch->pecho("Цель не найдена.");
+        ch->pecho(_("Цель не найдена."));
         return;
     }
 
@@ -845,19 +846,19 @@ static void format_affect(Affect *paf, ostringstream &buf)
         b << endl;
 
         if (pexit->key > 0)
-            b << fmt(0, "Ключ: [{W%7u{x]  ", pexit->key) << endl;
+            b << fmt(0, _("Ключ: [{W%7u{x]  "), pexit->key) << endl;
             
         if (pexit->exit_info)
-            b << fmt(0, "Флаги: [{W%s{x]", exit_flags.names(pexit->exit_info).c_str()) << endl;
+            b << fmt(0, _("Флаги: [{W%s{x]"), exit_flags.names(pexit->exit_info).c_str()) << endl;
 
         {
             ostringstream tbuf;
 
             if (!pexit->keyword.empty())
-                tbuf << fmt(0, "Имена: [{W%s{x]  ", Syntax::label_ru(pexit->keyword).c_str());
+                tbuf << fmt(0, _("Имена: [{W%s{x]  "), Syntax::label_ru(pexit->keyword).c_str());
 
             if (!pexit->short_descr.empty())
-                tbuf << fmt(0, "Краткое: [{W%s{x]  ", pexit->short_descr.get(LANG_DEFAULT).ruscase('1').c_str());
+                tbuf << fmt(0, _("Краткое: [{W%s{x]  "), pexit->short_descr.get(LANG_DEFAULT).ruscase('1').c_str());
 
             if (!pexit->description.empty())
                 tbuf << "Описание: " << pexit->description.get(LANG_DEFAULT);
@@ -877,7 +878,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
             h != r->history.end( );
             h++)
         {
-            b << fmt(0, "%s проходит через дверь %d.\r\n", h->name.c_str( ), h->went );
+            b << fmt(0, _("%s проходит через дверь %d.\r\n"), h->name.c_str( ), h->went );
         }
     }
 
@@ -901,53 +902,53 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho("Stat чему?");
+                ch->pecho(_("Stat чему?"));
                 return;
         }
 
         if ( ( obj = get_obj_world( ch, argument ) ) == 0 )
         {
-                ch->pecho("Ни на земле, ни в небесах не найдено. Увы и ах.");
+                ch->pecho(_("Ни на земле, ни в небесах не найдено. Увы и ах."));
                 return;
         }
 
         buf << fmt(0, "Name(s): %s\n\r", String::toString(obj->getKeyword()).c_str() );
 
-        buf << fmt(0, "Vnum: %d  Лимит: %d  Тип: %s  Ресеты: %d\n\r",
+        buf << fmt(0, _("Vnum: %d  Лимит: %d  Тип: %s  Ресеты: %d\n\r"),
                 obj->pIndexData->vnum, obj->pIndexData->limit,
                 item_table.message(obj->item_type).c_str( ),
                 obj->pIndexData->reset_num );
 
         if (obj->timestamp > 0) {
             DLString d = Date( obj->timestamp ).getTimeAsString( );
-            buf << fmt(0, "Лимит исчезнет в %s.\r\n", d.c_str( ) );
+            buf << fmt(0, _("Лимит исчезнет в %s.\r\n"), d.c_str( ) );
         }
 
-        buf << fmt(0, "Шорт: %s\n\rДлинное описание: %s\n\r",
+        buf << fmt(0, _("Шорт: %s\n\rДлинное описание: %s\n\r"),
                 obj->getShortDescr(LANG_DEFAULT).c_str(), obj->getDescription(LANG_DEFAULT).c_str() );
 
-        buf << fmt(0, "Владелец: %s\n\r", obj->getOwner().empty() ? "nobody" : obj->getOwner().c_str());
+        buf << fmt(0, _("Владелец: %s\n\r"), obj->getOwner().empty() ? "nobody" : obj->getOwner().c_str());
 
-        buf << fmt(0, "Материал: %s\n\r", obj->getMaterial( ).c_str());
+        buf << fmt(0, _("Материал: %s\n\r"), obj->getMaterial( ).c_str());
 
-        buf << fmt(0, "Берется в: %s\n\rЭкстра флаги: %s\n\r",
+        buf << fmt(0, _("Берется в: %s\n\rЭкстра флаги: %s\n\r"),
                 wear_flags.messages(obj->wear_flags, true, '1', Player::displayLang(ch)).c_str( ),
                 extra_flags.messages(obj->extra_flags, true, '1', Player::displayLang(ch)).c_str( ) );
 
-        buf << fmt(0, "Число: %d/%d  Вес: %d/%d/%d (десятые доли фунта)\n\r",1,
+        buf << fmt(0, _("Число: %d/%d  Вес: %d/%d/%d (десятые доли фунта)\n\r"),1,
                 obj->getNumber( ), obj->weight, obj->getWeight( ), obj->getTrueWeight( ) );
 
-        buf << fmt(0, "Уровень: %d  Цена: %d  Состояние: %d  Таймер: %d По счету: %d\n\r",
+        buf << fmt(0, _("Уровень: %d  Цена: %d  Состояние: %d  Таймер: %d По счету: %d\n\r"),
                 obj->level, obj->cost, obj->condition, obj->timer, obj->pIndexData->count );
 
-        buf << fmt(0, "В комнате: %d  Внутри: %s  В руках у: %s  Надето на: %s\n\r",
+        buf << fmt(0, _("В комнате: %d  Внутри: %s  В руках у: %s  Надето на: %s\n\r"),
                 obj->in_room == 0 ? 0 : obj->in_room->vnum,
                 obj->in_obj  == 0 ? "(none)" : obj->in_obj->getShortDescr( '1', LANG_DEFAULT ).c_str( ),
                 obj->carried_by == 0 ? "(none)" :
                         ch->can_see(obj->carried_by) ? obj->carried_by->getNameC() : "someone",
                 obj->wear_loc->getName( ).c_str( ) );
 
-        buf << fmt(0, "Значения: %d %d %d %d %d\n\r",
+        buf << fmt(0, _("Значения: %d %d %d %d %d\n\r"),
                 obj->value0(), obj->value1(), obj->value2(), obj->value3(),        obj->value4() );
 
         // now give out vital statistics as per identify
@@ -957,7 +958,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
         case ITEM_SCROLL:
         case ITEM_POTION:
         case ITEM_PILL:
-                buf << fmt(0,  "Заклинания %d уровня:", obj->value0() );
+                buf << fmt(0,  _("Заклинания %d уровня:"), obj->value0() );
                 ch->send_to(buf);
 
                 if ( obj->value1() >= 0 && obj->value1() < SkillManager::getThis( )->size() )
@@ -993,7 +994,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
         case ITEM_WAND:
         case ITEM_STAFF:
-                buf << fmt(0, "Имеет %d(%d) зарядов уровня %d",
+                buf << fmt(0, _("Имеет %d(%d) зарядов уровня %d"),
                         obj->value1(), obj->value2(), obj->value0() );
 
                 if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
@@ -1008,7 +1009,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
         case ITEM_DRINK_CON:
                 liquid = liquidManager->find( obj->value2() );
-                buf << fmt(0, "Содержит жидкость %s цвета, %s.\n",
+                buf << fmt(0, _("Содержит жидкость %s цвета, %s.\n"),
                     liquid->getColor( ).ruscase( '2' ).c_str( ),
                     liquid->getShortDescr( ).ruscase( '4' ).c_str( ) );
                 break;
@@ -1016,34 +1017,34 @@ static void format_affect(Affect *paf, ostringstream &buf)
         case ITEM_WEAPON:
                 buf << "Тип оружия: " << weapon_class.name(obj->value0()) << endl;
                 
-                buf << fmt(0, "Урон %dd%d (среднее %d)\n\r",
+                buf << fmt(0, _("Урон %dd%d (среднее %d)\n\r"),
                         obj->value1(),obj->value2(),weapon_ave(obj));
 
-                buf << fmt(0, "Тип удара: %s.\n\r", weapon_flags.name(obj->value3()).c_str( ));
+                buf << fmt(0, _("Тип удара: %s.\n\r"), weapon_flags.name(obj->value3()).c_str( ));
         
                 if (obj->value4())  /* weapon flags */
                 {
-                        buf << fmt(0, "Флаги оружия: %s\n\r",weapon_type2.messages(obj->value4()).c_str( ));
+                        buf << fmt(0, _("Флаги оружия: %s\n\r"),weapon_type2.messages(obj->value4()).c_str( ));
                 }
                 break;
 
         case ITEM_ARMOR:
-                buf << fmt(0, "Класс брони: %d колющее, %d удар, %d режущее, %d экзотика\n\r",
+                buf << fmt(0, _("Класс брони: %d колющее, %d удар, %d режущее, %d экзотика\n\r"),
                         obj->value0(), obj->value1(), obj->value2(), obj->value3() );
                 break;
 
         case ITEM_CONTAINER:
-                buf << fmt(0, "Вместимость: %d#  Максимальный вес: %d#  Флаги: %s\n\r",
+                buf << fmt(0, _("Вместимость: %d#  Максимальный вес: %d#  Флаги: %s\n\r"),
                         obj->value0(), obj->value3(), container_flags.messages(obj->value1()).c_str( ));
                 if (obj->value4() != 100)
                 {
-                        buf << fmt(0, "Уменьшение веса: %d%%\n\r",obj->value4());
+                        buf << fmt(0, _("Уменьшение веса: %d%%\n\r"),obj->value4());
                 }
                 break;
         
         case ITEM_CORPSE_PC:
         case ITEM_CORPSE_NPC:
-                buf << fmt(0, "Стейков: %d, Уровень: %d, Части тела: '%s', Vnum: %d\r\n",
+                buf << fmt(0, _("Стейков: %d, Уровень: %d, Части тела: '%s', Vnum: %d\r\n"),
                             obj->value0(), obj->value1(), 
                             part_flags.messages( obj->value2() ).c_str( ), obj->value3() );
                 break;
@@ -1080,10 +1081,10 @@ static void format_affect(Affect *paf, ostringstream &buf)
         format_affect(paf, buf);
 
 
-    buf << fmt(0, "Состояние : %d (%s) ", obj->condition, obj->get_cond_alias( Player::lang(ch) ) );
+    buf << fmt(0, _("Состояние : %d (%s) "), obj->condition, obj->get_cond_alias( Player::lang(ch) ) );
     
     if (obj->behavior) {        
-        buf << fmt(0, "Поведение: [%s]\r\n", obj->behavior->getType( ).c_str( ));
+        buf << fmt(0, _("Поведение: [%s]\r\n"), obj->behavior->getType( ).c_str( ));
         obj->behavior.toStream( buf );
 
     } else {
@@ -1325,7 +1326,7 @@ CMDWIZP( vnum )
 
     if (arg[0] == '\0')
     {
-        ch->pecho("Формат:");
+        ch->pecho(_("Формат:"));
         ch->pecho("  vnum obj <name>");
         ch->pecho("  vnum mob <name>");
         ch->pecho("  vnum type <item_type>");
@@ -1362,7 +1363,7 @@ CMDWIZP( vnum )
     one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
-        ch->pecho("Найти кого?");
+        ch->pecho(_("Найти кого?"));
         return;
     }
 
@@ -1383,7 +1384,7 @@ CMDWIZP( vnum )
         }   
 
     if ( !found )
-        ch->pecho("Мобы с таким именем не найдены.");
+        ch->pecho(_("Мобы с таким именем не найдены."));
 
     return;
 }
@@ -1399,7 +1400,7 @@ CMDWIZP( vnum )
     one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
-        ch->pecho("Найти что?");
+        ch->pecho(_("Найти что?"));
         return;
     }
 
@@ -1420,7 +1421,7 @@ CMDWIZP( vnum )
         }
 
     if ( !found )
-        ch->pecho("Объекты с таким именем не найдены.");
+        ch->pecho(_("Объекты с таким именем не найдены."));
 
     return;
 }
@@ -1431,7 +1432,7 @@ CMDWIZP( vnum )
     ostringstream buf;
     
     if ((type = item_table.value( argument )) == NO_FLAG) {
-        ch->pecho( "Такого типа предмета не существует." );
+        ch->pecho( _("Такого типа предмета не существует.") );
         return;
     }
     
@@ -1444,7 +1445,7 @@ CMDWIZP( vnum )
             }
 
     if (buf.str( ).empty( ))
-        ch->pecho( "Такого типа нет ни у одного объекта." );
+        ch->pecho( _("Такого типа нет ни у одного объекта.") );
     else
         page_to_char( buf.str( ).c_str( ), ch ); 
 }
@@ -1455,7 +1456,7 @@ CMDWIZP( rwhere )
     bool found = false;
 
     if (argument[0] == '\0') {
-        ch->pecho("Найти какую комнату?");
+        ch->pecho(_("Найти какую комнату?"));
         return;
     }
 
@@ -1466,7 +1467,7 @@ CMDWIZP( rwhere )
         }
 
     if (!found)
-        ch->pecho("Комната с таким именем не найдена.");
+        ch->pecho(_("Комната с таким именем не найдена."));
     else
         ch->send_to(buf);
 }
@@ -1482,7 +1483,7 @@ CMDWIZP( owhere )
 
     if ( argument[0] == '\0' )
     {
-            ch->pecho("Найти что?");
+            ch->pecho(_("Найти что?"));
             return;
     }
 
@@ -1514,19 +1515,19 @@ CMDWIZP( owhere )
 
         if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by)
                 && in_obj->carried_by->in_room != 0 )
-                buffer << fmt(0, "%3d) %N1 в руках у %s [Комната %d]\n\r",
+                buffer << fmt(0, _("%3d) %N1 в руках у %s [Комната %d]\n\r"),
                         number,
                         obj->getShortDescr( LANG_DEFAULT ).c_str( ),
                         ch->sees(in_obj->carried_by, '2').c_str(),
                         in_obj->carried_by->in_room->vnum );
         else if ( in_obj->in_room != 0 && ch->can_see(in_obj->in_room) )
-                buffer << fmt(0, "%3d) %N1 на полу в %s [Комната %d]\n\r",
+                buffer << fmt(0, _("%3d) %N1 на полу в %s [Комната %d]\n\r"),
                         number,
                         obj->getShortDescr( LANG_DEFAULT ).c_str( ),
                         in_obj->in_room->getName(),
                         in_obj->in_room->vnum );
         else
-               buffer << fmt(0, "%3d) %N1 черт его знает где.\n\r",
+               buffer << fmt(0, _("%3d) %N1 черт его знает где.\n\r"),
                         number,
                         obj->getShortDescr(LANG_DEFAULT).c_str( ) );
 
@@ -1536,7 +1537,7 @@ CMDWIZP( owhere )
     }
 
     if (!found)
-        ch->pecho("Ни на земле, ни в небесах не найдено. Увы и ах.");
+        ch->pecho(_("Ни на земле, ни в небесах не найдено. Увы и ах."));
     else
         page_to_char( buffer.str( ).c_str( ), ch );
 }
@@ -1577,13 +1578,13 @@ CMDWIZP( mwhere )
                 count++;
 
                 if (victim->is_npc( ))
-                    buffer << fmt(0, "%3d) %s (в теле %s) находится в %s [%d]\n\r",
+                    buffer << fmt(0, _("%3d) %s (в теле %s) находится в %s [%d]\n\r"),
                             count, 
                             victim->getPC( )->getNameC(),
                             victim->getNameP('1').c_str( ),
                             victim->in_room->getName(), victim->in_room->vnum);
                 else
-                    buffer << fmt(0, "%3d) %s находится в %s [%d]\n\r",
+                    buffer << fmt(0, _("%3d) %s находится в %s [%d]\n\r"),
                             count, 
                             victim->getNameC(),
                             victim->in_room->getName(), victim->in_room->vnum);
@@ -1622,7 +1623,7 @@ CMDWIZP( mwhere )
     }
 
     if (!found)
-        oldact_p("Тебе не удалось найти $T.", ch, 0, argument, TO_CHAR,POS_DEAD );
+        oldact_p(_("Тебе не удалось найти $T."), ch, 0, argument, TO_CHAR,POS_DEAD );
     else
         page_to_char(buffer.str( ).c_str( ),ch);
 
@@ -1664,25 +1665,25 @@ CMDWIZP( snoop )
 
     if ( arg[0] == '\0' )
     {
-        ch->pecho("Следить за кем?");
+        ch->pecho(_("Следить за кем?"));
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->pecho("Таких сейчас в мире нет");
+        ch->pecho(_("Таких сейчас в мире нет"));
         return;
     }
 
     if ( victim->desc == 0 )
     {
-        ch->pecho("Дескриптор не найден!");
+        ch->pecho(_("Дескриптор не найден!"));
         return;
     }
 
     if ( victim == ch )
     {
-        ch->pecho("Отменяем всю слежку.");
+        ch->pecho(_("Отменяем всю слежку."));
         wiznet( WIZ_SNOOPS, WIZ_SECURE, ch->get_trust(), "%C1 прекращает отслеживание.", ch );
         for ( d = descriptor_list; d != 0; d = d->next )
         {
@@ -1694,28 +1695,28 @@ CMDWIZP( snoop )
 
     if ( victim->desc->snoop_by != 0 )
     {
-        ch->pecho("Кто-то уже следит за этим игроком.");
+        ch->pecho(_("Кто-то уже следит за этим игроком."));
         return;
     }
 
     if (ch->in_room != victim->in_room
     &&  victim->in_room->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
     {
-        ch->pecho("Этот игрок сейчас в приватной комнате.");
+        ch->pecho(_("Этот игрок сейчас в приватной комнате."));
         return;
     }
 
     if ( victim->get_trust() >= ch->get_trust()
     ||   IS_SET(victim->comm,COMM_SNOOP_PROOF))
     {
-        ch->pecho("У тебя пока не хватает прав на слежку за игроками.");
+        ch->pecho(_("У тебя пока не хватает прав на слежку за игроками."));
         return;
     }
 
     if ( ch->desc != 0 ) {
         for ( d = ch->desc->snoop_by; d != 0; d = d->snoop_by ) {
             if ( d->character == victim || d->character->getPC( ) == victim ) {
-                ch->pecho("Упс, круговая слежка!");
+                ch->pecho(_("Упс, круговая слежка!"));
                 return;
             }
         }
@@ -1723,7 +1724,7 @@ CMDWIZP( snoop )
 
     victim->desc->snoop_by = ch->desc;
     wiznet( WIZ_SNOOPS, WIZ_SECURE, ch->get_trust(), "%C1 начинает следить за %C1.", ch, victim );
-    ch->pecho("Начинаем слежку.");
+    ch->pecho(_("Начинаем слежку."));
 }
 
 
@@ -1734,7 +1735,7 @@ CMDWIZP( switch )
     Character *victim;
 
     if(ch->is_npc( )) {
-        ch->pecho("Мобы этого не умеют.");
+        ch->pecho(_("Мобы этого не умеют."));
         return;
     }
     
@@ -1744,7 +1745,7 @@ CMDWIZP( switch )
 
     if ( arg[0] == '\0' )
     {
-        ch->pecho("Вселиться в чье тело?");
+        ch->pecho(_("Вселиться в чье тело?"));
         return;
     }
 
@@ -1753,24 +1754,24 @@ CMDWIZP( switch )
 
     if ( pch->switchedTo )
     {
-        ch->pecho("Ты уже в чужом теле.");
+        ch->pecho(_("Ты уже в чужом теле."));
         return;
     }
     
     victim = get_char_world( ch, arg );
     if ( !victim )
     {
-        ch->pecho("Таких сейчас в мире нет.");
+        ch->pecho(_("Таких сейчас в мире нет."));
         return;
     }
 
     if ( victim == ch ) {
-        ch->pecho("Ты в своем теле.");
+        ch->pecho(_("Ты в своем теле."));
         return;
     }
 
     if (!victim->is_npc()) {
-        ch->pecho("Вселиться можно только в тело мобов.");
+        ch->pecho(_("Вселиться можно только в тело мобов."));
         return;
     }
 
@@ -1779,12 +1780,12 @@ CMDWIZP( switch )
     if (ch->in_room != victim->in_room &&  victim->in_room->isPrivate( ) &&
             !IS_TRUSTED(ch,IMPLEMENTOR))
     {
-        ch->pecho("Этот персонаж сейчас в приватной комнате.");
+        ch->pecho(_("Этот персонаж сейчас в приватной комнате."));
         return;
     }
 
     if ( victim->desc != 0 ) {
-        ch->pecho("В это тело уже кто-то вселился!");
+        ch->pecho(_("В это тело уже кто-то вселился!"));
         return;
     }
 
@@ -1800,7 +1801,7 @@ CMDWIZP( switch )
     victim->prompt = ch->prompt;
     victim->comm = ch->comm;
     victim->lines = ch->lines;
-    victim->pecho("Ты вселяешься в чужое тело.");
+    victim->pecho(_("Ты вселяешься в чужое тело."));
     return;
 }
 
@@ -1817,8 +1818,8 @@ CMDWIZP( return )
     NPCharacter *mob = ch->getNPC();
 
     if(!mob) {
-        ch->pecho("Эта команда нужна для смены тел -- а ты и так в своем теле.");
-        ch->pecho("А чтобы вернуться в Храм, напиши {y{hcвозврат{x.");
+        ch->pecho(_("Эта команда нужна для смены тел -- а ты и так в своем теле."));
+        ch->pecho(_("А чтобы вернуться в Храм, напиши {y{hcвозврат{x."));
         return;
     }
     
@@ -1826,14 +1827,14 @@ CMDWIZP( return )
         return;
     
     if ( !mob->switchedFrom ) {
-        ch->pecho("Ты и так в своем теле.");
+        ch->pecho(_("Ты и так в своем теле."));
         return;
     }
 
     if (mprog_return( mob ))
         return;
 
-    mob->pecho("Ты возвращаешься в своё привычное тело.");    
+    mob->pecho(_("Ты возвращаешься в своё привычное тело."));    
 
     wiznet( WIZ_SWITCHES, WIZ_SECURE, ch->get_trust( ), 
             "%C1 returns from %C2.", mob->switchedFrom, mob );
@@ -1856,7 +1857,7 @@ CMDWIZP( load )
    DLString arg = args.getOneArgument();
 
     if (arg.empty()) {
-        ch->pecho("Формат:");
+        ch->pecho(_("Формат:"));
         ch->pecho("  load mob <vnum>");
         ch->pecho("  load obj <vnum> <level>");
         return;
@@ -1889,13 +1890,13 @@ CMDWIZP( load )
 
         if (arg.empty() || !arg.isNumber())
         {
-                ch->pecho("Формат: load mob <vnum>.");
+                ch->pecho(_("Формат: load mob <vnum>."));
                 return;
         }
 
         if ( ( pMobIndex = get_mob_index(arg.toInt()) ) == 0 )
         {
-                ch->pecho("Моба с таким внумом не найдено.");
+                ch->pecho(_("Моба с таким внумом не найдено."));
                 return;
         }
 
@@ -1904,13 +1905,13 @@ CMDWIZP( load )
         if (victim->in_room == 0)
             char_to_room( victim, ch->in_room );
 
-        oldact("$c1 создает $C4!", ch, 0, victim, TO_ROOM);
-        oldact("Ты создаешь $C4!", ch, 0, victim, TO_CHAR);
+        oldact(_("$c1 создает $C4!"), ch, 0, victim, TO_ROOM);
+        oldact(_("Ты создаешь $C4!"), ch, 0, victim, TO_CHAR);
 
 
         wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust(), 
                 "%C1 создает %C4.", ch, victim );
-        ch->pecho("Готово.");
+        ch->pecho(_("Готово."));
         return;
 }
 
@@ -1927,7 +1928,7 @@ CMDWIZP( load )
 
     if (arg1.empty() || !arg1.isNumber())
     {
-        ch->pecho("Формат: load obj <vnum> <level>.");
+        ch->pecho(_("Формат: load obj <vnum> <level>."));
         return;
     }
 
@@ -1937,20 +1938,20 @@ CMDWIZP( load )
     {
         if (!arg2.isNumber())
         {
-          ch->pecho("Формат: oload <vnum> <level>.");
+          ch->pecho(_("Формат: oload <vnum> <level>."));
           return;
         }
         level = arg2.toInt();
         if (level < 0 || level > ch->get_trust())
         {
-          ch->pecho("Уровень не может быть ниже нуля или выше твоего.");
+          ch->pecho(_("Уровень не может быть ниже нуля или выше твоего."));
             return;
         }
     }
 
     if ( ( pObjIndex = get_obj_index( arg1.toInt() ) ) == 0 )
     {
-        ch->pecho("Объект с таким внумом не найден.");
+        ch->pecho(_("Объект с таким внумом не найден."));
         return;
     }
 
@@ -1960,8 +1961,8 @@ CMDWIZP( load )
     else
         obj_to_room( obj, ch->in_room );
         
-    oldact("$c1 создает $o4!", ch, obj, 0, TO_ROOM);
-    oldact("Ты создаешь $o4!", ch, obj, 0, TO_CHAR);
+    oldact(_("$c1 создает $o4!"), ch, obj, 0, TO_ROOM);
+    oldact(_("Ты создаешь $o4!"), ch, obj, 0, TO_CHAR);
     wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), "%C1 loads %O4.", ch, obj );
     
     LogStream::sendNotice( ) 
@@ -2005,8 +2006,8 @@ CMDWIZP( purge )
               extract_obj( obj );
         }
 
-        oldact("$c1 изничтожает все в комнате!", ch, 0, 0, TO_ROOM);
-        ch->pecho("Готово.");
+        oldact(_("$c1 изничтожает все в комнате!"), ch, 0, 0, TO_ROOM);
+        ch->pecho(_("Готово."));
         dreamland->resetOption( DL_SAVE_MOBS );
         dreamland->resetOption( DL_SAVE_OBJS );
         save_items( ch->in_room );
@@ -2017,24 +2018,24 @@ CMDWIZP( purge )
     // Try to purge a mob in the room or an item in the room/inventory/equip.
     if ((victim = get_char_room(ch, arg))) {
         if (!victim->is_npc()) {
-            ch->pecho("Сначала научись рисовать и отрасти усики.");
+            ch->pecho(_("Сначала научись рисовать и отрасти усики."));
             return;
         }
 
-        oldact("$c1 изничтожает $C4.", ch, 0, victim, TO_NOTVICT );
-        oldact("Ты изничтожаешь $C4.", ch, 0, victim, TO_CHAR );
+        oldact(_("$c1 изничтожает $C4."), ch, 0, victim, TO_NOTVICT );
+        oldact(_("Ты изничтожаешь $C4."), ch, 0, victim, TO_CHAR );
         extract_char( victim );
         return;
     }
 
     if ((obj = get_obj_here(ch, arg))) {
-        oldact("$c1 изничтожает $o4.", ch, obj, 0, TO_ROOM );
-        oldact("Ты изничтожаешь $o4.", ch, obj, 0, TO_CHAR );
+        oldact(_("$c1 изничтожает $o4."), ch, obj, 0, TO_ROOM );
+        oldact(_("Ты изничтожаешь $o4."), ch, obj, 0, TO_CHAR );
         extract_obj(obj);
         return;
     }
 
-    ch->pecho("Ты не видишь здесь моба или предмет с таким именем.");
+    ch->pecho(_("Ты не видишь здесь моба или предмет с таким именем."));
 }
 
 
@@ -2065,13 +2066,13 @@ CMDWIZP( restore )
             vch->mana        = vch->max_mana;
             vch->move        = vch->max_move;
             update_pos( vch);
-            oldact_p("$c1 {Gвосстановил$gо||а {xтвои силы!",ch,0,vch,TO_VICT,POS_DEAD);
+            oldact_p(_("$c1 {Gвосстановил$gо||а {xтвои силы!"),ch,0,vch,TO_VICT,POS_DEAD);
         }
 
         wiznet( WIZ_RESTORE, WIZ_SECURE, ch->get_trust(), 
                 "%C1 restored room %d.", ch, ch->in_room->vnum );
 
-        ch->pecho("Комната восстановлена.");
+        ch->pecho(_("Комната восстановлена."));
         return;
 
     }
@@ -2101,15 +2102,15 @@ CMDWIZP( restore )
             victim->move        = victim->max_move;
             update_pos( victim);
             if (victim->in_room != 0)
-                oldact_p("$c1 {Gвосстановил$gо||а {xтвои силы!",ch,0,victim,TO_VICT,POS_DEAD);
+                oldact_p(_("$c1 {Gвосстановил$gо||а {xтвои силы!"),ch,0,victim,TO_VICT,POS_DEAD);
         }
-        ch->pecho("Все активные игроки восстановлены!");
+        ch->pecho(_("Все активные игроки восстановлены!"));
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->pecho("Таких здесь нет.");
+        ch->pecho(_("Таких здесь нет."));
         return;
     }
 
@@ -2123,9 +2124,9 @@ CMDWIZP( restore )
     victim->move = victim->max_move;
     update_pos( victim );
 
-    oldact_p("$c1 {Gвосстановил$gо||а {xтвои силы!", ch, 0, victim, TO_VICT,POS_DEAD );
+    oldact_p(_("$c1 {Gвосстановил$gо||а {xтвои силы!"), ch, 0, victim, TO_VICT,POS_DEAD );
     wiznet( WIZ_RESTORE, WIZ_SECURE, ch->get_trust( ), "%C1 restored %C4.", ch, victim );
-    ch->pecho("Готово.");
+    ch->pecho(_("Готово."));
 }
 
          
@@ -2138,40 +2139,40 @@ CMDWIZP( freeze )
 
     if ( arg[0] == '\0' )
     {
-        ch->pecho("Заморозить кого?");
+        ch->pecho(_("Заморозить кого?"));
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->pecho("Тут таких нет.");
+        ch->pecho(_("Тут таких нет."));
         return;
     }
 
     if ( victim->is_npc() )
     {
-        ch->pecho("Мобов замораживать бесполезно.");
+        ch->pecho(_("Мобов замораживать бесполезно."));
         return;
     }
 
     if ( victim->get_trust() >= ch->get_trust() )
     {
-        ch->pecho("У тебя пока не хватает прав для этого.");
+        ch->pecho(_("У тебя пока не хватает прав для этого."));
         return;
     }
 
     if ( IS_SET(victim->act, PLR_FREEZE) )
     {
         victim->act.removeBit( PLR_FREEZE);
-        victim->pecho("{CТебя разморозили!{x Ты чувствуешь как способность двигаться возвращается.");
-        ch->pecho("Цель разморожена.");
+        victim->pecho(_("{CТебя разморозили!{x Ты чувствуешь как способность двигаться возвращается."));
+        ch->pecho(_("Цель разморожена."));
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 thaws %C4.", ch, victim );
     }
     else
     {
         victim->act.setBit( PLR_FREEZE);
-        victim->pecho("{CТЕБЯ ЗАМОРОЗИЛИ!{x Ты теряешь способность двигаться и говорить.");
-        ch->pecho("Цель заморожена.");
+        victim->pecho(_("{CТЕБЯ ЗАМОРОЗИЛИ!{x Ты теряешь способность двигаться и говорить."));
+        ch->pecho(_("Цель заморожена."));
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
                 "%C1 puts %C4 in the deep freeze.", ch, victim );
     }
@@ -2193,8 +2194,8 @@ CMDWIZP( peace )
             rch->act.removeBit(ACT_AGGRESSIVE);
     }
 
-    ch->pecho("Ты наполняешь комнату миром и спокойствием.");
-    ch->recho("%^C1 жестом прекращает войны и агрессию вокруг.", ch);
+    ch->pecho(_("Ты наполняешь комнату миром и спокойствием."));
+    ch->recho(_("%^C1 жестом прекращает войны и агрессию вокруг."), ch);
     return;
 }
 
@@ -2250,7 +2251,7 @@ CMDWIZP( force )
 
     if ( arg[0] == '\0' || argument[0] == '\0' )
     {
-        ch->pecho("Принудить кого к чему?");
+        ch->pecho(_("Принудить кого к чему?"));
         return;
     }
 
@@ -2261,7 +2262,7 @@ CMDWIZP( force )
 
         if (ch->get_trust() < MAX_LEVEL - 5)
         {
-            ch->pecho("У тебя пока не хватает прав на принуждение.");
+            ch->pecho(_("У тебя пока не хватает прав на принуждение."));
             return;
         }
 
@@ -2282,32 +2283,32 @@ CMDWIZP( force )
 
         if ( ( victim = get_char_world( ch, arg ) ) == 0 )
         {
-            ch->pecho("Тут таких нет.");
+            ch->pecho(_("Тут таких нет."));
             return;
         }
 
         if ( victim == ch )
         {
-            ch->pecho("Сила воли, бессердечная ты сука.");
+            ch->pecho(_("Сила воли, бессердечная ты сука."));
             return;
         }
 
             if (ch->in_room != victim->in_room
         &&  victim->in_room->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
             {
-            ch->pecho("Этот персонаж сейчас в приватной комнате.");
+            ch->pecho(_("Этот персонаж сейчас в приватной комнате."));
             return;
         }
 
         if ( victim->get_trust() >= ch->get_trust() )
         {
-            ch->pecho("Эту цель ты пока не можешь принудить!");
+            ch->pecho(_("Эту цель ты пока не можешь принудить!"));
             return;
         }
 
         if ( !victim->is_npc() && ch->get_trust() < MAX_LEVEL - 4)
         {
-            ch->pecho("У тебя пока не хватает прав на такое принуждение.");
+            ch->pecho(_("У тебя пока не хватает прав на такое принуждение."));
             return;
         }
 
@@ -2315,7 +2316,7 @@ CMDWIZP( force )
         interpret( victim, argument );
     }
 
-    ch->pecho("Готово.");
+    ch->pecho(_("Готово."));
     return;
 }
 
@@ -2338,14 +2339,14 @@ CMDWIZP( wizinvis )
       if ( ch->invis_level)
       {
           ch->invis_level = 0;
-          oldact("$c1 внезапно проявляется в реальности.", ch, 0, 0, TO_ROOM);
-          ch->pecho("Ты снова проявляешься в реальности.");
+          oldact(_("$c1 внезапно проявляется в реальности."), ch, 0, 0, TO_ROOM);
+          ch->pecho(_("Ты снова проявляешься в реальности."));
       }
       else
       {
           ch->invis_level = 102;
-          oldact("$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
-          ch->pecho("Ты растворяешься за подкладкой реальности.");
+          oldact(_("$c1 подмигивает и растворяется за подкладкой реальности."), ch, 0, 0, TO_ROOM);
+          ch->pecho(_("Ты растворяешься за подкладкой реальности."));
       }
     else
     /* do the level thing */
@@ -2360,8 +2361,8 @@ CMDWIZP( wizinvis )
       {
           ch->reply = 0;
           ch->invis_level = level;
-          oldact("$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
-          ch->pecho("Ты растворяешься за подкладкой реальности.");
+          oldact(_("$c1 подмигивает и растворяется за подкладкой реальности."), ch, 0, 0, TO_ROOM);
+          ch->pecho(_("Ты растворяешься за подкладкой реальности."));
       }
     }
 
@@ -2383,14 +2384,14 @@ CMDWIZP( incognito )
       if ( ch->incog_level)
       {
           ch->incog_level = 0;
-          oldact("$c1 больше не маскируется.", ch, 0, 0, TO_ROOM);
-          ch->pecho("Ты больше не маскируешься.");
+          oldact(_("$c1 больше не маскируется."), ch, 0, 0, TO_ROOM);
+          ch->pecho(_("Ты больше не маскируешься."));
       }
       else
       {
           ch->incog_level = 102;
-          oldact("$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM);
-          ch->pecho("Ты скрываешь свое присутствие.");
+          oldact(_("$c1 скрывает $s присутствие."), ch, 0, 0, TO_ROOM);
+          ch->pecho(_("Ты скрываешь свое присутствие."));
       }
     else
     /* do the level thing */
@@ -2405,8 +2406,8 @@ CMDWIZP( incognito )
       {
           ch->reply = 0;
           ch->incog_level = level;
-          oldact("$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM);
-          ch->pecho("Ты скрываешь свое присутствие.");
+          oldact(_("$c1 скрывает $s присутствие."), ch, 0, 0, TO_ROOM);
+          ch->pecho(_("Ты скрываешь свое присутствие."));
       }
     }
 
@@ -2430,13 +2431,13 @@ CMDWIZP( advance )
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' || !is_number( arg2 ) )
     {
-        ch->pecho("Формат: advance <char> <level>.");
+        ch->pecho(_("Формат: advance <char> <level>."));
         return;
     }
 
     if ( ( vict = get_char_room( ch, arg1 ) ) == 0 )
     {
-        ch->pecho("Этого игрока тут нет.");
+        ch->pecho(_("Этого игрока тут нет."));
         return;
     }
 
@@ -2472,7 +2473,7 @@ CMDWIZP( advance )
         int temp_prac, temp_train;
 
         ch->pecho("Lowering a player's level!");
-        victim->pecho("**** ОООООО НЕЕЕЕЕЕЕЕЕТ!!! ****");
+        victim->pecho(_("**** ОООООО НЕЕЕЕЕЕЕЕЕТ!!! ****"));
         temp_prac = victim->practice;
         temp_train = victim->train;
         victim->setLevel( 1 );
@@ -2492,7 +2493,7 @@ CMDWIZP( advance )
     else
     {
         ch->pecho("Raising a player's level!");
-        victim->pecho("**** ООООО ДАААААААААА ****");
+        victim->pecho(_("**** ООООО ДАААААААААА ****"));
     }
 
     for ( iLevel = victim->getRealLevel( ) ; iLevel < level; iLevel++ )
@@ -2590,7 +2591,7 @@ CMDWIZP( rename )
             PCharacterManager::ext ).remove( );
 
     ch->pecho("Character renamed.");
-    oldact_p("$c1 переименова$gло|л|ла тебя в $C4!",ch,0,victim,TO_VICT,POS_DEAD);
+    oldact_p(_("$c1 переименова$gло|л|ла тебя в $C4!"),ch,0,victim,TO_VICT,POS_DEAD);
 }
 
 CMDWIZP( noaffect )

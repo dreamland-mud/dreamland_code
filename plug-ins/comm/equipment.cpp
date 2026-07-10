@@ -3,6 +3,7 @@
 #include "core/object.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool fShowEmpty );
 
@@ -16,10 +17,10 @@ CMDRUNP( equipment )
     
     naked = show_char_equip( ch, ch, buf, true );
 
-    ch->pecho( "Ты используешь:" );
+    ch->pecho( _("Ты используешь:") );
     ch->send_to( buf );
 
     if (naked)
-        ch->pecho( "На тебе совсем ничего нет -- не мешало бы одеться!" );
+        ch->pecho( _("На тебе совсем ничего нет -- не мешало бы одеться!") );
 }
 

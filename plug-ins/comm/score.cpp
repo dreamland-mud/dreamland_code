@@ -23,6 +23,7 @@
 #include "dreamland.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 RELIG(none);
 PROF(samurai);
@@ -44,8 +45,8 @@ static DLString show_money( int g, int s )
 
 static DLString show_experience( PCharacter *ch )
 {
-    return fmt( NULL, "У тебя %1$d очк%1$Iо|а|ов опыта. "
-               "До следующего уровня осталось %2$d очк%2$Iо|а|ов из %3$d.",
+    return fmt( NULL, _("У тебя %1$d очк%1$Iо|а|ов опыта. "
+               "До следующего уровня осталось %2$d очк%2$Iо|а|ов из %3$d."),
                ch->exp.getValue( ),
                ch->getExpToLevel( ),
                ch->getExpPerLevel( ch->getLevel( ) + 1 ) - ch->getExpPerLevel( ) );
@@ -63,7 +64,7 @@ CMDRUNP( worth )
 
     auto killed = ch->getPC()->getAttributes().getAttr<XMLKillingAttribute>("killed");
 
-    ch->pecho("Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей.",
+    ch->pecho(_("Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей."),
             ch, 
             killed->align[N_ALIGN_GOOD], "добрых",
             killed->align[N_ALIGN_NEUTRAL], "нейтральных",
@@ -115,13 +116,13 @@ static void score_prose( Character *ch )
     Room *room = 0;
     PCharacter *pch = ch->getPC( );
 
-    buf << fmt( 0, "Ты {W%1$s%2$s{x, уровень {C%3$d{w",
+    buf << fmt( 0, _("Ты {W%1$s%2$s{x, уровень {C%3$d{w"),
                    ch->seeName( ch, '1' ).c_str( ),
                    ch->is_npc( ) ? "" : Player::title(ch->getPC( ), Player::displayLang(ch)).c_str( ),
                    ch->getRealLevel( ));
     
     if (!ch->is_npc( ))
-        buf << fmt( 0, ", тебе %1$d %1$Iгод|года|лет (%2$d ча%2$Iс|са|сов).",
+        buf << fmt( 0, _(", тебе %1$d %1$Iгод|года|лет (%2$d ча%2$Iс|са|сов)."),
                         pch->age.getYears( ), pch->age.getHours( ) ); 
     
     buf << endl;
@@ -140,26 +141,26 @@ static void score_prose( Character *ch )
         room = get_room_instance( ROOM_VNUM_TEMPLE );
     
     buf << "  {wДом:{W " << (room ? room->areaName().c_str() : "Потерян" ) << "{x" << endl
-        << fmt(0, "У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r",
+        << fmt(0, _("У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r"),
                     ch->hit.getValue( ), ch->max_hit.getValue( ), 
                     ch->mana.getValue( ), ch->max_mana.getValue( ), 
                     ch->move.getValue( ), ch->max_move.getValue( ));
     
     if (!ch->is_npc( )) 
-        buf << fmt( 0, "У тебя {Y%1$d{x практи%1$Iка|ки|к и {Y%2$d{x тренировочн%2$Iая|ые|ых сесси%2$Iя|и|й.",
+        buf << fmt( 0, _("У тебя {Y%1$d{x практи%1$Iка|ки|к и {Y%2$d{x тренировочн%2$Iая|ые|ых сесси%2$Iя|и|й."),
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
-    buf << fmt(0, "Ты несешь {W%d/%d{x вещей с весом {W%d/%d{x фунтов.\n\r",
+    buf << fmt(0, _("Ты несешь {W%d/%d{x вещей с весом {W%d/%d{x фунтов.\n\r"),
                 ch->carry_number, Char::canCarryNumber(ch),
                 Char::getCarryWeight(ch)/10, Char::canCarryWeight(ch)/10 );
 
     if (ch->is_npc( )) {
         buf << fmt(0, 
-            "Твои параметры: исходные, (текущие)\n\r"
+            _("Твои параметры: исходные, (текущие)\n\r"
             "      Сила : %d(%d)    Интеллект : %d(%d)\n\r"
             "  Мудрость : %d(%d)     Ловкость : %d(%d)\n\r"
-            "  Сложение : %d(%d)      Обаяние : %d(%d)\n\r",
+            "  Сложение : %d(%d)      Обаяние : %d(%d)\n\r"),
             ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR),
             ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT),
             ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS),
@@ -169,10 +170,10 @@ static void score_prose( Character *ch )
 
     } else {
         buf << fmt(0, 
-            "Твои параметры: исходные, {c({Wтекущие{c){x, [{Cмаксимальные{x]\n\r"
+            _("Твои параметры: исходные, {c({Wтекущие{c){x, [{Cмаксимальные{x]\n\r"
             "      Сила: %d{c({W%d{c){x [{C%d{x]   Интеллект: %d{c({W%d{c){x [{C%d{x]\n\r"
             "  Мудрость: %d{c({W%d{c){x [{C%d{x]    Ловкость: %d{c({W%d{c){x [{C%d{x]\n\r"
-            "  Сложение: %d{c({W%d{c){x [{C%d{x]     Обаяние: %d{c({W%d{c){x [{C%d{x]\n\r",
+            "  Сложение: %d{c({W%d{c){x [{C%d{x]     Обаяние: %d{c({W%d{c){x [{C%d{x]\n\r"),
             ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR), pch->getMaxStat(STAT_STR),
             ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT), pch->getMaxStat(STAT_INT),
             ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS), pch->getMaxStat(STAT_WIS),
@@ -182,13 +183,13 @@ static void score_prose( Character *ch )
 
     }
 
-    buf << fmt(0, "У тебя {W%d{x очков опыта, и %s\n\r",
+    buf << fmt(0, _("У тебя {W%d{x очков опыта, и %s\n\r"),
                   ch->exp.getValue( ),
                   show_money( ch->gold, ch->silver ).c_str( ) );
 
     /* KIO shows exp to level */
     if (!ch->is_npc() && ch->getRealLevel( ) < LEVEL_HERO - 1)
-        buf << fmt(0, "Тебе нужно набрать {W%d{x очков опыта до следующего уровня.\n\r",
+        buf << fmt(0, _("Тебе нужно набрать {W%d{x очков опыта до следующего уровня.\n\r"),
                     ch->getPC()->getExpToLevel( ) );
 
     if (!ch->is_npc( )) {
@@ -196,12 +197,12 @@ static void score_prose( Character *ch )
         int qtime = qd ? qd->getTime( ) : 0;
         bool hasQuest = pch->getAttributes( ).isAvailable( "quest" );
         
-        buf << fmt( 0, "У тебя {Y%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
+        buf << fmt( 0, _("У тебя {Y%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. "),
                        pch->getQuestPoints() );
         if (qtime == 0)
             buf << "У тебя сейчас нет задания.";
         else
-            buf << fmt( 0, "До %1$s квеста осталось {Y%2$d{x ти%2$Iк|ка|ков.",
+            buf << fmt( 0, _("До %1$s квеста осталось {Y%2$d{x ти%2$Iк|ка|ков."),
                        hasQuest ? "конца" : "следующего",
                        qtime );
 
@@ -211,24 +212,24 @@ static void score_prose( Character *ch )
 
         if (ch->getProfession( ) != prof_samurai) {
             if (ch->wimpy > 0) {
-                buf << fmt(0, "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
+                buf << fmt(0, _("Ты попытаешься убежать при %d жизни.  "), ch->wimpy.getValue( ) );
                 newline = true;
             }
         } else {
             if (ch->getPC()->death > 0)
-                buf << fmt(0, "Тебя убили уже {r%1$d{x ра%1$Iз|за|з.", ch->getPC()->death.getValue());
+                buf << fmt(0, _("Тебя убили уже {r%1$d{x ра%1$Iз|за|з."), ch->getPC()->death.getValue());
             else
                 buf << "Тебя еще ни разу не убивали.";
             newline = true;
         }
         
         if (ch->getPC()->guarding != 0) {
-            buf << fmt(0, "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
+            buf << fmt(0, _("Ты охраняешь: %s. "), ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
             newline = true;
         }
 
         if (ch->getPC()->guarded_by != 0) {
-            buf << fmt(0, "Ты охраняешься: %s.", ch->seeName( ch->getPC()->guarded_by, '5' ).c_str( ) );
+            buf << fmt(0, _("Ты охраняешься: %s."), ch->seeName( ch->getPC()->guarded_by, '5' ).c_str( ) );
             newline = true;
         }
         
@@ -261,15 +262,15 @@ static void score_prose( Character *ch )
     buf << endl;
 
     /* print AC values */
-    buf << fmt(0, "Защита от укола {W%d{x, от удара {W%d{x, от разрезания {W%d{x, от экзотики {W%d{x.\n\r",
+    buf << fmt(0, _("Защита от укола {W%d{x, от удара {W%d{x, от разрезания {W%d{x, от экзотики {W%d{x.\n\r"),
             GET_AC(ch,AC_PIERCE),
             GET_AC(ch,AC_BASH),
             GET_AC(ch,AC_SLASH),
             GET_AC(ch,AC_EXOTIC));
-    buf << fmt(0, "Точность: {C%d{x  Урон: {C%d{x  Защита от заклинаний: {C%d{x\n\r",
+    buf << fmt(0, _("Точность: {C%d{x  Урон: {C%d{x  Защита от заклинаний: {C%d{x\n\r"),
                 ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
 
-    buf << fmt(0, "У тебя %s натура.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
+    buf << fmt(0, _("У тебя %s натура.  "), align_name( ch ).ruscase( '1' ).c_str( ) );
     
     switch (ch->ethos.getValue( )) {
     case ETHOS_LAWFUL:
@@ -291,15 +292,15 @@ static void score_prose( Character *ch )
     
     if (!ch->is_npc( )) {
         if (ch->getReligion( ) == god_none)
-            buf << fmt(0, "Ты не определил%Gось|ся|ась с выбором религии.  ", ch);
+            buf << fmt(0, _("Ты не определил%Gось|ся|ась с выбором религии.  "), ch);
         else
-            buf << fmt(0, "Твоя религия: {C%s{x.  ", ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
+            buf << fmt(0, _("Твоя религия: {C%s{x.  "), ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
         
-        buf << fmt(0, "Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->getLoyalty());
+        buf << fmt(0, _("Твои заслуги перед законом:  %d.\n\r"), ch->getPC( )->getLoyalty());
 
         auto killed = ch->getPC()->getAttributes().getAttr<XMLKillingAttribute>("killed");
 
-       buf << fmt(0, "Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей.\n\r",
+       buf << fmt(0, _("Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей.\n\r"),
                         ch, 
                         killed->align[N_ALIGN_GOOD], "добрых",
                         killed->align[N_ALIGN_NEUTRAL], "нейтральных",
@@ -308,7 +309,7 @@ static void score_prose( Character *ch )
     
     /* RT wizinvis and holy light */
     if (ch->is_immortal( )) 
-        buf << fmt(0, "Божественный взор %s. Невидимость %d уровня, инкогнито %d уровня.",
+        buf << fmt(0, _("Божественный взор %s. Невидимость %d уровня, инкогнито %d уровня."),
                    (IS_SET(ch->act, PLR_HOLYLIGHT) ? "включен" : "выключен"),
                    ch->getPC( )->invis_level.getValue( ),
                    ch->getPC( )->incog_level.getValue( ) )
@@ -324,7 +325,7 @@ static void score_prose( Character *ch )
     }
 
     if (IS_GHOST(ch)) {
-        buf << fmt(0, "{xТы призрак и обретёшь плоть через {Y%1$d {xсекун%1$Iду|ды|д.",
+        buf << fmt(0, _("{xТы призрак и обретёшь плоть через {Y%1$d {xсекун%1$Iду|ды|д."),
                  pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()))
         << endl;
     }
@@ -358,32 +359,32 @@ static void do_score_args(Character *ch, const DLString &arg)
         stat = STAT_INT;
 
     if (stat >=0) {
-        ch->pecho("%^N1 %d (%d), максимум %d.", 
+        ch->pecho(_("%^N1 %d (%d), максимум %d."), 
             stat_table.fields[stat].message, ch->perm_stat[stat], 
             ch->getCurrStat(stat), pch->getMaxStat(stat));
         return;
     }
    
     if (arg_is(arg, "hp")) {
-        ch->pecho("Здоровье %d из %d.", ch->hit, ch->max_hit);
+        ch->pecho(_("Здоровье %d из %d."), ch->hit, ch->max_hit);
         return;
     } 
     if (arg_is(arg, "mana")) {
-        ch->pecho("Мана %d из %d.", ch->mana, ch->max_mana);
+        ch->pecho(_("Мана %d из %d."), ch->mana, ch->max_mana);
         return;
     } 
     if (arg_is(arg, "moves")) {
-        ch->pecho("Шагов %d из %d.", ch->move, ch->max_move);
+        ch->pecho(_("Шагов %d из %d."), ch->move, ch->max_move);
         return;
     } 
     if (arg_is(arg, "level")) {
-        ch->pecho("Уровень %d.", ch->getRealLevel());
+        ch->pecho(_("Уровень %d."), ch->getRealLevel());
         return;
     } 
     if (arg_is(arg, "race")) {
         if (ch->getRace()->isPC()) {
             PCRace::Pointer pcRace = ch->getRace()->getPC(); 
-            ch->pecho("Ты %N1.", GET_SEX(ch,
+            ch->pecho(_("Ты %N1."), GET_SEX(ch,
                             pcRace->getMaleName().c_str(),
                             pcRace->getMaleName().c_str(),
                             pcRace->getFemaleName().c_str()));
@@ -391,51 +392,51 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
     if (arg_is(arg, "sex")) {   
-        ch->pecho("Пол %s.", ch->getSex( ) == 0 ? "потерян" : sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) ).c_str( ));
+        ch->pecho(_("Пол %s."), ch->getSex( ) == 0 ? "потерян" : sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) ).c_str( ));
         return;
     }
     if (arg_is(arg, "class")) {
-        ch->pecho("Ты %N1.", ch->getProfession()->getRusName().c_str());
+        ch->pecho(_("Ты %N1."), ch->getProfession()->getRusName().c_str());
         return;
     } 
     if (arg_is(arg, "align")) {
-        ch->pecho("У тебя %s натура.", align_name_short(ch, Grammar::MultiGender::FEMININE));
+        ch->pecho(_("У тебя %s натура."), align_name_short(ch, Grammar::MultiGender::FEMININE));
         return;
     } 
     if (arg_is(arg, "ethos")) {
-        ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos, '1', Player::displayLang(ch)).c_str());
+        ch->pecho(_("У тебя %s этос."), ethos_table.message(ch->ethos, '1', Player::displayLang(ch)).c_str());
         return;
     } 
     if (arg_is(arg, "hometown")) {
         Room *room = get_room_instance(pch->getHometown()->getAltar());
-        ch->pecho("Твой дом - %s.", room ? room->areaName().c_str() : "потерян");
+        ch->pecho(_("Твой дом - %s."), room ? room->areaName().c_str() : "потерян");
         return;
     } 
     if (arg_is(arg, "religion")) {
         if (ch->getReligion() == god_none)
-            ch->pecho("Ты не определил%Gось|ся|ась с выбором религии.", ch);
+            ch->pecho(_("Ты не определил%Gось|ся|ась с выбором религии."), ch);
         else
-            ch->pecho("Религия %s.", ch->getReligion()->getRussianName().ruscase('1').c_str());
+            ch->pecho(_("Религия %s."), ch->getReligion()->getRussianName().ruscase('1').c_str());
         return;
     } 
     if (arg_is(arg, "practice")) {
-        ch->pecho("Практик %d.", pch->practice);
+        ch->pecho(_("Практик %d."), pch->practice);
         return;
     } 
     if (arg_is(arg, "train")) {
-        ch->pecho("Тренировки %d.", pch->train);
+        ch->pecho(_("Тренировки %d."), pch->train);
         return;
     } 
     if (!str_prefix("quest", arg.c_str()) || !str_prefix("квест", arg.c_str())) {
-        ch->pecho("Используй команды {y{hcквест время{x и {y{hcквест очки{x.");
+        ch->pecho(_("Используй команды {y{hcквест время{x и {y{hcквест очки{x."));
         return;
     } 
     if (arg_is(arg, "wimpy")) {
-        ch->pecho("Трусость %d.", ch->wimpy);
+        ch->pecho(_("Трусость %d."), ch->wimpy);
         return;
     } 
     if (arg_is(arg, "death")) {
-        ch->pecho("Смертей %d.", pch->death);
+        ch->pecho(_("Смертей %d."), pch->death);
         return;
     } 
     if (arg_is(arg, "position")) {
@@ -443,50 +444,50 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     }
     if (arg_is(arg, "gold")) {
-        ch->pecho("Золота %d.", ch->gold);
+        ch->pecho(_("Золота %d."), ch->gold);
         return;
     } 
     if (arg_is(arg, "silver")) {
-        ch->pecho("Серебра %d.", ch->silver);
+        ch->pecho(_("Серебра %d."), ch->silver);
         return;
     } 
     if (arg_is(arg, "weight")) {
-        ch->pecho("Вес %d из %d.", Char::getCarryWeight(ch)/10, Char::canCarryWeight(ch)/10);
+        ch->pecho(_("Вес %d из %d."), Char::getCarryWeight(ch)/10, Char::canCarryWeight(ch)/10);
         return;
     } 
     if (arg_is(arg, "items")) {
-        ch->pecho("Вещи %d из %d.", ch->carry_number, Char::canCarryNumber(ch));
+        ch->pecho(_("Вещи %d из %d."), ch->carry_number, Char::canCarryNumber(ch));
         return;
     } 
     if (arg_is(arg, "exp")) {
-        ch->pecho("Опыта до уровня %d.", pch->getExpToLevel());
+        ch->pecho(_("Опыта до уровня %d."), pch->getExpToLevel());
         return;
     }
     if (arg_is(arg, "age")) {
-        ch->pecho("Возраст %d.", pch->age.getYears());
+        ch->pecho(_("Возраст %d."), pch->age.getYears());
         return;
     }
 
     if (arg_is(arg, "hr")) {
-        ch->pecho("Точность %d.", ch->hitroll);
+        ch->pecho(_("Точность %d."), ch->hitroll);
         return;
     } 
     if (arg_is(arg, "dr")) {
-        ch->pecho("Урон %d.", ch->damroll);
+        ch->pecho(_("Урон %d."), ch->damroll);
         return;
     } 
     if (arg_is(arg, "ac")) {
-        ch->pecho("Защита от уколов %d, ударов %d, разрезов %d, экзотики %d.", 
+        ch->pecho(_("Защита от уколов %d, ударов %d, разрезов %d, экзотики %d."), 
                     GET_AC(ch, AC_PIERCE), GET_AC(ch, AC_BASH),
                     GET_AC(ch, AC_SLASH), GET_AC(ch, AC_EXOTIC));
         return;
     }
     if (arg_is(arg, "saves")) {
-        ch->pecho("Защита от заклинаний %d.", ch->saving_throw);
+        ch->pecho(_("Защита от заклинаний %d."), ch->saving_throw);
         return;
     }
    
-    ch->pecho("Такого параметра не существует или он скрыт от тебя, попробуй что-то еще."); 
+    ch->pecho(_("Такого параметра не существует или он скрыт от тебя, попробуй что-то еще.")); 
 }
 
 
@@ -534,13 +535,13 @@ static void score_ascii( Character *ch )
                 
         
     ch->pecho(
-"     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r" 
+_("     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r" 
 "     | %sУровень:{x  %3d        %s|%s Сила:{x %2d{c({x%2d{c){x {C%2d{x %s| %sРелигия:{x %-14.14s%s|\n\r"
 "     | %sРаса :{x  %-12s %s| %sУм  :{x %2d{c({x%2d{c){x {C%2d{x %s| %sПрактик   :{x   %3d      %s|\n\r"
 "     | %sПол  :{x  %-11s  %s| %sМудр:{x %2d{c({x%2d{c){x {C%2d{x %s| %sТренировок:{x   %3d      %s|\n\r"
 "     | %sКласс:{x  %-13s%s| %sЛовк:{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. единиц:{x  %-6d%s |\n\r"
 "     | %sНатура:{x %-11s  %s| %sСлож:{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
-"     | %sЭтос :{x  %-12s %s| %sОбая:{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|",
+"     | %sЭтос :{x  %-12s %s| %sОбая:{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|"),
 
             CLR_FRAME, CLR_BAR, CLR_FRAME,
 
@@ -608,7 +609,7 @@ static void score_ascii( Character *ch )
             CLR_FRAME);
 
         ch->pecho(
-            fmt ( 0, "     %s| %sДом  :{x  %-30.30s %s| {Y%-22s %s|",
+            fmt ( 0, _("     %s| %sДом  :{x  %-30.30s %s| {Y%-22s %s|"),
                 CLR_FRAME,
                 CLR_CAPT,
                 room ? room->areaName().c_str() : "Потерян",
@@ -624,7 +625,7 @@ static void score_ascii( Character *ch )
     if (pch->guarding != 0) {
         ekle = 1;
         ch->pecho( 
-"     %s| {wТы охраняешь    :{Y %-10s                                    %s|",
+_("     %s| {wТы охраняешь    :{Y %-10s                                    %s|"),
             CLR_FRAME,
             ch->seeName( pch->guarding, '4' ).c_str(),
             CLR_FRAME);
@@ -633,7 +634,7 @@ static void score_ascii( Character *ch )
     if (pch->guarded_by != 0) {
         ekle = 1;
         ch->pecho( 
-"     %s| {wТебя охраняет     :{Y %-10s                                  %s|",
+_("     %s| {wТебя охраняет     :{Y %-10s                                  %s|"),
         CLR_FRAME,
         ch->seeName( pch->guarded_by, '1' ).c_str(),
         CLR_FRAME);
@@ -660,7 +661,7 @@ static void score_ascii( Character *ch )
     if (ch->is_adrenalined()) {
         ekle = 1;
         ch->pecho( 
-"     %s| {yАдреналин кипит в твоих венах!                                  %s|",
+_("     %s| {yАдреналин кипит в твоих венах!                                  %s|"),
                  CLR_FRAME,
                  CLR_FRAME );
     }
@@ -668,7 +669,7 @@ static void score_ascii( Character *ch )
     if (IS_GHOST(ch)) {
         ekle = 1;
         ch->pecho( 
-"     %1$s| {xТы призрак и обретёшь плоть через {Y%2$3d {xсекунд%2$-1Iу|ы|.                  %1$s|",
+_("     %1$s| {xТы призрак и обретёшь плоть через {Y%2$3d {xсекунд%2$-1Iу|ы|.                  %1$s|"),
                  CLR_FRAME,
                  pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()),
                  CLR_FRAME );
@@ -677,8 +678,8 @@ static void score_ascii( Character *ch )
     if (ch->is_immortal()) {
         ekle = 1;
         ch->pecho( 
-"     %s| {wНевидимость: уровня %3d   "
-         "Инкогнито: уровня %3d                 %s|",
+_("     %s| {wНевидимость: уровня %3d   "
+         "Инкогнито: уровня %3d                 %s|"),
               CLR_FRAME,
               pch->invis_level.getValue( ),
               pch->incog_level.getValue( ),
@@ -706,11 +707,11 @@ static void score_ascii( Character *ch )
 
 
     ch->pecho( 
-"     %s| %sВещи          :{x     %3d/%-4d        %sЗащита от уколов:{x   %-5d   %s|\n\r"
+_("     %s| %sВещи          :{x     %3d/%-4d        %sЗащита от уколов:{x   %-5d   %s|\n\r"
 "     | %sВес           :{x  %6d/%-8d    %sЗащита от ударов:{x   %-5d   %s|\n\r"
 "     | %sЗолото        :{Y %-10d          %sЗащита от разрезов:{x %-5d   %s|\n\r"
 "     | %sСеребро       :{W %-10d          %sЗащита от экзотики:{x %-5d   %s|\n\r"
-"     | %sЕдиниц опыта  :{x %-6d              %sЗащита от заклинаний:{x %4d  %s|",
+"     | %sЕдиниц опыта  :{x %-6d              %sЗащита от заклинаний:{x %4d  %s|"),
         CLR_FRAME,
         CLR_CAPT,
         ch->carry_number, Char::canCarryNumber(ch),
@@ -743,8 +744,8 @@ static void score_ascii( Character *ch )
         CLR_FRAME);
 
     ch->pecho( 
-"     %s| %sОпыта до уровня:{x %-6d                                         %s|\n\r"
-"     |                                    %sЖизни:{x %5d / %5d         %s|",
+_("     %s| %sОпыта до уровня:{x %-6d                                         %s|\n\r"
+"     |                                    %sЖизни:{x %5d / %5d         %s|"),
         CLR_FRAME,
         CLR_CAPT,
         pch->getExpToLevel( ),
@@ -755,8 +756,8 @@ static void score_ascii( Character *ch )
         CLR_FRAME);
 
     ch->pecho( 
-"     %s| %sТочность      :{x   %-3d            %sЭнергии:{x %5d / %5d         %s|\n\r"
-"     | %sУрон          :{x   %-3d           %sДвижения:{x %5d / %5d         %s|",
+_("     %s| %sТочность      :{x   %-3d            %sЭнергии:{x %5d / %5d         %s|\n\r"
+"     | %sУрон          :{x   %-3d           %sДвижения:{x %5d / %5d         %s|"),
         CLR_FRAME,
         CLR_CAPT,
         ch->hitroll.getValue( ),

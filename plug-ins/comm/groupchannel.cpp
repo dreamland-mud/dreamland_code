@@ -14,6 +14,7 @@
 #include "act.h"
 
 #include "def.h"
+#include "l10n.h"
 
 /*-------------------------------------------------------------------------
  * GroupChannel
@@ -64,12 +65,12 @@ void GroupChannel::triggers(Character *ch, const DLString &msg) const
         NPCharacter *pet = ch->getPC()->pet;
 
         if (!pet) {
-            ch->pecho("На твой вопрос отвечать некому, у тебя нет {hh15питомца{x.");
+            ch->pecho(_("На твой вопрос отвечать некому, у тебя нет {hh15питомца{x."));
             return;
         }
 
         if (IS_SET(ch->in_room->areaIndex()->area_flag, AREA_DUNGEON)) {
-            ch->pecho("Здесь никто не откликнется на твой вопрос.");
+            ch->pecho(_("Здесь никто не откликнется на твой вопрос."));
             return;
         }
 
@@ -86,7 +87,7 @@ void GroupChannel::triggers(Character *ch, const DLString &msg) const
                          pet->in_room->areaName().c_str(), pet->in_room->getName());
             } 
         } else {
-            ch->pecho("Твой питомец не в состоянии ответить на твой вопрос."); // dumb wording, for debugging
+            ch->pecho(_("Твой питомец не в состоянии ответить на твой вопрос.")); // dumb wording, for debugging
         }
     }
 }
@@ -97,7 +98,7 @@ bool GroupChannel::canTalkGlobally( Character *ch ) const
         return false;
 
     if (IS_SET( ch->comm, COMM_NOTELL )) {
-        ch->pecho( "Твое сообщение не получено!" );
+        ch->pecho( _("Твое сообщение не получено!") );
         return false;
     }
 

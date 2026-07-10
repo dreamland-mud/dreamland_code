@@ -8,6 +8,7 @@
 #include "room.h"
 #include "messengers.h"
 #include "act.h"
+#include "l10n.h"
 
 CMDRUNP( nohelp )
 {
@@ -17,12 +18,12 @@ CMDRUNP( nohelp )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->pecho("Об отсутствии какого раздела справки ты хочешь сообщить?");
+        ch->pecho(_("Об отсутствии какого раздела справки ты хочешь сообщить?"));
         return;
     }
 
     bugTracker->reportMessage(getName(), ch->getPC(), txt);
-    ch->pecho("Записано.");
+    ch->pecho(_("Записано."));
 }
 
 CMDRUNP( bug )
@@ -33,12 +34,12 @@ CMDRUNP( bug )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->pecho("О какой именно ошибке ты хочешь сообщить?");
+        ch->pecho(_("О какой именно ошибке ты хочешь сообщить?"));
         return;
     }
 
     bugTracker->reportMessage(getName(), ch->getPC(), txt);
-    ch->pecho( "Ошибка записана.");
+    ch->pecho( _("Ошибка записана."));
 }
 
 CMDRUNP( typo )
@@ -49,12 +50,12 @@ CMDRUNP( typo )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->pecho("О какой именно опечатке ты хочешь сообщить?");
+        ch->pecho(_("О какой именно опечатке ты хочешь сообщить?"));
         return;
     }
 
     bugTracker->reportMessage(getName(), ch->getPC(), txt);
-    ch->pecho( "Опечатка записана.");
+    ch->pecho( _("Опечатка записана."));
 }
 
 CMDRUNP( idea )
@@ -68,29 +69,29 @@ CMDRUNP( idea )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->pecho("Какой именно идейкой ты хочешь поделиться?");
+        ch->pecho(_("Какой именно идейкой ты хочешь поделиться?"));
         return;
     }
 
     if (txt.size( ) < IDEA_MIN_LENGTH) {
-        ch->pecho("Идейка слишком коротка -- опиши ее подробнее (хотя бы %d символов).",
+        ch->pecho(_("Идейка слишком коротка -- опиши ее подробнее (хотя бы %d символов)."),
                   (int)IDEA_MIN_LENGTH);
         return;
     }
 
-    txt = fmt(0, "от %1$C2]: %2$s", ch, txt.c_str());
+    txt = fmt(0, _("от %1$C2]: %2$s"), ch, txt.c_str());
     // Let's experiment and see if this will be abused -- can always mute abusers
     send_to_discord_stream(":bulb: [**Идейка** " + txt);
     send_telegram("[Идейка " + txt);
 
     bugTracker->reportMessage("idea", ch->getPC(), txt);
-    ch->pecho( "Идейка записана.");
+    ch->pecho( _("Идейка записана."));
 
     // Players not linked to Telegram won't see any reply from the devs, so
     // point them at the public chat where ideas get discussed.
     if (get_string_attribute(ch->getPC(), "telegram").empty())
-        ch->pecho("Ты не привязан к Telegram -- ответ на идейку ищи в нашем чате: "
-                  "{y{hlhttps://t.me/dreamland_rocks{x");
+        ch->pecho(_("Ты не привязан к Telegram -- ответ на идейку ищи в нашем чате: "
+                  "{y{hlhttps://t.me/dreamland_rocks{x"));
 }
 
 /** 

@@ -28,6 +28,7 @@
 #include "comm.h"
 
 #include "def.h"
+#include "l10n.h"
 
 const unsigned int MAX_ALIASES = 1000;
 
@@ -73,7 +74,7 @@ CMDRUN(alias)
         ostringstream buf;
         
         if (aliases->empty( )) {
-            pch->pecho("Не определен ни один синоним.");
+            pch->pecho(_("Не определен ни один синоним."));
             return;
         }
 
@@ -88,7 +89,7 @@ CMDRUN(alias)
     
     if (arg_is_strict(arg, "flush")) {
         aliases->clear( );
-        pch->pecho("Все синонимы удалены.");
+        pch->pecho(_("Все синонимы удалены."));
         return;
     }
     
@@ -96,9 +97,9 @@ CMDRUN(alias)
         i = aliases->find( arg );
         
         if (i != aliases->end( ))
-            pch->pecho( "%s означает '%s{x'.", arg.c_str( ), i->second.getValue( ).c_str( ) );
+            pch->pecho( _("%s означает '%s{x'."), arg.c_str( ), i->second.getValue( ).c_str( ) );
         else
-            pch->pecho("Этот синоним не задан.");
+            pch->pecho(_("Этот синоним не задан."));
 
         return;
     }
@@ -108,20 +109,20 @@ CMDRUN(alias)
     if (i != aliases->end( )) // redefine an alias
     {
         i->second.setValue( argument );
-        pch->pecho( "%s меняет свое значение на '%s{x'.", arg.c_str( ), argument.c_str( ) );
+        pch->pecho( _("%s меняет свое значение на '%s{x'."), arg.c_str( ), argument.c_str( ) );
         return;
     }
 
     if (aliases->size( ) >= MAX_ALIASES)
     {
-        pch->pecho( "Лимит синонимов (%d) уже превышен.", MAX_ALIASES );
+        pch->pecho( _("Лимит синонимов (%d) уже превышен."), MAX_ALIASES );
         return;
     }
 
     // make a new alias
     (**aliases) [arg] = argument;
 
-    pch->pecho( "%s теперь будет означать '%s{x'.", arg.c_str( ), argument.c_str( ) );
+    pch->pecho( _("%s теперь будет означать '%s{x'."), arg.c_str( ), argument.c_str( ) );
 }
 
 
@@ -145,7 +146,7 @@ CMDRUN(unalias)
     aliases = pch->getAttributes( ).getAttr<XMLAttributeAliases>( "aliases" );
     
     if (arg.empty( )) {
-        pch->pecho("Какой синоним удалить?");
+        pch->pecho(_("Какой синоним удалить?"));
         return;
     }
     
@@ -153,12 +154,12 @@ CMDRUN(unalias)
     
     if (i != aliases->end( ))
     {
-        pch->pecho("Синоним удален.");
+        pch->pecho(_("Синоним удален."));
         aliases->erase( i );
     }
     else
     {
-        pch->pecho("Синоним с таким именем не задан.");
+        pch->pecho(_("Синоним с таким именем не задан."));
     }
 }
 
@@ -208,7 +209,7 @@ public:
         iargs.line = get_multi_command( d, buffer );
 
         if (iargs.line.size( ) >  MAX_INPUT_LENGTH) {
-            iargs.ch->pecho("Подстановка синонимов слишком удлинила строку, строка будет обрезана.");
+            iargs.ch->pecho(_("Подстановка синонимов слишком удлинила строку, строка будет обрезана."));
             iargs.line.erase( MAX_INPUT_LENGTH - 1, iargs.line.size( ) );
         }
 

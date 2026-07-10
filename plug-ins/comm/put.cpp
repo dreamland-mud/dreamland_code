@@ -15,6 +15,7 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 DLString get_pocket_argument( char *arg );
 
@@ -43,16 +44,16 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
     switch (container->item_type) {
     case ITEM_CONTAINER:
         if (IS_SET(container->value1(), CONT_LOCKED)) {
-            ch->pecho("%1$^O1 заперт%1$Gо||а|ы на ключ, попробуй отпереть.", container);
+            ch->pecho(_("%1$^O1 заперт%1$Gо||а|ы на ключ, попробуй отпереть."), container);
             return false;
         }
         if (IS_SET(container->value1(), CONT_CLOSED)) {
-            ch->pecho("%1$^O1 закрыт%1$Gо||а|ы, попробуй открыть.", container);
+            ch->pecho(_("%1$^O1 закрыт%1$Gо||а|ы, попробуй открыть."), container);
             return false;
         }
 
         if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
-            ch->pecho( "Тебе не удалось нашарить ни одного кармана на %O6.", container );
+            ch->pecho( _("Тебе не удалось нашарить ни одного кармана на %O6."), container );
             return false;
         }
 
@@ -62,7 +63,7 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
         return true;
 
     default:
-        ch->pecho("%^O1 не контейнер, туда ничего нельзя положить.", container);
+        ch->pecho(_("%^O1 не контейнер, туда ничего нельзя положить."), container);
         return false;
     }
 }
@@ -70,17 +71,17 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
 static bool can_put_money_into( Character *ch, Object *container )
 {
     if (container->item_type != ITEM_CONTAINER) {
-        ch->pecho("Ты пытаешься положить деньги в %O4, но это не контейнер.", container);
+        ch->pecho(_("Ты пытаешься положить деньги в %O4, но это не контейнер."), container);
         return false;
     }
 
     if (IS_SET(container->wear_flags, ITEM_TAKE) || !container->in_room) {
-        ch->pecho("Ты можешь положить деньги только в стационарные контейнеры: ямы для пожертвований, алтари.");
+        ch->pecho(_("Ты можешь положить деньги только в стационарные контейнеры: ямы для пожертвований, алтари."));
         return false;
     }
 
     if (IS_SET(container->value1(), CONT_CLOSED)) {
-        ch->pecho("%1$^O1 закрыт%1$Gо||а|ы.", container);
+        ch->pecho(_("%1$^O1 закрыт%1$Gо||а|ы."), container);
         return false;
     }
 
@@ -93,7 +94,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
 
     if (obj == container) {
         if (verbose)
-            ch->pecho("Ты не можешь положить что-то в себя же.");
+            ch->pecho(_("Ты не можешь положить что-то в себя же."));
         return PUT_OBJ_ERR;
     }
     
@@ -101,7 +102,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         return PUT_OBJ_ERR;
 
     if (!Item::canDrop( ch, obj )) {
-        oldact("Ты не можешь избавиться от $o2.", ch, obj, 0, TO_CHAR );
+        oldact(_("Ты не можешь избавиться от $o2."), ch, obj, 0, TO_CHAR );
         return PUT_OBJ_ERR;
     }
     
@@ -109,13 +110,13 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
 
     if (container->item_type == ITEM_KEYRING) {
         if (pcount >= container->value0()) {
-            oldact("На $o6 не осталось свободного места.", ch, container, 0, TO_CHAR );
+            oldact(_("На $o6 не осталось свободного места."), ch, container, 0, TO_CHAR );
             return PUT_OBJ_STOP;
         }
 
         if (obj->item_type != ITEM_KEY && obj->item_type != ITEM_LOCKPICK) {
             if (verbose)
-                oldact("На $o4 ты можешь нанизать только ключи или отмычки.", ch, container, 0, TO_CHAR );
+                oldact(_("На $o4 ты можешь нанизать только ключи или отмычки."), ch, container, 0, TO_CHAR );
             return PUT_OBJ_ERR;
         }
 
@@ -123,18 +124,18 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
     }
 
     if (pcount > container->value0()) {
-        oldact("Опасно запихивать столько вещей в $o4!", ch,container,0, TO_CHAR);
+        oldact(_("Опасно запихивать столько вещей в $o4!"), ch,container,0, TO_CHAR);
         return PUT_OBJ_STOP;
     }
 
     if (obj->getWeightMultiplier() != 100 && !IS_SET(container->value1(), CONT_NESTED)) {
         if (verbose)
-            ch->pecho("Ты не можешь положить %O4 в другой контейнер.", obj);
+            ch->pecho(_("Ты не можешь положить %O4 в другой контейнер."), obj);
         return PUT_OBJ_ERR;
     }
 
     if (obj->pIndexData->limit != -1) {
-        oldact("$o4 нельзя хранить в такой дребедени.", ch,obj,0,TO_CHAR );
+        oldact(_("$o4 нельзя хранить в такой дребедени."), ch,obj,0,TO_CHAR );
         return PUT_OBJ_ERR;
     }
 
@@ -143,7 +144,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
             || obj->value0()  != WEAPON_ARROW ))
     {
         if (verbose)
-            oldact("Ты можешь положить только стрелы в $o4.",ch,container,0,TO_CHAR);
+            oldact(_("Ты можешь положить только стрелы в $o4."),ch,container,0,TO_CHAR);
         return PUT_OBJ_ERR;
     }
 
@@ -151,7 +152,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         ||  obj->getWeight( ) > (container->value3() * 10))
     {
         if (verbose)
-            ch->pecho("%1$^O1 не сможет вместить в себя %2$O4.", container, obj);
+            ch->pecho(_("%1$^O1 не сможет вместить в себя %2$O4."), container, obj);
         return PUT_OBJ_ERR;
     }
 
@@ -159,7 +160,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         pcount = count_obj_in_obj( container, ITEM_POTION );
                 
        if (pcount > 15) {
-            oldact("Небезопасно далее складывать снадобья в $o4.",ch,container,0, TO_CHAR);
+            oldact(_("Небезопасно далее складывать снадобья в $o4."),ch,container,0, TO_CHAR);
             return PUT_OBJ_ERR;
        }
     }
@@ -264,7 +265,7 @@ static void put_money_container(Character *ch, int amount, const char *currencyN
 {
     /* 'put -N ...' and 'put 0 ...' not allowed. */
     if (amount <= 0) {
-        ch->pecho("Сколько-сколько монет?");
+        ch->pecho(_("Сколько-сколько монет?"));
         return;
     }
 
@@ -276,7 +277,7 @@ static void put_money_container(Character *ch, int amount, const char *currencyN
 
     Object *container = get_obj_here(ch, containerName.c_str());
     if (!container) {
-        oldact("Ты не видишь здесь $T.", ch, 0, containerName.c_str(), TO_CHAR);
+        oldact(_("Ты не видишь здесь $T."), ch, 0, containerName.c_str(), TO_CHAR);
         return;
     }
 
@@ -302,8 +303,8 @@ static void put_money_container(Character *ch, int amount, const char *currencyN
     if (!oprog_put_money_msg(container, ch, gold, silver)) {
         DLString moneyArg = Money::describe(gold, silver, 4);
         DLString preposition = IS_SET( container->value1(), CONT_PUT_ON|CONT_PUT_ON2 ) ? "на" : "в";
-        ch->pecho("Ты кладешь %s %s %O4.", moneyArg.c_str(), preposition.c_str(), container);
-        ch->recho("%^C1 кладет %s %O4 несколько монет.", ch, preposition.c_str(), container);
+        ch->pecho(_("Ты кладешь %s %s %O4."), moneyArg.c_str(), preposition.c_str(), container);
+        ch->recho(_("%^C1 кладет %s %O4 несколько монет."), ch, preposition.c_str(), container);
     }
     
     // Add money to the container or merge with existing coins.
@@ -339,21 +340,21 @@ CMDRUNP( put )
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-        ch->pecho("Положить что и куда?");
+        ch->pecho(_("Положить что и куда?"));
         return;
     }
 
     /* no 'put obj all.container' syntax allowed */
     if (arg_is_alldot( arg2 ))
     {
-        ch->pecho("Ты не можешь сделать этого.");
+        ch->pecho(_("Ты не можешь сделать этого."));
         return;
     }
     
     pocket = get_pocket_argument( arg2 );
 
     if ( ( container = get_obj_here( ch, arg2 ) ) == 0 ) {
-        oldact("Ты не видишь здесь $T.", ch, 0, is_number(arg2) ? "этого" : arg2, TO_CHAR);
+        oldact(_("Ты не видишь здесь $T."), ch, 0, is_number(arg2) ? "этого" : arg2, TO_CHAR);
         return;
     }
     
@@ -365,7 +366,7 @@ CMDRUNP( put )
         /* 'put obj container' */
         if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
         {
-            ch->pecho("У тебя нет этого.");
+            ch->pecho(_("У тебя нет этого."));
             return;
         }
         
@@ -404,9 +405,9 @@ CMDRUNP( put )
         
         if (!found) {
             if (container->item_type == ITEM_KEYRING)
-                oldact("Ты не наш$gло|ел|ла ничего, что можно нанизать на $o4.", ch, container, 0, TO_CHAR );
+                oldact(_("Ты не наш$gло|ел|ла ничего, что можно нанизать на $o4."), ch, container, 0, TO_CHAR );
             else
-                oldact("Ты не наш$gло|ел|ла ничего, что можно положить в $o4.", ch, container, 0, TO_CHAR );
+                oldact(_("Ты не наш$gло|ел|ла ничего, что можно положить в $o4."), ch, container, 0, TO_CHAR );
         }
     }
 }

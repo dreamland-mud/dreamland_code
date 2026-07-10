@@ -18,6 +18,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 /*
  * 'commands'
@@ -48,7 +49,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
     lang_t lang = Player::lang(ch);
 
     if (arg.empty( )) {
-        ch->pecho("Использование: {yкоманды показ{D название{x.");
+        ch->pecho(_("Использование: {yкоманды показ{D название{x."));
         return;
     }
 
@@ -103,7 +104,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
     if (found)
         page_to_char( buf.str( ).c_str( ), ch );
     else
-        ch->pecho("Не найдено ни одной команды, начинающейся с '%s'.", arg.c_str( ));
+        ch->pecho(_("Не найдено ни одной команды, начинающейся с '%s'."), arg.c_str( ));
 }
 
 typedef map<DLString, StringList> Categories;
@@ -220,10 +221,10 @@ CMDRUN( commands )
         return;
     }
 
-    ch->pecho("Использование:\n"
+    ch->pecho(_("Использование:\n"
     "{y{hcкоманды{x        - таблица всех команд\n"
     "{y{hcкоманды список{x - список команд с краткой справкой\n"
-    "{yкоманды показ{x слово - показать синонимы и справку по команде.\n");
+    "{yкоманды показ{x слово - показать синонимы и справку по команде.\n"));
 }
 
 /*

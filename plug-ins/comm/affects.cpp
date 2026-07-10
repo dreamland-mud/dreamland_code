@@ -13,6 +13,7 @@
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 RELIG(none);
 
@@ -128,11 +129,11 @@ DLString AffectOutput::format_affect_location( Affect *paf )
         case APPLY_HEAL_GAIN:
         case APPLY_MANA_GAIN:
             if (paf->modifier > 100)
-                buf << fmt( 0, "улучшает {m%1$s{y на {m%2$d%%{y",
+                buf << fmt( 0, _("улучшает {m%1$s{y на {m%2$d%%{y"),
                                apply_flags.message( paf->location ).c_str( ),
                                paf->modifier - 100 );
             else if (paf->modifier < 100 && paf->modifier > 0)
-                buf << fmt( 0, "ухудшает {m%1$s{y на {m%2$d%%{y",
+                buf << fmt( 0, _("ухудшает {m%1$s{y на {m%2$d%%{y"),
                                apply_flags.message( paf->location ).c_str( ),
                                100 - paf->modifier );
             break;
@@ -262,24 +263,24 @@ struct PermanentAffects {
         print("Ты под воздействием", my_aff, affect_flags, '2');
 
         if (ch->getProfession()->getFlags().isSet(PROF_DIVINE) && ch->getReligion() == god_none)
-            ch->pecho("У тебя {rштраф{x на все молитвы, пока ты не выберешь себе {hh1религию{x.");
+            ch->pecho(_("У тебя {rштраф{x на все молитвы, пока ты не выберешь себе {hh1религию{x."));
 
         if (my_hgain <= -100)
-            ch->pecho("Твоё здоровье и шаги не восстанавливаются!");
+            ch->pecho(_("Твоё здоровье и шаги не восстанавливаются!"));
         else if (my_hgain != 0)
-            ch->pecho("Твоё здоровье и шаги восстанавливаются на {%s%d%%{x %s.",
+            ch->pecho(_("Твоё здоровье и шаги восстанавливаются на {%s%d%%{x %s."),
                     my_hgain > 0 ? "C" : "r",
                     abs(my_hgain) , my_hgain > 0 ? "быстрее" : "медленнее");
 
         if (my_mgain <= -100)
-            ch->pecho("Твоя мана не восстанавливается!");
+            ch->pecho(_("Твоя мана не восстанавливается!"));
         else if (my_mgain != 0)
-            ch->pecho("Твоя мана восстанавливается на {%s%d%%{x %s.",
+            ch->pecho(_("Твоя мана восстанавливается на {%s%d%%{x %s."),
                        my_mgain > 0 ? "C" : "r",
                        abs(my_mgain), my_mgain > 0 ? "быстрее" : "медленнее");
 
         if (my_beats != 0)
-            ch->pecho("Задержки от всех умений у тебя на {%s%d%%{x %s.",
+            ch->pecho(_("Задержки от всех умений у тебя на {%s%d%%{x %s."),
                        my_beats > 0 ? "r" : "C",
                        abs(my_beats), my_beats > 0 ? "длиннее" : "короче");
     }
@@ -392,9 +393,9 @@ CMDRUNP( affects )
 
     if (IS_CHARMED(ch)) {
         if (buf.str( ).empty( )) 
-            oldact("$C1 не находится под действием каких-либо аффектов.", ch->master, 0, ch, TO_CHAR);
+            oldact(_("$C1 не находится под действием каких-либо аффектов."), ch->master, 0, ch, TO_CHAR);
         else 
-            oldact("$C1 находится под действием следующих аффектов:", ch->master, 0, ch, TO_CHAR);
+            oldact(_("$C1 находится под действием следующих аффектов:"), ch->master, 0, ch, TO_CHAR);
         buf << "{x";
         ch->master->send_to( buf );
         return;
@@ -405,12 +406,12 @@ CMDRUNP( affects )
 
     if (buf.str( ).empty( )) {
         if (IS_SET(flags, FSHOW_EMPTY) && !permAff.isSet())
-            ch->pecho( "Ты не находишься под действием каких-либо аффектов." );
+            ch->pecho( _("Ты не находишься под действием каких-либо аффектов.") );
     } 
     else {
         if (permAff.isSet())
             ch->pecho("");
-        ch->pecho( "Ты находишься под действием следующих аффектов:" );
+        ch->pecho( _("Ты находишься под действием следующих аффектов:") );
         buf << "{x";
 
         if (!IS_SET(flags, FSHOW_COLOR)) {

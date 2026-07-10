@@ -85,6 +85,7 @@
 #include "def.h"
 #include "messengers.h"
 #include "msgformatter.h"
+#include "l10n.h"
 
 GSN(identify);
 
@@ -201,7 +202,7 @@ void auction_update (void)
             case 2 : /* going twice */
             if (auction->bet > 0)
             {
-                talk_auction(fmt(0, "%1$O1{Y: буд%1$nет|ут прода%1$Gно|н|на|ны за %2$d золот%2$Iую|ых|ых монет%2$Iу|ы| -- %3$s{x.", 
+                talk_auction(fmt(0, _("%1$O1{Y: буд%1$nет|ут прода%1$Gно|н|на|ны за %2$d золот%2$Iую|ых|ых монет%2$Iу|ы| -- %3$s{x."), 
                         auction->item,
                         auction->bet,
                         ((auction->going == 1) ? "раз" : "два")).c_str( ));
@@ -209,13 +210,13 @@ void auction_update (void)
             }
             else
             {
-                talk_auction(fmt(0, "%s{Y: ставок не получено -- %s{x.", 
+                talk_auction(fmt(0, _("%s{Y: ставок не получено -- %s{x."), 
                         auction->item->getShortDescr( '1', LANG_DEFAULT ).c_str( ),
                         ((auction->going == 1) ? "раз" : "два")).c_str());
 
                 if (auction->startbet != 0)
                 {
-                  talk_auction(fmt(0, "Начальная цена: %d золот%s{x.", 
+                  talk_auction(fmt(0, _("Начальная цена: %d золот%s{x."), 
                                 auction->startbet,
                                 GET_COUNT(auction->startbet,"ая монета","ые монеты","ых монет")).c_str());
                 }
@@ -225,21 +226,21 @@ void auction_update (void)
 
             if (auction->bet > 0 && buyer_can_trade())
             {
-                msg = fmt(0, "{1{C%1$^C1 {Yпокупает {2%2$O4{1 за %3$d золот%3$Iую|ых|ых монет%3$Iу|ы|{2.",
+                msg = fmt(0, _("{1{C%1$^C1 {Yпокупает {2%2$O4{1 за %3$d золот%3$Iую|ых|ых монет%3$Iу|ы|{2."),
                     auction->buyer, auction->item, auction->bet);                           
                 talk_auction(msg.c_str());
                 send_to_discord_stream(":moneybag: " + msg);
                 send_telegram(msg);
                 obj_to_char (auction->item,auction->buyer);
-                oldact_p("Из дымки появляется аукционер и передает тебе $o4.",
+                oldact_p(_("Из дымки появляется аукционер и передает тебе $o4."),
                      auction->buyer,auction->item,0,TO_CHAR,POS_DEAD);
-                oldact_p("$c1 получает от прибывшего аукционера $o4.",
+                oldact_p(_("$c1 получает от прибывшего аукционера $o4."),
                      auction->buyer,auction->item,0,TO_ROOM,POS_RESTING);
 
                 auction->seller->gold += auction->bet; /* give him the money */
-                oldact_p("Из дымки появляется аукционер и передает тебе вырученные деньги.",
+                oldact_p(_("Из дымки появляется аукционер и передает тебе вырученные деньги."),
                      auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                oldact_p("$c1 получает вырученные деньги от прибывшего аукционера.",
+                oldact_p(_("$c1 получает вырученные деньги от прибывшего аукционера."),
                      auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
 
                 auction->item = 0; /* reset item */
@@ -248,12 +249,12 @@ void auction_update (void)
             }
             else /* not sold */
             {
-                msg = fmt(0, "Ставок не получено -- %1$#O1{Y снят%1$Gо||а|ы с аукциона{x.", auction->item);
+                msg = fmt(0, _("Ставок не получено -- %1$#O1{Y снят%1$Gо||а|ы с аукциона{x."), auction->item);
                 talk_auction(msg.c_str());
 
-                oldact_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",
+                oldact_p(_("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w."),
                       auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                oldact_p("Аукционер появляется перед $c5 и возвращает $m {W$o4{w.",
+                oldact_p(_("Аукционер появляется перед $c5 и возвращает $m {W$o4{w."),
                       auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
                 obj_to_char (auction->item,auction->seller);
                 auction->item = 0; /* clear auction */
@@ -300,14 +301,14 @@ CMDRUNP( auction )
         {
                 if (arg_is_switch_on( arg1 ))
                 {
-                        ch->pecho("Канал Аукциона теперь {Rвключен{x.");
+                        ch->pecho(_("Канал Аукциона теперь {Rвключен{x."));
                         REMOVE_BIT(ch->comm,COMM_NOAUCTION);
                         return;
                 }
                 else
                 {
-                        ch->pecho("Канал Аукциона теперь {Rвыключен{x.");
-                        ch->pecho("Для получения информации по этому каналу включи его.");
+                        ch->pecho(_("Канал Аукциона теперь {Rвыключен{x."));
+                        ch->pecho(_("Для получения информации по этому каналу включи его."));
                         return;
                 }
         }
@@ -318,23 +319,23 @@ CMDRUNP( auction )
                 {
                         if ( ch->is_immortal() )
                         {
-                                ch->pecho("Продавец -- %s, текущая ставка -- %s",
+                                ch->pecho(_("Продавец -- %s, текущая ставка -- %s"),
                                         auction->seller->getNameC(),
                                         auction->buyer ? auction->buyer->getNameC() : "Нет");
                         }
                         /* show item data here */
                         if (auction->bet > 0)
                         {
-                                ch->pecho("Текущая ставка на выставленный лот -- %d золот%s{x.",
+                                ch->pecho(_("Текущая ставка на выставленный лот -- %d золот%s{x."),
                                         auction->bet,
                                         GET_COUNT(auction->bet,"ая монета","ые монеты","ых монет"));
                         }
                         else
                         {
-                                ch->pecho("Ставок на выставленный лот не получено{x.");
+                                ch->pecho(_("Ставок на выставленный лот не получено{x."));
                                 if (auction->startbet != 0)
                                 {
-                                        ch->pecho("Начальная цена -- %d золот%s{x.", auction->startbet,
+                                        ch->pecho(_("Начальная цена -- %d золот%s{x."), auction->startbet,
                                                 GET_COUNT(auction->startbet,"ая монета","ые монеты","ых монет"));
                                 }
                         }
@@ -347,7 +348,7 @@ CMDRUNP( auction )
                             return;
                         }
                         ch->pecho(
-                                "Лот: '%s{x'. Тип: %s. Экстра флаги: %s.\n\rВес: %d. Стоимость: %d. Уровень: %d.",
+                                _("Лот: '%s{x'. Тип: %s. Экстра флаги: %s.\n\rВес: %d. Стоимость: %d. Уровень: %d."),
                                 obj->getShortDescr( '1', Player::displayLang(ch) ).c_str( ),
                                 item_table.message(obj->item_type, '1', Player::displayLang(ch)).c_str( ),
                                 extra_flags.messages( obj->extra_flags, true, '1', Player::displayLang(ch)).c_str( ),
@@ -367,28 +368,28 @@ CMDRUNP( auction )
                         }
 
                         if  (obj->item_type == ITEM_WEAPON) {
-                                ch->pecho("Тип оружия: %s (%s), среднее повреждение %d.",
+                                ch->pecho(_("Тип оружия: %s (%s), среднее повреждение %d."),
                                            weapon_class.message(obj->value0() ).c_str( ),
                                            weapon_class.name( obj->value0() ).c_str( ),
                                            weapon_ave(obj));
                         }
 
                         if (obj->timer != 0) {
-                            ch->pecho("{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т после продажи.{x", obj->timer);
+                            ch->pecho(_("{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т после продажи.{x"), obj->timer);
                         }
 
                         return;
                 }
                 else
                 {
-                        ch->pecho("Что ты хочешь выставить на аукцион?");
+                        ch->pecho(_("Что ты хочешь выставить на аукцион?"));
                         return;
                 }
         }
 
         if (arg_is_switch_off( arg1 ))
         {
-                ch->pecho("Канал Аукциона теперь {Rвыключен{x.");
+                ch->pecho(_("Канал Аукциона теперь {Rвыключен{x."));
                 SET_BIT(ch->comm,COMM_NOAUCTION);
                 return;
         }
@@ -396,11 +397,11 @@ CMDRUNP( auction )
         if (arg_is_strict(arg1, "talk"))
         {
             if ( ch != auction->seller ) {
-                ch->pecho("Ты ничего не выставлял%Gо||а на аукцион -- рекламировать тебе нечего.", ch);
+                ch->pecho(_("Ты ничего не выставлял%Gо||а на аукцион -- рекламировать тебе нечего."), ch);
                 return;
             }
             if (argument[0] == '\0') {
-                ch->pecho("Как ты хочешь разрекламировать товар?");
+                ch->pecho(_("Как ты хочешь разрекламировать товар?"));
                 return;
             }
             
@@ -413,12 +414,12 @@ CMDRUNP( auction )
         {
                 if (auction->item == 0)
                 {
-                        ch->pecho("На аукцион ничего не выставлено. Будь внимательней!");
+                        ch->pecho(_("На аукцион ничего не выставлено. Будь внимательней!"));
                         return;
                 }
                 else /* stop the auction */
                 {
-                        talk_auction(fmt(0, "Продажа остановлена Богами. Лот '%s{Y' конфискован{x.",
+                        talk_auction(fmt(0, _("Продажа остановлена Богами. Лот '%s{Y' конфискован{x."),
                                 auction->item->getShortDescr( '1', LANG_DEFAULT ).c_str( )).c_str());
                         obj_to_char(auction->item, auction->seller);
                         auction->item = 0;
@@ -426,7 +427,7 @@ CMDRUNP( auction )
                         if (auction->buyer != 0) /* return money to the buyer */
                         {
                                 auction->buyer->gold += auction->bet;
-                                auction->buyer->pecho("Твои деньги возвращены.");
+                                auction->buyer->pecho(_("Твои деньги возвращены."));
                         }
                         return;
                 }
@@ -440,19 +441,19 @@ CMDRUNP( auction )
 
                         if ( ch == auction->seller )
                         {
-                                ch->pecho("Ты не можешь купить свой же лот.");
+                                ch->pecho(_("Ты не можешь купить свой же лот."));
                                 return;
                         }
 
                         if (auction->item->pIndexData->limit != -1 && auction->item->isAntiAligned(ch)) {
-                            ch->pecho("Твоя натура не позволит тебе владеть этим предметом.");
+                            ch->pecho(_("Твоя натура не позволит тебе владеть этим предметом."));
                             return;
                         }
 
                         /* make - perhaps - a bet now */
                         if (argument[0] == '\0')
                         {
-                                ch->pecho("Какую ставку ты хочешь сделать на этот лот?");
+                                ch->pecho(_("Какую ставку ты хочешь сделать на этот лот?"));
                                 return;
                         }
 
@@ -461,19 +462,19 @@ CMDRUNP( auction )
 
                         if ((auction->startbet != 0) && (newbet < (auction->startbet + 1)))
                         {
-                                ch->pecho("Тебе необходимо повысить ставку хотя бы на один золотой выше начальной цены.");
+                                ch->pecho(_("Тебе необходимо повысить ставку хотя бы на один золотой выше начальной цены."));
                                 return;
                         }
 
                         if (newbet < (auction->bet + 1))
                         {
-                                ch->pecho("Тебе необходимо повысить ставку хотя бы на один золотой выше текущей ставки.");
+                                ch->pecho(_("Тебе необходимо повысить ставку хотя бы на один золотой выше текущей ставки."));
                                 return;
                         }
 
                         if (newbet > ch->gold)
                         {
-                                ch->pecho("У тебя нет необходимой суммы!");
+                                ch->pecho(_("У тебя нет необходимой суммы!"));
                                 return;
                         }
 
@@ -489,7 +490,7 @@ CMDRUNP( auction )
                         auction->going = 0;
                         auction->pulse = PULSE_AUCTION; /* start the auction over again */
 
-                        talk_auction(fmt(0, "На %s{Y получена новая ставка: %d золот%s{x.\n\r",
+                        talk_auction(fmt(0, _("На %s{Y получена новая ставка: %d золот%s{x.\n\r"),
                                 auction->item->getShortDescr( '4', LANG_DEFAULT ).c_str( ),newbet,
                                 GET_COUNT(newbet,"ая монета","ые монеты","ых монет")).c_str());
                         return;
@@ -497,7 +498,7 @@ CMDRUNP( auction )
                 }
                 else
                 {
-                        ch->pecho("В данный момент на аукцион ничего не выставлено.");
+                        ch->pecho(_("В данный момент на аукцион ничего не выставлено."));
                         return;
                 }
         }
@@ -508,28 +509,28 @@ CMDRUNP( auction )
 
         if (obj == 0)
         {
-                ch->pecho("У тебя нет этого.");
+                ch->pecho(_("У тебя нет этого."));
                 return;
         }
 
         if (obj->timer != 0 && obj->timer < AUC_TIMER_CUTOFF)
         {
-                ch->pecho("Этот предмет нельзя выставить на аукцион -- он исчезнет всего через %1$d минут%1$Iу|ы|.", obj->timer);
+                ch->pecho(_("Этот предмет нельзя выставить на аукцион -- он исчезнет всего через %1$d минут%1$Iу|ы|."), obj->timer);
                 return;
         }
 
         if (IS_OBJ_STAT(obj, ITEM_NOSELL)) {
-            ch->pecho("Этот предмет не подлежит продаже.");
+            ch->pecho(_("Этот предмет не подлежит продаже."));
             return;
         }
         if (IS_OBJ_STAT(obj, ITEM_NODROP) || IS_OBJ_STAT(obj, ITEM_NOREMOVE)) {
-            ch->pecho("С этого предмета нужно снять проклятие перед продажей.");
+            ch->pecho(_("С этого предмета нужно снять проклятие перед продажей."));
             return;
         }
  
         if (auction->item == 0) {
                 if (ch->desc && banManager->check( ch->desc, BAN_COMMUNICATE )) {
-                    ch->pecho( "Ты не можешь ничего выставлять на аукцион." );
+                    ch->pecho( _("Ты не можешь ничего выставлять на аукцион.") );
                     return;
                 }
 
@@ -540,7 +541,7 @@ CMDRUNP( auction )
                 case ITEM_CORPSE_NPC:
                 case ITEM_TATTOO:
                 case ITEM_CRAFT_TATTOO:
-                        oldact_p("Ты не можешь выставить на аукцион $T.",
+                        oldact_p(_("Ты не можешь выставить на аукцион $T."),
                                 ch, 0, item_table.message(obj->item_type).c_str( ),TO_CHAR,POS_SLEEPING);
                         return;
                 default:
@@ -553,7 +554,7 @@ CMDRUNP( auction )
                         auction->pulse = PULSE_AUCTION;
                         auction->going = 0;
 
-                        msg = fmt(0, "{1{YНа аукцион выставлен новый лот -- {2%O1!", auction->item);                           
+                        msg = fmt(0, _("{1{YНа аукцион выставлен новый лот -- {2%O1!"), auction->item);                           
                         talk_auction(msg.c_str());
                         send_to_discord_stream(":moneybag: " + msg);
                         send_telegram(msg);
@@ -564,7 +565,7 @@ CMDRUNP( auction )
                         }
                         else
                         {
-                                talk_auction(fmt(0, "Начальная цена: %d золот%s{x.", auction->startbet,
+                                talk_auction(fmt(0, _("Начальная цена: %d золот%s{x."), auction->startbet,
                                         GET_COUNT(auction->startbet,"ая монета","ые монеты","ых монет")).c_str());
                         }
                         wiznet( 0, 0, 0, "Продавец -- %C1", ch );
@@ -574,7 +575,7 @@ CMDRUNP( auction )
         }
         else
         {
-                oldact_p("Попробуй позже! Кто-то другой уже выставил на аукцион $o4!",
+                oldact_p(_("Попробуй позже! Кто-то другой уже выставил на аукцион $o4!"),
                         ch,auction->item,0,TO_CHAR,POS_RESTING);
                 return;
         }

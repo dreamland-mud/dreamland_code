@@ -18,6 +18,7 @@
 #include "dl_strings.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 
 /*
@@ -61,13 +62,13 @@ static void get_obj_on_victim( Character *ch, Character *victim, const char *arg
     Object *obj;
 
     if (( obj = get_obj_wear_victim( victim, arg, ch ) ) == 0) {
-        oldact("У $C2 нет ничего похожего на $t.", ch, is_number(arg) ? "это" : arg, victim, TO_CHAR);
+        oldact(_("У $C2 нет ничего похожего на $t."), ch, is_number(arg) ? "это" : arg, victim, TO_CHAR);
         return;
     }
     
-    oldact("Ты берешь $C4 за $o4.", ch, obj, victim, TO_CHAR);
-    oldact("$c1 берет тебя за $o4.", ch, obj, victim, TO_VICT);
-    oldact("$c1 берет $C4 за $o4.", ch, obj, victim, TO_NOTVICT);
+    oldact(_("Ты берешь $C4 за $o4."), ch, obj, victim, TO_CHAR);
+    oldact(_("$c1 берет тебя за $o4."), ch, obj, victim, TO_VICT);
+    oldact(_("$c1 берет $C4 за $o4."), ch, obj, victim, TO_NOTVICT);
     
     FENIA_VOID_CALL( obj, "Seize", "CC", ch, victim );
     FENIA_VOID_CALL( ch, "Seize", "CCO", ch, victim, obj );
@@ -95,7 +96,7 @@ static bool oprog_can_get_corpse_pc( Character *ch, Object *obj )
 {
     if (!ch->is_immortal( ) && !obj->hasOwner( ch ))
     {
-        oldact("Похоже, $o4 от земли не оторвать.",ch,obj,0,TO_CHAR);
+        oldact(_("Похоже, $o4 от земли не оторвать."),ch,obj,0,TO_CHAR);
         return false;
     }
     
@@ -105,7 +106,7 @@ static bool oprog_can_get_corpse_pc( Character *ch, Object *obj )
 static bool oprog_can_get_furniture( Character *ch, Object *obj )
 {
     if (Item::countUsers(obj) > 0) {
-        oldact("Кто-то использует $o4.",ch,obj,0,TO_CHAR);
+        oldact(_("Кто-то использует $o4."),ch,obj,0,TO_CHAR);
         return false;
     }
 
@@ -149,7 +150,7 @@ bool oprog_can_fetch_corpse_pc( Character *ch, Object *container, Object *obj, b
 {
     if (ch->is_npc( )) {
         if (verbose)
-            ch->pecho("Ты не умеешь обшаривать чужие трупы.");
+            ch->pecho(_("Ты не умеешь обшаривать чужие трупы."));
         return false;
     }
     
@@ -165,20 +166,20 @@ bool oprog_can_fetch_corpse_pc( Character *ch, Object *container, Object *obj, b
     if (container->killer != ch->getNameC() && container->killer != "!anybody!")
     {
         if (verbose)
-            ch->pecho("Это не твоя добыча.");
+            ch->pecho(_("Это не твоя добыча."));
         return false;
     }
     
     if (container->count == 0) {
         if (verbose)
-            ch->pecho("Больше взять ничего не получится.");
+            ch->pecho(_("Больше взять ничего не получится."));
         return false;
     }
 
     // The corpse is someone killed by 'ch', let's check the mark.
     if (obj && obj->getProperty("loot") != "true") {
         if (verbose)
-            ch->pecho("Ты не можешь снять %O4 с трупа противника, это не добыча.", obj);
+            ch->pecho(_("Ты не можешь снять %O4 с трупа противника, это не добыча."), obj);
         return false;
     }
 
@@ -197,12 +198,12 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
         
     case ITEM_CONTAINER:
         if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
-            oldact("Тебе не удалось нашарить ни одного кармана у $o2.",ch,container,0,TO_CHAR);
+            oldact(_("Тебе не удалось нашарить ни одного кармана у $o2."),ch,container,0,TO_CHAR);
             return false;
         }
         
         if (IS_SET( container->value1(), CONT_CLOSED )) {
-            ch->pecho("%1$^O4 нужно сперва открыть.", container );
+            ch->pecho(_("%1$^O4 нужно сперва открыть."), container );
             return false;
         }
 
@@ -213,7 +214,7 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
         return true;
 
     default:
-        ch->pecho("%1$^O1 не контейнер, ты не можешь ничего оттуда взять.", container );
+        ch->pecho(_("%1$^O1 не контейнер, ты не можешь ничего оттуда взять."), container );
         return false;
     }
 }
@@ -229,7 +230,7 @@ static int can_get_obj( Character *ch, Object *obj )
 
     if ( (!obj->can_wear( ITEM_TAKE )) && (!ch->is_immortal()) )
     {
-        ch->pecho("Ты не можешь взять %1$O4.", obj );
+        ch->pecho(_("Ты не можешь взять %1$O4."), obj );
         return GET_OBJ_ERR;
     }
 
@@ -237,13 +238,13 @@ static int can_get_obj( Character *ch, Object *obj )
     {
         if (obj->isAntiAligned( ch )) {
             if (ch->is_immortal()) 
-                ch->pecho("Осторожно, ты не смог%1$Gло||ла бы владеть этой вещью, будучи смертн%1$Gым|ым|ой.", ch);
+                ch->pecho(_("Осторожно, ты не смог%1$Gло||ла бы владеть этой вещью, будучи смертн%1$Gым|ым|ой."), ch);
             else {
-                ch->pecho("%2$^s не позволят тебе владеть %1$O5.",
+                ch->pecho(_("%2$^s не позволят тебе владеть %1$O5."),
                           obj,
                           IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
                 
-                ch->recho("%1$^C1 обжигается о %2$O4.", ch, obj );
+                ch->recho(_("%1$^C1 обжигается о %2$O4."), ch, obj );
                 return GET_OBJ_ERR;
             }
         }
@@ -252,9 +253,9 @@ static int can_get_obj( Character *ch, Object *obj )
     if (ch->carry_number + obj->getNumber( ) > Char::canCarryNumber(ch))
     {
         if (ch->is_immortal())
-            ch->pecho("Осторожно, ты уже несешь слишком много вещей.");
+            ch->pecho(_("Осторожно, ты уже несешь слишком много вещей."));
         else {
-            ch->pecho("Ты не можешь унести больше %d вещей и поэтому не сможешь поднять %O4.", Char::canCarryNumber(ch), obj);
+            ch->pecho(_("Ты не можешь унести больше %d вещей и поэтому не сможешь поднять %O4."), Char::canCarryNumber(ch), obj);
             return GET_OBJ_STOP;
         }
     }
@@ -262,9 +263,9 @@ static int can_get_obj( Character *ch, Object *obj )
     if (Char::getCarryWeight(ch) + obj->getWeight( ) > Char::canCarryWeight(ch))
     {
         if (ch->is_immortal())
-            ch->pecho("Осторожно, ты не смог%1$Gло||ла бы поднять такую тяжесть, будучи смертн%1$Gым|ым|ой.", ch);
+            ch->pecho(_("Осторожно, ты не смог%1$Gло||ла бы поднять такую тяжесть, будучи смертн%1$Gым|ым|ой."), ch);
         else {
-            ch->pecho("Ты не можешь нести вес больше %d фунтов и поэтому не сможешь поднять %O4.", Char::canCarryWeight(ch), obj);
+            ch->pecho(_("Ты не можешь нести вес больше %d фунтов и поэтому не сможешь поднять %O4."), Char::canCarryWeight(ch), obj);
             return GET_OBJ_STOP;
         }
     }
@@ -274,8 +275,8 @@ static int can_get_obj( Character *ch, Object *obj )
 
 static bool get_obj( Character *ch, Object *obj )
 {
-    oldact("Ты берешь $o4.", ch, obj, 0, TO_CHAR);
-    oldact("$c1 берет $o4.", ch, obj, 0, TO_ROOM);
+    oldact(_("Ты берешь $o4."), ch, obj, 0, TO_CHAR);
+    oldact(_("$c1 берет $o4."), ch, obj, 0, TO_ROOM);
             
     obj_from_room( obj );
     obj_to_char( obj, ch );
@@ -389,7 +390,7 @@ CMDRUNP( get )
 
     if (argAllObj.empty( ))
     {
-        ch->pecho("Взять что?");
+        ch->pecho(_("Взять что?"));
         return;
     }
 
@@ -403,7 +404,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), ch->in_room->contents );
             
             if (!obj) {
-                oldact("Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR);
+                oldact(_("Ты не видишь здесь $T."), ch, 0, that.c_str( ), TO_CHAR);
 
             } else {
                 if (can_get_obj( ch, obj ) == GET_OBJ_OK)
@@ -444,11 +445,11 @@ CMDRUNP( get )
             if ( !found )
             {
                 if (all)
-                    ch->pecho("Ты ничего не видишь здесь.");
+                    ch->pecho(_("Ты ничего не видишь здесь."));
                 else if (allDot)
-                    ch->pecho("Ты не видишь ничего подобного здесь.");
+                    ch->pecho(_("Ты не видишь ничего подобного здесь."));
                 else
-                    oldact("Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR);
+                    oldact(_("Ты не видишь здесь $T."), ch, 0, that.c_str( ), TO_CHAR);
             }
             else
                 save_items( ch->in_room );
@@ -471,7 +472,7 @@ CMDRUNP( get )
         // Disallow 'get <name> all.<container>' syntax.
         if (arg_is_alldot( argContainer ))
         {
-            ch->pecho("Ты не можешь сделать этого.");
+            ch->pecho(_("Ты не можешь сделать этого."));
             return;
         }
 
@@ -486,7 +487,7 @@ CMDRUNP( get )
             if (victim)
                 get_obj_on_victim( ch, victim, argContainer.c_str( ) );
             else
-                oldact("Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR);
+                oldact(_("Ты не видишь здесь $T."), ch, 0, that.c_str( ), TO_CHAR);
             return;
         }
 
@@ -499,7 +500,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), container->contains, pocket );
 
             if(!obj) {
-                oldact("Ты не видишь ничего подобного в $o6.", ch, container, 0, TO_CHAR);
+                oldact(_("Ты не видишь ничего подобного в $o6."), ch, container, 0, TO_CHAR);
                 return;
             }
             
@@ -518,8 +519,8 @@ CMDRUNP( get )
 
             if (IS_PIT(container) && !ch->is_immortal() )
             {
-                ch->pecho("Не жадничай, пожертвования могут понадобиться кому-то еще.");
-                ch->pecho("И, кстати, не забудь, что продать вещи из ямы для пожертвований все равно не получится.");             
+                ch->pecho(_("Не жадничай, пожертвования могут понадобиться кому-то еще."));
+                ch->pecho(_("И, кстати, не забудь, что продать вещи из ямы для пожертвований все равно не получится."));             
                 return;
             }
                 
@@ -557,9 +558,9 @@ CMDRUNP( get )
 
             if (!found) {
                 if (!all)
-                    oldact("Ты не видишь ничего в $o6.", ch, container, 0, TO_CHAR);
+                    oldact(_("Ты не видишь ничего в $o6."), ch, container, 0, TO_CHAR);
                 else
-                    oldact("Ты не видишь ничего подобного в $o6.", ch, container, 0, TO_CHAR);
+                    oldact(_("Ты не видишь ничего подобного в $o6."), ch, container, 0, TO_CHAR);
             }
         }
     }

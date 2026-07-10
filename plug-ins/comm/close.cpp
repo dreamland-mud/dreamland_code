@@ -12,6 +12,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 /*--------------------------------------------------------------------
  *    close 
@@ -33,21 +34,21 @@ static void close_door( Character *ch, int door )
     pexit        = ch->in_room->exit[door];
     if ( IS_SET(pexit->exit_info, EX_CLOSED) )
     {
-            ch->pecho( "Здесь уже закрыто." );
+            ch->pecho( _("Здесь уже закрыто.") );
             return;
     }
 
     SET_BIT(pexit->exit_info, EX_CLOSED);
     
     const char *doorname = direction_doorname(pexit);
-    oldact("$c1 закрывает $N4.", ch, 0, doorname, TO_ROOM );
-    oldact("Ты закрываешь $N4.", ch, 0, doorname, TO_CHAR );
+    oldact(_("$c1 закрывает $N4."), ch, 0, doorname, TO_ROOM );
+    oldact(_("Ты закрываешь $N4."), ch, 0, doorname, TO_CHAR );
 
     // close the other side
     if ((pexit_rev = direction_reverse(room, door)))
     {
             SET_BIT( pexit_rev->exit_info, EX_CLOSED );
-            direction_target(room, door)->echo(POS_RESTING, "%^N1 закрывается.", direction_doorname(pexit_rev));
+            direction_target(room, door)->echo(POS_RESTING, _("%^N1 закрывается."), direction_doorname(pexit_rev));
     }
 }
 
@@ -62,7 +63,7 @@ CMDRUNP( close )
 
     if ( arg[0] == '\0' )
     {
-        ch->pecho( "Закрыть что?" );
+        ch->pecho( _("Закрыть что?") );
         return;
     }
 
@@ -82,50 +83,50 @@ CMDRUNP( close )
             if ( !IS_SET(obj->value1(),EX_ISDOOR)
                     || IS_SET(obj->value1(),EX_NOCLOSE) )
             {
-                ch->pecho( "Ты не можешь сделать этого." );
+                ch->pecho( _("Ты не можешь сделать этого.") );
                 return;
             }
 
             if ( IS_SET(obj->value1(),EX_CLOSED) )
             {
-                ch->pecho( "Здесь уже закрыто." );
+                ch->pecho( _("Здесь уже закрыто.") );
                 return;
             }
 
             obj->value1(obj->value1() | EX_CLOSED);
-            oldact("Ты закрываешь $o4.",ch,obj,0,TO_CHAR);
-            oldact("$c1 закрывает $o4.",ch,obj,0,TO_ROOM);
+            oldact(_("Ты закрываешь $o4."),ch,obj,0,TO_CHAR);
+            oldact(_("$c1 закрывает $o4."),ch,obj,0,TO_ROOM);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
             // 'close object'
             if ( IS_SET(obj->value1(), CONT_CLOSED) )
             {
-                ch->pecho( "Здесь уже закрыто." );
+                ch->pecho( _("Здесь уже закрыто.") );
                 return;
             }
 
             if ( !IS_SET(obj->value1(), CONT_CLOSEABLE) )
             {
-                ch->pecho( "Ты не можешь сделать этого." );
+                ch->pecho( _("Ты не можешь сделать этого.") );
                 return;
             }
 
             obj->value1(obj->value1() | CONT_CLOSED);
-            oldact("Ты закрываешь $o4.",ch,obj,0,TO_CHAR);
-            oldact("$c1 закрывает $o4.", ch, obj, 0, TO_ROOM);
+            oldact(_("Ты закрываешь $o4."),ch,obj,0,TO_CHAR);
+            oldact(_("$c1 закрывает $o4."), ch, obj, 0, TO_ROOM);
             oprog_close( obj, ch );
         }
         else if (obj->item_type == ITEM_DRINK_CON) {
             // cork a bottle 
             
             if (!IS_SET(obj->value3(), DRINK_CLOSE_CORK|DRINK_CLOSE_NAIL|DRINK_CLOSE_KEY)) {
-                oldact("$O4 невозможно закрыть или закупорить.", ch, 0, obj, TO_CHAR );
+                oldact(_("$O4 невозможно закрыть или закупорить."), ch, 0, obj, TO_CHAR );
                 return;
             }
 
             if (IS_SET(obj->value3(), DRINK_CLOSED)) {
-                oldact("$O4 уже закрыли.", ch, 0, obj, TO_CHAR );
+                oldact(_("$O4 уже закрыли."), ch, 0, obj, TO_CHAR );
                 return;
             }
             
@@ -133,28 +134,28 @@ CMDRUNP( close )
                 Object *cork = get_obj_carry_vnum( ch, OBJ_VNUM_CORK );
 
                 if (!cork) {
-                    oldact("У тебя нет пробки от $O2.", ch, 0, obj, TO_CHAR );
-                    oldact("$c1 шарит по карманам в поисках пробки.", ch, 0, obj, TO_ROOM );
+                    oldact(_("У тебя нет пробки от $O2."), ch, 0, obj, TO_CHAR );
+                    oldact(_("$c1 шарит по карманам в поисках пробки."), ch, 0, obj, TO_ROOM );
                     return;
                 }
 
                 extract_obj( cork );
-                oldact("Ты закупориваешь $O4 пробкой.", ch, 0, obj, TO_CHAR );
-                oldact("$c1 закупоривает $O4 пробкой.", ch, 0, obj, TO_ROOM );
+                oldact(_("Ты закупориваешь $O4 пробкой."), ch, 0, obj, TO_CHAR );
+                oldact(_("$c1 закупоривает $O4 пробкой."), ch, 0, obj, TO_ROOM );
             }
             else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL)) {
-                oldact("Ты закрываешь $O4 крышкой.", ch, 0, obj, TO_CHAR );
-                oldact("$c1 закрывает $O4 крышкой.", ch, 0, obj, TO_ROOM );
+                oldact(_("Ты закрываешь $O4 крышкой."), ch, 0, obj, TO_CHAR );
+                oldact(_("$c1 закрывает $O4 крышкой."), ch, 0, obj, TO_ROOM );
             }
             else {
-                oldact("Ты закрываешь $O4.", ch, 0, obj, TO_CHAR );
-                oldact("$c1 закрывает $O4.", ch, 0, obj, TO_ROOM );
+                oldact(_("Ты закрываешь $O4."), ch, 0, obj, TO_CHAR );
+                oldact(_("$c1 закрывает $O4."), ch, 0, obj, TO_ROOM );
             }
             
             obj->value3(obj->value3() | DRINK_CLOSED);
         }
         else {
-            ch->pecho( "Это не контейнер." );
+            ch->pecho( _("Это не контейнер.") );
             return;
         }
 
@@ -169,19 +170,19 @@ CMDRUNP( close )
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
         {
-                ch->pecho( "Это не дверь!" );
+                ch->pecho( _("Это не дверь!") );
                 return;
         }
 
         if ( IS_SET(peexit->exit_info, EX_CLOSED) )
         {
-                ch->pecho( "Здесь уже закрыто." );
+                ch->pecho( _("Здесь уже закрыто.") );
                 return;
         }
 
         SET_BIT(peexit->exit_info, EX_CLOSED);
-        oldact("$c1 закрывает $N4.", ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_ROOM);
-        oldact("Ты закрываешь $N4.", ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_CHAR);
+        oldact(_("$c1 закрывает $N4."), ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_ROOM);
+        oldact(_("Ты закрываешь $N4."), ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_CHAR);
 
         return;
     }        

@@ -92,6 +92,7 @@
 #include "doors.h"
 #include "loadsave.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(invader);
 CLAN(none);
@@ -100,7 +101,7 @@ GSN(suspect);
 
 CMDRUNP( rent )
 {
-    ch->pecho("Здесь нет ренты. Просто покинь мир.");
+    ch->pecho(_("Здесь нет ренты. Просто покинь мир."));
     return;
 }
 
@@ -164,7 +165,7 @@ CMDRUNP( quit )
     
     if (pch->position == POS_FIGHTING || pch->fighting) {
         if (!fForced) {
-            pch->pecho( "Не сейчас! Тебе необходимо закончить сражение!");
+            pch->pecho( _("Не сейчас! Тебе необходимо закончить сражение!"));
             return;
         }
 
@@ -173,7 +174,7 @@ CMDRUNP( quit )
 
     if (pch->position  < POS_STUNNED) {
         if (!fForced) {
-            pch->pecho("Ты еще не УМЕ%GРЛО|Р|РЛА.", pch);
+            pch->pecho(_("Ты еще не УМЕ%GРЛО|Р|РЛА."), pch);
             return;
         }
 
@@ -183,22 +184,22 @@ CMDRUNP( quit )
     
     if (!pch->is_immortal( ) && !fForced) {
         if (IS_VIOLENT(pch)) {
-            pch->pecho("У тебя слишком много адреналина в крови.");
+            pch->pecho(_("У тебя слишком много адреналина в крови."));
             return;
         }
         if (IS_SLAIN(pch)) {
-            pch->pecho("Правда о твоем поражении еще не забыта.");
+            pch->pecho(_("Правда о твоем поражении еще не забыта."));
             return;
         }
         if (IS_KILLER(pch)) {
-            pch->pecho("Боги еще помнят убийство, совершенное тобой.");
+            pch->pecho(_("Боги еще помнят убийство, совершенное тобой."));
             return;
         }
     }
 
     if (IS_CHARMED(pch)) {
         if (!fForced) {
-            pch->pecho( "Ты не можешь покинуть сво%1$Gего|его|ю хозя%1$Gина|ина|йку.", pch->master);
+            pch->pecho( _("Ты не можешь покинуть сво%1$Gего|его|ю хозя%1$Gина|ина|йку."), pch->master);
             return;
         }
 
@@ -209,13 +210,13 @@ CMDRUNP( quit )
         && !pch->is_immortal( )
         && IS_SET( pch->act, PLR_NO_EXP ))
     {
-        pch->pecho("Ты не можешь покинуть этот мир! Твой дух во власти противника.");
+        pch->pecho(_("Ты не можешь покинуть этот мир! Твой дух во власти противника."));
         return;
     }
 
     if (auction->item != 0 && ((pch == auction->buyer) || (pch == auction->seller))) {
         if (!fForced) {
-            pch->pecho("Подожди пока вещь, выставленная на аукцион, будет продана или возвращена.");
+            pch->pecho(_("Подожди пока вещь, выставленная на аукцион, будет продана или возвращена."));
             return;
         }
         
@@ -227,7 +228,7 @@ CMDRUNP( quit )
         && !pch->is_immortal()
         && IS_ROOM_AFFECTED( pch->in_room, AFF_ROOM_ESPIRIT ))
     {
-        pch->pecho("Злые духи в этой зоне не отпускают тебя.");
+        pch->pecho(_("Злые духи в этой зоне не отпускают тебя."));
         return;
     }
 
@@ -236,7 +237,7 @@ CMDRUNP( quit )
             && pch->getClan( ) != clan_invader 
             && pch->isAffected( gsn_evil_spirit ))
     {
-        pch->pecho("Злые духи, овладевшие тобой, не позволяют тебе покинуть этот мир.");
+        pch->pecho(_("Злые духи, овладевшие тобой, не позволяют тебе покинуть этот мир."));
         return;
     }
 
@@ -244,7 +245,7 @@ CMDRUNP( quit )
         && !pch->is_immortal()  
         && pch->isAffected(gsn_suspect))
     {
-        pch->pecho("Ты не можешь этого сделать -- тебя ждет Суд!");
+        pch->pecho(_("Ты не можешь этого сделать -- тебя ждет Суд!"));
         return;
     }
 
@@ -253,7 +254,7 @@ CMDRUNP( quit )
             && pch->death_ground_delay > 0
             && pch->trap.isSet( TF_NO_MOVE ))
     {
-        pch->pecho("Сначала выберись из ловушки, а потом можно и покинуть этот мир.");
+        pch->pecho(_("Сначала выберись из ловушки, а потом можно и покинуть этот мир."));
         return;
     }
 
@@ -262,7 +263,7 @@ CMDRUNP( quit )
             && pch->getClan() != pch->in_room->pIndexData->clan)
     {
         if (!fForced) {
-            pch->pecho("Ты не можешь этого сделать -- здесь не твоя территория!");
+            pch->pecho(_("Ты не можешь этого сделать -- здесь не твоя территория!"));
             return;
         }
         
@@ -278,17 +279,17 @@ CMDRUNP( quit )
     
     PCharacterManager::quit( pch );
 
-    pch->pecho("Жаль, но все хорошее когда-нибудь заканчивается.");
+    pch->pecho(_("Жаль, но все хорошее когда-нибудь заканчивается."));
     
     if (pch->desc && !fQuiet)
         DescriptorStateManager::getThis( )->handle( CON_PLAYING, CON_QUIT, pch->desc );
 
-    oldact_p("$c1 покину$gло|л|ла этот мир.", pch, 0, 0, TO_ROOM ,POS_DEAD);
+    oldact_p(_("$c1 покину$gло|л|ла этот мир."), pch, 0, 0, TO_ROOM ,POS_DEAD);
 
     if (!pch->getPC( )->getAttributes( ).isAvailable("quietLogin")) {
         wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$#C1 покину%1$#Gло|л|ла этот мир.", pch );
         infonet(pch, 0, "{CТихий голос из $o2: ", "{W%1$#C1 покину%1$#Gло|л|ла Мир Мечты.{x", pch);
-        send_discord_orb(fmt(0, "%1$#C1 покинул%1$#Gо||а Мир Мечты.", pch));
+        send_discord_orb(fmt(0, _("%1$#C1 покинул%1$#Gо||а Мир Мечты."), pch));
     }
 
     dreamland->removeOption( DL_SAVE_OBJS );
@@ -325,7 +326,7 @@ CMDRUNP( save )
         return;
 
     ch->getPC( )->save();
-    ch->pecho("Архивариус {CМира Мечты{x заносит сведения о тебе в свои манускрипты.");
+    ch->pecho(_("Архивариус {CМира Мечты{x заносит сведения о тебе в свои манускрипты."));
     ch->setWaitViolence( 1 );
 }
 

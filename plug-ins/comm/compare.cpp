@@ -6,6 +6,7 @@
 #include "wearloc_utils.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 CMDRUNP( compare )
 {
@@ -21,13 +22,13 @@ CMDRUNP( compare )
     argument = one_argument( argument, arg2 );
     if ( arg1[0] == '\0' )
     {
-        ch->pecho("Сравнить что и с чем.?");
+        ch->pecho(_("Сравнить что и с чем.?"));
         return;
     }
 
     if ( ( obj1 = get_obj_carry( ch, arg1 ) ) == 0 )
     {
-        ch->pecho("У тебя нет этого.");
+        ch->pecho(_("У тебя нет этого."));
         return;
     }
 
@@ -44,14 +45,14 @@ CMDRUNP( compare )
 
         if (obj2 == 0)
         {
-            ch->pecho("На тебе нет ничего, с чем можно было бы сравнить.");
+            ch->pecho(_("На тебе нет ничего, с чем можно было бы сравнить."));
             return;
         }
     }
 
     else if ( (obj2 = get_obj_carry(ch,arg2) ) == 0 )
     {
-        ch->pecho("У тебя нет этого.");
+        ch->pecho(_("У тебя нет этого."));
         return;
     }
 
