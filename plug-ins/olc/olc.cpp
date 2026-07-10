@@ -154,6 +154,19 @@ ptc(Character *ch, const char *fmt, ...)
     va_end(av);
 }
 
+void
+ptc(Character *ch, const MultiMessage &fmt, ...)
+{
+    va_list av;
+
+    va_start(av, fmt);
+
+    DLString rc = vfmt(ch, fmt.getMessage(ch).c_str( ), av);
+    stc(rc.c_str( ), ch);
+
+    va_end(av);
+}
+
 
 /** Get next available help ID to use. Can potentially result in duplicates if a plugin 
     containing some helps is unloaded when this function is being called.  */

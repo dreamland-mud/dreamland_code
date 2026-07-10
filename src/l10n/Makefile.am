@@ -8,7 +8,8 @@ src_INCLUDES = \
 -I$(srcdir) \
 -I$(srcdir)/../xml \
 -I$(srcdir)/../lang   \
--I$(srcdir)/../util 
+-I$(srcdir)/../util \
+-I$(srcdir)/../core
 
 AM_CPPFLAGS = -Wall
 
@@ -23,6 +24,7 @@ flexer.cpp \
 inflectedstring.cpp \
 xmlinflectedstring.cpp \
 lang.cpp \
-translation.cpp
+translation.cpp \
+l10n.cpp
 
 AM_CPPFLAGS += $(src_INCLUDES)

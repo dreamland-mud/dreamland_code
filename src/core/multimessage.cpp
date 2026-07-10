@@ -11,3 +11,8 @@ const DLString & MultiMessage::getMessage(const Character *ch) const
     // no libsystem dependency). TranslationManager falls back to RU on any miss.
     return TranslationManager::getThis().run(viewerLang(ch), file, ru);
 }
+
+const DLString & MultiMessage::getMessage(lang_t lang) const
+{
+    return TranslationManager::getThis().run(lang, file, ru);
+}

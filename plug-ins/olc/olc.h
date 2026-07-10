@@ -8,6 +8,7 @@
 
 #include "onlinecreation.h"
 #include "descriptor.h"
+#include "multimessage.h"
 
 #define OLC_VERSION "ILAB Online Creation [Beta 1.0, ROM 2.3 modified]\n\r" \
                 "     Port a ROM 2.4 v1.00\n\r"
@@ -30,6 +31,8 @@ void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json
 
 const char * get_skill_name( int sn, bool verbose = true );
 void ptc(Character *c, const char *fmt, ...);
+/* Trilinguality (Trello 2594, Phase 4): resolve for the single viewer `c`. */
+void ptc(Character *c, const MultiMessage &fmt, ...);
 
 int next_obj_index( Character *ch, RoomIndexData *r );
 int next_room( Character *ch, RoomIndexData *r );

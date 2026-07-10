@@ -18,6 +18,7 @@
 #include <stdarg.h>
 
 #include "dlstring.h"
+#include "multimessage.h"
 #include "nounholder.h"
 
 #include "core/fenia/wrappertarget.h"
@@ -155,6 +156,18 @@ public:
     void echo( int pos, int type, Character *vch, const char *f, ... );
     void vecho( int pos, int type, Character *, const char *, va_list );
     void vecho( int pos, int type, Character *, const char *, va_list, bool (needsOutput)(Character *));
+
+    /* Trilinguality (Trello 2594, Phase 4): MultiMessage overloads that resolve
+     * the format per recipient. Pure additions -- a MultiMessage never converts
+     * to/from const char*, so no existing call changes meaning. RU/untranslated
+     * renders byte-identical to the const char* path. */
+    void pecho( const MultiMessage &f, ... );
+    void pecho( int pos, const MultiMessage &f, ... );
+    void recho( const MultiMessage &f, ... );
+    void recho( int pos, const MultiMessage &f, ... );
+    void recho( Character *vch, const MultiMessage &f, ... );
+    void echo( int pos, int type, Character *vch, const MultiMessage &f, ... );
+    void vecho( int pos, int type, Character *vch, const MultiMessage &f, va_list av );
     
     // visibility of things 
     bool can_see( const Character *victim ) const;

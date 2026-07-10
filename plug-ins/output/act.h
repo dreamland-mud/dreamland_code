@@ -11,6 +11,7 @@
 #include <map>
 
 #include "dlstring.h"
+#include "multimessage.h"
 
 using namespace std;
 
@@ -38,13 +39,28 @@ enum {
 void oldact( const char *format, Character *ch, 
           const void *arg1, const void *arg2, int type );
 
-void oldact_p( const char *format, Character *ch, 
+void oldact_p( const char *format, Character *ch,
+            const void *arg1, const void *arg2, int type, int min_pos );
+
+/** Convert legacy `$`-act codes ($n/$e/$s/...) into the `%`-format the
+ *  MsgFormatter consumes. Defined in act.cpp; declared here so the MultiMessage
+ *  output path (character.cpp) can run it per resolved language. */
+DLString act_to_fmt(const char *s);
+
+/* Trilinguality (Trello 2594, Phase 4): MultiMessage overloads. The format is
+ * resolved per recipient in the viewer's language (RU/untranslated -> source
+ * literal, byte-identical to the const char* path). oldact sets the act-code
+ * flag so act_to_fmt runs per language. */
+void oldact( const MultiMessage &format, Character *ch,
+          const void *arg1, const void *arg2, int type );
+void oldact_p( const MultiMessage &format, Character *ch,
             const void *arg1, const void *arg2, int type, int min_pos );
 
 /*--------------------------------------------------------------------------
- * new fmt functions 
+ * new fmt functions
  *--------------------------------------------------------------------------*/
 DLString fmt(Character *to, const char *fmt, ...);
+DLString fmt(Character *to, const MultiMessage &fmt, ...);
 DLString vfmt(Character *to, const char *format, va_list av);
 
 /*--------------------------------------------------------------------------

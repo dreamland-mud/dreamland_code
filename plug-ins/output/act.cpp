@@ -163,7 +163,33 @@ void oldact_p( const char *format, Character *ch, const void *arg1,
     Character *vch = (Character *)arg2;
     DLString fmt = act_to_fmt(format);
 
-    ch->echo( min_pos, type, vch, fmt.c_str(), ch, arg1, arg2 );    
+    ch->echo( min_pos, type, vch, fmt.c_str(), ch, arg1, arg2 );
+}
+
+/* Trilinguality (Trello 2594, Phase 4) -- MultiMessage oldact. Unlike the
+ * const char* version, act_to_fmt cannot run here (it is language-specific);
+ * the act-code flag defers it into vecho, which converts each resolved
+ * language before formatting. */
+void oldact( const MultiMessage &format, Character *ch, const void *arg1,
+          const void *arg2, int type )
+{
+    oldact_p( format, ch, arg1, arg2, type, POS_RESTING );
+}
+
+void oldact_p( const MultiMessage &format, Character *ch, const void *arg1,
+            const void *arg2, int type, int min_pos )
+{
+    if (!ch)
+        return;
+
+    if (format.empty())
+        return;
+
+    Character *vch = (Character *)arg2;
+    MultiMessage f = format;
+    f.setActCodes(true);
+
+    ch->echo( min_pos, type, vch, f, ch, arg1, arg2 );
 }
 
 
@@ -256,8 +282,23 @@ DLString fmt(Character *to, const char *f, ...)
     va_list av;
 
     va_start(av, f);
-    
+
     DLString rc = vfmt(to, f, av);
+
+    va_end(av);
+
+    return rc;
+}
+
+// Trilinguality (Trello 2594, Phase 4): resolve for the single viewer `to`.
+// fmt formats are plain %-format (no $-codes), so no act_to_fmt needed.
+DLString fmt(Character *to, const MultiMessage &f, ...)
+{
+    va_list av;
+
+    va_start(av, f);
+
+    DLString rc = vfmt(to, f.getMessage(to).c_str(), av);
 
     va_end(av);
 
