@@ -435,8 +435,10 @@ MEDIT(show)
         try {
             std::basic_ostringstream<char> ostr;
             mob.behavior->save( ostr );
-            ptc(ch, "Legacy behavior: {D(oldbehavior{x)\r\n%s", ostr.str( ).c_str( ));
-            
+            ptc(ch, "Legacy behavior: {D(oldbehavior{x) %s\r\n%s",
+                web_edit_button(showWeb, ch, "oldbehavior", "web").c_str(),
+                ostr.str( ).c_str( ));
+
         } catch (const ExceptionXMLError &e) {
             ptc(ch, "Legacy behavior is BUGGY.\r\n");
         }
@@ -713,6 +715,19 @@ MEDIT(oldbehavior)
 
     if (arg.empty()) {
         if(!xmledit(mob.behavior))
+            return false;
+
+        stc("Поведение установлено.\r\n", ch);
+        return true;
+    }
+
+    // Edit the legacy behavior XML in the web editor (Monaco popup).
+    if (arg_is_web(arg))
+        return xmleditWeb(mob.behavior, "oldbehavior pastexml");
+
+    // Save callback replayed by the web editor once editing is done.
+    if (arg_is_strict(arg, "pastexml")) {
+        if (!xmleditPaste(mob.behavior))
             return false;
 
         stc("Поведение установлено.\r\n", ch);
