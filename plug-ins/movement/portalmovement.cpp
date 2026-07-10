@@ -26,6 +26,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 CLAN(battlerager);
 GSN(spellbane);
@@ -112,7 +113,7 @@ int PortalMovement::move( )
 
     if (portal->value0() == -1) {
         portal->getRoom( )->echo( POS_RESTING, 
-                                  "%^O1 медленно исчезает в дымке.", 
+                                  _("%^O1 медленно исчезает в дымке."), 
                                   portal );
         extract_obj( portal );
     }
@@ -122,7 +123,7 @@ int PortalMovement::move( )
 
 void PortalMovement::moveOneFollower( Character *wch, Character *fch )
 {
-    oldact("Ты следуешь за $C5.", fch, 0, wch, TO_CHAR );
+    oldact(_("Ты следуешь за $C5."), fch, 0, wch, TO_CHAR );
     PortalMovement( fch, portal ).moveRecursive( );
 }
 
@@ -227,8 +228,8 @@ bool PortalMovement::applySpellbane( Character *wch )
         return true;
     
     try {
-        oldact("Магия $o2 аннигилирует с твоим спеллбаном!", wch,portal,0,TO_CHAR);
-        oldact("Магия $o2 аннигилирует со спеллбаном $c2!", wch,portal,0,TO_ROOM);
+        oldact(_("Магия $o2 аннигилирует с твоим спеллбаном!"), wch,portal,0,TO_CHAR);
+        oldact(_("Магия $o2 аннигилирует со спеллбаном $c2!"), wch,portal,0,TO_ROOM);
         SkillDamage( wch, wch, gsn_spellbane, DAM_NEGATIVE, wch->max_hit / 3, DAMF_MAGIC ).hit( true );
         interpret_raw( wch, "cb", "Меня ударило магическим порталом!" );
     }

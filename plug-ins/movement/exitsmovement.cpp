@@ -29,6 +29,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 GSN(confuse);
 WEARLOC(none);
@@ -86,7 +87,7 @@ bool ExitsMovement::findTargetRoom( )
         return false;
 
     if (!pexit && !peexit) {
-        ch->pecho( "Извини, но ты не можешь туда идти." );
+        ch->pecho( _("Извини, но ты не можешь туда идти.") );
         return false;
     }
     
@@ -107,7 +108,7 @@ bool ExitsMovement::findTargetRoom( )
     }
 
     if (!to_room) { /* sanity check, will be re-checked in checkVisibility */
-        ch->pecho( "Жаль, но ты не можешь туда идти." );
+        ch->pecho( _("Жаль, но ты не можешь туда идти.") );
         return false;
     }
 
@@ -482,7 +483,7 @@ int ExitsMovement::adjustMovetype( Character *wch )
 
 void ExitsMovement::moveOneFollower( Character *wch, Character *fch )
 {
-    oldact("Ты следуешь за $C5.", fch, 0, wch, TO_CHAR );
+    oldact(_("Ты следуешь за $C5."), fch, 0, wch, TO_CHAR );
 
     if (peexit)
         ExitsMovement( fch, peexit, movetype ).moveRecursive( ); 
