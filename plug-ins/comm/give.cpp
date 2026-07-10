@@ -15,6 +15,7 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 /*
  * 'give' command
@@ -76,44 +77,44 @@ static bool oprog_present( Object *obj, Character *ch, Character *victim )
 static void give_obj_char( Character *ch, Object *obj, Character *victim, int mode = GIVE_MODE_USUAL )
 {
     if (ch == victim) {
-        ch->pecho("%s себе?", (mode ? "Подарить" : "Дать"));
+        ch->pecho(_("%s себе?"), (mode ? "Подарить" : "Дать"));
         return;
     }
 
     if ( !victim->is_npc() && IS_GHOST( victim ) )
     {
-        ch->pecho("Разве можно что-то %s призраку?", (mode ? "подарить" : "дать"));
+        ch->pecho(_("Разве можно что-то %s призраку?"), (mode ? "подарить" : "дать"));
         return;
     }
 
     if ( !Item::canDrop( ch, obj ) )
     {
-        ch->pecho("Ты не можешь избавиться от этого.");
+        ch->pecho(_("Ты не можешь избавиться от этого."));
         return;
     }
 
     if ( victim->carry_number + obj->getNumber( ) > Char::canCarryNumber(victim) )
     {
-		ch->pecho( "%1$^C1 не мо%1$nжет|гут нести столько вещей.", victim );
+		ch->pecho( _("%1$^C1 не мо%1$nжет|гут нести столько вещей."), victim );
         return;
     }
 
     if (Char::getCarryWeight(victim) + obj->getWeight( ) > Char::canCarryWeight(victim) )
     {
-		ch->pecho( "%1$^C1 не мо%1$nжет|гут нести такую тяжесть.", victim );
+		ch->pecho( _("%1$^C1 не мо%1$nжет|гут нести такую тяжесть."), victim );
         return;
     }
 
     if ( !victim->can_see( obj ) )
     {
-		ch->pecho( "%1$^C1 не вид%1$nит|ят этого.", victim );
+		ch->pecho( _("%1$^C1 не вид%1$nит|ят этого."), victim );
         return;
     }
 
     if (obj->pIndexData->limit != -1)
     {
         if (obj->isAntiAligned( victim )) {
-            ch->pecho("%1$^C1 не смо%1$nжет|гут владеть этой вещью.", victim);
+            ch->pecho(_("%1$^C1 не смо%1$nжет|гут владеть этой вещью."), victim);
             return;
         }
     }
@@ -124,15 +125,15 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
     switch (mode) {
     case GIVE_MODE_USUAL:
     default:
-        oldact("$c1 дает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-        oldact("$c1 дает тебе $o4.", ch, obj, victim, TO_VICT );
-        oldact("Ты даешь $o4 $C3.", ch, obj, victim, TO_CHAR );
+        oldact(_("$c1 дает $o4 $C3."), ch, obj, victim, TO_NOTVICT );
+        oldact(_("$c1 дает тебе $o4."), ch, obj, victim, TO_VICT );
+        oldact(_("Ты даешь $o4 $C3."), ch, obj, victim, TO_CHAR );
         break;
 
     case GIVE_MODE_PRESENT:
-        oldact("$c1 дарит $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-        oldact("$c1 дарит тебе $o4.", ch, obj, victim, TO_VICT );
-        oldact("Ты даришь $o4 $C3.", ch, obj, victim, TO_CHAR );
+        oldact(_("$c1 дарит $o4 $C3."), ch, obj, victim, TO_NOTVICT );
+        oldact(_("$c1 дарит тебе $o4."), ch, obj, victim, TO_VICT );
+        oldact(_("Ты даришь $o4 $C3."), ch, obj, victim, TO_CHAR );
 
         if (oprog_present( obj, ch, victim ))
             return;
@@ -159,13 +160,13 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
 {
     if (ch == victim)
     {
-            ch->pecho("Дать себе?");
+            ch->pecho(_("Дать себе?"));
             return;
     }
 
     if ( !victim->is_npc() && IS_GHOST( victim ) )
     {
-            ch->pecho("Разве можно что-то дать призраку?");
+            ch->pecho(_("Разве можно что-то дать призраку?"));
             return;
     }
 
@@ -176,7 +177,7 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
     {
             victim->silver  -= silver;
             victim->gold    -= gold;
-            ch->pecho( "%1$^C1 не мо%1$nжет|гут нести такую тяжесть.", victim );
+            ch->pecho( _("%1$^C1 не мо%1$nжет|гут нести такую тяжесть."), victim );
             return;
     }
 
@@ -186,29 +187,29 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
     if (silver > 0) {
         DLString slv( silver );
         if (mode == GIVE_MODE_PRESENT) {
-            oldact("$c1 дарит тебе $t серебра.", ch, slv.c_str( ), victim, TO_VICT);
-            oldact("Ты даришь $C3 $t серебра.",ch, slv.c_str( ), victim, TO_CHAR);
+            oldact(_("$c1 дарит тебе $t серебра."), ch, slv.c_str( ), victim, TO_VICT);
+            oldact(_("Ты даришь $C3 $t серебра."),ch, slv.c_str( ), victim, TO_CHAR);
         } else {
-            oldact("$c1 дает тебе $t серебра.", ch, slv.c_str( ), victim, TO_VICT);
-            oldact("Ты даешь $C3 $t серебра.",ch, slv.c_str( ), victim, TO_CHAR);
+            oldact(_("$c1 дает тебе $t серебра."), ch, slv.c_str( ), victim, TO_VICT);
+            oldact(_("Ты даешь $C3 $t серебра."),ch, slv.c_str( ), victim, TO_CHAR);
         }
     }
     
     if (gold > 0) {
         DLString gld( gold );
         if (mode == GIVE_MODE_PRESENT) {
-            oldact("$c1 дарит тебе $t золота.", ch, gld.c_str( ), victim, TO_VICT);
-            oldact("Ты даришь $C3 $t золота.",ch, gld.c_str( ), victim, TO_CHAR);
+            oldact(_("$c1 дарит тебе $t золота."), ch, gld.c_str( ), victim, TO_VICT);
+            oldact(_("Ты даришь $C3 $t золота."),ch, gld.c_str( ), victim, TO_CHAR);
         } else {
-            oldact("$c1 дает тебе $t золота.", ch, gld.c_str( ), victim, TO_VICT);
-            oldact("Ты даешь $C3 $t золота.",ch, gld.c_str( ), victim, TO_CHAR);
+            oldact(_("$c1 дает тебе $t золота."), ch, gld.c_str( ), victim, TO_VICT);
+            oldact(_("Ты даешь $C3 $t золота."),ch, gld.c_str( ), victim, TO_CHAR);
         }
     }
 
     if (mode == GIVE_MODE_PRESENT) {
-        oldact("$c1 дарит $C3 несколько монет.",  ch, 0, victim, TO_NOTVICT);
+        oldact(_("$c1 дарит $C3 несколько монет."),  ch, 0, victim, TO_NOTVICT);
     } else {
-        oldact("$c1 дает $C3 несколько монет.",  ch, 0, victim, TO_NOTVICT);
+        oldact(_("$c1 дает $C3 несколько монет."),  ch, 0, victim, TO_NOTVICT);
     }
     
     mprog_bribe( victim, ch, gold, silver );
@@ -227,13 +228,13 @@ static void give_money( Character *ch, char *arg1, char *arg2, char *argument, i
     argument = one_argument( argument, arg2 );
     if ( arg2[0] == '\0' )
     {
-            ch->pecho("Дать что и кому?");
+            ch->pecho(_("Дать что и кому?"));
             return;
     }
 
     if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
     {
-            ch->pecho("Здесь таких нет.");
+            ch->pecho(_("Здесь таких нет."));
             return;
     }
 
@@ -252,7 +253,7 @@ CMDRUNP( give )
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-            ch->pecho("Дать что и кому?");
+            ch->pecho(_("Дать что и кому?"));
             return;
     }
 
@@ -263,13 +264,13 @@ CMDRUNP( give )
 
     if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
     {
-        ch->pecho("У тебя нет этого.");
+        ch->pecho(_("У тебя нет этого."));
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
     {
-        ch->pecho("Здесь таких нет.");
+        ch->pecho(_("Здесь таких нет."));
         return;
     }
     
@@ -287,7 +288,7 @@ CMDRUNP( present )
     argument = one_argument( argument, arg2 );
 
     if (arg1[0] == '\0' || arg2[0] == '\0') {
-        ch->pecho( "Что и кому ты хочешь подарить?" );
+        ch->pecho( _("Что и кому ты хочешь подарить?") );
         return;
     }
 
@@ -297,12 +298,12 @@ CMDRUNP( present )
     }
 
     if (( obj = get_obj_carry( ch, arg1 ) ) == 0) {
-        ch->pecho( "У тебя нет этого." );
+        ch->pecho( _("У тебя нет этого.") );
         return;
     }
 
     if (( victim = get_char_room( ch, arg2 ) ) == 0) {
-        ch->pecho( "Они ушли, не дождавшись подарков." );
+        ch->pecho( _("Они ушли, не дождавшись подарков.") );
         return;
     }
     

@@ -3,6 +3,7 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 bool do_look_extradescr( Character *ch, const char *arg, int number );
 
@@ -24,5 +25,5 @@ CMDRUNP( read )
     number = number_argument( arg1, arg2 );
 
     if (!do_look_extradescr( ch, arg2, number ))
-        ch->pecho( "Ты не видишь этого тут." );
+        ch->pecho( _("Ты не видишь этого тут.") );
 }

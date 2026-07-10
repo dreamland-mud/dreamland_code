@@ -18,6 +18,7 @@
 #include "loadsave.h"
 #include "string_utils.h"
 #include "def.h"
+#include "l10n.h"
 
 #define log(x) LogStream::sendNotice() << x << endl
 
@@ -37,7 +38,7 @@ COMMAND(CWrite, "write")
     else if (( target = get_obj_room( ch, targetName.c_str( ) ) ))
         writeOnWall( ch, target, arguments );
     else
-        ch->pecho("У тебя нет этого.");
+        ch->pecho(_("У тебя нет этого."));
 }
 
 void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
@@ -47,22 +48,22 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
     Object *nail;
 
     if (wall->item_type != ITEM_PARCHMENT) {
-        oldact("Тебе не удастся ничего нацарапать на $o6.", ch, wall, 0, TO_CHAR);
+        oldact(_("Тебе не удастся ничего нацарапать на $o6."), ch, wall, 0, TO_CHAR);
         return;
     }
 
     if (wall->can_wear(ITEM_TAKE)) {
-        oldact("Подними $o4 с земли, а потом пиши.", ch, wall, 0, TO_CHAR);
+        oldact(_("Подними $o4 с земли, а потом пиши."), ch, wall, 0, TO_CHAR);
         return;
     }
     
     if (!( nail = findNail( ch ) )) {
-        ch->pecho("Ты не держишь в руках ничего колющего или царапающего.");
+        ch->pecho(_("Ты не держишь в руках ничего колющего или царапающего."));
         return;
     }
 
     if (arguments.empty( )) {
-        oldact("Что именно ты хочешь выцарапать на $o6?", ch, wall, 0, TO_CHAR);
+        oldact(_("Что именно ты хочешь выцарапать на $o6?"), ch, wall, 0, TO_CHAR);
         return;
     }
 
@@ -78,24 +79,24 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
         const DLString &text = wall->getExtraDescr(ed->keyword, LANG_DEFAULT);            
         wall->addExtraDescr(ed->keyword, String::addLine(text, arguments), LANG_DEFAULT);
 
-        oldact("Ты выцарапываешь $O5 надпись на $o6.", ch, wall, nail, TO_CHAR );
-        oldact("$c1 выцарапывает $O5 надпись на $o6.", ch, wall, nail, TO_ROOM );
+        oldact(_("Ты выцарапываешь $O5 надпись на $o6."), ch, wall, nail, TO_CHAR );
+        oldact(_("$c1 выцарапывает $O5 надпись на $o6."), ch, wall, nail, TO_ROOM );
     }
     else if (cmd == "-" && ch->is_immortal( )) {
         if (ed) {
             const DLString &text = wall->getExtraDescr(ed->keyword, LANG_DEFAULT);
             wall->addExtraDescr(ed->keyword, String::delLine(text), LANG_DEFAULT);
 
-            oldact("Ты отшкрябываешь последнюю строчку с $o2.", ch, wall, 0, TO_CHAR );
-            oldact("$c1 скребет $o4.", ch, wall, 0, TO_ROOM );
+            oldact(_("Ты отшкрябываешь последнюю строчку с $o2."), ch, wall, 0, TO_CHAR );
+            oldact(_("$c1 скребет $o4."), ch, wall, 0, TO_ROOM );
         }
         else
-            oldact("$o1 девственно чист(а) - удалять нечего.", ch, wall, 0, TO_CHAR );
+            oldact(_("$o1 девственно чист(а) - удалять нечего."), ch, wall, 0, TO_CHAR );
     }
     else if (cmd == "clear" && ch->is_immortal( )) {
         wall->clearProperDescription();
-        oldact("Ты тщательно отшкрябываешь все надписи с $o2.", ch, wall, 0, TO_CHAR );
-        oldact("$c1 тщательно отшкрябывает все надписи с $o2.", ch, wall, 0, TO_ROOM );
+        oldact(_("Ты тщательно отшкрябываешь все надписи с $o2."), ch, wall, 0, TO_CHAR );
+        oldact(_("$c1 тщательно отшкрябывает все надписи с $o2."), ch, wall, 0, TO_ROOM );
     }                
     else
         usage( ch );
@@ -108,12 +109,12 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
     bool fFace = false;
 
     if (paper->item_type != ITEM_PARCHMENT) {
-        ch->pecho("Это не пергамент.");
+        ch->pecho(_("Это не пергамент."));
         return;
     }
 
     if (arguments.empty( )) {
-        oldact("Что именно ты хочешь записать на $o4?", ch, paper, 0, TO_CHAR);
+        oldact(_("Что именно ты хочешь записать на $o4?"), ch, paper, 0, TO_CHAR);
         return;
     }
     
@@ -137,9 +138,9 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
         paper->extraDescriptions.findAndDestroy(keyword);
         
         if (fFace)
-            oldact("Ты стираешь все надписи с лицевой стороны $o2.", ch, paper, 0, TO_CHAR );
+            oldact(_("Ты стираешь все надписи с лицевой стороны $o2."), ch, paper, 0, TO_CHAR );
         else
-            oldact("Ты стираешь с $o2 все, что касается '$T'.", ch, paper, keyword.c_str( ), TO_CHAR );
+            oldact(_("Ты стираешь с $o2 все, что касается '$T'."), ch, paper, keyword.c_str( ), TO_CHAR );
 
         return;
     }
@@ -161,22 +162,22 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
         paper->addExtraDescr(ed->keyword, String::addLine(text, arguments), LANG_DEFAULT);
         
         if (fFace)
-            oldact("Ты делаешь запись на $o6.", ch, paper, 0, TO_CHAR );
+            oldact(_("Ты делаешь запись на $o6."), ch, paper, 0, TO_CHAR );
         else
-            oldact("Ты делаешь запись на $o6 в раздел '$T'", ch, paper, keyword.c_str( ), TO_CHAR );
+            oldact(_("Ты делаешь запись на $o6 в раздел '$T'"), ch, paper, keyword.c_str( ), TO_CHAR );
     }
     else if (cmd == "-") {
         if (!ed) {
-            oldact("Удалять с $o2 больше нечего.", ch, paper, 0, TO_CHAR );
+            oldact(_("Удалять с $o2 больше нечего."), ch, paper, 0, TO_CHAR );
 
         } else {
             const DLString &text = paper->getExtraDescr(ed->keyword, LANG_DEFAULT);
             paper->addExtraDescr(ed->keyword, String::delLine(text), LANG_DEFAULT);
 
             if (fFace)
-                oldact("Ты удаляешь последнюю строку с $o2.", ch, paper, 0, TO_CHAR );
+                oldact(_("Ты удаляешь последнюю строку с $o2."), ch, paper, 0, TO_CHAR );
             else
-                oldact("Ты удаляешь последнюю строку с $o2 в разделе '$T'.", ch, paper, keyword.c_str( ), TO_CHAR );
+                oldact(_("Ты удаляешь последнюю строку с $o2 в разделе '$T'."), ch, paper, keyword.c_str( ), TO_CHAR );
         } 
     }
 }
@@ -211,7 +212,7 @@ Object * CWrite::findNail( Character *ch )
 
 void CWrite::usage( Character *ch )
 {
-    ch->pecho("Подробнее см. 'help write'.");
+    ch->pecho(_("Подробнее см. 'help write'."));
 }
 
 

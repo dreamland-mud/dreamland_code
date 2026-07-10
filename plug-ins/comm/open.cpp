@@ -12,6 +12,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 /*--------------------------------------------------------------------
  *    open 
@@ -40,19 +41,19 @@ static bool oprog_open_msg(Object *obj, Character *ch)
 static bool open_drink_container( Character *ch, Object *obj )
 {
     if (!IS_SET(obj->value3(), DRINK_CLOSED)) {
-        ch->pecho( "%1$^O1 и так не запер%1$Gто|т|та|ты.", obj );
+        ch->pecho( _("%1$^O1 и так не запер%1$Gто|т|та|ты."), obj );
         return false;
     }
     
     if (IS_SET(obj->value3(), DRINK_LOCKED)) {
         if (IS_SET(obj->value3(), DRINK_CLOSE_CORK))
-            ch->pecho( "%1$^O1 плотно закупоре%1$Gно|н|на|ны пробкой, поищи штопор.", obj );
+            ch->pecho( _("%1$^O1 плотно закупоре%1$Gно|н|на|ны пробкой, поищи штопор."), obj );
         else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL))
-            ch->pecho( "%1$^O1 закры%1$Gто|т|та|ты крышкой и заколоче%1$Gн|но|на|ны.", obj );
+            ch->pecho( _("%1$^O1 закры%1$Gто|т|та|ты крышкой и заколоче%1$Gн|но|на|ны."), obj );
         else if (IS_SET(obj->value3(), DRINK_CLOSE_KEY))
-            ch->pecho( "%1$^O1 крепко запер%1$Gто|т|та|ты.", obj );
+            ch->pecho( _("%1$^O1 крепко запер%1$Gто|т|та|ты."), obj );
         else
-            ch->pecho( "%1$^O1 запер%1$Gто|т|та|ты.", obj );
+            ch->pecho( _("%1$^O1 запер%1$Gто|т|та|ты."), obj );
 
         return false;
     }
@@ -65,16 +66,16 @@ static bool open_drink_container( Character *ch, Object *obj )
         cork = create_object( get_obj_index( OBJ_VNUM_CORK ), 0 );
         obj_to_char( cork, ch );
 
-        oldact("Ты вынимаешь пробку из $O2.", ch, 0, obj, TO_CHAR );
-        oldact("$c1 вынимает пробку из $O2.", ch, 0, obj, TO_ROOM );
+        oldact(_("Ты вынимаешь пробку из $O2."), ch, 0, obj, TO_CHAR );
+        oldact(_("$c1 вынимает пробку из $O2."), ch, 0, obj, TO_ROOM );
     }
     else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL)) {
-        oldact("Ты открываешь крышку $O2.", ch, 0, obj, TO_CHAR );
-        oldact("$c1 открывает крышку $O2.", ch, 0, obj, TO_ROOM );
+        oldact(_("Ты открываешь крышку $O2."), ch, 0, obj, TO_CHAR );
+        oldact(_("$c1 открывает крышку $O2."), ch, 0, obj, TO_ROOM );
     }
     else {
-        oldact("Ты открываешь $O4.", ch, 0, obj, TO_CHAR );
-        oldact("$c1 открывает $O4.", ch, 0, obj, TO_ROOM );
+        oldact(_("Ты открываешь $O4."), ch, 0, obj, TO_CHAR );
+        oldact(_("$c1 открывает $O4."), ch, 0, obj, TO_ROOM );
     }
 
     return true;
@@ -84,19 +85,19 @@ static bool open_container( Character *ch, Object *obj )
 {
     if ( !IS_SET(obj->value1(), CONT_CLOSED) )
     {
-            ch->pecho( "Это уже открыто." );
+            ch->pecho( _("Это уже открыто.") );
             return false;
     }
 
     if ( !IS_SET(obj->value1(), CONT_CLOSEABLE) )
     {
-            ch->pecho( "Ты не можешь сделать этого." );
+            ch->pecho( _("Ты не можешь сделать этого.") );
             return false;
     }
 
     if ( IS_SET(obj->value1(), CONT_LOCKED) )
     {
-            ch->pecho( "Здесь заперто." );
+            ch->pecho( _("Здесь заперто.") );
             return false;
     }
     
@@ -106,8 +107,8 @@ static bool open_container( Character *ch, Object *obj )
     obj->value1(obj->value1() & ~CONT_CLOSED);
 
     if (!oprog_open_msg( obj, ch )) {
-        oldact("Ты открываешь $o4.",ch,obj,0,TO_CHAR);
-        oldact("$c1 открывает $o4.", ch, obj, 0, TO_ROOM);
+        oldact(_("Ты открываешь $o4."),ch,obj,0,TO_CHAR);
+        oldact(_("$c1 открывает $o4."), ch, obj, 0, TO_ROOM);
     }
 
     oprog_open( obj, ch );
@@ -127,7 +128,7 @@ CMDRUNP( open )
 
     if ( arg[0] == '\0' )
     {
-        ch->pecho( "Открыть что?" );
+        ch->pecho( _("Открыть что?") );
         return;
     }
 
@@ -157,7 +158,7 @@ CMDRUNP( open )
             break;
 
         default:
-            ch->pecho( "%^O4 невозможно открыть.", obj );
+            ch->pecho( _("%^O4 невозможно открыть."), obj );
             return;
         }
         

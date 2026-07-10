@@ -8,6 +8,7 @@
 #include "portalmovement.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 void do_visible(Character *);
 
@@ -72,9 +73,9 @@ CMDRUNP(enter)
     if (portal == 0 && peexit == 0)
     {
         if (!argument[0])
-            ch->pecho("Куда ты хочешь войти?");
+            ch->pecho(_("Куда ты хочешь войти?"));
         else
-            ch->pecho("Ты не видишь здесь такого портала или дополнительного выхода.");
+            ch->pecho(_("Ты не видишь здесь такого портала или дополнительного выхода."));
         return;
     }
 
@@ -86,7 +87,7 @@ CMDRUNP(enter)
 
     if (portal->item_type != ITEM_PORTAL)
     {
-        ch->pecho("Ты не находишь пути внутрь %O2, это не портал.", portal);
+        ch->pecho(_("Ты не находишь пути внутрь %O2, это не портал."), portal);
         return;
     }
 

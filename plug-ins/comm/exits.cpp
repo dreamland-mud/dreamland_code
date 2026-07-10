@@ -170,7 +170,7 @@ CMDRUNP( exits )
     int hiddenExits = 0;
 
     if (eyes_blinded( ch )) {
-        oldact("Ты ослепле$gно|н|на и не видишь ничего вокруг себя!", ch, 0, 0, TO_CHAR );
+        oldact(_("Ты ослепле$gно|н|на и не видишь ничего вокруг себя!"), ch, 0, 0, TO_CHAR );
         return;
     }
 

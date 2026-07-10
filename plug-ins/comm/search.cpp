@@ -2,6 +2,7 @@
 #include "character.h"
 #include "interp.h"
 #include "arg_utils.h"
+#include "l10n.h"
 
 CMDRUNP( search )
 {
@@ -14,6 +15,6 @@ CMDRUNP( search )
         }
     }
 
-    ch->pecho("Ты можешь искать только камни.");
+    ch->pecho(_("Ты можешь искать только камни."));
 }
 

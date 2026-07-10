@@ -14,6 +14,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 DLString get_pocket_argument( char *arg );
 void show_char_to_char_1( Character *victim, Character *ch, bool fBrief );
@@ -29,23 +30,23 @@ static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
     if (obj->value0() == 0)
     {
         if (obj->value1() == 0)
-                ch->pecho("Жаль, но здесь нет золота.");
+                ch->pecho(_("Жаль, но здесь нет золота."));
         else if (obj->value1() == 1)
-                ch->pecho("Ух ты! Одна золотая монетка!");
+                ch->pecho(_("Ух ты! Одна золотая монетка!"));
         else
-                ch->pecho("Здесь %d золот%s.",
+                ch->pecho(_("Здесь %d золот%s."),
                         obj->value1(),GET_COUNT(obj->value1(), "ая монета","ые монеты","ых монет"));
     }
     else if (obj->value1() == 0)
     {
         if (obj->value0() == 1)
-                ch->pecho("Ух ты! Одна серебряная монетка.");
+                ch->pecho(_("Ух ты! Одна серебряная монетка."));
         else
-                ch->pecho("Здесь %d серебрян%s.",
+                ch->pecho(_("Здесь %d серебрян%s."),
                         obj->value0(),GET_COUNT(obj->value0(), "ая монета","ые монеты","ых монет"));
     }
     else
-        ch->pecho("Здесь %d золот%s и %d серебрян%s.",
+        ch->pecho(_("Здесь %d золот%s и %d серебрян%s."),
                 obj->value1(),GET_COUNT(obj->value1(), "ая","ые","ых"),
                 obj->value0(),GET_COUNT(obj->value0(), "ая монета","ые монеты","ых монет"));
     return true;
@@ -97,20 +98,20 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 
     if (IS_SET(obj->value1(), CONT_LOCKED)) {
         if (obj->behavior && !obj->behavior->canLock(ch) && obj->value2() <= 0)
-            ch->pecho("%^O1 -- чья-то личная собственность, отпереть сможет только хозяин или хозяйка.", obj);
+            ch->pecho(_("%^O1 -- чья-то личная собственность, отпереть сможет только хозяин или хозяйка."), obj);
         else
-            ch->pecho("%1$^O1 заперт%1$Gо||а|ы на ключ, сперва отопри.", obj);
+            ch->pecho(_("%1$^O1 заперт%1$Gо||а|ы на ключ, сперва отопри."), obj);
         return true;
     }
 
     if (IS_SET(obj->value1(), CONT_CLOSED)) {
-        ch->pecho("%1$^O1 закрыт%1$Gо||а|ы, сперва открой.", obj);
+        ch->pecho(_("%1$^O1 закрыт%1$Gо||а|ы, сперва открой."), obj);
         return true;
     }
     
     if (!pocket.empty( )) {
         if (!IS_SET(obj->value1(), CONT_WITH_POCKETS)) {
-            ch->pecho( "Ты не видишь здесь ни одного кармана." );
+            ch->pecho( _("Ты не видишь здесь ни одного кармана.") );
             return true;
         }
     }
@@ -126,19 +127,19 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 
     if (IS_SET(obj->value1(),CONT_PUT_ON|CONT_PUT_ON2)) {
         if (!pocket.empty( ))
-            ch->pecho( "Отделение '%2$s' %1$O2 содержит:", obj, p );
+            ch->pecho( _("Отделение '%2$s' %1$O2 содержит:"), obj, p );
         else
-            ch->pecho( "На %1$O6 ты видишь:", obj );
+            ch->pecho( _("На %1$O6 ты видишь:"), obj );
     }
     else {
         if (!pocket.empty( )) {
             if (!obj->can_wear( ITEM_TAKE ))
-                ch->pecho( "На полке %1$O2 с надписью '%2$s' ты видишь:", obj, p );
+                ch->pecho( _("На полке %1$O2 с надписью '%2$s' ты видишь:"), obj, p );
             else
-                ch->pecho( "В кармане %1$O2 с надписью '%2$s' ты видишь:", obj, p );
+                ch->pecho( _("В кармане %1$O2 с надписью '%2$s' ты видишь:"), obj, p );
         }
         else {
-            ch->pecho( "%1$^O1 %2s содерж%1$nит|ат:", obj, where );
+            ch->pecho( _("%1$^O1 %2s содерж%1$nит|ат:"), obj, where );
         }
     }
 
@@ -148,14 +149,14 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 
 static bool oprog_examine_corpse( Object *obj, Character *ch, const DLString & )
 {
-    oldact("На $o6 ты видишь:", ch, obj, 0, TO_CHAR );
+    oldact(_("На $o6 ты видишь:"), ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        
 
 static bool oprog_examine_keyring( Object *obj, Character *ch, const DLString & )
 {
-    oldact("На $o4 нанизано:", ch, obj, 0, TO_CHAR );
+    oldact(_("На $o4 нанизано:"), ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        
@@ -195,7 +196,7 @@ static bool oprog_examine( Object *obj, Character *ch, const DLString &arg )
     }
 
     if (!rc)
-        ch->pecho( "Внутрь %O2 невозможно заглянуть.", obj );
+        ch->pecho( _("Внутрь %O2 невозможно заглянуть."), obj );
 
     return rc;
 }
@@ -210,7 +211,7 @@ void do_look_into( Character *ch, char *arg2 )
     
     if (arg2[0] == '\0')
     {
-        ch->pecho( "Посмотреть на что?" );
+        ch->pecho( _("Посмотреть на что?") );
         return;
     }
     
@@ -218,7 +219,7 @@ void do_look_into( Character *ch, char *arg2 )
     obj = get_obj_here( ch, arg2 );
 
     if (!obj) {
-        ch->pecho( "Ты не видишь этого тут." );
+        ch->pecho( _("Ты не видишь этого тут.") );
         return;
     }
     
@@ -241,7 +242,7 @@ CMDRUNP( examine )
     argument = one_argument( argument, arg );
 
     if (arg[0] == '\0') {
-        ch->pecho( "Изучить что?" );
+        ch->pecho( _("Изучить что?") );
         return;
     }
 
@@ -250,11 +251,11 @@ CMDRUNP( examine )
         if ( victim->can_see( ch ) )
         {
             if (ch == victim)
-                oldact("$c1 осматривает себя.",ch,0,0,TO_ROOM);
+                oldact(_("$c1 осматривает себя."),ch,0,0,TO_ROOM);
             else
             {
-                oldact("$c1 бросает взгляд на тебя.", ch, 0, victim, TO_VICT);
-                oldact("$c1 бросает взгляд на $C4.",  ch, 0, victim, TO_NOTVICT);
+                oldact(_("$c1 бросает взгляд на тебя."), ch, 0, victim, TO_VICT);
+                oldact(_("$c1 бросает взгляд на $C4."),  ch, 0, victim, TO_NOTVICT);
             }
         }
 

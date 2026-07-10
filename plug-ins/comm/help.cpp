@@ -11,6 +11,7 @@
 #include "merc.h"
 #include "bugtracker.h"
 #include "screenreader.h"
+#include "l10n.h"
 
 /*---------------------------------------------------------------------------*
  * Help
@@ -277,7 +278,7 @@ CMDRUNP( help )
                 page_to_char( help->getText( ch ).c_str( ), ch );
                 return;
             }
-            ch->pecho("Нет подсказки по данному слову.");
+            ch->pecho(_("Нет подсказки по данному слову."));
             bugTracker->reportNohelp( ch->getPC(), origArgument.c_str( ) );
             return;
         }
@@ -298,7 +299,7 @@ CMDRUNP( help )
             }
         }
         
-        ch->pecho("Нет подсказки по данному слову.");
+        ch->pecho(_("Нет подсказки по данному слову."));
         bugTracker->reportNohelp( ch->getPC(), origArgument.c_str( ) );
         return;
     }

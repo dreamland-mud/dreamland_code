@@ -8,6 +8,7 @@
 #include "dl_strings.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 CMDRUNP( areas )
 {
@@ -23,8 +24,8 @@ CMDRUNP( areas )
     arg2 = arguments.getOneArgument( );
     
     if (!arg1.empty( ) && !arg2.empty( ) && arg1.isNumber( ) != arg2.isNumber( )) {
-        ch->pecho( "Использование: \r\n"
-                     "зоны [<уровень> | <мин.уровень> <макс.уровень> | <название>]" );
+        ch->pecho( _("Использование: \r\n"
+                     "зоны [<уровень> | <мин.уровень> <макс.уровень> | <название>]") );
         return;
     }
     
@@ -40,7 +41,7 @@ CMDRUNP( areas )
             args.clear( );
         }
     } catch (const ExceptionBadType & ) {
-        ch->pecho("Уровень зоны указан неверно.");
+        ch->pecho(_("Уровень зоны указан неверно."));
         return;
     }
     

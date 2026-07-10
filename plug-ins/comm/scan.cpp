@@ -6,6 +6,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 /*--------------------------------------------------------------------
  *    scan
@@ -120,13 +121,13 @@ CMDRUNP(scan)
 
     if (ch->position < POS_SLEEPING)
     {
-        ch->pecho("Ты ничего не видишь, кроме звезд...");
+        ch->pecho(_("Ты ничего не видишь, кроме звезд..."));
         return;
     }
 
     if (ch->position == POS_SLEEPING)
     {
-        ch->pecho("Ты спишь и можешь видеть только сны.");
+        ch->pecho(_("Ты спишь и можешь видеть только сны."));
         return;
     }
 
@@ -134,7 +135,7 @@ CMDRUNP(scan)
 
     if (arg1[0] == '\0')
     {
-        oldact("$c1 осматривает все вокруг.", ch, 0, 0, TO_ROOM);
+        oldact(_("$c1 осматривает все вокруг."), ch, 0, 0, TO_ROOM);
         buf << "Осмотревшись, ты видишь:" << endl;
         scan_people(ch->in_room, ch, 0, -1, true, buf);
 
@@ -149,12 +150,12 @@ CMDRUNP(scan)
 
     if (door < 0)
     {
-        ch->pecho("В какую сторону?");
+        ch->pecho(_("В какую сторону?"));
         return;
     }
 
-    oldact("Ты пристально смотришь $T.", ch, 0, dirs[door].leave, TO_CHAR);
-    oldact("$c1 пристально смотрит $T.", ch, 0, dirs[door].leave, TO_ROOM);
+    oldact(_("Ты пристально смотришь $T."), ch, 0, dirs[door].leave, TO_CHAR);
+    oldact(_("$c1 пристально смотрит $T."), ch, 0, dirs[door].leave, TO_ROOM);
 
     range = max(1, ch->getModifyLevel() / 10);
     room = ch->in_room;
@@ -169,7 +170,7 @@ CMDRUNP(scan)
 
     if (!buf.str().empty())
     {
-        ch->pecho("Ты видишь:");
+        ch->pecho(_("Ты видишь:"));
         ch->send_to(buf);
     }
 }

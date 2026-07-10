@@ -18,6 +18,7 @@
 #include "arg_utils.h"
 #include "string_utils.h"
 #include "def.h"
+#include "l10n.h"
 
 
 // TODO edit multi-language description, consider auto-translate to other languages. Same as with the rest of user input.
@@ -25,7 +26,7 @@
 static void desc_show( Character *ch )
 {
         if (ch->desc) {
-            ch->pecho("Твое описание:");
+            ch->pecho(_("Твое описание:"));
             DLString text = ch->getDescription(LANG_DEFAULT);
             if (text.empty())
                 ch->desc->send("(Отсутствует).\n\r");
@@ -66,9 +67,9 @@ CMDRUNP( description )
             ->regs[0].split(ch->getDescription(LANG_DEFAULT)); 
 
         if (!is_websock(ch)) {
-                ch->pecho("Описание скопировано в буфер редактора, однако пользоваться редактором можно только изнутри веб-клиента.");
+                ch->pecho(_("Описание скопировано в буфер редактора, однако пользоваться редактором можно только изнутри веб-клиента."));
         } else {
-                ch->pecho("Описание скопировано в буфер редактора, используй команду вебредактор{x для редактирования.");
+                ch->pecho(_("Описание скопировано в буфер редактора, используй команду вебредактор{x для редактирования."));
         }
         return;
     }
@@ -79,16 +80,16 @@ CMDRUNP( description )
 
         DLString str = ch->getPC( )->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
         if (str.empty( )) {
-            ch->pecho( "Буфер редактора пуст!" );
+            ch->pecho( _("Буфер редактора пуст!") );
             return;
         }
         if (str.size( ) >= MAX_STRING_LENGTH) {
-            ch->pecho("Слишком длиное описание.");
+            ch->pecho(_("Слишком длиное описание."));
             return;
         }
 
         ch->setDescription(str, LANG_DEFAULT);
-        ch->pecho( "Новое описание вставлено из буфера редактора." );
+        ch->pecho( _("Новое описание вставлено из буфера редактора.") );
         desc_show( ch );
         interpret_raw(ch, "confirm", "review");
         return;
@@ -96,7 +97,7 @@ CMDRUNP( description )
 
     if (argument[0] == '\0') {
         desc_show( ch );
-        ch->pecho("\r\nПодробности читай в {W? описание{x.");
+        ch->pecho(_("\r\nПодробности читай в {W? описание{x."));
         return;
     }
 
@@ -104,7 +105,7 @@ CMDRUNP( description )
     {
         list<DLString> lines = String::toLines(ch->getDescription(LANG_DEFAULT));
         if (lines.empty()) {
-            ch->pecho("Нет ничего для удаления.");
+            ch->pecho(_("Нет ничего для удаления."));
             return;
         }
 
@@ -128,7 +129,7 @@ CMDRUNP( description )
 
         DLString text = String::fromLines(lines);
         if (text.size() > MAX_STRING_LENGTH) {
-            ch->pecho("Слишком длинное описание.");
+            ch->pecho(_("Слишком длинное описание."));
             return;
         }
 

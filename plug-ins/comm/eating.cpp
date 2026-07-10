@@ -29,6 +29,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 CLAN(battlerager);
 GSN(none);
@@ -68,7 +69,7 @@ COMMAND(CEat, "eat")
 
     if (arg.empty( ))
     {
-            ch->pecho("Съесть что?");
+            ch->pecho(_("Съесть что?"));
             return;
     }
     
@@ -81,7 +82,7 @@ COMMAND(CEat, "eat")
             return;
         }
         
-        ch->pecho("У тебя нет этого.");
+        ch->pecho(_("У тебя нет этого."));
         return;
     }
 
@@ -89,14 +90,14 @@ COMMAND(CEat, "eat")
     {
             if ( obj->item_type != ITEM_FOOD && obj->item_type != ITEM_PILL )
             {
-                    ch->pecho("Это несъедобно.");
+                    ch->pecho(_("Это несъедобно."));
                     return;
             }
 
             if ( ch->isAffected(gsn_manacles)
                     && obj->item_type == ITEM_PILL )
             {
-                    ch->pecho("Ты не можешь принимать снадобья в кандалах.");
+                    ch->pecho(_("Ты не можешь принимать снадобья в кандалах."));
                     return;
             }
 
@@ -105,7 +106,7 @@ COMMAND(CEat, "eat")
                 && !ch->is_immortal( )
                 && obj->item_type == ITEM_PILL)
             {
-                ch->pecho("Воинам клана Ярости это ни к чему!");
+                ch->pecho(_("Воинам клана Ярости это ни к чему!"));
                 return;
             }
 
@@ -118,12 +119,12 @@ COMMAND(CEat, "eat")
 
     if (get_wear_level(ch, obj) > ch->getRealLevel() && !ch->is_immortal() )
     {
-            ch->pecho("Тебе надо подрасти, чтобы заглотить это.");
+            ch->pecho(_("Тебе надо подрасти, чтобы заглотить это."));
             return;
     }
 
-    oldact("$c1 ест $o4.",  ch, obj, 0, TO_ROOM);
-    oldact("Ты ешь $o4.", ch, obj, 0, TO_CHAR);
+    oldact(_("$c1 ест $o4."),  ch, obj, 0, TO_ROOM);
+    oldact(_("Ты ешь $o4."), ch, obj, 0, TO_CHAR);
     if ( ch->fighting != 0 )
              ch->setWaitViolence( 3 );
 
@@ -166,8 +167,8 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
         Affect af;
 
         if ( !saves_spell(level / 2, ch, DAM_POISON) ) {
-            ch->recho("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а.", ch);
-            ch->pecho("Тебя начинает тошнить, когда яд проникает в твое тело.");
+            ch->recho(_("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а."), ch);
+            ch->pecho(_("Тебя начинает тошнить, когда яд проникает в твое тело."));
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
@@ -186,14 +187,14 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     int diff, dam, gain;
     
     if (ch->fighting) {
-        ch->pecho("Сейчас ты сражаешься -- тебе не до охоты!");
+        ch->pecho(_("Сейчас ты сражаешься -- тебе не до охоты!"));
         return;
     }
 
     // TODO: all messaging is currently focused on felines.
     Flags att = ch->getRace()->getAttitude(*mob->getRace( ));
     if (!att.isSet(RACE_HUNTS)) {
-        ch->pecho("Это животное не сделало тебе ничего плохого!");
+        ch->pecho(_("Это животное не сделало тебе ничего плохого!"));
         return;
     }
     
@@ -203,38 +204,38 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     
     if (!isCat) {
         if (!isRodent && !isFish) {
-            ch->pecho("Это животное не сделало тебе ничего плохого!");
+            ch->pecho(_("Это животное не сделало тебе ничего плохого!"));
         }
         else {
-            oldact("Вообразив себя ко$gтом|том|шкой, $c1 пытается изловить и сожрать $C4, но опыта явно не хватает.", ch, 0, mob, TO_ROOM);
-            oldact("На миг вообразив себя ко$gтом|том|шкой, ты пытаешься изловить и сожрать $C4, но опыта явно не хватает.", ch, 0, mob, TO_CHAR);
+            oldact(_("Вообразив себя ко$gтом|том|шкой, $c1 пытается изловить и сожрать $C4, но опыта явно не хватает."), ch, 0, mob, TO_ROOM);
+            oldact(_("На миг вообразив себя ко$gтом|том|шкой, ты пытаешься изловить и сожрать $C4, но опыта явно не хватает."), ch, 0, mob, TO_CHAR);
         }
 
         return;
     }
     else {
         if (!isRodent && !isFish) {
-            oldact("$c1, похоже, приня$gло|л|ла $C4 за маааленького грызунчика.", ch, 0, mob, TO_ROOM);
-            oldact("Это не грызун! Даже и не думай за $Y гоняться.", ch, 0, mob, TO_CHAR);
+            oldact(_("$c1, похоже, приня$gло|л|ла $C4 за маааленького грызунчика."), ch, 0, mob, TO_ROOM);
+            oldact(_("Это не грызун! Даже и не думай за $Y гоняться."), ch, 0, mob, TO_CHAR);
             return;
         }
     }
     
 
     if (mob->master) {
-        oldact("$c1 с аппетитом клацает зубами при виде $C2.", ch, 0, mob, TO_ROOM);
-        oldact("Ты с аппетитом клацаешь зубами при виде $C2.", ch, 0, mob, TO_CHAR);
+        oldact(_("$c1 с аппетитом клацает зубами при виде $C2."), ch, 0, mob, TO_ROOM);
+        oldact(_("Ты с аппетитом клацаешь зубами при виде $C2."), ch, 0, mob, TO_CHAR);
         
         if (mob->master == ch) {
-            oldact("$C1 с ужасом смотрит на $c4.", ch, 0, mob, TO_ROOM);
-            oldact("$C1 с ужасом смотрит на тебя.", ch, 0, mob, TO_CHAR);
+            oldact(_("$C1 с ужасом смотрит на $c4."), ch, 0, mob, TO_ROOM);
+            oldact(_("$C1 с ужасом смотрит на тебя."), ch, 0, mob, TO_CHAR);
         }
         else if (mob->master->in_room == mob->in_room) {
-            oldact("$C1 шустро прячется за спину хозя$gина|ина|йки!", mob->master, 0, mob, TO_ROOM);
-            oldact("$C1 шустро прячется за твою спину!", mob->master, 0, mob, TO_CHAR);  
+            oldact(_("$C1 шустро прячется за спину хозя$gина|ина|йки!"), mob->master, 0, mob, TO_ROOM);
+            oldact(_("$C1 шустро прячется за твою спину!"), mob->master, 0, mob, TO_CHAR);  
         }
         else
-            oldact("$C1 вжимается в пол, закрыв глаза лапами.", ch, 0, mob, TO_ALL);
+            oldact(_("$C1 вжимается в пол, закрыв глаза лапами."), ch, 0, mob, TO_ALL);
         
         return;
     }
@@ -244,8 +245,8 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
             if (!desireManager->find( i )->canEat( ch->getPC( ) ))
                  return;
    
-    oldact("$c1 с громким мяуканьем вцепляется зубами и когтями в $C4!", ch, 0, mob, TO_ROOM);
-    oldact("Ты с громким мяуканьем вцепляешься зубами и когтями в $C4!", ch, 0, mob, TO_CHAR);
+    oldact(_("$c1 с громким мяуканьем вцепляется зубами и когтями в $C4!"), ch, 0, mob, TO_ROOM);
+    oldact(_("Ты с громким мяуканьем вцепляешься зубами и когтями в $C4!"), ch, 0, mob, TO_CHAR);
 
     diff = max( 1, ch->getRealLevel( ) - mob->getRealLevel( ) );
     dam = diff * 10;
@@ -255,8 +256,8 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     if (dam >= mob->hit) {
         Object *obj, *obj_next;
         
-        oldact("Ты ешь $C4.", ch, 0, mob, TO_CHAR);
-        oldact("$c1 ест $C4.", ch, 0, mob, TO_ROOM);
+        oldact(_("Ты ешь $C4."), ch, 0, mob, TO_CHAR);
+        oldact(_("$c1 ест $C4."), ch, 0, mob, TO_ROOM);
 
         for (obj = mob->carrying; obj; obj = obj_next) {
             obj_next = obj->next_content;
@@ -286,37 +287,37 @@ CMDRUNP( quaff )
     one_argument( argument, arg );
 
     if(!ch->is_npc( ) && ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
-        ch->pecho("Ты же воин клана Ярости, а не презренный МАГ!");
+        ch->pecho(_("Ты же воин клана Ярости, а не презренный МАГ!"));
         return;
     }
 
     if (arg[0] == '\0') {
-        ch->pecho("Осушить что?");
+        ch->pecho(_("Осушить что?"));
         return;
     }
 
     if (( obj = get_obj_carry( ch, arg ) ) == 0) {
-        ch->pecho("У тебя нет такого снадобья.");
+        ch->pecho(_("У тебя нет такого снадобья."));
         return;
     }
 
     if (obj->item_type != ITEM_POTION) {
-        ch->pecho("Осушать можно только снадобья.");
+        ch->pecho(_("Осушать можно только снадобья."));
         return;
     }
 
     if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
-        ch->pecho("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить её.", ch);
+        ch->pecho(_("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить её."), ch);
         return;
     }
     
     if (ch->getProfession( ) == prof_druid) {
-        ch->pecho("Ты не хочешь осквернять свое тело синтетикой.");
+        ch->pecho(_("Ты не хочешь осквернять свое тело синтетикой."));
         return;        
     }
     
-    oldact("$c1 осушает $o4.", ch, obj, 0, TO_ROOM);
-    oldact("Ты осушаешь $o4.", ch, obj, 0 ,TO_CHAR);
+    oldact(_("$c1 осушает $o4."), ch, obj, 0, TO_ROOM);
+    oldact(_("Ты осушаешь $o4."), ch, obj, 0 ,TO_CHAR);
     
     if (oprog_quaff( obj, ch ))
         return;
@@ -347,7 +348,7 @@ CMDRUNP( vomit )
 {
     if (!ch->is_npc( )) {
         if (desire_bloodlust->applicable( ch->getPC( ) )) {
-            ch->pecho("Вампирам это, увы, недоступно.");
+            ch->pecho(_("Вампирам это, увы, недоступно."));
             return;
         }
         
@@ -356,8 +357,8 @@ CMDRUNP( vomit )
         desire_thirst->vomit( ch->getPC( ) );
     }
 
-    ch->recho("%1$^C1 засовыва%1$nет|ют пальцы в рот и начина%1$nет|ют блевать.", ch);
-	ch->pecho("Ты прочищаешь свой желудок двухпальцевым методом.");
+    ch->recho(_("%1$^C1 засовыва%1$nет|ют пальцы в рот и начина%1$nет|ют блевать."), ch);
+	ch->pecho(_("Ты прочищаешь свой желудок двухпальцевым методом."));
 
     mprog_vomit( ch );
 }

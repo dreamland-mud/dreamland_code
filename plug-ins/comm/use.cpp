@@ -11,6 +11,7 @@
 #include "interp.h"
 #include "act.h"
 #include "loadsave.h"
+#include "l10n.h"
 
 /*
  * fenia-related commands: use 
@@ -30,7 +31,7 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
     switch(obj->item_type) {
         case ITEM_POTION:
             if (obj->carried_by != ch || obj->wear_loc != wear_none) 
-                ch->pecho("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре.", obj);
+                ch->pecho(_("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре."), obj);
             else {
                 DLString idArg = DLString( obj->getID( ) ) + " " + argument;
                 interpret_cmd( ch, "quaff", idArg.c_str( ) );
@@ -38,7 +39,7 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
             return true;
         case ITEM_SCROLL:
             if (obj->carried_by != ch || obj->wear_loc != wear_none) 
-                ch->pecho("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре.", obj);
+                ch->pecho(_("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре."), obj);
             else {
                 DLString idArg = DLString( obj->getID( ) ) + " " + argument;
                 interpret_cmd( ch, "recite", idArg.c_str( ) );
@@ -46,13 +47,13 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
             return true;
         case ITEM_WAND:
             if (obj->wear_loc != wear_hold) 
-                ch->pecho("%1$^O4 сперва необходимо зажать в руках.", obj);
+                ch->pecho(_("%1$^O4 сперва необходимо зажать в руках."), obj);
             else
                 interpret_cmd( ch, "zap", argument );
             return true;
         case ITEM_STAFF:
             if (obj->wear_loc != wear_hold) 
-                ch->pecho("%1$^O4 сперва необходимо зажать в руках.", obj);
+                ch->pecho(_("%1$^O4 сперва необходимо зажать в руках."), obj);
             else
                 interpret_cmd( ch, "brandish", argument );
             return true;
@@ -69,7 +70,7 @@ CMDRUNP( use )
     argument = one_argument( argument, arg );
 
     if (!arg[0]) {
-        ch->pecho("Использовать что?");
+        ch->pecho(_("Использовать что?"));
         return;
     }
 
@@ -81,7 +82,7 @@ CMDRUNP( use )
 
     if (!obj)
     {
-        oldact("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+        oldact(_("Ты не видишь здесь этого."), ch, 0, 0, TO_CHAR);
         return;
     }
     
@@ -90,11 +91,11 @@ CMDRUNP( use )
     
     // Can only "handle" something in the inventory -- otherwise, "touch"
     if (obj->carried_by == ch && obj->wear_loc == wear_none) {
-        oldact("Ты вертишь в руках $o4, не находя способа это использовать.", ch, obj, 0, TO_CHAR);
-        oldact("$c1 вертит в руках $o4, не находя способа это использовать.", ch, obj, 0, TO_ROOM);
+        oldact(_("Ты вертишь в руках $o4, не находя способа это использовать."), ch, obj, 0, TO_CHAR);
+        oldact(_("$c1 вертит в руках $o4, не находя способа это использовать."), ch, obj, 0, TO_ROOM);
     } else {
-        oldact("Ты озадаченно ощупываешь $o4, не находя способа это использовать.", ch, obj, 0, TO_CHAR);
-        oldact("$c1 озадаченно ощупывает $o4, не находя способа это использовать.", ch, obj, 0, TO_ROOM);
+        oldact(_("Ты озадаченно ощупываешь $o4, не находя способа это использовать."), ch, obj, 0, TO_CHAR);
+        oldact(_("$c1 озадаченно ощупывает $o4, не находя способа это использовать."), ch, obj, 0, TO_ROOM);
     }
 }        
 

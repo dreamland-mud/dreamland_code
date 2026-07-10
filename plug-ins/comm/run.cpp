@@ -17,6 +17,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 
 static bool isBigLetter( char c )
@@ -40,7 +41,7 @@ CMDRUN( run )
     unsigned int i;
 
     if (ch->is_npc()) {
-        ch->pecho("Тебе доступно только передвижение пешком, увы.");
+        ch->pecho(_("Тебе доступно только передвижение пешком, увы."));
         return;
     }
 
@@ -49,17 +50,17 @@ CMDRUN( run )
     walk.stripWhiteSpace( );
 
     if (pch->fighting) {
-        pch->pecho("Но ты же сражаешься! Используй команду {yсбежать{x для побега из боя.");
+        pch->pecho(_("Но ты же сражаешься! Используй команду {yсбежать{x для побега из боя."));
         return;
     }
 
     if (!pch || walk.empty( )) {
-        ch->pecho("По какому маршруту ты хочешь бежать?");
+        ch->pecho(_("По какому маршруту ты хочешь бежать?"));
         return;
     }
 
     if (pch->position < POS_STANDING) {
-        pch->pecho("Исходное положение для бега -- стоя!");
+        pch->pecho(_("Исходное положение для бега -- стоя!"));
         return;
     }
     
@@ -70,19 +71,19 @@ CMDRUN( run )
             cnt = cnt * 10 + walk[i++] - '0';
 
             if (i >= walk.length( )) {
-                pch->pecho("Маршрут не может оканчиваться на цифру.");
+                pch->pecho(_("Маршрут не может оканчиваться на цифру."));
                 return;
             }
         }
         
         if (isBigLetter( walk[i] )) {
             if (cnt > 0) {
-                pch->pecho("До упора в одну сторону можно побежать только один раз.");
+                pch->pecho(_("До упора в одну сторону можно побежать только один раз."));
                 return;
             }
         }
         else if (!isSmallLetter( walk[i] )) {
-            pch->pecho( "Непонятное направление для бега: '%c'.", walk[i] );
+            pch->pecho( _("Непонятное направление для бега: '%c'."), walk[i] );
             return;
         }
         
@@ -93,7 +94,7 @@ CMDRUN( run )
     }
     
     if (buf.str( ).length( ) > 100) {
-        pch->pecho("Слишком далеко бежать.");
+        pch->pecho(_("Слишком далеко бежать."));
         return;
     }
     
@@ -279,10 +280,10 @@ void XMLAttributeSpeedWalk::show(PCharacter *ch) const
     }
         
     if (ch->isCoder())
-        ch->pecho("Развернутый маршрут: %s", path.c_str());
+        ch->pecho(_("Развернутый маршрут: %s"), path.c_str());
 
     if (!collated.empty())
-        ch->pecho("Тебе оставалось бежать: {hs{c%s{x", collated.c_str());
+        ch->pecho(_("Тебе оставалось бежать: {hs{c%s{x"), collated.c_str());
 }
 
 char XMLAttributeSpeedWalk::getFirstCommand( ) const

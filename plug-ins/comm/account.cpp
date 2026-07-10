@@ -6,6 +6,7 @@
 #include "player_account.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
@@ -18,20 +19,20 @@ CMDRUN( password )
     
     if (argOld.empty() || argNew.empty())
     {
-        ch->pecho("Синтаксис: пароль <старый> <новый>.");
+        ch->pecho(_("Синтаксис: пароль <старый> <новый>."));
         return;
     }
     
     if (!password_check( ch->getPC( ), argOld ))
     {
         ch->setWait(40 );
-        ch->pecho("Неверный пароль. Подожди 10 секунд.");
+        ch->pecho(_("Неверный пароль. Подожди 10 секунд."));
         return;
     }
 
     if (argNew.length() < 5)
     {
-        ch->pecho("Новый пароль должен содержать более пяти символов.");
+        ch->pecho(_("Новый пароль должен содержать более пяти символов."));
         return;
     }
 
@@ -53,7 +54,7 @@ CMDRUNP( delete )
     pch = ch->getPC( );
 
     if (pch->getAttributes().isAvailable("nodelete")) {
-        pch->pecho("Твой персонаж могут удалить только Боги.");
+        pch->pecho(_("Твой персонаж могут удалить только Боги."));
         return;
     }
 
@@ -61,7 +62,7 @@ CMDRUNP( delete )
     {
         if (!password_check( pch, argument ))
         {
-            pch->pecho("Попытка суицида отменена -- неверный пароль.");
+            pch->pecho(_("Попытка суицида отменена -- неверный пароль."));
             pch->confirm_delete = false;
             return;
         }
@@ -70,7 +71,7 @@ CMDRUNP( delete )
             wiznet( WIZ_SECURE, 0, pch->get_trust( ), 
                    "%1$^C1 превращает себя в помехи в проводах.", pch );
             DLString msg;
-            msg = fmt(0, "{1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир.", pch);
+            msg = fmt(0, _("{1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир."), pch);
             infonet(pch, 0, "{CТихий голос из $o2: ", msg.c_str());
             send_to_discord_stream(":ghost: " + msg); // discord only here, explicitly asked for by players
             
@@ -79,9 +80,9 @@ CMDRUNP( delete )
         }
     }
 
-    pch->pecho("{RВНИМАНИЕ: {WЭТО НЕОБРАТИМОЕ ДЕЙСТВИЕ, ТВОЙ ПЕРСОНАЖ БУДЕТ УДАЛЕН НАСОВСЕМ!{x");
-    pch->pecho("Введи {yудалить <твой пароль>{x для подтверждения команды.");
-    pch->pecho("Чтобы отменить попытку суицида, введи {yудалить без пароля.");
+    pch->pecho(_("{RВНИМАНИЕ: {WЭТО НЕОБРАТИМОЕ ДЕЙСТВИЕ, ТВОЙ ПЕРСОНАЖ БУДЕТ УДАЛЕН НАСОВСЕМ!{x"));
+    pch->pecho(_("Введи {yудалить <твой пароль>{x для подтверждения команды."));
+    pch->pecho(_("Чтобы отменить попытку суицида, введи {yудалить без пароля."));
     pch->getPC( )->confirm_delete = true;
     wiznet( WIZ_SECURE, 0, pch->get_trust( ), 
             "%^C1 собирается удалить своего персонажа.", pch );

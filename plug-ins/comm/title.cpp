@@ -6,6 +6,7 @@
 #include "merc.h"
 #include "def.h"
 #include <arg_utils.h>
+#include "l10n.h"
 
 static bool fix_title( PCharacter *ch, DLString &title )
 {
@@ -20,7 +21,7 @@ static bool fix_title( PCharacter *ch, DLString &title )
     title.replaces( "{+", "" );
 
     if (title.colourStrip().size() > 50) {
-        ch->pecho( "Слишком длинный титул." );
+        ch->pecho( _("Слишком длинный титул.") );
         return false;
     }
     
@@ -36,7 +37,7 @@ CMDRUNP( title )
         return;
 
     if (IS_SET(ch->act, PLR_NO_TITLE)) {
-        ch->pecho( "Ты не можешь сменить титул." );
+        ch->pecho( _("Ты не можешь сменить титул.") );
         return;
     }
     
@@ -62,7 +63,7 @@ CMDRUNP( title )
 
     if (arg == "clear" || arg == "очистить") {
         pch->setTitle( DLString::emptyString );
-        pch->pecho( "Титул удален." );
+        pch->pecho( _("Титул удален.") );
         return;
     }
 
@@ -71,7 +72,7 @@ CMDRUNP( title )
 
     pch->setTitle( arg );
 
-    pch->pecho("Теперь ты {W%C1{x%s{x", pch, Player::title(pch, Player::displayLang(pch)).c_str());
+    pch->pecho(_("Теперь ты {W%C1{x%s{x"), pch, Player::title(pch, Player::displayLang(pch)).c_str());
 }
 
 static bool fix_pretitle( PCharacter *ch, DLString &title )
@@ -86,12 +87,12 @@ static bool fix_pretitle( PCharacter *ch, DLString &title )
     nospace.stripWhiteSpace( );
    
     if (stripped.size( ) > 25) {
-        ch->pecho( "Слишком длинный претитул!" );
+        ch->pecho( _("Слишком длинный претитул!") );
         return false;
     }
     
     if (nospace.size( ) != stripped.size( )) {
-        ch->pecho( "В начале или в конце претитула не должно быть пробелов." );
+        ch->pecho( _("В начале или в конце претитула не должно быть пробелов.") );
         return false;
     }
     
@@ -100,7 +101,7 @@ static bool fix_pretitle( PCharacter *ch, DLString &title )
                 && stripped[i] != ' ' 
                 && stripped[i] != '\'') 
         {
-            ch->pecho( "В претитуле разрешено использовать только буквы, пробелы и одинарные кавычки." );
+            ch->pecho( _("В претитуле разрешено использовать только буквы, пробелы и одинарные кавычки.") );
             return false;
         }
 
@@ -123,7 +124,7 @@ CMDRUNP( pretitle )
         return;
 
     if (IS_SET(pch->act, PLR_NO_TITLE)) {
-         pch->pecho( "Ты не можешь изменить претитул.");
+         pch->pecho( _("Ты не можешь изменить претитул."));
          return;
     }
     
@@ -131,7 +132,7 @@ CMDRUNP( pretitle )
         DLString eng = pch->getPretitle( );
         DLString rus = pch->getRussianPretitle( );
 
-        pch->pecho( "Твой претитул: %s\r\nРусский претитул: %s",
+        pch->pecho( _("Твой претитул: %s\r\nРусский претитул: %s"),
                      (eng.empty( ) ? "(нет)" : eng.c_str( )),
                      (rus.empty( ) ? "(нет)" : rus.c_str( )) );
         return;
@@ -140,7 +141,7 @@ CMDRUNP( pretitle )
     if (arg == "clear" || arg == "очистить") {
         pch->setPretitle( DLString::emptyString );
         pch->setRussianPretitle( DLString::emptyString );
-        pch->pecho("Русский и английский претитулы очищены.");
+        pch->pecho(_("Русский и английский претитулы очищены."));
         return;
     }
     
@@ -151,7 +152,7 @@ CMDRUNP( pretitle )
             return;
 
         pch->setRussianPretitle( arg );
-        pch->pecho( "Русский претитул: %s", arg.c_str( ) );
+        pch->pecho( _("Русский претитул: %s"), arg.c_str( ) );
     }
     else { 
         arg = argument;
@@ -160,7 +161,7 @@ CMDRUNP( pretitle )
             return;
 
         pch->setPretitle( arg );
-        pch->pecho( "Твой претитул: %s", arg.c_str( ) );
+        pch->pecho( _("Твой претитул: %s"), arg.c_str( ) );
     }
 }
 

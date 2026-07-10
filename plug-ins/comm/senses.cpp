@@ -23,6 +23,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 bool oprog_smell_liquid(Liquid *liq, Character *ch);
 
@@ -46,8 +47,8 @@ CMDRUNP( listen )
     if (!arg[0] || arg_is_strict(arg, "room")) {
         bool rc = false;
 
-        oldact("Ты прислушиваешься.", ch, 0, 0, TO_CHAR);
-        oldact("$c1 прислушивается.", ch, 0, 0, TO_ROOM);
+        oldact(_("Ты прислушиваешься."), ch, 0, 0, TO_CHAR);
+        oldact(_("$c1 прислушивается."), ch, 0, 0, TO_ROOM);
 
         // Can add onListen triggers here for room and all affects on it.
 
@@ -57,7 +58,7 @@ CMDRUNP( listen )
         }
 
         if (!rc)
-            ch->pecho("Ты не слышишь ничего особенного вокруг.");
+            ch->pecho(_("Ты не слышишь ничего особенного вокруг."));
 
         return;
     }
@@ -67,12 +68,12 @@ CMDRUNP( listen )
          || ( obj = get_obj_room( ch, arg ) ))
     {
         if (obj->carried_by == ch) {
-            oldact("Ты подносишь к уху $o4 и прислушиваешься.", ch, obj, 0, TO_CHAR);
-            oldact("$c1 подносит к уху $o4 и прислушивается.", ch, obj, 0, TO_ROOM);
+            oldact(_("Ты подносишь к уху $o4 и прислушиваешься."), ch, obj, 0, TO_CHAR);
+            oldact(_("$c1 подносит к уху $o4 и прислушивается."), ch, obj, 0, TO_ROOM);
         }
         else {
-            oldact("Ты прикладываешь ухо к $o3 и прислушиваешься.", ch, obj, 0, TO_CHAR);
-            oldact("$c1 прикладывает ухо к $o3 и прислушивается.", ch, obj, 0, TO_ROOM);
+            oldact(_("Ты прикладываешь ухо к $o3 и прислушиваешься."), ch, obj, 0, TO_CHAR);
+            oldact(_("$c1 прикладывает ухо к $o3 и прислушивается."), ch, obj, 0, TO_ROOM);
         }
 
         if (oprog_listen( obj, ch, argument ))
@@ -84,16 +85,16 @@ CMDRUNP( listen )
         }
 
         if (IS_OBJ_STAT(obj, ITEM_HUM))
-            ch->pecho( "Ты чувствуешь слабую вибрацию." );
+            ch->pecho( _("Ты чувствуешь слабую вибрацию.") );
         else
-            ch->pecho("  ... но оттуда не доносится ни звука.");
+            ch->pecho(_("  ... но оттуда не доносится ни звука."));
 
         return;
     }
     
     /* TODO: listen to a mob */
 
-    oldact("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+    oldact(_("Ты не видишь здесь этого."), ch, 0, 0, TO_CHAR);
 }        
 
 /*---------------------------------------------------------------------------
@@ -165,8 +166,8 @@ CMDRUNP( smell )
     if (!arg[0] || arg_is_strict(arg, "room")) {
         bool rc = false;
 
-        oldact("Ты нюхаешь воздух.", ch, 0, 0, TO_CHAR);
-        oldact("$c1 принюхивается.", ch, 0, 0, TO_ROOM);
+        oldact(_("Ты нюхаешь воздух."), ch, 0, 0, TO_CHAR);
+        oldact(_("$c1 принюхивается."), ch, 0, 0, TO_ROOM);
 
         if (rprog_smell( ch->in_room, ch, argument ))
             rc = true;
@@ -182,7 +183,7 @@ CMDRUNP( smell )
         rc = afprog_smell( ch->in_room, ch, argument ) || rc;
 
         if (!rc)
-            ch->pecho("Вокруг пахнет вполне обычно.");
+            ch->pecho(_("Вокруг пахнет вполне обычно."));
 
         return;
     }
@@ -195,26 +196,26 @@ CMDRUNP( smell )
 
         if (!argument[0]) {
             if (attr && !attr->getValue( ).empty( ))
-                ch->pecho("Ты пахнешь:\n\r%s", attr->getValue( ).c_str( ) ); 
+                ch->pecho(_("Ты пахнешь:\n\r%s"), attr->getValue( ).c_str( ) ); 
             else
-                ch->pecho("Ты ничем особенным не пахнешь.");
+                ch->pecho(_("Ты ничем особенным не пахнешь."));
             return;
         }
 
         if (arg_is_strict(argument, "clear")) {
             attr->setValue( "" );
-            ch->pecho( "Теперь ты никак не пахнешь." );
+            ch->pecho( _("Теперь ты никак не пахнешь.") );
             return;
         }
 
         if (arg_is_help( argument )) {
-            ch->pecho( "Используй 'smell description <строка>' для установки запаха\n\r"
-                         "или 'smell description clear' для его очистки." );
+            ch->pecho( _("Используй 'smell description <строка>' для установки запаха\n\r"
+                         "или 'smell description clear' для его очистки.") );
             return;
         }
         
         attr->setValue( argument );
-        ch->pecho("Теперь ты будешь пахнуть так:\n\r%s", argument );
+        ch->pecho(_("Теперь ты будешь пахнуть так:\n\r%s"), argument );
         return;
     }
 
@@ -229,8 +230,8 @@ CMDRUNP( smell )
     {
         bool rc = false;
 
-        oldact("Ты нюхаешь $o4.", ch, obj, 0, TO_CHAR);
-        oldact("$c1 нюхает $o4.", ch, obj, 0, TO_ROOM);
+        oldact(_("Ты нюхаешь $o4."), ch, obj, 0, TO_CHAR);
+        oldact(_("$c1 нюхает $o4."), ch, obj, 0, TO_ROOM);
 
         if (oprog_smell( obj, ch, argument ))
             rc = true;
@@ -249,7 +250,7 @@ CMDRUNP( smell )
         rc = afprog_smell( obj, ch, argument ) || rc;
         
         if (!rc)
-            ch->pecho("Пахнет вполне обычно.");
+            ch->pecho(_("Пахнет вполне обычно."));
 
         return;
     }
@@ -263,12 +264,12 @@ CMDRUNP( smell )
         bool rc = false;
 
         if (ch == victim) {
-            oldact("Ты обнюхиваешь себя.", ch, 0, 0, TO_CHAR);
-            oldact("$c1 обнюхивает себя.", ch, 0, 0, TO_ROOM);
+            oldact(_("Ты обнюхиваешь себя."), ch, 0, 0, TO_CHAR);
+            oldact(_("$c1 обнюхивает себя."), ch, 0, 0, TO_ROOM);
         } else {
-            oldact("Ты обнюхиваешь $C4.", ch, 0, victim, TO_CHAR);
-            oldact("$c1 обнюхивает $C4.", ch, 0, victim, TO_NOTVICT);
-            oldact("$c1 обнюхивает тебя.", ch, 0, victim, TO_VICT);
+            oldact(_("Ты обнюхиваешь $C4."), ch, 0, victim, TO_CHAR);
+            oldact(_("$c1 обнюхивает $C4."), ch, 0, victim, TO_NOTVICT);
+            oldact(_("$c1 обнюхивает тебя."), ch, 0, victim, TO_VICT);
         }
 
         if (!( rc = mprog_smell( victim, ch, argument ) )) {
@@ -291,12 +292,12 @@ CMDRUNP( smell )
         rc = afprog_smell( victim, ch, argument ) || rc;
         
         if (!rc)
-            ch->pecho("Пахнет вполне обычно.");
+            ch->pecho(_("Пахнет вполне обычно."));
 
         return;
     }
 
-    oldact("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+    oldact(_("Ты не видишь здесь этого."), ch, 0, 0, TO_CHAR);
 }        
 
 

@@ -25,6 +25,7 @@
 #include "act.h"
 #include "arg_utils.h"
 #include "def.h"
+#include "l10n.h"
 
 #define MILD(ch)     (IS_SET((ch)->comm, COMM_MILDCOLOR))
 
@@ -70,7 +71,7 @@ bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
     if (arg.empty( )) {
         bool yes = isSetBit(ch);
         printLine( ch );
-        ch->pecho("\nИспользуй команду {hc{yрежим %s %s{x для изменения.",
+        ch->pecho(_("\nИспользуй команду {hc{yрежим %s %s{x для изменения."),
                       rname.c_str(), yes ? "нет" : "да", name.c_str(), yes ? "no" : "yes");
         return true;
     }
@@ -229,7 +230,7 @@ COMMAND(ConfigCommand, "config")
         config_discord_print(pch);
         config_lang_print(pch);
 
-        ch->pecho("\r\nПодробнее смотри по команде {yрежим {Dнастройка{w.");
+        ch->pecho(_("\r\nПодробнее смотри по команде {yрежим {Dнастройка{w."));
         return;
     }
 
@@ -259,13 +260,13 @@ COMMAND(ConfigCommand, "config")
                 if (arg1.strPrefix((*c)->getName()) || arg1.strPrefix((*c)->getRussianName()))
                 {
                     if (!(*c)->handleArgument( pch, arg2 ))
-                        pch->pecho("Неправильный переключатель. См. {W? режим{x.");
+                        pch->pecho(_("Неправильный переключатель. См. {W? режим{x."));
 
                     return;
                 }
 
     
-    pch->pecho("Опция не найдена. Используй {hc{yрежим{x для списка.");
+    pch->pecho(_("Опция не найдена. Используй {hc{yрежим{x для списка."));
 }
 
 
@@ -286,12 +287,12 @@ static void config_lang(PCharacter *ch, const DLString &constArguments)
     else if (arg_is(arg, "ru"))
         lang = "ru";
     else {
-        ch->pecho("Укажи язык: англ, укр или рус.");
+        ch->pecho(_("Укажи язык: англ, укр или рус."));
         return;
     }
 
     ch->getAttributes().getAttr<XMLStringAttribute>("lang")->setValue(lang);
-    ch->pecho("Ок.");
+    ch->pecho(_("Ок."));
 }
 
 static void config_lang_print(PCharacter *ch)
@@ -300,7 +301,7 @@ static void config_lang_print(PCharacter *ch)
     // TODO move to a func
     DLString langname = lang == EN ? "англ" : lang == UA ? "укр" : "рус";
 
-    ch->pecho( "  {%s%-14s {%s%5s {xнабери {y{hcрежим язык{x для установки",
+    ch->pecho( _("  {%s%-14s {%s%5s {xнабери {y{hcрежим язык{x для установки"),
                     CLR_NAME(ch),
                     "язык",
                     CLR_YES(ch),
@@ -315,7 +316,7 @@ static void config_scroll_print(PCharacter *ch)
     DLString lines(ch->lines);
     bool yes = ch->lines > 0;
     DLString msgNo = "Ты получаешь длинные сообщения без буферизации.";
-    DLString msgYes = fmt(0, "Тебе непрерывно выводится %d лин%s текста.",
+    DLString msgYes = fmt(0, _("Тебе непрерывно выводится %d лин%s текста."),
                        ch->lines.getValue( ), GET_COUNT(ch->lines.getValue( ), "ия","ии","ий") );
 
     print_line(ch, "scroll", "буфер", yes, msgYes, msgNo);
@@ -332,12 +333,12 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
     if (arg.empty( ))
     {
         config_scroll_print(ch);
-        ch->pecho("Для изменения используй {yрежим буфер{x число.");
+        ch->pecho(_("Для изменения используй {yрежим буфер{x число."));
         return;
     }
 
     if (!arg.isNumber( )) {
-        ch->pecho("Ты должен ввести количество линий.");
+        ch->pecho(_("Ты должен ввести количество линий."));
         return;
     }
 
@@ -345,25 +346,25 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
         lines = arg.toInt( );
     }
     catch (const ExceptionBadType& ) {
-        ch->pecho("Неправильное число.");
+        ch->pecho(_("Неправильное число."));
         return;
     }
 
     if (lines == 0)
     {
-        ch->pecho("Буферизация вывода отключена.");
+        ch->pecho(_("Буферизация вывода отключена."));
         ch->lines = 0;
         return;
     }
 
     if (lines < 10 || lines > 200)
     {
-        ch->pecho("Введи значение между 10 и 200.");
+        ch->pecho(_("Введи значение между 10 и 200."));
         return;
     }
 
     ch->lines = lines;
-    ch->pecho( "Вывод установлен на %d лин%s.", lines,
+    ch->pecho( _("Вывод установлен на %d лин%s."), lines,
                 GET_COUNT(lines, "ию","ии","ий") );
 }
 
@@ -374,7 +375,7 @@ static void config_telegram_print(PCharacter *ch)
 {
     const DLString &user = get_string_attribute(ch, "telegram");
     bool yes = !user.empty();
-    DLString msgYes = fmt(0, "Пользователь Telegram {C%s{x.", user.c_str());
+    DLString msgYes = fmt(0, _("Пользователь Telegram {C%s{x."), user.c_str());
     DLString msgNo = "Твой персонаж не связан с пользователями Telegram, набери {y{hcрежим телеграм{x.";
     print_line(ch, "telegram", "телеграм", yes, msgYes, msgNo);
 }
@@ -389,20 +390,20 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments)
 
     if (arg.empty()) {
         if (!user->empty())
-            ch->pecho("Твой персонаж связан с пользователем Telegram {C%s{x."
-                       "Используй {hc{yрежим телеграм очистить{x для очистки.\r\n", 
+            ch->pecho(_("Твой персонаж связан с пользователем Telegram {C%s{x."
+                       "Используй {hc{yрежим телеграм очистить{x для очистки.\r\n"), 
                        user->getValue().c_str());
         else
-            ch->pecho("Твой персонаж не связан с пользователями Telegram.\r\n"
-                        "Используй {yрежим телеграм @имя{x для установки.");        
+            ch->pecho(_("Твой персонаж не связан с пользователями Telegram.\r\n"
+                        "Используй {yрежим телеграм @имя{x для установки."));        
         return;
     }
 
     if (arg_is_clear(arg)) {
         if (user->empty()) 
-            ch->pecho("Нечего очищать.");
+            ch->pecho(_("Нечего очищать."));
         else {
-            ch->pecho("Связь с пользователем {C%s{x очищена.", user->getValue().c_str());
+            ch->pecho(_("Связь с пользователем {C%s{x очищена."), user->getValue().c_str());
             user->clear();
             PCharacterManager::save(ch);
         }
@@ -410,13 +411,13 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments)
     }
 
     if (arg.at(0) != '@') {
-        ch->pecho("Задай имя пользователя начиная с @.");
+        ch->pecho(_("Задай имя пользователя начиная с @."));
         return;
     }
 
     user->setValue(arg);
     PCharacterManager::save(ch);
-    ch->pecho("Теперь {C%s{x привязан к твоему персонажу.", arg.c_str());
+    ch->pecho(_("Теперь {C%s{x привязан к твоему персонажу."), arg.c_str());
 }
 
 /**
@@ -455,9 +456,9 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
         PCharacterManager::save(ch);
 
         if (linked)
-            ch->pecho("Связь с пользователем Discord очищена. ");
+            ch->pecho(_("Связь с пользователем Discord очищена. "));
 
-        ch->pecho("Новое секретное слово: {W%s{x.",
+        ch->pecho(_("Новое секретное слово: {W%s{x."),
                    discord["token"].asString().c_str());
         return;
     }
