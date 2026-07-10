@@ -96,6 +96,8 @@ protected:
     bool sedit(DLString &);
     bool sedit(XMLString &);
     bool xmledit(XMLDocument::Pointer &xml);
+    bool xmleditWeb(XMLDocument::Pointer &xml, const DLString &saveCommand);
+    bool xmleditPaste(XMLDocument::Pointer &xml);
 
     void seditDone( );
 

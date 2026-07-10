@@ -295,6 +295,48 @@ OLCState::xmledit(XMLDocument::Pointer &xml)
     return false;
 }
 
+/**
+ * Serialize a legacy behavior XML blob into the web editor (Monaco popup),
+ * same mechanism as 'desc web' etc. On save the client replays 'saveCommand',
+ * which is expected to call xmleditPaste() to parse the edited text back.
+ */
+bool
+OLCState::xmleditWeb(XMLDocument::Pointer &xml, const DLString &saveCommand)
+{
+    ostringstream os;
+    if (xml)
+        xml->save( os );
+
+    return editorWeb(os.str( ), saveCommand);
+}
+
+/**
+ * Parse the web editor buffer (filled by editor_save) back into an XML blob.
+ * Mirrors xmledit()'s parse+validate, but reads from the 'edstate' buffer
+ * instead of the inline string editor.
+ */
+bool
+OLCState::xmleditPaste(XMLDocument::Pointer &xml)
+{
+    PCharacter *ch = owner->character->getPC();
+    DLString buf = ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
+
+    try {
+        XMLDocument::Pointer doc(NEW);
+        istringstream is( buf );
+        doc->load( is );
+
+        if (!doc->getFirstNode())
+            throw Exception("empty root node. Use 'oldbehavior clear' instead.");
+
+        xml = doc;
+        return true;
+    } catch (const exception &e) {
+        owner->send((DLString("XML parse error: ") + e.what( ) + "\r\n").c_str( ));
+    }
+    return false;
+}
+
 void
 OLCState::seditDone( )
 {
