@@ -13,6 +13,7 @@
 #include "vnum.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(golden_eye);
 GSN(pick_lock);
@@ -107,7 +108,7 @@ Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )
         if (obj->item_type == ITEM_CONTAINER)
             return ContainerKeyhole::Pointer( NEW, ch, obj );
 
-        oldact("В $o6 нет замочной скважины.", ch, obj, 0, TO_CHAR );
+        oldact(_("В $o6 нет замочной скважины."), ch, obj, 0, TO_CHAR );
         return null;
     }
 
@@ -169,12 +170,12 @@ bool Keyhole::doPick( const DLString &arg )
     bitstring_t flags = getLockFlags( );
 
     if (!isLockable( )) {
-        ch->pecho( "Здесь нет замочной скважины." );
+        ch->pecho( _("Здесь нет замочной скважины.") );
         return false;
     }
 
     if (!IS_SET(flags, bitLocked( ))) {
-        ch->pecho( "Здесь уже не заперто." );
+        ch->pecho( _("Здесь уже не заперто.") );
         return false;
     }
     
@@ -182,7 +183,7 @@ bool Keyhole::doPick( const DLString &arg )
         return false;
     
     if (isPickProof( )) {
-        ch->pecho( "Этот замок защищен от взлома." );
+        ch->pecho( _("Этот замок защищен от взлома.") );
         return false;
     }
     
@@ -194,7 +195,7 @@ bool Keyhole::doPick( const DLString &arg )
     msgTryPickOther( );
 
     if (!checkLockPick( lockpick )) {
-        oldact("Ты не смо$gгло|г|гла пропихнуть $o4 в эту замочную скважину.", ch, lockpick, 0, TO_CHAR );
+        oldact(_("Ты не смо$gгло|г|гла пропихнуть $o4 в эту замочную скважину."), ch, lockpick, 0, TO_CHAR );
         return false;
     }
     
@@ -204,11 +205,11 @@ bool Keyhole::doPick( const DLString &arg )
         if (number_percent( ) >= gsn_pick_lock->getEffective( ch )
             && number_percent( ) > lockpick->value1()) 
         {
-            ch->pecho( "  ...но, слишком резко надавив, ломаешь %1$P2!", lockpick );
+            ch->pecho( _("  ...но, слишком резко надавив, ломаешь %1$P2!"), lockpick );
             extract_obj( lockpick );
         }
         else
-            ch->pecho( "  ...но твои манипуляции ни к чему не приводят." );
+            ch->pecho( _("  ...но твои манипуляции ни к чему не приводят.") );
 
         gsn_pick_lock->improve( ch, false );
         return false;
@@ -224,7 +225,7 @@ bool Keyhole::doPick( const DLString &arg )
 void Keyhole::unlock( )
 {
     setLockFlags(getLockFlags() & ~bitLocked());
-    ch->in_room->echo( POS_RESTING, "*Щелк*" );
+    ch->in_room->echo( POS_RESTING, _("*Щелк*") );
 }
 
 bool Keyhole::checkLockPick( Object *o )
@@ -248,7 +249,7 @@ bool Keyhole::checkGuards( )
                 && IS_AWAKE(rch)
                 && ch->getModifyLevel( ) + 5 < rch->getModifyLevel( ))
         {
-            oldact("$C1 маячит перед тобой, загораживая вожделенный замок.", ch, 0, rch, TO_CHAR );
+            oldact(_("$C1 маячит перед тобой, загораживая вожделенный замок."), ch, 0, rch, TO_CHAR );
             return false;
         }
 
@@ -259,17 +260,17 @@ bool Keyhole::findLockpick( )
 {
     if (!argKeyring.empty( )) {
         if (!( keyring = get_obj_list_type( ch, argKeyring, ITEM_KEYRING, ch->carrying ) )) {
-            ch->pecho( "У тебя нет такого кольца для ключей." );
+            ch->pecho( _("У тебя нет такого кольца для ключей.") );
             return false;
         }
 
         if (!( lockpick = get_obj_list_type( ch, argLockpick, ITEM_LOCKPICK, keyring->contains ) )) {
-            oldact("На $o6 не нанизано ничего похожего.", ch, keyring, 0, TO_CHAR );
+            oldact(_("На $o6 не нанизано ничего похожего."), ch, keyring, 0, TO_CHAR );
             return false;
         }
     }
     else if (!( lockpick = get_obj_list_type( ch, argLockpick, ITEM_LOCKPICK, ch->carrying )) ) {
-        ch->pecho( "У тебя нет такой отмычки." );
+        ch->pecho( _("У тебя нет такой отмычки.") );
         return false;
     }
 
@@ -330,13 +331,13 @@ bool Keyhole::doExamine( )
         return false;
         
     if (isPickProof( )) 
-        oldact("Замок защищен от взлома.", ch, 0, 0, TO_CHAR );
+        oldact(_("Замок защищен от взлома."), ch, 0, 0, TO_CHAR );
     else {
-        oldact("Замок не устоит перед хорошим взломщиком.", ch, 0, 0, TO_CHAR );
+        oldact(_("Замок не устоит перед хорошим взломщиком."), ch, 0, 0, TO_CHAR );
 
         for (Object *o = ch->carrying; o; o = o->next_content) {
             if (checkLockPick( o )) {
-                ch->pecho( "%1$^O1 тихонько звяка%1$nет|ют.", o );
+                ch->pecho( _("%1$^O1 тихонько звяка%1$nет|ют."), o );
                 continue;
             }
 
@@ -346,7 +347,7 @@ bool Keyhole::doExamine( )
             if (o->item_type == ITEM_KEYRING) 
                 for (Object *l = o->contains; l; l = l->next_content)
                     if (checkLockPick( l )) 
-                        ch->pecho( "%1$^O1 на %2$O6 тихонько звяка%1$nет|ют.", o, l );
+                        ch->pecho( _("%1$^O1 на %2$O6 тихонько звяка%1$nет|ют."), o, l );
         }
     }
     
@@ -390,11 +391,11 @@ void ItemKeyhole::unlock( )
 }
 void ItemKeyhole::msgTryPickSelf( )
 {
-    oldact("Ты осторожно поворачиваешь $o4 в замочной скважине $O2.", ch, lockpick, obj, TO_CHAR );
+    oldact(_("Ты осторожно поворачиваешь $o4 в замочной скважине $O2."), ch, lockpick, obj, TO_CHAR );
 }
 void ItemKeyhole::msgTryPickOther( )
 {
-    oldact("$c1 ковыряется в замке $O2.", ch, lockpick, obj, TO_ROOM );
+    oldact(_("$c1 ковыряется в замке $O2."), ch, lockpick, obj, TO_ROOM );
 }
 DLString ItemKeyhole::getDescription( )
 {
@@ -510,16 +511,16 @@ void DoorKeyhole::unlock( )
     
     if (pexit_rev && pexit_rev->u1.to_room == room) {
         REMOVE_BIT(pexit_rev->exit_info, bitLocked( ));
-        to_room->echo( POS_RESTING, "Дверной замок щелкает." );
+        to_room->echo( POS_RESTING, _("Дверной замок щелкает.") );
     }
 }
 void DoorKeyhole::msgTryPickSelf( )
 {
-    oldact("Ты осторожно поворачиваешь $o4 в замочной скважине.", ch, lockpick, 0, TO_CHAR );
+    oldact(_("Ты осторожно поворачиваешь $o4 в замочной скважине."), ch, lockpick, 0, TO_CHAR );
 }
 void DoorKeyhole::msgTryPickOther( )
 {
-    oldact("$c1 ковыряется в замке двери $t отсюда.", ch, dirs[door].leave, 0, TO_ROOM );
+    oldact(_("$c1 ковыряется в замке двери $t отсюда."), ch, dirs[door].leave, 0, TO_ROOM );
 }
 DLString DoorKeyhole::getDescription( )
 {
@@ -565,11 +566,11 @@ void ExtraExitKeyhole::setLockFlags(int flags)
 
 void ExtraExitKeyhole::msgTryPickSelf( )
 {
-    oldact("Ты осторожно поворачиваешь $o4 в замочной скважине $N2.", ch, lockpick, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_CHAR );
+    oldact(_("Ты осторожно поворачиваешь $o4 в замочной скважине $N2."), ch, lockpick, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_CHAR );
 }
 void ExtraExitKeyhole::msgTryPickOther( )
 {
-    oldact("$c1 ковыряется в замке $N2.", ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_ROOM );
+    oldact(_("$c1 ковыряется в замке $N2."), ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_ROOM );
 }
 
 DLString ExtraExitKeyhole::getDescription( )

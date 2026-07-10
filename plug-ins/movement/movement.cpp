@@ -30,6 +30,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 Movement::Movement( Character *ch ) 
 {
@@ -117,9 +118,9 @@ void Movement::place( Character *wch )
     {
         int helpId = get_area_help_id(to_room->areaIndex());
         if (helpId >= 0)
-            wch->pecho("Ты попадаешь в зону '{c{hh%d%s{x'.\r\n", helpId, to_room->areaName().c_str());
+            wch->pecho(_("Ты попадаешь в зону '{c{hh%d%s{x'.\r\n"), helpId, to_room->areaName().c_str());
         else
-            wch->pecho("Ты попадаешь в зону '{c{hh%s{x'.\r\n", to_room->areaName().c_str());
+            wch->pecho(_("Ты попадаешь в зону '{c{hh%s{x'.\r\n"), to_room->areaName().c_str());
     }
  
     if (doLook)

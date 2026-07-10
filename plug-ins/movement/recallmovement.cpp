@@ -14,6 +14,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 RecallMovement::RecallMovement( Character *ch )
                  : JumpMovement( ch )
@@ -51,14 +52,14 @@ bool RecallMovement::applyFightingSkill( Character *wch, SkillReference &skill )
         return false;
     }
 
-    wch->pecho( "Ты долж%1$Gно|ен|на сражаться!", wch );
+    wch->pecho( _("Ты долж%1$Gно|ен|на сражаться!"), wch );
     chance = skill->getEffective( wch );
     chance = 80 * chance / 100 + skill_level_bonus(*skill, ch);
     
     if (number_percent( ) > chance) {
         skill->improve( wch, false );
         wch->setWaitViolence( 1 );
-        wch->pecho( "Тебе не удается сбежать из боя!" );
+        wch->pecho( _("Тебе не удается сбежать из боя!") );
         return false;
     }
 
@@ -78,7 +79,7 @@ bool RecallMovement::checkMount( )
         return true;
 
     if (!canOrderHorse( )) {
-        ch->pecho( "Тебе необходимо сначала спешиться." );
+        ch->pecho( _("Тебе необходимо сначала спешиться.") );
         return false;
     }
 
@@ -88,7 +89,7 @@ bool RecallMovement::checkMount( )
 bool RecallMovement::checkShadow( )
 {
     if (!ch->is_npc( ) && ch->getPC( )->shadow != -1) {
-        ch->pecho( "Твои молитвы о возвращении тонут в пустоте твоей {Dтени{x." );
+        ch->pecho( _("Твои молитвы о возвращении тонут в пустоте твоей {Dтени{x.") );
         return false;
     }
 
@@ -122,14 +123,14 @@ bool RecallMovement::checkForsaken( Character *wch )
 bool RecallMovement::checkNorecall( Character *wch )
 {
     if (IS_SET(from_room->room_flags, ROOM_NO_RECALL)) {
-        wch->pecho("Эта местность проклята, здесь боги не услышат твою молитву о возвращении.");
+        wch->pecho(_("Эта местность проклята, здесь боги не услышат твою молитву о возвращении."));
         return false;
     }
 
     if (wch->death_ground_delay > 0
         && wch->trap.isSet( TF_NO_RECALL )) 
     {
-        wch->pecho("Ты в ловушке! Отсюда не удастся спастись молитвой о возвращении.");
+        wch->pecho(_("Ты в ловушке! Отсюда не удастся спастись молитвой о возвращении."));
         return false;
     }
 
@@ -140,13 +141,13 @@ bool RecallMovement::checkCurse( Character *wch )
 {
     if (IS_AFFECTED(wch, AFF_CURSE))
     { 
-        wch->pecho("На тебе висит проклятие, препятствующее молитве о возвращении.");
+        wch->pecho(_("На тебе висит проклятие, препятствующее молитве о возвращении."));
         return false;
     }
 
     if (IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE))
     {  
-        wch->pecho("На этой местности висит временное проклятие, препятствующее молитве о возвращении.");
+        wch->pecho(_("На этой местности висит временное проклятие, препятствующее молитве о возвращении."));
         return false;
     }
 
@@ -168,7 +169,7 @@ bool RecallMovement::applyMovepoints( )
 bool RecallMovement::checkSameRoom( )
 {
     if (from_room == to_room) {
-        ch->pecho("Но ты уже здесь!");
+        ch->pecho(_("Но ты уже здесь!"));
         return false;
     }
 
@@ -194,7 +195,7 @@ void RecallMovement::moveFollowers( Character *wch )
 bool RecallMovement::checkPumped( )
 {
     if (ch->getLastFightDelay( ) < FIGHT_DELAY_TIME) {
-        ch->pecho( "Твой пульс стучит слишком часто, ты не можешь сосредоточиться на молитве." );
+        ch->pecho( _("Твой пульс стучит слишком часто, ты не можешь сосредоточиться на молитве.") );
         return false;
     }
 

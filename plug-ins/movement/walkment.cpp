@@ -27,6 +27,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 GSN(cavalry);
 GSN(web);
@@ -282,7 +283,7 @@ void Walkment::visualize( Character *wch )
 bool Walkment::canControlHorse( )
 {
     if (!canOrderHorse( )) {
-        oldact("Ты не можешь управлять $C5.", ch, 0, horse, TO_CHAR );
+        oldact(_("Ты не можешь управлять $C5."), ch, 0, horse, TO_CHAR );
         return false;
     }
    
@@ -295,7 +296,7 @@ bool Walkment::canControlHorse( )
         return true;
 
     if (number_percent( ) > gsn_cavalry->getEffective( ch )) {
-        oldact("Тебе не хватает мастерства управлять $C5.", ch, 0, horse, TO_CHAR );
+        oldact(_("Тебе не хватает мастерства управлять $C5."), ch, 0, horse, TO_CHAR );
         gsn_cavalry->improve( ch, false );
         return false; 
     }
@@ -653,13 +654,13 @@ void Walkment::moveFollowers( Character *wch )
             if (fch->in_room == from_room && IS_CHARMED(fch) && wch->getPC( )) {
                 int sect = to_room->getSectorType( );
                 if (sect == SECT_AIR)
-                    wch->pecho("%1$^C1 не может взлететь и последовать за тобой.", fch);
+                    wch->pecho(_("%1$^C1 не может взлететь и последовать за тобой."), fch);
                 else if (sect == SECT_UNDERWATER)
-                    wch->pecho("%1$^C1 не может нырнуть и последовать за тобой.", fch);
+                    wch->pecho(_("%1$^C1 не может нырнуть и последовать за тобой."), fch);
                 else if (sect == SECT_WATER_NOSWIM)
-                    wch->pecho("%1$^C1 не умеет плавать и не может последовать за тобой.", fch);
+                    wch->pecho(_("%1$^C1 не умеет плавать и не может последовать за тобой."), fch);
                 else
-                    wch->pecho("%1$^C1 не может последовать за тобой.", fch);
+                    wch->pecho(_("%1$^C1 не может последовать за тобой."), fch);
             }
         }
 }
