@@ -9,6 +9,7 @@
 #include "logstream.h"
 #include "pcharacter.h"
 #include "descriptor.h"
+#include "room.h"
 #include "dl_ctype.h"
 #include "merc.h"
 
@@ -55,11 +56,36 @@ static DLString unique_keyword_id(const ExtraDescrList *const &edList, const DLS
     return DLString::emptyString;
 }
 
+
+// Returns true if 'keyword' names a *visible* exit of the character's room.
+// Hidden and invisible exits are skipped, so web decoration never turns a
+// secret door into a clickable link.
+static bool is_visible_exit_keyword(Character *ch, const DLString &keyword)
+{
+    if (ch == 0 || ch->in_room == 0)
+        return false;
+
+    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *pexit = ch->in_room->exit[door];
+        if (pexit == 0 || pexit->u1.to_room == 0)
+            continue;
+        if (!ch->can_see( pexit ))
+            continue;
+        if (pexit->keyword.matchesUnstrict( keyword.c_str( ) ))
+            return true;
+    }
+
+    return false;
+}
+
+
 /**
  * Decorates room descriptions, object descriptions and various extra descrs
  * by replacing (sign) with [read=sign знак,see=sign] pseudo-tag for web-client.
+ * A marker that matches no extra description but names a visible room exit is
+ * decorated with a [look=door,see=door] tag instead (exits resolve via 'look').
  * Normal (sign) is still sent to telnet clients and invisible for web.
- * These tags will become clickable links in the web client, resulting in 
+ * These tags will become clickable links in the web client, resulting in
  * "read 'sign znak'" command being sent back to the server.
  */
 WEBMANIP_RUN(decorateExtraDescr)
@@ -88,13 +114,17 @@ WEBMANIP_RUN(decorateExtraDescr)
         // Found something that may be a description keyword. 
         // Look if matching extra description exists.
         DLString unique = unique_keyword_id(edList, keyword);
-        if (unique.empty( )) {
-            // False alarm, move along.
-            buf << "(" << keyword << ")";
-        } else {
-            // Decorate with pseudo-tags, hide normal output from web.
+        if (!unique.empty( )) {
+            // Matches an extra description: clickable 'read', parens for telnet.
             buf << "{Iw[read=" << unique << ",see=" << keyword << "]";
             buf << "{IW(" << keyword << "){Ix";
+        } else if (myArgs.decorateExits && is_visible_exit_keyword(myArgs.target, keyword)) {
+            // Matches a visible room exit: clickable 'look', parens for telnet.
+            buf << "{Iw[look=" << keyword << ",see=" << keyword << "]";
+            buf << "{IW(" << keyword << "){Ix";
+        } else {
+            // False alarm, keep the literal parens for everyone.
+            buf << "(" << keyword << ")";
         }
 
         // Advance position to the next bracket.

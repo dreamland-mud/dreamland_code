@@ -71,10 +71,10 @@ void WebManipManager::decoratePocket( ostringstream &buf, const DLString &pocket
                 buf << pocket;
 }
 
-void WebManipManager::decorateExtraDescr( ostringstream &buf, const char *desc, const ExtraDescrList &edList, Character *ch ) const
+void WebManipManager::decorateExtraDescr( ostringstream &buf, const char *desc, const ExtraDescrList &edList, Character *ch, bool decorateExits ) const
 {
     static const DLString COMMAND_NAME = "decorateExtraDescr";
-    ExtraDescrManipArgs args( ch, desc, edList);
+    ExtraDescrManipArgs args( ch, desc, edList, decorateExits);
     if (!run( buf, COMMAND_NAME, args ))
         buf << desc;
 }
