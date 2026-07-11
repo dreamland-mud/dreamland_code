@@ -26,6 +26,7 @@
 #include "move_utils.h"
 #include "doors.h"
 #include "def.h"
+#include "l10n.h"
 
 PROF(none);
 
@@ -100,15 +101,15 @@ bool ClanItem::area( )
 
 void ClanItem::actDisappear( )
 {
-    oldact("$o1 загадочным образом исчезает.", 
+    oldact(_("$o1 загадочным образом исчезает."), 
          obj->getRoom( )->people, obj, 0, TO_ALL );
 }
 
 void ClanItem::get( Character *ch ) 
 { 
     if (ch->is_npc()) {
-        ch->pecho("Ты не можешь владеть %1$O5 и бросаешь %1$P2.", obj);
-        ch->recho("%2$^C1 не может владеть %1$O5 и бросает %1$P2.", obj, ch);
+        ch->pecho(_("Ты не можешь владеть %1$O5 и бросаешь %1$P2."), obj);
+        ch->recho(_("%2$^C1 не может владеть %1$O5 и бросает %1$P2."), obj, ch);
         obj_from_char(obj);
         obj_to_room(obj, ch->in_room);
         return;
@@ -122,7 +123,7 @@ void ClanItem::give( Character *from, Character *mob )
 
 bool ClanItem::sac( Character *ch ) 
 { 
-    oldact("{RБОГИ В ГНЕВЕ!{x",ch,0,0,TO_ALL);
+    oldact(_("{RБОГИ В ГНЕВЕ!{x"),ch,0,0,TO_ALL);
 
     rawdamage( ch, ch, DAM_HOLY, ch->hit - 10, true, "gods" );
     ch->gold = 0;
@@ -169,7 +170,7 @@ bool ClanAltar::fetch( Character *ch, Object *item )
     if (clan->getData( ))
         clan->getData( )->unsetItem( item );
 
-    DLString what = fmt(0, "{WКлан %N1 утратил свою святыню.{x", clanArea->getClan()->getRussianName().c_str());
+    DLString what = fmt(0, _("{WКлан %N1 утратил свою святыню.{x"), clanArea->getClan()->getRussianName().c_str());
     infonet(0, 0, "{CЕхидный голос из $o2: ", what.c_str());
     send_discord_clan(what);
     send_telegram(what);
@@ -180,19 +181,19 @@ bool ClanAltar::fetch( Character *ch, Object *item )
 
 void ClanAltar::actAppear( )
 {
-    oldact("Ты видишь, как медленно появляется $o1.", 
+    oldact(_("Ты видишь, как медленно появляется $o1."), 
          obj->in_room->people, obj, 0, TO_ALL );
 }
 
 void ClanAltar::actDisappear( )
 {
-    oldact("$o1 растворяется и исчезает!", 
+    oldact(_("$o1 растворяется и исчезает!"), 
          obj->getRoom( )->people, obj, NULL, TO_ALL );
 }
 
 void ClanAltar::actNotify( Character *ch )
 {
-    oldact_p("{gТы вздрагиваешь от осознания Силы своего Клана!{x", 
+    oldact_p(_("{gТы вздрагиваешь от осознания Силы своего Клана!{x"), 
             ch, 0, 0, TO_CHAR, POS_DEAD );
 }
 

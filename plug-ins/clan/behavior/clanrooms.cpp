@@ -13,6 +13,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 
 /*--------------------------------------------------------------------------
@@ -56,7 +57,7 @@ bool ClanPetShopStorage::canServeClient( Character *client )
     if (clanArea->findInvitation( client->getPC( ) )) 
         return true;        
     
-    client->pecho( "Тебя здесь обслуживать не будут." );
+    client->pecho( _("Тебя здесь обслуживать не будут.") );
     return false;
 }
 

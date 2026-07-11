@@ -12,6 +12,7 @@
 #include "def.h"
 #include "arg_utils.h"
 #include "logstream.h"
+#include "l10n.h"
 /*----------------------------------------------------------------------------
  * ClanOrder
  *---------------------------------------------------------------------------*/
@@ -112,19 +113,19 @@ void ClanOrgs::doMembers( PCharacter *pch, const DLString &cargs ) const
 
     if (!myOrg && !org) {
         if (recruiter)
-            pch->pecho("Укажи правильное название %O2.", &name);
+            pch->pecho(_("Укажи правильное название %O2."), &name);
         else
-            pch->pecho( "Ты не состоишь в %O6.", &name );
+            pch->pecho( _("Ты не состоишь в %O6."), &name );
         return;
     }
 
     if (!myOrg && org && !recruiter) {
-        pch->pecho( "Ты не состоишь в %O6.", &name );
+        pch->pecho( _("Ты не состоишь в %O6."), &name );
         return;
     }
 
     if (myOrg && org && myOrg->name != org->name && !recruiter) {
-        pch->pecho( "Ты не состоишь в эт%1$Gом|ом|ой %1$O6.", &name );
+        pch->pecho( _("Ты не состоишь в эт%1$Gом|ом|ой %1$O6."), &name );
         return;
     }
 
@@ -159,17 +160,17 @@ void ClanOrgs::doSelfInduct( PCharacter *pch, const DLString &arg ) const
     ClanOrder::Pointer ord;
 
     if (!pch->getClan( )->isRecruiter( pch )) {
-        pch->pecho( "Принять себя в %O4 может только рекрутер или лидер.", &name );
+        pch->pecho( _("Принять себя в %O4 может только рекрутер или лидер."), &name );
         return;
     }
     
     if (!( ord = findOrder( arg ) )) {
-        pch->pecho( "%1$^O1 указа%1$Gно|н|на неверно.", &name );
+        pch->pecho( _("%1$^O1 указа%1$Gно|н|на неверно."), &name );
         return;
     }
     
     setAttr( pch, ord->name );
-    pch->pecho( "Ты вступаешь в %s.", ord->shortDescr.c_str( ) );
+    pch->pecho( _("Ты вступаешь в %s."), ord->shortDescr.c_str( ) );
 }
 
 void ClanOrgs::doInduct( PCharacter *pch, const DLString &cargs) const
@@ -180,17 +181,17 @@ void ClanOrgs::doInduct( PCharacter *pch, const DLString &cargs) const
     DLString argOrder = args;
 
     if (!pch->getClan( )->isRecruiter( pch )) {
-        pch->pecho( "Твоих полномочий недостаточно." );
+        pch->pecho( _("Твоих полномочий недостаточно.") );
         return;
     }
 
     if (!( victim = PCharacterManager::find( argVict ) )) {
-        pch->pecho( "Никого нет с таким именем. Укажи имя полностью." );
+        pch->pecho( _("Никого нет с таким именем. Укажи имя полностью.") );
         return;
     }
 
     if (victim->getClan( ) != pch->getClan( )) {
-        pch->pecho( "Но %s не принадлежит к твоему клану!", victim->getName( ).c_str( ) );
+        pch->pecho( _("Но %s не принадлежит к твоему клану!"), victim->getName( ).c_str( ) );
         return;
     }
     
@@ -201,12 +202,12 @@ void ClanOrgs::doInduct( PCharacter *pch, const DLString &cargs) const
         myOrg ? myOrg->name.c_str() : "none", argOrder.c_str());
 
     if (!org && !myOrg) {
-        pch->pecho( "%1$^O1 указан%1$Gо||а неверно.", &name );
+        pch->pecho( _("%1$^O1 указан%1$Gо||а неверно."), &name );
         return;
     }
 
     if (!argOrder.empty() && !org) {
-        pch->pecho( "%1$^O1 указан%1$Gо||а неверно.", &name );
+        pch->pecho( _("%1$^O1 указан%1$Gо||а неверно."), &name );
         return;
     }
 
@@ -214,27 +215,27 @@ void ClanOrgs::doInduct( PCharacter *pch, const DLString &cargs) const
 
     if (hasAttr( victim )) {
         if (getAttr( victim ) != targetOrg->name) 
-            pch->pecho( "%1$s уже состоит в друг%2$Gом|ом|ой %2$O6.", 
+            pch->pecho( _("%1$s уже состоит в друг%2$Gом|ом|ой %2$O6."), 
                          victim->getName( ).c_str( ), &name );
         else
-            pch->pecho( "%1$s и так состоит в эт%2$Gом|ом|ой %2$O6.", 
+            pch->pecho( _("%1$s и так состоит в эт%2$Gом|ом|ой %2$O6."), 
                          victim->getName( ).c_str( ), &name );
         
         return;
     }
     
     if (!targetOrg->canInduct( victim )) {
-        pch->pecho( "%s не может вступить в %s.", 
+        pch->pecho( _("%s не может вступить в %s."), 
                     victim->getName( ).c_str( ), targetOrg->shortDescr.c_str( ) );
         return;
     }
     
     setAttr( victim, targetOrg->name );
-    pch->pecho( "Ты принимаешь %s в %s!", 
+    pch->pecho( _("Ты принимаешь %s в %s!"), 
                  victim->getName( ).c_str( ), targetOrg->shortDescr.c_str( ) );
     
     if (victim->isOnline( ))
-        victim->getPlayer( )->pecho( "%s принимает тебя в %s!",
+        victim->getPlayer( )->pecho( _("%s принимает тебя в %s!"),
                                      pch->getName( ).c_str( ),
                                      targetOrg->shortDescr.c_str( ) );
     else
@@ -244,10 +245,10 @@ void ClanOrgs::doInduct( PCharacter *pch, const DLString &cargs) const
 void ClanOrgs::doSelfRemove( PCharacter *pch ) const
 {
     if (!hasAttr( pch ))
-        pch->pecho( "Ты и так нигде не состоишь." );
+        pch->pecho( _("Ты и так нигде не состоишь.") );
     else {
         delAttr( pch );
-        pch->pecho( "Ты покидаешь сво%1$Gй|й|ю %1$^O4.", &name );
+        pch->pecho( _("Ты покидаешь сво%1$Gй|й|ю %1$^O4."), &name );
     }
 }
 
@@ -259,17 +260,17 @@ void ClanOrgs::doRemove( PCharacter *pch, const DLString &cargs ) const
     DLString argOrder = args;
 
     if (!pch->getClan( )->isRecruiter( pch )) {
-        pch->pecho( "Твоих полномочий недостаточно." );
+        pch->pecho( _("Твоих полномочий недостаточно.") );
         return;
     }
     
     if (!( victim = PCharacterManager::find( argVict ) )) {
-        pch->pecho( "Никого нет с таким именем. Укажи имя полностью." );
+        pch->pecho( _("Никого нет с таким именем. Укажи имя полностью.") );
         return;
     }
 
     if (victim->getClan( ) != pch->getClan( )) {
-        pch->pecho( "Но %s не принадлежит к твоем клану!", victim->getName( ).c_str( ) );
+        pch->pecho( _("Но %s не принадлежит к твоем клану!"), victim->getName( ).c_str( ) );
         return;
     }
 
@@ -277,24 +278,24 @@ void ClanOrgs::doRemove( PCharacter *pch, const DLString &cargs ) const
     ClanOrder::Pointer myOrg = findOrder(pch);
 
     if (!org && !myOrg) {
-        pch->pecho( "%1$^O1 указан%1$Gо||а неверно.", &name );
+        pch->pecho( _("%1$^O1 указан%1$Gо||а неверно."), &name );
         return;
     }
 
     ClanOrder::Pointer targetOrg = org ? org : myOrg;
 
     if (getAttr( victim ) != targetOrg->name) {
-        pch->pecho( "%1$s не состоит в эт%2$Gом|ом|ой %2$O6!", 
+        pch->pecho( _("%1$s не состоит в эт%2$Gом|ом|ой %2$O6!"), 
                     victim->getName( ).c_str( ), &name );
         return;
     }
     
     delAttr( victim );
-    pch->pecho( "%1$s покидает %2$O4.", 
+    pch->pecho( _("%1$s покидает %2$O4."), 
                  victim->getName( ).c_str( ), &name );
 
     if (victim->isOnline( ))
-        victim->getPlayer( )->pecho( "%s исключает тебя из %^O2!",
+        victim->getPlayer( )->pecho( _("%s исключает тебя из %^O2!"),
                                      pch->getName( ).c_str( ), &name );
     else
         PCharacterManager::saveMemory( victim );

@@ -17,6 +17,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 ClanSkill::ClanSkill( )
             : group(skillGroupManager)
@@ -91,7 +92,7 @@ bool ClanSkill::usable( Character * ch, bool message = true ) const
         return true;
 
     if (message)
-        ch->pecho( "Клан не может сейчас придать тебе сил." );
+        ch->pecho( _("Клан не может сейчас придать тебе сил.") );
 
     return false;
 }
@@ -170,10 +171,10 @@ bool ClanSkill::canTeach( NPCharacter *mob, PCharacter * ch, bool verbose )
    
     if (verbose) { 
         if (mob)
-            ch->pecho( "%^C1 не служит твоему клану.", mob );
+            ch->pecho( _("%^C1 не служит твоему клану."), mob );
         else
-            ch->pecho( "Клановые умения практикуют у служителей клана, "
-                         "например, у лекаря или охранника." );
+            ch->pecho( _("Клановые умения практикуют у служителей клана, "
+                         "например, у лекаря или охранника.") );
     }
 
     return false;

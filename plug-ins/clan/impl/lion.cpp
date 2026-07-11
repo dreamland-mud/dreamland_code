@@ -42,6 +42,7 @@
 #include "magic.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "l10n.h"
 
 CLAN(hunter);
 GSN(acid_arrow);
@@ -63,8 +64,8 @@ void ClanGuardLion::actGreet( PCharacter *wch )
 }
 void ClanGuardLion::actPush( PCharacter *wch )
 {
-    oldact("$C1 выпускает когти.\n\rИ ты быстренько убираешься из этой местности.", wch, 0, ch, TO_CHAR );
-    oldact("$C1, глядя на $c4, выпускает когти, и $c1 сматывает удочки.", wch, 0, ch, TO_ROOM );
+    oldact(_("$C1 выпускает когти.\n\rИ ты быстренько убираешься из этой местности."), wch, 0, ch, TO_CHAR );
+    oldact(_("$C1, глядя на $c4, выпускает когти, и $c1 сматывает удочки."), wch, 0, ch, TO_ROOM );
 }
 int ClanGuardLion::getCast( Character *victim )
 {
@@ -129,7 +130,7 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
 
   if ( ch->isAffected(sn ) )
         {
-                ch->pecho("Ты уже трансформирова{Smлся{Sfлась{Sx во льва.");
+                ch->pecho(_("Ты уже трансформирова{Smлся{Sfлась{Sx во льва."));
                 return;
         }
 
@@ -160,9 +161,9 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
   af.bitvector.setValue(AFF_BERSERK);
   affect_to_char( ch, &af );
 
-  oldact_p("Ты чувствуешь себя немного неповоротлив$gым|ым|ой, но зато намного более сильн$gым|ым|ой.",
+  oldact_p(_("Ты чувствуешь себя немного неповоротлив$gым|ым|ой, но зато намного более сильн$gым|ым|ой."),
                 ch,0,0,TO_CHAR,POS_RESTING);
-  oldact("Кожа $c2 становится серой!",ch,0,0,TO_ROOM);
+  oldact(_("Кожа $c2 становится серой!"),ch,0,0,TO_ROOM);
 
 }
 
@@ -174,19 +175,19 @@ VOID_SPELL(EyesOfTiger)::run( Character *ch, Character *victim, int sn, int leve
 { 
         if (DIGGED(victim))
         {
-                ch->pecho("Твой львиный глаз не может найти такого.");
+                ch->pecho(_("Твой львиный глаз не может найти такого."));
                 return;
         }
 
         if (victim->is_npc() || victim->getPC()->getClan() != clan_hunter)
         {
-                ch->pecho("Ты можешь следить только за Охотниками!");
+                ch->pecho(_("Ты можешь следить только за Охотниками!"));
                 return;
         }
         
         if (is_safe_nomessage(ch,victim)) 
         {
-                ch->pecho("Твой львиный глаз не смог найти такого.");
+                ch->pecho(_("Твой львиный глаз не смог найти такого."));
                 return;
         }
         
@@ -205,7 +206,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if (ch->isAffected( sn )) {
-        oldact("Ты уже защище$gно|н|на от ловушек Охотников.", ch, 0, 0, TO_CHAR);
+        oldact(_("Ты уже защище$gно|н|на от ловушек Охотников."), ch, 0, 0, TO_CHAR);
         return;
     }
 
@@ -215,7 +216,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Character *victim, int sn, int level )
     
     affect_to_char(ch, &af);  
 
-    ch->pecho( "Ты защищаешь себя от ловушек Охотников." );
+    ch->pecho( _("Ты защищаешь себя от ловушек Охотников.") );
 }
 
 VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level ) 
@@ -224,7 +225,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
 
         if ( room->isAffected( sn ))
         {
-                ch->pecho("Это место уже защищено от мести и ловушек Охотников.");
+                ch->pecho(_("Это место уже защищено от мести и ловушек Охотников."));
                 return;
         }
 
@@ -237,14 +238,14 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
         af.bitvector.setValue(AFF_ROOM_PREVENT);
         room->affectTo( &af );
 
-        ch->pecho("Ты защищаешь местность от ловушек Охотников и от их мести.");
-        oldact("$c1 защищает местность от ловушек Охотников и от их мести.",ch,0,0,TO_ROOM);
+        ch->pecho(_("Ты защищаешь местность от ловушек Охотников и от их мести."));
+        oldact(_("$c1 защищает местность от ловушек Охотников и от их мести."),ch,0,0,TO_ROOM);
 }
 
 AFFECT_DECL(Prevent);
 VOID_AFFECT(Prevent)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    buf << fmt( 0, "Местность на {W%1$d{x ча%1$Iс|са|сов защищена от ловушек и мести Охотников.", paf->duration )
+    buf << fmt( 0, _("Местность на {W%1$d{x ча%1$Iс|са|сов защищена от ловушек и мести Охотников."), paf->duration )
         << endl;
 }
 

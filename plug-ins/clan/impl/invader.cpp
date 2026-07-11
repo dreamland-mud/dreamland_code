@@ -37,6 +37,7 @@
 #include "clanreference.h"
 #include "magic.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(acid_arrow);
 GSN(acid_blast);
@@ -66,8 +67,8 @@ void ClanGuardInvader::actGreet(PCharacter *wch)
 }
 void ClanGuardInvader::actPush(PCharacter *wch)
 {
-    oldact("$C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься.", wch, 0, ch, TO_CHAR);
-    oldact("$C1 сверлит глазами $c4, и $c1 с испугу куда-то уносится.", wch, 0, ch, TO_ROOM);
+    oldact(_("$C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься."), wch, 0, ch, TO_CHAR);
+    oldact(_("$C1 сверлит глазами $c4, и $c1 с испугу куда-то уносится."), wch, 0, ch, TO_ROOM);
 }
 int ClanGuardInvader::getCast(Character *victim)
 {
@@ -128,19 +129,19 @@ SKILL_RUNP(fade)
    
     if (MOUNTED(ch))
     {
-        ch->pecho("Ты не можешь спрятаться в тенях, когда в седле.");
+        ch->pecho(_("Ты не можешь спрятаться в тенях, когда в седле."));
         return;
     }
 
     if (RIDDEN(ch))
     {
-        ch->pecho("Ты не можешь спрятаться в тенях, когда ты оседлан%Gо||а.", ch);
+        ch->pecho(_("Ты не можешь спрятаться в тенях, когда ты оседлан%Gо||а."), ch);
         return;
     }
 
     if (IS_AFFECTED(ch, AFF_FAERIE_FIRE))
     {
-        ch->pecho("Ты не можешь спрятаться в тенях, когда светишься.");
+        ch->pecho(_("Ты не можешь спрятаться в тенях, когда светишься."));
         return;
     }
 
@@ -155,11 +156,11 @@ SKILL_RUNP(fade)
     if (number_percent() < gsn_fade->getEffective(ch) * k / 100)
     {
         SET_BIT(ch->affected_by, AFF_FADE);
-        ch->pecho("Ты прячешься в тенях.");        
+        ch->pecho(_("Ты прячешься в тенях."));        
         gsn_fade->improve(ch, true);
     }
     else {        
-        ch->pecho("Ты пытаешься спрятаться в тенях, но безуспешно.");        
+        ch->pecho(_("Ты пытаешься спрятаться в тенях, но безуспешно."));        
         gsn_fade->improve(ch, false);
     }
     return;
@@ -172,19 +173,19 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, const DLString &args, int sn, int
 
     if ((victim = get_char_world(ch, args, FFIND_DOPPEL)) == 0 || DIGGED(victim))
     {
-        ch->pecho("Тьма не может обнаружить это существо.");
+        ch->pecho(_("Тьма не может обнаружить это существо."));
         return;
     }
 
     if (is_safe_nomessage(ch, victim))
     {
-        ch->pecho("Тьма не может проникнуть туда, где скрывается это существо.");
+        ch->pecho(_("Тьма не может проникнуть туда, где скрывается это существо."));
         return;
     }
 
     if ( (victim->is_npc()) && (IS_SET(victim->act, ACT_NOEYE)) )
     {
-        ch->pecho("Это существо защищено от твоего взора.");
+        ch->pecho(_("Это существо защищено от твоего взора."));
         return;
     }
    
@@ -192,12 +193,12 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, const DLString &args, int sn, int
     {
         if (saves_spell(level, victim, DAM_OTHER, ch, DAMF_MAGIC))
         {
-            ch->pecho("У тебя не хватает силы приказать темноте.");
+            ch->pecho(_("У тебя не хватает силы приказать темноте."));
             return;
         }
 
-        victim->pecho("На миг тебя окружает темнота, из которой на тебя смотрит огромный глаз.\n\r"
-                      "...И тихий звон {Yзолотой ауры{x рождает имя -- {D%#^C1{x.",
+        victim->pecho(_("На миг тебя окружает темнота, из которой на тебя смотрит огромный глаз.\n\r"
+                      "...И тихий звон {Yзолотой ауры{x рождает имя -- {D%#^C1{x."),
                       ch);
     }
 
@@ -215,7 +216,7 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
 
     if (ch->is_npc() || victim->is_npc() || ch->getClan() != victim->getClan())
     {
-        ch->pecho("Это заклинание ты можешь произнести только на члена твоего клана.");
+        ch->pecho(_("Это заклинание ты можешь произнести только на члена твоего клана."));
         return;
     }
 
@@ -224,7 +225,7 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
 
     if (orgCh != orgVict)
     {
-        ch->pecho("Это заклинание ты можешь произнести только на члена твоей организации.");
+        ch->pecho(_("Это заклинание ты можешь произнести только на члена твоей организации."));
         return;
     }
 
@@ -286,26 +287,26 @@ VOID_SPELL(Shadowlife)::run(Character *ch, Character *victim, int sn, int level)
 
     if (victim->is_npc())
     {
-        ch->pecho("Бесполезная трата сил и энергии...");
+        ch->pecho(_("Бесполезная трата сил и энергии..."));
         return;
     }
 
     if (ch->isAffected(sn))
     {
-        ch->pecho("У тебя недостаточно энергии, чтобы создать тень.");
+        ch->pecho(_("У тебя недостаточно энергии, чтобы создать тень."));
         return;
     }
 
     if (victim->isAffected(gsn_golden_aura) && saves_spell(level, victim, DAM_OTHER, ch, DAMF_MAGIC))
     {
-        ch->pecho("Твое заклинание не может пробиться через защиту от заклинаний противника.");
-        victim->pecho("Твоя золотая аура препятствует подлой попытке оживить твою тень!");
+        ch->pecho(_("Твое заклинание не может пробиться через защиту от заклинаний противника."));
+        victim->pecho(_("Твоя золотая аура препятствует подлой попытке оживить твою тень!"));
         return;
     }
 
-    oldact("Ты даешь жизнь тени $C2!", ch, 0, victim, TO_CHAR);
-    oldact("$c1 дает жизнь тени $C2!", ch, 0, victim, TO_NOTVICT);
-    oldact_p("$c1 дает жизнь твоей тени!", ch, 0, victim, TO_VICT, POS_DEAD);
+    oldact(_("Ты даешь жизнь тени $C2!"), ch, 0, victim, TO_CHAR);
+    oldact(_("$c1 дает жизнь тени $C2!"), ch, 0, victim, TO_NOTVICT);
+    oldact_p(_("$c1 дает жизнь твоей тени!"), ch, 0, victim, TO_VICT, POS_DEAD);
 
     victim->getPC()->shadow = 4 * ch->getModifyLevel() / 10;
 
@@ -339,8 +340,8 @@ VOID_AFFECT(EvilSpirit)::update(Room *room, Affect *paf)
     {
         if (!saves_spell(vch->getModifyLevel() + 2, vch, DAM_MENTAL, 0, DAMF_MAGIC) && !vch->is_immortal() && !is_safe_rspell(vch->getModifyLevel() + 2, vch) && !vch->isAffected(gsn_evil_spirit) && number_bits(3) == 0)
         {
-            vch->pecho("Злые духи овладевают тобой.");
-            oldact("Злые духи овладевают $c1.", vch, 0, 0, TO_ROOM);
+            vch->pecho(_("Злые духи овладевают тобой."));
+            oldact(_("Злые духи овладевают $c1."), vch, 0, 0, TO_ROOM);
             affect_join(vch, &af);
         }
     }
@@ -348,7 +349,7 @@ VOID_AFFECT(EvilSpirit)::update(Room *room, Affect *paf)
 
 VOID_AFFECT(EvilSpirit)::toStream(ostringstream &buf, Affect *paf)
 {
-    buf << fmt(0, "Злые духи воцарились здесь на {W%1$d{x ча%1$Iс|са|сов.", paf->duration)
+    buf << fmt(0, _("Злые духи воцарились здесь на {W%1$d{x ча%1$Iс|са|сов."), paf->duration)
         << endl;
 }
 
@@ -368,13 +369,13 @@ COMMAND(CDarkLeague, "darkleague")
 
     if (pch->getClan() != clan_invader)
     {
-        pch->pecho("Ты не принадлежишь к Кабалу Захватчиков.");
+        pch->pecho(_("Ты не принадлежишь к Кабалу Захватчиков."));
         return;
     }
 
     if (!(orgs = clan_invader->getOrgs()))
     {
-        pch->pecho("Попробуй позже.");
+        pch->pecho(_("Попробуй позже."));
         return;
     }
 
@@ -396,7 +397,7 @@ COMMAND(CDarkLeague, "darkleague")
 
     if (!pch->getClan()->isRecruiter(pch))
     {
-        pch->pecho("Твоих полномочий хватает только посмотреть список организаций.");
+        pch->pecho(_("Твоих полномочий хватает только посмотреть список организаций."));
         return;
     }
 
