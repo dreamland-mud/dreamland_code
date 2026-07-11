@@ -32,6 +32,7 @@
 
 #include "questor.h"
 #include "def.h"
+#include "l10n.h"
 
 #define OBJ_VNUM_QUEST_SCROLL 28109
 
@@ -65,8 +66,8 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     XMLAttributeQuestData::Pointer qdata;
     DLString arg = args.getOneArgument( );
 
-    oldact("$c1 информирует $C4 о выполнении задания.",client,0,ch,TO_ROOM);
-    oldact("Ты информируешь $C4 о выполнении задания.",client,0,ch,TO_CHAR);
+    oldact(_("$c1 информирует $C4 о выполнении задания."),client,0,ch,TO_ROOM);
+    oldact(_("Ты информируешь $C4 о выполнении задания."),client,0,ch,TO_CHAR);
 
     attributes = &client->getAttributes( );
     quest = attributes->findAttr<Quest>( "quest" );
@@ -198,8 +199,8 @@ void Questor::doCancel( PCharacter *client )
     XMLAttributes *attributes;
     Quest::Pointer quest;
     
-    oldact("$c1 просит $C4 отменить $S задание.",client,0,ch,TO_ROOM);
-    oldact("Ты просишь $C4 отменить $S задание.",client,0,ch,TO_CHAR);
+    oldact(_("$c1 просит $C4 отменить $S задание."),client,0,ch,TO_ROOM);
+    oldact(_("Ты просишь $C4 отменить $S задание."),client,0,ch,TO_CHAR);
     
     attributes = &client->getAttributes( );
     quest = attributes->findAttr<Quest>( "quest" );
@@ -237,8 +238,8 @@ void Questor::doFind( PCharacter *client )
     ostringstream buf;
     Quest::Pointer quest;
     
-    oldact("$c1 просит помощи у $C2.",client,0,ch,TO_ROOM);
-    oldact("Ты просишь помощи у $C2.",client,0,ch,TO_CHAR);
+    oldact(_("$c1 просит помощи у $C2."),client,0,ch,TO_ROOM);
+    oldact(_("Ты просишь помощи у $C2."),client,0,ch,TO_CHAR);
 
     quest = client->getAttributes( ).findAttr<Quest>( "quest" );
 
@@ -368,8 +369,8 @@ void Questor::rewardScroll( PCharacter *client )
     obj_to_char( scroll, client );
     tell_raw( client, ch, "Кроме того, я вручаю тебе свиток, внимательно изучив который, "
                           "ты сможешь усовершенствовать свои умения." );
-    oldact("$C1 дает тебе $o4.", client, scroll, ch, TO_CHAR );
-    oldact("$C1 дает $c3 $o4.", client, scroll, ch, TO_ROOM );
+    oldact(_("$C1 дает тебе $o4."), client, scroll, ch, TO_CHAR );
+    oldact(_("$C1 дает $c3 $o4."), client, scroll, ch, TO_ROOM );
     ::wiznet( WIZ_QUEST, 0, 0, "%^C1 получает свиток познания для умения %s", client, report.str().c_str());
 }
 
@@ -445,11 +446,11 @@ bool QuestScrollBehavior::examine( Character *ch )
     bool extract = true;
     
     if (!isOwner( ch )) {
-        oldact("Знания, заключенные в $o6, недоступны тебе.", ch, obj, 0, TO_CHAR);
+        oldact(_("Знания, заключенные в $o6, недоступны тебе."), ch, obj, 0, TO_CHAR);
         return true;
     }
     
-    oldact("Ты внимательно изучаешь знаки на $o6.", ch, obj, 0, TO_CHAR);
+    oldact(_("Ты внимательно изучаешь знаки на $o6."), ch, obj, 0, TO_CHAR);
     
     for (s = skills.begin( ); s != skills.end( ); s++) {
         if (s->second <= 0)
@@ -486,7 +487,7 @@ bool QuestScrollBehavior::examine( Character *ch )
 
     ch->send_to( buf );
     if(extract) {
-        oldact("Чернила меркнут, и $o1 рассыпается трухой.", ch, obj, 0, TO_CHAR);
+        oldact(_("Чернила меркнут, и $o1 рассыпается трухой."), ch, obj, 0, TO_CHAR);
         extract_obj( obj );
     }
     return true;
@@ -504,11 +505,11 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     DLString descr;
     
     if (arg.empty() || arg_is_list(arg)) {
-        oldact("$c1 просит $C4 показать список заданий.",client, 0, ch, TO_ROOM);
-        oldact("Ты просишь $C4 показать список заданий.",client, 0, ch, TO_CHAR);
+        oldact(_("$c1 просит $C4 показать список заданий."),client, 0, ch, TO_ROOM);
+        oldact(_("Ты просишь $C4 показать список заданий."),client, 0, ch, TO_CHAR);
     } else {
-        oldact("$c1 просит $C4 дать $m задание.", client, 0, ch, TO_ROOM);
-        oldact("Ты просишь $C4 дать тебе задание.", client, 0, ch, TO_CHAR);
+        oldact(_("$c1 просит $C4 дать $m задание."), client, 0, ch, TO_ROOM);
+        oldact(_("Ты просишь $C4 дать тебе задание."), client, 0, ch, TO_CHAR);
     }
 
     if (client->getAttributes( ).isAvailable( "quest" )) {
@@ -691,6 +692,6 @@ void Questor::give( Character *victim, Object *obj )
         tell_fmt("Если ты закончил%1$Gо||а мое задание, просто набери {y{hcзадание сдать{x.", victim, ch);
     }
 
-    victim->pecho("%1$^C1 возвраща%1$nет|ют тебе %2$O4.", ch, obj);
-    victim->recho(ch, "%1$^C1 возвраща%1$nет|ют %2$O4 %3$C3.", ch, obj, victim);
+    victim->pecho(_("%1$^C1 возвраща%1$nет|ют тебе %2$O4."), ch, obj);
+    victim->recho(ch, _("%1$^C1 возвраща%1$nет|ют %2$O4 %3$C3."), ch, obj, victim);
 }

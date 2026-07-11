@@ -18,6 +18,7 @@
 #include "msgformatter.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 /*
  * StaffQuest
@@ -120,8 +121,8 @@ QuestReward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman )
 
     r->exp = (r->points + r->clanpoints) * 10;
 
-    oldact("Ты передаешь $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_CHAR);
-    oldact("$c1 передает $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_ROOM);
+    oldact(_("Ты передаешь $n4 $C3."), ch, objName.getValue( ).c_str( ), questman, TO_CHAR);
+    oldact(_("$c1 передает $n4 $C3."), ch, objName.getValue( ).c_str( ), questman, TO_ROOM);
 
     return r;
 }

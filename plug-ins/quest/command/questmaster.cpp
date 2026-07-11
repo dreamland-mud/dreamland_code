@@ -12,6 +12,7 @@
 #include "act.h"
 
 #include "loadsave.h"
+#include "l10n.h"
 
 /*--------------------------------------------------------------------------
  * QuestMaster
@@ -61,7 +62,7 @@ void QuestMaster::speech( Character *victim, const char *msg )
 {
     if (my_message(msg)) {
         tell_hint(ch, victim);
-        oldact("$c1 что-то говорит $C3.", ch, 0, victim, TO_NOTVICT);
+        oldact(_("$c1 что-то говорит $C3."), ch, 0, victim, TO_NOTVICT);
     }
 }
 

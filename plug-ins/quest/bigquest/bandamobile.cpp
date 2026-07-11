@@ -9,6 +9,7 @@
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 BandaMobile::BandaMobile()
                : configured(false)
@@ -35,23 +36,23 @@ bool BandaMobile::death(Character *killer)
 
     if (ourHero( killer )) {
         if (chance(33)) 
-            killer->pecho("{YТы уничтожил%1$Gо||а очередную цель, браво.{x", killer);
+            killer->pecho(_("{YТы уничтожил%1$Gо||а очередную цель, браво.{x"), killer);
         else if (chance(50))
-            killer->pecho("{YМолодец, тебе удалось избавить мир от очередной напасти.{x", killer);
+            killer->pecho(_("{YМолодец, тебе удалось избавить мир от очередной напасти.{x"), killer);
         else
-            killer->pecho("{YПротив тебя у %2$P4 не было никаких шансов!{x", killer, ch);
+            killer->pecho(_("{YПротив тебя у %2$P4 не было никаких шансов!{x"), killer, ch);
         quest->mobKilled(pcm, killer);
         return false;
     }
 
     if (ourHeroGroup(killer)) {
-        killer->pecho("{YТы помог%1$Gло||ла согрупнику уничтожить очередную цель задания, браво.{x", killer);
-        pcm->getPlayer()->pecho("{YТвой согрупник помог тебе уничтожить очередную цель задания.{x");
+        killer->pecho(_("{YТы помог%1$Gло||ла согрупнику уничтожить очередную цель задания, браво.{x"), killer);
+        pcm->getPlayer()->pecho(_("{YТвой согрупник помог тебе уничтожить очередную цель задания.{x"));
         quest->mobKilled(pcm, killer);
         return false;
     }
 
-    pcm->getPlayer()->pecho("{YКто-то из целей текущего задания погиб без твоего участия.{x");
+    pcm->getPlayer()->pecho(_("{YКто-то из целей текущего задания погиб без твоего участия.{x"));
     quest->mobDestroyed(pcm);
     return false;
 }
@@ -146,7 +147,7 @@ BandaItem::~BandaItem()
 
 void BandaItem::getByOther( Character *ch ) 
 {
-    ch->pecho( "%1$^O1 не принадлежит тебе, и ты бросаешь %1$P2.", obj );
+    ch->pecho( _("%1$^O1 не принадлежит тебе, и ты бросаешь %1$P2."), obj );
 }
 
 void BandaItem::getByHero( PCharacter *ch ) 
@@ -159,14 +160,14 @@ void BandaItem::getByHero( PCharacter *ch )
 
     if (carries == quest->objsTotal) {
         obj->getRoom()->echo(POS_RESTING, quest->getScenario().msgJoin.c_str());
-        ch->pecho("Он вспыхивает и исчезает, оставив на своем месте {C1000{x очков опыта.");
-        ch->recho("Он ярко вспыхивает и исчезает.");
+        ch->pecho(_("Он вспыхивает и исчезает, оставив на своем месте {C1000{x очков опыта."));
+        ch->recho(_("Он ярко вспыхивает и исчезает."));
         Player::gainExp(ch, 1000);
         quest->destroyItems<BandaItem>();
         quest->wiznet("", "easter egg");
         return;
     }
 
-    oldact("Мерцающая аура окружает $o4.", ch, obj, 0, TO_CHAR );
+    oldact(_("Мерцающая аура окружает $o4."), ch, obj, 0, TO_CHAR );
 }
 

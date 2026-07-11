@@ -11,6 +11,7 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "act.h"
+#include "l10n.h"
 
 /* 
  * HiddenChest 
@@ -41,13 +42,13 @@ void LockPick::getByHero( PCharacter *ch )
         return;
 
     quest->wiznet( "", "%s gets key", ch->getNameP( '1' ).c_str( ) );
-    ch->pecho("%1$^O1 тускло поблескива%1$nет|ют.", obj );
+    ch->pecho(_("%1$^O1 тускло поблескива%1$nет|ют."), obj );
 }
 
 void LockPick::getByOther( Character *ch ) 
 { 
-    ch->pecho("Ты роняешь %1$O4.", obj);    
-    ch->recho("%1$^C1 роня%1$nет|ют %2$O4.", ch, obj);
+    ch->pecho(_("Ты роняешь %1$O4."), obj);    
+    ch->recho(_("%1$^C1 роня%1$nет|ют %2$O4."), ch, obj);
 }
 
 bool LockPick::ourMobile( NPCharacter *mob ) 
@@ -67,12 +68,12 @@ void RobbedItem::getByHero( PCharacter *ch )
         return;
 
     quest->wiznet( "", "%s gets item", ch->getNameP( '1' ).c_str( ) );
-    ch->pecho("%1$^O1 жажд%1$nет|ут вернуться к хозяину.", obj);
+    ch->pecho(_("%1$^O1 жажд%1$nет|ут вернуться к хозяину."), obj);
 }
 
 void RobbedItem::getByOther( Character *ch ) 
 {
-    ch->pecho("%1$^O1 выпада%1$nет|ют у тебя из рук.", obj);
-    ch->recho("%1$^C1 роня%1$nет|ют %2$O4.", ch, obj);
+    ch->pecho(_("%1$^O1 выпада%1$nет|ют у тебя из рук."), obj);
+    ch->recho(_("%1$^C1 роня%1$nет|ют %2$O4."), ch, obj);
 }
 

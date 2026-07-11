@@ -23,6 +23,7 @@
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 /*------------------------------------------------------------------------
  * QuestTrader 
@@ -98,18 +99,18 @@ void QuestTrader::msgListEmpty( Character *client )
 
 void QuestTrader::msgListRequest( Character *client ) 
 {
-    oldact("$c1 просит $C4 показать список вещей.", client, 0, getKeeper( ), TO_ROOM );
-    oldact("Ты просишь $C4 показать список вещей.", client, 0, getKeeper( ), TO_CHAR );
+    oldact(_("$c1 просит $C4 показать список вещей."), client, 0, getKeeper( ), TO_ROOM );
+    oldact(_("Ты просишь $C4 показать список вещей."), client, 0, getKeeper( ), TO_CHAR );
 }
 
 void QuestTrader::msgListBefore( Character *client ) 
 {
-    client->pecho("Перечень квестовых вещей для покупки:");
+    client->pecho(_("Перечень квестовых вещей для покупки:"));
 }
 
 void QuestTrader::msgListAfter( Character *client )
 {
-    client->pecho( "Для покупки чего-либо используй {yквест купить {Dназвание{x." );
+    client->pecho( _("Для покупки чего-либо используй {yквест купить {Dназвание{x.") );
 }
 
 void QuestTrader::msgArticleNotFound( Character *client ) 
@@ -124,7 +125,7 @@ void QuestTrader::msgArticleTooFew( Character *client, Article::Pointer )
 
 void QuestTrader::msgBuyRequest( Character *client )
 {
-    oldact("$c1 о чем-то просит $C4.", client, 0, getKeeper( ), TO_ROOM );
+    oldact(_("$c1 о чем-то просит $C4."), client, 0, getKeeper( ), TO_ROOM );
 }
 
 /*----------------------------------------------------------------------------
@@ -190,8 +191,8 @@ void ObjectQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     
     buyObject( obj, client, questman );
 
-    oldact("$C1 дает $o4 $c3.", client, obj, questman, TO_ROOM );
-    oldact("$C1 дает тебе $o4.", client, obj, questman, TO_CHAR );
+    oldact(_("$C1 дает $o4 $c3."), client, obj, questman, TO_ROOM );
+    oldact(_("$C1 дает тебе $o4."), client, obj, questman, TO_CHAR );
     obj_to_char( obj, client );
 }
 
@@ -290,8 +291,8 @@ void GoldQuestArticle::buy( PCharacter *client, NPCharacter *questman )
 {
     client->gold += amount.getValue( );
     
-    oldact("$C1 дает $t золотых монет $c3.", client, DLString(amount.getValue( )).c_str( ), questman, TO_ROOM );
-    oldact("$C1 дает тебе $t золотых монет.", client, DLString(amount.getValue( )).c_str( ), questman, TO_CHAR );
+    oldact(_("$C1 дает $t золотых монет $c3."), client, DLString(amount.getValue( )).c_str( ), questman, TO_ROOM );
+    oldact(_("$C1 дает тебе $t золотых монет."), client, DLString(amount.getValue( )).c_str( ), questman, TO_CHAR );
 }
 
 /*---------------------------------------------------------------------------
@@ -301,8 +302,8 @@ void ConQuestArticle::buy( PCharacter *client, NPCharacter *questman )
 {
     client->perm_stat[STAT_CON]++;
 
-    oldact("$C1 повышает телосложение $c2.", client, 0, questman, TO_ROOM );
-    oldact("$C1 повышает твое телосложение.", client, 0, questman, TO_CHAR );
+    oldact(_("$C1 повышает телосложение $c2."), client, 0, questman, TO_ROOM );
+    oldact(_("$C1 повышает твое телосложение."), client, 0, questman, TO_CHAR );
 }
     
 bool ConQuestArticle::available( Character *client, NPCharacter *questman ) const 
@@ -340,8 +341,8 @@ void PocketsQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     
     if (obj) {
         obj->value1(obj->value1() | CONT_WITH_POCKETS);
-        oldact("$C1 пришивает карманы на $o4.", client, obj, questman, TO_CHAR);
-        oldact("$C1 пришивает $c5 карманы на $o4.", client, obj, questman, TO_ROOM);
+        oldact(_("$C1 пришивает карманы на $o4."), client, obj, questman, TO_CHAR);
+        oldact(_("$C1 пришивает $c5 карманы на $o4."), client, obj, questman, TO_ROOM);
     }
 }
 
@@ -401,8 +402,8 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     waist->equip( keyring );
     extract_obj( girth );
 
-    oldact("$C1 прикрепляет огромный брелок к $o3.", client, keyring, questman, TO_CHAR);
-    oldact("$C1 прикрепляет огромный брелок к $o3.", client, keyring, questman, TO_ROOM);
+    oldact(_("$C1 прикрепляет огромный брелок к $o3."), client, keyring, questman, TO_CHAR);
+    oldact(_("$C1 прикрепляет огромный брелок к $o3."), client, keyring, questman, TO_ROOM);
 }
 
 bool KeyringQuestArticle::available( Character *client, NPCharacter *questman ) const 
@@ -510,8 +511,8 @@ void PiercingQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
 {
     client->wearloc.set( wear_ears );
     
-    oldact("$C1 достает огромный гвоздь и молниеносно пробивает дырку в мочке уха $c2.",client,0,tattoer,TO_ROOM);
-    oldact("$C1 достает огромный гвоздь и молниеносно пробивает дырку в твоей мочке уха. АЙ!",client,0,tattoer,TO_CHAR);
+    oldact(_("$C1 достает огромный гвоздь и молниеносно пробивает дырку в мочке уха $c2."),client,0,tattoer,TO_ROOM);
+    oldact(_("$C1 достает огромный гвоздь и молниеносно пробивает дырку в твоей мочке уха. АЙ!"),client,0,tattoer,TO_CHAR);
 }
 
 bool PiercingQuestArticle::available( Character *client, NPCharacter *tattoer ) const 
@@ -563,8 +564,8 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
     obj->setShortDescr( fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), leader), LANG_DEFAULT );
 
     obj_to_char( obj, client );
-    oldact("$C1 наносит тебе $o4!", client, obj, tattoer, TO_CHAR );
-    oldact("$C1 наносит $c3 $o4!", client, obj, tattoer, TO_ROOM );
+    oldact(_("$C1 наносит тебе $o4!"), client, obj, tattoer, TO_CHAR );
+    oldact(_("$C1 наносит $c3 $o4!"), client, obj, tattoer, TO_ROOM );
 
     equip_char( client, obj, wear_tattoo );    
 }

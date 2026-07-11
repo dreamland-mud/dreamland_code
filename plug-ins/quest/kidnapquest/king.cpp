@@ -19,6 +19,7 @@
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 void KidnapKing::deadAction( Quest::Pointer aquest, PCMemoryInterface *pcm, Character *killer )
 {
@@ -78,8 +79,8 @@ Object * KidnapKing::giveMarkHero( PCharacter *hero )
         mark = quest->createMark( );
         
     } catch (const QuestCannotStartException &e) {
-        oldact("Глюк! $C4 нечего тебе дать.", hero, 0, ch, TO_CHAR );
-        hero->pecho("Задание отменено. Через минуту сможешь получить новое.");
+        oldact(_("Глюк! $C4 нечего тебе дать."), hero, 0, ch, TO_CHAR );
+        hero->pecho(_("Задание отменено. Через минуту сможешь получить новое."));
         LogStream::sendError( ) << e.what( ) << endl;
         
         quest->setTime( hero, 1 );
