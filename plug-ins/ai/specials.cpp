@@ -31,6 +31,7 @@
 
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(heal);
 GSN(armor);
@@ -147,7 +148,7 @@ bool BasicMobileBehavior::doInvis()
 
     if (!IS_AFFECTED(ch, AFF_SNEAK)) {
         if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_SNEAK) && !MOUNTED(ch)) {
-            ch->pecho("Ты пытаешься двигаться незаметно.");
+            ch->pecho(_("Ты пытаешься двигаться незаметно."));
             SET_BIT(ch->affected_by, AFF_SNEAK);
             rc = true;
         }
@@ -299,8 +300,8 @@ bool BasicMobileBehavior::doQuaff( )
     }
 
     if (obj) {
-        oldact("$c1 осушает $o4.", ch, obj, 0, TO_ROOM );
-        oldact("Ты осушаешь $o4.", ch, obj, 0 ,TO_CHAR );
+        oldact(_("$c1 осушает $o4."), ch, obj, 0, TO_ROOM );
+        oldact(_("Ты осушаешь $o4."), ch, obj, 0 ,TO_CHAR );
         
         spell_by_item( ch, obj );
         obj_to_char( create_object(get_obj_index(OBJ_VNUM_POTION_VIAL),0),ch);
@@ -417,7 +418,7 @@ bool BasicMobileBehavior::doScavenge( )
     if ((can_wield_obj( ch, target ) && !get_eq_char( ch, wear_wield ))
         || (can_shield_obj( ch, target ) && !get_eq_char( ch, wear_shield )))
     {
-        oldact("$c1 оценивающе рассматривает $o4.", ch, target, 0, TO_ROOM);
+        oldact(_("$c1 оценивающе рассматривает $o4."), ch, target, 0, TO_ROOM);
         wear_obj( ch, target, F_WEAR_VERBOSE );
     }
 

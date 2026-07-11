@@ -15,10 +15,11 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 void QuestWeapon::wear(Character *ch)
 {
-    ch->pecho("{CТвое оружие ярко вспыхивает.{x");
+    ch->pecho(_("{CТвое оружие ярко вспыхивает.{x"));
 }
 
 void QuestWeapon::equip(Character *ch)

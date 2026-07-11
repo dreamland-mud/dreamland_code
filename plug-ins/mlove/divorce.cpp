@@ -11,6 +11,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "class.h"
+#include "l10n.h"
 
 COMMAND(Divorce, "divorce")
 {
@@ -20,12 +21,12 @@ COMMAND(Divorce, "divorce")
     DLString brideName1, brideName2;
     
     if (!ch->is_immortal( )) {
-        ch->pecho("Это не для тебя.");
+        ch->pecho(_("Это не для тебя."));
         return;
     }
 
     if (arguments.empty( )) {
-        ch->pecho("И кого разводить будем?");
+        ch->pecho(_("И кого разводить будем?"));
         return;
     }
     
@@ -50,12 +51,12 @@ COMMAND(Divorce, "divorce")
     brideName2.upperFirstCharacter( );
 
     if (brideName2 == brideName1) {
-        ch->pecho("Это еще как?");
+        ch->pecho(_("Это еще как?"));
         return;
     }
 
     if (ch->getPC()->getName( ) == brideName1 || ch->getPC()->getName( ) == brideName2) {
-        ch->pecho("Попроси кого-то помочь тебе.");
+        ch->pecho(_("Попроси кого-то помочь тебе."));
         return;
     }
 

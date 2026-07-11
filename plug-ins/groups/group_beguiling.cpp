@@ -38,6 +38,7 @@
 #include "string_utils.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 
 PROF(none);
@@ -52,11 +53,11 @@ PROF(none);
 void MagicJar::get( Character *ch )
 {
     if (!ch->is_npc( ) && String::contains(String::toString(obj->getKeyword()), ch->getPC()->getName())) {
-        oldact("Вот это удача!",ch,obj,0,TO_CHAR);
+        oldact(_("Вот это удача!"),ch,obj,0,TO_CHAR);
         extract_obj(obj);
     }
     else
-        oldact("Ты заполучи%gло|л|ла блудную душу.",ch,obj,0,TO_CHAR);
+        oldact(_("Ты заполучи%gло|л|ла блудную душу."),ch,obj,0,TO_CHAR);
 } 
 
 bool MagicJar::extract( bool fCount )
@@ -72,7 +73,7 @@ bool MagicJar::extract( bool fCount )
         {
             if (IS_SET( wch->act, PLR_NO_EXP )) {
                 REMOVE_BIT(wch->act,PLR_NO_EXP);
-                wch->pecho("Твоя душа возвращается к тебе.");
+                wch->pecho(_("Твоя душа возвращается к тебе."));
             }
 
             break;
@@ -113,26 +114,26 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
 
     if (victim == ch)
         {
-        ch->pecho("Твоя душа всегда с тобой!");
+        ch->pecho(_("Твоя душа всегда с тобой!"));
         return;
         }
 
     if (victim->is_npc())
         {
-        ch->pecho("Душа этого противника неподвластна тебе!");
+        ch->pecho(_("Душа этого противника неподвластна тебе!"));
         return;
         }
 
     if ( IS_SET( victim->act, PLR_NO_EXP ) )
     {
-        ch->pecho("Душа твоего противника где-то далеко...");
+        ch->pecho(_("Душа твоего противника где-то далеко..."));
         return;
     }
 
 
     if (saves_spell(level ,victim,DAM_MENTAL, ch, DAMF_MAGIC))
        {
-        ch->pecho("Твоя попытка закончилась неудачей.");
+        ch->pecho(_("Твоя попытка закончилась неудачей."));
         return;
        }
 
@@ -141,7 +142,7 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
             break;
 
     if (  vial == 0 )  {
-        ch->pecho("У тебя нет пустого сосуда, чтоб заточить в него дух противника.");
+        ch->pecho(_("У тебя нет пустого сосуда, чтоб заточить в него дух противника."));
         return;
     }
     
@@ -168,8 +169,8 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     obj_to_char( jar , ch );
 
     SET_BIT(victim->act,PLR_NO_EXP);
-    oldact("Дух $C2 теперь заточен в сосуде и находится в твоей власти.", ch, 0, victim, TO_CHAR);
-    oldact("$c1 {Rзаточил твой дух в сосуде.{x", ch, 0, victim, TO_VICT);
+    oldact(_("Дух $C2 теперь заточен в сосуде и находится в твоей власти."), ch, 0, victim, TO_CHAR);
+    oldact(_("$c1 {Rзаточил твой дух в сосуде.{x"), ch, 0, victim, TO_VICT);
 }
 
 

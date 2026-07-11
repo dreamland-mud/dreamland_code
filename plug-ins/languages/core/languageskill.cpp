@@ -15,6 +15,7 @@
 #include "player_utils.h"
 #include "math_utils.h"
 #include "poliglot.h"
+#include "l10n.h"
 
 const int Language::SKILL_ADEPT  = 50;
 const int Language::SKILL_SENSE  = 75;
@@ -132,9 +133,9 @@ bool Language::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
    
     if (verbose) { 
         if (mob)
-            ch->pecho( "%^C1 отнюдь не полиглот.", mob );
+            ch->pecho( _("%^C1 отнюдь не полиглот."), mob );
         else
-            ch->pecho( "Поищи бродячего монаха." );
+            ch->pecho( _("Поищи бродячего монаха.") );
     }
 
     return false;
@@ -264,7 +265,7 @@ void Language::improve( Character *ch, bool, Character *victim, int, int ) const
     PCSkillData &data = pch->getSkillData( getIndex( ) );
 
     data.learned++;
-    ch->pecho( "Ты совершенствуешь свои познания в %^N6.", name.get(RU).c_str() );
+    ch->pecho( _("Ты совершенствуешь свои познания в %^N6."), name.get(RU).c_str() );
 }
 
 AffectHandler::Pointer Language::getAffect( ) 

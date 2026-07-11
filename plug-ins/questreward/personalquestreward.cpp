@@ -14,13 +14,14 @@
 
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 void PersonalQuestReward::get( Character *ch ) 
 { 
     if (!canEquip( ch ))
         return;
 
-    oldact_p("{BМерцающая аура окружает $o4.\n\r{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
+    oldact_p(_("{BМерцающая аура окружает $o4.\n\r{x"), ch, obj, 0, TO_CHAR, POS_SLEEPING);
 }
 
 

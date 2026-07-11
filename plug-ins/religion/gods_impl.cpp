@@ -32,6 +32,7 @@
 
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(colour_spray);
 GSN(haste);
@@ -75,14 +76,14 @@ void ErevanGod::tattooFight( Object *obj, Character *ch ) const
 
     // Chance 1 in 8 of getting a heal. 
     if (ch->hit < ch->max_hit && chance(12)) {
-        ch->pecho("{C%^O1 загорается голубым светом.{x", obj);
+        ch->pecho(_("{C%^O1 загорается голубым светом.{x"), obj);
         spell(gsn_heal, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER);
         return; 
     }
 
     if (!IS_AFFECTED(ch, AFF_HASTE) && chance(50)) {
         spell(gsn_haste, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
-        ch->pecho("{WТы внезапно ощущаешь повышенную активность!{x");
+        ch->pecho(_("{WТы внезапно ощущаешь повышенную активность!{x"));
         return;
     }
 
@@ -96,8 +97,8 @@ void ErevanGod::tattooFight( Object *obj, Character *ch ) const
     if (chance(15)) {
         try {
             TricksterGodOneHit thit(ch, victim);
-            oldact("{CЭреван Илесир внезапно вселяется в тебя.{x", ch, 0, 0, TO_CHAR);
-            oldact("{CЭреван Илесир внезапно вселяется в $c4.{x", ch, 0, 0, TO_ROOM);
+            oldact(_("{CЭреван Илесир внезапно вселяется в тебя.{x"), ch, 0, 0, TO_CHAR);
+            oldact(_("{CЭреван Илесир внезапно вселяется в $c4.{x"), ch, 0, 0, TO_ROOM);
             thit.hit();
             do_yell(victim, "Помогите! Эреван Илесир пыряет меня ножом!");
         }

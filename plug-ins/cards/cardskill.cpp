@@ -17,6 +17,7 @@
 
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 GROUP(card_pack);
 static GlobalBitvector cardGroups(skillGroupManager, group_card_pack);
@@ -70,9 +71,9 @@ bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
     if (verbose) {    
         if (mob)
-            ch->pecho( "%^C1 не разбирается в картах.", mob );
+            ch->pecho( _("%^C1 не разбирается в картах."), mob );
         else
-            ch->pecho( "Поищи кого-то, кто разбирается в картах." );
+            ch->pecho( _("Поищи кого-то, кто разбирается в картах.") );
     }
 
     return false;

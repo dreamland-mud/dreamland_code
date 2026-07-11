@@ -23,6 +23,7 @@
 #include "fight_extract.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(arcadian);
 GSN(gas_breath);
@@ -145,8 +146,8 @@ bool BeerElementalBehavior::specFight( )
     dam = max( dam      + dice( level, 12 ) / 10, 
                dam / 10 + dice( level, 12 ) );
     
-    oldact("$c1 дышит на тебя перегаром!", ch, 0, victim, TO_VICT);
-    oldact("$c1 дышит перегаром на $C4!", ch, 0, victim, TO_NOTVICT);
+    oldact(_("$c1 дышит на тебя перегаром!"), ch, 0, victim, TO_VICT);
+    oldact(_("$c1 дышит перегаром на $C4!"), ch, 0, victim, TO_NOTVICT);
     
     try {
         damage_nocatch( ch, victim, dam, gsn_gas_breath, DAM_POISON, true, DAMF_SPELL);
@@ -162,7 +163,7 @@ bool BeerElementalBehavior::area( )
     ch->max_hit -= ch->max_hit / 100;
 
     if (ch->max_hit < ch->getModifyLevel( )) {
-        oldact("$c1 окончательно усыхает и исчезает.", ch, 0, 0, TO_ROOM );
+        oldact(_("$c1 окончательно усыхает и исчезает."), ch, 0, 0, TO_ROOM );
         extract_char( ch, true );
         return true;
     }

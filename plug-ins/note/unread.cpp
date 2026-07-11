@@ -15,6 +15,7 @@
 #include "hometown.h"
 #include "descriptor.h"
 #include "arg_utils.h"
+#include "l10n.h"
 
 HOMETOWN(moehewa);
 
@@ -58,7 +59,7 @@ void Unread::doSpool( PCharacter *ch, bool fVerbose )
         ch->send_to( buf );
     }
     else if (fVerbose)
-        ch->pecho("У тебя нет непрочитанных сообщений.");
+        ch->pecho(_("У тебя нет непрочитанных сообщений."));
 }
 
 
@@ -74,7 +75,7 @@ void Unread::doUnfinished( PCharacter *ch )
             const DLString &threadName = i->second.getThreadName( );
             NoteThread::Pointer thread = NoteManager::getThis( )->findThread( threadName );
 
-            ch->pecho("Ты не закончи%Gло|л|ла писать {W%N4{x!", 
+            ch->pecho(_("Ты не закончи%Gло|л|ла писать {W%N4{x!"), 
                       ch, thread ? thread->getRussianThreadName( ).c_str( ) : threadName.c_str( ) );
         }
 }
@@ -103,7 +104,7 @@ void Unread::doNext( PCharacter *ch )
     }
 
     if (!oldest) 
-        ch->pecho("У тебя нет непрочитанных сообщений.");
+        ch->pecho(_("У тебя нет непрочитанных сообщений."));
     else {
         ch->pecho( "{W%s{x:", oldest->getName( ).c_str( ) );
         oldest->showNoteToChar( ch, onote );

@@ -24,6 +24,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 GSN(pass_door);
 GSN(track);
@@ -102,18 +103,18 @@ bool BasicMobileBehavior::trackLastFought( Character *wch )
     int d;
 
     ch->setWait( gsn_track->getBeats(ch) );
-    oldact("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM);
+    oldact(_("$c1 всматривается в землю в поисках следов."),ch,0,0,TO_ROOM);
 
     d = room->history.went( wch );
     pexit = (d == -1 ? NULL : room->exit[d]);
 
     if (!pexit) {
-        oldact("Ты не видишь здесь следов $C2.", ch, 0, wch, TO_CHAR);
+        oldact(_("Ты не видишь здесь следов $C2."), ch, 0, wch, TO_CHAR);
         lostTrack = true;
         return true;
     }
     
-    oldact("Следы $C2 ведут $t.", ch, dirs[d].leave, wch, TO_CHAR);
+    oldact(_("Следы $C2 ведут $t."), ch, dirs[d].leave, wch, TO_CHAR);
     
     if (!move( d, pexit, wch )) 
         lostTrack = true;

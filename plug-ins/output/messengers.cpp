@@ -16,6 +16,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 static IconvMap koi2utf("koi8-u", "utf-8");
 
@@ -108,7 +109,7 @@ void send_telegram_note(const DLString &thread, const DLString &author, const DL
 void send_telegram_level(PCharacter *ch)
 {   
     if (ch->getLevel() == LEVEL_MORTAL)
-        send_to_telegram(koi2utf( fmt(0, "%1$^C1 достиг%1$Gло||ла уровня героя!", ch) ));
+        send_to_telegram(koi2utf( fmt(0, _("%1$^C1 достиг%1$Gло||ла уровня героя!"), ch) ));
 }
 
 void send_telegram_gquest(const DLString &gqName, const DLString &msg)
@@ -244,9 +245,9 @@ void send_discord_level(PCharacter *ch)
     DLString msg;
 
     if (ch->getLevel() == LEVEL_MORTAL)
-        msg = fmt(0, "%1$^C1 достиг%1$Gло||ла уровня героя!", ch);
+        msg = fmt(0, _("%1$^C1 достиг%1$Gло||ла уровня героя!"), ch);
     else
-        msg = fmt(0, "%1$^C1 достиг%1$Gло||ла следующей ступени мастерства.", ch);
+        msg = fmt(0, _("%1$^C1 достиг%1$Gло||ла следующей ступени мастерства."), ch);
 
     send_to_discord_stream(":zap: " + msg);
 }

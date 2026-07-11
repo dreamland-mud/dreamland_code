@@ -18,6 +18,7 @@
 #include "interp.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader );
 
@@ -119,7 +120,7 @@ void MixedPetShopRoom::doList( Character *client )
     createMixedList( list, client );
 
     if (list.empty( )) {
-        client->pecho( "Магазин не работает." );
+        client->pecho( _("Магазин не работает.") );
         return;
     }
 
@@ -201,6 +202,6 @@ void MixedPetShopRoom::doBuy( Character *client, const DLString &constArguments 
         }
     }
     
-    client->pecho( "Извини, ты не можешь купить этого здесь." );
+    client->pecho( _("Извини, ты не можешь купить этого здесь.") );
 }
 

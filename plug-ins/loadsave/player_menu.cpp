@@ -6,6 +6,7 @@
 #include "websocketrpc.h"
 #include "commandinterpreter.h"
 #include "descriptor.h"
+#include "l10n.h"
 
 using namespace std;
 
@@ -44,9 +45,9 @@ void Player::menuPrint(PCharacter* pch)
     pch->send_to(buf);
 
     if (is_websock(pch))
-        pch->pecho("Напиши номер или нажми на вариант из списка.");
+        pch->pecho(_("Напиши номер или нажми на вариант из списка."));
     else
-        pch->pecho("Напиши номер из списка.");
+        pch->pecho(_("Напиши номер из списка."));
 }
 
 const DLString& Player::menuGet(PCharacter* pch, const Integer& choice)
@@ -90,7 +91,7 @@ bool MenuInterpretLayer::process( InterpretArguments &iargs )
     DLString menuAction = Player::menuGet(pch, choice);
 
     if (menuAction.empty()) {
-        ch->pecho("{RТакого варианта не было в списке.{x\n");            
+        ch->pecho(_("{RТакого варианта не было в списке.{x\n"));            
         Player::menuPrint(pch);
         return false;
     }

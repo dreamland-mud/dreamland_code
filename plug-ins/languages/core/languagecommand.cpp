@@ -20,6 +20,7 @@
 #include "wiznet.h"
 
 #include "def.h"
+#include "l10n.h"
 
 GSN(garble);
 GSN(deafen);
@@ -61,12 +62,12 @@ void LanguageCommand::run( Character *ach, const DLString &constArguments )
     ch = ach->getPC( );
 
     if (!ch) {
-        ch->pecho( "Муу-у-у." );
+        ch->pecho( _("Муу-у-у.") );
         return;
     }
 
     if (arg.empty( )) {
-        ch->pecho( "Что ты хочешь произнести на %^N6?", language->name.get(RU).c_str( ) );
+        ch->pecho( _("Что ты хочешь произнести на %^N6?"), language->name.get(RU).c_str( ) );
         return;
     }
     
@@ -81,7 +82,7 @@ void LanguageCommand::run( Character *ach, const DLString &constArguments )
     }
     
     if (!available( ch )) {
-        ch->pecho( "Ты не умеешь разговаривать на %^N6.", language->name.get(RU).c_str( ) );
+        ch->pecho( _("Ты не умеешь разговаривать на %^N6."), language->name.get(RU).c_str( ) );
         return;
     }
 
@@ -140,8 +141,8 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
     chance = language->getEffective( ch );
     
     if (number_percent( ) > chance || ch->isAffected( gsn_garble )) {
-        ch->pecho( "Тебя подвело произношение." );
-        ch->recho( POS_RESTING, "%^C1 бормочет что-то неразборчивое.", ch );
+        ch->pecho( _("Тебя подвело произношение.") );
+        ch->recho( POS_RESTING, _("%^C1 бормочет что-то неразборчивое."), ch );
         ch->setWait( language->getBeats(ch) / 2 );
         return;
     }
@@ -157,20 +158,20 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
          
     if (obj) {
         if (number_bits( 1 ))
-            ch->pecho( "Ты проводишь рукой над %O5 и изрекаешь '{C%s{x'.", obj, arg1.c_str( ) );
+            ch->pecho( _("Ты проводишь рукой над %O5 и изрекаешь '{C%s{x'."), obj, arg1.c_str( ) );
         else
-            ch->pecho( "Ты изрекаешь, глядя на %O4: '{C%s{x'.", obj, arg1.c_str( ) );
+            ch->pecho( _("Ты изрекаешь, глядя на %O4: '{C%s{x'."), obj, arg1.c_str( ) );
     }
     else if (!victim || victim == ch)
-        ch->pecho( "Ты изрекаешь '{C%s{x'", arg1.c_str( ) );
+        ch->pecho( _("Ты изрекаешь '{C%s{x'"), arg1.c_str( ) );
     else {
-        ch->pecho( "Ты изрекаешь, указывая на %^C4: '{C%s{x'", victim, arg1.c_str( ) );
+        ch->pecho( _("Ты изрекаешь, указывая на %^C4: '{C%s{x'"), victim, arg1.c_str( ) );
         
         if (IS_AWAKE(victim) && !victim->isAffected( gsn_deafen )) {
             if (language->getEffective( victim ) < number_percent( ))
-                victim->pecho( "%^C1 что-то произносит, указывая в твою сторону.", ch );
+                victim->pecho( _("%^C1 что-то произносит, указывая в твою сторону."), ch );
             else 
-                victim->pecho( "%^C1 изрекает на %^N6, указывая в твою сторону: '{C%s{x'",
+                victim->pecho( _("%^C1 изрекает на %^N6, указывая в твою сторону: '{C%s{x'"),
                                ch, language->name.get(RU).c_str( ), arg1.c_str( ) );
         }
     }
@@ -186,19 +187,19 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
             continue;
 
         if (language->getEffective( rch ) < number_percent( ))
-            rch->pecho( "%^C1 что-то бормочет на странном языке.", ch );
+            rch->pecho( _("%^C1 что-то бормочет на странном языке."), ch );
         else 
-            rch->pecho( "%^C1 изрекает на %^N6 '{C%s{x'", 
+            rch->pecho( _("%^C1 изрекает на %^N6 '{C%s{x'"), 
                         ch, language->name.get(RU).c_str( ), arg1.c_str( ) );
     }
     
     if (word.empty( ) || !effect) {
-        oldact("{CНа мгновение все вокруг стихло.{x", ch, 0, 0, TO_ALL );
+        oldact(_("{CНа мгновение все вокруг стихло.{x"), ch, 0, 0, TO_ALL );
         return;
     }
 
     if (effect->isObject( ) && !obj) {
-        ch->pecho("Выбери, на какую вещь произнести слово.");
+        ch->pecho(_("Выбери, на какую вещь произнести слово."));
         fUsed = false;
     }
     else if (obj) {
@@ -206,7 +207,7 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
     }
     else {
         if (fMiss)
-            ch->pecho( "Твои слова, не достигнув цели, обратились на тебя сам%Gого|ого|у.", ch );
+            ch->pecho( _("Твои слова, не достигнув цели, обратились на тебя сам%Gого|ого|у."), ch );
         
         fUsed = effect->run( ch, (!victim ? ch : victim) );
     }
@@ -231,7 +232,7 @@ void LanguageCommand::doList( PCharacter *ch ) const
     const LanguageManager::Words &words = languageManager->getWords( );
     LanguageManager::Words::const_iterator i;
     
-    ch->pecho( "Текущий словарный запас для языка {c%N1{x: ", language->name.get(RU).c_str( ) );
+    ch->pecho( _("Текущий словарный запас для языка {c%N1{x: "), language->name.get(RU).c_str( ) );
         
     for (i = words.begin( ); i != words.end( ); i++) {
         const Word & w = i->second;
@@ -255,7 +256,7 @@ void LanguageCommand::doKnown( PCharacter *ch ) const
     bool hasDreams = showDreams( ch );
     bool hasRewards = showRewards( ch );
     if (!hasDreams && !hasRewards)
-        ch->pecho( "Ты не можешь вспомнить ни одного слова." );
+        ch->pecho( _("Ты не можешь вспомнить ни одного слова.") );
 }
 
 /*
@@ -306,12 +307,12 @@ bool LanguageCommand::showDreams( PCharacter *ch ) const
     }
 
     if (buf.str( ).empty( )) {
-        ch->pecho( "Тебе ни разу ничего не снилось на %N6.", language->name.get(RU).c_str( ) );
+        ch->pecho( _("Тебе ни разу ничего не снилось на %N6."), language->name.get(RU).c_str( ) );
         return true;
     }
 
     buf << endl;
-    ch->pecho( "Тебе приснились и запомнились слова на %N6: ", language->name.get(RU).c_str( ) );
+    ch->pecho( _("Тебе приснились и запомнились слова на %N6: "), language->name.get(RU).c_str( ) );
     ch->send_to( buf );
     return true;
 }
@@ -376,7 +377,7 @@ bool LanguageCommand::showRewards( PCharacter *ch ) const
         return false;
     }
 
-    ch->pecho( "Тебе сообщили такие слова на разных языках: " );
+    ch->pecho( _("Тебе сообщили такие слова на разных языках: ") );
     ch->send_to( buf );
     return true;
 }
@@ -389,7 +390,7 @@ void LanguageCommand::doIdent( PCharacter *ch, DLString &arguments ) const
     DLString arg = arguments.getOneArgument();
     
     if (arg.empty( )) {
-        ch->pecho( "Смысл чего ты пытаешься понять?" );
+        ch->pecho( _("Смысл чего ты пытаешься понять?") );
         return;
     }
     
@@ -399,17 +400,17 @@ void LanguageCommand::doIdent( PCharacter *ch, DLString &arguments ) const
         chance = language->getLearned( ch );
     
     if (chance < Language::SKILL_SENSE || number_percent( ) > chance) {
-        ch->pecho( "Тайный смысл слов %^N2 ускользает от тебя.", language->name.get(RU).c_str( ) );
+        ch->pecho( _("Тайный смысл слов %^N2 ускользает от тебя."), language->name.get(RU).c_str( ) );
         return;
     }
 
     if (!language->locateWord( word, ch, arg ) || !( ef = word.getEffect( ) )) {
-        ch->pecho( "Звучание слова %s кажется тебе бессмысленным.", arg.c_str( ) );
+        ch->pecho( _("Звучание слова %s кажется тебе бессмысленным."), arg.c_str( ) );
         return;
     }
 
-    ch->pecho( "Знание языка помогает тебе приподнять завесу тайны над словом '{c%s{x':", arg.c_str( ) );
-    ch->pecho( "оно содержит в себе секрет {c%N2{x.", ef->getMeaning( ).c_str( ) );
+    ch->pecho( _("Знание языка помогает тебе приподнять завесу тайны над словом '{c%s{x':"), arg.c_str( ) );
+    ch->pecho( _("оно содержит в себе секрет {c%N2{x."), ef->getMeaning( ).c_str( ) );
     wiznet( WIZ_LANGUAGE, 0, 0, "%^C1 узнает смысл слова '%s' (%s).", 
             ch, word.toStr( ), word.effect.getValue( ).c_str( ) );
 
@@ -423,12 +424,12 @@ void LanguageCommand::doForget( PCharacter *ch, const DLString &arg ) const
     XMLAttributeLanguage::Pointer attr = ch->getAttributes( ).findAttr<XMLAttributeLanguage>( "language" );
 
     if (arg.empty()) {
-        ch->pecho("Что именно ты хочешь забыть?");
+        ch->pecho(_("Что именно ты хочешь забыть?"));
         return;
     }
 
     if (!attr && !attrHints) {
-        ch->pecho("Ты не знаешь никаких слов.");
+        ch->pecho(_("Ты не знаешь никаких слов."));
         return;
     }
 
@@ -442,7 +443,7 @@ void LanguageCommand::doForget( PCharacter *ch, const DLString &arg ) const
         if (attr)
             attr->getWords( ).clear( );
 
-        ch->pecho( "Все приснившиеся тебе слова ускользают из твоей памяти." );
+        ch->pecho( _("Все приснившиеся тебе слова ускользают из твоей памяти.") );
         return;
     }
 
@@ -450,18 +451,18 @@ void LanguageCommand::doForget( PCharacter *ch, const DLString &arg ) const
     Word word;
     if (attr && attr->findWord(word, arg)) {
         attr->removeWord(word, ch);
-        ch->pecho("Ты забываешь слово %s.", arg.c_str());
+        ch->pecho(_("Ты забываешь слово %s."), arg.c_str());
         return;
     }
 
     // Find and forget a word among the rewards or overheard ones.
     if (attrHints && attrHints->hasWord(arg)) {
         attrHints->removeWord(arg);
-        ch->pecho("Ты забываешь слово %s.", arg.c_str());
+        ch->pecho(_("Ты забываешь слово %s."), arg.c_str());
         return;
     }
 
-    ch->pecho("Ты не знаешь такого слова.");
+    ch->pecho(_("Ты не знаешь такого слова."));
 }
 
 void LanguageCommand::doRemember( PCharacter *ch, const DLString &arg ) const
@@ -469,22 +470,22 @@ void LanguageCommand::doRemember( PCharacter *ch, const DLString &arg ) const
     XMLAttributeLanguageHints::Pointer attrHints = ch->getAttributes( ).getAttr<XMLAttributeLanguageHints>( "languageHints" );
 
     if (arg.empty()) {
-        ch->pecho("Что именно ты хочешь запомнить?");
+        ch->pecho(_("Что именно ты хочешь запомнить?"));
         return;
     }
     
     if (attrHints->hasWord(arg)) {
-        ch->pecho("Ты и так помнишь это слово.");
+        ch->pecho(_("Ты и так помнишь это слово."));
         return;
     }
     
     Word word;
     if (!language->locateWord( word, ch, arg )) {
-        ch->pecho("Это слово не существует.");
+        ch->pecho(_("Это слово не существует."));
         return;
     }
 
     attrHints->addWord(word, false); 
-    ch->pecho("Ты запоминаешь слово %s.", word.dictum.c_str());
+    ch->pecho(_("Ты запоминаешь слово %s."), word.dictum.c_str());
 }
 

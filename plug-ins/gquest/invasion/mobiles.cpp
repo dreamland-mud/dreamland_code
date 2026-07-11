@@ -16,6 +16,7 @@
 
 #include "act.h"
 #include "loadsave.h"
+#include "l10n.h"
 
 /*--------------------------------------------------------------------------
  * Invasion Mobile 
@@ -67,12 +68,12 @@ bool InvasionHelper::death( Character *killer )
 
             attr = wch->getPC( )->getAttributes( ).getAttr<XMLAttributeInvasion>( gq->getQuestID( ) );
             attr->punish( );
-            wch->pecho("{YВ твоих услугах более никто не нуждается.{x");
+            wch->pecho(_("{YВ твоих услугах более никто не нуждается.{x"));
         }
     } 
 
     char_to_room( gq->createHelper( ), ch->in_room );
-    oldact("{YБожественные силы возвращают $c4 к жизни!{x", ch, 0, 0, TO_ROOM);
+    oldact(_("{YБожественные силы возвращают $c4 к жизни!{x"), ch, 0, 0, TO_ROOM);
     return true;
 }
 
@@ -89,7 +90,7 @@ void InvasionHelper::tell( Character *victim, const char *speech )
 
     pch = victim->getPC( );
     
-    oldact("$C1 что-то говорит $c3.", ch, 0, victim, TO_NOTVICT);
+    oldact(_("$C1 что-то говорит $c3."), ch, 0, victim, TO_NOTVICT);
 
     if (!help.match( speech )) {
         actWrongSpeech( pch );
@@ -120,8 +121,8 @@ void InvasionHelper::actTooMuch( PCharacter *pch, Object *obj )
 
 void InvasionHelper::actGiveInstrument( PCharacter *pch, Object *obj )
 {
-    oldact("$c1 вручает тебе $o4.", ch, obj, pch, TO_VICT);
-    oldact("$c1 вручает $C3 $o4.", ch, obj, pch, TO_NOTVICT);
+    oldact(_("$c1 вручает тебе $o4."), ch, obj, pch, TO_VICT);
+    oldact(_("$c1 вручает $C3 $o4."), ch, obj, pch, TO_NOTVICT);
 }
 
 

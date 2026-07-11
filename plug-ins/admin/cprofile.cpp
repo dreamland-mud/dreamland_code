@@ -7,6 +7,7 @@
 #include "interp.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 CMDADM( profile )
 {
@@ -15,21 +16,21 @@ CMDADM( profile )
     DLString playerName = arguments.getOneArgument();
     
     if (!ch->isCoder()) {
-        ch->pecho("Эта команда не для тебя.");
+        ch->pecho(_("Эта команда не для тебя."));
         return;
     }
 
     if (arg.empty() || playerName.empty()) {
         ch->pecho(
-            "Формат:\r\n"
+            _("Формат:\r\n"
             "profile backup <player_name>  -- сохранить профайлы игрока в каталогах var/db/backup и var/db/oldstyle/backup\r\n"
             "profile recover <player_name> -- восстановить профайлы из backup-каталогов, поверх существующих профайлов\r\n"
             "profile undelete <player_name> -- восстановить профайлы из каталогов var/db/delete и var/db/oldstyle/delete, поверх существующих профайлов\r\n"
-            "profile unremort <player_name> <number> -- восстановить конкретный профайл перед ремортом из каталогов var/db/remort и var/db/oldstyle/remort, поверх существующих профайлов\r\n");
+            "profile unremort <player_name> <number> -- восстановить конкретный профайл перед ремортом из каталогов var/db/remort и var/db/oldstyle/remort, поверх существующих профайлов\r\n"));
 
         if (dreamland->hasOption(DL_BUILDPLOT))
             ch->pecho(
-            "profile buildplot <player_name> -- скопировать профайлы с основного мира на стройплощадку, выдав права на OLC и феню\r\n");
+            _("profile buildplot <player_name> -- скопировать профайлы с основного мира на стройплощадку, выдав права на OLC и феню\r\n"));
 
         return;            
     }
@@ -38,68 +39,68 @@ CMDADM( profile )
 
     if (arg_is(arg, "recover")) {
         if (pcm && pcm->isOnline()) {
-            ch->pecho("Персонаж сейчас в мире, не могу перезаписать профайлы.");
+            ch->pecho(_("Персонаж сейчас в мире, не могу перезаписать профайлы."));
             return;
         }
 
         if(!PCharacterManager::pfRecover(playerName, "", 0)) {
-            ch->pecho("Упс, не могу восстановить профайл, неверное имя?");
+            ch->pecho(_("Упс, не могу восстановить профайл, неверное имя?"));
             return;
         }
 
-        ch->pecho("Персонаж восстановлен из резервной копии.");
+        ch->pecho(_("Персонаж восстановлен из резервной копии."));
         return;
     }
 
     if (arg_is(arg, "unremort")) {
         if (pcm && pcm->isOnline()) {
-            ch->pecho("Персонаж сейчас в мире, не могу перезаписать профайлы.");
+            ch->pecho(_("Персонаж сейчас в мире, не могу перезаписать профайлы."));
             return;
         }
 
         DLString num = arguments.getOneArgument();
         Integer remorts;
         if (!Integer::tryParse(remorts, num)) {
-            ch->pecho("Номер реморта должен быть числом.");
+            ch->pecho(_("Номер реморта должен быть числом."));
             return;
         }
 
         if(!PCharacterManager::pfRecover(playerName, "remort", remorts)) {
-            ch->pecho("Упс, не могу восстановить профайл, неверное имя?");;
+            ch->pecho(_("Упс, не могу восстановить профайл, неверное имя?"));;
             return;
         }
 
-        ch->pecho("Персонаж восстановлен после реморта.");
+        ch->pecho(_("Персонаж восстановлен после реморта."));
         return;
     }
 
     if (arg_is(arg, "undelete")) {
         if (pcm && pcm->isOnline()) {
-            ch->pecho("Персонаж сейчас в мире, не могу перезаписать профайлы.");
+            ch->pecho(_("Персонаж сейчас в мире, не могу перезаписать профайлы."));
             return;
         }
 
         if(!PCharacterManager::pfRecover(playerName, "delete", 0)) {
-            ch->pecho("Не могу восстановить профайл. Возможно, забыли убрать случайное расширение в конце имени файла.");
+            ch->pecho(_("Не могу восстановить профайл. Возможно, забыли убрать случайное расширение в конце имени файла."));
             return;
         }
 
-        ch->pecho("Персонаж восстановлен после удаления.");
+        ch->pecho(_("Персонаж восстановлен после удаления."));
         return;
     }
 
     if (arg_is(arg, "buildplot")) {
         if (!dreamland->hasOption(DL_BUILDPLOT)) {
-            ch->pecho("Эту команду разумнее использовать на стройплощадке.");
+            ch->pecho(_("Эту команду разумнее использовать на стройплощадке."));
             return;
         }
 
         if (!pcm) {
             if(!PCharacterManager::pfRecover(playerName, "tmp", 0)) {
-                ch->pecho("Упс, не могу восстановить профайл. Сперва выполните profile backup на основном мире.");
+                ch->pecho(_("Упс, не могу восстановить профайл. Сперва выполните profile backup на основном мире."));
                 return;
             }
-            ch->pecho("Персонаж восстановлен из резервной копии в каталоге /tmp.");
+            ch->pecho(_("Персонаж восстановлен из резервной копии в каталоге /tmp."));
         }
 
         pcm = PCharacterManager::find(playerName);
@@ -107,7 +108,7 @@ CMDADM( profile )
         pcm->getAttributes( ).getAttr<XMLIntegerAttribute>( "feniasecurity" )->setValue(110);
         pcm->setSecurity(99);        
         PCharacterManager::saveMemory(pcm);
-        ch->pecho("Установлены права на феню и OLC.");
+        ch->pecho(_("Установлены права на феню и OLC."));
 
         // Grant editing permissions for most common areas.
         if (!pcm->getAttributes().isAvailable("olc")) {
@@ -124,26 +125,26 @@ CMDADM( profile )
     }
 
     if (!pcm) {
-        ch->pecho("Персонаж %s не найден.", playerName.c_str());
+        ch->pecho(_("Персонаж %s не найден."), playerName.c_str());
         return;
     }
 
     if (arg_is(arg, "backup")) {
         if (pcm->isOnline()) {
-            ch->pecho("Персонаж в мире, сохраняю.");
+            ch->pecho(_("Персонаж в мире, сохраняю."));
             pcm->getPlayer()->save();
         }
 
         if (!PCharacterManager::pfBackup(playerName)) {
-            ch->pecho("Упс, ошибка при сохранении копии профайла.");
+            ch->pecho(_("Упс, ошибка при сохранении копии профайла."));
             return;
         }
 
-        ch->pecho("Копия профайла сохранена в var/db/backup и /tmp.");
+        ch->pecho(_("Копия профайла сохранена в var/db/backup и /tmp."));
         return;
     }    
 
-    ch->pecho("Неправильная подкоманда, см. {y{hcprofile{x для списка.");
+    ch->pecho(_("Неправильная подкоманда, см. {y{hcprofile{x для списка."));
 }
 
 

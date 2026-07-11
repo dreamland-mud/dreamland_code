@@ -12,6 +12,7 @@
 
 #include "dreamland.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(none);
 WEARLOC(stuck_in);
@@ -177,17 +178,17 @@ bool Object::mustDisappear( Character *ch )
 
     if (pIndexData->limit > 0) {
         if (ch->getModifyLevel( ) > level + 20) {
-        ch->pecho("Ты уже слишком опыт{Smен{Sfна{Sx для этого лимита.");
+        ch->pecho(_("Ты уже слишком опыт{Smен{Sfна{Sx для этого лимита."));
             return true;
     }
             
         if (ch->getModifyLevel( ) < level - 3) {
-        ch->pecho("Ты еще слишком неопыт{Smен{Sfна{Sx для этого лимита.");
+        ch->pecho(_("Ты еще слишком неопыт{Smен{Sfна{Sx для этого лимита."));
             return true;
     }
 
         if (!IS_SET(ch->act, PLR_CONFIRMED)) {
-        ch->pecho("Чтобы пользоваться лимитами, надо сначала {hhподтвердить{x описание.");
+        ch->pecho(_("Чтобы пользоваться лимитами, надо сначала {hhподтвердить{x описание."));
             return true;
     }
     }
@@ -234,18 +235,18 @@ void eyes_blinded_msg( Character *ch )
 
     for (auto &paf: ch->affected.findAllWithBits(&affect_flags, AFF_BLIND)) {
         if (paf->type == gsn_fire_breath)
-            ch->pecho( "Твои глаза слезятся из-за дыма, и ты ничего не видишь." );
+            ch->pecho( _("Твои глаза слезятся из-за дыма, и ты ничего не видишь.") );
         else if (paf->type == gsn_sand_storm)
-            ch->pecho( "Песок в глазах мешает тебе что-либо разглядеть." );
+            ch->pecho( _("Песок в глазах мешает тебе что-либо разглядеть.") );
         else if (paf->type == gsn_dirt_kicking)
-            ch->pecho( "Ты ничего не видишь из-за пыли, попавшей в глаза." );
+            ch->pecho( _("Ты ничего не видишь из-за пыли, попавшей в глаза.") );
         else
             continue;
 
         return;
     }
 
-    ch->pecho( "Твои глаза слепы, ты ничего не видишь!" );
+    ch->pecho( _("Твои глаза слепы, ты ничего не видишь!") );
 }
 
 

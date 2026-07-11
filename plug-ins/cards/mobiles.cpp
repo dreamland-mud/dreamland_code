@@ -22,6 +22,7 @@
 #include "loadsave.h"
 
 #include "def.h"
+#include "l10n.h"
 
 CLAN(none);
 CLAN(flowers);
@@ -43,13 +44,13 @@ bool CardStarterBehavior::death( Character *killer )
     card = killer->getPC( )->getAttributes( ).getAttr<XMLAttributeCards>( "cards" );
     suit = card->getRandomSuit( );
 
-    oldact("{cТы уби$gло|л|ла шестерку $n2 из Колоды.{x", 
+    oldact(_("{cТы уби$gло|л|ла шестерку $n2 из Колоды.{x"), 
             killer, XMLAttributeCards::suitFaces[suit].mlt, 0, TO_CHAR );
 
     if (card->getLevel( ) < 0) {
         card->setSuit( suit );
         card->setLevel( 0 );
-        oldact("{cТеперь ТЫ займешь её место.{x", killer, 0, 0, TO_CHAR );
+        oldact(_("{cТеперь ТЫ займешь её место.{x"), killer, 0, 0, TO_CHAR );
     }
     
     return false;
@@ -62,7 +63,7 @@ CardSellerBehavior::CardSellerBehavior( )
 void CardSellerBehavior::greet( Character *victim )
 {
     if (!victim->is_npc( ))
-        oldact("$c1 перетасовывает карты, хитро поглядывая на тебя.", ch, 0, victim, TO_VICT);
+        oldact(_("$c1 перетасовывает карты, хитро поглядывая на тебя."), ch, 0, victim, TO_VICT);
 }
 
 void CardSellerBehavior::speech( Character *victim, const char *speech ) 
@@ -78,13 +79,13 @@ void CardSellerBehavior::speech( Character *victim, const char *speech )
         return;
     
     if (victim->getPC( )->getQuestPoints() < 50) {
-        oldact("$c1 ухмыляется.", ch, 0, 0, TO_ROOM);
-        oldact("$c1 произносит '{gУ тебя недостаточно дурной славы (qp), чтобы пользоваться моими картами.{x'", ch, 0, victim, TO_ROOM);
+        oldact(_("$c1 ухмыляется."), ch, 0, 0, TO_ROOM);
+        oldact(_("$c1 произносит '{gУ тебя недостаточно дурной славы (qp), чтобы пользоваться моими картами.{x'"), ch, 0, victim, TO_ROOM);
         return;
     }
     
     if (!( pPackIndex = get_obj_index( OBJ_VNUM_CARDPACK ) )) {
-        oldact("$c1 произносит '{gИзвини, у меня закончились карты.{x'", ch, 0, 0, TO_ROOM);
+        oldact(_("$c1 произносит '{gИзвини, у меня закончились карты.{x'"), ch, 0, 0, TO_ROOM);
         return;
     }
     
@@ -96,8 +97,8 @@ void CardSellerBehavior::speech( Character *victim, const char *speech )
 
     victim->getPC( )->addQuestPoints(-50);
 
-    oldact("$c1 вручает тебе $o4.", ch, pack, victim, TO_VICT);
-    oldact("$c1 вручает $C3 $o4.", ch, pack, victim, TO_NOTVICT);
+    oldact(_("$c1 вручает тебе $o4."), ch, pack, victim, TO_VICT);
+    oldact(_("$c1 вручает $C3 $o4."), ch, pack, victim, TO_NOTVICT);
 }
 
 int CardSellerBehavior::getOccupation( )

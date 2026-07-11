@@ -20,6 +20,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 /*
  * Note: shops were never fully refactored to use the Service classes. Unfinished attempt to do so can be found in
@@ -57,7 +58,7 @@ void ShopTrader::load( DLString str )
 void ShopTrader::give( Character *from, Object *obj )
 {
     tell_dim( from, ch, "Извини, но я не беру взяток!" );
-    oldact("$c1 роняет $o4.", ch, obj, 0, TO_ROOM );
+    oldact(_("$c1 роняет $o4."), ch, obj, 0, TO_ROOM );
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
 }
@@ -96,10 +97,10 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
         return;
     }
 
-    client->recho( ch, "%^C1 просит %C4 подробнее рассказать о %O6.", client, ch, obj );
+    client->recho( ch, _("%^C1 просит %C4 подробнее рассказать о %O6."), client, ch, obj );
 
     if (!IS_OBJ_STAT( obj, ITEM_INVENTORY )) {
-        client->pecho( "%1$^C1 говорит тебе '{gЯ раньше в глаза не виде%1$Gло|л|ла %2$O4.{x'", ch, obj );
+        client->pecho( _("%1$^C1 говорит тебе '{gЯ раньше в глаза не виде%1$Gло|л|ла %2$O4.{x'"), ch, obj );
         return;
     }
 
@@ -127,7 +128,7 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
         tell_dim( client, ch, "Я сообщаю тебе это совершенно бесплатно." );
     } else {
         deduct_cost( client, serviceCost );
-        client->pecho( "%1$^C1 взя%1$Gло|л|ла с тебя {W%2$d{x моне%2$Iту|ты|т за услуги.", ch, serviceCost );
+        client->pecho( _("%1$^C1 взя%1$Gло|л|ла с тебя {W%2$d{x моне%2$Iту|ты|т за услуги."), ch, serviceCost );
     }
 }
 

@@ -18,6 +18,7 @@
 #include "merc.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 const DLString Lover::XMLAttributeLoverString = "XMLAttributeLovers";
 
@@ -27,13 +28,13 @@ COMMAND(Lover, "lover")
     DLString cmd = arguments.getOneArgument( );
     
     if (ch->is_npc()) {
-        ch->pecho("Тебе нельзя.");
+        ch->pecho(_("Тебе нельзя."));
         return;
     }
 
     if (IS_CHARMED(ch)) {
-        oldact("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR);  
-        oldact("$c1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT);
+        oldact(_("... но сердцу не прикажешь."), ch, 0, 0, TO_CHAR);  
+        oldact(_("$c1 ухмыляется - сердцу не прикажешь."), ch, 0, ch->master, TO_VICT);
         return;
     }
     

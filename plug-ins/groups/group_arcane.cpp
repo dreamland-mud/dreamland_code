@@ -41,6 +41,7 @@
 #include "morphology.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "l10n.h"
 
 CLAN(battlerager);
 GSN(scrolls);
@@ -57,7 +58,7 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
     ostringstream errBuf;
     SpellTarget::Pointer t = spell->locateTargets( ch, args, errBuf );
     if (t->castFar && t->door != -1) {
-        ch->pecho("На таком расстоянии жертва ничего не почувствует.");
+        ch->pecho(_("На таком расстоянии жертва ничего не почувствует."));
         return;
     }
 
@@ -66,10 +67,10 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
     if (t->error != 0) {
         switch (t->error) {
         case TARGET_ERR_CAST_ON_WHOM:
-            ch->pecho("Ты зачитываешь одно из заклинаний %s %O2, но оно не находит, на кого подействовать.", so.c_str(), scroll);
+            ch->pecho(_("Ты зачитываешь одно из заклинаний %s %O2, но оно не находит, на кого подействовать."), so.c_str(), scroll);
             break;
         case TARGET_ERR_CAST_ON_WHAT:
-            ch->pecho("Ты зачитываешь одно из заклинаний %s %O2, но оно не находит, на что подействовать.", so.c_str(), scroll);
+            ch->pecho(_("Ты зачитываешь одно из заклинаний %s %O2, но оно не находит, на что подействовать."), so.c_str(), scroll);
             break;
         default:
             ch->pecho(errBuf.str());
@@ -79,13 +80,13 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
         return;
     }
 
-    ch->recho("%^C1 зачитывает заклинание %s %O2.", ch, so.c_str(), scroll);
-    ch->pecho("Ты зачитываешь одно из заклинаний %s %O2.", so.c_str(), scroll);
+    ch->recho(_("%^C1 зачитывает заклинание %s %O2."), ch, so.c_str(), scroll);
+    ch->pecho(_("Ты зачитываешь одно из заклинаний %s %O2."), so.c_str(), scroll);
 
     successfulTargets++;
 
     if (number_percent( ) >= gsn_scrolls->getEffective( ch )) {
-        oldact("Ты не совлада$gло|л|ла с произношением.", ch, 0, 0, TO_CHAR);
+        oldact(_("Ты не совлада$gло|л|ла с произношением."), ch, 0, 0, TO_CHAR);
         gsn_scrolls->improve( ch, false );
         return;
     }
@@ -113,24 +114,24 @@ SKILL_RUNP( recite )
     DLString args = argument, arg1;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->pecho("Какие еще свитки-шмитки?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!");
+        ch->pecho(_("Какие еще свитки-шмитки?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!"));
         return;
     }
 
     arg1 = args.getOneArgument( );
 
     if (( scroll = get_obj_carry( ch, arg1.c_str( ) ) ) == 0) {
-        ch->pecho("У тебя нет такого свитка.");
+        ch->pecho(_("У тебя нет такого свитка."));
         return;
     }
 
     if (scroll->item_type != ITEM_SCROLL) {
-        ch->pecho("С помощью этой команды можно зачитывать только свитки.");
+        ch->pecho(_("С помощью этой команды можно зачитывать только свитки."));
         return;
     }
 
     if (get_wear_level( ch, scroll ) > ch->getRealLevel()) {
-        ch->pecho("Этот свиток чересчур сложен для твоего понимания.");
+        ch->pecho(_("Этот свиток чересчур сложен для твоего понимания."));
         return;
     }
     
@@ -157,7 +158,7 @@ SKILL_RUNP( recite )
     }
 
     if (successfulSpells > 0) {
-        ch->pecho("%^O1 превращается в пыль.", scroll);
+        ch->pecho(_("%^O1 превращается в пыль."), scroll);
         extract_obj( scroll );
     }
 }
@@ -175,17 +176,17 @@ SKILL_RUNP( brandish )
     Spell::Pointer spell;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->pecho("Палками махать?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!");
+        ch->pecho(_("Палками махать?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!"));
         return;
     }
 
     if (( staff = get_eq_char( ch, wear_hold ) ) == 0) {
-        ch->pecho("Чтобы пользоваться посохами, их надо взять в руки.");
+        ch->pecho(_("Чтобы пользоваться посохами, их надо взять в руки."));
         return;
     }
 
     if (staff->item_type != ITEM_STAFF) {
-        ch->pecho("Ты можешь взмахнуть только посохом.");
+        ch->pecho(_("Ты можешь взмахнуть только посохом."));
         return;
     }
     
@@ -200,13 +201,13 @@ SKILL_RUNP( brandish )
     if (staff->value2() > 0) {
         const char *terrain = terrains[ch->in_room->getSectorType()].hit;
         
-        oldact("$c1 ударяет $o5 $T.", ch, staff, terrain, TO_ROOM );
-        oldact("Ты ударяешь $o5 $T.", ch, staff, terrain, TO_CHAR );
+        oldact(_("$c1 ударяет $o5 $T."), ch, staff, terrain, TO_ROOM );
+        oldact(_("Ты ударяешь $o5 $T."), ch, staff, terrain, TO_CHAR );
 
         if ( number_percent( ) >= gsn_staves->getEffective( ch ))
         {
-            oldact("Ты не смо$gгло|г|гла активировать $o4.",ch,staff,0,TO_CHAR);
-            oldact("...и ничего не происходит.",ch,0,0,TO_ROOM);
+            oldact(_("Ты не смо$gгло|г|гла активировать $o4."),ch,staff,0,TO_CHAR);
+            oldact(_("...и ничего не происходит."),ch,0,0,TO_ROOM);
             gsn_staves->improve( ch, false );
         }
         else {
@@ -258,8 +259,8 @@ SKILL_RUNP( brandish )
 
     staff->value2(staff->value2() - 1);
     if (staff->value2() <= 0) {
-        ch->recho( "%1$^O1 %2$C2 темне%1$nет|ют и исчеза%1$nет|ют.", staff, ch );
-        ch->pecho( "Тво%1$Gе|й|я|и %1$O1 темне%1$nет|ют и исчеза%1$nет|ют.", staff );
+        ch->recho( _("%1$^O1 %2$C2 темне%1$nет|ют и исчеза%1$nет|ют."), staff, ch );
+        ch->pecho( _("Тво%1$Gе|й|я|и %1$O1 темне%1$nет|ют и исчеза%1$nет|ют."), staff );
         extract_obj( staff );
     }
 }
@@ -279,17 +280,17 @@ SKILL_RUNP( zap )
     DLString args = argument;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->pecho("Ты долж%1$Gно|ен|на уничтожать магию, а не использовать её!", ch);
+        ch->pecho(_("Ты долж%1$Gно|ен|на уничтожать магию, а не использовать её!"), ch);
         return;
     }
 
     if (( wand = get_eq_char( ch, wear_hold ) ) == 0) {
-        ch->pecho("Жезл нужно сначала взять в руку.");
+        ch->pecho(_("Жезл нужно сначала взять в руку."));
         return;
     }
 
     if (wand->item_type != ITEM_WAND) {
-        ch->pecho("Ты можешь взмахнуть только волшебным жезлом!");
+        ch->pecho(_("Ты можешь взмахнуть только волшебным жезлом!"));
         return;
     }
     
@@ -306,10 +307,10 @@ SKILL_RUNP( zap )
     if (target->error != 0) {
         switch (target->error) {
         case TARGET_ERR_CAST_ON_WHAT:
-            ch->pecho("Взмахнуть жезлом на что?");
+            ch->pecho(_("Взмахнуть жезлом на что?"));
             break;
         case TARGET_ERR_CAST_ON_WHOM:
-            ch->pecho("Взмахнуть жезлом на кого именно?");
+            ch->pecho(_("Взмахнуть жезлом на кого именно?"));
             break;
         default:
             ch->pecho(buf.str());
@@ -320,7 +321,7 @@ SKILL_RUNP( zap )
     }
         
     if (target->castFar && target->door != -1) {
-        ch->pecho("Твой жезл не дотягивается до соседней комнаты.");
+        ch->pecho(_("Твой жезл не дотягивается до соседней комнаты."));
         return;
     }
     
@@ -329,28 +330,28 @@ SKILL_RUNP( zap )
 
         if (victim && victim->in_room == ch->in_room) {
             if (ch != victim) {
-                oldact("$c1 взмахивает $o5 на тебя!", ch, wand, victim, TO_VICT );
-                oldact("$c1 взмахивает $o5 на $C4.", ch, wand, victim, TO_NOTVICT );
-                oldact("Ты взмахиваешь $o5 на $C4.", ch, wand, victim, TO_CHAR );
+                oldact(_("$c1 взмахивает $o5 на тебя!"), ch, wand, victim, TO_VICT );
+                oldact(_("$c1 взмахивает $o5 на $C4."), ch, wand, victim, TO_NOTVICT );
+                oldact(_("Ты взмахиваешь $o5 на $C4."), ch, wand, victim, TO_CHAR );
             }
             else {
-                oldact("$c1 взмахивает $o5 на себя.", ch, wand, 0, TO_ROOM );
-                oldact("Ты взмахиваешь $o5 на себя.", ch, wand, 0, TO_CHAR );
+                oldact(_("$c1 взмахивает $o5 на себя."), ch, wand, 0, TO_ROOM );
+                oldact(_("Ты взмахиваешь $o5 на себя."), ch, wand, 0, TO_CHAR );
             }
         }
         else if (target->obj && target->obj->getRoom( ) == ch->in_room) {
-            oldact("$c1 взмахивает $o5 на $O4.", ch, wand, target->obj, TO_ROOM );
-            oldact("Ты взмахиваешь $o5 на $O4.", ch, wand, target->obj, TO_CHAR );
+            oldact(_("$c1 взмахивает $o5 на $O4."), ch, wand, target->obj, TO_ROOM );
+            oldact(_("Ты взмахиваешь $o5 на $O4."), ch, wand, target->obj, TO_CHAR );
         }
         else {
-            oldact("$c1 взмахивает $o5.", ch, wand, 0, TO_ROOM );
-            oldact("Ты взмахиваешь $o5.", ch, wand, 0, TO_CHAR );
+            oldact(_("$c1 взмахивает $o5."), ch, wand, 0, TO_ROOM );
+            oldact(_("Ты взмахиваешь $o5."), ch, wand, 0, TO_CHAR );
         }
 
         if (number_percent() >= gsn_wands->getEffective( ch )) {
-            oldact_p("Твои усиленные манипуляции с $o5 приводят лишь к дыму и искрам.",
+            oldact_p(_("Твои усиленные манипуляции с $o5 приводят лишь к дыму и искрам."),
                     ch,wand,0,TO_CHAR,POS_RESTING);
-            oldact_p("Усиленные манипуляции $c2 с $o5 приводят лишь к дыму и искрам.",
+            oldact_p(_("Усиленные манипуляции $c2 с $o5 приводят лишь к дыму и искрам."),
                     ch,wand,0,TO_ROOM,POS_RESTING);
             gsn_wands->improve( ch, false, victim );
         }
@@ -376,8 +377,8 @@ SKILL_RUNP( zap )
 
     wand->value2(wand->value2() - 1);
     if (wand->value2() <= 0) {
-        ch->recho( "%1$^O1 %2$C2 развалива%1$nется|ются на куски.", wand, ch );
-        ch->pecho( "Тво%1$Gе|й|я|и %1$O1 развалива%1$nется|ются на куски.", wand );
+        ch->recho( _("%1$^O1 %2$C2 развалива%1$nется|ются на куски."), wand, ch );
+        ch->pecho( _("Тво%1$Gе|й|я|и %1$O1 развалива%1$nется|ются на куски."), wand );
         extract_obj( wand );
     }
 }

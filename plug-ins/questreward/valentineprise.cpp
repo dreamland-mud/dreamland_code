@@ -10,16 +10,17 @@
 #include "object.h"
 #include "act.h"
 #include "loadsave.h"
+#include "l10n.h"
 
 void ValentinePrise::wear( Character *ch ) 
 {
     if (msgChar.getValue( ).empty( ))
-        oldact("{CАура {Rлюбви{C окружает тебя.{x", ch, obj, 0, TO_CHAR);
+        oldact(_("{CАура {Rлюбви{C окружает тебя.{x"), ch, obj, 0, TO_CHAR);
     else
         oldact(msgChar.getValue( ).c_str( ), ch, obj, 0, TO_CHAR);
 
     if (msgRoom.getValue( ).empty( ))
-        oldact("{CАура {Rлюбви{C окружает $c4.{x", ch, obj, 0, TO_ROOM);
+        oldact(_("{CАура {Rлюбви{C окружает $c4.{x"), ch, obj, 0, TO_ROOM);
     else
         oldact(msgRoom.getValue( ).c_str( ), ch, obj, 0, TO_ROOM);
 

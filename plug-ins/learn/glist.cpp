@@ -11,6 +11,7 @@
 #include "comm.h"
 #include "act.h"
 #include "merc.h"
+#include "l10n.h"
 
 
 GROUP(clan);
@@ -43,12 +44,12 @@ CMDRUN( glist )
         SkillGroup *group = skillGroupManager->findUnstrict( argument );
         
         if (!group) {
-            ch->pecho("Неправильно указана группа.");
+            ch->pecho(_("Неправильно указана группа."));
             return;
         }
 
         if (!group->visible(ch)) {
-            ch->pecho("Эта группа умений скрыта от тебя.");
+            ch->pecho(_("Эта группа умений скрыта от тебя."));
             return;
         }
         

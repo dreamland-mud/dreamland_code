@@ -15,6 +15,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "def.h"
+#include "l10n.h"
 
 void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d ) 
 {
@@ -60,7 +61,7 @@ void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d )
     }
 
     if (!buf.str( ).empty( )) {
-        GQChannel::pecho( ch, "\r\nГлобальные квесты, в которых ты можешь принять участие: ");
+        GQChannel::pecho( ch, l( ch, "\r\nГлобальные квесты, в которых ты можешь принять участие: "));
         GQChannel::pecho( ch, buf );
     }
 

@@ -30,6 +30,7 @@
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 COMMAND(CMlt, "mlt")
 {
@@ -52,12 +53,12 @@ COMMAND(CMlt, "mlt")
     
     if (!arg.empty( )) 
         if (!( pcm = PCharacterManager::find( arg ) )) {
-            ch->pecho( "В DreamLand нет жителя с таким именем." );
+            ch->pecho( _("В DreamLand нет жителя с таким именем.") );
             return;
         }
 
     if (!ch->is_immortal( ) && ch->getPC( ) != pcm ) {
-        ch->pecho("Эта информация скрыта от Вас.");
+        ch->pecho(_("Эта информация скрыта от Вас."));
         return;
     }
     
@@ -71,7 +72,7 @@ void CMlt::doShowOther( Character *ch, PCMemoryInterface *pcm )
 {
     Remorts &r = pcm->getRemorts( );
 
-    ch->pecho("{B Раса         Класс        Время игры   Бонус{x");
+    ch->pecho(_("{B Раса         Класс        Время игры   Бонус{x"));
 
     for (unsigned int i = 0; i < r.size( ); i++) {
         LifeData &life = r[i];
@@ -105,7 +106,7 @@ void CMlt::doShowSelf( PCharacter *ch )
     int wasted = attr ? attr->getWasted( ) : 0;
     
     if (victoriesTotal > 0) {
-        str << fmt(ch, "Всего ты выполни%1$Gло|л|ла {W%2$d{x персональн%2$Iый|ых|ых квес%2$Iт|та|тов, ", ch, victoriesTotal);
+        str << fmt(ch, _("Всего ты выполни%1$Gло|л|ла {W%2$d{x персональн%2$Iый|ых|ых квес%2$Iт|та|тов, "), ch, victoriesTotal);
 
         if (victoriesTotal == victoriesBonus)
             str << "{Wвсе{x из которых дают право на бонусы." << endl;
@@ -116,20 +117,20 @@ void CMlt::doShowSelf( PCharacter *ch )
 
         if (victoriesBonus > 0) {
             if (wasted == 0)
-                str << fmt(ch, "Ты пока не обменя%1$Gло|л|ла ни одну победу на плюшки.", ch) << endl;
+                str << fmt(ch, _("Ты пока не обменя%1$Gло|л|ла ни одну победу на плюшки."), ch) << endl;
             else
-                str << fmt(ch, "Ты обменя%1$Gло|л|ла {W%2$d{x побед%2$Iу|ы| на плюшки.", ch, wasted) << endl;
+                str << fmt(ch, _("Ты обменя%1$Gло|л|ла {W%2$d{x побед%2$Iу|ы| на плюшки."), ch, wasted) << endl;
         }
 
     } else {
-        str << fmt(ch, "Ты пока не выполни%1$Gло|л|ла ни одного персонального квеста.", ch) << endl;
+        str << fmt(ch, _("Ты пока не выполни%1$Gло|л|ла ни одного персонального квеста."), ch) << endl;
     }
     
     Remorts &r = ch->getRemorts( );
     int r_cnt = r.size( ), b_cnt = r.countBonusLifes( );
 
     if (r_cnt > 0) {
-        str << fmt( ch, "Ты прожи%1$Gло|л|ла {W%2$d{x жизн%2$Iь|и|ей, ", ch, r_cnt );
+        str << fmt( ch, _("Ты прожи%1$Gло|л|ла {W%2$d{x жизн%2$Iь|и|ей, "), ch, r_cnt );
 
         if (r_cnt == b_cnt) {
             if (r_cnt == 1)
@@ -149,7 +150,7 @@ void CMlt::doShowSelf( PCharacter *ch )
             int age = 17 + life.time / 20;
 
             str << fmt( ch,
-                        "     %N1 %N1, переродил%Gось|ся|ась в возрасте %d %s",
+                        _("     %N1 %N1, переродил%Gось|ся|ась в возрасте %d %s"),
                         (ch->getSex( ) == SEX_FEMALE ?
                               race->getFemaleName( ).c_str( )
                             : race->getMaleName( ).c_str( )),
@@ -166,18 +167,18 @@ void CMlt::doShowSelf( PCharacter *ch )
     
     if (r_cnt > 0 || wasted > 0) {
         str << endl
-            << fmt( ch, "Ты выкупи%1$Gло|л|ла {W%2$d{x купо%2$Iн|на|нов владельца и выбра%1$Gло|л|ла в качестве бонусов:", 
+            << fmt( ch, _("Ты выкупи%1$Gло|л|ла {W%2$d{x купо%2$Iн|на|нов владельца и выбра%1$Gло|л|ла в качестве бонусов:"), 
                         ch, r.owners.getValue( ) ) 
             << endl;
 
-        str << (r.hp > 0          ? fmt( ch, "     %d здоровья\n", r.hp.getValue( ) ) : "")
-            << (r.mana > 0        ? fmt( ch, "     %d маны\n", r.mana.getValue( ) ) : "")
-            << (r.level > 0       ? fmt( ch, "     %1$d уров%1$Iень|ня|ней \n", r.level.getValue( ) ) : "")
+        str << (r.hp > 0          ? fmt( ch, _("     %d здоровья\n"), r.hp.getValue( ) ) : "")
+            << (r.mana > 0        ? fmt( ch, _("     %d маны\n"), r.mana.getValue( ) ) : "")
+            << (r.level > 0       ? fmt( ch, _("     %1$d уров%1$Iень|ня|ней \n"), r.level.getValue( ) ) : "")
             << (r.pretitle        ?          "     цветной претитул\n" : "");
 
         for (int i = 0; i < stat_table.size; i++)
             if (r.stats[i] > 0)
-                str << fmt( ch, "     +%d к %s\n", 
+                str << fmt( ch, _("     +%d к %s\n"), 
                                 r.stats[i].getValue( ), 
                                 stat_table.message( i, '3' ).c_str( ) );
     }
@@ -205,12 +206,12 @@ void CMlt::doCount( Character* ch, int n )
     }
     
     if (cnt > 80)
-        ch->pecho( "Их слишком много. %d тел.", cnt );
+        ch->pecho( _("Их слишком много. %d тел."), cnt );
     else if (!buf.str( ).empty( )) {
         buf << "Count: " << cnt << endl;
         ch->send_to( buf );
     }
     else
-        ch->pecho("Никого нет.");
+        ch->pecho(_("Никого нет."));
 }
 

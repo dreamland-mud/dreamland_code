@@ -17,6 +17,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(deafen);
 
@@ -32,7 +33,7 @@ Character * PersonalChannel::findListener( Character *ch, const DLString &arg ) 
     Character *victim = get_char_world( ch, arg.c_str( ) );
 
     if (!victim)
-        ch->pecho( "Ты не находишь этого персонажа." );
+        ch->pecho( _("Ты не находишь этого персонажа.") );
     
     return victim;
 }
@@ -54,16 +55,16 @@ bool PersonalChannel::checkAFK( Character *ch, Character *victim, const DLString
         return false;
    
     if (victim->is_npc( ) || !victim->getPC( )->getAttributes( ).isAvailable( "afk" ))
-        oldact_p("$C1 отсутствует и не может сейчас получить твое сообщение.", 
+        oldact_p(_("$C1 отсутствует и не может сейчас получить твое сообщение."), 
                 ch, 0, victim, TO_CHAR, position );
     else
-        oldact_p("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x.", 
+        oldact_p(_("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x."), 
                 ch, 
                 victim->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( 
                                     "afk" )->getValue( ).c_str( ), 
                 victim, TO_CHAR, position );
 
-    oldact_p("Сообщение будет прочитано, когда $E вернется.", ch, 0, victim, TO_CHAR, position );
+    oldact_p(_("Сообщение будет прочитано, когда $E вернется."), ch, 0, victim, TO_CHAR, position );
     return true;
 }
 
@@ -76,11 +77,11 @@ bool PersonalChannel::checkAutoStore( Character *ch, Character *victim, const DL
         return false;
 
     if (victim->is_npc( )) {
-        oldact_p("$E сейчас сражается и не может получить твое сообщение.",ch,0,victim,TO_CHAR,position);
+        oldact_p(_("$E сейчас сражается и не может получить твое сообщение."),ch,0,victim,TO_CHAR,position);
         return true;
     }
     
-    oldact_p("$C1 сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой.",
+    oldact_p(_("$C1 сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой."),
             ch,0,victim,TO_CHAR,position);
     return true;
 }
@@ -93,7 +94,7 @@ bool PersonalChannel::checkDisconnect( Character *ch, Character *victim, const D
     if (victim->desc)
         return false;
 
-    oldact_p("У $C2 нет связи с этим миром, но твое сообщение будет прочитано, когда $E вернется.",
+    oldact_p(_("У $C2 нет связи с этим миром, но твое сообщение будет прочитано, когда $E вернется."),
             ch,0,victim,TO_CHAR,position);
     return true;
 }
@@ -106,7 +107,7 @@ bool PersonalChannel::checkPosition( Character *ch, Character *victim ) const
     if (positionOther <= victim->position)
         return false;
     
-    oldact_p("$E не слышит тебя, попробуй позже.", ch, 0, victim, TO_CHAR, position );
+    oldact_p(_("$E не слышит тебя, попробуй позже."), ch, 0, victim, TO_CHAR, position );
     return true;
 }
 
@@ -117,7 +118,7 @@ bool PersonalChannel::checkVictimDeaf( Character *ch, Character *victim ) const
 
     if (IS_SET(victim->comm, COMM_QUIET) || IS_SET(victim->comm, COMM_DEAF))
     {
-        oldact_p("Твое сообщение не дошло $M.", ch, 0, victim, TO_CHAR, position );
+        oldact_p(_("Твое сообщение не дошло $M."), ch, 0, victim, TO_CHAR, position );
         return true;
     }
 
@@ -185,17 +186,17 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
 bool PersonalChannel::canTalkPersonally( Character *ch ) const
 {
     if (IS_SET(ch->comm, COMM_NOTELL)) {
-        ch->pecho( "Боги лишили тебя возможности личного общения." );
+        ch->pecho( _("Боги лишили тебя возможности личного общения.") );
         return false;
     }
 
     if (IS_SET(ch->comm, COMM_QUIET)) {
-        ch->pecho( "Сперва выйди из режима тишины (quiet)." );
+        ch->pecho( _("Сперва выйди из режима тишины (quiet).") );
         return false;
     }
 
     if (IS_SET(ch->comm, COMM_DEAF)) {
-        ch->pecho("Сперва выйди из режима глухоты (deaf).");
+        ch->pecho(_("Сперва выйди из режима глухоты (deaf)."));
         return false;
     }
 

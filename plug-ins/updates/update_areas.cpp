@@ -31,6 +31,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 WEARLOC(none);
 WEARLOC(wield);
@@ -362,7 +363,7 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
 
     if (obj->pIndexData->limit != -1)
         if (verbose)
-            mob->recho("Милость богов снисходит на %C2, принося с собой %O4.", mob, obj);
+            mob->recho(_("Милость богов снисходит на %C2, принося с собой %O4."), mob, obj);
 
     reset_obj_location(pReset, obj, mob, verbose);
     eventBus->publish(ItemResetEvent(obj, pReset));
@@ -394,10 +395,10 @@ static bool reset_one_mob(NPCharacter *mob)
     {
         mob->position = mob->pIndexData->start_pos;
         switch (mob->position) {
-        case POS_RESTING: mob->recho("%^C1 садится отдыхать.", mob); break;
-        case POS_SITTING: mob->recho("%^C1 садится.", mob); break;
-        case POS_SLEEPING: mob->recho("%^C1 засыпает.", mob); break;
-        case POS_STANDING: mob->recho("%^C1 встает.", mob); break;
+        case POS_RESTING: mob->recho(_("%^C1 садится отдыхать."), mob); break;
+        case POS_SITTING: mob->recho(_("%^C1 садится."), mob); break;
+        case POS_SLEEPING: mob->recho(_("%^C1 засыпает."), mob); break;
+        case POS_STANDING: mob->recho(_("%^C1 встает."), mob); break;
         }
     }
 
@@ -809,7 +810,7 @@ void reset_area( Area *pArea, int flags )
                 && !IS_SET(ch->in_room->room_flags, ROOM_INDOORS)
                 && gsn_track->getEffective( ch ) > 50)
             {
-                ch->pecho( "Внезапно налетевший дождь смывает все следы." );
+                ch->pecho( _("Внезапно налетевший дождь смывает все следы.") );
             }
 
             ch->pecho( resetmsg );

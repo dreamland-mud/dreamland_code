@@ -35,6 +35,7 @@
 
 #include "def.h"
 #include "behavior.h"
+#include "l10n.h"
 
 GSN(garble);
 
@@ -75,7 +76,7 @@ bool BasicMobileBehavior::assistOffense( Character *fch, Character *victim )
     if (!( target = findAssistVictim( victim ) ))
         return false;
 
-    oldact("$c1 вскрикивает и атакует!", ch, 0, 0, TO_ROOM);
+    oldact(_("$c1 вскрикивает и атакует!"), ch, 0, 0, TO_ROOM);
     memoryAttacked.remember( target );
     attack( target );
     return true;
@@ -195,7 +196,7 @@ bool BasicMobileBehavior::assistGroup( Character *fch, Character *victim )
     if (assistGroupDistance( fch, victim )) 
         return true;
 
-    oldact("$c1 вступи$gло|л|ла в битву на стороне $C2.", ch, 0, fch, TO_NOTVICT);
+    oldact(_("$c1 вступи$gло|л|ла в битву на стороне $C2."), ch, 0, fch, TO_NOTVICT);
     memoryAttacked.remember( victim );
     attack( victim );
     return true;
@@ -229,8 +230,8 @@ bool BasicMobileBehavior::assistGroupDistance( Character *fch, Character *victim
         return false;
 
     if (!memoryFought.memorized( victim )) {
-        oldact("$c1 пристально смотрит на $C4.", ch, 0, victim, TO_NOTVICT);
-        oldact("$c1 пристально смотрит на тебя.", ch, 0, victim, TO_VICT);
+        oldact(_("$c1 пристально смотрит на $C4."), ch, 0, victim, TO_NOTVICT);
+        oldact(_("$c1 пристально смотрит на тебя."), ch, 0, victim, TO_VICT);
         memoryFought.remember( victim );
     }
     

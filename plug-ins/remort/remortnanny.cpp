@@ -18,6 +18,7 @@
 #include "move_utils.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 
 /**
@@ -36,7 +37,7 @@ static void update_remort_bonuses(PCharacter *ch)
         if (diff > 0) {
             notice("Fixing remort bonus for %s: %s bonus was %d, current max is %d, diff %d",
                     ch->getName().c_str(), stat_table.name(i).c_str(), bonus_stat, max_stat, diff);
-            ch->pecho("{cУ твоей расы теперь выше параметр '%s', тебе нет нужды покупать его дополнительно за реморты.{x",
+            ch->pecho(_("{cУ твоей расы теперь выше параметр '%s', тебе нет нужды покупать его дополнительно за реморты.{x"),
                        stat_table.message(i).c_str());
             ch->getRemorts().stats[i] -= diff;
             ch->getRemorts().points += 10 * diff;
@@ -44,7 +45,7 @@ static void update_remort_bonuses(PCharacter *ch)
     }
 
     if (oldPoints == 0 && ch->getRemorts().points != 0)
-        ch->pecho("{cТы попадаешь в избушку к Бабе Яге, чтобы снова выбрать плюшки за реморты.{x");
+        ch->pecho(_("{cТы попадаешь в избушку к Бабе Яге, чтобы снова выбрать плюшки за реморты.{x"));
 }
 
 /*-----------------------------------------------------------------------------

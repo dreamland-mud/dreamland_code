@@ -10,6 +10,7 @@
 #include "itemflags.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 bool drink_is_closed( Object *obj, Character *ch )
 {
@@ -20,13 +21,13 @@ bool drink_is_closed( Object *obj, Character *ch )
         return false;
     
     if (IS_SET(obj->value3(), DRINK_CLOSE_CORK))
-        ch->pecho( "%1$^O1 закупоре%1$Gно|н|на|ны пробкой, для начала стоит ее вынуть.", obj );
+        ch->pecho( _("%1$^O1 закупоре%1$Gно|н|на|ны пробкой, для начала стоит ее вынуть."), obj );
     else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL))
-        ch->pecho( "%1$^O1 закры%1$Gто|т|та|ты крышкой, для начала стоит ее открыть.", obj );
+        ch->pecho( _("%1$^O1 закры%1$Gто|т|та|ты крышкой, для начала стоит ее открыть."), obj );
     else if (IS_SET(obj->value3(), DRINK_CLOSE_KEY))
-        ch->pecho( "%1$^O1 запер%1$Gто|т|та|ты.", obj );
+        ch->pecho( _("%1$^O1 запер%1$Gто|т|та|ты."), obj );
     else
-        ch->pecho( "Тут закрыто." );
+        ch->pecho( _("Тут закрыто.") );
     
     return true;
 }

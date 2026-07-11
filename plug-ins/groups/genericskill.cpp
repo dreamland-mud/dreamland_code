@@ -23,6 +23,7 @@
 #include "clan.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 PROF(none);
 PROF(vampire);
@@ -165,7 +166,7 @@ bool GenericSkill::usable( Character *ch, bool message = false ) const
         return true;
 
     if (message)
-        ch->pecho("Для этого необходимо превратиться в вампира!");
+        ch->pecho(_("Для этого необходимо превратиться в вампира!"));
 
     return false;
 }
@@ -303,7 +304,7 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {
         if (verbose)
-            ch->pecho( "Тебе не с кем практиковаться здесь." );
+            ch->pecho( _("Тебе не с кем практиковаться здесь.") );
         return false;
     }
     
@@ -311,8 +312,8 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
         return true;
 
     if (verbose)
-        ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
-               "Учителя можно найти, прочитав справку по этому умению.",
+        ch->pecho( _("%1$^C1 не может научить тебя искусству '%2$s'.\n"
+               "Учителя можно найти, прочитав справку по этому умению."),
                mob, getNameFor( ch ).c_str( ) );
     return false;
 }

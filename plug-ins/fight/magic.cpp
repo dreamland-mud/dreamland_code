@@ -87,6 +87,7 @@
 #include "material.h"
 #include "fight.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(none);
 GSN(deafen);
@@ -119,19 +120,19 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
         case RESIST_IMMUNE:
             if (ch && verbose) {
                 if (ch != victim)
-                    ch->pecho("%^N1, похоже, никак не сможет навредить %C3.", damage_table.message(dam_type).c_str(), victim);
+                    ch->pecho(_("%^N1, похоже, никак не сможет навредить %C3."), damage_table.message(dam_type).c_str(), victim);
                 else
-                    ch->pecho("%^N1, похоже, никак не сможет навредить тебе.", damage_table.message(dam_type).c_str());
+                    ch->pecho(_("%^N1, похоже, никак не сможет навредить тебе."), damage_table.message(dam_type).c_str());
             }
             return true;
         case RESIST_RESISTANT:
             save += mlevel / 5;
             if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
                 if (ch != victim)
-                    ch->pecho("%^N1 {1{Gочень слабо{2 влияет на %C4.", 
+                    ch->pecho(_("%^N1 {1{Gочень слабо{2 влияет на %C4."), 
                         damage_table.message(dam_type).c_str(), victim);
                 else 
-                    ch->pecho("%^N1 {1{Gочень слабо{2 влияет на тебя.", 
+                    ch->pecho(_("%^N1 {1{Gочень слабо{2 влияет на тебя."), 
                         damage_table.message(dam_type).c_str());
             }
             break;
@@ -139,10 +140,10 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             save -= mlevel / 5;
             if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
                 if (ch != victim)
-                    ch->pecho("%^N1 {1{Rособо пагубно{2 влияет на %C4.", 
+                    ch->pecho(_("%^N1 {1{Rособо пагубно{2 влияет на %C4."), 
                         damage_table.message(dam_type).c_str(), victim);
                 else
-                    ch->pecho("%^N1 {1{Rособо пагубно{2 влияет на тебя.", 
+                    ch->pecho(_("%^N1 {1{Rособо пагубно{2 влияет на тебя."), 
                         damage_table.message(dam_type).c_str());
             }
             break;
@@ -258,20 +259,20 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
 
     if (IS_SET(flags, FSPELL_OBSTACLES)) {
         if (ch->isAffected( gsn_shielding ) && number_percent( ) > 50) {
-            ch->pecho("Ты пытаешься сотворить заклинание, но изолирующий экран блокирует тебя.");
-            ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но изолирующий экран блокирует %1$P2.", ch);
+            ch->pecho(_("Ты пытаешься сотворить заклинание, но изолирующий экран блокирует тебя."));
+            ch->recho(_("%1$^C1 пыта%1$nется|ются сотворить заклинание, но изолирующий экран блокирует %1$P2."), ch);
             return false;
         }
 
         if (ch->isAffected( gsn_garble ) && number_percent( ) > 50) {
-            ch->pecho("Твой язык заплетается, и ты не можешь как следует произнести заклинание.");
-            ch->recho("Язык %1$C2 заплетается, и %1$P1 не мо%1$nжет|гут как следует произнести заклинание.", ch);        
+            ch->pecho(_("Твой язык заплетается, и ты не можешь как следует произнести заклинание."));
+            ch->recho(_("Язык %1$C2 заплетается, и %1$P1 не мо%1$nжет|гут как следует произнести заклинание."), ch);        
             return false;
         }
         
         if (ch->isAffected( gsn_deafen ) && number_percent( ) > 50) {
-            ch->pecho("Глухота мешает тебе как следует произнести заклинание.");
-            ch->recho("Глухота мешает %1$C3 как следует произнести заклинание.", ch);        
+            ch->pecho(_("Глухота мешает тебе как следует произнести заклинание."));
+            ch->recho(_("Глухота мешает %1$C3 как следует произнести заклинание."), ch);        
             return false;
         }    
 
@@ -285,8 +286,8 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
     }
 
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_CAST)) {
-        ch->pecho("Эта местность поглощает и блокирует твое заклинание.");
-        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но что-то в этой местности блокирует %1$P2.", ch);
+        ch->pecho(_("Эта местность поглощает и блокирует твое заклинание."));
+        ch->recho(_("%1$^C1 пыта%1$nется|ются сотворить заклинание, но что-то в этой местности блокирует %1$P2."), ch);
         return false;
     }
 

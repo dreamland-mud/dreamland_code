@@ -48,6 +48,7 @@
 #include "interp.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "l10n.h"
 
 GSN(none);
 GSN(explode);
@@ -84,19 +85,19 @@ SKILL_RUNP( explode )
         one_argument(argument, arg);
 
         if (arg[0] == 0) {
-            ch->pecho("Подорвать кого?");
+            ch->pecho(_("Подорвать кого?"));
             return;
         }
 
         if ((victim = get_char_room(ch,arg)) == 0) {
-            ch->pecho("Здесь таких нет.");
+            ch->pecho(_("Здесь таких нет."));
             return;
         }
     }
 
-    oldact("$c1 поджигает что-то.",ch,0,victim,TO_NOTVICT);
-    oldact("$c1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
-    oldact("Пусть все сгорит!",ch,0,0,TO_CHAR);
+    oldact(_("$c1 поджигает что-то."),ch,0,victim,TO_NOTVICT);
+    oldact(_("$c1 поджигает что-то взрывчатое под тобой!"), ch,0,victim,TO_VICT);
+    oldact(_("Пусть все сгорит!"),ch,0,0,TO_CHAR);
 
     if (!ch->is_npc() && number_percent() >= gsn_explode->getEffective( ch ) + skill_level_bonus(*gsn_explode, ch)) {
         damage(ch,victim,0,gsn_explode,DAM_FIRE, true, DAMF_WEAPON);
@@ -173,26 +174,26 @@ SKILL_RUNP( harakiri )
 
     if ( MOUNTED(ch) )
     {
-        ch->pecho("Ты не можешь сделать харакири, если ты верхом!");
+        ch->pecho(_("Ты не можешь сделать харакири, если ты верхом!"));
         return;
     }
 
     if (ch->isAffected(gsn_hara_kiri))
     {
-        oldact("Если уж реши$gло|л|ла покончить с собой -- попробуй убить Тисахна.", ch, 0, 0, TO_CHAR);
+        oldact(_("Если уж реши$gло|л|ла покончить с собой -- попробуй убить Тисахна."), ch, 0, 0, TO_CHAR);
         return;
     }
 
     /* fighting */
     if (ch->position == POS_FIGHTING || ch->fighting)
     {
-        ch->pecho("Используй свой шанс сразиться до конца.");
+        ch->pecho(_("Используй свой шанс сразиться до конца."));
         return;
     }
 
     if(SHADOW(ch)) {
-      ch->pecho("Ты безуспешно режешь свою тень.");
-      oldact_p("$c1 не может даже сделать себе харакири.\n...пора на пенсию.",
+      ch->pecho(_("Ты безуспешно режешь свою тень."));
+      oldact_p(_("$c1 не может даже сделать себе харакири.\n...пора на пенсию."),
              ch, 0, 0, TO_ROOM,POS_RESTING);
       return;
     }
@@ -209,8 +210,8 @@ SKILL_RUNP( harakiri )
         desire_hunger->reset( ch->getPC( ) );
         desire_thirst->reset( ch->getPC( ) );
 
-        ch->pecho("Ты отрезаешь себе палец и ждешь, когда вытечет вся кровь.");
-        oldact_p("$c1 разрезает свое тело и ждет смерти.", ch,0,0,TO_ROOM,POS_FIGHTING);
+        ch->pecho(_("Ты отрезаешь себе палец и ждешь, когда вытечет вся кровь."));
+        oldact_p(_("$c1 разрезает свое тело и ждет смерти."), ch,0,0,TO_ROOM,POS_FIGHTING);
         gsn_hara_kiri->improve( ch, true );
         interpret_raw( ch, "sleep" );
         SET_BIT(ch->act,PLR_HARA_KIRI);
@@ -222,7 +223,7 @@ SKILL_RUNP( harakiri )
     {
         postaffect_to_char(ch, gsn_hara_kiri, 0);
 
-        ch->pecho("Ты не можешь отрезать себе палец. Ведь это не так легко!.");
+        ch->pecho(_("Ты не можешь отрезать себе палец. Ведь это не так легко!."));
         gsn_hara_kiri->improve( ch, false );
     }
 }
@@ -243,40 +244,40 @@ SKILL_RUNP( katana )
 
         if ( ch->isAffected(gsn_katana) )
         {
-                ch->pecho("Ты совсем недавно уже изготавливал%Gо||а катану.", ch);
+                ch->pecho(_("Ты совсем недавно уже изготавливал%Gо||а катану."), ch);
                 return;
         }
         
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho("Сделать катану? Из чего?");
+                ch->pecho(_("Сделать катану? Из чего?"));
                 return;
         }
 
         if ( ( part = get_obj_carry( ch, arg ) ) == 0 )
         {
-                ch->pecho("У тебя нету ни куска железа.");
+                ch->pecho(_("У тебя нету ни куска железа."));
                 return;
         }
 
         if ( part->pIndexData->vnum != OBJ_VNUM_CHUNK_IRON )
         {
-                ch->pecho("У тебя нет нужного материала -- поищи в Королевстве Дварфов");
+                ch->pecho(_("У тебя нет нужного материала -- поищи в Королевстве Дварфов"));
                 return;
         }
 
         if (SHADOW(ch))
         {
-                ch->pecho("Твоя тень все время мелькает перед глазами.\n\rТяжеловато сделать катану в таких условиях.");
-                oldact_p("$c1 вместе со своей тенью пытаются сделать катану.\n\r...глупое занятие.",
+                ch->pecho(_("Твоя тень все время мелькает перед глазами.\n\rТяжеловато сделать катану в таких условиях."));
+                oldact_p(_("$c1 вместе со своей тенью пытаются сделать катану.\n\r...глупое занятие."),
                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }
 
         if ( number_percent( ) > ( gsn_katana->getEffective( ch ) / 3 ) * 2 )
         {
-                ch->pecho("Ты понапрасну изводишь брусок хорошего железа.");
+                ch->pecho(_("Ты понапрасну изводишь брусок хорошего железа."));
                 extract_obj(part);
                 return;
         }
@@ -309,15 +310,15 @@ SKILL_RUNP( katana )
                 obj_to_char(katana, ch);
                 gsn_katana->improve( ch, true );
         
-                oldact("Ты делаешь катану из $o2!",ch,part,0,TO_CHAR);
-                oldact("$c1 делает катану из $o2!",ch,part,0,TO_ROOM);
+                oldact(_("Ты делаешь катану из $o2!"),ch,part,0,TO_CHAR);
+                oldact(_("$c1 делает катану из $o2!"),ch,part,0,TO_ROOM);
         
                 extract_obj(part);
                 return;
         }
         else
         {
-                oldact("Ты понапрасну изводишь $o4.",ch,part,0,TO_CHAR);
+                oldact(_("Ты понапрасну изводишь $o4."),ch,part,0,TO_CHAR);
                 extract_obj(part);
                 gsn_katana->improve( ch, false );
         }

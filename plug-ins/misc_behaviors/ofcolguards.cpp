@@ -15,6 +15,7 @@
 
 #include "loadsave.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(garble);
 
@@ -68,8 +69,8 @@ bool OfcolMarshal::specFight( )
         {
             int i;
 
-            oldact_p("$c1 призывает Богов на помощь.", ch,0,0,TO_ROOM,POS_SLEEPING);
-            oldact_p("Боги призывают $c4 на помощь Диане.", mob,0,0,TO_ROOM,POS_SLEEPING);
+            oldact_p(_("$c1 призывает Богов на помощь."), ch,0,0,TO_ROOM,POS_SLEEPING);
+            oldact_p(_("Боги призывают $c4 на помощь Диане."), mob,0,0,TO_ROOM,POS_SLEEPING);
 
             mob->max_hit = 6000;
             mob->hit = 6000;

@@ -10,6 +10,7 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 struct FindComplete {
     
@@ -182,17 +183,17 @@ CMDRUN( path )
     unsigned int matches = 0;
 
     if (roomName.empty() || DLString(constArguments).getOneArgument().empty()) {
-        ch->pecho("Укажи название местности, куда нужно проложить путь.");
+        ch->pecho(_("Укажи название местности, куда нужно проложить путь."));
         return;
     }
 
     if (IS_SET(myArea->area_flag, AREA_CLAN|AREA_DUNGEON|AREA_MANSION|AREA_WIZLOCK|AREA_SYSTEM)) {
-        ch->pecho("К сожалению, в этой зоне проложить путь не получится.");
+        ch->pecho(_("К сожалению, в этой зоне проложить путь не получится."));
         return;
     }
 
     if (eyes_blinded(ch)) {
-        ch->pecho("Ты не сможешь проложить путь, если даже не видишь, где сейчас находишься.");
+        ch->pecho(_("Ты не сможешь проложить путь, если даже не видишь, где сейчас находишься."));
         return;
     }
 
@@ -204,13 +205,13 @@ CMDRUN( path )
         }
 
     if (targets.empty()) {
-        ch->pecho("Не могу найти местность с названием '{W%s{x' в зоне {c%s{x.", 
+        ch->pecho(_("Не могу найти местность с названием '{W%s{x' в зоне {c%s{x."), 
                   roomName.c_str(), ch->in_room->areaName().c_str());
         return;
     }
 
     if (targets.size() == 1 && targets.front() == ch->in_room) {
-        ch->pecho("Но ты уже здесь!");
+        ch->pecho(_("Но ты уже здесь!"));
         return;
     }
 
@@ -248,17 +249,17 @@ CMDRUN( path )
     }
 
     if (foundPath)
-        ch->pecho("Найдены такие местности в зоне {c%s{x:", ch->in_room->areaName().c_str());
+        ch->pecho(_("Найдены такие местности в зоне {c%s{x:"), ch->in_room->areaName().c_str());
     else
-        ch->pecho("Не удалось проложить путь ни к одной из местностей:");
+        ch->pecho(_("Не удалось проложить путь ни к одной из местностей:"));
 
     ch->send_to(buf);
 
     if (foundPath)
-        ch->pecho("Не забывай, что на пути могут встретиться запертые или потайные выходы."); 
+        ch->pecho(_("Не забывай, что на пути могут встретиться запертые или потайные выходы.")); 
 
     if (matches > targets.size())
-        ch->pecho("Всего нашл%1$Iась|ись|ось {Y%1$d{x подходящ%1$Iая|ие|их местност%1$Iь|и|ей. Уточни название, чтобы увидеть остальные.",
+        ch->pecho(_("Всего нашл%1$Iась|ись|ось {Y%1$d{x подходящ%1$Iая|ие|их местност%1$Iь|и|ей. Уточни название, чтобы увидеть остальные."),
                   matches);
 }
 

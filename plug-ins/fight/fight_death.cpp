@@ -51,6 +51,7 @@
 #include "fight.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 using namespace std;
 
@@ -141,13 +142,13 @@ protected:
         if (IS_SET(killer->act, PLR_AUTOLOOT)){
             if (!killer->can_see( corpse )) {
                 if (IS_AFFECTED(killer, AFF_BLIND))
-                    killer->pecho("{WТы пытаешься вслепую ограбить труп, но ничего не выходит.{x");
+                    killer->pecho(_("{WТы пытаешься вслепую ограбить труп, но ничего не выходит.{x"));
                 else
-                    killer->pecho("{WТы пытаешься ограбить труп, но почему-то не находишь его.{x");
+                    killer->pecho(_("{WТы пытаешься ограбить труп, но почему-то не находишь его.{x"));
                 return;
             }
             else {
-                killer->pecho("{WТы методично обдираешь все вещи с трупа:{x");
+                killer->pecho(_("{WТы методично обдираешь все вещи с трупа:{x"));
                 interpret_raw(killer, "get", "all %lld", corpse->getID());
             }
         }
@@ -161,9 +162,9 @@ protected:
         if (IS_SET(killer->add_comm, PLR_AUTOLOOK)) {            
             if (!killer->can_see( corpse )) {
                 if (IS_AFFECTED(killer, AFF_BLIND))
-                    killer->pecho("{WТебе хочется осмотреть труп, но ты ничего не видишь!{x");
+                    killer->pecho(_("{WТебе хочется осмотреть труп, но ты ничего не видишь!{x"));
                 else
-                    killer->pecho("{WТы пытаешься осмотреть труп, но почему-то не находишь его.{x");
+                    killer->pecho(_("{WТы пытаешься осмотреть труп, но почему-то не находишь его.{x"));
                 return;
             }
             else {
@@ -190,8 +191,8 @@ protected:
         if (desire_bloodlust->applicable( killer->getPC( ) )
         && !(IS_BLOODLESS(ch)))    
         {
-            oldact("{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
-            oldact("{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
+            oldact(_("{R$c1 выпивает последние капли жизни из $C2!{x"), killer, 0,ch,TO_ROOM);
+            oldact(_("{RТы выпиваешь последние капли жизни из $C2!{x"), killer, 0,ch,TO_CHAR);
             desire_bloodlust->gain( killer->getPC( ), 3 );
         }
     }
@@ -231,9 +232,9 @@ public:
     }
     virtual void run( )
     {
-        pvict->pecho("Милостивая Варда больше не сможет тебя возродить.");
-        pvict->pecho("Ты превращаешься в призрак в последний раз и навсегда покидаешь этот мир.");
-        oldact("$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
+        pvict->pecho(_("Милостивая Варда больше не сможет тебя возродить."));
+        pvict->pecho(_("Ты превращаешься в призрак в последний раз и навсегда покидаешь этот мир."));
+        oldact(_("$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r"), pvict,0,0,TO_ROOM);
         
         DLString msg = fmt(0, msgWiznet.c_str(), pvict, killer);
         wiznet( 0, 0, 0, msg.c_str());
@@ -306,7 +307,7 @@ protected:
         pch->perm_stat[STAT_CON]--;
 
         if (pch->perm_stat[STAT_CON] >= 3) {
-            pch->pecho("Ты чувствуешь, как твое телосложение уменьшается после этой смерти.");
+            pch->pecho(_("Ты чувствуешь, как твое телосложение уменьшается после этой смерти."));
             return false;
         }
         
@@ -323,7 +324,7 @@ protected:
         if (pch->getProfession( ) == prof_samurai) {
             if ((pch->death % 3) == 2) {
                 pch->perm_stat[STAT_CHA]--;
-                pch->pecho("Ты чувствуешь, как твое обаяние уменьшается после этой смерти.");
+                pch->pecho(_("Ты чувствуешь, как твое обаяние уменьшается после этой смерти."));
             }
         }
 
@@ -448,7 +449,7 @@ static Object * corpse_create( Character *ch )
     DLString name;
 
     if (ch->is_npc( ) && IS_SET( ch->form, FORM_INSTANT_DECAY|FORM_INTANGIBLE )) {
-        ch->in_room->echo( POS_RESTING, "%1$^C1 превраща%1$nется|ются в прах и развеива%1$nется|ются по ветру, не оставляя после себя трупа.", ch );
+        ch->in_room->echo( POS_RESTING, _("%1$^C1 превраща%1$nется|ются в прах и развеива%1$nется|ются по ветру, не оставляя после себя трупа."), ch );
         return NULL;
     }    
     
@@ -778,7 +779,7 @@ static void ghost_gain( Character *victim )
         SET_DEATH_TIME(victim);
 
         if (victim->getModifyLevel( ) >= GHOST_MIN_LEVEL) {
-            victim->pecho("Ты лишаешься тела на несколько минут.");
+            victim->pecho(_("Ты лишаешься тела на несколько минут."));
             set_ghost( victim );
         }
     }

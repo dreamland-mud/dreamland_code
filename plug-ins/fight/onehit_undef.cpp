@@ -42,6 +42,7 @@
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(shalafi);
 
@@ -105,7 +106,7 @@ bool UndefinedOneHit::canDamage( )
 
     if (ch != victim) {
         if (victim->is_mirror( )) {
-            oldact("$c1 разбивается на мелкие осколки.",victim,0,0,TO_ROOM);
+            oldact(_("$c1 разбивается на мелкие осколки."),victim,0,0,TO_ROOM);
             extract_char(victim);
             return false;
         }
@@ -286,8 +287,8 @@ void UndefinedOneHit::damEffectVorpal()
 
     victim->pecho(msgVict, victim);
     victim->recho(msgOther, victim);
-    victim->recho("%^C1 уже ТРУП!!", victim);
-    victim->pecho("Тебя УБИЛИ!");
+    victim->recho(_("%^C1 уже ТРУП!!"), victim);
+    victim->pecho(_("Тебя УБИЛИ!"));
 
     eventBus->publish(CharDeathEvent(victim, ch, 0, "vorpal", dam_type));
     throw VictimDeathException( );
@@ -610,8 +611,8 @@ void UndefinedOneHit::damEffectMasterSword( )
         .incrementHitroll()
         .incrementDamroll();
 
-    oldact("$o1 $c2 загорается {Cголубым светом{x.", ch, katana, 0, TO_ROOM);
-    oldact("$o1 в твоей $T руке загорается {Cголубым светом{x.", 
+    oldact(_("$o1 $c2 загорается {Cголубым светом{x."), ch, katana, 0, TO_ROOM);
+    oldact(_("$o1 в твоей $T руке загорается {Cголубым светом{x."), 
             ch, katana, (secondary ? "левой" : "правой"), TO_CHAR);
 }
 
@@ -641,8 +642,8 @@ void UndefinedOneHit::damApplyDeathblow( )
 
         dam = number_range( min_dam, max_dam );
 
-        oldact("Твои руки наполняются смертоносной силой!",ch,0,0,TO_CHAR);
-        oldact("Руки $c2 наполняются смертоносной силой!",ch,0,0,TO_ROOM);
+        oldact(_("Твои руки наполняются смертоносной силой!"),ch,0,0,TO_CHAR);
+        oldact(_("Руки $c2 наполняются смертоносной силой!"),ch,0,0,TO_ROOM);
         gsn_deathblow->improve( ch, true, victim );
     }
     else
@@ -720,17 +721,17 @@ void UndefinedOneHit::damEffectMasterHand()
         return;
 
     if ( (victim->isAffected(gsn_nerve)) && (number_percent() < 15) )
-        ch->pecho("С ослабленными нервными окончаниями оглушить противника становится легче.");        
+        ch->pecho(_("С ослабленными нервными окончаниями оглушить противника становится легче."));        
                 
     if (!IS_AFFECTED(victim, AFF_WEAK_STUN)) {
         SET_BIT(victim->affected_by, AFF_WEAK_STUN);
         if (ch != victim) {
-            oldact("{rТвой удар в голову слегка оглушает $C4!{x", ch, 0, victim, TO_CHAR);
-            oldact("{r$c1 слегка оглушает тебя ударом в голову!{x", ch, 0, victim, TO_VICT);
-            oldact("{r$c1 слегка оглушает $C4 ударом в голову!{x", ch, 0, victim, TO_NOTVICT);
+            oldact(_("{rТвой удар в голову слегка оглушает $C4!{x"), ch, 0, victim, TO_CHAR);
+            oldact(_("{r$c1 слегка оглушает тебя ударом в голову!{x"), ch, 0, victim, TO_VICT);
+            oldact(_("{r$c1 слегка оглушает $C4 ударом в голову!{x"), ch, 0, victim, TO_NOTVICT);
         } else {
-            oldact("{rТвой удар отклонен тебе ж в голову! Ты слегка оглушаешь СЕБЯ!{x", ch, 0, victim, TO_CHAR);
-            oldact("{r$c1 слегка оглушает СЕБЯ ударом в голову!{x", ch, 0, victim, TO_NOTVICT);
+            oldact(_("{rТвой удар отклонен тебе ж в голову! Ты слегка оглушаешь СЕБЯ!{x"), ch, 0, victim, TO_CHAR);
+            oldact(_("{r$c1 слегка оглушает СЕБЯ ударом в голову!{x"), ch, 0, victim, TO_NOTVICT);
         }
     } else if (diceroll < (chance / 2) && !IS_AFFECTED(victim, AFF_STUN)) {
         if (ch != victim) {
@@ -741,9 +742,9 @@ void UndefinedOneHit::damEffectMasterHand()
 
             SET_BIT(victim->affected_by, AFF_STUN);
 
-            oldact("{rМощной серией ударов в голову ты сильно оглушаешь $C4!{x", ch, 0, victim, TO_CHAR);
-            oldact("{r$c1 сильно оглушает тебя мощной серией ударов в голову!{x", ch, 0, victim, TO_VICT);
-            oldact("{r$c1 оглушает $C4 мощной серией ударов в голову!{x", ch, 0, victim, TO_NOTVICT);
+            oldact(_("{rМощной серией ударов в голову ты сильно оглушаешь $C4!{x"), ch, 0, victim, TO_CHAR);
+            oldact(_("{r$c1 сильно оглушает тебя мощной серией ударов в голову!{x"), ch, 0, victim, TO_VICT);
+            oldact(_("{r$c1 оглушает $C4 мощной серией ударов в голову!{x"), ch, 0, victim, TO_NOTVICT);
         }
     }
 
@@ -819,9 +820,9 @@ void UndefinedOneHit::damApplyReligion()
                 || (ch->getReligion() == god_phobos && rch->getReligion() == god_deimos))
             {           
                 if (chance(1)) {
-                    ch->recho(rch, "%^C1 и %C1 наводят {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch, rch);
-                    ch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", rch);
-                    rch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch);
+                    ch->recho(rch, _("%^C1 и %C1 наводят {Rстрах и ужас{x на противников, нанося дополнительный урон!"), ch, rch);
+                    ch->pecho(_("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!"), rch);
+                    rch->pecho(_("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!"), ch);
                 }
 
                 dam = dam * 110 / 100;

@@ -104,6 +104,7 @@
 #include "fight.h"
 #include "material.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(area_attack);
 GSN(fifth_attack);
@@ -186,19 +187,19 @@ void violence_update()
             {
                 if (IS_AFFECTED(ch, AFF_STUN) && !ch->isAffected(gsn_paralysis))
                 {
-                    ch->pecho("Оглушение постепенно проходит.");
+                    ch->pecho(_("Оглушение постепенно проходит."));
                     REMOVE_BIT(ch->affected_by, AFF_STUN);
                     SET_BIT(ch->affected_by, AFF_WEAK_STUN);
                 }
                 else if (IS_AFFECTED(ch, AFF_WEAK_STUN))
                 {
-                    ch->pecho("Гул в твоей голове затихает.");
+                    ch->pecho(_("Гул в твоей голове затихает."));
                     REMOVE_BIT(ch->affected_by, AFF_WEAK_STUN);
                 }
 
                 if (ch->adrenaline_pending && !ch->is_adrenalined())
                 {
-                    ch->pecho("Адреналин в твоей крови улегся, и ты успокаиваешься.");
+                    ch->pecho(_("Адреналин в твоей крови улегся, и ты успокаиваешься."));
                     ch->adrenaline_pending = false;
                 }
                 continue;
@@ -230,9 +231,9 @@ void violence_update()
 
                 if (victim->fighting == ch)
                 {
-                    victim->pecho("Ты вступаешь в битву с %C5.", ch);
-                    ch->pecho("%^C1 вступает с тобой в битву!", victim);
-                    ch->recho(victim, "%^C1 вступает в битву с %C5.", victim, ch);
+                    victim->pecho(_("Ты вступаешь в битву с %C5."), ch);
+                    ch->pecho(_("%^C1 вступает с тобой в битву!"), victim);
+                    ch->recho(victim, _("%^C1 вступает в битву с %C5."), victim, ch);
                 }
             }
 
@@ -533,10 +534,10 @@ void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage )
 
     worn->condition -= damage;
 
-    oldact("$o1 наносит повреждения $O3.", ch, wield, worn, TO_ROOM );
+    oldact(_("$o1 наносит повреждения $O3."), ch, wield, worn, TO_ROOM );
 
     if (worn->condition < 1) {
-        oldact("$O1 разлетается на мелкие части.", ch, wield, worn, TO_ROOM);
+        oldact(_("$O1 разлетается на мелкие части."), ch, wield, worn, TO_ROOM);
         obj_dump_content(worn);
         extract_obj( worn );
         return;

@@ -24,6 +24,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 GSN(bow);
 GSN(herbs);
@@ -64,7 +65,7 @@ bool BasicMobileBehavior::aggressRanger( )
     if (!victim) 
         return false;
     
-    oldact("$c1 пристально смотрит $T и натягивает тетиву $o2.",
+    oldact(_("$c1 пристально смотрит $T и натягивает тетиву $o2."),
          ch, get_eq_char( ch, wear_wield ), dirs[victDoor].leave, TO_ROOM);
 
     interpret_raw( ch, "shoot", "%s %s", 

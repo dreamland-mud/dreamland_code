@@ -14,6 +14,7 @@
 #include "merc.h"
 #include "dl_strings.h"
 #include "def.h"
+#include "l10n.h"
 
 static const DLString LABEL_CRAFT = "craft";
 
@@ -227,7 +228,7 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
 
     attr->gainExp(getName(), xp);
 
-    ch->pecho("Ты получаешь %1$d очк%1$Iо|а|ов опыта в профессии %2$N2.", xp, getRusName().c_str());
+    ch->pecho(_("Ты получаешь %1$d очк%1$Iо|а|ов опыта в профессии %2$N2."), xp, getRusName().c_str());
 
     if (level >= maxLevel) {
         ch->save();
@@ -239,14 +240,14 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
     while (calc->expToLevel(level) <= 0) {
         level++;
         attr->setProficiencyLevel(getName(), level);
-        ch->pecho("{CТы достигаешь {Y%1$dго{C уровня мастерства в профессии {Y%2$N2{C!{x",
+        ch->pecho(_("{CТы достигаешь {Y%1$dго{C уровня мастерства в профессии {Y%2$N2{C!{x"),
                    level, getRusName().c_str());
 
         infonet(ch, 0, "{CРадостный голос из $o2: ", "{W%1$#C1 дости%1$#Gгло|г|гла новой ступени мастерства.{x", ch);
         wiznet(WIZ_LEVELS, 0, 0, 
                   "%1$#C1 дости%1$#Gгло|г|гла %2$d уровня в профессии %3$N2!", 
                   ch, level, getRusName().c_str());
-        send_discord_orb(":tools: " + fmt(0, "%1$#C1 дости%1$#Gгло|г|гла нового уровня мастерства в профессии %2$N2.",
+        send_discord_orb(":tools: " + fmt(0, _("%1$#C1 дости%1$#Gгло|г|гла нового уровня мастерства в профессии %2$N2."),
                             ch, getRusName().c_str()));
     }
 

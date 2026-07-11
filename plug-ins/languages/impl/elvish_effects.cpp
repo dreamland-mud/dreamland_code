@@ -19,6 +19,7 @@
 #include "wearloc_utils.h"
 
 #include "def.h"
+#include "l10n.h"
 
 GSN(bless);
 GSN(sidhe_armor);
@@ -29,9 +30,9 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
 
     if (!victim->getRace( )->getVuln( ).isSet( VULN_IRON )) {
         if (victim == ch)
-            oldact("Ты не страдаешь врожденной уязвимостью к железу.", ch, 0, 0, TO_CHAR);
+            oldact(_("Ты не страдаешь врожденной уязвимостью к железу."), ch, 0, 0, TO_CHAR);
         else
-            oldact("$C1 не страдает врожденной уязвимостью к железу.", ch, 0, victim, TO_CHAR);
+            oldact(_("$C1 не страдает врожденной уязвимостью к железу."), ch, 0, victim, TO_CHAR);
         
         return false;
     }
@@ -45,8 +46,8 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
     
     affect_join( victim, &af );
    
-    oldact("{CСекретное знание Сидхов теперь защищает $c4.{x", victim, 0, 0, TO_ROOM);
-    oldact("{CСекретное знание Сидхов теперь защищает тебя.{x", victim, 0, 0, TO_CHAR);
+    oldact(_("{CСекретное знание Сидхов теперь защищает $c4.{x"), victim, 0, 0, TO_ROOM);
+    oldact(_("{CСекретное знание Сидхов теперь защищает тебя.{x"), victim, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -54,7 +55,7 @@ bool BlessEquipWE::run( PCharacter *ch, Object *obj ) const
 {
 
     if (IS_OBJ_STAT(obj, ITEM_BLESS)){
-        ch->pecho("%1$^O1 уже благословле%1$Gно|н|на|ны.", obj);
+        ch->pecho(_("%1$^O1 уже благословле%1$Gно|н|на|ны."), obj);
         return false;
     }
 
@@ -70,7 +71,7 @@ bool BlessEquipWE::run( PCharacter *ch, Object *obj ) const
     
     affect_to_obj( obj, &af);
 
-    oldact("{C$o1 на мгновение загорается огнем нездешних звёзд.{x", ch, obj, 0, TO_ALL );
+    oldact(_("{C$o1 на мгновение загорается огнем нездешних звёзд.{x"), ch, obj, 0, TO_ALL );
     return true;
 }
 
@@ -82,9 +83,9 @@ bool RestoringWE::run( PCharacter *ch, Character *victim ) const
     update_pos( victim );
 
     if (ch != victim)
-        oldact("{CТаинственное мелодичное слово пронизывает $C4 теплом.{x", ch, 0, victim, TO_CHAR );
+        oldact(_("{CТаинственное мелодичное слово пронизывает $C4 теплом.{x"), ch, 0, victim, TO_CHAR );
 
-    victim->pecho( "{CТаинственное мелодичное слово пронизывает тебя теплом.{x" );
+    victim->pecho( _("{CТаинственное мелодичное слово пронизывает тебя теплом.{x") );
     return true;
 }
 

@@ -17,6 +17,7 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(doppelganger);
 
@@ -72,7 +73,7 @@ void notify_referers( Character *ch, int flags )
             wch->reply = 0;
 
         if (wch->doppel == ch && wch->isAffected(gsn_doppelganger)) {
-            wch->pecho("Ты принимаешь свое истинное обличье.");
+            wch->pecho(_("Ты принимаешь свое истинное обличье."));
             
             // TODO rework with verbose affect strip
             if (gsn_doppelganger->getAffect( ))

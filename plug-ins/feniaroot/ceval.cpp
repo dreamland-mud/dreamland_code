@@ -19,6 +19,7 @@
 #include "wrappersplugin.h"
 #include "wrappermanager.h"
 #include "def.h"
+#include "l10n.h"
 
 using Scripting::CodeSource;
 
@@ -59,12 +60,12 @@ CMDADM( eval )
         return;
     
     if (!has_fenia_security( pch )) {
-        ch->pecho("Ты не ботаешь по фене.");
+        ch->pecho(_("Ты не ботаешь по фене."));
         return;
     }
 
     if (constArguments.empty( )) {
-        ch->pecho("Синтаксис: {Weval {x<expression>");
+        ch->pecho(_("Синтаксис: {Weval {x<expression>"));
         return;
     }
 
@@ -104,7 +105,7 @@ RPCRUN(cs_eval)
                 << "----------------------------" << endl;
 
         if (!has_fenia_security( pch )) {
-            ch->pecho("Ты не ботаешь по фене.");
+            ch->pecho(_("Ты не ботаешь по фене."));
             return;
         }
 

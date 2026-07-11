@@ -38,6 +38,7 @@
 #include "merc.h"
 #include "def.h"
 #include "behavior.h"
+#include "l10n.h"
 
 BHV(cityguard);
 
@@ -245,7 +246,7 @@ void Gangsters::cleanup( bool performance )
                 do_say(ch, "Hasta la vista, baby!");
             
             if (ch->position >= POS_MORTAL)        
-                oldact("$c1 исчезает в клубе дыма.", ch, 0, 0, TO_ROOM);
+                oldact(_("$c1 исчезает в клубе дыма."), ch, 0, 0, TO_ROOM);
         }
         
         extract_char( ch );

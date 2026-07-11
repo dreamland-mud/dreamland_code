@@ -15,6 +15,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 /*----------------------------------------------------------------------
  * PetShopStorage
@@ -41,12 +42,12 @@ bool PetShopStorage::canServeClient( Character *client )
 
 void PetShopStorage::msgListEmpty( Character *client )
 {
-    client->pecho( "Извини, все животные давно разбежались." );
+    client->pecho( _("Извини, все животные давно разбежались.") );
 }
 
 void PetShopStorage::msgListBefore( Character *client )
 {
-    client->pecho( "Существа на продажу:" );
+    client->pecho( _("Существа на продажу:") );
 }
 
 void PetShopStorage::msgListAfter( Character *client )
@@ -99,12 +100,12 @@ void PetShopStorage::toStream( Character *client, ostringstream &buf )
 
 void PetShopStorage::msgArticleNotFound( Character *client )
 {
-    client->pecho( "Извини, ты не можешь купить этого здесь." );
+    client->pecho( _("Извини, ты не можешь купить этого здесь.") );
 }
 
 void PetShopStorage::msgArticleTooFew( Character *client, Article::Pointer )
 {
-    client->pecho( "Ты можешь купить только одного питомца." );
+    client->pecho( _("Ты можешь купить только одного питомца.") );
 }
 
 Article::Pointer PetShopStorage::findArticle( Character *client, DLString &arguments )

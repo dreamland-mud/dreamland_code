@@ -29,6 +29,7 @@
 #include "xmlattribute.h"
 #include "wiznet.h"
 #include "def.h"
+#include "l10n.h"
 
 /*---------------------------------------------------------------------------
  * 'nopost' command
@@ -51,7 +52,7 @@ CMDADM( nopost )
         pci = PCharacterManager::find( name );
         
         if (!pci) {
-            ch->pecho("Жертва не найдена. Укажите имя правильно и полностью.");
+            ch->pecho(_("Жертва не найдена. Укажите имя правильно и полностью."));
             return;
         }
 
@@ -70,12 +71,12 @@ CMDADM( nopost )
                 attributes->eraseAttribute( "nopost" );
                 PCharacterManager::saveMemory( pci );
 
-                ch->pecho("NOPOST снят.");
+                ch->pecho(_("NOPOST снят."));
                 wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
                         "%^C1 restores notes to %s.", ch, pci->getName( ).c_str( ) );
             }
             else {
-                ch->pecho("Не получилось.");
+                ch->pecho(_("Не получилось."));
             }
         }
         else if( arguments.empty( ) )
@@ -98,7 +99,7 @@ CMDADM( nopost )
             attr->start( pci );
             PCharacterManager::saveMemory(pci);
 
-            ch->pecho("NOPOST установлен.");
+            ch->pecho(_("NOPOST установлен."));
             
             wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
                     "%^C1 revokes %s's notes.", ch, pci->getName( ).c_str( ) );
@@ -134,6 +135,6 @@ void XMLAttributeNoPost::end( PCMemoryInterface *pcm ) const
     PCharacter *pch;
 
     if ((pch = dynamic_cast<PCharacter *>( pcm ))) 
-        pch->pecho("Боги вернули тебе привилегию писать письма.");
+        pch->pecho(_("Боги вернули тебе привилегию писать письма."));
 }
 

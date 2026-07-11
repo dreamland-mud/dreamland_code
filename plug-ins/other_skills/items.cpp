@@ -20,6 +20,7 @@
 
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 SPELL_DECL(GeneralPurpose);
 VOID_SPELL(GeneralPurpose)::run( Character *ch, Character *victim, int sn, int level ) 
@@ -53,7 +54,7 @@ VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level )
 
   if ( ch->isAffected(sn ) )
     {
-      ch->pecho("Кассандра использовалась совсем недавно.");
+      ch->pecho(_("Кассандра использовалась совсем недавно."));
       return;
     }
 
@@ -63,8 +64,8 @@ VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level )
   af.location = APPLY_AC;
   af.modifier  = -30;
   affect_to_char( ch, &af );
-  oldact("Таинственный щит окружает $c4.",ch, 0,0,TO_ROOM);
-  ch->pecho("Таинственный щит окружает тебя.");
+  oldact(_("Таинственный щит окружает $c4."),ch, 0,0,TO_ROOM);
+  ch->pecho(_("Таинственный щит окружает тебя."));
   return;
 
 }
@@ -77,7 +78,7 @@ VOID_SPELL(Matandra)::run( Character *ch, Character *victim, int sn, int level )
 
   if ( ch->isAffected(sn ) )
     {
-      ch->pecho("Кассандра использовалась для этой же цели совсем недавно.");
+      ch->pecho(_("Кассандра использовалась для этой же цели совсем недавно."));
       return;
     }
 
@@ -92,7 +93,7 @@ VOID_SPELL(Kassandra)::run( Character *ch, Character *, int sn, int level )
 { 
     if ( ch->isAffected(sn ) )
       {
-        ch->pecho("Ты совсем недавно пользовал%1$Gось|ся|ась этим заклинанием.", ch );
+        ch->pecho(_("Ты совсем недавно пользовал%1$Gось|ся|ась этим заклинанием."), ch );
         return;
       }
 
@@ -101,8 +102,8 @@ VOID_SPELL(Kassandra)::run( Character *ch, Character *, int sn, int level )
     ch->hit = min( ch->hit + 150, (int)ch->max_hit );
     update_pos( ch );
 
-    ch->pecho("Волна тепла согревает твое тело.");
-    oldact("$c1 выглядит лучше.", ch, 0, 0, TO_ROOM);
+    ch->pecho(_("Волна тепла согревает твое тело."));
+    oldact(_("$c1 выглядит лучше."), ch, 0, 0, TO_ROOM);
 }
 
 
@@ -115,9 +116,9 @@ VOID_SPELL(DetectHidden)::run( Character *ch, Character *victim, int sn, int lev
     if ( CAN_DETECT(victim, DETECT_HIDDEN) )
     {
         if (victim == ch)
-          ch->pecho("Ты уже чувствуешь присутствие скрытых сил. ");
+          ch->pecho(_("Ты уже чувствуешь присутствие скрытых сил. "));
         else
-          oldact_p("$C1 уже чувствует присутствие скрытых сил.",
+          oldact_p(_("$C1 уже чувствует присутствие скрытых сил."),
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -129,7 +130,7 @@ VOID_SPELL(DetectHidden)::run( Character *ch, Character *victim, int sn, int lev
     af.modifier  = 0;
     af.bitvector.setValue(DETECT_HIDDEN);
     affect_to_char( victim, &af );
-    victim->pecho("Теперь ты чувствуешь присутствие скрытых сил.");
+    victim->pecho(_("Теперь ты чувствуешь присутствие скрытых сил."));
     if ( ch != victim )
         ch->pecho("Ok.");
     return;

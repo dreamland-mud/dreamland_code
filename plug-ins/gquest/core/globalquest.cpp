@@ -28,6 +28,7 @@
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 
 GlobalQuest::GlobalQuest( )
@@ -179,8 +180,8 @@ void GlobalQuest::exorcism(Character *ch) const
     Room *recall;
     Character *actor = getActor(ch);
 
-    oldact("$c1 улетучивается.", ch, 0, 0, TO_ROOM);
-    oldact("Ты исчезаешь отсюда.", ch, 0, 0, TO_CHAR);
+    oldact(_("$c1 улетучивается."), ch, 0, 0, TO_ROOM);
+    oldact(_("Ты исчезаешь отсюда."), ch, 0, 0, TO_CHAR);
 
     // lonely npc with no current master
     if (ch->is_npc() && (ch == actor || actor->is_npc()))

@@ -38,6 +38,7 @@
 #include "act.h"
 
 #include "def.h"
+#include "l10n.h"
 
 GSN(spellbane);
 GSN(garble);
@@ -216,13 +217,13 @@ void DefaultSpell::utter( Character *ch )
 void DefaultSpell::utterPrayer(Character *ch)
 {
     if (ch->is_npc()) {
-        ch->recho("%^C1 молится своим богам.", ch);
+        ch->recho(_("%^C1 молится своим богам."), ch);
     } else if (ch->getReligion() == god_none) {
-        ch->pecho("Ты неумело молишься, прося богов о помощи.");  
-        ch->recho("%^C1 неумело молится, прося богов о помощи.", ch); 
+        ch->pecho(_("Ты неумело молишься, прося богов о помощи."));  
+        ch->recho(_("%^C1 неумело молится, прося богов о помощи."), ch); 
     } else {
-        ch->pecho("Ты возносишь молитву %N3.", ch->getReligion()->getRussianName().c_str());
-        ch->recho("%^C1 возносит молитву %N3.", ch, ch->getReligion()->getRussianName().c_str());
+        ch->pecho(_("Ты возносишь молитву %N3."), ch->getReligion()->getRussianName().c_str());
+        ch->recho(_("%^C1 возносит молитву %N3."), ch, ch->getReligion()->getRussianName().c_str());
     }
 }
 
@@ -269,13 +270,13 @@ bool DefaultSpell::canPray(Character *ch, int &slevel)
     }
 
     if (slevel <= 0) {
-        ch->pecho("Никто из богов больше не откликнется на твои молитвы, пока ты не изберешь себе {hh1религию{x.");
+        ch->pecho(_("Никто из богов больше не откликнется на твои молитвы, пока ты не изберешь себе {hh1религию{x."));
         return false;
     }
 
     Religion *randomGod = ReligionUtils::setRandomGod(ch);
     if (randomGod)
-        ch->pecho("Твою просьбу исполняет %N1 и советует поскорее выбрать себе {hh1религию{x.", randomGod->getRussianName().c_str());
+        ch->pecho(_("Твою просьбу исполняет %N1 и советует поскорее выбрать себе {hh1религию{x."), randomGod->getRussianName().c_str());
 
     return true;
 }
@@ -326,8 +327,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         if (number_percent( ) < chance) {
             slevel = mlevel;
             slevel += chance / 20;
-            oldact("Твои глаза на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_CHAR );
-            oldact("Глаза $c2 на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_ROOM );                
+            oldact(_("Твои глаза на мгновение вспыхивают {1{rбагровым{2."), ch, 0, 0, TO_CHAR );
+            oldact(_("Глаза $c2 на мгновение вспыхивают {1{rбагровым{2."), ch, 0, 0, TO_ROOM );                
             gsn_improved_maladiction->improve( ch, true );
         }
         else
@@ -340,8 +341,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         if (number_percent() < chance) {
             slevel = mlevel;
             slevel += chance / 20;
-            oldact("Твои глаза на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_CHAR );
-            oldact("Глаза $c2 на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_ROOM );                 
+            oldact(_("Твои глаза на мгновение вспыхивают {1{Yзолотом{2."), ch, 0, 0, TO_CHAR );
+            oldact(_("Глаза $c2 на мгновение вспыхивают {1{Yзолотом{2."), ch, 0, 0, TO_ROOM );                 
             gsn_improved_benediction->improve( ch, true );
         }
         else
@@ -356,8 +357,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         if (number_percent( ) < chance) {
             slevel = mlevel;
             slevel += chance / 20;
-            oldact("Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
-            oldact("Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
+            oldact(_("Свет на мгновение пронизывает твои ладони."), ch, 0, 0, TO_CHAR );
+            oldact(_("Свет на мгновение пронизывает ладони $c2."), ch, 0, 0, TO_ROOM );
             gsn_holy_remedy->improve( ch, true );
         }
     }
@@ -388,8 +389,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         f  = A0 / (1 + x / B0);
 
         slevel = (int) (f * slevel);
-        oldact("Яркая искра вспыхивает между твоих ладоней, фокусируя магический заряд.", ch, 0, 0, TO_CHAR );
-        oldact("Яркая искра вспыхивает между ладоней $c2, фокусируя магический заряд.", ch, 0, 0, TO_ROOM );            
+        oldact(_("Яркая искра вспыхивает между твоих ладоней, фокусируя магический заряд."), ch, 0, 0, TO_CHAR );
+        oldact(_("Яркая искра вспыхивает между ладоней $c2, фокусируя магический заряд."), ch, 0, 0, TO_ROOM );            
     }
 
     if (gsn_mastering_spell->usable( ch, false )) {
@@ -729,7 +730,7 @@ bool DefaultSpell::checkPosition( Character *ch ) const
 {
     if (ch->position < position.getValue( )) {
         const Skill *theSkill = skill.getPointer();
-        ch->pecho("Заклинание '%K1' нельзя использовать во время сражения.", theSkill);
+        ch->pecho(_("Заклинание '%K1' нельзя использовать во время сражения."), theSkill);
         return false;
     }
     
@@ -822,18 +823,18 @@ bool DefaultSpell::isPrayer( Character *caster ) const
 void DefaultSpell::baneMessage( Character *ch, Character *vch ) const
 {
     if (isPrayer( ch )) {
-        oldact("Твои боги не благосклонны к $C3.", ch, 0, vch, TO_CHAR);
-        oldact("Боги $c2 не благосклонны к тебе.", ch, 0, vch, TO_VICT);
-        oldact("Боги $c2 не благосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
+        oldact(_("Твои боги не благосклонны к $C3."), ch, 0, vch, TO_CHAR);
+        oldact(_("Боги $c2 не благосклонны к тебе."), ch, 0, vch, TO_VICT);
+        oldact(_("Боги $c2 не благосклонны к $C3."), ch, 0, vch, TO_NOTVICT);
     }
     else if (ch != vch) {
-        oldact("$C1 отклоняет твое заклинание!", ch, 0, vch, TO_CHAR);
-        oldact("Ты отклоняешь заклинание $c2!", ch, 0, vch, TO_VICT);
-        oldact("$C1 отклоняет заклинание $c2!", ch, 0, vch, TO_NOTVICT);
+        oldact(_("$C1 отклоняет твое заклинание!"), ch, 0, vch, TO_CHAR);
+        oldact(_("Ты отклоняешь заклинание $c2!"), ch, 0, vch, TO_VICT);
+        oldact(_("$C1 отклоняет заклинание $c2!"), ch, 0, vch, TO_NOTVICT);
     }
     else {
-        oldact("Ты отклоняешь заклинание!", ch, 0, vch, TO_VICT);
-        oldact("$C1 отклоняет заклинание!", ch, 0, vch, TO_NOTVICT);
+        oldact(_("Ты отклоняешь заклинание!"), ch, 0, vch, TO_VICT);
+        oldact(_("$C1 отклоняет заклинание!"), ch, 0, vch, TO_NOTVICT);
     }
 }
 

@@ -14,10 +14,11 @@
 #include "merc.h"
 #include "loadsave.h"
 #include "def.h"
+#include "l10n.h"
 
 void QuestGirth::wear( Character *ch ) 
 {
-    ch->pecho("{CТвой пояс ярко вспыхивает.{x");
+    ch->pecho(_("{CТвой пояс ярко вспыхивает.{x"));
 }
 
 

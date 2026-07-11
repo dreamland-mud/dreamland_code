@@ -6,6 +6,7 @@
 #include "arg_utils.h"
 #include "msgformatter.h"
 #include "act.h"
+#include "l10n.h"
 
 void Money::dematerialize( Object *list, int &gold, int &silver )
 {
@@ -164,24 +165,24 @@ bool Money::parse( Character *ch, const char *arg, int amount, int &gold, int &s
 {
     if ((!arg_is_silver( arg ) && !arg_is_gold( arg ) )) {
         if (!str_prefix( arg, "серебр" ) || !str_prefix( arg, "silver" )) {
-            ch->pecho( "Укажи название монеты полностью: серебро." );
+            ch->pecho( _("Укажи название монеты полностью: серебро.") );
             return false;
         }
         if (!str_prefix( arg, "золот" ) || !str_prefix( arg, "gold" )) {
-            ch->pecho( "Укажи название монеты полностью: золото." );
+            ch->pecho( _("Укажи название монеты полностью: золото.") );
             return false;
         }
-        ch->pecho( "Ты можешь указать количество денег в серебре или золоте ." );
+        ch->pecho( _("Ты можешь указать количество денег в серебре или золоте .") );
         return false;
     }
 
     if (amount < 0) {
-        ch->pecho( "Отрицательное количество денег?" );
+        ch->pecho( _("Отрицательное количество денег?") );
         return false;
     }
     
     if (amount == 0) {
-        ch->pecho( "Ноль монет -- это как?" );
+        ch->pecho( _("Ноль монет -- это как?") );
         return false;
     }
 
@@ -189,7 +190,7 @@ bool Money::parse( Character *ch, const char *arg, int amount, int &gold, int &s
     if (arg_is_silver( arg )) {
             if (ch->silver < amount)
             {
-                    ch->pecho("У тебя нет столько серебра.");
+                    ch->pecho(_("У тебя нет столько серебра."));
                     return false;
             }
 
@@ -199,7 +200,7 @@ bool Money::parse( Character *ch, const char *arg, int amount, int &gold, int &s
     {
             if (ch->gold < amount)
             {
-                    ch->pecho("У тебя нет столько золота.");
+                    ch->pecho(_("У тебя нет столько золота."));
                     return false;
             }
 

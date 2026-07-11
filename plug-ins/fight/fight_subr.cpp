@@ -32,6 +32,7 @@
 #include "vnum.h"
 #include "fight.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(paralysis);
 
@@ -60,29 +61,29 @@ bool check_stun(Character *ch, Character *victim)
             // critical success: shrug the stun entirely
             if (roll <= (int)chance / 2) {
                 affect_strip(ch, gsn_paralysis);
-                ch->pecho("{1{GТвой паралич проходит, и ты снова можешь двигаться!{2");
-                ch->recho("{1{GПаралич %1$C2 проходит, и %1$P1 снова начина%1$nет|ют двигаться!{2", ch);
+                ch->pecho(_("{1{GТвой паралич проходит, и ты снова можешь двигаться!{2"));
+                ch->recho(_("{1{GПаралич %1$C2 проходит, и %1$P1 снова начина%1$nет|ют двигаться!{2"), ch);
                 REMOVE_BIT(ch->affected_by, AFF_STUN);
                 return false; // can attack
             }
             // success: replace stun with weak stun
             else if (roll <= (int)chance) {
                 affect_strip(ch, gsn_paralysis);
-                ch->pecho("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2", ch);
-                ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!{2", ch);
+                ch->pecho(_("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2"), ch);
+                ch->recho(_("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!{2"), ch);
                 REMOVE_BIT(ch->affected_by, AFF_STUN);
                 SET_BIT(ch->affected_by, AFF_WEAK_STUN);
             } else {
-                ch->pecho("{WТы парализова%1$Gно|н|на|ны и не можешь реагировать на атаки %2$C2.{x", ch, victim);
-                victim->pecho("{W%1$^C1 парализова%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на твои атаки.{x", ch);
-                ch->recho(victim, "{W%1$^C1 парализова%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на атаки.{x", ch);
+                ch->pecho(_("{WТы парализова%1$Gно|н|на|ны и не можешь реагировать на атаки %2$C2.{x"), ch, victim);
+                victim->pecho(_("{W%1$^C1 парализова%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на твои атаки.{x"), ch);
+                ch->recho(victim, _("{W%1$^C1 парализова%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на атаки.{x"), ch);
             }
             return true;
         }
         // other stuns -- not AP's paralysis
         else {
-            ch->pecho("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2", ch);
-            ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!{2", ch);
+            ch->pecho(_("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2"), ch);
+            ch->recho(_("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!{2"), ch);
             REMOVE_BIT(ch->affected_by, AFF_STUN);
             SET_BIT(ch->affected_by, AFF_WEAK_STUN);
             return true;
@@ -90,9 +91,9 @@ bool check_stun(Character *ch, Character *victim)
     }
 
     if (IS_AFFECTED(ch, AFF_WEAK_STUN)) {
-        ch->pecho("{WТы оглуше%1$Gно|н|на|ны и не можешь реагировать на атаки %2$C2.{x", ch, victim);
-        victim->pecho("{W%1$^C1 оглуше%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на твои атаки.{x", ch);
-        ch->recho(victim, "{W%1$^C1 оглуше%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на атаки.{x", ch);
+        ch->pecho(_("{WТы оглуше%1$Gно|н|на|ны и не можешь реагировать на атаки %2$C2.{x"), ch, victim);
+        victim->pecho(_("{W%1$^C1 оглуше%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на твои атаки.{x"), ch);
+        ch->recho(victim, _("{W%1$^C1 оглуше%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на атаки.{x"), ch);
 
         REMOVE_BIT(ch->affected_by, AFF_WEAK_STUN);
 
@@ -126,7 +127,7 @@ void check_assist(Character *ch, Character *victim)
             && IS_CHARMED(ch)
             && ch->master == rch)
         {
-            oldact("Ты вступаешь в битву на стороне $C2.", rch, 0, ch, TO_CHAR);            
+            oldact(_("Ты вступаешь в битву на стороне $C2."), rch, 0, ch, TO_CHAR);            
             one_hit( rch, victim );
             continue;
         }
@@ -135,7 +136,7 @@ void check_assist(Character *ch, Character *victim)
         if (IS_SET(rch->act, PLR_AUTOASSIST)
             && is_same_group( ch, rch ))
         {
-            oldact("Ты вступаешь в битву на стороне $C2.", rch, 0, ch, TO_CHAR);
+            oldact(_("Ты вступаешь в битву на стороне $C2."), rch, 0, ch, TO_CHAR);
             one_hit( rch, victim );
             continue;
         }
@@ -182,7 +183,7 @@ void check_bloodthirst( Character *ch )
 
         if (ch != vch && ch->can_see(vch) && !is_safe_nomessage(ch, vch))
         {
-            ch->pecho( "{RБОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ!!!{x" );
+            ch->pecho( _("{RБОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ!!!{x") );
             REMOVE_BIT(ch->affected_by, AFF_CHARM);
             affect_bit_strip(ch, &affect_flags, AFF_CHARM);
 

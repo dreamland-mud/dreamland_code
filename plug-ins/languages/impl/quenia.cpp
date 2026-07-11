@@ -13,6 +13,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 const DLString QueniaLanguage::LANG_NAME = "quenia";
 
@@ -265,7 +266,7 @@ void QueniaLanguage::correct( DLString &d ) const
 
 void QueniaLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->pecho( "Сквозь зыбкую пелену сна тебе является слово {c%s{x.",
+    ch->pecho( _("Сквозь зыбкую пелену сна тебе является слово {c%s{x."),
                 word.toStr( ) ); 
 }
 

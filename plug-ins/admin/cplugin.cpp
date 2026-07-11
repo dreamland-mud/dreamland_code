@@ -20,6 +20,7 @@
 #include "descriptor.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 class PluginMessageTask : public SchedulerTask {
 public:
@@ -31,7 +32,7 @@ public:
 
         for (d = descriptor_list; d; d = d->next) 
             if (d->connected == CON_PLAYING && d->character) 
-                d->character->pecho("Мир неуловимо изменился...");
+                d->character->pecho(_("Мир неуловимо изменился..."));
     }
 
     virtual int getPriority( ) const
@@ -83,10 +84,10 @@ COMMAND(CPlugin, "plugin")
 void CPlugin::usage( Character *ch )
 {
     ch->pecho( 
-        "Использование: \r\n"
+        _("Использование: \r\n"
         "plugin list - список всех загруженных модулей.\r\n"
         "plugin reload [all|changed|<name>] \r\n"
-        "            - перегрузка модулей (всех, измененных или по имени)" );
+        "            - перегрузка модулей (всех, измененных или по имени)") );
 }
 
 void CPlugin::doList( Character *ch )

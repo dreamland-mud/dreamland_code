@@ -15,6 +15,7 @@
 #include "act.h"
 
 #include "def.h"
+#include "l10n.h"
 
 void ObjectBehaviorManager::assign( Object *obj ) {
     if (!obj->pIndexData->behavior) 
@@ -188,7 +189,7 @@ bool BasicObjectBehavior::save()
     if (obj->hasOwner( ch )) 
         return false;
     
-    oldact("$o1 исчезает!", ch, obj, 0, TO_CHAR);
+    oldact(_("$o1 исчезает!"), ch, obj, 0, TO_CHAR);
     extract_obj(obj);
     return true;    
 }
@@ -230,8 +231,8 @@ bool BasicObjectBehavior::checkOwnership(Character *ch)
         return true;
     
     if (!obj->hasOwner( ch )) {
-        ch->pecho( "Ты не можешь владеть %1$O5 и бросаешь %1$P2.", obj );
-        ch->recho("%2$^C1 не может владеть %1$O5 и бросает %1$P2.", obj, ch);
+        ch->pecho( _("Ты не можешь владеть %1$O5 и бросаешь %1$P2."), obj );
+        ch->recho(_("%2$^C1 не может владеть %1$O5 и бросает %1$P2."), obj, ch);
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
         return false;

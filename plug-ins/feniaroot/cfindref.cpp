@@ -20,6 +20,7 @@
 #include "def.h"
 
 #include <set>
+#include "l10n.h"
 
 using Scripting::CodeSource;
 
@@ -73,12 +74,12 @@ CMDADM(findrefs)
         return;
     
     if (!has_fenia_security( pch )) {
-        ch->pecho("Ты не ботаешь по фене.");
+        ch->pecho(_("Ты не ботаешь по фене."));
         return;
     }
 
     if (constArguments.empty( )) {
-        ch->pecho("Синтаксис: {Wfindrefs {x<cs id> - список ссылок на этот сценарий");
+        ch->pecho(_("Синтаксис: {Wfindrefs {x<cs id> - список ссылок на этот сценарий"));
         return;
     }
 
@@ -125,12 +126,12 @@ CMDADM(findrefs)
             DLString argCodesource = args.getOneArgument();
             it = CodeSource::manager->find( argCodesource.toInt( ) );
         } catch( ... ) {
-            ch->pecho("Укажи номер сценария.");
+            ch->pecho(_("Укажи номер сценария."));
             return;
         }
 
         if(it == CodeSource::manager->end( ) ) {
-            ch->pecho("Сценарий с таким номером не найден.");
+            ch->pecho(_("Сценарий с таким номером не найден."));
             return;
         }
 

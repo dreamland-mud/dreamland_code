@@ -8,6 +8,7 @@
 #include "descriptor.h"
 #include "messengers.h"
 #include "act.h"
+#include "l10n.h"
 
 using namespace Scripting;
 
@@ -84,7 +85,7 @@ void FeniaCroaker::discord(const DLString &header, const DLString &exception)
 void FeniaCroaker::wiznet(const DLString &exceptionMessage)
 {
     DLString crystalOrbMessage = 
-        fmt(0, "{CТихий голос из хрустального шара фенера: {W%s{x", exceptionMessage.c_str());
+        fmt(0, _("{CТихий голос из хрустального шара фенера: {W%s{x"), exceptionMessage.c_str());
 
     for (Descriptor *d = descriptor_list; d; d = d->next) {
         if (d->connected == CON_PLAYING

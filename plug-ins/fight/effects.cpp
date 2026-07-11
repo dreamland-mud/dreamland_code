@@ -69,6 +69,7 @@
 #include "material.h"
 #include "magic.h"
 #include "def.h"
+#include "l10n.h"
 
 using std::max;
 
@@ -243,9 +244,9 @@ void cold_effect(void *vo, Character *source, short level, int dam, int target, 
         {
             Affect af;
 
-            oldact_p("Волна холода пронизывает $c4.",
+            oldact_p(_("Волна холода пронизывает $c4."),
                    victim,0,0,TO_ROOM,POS_RESTING);
-            oldact_p("Холод окутывает тебя и проникает до самых костей.",
+            oldact_p(_("Холод окутывает тебя и проникает до самых костей."),
                    victim,0,0,TO_CHAR,POS_RESTING);
             af.type      = gsn_chill_touch;
             af.level     = level;
@@ -356,9 +357,9 @@ void fire_effect(void *vo, Character *source, short level, int dam, int target, 
             && !saves_spell(effect_level, victim, DAM_FIRE, 0, dam_flag))
         {
             Affect af;
-            oldact_p("$c1 ничего не видит из-за дыма, попавшего в глаза!",
+            oldact_p(_("$c1 ничего не видит из-за дыма, попавшего в глаза!"),
                    victim,0,0,TO_ROOM,POS_RESTING);
-            oldact_p("Твои глаза слезятся от попавшего в них дыма... и ты ничего не видишь!",
+            oldact_p(_("Твои глаза слезятся от попавшего в них дыма... и ты ничего не видишь!"),
                    victim,0,0,TO_CHAR,POS_RESTING);
         
             af.bitvector.setTable(&affect_flags);
@@ -505,8 +506,8 @@ void poison_effect(void *vo, Character *source, short level, int dam, int target
         {
             Affect af;
 
-            victim->pecho("{gТебя начинает тошнить, когда яд проникает в твое тело.{x");
-            victim->recho("%1$^C4 начинает тошнить, когда яд проникает в %1$P2 тело.", victim);
+            victim->pecho(_("{gТебя начинает тошнить, когда яд проникает в твое тело.{x"));
+            victim->recho(_("%1$^C4 начинает тошнить, когда яд проникает в %1$P2 тело."), victim);
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
@@ -608,7 +609,7 @@ void shock_effect(void *vo, Character *source, short level, int dam, int target,
         /* daze and confused? */
         if (!saves_spell(effect_level, victim, DAM_LIGHTNING, 0, dam_flag))
         {
-            victim->pecho("Твое тело парализовано.");
+            victim->pecho(_("Твое тело парализовано."));
             victim->setDaze( URANGE(8, dam_ratio, 20) );
         }
 
@@ -702,8 +703,8 @@ void sand_effect(void *vo, Character *source, short level, int dam, int target, 
         if (!IS_AFFECTED(victim,AFF_BLIND) && !saves_spell(effect_level, victim, DAM_SLASH, 0, dam_flag))
         {
             Affect af;
-            victim->recho("%^C1 ничего не видит из-за песка, попавшего в глаза!", victim);
-            victim->pecho("Твои глаза слезятся от попавшего в них песка... ты ничего не видишь!");
+            victim->recho(_("%^C1 ничего не видит из-за песка, попавшего в глаза!"), victim);
+            victim->pecho(_("Твои глаза слезятся от попавшего в них песка... ты ничего не видишь!"));
         
             af.bitvector.setTable(&affect_flags);
             af.type         = gsn_sand_storm;
@@ -843,8 +844,8 @@ void scream_effect(void *vo, Character *source, short level, int dam, int target
         if (!saves_spell(effect_level, victim, DAM_SOUND, 0, dam_flag))
         {
             Affect af;
-            victim->pecho("{MТы ничего не слышишь!{x");
-            victim->recho("%^C1 теперь ничего не слышит.", victim);  
+            victim->pecho(_("{MТы ничего не слышишь!{x"));
+            victim->recho(_("%^C1 теперь ничего не слышит."), victim);  
         
             af.bitvector.setTable(&affect_flags);
             af.type         = gsn_scream;
@@ -858,14 +859,14 @@ void scream_effect(void *vo, Character *source, short level, int dam, int target
                         
             /* daze and confused? */
             if (number_percent() < 50) {
-                victim->pecho("{WТы ошеломленно трясешь головой!{x");
-                victim->recho("%^C1 ошеломленно трясет головой.", victim);                
+                victim->pecho(_("{WТы ошеломленно трясешь головой!{x"));
+                victim->recho(_("%^C1 ошеломленно трясет головой."), victim);                
                 victim->setDaze( URANGE(8, dam_ratio, 20) );
             }
 
             if (victim->fighting) { 
-                victim->pecho("Дикий вопль заставляет тебя отвлечься от сражения!");
-                victim->recho("Дикий вопль заставляет %C4 отвлечься от сражения!", victim);                     
+                victim->pecho(_("Дикий вопль заставляет тебя отвлечься от сражения!"));
+                victim->recho(_("Дикий вопль заставляет %C4 отвлечься от сражения!"), victim);                     
                 stop_fighting( victim , true );
             }         
         }

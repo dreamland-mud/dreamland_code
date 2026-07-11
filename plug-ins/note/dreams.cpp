@@ -12,6 +12,7 @@
 
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 /*-----------------------------------------------------------------------
  * DreamThread
@@ -34,7 +35,7 @@ DreamThread::~DreamThread( )
 void DreamThread::getUnreadMessage( int count, ostringstream &buf ) const
 {
     // Example: Смертным приснили {W10{x новых снов ('{yсон{x').
-    buf << fmt( 0, "Смертным приснили {W%1$d{x нов%1$Iый|ых|ых с%1$Iон|на|нов ('{yсон{x').", count ) << endl;
+    buf << fmt( 0, _("Смертным приснили {W%1$d{x нов%1$Iый|ых|ых с%1$Iон|на|нов ('{yсон{x')."), count ) << endl;
 }
 
 bool DreamThread::canWrite( const PCharacter *ch ) const

@@ -28,6 +28,7 @@
 #include "descriptor.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 InvasionGQuest* InvasionGQuest::thisClass = NULL;
 
@@ -158,7 +159,7 @@ void InvasionGQuest::cleanup( bool performance )
             if (mob->behavior) {
                 if (mob->behavior.getDynamicPointer<InvasionMob>( )) {
                     if (performance) 
-                        oldact("$c1 лопается.", ch, 0, 0, TO_ROOM);
+                        oldact(_("$c1 лопается."), ch, 0, 0, TO_ROOM);
                     
                     extract_char( mob );
                 }
@@ -174,7 +175,7 @@ void InvasionGQuest::cleanup( bool performance )
         if (obj->behavior) {
             if (obj->behavior.getDynamicPointer<InvasionObj>( )) {
                 if (performance && obj->in_room)
-                    oldact("$o1 исчезает.", obj->in_room->people, obj, 0, TO_ROOM);
+                    oldact(_("$o1 исчезает."), obj->in_room->people, obj, 0, TO_ROOM);
 
                 extract_obj( obj );
             }

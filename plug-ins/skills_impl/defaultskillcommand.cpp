@@ -17,6 +17,7 @@
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 CommandTarget::CommandTarget() 
                 : vict(0), obj(0), door(-1)
@@ -192,8 +193,8 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     // Do skill availability check early. TODO: custom message overrides.
     if (!skill->usable(ch)) {
         if (IS_CHARMED(ch))
-            ch->master->pecho("%^C1 не владеет навыком {y{hh%s{x.", ch, skill->getNameFor(ch->master).c_str());
-        ch->pecho("Ты не владеешь навыком {y{hh%s{x.", skill->getNameFor(ch).c_str());
+            ch->master->pecho(_("%^C1 не владеет навыком {y{hh%s{x."), ch, skill->getNameFor(ch->master).c_str());
+        ch->pecho(_("Ты не владеешь навыком {y{hh%s{x."), skill->getNameFor(ch).c_str());
         return;
     }
 
@@ -209,7 +210,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
         if (ch->is_npc() && IS_CHARMED(ch)) 
             say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
         else 
-            ch->pecho("У тебя не хватает энергии.");
+            ch->pecho(_("У тебя не хватает энергии."));
 
         return;
     }
@@ -219,7 +220,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
         if (ch->is_npc() && IS_CHARMED(ch))
             say_fmt("Хозя%2$Gин|ин|йка, я слишком устал%1$Gо||а!", ch, ch->master);
         else
-            ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
+            ch->pecho(_("Ты слишком уста%Gло|л|ла для этого."), ch);
 
         return;
     }

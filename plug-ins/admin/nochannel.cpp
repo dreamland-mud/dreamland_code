@@ -24,6 +24,7 @@
 #include "dreamland.h"
 #include "wiznet.h"
 #include "def.h"
+#include "l10n.h"
 
 /*-------------------------------------------------------------------------
  * 'nochannel' command
@@ -39,14 +40,14 @@ CMDADM( nochannel )
         DLString name = arguments.getOneArgument( );
 
         if( name.empty( ) ) {
-            ch->pecho("Nochannel кому?");
+            ch->pecho(_("Nochannel кому?"));
             return;
         }
 
         pci = PCharacterManager::find( name );
         
         if (!pci) {
-            ch->pecho("Жертва не найдена. Укажите имя правильно и полностью.");
+            ch->pecho(_("Жертва не найдена. Укажите имя правильно и полностью."));
             return;
         }
 
@@ -64,13 +65,13 @@ CMDADM( nochannel )
                 attributes->eraseAttribute( "nochannel" );
                 PCharacterManager::saveMemory( pci );
 
-                ch->pecho("NOCHANNEL снят.");
+                ch->pecho(_("NOCHANNEL снят."));
                 wiznet( WIZ_PENALTIES, WIZ_SECURE, 0 , 
                         "%^C1 восстанавливает возможность общаться для %s.",
                         ch, pci->getName( ).c_str( ) );
             }
             else {
-                ch->pecho("Не получилось.");
+                ch->pecho(_("Не получилось."));
             }
         }
         else if( arguments.empty( ) )
@@ -93,7 +94,7 @@ CMDADM( nochannel )
             attr->start( pci );
             PCharacterManager::saveMemory(pci);
 
-            ch->pecho("NOCHANNEL установлен.");
+            ch->pecho(_("NOCHANNEL установлен."));
             
             wiznet( WIZ_PENALTIES, WIZ_SECURE, 0 , 
                     "%^C1 отбирает у %s возможность общаться.",
@@ -133,6 +134,6 @@ void XMLAttributeNoChannel::end( PCMemoryInterface *pcm ) const
     PCharacter *pch;
 
     if ((pch = dynamic_cast<PCharacter *>( pcm ))) 
-        pch->pecho("Боги вернули тебе возможность общаться.");
+        pch->pecho(_("Боги вернули тебе возможность общаться."));
 }
 

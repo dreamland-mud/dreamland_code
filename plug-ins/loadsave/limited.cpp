@@ -20,6 +20,7 @@
 
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(flowers);
 
@@ -132,7 +133,7 @@ void limit_ground_decay(Object *obj)
 
     // Speed up decay on the ground: every minute removes 1 day from timer.
     if (obj->in_room) {
-        obj->in_room->echo(POS_RESTING, "Лежа на земле, %1$O1 неумолимо истонча%1$nется|ются.", obj);
+        obj->in_room->echo(POS_RESTING, _("Лежа на земле, %1$O1 неумолимо истонча%1$nется|ются."), obj);
         obj->timestamp -= Date::SECOND_IN_DAY;
     }
 
@@ -144,9 +145,9 @@ void limit_ground_decay(Object *obj)
     // Speed up decay in safe rooms or for NPCs
     else if (ch->is_npc() || IS_SET(ch->in_room->room_flags, ROOM_SAFE)) {
         obj->timestamp -= Date::SECOND_IN_DAY;
-        ch->pecho("%^O1 в твоих руках неумолимо истонча%1$nется|ются.", obj);
-        ch->pecho("Лимитные вещи созданы для войны, и в {hh86безопасной комнате{x им находиться нельзя.");
-        ch->recho("%^O1 в руках %C2 неумолимо истонча%1$nется|ются.", obj, ch);
+        ch->pecho(_("%^O1 в твоих руках неумолимо истонча%1$nется|ются."), obj);
+        ch->pecho(_("Лимитные вещи созданы для войны, и в {hh86безопасной комнате{x им находиться нельзя."));
+        ch->recho(_("%^O1 в руках %C2 неумолимо истонча%1$nется|ются."), obj, ch);
     }
 
     // Speed up decay for flowers: they can hold limited item for several hours only.
@@ -182,7 +183,7 @@ bool limit_purge( Object *obj )
         return false;
 
     if (obj->getRoom( ))
-        obj->getRoom( )->echo( POS_RESTING, "%1$^O1 рассыпа%1$nется|ются трухой!", obj );
+        obj->getRoom( )->echo( POS_RESTING, _("%1$^O1 рассыпа%1$nется|ются трухой!"), obj );
 
     DLString where;
     if (obj->carried_by)

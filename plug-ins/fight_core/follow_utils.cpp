@@ -24,6 +24,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 GSN(charm_person);
 
@@ -57,9 +58,9 @@ void follower_add( Character *ch, Character *mch )
     ch->leader        = NULL;
 
     if (ch->master->can_see( ch ) || (ch->master->getPC() && ch->master->getPC()->pet && ch->master->getPC()->pet == ch))
-       mch->pecho("%1$^C1 теперь следу%1$nет|ют за тобой.", ch);
+       mch->pecho(_("%1$^C1 теперь следу%1$nет|ют за тобой."), ch);
     
-    ch->pecho("Ты теперь следуешь за %1$C5.", mch);
+    ch->pecho(_("Ты теперь следуешь за %1$C5."), mch);
 }
 
 static void afprog_stopfol( Character *ch )
@@ -114,10 +115,10 @@ void follower_clear( Character * ch, bool verbose )
         return;
    
     if (verbose && master->can_see( ch ))
-        master->pecho("%1$^C1 больше не следу%1$nет|ют за тобой.", ch);
+        master->pecho(_("%1$^C1 больше не следу%1$nет|ют за тобой."), ch);
 
     if (verbose)
-        ch->pecho("Ты больше не следуешь за %1$C5.", master);
+        ch->pecho(_("Ты больше не следуешь за %1$C5."), master);
 
     afprog_stopfol( ch );
 
@@ -182,9 +183,9 @@ bool is_same_group( Character *ach, Character *bch )
  */
 void guarding_stop( PCharacter *guard, PCharacter *victim )
 {
-    oldact("Ты прекращаешь охранять $C4.", guard, 0, victim, TO_CHAR);
-    oldact("$c1 прекращает охранять тебя.", guard, 0, victim, TO_VICT);
-    oldact("$c1 прекращает охранять $C4.", guard, 0, victim, TO_NOTVICT);
+    oldact(_("Ты прекращаешь охранять $C4."), guard, 0, victim, TO_CHAR);
+    oldact(_("$c1 прекращает охранять тебя."), guard, 0, victim, TO_VICT);
+    oldact(_("$c1 прекращает охранять $C4."), guard, 0, victim, TO_NOTVICT);
     guard->guarding  = 0;
     victim->guarded_by = 0;
 }

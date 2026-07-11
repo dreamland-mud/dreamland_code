@@ -36,6 +36,7 @@
 #include "fight.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 
 PROF(samurai);
@@ -50,13 +51,13 @@ CMDRUN( kill )
 
     if (arg.empty( ))
     {
-        ch->pecho("Убить кого?");
+        ch->pecho(_("Убить кого?"));
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-        ch->pecho("Таких здесь нет.");
+        ch->pecho(_("Таких здесь нет."));
         return;
     }
 
@@ -65,26 +66,26 @@ CMDRUN( kill )
 
     if ( ch->position == POS_FIGHTING )
     {
-        ch->pecho("Ты уже сражаешься -- сначала разберись с текущим противником.");
+        ch->pecho(_("Ты уже сражаешься -- сначала разберись с текущим противником."));
         return;
     }
 
     if ( !victim->is_npc() )
     {
-        ch->pecho("Чтобы напасть на игрока используй команду {y{hhпорешить{x.");
+        ch->pecho(_("Чтобы напасть на игрока используй команду {y{hhпорешить{x."));
         return;
     }
 
     if ( victim == ch )
     {
-        ch->pecho("{RТЫ ЖЕСТОКО ИЗБИВАЕШЬ САМ{SfУ{Sx СЕБЯ!{x");
+        ch->pecho(_("{RТЫ ЖЕСТОКО ИЗБИВАЕШЬ САМ{SfУ{Sx СЕБЯ!{x"));
         multi_hit( ch, ch );
         return;
     }
 
     if ( IS_CHARMED(ch) && ch->master == victim )
     {
-        oldact("Но $C1 -- тво$Gй|й|я любим$Gый|ый|ая хозя$Gин|ин|йка!", ch, 0, victim, TO_CHAR);
+        oldact(_("Но $C1 -- тво$Gй|й|я любим$Gый|ый|ая хозя$Gин|ин|йка!"), ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -106,19 +107,19 @@ CMDRUN( murder )
 
     if (arg.empty( ))
     {
-        ch->pecho("Порешить кого?");
+        ch->pecho(_("Порешить кого?"));
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-        ch->pecho("Таких здесь нет.");
+        ch->pecho(_("Таких здесь нет."));
         return;
     }
 
     if ( victim == ch )
     {
-        ch->pecho("{RТЫ ЖЕСТОКО ИЗБИВАЕШЬ САМ{SfУ{Sx СЕБЯ!{x");
+        ch->pecho(_("{RТЫ ЖЕСТОКО ИЗБИВАЕШЬ САМ{SfУ{Sx СЕБЯ!{x"));
         multi_hit( ch, ch );
         return;
     }
@@ -128,13 +129,13 @@ CMDRUN( murder )
 
     if ( IS_CHARMED(ch) && ch->master == victim )
     {
-        oldact("Но $C1 -- тво$Gй|й|я любим$Gый|ый|ая хозя$Gин|ин|йка.", ch, 0, victim, TO_CHAR);
+        oldact(_("Но $C1 -- тво$Gй|й|я любим$Gый|ый|ая хозя$Gин|ин|йка."), ch, 0, victim, TO_CHAR);
         return;
     }
 
     if ( ch->position == POS_FIGHTING )
     {
-        ch->pecho("Ты уже сражаешься -- сначала разберись с текущим противником.");
+        ch->pecho(_("Ты уже сражаешься -- сначала разберись с текущим противником."));
         return;
     }
 
@@ -161,19 +162,19 @@ CMDRUN( slay )
 
     if (arg.empty( ))
     {
-        ch->pecho("Умертвить кого?");
+        ch->pecho(_("Умертвить кого?"));
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-        ch->pecho("Таких здесь нет.");
+        ch->pecho(_("Таких здесь нет."));
         return;
     }
 
     if ( ch == victim )
     {
-        ch->pecho("Самоубийство -- это смертельный грех.");
+        ch->pecho(_("Самоубийство -- это смертельный грех."));
         return;
     }
 
@@ -185,13 +186,13 @@ CMDRUN( slay )
             && !victim->is_immortal( )
             && victim->get_trust( ) >= ch->getRealLevel( ) ) )
     {
-        ch->pecho("Твоя попытка безуспешна.");
+        ch->pecho(_("Твоя попытка безуспешна."));
         return;
     }
 
-    oldact("Ты хладнокровно умерщвляешь $C4!", ch, 0, victim, TO_CHAR);
-    oldact("$c1 хладнокровно умерщвляет тебя!", ch, 0, victim, TO_VICT);
-    oldact("$c1 хладнокровно умерщвляет $C4!", ch, 0, victim, TO_NOTVICT);
+    oldact(_("Ты хладнокровно умерщвляешь $C4!"), ch, 0, victim, TO_CHAR);
+    oldact(_("$c1 хладнокровно умерщвляет тебя!"), ch, 0, victim, TO_VICT);
+    oldact(_("$c1 хладнокровно умерщвляет $C4!"), ch, 0, victim, TO_NOTVICT);
     raw_kill( victim, 0, 0, "gods", DAM_OTHER );
     if( !ch->is_npc() && !victim->is_npc() && ch != victim )
     {
