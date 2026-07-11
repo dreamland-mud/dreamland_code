@@ -35,7 +35,14 @@ void Configurable::load()
 
         LogStream::sendNotice() << "Configurable " << getPath() << " loaded with " << value.size() << " entries." << endl;
 
-        configReg->add(Pointer(this));
+        // configReg can be NULL mid 'plug reload most': reloadNonCritical()
+        // unloads [system] (nulling configReg in the registry dtor) and may load
+        // a Configurable-bearing .so (e.g. quest_core's areaquest) before the
+        // registry is re-created. Dereferencing it here SIGSEGV'd the server.
+        // Guard mirrors the existing check in translations.cpp; boot order is
+        // always correct, so registration is missed only in that reload window.
+        if (configReg)
+            configReg->add(Pointer(this));
 
     } catch (const std::exception &ex) {
         LogStream::sendError() << getPath() << ex.what() << endl;
@@ -51,7 +58,9 @@ void Configurable::setText(const DLString &text)
 void Configurable::unload()
 {
     unloaded();
-    configReg->remove(Pointer(this));
+    // Same reload-window guard as in load(): the registry may already be gone.
+    if (configReg)
+        configReg->remove(Pointer(this));
 }
 
 void Configurable::save()
