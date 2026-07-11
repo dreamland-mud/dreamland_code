@@ -48,6 +48,7 @@
 #include "loadsave.h"
 #include "magic.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(knight);
 GSN(acid_arrow);
@@ -68,7 +69,7 @@ GSN(spellbane);
  *-------------------------------------------------------------------------*/
 void ClanItemKnight::actDisappear()
 {
-    oldact("$o1 исчезает в серой дымке.",
+    oldact(_("$o1 исчезает в серой дымке."),
         obj->getRoom()->people, obj, 0, TO_ALL);
 }
 
@@ -77,19 +78,19 @@ void ClanItemKnight::actDisappear()
  *-------------------------------------------------------------------------*/
 void ClanAltarKnight::actAppear()
 {
-    oldact("{WЛучи света пронизывают комнату и в центре материализуется $o1.{x",
+    oldact(_("{WЛучи света пронизывают комнату и в центре материализуется $o1.{x"),
         obj->in_room->people, obj, 0, TO_ALL);
 }
 
 void ClanAltarKnight::actDisappear()
 {
-    oldact("{WСвет $o2 исчезает и он растворяется в воздухе!{x",
+    oldact(_("{WСвет $o2 исчезает и он растворяется в воздухе!{x"),
         obj->getRoom()->people, obj, NULL, TO_ALL);
 }
 
 void ClanAltarKnight::actNotify(Character *ch)
 {
-    oldact_p("{WХрамовый алтарь вашего замка был осквернен безбожниками!{x",
+    oldact_p(_("{WХрамовый алтарь вашего замка был осквернен безбожниками!{x"),
           ch, 0, 0, TO_CHAR, POS_DEAD);
 }
 
@@ -102,8 +103,8 @@ void ClanGuardKnight::actGreet(PCharacter *wch)
 }
 void ClanGuardKnight::actPush(PCharacter *wch)
 {
-    oldact("$C1 кивает тебе, слегка хмурясь, взмахивает рукой.\n\r...и вот уже ты неторопливо несешься в воздухе.", wch, 0, ch, TO_CHAR);
-    oldact("$C1 кивает $c3, слегка нахмурившись, взмахивает рукой.\n\r... и $c1 с диким восторгом в глазах улетает.", wch, 0, ch, TO_ROOM);
+    oldact(_("$C1 кивает тебе, слегка хмурясь, взмахивает рукой.\n\r...и вот уже ты неторопливо несешься в воздухе."), wch, 0, ch, TO_CHAR);
+    oldact(_("$C1 кивает $c3, слегка нахмурившись, взмахивает рукой.\n\r... и $c1 с диким восторгом в глазах улетает."), wch, 0, ch, TO_ROOM);
 }
 
 void ClanGuardKnight::actInvited(PCharacter *wch, Object *obj)
@@ -123,8 +124,8 @@ void ClanGuardKnight::actGhost(PCharacter *)
 
 void ClanGuardKnight::actGiveInvitation(PCharacter *wch, Object *obj)
 {
-    oldact("$c1 внимательно сверяется со списком.", ch, 0, 0, TO_ROOM);
-    oldact("$c1 ставит Королевскую печать на $o6.", ch, obj, 0, TO_ROOM);
+    oldact(_("$c1 внимательно сверяется со списком."), ch, 0, 0, TO_ROOM);
+    oldact(_("$c1 ставит Королевскую печать на $o6."), ch, obj, 0, TO_ROOM);
 }
 
 int ClanGuardKnight::getCast(Character *victim)
@@ -177,19 +178,19 @@ SKILL_RUNP(guard)
 
     if (arg[0] == '\0')
     {
-        ch->pecho("Охранять кого?");
+        ch->pecho(_("Охранять кого?"));
         return;
     }
 
     if ((vict = get_char_room(ch, arg)) == 0)
     {
-        ch->pecho("Этого нет здесь.");
+        ch->pecho(_("Этого нет здесь."));
         return;
     }
 
     if (vict->is_npc())
     {
-        oldact("$C1 не нуждается в твоей помощи!", ch, 0, vict, TO_CHAR);
+        oldact(_("$C1 не нуждается в твоей помощи!"), ch, 0, vict, TO_CHAR);
         return;
     }
 
@@ -200,7 +201,7 @@ SKILL_RUNP(guard)
     {
         if (pch->guarding == 0)
         {
-            pch->pecho("Ты не можешь охранять себя же!");
+            pch->pecho(_("Ты не можешь охранять себя же!"));
             return;
         }
         else
@@ -212,51 +213,51 @@ SKILL_RUNP(guard)
 
     if (pch->guarding != 0)
     {
-        pch->pecho("Но ты охраняешь кого-то другого!");
+        pch->pecho(_("Но ты охраняешь кого-то другого!"));
         return;
     }
 
     if (victim->guarded_by != 0)
     {
-        oldact("$C4 уже кто-то охраняет.", pch, 0, victim, TO_CHAR);
+        oldact(_("$C4 уже кто-то охраняет."), pch, 0, victim, TO_CHAR);
         return;
     }
 
     if (!is_same_group(victim, pch))
     {
-        oldact("Но ты не состоишь в той же группе, что и $C1.", pch, 0, victim, TO_CHAR);
+        oldact(_("Но ты не состоишь в той же группе, что и $C1."), pch, 0, victim, TO_CHAR);
         return;
     }
 
     if (IS_CHARMED(pch))
     {
-        pch->pecho("Ты любишь сво%1$Gего|его|ю хозя%1$Gина|ина|йку так сильно, что не можешь охранять %2$C4!", pch->master, victim);
+        pch->pecho(_("Ты любишь сво%1$Gего|его|ю хозя%1$Gина|ина|йку так сильно, что не можешь охранять %2$C4!"), pch->master, victim);
         return;
     }
 
     if (victim->fighting != 0)
     {
-        pch->pecho("Почему бы тебе не позволить им сперва закончить сражение?");
+        pch->pecho(_("Почему бы тебе не позволить им сперва закончить сражение?"));
         return;
     }
 
     if (pch->fighting != 0)
     {
-        pch->pecho("Сперва закончи свое сражение, а потом беспокойся о защите кого-либо еще.");
+        pch->pecho(_("Сперва закончи свое сражение, а потом беспокойся о защите кого-либо еще."));
         return;
     }
 
     for (gch = victim->guarding, cnt = 2; gch; gch = gch->guarding, cnt++)
         if (gch == pch)
         {
-            pch->pecho("%d рыцар%s, поставленных стык-в-стык, представляют собой потрясающее зрелище!",
+            pch->pecho(_("%d рыцар%s, поставленных стык-в-стык, представляют собой потрясающее зрелище!"),
                         cnt, GET_COUNT(cnt, "ь", "я", "ей"));
             return;
         }
 
-    oldact("Теперь ты охраняешь $C4.", pch, 0, victim, TO_CHAR);
-    oldact("Теперь тебя охраняет $c4.", pch, 0, victim, TO_VICT);
-    oldact("$c1 теперь охраняет $C4.", pch, 0, victim, TO_NOTVICT);
+    oldact(_("Теперь ты охраняешь $C4."), pch, 0, victim, TO_CHAR);
+    oldact(_("Теперь тебя охраняет $c4."), pch, 0, victim, TO_VICT);
+    oldact(_("$c1 теперь охраняет $C4."), pch, 0, victim, TO_NOTVICT);
 
     pch->guarding = victim;
     victim->guarded_by = pch;
@@ -278,9 +279,9 @@ SKILL_APPLY(guard)
 
     if (number_percent() < min(100, chance))
     {
-        oldact("$c1 прыгает перед $C5!", pch->guarded_by, 0, ch, TO_NOTVICT);
-        oldact("$c1 прыгает перед тобой!", pch->guarded_by, 0, ch, TO_VICT);
-        oldact("Ты прыгаешь перед $C5!", pch->guarded_by, 0, ch, TO_CHAR);
+        oldact(_("$c1 прыгает перед $C5!"), pch->guarded_by, 0, ch, TO_NOTVICT);
+        oldact(_("$c1 прыгает перед тобой!"), pch->guarded_by, 0, ch, TO_VICT);
+        oldact(_("Ты прыгаешь перед $C5!"), pch->guarded_by, 0, ch, TO_CHAR);
         gsn_guard->improve(pch->guarded_by, true, victim);
         return true;
     }
@@ -309,9 +310,9 @@ VOID_SPELL(GoldenAura)::run(Character *ch, Room *room, int sn, int level)
         if (vch->isAffected(sn))
         {
             if (vch == ch)
-                oldact("Ты уже окруже$gно|н|на {YЗолотой аурой{x.", ch, 0, 0, TO_CHAR);
+                oldact(_("Ты уже окруже$gно|н|на {YЗолотой аурой{x."), ch, 0, 0, TO_CHAR);
             else
-                oldact("$C1 уже окруже$Gно|н|на {YЗолотой аурой{x.", ch, 0, vch, TO_CHAR);
+                oldact(_("$C1 уже окруже$Gно|н|на {YЗолотой аурой{x."), ch, 0, vch, TO_CHAR);
             continue;
         }
 
@@ -331,9 +332,9 @@ VOID_SPELL(GoldenAura)::run(Character *ch, Room *room, int sn, int level)
         af.location = APPLY_SAVING_SPELL;
         affect_to_char(vch, &af);
 
-        vch->pecho("{YЗолотая аура{x окружает тебя.");
+        vch->pecho(_("{YЗолотая аура{x окружает тебя."));
         if (ch != vch)
-            oldact("{YЗолотая аура{x окружает $C4.", ch, 0, vch, TO_CHAR);
+            oldact(_("{YЗолотая аура{x окружает $C4."), ch, 0, vch, TO_CHAR);
     }
 }
 
@@ -355,13 +356,13 @@ COMMAND(COrden, "orden")
 
     if (pch->getClan() != clan_knight)
     {
-        pch->pecho("Ты не принадлежишь к клану Рыцарей.");
+        pch->pecho(_("Ты не принадлежишь к клану Рыцарей."));
         return;
     }
 
     if (!(orgs = clan_knight->getOrgs()))
     {
-        pch->pecho("Ордена сейчас недоступны.");
+        pch->pecho(_("Ордена сейчас недоступны."));
         return;
     }
 

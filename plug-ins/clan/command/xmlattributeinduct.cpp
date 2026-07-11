@@ -12,6 +12,7 @@
 #include "act.h"
 #include "descriptor.h"
 #include "xmlattributeinduct.h"
+#include "l10n.h"
 
 const DLString XMLAttributeInduct::TYPE = "XMLAttributeInduct";
 
@@ -62,7 +63,7 @@ XMLAttributeInductListenerPlugin::run( int oldState, int newState, Descriptor *d
                 cnt++;
         
         if (cnt > 0)
-            ch->pecho( "%1$d петиц%1$Iия|ии|ии ожида%1$Iет|ют|ют твоего рассмотрения.\n", cnt );
+            ch->pecho( _("%1$d петиц%1$Iия|ии|ии ожида%1$Iет|ют|ют твоего рассмотрения.\n"), cnt );
     }
 }
 

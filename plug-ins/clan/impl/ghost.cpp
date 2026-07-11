@@ -25,6 +25,7 @@
 #include "magic.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(acid_arrow);
 GSN(acid_blast);
@@ -46,8 +47,8 @@ void ClanGuardGhost::actGreet( PCharacter *wch )
 }
 void ClanGuardGhost::actPush( PCharacter *wch )
 {
-    oldact("$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
-    oldact("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает.", wch, 0, ch, TO_ROOM );
+    oldact(_("$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон."), wch, 0, ch, TO_CHAR );
+    oldact(_("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает."), wch, 0, ch, TO_ROOM );
 }
 int ClanGuardGhost::getCast( Character *victim )
 {

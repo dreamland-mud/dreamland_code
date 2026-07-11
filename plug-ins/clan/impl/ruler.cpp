@@ -50,6 +50,7 @@
 
 #include "ruler.h"
 #include "cclantalk.h"
+#include "l10n.h"
 
 
 CLAN(chaos);
@@ -93,8 +94,8 @@ void ClanGuardRulerPre::actInvited( PCharacter *wch, Object *obj )
 
 void ClanGuardRulerPre::actPush( PCharacter *wch )
 {
-    oldact("$C1 взмахивает перед тобой кандалами... слегка задевает...\n\r... и ты летишь...", wch, 0, ch, TO_CHAR );
-    oldact("$C1 задевает кандалами $c4 и $c1 с воплем улетает...", wch, 0, ch, TO_ROOM );
+    oldact(_("$C1 взмахивает перед тобой кандалами... слегка задевает...\n\r... и ты летишь..."), wch, 0, ch, TO_CHAR );
+    oldact(_("$C1 задевает кандалами $c4 и $c1 с воплем улетает..."), wch, 0, ch, TO_ROOM );
 }
 
 void ClanGuardRulerPre::greet( Character *wch )
@@ -181,8 +182,8 @@ int ClanGuardRuler::getCast( Character *victim )
  *------------------------------------------------------------------------*/
 void ClanGuardRulerJailer::actPush( PCharacter *wch )
 {
-    oldact("$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
-    oldact("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает.", wch, 0, ch, TO_ROOM );
+    oldact(_("$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон."), wch, 0, ch, TO_CHAR );
+    oldact(_("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает."), wch, 0, ch, TO_ROOM );
 }
 
 void ClanGuardRulerJailer::actIntruder( PCharacter *wch )
@@ -261,14 +262,14 @@ bool ClanGuardRulerJailer::specFight( )
             if ( ( ch->getModifyLevel() + 8 > victim->getModifyLevel() )
                     && !is_safe_nomessage ( ch, victim ) )
             {
-                    DLString msg = fmt(0, "%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
+                    DLString msg = fmt(0, _("%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"),
                             victim->getNameC(), crime );
                     do_yell( ch, msg.c_str() );
                     multi_hit( ch, victim , "murder" );
             }
             else
             {
-                     DLString msg = fmt(0, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
+                     DLString msg = fmt(0, _("$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'"),
                             victim->getNameC());
                     oldact( msg.c_str(), ch, 0, 0, TO_ROOM);
             }
@@ -277,7 +278,7 @@ bool ClanGuardRulerJailer::specFight( )
 
     if ( ech != 0 )
     {
-            oldact_p("$c1 кричит ' ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
+            oldact_p(_("$c1 кричит ' ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"),
                     ch, 0, 0, TO_ROOM,POS_RESTING );
             multi_hit( ch, ech , "murder" );
             return true;
@@ -306,7 +307,7 @@ SKILL_RUNP( judge )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->pecho("У тебя отобрали привилегии Правителя!");
+                ch->pecho(_("У тебя отобрали привилегии Правителя!"));
                 return;
         }
 
@@ -314,26 +315,26 @@ SKILL_RUNP( judge )
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho("Кого будем осуждать?");
+                ch->pecho(_("Кого будем осуждать?"));
                 return;
         }
 
         /* judge thru world */
         if ( ( victim = get_char_world( ch, arg ) ) == 0 )
         {
-                ch->pecho("Нет этого тут.");
+                ch->pecho(_("Нет этого тут."));
                 return;
         }
 
         if (victim->is_npc())
         {
-                ch->pecho("Тебе незачем судить это подневольное создание.");
+                ch->pecho(_("Тебе незачем судить это подневольное создание."));
                 return;
         }
 
         if (victim->is_immortal() && !ch->is_immortal())
         {
-                ch->pecho("Ты не в силах применить обычные законы к Бессмертным.");
+                ch->pecho(_("Ты не в силах применить обычные законы к Бессмертным."));
                 return;
         }
 
@@ -341,8 +342,8 @@ SKILL_RUNP( judge )
         argument =  one_argument( argument, arg );
         if ( arg[0] == '\0' )
         {
-                ch->pecho("У %1$#C2 %2$s этос и %3$s натура.\n\r"
-                          "%1$#^P2 заслуги перед законом: %4$d.",
+                ch->pecho(_("У %1$#C2 %2$s этос и %3$s натура.\n\r"
+                          "%1$#^P2 заслуги перед законом: %4$d."),
                           victim, 
                           ethos_table.message( victim->ethos, '1' ).c_str( ),
                           align_name( victim ).ruscase( '1' ).c_str( ),
@@ -354,7 +355,7 @@ SKILL_RUNP( judge )
         {
                 if ( victim->getClan() == clan_chaos )
                 {
-                        ch->pecho("{xНет, с {MХаосом {xтебе придется бороться другими средствами!");
+                        ch->pecho(_("{xНет, с {MХаосом {xтебе придется бороться другими средствами!"));
                         return;
                 }
 
@@ -362,7 +363,7 @@ SKILL_RUNP( judge )
                         value = atoi( arg );
                 else
                 {
-                        ch->pecho("Неправильное число.");
+                        ch->pecho(_("Неправильное число."));
                         return;
                 }
 
@@ -374,7 +375,7 @@ SKILL_RUNP( judge )
 
                 victim->getPC( )->setLoyalty(value);
 
-                ch->pecho("Установлено в %d.",value);
+                ch->pecho(_("Установлено в %d."),value);
 
                 return;
         }
@@ -392,7 +393,7 @@ SKILL_RUNP( manacles )
    
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->pecho("У тебя отобрали привилегии Правителя!");
+                ch->pecho(_("У тебя отобрали привилегии Правителя!"));
                 return;
         }
 
@@ -400,38 +401,38 @@ SKILL_RUNP( manacles )
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho("И кого мы хотим заковать в кандалы?");
+                ch->pecho(_("И кого мы хотим заковать в кандалы?"));
                 return;
         }
 
         /* manacles works only in current room */
         if ( ( victim = get_char_room( ch, arg ) ) == 0 )
         {
-                ch->pecho("Нет этого тут.");
+                ch->pecho(_("Нет этого тут."));
                 return;
         }
 
         if ( victim == ch )
         {
-                ch->pecho("Идея неплоха, но не стоит этого делать.");
+                ch->pecho(_("Идея неплоха, но не стоит этого делать."));
                 return;
         }
 
         if (victim->is_npc())
         {
-                ch->pecho("Кандалы -- только для игроков.");
+                ch->pecho(_("Кандалы -- только для игроков."));
                 return;
         }
 
         if (victim->is_immortal() && !ch->is_immortal())
         {
-                ch->pecho("Ты не можешь заковывать в кандалы Бессмертных.");
+                ch->pecho(_("Ты не можешь заковывать в кандалы Бессмертных."));
                 return;
         }
 
         if ( victim->getClan() == clan_chaos )
         {
-                ch->pecho("{xНет, с {MХаосом {xтебе придется бороться другими средствами!");
+                ch->pecho(_("{xНет, с {MХаосом {xтебе придется бороться другими средствами!"));
                 return;
         }
 
@@ -441,9 +442,9 @@ SKILL_RUNP( manacles )
         if ( arg[0] == '\0' || arg_is_strict(arg, "check"))
         {
 
-                oldact_p("$c1 бросает быстрый взгляд на твои руки.",
+                oldact_p(_("$c1 бросает быстрый взгляд на твои руки."),
                                         ch,0,victim,TO_VICT,POS_RESTING);
-                oldact_p("$c1 бросает быстрый взгляд на руки $C4.",
+                oldact_p(_("$c1 бросает быстрый взгляд на руки $C4."),
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
                 Affect *paf = victim->affected.find(gsn_manacles);
@@ -454,7 +455,7 @@ SKILL_RUNP( manacles )
 
                         if ( paf->duration >= 0 )
                         {
-                                msg = fmt(0, "$C1 закован менее чем на %d час%s."
+                                msg = fmt(0, _("$C1 закован менее чем на %d час%s.")
                                         ,paf->duration.getValue() + 1
                                         ,GET_COUNT(paf->duration+1, "","а","ов"));
                         }
@@ -463,14 +464,14 @@ SKILL_RUNP( manacles )
                                 msg = "$C1 закован навсегда.";
                         }
 
-                        oldact_p("Руки $C4 закованы в кандалы!",
+                        oldact_p(_("Руки $C4 закованы в кандалы!"),
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
 
                         oldact(msg.c_str(), ch, 0, victim, TO_CHAR);
                 }
                 else
                 {
-                        oldact_p("$C1 свободен от оков.",
+                        oldact_p(_("$C1 свободен от оков."),
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
                 }
         
@@ -481,20 +482,20 @@ SKILL_RUNP( manacles )
                 {
                         affect_strip ( victim, gsn_manacles );
 
-                        oldact_p("Ты освобождаешь руки $C4 от оков.",
+                        oldact_p(_("Ты освобождаешь руки $C4 от оков."),
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
-                        oldact_p("$c1 снимает кандалы с твоих рук.",
+                        oldact_p(_("$c1 снимает кандалы с твоих рук."),
                                                 ch,0,victim,TO_VICT,POS_RESTING);
-                        oldact_p("$c1 снимает кандалы с рук $C4.",
+                        oldact_p(_("$c1 снимает кандалы с рук $C4."),
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
                 }
                 else
                 {
-                        oldact_p("Ты пытаешься освободить руки $C4 от оков, но они уже свободны.",
+                        oldact_p(_("Ты пытаешься освободить руки $C4 от оков, но они уже свободны."),
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
-                        oldact_p("$c1 делает вид, что снимает кандалы с твоих рук. К чему бы это...",
+                        oldact_p(_("$c1 делает вид, что снимает кандалы с твоих рук. К чему бы это..."),
                                                 ch,0,victim,TO_VICT,POS_RESTING);
-                        oldact_p("$c1 возится вокруг рук $C4... Наверное, хочет чего-то..",
+                        oldact_p(_("$c1 возится вокруг рук $C4... Наверное, хочет чего-то.."),
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
                 }
         }
@@ -514,13 +515,13 @@ SKILL_RUNP( manacles )
                         duration = atoi( arg );
                 else
                 {
-                        ch->pecho("Неправильное число.");
+                        ch->pecho(_("Неправильное число."));
                         return;
                 }
 
                 if ( duration == 0 || duration <= -2 )
                 {
-                        ch->pecho("Ты точно этого хочешь?");
+                        ch->pecho(_("Ты точно этого хочешь?"));
                         return;
                 }
 
@@ -536,7 +537,7 @@ SKILL_RUNP( manacles )
                 }
                 else if ( victim->position <= POS_DEAD )
                 {
-                        ch->pecho("Сковывать кандалами мертвых -- какая низость.");
+                        ch->pecho(_("Сковывать кандалами мертвых -- какая низость."));
                 }
                 else if ( victim->position >= POS_FIGHTING )
                 {
@@ -545,11 +546,11 @@ SKILL_RUNP( manacles )
 
                         if (!success)
                         {
-                                oldact_p("Ты пытаешься заковать $C4 в кандалы, но что-то идет не так...",
+                                oldact_p(_("Ты пытаешься заковать $C4 в кандалы, но что-то идет не так..."),
                                                         ch,0,victim,TO_CHAR,POS_RESTING);
-                                oldact_p("$c1 пытается сковать твои руки! ОН НЕ ПРАВ!",
+                                oldact_p(_("$c1 пытается сковать твои руки! ОН НЕ ПРАВ!"),
                                                         ch,0,victim,TO_VICT,POS_RESTING);
-                                oldact_p("$c1 пытается заковать $C4 в кандалы, но терпит неудачу.",
+                                oldact_p(_("$c1 пытается заковать $C4 в кандалы, но терпит неудачу."),
                                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
                         }
@@ -560,17 +561,17 @@ SKILL_RUNP( manacles )
                 {
                         postaffect_to_char(victim, gsn_manacles, duration);
 
-                        oldact_p("Ты успешно заковываешь $C4 в кандалы!",
+                        oldact_p(_("Ты успешно заковываешь $C4 в кандалы!"),
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
-                        oldact_p("$c1 заковывает тебя в кандалы!",
+                        oldact_p(_("$c1 заковывает тебя в кандалы!"),
                                                 ch,0,victim,TO_VICT,POS_RESTING);
-                        oldact_p("$c1 заковывает $C4 в кандалы!",
+                        oldact_p(_("$c1 заковывает $C4 в кандалы!"),
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
                 };
         
         } else
         {
-                ch->pecho("Ты не можешь этого сделать.");
+                ch->pecho(_("Ты не можешь этого сделать."));
         };
 
         return;
@@ -589,7 +590,7 @@ SKILL_RUNP( wanted )
  
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->pecho("У тебя отобрали привилегии Правителя!");
+                ch->pecho(_("У тебя отобрали привилегии Правителя!"));
                 return;
         }
 
@@ -598,7 +599,7 @@ SKILL_RUNP( wanted )
 
         if ( arg1[0] == '\0' || arg2[0] == '\0' )
         {
-                ch->pecho("Используй: wanted <player> <Y|N>");
+                ch->pecho(_("Используй: wanted <player> <Y|N>"));
                 return;
         }
 
@@ -606,27 +607,27 @@ SKILL_RUNP( wanted )
 
         if ( (victim == 0) ||        !(ch->can_see(victim)) )
         {
-                ch->pecho("Здесь нет таких.");
+                ch->pecho(_("Здесь нет таких."));
                 return;
         }
 
         if ( victim->getRealLevel( ) >= LEVEL_IMMORTAL
                 && (ch->getRealLevel( ) < victim->getRealLevel( )) )
         {
-                oldact_p("У тебя не хватает сил объявить $C4 в розыск.",
+                oldact_p(_("У тебя не хватает сил объявить $C4 в розыск."),
                                 ch, 0, victim, TO_CHAR,POS_RESTING);
                 return;
         }
 
         if (victim == ch)
         {
-                ch->pecho("Нельзя играть с такой вещью!");
+                ch->pecho(_("Нельзя играть с такой вещью!"));
                 return;
         }
 
         if ( victim->getClan() == clan_chaos )
         {
-                ch->pecho("{xНет, с {MХаосом {xтебе придется бороться другими средствами!");
+                ch->pecho(_("{xНет, с {MХаосом {xтебе придется бороться другими средствами!"));
                 return;
         }
 
@@ -639,18 +640,18 @@ SKILL_RUNP( wanted )
                         if ( victim->isAffected(gsn_suspect ) )
                         {
                                 affect_strip ( victim, gsn_suspect );
-                                victim->pecho("Твоя повестка в Суд горит синим пламенем!");
+                                victim->pecho(_("Твоя повестка в Суд горит синим пламенем!"));
                         }
 
                         if ( IS_SET(victim->act ,PLR_WANTED) )
                         {
-                                oldact("$C1 уже разыскивается.", ch, 0, victim, TO_CHAR);
+                                oldact(_("$C1 уже разыскивается."), ch, 0, victim, TO_CHAR);
                         }
                         else
                         {
                                 SET_BIT(victim->act, PLR_WANTED);
-                                oldact("$c1 теперь в РОЗЫСКЕ!!!",victim, 0, ch, TO_NOTVICT);
-                                victim->pecho("Ты теперь в РОЗЫСКЕ!!!");
+                                oldact(_("$c1 теперь в РОЗЫСКЕ!!!"),victim, 0, ch, TO_NOTVICT);
+                                victim->pecho(_("Ты теперь в РОЗЫСКЕ!!!"));
                                 if ( !victim->is_npc() )
                                         victim->getPC( )->setLoyalty( max ( victim->getPC( )->getLoyalty() - 50, -1000));
                                 ch->pecho("Ok.");
@@ -661,17 +662,17 @@ SKILL_RUNP( wanted )
                 case 'Н':
                 case 'н':
                         if ( !IS_SET(victim->act,PLR_WANTED) )
-                                oldact("$C1 не разыскивается.", ch, 0, victim, TO_CHAR);
+                                oldact(_("$C1 не разыскивается."), ch, 0, victim, TO_CHAR);
                         else
                         {
                                 REMOVE_BIT(victim->act, PLR_WANTED);
-                                oldact("$c1 больше не разыскивается.",victim, 0, ch, TO_NOTVICT);
-                                victim->pecho("Тебя больше не разыскивают.");
+                                oldact(_("$c1 больше не разыскивается."),victim, 0, ch, TO_NOTVICT);
+                                victim->pecho(_("Тебя больше не разыскивают."));
                                 ch->pecho("Ok.");
                         }
                         break;
                 default:
-                        ch->pecho("Используй: wanted <player> <Y|N>");
+                        ch->pecho(_("Используй: wanted <player> <Y|N>"));
                         break;
         }
 }
@@ -692,7 +693,7 @@ SKILL_RUNP( fine )
      
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->pecho("У тебя отобрали привилегии Правителя!");
+                ch->pecho(_("У тебя отобрали привилегии Правителя!"));
                 return;
         }
 
@@ -700,7 +701,7 @@ SKILL_RUNP( fine )
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho("Синтаксис: fine <наказуемый> <сумма> [<получатель>]");
+                ch->pecho(_("Синтаксис: fine <наказуемый> <сумма> [<получатель>]"));
                 return;
         }
 
@@ -710,13 +711,13 @@ SKILL_RUNP( fine )
 
                 if ( (victim == 0) ||        !(ch->can_see(victim)) )
                 {
-                        ch->pecho("У тебя не получается найти преступника с таким именем.");
+                        ch->pecho(_("У тебя не получается найти преступника с таким именем."));
                         return;
                 }
 
                 if ( victim->getClan() == clan_chaos )
                 {
-                        ch->pecho("{xНет, с {MХаосом {xтебе придется бороться другими средствами!");
+                        ch->pecho(_("{xНет, с {MХаосом {xтебе придется бороться другими средствами!"));
                         return;
                 }
 
@@ -728,13 +729,13 @@ SKILL_RUNP( fine )
                 value = atoi( arg );
         else
         {
-                ch->pecho("Неправильное число");
+                ch->pecho(_("Неправильное число"));
                 return;
         }
 
         if ( value <= 0 )
         {
-                ch->pecho("Странные какие-то у тебя штрафы.");
+                ch->pecho(_("Странные какие-то у тебя штрафы."));
                 return;
         }
 
@@ -746,7 +747,7 @@ SKILL_RUNP( fine )
 
                 if ( recepient == 0 || !(ch->can_see(recepient)) )
                 {
-                        ch->pecho("Ты не находишь того, кому собирался отдать собранный штраф.");
+                        ch->pecho(_("Ты не находишь того, кому собирался отдать собранный штраф."));
                         return;
                 }
         }
@@ -755,13 +756,13 @@ SKILL_RUNP( fine )
                 || ( ( recepient != 0 ) && recepient->is_npc() ) 
                 || victim == ch )
         {
-                ch->pecho("Тебе не кажется, что ты занимаешься мышиной возней?");
+                ch->pecho(_("Тебе не кажется, что ты занимаешься мышиной возней?"));
                 return;
         }
 
         if ( ( ( (inroom && victim->isAffected(gsn_manacles) ) ? (int)victim->gold : 0 ) + victim->getPC()->bank_g ) < value )
         {
-                oldact_p("Ты не можешь забрать столько золотых монет у $C4."
+                oldact_p(_("Ты не можешь забрать столько золотых монет у $C4.")
                         , ch, 0, victim, TO_CHAR, POS_RESTING );
                 return;
         }
@@ -777,11 +778,11 @@ SKILL_RUNP( fine )
                 victim->gold -= amount;
                 value -= amount;
 
-                oldact_p("Ты забираешь у $C4 несколько золотых монет в качестве штрафа."
+                oldact_p(_("Ты забираешь у $C4 несколько золотых монет в качестве штрафа.")
                         , ch, 0, victim, TO_CHAR, POS_RESTING );
-                oldact_p("$c1 забирает у тебя несколько золотых монет в качестве штрафа."
+                oldact_p(_("$c1 забирает у тебя несколько золотых монет в качестве штрафа.")
                         , ch, 0, victim, TO_VICT, POS_RESTING );
-                oldact_p("$c1 забирает у $C4 несколько золотых монет в качестве штрафа."
+                oldact_p(_("$c1 забирает у $C4 несколько золотых монет в качестве штрафа.")
                         , ch, 0, victim, TO_NOTVICT, POS_RESTING );
         }
 
@@ -789,18 +790,18 @@ SKILL_RUNP( fine )
         {
                 victim->getPC()->bank_g -= value;
 
-                oldact_p("Ты снимаешь у $C4 со счета несколько золотых монет в качестве штрафа."
+                oldact_p(_("Ты снимаешь у $C4 со счета несколько золотых монет в качестве штрафа.")
                         , ch, 0, victim, TO_CHAR, POS_RESTING );
-                oldact_p("$c1 снимает у $C4 со счета несколько золотых монет в качестве штрафа."
+                oldact_p(_("$c1 снимает у $C4 со счета несколько золотых монет в качестве штрафа.")
                         , ch, 0, victim, TO_NOTVICT, POS_RESTING );
                 if ( inroom )
                 {
-                        oldact_p("$c1 забирает у тебя со счета несколько золотых монет в качестве штрафа."
+                        oldact_p(_("$c1 забирает у тебя со счета несколько золотых монет в качестве штрафа.")
                                 , ch, 0, victim, TO_VICT, POS_RESTING );
                 }
                 else
                 {
-                        victim->pecho("Похоже, что твои золотые запасы в банке уменьшились.");
+                        victim->pecho(_("Похоже, что твои золотые запасы в банке уменьшились."));
                 }
         }
 
@@ -808,20 +809,20 @@ SKILL_RUNP( fine )
         {
                 ch->getPC()->bank_g += value2;
 
-                oldact_p("Ты переводишь на свой счет несколько золотых монет."
+                oldact_p(_("Ты переводишь на свой счет несколько золотых монет.")
                         , ch, 0, 0, TO_CHAR, POS_RESTING );
-                oldact_p("$c1 переводит на свой счет несколько золотых монет."
+                oldact_p(_("$c1 переводит на свой счет несколько золотых монет.")
                         , ch, 0, 0, TO_ROOM, POS_RESTING );
         }
         else
         {
                 recepient->getPC()->bank_g += value2;
                 
-                oldact_p("Ты переводишь на счет $C4 несколько золотых монет."
+                oldact_p(_("Ты переводишь на счет $C4 несколько золотых монет.")
                         , ch, 0, recepient, TO_CHAR, POS_RESTING );
-                oldact_p("$c1 переводит на твой счет несколько золотых монет."
+                oldact_p(_("$c1 переводит на твой счет несколько золотых монет.")
                         , ch, 0, recepient, TO_VICT, POS_RESTING );
-                oldact_p("$c1 переводит на счет $C4 несколько золотых монет."
+                oldact_p(_("$c1 переводит на счет $C4 несколько золотых монет.")
                         , ch, 0, recepient, TO_NOTVICT, POS_RESTING );
         }
 }
@@ -839,7 +840,7 @@ SKILL_RUNP( confiscate )
 
         if ( !gsn_confiscate->available( ch ))
         {
-            ch->pecho("Ась?");
+            ch->pecho(_("Ась?"));
             return;
         }
 
@@ -848,7 +849,7 @@ SKILL_RUNP( confiscate )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->pecho("У тебя отобрали привилегии Правителя!");
+                ch->pecho(_("У тебя отобрали привилегии Правителя!"));
                 return;
         }
 
@@ -856,7 +857,7 @@ SKILL_RUNP( confiscate )
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho("Синтаксис: confiscate <наказуемый> <% от кол-ва вещей>");
+                ch->pecho(_("Синтаксис: confiscate <наказуемый> <% от кол-ва вещей>"));
                 return;
         }
 
@@ -864,27 +865,27 @@ SKILL_RUNP( confiscate )
 
         if ( (victim == 0) ||        !(ch->can_see(victim)) )
         {
-                ch->pecho("У тебя не получается найти преступника с таким именем.");
+                ch->pecho(_("У тебя не получается найти преступника с таким именем."));
                 return;
         }
 
         if ( victim->is_npc()
                 || victim == ch )
         {
-                ch->pecho("Тебе не кажется, что ты занимаешься мышиной возней?");
+                ch->pecho(_("Тебе не кажется, что ты занимаешься мышиной возней?"));
                 return;
         }
 
         if ( !victim->isAffected(gsn_manacles) )
         {
-                oldact_p("И ты думаешь, что $C1 так просто отдаст тебе свои вещи? Сначала закуй в кандалы.",
+                oldact_p(_("И ты думаешь, что $C1 так просто отдаст тебе свои вещи? Сначала закуй в кандалы."),
                         ch, 0, victim, TO_CHAR, POS_RESTING);
                 return;
         }
 
         if ( victim->getClan() == clan_chaos )
         {
-                ch->pecho("{xНет, с {MХаосом {xтебе придется бороться другими средствами!");
+                ch->pecho(_("{xНет, с {MХаосом {xтебе придется бороться другими средствами!"));
                 return;
         }
 
@@ -894,13 +895,13 @@ SKILL_RUNP( confiscate )
                 percent = atoi( arg );
         else
         {
-                ch->pecho("Неправильный процент.");
+                ch->pecho(_("Неправильный процент."));
                 return;
         }
 
         if ( ( percent <= 0 ) || ( percent > 100 ) )
         {
-                ch->pecho("Недопустимое значение процента.");
+                ch->pecho(_("Недопустимое значение процента."));
                 return;
         }
 
@@ -936,13 +937,13 @@ SKILL_RUNP( confiscate )
                         obj_from_char( obj );
                         obj->wear_loc = wear_none ;
 
-                        oldact("Ты конфискуешь $o4 у $C4.", ch, obj, victim, TO_CHAR);
-                        oldact("$c1 конфискует у тебя $o4.", ch, obj, victim, TO_VICT);
-                        oldact("$c1 конфискует $o4 у $C4.", ch, obj, victim, TO_NOTVICT);
+                        oldact(_("Ты конфискуешь $o4 у $C4."), ch, obj, victim, TO_CHAR);
+                        oldact(_("$c1 конфискует у тебя $o4."), ch, obj, victim, TO_VICT);
+                        oldact(_("$c1 конфискует $o4 у $C4."), ch, obj, victim, TO_NOTVICT);
 
                         obj_to_room( obj, ch->in_room );
-                        oldact("Ты аккуратно кладешь $o4 на пол.", ch, obj, 0, TO_CHAR);
-                        oldact("$c1 аккуратно кладет $o4 на пол.", ch, obj, 0, TO_ROOM);
+                        oldact(_("Ты аккуратно кладешь $o4 на пол."), ch, obj, 0, TO_CHAR);
+                        oldact(_("$c1 аккуратно кладет $o4 на пол."), ch, obj, 0, TO_ROOM);
 
                 }
         }  
@@ -966,7 +967,7 @@ SKILL_RUNP( suspect )
 
         if ( !gsn_suspect->available( ch ))
         {
-            ch->pecho("Ась?");
+            ch->pecho(_("Ась?"));
             return;
         }
 
@@ -974,7 +975,7 @@ SKILL_RUNP( suspect )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->pecho("У тебя отобрали привилегии Правителя!");
+                ch->pecho(_("У тебя отобрали привилегии Правителя!"));
                 return;
         }
 
@@ -982,37 +983,37 @@ SKILL_RUNP( suspect )
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho("Кому выдаем повестку в Суд?");
+                ch->pecho(_("Кому выдаем повестку в Суд?"));
                 return;
         }
 
         if ( ( victim = get_char_world( ch, arg ) ) == 0 )
         {
-                ch->pecho("Нет этого тут.");
+                ch->pecho(_("Нет этого тут."));
                 return;
         }
 
         if (victim->is_npc())
         {
-                ch->pecho("Повестки -- только для игроков.");
+                ch->pecho(_("Повестки -- только для игроков."));
                 return;
         }
 
         if ( ch == victim )
         {
-                ch->pecho("А тебе не кажется, можно сделать это и добровольно?");
+                ch->pecho(_("А тебе не кажется, можно сделать это и добровольно?"));
                 return;
         }
 
         if (victim->is_immortal() && !ch->is_immortal())
         {
-                ch->pecho("Смешно требовать чего-то от Бессмертных.");
+                ch->pecho(_("Смешно требовать чего-то от Бессмертных."));
                 return;
         }
 
         if ( victim->getClan() == clan_chaos )
         {
-                ch->pecho("{xНет, с {MХаосом {xтебе придется бороться другими средствами!");
+                ch->pecho(_("{xНет, с {MХаосом {xтебе придется бороться другими средствами!"));
                 return;
         }
 
@@ -1025,11 +1026,11 @@ SKILL_RUNP( suspect )
 
                 if ( paf != 0 )   
                 {
-                        msg = fmt(0, "Повестка $C2 действительна менее %d час%s."
+                        msg = fmt(0, _("Повестка $C2 действительна менее %d час%s.")
                                 ,paf->duration.getValue() + 1
                                 ,GET_COUNT(paf->duration + 1, "а","ов","ов"));
 
-                        victim->pecho("Ты чувствуешь - тебя ждут в Суде.");
+                        victim->pecho(_("Ты чувствуешь - тебя ждут в Суде."));
                 }
                 else
                         msg = "$C1 не выдавалась повестка в Суд.";
@@ -1042,18 +1043,18 @@ SKILL_RUNP( suspect )
         {
                 if ( !victim->isAffected(gsn_suspect) )
                 {
-                        oldact_p("Но ведь $C3 не выдавалась повестка в Суд!", ch, 0, victim,
+                        oldact_p(_("Но ведь $C3 не выдавалась повестка в Суд!"), ch, 0, victim,
                                 TO_CHAR, POS_RESTING );
                 }
                 else
                 {
-                        oldact_p("Ты аннулируешь повестку $C4.", ch, 0, victim,
+                        oldact_p(_("Ты аннулируешь повестку $C4."), ch, 0, victim,
                                 TO_CHAR, POS_RESTING );
-                        oldact_p("$c1 аннулирует твою повестку в Суд.", ch, 0, victim,
+                        oldact_p(_("$c1 аннулирует твою повестку в Суд."), ch, 0, victim,
                                 TO_VICT, POS_RESTING );
-                        oldact_p("$c1 аннулирует повестку $C3 в Суд.", ch, 0, victim,
+                        oldact_p(_("$c1 аннулирует повестку $C3 в Суд."), ch, 0, victim,
                                 TO_NOTVICT, POS_RESTING );
-                        oldact_p("$C1 аннулирует повестку $c3 в Суд.", victim, 0, ch,
+                        oldact_p(_("$C1 аннулирует повестку $c3 в Суд."), victim, 0, ch,
                                 TO_NOTVICT, POS_RESTING );
 
                         affect_strip ( victim, gsn_suspect );
@@ -1065,13 +1066,13 @@ SKILL_RUNP( suspect )
                 value = atoi( arg );
         else
         {
-                ch->pecho("Неправильное число.");
+                ch->pecho(_("Неправильное число."));
                 return;
         }
 
         if ( value <= 0 )
         {
-                ch->pecho("ЗАПОМНИ: Нельзя выдавать повестки задним числом.");
+                ch->pecho(_("ЗАПОМНИ: Нельзя выдавать повестки задним числом."));
                 return;
         }
 
@@ -1079,18 +1080,18 @@ SKILL_RUNP( suspect )
         {
                 postaffect_to_char(victim, gsn_suspect, value);
 
-                oldact_p("Ты посылаешь повестку $C4.", ch, 0, victim,
+                oldact_p(_("Ты посылаешь повестку $C4."), ch, 0, victim,
                         TO_CHAR, POS_RESTING );
-                oldact_p("$c1 посылает тебе повестку в Суд.", ch, 0, victim,
+                oldact_p(_("$c1 посылает тебе повестку в Суд."), ch, 0, victim,
                         TO_VICT, POS_RESTING );
-                oldact_p("$c1 посылает $C3 повестку в Суд.", ch, 0, victim,
+                oldact_p(_("$c1 посылает $C3 повестку в Суд."), ch, 0, victim,
                         TO_NOTVICT, POS_RESTING );
-                oldact_p("$C1 посылает $c3 повестку в Суд.", victim, 0, ch,
+                oldact_p(_("$C1 посылает $c3 повестку в Суд."), victim, 0, ch,
                         TO_NOTVICT, POS_RESTING );
         }
         else
         {
-                ch->pecho("Сначала необходимо отменить предыдущую повестку.");
+                ch->pecho(_("Сначала необходимо отменить предыдущую повестку."));
         }
 
         return;
@@ -1109,7 +1110,7 @@ SKILL_RUNP( jail )
   
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->pecho("У тебя отобрали привилегии Правителя!");
+                ch->pecho(_("У тебя отобрали привилегии Правителя!"));
                 return;
         }
 
@@ -1117,38 +1118,38 @@ SKILL_RUNP( jail )
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho("И кого мы хотим посадить в кутузку?");
+                ch->pecho(_("И кого мы хотим посадить в кутузку?"));
                 return;
         }
 
         /* Jail works only in current room */
         if ( ( victim = get_char_room( ch, arg ) ) == 0 )
         {
-                ch->pecho("Нет этого тут.");
+                ch->pecho(_("Нет этого тут."));
                 return;
         }
 
         if ( victim == ch )
         {
-                ch->pecho("Идея неплоха, но не стоит этого делать.");
+                ch->pecho(_("Идея неплоха, но не стоит этого делать."));
                 return;
         }
 
         if (victim->is_npc())
         {
-                ch->pecho("Только для игроков.");
+                ch->pecho(_("Только для игроков."));
                 return;
         }
 
         if (victim->is_immortal() && !ch->is_immortal())
         {
-                ch->pecho("Ты не можешь упечь за решетку Бессмертных.");
+                ch->pecho(_("Ты не можешь упечь за решетку Бессмертных."));
                 return;
         }
 
         if ( victim->getClan() == clan_chaos )
         {
-                ch->pecho("{xНет, с {MХаосом {xтебе придется бороться другими средствами!");
+                ch->pecho(_("{xНет, с {MХаосом {xтебе придется бороться другими средствами!"));
                 return;
         }
 
@@ -1158,9 +1159,9 @@ SKILL_RUNP( jail )
         if ( arg[0] == '\0' || arg_is_strict(arg, "check"))
         {
 
-                oldact_p("$c1 пристально смотрит на ТЕБЯ.",
+                oldact_p(_("$c1 пристально смотрит на ТЕБЯ."),
                                         ch,0,victim,TO_VICT,POS_RESTING);
-                oldact_p("$c1 пристально смотрит на $C4.",
+                oldact_p(_("$c1 пристально смотрит на $C4."),
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
                 Affect *paf = victim->affected.find (gsn_jail);
@@ -1171,7 +1172,7 @@ SKILL_RUNP( jail )
 
                         if ( paf->duration >= 0 )
                         {
-                                msg = fmt(0, "$C1 в тюряге менее чем на %d час%s."
+                                msg = fmt(0, _("$C1 в тюряге менее чем на %d час%s.")
                                         ,paf->duration.getValue() + 1
                                         ,GET_COUNT(paf->duration + 1, "","а","ов"));
                         }
@@ -1181,13 +1182,13 @@ SKILL_RUNP( jail )
                         }
 
                         if ( victim->isAffected(gsn_manacles) )
-                                oldact("Руки $C4 закованы в кандалы!",ch,0,victim,TO_CHAR);
+                                oldact(_("Руки $C4 закованы в кандалы!"),ch,0,victim,TO_CHAR);
 
                         oldact(msg.c_str(), ch, 0, victim, TO_CHAR);
                 }
                 else
                 {
-                        oldact_p("$C1 не отбывает наказания.",
+                        oldact_p(_("$C1 не отбывает наказания."),
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
                 }
         
@@ -1198,20 +1199,20 @@ SKILL_RUNP( jail )
                 {
                         affect_strip ( victim, gsn_jail );
 
-                        oldact_p("Ты освобождаешь $C4 из каталажки.",
+                        oldact_p(_("Ты освобождаешь $C4 из каталажки."),
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
-                        oldact_p("$c1 освобождает тебя из каталажки.",
+                        oldact_p(_("$c1 освобождает тебя из каталажки."),
                                                 ch,0,victim,TO_VICT,POS_RESTING);
-                        oldact_p("$c1 освобождает $C4 из каталажки.",
+                        oldact_p(_("$c1 освобождает $C4 из каталажки."),
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
                 }
                 else
                 {
-                        oldact_p("Ты пытаешься освободить $C4 из тюрьмы, но ведь о$gно|н|на НЕ СИДИТ.",
+                        oldact_p(_("Ты пытаешься освободить $C4 из тюрьмы, но ведь о$gно|н|на НЕ СИДИТ."),
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
-                        oldact_p("$c1 пытается тебя освободить из тюрьмы. К чему бы это...",
+                        oldact_p(_("$c1 пытается тебя освободить из тюрьмы. К чему бы это..."),
                                                 ch,0,victim,TO_VICT,POS_RESTING);
-                        oldact_p("$c1 напыщенно что то говорит $C4... $C1 хихикает...",
+                        oldact_p(_("$c1 напыщенно что то говорит $C4... $C1 хихикает..."),
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
                 }
         }
@@ -1230,13 +1231,13 @@ SKILL_RUNP( jail )
                         duration = atoi( arg );
                 else
                 {
-                        ch->pecho("Неправильное число.");
+                        ch->pecho(_("Неправильное число."));
                         return;
                 }
 
                 if ( duration == 0 || duration <= -2 )
                 {
-                        ch->pecho("Ты точно этого хочешь?");
+                        ch->pecho(_("Ты точно этого хочешь?"));
                         return;
                 }
 
@@ -1247,15 +1248,15 @@ SKILL_RUNP( jail )
 
                 postaffect_to_char(victim, gsn_jail, duration);
 
-                oldact_p("Ты приговариваешь $C4 к тюремному заключению!",
+                oldact_p(_("Ты приговариваешь $C4 к тюремному заключению!"),
                                         ch,0,victim,TO_CHAR,POS_RESTING);
-                oldact_p("$c1 приговаривает тебя к тюремному заключению.",
+                oldact_p(_("$c1 приговаривает тебя к тюремному заключению."),
                                         ch,0,victim,TO_VICT,POS_RESTING);
-                oldact_p("$c1 приговаривает $C4 к тюремному заключению.",
+                oldact_p(_("$c1 приговаривает $C4 к тюремному заключению."),
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
         } else
         {
-                ch->pecho("Ты не можешь этого сделать.");
+                ch->pecho(_("Ты не можешь этого сделать."));
         };
 
         return;
@@ -1274,7 +1275,7 @@ SKILL_RUNP( dismiss )
  
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->pecho("У тебя отобрали привилегии Правителя!");
+                ch->pecho(_("У тебя отобрали привилегии Правителя!"));
                 return;
         }
 
@@ -1282,44 +1283,44 @@ SKILL_RUNP( dismiss )
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho("И кого мы хотим лишить прав?");
+                ch->pecho(_("И кого мы хотим лишить прав?"));
                 return;
         }
 
         /* Dismiss works in whole room */
         if ( ( victim = get_char_world( ch, arg ) ) == 0 )
         {
-                ch->pecho("Нет этого тут.");
+                ch->pecho(_("Нет этого тут."));
                 return;
         }
 
         if ( victim == ch )
         {
-                ch->pecho("Идея неплоха, но не стоит этого делать.");
+                ch->pecho(_("Идея неплоха, но не стоит этого делать."));
                 return;
         }
 
         if (victim->is_npc())
         {
-                ch->pecho("Только для игроков.");
+                ch->pecho(_("Только для игроков."));
                 return;
         }
 
         if (victim->is_immortal() && !ch->is_immortal())
         {
-                ch->pecho("Ты не можешь лишать Бессмертных их прав.");
+                ch->pecho(_("Ты не можешь лишать Бессмертных их прав."));
                 return;
         }
 
         if ( victim->getPC()->getClan() != clan_ruler )
         {
-                ch->pecho("Лишить привилегий можно только других Правителей.");
+                ch->pecho(_("Лишить привилегий можно только других Правителей."));
                 return;
         }
 
         if ( victim->getPC()->getClanLevel() >= ch->getPC()->getClanLevel() )
         {
-                ch->pecho("Твоих полномочий (кланового ранга) тут явно недостаточно.");
+                ch->pecho(_("Твоих полномочий (кланового ранга) тут явно недостаточно."));
                 return;
         }
 
@@ -1328,9 +1329,9 @@ SKILL_RUNP( dismiss )
         if ( arg[0] == '\0' || arg_is_strict(arg, "check"))
         {
 
-                oldact_p("$c1 роется в твоем личном деле.",
+                oldact_p(_("$c1 роется в твоем личном деле."),
                                         ch,0,victim,TO_VICT,POS_RESTING);
-                oldact_p("$c1 роется в личном деле $C4.",
+                oldact_p(_("$c1 роется в личном деле $C4."),
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
                 Affect *paf = victim->affected.find (gsn_dismiss);
@@ -1341,7 +1342,7 @@ SKILL_RUNP( dismiss )
 
                         if ( paf->duration >= 0 )
                         {
-                                msg = fmt(0, "$C1 лише$Gно|н|на своих привилегий Правителя менее чем на %d час%s."
+                                msg = fmt(0, _("$C1 лише$Gно|н|на своих привилегий Правителя менее чем на %d час%s.")
                                         ,paf->duration.getValue() + 1
                                         ,GET_COUNT(paf->duration+1, "","а","ов"));
                         }
@@ -1354,7 +1355,7 @@ SKILL_RUNP( dismiss )
                 }
                 else
                 {
-                        oldact_p("$C1 обладает полными привилегиями Правителя.",
+                        oldact_p(_("$C1 обладает полными привилегиями Правителя."),
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
                 }
         
@@ -1365,16 +1366,16 @@ SKILL_RUNP( dismiss )
                 {
                         affect_strip ( victim, gsn_dismiss );
 
-                        oldact_p("Ты возвращаешь $C3 право вершить суд.",
+                        oldact_p(_("Ты возвращаешь $C3 право вершить суд."),
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
-                        oldact_p("$c1 возвращает тебе право вершить суд.",
+                        oldact_p(_("$c1 возвращает тебе право вершить суд."),
                                                 ch,0,victim,TO_VICT,POS_RESTING);
-                        oldact_p("$c1 возвращает $C3 право вершить суд.",
+                        oldact_p(_("$c1 возвращает $C3 право вершить суд."),
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
                 }
                 else
                 {
-                        ch->pecho("Расслабься. Все на своих местах и пашут как кони!");
+                        ch->pecho(_("Расслабься. Все на своих местах и пашут как кони!"));
                 }
         }
         else if (arg_is_strict(arg, "dismiss.place"))
@@ -1392,13 +1393,13 @@ SKILL_RUNP( dismiss )
                         duration = atoi( arg );
                 else
                 {
-                        ch->pecho("Неправильное число.");
+                        ch->pecho(_("Неправильное число."));
                         return;
                 }
 
                 if ( duration == 0 || duration <= -2 )
                 {
-                        ch->pecho("Ты точно этого хочешь?");
+                        ch->pecho(_("Ты точно этого хочешь?"));
                         return;
                 }
 
@@ -1409,15 +1410,15 @@ SKILL_RUNP( dismiss )
 
                 postaffect_to_char(victim, gsn_dismiss, duration);
 
-                oldact_p("Ты лишаешь $C4 права вершить суд!",
+                oldact_p(_("Ты лишаешь $C4 права вершить суд!"),
                                         ch,0,victim,TO_CHAR,POS_RESTING);
-                oldact_p("$c1 лишает тебя права вершить суд.",
+                oldact_p(_("$c1 лишает тебя права вершить суд."),
                                         ch,0,victim,TO_VICT,POS_RESTING);
-                oldact_p("$c1 лишает $C4 права вершить суд.",
+                oldact_p(_("$c1 лишает $C4 права вершить суд."),
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
         } else
         {
-                ch->pecho("Ты не можешь этого сделать.");
+                ch->pecho(_("Ты не можешь этого сделать."));
         };
 
         return;
@@ -1437,7 +1438,7 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
         target = victim;
     
     if (target->in_room != victim->in_room) {
-        ch->pecho("Среди зеркал нет оригинала.");
+        ch->pecho(_("Среди зеркал нет оригинала."));
         return;
     }
 
@@ -1452,11 +1453,11 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
 
     for (rch = victim->in_room->people; rch; rch = rch->next_in_room) {
         if (rch->is_mirror() && rch->doppel == target) {
-            oldact("Луч света, посланный $c5, отражается от зеркала и поражает ТЕБЯ!",
+            oldact(_("Луч света, посланный $c5, отражается от зеркала и поражает ТЕБЯ!"),
                  ch, 0, target, TO_VICT );
-            oldact("Луч света, посланный $c5, отражается от зеркала и поражает $C4!",
+            oldact(_("Луч света, посланный $c5, отражается от зеркала и поражает $C4!"),
                  ch, 0, target, TO_NOTVICT );
-            oldact("Луч света, посланный тобой, отражается от зеркала и поражает $C4!",
+            oldact(_("Луч света, посланный тобой, отражается от зеркала и поражает $C4!"),
                  ch, 0, target, TO_CHAR );
 
             dam = dice( level, 5 );
@@ -1501,14 +1502,14 @@ bool RulerSpecialGuard::specFight( )
     if ( ( ch->getModifyLevel() + 20 > victim->getModifyLevel() )
             && !is_safe_nomessage ( ch, victim ) )
     {
-        DLString msg = fmt(0, "%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
+        DLString msg = fmt(0, _("%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"),
                 victim->getNameC() );
         do_yell( ch, msg.c_str() );
         multi_hit( ch, victim , "murder" );
     }
     else
     {
-        DLString msg = fmt(0, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
+        DLString msg = fmt(0, _("$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'"),
                  victim->getNameC());
         oldact( msg.c_str(), ch, 0, 0, TO_ROOM);
     }
@@ -1523,7 +1524,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
 
     if ( ch->isAffected(gsn_dismiss ) )
     {
-        ch->pecho("У тебя отобрали привилегии Правителя!");
+        ch->pecho(_("У тебя отобрали привилегии Правителя!"));
         return;
     }
 
@@ -1540,12 +1541,12 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
                         repops.push_back( r.second );
             
             if (repops.size( ) == 1) {
-                ch->pecho( "%s обитает в местности под названием %s (%s).",
+                ch->pecho( _("%s обитает в местности под названием %s (%s)."),
                             mob->getNameP( '1' ).c_str( ), 
                             repops.front( )->name, repops.front( )->areaIndex->getName().c_str() );
             }
             else if (repops.size( ) > 0) {
-                oldact("$C1 может обитать в одном из следующих мест:", ch, 0, mob, TO_CHAR );
+                oldact(_("$C1 может обитать в одном из следующих мест:"), ch, 0, mob, TO_CHAR );
 
                 for (auto &r: repops)
                     ch->pecho( "    %s  (%s)", r->name, r->areaIndex->getName().c_str());
@@ -1554,17 +1555,17 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
     }
 
     if (!victim->isAffected(gsn_doppelganger)) {
-        oldact("Ты не замечаешь во внешности $C2 ничего необычного.", ch, 0, victim, TO_CHAR);
+        oldact(_("Ты не замечаешь во внешности $C2 ничего необычного."), ch, 0, victim, TO_CHAR);
     }
     else if (saves_spell( level, victim, DAM_MENTAL, ch, DAMF_MAGIC)) {
-        oldact("Тебе не удалось заглянуть под личину $C2.", ch, 0, victim, TO_CHAR);
+        oldact(_("Тебе не удалось заглянуть под личину $C2."), ch, 0, victim, TO_CHAR);
     }
     else {
         if (victim->is_mirror( )) 
-            ch->pecho( "%^C1 -- это всего лишь зеркало, созданное %#^C5!",
+            ch->pecho( _("%^C1 -- это всего лишь зеркало, созданное %#^C5!"),
                        victim, victim->doppel );
         else 
-            ch->pecho( "Ты замечаешь, что под обликом %1$^C2 скрывается %1$#^C1!",
+            ch->pecho( _("Ты замечаешь, что под обликом %1$^C2 скрывается %1$#^C1!"),
                        victim );
     }
 }
@@ -1584,8 +1585,8 @@ VOID_SPELL(RemoveBadge)::run( Character *ch, Character *victim, int sn, int leve
       obj_next = badge->next_content;
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
         {
-          oldact("Твой $o1 исчезает.",ch, badge, 0, TO_CHAR);
-          oldact("У $c2 исчезает $o1.", ch, badge, 0, TO_ROOM);
+          oldact(_("Твой $o1 исчезает."),ch, badge, 0, TO_CHAR);
+          oldact(_("У $c2 исчезает $o1."), ch, badge, 0, TO_ROOM);
         
           obj_from_char(badge);
           extract_obj(badge);
@@ -1611,7 +1612,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
   if ( (get_eq_char(ch, wear_neck_1)  != 0 ) &&
         (get_eq_char(ch, wear_neck_2)  != 0 ) )
   {
-    ch->pecho("Но у тебя уже что-то надето на шею.");
+    ch->pecho(_("Но у тебя уже что-то надето на шею."));
     return;
   }
 
@@ -1621,7 +1622,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
       obj_next = badge->next_content;
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
         {
-          oldact("Твой $o1 исчезает.",ch, badge, 0, TO_CHAR);
+          oldact(_("Твой $o1 исчезает."),ch, badge, 0, TO_CHAR);
           obj_from_char(badge);
           extract_obj(badge);
           continue;
@@ -1652,8 +1653,8 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
 
 
   badge->timer = 200;
-  oldact("Ты надеваешь символ Хранителя Закона!",ch, 0, 0, TO_CHAR);
-  oldact("$c1 надевает символ Хранителя Закона!", ch, 0, 0, TO_ROOM);
+  oldact(_("Ты надеваешь символ Хранителя Закона!"),ch, 0, 0, TO_CHAR);
+  oldact(_("$c1 надевает символ Хранителя Закона!"), ch, 0, 0, TO_ROOM);
 
   obj_to_char(badge,ch);
   wear_obj( ch, badge, 0 );
@@ -1701,9 +1702,9 @@ VOID_SPELL(ShieldOfRuler)::run( Character *ch, const DLString&, int sn, int leve
   af.location = APPLY_CHA;
   affect_to_obj( shield, &af);
 
-  oldact_p("Ты взмахиваешь руками и создаешь $o4!",
+  oldact_p(_("Ты взмахиваешь руками и создаешь $o4!"),
          ch,shield,0,TO_CHAR,POS_RESTING);
-  oldact_p("$c1 взмахивает руками и создает $o4!",
+  oldact_p(_("$c1 взмахивает руками и создает $o4!"),
          ch,shield,0,TO_ROOM,POS_RESTING);
 
 }
@@ -1720,37 +1721,37 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->pecho("У тебя отобрали привилегии Правителя!");
+                ch->pecho(_("У тебя отобрали привилегии Правителя!"));
                 return;
         }
 
   if (victim == ch || victim->in_room == 0
       || victim->is_npc() || !IS_SET(victim->act, PLR_WANTED))
     {
-      ch->pecho("Твоя попытка закончилась неудачей.");
+      ch->pecho(_("Твоя попытка закончилась неудачей."));
       return;
     }
 
   if (ch->isAffected(sn))
     {
-      ch->pecho("Это заклинание использовалось совсем недавно.");
+      ch->pecho(_("Это заклинание использовалось совсем недавно."));
       return;
     }
 
   if( !is_safe_nomessage(ch,victim) )
     {
-      ch->pecho("Тебе лучше использовать охранников для этой цели.");
+      ch->pecho(_("Тебе лучше использовать охранников для этой цели."));
       return;
     }
 
         if ( victim->getClan() == clan_chaos )
         {
-                ch->pecho("{xНет, с {MХаосом {xтебе придется бороться другими средствами!");
+                ch->pecho(_("{xНет, с {MХаосом {xтебе придется бороться другими средствами!"));
                 return;
         }
 
-  ch->pecho("Ты пытаешься призвать себе в помощь охотника за головами.");
-  oldact("$c1 пытается призвать себе на помощь охотника за головами.",ch,0,0,TO_ROOM);
+  ch->pecho(_("Ты пытаешься призвать себе в помощь охотника за головами."));
+  oldact(_("$c1 пытается призвать себе на помощь охотника за головами."),ch,0,0,TO_ROOM);
 
   stalker = create_mobile( get_mob_index(MOB_VNUM_STALKER) );
 
@@ -1793,12 +1794,12 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
         if ( victim->isAffected(gsn_suspect ) )
         {
                 affect_strip ( victim, gsn_suspect );
-                victim->pecho("Твоя повестка в Суд горит синим пламенем!");
+                victim->pecho(_("Твоя повестка в Суд горит синим пламенем!"));
         }
-  victim->pecho("Охотник за головами послан за тобой!");
-  oldact_p("Охотник за головами прибывает, чтобы искать $c4!",
+  victim->pecho(_("Охотник за головами послан за тобой!"));
+  oldact_p(_("Охотник за головами прибывает, чтобы искать $c4!"),
          victim,0,0,TO_ROOM,POS_RESTING);
-  ch->pecho("Охотник за головами послан по заданию.");
+  ch->pecho(_("Охотник за головами послан по заданию."));
 }
 
 AFFECT_DECL(Jail);
@@ -1808,13 +1809,13 @@ VOID_AFFECT(Jail)::remove( Character *victim )
 
     DefaultAffectHandler::remove( victim );
 
-    clantalk( *clan_ruler, fmt(0, "С этого момента %s снова на свободе!", victim->getNameP( '1' ).c_str()) );
+    clantalk( *clan_ruler, fmt(0, _("С этого момента %s снова на свободе!"), victim->getNameP( '1' ).c_str()) );
 
     if (victim->isAffected(gsn_manacles ))
         affect_strip( victim, gsn_manacles );
 
-    oldact("$c1 искупи$gло|л|ла свою провинность и освобождается из-под стражи.", victim, 0, 0, TO_ROOM);
-    oldact("ТЫ СНОВА НА СВОБОДЕ!", victim, 0, 0, TO_CHAR);
+    oldact(_("$c1 искупи$gло|л|ла свою провинность и освобождается из-под стражи."), victim, 0, 0, TO_ROOM);
+    oldact(_("ТЫ СНОВА НА СВОБОДЕ!"), victim, 0, 0, TO_CHAR);
 
     if (victim->in_room
         && victim->in_room->vnum >= 4343
@@ -1822,7 +1823,7 @@ VOID_AFFECT(Jail)::remove( Character *victim )
     {
         if ( ( location = get_room_instance( 4283 ) ) == 0 )
         {
-            victim->pecho("Мда... Освобождать-то тебя - некуда.");
+            victim->pecho(_("Мда... Освобождать-то тебя - некуда."));
             return;
         }
         
@@ -1840,7 +1841,7 @@ VOID_AFFECT(Jail)::update( Character *ch, Affect *paf )
 
     if ( paf->duration < 3) {
         int hours = paf->duration + 1; // Affects are removed when duration reaches below zero.
-        clantalk(*clan_ruler, fmt(0, "%s выйдет на свободу через %d час%s",
+        clantalk(*clan_ruler, fmt(0, _("%s выйдет на свободу через %d час%s"),
                 ch->getNameP( '1' ).c_str(),
                 hours,
                 GET_COUNT(hours, "","а","ов")));
@@ -1852,7 +1853,7 @@ VOID_AFFECT(Manacles)::remove( Character *ch )
 {
     DefaultAffectHandler::remove( ch );
 
-    clantalk(*clan_ruler, fmt(0, "С %s спали кандалы!", ch->getNameP( '2' ).c_str()) );
+    clantalk(*clan_ruler, fmt(0, _("С %s спали кандалы!"), ch->getNameP( '2' ).c_str()) );
 }
 
 VOID_AFFECT(Manacles)::update( Character *ch, Affect *paf ) 
@@ -1861,7 +1862,7 @@ VOID_AFFECT(Manacles)::update( Character *ch, Affect *paf )
 
     if ( paf->duration < 3) {
         int hours = paf->duration + 1;
-        clantalk(*clan_ruler, fmt(0, "С %s спадут кандалы через %d час%s",
+        clantalk(*clan_ruler, fmt(0, _("С %s спадут кандалы через %d час%s"),
                 ch->getNameP( '2' ).c_str(),
                 hours,
                 GET_COUNT(hours, "","а","ов")));
@@ -1873,7 +1874,7 @@ AFFECT_DECL(Suspect);
 VOID_AFFECT(Suspect)::remove( Character *ch ) 
 { 
     DefaultAffectHandler::remove( ch );
-    clantalk(*clan_ruler, fmt(0, "Повестка в суд для %s истекла!", ch->getNameP( '2' ).c_str()) );
+    clantalk(*clan_ruler, fmt(0, _("Повестка в суд для %s истекла!"), ch->getNameP( '2' ).c_str()) );
 }
 
 VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf ) 
@@ -1882,7 +1883,7 @@ VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf )
 
     if ( paf->duration < 3) {
         int hours = paf->duration + 1;
-        clantalk(*clan_ruler, fmt(0, "Повестка в суд для %s истекает через %d час%s",
+        clantalk(*clan_ruler, fmt(0, _("Повестка в суд для %s истекает через %d час%s"),
                 ch->getNameP( '2' ).c_str(),
                 hours,
                 GET_COUNT(hours, "","а","ов")));

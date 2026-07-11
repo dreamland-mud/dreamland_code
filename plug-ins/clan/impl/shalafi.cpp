@@ -44,6 +44,7 @@
 #include "move_utils.h"
 #include "doors.h"
 #include "def.h"
+#include "l10n.h"
 
 RELIG(alala);
 RELIG(ares);
@@ -72,8 +73,8 @@ void ClanGuardShalafi::actGreet( PCharacter *wch )
 }
 void ClanGuardShalafi::actPush( PCharacter *wch )
 {
-    oldact("$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
-    oldact("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает.", wch, 0, ch, TO_ROOM );
+    oldact(_("$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон."), wch, 0, ch, TO_CHAR );
+    oldact(_("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает."), wch, 0, ch, TO_ROOM );
 }
 int ClanGuardShalafi::getCast( Character *victim )
 {
@@ -179,7 +180,7 @@ void ShalafiClan::onInduct(PCharacter *ch) const
     for (auto &o: *getOrgs())
         if (o.second->canInduct(ch)) {
             ClanOrgs::setAttr(ch, o.first);
-            ch->pecho("Ты поступаешь на {b%N4{x.", o.second->shortDescr.c_str());
+            ch->pecho(_("Ты поступаешь на {b%N4{x."), o.second->shortDescr.c_str());
             return;
         }
 
@@ -230,13 +231,13 @@ VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int leve
           affect_to_char(victim,&af);
 
           if (ch != victim) {
-            oldact("Твой ментальный удар повреждает разум $C2!", ch,0,victim,TO_CHAR);
-            oldact("Ментальный удар $c2 повреждает твой разум!", ch,0,victim,TO_VICT);
-            oldact("Ментальный удар $c2 повреждает разум $C2!", ch,0,victim,TO_NOTVICT);
+            oldact(_("Твой ментальный удар повреждает разум $C2!"), ch,0,victim,TO_CHAR);
+            oldact(_("Ментальный удар $c2 повреждает твой разум!"), ch,0,victim,TO_VICT);
+            oldact(_("Ментальный удар $c2 повреждает разум $C2!"), ch,0,victim,TO_NOTVICT);
           }
           else {
-            oldact("Ментальный удар повреждает твой разум!", ch,0,0,TO_CHAR);
-            oldact("Ментальный удар $c2 повреждает $s разум!", ch,0,0,TO_ROOM);
+            oldact(_("Ментальный удар повреждает твой разум!"), ch,0,0,TO_CHAR);
+            oldact(_("Ментальный удар $c2 повреждает $s разум!"), ch,0,0,TO_ROOM);
           }
         }
   } catch (const VictimDeathException &) {
@@ -313,7 +314,7 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
 
   if (ch->isAffected(sn) || ch->hit > ch->max_hit)
     {
-      oldact("Ты уже переполне$gно|н|на жизненной энергией.", ch, 0, 0, TO_CHAR);
+      oldact(_("Ты уже переполне$gно|н|на жизненной энергией."), ch, 0, 0, TO_CHAR);
       return;
     }
 
@@ -334,7 +335,7 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
   af.bitvector.setValue(AFF_SLOW);    
   affect_to_char( ch, &af );
 
-  ch->pecho("Прилив жизненной силы затмевает твой разум.");
+  ch->pecho(_("Прилив жизненной силы затмевает твой разум."));
 
 }
 

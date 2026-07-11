@@ -45,6 +45,7 @@
 #include "immunity.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "l10n.h"
 
 using std::max;
 using std::min;
@@ -145,9 +146,9 @@ SKILL_APPLY( mortalstrike )
     // Success, inflict a lot of damage. Anatolia implementation had (victim->hit+1), but the 
     // resulting damage always got reduced by sanctuary and other protections.
     int dam;
-    oldact("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_CHAR);
-    oldact("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT);
-    oldact_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
+    oldact(_("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x"), ch,0,victim,TO_CHAR);
+    oldact(_("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x"), ch,0,victim,TO_NOTVICT);
+    oldact_p(_("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x"), ch,0,victim,TO_VICT,POS_DEAD);
     dam = victim->hit * 2; 
     damage(ch, victim, dam, gsn_mortal_strike, dam_type, true, dam_flag);
     gsn_mortal_strike->improve( ch, true, victim );
@@ -166,19 +167,19 @@ SKILL_RUNP( bloodthirst )
 
     if (IS_AFFECTED(ch,AFF_BLOODTHIRST) || ch->isAffected(gsn_bloodthirst) )
     {
-        ch->pecho( "Ты уже жаждешь крови." );
+        ch->pecho( _("Ты уже жаждешь крови.") );
         return;
     }
 
     if (IS_AFFECTED(ch,AFF_CALM))
     {
-        ch->pecho( "Ты слишком миролюбив{Sfа{Sx, чтоб жаждать крови." );
+        ch->pecho( _("Ты слишком миролюбив{Sfа{Sx, чтоб жаждать крови.") );
         return;
     }
 
     if (ch->fighting == 0)
       {
-        ch->pecho( "Это умение сработает только в бою." );
+        ch->pecho( _("Это умение сработает только в бою.") );
         return;
       }
 
@@ -193,8 +194,8 @@ SKILL_RUNP( bloodthirst )
 
         int slevel = skill_level(*gsn_bloodthirst, ch);
         
-        ch->pecho( "Ты жаждешь {rкрови!{x" );
-        oldact_p("Глаза $c2 загораются кровожадным огнем.",
+        ch->pecho( _("Ты жаждешь {rкрови!{x") );
+        oldact_p(_("Глаза $c2 загораются кровожадным огнем."),
                ch,0,0,TO_ROOM,POS_RESTING);
         gsn_bloodthirst->improve( ch, true );
 
@@ -218,7 +219,7 @@ SKILL_RUNP( bloodthirst )
 
     else
     {
-        ch->pecho( "На миг ты чувствуешь себя кровожадно, но это быстро проходит." );
+        ch->pecho( _("На миг ты чувствуешь себя кровожадно, но это быстро проходит.") );
         gsn_bloodthirst->improve( ch, false );
     }
 }
@@ -234,7 +235,7 @@ SKILL_RUNP( spellbane )
         
         if (ch->isAffected(gsn_spellbane))
         {
-                ch->pecho( "Ты уже отражаешь заклинания." );
+                ch->pecho( _("Ты уже отражаешь заклинания.") );
                 return;
         }
 
@@ -251,8 +252,8 @@ SKILL_RUNP( spellbane )
 
         affect_to_char(ch,&af);
 
-        oldact("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR);
-        oldact("$c1 распространяет вокруг себя ненависть к магии.", ch,0,0,TO_ROOM);
+        oldact(_("Ненависть к магии окружает тебя."),ch,0,0,TO_CHAR);
+        oldact(_("$c1 распространяет вокруг себя ненависть к магии."), ch,0,0,TO_ROOM);
 }
 
 /*
@@ -263,7 +264,7 @@ SKILL_RUNP( resistance )
 {
         if (ch->isAffected(gsn_resistance))
         {
-                ch->pecho( "Ты уже сопротивляешься физическим атакам." );
+                ch->pecho( _("Ты уже сопротивляешься физическим атакам.") );
                 return;
         }
 
@@ -272,15 +273,15 @@ SKILL_RUNP( resistance )
     {
         postaffect_to_char(ch, gsn_resistance, skill_level(*gsn_resistance, ch) / 6);
 
-      oldact("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR);
-      oldact("$c1 выглядит покрепче.",ch,0,0,TO_ROOM);
+      oldact(_("Ты чувствуешь себя крепче!"),ch,0,0,TO_CHAR);
+      oldact(_("$c1 выглядит покрепче."),ch,0,0,TO_ROOM);
       gsn_resistance->improve( ch, true );
     }
   else
     {
 
-     ch->pecho( "Ты напрягаешь свои мускулы, но это все впустую." );
-      oldact_p("$c1 играет мускулами, пытаясь выглядеть крепче.",
+     ch->pecho( _("Ты напрягаешь свои мускулы, но это все впустую.") );
+      oldact_p(_("$c1 играет мускулами, пытаясь выглядеть крепче."),
              ch,0,0,TO_ROOM,POS_RESTING);
       gsn_resistance->improve( ch, false );
     }
@@ -297,7 +298,7 @@ SKILL_RUNP( truesight )
 
   if (ch->isAffected(gsn_truesight))
     {
-      ch->pecho( "Твои глаза настолько зорки, насколько это возможно." );
+      ch->pecho( _("Твои глаза настолько зорки, насколько это возможно.") );
       return;
     }
 
@@ -323,15 +324,15 @@ SKILL_RUNP( truesight )
       affect_to_char(ch,&af);
 
 
-      oldact("Ты зорко смотришь вокруг!",ch,0,0,TO_CHAR);
-      oldact("$c1 смотрит более зорко.",ch,0,0,TO_ROOM);
+      oldact(_("Ты зорко смотришь вокруг!"),ch,0,0,TO_CHAR);
+      oldact(_("$c1 смотрит более зорко."),ch,0,0,TO_ROOM);
       gsn_truesight->improve( ch, true );
     }
   else
     {
 
-     ch->pecho( "Ты зорко смотришь вокруг, но не видишь ничего нового." );
-      oldact_p("$c1 зорко смотрит вокруг, но ничего нового не замечает.",
+     ch->pecho( _("Ты зорко смотришь вокруг, но не видишь ничего нового.") );
+      oldact_p(_("$c1 зорко смотрит вокруг, но ничего нового не замечает."),
              ch,0,0,TO_ROOM,POS_RESTING);
       gsn_truesight->improve( ch, false );
     }
@@ -349,14 +350,14 @@ SKILL_RUNP( bandage )
 
         if (ch->isAffected(gsn_bandage))
         {
-                oldact("Ты уже перевяза$gло|л|ла свои раны!",ch,0,0,TO_CHAR);
+                oldact(_("Ты уже перевяза$gло|л|ла свои раны!"),ch,0,0,TO_CHAR);
                 return;
         }
 
         if (SHADOW(ch))
         {
-                ch->pecho( "Как это наверное интересно смотрится со стороны -- бинтовать собственную тень." );
-                oldact_p("$c1 пытается забинтовать свою собственную тень\n\r...похоже кому-то нужен доктор.",
+                ch->pecho( _("Как это наверное интересно смотрится со стороны -- бинтовать собственную тень.") );
+                oldact_p(_("$c1 пытается забинтовать свою собственную тень\n\r...похоже кому-то нужен доктор."),
                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }
@@ -368,14 +369,14 @@ SKILL_RUNP( bandage )
 
                 int slevel = skill_level(*gsn_bandage, ch);
 
-                ch->pecho( "Ты накладываешь повязку на свою рану!" );
-                oldact("$c1 перевязывает свои раны.",ch,0,0,TO_ROOM);
+                ch->pecho( _("Ты накладываешь повязку на свою рану!") );
+                oldact(_("$c1 перевязывает свои раны."),ch,0,0,TO_ROOM);
                 gsn_bandage->improve( ch, true );
 
                 heal = ( dice(4, 8 ) + slevel / 2 );
                 ch->hit = min( ch->hit + heal, (int)ch->max_hit );
                 update_pos( ch );
-                ch->pecho( "Тебе становится лучше!" );
+                ch->pecho( _("Тебе становится лучше!") );
 
                 af.bitvector.setTable(&affect_flags);
                 af.type                = gsn_bandage;
@@ -389,7 +390,7 @@ SKILL_RUNP( bandage )
         else
         {
 
-                ch->pecho( "Ты пытаешься перевязать свои раны, но пальцы не слушаются тебя." );
+                ch->pecho( _("Ты пытаешься перевязать свои раны, но пальцы не слушаются тебя.") );
                 gsn_bandage->improve( ch, false );
         }
 }
@@ -451,13 +452,13 @@ void ClanHealerBattlerager::speech( Character *wch, const char *cspeech )
         return;
     }
 
-    oldact_p("$c1 дает тебе лечебное зелье, предлагая выпить его.",
+    oldact_p(_("$c1 дает тебе лечебное зелье, предлагая выпить его."),
            ch,0,wch,TO_VICT,POS_RESTING);
-    oldact("Ты выпиваешь лечебное зелье.",ch,0,wch,TO_VICT);
-    oldact("Ты передаешь лечебное зелье $C3.",ch,0,wch,TO_CHAR);
-    oldact("$C1 выпивает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR);
-    oldact("$c1 дает лечебное зелье $C3.",ch,0,wch,TO_NOTVICT);
-    oldact("$C1 выпивает лечебное зелье, которое $m да$gло|л|ла $c1.",ch,0,wch,TO_NOTVICT);
+    oldact(_("Ты выпиваешь лечебное зелье."),ch,0,wch,TO_VICT);
+    oldact(_("Ты передаешь лечебное зелье $C3."),ch,0,wch,TO_CHAR);
+    oldact(_("$C1 выпивает лечебное зелье, данное тобой."),ch,0,wch,TO_CHAR);
+    oldact(_("$c1 дает лечебное зелье $C3."),ch,0,wch,TO_NOTVICT);
+    oldact(_("$C1 выпивает лечебное зелье, которое $m да$gло|л|ла $c1."),ch,0,wch,TO_NOTVICT);
 
     wch->is_npc( ) ? wch->master->setWaitViolence( 1 ) : wch->setWaitViolence( 1 );
 
@@ -489,8 +490,8 @@ bool ClanGuardBattlerager::specFight( )
 
     if ( number_percent() < 33 )
     {
-            oldact("Ты наносишь тройной удар смертоносной силы!",ch,0,0,TO_CHAR);
-            oldact("$c1 наносит тройной удар смертоносной силы!",ch,0,0,TO_ROOM);
+            oldact(_("Ты наносишь тройной удар смертоносной силы!"),ch,0,0,TO_CHAR);
+            oldact(_("$c1 наносит тройной удар смертоносной силы!"),ch,0,0,TO_ROOM);
             one_hit( ch, victim );
             one_hit( ch, victim );
             one_hit( ch, victim );
@@ -512,8 +513,8 @@ void ClanGuardBattlerager::actGreet( PCharacter *wch )
 
 void ClanGuardBattlerager::actPush( PCharacter *wch )
 {
-    oldact("$C1 отвешивает тебе нехилый подзатыльник...", wch, 0, ch, TO_CHAR );
-    oldact("$C1 отвешивает $c3 подзатыльник...\n\r$c1 -- как ветром сдуло.", wch, 0, ch, TO_ROOM );
+    oldact(_("$C1 отвешивает тебе нехилый подзатыльник..."), wch, 0, ch, TO_CHAR );
+    oldact(_("$C1 отвешивает $c3 подзатыльник...\n\r$c1 -- как ветром сдуло."), wch, 0, ch, TO_ROOM );
 }
 
 

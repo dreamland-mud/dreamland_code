@@ -30,6 +30,7 @@
 #include "doors.h"
 
 #include "def.h"
+#include "l10n.h"
 
 CLAN(battlerager);
 CLAN(none);
@@ -301,8 +302,8 @@ void ClanGuard::speech( Character *wch, const char *cspeech )
 
             obj = create_object(get_obj_index(clanArea->keyVnum), 0);
             obj->timer = 120;
-            oldact("$c1 снимает с шеи $o4.", ch, obj, 0, TO_ROOM );
-            oldact("Ты снимаешь с шеи $o4.", ch, obj, 0, TO_CHAR );
+            oldact(_("$c1 снимает с шеи $o4."), ch, obj, 0, TO_ROOM );
+            oldact(_("Ты снимаешь с шеи $o4."), ch, obj, 0, TO_CHAR );
         }
     }
     else if (speech ^ "I need invitation" || speech ^ "Мне нужно приглашение") {
@@ -334,16 +335,16 @@ void ClanGuard::speech( Character *wch, const char *cspeech )
     }
 
     if (obj) {
-        oldact("$C1 дает $o4 $c3.", wch, obj, ch, TO_ROOM );
-        oldact("$C1 дает тебе $o4.", wch, obj, ch, TO_CHAR );
+        oldact(_("$C1 дает $o4 $c3."), wch, obj, ch, TO_ROOM );
+        oldact(_("$C1 дает тебе $o4."), wch, obj, ch, TO_CHAR );
         obj_to_char(obj, wch);
     }
 }
 
 void ClanGuard::actGiveInvitation( PCharacter *wch, Object *obj )
 {
-    oldact("$c1 пишет на $o6.", ch, obj, 0, TO_ROOM );
-    oldact("Ты пишешь на $o6.", ch, obj, 0, TO_CHAR );
+    oldact(_("$c1 пишет на $o6."), ch, obj, 0, TO_ROOM );
+    oldact(_("Ты пишешь на $o6."), ch, obj, 0, TO_CHAR );
 }
 
 /*--------------------------------------------------------------------------

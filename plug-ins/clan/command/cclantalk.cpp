@@ -32,6 +32,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(none);
 GSN(deafen);
@@ -75,8 +76,8 @@ static bool check_soap( Character *ch )
     if (!ch->getPC( )->getAttributes( ).isAvailable( soap )) 
         return false;
     
-    oldact("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_ROOM);
-    oldact("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_CHAR);
+    oldact(_("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри."), ch, 0, 0, TO_ROOM);
+    oldact(_("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри."), ch, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -88,12 +89,12 @@ COMMAND(CClanTalk, "cb")
     DLString act_str;
 
     if (ch->getClan( ) == clan_none) {
-        ch->pecho("Ты не принадлежишь ни к одному Клану.");
+        ch->pecho(_("Ты не принадлежишь ни к одному Клану."));
         return;
     }
 
     if (!ch->getClan( )->hasChannel( )) {
-        ch->pecho("До тебя никому нет дела.");
+        ch->pecho(_("До тебя никому нет дела."));
         return;
     }
     
@@ -101,9 +102,9 @@ COMMAND(CClanTalk, "cb")
         TOGGLE_BIT(ch->comm, COMM_NOCB);
 
         if (IS_SET(ch->comm, COMM_NOCB))
-            ch->pecho("С этого момента ты не слышишь клановые разговоры.");
+            ch->pecho(_("С этого момента ты не слышишь клановые разговоры."));
         else
-            ch->pecho("Ты снова слышишь клановые разговоры.");
+            ch->pecho(_("Ты снова слышишь клановые разговоры."));
         return;
     }
     
