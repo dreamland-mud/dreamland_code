@@ -19,6 +19,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(deafen);
 
@@ -67,13 +68,13 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 
         if (!IS_SET(ch->comm, off)) {
             if (msgOn.empty( ))
-                ch->pecho( "Канал %s теперь включен.", getName( ).c_str( ) );
+                ch->pecho( _("Канал %s теперь включен."), getName( ).c_str( ) );
             else
                 ch->pecho( msgOn );
         }
         else {
             if (msgOff.empty( ))
-                ch->pecho( "Канал %s теперь выключен.", getName( ).c_str( ) );
+                ch->pecho( _("Канал %s теперь выключен."), getName( ).c_str( ) );
             else
                 ch->pecho( msgOff );
         }
@@ -125,17 +126,17 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 bool GlobalChannel::canTalkGlobally( Character *ch ) const
 {
     if (nomob && ch->is_npc( )) {
-        ch->pecho( "Этот канал не для тебя, прости." );
+        ch->pecho( _("Этот канал не для тебя, прости.") );
         return false;
     }
     
     if (ch->get_trust( ) < trustSpeak) {
-        ch->pecho( "В этом канале ты можешь только слушать, прости." );
+        ch->pecho( _("В этом канале ты можешь только слушать, прости.") );
         return false;
     }
     
     if (quiet && IS_SET(ch->comm, COMM_QUIET)) {
-        ch->pecho( "Сначала необходимо повынимать вату из ушей.");
+        ch->pecho( _("Сначала необходимо повынимать вату из ушей."));
         return false;
     }
 
@@ -152,7 +153,7 @@ bool GlobalChannel::canTalkGlobally( Character *ch ) const
         int cost = ch->max_mana * manaPercent / 100;
 
         if (ch->mana < cost) {
-            ch->pecho( "У тебя недостаточно сил, чтобы орать на весь мир." );
+            ch->pecho( _("У тебя недостаточно сил, чтобы орать на весь мир.") );
             return false;
         }
 
@@ -201,7 +202,7 @@ bool GlobalChannel::checkConfirmed( Character *ch ) const
 
     if (!ch->is_npc( ) && !IS_SET(ch->act, PLR_CONFIRMED))
     {
-        ch->pecho("Только подтвержденные богами персонажи могут общаться в этом канале." );
+        ch->pecho(_("Только подтвержденные богами персонажи могут общаться в этом канале.") );
         return true;
     }
 
@@ -217,13 +218,13 @@ bool GlobalChannel::checkNoChannel( Character *ch ) const
         if (!msgNochan.empty( ))
             ch->pecho( msgNochan );
         else
-            ch->pecho( "Боги лишили тебя возможности общаться." );
+            ch->pecho( _("Боги лишили тебя возможности общаться.") );
         
         return true;
     }
 
     if (IS_CHARMED(ch) && has_nochannel( ch->master )) {
-        oldact("$c1 сдавленно хрипит, не в силах вымолвить ни слова.", ch, 0, 0, TO_ROOM);        
+        oldact(_("$c1 сдавленно хрипит, не в силах вымолвить ни слова."), ch, 0, 0, TO_ROOM);        
         return true;
     }
 
@@ -246,8 +247,8 @@ bool GlobalChannel::checkSoap( Character *ch ) const
     if (!ch->getPC( )->getAttributes( ).isAvailable( attrName )) 
         return false;
     
-    oldact("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_ROOM);
-    oldact("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_CHAR);
+    oldact(_("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри."), ch, 0, 0, TO_ROOM);
+    oldact(_("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри."), ch, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -282,7 +283,7 @@ bool GlobalChannel::needOutputSelf( Character *ch ) const
 bool GlobalChannel::needOutputOther( Character *ch ) const
 {
     if (dig && DIGGED(ch)) {
-        ch->pecho( "Стены могилы поглощают звуки." );
+        ch->pecho( _("Стены могилы поглощают звуки.") );
         return false;
     }
     

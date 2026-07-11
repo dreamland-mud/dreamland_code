@@ -6,6 +6,7 @@
 #include "xmlattributelanguage.h"
 
 #include "pcharacter.h"
+#include "l10n.h"
 
 XMLAttributeLanguage::XMLAttributeLanguage( ) 
 {
@@ -13,7 +14,7 @@ XMLAttributeLanguage::XMLAttributeLanguage( )
 
 void XMLAttributeLanguage::removeWord( const Word &word, PCharacter *ch )
 {
-    ch->pecho( "{wСлово {w%s{w ускользает от тебя.{x", word.dictum.getValue( ).c_str( ) );
+    ch->pecho( _("{wСлово {w%s{w ускользает от тебя.{x"), word.dictum.getValue( ).c_str( ) );
     
     Words::iterator w = words.find( word.dictum );
     words.erase(w);

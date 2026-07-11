@@ -14,10 +14,11 @@
 #include "merc.h"
 #include "loadsave.h"
 #include "def.h"
+#include "l10n.h"
 
 void QuestRing::wear( Character *ch ) 
 {
-    ch->pecho("{CТвое кольцо ярко вспыхивает.{x");
+    ch->pecho(_("{CТвое кольцо ярко вспыхивает.{x"));
 }
 
 void QuestRing::equip( Character *ch ) 

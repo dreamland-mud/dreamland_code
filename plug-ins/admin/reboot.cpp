@@ -5,6 +5,7 @@
 #include "arg_utils.h"
 #include "act.h"
 #include "dreamland.h"
+#include "l10n.h"
 
 static void reboot_now( )
 {
@@ -69,7 +70,7 @@ void reboot_action(const DLString& constArguments, ostringstream& buf)
     if (arg.isNumber())
     {
         dreamland->setRebootCounter(arg.toInt());
-        buf << fmt(0, "Мир Мечты будет ПЕРЕЗАГРУЖЕН через %d тиков!", dreamland->getRebootCounter()) << endl;
+        buf << fmt(0, _("Мир Мечты будет ПЕРЕЗАГРУЖЕН через %d тиков!"), dreamland->getRebootCounter()) << endl;
         return;
     }
 

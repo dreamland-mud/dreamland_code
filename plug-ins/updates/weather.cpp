@@ -37,6 +37,7 @@
 #include "def.h"
 
 #include "messengers.h"
+#include "l10n.h"
 
 PROF(vampire);
 BONUS(experience);
@@ -439,7 +440,7 @@ CMDRUN( time )
     ostringstream buf;
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_TIME)) {
-        ch->pecho( "Похоже, в этом месте время остановило свой ход." );
+        ch->pecho( _("Похоже, в этом месте время остановило свой ход.") );
         return;
     }
 
@@ -475,7 +476,7 @@ CMDRUN( time )
     ch->send_to(buf);
 
     if (ch->is_immortal( )) 
-        ch->pecho( "Мир Мечты загружен %s\r\nСистемное время: %s",
+        ch->pecho( _("Мир Мечты загружен %s\r\nСистемное время: %s"),
                     Date::getTimeAsString( dreamland->getBootTime( ) ).c_str( ),
                     Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ) );
 }
@@ -491,13 +492,13 @@ CMDRUN( weather )
     };
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER)) {
-        ch->pecho( "Похоже, в этом месте погода всегда одинаковая." );
+        ch->pecho( _("Похоже, в этом месте погода всегда одинаковая.") );
         return;
     }
     
     if ( !RoomUtils::isOutside(ch) )
     {
-        ch->pecho("В помещении погоду не видно -- попробуй выйти наружу!");
+        ch->pecho(_("В помещении погоду не видно -- попробуй выйти наружу!"));
         return;
     }
     
@@ -522,7 +523,7 @@ CMDRUN( weather )
             wind = "резкий северный";
     }
 
-    ch->pecho( "Небо %s и дует %s ветер.",
+    ch->pecho( _("Небо %s и дует %s ветер."),
         sky_look[weather_info.sky],
         wind
     );
@@ -634,7 +635,7 @@ struct Calendar {
     {
         long today = day_of_epoch(time_info);
 
-        out << fmt(0, "Сегодня -- %d число месяца %s, год %d.",
+        out << fmt(0, _("Сегодня -- %d число месяца %s, год %d."),
                    time_info.day + 1,
                    month_table[time_info.month].name,
                    time_info.year)
@@ -657,7 +658,7 @@ struct Calendar {
                 if (days_left == 0) {
                     active << " (до конца дня)";
                 } else {
-                    active << fmt(0, ": осталось %1$d дн%1$Iень|я|ей (до %2$d числа месяца %3$s)",
+                    active << fmt(0, _(": осталось %1$d дн%1$Iень|я|ей (до %2$d числа месяца %3$s)"),
                                   (int)days_left, end_day + 1, month_table[end_month].name);
                 }
             } else {
@@ -690,7 +691,7 @@ struct Calendar {
                     continue;
 
                 upcoming << "  -- " << bonus->getRussianName()
-                         << fmt(0, ": через %1$d дн%1$Iень|я|ей (%2$d числа месяца %3$s)",
+                         << fmt(0, _(": через %1$d дн%1$Iень|я|ей (%2$d числа месяца %3$s)"),
                                 days_ahead,
                                 future_ti.day + 1,
                                 month_table[future_ti.month].name)

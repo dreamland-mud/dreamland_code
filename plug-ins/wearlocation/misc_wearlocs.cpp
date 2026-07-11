@@ -18,6 +18,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(second_weapon);
 GSN(hand_to_hand);
@@ -68,7 +69,7 @@ bool StuckInWearloc::canRemove( Character *ch, Object *obj, int flags )
     // Blinded, you fumble for the shaft and rarely grab it on the first try.
     if (!ch->is_immortal( ) && IS_AFFECTED(ch, AFF_BLIND) && number_percent( ) < 50) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->pecho("Ничего не видя, ты никак не можешь нащупать и выдернуть %1$O4.", obj);
+            ch->pecho(_("Ничего не видя, ты никак не можешь нащупать и выдернуть %1$O4."), obj);
         return false;
     }
 
@@ -184,7 +185,7 @@ int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
     {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
             echo_master(ch, "Твои руки заняты оружием!");
-            ch->recho("%^C1 крутит в руках %O4, но одновременно с оружием это надеть никак не выходит.", ch, obj);
+            ch->recho(_("%^C1 крутит в руках %O4, но одновременно с оружием это надеть никак не выходит."), ch, obj);
         }
         return RC_WEAR_CONFLICT;
     }
@@ -325,8 +326,8 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
         
     if (!ch->is_npc( ) && obj->getWeight( ) > (get_str_app(ch).wield * 10)) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho("Ты не можешь этим вооружиться. Оно слишком тяжело для тебя.");
-            ch->recho("%^C1, кряхтя, пытается надеть %O4, но сил к сожалению не хватает.", ch, obj);
+            ch->pecho(_("Ты не можешь этим вооружиться. Оно слишком тяжело для тебя."));
+            ch->recho(_("%^C1, кряхтя, пытается надеть %O4, но сил к сожалению не хватает."), ch, obj);
         }
         return RC_WEAR_HEAVY;
     }
@@ -337,8 +338,8 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
             || (ch->getRace( )->getSize( ) < SIZE_HUGE && wear_second_wield->find( ch ))))
     {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho("Чтобы вооружиться этим, у тебя должны быть свободны обе руки.");
-            ch->recho("%1$^C1 пытается вооружиться %2$O4, но %1$P3 не хватает обеих свободных рук.", ch, obj);
+            ch->pecho(_("Чтобы вооружиться этим, у тебя должны быть свободны обе руки."));
+            ch->recho(_("%1$^C1 пытается вооружиться %2$O4, но %1$P3 не хватает обеих свободных рук."), ch, obj);
         }
         return RC_WEAR_LARGE;
     }
@@ -425,48 +426,48 @@ int SecondWieldWearloc::canWear( Character *ch, Object *obj, int flags )
     
     if (wear_shield->find( ch )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho("Твои руки уже заняты щитом.");
-            ch->recho("%^C1 пытается ухватить %O4, но одновременно со щитом это надеть не получается.", ch, obj);
+            ch->pecho(_("Твои руки уже заняты щитом."));
+            ch->recho(_("%^C1 пытается ухватить %O4, но одновременно со щитом это надеть не получается."), ch, obj);
         }
         return RC_WEAR_CONFLICT;
     }
 
     if (wear_hold->find( ch )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho("В твоей левой руке уже что-то зажато.");
-            ch->recho("%1$^C1 пытается ухватить %2$O4, но в %1$P2 левой руке уже что-то зажато.", ch, obj);
+            ch->pecho(_("В твоей левой руке уже что-то зажато."));
+            ch->recho(_("%1$^C1 пытается ухватить %2$O4, но в %1$P2 левой руке уже что-то зажато."), ch, obj);
         }
         return RC_WEAR_CONFLICT;
     }
 
     if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS) && ch->getRace( )->getSize( ) < SIZE_HUGE) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho("Ты не можешь взять двуручное оружие в левую руку!");
-            ch->recho("%^C1 пытается взять %O4 в левую руку, но такое под силу только гигантам.", ch, obj);
+            ch->pecho(_("Ты не можешь взять двуручное оружие в левую руку!"));
+            ch->recho(_("%^C1 пытается взять %O4 в левую руку, но такое под силу только гигантам."), ch, obj);
         }
         return RC_WEAR_LARGE;
     }
 
     if (!( wield = wear_wield->find( ch ) )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho("У тебя нет даже первичного оружия!");
-            ch->recho("%^C1 пытается взять %O4 в левую руку, но понимает, что сначала стоит взять что-то в правую.", ch, obj);
+            ch->pecho(_("У тебя нет даже первичного оружия!"));
+            ch->recho(_("%^C1 пытается взять %O4 в левую руку, но понимает, что сначала стоит взять что-то в правую."), ch, obj);
         }
         return RC_WEAR_CONFLICT;
     }
 
     if (IS_WEAPON_STAT(wield, WEAPON_TWO_HANDS) && ch->getRace( )->getSize( ) < SIZE_HUGE) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho("Обе руки заняты двуручным оружием!");
-            ch->recho("%1$^C1 пытается ухватить %2$O4, но %1$P2 руки уже заняты двуручным оружием.", ch, obj);
+            ch->pecho(_("Обе руки заняты двуручным оружием!"));
+            ch->recho(_("%1$^C1 пытается ухватить %2$O4, но %1$P2 руки уже заняты двуручным оружием."), ch, obj);
         }
         return RC_WEAR_LARGE;
     }
 
     if (obj->getWeight( ) > (get_str_app(ch).wield * 5)) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho("Это оружие слишком тяжело для тебя, чтобы использовать его как вторичное.");
-            ch->recho("%^C1 пытается взять %O4 в левую руку, но сил явно не хватает.", ch, obj);
+            ch->pecho(_("Это оружие слишком тяжело для тебя, чтобы использовать его как вторичное."));
+            ch->recho(_("%^C1 пытается взять %O4 в левую руку, но сил явно не хватает."), ch, obj);
         }
         return RC_WEAR_HEAVY;
     }

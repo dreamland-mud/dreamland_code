@@ -17,6 +17,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 const DLString LanguageManager::TABLE_NAME = "languages";
 const DLString LanguageManager::NODE_NAME = "Language";
@@ -185,7 +186,7 @@ void LanguageManager::wordUsed( const Word &word, PCharacter *ch )
     if (--w->second.count > 0)
         return;
 
-    ch->pecho( "{wСлово {w%s{w утрачивает силу.{x", 
+    ch->pecho( _("{wСлово {w%s{w утрачивает силу.{x"), 
                w->second.dictum.getValue( ).c_str( ) );
 
     words.erase( w );

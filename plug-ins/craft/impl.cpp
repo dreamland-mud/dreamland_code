@@ -13,6 +13,7 @@
 #include "craftskill.h"
 #include "craftwearloc.h"
 #include "dl_math.h"
+#include "l10n.h"
 
 TABLE_LOADER(CraftProfessionLoader, "craft-professions", "CraftProfession");
 TABLE_LOADER(CraftWearlocLoader, "craft-wearlocs", "Wearlocation");
@@ -24,9 +25,9 @@ VOID_AFFECT(RemoveTattoo)::update( Object *obj, Affect *paf )
 
     if (obj->carried_by) {
         if (chance(50))
-            obj->carried_by->pecho("%^O1 бледнеет.", obj);
+            obj->carried_by->pecho(_("%^O1 бледнеет."), obj);
         else 
-            obj->carried_by->pecho("Краски на %O6 постепенно тускнеют.", obj);
+            obj->carried_by->pecho(_("Краски на %O6 постепенно тускнеют."), obj);
     }
 }
 

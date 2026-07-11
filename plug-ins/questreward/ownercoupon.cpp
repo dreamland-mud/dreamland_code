@@ -14,6 +14,7 @@
 #include "wiznet.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 bool OwnerCoupon::use( Character *ch, const char *arg ) 
 { 
@@ -23,33 +24,33 @@ bool OwnerCoupon::use( Character *ch, const char *arg )
         return false;
     
     if (!arg[0]) {
-        ch->pecho( "Какую именно вещь ты хочешь сделать своей собственностью?" );
+        ch->pecho( _("Какую именно вещь ты хочешь сделать своей собственностью?") );
         return true;
     }
 
     if (!( item = get_obj_carry( ch, arg ) )) {
-        ch->pecho( "У тебя нет этого." );
+        ch->pecho( _("У тебя нет этого.") );
         return true;
     }
 
     if (item->pIndexData->limit >= 0) {
-        ch->pecho( "Лимиты нельзя приватизировать!" );
+        ch->pecho( _("Лимиты нельзя приватизировать!") );
         return true;
     }
 
     if (item->timer > 0) {
-        ch->pecho( "%^O1 исчезнет через некоторое время, не жалко купон тратить?", item );
+        ch->pecho( _("%^O1 исчезнет через некоторое время, не жалко купон тратить?"), item );
         return true;
     }
 
     if (item->pIndexData == obj->pIndexData) {
-        ch->pecho( "Это неразумно." );
+        ch->pecho( _("Это неразумно.") );
         return true;
     }
 
     if (item->behavior) {
         if (item->behavior.getDynamicPointer<PersonalQuestReward>( )) {
-            ch->pecho( "У %O2 уже есть постоянный владелец.", item );
+            ch->pecho( _("У %O2 уже есть постоянный владелец."), item );
             return true;
         }
 
@@ -68,9 +69,9 @@ bool OwnerCoupon::use( Character *ch, const char *arg )
         << " using " << (obj->getOwner().empty() ? obj->getOwner().c_str() : "nobody") 
         << "'s coupon [ID " << obj->getID( ) << "]" << endl;
 
-    ch->recho( POS_RESTING, "%^C1 проделывает манипуляции с %O5 и %O5.", ch, item, obj );
-    ch->pecho( "Ты превращаешь %O4 в свою личную вещь.", item );
-    ch->pecho( "(во избежание недоразумений внимательно прочти help owner!)" );
+    ch->recho( POS_RESTING, _("%^C1 проделывает манипуляции с %O5 и %O5."), ch, item, obj );
+    ch->pecho( _("Ты превращаешь %O4 в свою личную вещь."), item );
+    ch->pecho( _("(во избежание недоразумений внимательно прочти help owner!)") );
     extract_obj( obj );
     return true; 
 }

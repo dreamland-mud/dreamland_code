@@ -83,6 +83,7 @@
 #include "wrap_utils.h"
 #include "subr.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(dark_shroud);
 GSN(manacles);
@@ -1016,8 +1017,8 @@ NMI_INVOKE( CharacterWrapper, flydown, "опуститься на землю б�
 
     if (is_flying(target)) {
         target->posFlags.setBit( POS_FLY_DOWN );
-        target->pecho( "Ты перестаешь летать." );
-        target->recho( "%1$^C1 переста%1$nет|ют летать.", target );
+        target->pecho( _("Ты перестаешь летать.") );
+        target->recho( _("%1$^C1 переста%1$nет|ют летать."), target );
         return Register(true);
     }
 
@@ -1844,7 +1845,7 @@ NMI_INVOKE( CharacterWrapper, echoMaster, "(fmt, args): выдать строк�
             && target->master->getPC()->getAttributes().isAvailable("ordering");
 
     if (needsOutput) {
-        DLString msg = fmt(0, "{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x\r\n  {W*{x ", target);
+        DLString msg = fmt(0, _("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x\r\n  {W*{x "), target);
         target->master->pecho( msg + regfmt(target->master, args) );
         return true;
     }
@@ -1903,7 +1904,7 @@ NMI_INVOKE( CharacterWrapper, say, "(format, args...): произносит вс
             continue;
 
         DLString msg = regfmt(to, args);
-        to->pecho(POS_RESTING, "%^C1 произносит '{g%s{x'", target, msg.c_str());
+        to->pecho(POS_RESTING, _("%^C1 произносит '{g%s{x'"), target, msg.c_str());
     }
 
     return Register();
@@ -1917,7 +1918,7 @@ NMI_INVOKE( CharacterWrapper, psay, "(ch, format, args...): произносит
     myArgs.pop_front();
 
     DLString msg = regfmt(ch, myArgs);
-    ch->pecho("%^C1 произносит '{g%s{x'", target, msg.c_str());
+    ch->pecho(_("%^C1 произносит '{g%s{x'"), target, msg.c_str());
     return Register();
 }
 
@@ -3083,8 +3084,8 @@ NMI_INVOKE(CharacterWrapper, give, "(vict,vnum|obj): дать персонажу
     obj_from_anywhere(item);
     obj_to_char(item, vict);
 
-    vict->pecho("%^C1 дает тебе %O4.", target, item);
-    vict->recho("%^C1 дает %C3 %O4.", target, vict, item);
+    vict->pecho(_("%^C1 дает тебе %O4."), target, item);
+    vict->recho(_("%^C1 дает %C3 %O4."), target, vict, item);
 
     return Register();
 }
@@ -3101,8 +3102,8 @@ NMI_INVOKE(CharacterWrapper, giveBack, "(vict,obj): вернуть персон�
     obj_from_char(item);
     obj_to_char(item, vict);
 
-    vict->pecho("%^C1 возвращает тебе %O4.", target, item);
-    vict->recho("%^C1 возвращает %C3 %O4.", target, vict, item);
+    vict->pecho(_("%^C1 возвращает тебе %O4."), target, item);
+    vict->recho(_("%^C1 возвращает %C3 %O4."), target, vict, item);
 
     return Register();
 }

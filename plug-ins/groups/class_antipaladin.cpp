@@ -46,6 +46,7 @@
 #include "loadsave.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "l10n.h"
 
 PROF(anti_paladin);
 GSN(cleave);
@@ -84,9 +85,9 @@ void CleaveOneHit::calcDamage( )
     }
 
     if (number_percent( ) < chance) {
-        oldact("Ты рассекаешь $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_CHAR);
-        oldact("$c1 рассекает тебя {RПОПОЛАМ{x!",ch,0,victim,TO_VICT);
-        oldact("$c1 рассекает $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_NOTVICT);
+        oldact(_("Ты рассекаешь $C4 {RПОПОЛАМ{x!"),ch,0,victim,TO_CHAR);
+        oldact(_("$c1 рассекает тебя {RПОПОЛАМ{x!"),ch,0,victim,TO_VICT);
+        oldact(_("$c1 рассекает $C4 {RПОПОЛАМ{x!"),ch,0,victim,TO_NOTVICT);
 
         ch->setWait( 2 );
 
@@ -130,7 +131,7 @@ SKILL_RUNP( cleave )
     Object *obj;
 
     if ( MOUNTED(ch) ) {
-        ch->pecho("Находясь в седле, трудно это сделать!");
+        ch->pecho(_("Находясь в седле, трудно это сделать!"));
         return;
     }
 
@@ -141,17 +142,17 @@ SKILL_RUNP( cleave )
 
  
     if (arg[0] == '\0') {
-        ch->pecho("Рассечь кого?");
+        ch->pecho(_("Рассечь кого?"));
         return;
     }
 
     if (( victim = get_char_room( ch, arg ) ) == 0) {
-        ch->pecho("Этого нет здесь.");
+        ch->pecho(_("Этого нет здесь."));
         return;
     }
 
     if (victim == ch) {
-        ch->pecho("Себя???");
+        ch->pecho(_("Себя???"));
         return;
     }
 
@@ -159,23 +160,23 @@ SKILL_RUNP( cleave )
         return;
 
     if ( ( obj = get_eq_char( ch, wear_wield ) ) == 0) {
-        ch->pecho("Вооружись для начала режущим или рубящим оружием.");
+        ch->pecho(_("Вооружись для начала режущим или рубящим оружием."));
         return;
     }
 
     if (attack_table[obj->value3()].damage != DAM_SLASH) {
-        ch->pecho("Чтобы рассечь кого-то, нужно вооружится режущим или рубящим оружием.");
+        ch->pecho(_("Чтобы рассечь кого-то, нужно вооружится режущим или рубящим оружием."));
         return;
     }
 
     if (victim->fighting != 0) {
-        ch->pecho("Дождись окончания боя.");
+        ch->pecho(_("Дождись окончания боя."));
         return;
     }
 
     if (victim->hit < 0.9 * victim->max_hit && IS_AWAKE(victim) )
     {
-        oldact_p("$C1 ране$Gно|н|на и настороженно оглядывается... ты не сможешь подкрасться незаметно.",
+        oldact_p(_("$C1 ране$Gно|н|на и настороженно оглядывается... ты не сможешь подкрасться незаметно."),
                 ch, 0, victim, TO_CHAR,POS_RESTING);
         return;
     }

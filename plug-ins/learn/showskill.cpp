@@ -9,6 +9,7 @@
 #include "interp.h"
 #include "skill_utils.h"
 #include "skillgroup.h"
+#include "l10n.h"
 
 GROUP(none);
 
@@ -31,7 +32,7 @@ CMDRUN( showskill )
         return;
     
     if (argument.empty( )) {
-        ch->pecho("Использование: {yумение{x <умение или заклинание>");
+        ch->pecho(_("Использование: {yумение{x <умение или заклинание>"));
         return;
     }
 
@@ -39,14 +40,14 @@ CMDRUN( showskill )
     skill = skillManager->find( sn );
 
     if (!skill) {
-        ch->pecho("Такого умения нет.");
+        ch->pecho(_("Такого умения нет."));
         return;
     }
     
     skill->show( pch, buf );
 
     if (buf.str().empty()) {
-        ch->pecho("Такого умения нет.");
+        ch->pecho(_("Такого умения нет."));
         return;        
     }
 

@@ -12,6 +12,7 @@
 #include "act.h"
 
 #include "def.h"
+#include "l10n.h"
 
 /*--------------------------------------------------------------------------
  * XMLAttributeCards
@@ -93,16 +94,16 @@ bool XMLAttributeCards::handle( const DeathArguments &args )
             if (card->suit < 0)
                 card->suit = getRandomSuit( );
 
-            oldact("{cТы уби$gло|л|ла $t из Колоды.{x", pkiller, getFace( '4' ).c_str( ), 0, TO_CHAR );
-            oldact("{cТеперь ты $t!{x", pkiller, card->getFace( '1' ).c_str( ), 0, TO_CHAR );
+            oldact(_("{cТы уби$gло|л|ла $t из Колоды.{x"), pkiller, getFace( '4' ).c_str( ), 0, TO_CHAR );
+            oldact(_("{cТеперь ты $t!{x"), pkiller, card->getFace( '1' ).c_str( ), 0, TO_CHAR );
         }
     
         level--;
 
         if (level >= 0)
-            args.pch->pecho( "{cТы становишься %s.{x", getFace( '5' ).c_str( ) );
+            args.pch->pecho( _("{cТы становишься %s.{x"), getFace( '5' ).c_str( ) );
         else {
-            args.pch->pecho("{cТы выбываешь из колоды!{x");
+            args.pch->pecho(_("{cТы выбываешь из колоды!{x"));
             args.pch->getAttributes( ).eraseAttribute( "cards" );
             return false;
         }

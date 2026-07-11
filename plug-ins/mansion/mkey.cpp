@@ -18,6 +18,7 @@
 #include "loadsave.h"
 
 #include "def.h"
+#include "l10n.h"
 
 /*-------------------------------------------------------------------------
  * 'mkey' command
@@ -53,12 +54,12 @@ COMMAND(MKey, "mkey")
         maker = find_people_behavior<MansionKeyMaker>( ch->in_room );
 
         if (!maker) {
-            ch->pecho("Здесь нет ключника.");
+            ch->pecho(_("Здесь нет ключника."));
             return;
         }
 
         if (ch->is_npc( )) {
-            ch->pecho("Ты бездомное.");
+            ch->pecho(_("Ты бездомное."));
             return;
         }
         
@@ -87,12 +88,12 @@ void MKey::doRemove( Character *ch, DLString &arguments )
     try {
         vnum = arguments.getOneArgument( ).toInt( );
     } catch (const ExceptionBadType& e) {
-        ch->pecho("Неправильный vnum ключа.");
+        ch->pecho(_("Неправильный vnum ключа."));
         return;
     }
 
     if ( (pci = PCharacterManager::find( name )) == 0) {
-        ch->pecho("Неправильное имя.");
+        ch->pecho(_("Неправильное имя."));
         return;
     }
     
@@ -108,7 +109,7 @@ void MKey::doRemove( Character *ch, DLString &arguments )
             return;
         }
     
-    ch->pecho("Такой ключ не найден.");
+    ch->pecho(_("Такой ключ не найден."));
 }
 
 void MKey::doGrant( Character *ch, DLString &arguments ) 
@@ -130,12 +131,12 @@ void MKey::doGrant( Character *ch, DLString &arguments )
     }
 
     if (get_obj_index( vnum ) == 0) {
-        ch->pecho("Такого ключа не существует.");
+        ch->pecho(_("Такого ключа не существует."));
         return;
     }
 
     if ( (pci = PCharacterManager::find( name )) == 0) {
-        ch->pecho("Неправильное имя.");
+        ch->pecho(_("Неправильное имя."));
         return;
     }
     
@@ -145,7 +146,7 @@ void MKey::doGrant( Character *ch, DLString &arguments )
 
     for (i = attr->keys.begin( ); i != attr->keys.end( ); i++)
         if (i->getValue( ) == vnum) {
-            ch->pecho("Такой ключ у него уже есть.");
+            ch->pecho(_("Такой ключ у него уже есть."));
             return;
         }
     
@@ -163,7 +164,7 @@ void MKey::doShow( Character *ch, DLString &arguments )
     DLString name = arguments.getOneArgument( );
 
     if ( (pci = PCharacterManager::find( name )) == 0) {
-        ch->pecho("Неправильное имя.");
+        ch->pecho(_("Неправильное имя."));
         return;
     }
     
@@ -171,11 +172,11 @@ void MKey::doShow( Character *ch, DLString &arguments )
     attr = attributes->findAttr<XMLAttributeMansionKey>( "mkey" );
 
     if (!attr) {
-        ch->pecho("Ключей не найдено.");
+        ch->pecho(_("Ключей не найдено."));
         return;
     }
 
-    ch->pecho( "%s владеет такими ключами: ", pci->getName( ).c_str( ) );
+    ch->pecho( _("%s владеет такими ключами: "), pci->getName( ).c_str( ) );
 
     for (i = attr->keys.begin( ); i != attr->keys.end( ); i++) {
         int vnum = i->getValue( );
@@ -269,8 +270,8 @@ bool MansionKeyMaker::canServeClient( Character * )
 
 void MansionKeyMaker::msgListRequest( Character *client )
 {
-    oldact("$c1 просит $C4 показать список ключей.", client, 0, getKeeper( ), TO_ROOM );
-    oldact("Ты просишь у $C4 показать список ключей.", client, 0, getKeeper( ), TO_CHAR );
+    oldact(_("$c1 просит $C4 показать список ключей."), client, 0, getKeeper( ), TO_ROOM );
+    oldact(_("Ты просишь у $C4 показать список ключей."), client, 0, getKeeper( ), TO_CHAR );
 }
 
 void MansionKeyMaker::msgBuyRequest( Character *client )
@@ -350,8 +351,8 @@ bool MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const D
     key = create_object( get_obj_index( vnum ), 1 );
     obj_to_char( key, client );
 
-    oldact("$C1 вручает тебе $o4.", client, key, maker, TO_CHAR );
-    oldact("$C1 вручает $c3 $o4." , client, key, maker, TO_ROOM );
+    oldact(_("$C1 вручает тебе $o4."), client, key, maker, TO_CHAR );
+    oldact(_("$C1 вручает $c3 $o4.") , client, key, maker, TO_ROOM );
     return true;
 }
 

@@ -11,6 +11,7 @@
 #include "dl_strings.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 /*-------------------------------------------------------------------
  * AreaHelp 
@@ -90,7 +91,7 @@ static void format_area_quest(AreaQuest *q, ostringstream &qbuf)
     // Quest frequency
     qbuf << "Как часто: ";
     if (q->limitPerLife > 0)
-        qbuf << fmt(0, "%1$d раз%1$I|а| за жизнь", q->limitPerLife.getValue());
+        qbuf << fmt(0, _("%1$d раз%1$I|а| за жизнь"), q->limitPerLife.getValue());
     else // TODO support for 'once per hour' etc
         qbuf << "сколько угодно раз";
 

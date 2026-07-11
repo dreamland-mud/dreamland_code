@@ -24,6 +24,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 WEARLOC(hair);
 WEARLOC(tail);
@@ -63,7 +64,7 @@ CMDRUNP( wear )
     argument = one_argument( argument, argVict );
 
     if (!argObj[0]) {
-        ch->pecho("Надеть, вооружиться или взять это в руки?");
+        ch->pecho(_("Надеть, вооружиться или взять это в руки?"));
         return;
     }
     
@@ -75,10 +76,10 @@ CMDRUNP( wear )
             fTail = true;
         }
         else if (( victim = get_char_room( ch, argVict  ) ) == 0) {
-            ch->pecho("На кого ты хочешь это надеть?");
+            ch->pecho(_("На кого ты хочешь это надеть?"));
             return;
         } else if (victim != ch && !victim->is_npc( )) {
-            oldact("$C1 в состоянии одеться са$Gмо|м|ма!", ch, 0, victim, TO_CHAR);
+            oldact(_("$C1 в состоянии одеться са$Gмо|м|ма!"), ch, 0, victim, TO_CHAR);
             return;
         }
     }
@@ -150,15 +151,15 @@ CMDRUNP( wear )
             obj_from_char( obj );
             obj_to_char( obj, ch );
         }
-        oldact("Ты пытаешься надеть $o4 на $C4, но безуспешно.", ch, obj, victim, TO_CHAR);
-        oldact("$c1 пытается надеть на тебя $o4, но не может.", ch, obj, victim, TO_VICT);
-        oldact("$c1 пытается надеть на $C4 $o4, но не может.", ch, obj, victim, TO_NOTVICT);
+        oldact(_("Ты пытаешься надеть $o4 на $C4, но безуспешно."), ch, obj, victim, TO_CHAR);
+        oldact(_("$c1 пытается надеть на тебя $o4, но не может."), ch, obj, victim, TO_VICT);
+        oldact(_("$c1 пытается надеть на $C4 $o4, но не может."), ch, obj, victim, TO_NOTVICT);
         return;
     }
     
-    oldact("Ты надеваешь $o4 на $C4.", ch, obj, victim, TO_CHAR);
-    oldact("$c1 надевает на тебя $o4.", ch, obj, victim, TO_VICT);
-    oldact("$c1 надевает на $C4 $o4.", ch, obj, victim, TO_NOTVICT);
+    oldact(_("Ты надеваешь $o4 на $C4."), ch, obj, victim, TO_CHAR);
+    oldact(_("$c1 надевает на тебя $o4."), ch, obj, victim, TO_VICT);
+    oldact(_("$c1 надевает на $C4 $o4."), ch, obj, victim, TO_NOTVICT);
     oprog_dress(obj, ch, victim);	
 }
 
@@ -182,7 +183,7 @@ CMDRUNP( remove )
     argument = one_argument( argument, argVict );
 
     if (!argObj[0]) {
-        ch->pecho("Снять что?");
+        ch->pecho(_("Снять что?"));
         return;
     }
 
@@ -239,15 +240,15 @@ CMDRUNP( remove )
     }
     
     if (!obj->wear_loc->remove( obj, 0 )) {
-        oldact("Ты пытаешься снять $o4 с $C2, но безуспешно.", ch, obj, victim, TO_CHAR);
-        oldact("$c1 пытается снять с тебя $o4, но не может.", ch, obj, victim, TO_VICT);
-        oldact("$c1 пытается снять с $C2 $o4, но не может.", ch, obj, victim, TO_NOTVICT);
+        oldact(_("Ты пытаешься снять $o4 с $C2, но безуспешно."), ch, obj, victim, TO_CHAR);
+        oldact(_("$c1 пытается снять с тебя $o4, но не может."), ch, obj, victim, TO_VICT);
+        oldact(_("$c1 пытается снять с $C2 $o4, но не может."), ch, obj, victim, TO_NOTVICT);
         return;
     }
     
-    oldact("Ты снимаешь $o4 с $C2.", ch, obj, victim, TO_CHAR);
-    oldact("$c1 снимает с тебя $o4.", ch, obj, victim, TO_VICT);
-    oldact("$c1 снимает с $C2 $o4.", ch, obj, victim, TO_NOTVICT);
+    oldact(_("Ты снимаешь $o4 с $C2."), ch, obj, victim, TO_CHAR);
+    oldact(_("$c1 снимает с тебя $o4."), ch, obj, victim, TO_VICT);
+    oldact(_("$c1 снимает с $C2 $o4."), ch, obj, victim, TO_NOTVICT);
     
     if (obj->carried_by == victim) {
         obj_from_char( obj );

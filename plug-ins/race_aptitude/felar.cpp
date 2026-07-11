@@ -30,6 +30,7 @@
 #include "act.h"
 #include "interp.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(tail);
 
@@ -45,7 +46,7 @@ SKILL_RUNP( tail )
     one_argument( argument, arg );
     
     if (MOUNTED( ch )) {
-        ch->pecho("Только не верхом!");
+        ch->pecho(_("Только не верхом!"));
         return;
     }
 
@@ -56,23 +57,23 @@ SKILL_RUNP( tail )
     if (arg[0] == '\0') {
         victim = ch->fighting;
         if (victim == 0) {
-            ch->pecho("Сейчас ты не сражаешься!");
+            ch->pecho(_("Сейчас ты не сражаешься!"));
             return;
         }
     }
     else if ((victim = get_char_room(ch, arg)) == 0) {
-        ch->pecho("Этого нет здесь.");
+        ch->pecho(_("Этого нет здесь."));
         return;
     }
 
     if (victim->position < POS_FIGHTING) {
-        oldact_p("Тебе нужно подождать, пока $E повернется к тебе.",
+        oldact_p(_("Тебе нужно подождать, пока $E повернется к тебе."),
                 ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
 
     if (victim == ch) {
-        ch->pecho("Ты пытаешься огреть себя хвостом, но ничего не выходит.");
+        ch->pecho(_("Ты пытаешься огреть себя хвостом, но ничего не выходит."));
         return;
     }
 
@@ -80,7 +81,7 @@ SKILL_RUNP( tail )
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
-        oldact("Но $C1 твой друг!",ch,0,victim,TO_CHAR);
+        oldact(_("Но $C1 твой друг!"),ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -118,9 +119,9 @@ SKILL_RUNP( tail )
     /* now the attack */
     if (number_percent() < chance / 2)
     {
-        oldact("$c1 наносит тебе удар хвостом!",ch,0,victim,TO_VICT);
-        oldact("Ты наносишь $C3 удар хвостом!",ch,0,victim,TO_CHAR);
-        oldact("$c1 наносит $C3 удар хвостом.",ch,0,victim,TO_NOTVICT);
+        oldact(_("$c1 наносит тебе удар хвостом!"),ch,0,victim,TO_VICT);
+        oldact(_("Ты наносишь $C3 удар хвостом!"),ch,0,victim,TO_CHAR);
+        oldact(_("$c1 наносит $C3 удар хвостом."),ch,0,victim,TO_NOTVICT);
         gsn_tail->improve( ch, true, victim );
     
         victim->setWaitViolence( number_bits( 2 ) + 1 );
@@ -137,9 +138,9 @@ SKILL_RUNP( tail )
     {
         damage(ch,victim,0,gsn_tail,DAM_BASH, true, DAMF_WEAPON);
         
-        oldact("Ты теряешь равновесие и падаешь!",ch,0,victim,TO_CHAR);
-        oldact("$c1 теряет равновесие и падает!",ch,0,victim,TO_NOTVICT);
-        oldact("Ты уклоняешься от хвоста $c2, и $e падает.",ch,0,victim,TO_VICT);
+        oldact(_("Ты теряешь равновесие и падаешь!"),ch,0,victim,TO_CHAR);
+        oldact(_("$c1 теряет равновесие и падает!"),ch,0,victim,TO_NOTVICT);
+        oldact(_("Ты уклоняешься от хвоста $c2, и $e падает."),ch,0,victim,TO_VICT);
         
         gsn_tail->improve( ch, false, victim );
         ch->position = POS_RESTING;

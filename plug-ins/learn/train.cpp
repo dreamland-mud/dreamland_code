@@ -24,6 +24,7 @@
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 static const int conPriceQP = 150;
 HOMETOWN(frigate);
@@ -70,8 +71,8 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
             return;
         }
 
-        oldact("$C1 дает тебе {Y10{x практик в обмен на {Y1{x тренировочную сессию.", client, 0, ch, TO_CHAR);
-        oldact("$C1 обменивает для $c2 тренировочные сессии на сессии практики.", client, 0, ch, TO_NOTVICT );
+        oldact(_("$C1 дает тебе {Y10{x практик в обмен на {Y1{x тренировочную сессию."), client, 0, ch, TO_CHAR);
+        oldact(_("$C1 обменивает для $c2 тренировочные сессии на сессии практики."), client, 0, ch, TO_NOTVICT );
 
         client->practice += 10;
         client->train -=1 ;
@@ -84,8 +85,8 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
             return;
         }
 
-        oldact("$C1 дает тебе {Y1{x тренировочную сессию в обмен на {Y10{x практик.", client, 0, ch, TO_CHAR );
-        oldact("$C1 обменивает для $c2 сессии практики на тренировочные сессии.", client, 0, ch, TO_NOTVICT );
+        oldact(_("$C1 дает тебе {Y1{x тренировочную сессию в обмен на {Y10{x практик."), client, 0, ch, TO_CHAR );
+        oldact(_("$C1 обменивает для $c2 сессии практики на тренировочные сессии."), client, 0, ch, TO_NOTVICT );
 
         client->practice -= 10;
         client->train +=1 ;
@@ -165,8 +166,8 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 
     client->perm_stat[stat_table.fields[stat].value] += 1;
 
-    oldact("Ты повышаешь {W$N4{x!", client, 0, stat_table.fields[stat].message, TO_CHAR );
-    oldact("$c1 повышает {W$N4!{x", client, 0, stat_table.fields[stat].message, TO_ROOM );
+    oldact(_("Ты повышаешь {W$N4{x!"), client, 0, stat_table.fields[stat].message, TO_CHAR );
+    oldact(_("$c1 повышает {W$N4!{x"), client, 0, stat_table.fields[stat].message, TO_ROOM );
 
     mprog_train(client, ch, stat);
 }
@@ -230,14 +231,14 @@ CMDRUN( train )
     DLString argument = constArguments;
 
     if (ch->is_npc( )) {
-        ch->pecho( "Это бесполезно для тебя." );
+        ch->pecho( _("Это бесполезно для тебя.") );
         return;
     }
     
     trainer = find_attracted_mob_behavior<Trainer>( ch, OCC_TRAINER );
 
     if (!trainer) {
-        ch->pecho( "Здесь некому тренировать тебя." );
+        ch->pecho( _("Здесь некому тренировать тебя.") );
         return;
     }
 

@@ -13,6 +13,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 const DLString ArcadianLanguage::LANG_NAME = "arcadian";
 
@@ -78,7 +79,7 @@ DLString ArcadianLanguage::createDictum( ) const
 
 void ArcadianLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->pecho( "В веселом гаме и цокоте копыт ты различаешь слово {c%s{x.",
+    ch->pecho( _("В веселом гаме и цокоте копыт ты различаешь слово {c%s{x."),
                 word.toStr( ) ); 
 }
 

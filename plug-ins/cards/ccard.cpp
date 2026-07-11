@@ -19,6 +19,7 @@
 #include "loadsave.h"
 #include "save.h"
 #include "def.h"
+#include "l10n.h"
 
 COMMAND(CCard, "card")
 {
@@ -30,7 +31,7 @@ COMMAND(CCard, "card")
         return;
     
     if (!pch->is_immortal( )) {
-        pch->pecho("Это не для тебя.");
+        pch->pecho(_("Это не для тебя."));
         return;
     }
     
@@ -52,7 +53,7 @@ void CCard::doMob( PCharacter *ch, DLString& arguments )
     DLString mobName = arguments.getOneArgument( );
     
     if (mobName.empty( )) {
-        ch->pecho("Кого ты хочешь сделать шестеркой?");
+        ch->pecho(_("Кого ты хочешь сделать шестеркой?"));
         return;
     }
     
@@ -68,7 +69,7 @@ void CCard::doMob( PCharacter *ch, DLString& arguments )
     mob->getNPC( )->behavior.setPointer( *bhv );
     save_mobs( mob->in_room );
 
-    ch->pecho( "%s из комнаты [%d] стал(о) шестеркой.",
+    ch->pecho( _("%s из комнаты [%d] стал(о) шестеркой."),
                 mob->getNameP( '1' ).c_str( ), mob->in_room->vnum );
 }
 
@@ -84,7 +85,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     pci = PCharacterManager::find( name );
 
     if (!pci) {
-        ch->pecho("Жертва не найдена.");
+        ch->pecho(_("Жертва не найдена."));
         return;
     }
 
@@ -92,9 +93,9 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     card = attributes->findAttr<XMLAttributeCards>( "cards" );
     
     if (!card)
-        ch->pecho( "%C1 не состоит в Колоде.", pci );
+        ch->pecho( _("%C1 не состоит в Колоде."), pci );
     else
-        ch->pecho( "%C1 - это %s из Колоды.", pci, card->getFace( '1' ).c_str( ) );
+        ch->pecho( _("%C1 - это %s из Колоды."), pci, card->getFace( '1' ).c_str( ) );
 
 
     arg = arguments.getOneArgument( );
@@ -105,7 +106,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     if (arg == "clear" || arg == "off") {
         attributes->eraseAttribute( "cards" );
         PCharacterManager::saveMemory( pci );
-        ch->pecho( "Он(а) выбывает из Колоды." );        
+        ch->pecho( _("Он(а) выбывает из Колоды.") );        
         return;
     }
 
@@ -114,7 +115,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
         if (level < 0 || level > 8)
             throw Exception( );
     } catch (const Exception& ) {
-        ch->pecho("<card level> должен быть числом от 0 до 8.");
+        ch->pecho(_("<card level> должен быть числом от 0 до 8."));
         return;
     }
     
@@ -127,7 +128,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
         card->setSuit( card->getRandomSuit( ) );
 
     PCharacterManager::saveMemory( pci );
-    ch->pecho( "%C1 становится %s.", pci, card->getFace( '5' ).c_str( ) );
+    ch->pecho( _("%C1 становится %s."), pci, card->getFace( '5' ).c_str( ) );
      
 }
 
@@ -138,7 +139,7 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
     PCharacterMemoryList::const_iterator i;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
    
-    ch->pecho("Список всех карт из Колоды: \r\nИгроки: ");
+    ch->pecho(_("Список всех карт из Колоды: \r\nИгроки: "));
     cnt = 0;
      
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
@@ -157,9 +158,9 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
     }
     
     if (cnt > 0)
-        ch->pecho( "Итого: %d тел", cnt );
+        ch->pecho( _("Итого: %d тел"), cnt );
 
-    ch->pecho( "\r\nМобы-шестерки:", cnt );
+    ch->pecho( _("\r\nМобы-шестерки:"), cnt );
     cnt = 0;
         
     for (wch = char_list; wch; wch = wch->next) {
@@ -185,7 +186,7 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
     }
     
     if (cnt > 0)
-        ch->pecho( "Итого: %d тел", cnt );
+        ch->pecho( _("Итого: %d тел"), cnt );
 }
 
 void CCard::usage( PCharacter *ch )

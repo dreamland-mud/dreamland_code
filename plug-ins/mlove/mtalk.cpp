@@ -8,6 +8,7 @@
 
 #include "pcharacter.h"
 #include "pcharactermanager.h"
+#include "l10n.h"
 
 CMDRUN( mtalk )
 {
@@ -17,19 +18,19 @@ CMDRUN( mtalk )
     PCharacter *victim;
     
     if (ch->is_npc( )) {
-        ch->pecho("Тебе нельзя.");
+        ch->pecho(_("Тебе нельзя."));
         return;
     }
 
     attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeMarriage>( "marriage" );
     
     if (!attr || attr->spouse.getValue( ).empty( )) {
-        ch->pecho("Сначала женись, потом поговорим.");
+        ch->pecho(_("Сначала женись, потом поговорим."));
         return;
     }
 
     if (constArguments.empty( )) {
-        ch->pecho( "Сказать что?" );
+        ch->pecho( _("Сказать что?") );
         return;
     }
     
@@ -37,9 +38,9 @@ CMDRUN( mtalk )
 
     if (!victim) {
         if (attr->wife.getValue( ))
-            ch->pecho("Твой муж отсутствует в мире.");
+            ch->pecho(_("Твой муж отсутствует в мире."));
         else
-            ch->pecho("Твоя жена отсутствует в мире.");
+            ch->pecho(_("Твоя жена отсутствует в мире."));
         
         return;
     }

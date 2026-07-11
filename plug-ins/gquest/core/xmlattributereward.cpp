@@ -16,6 +16,7 @@
 #include "descriptor.h"
 #include "msgformatter.h"
 #include "act.h"
+#include "l10n.h"
 
 XMLReward::XMLReward( )
 {
@@ -58,7 +59,7 @@ void XMLAttributeReward::reward( PCharacter *ch )
         c = r->gold;
         if (c > 0) {
             ch->gold += c;
-            buf << fmt(0, "%s%s%4d %sзолот%s\r\n",
+            buf << fmt(0, _("%s%s%4d %sзолот%s\r\n"),
                      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
                      GET_COUNT(c, "ую монету", "ые монеты", "ых монет") );
         }
@@ -66,7 +67,7 @@ void XMLAttributeReward::reward( PCharacter *ch )
         c = r->qpoints;
         if (c > 0) {
             ch->addQuestPoints(c);
-            buf << fmt(0, "%s%s%4d %sквестов%s\r\n",
+            buf << fmt(0, _("%s%s%4d %sквестов%s\r\n"),
                      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
                      GET_COUNT(c, "ую единицу", "ые единицы", "ых единиц") );
         }
@@ -74,7 +75,7 @@ void XMLAttributeReward::reward( PCharacter *ch )
         c = r->practice;
         if (c > 0) {
             ch->practice += c;
-            buf << fmt(0, "%s%s%4d %sпрактик%s\r\n",
+            buf << fmt(0, _("%s%s%4d %sпрактик%s\r\n"),
                       offset, GQChannel::BOLD, c, GQChannel::NORMAL,
                       GET_COUNT(c, "у", "и", "") );
         }
@@ -82,7 +83,7 @@ void XMLAttributeReward::reward( PCharacter *ch )
         c = r->experience;
         if (c > 0) {
             Player::gainExp(ch, c);
-            buf << fmt(0, "%s%s%4d %sочк%s опыта\r\n",
+            buf << fmt(0, _("%s%s%4d %sочк%s опыта\r\n"),
                      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
                      GET_COUNT(c, "о", "а", "ов"));
         }

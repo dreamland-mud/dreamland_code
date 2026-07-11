@@ -9,6 +9,7 @@
 #include "regexp.h"
 #include "dreamland.h"
 #include "comm.h"
+#include "l10n.h"
 
 HOMETOWN(frigate);
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
@@ -19,7 +20,7 @@ CMDADM( idelete )
     DLString name = constArguments;
 
     if (name.empty( )) {
-        ch->pecho( "Удалить чей профайл?" );
+        ch->pecho( _("Удалить чей профайл?") );
         return;
     }
 
@@ -65,17 +66,17 @@ CMDADM( idelete )
 
 
     if (!( pci = PCharacterManager::find( name ) )) {
-        ch->pecho( "Персонаж с таким именем не найден." );
+        ch->pecho( _("Персонаж с таким именем не найден.") );
         return;
     }
 
     if (pci->isOnline( )) {
-        ch->pecho( "Персонаж присутствует в мире, удаление невозможно." );
+        ch->pecho( _("Персонаж присутствует в мире, удаление невозможно.") );
         return;
     }
     
     if (!PCharacterManager::pfDelete( constArguments ))
-        ch->pecho( "Ошибка при удалении профайла!" );
+        ch->pecho( _("Ошибка при удалении профайла!") );
     else
         ch->pecho( "Ok." );
 }
@@ -89,7 +90,7 @@ CMDADM( ipassword )
     DLString passwd = arguments.getOneArgument( );
 
     if (name.empty( )) {
-        ch->pecho( "Установить пароль кому?" );
+        ch->pecho( _("Установить пароль кому?") );
         return;
     }
 
@@ -110,22 +111,22 @@ CMDADM( ipassword )
             }
         }
 
-        ch->pecho( "Захешированы пароли %d персонажей из %d.", cnt, pcm.size( ) );
+        ch->pecho( _("Захешированы пароли %d персонажей из %d."), cnt, pcm.size( ) );
         return;
     }
 
     if (passwd.empty( )) {
-        ch->pecho("Использование: ipassword <player name> <new password>.");
+        ch->pecho(_("Использование: ipassword <player name> <new password>."));
         return;
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-        ch->pecho( "Персонаж с таким именем не найден." );
+        ch->pecho( _("Персонаж с таким именем не найден.") );
         return;
     }
     
     password_set( pci, passwd );
-    ch->pecho( "Новый пароль установлен и сохранен." );
+    ch->pecho( _("Новый пароль установлен и сохранен.") );
 }
 
 

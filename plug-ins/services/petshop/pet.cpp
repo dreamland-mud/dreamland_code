@@ -27,6 +27,7 @@
 #include "skill_utils.h"
 #include "roomutils.h"
 #include "move_utils.h"
+#include "l10n.h"
 
 GSN(haggle);
 RELIG(fili);
@@ -68,15 +69,15 @@ bool Pet::area( )
     }
     
 
-    DLString msg = fmt(0, "Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и ", ch);
+    DLString msg = fmt(0, _("Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и "), ch);
     if (is_flying(ch))
-        msg = msg + fmt(0, "улета%1$nет|ют ", ch);
+        msg = msg + fmt(0, _("улета%1$nет|ют "), ch);
     else if (RoomUtils::isWater(ch->in_room))
-        msg = msg + fmt(0, "уплыва%1$nет|ют ", ch);
+        msg = msg + fmt(0, _("уплыва%1$nет|ют "), ch);
     else if (!Char::hasLegs(ch))
-        msg = msg + fmt(0, "уполза%1$nет|ют ", ch);
+        msg = msg + fmt(0, _("уполза%1$nет|ют "), ch);
     else
-        msg = msg + fmt(0, "уход%1$nит|ят ", ch);
+        msg = msg + fmt(0, _("уход%1$nит|ят "), ch);
 
     msg = msg + "восвояси.";
     ch->recho(msg.c_str());
@@ -94,23 +95,23 @@ bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     NPCharacter *pet;
 
     if (client->is_npc( ) || client->getPC( )->pet) {
-        client->pecho( "У тебя уже есть один питомец." );
+        client->pecho( _("У тебя уже есть один питомец.") );
         return false;
     }
     
     if (client->getProfession( ) == prof_druid) {
-        client->pecho( "Тебе омерзительна сама мысль о покупке этих несчастных порабощенных созданий." );
-        client->pecho( "Ты надеешься, что если перестать покупать питомцев, то их просто выпустят на волю." );
+        client->pecho( _("Тебе омерзительна сама мысль о покупке этих несчастных порабощенных созданий.") );
+        client->pecho( _("Ты надеешься, что если перестать покупать питомцев, то их просто выпустят на волю.") );
         return false;
     }
 
     if (!canAfford( client )) {
-        client->pecho( "У тебя не хватает %N2, чтобы заплатить за это.", toCurrency( ).c_str( ) );
+        client->pecho( _("У тебя не хватает %N2, чтобы заплатить за это."), toCurrency( ).c_str( ) );
         return false;
     }
 
     if (getLevel( client ) > client->getModifyLevel( )) {
-        client->pecho( "У тебя недостаточно опыта, чтобы справиться с этим питомцем." );
+        client->pecho( _("У тебя недостаточно опыта, чтобы справиться с этим питомцем.") );
         return false;
     }
 
@@ -118,8 +119,8 @@ bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     pet = create( client->getPC( ) ); 
     client->setWaitViolence( 1 );
     
-    oldact("В трудную минуту $E поможет тебе!", client, 0, pet, TO_CHAR );
-    oldact("$c1 приобретает $C4.", client, 0, pet, TO_ROOM );
+    oldact(_("В трудную минуту $E поможет тебе!"), client, 0, pet, TO_CHAR );
+    oldact(_("$c1 приобретает $C4."), client, 0, pet, TO_ROOM );
     interpret_raw(pet, "report");
     return true;
 }
@@ -154,7 +155,7 @@ int Pet::haggle( Character *client ) const
 
     if (bonus || (roll < gsn_haggle->getEffective( client ) + skill_level_bonus(*gsn_haggle, ch))) {
         cost -= cost / 2 * roll / 100;
-        client->pecho( "Ты торгуешься и цена снижается до %d монет.", cost );
+        client->pecho( _("Ты торгуешься и цена снижается до %d монет."), cost );
         gsn_haggle->improve( client, true );
     }
     
@@ -176,7 +177,7 @@ void Pet::config( PCharacter *client, NPCharacter *pet ) const
         pet->alignment = client->alignment;
     
     pet->setDescription( fmt(0,
-             "%s\r\nТы понимаешь, что %s будет защищать и следовать за {C%s{x до самой смерти.\n\r",
+             _("%s\r\nТы понимаешь, что %s будет защищать и следовать за {C%s{x до самой смерти.\n\r"),
              pet->getNPC( )->pIndexData->description.get(LANG_DEFAULT).c_str(),
              pet->getNameP( '1' ).c_str( ), client->getNameP( '5' ).c_str( ) ), LANG_DEFAULT );
 }
@@ -295,23 +296,23 @@ bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
         return false;
 
     if (client->getProfession( ) == prof_druid) {
-        client->pecho( "Тебе омерзительна сама мысль о покупке этих несчастных порабощенных созданий." );
-        client->pecho( "Ты надеешься, что если перестать покупать питомцев, то их просто выпустят на волю." );
+        client->pecho( _("Тебе омерзительна сама мысль о покупке этих несчастных порабощенных созданий.") );
+        client->pecho( _("Ты надеешься, что если перестать покупать питомцев, то их просто выпустят на волю.") );
         return false;
     }
     
     if (MOUNTED(client)) {
-        client->pecho( "У тебя уже есть скакун." );
+        client->pecho( _("У тебя уже есть скакун.") );
         return false;
     }
 
     if (!canAfford( client )) {
-        client->pecho( "У тебя не хватает %N2, чтобы заплатить за это.", toCurrency( ).c_str( ) );
+        client->pecho( _("У тебя не хватает %N2, чтобы заплатить за это."), toCurrency( ).c_str( ) );
         return false;
     }
 
     if (getLevel( client ) - 5 > client->getModifyLevel( )) {
-        ch->pecho("Тебе не хватит опыта справиться с этим скакуном.");
+        ch->pecho(_("Тебе не хватит опыта справиться с этим скакуном."));
         return false;
     }
 
@@ -321,8 +322,8 @@ bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
     
     interpret_fmt( client, "mount %s", horse->getNameC() );
 
-    client->pecho("Наслаждайся своим скакуном.");
-    oldact("$c1 приобретает для верховой езды $C4.", client, 0, horse, TO_ROOM );
+    client->pecho(_("Наслаждайся своим скакуном."));
+    oldact(_("$c1 приобретает для верховой езды $C4."), client, 0, horse, TO_ROOM );
     return true;
 }
 

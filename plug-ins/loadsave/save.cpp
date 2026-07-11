@@ -102,6 +102,7 @@
 #include "itemevents.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(none);
 GSN(doppelganger);
@@ -612,7 +613,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
         {
             if (!obj->hasOwner( ch ) && obj->mustDisappear( ch ))
             {
-                oldact("$o1 рассыпается трухой!",ch,obj,0,TO_CHAR);
+                oldact(_("$o1 рассыпается трухой!"),ch,obj,0,TO_CHAR);
                 extract_obj( obj );
                 return;
             }

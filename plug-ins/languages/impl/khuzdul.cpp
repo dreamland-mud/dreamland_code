@@ -13,6 +13,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 const DLString KhuzdulLanguage::LANG_NAME = "khuzdul";
 
@@ -91,6 +92,6 @@ DLString KhuzdulLanguage::radicalToDictum( ) const
 
 void KhuzdulLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->pecho( "Отзвуком древних битв приходит в твои сны слово {c%s{x.", word.toStr( ) ); 
+    ch->pecho( _("Отзвуком древних битв приходит в твои сны слово {c%s{x."), word.toStr( ) ); 
 }
 

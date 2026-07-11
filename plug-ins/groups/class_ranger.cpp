@@ -61,6 +61,7 @@
 #include "interp.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "l10n.h"
 
 PROF(ranger);
 GSN(ambush);
@@ -100,11 +101,11 @@ SKILL_RUNP( track )
     int d;
 
     if (arg.empty( )) {
-        ch->pecho( "Кого ты хочешь выследить?" );
+        ch->pecho( _("Кого ты хочешь выследить?") );
         return;
     }
 
-    oldact("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM);
+    oldact(_("$c1 всматривается в землю в поисках следов."),ch,0,0,TO_ROOM);
 
     int slevel;
     slevel = gsn_track->getEffective( ch ) + skill_level_bonus(*gsn_track, ch);  
@@ -119,7 +120,7 @@ SKILL_RUNP( track )
                     if (oprog_track(obj, ch, arg.c_str(), d))
                         return;
 
-                ch->pecho("Следы %N2 ведут %s.", arg.c_str(), dirs[d].leave);
+                ch->pecho(_("Следы %N2 ведут %s."), arg.c_str(), dirs[d].leave);
                 
                 if (IS_SET(pexit->exit_info, EX_CLOSED)) 
                     open_door_extra( ch, d, pexit );
@@ -129,7 +130,7 @@ SKILL_RUNP( track )
             }
         }
     
-    ch->pecho("Ты не видишь здесь следов.");
+    ch->pecho(_("Ты не видишь здесь следов."));
     gsn_track->improve( ch, false );
 }
 
@@ -147,12 +148,12 @@ static Object * find_arrow( Character *ch, Object *quiver )
         }
 
     if (!arrow) {
-        oldact("В $o6 закончились стрелы.", ch, quiver, 0, TO_CHAR);
+        oldact(_("В $o6 закончились стрелы."), ch, quiver, 0, TO_CHAR);
         return NULL;
     }
 
     if (ch->getModifyLevel( ) + 10 < arrow->level) {
-        ch->pecho("Тебе не хватает опыта воспользоватся этой стрелой.");
+        ch->pecho(_("Тебе не хватает опыта воспользоватся этой стрелой."));
         return NULL;
     }
 
@@ -179,12 +180,12 @@ SKILL_RUNP( shoot )
 
     if ( ch->fighting )
     {
-            ch->pecho("Сражаясь, ты не можешь прицелиться.");
+            ch->pecho(_("Сражаясь, ты не можешь прицелиться."));
             return;
     }
 
     if (!direction_range_argument(argument, argDoor, argVict, direction)) {
-        ch->pecho("Выстрелить в каком направлении и в кого?");
+        ch->pecho(_("Выстрелить в каком направлении и в кого?"));
         return;
     }
 
@@ -197,19 +198,19 @@ SKILL_RUNP( shoot )
 
     if ( !victim->is_npc() && victim->desc == 0 )
     {
-            ch->pecho("Ты не можешь сделать этого.");
+            ch->pecho(_("Ты не можешь сделать этого."));
             return;
     }
 
     if ( victim == ch )
     {
-            ch->pecho("Это невозможно!");
+            ch->pecho(_("Это невозможно!"));
             return;
     }
 
     if (is_safe(ch,victim))
     {
-            ch->pecho("Боги покровительствуют %C3.", victim);
+            ch->pecho(_("Боги покровительствуют %C3."), victim);
             return;
     }
 
@@ -221,7 +222,7 @@ SKILL_RUNP( shoot )
             || wield->item_type != ITEM_WEAPON
             || wield->value0() != WEAPON_BOW )
     {
-            ch->pecho("Для того, чтобы стрелять тебе нужен лук!");
+            ch->pecho(_("Для того, чтобы стрелять тебе нужен лук!"));
             return;            
     }
 
@@ -229,26 +230,26 @@ SKILL_RUNP( shoot )
         && (get_eq_char(ch,wear_second_wield)
             || get_eq_char(ch,wear_shield)) )
     {
-            ch->pecho("Твоя вторая рука должна быть свободна!");
+            ch->pecho(_("Твоя вторая рука должна быть свободна!"));
             return;            
     }
 
     if (!ch->is_npc( ) && !quiver)
     {
-            ch->pecho("У тебя в руках ничего нет!");
+            ch->pecho(_("У тебя в руках ничего нет!"));
             return;            
     }        
     
     if (!ch->is_npc( ) && 
         (quiver->item_type != ITEM_CONTAINER || !IS_SET(quiver->value1(), CONT_FOR_ARROW)))
     {
-            ch->pecho("Возьми в руки колчан.");
+            ch->pecho(_("Возьми в руки колчан."));
             return;
     }
 
     if ( ch->in_room == victim->in_room )
     {
-            ch->pecho("Ты не можешь стрелять из лука в упор.");
+            ch->pecho(_("Ты не можешь стрелять из лука в упор."));
             return;
     }
 
@@ -271,8 +272,8 @@ SKILL_RUNP( shoot )
             chance -= 40;
     chance += ch->hitroll;
     
-    ch->pecho( "%1$^O1, посланн%1$Gое|ый|ая|ые тобой, улете%1$nла|ли %2$s.", arrow, dirs[ direction ].leave );
-    ch->recho( "%1$^O1, посланн%1$Gое|ый|ая|ые %3$C5, улете%1$nла|ли %2$s.", arrow, dirs[ direction ].leave, ch );
+    ch->pecho( _("%1$^O1, посланн%1$Gое|ый|ая|ые тобой, улете%1$nла|ли %2$s."), arrow, dirs[ direction ].leave );
+    ch->recho( _("%1$^O1, посланн%1$Gое|ый|ая|ые %3$C5, улете%1$nла|ли %2$s."), arrow, dirs[ direction ].leave, ch );
 
     set_violent( ch, victim, false );
 
@@ -486,7 +487,7 @@ SKILL_RUNP( ambush )
 
     if ( MOUNTED(ch) )
     {
-            ch->pecho("Ты не можешь быть в засаде верхом!");
+            ch->pecho(_("Ты не можешь быть в засаде верхом!"));
             return;
     }
 
@@ -496,12 +497,12 @@ SKILL_RUNP( ambush )
     {
             if (ch->ambushing.empty())
             {
-                    ch->pecho("Засаду кому?");
+                    ch->pecho(_("Засаду кому?"));
                     return;
             }
             else
             {
-                    ch->pecho("Ты сидишь в засаде на '%s'.", ch->ambushing.c_str());
+                    ch->pecho(_("Ты сидишь в засаде на '%s'."), ch->ambushing.c_str());
                     return;
             }
     }
@@ -510,29 +511,29 @@ SKILL_RUNP( ambush )
     {
             if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) )
             {
-                    ch->pecho("Сначала тебе стоит замаскироваться.");
+                    ch->pecho(_("Сначала тебе стоит замаскироваться."));
                     return;
             }
-            ch->pecho("Ты готовишься к засаде.");
+            ch->pecho(_("Ты готовишься к засаде."));
             ch->ambushing = arg;
             return;
     }
 
     if ( victim == ch )
     {
-            ch->pecho("Засаду себе? Это еще как?!");
+            ch->pecho(_("Засаду себе? Это еще как?!"));
             return;
     }
 
     if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) )
     {
-            ch->pecho("Сначала тебе стоит замаскироваться.");
+            ch->pecho(_("Сначала тебе стоит замаскироваться."));
             return;
     }   
 
     if ( victim->can_see(ch) )
     {
-            ch->pecho("Твоя жертва тебя видит.");
+            ch->pecho(_("Твоя жертва тебя видит."));
             return;
     }
 
@@ -585,7 +586,7 @@ SKILL_APPLY( ambush )
                 && !is_safe_nomessage(ch,vch)
                 && is_name(ch->ambushing.c_str(), vch->getNameC()))
         {
-            ch->pecho( "{YТЫ ВЫСКАКИВАЕШЬ ИЗ ЗАСАДЫ!{x" );
+            ch->pecho( _("{YТЫ ВЫСКАКИВАЕШЬ ИЗ ЗАСАДЫ!{x") );
             run( ch, const_cast<char *>(ch->ambushing.c_str()) );
             return true;
         }
@@ -603,26 +604,26 @@ SKILL_RUNP( camouflage )
 {
         if ( MOUNTED(ch) )
         {
-                ch->pecho("Ты не можешь замаскироваться, когда ты в седле.");
+                ch->pecho(_("Ты не можешь замаскироваться, когда ты в седле."));
                 return;
         }
 
         if ( RIDDEN(ch) )
         {
-                ch->pecho("Ты не можешь замаскироваться, когда ты оседлан%Gо||а.", ch);
+                ch->pecho(_("Ты не можешь замаскироваться, когда ты оседлан%Gо||а."), ch);
                 return;
         }
 
         if ( IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
         {
-                ch->pecho("Ты не можешь замаскироваться, когда светишься.");
+                ch->pecho(_("Ты не можешь замаскироваться, когда светишься."));
                 return;
         }
 
         if (!RoomUtils::isNature(ch->in_room))
         {
-                ch->pecho("Ты можешь замаскироваться только в дикой местности.");
-                oldact("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM);
+                ch->pecho(_("Ты можешь замаскироваться только в дикой местности."));
+                oldact(_("$c1 пытается замаскироваться, но не может найти укрытия."),ch,0,0,TO_ROOM);
                 return;
         }
 
@@ -642,12 +643,12 @@ SKILL_RUNP( camouflage )
         if ( ch->is_npc()
                 || number_percent( ) < ( gsn_camouflage->getEffective( ch ) + skill_level_bonus(*gsn_camouflage, ch) ) * k / 100 )
         {
-                ch->pecho("Ты маскируешься на местности.");
+                ch->pecho(_("Ты маскируешься на местности."));
                 SET_BIT(ch->affected_by, AFF_CAMOUFLAGE);
                 gsn_camouflage->improve( ch, true );
         }
         else {
-                ch->pecho("Твоя попытка замаскироваться закончилась неудачей.");
+                ch->pecho(_("Твоя попытка замаскироваться закончилась неудачей."));
                 gsn_camouflage->improve( ch, false );
         }
 

@@ -39,6 +39,7 @@
 #include "material.h"
 #include "immunity.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(learning);
 GSN(anathema);
@@ -179,7 +180,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
 
     /* no improve in safe rooms or mansions */
     if ( IS_SET(pch->in_room->room_flags, ROOM_SAFE|ROOM_MANSION) ) {
-        pch->pecho("{WТишина и покой в этой местности расслабляют тебя, препятствуя прокачке умений.{x");
+        pch->pecho(_("{WТишина и покой в этой местности расслабляют тебя, препятствуя прокачке умений.{x"));
         return;
     }
     
@@ -201,7 +202,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         if (number_percent( ) >= chance)
             return;
 
-        pch->pecho("{GТеперь ты гораздо лучше владеешь искусством '%K1'!{x", thiz);
+        pch->pecho(_("{GТеперь ты гораздо лучше владеешь искусством '%K1'!{x"), thiz);
             
         data.learned++;
     }
@@ -216,7 +217,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         if (number_percent( ) >= chance)
             return;
 
-        pch->pecho("{GТы учишься на своих ошибках, и твое умение '%K1' совершенствуется.{x", thiz);
+        pch->pecho(_("{GТы учишься на своих ошибках, и твое умение '%K1' совершенствуется.{x"), thiz);
         
         data.learned += number_range( 1, wis_mod );
         data.learned = min( (int)data.learned, getMaximum( pch ) );
@@ -229,7 +230,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         xp += data.learned / 4;
 
     if (data.learned >= getMaximum( pch )) {
-        pch->pecho("{WТеперь ты {Cмастерски{W владеешь искусством {C%K1{W!{x", thiz);
+        pch->pecho(_("{WТеперь ты {Cмастерски{W владеешь искусством {C%K1{W!{x"), thiz);
         
         xp += 98 * getRating( pch );
     }
@@ -492,9 +493,9 @@ DLString BasicSkill::printLevelBonus(PCharacter *ch) const
     int bonus = skill_level_bonus(const_cast<Skill &>(*(Skill*)this), ch);
 
     if (bonus > 0)
-        buf << SKILL_INFO_PAD << fmt(0, "У тебя бонус {C%1$d{x уров%1$Iень|ня|ней на это умение.", bonus) << endl;
+        buf << SKILL_INFO_PAD << fmt(0, _("У тебя бонус {C%1$d{x уров%1$Iень|ня|ней на это умение."), bonus) << endl;
     else if (bonus < 0)
-        buf << SKILL_INFO_PAD << fmt(0, "У тебя штраф {r%1$d{x уров%1$Iень|ня|ней на это умение.", bonus) << endl;
+        buf << SKILL_INFO_PAD << fmt(0, _("У тебя штраф {r%1$d{x уров%1$Iень|ня|ней на это умение."), bonus) << endl;
 
     return buf.str();
 }
@@ -552,7 +553,7 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
 
     int beat = getBeats(ch) / dreamland->getPulsePerSecond();
     if (beat > 0) {
-         outputLines.push_back(fmt(0, "Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. ", beat));
+         outputLines.push_back(fmt(0, _("Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. "), beat));
     }
     
     // Collect move/mana/health costs and penalties into a string.

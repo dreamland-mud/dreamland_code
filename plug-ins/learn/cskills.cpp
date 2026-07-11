@@ -17,6 +17,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 struct SkillInfo 
 {
@@ -187,9 +188,9 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
 
         // Unknown garbage.
         buf << fmt(0, 
-            "Неверный параметр '%1$s', подходящие фильтры: "
+            _("Неверный параметр '%1$s', подходящие фильтры: "
             "заклинания, навыки, пассивные, "
-            "активные, название группы умений, диапазон уровней.\r\n", t.c_str());
+            "активные, название группы умений, диапазон уровней.\r\n"), t.c_str());
         return false;
     }
 
@@ -373,9 +374,9 @@ void AllSkillsList::display( std::ostream & buf )
         buf << "                   |         |" << endl;
 
     buf << fmt(0, 
-        "Также используй фильтры "
+        _("Также используй фильтры "
         "{y{hc%1$s заклинания{x, {y{hc%1$s навыки{x, {y{hc%1$s пассивные{x, "
-        "{y{hc%1$s активные{x, группа умений и диапазон уровней (например, 10 или 10 42)\r\n", mycmd.c_str());
+        "{y{hc%1$s активные{x, группа умений и диапазон уровней (например, 10 или 10 42)\r\n"), mycmd.c_str());
 
     buf << endl << "См. также {y{hc" << mycmd << " ?{x." << endl;
 }

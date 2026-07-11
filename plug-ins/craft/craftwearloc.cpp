@@ -7,6 +7,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 int CraftTattooWearloc::canWear( Character *ch, Object *obj, int flags )
 {
@@ -19,7 +20,7 @@ int CraftTattooWearloc::canWear( Character *ch, Object *obj, int flags )
 bool CraftTattooWearloc::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(flags, F_WEAR_VERBOSE))
-        oldact("Только специальные средства могут избавить тебя от $o2.", ch, obj, 0, TO_CHAR);
+        oldact(_("Только специальные средства могут избавить тебя от $o2."), ch, obj, 0, TO_CHAR);
 
     return false;
 }

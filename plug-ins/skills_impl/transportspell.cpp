@@ -20,6 +20,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 CLAN(none);
 GSN(mental_block);
@@ -50,7 +51,7 @@ GateMovement::~GateMovement( )
 bool GateMovement::moveAtomic( )
 {
     if (!JumpMovement::moveAtomic( )) {
-        ch->pecho( "Твоя попытка закончилась неудачей." );
+        ch->pecho( _("Твоя попытка закончилась неудачей.") );
         return false;
     }
 
@@ -96,17 +97,17 @@ bool GateMovement::checkLevel( )
 bool GateMovement::checkCaster( Character *wch )
 {
     if (wch->fighting) {
-        wch->pecho( "Адреналин в крови мешает тебе сконцентрироваться." );
+        wch->pecho( _("Адреналин в крови мешает тебе сконцентрироваться.") );
         return false;
     }
         
     if (IS_AFFECTED(wch, AFF_CURSE)) {
-        wch->pecho( "Проклятие на тебе блокирует транспортные заклинания." );
+        wch->pecho( _("Проклятие на тебе блокирует транспортные заклинания.") );
         return false;
     }
     
     if (spell && !spell->gateShadow && HAS_SHADOW( wch )) {
-        wch->pecho( "Вторая тень блокирует транспортные заклинания." );
+        wch->pecho( _("Вторая тень блокирует транспортные заклинания.") );
         return false;
     }
 
@@ -119,12 +120,12 @@ bool GateMovement::checkCaster( Character *wch )
 bool GateMovement::checkCasterRoom( )
 {
     if (IS_SET(from_room->room_flags, ROOM_SAFE|ROOM_NO_RECALL|ROOM_NOSUMMON)) {
-        ch->pecho( "Транспортные заклинания в этой местности запрещены Богами." );
+        ch->pecho( _("Транспортные заклинания в этой местности запрещены Богами.") );
         return false;
     }
 
     if (IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE)) {
-        ch->pecho( "На этой местности висит временное проклятие." );
+        ch->pecho( _("На этой местности висит временное проклятие.") );
         return false;
     }
   
@@ -134,34 +135,34 @@ bool GateMovement::checkCasterRoom( )
 bool GateMovement::checkVictim( )
 {
     if (victim == ch || victim == ch->mount) {
-        ch->pecho( "Перейти на сам{Smого{Sfу{Sx себя? Но как узнать, где настоящ{Smий{Sfая{Sx ты -- здесь или там?" );
-        ch->pecho( "А вдруг тебя вообще не существует?! Вопросы, вопросы..." );      
+        ch->pecho( _("Перейти на сам{Smого{Sfу{Sx себя? Но как узнать, где настоящ{Smий{Sfая{Sx ты -- здесь или там?") );
+        ch->pecho( _("А вдруг тебя вообще не существует?! Вопросы, вопросы...") );      
         return false;
     }
 
     if (victim->is_immortal( ) && !ch->is_immortal( )) {
-        ch->pecho( "Таким способом Бессмертных лучше не беспокоить." );      
+        ch->pecho( _("Таким способом Бессмертных лучше не беспокоить.") );      
         return false;
     }
 
     if (DIGGED(victim)) {
-        ch->pecho( "Непроницаемый экран защищает твою цель, тебе не удается установить ментальную связь." );      
+        ch->pecho( _("Непроницаемый экран защищает твою цель, тебе не удается установить ментальную связь.") );      
         return false;
     }
 
     if (victim->is_npc( )) {
         if (IS_SET(victim->getNPC( )->pIndexData->area->area_flag, AREA_NOGATE)) {
-            ch->pecho( "Местность, в которой находится твоя цель, защищена Богами." );
+            ch->pecho( _("Местность, в которой находится твоя цель, защищена Богами.") );
             return false;
         }
       
         if (IS_SET(victim->imm_flags, IMM_SUMMON)) {
-            ch->pecho( "Непроницаемый экран защищает твою цель, тебе не удается установить ментальную связь." );      
+            ch->pecho( _("Непроницаемый экран защищает твою цель, тебе не удается установить ментальную связь.") );      
             return false;
         }
             
         if (IS_CHARMED(victim)) {
-            ch->pecho( "Разум твоей жертвы во власти кого-то другого, тебе не удается установить ментальную связь." );
+            ch->pecho( _("Разум твоей жертвы во власти кого-то другого, тебе не удается установить ментальную связь.") );
             return false;
         }
     } 
@@ -177,7 +178,7 @@ bool GateMovement::checkVictim( )
             && IS_SET(victim->act, PLR_NOSUMMON) 
             && spell 
             && from_room->area != to_room->area) {
-            ch->pecho( "Открыть портал на твою цель удастся только в пределах одной зоны." );
+            ch->pecho( _("Открыть портал на твою цель удастся только в пределах одной зоны.") );
             return false;
         }  
         

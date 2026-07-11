@@ -32,6 +32,7 @@
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(black_feeble);
 GSN(counter);
@@ -216,9 +217,9 @@ void WeaponOneHit::damApplyCounter( )
     if (number_percent() <= chance)
     {
         gsn_counter->improve( victim, true, ch );
-        oldact("$C1 направляет твой удар против тебя само$gго|го|й!",ch,0,victim,TO_CHAR);
-        oldact("Ты направляешь удар $c2 против $x!",ch,0,victim,TO_VICT);
-        oldact("$C1 возвращает удар $c2 обратно!",ch,0,victim,TO_NOTVICT);
+        oldact(_("$C1 направляет твой удар против тебя само$gго|го|й!"),ch,0,victim,TO_CHAR);
+        oldact(_("Ты направляешь удар $c2 против $x!"),ch,0,victim,TO_VICT);
+        oldact(_("$C1 возвращает удар $c2 обратно!"),ch,0,victim,TO_NOTVICT);
 
         // set fighting state
         if (ch->fighting == NULL)
@@ -333,7 +334,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
         for (auto &waf: wield->affected.findAllWithBits(&weapon_type2, WEAPON_SPELL)) 
             if (number_range( 1, waf->modifier ) == 1)
             {
-                oldact("$o1 ярко вспыхивает!", ch, wield, 0, TO_ALL);
+                oldact(_("$o1 ярко вспыхивает!"), ch, wield, 0, TO_ALL);
                 lvl = std::min((int)ch->getModifyLevel(), (int)waf->level);
                 spell_nocatch( waf->type, lvl, ch, victim );
             }
@@ -352,11 +353,11 @@ void WeaponOneHit::damEffectFeeble( )
         return;
    
     SET_BIT( ch->affected_by, AFF_WEAK_STUN );
-    oldact("{DЧерная немощь{x поражает твою руку!", ch, 0, 0, TO_CHAR);
-    oldact("{DЧерная немощь{x поражает руку $c2!", ch, 0, 0, TO_ROOM);
+    oldact(_("{DЧерная немощь{x поражает твою руку!"), ch, 0, 0, TO_CHAR);
+    oldact(_("{DЧерная немощь{x поражает руку $c2!"), ch, 0, 0, TO_ROOM);
 
     if (wield && !IS_OBJ_STAT(wield, ITEM_NOREMOVE)) {
-        oldact("Ты парализова$gно|н|на и роняешь оружие!", ch, 0, 0, TO_CHAR);
+        oldact(_("Ты парализова$gно|н|на и роняешь оружие!"), ch, 0, 0, TO_CHAR);
         
         obj_from_char( wield );
 

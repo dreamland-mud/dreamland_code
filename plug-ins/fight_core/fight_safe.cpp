@@ -28,6 +28,7 @@
 #include "wiznet.h"
 #include "def.h"
 #include "vnum.h"
+#include "l10n.h"
 
 CLAN(none);
 CLAN(flowers);
@@ -44,8 +45,8 @@ bool is_safe(Character *ch, Character *victim)
         return false;
 
     if (ch && victim) {
-        oldact("$C1 находится под защитой богов.",ch,0,victim,TO_CHAR);
-        oldact("Боги защитили $C4 от $c2.",ch,0,victim,TO_ROOM);
+        oldact(_("$C1 находится под защитой богов."),ch,0,victim,TO_CHAR);
+        oldact(_("Боги защитили $C4 от $c2."),ch,0,victim,TO_ROOM);
 
         if (victim->fighting == ch) 
             stop_fighting (victim, false);
@@ -217,8 +218,8 @@ bool is_safe_rspell( short level, Character *victim, bool verbose )
         rc = false;
 
     if (rc && verbose) {
-        oldact("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0, TO_CHAR);
-        oldact("Боги защищают $c4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
+        oldact(_("Боги защищают тебя от заклинаний в этой местности."), victim, 0, 0, TO_CHAR);
+        oldact(_("Боги защищают $c4 от заклинаний в этой местности."), victim, 0, 0, TO_ROOM);
     }
 
     return rc;
@@ -237,8 +238,8 @@ bool is_safe_rspell( Affect *paf, Character *victim, bool verbose )
         
     bool rc = is_safe_nomessage(pafOwner, victim);
     if (rc && verbose) {
-        oldact("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0, TO_CHAR);
-        oldact("Боги защищают $c4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
+        oldact(_("Боги защищают тебя от заклинаний в этой местности."), victim, 0, 0, TO_CHAR);
+        oldact(_("Боги защищают $c4 от заклинаний в этой местности."), victim, 0, 0, TO_ROOM);
     }
 
     return rc;

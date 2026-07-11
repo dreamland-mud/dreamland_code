@@ -30,6 +30,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 RainbowMob::RainbowMob( ) 
 {
@@ -79,8 +80,8 @@ bool RainbowMob::specIdle( )
     
     obj = gq->createPiece( number ); 
     obj_to_char( obj, wch );
-    oldact("$c1 вручает тебе $o4.", ch, obj, wch, TO_VICT);
-    oldact("$c1 вручает $C3 $o4.", ch, obj, wch, TO_NOTVICT);
+    oldact(_("$c1 вручает тебе $o4."), ch, obj, wch, TO_VICT);
+    oldact(_("$c1 вручает $C3 $o4."), ch, obj, wch, TO_NOTVICT);
     obj->behavior->get( wch );
     return false;
 }
@@ -108,12 +109,12 @@ bool RainbowMob::death( Character *killer )
         
         if (!wch->is_npc( )) {
             wch->getPC( )->getAttributes( ).getAttr<XMLEmptyAttribute>( gq->getQuestID( ) );
-            wch->pecho("{RТы не сможешь больше принимать участие в задании, т.к. осквернил%Gо||а свои руки убийством.{x", wch);
+            wch->pecho(_("{RТы не сможешь больше принимать участие в задании, т.к. осквернил%Gо||а свои руки убийством.{x"), wch);
         }
     } 
 
     gq->recreateMob( this );
-    oldact("Божественные силы возвращают $c4 к жизни!", ch, 0, 0, TO_ROOM);
+    oldact(_("Божественные силы возвращают $c4 к жизни!"), ch, 0, 0, TO_ROOM);
     return false;
 }
 

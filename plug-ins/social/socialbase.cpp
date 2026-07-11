@@ -17,6 +17,7 @@
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 SocialBase::SocialBase( ) 
 {
@@ -61,22 +62,22 @@ int SocialBase::dispatch( const InterpretArguments &iargs )
 
     if (!ch->is_npc( )) {
         if (IS_SET(ch->act, PLR_FREEZE)) {
-            ch->pecho("Ты полностью замороже%Gно|н|на!", ch);
+            ch->pecho(_("Ты полностью замороже%Gно|н|на!"), ch);
             return RC_DISPATCH_PENALTY;
         }
 
         if (IS_SET( ch->comm, COMM_NOEMOTE )) {
-            ch->pecho("Ты анти-социал%Gьно|ен|ьна!", ch);
+            ch->pecho(_("Ты анти-социал%Gьно|ен|ьна!"), ch);
             return RC_DISPATCH_PENALTY;
         }
 
         if (IS_SET( ch->comm, COMM_AFK )) {
-            ch->pecho("Выйди сначала из {WAFK{x");
+            ch->pecho(_("Выйди сначала из {WAFK{x"));
             return RC_DISPATCH_AFK;
         }
 
         if (ch->act.isSet(PLR_RITUAL)) {
-            ch->pecho("Ты не можешь выражать эмоции, не прервав ритуал.");
+            ch->pecho(_("Ты не можешь выражать эмоции, не прервав ритуал."));
             return RC_DISPATCH_POSITION;
         }
     }
@@ -213,9 +214,9 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
 
         case RC_VICT2_NOT_FOUND: // не найден персонаж или предмет по второму аргументу
             if (victim == ch)
-                ch->pecho( "Ты видишь только себя здесь, кто такой %s?", secondArgument.c_str( ));
+                ch->pecho( _("Ты видишь только себя здесь, кто такой %s?"), secondArgument.c_str( ));
             else
-                ch->pecho( "Ты видишь только %1$C4 здесь, кто такой %s?", victim, secondArgument.c_str( ));
+                ch->pecho( _("Ты видишь только %1$C4 здесь, кто такой %s?"), victim, secondArgument.c_str( ));
             return;
 
 
@@ -253,7 +254,7 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
         if (!getErrorMsg( ).empty( ))
             oldact_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
         else
-            ch->pecho("Нет этого здесь.");
+            ch->pecho(_("Нет этого здесь."));
         return;
     }
 
@@ -268,32 +269,32 @@ bool SocialBase::checkPosition( Character *ch )
 
     switch (ch->position.getValue( )) {
     case POS_DEAD:
-        ch->pecho("Лежи смирно! Ты {RТРУП{x.");
+        ch->pecho(_("Лежи смирно! Ты {RТРУП{x."));
         break;
 
     case POS_INCAP:
     case POS_MORTAL:
-        ch->pecho("Даже не думай об этом! Ты в ужасном состоянии.");
+        ch->pecho(_("Даже не думай об этом! Ты в ужасном состоянии."));
         break;
 
     case POS_STUNNED:
-        ch->pecho("Ты не в состоянии сделать это.");
+        ch->pecho(_("Ты не в состоянии сделать это."));
         break;
 
     case POS_SLEEPING:
-        ch->pecho("Во сне? Или может сначала проснешься...");
+        ch->pecho(_("Во сне? Или может сначала проснешься..."));
         break;
 
     case POS_RESTING:
-        ch->pecho("Уфф... Но ведь ты отдыхаешь...");
+        ch->pecho(_("Уфф... Но ведь ты отдыхаешь..."));
         break;
 
     case POS_SITTING:
-        ch->pecho("Сидя? Или может сначала встанешь...");
+        ch->pecho(_("Сидя? Или может сначала встанешь..."));
         break;
 
     case POS_FIGHTING:
-        oldact_p("Тебе не до того, ты же сражаешься!", ch, 0, 0, TO_CHAR, POS_FIGHTING );
+        oldact_p(_("Тебе не до того, ты же сражаешься!"), ch, 0, 0, TO_CHAR, POS_FIGHTING );
         break;
     }
 

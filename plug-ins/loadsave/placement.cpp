@@ -19,6 +19,7 @@
 
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 WEARLOC(none);
 WEARLOC(light);
@@ -435,8 +436,8 @@ void undig( Character *ch )
     if (ch->position < POS_RESTING)
         ch->position = POS_RESTING;
         
-    oldact_p("Ты выкапываешься из земли.", ch, 0, 0, TO_CHAR, POS_DEAD); 
-    oldact("Земля шевелится, и $c1 выкапывается из своей могилы.", ch, 0, 0, TO_ROOM); 
+    oldact_p(_("Ты выкапываешься из земли."), ch, 0, 0, TO_CHAR, POS_DEAD); 
+    oldact(_("Земля шевелится, и $c1 выкапывается из своей могилы."), ch, 0, 0, TO_ROOM); 
     extract_grave( ch );
 }
 
@@ -451,8 +452,8 @@ void undig_earthquake( Character *ch )
     ch->was_in_room = 0; 
     ch->ambushing.clear();
 
-    oldact_p("Землятрясение заставляет тебя выбраться из могилы.", ch, 0, 0, TO_CHAR, POS_DEAD); 
-    oldact("Земля раскалывается, обнаруживая лежавш$gое|его|ую в ней $c2!", ch, 0, 0, TO_ROOM); 
+    oldact_p(_("Землятрясение заставляет тебя выбраться из могилы."), ch, 0, 0, TO_CHAR, POS_DEAD); 
+    oldact(_("Земля раскалывается, обнаруживая лежавш$gое|его|ую в ней $c2!"), ch, 0, 0, TO_ROOM); 
     extract_grave( ch );
 }
 
@@ -527,8 +528,8 @@ void strip_camouflage( Character *ch )
 
             // TODO remove messages once camouflage is added via an affect.
             if (showMessages) {
-                ch->pecho("Ты выходишь из своего укрытия.");
-                oldact("$c1 выходит из $s укрытия.", ch, 0, 0,TO_ROOM);
+                ch->pecho(_("Ты выходишь из своего укрытия."));
+                oldact(_("$c1 выходит из $s укрытия."), ch, 0, 0,TO_ROOM);
             }
     }
 }
@@ -544,8 +545,8 @@ void strip_hide_and_fade(Character *ch)
 
         // TODO remove messages and split this "if" block into two, once hide/fade become affects.
         if (showMessage) {
-            ch->pecho("Ты выходишь из тени.");
-            oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
+            ch->pecho(_("Ты выходишь из тени."));
+            oldact(_("$c1 выходит из тени."), ch, 0, 0, TO_ROOM);
         }
     }
 }
@@ -561,8 +562,8 @@ void strip_invisibility(Character *ch)
 
         // For mobs, if invisibility is gained via a bit.
         if (showMessage) {
-            oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
-            oldact("$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
+            oldact(_("Ты становишься видим$gо|ым|ой для окружающих."), ch, 0, 0, TO_CHAR);
+            oldact(_("$c1 становится видим$gо|ым|ой для окружающих."), ch, 0, 0, TO_ROOM);
         }
     }
 }
@@ -576,8 +577,8 @@ void strip_improved_invisibility(Character *ch)
 
         // For mobs, if invisibility is gained via a bit.
         if (showMessage) {
-            oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
-            oldact("$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
+            oldact(_("Ты становишься видим$gо|ым|ой для окружающих."), ch, 0, 0, TO_CHAR);
+            oldact(_("$c1 становится видим$gо|ым|ой для окружающих."), ch, 0, 0, TO_ROOM);
         }        
     }
 }

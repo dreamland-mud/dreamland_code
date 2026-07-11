@@ -4,6 +4,7 @@
 #include "character.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 bitstring_t Item::furnitureFlags(Object *obj)
 {
@@ -60,7 +61,7 @@ bool Item::canDrop( Character *ch, Object *obj, bool verbose )
         return true;
 
     if (verbose)
-        ch->pecho("Ты не можешь избавиться от этого.");
+        ch->pecho(_("Ты не можешь избавиться от этого."));
 
     return false;
 }

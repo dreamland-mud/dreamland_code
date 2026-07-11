@@ -14,6 +14,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 RELIG(karmina);
 
@@ -38,8 +39,8 @@ void BloodlustDesire::damage( PCharacter *ch )
         if (ch->getReligion() == god_karmina && chance(50)) {
             Object *tattoo = get_eq_char(ch, wear_tattoo);
             if (tattoo) {
-                ch->pecho("{rКармина{x утоляет твою жажду, предотвращая безумие.");
-                ch->recho("%^O1 на челе %C2 вспыхивает {rбагряным{x.", tattoo, ch);
+                ch->pecho(_("{rКармина{x утоляет твою жажду, предотвращая безумие."));
+                ch->recho(_("%^O1 на челе %C2 вспыхивает {rбагряным{x."), tattoo, ch);
                 ch->desires[getIndex( )] = 40;
                 return;
             }
@@ -94,7 +95,7 @@ bool DrunkDesire::isActive( PCharacter *ch )
 bool DrunkDesire::canDrink( PCharacter *ch )
 {
     if (isActive( ch )) {
-        ch->pecho( "Ты проносишь мимо рта... *ИК*" );
+        ch->pecho( _("Ты проносишь мимо рта... *ИК*") );
         return false;
     }
 
@@ -117,7 +118,7 @@ bool FullDesire::applicable( PCharacter *ch )
 bool FullDesire::canDrink( PCharacter *ch )
 {
     if (isOverflow( ch )) {
-        ch->pecho( "Твой желудок полон, ты больше не можешь выпить ни капли." );
+        ch->pecho( _("Твой желудок полон, ты больше не можешь выпить ни капли.") );
         return false;
     }
 
@@ -127,7 +128,7 @@ bool FullDesire::canDrink( PCharacter *ch )
 bool FullDesire::canEat( PCharacter *ch )
 {
     if (isOverflow( ch )) {
-        ch->pecho( "Твой желудок полон, ты больше не можешь съесть ни кусочка." );
+        ch->pecho( _("Твой желудок полон, ты больше не можешь съесть ни кусочка.") );
         return false;
     }
 

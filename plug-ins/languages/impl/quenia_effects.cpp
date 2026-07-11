@@ -17,6 +17,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 GSN(accuracy);
 GSN(sanctuary);         
@@ -43,7 +44,7 @@ bool GoodSpellWE::run( PCharacter *ch, Character *victim ) const
 
     int i;
 
-    oldact("{CСила древнего благословения проникает в мир.{x", ch, 0, 0, TO_ALL );
+    oldact(_("{CСила древнего благословения проникает в мир.{x"), ch, 0, 0, TO_ALL );
 
     for (i = 0; i < spells_size; i++)
         spell( spells[i], 
@@ -64,8 +65,8 @@ bool AccuracyWE::run( PCharacter *ch, Character *victim ) const
     
     affect_join( victim, &af );
 
-    oldact("{CТеперь твой взгляд способен различить каждое перышко жаворонка в небе.{x", victim, 0, 0, TO_CHAR );
-    oldact("{CВ глазах $c2 стальным блеском вспыхивает наконечник стрелы.{x", victim, 0, 0, TO_ROOM );
+    oldact(_("{CТеперь твой взгляд способен различить каждое перышко жаворонка в небе.{x"), victim, 0, 0, TO_CHAR );
+    oldact(_("{CВ глазах $c2 стальным блеском вспыхивает наконечник стрелы.{x"), victim, 0, 0, TO_ROOM );
     return true;
 }
 

@@ -23,6 +23,7 @@
 #include "wiznet.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 const char *ttype_name( int ttype );
 
@@ -198,7 +199,7 @@ public:
         int total_hints = iargs.hints1.size() + iargs.hints2.size() + iargs.translitCmd.size();
 
         if (total_hints == 0) {
-            iargs.ch->pecho("Что? Для справки наберите {y{hcкоманды{x или {y{hcсправка{x.");
+            iargs.ch->pecho(_("Что? Для справки наберите {y{hcкоманды{x или {y{hcсправка{x."));
             return false;
         }
 

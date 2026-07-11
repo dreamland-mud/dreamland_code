@@ -20,6 +20,7 @@
 #include "dl_strings.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
 {
@@ -197,30 +198,30 @@ COMMAND(NoteHooks, "webdump")
     DLString args = constArguments;
 
     if (!ch->isCoder()) {
-        ch->pecho("Что?");
+        ch->pecho(_("Что?"));
         return;
     }
 
     DLString name = args.getOneArgument();
     if (name.empty()) {
-        ch->pecho("Какой именно вид сообщений нужно сохранить на диск?");
+        ch->pecho(_("Какой именно вид сообщений нужно сохранить на диск?"));
         return;
     }
 
     if (arg_is(name, "news")) {
         webDumpNews();
-        ch->pecho("Все новости и изменения сохранены в %s.", NEWS_EXPORT_PATH.c_str());
+        ch->pecho(_("Все новости и изменения сохранены в %s."), NEWS_EXPORT_PATH.c_str());
         return;
     }
 
     if (arg_is(name, "story")) {
         webDumpOldStories();
-        ch->pecho("Старые истории сохранены в %s.", STORY_OLD_EXPORT_PATH.c_str());
+        ch->pecho(_("Старые истории сохранены в %s."), STORY_OLD_EXPORT_PATH.c_str());
 
         webDumpModernStories();
-        ch->pecho("Современные истории сохранены в %s.", STORY_MODERN_EXPORT_PATH.c_str());
+        ch->pecho(_("Современные истории сохранены в %s."), STORY_MODERN_EXPORT_PATH.c_str());
         return;
     }
 
-    ch->pecho( "Команда 'webdump' не поддерживается для этого вида сообщений." );
+    ch->pecho( _("Команда 'webdump' не поддерживается для этого вида сообщений.") );
 }

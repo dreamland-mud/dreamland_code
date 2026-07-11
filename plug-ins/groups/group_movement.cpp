@@ -53,6 +53,7 @@
 #include "vnum.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "l10n.h"
 
 CLAN(battlerager);
 
@@ -72,7 +73,7 @@ SKILL_RUNP( sneak )
 
     if (MOUNTED(ch))
     {
-        ch->pecho("Ты не можешь двигаться бесшумно, когда ты в седле.");
+        ch->pecho(_("Ты не можешь двигаться бесшумно, когда ты в седле."));
         return;
     }
 
@@ -80,8 +81,8 @@ SKILL_RUNP( sneak )
 
     if( IS_AFFECTED(ch,AFF_SNEAK)) {
         if(IS_CHARMED(ch))
-        ch->master->pecho("%^$#C1 и так двигается бесшумно.\n\r", ch);
-        ch->pecho("Ты и так двигаешься бесшумно.");
+        ch->master->pecho(_("%^$#C1 и так двигается бесшумно.\n\r"), ch);
+        ch->pecho(_("Ты и так двигаешься бесшумно."));
         return;
     }
 
@@ -98,13 +99,13 @@ SKILL_RUNP( sneak )
         af.bitvector.setValue(AFF_SNEAK);
         affect_to_char( ch, &af );
         if(IS_CHARMED(ch))
-        ch->master->pecho("%1$#^C1 начинает скрытно передвигаться.\n\r", ch);
-        ch->pecho("Ты начинаешь скрытно передвигаться.");
+        ch->master->pecho(_("%1$#^C1 начинает скрытно передвигаться.\n\r"), ch);
+        ch->pecho(_("Ты начинаешь скрытно передвигаться."));
     } else {
       gsn_sneak->improve( ch, false );
         if(IS_CHARMED(ch))
-        ch->master->pecho("%1$#^C1 не удается скрытно передвигаться.\n\r", ch);
-        ch->pecho("Тебе не удается скрытно передвигаться.");
+        ch->master->pecho(_("%1$#^C1 не удается скрытно передвигаться.\n\r"), ch);
+        ch->pecho(_("Тебе не удается скрытно передвигаться."));
     }
 
 }
@@ -156,7 +157,7 @@ protected:
         if (!ch->getPC( )
             && (!ch->leader || ch->leader->is_npc( ) || ch->leader->getPC( )->pet != ch))
         {
-            ch->pecho( "Тебе некуда возвращаться." );
+            ch->pecho( _("Тебе некуда возвращаться.") );
             return false;
         }
 
@@ -166,7 +167,7 @@ protected:
             point = ch->leader->getPC( )->getHometown( )->getRecall( );
 
         if (!( to_room = get_room_instance( point ) )) {
-            ch->pecho( "Команда 'возврат' сейчас недоступна тебе.", ch );
+            ch->pecho( _("Команда 'возврат' сейчас недоступна тебе."), ch );
             return false;
         }
         
@@ -235,7 +236,7 @@ protected:
         door = find_exit( ch, arg, FEX_NO_EMPTY|FEX_NO_INVIS );
 
         if ((!peexit || !ch->can_see( peexit )) && door < 0) {
-            ch->pecho( "И куда это мы намылились?" );
+            ch->pecho( _("И куда это мы намылились?") );
             return false;
         }
 
@@ -258,7 +259,7 @@ protected:
             return false;
 
         if (!canFlee( wch )) {
-            ch->pecho( "Что-то не дает тебе сбежать в этом направлении." );
+            ch->pecho( _("Что-то не дает тебе сбежать в этом направлении.") );
             return false;
         }
         else
@@ -281,7 +282,7 @@ protected:
     virtual bool checkCyclicRooms( Character *wch ) 
     {
         if (from_room == to_room) {
-            ch->pecho( "Ты не можешь сбежать туда, попробуй другое место." );
+            ch->pecho( _("Ты не можешь сбежать туда, попробуй другое место.") );
             return false;
         }
 
@@ -289,12 +290,12 @@ protected:
     }
     virtual bool checkPositionHorse( )
     {
-        ch->pecho( "Сначала слезь, а потом уже убегай." );
+        ch->pecho( _("Сначала слезь, а потом уже убегай.") );
         return false;
     }
     virtual bool checkPositionRider( )
     {
-        ch->pecho( "На тебе сверху кто-то сидит и не дает сбежать." );
+        ch->pecho( _("На тебе сверху кто-то сидит и не дает сбежать.") );
         return false;
     }
     virtual bool checkPositionWalkman( )
@@ -303,7 +304,7 @@ protected:
             if (ch->position == POS_FIGHTING)
                 ch->position = POS_STANDING;
 
-            ch->pecho( "Ты сейчас ни с кем не дерешься." );
+            ch->pecho( _("Ты сейчас ни с кем не дерешься.") );
             return false;
         }
 
@@ -324,7 +325,7 @@ SKILL_RUNP( escape )
     argument = one_argument( argument, arg );
 
     if (arg[0] == '\0') {
-        ch->pecho( "Укажи направление." );
+        ch->pecho( _("Укажи направление.") );
         return;
     }
 

@@ -37,6 +37,7 @@
 #include "vnum.h"
 #include "def.h"
 #include "magic.h"
+#include "l10n.h"
 
 PROF(vampire);
 GSN(none);
@@ -66,22 +67,22 @@ CMDRUN( fill )
     arg1 = arguments.getOneArgument( );
 
     if (arg.empty( )) {
-        ch->pecho("Наполнить что?");
+        ch->pecho(_("Наполнить что?"));
         return;
     }
 
     if (( obj = get_obj_wear_carry( ch, arg.c_str( ), 0 ) ) == 0) {
-        ch->pecho("У тебя нет этого.");
+        ch->pecho(_("У тебя нет этого."));
         return;
     }
 
     if (obj->item_type == ITEM_FOUNTAIN) {
-        ch->pecho("Чтобы наполнить фонтан, попробуй вылить туда емкость с жидкостью.", obj);
+        ch->pecho(_("Чтобы наполнить фонтан, попробуй вылить туда емкость с жидкостью."), obj);
         return;
     }
 	
     if (obj->item_type != ITEM_DRINK_CON) {
-        ch->pecho( "Ты не можешь наполнить %O4 -- это не емкость для жидкости.", obj );
+        ch->pecho( _("Ты не можешь наполнить %O4 -- это не емкость для жидкости."), obj );
         return;
     }
 
@@ -90,20 +91,20 @@ CMDRUN( fill )
 		if (!source) source = get_obj_room_type( ch, ITEM_DRINK_CON );
         if (!source && room->getLiquid() == liq_none)
             if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
-                ch->pecho("Здесь нет источника!");
+                ch->pecho(_("Здесь нет источника!"));
                 return;
             }
     }
     else {
         source = get_obj_here( ch, arg1.c_str( ) );
         if (!source) {
-            ch->pecho("Здесь нет такого источника.");
+            ch->pecho(_("Здесь нет такого источника."));
             return;
         }
 
         if (source->item_type != ITEM_FOUNTAIN &&
 		   	source->item_type != ITEM_DRINK_CON) {
-            ch->pecho("%1$^O1 -- не фонтан и не емкость для жидкости.", source);
+            ch->pecho(_("%1$^O1 -- не фонтан и не емкость для жидкости."), source);
             return;
         } 
     }
@@ -114,8 +115,8 @@ CMDRUN( fill )
 	// Source is empty or frozen
     if (source && source->value1() == 0) {
 		if (source->isAffected(gsn_chill_touch))
-			ch->pecho("Жидкость в %1$O6, похоже, заморожена.", source);
-		else ch->pecho("В %1$O6, похоже, пусто.", source);
+			ch->pecho(_("Жидкость в %1$O6, похоже, заморожена."), source);
+		else ch->pecho(_("В %1$O6, похоже, пусто."), source);
         return;
     }
 	
@@ -143,7 +144,7 @@ CMDRUN( fill )
     }
 
     if (obj->value1() >= obj->value0()) {
-        ch->pecho("%1$^O1 уже наполнен%1$Gо||а|ы до краев.", obj);
+        ch->pecho(_("%1$^O1 уже наполнен%1$Gо||а|ы до краев."), obj);
         return;
     }    
     
@@ -152,13 +153,13 @@ CMDRUN( fill )
             "You fill %O4 with %N5 from %O2.",
             "Ты наполняешь %O4 %N5 из %O2.",
             "Ти наповнюєш %O4 %N5 з %O2."), obj, liqname, source );
-        ch->recho( "%^C1 наполняет %O4 %N5 из %O2.",ch, obj, liqname, source );
+        ch->recho( _("%^C1 наполняет %O4 %N5 из %O2."),ch, obj, liqname, source );
     } else {
         ch->pecho( lmsg(lang,
             "You scoop up %N4 and fill %O4.",
             "Ты зачерпываешь %N4 и наполняешь %O4.",
             "Ти зачерпуєш %N4 і наповнюєш %O4."), liqname, obj);
-        ch->recho("%^C1 зачерпывает %N4 и наполняет %O4.", ch, liqname, obj);
+        ch->recho(_("%^C1 зачерпывает %N4 и наполняет %O4."), ch, liqname, obj);
     }
 
     if (source && source->value0() > -1) {
@@ -216,16 +217,16 @@ static void create_pool( Object *out, int amount )
 			liquid = liquidManager->find(liq_swill); // When liquids mix, make "swill"
     		liqShort = liquid->getShortDescr( ); // reassign names to swill
     		liqName  = liquid->getName( );			
-			room->echo( POS_RESTING, "%^N1 и %N1 смешиваются, образуя лужу %N2.",
+			room->echo( POS_RESTING, _("%^N1 и %N1 смешиваются, образуя лужу %N2."),
 					   liquidManager->find(out->value2())->getShortDescr( ).c_str( ),
 					   liquidManager->find(pool->value2())->getShortDescr( ).c_str( ),
 					   liqShort.c_str( ) );
 		}
-		else room->echo( POS_RESTING, "Лужа %N2 растекается еще шире.", liqShort.c_str( ) );
+		else room->echo( POS_RESTING, _("Лужа %N2 растекается еще шире."), liqShort.c_str( ) );
 	}
     else {
 		pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);
-		room->echo( POS_RESTING, "На земле образуется лужа %N2.", liqShort.c_str( ) );
+		room->echo( POS_RESTING, _("На земле образуется лужа %N2."), liqShort.c_str( ) );
 	}
 	
     pool->setShortDescr( fmt(0, pool->pIndexData->short_descr.get(LANG_DEFAULT).c_str(), liqShort.ruscase( '2' ).c_str( )), LANG_DEFAULT );
@@ -253,7 +254,7 @@ void pour_out(Object *out)
     // Tai: updating this to include the destruction of items, not just manual pour out
 
     if (out->value1() == 0) {
-        room->echo(POS_RESTING, "Из %O2 не выливается ни капли.", out);
+        room->echo(POS_RESTING, _("Из %O2 не выливается ни капли."), out);
         return;
     }
 
@@ -270,18 +271,18 @@ void pour_out(Object *out)
         return;
 
     if (ch) {
-        ch->pecho("Ты переворачиваешь %O4.", out);
-        ch->recho("%^C1 переворачивает %O4.", ch, out);
+        ch->pecho(_("Ты переворачиваешь %O4."), out);
+        ch->recho(_("%^C1 переворачивает %O4."), ch, out);
     }
 
     if (RoomUtils::isWater(room))
-        room->echo(POS_RESTING, "Поток %N2 из %O2 выплескивается в %N4.", liqShort.c_str(), out, room->getLiquid()->getShortDescr().c_str());
+        room->echo(POS_RESTING, _("Поток %N2 из %O2 выплескивается в %N4."), liqShort.c_str(), out, room->getLiquid()->getShortDescr().c_str());
     else if (room->getSectorType() == SECT_AIR)
-        room->echo(POS_RESTING, "Поток %N2 из %O2 устремляется куда-то вниз и пропадает.", liqShort.c_str(), out); // TO-DO: move to non-air room downwards
+        room->echo(POS_RESTING, _("Поток %N2 из %O2 устремляется куда-то вниз и пропадает."), liqShort.c_str(), out); // TO-DO: move to non-air room downwards
     else if (room->getSectorType() == SECT_DESERT)
-        room->echo(POS_RESTING, "Лужа %N2 из %O2 с шипением испаряется на песке.", liqShort.c_str(), out);
+        room->echo(POS_RESTING, _("Лужа %N2 из %O2 с шипением испаряется на песке."), liqShort.c_str(), out);
     else {
-        room->echo(POS_RESTING, "Поток %N2 из %O2 проливается на землю.", liqShort.c_str(), out);
+        room->echo(POS_RESTING, _("Поток %N2 из %O2 проливается на землю."), liqShort.c_str(), out);
         create_pool(out, amount);
     }
 
@@ -426,7 +427,7 @@ void pour_out( Character *ch, Object * out, Character *victim )
             }
 
             if (rc) 
-                victim->pecho( POS_RESTING, "Вода смывает с тебя часть посторонних запахов." );
+                victim->pecho( POS_RESTING, _("Вода смывает с тебя часть посторонних запахов.") );
         }
         else {
             Affect af;
@@ -459,8 +460,8 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
 	// Source is empty or frozen
     if (out->value1() == 0) {
 		if (out->isAffected(gsn_chill_touch))
-			ch->pecho("Жидкость в %1$O6, похоже, заморожена.", out);
-		else ch->pecho("В %1$O6, похоже, пусто.", out);
+			ch->pecho(_("Жидкость в %1$O6, похоже, заморожена."), out);
+		else ch->pecho(_("В %1$O6, похоже, пусто."), out);
         return;
     }
 	
@@ -469,14 +470,14 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
 	// Check for correct item type 
     if (in->item_type != ITEM_DRINK_CON && in->item_type != ITEM_FOUNTAIN) {
         if (!vch || vch == ch)
-            ch->pecho("Ты пытаешься налить что-то в %O4, а это не фонтан и не емкость для жидкости.", in);
+            ch->pecho(_("Ты пытаешься налить что-то в %O4, а это не фонтан и не емкость для жидкости."), in);
         else
-            ch->pecho("В руках у %C2 зажата совсем не емкость для жидкости.", vch);
+            ch->pecho(_("В руках у %C2 зажата совсем не емкость для жидкости."), vch);
         return;
     }
 	
     if (in == out) {
-        ch->pecho("Ты не можешь перелить из %1$O2 в сам%1$Gое|ого|у|их себя!", in);
+        ch->pecho(_("Ты не можешь перелить из %1$O2 в сам%1$Gое|ого|у|их себя!"), in);
         return;
     }
 	
@@ -488,30 +489,30 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
 	
 	// Check if target is frozen
 	if (in->isAffected(gsn_chill_touch)) {
-		ch->pecho("Жидкость в %1$O6, похоже, заморожена -- придется сначала разморозить.", in);
+		ch->pecho(_("Жидкость в %1$O6, похоже, заморожена -- придется сначала разморозить."), in);
 		return;
 	}
 	
 	// Don't fill infinite fountains
     if (in->value0() < 0) {
-		ch->pecho("%1$^O1 бездон%1$Gно|eн|на|ны и не нужда%1$nется|ются в заполнении.", in);
+		ch->pecho(_("%1$^O1 бездон%1$Gно|eн|на|ны и не нужда%1$nется|ются в заполнении."), in);
         return;
     }
 	
     if (in->value1() > 0 && in->value1() == in->value0()) {
         if (!vch || vch == ch)
-            ch->pecho( "%1$^O1 уже полностью заполне%1$Gно|н|на|ны.", in );
+            ch->pecho( _("%1$^O1 уже полностью заполне%1$Gно|н|на|ны."), in );
         else
-            ch->pecho( "%1$^O1 в руках у %2$C2 уже полностью заполне%1$Gно|н|на|ны.", in, vch );
+            ch->pecho( _("%1$^O1 в руках у %2$C2 уже полностью заполне%1$Gно|н|на|ны."), in, vch );
         return;
     }
 	
 	// Can't mix liquids (yet!)
     if (in->value1() != 0 && in->value2() != out->value2()) {
         if (!vch || vch == ch)
-            ch->pecho("В %O4 налита другая жидкость.", in);
+            ch->pecho(_("В %O4 налита другая жидкость."), in);
         else
-            ch->pecho("В %O4 в руках у %C2 налита другая жидкость.", in, vch);
+            ch->pecho(_("В %O4 в руках у %C2 налита другая жидкость."), in, vch);
         return;
     }
 
@@ -530,7 +531,7 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
             "You pour %N4 from %O2 into %O4.",
             "Ты наливаешь %N4 из %O2 в %O4.",
             "Ти наливаєш %N4 з %O2 у %O4."), liqShort, out, in );
-        ch->recho( "%^C1 наливает %N4 из %O2 в %O4.", ch, liqShort, out, in );
+        ch->recho( _("%^C1 наливает %N4 из %O2 в %O4."), ch, liqShort, out, in );
     }
     else {
         if (vch != ch) {
@@ -542,14 +543,14 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
                 "%^C1 pours you %N4.",
                 "%^C1 наливает тебе %N4.",
                 "%^C1 наливає тобі %N4."), ch, liq->getShortDescr( Player::lang(vch) ).c_str( ) );
-            ch->recho( vch, "%^C1 наливает %N4 для %C2.", ch, liqShort, vch );
+            ch->recho( vch, _("%^C1 наливает %N4 для %C2."), ch, liqShort, vch );
         }
         else {
             ch->pecho( lmsg(lang,
                 "You pour yourself %N4.",
                 "Ты наливаешь себе %N4.",
                 "Ти наливаєш собі %N4."), liqShort );
-            ch->recho( "%^C1 наливает себе %N4.", ch, liqShort );
+            ch->recho( _("%^C1 наливает себе %N4."), ch, liqShort );
         }
     }
 
@@ -576,17 +577,17 @@ CMDRUN( pourout )
     arg2 = arguments.getOneArgument( ); // victim or empty
 
     if (arg1.empty( )) {
-        ch->pecho("Вылить что и куда?");
+        ch->pecho(_("Вылить что и куда?"));
         return;
     }
 
     if ((out = get_obj_carry(ch,arg1.c_str( ))) == 0) {
-        ch->pecho("У тебя в инвентаре нет такой емкости для жидкости.");
+        ch->pecho(_("У тебя в инвентаре нет такой емкости для жидкости."));
         return;
     }
 
     if (out->item_type != ITEM_DRINK_CON) {
-        ch->pecho("%^O1 -- не емкость для жидкости.", out);
+        ch->pecho(_("%^O1 -- не емкость для жидкости."), out);
         return;
     }
 
@@ -599,7 +600,7 @@ CMDRUN( pourout )
     }
 
     if (( vch = get_char_room(ch, arg2 ) ) == 0) {
-        ch->pecho( "Вылить на кого?" );
+        ch->pecho( _("Вылить на кого?") );
         return;
     }
 
@@ -625,17 +626,17 @@ CMDRUN( pour )
     arg3 = arguments.getOneArgument( ); // victim (holding drink2) or empty
 
     if (arg1.empty( )) {
-        ch->pecho("Вылить что и куда?");
+        ch->pecho(_("Вылить что и куда?"));
         return;
     }
 
     if ((out = get_obj_carry(ch,arg1.c_str( ))) == 0) {
-        ch->pecho("У тебя в инвентаре нет такой емкости для жидкости.");
+        ch->pecho(_("У тебя в инвентаре нет такой емкости для жидкости."));
         return;
     }
 
     if (out->item_type != ITEM_DRINK_CON) {
-        ch->pecho("%^O1 -- не емкость для жидкости.", out);
+        ch->pecho(_("%^O1 -- не емкость для жидкости."), out);
         return;
     }
 
@@ -645,7 +646,7 @@ CMDRUN( pour )
     if (arg2 == "out" || arg2.empty( )) {
         if (!arg3.empty( )) {
             if (( vch = get_char_room(ch, arg3 ) ) == 0) {
-                ch->pecho( "Вылить на кого?" );
+                ch->pecho( _("Вылить на кого?") );
                 return;
             }
 
@@ -661,14 +662,14 @@ CMDRUN( pour )
         vch = get_char_room(ch, arg2);
 
         if (vch == 0) {
-            ch->pecho("Вылить во что?");
+            ch->pecho(_("Вылить во что?"));
             return;
         }
 
         in = wear_hold->find( vch );
 
         if (in == 0) {
-            ch->pecho("У %C2 в руках нет бокала или другой емкости.", vch);
+            ch->pecho(_("У %C2 в руках нет бокала или другой емкости."), vch);
             return;
         }
     }
@@ -731,13 +732,13 @@ CMDRUN( drink )
         obj = get_obj_room_type( ch, ITEM_FOUNTAIN );
         if (!obj && pRoom->liquid == liq_none) 
             if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
-                ch->pecho("Выпить что?");
+                ch->pecho(_("Выпить что?"));
                 return;
             }
     }
     else {
         if (( obj = get_obj_here( ch, arg ) ) == 0) {
-            ch->pecho("Ты не находишь этого.");
+            ch->pecho(_("Ты не находишь этого."));
             return;
         }
     }
@@ -745,15 +746,15 @@ CMDRUN( drink )
     if (obj) {
         switch (obj->item_type) {
         default:
-            ch->pecho("Ты не можешь пить из %O2.", obj);
+            ch->pecho(_("Ты не можешь пить из %O2."), obj);
             return;
 
         case ITEM_FOUNTAIN:
 			// Source is empty or frozen
     		if (obj->value0() > -1 && obj->value1() == 0) {
 				if (obj->isAffected(gsn_chill_touch))
-					ch->pecho("Жидкость в %1$O6, похоже, заморожена.", obj);
-				else ch->pecho("В %1$O6, похоже, пусто.", obj);
+					ch->pecho(_("Жидкость в %1$O6, похоже, заморожена."), obj);
+				else ch->pecho(_("В %1$O6, похоже, пусто."), obj);
         		return;
     		}			
 
@@ -769,8 +770,8 @@ CMDRUN( drink )
 			// Source is empty or frozen
     		if (obj->value1() <= 0) {
 				if (obj->isAffected(gsn_chill_touch))
-					ch->pecho("Жидкость в %1$O6, похоже, заморожена.", obj);
-				else ch->pecho("В %1$O6, похоже, пусто.", obj);
+					ch->pecho(_("Жидкость в %1$O6, похоже, заморожена."), obj);
+				else ch->pecho(_("В %1$O6, похоже, пусто."), obj);
         		return;
     		}
 
@@ -796,13 +797,13 @@ CMDRUN( drink )
     DLString buf = liquid->getShortDescr( lang ).ruscase( '4' );
 
     if (obj) {
-        oldact("$c1 пьет $T из $o2.", ch,obj,buf.c_str( ),TO_ROOM );
+        oldact(_("$c1 пьет $T из $o2."), ch,obj,buf.c_str( ),TO_ROOM );
         oldact(lmsg(lang,
             "You drink $T from $o2.",
             "Ты пьешь $T из $o2.",
             "Ти п'єш $T з $o2."), ch,obj,buf.c_str( ),TO_CHAR );
     } else {
-        oldact("$c1 зачерпывает и пьет $T.", ch, 0, buf.c_str( ),TO_ROOM );
+        oldact(_("$c1 зачерпывает и пьет $T."), ch, 0, buf.c_str( ),TO_ROOM );
         oldact(lmsg(lang,
             "You scoop up and drink $T.",
             "Ты зачерпываешь и пьешь $T.",
@@ -823,8 +824,8 @@ CMDRUN( drink )
         Affect af;
 
         if ( !saves_spell(level / 2, ch, DAM_POISON) ) {
-            ch->recho("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а.", ch);
-            ch->pecho("Тебя начинает тошнить, когда яд проникает в твое тело.");
+            ch->recho(_("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а."), ch);
+            ch->pecho(_("Тебя начинает тошнить, когда яд проникает в твое тело."));
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
@@ -855,8 +856,8 @@ CMDRUN( drink )
         return;
 
     if (obj && IS_OBJ_STAT(obj, ITEM_BLESS) && IS_EVIL(ch) && immune_check(ch, DAM_HOLY, DAMF_OTHER) == RESIST_VULNERABLE) {
-        ch->pecho("Святость %O2 обжигает твои внутренности!", obj);
-        ch->recho("Лицо %^C2 искажается гримасой боли.", ch);
+        ch->pecho(_("Святость %O2 обжигает твои внутренности!"), obj);
+        ch->recho(_("Лицо %^C2 искажается гримасой боли."), ch);
         rawdamage(ch, ch, DAM_HOLY, ch->hit / 100 + 1, true, "holywater");
     }
 }

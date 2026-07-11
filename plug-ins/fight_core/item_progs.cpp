@@ -14,6 +14,7 @@
 #include "follow_utils.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 /* RT part of the corpse looting code */
 static bool oprog_get_money( Character *ch, Object *obj )
@@ -23,7 +24,7 @@ static bool oprog_get_money( Character *ch, Object *obj )
 
     if (obj->pIndexData->vnum > 5 && (obj->value0() > 0 || obj->value1() > 0)) {
         DLString moneyArg = Money::describe(obj->value1( ), obj->value0( ), 4);
-        ch->pecho("Твой кошелек пополнился на %s.", moneyArg.c_str());
+        ch->pecho(_("Твой кошелек пополнился на %s."), moneyArg.c_str());
     }
 
     if (IS_SET(ch->act,PLR_AUTOSPLIT))

@@ -32,6 +32,7 @@
 #include "dl_ctype.h"
 #include "dl_strings.h"
 #include "def.h"
+#include "l10n.h"
 
 using namespace Scripting;
 using namespace std;
@@ -51,7 +52,7 @@ static bool cs_by_subj(PCharacter *ch, const DLString &arg, id_t &csid)
         }
     }
 
-    ch->pecho("Сценарий с темой '%s' не найден.", arg.c_str());
+    ch->pecho(_("Сценарий с темой '%s' не найден."), arg.c_str());
     return false;
 }
 
@@ -66,7 +67,7 @@ static bool cs_by_number(PCharacter *ch, const DLString &arg, id_t &csid)
 
     i = CodeSource::manager->find(num);
     if (i == CodeSource::manager->end()) {
-        ch->pecho("Сценарий под номером %d не найден.", num.getValue());
+        ch->pecho(_("Сценарий под номером %d не найден."), num.getValue());
         return false;
     }
 
@@ -82,7 +83,7 @@ CMDADM( codesource )
         return;
 
     if (!has_fenia_security( pch )) {
-        ch->pecho("Ты не ботаешь по фене.");
+        ch->pecho(_("Ты не ботаешь по фене."));
         return;
     }
     
@@ -162,7 +163,7 @@ CMDADM( codesource )
         static DLString highlight("{R");
 
         if (args.empty()) {
-            ch->pecho("Синтаксис: cs search <строка>");
+            ch->pecho(_("Синтаксис: cs search <строка>"));
             return;
         }
 
@@ -196,7 +197,7 @@ CMDADM( codesource )
         pch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")
             ->regs[0].split(content);
         
-        ch->pecho("Сценарий %d скопирован в буфер редактора.", csid);
+        ch->pecho(_("Сценарий %d скопирован в буфер редактора."), csid);
         return;
     }
     
@@ -268,7 +269,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            ch->pecho("Ты не редактируешь сценарий.");
+            ch->pecho(_("Ты не редактируешь сценарий."));
             return;
         } 
         
@@ -305,7 +306,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            ch->pecho("Ты не редактируешь сценарий.");
+            ch->pecho(_("Ты не редактируешь сценарий."));
             return;
         } 
         
@@ -348,7 +349,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            ch->pecho("Ты не редактируешь сценарий.");
+            ch->pecho(_("Ты не редактируешь сценарий."));
             return;
         } 
         
@@ -401,7 +402,7 @@ CMDADM( codesource )
         return;
     }
     
-    ch->pecho("Неверная подкоманда, используйте {Wcodesource help{x для справки.");
+    ch->pecho(_("Неверная подкоманда, используйте {Wcodesource help{x для справки."));
 }
 
 

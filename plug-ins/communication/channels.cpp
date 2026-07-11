@@ -25,6 +25,7 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 bool has_nochannel(Character *);
 
@@ -42,7 +43,7 @@ Character * TellChannel::findListener( Character *ch, const DLString &name ) con
         victim = get_player_world(ch, name.c_str(), false);
 
     if (!victim || (victim->is_npc() && victim->in_room != ch->in_room)) {
-        ch->pecho( "Ты не находишь этого персонажа.");
+        ch->pecho( _("Ты не находишь этого персонажа."));
         return NULL;
     }
 
@@ -79,7 +80,7 @@ Character * ReplyChannel::findListener( Character *ch, const DLString &name ) co
     Character *victim = ch->reply;
    
     if (!victim)
-        ch->pecho( "Ты не находишь этого персонажа." );
+        ch->pecho( _("Ты не находишь этого персонажа.") );
 
     return victim;
 }
@@ -112,7 +113,7 @@ Character * PageChannel::findListener( Character *ch, const DLString &name ) con
     victim = get_player_world( ch, name.c_str( ), false );
 
     if (!victim || (victim->is_immortal( ) && !ch->is_immortal( ))) {
-        ch->pecho( "Информационное агенство не может найти данного абонента." );
+        ch->pecho( _("Информационное агенство не может найти данного абонента.") );
         return NULL;
     }
 
@@ -126,7 +127,7 @@ void PageChannel::run( Character *ch, const DLString &constArguments )
     arguments = constArguments;
 
     if (!get_pager( ch )) {
-        ch->pecho( "Тебе определенно нужен хрустальный шар и то, что внутри него." );
+        ch->pecho( _("Тебе определенно нужен хрустальный шар и то, что внутри него.") );
         return;
     }
 
@@ -139,7 +140,7 @@ void PageChannel::run( Character *ch, const DLString &constArguments )
 bool PageChannel::isPersonalListener( Character *ch, Character *victim, const DLString &msg ) const
 {
     if (!get_pager( victim )) {
-        oldact_p("У $C2 нет хрустального шара.",ch,0,victim,TO_CHAR, position);
+        oldact_p(_("У $C2 нет хрустального шара."),ch,0,victim,TO_CHAR, position);
         return false;
     }
 
@@ -259,7 +260,7 @@ bool EmoteChannel::canTalkGlobally( Character *ch ) const
         return false;
 
     if (IS_SET(ch->comm, COMM_NOEMOTE)) {
-        ch->pecho( "Боги запретили тебе волноваться." );
+        ch->pecho( _("Боги запретили тебе волноваться.") );
         return false;
     }
 

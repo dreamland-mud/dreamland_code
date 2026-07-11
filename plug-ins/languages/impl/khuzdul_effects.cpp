@@ -18,6 +18,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(ancient_rage);
 GSN(enchant_weapon);
@@ -46,8 +47,8 @@ bool FireproofWE::run( PCharacter *ch, Character *victim ) const
         affect_to_obj( obj, &af);
     }
 
-    oldact("{CОбмундирование на $c6 вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_ROOM );
-    oldact("{CТвое обмундирование вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_CHAR );
+    oldact(_("{CОбмундирование на $c6 вспыхивает ослепительным блеском.{x"), victim, 0, 0, TO_ROOM );
+    oldact(_("{CТвое обмундирование вспыхивает ослепительным блеском.{x"), victim, 0, 0, TO_CHAR );
     return true;
 }
 
@@ -60,11 +61,11 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
 
     if (!obj) {
         if (ch != victim) {
-            victim->pecho( "Ты чувствуешь легкое покалывание ладони." );
-            oldact("Слово не достигло цели - $C1 ничем не вооруж$Gено|ен|ена.", ch, 0, victim, TO_CHAR );
+            victim->pecho( _("Ты чувствуешь легкое покалывание ладони.") );
+            oldact(_("Слово не достигло цели - $C1 ничем не вооруж$Gено|ен|ена."), ch, 0, victim, TO_CHAR );
         }
         else {
-            oldact("Слово не достигло цели - ты ничем не вооруж$gено|ен|ена.", ch, 0, 0, TO_CHAR );
+            oldact(_("Слово не достигло цели - ты ничем не вооруж$gено|ен|ена."), ch, 0, 0, TO_CHAR );
         }
 
         return false;
@@ -82,7 +83,7 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
     af.location = APPLY_HITROLL;
     affect_enhance( obj, &af );
     
-    oldact("{CСекреты кузнецов древности преображают $o4!{x", ch, obj, 0, TO_ALL );
+    oldact(_("{CСекреты кузнецов древности преображают $o4!{x"), ch, obj, 0, TO_ALL );
     return true;
 }
 
@@ -92,14 +93,14 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
     
     if ( IS_AFFECTED(ch,AFF_CALM) || victim->isAffected( gsn_inaction ) )
     {
-        victim->pecho( "Ты слишком миролюбив{Sfа{Sx для древней ярости." );
-        victim->recho("%1$^C1 слишком миролюбив%1$Gо||а для древней ярости.", victim);
+        victim->pecho( _("Ты слишком миролюбив{Sfа{Sx для древней ярости.") );
+        victim->recho(_("%1$^C1 слишком миролюбив%1$Gо||а для древней ярости."), victim);
         return false;
     } 
 
     if (victim->isAffected( gsn_ancient_rage )) {
-        victim->pecho("Пламя древней ярости уже горит в тебе.");
-        victim->recho("Пламя древней ярости уже горит в %C6.", victim);
+        victim->pecho(_("Пламя древней ярости уже горит в тебе."));
+        victim->recho(_("Пламя древней ярости уже горит в %C6."), victim);
         return false;
     }
 
@@ -109,8 +110,8 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
     af.location         = (number_bits( 1 ) ? APPLY_HITROLL : APPLY_DAMROLL);
     af.modifier = max( 1, number_range( af.level / 6, af.level / 5 ) );
 
-    victim->pecho( "{CПламя древней ярости вспыхивает в тебе!{x" );
-    victim->recho( "{CПламя древней ярости вспыхивает в %C6!{x", victim);
+    victim->pecho( _("{CПламя древней ярости вспыхивает в тебе!{x") );
+    victim->recho( _("{CПламя древней ярости вспыхивает в %C6!{x"), victim);
     affect_join( victim, &af );
     return true;
 }
@@ -128,8 +129,8 @@ bool MendingWE::run( PCharacter *ch, Character *victim ) const
         affect_strip(obj, gsn_corrosion, true);
     }
 
-    oldact("{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x", victim, 0, 0, TO_CHAR );
-    oldact("{CСекреты древних кузнецов улучшают облик обмундирования $c2.{x", victim, 0, 0, TO_ROOM );
+    oldact(_("{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x"), victim, 0, 0, TO_CHAR );
+    oldact(_("{CСекреты древних кузнецов улучшают облик обмундирования $c2.{x"), victim, 0, 0, TO_ROOM );
     return true;
 }
 

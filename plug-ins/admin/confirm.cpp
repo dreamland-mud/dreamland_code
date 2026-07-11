@@ -26,6 +26,7 @@
 #include "websocketrpc.h"
 #include "descriptor.h"
 #include "def.h"
+#include "l10n.h"
     
 CLAN(none);
 
@@ -51,7 +52,7 @@ COMMAND(Confirm, "confirm")
     cmd = arguments.getOneArgument( );
     
     if (ch->is_npc( )) {
-        ch->pecho("Тебе нельзя.");
+        ch->pecho(_("Тебе нельзя."));
         return;
     }
     
@@ -98,7 +99,7 @@ void Confirm::doRequest( Character *ch )
     DLString descr;    
 
     if (IS_SET( ch->act, PLR_CONFIRMED )) {
-        ch->pecho("Твой персонаж уже подтвержден.");
+        ch->pecho(_("Твой персонаж уже подтвержден."));
         return;
     }
     
@@ -111,13 +112,13 @@ void Confirm::doRequest( Character *ch )
     }
     
     if (descr.empty( )) {
-        ch->pecho("Прочитай внимательно 'справка подтверждение' и 'справка описание'.");
+        ch->pecho(_("Прочитай внимательно 'справка подтверждение' и 'справка описание'."));
         return;
     }
 
     attr = get_confirm_attr(ch->getPC());
     
-    ch->pecho( "Твое описание отправлено Бессмертным на рассмотрение." );
+    ch->pecho( _("Твое описание отправлено Бессмертным на рассмотрение.") );
     wiznet( WIZ_CONFIRM, 0, 0,
             "%^C1 просит подтверждения своему персонажу ({y{hcconfirm show %s{x).", ch, ch->getNameC() );    
     send_telegram("Вниманию богов: кто-то попросил подтверждения своему персонажу.");
@@ -150,7 +151,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
     DLString name = arguments.getOneArgument( );
 
     if (name.empty( )) {
-        ch->pecho("Подтвердить кого?");
+        ch->pecho(_("Подтвердить кого?"));
         return;
     }
 
@@ -167,7 +168,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
 
     if (!attr) { 
         if (!ch->isCoder( )) {
-            ch->pecho( "От %s не было заявки на подтверждение персонажа.", pci->getName( ).c_str( ) );
+            ch->pecho( _("От %s не было заявки на подтверждение персонажа."), pci->getName( ).c_str( ) );
             return;
         }
 
@@ -203,7 +204,7 @@ void Confirm::doReject( Character *ch, DLString& arguments )
     }
 
     if (arguments.empty( )) {
-        ch->pecho("Нужно указать причину отказа.");
+        ch->pecho(_("Нужно указать причину отказа."));
         return;
     }
 
@@ -244,7 +245,7 @@ void Confirm::doDelete( Character *ch, DLString& arguments )
     DLString name = arguments.getOneArgument( );
 
     if (name.empty( )) {
-        ch->pecho("Чью заявку удалить?");
+        ch->pecho(_("Чью заявку удалить?"));
         return;
     }
 
@@ -258,7 +259,7 @@ void Confirm::doDelete( Character *ch, DLString& arguments )
     attr = find_confirm_attr(pci);
     
     if (!attr) {
-        ch->pecho("Этот игрок не посылал заявки на подтверждение.");
+        ch->pecho(_("Этот игрок не посылал заявки на подтверждение."));
         return;
     }
     
@@ -281,7 +282,7 @@ void Confirm::doUnread( Character *ch )
     }
 
     if (newRequests > 0)
-        ch->pecho("Тебя ожида%1$Iет|ют|ют %1$d нов%1$Iая|ые|ых заяв%1$Iка|ки|ок на подтверждение персонажа ({y{hcconfirm list new{x).",
+        ch->pecho(_("Тебя ожида%1$Iет|ют|ют %1$d нов%1$Iая|ые|ых заяв%1$Iка|ки|ок на подтверждение персонажа ({y{hcconfirm list new{x)."),
                   newRequests);
 }
 
@@ -327,12 +328,12 @@ void Confirm::doList( Character *ch, bool newOnly )
     }
 
     if (totalRequests == 0) {
-        ch->pecho("Нет ни одной заявки на подтверждение персонажа.");
+        ch->pecho(_("Нет ни одной заявки на подтверждение персонажа."));
     } else if (newRequests != 0) {
-        ch->pecho("Найден%1$Iа|о|о %1$d нов%1$Iая|ые|ых заяв%1$Iка|ки|ок, всего заявок: %2$d.",
+        ch->pecho(_("Найден%1$Iа|о|о %1$d нов%1$Iая|ые|ых заяв%1$Iка|ки|ок, всего заявок: %2$d."),
                   newRequests, totalRequests);
     } else {
-        ch->pecho("Нерассмотренных заявок на подтверждение нет. Всего заявок: %1$d.", totalRequests);
+        ch->pecho(_("Нерассмотренных заявок на подтверждение нет. Всего заявок: %1$d."), totalRequests);
     }
 }
 
@@ -353,7 +354,7 @@ void Confirm::doShow( Character *ch, DLString& argument )
     attr = find_confirm_attr(pci);
     
     if (!attr) {
-        ch->pecho("Этот игрок не посылал заявки на подтверждение.");
+        ch->pecho(_("Этот игрок не посылал заявки на подтверждение."));
         return;
     }
 

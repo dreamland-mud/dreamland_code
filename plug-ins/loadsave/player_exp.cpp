@@ -22,6 +22,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(none);
 PROF(samurai);
@@ -55,24 +56,24 @@ void Player::gainExp(PCharacter *pch, int gain)
         return;
 
     if (level > 19  && !IS_SET( pch->act, PLR_CONFIRMED )) {
-        pch->pecho("Ты больше не можешь получать опыт, пока тебя не подтвердили Боги.\n\r"
-                "Прочитай 'справка подтверждение'.");
+        pch->pecho(_("Ты больше не можешь получать опыт, пока тебя не подтвердили Боги.\n\r"
+                "Прочитай 'справка подтверждение'."));
         return;
     }
 
     if (level > 19  && pch->getHometown( ) == home_frigate ) {
-        pch->pecho("Ты больше не можешь получать опыт, пока не выберешь дом.\n\r"
-                "Прочитай 'справка родной город'.");
+        pch->pecho(_("Ты больше не можешь получать опыт, пока не выберешь дом.\n\r"
+                "Прочитай 'справка родной город'."));
         return;
     }
 
     if (level >= PK_MIN_LEVEL && IS_SET(pch->in_room->room_flags, ROOM_NEWBIES_ONLY)) {
-        pch->pecho("Ты не можешь больше получать опыт в этой арии.");
+        pch->pecho(_("Ты не можешь больше получать опыт в этой арии."));
         return;
     }
 
     if (IS_SET(pch->act,PLR_NO_EXP)) {
-        pch->pecho("Ты не можешь получать опыт, пока твой дух во власти противника.");
+        pch->pecho(_("Ты не можешь получать опыт, пока твой дух во власти противника."));
         return;
     }
     
@@ -83,7 +84,7 @@ void Player::gainExp(PCharacter *pch, int gain)
 
     while (pch->getLevel() < LEVEL_HERO - 1 && pch->getExpToLevel( ) <= 0) {
         
-        oldact_p("{CТы дости$gгло|г|гла следующего уровня!!!{x", pch, 0, 0, TO_CHAR, POS_DEAD);
+        oldact_p(_("{CТы дости$gгло|г|гла следующего уровня!!!{x"), pch, 0, 0, TO_CHAR, POS_DEAD);
 
         int lastLevelSkillCount = count_available_skills(pch);
 
@@ -107,7 +108,7 @@ void Player::gainExp(PCharacter *pch, int gain)
         int thisLevelSkillCount = count_available_skills(pch);
         int skillsDiff = thisLevelSkillCount - lastLevelSkillCount;
         if (skillsDiff > 0)
-            pch->pecho("{CТебе открыл%1$Iось|ись|ись {Y%1$d{C нов%1$Iое|ых|ых умени%1$Iе|я|й.{x", skillsDiff);
+            pch->pecho(_("{CТебе открыл%1$Iось|ись|ись {Y%1$d{C нов%1$Iое|ых|ых умени%1$Iе|я|й.{x"), skillsDiff);
 
         pch->save( );
     }

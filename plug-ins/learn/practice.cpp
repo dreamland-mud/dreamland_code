@@ -30,6 +30,7 @@
 #include "merc.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(battlerager);
 
@@ -166,7 +167,7 @@ void CPractice::pracShow( PCharacter *ch )
         buf << endl;
     }
     
-    buf << fmt(0, "У тебя %d сесси%s практики.\n\r",
+    buf << fmt(0, _("У тебя %d сесси%s практики.\n\r"),
                  ch->practice.getValue( ), GET_COUNT(ch->practice, "я","и","й") );
 
     page_to_char( buf.str( ).c_str( ), ch );
@@ -184,11 +185,11 @@ void CPractice::pracHere( PCharacter *ch )
 
     if (!( teacher = findTeacher( ch ) ))
         if (!( teacher = findPracticer( ch ) )) {
-            ch->pecho("Тебе не с кем практиковаться здесь.");
+            ch->pecho(_("Тебе не с кем практиковаться здесь."));
             return;
         }
 
-    buf << fmt( ch, "%1$^C1 может помочь тебе практиковаться в таких умениях:", teacher ) << endl;
+    buf << fmt( ch, _("%1$^C1 может помочь тебе практиковаться в таких умениях:"), teacher ) << endl;
 
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         ostringstream errbuf;
@@ -239,7 +240,7 @@ void CPractice::pracHere( PCharacter *ch )
     if (found) 
         page_to_char( buf.str( ).c_str( ), ch );
     else
-        ch->pecho("Тебе нечему научиться у %C2.", teacher );
+        ch->pecho(_("Тебе нечему научиться у %C2."), teacher );
 
     if (teacher->is_npc())
         mprog_teach(ch, teacher->getNPC(), "here");
@@ -254,7 +255,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     ostringstream buf;
 
     if (!IS_AWAKE( ch )) {
-        ch->pecho("Во сне или как?");
+        ch->pecho(_("Во сне или как?"));
         return;
     }
 
@@ -262,18 +263,18 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     skill = skillManager->find( sn );
 
     if (!skill) {
-        ch->pecho("Умение {W%s{x не существует или еще тебе не доступно.", arg.c_str());
+        ch->pecho(_("Умение {W%s{x не существует или еще тебе не доступно."), arg.c_str());
         return;
     }
 
     if (!skill->available(ch)) {
-        ch->pecho("Умение {W%N1{x тебе не доступно.", skill->getNameFor(ch).c_str());
+        ch->pecho(_("Умение {W%N1{x тебе не доступно."), skill->getNameFor(ch).c_str());
         return;
     }
 
     if (!skill->canPractice( ch, buf )) {
         if (buf.str().empty())
-            ch->pecho("Ты не можешь выучить умение {W%K1{x.", skill);
+            ch->pecho(_("Ты не можешь выучить умение {W%K1{x."), skill);
         else
             ch->send_to(buf);
         return;
@@ -287,7 +288,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
         return;
 
     if (ch->practice <= 0) {
-        ch->pecho("У тебя сейчас нет сессий практики.");
+        ch->pecho(_("У тебя сейчас нет сессий практики."));
         return;
     }
 
@@ -296,8 +297,8 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     adept = skill->getAdept( ch );
 
     if (learned >= adept) {
-        ch->pecho("Ты уже слишком хорошо владеешь умением {W%K1{x, практиковаться бессмысленно.", skill);
-        ch->pecho("Чтобы овладеть умением еще лучше, просто применяй его почаще.");  
+        ch->pecho(_("Ты уже слишком хорошо владеешь умением {W%K1{x, практиковаться бессмысленно."), skill);
+        ch->pecho(_("Чтобы овладеть умением еще лучше, просто применяй его почаще."));  
         return;
     }
 
@@ -305,16 +306,16 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     
     skill->practice( ch );
 
-    ch->pecho("%^C1 обучает тебя умению {W%K1{x.", teacher, skill);
-    teacher->pecho("Ты обучаешь %C4 умению {W%K1{x.", ch, skill);
-    ch->recho(teacher, "%^C1 обучает %C4 умению {W%K1{x.", teacher, ch, skill);
+    ch->pecho(_("%^C1 обучает тебя умению {W%K1{x."), teacher, skill);
+    teacher->pecho(_("Ты обучаешь %C4 умению {W%K1{x."), ch, skill);
+    ch->recho(teacher, _("%^C1 обучает %C4 умению {W%K1{x."), teacher, ch, skill);
     
     if (learned < adept)
-        ch->pecho( "Ты теперь знаешь умение {W%K1{x на %d процентов.", skill, learned );
+        ch->pecho( _("Ты теперь знаешь умение {W%K1{x на %d процентов."), skill, learned );
     else {
-        ch->pecho("Теперь ты хорошо владеешь умением {W%K1{x.", skill);
-        ch->pecho( "Дальше практиковать не получится, просто начни применять его почаще." );        
-        ch->recho("%^C1 теперь хорошо владеет умением {W%K1{x.", ch, skill);
+        ch->pecho(_("Теперь ты хорошо владеешь умением {W%K1{x."), skill);
+        ch->pecho( _("Дальше практиковать не получится, просто начни применять его почаще.") );        
+        ch->recho(_("%^C1 теперь хорошо владеет умением {W%K1{x."), ch, skill);
     }
 
     if (teacher->is_npc()) {

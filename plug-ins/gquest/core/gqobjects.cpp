@@ -6,6 +6,7 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 // Extract items from expired quests.
 bool GlobalQuestObject::save( )
@@ -17,7 +18,7 @@ bool GlobalQuestObject::save( )
         return false;
 
     if (obj->carried_by)
-        obj->carried_by->pecho("%^O1 исчезает.", obj);
+        obj->carried_by->pecho(_("%^O1 исчезает."), obj);
         
     extract_obj(obj);
     return true;

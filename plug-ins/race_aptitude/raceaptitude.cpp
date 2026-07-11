@@ -18,6 +18,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 
 RaceAptitude::RaceAptitude( ) 
@@ -84,7 +85,7 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {
         if (verbose)
-            ch->pecho( "Тебе не с кем практиковаться здесь." );
+            ch->pecho( _("Тебе не с кем практиковаться здесь.") );
         return false;
     }
     
@@ -92,7 +93,7 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
         return true;
 
     if (verbose)
-        ch->pecho( "Ты не можешь практиковать это здесь." );
+        ch->pecho( _("Ты не можешь практиковать это здесь.") );
     return false;
 }
 

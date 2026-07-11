@@ -61,6 +61,7 @@
 #include "interp.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(backguard);
 GSN(backstab);
@@ -231,7 +232,7 @@ SKILL_RUNP( pick )
 
 
     if (MOUNTED(ch)) {
-        ch->pecho( "Ты не можешь взломать что-либо, пока ты в седле." );
+        ch->pecho( _("Ты не можешь взломать что-либо, пока ты в седле.") );
         return;
     }
 
@@ -239,17 +240,17 @@ SKILL_RUNP( pick )
     arg2 = args.getOneArgument( );
 
     if (arg1.empty( )) {
-        ch->pecho( "Взломать что?" );
+        ch->pecho( _("Взломать что?") );
         return;
     }
 
     if (arg2.empty( )) {
-        ch->pecho( "Взломать чем?" );
+        ch->pecho( _("Взломать чем?") );
         return;
     }
 
     if (!( keyhole = Keyhole::create( ch, arg1 ) )) {
-        ch->pecho( "Ты не видишь здесь такого замка." );
+        ch->pecho( _("Ты не видишь здесь такого замка.") );
         return;
     }
 
@@ -272,26 +273,26 @@ SKILL_RUNP( backstab )
 
     if ( MOUNTED(ch) )
     {
-            ch->pecho("Ты не можешь ударить сзади, если ты верхом!");
+            ch->pecho(_("Ты не можешь ударить сзади, если ты верхом!"));
             return;
     }
 
     if ( arg[0] == '\0' )
     {
-            ch->pecho("Ударить сзади? Кого?");
+            ch->pecho(_("Ударить сзади? Кого?"));
             return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-            ch->pecho("Таких здесь нет.");
+            ch->pecho(_("Таких здесь нет."));
             return;
     }
 
 
     if ( victim == ch )
     {
-            ch->pecho("Как ты можешь ударить сзади себя?");
+            ch->pecho(_("Как ты можешь ударить сзади себя?"));
             return;
     }
 
@@ -302,40 +303,40 @@ SKILL_RUNP( backstab )
 
     if ( ( obj = get_eq_char( ch, wear_wield ) ) == 0 )
     {
-            oldact_p("Ты долж$gно|ен|на быть вооруже$gно|н|на, чтоб ударить сзади.",
+            oldact_p(_("Ты долж$gно|ен|на быть вооруже$gно|н|на, чтоб ударить сзади."),
                     ch,0,0,TO_CHAR,POS_RESTING);
             return;
     }
 
     if ( attack_table[obj->value3()].damage != DAM_PIERCE && obj->value0() != WEAPON_DAGGER )
     {
-            ch->pecho("Чтобы ударить сзади, нужно вооружиться кинжалом или другим колющим оружием.");
+            ch->pecho(_("Чтобы ударить сзади, нужно вооружиться кинжалом или другим колющим оружием."));
             return;
     }
 
     if ( victim->fighting != 0 )
     {
-            ch->pecho("Ты не можешь ударить сзади того, кто уже сражается.");
+            ch->pecho(_("Ты не можешь ударить сзади того, кто уже сражается."));
             return;
     }
 
     if ( ch->fighting != 0 )
     {
-            ch->pecho("Тебе некогда подкрадываться к противнику -- ты сражаешься!");
+            ch->pecho(_("Тебе некогда подкрадываться к противнику -- ты сражаешься!"));
             return;
     }
 
     if ( victim->hit < (0.7 * victim->max_hit)
             && (IS_AWAKE(victim) ) )
     {
-            oldact_p("$C1 бол$Gьно|ен|ьна и подозрител$Gьно|ен|ьна... ты не можешь незаметно подкрасться к не$Gму|му|й.",
+            oldact_p(_("$C1 бол$Gьно|ен|ьна и подозрител$Gьно|ен|ьна... ты не можешь незаметно подкрасться к не$Gму|му|й."),
                     ch, 0, victim, TO_CHAR,POS_RESTING);
             return;
     }
 
     if (victim->getLastFightDelay( ) < 300 && IS_AWAKE(victim) )
     {
-            oldact_p("$C1 беспокойно озирается по сторонам... ты не сможешь незаметно подкрасться.",
+            oldact_p(_("$C1 беспокойно озирается по сторонам... ты не сможешь незаметно подкрасться."),
                     ch, 0, victim, TO_CHAR,POS_RESTING);
             return;
     }
@@ -442,13 +443,13 @@ SKILL_RUNP( circle )
 
     if ( MOUNTED(ch) )
     {
-            ch->pecho("Только не верхом!");
+            ch->pecho(_("Только не верхом!"));
             return;
     }
 
     if ( ( victim = ch->fighting ) == 0 )
     {
-            ch->pecho("Сейчас ты не сражаешься.");
+            ch->pecho(_("Сейчас ты не сражаешься."));
             return;
     }
 
@@ -456,7 +457,7 @@ SKILL_RUNP( circle )
             || (attack_table[obj->value3()].damage != DAM_PIERCE 
             && obj->value0() != WEAPON_DAGGER))
     {
-            ch->pecho("Вооружись для этого кинжалом или другим колющим оружием.");
+            ch->pecho(_("Вооружись для этого кинжалом или другим колющим оружием."));
             return;
     }
 
@@ -467,7 +468,7 @@ SKILL_RUNP( circle )
     {
             if (person->fighting == ch)
             {
-                    ch->pecho("Ты не можешь сделать это, защищаясь от ударов.");
+                    ch->pecho(_("Ты не можешь сделать это, защищаясь от ударов."));
                     return;
             }
     }
@@ -515,32 +516,32 @@ SKILL_RUNP( knife )
     one_argument(argument, arg);
 
     if (arg[0] == '\0') {
-        ch->pecho("Пырнуть ножом кого?");
+        ch->pecho(_("Пырнуть ножом кого?"));
         return;
     }
 
     if ((knife = get_eq_char(ch, wear_wield)) == NULL) {
-        ch->pecho("Вооружись для начала.");
+        ch->pecho(_("Вооружись для начала."));
         return;
     }
 
     if (knife->value0() != WEAPON_DAGGER) {
-        ch->pecho("Для этого тебе нужен кинжал.");
+        ch->pecho(_("Для этого тебе нужен кинжал."));
         return;
     }
 
     if ((victim = get_char_room(ch, arg)) == NULL) {
-        ch->pecho("Нет таких здесь.");
+        ch->pecho(_("Нет таких здесь."));
         return;
     }
 
     if (ch == victim) {
-        ch->pecho("У тебя боязнь себя?");
+        ch->pecho(_("У тебя боязнь себя?"));
         return;
     }
 
     if (victim->fighting != NULL) {
-        ch->pecho("Подожди, пока закончится сражение.");
+        ch->pecho(_("Подожди, пока закончится сражение."));
         return;
     }
 
@@ -580,7 +581,7 @@ SKILL_RUNP( forge )
     Object *key, *blank;
 
     if (( arg = args.getOneArgument( ) ).empty( )) {
-        ch->pecho( "Подделать что?" );
+        ch->pecho( _("Подделать что?") );
         return;
     }
 
@@ -590,7 +591,7 @@ SKILL_RUNP( forge )
         ;
 
     if (!blank) {
-        ch->pecho( "Тебе понадобится заготовка, чтобы создать дубликат или отмычку." );
+        ch->pecho( _("Тебе понадобится заготовка, чтобы создать дубликат или отмычку.") );
         return;
     }
 
@@ -604,17 +605,17 @@ SKILL_RUNP( forge )
         static const char * DUP_LONG  = "Дубликат %s лежит тут.";
 
         if (!( keyhole = Keyhole::locate( ch, key ) )) {
-            ch->pecho( "Непонятно, что же открывает этот ключ." );
+            ch->pecho( _("Непонятно, что же открывает этот ключ.") );
             return;
         }
 
         if (!keyhole->isLockable( )) {
-            ch->pecho( "Это ключ от сломанного замка." );
+            ch->pecho( _("Это ключ от сломанного замка.") );
             return;
         }
 
         if (keyhole->isPickProof( )) {
-            ch->pecho( "Это ключ от замка, который невозможно взломать. Увы.." );
+            ch->pecho( _("Это ключ от замка, который невозможно взломать. Увы..") );
             return;
         }
 
@@ -622,7 +623,7 @@ SKILL_RUNP( forge )
         chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch));    
         
         if (number_percent( ) >= chance) {
-            oldact("Тебе не удалось точно передать рисунок бороздок $o2.", ch, key, 0, TO_CHAR );
+            oldact(_("Тебе не удалось точно передать рисунок бороздок $o2."), ch, key, 0, TO_CHAR );
             gsn_key_forgery->improve( ch, false );
             return;
         }
@@ -642,8 +643,8 @@ SKILL_RUNP( forge )
         dup->value1(1);
         obj_to_char( dup, ch );
 
-        oldact("Ты изготавливаешь $o4 из $O2.", ch, dup, blank, TO_CHAR );
-        oldact("$c1 изготавливает $o4.", ch, key, 0, TO_ROOM );
+        oldact(_("Ты изготавливаешь $o4 из $O2."), ch, dup, blank, TO_CHAR );
+        oldact(_("$c1 изготавливает $o4."), ch, key, 0, TO_ROOM );
 
         gsn_key_forgery->improve( ch, true );
         extract_obj( blank );
@@ -660,12 +661,12 @@ SKILL_RUNP( forge )
         static const char * LOCK_EXTRA = "Эта отмычка из 'Фирменного набора %1$#^C2' подходит для замка:\n%2$N2\n";
 
         if (!keyhole->isLockable( )) {
-            ch->pecho( "Здесь нет замочной скважины." );
+            ch->pecho( _("Здесь нет замочной скважины.") );
             return;
         }
 
         if (keyhole->isPickProof( )) {
-            ch->pecho( "Этот замок защищен от взлома." );
+            ch->pecho( _("Этот замок защищен от взлома.") );
             return;
         }
 
@@ -673,13 +674,13 @@ SKILL_RUNP( forge )
     chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch)); 
 
         if (number_percent( ) >= chance) {
-            oldact("Твои попытки превратить $o4 в отмычку к этому замку ни к чему не привели.", ch, blank, 0, TO_CHAR );
+            oldact(_("Твои попытки превратить $o4 в отмычку к этому замку ни к чему не привели."), ch, blank, 0, TO_CHAR );
             gsn_key_forgery->improve( ch, false );
             return;
         }
 
-        oldact("$o1 в твоих умелых руках постепенно превращается в отмычку для $N2.", ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
-        oldact("$c1 проделывает манипуляции с $o5.", ch, blank, 0, TO_ROOM );
+        oldact(_("$o1 в твоих умелых руках постепенно превращается в отмычку для $N2."), ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
+        oldact(_("$c1 проделывает манипуляции с $o5."), ch, blank, 0, TO_ROOM );
 
         // TODO multi-language descriptions
         blank->gram_gender = Grammar::MultiGender::FEMININE;
@@ -696,6 +697,6 @@ SKILL_RUNP( forge )
         return;
     }
 
-    ch->pecho( "У тебя нет такого ключа, и здесь нет такой замочной скважины." );
+    ch->pecho( _("У тебя нет такого ключа, и здесь нет такой замочной скважины.") );
 }
 

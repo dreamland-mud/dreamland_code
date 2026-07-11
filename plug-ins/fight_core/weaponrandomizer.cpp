@@ -15,6 +15,7 @@
 
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 WeaponRandomizer * WeaponRandomizer::thisClass = 0;
 
@@ -103,7 +104,7 @@ void WeaponRandomizer::eventItemReset(const ItemResetEvent &event) const
         if (chance(90))
             return;
 
-        obj->getCarrier()->recho("%^C1 проводит инвентаризацию.", obj->getCarrier());
+        obj->getCarrier()->recho(_("%^C1 проводит инвентаризацию."), obj->getCarrier());
         clearWeapon(obj);
     }
 
@@ -209,7 +210,7 @@ void WeaponRandomizer::randomizeWeaponStats(Object *obj, int bestTierOverride) c
 
     Character *carrier = obj->getCarrier();
     if (carrier && !carrier->is_npc())
-        carrier->pecho(POS_DEAD, "%^O1 меняет свои характеристики на случайные.", obj);
+        carrier->pecho(POS_DEAD, _("%^O1 меняет свои характеристики на случайные."), obj);
 }
 
 // Full randomize of a weapon. Most often the weapon will be a fixed "stub" item w/o any properties.

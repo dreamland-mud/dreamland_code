@@ -31,6 +31,7 @@
 #include "act.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "l10n.h"
 
 PROF(samurai);
 BONUS(experience);
@@ -87,8 +88,8 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         if (victim->getRealLevel() > mylevel && mylevel < 103) {
             int oldParam = ch->getRealLevel();
             ch->setLevel( ch->getRealLevel() + 1 );
-            ch->pecho("Ты получаешь уровень!");
-            oldact("$c1 выглядит более опытн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
+            ch->pecho(_("Ты получаешь уровень!"));
+            oldact(_("$c1 выглядит более опытн$gым|ым|ой!\n\r"),ch,0,0,TO_ROOM);
             wiznet(ch, victim, "уровень", oldParam, ch->getRealLevel(), victim->getRealLevel());
 
             // Restore act bits that are removed for low-level adaptive pets.
@@ -105,8 +106,8 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         if (victim->hitroll > ch->hitroll && ch->hitroll < mylevel * 3) {
             int oldParam = ch->hitroll;
             ch->hitroll++;
-            ch->pecho("Теперь ты будешь попадать более метко!");
-            oldact("$c1 становится более метк$gим|им|ой!\n\r",ch,0,0,TO_ROOM);
+            ch->pecho(_("Теперь ты будешь попадать более метко!"));
+            oldact(_("$c1 становится более метк$gим|им|ой!\n\r"),ch,0,0,TO_ROOM);
             wiznet(ch, victim, "точность", oldParam, ch->hitroll, victim->hitroll);
         }
     }
@@ -115,8 +116,8 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         if (victim->damroll > ch->damroll && ch->damroll < mylevel * 3) {
             int oldParam = ch->damroll;
             ch->damroll++;
-            ch->pecho("Теперь ты будешь больнее бить!");
-            oldact("$c1 теперь будет больнее бить!\n\r",ch,0,0,TO_ROOM);
+            ch->pecho(_("Теперь ты будешь больнее бить!"));
+            oldact(_("$c1 теперь будет больнее бить!\n\r"),ch,0,0,TO_ROOM);
             wiznet(ch, victim, "урон", oldParam, ch->damroll, victim->damroll);
         }
     }
@@ -131,8 +132,8 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         if (gain > 0 && ch->max_hit < max_hp) {
             int oldParam = ch->max_hit;
             ch->max_hit = min(ch->max_hit + gain, max_hp);
-            ch->pecho("Ты здоровеешь!");
-            oldact("Здоровье $c2 растет!\n\r",ch,0,0,TO_ROOM);
+            ch->pecho(_("Ты здоровеешь!"));
+            oldact(_("Здоровье $c2 растет!\n\r"),ch,0,0,TO_ROOM);
             wiznet(ch, victim, "здоровье", oldParam, ch->max_hit, victim->max_hit);
         }
     }
@@ -147,8 +148,8 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         if (gain > 0 && ch->max_mana < max_mana) {
             int oldParam = ch->max_mana;            
             ch->max_mana = min(ch->max_mana + gain, max_mana);
-            ch->pecho("Ты чувствуешь прилив энергии!");
-            oldact("$c1 наполняется энергией!\n\r",ch,0,0,TO_ROOM);
+            ch->pecho(_("Ты чувствуешь прилив энергии!"));
+            oldact(_("$c1 наполняется энергией!\n\r"),ch,0,0,TO_ROOM);
             wiznet(ch, victim, "ману", oldParam, ch->max_mana, victim->max_mana);
         }
     }
@@ -162,8 +163,8 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             if (vch->damage[DICE_NUMBER] > ch->damage[DICE_NUMBER] && ch->damage[DICE_NUMBER] < max_dice) {
                 int oldParam = ch->damage[DICE_NUMBER];
                 ch->damage[DICE_NUMBER]++;
-                ch->pecho("Теперь ты будешь наносить больше повреждений!");
-                oldact("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
+                ch->pecho(_("Теперь ты будешь наносить больше повреждений!"));
+                oldact(_("$c1 становится более опасн$gым|ым|ой!\n\r"),ch,0,0,TO_ROOM);
                 wiznet(ch, victim, "dice_number", oldParam, ch->damage[DICE_NUMBER], vch->damage[DICE_NUMBER]);
             }
         }
@@ -172,8 +173,8 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             if (vch->damage[DICE_TYPE] > ch->damage[DICE_TYPE] && ch->damage[DICE_TYPE] < max_dice) {
                 int oldParam = ch->damage[DICE_TYPE];
                 ch->damage[DICE_TYPE]++;
-                ch->pecho("Теперь ты будешь наносить больше повреждений!");
-                oldact("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
+                ch->pecho(_("Теперь ты будешь наносить больше повреждений!"));
+                oldact(_("$c1 становится более опасн$gым|ым|ой!\n\r"),ch,0,0,TO_ROOM);
                 wiznet(ch, victim, "dice_type", oldParam, ch->damage[DICE_TYPE], vch->damage[DICE_TYPE]);
             }
         }
@@ -208,8 +209,8 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         if (gain < 0 && ch->armor[dam_type] > -10 * mylevel) {
             int oldParam = ch->armor[dam_type];
             ch->armor[dam_type] += gain;
-            ch->pecho("Твоя защита улучшается!");
-            oldact("Защита $c2 улучшается!\n\r",ch,0,0,TO_ROOM);
+            ch->pecho(_("Твоя защита улучшается!"));
+            oldact(_("Защита $c2 улучшается!\n\r"),ch,0,0,TO_ROOM);
             wiznet(ch, victim, "броню", oldParam, ch->armor[dam_type], victim->armor[dam_type]);
         }
     }
@@ -223,8 +224,8 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         {
             int oldParam = ch->perm_stat[i];
             ch->perm_stat[i] += 1;
-            ch->pecho("Твои параметры улучшаются!");
-            oldact("$c1 улучшает свои параметры!\n\r",ch,0,0,TO_ROOM);
+            ch->pecho(_("Твои параметры улучшаются!"));
+            oldact(_("$c1 улучшает свои параметры!\n\r"),ch,0,0,TO_ROOM);
             wiznet(ch, victim, stat_table.fields[i].name, oldParam, ch->perm_stat[i], victim->perm_stat[i]);
         }
     }
@@ -242,9 +243,9 @@ static void apply_align_changes( PCharacter *ch )
                 continue;
 
         if (obj->isAntiAligned( ch )) {
-            oldact_p("Ты пытаешься использовать $o4, но это не для тебя.",
+            oldact_p(_("Ты пытаешься использовать $o4, но это не для тебя."),
                 ch, obj, 0, TO_CHAR,POS_RESTING );
-            oldact_p("$c1 пытается использовать $o4, но оно $m не подходит.",
+            oldact_p(_("$c1 пытается использовать $o4, но оно $m не подходит."),
                 ch, obj, 0, TO_ROOM,POS_RESTING );
             obj_from_char( obj );
             obj_to_room( obj, ch->in_room );
@@ -258,12 +259,12 @@ static bool can_influence_exp( PCharacter *gch, Character *leader )
         return false;
 
     if (gch->getModifyLevel( ) - leader->getModifyLevel( ) > GROUP_RANGE ) {
-        gch->pecho("Ты слишком высокого уровня для этой группы.");
+        gch->pecho(_("Ты слишком высокого уровня для этой группы."));
         return false;
     }
 
     if (gch->getModifyLevel( ) - leader->getModifyLevel( ) < -GROUP_RANGE ) {
-        gch->pecho("Ты слишком низкого уровня для этой группы.");
+        gch->pecho(_("Ты слишком низкого уровня для этой группы."));
         return false;
     }
 
@@ -314,7 +315,7 @@ void group_gain( Character *ch, Character *victim, Character *realKiller )
         PCharacter *gch = *i;
         
         xp = xp_compute( gch, victim, mobcount, players.size( ), leader, base_exp_bonus );
-        gch->pecho( "Ты получаешь {C%1$d{x очк%1$Iо|а|ов опыта за убийство %2$#C2.", xp, victim );
+        gch->pecho( _("Ты получаешь {C%1$d{x очк%1$Iо|а|ов опыта за убийство %2$#C2."), xp, victim );
         Player::gainExp(gch, xp);
         
         apply_align_changes( gch );
@@ -441,9 +442,9 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
             xp += (xp * skill / 2) / 100;
             xp += bonus * 10;
             if (gch != leader)
-                gch->pecho("{cБлагодаря умелому руководству %C2 ты получаешь больше опыта.{x", leader);
+                gch->pecho(_("{cБлагодаря умелому руководству %C2 ты получаешь больше опыта.{x"), leader);
             else
-                leader->pecho("{cБлагодаря твоему умелому руководству группа получает больше опыта.{x");
+                leader->pecho(_("{cБлагодаря твоему умелому руководству группа получает больше опыта.{x"));
 
             gsn_leadership->improve(leader, true);
         }
@@ -465,7 +466,7 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
         && victim->getModifyLevel() - gch->getModifyLevel() >= 20
         && chance(10))
     {
-        oldact("Ты уби$gло|л|ла достойного противника, и твое обаяние повысилось на единицу.", gch, 0, 0, TO_CHAR);
+        oldact(_("Ты уби$gло|л|ла достойного противника, и твое обаяние повысилось на единицу."), gch, 0, 0, TO_CHAR);
         gch->perm_stat[STAT_CHA] += 1;
     }
 
@@ -486,14 +487,14 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
 
         if ((sameAlignKills % 100) == 99)
         {
-            gch->pecho("На твоем счету {%2$s%1$d{x труп%1$I|а|ов {%2$s%3$s{x персонажей.", 
+            gch->pecho(_("На твоем счету {%2$s%1$d{x труп%1$I|а|ов {%2$s%3$s{x персонажей."), 
                 sameAlignKills,
                 IS_GOOD(gch) ? "Y" : IS_NEUTRAL(gch) ? "W" : IS_EVIL(gch) ? "r" : "w",
                 IS_GOOD(gch) ? "хороших" : IS_NEUTRAL(gch) ? "нейтральных" : IS_EVIL(gch) ? "злых" : "");
 
             if (gch->perm_stat[STAT_CHA] > 3 && IS_GOOD(gch))
             {
-                gch->pecho("Твое обаяние понизилось на единицу.");
+                gch->pecho(_("Твое обаяние понизилось на единицу."));
                 gch->perm_stat[STAT_CHA] -= 1;
             }
         }
@@ -508,7 +509,7 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
 
         if ((otherAlignKills % 200) == 199)
         {
-            gch->pecho("На твоем счету {W%1$d{x труп%1$I|а|ов {W%s{x персонажей.",
+            gch->pecho(_("На твоем счету {W%1$d{x труп%1$I|а|ов {W%s{x персонажей."),
                 otherAlignKills,
                 IS_GOOD(gch) ? "недобрых" :
                 IS_NEUTRAL(gch) ? "добрых и злых" :
@@ -517,7 +518,7 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
             if (gch->perm_stat[STAT_CHA] < gch->getMaxTrain(STAT_CHA)
                 && IS_GOOD(gch))
             {
-                gch->pecho("Твое обаяние повысилось на единицу.");
+                gch->pecho(_("Твое обаяние повысилось на единицу."));
                 gch->perm_stat[STAT_CHA] += 1;
             }
         }

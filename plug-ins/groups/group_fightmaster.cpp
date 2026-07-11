@@ -52,6 +52,7 @@
 #include "skill_utils.h"
 #include "roomutils.h"
 #include "vnum.h"
+#include "l10n.h"
 
 GSN(area_attack);
 GSN(bash);
@@ -257,10 +258,10 @@ SKILL_APPLY(parry)
         /* now the attack */
         if (number_percent() < ( chance / 20  ))
         {
-            oldact("Ты не можешь устоять на ногах!",ch,0,victim,TO_VICT);
-            oldact("Ты падаешь вниз!",ch,0,victim,TO_VICT);
-            oldact("$C1 не может устоять на ногах и падает вниз!", ch,0,victim,TO_CHAR);
-            oldact("$C1 пытается парировать мощный удар $c1, но не может устоять на ногах.", ch,0,victim,TO_NOTVICT);
+            oldact(_("Ты не можешь устоять на ногах!"),ch,0,victim,TO_VICT);
+            oldact(_("Ты падаешь вниз!"),ch,0,victim,TO_VICT);
+            oldact(_("$C1 не может устоять на ногах и падает вниз!"), ch,0,victim,TO_CHAR);
+            oldact(_("$C1 пытается парировать мощный удар $c1, но не может устоять на ногах."), ch,0,victim,TO_NOTVICT);
 
             victim->setWait(gsn_bash->getBeats(victim));
             victim->position = POS_RESTING;
@@ -588,9 +589,9 @@ SKILL_APPLY(crossblock)
         /* now the attack */
         if (number_percent() < ( chance / 20  ))
         {
-            oldact("Тебе не удается удержать равновесие!\nТы падаешь!", ch, 0, victim, TO_VICT);
-            oldact("$C1 не может сдержать твою атаку и падает!", ch, 0, victim, TO_CHAR);
-            oldact("$C1 не может сдержать ошеломляющую атаку $c2 и падает.", ch, 0, victim, TO_NOTVICT);
+            oldact(_("Тебе не удается удержать равновесие!\nТы падаешь!"), ch, 0, victim, TO_VICT);
+            oldact(_("$C1 не может сдержать твою атаку и падает!"), ch, 0, victim, TO_CHAR);
+            oldact(_("$C1 не может сдержать ошеломляющую атаку $c2 и падает."), ch, 0, victim, TO_NOTVICT);
 
             victim->setWait(gsn_bash->getBeats(victim));
             victim->position = POS_RESTING;

@@ -36,6 +36,7 @@
 #include "descriptor.h"
 #include "vnum.h"
 #include "def.h"
+#include "l10n.h"
 
 RainbowGQuest* RainbowGQuest::thisClass = NULL;
 
@@ -235,7 +236,7 @@ void RainbowGQuest::report( std::ostringstream &buf, PCharacter *ch ) const
     getScenario( )->printTime( buf );
 
     if (ch->getAttributes().isAvailable(getQuestID())) 
-        buf << fmt(0, "{RТы не сможешь больше принимать участие в задании, т.к. осквернил%Gо||а свои руки убийством.{x", ch)
+        buf << fmt(0, _("{RТы не сможешь больше принимать участие в задании, т.к. осквернил%Gо||а свои руки убийством.{x"), ch)
             << endl;
 }
 
@@ -284,7 +285,7 @@ void RainbowGQuest::getQuestDescription( std::ostringstream &str ) const
             continue;
         
         
-        str << fmt(0, "%s%-30s%s из %s%s",
+        str << fmt(0, _("%s%-30s%s из %s%s"),
                      GQChannel::NORMAL, ch->getNameP( '1' ).c_str( ), 
                      GQChannel::NORMAL, ch->in_room->getName(), GQChannel::NORMAL);
         if (t <= 5)

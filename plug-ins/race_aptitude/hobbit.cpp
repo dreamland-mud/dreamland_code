@@ -29,6 +29,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 GSN(search_stones);
 
@@ -69,7 +70,7 @@ SKILL_RUNP( searchstones )
     int chance, count, mlevel;
     
     if (!gsn_search_stones->usable( ch )) {
-        ch->pecho("Ты не умеешь это делать.");
+        ch->pecho(_("Ты не умеешь это делать."));
         return;
     }
     
@@ -84,12 +85,12 @@ SKILL_RUNP( searchstones )
     }
 
     if (chance == 0) {
-        ch->pecho("В этой местности бесполезно искать камни.");
+        ch->pecho(_("В этой местности бесполезно искать камни."));
         return;
     }
     
     if (number_percent( ) > gsn_search_stones->getEffective( ch ) * chance / 100) {
-        ch->pecho("Тебе не удалось отыскать ни одного камня.");
+        ch->pecho(_("Тебе не удалось отыскать ни одного камня."));
 
         if (number_percent( ) < chance)
             gsn_search_stones->improve( ch, false );
@@ -100,14 +101,14 @@ SKILL_RUNP( searchstones )
     mlevel = ch->getModifyLevel( );
     count = number_range( 5, 5 + mlevel / 30 );
 
-    oldact("Ты подбираешь с земли $t.", ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_CHAR );
-    oldact("$c1 подбирает с земли $t.", ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_ROOM );
+    oldact(_("Ты подбираешь с земли $t."), ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_CHAR );
+    oldact(_("$c1 подбирает с земли $t."), ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_ROOM );
     
     for (int i = 0; i < count; i++) {
         stone = create_stone( mlevel );
 
         if (Char::getCarryWeight(ch) + stone->getWeight( ) > Char::canCarryWeight(ch)) {
-            ch->pecho( "Ты не в силах удержать %1$O4 и роняешь %1$P2.", stone );
+            ch->pecho( _("Ты не в силах удержать %1$O4 и роняешь %1$P2."), stone );
             obj_to_room( stone, ch->in_room );
             break;
         }

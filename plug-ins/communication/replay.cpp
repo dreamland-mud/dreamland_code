@@ -7,6 +7,7 @@
 #include "pcharacter.h"
 #include "dreamland.h"
 #include "arg_utils.h"
+#include "l10n.h"
 
 static const DLString ATTR_PRIVATE = "history_private";
 static const DLString ATTR_NEAR = "history_near";
@@ -134,7 +135,7 @@ void ReplayAttribute::notify(PCharacter *ch) const
 {
     if (tells.size() > 0)
         ch->pecho(
-            "Тебя ожидает {R%1$d{x сообщен%1$Iие|ия|ий, используй команду {hc{yпрослушать{x для просмотра.",
+            _("Тебя ожидает {R%1$d{x сообщен%1$Iие|ия|ий, используй команду {hc{yпрослушать{x для просмотра."),
             tells.size());    
 }
 

@@ -28,6 +28,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "l10n.h"
 
 #define OBJ_VNUM_ALTAR 88
 
@@ -40,12 +41,12 @@ GSN(altar);
 CMDRUN(altar)
 {
     if (ch->is_npc()) {
-        ch->pecho("Изыди, глупое животное.");
+        ch->pecho(_("Изыди, глупое животное."));
         return;
     }
 
     if (IS_CHARMED(ch)) {
-        ch->pecho("Боги вряд ли оценят такое.");
+        ch->pecho(_("Боги вряд ли оценят такое."));
         return;
     }
 
@@ -54,24 +55,24 @@ CMDRUN(altar)
     const char *rname = religion.getRussianName().c_str();
 
     if (religion.getIndex() == god_none) {
-        ch->pecho("Но ты же закоренел%1$Gое|ый|ая атеист%1$G||ка.", ch);
+        ch->pecho(_("Но ты же закоренел%1$Gое|ый|ая атеист%1$G||ка."), ch);
         return;
     }
 
     DefaultReligion *drelig = dynamic_cast<DefaultReligion *>(pch->getReligion().getElement());
     if (!drelig || !drelig->flags.isSet(RELIG_CULT)) {
-        ch->pecho("Похоже, %N1 совершенно равнодуш%gно|ен|на к жертвоприношениям.", 
+        ch->pecho(_("Похоже, %N1 совершенно равнодуш%gно|ен|на к жертвоприношениям."), 
                    rname, religion.getSex());
         return;
     }
 
     if (IS_VIOLENT(pch) || IS_KILLER(pch) || IS_THIEF(pch)) {
-        ch->pecho("Ты слишком возбужден%Gо||а, чтобы воздвигать алтарь.", ch);
+        ch->pecho(_("Ты слишком возбужден%Gо||а, чтобы воздвигать алтарь."), ch);
         return;
     }
 
     if (ch->isAffected(gsn_altar)) {
-        ch->pecho("Ты все еще истощен%Gо||а постройкой предыдущего алтаря.", ch);
+        ch->pecho(_("Ты все еще истощен%Gо||а постройкой предыдущего алтаря."), ch);
         return;
     }
 
@@ -79,12 +80,12 @@ CMDRUN(altar)
           || IS_SET(ch->in_room->room_flags, ROOM_LAW)
           || RoomUtils::isWater(ch->in_room)) 
     {
-        ch->pecho("Здесь неподходящее место для воздвигания алтарей.");
+        ch->pecho(_("Здесь неподходящее место для воздвигания алтарей."));
         return;
     }
     
     if (get_obj_room_vnum(ch->in_room, OBJ_VNUM_ALTAR)) {
-        ch->pecho("Но здесь уже есть какой-то алтарь!");
+        ch->pecho(_("Но здесь уже есть какой-то алтарь!"));
         return;
     }
 
@@ -93,8 +94,8 @@ CMDRUN(altar)
     altar->timer = 60;
     altar->setOwner(religion.getName().c_str());
     
-    ch->pecho("Ты сооружаешь %O4 для подношений %N3.", altar, rname);
-    ch->recho("%^C1 сооружает %O4 для подношений своему божеству.", ch, altar);
+    ch->pecho(_("Ты сооружаешь %O4 для подношений %N3."), altar, rname);
+    ch->recho(_("%^C1 сооружает %O4 для подношений своему божеству."), ch, altar);
     postaffect_to_char(ch, gsn_altar, 30);
     ch->setWaitViolence(2);
 }

@@ -16,6 +16,7 @@
 #include "vnum.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 bool GangChef::death( Character *killer ) 
 {
@@ -29,7 +30,7 @@ bool GangChef::death( Character *killer )
     log("GangChef: killed by " << killer->getNameC());
 
     if (!gquest->isLevelOK( killer )) {
-        oldact("Ну даешь! Как ты сюда вообще попал?", killer, 0, 0, TO_CHAR);
+        oldact(_("Ну даешь! Как ты сюда вообще попал?"), killer, 0, 0, TO_CHAR);
         LogStream::sendNotice( ) << "BAD guy in the Lair: " << killer->getNameC() 
                                  << " lvl " << killer->getModifyLevel( ) << endl;
 
@@ -63,7 +64,7 @@ void GangChef::greet( Character *mob )
     Gangsters *gquest = Gangsters::getThis( );
 
     if (!gquest->isLevelOK( gquest->getActor( mob ) )) {
-        oldact("$c1 вопит '{RВОН ОТСЮДА!{x'", ch, 0, mob, TO_VICT);
+        oldact(_("$c1 вопит '{RВОН ОТСЮДА!{x'"), ch, 0, mob, TO_VICT);
         gquest->exorcism( mob );
         return;
     }
@@ -78,7 +79,7 @@ void GangChef::greet( Character *mob )
         return;
     
     if (!ch->fighting)
-        oldact_p("$c1 тушит сигару о ладонь одного из гангстеров и выхватывает кинжал.",
+        oldact_p(_("$c1 тушит сигару о ладонь одного из гангстеров и выхватывает кинжал."),
                ch, 0, mob, TO_ROOM, POS_RESTING);
 
     /* force guest to begin the fight */

@@ -10,6 +10,7 @@
 #include "act.h"
 #include "arg_utils.h"
 #include "replay.h"
+#include "l10n.h"
 
 static const DLString ATTRNAME = "godreward";
 
@@ -34,7 +35,7 @@ void XMLAttributeGodReward::listRewards(ostringstream &buf) const
     XMLVectorBase<XMLGodReward>::const_iterator r;
 
     for (r = rewards.begin( ); r!= rewards.end( ); r++) {
-        buf << "      " << fmt(0, "{Y%1$d{x квестов%1$Iую|ые|ых единиц%1$Iу|ы|", r->qp)
+        buf << "      " << fmt(0, _("{Y%1$d{x квестов%1$Iую|ые|ых единиц%1$Iу|ы|"), r->qp)
             << "  " << r->reason << endl;
     }
 }
@@ -93,24 +94,24 @@ CMDADM( ireward )
     DLString reason = arguments;
 
     if (name.empty( )) {
-        ch->pecho( "Вознаградить кого?" );
+        ch->pecho( _("Вознаградить кого?") );
         return;
     }
 
     if (qpStr.empty( )) {
-        ch->pecho("Использование: \r\n    ireward персонаж кп причина\r\n    ireward персонаж show\r\n    ireward персонаж delete");
+        ch->pecho(_("Использование: \r\n    ireward персонаж кп причина\r\n    ireward персонаж show\r\n    ireward персонаж delete"));
         return;
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-        ch->pecho( "Персонаж с таким именем не найден." );
+        ch->pecho( _("Персонаж с таким именем не найден.") );
         return;
     }
 
     if (arg_is(qpStr, "del")) {
         pci->getAttributes().eraseAttribute(ATTRNAME);
         PCharacterManager::saveMemory(pci);
-        ch->pecho("Удалены все награды.");
+        ch->pecho(_("Удалены все награды."));
         return;
     } 
 
@@ -118,7 +119,7 @@ CMDADM( ireward )
 
     if (arg_is_show(qpStr)) {
         if (attr->isEmpty()) {
-            ch->pecho("Наград не найдено.");
+            ch->pecho(_("Наград не найдено."));
             return;
         }
 
@@ -134,12 +135,12 @@ CMDADM( ireward )
     try {
         qp = qpStr.toInt( );
     } catch (const ExceptionBadType& e) {
-        ch->pecho("Укажите кол-во квестовых единиц.\r\n");
+        ch->pecho(_("Укажите кол-во квестовых единиц.\r\n"));
         return;
     }
 
     attr->addReward(qp, arguments);
-    ch->pecho("Установлена награда в %d qp, причина: %s.", qp, arguments.c_str());
+    ch->pecho(_("Установлена награда в %d qp, причина: %s."), qp, arguments.c_str());
 
     if (pci->isOnline()) {      
         PCharacter *vict = pci->getPlayer();

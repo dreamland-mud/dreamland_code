@@ -28,6 +28,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(sconce);
 GSN(joker);
@@ -53,8 +54,8 @@ VOID_SPELL(AceInSleeves)::run( Character *ch, const DLString &, int sn, int leve
     
     obj_to_char( sleeves, ch );
 
-    oldact("Ты создаешь $o4!", ch, sleeves, 0, TO_CHAR);
-    oldact("$c1 создает $o4!", ch, sleeves, 0, TO_ROOM);
+    oldact(_("Ты создаешь $o4!"), ch, sleeves, 0, TO_CHAR);
+    oldact(_("$c1 создает $o4!"), ch, sleeves, 0, TO_ROOM);
 }
 
 /*
@@ -68,32 +69,32 @@ SKILL_RUNP( sconce )
     int chance;
 
     if (MOUNTED(ch)) {
-        ch->pecho("Только не верхом!");
+        ch->pecho(_("Только не верхом!"));
         return;
     }
 
     if ((victim = get_char_room(ch,argument)) == 0) {
-        ch->pecho("Здесь таких нет.");
+        ch->pecho(_("Здесь таких нет."));
         return;
     }
 
     if (ch == victim) {
-        ch->pecho("Не надо.. можешь потерять сознание.");
+        ch->pecho(_("Не надо.. можешь потерять сознание."));
         return;
     }
 
     if (victim->fighting) {
-        ch->pecho("Подожди пока закончится сражение.");
+        ch->pecho(_("Подожди пока закончится сражение."));
         return;
     }
 
     if (IS_CHARMED(ch)) {
-        ch->pecho( "Ты же не хочешь ударить по голове сво%1$Gего|его|ю любим%1$Gого|ого|ую хозя%1$Gина|ина|йку?", ch->master);
+        ch->pecho( _("Ты же не хочешь ударить по голове сво%1$Gего|его|ю любим%1$Gого|ого|ую хозя%1$Gина|ина|йку?"), ch->master);
         return;
     }
 
     if (IS_AFFECTED(victim,AFF_SLEEP)) {
-        oldact("$E уже спит.",ch,0,victim,TO_CHAR);
+        oldact(_("$E уже спит."),ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -118,9 +119,9 @@ SKILL_RUNP( sconce )
         chance -= 40;
 
     if (number_percent( ) < chance * k / 100) {
-        oldact("Ты со всей силы бьешь $C4 канделябром по голове!", ch, 0, victim, TO_CHAR);
-        oldact("$c1 ударяет тебя канделябром по голове! Ты отключаешься.", ch, 0, victim, TO_VICT);
-        oldact("$c1 лупит $C4 по голове канделябром.", ch, 0, victim, TO_NOTVICT);
+        oldact(_("Ты со всей силы бьешь $C4 канделябром по голове!"), ch, 0, victim, TO_CHAR);
+        oldact(_("$c1 ударяет тебя канделябром по голове! Ты отключаешься."), ch, 0, victim, TO_VICT);
+        oldact(_("$c1 лупит $C4 по голове канделябром."), ch, 0, victim, TO_NOTVICT);
         gsn_sconce->improve( ch, true, victim );
 
         af.type = gsn_sconce;
@@ -162,9 +163,9 @@ public:
                 || ( IS_AWAKE( victim ) && number_percent() <= 10 ) )
             && !victim->is_immortal())
         {
-            oldact("Твоя {Rшутка{x над $C5 удалась!",ch,0,victim,TO_CHAR);
-            oldact("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x над $C5!",ch,0,victim,TO_NOTVICT);
-            oldact_p("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x!",ch,0,victim,TO_VICT,POS_DEAD);
+            oldact(_("Твоя {Rшутка{x над $C5 удалась!"),ch,0,victim,TO_CHAR);
+            oldact(_("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x над $C5!"),ch,0,victim,TO_NOTVICT);
+            oldact_p(_("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x!"),ch,0,victim,TO_VICT,POS_DEAD);
 
             gsn_joker->improve( ch, true, victim );
 
@@ -191,22 +192,22 @@ SKILL_RUNP( joker )
     one_argument( argument, arg );
 
     if (IS_CHARMED(ch)) {
-        ch->pecho( "Нехорошо шутить над сво%1$Gим|им|ей хозя%1$Gином|ином|йкой.", ch->master);
+        ch->pecho( _("Нехорошо шутить над сво%1$Gим|им|ей хозя%1$Gином|ином|йкой."), ch->master);
         return;
     }
 
     if ( arg[0] == '\0' ) {
-        ch->pecho("Пошутить над кем?");
+        ch->pecho(_("Пошутить над кем?"));
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 ) {
-        ch->pecho("Этого нет здесь.");
+        ch->pecho(_("Этого нет здесь."));
         return;
     }
 
     if (victim == ch) {
-        ch->pecho("Сам пошутил - сам посмеялся.");
+        ch->pecho(_("Сам пошутил - сам посмеялся."));
         return;
     }
 
@@ -214,12 +215,12 @@ SKILL_RUNP( joker )
         return;
 
     if (victim->is_immortal( )) {
-        ch->pecho("А вот эта шутка окончится для тебя плачевно.");
+        ch->pecho(_("А вот эта шутка окончится для тебя плачевно."));
         return;
     }
 
     if (victim->fighting != 0) {
-        ch->pecho("Подожди, пока закончится сражение.");
+        ch->pecho(_("Подожди, пока закончится сражение."));
         return;
     }
     
@@ -227,7 +228,7 @@ SKILL_RUNP( joker )
             && victim->can_see(ch)
             && IS_AWAKE(victim) )
     {
-        oldact("Нехорошо шутить над больными!", ch, 0, victim, TO_CHAR );
+        oldact(_("Нехорошо шутить над больными!"), ch, 0, victim, TO_CHAR );
         return;
     }
 
@@ -241,7 +242,7 @@ SKILL_RUNP( joker )
         }
         else
         {
-            oldact("Твоя шутка не удалась..",ch,0,victim,TO_CHAR);
+            oldact(_("Твоя шутка не удалась.."),ch,0,victim,TO_CHAR);
             gsn_joker->improve( ch, false, victim );
             joke.miss( );
         }

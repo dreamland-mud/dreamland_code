@@ -21,6 +21,7 @@
 #include "merc.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(manacles);
 
@@ -186,33 +187,33 @@ int Command::dispatchOrder( const InterpretArguments &iargs )
         && IS_SET(ch->act, PLR_FREEZE)
         && !getExtra( ).isSet( CMD_FREEZE ))
     {
-        ch->pecho("Ты полностью замороже%Gно|н|на!", ch);
+        ch->pecho(_("Ты полностью замороже%Gно|н|на!"), ch);
         return RC_DISPATCH_PENALTY;
     }
 
     if (IS_SET( ch->comm, COMM_AFK ) && !getExtra( ).isSet( CMD_AFK )) {
-        ch->pecho("Выйди сначала из {WAFK{x");
+        ch->pecho(_("Выйди сначала из {WAFK{x"));
         return RC_DISPATCH_AFK;
     }
 
     if (getExtra( ).isSet( CMD_SPELLOUT ) && !matchesExactly( iargs.cmdName.toLower( ) )) {
-        ch->pecho("Команду '%s' необходимо ввести полностью.", getName( ).c_str( ) );
+        ch->pecho(_("Команду '%s' необходимо ввести полностью."), getName( ).c_str( ) );
         return RC_DISPATCH_SPELLOUT;
     }
                     
     if (IS_AFFECTED( ch, AFF_STUN ) && !getExtra( ).isSet( CMD_KEEP_HIDE )) {
-        ch->pecho("Ты не в состоянии сделать это.");
+        ch->pecho(_("Ты не в состоянии сделать это."));
         return RC_DISPATCH_STUN;
     }
 
     // prevent ghosts from doing a bunch of commands
     if (IS_GHOST( ch ) && !getExtra( ).isSet( CMD_GHOST )) {
-        ch->pecho("У тебя нет тела... А твой немощный дух не в состоянии тебе помочь.");
+        ch->pecho(_("У тебя нет тела... А твой немощный дух не в состоянии тебе помочь."));
         return RC_DISPATCH_GHOST;
     }
 
     if (getExtra().isSet(CMD_NO_DUNGEON) && IS_SET(ch->in_room->areaIndex()->area_flag, AREA_DUNGEON)) {
-        ch->pecho("Эта команда сейчас недоступна.");
+        ch->pecho(_("Эта команда сейчас недоступна."));
         return RC_DISPATCH_NOT_HERE;
     }
 
@@ -233,12 +234,12 @@ int Command::dispatch( const InterpretArguments &iargs )
     if (IS_CHARMED(ch) 
         && !(ch->is_npc( ) && ch->getNPC( )->switchedFrom)) 
     {
-        ch->pecho( "Сперва спроси разрешения у любим%1$Gого|ого|ой хозя%1$Gина|ина|йки!" , ch->master );
+        ch->pecho( _("Сперва спроси разрешения у любим%1$Gого|ого|ой хозя%1$Gина|ина|йки!") , ch->master );
         return RC_DISPATCH_CHARMED;
     }
 
     if (ch->isAffected(gsn_manacles ) && !getExtra( ).isSet( CMD_MANACLES )) {
-        ch->pecho("Ты не можешь этого сделать - мешают кандалы!");
+        ch->pecho(_("Ты не можешь этого сделать - мешают кандалы!"));
         return RC_DISPATCH_CHARMED;
     }
 
@@ -270,32 +271,32 @@ bool Command::checkPosition( Character *ch )
 
     switch (ch->position.getValue( )) {
         case POS_DEAD:
-            ch->pecho("Лежи смирно! Ты {RТРУП{x.");
+            ch->pecho(_("Лежи смирно! Ты {RТРУП{x."));
             break;
 
         case POS_MORTAL:
         case POS_INCAP:
-            ch->pecho("Даже не думай об этом! Ты в ужасном состоянии.");
+            ch->pecho(_("Даже не думай об этом! Ты в ужасном состоянии."));
             break;
 
         case POS_STUNNED:
-            ch->pecho("Ты не в состоянии сделать это.");
+            ch->pecho(_("Ты не в состоянии сделать это."));
             break;
 
         case POS_SLEEPING:
-            ch->pecho("Во сне? Или может сначала проснешься...");
+            ch->pecho(_("Во сне? Или может сначала проснешься..."));
             break;
 
         case POS_RESTING:
-            ch->pecho("Уфф... Но ведь ты отдыхаешь...");
+            ch->pecho(_("Уфф... Но ведь ты отдыхаешь..."));
             break;
 
         case POS_SITTING:
-            ch->pecho("Сидя? Или может сначала встанешь...");
+            ch->pecho(_("Сидя? Или может сначала встанешь..."));
             break;
 
         case POS_FIGHTING:
-            oldact_p("Куда! Ты долж$gно|ен|на сражаться.", ch, 0, 0, TO_CHAR, POS_FIGHTING );
+            oldact_p(_("Куда! Ты долж$gно|ен|на сражаться."), ch, 0, 0, TO_CHAR, POS_FIGHTING );
             break;
     }
     
