@@ -89,6 +89,16 @@ protected:
         return d.toNumber();
     }
     virtual DLString argStr() {
+        // Trilinguality: a %s arg may itself be a Fenia ._(ru) MultiMessage
+        // (e.g. dropWhere() location nouns, weather rain-type). Resolve it to
+        // the recipient's display language, mirroring the format-arg path in
+        // regfmt() above. Only OBJECT registers can carry a handler, and
+        // toHandler() throws on a STRING, so gate on the type first. Trello 2594.
+        if (d.type == Register::OBJECT) {
+            MultiMessageWrapper *mmw = d.toHandler( ).getDynamicPointer<MultiMessageWrapper>( );
+            if (mmw != 0)
+                return mmw->getMulti( ).getMessage( to );
+        }
         return d.toString();
     }
     virtual const Skill * argSkill() {
