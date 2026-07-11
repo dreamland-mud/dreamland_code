@@ -13,6 +13,7 @@
 #include "dreamland.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 using namespace Scripting;
 
@@ -59,7 +60,7 @@ void AreaQuestCleanupPlugin::run( int oldState, int newState, Descriptor *d )
 
             } else if (!aquest->flags.isSet(AQUEST_ONBOARDING|AQUEST_NOEXPIRE)) {
                 // Make the player type 'quest cancel <num>', to allow onCancel triggers to run.
-                pch->pecho("\r\n{yЗадание {Y%s{y будет отменено из-за неактивности.{x", aquest->title.get(LANG_DEFAULT).c_str());
+                pch->pecho(_("\r\n{yЗадание {Y%s{y будет отменено из-за неактивности.{x"), aquest->title.get(LANG_DEFAULT).c_str());
 
                 interpret_raw(ch, "quest", "cancel %d", aquest->vnum.getValue());
 

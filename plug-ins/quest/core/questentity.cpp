@@ -16,6 +16,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "def.h"
+#include "l10n.h"
 
 void QuestEntity::mandatoryExtract( )
 {
@@ -39,7 +40,7 @@ void QuestEntity::mandatoryExtract( )
         quest->scheduleDestroy( );
 
         if (pcm->isOnline())
-            pcm->getPlayer()->pecho("{YТвоё задание уже невозможно выполнить. Через несколько минут сможешь попросить новое.{x");
+            pcm->getPlayer()->pecho(_("{YТвоё задание уже невозможно выполнить. Через несколько минут сможешь попросить новое.{x"));
     }
 }
 

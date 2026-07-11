@@ -15,11 +15,12 @@
 #include "act.h"
 
 #include "def.h"
+#include "l10n.h"
 
 void SteakCustomer::greet( Character *victim ) 
 {
     if (ourHero( victim ))
-        oldact("$c1 выжидающе смотрит на тебя.", ch, 0, victim, TO_VICT );
+        oldact(_("$c1 выжидающе смотрит на тебя."), ch, 0, victim, TO_VICT );
 }
 
 void SteakCustomer::show( Character *victim, std::basic_ostringstream<char> &buf ) 
@@ -64,8 +65,8 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
 
 void SteakCustomer::givenBad( PCharacter *hero, Object *obj )
 {
-    oldact("$c1 возвращает тебе $o4.", ch, obj, hero, TO_VICT);
-    oldact("$c1 возвращает $C5 $o4.", ch, obj, hero, TO_NOTVICT);
+    oldact(_("$c1 возвращает тебе $o4."), ch, obj, hero, TO_VICT);
+    oldact(_("$c1 возвращает $C5 $o4."), ch, obj, hero, TO_NOTVICT);
 }
 
 void SteakCustomer::givenGood( PCharacter *hero, Object *obj )
@@ -79,14 +80,14 @@ void SteakCustomer::givenGood( PCharacter *hero, Object *obj )
     else 
         tell_raw(hero, ch, "Маловато будет...");
     
-    oldact("$c1 куда-то прячет $o4.", ch, obj, 0, TO_ROOM);
+    oldact(_("$c1 куда-то прячет $o4."), ch, obj, 0, TO_ROOM);
     extract_obj( obj );
 }
 
 void SteakCustomer::deadAction( Quest::Pointer quest, PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( )) 
-        pcm->getPlayer( )->pecho( "{YЗаказ отменен в связи с кончиной заказчика.{x" );
+        pcm->getPlayer( )->pecho( _("{YЗаказ отменен в связи с кончиной заказчика.{x") );
 
     ProtectedClient::deadAction( quest, pcm, killer );
 }

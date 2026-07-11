@@ -16,6 +16,7 @@
 
 #include "magic.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(curse);
 GSN(poison);
@@ -26,7 +27,7 @@ void StaffBehavior::getByOther( Character *ch )
 {
     short level = max( 1, ch->getModifyLevel( ) - 9 );
 
-    ch->pecho( "%1$^O1 не принадлежит тебе, и ты бросаешь %1$P2.", obj );
+    ch->pecho( _("%1$^O1 не принадлежит тебе, и ты бросаешь %1$P2."), obj );
 
     switch (dice( 1, 10 ))  {
     case 1:
@@ -41,17 +42,17 @@ void StaffBehavior::getByOther( Character *ch )
 void StaffBehavior::getByHero( PCharacter *ch ) 
 {
     if (IS_AFFECTED( ch, AFF_POISON ) && (dice( 1, 5) == 1))  {
-        oldact("$o1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
+        oldact(_("$o1 загорается голубым пламенем."), ch, obj, 0, TO_CHAR );
         spell( gsn_cure_poison, 30, ch, ch );
         return;
     }
 
     if ( IS_AFFECTED( ch, AFF_CURSE ) && (dice(1,5)==1) )  {
-        oldact("$o1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
+        oldact(_("$o1 загорается голубым пламенем."), ch, obj, 0, TO_CHAR );
         spell( gsn_remove_curse, 30, ch, ch );
         return;
     }
     
-    oldact("Мерцающая аура окружает $o4.", ch, obj, 0, TO_CHAR );
+    oldact(_("Мерцающая аура окружает $o4."), ch, obj, 0, TO_CHAR );
 }
 

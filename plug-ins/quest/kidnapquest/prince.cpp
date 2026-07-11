@@ -22,6 +22,7 @@
 #include "scenario.h"
 #include "prince.h"
 #include "bandit.h"
+#include "l10n.h"
 
 
 KidnapPrince::KidnapPrince( ) 
@@ -169,7 +170,7 @@ void KidnapPrince::give( Character *victim, Object *obj )
         quest->getScenario( ).actWrongGiver( ch, victim, obj );
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
-        oldact("$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
+        oldact(_("$c1 бросает $o4."), ch, obj, 0, TO_ROOM );
         return;
     }
         

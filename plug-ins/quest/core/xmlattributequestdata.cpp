@@ -14,6 +14,7 @@
 #include "msgformatter.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 bool XMLAttributeQuestData::handle( const DeathArguments &args ) 
 {
@@ -66,7 +67,7 @@ bool XMLAttributeQuestData::pull( PCharacter *pch )
     if (quest) {
 
         if (time == 0) {
-            pch->pecho("Время, отведенное на задание, вышло!");
+            pch->pecho(_("Время, отведенное на задание, вышло!"));
             attributes->eraseAttribute( "quest" );
             
             time = quest->getFailTime( pch );
@@ -77,11 +78,11 @@ bool XMLAttributeQuestData::pull( PCharacter *pch )
             pch->send_to( buf );
 
         } else if (time < 6) {
-            pch->pecho("Поторопись! Время, отведенное на выполнение задания, заканчивается!");
+            pch->pecho(_("Поторопись! Время, отведенное на выполнение задания, заканчивается!"));
         }
         
     } else if (time == 0) {
-        pch->pecho("Теперь ты снова можешь взять задание.");
+        pch->pecho(_("Теперь ты снова можешь взять задание."));
     }
         
     PCharacterManager::save(pch);

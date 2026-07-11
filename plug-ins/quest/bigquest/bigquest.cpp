@@ -15,6 +15,7 @@
 #include "act.h"
 #include "save.h"
 #include "def.h"
+#include "l10n.h"
 
 /*----------------------------------------------------------------------------
  * BigQuest
@@ -114,7 +115,7 @@ void BigQuest::shortInfo( std::ostream &buf, PCharacter *ch )
     if (isComplete( ))
         buf << "Сообщить квестору о выполнении задания.";
     else
-        buf << fmt(0, "Уничтожить %1$d преступник%1$Iа|ов|ов из '%2$s' (убито %3$d).",
+        buf << fmt(0, _("Уничтожить %1$d преступник%1$Iа|ов|ов из '%2$s' (убито %3$d)."),
                     mobsTotal.getValue(), areaName.c_str(), mobsKilled.getValue());
 }
 
@@ -138,10 +139,10 @@ void BigQuest::mobKilled(PCMemoryInterface *hero, Character *killer)
 
     if (hero->isOnline()) {
         if (hasPartialRewards()) 
-            hero->getPlayer()->pecho("{YТебе осталось уничтожить %d из %d, или же сообщить квестору о частичном выполнении задания.{x", 
+            hero->getPlayer()->pecho(_("{YТебе осталось уничтожить %d из %d, или же сообщить квестору о частичном выполнении задания.{x"), 
                                        mobsLeft, mobsTotal.getValue());
         else
-            hero->getPlayer()->pecho("{YТебе осталось уничтожить %d из %d.{x", mobsLeft, mobsTotal.getValue());
+            hero->getPlayer()->pecho(_("{YТебе осталось уничтожить %d из %d.{x"), mobsLeft, mobsTotal.getValue());
     }
 }
 
@@ -158,7 +159,7 @@ void BigQuest::mobDestroyed(PCMemoryInterface *hero)
 void BigQuest::notifyNoMore(PCMemoryInterface *hero)
 {
     if (hero->isOnline())
-        hero->getPlayer()->pecho("{YВсе разбежались или были уничтожены, сообщи квестору о выполнении задания.{x");
+        hero->getPlayer()->pecho(_("{YВсе разбежались или были уничтожены, сообщи квестору о выполнении задания.{x"));
 }
 
 bool BigQuest::hasPartialRewards() const

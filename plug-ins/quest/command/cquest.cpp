@@ -35,6 +35,7 @@
 #include "questtrader.h"
 #include "xmlattributequestdata.h"
 #include "def.h"
+#include "l10n.h"
 
 HOMETOWN(frigate);
 enum {
@@ -82,7 +83,7 @@ static bool gprog_quest( PCharacter *ch, const DLString &cmd, const DLString &ar
 
 static void see_also( PCharacter *pch )
 {
-    pch->pecho( "Смотри также {y{hcквест ?{x для списка всех возможных действий." );
+    pch->pecho( _("Смотри также {y{hcквест ?{x для списка всех возможных действий.") );
 }
 
 COMMAND(CQuest, "quest")
@@ -96,7 +97,7 @@ COMMAND(CQuest, "quest")
         return;
 
     if (IS_GHOST( pch )) {
-        pch->pecho("Наслаждение жизнью недоступно призракам.");
+        pch->pecho(_("Наслаждение жизнью недоступно призракам."));
         return;
     }
 
@@ -149,7 +150,7 @@ COMMAND(CQuest, "quest")
         trader = find_attracted_mob_behavior<QuestTrader>( pch, OCC_QUEST_TRADER );
 
         if (!trader) {
-            pch->pecho("Здесь нет торговца квестовыми наградами.");
+            pch->pecho(_("Здесь нет торговца квестовыми наградами."));
             see_also( pch );
             return;
         }
@@ -198,10 +199,10 @@ COMMAND(CQuest, "quest")
         if (pch->getHometown( ) != home_frigate) {
             switch (qcmd) {
                 case QCMD_CANCEL:
-                    pch->pecho("Для отмены задания квестора необходимо стоять рядом с ним.");
+                    pch->pecho(_("Для отмены задания квестора необходимо стоять рядом с ним."));
                     break;
                 default:
-                    pch->pecho("Эту команду можно выполнить только рядом с квестором.");
+                    pch->pecho(_("Эту команду можно выполнить только рядом с квестором."));
                     break;
             }
             see_also( pch );
@@ -211,13 +212,13 @@ COMMAND(CQuest, "quest")
         // Special handling for newbie quests. TODO: add Fenia triggers for each command.
         switch(qcmd) {
             case QCMD_CANCEL:
-                pch->pecho("Твое задание не нужно отменять, оно исчезнет как только ты сойдешь с корабля.");
+                pch->pecho(_("Твое задание не нужно отменять, оно исчезнет как только ты сойдешь с корабля."));
                 break;
             case QCMD_REQUEST:
             case QCMD_FIND:
             case QCMD_COMPLETE:
-                pch->pecho("Эта команда недоступна пока ты на корабле.");
-                pch->pecho("Список текущих квестов показывает команда {yквест{x.");
+                pch->pecho(_("Эта команда недоступна пока ты на корабле."));
+                pch->pecho(_("Список текущих квестов показывает команда {yквест{x."));
                 break;
         }
         return;
@@ -273,7 +274,7 @@ void CQuest::doInfo( PCharacter *ch )
     autoQuestInfo(ch, buf);
     
     if (buf.str().empty())
-        ch->pecho("У тебя сейчас нет задания от квестора. См. также команду {y{hcквест{x.");
+        ch->pecho(_("У тебя сейчас нет задания от квестора. См. также команду {y{hcквест{x."));
     else
         ch->send_to(buf);
 }
@@ -294,7 +295,7 @@ void CQuest::doSummary( PCharacter *ch, const DLString &arguments )
 
     // No active Fenia quest or questor's quest. 
     if (!feniaquest && !autoquest) {
-        ch->pecho("У тебя сейчас нет задания. Подробности читай по команде {y{hcсправка квесты{x.");
+        ch->pecho(_("У тебя сейчас нет задания. Подробности читай по команде {y{hcсправка квесты{x."));
         return;
     }
 
@@ -304,9 +305,9 @@ void CQuest::doSummary( PCharacter *ch, const DLString &arguments )
 
     // Questor's quest and footer:
     if (autoquest) {
-        ch->pecho("{WЗадание квестора{x");
+        ch->pecho(_("{WЗадание квестора{x"));
         ch->send_to(buf);
-        ch->pecho("{wКоманды{x: {y{hcквест сдать{x, {y{hcквест сдать опыт{x, {y{hcквест найти{x, {y{hcквест отменить{x.");
+        ch->pecho(_("{wКоманды{x: {y{hcквест сдать{x, {y{hcквест сдать опыт{x, {y{hcквест найти{x, {y{hcквест отменить{x."));
     }
 }
 
@@ -314,7 +315,7 @@ void CQuest::doPoints( PCharacter *ch )
 {
     int points = ch->getQuestPoints();
 
-    ch->pecho("У тебя {Y%d{x квестов%s единиц%s.", 
+    ch->pecho(_("У тебя {Y%d{x квестов%s единиц%s."), 
              points, GET_COUNT(points, "ая", "ых", "ых"), GET_COUNT(points, "а", "ы", ""));
 }
 
@@ -390,21 +391,21 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
     }
     
     if (name.empty( ) || questID.empty( ) || number.empty( )) {
-        ch->pecho("Использование: quest set <player> <quest id> [+]<num. of victories>");
+        ch->pecho(_("Использование: quest set <player> <quest id> [+]<num. of victories>"));
         return;
     }
 
     pci = PCharacterManager::find( name );
 
     if (!pci) {
-        ch->pecho("%s: имя не найдено.", name.c_str( ));
+        ch->pecho(_("%s: имя не найдено."), name.c_str( ));
         return;
     }
     
     qbase = QuestManager::getThis( )->findQuestRegistrator( questID );
 
     if (!qbase) {
-        ch->pecho("Неправильный ID.");
+        ch->pecho(_("Неправильный ID."));
         return;
     }
     
@@ -416,7 +417,7 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
         
         count = number.toInt( );
     } catch (const ExceptionBadType&) {
-        ch->pecho("Неверное количество побед.");
+        ch->pecho(_("Неверное количество побед."));
         return;
     }
    
@@ -475,7 +476,7 @@ void CQuest::doStat( PCharacter *ch )
             for (; r != records.end(); r++, cnt++)
                 if (r->first == ch->getName()) {
                     buf << "               {W....{w " << endl;
-                    buf << fmt(0, "          {W%4d{w %s (%dе место)\r\n", 
+                    buf << fmt(0, _("          {W%4d{w %s (%dе место)\r\n"), 
                                      r->second, r->first.c_str(), cnt+1);
                     break;
                 }
