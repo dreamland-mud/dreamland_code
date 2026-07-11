@@ -666,9 +666,13 @@ NMI_GET( LiquidWrapper, name, "английское название" )
 {
     return getTarget()->getName( );
 }
-NMI_GET( LiquidWrapper, short_descr, "русское название с цветами и падежами" ) 
+NMI_GET( LiquidWrapper, short_descr, "русское название с цветами и падежами" )
 {
     return getTarget()->getShortDescr( );
+}
+NMI_INVOKE( LiquidWrapper, getShort, "(lang): название с цветами и падежами на языке lang (0=en,1=ru,2=ua)" )
+{
+    return Scripting::Register( getTarget()->getShortDescr( argnum2lang(args, 1) ) );
 }
 NMI_GET( LiquidWrapper, color, "прилагательное цвета с падежами" ) 
 {

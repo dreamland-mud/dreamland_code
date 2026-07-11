@@ -15,6 +15,7 @@
 #include "core/object.h"
 #include "objectmanager.h"
 #include "room.h"
+#include "l10n.h"
 
 #include "merc.h"
 
@@ -73,10 +74,14 @@ void extract_obj_1( Object *obj, bool count, const char *not_used )
 
         DLString message = obj->getProperty("extract");
 
-        // Remove obj from all locations, showing an optional message.
+        // Trilinguality (Trello 2594): the "extract" decay/removal message is set
+        // as a raw-RU literal at the point of destruction (obj_update, drown, etc.)
+        // and flattened into a plain-string property. Wrap it here, at the single
+        // echo choke point, so the catalog (keyed to THIS file) resolves it to
+        // each viewer's language. All decay phrases live in the extraction.cpp shard.
         if (obj->in_room != 0) {
             if (!message.empty())
-                obj->in_room->echo(POS_RESTING, message.c_str(), obj, obj->in_room->getLiquid()->getShortDescr().c_str());
+                obj->in_room->echo(POS_RESTING, _(message), obj, obj->in_room->getLiquid()->getShortDescr().c_str());
             obj_from_room(obj);
 
         } else if (obj->carried_by != 0) {
@@ -91,9 +96,9 @@ void extract_obj_1( Object *obj, bool count, const char *not_used )
             obj_from_char(obj);
 
             if (!message.empty()) {
-                carrier->pecho(message.c_str(), obj);
+                carrier->pecho(_(message), obj);
                 if (echoAround)
-                    carrier->recho(message.c_str(), obj);
+                    carrier->recho(_(message), obj);
             }
 
         } else if (obj->in_obj != 0) {
