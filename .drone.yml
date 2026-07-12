@@ -20,6 +20,13 @@ steps:
   - cd ../objs
   - ../dreamland_code/configure --prefix=/home/dreamland/runtime
   - rm -f plug-ins/*/lib*cpp plug-ins/*/*/lib*cpp
+  # ~/objs is persistent and the build is incremental, so a change to a GLOBAL
+  # compiler flag would silently apply to only the TUs whose sources changed
+  # (this bit us with -fno-gnu-unique). Force a full recompile whenever the flag
+  # sources change. CXXFLAGS is assembled from configure.ac AND admin/acinclude.m4.in
+  # (-std/-Og/charset live in the latter). Stamp their content next to the objects:
+  # git-mechanics-independent and self-healing across failed builds / manual resets.
+  - if ! cat ../dreamland_code/configure.ac ../dreamland_code/admin/acinclude.m4.in | cmp -s - .flags.stamp; then find . \( -name '*.o' -o -name '*.lo' \) -delete && cat ../dreamland_code/configure.ac ../dreamland_code/admin/acinclude.m4.in > .flags.stamp; fi
   - make -j 2
   - make install
 
