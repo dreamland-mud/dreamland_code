@@ -212,6 +212,12 @@ void PluginManager::checkReloadRequest( )
     catch (const PluginException &e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
+    catch (const std::exception &e) {
+        // A plugin's load/init threw (e.g. a command with no help profile mid
+        // 'plug reload most'). Abort the reload with a log line rather than
+        // letting it escape to std::terminate and abort() the whole server.
+        LogStream::sendError( ) << "Plugin reload aborted: " << e.what( ) << endl;
+    }
 
     request.clear( );
 }

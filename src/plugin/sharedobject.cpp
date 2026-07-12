@@ -25,13 +25,14 @@
 bool 
 InitializerCmp::operator( ) (const Initializer *left, const Initializer *right) const
 {
-    if(left->getPriority( ) < right->getPriority( ))
-        return true;
-    
-    if(left < right)
-        return true;
+    // Strict weak ordering: order by priority, and tie-break by pointer ONLY
+    // when priorities are equal. The old form ran the pointer compare even when
+    // left's priority was higher, so cmp(a,b) and cmp(b,a) could both be true --
+    // undefined behaviour in std::set (could silently drop/misorder initializers).
+    if(left->getPriority( ) != right->getPriority( ))
+        return left->getPriority( ) < right->getPriority( );
 
-    return false;
+    return left < right;
 }
 
 /*--------------------------------------------------------------------------
@@ -185,7 +186,7 @@ void XMLSharedObject::load( )
         loadSO( );
     } catch (const std::exception &ex) {
         LogStream::sendFatal() << "Exception loading [" << name << "]: " << ex.what() << endl;
-        throw ex;
+        throw; // rethrow original type, not a sliced std::exception copy
     }
 }
 
@@ -202,7 +203,7 @@ void XMLSharedObject::unload( )
         unloadSO( );
     } catch (const std::exception &ex) {
         LogStream::sendFatal() << "Exception unloading [" << name << "]: " << ex.what() << endl;
-        throw ex;
+        throw; // rethrow original type, not a sliced std::exception copy
     }
 }
 

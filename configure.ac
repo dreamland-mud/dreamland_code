@@ -41,7 +41,16 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_DLSIZE_T
 AC_TYPE_SIGNAL
 AC_TYPE_SIZE_T
-CXXFLAGS="$CXXFLAGS -fconcepts"
+# -fno-gnu-unique: emit lambda/inline statics as WEAK, not STB_GNU_UNIQUE.
+# glibc 2.27 permanently marks any dlopened .so exporting a bound GNU_UNIQUE
+# symbol as DF_1_NODELETE, so it never unmaps on dlclose. The L10N_FILE macro
+# (src/l10n/l10n.h, used by _()/l() trilingual wraps) is a lambda-local static
+# -> UNIQUE -> its plugin .so becomes un-unloadable -> 'plug reload most'
+# re-dlopens the stale mapping without re-running ctors, leaving PluginInitializer
+# globals (commandPluginLoader, configReg, ...) NULL -> crash. This restores
+# proper unload/reload semantics. Plugins are RTLD_LOCAL and these statics are
+# per-callsite, so no cross-DSO symbol sharing is intended.
+CXXFLAGS="$CXXFLAGS -fconcepts -fno-gnu-unique"
 
 AC_CHECK_TIME_T
 
