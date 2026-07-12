@@ -15,7 +15,15 @@ bool CommandPlugin::saveCommand() const
 
 void CommandPlugin::initialization( )
 {
-    getLoader()->loadCommand( Pointer( this ) );
+    // getLoader() (commandPluginLoader global) can be NULL mid 'plug reload
+    // most': reloadNonCritical() destructs [command] (nulling the loader in its
+    // dtor) and may re-init a command template from another .so (e.g. religion's
+    // altar cmd) before the loader plugin is reconstructed. Dereferencing it here
+    // SIGSEGV'd the server. Guard mirrors the configReg check in configurable.cpp
+    // (code #659): boot order is always correct, so the XML load is skipped only
+    // in that reload window. The command still registers and stays callable.
+    if (getLoader())
+        getLoader()->loadCommand( Pointer( this ) );
     commandManager->registrate( Pointer( this ) );
     linkWrapper();
 }
