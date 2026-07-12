@@ -18,7 +18,7 @@ void WrappedCommand::linkWrapper()
         // (no Fenia runFunc override until next boot) rather than throwing and
         // aborting the reload. Normal boot always has a help id, so this is a
         // degraded-but-safe fallback, not the common path.
-        if (getHelp() == 0 || getHelp()->getID() <= 0) {
+        if (!getHelp() || getHelp()->getID() <= 0) {
             LogStream::sendError() << "Fenia command: no help id for " << getName()
                 << ", skipping wrapper link." << endl;
             return;
