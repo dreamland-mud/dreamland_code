@@ -12,6 +12,17 @@ using namespace Scripting;
 void WrappedCommand::linkWrapper()
 {
     if (FeniaManager::wrapperManager) {
+        // Guard: linkWrapper() calls getID(), which throws when the command has
+        // no help profile (getHelp() null or id <= 0). That can happen mid
+        // 'plug reload most' if the command's loader was skipped. Skip linking
+        // (no Fenia runFunc override until next boot) rather than throwing and
+        // aborting the reload. Normal boot always has a help id, so this is a
+        // degraded-but-safe fallback, not the common path.
+        if (getHelp() == 0 || getHelp()->getID() <= 0) {
+            LogStream::sendError() << "Fenia command: no help id for " << getName()
+                << ", skipping wrapper link." << endl;
+            return;
+        }
         FeniaManager::wrapperManager->linkWrapper(this);
         if (wrapper)
             LogStream::sendNotice() << "Fenia command: linked wrapper for " << getName() << endl;
