@@ -38,6 +38,17 @@
 
 #include "messengers.h"
 #include "l10n.h"
+#include "lang.h"
+
+#include <fstream>
+#include "xmldocument.h"
+#include "xmlnode.h"
+#include "xmlmultistring.h"
+#include "dlfile.h"
+#include "logstream.h"
+#include "exception.h"
+#include "plugin.h"
+#include "plugininitializer.h"
 
 PROF(vampire);
 BONUS(experience);
@@ -108,6 +119,128 @@ const char *        const        day_name        [] =
     "Великих Богов", "Солнца"
 };
 
+/*--------------------------------------------------------------------------
+ * Ambient weather/time messages, loaded from config/weather.xml.
+ *
+ * One entry per transition event id (sunrise, precip_start, lightning_start,
+ * ...); each holds season-tagged multilingual variants. At a transition the
+ * engine picks ONE variant at random for the current season and renders it to
+ * every viewer in that viewer's own language. This both adds variety and kills
+ * the old RU-only leak into the EN/UA frame. Winter precipitation reads as snow
+ * purely through season selection (matching the Fenia snowdrift layer in
+ * global/update) -- no rain/snow branch needed here.
+ *
+ * Reloadable via `plug reload` (see WeatherMessagesLoader below): edit
+ * config/weather.xml, reload, no server restart.
+ *-------------------------------------------------------------------------*/
+class WeatherMessages {
+public:
+    static WeatherMessages & getThis( )
+    {
+        static WeatherMessages instance;
+        return instance;
+    }
+
+    void clear( )
+    {
+        events.clear( );
+    }
+
+    void load( )
+    {
+        clear( );
+
+        DLFile file( dreamland->getTableDir( ), "config/weather", ".xml" );
+        ifstream istr( file.getCPath( ) );
+        if (!istr) {
+            LogStream::sendError( ) << "weather.xml: cannot open " << file.getPath( ) << endl;
+            return;
+        }
+
+        try {
+            XMLDocument::Pointer doc( NEW );
+            doc->load( istr );
+
+            // Find the <weather> root, skipping any leading comment/PI nodes.
+            XMLNode::Pointer root;
+            for (auto &n: doc->getNodeList( ))
+                if (n->getName( ) == "weather") { root = n; break; }
+            if (root.isEmpty( ))
+                return;
+
+            int count = 0;
+            for (auto &ev: root->getNodeList( )) {
+                if (ev->getName( ) != "event")
+                    continue;
+                DLString id = ev->getAttribute( "id" );
+                if (id.empty( ))
+                    continue;
+
+                vector<Variant> &vars = events[id];
+                for (auto &v: ev->getNodeList( )) {
+                    if (v->getName( ) != "variant")
+                        continue;
+                    Variant variant;
+                    variant.season = v->getAttribute( "season" );
+                    if (variant.season.empty( ))
+                        variant.season = "any";
+                    for (auto &ln: v->getNodeList( )) {
+                        if (ln->getName( ) != "line")
+                            continue;
+                        lang_t lang = attr2lang( ln->getAttribute( "l" ) );
+                        XMLNode::Pointer txt = ln->getFirstNode( );
+                        variant.msg[lang] = txt.isEmpty( ) ? DLString::emptyString : txt->getCData( );
+                    }
+                    vars.push_back( variant );
+                    count++;
+                }
+            }
+            LogStream::sendNotice( ) << "weather.xml: " << count << " variants across "
+                                     << events.size( ) << " events." << endl;
+        }
+        catch (const Exception &ex) {
+            LogStream::sendError( ) << "weather.xml parse error: " << ex << endl;
+        }
+    }
+
+    /** One random variant for 'eventId' suited to 'seasonName' (variants tagged
+     *  with that season plus season="any"), or 0 when the event has no usable
+     *  variants -- the caller then stays silent. */
+    const XMLMultiString * pick( const DLString &eventId, const DLString &seasonName ) const
+    {
+        map<DLString, vector<Variant> >::const_iterator it = events.find( eventId );
+        if (it == events.end( ))
+            return 0;
+
+        vector<const XMLMultiString *> pool;
+        for (auto &v: it->second)
+            if (v.season == seasonName || v.season == "any")
+                pool.push_back( &v.msg );
+
+        if (pool.empty( ))
+            return 0;
+        return pool[number_range( 0, (int)pool.size( ) - 1 )];
+    }
+
+private:
+    struct Variant {
+        DLString season;
+        XMLMultiString msg;
+    };
+    map<DLString, vector<Variant> > events;
+};
+
+/** Loads config/weather.xml on boot and on every `plug reload`. */
+class WeatherMessagesLoader : public Plugin {
+public:
+    typedef ::Pointer<WeatherMessagesLoader> Pointer;
+
+    virtual void initialization( ) { WeatherMessages::getThis( ).load( ); }
+    virtual void destruction( )    { WeatherMessages::getThis( ).clear( ); }
+};
+
+PluginInitializer<WeatherMessagesLoader> initWeatherMessagesLoader;
+
 void mmhg_update()
 {
     int diff, d;
@@ -148,11 +281,40 @@ DLString season()
 }
 
 /*
+ * Broadcast one ambient weather/time transition to every eligible outdoor
+ * player, each in their own language, using a random variant from
+ * config/weather.xml. 'noFlag' is the room flag that suppresses this class of
+ * message (ROOM_NO_WEATHER for sky, ROOM_NO_TIME for daylight). Silent if the
+ * event has no variants configured.
+ */
+static void weather_broadcast( const DLString &eventId, int noFlag )
+{
+    const XMLMultiString *msg = WeatherMessages::getThis( ).pick( eventId, season( ) );
+    if (msg == 0)
+        return;
+
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
+        if (d->connected != CON_PLAYING)
+            continue;
+
+        Character *ch = d->character;
+        if (ch
+            && RoomUtils::isOutside( ch )
+            && IS_AWAKE( ch )
+            && !IS_SET( ch->in_room->room_flags, noFlag ))
+        {
+            ch->send_to( msg->getForLang( viewerLang( ch ) ) + "\r\n" );
+        }
+    }
+}
+
+/*
  * Daytime change
  */
 void sunlight_update( )
 {
-    ostringstream buf, tbuf;
+    ostringstream tbuf;
+    DLString lightEvent;
     int this_season = month_table[time_info.month].season;
     int this_day = time_info.day;
     int this_month = time_info.month;
@@ -164,19 +326,19 @@ void sunlight_update( )
 
     if (time_info.hour == month_table[time_info.month].sunrise) {
         weather_info.sunlight = SUN_RISE;
-        buf << "Первые лучи солнца пробиваются с востока." << endl;
+        lightEvent = "sunrise";
     }
     else if (time_info.hour == month_table[time_info.month].sunrise + 1) {
         weather_info.sunlight = SUN_LIGHT;
-        buf << "Начался новый день." << endl;
+        lightEvent = "day_begin";
     }
     else if (time_info.hour == month_table[time_info.month].sunset) {
         weather_info.sunlight = SUN_SET;
-        buf << "Солнце медленно прячется за горизонтом." << endl;
+        lightEvent = "sunset";
     }
     else if (time_info.hour == month_table[time_info.month].sunset + 1) {
         weather_info.sunlight = SUN_DARK;
-        buf << "Начинается ночь." << endl;
+        lightEvent = "night_begin";
     }
 
     if (time_info.hour == 24) {
@@ -225,30 +387,31 @@ void sunlight_update( )
         }
     }
 
-    string buf_str = buf.str();
-    string tbuf_str = tbuf.str();
+    // Daylight transition -> random multilingual variant from weather.xml,
+    // rendered to each outdoor viewer in their own language.
+    if (!lightEvent.empty())
+        weather_broadcast(lightEvent, ROOM_NO_TIME);
 
-    if (!buf_str.empty() || !tbuf_str.empty()) {
+    // Calendar / bonus announcements (still RU-only -- Phase 2). Sent to every
+    // awake player in a non-timeless room, indoors included, as before.
+    string tbuf_str = tbuf.str();
+    if (!tbuf_str.empty()) {
         for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
             if (d->connected != CON_PLAYING)
                 continue;
 
             Character *ch = d->character;
-
             if (ch
-                && IS_AWAKE(ch) 
+                && IS_AWAKE(ch)
                 && !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
             {
-                if (RoomUtils::isOutside(ch) && !buf_str.empty())
-                    ch->send_to(buf_str);
-                if (!tbuf_str.empty())
-                    ch->send_to(tbuf_str);
+                ch->send_to(tbuf_str);
             }
         }
     }
 
     DLString newTime;
-    if (!buf_str.empty()) {
+    if (!lightEvent.empty()) {
         if (weather_info.sunlight >= SUN_DARK && weather_info.sunlight <= SUN_SET)
             newTime = sunlight_en[weather_info.sunlight];
     }
@@ -284,7 +447,7 @@ DLString sunlight( lang_t lang )
  */
 void weather_update( )
 {
-    ostringstream buf;
+    DLString skyEvent;
 
     mmhg_update( );
 
@@ -299,7 +462,7 @@ void weather_update( )
         if ( weather_info.mmhg <  990
                 || ( weather_info.mmhg < 1010 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Небо затягивается тучами." << endl;
+            skyEvent = "clouds_gather";
             weather_info.sky = SKY_CLOUDY;
         }
         break;
@@ -308,13 +471,13 @@ void weather_update( )
         if ( weather_info.mmhg <  970
                 || ( weather_info.mmhg <  990 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Начинается дождь." << endl;
+            skyEvent = "precip_start";
             weather_info.sky = SKY_RAINING;
         }
 
         if ( weather_info.mmhg > 1030 && number_bits( 2 ) == 0 )
         {
-            buf << "Тучи рассеиваются." << endl;
+            skyEvent = "clouds_clear";
             weather_info.sky = SKY_CLOUDLESS;
         }
         break;
@@ -322,14 +485,14 @@ void weather_update( )
     case SKY_RAINING:
         if ( weather_info.mmhg <  970 && number_bits( 2 ) == 0 )
         {
-            buf << "Молнии сверкают на небе." << endl;
+            skyEvent = "lightning_start";
             weather_info.sky = SKY_LIGHTNING;
         }
 
         if ( weather_info.mmhg > 1030
                 || ( weather_info.mmhg > 1010 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Дождь прекращается." << endl;
+            skyEvent = "precip_stop";
             weather_info.sky = SKY_CLOUDY;
         }
         break;
@@ -338,32 +501,18 @@ void weather_update( )
         if ( weather_info.mmhg > 1010
                 || ( weather_info.mmhg >  990 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Гроза понемногу утихает, молний больше нет." << endl;
+            skyEvent = "storm_ease";
             weather_info.sky = SKY_RAINING;
             break;
         }
         break;
     }
 
-    if (!buf.str( ).empty( )) {
-        Descriptor *d;
-        Character *ch;
-        
-        for (d = descriptor_list; d != 0; d = d->next) {
-            if (d->connected != CON_PLAYING)
-                continue;
-
-            ch = d->character;
-
-            if (ch
-                && RoomUtils::isOutside(ch) 
-                && IS_AWAKE(ch) 
-                && !IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER))
-            {
-                ch->send_to( buf );
-            }
-        }
-    }
+    // Sky transition -> random multilingual variant from weather.xml, rendered
+    // to each outdoor viewer in their own language. Winter precipitation reads
+    // as snow via the winter variants of precip_start / precip_stop.
+    if (!skyEvent.empty())
+        weather_broadcast( skyEvent, ROOM_NO_WEATHER );
 }
 
 
