@@ -42,10 +42,14 @@ enum{
 
 struct season_info {
     int number;
-    const char *name;
-    const char *rname;
-    const char *short_descr;
-    const char *adjective;
+    const char *name;         // EN season key, e.g. "winter"
+    const char *rname;         // RU nominative, e.g. "зима"
+    const char *short_descr;   // RU Flexer pad for russian_case()
+    const char *adjective;     // RU genitive adjective, e.g. "зимнего"
+    const char *adjective_en;  // EN attributive, e.g. "winter"
+    const char *adjective_ua;  // UA genitive adjective, e.g. "зимового"
+    const char *genitive_en;   // EN genitive noun, e.g. "winter"
+    const char *genitive_ua;   // UA genitive noun, e.g. "зими"
     char color;
 };
 
