@@ -75,10 +75,10 @@ const char * sunlight_ua [4] = {
 };
 
 const struct season_info season_table [4] = {
-    { SEASON_WINTER, "winter", "зима",  "зим|а|ы|е|у|ой|е",  "зимнего",   'C' },
-    { SEASON_SPRING, "spring", "весна", "весн|а|ы|е|у|ой|е", "весеннего", 'G' },
-    { SEASON_SUMMER, "summer", "лето",  "лет|о|а|у|о|ом|е",  "летнего",   'R' },
-    { SEASON_AUTUMN, "autumn", "осень", "осен|ь|и|и|ь|ью|и", "осеннего",  'Y' },
+    { SEASON_WINTER, "winter", "зима",  "зим|а|ы|е|у|ой|е",  "зимнего",   "winter", "зимового",  "winter", "зими",  'C' },
+    { SEASON_SPRING, "spring", "весна", "весн|а|ы|е|у|ой|е", "весеннего", "spring", "весняного", "spring", "весни", 'G' },
+    { SEASON_SUMMER, "summer", "лето",  "лет|о|а|у|о|ом|е",  "летнего",   "summer", "літнього",  "summer", "літа",  'R' },
+    { SEASON_AUTUMN, "autumn", "осень", "осен|ь|и|и|ь|ью|и", "осеннего",  "autumn", "осіннього", "autumn", "осені", 'Y' },
 };
 
 struct month_info {
@@ -118,6 +118,47 @@ const char *        const        day_name        [] =
     "Луны", "Быка", "Лжи", "Грома", "Свободы",
     "Великих Богов", "Солнца"
 };
+const char * const day_name_en [7] =
+{
+    "the Moon", "the Bull", "Deception", "Thunder", "Freedom",
+    "the High Gods", "the Sun"
+};
+const char * const day_name_ua [7] =
+{
+    "Місяця", "Бика", "Брехні", "Грому", "Свободи",
+    "Вищих Богів", "Сонця"
+};
+
+// Weekday name in the viewer's language (RU array kept for context-free make_date).
+static const char * day_name_for( lang_t lang, int idx )
+{
+    switch (lang) {
+        case LANG_EN: return day_name_en[idx];
+        case LANG_UA: return day_name_ua[idx];
+        default:      return day_name[idx];
+    }
+}
+
+// Season genitive adjective ("of the winter month") in the viewer's language.
+static const char * season_adjective( lang_t lang, const season_info &s )
+{
+    switch (lang) {
+        case LANG_EN: return s.adjective_en;
+        case LANG_UA: return s.adjective_ua;
+        default:      return s.adjective;
+    }
+}
+
+// Season genitive noun ("the first day of winter") in the viewer's language.
+// RU declines the Flexer pad; EN/UA carry explicit forms on the season table.
+static DLString season_genitive( lang_t lang, const season_info &s )
+{
+    switch (lang) {
+        case LANG_EN: return s.genitive_en;
+        case LANG_UA: return s.genitive_ua;
+        default:      return russian_case( s.short_descr, '2' );
+    }
+}
 
 /*--------------------------------------------------------------------------
  * Ambient weather/time messages, loaded from config/weather.xml.
@@ -313,8 +354,9 @@ static void weather_broadcast( const DLString &eventId, int noFlag )
  */
 void sunlight_update( )
 {
-    ostringstream tbuf;
     DLString lightEvent;
+    DLString calByLang[LANG_MAX]; // calendar rollover text, one build per viewer language
+    string bonus_str;             // new-day bonus report (RU; bonus subsystem -- Phase 2)
     int this_season = month_table[time_info.month].season;
     int this_day = time_info.day;
     int this_month = time_info.month;
@@ -356,22 +398,54 @@ void sunlight_update( )
         time_info.year++;
     }
     
-    if (this_day != time_info.day)
-        tbuf << "Полночь. Начинается день " << day_name[time_info.day % 7] << "." << endl;
-    
+    // Calendar rollover, assembled once per language and dispatched per viewer below.
+    if (this_day != time_info.day) {
+        for (int lg = 0; lg < LANG_MAX; lg++) {
+            lang_t vl = (lang_t)lg;
+            calByLang[lg] += fmt(0, lmsg(vl,
+                                 "Midnight. The day of %s begins.",
+                                 "Полночь. Начинается день %s.",
+                                 "Північ. Починається день %s."),
+                             day_name_for(vl, time_info.day % 7));
+            calByLang[lg] += "\r\n";
+        }
+    }
+
     if (this_month != time_info.month) {
         const struct month_info &month = month_table[time_info.month];
         const struct season_info &season = season_table[month.season];
-        tbuf << "Сегодня первый день месяца " << month.name;
-        if (this_season != month.season) 
-            tbuf << " и первый день {" << season.color << russian_case(season.short_descr, '2') << "{x!" << endl;
-        else if (this_year != time_info.year)
-            tbuf << " и {Cновый год{x!" << endl;
-        else
-            tbuf << "." << endl;
+        for (int lg = 0; lg < LANG_MAX; lg++) {
+            lang_t vl = (lang_t)lg;
+            DLString line = fmt(0, lmsg(vl,
+                                "Today is the first day of the month of %s",
+                                "Сегодня первый день месяца %s",
+                                "Сьогодні перший день місяця %s"),
+                            calendar_month(vl).c_str());
+            if (this_season != month.season) {
+                DLString colored = "{";
+                colored += season.color;
+                colored += season_genitive(vl, season);
+                colored += "{x";
+                line += fmt(0, lmsg(vl,
+                                " and the first day of %s!",
+                                " и первый день %s!",
+                                " і перший день %s!"),
+                            colored.c_str());
+            }
+            else if (this_year != time_info.year) {
+                line += lmsg(vl,
+                             " and {Ca new year{x!",
+                             " и {Cновый год{x!",
+                             " і {Cновий рік{x!");
+            }
+            else {
+                line += ".";
+            }
+            calByLang[lg] += line + "\r\n";
+        }
     }
 
-    // Output new day's bonus.
+    // Output new day's bonus (RU; bonus subsystem localization -- Phase 2).
     if (this_day != time_info.day) {
         ostringstream bonus_buf;
         for (int bn = 0; bn < bonusManager->size(); bn++) {
@@ -380,11 +454,9 @@ void sunlight_update( )
                 bonus->reportTime(0, bonus_buf);
         }
 
-        string bonus_str = bonus_buf.str();
-        if (!bonus_str.empty()) {
-            tbuf << bonus_str;
+        bonus_str = bonus_buf.str();
+        if (!bonus_str.empty())
             send_discord_bonus(bonus_str);
-        }
     }
 
     // Daylight transition -> random multilingual variant from weather.xml,
@@ -392,21 +464,22 @@ void sunlight_update( )
     if (!lightEvent.empty())
         weather_broadcast(lightEvent, ROOM_NO_TIME);
 
-    // Calendar / bonus announcements (still RU-only -- Phase 2). Sent to every
-    // awake player in a non-timeless room, indoors included, as before.
-    string tbuf_str = tbuf.str();
-    if (!tbuf_str.empty()) {
-        for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
-            if (d->connected != CON_PLAYING)
-                continue;
+    // Calendar rollover -> each viewer's own language; the new-day bonus report
+    // (bonus_str) is still RU (bonus subsystem -- Phase 2). Sent to every awake
+    // player in a non-timeless room, indoors included, as before.
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
+        if (d->connected != CON_PLAYING)
+            continue;
 
-            Character *ch = d->character;
-            if (ch
-                && IS_AWAKE(ch)
-                && !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
-            {
-                ch->send_to(tbuf_str);
-            }
+        Character *ch = d->character;
+        if (ch
+            && IS_AWAKE(ch)
+            && !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
+        {
+            DLString out = calByLang[viewerLang(ch)];
+            out += bonus_str;
+            if (!out.empty())
+                ch->send_to(out);
         }
     }
 
@@ -586,28 +659,42 @@ void make_date( ostringstream &buf )
 
 CMDRUN( time )
 {
-    ostringstream buf;
-    
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_TIME)) {
         ch->pecho( _("Похоже, в этом месте время остановило свой ход.") );
         return;
     }
 
-    // Output time of day and sunlight.
-    buf << "Сейчас " << hour_of_day() << " " << time_of_day();
-    if (RoomUtils::isOutside(ch))
-        buf << ", " << sunlight();
-    buf << ". ";
+    lang_t lang = viewerLang(ch);
+    ostringstream buf;
 
-    // Output day of the week, day, season, month, year.
+    // Time of day (and sunlight when outdoors).
+    if (RoomUtils::isOutside(ch))
+        buf << fmt(0, lmsg(lang,
+                       "It is now %d %s, %s. ",
+                       "Сейчас %d %s, %s. ",
+                       "Зараз %d %s, %s. "),
+                   hour_of_day(), time_of_day(lang).c_str(), sunlight(lang).c_str());
+    else
+        buf << fmt(0, lmsg(lang,
+                       "It is now %d %s. ",
+                       "Сейчас %d %s. ",
+                       "Зараз %d %s. "),
+                   hour_of_day(), time_of_day(lang).c_str());
+
+    // Day of the week, day, season, month, year.
     int day = time_info.day + 1;
     const month_info &month = month_table[time_info.month];
     const season_info &season = season_table[month.season];
 
-    buf << "Сегодня день " << day_name[day % 7] << ", "
-        << day << "й день "
-        << season.adjective << " месяца " << month.name << ", "
-        << "года " << time_info.year << "." << endl;
+    buf << fmt(0, lmsg(lang,
+                   "Today is the day of %s, day %d of the %s month of %s, year %d.",
+                   "Сегодня день %s, %dй день %s месяца %s, года %d.",
+                   "Сьогодні день %s, %dй день %s місяця %s, року %d."),
+               day_name_for(lang, day % 7),
+               day,
+               season_adjective(lang, season),
+               calendar_month(lang).c_str(),
+               time_info.year) << endl;
 
     if (ch->is_npc())
         return;
@@ -615,8 +702,11 @@ CMDRUN( time )
     PCharacter *pch = ch->getPC();
 
     if (ch->getProfession( ) == prof_vampire && weather_info.sunlight == SUN_DARK)
-        buf <<  "Время {rубивать{x, {Dсоздание ночи{x!" << endl;
-  
+        buf << lmsg(lang,
+                    "Time to {rkill{x, {Dcreature of the night{x!",
+                    "Время {rубивать{x, {Dсоздание ночи{x!",
+                    "Час {rвбивати{x, {Dстворіння ночі{x!") << endl;
+
     for (int bn = 0; bn < bonusManager->size(); bn++) {
         Bonus *bonus = bonusManager->find(bn);
         if (bonus->isActive(pch, time_info))
@@ -632,50 +722,58 @@ CMDRUN( time )
 
 CMDRUN( weather )
 {
-    static const char * const sky_look[4] =
-    {
-        "ясное",
-        "облачное",
-        "дождливое",
-        "во вспышках молний"
-    };
-    
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER)) {
         ch->pecho( _("Похоже, в этом месте погода всегда одинаковая.") );
         return;
     }
-    
+
     if ( !RoomUtils::isOutside(ch) )
     {
         ch->pecho(_("В помещении погоду не видно -- попробуй выйти наружу!"));
         return;
     }
-    
+
+    lang_t lang = viewerLang(ch);
+
+    // Sky condition, indexed by weather_info.sky
+    // (0 cloudless, 1 cloudy, 2 raining, 3 lightning).
+    static const char * const sky_ru[4] = { "ясное", "облачное", "дождливое", "во вспышках молний" };
+    static const char * const sky_en[4] = { "clear", "cloudy", "rainy", "flashing with lightning" };
+    static const char * const sky_ua[4] = { "ясне", "хмарне", "дощове", "у спалахах блискавок" };
+    const char *sky;
+    switch (lang) {
+        case LANG_EN: sky = sky_en[weather_info.sky]; break;
+        case LANG_UA: sky = sky_ua[weather_info.sky]; break;
+        default:      sky = sky_ru[weather_info.sky]; break;
+    }
+
+    // Wind, chosen by season and pressure trend.
     const char *wind;
     int season = month_table[time_info.month].season;
     if (weather_info.change >= 0) {
         if (season == SEASON_SUMMER)
-            wind = "теплый летний";
+            wind = lmsg(lang, "warm summer", "теплый летний", "теплий літній");
         else if (season == SEASON_SPRING)
-            wind = "теплый весенний";
+            wind = lmsg(lang, "warm spring", "теплый весенний", "теплий весняний");
         else
-            wind = "теплый южный";
+            wind = lmsg(lang, "warm southern", "теплый южный", "теплий південний");
     }
     else {
         if (season == SEASON_WINTER)
-            wind = "холодный зимний";
+            wind = lmsg(lang, "cold winter", "холодный зимний", "холодний зимовий");
         else if (season == SEASON_AUTUMN)
-            wind = "пронизывающий осенний";
+            wind = lmsg(lang, "piercing autumn", "пронизывающий осенний", "пронизливий осінній");
         else if (season == SEASON_SPRING)
-            wind = "прохладный весенний";
+            wind = lmsg(lang, "cool spring", "прохладный весенний", "прохолодний весняний");
         else
-            wind = "резкий северный";
+            wind = lmsg(lang, "sharp northern", "резкий северный", "різкий північний");
     }
 
-    ch->pecho( _("Небо %s и дует %s ветер."),
-        sky_look[weather_info.sky],
-        wind
-    );
+    ch->pecho( lmsg(lang,
+                   "The sky is %s and a %s wind blows.",
+                   "Небо %s и дует %s ветер.",
+                   "Небо %s і дує %s вітер."),
+               sky, wind );
 }
 
 
