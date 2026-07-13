@@ -139,6 +139,16 @@ static const char * day_name_for( lang_t lang, int idx )
     }
 }
 
+// Month name in the viewer's language, for any month index (the grid draws all).
+static const char * month_name_for( lang_t lang, int m )
+{
+    switch (lang) {
+        case LANG_EN: return month_table[m].name_en;
+        case LANG_UA: return month_table[m].name_ua;
+        default:      return month_table[m].name;
+    }
+}
+
 // Season genitive adjective ("of the winter month") in the viewer's language.
 static const char * season_adjective( lang_t lang, const season_info &s )
 {
@@ -847,6 +857,7 @@ void weather_init( )
 struct Calendar {
     Calendar(PCharacter *ch) {
         this->ch = ch;
+        this->lang = viewerLang(ch);
     }
 
     void draw(ostringstream &out) {
@@ -882,9 +893,12 @@ struct Calendar {
     {
         long today = day_of_epoch(time_info);
 
-        out << fmt(0, _("Сегодня -- %d число месяца %s, год %d."),
+        out << fmt(0, lmsg(lang,
+                       "Today is day %d of the month of %s, year %d.",
+                       "Сегодня -- %d число месяца %s, год %d.",
+                       "Сьогодні -- %d число місяця %s, рік %d."),
                    time_info.day + 1,
-                   month_table[time_info.month].name,
+                   month_name_for(lang, time_info.month),
                    time_info.year)
             << endl << endl;
 
@@ -915,9 +929,13 @@ struct Calendar {
         }
 
         if (active.tellp() > 0)
-            out << "Активные бонусы:" << endl << active.str() << endl;
+            out << lmsg(lang, "Active bonuses:", "Активные бонусы:", "Активні бонуси:")
+                << endl << active.str() << endl;
         else
-            out << "Сегодня нет активных бонусов." << endl << endl;
+            out << lmsg(lang, "No bonuses are active today.",
+                              "Сегодня нет активных бонусов.",
+                              "Сьогодні немає активних бонусів.")
+                << endl << endl;
 
         // Upcoming bonuses in the next 35 days.
         ostringstream upcoming;
@@ -948,11 +966,13 @@ struct Calendar {
         }
 
         if (upcoming.tellp() > 0)
-            out << "Ближайшие бонусы:" << endl << upcoming.str();
+            out << lmsg(lang, "Upcoming bonuses:", "Ближайшие бонусы:", "Найближчі бонуси:")
+                << endl << upcoming.str();
     }
 
 protected:
     PCharacter *ch;
+    lang_t lang;
     ostringstream buf;
 
     void draw_divider()
@@ -1008,7 +1028,7 @@ protected:
     void draw_month_name(int m)
     {
         const month_info &month = month_table[m];
-        buf << " {" << season_table[month.season].color << fmt(0, "%-18s", month.name);
+        buf << " {" << season_table[month.season].color << fmt(0, "%-18s", month_name_for(lang, m));
 
         if ((m+1)%4 != 0)
             buf << "{D|{x";
@@ -1026,6 +1046,7 @@ CMDRUN( calendar )
         return;
 
     PCharacter *pch = ch->getPC();
+    lang_t lang = viewerLang(ch);
     ostringstream buf;
     Calendar calendar(pch);
 
@@ -1033,10 +1054,21 @@ CMDRUN( calendar )
         calendar.draw_screenreader(buf);
     } else {
         calendar.draw(buf);
-        buf << "{WУсловные обозначения цветом{x: " << endl
-            << "         {RX{x: сегодня, {cX{x: больше опыта за убийства, {bX{x: меньше расход маны," << endl
-            << "         {GX{x: быстрее прокачка умений, {DX{x: низкие цены, {MX{x: удачнее воровские навыки," << endl
-            << "         {gX{x: существа быстрее улучшают параметры" << endl;
+        buf << lmsg(lang,
+            "{WColour legend{x: \n"
+            "         {RX{x: today, {cX{x: more experience for kills, {bX{x: less mana cost,\n"
+            "         {GX{x: faster skill practice, {DX{x: lower prices, {MX{x: better thieving skills,\n"
+            "         {gX{x: creatures improve their stats faster\n",
+
+            "{WУсловные обозначения цветом{x: \n"
+            "         {RX{x: сегодня, {cX{x: больше опыта за убийства, {bX{x: меньше расход маны,\n"
+            "         {GX{x: быстрее прокачка умений, {DX{x: низкие цены, {MX{x: удачнее воровские навыки,\n"
+            "         {gX{x: существа быстрее улучшают параметры\n",
+
+            "{WКольорові позначення{x: \n"
+            "         {RX{x: сьогодні, {cX{x: більше досвіду за вбивства, {bX{x: менша витрата мани,\n"
+            "         {GX{x: швидше вивчення умінь, {DX{x: нижчі ціни, {MX{x: вдаліші злодійські навички,\n"
+            "         {gX{x: істоти швидше покращують параметри\n");
     }
     ch->send_to(buf);
 }
