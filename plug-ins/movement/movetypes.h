@@ -15,8 +15,12 @@ struct movetype_t {
     const char * name;
     const char * rname;
     const char * uaname;
-    const char * enter;
-    const char * leave;
+    const char * enter;      // RU arrival verb (gender-inflected via %1$G)
+    const char * leave;      // RU departure verb
+    const char * enter_en;   // EN arrival verb (no gender)
+    const char * leave_en;   // EN departure verb
+    const char * enter_ua;   // UA arrival verb (gender-inflected via %1$G)
+    const char * leave_ua;   // UA departure verb
 };
 
 extern const struct movetype_t movetypes [];

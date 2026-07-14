@@ -42,6 +42,10 @@ protected:
     void msgSelfRoom( Character *, const char *, const char * );
     void msgRoomNoParty( Character *, const char * );
     void msgRoomNoParty( Character *, const char *, const char * );
+    // Trilingual room broadcast: each recipient gets the format in their own
+    // display language (viewerLang), so an assembled message (verb + direction)
+    // resolves per viewer. Args are shared (act codes resolve per recipient).
+    void msgRoomNoParty( Character *, const char *en, const char *ru, const char *ua );
     void msgSelfMaster( Character *, const char *, const char * );
     void msgSelf( Character *, const char * );
     void msgRoom( Character *, const char * );
