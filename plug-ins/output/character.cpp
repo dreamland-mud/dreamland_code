@@ -46,12 +46,19 @@ void Character::send_to( const char *txt )
 void Character::vpecho( const char *f, va_list av)
 {
     DLString r;
-    
+
     if (( r = vfmt(this, f, av) ).empty( ))
         return;
-           
+
     r += "\r\n";
     send_to( r );
+}
+
+/* Trilinguality (Trello 2594): pecho is single-recipient, so resolve the
+ * MultiMessage against `this' up front (RU fallback -> byte-identical). */
+void Character::vpecho( const MultiMessage &f, va_list av )
+{
+    vpecho(f.getMessage(this).c_str(), av);
 }
 
 void Character::pecho( const DLString &line )
@@ -293,6 +300,73 @@ void Character::vecho( int pos, int type, Character *vch, const MultiMessage &mm
         if (type != TO_VICT && type != TO_CHAR)
             if (!to->can_sense( this ) || (vch && !to->can_sense( vch )))
                 continue;
+
+        lang_t lg = viewerLang(to);
+        if (!done[lg]) {
+            // oldact-origin messages carry $-codes -> act_to_fmt per language.
+            if (mm.hasActCodes())
+                slot[lg] = act_to_fmt(mm.getMessage(lg).c_str());
+            else
+                slot[lg] = mm.getMessage(lg);
+            done[lg] = true;
+        }
+
+        if (( r = vfmt(to, slot[lg].c_str(), av) ).empty( ))
+            continue;
+
+        r << "\r\n";
+        to->send_to( r );
+    }
+}
+
+/* Trilinguality (Trello 2594): the MultiMessage vecho above plus the
+ * needsOutput recipient filter, mirroring the const char* predicate vecho.
+ * Kept a verbatim copy (per the note above) so the two MultiMessage vecho
+ * paths stay in sync; unblocks echo_char/echo_room/echo_notvict. */
+void Character::vecho( int pos, int type, Character *vch, const MultiMessage &mm, va_list av, bool (needsOutput)(Character *) )
+{
+    Character *to;
+    DLString r;
+    DLString slot[LANG_MAX];                       // per-language resolved format
+    bool done[LANG_MAX] = { false, false, false }; // which slots are computed
+
+    if(in_room == NULL)
+        return;
+
+    if (type == TO_NOBODY)
+        return;
+
+    to = in_room->people;
+
+    if (type == TO_VICT) {
+        if (!vch || !vch->in_room)
+            return;
+
+        to = vch->in_room->people;
+    }
+
+    for ( ; to; to = to->next_in_room) {
+        if (to->position < pos)
+            continue;
+
+        if (type == TO_CHAR && to != this)
+            continue;
+
+        if (type == TO_VICT && (to != vch || to == this))
+            continue;
+
+        if (type == TO_ROOM && to == this)
+            continue;
+
+        if (type == TO_NOTVICT && (to == vch || to == this))
+            continue;
+
+        if (type != TO_VICT && type != TO_CHAR)
+            if (!to->can_sense( this ) || (vch && !to->can_sense( vch )))
+                continue;
+
+        if (!needsOutput(to))
+            continue;
 
         lang_t lg = viewerLang(to);
         if (!done[lg]) {

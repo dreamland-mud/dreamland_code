@@ -168,7 +168,9 @@ public:
     void recho( Character *vch, const MultiMessage &f, ... );
     void echo( int pos, int type, Character *vch, const MultiMessage &f, ... );
     void vecho( int pos, int type, Character *vch, const MultiMessage &f, va_list av );
-    
+    void vpecho( const MultiMessage &f, va_list av );
+    void vecho( int pos, int type, Character *vch, const MultiMessage &f, va_list av, bool (needsOutput)(Character *) );
+
     // visibility of things 
     bool can_see( const Character *victim ) const;
     bool can_see( const Object *obj ) const;

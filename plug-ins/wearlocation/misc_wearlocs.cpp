@@ -108,7 +108,7 @@ int HorseWearloc::canWear( Character *ch, Object *obj, int flags )
 
     if (RIDDEN(ch)) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            echo_master(ch, "Ты не цирков%1$Gой|ой|ая %1$Gконь|конь|лошадь! Попроси всадника спешиться.", ch);
+            echo_master(ch, _("Ты не цирков%1$Gой|ой|ая %1$Gконь|конь|лошадь! Попроси всадника спешиться."), ch);
         }
         return RC_WEAR_CONFLICT;
     }
@@ -124,7 +124,7 @@ bool HorseWearloc::canRemove( Character *ch, Object *obj, int flags )
 
     if (RIDDEN(ch)) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            echo_master(ch, "Ты не цирков%1$Gой|ой|ая %1$Gконь|конь|лошадь! Попроси всадника спешиться.", ch);
+            echo_master(ch, _("Ты не цирков%1$Gой|ой|ая %1$Gконь|конь|лошадь! Попроси всадника спешиться."), ch);
         }
         return false;
     }
@@ -159,7 +159,7 @@ void HairWearloc::affectsOnUnequip( Character *ch, Object *obj ) { }
 int HairWearloc::canWear( Character *ch, Object *obj, int flags ) {
     if (find( ch ) != NULL) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            echo_master(ch, "В твоих волосах уже запуталось что-то другое.");
+            echo_master(ch, _("В твоих волосах уже запуталось что-то другое."));
         return RC_WEAR_CONFLICT;
     }
     return DefaultWearlocation::canWear( ch, obj, flags );
@@ -184,7 +184,7 @@ int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
         && IS_WEAPON_STAT(weapon, WEAPON_TWO_HANDS))
     {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            echo_master(ch, "Твои руки заняты оружием!");
+            echo_master(ch, _("Твои руки заняты оружием!"));
             ch->recho(_("%^C1 крутит в руках %O4, но одновременно с оружием это надеть никак не выходит."), ch, obj);
         }
         return RC_WEAR_CONFLICT;
@@ -489,7 +489,7 @@ int TattooWearloc::canWear( Character *ch, Object *obj, int flags )
 bool TattooWearloc::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(flags, F_WEAR_VERBOSE))
-        echo_master(ch, "Лишь Божественные Силы могут избавить тебя от %O2.", obj);
+        echo_master(ch, _("Лишь Божественные Силы могут избавить тебя от %O2."), obj);
 
     return false;
 }
@@ -521,7 +521,7 @@ void TailWearloc::affectsOnUnequip( Character *ch, Object *obj )
 int TailWearloc::canWear( Character *ch, Object *obj, int flags ) {
     if (find( ch ) != NULL) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            echo_master(ch, "На твой хвост уже что-то надето.");
+            echo_master(ch, _("На твой хвост уже что-то надето."));
         return RC_WEAR_CONFLICT;
     }
     return DefaultWearlocation::canWear( ch, obj, flags );
