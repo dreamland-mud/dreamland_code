@@ -39,6 +39,8 @@ protected:
     virtual bool canHear( Character *, Character * );
     virtual void msgEcho( Character *, Character *, const char * );
     void msgSelfParty( Character *, const char *, const char * );
+    void msgSelfParty( Character *, const char *sEn, const char *sRu, const char *sUa,
+                                    const char *pEn, const char *pRu, const char *pUa );
     void msgSelfRoom( Character *, const char *, const char * );
     void msgRoomNoParty( Character *, const char * );
     void msgRoomNoParty( Character *, const char *, const char * );
@@ -47,7 +49,10 @@ protected:
     // resolves per viewer. Args are shared (act codes resolve per recipient).
     void msgRoomNoParty( Character *, const char *en, const char *ru, const char *ua );
     void msgSelfMaster( Character *, const char *, const char * );
+    void msgSelfMaster( Character *, const char *sEn, const char *sRu, const char *sUa,
+                                     const char *mEn, const char *mRu, const char *mUa );
     void msgSelf( Character *, const char * );
+    void msgSelf( Character *, const char *en, const char *ru, const char *ua );
     void msgRoom( Character *, const char * );
 
     Character * ch;

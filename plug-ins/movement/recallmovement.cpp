@@ -48,7 +48,7 @@ bool RecallMovement::applyFightingSkill( Character *wch, SkillReference &skill )
     }
 
     if (wch != ch) {
-        msgSelf( ch, "Но %2$C1 сражается!" );
+        msgSelf( ch, "But %2$C1 is fighting!", "Но %2$C1 сражается!", "Але %2$C1 б'ється!" );
         return false;
     }
 
@@ -64,14 +64,16 @@ bool RecallMovement::applyFightingSkill( Character *wch, SkillReference &skill )
     }
 
     skill->improve( wch, true );
-    msgSelfParty( wch, "Ты убегаешь с поля битвы!", "%2$^C1 убегает с поля битвы!" );
+    msgSelfParty( wch, "You flee the battlefield!", "Ты убегаешь с поля битвы!", "Ти тікаєш з поля бою!",
+                   "%2$^C1 flees the battlefield!", "%2$^C1 убегает с поля битвы!", "%2$^C1 тікає з поля бою!" );
     return true;
 }
 
 bool RecallMovement::checkMount( )
 {
     if (actor->is_npc( ) && actor == ch && actor->mount) {
-        msgSelfMaster( actor, "Ты не сможешь этого сделать.", "%3$^C1 не сможет этого сделать." );
+        msgSelfMaster( actor, "You can't do that.", "Ты не сможешь этого сделать.", "Ти не зможеш цього зробити.",
+                      "%3$^C1 can't do that.", "%3$^C1 не сможет этого сделать.", "%3$^C1 не зможе цього зробити." );
         return false;
     }
 

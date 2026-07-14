@@ -281,9 +281,18 @@ void Movement::callProgsFinish( Character *wch )
 void Movement::msgSelfParty( Character *wch, const char *msgSelf, const char *msgParty )
 {
     msgEcho( wch, wch, msgSelf );
-    
+
     if (wch->mount == ch)
         msgEcho( wch->mount, wch->mount, msgParty );
+}
+
+void Movement::msgSelfParty( Character *wch, const char *sEn, const char *sRu, const char *sUa,
+                                             const char *pEn, const char *pRu, const char *pUa )
+{
+    msgEcho( wch, wch, lmsg( viewerLang( wch ), sEn, sRu, sUa ) );
+
+    if (wch->mount == ch)
+        msgEcho( wch->mount, wch->mount, lmsg( viewerLang( wch->mount ), pEn, pRu, pUa ) );
 }
 
 void Movement::msgSelfRoom( Character *wch, const char *msgSelf, const char *msgOther )
@@ -329,14 +338,28 @@ void Movement::msgRoom( Character *wch, const char *msg )
 void Movement::msgSelfMaster( Character *wch, const char *msgSelf, const char *msgMaster )
 {
     msgEcho( wch, wch, msgSelf );
-    
+
     if (IS_CHARMED(wch))
         msgEcho( wch->master, wch, msgMaster );
+}
+
+void Movement::msgSelfMaster( Character *wch, const char *sEn, const char *sRu, const char *sUa,
+                                              const char *mEn, const char *mRu, const char *mUa )
+{
+    msgEcho( wch, wch, lmsg( viewerLang( wch ), sEn, sRu, sUa ) );
+
+    if (IS_CHARMED(wch))
+        msgEcho( wch->master, wch, lmsg( viewerLang( wch->master ), mEn, mRu, mUa ) );
 }
 
 void Movement::msgSelf( Character *wch, const char *msgSelf )
 {
     msgEcho( wch, wch, msgSelf );
+}
+
+void Movement::msgSelf( Character *wch, const char *en, const char *ru, const char *ua )
+{
+    msgEcho( wch, wch, lmsg( viewerLang( wch ), en, ru, ua ) );
 }
 
 bool Movement::canHear( Character *victim, Character *wch )
