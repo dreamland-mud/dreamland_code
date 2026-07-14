@@ -156,8 +156,10 @@ CMDRUNP(scan)
 
     ch->pecho(lmsg(viewerLang(ch), "You peer intently %s.", "Ты пристально смотришь %s.", "Ти пильно вдивляєшся %s."),
               direction_word(viewerLang(ch), door, DIR_CASE_TO));
-    // TO_ROOM $T direction arg is engine-limited (per-recipient text args unsupported); left RU pending part 3.
-    oldact(_("$c1 пристально смотрит $T."), ch, 0, dirs[door].leave, TO_ROOM);
+    // $W resolves the direction per viewer (TO_ROOM): each onlooker sees it in
+    // their own language rather than the actor-side RU accusative for everyone.
+    LangText dir = direction_langtext(door, DIR_CASE_TO);
+    oldact(_("$c1 пристально смотрит $W."), ch, 0, &dir, TO_ROOM);
 
     range = max(1, ch->getModifyLevel() / 10);
     room = ch->in_room;
