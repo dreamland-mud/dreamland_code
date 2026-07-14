@@ -472,9 +472,83 @@ void echo_room(Character *ch, bool (needsOutput)(Character *), const char *forma
 void echo_notvict(Character *ch, Character *victim, bool (needsOutput)(Character *), const char *format, ...)
 {
     va_list av;
-    
+
     va_start(av, format);
-    ch->vecho( POS_RESTING, TO_NOTVICT, victim, format, av, needsOutput ); 
+    ch->vecho( POS_RESTING, TO_NOTVICT, victim, format, av, needsOutput );
+    va_end(av);
+}
+
+/****************************************************************************
+ * Trilinguality (Trello 2594): MultiMessage overloads of the hint/echo
+ * helpers. Each mirrors its const char* twin but forwards the MultiMessage
+ * so the format resolves in every recipient's display language (RU fallback
+ * -> byte-identical to the unwrapped call). See act.h for the pairing.
+ ****************************************************************************/
+void hint_fmt(Character *ch, const MultiMessage &format, ...)
+{
+    if (ch->is_npc())
+        return;
+
+    // Everyone below level 50 and living first life is a newbie.
+    if (!ch->is_immortal()) {
+        if (ch->getPC()->getRemorts().size() > 0)
+            return;
+
+        if (ch->getLevel() >= 50)
+            return;
+    }
+
+    va_list av;
+    va_start(av, format);
+    DLString output = vfmt(ch, format.getMessage(ch).c_str(), av);
+    va_end(av);
+
+    ch->pecho("{y[{GПодсказка{y]{x " + output);
+}
+
+void echo_master(Character *ch, const MultiMessage &format, ...)
+{
+    va_list av;
+    va_start(av, format);
+
+    bool isCharmed = (IS_AFFECTED(ch, AFF_CHARM) && ch->master != NULL);
+    bool needsOutput = isCharmed && ch->master->getPC() && ch->master->getPC()->getAttributes().isAvailable("ordering");
+
+    if (needsOutput)
+        ch->master->pecho("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x", ch);
+
+    ch->vpecho(format, av);
+
+    if (needsOutput)
+        ch->master->vpecho(format, av);
+
+    va_end(av);
+}
+
+void echo_char(Character *ch, bool (needsOutput)(Character *), const MultiMessage &format, ...)
+{
+    va_list av;
+
+    va_start(av, format);
+    ch->vecho( POS_RESTING, TO_CHAR, 0, format, av, needsOutput );
+    va_end(av);
+}
+
+void echo_room(Character *ch, bool (needsOutput)(Character *), const MultiMessage &format, ...)
+{
+    va_list av;
+
+    va_start(av, format);
+    ch->vecho( POS_RESTING, TO_ROOM, 0, format, av, needsOutput );
+    va_end(av);
+}
+
+void echo_notvict(Character *ch, Character *victim, bool (needsOutput)(Character *), const MultiMessage &format, ...)
+{
+    va_list av;
+
+    va_start(av, format);
+    ch->vecho( POS_RESTING, TO_NOTVICT, victim, format, av, needsOutput );
     va_end(av);
 }
 
