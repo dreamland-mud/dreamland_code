@@ -119,7 +119,7 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
             continue;
         }
 
-        ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
+        ename = direction_word(cfg.ruexits ? LANG_RU : viewerLang(ch), door, DIR_CASE_NOM);
         cmd = cmd_exit(ch, door, pexit);
         star = IS_SET(pexit->exit_info, EX_CLOSED|EX_LOCKED) ? "*" : "";
 
@@ -128,7 +128,7 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
     }
     
     if (!found)
-        buf << (cfg.ruexits ? " нет" : " none");
+        buf << lmsg(cfg.ruexits ? LANG_RU : viewerLang(ch), " none", " нет", " немає");
             
 
     StringList extras;
@@ -196,7 +196,7 @@ CMDRUNP( exits )
         }
 
         found = true;   
-        ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
+        ename = direction_word(cfg.ruexits ? LANG_RU : viewerLang(ch), door, DIR_CASE_NOM);
         cmd = cmd_exit(ch, door, pexit);
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED|EX_LOCKED))
