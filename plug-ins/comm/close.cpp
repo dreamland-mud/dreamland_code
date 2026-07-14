@@ -40,15 +40,18 @@ static void close_door( Character *ch, int door )
 
     SET_BIT(pexit->exit_info, EX_CLOSED);
     
-    const char *doorname = direction_doorname(pexit);
-    oldact(_("$c1 закрывает $N4."), ch, 0, doorname, TO_ROOM );
-    oldact(_("Ты закрываешь $N4."), ch, 0, doorname, TO_CHAR );
+    DoorName dn = direction_doorname_langtext(pexit, '4');
+    LangText doorname = dn.lt();
+    oldact(_("$c1 закрывает $W."), ch, 0, &doorname, TO_ROOM );
+    oldact(_("Ты закрываешь $W."), ch, 0, &doorname, TO_CHAR );
 
     // close the other side
     if ((pexit_rev = direction_reverse(room, door)))
     {
             SET_BIT( pexit_rev->exit_info, EX_CLOSED );
-            direction_target(room, door)->echo(POS_RESTING, _("%^N1 закрывается."), direction_doorname(pexit_rev));
+            DoorName dnr = direction_doorname_langtext(pexit_rev, '1');
+            LangText dnrlt = dnr.lt();
+            direction_target(room, door)->echo(POS_RESTING, _("%^w закрывается."), &dnrlt);
     }
 }
 

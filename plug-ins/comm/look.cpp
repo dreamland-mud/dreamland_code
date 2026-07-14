@@ -1477,10 +1477,16 @@ static bool do_look_direction( Character *ch, const char *arg1 )
     else
             ch->pecho( _("Здесь нет ничего особенного.") );
 
-    if ( IS_SET(pexit->exit_info, EX_CLOSED) )
-        oldact(_("$N1: тут закрыто."), ch, 0, direction_doorname(pexit), TO_CHAR);
-    else if ( IS_SET(pexit->exit_info, EX_ISDOOR) )
-        oldact(_("$N1: тут открыто."), ch, 0, direction_doorname(pexit), TO_CHAR);
+    if ( IS_SET(pexit->exit_info, EX_CLOSED) ) {
+        DoorName dn = direction_doorname_langtext(pexit, '1');
+        LangText lt = dn.lt();
+        oldact(_("$W: тут закрыто."), ch, 0, &lt, TO_CHAR);
+    }
+    else if ( IS_SET(pexit->exit_info, EX_ISDOOR) ) {
+        DoorName dn = direction_doorname_langtext(pexit, '1');
+        LangText lt = dn.lt();
+        oldact(_("$W: тут открыто."), ch, 0, &lt, TO_CHAR);
+    }
     
     DoorKeyhole( ch, ch->in_room, door ).doExamine( );
     return true;

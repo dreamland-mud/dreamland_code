@@ -9,6 +9,7 @@
 
 #include "act.h"
 #include "merc.h"
+#include "dl_strings.h"
 
 #include "def.h"
 #include "l10n.h"
@@ -200,6 +201,30 @@ const char * direction_doorname(EXIT_DATA *pexit)
     if (!pexit || pexit->short_descr.get(LANG_DEFAULT).empty())
         return "дверь";
     return pexit->short_descr.get(LANG_DEFAULT).c_str();
+}
+
+DoorName direction_doorname_langtext(EXIT_DATA *pexit, char rcase)
+{
+    DoorName dn;
+
+    if (!pexit || pexit->short_descr.get(LANG_RU).empty()) {
+        dn.en = "door";
+        dn.ru = "дверь";
+        dn.ua = "двері";
+    }
+    else {
+        dn.ru = pexit->short_descr.get(LANG_RU);
+        dn.en = pexit->short_descr.get(LANG_EN);
+        dn.ua = pexit->short_descr.get(LANG_UA);
+        if (dn.en.empty()) dn.en = dn.ru;
+        if (dn.ua.empty()) dn.ua = dn.ru;
+    }
+
+    // RU is grammatically declined (russian_case is viewer-independent); EN is
+    // caseless; UA stays nominative. RU output matches the legacy
+    // russian_case(direction_doorname(), rcase) path byte-for-byte.
+    dn.ru = russian_case(dn.ru, rcase);
+    return dn;
 }
 
 exit_data *direction_reverse(Room *room, int door)

@@ -58,7 +58,9 @@ static void unlock_door( Character *ch, int door )
     if ((pexit_rev = direction_reverse(room, door)))
     {
             REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED | EX_CLOSED );
-            direction_target(room, door)->echo(POS_RESTING, _("%^N1 щелкает."), direction_doorname(pexit_rev));
+            DoorName dnr = direction_doorname_langtext(pexit_rev, '1');
+            LangText dnrlt = dnr.lt();
+            direction_target(room, door)->echo(POS_RESTING, _("%^w щелкает."), &dnrlt);
     }
 }
 
