@@ -32,6 +32,11 @@ protected:
     virtual float argFloat() = 0;
     virtual unsigned int argUInt() = 0;
     virtual DLString argStr() = 0;
+    // Per-recipient localized text arg (%w). Default treats it as a plain
+    // string, so formatters without language-aware args (Fenia RegFormatter)
+    // need no change; VarArgFormatter overrides it to resolve a LangText* in
+    // the current recipient's language.
+    virtual DLString argLangText() { return argStr(); }
     virtual const Skill * argSkill() = 0;
     virtual Pointer<Grammar::Noun> argNoun(int nounFlags = 0) = 0;
 };

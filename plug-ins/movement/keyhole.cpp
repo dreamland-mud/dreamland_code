@@ -520,7 +520,10 @@ void DoorKeyhole::msgTryPickSelf( )
 }
 void DoorKeyhole::msgTryPickOther( )
 {
-    oldact(_("$c1 ковыряется в замке двери $t отсюда."), ch, dirs[door].leave, 0, TO_ROOM );
+    // $w resolves the direction per viewer (TO_ROOM); each recipient sees it in
+    // their own language rather than the actor-side RU accusative for everyone.
+    LangText dir = direction_langtext(door, DIR_CASE_TO);
+    oldact(_("$c1 ковыряется в замке двери $w отсюда."), ch, &dir, 0, TO_ROOM );
 }
 DLString DoorKeyhole::getDescription( )
 {

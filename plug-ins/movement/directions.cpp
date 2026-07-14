@@ -81,6 +81,15 @@ const char * direction_word(lang_t lang, int door, dir_case_t dcase)
     }
 }
 
+LangText direction_langtext(int door, dir_case_t dcase)
+{
+    LangText lt;
+    lt.en = direction_word(LANG_EN, door, dcase);
+    lt.ru = direction_word(LANG_RU, door, dcase);
+    lt.ua = direction_word(LANG_UA, door, dcase);
+    return lt;
+}
+
 int direction_lookup( char c )
 {
     char arg[2];

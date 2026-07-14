@@ -253,6 +253,10 @@ again:
                 s += argStr();
                 state = 0;
                 break;
+            case 'w':
+                s += argLangText();
+                state = 0;
+                break;
             case 'S':
                 s += DLString(argStr()).getOneArgument();
                 state = 0;

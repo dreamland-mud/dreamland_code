@@ -24,6 +24,26 @@ DLString lang2attr(lang_t lang);
  *  callers can pass ru==ua when a UA variant isn't ready yet). */
 const char * lmsg(lang_t lang, const char *en, const char *ru, const char *ua);
 
+/** A per-recipient text argument for act/fmt/echo. A plain char* arg is
+ *  resolved once and shown to every recipient identically; a LangText* passed
+ *  to the %w formatter code (act-code $w = arg1, $W = arg2) is resolved to each
+ *  viewer's language INSIDE the formatter, so one TO_ROOM message shows every
+ *  recipient the word in their own language. The en/ru/ua pointers must
+ *  reference storage that outlives the (synchronous) act call; a null/empty en
+ *  or ua falls back to ru. */
+struct LangText {
+    const char *en;
+    const char *ru;
+    const char *ua;
+    const char *get(lang_t lang) const {
+        switch (lang) {
+        case LANG_EN: return (en && en[0]) ? en : ru;
+        case LANG_UA: return (ua && ua[0]) ? ua : ru;
+        default:      return ru;
+        }
+    }
+};
+
 class Character;
 
 /** Resolve the display language (EN/RU/UA) of viewer 'wch': an explicit

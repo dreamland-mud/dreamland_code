@@ -26,6 +26,7 @@
 #include "descriptor.h"
 #include "colour.h"
 #include "merc.h"
+#include "lang.h"
 
 #include "def.h"
 
@@ -64,6 +65,9 @@ static const char * actChar_to_fmtChar(char c)
     case 'd':        return "%3$S";
     case 't':        return "%2$s";
     case 'n':        return "%2$N";
+
+    case 'w':        return "%2$w"; // arg1 as a per-recipient LangText word
+    case 'W':        return "%3$w"; // arg2 as a per-recipient LangText word
 
     default:        return "";
     }
@@ -242,6 +246,16 @@ protected:
     virtual DLString argStr() {
         return DLString(d.string);
     }
+    // Resolve a per-recipient LangText* in the current viewer's language.
+    // Called from the %w formatter code; because vecho re-runs the formatter
+    // for each recipient with `to` set to that recipient, one TO_ROOM message
+    // shows every viewer the word in their own language.
+    virtual DLString argLangText() {
+        if (!d.lt)
+            return DLString();
+        const char *w = d.lt->get(viewerLang(to));
+        return w ? DLString(w) : DLString();
+    }
     virtual const Skill * argSkill() {
         return d.skill;
     }
@@ -271,6 +285,7 @@ private:
         Object *obj;
         InflectedString *rstr;
         const Skill *skill;
+        LangText *lt;
     } arg_t;
     arg_t args[MAXARGS], d;
     int argcnt;
