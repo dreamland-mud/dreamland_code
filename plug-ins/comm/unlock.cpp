@@ -47,10 +47,11 @@ static void unlock_door( Character *ch, int door )
             return;
     }
 
-    const char *doorname = direction_doorname(pexit);
+    DoorName dn = direction_doorname_langtext(pexit, '4');
+    LangText doorname = dn.lt();
 
-    ch->pecho(_("Ты отпираешь %O5 и открываешь %N4."), key, doorname);
-    ch->recho(_("%^C1 отпирает %O5 и открывает %N4."), ch, key, doorname);
+    ch->pecho(_("Ты отпираешь %O5 и открываешь %w."), key, &doorname);
+    ch->recho(_("%^C1 отпирает %O5 и открывает %w."), ch, key, &doorname);
 
     REMOVE_BIT(pexit->exit_info, EX_LOCKED | EX_CLOSED);
 

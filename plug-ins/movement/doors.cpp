@@ -39,8 +39,10 @@ void open_door_extra ( Character *ch, int door, void *pexit )
             : ((EXIT_DATA *) pexit)->exit_info, EX_CLOSED);
 
     if ( eexit ) {
-        oldact(_("$c1 открывает $n4."), ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from.get(LANG_DEFAULT).c_str(), 0, TO_ROOM );
-        oldact(_("Ты открываешь $n4."), ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from.get(LANG_DEFAULT).c_str(), 0, TO_CHAR );
+        DoorName dn = direction_doorname_langtext(((EXTRA_EXIT_DATA *) pexit)->short_desc_from, '4');
+        LangText doorname = dn.lt();
+        oldact(_("$c1 открывает $w."), ch, &doorname, 0, TO_ROOM );
+        oldact(_("Ты открываешь $w."), ch, &doorname, 0, TO_CHAR );
     }
     else {
         DoorName dn = direction_doorname_langtext((EXIT_DATA *) pexit, '4');
