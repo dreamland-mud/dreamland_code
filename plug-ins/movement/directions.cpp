@@ -46,13 +46,40 @@ char const extra_move_rtpm [] =
 };
 
 const struct direction_t dirs [] = {
-    { DIR_NORTH, DIR_SOUTH, "north", "север",  "на север",  "с севера",  "на севере",  0, 0 },
-    { DIR_EAST,  DIR_WEST,  "east",  "восток", "на восток", "с востока", "на востоке", 0, 0 },
-    { DIR_SOUTH, DIR_NORTH, "south", "юг",     "на юг",     "с юга",     "на юге",     0, 0 },
-    { DIR_WEST,  DIR_EAST,  "west",  "запад",  "на запад",  "с запада",  "на западе",  0, 0 },
-    { DIR_UP,    DIR_DOWN,  "up",    "вверх",  "вверх",     "сверху",    "наверху",    "подняться", "^" },
-    { DIR_DOWN,  DIR_UP,    "down",  "вниз",   "вниз",      "снизу",     "внизу",      "опуститься", "v"},
+    { DIR_NORTH, DIR_SOUTH, "north", "север",  "на север",  "с севера",  "на севере",  "північ",  "на північ",  "з півночі",  "на півночі", 0, 0 },
+    { DIR_EAST,  DIR_WEST,  "east",  "восток", "на восток", "с востока", "на востоке", "схід",    "на схід",    "зі сходу",   "на сході",   0, 0 },
+    { DIR_SOUTH, DIR_NORTH, "south", "юг",     "на юг",     "с юга",     "на юге",     "південь", "на південь", "з півдня",   "на півдні",  0, 0 },
+    { DIR_WEST,  DIR_EAST,  "west",  "запад",  "на запад",  "с запада",  "на западе",  "захід",   "на захід",   "із заходу",  "на заході",  0, 0 },
+    { DIR_UP,    DIR_DOWN,  "up",    "вверх",  "вверх",     "сверху",    "наверху",    "вгору",   "вгору",      "згори",      "вгорі",      "подняться", "^" },
+    { DIR_DOWN,  DIR_UP,    "down",  "вниз",   "вниз",      "снизу",     "внизу",      "вниз",    "вниз",       "знизу",      "внизу",      "опуститься", "v"},
 };
+
+const char * direction_word(lang_t lang, int door, dir_case_t dcase)
+{
+    if (door < 0 || door >= DIR_SOMEWHERE)
+        return "";
+
+    const direction_t &d = dirs[door];
+
+    if (lang == LANG_EN)
+        return d.name; // English is caseless; the frame carries the preposition.
+
+    if (lang == LANG_UA) {
+        switch (dcase) {
+            case DIR_CASE_TO:   return d.ua_leave;
+            case DIR_CASE_FROM: return d.ua_enter;
+            case DIR_CASE_AT:   return d.ua_where;
+            default:            return d.ua_rname;
+        }
+    }
+
+    switch (dcase) { // RU (also the fallback)
+        case DIR_CASE_TO:   return d.leave;
+        case DIR_CASE_FROM: return d.enter;
+        case DIR_CASE_AT:   return d.where;
+        default:            return d.rname;
+    }
+}
 
 int direction_lookup( char c )
 {

@@ -5,6 +5,8 @@
 #ifndef __DIRECTIONS_H__
 #define __DIRECTIONS_H__
 
+#include "lang.h"
+
 class DLString;
 class Character;
 class Room;
@@ -13,14 +15,31 @@ struct exit_data;
 struct direction_t {
     int door;
     int rev;
-    const char * name;
-    const char * rname;
-    const char * leave;
-    const char * enter;
-    const char * where;
+    const char * name;      // EN (caseless; prepositions live in the frame)
+    const char * rname;     // RU nominative     ("север")
+    const char * leave;     // RU accusative/to  ("на север")
+    const char * enter;     // RU genitive/from  ("с севера")
+    const char * where;     // RU locative/at    ("на севере")
+    const char * ua_rname;  // UA nominative     ("північ")
+    const char * ua_leave;  // UA accusative/to  ("на північ")
+    const char * ua_enter;  // UA genitive/from  ("з півночі")
+    const char * ua_where;  // UA locative/at    ("на півночі")
     const char * rname_extra_1;
     const char * rname_extra_2;
 };
+
+// Grammatical case selector for direction_word().
+enum dir_case_t {
+    DIR_CASE_NOM = 0,  // nominative:      "север"   / "north" / "північ"
+    DIR_CASE_TO,       // accusative (to): "на север"/ "north" / "на північ"
+    DIR_CASE_FROM,     // genitive (from): "с севера"/ "north" / "з півночі"
+    DIR_CASE_AT        // locative (at):   "на севере"/"north" / "на півночі"
+};
+
+/** Direction word in the viewer's language and the requested grammatical case.
+ *  EN is caseless -- returns the bare name for every case, so EN callers must
+ *  carry the preposition in the frame ("leaves %s" / "from the %s"). */
+const char * direction_word(lang_t lang, int door, dir_case_t dcase);
 
 extern const struct direction_t dirs [];
 
