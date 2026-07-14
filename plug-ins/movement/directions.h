@@ -41,6 +41,12 @@ enum dir_case_t {
  *  carry the preposition in the frame ("leaves %s" / "from the %s"). */
 const char * direction_word(lang_t lang, int door, dir_case_t dcase);
 
+/** Build a %w / $w act argument for `door` in case `dcase`, carrying the EN/RU/UA
+ *  words so a TO_ROOM message resolves the direction per viewer. The returned
+ *  struct's pointers reference static dirs[] storage, so it is safe to pass its
+ *  address straight to a synchronous act/oldact call. */
+LangText direction_langtext(int door, dir_case_t dcase);
+
 extern const struct direction_t dirs [];
 
 extern const char * extra_move_ru [];
