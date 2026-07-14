@@ -20,6 +20,7 @@
 #include "save.h"
 #include "def.h"
 #include "behavior.h"
+#include "l10n.h"
 
 BHV(cityguard);
 
@@ -72,23 +73,23 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
                  victim->getRealLevel( ), 
                  mode.getValue( ) );
 
-    tell_raw( pch, questman, "У меня есть для тебя срочное поручение!" );
+    tell_raw( pch, questman, _("У меня есть для тебя срочное поручение!") );
 
     if (IS_GOOD( pch ))        {        
-        tell_raw( pch, questman, "Спокойствие нашего Мира было нарушено!" );
-        tell_fmt( "Я поручаю тебе наказать {W%3$#C4{G, совершивш%3$Gее|его|ую множество злодеяний.", pch, questman, victim );
+        tell_raw( pch, questman, _("Спокойствие нашего Мира было нарушено!") );
+        tell_fmt( _("Я поручаю тебе наказать {W%3$#C4{G, совершивш%3$Gее|его|ую множество злодеяний."), pch, questman, victim );
     }
     else if (IS_EVIL( pch )) {
-        tell_fmt( "Темные силы нашего Мира ослаблены действиями {W%3$#C2{G.", pch, questman,victim );
-        tell_fmt( "Тебе поручается убить %3$P2!",  pch, questman, victim );
+        tell_fmt( _("Темные силы нашего Мира ослаблены действиями {W%3$#C2{G."), pch, questman,victim );
+        tell_fmt( _("Тебе поручается убить %3$P2!"),  pch, questman, victim );
     } else {
-        tell_raw( pch, questman, "Равновесие нашего Мира было нарушено!");
-        tell_fmt( "В этом винов%3$Gно|ен|на {W%3$#C1{G, я поручаю тебе наказать %3$P2.",  pch, questman, victim );
+        tell_raw( pch, questman, _("Равновесие нашего Мира было нарушено!"));
+        tell_fmt( _("В этом винов%3$Gно|ен|на {W%3$#C1{G, я поручаю тебе наказать %3$P2."),  pch, questman, victim );
     }
 
-    tell_fmt( "Место, где %3$P2 видели в последний раз - {W%4$s{G!",  pch, questman, victim, pRoom->getName() );
-    tell_fmt( "Это находится в районе под названием {W{hh%3$s{hx{G.",  pch, questman, pRoom->areaName().c_str() );
-    tell_fmt( "У тебя есть {Y%3$d{G мину%3$Iта|ты|т на выполнение задания.",  pch, questman, time );
+    tell_fmt( _("Место, где %3$P2 видели в последний раз - {W%4$s{G!"),  pch, questman, victim, pRoom->getName() );
+    tell_fmt( _("Это находится в районе под названием {W{hh%3$s{hx{G."),  pch, questman, pRoom->areaName().c_str() );
+    tell_fmt( _("У тебя есть {Y%3$d{G мину%3$Iта|ты|т на выполнение задания."),  pch, questman, time );
 }
 
 void KillQuest::destroy( ) 

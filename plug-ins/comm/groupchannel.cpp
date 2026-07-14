@@ -76,13 +76,13 @@ void GroupChannel::triggers(Character *ch, const DLString &msg) const
 
         if (pet->position > POS_SLEEPING) {
             if (IS_AFFECTED(pet, AFF_BLIND)) {
-                tell_raw(ch, pet, "%s, я ничего не вижу!",
+                tell_raw(ch, pet, _("%s, я ничего не вижу!"),
                          GET_SEX(ch, "Хозяин", "Хозяин", "Хозяйка"));
             } else if (eyes_darkened(pet)) {
-                tell_raw(ch, pet, "%s, тут слишком темно, я ничего не вижу!",
+                tell_raw(ch, pet, _("%s, тут слишком темно, я ничего не вижу!"),
                          GET_SEX(ch, "Хозяин", "Хозяин", "Хозяйка"));
             } else {
-                tell_raw(ch, pet, "%s, я нахожусь в {hh%s{hx - %s",
+                tell_raw(ch, pet, _("%s, я нахожусь в {hh%s{hx - %s"),
                          GET_SEX(ch, "Хозяин", "Хозяин", "Хозяйка"),
                          pet->in_room->areaName().c_str(), pet->in_room->getName());
             } 

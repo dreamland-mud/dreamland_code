@@ -24,6 +24,7 @@
 #include "vnum.h"
 #include "def.h"
 #include "behavior.h"
+#include "l10n.h"
 
 BHV(thief);
 
@@ -115,23 +116,23 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     time = number_fuzzy( 10 );
     setTime( pch, time );
     
-    tell_raw( pch, questman, "У меня есть для тебя срочное поручение!" );
+    tell_raw( pch, questman, _("У меня есть для тебя срочное поручение!") );
     
     switch (number_range( 1, 3 )) {
-    case 1:  tell_fmt( "{W%3$#^C4{G обворовали, %3$P1 просит помочь в поимке негодяев.", 
+    case 1:  tell_fmt( _("{W%3$#^C4{G обворовали, %3$P1 просит помочь в поимке негодяев."), 
                         pch, questman, victim );
              break;
-    case 2:  tell_fmt( "{W%3$#^C1{G ста%3$Gло|л|ла жертвой грабителей и просит вернуть украденную вещь.", 
+    case 2:  tell_fmt( _("{W%3$#^C1{G ста%3$Gло|л|ла жертвой грабителей и просит вернуть украденную вещь."), 
                         pch, questman, victim );
              break;
-    case 3:  tell_fmt( "Воры ограбили {W%3$#C4{G, и теперь %3$P1 нуждается в твоей помощи.", 
+    case 3:  tell_fmt( _("Воры ограбили {W%3$#C4{G, и теперь %3$P1 нуждается в твоей помощи."), 
                         pch, questman, victim );
              break;
     }
 
-    tell_raw( pch, questman, "Пострадавшего ищи в районе {W%s{G ({W{hh%s{hx{G).", 
+    tell_raw( pch, questman, _("Пострадавшего ищи в районе {W%s{G ({W{hh%s{hx{G)."), 
                   victim->in_room->getName(), victim->in_room->areaName().c_str() );
-    tell_fmt("У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности.", 
+    tell_fmt(_("У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности."), 
               pch, questman, time );
     
     wiznet( "", "thief [%s] [%d], obj [%s], victim [%s] [%d], chest [%d], mode %d",

@@ -21,6 +21,7 @@
 #include "loadsave.h"
 #include "save.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(butcher);
 
@@ -54,9 +55,9 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     time = number_range( 15, 25 );
     setTime( pch, time );
 
-    tell_raw( pch, questman, "У меня есть для тебя срочное поручение!" );
+    tell_raw( pch, questman, _("У меня есть для тебя срочное поручение!") );
     tell_raw( pch, questman, 
-        "{W%s{G из местности {W{hh%s{hx{G хочет подать к столу {W%d{G кус%s мяса {W%s{G из местности {W{hh%s{hx{G.", 
+        _("{W%s{G из местности {W{hh%s{hx{G хочет подать к столу {W%d{G кус%s мяса {W%s{G из местности {W{hh%s{hx{G."), 
         customerName.c_str( ),
         customerArea.c_str( ),
         ordered.getValue( ),
@@ -64,8 +65,8 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
         raceRusName.ruscase( '2' ).c_str( ),
         areaName.c_str( ));
 
-    tell_raw( pch, questman, "Доставь мясо заказчику и вернись сюда за вознаграждением." );
-    tell_raw( pch, questman, "У тебя есть {Y%d{G минут%s на выполнение задания.",
+    tell_raw( pch, questman, _("Доставь мясо заказчику и вернись сюда за вознаграждением.") );
+    tell_raw( pch, questman, _("У тебя есть {Y%d{G минут%s на выполнение задания."),
                   time, GET_COUNT(time,"а","ы","") ); 
 
     wiznet( "", "%d steaks of %s from %s, customer %s.",

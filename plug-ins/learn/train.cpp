@@ -67,7 +67,7 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
     
     if (arg_is(arg, "revert")) {
         if (client->train < 1) {
-            tell_act( client, ch, "У тебя нет тренировочных сессий." );
+            tell_act( client, ch, _("У тебя нет тренировочных сессий.") );
             return;
         }
 
@@ -81,7 +81,7 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
 
     if (arg_is(arg, "convert")) {
         if (client->practice < 10) {
-            tell_act( client, ch, "У тебя недостаточно практик -- надо 10." );
+            tell_act( client, ch, _("У тебя недостаточно практик -- надо 10.") );
             return;
         }
 
@@ -112,7 +112,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 
     if (!argQP.empty( )) {
         if (argQP != "qp" && argQP != "кп") {
-            tell_raw( client, ch, "Чтобы тренироваться за квестовые единицы, напиши {hcтренировать тело кп{x." );
+            tell_raw( client, ch, _("Чтобы тренироваться за квестовые единицы, напиши {hcтренировать тело кп{x.") );
             return;
         }
         else
@@ -129,7 +129,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
         }
     
     if (stat == -1) {
-        tell_raw(client, ch, "Я не понимаю, чего ты хочешь.");
+        tell_raw(client, ch, _("Я не понимаю, чего ты хочешь."));
         showTrain(client);
         showGain(client);
         return;
@@ -138,7 +138,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     if (client->perm_stat[stat_table.fields[stat].value] 
         >= client->getMaxTrain( stat_table.fields[stat].value )) 
     {
-        tell_raw( client, ch, "Ты не можешь дальше тренировать %s (%s).", 
+        tell_raw( client, ch, _("Ты не можешь дальше тренировать %s (%s)."), 
                   russian_case( stat_table.fields[stat].message, '4' ).c_str( ), 
                   stat_table.fields[stat].name );
         return;
@@ -146,16 +146,16 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     
     if (fQP) {
         if (stat != STAT_CON) {
-            tell_raw( client, ch, "За квестовые очки можно тренировать только телосложение." );
+            tell_raw( client, ch, _("За квестовые очки можно тренировать только телосложение.") );
             return;
         }
 
         if (conPriceQP > client->getQuestPoints()) {
-            tell_raw( client, ch, "У тебя недостаточно квестовых единиц." );
+            tell_raw( client, ch, _("У тебя недостаточно квестовых единиц.") );
             return;
         }
     } else if (cost > client->train) {
-        tell_raw( client, ch, "У тебя недостаточно тренировочных сессий." );
+        tell_raw( client, ch, _("У тебя недостаточно тренировочных сессий.") );
         return;
     }
     
@@ -175,7 +175,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 
 void Trainer::showTotal(PCharacter *client)
 {
-    tell_raw( client, ch, "У тебя {Y%d{G тренировочн%s.", 
+    tell_raw( client, ch, _("У тебя {Y%d{G тренировочн%s."), 
               client->train.getValue( ),
               GET_COUNT(client->train,"ая сессия","ые сессии","ых сессий") );
 }
@@ -196,7 +196,7 @@ void Trainer::showTrain(PCharacter *client)
     
     if (cnt > 0) {
         tell_raw( client, ch, 
-                  "Ты можешь тренировать:%s%s", 
+                  _("Ты можешь тренировать:%s%s"), 
                   (cnt > 3 ? "\r\n" : " " ),
                   buf.str( ).c_str( ) );
         
@@ -205,13 +205,13 @@ void Trainer::showTrain(PCharacter *client)
                             && client->getQuestPoints() < conPriceQP;
         
         if (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON ) && !hideQpPrice)
-            tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: {hcтренировать сложение кп{x.", conPriceQP );
+            tell_raw( client, ch, _("Ты можешь повысить телосложение за {Y%d{G квестовых единиц: {hcтренировать сложение кп{x."), conPriceQP );
     }            
     else {
         /*
          * This message dedicated to Jordan ... you big stud!
          */
-        tell_raw( client, ch, "Тебе больше нечего тренировать, %s!",
+        tell_raw( client, ch, _("Тебе больше нечего тренировать, %s!"),
                   GET_SEX(client, "жеребчик", "дикое животное", "красотка") );
     }
 }
@@ -219,10 +219,10 @@ void Trainer::showTrain(PCharacter *client)
 void Trainer::showGain(PCharacter *client)
 {
     if (client->practice >= 10)
-        tell_act( client, ch, "Можно обменять {Y10{G практик на {Y1{G тренировочную сессию: {hcтренировки купить{x." );
+        tell_act( client, ch, _("Можно обменять {Y10{G практик на {Y1{G тренировочную сессию: {hcтренировки купить{x.") );
     
     if (client->train >= 1)
-        tell_act( client, ch, "Можно обменять {Y1{G тренировку на {Y10{G практик: {hcтренировки продать{x" );  
+        tell_act( client, ch, _("Можно обменять {Y1{G тренировку на {Y10{G практик: {hcтренировки продать{x") );  
 }
 
 CMDRUN( train )

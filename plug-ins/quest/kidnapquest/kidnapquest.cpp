@@ -22,6 +22,7 @@
 #include "save.h"
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 #define OBJ_VNUM_CANOE 3051
 
@@ -68,7 +69,7 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
     setTime( pch, time );
     
     getScenario( ).onQuestStart( pch, questman, king );
-    tell_raw( pch, questman, "У тебя есть {Y%d{G минут%s, чтобы добраться туда и узнать, в чем дело.",
+    tell_raw( pch, questman, _("У тебя есть {Y%d{G минут%s, чтобы добраться туда и узнать, в чем дело."),
                   time, GET_COUNT(time,"а","ы","") ); 
 
     wiznet( scenName.c_str( ), "%s in [%d], kid in [%d]",
@@ -192,30 +193,30 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
     Room *room = helpLocation( );
 
     if (state == QSTAT_INIT) {
-        tell_fmt( "Извини, но на этом этапе задания тебе придется искать путь само%1$Gму|му|ой.", ch, questman );
+        tell_fmt( _("Извини, но на этом этапе задания тебе придется искать путь само%1$Gму|му|ой."), ch, questman );
         return true;
     }
     else if(!room){
-        tell_fmt( "Извини, я сейчас не могу тебе помочь - придется искать путь само%1$Gму|му|ой.", ch, questman );
+        tell_fmt( _("Извини, я сейчас не могу тебе помочь - придется искать путь само%1$Gму|му|ой."), ch, questman );
         wiznet( "find", "failure" );
         return true;
     }
 
     if (hint.getValue( ) > 5 && !Player::isNewbie(ch)) {
         if (number_percent( ) < 30)
-            tell_fmt( "%1$^C1, тебе необходимо следовать по такому пути: eeeennnwwnewseesennnnnnnnwwnnn.", ch, questman ); 
+            tell_fmt( _("%1$^C1, тебе необходимо следовать по такому пути: eeeennnwwnewseesennnnnnnnwwnnn."), ch, questman ); 
         else
-            tell_fmt( "О, %1$^C1, как же ты меня утоми%1$Gло|л|ла.. Ступай... Ищи са%1$Gмо|м|ма.", ch, questman );
+            tell_fmt( _("О, %1$^C1, как же ты меня утоми%1$Gло|л|ла.. Ступай... Ищи са%1$Gмо|м|ма."), ch, questman );
         
         wiznet( "find", "failure" );
         return true;
     }
 
     if (!Player::isNewbie(ch))
-        tell_raw( ch, questman,  "Я помогу тебе, но награда будет не так велика.");
+        tell_raw( ch, questman,  _("Я помогу тебе, но награда будет не так велика."));
 
     tell_raw( ch, questman, 
-            "Последний раз {W%s{G видели в местности {W{hh%s{hx{G.", 
+            _("Последний раз {W%s{G видели в местности {W{hh%s{hx{G."), 
             russian_case( princeName, '4' ).c_str( ),
             room->areaName().c_str() );
      
