@@ -45,7 +45,7 @@ void QuestTrader::doTrouble( PCharacter *client, const DLString &constArguments 
     arguments = constArguments;
     arg = arguments.getOneArgument( );
     if (arg.empty( )) {
-        tell_act( client, getKeeper( ), "Какую именно вещь ты хочешь вернуть?" );
+        tell_act( client, getKeeper( ), _("Какую именно вещь ты хочешь вернуть?") );
         return;
     }
 
@@ -59,7 +59,7 @@ void QuestTrader::doTrouble( PCharacter *client, const DLString &constArguments 
     personal = article.getDynamicPointer<PersonalQuestArticle>( );
     
     if (!personal)
-        tell_act( client, getKeeper( ), "Извини, $c1, я не могу вернуть тебе эту вещь." );
+        tell_act( client, getKeeper( ), _("Извини, $c1, я не могу вернуть тебе эту вещь.") );
     else
         personal->trouble( client, getKeeper( ) );
 }
@@ -70,22 +70,22 @@ bool QuestTrader::canServeClient( Character *client )
         return false;
 
     if (IS_GHOST( client )) {
-        say_act( client, getKeeper( ), "Наслажденье жизнью недоступно призракам." );
+        say_act( client, getKeeper( ), _("Наслажденье жизнью недоступно призракам.") );
         return false;
     }
 
     if (IS_CHARMED(client)) {
-        say_act( client, getKeeper( ), "Ты не можешь сделать этого, пока ты не владеешь собой!" );
+        say_act( client, getKeeper( ), _("Ты не можешь сделать этого, пока ты не владеешь собой!") );
         return false;
     }
    
     if (getKeeper( )->fighting) {
-        say_act( client, getKeeper( ), "Подожди немного, $c1, мне сейчас не до тебя." );
+        say_act( client, getKeeper( ), _("Подожди немного, $c1, мне сейчас не до тебя.") );
         return false;
     }
 
     if (!getKeeper( )->can_see( client )) {
-        say_act( client, getKeeper( ), "Я не общаюсь с невидимками." );
+        say_act( client, getKeeper( ), _("Я не общаюсь с невидимками.") );
         return false;
     }
     
@@ -94,7 +94,7 @@ bool QuestTrader::canServeClient( Character *client )
 
 void QuestTrader::msgListEmpty( Character *client )
 {
-    say_act( client, getKeeper( ), "Извини, $c1, мне нечего тебе предложить." );
+    say_act( client, getKeeper( ), _("Извини, $c1, мне нечего тебе предложить.") );
 }
 
 void QuestTrader::msgListRequest( Character *client ) 
@@ -115,12 +115,12 @@ void QuestTrader::msgListAfter( Character *client )
 
 void QuestTrader::msgArticleNotFound( Character *client ) 
 {
-    say_act( client, getKeeper( ), "У меня нет этого, $c1." );
+    say_act( client, getKeeper( ), _("У меня нет этого, $c1.") );
 }
 
 void QuestTrader::msgArticleTooFew( Character *client, Article::Pointer )
 {
-    say_act( client, getKeeper( ), "Не жадничай." );
+    say_act( client, getKeeper( ), _("Не жадничай.") );
 }
 
 void QuestTrader::msgBuyRequest( Character *client )
@@ -168,7 +168,7 @@ int QuestTradeArticle::getQuantity( ) const
 bool QuestTradeArticle::purchase( Character *client, NPCharacter *questman, const DLString &, int )
 {
     if (!price->canAfford( client )) {
-        say_act( client, questman, "Извини, $c1, но у тебя недостаточно $n2 для этого.",
+        say_act( client, questman, _("Извини, $c1, но у тебя недостаточно $n2 для этого."),
                  price->toCurrency( ).c_str( ) );
         return false;
     } else if (!client->is_npc( )) {
@@ -263,23 +263,23 @@ void PersonalQuestArticle::trouble( PCharacter *client, NPCharacter *questman )
     }
 
     if (count == 0 || count > 3) {
-        tell_act( client, questman, "Извини, $c1, я не могу вернуть тебе эту вещь." );
+        tell_act( client, questman, _("Извини, $c1, я не могу вернуть тебе эту вещь.") );
         return;
     }
     
     obj = get_obj_world_unique( vnum, client );
 
     if (obj) {
-        tell_act( client, questman, "Извини, но у тебя уже есть $o1.", obj );
+        tell_act( client, questman, _("Извини, но у тебя уже есть $o1."), obj );
         // extract_obj( obj ); у вас все было 
         return;
     }
 
     buy( client, questman );
-    tell_act( client, questman, "Я возвращаю тебе эту вещь $t-й раз.", DLString( count ).c_str( ) );
+    tell_act( client, questman, _("Я возвращаю тебе эту вещь $t-й раз."), DLString( count ).c_str( ) );
     
     if (count == 3) 
-        tell_act( client, questman, "Будь внимательнее! В следующий раз я не смогу помочь тебе." );
+        tell_act( client, questman, _("Будь внимательнее! В следующий раз я не смогу помочь тебе.") );
     
     attr->setCount( vnum, count + 1 );
 }
@@ -314,7 +314,7 @@ bool ConQuestArticle::available( Character *client, NPCharacter *questman ) cons
     if (client->perm_stat[STAT_CON] < client->getPC( )->getMaxTrain( STAT_CON ))
         return true;
     
-    say_act( client, questman, "Извини, $c1, но твое телосложение уже на максимуме." );
+    say_act( client, questman, _("Извини, $c1, но твое телосложение уже на максимуме.") );
     return false;
 }
 
@@ -354,7 +354,7 @@ bool PocketsQuestArticle::available( Character *client, NPCharacter *questman ) 
     if (findBag( client->getPC( ) )) 
         return true;
 
-    say_act( client, questman, "Извини, $c1, но я не вижу у тебя сумки без карманов." );
+    say_act( client, questman, _("Извини, $c1, но я не вижу у тебя сумки без карманов.") );
     return false;
 }
 
@@ -414,7 +414,7 @@ bool KeyringQuestArticle::available( Character *client, NPCharacter *questman ) 
     if (get_obj_carry_vnum( client, OBJ_VNUM_QUESTGIRTH ))
         return true;
 
-    say_act( client, questman, "Извини, $c1, но я не вижу у тебя пояса без брелков." );
+    say_act( client, questman, _("Извини, $c1, но я не вижу у тебя пояса без брелков.") );
     return false;
 }
 
@@ -481,12 +481,12 @@ bool OwnerQuestArticle::available( Character *client, NPCharacter *questman ) co
         return false;
 
     if (lifePrice.getValue( client->getPC( ) ) <= 0) {
-        say_act( client, questman, "Извини, $c1, но у тебя не хватает $n2, чтобы владеть этой вещью.", lifePrice.toCurrency( ).c_str( ) );
+        say_act( client, questman, _("Извини, $c1, но у тебя не хватает $n2, чтобы владеть этой вещью."), lifePrice.toCurrency( ).c_str( ) );
         return false;
     }
 
     if (!lifePrice.canAfford( client )) {
-        say_act( client, questman, "Извини, $c1, но ты уже исчерпа$gло|л|ла отведенное тебе количество этих купонов." );
+        say_act( client, questman, _("Извини, $c1, но ты уже исчерпа$gло|л|ла отведенное тебе количество этих купонов.") );
         return false;
     }
 
@@ -518,15 +518,15 @@ void PiercingQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
 bool PiercingQuestArticle::available( Character *client, NPCharacter *tattoer ) const 
 {
     if (!visible( client )) {
-        say_act( client, tattoer, "У тебя уже проколоты уши, $c1." );
-        say_act( client, tattoer, "Может, тебе еще что-нибудь проколоть?" );
+        say_act( client, tattoer, _("У тебя уже проколоты уши, $c1.") );
+        say_act( client, tattoer, _("Может, тебе еще что-нибудь проколоть?") );
         interpret_raw( tattoer, "smirk" );
         return false;
     }
 
     if (get_eq_char( client, wear_head )) {
         interpret_raw( tattoer, "bonk", client->getNameC() );
-        say_act( client, tattoer, "Шляпу сними! Не получается до твоего уха добраться." );
+        say_act( client, tattoer, _("Шляпу сними! Не получается до твоего уха добраться.") );
         return false;
     }
 
@@ -576,18 +576,18 @@ bool TattooQuestArticle::available( Character *client, NPCharacter *tattoer ) co
         return false;
 
     if (client->getReligion( ) == god_none) {
-        say_act( client, tattoer, "$c1, ты атеист$g||ка и не можешь получить знак религии." );
+        say_act( client, tattoer, _("$c1, ты атеист$g||ка и не можешь получить знак религии.") );
         return false;
     }
 
     if (wear_tattoo->find( client )) {
-        say_act( client, tattoer, "Но у тебя уже есть знак религии, $c1!" );
+        say_act( client, tattoer, _("Но у тебя уже есть знак религии, $c1!") );
         return false;
     }
 
     DefaultReligion *religion = dynamic_cast<DefaultReligion *>(&client->getReligion());
     if (religion && religion->tattooVnum != 0 && !get_obj_index(religion->tattooVnum)) {
-        say_act(client, tattoer, "Я не могу сейчас нанести тебе этот знак религии, приходи позже.");
+        say_act(client, tattoer, _("Я не могу сейчас нанести тебе этот знак религии, приходи позже."));
         LogStream::sendError() << "BUG: no tattoo index data for " << religion->getName() << endl;
         return false;
     }

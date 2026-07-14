@@ -73,6 +73,15 @@ void tell_dim( Character *, Character *, const char *, const void *arg = 0 );
 void tell_fmt( const char *, ... );
 void say_fmt( const char *, ... );
 
+/* Trilinguality (Trello 2594): MultiMessage overloads localize the speech frame
+ * per recipient. The const char* twins keep the RU frame, so unwrapped callers
+ * stay byte-identical -- only a _()-wrapped msg gets a localized frame. */
+void say_act( Character *, Character *, const MultiMessage &, const void *arg = 0 );
+void tell_act( Character *, Character *, const MultiMessage &, const void *arg = 0 );
+void tell_dim( Character *, Character *, const MultiMessage &, const void *arg = 0 );
+void tell_fmt( const MultiMessage &, ... );
+void tell_raw( Character *ch, NPCharacter *talker, const MultiMessage &format, ... );
+
 /** Display newbie hint message. */
 void hint_fmt(Character *ch, const char *format, ...);
 
