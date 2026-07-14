@@ -388,9 +388,25 @@ void ExitsMovement::setWaitstate( )
 }
 
 // TODO all movement messages should be multi-lingual based on the looker lang config
+// EN arrival direction phrase. RU/UA bake the preposition into dirs[] (leave =
+// accusative "на север", enter = genitive "с севера"); the EN direction_word is
+// the bare caseless name, so the arrival "from ..." phrase is spelled out here.
+static const char * en_arrive_from(int door)
+{
+    switch (door) {
+    case DIR_NORTH: return "from the north";
+    case DIR_EAST:  return "from the east";
+    case DIR_SOUTH: return "from the south";
+    case DIR_WEST:  return "from the west";
+    case DIR_UP:    return "from above";
+    case DIR_DOWN:  return "from below";
+    }
+    return "";
+}
+
 void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
 {
-    ostringstream buf;
+    ostringstream bufRu, bufEn, bufUa;
     
     if (MOUNTED(wch))
         return;
@@ -402,10 +418,15 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
         return;
     
     if (peexit) {
-        if (fLeaving)
-            buf << peexit->msgLeaveRoom.get(LANG_DEFAULT);
-        else
-            buf << peexit->msgEntryRoom.get(LANG_DEFAULT);
+        const auto &m = fLeaving ? peexit->msgLeaveRoom : peexit->msgEntryRoom;
+        DLString ru = m.get(LANG_RU);
+        DLString en = m.get(LANG_EN);
+        DLString ua = m.get(LANG_UA);
+        if (en.empty()) en = ru;
+        if (ua.empty()) ua = ru;
+        bufRu << ru;
+        bufEn << en;
+        bufUa << ua;
     }
     else {
         int mt = adjustMovetype( wch );
@@ -413,10 +434,28 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
         if (IS_AFFECTED(wch, AFF_SNEAK | AFF_CAMOUFLAGE) && movetypes[mt].sneak)
             return;
 
-        buf << "%1$^C1 "
-            << (fLeaving ? movetypes[mt].leave : movetypes[mt].enter)
-            << " " 
-            << (fLeaving ? dirs[door].leave : dirs[dirs[door].rev].enter);
+        const movetype_t &mv = movetypes[mt];
+        int revdoor = dirs[door].rev;
+
+        // The verb keeps its %1$G gender code so it (and the %1$^C1 name)
+        // resolves per viewer -- correct even when the actor is invisible to
+        // some onlookers.
+        bufRu << "%1$^C1 "
+              << (fLeaving ? mv.leave : mv.enter)
+              << " "
+              << (fLeaving ? dirs[door].leave : dirs[revdoor].enter);
+
+        bufEn << "%1$^C1 "
+              << (fLeaving ? mv.leave_en : mv.enter_en)
+              << " "
+              << (fLeaving ? direction_word(LANG_EN, door, DIR_CASE_TO)
+                           : en_arrive_from(revdoor));
+
+        bufUa << "%1$^C1 "
+              << (fLeaving ? mv.leave_ua : mv.enter_ua)
+              << " "
+              << (fLeaving ? direction_word(LANG_UA, door, DIR_CASE_TO)
+                           : direction_word(LANG_UA, revdoor, DIR_CASE_FROM));
 
         if ((mt == MOVETYPE_SWIMMING || mt == MOVETYPE_WATER_WALK) && boat) {
             int ncase = 0;
@@ -435,21 +474,29 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
             case PUT_INSIDE: prep = "внутри"; ncase = 2; break;
             }
 
+            // Boat clause is RU-only: its %5$O reads an unprovisioned 5th vararg
+            // (msgEcho passes 3 args) -- a pre-existing latent bug, kept
+            // byte-identical for RU rather than propagated into EN/UA.
             if (!prep.empty( )) {
                 if (!part.empty( ))
-                    buf << ", " << part;
+                    bufRu << ", " << part;
 
-                buf << " " << prep << " %5$O" << ncase;
+                bufRu << " " << prep << " %5$O" << ncase;
             }
         }
     }
     
-    if (RIDDEN(wch))
-        buf << ", верхом на %2$C6";
+    if (RIDDEN(wch)) {
+        bufRu << ", верхом на %2$C6";
+        bufEn << ", riding on %2$C6";
+        bufUa << ", верхи на %2$C6";
+    }
 
-    buf << "."; 
+    bufRu << ".";
+    bufEn << ".";
+    bufUa << ".";
 
-    msgRoomNoParty( wch, buf.str( ).c_str( ) );
+    msgRoomNoParty( wch, bufEn.str( ).c_str( ), bufRu.str( ).c_str( ), bufUa.str( ).c_str( ) );
 }            
 
 int ExitsMovement::adjustMovetype( Character *wch )

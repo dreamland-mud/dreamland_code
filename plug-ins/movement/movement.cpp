@@ -31,6 +31,7 @@
 
 #include "def.h"
 #include "l10n.h"
+#include "lang.h"
 
 Movement::Movement( Character *ch ) 
 {
@@ -309,6 +310,13 @@ void Movement::msgRoomNoParty( Character *wch, const char *msgRoomSingle, const 
             else
                 msgEcho( rch, wch, msgRoomSingle );
         }
+}
+
+void Movement::msgRoomNoParty( Character *wch, const char *en, const char *ru, const char *ua )
+{
+    for (Character *rch = wch->in_room->people; rch; rch = rch->next_in_room)
+        if (rch != wch && rch != wch->mount)
+            msgEcho( rch, wch, lmsg( viewerLang( rch ), en, ru, ua ) );
 }
 
 void Movement::msgRoom( Character *wch, const char *msg )
