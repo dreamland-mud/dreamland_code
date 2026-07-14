@@ -42,12 +42,12 @@ static void scan_people(Room *room, Character *ch, int depth, int door,
             if (door != -1)
             {
                 if (fShowDir)
-                    buf << (fRus ? dirs[door].where : dirs[door].name);
+                    buf << direction_word(fRus ? LANG_RU : viewerLang(ch), door, DIR_CASE_AT);
                 else
-                    buf << "Дальность " << depth;
+                    buf << lmsg(viewerLang(ch), "Range ", "Дальность ", "Відстань ") << depth;
             }
             else
-                buf << "Здесь";
+                buf << lmsg(viewerLang(ch), "Here", "Здесь", "Тут");
 
             buf << ":{x" << endl;
             found = true;
@@ -83,9 +83,9 @@ static Room *scan_room(Room *start_room, Character *ch, int depth, int door,
         buf << "{" << CLR_SCAN_DIR(ch);
 
         if (fShowDir)
-            buf << (fRus ? dirs[door].where : dirs[door].name);
+            buf << direction_word(fRus ? LANG_RU : viewerLang(ch), door, DIR_CASE_AT);
         else
-            buf << "Дальность " << depth;
+            buf << lmsg(viewerLang(ch), "Range ", "Дальность ", "Відстань ") << depth;
 
         buf << ":{x" << endl
             << "    {" << CLR_SCAN_DOOR(ch) << russian_case(direction_doorname(pExit), '1') << " (закрыто).{x" << endl;
@@ -98,12 +98,12 @@ static Room *scan_room(Room *start_room, Character *ch, int depth, int door,
         buf << "{" << CLR_SCAN_DIR(ch);
 
         if (fShowDir)
-            buf << (fRus ? dirs[door].where : dirs[door].name);
+            buf << direction_word(fRus ? LANG_RU : viewerLang(ch), door, DIR_CASE_AT);
         else
-            buf << "Дальность " << depth;
+            buf << lmsg(viewerLang(ch), "Range ", "Дальность ", "Відстань ") << depth;
 
         buf << ":{x" << endl
-            << "    Невозможно что-либо разглядеть." << endl;
+            << "    " << lmsg(viewerLang(ch), "Nothing can be made out.", "Невозможно что-либо разглядеть.", "Нічого не роздивитися.") << endl;
         return NULL;
     }
 
@@ -136,7 +136,7 @@ CMDRUNP(scan)
     if (arg1[0] == '\0')
     {
         oldact(_("$c1 осматривает все вокруг."), ch, 0, 0, TO_ROOM);
-        buf << "Осмотревшись, ты видишь:" << endl;
+        buf << lmsg(viewerLang(ch), "Looking around, you see:", "Осмотревшись, ты видишь:", "Роздивившись, ти бачиш:") << endl;
         scan_people(ch->in_room, ch, 0, -1, true, buf);
 
         for (door = 0; door < DIR_SOMEWHERE; door++)
@@ -154,7 +154,9 @@ CMDRUNP(scan)
         return;
     }
 
-    oldact(_("Ты пристально смотришь $T."), ch, 0, dirs[door].leave, TO_CHAR);
+    ch->pecho(lmsg(viewerLang(ch), "You peer intently %s.", "Ты пристально смотришь %s.", "Ти пильно вдивляєшся %s."),
+              direction_word(viewerLang(ch), door, DIR_CASE_TO));
+    // TO_ROOM $T direction arg is engine-limited (per-recipient text args unsupported); left RU pending part 3.
     oldact(_("$c1 пристально смотрит $T."), ch, 0, dirs[door].leave, TO_ROOM);
 
     range = max(1, ch->getModifyLevel() / 10);
