@@ -6,8 +6,8 @@
 #define __DIRECTIONS_H__
 
 #include "lang.h"
+#include "dlstring.h"
 
-class DLString;
 class Character;
 class Room;
 struct exit_data;
@@ -61,6 +61,28 @@ int direction_lookup( const char *arg );
 
 /** Return short description of the exit, or generic "door" if not set. */
 const char * direction_doorname(exit_data *);
+
+/** Per-viewer door name for the %w / $w act code and single-viewer string
+ *  building. Owns its three language forms; the RU form is pre-declined to a
+ *  grammatical case (russian_case is viewer-independent), EN is caseless, UA
+ *  degrades to nominative (no ukrainian_case yet). Generic fallback for a
+ *  nameless door: door / дверь / двері. Keep the DoorName alive while any
+ *  LangText from lt() is in use -- the LangText points into these strings. */
+struct DoorName {
+    DLString en, ru, ua;
+    const DLString & forLang(lang_t lang) const {
+        if (lang == LANG_EN && !en.empty()) return en;
+        if (lang == LANG_UA && !ua.empty()) return ua;
+        return ru;
+    }
+    LangText lt() const { return LangText { en.c_str(), ru.c_str(), ua.c_str() }; }
+};
+
+/** Build a DoorName for `pexit`, RU pre-declined to case `rcase` ('1' nom, '4'
+ *  acc, ...). RU output matches the legacy russian_case(direction_doorname())
+ *  path byte-for-byte; EN/UA are the exit's own short_descr forms (RU fallback
+ *  when empty). */
+DoorName direction_doorname_langtext(exit_data *pexit, char rcase);
 /** Return corresponding exit from the opposite side, but only if it leads back here. */
 exit_data *direction_reverse(Room *room, int door);
 /** Return room this door leads to. */

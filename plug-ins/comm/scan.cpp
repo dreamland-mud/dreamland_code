@@ -88,7 +88,7 @@ static Room *scan_room(Room *start_room, Character *ch, int depth, int door,
             buf << lmsg(viewerLang(ch), "Range ", "Дальность ", "Відстань ") << depth;
 
         buf << ":{x" << endl
-            << "    {" << CLR_SCAN_DOOR(ch) << russian_case(direction_doorname(pExit), '1') << " (закрыто).{x" << endl;
+            << "    {" << CLR_SCAN_DOOR(ch) << direction_doorname_langtext(pExit, '1').forLang(fRus ? LANG_RU : viewerLang(ch)) << " (закрыто).{x" << endl;
 
         return NULL;
     }

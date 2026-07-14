@@ -216,7 +216,7 @@ CMDRUNP( exits )
         else {
             ename = "*" + ename + "*";
             buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - "
-                << russian_case(direction_doorname(pexit), '1') 
+                << direction_doorname_langtext(pexit, '1').forLang(cfg.ruexits ? LANG_RU : viewerLang(ch))
                 << " (" << (IS_SET(pexit->exit_info, EX_LOCKED) ? l(ch, "заперто") : l(ch, "закрыто")) << ")";
 
             if (cfg.holy)
