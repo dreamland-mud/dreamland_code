@@ -21,6 +21,7 @@
 
 #include "act.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(observation);
 
@@ -80,15 +81,15 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
 
     setTime( pch, time );
 
-    tell_raw( pch, questman, "У меня есть для тебя срочное поручение!" );   
-    tell_fmt( "{W%3$#^C1{G чем-то серьезно бол%3$Gьно|ен|ьна и нуждается в помощи лекаря.",
+    tell_raw( pch, questman, _("У меня есть для тебя срочное поручение!") );   
+    tell_fmt( _("{W%3$#^C1{G чем-то серьезно бол%3$Gьно|ен|ьна и нуждается в помощи лекаря."),
                pch, questman, patient );
-    tell_fmt( "Место, где %3$P2 видели в последний раз - {W%4$s{x.",
+    tell_fmt( _("Место, где %3$P2 видели в последний раз - {W%4$s{x."),
               pch, questman, patient, patient->in_room->getName() );
-    tell_fmt( "Это находится в районе под названием {W{hh%3$s{x.", 
+    tell_fmt( _("Это находится в районе под названием {W{hh%3$s{x."), 
               pch, questman, patient->in_room->areaName().c_str() );
-    tell_fmt( "Поторопись, пока болезнь не доконала %3$P2!", pch, questman, patient );
-    tell_fmt( "У тебя есть {Y%3$d{G мину%3$Iта|ты|т на выполнение задания.", pch, questman, time );
+    tell_fmt( _("Поторопись, пока болезнь не доконала %3$P2!"), pch, questman, patient );
+    tell_fmt( _("У тебя есть {Y%3$d{G мину%3$Iта|ты|т на выполнение задания."), pch, questman, time );
 
     wiznet( "", "cure %s [%d] from %d maladies, mode %d",
                 patient->getNameP('1').c_str( ), patient->in_room->vnum,

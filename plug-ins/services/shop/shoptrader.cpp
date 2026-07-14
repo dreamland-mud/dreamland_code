@@ -57,7 +57,7 @@ void ShopTrader::load( DLString str )
 
 void ShopTrader::give( Character *from, Object *obj )
 {
-    tell_dim( from, ch, "Извини, но я не беру взяток!" );
+    tell_dim( from, ch, _("Извини, но я не беру взяток!") );
     oldact(_("$c1 роняет $o4."), ch, obj, 0, TO_ROOM );
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
@@ -93,7 +93,7 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
 
     if (!obj) {
         if (verbose)
-            tell_dim( client, ch, "Я не продаю этого - используй 'список{x'." );
+            tell_dim( client, ch, _("Я не продаю этого - используй 'список{x'.") );
         return;
     }
 
@@ -107,11 +107,11 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
     int itemCost = get_cost( ch, obj, true, this );
     int serviceCost = Player::isNewbie(client->getPC()) ? 0 : itemCost / 100;
     if ((client->silver + client->gold * 100) < serviceCost) {
-        tell_dim( client, ch, "Я не справочная контора. Будут деньги, тогда и возвращайся." );
+        tell_dim( client, ch, _("Я не справочная контора. Будут деньги, тогда и возвращайся.") );
         return;
     }
 
-    tell_dim( client, ch, "Нигде больше не найдешь такого замечательного товара:" );
+    tell_dim( client, ch, _("Нигде больше не найдешь такого замечательного товара:") );
 
     {
         bool hadMagic = client->detection.isSet(DETECT_MAGIC);
@@ -125,7 +125,7 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
     }
 
     if (serviceCost < 1) {
-        tell_dim( client, ch, "Я сообщаю тебе это совершенно бесплатно." );
+        tell_dim( client, ch, _("Я сообщаю тебе это совершенно бесплатно.") );
     } else {
         deduct_cost( client, serviceCost );
         client->pecho( _("%1$^C1 взя%1$Gло|л|ла с тебя {W%2$d{x моне%2$Iту|ты|т за услуги."), ch, serviceCost );

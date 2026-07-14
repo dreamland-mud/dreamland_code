@@ -23,6 +23,7 @@
 #include "save.h"
 
 #include "def.h"
+#include "l10n.h"
 
 CLAN(battlerager);
 GSN(locate_object);
@@ -73,11 +74,11 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
 
     setTime( pch, time );
 
-    tell_fmt( "{W%3$#^C1{G хочет отыскать некоторые принадлежащие %3$P3 вещи.",  
+    tell_fmt( _("{W%3$#^C1{G хочет отыскать некоторые принадлежащие %3$P3 вещи."),  
               pch, questman, customer );
-    tell_fmt( "%3$#^P1 ждет тебя в районе {W%4$s{G ({W{hh%5$s{hx{G).", 
+    tell_fmt( _("%3$#^P1 ждет тебя в районе {W%4$s{G ({W{hh%5$s{hx{G)."), 
                pch, questman, customer, customer->in_room->getName(), customer->in_room->areaName().c_str() );
-    tell_fmt( "У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности.",  
+    tell_fmt( _("У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности."),  
                pch, questman, time );
     
     wiznet( scenName.getValue( ).c_str( ), 

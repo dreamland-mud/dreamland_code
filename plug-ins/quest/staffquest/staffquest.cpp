@@ -47,11 +47,11 @@ void StaffQuest::create( PCharacter *pch, NPCharacter *questman )
     setTime( pch, time );
     
     getScenario( ).onQuestStart( pch, questman );
-    tell_raw( pch, questman, "Придворные волшебники определили, где спрятано украденное сокровище." );
-    tell_raw( pch, questman, "Тебе поручается доставить его мне!" );        
-    tell_raw( pch, questman, "Место, где оно спрятано, называется {W%s{G", roomName.c_str( ) );
-    tell_raw( pch, questman, "И находится это место в районе под названием - {W{hh%s{hx{G", areaName.c_str( ) );
-    tell_raw( pch, questman, "У тебя есть {Y%d{G минут%s на выполнение задания.",
+    tell_raw( pch, questman, _("Придворные волшебники определили, где спрятано украденное сокровище.") );
+    tell_raw( pch, questman, _("Тебе поручается доставить его мне!") );        
+    tell_raw( pch, questman, _("Место, где оно спрятано, называется {W%s{G"), roomName.c_str( ) );
+    tell_raw( pch, questman, _("И находится это место в районе под названием - {W{hh%s{hx{G"), areaName.c_str( ) );
+    tell_raw( pch, questman, _("У тебя есть {Y%d{G минут%s на выполнение задания."),
                   time, GET_COUNT(time,"а","ы","") ); 
     
     wiznet( scenName.c_str( ), "in room \"%s\" area \"%s\"", 
@@ -172,7 +172,7 @@ bool StaffScenario::applicable( PCharacter *pch )  const
 void StaffScenario::onQuestStart( PCharacter *pch, NPCharacter *questman ) const
 {
     if (msg.empty( ))
-        tell_raw( pch, questman, "Из королевской сокровищницы похитили {W%s{G!", 
+        tell_raw( pch, questman, _("Из королевской сокровищницы похитили {W%s{G!"), 
                   shortDesc.ruscase( '4' ).c_str( ) );
     else
         tell_raw( pch, questman, msg.c_str( ) );

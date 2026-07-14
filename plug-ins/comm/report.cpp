@@ -290,7 +290,7 @@ CMDRUNP(report)
     }
     else {
         page_to_char(result.str().c_str(), pet->master);
-        tell_raw(pet->master, pet, "%s, больше я ничегошеньки не умею!", GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"));
+        tell_raw(pet->master, pet, _("%s, больше я ничегошеньки не умею!"), GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"));
         interpret_raw(pet, "abat", "");
     }
 }

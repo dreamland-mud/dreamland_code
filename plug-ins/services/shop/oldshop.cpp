@@ -352,7 +352,7 @@ CMDRUN( sell )
 
     ShopStock stock = get_stock_keeper( trader, NULL, "" );
     if (stock.size( ) > 25) {
-        tell_dim( ch, keeper, "Я ничего не покупаю! Мне некуда ставить товар!");
+        tell_dim( ch, keeper, _("Я ничего не покупаю! Мне некуда ставить товар!"));
         return;
     }
 
@@ -507,9 +507,9 @@ CMDRUN( list )
 
     if (stock.empty( )) {
         if (arg.empty( ))
-            tell_dim( ch, keeper, "Мне сегодня нечего тебе предложить.");
+            tell_dim( ch, keeper, _("Мне сегодня нечего тебе предложить."));
         else
-            tell_dim( ch, keeper, "Я не продаю '$t'.", arg.c_str( ) );
+            tell_dim( ch, keeper, _("Я не продаю '$t'."), arg.c_str( ) );
         return;
     }
 
@@ -537,8 +537,8 @@ CMDRUN( list )
     ch->send_to( buf );
 
     if (bonus_black_friday->isActive(NULL, time_info))
-        tell_dim(ch, keeper, "Сегодня в моем магазине невероятно низкие цены.");
-    tell_dim( ch, keeper, "Скажи мне название товара, и я расскажу всё, что о нем знаю, за 1%% от стоимости." );
+        tell_dim(ch, keeper, _("Сегодня в моем магазине невероятно низкие цены."));
+    tell_dim( ch, keeper, _("Скажи мне название товара, и я расскажу всё, что о нем знаю, за 1%% от стоимости.") );
 
     // TODO when moved to Fenia, all shoppers in the room will react to the list command
 }
@@ -576,10 +576,10 @@ static bool value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Point
     int silver = cost - gold * 100;
 
     if (dreamland->getBalanceMerchantBank() < (gold + 1))
-        tell_fmt("Я дал%2$Gо||а бы тебе %3s за %4$O4, но у меня нет денег.", 
+        tell_fmt(_("Я дал%2$Gо||а бы тебе %3s за %4$O4, но у меня нет денег."), 
                  ch, keeper, format_coins(gold, silver).c_str(), obj);
     else
-        tell_fmt("Я дам тебе %3s за %4$O4.", 
+        tell_fmt(_("Я дам тебе %3s за %4$O4."), 
                  ch, keeper, format_coins(gold, silver).c_str(), obj);
 
     return true;
@@ -607,7 +607,7 @@ CMDRUN( value )
         bool saidSomething = false;
 
         if (!ch->carrying) {
-            tell_fmt("Но у тебя же ничего нет!", ch, keeper);
+            tell_fmt(_("Но у тебя же ничего нет!"), ch, keeper);
             return;
         }
 
@@ -617,13 +617,13 @@ CMDRUN( value )
         }
 
         if (!saidSomething)
-            tell_fmt("Я не вижу у тебя ничего, что могло бы меня заинтересовать.", ch, keeper);
+            tell_fmt(_("Я не вижу у тебя ничего, что могло бы меня заинтересовать."), ch, keeper);
 
         return;
     }
 
     if ( ( obj = get_obj_carry( ch, arg.c_str( ) ) ) == 0 ) {
-        tell_fmt("У тебя нет этого.", ch, keeper);
+        tell_fmt(_("У тебя нет этого."), ch, keeper);
         return;
     }
 

@@ -34,10 +34,10 @@ bool KS::applicable( PCharacter *hero ) const
 void KS::onQuestStart( PCharacter *hero, NPCharacter *questman, NPCharacter *king ) const
 {
     tell_raw( hero, questman, 
-              "{W%s{G зачем-то понадобилась твоя помощь.",
+              _("{W%s{G зачем-то понадобилась твоя помощь."),
                    king->getNameP( '3' ).c_str() );
     tell_raw( hero, questman, 
-             "Ищи %s в местности под названием {W%s{G ({W{hh%s{hx{G).",
+             _("Ищи %s в местности под названием {W%s{G ({W{hh%s{hx{G)."),
                    GET_SEX(king, "его", "его", "ее"), king->in_room->getName(), king->in_room->areaName().c_str() );
 }
 

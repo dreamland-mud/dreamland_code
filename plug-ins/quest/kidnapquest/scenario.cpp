@@ -12,6 +12,7 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 RACE(none);
 
@@ -33,10 +34,10 @@ void KSPrinceData::dress( NPCharacter *mob, NPCharacter *king ) const
 void KidnapScenario::onQuestStart( PCharacter *hero, NPCharacter *questman, NPCharacter *king ) const
 {
     tell_raw( hero, questman, 
-              "У {W%s{G случилось несчастье. Срочно требуется твоя помощь.",
+              _("У {W%s{G случилось несчастье. Срочно требуется твоя помощь."),
                    king->getNameP( '2' ).c_str() );
     tell_raw( hero, questman, 
-             "Ищи %s в местности под названием {W%s{G ({W{hh%s{hx{G).",
+             _("Ищи %s в местности под названием {W%s{G ({W{hh%s{hx{G)."),
                    GET_SEX(king, "его", "его", "ее"), king->in_room->getName(), king->in_room->areaName().c_str() );
 }
 

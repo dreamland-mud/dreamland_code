@@ -54,8 +54,8 @@ static bool my_message(const char *msg)
 
 static void tell_hint(Character *ch, Character *victim)
 {
-    tell_fmt("Ты очень отваж%1$Gно|ен|на, %1$C1!", victim, ch);
-    tell_fmt("Изучи справку по теме {hh125квестор{hx, а когда будешь готов%1$Gо||а, набери {y{hcквест попросить{x.", victim, ch);
+    tell_fmt(_("Ты очень отваж%1$Gно|ен|на, %1$C1!"), victim, ch);
+    tell_fmt(_("Изучи справку по теме {hh125квестор{hx, а когда будешь готов%1$Gо||а, набери {y{hcквест попросить{x."), victim, ch);
 }
 
 void QuestMaster::speech( Character *victim, const char *msg )

@@ -37,17 +37,17 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
         return false;
 
     if (obj->pIndexData->vnum != OBJ_VNUM_STEAK) {
-        tell_fmt( "Что ты мне приволок%1$Gло|л|ла! Это даже не мясо!", hero, ch );
+        tell_fmt( _("Что ты мне приволок%1$Gло|л|ла! Это даже не мясо!"), hero, ch );
         return false;
     }
 
     if (!( orig = get_mob_index( obj->value2() ) )) {
-        tell_fmt( "Ужас, с кого ты это среза%1$Gло|л|ла?!", hero, ch );
+        tell_fmt( _("Ужас, с кого ты это среза%1$Gло|л|ла?!"), hero, ch );
         return false;
     }
 
     if (quest->raceName != orig->race) {
-        tell_fmt( "Хороший кусок, но я заказыва%2$Gло|л|ла мясо %3$N2.",
+        tell_fmt( _("Хороший кусок, но я заказыва%2$Gло|л|ла мясо %3$N2."),
                   hero, ch, quest->raceRusName.c_str( ) );
         return false;        
         
@@ -55,7 +55,7 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
     
     if (quest->areaName != orig->area->getName()) {
         tell_raw( hero, ch, 
-                "Эти звери водятся в %s, а не в %s.",
+                _("Эти звери водятся в %s, а не в %s."),
                 orig->area->getName().c_str(), quest->areaName.c_str( ) );
         return false;
     }
@@ -74,11 +74,11 @@ void SteakCustomer::givenGood( PCharacter *hero, Object *obj )
     quest->delivered++;
     
     if (quest->delivered == quest->ordered) 
-        tell_raw(hero, ch, "Спасибо за помощь! Вернись к квестору за наградой.");
+        tell_raw(hero, ch, _("Спасибо за помощь! Вернись к квестору за наградой."));
     else if (quest->delivered > quest->ordered) 
-        tell_fmt("Хватит, родн%1$Gое|ой|ая.", hero, ch);
+        tell_fmt(_("Хватит, родн%1$Gое|ой|ая."), hero, ch);
     else 
-        tell_raw(hero, ch, "Маловато будет...");
+        tell_raw(hero, ch, _("Маловато будет..."));
     
     oldact(_("$c1 куда-то прячет $o4."), ch, obj, 0, TO_ROOM);
     extract_obj( obj );

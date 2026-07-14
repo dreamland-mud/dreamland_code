@@ -245,18 +245,18 @@ void MansionKeyMaker::toStream( Character *client, ostringstream &buf )
 
 void MansionKeyMaker::msgListEmpty( Character *client ) 
 {
-    say_act( client, getKeeper( ), "У тебя нет ключей ни от какого дома." );
+    say_act( client, getKeeper( ), _("У тебя нет ключей ни от какого дома.") );
 }
 
 void MansionKeyMaker::msgListBefore( Character *client ) 
 {
-    tell_dim( client, getKeeper( ), "Я могу изготовить для тебя такие ключи: " );
+    tell_dim( client, getKeeper( ), _("Я могу изготовить для тебя такие ключи: ") );
 }
 
 void MansionKeyMaker::msgListAfter( Character *client ) 
 {
     client->pecho("");
-    tell_dim( client, getKeeper( ), "За свою работу я потребую $n4.", price->toString( client ).c_str( ) );
+    tell_dim( client, getKeeper( ), _("За свою работу я потребую $n4."), price->toString( client ).c_str( ) );
 }
 
 void MansionKeyMaker::msgArticleNotFound( Character *client ) 
@@ -308,12 +308,12 @@ int MansionKeyMaker::findKeyVnum( PCharacter *client, const DLString& arg )
     attr = client->getAttributes( ).findAttr<XMLAttributeMansionKey>( "mkey" );
 
     if (!attr || attr->keys.empty( )) {
-        tell_act( client, getKeeper( ), "Извини, $c1, но тебе не принадлежит ни одного ключа. " );
+        tell_act( client, getKeeper( ), _("Извини, $c1, но тебе не принадлежит ни одного ключа. ") );
         return 0;
     }
 
     if (arg.empty( )) {
-        tell_act( client, getKeeper( ), "Какой именно ключ ты хочешь купить?" );
+        tell_act( client, getKeeper( ), _("Какой именно ключ ты хочешь купить?") );
         return 0;
     }
 
@@ -329,7 +329,7 @@ int MansionKeyMaker::findKeyVnum( PCharacter *client, const DLString& arg )
         return i->getValue( );
     }
 
-    tell_act( client, getKeeper( ), "Извини, $c1, но тебе не принадлежит ключ с таким именем." );
+    tell_act( client, getKeeper( ), _("Извини, $c1, но тебе не принадлежит ключ с таким именем.") );
     return 0;
 }
 
@@ -342,7 +342,7 @@ bool MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const D
     
     if (!price->canAfford( client )) {
         tell_act( client, maker, 
-                  "У тебя недостаточно $n2, чтобы оплатить мою работу, $c1.", 
+                  _("У тебя недостаточно $n2, чтобы оплатить мою работу, $c1."), 
                   price->toCurrency( ).c_str( ) );
         return false;
     }
