@@ -323,7 +323,9 @@ bool ExitsMovement::applyPassDoor( Character *wch )
                      95 );
 
     if (number_percent( ) < chance) {
-        msgSelf( wch, "Ты просачиваешься сквозь %4$N4." );
+        msgSelf( wch, "You seep through %4$N4.",
+                      "Ты просачиваешься сквозь %4$N4.",
+                      "Ти просочуєшся крізь %4$N4." );
         wch->setWait( 2 );
         return true;        
     }

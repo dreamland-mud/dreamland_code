@@ -86,7 +86,9 @@ bool FleeMovement::findTargetRoom( )
 
     switch (targetDoor) {
     case -1:
-        msgSelf( ch, "{RПАНИКА!{x Ты не находишь выхода!" );
+        msgSelf( ch, "{RPANIC!{x You can't find a way out!",
+                     "{RПАНИКА!{x Ты не находишь выхода!",
+                     "{RПАНІКА!{x Ти не знаходиш виходу!" );
         return false;
 
     case DIR_SOMEWHERE:
@@ -115,7 +117,9 @@ bool FleeMovement::canMove( Character * )
 bool FleeMovement::checkPositionHorse( )
 {
     if (horse->position <= POS_RESTING) {
-        msgSelf( ch, "%2$^C1 долж%2$Gно|ен|на сначала встать." );
+        msgSelf( ch, "%2$^C1 must stand up first.",
+                     "%2$^C1 долж%2$Gно|ен|на сначала встать.",
+                     "%2$^C1 мусить спершу встати." );
         return false;
     }
 
@@ -144,11 +148,17 @@ void FleeMovement::msgOnMove( Character *wch, bool fLeaving )
 {
     if (fLeaving) {
         if (wch == rider)
-            msgSelf( wch, "%2$^C1 выносит тебя с поля битвы!" );
+            msgSelf( wch, "%2$^C1 carries you off the battlefield!",
+                          "%2$^C1 выносит тебя с поля битвы!",
+                          "%2$^C1 виносить тебе з поля бою!" );
         else if (wch == horse) 
-            msgSelf( wch, "%1$^C1 покидает поле битвы верхом на тебе!" );
+            msgSelf( wch, "%1$^C1 leaves the battlefield riding on you!",
+                          "%1$^C1 покидает поле битвы верхом на тебе!",
+                          "%1$^C1 покидає поле бою верхи на тобі!" );
         else
-            msgSelf( wch, "Ты убегаешь с поля битвы!" );
+            msgSelf( wch, "You flee the battlefield!",
+                          "Ты убегаешь с поля битвы!",
+                          "Ти тікаєш з поля бою!" );
     }
     
     ExitsMovement::msgOnMove( wch, fLeaving );
@@ -164,7 +174,9 @@ bool FleeMovement::applySkill( SkillReference &skill )
     bool fSuccess = true;;
     
     if (number_percent() > skill->getEffective( ch )) {
-        msgSelf( ch, "У тебя не получается сбежать." );
+        msgSelf( ch, "You fail to escape.",
+                     "У тебя не получается сбежать.",
+                     "Тобі не вдається втекти." );
         fSuccess = false;
     }
 

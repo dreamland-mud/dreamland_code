@@ -220,7 +220,7 @@ bool Walkment::checkPosition( Character *wch )
 bool Walkment::checkPositionHorse( )
 {
     if (horse->fighting) {
-        msgSelf( ch, "Ты долж%1$Gно|ен|на cперва спешиться." ); 
+        msgSelf( ch, "You must dismount first.", "Ты долж%1$Gно|ен|на cперва спешиться.", "Ти мусиш спершу спішитися." ); 
         return false;
     }
 
@@ -250,13 +250,13 @@ bool Walkment::checkPositionWalkman( )
 {
     if (ch->fighting) {
         rc = RC_MOVE_FIGHTING;
-        msgSelf( ch, "Куда? Ты же сражаешься!" );
+        msgSelf( ch, "Where to? You're fighting!", "Куда? Ты же сражаешься!", "Куди? Ти ж б'єшся!" );
         return false;
     }
     
     if (ch->position < POS_STANDING) {
         rc = RC_MOVE_RESTING;
-        msgSelf( ch, "Исходное положение для ходьбы -- стоя!" );
+        msgSelf( ch, "You must be standing to walk!", "Исходное положение для ходьбы -- стоя!", "Щоб іти, треба стояти!" );
         return false;
     }
 
@@ -379,7 +379,7 @@ bool Walkment::checkGuild( Character *wch )
         if (IS_CHARMED(wch))
             return checkGuild(wch->master);
         else {
-            msgSelf(wch, "Ты не можешь войти в чужую гильдию.");
+            msgSelf(wch, "You can't enter someone else's guild.", "Ты не можешь войти в чужую гильдию.", "Ти не можеш увійти до чужої гільдії.");
             return false;
         }
     }
