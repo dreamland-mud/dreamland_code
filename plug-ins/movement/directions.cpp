@@ -203,19 +203,19 @@ const char * direction_doorname(EXIT_DATA *pexit)
     return pexit->short_descr.get(LANG_DEFAULT).c_str();
 }
 
-DoorName direction_doorname_langtext(EXIT_DATA *pexit, char rcase)
+DoorName direction_doorname_langtext(const XMLMultiString &sd, char rcase)
 {
     DoorName dn;
 
-    if (!pexit || pexit->short_descr.get(LANG_RU).empty()) {
+    if (sd.get(LANG_RU).empty()) {
         dn.en = "door";
         dn.ru = "дверь";
         dn.ua = "двері";
     }
     else {
-        dn.ru = pexit->short_descr.get(LANG_RU);
-        dn.en = pexit->short_descr.get(LANG_EN);
-        dn.ua = pexit->short_descr.get(LANG_UA);
+        dn.ru = sd.get(LANG_RU);
+        dn.en = sd.get(LANG_EN);
+        dn.ua = sd.get(LANG_UA);
         if (dn.en.empty()) dn.en = dn.ru;
         if (dn.ua.empty()) dn.ua = dn.ru;
     }
@@ -225,6 +225,12 @@ DoorName direction_doorname_langtext(EXIT_DATA *pexit, char rcase)
     // russian_case(direction_doorname(), rcase) path byte-for-byte.
     dn.ru = russian_case(dn.ru, rcase);
     return dn;
+}
+
+DoorName direction_doorname_langtext(EXIT_DATA *pexit, char rcase)
+{
+    static const XMLMultiString empty;
+    return direction_doorname_langtext(pexit ? pexit->short_descr : empty, rcase);
 }
 
 exit_data *direction_reverse(Room *room, int door)

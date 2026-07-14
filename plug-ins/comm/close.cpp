@@ -184,8 +184,10 @@ CMDRUNP( close )
         }
 
         SET_BIT(peexit->exit_info, EX_CLOSED);
-        oldact(_("$c1 закрывает $N4."), ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_ROOM);
-        oldact(_("Ты закрываешь $N4."), ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_CHAR);
+        DoorName dn = direction_doorname_langtext(peexit->short_desc_from, '4');
+        LangText doorname = dn.lt();
+        oldact(_("$c1 закрывает $W."), ch, 0, &doorname, TO_ROOM);
+        oldact(_("Ты закрываешь $W."), ch, 0, &doorname, TO_CHAR);
 
         return;
     }        

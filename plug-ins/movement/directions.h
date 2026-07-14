@@ -10,6 +10,7 @@
 
 class Character;
 class Room;
+class XMLMultiString;
 struct exit_data;
 
 struct direction_t {
@@ -83,6 +84,8 @@ struct DoorName {
  *  path byte-for-byte; EN/UA are the exit's own short_descr forms (RU fallback
  *  when empty). */
 DoorName direction_doorname_langtext(exit_data *pexit, char rcase);
+/** Same, from an exit's short_desc_from XMLMultiString (extra/custom exits). */
+DoorName direction_doorname_langtext(const XMLMultiString &shortDesc, char rcase);
 /** Return corresponding exit from the opposite side, but only if it leads back here. */
 exit_data *direction_reverse(Room *room, int door);
 /** Return room this door leads to. */

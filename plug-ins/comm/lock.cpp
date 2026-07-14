@@ -53,14 +53,15 @@ static void lock_door( Character *ch, int door )
             return;
     }
 
-    const char *doorname = direction_doorname(pexit);
+    DoorName dn = direction_doorname_langtext(pexit, '4');
+    LangText doorname = dn.lt();
 
     if (IS_SET(pexit->exit_info, EX_CLOSED)) {
-        ch->pecho(_("Ты запираешь %N4 %O5."), doorname, key);
-        ch->recho(_("%^C1 запирает %N4 %O5."), ch, doorname, key);
+        ch->pecho(_("Ты запираешь %w %O5."), &doorname, key);
+        ch->recho(_("%^C1 запирает %w %O5."), ch, &doorname, key);
     } else {
-        ch->pecho(_("Ты закрываешь %N4 и запираешь %O5."), doorname, key);
-        ch->recho(_("%^C1 закрывает %N4 и запирает %O5."), ch, doorname, key);
+        ch->pecho(_("Ты закрываешь %w и запираешь %O5."), &doorname, key);
+        ch->recho(_("%^C1 закрывает %w и запирает %O5."), ch, &doorname, key);
     }
 
     SET_BIT(pexit->exit_info, EX_LOCKED | EX_CLOSED);
