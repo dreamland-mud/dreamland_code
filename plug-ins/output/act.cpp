@@ -399,13 +399,84 @@ void tell_act( Character *listener, Character *teller,
     oldact( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
 }
 
-void tell_dim( Character *listener, Character *teller, 
+void tell_dim( Character *listener, Character *teller,
                const char *msg, const void *arg )
 {
     ostringstream buf;
 
     buf << "$C1 говорит тебе '{g" << msg << "{x'";
     oldact( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
+}
+
+/****************************************************************************
+ * Trilinguality (Trello 2594): MultiMessage overloads of the speech frames.
+ * Only these localize the FRAME (via lmsg, resolved for the primary recipient)
+ * AND the spoken text (msg.getMessage). The const char* twins above keep the RU
+ * frame verbatim, so an unwrapped caller stays byte-identical RU -- no mixed
+ * EN-frame/RU-content line ever ships.
+ ****************************************************************************/
+void tell_fmt( const MultiMessage &msg, ... )
+{
+    va_list ap, ap0;
+    ostringstream buf;
+    typedef union { Character *ch; } arg_t;
+    arg_t listener;
+
+    va_start( ap, msg );
+    va_copy( ap0, ap );
+    listener = va_arg(ap, arg_t);
+
+    lang_t lg = viewerLang(listener.ch);
+    buf << lmsg(lg, "%2$^C1 tells you '{G", "%2$^C1 говорит тебе '{G", "%2$^C1 каже тобі '{G")
+        << msg.getMessage(lg) << "{x'";
+    listener.ch->vpecho( buf.str( ).c_str( ), ap0 );
+    va_end( ap );
+    va_end( ap0 );
+}
+
+void say_act( Character *listener, Character *teller, const MultiMessage &msg, const void *arg )
+{
+    lang_t lg = viewerLang(listener);
+    ostringstream buf;
+
+    buf << lmsg(lg, "$C1 says '{g", "$C1 произносит '{g", "$C1 промовляє '{g")
+        << msg.getMessage(lg) << "{x'";
+    oldact( buf.str( ).c_str( ), listener, arg, teller, TO_ALL );
+}
+
+void tell_act( Character *listener, Character *teller, const MultiMessage &msg, const void *arg )
+{
+    lang_t lg = viewerLang(listener);
+    ostringstream buf;
+
+    buf << lmsg(lg, "$C1 tells you '{G", "$C1 говорит тебе '{G", "$C1 каже тобі '{G")
+        << msg.getMessage(lg) << "{x'";
+    oldact( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
+}
+
+void tell_dim( Character *listener, Character *teller, const MultiMessage &msg, const void *arg )
+{
+    lang_t lg = viewerLang(listener);
+    ostringstream buf;
+
+    buf << lmsg(lg, "$C1 tells you '{g", "$C1 говорит тебе '{g", "$C1 каже тобі '{g")
+        << msg.getMessage(lg) << "{x'";
+    oldact( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
+}
+
+void tell_raw(Character *ch, NPCharacter *talker, const MultiMessage &format, ...)
+{
+    lang_t lg = viewerLang(ch);
+    va_list ap;
+
+    va_start(ap, format);
+    DLString messageMiddle = vfmt(0, format.getMessage(lg).c_str(), ap);
+    va_end(ap);
+
+    DLString messageStart = fmt(ch, lmsg(lg, "%^C1 tells you '{G", "%^C1 говорит тебе '{G", "%^C1 каже тобі '{G"), talker);
+    DLString messageEnd = "{x'\n\r";
+
+    ch->send_to(messageStart + messageMiddle + messageEnd);
 }
 
 void hint_fmt(Character *ch, const char *format, ...)
