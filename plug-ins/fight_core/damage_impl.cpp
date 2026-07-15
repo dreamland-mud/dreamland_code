@@ -20,6 +20,7 @@
 #include "npcharacter.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(resistance);
 GSN(mental_knife);
@@ -50,21 +51,21 @@ RawDamage::RawDamage( Character *ch, Character *victim, int dam_type, int dam, c
 void RawDamage::message( )
 {
     if( ch == victim ) {
-        msgRoom( "%2$^C1\6себя", dam, ch );
-        msgChar( "Ты\5себя", dam );
+        msgRoom( _("%2$^C1\6себя"), dam, ch );
+        msgChar( _("Ты\5себя"), dam );
         return;
-    } 
+    }
 
     if ( dam == 0 ) {
-       msgRoom( "%2$^C1\6%3$C2", dam, ch, victim); 
-       msgChar( "Ты\5%3$C2", dam, ch, victim);
+       msgRoom( "%2$^C1\6%3$C2", dam, ch, victim);
+       msgChar( _("Ты\5%3$C2"), dam, ch, victim);
     }
     else {
         msgRoom( "%2$^C1\6%3$C4", dam, ch, victim );
-        msgChar( "Ты\5%3$C4", dam, ch, victim );
+        msgChar( _("Ты\5%3$C4"), dam, ch, victim );
     }
 
-    msgVict( "%2$^C1\6тебя", dam, ch );
+    msgVict( _("%2$^C1\6тебя"), dam, ch );
 }
 
 bool RawDamage::canDamage( )
