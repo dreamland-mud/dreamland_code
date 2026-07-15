@@ -860,7 +860,7 @@ static void show_char_wounds( Character *ch, Character *victim, ostringstream &b
         percent = -1;
 
     if (percent >= 100)
-        buf << "{C в прекрасном состоянии";
+        buf << l(ch, "{C в прекрасном состоянии");
     else if (percent >= 90)
         buf << fmt(ch, _("{B име%1$nет|ют несколько царапин"), victim);
     else if (percent >= 75)
@@ -872,7 +872,7 @@ static void show_char_wounds( Character *ch, Character *victim, ostringstream &b
     else if (percent >= 15)
         buf << fmt(ch, _("{M выгляд%1$nит|ят сильно поврежденн%1$Gым|ым|ой|ыми"), victim);
     else if (percent >= 0 )
-        buf << "{R в ужасном состоянии";
+        buf << l(ch, "{R в ужасном состоянии");
     else
         buf << fmt(ch, _("{R истека%1$nет|ют кровью"), victim);
 
