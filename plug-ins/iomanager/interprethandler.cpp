@@ -493,7 +493,6 @@ void InterpretHandler::battlePrompt( Character *ch )
 {
     Character *victim;
     int percent;
-    ostringstream buf;
 
     victim = ch->fighting;
 
@@ -505,26 +504,22 @@ void InterpretHandler::battlePrompt( Character *ch )
     else
         percent = -1;
 
-    buf << "%1$^C1 ";
-
     if( percent >= 100 )
-        buf << "{Cв прекрасном состоянии.{x";
+        ch->pecho( _("%1$^C1 {Cв прекрасном состоянии.{x"), victim );
     else if( percent >= 90 )
-        buf << "{Bиме%1$nет|ют несколько царапин.{x";
+        ch->pecho( _("%1$^C1 {Bиме%1$nет|ют несколько царапин.{x"), victim );
     else if( percent >= 75 )
-        buf << "{Bиме%1$nет|ют несколько небольших синяков и царапин.{x";
+        ch->pecho( _("%1$^C1 {Bиме%1$nет|ют несколько небольших синяков и царапин.{x"), victim );
     else if( percent >= 50 )
-        buf << "{Gиме%1$nет|ют довольно много ран.{x";
+        ch->pecho( _("%1$^C1 {Gиме%1$nет|ют довольно много ран.{x"), victim );
     else if( percent >= 30 )
-        buf << "{Yиме%1$nет|ют несколько больших, опасных ран и царапин.{x";
+        ch->pecho( _("%1$^C1 {Yиме%1$nет|ют несколько больших, опасных ран и царапин.{x"), victim );
     else if( percent >= 15 )
-        buf << "{Mвыгляд%1$nит|ят сильно поврежденн%1$Gым|ым|ой|ыми.{x";
+        ch->pecho( _("%1$^C1 {Mвыгляд%1$nит|ят сильно поврежденн%1$Gым|ым|ой|ыми.{x"), victim );
     else if( percent >= 0 )
-        buf << "{Rв ужасном состоянии.{x";
+        ch->pecho( _("%1$^C1 {Rв ужасном состоянии.{x"), victim );
     else
-        buf << "{Rистека%1$nет|ют кровью.{x";
-
-    ch->pecho( buf.str( ).c_str( ), victim );
+        ch->pecho( _("%1$^C1 {Rистека%1$nет|ют кровью.{x"), victim );
 }
 
 void InterpretHandler::close( Descriptor *d )
