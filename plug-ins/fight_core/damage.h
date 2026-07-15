@@ -8,6 +8,8 @@
 #include <stdarg.h>
 #include "dlstring.h"
 #include "bitstring.h"
+#include "lang.h"
+#include "multimessage.h"
 #include "fight_exception.h"
 #include "eventbus.h"
 
@@ -59,11 +61,20 @@ protected:
     void msgVict( const char *fmt, ... );
     void msgRoom( const char *fmt, ... );
     void msgChar( const char *fmt, ... );
+    // Trilinguality (Trello 2594): MultiMessage overloads. The frame resolves
+    // per recipient in viewerLang(to), and the spliced damage verb resolves in
+    // the same language (RU stays byte-identical -- the RU verb tables live in
+    // C++, EN/UA layer from config/fight/damage_verbs.json with RU fallback).
+    void msgVict( const MultiMessage &fmt, ... );
+    void msgRoom( const MultiMessage &fmt, ... );
+    void msgChar( const MultiMessage &fmt, ... );
     virtual int msgNoSpamBit( );
     bool canSeeMessage(Character *to);
     void msgEcho(Character *to, const char *f, va_list va);
-    void msgOldFormat( bool vs, char *buf );
-    void msgNewFormat( bool vs, char *buf );
+    void msgEcho(Character *to, const MultiMessage &f, va_list va);
+    void msgEchoImpl(Character *to, const DLString &fmt, lang_t lang, va_list va);
+    void msgOldFormat( bool vs, char *buf, lang_t lang );
+    void msgNewFormat( bool vs, char *buf, lang_t lang );
     char msgPunct( );
 
     virtual bool mprog_immune();
