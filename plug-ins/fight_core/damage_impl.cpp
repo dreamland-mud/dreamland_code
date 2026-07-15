@@ -18,9 +18,13 @@
 #include "spell.h"
 #include "skillgroup.h"
 #include "npcharacter.h"
+#include "configurable.h"
+#include "multiinflectedstring.h"
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+
+#include <map>
 
 GSN(resistance);
 GSN(mental_knife);
@@ -96,38 +100,67 @@ int SkillDamage::msgNoSpamBit( )
     return CONFIG_SKILLSPAM;
 }
 
+/*-----------------------------------------------------------------------------
+ * Trilingual skill damage nouns (Trello 2594)
+ *
+ * A skill's damage noun (dammsg, e.g. "струя кислоты") is stored RU-only as an
+ * XMLInflectedString. The en/ua forms live in config/fight/skill_dammsg.json,
+ * keyed by the RU fullForm; a skill with no entry falls back to RU. Same engine
+ * (MultiInflectedString) as the attack_table nouns in onehit_undef.cpp.
+ *----------------------------------------------------------------------------*/
+static std::map<DLString, std::pair<DLString, DLString> > skillDammsg;
+
+CONFIGURABLE_LOADED(fight, skill_dammsg)
+{
+    skillDammsg.clear();
+    Json::Value::Members keys = value.getMemberNames();
+    for (Json::Value::Members::const_iterator k = keys.begin(); k != keys.end(); k++) {
+        const Json::Value &v = value[*k];
+        skillDammsg[DLString(k->c_str())] = std::make_pair(
+            DLString(v["en"].asString().c_str()), DLString(v["ua"].asString().c_str()));
+    }
+}
+
 void SkillDamage::message( )
 {
-    const InflectedString &attack = skillManager->find(sn)->getDammsg( );
+    const InflectedString &dammsg = skillManager->find(sn)->getDammsg( );
+
+    DLString en, ua;
+    std::map<DLString, std::pair<DLString, DLString> >::const_iterator i = skillDammsg.find(dammsg.getFullForm());
+    if (i != skillDammsg.end()) {
+        en = i->second.first;
+        ua = i->second.second;
+    }
+    MultiInflectedString attack(dammsg.getFullForm(), en, ua, dammsg.getMultiGender());
 
     if (immune) {
         if (ch == victim) {
-            msgRoom("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %3$P4 сам%3$Gого|ого|ой|их", dam, &attack, ch);
-            msgChar("Тебе повезло, у тебя иммунитет к этому", dam);
+            msgRoom(_("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %3$P4 сам%3$Gого|ого|ой|их"), dam, &attack, ch);
+            msgChar(_("Тебе повезло, у тебя иммунитет к этому"), dam);
         }
         else {
-            msgRoom("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %4$C2", dam, &attack, ch, victim);
-            msgChar("%2$^T1 %2$O1 бессил%2$Gьно|ен|ьна|ьны против %3$C2", dam, &attack, victim);
-            msgVict("Против тебя %3$O1 %2$C2 бессил%3$Gьно|ен|ьна|ьны", dam, ch, &attack);
+            msgRoom(_("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %4$C2"), dam, &attack, ch, victim);
+            msgChar(_("%2$^T1 %2$O1 бессил%2$Gьно|ен|ьна|ьны против %3$C2"), dam, &attack, victim);
+            msgVict(_("Против тебя %3$O1 %2$C2 бессил%3$Gьно|ен|ьна|ьны"), dam, ch, &attack);
         }
     }
     else {
         if (ch == victim) {
-            msgRoom( "%2$^O1 %3$C2\6%3$P2", dam, &attack, ch );
-            msgChar( "%2$^T1 %2$O1\6тебя", dam, &attack );
+            msgRoom( _("%2$^O1 %3$C2\6%3$P2"), dam, &attack, ch );
+            msgChar( _("%2$^T1 %2$O1\6тебя"), dam, &attack );
         }
         else {
             if ( dam == 0 )
             {
-                msgRoom( "%2$^O1 %3$C2\6%4$C2", dam, &attack, ch, victim );
-                msgChar( "%2$^T1 %2$O1\6%3$C2", dam, &attack, victim );
+                msgRoom( _("%2$^O1 %3$C2\6%4$C2"), dam, &attack, ch, victim );
+                msgChar( _("%2$^T1 %2$O1\6%3$C2"), dam, &attack, victim );
             }
             else {
-                msgRoom( "%2$^O1 %3$C2\6%4$C4", dam, &attack, ch, victim );
-                msgChar( "%2$^T1 %2$O1\6%3$C4", dam, &attack, victim );
+                msgRoom( _("%2$^O1 %3$C2\6%4$C4"), dam, &attack, ch, victim );
+                msgChar( _("%2$^T1 %2$O1\6%3$C4"), dam, &attack, victim );
             }
 
-            msgVict( "%2$^O1 %3$C2\6тебя", dam, &attack, ch );
+            msgVict( _("%2$^O1 %3$C2\6тебя"), dam, &attack, ch );
         }
     }
 }
