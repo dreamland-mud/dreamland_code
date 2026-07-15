@@ -40,6 +40,7 @@
 #include "act.h"
 
 #include "configurable.h"
+#include "multiinflectedstring.h"
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"
@@ -317,39 +318,6 @@ CONFIGURABLE_LOADED(fight, attack_nouns)
 {
     attackNouns.fromJson(value);
 }
-
-// A noun that declines in the recipient's display language. Derives from
-// InflectedString, so the act %O/%C/%T/%G machinery treats it as an ordinary
-// noun arg. toNoun(forWhom) picks the form by viewerLang(forWhom): RU (or an
-// empty en/ua) -> the RU InflectedString (byte-identical); EN -> a caseless
-// single form ("=en", every Case yields en); UA -> the ua string as an
-// InflectedString fullForm (Flexer-declined, or "=..|.." explicit for irregulars).
-class MultiInflectedString : public InflectedString {
-public:
-    MultiInflectedString(const DLString &ru, const DLString &en, const DLString &ua,
-                         const Grammar::MultiGender &mg)
-        : InflectedString(ru, mg), enForm(en), uaForm(ua)
-    {
-    }
-
-    virtual Grammar::NounHolder::NounPointer toNoun(const DLObject *forWhom = 0, int flags = 0) const
-    {
-        lang_t lang = LANG_RU;
-        const Character *wch = dynamic_cast<const Character *>(forWhom);
-        if (wch)
-            lang = viewerLang(wch);
-
-        if (lang == LANG_EN && !enForm.empty())
-            return InflectedString::Pointer(NEW, DLString("=") + enForm, getMultiGender());
-        if (lang == LANG_UA && !uaForm.empty())
-            return InflectedString::Pointer(NEW, uaForm, getMultiGender());
-
-        return InflectedString::toNoun(forWhom, flags);
-    }
-
-private:
-    DLString enForm, uaForm;
-};
 
 void UndefinedOneHit::message( )
 {
