@@ -39,6 +39,7 @@
 #include "profflags.h"
 #include "act.h"
 
+#include "configurable.h"
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"
@@ -294,38 +295,99 @@ void UndefinedOneHit::damEffectVorpal()
     throw VictimDeathException( );
 }
 
+/*-----------------------------------------------------------------------------
+ * Trilingual attack nouns (Trello 2594)
+ *
+ * attack_table keeps the RU noun (byte-identical); en/ua forms live in
+ * config/fight/attack_nouns.json, indexed 1:1 with attack_table. A RU viewer --
+ * or any viewer with a missing en/ua cell -- gets the RU InflectedString exactly
+ * as before, so this is zero-regression.
+ *----------------------------------------------------------------------------*/
+struct AttackNounRow {
+    DLString en, ua;
+    void fromJson(const Json::Value &v)
+    {
+        en = v["en"].asString();
+        ua = v["ua"].asString();
+    }
+};
+static json_vector<AttackNounRow> attackNouns;
+
+CONFIGURABLE_LOADED(fight, attack_nouns)
+{
+    attackNouns.fromJson(value);
+}
+
+// A noun that declines in the recipient's display language. Derives from
+// InflectedString, so the act %O/%C/%T/%G machinery treats it as an ordinary
+// noun arg. toNoun(forWhom) picks the form by viewerLang(forWhom): RU (or an
+// empty en/ua) -> the RU InflectedString (byte-identical); EN -> a caseless
+// single form ("=en", every Case yields en); UA -> the ua string as an
+// InflectedString fullForm (Flexer-declined, or "=..|.." explicit for irregulars).
+class MultiInflectedString : public InflectedString {
+public:
+    MultiInflectedString(const DLString &ru, const DLString &en, const DLString &ua,
+                         const Grammar::MultiGender &mg)
+        : InflectedString(ru, mg), enForm(en), uaForm(ua)
+    {
+    }
+
+    virtual Grammar::NounHolder::NounPointer toNoun(const DLObject *forWhom = 0, int flags = 0) const
+    {
+        lang_t lang = LANG_RU;
+        const Character *wch = dynamic_cast<const Character *>(forWhom);
+        if (wch)
+            lang = viewerLang(wch);
+
+        if (lang == LANG_EN && !enForm.empty())
+            return InflectedString::Pointer(NEW, DLString("=") + enForm, getMultiGender());
+        if (lang == LANG_UA && !uaForm.empty())
+            return InflectedString::Pointer(NEW, uaForm, getMultiGender());
+
+        return InflectedString::toNoun(forWhom, flags);
+    }
+
+private:
+    DLString enForm, uaForm;
+};
+
 void UndefinedOneHit::message( )
 {
-    InflectedString noun(attack_table[attack].noun,
-                       attack_table[attack].gender);
+    DLString en, ua;
+    if (attack >= 0 && attack < (int)attackNouns.size()) {
+        en = attackNouns[attack].en;
+        ua = attackNouns[attack].ua;
+    }
+    MultiInflectedString noun(attack_table[attack].noun, en, ua,
+                              attack_table[attack].gender);
 
     if (immune) {
         if (ch == victim) {
-            msgRoom("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %3$P4 сам%3$Gого|ого|ой|их", dam, &noun, ch);
-            msgChar("Тебе повезло, у тебя иммунитет к этому", dam);
+            msgRoom(_("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %3$P4 сам%3$Gого|ого|ой|их"), dam, &noun, ch);
+            msgChar(_("Тебе повезло, у тебя иммунитет к этому"), dam);
         }
         else {
-            msgRoom("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %4$C2", dam, &noun, ch, victim);
-            msgChar("%2$^T1 %2$O1 бессил%2$Gьно|ен|ьна|ьны против %3$C2", dam, &noun, victim);
-            msgVict("Против тебя %3$O1 %2$C2 бессил%3$Gьно|ен|ьна", dam, ch, &noun);
+            msgRoom(_("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %4$C2"), dam, &noun, ch, victim);
+            msgChar(_("%2$^T1 %2$O1 бессил%2$Gьно|ен|ьна|ьны против %3$C2"), dam, &noun, victim);
+            msgVict(_("Против тебя %3$O1 %2$C2 бессил%3$Gьно|ен|ьна"), dam, ch, &noun);
         }
     }
     else {
         if (ch == victim) {
-            msgRoom( "%2$^O1 %3$C2\6себя", dam, &noun, ch );
-            msgChar( "%2$^T1 %2$O1\6тебя", dam, &noun );
+            msgRoom( _("%2$^O1 %3$C2\6себя"), dam, &noun, ch );
+            msgChar( _("%2$^T1 %2$O1\6тебя"), dam, &noun );
         }
         else {
             if ( dam == 0 )
             {
-                msgRoom( "%2$^O1 %3$C2\6%4$C2", dam, &noun, ch, victim );
-                msgChar( "%2$^T1 %2$O1\6%3$C2", dam, &noun, victim );
+                msgRoom( _("%2$^O1 %3$C2\6%4$C2"), dam, &noun, ch, victim );
+                msgChar( _("%2$^T1 %2$O1\6%3$C2"), dam, &noun, victim );
             }
             else {
-                msgRoom( "%2$^O1 %3$C2\6%4$C4", dam, &noun, ch, victim );
-                msgChar( "%2$^T1 %2$O1\6%3$C4", dam, &noun, victim );
+                msgRoom( _("%2$^O1 %3$C2\6%4$C4"), dam, &noun, ch, victim );
+                msgChar( _("%2$^T1 %2$O1\6%3$C4"), dam, &noun, victim );
             }
-            msgVict( "%2$^O1 %3$C2\6тебя", dam, &noun, ch );
+            msgVict( _("%2$^O1 %3$C2\6тебя"), dam, &noun, ch );
         }
     }
 }
