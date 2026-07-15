@@ -39,6 +39,7 @@
 #include "profflags.h"
 #include "immunity.h"
 #include "material.h"
+#include "configurable.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -579,6 +580,58 @@ void Damage::handleDeath( )
 
 
 /*-----------------------------------------------------------------------------
+ * Trilinguality (Trello 2594): EN/UA damage verbs
+ *
+ * The RU severity verbs stay in the C++ relTable/msgTable arrays below
+ * (byte-identical -- RU viewers are untouched). This layer carries ONLY the
+ * en/ua columns, loaded from config/fight/damage_verbs.json, indexed 1:1 with
+ * relTable ("new") and msgTable ("old"); "missNew" holds the two dam==0 verbs
+ * that the new format keeps outside relTable. An empty en/ua cell (or an
+ * absent file) falls back to the RU verb, so this is zero-regression until the
+ * catalog is populated. plug-reload-able.
+ *----------------------------------------------------------------------------*/
+struct DamageVerbRow {
+    DLString vsEn, vsUa, vpEn, vpUa;
+    void fromJson(const Json::Value &v)
+    {
+        vsEn = v["vs"]["en"].asString();
+        vsUa = v["vs"]["ua"].asString();
+        vpEn = v["vp"]["en"].asString();
+        vpUa = v["vp"]["ua"].asString();
+    }
+};
+static json_vector<DamageVerbRow> damageVerbsNew;
+static json_vector<DamageVerbRow> damageVerbsOld;
+static DamageVerbRow damageMissNew;
+
+CONFIGURABLE_LOADED(fight, damage_verbs)
+{
+    damageVerbsNew.fromJson(value["new"]);
+    damageVerbsOld.fromJson(value["old"]);
+    damageMissNew.fromJson(value["missNew"]);
+}
+
+// Resolve one verb form (vs=2nd person / vp=3rd person) of a single row for
+// `lang`. RU -- and any empty en/ua cell -- returns the RU fallback verbatim.
+static const char * resolveVerb(const DamageVerbRow &row, bool vs, lang_t lang, const char *ruFallback)
+{
+    if (lang == LANG_RU)
+        return ruFallback;
+    const DLString &s = (lang == LANG_EN) ? (vs ? row.vsEn : row.vpEn)
+                                          : (vs ? row.vsUa : row.vpUa);
+    return s.empty() ? ruFallback : s.c_str();
+}
+
+// Same, for a verb at row index `idx` of a loaded table (bounds-checked).
+static const char * localizeVerb(const json_vector<DamageVerbRow> &table,
+                                 int idx, bool vs, lang_t lang, const char *ruFallback)
+{
+    if (lang == LANG_RU || idx < 0 || idx >= (int)table.size())
+        return ruFallback;
+    return resolveVerb(table[idx], vs, lang, ruFallback);
+}
+
+/*-----------------------------------------------------------------------------
  * Damage reporting: new messages
  *----------------------------------------------------------------------------*/
 
@@ -613,13 +666,13 @@ static void drawRushechki(char *buf, const char *msg, const char *art, char colo
     *buf++ = 0;
 }
 
-void Damage::msgNewFormat( bool vs, char *buf )
+void Damage::msgNewFormat( bool vs, char *buf, lang_t lang )
 {
     static const struct {
         int dam;
         char color;
         const char *art;
-    } absTable [] = 
+    } absTable [] =
     {
       {   0,  'r', " "                     },
       {   4,  'r', " "                     },
@@ -690,18 +743,20 @@ void Damage::msgNewFormat( bool vs, char *buf )
     for (j = 0; relTable[j].perc >= 0 && perc > relTable[j].perc; j++)
         ;
 
-    if(dam == 0)
-        strcpy(buf, vs ? " не можешь пробить защиту " : " промахива%2$nется|ются мимо ");
+    if(dam == 0) {
+        const char *ru = vs ? " не можешь пробить защиту " : " промахива%2$nется|ются мимо ";
+        strcpy(buf, resolveVerb(damageMissNew, vs, lang, ru));
+    }
     else
-        drawRushechki(buf, 
-                vs ? relTable[j].vs : relTable[j].vp, 
+        drawRushechki(buf,
+                localizeVerb(damageVerbsNew, j, vs, lang, vs ? relTable[j].vs : relTable[j].vp),
                 absTable[i].art, absTable[i].color);
 }
 
 /*-----------------------------------------------------------------------------
  * Damage reporting: old messages
  *----------------------------------------------------------------------------*/
-void Damage::msgOldFormat( bool vs, char *buf )
+void Damage::msgOldFormat( bool vs, char *buf, lang_t lang )
 {
     static const struct {
         int dam;
@@ -745,8 +800,8 @@ void Damage::msgOldFormat( bool vs, char *buf )
     for (i = 0; msgTable[i].dam >= 0 && dam > msgTable[i].dam; i++)
         ;
 
-    drawRushechki(buf, 
-            vs ? msgTable[i].vs : msgTable[i].vp, 
+    drawRushechki(buf,
+            localizeVerb(damageVerbsOld, i, vs, lang, vs ? msgTable[i].vs : msgTable[i].vp),
             msgTable[i].art, msgTable[i].color);
 }
 
@@ -783,45 +838,55 @@ bool Damage::canSeeMessage(Character *to)
     return true;
 }
 
-void Damage::msgEcho(Character *to, const char *fmt, va_list va)
+// Shared body: `fmt` is already resolved to the recipient's language, `lang`
+// selects the spliced damage verbs. Both msgEcho overloads funnel here.
+void Damage::msgEchoImpl(Character *to, const DLString &fmt, lang_t lang, va_list va)
 {
-    if (!canSeeMessage(to))
-        return;
-
     ostringstream buf;
-    const char *v;
     char damVs[256], damVp[256];
-    
-    if(to->getPC() && IS_SET(to->getPC()->config, CONFIG_NEWDAMAGE)) {
-        msgNewFormat(true, damVs);
-        msgNewFormat(false, damVp);
+
+    PCharacter *pc = to->getPC();
+    bool newdmg = pc && IS_SET(pc->config, CONFIG_NEWDAMAGE);
+
+    if (newdmg) {
+        msgNewFormat(true, damVs, lang);
+        msgNewFormat(false, damVp, lang);
     } else {
-        msgOldFormat(true, damVs);
-        msgOldFormat(false, damVp);
+        msgOldFormat(true, damVs, lang);
+        msgOldFormat(false, damVp, lang);
     }
 
-    for(; *fmt; fmt++)
-        switch(*fmt) {
-        case '\5':
-            for(v=damVs;*v;v++)
-                buf << *v;
-            break;
-        case '\6':
-            for(v=damVp;*v;v++)
-                buf << *v;
-            break;
-        default:
-            buf << *fmt;
+    for (const char *f = fmt.c_str(); *f; f++)
+        switch (*f) {
+        case '\5': buf << damVs; break;
+        case '\6': buf << damVp; break;
+        default:   buf << *f;
         }
 
     buf << msgPunct();
 
     // show explicit damage numbers for old damage config
     // not for newbies -- not enabled by default
-    if(to->getPC() && !IS_SET(to->getPC()->config, CONFIG_NEWDAMAGE))
-         buf << " {D[{Y%1$d{D]{x";
+    if (pc && !newdmg)
+        buf << " {D[{Y%1$d{D]{x";
 
     to->vpecho(buf.str().c_str(), va);
+}
+
+void Damage::msgEcho(Character *to, const char *fmt, va_list va)
+{
+    if (!canSeeMessage(to))
+        return;
+    // Verbs still localize to the viewer even for a RU-literal frame.
+    msgEchoImpl(to, fmt, viewerLang(to), va);
+}
+
+void Damage::msgEcho(Character *to, const MultiMessage &fmt, va_list va)
+{
+    if (!canSeeMessage(to))
+        return;
+    lang_t lg = viewerLang(to);
+    msgEchoImpl(to, fmt.getMessage(lg), lg, va);
 }
 
 void Damage::msgChar( const char *fmt, ... )
@@ -846,12 +911,47 @@ void Damage::msgRoom( const char *fmt, ... )
 {
     Character *rch;
     va_list va;
-    
+
     va_start(va, fmt);
 
     for(rch = ch->in_room->people; rch; rch = rch->next_in_room)
-        if(rch != victim && rch != ch) 
+        if(rch != victim && rch != ch)
             msgEcho(rch, fmt, va);
-            
+
+    va_end(va);
+}
+
+/* Trilinguality (Trello 2594): MultiMessage twins -- the frame resolves per
+ * recipient in msgEcho, so a _()-wrapped message() gets a localized frame and
+ * verb. The const char* twins above stay RU-frame (verb still localizes). */
+void Damage::msgChar( const MultiMessage &fmt, ... )
+{
+    va_list va;
+
+    va_start(va, fmt);
+    msgEcho(ch, fmt, va);
+    va_end(va);
+}
+
+void Damage::msgVict( const MultiMessage &fmt, ... )
+{
+    va_list va;
+
+    va_start(va, fmt);
+    msgEcho(victim, fmt, va);
+    va_end(va);
+}
+
+void Damage::msgRoom( const MultiMessage &fmt, ... )
+{
+    Character *rch;
+    va_list va;
+
+    va_start(va, fmt);
+
+    for(rch = ch->in_room->people; rch; rch = rch->next_in_room)
+        if(rch != victim && rch != ch)
+            msgEcho(rch, fmt, va);
+
     va_end(va);
 }
