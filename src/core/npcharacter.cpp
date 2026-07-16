@@ -249,9 +249,17 @@ Noun::Pointer NPCharacter::toNoun( const DLObject *forWhom, int flags ) const
         if (wch && !wch->can_see( this ))
             return somebody;
     }
-    
-    // TODO take lang from forWhom
-    return cachedNouns.find(LANG_DEFAULT)->second;
+
+    // Render the mob name in the viewer's display language, mirroring
+    // PCharacter::toNoun and getNameP(gram_case, lang). cachedNouns is
+    // populated for every language by updateCachedNouns; fall back to
+    // LANG_DEFAULT (== RU) when the viewer's language is unknown (null/NPC
+    // forWhom), keeping RU output byte-identical.
+    lang_t lang = viewerLang( wch );
+    auto i = cachedNouns.find( lang );
+    if (i == cachedNouns.end())
+        i = cachedNouns.find( LANG_DEFAULT );
+    return i->second;
 }
 
 void NPCharacter::updateCachedNouns()
