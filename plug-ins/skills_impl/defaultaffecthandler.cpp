@@ -10,6 +10,7 @@
 #include "object.h"
 #include "merc.h"
 #include "act.h"
+#include "l10n.h"
 #include "def.h"
 
 DefaultAffectHandler::DefaultAffectHandler( )
@@ -43,10 +44,10 @@ void DefaultAffectHandler::unsetSkill( )
 void DefaultAffectHandler::remove( Character *ch )
 {
     if (!removeCharSelf.empty( ))
-        ch->pecho( POS_DEAD, removeCharSelf.c_str( ), ch );
-        
+        ch->pecho( POS_DEAD, _(removeCharSelf.c_str( )), ch );
+
     if (!removeCharOthers.empty( ))
-        ch->recho( removeCharOthers.c_str( ), ch );
+        ch->recho( _(removeCharOthers.c_str( )), ch );
 }
 
 void DefaultAffectHandler::remove( Object *obj )
@@ -54,17 +55,17 @@ void DefaultAffectHandler::remove( Object *obj )
     if (removeObj.empty( ))
         return;
 
-    if (obj->carried_by != 0) 
-        obj->carried_by->pecho( removeObj.c_str( ), obj );
+    if (obj->carried_by != 0)
+        obj->carried_by->pecho( _(removeObj.c_str( )), obj );
 
     if (obj->in_room != 0)
-        obj->in_room->echo( POS_RESTING, removeObj.c_str( ), obj );
+        obj->in_room->echo( POS_RESTING, _(removeObj.c_str( )), obj );
 }
 
 void DefaultAffectHandler::remove( Room * room )
 {
     if (!removeRoom.empty( ))
-        room->echo( POS_RESTING, removeRoom.c_str( ) );
+        room->echo( POS_RESTING, _(removeRoom.c_str( )) );
 }
 
 void DefaultAffectHandler::dispel( Character *ch )
