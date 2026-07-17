@@ -45,7 +45,7 @@ static DLString show_money( int g, int s )
 
 static DLString show_experience( PCharacter *ch )
 {
-    return fmt( NULL, _("У тебя %1$d очк%1$Iо|а|ов опыта. "
+    return fmt( ch, _("У тебя %1$d очк%1$Iо|а|ов опыта. "
                "До следующего уровня осталось %2$d очк%2$Iо|а|ов из %3$d."),
                ch->exp.getValue( ),
                ch->getExpToLevel( ),
@@ -116,13 +116,13 @@ static void score_prose( Character *ch )
     Room *room = 0;
     PCharacter *pch = ch->getPC( );
 
-    buf << fmt( 0, _("Ты {W%1$s%2$s{x, уровень {C%3$d{w"),
+    buf << fmt( ch, _("Ты {W%1$s%2$s{x, уровень {C%3$d{w"),
                    ch->seeName( ch, '1' ).c_str( ),
                    ch->is_npc( ) ? "" : Player::title(ch->getPC( ), Player::displayLang(ch)).c_str( ),
                    ch->getRealLevel( ));
     
     if (!ch->is_npc( ))
-        buf << fmt( 0, _(", тебе %1$d %1$Iгод|года|лет (%2$d ча%2$Iс|са|сов)."),
+        buf << fmt( ch, _(", тебе %1$d %1$Iгод|года|лет (%2$d ча%2$Iс|са|сов)."),
                         pch->age.getYears( ), pch->age.getHours( ) ); 
     
     buf << endl;
@@ -141,22 +141,22 @@ static void score_prose( Character *ch )
         room = get_room_instance( ROOM_VNUM_TEMPLE );
     
     buf << "  {wДом:{W " << (room ? room->areaName().c_str() : "Потерян" ) << "{x" << endl
-        << fmt(0, _("У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r"),
+        << fmt(ch, _("У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r"),
                     ch->hit.getValue( ), ch->max_hit.getValue( ), 
                     ch->mana.getValue( ), ch->max_mana.getValue( ), 
                     ch->move.getValue( ), ch->max_move.getValue( ));
     
     if (!ch->is_npc( )) 
-        buf << fmt( 0, _("У тебя {Y%1$d{x практи%1$Iка|ки|к и {Y%2$d{x тренировочн%2$Iая|ые|ых сесси%2$Iя|и|й."),
+        buf << fmt( ch, _("У тебя {Y%1$d{x практи%1$Iка|ки|к и {Y%2$d{x тренировочн%2$Iая|ые|ых сесси%2$Iя|и|й."),
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
-    buf << fmt(0, _("Ты несешь {W%d/%d{x вещей с весом {W%d/%d{x фунтов.\n\r"),
+    buf << fmt(ch, _("Ты несешь {W%d/%d{x вещей с весом {W%d/%d{x фунтов.\n\r"),
                 ch->carry_number, Char::canCarryNumber(ch),
                 Char::getCarryWeight(ch)/10, Char::canCarryWeight(ch)/10 );
 
     if (ch->is_npc( )) {
-        buf << fmt(0, 
+        buf << fmt(ch, 
             _("Твои параметры: исходные, (текущие)\n\r"
             "      Сила : %d(%d)    Интеллект : %d(%d)\n\r"
             "  Мудрость : %d(%d)     Ловкость : %d(%d)\n\r"
@@ -169,7 +169,7 @@ static void score_prose( Character *ch )
             ch->perm_stat[STAT_CHA], ch->getCurrStat(STAT_CHA) );
 
     } else {
-        buf << fmt(0, 
+        buf << fmt(ch, 
             _("Твои параметры: исходные, {c({Wтекущие{c){x, [{Cмаксимальные{x]\n\r"
             "      Сила: %d{c({W%d{c){x [{C%d{x]   Интеллект: %d{c({W%d{c){x [{C%d{x]\n\r"
             "  Мудрость: %d{c({W%d{c){x [{C%d{x]    Ловкость: %d{c({W%d{c){x [{C%d{x]\n\r"
@@ -183,13 +183,13 @@ static void score_prose( Character *ch )
 
     }
 
-    buf << fmt(0, _("У тебя {W%d{x очков опыта, и %s\n\r"),
+    buf << fmt(ch, _("У тебя {W%d{x очков опыта, и %s\n\r"),
                   ch->exp.getValue( ),
                   show_money( ch->gold, ch->silver ).c_str( ) );
 
     /* KIO shows exp to level */
     if (!ch->is_npc() && ch->getRealLevel( ) < LEVEL_HERO - 1)
-        buf << fmt(0, _("Тебе нужно набрать {W%d{x очков опыта до следующего уровня.\n\r"),
+        buf << fmt(ch, _("Тебе нужно набрать {W%d{x очков опыта до следующего уровня.\n\r"),
                     ch->getPC()->getExpToLevel( ) );
 
     if (!ch->is_npc( )) {
@@ -197,12 +197,12 @@ static void score_prose( Character *ch )
         int qtime = qd ? qd->getTime( ) : 0;
         bool hasQuest = pch->getAttributes( ).isAvailable( "quest" );
         
-        buf << fmt( 0, _("У тебя {Y%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. "),
+        buf << fmt( ch, _("У тебя {Y%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. "),
                        pch->getQuestPoints() );
         if (qtime == 0)
             buf << "У тебя сейчас нет задания.";
         else
-            buf << fmt( 0, _("До %1$s квеста осталось {Y%2$d{x ти%2$Iк|ка|ков."),
+            buf << fmt( ch, _("До %1$s квеста осталось {Y%2$d{x ти%2$Iк|ка|ков."),
                        hasQuest ? "конца" : "следующего",
                        qtime );
 
@@ -212,24 +212,24 @@ static void score_prose( Character *ch )
 
         if (ch->getProfession( ) != prof_samurai) {
             if (ch->wimpy > 0) {
-                buf << fmt(0, _("Ты попытаешься убежать при %d жизни.  "), ch->wimpy.getValue( ) );
+                buf << fmt(ch, _("Ты попытаешься убежать при %d жизни.  "), ch->wimpy.getValue( ) );
                 newline = true;
             }
         } else {
             if (ch->getPC()->death > 0)
-                buf << fmt(0, _("Тебя убили уже {r%1$d{x ра%1$Iз|за|з."), ch->getPC()->death.getValue());
+                buf << fmt(ch, _("Тебя убили уже {r%1$d{x ра%1$Iз|за|з."), ch->getPC()->death.getValue());
             else
                 buf << "Тебя еще ни разу не убивали.";
             newline = true;
         }
         
         if (ch->getPC()->guarding != 0) {
-            buf << fmt(0, _("Ты охраняешь: %s. "), ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
+            buf << fmt(ch, _("Ты охраняешь: %s. "), ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
             newline = true;
         }
 
         if (ch->getPC()->guarded_by != 0) {
-            buf << fmt(0, _("Ты охраняешься: %s."), ch->seeName( ch->getPC()->guarded_by, '5' ).c_str( ) );
+            buf << fmt(ch, _("Ты охраняешься: %s."), ch->seeName( ch->getPC()->guarded_by, '5' ).c_str( ) );
             newline = true;
         }
         
@@ -262,15 +262,15 @@ static void score_prose( Character *ch )
     buf << endl;
 
     /* print AC values */
-    buf << fmt(0, _("Защита от укола {W%d{x, от удара {W%d{x, от разрезания {W%d{x, от экзотики {W%d{x.\n\r"),
+    buf << fmt(ch, _("Защита от укола {W%d{x, от удара {W%d{x, от разрезания {W%d{x, от экзотики {W%d{x.\n\r"),
             GET_AC(ch,AC_PIERCE),
             GET_AC(ch,AC_BASH),
             GET_AC(ch,AC_SLASH),
             GET_AC(ch,AC_EXOTIC));
-    buf << fmt(0, _("Точность: {C%d{x  Урон: {C%d{x  Защита от заклинаний: {C%d{x\n\r"),
+    buf << fmt(ch, _("Точность: {C%d{x  Урон: {C%d{x  Защита от заклинаний: {C%d{x\n\r"),
                 ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
 
-    buf << fmt(0, _("У тебя %s натура.  "), align_name( ch ).ruscase( '1' ).c_str( ) );
+    buf << fmt(ch, _("У тебя %s натура.  "), align_name( ch ).ruscase( '1' ).c_str( ) );
     
     switch (ch->ethos.getValue( )) {
     case ETHOS_LAWFUL:
@@ -292,15 +292,15 @@ static void score_prose( Character *ch )
     
     if (!ch->is_npc( )) {
         if (ch->getReligion( ) == god_none)
-            buf << fmt(0, _("Ты не определил%Gось|ся|ась с выбором религии.  "), ch);
+            buf << fmt(ch, _("Ты не определил%Gось|ся|ась с выбором религии.  "), ch);
         else
-            buf << fmt(0, _("Твоя религия: {C%s{x.  "), ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
+            buf << fmt(ch, _("Твоя религия: {C%s{x.  "), ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
         
-        buf << fmt(0, _("Твои заслуги перед законом:  %d.\n\r"), ch->getPC( )->getLoyalty());
+        buf << fmt(ch, _("Твои заслуги перед законом:  %d.\n\r"), ch->getPC( )->getLoyalty());
 
         auto killed = ch->getPC()->getAttributes().getAttr<XMLKillingAttribute>("killed");
 
-       buf << fmt(0, _("Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей.\n\r"),
+       buf << fmt(ch, _("Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей.\n\r"),
                         ch, 
                         killed->align[N_ALIGN_GOOD], "добрых",
                         killed->align[N_ALIGN_NEUTRAL], "нейтральных",
@@ -309,7 +309,7 @@ static void score_prose( Character *ch )
     
     /* RT wizinvis and holy light */
     if (ch->is_immortal( )) 
-        buf << fmt(0, _("Божественный взор %s. Невидимость %d уровня, инкогнито %d уровня."),
+        buf << fmt(ch, _("Божественный взор %s. Невидимость %d уровня, инкогнито %d уровня."),
                    (IS_SET(ch->act, PLR_HOLYLIGHT) ? "включен" : "выключен"),
                    ch->getPC( )->invis_level.getValue( ),
                    ch->getPC( )->incog_level.getValue( ) )
@@ -325,7 +325,7 @@ static void score_prose( Character *ch )
     }
 
     if (IS_GHOST(ch)) {
-        buf << fmt(0, _("{xТы призрак и обретёшь плоть через {Y%1$d {xсекун%1$Iду|ды|д."),
+        buf << fmt(ch, _("{xТы призрак и обретёшь плоть через {Y%1$d {xсекун%1$Iду|ды|д."),
                  pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()))
         << endl;
     }
