@@ -958,18 +958,24 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
     if (!fBrief) 
         show_char_description( ch, vict );
 
+    // ch->sees() already yields the mount/rider name in the viewer's language
+    // and grammatical case (toNoun+decline); only the connecting prose needs l10n.
+    lang_t lang = Player::lang(ch);
+
     if (MOUNTED(vict))
-        buf << ch->sees( vict, '1' ) << " верхом на " 
-            << (ch == vict->mount ? "тебе" : ch->sees( MOUNTED( vict ), '6' ))
+        buf << ch->sees( vict, '1' )
+            << lmsg(lang, " riding ", " верхом на ", " верхи на ")
+            << (ch == vict->mount ? lmsg(lang, "you", "тебе", "тобі")
+                                  : ch->sees( MOUNTED( vict ), '6' ))
             << endl;
 
     if (RIDDEN(vict)) {
         buf << ch->sees( vict, '1' );
 
         if (ch == vict->mount)
-            buf << " под твоим седлом";
+            buf << lmsg(lang, " with you in the saddle", " под твоим седлом", " під твоїм сідлом");
         else
-            buf << " под седлом, в котором сидит " 
+            buf << lmsg(lang, " under a saddle, ridden by ", " под седлом, в котором сидит ", " під сідлом, в якому сидить ")
                 << ch->sees( RIDDEN( vict ), '1' );
         buf << "." << endl;
     }
@@ -1096,11 +1102,27 @@ static void show_people_to_char( Character *list, Character *ch, bool fShowMount
         }
     }
 
-    if (life_count && CAN_DETECT(ch, DETECT_LIFE))
-        ch->pecho( _("Ты чувствуешь присутствие %d жизненн%s форм%s в комнате."),
-                    life_count,
-                    GET_COUNT(life_count, "ой", "ых", "ых"),
-                    GET_COUNT(life_count, "ы", "", ""));
+    // Per-language plural: the RU/UA endings injected via %s (GET_COUNT) don't map
+    // onto EN, so branch on the viewer's language instead of a shared catalog entry.
+    if (life_count && CAN_DETECT(ch, DETECT_LIFE)) {
+        switch (Player::lang(ch)) {
+        case LANG_EN:
+            ch->pecho( "You sense the presence of %d life form%s in the room.",
+                        life_count, life_count == 1 ? "" : "s" );
+            break;
+        case LANG_UA:
+            ch->pecho( "Ти відчуваєш присутність %d життєв%s форм%s у кімнаті.",
+                        life_count,
+                        GET_COUNT(life_count, "ої", "их", "их"),
+                        GET_COUNT(life_count, "и", "", "") );
+            break;
+        default:
+            ch->pecho( "Ты чувствуешь присутствие %d жизненн%s форм%s в комнате.",
+                        life_count,
+                        GET_COUNT(life_count, "ой", "ых", "ых"),
+                        GET_COUNT(life_count, "ы", "", "") );
+        }
+    }
 }
 
 
