@@ -208,7 +208,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     int mana = skill->getMana(ch);
     if (mana > 0 && ch->mana < mana) {
         if (ch->is_npc() && IS_CHARMED(ch)) 
-            say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
+            say_fmt(_("Хозя%2$Gин|ин|йка, у меня мана кончилась!"), ch, ch->master);
         else 
             ch->pecho(_("У тебя не хватает энергии."));
 
@@ -218,7 +218,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     int moves = skill->getMoves(ch);
     if (moves > 0 && ch->move < moves) {
         if (ch->is_npc() && IS_CHARMED(ch))
-            say_fmt("Хозя%2$Gин|ин|йка, я слишком устал%1$Gо||а!", ch, ch->master);
+            say_fmt(_("Хозя%2$Gин|ин|йка, я слишком устал%1$Gо||а!"), ch, ch->master);
         else
             ch->pecho(_("Ты слишком уста%Gло|л|ла для этого."), ch);
 

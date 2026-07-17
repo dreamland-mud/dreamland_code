@@ -279,7 +279,7 @@ CMDRUN( buy )
 
     int wlevel = get_wear_level( ch, obj );
     if (ch->getRealLevel() < wlevel) {
-        say_fmt("Ты сможешь использовать %3$O4 только на %4$d уровне.", keeper, ch, obj, wlevel);
+        say_fmt(_("Ты сможешь использовать %3$O4 только на %4$d уровне."), keeper, ch, obj, wlevel);
     }
 
     deduct_cost( ch, cost * number );

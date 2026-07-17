@@ -479,6 +479,37 @@ void tell_raw(Character *ch, NPCharacter *talker, const MultiMessage &format, ..
     ch->send_to(messageStart + messageMiddle + messageEnd);
 }
 
+void say_fmt( const MultiMessage &content, ... )
+{
+    va_list ap, ap0;
+    typedef union { Character *ch; } arg_t;
+    arg_t teller;
+
+    // Compose the full spoken line (frame + content + close) in every language,
+    // then hand the explicit MultiMessage to vecho(MM), which resolves it per
+    // room recipient (reusing vecho's awake/blind/position filter -- no need to
+    // replicate it here). The teller name (%1$^C1) still substitutes per viewer
+    // via vfmt/toNoun. RU branch is byte-identical to the const char* twin.
+    MultiMessage toRoom(
+        DLString("%1$^C1 says '{g")      + content.getMessage(LANG_EN) + "{x'",
+        DLString("%1$^C1 произносит '{g") + content.getMessage(LANG_RU) + "{x'",
+        DLString("%1$^C1 промовляє '{g")  + content.getMessage(LANG_UA) + "{x'");
+    MultiMessage toChar(
+        DLString("You say '{g")           + content.getMessage(LANG_EN) + "{x'",
+        DLString("Ты произносишь '{g")    + content.getMessage(LANG_RU) + "{x'",
+        DLString("Ти промовляєш '{g")     + content.getMessage(LANG_UA) + "{x'");
+
+    va_start( ap, content );
+    va_copy( ap0, ap );
+    teller = va_arg(ap, arg_t);
+
+    teller.ch->vecho(POS_RESTING, TO_ROOM, 0, toRoom, ap0);
+    teller.ch->vecho(POS_RESTING, TO_CHAR, 0, toChar, ap0);
+
+    va_end( ap );
+    va_end( ap0 );
+}
+
 void hint_fmt(Character *ch, const char *format, ...)
 {
     if (ch->is_npc())

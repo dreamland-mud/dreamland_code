@@ -81,6 +81,11 @@ void tell_act( Character *, Character *, const MultiMessage &, const void *arg =
 void tell_dim( Character *, Character *, const MultiMessage &, const void *arg = 0 );
 void tell_fmt( const MultiMessage &, ... );
 void tell_raw( Character *ch, NPCharacter *talker, const MultiMessage &format, ... );
+/* say_fmt broadcasts to the whole room (many recipients, differing langs) with
+ * no single listener anchor, so it composes the frame+content in all three
+ * languages into an explicit MultiMessage and lets vecho(MM) resolve per
+ * recipient. */
+void say_fmt( const MultiMessage &, ... );
 
 /** Display newbie hint message. */
 void hint_fmt(Character *ch, const char *format, ...);
