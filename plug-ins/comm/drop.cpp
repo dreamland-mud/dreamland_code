@@ -62,6 +62,14 @@ static int drop_obj( Character *ch, Object *obj )
     return DROP_OBJ_EXTRACT;
 }
 
+/*
+ * DEAD in normal play. The live 'drop' is Fenia (command/drop/runFunc), which
+ * routes through .tmp.object.dropObj and fires the onDrop behaviour triggers
+ * this plain native version lacks. Per WrappedCommand::entryPoint a runFunc
+ * override fully replaces this handler for PCs and NPCs alike, so this body only
+ * fires as a boot-safety fall-through if the Fenia command never loaded. Do NOT
+ * l10n/"fix" it expecting an in-game effect -- edit the Fenia override instead.
+ */
 CMDRUNP( drop )
 {
     char arg[MAX_INPUT_LENGTH];
