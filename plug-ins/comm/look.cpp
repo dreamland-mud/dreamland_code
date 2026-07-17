@@ -922,13 +922,22 @@ static void show_char_sexrace( Character *ch, Character *vict, ostringstream &bu
 {
     buf << "(";
 
-    if (ch->getConfig( ).rucommands) {
-        buf << (IS_VAMPIRE(vict) ? GET_SEX(vict, "вампир", "вампир", "вампирша")
-                                : vict->getRace( )->getNameFor( ch, vict ).ruscase('1'));
-    } else {
+    // Render sex+race in the viewer's DISPLAY language (not the rucommands input
+    // flag). EN uses a sex word + ungendered race name ("female angel"); RU/UA use
+    // the gendered race name alone -- getNameFor() is display-language-aware and
+    // returns the UA field (RU fallback) for UA viewers, so no sex word is needed.
+    if (Player::displayLang(ch) == LANG_EN) {
         buf << GET_SEX(vict, "male", "sexless", "female")
             << " "
             << (IS_VAMPIRE(vict) ? "vampire" : vict->getRace( )->getName( ));
+    } else if (IS_VAMPIRE(vict)) {
+        // Vampire overrides the race name with its own gendered word per viewer lang.
+        if (Player::displayLang(ch) == LANG_UA)
+            buf << GET_SEX(vict, "вампір", "вампір", "вампірка");
+        else
+            buf << GET_SEX(vict, "вампир", "вампир", "вампирша");
+    } else {
+        buf << vict->getRace( )->getNameFor( ch, vict ).ruscase('1');
     }
     buf << ", " << size_table.message(min(vict->size, SIZE_GARGANTUAN), '2', Player::displayLang(ch))
         << " " << _("размера").getMessage(Player::displayLang(ch));
