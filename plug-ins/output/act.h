@@ -53,6 +53,14 @@ DLString act_to_fmt(const char *s);
  * flag so act_to_fmt runs per language. */
 void oldact( const MultiMessage &format, Character *ch,
           const void *arg1, const void *arg2, int type );
+/* Trilinguality (2594): oldact that carries BOTH act-codes AND printf args, so a
+ * broadcast/NPC-say line with a %d/%s (e.g. an "in N minutes" timer) resolves per
+ * recipient instead of being pre-formatted RU by fmt(0). act-codes occupy fmt args
+ * 1-3 ($c->%1, $o->%2, $C->%3 per actChar_to_fmtChar), so number the source's
+ * printf placeholders %4$... onward. Varargs are (Character *ch, const void *arg1,
+ * const void *arg2, <printf args>) -- the same first three as oldact, then the
+ * printf args. Reuses vecho(MM,va_list) (say_fmt's per-recipient path). */
+void oldact_fmt( const MultiMessage &format, int type, ... );
 void oldact_p( const MultiMessage &format, Character *ch,
             const void *arg1, const void *arg2, int type, int min_pos );
 
