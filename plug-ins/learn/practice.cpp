@@ -50,6 +50,14 @@ static void mprog_teach( PCharacter *client, NPCharacter *teacher, const char *s
     behavior_trigger(teacher, "Teach", "CCs", teacher, client, skillName);
 }
 
+/*
+ * DEAD in normal play. The live 'practice' is Fenia (command/practice/runFunc).
+ * CPractice is a CommandPlugin (-> WrappedCommand), so per
+ * WrappedCommand::entryPoint a runFunc override fully replaces this run() body
+ * for PCs and NPCs alike; it only fires as a boot-safety fall-through if the
+ * Fenia command never loaded. Do NOT l10n/"fix" it expecting an in-game effect
+ * -- edit the Fenia override instead.
+ */
 COMMAND(CPractice, "practice")
 {
     DLString argument = constArguments;
