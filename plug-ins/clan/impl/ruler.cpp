@@ -269,9 +269,7 @@ bool ClanGuardRulerJailer::specFight( )
             }
             else
             {
-                     DLString msg = fmt(0, _("$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'"),
-                            victim->getNameC());
-                    oldact( msg.c_str(), ch, 0, 0, TO_ROOM);
+                    oldact(_("$c1 кричит '$C2! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'"), ch, 0, victim, TO_ROOM);
             }
             return true;
     }
@@ -1509,9 +1507,7 @@ bool RulerSpecialGuard::specFight( )
     }
     else
     {
-        DLString msg = fmt(0, _("$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'"),
-                 victim->getNameC());
-        oldact( msg.c_str(), ch, 0, 0, TO_ROOM);
+        oldact(_("$c1 кричит '$C2! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'"), ch, 0, victim, TO_ROOM);
     }
 
     return true;
