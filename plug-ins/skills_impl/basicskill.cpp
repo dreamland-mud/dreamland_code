@@ -493,9 +493,9 @@ DLString BasicSkill::printLevelBonus(PCharacter *ch) const
     int bonus = skill_level_bonus(const_cast<Skill &>(*(Skill*)this), ch);
 
     if (bonus > 0)
-        buf << SKILL_INFO_PAD << fmt(0, _("У тебя бонус {C%1$d{x уров%1$Iень|ня|ней на это умение."), bonus) << endl;
+        buf << SKILL_INFO_PAD << fmt(ch, _("У тебя бонус {C%1$d{x уров%1$Iень|ня|ней на это умение."), bonus) << endl;
     else if (bonus < 0)
-        buf << SKILL_INFO_PAD << fmt(0, _("У тебя штраф {r%1$d{x уров%1$Iень|ня|ней на это умение."), bonus) << endl;
+        buf << SKILL_INFO_PAD << fmt(ch, _("У тебя штраф {r%1$d{x уров%1$Iень|ня|ней на это умение."), bonus) << endl;
 
     return buf.str();
 }
@@ -553,7 +553,7 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
 
     int beat = getBeats(ch) / dreamland->getPulsePerSecond();
     if (beat > 0) {
-         outputLines.push_back(fmt(0, _("Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. "), beat));
+         outputLines.push_back(fmt(ch, _("Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. "), beat));
     }
     
     // Collect move/mana/health costs and penalties into a string.
