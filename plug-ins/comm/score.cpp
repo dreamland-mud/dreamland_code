@@ -806,9 +806,10 @@ CMDRUNP( oscore )
 
 /*
  * 'score' proper is the accessible panel implemented in Fenia
- * (command/score/runFunc). This native handler only fires as a fall-through
- * (an NPC, or if the Fenia command is ever unavailable): render the linear
- * prose score, honouring a single-parameter query as before.
+ * (command/score/runFunc). Per WrappedCommand::entryPoint the runFunc override
+ * replaces this native handler for PCs and NPCs alike, so it only fires as a
+ * boot-safety fall-through if the Fenia command is unavailable (e.g. Fenia never
+ * loaded): render the linear prose score, honouring a single-parameter query.
  */
 CMDRUNP( score )
 {

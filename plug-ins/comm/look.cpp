@@ -1037,13 +1037,13 @@ bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool
 
         if (!obj) {
             if (fShowEmpty)
-                objName << "{" << CLR_NOEQ(ch) << "ничего.{x";
+                objName << "{" << CLR_NOEQ(ch) << lmsg(Player::lang(ch), "nothing.", "ничего.", "нічого.") << "{x";
             else
                 continue;
         }
         else if (!ch->can_see( obj )) {
             if (fShowEmpty)
-                objName = "нечто.";
+                objName = lmsg(Player::lang(ch), "something.", "нечто.", "щось.");
             else
                 continue;
         }
