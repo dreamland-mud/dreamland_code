@@ -171,13 +171,40 @@ void clantalk( Clan &clan, const DLString &message )
         << "[" << clan.getShortName( ) << "] : "
         << message << "{x" << endl;
 
-    for (Descriptor *d = descriptor_list; d != 0; d = d->next) 
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next)
         if (d->connected == CON_PLAYING
                 && d->character
                 && (d->character->getClan( ) == clan)
                 && !IS_SET(d->character->comm, COMM_NOCB)
                 && !d->character->isAffected(gsn_deafen))
         {
+            d->character->send_to( buf );
+        }
+}
+
+/* Trilinguality (Trello 2594): the per-recipient body-localizing twin. The
+ * [ClanName] frame is clan identity (unchanged); only `message` resolves per
+ * member (getMessage) and its trailing args are applied per member (vfmt), so
+ * the same broadcast renders in each viewer's display language. */
+void clantalk( Clan &clan, const MultiMessage &message, ... )
+{
+    va_list ap;
+
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next)
+        if (d->connected == CON_PLAYING
+                && d->character
+                && (d->character->getClan( ) == clan)
+                && !IS_SET(d->character->comm, COMM_NOCB)
+                && !d->character->isAffected(gsn_deafen))
+        {
+            va_start( ap, message );
+            DLString body = vfmt( d->character, message.getMessage( d->character ).c_str( ), ap );
+            va_end( ap );
+
+            ostringstream buf;
+            buf << "{" << clan.getColor( )
+                << "[" << clan.getShortName( ) << "] : "
+                << body << "{x" << endl;
             d->character->send_to( buf );
         }
 }

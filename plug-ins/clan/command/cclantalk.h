@@ -9,7 +9,14 @@
 #include "clan.h"
 #include "commandplugin.h"
 
+class MultiMessage;
+
 void clantalk( Clan &, const DLString &message );
+/* Trilinguality (Trello 2594): resolve the broadcast body per clan member, so a
+ * _()-wrapped message renders in each recipient's display language. Trailing
+ * printf args (e.g. a %s name) are applied per recipient via vfmt. The const
+ * DLString& twin above stays byte-identical for unwrapped callers. */
+void clantalk( Clan &, const MultiMessage &message, ... );
 
 class CClanTalk : public CommandPlugin {
 public:

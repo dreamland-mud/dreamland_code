@@ -1809,7 +1809,7 @@ VOID_AFFECT(Jail)::remove( Character *victim )
 
     DefaultAffectHandler::remove( victim );
 
-    clantalk( *clan_ruler, fmt(0, _("С этого момента %s снова на свободе!"), victim->getNameP( '1' ).c_str()) );
+    clantalk( *clan_ruler, _("С этого момента %s снова на свободе!"), victim->getNameP( '1' ).c_str() );
 
     if (victim->isAffected(gsn_manacles ))
         affect_strip( victim, gsn_manacles );
@@ -1841,10 +1841,9 @@ VOID_AFFECT(Jail)::update( Character *ch, Affect *paf )
 
     if ( paf->duration < 3) {
         int hours = paf->duration + 1; // Affects are removed when duration reaches below zero.
-        clantalk(*clan_ruler, fmt(0, _("%s выйдет на свободу через %d час%s"),
+        clantalk(*clan_ruler, _("%1$s выйдет на свободу через %2$d ча%2$Iс|са|сов"),
                 ch->getNameP( '1' ).c_str(),
-                hours,
-                GET_COUNT(hours, "","а","ов")));
+                hours);
     }
 }
 
@@ -1853,7 +1852,7 @@ VOID_AFFECT(Manacles)::remove( Character *ch )
 {
     DefaultAffectHandler::remove( ch );
 
-    clantalk(*clan_ruler, fmt(0, _("С %s спали кандалы!"), ch->getNameP( '2' ).c_str()) );
+    clantalk(*clan_ruler, _("С %s спали кандалы!"), ch->getNameP( '2' ).c_str() );
 }
 
 VOID_AFFECT(Manacles)::update( Character *ch, Affect *paf ) 
@@ -1862,10 +1861,9 @@ VOID_AFFECT(Manacles)::update( Character *ch, Affect *paf )
 
     if ( paf->duration < 3) {
         int hours = paf->duration + 1;
-        clantalk(*clan_ruler, fmt(0, _("С %s спадут кандалы через %d час%s"),
+        clantalk(*clan_ruler, _("С %1$s спадут кандалы через %2$d ча%2$Iс|са|сов"),
                 ch->getNameP( '2' ).c_str(),
-                hours,
-                GET_COUNT(hours, "","а","ов")));
+                hours);
     }
 }
 
@@ -1874,7 +1872,7 @@ AFFECT_DECL(Suspect);
 VOID_AFFECT(Suspect)::remove( Character *ch ) 
 { 
     DefaultAffectHandler::remove( ch );
-    clantalk(*clan_ruler, fmt(0, _("Повестка в суд для %s истекла!"), ch->getNameP( '2' ).c_str()) );
+    clantalk(*clan_ruler, _("Повестка в суд для %s истекла!"), ch->getNameP( '2' ).c_str() );
 }
 
 VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf ) 
@@ -1883,10 +1881,9 @@ VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf )
 
     if ( paf->duration < 3) {
         int hours = paf->duration + 1;
-        clantalk(*clan_ruler, fmt(0, _("Повестка в суд для %s истекает через %d час%s"),
+        clantalk(*clan_ruler, _("Повестка в суд для %1$s истекает через %2$d ча%2$Iс|са|сов"),
                 ch->getNameP( '2' ).c_str(),
-                hours,
-                GET_COUNT(hours, "","а","ов")));
+                hours);
     }
 }
 

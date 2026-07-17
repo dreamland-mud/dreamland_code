@@ -836,9 +836,9 @@ void HunterBeaconTrap::greet( Character *victim )
 
 //    oldact("Рядом с тобой раздается щелчок.", victim, 0, 0, TO_ALL );
 
-    clantalk( *clan_hunter, 
-              fmt(0, _("Внимание! Сработал маяк, установленный в '%s' и настроенный на появление %s."),
-              obj->in_room->getName(), victim->getNameP( '2' ).c_str( )) );
+    clantalk( *clan_hunter,
+              _("Внимание! Сработал маяк, установленный в '%s' и настроенный на появление %s."),
+              obj->in_room->getName(), victim->getNameP( '2' ).c_str( ) );
     
     log( victim, "активизирует" );
 
