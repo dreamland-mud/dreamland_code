@@ -1365,7 +1365,7 @@ struct LightVampireDamage : public Damage {
         else
             msgRoom( "%2$^O1\6%3$C4", dam, sunlight, ch);
             
-        msgChar( "%2$^O1\6тебя", dam, sunlight );
+        msgChar( _("%2$^O1\6тебя"), dam, sunlight );
     }
 };
 

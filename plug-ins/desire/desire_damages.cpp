@@ -8,6 +8,7 @@
 #include "damageflags.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 HungerDamage::HungerDamage( Character *ch, int dam )
     : SelfDamage( ch, DAM_NONE, dam )
@@ -20,8 +21,8 @@ void HungerDamage::message( )
     // No \5/\6 damage-verb markers here: those expand to combat verbs from the
     // attack table (СОКРУШАЕШЬ/РАСЧЛЕНЯЕШЬ at high dam), which read absurdly for
     // starvation. Hunger just weakens -- and canDamage() never lets it kill.
-    msgRoom( "%2$^C1 слабеет от голода", dam, ch );
-    msgChar( "Ты слабеешь от голода", dam );
+    msgRoom( _("%2$^C1 слабеет от голода"), dam, ch );
+    msgChar( _("Ты слабеешь от голода"), dam );
 }
 
 bool HungerDamage::canDamage()
@@ -38,8 +39,8 @@ ThirstDamage::ThirstDamage( Character *ch, int dam )
 
 void ThirstDamage::message( )
 {
-    msgRoom( "От жажды %2$C1\6себя", dam, ch );
-    msgChar( "От жажды ты\5себя", dam );
+    msgRoom( _("От жажды %2$C1\6себя"), dam, ch );
+    msgChar( _("От жажды ты\5себя"), dam );
 }
 
 bool ThirstDamage::canDamage()
