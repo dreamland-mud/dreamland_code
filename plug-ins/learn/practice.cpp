@@ -175,8 +175,8 @@ void CPractice::pracShow( PCharacter *ch )
         buf << endl;
     }
     
-    buf << fmt(0, _("У тебя %d сесси%s практики.\n\r"),
-                 ch->practice.getValue( ), GET_COUNT(ch->practice, "я","и","й") );
+    buf << fmt(ch, _("У тебя %1$d сесси%1$Iя|и|й практики.\n\r"),
+                 ch->practice.getValue( ) );
 
     page_to_char( buf.str( ).c_str( ), ch );
 }

@@ -316,8 +316,8 @@ static void config_scroll_print(PCharacter *ch)
     DLString lines(ch->lines);
     bool yes = ch->lines > 0;
     DLString msgNo = "Ты получаешь длинные сообщения без буферизации.";
-    DLString msgYes = fmt(0, _("Тебе непрерывно выводится %d лин%s текста."),
-                       ch->lines.getValue( ), GET_COUNT(ch->lines.getValue( ), "ия","ии","ий") );
+    DLString msgYes = fmt(ch, _("Тебе непрерывно выводится %1$d лин%1$Iия|ии|ий текста."),
+                       ch->lines.getValue( ) );
 
     print_line(ch, "scroll", "буфер", yes, msgYes, msgNo);
 }
