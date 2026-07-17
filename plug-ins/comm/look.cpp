@@ -609,22 +609,22 @@ static void show_char_to_char_0( Character *victim, Character *ch )
         show_char_pk_flags( pVict, buf );
 
         if (pVict->desc == 0 )
-            buf << "[{DБез связи{x]";
+            buf << fmt(ch, _("[{DБез связи{x]"));
 
         if (IS_SET(pVict->comm, COMM_AFK ))
-            buf << "[{CАФК{x]";
+            buf << fmt(ch, _("[{CАФК{x]"));
 
         if (pVict->act.isSet(PLR_RITUAL))
-            buf << "({bРитуал{x)";
+            buf << fmt(ch, _("({bРитуал{x)"));
 
         if (IS_SET(pVict->act, PLR_WANTED))
-            buf << "({RРАЗЫСКИВАЕТСЯ{x)";
+            buf << fmt(ch, _("({RРАЗЫСКИВАЕТСЯ{x)"));
 
         if (pVict->isAffected(gsn_manacles ))
-            buf << "({DКАНДАЛЫ{x)";
+            buf << fmt(ch, _("({DКАНДАЛЫ{x)"));
 
         if (victim->isAffected(gsn_jail ))
-            buf << "({DТЮРЬМА{x)";
+            buf << fmt(ch, _("({DТЮРЬМА{x)"));
         
         if (pVict->invis_level >= LEVEL_HERO)
             buf << "(Wizi)";
@@ -656,35 +656,35 @@ static void show_char_to_char_0( Character *victim, Character *ch )
             (IS_SET(victim->act, ACT_UNDEAD) || IS_SET(victim->form, FORM_UNDEAD));
     
         if (npcUndead || IS_VAMPIRE(victim))
-            buf << "({1{rНежить{2)";
+            buf << fmt(ch, _("({1{rНежить{2)"));
     }
 
     if (IS_AFFECTED(victim, AFF_PASS_DOOR))
         buf << fmt(ch, _("({1{wПр{Dо{wзр{Dа{wч%Gно|ен|на{2)"), victim);
 
     if (IS_AFFECTED(victim, AFF_FAERIE_FIRE))
-        buf << "({MРозовая Аура{x)";
+        buf << fmt(ch, _("({MРозовая Аура{x)"));
 
     if (IS_EVIL(victim) && CAN_DETECT(ch, DETECT_EVIL))
-        buf << "({RКрасная Аура{x)";
+        buf << fmt(ch, _("({RКрасная Аура{x)"));
 
     if (IS_GOOD(victim) && CAN_DETECT(ch, DETECT_GOOD))
-        buf << "({YЗолотая Аура{x)";
+        buf << fmt(ch, _("({YЗолотая Аура{x)"));
 
     if (IS_AFFECTED(victim, AFF_SANCTUARY))
-        buf << "({WБелая Аура{x)";
+        buf << fmt(ch, _("({WБелая Аура{x)"));
 
     if (victim->isAffected(gsn_rainbow_shield))
-        buf << "({RР{Yа{Gд{Cу{Bг{Mа{x)";
+        buf << fmt(ch, _("({RР{Yа{Gд{Cу{Bг{Mа{x)"));
 
     if (victim->isAffected(gsn_demonic_mantle))
-        buf << "({RМ{Dантия{x)";
+        buf << fmt(ch, _("({RМ{Dантия{x)"));
 
     if (victim->isAffected(gsn_dark_shroud))
-        buf << "({DАура Тьмы{x)";
+        buf << fmt(ch, _("({DАура Тьмы{x)"));
 
     if (victim->isAffected(gsn_stardust))
-        buf << "({WЗ{wве{Wзд{wная {WП{wыль{x)";
+        buf << fmt(ch, _("({WЗ{wве{Wзд{wная {WП{wыль{x)"));
 
     if (nVict) 
         if (can_show_long_descr(nVict)) {

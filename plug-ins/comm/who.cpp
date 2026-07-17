@@ -357,22 +357,22 @@ CMDRUN(who)
     int max_total = Descriptor::getMaxOnline() + Descriptor::getMaxOffline();
 
     if (online_count > 0)
-        buf << fmt(0, _("Сейчас в мире {W%1$d{w игрок%1$I|а|ов:"), online_count) << endl;
+        buf << fmt(ch, _("Сейчас в мире {W%1$d{w игрок%1$I|а|ов:"), online_count) << endl;
     for (const auto &victim: online)
         buf << who_cmd_format_char(pch, victim, arguments);
 
     if (offline_count > 0)
-        buf << endl << fmt(0, _("Еще {W%1$d{w игрок%1$I|а|ов слыш%1$Iит|ат|ат общие каналы:"), offline_count) << endl;
+        buf << endl << fmt(ch, _("Еще {W%1$d{w игрок%1$I|а|ов слыш%1$Iит|ат|ат общие каналы:"), offline_count) << endl;
     for (const auto &victim: offline)
         buf << who_cmd_format_offline(pch, victim);
 
     buf << endl;
 
-    buf << "Всего {W" << total << "{w, максимум за последнее время был {W" << max_total << "{w." << endl;
+    buf << fmt(ch, _("Всего {W%1$d{w, максимум за последнее время был {W%2$d{w."), total, max_total) << endl;
 
     if (!IS_SET( ch->act, PLR_CONFIRMED ) && pch->getRemorts( ).size( ) == 0) 
-        buf << "Буква (U) рядом с твоим именем означает, что твое описание еще не одобрено богами." << endl
-            << "Подробнее читай {y{hcсправка подтверждение{x." << endl;
+        buf << fmt(ch, _("Буква (U) рядом с твоим именем означает, что твое описание еще не одобрено богами.")) << endl
+            << fmt(ch, _("Подробнее читай {y{hcсправка подтверждение{x.")) << endl;
     ch->send_to( buf );
 }
 

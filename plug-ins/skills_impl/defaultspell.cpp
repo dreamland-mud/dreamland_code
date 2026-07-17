@@ -231,7 +231,7 @@ void DefaultSpell::utterMagicSpell(Character *ch)
 {
     Character *rch;
     DLString utterance = spell_utterance(*skill);
-    const char *pat = "$c1 бормочет '$t'.";
+    MultiMessage pat = _("$c1 бормочет '$t'.");
 
     for (rch = ch->in_room->people; rch; rch = rch->next_in_room) {
         if (rch != ch) {
