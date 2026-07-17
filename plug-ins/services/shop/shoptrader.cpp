@@ -78,9 +78,9 @@ void ShopTrader::tell( Character *victim, const char *speech )
     describeGoods( victim, speech, true );
 }
 
-void ShopTrader::show(Character *, std::basic_ostringstream<char> &buf) 
+void ShopTrader::show(Character *ch, std::basic_ostringstream<char> &buf)
 {
-    buf << "{y({GПродавец{y){x";
+    buf << fmt(ch, _("{y({GПродавец{y){x"));
 }
 
 void ShopTrader::describeGoods( Character *client, const DLString &args, bool verbose )

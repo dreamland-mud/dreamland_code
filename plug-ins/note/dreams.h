@@ -23,7 +23,7 @@ public:
     DreamThread( );
     virtual ~DreamThread( );
     
-    virtual void getUnreadMessage( int, ostringstream & ) const;
+    virtual void getUnreadMessage( PCharacter *, int, ostringstream & ) const;
     virtual bool canWrite( const PCharacter * ) const;
 
 protected:

@@ -118,7 +118,7 @@ public:
     virtual bool canWrite( const PCharacter * ) const;
     virtual bool canRead( const PCharacter * ) const;
     virtual bool isExpired( const Note * ) const;
-    virtual void getUnreadMessage( int, ostringstream & ) const { };
+    virtual void getUnreadMessage( PCharacter *, int, ostringstream & ) const { };
     inline const Enumeration &getGender() const;
     inline const DLString &getRussianThreadName( ) const;
     inline const DLString &getRussianMltName() const;
@@ -231,9 +231,9 @@ public:
     {
         return THREAD_NAME;
     }
-    virtual void getUnreadMessage( int count, ostringstream &buf ) const 
+    virtual void getUnreadMessage( PCharacter *ch, int count, ostringstream &buf ) const 
     {
-        return NoteThread::getUnreadMessage( count, buf );
+        return NoteThread::getUnreadMessage( ch, count, buf );
     }
     virtual bool canWrite( const PCharacter *ch ) const 
     {

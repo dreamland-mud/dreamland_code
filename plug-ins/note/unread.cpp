@@ -50,7 +50,7 @@ void Unread::doSpool( PCharacter *ch, bool fVerbose )
         int count = i->second->countSpool( ch );
 
         if (count > 0)
-            i->second->getUnreadMessage( count, buf );
+            i->second->getUnreadMessage( ch, count, buf );
     }
 
     if (!buf.str( ).empty( )) {
