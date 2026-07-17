@@ -224,6 +224,13 @@ void Trainer::showGain(PCharacter *client)
         tell_act( client, ch, "Можно обменять {Y1{G тренировку на {Y10{G практик: {hcтренировки продать{x" );  
 }
 
+/*
+ * DEAD in normal play. The live 'train' is Fenia (command/train/runFunc); per
+ * WrappedCommand::entryPoint a runFunc override fully replaces this native
+ * handler for PCs and NPCs alike, so this body only fires as a boot-safety
+ * fall-through if the Fenia command never loaded. Do NOT l10n/"fix" it expecting
+ * an in-game effect -- edit the Fenia override instead.
+ */
 CMDRUN( train )
 {
     Trainer::Pointer trainer;

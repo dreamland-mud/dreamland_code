@@ -8,6 +8,13 @@
 #include "def.h"
 #include "l10n.h"
 
+/*
+ * DEAD in normal play. The live 'compare' is Fenia (command/compare/runFunc);
+ * per WrappedCommand::entryPoint a runFunc override fully replaces this native
+ * handler for PCs and NPCs alike, so this body only fires as a boot-safety
+ * fall-through if the Fenia command never loaded. Do NOT l10n/"fix" it expecting
+ * an in-game effect -- edit the Fenia override instead.
+ */
 CMDRUNP( compare )
 {
     char arg1[MAX_INPUT_LENGTH];
