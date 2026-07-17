@@ -930,7 +930,8 @@ static void show_char_sexrace( Character *ch, Character *vict, ostringstream &bu
             << " "
             << (IS_VAMPIRE(vict) ? "vampire" : vict->getRace( )->getName( ));
     }
-    buf << ", " << size_table.message(min(vict->size, SIZE_GARGANTUAN), '2', Player::displayLang(ch)) << " размера";
+    buf << ", " << size_table.message(min(vict->size, SIZE_GARGANTUAN), '2', Player::displayLang(ch))
+        << " " << _("размера").getMessage(Player::displayLang(ch));
     buf << ") ";
 }
 
