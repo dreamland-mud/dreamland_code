@@ -135,7 +135,7 @@ CMDRUN( cast )
     }
 
     if (ch->is_npc( ) && IS_CHARMED(ch) && ch->master->getClan( ) == clan_battlerager) {
-        say_fmt("Хозя%2$Gин|ин|йка, я уважаю твои убеждения.", ch, ch->master);
+        say_fmt(_("Хозя%2$Gин|ин|йка, я уважаю твои убеждения."), ch, ch->master);
         return;
     }
     
@@ -169,7 +169,7 @@ CMDRUN( cast )
     int mana = skill->getMana(ch);
     if (mana > 0 && ch->mana < mana) {
         if (ch->is_npc( ) && IS_CHARMED(ch)) 
-            say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
+            say_fmt(_("Хозя%2$Gин|ин|йка, у меня мана кончилась!"), ch, ch->master);
         else 
             ch->pecho(_("У тебя не хватает энергии."));
 
@@ -179,7 +179,7 @@ CMDRUN( cast )
     int moves = skill->getMoves(ch);
     if (moves > 0 && ch->move < moves) {
         if (ch->is_npc( ) && IS_CHARMED(ch))
-            say_fmt("Хозя%2$Gин|ин|йка, я слишком устал%1$Gо||а!", ch, ch->master);
+            say_fmt(_("Хозя%2$Gин|ин|йка, я слишком устал%1$Gо||а!"), ch, ch->master);
         else
             ch->pecho(_("Ты слишком уста%Gло|л|ла для этого."), ch);
 
@@ -190,7 +190,7 @@ CMDRUN( cast )
     if (target->error != 0) {
         ch->pecho( buf.str() );
         if (ch->is_npc() && IS_CHARMED(ch) && !buf.str().empty())
-            say_fmt("Хозя%2$Gин|ин|йка, у меня ничего не получится: %3$s", ch, ch->master, buf.str().c_str());
+            say_fmt(_("Хозя%2$Gин|ин|йка, у меня ничего не получится: %3$s"), ch, ch->master, buf.str().c_str());
 
         return;
     }
@@ -200,7 +200,7 @@ CMDRUN( cast )
 
     if (!spell->properOrder(ch)) {
         if (offensive && victim && !victim->is_npc( ))
-            say_fmt("Хозя%2$Gин|ин|йка, я %3$Gего|его|её боюсь!", ch, ch->master, victim);
+            say_fmt(_("Хозя%2$Gин|ин|йка, я %3$Gего|его|её боюсь!"), ch, ch->master, victim);
         else
             do_say(ch, "Я не буду делать этого.");
 

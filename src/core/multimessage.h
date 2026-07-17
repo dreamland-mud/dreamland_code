@@ -20,6 +20,15 @@ public:
     MultiMessage() { }
     MultiMessage(const DLString &ru, const DLString &file) : ru(ru), file(file) { }
 
+    /** Explicit three-language ctor: stores en/ru/ua verbatim so getMessage()
+     *  returns the stored text (RU fallback when en/ua empty) with NO catalog
+     *  lookup. Used to build a per-recipient message from already-composed
+     *  lines -- e.g. say_fmt, which glues a localized speech frame around
+     *  already-localized content and hands the result to vecho(MM). Distinct
+     *  arity (3 args) from the (ru,file) ctor, so no overload ambiguity. */
+    MultiMessage(const DLString &en, const DLString &ru, const DLString &ua)
+        : ru(ru), en(en), ua(ua), explicitLangs(true) { }
+
     /** The message in `ch`'s display language (RU fallback -> never blank). */
     const DLString & getMessage(const Character *ch) const;
 
@@ -41,6 +50,9 @@ public:
 private:
     DLString ru;
     DLString file;
+    DLString en;  // only meaningful when explicitLangs (three-language ctor)
+    DLString ua;  // only meaningful when explicitLangs (three-language ctor)
+    bool explicitLangs = false;
     bool actCodes = false;
 };
 

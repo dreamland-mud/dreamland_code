@@ -102,7 +102,7 @@ CMDRUNP(request)
 
     if (victim->getModifyLevel() >= ch->getModifyLevel() + 10 || victim->getModifyLevel() >= ch->getModifyLevel() * 2)
     {
-        say_fmt("Всему свое время, малыш%2$G||ка.", victim, ch);
+        say_fmt(_("Всему свое время, малыш%2$G||ка."), victim, ch);
         return;
     }
 
@@ -117,7 +117,7 @@ CMDRUNP(request)
         && victim->getNPC()->behavior
         && IS_SET(victim->getNPC()->behavior->getOccupation(), (1 << OCC_SHOPPER)))
     {
-        say_fmt("Если тебе нравится %3$O1, ты можешь у меня %3$P2 купить.", victim, ch, obj);
+        say_fmt(_("Если тебе нравится %3$O1, ты можешь у меня %3$P2 купить."), victim, ch, obj);
         return;
     }
 
