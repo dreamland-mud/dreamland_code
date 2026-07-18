@@ -117,8 +117,6 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 
 {
-    DLString msg;
-
     if(number_percent() < 50) {
         oldact(_("$c1 говорит тебе '{GНо это еще ладно, они хотят его повесить. Понимаешь, невиновного человека повесить!!!{x'"), king, 0, hero, TO_VICT);
     } else {
@@ -130,9 +128,9 @@ void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int ti
     oldact(_("$c1 говорит тебе '{Gтак как в наше время без документа никуда, а заодно братишка поймет, что тебе можно доверять...{x'"), king, 0, hero, TO_VICT);
     oldact(_("$c1 вручает тебе $o4."), king, mark, hero, TO_VICT);
     oldact(_("$c1 вручает $C3 $o4."), king, mark, hero, TO_NOTVICT);
-    msg = fmt(0, _("$c1 говорит тебе '{GПо моим подсчетам у тебя есть {Y%d{G минут%s, пока идут приготовления к казни. "
-                  "Приведи его сюда.{x'"), time, GET_COUNT(time, "а", "ы", "") );
-    oldact(msg.c_str(), king, 0, hero, TO_VICT);
+    oldact_fmt(_("$c1 говорит тебе '{GПо моим подсчетам у тебя есть {Y%4$d{G минут%4$Iа|ы|, пока идут приготовления к казни. "
+                 "Приведи его сюда.{x'"),
+               TO_VICT, king, 0, hero, time);
 }
 void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const 
 {
@@ -217,8 +215,6 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 
 {
-    DLString msg;
-
     if(number_percent() < 50) {
         oldact(_("$c1 говорит тебе '{GВсе бы ничего, но какой-то тип, очень похожий на моего товарища, видать так сильно насолил этой Фемиде, что она аж окаменела от ужаса.{x'"), king, 0, hero, TO_VICT);
         oldact(_("$c1 говорит тебе '{GТак и стоит в своем храме, а ее доблестные служители прямо взбесились и без всякого следствия хотят вздернуть моего лучшего голов... товарища.'{x"), king, 0, hero, TO_VICT);
@@ -232,10 +228,9 @@ void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int ti
 
     oldact(_("$c1 вручает тебе $o4."), king, mark, hero, TO_VICT);
     oldact(_("$c1 вручает $C3 $o4."), king, mark, hero, TO_NOTVICT);
-    msg = fmt(0, _("$c1 говорит тебе '{GУ тебя есть примерно {W%d{G минут%s, пока идут приготовления к казни. "
-                  "Приведи его ко мне.{x'"),
-             time, GET_COUNT(time, "а", "ы", "") );
-    oldact(msg.c_str(), king, 0, hero, TO_VICT);
+    oldact_fmt(_("$c1 говорит тебе '{GУ тебя есть примерно {W%4$d{G минут%4$Iа|ы|, пока идут приготовления к казни. "
+                 "Приведи его ко мне.{x'"),
+               TO_VICT, king, 0, hero, time);
 }
 
 void KS::actWrongGiver( NPCharacter *kid, Character *victim, Object *obj ) const
