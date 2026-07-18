@@ -359,6 +359,24 @@ NMI_SET( CharacterWrapper, logon, "время последнего захода 
     CHK_NPC
     target->getPC( )->age.setLogon( arg.toNumber( ) );
 }
+NMI_GET( CharacterWrapper, ageYears, "возраст персонажа в годах (текущий, с учётом магического старения APPLY_AGE)" )
+{
+    checkTarget( );
+    CHK_NPC
+    return target->getPC( )->age.getYears( );
+}
+NMI_GET( CharacterWrapper, ageTrueYears, "настоящий возраст персонажа в годах (без учёта магического старения)" )
+{
+    checkTarget( );
+    CHK_NPC
+    return target->getPC( )->age.getTrueYears( );
+}
+NMI_GET( CharacterWrapper, ageHours, "сколько реальных часов сыграно персонажем (истинное время, без APPLY_AGE)" )
+{
+    checkTarget( );
+    CHK_NPC
+    return target->getPC( )->age.getTrueHours( );
+}
 NMI_GET( CharacterWrapper, terminal_type, "тип терминала у mud-клиента" )
 {
     checkTarget( );
