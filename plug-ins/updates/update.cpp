@@ -1454,7 +1454,7 @@ void track_update( )
 void check_reboot( void )
 {
     Descriptor *d;
-    DLString msg, msg2;
+    DLString msg2;
 
     switch(dreamland->getRebootCounter( ))
     {
@@ -1473,17 +1473,21 @@ void check_reboot( void )
     case 5:
     case 10:
     case 15:
-        msg2 = fmt( NULL, _("Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!"),
-                   dreamland->getRebootCounter( ) );
-        if (dreamland->getRebootCounter( ) == 5) {
-            send_to_discord_stream(":red_circle: " + msg2);
-            send_telegram(msg2);
+        {
+            int counter = dreamland->getRebootCounter( );
+            const char *crier = chance( 50 ) ? "Хассан" : "Валькирия";
+            // per-viewer: each player's pecho resolves the MultiMessage in their own language
+            for (d = descriptor_list; d != 0; d = d->next)
+                if (d->connected == CON_PLAYING && d->character)
+                    d->character->pecho(
+                        _("%1$^s громко кричит '{RВнимание! Через %2$d мину%2$Iту|ты|т будет перезагрузка Мира Мечты!{x'"),
+                        crier, counter );
+            if (counter == 5) {
+                msg2 = fmt( NULL, _("Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!"), counter );
+                send_to_discord_stream(":red_circle: " + msg2);
+                send_telegram(msg2);
+            }
         }
-        msg = fmt( NULL, _("%1$^s громко кричит '{R%2$s{x'"),
-                   (chance( 50 ) ? "Хассан" : "Валькирия"), msg2.c_str() );
-        for (d = descriptor_list; d != 0; d = d->next)
-            if (d->connected == CON_PLAYING && d->character)
-                d->character->pecho( msg );
     default:
         dreamland->setRebootCounter( dreamland->getRebootCounter( ) - 1 );
         break;
