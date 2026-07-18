@@ -196,32 +196,6 @@ void oldact_p( const MultiMessage &format, Character *ch, const void *arg1,
     ch->echo( min_pos, type, vch, f, ch, arg1, arg2 );
 }
 
-/* Trilinguality (2594): oldact carrying act-codes AND printf args (see act.h).
- * The act-code args (ch/arg1/arg2) are the first three fmt args (positions 1-3);
- * the source's printf placeholders are numbered %4$... and passed after them.
- * We hand vecho the WHOLE va_list starting at ch, so vfmt reads arg1=ch (for
- * $c->%1$C), arg2=arg1 (for $o->%2$O), arg3=arg2 (for $C->%3$C), arg4+=printf. */
-void oldact_fmt( const MultiMessage &format, int type, ... )
-{
-    if (format.empty())
-        return;
-
-    MultiMessage f = format;
-    f.setActCodes(true);
-
-    va_list ap, ap0;
-    va_start( ap, type );
-    va_copy( ap0, ap );
-    Character *ch  = va_arg( ap, Character * );   // 1st vararg: actor  ($c -> arg 1)
-    va_arg( ap, const void * );                   // 2nd vararg: arg1   ($o -> arg 2)
-    Character *vch = va_arg( ap, Character * );    // 3rd vararg: arg2   ($C -> arg 3), TO_VICT target
-    va_end( ap );
-
-    if (ch != 0)
-        ch->vecho( POS_RESTING, type, vch, f, ap0 );
-    va_end( ap0 );
-}
-
 
 /*--------------------------------------------------------------------------
  * fmt and vfmt (new format concept)
