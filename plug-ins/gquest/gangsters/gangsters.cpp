@@ -441,7 +441,9 @@ void Gangsters::rewardLeader( )
         reward.qpoints = max * number_range( 10, 15 ) + number_fuzzy( 10 );
         reward.gold = max * number_range( 10, 15 );
         reward.experience = max * number_fuzzy( 50 );
-        reward.reason = DLString( "За убийство самого большого количества бандитов ты получаешь: " );
+        reward.reason[LANG_RU] = "За убийство самого большого количества бандитов ты получаешь: ";
+        reward.reason[LANG_EN] = "For slaying the most bandits, you receive: ";
+        reward.reason[LANG_UA] = "За вбивство найбільшої кількості бандитів ти отримуєш: ";
         reward.id = getQuestID( );
         
         if (leaders.size( ) == 1)
@@ -477,7 +479,9 @@ void Gangsters::rewardChefKiller( )
     r.qpoints = number_range( 200, 250 );
     r.experience = number_range( 300, 500 );
     r.practice = number_range( -6, 3 );
-    r.reason = DLString( "Поздравляем! Шеф убит и все бандиты разбежались. В награду ты получаешь: " );
+    r.reason[LANG_RU] = "Поздравляем! Шеф убит и все бандиты разбежались. В награду ты получаешь: ";
+    r.reason[LANG_EN] = "Congratulations! The boss is dead and the bandits have scattered. As your reward you receive: ";
+    r.reason[LANG_UA] = "Вітаємо! Шефа вбито, і всі бандити розбіглися. У нагороду ти отримуєш: ";
     r.id = getQuestID( );
 
     GlobalQuestManager::getThis( )->rewardChar( pci, r );
@@ -504,7 +508,9 @@ void Gangsters::rewardMobKiller( PCharacter *killer, Character *mob )
     r.experience = number_range( 10, 30 );
     r.qpoints = number_range( diff, 8 );
     r.gold = number_range( diff, 8 );
-    r.reason = "Твоя награда за уничтожение преступника составляет: ";
+    r.reason[LANG_RU] = "Твоя награда за уничтожение преступника составляет: ";
+    r.reason[LANG_EN] = "Your reward for eliminating the criminal is: ";
+    r.reason[LANG_UA] = "Твоя нагорода за знищення злочинця становить: ";
     r.id = getQuestID( );
     GlobalQuestManager::getThis( )->rewardChar( killer, r );        
 
