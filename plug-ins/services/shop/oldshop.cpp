@@ -262,19 +262,15 @@ CMDRUN( buy )
 
     if ( number > 1 )
     {
-        DLString toRoom = fmt(0, _("$c1 покупает $o4[%d]."), number );
-        oldact( toRoom.c_str(), ch, obj, 0, TO_ROOM);
-        DLString toChar = fmt(0, _("Ты покупаешь $o4[%d] за %d серебрян%s."),
-                        number, cost * number,
-                        GET_COUNT( cost * number, "ую монету", "ые монеты", "ых монет" ) );
-        oldact( toChar.c_str(), ch, obj, 0, TO_CHAR);
+        oldact_fmt(_("$c1 покупает $o4[%4$d]."), TO_ROOM, ch, obj, 0, number);
+        oldact_fmt(_("Ты покупаешь $o4[%4$d] за %5$d серебрян%5$Iую|ые|ых монет%5$Iу|ы|."),
+                   TO_CHAR, ch, obj, 0, number, cost * number);
     }
     else
     {
         oldact(_("$c1 покупает $o4."), ch, obj, 0, TO_ROOM);
-        DLString toChar = fmt( 0, _("Ты покупаешь $o4 за %d серебрян%s."),
-                        cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
-        oldact( toChar.c_str(), ch, obj, 0, TO_CHAR);
+        oldact_fmt(_("Ты покупаешь $o4 за %4$d серебрян%4$Iую|ые|ых монет%4$Iу|ы|."),
+                   TO_CHAR, ch, obj, 0, cost);
     }
 
     int wlevel = get_wear_level( ch, obj );

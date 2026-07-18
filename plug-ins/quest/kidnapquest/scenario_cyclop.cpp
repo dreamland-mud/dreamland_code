@@ -131,26 +131,22 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 
 {
-    DLString msg;
-
     if(number_percent() < 50) {
         oldact(_("$c1 говорит тебе '{GЯ бы са$gмо|м|ма навести$gло|л|ла его, но голод ослабил меня.{x'"), king, 0, hero, TO_VICT);
         oldact(_("$c1 говорит тебе '{GВот, возьми эту деревяшку, думаю как приманка сработает.{x'"), king, 0, hero, TO_VICT);
         oldact(_("$c1 дает тебе $o4."), king, mark, hero, TO_VICT);
         oldact(_("$c1 вручает $C3 $o4."), king, mark, hero, TO_NOTVICT);
         oldact(_("$c1 говорит тебе '{GПриведи его сюда.{x'"), king, 0, hero, TO_VICT);
-        msg = fmt(0, _("$c1 говорит тебе '{GИ поспеши! Чувствую, что через {Y%d{G минут%s он мне уже не понадобится.{x"),
-                 time, GET_COUNT(time, "у", "ы", "") );
+        oldact_fmt(_("$c1 говорит тебе '{GИ поспеши! Чувствую, что через {Y%4$d{G минут%4$Iу|ы| он мне уже не понадобится.{x"),
+                   TO_VICT, king, 0, hero, time);
     } else {
         oldact(_("$c1 говорит тебе '{GЯ бы и са$gмо|м|ма навести$gло|л|ла его, но жду гостей, надо многое приготовить, а времени нет.{x'"), king, 0, hero, TO_VICT);
         oldact(_("$c1 говорит тебе '{GВот, возьми эту деревяшку, думаю как приманка сработает.{x'"), king, 0, hero, TO_VICT);
         oldact(_("$c1 дает тебе $o4."), king, mark, hero, TO_VICT);
         oldact(_("$c1 вручает $C3 $o4."), king, mark, hero, TO_NOTVICT);
-        msg = fmt(0, _("$c1 говорит тебе '{GПоспеши! Через {Y%d{G минут%s он должен быть здесь!{x"),
-                 time, GET_COUNT(time, "у", "ы", "") );
+        oldact_fmt(_("$c1 говорит тебе '{GПоспеши! Через {Y%4$d{G минут%4$Iу|ы| он должен быть здесь!{x"),
+                   TO_VICT, king, 0, hero, time);
     }
-
-    oldact(msg.c_str(), king, 0, hero, TO_VICT);
 }
 void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const 
 {
