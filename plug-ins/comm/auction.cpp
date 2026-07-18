@@ -128,6 +128,35 @@ void talk_auction(const char *argument)
     }
 }
 
+/* Per-viewer auction broadcast: resolves the MultiMessage (and its args) in
+   each listener's own language, then prepends the localized "AUCTION:" prefix.
+   Item/char args (%O/%C) and count inflections (%I) localize per recipient. */
+void talk_auction( const MultiMessage &message, ... )
+{
+    va_list ap;
+    MultiMessage prefix( "AUCTION", "АУКЦИОН", "АУКЦІОН" );
+
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
+        if (d->connected != CON_PLAYING)
+            continue;
+
+        Character *ch = d->character;
+
+        if (!ch)
+            continue;
+
+        if (IS_SET(ch->getPC( )->comm, COMM_NOAUCTION))
+            continue;
+
+        va_start( ap, message );
+        DLString body = vfmt( ch, message.getMessage( ch ).c_str( ), ap );
+        va_end( ap );
+
+        ch->pecho( POS_SLEEPING,
+                   (DLString("{Y") + prefix.getMessage( ch ) + ": " + body + "{x").c_str( ) );
+    }
+}
+
 
 /*
   This function allows the following kinds of bets to be made:
@@ -202,23 +231,25 @@ void auction_update (void)
             case 2 : /* going twice */
             if (auction->bet > 0)
             {
-                talk_auction(fmt(0, _("%1$O1{Y: буд%1$nет|ут прода%1$Gно|н|на|ны за %2$d золот%2$Iую|ых|ых монет%2$Iу|ы| -- %3$s{x."), 
-                        auction->item,
-                        auction->bet,
-                        ((auction->going == 1) ? "раз" : "два")).c_str( ));
+                if (auction->going == 1)
+                    talk_auction(_("%1$O1{Y: буд%1$nет|ут прода%1$Gно|н|на|ны за %2$d золот%2$Iую|ых|ых монет%2$Iу|ы| -- раз{x."),
+                            auction->item, auction->bet);
+                else
+                    talk_auction(_("%1$O1{Y: буд%1$nет|ут прода%1$Gно|н|на|ны за %2$d золот%2$Iую|ых|ых монет%2$Iу|ы| -- два{x."),
+                            auction->item, auction->bet);
                 break;                
             }
             else
             {
-                talk_auction(fmt(0, _("%s{Y: ставок не получено -- %s{x."), 
-                        auction->item->getShortDescr( '1', LANG_DEFAULT ).c_str( ),
-                        ((auction->going == 1) ? "раз" : "два")).c_str());
+                if (auction->going == 1)
+                    talk_auction(_("%1$O1{Y: ставок не получено -- раз{x."), auction->item);
+                else
+                    talk_auction(_("%1$O1{Y: ставок не получено -- два{x."), auction->item);
 
                 if (auction->startbet != 0)
                 {
-                  talk_auction(fmt(0, _("Начальная цена: %d золот%s{x."), 
-                                auction->startbet,
-                                GET_COUNT(auction->startbet,"ая монета","ые монеты","ых монет")).c_str());
+                  talk_auction(_("Начальная цена: %1$d золот%1$Iая|ые|ых монет%1$Iа|ы|{x."),
+                                auction->startbet);
                 }
                 break;
             }
@@ -228,7 +259,8 @@ void auction_update (void)
             {
                 msg = fmt(0, _("{1{C%1$^C1 {Yпокупает {2%2$O4{1 за %3$d золот%3$Iую|ых|ых монет%3$Iу|ы|{2."),
                     auction->buyer, auction->item, auction->bet);                           
-                talk_auction(msg.c_str());
+                talk_auction(_("{1{C%1$^C1 {Yпокупает {2%2$O4{1 за %3$d золот%3$Iую|ых|ых монет%3$Iу|ы|{2."),
+                    auction->buyer, auction->item, auction->bet);
                 send_to_discord_stream(":moneybag: " + msg);
                 send_telegram(msg);
                 obj_to_char (auction->item,auction->buyer);
@@ -249,8 +281,7 @@ void auction_update (void)
             }
             else /* not sold */
             {
-                msg = fmt(0, _("Ставок не получено -- %1$#O1{Y снят%1$Gо||а|ы с аукциона{x."), auction->item);
-                talk_auction(msg.c_str());
+                talk_auction(_("Ставок не получено -- %1$#O1{Y снят%1$Gо||а|ы с аукциона{x."), auction->item);
 
                 oldact_p(_("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w."),
                       auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
@@ -419,8 +450,8 @@ CMDRUNP( auction )
                 }
                 else /* stop the auction */
                 {
-                        talk_auction(fmt(0, _("Продажа остановлена Богами. Лот '%s{Y' конфискован{x."),
-                                auction->item->getShortDescr( '1', LANG_DEFAULT ).c_str( )).c_str());
+                        talk_auction(_("Продажа остановлена Богами. Лот '%1$O1{Y' конфискован{x."),
+                                auction->item);
                         obj_to_char(auction->item, auction->seller);
                         auction->item = 0;
                         auction->seller = 0;
@@ -490,9 +521,8 @@ CMDRUNP( auction )
                         auction->going = 0;
                         auction->pulse = PULSE_AUCTION; /* start the auction over again */
 
-                        talk_auction(fmt(0, _("На %s{Y получена новая ставка: %d золот%s{x.\n\r"),
-                                auction->item->getShortDescr( '4', LANG_DEFAULT ).c_str( ),newbet,
-                                GET_COUNT(newbet,"ая монета","ые монеты","ых монет")).c_str());
+                        talk_auction(_("На %1$O4{Y получена новая ставка: %2$d золот%2$Iая|ые|ых монет%2$Iа|ы|{x.\n\r"),
+                                auction->item, newbet);
                         return;
 
                 }
@@ -555,18 +585,18 @@ CMDRUNP( auction )
                         auction->going = 0;
 
                         msg = fmt(0, _("{1{YНа аукцион выставлен новый лот -- {2%O1!"), auction->item);                           
-                        talk_auction(msg.c_str());
+                        talk_auction(_("{1{YНа аукцион выставлен новый лот -- {2%O1!"), auction->item);
                         send_to_discord_stream(":moneybag: " + msg);
                         send_telegram(msg);
 
                         if (auction->startbet == 0)
                         {
-                                talk_auction("Начальная цена владельцем не установлена{x.");
+                                talk_auction(_("Начальная цена владельцем не установлена{x."));
                         }
                         else
                         {
-                                talk_auction(fmt(0, _("Начальная цена: %d золот%s{x."), auction->startbet,
-                                        GET_COUNT(auction->startbet,"ая монета","ые монеты","ых монет")).c_str());
+                                talk_auction(_("Начальная цена: %1$d золот%1$Iая|ые|ых монет%1$Iа|ы|{x."),
+                                        auction->startbet);
                         }
                         wiznet( 0, 0, 0, "Продавец -- %C1", ch );
                         return;
