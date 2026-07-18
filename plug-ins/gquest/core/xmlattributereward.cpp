@@ -54,38 +54,34 @@ void XMLAttributeReward::reward( PCharacter *ch )
             continue;
         }
 
-        buf << r->reason << endl;
-            
+        buf << r->reason.getForLang(viewerLang(ch)) << endl;
+
         c = r->gold;
         if (c > 0) {
             ch->gold += c;
-            buf << fmt(0, _("%s%s%4d %sзолот%s\r\n"),
-                     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-                     GET_COUNT(c, "ую монету", "ые монеты", "ых монет") );
+            buf << fmt(ch, _("%1$s%2$s%3$4d %4$sзолот%3$Iую|ые|ых монет%3$Iу|ы|\r\n"),
+                     offset, GQChannel::BOLD, c, GQChannel::NORMAL );
         }
 
         c = r->qpoints;
         if (c > 0) {
             ch->addQuestPoints(c);
-            buf << fmt(0, _("%s%s%4d %sквестов%s\r\n"),
-                     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-                     GET_COUNT(c, "ую единицу", "ые единицы", "ых единиц") );
+            buf << fmt(ch, _("%1$s%2$s%3$4d %4$sквестов%3$Iую|ые|ых едини%3$Iцу|цы|ц\r\n"),
+                     offset, GQChannel::BOLD, c, GQChannel::NORMAL );
         }
 
         c = r->practice;
         if (c > 0) {
             ch->practice += c;
-            buf << fmt(0, _("%s%s%4d %sпрактик%s\r\n"),
-                      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-                      GET_COUNT(c, "у", "и", "") );
+            buf << fmt(ch, _("%1$s%2$s%3$4d %4$sпрактик%3$Iу|и|\r\n"),
+                      offset, GQChannel::BOLD, c, GQChannel::NORMAL );
         }
-        
+
         c = r->experience;
         if (c > 0) {
             Player::gainExp(ch, c);
-            buf << fmt(0, _("%s%s%4d %sочк%s опыта\r\n"),
-                     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-                     GET_COUNT(c, "о", "а", "ов"));
+            buf << fmt(ch, _("%1$s%2$s%3$4d %4$sочк%3$Iо|а|ов опыта\r\n"),
+                     offset, GQChannel::BOLD, c, GQChannel::NORMAL );
         }
         
         GQChannel::pecho( ch, buf );

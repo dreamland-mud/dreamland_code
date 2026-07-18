@@ -9,6 +9,7 @@
 #include "xmlvector.h"
 #include "xmlinteger.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlvariablecontainer.h"
 
 #include "descriptorstatelistener.h"
@@ -33,7 +34,7 @@ public:
         XML_VARIABLE XMLInteger practice;
         XML_VARIABLE XMLInteger restring;
         XML_VARIABLE XMLInteger experience;
-        XML_VARIABLE XMLString  reason;
+        XML_VARIABLE XMLMultiString reason;
         XML_VARIABLE XMLString  id;
 };
 

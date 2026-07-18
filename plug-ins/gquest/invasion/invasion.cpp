@@ -279,7 +279,7 @@ void InvasionGQuest::rewardLeader( )
         reward.gold = number_range( 150, 250 );
         reward.experience = number_range( 100, 400 );
         reward.practice = number_range( -6, 3 );
-        reward.reason = scen->getWinnerMsg( );
+        reward.reason[LANG_RU] = scen->getWinnerMsg( );
         reward.id = getQuestID( );
 
         if (leaders.size() == 1) {
@@ -330,7 +330,7 @@ void InvasionGQuest::rewardKiller( PCharacter *killer )
     attr->setKilled( attr->getKilled( ) + 1 );
 
     r.qpoints = 1;
-    r.reason = getScenario( )->getRewardMsg( );
+    r.reason[LANG_RU] = getScenario( )->getRewardMsg( );
     r.id = getQuestID( );
     GlobalQuestManager::getThis( )->rewardChar( killer, r );        
 }
