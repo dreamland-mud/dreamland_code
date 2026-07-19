@@ -139,7 +139,7 @@ void DefaultSkillGroup::listSkills( PCharacter *ch, ostringstream &buf ) const
 {
     // True if it's a help json dump and not a player requesting the article.
     bool autodump = ch->desc == 0;
-    bool fRus = ch->getConfig().ruskills;
+    bool fRus = Player::displayLang(ch) != LANG_EN;
     int columns = 3;
     const char *pattern = fRus ? "{%c%-26s{x" : "{%c%-20s{x";
     const char *autopattern = "%-26s";

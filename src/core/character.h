@@ -64,11 +64,8 @@ struct PlayerConfig {
 
     bool holy;
     bool color;
-    bool ruskills;
-    bool runames;
+    // Legacy 'config lang' seed only; retire with the CONFIG_RUCOMMANDS bit.
     bool rucommands;
-    bool ruexits;
-    bool ruother;
 };
 
 

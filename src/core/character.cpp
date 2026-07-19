@@ -62,18 +62,17 @@ Character * newbie_list = 0;
 PlayerConfig::PlayerConfig( )
 {
     holy = color = false;
-    ruskills = runames = rucommands = ruexits = ruother = false;
+    rucommands = false;
 }
 
 PlayerConfig::PlayerConfig( const PCharacter *ch )
 {
     holy = IS_SET(ch->act, PLR_HOLYLIGHT);
     color = IS_SET(ch->act, PLR_COLOR);
-    ruskills = ch->config.isSet(CONFIG_RUSKILLS);
-    runames = ch->config.isSet(CONFIG_RUNAMES);
+    // Legacy per-category Russian toggles retired in favor of 'config lang'.
+    // 'rucommands' lingers one release to seed 'lang' for players who predate
+    // 'config lang' (see PCharacterManager::load migration); drop it afterwards.
     rucommands = ch->config.isSet(CONFIG_RUCOMMANDS);
-    ruexits = ch->config.isSet(CONFIG_RUEXITS);
-    ruother = ch->config.isSet(CONFIG_RUOTHER);
 }
 
 Character::Character( )

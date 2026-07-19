@@ -9,6 +9,7 @@
 #include "dlfilestream.h"
 #include "dldirectory.h"
 #include "pcharacter.h"
+#include "commonattributes.h"
 #include "npcharacter.h"
 #include "dreamland.h"
 #include "act.h"
@@ -212,7 +213,7 @@ void send_discord_ic(Character *ch, const DLString &format, const DLString &msg)
     // Create a pseudo-player, with just enough parameters in order not to crash.
     PCharacter vict;
     vict.in_room = get_room_instance(2);
-    vict.config.setBit(CONFIG_RUNAMES);
+    vict.getAttributes( ).getAttr<XMLStringAttribute>( "lang" )->setValue( "ru" );
 
     DLString description = fmt(&vict, format.c_str(), ch, msg.c_str(), 0);
     send_to_discord_stream(":speech_left: `" + description + "`");

@@ -46,8 +46,10 @@ static DLString cmd_extra_exit(Character *ch, EXTRA_EXIT_DATA *eexit, bool prefe
 static DLString cmd_exit(Character *ch, int door, EXIT_DATA *pexit)
 {
     DLString cmd;
-    PlayerConfig cfg = ch->getConfig();
-    DLString ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
+    // Keep this 2-valued (RU vs EN): 'ename' becomes a movement command the web
+    // client sends back, so it must be a parser-recognized direction keyword.
+    // UA viewers fall back to the Russian keyword rather than an unparseable one.
+    DLString ename = (viewerLang(ch) != LANG_EN ? dirs[door].rname : dirs[door].name);
 
     if (IS_SET(pexit->exit_info, EX_LOCKED))
         return "отпереть " + ename;
@@ -119,7 +121,7 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
             continue;
         }
 
-        ename = direction_word(cfg.ruexits ? LANG_RU : viewerLang(ch), door, DIR_CASE_NOM);
+        ename = direction_word(viewerLang(ch), door, DIR_CASE_NOM);
         cmd = cmd_exit(ch, door, pexit);
         star = IS_SET(pexit->exit_info, EX_CLOSED|EX_LOCKED) ? "*" : "";
 
@@ -128,7 +130,7 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
     }
     
     if (!found)
-        buf << lmsg(cfg.ruexits ? LANG_RU : viewerLang(ch), " none", " нет", " немає");
+        buf << lmsg(viewerLang(ch), " none", " нет", " немає");
             
 
     StringList extras;
@@ -196,7 +198,7 @@ CMDRUNP( exits )
         }
 
         found = true;   
-        ename = direction_word(cfg.ruexits ? LANG_RU : viewerLang(ch), door, DIR_CASE_NOM);
+        ename = direction_word(viewerLang(ch), door, DIR_CASE_NOM);
         cmd = cmd_exit(ch, door, pexit);
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED|EX_LOCKED))
@@ -216,7 +218,7 @@ CMDRUNP( exits )
         else {
             ename = "*" + ename + "*";
             buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - "
-                << direction_doorname_langtext(pexit, '1').forLang(cfg.ruexits ? LANG_RU : viewerLang(ch))
+                << direction_doorname_langtext(pexit, '1').forLang(viewerLang(ch))
                 << " (" << (IS_SET(pexit->exit_info, EX_LOCKED) ? l(ch, "заперто") : l(ch, "закрыто")) << ")";
 
             if (cfg.holy)

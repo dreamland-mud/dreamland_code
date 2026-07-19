@@ -13,6 +13,7 @@
 #include "websocketrpc.h"
 #include "screenreader.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "race.h"
 #include "merc.h"
 #include "def.h"
@@ -393,17 +394,14 @@ protected:
 
 VisibilityTags::VisibilityTags( const char *text, Character *ch )
 {
-    PlayerConfig cfg = ch ? ch->getConfig( ) : PlayerConfig( );
     this->text = text;
     this->ch = ch;
 
-    my_clang = (cfg.rucommands) ? LANG_RUSSIAN : LANG_ENGLISH;
-
-    my_slang = (cfg.ruskills) ? LANG_RUSSIAN : LANG_ENGLISH;
-
-    my_nlang = (cfg.runames) ? LANG_RUSSIAN : LANG_ENGLISH;
-
-    my_elang = (cfg.ruexits) ? LANG_RUSSIAN : LANG_ENGLISH;
+    // The four legacy per-category channels (commands/skills/names/exits) now
+    // follow the viewer's single display language ('config lang'): EN takes the
+    // English tag forms, RU and UA both take the localized (Russian) ones.
+    int tagLang = (ch && Player::displayLang( ch ) != LANG_EN) ? LANG_RUSSIAN : LANG_ENGLISH;
+    my_clang = my_slang = my_nlang = my_elang = tagLang;
 
     my_sex = ch ? ch->getSex( ) : SEX_MALE;
 
@@ -712,8 +710,8 @@ void VisibilityTags::hyper_tag_end( ostringstream &out )
 
 /** 
  * Additional behavior for some of the hyper-tags:
- * - {hs replaces exit names inside speedwalk based on player's ruexits config.
- *    Works for both web and telnet.
+ * - {hs replaces exit names inside speedwalk based on the viewer's display
+ *   language ('config lang'). Works for both web and telnet.
  */
 bool VisibilityTags::hyper_tag_work()
 {

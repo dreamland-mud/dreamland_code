@@ -4,6 +4,7 @@
 #include "logstream.h"
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "alignment.h"
 #include "infonet.h"
 #include "messengers.h"
@@ -111,7 +112,7 @@ void CraftProfession::unloaded( )
 
 DLString CraftProfession::getNameFor( Character *ch, const Grammar::Case &c ) const
 {
-    if (ch && ch->getConfig( ).rucommands)
+    if (ch && Player::displayLang(ch) != LANG_EN)
         return getRusName( ).ruscase( c );
     else
         return getName( );

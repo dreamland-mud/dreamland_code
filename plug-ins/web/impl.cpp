@@ -321,7 +321,7 @@ Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
     Json::Value exits;
     exits["h"] = hidden.str( );
     exits["e"] = visible.str( );
-    exits["l"] = ch->getConfig( ).ruexits ? "r" : "e";
+    exits["l"] = Player::displayLang( ch ) != LANG_EN ? "r" : "e";
     return exits;
 }    
 
@@ -918,9 +918,7 @@ public:
         dummy.setRussianName("Кадм||а|у|а|ом|е");
         dummy.setLevel(1);
         dummy.setSex(SEX_MALE);
-        dummy.config.setBit(CONFIG_RUSKILLS);
-        dummy.config.setBit(CONFIG_RUCOMMANDS);
-        dummy.config.setBit(CONFIG_RUOTHER);
+        dummy.getAttributes( ).getAttr<XMLStringAttribute>( "lang" )->setValue( "ru" );
         SET_BIT(dummy.act, PLR_COLOR);
 
         Json::Value helps;

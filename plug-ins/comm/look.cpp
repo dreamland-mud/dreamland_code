@@ -922,8 +922,8 @@ static void show_char_sexrace( Character *ch, Character *vict, ostringstream &bu
 {
     buf << "(";
 
-    // Render sex+race in the viewer's DISPLAY language (not the rucommands input
-    // flag). EN uses a sex word + ungendered race name ("female angel"); RU/UA use
+    // Render sex+race in the viewer's DISPLAY language ('config lang').
+    // EN uses a sex word + ungendered race name ("female angel"); RU/UA use
     // the gendered race name alone -- getNameFor() is display-language-aware and
     // returns the UA field (RU fallback) for UA viewers, so no sex word is needed.
     if (Player::displayLang(ch) == LANG_EN) {

@@ -22,7 +22,6 @@ static void scan_people(Room *room, Character *ch, int depth, int door,
 {
     Character *rch, *orig;
     bool found;
-    bool fRus = ch->getConfig().ruexits;
 
     found = false;
 
@@ -42,7 +41,7 @@ static void scan_people(Room *room, Character *ch, int depth, int door,
             if (door != -1)
             {
                 if (fShowDir)
-                    buf << direction_word(fRus ? LANG_RU : viewerLang(ch), door, DIR_CASE_AT);
+                    buf << direction_word(viewerLang(ch), door, DIR_CASE_AT);
                 else
                     buf << lmsg(viewerLang(ch), "Range ", "Дальность ", "Відстань ") << depth;
             }
@@ -69,7 +68,6 @@ static Room *scan_room(Room *start_room, Character *ch, int depth, int door,
 {
     EXIT_DATA *pExit;
     Room *room;
-    bool fRus = ch->getConfig().ruexits;
 
     pExit = start_room->exit[door];
 
@@ -83,12 +81,12 @@ static Room *scan_room(Room *start_room, Character *ch, int depth, int door,
         buf << "{" << CLR_SCAN_DIR(ch);
 
         if (fShowDir)
-            buf << direction_word(fRus ? LANG_RU : viewerLang(ch), door, DIR_CASE_AT);
+            buf << direction_word(viewerLang(ch), door, DIR_CASE_AT);
         else
             buf << lmsg(viewerLang(ch), "Range ", "Дальность ", "Відстань ") << depth;
 
         buf << ":{x" << endl
-            << "    {" << CLR_SCAN_DOOR(ch) << direction_doorname_langtext(pExit, '1').forLang(fRus ? LANG_RU : viewerLang(ch)) << " (закрыто).{x" << endl;
+            << "    {" << CLR_SCAN_DOOR(ch) << direction_doorname_langtext(pExit, '1').forLang(viewerLang(ch)) << " (закрыто).{x" << endl;
 
         return NULL;
     }
@@ -98,7 +96,7 @@ static Room *scan_room(Room *start_room, Character *ch, int depth, int door,
         buf << "{" << CLR_SCAN_DIR(ch);
 
         if (fShowDir)
-            buf << direction_word(fRus ? LANG_RU : viewerLang(ch), door, DIR_CASE_AT);
+            buf << direction_word(viewerLang(ch), door, DIR_CASE_AT);
         else
             buf << lmsg(viewerLang(ch), "Range ", "Дальность ", "Відстань ") << depth;
 

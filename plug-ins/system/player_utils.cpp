@@ -61,8 +61,10 @@ lang_t Player::displayLang(Character *ch)
     if (langAttr && !langAttr->getValue().empty())
         return lang(ch);
 
-    // Never set a language: keep the historical ru/en commands behavior.
-    return ch->getConfig().rucommands ? LANG_RU : LANG_EN;
+    // Never set a language: players who predate 'config lang' are seeded from
+    // the retired 'rucommands' flag on load (PCharacterManager::load), so a
+    // still-empty 'lang' here just means a brand-new session -- use the default.
+    return LANG_DEFAULT;
 }
 
 DLString Player::title(PCMemoryInterface *pcm, lang_t lang)
