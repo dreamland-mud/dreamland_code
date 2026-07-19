@@ -15,6 +15,7 @@
 #include "skillcommand.h"
 #include "skillgroup.h"
 #include "character.h"
+#include "player_utils.h"
 #include "commandflags.h"
 #include "def.h"
 
@@ -54,10 +55,10 @@ void SkillHelpFormatter::reset( )
 void SkillHelpFormatter::setup( Character *ch )
 {
     if (ch) {
-        PlayerConfig cfg = ch->getConfig( );
+        bool fRus = Player::displayLang(ch) != LANG_EN;
 
-        fRusCmd = cfg.rucommands;
-        fRusSkill = cfg.ruskills;
+        fRusCmd = fRus;
+        fRusSkill = fRus;
     }
     
     HelpFormatter::setup( ch );

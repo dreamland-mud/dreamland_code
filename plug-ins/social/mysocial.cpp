@@ -9,6 +9,7 @@
 
 #include "mysocial.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "comm.h"
 #include "arg_utils.h"
 #include "act.h"
@@ -187,7 +188,7 @@ void MySocial::doList( Character *ch, XMLAttributeCustomSocials::Pointer attr )
         return;
     }
     
-    bool fRus = ch->getConfig( ).rucommands;
+    bool fRus = Player::displayLang(ch) != LANG_EN;
 
     buf << "{W----------------+--------------------------------------------------------------{x" << endl;
       

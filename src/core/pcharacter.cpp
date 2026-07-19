@@ -718,9 +718,10 @@ using namespace Grammar;
 // launcher links only the core libs, so core cannot reference Player:: or the
 // plugin-side XMLStringAttribute type. We read the same 'lang' attribute through
 // its core XMLStringVariable base. An explicit 'config lang' (ua/ru/en) wins;
-// otherwise fall back to the legacy rucommands flag. Keep in sync with
-// Player::lang / Player::displayLang. Prototype in l10n/lang.h so Object::toNoun
-// shares this exact resolution (not static -- exported from the core lib).
+// otherwise fall back to LANG_DEFAULT (players who predate 'config lang' are
+// seeded from the retired 'rucommands' flag on load, see PCharacterManager::load).
+// Keep in sync with Player::lang / Player::displayLang. Prototype in l10n/lang.h
+// so Object::toNoun shares this exact resolution (not static -- exported).
 lang_t viewerLang( const Character *wch )
 {
     if (!wch)
@@ -741,7 +742,7 @@ lang_t viewerLang( const Character *wch )
         if (v == "en") return LANG_EN;
     }
 
-    return wch->getConfig( ).rucommands ? LANG_RU : LANG_EN;
+    return LANG_DEFAULT;
 }
 
 Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const

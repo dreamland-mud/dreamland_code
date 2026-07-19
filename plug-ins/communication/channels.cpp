@@ -13,6 +13,7 @@
 #include "../loadsave/behavior_utils.h"
 #include "core/behavior/behavior_utils.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "npcharacter.h"
 #include "object.h"
 #include "room.h"
@@ -304,7 +305,7 @@ COMMAND(ChannelsCommand, "channels")
 {
     ostringstream buf;
     Channels::iterator c;
-    bool rus = ch->getConfig( ).rucommands;
+    bool rus = Player::displayLang(ch) != LANG_EN;
     
     buf << "   канал     статус  " << endl
         << "---------------------" << endl;

@@ -13,6 +13,7 @@
 #include "pcharactermemory.h"
 #include "grammar_entities_impl.h"
 #include "character.h"
+#include "lang.h"
 #include "merc.h"
 #include "def.h"
 
@@ -373,14 +374,13 @@ using namespace Grammar;
 Noun::Pointer PCharacterMemory::toNoun( const DLObject *forWhom, int flags ) const
 {
     const Character *wch = dynamic_cast<const Character *>(forWhom);
-    PlayerConfig cfg = wch ? wch->getConfig( ) : PlayerConfig();
     MultiGender mg( getSex( ), Number::SINGULAR );
-    
+
     DLString rname = getRussianName( ).getFullForm( );
     if (rname.empty( ))
         rname = getName( );
-        
-    if (wch && !cfg.runames)
+
+    if (wch && viewerLang( wch ) == LANG_EN)
         return InflectedString::Pointer( NEW, getName( ), mg );
     else
         return InflectedString::Pointer( NEW, rname, mg );

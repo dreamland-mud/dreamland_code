@@ -4,6 +4,7 @@
  */
 #include "skillcommand.h"
 #include "character.h"
+#include "lang.h"
 
 SkillCommand::~SkillCommand( )
 {
@@ -23,7 +24,7 @@ const DLString & SkillCommand::getRussianName( ) const
 
 const DLString& SkillCommand::getNameFor(Character *ch) const
 {
-    if (ch && ch->getConfig( ).rucommands)
+    if (ch && viewerLang( ch ) != LANG_EN)
         return getRussianName( );
     else
         return getName( );

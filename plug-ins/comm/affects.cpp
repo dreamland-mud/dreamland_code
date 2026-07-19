@@ -3,6 +3,7 @@
 #include "liquid.h"
 #include "religion.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "npcharacter.h"
 #include "affect.h"
 #include "autoflags.h"
@@ -317,7 +318,7 @@ CMDRUNP( affects )
     list<AffectOutput>::iterator o;
     int flags = FSHOW_LINES|FSHOW_TIME|FSHOW_COLOR|FSHOW_EMPTY;
 
-    if ((IS_CHARMED(ch) ? ch->master : ch)->getConfig().ruskills)
+    if (Player::displayLang(IS_CHARMED(ch) ? ch->master : ch) != LANG_EN)
         SET_BIT(flags, FSHOW_RUSSIAN);
    
     // Keep track of res, vuln, hp/mana gain. 

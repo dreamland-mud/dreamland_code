@@ -7,6 +7,7 @@
 #include "commandplugin.h"
 #include "commandmanager.h"
 #include "character.h"
+#include "player_utils.h"
 
 const DLString CommandHelp::TYPE = "CommandHelp";
 static const DLString LABEL_COMMAND = "cmd";
@@ -148,7 +149,7 @@ void CommandHelpFormatter::reset( )
 void CommandHelpFormatter::setup( Character *ch )
 {
     if (ch) {
-        fRusCmd = ch->getConfig( ).rucommands;
+        fRusCmd = Player::displayLang(ch) != LANG_EN;
     }
     
     HelpFormatter::setup( ch );

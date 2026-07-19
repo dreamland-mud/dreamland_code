@@ -210,7 +210,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 
     while( *str ) {
         ostringstream doors;
-        bool ruexits = false;
+        bool fRus = false;
         bool handled = false;
 
         if ( *str != '%' ) {
@@ -243,7 +243,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'd':
         case 'e':
-            ruexits = ch->getPC( ) && ch->getPC( )->getConfig( ).ruexits;
+            fRus = ch->getPC( ) && Player::displayLang( ch ) != LANG_EN;
 
             for (int door = 0; door < DIR_SOMEWHERE; door++) {
                 EXIT_DATA *pexit = ch->in_room->exit[door];
@@ -252,13 +252,13 @@ void InterpretHandler::normalPrompt( Character *ch )
                     continue;
 
                 if (IS_SET(pexit->exit_info, EX_CLOSED)) {
-                    doors << (ruexits ? ru_dir_name_small[door] : dir_name_small[door]);
+                    doors << (fRus ? ru_dir_name_small[door] : dir_name_small[door]);
                 } else {
-                    doors << (ruexits ? ru_dir_name_big[door] : dir_name_big[door]);
+                    doors << (fRus ? ru_dir_name_big[door] : dir_name_big[door]);
                 }
             }
             if (doors.str( ).empty( ))
-                out << (ruexits ? "нет" : "none");
+                out << (fRus ? "нет" : "none");
             else
                 out << doors.str( );
             break;

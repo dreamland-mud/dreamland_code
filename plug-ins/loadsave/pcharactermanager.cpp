@@ -25,6 +25,7 @@
 #include "pcharactermemorylist.h"
 #include "pcharactermemory.h"
 #include "pcharacter.h"
+#include "commonattributes.h"
 
 #include "fread_utils.h"
 #include "dreamland.h"
@@ -515,9 +516,24 @@ bool PCharacterManager::save( PCharacter* pc )
 bool PCharacterManager::load( PCharacter* pc )
 {
     DLString name= pc->getName( );
-    
+
     name.toLower( );
-    return thisClass->loadXML( pc, name );
+    if (!thisClass->loadXML( pc, name ))
+        return false;
+
+    // One-time migration off the retired per-category Russian toggles: players
+    // created before 'config lang' existed have no 'lang' attribute, so seed it
+    // from the legacy 'rucommands' flag (set -> ru, clear -> en) to preserve
+    // their effective display language. Idempotent -- runs only while 'lang' is
+    // empty. Remove together with the leftover CONFIG_RUCOMMANDS bit once the
+    // player base has cycled through a login.
+    auto langAttr = pc->getAttributes( ).findAttr<XMLStringAttribute>( "lang" );
+    if (!langAttr || langAttr->getValue( ).empty( )) {
+        const char *seed = pc->getConfig( ).rucommands ? "ru" : "en";
+        pc->getAttributes( ).getAttr<XMLStringAttribute>( "lang" )->setValue( seed );
+    }
+
+    return true;
 }
 
 PCharacter * PCharacterManager::create( const DLString &name )

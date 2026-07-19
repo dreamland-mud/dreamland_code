@@ -113,7 +113,7 @@ bool ConfigElement::printText( PCharacter *ch ) const
 void ConfigElement::printRow( PCharacter *ch ) const
 {
     bool yes = isSetBit( ch );
-    bool rus = ch->getConfig( ).rucommands;
+    bool rus = Player::displayLang( ch ) != LANG_EN;
 
     ch->pecho( "| {%s%-14s {x|  {%s%-7s {x|", 
                       CLR_NAME(ch), 
@@ -125,7 +125,7 @@ void ConfigElement::printRow( PCharacter *ch ) const
 
 static void print_line(PCharacter *ch, const DLString &name, const DLString &rname, bool yes, const DLString &msgYes, const DLString &msgNo)
 {
-    if (ch->getConfig( ).rucommands)
+    if (Player::displayLang( ch ) != LANG_EN)
         ch->pecho( "  {%s%-14s {%s%5s {x%s",
                         CLR_NAME(ch),
                         rname.c_str(),

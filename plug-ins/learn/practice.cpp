@@ -18,6 +18,7 @@
 #include "spell.h"
 #include "clanreference.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "room.h"
 #include "../loadsave/behavior_utils.h"
 #include "areaquestutils.h"
@@ -105,7 +106,7 @@ void CPractice::pracShow( PCharacter *ch )
 {
     ostringstream buf;
     PracCategoryMap categoryMap;
-    bool fRussian = ch->getConfig( ).ruskills;
+    bool fRussian = Player::displayLang(ch) != LANG_EN;
     
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         Skill *skill = SkillManager::getThis( )->find( sn );

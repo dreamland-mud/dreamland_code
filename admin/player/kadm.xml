@@ -37,7 +37,7 @@
   <batle_prompt>&lt;%n: %h/%Hhp %m/%Mm %v/%Vmv Opp:&lt;%o&gt;&gt; </batle_prompt>
   <clanLevel>0</clanLevel>
   <comm>prompt combine</comm>
-  <config>fightspam skillspam runames objname_hint newdamage ruskills rucommands ruexits</config>
+  <config>fightspam skillspam objname_hint newdamage rucommands</config>
   <description>Темноволосый смуглый человек с немного усталым выражением лица.
 Он одет в пыльную робу, в мозолистых руках крепко зажата лопата.
 В глазах видна бесконечность.

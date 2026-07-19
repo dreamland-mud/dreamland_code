@@ -7,6 +7,7 @@
 #include "religion.h"
 #include "affect.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "core/object.h"
 #include "calendar_utils.h"
 #include "skill.h"
@@ -149,7 +150,7 @@ char skill_learned_colour(const Skill *skill, PCharacter *ch)
 
 DLString print_names_for(const Skill *skill, Character *ch)
 {
-    bool rus = ch->getConfig( ).ruskills;
+    bool rus = Player::displayLang(ch) != LANG_EN;
     const char *format = "'{%c%N1{%c' или '{%c%N1{%c'";
 
     if (rus)

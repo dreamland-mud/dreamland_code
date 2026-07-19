@@ -13,6 +13,7 @@
 #include "affect.h"
 #include "object.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "npcharacter.h"
 #include "string_utils.h"
 #include "merc.h"
@@ -133,7 +134,7 @@ void QuestTrader::msgBuyRequest( Character *client )
  *---------------------------------------------------------------------------*/
 void QuestTradeArticle::toStream( Character *client, ostringstream &buf ) const
 {
-    DLString myname = client->getConfig().rucommands && !rname.empty() ? rname : name;
+    DLString myname = Player::displayLang(client) != LANG_EN && !rname.empty() ? rname : name;
     buf << "    " << setiosflags( ios::right ) << setw( 7 );
     
     price->toStream( client, buf );
