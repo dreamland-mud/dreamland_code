@@ -135,54 +135,54 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     if (!r->getStats( ).empty( )) {
         bool found = false;
 
-        in << "{cПараметры{x   : ";
+        in << "{c" << l(ch, "Параметры") << "{x   : ";
         for (int i = 0; i < stat_table.size; i++) {
             int stat = r->getStats( )[i];
             if (stat != 0) {
-                if (found) 
+                if (found)
                     in << ", ";
-                in << (stat > 0 ? "+" : "") << stat << " к " << stat_table.message( i, '3', Player::displayLang(ch) );
+                in << (stat > 0 ? "+" : "") << stat << l(ch, " к ") << stat_table.message( i, '3', Player::displayLang(ch) );
                 found = true;
             }
         }
         if (!found)
-            in << "без изменений";
+            in << l(ch, "без изменений");
         in << endl;
     }
-    in << "{cРазмер{x      : " << size_table.message( r->getSize( ), '1', Player::displayLang(ch) ) << endl;
+    in << "{c" << l(ch, "Размер") << "{x      : " << size_table.message( r->getSize( ), '1', Player::displayLang(ch) ) << endl;
     
-    in << "{cКлассы{x      : любой";
+    in << "{c" << l(ch, "Классы") << "{x      : " << l(ch, "любой");
     bool found = false;
     for (int i = 0; i < professionManager->size( ); i++) {
         Profession *prof = professionManager->find( i );
 
-        if (prof->isValid() 
+        if (prof->isValid()
             && prof->isPlayed()
             && !prof->getFlags().isSet(PROF_NEWLOCK)
-            && const_cast<PCRace *>(r)->getClasses( )[prof->getIndex( )] <= 0) 
+            && const_cast<PCRace *>(r)->getClasses( )[prof->getIndex( )] <= 0)
         {
             if (!found)
-                in << ", кроме ";
+                in << l(ch, ", кроме ");
             else
                 in << ", ";
-            in << prof->getRusName( ).ruscase( '2' );
+            in << prof->getNameFor( ch, Grammar::Case('2') );
             found = true;
         }
     }
     in << endl;
 
-    DLString res = imm_flags.messages( r->getRes( ), true, '1' );
+    DLString res = imm_flags.messages( r->getRes( ), true, '1', Player::displayLang(ch) );
     if (!res.empty( )) {
-        in << "{cУстойчивы{x   : к " << res << endl;
+        in << "{c" << l(ch, "Устойчивы") << "{x   : " << l(ch, "к ") << res << endl;
     }
-    DLString vuln = imm_flags.messages( r->getVuln( ), true, '1' );
+    DLString vuln = imm_flags.messages( r->getVuln( ), true, '1', Player::displayLang(ch) );
     if (!vuln.empty( )) {
-        in << "{cУязвимы{x     : к " << vuln << endl;
+        in << "{c" << l(ch, "Уязвимы") << "{x     : " << l(ch, "к ") << vuln << endl;
     }
 
-    DLString aff = r->getAff( ).messages( true, '1' );
+    DLString aff = r->getAff( ).messages( true, '1', Player::displayLang(ch) );
     if (!aff.empty( )) {
-        in << "{cВоздействия{x : " << aff << endl;
+        in << "{c" << l(ch, "Воздействия") << "{x : " << aff << endl;
     }
 
     in << endl;
@@ -194,7 +194,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
 
     for (int sn = 0; sn < skillManager->size( ); sn++) {
         Skill *skill = skillManager->find( sn );
-        DLString sname = skill->getRussianName( );
+        DLString sname = skill->getNameFor( ch );
         PCharacter dummy;
         dummy.setRace( race->getName( ) );
         dummy.setLevel( 100 );
@@ -209,7 +209,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
                 int adept = skill->getAdept(&dummy);
                 if (max > adept) {
                     DLString langName;
-                    langName << sname << " до " << max << "%";
+                    langName << sname << l(ch, " до ") << max << "%";
                     lang.insert(langName);
                 }
             }
@@ -233,16 +233,16 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     }
     
     if (!raceApt.empty( )) {
-        in << "{WУникальные способности{x: " << raceApt << endl;
+        in << "{W" << l(ch, "Уникальные способности") << "{x: " << raceApt << endl;
     }
     if (!prof100.empty( )) {
-        in << "{WБонусы на классовые умения{x: " << prof100 << endl;
+        in << "{W" << l(ch, "Бонусы на классовые умения") << "{x: " << prof100 << endl;
     }
     if (!noprof100.empty( )) {
-        in << "{WБонусные умения{x: " << noprof100 << endl;
+        in << "{W" << l(ch, "Бонусные умения") << "{x: " << noprof100 << endl;
     }
     if (!lang.empty()) {
-        in << "{WЗнание древних языков{x: " << lang << endl;
+        in << "{W" << l(ch, "Знание древних языков") << "{x: " << lang << endl;
     }
     
     in << endl << "Подробнее о значении каждого параметра читай %H% [расовые особенности]." << endl;

@@ -194,6 +194,18 @@ DLString ProfessionHelp::getTitle(const DLString &label) const
     return HelpArticle::getTitle(label);
 }
 
+// Per-viewer plural (multiple) race name: UA name for a UA viewer (RU fallback),
+// latin for EN, declinable RU otherwise.
+static DLString raceMltNameFor( Race *race, Character *ch, char gcase )
+{
+    lang_t lang = Player::displayLang( ch );
+    if (lang == LANG_UA && !race->getMltNameUa( ).empty( ))
+        return race->getMltNameUa( ).ruscase( gcase );
+    if (lang == LANG_EN)
+        return race->getName( );
+    return race->getMltName( ).ruscase( gcase );
+}
+
 void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     in << l(ch, "Класс") << " {C" << prof->getNameFor( ch, Grammar::Case('1') ) << "{x " << l(ch, "или") << " {C"
@@ -205,60 +217,60 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
     in << "{cНатура{x    : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ), ch ) << endl;
 
     if (prof->getEthos( ).equalsToBitNumber( ETHOS_LAWFUL ))
-        in << "{cЭтос{x      : " << "законопослушный" << endl;
+        in << "{c" << l(ch, "Этос") << "{x      : " << l(ch, "законопослушный") << endl;
 
     if (prof->getSex( ).equalsToBitNumber( SEX_FEMALE ))
-        in << "{cПол{x       : " << "женский" << endl;
+        in << "{c" << l(ch, "Пол") << "{x       : " << l(ch, "женский") << endl;
     else if (prof->getSex( ).equalsToBitNumber( SEX_MALE ))
-        in << "{cПол{x       : " << "мужской" << endl;
+        in << "{c" << l(ch, "Пол") << "{x       : " << l(ch, "мужской") << endl;
 
     bool found = false;
 
-    in << "{cПараметры{x : ";
+    in << "{c" << l(ch, "Параметры") << "{x : ";
     for (int i = 0; i < stat_table.size - 1; i++) {
         int stat = prof->getStat( i );
         if (stat != 0) {
-            if (found) 
+            if (found)
                 in << ", ";
-            in << (stat > 0 ? "+" : "") << stat << " к " << stat_table.message( i, '3', Player::displayLang(ch) );
+            in << (stat > 0 ? "+" : "") << stat << l(ch, " к ") << stat_table.message( i, '3', Player::displayLang(ch) );
             found = true;
         }
     }
     if (!found)
-        in << "без изменений";
+        in << l(ch, "без изменений");
     in << endl;
 
-    in << "{cДоп. опыт{x : " << prof->getPoints( ) << endl;
+    in << "{c" << l(ch, "Доп. опыт") << "{x : " << prof->getPoints( ) << endl;
 
     StringList noraces, races;
     for (int i = 0; i < raceManager->size(); i++) {
         Race *race = raceManager->find(i);
         if (race->isPC()) {
             if (race->getPC()->getClasses()[prof->getIndex()] <= 0)
-                noraces.push_back(race->getMltName().ruscase('2'));
+                noraces.push_back(raceMltNameFor(race, ch, '2'));
             else
-                races.push_back(race->getMltName().ruscase('1'));
+                races.push_back(raceMltNameFor(race, ch, '1'));
         }
     }
-    in << "{cРасы      {x: ";
+    in << "{c" << l(ch, "Расы") << "      {x: ";
     if (noraces.empty())
-        in << "все";
+        in << l(ch, "все");
     else if (races.size() < noraces.size() || noraces.size() > 5)
-        in << "только " << races.join(", ");
+        in << l(ch, "только ") << races.join(", ");
     else if (!races.empty())
-        in << "все, кроме " << noraces.join(", ");
+        in << l(ch, "все, кроме ") << noraces.join(", ");
     else
-        in << "никто";
+        in << l(ch, "никто");
     in << endl;
-    
-    in << "{cБонус к уровню вещей{x: ";
+
+    in << "{c" << l(ch, "Бонус к уровню вещей") << "{x: ";
     found = false;
     for (int i = 0; i < item_table.size; i++) {
         int m = prof->getWearModifier( i );
         if (m != 0) {
             if (found)
                 in << ", ";
-            in << (m > 0 ? "+" : "") << m << " к " << item_table.message( i, '3' );
+            in << (m > 0 ? "+" : "") << m << l(ch, " к ") << item_table.message( i, '3', Player::displayLang(ch) );
             found = true;
         }
     }
