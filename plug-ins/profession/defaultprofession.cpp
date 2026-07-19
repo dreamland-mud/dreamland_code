@@ -202,7 +202,7 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 
     in << text.getForLang( Player::displayLang(ch) ) << endl;
 
-    in << "{cНатура{x    : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ) ) << endl;
+    in << "{cНатура{x    : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ), ch ) << endl;
 
     if (prof->getEthos( ).equalsToBitNumber( ETHOS_LAWFUL ))
         in << "{cЭтос{x      : " << "законопослушный" << endl;

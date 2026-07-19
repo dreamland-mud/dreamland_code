@@ -21,7 +21,7 @@ struct alignment_t {
 
 extern const struct alignment_t alignment_table [];
 
-DLString align_name_for_range( int min, int max );
+DLString align_name_for_range( int min, int max, Character *ch = 0 );
 DLString align_name( Character * );
 DLString align_max( PCharacter * );
 DLString align_min( PCharacter * );
