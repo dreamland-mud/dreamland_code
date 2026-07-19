@@ -13,7 +13,7 @@
 #include "websocketrpc.h"
 #include "screenreader.h"
 #include "pcharacter.h"
-#include "player_utils.h"
+#include "lang.h"
 #include "race.h"
 #include "merc.h"
 #include "def.h"
@@ -400,7 +400,7 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
     // The four legacy per-category channels (commands/skills/names/exits) now
     // follow the viewer's single display language ('config lang'): EN takes the
     // English tag forms, RU and UA both take the localized (Russian) ones.
-    int tagLang = (ch && Player::displayLang( ch ) != LANG_EN) ? LANG_RUSSIAN : LANG_ENGLISH;
+    int tagLang = (ch && viewerLang( ch ) != LANG_EN) ? LANG_RUSSIAN : LANG_ENGLISH;
     my_clang = my_slang = my_nlang = my_elang = tagLang;
 
     my_sex = ch ? ch->getSex( ) : SEX_MALE;

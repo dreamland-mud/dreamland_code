@@ -9,7 +9,6 @@
 #include "dlfilestream.h"
 #include "dldirectory.h"
 #include "pcharacter.h"
-#include "commonattributes.h"
 #include "npcharacter.h"
 #include "dreamland.h"
 #include "act.h"
@@ -213,7 +212,9 @@ void send_discord_ic(Character *ch, const DLString &format, const DLString &msg)
     // Create a pseudo-player, with just enough parameters in order not to crash.
     PCharacter vict;
     vict.in_room = get_room_instance(2);
-    vict.getAttributes( ).getAttr<XMLStringAttribute>( "lang" )->setValue( "ru" );
+    // No 'lang' attr set: this pseudo-viewer falls back to LANG_DEFAULT (RU) in
+    // viewerLang, so names render in Russian as before (the output plugin can't
+    // reach the plug-ins/system attribute headers to set it explicitly).
 
     DLString description = fmt(&vict, format.c_str(), ch, msg.c_str(), 0);
     send_to_discord_stream(":speech_left: `" + description + "`");
