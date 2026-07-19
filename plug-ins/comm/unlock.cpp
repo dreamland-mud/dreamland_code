@@ -239,8 +239,8 @@ CMDRUNP( unlock )
                 return;
         }
 
-        ch->pecho(_("Ты отпираешь %O5 и открываешь %N4."), key, peexit->short_desc_from.get(LANG_DEFAULT).c_str());
-        ch->recho(_("%^C1 отпирает %O5 и открывает %N4."), ch, key, peexit->short_desc_from.get(LANG_DEFAULT).c_str());
+        ch->pecho(_("Ты отпираешь %O5 и открываешь %N4."), key, peexit->short_desc_from.getForLang(viewerLang(ch)).c_str());
+        ch->recho(_("%^C1 отпирает %O5 и открывает %N4."), ch, key, peexit->short_desc_from.getForLang(viewerLang(ch)).c_str());
 
         REMOVE_BIT(peexit->exit_info, EX_LOCKED | EX_CLOSED);
 

@@ -569,11 +569,11 @@ void ExtraExitKeyhole::setLockFlags(int flags)
 
 void ExtraExitKeyhole::msgTryPickSelf( )
 {
-    oldact(_("Ты осторожно поворачиваешь $o4 в замочной скважине $N2."), ch, lockpick, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_CHAR );
+    oldact(_("Ты осторожно поворачиваешь $o4 в замочной скважине $N2."), ch, lockpick, peexit->short_desc_from.getForLang(viewerLang(ch)).c_str(), TO_CHAR );
 }
 void ExtraExitKeyhole::msgTryPickOther( )
 {
-    oldact(_("$c1 ковыряется в замке $N2."), ch, 0, peexit->short_desc_from.get(LANG_DEFAULT).c_str(), TO_ROOM );
+    oldact(_("$c1 ковыряется в замке $N2."), ch, 0, peexit->short_desc_from.getForLang(viewerLang(ch)).c_str(), TO_ROOM );
 }
 
 DLString ExtraExitKeyhole::getDescription( )
