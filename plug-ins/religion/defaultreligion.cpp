@@ -19,6 +19,7 @@
 #include "religionflags.h"
 #include "liquidflags.h"
 #include "websocketrpc.h"
+#include "l10n.h"
 #include "merc.h"
 #include "def.h"
 
@@ -83,18 +84,18 @@ DLString ReligionHelp::getTitle(const DLString &label) const
 
 void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    in << "Религия {C" << religion->getRussianName().ruscase('1') << "{x ({C"
+    in << l(ch, "Религия") << " {C" << religion->getNameFor(ch).ruscase('1') << "{x ({C"
        << religion->getShortDescr() << "{x)";
-    
+
     if (ch && ch->desc) {
         if (religion->available(ch))
-            in << ", доступна для тебя.";
+            in << l(ch, ", доступна для тебя.");
         else
-            in << ", недоступна тебе.";
+            in << l(ch, ", недоступна тебе.");
     }
 
     in << " " << "%PAUSE% " << web_edit_button(ch, "reledit", religion->getName()) << "%RESUME%" << endl << endl
-       << text.get(RU);
+       << text.getForLang(Player::displayLang(ch));
 }
 
 /*----------------------------------------------------------------------
