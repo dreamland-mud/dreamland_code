@@ -23,6 +23,7 @@
 #include "profflags.h"
 
 #include "dreamland.h"
+#include "l10n.h"
 #include "merc.h"
 #include "def.h"
 
@@ -106,16 +107,25 @@ inline ostream& operator << ( ostream& ostr, const CommaSet& cset )
 
 void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    DLString nameF = race->getFemaleName( ).ruscase( '1' ); 
-    DLString nameM = race->getMaleName( ).ruscase( '1' ); 
+    lang_t vlang = Player::displayLang(ch);
+    DLString nameF, nameM;
+    if (vlang == LANG_UA) {
+        nameF = (!race->getFemaleNameUa( ).empty( ) ? race->getFemaleNameUa( ) : race->getFemaleName( )).ruscase( '1' );
+        nameM = (!race->getMaleNameUa( ).empty( ) ? race->getMaleNameUa( ) : race->getMaleName( )).ruscase( '1' );
+    } else if (vlang == LANG_EN) {
+        nameF = nameM = race->getName( );
+    } else {
+        nameF = race->getFemaleName( ).ruscase( '1' );
+        nameM = race->getMaleName( ).ruscase( '1' );
+    }
 
-    in << "Раса {C" << (ch->getSex( ) == SEX_FEMALE ? nameF : nameM) << "{x";
+    in << l(ch, "Раса") << " {C" << (ch->getSex( ) == SEX_FEMALE ? nameF : nameM) << "{x";
     if (nameF != nameM)
         in << " ({C" << (ch->getSex( ) == SEX_FEMALE ? nameM : nameF) << "{x)";
-    in << " или {C" << race->getName( ) << "{x " 
+    in << " " << l(ch, "или") << " {C" << race->getName( ) << "{x "
        << editButton(ch) << endl;
-    
-    in << endl << text.get(RU) << endl;
+
+    in << endl << text.getForLang(Player::displayLang(ch)) << endl;
 
     const PCRace *r = race.getConstPointer<DefaultRace>()->getPC( );
     if (!r || !r->isValid())
