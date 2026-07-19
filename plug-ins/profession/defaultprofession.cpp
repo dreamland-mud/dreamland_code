@@ -15,6 +15,7 @@
 #include "alignment.h"
 #include "room.h"
 #include "pcrace.h"
+#include "l10n.h"
 #include "merc.h"
 #include "def.h"
 
@@ -56,10 +57,10 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
     // True if it's a help json dump and not a player requesting the article.
     bool autodump = ch->desc == 0;
 
-    in << "Навыки и заклинания класса {C" << prof->getRusName( ).ruscase('1') << "{x, {C"
+    in << l(ch, "Навыки и заклинания класса") << " {C" << prof->getNameFor( ch, Grammar::Case('1') ) << "{x, {C"
        << prof->getName( ) << "{x: " << editButton(ch) << endl << endl;
-        
-    in << text.get(RU);
+
+    in << text.getForLang( Player::displayLang(ch) );
 
     PCharacter dummy;
     dummy.setLevel(100);
@@ -100,7 +101,7 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
     }
 
     for (auto &pair: myskills) {
-        in << "Уровень {C" << pair.first << "{x: " << pair.second.join(", ") << endl;
+        in << l(ch, "Уровень") << " {C" << pair.first << "{x: " << pair.second.join(", ") << endl;
     }
 }
 
@@ -195,11 +196,11 @@ DLString ProfessionHelp::getTitle(const DLString &label) const
 
 void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    in << "Класс {C" << prof->getRusName( ).ruscase( '1' ) << "{x или {C"
-       << prof->getName( ) << "{x" 
+    in << l(ch, "Класс") << " {C" << prof->getNameFor( ch, Grammar::Case('1') ) << "{x " << l(ch, "или") << " {C"
+       << prof->getName( ) << "{x"
        << editButton(ch) << endl << endl;
-        
-    in << text.get(RU) << endl;
+
+    in << text.getForLang( Player::displayLang(ch) ) << endl;
 
     in << "{cНатура{x    : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ) ) << endl;
 
