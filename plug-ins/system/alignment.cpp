@@ -5,6 +5,7 @@
 #include "alignment.h"
 #include "pcharacter.h"
 #include "pcrace.h"
+#include "l10n.h"
 
 #include "grammar_entities_impl.h"
 
@@ -27,19 +28,19 @@ const struct alignment_t alignment_table [] = {
   { 0, 0, 0, NULL }
 };
 
-DLString align_name_for_range( int min, int max )
+DLString align_name_for_range( int min, int max, Character *ch )
 {
     if (max <= -300)
-        return "злая";
+        return l(ch, "злая");
     if (min >= 300)
-        return "добрая";            
+        return l(ch, "добрая");
     if (min >  -300 && max < 300)
-        return "нейтральная";
+        return l(ch, "нейтральная");
     if (min > -300 and max >= 500)
-        return "нейтральная или добрая";
+        return l(ch, "нейтральная или добрая");
     if (min <= -300 && max <= 300)
-        return "злая или нейтральная";
-    return "любая";
+        return l(ch, "злая или нейтральная");
+    return l(ch, "любая");
 }
 
 void align_get_ranges( PCharacter *ch, int &a_min, int &a_max )

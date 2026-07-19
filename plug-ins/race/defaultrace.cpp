@@ -131,7 +131,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     if (!r || !r->isValid())
         return;
         
-    in << "{cНатура{x      : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;
+    in << "{cНатура{x      : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ), ch ) << endl;
     if (!r->getStats( ).empty( )) {
         bool found = false;
 
