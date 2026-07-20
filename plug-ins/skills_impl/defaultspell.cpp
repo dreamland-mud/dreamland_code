@@ -461,7 +461,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         result->room = ch->in_room;
 
         if (arg.empty()) {
-            buf << "Укажи название двери или выхода, например: {yворота{x, {yвосток{x или {yю{x.";
+            buf << l(ch, "Укажи название двери или выхода, например: {yворота{x, {yвосток{x или {yю{x.");
             result->error = TARGET_ERR_EXIT_NOT_FOUND;
             return result;
         }
@@ -476,7 +476,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 
         result->argdoor = find_exit(ch, arg.c_str(), FEX_NO_INVIS | FEX_NO_EMPTY);
         if (result->argdoor < 0) {
-            buf << "Ты не видишь здесь выхода с таким названием.";
+            buf << l(ch, "Ты не видишь здесь выхода с таким названием.");
             result->error = TARGET_ERR_EXIT_NOT_FOUND;
             return result;
         }
@@ -494,7 +494,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         
         if (target.isSet( TAR_CHAR_SELF )) {
             if (!is_self_name( arg, ch )) {
-                buf << "Это заклинание нельзя использовать на других.";
+                buf << l(ch, "Это заклинание нельзя использовать на других.");
                 result->error = TARGET_ERR_NOT_ON_OTHERS;
                 return result;
             }
@@ -512,7 +512,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 
     if (target.isSet( TAR_CHAR_WORLD )) {
         if (arg.empty( )) {
-            buf << "Для этого заклинания нужно указать имя персонажа в качестве цели.";
+            buf << l(ch, "Для этого заклинания нужно указать имя персонажа в качестве цели.");
             result->error = TARGET_ERR_CAST_ON_WHOM;
             return result;
         }
@@ -530,7 +530,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return objresult;
         
         buf.str( "" );
-        buf << "Увы, никого с таким именем обнаружить не удается.";
+        buf << l(ch, "Увы, никого с таким именем обнаружить не удается.");
         result->error = TARGET_ERR_CHAR_NOT_FOUND;
         return result;
     }
@@ -542,7 +542,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                 return objresult;
 
             buf.str( "" );
-            buf << "Это заклинание нельзя использовать на других.";
+            buf << l(ch, "Это заклинание нельзя использовать на других.");
             result->error = TARGET_ERR_NOT_ON_OTHERS;
             return result;
         }
@@ -568,7 +568,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             if (!victim) {
                 // Victim still not found, e.g. offensive spell cast outside of battle.
                 buf.str( "" );
-                buf << "Нужно указать цель для заклинания.";
+                buf << l(ch, "Нужно указать цель для заклинания.");
                 result->error = TARGET_ERR_CAST_ON_WHOM;
                 return result;
             }
@@ -620,7 +620,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return objresult;
             
         buf.str( "" );
-        buf << "Увы, никого с таким именем в этой местности обнаружить не удается.";
+        buf << l(ch, "Увы, никого с таким именем в этой местности обнаружить не удается.");
         result->error = TARGET_ERR_CAST_ON_WHOM;
         return result;
     }
@@ -639,7 +639,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         if (!arg.empty( )) {
             if (!( victim = get_char_room( ch, arg ) )) {
                 buf.str("");
-                buf << "Увы, никого с таким именем перепризвать не удается.";
+                buf << l(ch, "Увы, никого с таким именем перепризвать не удается.");
                 result->error = TARGET_ERR_SUMMON_WHO; 
                 return result;
             }
@@ -656,7 +656,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
     }
     
     if (buf.str( ).empty( ))
-        buf << "Для этого заклинания нужно указать цель.";
+        buf << l(ch, "Для этого заклинания нужно указать цель.");
 
     result->error = TARGET_ERR_CAST_ON_WHOM;
 
@@ -680,13 +680,13 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
         obj = NULL;
 
         if (ch->is_npc( )) {
-            buf << "Ты не можешь использовать заклинания, направленные на предметы.";
+            buf << l(ch, "Ты не можешь использовать заклинания, направленные на предметы.");
             result->error = TARGET_ERR_CAST_ON_WHAT;
             return result;
         }
     
         if (arg.empty( )) {
-            buf << "Для этого заклинания нужно выбрать предмет в качестве цели.";
+            buf << l(ch, "Для этого заклинания нужно выбрать предмет в качестве цели.");
             result->error = TARGET_ERR_CAST_ON_WHAT;
             return result;
         }
@@ -711,13 +711,13 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
         }
 
         if (target.isSet(TAR_OBJ_ROOM) && target.isSet(TAR_OBJ_INV|TAR_OBJ_EQUIP))
-            buf << "Увы, нигде рядом с тобой такого предмета нет.";
+            buf << l(ch, "Увы, нигде рядом с тобой такого предмета нет.");
         else if (target.isSet( TAR_OBJ_INV|TAR_OBJ_EQUIP ))
-            buf << "Увы, в инвентаре или экипировке такого предмета найти не удается.";
+            buf << l(ch, "Увы, в инвентаре или экипировке такого предмета найти не удается.");
         else if (target.isSet( TAR_OBJ_ROOM ))
-            buf << "Увы, в этой местности такого предмета найти не удается.";
+            buf << l(ch, "Увы, в этой местности такого предмета найти не удается.");
         else if (target.isSet( TAR_OBJ_WORLD ))
-            buf << "Увы, во всей Тэре такого предмета найти не удается.";
+            buf << l(ch, "Увы, во всей Тэре такого предмета найти не удается.");
 
         result->error = TARGET_ERR_OBJ_NOT_FOUND;
         return result;
