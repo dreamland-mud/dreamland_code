@@ -505,7 +505,7 @@ DLString BasicSkill::printPracticers(PCharacter *ch) const
     const char *pad = SKILL_INFO_PAD;
     ostringstream buf;
     std::set<MOB_INDEX_DATA *> practicers;
-    const DLString what = skill_what(this).ruscase('1');
+    bool isSpell = skill_is_spell(this);
 
     for (auto g: const_cast<BasicSkill *>(this)->getGroups().toArray()) {
         SkillGroup *group = skillGroupManager->find(g);
@@ -517,31 +517,42 @@ DLString BasicSkill::printPracticers(PCharacter *ch) const
             practicers.insert(pMob);
     }
 
+    // The noun for skill/spell is declined into the frame in Russian, which
+    // neither English nor Ukrainian can do, so each variant is a whole sentence.
     if (practicers.empty()) {
         // '...в твоей гильдии' - с гипер-ссылкой на справку.
-        buf << pad << "Это " << what << " можно выучить в твоей {g{hh44гильдии{x." << endl;
+        if (isSpell)
+            buf << pad << l(ch, "Это заклинание можно выучить в твоей {g{hh44гильдии{x.") << endl;
+        else
+            buf << pad << l(ch, "Это умение можно выучить в твоей {g{hh44гильдии{x.") << endl;
     } else {
         // 'Это заклинание можно выучить у Маршала Дианы (зона Новый Офкол)' - с гипер-ссылкой на зону
-        buf << pad << "Это " << what << " можно выучить у ";
-        
+        lang_t lang = viewerLang(ch);
+        auto teacher = [ch, lang](MOB_INDEX_DATA *mob) {
+            return fmt(ch, _("{g%1$s{x (зона {g{hh%2$s{x)"),
+                       mob->short_descr.getForLang(lang).ruscase('2').c_str(),
+                       mob->area->getName(lang).c_str());
+        };
+
         auto p = practicers.begin();
-        buf << "{g" << (*p)->short_descr.get(LANG_RU).ruscase('2') << "{x "
-                << "(зона {g{hh" << (*p)->area->getName() << "{x)";
+        DLString teachers = teacher(*p);
 
         // For multi-groups show two teachers only.
         if (practicers.size() > 1) {
             p++;
-            buf << " или у {g" << (*p)->short_descr.get(LANG_RU).ruscase('2') << "{x "
-                    << "(зона {g{hh" << (*p)->area->getName() << "{x)";
+            teachers << l(ch, " или у ") << teacher(*p);
         }
-                    
-        buf << "." << endl;
+
+        if (isSpell)
+            buf << pad << fmt(ch, _("Это заклинание можно выучить у %1$s."), teachers.c_str()) << endl;
+        else
+            buf << pad << fmt(ch, _("Это умение можно выучить у %1$s."), teachers.c_str()) << endl;
     }
-    
+
     if (ch->getHometown() == home_frigate)
-        buf << pad << "Пока ты на корабле, обращайся к {gКацману{x (Лазарет) или к {gЭткину{x (Арсенал)." << endl;
+        buf << pad << l(ch, "Пока ты на корабле, обращайся к {gКацману{x (Лазарет) или к {gЭткину{x (Арсенал).") << endl;
     else if (ch->getModifyLevel() < 20)
-        buf << pad << "Ты все еще можешь учиться у {gадепта{x ({g{hh1433Старая Школа Новичков{x)." << endl;
+        buf << pad << l(ch, "Ты все еще можешь учиться у {gадепта{x ({g{hh1433Старая Школа Новичков{x).") << endl;
 
     return buf.str();
 }
@@ -562,43 +573,28 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
         StringList cost, penalty; 
         
         int mana = getMana(ch);
-        if (mana > 0) {
-            DLString m = "маны {W";
-            m << mana << "{x";
-            cost.push_back(m);
-        }
+        if (mana > 0)
+            cost.push_back(fmt(ch, _("маны {W%1$d{x"), mana));
 
         int moves = getMoves(ch);
-        if (moves > 0) {
-            DLString m = "шагов {W";
-            m << moves << "{x";
-            cost.push_back(m);
-        }
+        if (moves > 0)
+            cost.push_back(fmt(ch, _("шагов {W%1$d{x"), moves));
 
-        if (manaPenalty > 0) {
-            DLString m = "маны {C";
-            m << manaPenalty << "%{x";
-            penalty.push_back(m);
-        }
+        if (manaPenalty > 0)
+            penalty.push_back(fmt(ch, _("маны {C%1$d%%{x"), manaPenalty));
 
-        if (movesPenalty > 0) {
-            DLString m = "шагов {C";
-            m << movesPenalty << "%{x";
-            penalty.push_back(m);
-        }
+        if (movesPenalty > 0)
+            penalty.push_back(fmt(ch, _("шагов {C%1$d%%{x"), movesPenalty));
 
-        if (healthPenalty > 0) {
-            DLString m = "здоровья {C";
-            m << healthPenalty << "%{x";
-            penalty.push_back(m);
-        }
+        if (healthPenalty > 0)
+            penalty.push_back(fmt(ch, _("здоровья {C%1$d%%{x"), healthPenalty));
 
         if (!cost.empty()) {
-            buf << "Расход " << cost.join(", ") << ". ";
+            buf << fmt(ch, _("Расход %1$s. "), cost.join(", ").c_str());
         }
 
         if (!penalty.empty()) {
-            buf << "Дополнительный расход " << penalty.join(", ") << ". ";
+            buf << fmt(ch, _("Дополнительный расход %1$s. "), penalty.join(", ").c_str());
         }
 
         if (!buf.str().empty())
@@ -610,29 +606,28 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
         const char *force_type = "";
         if (dspell->flags.isSet(SPELL_PRAYER)) {
             if (dspell->flags.isSet(SPELL_MAGIC))
-                force_type = " магия или молитва";
+                force_type = l(ch, " магия или молитва");
             else
-                force_type = " молитва";
+                force_type = l(ch, " молитва");
         }
         else if (dspell->flags.isSet(SPELL_MAGIC))
-            force_type = " магия";
-        
-        ostringstream buf;
-        buf << "Тип заклинания" << " {W" << spell_types.message(spell->getSpellType()) << force_type << "{x. ";
-        outputLines.push_back(buf.str());
+            force_type = l(ch, " магия");
+
+        outputLines.push_back(fmt(ch, _("Тип заклинания {W%1$s%2$s{x. "),
+                                  spell_types.message(spell->getSpellType(), '1', viewerLang(ch)).c_str(),
+                                  force_type));
     }
 
     if (dspell && spell->isCasted() && spell->getTarget() != 0) {
-        ostringstream buf;
-        buf << "Целью служит {W" << target_table.messages(spell->getTarget(), true);
+        DLString targets = target_table.messages(spell->getTarget(), true, '1', viewerLang(ch));
         if (dspell->getMaxRange(ch) > 0)
-            buf << " или по направлению (дальнобойное)";
-        buf << "{x. ";
-        outputLines.push_back(buf.str());
+            targets << l(ch, " или по направлению (дальнобойное)");
+
+        outputLines.push_back(fmt(ch, _("Целью служит {W%1$s{x. "), targets.c_str()));
     }
 
     if (isPassive()) {
-        outputLines.push_back("Это {Cпассивное умение{x, работает автоматически.");
+        outputLines.push_back(l(ch, "Это {Cпассивное умение{x, работает автоматически."));
     }
 
     // TODO: expose spell position and show it here.
