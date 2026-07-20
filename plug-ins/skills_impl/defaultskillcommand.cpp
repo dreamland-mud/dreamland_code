@@ -114,23 +114,23 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
 
         case ARG_OBJ_CARRY:
             target.obj = get_obj_list(actor, argOne.c_str(), actor->carrying);
-            errbuf << "Ты не видишь такого предмета у себя в инвентаре или экипировке.";
+            errbuf << l(actor, "Ты не видишь такого предмета у себя в инвентаре или экипировке.");
             return target.obj != 0;
 
         case ARG_OBJ_HERE:
             target.obj = get_obj_here(actor, argOne.c_str());
-            errbuf << "Ты не видишь здесь такого предмета.";
+            errbuf << l(actor, "Ты не видишь здесь такого предмета.");
             return target.obj != 0;
 
         case ARG_CHAR_ROOM:
             target.vict = get_char_room(actor, argOne);
-            errbuf << "Рядом с тобой нет никого с таким именем.";
+            errbuf << l(actor, "Рядом с тобой нет никого с таким именем.");
             return target.vict != 0;
 
         case ARG_CHAR_FIGHT:
             if (argOne.empty()) {
                 if (!actor->fighting) {
-                	errbuf << "Без указания цели это умение можно применять только в бою.";
+                	errbuf << l(actor, "Без указания цели это умение можно применять только в бою.");
                 	return false;
                 }
                 else {
@@ -140,7 +140,7 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
             }
 
             target.vict = get_char_room(actor, argOne);
-            errbuf << "Рядом с тобой нет никого с таким именем.";
+            errbuf << l(actor, "Рядом с тобой нет никого с таким именем.");
             return target.vict != 0;
 
         case ARG_CHAR_SELF:
@@ -148,14 +148,14 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
                 target.vict = actor;
             else {
                 target.vict = get_char_room(actor, argOne);
-                errbuf << "Рядом с тобой нет никого с таким именем.";
+                errbuf << l(actor, "Рядом с тобой нет никого с таким именем.");
             }
             return target.vict != 0;
 
         case ARG_EXIT:
             // Find exit or extra exit visible to the character.            
             if (argOne.empty()) {
-                errbuf << "Укажи название двери или выхода, например: {yворота{x, {yвосток{x или {yю{x.";
+                errbuf << l(actor, "Укажи название двери или выхода, например: {yворота{x, {yвосток{x или {yю{x.");
                 return false;
 
             } else {                
@@ -169,7 +169,7 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
 
                 target.door = find_exit(actor, argAll.c_str(), FEX_NO_INVIS | FEX_NO_EMPTY);
                 if (target.door < 0) {
-                    errbuf << "Ты не видишь здесь выхода с таким названием.";
+                    errbuf << l(actor, "Ты не видишь здесь выхода с таким названием.");
                     return false;
                 }
 
