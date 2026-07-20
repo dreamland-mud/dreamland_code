@@ -208,7 +208,7 @@ CMDRUNP( exits )
             if (room->isDark( ) && !cfg.holy && !IS_AFFECTED(ch, AFF_INFRARED ))
                 buf << l(ch, "Дорога ведет в темноту и неизвестность...");
             else
-                buf << room->getName();
+                buf << room->getName(viewerLang(ch));
 
             if (cfg.holy)
                 buf << " (room " << room->vnum << ")";
