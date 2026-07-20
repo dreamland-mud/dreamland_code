@@ -276,7 +276,7 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
     }
 
     in << endl;
-    in << endl << "Подробнее обо всех параметрах читай в %H% {hh28таблица классов{x. ";
+    in << endl << l(ch, "Подробнее обо всех параметрах читай в %H% {hh28таблица классов{x. ");
     if (prof->skillHelp && prof->skillHelp->getID() > 0)
         in << "%SA% %H% [(" << prof->getName() << " skills,умения " 
            << prof->getRusName().ruscase('2') << ")].";

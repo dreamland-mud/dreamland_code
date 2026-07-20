@@ -427,7 +427,7 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
     if (shortDescriptions.empty( ))
     {
         if (fShowNothing)
-            output << "     Ничего." << endl;
+            output << "     " << l(ch, "Ничего.") << endl;
     }
     else {
         std::list<DLString>::iterator sd;
