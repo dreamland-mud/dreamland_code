@@ -57,6 +57,13 @@ DLString AreaIndexData::getName(char gcase) const
     return name.get(LANG_DEFAULT).ruscase(gcase);
 }
 
+DLString AreaIndexData::getName(lang_t lang, char gcase) const
+{
+    // ruscase() collapses a Flexer pad in any language (it just picks the Nth
+    // segment), and is the identity on an English name, which carries no pipes.
+    return name.getForLang(lang).ruscase(gcase);
+}
+
 Area::Area()
     : empty(true), age(15), nplayer(0),
       area_flag(0), pIndexData(0)

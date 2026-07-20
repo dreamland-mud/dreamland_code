@@ -45,6 +45,7 @@ struct AreaIndexData {
     Area *create();
 
     DLString getName(char gcase = '1') const;
+    DLString getName(lang_t lang, char gcase = '1') const;
 
     XMLMultiString name; // main area name in all languages
     XMLMultiString altname; // alternative names for this area
