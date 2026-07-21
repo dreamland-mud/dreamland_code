@@ -72,9 +72,11 @@ void Character::pecho( const DLString &line )
 
 void Character::pecho(const XMLMultiString &line)
 {
-    const lang_t lang = LANG_DEFAULT; // TODO take from player config
-    // TODO output non-empty fallback string
-    pecho(line.get(lang));
+    // Resolve the trilingual line in the recipient's language, with the
+    // getForLang RU->EN fallback for empty slots. Previously hardcoded
+    // LANG_DEFAULT, so a viewer with EN/UA config still saw the RU text of
+    // any smell/sound/etc. passed as an XMLMultiString.
+    pecho(line.getForLang(viewerLang(this)));
 }
 
 
