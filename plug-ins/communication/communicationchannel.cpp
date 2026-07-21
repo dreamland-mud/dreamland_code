@@ -10,9 +10,17 @@
 
 #include "mudtags.h"
 
+#include "multimessage.h"
 #include "merc.h"
 #include "act.h"
 #include "def.h"
+
+/* Catalog file-key for every channel message (msgSelf/msgOther/...). These come
+ * from channels.xml, not a cpp __FILE__, so they can't use the _() macro; wrap
+ * them in a MultiMessage under this shared key instead. Entries live in the
+ * translation catalog keyed (this file, ru); untranslated messages fall back to
+ * RU byte-for-byte, so wrapping is zero-regression. See Trello 2594. */
+static const DLString CHANNELS_L10N_FILE = "commands/channels.xml";
 
 GSN(garble);
 
@@ -103,21 +111,24 @@ bool CommunicationChannel::checkIsolator( Character *ch, Character *victim ) con
 
 DLString CommunicationChannel::outputSelf( Character *ch, const DLString &format, const DLString &msg ) const
 {
-    DLString message = fmt( ch, format.c_str( ), ch, msg.c_str( ) );
+    DLString localFormat = MultiMessage( format, CHANNELS_L10N_FILE ).getMessage( ch );
+    DLString message = fmt( ch, localFormat.c_str( ), ch, msg.c_str( ) );
     return message;
 }
 
-DLString CommunicationChannel::outputVict( Character *ch, Character *victim, 
+DLString CommunicationChannel::outputVict( Character *ch, Character *victim,
                                 const DLString &format, const DLString &msg ) const
 {
-    DLString message = fmt( victim, format.c_str( ), ch, msg.c_str( ), victim );
+    DLString localFormat = MultiMessage( format, CHANNELS_L10N_FILE ).getMessage( victim );
+    DLString message = fmt( victim, localFormat.c_str( ), ch, msg.c_str( ), victim );
     return message;
 }
 
-DLString CommunicationChannel::outputChar( Character *ch, Character *victim, 
+DLString CommunicationChannel::outputChar( Character *ch, Character *victim,
                                   const DLString &format, const DLString &msg ) const
 {
-    DLString message = fmt( ch, format.c_str( ), ch, msg.c_str( ), victim );
+    DLString localFormat = MultiMessage( format, CHANNELS_L10N_FILE ).getMessage( ch );
+    DLString message = fmt( ch, localFormat.c_str( ), ch, msg.c_str( ), victim );
     return message;
 }
 
