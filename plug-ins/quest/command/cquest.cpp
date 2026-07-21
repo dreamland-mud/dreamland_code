@@ -259,11 +259,10 @@ void CQuest::autoQuestInfo(PCharacter *ch, ostringstream &buf)
 
     if (!quest) {
         if (ch->getAttributes( ).isAvailable( "quest" )) 
-            buf << "Твое задание невозможно ни выполнить, ни отменить." << endl;
+            buf << fmt(ch, _("Твое задание невозможно ни выполнить, ни отменить.")) << endl;
     } else {
         quest->info( buf, ch );
-        buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
-            << " на выполнение задания." << endl;
+        buf << fmt(ch, _("У тебя {Y%1$d{x минут%1$Iа|ы| на выполнение задания."), time) << endl;
     }
 }
 
@@ -330,22 +329,19 @@ void CQuest::doTime( PCharacter *ch )
     
     if (!quest) {
         if (ch->getAttributes( ).isAvailable( "quest" )) 
-            buf << "Твое задание невозможно ни выполнить, ни отменить." << endl;
+            buf << fmt(ch, _("Твое задание невозможно ни выполнить, ни отменить.")) << endl;
         else {
-            buf << "У тебя сейчас нет задания." << endl;
+            buf << fmt(ch, _("У тебя сейчас нет задания.")) << endl;
             
             if (time > 1) 
-                buf << "До того, как ты снова сможешь получить задание, {Y"
-                    << time <<  "{x минут"
-                    << GET_COUNT(time, "а.", "ы.", ".") << endl;
+                buf << fmt(ch, _("До того, как ты снова сможешь получить задание, {Y%1$d{x минут%1$Iа.|ы.|."), time) << endl;
             else if (time == 1) 
-                buf <<"Осталось меньше минуты до того, как ты снова сможешь получить задание." << endl;
+                buf << fmt(ch, _("Осталось меньше минуты до того, как ты снова сможешь получить задание.")) << endl;
         }
         
     }
     else {
-         buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
-             << " на выполнение задания." << endl;
+         buf << fmt(ch, _("У тебя {Y%1$d{x минут%1$Iа|ы| на выполнение задания."), time) << endl;
     }
 
     ch->send_to( buf );
@@ -439,7 +435,7 @@ void CQuest::doStat( PCharacter *ch )
     
     stat = XMLAttributeStatistic::gatherAll( "questdata" );
 
-    buf << "{wЛучшие квестодеятели Мира Мечты: {x" << endl;
+    buf << fmt(ch, _("{wЛучшие квестодеятели Мира Мечты: {x")) << endl;
 
     for (s = stat.begin( ); s != stat.end( ); s++) {
         XMLAttributeStatistic::StatRecordList::iterator r;
@@ -491,8 +487,8 @@ void CQuest::usage( PCharacter *ch )
 {
     ostringstream buf;
 
-    buf << "Укажи одну из квестовых команд:" << endl << "    "
-        << "очки инфо время попросить сдать список купить вернуть найти отменить стат." 
+    buf << fmt(ch, _("Укажи одну из квестовых команд:")) << endl << "    "
+        << fmt(ch, _("очки инфо время попросить сдать список купить вернуть найти отменить стат.")) 
         << endl
         << "Также смотри {W? квесты{x." << endl;
     ch->send_to( buf );
