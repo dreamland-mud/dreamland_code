@@ -26,13 +26,12 @@ enum {
     FSHOW_TIME = (B),
     FSHOW_COLOR = (C),
     FSHOW_EMPTY = (D),
-    FSHOW_RUSSIAN = (E),
 };
 
 struct AffectOutput {
-    AffectOutput( ) { }
-    AffectOutput( Affect *, int flags );
-    
+    AffectOutput( ) : unitMinutes(false), viewer(0), lang(LANG_DEFAULT) { }
+    AffectOutput( Affect *, Character *viewer );
+
     void format_affect( Affect * );
     DLString format_affect_location( Affect * );
     DLString format_affect_bitvector( Affect * );
@@ -44,26 +43,30 @@ struct AffectOutput {
     DLString name;
     list<DLString> lines;
     bool unitMinutes;
-    bool russian;
+    Character *viewer;
+    lang_t lang;
 };
 
 struct ShadowAffectOutput : public AffectOutput {
-    ShadowAffectOutput( int, int flags );
+    ShadowAffectOutput( int, Character *viewer );
 };
 
-ShadowAffectOutput::ShadowAffectOutput( int shadow, int flags )
+ShadowAffectOutput::ShadowAffectOutput( int shadow, Character *viewer )
 {
-    duration = shadow * 4; 
-    name = "вторая тень";
+    this->viewer = viewer;
+    lang = Player::displayLang( viewer );
+    duration = shadow * 4;
+    name = _("вторая тень").getMessage( lang );
     type = -1;
     unitMinutes = false;
 }
 
-AffectOutput::AffectOutput( Affect *paf, int flags )
+AffectOutput::AffectOutput( Affect *paf, Character *viewer )
 {
+    this->viewer = viewer;
+    lang = Player::displayLang( viewer );
     type = paf->type;
-    russian = IS_SET(flags, FSHOW_RUSSIAN);
-    name = russian ? paf->type->getRussianName( ) : paf->type->getName( );
+    name = paf->type->getNameFor( viewer );
     duration = paf->duration;
     unitMinutes = true;
 }
@@ -73,33 +76,33 @@ void AffectOutput::show_affect( ostringstream &buf, int flags )
     ostringstream f;
     DLString fmtResult;
     
-    if (IS_SET(flags, FSHOW_RUSSIAN))
-        f << "{Y%1$-23s{x";
-    else
+    if (lang == LANG_EN)
         f << "{Y%1$-18s{x";
-    
-    if (IS_SET(flags, FSHOW_LINES|FSHOW_TIME)) 
+    else
+        f << "{Y%1$-23s{x";
+
+    if (IS_SET(flags, FSHOW_LINES|FSHOW_TIME))
         f << "{y:";
-    
+
     if (IS_SET(flags, FSHOW_LINES))
         for (list<DLString>::iterator l = lines.begin( ); l != lines.end( ); l++) {
-            if (l != lines.begin( )) {                
-                f << "," << endl;                
-                if (IS_SET(flags, FSHOW_RUSSIAN))
-                    f << "                        ";
-                else
+            if (l != lines.begin( )) {
+                f << "," << endl;
+                if (lang == LANG_EN)
                     f << "                   ";
+                else
+                    f << "                        ";
             }
 
             f << "{y " << *l;
         }
-    
+
     if (IS_SET(flags, FSHOW_TIME)) {
         if (duration < 0)
-            f << " {cпостоянно";
+            f << " {c" << _("постоянно").getMessage( lang );
         else
-            f << " {yв течение {m%2$d{y "
-              << (unitMinutes ? "час%2$Iа|ов|ов" : "секун%2$Iды|д|д");
+            f << " {y" << _("в течение {m%2$d{y ").getMessage( lang )
+              << (unitMinutes ? _("час%2$Iа|ов|ов").getMessage( lang ) : _("секун%2$Iды|д|д").getMessage( lang ));
     }
     
     fmtResult = fmt( 0, f.str( ).c_str( ), name.c_str( ), duration );
@@ -130,12 +133,12 @@ DLString AffectOutput::format_affect_location( Affect *paf )
         case APPLY_HEAL_GAIN:
         case APPLY_MANA_GAIN:
             if (paf->modifier > 100)
-                buf << fmt( 0, _("улучшает {m%1$s{y на {m%2$d%%{y"),
-                               apply_flags.message( paf->location ).c_str( ),
+                buf << fmt( 0, _("улучшает {m%1$s{y на {m%2$d%%{y").getMessage( lang ).c_str( ),
+                               apply_flags.message( paf->location, '1', lang ).c_str( ),
                                paf->modifier - 100 );
             else if (paf->modifier < 100 && paf->modifier > 0)
-                buf << fmt( 0, _("ухудшает {m%1$s{y на {m%2$d%%{y"),
-                               apply_flags.message( paf->location ).c_str( ),
+                buf << fmt( 0, _("ухудшает {m%1$s{y на {m%2$d%%{y").getMessage( lang ).c_str( ),
+                               apply_flags.message( paf->location, '1', lang ).c_str( ),
                                100 - paf->modifier );
             break;
 
@@ -145,8 +148,9 @@ DLString AffectOutput::format_affect_location( Affect *paf )
 
         default:
             if (paf->global.empty()) {
-                buf << "изменяет {m" << apply_flags.message( paf->location ) << "{y "
-                    << "на {m" << paf->modifier << "{y";
+                buf << fmt( 0, _("изменяет {m%1$s{y на {m%2$d{y").getMessage( lang ).c_str( ),
+                               apply_flags.message( paf->location, '1', lang ).c_str( ),
+                               paf->modifier );
             }
             break;
         }
@@ -162,33 +166,35 @@ DLString AffectOutput::format_affect_bitvector( Affect *paf )
     bool removes = paf->location == APPLY_BITVECTOR && paf->modifier < 0;
 
     if (table && b) {
-        const char *word = 0;
+        DLString word;
         char gcase = '1';
         DLString ending;
 
         if (table == &affect_flags) {
-            word = removes ? "{1{Rотнимает{2" : "добавляет";
+            word = (removes ? _("{1{Rотнимает{2") : _("добавляет")).getMessage( lang );
             gcase = '4';
         } else if (table == &imm_flags) {
-            word = removes ? "{1{Rотнимает{2 иммунитет к" : "иммунитет к";
+            word = (removes ? _("{1{Rотнимает{2 иммунитет к") : _("иммунитет к")).getMessage( lang );
         } else if (table == &res_flags) {
-            word = removes ? "{1{Rотнимает{2 сопротивляемость к" : "сопротивляемость к";
+            word = (removes ? _("{1{Rотнимает{2 сопротивляемость к") : _("сопротивляемость к")).getMessage( lang );
         } else if (table == &vuln_flags) {
-            word = removes ? "отнимает уязвимость к" : "уязвимость к";
+            word = (removes ? _("отнимает уязвимость к") : _("уязвимость к")).getMessage( lang );
         } else if (table == &detect_flags) {
-            word = (IS_SET(b, ADET_WEB|ADET_FEAR) ?  
-                    (removes ? "отнимает" : "добавляет") : 
-                    (removes ? "отнимает обнаружение" : "обнаружение"));
-            gcase = (IS_SET(b, ADET_WEB|ADET_FEAR) ? '4': '2');
-            
+            if (IS_SET(b, ADET_WEB|ADET_FEAR)) {
+                word = (removes ? _("отнимает") : _("добавляет")).getMessage( lang );
+                gcase = '4';
+            } else {
+                word = (removes ? _("отнимает обнаружение") : _("обнаружение")).getMessage( lang );
+                gcase = '2';
+            }
         } else if (table == &form_flags) {
-            word = removes ? "отнимает форму" : "добавляет форму";
+            word = (removes ? _("отнимает форму") : _("добавляет форму")).getMessage( lang );
         } else if (table == &part_flags) {
-            word = removes ? "отнимает часть тела" : "добавляет часть тела";
+            word = (removes ? _("отнимает часть тела") : _("добавляет часть тела")).getMessage( lang );
         }
-        
-        if (word)
-            buf << word << " {m" << table->messages( b, true, gcase ) << "{y" << ending;
+
+        if (!word.empty())
+            buf << word << " {m" << table->messages( b, true, gcase, lang ) << "{y" << ending;
     }
 
     return buf.str();
@@ -202,17 +208,17 @@ DLString AffectOutput::format_affect_global( Affect *paf )
 
     if (registry) {
         if (registry == skillManager) {
-            buf << (mod >= 0 ? "повышает" : "понижает") << " "
-                << (paf->location == APPLY_LEARNED ? "владение умением" : "уровень умения")
-                << " {m" << paf->global.toRussianString().quote() 
-                << "{y на {m" << (int)abs(mod) << "{y";
+            buf << (mod >= 0 ? _("повышает") : _("понижает")).getMessage( lang ) << " "
+                << (paf->location == APPLY_LEARNED ? _("владение умением") : _("уровень умения")).getMessage( lang )
+                << " {m" << paf->global.toRussianString().quote()
+                << "{y " << _("на").getMessage( lang ) << " {m" << (int)abs(mod) << "{y";
         } else if (registry == skillGroupManager) {
-            buf << (mod >= 0 ? "повышает" : "понижает") << " "
-                << (paf->location == APPLY_LEARNED ? "владение группой умений" : "уровень умений группы")
-                << " {m" << paf->global.toRussianString().quote() 
-                << "{y на {m" << (int)abs(mod) << "{y";
+            buf << (mod >= 0 ? _("повышает") : _("понижает")).getMessage( lang ) << " "
+                << (paf->location == APPLY_LEARNED ? _("владение группой умений") : _("уровень умений группы")).getMessage( lang )
+                << " {m" << paf->global.toRussianString().quote()
+                << "{y " << _("на").getMessage( lang ) << " {m" << (int)abs(mod) << "{y";
         } else if (registry == liquidManager) {
-            buf << "добавляет запах {m" << paf->global.toRussianString('2', ",").colourStrip() << "{x";
+            buf << _("добавляет запах").getMessage( lang ) << " {m" << paf->global.toRussianString('2', ",").colourStrip() << "{x";
         } else if (registry == wearlocationManager) {
             StringList cut;
 
@@ -221,9 +227,9 @@ DLString AffectOutput::format_affect_global( Affect *paf )
                 cut.push_back(wearloc->getRibName().ruscase('2'));
             }
 
-            buf << "лишает {1{m" << cut.join("{2, {1{m");
+            buf << _("лишает").getMessage( lang ) << " {1{m" << cut.join("{2, {1{m");
         } else {
-            buf << "неизвестный вектор";
+            buf << _("неизвестный вектор").getMessage( lang );
         }
     }
 
@@ -257,11 +263,11 @@ struct PermanentAffects {
     }
 
     void printAll() const {
-        print("У тебя иммунитет к", my_imm, imm_flags, '2');
-        print("Ты обладаешь сопротивляемостью к", my_res, imm_flags, '3');
-        print("Ты уязвим%1$Gо||а к", my_vuln, imm_flags, '3');
-        print("Ты способ%1$Gно|ен|на обнаружить", my_det, detect_flags, '4');
-        print("Ты под воздействием", my_aff, affect_flags, '2');
+        print(_("У тебя иммунитет к"), my_imm, imm_flags, '2');
+        print(_("Ты обладаешь сопротивляемостью к"), my_res, imm_flags, '3');
+        print(_("Ты уязвим%1$Gо||а к"), my_vuln, imm_flags, '3');
+        print(_("Ты способ%1$Gно|ен|на обнаружить"), my_det, detect_flags, '4');
+        print(_("Ты под воздействием"), my_aff, affect_flags, '2');
 
         if (ch->getProfession()->getFlags().isSet(PROF_DIVINE) && ch->getReligion() == god_none)
             ch->pecho(_("У тебя {rштраф{x на все молитвы, пока ты не выберешь себе {hh1религию{x."));
@@ -271,19 +277,19 @@ struct PermanentAffects {
         else if (my_hgain != 0)
             ch->pecho(_("Твоё здоровье и шаги восстанавливаются на {%s%d%%{x %s."),
                     my_hgain > 0 ? "C" : "r",
-                    abs(my_hgain) , my_hgain > 0 ? "быстрее" : "медленнее");
+                    abs(my_hgain), (my_hgain > 0 ? _("быстрее") : _("медленнее")).getMessage(Player::displayLang(ch)).c_str());
 
         if (my_mgain <= -100)
             ch->pecho(_("Твоя мана не восстанавливается!"));
         else if (my_mgain != 0)
             ch->pecho(_("Твоя мана восстанавливается на {%s%d%%{x %s."),
                        my_mgain > 0 ? "C" : "r",
-                       abs(my_mgain), my_mgain > 0 ? "быстрее" : "медленнее");
+                       abs(my_mgain), (my_mgain > 0 ? _("быстрее") : _("медленнее")).getMessage(Player::displayLang(ch)).c_str());
 
         if (my_beats != 0)
             ch->pecho(_("Задержки от всех умений у тебя на {%s%d%%{x %s."),
                        my_beats > 0 ? "r" : "C",
-                       abs(my_beats), my_beats > 0 ? "длиннее" : "короче");
+                       abs(my_beats), (my_beats > 0 ? _("длиннее") : _("короче")).getMessage(Player::displayLang(ch)).c_str());
     }
 
     bool isSet() const {
@@ -291,12 +297,13 @@ struct PermanentAffects {
     }
 
 private:
-    void print(const char *messagePrefix, const int &my_flags, const FlagTable &my_table, char gcase) const {
+    void print(const MultiMessage &prefix, const int &my_flags, const FlagTable &my_table, char gcase) const {
         if (my_flags == 0)
             return;
 
-        StringList names = my_table.toStringList(my_flags, gcase);
-        DLString message = DLString(messagePrefix) + " " + names.wrap("{Y", "{x").join(", ") + ".";
+        lang_t lang = Player::displayLang(ch);
+        StringList names = my_table.toStringList(my_flags, gcase, lang);
+        DLString message = prefix.getMessage(lang) + " " + names.wrap("{Y", "{x").join(", ") + ".";
         ch->pecho(message.c_str(), ch);
     }
 
@@ -318,21 +325,21 @@ CMDRUNP( affects )
     list<AffectOutput>::iterator o;
     int flags = FSHOW_LINES|FSHOW_TIME|FSHOW_COLOR|FSHOW_EMPTY;
 
-    if (Player::displayLang(IS_CHARMED(ch) ? ch->master : ch) != LANG_EN)
-        SET_BIT(flags, FSHOW_RUSSIAN);
-   
-    // Keep track of res, vuln, hp/mana gain. 
+    // The display language follows the charmer when the char is charmed.
+    Character *viewer = IS_CHARMED(ch) ? ch->master : ch;
+
+    // Keep track of res, vuln, hp/mana gain.
     PermanentAffects permAff(ch);
- 
+
     for (auto &paf: ch->affected) {
-        if (output.empty( ) || output.back( ).type != paf->type) 
-            output.push_back( AffectOutput( paf, flags ) );
-        
+        if (output.empty( ) || output.back( ).type != paf->type)
+            output.push_back( AffectOutput( paf, viewer ) );
+
         output.back( ).format_affect( paf );
     }
-    
+
     if (HAS_SHADOW(ch))
-        output.push_front( ShadowAffectOutput( ch->getPC( )->shadow, flags ) );
+        output.push_front( ShadowAffectOutput( ch->getPC( )->shadow, viewer ) );
 
     DLString words = argument;
     for (auto &word: words.split(" ")) {
@@ -361,7 +368,8 @@ CMDRUNP( affects )
     // Output skill and level bonuses in the end.
     if (!ch->is_npc()) {
         PCharacter *pch = ch->getPC();
-        bool rus = IS_SET(flags, FSHOW_RUSSIAN);
+        lang_t lang = Player::displayLang(viewer);
+        bool rus = (lang != LANG_EN);
         const DLString joiner = " {yна{m ";
         StringList learnedSkills;
         StringList learnedGroups = pch->mod_skill_groups.toStringList(rus, joiner);
@@ -371,25 +379,25 @@ CMDRUNP( affects )
         for ( int sn = 0; sn < skillManager->size( ); sn++) {
             Skill *skill = skillManager->find(sn);
             if (skill->available(pch) && pch->mod_skills[sn] != 0) {
-                DLString line = rus ? skill->getRussianName() : skill->getName();
+                DLString line = skill->getNameFor(viewer);
                 line << joiner << pch->mod_skills[sn];
                 learnedSkills.push_back( line );
             }
         }
         if (!learnedSkills.empty())
-            buf << "{yИзменено владение умениями: " << learnedSkills.wrap("{m", "%{y").join(", ") << "." << endl;
+            buf << _("{yИзменено владение умениями: ").getMessage(lang) << learnedSkills.wrap("{m", "%{y").join(", ") << "." << endl;
         if (!learnedGroups.empty())
-            buf << "{yИзменено владение группами умений: " << learnedGroups.wrap("{m", "%{y").join(", ") << "." << endl;
+            buf << _("{yИзменено владение группами умений: ").getMessage(lang) << learnedGroups.wrap("{m", "%{y").join(", ") << "." << endl;
         if (pch->mod_skill_all != 0)
-            buf << "{yВладение всеми умениями изменено на {m" << pch->mod_skill_all << "%{y.{x" << endl;
+            buf << _("{yВладение всеми умениями изменено на {m").getMessage(lang) << pch->mod_skill_all << "%{y.{x" << endl;
         if (!levelSkills.empty())
-            buf << "{yИзменен уровень умений: " << levelSkills.wrap("{m", "{y").join(", ") << "." << endl;
+            buf << _("{yИзменен уровень умений: ").getMessage(lang) << levelSkills.wrap("{m", "{y").join(", ") << "." << endl;
         if (!levelGroups.empty())
-            buf << "{yИзменен уровень группы умений: " << levelGroups.wrap("{m", "{y").join(", ") << "." << endl;
+            buf << _("{yИзменен уровень группы умений: ").getMessage(lang) << levelGroups.wrap("{m", "{y").join(", ") << "." << endl;
         if (pch->mod_level_all != 0)
-            buf << "{yУровень всех умений изменен на {m" << pch->mod_level_all << "{y.{x" << endl;
+            buf << _("{yУровень всех умений изменен на {m").getMessage(lang) << pch->mod_level_all << "{y.{x" << endl;
         if (pch->mod_level_spell != 0)
-            buf << "{yУровень всех заклинаний изменен на {m" << pch->mod_level_spell << "{y.{x" << endl;
+            buf << _("{yУровень всех заклинаний изменен на {m").getMessage(lang) << pch->mod_level_spell << "{y.{x" << endl;
     }
 
     if (IS_CHARMED(ch)) {
