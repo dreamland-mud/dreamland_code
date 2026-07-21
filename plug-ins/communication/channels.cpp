@@ -338,16 +338,16 @@ COMMAND(ChannelsCommand, "channels")
         <<     endl;
 
     if (IS_SET(ch->comm, COMM_SNOOP_PROOF))
-        buf << "Ты защищен от подслушивания." << endl;
+        buf << fmt(ch, _("Ты защищен от подслушивания.")) << endl;
 
     if (IS_SET(ch->comm, COMM_NOTELL))
-        buf << "Ты не можешь использовать команду 'говорить'." << endl;
+        buf << fmt(ch, _("Ты не можешь использовать команду 'говорить'.")) << endl;
 
     if (has_nochannel( ch ))
-        buf << "Ты не можешь использовать каналы общения." << endl;
+        buf << fmt(ch, _("Ты не можешь использовать каналы общения.")) << endl;
 
     if (IS_SET(ch->comm, COMM_NOEMOTE))
-        buf << "Ты не можешь выражать эмоции." << endl;
+        buf << fmt(ch, _("Ты не можешь выражать эмоции.")) << endl;
 
     ch->send_to( buf );
 }
