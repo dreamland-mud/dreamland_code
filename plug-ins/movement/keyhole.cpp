@@ -304,7 +304,7 @@ bool Keyhole::doLore( ostringstream &buf )
         return false;
 
     if (!isLockable( )) 
-        buf << "Это ключ от поломанного замка." << endl;
+        buf << fmt(ch, _("Это ключ от поломанного замка.")) << endl;
     else if (isPickProof( )) 
         buf << "Открывает защищенный от взлома замок на "
             << getDescription( ).ruscase( '6' ) << "." << endl;
@@ -313,10 +313,10 @@ bool Keyhole::doLore( ostringstream &buf )
             << getDescription( ).ruscase( '6' ) << "." << endl;
     
     if (key->value0() == 0)
-        buf << "Рассыпается, лежа в кармане." << endl;
+        buf << fmt(ch, _("Рассыпается, лежа в кармане.")) << endl;
 
     if (key->value1() > 0)
-        buf << "Рассыпается, лежа на земле." << endl;
+        buf << fmt(ch, _("Рассыпается, лежа на земле.")) << endl;
 
     gsn_golden_eye->improve( ch, true );
     return true;
