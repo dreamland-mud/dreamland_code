@@ -298,15 +298,15 @@ void HomeRecall::doList( PCharacter *ch )
     }
 }
 
-static void print_room_mortal( int vnum, ostringstream &buf )
+static void print_room_mortal( int vnum, ostringstream &buf, Character *ch )
 {
     Room *room = get_room_instance( vnum );
     if (!room) {
-        buf << "не существует!" << endl;
+        buf << fmt(ch, _("не существует!")) << endl;
         return;
     }
 
-    buf << room->getName() << " (" << room->areaName() << ")" << endl;
+    buf << room->getName(viewerLang(ch)) << " (" << room->areaName() << ")" << endl;
 }
 
 void HomeRecall::doListMortal( PCharacter * ch )
@@ -318,12 +318,12 @@ void HomeRecall::doListMortal( PCharacter * ch )
     }
     
     ostringstream buf;
-    buf << "Основной дом: ";
-    print_room_mortal( attr->getPoint( ), buf );
+    buf << fmt(ch, _("Основной дом: "));
+    print_room_mortal( attr->getPoint( ), buf, ch );
 
     for (XMLAttributeHomeRecall::LabeledPoints::const_iterator l = attr->getLabeled( ).begin( ); l != attr->getLabeled( ).end( ); l++) {
-        buf << "Дом с меткой '" << l->first << "': ";
-        print_room_mortal( l->second, buf );
+        buf << fmt(ch, _("Дом с меткой '%1$s': "), l->first.c_str());
+        print_room_mortal( l->second, buf, ch );
     }
     ch->send_to( buf );
 }

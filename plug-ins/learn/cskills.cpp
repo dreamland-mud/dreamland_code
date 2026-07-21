@@ -102,7 +102,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         // May be <level> or one of <level1> <level2>?
         if (t.isNumber()) {
             if (fAll) {
-                buf << "Диапазон уровней нельзя задать одновременно со словом все." << endl;
+                buf << fmt(ch, _("Диапазон уровней нельзя задать одновременно со словом все.")) << endl;
                 return false;
             }
 
@@ -111,7 +111,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
             else if (!num2)
                 num2 = t.toInt();
             else {
-                buf << "Укажи уровень (например, 15) или диапазон уровней (например, 10 42)" << endl;
+                buf << fmt(ch, _("Укажи уровень (например, 15) или диапазон уровней (например, 10 42)")) << endl;
                 return false;
             }
 
@@ -122,7 +122,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         // 'all' argument cannot be mixed with levels. 
         if (arg_is_all(t)) {
             if (num1 || num2) {
-                buf << "Диапазон уровней нельзя задать одновременно со словом {yвсе{x." << endl;
+                buf << fmt(ch, _("Диапазон уровней нельзя задать одновременно со словом {yвсе{x.")) << endl;
                 return false;                        
             }
             fAll = true;
@@ -133,7 +133,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         // Found "sortby" argument, check if it's "sortby <criteria>".
         if (arg_is(t, "sortby")) {
             if (criteria) {
-                buf << "Критерий сортировки не может быть задан дважды." << endl;
+                buf << fmt(ch, _("Критерий сортировки не может быть задан дважды.")) << endl;
                 return false;
             }
 
@@ -146,7 +146,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
                 else if (arg_is(nextToken, "learned"))
                     criteria = SkillInfo::cmp_by_learned;
                 else {
-                    buf << "Неправильный критерий сортировки '" << nextToken << "', допустимые значения: 'имя', 'уровень' или 'изучено'" << endl;
+                    buf << fmt(ch, _("Неправильный критерий сортировки '%1$s', допустимые значения: 'имя', 'уровень' или 'изучено'"), nextToken.c_str()) << endl;
                     return false;
                 }
 
@@ -154,7 +154,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
                 continue;
             }
 
-            buf << "Укажите критерий сортировки ('имя', 'уровень' или 'изучено')." << endl;
+            buf << fmt(ch, _("Укажите критерий сортировки ('имя', 'уровень' или 'изучено').")) << endl;
             return false;
         }
 
@@ -288,7 +288,7 @@ void AllSkillsList::display( std::ostream & buf )
     int prevLevel = 0, firstColumn = true;
 
     if (empty( )) {
-        buf << "Не найдено ни одного умения." << endl;
+        buf << fmt(ch, _("Не найдено ни одного умения.")) << endl;
         return;
     }
 
