@@ -18,6 +18,7 @@
 #include "merc.h"
 #include "player_utils.h"
 #include "def.h"
+#include "l10n.h"
 
 GROUP(clan);
 
@@ -84,7 +85,7 @@ bool DefaultSkillGroup::available( Character *ch ) const
 
 void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
 {
-    buf << "Группа "
+    buf << fmt(ch, _("Группа "))
         << "{Y" << getRussianName( ) << "{w, "
         << "{Y" << getName( ) << "{w ";
         
@@ -94,7 +95,7 @@ void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
     buf << endl;
 
     if (help)
-        buf << help->text.get(RU);
+        buf << help->text.getForLang(Player::displayLang(ch));
 
     if (autoHelp) {
         buf << endl;
@@ -107,10 +108,10 @@ void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
 void DefaultSkillGroup::listPracticers( PCharacter *ch, ostringstream &buf ) const
 {
     if (group_clan == this) {
-        buf << "Практикуется у {gкланового охранника{x.";
+        buf << fmt(ch, _("Практикуется у {gкланового охранника{x."));
     }
     else if (practicer == 0) {
-        buf << "Практикуется в {gгильдии{x.";
+        buf << fmt(ch, _("Практикуется в {gгильдии{x."));
     }
     else {
         MOB_INDEX_DATA *pMob = get_mob_index( practicer );
@@ -121,9 +122,9 @@ void DefaultSkillGroup::listPracticers( PCharacter *ch, ostringstream &buf ) con
         }
 
         if (pMob->sex == SEX_FEMALE)
-            buf << "Учительница";
+            buf << fmt(ch, _("Учительница"));
         else
-            buf << "Учитель";
+            buf << fmt(ch, _("Учитель"));
 
         int helpID = area_helpid(pMob->area);
 
@@ -144,7 +145,7 @@ void DefaultSkillGroup::listSkills( PCharacter *ch, ostringstream &buf ) const
     const char *pattern = fRus ? "{%c%-26s{x" : "{%c%-20s{x";
     const char *autopattern = "%-26s";
 
-    buf << endl << "Навыки этой группы:" << endl;
+    buf << endl << fmt(ch, _("Навыки этой группы:")) << endl;
 
     for (int col = 0, sn = 0; sn < skillManager->size( ); sn++) {
         Skill *skill = skillManager->find( sn );
