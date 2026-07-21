@@ -318,11 +318,11 @@ static void show_pockets_to_char( Object *container, Character *ch, ostringstrea
         return;
 
     if (IS_SET(container->value1(), CONT_PUT_ON|CONT_PUT_ON2))
-        buf << "Отделения: " << endl;
+        buf << fmt(ch, _("Отделения: ")) << endl;
     else if (!container->can_wear( ITEM_TAKE ))
-        buf << "Полки: " << endl;
+        buf << fmt(ch, _("Полки: ")) << endl;
     else
-        buf << "Карманы: " << endl;
+        buf << fmt(ch, _("Карманы: ")) << endl;
     
     for (obj = container->contains; obj; obj = obj->next_content) {
         if (obj->pocket.empty( ))
@@ -332,7 +332,7 @@ static void show_pockets_to_char( Object *container, Character *ch, ostringstrea
     }
 
     if (pockets.empty( )) {
-        buf << "      (пустые)" << endl;
+        buf << fmt(ch, _("      (пустые)")) << endl;
     } 
     else {
        for (std::map<DLString, int>::iterator i = pockets.begin( ); i != pockets.end( ); i++) {
@@ -489,7 +489,7 @@ static void show_char_blindness(Character* ch, Character* victim, ostringstream&
 {
     if (IS_AFFECTED(victim, AFF_BLIND) && IS_AWAKE(victim)) {
         if (victim->fighting == ch)
-            buf << "{x...вслепую размахивая во все стороны.{x" << endl;
+            buf << fmt(ch, _("{x...вслепую размахивая во все стороны.{x")) << endl;
         else
             buf << fmt(ch, _("{x...%1$P1 выгляд%1$nит|ят слеп%1$Gым|ым|ой|ыми и дезориентированн%1$Gым|ым|ой|ыми.{x"), victim) << endl;
     }
@@ -737,20 +737,20 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     buf << " ";
 
     switch (victim->position.getValue( )) {
-    case POS_DEAD:     
-        buf << "уже {1{RТРУП!!!{2" << endl;
+    case POS_DEAD:
+        buf << fmt(ch, _("уже {1{RТРУП!!!{2")) << endl;
         break;
-        
-    case POS_MORTAL:   
-        buf << "при смерти." << endl;   
+
+    case POS_MORTAL:
+        buf << fmt(ch, _("при смерти.")) << endl;
         break;
-        
-    case POS_INCAP:    
-        buf << "в беспомощном состоянии." << endl;      
+
+    case POS_INCAP:
+        buf << fmt(ch, _("в беспомощном состоянии.")) << endl;
         break;
-        
-    case POS_STUNNED:  
-        buf << "лежит без сознания." << endl; 
+
+    case POS_STUNNED:
+        buf << fmt(ch, _("лежит без сознания.")) << endl;
         break;
         
     case POS_SLEEPING:
@@ -787,7 +787,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     }
 
     if (HAS_SHADOW(victim))
-        buf << " ...отбрасывает странную тень." << endl;
+        buf << fmt(ch, _(" ...отбрасывает странную тень.")) << endl;
     
     if (victim->death_ground_delay > 0) {
         DLString rc = rprog_show_end( victim->in_room, victim, ch );
@@ -1530,8 +1530,8 @@ static void do_look_object( Character *ch, Object *obj )
         ostringstream buf;
         lang_t lang = Player::lang(ch);
 
-        buf << "Ты смотришь на {c" << obj->getShortDescr( '4', lang ) << "{x."
-            << " Это {W" << item_table.message(obj->item_type) << "{x";
+        buf << fmt(ch, _("Ты смотришь на {c")) << obj->getShortDescr( '4', lang ) << fmt(ch, _("{x. Это {W"))
+            << item_table.message(obj->item_type, '1', lang) << "{x";
 
 
         for (int i = 0; i < wearlocationManager->size( ); i++) {
