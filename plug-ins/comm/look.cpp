@@ -509,7 +509,10 @@ static void show_char_position( Character *ch, Character *victim,
     int furniture_flag = 0;
     lang_t lang = Player::lang(ch);
     if (!MOUNTED(victim)) {
-        buf << verb << " ";
+        // verb is the RU stem ("спит"/"сидит"/...) resolved per-viewer through
+        // the catalog: EN gets the Anatolia present-continuous ("is sleeping"),
+        // the noun that follows already declines per language via getShortDescr.
+        buf << fmt(ch, _(verb)) << " ";
 
         if (victim->on != 0) {
             furniture_flag = Item::furnitureFlags(victim->on);
@@ -519,22 +522,22 @@ static void show_char_position( Character *ch, Character *victim,
             if (!rc.empty( ))
                 buf << rc;
             else if (IS_SET(furniture_flag, atFlag))
-                buf << "возле " << victim->on->getShortDescr( '2', lang );
+                buf << fmt(ch, _("возле ")) << victim->on->getShortDescr( '2', lang );
             else if (IS_SET(furniture_flag, onFlag))
-                buf << "на " << victim->on->getShortDescr( '6', lang );
+                buf << fmt(ch, _("на ")) << victim->on->getShortDescr( '6', lang );
             else
-                buf << "в " << victim->on->getShortDescr( '6', lang );
+                buf << fmt(ch, _("в ")) << victim->on->getShortDescr( '6', lang );
         }
         else
-            buf << "здесь";
+            buf << fmt(ch, _("здесь"));
 
-        if (victim->position == POS_SLEEPING && !IS_AFFECTED(victim, AFF_SLEEP)) 
+        if (victim->position == POS_SLEEPING && !IS_AFFECTED(victim, AFF_SLEEP))
             if (gsn_curl->getEffective( victim ) > 1)
-                buf << ", свернувшись клубочком";
+                buf << fmt(ch, _(", свернувшись клубочком"));
     }
     else
-        buf << "сидит здесь верхом на " 
-            << (ch == victim->mount ? "тебе" : ch->sees( MOUNTED(victim), '6' ));
+        buf << fmt(ch, _("сидит здесь верхом на "))
+            << (ch == victim->mount ? fmt(ch, _("тебе")) : ch->sees( MOUNTED(victim), '6' ));
 
     buf << "." << endl;
     show_char_blindness( ch, victim, buf );
