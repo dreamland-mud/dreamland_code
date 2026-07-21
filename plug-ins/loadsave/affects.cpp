@@ -376,7 +376,12 @@ void affect_remove( Character *ch, Affect *paf, bool verbose )
                 return;
         }
 
-        if (verbose) {
+        // A wear-off must stay silent on a corpse: an affect whose duration
+        // expires on the same pulse the char dies would otherwise announce
+        // itself right after the death message. Death itself strips affects
+        // with verbose=false already; this covers the verbose natural-expiry
+        // path landing on an already-dead char.
+        if (verbose && !ch->isDead()) {
             if (paf->type->getAffect())
                 paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, ch), paf);
         }
