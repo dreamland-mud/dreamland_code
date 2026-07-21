@@ -45,15 +45,14 @@ CMDRUNP( areas )
         return;
     }
     
-    if (level != -1) 
-        buf << "{YЗоны Мира Мечты для уровня " << level << ":{x" << endl;
+    if (level != -1)
+        buf << fmt(ch, _("{YЗоны Мира Мечты для уровня %1$d:{x"), level) << endl;
     else if (!args.empty( ))
-        buf << "{YНайдены зоны: {x" << endl;
+        buf << fmt(ch, _("{YНайдены зоны: {x")) << endl;
     else if (minLevel != -1 && maxLevel != -1)
-        buf << "{YЗоны Мира Мечты для уровней " 
-            << minLevel << " - " << maxLevel << ":{x" << endl;
+        buf << fmt(ch, _("{YЗоны Мира Мечты для уровней %1$d - %2$d:{x"), minLevel, maxLevel) << endl;
     else
-        buf << "{YВсе зоны Мира Мечты: {x" << endl;
+        buf << fmt(ch, _("{YВсе зоны Мира Мечты: {x")) << endl;
     
     buf << "Название                Сложность        Название                Сложность" << endl
         << "-------------------------------------------------------------------------------" << endl;
@@ -88,10 +87,10 @@ CMDRUNP( areas )
         // Make area name a clickable link to area help, if present.
         int hid = area_helpid(pArea);
         if (hid > 0) {
-            DLString aname = pArea->getName();
+            DLString aname = pArea->getName(viewerLang(ch));
             str << fmt(ch, web_cmd(ch, "help " + DLString(hid), nameFmt).c_str(), aname.colourStrip().c_str());
-        } else {            
-            str << fmt(ch, nameFmt, pArea->getName().c_str());
+        } else {
+            str << fmt(ch, nameFmt, pArea->getName(viewerLang(ch)).c_str());
         }
 
         // For normal areas, display level range and danger level.
@@ -112,15 +111,15 @@ CMDRUNP( areas )
     if (acnt + ccnt + mcnt == 0) {
         ostringstream errbuf;
 
-        errbuf << "Не найдено ни одной зоны";
+        errbuf << fmt(ch, _("Не найдено ни одной зоны"));
         if (!args.empty())
-            errbuf << ", содержащей '" << args << "' в названии";
+            errbuf << fmt(ch, _(", содержащей '%1$s' в названии"), args.c_str());
         else if (level != -1)
-            errbuf << " для уровня " << level;
+            errbuf << fmt(ch, _(" для уровня %1$d"), level);
         else if (maxLevel != -1 && minLevel != -1)
-            errbuf << " для диапазона уровней " << minLevel << "-" << maxLevel;
-        errbuf << "." << endl 
-               << "Используй команду {hc{yзоны{x для полного списка." << endl;
+            errbuf << fmt(ch, _(" для диапазона уровней %1$d-%2$d"), minLevel, maxLevel);
+        errbuf << "." << endl
+               << fmt(ch, _("Используй команду {hc{yзоны{x для полного списка.")) << endl;
                
         ch->send_to(errbuf);
         return;
@@ -133,17 +132,17 @@ CMDRUNP( areas )
     }
 
     if (!clanBuf.str().empty()) {
-        buf << endl << "{yКлановые территории:{x" << endl << clanBuf.str();
+        buf << endl << fmt(ch, _("{yКлановые территории:{x")) << endl << clanBuf.str();
         if (ccnt % 2)
             buf << endl;
     }
 
     if (!mansionBuf.str().empty()) {
-        buf << endl << "{yПригороды под застройку:{x" << endl << mansionBuf.str();
+        buf << endl << fmt(ch, _("{yПригороды под застройку:{x")) << endl << mansionBuf.str();
         if (mcnt % 2)
             buf << endl;
     }
-    buf << endl << "Подробнее о каждой зоне читай в {Wсправка {Dназвание зоны{x, например {y{hcсправка мидгаард{x." << endl;    
+    buf << endl << fmt(ch, _("Подробнее о каждой зоне читай в {Wсправка {Dназвание зоны{x, например {y{hcсправка мидгаард{x.")) << endl;
     page_to_char( buf.str( ).c_str( ), ch );        
 }
 
