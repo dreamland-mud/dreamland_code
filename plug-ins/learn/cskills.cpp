@@ -82,6 +82,7 @@ struct AllSkillsList : public std::list<SkillInfo> {
     bool fActive, fPassive, fSpell;
     SkillGroup *group;
     bool (*criteria) ( SkillInfo, SkillInfo );
+    Character *ch;
 };
 
 
@@ -216,6 +217,8 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
 
 void AllSkillsList::make( Character *ch )
 {
+    this->ch = ch;
+
     SkillInfo info;
 
     // Collate all displayable skills into a list.
