@@ -773,16 +773,21 @@ static void show_char_to_char_0( Character *victim, Character *ch )
         break;
 
     case POS_FIGHTING:
-        buf << "здесь, сражается ";
+        buf << fmt(ch, _("здесь, сражается "));
 
         if (victim->fighting == 0)
-            buf << "неизвестно с кем...";
+            buf << fmt(ch, _("неизвестно с кем..."));
         else if (victim->fighting == ch)
-            buf << "с {1{RТОБОЙ!!!{2";
-        else if (victim->in_room == victim->fighting->in_room)
-            buf << "с " << ch->sees( victim->fighting, '5') << ".";
+            buf << fmt(ch, _("с {1{RТОБОЙ!!!{2"));
+        else if (victim->in_room == victim->fighting->in_room) {
+            // RU/UA prepose "с "/"з " before the instrumental-case name; EN
+            // takes a direct object ("fighting <name>.").
+            if (Player::displayLang(ch) != LANG_EN)
+                buf << fmt(ch, _("с "));
+            buf << ch->sees( victim->fighting, '5') << ".";
+        }
         else
-            buf << "кем-то, кто ушел...";
+            buf << fmt(ch, _("кем-то, кто ушел..."));
 
         buf << endl;
         show_char_blindness( ch, victim, buf );
