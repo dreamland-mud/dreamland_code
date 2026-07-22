@@ -836,8 +836,10 @@ Json::Value AreaQuestWebPromptListener::jsonAreaQuest( Descriptor *d, Character 
         strip_colors_and_tags(quest->title.getForLang(lang), buf);
         buf << "\"" << ": ";
 
-        aq["t"] = lmsg(lang, "Quest in ", "Задание в зоне ", "Завдання в зоні ")
-                  + quest->pAreaIndex->name.getForLang(lang).colourStrip();
+        // getForLang alone leaks the raw Flexer pad ("Шабаш||а|у||ом|е"); decline
+        // the area name to the prepositional case so it reads "Задание в Шабаше".
+        aq["t"] = lmsg(lang, "Quest in ", "Задание в ", "Завдання в ")
+                  + quest->pAreaIndex->getName(lang, '6').colourStrip();
     } else {
         aq["t"] = lmsg(lang, "Training", "Обучение", "Навчання");
     }
