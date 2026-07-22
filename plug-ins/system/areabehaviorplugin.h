@@ -55,7 +55,7 @@ bool area_is_hometown(AreaIndexData *);
 bool area_has_levels(AreaIndexData *area);
 
 /** Describe area danger level, with colors. */
-DLString area_danger_long(AreaIndexData *area);
+DLString area_danger_long(AreaIndexData *area, Character *ch);
 
 /** Describe area danger level as a single word, with colors. */
 DLString area_danger_short(AreaIndexData *area, Character *ch);

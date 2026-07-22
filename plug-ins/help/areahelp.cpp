@@ -70,30 +70,32 @@ DLString AreaHelp::getTitle(const DLString &label) const
     return buf.str();
 }
 
-static void format_area_quest(AreaQuest *q, ostringstream &qbuf)
+static void format_area_quest(AreaQuest *q, ostringstream &qbuf, Character *ch)
 {
-    qbuf << "{Y%A%{x " << q->description.get(LANG_DEFAULT)
-            << "  " << "Уровни: ";
+    // %A% is a website map macro -- keep it out of any fmt() format string.
+    qbuf << "{Y%A%{x " << q->description.getForLang(viewerLang(ch))
+            << "  " << _("Уровни: ").getMessage(ch);
 
     // Restrictions by level and align
     if (q->minLevel > 0 && q->maxLevel < LEVEL_MORTAL)
-        qbuf << "с " << q->minLevel << " по " << q->maxLevel << ". ";
+        qbuf << fmt(ch, _("с %1$d по %2$d. "), q->minLevel.getValue(), q->maxLevel.getValue());
     else if (q->maxLevel < LEVEL_MORTAL)
-        qbuf << "до " << q->maxLevel << ". ";
+        qbuf << fmt(ch, _("до %1$d. "), q->maxLevel.getValue());
     else if (q->minLevel > 0)
-        qbuf << "с " << q->minLevel << ". ";
+        qbuf << fmt(ch, _("с %1$d. "), q->minLevel.getValue());
     else
-        qbuf << "любые. ";
+        qbuf << _("любые. ").getMessage(ch);
 
+    // align noun stays RU (the align table is not externalized); localize the frame.
     if (q->align.getValue() != 0)
-        qbuf << "Натура: " << q->align.messages(true, '1') << ". ";
+        qbuf << _("Натура: ").getMessage(ch) << q->align.messages(true, '1', viewerLang(ch)) << ". ";
 
     // Quest frequency
-    qbuf << "Как часто: ";
+    qbuf << _("Как часто: ").getMessage(ch);
     if (q->limitPerLife > 0)
-        qbuf << fmt(0, _("%1$d раз%1$I|а| за жизнь"), q->limitPerLife.getValue());
+        qbuf << fmt(ch, _("%1$d раз%1$I|а| за жизнь"), q->limitPerLife.getValue());
     else // TODO support for 'once per hour' etc
-        qbuf << "сколько угодно раз";
+        qbuf << _("сколько угодно раз").getMessage(ch);
 
     qbuf << "." << endl;
 }
@@ -107,15 +109,15 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
         return;
     }
 
-    in << "Зона {Y" << area->getName() << "{x, ";
+    in << fmt(ch, _("Зона {Y%1$s{x, "), area->getName(viewerLang(ch)).c_str());
 
     if (area->low_range > 0 || area->high_range > 0)
-       in << "уровни {Y" << area->low_range << "-" << area->high_range << "{x, ";
+       in << fmt(ch, _("уровни {Y%1$d-%2$d{x, "), area->low_range, area->high_range);
 
-    in << "автор {y" << area->authors << "{x";
+    in << fmt(ch, _("автор {y%1$s{x"), area->authors.c_str());
 
     if (!area->translator.empty())
-        in << ", перевод {y" << area->translator << "{x";
+        in << fmt(ch, _(", перевод {y%1$s{x"), area->translator.c_str());
 
     // This bit is going to be replaced with a link to the map by the webclient.
     in << "%PAUSE% {Iw[map=" << areafile->file_name << "]{Ix%RESUME%";
@@ -129,31 +131,31 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
     names.remove(area->getName().colourStrip());
 
     if (!names.empty())
-        in << "{DТакже известна как: " << String::join(names, ", ") << "{x" << endl;
+        in << fmt(ch, _("{DТакже известна как: %1$s{x"), String::join(names, ", ").c_str()) << endl;
 
     if (IS_SET(area->area_flag, AREA_SAFE|AREA_EASY|AREA_HARD|AREA_DEADLY))
-        in << "Уровень опасности: " << area_danger_long(area) << endl;
+        in << _("Уровень опасности: ").getMessage(ch) << area_danger_long(area, ch) << endl;
 
     in << endl;
 
-    if (!text.get(RU).empty())
-       in << text.get(RU) << endl;
+    if (!text.getForLang(viewerLang(ch)).empty())
+       in << text.getForLang(viewerLang(ch)) << endl;
 
     if (!area->quests.empty()) {
         ostringstream qbuf;
 
         for (auto &q: area->quests)
             if (!q->flags.isSet(AQUEST_HIDDEN))
-                format_area_quest(*q, qbuf);
+                format_area_quest(*q, qbuf, ch);
 
         if (!qbuf.str().empty())
-            in << "{yЗадания{x:" << endl << qbuf.str() << endl;
+            in << _("{yЗадания{x:").getMessage(ch) << endl << qbuf.str() << endl;
     }
 
     if (!area->speedwalk.emptyValues()) {
         const DLString &speedwalk = area->speedwalk.get(LANG_DEFAULT);
 
-        in << "{yКак добраться{x: ";
+        in << _("{yКак добраться{x: ").getMessage(ch);
 
         // For speedwalks that only contain run path, surround it with {hs tags.
         RegExp simpleSpeedwalkRE("^[0-9nsewud]+$");
@@ -166,7 +168,7 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
         // and not just text, explain the starting point.
         RegExp speedwalkRE("[0-9]?[nsewud]+");
         if (speedwalkRE.match(speedwalk))
-           in << "{D(все пути ведут от Рыночной Площади Мидгаарда, если не указано иначе){x" << endl;
+           in << _("{D(все пути ведут от Рыночной Площади Мидгаарда, если не указано иначе){x").getMessage(ch) << endl;
     }
 }
 

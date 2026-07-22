@@ -64,21 +64,21 @@ bool area_has_levels(AreaIndexData *area)
     return area->high_range > 0 || area->low_range > 0;
 }
 
-DLString area_danger_long(AreaIndexData *area)
+DLString area_danger_long(AreaIndexData *area, Character *ch)
 {
     bitstring_t flags = area->area_flag;
 
     if (IS_SET(flags, AREA_SAFE))
-        return "{Cбезопасно{x";
-    
+        return _("{Cбезопасно{x").getMessage(ch);
+
     if (IS_SET(flags, AREA_EASY))
-        return "{Gлёгкие противники{x";
+        return _("{Gлёгкие противники{x").getMessage(ch);
 
     if (IS_SET(flags, AREA_HARD))
-        return "{Yсложные противники{x";
+        return _("{Yсложные противники{x").getMessage(ch);
 
     if (IS_SET(flags, AREA_DEADLY))
-        return "{Rсмертельно опасно{x";
+        return _("{Rсмертельно опасно{x").getMessage(ch);
 
     return DLString::emptyString;
 }
