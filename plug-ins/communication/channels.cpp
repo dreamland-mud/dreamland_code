@@ -305,37 +305,37 @@ COMMAND(ChannelsCommand, "channels")
 {
     ostringstream buf;
     Channels::iterator c;
-    bool rus = Player::displayLang(ch) != LANG_EN;
-    
-    buf << "   канал     статус  " << endl
+    lang_t lang = Player::displayLang(ch);
+    // Resolve the on/off status words once per viewer (RU "ВКЛ"/"ВЫКЛ" for EN too
+    // was the pre-l10n bug: the status column was Cyrillic for every language).
+    DLString on  = _("ВКЛ").getMessage(ch);
+    DLString off = _("ВЫКЛ").getMessage(ch);
+
+    buf << fmt(ch, _("   канал     статус  ")) << endl
         << "---------------------" << endl;
-    
-    for (c = channels.begin( ); c != channels.end( ); c++) 
+
+    for (c = channels.begin( ); c != channels.end( ); c++)
         if ((*c)->getOff( ) && (*c)->canHear( ch ))
-            buf << fmt(0, "%-12s %s.", 
-                             rus ? (*c)->getRussianName( ).c_str( )
-                                 : (*c)->getName( ).c_str( ),
-                             (IS_SET(ch->comm, (*c)->getOff( )) 
-                                 ? "ВЫКЛ" 
-                                 : "ВКЛ")
-                            )
+            buf << fmt(ch, "%-12s %s.",
+                             (*c)->name.getForLang( lang ).c_str( ),
+                             (IS_SET(ch->comm, (*c)->getOff( )) ? off : on).c_str( ))
                 << endl;
-    
-    
-    if (ch->getClan( )->hasChannel( )) 
-        buf << (rus ? "кланканал     " : "clantalk (cb) ")
-            << (!IS_SET(ch->comm, COMM_NOCB) ? "ВКЛ." : "ВЫКЛ.")
+
+
+    if (ch->getClan( )->hasChannel( ))
+        buf << fmt(ch, "%-14s%s.", _("кланканал").getMessage(ch).c_str( ),
+                         (!IS_SET(ch->comm, COMM_NOCB) ? on : off).c_str( ))
             << endl;
 
-    buf <<     (rus ? "аукцион       " : "auction       ")
-        <<     (!IS_SET(ch->comm, COMM_NOAUCTION) ? "ВКЛ." : "ВЫКЛ.")
-        <<     endl
-        <<     (rus ? "глухота       " : "tells         ")
-        <<     (!IS_SET(ch->comm, COMM_DEAF) ? "ВКЛ." : "ВЫКЛ.")
-        <<     endl
-        <<     (rus ? "тишина        " : "quiet mode    ")
-        <<     (IS_SET(ch->comm, COMM_QUIET) ? "ВКЛ." : "ВЫКЛ.")
-        <<     endl;
+    buf << fmt(ch, "%-14s%s.", _("аукцион").getMessage(ch).c_str( ),
+                     (!IS_SET(ch->comm, COMM_NOAUCTION) ? on : off).c_str( ))
+        << endl
+        << fmt(ch, "%-14s%s.", _("глухота").getMessage(ch).c_str( ),
+                     (!IS_SET(ch->comm, COMM_DEAF) ? on : off).c_str( ))
+        << endl
+        << fmt(ch, "%-14s%s.", _("тишина").getMessage(ch).c_str( ),
+                     (IS_SET(ch->comm, COMM_QUIET) ? on : off).c_str( ))
+        << endl;
 
     if (IS_SET(ch->comm, COMM_SNOOP_PROOF))
         buf << fmt(ch, _("Ты защищен от подслушивания.")) << endl;
