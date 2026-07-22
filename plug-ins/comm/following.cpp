@@ -35,6 +35,7 @@ WEARLOC(tattoo);
 CLAN(battlerager);
 CLAN(ruler);
 GSN(manacles);
+GSN(charm_person);
 
 static bool check_mutual_induct( Character *ch, Character *victim, ClanReference &clan )
 {
@@ -143,13 +144,30 @@ CMDRUN( group )
 
         for (Character *gch = char_list; gch != 0; gch = gch->next )
             if (is_same_group( gch, ch )) {
-                if (gch->is_npc( ))
-                    ch->pecho( "[%3d    ] %-16.16s{x %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv",
-                        gch->getRealLevel( ),
-                        ch->sees( gch, '1' ).c_str( ),
-                        gch->hit.getValue( ), gch->max_hit.getValue( ), 
-                        gch->mana.getValue( ), gch->max_mana.getValue( ),
-                        gch->move.getValue( ), gch->max_move.getValue( ) );
+                if (gch->is_npc( )) {
+                    // Show how long a charmed pet stays charmed (its charm timer).
+                    int charmLeft = -1;
+                    for (auto &paf: gch->affected)
+                        if (paf->type.getValue( ) == gsn_charm_person) {
+                            charmLeft = paf->duration.getValue( );
+                            break;
+                        }
+                    if (charmLeft >= 0)
+                        ch->pecho( "[%3d    ] %-16.16s{x %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv  charm:%d",
+                            gch->getRealLevel( ),
+                            ch->sees( gch, '1' ).c_str( ),
+                            gch->hit.getValue( ), gch->max_hit.getValue( ),
+                            gch->mana.getValue( ), gch->max_mana.getValue( ),
+                            gch->move.getValue( ), gch->max_move.getValue( ),
+                            charmLeft );
+                    else
+                        ch->pecho( "[%3d    ] %-16.16s{x %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv",
+                            gch->getRealLevel( ),
+                            ch->sees( gch, '1' ).c_str( ),
+                            gch->hit.getValue( ), gch->max_hit.getValue( ),
+                            gch->mana.getValue( ), gch->max_mana.getValue( ),
+                            gch->move.getValue( ), gch->max_move.getValue( ) );
+                }
                 else
                     ch->pecho( "[%3d %3s] %-16.16s %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv %5d xp",
                         gch->getRealLevel( ), 
