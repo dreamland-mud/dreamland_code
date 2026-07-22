@@ -54,7 +54,7 @@ CMDRUNP( areas )
     else
         buf << fmt(ch, _("{YВсе зоны Мира Мечты: {x")) << endl;
     
-    buf << "Название                Сложность        Название                Сложность" << endl
+    buf << fmt(ch, _("Название                Сложность        Название                Сложность")) << endl
         << "-------------------------------------------------------------------------------" << endl;
 
     for(auto &pArea: areaIndexes) {
@@ -100,7 +100,7 @@ CMDRUNP( areas )
                 levels << pArea->low_range << "-" << pArea->high_range;
             str << fmt(ch, "%7s", levels.c_str());            
 
-            DLString danger = area_danger_short(pArea);
+            DLString danger = area_danger_short(pArea, ch);
             str << " " << fmt(ch, "%6s   ", danger.c_str());
         }
 

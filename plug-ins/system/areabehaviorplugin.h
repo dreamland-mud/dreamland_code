@@ -10,6 +10,7 @@
 #include "class.h"
 
 struct AreaIndexData;
+class Character;
 
 class AreaBehaviorPlugin : public Plugin {
 public:
@@ -57,6 +58,6 @@ bool area_has_levels(AreaIndexData *area);
 DLString area_danger_long(AreaIndexData *area);
 
 /** Describe area danger level as a single word, with colors. */
-DLString area_danger_short(AreaIndexData *area);
+DLString area_danger_short(AreaIndexData *area, Character *ch);
 
 #endif
