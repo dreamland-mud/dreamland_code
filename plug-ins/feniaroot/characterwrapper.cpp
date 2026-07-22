@@ -2902,7 +2902,11 @@ NMI_INVOKE( CharacterWrapper, reportSkills, "(): для очарованного
         int hid = (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
                     ? skill->getSkillHelp()->getID() : 0;
         info->setField(IdRef("help_id"), hid);
-        DLString dname = (bucket <= 1 && cmd) ? cmd->getNameFor(master) : skill->getNameFor(master);
+        // getNameFor lives on SkillCommand (skill->getCommand()), not on the
+        // Command base we down-cast to for properOrder/getExtra.
+        DLString dname = (bucket <= 1 && skill->getCommand())
+                            ? skill->getCommand()->getNameFor(master)
+                            : skill->getNameFor(master);
         info->setField(IdRef("cmdname"), dname);
         info->setField(IdRef("sysname"), skill->getName());
         info->setField(IdRef("showall_only"), showallOnly);
