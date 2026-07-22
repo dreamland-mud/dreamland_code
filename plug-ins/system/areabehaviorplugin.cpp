@@ -6,7 +6,6 @@
 #include "areabehaviorplugin.h"
 #include "character.h"
 #include "l10n.h"
-#include "act.h"
 #include "dreamland.h"
 #include "merc.h"
 
@@ -89,16 +88,16 @@ DLString area_danger_short(AreaIndexData *area, Character *ch)
     bitstring_t flags = area->area_flag;
 
     if (IS_SET(flags, AREA_SAFE))
-        return fmt(ch, _("{Cмирная{x"));
+        return _("{Cмирная{x").getMessage(ch);
     
     if (IS_SET(flags, AREA_EASY))
-        return fmt(ch, _("{Gлегко{x"));
+        return _("{Gлегко{x").getMessage(ch);
 
     if (IS_SET(flags, AREA_HARD))
-        return fmt(ch, _("{Yсложно{x"));
+        return _("{Yсложно{x").getMessage(ch);
 
     if (IS_SET(flags, AREA_DEADLY))
-        return fmt(ch, _("{Rопасно{x"));
+        return _("{Rопасно{x").getMessage(ch);
 
     return DLString::emptyString;
 }
