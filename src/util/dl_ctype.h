@@ -23,23 +23,31 @@ bool dl_is_rus_specific(char c);
 
 inline char dl_toupper( char c )
 {
-    return (c >= 'a' && c <= 'z') 
-           ? c + 'A' - 'a' 
-           : (c >= 'ю' && c <= 'ъ') 
-                ? c + 'Ю' - 'ю' 
-                : c == 'ё'
-                    ? 'Ё'
-                    : c;
+    return (c >= 'a' && c <= 'z')
+           ? c + 'A' - 'a'
+           : (c >= 'ю' && c <= 'ъ')
+                ? c + 'Ю' - 'ю'
+                : c == 'ё' ? 'Ё'
+                // Ukrainian-specific letters have no contiguous range in koi8-u;
+                // map each pair explicitly (mirrors dl_is_ukr_specific).
+                : c == 'і' ? 'І'
+                : c == 'ї' ? 'Ї'
+                : c == 'є' ? 'Є'
+                : c == 'ґ' ? 'Ґ'
+                : c;
 }
 inline char dl_tolower( char c )
 {
-    return (c >= 'A' && c <= 'Z') 
-           ? c + 'a' - 'A' 
-           : (c >= 'Ю' && c < 'Ъ') 
-                ? c + 'ю' - 'Ю' 
-                : c == 'Ё'
-                    ? 'ё'
-                    : c;
+    return (c >= 'A' && c <= 'Z')
+           ? c + 'a' - 'A'
+           : (c >= 'Ю' && c < 'Ъ')
+                ? c + 'ю' - 'Ю'
+                : c == 'Ё' ? 'ё'
+                : c == 'І' ? 'і'
+                : c == 'Ї' ? 'ї'
+                : c == 'Є' ? 'є'
+                : c == 'Ґ' ? 'ґ'
+                : c;
 }
 
 inline bool dl_is_arg_separator(char c)
