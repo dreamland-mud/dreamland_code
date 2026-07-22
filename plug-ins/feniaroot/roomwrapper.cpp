@@ -167,6 +167,12 @@ NMI_GET( RoomWrapper, name , "название комнаты")
     return Register( target->getName() );
 }
 
+NMI_INVOKE( RoomWrapper, getName, "(lang): название комнаты на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    return Register( target->getName( argnum2lang( args, 1 ) ) );
+}
+
 NMI_GET( RoomWrapper, areaname , "имя арии в именительном падеже")
 {
     checkTarget( );
