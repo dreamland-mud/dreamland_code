@@ -21,6 +21,7 @@
 #include "clanreference.h"
 #include "wearlocation.h"
 #include "skillreference.h"
+#include "affect.h"
 #include "msgformatter.h"
 #include "follow_utils.h"
 #include "loadsave.h"
