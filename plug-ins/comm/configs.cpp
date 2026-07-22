@@ -113,31 +113,39 @@ bool ConfigElement::printText( PCharacter *ch ) const
 void ConfigElement::printRow( PCharacter *ch ) const
 {
     bool yes = isSetBit( ch );
-    bool rus = Player::displayLang( ch ) != LANG_EN;
+    lang_t lang = Player::displayLang( ch );
+    // Status word per viewer (was hardcoded Cyrillic ВКЛ/ВЫКЛ for every language,
+    // so EN players saw Cyrillic in the config table). Option name stays binary
+    // EN/RU -- ConfigElement carries no UA name field.
+    DLString status = (yes ? _("ВКЛ.") : _("ВЫКЛ.")).getMessage(ch);
 
     ch->pecho( "| {%s%-14s {x|  {%s%-7s {x|", 
                       CLR_NAME(ch), 
-                      rus ? rname.getValue( ).c_str( ) : name.getValue( ).c_str( ), 
+                      (lang == LANG_EN ? name : rname).getValue( ).c_str( ),
                       yes ? CLR_YES(ch) : CLR_NO(ch),
-                      yes ? "ВКЛ." : "ВЫКЛ." );
+                      status.c_str( ) );
 }
 
 
 static void print_line(PCharacter *ch, const DLString &name, const DLString &rname, bool yes, const DLString &msgYes, const DLString &msgNo)
 {
+    // yes/no word per viewer; the RU key "ДА"/"НЕТ" resolves to YES/NO (EN) and
+    // ТАК/НІ (UA). Option name + description stay RU-data-bound (no UA fields).
+    DLString status = (yes ? _("ДА") : _("НЕТ")).getMessage(ch);
+
     if (Player::displayLang( ch ) != LANG_EN)
         ch->pecho( "  {%s%-14s {%s%5s {x%s",
                         CLR_NAME(ch),
                         rname.c_str(),
                         yes ? CLR_YES(ch) : CLR_NO(ch),
-                        yes ? "ДА" : "НЕТ",
+                        status.c_str(),
                         yes ? msgYes.c_str() : msgNo.c_str() );
     else
         ch->pecho( "  {%s%-12s {%s%5s {x%s",
                         CLR_NAME(ch),
                         name.c_str( ),
                         yes ? CLR_YES(ch) : CLR_NO(ch),
-                        yes ? "YES" : "NO",
+                        status.c_str(),
                         yes ? msgYes.c_str() : msgNo.c_str() );
 }
 
