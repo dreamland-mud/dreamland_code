@@ -121,10 +121,24 @@ NMI_GET( MobIndexWrapper, size , "численный размер моба ил�
     checkTarget( ); 
     return target->getSize();
 }
-NMI_GET( MobIndexWrapper, imm_flags , "флаги иммунитета (таблица .tables.imm_flags)") 
-{ 
-    checkTarget( ); 
+NMI_GET( MobIndexWrapper, imm_flags , "флаги иммунитета (таблица .tables.imm_flags)")
+{
+    checkTarget( );
     return (int)target->imm_flags;
+}
+
+// Average base health/mana this prototype spawns with (dice indices 0=number,
+// 1=type, 2=bonus). Charmed pets grow their max_hit/max_mana above this as they
+// fight, so `pet.max_hit - pet.pIndexData.baseHit` is how much a pet has grown.
+NMI_GET( MobIndexWrapper, baseHit , "среднее базовое здоровье прототипа (сравнить с выросшим max_hit питомца)")
+{
+    checkTarget( );
+    return target->hit[0] * (target->hit[1] + 1) / 2 + target->hit[2];
+}
+NMI_GET( MobIndexWrapper, baseMana , "среднее базовое количество маны прототипа")
+{
+    checkTarget( );
+    return target->mana[0] * (target->mana[1] + 1) / 2 + target->mana[2];
 }
 NMI_GET( MobIndexWrapper, group, "к какой группе принадлежит моб (нужно для assist)") 
 { 
