@@ -85,9 +85,42 @@
 #include "def.h"
 #include "l10n.h"
 
+// For reportSkills(): the pet-report skill gathering, migrated out of comm/report.cpp.
+#include "spell.h"
+#include "skillcommand.h"
+#include "command.h"
+#include "commandbase.h"
+#include "commandflags.h"
+#include "wearlocation.h"
+#include "wearloc_utils.h"
+#include "char_weight.h"
+
 GSN(dark_shroud);
 GSN(manacles);
 GSN(charm_person);
+// Weapon/utility skills excluded from a weaponless pet's report, and the
+// combat-invalid set -- kept in sync with comm/report.cpp's own gsn list.
+GSN(lash);
+GSN(bash);
+GSN(hand_to_hand);
+GSN(sword);
+GSN(polearm);
+GSN(dagger);
+GSN(whip);
+GSN(grip);
+GSN(axe);
+GSN(mace);
+GSN(shield_block);
+GSN(flail);
+GSN(slice);
+GSN(second_weapon);
+GSN(pick_lock);
+GSN(recall);
+GSN(concentrate);
+GSN(hide);
+GSN(sneak);
+GSN(detect_hide);
+GSN(bash_door);
 DESIRE(hunger);
 DESIRE(bloodlust);
 DESIRE(thirst);
@@ -2777,6 +2810,107 @@ NMI_INVOKE( CharacterWrapper, skillsInfo, "(): список структур д�
     return ::wrap(list);
 }
 
+// Weapon/utility skills that make no sense in a weaponless pet's report.
+// Mirrors skill_is_invalid() in comm/report.cpp.
+static bool report_skill_invalid(int sn, bool noCarry)
+{
+    if (!noCarry)
+        return false;
+    return sn == gsn_lash || sn == gsn_bash || sn == gsn_hand_to_hand
+        || sn == gsn_sword || sn == gsn_polearm || sn == gsn_dagger
+        || sn == gsn_whip || sn == gsn_grip || sn == gsn_axe
+        || sn == gsn_mace || sn == gsn_shield_block || sn == gsn_flail
+        || sn == gsn_slice || sn == gsn_second_weapon || sn == gsn_pick_lock;
+}
+
+// Skills that can never be ordered while the pet is fighting.
+// Mirrors skill_is_invalid_in_fight() in comm/report.cpp.
+static bool report_skill_invalid_in_fight(int sn)
+{
+    return sn == gsn_recall || sn == gsn_concentrate || sn == gsn_hide
+        || sn == gsn_sneak || sn == gsn_detect_hide || sn == gsn_pick_lock
+        || sn == gsn_bash_door;
+}
+
+NMI_INVOKE( CharacterWrapper, reportSkills, "(): для очарованного NPC -- список структур приказываемых скилов для рапорта. Поля: bucket (0 внебоевая команда, 1 боевая, 2 заклинание, 3 пассив), help_id, cmdname (имя для хозяина), sysname (англ. имя скила), showall_only (показывать только в 'рапорт все')" )
+{
+    checkTarget();
+
+    RegList::Pointer list(NEW);
+
+    NPCharacter *pet = target->getNPC();
+    if (!pet || pet->master == 0)
+        return ::wrap(list);
+    Character *master = pet->master;
+
+    bool noCarry = Char::canCarryNumber(pet) == 0 || !pet->wearloc.isSet(wear_wield);
+    // properOrder inspects the pet's fighting flag to test fight-context
+    // orderability; toggle it around the check and restore, never clobber.
+    Character *savedFighting = pet->fighting;
+
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        Skill *skill = skillManager->find(sn);
+        Spell::Pointer spell = skill->getSpell();
+        Command::Pointer cmd = skill->getCommand().getDynamicPointer<Command>();
+        bool passive = skill->isPassive();
+        int bucket = -1;
+        bool showallOnly = false;
+
+        if (!skill->usable(pet, false))
+            continue;
+
+        if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
+            bool canOrder = cmd->properOrder(pet) == RC_ORDER_OK;
+            pet->fighting = pet;
+            bool canOrderFight = (cmd->properOrder(pet) == RC_ORDER_OK) && !report_skill_invalid_in_fight(sn);
+            pet->fighting = savedFighting;
+
+            if (report_skill_invalid(sn, noCarry))
+                continue;
+
+            if (sn == gsn_second_weapon) {
+                if (!(canOrder && pet->wearloc.isSet(wear_second_wield)))
+                    continue;
+                bucket = 0;
+            }
+            else if (canOrderFight) {
+                bucket = 1;
+            }
+            else if (canOrder) {
+                bucket = 0;
+                showallOnly = true;
+            }
+            else
+                continue;
+        }
+        else if (spell && spell->isCasted()) {
+            if (!spell->properOrder(pet))
+                continue;
+            bucket = 2;
+            showallOnly = !IS_SET(spell->getTarget(), TAR_CHAR_ROOM);
+        }
+        else if (passive && !report_skill_invalid(sn, noCarry)) {
+            bucket = 3;
+            showallOnly = true;
+        }
+        else
+            continue;
+
+        Register infoReg = Register::handler<IdContainer>();
+        IdContainer *info = infoReg.toHandler().getDynamicPointer<IdContainer>();
+        info->setField(IdRef("bucket"), bucket);
+        int hid = (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
+                    ? skill->getSkillHelp()->getID() : 0;
+        info->setField(IdRef("help_id"), hid);
+        DLString dname = (bucket <= 1 && cmd) ? cmd->getNameFor(master) : skill->getNameFor(master);
+        info->setField(IdRef("cmdname"), dname);
+        info->setField(IdRef("sysname"), skill->getName());
+        info->setField(IdRef("showall_only"), showallOnly);
+        list->push_back(infoReg);
+    }
+
+    return ::wrap(list);
+}
 
 NMI_INVOKE( CharacterWrapper, updateSkills, "(): освежить разученность умений (при входе в мир)" )
 {
