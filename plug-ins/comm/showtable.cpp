@@ -53,7 +53,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
         return;
     }
 
-    buf << "Найдены такие команды:" << endl << endl;
+    buf << fmt(ch, _("Найдены такие команды:")) << endl << endl;
 
     for (auto &c: commandManager->getCommands()) {
         ostringstream aliases;
@@ -61,44 +61,47 @@ static void show_matched_commands( Character *ch, const DLString &arg )
 
         if (cmd->getLevel( ) >= LEVEL_HERO && !ch->is_immortal())
             continue;
-        
+
         if (!cmd->matches( arg ))
             continue;
-        
+
         found = true;
 
         // Header: name, hint in player's target lang
-        buf << "Команда {c" << cmd->name.get(lang) << "{x: " << cmd->hint.get(lang) << endl;
+        buf << fmt(ch, _("Команда {c%1$s{x: %2$s"),
+                       cmd->name.get(lang).c_str(), cmd->hint.get(lang).c_str()) << endl;
 
         // Output names and aliases in all languages
-        buf << "Синонимы: {D" << show_aliases(cmd, lang) << "{x" << endl;
+        buf << fmt(ch, _("Синонимы: {D%1$s{x"), show_aliases(cmd, lang).c_str()) << endl;
 
-        // Category, position
-        DLString cat = cmd->getCommandCategory().messages().toLower();
+        // Category, position -- flag words come from the (now externalized) tables
+        DLString cat = cmd->getCommandCategory().messages(false, '1', lang).toLower();
         if (cat.empty())
-            cat = "(нет)";
-        buf << "Категория {W" << cat << "{x";
+            cat = _("(нет)").getMessage(ch);
+        buf << fmt(ch, _("Категория {W%1$s{x"), cat.c_str());
 
         bitstring_t extra = cmd->getExtra();
         REMOVE_BIT(extra, CMD_HIDDEN|CMD_NO_INTERPRET);
-        buf << ", можно выполнить {W";
+        DLString posWord;
         switch (cmd->getPosition().getValue()) {
-            default: buf << "всегда"; break;
-            case POS_STANDING: buf << "только стоя и вне боя"; break;
-            case POS_FIGHTING: buf << "сражаясь"; break;
-            case POS_SITTING: buf << "сидя"; break;
-            case POS_RESTING: buf << "на отдыхе"; break;
-            case POS_SLEEPING: buf << "во сне"; break;
+            default: posWord = _("всегда").getMessage(ch); break;
+            case POS_STANDING: posWord = _("только стоя и вне боя").getMessage(ch); break;
+            case POS_FIGHTING: posWord = _("сражаясь").getMessage(ch); break;
+            case POS_SITTING: posWord = _("сидя").getMessage(ch); break;
+            case POS_RESTING: posWord = _("на отдыхе").getMessage(ch); break;
+            case POS_SLEEPING: posWord = _("во сне").getMessage(ch); break;
         }
-        
-        buf << ".{x" << endl;
+        buf << fmt(ch, _(", можно выполнить {W%1$s.{x"), posWord.c_str()) << endl;
 
         // Command flags and order flags
-        buf << "Эта команда {W" << (extra > 0 ? command_flags.messages(extra, true) : "без особенностей") << "{x";
+        DLString flagMsg = extra > 0 ? command_flags.messages(extra, true, '1', lang)
+                                     : _("без особенностей").getMessage(ch);
+        buf << fmt(ch, _("Эта команда {W%1$s{x"), flagMsg.c_str());
         if (cmd->getOrder().getValue() != 0)
-            buf << ", приказы примут {W" << cmd->getOrder().messages(true) << "{x";
+            buf << fmt(ch, _(", приказы примут {W%1$s{x"),
+                           cmd->getOrder().messages(true, '1', lang).c_str());
 
-        buf << "." << endl << endl;             
+        buf << "." << endl << endl;
     }
 
     if (found)
@@ -145,12 +148,13 @@ static Categories group_by_categories(Character *ch)
 static void show_commands_by_categories( Character *ch)
 {
     ostringstream buf;
+    lang_t lang = Player::lang(ch);
     Categories categories = group_by_categories(ch);
-    
+
     for (int i = 0; i < command_category_flags.size; i++) {
         DLString name = command_category_flags.fields[i].name;
         const StringList &commands = categories[name];
-        DLString msg = command_category_flags.fields[i].message;
+        DLString msg = command_category_flags.message(command_category_flags.fields[i].value, '1', lang);
         msg = "{c" + msg.toUpper() + "{x: ";
 
         if (!commands.empty())
@@ -168,10 +172,14 @@ static void show_commands_list( Character *ch )
     lang_t lang = Player::lang(ch);
 
 
-    buf << fmt( 0, "%-12s | %-45s| %s", 
-                "Название", "Справка", "Синонимы")
+    // Column labels localized; the %-Ns padding realigns them to the data columns
+    // regardless of the word's length.
+    buf << fmt( ch, "%-12s | %-45s| %s",
+                _("Название").getMessage(ch).c_str(),
+                _("Справка").getMessage(ch).c_str(),
+                _("Синонимы").getMessage(ch).c_str())
         << endl
-        << "-------------+------------------+--------------------------------------------" 
+        << "-------------+------------------+--------------------------------------------"
         << endl;
 
     for (auto &c: commandManager->getCommands()) {
