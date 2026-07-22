@@ -149,7 +149,7 @@ CMDRUN( group )
                     // Show how long a charmed pet stays charmed (its charm timer).
                     int charmLeft = -1;
                     for (auto &paf: gch->affected)
-                        if (paf->type.getValue( ) == gsn_charm_person) {
+                        if (paf->type.getName( ) == gsn_charm_person->getName( )) {
                             charmLeft = paf->duration.getValue( );
                             break;
                         }
