@@ -343,7 +343,7 @@ SKILL_RUNP( judge )
                 ch->pecho(_("У %1$#C2 %2$s этос и %3$s натура.\n\r"
                           "%1$#^P2 заслуги перед законом: %4$d."),
                           victim, 
-                          ethos_table.message( victim->ethos, '1' ).c_str( ),
+                          ethos_table.message( victim->ethos, '1', viewerLang(ch) ).c_str( ),
                           align_name( victim ).ruscase( '1' ).c_str( ),
                           victim->getPC( )->getLoyalty());
 
