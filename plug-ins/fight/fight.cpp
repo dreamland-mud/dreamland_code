@@ -86,6 +86,7 @@
 #include "core/object.h"
 #include "descriptor.h"
 #include "comm.h"
+#include "mudtags.h"
 #include "effects.h"
 #include "wiznet.h"
 #include "loadsave.h"
@@ -244,11 +245,18 @@ static void fightspam_round_summary( )
             chunk << "{r>{x";
         ch->fightEmptyStreak++;
 
+        // Convert {colour and visibility tags to the client's encoding before
+        // sending. d->send() is the raw buffer write; the normal pecho/send_to
+        // path runs mudtags_convert first, and skipping it leaked literal "{R"
+        // codes to the client (telnet ANSI and mudjs alike).
+        ostringstream converted;
+        mudtags_convert( chunk.c_str( ), converted, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR, ch );
+
         // fcommand=true skips the buffer's leading "\n\r" so ">" appends to the
         // current line; process_output(d,false) flushes it without a prompt.
         bool savedFcommand = d->fcommand;
         d->fcommand = true;
-        d->send( chunk.c_str( ) );
+        d->send( converted.str( ).c_str( ) );
         process_output( d, false );
         d->fcommand = savedFcommand;
     }
