@@ -476,8 +476,8 @@ InterpretHandler::prompt(Descriptor *d)
     if (is_websock(d))
         webPrompt(d, d->character);
 
-    if (!IS_SET( ch->comm, COMM_COMPACT ))
-        d->send("\n\r");
+    // 'compact' config option retired -- the blank line before the prompt is always sent.
+    d->send("\n\r");
 
     if (IS_SET( ch->comm, COMM_PROMPT ))
         normalPrompt( ch );

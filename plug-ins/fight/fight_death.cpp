@@ -159,7 +159,8 @@ protected:
         if (!corpse || !corpse->contains)
             return;
 
-        if (IS_SET(killer->add_comm, PLR_AUTOLOOK)) {            
+        // 'autolook' config option retired -- players always glance into the corpse.
+        if (!killer->is_npc( )) {
             if (!killer->can_see( corpse )) {
                 if (IS_AFFECTED(killer, AFF_BLIND))
                     killer->pecho(_("{WТебе хочется осмотреть труп, но ты ничего не видишь!{x"));
@@ -178,7 +179,8 @@ protected:
         if (!corpse || !corpse->contains)
             return;
 
-        if (IS_SET(killer->act, PLR_AUTOGOLD)) {
+        // 'autogold' config option retired -- players always loot coins from the corpse.
+        if (!killer->is_npc( )) {
             Object *money = get_obj_list_type( killer, ITEM_MONEY, corpse->contains );
 
             if (money)

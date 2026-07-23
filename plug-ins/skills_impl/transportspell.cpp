@@ -174,15 +174,18 @@ bool GateMovement::checkVictim( )
             && ch->getClan( ) == victim->getClan( ))
             return true; 
         
-        if (!is_safe_nomessage(ch, victim) 
-            && IS_SET(victim->act, PLR_NOSUMMON) 
-            && spell 
+        // 'nosummon' config option retired -- players are always protected from
+        // being summoned/gated by anyone they are safe from (outside PK range),
+        // clan and group excepted (handled above / by is_safe).
+        if (!is_safe_nomessage(ch, victim)
+            && !victim->is_npc( )
+            && spell
             && from_room->area != to_room->area) {
             ch->pecho( _("Открыть портал на твою цель удастся только в пределах одной зоны.") );
             return false;
-        }  
-        
-        if (IS_SET(victim->act, PLR_NOSUMMON) && is_safe(ch, victim))
+        }
+
+        if (!victim->is_npc( ) && is_safe(ch, victim))
             return false;
     }
     

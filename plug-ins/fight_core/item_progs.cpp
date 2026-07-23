@@ -27,7 +27,8 @@ static bool oprog_get_money( Character *ch, Object *obj )
         ch->pecho(_("Твой кошелек пополнился на %s."), moneyArg.c_str());
     }
 
-    if (IS_SET(ch->act,PLR_AUTOSPLIT))
+    // 'autosplit' config option retired -- coins are always split with the party.
+    if (!ch->is_npc( ))
         if (obj->value0() > 1 || obj->value1())
             if (party_members_room( ch ).size( ) > 1)
                 interpret_raw( ch, "split", "%d %d", obj->value0(), obj->value1() );
