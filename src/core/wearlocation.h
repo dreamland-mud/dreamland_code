@@ -36,7 +36,7 @@ public:
     virtual bool isValid( ) const;
     virtual bool givesAffects() const;
     
-    virtual const DLString &getRibName( ) const;
+    virtual const DLString &getRibName( lang_t lang = LANG_DEFAULT ) const;
     virtual const DLString &getPurpose( lang_t lang = LANG_DEFAULT ) const;
     virtual int getDestroyChance( ) const;
     virtual int getOrderWear( ) const;

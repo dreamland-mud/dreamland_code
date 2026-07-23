@@ -33,7 +33,7 @@ public:
     virtual void loaded( );
     virtual void unloaded( );
     
-    inline virtual const DLString & getRibName( ) const;
+    inline virtual const DLString & getRibName( lang_t lang = LANG_DEFAULT ) const;
     inline virtual const DLString & getPurpose( lang_t lang = LANG_DEFAULT ) const;
     inline virtual int getDestroyChance( ) const;
     inline virtual int getOrderWear( ) const;
@@ -94,14 +94,14 @@ protected:
     XML_VARIABLE XMLIntegerNoEmpty     orderWear, orderDisplay;
     XML_VARIABLE XMLBoolean            displayAlways;
     XML_VARIABLE XMLMultiString        msgDisplay;
-    XML_VARIABLE XMLStringNoEmpty      ribName;
+    XML_VARIABLE XMLMultiString        ribName;
     XML_VARIABLE XMLMultiString        purpose;
     XML_VARIABLE XMLIntegerNoEmpty     destroyChance;
 };
 
-inline const DLString &DefaultWearlocation::getRibName( ) const
+inline const DLString &DefaultWearlocation::getRibName( lang_t lang ) const
 {
-    return ribName.getValue( );
+    return ribName.getForLang( lang );
 }
 inline const DLString &DefaultWearlocation::getPurpose( lang_t lang ) const
 {
