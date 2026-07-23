@@ -228,6 +228,7 @@ public:
     // public: cleared directly by the free function violence_update() in plug-ins/fight
     bool                          adrenaline_pending; // armed by setLastFightTime, fires one "calmed down" line when adrenaline decays
     int                           roundDamage; // total damage dealt this combat round; reset+summarized by violence_update for fightspam-OFF viewers
+    int                           fightEmptyStreak; // consecutive fightspam-OFF empty rounds (no damage summary), for the "You're fighting! >>>" indicator
     bool extracted;
     Character*                         reply;
     Character*                         next;

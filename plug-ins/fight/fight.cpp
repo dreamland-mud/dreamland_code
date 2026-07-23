@@ -105,6 +105,8 @@
 #include "material.h"
 #include "def.h"
 #include "l10n.h"
+#include "descriptor.h"
+#include "comm.h"
 
 GSN(area_attack);
 GSN(fifth_attack);
@@ -191,11 +193,16 @@ static char round_damage_colour( int perc )
 static void fightspam_round_summary( )
 {
     for (Character *ch = char_list; ch != 0; ch = ch->next) {
-        if (ch->getPC( ) == 0 || ch->extracted || ch->in_room == 0 || ch->fighting == 0)
+        if (ch->getPC( ) == 0 || ch->extracted || ch->in_room == 0)
             continue;
+        if (ch->fighting == 0) {
+            ch->fightEmptyStreak = 0; // reset the indicator between fights
+            continue;
+        }
         if (!IS_AWAKE(ch) || IS_SET(ch->getPC( )->config, CONFIG_FIGHTSPAM))
             continue;
 
+        bool anyLine = false;
         for (Character *att = ch->in_room->people; att != 0; att = att->next_in_room) {
             if (att->extracted || att->roundDamage <= 0)
                 continue;
@@ -214,7 +221,36 @@ static void fightspam_round_summary( )
             // Args in reference order (1=attacker, 2=victim, 3=number string) so
             // the act formatter reads each va_arg with the right type.
             ch->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, vic, num );
+            anyLine = true;
         }
+
+        if (anyLine) {
+            ch->fightEmptyStreak = 0;
+            continue;
+        }
+
+        // Empty round (no damage summary): show one ">" per empty round on the
+        // SAME line ("You're fighting! >>>>"), WITHOUT a prompt -- so the player
+        // sees combat is still ticking. The label prints once at the streak start.
+        // Only when the output buffer is idle, so we never race real pending output.
+        Descriptor *d = ch->desc;
+        if (d == 0 || d->outtop != 0)
+            continue;
+
+        DLString chunk;
+        if (ch->fightEmptyStreak == 0)
+            chunk << "{R" << _("Ты сражаешься!").getMessage( ch ).c_str( ) << " {r>{x";
+        else
+            chunk << "{r>{x";
+        ch->fightEmptyStreak++;
+
+        // fcommand=true skips the buffer's leading "\n\r" so ">" appends to the
+        // current line; process_output(d,false) flushes it without a prompt.
+        bool savedFcommand = d->fcommand;
+        d->fcommand = true;
+        d->send( chunk.c_str( ) );
+        process_output( d, false );
+        d->fcommand = savedFcommand;
     }
 }
 
