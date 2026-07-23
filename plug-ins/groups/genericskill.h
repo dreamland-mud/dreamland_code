@@ -60,8 +60,8 @@ public:
 
     virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
     virtual DLString accessToString() const;
-    DLString skillClassesList() const;
-    DLString skillRacesList() const;
+    DLString skillClassesList(Character *ch) const;
+    DLString skillRacesList(Character *ch) const;
 
 protected:
     bool availableForAll( ) const;
