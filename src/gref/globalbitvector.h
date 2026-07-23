@@ -9,6 +9,7 @@
 #include <set>
 #include "dlstring.h"
 #include "globalregistry.h"
+#include "lang.h"
 
 class GlobalBitvector {
 public:
@@ -119,6 +120,8 @@ public:
     void fromString( const DLString &source );
     DLString toString( char joiner = ' ' ) const;
     DLString toRussianString( char gcase = '1', const char *joiner = 0 ) const;
+    // Per-viewer variant: element names in `lang` (UA falls back to RU).
+    DLString toString( lang_t lang, char gcase = '1', const char *joiner = 0 ) const;
     vector<int> toArray( ) const;
     std::set<int> toSet() const;
 
