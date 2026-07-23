@@ -14,6 +14,7 @@
 #include "skill_utils.h"
 
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "room.h"
 #include "npcharacter.h"
 #include "hometown.h"
@@ -328,9 +329,9 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
 
     auto fillRacesClassesInfo = [&]() {
         if (!classes.empty())
-            buf << pad << "Доступно классам: {D" << this->skillClassesList() << "{x" << endl;
+            buf << pad << l(ch, "Доступно классам:") << " {D" << this->skillClassesList(ch) << "{x" << endl;
         if (!raceBonuses.empty())
-            buf << pad << "Бонус для рас: {D" << this->skillRacesList() << "{x" << endl;
+            buf << pad << l(ch, "Бонус для рас:") << " {D" << this->skillRacesList(ch) << "{x" << endl;
     };
 
     buf << print_what(this) << " "
@@ -484,23 +485,35 @@ DLString GenericSkill::accessToString() const
     return classBuf.join(", ") +  ";" + raceBonuses.toString(' ');
 }
 
-DLString GenericSkill::skillClassesList() const
+DLString GenericSkill::skillClassesList(Character *ch) const
 {
     StringList result;
 
     for (auto &c: classes) {
-        result.push_back(professionManager->find(c.first)->getRusName().ruscase('1'));
+        result.push_back(professionManager->find(c.first)->getNameFor(ch, Grammar::Case('1')));
     }
 
     return result.join("{x, {D");
 }
 
-DLString GenericSkill::skillRacesList() const
+// Per-viewer plural (multiple) race name: UA name for a UA viewer (RU fallback),
+// latin for EN, declinable RU otherwise. Mirrors defaultprofession.cpp:raceMltNameFor.
+static DLString raceMltNameFor(Race *race, Character *ch, char gcase)
+{
+    lang_t lang = Player::displayLang(ch);
+    if (lang == LANG_UA && !race->getMltNameUa().empty())
+        return race->getMltNameUa().ruscase(gcase);
+    if (lang == LANG_EN)
+        return race->getName();
+    return race->getMltName().ruscase(gcase);
+}
+
+DLString GenericSkill::skillRacesList(Character *ch) const
 {
     StringList result;
 
     for (auto &r: raceBonuses.toArray()) {
-        result.push_back(raceManager->find(r)->getMltName().ruscase('1'));
+        result.push_back(raceMltNameFor(raceManager->find(r), ch, '1'));
     }
 
     return result.join("{x, {D");
