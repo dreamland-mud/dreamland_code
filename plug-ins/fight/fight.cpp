@@ -235,8 +235,16 @@ static void fightspam_round_summary( )
         // sees combat is still ticking. The label prints once at the streak start.
         // Only when the output buffer is idle, so we never race real pending output.
         Descriptor *d = ch->desc;
-        if (d == 0 || d->outtop != 0)
+        if (d == 0)
             continue;
+        // Any pending output this round (a spell message, a wound line, a special
+        // attack -- not just a damage summary) means the screen isn't silent, so
+        // re-arm the streak: the next truly-empty round starts a fresh
+        // "You're fighting!" label instead of continuing a bare-arrow run.
+        if (d->outtop != 0) {
+            ch->fightEmptyStreak = 0;
+            continue;
+        }
 
         DLString chunk;
         if (ch->fightEmptyStreak == 0)
