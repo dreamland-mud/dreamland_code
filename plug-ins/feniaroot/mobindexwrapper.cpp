@@ -140,6 +140,30 @@ NMI_GET( MobIndexWrapper, baseMana , "среднее базовое количе
     checkTarget( );
     return target->mana[0] * (target->mana[1] + 1) / 2 + target->mana[2];
 }
+
+// Base combat params a charmed pet spawns with, so the report can show how much
+// each improved (creation.cpp: instance hitroll = level + baseHitroll, damroll =
+// damage[2], dice number/type = damage[0]/[1]). dice indices 0=number,1=type,2=bonus.
+NMI_GET( MobIndexWrapper, baseHitroll , "базовый hitroll прототипа (у инстанса он level + baseHitroll)")
+{
+    checkTarget( );
+    return target->hitroll;
+}
+NMI_GET( MobIndexWrapper, baseDamroll , "базовый damroll прототипа (бонус к кубику урона)")
+{
+    checkTarget( );
+    return target->damage[2];
+}
+NMI_GET( MobIndexWrapper, baseDamNumber , "базовое число кубиков урона прототипа")
+{
+    checkTarget( );
+    return target->damage[0];
+}
+NMI_GET( MobIndexWrapper, baseDamType , "базовое число граней кубика урона прототипа")
+{
+    checkTarget( );
+    return target->damage[1];
+}
 NMI_GET( MobIndexWrapper, group, "к какой группе принадлежит моб (нужно для assist)") 
 { 
     checkTarget( ); 
