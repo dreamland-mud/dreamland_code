@@ -367,7 +367,8 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
     if (container && pocket.empty( ))
         show_pockets_to_char( container, ch, output );
     
-    fConfigCombine = (ch->is_npc() || IS_SET(ch->comm, COMM_COMBINE));
+    // 'combine' config option retired -- similar items are always grouped.
+    fConfigCombine = true;
 
     /*
      * Format the list of objects.
@@ -1429,7 +1430,8 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         buf << look_targets_hint( ch, room->getExtraDescr(), lang );
     }
 
-    if (ch->getPC( ) && IS_SET(ch->getPC( )->act, PLR_AUTOEXIT))
+    // 'autoexit' config option retired -- exits are always shown to players.
+    if (ch->getPC( ))
     {
         buf << endl;
         ch->send_to( buf );

@@ -679,7 +679,8 @@ CMDRUNP( sacrifice )
     }
     else ch->pecho(_("Твое скудное жертвоприношение остается без награды от %N2."), rname);
 
-    if (IS_SET(ch->act,PLR_AUTOSPLIT))
+    // 'autosplit' config option retired -- coins are always split with the party.
+    if (!ch->is_npc( ))
         if (silver > 1)
             if (party_members_room( ch ).size( ) > 1)
                 interpret_raw( ch, "split", "%d", silver );

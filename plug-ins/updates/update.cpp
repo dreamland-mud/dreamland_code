@@ -1615,8 +1615,7 @@ void idle_update( PCharacter *ch )
     oldact(_("$c1 растворяется в воздухе."),ch, 0, 0, TO_ROOM );
     oldact(_("Ты растворяешься в воздухе."), ch, 0, 0, TO_CHAR );
 
-    if (IS_SET(ch->config, CONFIG_AUTOAFK) && !IS_SET(ch->comm, COMM_AFK))
-        interpret_raw( ch, "afk" );
+    // 'autoafk' config option retired -- vanishing no longer forces afk.
 }
 
 void char_update_affects( Character *ch )
