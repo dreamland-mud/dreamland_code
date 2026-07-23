@@ -41,7 +41,7 @@ bool Wearlocation::givesAffects() const
     return false;
 }
 
-const DLString &Wearlocation::getRibName( ) const
+const DLString &Wearlocation::getRibName( lang_t ) const
 {
     return DLString::emptyString;
 }

@@ -224,7 +224,7 @@ DLString AffectOutput::format_affect_global( Affect *paf )
 
             for (auto wearlocIndex: paf->global.toArray()) {
                 Wearlocation *wearloc = wearlocationManager->find(wearlocIndex);
-                cut.push_back(wearloc->getRibName().ruscase('2'));
+                cut.push_back(wearloc->getRibName(lang).ruscase('2'));
             }
 
             buf << _("лишает").getMessage( lang ) << " {1{m" << cut.join("{2, {1{m");
