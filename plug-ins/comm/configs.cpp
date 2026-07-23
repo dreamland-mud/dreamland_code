@@ -60,6 +60,11 @@ const DLString & ConfigElement::getRussianName( ) const
     return rname;
 }
 
+const DLString & ConfigElement::getUaName( ) const
+{
+    return uaname;
+}
+
 bool ConfigElement::available(PCharacter *ch) const
 {
     if (level > ch->get_trust())
@@ -102,7 +107,8 @@ bool ConfigElement::isSetBit( PCharacter *ch ) const
 
 bool ConfigElement::printText( PCharacter *ch ) const
 {
-    const DLString &msg = (isSetBit( ch ) ? msgOn.getValue( ) : msgOff.getValue( ) );
+    lang_t lang = Player::displayLang( ch );
+    const DLString &msg = (isSetBit( ch ) ? msgOn.getForLang( lang ) : msgOff.getForLang( lang ) );
 
     if (!msg.empty( )) {
         ch->pecho( msg );
@@ -129,32 +135,36 @@ void ConfigElement::printRow( PCharacter *ch ) const
 }
 
 
-static void print_line(PCharacter *ch, const DLString &name, const DLString &rname, bool yes, const DLString &msgYes, const DLString &msgNo)
+static void print_line(PCharacter *ch, const DLString &name, const DLString &rname, const DLString &uaname, bool yes, const DLString &msgYes, const DLString &msgNo)
 {
-    // yes/no word per viewer; the RU key "ДА"/"НЕТ" resolves to YES/NO (EN) and
-    // ТАК/НІ (UA). Option name + description stay RU-data-bound (no UA fields).
+    // yes/no word + option name + toggle message all per viewer; RU key "ДА"/"НЕТ"
+    // resolves to YES/NO (EN) and ТАК/НІ (UA). UA name falls back to RU if empty.
     DLString status = (yes ? _("ДА") : _("НЕТ")).getMessage(ch);
+    lang_t lang = Player::displayLang( ch );
 
-    if (Player::displayLang( ch ) != LANG_EN)
-        ch->pecho( "  {%s%-14s {%s%5s {x%s",
-                        CLR_NAME(ch),
-                        rname.c_str(),
-                        yes ? CLR_YES(ch) : CLR_NO(ch),
-                        status.c_str(),
-                        yes ? msgYes.c_str() : msgNo.c_str() );
-    else
+    if (lang == LANG_EN)
         ch->pecho( "  {%s%-12s {%s%5s {x%s",
                         CLR_NAME(ch),
                         name.c_str( ),
                         yes ? CLR_YES(ch) : CLR_NO(ch),
                         status.c_str(),
                         yes ? msgYes.c_str() : msgNo.c_str() );
+    else {
+        const DLString &nm = (lang == LANG_UA && !uaname.empty( )) ? uaname : rname;
+        ch->pecho( "  {%s%-14s {%s%5s {x%s",
+                        CLR_NAME(ch),
+                        nm.c_str(),
+                        yes ? CLR_YES(ch) : CLR_NO(ch),
+                        status.c_str(),
+                        yes ? msgYes.c_str() : msgNo.c_str() );
+    }
 }
 
 void ConfigElement::printLine( PCharacter *ch ) const
 {
     bool yes = isSetBit( ch );
-    print_line(ch, name, rname, yes, msgOn, msgOff);
+    lang_t lang = Player::displayLang( ch );
+    print_line(ch, name, rname, uaname, yes, msgOn.getForLang( lang ), msgOff.getForLang( lang ));
 }
 
 Flags & ConfigElement::getField( PCharacter *ch ) const
@@ -182,9 +192,9 @@ Flags & ConfigElement::getField( PCharacter *ch ) const
  *------------------------------------------------------------------------*/
 void ConfigGroup::printHeader( PCharacter *ch ) const
 {
-    ch->pecho( "\r\n{%s%s{x", 
+    ch->pecho( "\r\n{%s%s{x",
                     CLR_HEADER(ch),
-                    name.getValue( ).c_str( ) );
+                    name.getForLang( Player::displayLang( ch ) ).c_str( ) );
 }
 
 /*-------------------------------------------------------------------------
@@ -273,9 +283,9 @@ COMMAND(ConfigCommand, "config")
     for (g = groups.begin( ); g != groups.end( ); g++) 
         for (c = g->begin( ); c != g->end( ); c++) 
             if ((*c)->available(pch))
-                // Synonym-aware match: renamed options keep their old names +
-                // gain UA names via synonyms.json (keyed by the option's getName).
-                if (arg_is_soft(arg1, (*c)->getName()) || arg_is_soft(arg1, (*c)->getRussianName()))
+                // Synonym-aware match on EN/RU/UA names (+ old names via synonyms.json).
+                if (arg_is_soft(arg1, (*c)->getName()) || arg_is_soft(arg1, (*c)->getRussianName())
+                        || arg_is_soft(arg1, (*c)->getUaName()))
                 {
                     if (!(*c)->handleArgument( pch, arg2 ))
                         pch->pecho(_("Неправильный переключатель. См. {W? режим{x."));
@@ -388,7 +398,7 @@ static void config_scroll_print(PCharacter *ch)
     DLString msgYes = fmt(ch, _("Тебе непрерывно выводится %1$d лин%1$Iия|ии|ий текста."),
                        ch->lines.getValue( ) );
 
-    print_line(ch, "lines", "строк", yes, msgYes, msgNo);
+    print_line(ch, "lines", "строк", "рядки", yes, msgYes, msgNo);
 }
 
 static void config_scroll(PCharacter *ch, const DLString &constArguments)
@@ -453,7 +463,7 @@ static void config_telegram_print(PCharacter *ch)
     bool yes = !user.empty();
     DLString msgYes = fmt(0, _("Пользователь Telegram {C%s{x."), user.c_str());
     DLString msgNo = "Твой персонаж не связан с пользователями Telegram, набери {y{hcрежим телеграм{x.";
-    print_line(ch, "telegram", "телеграм", yes, msgYes, msgNo);
+    print_line(ch, "telegram", "телеграм", "телеграм", yes, msgYes, msgNo);
 }
 
 /**
@@ -510,7 +520,7 @@ static void config_discord_print(PCharacter *ch)
            << "{w ({C" << discord["id"].asString() << "{w), статус " << discord["status"];            
 
     DLString msgNo = "Твой персонаж не связан с пользователем Discord, набери {y{hcрежим дискорд{x";
-    print_line(ch, "discord", "дискорд", yes, msgYes.str(), msgNo);
+    print_line(ch, "discord", "дискорд", "дискорд", yes, msgYes.str(), msgNo);
 }
 
 /**
