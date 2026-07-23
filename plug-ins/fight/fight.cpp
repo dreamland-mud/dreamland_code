@@ -84,6 +84,8 @@
 #include "race.h"
 #include "npcharacter.h"
 #include "core/object.h"
+#include "descriptor.h"
+#include "comm.h"
 #include "effects.h"
 #include "wiznet.h"
 #include "loadsave.h"
@@ -105,8 +107,6 @@
 #include "material.h"
 #include "def.h"
 #include "l10n.h"
-#include "descriptor.h"
-#include "comm.h"
 
 GSN(area_attack);
 GSN(fifth_attack);
