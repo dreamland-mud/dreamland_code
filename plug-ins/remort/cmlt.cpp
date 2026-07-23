@@ -180,7 +180,7 @@ void CMlt::doShowSelf( PCharacter *ch )
             if (r.stats[i] > 0)
                 str << fmt( ch, _("     +%d к %s\n"), 
                                 r.stats[i].getValue( ), 
-                                stat_table.message( i, '3' ).c_str( ) );
+                                stat_table.message( i, '3', viewerLang(ch) ).c_str( ) );
     }
 
     ch->send_to( str );
