@@ -255,7 +255,7 @@ COMMAND(ConfigCommand, "config")
         return;
     }
 
-    if (arg_is(arg1, "scroll")) {
+    if (arg_is(arg1, "lines")) {
         config_scroll(pch, arg2);
         return;
     }
@@ -273,7 +273,9 @@ COMMAND(ConfigCommand, "config")
     for (g = groups.begin( ); g != groups.end( ); g++) 
         for (c = g->begin( ); c != g->end( ); c++) 
             if ((*c)->available(pch))
-                if (arg1.strPrefix((*c)->getName()) || arg1.strPrefix((*c)->getRussianName()))
+                // Synonym-aware match: renamed options keep their old names +
+                // gain UA names via synonyms.json (keyed by the option's getName).
+                if (arg_is_soft(arg1, (*c)->getName()) || arg_is_soft(arg1, (*c)->getRussianName()))
                 {
                     if (!(*c)->handleArgument( pch, arg2 ))
                         pch->pecho(_("Неправильный переключатель. См. {W? режим{x."));
@@ -386,7 +388,7 @@ static void config_scroll_print(PCharacter *ch)
     DLString msgYes = fmt(ch, _("Тебе непрерывно выводится %1$d лин%1$Iия|ии|ий текста."),
                        ch->lines.getValue( ) );
 
-    print_line(ch, "scroll", "буфер", yes, msgYes, msgNo);
+    print_line(ch, "lines", "строк", yes, msgYes, msgNo);
 }
 
 static void config_scroll(PCharacter *ch, const DLString &constArguments)
@@ -400,7 +402,7 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
     if (arg.empty( ))
     {
         config_scroll_print(ch);
-        ch->pecho(_("Для изменения используй {yрежим буфер{x число."));
+        ch->pecho(_("Для изменения используй {yрежим строк{x число."));
         return;
     }
 

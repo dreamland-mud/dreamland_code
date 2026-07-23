@@ -42,6 +42,28 @@ bool arg_is(const DLString &arg, const DLString &keyword)
     return false;
 }
 
+// Like arg_is, but a keyword with no synonyms entry silently yields no match
+// instead of logging an error. For callers passing arbitrary runtime strings
+// (e.g. config option names) that may or may not have a synonyms list.
+bool arg_is_soft(const DLString &arg, const DLString &keyword)
+{
+    if (arg.empty())
+        return false;
+
+    if (arg.strPrefix(keyword))
+        return true;
+
+    if (!synonyms.isMember(keyword))
+        return false;
+
+    for (auto &synon: synonyms[keyword]) {
+        if (arg.strPrefix(synon.asString()))
+            return true;
+    }
+
+    return false;
+}
+
 // Exact synonym lookup.
 bool arg_is_strict(const DLString &arg, const DLString &keyword)
 {

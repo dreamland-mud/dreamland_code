@@ -8,6 +8,7 @@
 class DLString;
 
 bool arg_is(const DLString &arg, const DLString &keyword);
+bool arg_is_soft(const DLString &arg, const DLString &keyword);
 bool arg_is_strict(const DLString &arg, const DLString &keyword);
 
 
