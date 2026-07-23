@@ -404,6 +404,13 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
         return;
     }
 
+    // 'no'/'off' disables buffering (was: "Ты должен ввести количество линий.")
+    if (arg_is_no(arg) || arg_is_switch_off(arg)) {
+        ch->lines = 0;
+        ch->pecho(_("Буферизация вывода отключена."));
+        return;
+    }
+
     if (!arg.isNumber( )) {
         ch->pecho(_("Ты должен ввести количество линий."));
         return;
