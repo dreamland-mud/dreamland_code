@@ -128,9 +128,9 @@ void DefaultSkillGroup::listPracticers( PCharacter *ch, ostringstream &buf ) con
 
         int helpID = area_helpid(pMob->area);
 
-        buf << " - {g" 
-            << pMob->short_descr.get(LANG_RU).ruscase('1') << "{x "
-            << "({g{hh" << (helpID > 0 ? DLString(helpID) : "") << pMob->area->getName() << "{x).";
+        buf << " - {g"
+            << pMob->short_descr.getForLang(viewerLang(ch)).ruscase('1') << "{x "
+            << "({g{hh" << (helpID > 0 ? DLString(helpID) : "") << pMob->area->getName(viewerLang(ch)) << "{x).";
     }
 
     buf << endl;
