@@ -111,6 +111,10 @@ bool Damage::hit( bool show )
     calcDamage( );
     priorDamageEffects( );
 
+    // Accumulate for the per-round fightspam-OFF summary (emitted by violence_update).
+    if (dam > 0 && ch != 0)
+        ch->roundDamage += dam;
+
     if (show)
         message( );
 
@@ -827,7 +831,14 @@ bool Damage::canSeeMessage(Character *to)
         && !to->is_npc( )
         && !IS_SET(to->getPC( )->config, msgNoSpamBit( )))
         return false;
-    
+
+    // fightspam OFF: suppress the per-hit damage line; violence_update prints
+    // one aggregated summary line per participant per round instead.
+    if (dam > 0
+        && !to->is_npc( )
+        && !IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM))
+        return false;
+
     if (!IS_AWAKE(to) || !to->can_sense( ch ) || !to->can_sense( victim ))
         return false;
 
