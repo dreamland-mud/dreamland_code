@@ -344,7 +344,7 @@ SKILL_RUNP( judge )
                           "%1$#^P2 заслуги перед законом: %4$d."),
                           victim, 
                           ethos_table.message( victim->ethos, '1', viewerLang(ch) ).c_str( ),
-                          align_name( victim ).ruscase( '1' ).c_str( ),
+                          align_name( victim, viewerLang(ch) ).ruscase( '1' ).c_str( ),
                           victim->getPC( )->getLoyalty());
 
                 return;

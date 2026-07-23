@@ -8,6 +8,7 @@
 #include <sstream>
 #include "dlstring.h"
 #include "grammar_entities.h"
+#include "lang.h"
 
 class Character;
 class PCharacter;
@@ -16,13 +17,17 @@ struct alignment_t {
     int minValue;
     int aveValue;
     int maxValue;
-    const char *rname;
+    const char *rname;   // Russian (Flexer pad, declines with feminine "натура")
+    const char *name;    // English adjective
+    const char *uaname;  // Ukrainian (feminine, agrees with "натура")
 };
 
 extern const struct alignment_t alignment_table [];
 
 DLString align_name_for_range( int min, int max, Character *ch = 0 );
 DLString align_name( Character * );
+DLString align_name( int a, lang_t lang );
+DLString align_name( Character *ch, lang_t lang );
 DLString align_max( PCharacter * );
 DLString align_min( PCharacter * );
 const char *align_name_short(Character *ch, const Grammar::MultiGender &g);

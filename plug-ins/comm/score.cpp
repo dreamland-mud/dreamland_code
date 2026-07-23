@@ -270,7 +270,7 @@ static void score_prose( Character *ch )
     buf << fmt(ch, _("Точность: {C%d{x  Урон: {C%d{x  Защита от заклинаний: {C%d{x\n\r"),
                 ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
 
-    buf << fmt(ch, _("У тебя %s натура.  "), align_name( ch ).ruscase( '1' ).c_str( ) );
+    buf << fmt(ch, _("У тебя %s натура.  "), align_name( ch, viewerLang(ch) ).ruscase( '1' ).c_str( ) );
     
     switch (ch->ethos.getValue( )) {
     case ETHOS_LAWFUL:
