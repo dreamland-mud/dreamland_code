@@ -42,6 +42,8 @@ static void config_discord(PCharacter *ch, const DLString &constArguments);
 static void config_discord_print(PCharacter *ch);
 static void config_lang(PCharacter *ch, const DLString &constArguments);
 static void config_lang_print(PCharacter *ch);
+static void config_color(PCharacter *ch, const DLString &constArguments);
+static void config_color_print(PCharacter *ch);
 
 list<PCMemoryInterface *> who_find_offline(PCharacter *looker);
 
@@ -233,6 +235,7 @@ COMMAND(ConfigCommand, "config")
                     (*c)->printLine( pch );
         }
 
+        config_color_print(pch);
         config_scroll_print(pch);
         config_telegram_print(pch);
         config_discord_print(pch);
@@ -247,9 +250,14 @@ COMMAND(ConfigCommand, "config")
         return; 
     }
 
+    if (arg_is(arg1, "color")) {
+        config_color(pch, arg2);
+        return;
+    }
+
     if (arg_is(arg1, "scroll")) {
         config_scroll(pch, arg2);
-        return; 
+        return;
     }
 
     if (arg_is(arg1, "telegram")) {
@@ -317,7 +325,58 @@ static void config_lang_print(PCharacter *ch)
 }
 
 /*-------------------------------------------------------------------------
- * 'config scroll'  
+ * 'config color'  -- merged on/off/mild (replaces the old color + mildcolor
+ * boolean options; a tri-state value handler like 'config lang'/'config scroll').
+ *------------------------------------------------------------------------*/
+static void config_color_print(PCharacter *ch)
+{
+    const char *state;
+    if (!IS_SET(ch->act, PLR_COLOR))
+        state = "выкл";
+    else if (IS_SET(ch->comm, COMM_MILDCOLOR))
+        state = "мягкий";
+    else
+        state = "вкл";
+
+    ch->pecho( _("  {%s%-14s {%s%6s {xнабери {y{hcрежим цвет{x вкл, выкл или мягкий"),
+                    CLR_NAME(ch),
+                    "цвет",
+                    CLR_YES(ch),
+                    state);
+}
+
+static void config_color(PCharacter *ch, const DLString &constArguments)
+{
+    DLString arg = constArguments;
+    arg = arg.getOneArgument( );
+
+    if (arg.empty( )) {
+        config_color_print(ch);
+        return;
+    }
+
+    if (arg_is_yes(arg) || arg_is_switch_on(arg)) {
+        SET_BIT(ch->act, PLR_COLOR);
+        REMOVE_BIT(ch->comm, COMM_MILDCOLOR);
+        ch->pecho(_("Ты используешь стандартную (яркую) цветовую схему."));
+    }
+    else if (arg_is_no(arg) || arg_is_switch_off(arg)) {
+        REMOVE_BIT(ch->act, PLR_COLOR);
+        REMOVE_BIT(ch->comm, COMM_MILDCOLOR);
+        ch->pecho(_("Цвета отключены."));
+    }
+    else if (arg_is(arg, "mild")) {
+        SET_BIT(ch->act, PLR_COLOR);
+        SET_BIT(ch->comm, COMM_MILDCOLOR);
+        ch->pecho(_("Ты используешь 'мягкую' цветовую схему."));
+    }
+    else {
+        ch->pecho(_("Укажи: вкл, выкл или мягкий."));
+    }
+}
+
+/*-------------------------------------------------------------------------
+ * 'config scroll'
  *------------------------------------------------------------------------*/
 static void config_scroll_print(PCharacter *ch)
 {
