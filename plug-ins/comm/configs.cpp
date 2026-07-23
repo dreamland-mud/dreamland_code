@@ -326,12 +326,12 @@ static void config_lang(PCharacter *ch, const DLString &constArguments)
 static void config_lang_print(PCharacter *ch)
 {
     lang_t lang = Player::lang(ch);
-    // TODO move to a func
-    DLString langname = lang == EN ? "англ" : lang == UA ? "укр" : "рус";
+    // langname = the SELECTED language's name, rendered in the viewer's language.
+    DLString langname = lang == EN ? l(ch, "англ") : lang == UA ? l(ch, "укр") : l(ch, "рус");
 
     ch->pecho( _("  {%s%-14s {%s%5s {xнабери {y{hcрежим язык{x для установки"),
                     CLR_NAME(ch),
-                    "язык",
+                    l(ch, "язык"),
                     CLR_YES(ch),
                     langname.c_str());
 }
@@ -342,19 +342,19 @@ static void config_lang_print(PCharacter *ch)
  *------------------------------------------------------------------------*/
 static void config_color_print(PCharacter *ch)
 {
-    const char *state;
+    DLString state;
     if (!IS_SET(ch->act, PLR_COLOR))
-        state = "выкл";
+        state = l(ch, "выкл");
     else if (IS_SET(ch->comm, COMM_MILDCOLOR))
-        state = "мягкий";
+        state = l(ch, "мягкий");
     else
-        state = "вкл";
+        state = l(ch, "вкл");
 
     ch->pecho( _("  {%s%-14s {%s%6s {xнабери {y{hcрежим цвет{x вкл, выкл или мягкий"),
                     CLR_NAME(ch),
-                    "цвет",
+                    l(ch, "цвет"),
                     CLR_YES(ch),
-                    state);
+                    state.c_str());
 }
 
 static void config_color(PCharacter *ch, const DLString &constArguments)
@@ -394,7 +394,7 @@ static void config_scroll_print(PCharacter *ch)
 {
     DLString lines(ch->lines);
     bool yes = ch->lines > 0;
-    DLString msgNo = "Ты получаешь длинные сообщения без буферизации.";
+    DLString msgNo = l(ch, "Ты получаешь длинные сообщения без буферизации.");
     DLString msgYes = fmt(ch, _("Тебе непрерывно выводится %1$d лин%1$Iия|ии|ий текста."),
                        ch->lines.getValue( ) );
 
@@ -461,8 +461,8 @@ static void config_telegram_print(PCharacter *ch)
 {
     const DLString &user = get_string_attribute(ch, "telegram");
     bool yes = !user.empty();
-    DLString msgYes = fmt(0, _("Пользователь Telegram {C%s{x."), user.c_str());
-    DLString msgNo = "Твой персонаж не связан с пользователями Telegram, набери {y{hcрежим телеграм{x.";
+    DLString msgYes = fmt(ch, _("Пользователь Telegram {C%s{x."), user.c_str());
+    DLString msgNo = l(ch, "Твой персонаж не связан с пользователями Telegram, набери {y{hcрежим телеграм{x.");
     print_line(ch, "telegram", "телеграм", "телеграм", yes, msgYes, msgNo);
 }
 
@@ -515,12 +515,12 @@ static void config_discord_print(PCharacter *ch)
     get_json_attribute(ch, "discord", discord);
     bool yes = !discord["id"].asString().empty();
 
-    ostringstream msgYes;
-    msgYes << "Пользователь Discord {C" << discord["username"].asString() 
-           << "{w ({C" << discord["id"].asString() << "{w), статус " << discord["status"];            
-
-    DLString msgNo = "Твой персонаж не связан с пользователем Discord, набери {y{hcрежим дискорд{x";
-    print_line(ch, "discord", "дискорд", "дискорд", yes, msgYes.str(), msgNo);
+    DLString msgYes = fmt(ch, _("Пользователь Discord {C%s{w ({C%s{w), статус %s"),
+                          discord["username"].asString().c_str(),
+                          discord["id"].asString().c_str(),
+                          discord["status"].asString().c_str());
+    DLString msgNo = l(ch, "Твой персонаж не связан с пользователем Discord, набери {y{hcрежим дискорд{x");
+    print_line(ch, "discord", "дискорд", "дискорд", yes, msgYes, msgNo);
 }
 
 /**
