@@ -9,6 +9,7 @@
 #include "xmllist.h"
 #include "xmlinteger.h"
 #include "xmlpointer.h"
+#include "xmlmultistring.h"
 
 class PCharacter;
 
@@ -20,6 +21,7 @@ public:
     
     const DLString & getName() const;
     const DLString & getRussianName( ) const;
+    const DLString & getUaName( ) const;
     bool handleArgument( PCharacter *, const DLString & ) const;
     bool available(PCharacter *) const;
 
@@ -27,10 +29,10 @@ public:
     void printRow( PCharacter * ) const;
     void printLine( PCharacter * ) const;
 
-protected:    
+protected:
     XML_VARIABLE XMLFlagsWithTable   bit;
-    XML_VARIABLE XMLString  name, rname;
-    XML_VARIABLE XMLString  msgOn, msgOff;
+    XML_VARIABLE XMLString  name, rname, uaname;
+    XML_VARIABLE XMLMultiString  msgOn, msgOff;
     XML_VARIABLE XMLString  hint;
     XML_VARIABLE XMLIntegerNoEmpty level;
 
@@ -48,7 +50,7 @@ public:
 
     void printHeader( PCharacter * ) const;
 
-    XML_VARIABLE XMLString name;
+    XML_VARIABLE XMLMultiString name;
 };
 
 class ConfigCommand : public CommandPlugin {
