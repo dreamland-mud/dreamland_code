@@ -172,12 +172,62 @@ static void wlprog_fight( Object *obj, Character *ch)
  * Control the fights going on.
  * Called periodically by update_handler.
  */
+// Colour for the fightspam-OFF round-summary number, by % of victim's max hp
+// (mirrors the newdamage intensity progression r->M->G->B->R, percent-keyed).
+static char round_damage_colour( int perc )
+{
+    if (perc <= 10) return 'r';
+    if (perc <= 25) return 'M';
+    if (perc <= 50) return 'G';
+    if (perc <= 75) return 'B';
+    return 'R';
+}
+
+// After a combat round, fightspam-OFF players get one aggregated line per
+// participant in their room ("<attacker> => <victim> [N]"), shown only for real
+// damage (>0) against a still-living victim -- a kill already printed its line.
+// Pointer-safe: runs over the LIVE char_list after the hit loop (dead chars are
+// already extracted; the victim is read live as att->fighting).
+static void fightspam_round_summary( )
+{
+    for (Character *ch = char_list; ch != 0; ch = ch->next) {
+        if (ch->getPC( ) == 0 || ch->extracted || ch->in_room == 0 || ch->fighting == 0)
+            continue;
+        if (!IS_AWAKE(ch) || IS_SET(ch->getPC( )->config, CONFIG_FIGHTSPAM))
+            continue;
+
+        for (Character *att = ch->in_room->people; att != 0; att = att->next_in_room) {
+            if (att->extracted || att->roundDamage <= 0)
+                continue;
+
+            Character *vic = att->fighting;
+            if (vic == 0 || vic->extracted || vic->position == POS_DEAD || vic->max_hit <= 0)
+                continue;
+            if (!ch->can_sense( att ) || !ch->can_sense( vic ))
+                continue;
+
+            int perc = att->roundDamage * 100 / vic->max_hit;
+            char num[64];
+            snprintf( num, sizeof( num ), "{D[{x{%c%d{x{D]{x",
+                      round_damage_colour( perc ), att->roundDamage );
+
+            // Args in reference order (1=attacker, 2=victim, 3=number string) so
+            // the act formatter reads each va_arg with the right type.
+            ch->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, vic, num );
+        }
+    }
+}
+
 void violence_update()
 {
     ProfilerBlock profiler("violence_update", 100);
     Character *ch;
     Character *victim;
     Object *obj, *obj_next;
+
+    // Reset per-round damage accumulators before the hit loop; summarized below.
+    for (ch = char_list; ch != 0; ch = ch->next)
+        ch->roundDamage = 0;
 
     for (ch = char_list; ch != 0; ch = ch->next)
     {
@@ -275,6 +325,8 @@ void violence_update()
             continue;
         }
     }
+
+    fightspam_round_summary( );
 }
 
 struct second_weapon_t {
