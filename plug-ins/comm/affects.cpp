@@ -210,15 +210,15 @@ DLString AffectOutput::format_affect_global( Affect *paf )
         if (registry == skillManager) {
             buf << (mod >= 0 ? _("повышает") : _("понижает")).getMessage( lang ) << " "
                 << (paf->location == APPLY_LEARNED ? _("владение умением") : _("уровень умения")).getMessage( lang )
-                << " {m" << paf->global.toRussianString().quote()
+                << " {m" << paf->global.toString(lang).quote()
                 << "{y " << _("на").getMessage( lang ) << " {m" << (int)abs(mod) << "{y";
         } else if (registry == skillGroupManager) {
             buf << (mod >= 0 ? _("повышает") : _("понижает")).getMessage( lang ) << " "
                 << (paf->location == APPLY_LEARNED ? _("владение группой умений") : _("уровень умений группы")).getMessage( lang )
-                << " {m" << paf->global.toRussianString().quote()
+                << " {m" << paf->global.toString(lang).quote()
                 << "{y " << _("на").getMessage( lang ) << " {m" << (int)abs(mod) << "{y";
         } else if (registry == liquidManager) {
-            buf << _("добавляет запах").getMessage( lang ) << " {m" << paf->global.toRussianString('2', ",").colourStrip() << "{x";
+            buf << _("добавляет запах").getMessage( lang ) << " {m" << paf->global.toString(lang, '2', ",").colourStrip() << "{x";
         } else if (registry == wearlocationManager) {
             StringList cut;
 

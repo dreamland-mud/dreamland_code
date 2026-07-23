@@ -80,6 +80,35 @@ DLString GlobalBitvector::toRussianString( char gcase, const char *cjoiner ) con
     return result.join(joiner);
 }
 
+DLString GlobalBitvector::toString( lang_t lang, char gcase, const char *cjoiner ) const
+{
+    if (!registry)
+        return DLString::emptyString;
+
+    StringList result;
+
+    for (unsigned int b = 0; b < bits.size( ); b++)
+        if (bits[b]) {
+            GlobalRegistryElement *e = registry->find(b);
+            if (e) {
+                DLString name;
+                if (lang == LANG_EN)
+                    name = e->getName( );
+                else if (lang == LANG_UA) {
+                    name = e->getUkrainianName( );
+                    if (name.empty( ))
+                        name = e->getRussianName( );
+                }
+                else
+                    name = e->getRussianName( );
+                result.push_back(name.ruscase(gcase).quote());
+            }
+        }
+
+    DLString joiner = cjoiner ? cjoiner : " ";
+    return result.join(joiner);
+}
+
 vector<int> GlobalBitvector::toArray( ) const
 {
     vector<int> array;
