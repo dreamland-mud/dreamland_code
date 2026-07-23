@@ -121,6 +121,7 @@ void Character::init( )
     last_fight_time = 0;
     adrenaline_pending = false;
     roundDamage = 0;
+    fightEmptyStreak = 0;
 
     extracted = false;
     reply = 0;
