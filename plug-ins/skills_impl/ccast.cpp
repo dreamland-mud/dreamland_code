@@ -253,7 +253,17 @@ CMDRUN( cast )
      
     if (spell->spellbane( ch, victim ))
         return;
-        
+
+    // 'config nobuff': the target (or their pet's owner) refuses beneficial spells
+    // from third-party players. Refuse after utter (words are spoken) but before
+    // mana is spent, like spellbane.
+    if (spell->blockedByNobuff( ch, victim )) {
+        oldact(_("$C1 не принимает магической помощи от посторонних."), ch, 0, victim, TO_CHAR);
+        if (victim != ch && !victim->is_npc( ))
+            oldact(_("Ты не принимаешь магической помощи от посторонних."), ch, 0, victim, TO_VICT);
+        return;
+    }
+
     if (number_percent( ) > skill->getEffective( ch )) {
         ch->pecho(_("Ты пытаешься сотворить заклинание '{W%K1{x', но теряешь концентрацию и терпишь неудачу."), *skill);
         ch->recho(_("%1$^C1 пыта%1$nется|ются сотворить заклинание, но теря%1$nет|ют концентрацию и терп%1$nит|ят неудачу."), ch);
