@@ -84,6 +84,10 @@ private:
     list<Affect> affects;
     vector<DLString> adjectives;
     vector<DLString> nouns;
+    // Parallel per-language affix forms (same index/subset as adjectives/nouns);
+    // EN = plain, UA = nominative (declined at gen-time via Morphology::declineUa).
+    vector<DLString> adjectives_en, adjectives_ua;
+    vector<DLString> nouns_en, nouns_ua;
 
     PCharacter *pch;
     int sn;

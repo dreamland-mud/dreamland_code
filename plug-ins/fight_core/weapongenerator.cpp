@@ -391,13 +391,22 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
         }
 
         // Each adjective or noun has a chance to be chosen, but the most expensive get an advantage.
-        for (auto &adj: affix["adjectives"])
-            if (number_range(minPrice - 10, maxPrice) <= pinfo.price)
-                adjectives.push_back(adj.asString());
+        // Push the parallel EN/UA forms under the SAME roll so the vectors stay index-aligned.
+        const Json::Value &adjEn = affix["adjectives_en"], &adjUa = affix["adjectives_ua"];
+        for (Json::ArrayIndex k = 0; k < affix["adjectives"].size(); k++)
+            if (number_range(minPrice - 10, maxPrice) <= pinfo.price) {
+                adjectives.push_back(affix["adjectives"][k].asString());
+                adjectives_en.push_back(k < adjEn.size() ? adjEn[k].asString() : DLString::emptyString);
+                adjectives_ua.push_back(k < adjUa.size() ? adjUa[k].asString() : DLString::emptyString);
+            }
 
-        for (auto &noun: affix["nouns"])
-            if (pinfo.price >= 0 && number_range(minPrice - 10, maxPrice) <= pinfo.price)
-                nouns.push_back(noun.asString());
+        const Json::Value &nounEn = affix["nouns_en"], &nounUa = affix["nouns_ua"];
+        for (Json::ArrayIndex k = 0; k < affix["nouns"].size(); k++)
+            if (pinfo.price >= 0 && number_range(minPrice - 10, maxPrice) <= pinfo.price) {
+                nouns.push_back(affix["nouns"][k].asString());
+                nouns_en.push_back(k < nounEn.size() ? nounEn[k].asString() : DLString::emptyString);
+                nouns_ua.push_back(k < nounUa.size() ? nounUa[k].asString() : DLString::emptyString);
+            }
     }
 
     // Additional flags configured for weapon class. 
@@ -495,37 +504,54 @@ void WeaponGenerator::setName() const
 
 void WeaponGenerator::setShortDescr() const
 {
-    DLString randomAdjective, randomNoun; 
-
     obj->gram_gender = MultiGender(nameConfig["gender"].asCString());
 
-    if (!adjectives.empty()) {
-        int a = number_range(0, adjectives.size() - 1);
-        randomAdjective = adjectives[a];
-    }
+    // Pick one affix adjective + noun (same index across languages).
+    int a = -1, n = -1;
+    if (!adjectives.empty())
+        a = number_range(0, adjectives.size() - 1);
+    if (!nouns.empty())
+        n = number_range(0, nouns.size() - 1);
 
-    if (!nouns.empty()) {
-        int n = number_range(0, nouns.size() - 1);
-        randomNoun = nouns[n];
-    }
-
+    // --- Russian (unchanged) ---
     DLString myshort;
-
-    if (!randomAdjective.empty())
-        myshort += Morphology::adjective(randomAdjective, obj->gram_gender) + " "; // леденящий
-
+    if (a >= 0)
+        myshort += Morphology::adjective(adjectives[a], obj->gram_gender) + " "; // леденящий
     myshort += nameConfig["short"].asString(); // буздыган
-
-    if (!randomNoun.empty())
-        myshort += " " + randomNoun; // боли
+    if (n >= 0)
+        myshort += " " + nouns[n]; // боли
 
     obj->setShortDescr(myshort, LANG_RU);
-    // Random weapon names are generated in Russian only; mirror into the other
-    // languages so a non-RU viewer sees the name, not the prototype placeholder.
-    obj->setShortDescr(myshort, LANG_EN);
-    obj->setShortDescr(myshort, LANG_UA);
-
     obj->setProperty("eqName", nameConfig["short"].asString()); // 'буздыган' in sheath wearloc
+
+    // --- English: plain per-language forms if authored, else mirror RU ---
+    if (nameConfig.isMember("short_en")) {
+        DLString en;
+        if (a >= 0 && a < (int)adjectives_en.size() && !adjectives_en[a].empty())
+            en += adjectives_en[a] + " ";
+        en += nameConfig["short_en"].asString();
+        if (n >= 0 && n < (int)nouns_en.size() && !nouns_en[n].empty())
+            en += " " + nouns_en[n];
+        obj->setShortDescr(en, LANG_EN);
+    } else {
+        obj->setShortDescr(myshort, LANG_EN);
+    }
+
+    // --- Ukrainian: decline nominative forms via the sidecar, else mirror RU ---
+    if (nameConfig.isMember("short_ua")) {
+        DLString g = nameConfig["gender"].asString();
+        DLString gtag = g == "m" ? "masc" : g == "f" ? "femn" : g == "n" ? "neut" : "-";
+
+        DLString ua;
+        if (a >= 0 && a < (int)adjectives_ua.size() && !adjectives_ua[a].empty())
+            ua += Morphology::declineUa(adjectives_ua[a], "ADJF", gtag) + " ";
+        ua += Morphology::declineUa(nameConfig["short_ua"].asString(), "NOUN", gtag);
+        if (n >= 0 && n < (int)nouns_ua.size() && !nouns_ua[n].empty())
+            ua += " " + Morphology::declineUa(nouns_ua[n], "NOUN", "-");
+        obj->setShortDescr(ua, LANG_UA);
+    } else {
+        obj->setShortDescr(myshort, LANG_UA);
+    }
 }
 
 const WeaponGenerator & WeaponGenerator::assignNames() const
@@ -534,8 +560,8 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
     setName();
     setShortDescr();
     obj->setDescription(nameConfig["long"].asCString(), LANG_RU);
-    obj->setDescription(nameConfig["long"].asCString(), LANG_EN);
-    obj->setDescription(nameConfig["long"].asCString(), LANG_UA);
+    obj->setDescription(nameConfig.isMember("long_en") ? nameConfig["long_en"].asCString() : nameConfig["long"].asCString(), LANG_EN);
+    obj->setDescription(nameConfig.isMember("long_ua") ? nameConfig["long_ua"].asCString() : nameConfig["long"].asCString(), LANG_UA);
 
     // Set up provided material or default.
     obj->setMaterial(findMaterial());
@@ -546,20 +572,16 @@ const WeaponGenerator & WeaponGenerator::assignColours() const
 {
     DLString colour = weapon_tier_table[valTier-1].colour;
 
-    DLString myshort = obj->getShortDescr(LANG_RU);
     if (obj->getProperty("eqName").empty())
-        obj->setProperty("eqName", myshort);
+        obj->setProperty("eqName", obj->getShortDescr(LANG_RU));
 
-    if (!colour.empty()) {
-        myshort = "{" + colour + myshort.colourStrip() + "{x";
-        obj->setShortDescr(myshort, LANG_RU);
-    }
-
-    // Keep the other languages in sync with the final (coloured) Russian name;
-    // this also covers the re-stat path, which doesn't regenerate the name.
-    DLString finalShort = obj->getShortDescr(LANG_RU);
-    obj->setShortDescr(finalShort, LANG_EN);
-    obj->setShortDescr(finalShort, LANG_UA);
+    // Colour each language's own name -- the tier colour wrap is language-agnostic.
+    // Also covers the re-stat path, which doesn't regenerate the names.
+    if (!colour.empty())
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            DLString s = obj->getShortDescr((lang_t)l);
+            obj->setShortDescr("{" + colour + s.colourStrip() + "{x", (lang_t)l);
+        }
 
     return *this;
 }
