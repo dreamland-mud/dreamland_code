@@ -396,16 +396,16 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
         for (Json::ArrayIndex k = 0; k < affix["adjectives"].size(); k++)
             if (number_range(minPrice - 10, maxPrice) <= pinfo.price) {
                 adjectives.push_back(affix["adjectives"][k].asString());
-                adjectives_en.push_back(k < adjEn.size() ? adjEn[k].asString() : DLString::emptyString);
-                adjectives_ua.push_back(k < adjUa.size() ? adjUa[k].asString() : DLString::emptyString);
+                adjectives_en.push_back(k < adjEn.size() ? DLString(adjEn[k].asString()) : DLString::emptyString);
+                adjectives_ua.push_back(k < adjUa.size() ? DLString(adjUa[k].asString()) : DLString::emptyString);
             }
 
         const Json::Value &nounEn = affix["nouns_en"], &nounUa = affix["nouns_ua"];
         for (Json::ArrayIndex k = 0; k < affix["nouns"].size(); k++)
             if (pinfo.price >= 0 && number_range(minPrice - 10, maxPrice) <= pinfo.price) {
                 nouns.push_back(affix["nouns"][k].asString());
-                nouns_en.push_back(k < nounEn.size() ? nounEn[k].asString() : DLString::emptyString);
-                nouns_ua.push_back(k < nounUa.size() ? nounUa[k].asString() : DLString::emptyString);
+                nouns_en.push_back(k < nounEn.size() ? DLString(nounEn[k].asString()) : DLString::emptyString);
+                nouns_ua.push_back(k < nounUa.size() ? DLString(nounUa[k].asString()) : DLString::emptyString);
             }
     }
 
