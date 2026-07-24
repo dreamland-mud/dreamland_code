@@ -24,8 +24,11 @@ struct SpellTemplate<tn, DefaultSpell> : public DefaultSpell, public ClassSelfRe
     virtual void run( Character *, Room *, int, int ) { }
     virtual bool apply( Character *ch, Character *victim, int level ) { return false; }    
 
-    virtual bool spellbane( Character *ch, Character *victim ) const { 
+    virtual bool spellbane( Character *ch, Character *victim ) const {
         return DefaultSpell::spellbane( ch, victim );
+    }
+    virtual bool blockedByNobuff( Character *ch, Character *victim ) const {
+        return DefaultSpell::blockedByNobuff( ch, victim );
     }
     virtual void utter( Character * ch ) { 
         DefaultSpell::utter( ch );

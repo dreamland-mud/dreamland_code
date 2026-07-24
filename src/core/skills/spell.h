@@ -39,6 +39,8 @@ public:
 
     virtual int getMaxRange( Character * ) const = 0;
     virtual bool spellbane( Character *, Character * ) const = 0;
+    // Default: no third-party-buff block; DefaultSpell provides the real logic.
+    virtual bool blockedByNobuff( Character *, Character * ) const { return false; }
     virtual void utter( Character * ) = 0;
     virtual int getSpellLevel( Character *, int ) = 0;
 
