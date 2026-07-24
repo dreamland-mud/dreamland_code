@@ -191,10 +191,15 @@ protected:
     void autoBlood( )
     {
         if (desire_bloodlust->applicable( killer->getPC( ) )
-        && !(IS_BLOODLESS(ch)))    
+        && !(IS_BLOODLESS(ch)))
         {
-            oldact(_("{R$c1 выпивает последние капли жизни из $C2!{x"), killer, 0,ch,TO_ROOM);
-            oldact(_("{RТы выпиваешь последние капли жизни из $C2!{x"), killer, 0,ch,TO_CHAR);
+            // The "drink the last drops of life" flavour only fits a transformed
+            // vampire -- a vampire in human form saw it on every kill (Ash's bug).
+            // Bloodlust still accrues as before, regardless of form.
+            if (IS_VAMPIRE( killer )) {
+                oldact(_("{R$c1 выпивает последние капли жизни из $C2!{x"), killer, 0,ch,TO_ROOM);
+                oldact(_("{RТы выпиваешь последние капли жизни из $C2!{x"), killer, 0,ch,TO_CHAR);
+            }
             desire_bloodlust->gain( killer->getPC( ), 3 );
         }
     }
