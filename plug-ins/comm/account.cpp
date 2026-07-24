@@ -68,12 +68,12 @@ CMDRUNP( delete )
         }
         else
         {
-            wiznet( WIZ_SECURE, 0, pch->get_trust( ), 
+            wiznet( WIZ_SECURE, 0, pch->get_trust( ),
                    "%1$^C1 превращает себя в помехи в проводах.", pch );
-            DLString msg;
-            msg = fmt(0, _("{1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир."), pch);
-            infonet(pch, 0, "{CТихий голос из $o2: ", msg.c_str());
-            send_to_discord_stream(":ghost: " + msg); // discord only here, explicitly asked for by players
+            // In-game info channel per viewer; Discord in English (players asked
+            // for the Discord relay explicitly).
+            infonet(pch, 0, _("{CТихий голос из $o2: {1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир."), pch);
+            send_to_discord_stream(":ghost: " + fmtLang(LANG_EN, _("{1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир."), pch));
             
             Player::quitAndDelete( pch );
             return;
