@@ -19,6 +19,7 @@
 #include "dlfileloader.h"
 
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "npcharacter.h"
 #include "pcharactermanager.h"
 #include "room.h"
@@ -293,7 +294,18 @@ NMI_INVOKE( NannyHandler, generateDescription, "" )
         return DLString::emptyString;
     }
 
-    return cfg->getValue()[prof][sex].asString() + "\n";
+    // A description entry is either a legacy flat RU string or a trilingual
+    // { "en":.., "ru":.., "ua":.. } object. Serve the player's display
+    // language, falling back to RU (the always-present slot).
+    const Json::Value &entry = cfg->getValue()[prof][sex];
+    if (entry.isString())
+        return entry.asString() + "\n";
+
+    static const char *langKeys[3] = { "en", "ru", "ua" };
+    DLString text = entry[ langKeys[Player::displayLang(ch)] ].asString();
+    if (text.empty())
+        text = entry["ru"].asString();
+    return text + "\n";
 }
 
 NMI_INVOKE( NannyHandler, checkPassword, "" )
