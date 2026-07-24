@@ -1,4 +1,12 @@
 #include <jsoncpp/json/json.h>
+#include <stdlib.h>
+#include <string.h>
+#include <map>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/time.h>
+#include <unistd.h>
 #include "logstream.h"
 #include "morphology.h"
 #include "grammar_entities_impl.h"
@@ -6,6 +14,7 @@
 #include "stringset.h"
 #include "stringlist.h"
 #include "dl_ctype.h"
+#include "iconvmap.h"
 #include "flagmessagestore.h"
 
 Json::Value rules;
@@ -98,6 +107,71 @@ DLString Morphology::adjective(const DLString &form, const MultiGender &gender)
 
     DLString cases = rules[rule].asString();
     return stem + cases;
+}
+
+DLString Morphology::declineUa( const DLString &word, const DLString &pos, const DLString &gender )
+{
+    DLString fallback = word + "|||||"; // nominative in every case, no delta
+
+    if (word.empty( ))
+        return fallback;
+
+    static std::map<DLString, DLString> cache;
+    DLString key = word + "\t" + pos + "\t" + gender;
+    std::map<DLString, DLString>::iterator ci = cache.find( key );
+    if (ci != cache.end( ))
+        return ci->second;
+
+    static IconvMap koi2utf( "koi8-u", "utf-8" );
+    static IconvMap utf2koi( "utf-8", "koi8-u" );
+
+    int fd = ::socket( AF_INET, SOCK_STREAM, 0 );
+    if (fd < 0)
+        return fallback;
+
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 500000; // 500ms cap -- authoring-time, never a hot path
+    ::setsockopt( fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv) );
+    ::setsockopt( fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv) );
+
+    struct sockaddr_in addr;
+    memset( &addr, 0, sizeof(addr) );
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons( 5299 );
+    inet_pton( AF_INET, "127.0.0.1", &addr.sin_addr );
+
+    if (::connect( fd, (struct sockaddr *)&addr, sizeof(addr) ) < 0) {
+        ::close( fd );
+        return fallback;
+    }
+
+    DLString req = koi2utf( word ) + "\t" + pos + "\t" + gender + "\n";
+    if (::write( fd, req.c_str( ), req.size( ) ) < 0) {
+        ::close( fd );
+        return fallback;
+    }
+
+    char buf[4096];
+    int n = ::read( fd, buf, sizeof(buf) - 1 );
+    ::close( fd );
+    if (n <= 0)
+        return fallback;
+    buf[n] = '\0';
+
+    DLString resp = utf2koi( std::string( buf ) ); // "pad\tscore\n"
+    DLString::size_type tab = resp.find( '\t' );
+    if (tab == DLString::npos)
+        return fallback;
+
+    DLString pad = resp.substr( 0, tab );
+    double score = atof( resp.substr( tab + 1 ).c_str( ) );
+    if (score < 0.4)
+        LogStream::sendWarning( ) << "ua-morph: low confidence " << score
+                                  << " declining '" << word << "' -> " << pad << endl;
+
+    cache[key] = pad;
+    return pad;
 }
 
 static bool is_consonant(char c)
