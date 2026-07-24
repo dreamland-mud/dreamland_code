@@ -94,7 +94,7 @@ void Player::gainExp(PCharacter *pch, int gain)
         if (pch->getProfession( ) == prof_samurai && level == 10)
             pch->wimpy = 0;
 
-        infonet(pch, 0, "{CРадостный голос из $o2: ", "{W%1$#C1 дости%1$G#гло|г|гла следующей ступени мастерства.{x", pch);
+        infonet(pch, 0, _("{CРадостный голос из $o2: {W%1$#C1 дости%1$Gгло|г|гла следующей ступени мастерства.{x"), pch);
 
         ::wiznet( WIZ_LEVELS, 0, 0, 
                   "%1$^C1 дости%1$Gгло|г|гла %2$d уровня!", pch, pch->getLevel( ) );
