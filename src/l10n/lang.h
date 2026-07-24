@@ -53,5 +53,21 @@ class Character;
  *  Object::toNoun share this one implementation. Defined in core/pcharacter.cpp. */
 lang_t viewerLang(const Character *wch);
 
+/** RAII: force viewerLang() to return `lang` for every viewer for the duration
+ *  of a SYNCHRONOUS render, then restore the previous value. Lets fmtLang()
+ *  render a message (format AND declined names, via toNoun/getNameFor which all
+ *  route through viewerLang) in a fixed language for a sink that has no
+ *  recipient Character -- Discord=EN, Telegram=RU. Only ever wrap a single
+ *  synchronous fmt()/act() string build: the output path never yields mid-format
+ *  and the game loop is single-threaded, so the static is safe; nesting is
+ *  handled by save/restore. Defined in core/pcharacter.cpp beside viewerLang. */
+class ForcedViewerLang {
+public:
+    explicit ForcedViewerLang(lang_t lang);
+    ~ForcedViewerLang();
+private:
+    int prev;
+};
+
 
 #endif

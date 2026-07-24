@@ -722,8 +722,28 @@ using namespace Grammar;
 // seeded from the retired 'rucommands' flag on load, see PCharacterManager::load).
 // Keep in sync with Player::lang / Player::displayLang. Prototype in l10n/lang.h
 // so Object::toNoun shares this exact resolution (not static -- exported).
+// Forced render language: when >= 0, viewerLang() returns it for every viewer,
+// so fmtLang() can render a whole message (format + declined names) in a fixed
+// language for a recipient-less sink. Set/cleared only by ForcedViewerLang
+// around a synchronous render; single-threaded game loop makes the static safe.
+static int forcedViewerLang = -1;
+
+ForcedViewerLang::ForcedViewerLang( lang_t lang )
+        : prev( forcedViewerLang )
+{
+    forcedViewerLang = lang;
+}
+
+ForcedViewerLang::~ForcedViewerLang( )
+{
+    forcedViewerLang = prev;
+}
+
 lang_t viewerLang( const Character *wch )
 {
+    if (forcedViewerLang >= 0)
+        return (lang_t)forcedViewerLang;
+
     if (!wch)
         return LANG_DEFAULT;
 
