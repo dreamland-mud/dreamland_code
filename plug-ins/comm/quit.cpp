@@ -288,8 +288,8 @@ CMDRUNP( quit )
 
     if (!pch->getPC( )->getAttributes( ).isAvailable("quietLogin")) {
         wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$#C1 покину%1$#Gло|л|ла этот мир.", pch );
-        infonet(pch, 0, "{CТихий голос из $o2: ", "{W%1$#C1 покину%1$#Gло|л|ла Мир Мечты.{x", pch);
-        send_discord_orb(fmt(0, _("%1$#C1 покинул%1$#Gо||а Мир Мечты."), pch));
+        infonet(pch, 0, _("{CТихий голос из $o2: {W%1$#C1 покину%1$#Gло|л|ла Мир Мечты.{x"), pch);
+        send_discord_orb(fmtLang(LANG_EN, _("%1$#C1 покинул%1$#Gо||а Мир Мечты."), pch));
     }
 
     dreamland->removeOption( DL_SAVE_OBJS );

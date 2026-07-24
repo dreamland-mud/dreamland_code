@@ -7,6 +7,7 @@
 
 #include "infonet.h"
 #include "act.h"
+#include "multimessage.h"
 #include "descriptor.h"
 
 #define OBJ_VNUM_PAGER                        102 
@@ -62,6 +63,38 @@ void infonet( const char *string, Character *ch, int min_level )
         
       if (( obj = get_pager( d->character ) ))
            oldact_p( string, d->character, obj, ch, TO_CHAR, POS_DEAD);
+  }
+}
+
+// Per-recipient info channel: resolve `format` in each listener's language and
+// render its %N$ args per viewer, then oldact_p the $-codes. Same shape as the
+// const char* overload above, just rendered inside the loop instead of once.
+void infonet( Character *ch, int min_level, const MultiMessage &format, ... )
+{
+  Descriptor *d;
+  Object *obj;
+  va_list args;
+
+  for ( d = descriptor_list; d != 0; d = d->next )
+  {
+      if (!d->character || d->connected != CON_PLAYING)
+          continue;
+
+      if (ch && ch->is_immortal( ))
+          continue;
+
+      if (d->character->get_trust() < min_level)
+          continue;
+
+      if (d->character == ch)
+          continue;
+
+      if (( obj = get_pager( d->character ) )) {
+          va_start( args, format );
+          DLString msg = vfmt( d->character, format.getMessage( d->character ).c_str( ), args );
+          va_end( args );
+          oldact_p( msg.c_str( ), d->character, obj, ch, TO_CHAR, POS_DEAD );
+      }
   }
 }
 

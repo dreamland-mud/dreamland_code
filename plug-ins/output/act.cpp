@@ -320,6 +320,24 @@ DLString fmt(Character *to, const MultiMessage &f, ...)
     return rc;
 }
 
+// Render `f` fully in `lang` (format + declined names) for a recipient-less
+// sink. The ForcedViewerLang scope makes viewerLang() return `lang` throughout
+// the synchronous vfmt, so toNoun/getNameFor localize to `lang` even with a
+// NULL recipient. RU byte-identical to the old fmt(0, ...) when lang==LANG_RU.
+DLString fmtLang(lang_t lang, const MultiMessage &f, ...)
+{
+    ForcedViewerLang scope(lang);
+    va_list av;
+
+    va_start(av, f);
+
+    DLString rc = vfmt(0, f.getMessage(lang).c_str(), av);
+
+    va_end(av);
+
+    return rc;
+}
+
 DLString vfmt(Character *to, const char *format, va_list av)
 {
     VarArgFormatter formatter(to);

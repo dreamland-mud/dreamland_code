@@ -63,6 +63,13 @@ DLString fmt(Character *to, const char *fmt, ...);
 DLString fmt(Character *to, const MultiMessage &fmt, ...);
 DLString vfmt(Character *to, const char *format, va_list av);
 
+/* Trilinguality (Trello 2594): render a MultiMessage in a FIXED language, for a
+ * sink that has no recipient Character -- Discord=EN, Telegram=RU. Picks the
+ * format in `lang` and, via a ForcedViewerLang scope, resolves declined names
+ * (%C/%O/%K) in `lang` too. Distinct name (not an `fmt` overload) so `fmt(0,
+ * MM, ...)` stays an unambiguous NULL-Character* call. */
+DLString fmtLang(lang_t lang, const MultiMessage &fmt, ...);
+
 /*--------------------------------------------------------------------------
  * tell-like output 
  *--------------------------------------------------------------------------*/
