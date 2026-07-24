@@ -23,14 +23,30 @@ void XMLItemRestring::dress( ::Object *obj, PCharacter *ch ) const
     if (!name.empty( ))
         obj->setKeyword( name.c_str( ) );
 
-    if (!shortDescr.empty( ))
-        obj->setShortDescr( fmt( 0, shortDescr.c_str( ), ch ), LANG_DEFAULT);
+    // A restring is authored in a single language; mirror it into every
+    // language slot so EN/UA viewers see the restring instead of falling back
+    // to the untouched prototype name. Otherwise the instance's per-language
+    // short/long/desc stay empty and firstNonEmpty/toNoun surface the
+    // prototype for non-RU viewers, making the restring invisible to them.
+    // Author-language canonical, displayed as-is (no machine translation).
+    if (!shortDescr.empty( )) {
+        DLString s = fmt( 0, shortDescr.c_str( ), ch );
+        for (int l = LANG_MIN; l < LANG_MAX; l++)
+            obj->setShortDescr( s, (lang_t)l );
+    }
 
-    if (!longDescr.empty( ))
-        obj->setDescription( fmt( 0, longDescr.c_str( ), ch ), LANG_DEFAULT );
+    if (!longDescr.empty( )) {
+        DLString s = fmt( 0, longDescr.c_str( ), ch );
+        for (int l = LANG_MIN; l < LANG_MAX; l++)
+            obj->setDescription( s, (lang_t)l );
+    }
 
-    if (!description.empty( ))
-        obj->addProperDescription()->description[LANG_DEFAULT] = fmt( 0, description.c_str( ), ch );
+    if (!description.empty( )) {
+        DLString s = fmt( 0, description.c_str( ), ch );
+        ExtraDescription *ed = obj->addProperDescription( );
+        for (int l = LANG_MIN; l < LANG_MAX; l++)
+            ed->description[(lang_t)l] = s;
+    }
 }
 
 Scripting::Register XMLAttributeRestring::toRegister() const
