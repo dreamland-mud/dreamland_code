@@ -21,9 +21,9 @@ int WordEffect::getFrequency( ) const
     return frequency.getValue( );
 }
 
-DLString WordEffect::getMeaning( ) const
+DLString WordEffect::getMeaning( lang_t lang ) const
 {
-    return meaning.getValue( );
+    return meaning.getForLang( lang );
 }
 
 bool WordEffect::isGlobal( ) const
