@@ -942,7 +942,9 @@ SKILL_APPLY( bonedagger )
         if (is_safe_nomessage( vch, ch ))
             continue;
         
-        if (!is_name( ch->ambushing.c_str(), vch->getNameC() ))
+        // getNameP('7') is the all-language namelist, so a victim name typed
+        // in RU/UA matches too (mirrors char_has_name in finding.cpp).
+        if (!is_name( ch->ambushing.c_str(), vch->getNameP('7').c_str() ))
             continue;
 
         break;
