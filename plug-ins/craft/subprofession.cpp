@@ -244,7 +244,7 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
         ch->pecho(_("{CТы достигаешь {Y%1$dго{C уровня мастерства в профессии {Y%2$N2{C!{x"),
                    level, getRusName().c_str());
 
-        infonet(ch, 0, "{CРадостный голос из $o2: ", "{W%1$#C1 дости%1$#Gгло|г|гла новой ступени мастерства.{x", ch);
+        infonet(ch, 0, _("{CРадостный голос из $o2: {W%1$#C1 дости%1$#Gгло|г|гла новой ступени мастерства.{x"), ch);
         wiznet(WIZ_LEVELS, 0, 0, 
                   "%1$#C1 дости%1$#Gгло|г|гла %2$d уровня в профессии %3$N2!", 
                   ch, level, getRusName().c_str());
