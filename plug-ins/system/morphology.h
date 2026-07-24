@@ -13,6 +13,13 @@ namespace Morphology {
 
     // Decide which form of "с/со" preposition to use in front of this noun.
     DLString preposition_with(const DLString &noun);
+
+    // Decline a Ukrainian word into a game Flexer pad (root + per-case delta
+    // endings, e.g. "меч||а|еві||ем|еві") by asking the local pymorphy3 sidecar
+    // (127.0.0.1:5299). pos = "NOUN"|"ADJF"|"-", gender = "masc"|"femn"|"neut"|"-".
+    // Authoring-time only; caches, times out at 500ms, and falls back to the
+    // nominative in every case if the sidecar is unreachable (never blocks long).
+    DLString declineUa(const DLString &word, const DLString &pos = "-", const DLString &gender = "-");
 };
 
 namespace Syntax {
