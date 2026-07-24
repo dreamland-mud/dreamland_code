@@ -397,6 +397,12 @@ const DLString & DefaultRace::getMltNameUa( ) const
 {
     return nameMltUa.getValue( );
 }
+// Surface the UA name to GlobalRegistryElement::matchesStrict/Unstrict (empty for
+// races without UA-name data yet -> safe no-op, falls back to EN/RU matching).
+const DLString & DefaultRace::getUkrainianName( ) const
+{
+    return getMltNameUa( );
+}
 DLString DefaultRace::getNameFor( Character *looker, Character *me ) const
 {
     lang_t lang = looker ? Player::displayLang( looker ) : LANG_EN;

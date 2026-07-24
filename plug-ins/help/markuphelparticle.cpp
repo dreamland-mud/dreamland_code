@@ -6,7 +6,9 @@
 #include "helpformatter.h"
 #include "websocketrpc.h"
 #include "character.h"
+#include "pcharacter.h"
 #include "descriptor.h"
+#include "l10n.h"
 
 // Get a list of additional keywords not mentioned in the title.
 DLString help_article_disambig(const HelpArticle *help)
@@ -57,12 +59,12 @@ void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
         DLString title = getTitle(DLString::emptyString);
         DLString disambig = help_article_disambig(this);
 
-        in << "{WСправка на тему {C" << title << "{x " << editButton(ch) << endl;
+        in << l(ch, "{WСправка на тему {C") << title << "{x " << editButton(ch) << endl;
         if (!disambig.empty())
-            in << "{DКлючевые слова: " << disambig << "{x" << endl << endl;
+            in << l(ch, "{DКлючевые слова: ") << disambig << "{x" << endl << endl;
     }
 
-    in << text.get(RU);
+    in << text.getForLang(Player::displayLang(ch));
 }
 
 void MarkupHelpArticle::applyFormatter( Character *ch, ostringstream &in, ostringstream &out ) const

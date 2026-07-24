@@ -29,7 +29,7 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
     in << "%RESUME%";
 
     in << endl
-       << text.get(RU);
+       << text.getForLang(Player::displayLang(ch));
 }
 
 SkillHelpFormatter::SkillHelpFormatter( const char *text, Skill::Pointer skill )

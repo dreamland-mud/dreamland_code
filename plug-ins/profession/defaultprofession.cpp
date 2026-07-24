@@ -372,6 +372,12 @@ const DLString & DefaultProfession::getUaName( ) const
 {
     return uaName.getValue( );
 }
+// Surface the UA name to GlobalRegistryElement::matchesStrict/Unstrict so a
+// class can be picked/referenced by its Ukrainian name.
+const DLString & DefaultProfession::getUkrainianName( ) const
+{
+    return getUaName( );
+}
 int DefaultProfession::getWeapon( ) const
 {
     return weapon.getValue( );

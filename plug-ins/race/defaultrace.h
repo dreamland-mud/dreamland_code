@@ -92,6 +92,7 @@ public:
     virtual const DLString & getMaleNameUa( ) const;
     virtual const DLString & getFemaleNameUa( ) const;
     virtual const DLString & getMltNameUa( ) const;
+    virtual const DLString & getUkrainianName( ) const; // wire UA name into gref matching
     virtual DLString getNameFor( Character *looker, Character *me ) const;
 
     XML_VARIABLE XMLFlagsNoEmpty         det;

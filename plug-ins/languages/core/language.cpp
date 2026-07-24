@@ -57,7 +57,7 @@ void LanguageHelp::getRawText( Character *ch, ostringstream &in ) const
     in << "%RESUME%";
 
     in << endl
-       << text.get(RU);
+       << text.getForLang(Player::displayLang(ch));
 }
 
 /*--------------------------------------------------------------------
