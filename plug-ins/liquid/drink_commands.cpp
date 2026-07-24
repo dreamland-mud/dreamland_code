@@ -229,8 +229,17 @@ static void create_pool( Object *out, int amount )
 		room->echo( POS_RESTING, _("На земле образуется лужа %N2."), liqShort.c_str( ) );
 	}
 	
-    pool->setShortDescr( fmt(0, pool->pIndexData->short_descr.get(LANG_DEFAULT).c_str(), liqShort.ruscase( '2' ).c_str( )), LANG_DEFAULT );
-    pool->setDescription( fmt(0, pool->pIndexData->description.get(LANG_DEFAULT).c_str(), liqShort.ruscase( '2' ).c_str( )), LANG_DEFAULT );
+    // Build the puddle name/description per viewer language: the pool prototype
+    // templates carry a %s for the liquid noun in every language and the liquid
+    // itself has per-language shorts, so fill every slot instead of RU only --
+    // otherwise EN/UA viewers fall back to the empty/prototype puddle name.
+    // RU byte-identical (LANG_DEFAULT slot renders exactly as before).
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        DLString ln = liquid->getShortDescr( lang ).ruscase( '2' );
+        pool->setShortDescr( fmt(0, pool->pIndexData->short_descr.get(lang).c_str(), ln.c_str( )), lang );
+        pool->setDescription( fmt(0, pool->pIndexData->description.get(lang).c_str(), ln.c_str( )), lang );
+    }
 	// Don't set material to liquid name -- those don't exist in the materials list
 	// Use "drink" material for unspecified liquid types (set by default in OBJ_VNUM_POOL, vnum 75)
     // pool->setMaterial( liqName );        
