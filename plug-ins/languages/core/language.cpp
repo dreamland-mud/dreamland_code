@@ -13,6 +13,7 @@
 #include "commandmanager.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "pcrace.h"
 #include "merc.h"
 #include "def.h"
