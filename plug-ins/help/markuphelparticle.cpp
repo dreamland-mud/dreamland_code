@@ -12,9 +12,9 @@
 #include "l10n.h"
 
 // Get a list of additional keywords not mentioned in the title.
-DLString help_article_disambig(const HelpArticle *help)
+DLString help_article_disambig(const HelpArticle *help, lang_t lang)
 {
-    DLString ltitle = help->getTitle(DLString::emptyString);
+    DLString ltitle = help->getTitle(DLString::emptyString, lang);
     ltitle.toLower();
 
     const StringSet &keywords = help->getAllKeywords();
@@ -57,8 +57,8 @@ DLString MarkupHelpArticle::editButton(Character *ch) const
 void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
 {
     if (ch && ch->desc && ch->desc->connected == CON_PLAYING) {
-        DLString title = getTitle(DLString::emptyString);
-        DLString disambig = help_article_disambig(this);
+        DLString title = getTitle(DLString::emptyString, Player::displayLang(ch));
+        DLString disambig = help_article_disambig(this, Player::displayLang(ch));
 
         in << l(ch, "{WСправка на тему {C") << title << "{x " << editButton(ch) << endl;
         if (!disambig.empty())

@@ -56,6 +56,10 @@ public:
     /** Construct article title depending on implementation. */
     virtual DLString getTitle(const DLString &label) const;
 
+    /** Same, but in the viewer's language: uses the per-lang title if present,
+     *  otherwise falls back to the default (RU / keyword / subclass) title. */
+    DLString getTitle(const DLString &label, lang_t lang) const;
+
     /** Regenerate keywordsAll* fields. */
     void refreshKeywords();
 

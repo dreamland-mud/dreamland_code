@@ -46,7 +46,7 @@ int HelpArticle::getID() const
     return id;
 }
 
-DLString HelpArticle::getTitle(const DLString &label) const 
+DLString HelpArticle::getTitle(const DLString &label) const
 {
     const DLString &t = title.get(LANG_DEFAULT);
 
@@ -54,6 +54,18 @@ DLString HelpArticle::getTitle(const DLString &label) const
         return t;
     else
         return getAllKeywordsString();
+}
+
+DLString HelpArticle::getTitle(const DLString &label, lang_t lang) const
+{
+    // getForLang falls back to RU when the requested language is empty, so a
+    // filled per-lang title upgrades the display and everything else stays RU.
+    const DLString &t = title.getForLang(lang);
+
+    if (!t.empty())
+        return t;
+    else
+        return getTitle(label);
 }
 
 void HelpArticle::save() const
