@@ -265,7 +265,7 @@ void Language::improve( Character *ch, bool, Character *victim, int, int ) const
     PCSkillData &data = pch->getSkillData( getIndex( ) );
 
     data.learned++;
-    ch->pecho( _("Ты совершенствуешь свои познания в %^N6."), name.get(RU).c_str() );
+    ch->pecho( _("Ты совершенствуешь свои познания в %^N6."), getNameFor(ch).c_str() );
 }
 
 AffectHandler::Pointer Language::getAffect( ) 
