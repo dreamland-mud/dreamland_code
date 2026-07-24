@@ -546,8 +546,10 @@ void WeaponGenerator::setShortDescr() const
         if (a >= 0 && a < (int)adjectives_ua.size() && !adjectives_ua[a].empty())
             ua += Morphology::declineUa(adjectives_ua[a], "ADJF", gtag) + " ";
         ua += Morphology::declineUa(nameConfig["short_ua"].asString(), "NOUN", gtag);
+        // Suffix nouns ("... of pain") are a fixed genitive -- appended as-is,
+        // like RU, so they stay put when the weapon name declines by case.
         if (n >= 0 && n < (int)nouns_ua.size() && !nouns_ua[n].empty())
-            ua += " " + Morphology::declineUa(nouns_ua[n], "NOUN", "-");
+            ua += " " + nouns_ua[n];
         obj->setShortDescr(ua, LANG_UA);
     } else {
         obj->setShortDescr(myshort, LANG_UA);
