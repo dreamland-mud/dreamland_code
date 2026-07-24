@@ -7,8 +7,10 @@
 
 #include "xmlvariablecontainer.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlinteger.h"
 #include "xmlboolean.h"
+#include "lang.h"
 
 class Character;
 class PCharacter;
@@ -25,14 +27,14 @@ public:
     virtual bool run( PCharacter *, Object * ) const;
 
     int getFrequency( ) const;
-    DLString getMeaning( ) const;
+    DLString getMeaning( lang_t lang = LANG_DEFAULT ) const;
     bool isGlobal( ) const;
     bool isObject( ) const;
     bool isOffensive( ) const;
 
 protected:
     XML_VARIABLE XMLInteger frequency;
-    XML_VARIABLE XMLString  meaning;
+    XML_VARIABLE XMLMultiString meaning;
     XML_VARIABLE XMLBoolean global;
     XML_VARIABLE XMLBoolean object;
     XML_VARIABLE XMLBoolean offensive;

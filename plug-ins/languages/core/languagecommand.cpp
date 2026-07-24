@@ -302,7 +302,7 @@ bool LanguageCommand::showDreams( PCharacter *ch ) const
         ef = w->second.getEffect( );
 
         if (ef && (fShowEffect || hasHint )) 
-            buf << fmt( 0, "    (%N1)", ef->getMeaning( ).c_str( ) );
+            buf << fmt( 0, "    (%N1)", ef->getMeaning( viewerLang(ch) ).c_str( ) );
         buf << endl;
     }
 
@@ -365,7 +365,7 @@ bool LanguageCommand::showRewards( PCharacter *ch ) const
         buf << fmt(0, "        {c%-30s{x", dictum.c_str( ) );
 
         if (ef && (fShowEffect || hasHint )) 
-            buf << fmt( 0, "    (%N1)", ef->getMeaning( ).c_str( ) );
+            buf << fmt( 0, "    (%N1)", ef->getMeaning( viewerLang(ch) ).c_str( ) );
 
         buf << endl;
     }
@@ -410,7 +410,7 @@ void LanguageCommand::doIdent( PCharacter *ch, DLString &arguments ) const
     }
 
     ch->pecho( _("Знание языка помогает тебе приподнять завесу тайны над словом '{c%s{x':"), arg.c_str( ) );
-    ch->pecho( _("оно содержит в себе секрет {c%N2{x."), ef->getMeaning( ).c_str( ) );
+    ch->pecho( _("оно содержит в себе секрет {c%N2{x."), ef->getMeaning( viewerLang(ch) ).c_str( ) );
     wiznet( WIZ_LANGUAGE, 0, 0, "%^C1 узнает смысл слова '%s' (%s).", 
             ch, word.toStr( ), word.effect.getValue( ).c_str( ) );
 
