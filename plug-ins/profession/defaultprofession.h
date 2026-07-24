@@ -158,6 +158,7 @@ public:
     virtual const DLString &getRusName( ) const;
     virtual const DLString &getMltName( ) const;
     virtual const DLString &getUaName( ) const;
+    virtual const DLString &getUkrainianName( ) const; // wire UA name into gref matching
     virtual DLString getNameFor( Character *, const Grammar::Case & = Grammar::Case::NONE ) const;
     virtual DLString getWhoNameFor( Character * ) const;
     virtual int  getWeapon( ) const;

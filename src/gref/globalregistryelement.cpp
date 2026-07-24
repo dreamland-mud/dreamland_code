@@ -37,6 +37,9 @@ bool GlobalRegistryElement::matchesStrict( const DLString &str ) const
     if (lstr == getRussianName().ruscase('1').toLower())
         return true;
 
+    if (!getUkrainianName().empty() && lstr == getUkrainianName().ruscase('1').toLower())
+        return true;
+
     return false;
 }
 
@@ -51,7 +54,11 @@ bool GlobalRegistryElement::matchesUnstrict( const DLString &str ) const
     DLString rname = getRussianName().ruscase('1');
     if (is_name(str.c_str(), rname.c_str()))
         return true;
-    
+
+    DLString uname = getUkrainianName().ruscase('1');
+    if (!uname.empty() && is_name(str.c_str(), uname.c_str()))
+        return true;
+
     return false;
 }
 
