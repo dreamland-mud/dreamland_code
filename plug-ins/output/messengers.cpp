@@ -246,10 +246,11 @@ void send_discord_level(PCharacter *ch)
 {   
     DLString msg;
 
+    // Discord is English-only (Telegram stays Russian, see send_telegram_level).
     if (ch->getLevel() == LEVEL_MORTAL)
-        msg = fmt(0, _("%1$^C1 достиг%1$Gло||ла уровня героя!"), ch);
+        msg = fmtLang(LANG_EN, _("%1$^C1 достиг%1$Gло||ла уровня героя!"), ch);
     else
-        msg = fmt(0, _("%1$^C1 достиг%1$Gло||ла следующей ступени мастерства."), ch);
+        msg = fmtLang(LANG_EN, _("%1$^C1 достиг%1$Gло||ла следующей ступени мастерства."), ch);
 
     send_to_discord_stream(":zap: " + msg);
 }
