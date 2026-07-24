@@ -589,8 +589,8 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                     if (victim->is_npc() && IS_SET(victim->act,ACT_NOTRACK )
                         && victim->in_room != ch->in_room )
                     {
-                        buf << "Это заклинание не подействует на "
-                            << victim->getNameP( '4' ) << " на таком расстоянии.";
+                        buf << fmt( ch, _("Это заклинание не подействует на %1$s на таком расстоянии."),
+                                    ch->sees( victim, '4' ).c_str() );
                         result->error = TARGET_ERR_TOO_FAR;
                         return result;
                     }
