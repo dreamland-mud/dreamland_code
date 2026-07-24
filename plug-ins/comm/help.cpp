@@ -1,5 +1,6 @@
 #include <string.h>
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "helpmanager.h"
 #include "act.h"
 #include "string_utils.h"
@@ -52,7 +53,7 @@ struct FuzzySearch {
         int max_output = 5; 
         int firstId = -1;   
 
-        buf << "Справка не найдена. Возможно, имелось в виду:" << endl;
+        buf << l(ch, "Справка не найдена. Возможно, имелось в виду:") << endl;
 
         // Output matches starting with best distance ones, but no more than max_output.
         for (int i = 1; i <= min_distance && max_output > 0; i++) {
@@ -61,7 +62,7 @@ struct FuzzySearch {
             for (auto &pair: matches) {
                 int id = pair.second->getID();
                 DLString hint = pair.first;
-                DLString title = pair.second->getTitle(DLString::emptyString);
+                DLString title = pair.second->getTitle(DLString::emptyString, Player::displayLang(ch));
                 
                 // For example:  {hh123beer{x: [{C{hh123{x] Spell 'beer armor'
                 buf << fmt(0, "  {hh%d%-20s{x: [{C{hh%5d{x] %s\r\n",
@@ -311,12 +312,12 @@ CMDRUNP( help )
     }
 
     // Several matches, display them all with numbers.
-    buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки с такими номерами:" << endl << endl;
+    buf << fmt(ch, _("По запросу '{C%1$s{x' найдено несколько разделов справки с такими номерами:"), origArgument.c_str()) << endl << endl;
     DLString lineFormat = "[{C{hh%5d{x] %s\r\n";
     int firstId = -1;
     for (unsigned int a = 0; a < articles.size(); a++) {
         auto help = articles[a];
-        DLString title = help->getTitle(DLString::emptyString);
+        DLString title = help->getTitle(DLString::emptyString, Player::displayLang(ch));
 
         // Create a line with help ID and title 
         DLString line = title;
@@ -328,8 +329,7 @@ CMDRUNP( help )
     }
 
     buf << endl
-        << "Для уточнения поиска смотри справку по нужному номеру, например, "
-        << "{y{hcсправка " << firstId << "{x." << endl;        
+        << fmt(ch, _("Для уточнения поиска смотри справку по нужному номеру, например, {y{hcсправка %1$d{x."), firstId) << endl;
 
     page_to_char(buf.str().c_str(), ch);
 }                  
