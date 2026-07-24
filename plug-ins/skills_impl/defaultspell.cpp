@@ -38,6 +38,7 @@
 #include "act.h"
 
 #include "def.h"
+#include "clanreference.h"
 #include "l10n.h"
 
 GSN(spellbane);
@@ -954,9 +955,33 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
     }
 }
 
+bool DefaultSpell::blockedByNobuff( Character *ch, Character *victim ) const
+{
+    // Only beneficial (defensive) spells count as "buffs"; only a real player is
+    // a "third party". PvE / hostile-mob casts are unaffected (cast-only v1).
+    if (getSpellType( ) != SPELL_DEFENSIVE || !victim || ch->is_npc( ))
+        return false;
+
+    // The protected owner is the PC being targeted, or the PC master of a
+    // targeted pet/charmy (Wolfram: "cast Fly on my pet").
+    Character *owner = victim->is_npc( ) ? victim->master : victim;
+    if (!owner || owner->is_npc( ) || !IS_SET(owner->add_comm, COMM_NOBUFF))
+        return false;
+
+    // Self / group / same-clan casts are always allowed (mirror spellbane's and
+    // canGetRoomAffect's exclusions). getClan() never returns null; a clanless
+    // player's clan is dispersed, so the clan test won't exempt clanless enemies.
+    if (ch == owner || ch == victim || is_same_group( ch, owner ))
+        return false;
+    if (!ch->getClan( )->isDispersed( ) && ch->getClan( ) == owner->getClan( ))
+        return false;
+
+    return true;
+}
+
 int DefaultSpell::getBeats(Character *ch) const
 {
-    return skill->getBeats(ch); 
+    return skill->getBeats(ch);
 }
 int DefaultSpell::getMana( ) const
 {

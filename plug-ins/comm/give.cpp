@@ -15,6 +15,8 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+#include "follow_utils.h"
+#include "clanreference.h"
 #include "l10n.h"
 
 /*
@@ -74,6 +76,20 @@ static bool oprog_present( Object *obj, Character *ch, Character *victim )
     return false;
 }
 
+// 'config notransfer': a PC refuses items/money from third-party players (not
+// self, not group, not same clan). NPC gives (shops, quests) always pass.
+// See Trello 709 / Nimly.
+static bool give_blocked_notransfer( Character *ch, Character *victim )
+{
+    if (ch->is_npc( ) || victim->is_npc( ) || !IS_SET(victim->add_comm, COMM_NOTRANSFER))
+        return false;
+    if (ch == victim || is_same_group( ch, victim ))
+        return false;
+    if (!ch->getClan( )->isDispersed( ) && ch->getClan( ) == victim->getClan( ))
+        return false;
+    return true;
+}
+
 static void give_obj_char( Character *ch, Object *obj, Character *victim, int mode = GIVE_MODE_USUAL )
 {
     if (ch == victim) {
@@ -84,6 +100,12 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
     if ( !victim->is_npc() && IS_GHOST( victim ) )
     {
         ch->pecho(_("Разве можно что-то %s призраку?"), (mode ? "подарить" : "дать"));
+        return;
+    }
+
+    if ( give_blocked_notransfer( ch, victim ) )
+    {
+        ch->pecho( _("%1$^C1 не принима%1$nет|ют вещей от посторонних."), victim );
         return;
     }
 
@@ -167,6 +189,12 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
     if ( !victim->is_npc() && IS_GHOST( victim ) )
     {
             ch->pecho(_("Разве можно что-то дать призраку?"));
+            return;
+    }
+
+    if ( give_blocked_notransfer( ch, victim ) )
+    {
+            ch->pecho( _("%1$^C1 не принима%1$nет|ют денег от посторонних."), victim );
             return;
     }
 

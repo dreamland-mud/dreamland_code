@@ -59,7 +59,12 @@ public:
     virtual bool apply( Character *ch, Room *room, int level) { return false; }
 
     virtual int getMaxRange( Character * ) const;                
-    virtual bool spellbane( Character *, Character * ) const; 
+    virtual bool spellbane( Character *, Character * ) const;
+
+    // True if this (defensive) spell must be refused because the target -- a PC,
+    // or a pet/charmy whose PC master -- has 'config nobuff' and the caster is a
+    // third party (not self, not group, not same clan). See Trello 709 / Wolfram.
+    bool blockedByNobuff( Character *ch, Character *victim ) const;
     virtual void utter( Character * );
     virtual int getSpellLevel( Character *, int );
 
