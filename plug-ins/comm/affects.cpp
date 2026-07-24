@@ -302,7 +302,12 @@ private:
             return;
 
         lang_t lang = Player::displayLang(ch);
-        StringList names = my_table.toStringList(my_flags, gcase, lang);
+        // imm/res/vuln all read "...до <damage>" in UA, which governs the GENITIVE,
+        // so the RU-tuned gcase (dative, for "к") renders the wrong UA case
+        // ("вразлив до кислоті" -> should be "кислоти"). RU/EN names are fixed
+        // strings (bits.conf) and ignore gcase; only UA declines -> force genitive.
+        char gc = (lang == LANG_UA) ? '2' : gcase;
+        StringList names = my_table.toStringList(my_flags, gc, lang);
         DLString message = prefix.getMessage(lang) + " " + names.wrap("{Y", "{x").join(", ") + ".";
         ch->pecho(message.c_str(), ch);
     }
