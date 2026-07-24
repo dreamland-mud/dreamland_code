@@ -7,6 +7,7 @@
 #include "websocketrpc.h"
 #include "character.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "descriptor.h"
 #include "l10n.h"
 
