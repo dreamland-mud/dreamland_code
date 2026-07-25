@@ -57,8 +57,10 @@ public:
     virtual DLString getTitle(const DLString &label) const;
 
     /** Same, but in the viewer's language: uses the per-lang title if present,
-     *  otherwise falls back to the default (RU / keyword / subclass) title. */
-    DLString getTitle(const DLString &label, lang_t lang) const;
+     *  otherwise falls back to the default (RU / keyword / subclass) title.
+     *  Virtual so subclasses (e.g. BehaviorHelp) can render a fully per-viewer
+     *  synthesized title without an explicit <title> field. */
+    virtual DLString getTitle(const DLString &label, lang_t lang) const;
 
     /** Regenerate keywordsAll* fields. */
     void refreshKeywords();

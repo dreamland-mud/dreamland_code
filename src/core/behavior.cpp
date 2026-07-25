@@ -31,6 +31,13 @@ const DLString &Behavior::getRussianName() const
     return nameRus;
 }
 
+const DLString &Behavior::getUkrainianName() const
+{
+    if (!nameUa.empty())
+        return nameUa;
+    return nameRus;
+}
+
 long long Behavior::getID() const
 {
     if (id <= 0)
