@@ -26,6 +26,7 @@ void material_t::fromJson(const Json::Value &value)
     flags.fromJson(value["flags"]);
     vuln.fromJson(value["vuln"]);
     rname = value["rname"].asString();
+    uaname = value["uaname"].asString();
 }
 
 json_vector<material_t> material_table;
@@ -206,6 +207,34 @@ DLString material_rname(const char *materials)
             names.push_back(mat->name);
     }
 
+
+    return names.join(", ");
+}
+
+DLString material_uaname(Object *obj)
+{
+    return material_uaname(obj->getMaterial().c_str());
+}
+
+DLString material_uaname(const char *materials)
+{
+    StringList names;
+    vector<const material_t *> result;
+
+    material_parse( materials, result );
+
+    for (auto &mat: result) {
+        if (mat->type.isSet(MAT_NONE))
+            continue;
+
+        // Fall back RU->EN when a material has no Ukrainian name yet.
+        if (!mat->uaname.empty())
+            names.push_back(mat->uaname);
+        else if (!mat->rname.empty())
+            names.push_back(mat->rname);
+        else
+            names.push_back(mat->name);
+    }
 
     return names.join(", ");
 }
