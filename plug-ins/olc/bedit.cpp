@@ -97,6 +97,9 @@ void OLCStateBehavior::show( PCharacter *ch )
     ptc(ch, "Название:        {C%s{x %s {D(nameRus help){x\r\n",
             bhv->getRussianName().c_str(),
             web_edit_button(ch, "nameRus", "web").c_str());
+    ptc(ch, "Укр.название:    {C%s{x %s {D(nameUa help){x\r\n",
+            bhv->nameUa.c_str(),
+            web_edit_button(ch, "nameUa", "web").c_str());
     ptc(ch, "Описание:        %s {D(desc help){x\r\n{c%s{x\r\n",
             web_edit_button(ch, "desc", "web").c_str(),
             bhv->getDescription().c_str());
@@ -197,6 +200,11 @@ BEDIT(affect, "аффект", "создать или редактировать 
 BEDIT(nameRus, "название", "установить название с падежами")
 {
     return editor(argument, getOriginal()->nameRus, (editor_flags)(ED_NO_NEWLINE));
+}
+
+BEDIT(nameUa, "укрназвание", "установить украинское название")
+{
+    return editor(argument, getOriginal()->nameUa, (editor_flags)(ED_NO_NEWLINE));
 }
 
 BEDIT(description, "описание", "установить описание")
