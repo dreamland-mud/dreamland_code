@@ -264,16 +264,15 @@ CMDRUN( buy )
     {
         DLString toRoom = fmt(0, _("$c1 покупает $o4[%d]."), number );
         oldact( toRoom.c_str(), ch, obj, 0, TO_ROOM);
-        DLString toChar = fmt(0, _("Ты покупаешь $o4[%d] за %d серебрян%s."),
-                        number, cost * number,
-                        GET_COUNT( cost * number, "ую монету", "ые монеты", "ых монет" ) );
+        DLString toChar = fmt(ch, _("Ты покупаешь $o4[%1$d] за %2$d серебрян%2$Iую|ые|ых монет%2$Iу|ы|."),
+                        number, cost * number );
         oldact( toChar.c_str(), ch, obj, 0, TO_CHAR);
     }
     else
     {
         oldact(_("$c1 покупает $o4."), ch, obj, 0, TO_ROOM);
-        DLString toChar = fmt( 0, _("Ты покупаешь $o4 за %d серебрян%s."),
-                        cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
+        DLString toChar = fmt( ch, _("Ты покупаешь $o4 за %1$d серебрян%1$Iую|ые|ых монет%1$Iу|ы|."),
+                        cost );
         oldact( toChar.c_str(), ch, obj, 0, TO_CHAR);
     }
 
