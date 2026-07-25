@@ -79,9 +79,11 @@ CMDRUNP( idea )
         return;
     }
 
-    txt = fmt(0, _("от %1$C2]: %2$s"), ch, txt.c_str());
+    DLString idea = txt;
+    txt = fmt(0, _("от %1$C2]: %2$s"), ch, idea.c_str());
     // Let's experiment and see if this will be abused -- can always mute abusers
-    send_to_discord_stream(":bulb: [**Идейка** " + txt);
+    // Discord relay is English (the idea text itself stays in the author's language).
+    send_to_discord_stream(":bulb: [**Idea** " + fmtLang(LANG_EN, _("от %1$C2]: %2$s"), ch, idea.c_str()));
     send_telegram("[Идейка " + txt);
 
     bugTracker->reportMessage("idea", ch->getPC(), txt);

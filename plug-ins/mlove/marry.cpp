@@ -14,11 +14,11 @@
 #include "messengers.h"
 #include "room.h"
 #include "class.h"
+#include "act.h"
 #include "l10n.h"
 
 COMMAND(Marry, "marry")
 {
-    std::basic_ostringstream<char> buf;
     PCharacter *bride1, *bride2;
     DLString arguments = constArguments;
     DLString brideName1, brideName2;
@@ -68,31 +68,29 @@ COMMAND(Marry, "marry")
     bride2->getAttributes( ).getAttr<XMLAttributeMarriage>( "marriage" )->spouse.setValue( brideName1 );
     bride2->getAttributes( ).getAttr<XMLAttributeMarriage>( "marriage" )->wife.setValue( true );
 
-    buf << "Ты объявляешь " << brideName1 << " и " << brideName2 << " мужем и женой!" << endl;
-    ch->send_to( buf );
+    ch->send_to(fmt(ch, _("Ты объявляешь %1$s и %2$s мужем и женой!\n"),
+        brideName1.c_str( ), brideName2.c_str( )));
 
-    buf.str( "" );
-    buf << ch->getNameP('1') << " объявляет вас мужем и женой!" << endl;
-    bride1->send_to( buf );
-    bride2->send_to( buf );
+    // The two brides and every onlooker see the celebrant's name (%C1, declined
+    // per viewer); the wedding names are author-typed strings shown as-is (%s).
+    bride1->send_to(fmt(bride1, _("%1$C1 объявляет вас мужем и женой!\n"), ch));
+    bride2->send_to(fmt(bride2, _("%1$C1 объявляет вас мужем и женой!\n"), ch));
 
-    buf.str( "" );
-    buf << ch->getNameP('1') << " объявляет " << brideName1 << " и " << brideName2 << " мужем и женой!" << endl;
-    
     for (Character *wch = ch->in_room->people; wch; wch = wch->next_in_room) {
         if (!wch->is_npc( ) && wch != ch && wch != bride1 && wch != bride2)
-            wch->send_to( buf );
+            wch->send_to(fmt(wch, _("%1$C1 объявляет %2$s и %3$s мужем и женой!\n"),
+                ch, brideName1.c_str( ), brideName2.c_str( )));
     }
 
     bride1->getAttributes( ).getAttr<XMLAttributeLovers>( "lovers" )->lovers.put( brideName2 );
     bride2->getAttributes( ).getAttr<XMLAttributeLovers>( "lovers" )->lovers.put( brideName1 );
 
-    buf.str( "" );
-    buf << "{CВеселый голос из $o2: {Y" 
-        << brideName1 << "{W и {Y" << brideName2 << "{W теперь муж и жена!!!{x";
-    infonet( buf.str( ).c_str( ), 0, 0 );
+    // Info channel per viewer; Discord is EN-only (names are author content).
+    infonet((Character*)0, 0,
+        _("{CВеселый голос из $o2: {Y%1$s{W и {Y%2$s{W теперь муж и жена!!!{x"),
+        brideName1.c_str( ), brideName2.c_str( ));
 
-    send_discord_orb(":heart: " + brideName1 + " и " + brideName2 + " теперь муж и жена.");
+    send_discord_orb(":heart: " + brideName1 + " and " + brideName2 + " are now husband and wife.");
 }
 
 PCharacter * Marry::checkBride( Character *ch, DLString name ) {
