@@ -319,7 +319,8 @@ void RainbowGQuest::rewardWinner( )
     XMLReward r;
     PCMemoryInterface *pci = PCharacterManager::find( winnerName );
 
-    r.reason[LANG_RU] = getScenario( )->getWinnerMsg( );
+    for (int lg = LANG_MIN; lg < LANG_MAX; lg++)
+        r.reason[(lang_t)lg] = getScenario( )->getWinnerMsg( (lang_t)lg );
     r.gold = number_range( 400, 700 );
     r.qpoints = number_range( 250, 350 );
     r.id = getQuestID( );
