@@ -906,7 +906,14 @@ static void show_char_description( Character *ch, Character *vict )
     const char *dsc = descRef->c_str();
 
     if ((vict->is_npc( ) && dsc) || (!vict->is_npc( ) && dsc[0])) {
-        ch->send_to( dsc );
+        // Normalize the terminator: some descriptions carry no trailing newline
+        // (or trailing spaces), which lets the following "(race, size) name in
+        // <condition>" appearance line run on and render mis-aligned. Guarantee
+        // exactly one newline so the appearance line always starts fresh.
+        DLString d = dsc;
+        d.stripRightWhiteSpace( );
+        d += "\n";
+        ch->send_to( d.c_str( ) );
         return;
     }
 
