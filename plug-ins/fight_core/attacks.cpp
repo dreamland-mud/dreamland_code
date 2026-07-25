@@ -48,6 +48,8 @@
 *        By using this code, you have agreed to follow the terms of the           *
 *        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
+#include "jsoncpp/json/json.h"
+#include "configurable.h"
 #include "attacks.h"
 #include "damageflags.h"
 #include "grammar_entities_impl.h"
@@ -109,7 +111,43 @@ struct attack_type        attack_table        []                =
     { "mental",      "ментальный удар",              DAM_MENTAL,      MultiGender::MASCULINE},
     { "disease",      "чумные миазмы",              DAM_DISEASE,      MultiGender::PLURAL},
     { "charm",      "неотразимость",              DAM_CHARM,      MultiGender::FEMININE},
-    { "sound",      "звуковая волна",              DAM_SOUND,      MultiGender::FEMININE},    
+    { "sound",      "звуковая волна",              DAM_SOUND,      MultiGender::FEMININE},
     { 0,                0,                        0                }
 };
+
+/*
+ * Trilingual attack nouns (Trello 2594). The en/ua display forms live in
+ * config/fight/attack_nouns.json, indexed 1:1 with attack_table above; the RU
+ * form stays baked into attack_table[].noun (byte-identical). Loaded here in
+ * fight_core so both the combat message path (onehit_undef) and the Fenia
+ * ObjectWrapper bindings (identify/lore) share one source.
+ */
+struct AttackNounRow {
+    DLString en, ua;
+    void fromJson(const Json::Value &v)
+    {
+        en = v["en"].asString();
+        ua = v["ua"].asString();
+    }
+};
+static json_vector<AttackNounRow> attackNouns;
+
+CONFIGURABLE_LOADED(fight, attack_nouns)
+{
+    attackNouns.fromJson(value);
+}
+
+const DLString & attack_noun_en(int index)
+{
+    if (index >= 0 && index < (int)attackNouns.size())
+        return attackNouns[index].en;
+    return DLString::emptyString;
+}
+
+const DLString & attack_noun_ua(int index)
+{
+    if (index >= 0 && index < (int)attackNouns.size())
+        return attackNouns[index].ua;
+    return DLString::emptyString;
+}
 

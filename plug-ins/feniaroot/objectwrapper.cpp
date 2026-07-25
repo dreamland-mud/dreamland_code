@@ -490,6 +490,18 @@ NMI_GET( ObjectWrapper, attack_noun, "русск название типа ат�
     return target->item_type == ITEM_WEAPON ? attack_table[target->value3()].noun : "";
 }
 
+NMI_GET( ObjectWrapper, attack_noun_en, "англ название типа атаки оружия (config/fight/attack_nouns.json)")
+{
+    checkTarget();
+    return target->item_type == ITEM_WEAPON ? ::attack_noun_en(target->value3()) : DLString::emptyString;
+}
+
+NMI_GET( ObjectWrapper, attack_noun_ua, "укр название типа атаки оружия (config/fight/attack_nouns.json)")
+{
+    checkTarget();
+    return target->item_type == ITEM_WEAPON ? ::attack_noun_ua(target->value3()) : DLString::emptyString;
+}
+
 NMI_GET( ObjectWrapper, attack_damage, "название типа повреждения оружия (таблица .tables.damage_table)")
 {
     checkTarget();
