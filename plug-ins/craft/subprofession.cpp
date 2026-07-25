@@ -60,6 +60,8 @@ void CraftProfessionHelp::setProfession( CraftProfession::Pointer prof )
     addAutoKeyword( prof->getName( ) );
     addAutoKeyword( prof->getRusName( ).ruscase( '1' ) );
     addAutoKeyword( prof->getMltName( ).ruscase( '1' ) );
+    if (!prof->getUaName( ).empty( ))
+        addAutoKeyword( prof->getUaName( ).ruscase( '1' ) );
     labels.addTransient(LABEL_CRAFT);
 
     helpManager->registrate( Pointer( this ) );
@@ -112,10 +114,13 @@ void CraftProfession::unloaded( )
 
 DLString CraftProfession::getNameFor( Character *ch, const Grammar::Case &c ) const
 {
-    if (ch && Player::displayLang(ch) != LANG_EN)
-        return getRusName( ).ruscase( c );
-    else
+    if (!ch || Player::displayLang(ch) == LANG_EN)
         return getName( );
+    // UA players get the Ukrainian name when it's authored; otherwise fall back
+    // to the Russian pad (byte-identical to the previous behaviour).
+    if (Player::displayLang(ch) == LANG_UA && !uaName.empty())
+        return getUaName( ).ruscase( c );
+    return getRusName( ).ruscase( c );
 }
 
 int ExperienceCalculator::expPerLevel(int level_) const
