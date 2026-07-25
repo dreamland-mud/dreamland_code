@@ -233,7 +233,7 @@ class PlayerDeleteTask : public SchedulerTask {
 public:
     typedef ::Pointer<PlayerDeleteTask> Pointer;
     
-    PlayerDeleteTask( PCharacter *p, Character *k, const DLString &m )
+    PlayerDeleteTask( PCharacter *p, Character *k, const MultiMessage &m )
                       : pvict( p ), killer( k ), msgWiznet( m )
     {
     }
@@ -243,11 +243,18 @@ public:
         pvict->pecho(_("Ты превращаешься в призрак в последний раз и навсегда покидаешь этот мир."));
         oldact(_("$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r"), pvict,0,0,TO_ROOM);
         
-        DLString msg = fmt(0, msgWiznet.c_str(), pvict, killer);
-        wiznet( 0, 0, 0, msg.c_str());
-        infonet(pvict, 0, "{CТихий голос из $o2: ", msg.c_str());
-        send_to_discord_stream(":ghost: " + msg);
-        send_telegram(msg.c_str());
+        // Immortal wiznet + Telegram stay RU (policy); Discord = EN; the info
+        // channel renders per viewer, with the quiet-voice frame prepended in
+        // each language so %C1 (the victim) still resolves per recipient.
+        DLString msgRu = fmtLang(LANG_RU, msgWiznet, pvict, killer);
+        wiznet( 0, 0, 0, msgRu.c_str());
+        MultiMessage info(
+            DLString("{CТихий голос из $o2: ") + msgWiznet.getMessage(LANG_EN),
+            DLString("{CТихий голос из $o2: ") + msgWiznet.getMessage(LANG_RU),
+            DLString("{CТихий голос из $o2: ") + msgWiznet.getMessage(LANG_UA));
+        infonet( pvict, 0, info, pvict, killer );
+        send_to_discord_stream(":ghost: " + fmtLang(LANG_EN, msgWiznet, pvict, killer));
+        send_telegram( msgRu.c_str());
 
         Player::quitAndDelete( pvict );
     }
@@ -259,7 +266,7 @@ public:
 private:
     PCharacter *pvict;
     Character *killer;
-    DLString msgWiznet;
+    MultiMessage msgWiznet;
 };
 
 class DeathPenalties {
@@ -321,8 +328,8 @@ protected:
         pch->perm_stat[STAT_CON] = 10;
 
         DLScheduler::getThis( )->putTaskNOW(
-            PlayerDeleteTask::Pointer( NEW, pch, killer, 
-                "%C1 теряет слишком много очков телосложения и навсегда покидает этот мир." ) );
+            PlayerDeleteTask::Pointer( NEW, pch, killer,
+                _("%C1 теряет слишком много очков телосложения и навсегда покидает этот мир.") ) );
         return true;
     }
 
@@ -349,8 +356,8 @@ protected:
         pch->death = 0;
 
         DLScheduler::getThis( )->putTaskNOW(
-            PlayerDeleteTask::Pointer( NEW, pch, killer, 
-                "%C1 десятый раз гибнет смертью самурая и навсегда покидает этот мир" ) );
+            PlayerDeleteTask::Pointer( NEW, pch, killer,
+                _("%C1 десятый раз гибнет смертью самурая и навсегда покидает этот мир") ) );
         return true;
     }
 
