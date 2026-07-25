@@ -10,6 +10,7 @@
 #include "globalreference.h"
 #include "xmlglobalreference.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlinteger.h"
 #include "xmljsonvalue.h"
 #include "xmlenumeration.h"
@@ -40,12 +41,18 @@ public:
     virtual bool isValid() const;
     virtual const DLString &getRussianName() const;
 
+    // Behavior description in the viewer's language (falls back RU->EN).
+    const DLString & getDescription( lang_t lang = LANG_DEFAULT ) const
+    {
+        return description.getForLang( lang );
+    }
+
     // Internal ID to use as unique ID for Fenia.
     XML_VARIABLE XMLInteger id;
 
     XML_VARIABLE XMLString nameRus;
 
-    XML_VARIABLE XMLString description;
+    XML_VARIABLE XMLMultiString description;
 
     // Where is it assigned: mob/obj/room.
     XML_VARIABLE XMLEnumeration target;
