@@ -99,7 +99,7 @@ void OLCStateBehavior::show( PCharacter *ch )
             web_edit_button(ch, "nameRus", "web").c_str());
     ptc(ch, "Описание:        %s {D(desc help){x\r\n{c%s{x\r\n",
             web_edit_button(ch, "desc", "web").c_str(),
-            bhv->description.c_str());
+            bhv->getDescription().c_str());
     ptc(ch, "Цель:            {c%s {D(target){x\r\n", bhv->target.name().c_str());
     ptc(ch, "Подкоманды:      {c%s {D(subcommand){x\r\n", bhv->cmd.c_str());
 
@@ -201,7 +201,7 @@ BEDIT(nameRus, "название", "установить название с п�
 
 BEDIT(description, "описание", "установить описание")
 {
-    return editor(argument, getOriginal()->description, (editor_flags)(ED_NO_NEWLINE));
+    return editor(argument, getOriginal()->description[LANG_RU], (editor_flags)(ED_NO_NEWLINE));
 }
 
 BEDIT(target, "цель", "установить цель поведения")
