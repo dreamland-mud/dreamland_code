@@ -73,10 +73,16 @@ AreaIndexWrapper::getTarget( ) const
     return target;
 }
 
-NMI_GET( AreaIndexWrapper, name, "название зоны со всеми падежами") 
-{ 
-    checkTarget( ); 
+NMI_GET( AreaIndexWrapper, name, "название зоны со всеми падежами")
+{
+    checkTarget( );
     return Register( target->name.get(LANG_DEFAULT));
+}
+
+NMI_INVOKE( AreaIndexWrapper, getName, "(lang): название зоны на языке lang (0=en,1=ru,2=ua) со всеми падежами" )
+{
+    checkTarget( );
+    return Register( target->name.getForLang( argnum2lang( args, 1 ) ) );
 }
 
 NMI_GET( AreaIndexWrapper, filename, "название файла зоны") 
