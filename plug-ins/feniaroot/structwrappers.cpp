@@ -761,9 +761,14 @@ NMI_GET( WearlocWrapper, nameRus, "название слота с падежам
     return getTarget()->getRussianName();
 }
 
-NMI_GET( WearlocWrapper, purpose, "описание Надевается на..." ) 
+NMI_GET( WearlocWrapper, purpose, "описание Надевается на..." )
 {
     return getTarget()->getPurpose();
+}
+
+NMI_INVOKE( WearlocWrapper, getPurpose, "(lang): описание на языке lang (0=en,1=ru,2=ua)" )
+{
+    return Scripting::Register( getTarget()->getPurpose( argnum2lang(args, 1) ) );
 }
 
 
