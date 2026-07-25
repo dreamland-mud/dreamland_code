@@ -105,10 +105,10 @@ void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int ti
     oldact(_("$c1 вручает тебе $o4."), king, mark, hero, TO_VICT);
     oldact(_("$c1 вручает $C3 $o4."), king, mark, hero, TO_NOTVICT);
     oldact(_("$c1 говорит тебе '{GПередай его ему и поскорей!{x'"), king, 0, hero, TO_VICT);
-    msg = fmt(0, _("$c1 говорит тебе '{GМатеринское сердце подсказывает мне, "
-                  "что, если ты не приведешь его ко мне через {Y%d{G минут%s, "
+    msg = fmt(hero, _("$c1 говорит тебе '{GМатеринское сердце подсказывает мне, "
+                  "что, если ты не приведешь его ко мне через {Y%1$d{G минут%1$Iу|ы|, "
                   "с ним случится что-то непоправимое.{x'"),
-             time, GET_COUNT(time, "у", "ы", "") );
+             time );
 
     oldact(msg.c_str(), king, 0, hero, TO_VICT);
 }
