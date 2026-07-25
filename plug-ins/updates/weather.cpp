@@ -458,10 +458,15 @@ void sunlight_update( )
     // Output new day's bonus (RU; bonus subsystem localization -- Phase 2).
     if (this_day != time_info.day) {
         ostringstream bonus_buf;
-        for (int bn = 0; bn < bonusManager->size(); bn++) {
-            Bonus *bonus = bonusManager->find(bn);
-            if (bonus->isActive(0, time_info))
-                bonus->reportTime(0, bonus_buf);
+        {
+            // Discord bonus relay is English; force the render language for these
+            // no-recipient reportTime() calls (resolves via viewerLang()).
+            ForcedViewerLang forced(LANG_EN);
+            for (int bn = 0; bn < bonusManager->size(); bn++) {
+                Bonus *bonus = bonusManager->find(bn);
+                if (bonus->isActive(0, time_info))
+                    bonus->reportTime(0, bonus_buf);
+            }
         }
 
         bonus_str = bonus_buf.str();

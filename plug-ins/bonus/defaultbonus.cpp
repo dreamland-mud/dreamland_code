@@ -90,7 +90,10 @@ void DefaultBonus::reportAction(PCharacter *ch, ostringstream &buf) const
 
 void DefaultBonus::reportTime(PCharacter *ch, ostringstream &buf) const
 {
-    lang_t lang = ch ? Player::lang(ch) : LANG_DEFAULT;
+    // No recipient (e.g. the Discord day-bonus relay) resolves through
+    // viewerLang(), so a ForcedViewerLang scope can pin the render language;
+    // unforced it is LANG_DEFAULT, byte-identical to before.
+    lang_t lang = ch ? Player::lang(ch) : viewerLang(ch);
 
     if (activeForPlayer(ch, time_info))
         buf << fmt(0, msgTodayReligion.getForLang(lang).c_str(), ch->getReligion()->getNameFor(ch).c_str());
