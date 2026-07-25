@@ -450,8 +450,7 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
     }
 
     ch->lines = lines;
-    ch->pecho( _("Вывод установлен на %d лин%s."), lines,
-                GET_COUNT(lines, "ию","ии","ий") );
+    ch->pecho( _("Вывод установлен на %1$d лин%1$Iию|ии|ий."), lines );
 }
 
 /**
@@ -557,17 +556,19 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
     }
 
     if (discord["id"].asString().empty()) {
-        buf << "Для связи этого персонажа с пользователем Discord: " << endl
-            << "  {W*{x зайди на сервер {hlhttps://discord.gg/fVtaeePyey{x" << endl
-            << "  {W*{x зайди на канал {W#дрим-чат{x или открой приват с ботом {WВалькирия{x" << endl
-            << "  {W*{x набери {W/link " << discord["token"].asString() << "{x" << endl
-            << "Для смены секретного слова набери {hc{yрежим дискорд очистить{x." << endl;
+        buf << l(ch, "Для связи этого персонажа с пользователем Discord: ") << endl
+            << l(ch, "  {W*{x зайди на сервер {hlhttps://discord.gg/fVtaeePyey{x") << endl
+            << l(ch, "  {W*{x зайди на канал {W#дрим-чат{x или открой приват с ботом {WВалькирия{x") << endl
+            << fmt(ch, _("  {W*{x набери {W/link %s{x"), discord["token"].asString().c_str()) << endl
+            << l(ch, "Для смены секретного слова набери {hc{yрежим дискорд очистить{x.") << endl;
     } else {
-        buf << "Твой персонаж связан с пользователем {C" << discord["username"].asString() << "{w ({C" 
-            << discord["id"].asString() << "{w), статус " << discord["status"].asString() << endl;
-        buf << "Для повторной линковки набери {W/link " << discord["token"].asString() <<"{x в привате с ботом {WВалькирия{x" << endl
-            << "Для очистки и смены секретного слова набери {hc{yрежим дискорд очистить{x."
-            << endl;
+        buf << fmt(ch, _("Твой персонаж связан с пользователем {C%s{w ({C%s{w), статус %s"),
+                   discord["username"].asString().c_str(),
+                   discord["id"].asString().c_str(),
+                   discord["status"].asString().c_str()) << endl;
+        buf << fmt(ch, _("Для повторной линковки набери {W/link %s{x в привате с ботом {WВалькирия{x"),
+                   discord["token"].asString().c_str()) << endl
+            << l(ch, "Для очистки и смены секретного слова набери {hc{yрежим дискорд очистить{x.") << endl;
     }
 
     ch->send_to(buf);
