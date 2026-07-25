@@ -261,7 +261,10 @@ void auction_update (void)
                     auction->buyer, auction->item, auction->bet);                           
                 talk_auction(_("{1{C%1$^C1 {Yпокупает {2%2$O4{1 за %3$d золот%3$Iую|ых|ых монет%3$Iу|ы|{2."),
                     auction->buyer, auction->item, auction->bet);
-                send_to_discord_stream(":moneybag: " + msg);
+                // Discord relay in English (%O renders the item's EN short_descr).
+                send_to_discord_stream(":moneybag: " + fmtLang(LANG_EN,
+                    _("{1{C%1$^C1 {Yпокупает {2%2$O4{1 за %3$d золот%3$Iую|ых|ых монет%3$Iу|ы|{2."),
+                    auction->buyer, auction->item, auction->bet));
                 send_telegram(msg);
                 obj_to_char (auction->item,auction->buyer);
                 oldact_p(_("Из дымки появляется аукционер и передает тебе $o4."),
@@ -586,7 +589,9 @@ CMDRUNP( auction )
 
                         msg = fmt(0, _("{1{YНа аукцион выставлен новый лот -- {2%O1!"), auction->item);                           
                         talk_auction(_("{1{YНа аукцион выставлен новый лот -- {2%O1!"), auction->item);
-                        send_to_discord_stream(":moneybag: " + msg);
+                        // Discord relay in English (%O renders the item's EN short_descr).
+                        send_to_discord_stream(":moneybag: " + fmtLang(LANG_EN,
+                            _("{1{YНа аукцион выставлен новый лот -- {2%O1!"), auction->item));
                         send_telegram(msg);
 
                         if (auction->startbet == 0)
