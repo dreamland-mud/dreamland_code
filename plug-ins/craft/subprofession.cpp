@@ -248,8 +248,10 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
         wiznet(WIZ_LEVELS, 0, 0, 
                   "%1$#C1 дости%1$#Gгло|г|гла %2$d уровня в профессии %3$N2!", 
                   ch, level, getRusName().c_str());
-        send_discord_orb(":tools: " + fmt(0, _("%1$#C1 дости%1$#Gгло|г|гла нового уровня мастерства в профессии %2$N2."),
-                            ch, getRusName().c_str()));
+        // Discord relay in English; getName() is the profession's English name
+        // (%s), so no %N russian-case declension -- that only works for RU.
+        send_discord_orb(":tools: " + fmtLang(LANG_EN, _("%1$#C1 reached a new level of mastery as a %2$s."),
+                            ch, getName().c_str()));
     }
 
     ch->updateSkills();
