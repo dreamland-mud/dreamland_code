@@ -365,8 +365,8 @@ static void weather_broadcast( const DLString &eventId, int noFlag )
 void sunlight_update( )
 {
     DLString lightEvent;
-    DLString calByLang[LANG_MAX]; // calendar rollover text, one build per viewer language
-    string bonus_str;             // new-day bonus report (RU; bonus subsystem -- Phase 2)
+    DLString calByLang[LANG_MAX];   // calendar rollover text, one build per viewer language
+    DLString bonusByLang[LANG_MAX]; // new-day bonus report, one build per viewer language
     int this_season = month_table[time_info.month].season;
     int this_day = time_info.day;
     int this_month = time_info.month;
@@ -455,23 +455,28 @@ void sunlight_update( )
         }
     }
 
-    // Output new day's bonus (RU; bonus subsystem localization -- Phase 2).
+    // New day's bonus: render it once per language for the per-viewer in-game
+    // broadcast below, and relay the English variant to Discord. (Building it
+    // only in English and reusing that for the in-game loop leaked English to
+    // RU/UA players.)
     if (this_day != time_info.day) {
-        ostringstream bonus_buf;
-        {
-            // Discord bonus relay is English; force the render language for these
-            // no-recipient reportTime() calls (resolves via viewerLang()).
-            ForcedViewerLang forced(LANG_EN);
-            for (int bn = 0; bn < bonusManager->size(); bn++) {
-                Bonus *bonus = bonusManager->find(bn);
-                if (bonus->isActive(0, time_info))
-                    bonus->reportTime(0, bonus_buf);
+        for (int lg = LANG_MIN; lg < LANG_MAX; lg++) {
+            ostringstream bonus_buf;
+            {
+                // reportTime(0) has no recipient, so it resolves the render
+                // language through viewerLang() -- pin it per iteration.
+                ForcedViewerLang forced((lang_t)lg);
+                for (int bn = 0; bn < bonusManager->size(); bn++) {
+                    Bonus *bonus = bonusManager->find(bn);
+                    if (bonus->isActive(0, time_info))
+                        bonus->reportTime(0, bonus_buf);
+                }
             }
+            bonusByLang[lg] = bonus_buf.str();
         }
 
-        bonus_str = bonus_buf.str();
-        if (!bonus_str.empty())
-            send_discord_bonus(bonus_str);
+        if (!bonusByLang[LANG_EN].empty())
+            send_discord_bonus(bonusByLang[LANG_EN]);
     }
 
     // Daylight transition -> random multilingual variant from weather.xml,
@@ -479,9 +484,8 @@ void sunlight_update( )
     if (!lightEvent.empty())
         weather_broadcast(lightEvent, ROOM_NO_TIME);
 
-    // Calendar rollover -> each viewer's own language; the new-day bonus report
-    // (bonus_str) is still RU (bonus subsystem -- Phase 2). Sent to every awake
-    // player in a non-timeless room, indoors included, as before.
+    // Calendar rollover + new-day bonus -> each viewer's own language. Sent to
+    // every awake player in a non-timeless room, indoors included, as before.
     for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
         if (d->connected != CON_PLAYING)
             continue;
@@ -492,7 +496,7 @@ void sunlight_update( )
             && !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
         {
             DLString out = calByLang[viewerLang(ch)];
-            out += bonus_str;
+            out += bonusByLang[viewerLang(ch)];
             if (!out.empty())
                 ch->send_to(out);
         }
