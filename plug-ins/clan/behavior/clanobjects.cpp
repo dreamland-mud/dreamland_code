@@ -30,6 +30,19 @@
 
 PROF(none);
 
+// Display-only Title Case for the EN clan name, sourced from the shortName tag
+// (always populated). An ALL-CAPS code (BATTLERAGER) becomes Battlerager; an
+// already mixed-case name (Flower Children) is left as-is. NEVER derived from
+// getName() -- that is the clan identity key (pfiles, diplomacy maps); this is
+// display only, fed to the %w LangText for Discord/EN rendering.
+static DLString clanNameEn( const DLString &shortName )
+{
+    DLString n = shortName;
+    if (n.find_first_of("abcdefghijklmnopqrstuvwxyz") == DLString::npos)
+        return n.capitalize( );
+    return n;
+}
+
 /*--------------------------------------------------------------------------
  * Clan Object (base class)
  *-------------------------------------------------------------------------*/
@@ -170,10 +183,16 @@ bool ClanAltar::fetch( Character *ch, Object *item )
     if (clan->getData( ))
         clan->getData( )->unsetItem( item );
 
-    DLString what = fmt(0, _("{WКлан %N1 утратил свою святыню.{x"), clanArea->getClan()->getRussianName().c_str());
-    infonet(0, 0, "{CЕхидный голос из $o2: ", what.c_str());
-    send_discord_clan(what);
-    send_telegram(what);
+    // Per-viewer clan name via a %w LangText: EN Title-Case tag, RU/UA declined
+    // pads. Resolves per recipient in infonet(MM) and to the fixed language in
+    // fmtLang() for Discord=EN / Telegram=RU. RU byte-identical (%N == ruscase).
+    DLString cnEn = clanNameEn(clanArea->getClan()->getShortName());
+    DLString cnRu = clanArea->getClan()->getRussianName().ruscase('1');
+    DLString cnUa = clanArea->getClan()->getUkrainianName().ruscase('1');
+    LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
+    infonet((Character*)0, 0, _("{CЕхидный голос из $o2: {WКлан %w утратил свою святыню.{x"), &clanName);
+    send_discord_clan(fmtLang(LANG_EN, _("{WКлан %w утратил свою святыню.{x"), &clanName));
+    send_telegram(fmtLang(LANG_RU, _("{WКлан %w утратил свою святыню.{x"), &clanName));
 
     extract_obj(obj);
     return true;
