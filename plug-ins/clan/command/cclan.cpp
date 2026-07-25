@@ -41,6 +41,17 @@ CLAN(none);
 
 using namespace std;
 
+// Display-only Title Case for the EN clan name from the shortName tag (always
+// populated). NEVER from getName() -- that is the clan identity key (pfiles,
+// diplomacy maps). Fed to the %w LangText for per-viewer / Discord=EN rendering.
+static DLString clanNameEn( const DLString &shortName )
+{
+    DLString n = shortName;
+    if (n.find_first_of("abcdefghijklmnopqrstuvwxyz") == DLString::npos)
+        return n.capitalize( );
+    return n;
+}
+
 #define OBJ_VNUM_DIAMOND          3377
 
 enum {
@@ -972,14 +983,19 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
 
     // Notify about level upgrades otherwise noticeable in 'who'.
     if (oldLevel < i && clan.isRecruiter(victim)) {
-        DLString what = fmt(0, _("{W%s становится %s %s.{x"), 
-            victim->getNameP('1').c_str(),
-            (clan.isLeader(victim) ? "лидером" : "рекрутером"),
-            clan.getRussianName().ruscase('2').c_str());
-
-        infonet(pcVictim, 0, "{CТихий голос из $o2: ", what.c_str());
-        send_discord_clan(what);
-        send_telegram(what);
+        DLString cnEn = clanNameEn(clan.getShortName());
+        DLString cnRu = clan.getRussianName().ruscase('2');
+        DLString cnUa = clan.getUkrainianName().ruscase('2');
+        LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
+        if (clan.isLeader(victim)) {
+            infonet(pcVictim, 0, _("{CТихий голос из $o2: {W%C1 становится лидером %w.{x"), victim, &clanName);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%C1 становится лидером %w.{x"), victim, &clanName));
+            send_telegram(fmtLang(LANG_RU, _("{W%C1 становится лидером %w.{x"), victim, &clanName));
+        } else {
+            infonet(pcVictim, 0, _("{CТихий голос из $o2: {W%C1 становится рекрутером %w.{x"), victim, &clanName);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%C1 становится рекрутером %w.{x"), victim, &clanName));
+            send_telegram(fmtLang(LANG_RU, _("{W%C1 становится рекрутером %w.{x"), victim, &clanName));
+        }
     }
 }
 
@@ -1233,10 +1249,13 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
         if (!found)
             pc->pecho(_("(сейчас в мире нет никого из руководства этого клана)"));
 
-        DLString what = fmt(0, _("{W%1$^C1 подал%1$Gо||а петицию в %s.{x"), pc, clan->getRussianName( ).ruscase('4').c_str());
-        infonet(pc, 0, "{CТихий голос из $o2: ", what.c_str());
-        send_discord_clan(what);
-        send_telegram(what);
+        DLString cnEn = clanNameEn(clan->getShortName());
+        DLString cnRu = clan->getRussianName().ruscase('4');
+        DLString cnUa = clan->getUkrainianName().ruscase('4');
+        LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
+        infonet(pc, 0, _("{CТихий голос из $o2: {W%1$^C1 подал%1$Gо||а петицию в %w.{x"), pc, &clanName);
+        send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 подал%1$Gо||а петицию в %w.{x"), pc, &clanName));
+        send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 подал%1$Gо||а петицию в %w.{x"), pc, &clanName));
     }
 }
 
@@ -1319,15 +1338,20 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
         PCharacterManager::saveMemory( victim );
     
     if (victim->getLevel() <= LEVEL_MORTAL) {
-        DLString what;
-        if (victim->getClan() == clan_none)
-            what = fmt(0, _("{W%s становится внекланов%s.{x"), victim->getNameP('1').c_str(), GET_SEX(victim, "ым", "ым", "ой"));
-        else
-            what = fmt(0, _("{W%s вступает в %s.{x"), victim->getNameP('1').c_str(), clan.getRussianName( ).ruscase('4').c_str());
-            
-        infonet(victim->getPlayer(), 0, "{CТихий голос из $o2: ", what.c_str());
-        send_discord_clan(what);
-        send_telegram(what);
+        if (victim->getClan() == clan_none) {
+            infonet(victim->getPlayer(), 0, _("{CТихий голос из $o2: {W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim));
+            send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim));
+        }
+        else {
+            DLString cnEn = clanNameEn(clan.getShortName());
+            DLString cnRu = clan.getRussianName().ruscase('4');
+            DLString cnUa = clan.getUkrainianName().ruscase('4');
+            LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
+            infonet(victim->getPlayer(), 0, _("{CТихий голос из $o2: {W%1$^C1 вступает в %w.{x"), victim, &clanName);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 вступает в %w.{x"), victim, &clanName));
+            send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 вступает в %w.{x"), victim, &clanName));
+        }
     }
 }
 
