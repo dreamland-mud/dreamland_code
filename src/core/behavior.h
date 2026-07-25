@@ -40,6 +40,8 @@ public:
     virtual const DLString &getName() const;
     virtual bool isValid() const;
     virtual const DLString &getRussianName() const;
+    // Ukrainian display name, falls back to the Russian one when unset.
+    virtual const DLString &getUkrainianName() const;
 
     // Behavior description in the viewer's language (falls back RU->EN).
     const DLString & getDescription( lang_t lang = LANG_DEFAULT ) const
@@ -51,6 +53,8 @@ public:
     XML_VARIABLE XMLInteger id;
 
     XML_VARIABLE XMLString nameRus;
+
+    XML_VARIABLE XMLString nameUa;
 
     XML_VARIABLE XMLMultiString description;
 

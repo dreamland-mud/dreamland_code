@@ -35,7 +35,32 @@ DLString BehaviorHelp::getTitle(const DLString &label) const
     if (!title.get(RU).empty() || !bhv)
         return MarkupHelpArticle::getTitle(label);
 
-    buf << "Поведение {c" << bhv->getRussianName().ruscase('1') << "{x";
+    // In-game header: just the behavior's name, capitalized. No "Поведение"
+    // prefix -- players don't know what "behaviors" are. Per-viewer name is
+    // handled by the lang-aware override below; this path is the RU default.
+    buf << "{c" << bhv->getRussianName().ruscase('1').upperFirstCharacter() << "{x";
+    return buf.str();
+}
+
+DLString BehaviorHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    // Website surfaces (toc/title), an explicitly-set <title>, or no behavior:
+    // keep the base rendering (toc keeps its "Поведение '...'" grouping).
+    if (label == "toc" || label == "title" || !title.get(RU).empty() || !bhv)
+        return HelpArticle::getTitle(label, lang);
+
+    // In-game player help header: the behavior's name in the viewer's language,
+    // capitalized, with NO "Поведение" prefix.
+    DLString nm;
+    if (lang == LANG_EN)
+        nm = bhv->getName();            // latin keyword, e.g. "cuisinart"
+    else if (lang == LANG_UA)
+        nm = bhv->getUkrainianName();   // UA name, falls back to RU
+    else
+        nm = bhv->getRussianName();
+
+    ostringstream buf;
+    buf << "{c" << nm.ruscase('1').upperFirstCharacter() << "{x";
     return buf.str();
 }
 
