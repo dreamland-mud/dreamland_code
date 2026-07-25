@@ -8,6 +8,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlvector.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlinteger.h"
 #include "plugin.h"
 
@@ -33,8 +34,8 @@ public:
 
     inline const DLString& getStartMsg( );
     inline const DLString& getInfoMsg( );
-    inline const DLString& getRewardMsg( );
-    inline const DLString& getWinnerMsg( );
+    inline const DLString& getRewardMsg( lang_t lang = LANG_DEFAULT );
+    inline const DLString& getWinnerMsg( lang_t lang = LANG_DEFAULT );
     inline const DLString& getWinnerMsgOther( );
     inline const DLString& getWinnerMsgOtherMlt( );
     inline const DLString& getNoWinnerMsg( );
@@ -47,8 +48,8 @@ public:
 protected:
     XML_VARIABLE XMLString startMsg;
     XML_VARIABLE XMLString infoMsg;
-    XML_VARIABLE XMLString rewardMsg;
-    XML_VARIABLE XMLString winnerMsg;
+    XML_VARIABLE XMLMultiString rewardMsg;
+    XML_VARIABLE XMLMultiString winnerMsg;
     XML_VARIABLE XMLString winnerMsgOther;
     XML_VARIABLE XMLString winnerMsgOtherMlt;
     XML_VARIABLE XMLString noWinnerMsg;
@@ -83,13 +84,13 @@ inline const DLString& InvasionScenario::getInfoMsg( )
 {
     return infoMsg.getValue( );
 }
-inline const DLString& InvasionScenario::getRewardMsg( )
+inline const DLString& InvasionScenario::getRewardMsg( lang_t lang )
 {
-    return rewardMsg.getValue( );
+    return rewardMsg.getForLang( lang );
 }
-inline const DLString& InvasionScenario::getWinnerMsg( )
+inline const DLString& InvasionScenario::getWinnerMsg( lang_t lang )
 {
-    return winnerMsg.getValue( );
+    return winnerMsg.getForLang( lang );
 }
 inline const DLString& InvasionScenario::getWinnerMsgOther( )
 {

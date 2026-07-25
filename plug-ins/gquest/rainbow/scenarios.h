@@ -8,6 +8,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlvector.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlinteger.h"
 #include "plugin.h"
 
@@ -37,7 +38,7 @@ public:
     inline const DLString& getDisplayName( ) const;
     inline const DLString& getStartMsg( ) const;
     inline const DLString& getRewardMsg( ) const;
-    inline const DLString& getWinnerMsg( ) const;
+    inline const DLString& getWinnerMsg( lang_t lang = LANG_DEFAULT ) const;
     inline const DLString& getNoWinnerMsg( ) const;
     inline const DLString& getInfoMsg( ) const;
     inline int  getInitTime( ) const;
@@ -59,7 +60,7 @@ protected:
     XML_VARIABLE XMLString displayName;
     XML_VARIABLE XMLString startMsg;
     XML_VARIABLE XMLString infoMsg;
-    XML_VARIABLE XMLString winnerMsg;
+    XML_VARIABLE XMLMultiString winnerMsg;
     XML_VARIABLE XMLString noWinnerMsg;
     XML_VARIABLE XMLInteger initTime;
     XML_VARIABLE XMLInteger pieceVnum;
@@ -106,9 +107,9 @@ inline const DLString& RainbowScenario::getNoWinnerMsg( ) const
 {
     return noWinnerMsg.getValue( );
 }
-inline const DLString& RainbowScenario::getWinnerMsg( ) const
+inline const DLString& RainbowScenario::getWinnerMsg( lang_t lang ) const
 {
-    return winnerMsg.getValue( );
+    return winnerMsg.getForLang( lang );
 }
 inline int RainbowScenario::getInitTime( ) const
 {
