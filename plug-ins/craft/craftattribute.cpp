@@ -6,6 +6,8 @@
 #include "regcontainer.h"
 #include "subprofession.h"
 #include "pcharacter.h"
+#include "act.h"
+#include "l10n.h"
 
 using namespace Scripting;
 
@@ -25,8 +27,8 @@ bool XMLAttributeCraft::handle( const WhoisArguments &args )
     if (proficiency.empty())
         return false;
 
-    buf << "владеет профессиями: ";
-    
+    buf << l(args.looker, "владеет профессиями: ");
+
     StringList pnames;
     Proficiency::const_iterator p;
     for (p = proficiency.begin(); p != proficiency.end(); p++) {
@@ -54,12 +56,14 @@ bool XMLAttributeCraft::handle( const ScoreArguments &args )
         if (prof) {
             ostringstream buf;
 
-            buf << "Профессия: " << prof->getNameFor(args.pch) << " уровня " << p->second.level;
+            buf << fmt(args.pch, _("Профессия: %1$s уровня %2$d"),
+                      prof->getNameFor(args.pch).c_str(), p->second.level);
             if (p->second.level >= prof->getMaxLevel()) {
-                buf << " (максимальный уровень)";
+                buf << l(args.pch, " (максимальный уровень)");
             } else {
                 ExperienceCalculator::Pointer calc = prof->getCalculator(args.pch);
-                buf << ", опыта до уровня " << calc->expToLevel() << "/" << calc->expThisLevel();
+                buf << fmt(args.pch, _(", опыта до уровня %1$d/%2$d"),
+                          calc->expToLevel(), calc->expThisLevel());
             }
             args.lines.push_back( buf.str() );
         }
