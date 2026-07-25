@@ -299,33 +299,16 @@ void UndefinedOneHit::damEffectVorpal()
 /*-----------------------------------------------------------------------------
  * Trilingual attack nouns (Trello 2594)
  *
- * attack_table keeps the RU noun (byte-identical); en/ua forms live in
- * config/fight/attack_nouns.json, indexed 1:1 with attack_table. A RU viewer --
- * or any viewer with a missing en/ua cell -- gets the RU InflectedString exactly
- * as before, so this is zero-regression.
+ * attack_table keeps the RU noun (byte-identical); the en/ua forms live in
+ * config/fight/attack_nouns.json and are loaded + exposed by fight_core
+ * (attacks.cpp: attack_noun_en/attack_noun_ua), shared with the Fenia
+ * ObjectWrapper identify bindings. A RU viewer -- or any viewer with a missing
+ * en/ua cell -- gets the RU InflectedString exactly as before (zero-regression).
  *----------------------------------------------------------------------------*/
-struct AttackNounRow {
-    DLString en, ua;
-    void fromJson(const Json::Value &v)
-    {
-        en = v["en"].asString();
-        ua = v["ua"].asString();
-    }
-};
-static json_vector<AttackNounRow> attackNouns;
-
-CONFIGURABLE_LOADED(fight, attack_nouns)
-{
-    attackNouns.fromJson(value);
-}
-
 void UndefinedOneHit::message( )
 {
-    DLString en, ua;
-    if (attack >= 0 && attack < (int)attackNouns.size()) {
-        en = attackNouns[attack].en;
-        ua = attackNouns[attack].ua;
-    }
+    DLString en = attack_noun_en(attack);
+    DLString ua = attack_noun_ua(attack);
     MultiInflectedString noun(attack_table[attack].noun, en, ua,
                               attack_table[attack].gender);
 
