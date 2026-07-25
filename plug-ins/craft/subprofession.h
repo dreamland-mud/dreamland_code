@@ -88,6 +88,7 @@ public:
     virtual DLString getNameFor( Character *, const Grammar::Case & = Grammar::Case::NONE ) const;
     inline virtual const DLString &getRusName( ) const;
     inline virtual const DLString &getMltName( ) const;
+    inline virtual const DLString &getUaName( ) const;
     virtual void setLevel( PCharacter *, int level = -1 ) const;
     virtual int getLevel( PCharacter * ) const;
     inline virtual int getBaseExp( ) const;
@@ -97,7 +98,7 @@ public:
     virtual void gainExp( PCharacter *ch, int xp ) const;
     
 protected:
-    XML_VARIABLE XMLString  name, rusName, mltName;
+    XML_VARIABLE XMLString  name, rusName, mltName, uaName;
     XML_VARIABLE XMLInteger baseExp;
     XML_VARIABLE XMLInteger maxLevel;
     XML_VARIABLE XMLPointerNoEmpty<CraftProfessionHelp> help;
@@ -122,6 +123,11 @@ inline const DLString & CraftProfession::getRusName( ) const
 inline const DLString &CraftProfession::getMltName( ) const
 {
     return mltName;
+}
+
+inline const DLString &CraftProfession::getUaName( ) const
+{
+    return uaName;
 }
 
 inline int CraftProfession::getBaseExp( ) const
