@@ -749,7 +749,7 @@ NMI_INVOKE(Root, infonetML, "(ch, fmt, args...): как infonet, но fmt (об�
         return Register( );
 
     Descriptor *d;
-    Object *obj;
+    ::Object *obj;   // disambiguate from Scripting::Object in this plugin's scope
     for (d = descriptor_list; d != 0; d = d->next) {
         if (!d->character || d->connected != CON_PLAYING)
             continue;
