@@ -32,6 +32,17 @@
 #include "def.h"
 #include "l10n.h"
 
+// Display-only Title Case for the EN clan name from the shortName tag (always
+// populated). NEVER from getName() -- that is the clan identity key. Fed to the
+// %w LangText for per-viewer / Discord=EN rendering.
+static DLString clanNameEn( const DLString &shortName )
+{
+    DLString n = shortName;
+    if (n.find_first_of("abcdefghijklmnopqrstuvwxyz") == DLString::npos)
+        return n.capitalize( );
+    return n;
+}
+
 CLAN(battlerager);
 CLAN(none);
 CLAN(flowers);
@@ -93,10 +104,13 @@ bool ClanGuard::death( Character *killer )
     if (!clanArea)
         return false;
 
-    DLString what = clanArea->getClan()->getRussianName( ).ruscase('3') + " {Wне удалось удержать оборону.{x";
-    infonet(0, 0, "{CТихий голос из $o2: ", what.c_str());
-    send_discord_clan(what);
-    send_telegram(what);
+    DLString cnEn = clanNameEn(clanArea->getClan()->getShortName());
+    DLString cnRu = clanArea->getClan()->getRussianName().ruscase('3');
+    DLString cnUa = clanArea->getClan()->getUkrainianName().ruscase('3');
+    LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
+    infonet((Character*)0, 0, _("{CТихий голос из $o2: %w {Wне удалось удержать оборону.{x"), &clanName);
+    send_discord_clan(fmtLang(LANG_EN, _("%w {Wне удалось удержать оборону.{x"), &clanName));
+    send_telegram(fmtLang(LANG_RU, _("%w {Wне удалось удержать оборону.{x"), &clanName));
 
     return false;
 }
@@ -191,9 +205,12 @@ void ClanGuard::doNotify()
         return;
 
     ClanArea::Pointer clanArea = getClanArea();
-    DLString msg = "Территория " + clanArea->getClan()->getRussianName( ).ruscase('2') + "{x атакована!";
-    send_discord_clan(msg);
-    send_telegram(msg);
+    DLString cnEn = clanNameEn(clanArea->getClan()->getShortName());
+    DLString cnRu = clanArea->getClan()->getRussianName().ruscase('2');
+    DLString cnUa = clanArea->getClan()->getUkrainianName().ruscase('2');
+    LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
+    send_discord_clan(fmtLang(LANG_EN, _("Территория %w{x атакована!"), &clanName));
+    send_telegram(fmtLang(LANG_RU, _("Территория %w{x атакована!"), &clanName));
     lastNotified = now;
 }
 
