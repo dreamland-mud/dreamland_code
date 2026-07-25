@@ -130,8 +130,8 @@ void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int ti
     oldact(_("$c1 говорит тебе '{Gтак как в наше время без документа никуда, а заодно братишка поймет, что тебе можно доверять...{x'"), king, 0, hero, TO_VICT);
     oldact(_("$c1 вручает тебе $o4."), king, mark, hero, TO_VICT);
     oldact(_("$c1 вручает $C3 $o4."), king, mark, hero, TO_NOTVICT);
-    msg = fmt(0, _("$c1 говорит тебе '{GПо моим подсчетам у тебя есть {Y%d{G минут%s, пока идут приготовления к казни. "
-                  "Приведи его сюда.{x'"), time, GET_COUNT(time, "а", "ы", "") );
+    msg = fmt(hero, _("$c1 говорит тебе '{GПо моим подсчетам у тебя есть {Y%1$d{G минут%1$Iа|ы|, пока идут приготовления к казни. "
+                  "Приведи его сюда.{x'"), time );
     oldact(msg.c_str(), king, 0, hero, TO_VICT);
 }
 void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const 
@@ -232,9 +232,9 @@ void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int ti
 
     oldact(_("$c1 вручает тебе $o4."), king, mark, hero, TO_VICT);
     oldact(_("$c1 вручает $C3 $o4."), king, mark, hero, TO_NOTVICT);
-    msg = fmt(0, _("$c1 говорит тебе '{GУ тебя есть примерно {W%d{G минут%s, пока идут приготовления к казни. "
+    msg = fmt(hero, _("$c1 говорит тебе '{GУ тебя есть примерно {W%1$d{G минут%1$Iа|ы|, пока идут приготовления к казни. "
                   "Приведи его ко мне.{x'"),
-             time, GET_COUNT(time, "а", "ы", "") );
+             time );
     oldact(msg.c_str(), king, 0, hero, TO_VICT);
 }
 
