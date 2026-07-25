@@ -222,7 +222,7 @@ void send_discord_ic(Character *ch, const DLString &format, const DLString &msg)
 
 void send_discord_note_notify(const DLString &thread, const DLString &from, const DLString &subj)
 {
-    send_to_discord_stream(":envelope: " + thread.upperFirstCharacter() + " от " + from + " на тему: " + subj);
+    send_to_discord_stream(":envelope: " + thread.upperFirstCharacter() + " from " + from + " re: " + subj);
 }
 
 // Removed emoji from here to make other messages stand out more amidst in/out spam
