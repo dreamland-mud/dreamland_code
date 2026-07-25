@@ -17,6 +17,7 @@ struct material_t {
     json_flag<&material_flags> flags;
     json_flag<&imm_flags> vuln;
     DLString rname;
+    DLString uaname;
 
     void fromJson(const Json::Value &value);
 };

@@ -806,9 +806,14 @@ NMI_GET( MaterialWrapper, name, "английские названия" )
     return names;
 }
 
-NMI_GET( MaterialWrapper, nameRus, "русские названия с падежами" ) 
+NMI_GET( MaterialWrapper, nameRus, "русские названия с падежами" )
 {
     return material_rname(names.c_str());
+}
+
+NMI_GET( MaterialWrapper, nameUa, "украинские названия с падежами (откат на русский, если пусто)" )
+{
+    return material_uaname(names.c_str());
 }
 
 NMI_GET( MaterialWrapper, wood, "среди материалов есть дерево" )

@@ -17,6 +17,8 @@ int material_burns( Object * );
 int material_burns( const char * );
 DLString material_rname(Object *obj);
 DLString material_rname(const char *materials);
+DLString material_uaname(Object *obj);
+DLString material_uaname(const char *materials);
 
 enum {
     SWIM_UNDEF = 0,
