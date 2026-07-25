@@ -731,6 +731,37 @@ NMI_INVOKE(Root, infonet, "(msg, ch): выдать сообщение msg чер
     return Register( );
 }
 
+NMI_INVOKE(Root, infonetML, "(ch, fmt, args...): как infonet, но fmt (обычно ._(msg)) переводится в язык каждого получателя" )
+{
+    // Per-recipient info channel: same audience/pager loop as ::infonet(const char*)
+    // above, but the format is rendered per listener via regfmt (resolves a ._()
+    // MultiMessage into the viewer's language + its %N$ codes), then oldact_p
+    // resolves the $-codes ($o2 = reader's pager). ch is the actor, excluded and
+    // gating the immortal case, exactly like the const char* overload.
+    if (args.size( ) < 2)
+        throw Scripting::NotEnoughArgumentsException( );
+
+    RegisterList myArgs(args);
+    Character *ch = args2character( args );
+    myArgs.pop_front( );
+
+    if (ch && ch->is_immortal( ))
+        return Register( );
+
+    Descriptor *d;
+    Object *obj;
+    for (d = descriptor_list; d != 0; d = d->next) {
+        if (!d->character || d->connected != CON_PLAYING)
+            continue;
+        if (d->character == ch)
+            continue;
+        if (( obj = get_pager( d->character ) ))
+            oldact_p( regfmt( d->character, myArgs ).c_str( ), d->character, obj, ch, TO_CHAR, POS_DEAD );
+    }
+
+    return Register( );
+}
+
 NMI_INVOKE(Root, wiznet, "(msg[, trust[, wiztype]]): выдать сообщение msg по wiznet" )
 {
     DLString msg;
