@@ -169,6 +169,14 @@ public:
     virtual const InflectedString& getRussianName( ) const ;
     virtual void setRussianName( const DLString& ) ;
 
+    // Per-language name forms a player can set for themselves (T8 editor): an
+    // English (Latin) form and a declinable Ukrainian form. Empty => the cached
+    // noun falls back to romanising / the Russian form. See CachedNoun::update.
+    virtual const DLString& getEnglishName( ) const ;
+    virtual void setEnglishName( const DLString& ) ;
+    virtual const InflectedString& getUkrainianName( ) const ;
+    virtual void setUkrainianName( const DLString& ) ;
+
     virtual Remorts& getRemorts( ) ;
     virtual const Remorts& getRemorts( ) const ;
     virtual void setRemorts( const Remorts& ) ; 
@@ -250,6 +258,8 @@ private:
     XML_VARIABLE Remorts remorts;
     XML_VARIABLE XMLIntegerNoEmpty trust;
     XML_VARIABLE XMLInflectedString russianName;
+    XML_VARIABLE XMLString englishName;
+    XML_VARIABLE XMLInflectedString ukrainianName;
 
     XML_VARIABLE XMLStringNoEmpty title;
     XML_VARIABLE XMLStringNoEmpty pretitle;

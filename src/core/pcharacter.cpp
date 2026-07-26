@@ -160,11 +160,12 @@ void CachedNoun::update( PCharacter *ch )
     };
     MultiGender mg( ch->getSex( ), Number::SINGULAR );
 
-    /* plain english name. There is no separate EN name form yet (T8), so a
-       character created with a Cyrillic login otherwise leaks that Cyrillic to
-       English viewers; romanise it for a readable Latin default. A Latin login
-       transliterates to itself (byte-identical). */
-    DLString ename = String::translitToLatin( ch->getName( ) );
+    /* plain english name: the player's own English form if they set one (T8
+       editor), otherwise romanise the login so a Cyrillic name doesn't leak to
+       English viewers. A Latin login romanises to itself (byte-identical). */
+    DLString ename = ch->getEnglishName( );
+    if (ename.empty( ))
+        ename = String::translitToLatin( ch->getName( ) );
 
     if (name.find(LANG_EN) == name.end())
         name[LANG_EN] = InflectedString::Pointer( NEW, ename, mg );
@@ -185,9 +186,11 @@ void CachedNoun::update( PCharacter *ch )
         name[LANG_RU]->setGender( mg );
     }
 
-    /* UA name if set, defaults to previous values */
-    /* TODO add a way to set this name. */
-    DLString uaname = rname;
+    /* UA name: the player's own declinable Ukrainian form if they set one (T8
+       editor), otherwise fall back to the Russian form. */
+    DLString uaname = ch->getUkrainianName( ).getFullForm( );
+    if (uaname.empty( ))
+        uaname = rname;
     if (name.find(LANG_UA) == name.end())
         name[LANG_UA] = InflectedString::Pointer( NEW, uaname, mg );
     else {
@@ -647,9 +650,27 @@ const InflectedString& PCharacter::getRussianName( ) const
 {
     return russianName;
 }
-void PCharacter::setRussianName( const DLString& name ) 
+void PCharacter::setRussianName( const DLString& name )
 {
     russianName.setFullForm( name );
+    updateCachedNoun( );
+}
+const DLString& PCharacter::getEnglishName( ) const
+{
+    return englishName.getValue( );
+}
+void PCharacter::setEnglishName( const DLString& name )
+{
+    englishName.setValue( name );
+    updateCachedNoun( );
+}
+const InflectedString& PCharacter::getUkrainianName( ) const
+{
+    return ukrainianName;
+}
+void PCharacter::setUkrainianName( const DLString& name )
+{
+    ukrainianName.setFullForm( name );
     updateCachedNoun( );
 }
 int PCharacter::getStartRoom() const
