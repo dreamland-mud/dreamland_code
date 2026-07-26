@@ -91,7 +91,7 @@ void GQChannel::gecho( GlobalQuest *gq, const MultiMessage &msg, PCharacter *pch
     if (dreamland->isShutdown( ))
         return;
 
-    GlobalQuestInfo *gqi = GlobalQuestManager::getThis( )->findGlobalQuestInfo( gq->getQuestID( ) );
+    GlobalQuestInfo::Pointer gqi = GlobalQuestManager::getThis( )->findGlobalQuestInfo( gq->getQuestID( ) );
 
     for (d = descriptor_list; d; d = d->next) {
         if (d->connected != CON_PLAYING)
