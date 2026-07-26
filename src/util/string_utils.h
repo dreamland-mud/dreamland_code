@@ -29,6 +29,13 @@ namespace String {
     /** True if has at least one Cyrillic character. */
     bool hasCyrillic(const DLString &str);
 
+    /** Phonetic Cyrillic -> Latin transliteration (KOI8 chars). Used to
+     *  surface a readable Latin form of a Cyrillic name to English viewers
+     *  when no explicit English name form is set. Non-Cyrillic chars pass
+     *  through; the first output letter is capitalized (single-token names).
+     *  Lossy and one-directional -- meant for display defaults, not identity. */
+    DLString translitToLatin(const DLString &str);
+
     bool lessCase( const DLString &a, const DLString& b );
 
     /** True if arg is empty ignoring colours. */
