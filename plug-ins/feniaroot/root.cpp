@@ -179,7 +179,21 @@ NMI_INVOKE( Root, _, "(msg): пометить русскую строку msg к
     return Register( obj );
 }
 
-NMI_INVOKE( Root, print , "(msg): вывести строку msg в системные логи") 
+NMI_INVOKE( Root, mm, "(en, ru, ua): мультиязычное сообщение из трёх явных строк (в отличие от ._(ru) НЕ ищет в каталоге). Передавай как %s-аргумент act/echo -- резолвится на язык КАЖДОГО зрителя, поэтому годится для broadcast со склонённым именем собственным (бог, зона), которое нельзя занести в каталог.")
+{
+    DLString en = argnum2string( args, 1 );
+    DLString ru = argnum2string( args, 2 );
+    DLString ua = argnum2string( args, 3 );
+
+    MultiMessageWrapper::Pointer w( NEW );
+    w->initExplicit( en, ru, ua );
+
+    Scripting::Object *obj = &Scripting::Object::manager->allocate( );
+    obj->setHandler( w );
+    return Register( obj );
+}
+
+NMI_INVOKE( Root, print , "(msg): вывести строку msg в системные логи")
 {
     LogStream::sendNotice() << ">> " << args.front().toString() << endl;
     return Register();
