@@ -488,7 +488,7 @@ NMI_INVOKE(RoomWrapper, roomAt, "(ch,arg): доступная ch комната 
     return wrap(dest);
 }
 
-NMI_INVOKE( RoomWrapper, dirMsgLeave, "(имя или номер выхода): сообщение при уходе через этот выход (на север, на восток)" )
+NMI_INVOKE( RoomWrapper, dirMsgLeave, "(выход[, lang]): сообщение при уходе через этот выход (на север, на восток); с lang (0=en,1=ru,2=ua) вернёт слово направления на языке зрителя -- для per-viewer echo в комнате со смешанными языками" )
 {
     checkTarget( );
 
@@ -496,7 +496,13 @@ NMI_INVOKE( RoomWrapper, dirMsgLeave, "(имя или номер выхода): 
     if (door == -1)
         return Register();
 
-    return dirs[door].leave;
+    // With an explicit lang, return the viewer's leave-word so a room broadcast
+    // resolves per recipient; a bare call (lang absent -> LANG_DEFAULT) keeps RU.
+    switch (argnum2lang( args, 2 )) {
+    case LANG_EN: return dirs[door].name;      // English is caseless
+    case LANG_UA: return dirs[door].ua_leave;
+    default:      return dirs[door].leave;     // RU
+    }
 }
 
 NMI_INVOKE( RoomWrapper, dirMsgWhere, "(имя или номер выхода): где находится направление (на севере, внизу, на востоке)" )
