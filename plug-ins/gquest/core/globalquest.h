@@ -22,6 +22,7 @@ class NPCharacter;
 class Character;
 class Room;
 class Object;
+class MultiMessage;
 struct AreaIndexData;
 
 
@@ -55,6 +56,11 @@ public:
     inline virtual const DLString& getQuestID( ) const;
     virtual void getQuestDescription( std::ostringstream &, Character * ) const = 0;
     virtual void getQuestStartMessage( std::ostringstream & ) const = 0;
+    /* Per-viewer quest-start announcement. Default empty -> the start broadcast
+     * falls back to the RU getQuestStartMessage buffer (used by gangsters, whose
+     * start line interpolates a level range). A quest whose start message is
+     * pure flavor (invasion scenarios) overrides this to return a MultiMessage. */
+    virtual MultiMessage getStartBroadcast( ) const;
 
     inline int getElapsedTime( ) const;
     inline int getRemainingTime( ) const;

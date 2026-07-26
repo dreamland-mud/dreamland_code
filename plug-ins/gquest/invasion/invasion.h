@@ -39,6 +39,7 @@ public:
 
     virtual void getQuestDescription( std::ostringstream &, Character * ) const;
     virtual void getQuestStartMessage( std::ostringstream & ) const;
+    virtual MultiMessage getStartBroadcast( ) const;
 
     inline static InvasionGQuest* getThis( );
 
