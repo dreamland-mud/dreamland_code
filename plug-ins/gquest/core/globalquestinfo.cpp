@@ -89,10 +89,14 @@ void GlobalQuestInfo::tryStart( const GlobalQuestInfo::Config &config )
 
     gq->create( config );
     
-    gq->getQuestStartMessage( buf );
-
-    if (!buf.str( ).empty( ))
-        GQChannel::gecho( this, buf.str( ) );
+    MultiMessage startMM = gq->getStartBroadcast( );
+    if (!startMM.empty( )) {
+        GQChannel::gecho( *gq, startMM );
+    } else {
+        gq->getQuestStartMessage( buf );
+        if (!buf.str( ).empty( ))
+            GQChannel::gecho( this, buf.str( ) );
+    }
 
     gq->resume( );
     manager->saveRT( *gq );

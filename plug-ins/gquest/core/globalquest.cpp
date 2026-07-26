@@ -128,6 +128,11 @@ void GlobalQuest::clearAttributes( ) const
     }
 }
 
+MultiMessage GlobalQuest::getStartBroadcast( ) const
+{
+    return MultiMessage( );
+}
+
 void GlobalQuest::printRemainedTime( ostringstream &buf, Character *ch ) const
 {
     int t = getRemainingTime( );

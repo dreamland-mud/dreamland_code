@@ -237,6 +237,11 @@ void InvasionGQuest::getQuestStartMessage( std::ostringstream &buf ) const
     buf << getScenario( )->getStartMsg( ) << endl;
 }
 
+MultiMessage InvasionGQuest::getStartBroadcast( ) const
+{
+    return _( getScenario( )->getStartMsg( ) );
+}
+
 /*****************************************************************************/
 
 /*
@@ -270,9 +275,11 @@ void InvasionGQuest::rewardLeader( )
     }
     
     if (leaders.empty( )) {
-        buf << scen->getNoWinnerMsg( ) << endl;
+        GQChannel::gecho( this, _( scen->getNoWinnerMsg( ) ) );
+        return;
     }
-    else { 
+
+    {
         XMLReward reward;
 
         reward.qpoints = 200;
