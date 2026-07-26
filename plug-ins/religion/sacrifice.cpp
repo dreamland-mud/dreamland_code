@@ -379,7 +379,9 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
     
     PCharacter *pch = ch->getPC();
     const Religion &religion = *(pch->getReligion());
-    const char *rname = religion.getRussianName().c_str();
+    // Per-viewer deity pad: %N<case> then declines it in the recipient's language
+    // (RU nameRus / UA nameUa / EN caseless shortDescr). RU byte-identical.
+    const char *rname = religion.getNameFor(ch).c_str();
 
     if (religion.getIndex() == god_none) {
         ch->pecho(_("Но ты же закоренел%1$Gое|ый|ая атеист%1$G||ка."), ch);
@@ -547,7 +549,9 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 {
     PCharacter *pch = ch->getPC();
     const Religion &religion = *(pch->getReligion());
-    const char *rname = religion.getRussianName().c_str();
+    // Per-viewer deity pad: %N<case> then declines it in the recipient's language
+    // (RU nameRus / UA nameUa / EN caseless shortDescr). RU byte-identical.
+    const char *rname = religion.getNameFor(ch).c_str();
 
     if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
         rname = "бог|и|ов|ам|ов|ами|ах";
@@ -592,7 +596,9 @@ CMDRUNP( sacrifice )
     int mana_gain = -1;
     PCharacter *pch = ch->getPC();
     const Religion &religion = *(pch->getReligion());
-    const char *rname = religion.getRussianName().c_str();
+    // Per-viewer deity pad: %N<case> then declines it in the recipient's language
+    // (RU nameRus / UA nameUa / EN caseless shortDescr). RU byte-identical.
+    const char *rname = religion.getNameFor(ch).c_str();
 
     if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
         rname = "бог|и|ов|ам|ов|ами|ах";
