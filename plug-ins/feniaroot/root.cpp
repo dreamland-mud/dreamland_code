@@ -1615,7 +1615,7 @@ NMI_INVOKE(Root, config, "(name): read-only доступ до конфигура
 }
 
 
-NMI_INVOKE(Root, help, "(id): вернуть сырой текст статьи справки по id или исключение")
+NMI_INVOKE(Root, help, "(id[, ch]): вернуть текст статьи справки по id (на языке зрителя ch, если указан) или исключение")
 {
     int id = argnum2number(args, 1);
     HelpArticle::Pointer article = helpManager->getArticle(id);
@@ -1623,8 +1623,9 @@ NMI_INVOKE(Root, help, "(id): вернуть сырой текст статьи 
     if (article.isEmpty())
         throw Scripting::Exception("Help article with this ID not found");
 
-    DLString text = article->getText();
-    return Register(text); 
+    Character *ch = args.size( ) > 1 ? argnum2character(args, 2) : 0;
+    DLString text = article->getText(ch);
+    return Register(text);
 }
 
 NMI_INVOKE(Root, finger, "(ip): список (.List) имен персонажей, заходивших с этого IP адреса")

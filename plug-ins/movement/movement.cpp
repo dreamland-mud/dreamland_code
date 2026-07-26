@@ -118,10 +118,11 @@ void Movement::place( Character *wch )
             && !eyes_darkened( wch ))
     {
         int helpId = get_area_help_id(to_room->areaIndex());
+        DLString zoneName = to_room->areaIndex()->getName(viewerLang(wch), '1');
         if (helpId >= 0)
-            wch->pecho(_("Ты попадаешь в зону '{c{hh%d%s{x'.\r\n"), helpId, to_room->areaName().c_str());
+            wch->pecho(_("Ты попадаешь в зону '{c{hh%d%s{x'.\r\n"), helpId, zoneName.c_str());
         else
-            wch->pecho(_("Ты попадаешь в зону '{c{hh%s{x'.\r\n"), to_room->areaName().c_str());
+            wch->pecho(_("Ты попадаешь в зону '{c{hh%s{x'.\r\n"), zoneName.c_str());
     }
  
     if (doLook)

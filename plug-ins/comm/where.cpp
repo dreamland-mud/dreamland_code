@@ -26,7 +26,7 @@ static void format_where( Character *ch, Character *victim )
                 victim,
                 fPK  ? "({rPK{x)"  : "    ",
                 fAfk ? "[{CAFK{x]" : "     ",
-                victim->in_room->getName() );
+                victim->in_room->getName(viewerLang(ch)) );
 }
 
 static bool rprog_where( Character *ch, const char *arg )
@@ -67,7 +67,7 @@ CMDRUNP( where )
     if (arg.empty( ) || fPKonly)
     {
         ch->pecho( _("Ты находишься в зоне {W{hh%s{x. Недалеко от тебя:"),
-                     ch->in_room->areaName().c_str() );
+                     ch->in_room->areaIndex()->getName(viewerLang(ch), '1').c_str() );
         found = false;
 
         for ( d = descriptor_list; d; d = d->next )
