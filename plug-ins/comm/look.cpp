@@ -259,7 +259,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             if (obj->condition <= 99 )
                 buf << " [" << obj->get_cond_alias( lang ) << "]";
 
-        format_hint(buf, obj->getKeyword(), obj->getShortDescr(LANG_DEFAULT), ch, false);
+        format_hint(buf, obj->getKeyword(), obj->getShortDescr(viewerLang(ch)), ch, false);
     }
     else
     {
@@ -288,7 +288,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             }
 
             msg << "{x";
-            format_hint(msg, obj->getKeyword(), obj->getShortDescr(LANG_DEFAULT), ch, false);
+            format_hint(msg, obj->getKeyword(), obj->getShortDescr(viewerLang(ch)), ch, false);
 
             buf << fmt( ch, msg.str().c_str( ), obj, liq.c_str( ) );
         }
@@ -297,7 +297,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             if (longd.empty())
                 longd = obj->getDescription(LANG_DEFAULT);
             buf << "{" << CLR_OBJROOM(ch) << longd << "{x";
-            format_hint(buf, obj->getKeyword(), obj->getShortDescr(LANG_DEFAULT), ch, true);
+            format_hint(buf, obj->getKeyword(), obj->getShortDescr(viewerLang(ch)), ch, true);
         }
     }
 
@@ -699,7 +699,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
                 mlong = nVict->getLongDescr(LANG_DEFAULT);
 
             longd << mlong << "{x";
-            format_hint(longd, nVict->getKeyword(), nVict->getShortDescr(LANG_DEFAULT), ch, true);
+            format_hint(longd, nVict->getKeyword(), nVict->getShortDescr(viewerLang(ch)), ch, true);
                   
             buf << "{" << CLR_MOB(ch);
             webManipManager->decorateCharacter(buf, longd.str(), victim, ch);
@@ -735,7 +735,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     buf << "{2";
 
     if (nVict) {
-        format_hint(buf, nVict->getKeyword(), nVict->getShortDescr(LANG_DEFAULT), ch, false);
+        format_hint(buf, nVict->getKeyword(), nVict->getShortDescr(viewerLang(ch)), ch, false);
     }
 
     buf << " ";
