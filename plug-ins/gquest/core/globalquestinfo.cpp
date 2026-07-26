@@ -19,9 +19,15 @@
 #include "vnum.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(jail);
 HOMETOWN(frigate);
+
+const char * GlobalQuestInfo::getQuestNameFor( const Character *ch ) const
+{
+    return l( ch, getQuestName( ).c_str( ) );
+}
 
 /*---------------------------------------------------------------------------
  * GlobalQuestInfo

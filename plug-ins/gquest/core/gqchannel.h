@@ -15,6 +15,7 @@ class Character;
 class PCharacter;
 class GlobalQuest;
 class GlobalQuestInfo;
+class MultiMessage;
 
 class GQChannel {
 public:
@@ -25,6 +26,11 @@ public:
     static void gecho( GlobalQuest *, ostringstream & );
     static void gecho( const DLString& );
     static void gecho( const DLString&, const DLString&, PCharacter *pch = NULL);
+    /* Per-viewer variants: the message resolves in each recipient's display
+     * language (RU fallback), and the "[Global: <quest>]" frame + quest name
+     * are localized per viewer too. Mirrors clantalk(MultiMessage). */
+    static void gecho( GlobalQuest *, const MultiMessage&, PCharacter *pch = NULL);
+    static void gecho( const DLString& name, const MultiMessage&, PCharacter *pch = NULL);
     static void pecho( Character *, const DLString& );
     static void pecho( Character *, ostringstream& );
 

@@ -214,7 +214,7 @@ int RainbowGQuest::getTaskTime( ) const
 void RainbowGQuest::after( )
 {
     if (state == ST_INIT) {
-        GQChannel::gecho( this, getScenario( )->getStartMsg( ) );
+        GQChannel::gecho( this, _( getScenario( )->getStartMsg( ) ) );
         state = ST_RUNNING;
     }
     
@@ -231,12 +231,12 @@ void RainbowGQuest::report( std::ostringstream &buf, PCharacter *ch ) const
     cnt = countPieces( ch );
 
     if (cnt > 0)
-        getScenario( )->printCount( cnt, buf );
+        getScenario( )->printCount( cnt, buf, ch );
 
-    getScenario( )->printTime( buf );
+    getScenario( )->printTime( buf, ch );
 
-    if (ch->getAttributes().isAvailable(getQuestID())) 
-        buf << fmt(0, _("{RТы не сможешь больше принимать участие в задании, т.к. осквернил%Gо||а свои руки убийством.{x"), ch)
+    if (ch->getAttributes().isAvailable(getQuestID()))
+        buf << fmt(ch, _("{RТы не сможешь больше принимать участие в задании, т.к. осквернил%Gо||а свои руки убийством.{x"), ch)
             << endl;
 }
 
@@ -264,16 +264,16 @@ void RainbowGQuest::progress( std::ostringstream &ostr ) const
     }
 }
 
-void RainbowGQuest::getQuestDescription( std::ostringstream &str ) const
+void RainbowGQuest::getQuestDescription( std::ostringstream &str, Character *viewer ) const
 {
     Character *ch;
     NPCharacter *mob;
     int t = getRemainingTime( );
-    
+
     if (isHidden( ))
         return;
-   
-    str << getScenario( )->getInfoMsg( ) << endl << endl;
+
+    str << _( getScenario( )->getInfoMsg( ) ).getMessage( viewer ) << endl << endl;
     
     for (ch = char_list; ch; ch = ch->next) {
         if (!ch->is_npc( ))
@@ -310,7 +310,7 @@ bool RainbowGQuest::isHidden( ) const
 
 void RainbowGQuest::rewardNobody( ) 
 {
-    GQChannel::gecho( getDisplayName( ), getScenario( )->getNoWinnerMsg( ) );
+    GQChannel::gecho( getDisplayName( ), _( getScenario( )->getNoWinnerMsg( ) ) );
 }
 
 void RainbowGQuest::rewardWinner( )

@@ -120,18 +120,16 @@ bool RainbowDefaultScenario::checkRoom( Room *room ) const
     return RainbowScenario::checkRoom( room );
 }
 
-void RainbowDefaultScenario::printCount( int cnt, ostringstream& buf ) const
+void RainbowDefaultScenario::printCount( int cnt, ostringstream& buf, Character *ch ) const
 {
-    buf << "У тебя уже есть " << GQChannel::BOLD << cnt << GQChannel::NORMAL
-        << " разноцветн" << GET_COUNT(cnt, "ый", "ых", "ых")
-        << " кусоч" << GET_COUNT(cnt, "ек", "ка", "ков") << ". ";
+    buf << fmt( ch, _("У тебя уже есть {Y%1$d{y разноцветн%1$Iый|ых|ых кусоч%1$Iек|ка|ков. "), cnt );
 }
 
-void RainbowDefaultScenario::printTime( ostringstream& buf ) const
+void RainbowDefaultScenario::printTime( ostringstream& buf, Character *ch ) const
 {
-    buf << "Остается ";
-    RainbowGQuest::getThis( )->printRemainedTime( buf );
-    buf << ", чтобы собрать всю радугу." << endl;
+    buf << fmt( ch, _("Остается ") );
+    RainbowGQuest::getThis( )->printRemainedTime( buf, ch );
+    buf << fmt( ch, _(", чтобы собрать всю радугу.") ) << endl;
 }
 
 void RainbowDefaultScenario::printWinnerMsgOther( const DLString &name, ostringstream& buf ) const 
@@ -202,17 +200,15 @@ void RainbowSinsScenario::canStart( ) const
         throw GQCannotStartException( "won't start" );
 }
 
-void RainbowSinsScenario::printCount( int cnt, ostringstream& buf ) const
+void RainbowSinsScenario::printCount( int cnt, ostringstream& buf, Character *ch ) const
 {
-    buf << "Тебе удалось собрать " << GQChannel::BOLD << cnt << GQChannel::NORMAL
-        << " смертн" << GET_COUNT(cnt, "ый", "ых", "ых")
-        << " грех" << GET_COUNT(cnt, "", "а", "ов") << ". ";
+    buf << fmt( ch, _("Тебе удалось собрать {Y%1$d{y смертн%1$Iый|ых|ых грех%1$I|а|ов. "), cnt );
 }
 
-void RainbowSinsScenario::printTime( ostringstream& buf ) const
+void RainbowSinsScenario::printTime( ostringstream& buf, Character *ch ) const
 {
-    buf << "До закрытия вакансии остается ";
-    RainbowGQuest::getThis( )->printRemainedTime( buf );
+    buf << fmt( ch, _("До закрытия вакансии остается ") );
+    RainbowGQuest::getThis( )->printRemainedTime( buf, ch );
     buf << "." << endl;
 }
 

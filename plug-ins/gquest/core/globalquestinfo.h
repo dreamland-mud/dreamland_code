@@ -16,6 +16,7 @@
 
 class GlobalQuest;
 class PCharacter;
+class Character;
 
 /*---------------------------------------------------------------------------
  * GlobalQuestInfo
@@ -54,8 +55,13 @@ public:
     
     virtual const DLString & getQuestID( ) const = 0;
 
-    inline virtual const DLString & getQuestName( ) const;  
+    inline virtual const DLString & getQuestName( ) const;
     inline const DLString & getQuestShortDescr( ) const;
+    /* Quest name resolved in `ch`'s display language via the translation
+     * catalog (keyed to globalquestinfo.cpp) -- the name is a proper-noun label
+     * stored RU-only in the profile, so it is localized here rather than in the
+     * data file (which the running server re-saves on every quest start). */
+    const char * getQuestNameFor( const Character * ) const;
     inline int getLastTime( ) const;
     inline void setLastTime( int );
     inline int getWaitingTime( ) const;

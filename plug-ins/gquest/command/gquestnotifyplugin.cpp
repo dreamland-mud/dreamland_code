@@ -12,6 +12,7 @@
 #include "cgquest.h"
 
 #include "pcharacter.h"
+#include "act.h"
 #include "merc.h"
 #include "descriptor.h"
 #include "def.h"
@@ -47,17 +48,14 @@ void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d )
         if (!gq->isLevelOK( ch ))
             continue;
             
-        buf << "         Квест " 
-            << GQChannel::BOLD << "\""<< gqi->getQuestName( ) << "\""
-            << GQChannel::NORMAL << " (для ";
-            
         if (gq->hasLevels( ))
-            buf << GQChannel::BOLD << gq->getMinLevel( ) 
-                << "-" << gq->getMaxLevel( ) << GQChannel::NORMAL;
+            buf << fmt( ch, _("         Квест {Y\"%1$s\"{y (для {Y%2$d-%3$d{y уровней)"),
+                        gqi->getQuestNameFor( ch ), gq->getMinLevel( ), gq->getMaxLevel( ) )
+                << endl;
         else
-            buf << "всех";
-        
-        buf << " уровней)" << endl;
+            buf << fmt( ch, _("         Квест {Y\"%1$s\"{y (для всех уровней)"),
+                        gqi->getQuestNameFor( ch ) )
+                << endl;
     }
 
     if (!buf.str( ).empty( )) {

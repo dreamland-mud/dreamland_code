@@ -128,15 +128,14 @@ void GlobalQuest::clearAttributes( ) const
     }
 }
 
-void GlobalQuest::printRemainedTime( ostringstream &buf ) const
+void GlobalQuest::printRemainedTime( ostringstream &buf, Character *ch ) const
 {
     int t = getRemainingTime( );
 
     if (t > 0)
-        buf << GQChannel::BOLD << t << GQChannel::NORMAL
-            << " минут" << GET_COUNT( t, "а", "ы", "");
+        buf << fmt( ch, _("{Y%1$d{y минут%1$Iа|ы|"), t );
     else
-        buf << "меньше минуты";
+        buf << fmt( ch, _("меньше минуты") );
 }
 
 bool GlobalQuest::isLevelOK( Character *ch ) const

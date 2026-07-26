@@ -198,11 +198,11 @@ void InvasionGQuest::report( std::ostringstream &buf, PCharacter *ch ) const
     attr = ch->getAttributes( ).findAttr<XMLAttributeInvasion>( getQuestID( ) );
     
     if (attr && attr->getKilled( ) > 0)
-        buf << "Число уничтоженных тобой безобразий: " 
-            << GQChannel::BOLD <<  attr->getKilled( ) << GQChannel::NORMAL << endl;
-    
-    buf << "До конца охоты остается ";
-    printRemainedTime( buf );
+        buf << fmt( ch, _("Число уничтоженных тобой безобразий: {Y%1$d{y"), attr->getKilled( ) )
+            << endl;
+
+    buf << fmt( ch, _("До конца охоты остается ") );
+    printRemainedTime( buf, ch );
     buf << "." << endl;
 }
 
@@ -227,9 +227,9 @@ void InvasionGQuest::progress( std::ostringstream &ostr ) const
     }
 }
 
-void InvasionGQuest::getQuestDescription( std::ostringstream &buf ) const
+void InvasionGQuest::getQuestDescription( std::ostringstream &buf, Character *ch ) const
 {
-    buf << getScenario( )->getInfoMsg( ) << endl;
+    buf << _( getScenario( )->getInfoMsg( ) ).getMessage( ch ) << endl;
 }
 
 void InvasionGQuest::getQuestStartMessage( std::ostringstream &buf ) const
