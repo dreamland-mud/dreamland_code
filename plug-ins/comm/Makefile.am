@@ -34,6 +34,7 @@ drop.cpp \
 help.cpp \
 score.cpp \
 title.cpp \
+pcname.cpp \
 report.cpp \
 prompt.cpp \
 compare.cpp \
