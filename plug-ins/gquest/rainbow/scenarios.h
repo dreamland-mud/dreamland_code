@@ -18,6 +18,7 @@ class Room;
 struct AreaIndexData;
 class NPCharacter;
 class PCharacter;
+class Character;
 class Object;
 
 /*---------------------------------------------------------------------------
@@ -46,8 +47,8 @@ public:
     inline int getPiecesCount( ) const;
     virtual void dressItem( Object*, int ) const = 0;
 
-    virtual void printCount( int, ostringstream& ) const = 0;
-    virtual void printTime( ostringstream& ) const = 0;
+    virtual void printCount( int, ostringstream&, Character * ) const = 0;
+    virtual void printTime( ostringstream&, Character * ) const = 0;
     virtual void printWinnerMsgOther( const DLString &, ostringstream& ) const = 0;
     virtual void onGivePiece( PCharacter *, NPCharacter * ) const = 0;
     virtual void onQuestInit( ) const;
@@ -135,8 +136,8 @@ public:
     virtual void canStart( ) const ;
     virtual bool checkRoom( Room * ) const;
 
-    virtual void printCount( int, ostringstream& ) const;
-    virtual void printTime( ostringstream& ) const;
+    virtual void printCount( int, ostringstream&, Character * ) const;
+    virtual void printTime( ostringstream&, Character * ) const;
     virtual void printWinnerMsgOther( const DLString &, ostringstream& ) const;
     virtual void onGivePiece( PCharacter *, NPCharacter * ) const;
     virtual void onQuestFinish( PCharacter * ) const;
@@ -156,8 +157,8 @@ public:
     virtual void canStart( ) const ;
     virtual bool checkMobile( NPCharacter * ) const;
 
-    virtual void printCount( int, ostringstream& ) const;
-    virtual void printTime( ostringstream& ) const;
+    virtual void printCount( int, ostringstream&, Character * ) const;
+    virtual void printTime( ostringstream&, Character * ) const;
     virtual void printWinnerMsgOther( const DLString &, ostringstream& ) const;
     virtual void onGivePiece( PCharacter *, NPCharacter * ) const;
     virtual void onQuestFinish( PCharacter * ) const;

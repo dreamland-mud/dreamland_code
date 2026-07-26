@@ -9,11 +9,14 @@
 #include "globalquestinfo.h"
 
 #include "character.h"
+#include "pcharacter.h"
 #include "room.h"
 #include "dreamland.h"
 #include "messengers.h"
 #include "merc.h"
 #include "descriptor.h"
+#include "multimessage.h"
+#include "l10n.h"
 
 const char * const GQChannel::BOLD = "{Y";
 const char * const GQChannel::NORMAL = "{y";
@@ -81,15 +84,69 @@ void GQChannel::gecho( const DLString& name, const DLString& msg, PCharacter *pc
     send_telegram_gquest(name, msg);
 }
 
-void GQChannel::gecho( const DLString& msg ) 
+void GQChannel::gecho( GlobalQuest *gq, const MultiMessage &msg, PCharacter *pch )
+{
+    Descriptor *d;
+
+    if (dreamland->isShutdown( ))
+        return;
+
+    GlobalQuestInfo *gqi = GlobalQuestManager::getThis( )->findGlobalQuestInfo( gq->getQuestID( ) );
+
+    for (d = descriptor_list; d; d = d->next) {
+        if (d->connected != CON_PLAYING)
+            continue;
+
+        Character *ch = d->character;
+        if (!ch || (pch && pch == ch->getPC( )))
+            continue;
+
+        std::basic_ostringstream<char> buf;
+        buf << BOLD << "[" << NORMAL << l( ch, "Глобал" ) << BOLD << ": "
+            << NORMAL << gqi->getQuestNameFor( ch ) << BOLD << "] "
+            << NORMAL << msg.getMessage( ch ) << "{x" << endl;
+        ch->send_to( buf );
+    }
+
+    send_discord_gquest( gqi->getQuestName( ), msg.getRu( ) );
+    send_telegram_gquest( gqi->getQuestName( ), msg.getRu( ) );
+}
+
+void GQChannel::gecho( const DLString &name, const MultiMessage &msg, PCharacter *pch )
+{
+    Descriptor *d;
+
+    if (dreamland->isShutdown( ))
+        return;
+
+    for (d = descriptor_list; d; d = d->next) {
+        if (d->connected != CON_PLAYING)
+            continue;
+
+        Character *ch = d->character;
+        if (!ch || (pch && pch == ch->getPC( )))
+            continue;
+
+        std::basic_ostringstream<char> buf;
+        buf << BOLD << "[" << NORMAL << l( ch, "Глобал" ) << BOLD << ": "
+            << NORMAL << l( ch, name.c_str( ) ) << BOLD << "] "
+            << NORMAL << msg.getMessage( ch ) << "{x" << endl;
+        ch->send_to( buf );
+    }
+
+    send_discord_gquest( name, msg.getRu( ) );
+    send_telegram_gquest( name, msg.getRu( ) );
+}
+
+void GQChannel::gecho( const DLString& msg )
 {
     Descriptor *d;
     std::basic_ostringstream<char> buf;
-    
+
     if (dreamland->isShutdown( ))
         return;
-    
-    buf << BOLD << "[" << NORMAL << "Глобал" << BOLD << "] " 
+
+    buf << BOLD << "[" << NORMAL << "Глобал" << BOLD << "] "
         << NORMAL << msg << "{x" << endl;
     
     for ( d = descriptor_list; d; d = d->next ) 

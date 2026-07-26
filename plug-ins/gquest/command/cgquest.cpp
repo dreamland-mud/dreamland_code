@@ -141,7 +141,7 @@ void CGQuest::doInfo( PCharacter *ch )
             continue;
 
         buf << GQChannel::BOLD << "\"" << gqi->getQuestName( ) << "\"" << GQChannel::NORMAL << endl;
-        gq->getQuestDescription( buf );
+        gq->getQuestDescription( buf, ch );
         buf << GQChannel::NORMAL;
         gq->report( buf, ch );
         GQChannel::pecho( ch, buf );
@@ -172,16 +172,14 @@ void CGQuest::doProgress( PCharacter *ch )
         if (gq->isHidden( ))
             continue;
 
-        buf << GQChannel::NORMAL << "Квест "<< GQChannel::BOLD << "\""<< gqi->getQuestName( ) << "\""
-            << GQChannel::NORMAL << " (для ";
-            
         if (gq->hasLevels( ))
-            buf << GQChannel::BOLD << gq->getMinLevel( ) 
-                << "-" << gq->getMaxLevel( ) << GQChannel::NORMAL;
+            buf << fmt( ch, _("{yКвест {Y\"%1$s\"{y (для {Y%2$d-%3$d{y уровней)"),
+                        gqi->getQuestNameFor( ch ), gq->getMinLevel( ), gq->getMaxLevel( ) )
+                << endl;
         else
-            buf << "всех";
-        
-        buf << " уровней)" << endl;
+            buf << fmt( ch, _("{yКвест {Y\"%1$s\"{y (для всех уровней)"),
+                        gqi->getQuestNameFor( ch ) )
+                << endl;
         gq->progress( buf );
         GQChannel::pecho( ch, buf );
     }
@@ -227,7 +225,7 @@ void CGQuest::doVictory( PCharacter *ch )
     XMLAttributeGlobalQuest::Pointer gqAttr;
     int cnt = 0;
 
-    buf << "Твои победы в глобальных квестах:" << endl;
+    buf << fmt( ch, _("Твои победы в глобальных квестах:") ) << endl;
 
     gqAttr = ch->getAttributes( ).findAttr<XMLAttributeGlobalQuest>( "gquest" );
     if (gqAttr) {
@@ -240,14 +238,14 @@ void CGQuest::doVictory( PCharacter *ch )
 
             if (vct > 0) {
                 cnt++;
-                buf << GQChannel::BOLD << "\"" << gqi->getQuestName( ) << "\"" << GQChannel::NORMAL << endl
+                buf << GQChannel::BOLD << "\"" << gqi->getQuestNameFor( ch ) << "\"" << GQChannel::NORMAL << endl
                     << "    " << vct << endl << endl;
             }
         }
     }
     
-    if (cnt == 0) 
-        buf << "    ни одной, увы" << endl;
+    if (cnt == 0)
+        buf << fmt( ch, _("    ни одной, увы") ) << endl;
 
     GQChannel::pecho( ch, buf );
 }
@@ -261,7 +259,7 @@ void CGQuest::doStat( PCharacter *ch )
    
     stat = XMLAttributeStatistic::gatherAll( "gquest" );
 
-    buf << "Лучшие квестодеятели Мира Грез: " << endl;
+    buf << fmt( ch, _("Лучшие квестодеятели Мира Грез: ") ) << endl;
 
     for (s = stat.begin( ); s != stat.end( ); s++) {
         XMLAttributeStatistic::StatRecordList::iterator r;
@@ -275,7 +273,7 @@ void CGQuest::doStat( PCharacter *ch )
 
         XMLAttributeStatistic::StatRecordList &records = s->second;
         
-        buf << GQChannel::BOLD << "\"" << gqi->getQuestName( ) << "\"" << GQChannel::NORMAL << endl;
+        buf << GQChannel::BOLD << "\"" << gqi->getQuestNameFor( ch ) << "\"" << GQChannel::NORMAL << endl;
 
         for (r = records.begin( ); r != records.end( ) && cnt < 10; cnt++) {
             last = r->second;

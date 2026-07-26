@@ -53,7 +53,7 @@ public:
     virtual void progress( std::ostringstream & ) const = 0;
     
     inline virtual const DLString& getQuestID( ) const;
-    virtual void getQuestDescription( std::ostringstream & ) const = 0;
+    virtual void getQuestDescription( std::ostringstream &, Character * ) const = 0;
     virtual void getQuestStartMessage( std::ostringstream & ) const = 0;
 
     inline int getElapsedTime( ) const;
@@ -63,7 +63,7 @@ public:
     inline void setStartTime( );
     inline int getStartTime( ) const;
     inline virtual int getTaskTime( ) const;
-    void printRemainedTime( ostringstream& buf ) const;
+    void printRemainedTime( ostringstream& buf, Character *ch ) const;
     
     inline bool hasLevels( ) const;
     inline int getMinLevel( ) const;

@@ -36,7 +36,7 @@ public:
     virtual void report( std::ostringstream &, PCharacter* ) const;
     virtual void progress( std::ostringstream & ) const;
 
-    virtual void getQuestDescription( std::ostringstream & ) const;
+    virtual void getQuestDescription( std::ostringstream &, Character * ) const;
     virtual void getQuestStartMessage( std::ostringstream & ) const;
 
     inline static Gangsters* getThis( );

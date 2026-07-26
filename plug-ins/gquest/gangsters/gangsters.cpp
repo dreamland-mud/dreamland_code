@@ -355,11 +355,11 @@ void Gangsters::report( std::ostringstream &buf, PCharacter *ch ) const
         attr = ch->getAttributes( ).findAttr<XMLAttributeGangsters>( getQuestID( ) );
         
         if (attr && attr->getKilled( ) > 0)
-            buf << "Число убитых тобой преступников: " 
-                << GQChannel::BOLD <<  attr->getKilled( ) << GQChannel::NORMAL << endl;
-        
-        buf << "До конца охоты остается ";
-        printRemainedTime( buf );
+            buf << fmt( ch, _("Число убитых тобой преступников: {Y%1$d{y"), attr->getKilled( ) )
+                << endl;
+
+        buf << fmt( ch, _("До конца охоты остается ") );
+        printRemainedTime( buf, ch );
         buf << "." << endl;
     }
 }
@@ -384,8 +384,10 @@ void Gangsters::progress( std::ostringstream &buf ) const
     }
 }
 
-void Gangsters::getQuestDescription( std::ostringstream &buf ) const
+void Gangsters::getQuestDescription( std::ostringstream &buf, Character * ) const
 {
+    // start message + hint interpolate RU-declined mob/room names -- kept RU
+    // (localizing the frame around a RU noun would produce a mixed-language line).
     getQuestStartMessage( buf );
     buf << endl        << getHint( ) << endl;
 }
@@ -497,7 +499,7 @@ void Gangsters::rewardChefKiller( )
 
 void Gangsters::rewardNobody( ) 
 {
-    GQChannel::gecho( this, "Шефа банды убила противоборствующая группировка.");
+    GQChannel::gecho( this, _("Шефа банды убила противоборствующая группировка.") );
 }
 
 void Gangsters::rewardMobKiller( PCharacter *killer, Character *mob )
