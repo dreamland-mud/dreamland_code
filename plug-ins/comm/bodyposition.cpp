@@ -611,7 +611,15 @@ CMDRUNP(sit)
 CMDRUNP(sleep)
 {
     Object *obj = 0;
-    ostringstream toMe, toRoom;
+    ostringstream toMe, toRoomRu, toRoomEn, toRoomUa;
+    // Compose the to-room message in all three languages in parallel, so the
+    // (multi-viewer) recho below can render each observer their own; the to-me
+    // message goes only to `ch`, so it composes directly in ch's language.
+    auto room = [&](const char *ru) {
+        toRoomRu << ru;
+        toRoomEn << _(ru).getMessage(LANG_EN);
+        toRoomUa << _(ru).getMessage(LANG_UA);
+    };
     int furniture_flag = 0;
 
     if (MOUNTED(ch))
@@ -649,13 +657,13 @@ CMDRUNP(sleep)
         {
             ch->position = POS_SLEEPING;
 
-            toMe << "Ты засыпаешь";
-            toRoom << "%1$^C1 засыпает";
+            toMe << l(ch, "Ты засыпаешь");
+            room("%1$^C1 засыпает");
 
             if (gsn_curl->getEffective(ch) > 1)
             {
-                toMe << ", свернувшись клубочком";
-                toRoom << ", свернувшись клубочком";
+                toMe << l(ch, ", свернувшись клубочком");
+                room(", свернувшись клубочком");
             }
         }
         else /* find an object and sleep on it */
@@ -694,38 +702,38 @@ CMDRUNP(sleep)
             if (oprog_msg_furniture(obj, ch, "msgSleepRoom", "msgSleepChar"))
                 return;
 
-            toMe << "Ты ложишься спать ";
-            toRoom << "%1$^C1 ложится спать ";
+            toMe << l(ch, "Ты ложишься спать ");
+            room("%1$^C1 ложится спать ");
 
             if (IS_SET(furniture_flag, SLEEP_AT))
             {
-                toMe << "возле %2$O2";
-                toRoom << "возле %2$O2";
+                toMe << l(ch, "возле %2$O2");
+                room("возле %2$O2");
             }
             else if (IS_SET(furniture_flag, SLEEP_ON))
             {
-                toMe << "на %2$O4";
-                toRoom << "на %2$O4";
+                toMe << l(ch, "на %2$O4");
+                room("на %2$O4");
             }
             else
             {
-                toMe << "в %2$O4";
-                toRoom << "в %2$O4";
+                toMe << l(ch, "в %2$O4");
+                room("в %2$O4");
             }
 
             if (gsn_curl->getEffective(ch) > 1)
             {
-                toMe << ", свернувшись клубочком";
-                toRoom << ", свернувшись клубочком";
+                toMe << l(ch, ", свернувшись клубочком");
+                room(", свернувшись клубочком");
             }
         }
         break;
     }
 
     toMe << ".";
-    toRoom << ".";
+    toRoomRu << "."; toRoomEn << "."; toRoomUa << ".";
     ch->pecho(toMe.str().c_str(), ch, obj);
-    ch->recho(POS_RESTING, toRoom.str().c_str(), ch, obj);
+    ch->recho(POS_RESTING, MultiMessage(toRoomEn.str(), toRoomRu.str(), toRoomUa.str()), ch, obj);
 }
 
 CMDRUNP(wake)
