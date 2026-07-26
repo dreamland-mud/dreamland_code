@@ -8,6 +8,8 @@
 #include "npcharacter.h"
 #include "msgformatter.h"
 #include "dreamland.h"
+#include "act.h"
+#include "l10n.h"
 
 /*----------------------------------------------------------------------
  * Price
@@ -35,14 +37,14 @@ DLString MoneyPrice::toString( Character *ch ) const
     gold = silver / 100;
     silver = silver % 100;
 
-    if (gold > 0) 
-        buf << gold << " золот" << GET_COUNT(gold, "ая монета", "ые монеты", "ых монет");
-    
+    if (gold > 0)
+        buf << fmt(ch, _("%1$d золот%1$Iая|ые|ых монет%1$Iа|ы|"), gold);
+
     if (silver > 0) {
         if (gold > 0)
-            buf << " и ";
+            buf << fmt(ch, _(" и "));
 
-        buf << silver << " серебрян" << GET_COUNT(silver, "ая монета", "ые монеты", "ых монет");
+        buf << fmt(ch, _("%1$d серебрян%1$Iая|ые|ых монет%1$Iа|ы|"), silver);
     }
     
     return buf.str( );
