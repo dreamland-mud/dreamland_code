@@ -616,11 +616,22 @@ bool Gangsters::createSecondHint( )
 
 void Gangsters::createThirdHint( )
 {
+    // Stored hint stays RU (it feeds the RU hint/quest-description display,
+    // which interpolates declined mob/room names and is kept RU by design).
     std::basic_ostringstream<char> buf;
-
-    buf << "Больше всего от руки бандитов пострадала местность {hh" << areaName << "{hx.";
+    buf << "Больше всего от руки бандитов пострадала местность {hh"
+        << areaName.getForLang( LANG_RU ) << "{hx.";
     setHint( buf.str( ) );
-    GQChannel::gecho( this, buf );
+
+    // Per-viewer broadcast: catalog frame + the area name in each viewer's
+    // language (falls back to RU where an EN/UA area name is unset -- same as
+    // every other area-name display). Built as an explicit 3-language message;
+    // the {hh help-link resolves on the RU name keyword in every case.
+    MultiMessage frame = _("Больше всего от руки бандитов пострадала местность {hh%1$s{hx.");
+    DLString en = frame.getMessage( LANG_EN ); en.replaces( "%1$s", areaName.getForLang( LANG_EN ) );
+    DLString ru = frame.getMessage( LANG_RU ); ru.replaces( "%1$s", areaName.getForLang( LANG_RU ) );
+    DLString ua = frame.getMessage( LANG_UA ); ua.replaces( "%1$s", areaName.getForLang( LANG_UA ) );
+    GQChannel::gecho( this, MultiMessage( en, ru, ua ) );
 
     state = ST_NO_MORE_HINTS;
 }
@@ -849,7 +860,11 @@ void Gangsters::populateArea( AreaIndexData *area, RoomList &mobRooms, int numPo
 {
     int number;
     
-    areaName = area->getName();
+    // capture the area name in every language now (runtime state, regenerated
+    // each quest) so the third hint can broadcast it per viewer later
+    areaName[LANG_EN] = area->getName( LANG_EN, '1' );
+    areaName[LANG_RU] = area->getName( LANG_RU, '1' );
+    areaName[LANG_UA] = area->getName( LANG_UA, '1' );
     SET_BIT( area->area_flag, AREA_NOGATE );
     
     number = number_fuzzy( mobRooms.size( ) / 5 );

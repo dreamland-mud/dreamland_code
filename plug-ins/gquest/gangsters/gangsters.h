@@ -8,6 +8,7 @@
 #include "globalquest.h"
 
 #include "xmlvector.h"
+#include "xmlmultistring.h"
 #include "logstream.h"
 #define log(x) LogStream::sendNotice() << "Gangsters: " << x << endl
 
@@ -72,7 +73,7 @@ protected:
     static bool isPoliceman( Character * );
     static bool checkRoom( Room *const );
 
-    XML_VARIABLE XMLString areaName;
+    XML_VARIABLE XMLMultiString areaName;
     XML_VARIABLE XMLString informerName;
     XML_VARIABLE XMLString informerRoom;
     XML_VARIABLE XMLString hint;
