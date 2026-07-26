@@ -336,8 +336,8 @@ bool DefaultWearlocation::remove( Object *obj, int flags )
         return false;
     
     if (IS_SET(flags, F_WEAR_VERBOSE)) {
-        ch->recho( getMsgRoomRemove(obj).c_str( ), ch, obj );
-        ch->pecho( getMsgSelfRemove(obj).c_str( ), ch, obj );
+        ch->recho( _(getMsgRoomRemove(obj)), ch, obj );
+        ch->pecho( _(getMsgSelfRemove(obj)), ch, obj );
     }
     
     unequip( obj );
