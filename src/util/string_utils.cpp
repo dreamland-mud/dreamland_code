@@ -83,6 +83,57 @@ bool String::hasCyrillic(const DLString &str)
     return false;
 }
 
+// One lower-case Cyrillic letter -> its Latin spelling. Sources are UTF-8 but
+// the build's -fexec-charset=KOI8-U folds each literal to a single runtime byte,
+// so a plain char switch matches the KOI8 characters a name is made of. Digraphs
+// for hushers and iotated vowels; hard/soft signs drop; Russian and Ukrainian
+// share the table (г->g, і/и->i) since a bare name gives no language to
+// disambiguate on. Returns 0 for a non-Cyrillic byte (pass it through), "" for a
+// sign (drop it). Uppercase 'Ъ' is listed explicitly: it sits at the end of the
+// KOI8 upper range that dl_tolower folds and would otherwise slip through.
+static const char * cyr_letter_to_latin(char c)
+{
+    switch (c) {
+    case 'а': return "a";  case 'б': return "b";  case 'в': return "v";
+    case 'г': return "g";  case 'ґ': return "g";  case 'д': return "d";
+    case 'е': return "e";  case 'є': return "ye"; case 'ё': return "yo";
+    case 'ж': return "zh"; case 'з': return "z";  case 'и': return "i";
+    case 'і': return "i";  case 'ї': return "yi"; case 'й': return "y";
+    case 'к': return "k";  case 'л': return "l";  case 'м': return "m";
+    case 'н': return "n";  case 'о': return "o";  case 'п': return "p";
+    case 'р': return "r";  case 'с': return "s";  case 'т': return "t";
+    case 'у': return "u";  case 'ф': return "f";  case 'х': return "kh";
+    case 'ц': return "ts"; case 'ч': return "ch"; case 'ш': return "sh";
+    case 'щ': return "shch"; case 'ъ': return "";  case 'Ъ': return "";
+    case 'ы': return "y";  case 'ь': return "";   case 'э': return "e";
+    case 'ю': return "yu"; case 'я': return "ya";
+    }
+    return 0;
+}
+
+DLString String::translitToLatin(const DLString &str)
+{
+    ostringstream buf;
+    bool converted = false;
+
+    for (DLString::size_type i = 0; i < str.length(); i++) {
+        const char *lat = cyr_letter_to_latin( dl_tolower( str.at(i) ) );
+        if (lat != 0) {
+            buf << lat;             // Cyrillic letter -> Latin (digraph, or "" for signs)
+            converted = true;
+        } else {
+            buf << str.at(i);       // ASCII / punctuation / non-Cyrillic byte, verbatim
+        }
+    }
+
+    DLString out = buf.str();
+    // Capitalize the single-token name -- but only when we actually romanized,
+    // so an all-Latin login is returned byte-identical.
+    if (converted && !out.empty() && out.at(0) >= 'a' && out.at(0) <= 'z')
+        out.at(0) = out.at(0) - ('a' - 'A');
+    return out;
+}
+
 bool String::lessCase( const DLString &a, const DLString& b )
 {
         DLString::size_type len = a.length( ) < b.length( ) ? a.length( ) : b.length( );

@@ -14,6 +14,7 @@
 
 #include "class.h"
 #include "logstream.h"
+#include "string_utils.h"
 #include "grammar_entities_impl.h"
 #include "ru_pronouns.h"
 
@@ -159,11 +160,16 @@ void CachedNoun::update( PCharacter *ch )
     };
     MultiGender mg( ch->getSex( ), Number::SINGULAR );
 
-    /* plain english name */
+    /* plain english name. There is no separate EN name form yet (T8), so a
+       character created with a Cyrillic login otherwise leaks that Cyrillic to
+       English viewers; romanise it for a readable Latin default. A Latin login
+       transliterates to itself (byte-identical). */
+    DLString ename = String::translitToLatin( ch->getName( ) );
+
     if (name.find(LANG_EN) == name.end())
-        name[LANG_EN] = InflectedString::Pointer( NEW, ch->getName( ), mg );
+        name[LANG_EN] = InflectedString::Pointer( NEW, ename, mg );
     else {
-        name[LANG_EN]->setFullForm( ch->getName( ) );
+        name[LANG_EN]->setFullForm( ename );
         name[LANG_EN]->setGender( mg );
     }
 
