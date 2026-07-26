@@ -790,7 +790,7 @@ void reset_area( Area *pArea, int flags )
     // The ambient reset line is resolved in each recipient's own language below
     // (the area's resetMessage is XMLMultiString; the default falls back via _()).
     const XMLMultiString &resetMessage = pArea->pIndexData->resetMessage;
-    bool hasReset = !resetMessage[LANG_DEFAULT].empty();
+    bool hasReset = !resetMessage.getForLang( LANG_DEFAULT ).empty();
 
     for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
         Character *ch;
