@@ -781,20 +781,16 @@ void reset_room(Room *pRoom, int flags)
  */
 void reset_area( Area *pArea, int flags )
 {
-    DLString resetmsg;
-    static const char *default_resetmsg = "Ты слышишь мелодичный перезвон колокольчиков.";        
-
     for (map<int, Room *>::iterator i = pArea->rooms.begin( ); i != pArea->rooms.end( ); i++)
         reset_room( i->second, flags );
-    
-    if (pArea->pIndexData->behavior) 
+
+    if (pArea->pIndexData->behavior)
         pArea->pIndexData->behavior->update( );
 
-    // TODO format for each player
-    if (!pArea->pIndexData->resetMessage[LANG_DEFAULT].empty())
-        resetmsg = pArea->pIndexData->resetMessage[LANG_DEFAULT];
-    else
-        resetmsg = default_resetmsg;
+    // The ambient reset line is resolved in each recipient's own language below
+    // (the area's resetMessage is XMLMultiString; the default falls back via _()).
+    const XMLMultiString &resetMessage = pArea->pIndexData->resetMessage;
+    bool hasReset = !resetMessage[LANG_DEFAULT].empty();
 
     for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
         Character *ch;
@@ -813,7 +809,10 @@ void reset_area( Area *pArea, int flags )
                 ch->pecho( _("Внезапно налетевший дождь смывает все следы.") );
             }
 
-            ch->pecho( resetmsg );
+            if (hasReset)
+                ch->pecho( resetMessage.getForLang( viewerLang( ch ) ).c_str( ) );
+            else
+                ch->pecho( _("Ты слышишь мелодичный перезвон колокольчиков.") );
         }
     }
 }
