@@ -18,6 +18,8 @@
 #include "affect.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
+#include "string_utils.h"
+#include "morphology.h"
 #include "desire.h"
 #include "npcharacter.h"
 #include "race.h"
@@ -1801,6 +1803,44 @@ NMI_INVOKE( CharacterWrapper, getName, "(): имя игрока или спис�
 {
     checkTarget( );
     return Register( target->getNameC() );
+}
+
+// The compiled half of the T8 name auto-fill: romanise / decline the login into
+// whatever per-language form the player hasn't set. Kept in C++ for speed; the
+// hot-reloadable global/onConnect trigger just calls autofillNameForms() on
+// every character entering the game.
+static void autofill_name_forms( PCharacter *pch )
+{
+    // English: romanise the login when no explicit form is set (a Latin login
+    // romanises to itself).
+    if (pch->getEnglishName( ).empty( )) {
+        DLString en = String::translitToLatin( pch->getName( ) );
+        if (!en.empty( ))
+            pch->setEnglishName( en );
+    }
+
+    // Ukrainian: decline the login into a Flexer pad via the morphology sidecar.
+    // Only store a pad that actually declined -- declineUa's failure fallback is
+    // "word|||||", and a Latin login won't decline as Ukrainian, so those stay
+    // empty (fall back to the Russian form, retried on the next login).
+    if (pch->getUkrainianName( ).getFullForm( ).empty( )) {
+        DLString gender = "-";
+        if (pch->getSex( ) == SEX_MALE)   gender = "masc";
+        if (pch->getSex( ) == SEX_FEMALE) gender = "femn";
+
+        DLString pad = Morphology::declineUa( pch->getName( ), "NOUN", gender );
+        if (pad != pch->getName( ) + "|||||")
+            pch->setUkrainianName( pad );
+    }
+}
+
+NMI_INVOKE( CharacterWrapper, autofillNameForms, "(): заполнить недостающие языковые формы имени игрока (T8)" )
+{
+    checkTarget( );
+    PCharacter *pch = target->getPC( );
+    if (pch != 0)
+        autofill_name_forms( pch );
+    return Register( );
 }
 
 NMI_INVOKE( CharacterWrapper, seeName, "(ch[, case]): как мы видим имя и претитул ch в падеже case") 
