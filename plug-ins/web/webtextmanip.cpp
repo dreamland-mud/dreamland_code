@@ -11,6 +11,8 @@
 #include "descriptor.h"
 #include "room.h"
 #include "dl_ctype.h"
+#include "string_utils.h"
+#include "lang.h"
 #include "merc.h"
 
 #include "def.h"
@@ -54,6 +56,50 @@ static DLString unique_keyword_id(const ExtraDescrList *const &edList, const DLS
             return ed->keyword;
 
     return DLString::emptyString;
+}
+
+
+// An extra-description keyword blob ("door дверь двері") lists the marker word
+// in every language, space-separated. A room/object description historically
+// embeds just ONE of them in its (kw) marker -- almost always the English word,
+// even inside a Russian or Ukrainian desc -- so a RU player reads
+// "...дверь (door)...". Re-pick the VISIBLE marker in the viewer's own language:
+// keep the author's word when its script already matches the viewer, otherwise
+// take the first same-script word from the blob (Ukrainian-specific letters tell
+// RU and UA apart). If the blob has no word in the viewer's language, leave the
+// original -- that's a data gap, not something this render can invent.
+static DLString localize_keyword_marker(const DLString &blob, const DLString &authored, lang_t lang)
+{
+    bool wantCyr = (lang != LANG_EN);
+
+    // Author already wrote a same-script word -> respect their exact wording.
+    if (String::hasCyrillic(authored) == wantCyr)
+        return authored;
+
+    DLString firstSame, ukrWord, ruWord;
+    istringstream is(blob);
+    DLString word;
+    while (is >> word) {
+        if (String::hasCyrillic(word) != wantCyr)
+            continue;
+        if (firstSame.empty())
+            firstSame = word;
+        if (wantCyr) {
+            if (String::hasUaSymbol(word)) {
+                if (ukrWord.empty()) ukrWord = word;
+            } else {
+                if (ruWord.empty()) ruWord = word;
+            }
+        }
+    }
+
+    if (lang == LANG_UA && !ukrWord.empty())
+        return ukrWord;
+    if (lang == LANG_RU && !ruWord.empty())
+        return ruWord;
+    if (!firstSame.empty())
+        return firstSame;
+    return authored;
 }
 
 
@@ -116,8 +162,12 @@ WEBMANIP_RUN(decorateExtraDescr)
         DLString unique = unique_keyword_id(edList, keyword);
         if (!unique.empty( )) {
             // Matches an extra description: clickable 'read', parens for telnet.
-            buf << "{Iw[read=" << unique << ",see=" << keyword << "]";
-            buf << "{IW(" << keyword << "){Ix";
+            // Show the marker in the viewer's language (the desc embeds the
+            // English word even in RU/UA text); the read= payload keeps the full
+            // blob so 'read door дверь двері' still resolves in every language.
+            DLString shown = localize_keyword_marker(unique, keyword, viewerLang(myArgs.target));
+            buf << "{Iw[read=" << unique << ",see=" << shown << "]";
+            buf << "{IW(" << shown << "){Ix";
         } else if (myArgs.decorateExits && is_visible_exit_keyword(myArgs.target, keyword)) {
             // Matches a visible room exit: clickable 'look', parens for telnet.
             buf << "{Iw[look=" << keyword << ",see=" << keyword << "]";
