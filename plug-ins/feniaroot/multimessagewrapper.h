@@ -20,6 +20,9 @@ public:
     MultiMessageWrapper() : self(0) { }
 
     void init(const DLString &ru, const DLString &file) { multi = MultiMessage(ru, file); }
+    /* Three explicit languages, no catalog lookup -- for `.mm(en, ru, ua)`, e.g. a
+     * per-viewer declined proper noun (god/area name) built at the call site. */
+    void initExplicit(const DLString &en, const DLString &ru, const DLString &ua) { multi = MultiMessage(en, ru, ua); }
     const MultiMessage & getMulti() const { return multi; }
 
     /* Handler interface -- opaque carrier, nothing exposed to scripts. The two
