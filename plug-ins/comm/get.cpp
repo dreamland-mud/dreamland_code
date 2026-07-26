@@ -289,41 +289,45 @@ static bool get_obj( Character *ch, Object *obj )
 
 static bool get_obj_container( Character *ch, Object *obj, Object *container )
 {
-    ostringstream toChar, toRoom;
-    DLString prep;
-    
+    // Whole per-preposition sentences (not a spliced RU prep) so each renders
+    // per viewer through oldact(MultiMessage).
+    MultiMessage mChar, mRoom;
+
     switch (container->item_type) {
     case ITEM_KEYRING:
-        toChar << "Ты снимаешь $o4 с $O2.";
-        toRoom << "$c1 снимает $o4 с $O2.";
+        mChar = _("Ты снимаешь $o4 с $O2.");
+        mRoom = _("$c1 снимает $o4 с $O2.");
         break;
 
     case ITEM_CONTAINER:
-        if (IS_SET(container->value1(), CONT_PUT_ON)) 
-            prep = "со";
-        else if (IS_SET(container->value1(), CONT_PUT_ON2)) 
-            prep = "с";
-        else
-            prep = "из";
-        
-        toChar << "Ты берешь $o4 " << prep << " $O2.";
-        toRoom << "$c1 берет $o4 " << prep << " $O2.";
+        if (IS_SET(container->value1(), CONT_PUT_ON)) {
+            mChar = _("Ты берешь $o4 со $O2.");
+            mRoom = _("$c1 берет $o4 со $O2.");
+        }
+        else if (IS_SET(container->value1(), CONT_PUT_ON2)) {
+            mChar = _("Ты берешь $o4 с $O2.");
+            mRoom = _("$c1 берет $o4 с $O2.");
+        }
+        else {
+            mChar = _("Ты берешь $o4 из $O2.");
+            mRoom = _("$c1 берет $o4 из $O2.");
+        }
         break;
 
     case ITEM_CORPSE_NPC:
     case ITEM_CORPSE_PC:
-        toChar << "Ты снимаешь $o4 с $O2.";
-        toRoom << "$c1 снимает $o4 с $O2.";
+        mChar = _("Ты снимаешь $o4 с $O2.");
+        mRoom = _("$c1 снимает $o4 с $O2.");
         break;
 
     default:
-        toChar << "Ты берешь $o4 из $O2.";
-        toRoom << "$c1 берет $o4 из $O2.";
+        mChar = _("Ты берешь $o4 из $O2.");
+        mRoom = _("$c1 берет $o4 из $O2.");
         break;
     }
 
-    oldact( toChar.str( ).c_str( ), ch, obj, container, TO_CHAR );
-    oldact( toRoom.str( ).c_str( ), ch, obj, container, TO_ROOM );
+    oldact( mChar, ch, obj, container, TO_CHAR );
+    oldact( mRoom, ch, obj, container, TO_ROOM );
 
     obj_from_obj( obj );
     obj_to_char( obj, ch );
