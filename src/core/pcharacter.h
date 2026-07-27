@@ -182,6 +182,13 @@ public:
     lang_t getBaseLang( ) const;
     void setBaseLang( lang_t );
 
+    // Reset the per-language name forms (englishName/ukrainianName/baseLang).
+    // Called when a pooled object is handed out for reuse -- these fields are
+    // absent from pfiles predating the feature, so fromXML would not overwrite
+    // them and a recycled object would otherwise leak the previous occupant's
+    // name into a character that has no such element (and persist it on save).
+    void clearNameForms( );
+
     virtual Remorts& getRemorts( ) ;
     virtual const Remorts& getRemorts( ) const ;
     virtual void setRemorts( const Remorts& ) ; 

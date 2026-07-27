@@ -689,6 +689,15 @@ void PCharacter::setBaseLang( lang_t lang )
     if (baseLang.getValue( ) == 0 && lang >= LANG_MIN && lang < LANG_MAX)
         baseLang.setValue( (int)lang + 1 );
 }
+void PCharacter::clearNameForms( )
+{
+    // Direct field resets: bypass setBaseLang's set-once guard, and clear the
+    // name forms that fromXML leaves untouched when the element is absent.
+    englishName.setValue( DLString::emptyString );
+    ukrainianName.setFullForm( DLString::emptyString );
+    baseLang.setValue( 0 );
+    updateCachedNoun( );
+}
 int PCharacter::getStartRoom() const
 {
     return start_room;

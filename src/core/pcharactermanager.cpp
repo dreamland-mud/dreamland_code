@@ -137,6 +137,12 @@ PCharacter* PCharacterManager::getPCharacter( )
     }
 
     pch->setID( dreamland->genID( ) );
+
+    // Pooled objects are reused as-is; wipe the per-language name forms so a
+    // character loaded from a pfile that predates these fields cannot inherit
+    // (and then persist) the previous occupant's englishName/ukrainianName.
+    pch->clearNameForms( );
+
     return pch;
 }
 
