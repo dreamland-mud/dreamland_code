@@ -112,28 +112,6 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief );
 static void show_people_to_char( Character *list, Character *ch, bool fShowMount = true );
 bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool fShowEmpty );
 
-/*
- * For long descriptions on the floor: show EN or RU hint depending on player's config.
- * For short descr: only show EN hint if configured. We assume that all mobs and items react to short descrs.
- * Screenreaders historically didn't use hints but that can be adjusted based on feedback.
- */
-static void format_hint(ostringstream &buf, const XMLMultiString &keyword, const DLString &shortDesc, Character *ch, bool fLong)
-{
-    DLString hint;
-
-    if (uses_screenreader(ch))
-        return;
-
-    if (!ch->is_npc() && ch->getPC()->config.isSet(CONFIG_OBJNAME_HINT))
-        hint = Syntax::label_en(keyword);
-    else if (fLong)
-        hint = Syntax::noun(shortDesc).ruscase('1');
-    else
-        return;
-
-    buf << " {D[" << hint << "]{x";
-}
-
 // Translate colour coding (tier, unusual item) into auras when screenreader is on or colours are off.
 static void format_screenreader_flags(Object *obj, ostringstream &buf, Character *ch)
 {
@@ -258,8 +236,6 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
         if (obj->pIndexData->vnum > 5)        /* money, gold, etc */
             if (obj->condition <= 99 )
                 buf << " [" << obj->get_cond_alias( lang ) << "]";
-
-        format_hint(buf, obj->getKeyword(), obj->getShortDescr(viewerLang(ch)), ch, false);
     }
     else
     {
@@ -288,7 +264,6 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             }
 
             msg << "{x";
-            format_hint(msg, obj->getKeyword(), obj->getShortDescr(viewerLang(ch)), ch, false);
 
             buf << fmt( ch, msg.str().c_str( ), obj, liq.c_str( ) );
         }
@@ -297,7 +272,6 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             if (longd.empty())
                 longd = obj->getDescription(LANG_DEFAULT);
             buf << "{" << CLR_OBJROOM(ch) << longd << "{x";
-            format_hint(buf, obj->getKeyword(), obj->getShortDescr(viewerLang(ch)), ch, true);
         }
     }
 
@@ -699,8 +673,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
                 mlong = nVict->getLongDescr(LANG_DEFAULT);
 
             longd << mlong << "{x";
-            format_hint(longd, nVict->getKeyword(), nVict->getShortDescr(viewerLang(ch)), ch, true);
-                  
+
             buf << "{" << CLR_MOB(ch);
             webManipManager->decorateCharacter(buf, longd.str(), victim, ch);
             buf << "{x" << endl;
@@ -733,10 +706,6 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     }
 
     buf << "{2";
-
-    if (nVict) {
-        format_hint(buf, nVict->getKeyword(), nVict->getShortDescr(viewerLang(ch)), ch, false);
-    }
 
     buf << " ";
 
