@@ -527,9 +527,6 @@ CMDRUN( list )
 
         webManipManager->decorateShopItem( buf, si.obj->getShortDescr( '1', LANG_DEFAULT ), si.obj, ch );
 
-        if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
-            buf << " (" << Syntax::label_en(si.obj->getKeyword()) << ")";
-
         buf << endl;
     }
 
