@@ -44,7 +44,38 @@ static void csv_escape( DLString &name ) {
 //    name.replaces( "\'", "\\\'");
 }
 
-static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData *&pArea, DLString &where)
+/** Emit a display string in all three languages. The bare key keeps its historic
+ *  Russian value so existing consumers of the dump keep working; 'keyEn'/'keyUa'
+ *  are additions. Empty EN/UA fall back to RU inside getForLang. */
+static void json_lang_string( Json::Value &j, const char *key,
+                              const XMLMultiString &src, bool lower = false )
+{
+    static const lang_t langs[3] = { RU, EN, UA };
+    static const char * const suffix[3] = { "", "En", "Ua" };
+
+    for (int i = 0; i < 3; i++) {
+        DLString v = src.getForLang( langs[i] ).ruscase( '1' );
+        if (lower)
+            v.toLower( );
+        csv_escape( v );
+        j[( DLString( key ) + suffix[i] ).c_str( )] = v;
+    }
+}
+
+/** Same, for area names, which have their own per-language accessor. */
+static void json_lang_area( Json::Value &j, const char *key, AreaIndexData *pArea )
+{
+    static const lang_t langs[3] = { RU, EN, UA };
+    static const char * const suffix[3] = { "", "En", "Ua" };
+
+    for (int i = 0; i < 3; i++) {
+        DLString v = pArea->getName( langs[i] );
+        csv_escape( v );
+        j[( DLString( key ) + suffix[i] ).c_str( )] = v;
+    }
+}
+
+static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData *&pArea, XMLMultiString &where)
 {
     int mobVnum = -1;
     for(auto &pReset: pRoom->resets) {
@@ -61,7 +92,7 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
                     if (pMob && pReset->rand == RAND_NONE) {
                         // Return success
                         pArea = pRoom->areaIndex;
-                        where = russian_case(pMob->short_descr[RU], '1');
+                        where = pMob->short_descr;
                         return true;
                     }
                 }
@@ -70,7 +101,7 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
                 if (pReset->arg1 == vnum && pReset->rand == RAND_NONE) { 
                     // Object is on the floor, return success.
                     pArea = pRoom->areaIndex;
-                    where = pRoom->name[RU];
+                    where = pRoom->name;
                     return true;
                 }
                 break; 
@@ -81,7 +112,7 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
                     if (in && pReset->rand == RAND_NONE) {
                         // Return success.
                         pArea = pRoom->areaIndex;
-                        where = pRoom->name[RU];
+                        where = pRoom->name;
                         return true;
                     }
                 }
@@ -93,7 +124,7 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
     return false;
 }            
 
-static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLString &where )
+static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, XMLMultiString &where )
 {
     for (auto &r: roomIndexMap) {
         RoomIndexData *pRoom = r.second;
@@ -102,7 +133,7 @@ static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLStrin
             case 'M':
                 if (pReset->arg1 == pMob->vnum) {
                     pArea = pRoom->areaIndex;
-                    where = pRoom->name[RU];
+                    where = pRoom->name;
                     return true;
                 }
             }
@@ -112,7 +143,7 @@ static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLStrin
     return false;
 }
 
-static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AreaIndexData *&pArea, DLString &where )
+static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AreaIndexData *&pArea, XMLMultiString &where )
 {
     // First look for obj resets in the same area it's from.
     for (auto &pair: pObj->area->roomIndexes) {
@@ -231,17 +262,14 @@ public:
             if (type.find("Pet") == DLString::npos && type != "Rat")
                 continue;
             
-            DLString aname = pMob->area->getName();
-            csv_escape(aname);
-
             Json::Value pet;
             pet["vnum"] = pMob->vnum;
-            pet["name"] = russian_case(pMob->short_descr[RU], '1').colourStrip();
+            json_lang_string(pet, "name", pMob->short_descr);
             pet["level"] = (type == "LevelAdaptivePet" || type == "Rat" ? -1 : pMob->level);
             pet["act"] = act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_NOWHERE));
             pet["aff"] = affect_flags.names(REMOVE_BIT(pMob->affected_by, AFF_INFRARED));
             pet["off"] = off_flags.names(REMOVE_BIT(pMob->off_flags, ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE|OFF_FADE));
-            pet["area"] = aname;
+            json_lang_area(pet, "area", pMob->area);
             dump.append(pet);
         }
 
@@ -293,9 +321,7 @@ public:
             // Format object item type and damage roll.
             DLString itemtype = item_table.message( pObj->item_type );
             
-            // Format object name.
-            DLString name = russian_case(pObj->short_descr[RU], '1').toLower( );
-            csv_escape( name );
+            // Object name is emitted per language further down.
         
             // Find all bonuses.
             int hr=0, dr=0, hp=0, svs=0, mana=0, move=0;
@@ -365,7 +391,7 @@ public:
                 continue;
 
             // Find item resets and ignore items without resets and from clan areas.
-            DLString where;
+            XMLMultiString where;
             AreaIndexData *pArea;
             useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
@@ -374,13 +400,11 @@ public:
                 continue;
             if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
                 continue;
-            DLString area = pArea->getName();
-            csv_escape( area );
-            csv_escape( where );
+
 
             Json::Value a;
             a["vnum"] = pObj->vnum;
-            a["name"] = name;
+            json_lang_string(a, "name", pObj->short_descr, true);
             a["level"] = pObj->level;
             a["wearloc"] = wearloc;
             a["itemtype"] = itemtype;
@@ -409,8 +433,8 @@ public:
                 a["align"] = "-";
             }
 
-            a["area"] = area;
-            a["where"] = where;
+            json_lang_area(a, "area", pArea);
+            json_lang_string(a, "where", where);
             a["limit"] = pObj->limit;
             dump.append(a);
         }
@@ -458,9 +482,7 @@ public:
             int d2 = pObj->value[2];
             int ave = weapon_ave(pObj);
             
-            // Format object name.
-            DLString name = russian_case(pObj->short_descr[RU], '1').toLower( );
-            csv_escape( name );
+            // Object name is emitted per language further down.
         
             // Find all bonuses.
             int hr=0, dr=0, hp=0, svs=0, mana=0, move=0;
@@ -498,7 +520,7 @@ public:
             }
 
             // Find item resets and ignore items without resets and from clan areas.
-            DLString where;
+            XMLMultiString where;
             AreaIndexData *pArea;
             bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
@@ -507,13 +529,11 @@ public:
                 continue;
             if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
                 continue;
-            DLString area = pArea->getName();
-            csv_escape( area );
-            csv_escape( where );
+
 
             Json::Value w;
             w["vnum"] = pObj->vnum;
-            w["name"] = name;
+            json_lang_string(w, "name", pObj->short_descr, true);
             w["level"] = pObj->level;
             w["wclass"] = weaponClass;
 
@@ -544,8 +564,8 @@ public:
                 w["stat_con"] = w["align"] = "-";
             }
 
-            w["area"] = area;
-            w["where"] = where;
+            json_lang_area(w, "area", pArea);
+            json_lang_string(w, "where", where);
             w["limit"] = pObj->limit;
             dump.append(w);
         }
@@ -629,12 +649,10 @@ public:
                 continue;
             }
 
-            // Format object name.
-            DLString name = russian_case(pObj->short_descr[RU], '1').toLower( );
-            csv_escape( name );
+            // Object name is emitted per language further down.
 
             // Find item resets and ignore items without resets and from clan areas.
-            DLString where;
+            XMLMultiString where;
             AreaIndexData *pArea;
             bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
@@ -643,13 +661,11 @@ public:
                 continue;
             if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
                 continue;
-            DLString area = pArea->getName();
-            csv_escape( area );
-            csv_escape( where );
+
                 
             Json::Value wand;
             wand["vnum"] = pObj->vnum;
-            wand["name"] = name;
+            json_lang_string(wand, "name", pObj->short_descr, true);
             wand["level"] = pObj->level;
             wand["itemtype"] = itemtype;
 
@@ -664,8 +680,8 @@ public:
                 wand["spells"] = wand["ruspells"] = "-";
             }
 
-            wand["area"] = area;
-            wand["where"] = where;
+            json_lang_area(wand, "area", pArea);
+            json_lang_string(wand, "where", where);
             wand["limit"] = pObj->limit;
             dump.append(wand);
         }
@@ -781,7 +797,7 @@ CMDRUNP(searcher)
                                     (p.saves != 0 ? "C": "w"), p.saves, 
                                     pObj->area->getName().c_str());
 
-                    DLString where;
+                    XMLMultiString where;
                     AreaIndexData *pArea;
                     if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
@@ -863,7 +879,7 @@ CMDRUNP(searcher)
                                     pObj->weight, 
                                     p.wflags.c_str());
 
-                    DLString where;
+                    XMLMultiString where;
                     AreaIndexData *pArea;
                     if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
@@ -937,7 +953,7 @@ CMDRUNP(searcher)
                                     russian_case(pObj->short_descr[RU], '1').c_str(),
                                     p.power, p.charges, p.spells.c_str());
 
-                    DLString where;
+                    XMLMultiString where;
                     AreaIndexData *pArea;
                     if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
@@ -1011,7 +1027,7 @@ CMDRUNP(searcher)
                                     weapon_flags.name(pMob->dam_type).c_str(),
                                     pMob->area->getName().c_str());
 
-                    DLString where;
+                    XMLMultiString where;
                     AreaIndexData *pArea;
                     if (IS_SET(pMob->area->area_flag, AREA_HIDDEN) || !get_mob_resets(pMob, pArea, where)) {
                         line.colourstrip();
