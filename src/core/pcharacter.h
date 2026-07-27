@@ -176,6 +176,11 @@ public:
     virtual void setEnglishName( const DLString& ) ;
     virtual const InflectedString& getUkrainianName( ) const ;
     virtual void setUkrainianName( const DLString& ) ;
+    // The language the player registered under -- their locked default name form.
+    // Captured once at the nanny (setBaseLang is a no-op once set); falls back to
+    // inferring from the login's script for characters created before it existed.
+    lang_t getBaseLang( ) const;
+    void setBaseLang( lang_t );
 
     virtual Remorts& getRemorts( ) ;
     virtual const Remorts& getRemorts( ) const ;
@@ -260,6 +265,7 @@ private:
     XML_VARIABLE XMLInflectedString russianName;
     XML_VARIABLE XMLString englishName;
     XML_VARIABLE XMLInflectedString ukrainianName;
+    XML_VARIABLE XMLIntegerNoEmpty baseLang;   // registration language + 1 (0 = unset)
 
     XML_VARIABLE XMLStringNoEmpty title;
     XML_VARIABLE XMLStringNoEmpty pretitle;
