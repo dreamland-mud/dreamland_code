@@ -37,7 +37,7 @@
   <batle_prompt>&lt;%n: %h/%Hhp %m/%Mm %v/%Vmv Opp:&lt;%o&gt;&gt; </batle_prompt>
   <clanLevel>0</clanLevel>
   <comm>prompt combine</comm>
-  <config>fightspam skillspam objname_hint newdamage</config>
+  <config>fightspam skillspam newdamage</config>
   <description>You see tanned dark-haired man with a tired look on his face.
 He's dressed in a dusty tunic, his calloused hands grip a shovel.
 There is a glimpse of infinity in his eyes.
