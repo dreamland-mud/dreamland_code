@@ -109,14 +109,10 @@ CMDRUNP( pcname )
         lang = LANG_EN;
     else if (arg_oneof( sub, "ua", "укр", "украинский", "українська" ))
         lang = LANG_UA;
-    else if (arg_oneof( sub, "ru", "рус", "русский" )) {
-        // Editing the Russian form needs a Russian auto-decliner in the
-        // morphology sidecar (only Ukrainian exists today) -- deferred.
-        pch->pecho( _("Задание русской формы имени пока не поддерживается.") );
-        return;
-    }
+    else if (arg_oneof( sub, "ru", "рус", "русский" ))
+        lang = LANG_RU;
     else {
-        pch->pecho( _("Используй: имя <en|ua> <имя>. Без аргументов -- показать формы.") );
+        pch->pecho( _("Используй: имя <en|ru|ua> <имя>. Без аргументов -- показать формы.") );
         return;
     }
 
@@ -139,8 +135,8 @@ CMDRUNP( pcname )
         pch->pecho( _("Английская форма имени должна быть латиницей.") );
         return;
     }
-    if (lang == LANG_UA && !cyr) {
-        pch->pecho( _("Украинская форма имени должна быть кириллицей.") );
+    if (lang != LANG_EN && !cyr) {
+        pch->pecho( _("Русская и украинская формы имени должны быть кириллицей.") );
         return;
     }
     if (form.colourStrip( ).size( ) > 24) {
@@ -171,12 +167,16 @@ CMDRUNP( pcname )
         pch->setEnglishName( form );
     }
     else {
-        // Ukrainian declines: turn the nominative the player typed into a Flexer
-        // pad via the morphology sidecar (gender from the character's sex).
+        // Russian/Ukrainian decline: turn the nominative the player typed into a
+        // Flexer pad via the morphology sidecar (gender from the character's sex).
         DLString gender = "-";
         if (pch->getSex( ) == SEX_MALE)   gender = "masc";
         if (pch->getSex( ) == SEX_FEMALE) gender = "femn";
-        pch->setUkrainianName( Morphology::declineUa( form, "NOUN", gender ) );
+
+        if (lang == LANG_RU)
+            pch->setRussianName( Morphology::declineRu( form, "NOUN", gender ) );
+        else
+            pch->setUkrainianName( Morphology::declineUa( form, "NOUN", gender ) );
     }
 
     pch->pecho( _("Готово. Теперь на этом языке тебя видят как: %s"),
