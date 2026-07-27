@@ -1843,6 +1843,19 @@ NMI_INVOKE( CharacterWrapper, autofillNameForms, "(): заполнить нед�
     return Register( );
 }
 
+NMI_GET( CharacterWrapper, baseLang, "язык регистрации (0=en,1=ru,2=ua); эта форма имени -- default, не редактируется" )
+{
+    checkTarget( );
+    CHK_NPC
+    return (int)target->getPC( )->getBaseLang( );
+}
+NMI_SET( CharacterWrapper, baseLang, "язык регистрации; ставится один раз в nanny" )
+{
+    checkTarget( );
+    CHK_NPC
+    target->getPC( )->setBaseLang( (lang_t)arg.toNumber( ) );
+}
+
 NMI_INVOKE( CharacterWrapper, seeName, "(ch[, case]): как мы видим имя и претитул ch в падеже case") 
 {
     checkTarget( );

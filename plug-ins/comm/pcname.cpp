@@ -47,15 +47,6 @@ static int name_distance( const DLString &a, const DLString &b )
     return prev[m];
 }
 
-// The language whose form is the player's locked default -- the one they
-// registered under. Not persisted yet (TODO: capture the nanny's first-question
-// language into a stored baseLang), so infer from the login's script: a Cyrillic
-// login is an RU/UA registration (lock RU), a Latin one an EN registration.
-static lang_t name_base_lang( PCharacter *pch )
-{
-    return String::hasCyrillic( pch->getName( ) ) ? LANG_RU : LANG_EN;
-}
-
 // The default form a viewer of `lang` sees when the player has set nothing:
 // English romanises the login, the others show the Russian/login form.
 static DLString name_default_form( PCharacter *pch, lang_t lang )
@@ -69,7 +60,7 @@ static DLString name_default_form( PCharacter *pch, lang_t lang )
 
 static void name_show( PCharacter *pch )
 {
-    lang_t base = name_base_lang( pch );
+    lang_t base = pch->getBaseLang( );
     ostringstream buf;
 
     buf << "Твое имя (" << pch->getName( ) << ") показывается на разных языках так:" << endl;
@@ -116,7 +107,7 @@ CMDRUNP( pcname )
         return;
     }
 
-    lang_t base = name_base_lang( pch );
+    lang_t base = pch->getBaseLang( );
     if (lang == base) {
         pch->pecho( _("Это язык, под которым ты зарегистрирован -- эту форму менять нельзя.") );
         return;

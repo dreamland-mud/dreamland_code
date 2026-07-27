@@ -673,6 +673,22 @@ void PCharacter::setUkrainianName( const DLString& name )
     ukrainianName.setFullForm( name );
     updateCachedNoun( );
 }
+lang_t PCharacter::getBaseLang( ) const
+{
+    int v = baseLang.getValue( );
+    if (v >= 1 && v <= LANG_MAX)
+        return (lang_t)(v - 1);
+    // Pre-#3 characters have no stored value: infer from the login's script
+    // (Cyrillic => Russian, Latin => English).
+    return String::hasCyrillic( getName( ) ) ? LANG_RU : LANG_EN;
+}
+void PCharacter::setBaseLang( lang_t lang )
+{
+    // Set once, at registration; ignore later calls (a returning player
+    // re-picking a display language) and out-of-range values.
+    if (baseLang.getValue( ) == 0 && lang >= LANG_MIN && lang < LANG_MAX)
+        baseLang.setValue( (int)lang + 1 );
+}
 int PCharacter::getStartRoom() const
 {
     return start_room;
