@@ -109,7 +109,7 @@ DLString Morphology::adjective(const DLString &form, const MultiGender &gender)
     return stem + cases;
 }
 
-DLString Morphology::declineUa( const DLString &word, const DLString &pos, const DLString &gender )
+static DLString decline_sidecar( const DLString &word, const DLString &pos, const DLString &gender, const DLString &lang )
 {
     DLString fallback = word + "|||||"; // nominative in every case, no delta
 
@@ -117,7 +117,7 @@ DLString Morphology::declineUa( const DLString &word, const DLString &pos, const
         return fallback;
 
     static std::map<DLString, DLString> cache;
-    DLString key = word + "\t" + pos + "\t" + gender;
+    DLString key = word + "\t" + pos + "\t" + gender + "\t" + lang;
     std::map<DLString, DLString>::iterator ci = cache.find( key );
     if (ci != cache.end( ))
         return ci->second;
@@ -146,7 +146,7 @@ DLString Morphology::declineUa( const DLString &word, const DLString &pos, const
         return fallback;
     }
 
-    DLString req = koi2utf( word ) + "\t" + pos + "\t" + gender + "\n";
+    DLString req = koi2utf( word ) + "\t" + pos + "\t" + gender + "\t" + lang + "\n";
     if (::write( fd, req.c_str( ), req.size( ) ) < 0) {
         ::close( fd );
         return fallback;
@@ -172,6 +172,16 @@ DLString Morphology::declineUa( const DLString &word, const DLString &pos, const
 
     cache[key] = pad;
     return pad;
+}
+
+DLString Morphology::declineUa( const DLString &word, const DLString &pos, const DLString &gender )
+{
+    return decline_sidecar( word, pos, gender, "uk" );
+}
+
+DLString Morphology::declineRu( const DLString &word, const DLString &pos, const DLString &gender )
+{
+    return decline_sidecar( word, pos, gender, "ru" );
 }
 
 static bool is_consonant(char c)

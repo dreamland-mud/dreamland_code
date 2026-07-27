@@ -20,6 +20,10 @@ namespace Morphology {
     // Authoring-time only; caches, times out at 500ms, and falls back to the
     // nominative in every case if the sidecar is unreachable (never blocks long).
     DLString declineUa(const DLString &word, const DLString &pos = "-", const DLString &gender = "-");
+
+    // Same as declineUa but for Russian (the sidecar's ru analyzer, loaded on
+    // first use). gender = "masc"|"femn"|"neut"|"-".
+    DLString declineRu(const DLString &word, const DLString &pos = "-", const DLString &gender = "-");
 };
 
 namespace Syntax {
