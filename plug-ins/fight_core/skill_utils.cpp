@@ -149,19 +149,23 @@ char skill_learned_colour(const Skill *skill, PCharacter *ch)
     return 'x';
 }
 
+/* Both names a skill answers to, the reader's own first. It used to be a
+ * two-way English-or-Russian choice, so a Ukrainian reader was shown the
+ * Russian name as the primary one even where the skill carries <name l="ua">
+ * (fireball / огненный шар / вогняна куля). getNameFor() falls back to RU, so
+ * a skill without a Ukrainian name reads exactly as it did before.
+ * The connector between them is a word too, and belongs to the same language
+ * as the frame around it. */
 DLString print_names_for(const Skill *skill, Character *ch)
 {
-    bool rus = Player::displayLang(ch) != LANG_EN;
-    const char *format = "'{%c%N1{%c' или '{%c%N1{%c'";
+    lang_t lang = Player::displayLang(ch);
+    DLString primary = skill->getNameFor(lang);
+    DLString secondary = (lang == LANG_EN ? skill->getRussianName() : skill->getName());
+    DLString format = DLString("'{%c%N1{%c' ") + l(ch, "или") + " '{%c%N1{%c'";
 
-    if (rus)
-        return fmt(0, format, 
-            SKILL_HEADER_FG, skill->getRussianName().c_str(), SKILL_HEADER_BG, 
-            SKILL_HEADER_FG, skill->getName().c_str(), SKILL_HEADER_BG);
-    else
-        return fmt(0, format, 
-            SKILL_HEADER_FG, skill->getName().c_str(), SKILL_HEADER_BG, 
-            SKILL_HEADER_FG, skill->getRussianName().c_str(), SKILL_HEADER_BG);
+    return fmt(0, format.c_str(),
+        SKILL_HEADER_FG, primary.c_str(), SKILL_HEADER_BG,
+        SKILL_HEADER_FG, secondary.c_str(), SKILL_HEADER_BG);
 }
 
 /* The word a skill help opens with. It used to be the Russian noun declined
