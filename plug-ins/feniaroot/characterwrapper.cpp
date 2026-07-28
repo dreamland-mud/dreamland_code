@@ -1805,6 +1805,23 @@ NMI_INVOKE( CharacterWrapper, getName, "(): имя игрока или спис�
     return Register( target->getNameC() );
 }
 
+// Did this Flexer pad actually decline, i.e. does any case cell past the
+// nominative carry a form? Both "cannot decline" answers come back with every
+// case cell empty, but with a DIFFERENT cell count: the sidecar answers
+// "word||||||" (a full 7-cell pad) when it does not recognise the word, while
+// decline_sidecar's own fallback is "word|||||" for when the sidecar is
+// unreachable. Testing the cells covers both; string-comparing one exact shape
+// silently missed the other.
+static bool pad_declined( const DLString &pad )
+{
+    DLString::size_type bar = pad.find( '|' );
+
+    if (bar == DLString::npos)
+        return false;
+
+    return pad.find_first_not_of( '|', bar ) != DLString::npos;
+}
+
 // The compiled half of the T8 name auto-fill: romanise / decline the login into
 // whatever per-language form the player hasn't set. Kept in C++ for speed; the
 // hot-reloadable global/onConnect trigger just calls autofillNameForms() on
@@ -1819,17 +1836,34 @@ static void autofill_name_forms( PCharacter *pch )
             pch->setEnglishName( en );
     }
 
-    // Ukrainian: decline the login into a Flexer pad via the morphology sidecar.
-    // Only store a pad that actually declined -- declineUa's failure fallback is
-    // "word|||||", and a Latin login won't decline as Ukrainian, so those stay
-    // empty (fall back to the Russian form, retried on the next login).
-    if (pch->getUkrainianName( ).getFullForm( ).empty( )) {
+    // Ukrainian: decline into a Flexer pad via the morphology sidecar. Feed it the
+    // Russian nominative rather than the login -- Ukrainian morphology can do
+    // nothing with a Latin "Telesyk" and hands back an empty pad, whereas the
+    // Russian form is Cyrillic and declines properly ("Телесик" ->
+    // "Телесик||а|ові|а|ом|ові"). Cyrillic logins with no Russian form yet still
+    // fall back to the login itself.
+    //
+    // The condition covers an undeclined pad as well as a missing one: characters
+    // that went through the earlier, broken version carry a stored "Login||||||",
+    // which counts as "set", so a plain empty() test would never repair them.
+    if (!pad_declined( pch->getUkrainianName( ).getFullForm( ) )) {
         DLString gender = "-";
         if (pch->getSex( ) == SEX_MALE)   gender = "masc";
         if (pch->getSex( ) == SEX_FEMALE) gender = "femn";
 
-        DLString pad = Morphology::declineUa( pch->getName( ), "NOUN", gender );
-        if (pad != pch->getName( ) + "|||||")
+        DLString source = pch->getRussianName( ).getFullForm( );
+        DLString::size_type bar = source.find( '|' );
+        if (bar != DLString::npos)
+            source = source.substr( 0, bar );
+        if (source.empty( ))
+            source = pch->getName( );
+
+        // Store only a pad that really declined. Keeping an undeclinable one would
+        // make the field non-empty, so this autofill would never retry it AND the
+        // "empty Ukrainian falls back to Russian" rule in PCharacter's name map
+        // would stop firing -- leaving Ukrainian viewers with a bare Latin login.
+        DLString pad = Morphology::declineUa( source, "NOUN", gender );
+        if (pad_declined( pad ))
             pch->setUkrainianName( pad );
     }
 }
