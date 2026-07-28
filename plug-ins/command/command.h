@@ -6,6 +6,7 @@
 #ifndef        COMMAND_H
 #define        COMMAND_H
 
+#include "lang.h"
 #include "xmlvariablecontainer.h"
 #include "xmlshort.h"
 #include "xmlboolean.h"

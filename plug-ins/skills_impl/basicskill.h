@@ -5,6 +5,7 @@
 #ifndef __BASICSKILL_H__
 #define __BASICSKILL_H__
 
+#include "lang.h"
 #include <map>
 #include "xmlpointer.h"
 #include "xmlvariablecontainer.h"

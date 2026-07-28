@@ -1,6 +1,7 @@
 #ifndef SUBPROFESSION_H
 #define SUBPROFESSION_H
 
+#include "lang.h"
 #include "xmlvector.h"
 #include "xmlinteger.h"
 #include "xmlboolean.h"

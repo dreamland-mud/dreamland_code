@@ -5,6 +5,7 @@
 #ifndef __LANGUAGE_H__
 #define __LANGUAGE_H__
 
+#include "lang.h"
 #include "exception.h"
 #include "enumeration.h"
 #include "xmlmap.h"

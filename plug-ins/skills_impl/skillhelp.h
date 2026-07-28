@@ -5,6 +5,7 @@
 #ifndef SKILLHELP_H
 #define SKILLHELP_H
 
+#include "lang.h"
 #include "markuphelparticle.h"
 #include "helpformatter.h"
 #include "skillaction.h"

@@ -5,6 +5,7 @@
 #ifndef DEFAULTRACE_H
 #define DEFAULTRACE_H
 
+#include "lang.h"
 #include "xmlvariablecontainer.h"
 #include "xmlstring.h"
 #include "xmlboolean.h"

@@ -5,6 +5,7 @@
 #ifndef DEFAULTSKILLGROUP_H
 #define DEFAULTSKILLGROUP_H
 
+#include "lang.h"
 #include "xmlvariablecontainer.h"
 #include "xmlboolean.h"
 #include "xmlstring.h"

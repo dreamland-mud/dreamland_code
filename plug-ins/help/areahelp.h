@@ -5,6 +5,7 @@
 #ifndef AREAHELP_H
 #define AREAHELP_H
 
+#include "lang.h"
 #include "markuphelparticle.h"
 
 class AreaIndexData;

@@ -9,6 +9,7 @@
 #ifndef SOCIAL_H
 #define SOCIAL_H
 
+#include "lang.h"
 #include "xmlvariablecontainer.h"
 #include "xmlstring.h"
 #include "xmlstringlist.h"

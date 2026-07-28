@@ -5,6 +5,7 @@
 #ifndef __DEFAULTPROFESSION_H__
 #define __DEFAULTPROFESSION_H__
 
+#include "lang.h"
 #include "xmlvector.h"
 #include "xmlinteger.h"
 #include "xmlboolean.h"

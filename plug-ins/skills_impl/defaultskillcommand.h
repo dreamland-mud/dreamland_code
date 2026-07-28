@@ -5,6 +5,7 @@
 #ifndef DEFAULTSKILLCOMMAND_H
 #define DEFAULTSKILLCOMMAND_H
 
+#include "lang.h"
 #include "skillcommand.h"
 #include "command.h"
 
