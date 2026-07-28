@@ -4,9 +4,10 @@
  */
 #include "helpformatter.h"
 #include "character.h"
+#include "l10n.h"
 
 HelpFormatter::HelpFormatter( )
-                : fParse( true ), text( 0 )
+                : fParse( true ), text( 0 ), viewer( 0 )
 {
 }
 
@@ -17,10 +18,12 @@ HelpFormatter::~HelpFormatter( )
 void HelpFormatter::reset( )
 {
     fParse = true;
+    viewer = 0;
 }
 
-void HelpFormatter::setup( Character * )
+void HelpFormatter::setup( Character *ch )
 {
+    viewer = ch;
 }
 
 // *...*     ->  {y...{w                      (bold text)
@@ -133,31 +136,41 @@ void HelpFormatter::run( Character *ch, ostringstream &out )
     
 }
 
-// %KEYWORD%:
-// H, HELP     ->  {Wсправка{w
-// SA, SEEALSO ->  См. также
-// U, USAGE    ->  Использование
-// FMT         ->  {wФормат:{w
-// FFF         ->  {w       {w
-// PAUSE       ->  stops help tag parsing
-// RESUME      ->  resumes help tag parsing
-// A           ->  * 
-// CAST        ->  колдовать
-// OBJ         ->  предмет
-// CHAR        ->  персонаж
-// PLR         ->  игрок
-// MOB         ->  монстр
-// VICT        ->  жертва
-// DIR         ->  направление
-// YES, NO     ->  да, нет
-// ALL         ->  все
-// SHOW        ->  показ
-// ON          ->  вкл
-// OFF         ->  выкл
+/* %KEYWORD% -- the words the help articles are written out of. RU is the
+ * source and the fallback; en/ua come from the catalog keyed on this file.
+ *
+ * The command words (H, CAST) and the literal arguments (YES/NO/ALL/SHOW)
+ * resolve to forms the parser actually ACCEPTS: help.xml declares the aliases
+ * ? / справка / довідка, cast.xml declares cast / колдовать / чаклувати, and
+ * grammar/synonyms.json takes yes|так|да and friends. A help line telling you
+ * to type a word the game does not know would be worse than a Russian one, so
+ * nothing goes in here that is not already an alias.
+ *
+ * H, HELP     ->  {Wсправка{w
+ * SA, SEEALSO ->  См. также
+ * U, USAGE    ->  Использование
+ * FMT         ->  {wФормат:{w
+ * FFF         ->  {w       {w
+ * PAUSE       ->  stops help tag parsing
+ * RESUME      ->  resumes help tag parsing
+ * A           ->  * 
+ * CAST        ->  колдовать
+ * OBJ         ->  предмет
+ * CHAR        ->  персонаж
+ * PLR         ->  игрок
+ * MOB         ->  монстр
+ * VICT        ->  жертва
+ * DIR         ->  направление
+ * YES, NO     ->  да, нет
+ * ALL         ->  все
+ * SHOW        ->  показ
+ * ON          ->  вкл
+ * OFF         ->  выкл
+ */
 bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
     if (kw == "H" || kw == "HELP") {
-        out << "{Wсправка{w";
+        out << "{W" << l(viewer, "справка") << "{w";
         return true;
     }
 
@@ -167,7 +180,7 @@ bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
     }
 
     if (kw == "FMT") {
-        out << "{wФормат:{w";
+        out << "{w" << l(viewer, "Формат:") << "{w";
         return true;
     }
 
@@ -177,78 +190,78 @@ bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
     }
 
     if (kw == "U" || kw == "USAGE") {
-        out << "Использование";
+        out << l(viewer, "Использование");
         return true;
     }
 
     if (kw == "SA" || kw == "SEEALSO") {
-        out << "См. также";
+        out << l(viewer, "См. также");
         return true;
     }
 
     if (kw == "CAST") {
-        out << "колдовать";
+        out << l(viewer, "колдовать");
         return true;
     }
 
     if (kw == "OBJ") {
-        out << "предмет";
+        out << l(viewer, "предмет");
         return true;
     }
 
     if (kw == "CHAR") {
-        out << "персонаж";
+        out << l(viewer, "персонаж");
         return true;
     }
 
     if (kw == "PLR") {
-        out << "игрок";
+        out << l(viewer, "игрок");
         return true;
     }
 
     if (kw == "MOB") {
-        out << "монстр";
+        out << l(viewer, "монстр");
         return true;
     }
 
 
     if (kw == "VICT") {
-        out << "жертва";
+        out << l(viewer, "жертва");
         return true;
     }
 
     if (kw == "DIR") {
-        out << "направление";
+        out << l(viewer, "направление");
         return true;
     }
 
     if (kw == "YES") {
-        out << "да";
+        out << l(viewer, "да");
         return true;
     }
 
     if (kw == "NO") {
-        out << "нет";
+        out << l(viewer, "нет");
         return true;
     }
 
     if (kw == "ALL") {
-        out << "все";
+        out << l(viewer, "все");
         return true;
     }
 
     if (kw == "SHOW") {
-        out << "показ";
+        out << l(viewer, "показ");
         return true;
     }
 
     if (kw == "ON") {
-        out << "вкл";
+        out << l(viewer, "вкл");
         return true;
     }
 
     if (kw == "OFF") {
-        out << "выкл";
+        out << l(viewer, "выкл");
         return true;
     }
 

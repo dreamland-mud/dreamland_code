@@ -27,6 +27,10 @@ protected:
 
     bool fParse;
     const char *text;
+    /* The viewer, remembered by setup() so handleKeyword() can resolve its
+     * words in their language: the keywords expand into help text, and help
+     * text is read by one person at a time. */
+    Character *viewer;
 };
 
 class DefaultHelpFormatter : public HelpFormatter {

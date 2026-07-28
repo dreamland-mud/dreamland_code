@@ -38,8 +38,7 @@ SkillHelpFormatter::SkillHelpFormatter( const char *text, Skill::Pointer skill )
     this->text = text;
     this->skill = skill;
     this->cmd = skill->getCommand( );
-    fRusCmd = false;
-    fRusSkill = false;
+    lang = LANG_DEFAULT;
 }
 
 SkillHelpFormatter::~SkillHelpFormatter( )
@@ -49,27 +48,30 @@ SkillHelpFormatter::~SkillHelpFormatter( )
 void SkillHelpFormatter::reset( )
 {
     HelpFormatter::reset( );
-    fRusCmd = false;
-    fRusSkill = false;
+    lang = LANG_DEFAULT;
 }
 
 void SkillHelpFormatter::setup( Character *ch )
 {
-    if (ch) {
-        bool fRus = Player::displayLang(ch) != LANG_EN;
+    if (ch)
+        lang = Player::displayLang(ch);
 
-        fRusCmd = fRus;
-        fRusSkill = fRus;
-    }
-    
     HelpFormatter::setup( ch );
 }
 
 
 /*
- * CMD      ->  русское_имя
- * SKILL    ->  русское_имя
- * SPELL    ->  к 'название заклинания'
+ * CMD      ->  the command's name in the viewer's language
+ * SKILL    ->  the skill's name in the viewer's language
+ * SPELL    ->  к 'название заклинания'  (the cast command plus the spell)
+ *
+ * These used to be a two-way English-or-Russian choice, so a Ukrainian reader
+ * got Russian everywhere. Both Command and Skill already carry getNameFor().
+ *
+ * The cast prefix stays a literal, because it is not a name but the shortest
+ * thing you can TYPE: 'c' in English, 'к' in Russian. Ukrainian has no
+ * one-letter form -- 'ч' also prefixes час and читати -- so it spells the
+ * command out.
  */
 bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
@@ -77,22 +79,17 @@ bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
         return true;
     
     if (kw == "CMD" && cmd) {
-        out << (fRusCmd && !cmd->getRussianName( ).empty( )
-                        ? cmd->getRussianName( )
-                        : cmd->getName( ));
+        out << cmd->getNameFor( lang );
         return true;
     }
 
     if (kw == "SKILL") {
-        out << (fRusSkill ? skill->getRussianName( ).quote( )
-                          : skill->getName( ).quote( ));
+        out << skill->getNameFor( lang ).quote( );
         return true;
     }
 
     if (kw == "SPELL") {
-        out << (fRusCmd ? "к" : "c") << " "
-            << (fRusSkill ? skill->getRussianName( ).quote( )
-                          : skill->getName( ).quote( ));
+        out << l(viewer, "к") << " " << skill->getNameFor( lang ).quote( );
         return true;
     }
     

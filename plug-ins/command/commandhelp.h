@@ -55,7 +55,7 @@ protected:
     virtual bool handleKeyword( const DLString &, ostringstream & );
 
     ::Pointer<Command> cmd;
-    bool fRusCmd;
+    lang_t lang;
 };
 
 #endif

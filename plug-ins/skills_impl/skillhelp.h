@@ -57,7 +57,7 @@ protected:
 
     Skill::Pointer skill;
     SkillCommand::Pointer cmd;
-    bool fRusCmd, fRusSkill;
+    lang_t lang;
 };
 
 #endif
