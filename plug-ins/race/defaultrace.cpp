@@ -88,6 +88,42 @@ DLString RaceHelp::getTitle(const DLString &label) const
     return HelpArticle::getTitle(label);
 }
 
+/**
+ * Same title, composed in the viewer's language.
+ *
+ * Most articles carry no authored <title> -- theirs is assembled here at
+ * display time, and that assembly was Russian for every viewer, including the
+ * "toc" form the website's category rail is built from.
+ */
+static DLString race_name_for(::Pointer<DefaultRace> race, lang_t lang, bool plural)
+{
+    // EN has no separate noun: the registry key IS the English race name.
+    if (lang == LANG_EN)
+        return race->getName();
+
+    if (lang == LANG_UA) {
+        const DLString &ua = plural ? race->getMltNameUa() : race->getMaleNameUa();
+        if (!ua.empty())
+            return ua.ruscase('1');
+    }
+
+    return (plural ? race->getMltName() : race->getMaleName()).ruscase('1');
+}
+
+DLString RaceHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    if (!race || !title.get(RU).empty())
+        return HelpArticle::getTitle(label, lang);
+
+    if (label == "title")
+        return DLString::emptyString;
+
+    if (label == "toc")
+        return help_title_fmt(lang, _("Раса '%1$s'"), race_name_for(race, lang, false));
+
+    return help_title_fmt(lang, _("Раса {c%1$s{x"), race_name_for(race, lang, true));
+}
+
 struct CommaSet : public set<string> {
     void print( ostream &buf ) const {
         bool found = false;

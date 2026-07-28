@@ -70,6 +70,38 @@ DLString AreaHelp::getTitle(const DLString &label) const
     return buf.str();
 }
 
+/**
+ * Same title, composed in the viewer's language.
+ *
+ * Only ~220 of the 1300-odd articles carry an authored <title>; the rest have
+ * theirs assembled here at display time, and that assembly used to be Russian
+ * for every viewer -- including the "toc" form the website's category rail is
+ * built from. The frame word comes from the catalog, the zone name from the
+ * area's own per-language name.
+ */
+DLString AreaHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    // An authored <title> already resolves per language in the base, and a
+    // help with no area has nothing to compose from.
+    if (!title.get(RU).empty() || !areafile || !areafile->area)
+        return MarkupHelpArticle::getTitle(label, lang);
+
+    // Website: the article's own <h1> -- the page supplies its own heading.
+    if (label == "title")
+        return DLString::emptyString;
+
+    DLString name = areafile->area->getName(lang);
+
+    // Website: right-hand side table of contents
+    if (label == "toc")
+        return help_title_fmt(lang, _("Зона '%1$s'"), name);
+
+    if (!selfHelp)
+        return MarkupHelpArticle::getTitle(label, lang);
+
+    return help_title_fmt(lang, _("Зона {c%1$s{x"), name);
+}
+
 static void format_area_quest(AreaQuest *q, ostringstream &qbuf, Character *ch)
 {
     // %A% is a website map macro -- keep it out of any fmt() format string.

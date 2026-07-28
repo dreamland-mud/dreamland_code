@@ -61,6 +61,11 @@ const DLString& SkillGroup::getNameFor( Character *ch ) const
     return getName( );
 }
 
+const DLString& SkillGroup::getNameFor( lang_t ) const
+{
+    return getName( );
+}
+
 /*-------------------------------------------------------------------
  * SkillGroupManager
  *------------------------------------------------------------------*/

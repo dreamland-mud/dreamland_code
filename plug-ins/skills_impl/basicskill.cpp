@@ -337,6 +337,11 @@ const DLString& BasicSkill::getNameFor( Character *ch ) const
     return name.get(Player::lang(ch));
 }
 
+const DLString& BasicSkill::getNameFor( lang_t lang ) const
+{
+    return name.getForLang(lang);
+}
+
 const DLString & BasicSkill::getWebColumn( ) const
 {
     return webColumn;

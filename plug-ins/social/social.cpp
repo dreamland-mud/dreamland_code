@@ -67,6 +67,15 @@ void SocialHelp::save() const
         social->save();
 }
 
+const DLString &Social::getNameFor( lang_t lang ) const
+{
+    if (lang == LANG_UA && !uaName.getValue().empty())
+        return uaName.getValue();
+    if (lang != LANG_EN && !rusName.getValue().empty())
+        return rusName.getValue();
+    return getName();
+}
+
 DLString SocialHelp::getTitle(const DLString &label) const
 {
     ostringstream buf;
@@ -88,6 +97,35 @@ DLString SocialHelp::getTitle(const DLString &label) const
         return "Социал {c" + social->getRussianName() + "{x, {c" + social->getName() + "{x";
         
     return HelpArticle::getTitle(label);
+}
+
+/**
+ * Same title, composed in the viewer's language. See AreaHelp for the why:
+ * a composed title used to be Russian for every viewer, "toc" included.
+ */
+DLString SocialHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    if (!social || !title.get(RU).empty())
+        return HelpArticle::getTitle(label, lang);
+
+    if (label == "title")
+        return DLString::emptyString;
+
+    // Socials are addressed by name, so the title carries BOTH the viewer's
+    // form and the Latin keyword -- either one is what a player would type.
+    DLString mine = social->getNameFor(lang);
+    DLString latin = social->getName();
+
+    if (label == "toc") {
+        if (mine == latin)
+            return latin;
+        return mine + ", " + latin;
+    }
+
+    if (mine == latin)
+        return help_title_fmt(lang, _("Социал {c%1$s{x"), latin);
+
+    return help_title_fmt(lang, _("Социал {c%1$s{x, {c%2$s{x"), mine, latin);
 }
 
 static const InflectedString & object_name()

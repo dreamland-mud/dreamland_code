@@ -18,6 +18,7 @@
 #include "player_utils.h"
 #include "commandflags.h"
 #include "def.h"
+#include "l10n.h"
 
 GROUP(none);
 const DLString SkillHelp::TYPE = "SkillHelp";
@@ -149,6 +150,44 @@ DLString SkillHelp::getTitle(const DLString &label) const
     }
 
     return title.get(RU);
+}
+
+/**
+ * Same title, composed in the viewer's language.
+ *
+ * Most articles carry no authored <title> -- theirs is assembled here at
+ * display time, and that assembly was Russian for every viewer, including the
+ * "toc" form the website's category rail is built from.
+ */
+DLString SkillHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    if (!skill || !title.get(RU).empty())
+        return HelpArticle::getTitle(label, lang);
+
+    // Website: the article's own <h1> -- the page supplies its own heading.
+    if (label == "title")
+        return DLString::emptyString;
+
+    DLString name = skill->getNameFor(lang);
+    bool spell = skill_is_spell(*skill);
+
+    // Website: right-hand side table of contents
+    if (label == "toc")
+        return spell
+            ? help_title_fmt(lang, _("Заклинание '%1$s'"), name)
+            : help_title_fmt(lang, _("Умение '%1$s'"), name);
+
+    // In-game header. A skill that is also a command names both.
+    if (skill->getCommand() && !skill->getCommand()->getNameFor(lang).empty()) {
+        DLString cmd = skill->getCommand()->getNameFor(lang);
+        return spell
+            ? help_title_fmt(lang, _("Заклинание {c%1$s{x и команда {c%2$s{x"), name, cmd)
+            : help_title_fmt(lang, _("Умение {c%1$s{x и команда {c%2$s{x"), name, cmd);
+    }
+
+    return spell
+        ? help_title_fmt(lang, _("Заклинание {c%1$s{x"), name)
+        : help_title_fmt(lang, _("Умение {c%1$s{x"), name);
 }
 
 void SkillHelp::setSkill( Skill::Pointer skill )

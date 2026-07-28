@@ -38,6 +38,10 @@ public:
 
     virtual const DLString & getName( ) const;
     virtual const DLString & getRussianName( ) const;
+    /** Both bases now declare a language-only getNameFor, so this class has to
+     *  say which one wins. Command's is the right answer: it holds the full
+     *  multilingual name, while SkillCommand's only knows EN and RU. */
+    virtual const DLString & getNameFor( lang_t lang ) const;
     virtual void run( Character *, const DLString & );
     virtual void run( Character *, char * );
     virtual bool applyLegacy(Character * ch, Character *victim, int level);

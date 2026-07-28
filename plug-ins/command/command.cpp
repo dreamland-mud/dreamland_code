@@ -84,6 +84,11 @@ const DLString & Command::getRussianName( ) const
     return name.get(RU);
 }
 
+const DLString & Command::getNameFor( lang_t lang ) const
+{
+    return name.getForLang(lang);
+}
+
 bool Command::available( Character *ch ) const 
 {
     if (getLevel( ) > ch->get_trust( ))

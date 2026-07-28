@@ -3,6 +3,7 @@
 #include "feniamanager.h"
 #include "logstream.h"
 #include "configurable.h"
+#include "l10n.h"
 
 CONFIGURABLE_LOADED(behaviors, services)
 {
@@ -42,25 +43,32 @@ DLString BehaviorHelp::getTitle(const DLString &label) const
     return buf.str();
 }
 
+static DLString behavior_name_for(DefaultBehavior::Pointer bhv, lang_t lang)
+{
+    if (lang == LANG_EN)
+        return bhv->getName().ruscase('1');       // latin keyword, e.g. "cuisinart"
+    if (lang == LANG_UA)
+        return bhv->getUkrainianName().ruscase('1');  // falls back to RU
+    return bhv->getRussianName().ruscase('1');
+}
+
 DLString BehaviorHelp::getTitle(const DLString &label, lang_t lang) const
 {
-    // Website surfaces (toc/title), an explicitly-set <title>, or no behavior:
-    // keep the base rendering (toc keeps its "Поведение '...'" grouping).
-    if (label == "toc" || label == "title" || !title.get(RU).empty() || !bhv)
+    // An authored <title> already resolves per language in the base.
+    if (label == "title" || !title.get(RU).empty() || !bhv)
         return HelpArticle::getTitle(label, lang);
 
-    // In-game player help header: the behavior's name in the viewer's language,
-    // capitalized, with NO "Поведение" prefix.
-    DLString nm;
-    if (lang == LANG_EN)
-        nm = bhv->getName();            // latin keyword, e.g. "cuisinart"
-    else if (lang == LANG_UA)
-        nm = bhv->getUkrainianName();   // UA name, falls back to RU
-    else
-        nm = bhv->getRussianName();
+    // Website: right-hand side table of contents. Keeps the "Поведение '...'"
+    // grouping -- it is what sorts these together in the rail -- but the frame
+    // word and the name now follow the viewer.
+    if (label == "toc")
+        return help_title_fmt(lang, _("Поведение '%1$s'"), behavior_name_for(bhv, lang));
 
+    // In-game player help header: the behavior's name in the viewer's language,
+    // capitalized, with NO "Поведение" prefix -- players don't know what
+    // "behaviors" are.
     ostringstream buf;
-    buf << "{c" << nm.ruscase('1').upperFirstCharacter() << "{x";
+    buf << "{c" << behavior_name_for(bhv, lang).upperFirstCharacter() << "{x";
     return buf.str();
 }
 

@@ -50,6 +50,33 @@ DLString ClassSkillHelp::getTitle(const DLString &label) const
     return HelpArticle::getTitle(label);
 }
 
+/**
+ * Same title, composed in the viewer's language. See AreaHelp for the why:
+ * a composed title used to be Russian for every viewer, "toc" included.
+ */
+static DLString prof_name_for(::Pointer<DefaultProfession> prof, lang_t lang, char gcase)
+{
+    if (lang == LANG_EN)
+        return prof->getName();
+
+    if (lang == LANG_UA && !prof->getUaName().empty())
+        return prof->getUaName().ruscase(gcase);
+
+    return prof->getRusName().ruscase(gcase);
+}
+
+DLString ClassSkillHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    if (!prof || !title.get(RU).empty())
+        return HelpArticle::getTitle(label, lang);
+
+    if (label == "title")
+        return DLString::emptyString;
+
+    // genitive in RU/UA ("умения вора"); EN has no case to pick
+    return help_title_fmt(lang, _("Умения %1$s"), prof_name_for(prof, lang, '2'));
+}
+
 void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     static const DLString PROF_SKILL_TYPE = "GenericSkill";
@@ -192,6 +219,26 @@ DLString ProfessionHelp::getTitle(const DLString &label) const
         return "Класс {c" + prof->getRusName().ruscase('1') + "{x";
 
     return HelpArticle::getTitle(label);
+}
+
+/**
+ * Same title, composed in the viewer's language. See AreaHelp for the why:
+ * a composed title used to be Russian for every viewer, "toc" included.
+ */
+DLString ProfessionHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    if (!prof || !title.get(RU).empty())
+        return HelpArticle::getTitle(label, lang);
+
+    if (label == "title")
+        return DLString::emptyString;
+
+    DLString name = prof_name_for(prof, lang, '1');
+
+    if (label == "toc")
+        return help_title_fmt(lang, _("Класс '%1$s'"), name);
+
+    return help_title_fmt(lang, _("Класс {c%1$s{x"), name);
 }
 
 // Per-viewer plural (multiple) race name: UA name for a UA viewer (RU fallback),

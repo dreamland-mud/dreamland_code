@@ -5,6 +5,7 @@
 #include "logstream.h"
 #include "helpmanager.h"
 #include "character.h"
+#include "multimessage.h"
 
 template class XMLStub<HelpArticle>;
 
@@ -44,6 +45,16 @@ void HelpArticle::setID(int id)
 int HelpArticle::getID() const
 {
     return id;
+}
+
+DLString help_title_fmt(lang_t lang, const MultiMessage &pattern,
+                        const DLString &a1, const DLString &a2)
+{
+    DLString result = pattern.getMessage(lang);
+    result.replaces("%1$s", a1);
+    if (!a2.empty())
+        result.replaces("%2$s", a2);
+    return result;
 }
 
 DLString HelpArticle::getTitle(const DLString &label) const

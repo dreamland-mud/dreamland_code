@@ -30,3 +30,13 @@ const DLString& SkillCommand::getNameFor(Character *ch) const
         return getName( );
 }
 
+const DLString& SkillCommand::getNameFor(lang_t lang) const
+{
+    // Base commands only carry EN + RU; DefaultSkillCommand overrides this
+    // with the full multilingual name.
+    if (lang != LANG_EN)
+        return getRussianName( );
+    else
+        return getName( );
+}
+

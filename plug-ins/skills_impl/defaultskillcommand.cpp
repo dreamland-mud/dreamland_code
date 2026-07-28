@@ -87,6 +87,11 @@ const DLString & DefaultSkillCommand::getRussianName( ) const
     return Command::getRussianName( );
 }
 
+const DLString & DefaultSkillCommand::getNameFor( lang_t lang ) const
+{
+    return Command::getNameFor( lang );
+}
+
 bool DefaultSkillCommand::visible( Character *ch ) const
 {
     if (!Command::visible( ch ))

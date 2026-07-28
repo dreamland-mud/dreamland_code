@@ -39,6 +39,8 @@ public:
     virtual void show( PCharacter *, ostringstream & ) const;
     virtual int getPracticer( ) const;
     virtual const DLString& getNameFor( Character * ) const;
+    /** Language-only variant, for per-language help titles (no Character). */
+    virtual const DLString& getNameFor( lang_t lang ) const;
 
 protected:
     DLString elementName;

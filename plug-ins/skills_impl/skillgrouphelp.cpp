@@ -7,6 +7,7 @@
 #include "skillgrouphelp.h"
 #include "character.h"
 #include "xmltableelement.h"
+#include "l10n.h"
 
 /*-------------------------------------------------------------------
  * SkillGroupHelp 
@@ -42,6 +43,30 @@ DLString SkillGroupHelp::getTitle(const DLString &label) const
         return MarkupHelpArticle::getTitle(label);
 
     return "Группа умений {c" + group->getRussianName() + "{x, {c" + group->getName() + "{x";
+}
+
+/**
+ * Same title, composed in the viewer's language.
+ *
+ * Most articles carry no authored <title> -- theirs is assembled here at
+ * display time, and that assembly was Russian for every viewer, including the
+ * "toc" form the website's category rail is built from.
+ */
+DLString SkillGroupHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    if (!group || !title.get(RU).empty())
+        return MarkupHelpArticle::getTitle(label, lang);
+
+    if (label == "title")
+        return DLString::emptyString;
+
+    DLString name = group->getNameFor(lang);
+
+    if (label == "toc")
+        return help_title_fmt(lang, _("Группа умений '%1$s'"), name);
+
+    return help_title_fmt(lang, _("Группа умений {c%1$s{x, {c%2$s{x"),
+                          name, group->getName());
 }
 
 void SkillGroupHelp::getRawText( Character *ch, ostringstream &buf ) const

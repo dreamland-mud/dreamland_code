@@ -39,6 +39,9 @@ public:
     virtual bool isValid( ) const;
     
     virtual const DLString& getNameFor( Character * ) const;
+    /** Same, for a display path that knows the language but has no Character --
+     *  help-article titles rendered once per language by the web dumper. */
+    virtual const DLString& getNameFor( lang_t lang ) const;
     virtual const DLString &getRussianName( ) const;
     virtual GlobalBitvector & getGroups();
     bool hasGroup(unsigned int group);
