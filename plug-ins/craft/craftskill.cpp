@@ -123,7 +123,7 @@ bool CraftSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
 void CraftSkill::show( PCharacter *ch, std::ostream &buf ) const
 {
-    buf << print_what(this) << " "
+    buf << print_what(this, ch) << " "
         << print_names_for(this, ch)
         << print_group_for(this, ch)
         << ".{x" << endl;

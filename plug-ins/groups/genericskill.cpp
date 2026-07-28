@@ -334,7 +334,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
             buf << pad << l(ch, "Бонус для рас:") << " {D" << this->skillRacesList(ch) << "{x" << endl;
     };
 
-    buf << print_what(this) << " "
+    buf << print_what(this, ch) << " "
         << print_names_for(this, ch)
         << print_group_for(this, ch)
         << ".{x" << endl

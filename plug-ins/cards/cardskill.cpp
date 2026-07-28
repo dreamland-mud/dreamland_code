@@ -81,7 +81,7 @@ bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
 void CardSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
-    buf << print_what(this) << " Колоды "
+    buf << print_what(this, ch) << " Колоды "
         << print_names_for(this, ch)
         << print_group_for(this, ch)
         << ".{x" << endl;
