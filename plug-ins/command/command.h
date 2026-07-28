@@ -41,6 +41,10 @@ public:
 
         virtual const DLString& getName( ) const;
         virtual const DLString & getRussianName( ) const;
+        /** The name in a given language, RU-then-EN fallback when unset. For
+         *  display paths that know the viewer's language but have no Character
+         *  (help-article titles rendered per language by the web dumper). */
+        virtual const DLString & getNameFor( lang_t lang ) const;
         virtual const DLString & getHint( ) const;
         virtual ::Pointer<CommandHelp> getHelp( ) const;
         virtual short getLog( ) const;

@@ -39,6 +39,7 @@ public:
     virtual void setName( const DLString & );
     virtual const DLString &getRussianName( ) const;
     virtual const DLString& getNameFor( Character * ) const;
+    virtual const DLString& getNameFor( lang_t lang ) const;
     virtual const DLString & getWebColumn( ) const;
     virtual DLString getWebLabel( lang_t lang ) const;
     virtual bool matchesStrict( const DLString &str ) const;

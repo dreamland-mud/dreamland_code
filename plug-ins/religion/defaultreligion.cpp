@@ -82,6 +82,40 @@ DLString ReligionHelp::getTitle(const DLString &label) const
     return HelpArticle::getTitle(label);
 }
 
+/**
+ * Same title, composed in the viewer's language.
+ *
+ * Most articles carry no authored <title> -- theirs is assembled here at
+ * display time, and that assembly was Russian for every viewer, including the
+ * "toc" form the website's category rail is built from.
+ */
+static DLString religion_name_for(::Pointer<DefaultReligion> religion, lang_t lang)
+{
+    if (lang == LANG_EN)
+        return religion->getName();
+
+    if (lang == LANG_UA && !religion->getNameUa().empty())
+        return religion->getNameUa().ruscase('1');
+
+    return religion->getRussianName().ruscase('1');
+}
+
+DLString ReligionHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    if (!religion || !title.get(RU).empty())
+        return HelpArticle::getTitle(label, lang);
+
+    if (label == "title")
+        return DLString::emptyString;
+
+    DLString name = religion_name_for(religion, lang);
+
+    if (label == "toc")
+        return help_title_fmt(lang, _("Религия '%1$s'"), name);
+
+    return help_title_fmt(lang, _("Религия {c%1$s{x"), name);
+}
+
 void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     in << l(ch, "Религия") << " {C" << religion->getNameFor(ch).ruscase('1') << "{x ({C"

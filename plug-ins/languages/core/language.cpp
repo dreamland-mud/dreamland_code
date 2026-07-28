@@ -17,6 +17,7 @@
 #include "pcrace.h"
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 /*--------------------------------------------------------------------
  * LanguageHelp
@@ -47,6 +48,30 @@ DLString LanguageHelp::getTitle(const DLString &label) const
         buf << command->getRussianName() << "{x, {c";
     buf << command->getName() << "{x";
     return buf.str();
+}
+
+/**
+ * Same title, composed in the viewer's language. See AreaHelp for the why:
+ * a composed title used to be Russian for every viewer, "toc" included.
+ */
+DLString LanguageHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    if (!command || !title.get(RU).empty())
+        return MarkupHelpArticle::getTitle(label, lang);
+
+    if (label == "title")
+        return DLString::emptyString;
+
+    DLString mine = command->getNameFor(lang);
+    DLString latin = command->getName();
+
+    if (label == "toc")
+        return help_title_fmt(lang, _("Древний язык '%1$s'"), mine);
+
+    if (mine == latin || mine.empty())
+        return help_title_fmt(lang, _("Древний язык {c%1$s{x"), latin);
+
+    return help_title_fmt(lang, _("Древний язык {c%1$s{x, {c%2$s{x"), mine, latin);
 }
 
 void LanguageHelp::getRawText( Character *ch, ostringstream &in ) const

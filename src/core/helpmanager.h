@@ -16,7 +16,19 @@
 #include "xmlvariablecontainer.h"
 
 class Character;
+class MultiMessage;
 struct area_file;
+
+/** Resolve a help-title pattern in `lang` and fill its %N$s slots.
+ *
+ * Composed help titles ("Spell '<name>'", "Zone '<name>'", ...) are built in
+ * a dozen different plug-ins, and not all of them link the output plug-in, so
+ * fmtLang/act.h is not reachable everywhere. This does the one thing those
+ * titles need -- a catalog lookup plus one or two substitutions -- from core,
+ * where every help plug-in can already see it. */
+DLString help_title_fmt(lang_t lang, const MultiMessage &pattern,
+                        const DLString &a1,
+                        const DLString &a2 = DLString::emptyString);
 
 class HelpArticle : public XMLVariableContainer {
 XML_OBJECT    

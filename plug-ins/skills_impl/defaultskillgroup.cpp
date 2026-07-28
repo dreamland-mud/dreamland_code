@@ -68,6 +68,11 @@ const DLString& DefaultSkillGroup::getNameFor( Character *ch ) const
     return name.get(Player::lang(ch));
 }
 
+const DLString& DefaultSkillGroup::getNameFor( lang_t lang ) const
+{
+    return name.getForLang(lang);
+}
+
 int DefaultSkillGroup::getPracticer( ) const
 {
     return practicer;

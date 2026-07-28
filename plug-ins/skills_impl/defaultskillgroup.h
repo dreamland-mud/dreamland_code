@@ -34,6 +34,7 @@ public:
     virtual bool matchesUnstrict( const DLString &str ) const;
     virtual bool matchesSubstring( const DLString &str ) const;
     virtual const DLString& getNameFor( Character * ) const;
+    virtual const DLString& getNameFor( lang_t lang ) const;
     virtual void loaded( );
     virtual void unloaded( );
     

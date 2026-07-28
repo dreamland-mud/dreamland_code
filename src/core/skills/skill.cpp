@@ -36,6 +36,10 @@ const DLString& Skill::getNameFor( Character *ch ) const
 {
     return getName();
 }
+const DLString& Skill::getNameFor( lang_t ) const
+{
+    return getName();
+}
 const DLString &Skill::getRussianName( ) const
 {
     return DLString::emptyString;

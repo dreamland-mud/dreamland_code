@@ -56,6 +56,7 @@ public:
     virtual void unsetProfession( );
 
     virtual DLString getTitle(const DLString &label) const;
+    virtual DLString getTitle(const DLString &label, lang_t lang) const;
     virtual void getRawText( Character *, ostringstream & ) const;
     virtual void save() const;
     inline virtual const DLString & getType( ) const;

@@ -33,6 +33,7 @@ public:
     virtual void save() const;
 
     virtual DLString getTitle(const DLString &label) const;
+    virtual DLString getTitle(const DLString &label, lang_t lang) const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
 
@@ -62,6 +63,11 @@ public:
     inline virtual const DLString &getName( ) const;
     inline virtual void setName( const DLString & );
     inline virtual const DLString &getRussianName( ) const;
+    inline virtual const DLString &getUaName( ) const;
+    /** The name in a given language, falling back to RU then the Latin
+     *  keyword. Socials carry three separate names rather than one
+     *  XMLMultiString because the Latin keyword is also the registry key. */
+    virtual const DLString &getNameFor( lang_t lang ) const;
     inline const DLString &getShortDesc( ) const;
 
     inline virtual int getPosition( ) const;
@@ -92,6 +98,7 @@ private:
 
 public:    
     XML_VARIABLE XMLString  rusName;
+    XML_VARIABLE XMLString  uaName;
     XML_VARIABLE XMLString  shortDesc;
     XML_VARIABLE XMLString  msgCharNoArgument;
     XML_VARIABLE XMLString  msgOthersNoArgument;
@@ -130,6 +137,11 @@ inline void Social::setName( const DLString &name )
 inline const DLString& Social::getRussianName( ) const 
 {
     return rusName.getValue( );
+}
+
+inline const DLString& Social::getUaName( ) const
+{
+    return uaName.getValue( );
 }
 inline const DLString & Social::getShortDesc( ) const
 {

@@ -52,6 +52,32 @@ DLString CraftProfessionHelp::getTitle(const DLString &label) const
     
     return HelpArticle::getTitle(label);
 }
+
+/**
+ * Same title, composed in the viewer's language. See AreaHelp for the why:
+ * a composed title used to be Russian for every viewer, "toc" included.
+ */
+DLString CraftProfessionHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    if (!prof || !title.get(RU).empty())
+        return HelpArticle::getTitle(label, lang);
+
+    if (label == "title")
+        return DLString::emptyString;
+
+    DLString name;
+    if (lang == LANG_EN)
+        name = prof->getName();
+    else if (lang == LANG_UA && !prof->getUaName().empty())
+        name = prof->getUaName().ruscase('1');
+    else
+        name = prof->getRusName().ruscase('1');
+
+    if (label == "toc")
+        return help_title_fmt(lang, _("Профессия '%1$s'"), name);
+
+    return help_title_fmt(lang, _("Профессия {c%1$s{x"), name);
+}
     
 void CraftProfessionHelp::setProfession( CraftProfession::Pointer prof )
 {
