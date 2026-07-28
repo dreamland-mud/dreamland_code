@@ -268,7 +268,12 @@ bool Social::matches( const DLString& argument ) const
     
     if (SocialBase::matches( argument ))
         return true;
-    
+
+    // SocialBase only knows the Latin keyword and the Russian name; the
+    // Ukrainian one is stored here, and a social nobody can type is no social.
+    if (!uaName.getValue( ).empty( ) && argument.strPrefix( uaName.getValue( ) ))
+        return true;
+
     for (XMLStringList::const_iterator a = aliases.begin( ); a != aliases.end( ); a++)
         if (argument.strPrefix( *a ))
             return true;
