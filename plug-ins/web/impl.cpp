@@ -904,8 +904,12 @@ public:
     }
 
     /**
-     * Output help categories and list of unique links to disk, all formated for
-     * a 1st level player with Russian language settings.
+     * Output help categories and list of unique links to disk, formatted for a
+     * 1st level player. Every article is rendered three times -- the bare keys
+     * stay Russian so existing consumers keep working, 'textEn'/'titleEn'/'tocEn'
+     * and the Ua equivalents are additions. Article text already routes through
+     * text.getForLang(Player::displayLang(ch)), so flipping the dummy's 'lang'
+     * attribute is all it takes to get another language out.
      */
     virtual void run( )
     {
@@ -920,8 +924,21 @@ public:
         dummy.setRussianName("Кадм||а|у|а|ом|е");
         dummy.setLevel(1);
         dummy.setSex(SEX_MALE);
-        dummy.getAttributes( ).getAttr<XMLStringAttribute>( "lang" )->setValue( "ru" );
         SET_BIT(dummy.act, PLR_COLOR);
+
+        XMLStringAttribute::Pointer langAttr
+            = dummy.getAttributes( ).getAttr<XMLStringAttribute>( "lang" );
+        langAttr->setValue( "ru" );
+
+        static const struct {
+            const char *attr;
+            lang_t lang;
+            const char *suffix;
+        } dumpLangs[3] = {
+            { "ru", RU, ""   },
+            { "en", EN, "En" },
+            { "ua", UA, "Ua" },
+        };
 
         Json::Value helps;
         HelpArticles::const_iterator a;
@@ -947,13 +964,21 @@ public:
                     h["labels"].append(l);
                 }
 
-                h["toc"] = (*a)->getTitle("toc").colourStrip();       
-                h["title"] = (*a)->getTitle("title").colourStrip();           
+                for (int i = 0; i < 3; i++) {
+                    const DLString suffix = dumpLangs[i].suffix;
+                    langAttr->setValue( dumpLangs[i].attr );
 
-                ostringstream textStream;
-                DLString text = (*a)->getText(&dummy);
-                mudtags_convert(text.c_str(), textStream, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_WEB, &dummy);
-                h["text"] = textStream.str();
+                    h[("toc" + suffix).c_str()]
+                        = (*a)->getTitle("toc", dumpLangs[i].lang).colourStrip();
+                    h[("title" + suffix).c_str()]
+                        = (*a)->getTitle("title", dumpLangs[i].lang).colourStrip();
+
+                    ostringstream textStream;
+                    DLString text = (*a)->getText(&dummy);
+                    mudtags_convert(text.c_str(), textStream, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_WEB, &dummy);
+                    h[("text" + suffix).c_str()] = textStream.str();
+                }
+                langAttr->setValue( "ru" );
 
                 helps.append(h);
             }
