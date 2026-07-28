@@ -40,7 +40,7 @@ char skill_learned_colour(const Skill *, PCharacter *ch);
 DLString print_names_for(const Skill *skill, Character *ch);
 
 /** Return "Skill" or "Spell" string for the help header. */
-DLString print_what(const Skill *skill);
+DLString print_what(const Skill *skill, Character *ch);
 
 /** Return skill group name with a hyper-link. */
 DLString print_group_for(const Skill *skill, Character *ch);

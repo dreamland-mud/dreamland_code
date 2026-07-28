@@ -11,6 +11,7 @@
 #include "core/object.h"
 #include "calendar_utils.h"
 #include "skill.h"
+#include "l10n.h"
 #include "bonus.h"
 #include "affectflags.h"
 #include "damageflags.h"
@@ -163,12 +164,16 @@ DLString print_names_for(const Skill *skill, Character *ch)
             SKILL_HEADER_FG, skill->getRussianName().c_str(), SKILL_HEADER_BG);
 }
 
-DLString print_what(const Skill *skill)
+/* The word a skill help opens with. It used to be the Russian noun declined
+ * through the Flexer, with no language branch at all, so an English reader's
+ * fireball help started "Заклинание 'fireball'". RU resolves to the same word
+ * the Flexer produced, so Russian output is unchanged. */
+DLString print_what(const Skill *skill, Character *ch)
 {
     ostringstream buf;
 
     buf << "{" << SKILL_HEADER_BG
-        << skill_what(skill).ruscase('1').upperFirstCharacter();
+        << l(ch, skill_is_spell(skill) ? "Заклинание" : "Умение");
 
     return buf.str();
 }
@@ -180,9 +185,9 @@ DLString print_group_for(const Skill *skill, Character *ch)
         return DLString::emptyString;
 
     ostringstream buf;
-    buf << "{" << SKILL_HEADER_BG << ", входит в групп"
-        << (groups.size() == 1 ? "у" : "ы")
-        << " ";
+    buf << "{" << SKILL_HEADER_BG
+        << (groups.size() == 1 ? l(ch, ", входит в группу ")
+                               : l(ch, ", входит в группы "));
         
     for (unsigned int g = 0; g < groups.size(); g++) {
         if (g > 0)

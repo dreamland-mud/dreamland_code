@@ -187,7 +187,7 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
     PCSkillData &data = ch->getSkillData( getIndex( ) );    
     const char *pad = SKILL_INFO_PAD;
 
-    buf << print_what(this) << " "
+    buf << print_what(this, ch) << " "
         << print_names_for(this, ch)
         << ", навык ";
 
