@@ -133,7 +133,7 @@ CommandHelpFormatter::CommandHelpFormatter( const char *text, Command::Pointer c
 {
     this->text = text;
     this->cmd = cmd;
-    fRusCmd = false;
+    lang = LANG_DEFAULT;
 }
 
 CommandHelpFormatter::~CommandHelpFormatter( )
@@ -143,20 +143,24 @@ CommandHelpFormatter::~CommandHelpFormatter( )
 void CommandHelpFormatter::reset( )
 {
     HelpFormatter::reset( );
-    fRusCmd = false;
+    lang = LANG_DEFAULT;
 }
 
 void CommandHelpFormatter::setup( Character *ch )
 {
-    if (ch) {
-        fRusCmd = Player::displayLang(ch) != LANG_EN;
-    }
-    
+    if (ch)
+        lang = Player::displayLang(ch);
+
     HelpFormatter::setup( ch );
 }
 
 /*
- * CMD    ->  русское_имя
+ * CMD -> the command's own name in the viewer's language.
+ *
+ * It used to be a two-way choice, English name or Russian one, which handed a
+ * Ukrainian reader the Russian command in all 499 places this keyword appears
+ * -- even though commands carry <name l="ua"> (cast / колдовать / чаклувати).
+ * getNameFor() already does the per-language pick with a RU-then-EN fallback.
  */
 bool CommandHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
@@ -164,9 +168,7 @@ bool CommandHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out
         return true;
     
     if (kw == "CMD" && cmd) {
-        out << (fRusCmd && !cmd->getRussianName( ).empty( )
-                        ? cmd->getRussianName( )
-                        : cmd->getName( ));
+        out << cmd->getNameFor( lang );
         return true;
     }
     
