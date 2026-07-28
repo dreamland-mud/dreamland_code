@@ -5,6 +5,7 @@
 #ifndef SKILLGROUPHELP_H
 #define SKILLGROUPHELP_H
 
+#include "lang.h"
 #include "markuphelparticle.h"
 #include "skillgroup.h"
 

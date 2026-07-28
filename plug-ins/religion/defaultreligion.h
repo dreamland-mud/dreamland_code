@@ -5,6 +5,7 @@
 #ifndef DEFAULTRELIGION_H
 #define DEFAULTRELIGION_H
 
+#include "lang.h"
 #include "xmlstring.h"
 #include "xmlflags.h"
 #include "xmltableelement.h"

@@ -5,6 +5,7 @@
 #ifndef SKILLGROUP_H
 #define SKILLGROUP_H
 
+#include "lang.h"
 #include <sstream>
 #include "oneallocate.h"
 #include "globalregistryelement.h"

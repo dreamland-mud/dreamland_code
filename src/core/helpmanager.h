@@ -5,6 +5,7 @@
 #ifndef HELPMANAGER_H
 #define HELPMANAGER_H
 
+#include "lang.h"
 #include <list>
 #include <map>
 
