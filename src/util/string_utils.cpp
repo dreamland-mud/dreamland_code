@@ -134,6 +134,40 @@ DLString String::translitToLatin(const DLString &str)
     return out;
 }
 
+// Some personal names do not decline at all, and a pad repeating the nominative
+// is the CORRECT answer for them, not a failure to inflect: foreign names ending
+// in a vowel (Кворо, Самуро, Теруто) and feminine names ending in a consonant
+// (Тайфоэн, Кармен) keep one form in every case. These are exactly the classes
+// the rule-based Russian decliner in fenia utils/inflect already refuses.
+//
+// -а and -я are NOT here: those decline in both languages (Олена -> Олени).
+// KOI8 char switch, as everywhere else in this file.
+bool String::nameIsIndeclinable(const DLString &name, bool female)
+{
+    if (name.size( ) <= 2)
+        return true;
+
+    char last = dl_tolower( name.at( name.size( ) - 1 ) );
+
+    switch (last) {
+    case 'о': case 'у': case 'ю': case 'е': case 'є':
+    case 'и': case 'і': case 'ї': case 'э': case 'ы': case 'ё':
+        return true;
+    }
+
+    // A feminine name ending in a consonant. 'ь' is not a consonant for this
+    // purpose -- Любовь and friends still decline.
+    if (female && dl_is_cyrillic( last )) {
+        switch (last) {
+        case 'а': case 'я': case 'ь':
+            return false;
+        }
+        return true;
+    }
+
+    return false;
+}
+
 // The four Russian letters Ukrainian does not have. Same KOI8 note as
 // cyr_letter_to_latin above: -fexec-charset=KOI8-U folds each literal to one
 // runtime byte, so this is a char switch and not UTF-8. 'ъ' drops, 'ё' expands

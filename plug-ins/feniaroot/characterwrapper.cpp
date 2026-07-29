@@ -1866,13 +1866,22 @@ static void autofill_name_forms( PCharacter *pch )
         // judgement about each name rather than transliteration.
         source = String::ruLettersToUa( source );
 
-        // Store only a pad that really declined. Keeping an undeclinable one would
-        // make the field non-empty, so this autofill would never retry it AND the
-        // "empty Ukrainian falls back to Russian" rule in PCharacter's name map
-        // would stop firing -- leaving Ukrainian viewers with a bare Latin login.
-        DLString pad = Morphology::declineUa( source, "NOUN", gender );
-        if (pad_declined( pad ))
-            pch->setUkrainianName( pad );
+        // Names that do not decline must not be handed to the morphology
+        // service: it has no notion of the class and will invent a paradigm --
+        // it declined the indeclinable Кворо as a feminine noun
+        // ("Квор|а|и|і|у|ою|і") and inflected Тайфоэн, a feminine name ending in
+        // a consonant. Leaving the slot empty is right: the name map already
+        // falls back to the Russian form, which carries the same single shape.
+        if (!String::nameIsIndeclinable( source, pch->getSex( ) == SEX_FEMALE )) {
+            // Store only a pad that really declined. Keeping an undeclinable one
+            // would make the field non-empty, so this autofill would never retry
+            // it AND the "empty Ukrainian falls back to Russian" rule in
+            // PCharacter's name map would stop firing -- leaving Ukrainian
+            // viewers with a bare Latin login.
+            DLString pad = Morphology::declineUa( source, "NOUN", gender );
+            if (pad_declined( pad ))
+                pch->setUkrainianName( pad );
+        }
     }
 }
 
