@@ -35,11 +35,17 @@ void Player::menuPrint(PCharacter* pch)
     if (menu.empty())
         return;
 
+    // The bracket label was a bare Russian literal, so every menu in the game --
+    // quest answers included -- said "ВЫБОР" to English and Ukrainian players.
+    // It is composed at runtime around the choice number, so it needs lmsg
+    // rather than a catalog entry for the finished line.
+    const char *label = lmsg(viewerLang(pch), "CHOICE ", "ВЫБОР ", "ВИБІР ");
+
     for (auto &m: menu) {
         const DLString &choice = m.first;
         const DLString &action = m.second;
 
-        buf << "{D[ВЫБОР " << choice << "]: {y{hc" << action << "{x" << endl;
+        buf << "{D[" << label << choice << "]: {y{hc" << action << "{x" << endl;
     }
 
     pch->send_to(buf);
