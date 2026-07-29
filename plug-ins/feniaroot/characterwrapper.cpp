@@ -1858,6 +1858,14 @@ static void autofill_name_forms( PCharacter *pch )
         if (source.empty( ))
             source = pch->getName( );
 
+        // Ukrainian has no э/ы/ъ/ё, so a Russian name carrying one is a word the
+        // Ukrainian dictionary simply cannot read: it declines nothing and cannot
+        // even tell the name is animate. Rewriting those four letters first makes
+        // ~60 more of the 602 affected names parse. и is deliberately left alone
+        // -- it is a normal Ukrainian letter, so mapping it to і would be a
+        // judgement about each name rather than transliteration.
+        source = String::ruLettersToUa( source );
+
         // Store only a pad that really declined. Keeping an undeclinable one would
         // make the field non-empty, so this autofill would never retry it AND the
         // "empty Ukrainian falls back to Russian" rule in PCharacter's name map

@@ -134,6 +134,36 @@ DLString String::translitToLatin(const DLString &str)
     return out;
 }
 
+// The four Russian letters Ukrainian does not have. Same KOI8 note as
+// cyr_letter_to_latin above: -fexec-charset=KOI8-U folds each literal to one
+// runtime byte, so this is a char switch and not UTF-8. 'ъ' drops, 'ё' expands
+// to a digraph. Returns 0 for anything else, meaning "pass the byte through".
+static const char * ru_letter_to_ua(char c)
+{
+    switch (c) {
+    case 'э': return "е";   case 'Э': return "Е";
+    case 'ы': return "и";   case 'Ы': return "И";
+    case 'ъ': return "";    case 'Ъ': return "";
+    case 'ё': return "йо";  case 'Ё': return "Йо";
+    }
+    return 0;
+}
+
+DLString String::ruLettersToUa(const DLString &str)
+{
+    ostringstream buf;
+
+    for (DLString::size_type i = 0; i < str.length(); i++) {
+        const char *ua = ru_letter_to_ua( str.at(i) );
+        if (ua != 0)
+            buf << ua;
+        else
+            buf << str.at(i);
+    }
+
+    return buf.str();
+}
+
 bool String::lessCase( const DLString &a, const DLString& b )
 {
         DLString::size_type len = a.length( ) < b.length( ) ? a.length( ) : b.length( );
