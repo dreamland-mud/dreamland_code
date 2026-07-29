@@ -13,6 +13,7 @@
 #include "pcharactermemory.h"
 #include "grammar_entities_impl.h"
 #include "character.h"
+#include "string_utils.h"
 #include "lang.h"
 #include "merc.h"
 #include "def.h"
@@ -37,6 +38,34 @@ const DLString &PCharacterMemory::getNameP(char gram_case) const
         return name;
 
     return russianName.decline(gram_case);
+}
+
+/**
+ * Per-language name of an offline player.
+ *
+ * Without this override the interface default (CharacterMemoryInterface) throws
+ * the language away and answers with the Russian declension for everyone, so an
+ * offline character's name leaked Russian into English and Ukrainian output --
+ * clan rosters, note and board authors, and the channel servlet, which renders a
+ * message from an offline player through a dummy PCharacter built by setMemory().
+ *
+ * The fallbacks match PCharacter's cached noun: English is undeclined and falls
+ * back to the login (which is what autofill romanises it from anyway), Ukrainian
+ * falls back to the Russian pad.
+ */
+const DLString &PCharacterMemory::getNameP(char gram_case, lang_t lang) const
+{
+    if (lang == LANG_EN) {
+        if (englishName.getValue( ).empty( ))
+            return name;
+
+        return englishName;
+    }
+
+    if (lang == LANG_UA && !ukrainianName.getFullForm( ).empty( ))
+        return ukrainianName.decline( gram_case );
+
+    return getNameP( gram_case );
 }
 
 const char * PCharacterMemory::getNameC() const
@@ -288,9 +317,47 @@ const InflectedString& PCharacterMemory::getRussianName( ) const
     return russianName;
 }
 
-void PCharacterMemory::setRussianName( const DLString& name ) 
+void PCharacterMemory::setRussianName( const DLString& name )
 {
     russianName.setFullForm( name );
+}
+
+const DLString& PCharacterMemory::getEnglishName( ) const
+{
+    return englishName.getValue( );
+}
+
+void PCharacterMemory::setEnglishName( const DLString& name )
+{
+    englishName.setValue( name );
+}
+
+const InflectedString& PCharacterMemory::getUkrainianName( ) const
+{
+    return ukrainianName;
+}
+
+void PCharacterMemory::setUkrainianName( const DLString& name )
+{
+    ukrainianName.setFullForm( name );
+}
+
+lang_t PCharacterMemory::getBaseLang( ) const
+{
+    int v = baseLang.getValue( );
+
+    if (v >= 1 && v <= LANG_MAX)
+        return (lang_t)(v - 1);
+
+    // Same fallback as PCharacter: characters predating the field have nothing
+    // stored, so infer from the login's script.
+    return String::hasCyrillic( getName( ) ) ? LANG_RU : LANG_EN;
+}
+
+void PCharacterMemory::setBaseLang( lang_t lang )
+{
+    if (lang >= LANG_MIN && lang < LANG_MAX)
+        baseLang.setValue( (int)lang + 1 );
 }
 
 int PCharacterMemory::get_trust( ) const

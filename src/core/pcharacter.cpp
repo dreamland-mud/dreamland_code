@@ -435,6 +435,9 @@ PCharacterMemory* PCharacter::getMemory( )
         mem->setAttributes( getAttributes( ) );
         mem->setRemorts( getRemorts( ) );
         mem->setRussianName( getRussianName( ).getFullForm( ) );
+        mem->setEnglishName( getEnglishName( ) );
+        mem->setUkrainianName( getUkrainianName( ).getFullForm( ) );
+        mem->setBaseLang( getBaseLang( ) );
         mem->setReligion( getReligion( ) );
         mem->setDescription(getDescription());
         mem->setPretitle(getPretitle());
@@ -470,6 +473,12 @@ void PCharacter::setMemory( PCharacterMemory* pcm )
         setAttributes( pcm->getAttributes( ) );
         setRemorts( pcm->getRemorts( ) );
         setRussianName( pcm->getRussianName( ).getFullForm( ) );
+        setEnglishName( pcm->getEnglishName( ) );
+        setUkrainianName( pcm->getUkrainianName( ).getFullForm( ) );
+        // setBaseLang is set-once, so this restores a value only when the target
+        // has none -- it can never overwrite the registration language that
+        // load() just read from the pfile.
+        setBaseLang( pcm->getBaseLang( ) );
         setReligion( pcm->getReligion( ) );
         setDescription(pcm->getDescription());
         setPretitle(pcm->getPretitle());
