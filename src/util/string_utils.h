@@ -43,6 +43,13 @@ namespace String {
      *  not a mechanical rule. Everything else passes through. */
     DLString ruLettersToUa(const DLString &str);
 
+    /** True when a personal name belongs to a class that does not decline, so a
+     *  pad repeating the nominative is the right answer rather than a failure:
+     *  vowel-final foreign names (Кворо, Самуро) and feminine names ending in a
+     *  consonant (Тайфоэн). Mirrors the rules the Russian decliner in fenia
+     *  utils/inflect applies. Names in -а / -я decline and are not included. */
+    bool nameIsIndeclinable(const DLString &name, bool female);
+
     bool lessCase( const DLString &a, const DLString& b );
 
     /** True if arg is empty ignoring colours. */
