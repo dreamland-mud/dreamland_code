@@ -49,6 +49,7 @@ public:
     // CharacterMemoryInterface
     virtual const DLString& getName( ) const ;
     virtual const DLString &getNameP(char gram_case) const;
+    virtual const DLString &getNameP(char gram_case, lang_t lang) const;
     virtual const char * getNameC( ) const;
     virtual void setName( const DLString& name ) ;
 
@@ -133,6 +134,18 @@ public:
     virtual const InflectedString& getRussianName( ) const ;
     virtual void setRussianName( const DLString& name ) ;
 
+    // Per-language name forms, mirroring PCharacter. Without these an offline
+    // player renders in Russian for everyone, because getNameP(case, lang) below
+    // would otherwise inherit the interface default that discards the language.
+    virtual const DLString& getEnglishName( ) const ;
+    virtual void setEnglishName( const DLString& name ) ;
+
+    virtual const InflectedString& getUkrainianName( ) const ;
+    virtual void setUkrainianName( const DLString& name ) ;
+
+    virtual lang_t getBaseLang( ) const ;
+    virtual void setBaseLang( lang_t ) ;
+
     virtual bool isOnline( ) const;
     virtual PCharacter * getPlayer( );
     virtual NPCharacter * getMobile( );
@@ -176,6 +189,9 @@ private:
     XML_VARIABLE XMLInteger questpoints;
     XML_VARIABLE XMLInteger security;
     XML_VARIABLE XMLInflectedString russianName;
+    XML_VARIABLE XMLString englishName;
+    XML_VARIABLE XMLInflectedString ukrainianName;
+    XML_VARIABLE XMLIntegerNoEmpty baseLang;   // registration language + 1 (0 = unset)
     XML_VARIABLE PCSkills skills;
     XML_VARIABLE PCBonuses bonuses;
     XML_VARIABLE XMLInteger start_room;
