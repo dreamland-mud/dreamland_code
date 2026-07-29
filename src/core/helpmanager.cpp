@@ -127,6 +127,97 @@ bool HelpArticle::visible( Character *ch ) const
     return ch->get_trust( ) >= level;
 }
 
+/*
+ * Help categories -- HELP_IA.md.
+ *
+ * The vocabulary is closed and an article carries at most one topical key in its
+ * persistent labels. Most articles carry none: the labels the engine assigns at
+ * load time (spell, social, race, area, <class>-skills ...) already say what the
+ * article is, so an ordered fallback over those places about 1150 of the ~1340
+ * player-visible articles without any hand labelling at all.
+ *
+ * Order is load-bearing in both lists. A spell also carries `skill` and its
+ * class facet, so `spell` has to be tested before `skill` or every spell would
+ * end up on the skills shelf.
+ *
+ * The same order is implemented in scripts/help_category.py (the specification)
+ * and in dreamland_web/site.js/help-category.js (the website). All three must
+ * agree; change them together.
+ */
+static const char * PLAYER_CATEGORIES[] = {
+    "start", "char", "combat", "skills", "magic", "classes", "races", "gods",
+    "items", "quests", "world", "society", "comm", "socials", NULL
+};
+
+static const char * NON_PLAYER_CATEGORIES[] = {
+    "imm", "credits", "engine", "deprecated", NULL
+};
+
+static const struct {
+    const char *facet;
+    const char *category;
+} CATEGORY_FALLBACK[] = {
+    { "spell",        "magic"   },
+    { "social",       "socials" },
+    { "race",         "races"   },
+    { "raceaptitude", "races"   },
+    { "religion",     "gods"    },
+    { "class",        "classes" },
+    { "skillgroup",   "classes" },
+    { "craft",        "items"   },
+    { "craftskill",   "items"   },
+    { "item",         "items"   },
+    { "clanskill",    "skills"  },
+    { "cardskill",    "skills"  },
+    { "language",     "skills"  },
+    { "skill",        "skills"  },
+    { "area",         "world"   },
+    { "clan",         "society" },
+    { NULL,           NULL      }
+};
+
+const std::list<DLString> & HelpArticle::playerCategories()
+{
+    static std::list<DLString> categories;
+
+    if (categories.empty())
+        for (int i = 0; PLAYER_CATEGORIES[i]; i++)
+            categories.push_back(PLAYER_CATEGORIES[i]);
+
+    return categories;
+}
+
+bool HelpArticle::isPlayerCategory(const DLString &category)
+{
+    for (int i = 0; PLAYER_CATEGORIES[i]; i++)
+        if (category == PLAYER_CATEGORIES[i])
+            return true;
+
+    return false;
+}
+
+DLString HelpArticle::getCategory() const
+{
+    for (int i = 0; PLAYER_CATEGORIES[i]; i++)
+        if (labels.persistent.count(PLAYER_CATEGORIES[i]) > 0)
+            return PLAYER_CATEGORIES[i];
+
+    for (int i = 0; NON_PLAYER_CATEGORIES[i]; i++)
+        if (labels.persistent.count(NON_PLAYER_CATEGORIES[i]) > 0)
+            return NON_PLAYER_CATEGORIES[i];
+
+    for (int i = 0; CATEGORY_FALLBACK[i].facet; i++)
+        if (labels.all.count(CATEGORY_FALLBACK[i].facet) > 0)
+            return CATEGORY_FALLBACK[i].category;
+
+    // the generated per-class skill lists carry only a <class>-skills label
+    for (auto &l: labels.all)
+        if (l.size() > 7 && l.substr(l.size() - 7) == "-skills")
+            return "classes";
+
+    return DLString::emptyString;
+}
+
 bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
 {
     XMLVariableContainer::toXML(parent);

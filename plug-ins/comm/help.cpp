@@ -1,3 +1,4 @@
+#include <map>
 #include <string.h>
 #include "pcharacter.h"
 #include "player_utils.h"
@@ -256,6 +257,176 @@ private:
     StringSet preferredLabels;
 };
 
+/*-----------------------------------------------------------------------
+ * Category index -- HELP_IA.md
+ *
+ * 'help index' lists the browsable categories; 'help index <category>' lists
+ * that category's articles. The category an article belongs to is resolved by
+ * HelpArticle::getCategory(), which the website and the help dump also use, so
+ * the three views cannot drift apart.
+ *
+ * Output is plain lines with no frames or column art: roughly a third of the
+ * players read the game through a screen reader, and a table drawn out of
+ * punctuation is unreadable to them.
+ *-----------------------------------------------------------------------*/
+static const struct {
+    const char *key;
+    const char *name[3];        // indexed by lang_t: RU, EN, UA
+} CATEGORY_NAME[] = {
+    { "start",   { "С чего начать",  "Getting started",  "З чого почати" } },
+    { "char",    { "Твой персонаж",  "Your character",   "Твій персонаж" } },
+    { "combat",  { "Бой",            "Combat",           "Бій" } },
+    { "skills",  { "Умения и обучение", "Skills & learning", "Вміння й навчання" } },
+    { "magic",   { "Заклинания и магия", "Spells & magic", "Закляття й магія" } },
+    { "classes", { "Классы",         "Classes",          "Класи" } },
+    { "races",   { "Расы",           "Races",            "Раси" } },
+    { "gods",    { "Боги и религии", "Gods & religions", "Боги й релігії" } },
+    { "items",   { "Вещи и хозяйство", "Items & economy", "Речі й господарство" } },
+    { "quests",  { "Квесты",         "Quests",           "Квести" } },
+    { "world",   { "Мир и путешествия", "World & travel", "Світ і подорожі" } },
+    { "society", { "Игроки и кланы", "Players & clans",  "Гравці й клани" } },
+    { "comm",    { "Общение и настройки", "Communication & settings",
+                   "Спілкування й налаштування" } },
+    { "socials", { "Социалы",        "Socials",          "Соціали" } },
+    { NULL,      { NULL, NULL, NULL } }
+};
+
+/** The word that follows the command name: 'help index', 'справка разделы'. */
+static const char * INDEX_KEYWORD[3] = { "разделы", "index", "розділи" };
+
+static int lang_slot(lang_t lang)
+{
+    switch (lang) {
+        case EN: return 1;
+        case UA: return 2;
+        default: return 0;
+    }
+}
+
+static DLString category_name(const DLString &key, lang_t lang)
+{
+    for (int i = 0; CATEGORY_NAME[i].key; i++)
+        if (key == CATEGORY_NAME[i].key)
+            return CATEGORY_NAME[i].name[lang_slot(lang)];
+
+    return key;
+}
+
+/** Match what the player typed against a category: its name in their own
+ *  language first, then the bare key, so both 'справка разделы Боги и религии'
+ *  and 'help index gods' work whatever the display language. */
+static DLString category_from_argument(const DLString &arg)
+{
+    DLString needle = arg;
+    needle.toLower();
+
+    for (int i = 0; CATEGORY_NAME[i].key; i++) {
+        DLString key = CATEGORY_NAME[i].key;
+        key.toLower();
+        if (needle == key)
+            return CATEGORY_NAME[i].key;
+
+        // Accept the display name in any language, not only the viewer's: a
+        // player who copies a category name out of a friend's paste should not
+        // be told it does not exist.
+        for (int l = 0; l < 3; l++) {
+            DLString name = CATEGORY_NAME[i].name[l];
+            name.toLower();
+            if (needle == name)
+                return CATEGORY_NAME[i].key;
+        }
+    }
+
+    return DLString::emptyString;
+}
+
+static bool is_index_keyword(const DLString &arg)
+{
+    for (int l = 0; l < 3; l++)
+        if (arg_is(arg, INDEX_KEYWORD[l]))
+            return true;
+
+    return false;
+}
+
+/** All articles of one category this character may see. */
+static void collect_category(Character *ch, const DLString &key,
+                             HelpFinder::ArticleArray &result)
+{
+    HelpArticles::const_iterator a;
+
+    for (a = helpManager->getArticles( ).begin( );
+         a != helpManager->getArticles( ).end( ); a++)
+    {
+        if ((*a)->getID() <= 0 || !(*a)->visible(ch))
+            continue;
+
+        if ((*a)->getCategory() == key)
+            result.push_back(*a);
+    }
+}
+
+static void help_index_list(Character *ch, const DLString &cmdName,
+                            const DLString &key)
+{
+    std::basic_ostringstream<char> buf;
+    lang_t lang = Player::displayLang(ch);
+    HelpFinder::ArticleArray articles;
+
+    collect_category(ch, key, articles);
+
+    buf << fmt(ch, _("{WРаздел '%1$s'{x, статей: %2$d"),
+               category_name(key, lang).c_str(), (int)articles.size())
+        << endl << endl;
+
+    std::multimap<DLString, HelpArticle::Pointer> sorted;
+    for (unsigned int i = 0; i < articles.size(); i++)
+        sorted.insert(std::make_pair(
+            articles[i]->getTitle("toc", lang).colourStrip().toLower(),
+            articles[i]));
+
+    for (auto &pair: sorted)
+        buf << fmt(0, "  [{C{hh%d{x] %s\r\n",
+                   pair.second->getID(),
+                   pair.second->getTitle("toc", lang).c_str());
+
+    buf << endl
+        << fmt(ch, _("Все разделы: {y{hc%1$s %2$s{x."),
+               cmdName.c_str(), INDEX_KEYWORD[lang_slot(lang)])
+        << endl;
+
+    page_to_char(buf.str().c_str(), ch);
+}
+
+static void help_index_summary(Character *ch, const DLString &cmdName)
+{
+    std::basic_ostringstream<char> buf;
+    lang_t lang = Player::displayLang(ch);
+    const char *indexWord = INDEX_KEYWORD[lang_slot(lang)];
+
+    buf << fmt(ch, _("{WРазделы справки.{x Выбери раздел, чтобы увидеть его статьи:"))
+        << endl << endl;
+
+    for (auto &key: HelpArticle::playerCategories()) {
+        HelpFinder::ArticleArray articles;
+        collect_category(ch, key, articles);
+
+        if (articles.empty())
+            continue;
+
+        DLString name = category_name(key, lang);
+
+        // The whole label is the link, because a {hc} link sends exactly the
+        // text it shows -- so the text has to be a command the player's own
+        // language resolves.
+        buf << fmt(0, "  {y{hc%s %s %s{x{D  --  %d{x\r\n",
+                   cmdName.c_str(), indexWord, name.c_str(),
+                   (int)articles.size());
+    }
+
+    page_to_char(buf.str().c_str(), ch);
+}
+
 CMDRUNP( help )
 {
     std::basic_ostringstream<char> buf;
@@ -263,6 +434,40 @@ CMDRUNP( help )
 
     if (!ch->getPC())
         return;
+
+    // 'help index' / 'справка разделы' / 'довідка розділи', optionally with a
+    // category name after it. Handled before the article search so that a
+    // category named like an article keyword cannot shadow the index.
+    {
+        DLString rest = origArgument;
+        DLString first = rest.getOneArgument();
+
+        if (!first.empty() && is_index_keyword(first)) {
+            DLString cmdName = getNameFor(Player::displayLang(ch));
+
+            if (rest.empty()) {
+                help_index_summary(ch, cmdName);
+                return;
+            }
+
+            DLString key = category_from_argument(rest);
+            if (!key.empty()) {
+                help_index_list(ch, cmdName, key);
+                return;
+            }
+
+            // Formatted first and sent as a whole: the message embeds a {hc}
+            // link built from the command name, and handing that to pecho as a
+            // format string would make it reinterpret any % inside it.
+            ostringstream out;
+            out << fmt(ch, _("Нет такого раздела справки. Все разделы: {y{hc%1$s %2$s{x."),
+                       cmdName.c_str(),
+                       INDEX_KEYWORD[lang_slot(Player::displayLang(ch))])
+                << endl;
+            ch->send_to(out);
+            return;
+        }
+    }
 
     if (origArgument.empty()) {
         strcpy(argument, "summary");
