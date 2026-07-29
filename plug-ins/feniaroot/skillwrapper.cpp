@@ -401,7 +401,24 @@ NMI_GET( SkillGroupWrapper, name, "английское название" )
     return getTarget()->getName( );
 }
 
-NMI_GET( SkillGroupWrapper, nameRus, "русское название" ) 
+NMI_GET( SkillGroupWrapper, nameRus, "русское название" )
 {
     return getTarget()->getRussianName( );
+}
+
+/** The Fenia twin of SkillWrapper.nameFor. Without it a script could only
+ *  reach name (English) or nameRus, so the practice list and every other
+ *  Fenia site naming a skill group had no way to answer a Ukrainian reader --
+ *  even though SkillGroup itself has carried getNameFor since the
+ *  per-language help titles landed.
+ *
+ *  NOT called nameFor: NMI_INVOKE declares its method name as a tag in the
+ *  GLOBAL nmi:: namespace, so a second nameFor would collide with
+ *  SkillWrapper.nameFor above and silently unregister one of them -- a runtime
+ *  "Method not found", never a build error. Same reason AreaWrapper had to
+ *  become nameForLang. */
+NMI_INVOKE( SkillGroupWrapper, groupNameFor, "(ch): название группы с учетом языковых настроек персонажа" )
+{
+    Character *ch = args2character(args);
+    return getTarget()->getNameFor(ch);
 }
