@@ -142,7 +142,13 @@ void CPractice::pracShow( PCharacter *ch )
 
     for (auto &c: categoryMap) {
         bitnumber_t category = c.first;
-        DLString categoryName = skill_category_flags.messages(category).upperFirstCharacter();
+        // Without the language argument this defaults to LANG_DEFAULT, so the
+        // section headings came out Russian ("древние языки") in an otherwise
+        // English practice list. The skill names beside them already resolve
+        // through getNameFor(ch).
+        DLString categoryName = skill_category_flags
+                                    .messages(category, false, '1', viewerLang(ch))
+                                    .upperFirstCharacter();
 
         buf << "{W" << categoryName << ":{x" << endl;
         
