@@ -276,16 +276,16 @@ static const struct {
     { "start",   { "С чего начать",  "Getting started",  "З чого почати" } },
     { "char",    { "Твой персонаж",  "Your character",   "Твій персонаж" } },
     { "combat",  { "Бой",            "Combat",           "Бій" } },
-    { "skills",  { "Умения и обучение", "Skills & learning", "Вміння й навчання" } },
-    { "magic",   { "Заклинания и магия", "Spells & magic", "Закляття й магія" } },
+    { "skills",  { "Умения и обучение", "Skills and learning", "Вміння й навчання" } },
+    { "magic",   { "Заклинания и магия", "Spells and magic", "Закляття й магія" } },
     { "classes", { "Классы",         "Classes",          "Класи" } },
     { "races",   { "Расы",           "Races",            "Раси" } },
-    { "gods",    { "Боги и религии", "Gods & religions", "Боги й релігії" } },
-    { "items",   { "Вещи и хозяйство", "Items & economy", "Речі й господарство" } },
+    { "gods",    { "Боги и религии", "Gods and religions", "Боги й релігії" } },
+    { "items",   { "Вещи и хозяйство", "Items and economy", "Речі й господарство" } },
     { "quests",  { "Квесты",         "Quests",           "Квести" } },
-    { "world",   { "Мир и путешествия", "World & travel", "Світ і подорожі" } },
-    { "society", { "Игроки и кланы", "Players & clans",  "Гравці й клани" } },
-    { "comm",    { "Общение и настройки", "Communication & settings",
+    { "world",   { "Мир и путешествия", "World and travel", "Світ і подорожі" } },
+    { "society", { "Игроки и кланы", "Players and clans",  "Гравці й клани" } },
+    { "comm",    { "Общение и настройки", "Communication and settings",
                    "Спілкування й налаштування" } },
     { "socials", { "Социалы",        "Socials",          "Соціали" } },
     { NULL,      { NULL, NULL, NULL } }
@@ -340,10 +340,19 @@ static DLString category_from_argument(const DLString &arg)
     return DLString::emptyString;
 }
 
+/** Deliberately not arg_is(): that matches a one-letter prefix, so 'help i'
+ *  would open the index instead of searching, and it logs an error for any
+ *  keyword absent from the synonyms table -- which these three are, so every
+ *  'help <anything>' would write three error lines. Accept the whole word or a
+ *  prefix of at least three characters. */
 static bool is_index_keyword(const DLString &arg)
 {
+    if (arg.size() < 3)
+        return false;
+
+    // strPrefix is "this is a prefix of the argument", and it lowercases both.
     for (int l = 0; l < 3; l++)
-        if (arg_is(arg, INDEX_KEYWORD[l]))
+        if (arg.strPrefix(INDEX_KEYWORD[l]))
             return true;
 
     return false;
