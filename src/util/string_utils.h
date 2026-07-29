@@ -36,6 +36,13 @@ namespace String {
      *  Lossy and one-directional -- meant for display defaults, not identity. */
     DLString translitToLatin(const DLString &str);
 
+    /** Rewrite the four letters Ukrainian does not have (э ы ъ ё) into their
+     *  Ukrainian spelling, so a Russian-spelled name can be read by Ukrainian
+     *  morphology. NOT a full transliteration: и is left alone, because it is a
+     *  normal Ukrainian letter and turning it into і is a per-name judgement,
+     *  not a mechanical rule. Everything else passes through. */
+    DLString ruLettersToUa(const DLString &str);
+
     bool lessCase( const DLString &a, const DLString& b );
 
     /** True if arg is empty ignoring colours. */
