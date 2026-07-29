@@ -1493,6 +1493,23 @@ NMI_GET( CharacterWrapper, russianName, "русские имена с падеж
     return target->getPC( )->getRussianName( ).getFullForm( );
 }
 
+// The Ukrainian twin of the pair above. russianName has been reachable from
+// Fenia for years while this slot was not, so the nanny had nowhere to put the
+// name of a player who registers in Ukrainian and had to file it under Russian.
+NMI_SET( CharacterWrapper, ukrainianName, "украинские имена с падежами" )
+{
+    checkTarget( );
+    CHK_NPC
+    target->getPC( )->setUkrainianName( arg.toString( ) );
+}
+
+NMI_GET( CharacterWrapper, ukrainianName, "украинские имена с падежами" )
+{
+    checkTarget( );
+    CHK_NPC
+    return target->getPC( )->getUkrainianName( ).getFullForm( );
+}
+
 NMI_SET( CharacterWrapper, name, "имя" )
 {
     checkTarget( );
@@ -1822,6 +1839,18 @@ static bool pad_declined( const DLString &pad )
     return pad.find_first_not_of( '|', bar ) != DLString::npos;
 }
 
+// The nominative out of a Flexer pad -- everything before the first '|', or the
+// whole string when it carries no case forms at all.
+static DLString pad_nominative( const DLString &pad )
+{
+    DLString::size_type bar = pad.find( '|' );
+
+    if (bar == DLString::npos)
+        return pad;
+
+    return pad.substr( 0, bar );
+}
+
 // The compiled half of the T8 name auto-fill: romanise / decline the login into
 // whatever per-language form the player hasn't set. Kept in C++ for speed; the
 // hot-reloadable global/onConnect trigger just calls autofillNameForms() on
@@ -1851,10 +1880,14 @@ static void autofill_name_forms( PCharacter *pch )
         if (pch->getSex( ) == SEX_MALE)   gender = "masc";
         if (pch->getSex( ) == SEX_FEMALE) gender = "femn";
 
-        DLString source = pch->getRussianName( ).getFullForm( );
-        DLString::size_type bar = source.find( '|' );
-        if (bar != DLString::npos)
-            source = source.substr( 0, bar );
+        // Prefer the Ukrainian slot's OWN nominative. A player who registered in
+        // Ukrainian has the name they typed sitting right there, undeclined;
+        // deriving it from the Russian form instead would round-trip it through
+        // another alphabet for nothing. Only when that slot is empty does the
+        // Russian form -- and finally the login -- become the source.
+        DLString source = pad_nominative( pch->getUkrainianName( ).getFullForm( ) );
+        if (source.empty( ))
+            source = pad_nominative( pch->getRussianName( ).getFullForm( ) );
         if (source.empty( ))
             source = pch->getName( );
 
