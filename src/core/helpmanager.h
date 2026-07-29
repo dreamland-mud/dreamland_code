@@ -78,6 +78,22 @@ public:
     /** Regenerate keywordsAll* fields. */
     void refreshKeywords();
 
+    /** Browsable category this article belongs to, or an empty string if it
+     *  belongs to none. See HELP_IA.md: at most one topical key is stored in
+     *  'labels', and where there is none an ordered fallback over the labels the
+     *  engine itself assigns decides. The website and the in-game browser both
+     *  follow the same order, so a change here has to be mirrored in
+     *  scripts/help_category.py and dreamland_web/site.js/help-category.js. */
+    DLString getCategory() const;
+
+    /** True if getCategory() names a category players are shown. Immortal docs,
+     *  licences and engine-internal articles stay reachable by keyword and by
+     *  direct link, but never appear in a browsable index. */
+    static bool isPlayerCategory(const DLString &category);
+
+    /** The player-facing categories, in display order. */
+    static const std::list<DLString> & playerCategories();
+
     struct area_file * areafile;
 
     StringStorage labels;

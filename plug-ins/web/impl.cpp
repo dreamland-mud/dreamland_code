@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include "webprompt.h"
+#include "helpmanager.h"
 #include "logstream.h"
 #include "schedulertaskroundplugin.h"
 #include "dlscheduler.h"
@@ -963,6 +964,11 @@ public:
                 for (auto &l: (*a)->labels.all) {
                     h["labels"].append(l);
                 }
+
+                // The browsable category (HELP_IA.md). The website used to work
+                // this out from the raw labels; publishing it here means the
+                // site, the in-game browser and the dump cannot disagree.
+                h["cat"] = (*a)->getCategory();
 
                 for (int i = 0; i < 3; i++) {
                     const DLString suffix = dumpLangs[i].suffix;
