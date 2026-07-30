@@ -83,7 +83,7 @@ DLString SocialHelp::getTitle(const DLString &label) const
     // Website: right-hand side table of contents
     if (label == "toc") {
         if (social)
-            buf << social->getName() << ", "<< social->getRussianName();
+            buf << social->getRussianName().upperFirstCharacter();
         return buf.str();
     }
 
@@ -116,11 +116,8 @@ DLString SocialHelp::getTitle(const DLString &label, lang_t lang) const
     DLString mine = social->getNameFor(lang);
     DLString latin = social->getName();
 
-    if (label == "toc") {
-        if (mine == latin)
-            return latin;
-        return mine + ", " + latin;
-    }
+    if (label == "toc")
+        return mine.upperFirstCharacter();
 
     if (mine == latin)
         return help_title_fmt(lang, _("Социал {c%1$s{x"), latin);

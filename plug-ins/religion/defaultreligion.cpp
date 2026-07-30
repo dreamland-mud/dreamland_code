@@ -66,7 +66,7 @@ DLString ReligionHelp::getTitle(const DLString &label) const
     // Website: right-hand side table of contents
     if (label == "toc") {
         if (religion)
-            buf << "Религия '" << religion->getRussianName().ruscase('1')  << "'";
+            buf << religion->getRussianName().ruscase('1').upperFirstCharacter();
         return buf.str();
     }
 
@@ -111,9 +111,9 @@ DLString ReligionHelp::getTitle(const DLString &label, lang_t lang) const
     DLString name = religion_name_for(religion, lang);
 
     if (label == "toc")
-        return help_title_fmt(lang, _("Религия '%1$s'"), name);
+        return name.upperFirstCharacter();
 
-    return help_title_fmt(lang, _("Религия {c%1$s{x"), name);
+    return "{c" + name.upperFirstCharacter() + "{x";
 }
 
 void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const

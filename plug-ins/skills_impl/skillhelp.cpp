@@ -124,10 +124,8 @@ DLString SkillHelp::getTitle(const DLString &label) const
         return HelpArticle::getTitle(label);
 
     // Website: right-hand side table of contents
-    if (label == "toc") {
-        buf << skill_what(*skill).ruscase('1').upperFirstCharacter() << " '" << skill->getRussianName() << "'";
-        return buf.str();
-    }
+    if (label == "toc")
+        return skill->getRussianName().upperFirstCharacter();
 
     // Website: article title
     if (label == "title") {
@@ -135,16 +133,8 @@ DLString SkillHelp::getTitle(const DLString &label) const
     }
 
     // Default title if not set explicitly.
-    if (title.get(RU).empty()) {
-        DLString title = (skill_is_spell(*skill) ? "Заклинание {c" : "Умение {c")
-            + skill->getRussianName() + "{x";
-
-        if (skill->getCommand() && !skill->getCommand()->getRussianName().empty())
-            title += " и команда {c" 
-                + skill->getCommand()->getRussianName() + "{x";
-
-        return title;
-    }
+    if (title.get(RU).empty())
+        return "{c" + skill->getRussianName().upperFirstCharacter() + "{x";
 
     return title.get(RU);
 }
@@ -165,26 +155,13 @@ DLString SkillHelp::getTitle(const DLString &label, lang_t lang) const
     if (label == "title")
         return DLString::emptyString;
 
-    DLString name = skill->getNameFor(lang);
-    bool spell = skill_is_spell(*skill);
+    DLString name = skill->getNameFor(lang).upperFirstCharacter();
 
     // Website: right-hand side table of contents
     if (label == "toc")
-        return spell
-            ? help_title_fmt(lang, _("Заклинание '%1$s'"), name)
-            : help_title_fmt(lang, _("Умение '%1$s'"), name);
+        return name;
 
-    // In-game header. A skill that is also a command names both.
-    if (skill->getCommand() && !skill->getCommand()->getNameFor(lang).empty()) {
-        DLString cmd = skill->getCommand()->getNameFor(lang);
-        return spell
-            ? help_title_fmt(lang, _("Заклинание {c%1$s{x и команда {c%2$s{x"), name, cmd)
-            : help_title_fmt(lang, _("Умение {c%1$s{x и команда {c%2$s{x"), name, cmd);
-    }
-
-    return spell
-        ? help_title_fmt(lang, _("Заклинание {c%1$s{x"), name)
-        : help_title_fmt(lang, _("Умение {c%1$s{x"), name);
+    return "{c" + name + "{x";
 }
 
 void SkillHelp::setSkill( Skill::Pointer skill )

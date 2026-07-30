@@ -37,7 +37,7 @@ DLString CraftProfessionHelp::getTitle(const DLString &label) const
     // Website: right-hand side table of contents
     if (label == "toc") {
         if (prof)
-            buf << "Профессия '" << prof->getRusName().ruscase('1') << "'";
+            buf << prof->getRusName().ruscase('1').upperFirstCharacter();
         return buf.str();
     }
 
@@ -74,9 +74,9 @@ DLString CraftProfessionHelp::getTitle(const DLString &label, lang_t lang) const
         name = prof->getRusName().ruscase('1');
 
     if (label == "toc")
-        return help_title_fmt(lang, _("Профессия '%1$s'"), name);
+        return name.upperFirstCharacter();
 
-    return help_title_fmt(lang, _("Профессия {c%1$s{x"), name);
+    return "{c" + name.upperFirstCharacter() + "{x";
 }
     
 void CraftProfessionHelp::setProfession( CraftProfession::Pointer prof )

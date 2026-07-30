@@ -94,7 +94,7 @@ DLString AreaHelp::getTitle(const DLString &label, lang_t lang) const
 
     // Website: right-hand side table of contents
     if (label == "toc")
-        return help_title_fmt(lang, _("Зона '%1$s'"), name);
+        return name.upperFirstCharacter();
 
     if (!selfHelp)
         return MarkupHelpArticle::getTitle(label, lang);

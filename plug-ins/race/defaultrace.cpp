@@ -72,7 +72,7 @@ DLString RaceHelp::getTitle(const DLString &label) const
     // Website: right-hand side table of contents
     if (label == "toc") {
         if (race)
-            buf << "Раса '" << race->getMaleName().ruscase('1') << "'";
+            buf << race->getMaleName().ruscase('1').upperFirstCharacter();
         return buf.str();
     }
 
@@ -119,9 +119,9 @@ DLString RaceHelp::getTitle(const DLString &label, lang_t lang) const
         return DLString::emptyString;
 
     if (label == "toc")
-        return help_title_fmt(lang, _("Раса '%1$s'"), race_name_for(race, lang, false));
+        return race_name_for(race, lang, false).upperFirstCharacter();
 
-    return help_title_fmt(lang, _("Раса {c%1$s{x"), race_name_for(race, lang, true));
+    return "{c" + race_name_for(race, lang, false).upperFirstCharacter() + "{x";
 }
 
 struct CommaSet : public set<string> {

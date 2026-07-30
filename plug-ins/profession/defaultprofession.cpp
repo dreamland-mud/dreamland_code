@@ -205,7 +205,7 @@ DLString ProfessionHelp::getTitle(const DLString &label) const
     // Website: right-hand side table of contents
     if (label == "toc") {
         if (prof)
-            buf << "Класс '" << prof->getRusName().ruscase('1') << "'";
+            buf << prof->getRusName().ruscase('1').upperFirstCharacter();
         return buf.str();
     }
 
@@ -236,9 +236,9 @@ DLString ProfessionHelp::getTitle(const DLString &label, lang_t lang) const
     DLString name = prof_name_for(prof, lang, '1');
 
     if (label == "toc")
-        return help_title_fmt(lang, _("Класс '%1$s'"), name);
+        return name.upperFirstCharacter();
 
-    return help_title_fmt(lang, _("Класс {c%1$s{x"), name);
+    return "{c" + name.upperFirstCharacter() + "{x";
 }
 
 // Per-viewer plural (multiple) race name: UA name for a UA viewer (RU fallback),

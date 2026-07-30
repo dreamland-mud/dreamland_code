@@ -30,7 +30,7 @@ DLString SkillGroupHelp::getTitle(const DLString &label) const
     // Website: right-hand side table of contents
     if (label == "toc") {
         if (group)
-            buf << "Группа умений '" << group->getRussianName()  << "'";
+            buf << group->getRussianName().upperFirstCharacter();
         return buf.str();
     }
 
@@ -63,7 +63,7 @@ DLString SkillGroupHelp::getTitle(const DLString &label, lang_t lang) const
     DLString name = group->getNameFor(lang);
 
     if (label == "toc")
-        return help_title_fmt(lang, _("Группа умений '%1$s'"), name);
+        return name.upperFirstCharacter();
 
     return help_title_fmt(lang, _("Группа умений {c%1$s{x, {c%2$s{x"),
                           name, group->getName());
