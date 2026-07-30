@@ -182,6 +182,10 @@ DLString print_what(const Skill *skill, Character *ch)
     return buf.str();
 }
 
+/* The group used to be a clause tacked onto the opening sentence, which made a
+ * header that already carried two names and a kind run to three lines. It is a
+ * property of the skill like its lag and its mana cost, so it now joins them in
+ * the bullet list underneath, and returns a whole line of its own. */
 DLString print_group_for(const Skill *skill, Character *ch)
 {
     vector<int> groups = const_cast<Skill *>(skill)->getGroups().toArray();    
@@ -189,19 +193,19 @@ DLString print_group_for(const Skill *skill, Character *ch)
         return DLString::emptyString;
 
     ostringstream buf;
-    buf << "{" << SKILL_HEADER_BG
-        << (groups.size() == 1 ? l(ch, ", входит в группу ")
-                               : l(ch, ", входит в группы "));
-        
+    buf << SKILL_INFO_PAD
+        << (groups.size() == 1 ? l(ch, "Группа: ") : l(ch, "Группы: "));
+
     for (unsigned int g = 0; g < groups.size(); g++) {
         if (g > 0)
             buf << ", ";
 
         buf << "'{hg{" << SKILL_HEADER_FG 
             << skillGroupManager->find(groups[g])->getNameFor(ch) << "{hx"
-            << "{" << SKILL_HEADER_BG << "'{x";
+            << "{x'";
     }
 
+    buf << "." << endl;
     return buf.str();
 }
 

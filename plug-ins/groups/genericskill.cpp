@@ -336,8 +336,8 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
 
     buf << print_what(this, ch) << " "
         << print_names_for(this, ch)
-        << print_group_for(this, ch)
         << ".{x" << endl
+        << print_group_for(this, ch)
         << printWaitAndMana(ch);
 
     if (!visible( ch )) {
