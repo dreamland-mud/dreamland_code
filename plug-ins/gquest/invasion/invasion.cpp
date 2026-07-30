@@ -248,9 +248,8 @@ MultiMessage InvasionGQuest::getStartBroadcast( ) const
  *  rewards
  */
 
-void InvasionGQuest::rewardLeader( ) 
+void InvasionGQuest::rewardLeader( )
 {
-    std::basic_ostringstream<char> buf;
     PCharacterMemoryList::const_iterator i;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
     std::list<PCMemoryInterface *> leaders;
@@ -296,30 +295,35 @@ void InvasionGQuest::rewardLeader( )
                             ->rememberVictory( getQuestID( ) );
         }
 
+        MultiMessage frame;
         if (leaders.size( ) > 1 && !scen->getWinnerMsgOtherMlt( ).empty( ))
-            buf << scen->getWinnerMsgOtherMlt( );
+            frame = _( scen->getWinnerMsgOtherMlt( ) );
         else
-            buf << scen->getWinnerMsgOther( );
+            frame = _( scen->getWinnerMsgOther( ) );
 
-        buf << GQChannel::BOLD;
+        // Winner names decline per language (EN gets the Latin login name), so
+        // the roll-call is composed once per language.
+        std::basic_ostringstream<char> roll[LANG_MAX];
+        for (int lg = LANG_MIN; lg < LANG_MAX; lg++)
+            roll[lg] << frame.getMessage( (lang_t)lg ) << GQChannel::BOLD;
 
         while (!leaders.empty( )) {
-            PCMemoryInterface * pci;
-
-            pci = leaders.back( );
+            PCMemoryInterface *pci = leaders.back( );
             leaders.pop_back( );
 
-            buf << " " << pci->getNameP('1');
-            if (!leaders.empty( ))
-                buf << ",";
+            for (int lg = LANG_MIN; lg < LANG_MAX; lg++) {
+                roll[lg] << " " << pci->getNameP( '1', (lang_t)lg );
+                if (!leaders.empty( ))
+                    roll[lg] << ",";
+            }
 
             log("InvasionGQuest: reward winner " << pci->getName( ));
             GlobalQuestManager::getThis( )->rewardChar( pci, reward );
         }
 
+        GQChannel::gecho( this,
+            MultiMessage( roll[LANG_EN].str( ), roll[LANG_RU].str( ), roll[LANG_UA].str( ) ) );
     }
-
-    GQChannel::gecho( this, buf );
 }
 
 void InvasionGQuest::rewardKiller( PCharacter *killer )
