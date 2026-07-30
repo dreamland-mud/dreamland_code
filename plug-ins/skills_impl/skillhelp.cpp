@@ -170,14 +170,21 @@ void SkillHelp::setSkill( Skill::Pointer skill )
     
     addAutoKeyword( skill->getName( ) );    
     addAutoKeyword( skill->getRussianName( ) );    
+    // The Ukrainian name was never added here, so `довідка вогняна куля` found
+    // nothing even though the skill declares <name l="ua">. getNameFor falls
+    // back to Russian, so a skill without one contributes a duplicate the
+    // keyword set drops.
+    addAutoKeyword( skill->getNameFor( UA ) );
     
     if (skill->getCommand( )) {
         Command::Pointer cmd = skill->getCommand( ).getDynamicPointer<Command>( );
         
         if (cmd) {
             addAutoKeyword(cmd->getName());
+            addAutoKeyword(cmd->getNameFor(UA));
             addAutoKeyword(cmd->aliases.get(EN).split(" "));
             addAutoKeyword(cmd->aliases.get(RU).split(" "));
+            addAutoKeyword(cmd->aliases.get(UA).split(" "));
             if (!cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
                 labels.addTransient("cmd");
             }

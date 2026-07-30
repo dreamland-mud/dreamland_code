@@ -44,6 +44,8 @@ void RaceHelp::setRace( DefaultRace::Pointer race )
     addAutoKeyword( race->getMaleName( ).ruscase( '1' ) );
     addAutoKeyword( race->getFemaleName( ).ruscase( '1' ) );
     addAutoKeyword( race->getMltName( ).ruscase( '1' ) );
+    if (!race->getUkrainianName( ).empty( ))
+        addAutoKeyword( race->getUkrainianName( ).ruscase( '1' ) );
     labels.addTransient(LABEL_RACE);
 
     helpManager->registrate( Pointer( this ) );
