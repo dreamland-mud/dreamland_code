@@ -280,20 +280,37 @@ COMMAND(ConfigCommand, "config")
         return;
     }
 
-    for (g = groups.begin( ); g != groups.end( ); g++) 
-        for (c = g->begin( ); c != g->end( ); c++) 
-            if ((*c)->available(pch))
+    // Exact pass before the abbreviation pass, so a fully typed option name wins
+    // over a longer option that the argument merely abbreviates. Otherwise the
+    // first declared option swallows the shorter name for good: RU 'кратко'
+    // (brief) is a prefix of 'краткофлаги' (shortflags), declared earlier, which
+    // left 'brief' unreachable for RU players however they spelled it.
+    for (int exactPass = 1; exactPass >= 0; exactPass--)
+        for (g = groups.begin( ); g != groups.end( ); g++)
+            for (c = g->begin( ); c != g->end( ); c++) {
+                if (!(*c)->available(pch))
+                    continue;
+
                 // Synonym-aware match on EN/RU/UA names (+ old names via synonyms.json).
-                if (arg_is_soft(arg1, (*c)->getName()) || arg_is_soft(arg1, (*c)->getRussianName())
-                        || arg_is_soft(arg1, (*c)->getUaName()))
-                {
-                    if (!(*c)->handleArgument( pch, arg2 ))
-                        pch->pecho(_("Неправильный переключатель. См. {W? режим{x."));
+                bool hit;
+                if (exactPass)
+                    hit = arg_is_strict_soft(arg1, (*c)->getName())
+                          || arg_is_strict_soft(arg1, (*c)->getRussianName())
+                          || arg_is_strict_soft(arg1, (*c)->getUaName());
+                else
+                    hit = arg_is_soft(arg1, (*c)->getName())
+                          || arg_is_soft(arg1, (*c)->getRussianName())
+                          || arg_is_soft(arg1, (*c)->getUaName());
 
-                    return;
-                }
+                if (!hit)
+                    continue;
 
-    
+                if (!(*c)->handleArgument( pch, arg2 ))
+                    pch->pecho(_("Неправильный переключатель. См. {W? режим{x."));
+
+                return;
+            }
+
     pch->pecho(_("Опция не найдена. Используй {hc{yрежим{x для списка."));
 }
 
