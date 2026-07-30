@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "clanskill.h"
+#include "player_utils.h"
 #include "clantypes.h"
 
 #include "stringlist.h"
@@ -180,6 +181,18 @@ bool ClanSkill::canTeach( NPCharacter *mob, PCharacter * ch, bool verbose )
     return false;
 }
 
+/* The clan's name in the reader's language. Only Ukrainian is switched here:
+ * the English display name is derived from shortName elsewhere and is not a
+ * straight field, so a UA reader stops seeing "навык Артели Охотников" while
+ * everyone else reads exactly what they read before. */
+static DLString clan_name_for( Clan *clan, Character *ch )
+{
+    if (Player::displayLang( ch ) == LANG_UA && !clan->getUkrainianName( ).empty( ))
+        return clan->getUkrainianName( );
+
+    return clan->getRussianName( );
+}
+
 void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
     StringList clanNames;
@@ -189,13 +202,13 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
 
     buf << print_what(this, ch) << " "
         << print_names_for(this, ch)
-        << ", навык ";
+        << l(ch, ", навык ");
 
     for (i = clans.begin( ); i != clans.end( ); i++) {
         Clan *clan = ClanManager::getThis( )->find( i->first );
         
         if (clan->isValid())
-            clanNames.push_back(clan->getRussianName( ).ruscase('2'));
+            clanNames.push_back(clan_name_for( clan, ch ).ruscase('2'));
     }
 
     if (clanNames.empty())
