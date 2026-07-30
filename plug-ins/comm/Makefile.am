@@ -32,6 +32,7 @@ groupchannel.cpp \
 following.cpp \
 drop.cpp \
 help.cpp \
+helpcategory.cpp \
 score.cpp \
 title.cpp \
 pcname.cpp \
