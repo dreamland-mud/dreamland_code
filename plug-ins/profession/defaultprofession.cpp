@@ -183,6 +183,8 @@ void ProfessionHelp::setProfession( DefaultProfession::Pointer prof )
     addAutoKeyword( prof->getName( ) );
     addAutoKeyword( prof->getRusName( ).ruscase( '1' ) );
     addAutoKeyword( prof->getMltName( ).ruscase( '1' ) );
+    if (!prof->getUaName( ).empty( ))
+        addAutoKeyword( prof->getUaName( ).ruscase( '1' ) );
     labels.addTransient(LABEL_CLASS);
 
     helpManager->registrate( Pointer( this ) );

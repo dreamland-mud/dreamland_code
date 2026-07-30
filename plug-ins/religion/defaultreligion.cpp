@@ -38,6 +38,8 @@ void ReligionHelp::setReligion( DefaultReligion::Pointer religion )
     
     addAutoKeyword( religion->getName( ) );
     addAutoKeyword( religion->getRussianName( ).ruscase( '1' ) );
+    if (!religion->nameUa.empty( ))
+        addAutoKeyword( religion->nameUa.ruscase( '1' ) );
     labels.addTransient(LABEL_RELIGION);
 
     helpManager->registrate( Pointer( this ) );

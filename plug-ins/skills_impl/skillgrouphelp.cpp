@@ -81,6 +81,7 @@ void SkillGroupHelp::setSkillGroup( SkillGroup::Pointer group )
     
     addAutoKeyword( group->getName( ) );    
     addAutoKeyword( group->getRussianName( ) );    
+    addAutoKeyword( group->getNameFor( UA ) );    
     labels.addTransient("skillgroup");
     helpManager->registrate( Pointer( this ) );
 }

@@ -51,6 +51,8 @@ void SocialHelp::setSocial(Social::Pointer social)
     this->social = social;
     addAutoKeyword(social->getName());
     addAutoKeyword(social->getRussianName());
+    if (!social->getUaName().empty())
+        addAutoKeyword(social->getUaName());
     labels.addTransient("social");
     helpManager->registrate( Pointer( this ) );
 }

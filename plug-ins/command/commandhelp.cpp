@@ -67,8 +67,10 @@ void CommandHelp::setCommand( Command::Pointer command )
     
     addAutoKeyword(command->getName());
     addAutoKeyword(command->getRussianName());    
+    addAutoKeyword(command->getNameFor(UA));
     addAutoKeyword(command->aliases.get(EN).split(" "));
     addAutoKeyword(command->aliases.get(RU).split(" "));
+    addAutoKeyword(command->aliases.get(UA).split(" "));
 
     labels.addTransient(
         command->getCommandCategory().names());
