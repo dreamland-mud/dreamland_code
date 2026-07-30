@@ -11,6 +11,7 @@
 #include "skill_utils.h"
 #include "core/behavior/behavior_utils.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "room.h"
 #include "npcharacter.h"
 #include "merc.h"
@@ -79,27 +80,51 @@ bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
     return false;
 }
 
+/* The face a card skill starts appearing at. levelFaces carries Russian Flexer
+ * pads only, so the sentence around it could not be translated without leaving a
+ * Russian noun inside an English one; these are the same nine faces, in the
+ * genitive the sentence needs. */
+static const char * CARD_FACE_GENITIVE[3][9] = {
+    // RU -- declined from levelFaces at runtime, this row is unused
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { "six", "seven", "eight", "nine", "ten", "jack", "queen", "king", "ace" },
+    { "шістки", "сімки", "вісімки", "дев'ятки", "десятки",
+      "валета", "дами", "короля", "туза" },
+};
+
+static DLString card_face_genitive(int level, lang_t lang)
+{
+    if (level < 0 || level > XMLAttributeCards::getMaxLevel())
+        return DLString::emptyString;
+
+    if (lang == LANG_EN || lang == LANG_UA)
+        return CARD_FACE_GENITIVE[lang == LANG_EN ? 1 : 2][level];
+
+    return russian_case( XMLAttributeCards::levelFaces[level].name, '2' );
+}
+
 void CardSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
-    buf << print_what(this, ch) << " Колоды "
-        << print_names_for(this, ch)
-        << print_group_for(this, ch)
-        << ".{x" << endl;
+    buf << fmt(ch, _("%1$s Колоды %2$s.{x"),
+                   print_what(this, ch).c_str(),
+                   print_names_for(this, ch).c_str())
+        << endl;
 
+    buf << print_group_for(this, ch);
     buf << printWaitAndMana(ch);
     
-    buf << SKILL_INFO_PAD 
-        << "Появляется у карт, начиная с {C" 
-        << russian_case( XMLAttributeCards::levelFaces[cardLevel].name, '2' ) 
-        << "{x"; 
+    buf << SKILL_INFO_PAD
+        << fmt(ch, _("Появляется у карт, начиная с {C%1$s{x"),
+                   card_face_genitive(cardLevel, Player::displayLang(ch)).c_str());
 
     if (visible( ch )) {
         int learned = getLearned( ch );
         if (learned > 0)
-            buf << ", изучено на {" << skill_learned_colour(this, ch) << learned << "%{x";
+            buf << fmt(ch, _(", изучено на {%1$c%2$d%%{x"),
+                           skill_learned_colour(this, ch), learned);
 
         if (!usable( ch ))
-            buf << " (сейчас тебе недоступно)";
+            buf << l(ch, " (сейчас тебе недоступно)");
     }
     
     buf << "." << endl; 

@@ -569,7 +569,7 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
 
     int beat = getBeats(ch) / dreamland->getPulsePerSecond();
     if (beat > 0) {
-         outputLines.push_back(fmt(ch, _("Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. "), beat));
+         outputLines.push_back(fmt(ch, _("Задержка при выполнении: {W%1$d{x секунд%1$Iу|ы|. "), beat));
     }
     
     // Collect move/mana/health costs and penalties into a string.
@@ -595,11 +595,11 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
             penalty.push_back(fmt(ch, _("здоровья {C%1$d%%{x"), healthPenalty));
 
         if (!cost.empty()) {
-            buf << fmt(ch, _("Расход %1$s. "), cost.join(", ").c_str());
+            buf << fmt(ch, _("Расход: %1$s. "), cost.join(", ").c_str());
         }
 
         if (!penalty.empty()) {
-            buf << fmt(ch, _("Дополнительный расход %1$s. "), penalty.join(", ").c_str());
+            buf << fmt(ch, _("Дополнительный расход: %1$s. "), penalty.join(", ").c_str());
         }
 
         if (!buf.str().empty())
@@ -618,7 +618,7 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
         else if (dspell->flags.isSet(SPELL_MAGIC))
             force_type = l(ch, " магия");
 
-        outputLines.push_back(fmt(ch, _("Тип заклинания {W%1$s%2$s{x. "),
+        outputLines.push_back(fmt(ch, _("Тип заклинания: {W%1$s%2$s{x. "),
                                   spell_types.message(spell->getSpellType(), '1', viewerLang(ch)).c_str(),
                                   force_type));
     }
@@ -628,7 +628,7 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
         if (dspell->getMaxRange(ch) > 0)
             targets << l(ch, " или по направлению (дальнобойное)");
 
-        outputLines.push_back(fmt(ch, _("Целью служит {W%1$s{x. "), targets.c_str()));
+        outputLines.push_back(fmt(ch, _("Цель: {W%1$s{x. "), targets.c_str()));
     }
 
     if (isPassive()) {
@@ -650,7 +650,7 @@ void BasicSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
     buf << print_what(this, ch) << " "
         << print_names_for(this, ch)
-        << print_group_for(this, ch)
         << ".{x" << endl
+        << print_group_for(this, ch)
         << printWaitAndMana(ch);
 }

@@ -164,8 +164,9 @@ void Language::show( PCharacter *ch, std::ostream & buf ) const
     WordList::const_iterator n;
     DLString userName;
 
-    buf << "{" << SKILL_HEADER_BG << "Язык " << print_names_for(this, ch)
-        << print_group_for(this, ch) << ".{x" << endl;
+    buf << "{" << SKILL_HEADER_BG << l(ch, "Язык ") << print_names_for(this, ch)
+        << ".{x" << endl
+        << print_group_for(this, ch);
 
     for (r = races.begin( ); r != races.end( ); r++) {
         Race *race = raceManager->findExisting( r->first );

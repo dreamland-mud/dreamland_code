@@ -125,8 +125,8 @@ void CraftSkill::show( PCharacter *ch, std::ostream &buf ) const
 {
     buf << print_what(this, ch) << " "
         << print_names_for(this, ch)
-        << print_group_for(this, ch)
-        << ".{x" << endl;
+        << ".{x" << endl
+        << print_group_for(this, ch);
 
     StringList pnames; 
     CraftProfessions::const_iterator sp;
