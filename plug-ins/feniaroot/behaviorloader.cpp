@@ -24,7 +24,7 @@ DLString BehaviorHelp::getTitle(const DLString &label) const
 
     // Website: right-hand side table of contents
     if (label == "toc") {
-        buf << "Поведение '" << bhv->getRussianName().ruscase('1') << "'";
+        buf << bhv->getRussianName().ruscase('1').upperFirstCharacter();
         return buf.str();
     }
 
@@ -62,7 +62,7 @@ DLString BehaviorHelp::getTitle(const DLString &label, lang_t lang) const
     // grouping -- it is what sorts these together in the rail -- but the frame
     // word and the name now follow the viewer.
     if (label == "toc")
-        return help_title_fmt(lang, _("Поведение '%1$s'"), behavior_name_for(bhv, lang));
+        return behavior_name_for(bhv, lang).upperFirstCharacter();
 
     // In-game player help header: the behavior's name in the viewer's language,
     // capitalized, with NO "Поведение" prefix -- players don't know what

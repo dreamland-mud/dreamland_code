@@ -39,10 +39,8 @@ DLString CommandHelp::getTitle(const DLString &label) const
     ostringstream buf;
 
     // Website: right-hand side table of contents
-    if (label == "toc") {
-        buf << "Команда '" << command->getRussianName() << "'";
-        return buf.str();
-    }
+    if (label == "toc")
+        return command->getRussianName().upperFirstCharacter();
 
     // Website: article title
     if (label == "title") {

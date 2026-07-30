@@ -31,7 +31,7 @@ DLString LanguageHelp::getTitle(const DLString &label) const
     // Website: right-hand side table of contents
     if (label == "toc") {
         if (command)
-            buf << "Древний язык '" << command->getRussianName() << "'";
+            buf << command->getRussianName().upperFirstCharacter();
         return buf.str();
     }
 
@@ -66,7 +66,7 @@ DLString LanguageHelp::getTitle(const DLString &label, lang_t lang) const
     DLString latin = command->getName();
 
     if (label == "toc")
-        return help_title_fmt(lang, _("Древний язык '%1$s'"), mine);
+        return mine.upperFirstCharacter();
 
     if (mine == latin || mine.empty())
         return help_title_fmt(lang, _("Древний язык {c%1$s{x"), latin);
