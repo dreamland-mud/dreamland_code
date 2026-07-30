@@ -315,7 +315,6 @@ void RainbowGQuest::rewardNobody( )
 
 void RainbowGQuest::rewardWinner( )
 {
-    std::basic_ostringstream<char> buf;
     XMLReward r;
     PCMemoryInterface *pci = PCharacterManager::find( winnerName );
 
@@ -327,9 +326,9 @@ void RainbowGQuest::rewardWinner( )
 
     GlobalQuestManager::getThis( )->rewardChar( pci, r );
 
-    getScenario( )->printWinnerMsgOther( pci->getRussianName().getFullForm(), buf );
-
-    GQChannel::gecho( getDisplayName(), buf.str( ), pci->getPlayer() );
+    GQChannel::gecho( getDisplayName( ),
+                      getScenario( )->getWinnerMsgOther( pci ),
+                      pci->getPlayer( ) );
 
     pci->getAttributes( ).getAttr<XMLAttributeGlobalQuest>( "gquest" )
                     ->rememberVictory( getQuestID( ) );

@@ -11,6 +11,7 @@
 #include "xmlstring.h"
 #include "xmlinteger.h"
 #include "xmlboolean.h"
+#include "lang.h"
 
 #include "plugin.h"
 
@@ -62,6 +63,9 @@ public:
      * stored RU-only in the profile, so it is localized here rather than in the
      * data file (which the running server re-saves on every quest start). */
     const char * getQuestNameFor( const Character * ) const;
+    /* Same name in an explicit language, for output that has no viewer: the
+     * Discord sink posts English no matter who is online. */
+    const DLString & getQuestNameFor( lang_t ) const;
     inline int getLastTime( ) const;
     inline void setLastTime( int );
     inline int getWaitingTime( ) const;

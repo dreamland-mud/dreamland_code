@@ -22,9 +22,12 @@ public:
 
     static void zecho( GlobalQuest *, struct Area*, const DLString& );
     static void gecho( GlobalQuestInfo *, const DLString& );
-    static void gecho( GlobalQuest *, const DLString&, PCharacter *pch = NULL);
-    static void gecho( GlobalQuest *, ostringstream & );
     static void gecho( const DLString& );
+    /* Raw-body variants: the body is a plain RU string with no translation, so
+     * it reaches Discord as-is. Only for text nobody can translate -- an
+     * immortal's free-form 'gquest talk'. Anything the engine composes must go
+     * through the MultiMessage overloads below, or it posts Russian to an
+     * English-only channel. */
     static void gecho( const DLString&, const DLString&, PCharacter *pch = NULL);
     /* Per-viewer variants: the message resolves in each recipient's display
      * language (RU fallback), and the "[Global: <quest>]" frame + quest name

@@ -15,6 +15,7 @@
 #include "roomutils.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
+#include "pcmemoryinterface.h"
 #include "affect.h"
 
 #include "msgformatter.h"
@@ -132,11 +133,13 @@ void RainbowDefaultScenario::printTime( ostringstream& buf, Character *ch ) cons
     buf << fmt( ch, _(", чтобы собрать всю радугу.") ) << endl;
 }
 
-void RainbowDefaultScenario::printWinnerMsgOther( const DLString &name, ostringstream& buf ) const 
+MultiMessage RainbowDefaultScenario::getWinnerMsgOther( PCMemoryInterface *pci ) const
 {
-    buf << GQChannel::BOLD << name.ruscase('1') << GQChannel::NORMAL
-        << " зажигает {Yр{Rа{Mд{Gу{Bг{Cу{x " << GQChannel::NORMAL 
-        << "над Миром!";
+    MultiMessage frame = _("{Y%1$s{y зажигает {Yр{Rа{Mд{Gу{Bг{Cу{x {yнад Миром!");
+    DLString en = frame.getMessage( LANG_EN ); en.replaces( "%1$s", pci->getNameP( '1', LANG_EN ) );
+    DLString ru = frame.getMessage( LANG_RU ); ru.replaces( "%1$s", pci->getNameP( '1', LANG_RU ) );
+    DLString ua = frame.getMessage( LANG_UA ); ua.replaces( "%1$s", pci->getNameP( '1', LANG_UA ) );
+    return MultiMessage( en, ru, ua );
 }
 
 bool RainbowDefaultScenario::canHearInitMsg( PCharacter *ch ) const
@@ -212,10 +215,14 @@ void RainbowSinsScenario::printTime( ostringstream& buf, Character *ch ) const
     buf << "." << endl;
 }
 
-void RainbowSinsScenario::printWinnerMsgOther( const DLString &name, ostringstream& buf ) const 
+MultiMessage RainbowSinsScenario::getWinnerMsgOther( PCMemoryInterface *pci ) const
 {
-    buf << GQChannel::BOLD << name.ruscase('4') << GQChannel::NORMAL
-        << " приняли на адскую должность!";
+    // Accusative in RU/UA ("приняли КОГО"); EN just takes the plain name.
+    MultiMessage frame = _("{Y%1$s{y приняли на адскую должность!");
+    DLString en = frame.getMessage( LANG_EN ); en.replaces( "%1$s", pci->getNameP( '4', LANG_EN ) );
+    DLString ru = frame.getMessage( LANG_RU ); ru.replaces( "%1$s", pci->getNameP( '4', LANG_RU ) );
+    DLString ua = frame.getMessage( LANG_UA ); ua.replaces( "%1$s", pci->getNameP( '4', LANG_UA ) );
+    return MultiMessage( en, ru, ua );
 }
 
 bool RainbowSinsScenario::canHearInitMsg( PCharacter *ch ) const

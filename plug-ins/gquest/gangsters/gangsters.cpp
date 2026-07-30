@@ -395,9 +395,21 @@ void Gangsters::getQuestDescription( std::ostringstream &buf, Character * ) cons
 void Gangsters::getQuestStartMessage( std::ostringstream &buf ) const
 {
     buf << "Шайка преступников атаковала мирных жителей. "
-        << "Ищутся храбрецы " 
+        << "Ищутся храбрецы "
         << GQChannel::BOLD << minLevel << "-" << maxLevel << GQChannel::NORMAL
         << " уровней для уничтожения бандитов и их главаря.";
+}
+
+MultiMessage Gangsters::getStartBroadcast( ) const
+{
+    std::basic_ostringstream<char> levels;
+    levels << minLevel << "-" << maxLevel;
+
+    MultiMessage frame = _("Шайка преступников атаковала мирных жителей. Ищутся храбрецы {Y%1$s{y уровней для уничтожения бандитов и их главаря.");
+    DLString en = frame.getMessage( LANG_EN ); en.replaces( "%1$s", levels.str( ) );
+    DLString ru = frame.getMessage( LANG_RU ); ru.replaces( "%1$s", levels.str( ) );
+    DLString ua = frame.getMessage( LANG_UA ); ua.replaces( "%1$s", levels.str( ) );
+    return MultiMessage( en, ru, ua );
 }
 
 /*****************************************************************************/
@@ -406,9 +418,8 @@ void Gangsters::getQuestStartMessage( std::ostringstream &buf ) const
  *  rewards
  */
 
-void Gangsters::rewardLeader( ) 
+void Gangsters::rewardLeader( )
 {
-    std::basic_ostringstream<char> buf;
     PCharacterMemoryList::const_iterator i;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
     std::list<PCMemoryInterface *> leaders;
@@ -431,52 +442,58 @@ void Gangsters::rewardLeader( )
             leaders.push_back( i->second );
     }
     
-    buf << "Главаря шайки так никто и не убил.";
-    GQChannel::gecho( this, buf );
+    GQChannel::gecho( this, _("Главаря шайки так никто и не убил.") );
 
     if (leaders.empty( )) {
-        buf << "Более того, ни один бандит не пострадал."  << endl;
+        GQChannel::gecho( this, _("Более того, ни один бандит не пострадал.") );
+        return;
     }
-    else { 
-        XMLReward reward;
-        
-        reward.qpoints = max * number_range( 10, 15 ) + number_fuzzy( 10 );
-        reward.gold = max * number_range( 10, 15 );
-        reward.experience = max * number_fuzzy( 50 );
-        reward.reason[LANG_RU] = "За убийство самого большого количества бандитов ты получаешь: ";
-        reward.reason[LANG_EN] = "For slaying the most bandits, you receive: ";
-        reward.reason[LANG_UA] = "За вбивство найбільшої кількості бандитів ти отримуєш: ";
-        reward.id = getQuestID( );
-        
-        if (leaders.size( ) == 1)
-            buf << "Самый лучший охотник за бандитами:" << GQChannel::BOLD;
-        else
-            buf << "Самые успешные охотники за бандитами:" << GQChannel::BOLD;
-        
-        while (!leaders.empty( )) {
-            PCMemoryInterface * pci;
 
-            pci = leaders.back( );
-            leaders.pop_back( );
+    XMLReward reward;
 
-            buf << " " << pci->getNameP('1');
+    reward.qpoints = max * number_range( 10, 15 ) + number_fuzzy( 10 );
+    reward.gold = max * number_range( 10, 15 );
+    reward.experience = max * number_fuzzy( 50 );
+    reward.reason[LANG_RU] = "За убийство самого большого количества бандитов ты получаешь: ";
+    reward.reason[LANG_EN] = "For slaying the most bandits, you receive: ";
+    reward.reason[LANG_UA] = "За вбивство найбільшої кількості бандитів ти отримуєш: ";
+    reward.id = getQuestID( );
+
+    MultiMessage frame;
+    if (leaders.size( ) == 1)
+        frame = _("Самый лучший охотник за бандитами:");
+    else
+        frame = _("Самые успешные охотники за бандитами:");
+
+    // Player names decline per language (EN gets the Latin login name), so the
+    // roll-call is composed once per language instead of once for everyone.
+    std::basic_ostringstream<char> roll[LANG_MAX];
+    for (int lg = LANG_MIN; lg < LANG_MAX; lg++)
+        roll[lg] << frame.getMessage( (lang_t)lg ) << GQChannel::BOLD;
+
+    while (!leaders.empty( )) {
+        PCMemoryInterface *pci = leaders.back( );
+        leaders.pop_back( );
+
+        for (int lg = LANG_MIN; lg < LANG_MAX; lg++) {
+            roll[lg] << " " << pci->getNameP( '1', (lang_t)lg );
             if (!leaders.empty( ))
-                buf << ",";
-
-            log("reward leader " << pci->getName( ));
-            GlobalQuestManager::getThis( )->rewardChar( pci, reward );
+                roll[lg] << ",";
         }
+
+        log("reward leader " << pci->getName( ));
+        GlobalQuestManager::getThis( )->rewardChar( pci, reward );
     }
 
-    GQChannel::gecho( this, buf );
+    GQChannel::gecho( this,
+        MultiMessage( roll[LANG_EN].str( ), roll[LANG_RU].str( ), roll[LANG_UA].str( ) ) );
 }
 
-void Gangsters::rewardChefKiller( ) 
+void Gangsters::rewardChefKiller( )
 {
-    std::basic_ostringstream<char> buf;
     XMLReward r;
     PCMemoryInterface *pci = PCharacterManager::find( chefKiller );
-    
+
     r.gold = number_range( getMaxLevel( ), 2 * getMaxLevel( ) );
     r.qpoints = number_range( 200, 250 );
     r.experience = number_range( 300, 500 );
@@ -488,11 +505,20 @@ void Gangsters::rewardChefKiller( )
 
     GlobalQuestManager::getThis( )->rewardChar( pci, r );
 
-    buf << GQChannel::BOLD << pci->getNameP('1') << GQChannel::NORMAL 
-        << " уничтожил" << GET_SEX(pci, "", "о", "а") <<" главаря шайки!";
+    // Verb agreement is language-specific (EN has none), so the sentence is
+    // composed per language around one catalog frame; %2$s is the gender ending.
+    MultiMessage frame = _("{Y%1$s{y уничтожил%2$s главаря шайки!");
+    DLString en = frame.getMessage( LANG_EN );
+    en.replaces( "%1$s", pci->getNameP( '1', LANG_EN ) );
+    DLString ru = frame.getMessage( LANG_RU );
+    ru.replaces( "%1$s", pci->getNameP( '1', LANG_RU ) );
+    ru.replaces( "%2$s", GET_SEX( pci, "", "о", "а" ) );
+    DLString ua = frame.getMessage( LANG_UA );
+    ua.replaces( "%1$s", pci->getNameP( '1', LANG_UA ) );
+    ua.replaces( "%2$s", GET_SEX( pci, "в", "ло", "ла" ) );
 
-    GQChannel::gecho( this, buf );
-    
+    GQChannel::gecho( this, MultiMessage( en, ru, ua ) );
+
     pci->getAttributes( ).getAttr<XMLAttributeGlobalQuest>( "gquest" )
                     ->rememberVictory( getQuestID( ) );
 }
@@ -555,7 +581,7 @@ void Gangsters::createFirstHint( MobileList &people )
     setHint( buf.str( ) );
 }            
 
-Room * Gangsters::findHintRoom( std::ostringstream &buf )
+Room * Gangsters::findHintRoom( MultiMessage &msg )
 {
     Room *room = NULL;
 
@@ -583,34 +609,55 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
 
             /* from the same area but not informer */
             
-            name.upperFirstCharacter( );
-            buf        << name << " столкнул" << GET_SEX( ch, "ся", "ось", "ась" )
-                << " с гангстерами возле " << room->getName() << ".";
+            // Mob and room names render in each language; the verb agrees in
+            // RU/UA (%2$s) and carries no ending in EN.
+            DLString nameEn = ch->getNameP( '1', LANG_EN ); nameEn.upperFirstCharacter( );
+            DLString nameRu = ch->getNameP( '1', LANG_RU ); nameRu.upperFirstCharacter( );
+            DLString nameUa = ch->getNameP( '1', LANG_UA ); nameUa.upperFirstCharacter( );
 
+            MultiMessage frame = _("%1$s столкнул%2$s с гангстерами возле %3$s.");
+            DLString en = frame.getMessage( LANG_EN );
+            en.replaces( "%1$s", nameEn );
+            en.replaces( "%3$s", room->getName( LANG_EN ) );
+            DLString ru = frame.getMessage( LANG_RU );
+            ru.replaces( "%1$s", nameRu );
+            ru.replaces( "%2$s", GET_SEX( ch, "ся", "ось", "ась" ) );
+            ru.replaces( "%3$s", room->getName( LANG_RU ) );
+            DLString ua = frame.getMessage( LANG_UA );
+            ua.replaces( "%1$s", nameUa );
+            ua.replaces( "%2$s", GET_SEX( ch, "вся", "лося", "лася" ) );
+            ua.replaces( "%3$s", room->getName( LANG_UA ) );
+
+            msg = MultiMessage( en, ru, ua );
             return room;
         }
     }
-    
+
     /* cannot find mob, give hint only about a room they're in */
-    if (room) 
-        buf << "Гангстеры были также замечены неподалеку от " 
-            << room->getName() << ".";
-    
+    if (room) {
+        MultiMessage frame = _("Гангстеры были также замечены неподалеку от %1$s.");
+        DLString en = frame.getMessage( LANG_EN ); en.replaces( "%1$s", room->getName( LANG_EN ) );
+        DLString ru = frame.getMessage( LANG_RU ); ru.replaces( "%1$s", room->getName( LANG_RU ) );
+        DLString ua = frame.getMessage( LANG_UA ); ua.replaces( "%1$s", room->getName( LANG_UA ) );
+        msg = MultiMessage( en, ru, ua );
+    }
+
     return room;
 }
 
 bool Gangsters::createSecondHint( )
 {
-    std::basic_ostringstream<char> buf;
-    Room *room = findHintRoom( buf );
+    MultiMessage msg;
+    Room *room = findHintRoom( msg );
 
     if (room) {
-        GQChannel::gecho( this, buf );
-        
-        setHint( getHint( ) + " " + buf.str( ) );
+        GQChannel::gecho( this, msg );
+
+        // Stored hint stays RU -- it feeds the RU quest-description display.
+        setHint( getHint( ) + " " + msg.getRu( ) );
         char_to_room( createMob( ), room );
     }
-    
+
     return (room != NULL);
 }
 

@@ -18,6 +18,10 @@
 #include "multimessage.h"
 #include "l10n.h"
 
+/* Messenger fan-out convention for every gecho below: the Discord stream is
+ * English-only (both the quest label and the body), Telegram stays Russian.
+ * Same split as send_discord_level / send_telegram_level. */
+
 const char * const GQChannel::BOLD = "{Y";
 const char * const GQChannel::NORMAL = "{y";
 
@@ -41,47 +45,38 @@ void GQChannel::zecho( GlobalQuest *gquest, Area *area, const DLString& msg )
     }
 }
 
-void GQChannel::gecho( GlobalQuest *gq, ostringstream &buf )
-{
-    gecho( GlobalQuestManager::getThis( )->findGlobalQuestInfo( 
-                            gq->getQuestID( ) )->getQuestName( ),
-            buf.str( ) );
-
-    buf.str( "" );
-}
-
-void GQChannel::gecho( GlobalQuest *gq, const DLString& msg, PCharacter *pch ) 
-{
-    gecho( 
-            GlobalQuestManager::getThis( )->findGlobalQuestInfo( 
-                            gq->getQuestID( ) )->getQuestName( ),
-            msg, pch );
-}
-
-void GQChannel::gecho( GlobalQuestInfo *gqi, const DLString& msg ) 
+void GQChannel::gecho( GlobalQuestInfo *gqi, const DLString& msg )
 {
     gecho( gqi->getQuestName( ), msg );
 }
 
-void GQChannel::gecho( const DLString& name, const DLString& msg, PCharacter *pch ) 
+void GQChannel::gecho( const DLString& name, const DLString& msg, PCharacter *pch )
 {
     Descriptor *d;
-    std::basic_ostringstream<char> buf;
-    
+
     if (dreamland->isShutdown( ))
         return;
-    
-    buf << BOLD << "[" << NORMAL << "Глобал" << BOLD << ": " 
-        << NORMAL << name << BOLD << "] "
-        << NORMAL << msg << "{x" << endl;
-    
-    for ( d = descriptor_list; d; d = d->next ) 
-        if (d->connected == CON_PLAYING)
-            if (d->character && (!pch || pch != d->character->getPC( ))) 
-                d->character->send_to( buf );
 
-    send_discord_gquest(name, msg);
-    send_telegram_gquest(name, msg);
+    for ( d = descriptor_list; d; d = d->next ) {
+        if (d->connected != CON_PLAYING)
+            continue;
+
+        Character *ch = d->character;
+        if (!ch || (pch && pch == ch->getPC( )))
+            continue;
+
+        std::basic_ostringstream<char> buf;
+        buf << BOLD << "[" << NORMAL << l( ch, "Глобал" ) << BOLD << ": "
+            << NORMAL << l( ch, name.c_str( ) ) << BOLD << "] "
+            << NORMAL << msg << "{x" << endl;
+        ch->send_to( buf );
+    }
+
+    // The body reaching this overload is free-form immortal text ('gquest talk'),
+    // so only the quest label can be localized for Discord.
+    DLString nameEn = _( name ).getMessage( LANG_EN );
+    send_discord_gquest( nameEn, msg );
+    send_telegram_gquest( name, msg );
 }
 
 void GQChannel::gecho( GlobalQuest *gq, const MultiMessage &msg, PCharacter *pch )
@@ -108,7 +103,7 @@ void GQChannel::gecho( GlobalQuest *gq, const MultiMessage &msg, PCharacter *pch
         ch->send_to( buf );
     }
 
-    send_discord_gquest( gqi->getQuestName( ), msg.getRu( ) );
+    send_discord_gquest( gqi->getQuestNameFor( LANG_EN ), msg.getMessage( LANG_EN ) );
     send_telegram_gquest( gqi->getQuestName( ), msg.getRu( ) );
 }
 
@@ -134,7 +129,8 @@ void GQChannel::gecho( const DLString &name, const MultiMessage &msg, PCharacter
         ch->send_to( buf );
     }
 
-    send_discord_gquest( name, msg.getRu( ) );
+    DLString nameEn = _( name ).getMessage( LANG_EN );
+    send_discord_gquest( nameEn, msg.getMessage( LANG_EN ) );
     send_telegram_gquest( name, msg.getRu( ) );
 }
 

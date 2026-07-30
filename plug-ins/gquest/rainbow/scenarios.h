@@ -20,6 +20,8 @@ class NPCharacter;
 class PCharacter;
 class Character;
 class Object;
+class MultiMessage;
+class PCMemoryInterface;
 
 /*---------------------------------------------------------------------------
  * RainbowScenario base class, and its registrator 
@@ -49,7 +51,9 @@ public:
 
     virtual void printCount( int, ostringstream&, Character * ) const = 0;
     virtual void printTime( ostringstream&, Character * ) const = 0;
-    virtual void printWinnerMsgOther( const DLString &, ostringstream& ) const = 0;
+    /* Winner announcement seen by everyone else: the winner's name declines per
+     * language, so the whole line is composed in all three at once. */
+    virtual MultiMessage getWinnerMsgOther( PCMemoryInterface * ) const = 0;
     virtual void onGivePiece( PCharacter *, NPCharacter * ) const = 0;
     virtual void onQuestInit( ) const;
     virtual void onQuestFinish( PCharacter * ) const = 0;
@@ -138,7 +142,7 @@ public:
 
     virtual void printCount( int, ostringstream&, Character * ) const;
     virtual void printTime( ostringstream&, Character * ) const;
-    virtual void printWinnerMsgOther( const DLString &, ostringstream& ) const;
+    virtual MultiMessage getWinnerMsgOther( PCMemoryInterface * ) const;
     virtual void onGivePiece( PCharacter *, NPCharacter * ) const;
     virtual void onQuestFinish( PCharacter * ) const;
     virtual bool canHearInitMsg( PCharacter * ) const;
@@ -159,7 +163,7 @@ public:
 
     virtual void printCount( int, ostringstream&, Character * ) const;
     virtual void printTime( ostringstream&, Character * ) const;
-    virtual void printWinnerMsgOther( const DLString &, ostringstream& ) const;
+    virtual MultiMessage getWinnerMsgOther( PCMemoryInterface * ) const;
     virtual void onGivePiece( PCharacter *, NPCharacter * ) const;
     virtual void onQuestFinish( PCharacter * ) const;
     virtual bool canHearInitMsg( PCharacter * ) const;

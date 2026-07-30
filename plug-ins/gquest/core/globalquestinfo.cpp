@@ -29,6 +29,11 @@ const char * GlobalQuestInfo::getQuestNameFor( const Character *ch ) const
     return l( ch, getQuestName( ).c_str( ) );
 }
 
+const DLString & GlobalQuestInfo::getQuestNameFor( lang_t lang ) const
+{
+    return TranslationManager::getThis( ).run( lang, L10N_FILE, getQuestName( ) );
+}
+
 /*---------------------------------------------------------------------------
  * GlobalQuestInfo
  *---------------------------------------------------------------------------*/

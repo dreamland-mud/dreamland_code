@@ -39,6 +39,7 @@ public:
 
     virtual void getQuestDescription( std::ostringstream &, Character * ) const;
     virtual void getQuestStartMessage( std::ostringstream & ) const;
+    virtual MultiMessage getStartBroadcast( ) const;
 
     inline static Gangsters* getThis( );
 
@@ -60,7 +61,7 @@ protected:
     inline void setHint( const DLString & );
 
     void createFirstHint( MobileList & );
-    Room * findHintRoom( std::ostringstream& );
+    Room * findHintRoom( MultiMessage& );
     bool createSecondHint( );
     void createThirdHint( );
 
