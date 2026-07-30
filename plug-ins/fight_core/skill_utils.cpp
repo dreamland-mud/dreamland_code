@@ -156,16 +156,15 @@ char skill_learned_colour(const Skill *skill, PCharacter *ch)
  * a skill without a Ukrainian name reads exactly as it did before.
  * The connector between them is a word too, and belongs to the same language
  * as the frame around it. */
+/* The reader's own name, and only that. This used to print both -- "'вовк' or
+ * 'wolf'" -- which put two languages in one sentence for every skill in the
+ * game. The other names remain keywords, so the article is just as findable by
+ * them; they simply do not belong in the header. */
 DLString print_names_for(const Skill *skill, Character *ch)
 {
-    lang_t lang = Player::displayLang(ch);
-    DLString primary = skill->getNameFor(lang);
-    DLString secondary = (lang == LANG_EN ? skill->getRussianName() : skill->getName());
-    DLString format = DLString("'{%c%N1{%c' ") + l(ch, "или") + " '{%c%N1{%c'";
+    DLString name = skill->getNameFor(Player::displayLang(ch));
 
-    return fmt(0, format.c_str(),
-        SKILL_HEADER_FG, primary.c_str(), SKILL_HEADER_BG,
-        SKILL_HEADER_FG, secondary.c_str(), SKILL_HEADER_BG);
+    return fmt(0, "'{%c%N1{%c'", SKILL_HEADER_FG, name.c_str(), SKILL_HEADER_BG);
 }
 
 /* The word a skill help opens with. It used to be the Russian noun declined
