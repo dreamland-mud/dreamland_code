@@ -5,6 +5,7 @@
 #include <set>
 
 #include "defaultrace.h"
+#include "helpmeta.h"
 #include "defaultpcrace.h"
 #include "raceflags.h"
 
@@ -163,67 +164,82 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     in << " " << l(ch, "или") << " {C" << race->getName( ) << "{x "
        << editButton(ch) << endl;
 
-    in << endl << text.getForLang(Player::displayLang(ch)) << endl;
-
     const PCRace *r = race.getConstPointer<DefaultRace>()->getPC( );
-    if (!r || !r->isValid())
-        return;
-        
-    in << "{cНатура{x      : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ), ch ) << endl;
-    if (!r->getStats( ).empty( )) {
-        bool found = false;
+    bool playable = r && r->isValid( );
 
-        in << "{c" << l(ch, "Параметры") << "{x   : ";
-        for (int i = 0; i < stat_table.size; i++) {
-            int stat = r->getStats( )[i];
-            if (stat != 0) {
-                if (found)
-                    in << ", ";
-                in << (stat > 0 ? "+" : "") << stat << l(ch, " к ") << stat_table.message( i, '3', Player::displayLang(ch) );
-                found = true;
+    /* What the race IS, as a bullet list at the head of the article. These
+     * numbers used to hang below the flavour text in a hand-aligned column,
+     * where the padding had to be counted out per label and only ever lined
+     * up in Russian. */
+    if (playable) {
+        in << help_meta_line(l(ch, "Натура"),
+                             align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ), ch )) << endl;
+
+        if (!r->getStats( ).empty( )) {
+            ostringstream stats;
+            bool found = false;
+
+            for (int i = 0; i < stat_table.size; i++) {
+                int stat = r->getStats( )[i];
+                if (stat != 0) {
+                    if (found)
+                        stats << ", ";
+                    stats << (stat > 0 ? "+" : "") << stat << l(ch, " к ") << stat_table.message( i, '3', vlang );
+                    found = true;
+                }
             }
-        }
-        if (!found)
-            in << l(ch, "без изменений");
-        in << endl;
-    }
-    in << "{c" << l(ch, "Размер") << "{x      : " << size_table.message( r->getSize( ), '1', Player::displayLang(ch) ) << endl;
-    
-    in << "{c" << l(ch, "Классы") << "{x      : " << l(ch, "любой");
-    bool found = false;
-    for (int i = 0; i < professionManager->size( ); i++) {
-        Profession *prof = professionManager->find( i );
-
-        if (prof->isValid()
-            && prof->isPlayed()
-            && !prof->getFlags().isSet(PROF_NEWLOCK)
-            && const_cast<PCRace *>(r)->getClasses( )[prof->getIndex( )] <= 0)
-        {
             if (!found)
-                in << l(ch, ", кроме ");
-            else
-                in << ", ";
-            in << prof->getNameFor( ch, Grammar::Case('2') );
-            found = true;
+                stats << l(ch, "без изменений");
+
+            in << help_meta_line(l(ch, "Параметры"), stats.str( )) << endl;
+        }
+
+        in << help_meta_line(l(ch, "Размер"), size_table.message( r->getSize( ), '1', vlang )) << endl;
+
+        {
+            ostringstream classes;
+            bool found = false;
+
+            classes << l(ch, "любой");
+            for (int i = 0; i < professionManager->size( ); i++) {
+                Profession *prof = professionManager->find( i );
+
+                if (prof->isValid()
+                    && prof->isPlayed()
+                    && !prof->getFlags().isSet(PROF_NEWLOCK)
+                    && const_cast<PCRace *>(r)->getClasses( )[prof->getIndex( )] <= 0)
+                {
+                    if (!found)
+                        classes << l(ch, ", кроме ");
+                    else
+                        classes << ", ";
+                    classes << prof->getNameFor( ch, Grammar::Case('2') );
+                    found = true;
+                }
+            }
+
+            in << help_meta_line(l(ch, "Классы"), classes.str( )) << endl;
+        }
+
+        DLString res = imm_flags.messages( r->getRes( ), true, '1', vlang );
+        if (!res.empty( )) {
+            in << help_meta_line(l(ch, "Устойчивы"), DLString(l(ch, "к ")) + res) << endl;
+        }
+        DLString vuln = imm_flags.messages( r->getVuln( ), true, '1', vlang );
+        if (!vuln.empty( )) {
+            in << help_meta_line(l(ch, "Уязвимы"), DLString(l(ch, "к ")) + vuln) << endl;
+        }
+
+        DLString aff = r->getAff( ).messages( true, '1', vlang );
+        if (!aff.empty( )) {
+            in << help_meta_line(l(ch, "Воздействия"), aff) << endl;
         }
     }
-    in << endl;
 
-    DLString res = imm_flags.messages( r->getRes( ), true, '1', Player::displayLang(ch) );
-    if (!res.empty( )) {
-        in << "{c" << l(ch, "Устойчивы") << "{x   : " << l(ch, "к ") << res << endl;
-    }
-    DLString vuln = imm_flags.messages( r->getVuln( ), true, '1', Player::displayLang(ch) );
-    if (!vuln.empty( )) {
-        in << "{c" << l(ch, "Уязвимы") << "{x     : " << l(ch, "к ") << vuln << endl;
-    }
+    in << endl << text.getForLang(vlang) << endl;
 
-    DLString aff = r->getAff( ).messages( true, '1', Player::displayLang(ch) );
-    if (!aff.empty( )) {
-        in << "{c" << l(ch, "Воздействия") << "{x : " << aff << endl;
-    }
-
-    in << endl;
+    if (!playable)
+        return;
 
     // Pretend we have a dummy character of this race. Find out
     // all available race aptitude, professional and
@@ -270,18 +286,22 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         }
     }
     
-    if (!raceApt.empty( )) {
-        in << "{W" << l(ch, "Уникальные способности") << "{x: " << raceApt << endl;
-    }
-    if (!prof100.empty( )) {
-        in << "{W" << l(ch, "Бонусы на классовые умения") << "{x: " << prof100 << endl;
-    }
-    if (!noprof100.empty( )) {
-        in << "{W" << l(ch, "Бонусные умения") << "{x: " << noprof100 << endl;
-    }
-    if (!lang.empty()) {
-        in << "{W" << l(ch, "Знание древних языков") << "{x: " << lang << endl;
-    }
+    /* The derived skill lists stay below the flavour text -- they are what the
+     * race can DO, not what it is -- but wear the same bullet as the block up
+     * top, so the article has one shape and not two. */
+    auto skillList = [ch, &in](const char *label, const CommaSet &names) {
+        if (names.empty( ))
+            return;
+
+        ostringstream buf;
+        buf << names;
+        in << help_meta_line(label, buf.str( )) << endl;
+    };
+
+    skillList(l(ch, "Уникальные способности"), raceApt);
+    skillList(l(ch, "Бонусы на классовые умения"), prof100);
+    skillList(l(ch, "Бонусные умения"), noprof100);
+    skillList(l(ch, "Знание древних языков"), lang);
     
     in << endl << "Подробнее о значении каждого параметра читай %H% [расовые особенности]." << endl;
 }

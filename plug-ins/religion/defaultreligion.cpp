@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "defaultreligion.h"
+#include "helpmeta.h"
 #include "religionattribute.h"
 #include "logstream.h"
 
@@ -121,17 +122,19 @@ DLString ReligionHelp::getTitle(const DLString &label, lang_t lang) const
 void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     in << l(ch, "Религия") << " {C" << religion->getNameFor(ch).ruscase('1') << "{x ({C"
-       << religion->getShortDescr() << "{x)";
+       << religion->getShortDescr() << "{x) "
+       << "%PAUSE% " << web_edit_button(ch, "reledit", religion->getName()) << "%RESUME%" << endl;
 
-    if (ch && ch->desc) {
-        if (religion->available(ch))
-            in << l(ch, ", доступна для тебя.");
-        else
-            in << l(ch, ", недоступна тебе.");
-    }
+    // Whether you may take it is the one fact the article states about the
+    // religion rather than about its god; it used to trail off the header line
+    // as a comma clause. Nobody but a playing character has an answer.
+    if (ch && ch->desc)
+        in << help_meta_line(l(ch, "Доступ"),
+                             religion->available(ch)
+                                 ? DLString("{g") + l(ch, "открыт") + "{x"
+                                 : DLString("{r") + l(ch, "закрыт") + "{x") << endl;
 
-    in << " " << "%PAUSE% " << web_edit_button(ch, "reledit", religion->getName()) << "%RESUME%" << endl << endl
-       << text.getForLang(Player::displayLang(ch));
+    in << endl << text.getForLang(Player::displayLang(ch));
 }
 
 /*----------------------------------------------------------------------

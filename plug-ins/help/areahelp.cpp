@@ -4,8 +4,10 @@
  */
 #include <string.h>
 #include "areahelp.h"
+#include "helpmeta.h"
 #include "areabehaviorplugin.h"
 #include "regexp.h"
+#include "character.h"
 #include "merc.h"
 #include "string_utils.h"
 #include "dl_strings.h"
@@ -135,43 +137,85 @@ static void format_area_quest(AreaQuest *q, ostringstream &qbuf, Character *ch)
 void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     AreaIndexData *area = areafile->area;
-    
+
     if (!selfHelp) {
         MarkupHelpArticle::getRawText(ch, in);
         return;
     }
 
-    in << fmt(ch, _("Зона {Y%1$s{x, "), area->getName(viewerLang(ch)).c_str());
+    lang_t lang = viewerLang(ch);
 
-    if (area->low_range > 0 || area->high_range > 0)
-       in << fmt(ch, _("уровни {Y%1$d-%2$d{x, "), area->low_range, area->high_range);
+    /* The website and the maps page put the zone name in the article's own
+     * <h1>, so for the json dump (no descriptor) the heading would be the same
+     * words twice over. In game there is no <h1> to inherit from. */
+    if (ch && ch->desc)
+        in << fmt(ch, _("Зона {c%1$s{x"), area->getName(lang).c_str()) << endl;
 
-    in << fmt(ch, _("автор {y%1$s{x"), area->authors.c_str());
+    /* Everything the article knows ABOUT the zone, one bullet each. It used to
+     * be a run-on first line, a stray line for the danger level, and the way in
+     * at the very bottom, below the article text. */
+    if (area->low_range > 0 || area->high_range > 0) {
+        ostringstream levels;
 
-    if (!area->translator.empty())
-        in << fmt(ch, _(", перевод {y%1$s{x"), area->translator.c_str());
-
-    // This bit is going to be replaced with a link to the map by the webclient.
-    in << "%PAUSE% {Iw[map=" << areafile->file_name << "]{Ix%RESUME%";
-
-    in << endl;
-
-    // Make a list of all alternative names excluding the main one.
-    list<DLString> altnames = String::toNormalizedList(area->altname);
-    list<DLString> names = String::toNormalizedList(area->name);
-    names.splice(names.end(), altnames);
-    names.remove(area->getName().colourStrip());
-
-    if (!names.empty())
-        in << fmt(ch, _("{DТакже известна как: %1$s{x"), String::join(names, ", ").c_str()) << endl;
+        levels << "{Y" << area->low_range << "-" << area->high_range << "{x";
+        in << help_meta_line(l(ch, "Уровни"), levels.str()) << endl;
+    }
 
     if (IS_SET(area->area_flag, AREA_SAFE|AREA_EASY|AREA_HARD|AREA_DEADLY))
-        in << _("Уровень опасности: ").getMessage(ch) << area_danger_long(area, ch) << endl;
+        in << help_meta_line(l(ch, "Опасность"), area_danger_long(area, ch)) << endl;
+
+    // Every zone has one today, but a bullet with nothing after the colon is a
+    // visible defect in a way a trailing "author " never was.
+    if (!area->authors.empty())
+        in << help_meta_line(l(ch, "Автор"), DLString("{y") + area->authors + "{x") << endl;
+
+    if (!area->translator.empty())
+        in << help_meta_line(l(ch, "Перевод"), DLString("{y") + area->translator + "{x") << endl;
+
+    /* The alternative name in the VIEWER's language, and only that one: the
+     * list used to be assembled from every language at once with just the
+     * Russian main name taken back out, so an English reader was shown their
+     * own zone name a second time and the Ukrainian one after it. Strict
+     * get() rather than getForLang() -- an alias is a garnish, and falling
+     * back would drop an English word into a Russian line. */
+    DLString altname = area->altname.get(lang).ruscase('1').colourStrip();
+
+    if (!altname.empty() && altname != area->getName(lang).colourStrip())
+        in << help_meta_line(l(ch, "Также известна как"), altname) << endl;
+
+    if (!area->speedwalk.emptyValues()) {
+        // Was LANG_DEFAULT: a zone whose way in is prose rather than a run path
+        // read Russian to everybody.
+        const DLString &speedwalk = area->speedwalk.getForLang(lang);
+        ostringstream way;
+
+        // For speedwalks that only contain run path, surround it with {hs tags.
+        RegExp simpleSpeedwalkRE("^[0-9nsewud]+$");
+        if (simpleSpeedwalkRE.match(speedwalk))
+            way << "{y{hs" << speedwalk << "{x";
+        else
+            way << speedwalk;
+
+        // A path spelled in directions has to start somewhere; prose says so itself.
+        RegExp speedwalkRE("[0-9]?[nsewud]+");
+        if (speedwalkRE.match(speedwalk))
+            way << " {D" << l(ch, "(от Рыночной Площади)") << "{x";
+
+        in << help_meta_line(l(ch, "Как добраться"), way.str()) << endl;
+    }
+
+    /* Web clients turn the marker into a link to the zone's map page. Telnet
+     * has nothing to open, so the whole bullet -- its newline included -- sits
+     * inside the web-only branch, and %PAUSE% keeps the [brackets] from being
+     * read as a help reference. */
+    in << "%PAUSE%{Iw"
+       << help_meta_line(l(ch, "Карта"), DLString("[map=") + areafile->file_name + "]")
+       << endl << "{Ix%RESUME%";
 
     in << endl;
 
-    if (!text.getForLang(viewerLang(ch)).empty())
-       in << text.getForLang(viewerLang(ch)) << endl;
+    if (!text.getForLang(lang).empty())
+       in << text.getForLang(lang) << endl;
 
     if (!area->quests.empty()) {
         ostringstream qbuf;
@@ -182,25 +226,6 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 
         if (!qbuf.str().empty())
             in << _("{yЗадания{x:").getMessage(ch) << endl << qbuf.str() << endl;
-    }
-
-    if (!area->speedwalk.emptyValues()) {
-        const DLString &speedwalk = area->speedwalk.get(LANG_DEFAULT);
-
-        in << _("{yКак добраться{x: ").getMessage(ch);
-
-        // For speedwalks that only contain run path, surround it with {hs tags.
-        RegExp simpleSpeedwalkRE("^[0-9nsewud]+$");
-        if (simpleSpeedwalkRE.match(speedwalk))
-            in << "{y{hs" << speedwalk << "{x" << endl;
-        else
-            in << speedwalk << endl;
-
-        // If 'speedwalk' field contains something resembling a run path,
-        // and not just text, explain the starting point.
-        RegExp speedwalkRE("[0-9]?[nsewud]+");
-        if (speedwalkRE.match(speedwalk))
-           in << _("{D(все пути ведут от Рыночной Площади Мидгаарда, если не указано иначе){x").getMessage(ch) << endl;
     }
 }
 
