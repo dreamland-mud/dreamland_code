@@ -172,7 +172,7 @@ inline const DLString& Social::getUaName( ) const
 }
 inline const DLString & Social::getShortDesc( ) const
 {
-    return shortDesc.get(RU);
+    return shortDesc.getForLang(RU);
 }
 inline const DLString & Social::getShortDescFor( lang_t lang ) const
 {
@@ -184,68 +184,68 @@ inline int Social::getPosition( ) const
 }
 inline const DLString & Social::getNoargOther( ) const
 {
-    return msgOthersNoArgument.get(RU);
+    return msgOthersNoArgument.getForLang(RU);
 }
 inline const DLString & Social::getNoargMe( ) const
 {
-    return msgCharNoArgument.get(RU);
+    return msgCharNoArgument.getForLang(RU);
 }
 inline const DLString & Social::getArgMe( ) const
 {
-    return msgCharFound.get(RU);
+    return msgCharFound.getForLang(RU);
 }
 inline const DLString & Social::getArgOther( ) const
 {
-    return msgOthersFound.get(RU);
+    return msgOthersFound.getForLang(RU);
 }
 inline const DLString & Social::getArgVictim( ) const
 {
-    return msgVictimFound.get(RU);
+    return msgVictimFound.getForLang(RU);
 }
 inline const DLString & Social::getAutoMe( ) const
 {
-    return msgCharAuto.get(RU);
+    return msgCharAuto.getForLang(RU);
 }
 inline const DLString & Social::getAutoOther( ) const
 {
-    return msgOthersAuto.get(RU);
+    return msgOthersAuto.getForLang(RU);
 }
 inline const DLString & Social::getArgMe2( ) const
 {
-    return msgCharFound2.get(RU);
+    return msgCharFound2.getForLang(RU);
 }
 inline const DLString & Social::getArgOther2( ) const
 {
-    return msgOthersFound2.get(RU);
+    return msgOthersFound2.getForLang(RU);
 }
 inline const DLString & Social::getArgVictim2( ) const
 {
-    return msgVictimFound2.get(RU);
+    return msgVictimFound2.getForLang(RU);
 }
 inline const DLString & Social::getErrorMsg( ) const
 {
-    return msgCharNotFound.get(RU);
+    return msgCharNotFound.getForLang(RU);
 }
 
 inline const DLString & Social::getObjVictim() const
 {
-    return msgVictimObj.get(RU);
+    return msgVictimObj.getForLang(RU);
 }
 inline const DLString & Social::getObjChar() const
 {
-    return msgCharVictimObj.get(RU);
+    return msgCharVictimObj.getForLang(RU);
 }
 inline const DLString & Social::getObjOthers() const
 {
-    return msgOthersVictimObj.get(RU);
+    return msgOthersVictimObj.getForLang(RU);
 }
 inline const DLString & Social::getObjNoVictimSelf() const
 {
-    return msgCharObj.get(RU);
+    return msgCharObj.getForLang(RU);
 }
 inline const DLString & Social::getObjNoVictimOthers() const
 {
-    return msgOthersObj.get(RU);
+    return msgOthersObj.getForLang(RU);
 }
 
 #endif

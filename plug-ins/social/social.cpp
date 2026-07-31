@@ -82,10 +82,15 @@ const DLString &Social::getNameFor( lang_t lang ) const
  * Build a per-recipient message out of a social's stored translations. The
  * three-language MultiMessage ctor skips the catalog entirely -- socials keep
  * their translations next to the Russian source, in their own XML.
+ *
+ * Every slot goes through getForLang, which falls back RU->EN, because the
+ * MultiMessage RU slot has no fallback of its own: a legacy node with no 'l'
+ * attribute and no Cyrillic in it (`ARRRRRRRRRRGH!!!!!`) is read as ENGLISH,
+ * and a bare get(RU) would hand a Russian reader an empty line.
  */
 static MultiMessage social_msg( const XMLMultiString &msg )
 {
-    return MultiMessage( msg.get(EN), msg.get(RU), msg.get(UA) );
+    return MultiMessage( msg.getForLang(EN), msg.getForLang(RU), msg.getForLang(UA) );
 }
 
 MultiMessage Social::getNoargOtherMsg( ) const { return social_msg( msgOthersNoArgument ); }
