@@ -66,16 +66,30 @@ void OLCStateSocial::changed( PCharacter *ch )
     isChanged = true;
 }
 
+lang_t OLCStateSocial::getLang() const
+{
+    DLString value = editLang.getValue();
+
+    if (value == "en")
+        return EN;
+    if (value == "ua")
+        return UA;
+
+    return RU;
+}
+
 void OLCStateSocial::show( PCharacter *ch )
 {
     Social *s = getOriginal();
+    lang_t lang = getLang();
 
     ptc(ch, "Социал:      {C%s\r\n", s->getName().c_str());
     ptc(ch, "По-русски:   {C%s{x %s {D(russian help){x\r\n",
             s->getRussianName().c_str(),
             web_edit_button(ch, "russian", "web").c_str());
+    ptc(ch, "Язык полей:  {C%s{x {D(language){x\r\n", lang2attr(lang).c_str());
     ptc(ch, "Описание:    {C%s{x %s {D(short help){x\r\n",
-            s->getShortDesc().c_str(),
+            s->shortDesc.get(lang).c_str(),
             web_edit_button(ch, "short", "web").c_str());
     ptc(ch, "Синонимы:    {C%s{x %s {D(alias help){x\r\n",
             s->aliases.toList().toString().c_str(),
@@ -83,21 +97,21 @@ void OLCStateSocial::show( PCharacter *ch )
     ptc(ch, "Позиция:     {C%s {D(position){x\r\n", 
             s->position.name().c_str());
 
-    ptc(ch, "charNoArgument:   %s  %s\r\n", web_edit_button(ch, "charNoArgument", "web").c_str(), s->msgCharNoArgument.c_str());
-    ptc(ch, "othersNoArgument: %s  %s\r\n", web_edit_button(ch, "othersNoArgument", "web").c_str(), s->msgOthersNoArgument.c_str());
-    ptc(ch, "charFound1:        %s  %s\r\n", web_edit_button(ch, "charFound1", "web").c_str(), s->msgCharFound.c_str());
-    ptc(ch, "othersFound1:      %s  %s\r\n", web_edit_button(ch, "othersFound1", "web").c_str(), s->msgOthersFound.c_str());
-    ptc(ch, "victimFound1:      %s  %s\r\n", web_edit_button(ch, "victimFound1", "web").c_str(), s->msgVictimFound.c_str());
-    ptc(ch, "charNotFound:     %s  %s\r\n", web_edit_button(ch, "charNotFound", "web").c_str(), s->msgCharNotFound.c_str());
-    ptc(ch, "othersAuto:       %s  %s\r\n", web_edit_button(ch, "othersAuto", "web").c_str(), s->msgOthersAuto.c_str());
-    ptc(ch, "charFound2:       %s  %s\r\n", web_edit_button(ch, "charFound2", "web").c_str(), s->msgCharFound2.c_str());
-    ptc(ch, "othersFound2:     %s  %s\r\n", web_edit_button(ch, "othersFound2", "web").c_str(), s->msgOthersFound2.c_str());
-    ptc(ch, "victimFound2:     %s  %s\r\n", web_edit_button(ch, "victimFound2", "web").c_str(), s->msgVictimFound2.c_str());
-    ptc(ch, "victimObj:        %s  %s\r\n", web_edit_button(ch, "victimObj", "web").c_str(), s->msgVictimObj.c_str());
-    ptc(ch, "charVictimObj:    %s  %s\r\n", web_edit_button(ch, "charVictimObj", "web").c_str(), s->msgCharVictimObj.c_str());
-    ptc(ch, "othersVictimObj:  %s  %s\r\n", web_edit_button(ch, "othersVictimObj", "web").c_str(), s->msgOthersVictimObj.c_str());
-    ptc(ch, "charObj:          %s  %s\r\n", web_edit_button(ch, "charObj", "web").c_str(), s->msgCharObj.c_str());
-    ptc(ch, "othersObj:        %s  %s\r\n", web_edit_button(ch, "othersObj", "web").c_str(), s->msgOthersObj.c_str());
+    ptc(ch, "charNoArgument:   %s  %s\r\n", web_edit_button(ch, "charNoArgument", "web").c_str(), s->msgCharNoArgument.get(lang).c_str());
+    ptc(ch, "othersNoArgument: %s  %s\r\n", web_edit_button(ch, "othersNoArgument", "web").c_str(), s->msgOthersNoArgument.get(lang).c_str());
+    ptc(ch, "charFound1:        %s  %s\r\n", web_edit_button(ch, "charFound1", "web").c_str(), s->msgCharFound.get(lang).c_str());
+    ptc(ch, "othersFound1:      %s  %s\r\n", web_edit_button(ch, "othersFound1", "web").c_str(), s->msgOthersFound.get(lang).c_str());
+    ptc(ch, "victimFound1:      %s  %s\r\n", web_edit_button(ch, "victimFound1", "web").c_str(), s->msgVictimFound.get(lang).c_str());
+    ptc(ch, "charNotFound:     %s  %s\r\n", web_edit_button(ch, "charNotFound", "web").c_str(), s->msgCharNotFound.get(lang).c_str());
+    ptc(ch, "othersAuto:       %s  %s\r\n", web_edit_button(ch, "othersAuto", "web").c_str(), s->msgOthersAuto.get(lang).c_str());
+    ptc(ch, "charFound2:       %s  %s\r\n", web_edit_button(ch, "charFound2", "web").c_str(), s->msgCharFound2.get(lang).c_str());
+    ptc(ch, "othersFound2:     %s  %s\r\n", web_edit_button(ch, "othersFound2", "web").c_str(), s->msgOthersFound2.get(lang).c_str());
+    ptc(ch, "victimFound2:     %s  %s\r\n", web_edit_button(ch, "victimFound2", "web").c_str(), s->msgVictimFound2.get(lang).c_str());
+    ptc(ch, "victimObj:        %s  %s\r\n", web_edit_button(ch, "victimObj", "web").c_str(), s->msgVictimObj.get(lang).c_str());
+    ptc(ch, "charVictimObj:    %s  %s\r\n", web_edit_button(ch, "charVictimObj", "web").c_str(), s->msgCharVictimObj.get(lang).c_str());
+    ptc(ch, "othersVictimObj:  %s  %s\r\n", web_edit_button(ch, "othersVictimObj", "web").c_str(), s->msgOthersVictimObj.get(lang).c_str());
+    ptc(ch, "charObj:          %s  %s\r\n", web_edit_button(ch, "charObj", "web").c_str(), s->msgCharObj.get(lang).c_str());
+    ptc(ch, "othersObj:        %s  %s\r\n", web_edit_button(ch, "othersObj", "web").c_str(), s->msgOthersObj.get(lang).c_str());
 
     ptc(ch, "\r\n{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");                    
 }
@@ -114,9 +128,24 @@ SOCEDIT(russian, "русское", "русское название социал
     return editor(argument, getOriginal()->rusName, ED_NO_NEWLINE);
 }
 
+SOCEDIT(language, "язык", "какой язык правят команды полей: en, ru или ua")
+{
+    DLString arg = DLString(argument).getOneArgument().toLower();
+
+    if (arg != "en" && arg != "ru" && arg != "ua") {
+        ptc(ch, "Язык полей сейчас {C%s{x. Укажи en, ru или ua.\r\n",
+                lang2attr(getLang()).c_str());
+        return false;
+    }
+
+    editLang = arg;
+    ptc(ch, "Команды полей теперь правят {C%s{x.\r\n", arg.c_str());
+    return true;
+}
+
 SOCEDIT(shortdesc, "кратко", "краткое описание социала")
 {
-    return editor(argument, getOriginal()->shortDesc, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->shortDesc[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(position, "позиция", "мин. положение тела для социала (? position_table)")
@@ -131,77 +160,77 @@ SOCEDIT(aliases, "синонимы", "русские и английские с�
 
 SOCEDIT(charNoArgument, "", "поле msgCharNoArgument")
 {
-    return editor(argument, getOriginal()->msgCharNoArgument, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgCharNoArgument[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(othersNoArgument, "", "поле msgOthersNoArgument")
 {
-    return editor(argument, getOriginal()->msgOthersNoArgument, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgOthersNoArgument[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(charFound1, "", "поле msgCharFound")
 {
-    return editor(argument, getOriginal()->msgCharFound, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgCharFound[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(othersFound1, "", "поле msgOthersFound")
 {
-    return editor(argument, getOriginal()->msgOthersFound, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgOthersFound[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(victimFound1, "", "поле msgVictimFound")
 {
-    return editor(argument, getOriginal()->msgVictimFound, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgVictimFound[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(charNotFound, "", "поле msgCharNotFound")
 {
-    return editor(argument, getOriginal()->msgCharNotFound, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgCharNotFound[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(othersAuto, "", "поле msgOthersAuto")
 {
-    return editor(argument, getOriginal()->msgOthersAuto, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgOthersAuto[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(charFound2, "", "поле msgCharFound2")
 {
-    return editor(argument, getOriginal()->msgCharFound2, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgCharFound2[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(othersFound2, "", "поле msgOthersFound2")
 {
-    return editor(argument, getOriginal()->msgOthersFound2, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgOthersFound2[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(victimFound2, "", "поле msgVictimFound2")
 {
-    return editor(argument, getOriginal()->msgVictimFound2, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgVictimFound2[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(victimObj, "", "поле msgVictimObj")
 {
-    return editor(argument, getOriginal()->msgVictimObj, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgVictimObj[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(charVictimObj, "", "поле msgCharVictimObj")
 {
-    return editor(argument, getOriginal()->msgCharVictimObj, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgCharVictimObj[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(othersVictimObj, "", "поле msgOthersVictimObj")
 {
-    return editor(argument, getOriginal()->msgOthersVictimObj, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgOthersVictimObj[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(charObj, "", "поле msgCharObj")
 {
-    return editor(argument, getOriginal()->msgCharObj, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgCharObj[getLang()], ED_NO_NEWLINE);
 }
 
 SOCEDIT(othersObj, "", "поле msgOthersObj")
 {
-    return editor(argument, getOriginal()->msgOthersObj, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgOthersObj[getLang()], ED_NO_NEWLINE);
 }
 
 

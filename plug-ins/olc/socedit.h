@@ -29,12 +29,18 @@ public:
 
     template <typename T>
     bool cmd(PCharacter *ch, char *argument);
-    
+
 private:
     virtual void statePrompt( Descriptor * );
     Social * getOriginal();
 
+    /** Which language slot the message editors read and write. Every message is
+     *  an XMLMultiString now, and 16 fields times three languages would be 48
+     *  commands, so the session carries the language instead. */
+    lang_t getLang() const;
+
     XML_VARIABLE XMLBoolean isChanged;
+    XML_VARIABLE XMLString editLang;
 };
 
 #define SOCEDIT(C, rname, help) OLC_CMD(OLCStateSocial, C, rname, help)
