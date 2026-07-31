@@ -128,11 +128,15 @@ void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
     // Whether you may take it is the one fact the article states about the
     // religion rather than about its god; it used to trail off the header line
     // as a comma clause. Nobody but a playing character has an answer.
+    // %PAUSE%d like every other metadata block -- the help formatter reads a
+    // bare `*` as its bold marker and would swallow the bullet.
     if (ch && ch->desc)
-        in << help_meta_line(l(ch, "Доступ"),
+        in << "%PAUSE%"
+           << help_meta_line(l(ch, "Доступ"),
                              religion->available(ch)
                                  ? DLString("{g") + l(ch, "открыт") + "{x"
-                                 : DLString("{r") + l(ch, "закрыт") + "{x") << endl;
+                                 : DLString("{r") + l(ch, "закрыт") + "{x")
+           << "%RESUME%" << endl;
 
     in << endl << text.getForLang(Player::displayLang(ch));
 }

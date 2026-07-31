@@ -170,8 +170,12 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     /* What the race IS, as a bullet list at the head of the article. These
      * numbers used to hang below the flavour text in a hand-aligned column,
      * where the padding had to be counted out per label and only ever lined
-     * up in Russian. */
+     * up in Russian.
+     *
+     * %PAUSE%d like every other metadata block: the help formatter owns `*`,
+     * `_`, `=` and `(...)` as its own markup and would eat the bullet. */
     if (playable) {
+        in << "%PAUSE%";
         in << help_meta_line(l(ch, "Натура"),
                              align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ), ch )) << endl;
 
@@ -234,6 +238,8 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         if (!aff.empty( )) {
             in << help_meta_line(l(ch, "Воздействия"), aff) << endl;
         }
+
+        in << "%RESUME%";
     }
 
     in << endl << text.getForLang(vlang) << endl;
@@ -298,11 +304,15 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         in << help_meta_line(label, buf.str( )) << endl;
     };
 
+    in << "%PAUSE%";
     skillList(l(ch, "Уникальные способности"), raceApt);
     skillList(l(ch, "Бонусы на классовые умения"), prof100);
     skillList(l(ch, "Бонусные умения"), noprof100);
     skillList(l(ch, "Знание древних языков"), lang);
-    
+    in << "%RESUME%";
+
+    // The %H% keyword and the [reference] below need the formatter, hence the
+    // RESUME above rather than one fence around everything.
     in << endl << "Подробнее о значении каждого параметра читай %H% [расовые особенности]." << endl;
 }
 
