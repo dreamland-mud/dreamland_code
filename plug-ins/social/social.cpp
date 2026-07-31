@@ -78,6 +78,33 @@ const DLString &Social::getNameFor( lang_t lang ) const
     return getName();
 }
 
+/**
+ * Build a per-recipient message out of a social's stored translations. The
+ * three-language MultiMessage ctor skips the catalog entirely -- socials keep
+ * their translations next to the Russian source, in their own XML.
+ */
+static MultiMessage social_msg( const XMLMultiString &msg )
+{
+    return MultiMessage( msg.get(EN), msg.get(RU), msg.get(UA) );
+}
+
+MultiMessage Social::getNoargOtherMsg( ) const { return social_msg( msgOthersNoArgument ); }
+MultiMessage Social::getNoargMeMsg( ) const { return social_msg( msgCharNoArgument ); }
+MultiMessage Social::getAutoOtherMsg( ) const { return social_msg( msgOthersAuto ); }
+MultiMessage Social::getAutoMeMsg( ) const { return social_msg( msgCharAuto ); }
+MultiMessage Social::getArgOtherMsg( ) const { return social_msg( msgOthersFound ); }
+MultiMessage Social::getArgMeMsg( ) const { return social_msg( msgCharFound ); }
+MultiMessage Social::getArgVictimMsg( ) const { return social_msg( msgVictimFound ); }
+MultiMessage Social::getErrorMsgMsg( ) const { return social_msg( msgCharNotFound ); }
+MultiMessage Social::getArgOther2Msg( ) const { return social_msg( msgOthersFound2 ); }
+MultiMessage Social::getArgMe2Msg( ) const { return social_msg( msgCharFound2 ); }
+MultiMessage Social::getArgVictim2Msg( ) const { return social_msg( msgVictimFound2 ); }
+MultiMessage Social::getObjVictimMsg( ) const { return social_msg( msgVictimObj ); }
+MultiMessage Social::getObjCharMsg( ) const { return social_msg( msgCharVictimObj ); }
+MultiMessage Social::getObjOthersMsg( ) const { return social_msg( msgOthersVictimObj ); }
+MultiMessage Social::getObjNoVictimSelfMsg( ) const { return social_msg( msgCharObj ); }
+MultiMessage Social::getObjNoVictimOthersMsg( ) const { return social_msg( msgOthersObj ); }
+
 DLString SocialHelp::getTitle(const DLString &label) const
 {
     ostringstream buf;
@@ -127,10 +154,15 @@ DLString SocialHelp::getTitle(const DLString &label, lang_t lang) const
     return help_title_fmt(lang, _("Социал {c%1$s{x, {c%2$s{x"), mine, latin);
 }
 
-static const InflectedString & object_name()
+// The stand-in item the demo lines are rendered against, declined where the
+// language declines.
+static InflectedString object_name(lang_t lang)
 {
-    static InflectedString obj("кинжал||а|у||ом|е");
-    return obj;
+    switch (lang) {
+        case LANG_EN: return InflectedString("dagger");
+        case LANG_UA: return InflectedString("кинджал||а|у||ом|і");
+        default:      return InflectedString("кинжал||а|у||ом|е");
+    }
 }
 
 // Tranforms player info into structure that 'format' functions would understand:
@@ -144,8 +176,17 @@ static InflectedString russian_string(PCMemoryInterface *pc)
         return InflectedString(pc->getRussianName().getFullForm(), mg);
 }
 
+// Same, for a viewer reading English: the Latin name, which has no cases.
+static InflectedString player_string(PCMemoryInterface *pc, lang_t lang)
+{
+    if (lang == LANG_EN)
+        return InflectedString(pc->getName(), MultiGender(pc->getSex(), Number::SINGULAR));
+
+    return russian_string(pc);
+}
+
 // Finds random registered player and returns its name+gender.
-static InflectedString player_name()
+static InflectedString player_name(lang_t lang)
 {
     static InflectedString empty;
     PCharacterMemoryList::const_iterator i;
@@ -156,15 +197,19 @@ static InflectedString player_name()
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
         PCMemoryInterface *pc = i->second;
         const DLString &rname = pc->getRussianName().getFullForm();
-    
-        // Ignore players w/o configured Russian name.    
-        if (rname.empty())
-            continue;
 
-        // Ignore players whose names look the same in all cases.
-        if (rname.find('|') == DLString::npos)
-            continue;
-        
+        // A declined example only means something in a language that declines;
+        // for English any registered name will do.
+        if (lang != LANG_EN) {
+            // Ignore players w/o configured Russian name.
+            if (rname.empty())
+                continue;
+
+            // Ignore players whose names look the same in all cases.
+            if (rname.find('|') == DLString::npos)
+                continue;
+        }
+
         if (number_range(0, totalFound++) == 0)
             result = pc;
     }
@@ -172,7 +217,22 @@ static InflectedString player_name()
     if (!result)
         return empty;
 
-    return russian_string(result);
+    return player_string(result, lang);
+}
+
+// One label column for the demo table, padded to a fixed width in every
+// language so the examples stay aligned. Cyrillic is single-byte in KOI8, so
+// byte width is character width.
+static const int SOCIAL_LABEL_WIDTH = 15;
+
+static DLString social_label(const DLString &label)
+{
+    DLString padded = label;
+
+    while (padded.size() < (size_t)SOCIAL_LABEL_WIDTH)
+        padded += " ";
+
+    return padded;
 }
 
 
@@ -183,55 +243,93 @@ void SocialHelp::getRawText( Character *ch, ostringstream &buf ) const
     if (ch->is_npc())
         return;
 
-    buf << "%PAUSE%Социал {c" << social->getRussianName() << "{x, {c"
-        << social->getName() << "{x: " 
-        << social->getShortDesc() << endl << endl
-        << "Вот как этот социал виден тебе и окружающим, когда он применен..." << endl;
+    lang_t lang = viewerLang(ch);
+    DLString mine = social->getNameFor(lang);
+    DLString latin = social->getName();
+    DLString blank = social_label(DLString::emptyString);
 
-    InflectedString me = russian_string(ch->getPC());
-    InflectedString vict1 = player_name();
-    InflectedString vict2 = player_name();
-    const InflectedString &obj = object_name();
+    // A social is addressed by name, so the header carries both the viewer's
+    // form and the Latin keyword -- unless they are the same word.
+    buf << "%PAUSE%";
+    if (mine == latin)
+        buf << fmt(ch, _("Социал {c%1$s{x: %2$s"),
+                   latin.c_str(), social->getShortDescFor(lang).c_str());
+    else
+        buf << fmt(ch, _("Социал {c%1$s{x, {c%2$s{x: %3$s"),
+                   mine.c_str(), latin.c_str(), social->getShortDescFor(lang).c_str());
 
-    if (!social->getAutoMe().empty()) {
+    buf << endl << endl
+        << fmt(ch, _("Вот как этот социал виден тебе и окружающим, когда он применен...")) << endl;
+
+    InflectedString me = player_string(ch->getPC(), lang);
+    InflectedString vict1 = player_name(lang);
+    InflectedString vict2 = player_name(lang);
+    InflectedString obj = object_name(lang);
+
+    // Every example renders in the reader's own language, falling back to the
+    // Russian source for a social that has no translation yet.
+    const DLString &autoMe = social->msgCharAuto.getForLang(lang);
+    const DLString &autoOther = social->msgOthersAuto.getForLang(lang);
+    const DLString &noargMe = social->msgCharNoArgument.getForLang(lang);
+    const DLString &noargOther = social->msgOthersNoArgument.getForLang(lang);
+    const DLString &argMe = social->msgCharFound.getForLang(lang);
+    const DLString &argVictim = social->msgVictimFound.getForLang(lang);
+    const DLString &argOther = social->msgOthersFound.getForLang(lang);
+    const DLString &argMe2 = social->msgCharFound2.getForLang(lang);
+    const DLString &argVictim2 = social->msgVictimFound2.getForLang(lang);
+    const DLString &argOther2 = social->msgOthersFound2.getForLang(lang);
+    const DLString &objSelf = social->msgCharObj.getForLang(lang);
+    const DLString &objOthers = social->msgOthersObj.getForLang(lang);
+    const DLString &objCharVict = social->msgCharVictimObj.getForLang(lang);
+    const DLString &objVict = social->msgVictimObj.getForLang(lang);
+    const DLString &objOthersVict = social->msgOthersVictimObj.getForLang(lang);
+
+    if (!autoMe.empty()) {
         buf << endl
-            << "На себя:       " << fmt(0, act_to_fmt(social->getAutoMe().c_str()).c_str(), &me) << endl;
-        if (!social->getAutoOther().empty())
-            buf << "               " << fmt(0, act_to_fmt(social->getAutoOther().c_str()).c_str(), &me) << endl;
+            << social_label(fmt(ch, _("На себя:")))
+            << fmt(ch, act_to_fmt(autoMe.c_str()).c_str(), &me) << endl;
+        if (!autoOther.empty())
+            buf << blank << fmt(ch, act_to_fmt(autoOther.c_str()).c_str(), &me) << endl;
     }
 
-    if (!social->getNoargMe().empty()) {
+    if (!noargMe.empty()) {
         buf << endl
-            << "Без параметра: " << fmt(0, act_to_fmt(social->getNoargMe().c_str()).c_str(), &me) << endl;
-        if (!social->getNoargOther().empty())
-            buf << "               " << fmt(0, act_to_fmt(social->getNoargOther().c_str()).c_str(), &me) << endl;
+            << social_label(fmt(ch, _("Без параметра:")))
+            << fmt(ch, act_to_fmt(noargMe.c_str()).c_str(), &me) << endl;
+        if (!noargOther.empty())
+            buf << blank << fmt(ch, act_to_fmt(noargOther.c_str()).c_str(), &me) << endl;
     }
-    
-    if (!social->getArgVictim().empty()) {
+
+    if (!argVictim.empty()) {
         buf << endl
-            << "На кого-то:    " <<  fmt(0, act_to_fmt(social->getArgMe().c_str()).c_str(), &me, 0, &vict1) << endl
-            << "               " <<  fmt(0, act_to_fmt(social->getArgVictim().c_str()).c_str(), &me, 0, &vict1) << endl
-            << "               " <<  fmt(0, act_to_fmt(social->getArgOther().c_str()).c_str(), &me, 0, &vict1) << endl;
-        
-        if (!social->getArgVictim2().empty()) {
+            << social_label(fmt(ch, _("На кого-то:")))
+            << fmt(ch, act_to_fmt(argMe.c_str()).c_str(), &me, 0, &vict1) << endl
+            << blank << fmt(ch, act_to_fmt(argVictim.c_str()).c_str(), &me, 0, &vict1) << endl
+            << blank << fmt(ch, act_to_fmt(argOther.c_str()).c_str(), &me, 0, &vict1) << endl;
+
+        if (!argVictim2.empty()) {
             buf << endl
-                << "На двоих:      " <<  fmt(0, social->getArgMe2().c_str(), &me, &vict1, &vict2) << endl
-                << "               " <<  fmt(0, social->getArgVictim2().c_str(), &me, &vict1, &vict2) << endl
-                << "               " <<  fmt(0, social->getArgOther2().c_str(), &me, &vict1, &vict2) << endl;
+                << social_label(fmt(ch, _("На двоих:")))
+                << fmt(ch, argMe2.c_str(), &me, &vict1, &vict2) << endl
+                << blank << fmt(ch, argVictim2.c_str(), &me, &vict1, &vict2) << endl
+                << blank << fmt(ch, argOther2.c_str(), &me, &vict1, &vict2) << endl;
         }
     }
 
-    if (!social->getObjNoVictimSelf().empty()) {
+    if (!objSelf.empty()) {
         buf << endl
-            << "На предмет:    " <<  fmt(0, social->getObjNoVictimSelf().c_str(), &me, &obj) << endl
-            << "               " <<  fmt(0, social->getObjNoVictimOthers().c_str(), &me, &obj) << endl;
+            << social_label(fmt(ch, _("На предмет:")))
+            << fmt(ch, objSelf.c_str(), &me, &obj) << endl
+            << blank << fmt(ch, objOthers.c_str(), &me, &obj) << endl;
     }
 
-    if (!social->getObjVictim().empty()) {
+    if (!objVict.empty()) {
         buf << endl
-            << "На предмет     " <<  fmt(0, social->getObjChar().c_str(), &me, &vict1, &obj) << endl
-            << "и персонажа:   " <<  fmt(0, social->getObjVictim().c_str(), &me, &vict1, &obj) << endl
-            << "               " <<  fmt(0, social->getObjOthers().c_str(), &me, &vict1, &obj) << endl;
+            << social_label(fmt(ch, _("На предмет")))
+            << fmt(ch, objCharVict.c_str(), &me, &vict1, &obj) << endl
+            << social_label(fmt(ch, _("и персонажа:")))
+            << fmt(ch, objVict.c_str(), &me, &vict1, &obj) << endl
+            << blank << fmt(ch, objOthersVict.c_str(), &me, &vict1, &obj) << endl;
     }
 }
 
@@ -339,9 +437,9 @@ bool Social::reaction( Character *ch, Character *victim, const DLString &arg )
     case 0:
     case 1: case 2: case 3: case 4:
     case 5: case 6: case 7: case 8:
-        oldact( getArgOther( ).c_str( ), victim, 0, ch, TO_NOTVICT );
-        oldact_p( getArgMe( ).c_str( ), victim, 0, ch, TO_CHAR, getPosition( ) );
-        oldact( getArgVictim( ).c_str( ), victim, 0, ch, TO_VICT );
+        oldact( getArgOtherMsg( ), victim, 0, ch, TO_NOTVICT );
+        oldact_p( getArgMeMsg( ), victim, 0, ch, TO_CHAR, getPosition( ) );
+        oldact( getArgVictimMsg( ), victim, 0, ch, TO_VICT );
         break;
 
     case 9: case 10: case 11: case 12:
