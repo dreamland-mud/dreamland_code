@@ -32,6 +32,28 @@ short SocialBase::getLog( ) const
     return LOG_NORMAL;
 }
 
+MultiMessage SocialBase::plain( const DLString &msg )
+{
+    return MultiMessage( msg, msg, msg );
+}
+
+MultiMessage SocialBase::getNoargOtherMsg( ) const { return plain( getNoargOther( ) ); }
+MultiMessage SocialBase::getNoargMeMsg( ) const { return plain( getNoargMe( ) ); }
+MultiMessage SocialBase::getAutoOtherMsg( ) const { return plain( getAutoOther( ) ); }
+MultiMessage SocialBase::getAutoMeMsg( ) const { return plain( getAutoMe( ) ); }
+MultiMessage SocialBase::getArgOtherMsg( ) const { return plain( getArgOther( ) ); }
+MultiMessage SocialBase::getArgMeMsg( ) const { return plain( getArgMe( ) ); }
+MultiMessage SocialBase::getArgVictimMsg( ) const { return plain( getArgVictim( ) ); }
+MultiMessage SocialBase::getErrorMsgMsg( ) const { return plain( getErrorMsg( ) ); }
+MultiMessage SocialBase::getArgOther2Msg( ) const { return plain( getArgOther2( ) ); }
+MultiMessage SocialBase::getArgMe2Msg( ) const { return plain( getArgMe2( ) ); }
+MultiMessage SocialBase::getArgVictim2Msg( ) const { return plain( getArgVictim2( ) ); }
+MultiMessage SocialBase::getObjVictimMsg( ) const { return plain( getObjVictim( ) ); }
+MultiMessage SocialBase::getObjCharMsg( ) const { return plain( getObjChar( ) ); }
+MultiMessage SocialBase::getObjOthersMsg( ) const { return plain( getObjOthers( ) ); }
+MultiMessage SocialBase::getObjNoVictimSelfMsg( ) const { return plain( getObjNoVictimSelf( ) ); }
+MultiMessage SocialBase::getObjNoVictimOthersMsg( ) const { return plain( getObjNoVictimOthers( ) ); }
+
 bool SocialBase::matches( const DLString& argument ) const
 {
     if (argument.empty( )) 
@@ -193,19 +215,19 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
 
     switch (rc) {
         case RC_NOARG:  // вызов без параметров
-            oldact( getNoargOther( ).c_str( ), ch, 0, victim, TO_ROOM );
-            oldact_p( getNoargMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+            oldact( getNoargOtherMsg( ), ch, 0, victim, TO_ROOM );
+            oldact_p( getNoargMeMsg( ), ch, 0, victim, TO_CHAR, pos );
             break;
-    
+
         case RC_SELF: // применение социала на себя, в т.ч. если оба аргумента - тоже я
-            oldact( getAutoOther( ).c_str( ), ch, 0, victim, TO_ROOM );
-            oldact_p( getAutoMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+            oldact( getAutoOtherMsg( ), ch, 0, victim, TO_ROOM );
+            oldact_p( getAutoMeMsg( ), ch, 0, victim, TO_CHAR, pos );
             break;
 
         case RC_VICT: // применение социала на жертву, в т.ч. если оба аргумента - одна и та же жертва
-            oldact( getArgOther( ).c_str( ), ch, 0, victim, TO_NOTVICT );
-            oldact_p( getArgMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
-            oldact( getArgVictim( ).c_str( ), ch, 0, victim, TO_VICT );
+            oldact( getArgOtherMsg( ), ch, 0, victim, TO_NOTVICT );
+            oldact_p( getArgMeMsg( ), ch, 0, victim, TO_CHAR, pos );
+            oldact( getArgVictimMsg( ), ch, 0, victim, TO_VICT );
             break;
 
         case RC_VICT_NOT_FOUND: // не найдет персонаж или предмет по первому аргументу
@@ -225,34 +247,34 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
             arg1 = victimOrSelf(ch, victim);
             arg2 = victimOrSelf(ch, victim2);
 
-            ch->pecho( getArgMe2( ).c_str( ), ch, arg1, arg2 );
-            if (victim != ch ) victim->pecho( getArgVictim2( ).c_str( ), ch, arg1, arg2 );
-            if (victim2 != ch ) victim2->pecho( getArgVictim2( ).c_str( ), ch, arg2, arg1 );
+            ch->pecho( getArgMe2Msg( ), ch, arg1, arg2 );
+            if (victim != ch ) victim->pecho( getArgVictim2Msg( ), ch, arg1, arg2 );
+            if (victim2 != ch ) victim2->pecho( getArgVictim2Msg( ), ch, arg2, arg1 );
 
             // Output to everyone else in the room.
             for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
                 if (rch != ch && rch != victim && rch != victim2)
-                    rch->pecho( getArgOther2( ).c_str( ), ch, arg1, arg2 );
+                    rch->pecho( getArgOther2Msg( ), ch, arg1, arg2 );
             break;
 
         case RC_VICT_OBJ:
             arg1 = victimOrSelf(ch, victim);
-            ch->pecho(getObjChar().c_str(), ch, arg1, obj);
+            ch->pecho(getObjCharMsg(), ch, arg1, obj);
             if (victim != ch)
-                victim->pecho(getObjVictim().c_str(), ch, arg1, obj);
-            ch->recho(victim, getObjOthers().c_str(), ch, arg1, obj);
+                victim->pecho(getObjVictimMsg(), ch, arg1, obj);
+            ch->recho(victim, getObjOthersMsg(), ch, arg1, obj);
             break;
 
         case RC_OBJ:
-            ch->pecho(getObjNoVictimSelf().c_str(), ch, obj);
-            ch->recho(getObjNoVictimOthers().c_str(), ch, obj);
+            ch->pecho(getObjNoVictimSelfMsg(), ch, obj);
+            ch->recho(getObjNoVictimOthersMsg(), ch, obj);
             break;
     }
     
     bool reacted = reaction( ch, victim, firstArgument );
     if (!reacted && rc == RC_VICT_NOT_FOUND) {
         if (!getErrorMsg( ).empty( ))
-            oldact_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
+            oldact_p( getErrorMsgMsg( ), ch, 0, 0, TO_CHAR, getPosition( ) );
         else
             ch->pecho(_("Нет этого здесь."));
         return;

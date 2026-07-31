@@ -10,6 +10,7 @@
 #define SOCIALBASE_H
 
 #include "commandbase.h"
+#include "multimessage.h"
 
 class SocialBase : public CommandBase {
 public:        
@@ -45,12 +46,38 @@ public:
     inline virtual const DLString & getObjNoVictimSelf() const { return DLString::emptyString; }
     inline virtual const DLString & getObjNoVictimOthers() const { return DLString::emptyString; }
 
+    /* Trilinguality (Trello 2594): what a recipient actually sees, resolved in
+     * their display language by the act/pecho MultiMessage overloads. Socials
+     * keep their translations as DATA (XMLMultiString per message) rather than
+     * in the catalog, so Social overrides these with its per-language values.
+     * The default wraps the single stored string -- which is all a
+     * player-authored CustomSocial has, and all it will ever have. */
+    virtual MultiMessage getNoargOtherMsg( ) const;
+    virtual MultiMessage getNoargMeMsg( ) const;
+    virtual MultiMessage getAutoOtherMsg( ) const;
+    virtual MultiMessage getAutoMeMsg( ) const;
+    virtual MultiMessage getArgOtherMsg( ) const;
+    virtual MultiMessage getArgMeMsg( ) const;
+    virtual MultiMessage getArgVictimMsg( ) const;
+    virtual MultiMessage getErrorMsgMsg( ) const;
+    virtual MultiMessage getArgOther2Msg( ) const;
+    virtual MultiMessage getArgMe2Msg( ) const;
+    virtual MultiMessage getArgVictim2Msg( ) const;
+    virtual MultiMessage getObjVictimMsg( ) const;
+    virtual MultiMessage getObjCharMsg( ) const;
+    virtual MultiMessage getObjOthersMsg( ) const;
+    virtual MultiMessage getObjNoVictimSelfMsg( ) const;
+    virtual MultiMessage getObjNoVictimOthersMsg( ) const;
 
-protected:    
+protected:
     virtual bool reaction( Character *, Character *, const DLString & ) = 0;
     virtual int getPosition( ) const = 0;
     void visualize( Character * );
     bool checkPosition( Character * );
+
+    /** One string standing in for all three languages: the same text whatever
+     *  the viewer, with no catalog lookup. */
+    static MultiMessage plain( const DLString & );
 };
 
 #endif

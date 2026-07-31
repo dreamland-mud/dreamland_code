@@ -12,6 +12,7 @@
 #include "lang.h"
 #include "xmlvariablecontainer.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlstringlist.h"
 #include "xmlenumeration.h"
 #include "xmltableelement.h"
@@ -70,6 +71,8 @@ public:
      *  XMLMultiString because the Latin keyword is also the registry key. */
     virtual const DLString &getNameFor( lang_t lang ) const;
     inline const DLString &getShortDesc( ) const;
+    /** Short description in a given language, RU fallback. */
+    inline const DLString &getShortDescFor( lang_t lang ) const;
 
     inline virtual int getPosition( ) const;
     inline virtual const DLString & getNoargOther( ) const;
@@ -89,6 +92,25 @@ public:
     inline virtual const DLString & getObjNoVictimSelf() const;
     inline virtual const DLString & getObjNoVictimOthers() const;
 
+    /* Trilinguality (Trello 2594): each message resolved in the recipient's own
+     * language rather than handing the same Russian line to the whole room. */
+    virtual MultiMessage getNoargOtherMsg( ) const;
+    virtual MultiMessage getNoargMeMsg( ) const;
+    virtual MultiMessage getAutoOtherMsg( ) const;
+    virtual MultiMessage getAutoMeMsg( ) const;
+    virtual MultiMessage getArgOtherMsg( ) const;
+    virtual MultiMessage getArgMeMsg( ) const;
+    virtual MultiMessage getArgVictimMsg( ) const;
+    virtual MultiMessage getErrorMsgMsg( ) const;
+    virtual MultiMessage getArgOther2Msg( ) const;
+    virtual MultiMessage getArgMe2Msg( ) const;
+    virtual MultiMessage getArgVictim2Msg( ) const;
+    virtual MultiMessage getObjVictimMsg( ) const;
+    virtual MultiMessage getObjCharMsg( ) const;
+    virtual MultiMessage getObjOthersMsg( ) const;
+    virtual MultiMessage getObjNoVictimSelfMsg( ) const;
+    virtual MultiMessage getObjNoVictimOthersMsg( ) const;
+
 protected:
     virtual bool reaction( Character *, Character *, const DLString & );
 
@@ -97,28 +119,32 @@ private:
 
     DLString name;
 
-public:    
+public:
     XML_VARIABLE XMLString  rusName;
     XML_VARIABLE XMLString  uaName;
-    XML_VARIABLE XMLString  shortDesc;
-    XML_VARIABLE XMLString  msgCharNoArgument;
-    XML_VARIABLE XMLString  msgOthersNoArgument;
-    XML_VARIABLE XMLString  msgCharFound;
-    XML_VARIABLE XMLString  msgOthersFound;
-    XML_VARIABLE XMLString  msgVictimFound;
-    XML_VARIABLE XMLString  msgCharNotFound;
-    XML_VARIABLE XMLString  msgCharAuto;
-    XML_VARIABLE XMLString  msgOthersAuto;
 
-    XML_VARIABLE XMLStringNoEmpty  msgCharFound2;
-    XML_VARIABLE XMLStringNoEmpty  msgOthersFound2;
-    XML_VARIABLE XMLStringNoEmpty  msgVictimFound2;
+    /* Every player-visible line is per-language data. Legacy nodes carry no 'l'
+     * attribute and XMLMultiString reads them as Russian (Cyrillic content), so
+     * an untranslated social renders exactly as it did before. */
+    XML_VARIABLE XMLMultiString  shortDesc;
+    XML_VARIABLE XMLMultiString  msgCharNoArgument;
+    XML_VARIABLE XMLMultiString  msgOthersNoArgument;
+    XML_VARIABLE XMLMultiString  msgCharFound;
+    XML_VARIABLE XMLMultiString  msgOthersFound;
+    XML_VARIABLE XMLMultiString  msgVictimFound;
+    XML_VARIABLE XMLMultiString  msgCharNotFound;
+    XML_VARIABLE XMLMultiString  msgCharAuto;
+    XML_VARIABLE XMLMultiString  msgOthersAuto;
 
-    XML_VARIABLE XMLStringNoEmpty  msgVictimObj;
-    XML_VARIABLE XMLStringNoEmpty  msgCharVictimObj;
-    XML_VARIABLE XMLStringNoEmpty  msgOthersVictimObj;
-    XML_VARIABLE XMLStringNoEmpty  msgCharObj;
-    XML_VARIABLE XMLStringNoEmpty  msgOthersObj;
+    XML_VARIABLE XMLMultiString  msgCharFound2;
+    XML_VARIABLE XMLMultiString  msgOthersFound2;
+    XML_VARIABLE XMLMultiString  msgVictimFound2;
+
+    XML_VARIABLE XMLMultiString  msgVictimObj;
+    XML_VARIABLE XMLMultiString  msgCharVictimObj;
+    XML_VARIABLE XMLMultiString  msgOthersVictimObj;
+    XML_VARIABLE XMLMultiString  msgCharObj;
+    XML_VARIABLE XMLMultiString  msgOthersObj;
 
     XML_VARIABLE XMLStringList aliases;
 
@@ -146,7 +172,11 @@ inline const DLString& Social::getUaName( ) const
 }
 inline const DLString & Social::getShortDesc( ) const
 {
-    return shortDesc.getValue( );
+    return shortDesc.get(RU);
+}
+inline const DLString & Social::getShortDescFor( lang_t lang ) const
+{
+    return shortDesc.getForLang(lang);
 }
 inline int Social::getPosition( ) const 
 {
@@ -154,68 +184,68 @@ inline int Social::getPosition( ) const
 }
 inline const DLString & Social::getNoargOther( ) const
 {
-    return msgOthersNoArgument.getValue( );
+    return msgOthersNoArgument.get(RU);
 }
 inline const DLString & Social::getNoargMe( ) const
 {
-    return msgCharNoArgument.getValue( );
+    return msgCharNoArgument.get(RU);
 }
 inline const DLString & Social::getArgMe( ) const
 {
-    return msgCharFound.getValue( );
+    return msgCharFound.get(RU);
 }
 inline const DLString & Social::getArgOther( ) const
 {
-    return msgOthersFound.getValue( );
+    return msgOthersFound.get(RU);
 }
 inline const DLString & Social::getArgVictim( ) const
 {
-    return msgVictimFound.getValue( );
+    return msgVictimFound.get(RU);
 }
 inline const DLString & Social::getAutoMe( ) const
 {
-    return msgCharAuto.getValue( );
+    return msgCharAuto.get(RU);
 }
 inline const DLString & Social::getAutoOther( ) const
 {
-    return msgOthersAuto.getValue( );
+    return msgOthersAuto.get(RU);
 }
 inline const DLString & Social::getArgMe2( ) const
 {
-    return msgCharFound2.getValue( );
+    return msgCharFound2.get(RU);
 }
 inline const DLString & Social::getArgOther2( ) const
 {
-    return msgOthersFound2.getValue( );
+    return msgOthersFound2.get(RU);
 }
 inline const DLString & Social::getArgVictim2( ) const
 {
-    return msgVictimFound2.getValue( );
+    return msgVictimFound2.get(RU);
 }
 inline const DLString & Social::getErrorMsg( ) const
 {
-    return msgCharNotFound.getValue( );
+    return msgCharNotFound.get(RU);
 }
 
 inline const DLString & Social::getObjVictim() const
 {
-    return msgVictimObj.getValue();
+    return msgVictimObj.get(RU);
 }
 inline const DLString & Social::getObjChar() const
 {
-    return msgCharVictimObj.getValue();
+    return msgCharVictimObj.get(RU);
 }
 inline const DLString & Social::getObjOthers() const
 {
-    return msgOthersVictimObj.getValue();
+    return msgOthersVictimObj.get(RU);
 }
 inline const DLString & Social::getObjNoVictimSelf() const
 {
-    return msgCharObj.getValue();
+    return msgCharObj.get(RU);
 }
 inline const DLString & Social::getObjNoVictimOthers() const
 {
-    return msgOthersObj.getValue();
+    return msgOthersObj.get(RU);
 }
 
 #endif
