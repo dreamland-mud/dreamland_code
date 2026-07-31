@@ -153,7 +153,14 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 
     /* Everything the article knows ABOUT the zone, one bullet each. It used to
      * be a run-on first line, a stray line for the danger level, and the way in
-     * at the very bottom, below the article text. */
+     * at the very bottom, below the article text.
+     *
+     * The whole block is %PAUSE%d, the way skill and language helps have always
+     * fenced theirs. The help formatter owns `*`, `_`, `=`, `(...)` and `[...]`
+     * as markup, so an unfenced block loses the bullet itself (`*...*` is its
+     * bold) and any parenthesised aside (`(eng,rus)` is its language choice). */
+    in << "%PAUSE%";
+
     if (area->low_range > 0 || area->high_range > 0) {
         ostringstream levels;
 
@@ -191,14 +198,18 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 
         // For speedwalks that only contain run path, surround it with {hs tags.
         RegExp simpleSpeedwalkRE("^[0-9nsewud]+$");
-        if (simpleSpeedwalkRE.match(speedwalk))
+        bool runPath = simpleSpeedwalkRE.match(speedwalk);
+
+        if (runPath)
             way << "{y{hs" << speedwalk << "{x";
         else
             way << speedwalk;
 
-        // A path spelled in directions has to start somewhere; prose says so itself.
-        RegExp speedwalkRE("[0-9]?[nsewud]+");
-        if (speedwalkRE.match(speedwalk))
+        /* A bare run of directions has to start somewhere. Only for a bare one:
+         * where the field is prose it names its own starting point already, and
+         * the note used to be appended to those too ("4e3n2wn from the Market
+         * Square (from the Market Square)"). */
+        if (runPath)
             way << " {D" << l(ch, "(от Рыночной Площади)") << "{x";
 
         in << help_meta_line(l(ch, "Как добраться"), way.str()) << endl;
@@ -206,13 +217,12 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 
     /* Web clients turn the marker into a link to the zone's map page. Telnet
      * has nothing to open, so the whole bullet -- its newline included -- sits
-     * inside the web-only branch, and %PAUSE% keeps the [brackets] from being
-     * read as a help reference. */
-    in << "%PAUSE%{Iw"
+     * inside the web-only branch. */
+    in << "{Iw"
        << help_meta_line(l(ch, "Карта"), DLString("[map=") + areafile->file_name + "]")
-       << endl << "{Ix%RESUME%";
+       << endl << "{Ix";
 
-    in << endl;
+    in << "%RESUME%" << endl;
 
     if (!text.getForLang(lang).empty())
        in << text.getForLang(lang) << endl;
