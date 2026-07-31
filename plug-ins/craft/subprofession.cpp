@@ -107,8 +107,11 @@ void CraftProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     in << "Дополнительная профессия {C" << prof->getRusName( ).ruscase( '1' ) << "{x или {C"
        << prof->getName( ) << "{x" << endl << endl;
-        
-    in << text.get(RU) << endl;
+
+    // Was get(RU): a translated article still read Russian to everyone. The
+    // header above stays Russian on purpose -- the profession has only a
+    // Russian name to put in it, and half a sentence in each language is worse.
+    in << text.getForLang(Player::displayLang(ch)) << endl;
 }
 
 /*-------------------------------------------------------------------
