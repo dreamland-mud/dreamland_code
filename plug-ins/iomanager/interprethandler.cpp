@@ -13,6 +13,7 @@
 #include "colour.h"
 #include "telnet.h"
 #include "interprethandler.h"
+#include "resume.h"
 #include "webprompt.h"
 
 #include "pcharacter.h"
@@ -444,6 +445,11 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
     // Player display language (from 'config language') lets the web map pick room and
     // area names in the viewer's language; mudjs reads b.lang ("en"/"ru"/"ua").
     prompt["args"][0]["lang"] = lang2attr( Player::displayLang( ch ) ).c_str( );
+    /* Session resume token (resume.h). Rides the prompt because the prompt is
+     * the one thing a web client is guaranteed to receive while playing, so the
+     * copy in its tab is never more than one command stale. */
+    if (ch->getPC( ))
+        prompt["args"][0]["resume"] = resume_token_issue( ch->getPC( ) ).c_str( );
 
     if (ch->fighting) {
         prompt["args"][0]["fight"] = HEALTH(ch->fighting);
