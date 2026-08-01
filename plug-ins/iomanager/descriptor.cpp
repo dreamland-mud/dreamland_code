@@ -13,6 +13,7 @@
 #include "json/json.h"
 #include "math_utils.h"
 #include "rpccommandmanager.h"
+#include "resume.h"
 #include "iconvmap.h"
 #include "logstream.h"
 #include "descriptor.h"
@@ -343,6 +344,14 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
         for(string::iterator i = arg.begin();i != arg.end();i++)
             if(inputChar(*i) < 0)
                 return false;
+    } else if(name == "resume") {
+        /* Also character-less, and necessarily so: this is what a returning web
+         * client sends INSTEAD of logging in. The token never goes through
+         * console_in, which would put a password-equivalent into the command
+         * log. Either answer puts the client back on a known path -- resumed,
+         * or told to start the ordinary login. */
+        bool ok = !args.empty() && resume_attach(this, args.front());
+        writeWSCommand(ok ? "resume_ok" : "resume_failed", std::vector<DLString>());
     } else if(character) {
         RpcCommandManager::getThis()->run(character, name, args);
     } else {

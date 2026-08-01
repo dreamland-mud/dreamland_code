@@ -28,6 +28,7 @@ backdoorhandler.cpp \
 badnames.cpp \
 base64.cpp \
 rpccommandmanager.cpp \
+resume.cpp \
 webmanip.cpp \
 lasthost.cpp \
 banflags.cpp \
