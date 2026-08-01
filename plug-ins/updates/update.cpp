@@ -82,6 +82,7 @@
 #include "player_account.h"
 #include "update.h"
 #include "update_areas.h"
+#include "resume.h"
 #include "weather.h"
 
 #include "configurable.h"
@@ -542,6 +543,19 @@ void char_update_lostlink()
             continue;
 
         if (ch->getPC()->isCoder())
+            continue;
+
+        /* A web session that can still be resumed keeps its body: with
+         * `lostlink: 0` this sweep runs every pulse and would quit the player
+         * out a quarter of a second after their phone suspended the tab,
+         * leaving the returning client nothing to attach to. The token expires
+         * on its own (resume.h), so this holds for at most that window.
+         *
+         * Not in a fight, though. A body left standing can be attacked, and
+         * the one moment where that reliably costs the player something is the
+         * one where someone is already swinging at them -- so a link lost mid
+         * fight still quits out at once, the way it always has. */
+        if (ch->fighting == 0 && resume_pending(ch->getPC()))
             continue;
 
         if (lostlink_timer == 0) {

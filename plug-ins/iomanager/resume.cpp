@@ -14,9 +14,11 @@
 #include "merc.h"
 #include "def.h"
 
-/** A token outlives the socket by this much -- long enough to walk back from
- *  another app, short enough that a stolen one is worth little. */
-static const int RESUME_TTL = 10 * 60;
+/* A token outlives the socket by this much: long enough to walk back from
+ * another app, short enough that a stolen one is worth little -- and short
+ * because the linkdead body has to stand in the world for the whole of it
+ * (see resume.h), able to be attacked while nobody is driving. */
+static const int RESUME_TTL = 90;
 
 struct ResumeEntry {
     DLString name;
@@ -114,6 +116,25 @@ DLString resume_token_issue(PCharacter *ch)
     byName[name] = token;
 
     return token;
+}
+
+bool resume_pending(PCharacter *ch)
+{
+    if (!ch)
+        return false;
+
+    NameMap::iterator n = byName.find(ch->getName());
+    if (n == byName.end())
+        return false;
+
+    TokenMap::iterator t = tokens.find(n->second);
+    if (t == tokens.end())
+        return false;
+
+    /* The token is refreshed on every prompt, so its expiry is really "last
+     * seen + TTL": once the socket dies the refreshes stop and this runs out
+     * on its own, without anything having to notice the disconnect. */
+    return t->second.expires > time(0);
 }
 
 void resume_token_clear(PCharacter *ch)

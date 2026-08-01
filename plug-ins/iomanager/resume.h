@@ -13,10 +13,17 @@
  * the character it left linkdead -- the same take-over `nanny.reconnect` does
  * after a manual re-login, minus the login and minus the announcement.
  *
- * The token is credential-grade for as long as it lives, so: 10 minutes, one
+ * The token is credential-grade for as long as it lives, so: 90 seconds, one
  * use (burned on presentation, valid or not), one live token per player, never
  * written to a log, and useless unless that character is actually in the world
  * with no descriptor on it.
+ *
+ * The window is 90 seconds and not longer because of what has to be true for a
+ * resume to land: the body must still be in the world. char_update_lostlink()
+ * runs every pulse and, with `lostlink: 0`, quits a descriptor-less player out
+ * a quarter of a second after the socket dies -- so resume_pending() holds that
+ * sweep off while a session can still come back, and every second of that is a
+ * second the character stands there able to be attacked.
  */
 #ifndef RESUME_H
 #define RESUME_H
@@ -39,5 +46,12 @@ void resume_token_clear(PCharacter *ch);
  * character is gone, playing elsewhere, or switched into a mob.
  */
 bool resume_attach(Descriptor *d, const DLString &token);
+
+/**
+ * True while this player has a live token and lost their link recently enough
+ * to use it -- the window in which char_update_lostlink() must leave the body
+ * alone, or there will be nothing left to resume into.
+ */
+bool resume_pending(PCharacter *ch);
 
 #endif
