@@ -30,6 +30,9 @@
 #include "bitstring.h"
 #include "affecthandler.h"
 #include "skillcommand.h"
+#include "defaultskillcommand.h"
+#include "skillmanager.h"
+#include "skillsflags.h"
 #include "spell.h"
 #include "clanreference.h"
 #include "affect.h"
@@ -77,6 +80,12 @@ static const DLString PERM_STAT = "ps";
 static const DLString CURR_STAT = "cs";
 static const DLString QUESTOR = "q";
 static const DLString AREAQUEST = "aq";
+static const DLString SPELLBOOK = "sp";
+static const DLString FIGHTCMD = "fcmd";
+
+// A button row this long already covers every class; past that the panel starts
+// scrolling and stops being a panic button.
+static const unsigned int FIGHTCMD_MAX = 8;
 
 LIQ(none);
 
@@ -859,6 +868,138 @@ Json::Value AreaQuestWebPromptListener::jsonAreaQuest( Descriptor *d, Character 
     return aq;
 }
 
+/*-------------------------------------------------------------------------
+ * CommandPanelWebPromptListener
+ *------------------------------------------------------------------------*/
+/** Tells the web client's button panel what this character can actually do:
+ *  whether the 'spells' button has anything behind it, and which combat actions
+ *  are worth a button while a fight is on. Both fields ride updateIfNew, so a
+ *  steady state costs nothing on the wire.
+ */
+class CommandPanelWebPromptListener : public WebPromptListener {
+public:
+        typedef ::Pointer<CommandPanelWebPromptListener> Pointer;
+
+        virtual void run( Descriptor *, Character *, Json::Value &json );
+protected:
+        Json::Value jsonSpellbook( Character *ch );
+        Json::Value jsonFightCommands( Character *ch );
+};
+
+void CommandPanelWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &json )
+{
+    WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
+    Json::Value &prompt = json["args"][0];
+
+    attr->updateIfNew( SPELLBOOK, jsonSpellbook( ch ), prompt );
+    attr->updateIfNew( FIGHTCMD, jsonFightCommands( ch ), prompt );
+}
+
+/** 1 if the character can see at least one castable spell in their skill list,
+ *  which is exactly what the panel's 'spells' button would display.
+ */
+Json::Value CommandPanelWebPromptListener::jsonSpellbook( Character *ch )
+{
+    for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
+        Skill *skill = SkillManager::getThis( )->find( sn );
+        Spell::Pointer spell = skill->getSpell( );
+
+        if (spell && spell->isCasted( ) && skill->visible( ch ))
+            return Json::Value( 1 );
+    }
+
+    return Json::Value( 0 );
+}
+
+/** A button sends its command with no argument, so only skills that either need
+ *  no target, default to the current adversary, or fall back to the caster can
+ *  be one. Everything else would just answer with "who?".
+ */
+static bool fightcmd_needs_no_argument( DefaultSkillCommand *cmd )
+{
+    switch (cmd->argtype.getValue( )) {
+    case ARG_UNDEF:
+    case ARG_STRING:
+    case ARG_CHAR_FIGHT:
+    case ARG_CHAR_SELF:
+        return true;
+    default:
+        return false;
+    }
+}
+
+/** Combat actions available to this character right now, in the language they
+ *  read the game in. Empty out of combat, so the panel hides the whole row.
+ */
+Json::Value CommandPanelWebPromptListener::jsonFightCommands( Character *ch )
+{
+    Json::Value cmds( Json::arrayValue );
+
+    if (ch->fighting == 0)
+        return cmds;
+
+    lang_t lang = Player::displayLang( ch );
+    std::set<DLString> seen;
+
+    // The two escape hatches every character has, first and in this order: they
+    // are what a player reaches for when the fight turns bad.
+    static const char *ESCAPES[] = { "flee", "recall", 0 };
+
+    for (int i = 0; ESCAPES[i]; i++) {
+        Command::Pointer cmd = commandManager->findExact( ESCAPES[i] );
+
+        if (!cmd || !cmd->visible( ch ))
+            continue;
+
+        const DLString &name = cmd->getNameFor( lang );
+        cmds.append( name );
+        seen.insert( name );
+    }
+
+    // Then the character's own class and clan skills, cheapest first. A minimum
+    // position of 'fighting' is the skill author's own marker that the action
+    // belongs in a brawl and makes no sense anywhere below it.
+    std::multimap<int, DLString> byLevel;
+
+    for (auto &c: commandManager->getCommands( )) {
+        Command::Pointer cmd = *c;
+
+        if (cmd->getPosition( ).getValue( ) != POS_FIGHTING)
+            continue;
+
+        DefaultSkillCommand *skcmd = cmd.getDynamicPointer<DefaultSkillCommand>( );
+        if (!skcmd || !fightcmd_needs_no_argument( skcmd ))
+            continue;
+
+        Skill *skill = skcmd->getSkill( ).getPointer( );
+        if (!skill || skill->isPassive( ) || skill->getSpell( ))
+            continue;
+
+        // Learned and usable this very moment: no teasing with what they cannot press.
+        if (skill->getLearned( ch ) <= 0 || !skill->usable( ch, false ))
+            continue;
+
+        if (!cmd->visible( ch ))
+            continue;
+
+        const DLString &name = cmd->getNameFor( lang );
+        if (name.empty( ) || seen.count( name ) > 0)
+            continue;
+
+        seen.insert( name );
+        byLevel.insert( std::pair<int, DLString>( skill->getLevel( ch ), name ) );
+    }
+
+    for (auto &s: byLevel) {
+        if (cmds.size( ) >= FIGHTCMD_MAX)
+            break;
+
+        cmds.append( s.second );
+    }
+
+    return cmds;
+}
+
 
 /*-------------------------------------------------------------------------
  * WebPromptDescriptorStateListener
@@ -1011,6 +1152,7 @@ extern "C"
         Plugin::registerPlugin<ParamsWebPromptListener>( ppl );
         Plugin::registerPlugin<QuestorWebPromptListener>( ppl );
         Plugin::registerPlugin<AreaQuestWebPromptListener>( ppl );
+        Plugin::registerPlugin<CommandPanelWebPromptListener>( ppl );
         Plugin::registerPlugin<WebPromptDescriptorStateListener>( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<WebPromptAttribute> >( ppl );
         
