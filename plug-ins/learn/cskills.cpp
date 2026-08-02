@@ -406,7 +406,7 @@ CMDRUN( skills )
     DLString argument = constArguments;
 
     if (arg_is_help(argument)) {
-        interpret_raw(ch, "help", DLString(getHelp()->getID()).c_str());
+        interpret_raw(ch, "help", "%s", DLString(getHelp()->getID()).c_str());
         return;
     }
 

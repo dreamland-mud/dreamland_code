@@ -34,7 +34,7 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
                 ch->pecho(_("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре."), obj);
             else {
                 DLString idArg = DLString( obj->getID( ) ) + " " + argument;
-                interpret_cmd( ch, "quaff", idArg.c_str( ) );
+                interpret_cmd( ch, "quaff", "%s", idArg.c_str( ) );
              }
             return true;
         case ITEM_SCROLL:
@@ -42,20 +42,20 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
                 ch->pecho(_("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре."), obj);
             else {
                 DLString idArg = DLString( obj->getID( ) ) + " " + argument;
-                interpret_cmd( ch, "recite", idArg.c_str( ) );
+                interpret_cmd( ch, "recite", "%s", idArg.c_str( ) );
             }
             return true;
         case ITEM_WAND:
             if (obj->wear_loc != wear_hold) 
                 ch->pecho(_("%1$^O4 сперва необходимо зажать в руках."), obj);
             else
-                interpret_cmd( ch, "zap", argument );
+                interpret_cmd( ch, "zap", "%s", argument );
             return true;
         case ITEM_STAFF:
             if (obj->wear_loc != wear_hold) 
                 ch->pecho(_("%1$^O4 сперва необходимо зажать в руках."), obj);
             else
-                interpret_cmd( ch, "brandish", argument );
+                interpret_cmd( ch, "brandish", "%s", argument );
             return true;
     }
 

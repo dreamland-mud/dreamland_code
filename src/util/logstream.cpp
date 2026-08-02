@@ -117,7 +117,7 @@ void formattedLog( char logLevel, const char *format, ... )
     va_list ap;
 
     va_start( ap, format );
-    vsprintf( buf, format, ap );
+    vsnprintf( buf, sizeof(buf), format, ap );
     va_end( ap );
 
     LogStream::send( logLevel ) << buf << endl;

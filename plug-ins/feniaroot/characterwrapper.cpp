@@ -1627,7 +1627,7 @@ NMI_INVOKE( CharacterWrapper, interpret_raw, "(cmd, arg): выполняет к�
     if (++i != args.end( ))
         cmdArgs = i->toString( );
 
-    ::interpret_raw( target, cmdName.c_str( ), cmdArgs.c_str( ) );
+    ::interpret_raw( target, cmdName.c_str( ), "%s", cmdArgs.c_str( ) );
     return Register();
 }
 
@@ -1646,7 +1646,7 @@ NMI_INVOKE( CharacterWrapper, interpret_cmd, "(cmd, args): выполняет к
     if (++i != args.end( ))
         cmdArgs = i->toString( );
 
-    ::interpret_cmd( target, cmdName.c_str( ), cmdArgs.c_str( ) );
+    ::interpret_cmd( target, cmdName.c_str( ), "%s", cmdArgs.c_str( ) );
     return Register();
 }
 

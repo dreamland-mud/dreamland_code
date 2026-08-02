@@ -30,12 +30,12 @@ SERVLET_HANDLE(cmd_ooc, "/ooc")
         return;
 
     if (player->isOnline()) {
-        interpret_raw(player->getPlayer(), "ooc", message.c_str());
+        interpret_raw(player->getPlayer(), "ooc", "%s", message.c_str());
     } else {
         PCharacterMemory *memory = dynamic_cast<PCharacterMemory *>(player);
         PCharacter dummy;
         dummy.setMemory(memory);
-        interpret_raw(&dummy, "ooc", message.c_str());
+        interpret_raw(&dummy, "ooc", "%s", message.c_str());
     }
 
     servlet_response_200(response, "Message sent");

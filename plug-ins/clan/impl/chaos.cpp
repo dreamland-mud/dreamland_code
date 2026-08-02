@@ -159,9 +159,9 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
         }
 
         if ( rch )
-            interpret_raw( victim, "murder", rch->getNameC());
+            interpret_raw( victim, "murder", "%s", rch->getNameC());
 
-        interpret_raw( victim, "murder", ch->getNameC());
+        interpret_raw( victim, "murder", "%s", ch->getNameC());
 
 }
 

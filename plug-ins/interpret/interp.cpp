@@ -47,7 +47,7 @@ void interpret_fmt( Character *ch, const char *format, ... )
     va_list ap;
 
     va_start( ap, format );
-    vsprintf( buf, format, ap );
+    vsnprintf( buf, sizeof(buf), format, ap );
     va_end( ap );
     
     interpret( ch, buf );
@@ -64,7 +64,7 @@ bool interpret_cmd( Character *ch, const char *cmd, const char *argsFormat, ... 
     va_list ap;
     
     va_start( ap, argsFormat );
-    vsprintf( args, argsFormat, ap );
+    vsnprintf( args, sizeof(args), argsFormat, ap );
     va_end( ap );
 
     iargs.d = ch->desc;
@@ -95,7 +95,7 @@ void interpret_raw( Character *ch, const char *cmd, const char *format, ... )
     };
 
     va_start( ap, format );
-    vsprintf( buf, format, ap );
+    vsnprintf( buf, sizeof(buf), format, ap );
     va_end( ap );
     
     iargs.d = ch->desc;
@@ -114,12 +114,12 @@ void interpret_raw( Character *ch, const char *cmd, const char *format, ... )
 
 void do_yell( Character *ch, const char *argument )
 {
-    interpret_raw( ch, "yell", argument );
+    interpret_raw( ch, "yell", "%s", argument );
 }
 
 void do_say( Character *ch, const char *argument )
 {
-    interpret_raw( ch, "say", argument );
+    interpret_raw( ch, "say", "%s", argument );
 }
 
 
