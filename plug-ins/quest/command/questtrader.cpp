@@ -526,7 +526,7 @@ bool PiercingQuestArticle::available( Character *client, NPCharacter *tattoer ) 
     }
 
     if (get_eq_char( client, wear_head )) {
-        interpret_raw( tattoer, "bonk", client->getNameC() );
+        interpret_raw( tattoer, "bonk", "%s", client->getNameC() );
         say_act( client, tattoer, _("Шляпу сними! Не получается до твоего уха добраться.") );
         return false;
     }

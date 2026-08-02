@@ -71,6 +71,6 @@ Character * KidnapMobile::getAggrRoom( Room *room )
 void KidnapMobile::debug( const DLString &msg )
 {
     if (getQuest( ) && quest->debug) 
-        interpret_raw( ch, "say", msg.c_str( ) );
+        interpret_raw( ch, "say", "%s", msg.c_str( ) );
 }
 

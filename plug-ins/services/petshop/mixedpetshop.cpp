@@ -197,7 +197,7 @@ void MixedPetShopRoom::doBuy( Character *client, const DLString &constArguments 
                 return;
             }
         } else {
-            interpret_cmd( client, "buy", newArg.c_str( ) );
+            interpret_cmd( client, "buy", "%s", newArg.c_str( ) );
             return;
         }
     }

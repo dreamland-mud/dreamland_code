@@ -207,7 +207,7 @@ bool BasicMobileBehavior::aggressCaster( )
         target->castFar = true;
         target->range = victRange;
 
-        interpret_cmd(ch, "scan", dirs[victDoor].name);
+        interpret_cmd(ch, "scan", "%s", dirs[victDoor].name);
         return ::spell( castSn, ch->getModifyLevel( ), ch, target, 
                         FSPELL_VERBOSE | FSPELL_BANE | FSPELL_WAIT | FSPELL_OBSTACLES | FSPELL_MANA );
     }

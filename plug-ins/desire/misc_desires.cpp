@@ -55,7 +55,7 @@ void BloodlustDesire::damage( PCharacter *ch )
                 && !is_safe_nomessage(ch, vch))
             {
                 interpret_raw( ch, "yell", "КРОВИ! Я ЖАЖДУ КРОВИ!");
-                interpret_raw( ch, "murder",  vch->getNameC());
+                interpret_raw( ch, "murder",  "%s", vch->getNameC());
                 return;
             }
         }

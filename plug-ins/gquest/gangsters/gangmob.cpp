@@ -172,7 +172,7 @@ void GangMember::bribe( Character *briber, int gold, int silver )
         switch (number_range( 1, 3 )) {
         case 1: 
             oldact(_("$c1 громко вопит '{gПытаешься подкупить меня, сопля$Gк|к|чка?!{x'"), ch, 0, briber, TO_ROOM);
-            interpret_raw(ch, "murder", briber->getNameC());
+            interpret_raw(ch, "murder", "%s", briber->getNameC());
             break;
         case 2:
             oldact(_("$c1 произносит '{gПлакали твои денежки, $C1!{x'"), ch, 0, briber, TO_ROOM);
@@ -222,7 +222,7 @@ void GangMember::greet( Character *mob )
             break;
         case 3:
             oldact(_("$c1 рычит '{g$C1, как же ты меня доста$Gло|л|ла!{x'"), ch, 0, mob, TO_ROOM);
-            interpret_raw(ch, "murder", mob->getNameC() );
+            interpret_raw(ch, "murder", "%s", mob->getNameC() );
             break;
         }
         return;

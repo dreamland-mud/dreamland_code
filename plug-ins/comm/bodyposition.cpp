@@ -746,7 +746,7 @@ CMDRUNP(wake)
     if (arg[0] == '\0')
     {
         if (DIGGED(ch) && ch->position <= POS_SLEEPING)
-            interpret_raw(ch, "rest", argument);
+            interpret_raw(ch, "rest", "%s", argument);
         else
         {
             undig(ch);

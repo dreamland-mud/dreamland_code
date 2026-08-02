@@ -113,13 +113,13 @@ CMDADM( profile )
         // Grant editing permissions for most common areas.
         if (!pcm->getAttributes().isAvailable("olc")) {
             DLString cmdArgs = playerName + " set 1 50000 9";
-            interpret_raw(ch, "olcvnum", cmdArgs.c_str());
+            interpret_raw(ch, "olcvnum", "%s", cmdArgs.c_str());
         }
 
         // Create sandbox area for this player.
         {
             DLString cmdArgs = playerName + " create";
-            interpret_raw(ch, "olcvnum", cmdArgs.c_str());
+            interpret_raw(ch, "olcvnum", "%s", cmdArgs.c_str());
         }
         return;
     }

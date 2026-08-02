@@ -90,7 +90,7 @@ CMDRUNP(request)
             }
             if (ch->getModifyLevel() > 30 && number_percent() > 75)
             {
-                interpret_raw(victim, "murder", ch->getNameC());
+                interpret_raw(victim, "murder", "%s", ch->getNameC());
             }
             return;
         }
@@ -264,7 +264,7 @@ CMDRUNP(demand)
 
     if (number_percent() > chance) {
         do_say(victim, "Я не собираюсь ничего отдавать тебе!");
-        interpret_raw(victim, "murder", ch->getNameC());
+        interpret_raw(victim, "murder", "%s", ch->getNameC());
         return;
     }
 

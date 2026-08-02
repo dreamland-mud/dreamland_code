@@ -10,7 +10,7 @@ CMDRUNP( search )
 
     if (!arg.empty( )) {
         if (arg_is(arg, "stones")) {
-            interpret_cmd( ch, "searchstones", args.c_str( ) );
+            interpret_cmd( ch, "searchstones", "%s", args.c_str( ) );
             return;
         }
     }

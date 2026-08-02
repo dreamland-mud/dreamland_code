@@ -97,7 +97,7 @@ bool MagicItemUsage::use( Object *obj, Character *user, Character *target ) cons
             break;
     }
 
-    return interpret_cmd( user, cmd, args.c_str( ) );
+    return interpret_cmd( user, cmd, "%s", args.c_str( ) );
 }
 
 /*
