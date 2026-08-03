@@ -285,11 +285,17 @@ void Damage::adjustFollowers( )
         victim->dismount( );
 }
 
-/* 
- * Remove (P)rotected 
+/*
+ * Remove (P)rotected
  */
 void Damage::adjustDeathTime( )
 {
+    // Dealing damage costs the attacker their post-death protection, but hurting
+    // yourself is not an attack: a burning item, a trap or a backfired spell must
+    // not strip (P) from the very character it just protected.
+    if (ch == victim)
+        return;
+
     UNSET_DEATH_TIME(ch);
 }
 
