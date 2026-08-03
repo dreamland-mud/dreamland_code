@@ -57,7 +57,9 @@ static void scan_people(Room *room, Character *ch, int depth, int door,
         buf << "    {" << CLR_SCAN_MOB(ch) << ch->sees(orig, '1') << ".{x";
 
         if (IS_SET(orig->comm, COMM_AFK))
-            buf << " {w[{CАФК{x{w]{x";
+            buf << lmsg(viewerLang(ch), " {w[{CAFK{x{w]{x",
+                                        " {w[{CАФК{x{w]{x",
+                                        " {w[{CАФК{x{w]{x");
 
         buf << endl;
     }
@@ -86,7 +88,8 @@ static Room *scan_room(Room *start_room, Character *ch, int depth, int door,
             buf << lmsg(viewerLang(ch), "Range ", "Дальность ", "Відстань ") << depth;
 
         buf << ":{x" << endl
-            << "    {" << CLR_SCAN_DOOR(ch) << direction_doorname_langtext(pExit, '1').forLang(viewerLang(ch)) << " (закрыто).{x" << endl;
+            << "    {" << CLR_SCAN_DOOR(ch) << direction_doorname_langtext(pExit, '1').forLang(viewerLang(ch))
+            << lmsg(viewerLang(ch), " (closed).", " (закрыто).", " (зачинено).") << "{x" << endl;
 
         return NULL;
     }
