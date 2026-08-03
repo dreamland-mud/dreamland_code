@@ -432,7 +432,11 @@ bool DefaultWearlocation::wearAtomic( Character *ch, Object *obj, int flags )
     if (canWear( ch, flags )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
             ch->pecho( getMsgSelfWear(ch, obj).c_str(), ch, obj );
-            ch->recho( getMsgRoomWear(obj).c_str( ), ch, obj );
+            // The room line goes to every onlooker at once, so it has to resolve
+            // per recipient rather than in the wearer's language -- same treatment
+            // the remove path already gets. msgSelfWear above is a different case:
+            // it reaches one reader, so the XMLMultiString lookup is enough.
+            ch->recho( _(getMsgRoomWear(obj)), ch, obj );
         }
 
         triggersOnWear(ch, obj);
