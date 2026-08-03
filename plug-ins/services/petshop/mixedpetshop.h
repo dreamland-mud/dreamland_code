@@ -12,7 +12,10 @@
 struct MixedEntry {
     MixedEntry( );
     MixedEntry( Pet::Pointer, Character * );
-    MixedEntry( Object *, int );
+    // The client is needed for its display language: short_descr is snapshotted
+    // here and rendered verbatim later, so it has to be captured already
+    // resolved for the reader who asked for the list.
+    MixedEntry( Object *, int, Character * );
     
     int level;
     int cost;

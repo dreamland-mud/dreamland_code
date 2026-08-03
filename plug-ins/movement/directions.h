@@ -60,8 +60,9 @@ extern char const extra_move_rtpm [];
 int direction_lookup( char c );
 int direction_lookup( const char *arg );
 
-/** Return short description of the exit, or generic "door" if not set. */
-const char * direction_doorname(exit_data *);
+/** Return short description of the exit in the reader's language, or the
+ *  generic word for "door" in that language if the exit carries no name. */
+const char * direction_doorname(exit_data *, lang_t lang);
 
 /** Per-viewer door name for the %w / $w act code and single-viewer string
  *  building. Owns its three language forms; the RU form is pre-declined to a

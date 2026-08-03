@@ -162,6 +162,9 @@ public:
     /** Quick access to room area name, in nominative case by default. */
     DLString areaName(char gcase = '1') const;
 
+    /** Room area name in the given language (falls back to RU/EN when empty). */
+    DLString areaName(lang_t lang, char gcase = '1') const;
+
     /** This room's position in the global roomInstances vector. Needed for backward compat. */
     int position;
 
