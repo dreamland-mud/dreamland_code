@@ -131,7 +131,19 @@ int direction_lookup( const char *arg )
         if (dir.rname_extra_1 && !str_prefix( arg, dir.rname_extra_1 ))
             return door;
     }
-    
+
+    // Ukrainian names run as a second pass, so every abbreviation that resolves
+    // today keeps resolving to the same door: 'с' stays north (север) even
+    // though схід also starts with it, 'п' stays up (подняться) over північ,
+    // 'в' stays east (восток) over вгору. Only input the EN/RU pass rejects
+    // outright reaches here -- захід, схід, вг, південь and the like.
+    for (door = 0; door < DIR_SOMEWHERE; door++) {
+        const direction_t &dir = dirs[door];
+
+        if (dir.ua_rname && !str_prefix( arg, dir.ua_rname ))
+            return door;
+    }
+
     return -1;
 }
 
