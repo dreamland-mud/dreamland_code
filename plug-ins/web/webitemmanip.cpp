@@ -313,6 +313,7 @@ WEBMANIP_RUN(decorateItem)
     StringSet triggers = trigger_labels(item);
 
     ItemManipList manips( item, descr );
+    manips.lang = viewerLang( ch );
     bitstring_t wear = item->wear_flags;
     REMOVE_BIT(wear, ITEM_TAKE);
 
@@ -532,6 +533,7 @@ WEBMANIP_RUN(decorateShopItem)
     Object *item = myArgs.item;
 
     ItemManipList manips( item, descr );
+    manips.lang = viewerLang( myArgs.target );
 
     manips.add( "buy" );
     if (IS_OBJ_STAT( item, ITEM_INVENTORY )) 
@@ -548,6 +550,7 @@ WEBMANIP_RUN(decoratePocket)
     Object *container = myArgs.container;
 
     ItemManipList manips( container, pocket );
+    manips.lang = viewerLang( myArgs.target );
 
     manips.add( "look", "в", pocket );
     manips.add( "get", "все", pocket );

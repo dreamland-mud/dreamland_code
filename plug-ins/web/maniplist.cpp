@@ -11,15 +11,17 @@ Manip::Manip( const DLString &cmdName, const DLString &args )
     this->args = args;
 }
 
-DLString Manip::toString( ) const 
+DLString Manip::toString( lang_t lang ) const
 {
     if (cmd.isEmpty()) {
         LogStream::sendError() << "WEB: menu item has invalid command " << cmdName << endl;
         return DLString::emptyString;
     }
 
-    const DLString &rname = cmd->getRussianName().empty() ? cmd->getName() : cmd->getRussianName();
-    return rname + " " + args;
+    // The entry is dispatched back through the parser as typed, so it must be
+    // the command's name in the reader's language, not the Russian one for
+    // everybody. getNameFor already falls back when a slot is empty.
+    return cmd->getNameFor( lang ) + " " + args;
 }
 
 const DLString ManipList::TAG = "m";
@@ -43,7 +45,7 @@ DLString ManipList::toString( ) const
              m != manips.end( );
              m++)
         {
-            buf << m->toString( ) << ",";
+            buf << m->toString( lang ) << ",";
         }
 
         buf << "\" ";
@@ -55,7 +57,7 @@ DLString ManipList::toString( ) const
              m != locals.end( );
              m++)
         {
-            buf << m->toString( ) << ",";
+            buf << m->toString( lang ) << ",";
         }
         buf << "\" ";
     }
