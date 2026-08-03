@@ -228,10 +228,16 @@ DoorName direction_doorname_langtext(const XMLMultiString &sd, char rcase)
         if (dn.ua.empty()) dn.ua = dn.ru;
     }
 
-    // RU is grammatically declined (russian_case is viewer-independent); EN is
-    // caseless; UA stays nominative. RU output matches the legacy
-    // russian_case(direction_doorname(), rcase) path byte-for-byte.
+    // All three go through the Flexer, despite the name: russian_case only
+    // splits on '|' and picks a cell, which is exactly the format Ukrainian pads
+    // use too. Declining dn.ru alone left the other two carrying the raw pad --
+    // an English or Ukrainian reader saw 'ворот|а|іт|ам|а|ами|ах'. It matters for
+    // dn.en as well, because an empty EN slot falls back to the Russian pad just
+    // above. A name with no pipes passes through untouched, so a real English
+    // door name is unaffected, and RU output is byte-for-byte what it was.
     dn.ru = russian_case(dn.ru, rcase);
+    dn.ua = russian_case(dn.ua, rcase);
+    dn.en = russian_case(dn.en, rcase);
     return dn;
 }
 
