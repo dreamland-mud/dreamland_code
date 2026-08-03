@@ -83,6 +83,13 @@ void ClanData::save( )
 void ClanData::load( )
 {
     loadXML( this, name, true );
+
+    // Stored data written before the bank existed carries an empty <bank/> node
+    // with no type attribute, which deserializes to a null pointer. Nothing else
+    // ever assigns this field, and 'clan bank' refuses to run without it -- so a
+    // clan in that state could never obtain a bank by any means. Seed one.
+    if (bank.isEmpty( ))
+        bank.setPointer( new ClanBank );
 }
 
 void ClanData::setItem( Object *obj )
