@@ -23,6 +23,19 @@ namespace Player {
     lang_t displayLang(Character *ch);
 
     DLString title(PCMemoryInterface *pcm, lang_t lang = LANG_DEFAULT);
+
+    /**
+     * The stock status line in the reader's own language -- what a character is
+     * created with and what 'prompt all' resets to. Labels are kept in step with
+     * dreamland_fenia/newbie/nanny (initCreated), which stamps them at creation;
+     * the RU form is byte-identical to the string the engine used before there
+     * were three. Also lets the command log tell a stock prompt from a custom
+     * one without every reader's default counting as "custom".
+     */
+    DLString defaultPrompt(lang_t lang, bool battle);
+
+    /** True if `prompt` is the stock status line of ANY language. */
+    bool isDefaultPrompt(const DLString &prompt, bool battle);
 }
 
 #endif
