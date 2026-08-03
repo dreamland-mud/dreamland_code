@@ -44,13 +44,11 @@ Religion * ReligionUtils::getRandomGod(Character *ch)
     return 0;
 }
 
-DLString ReligionUtils::godName(Character *ch)
+Religion * ReligionUtils::godReligion(Character *ch)
 {
-    static const char *gods = "бог|и|ов|ам|ов|ами|ах";
-
     if (ch->is_npc()) {
         // A mob prays to its own deity when its prototype names exactly one
-        // religion (the medit religion field); otherwise the generic plural.
+        // religion (the medit religion field); otherwise no one in particular.
         MOB_INDEX_DATA *pMob = ch->getNPC()->pIndexData;
         if (pMob) {
             Religion *only = 0;
@@ -62,14 +60,21 @@ DLString ReligionUtils::godName(Character *ch)
                 }
             }
             if (cnt == 1 && only)
-                return only->getRussianName();
+                return only;
         }
-        return gods;
+        return 0;
     }
 
     if (ch->getReligion() != god_none)
-        return ch->getReligion()->getRussianName();
+        return ch->getReligion().getElement();
 
-    Religion *randomGod = ReligionUtils::getRandomGod(ch);
-    return randomGod ? randomGod->getRussianName() : gods;
+    return ReligionUtils::getRandomGod(ch);
+}
+
+DLString ReligionUtils::godName(Character *ch)
+{
+    static const char *gods = "бог|и|ов|ам|ов|ами|ах";
+
+    Religion *god = ReligionUtils::godReligion(ch);
+    return god ? god->getRussianName() : gods;
 }
