@@ -139,6 +139,7 @@ WEBMANIP_RUN(decoratePlayer)
     PCharacter *victim = myArgs.victim;
 
     PlayerManipList manips( victim, myArgs.descr );
+    manips.lang = viewerLang( ch );
 
     if (ch->in_room == victim->in_room) {
         manips.add( "look" );
@@ -179,6 +180,7 @@ WEBMANIP_RUN(decorateMobile)
     NPCharacter *victim = myArgs.victim;
 
     MobileManipList manips( victim, myArgs.descr );
+    manips.lang = viewerLang( ch );
 
     if (ch->is_immortal()) {
         manips.addLocal("stat", "mob $");
