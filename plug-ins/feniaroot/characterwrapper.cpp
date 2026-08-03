@@ -1439,6 +1439,15 @@ NMI_GET( CharacterWrapper, godName, "название религии, случа
     return ReligionUtils::godName(target);    
 }
 
+NMI_GET( CharacterWrapper, godReligion, "божество, которому молится персонаж (структура .Religion), или null -- в отличие от godName работает и для мобов, и отдаёт объект, а не русское имя" )
+{
+    checkTarget( );
+    Religion *god = ReligionUtils::godReligion(target);
+    if (!god)
+        return Register( );
+    return Register::handler<ReligionWrapper>( god->getName( ) );
+}
+
 NMI_SET( CharacterWrapper, religion, "религия (структура .Religion)" )
 {
     checkTarget( );
