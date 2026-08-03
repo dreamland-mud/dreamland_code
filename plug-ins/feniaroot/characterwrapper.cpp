@@ -1445,6 +1445,16 @@ NMI_GET( CharacterWrapper, godReligion, "божество, которому мо
     Religion *god = ReligionUtils::godReligion(target);
     if (!god)
         return Register( );
+
+    // ReligionWrapper keeps only the name and re-resolves it with findExisting()
+    // on every field read, so a handle built from a name that call cannot find is
+    // non-null and throws on the FIRST read -- which is how a deityless healer's
+    // armor spell took the game down after reboot #48. Resolve it here, through
+    // the same call the wrapper will use, and hand back null when it fails, so a
+    // plain null check is enough on the Fenia side.
+    if (!religionManager->findExisting( god->getName( ) ))
+        return Register( );
+
     return Register::handler<ReligionWrapper>( god->getName( ) );
 }
 

@@ -67,6 +67,40 @@ struct ItemManipList : public ManipList {
         locals.push_back( Manip( cmdName, arg ) );
     }
 
+    // ManipList::lang localizes the command WORD, but the argument words below
+    // are literals it never reaches, so every reader was handed the Russian
+    // spelling. All of these resolve through grammar/synonyms.json, so this
+    // changes how a menu entry reads, not what the parser accepts.
+    const char * allWord( ) const {
+        switch (lang) {
+        case LANG_EN: return "all";
+        case LANG_UA: return "усе";
+        default:      return "все";
+        }
+    }
+
+    const char * inWord( ) const {
+        switch (lang) {
+        case LANG_EN: return "in";
+        case LANG_UA: return "у";
+        default:      return "в";
+        }
+    }
+
+    // getKeyword(lang) has NO fallback: an object carrying no keyword in the
+    // reader's language returns an empty string, which would build "все.''".
+    DLString keywordFor( Object *obj ) const {
+        const DLString &own = obj->getKeyword( lang );
+        if (!own.empty( ))
+            return own;
+
+        const DLString &ru = obj->getKeyword( LANG_RU );
+        if (!ru.empty( ))
+            return ru;
+
+        return obj->getKeyword( LANG_EN );
+    }
+
     // Add commands to the main list, with various arguments.
     void add( const DLString &cmdName ) {
         manips.push_back( Manip( cmdName, THIS ) );
@@ -98,9 +132,9 @@ struct ItemManipList : public ManipList {
     }
 
     // addAll methods will create commands in the format: 
-    // get все.'item names'[ <container>[:<pocket>]]
+    // get all.'item names'[ <container>[:<pocket>]], in the reader's language
     void addAll( const DLString &cmdName, Object *obj1, Object *obj2 = NULL ) {
-        DLString args = "все.'" + obj1->getKeyword(LANG_RU) + "'";
+        DLString args = DLString( allWord( ) ) + ".'" + keywordFor( obj1 ) + "'";
         if (obj2) {
             args += " " + DLString( obj2->getID( ) ); 
         }
@@ -108,7 +142,7 @@ struct ItemManipList : public ManipList {
     }
 
     void addAll( const DLString &cmdName, Object *obj1, Object *obj2, const DLString &pocket ) {
-        DLString args = "все.'" + obj1->getKeyword(LANG_RU) + "'";
+        DLString args = DLString( allWord( ) ) + ".'" + keywordFor( obj1 ) + "'";
         args += " ";
         args += (obj2 == target ? THIS : DLString( obj2->getID( ) ));
         args += ":" + pocket;
@@ -356,11 +390,11 @@ WEBMANIP_RUN(decorateItem)
                 break;
             case ITEM_CONTAINER:
                 if (!IS_PIT(item))
-                    manips.add( "get", "все" );
+                    manips.add( "get", manips.allWord( ) );
                 break;
             case ITEM_CORPSE_NPC:
             case ITEM_CORPSE_PC:
-                manips.add( "get", "все" );
+                manips.add( "get", manips.allWord( ) );
                 break;
             case ITEM_WAND:
                 if (item->wear_loc == wear_hold) 
@@ -465,12 +499,12 @@ WEBMANIP_RUN(decorateItem)
 
             case ITEM_CONTAINER:
                 if (!IS_PIT(item))
-                    manips.add( "get", "все" );
+                    manips.add( "get", manips.allWord( ) );
                 break;
 
             case ITEM_CORPSE_NPC:
             case ITEM_CORPSE_PC:
-                manips.add( "get", "все" );
+                manips.add( "get", manips.allWord( ) );
                 break;
 
             case ITEM_FURNITURE:
@@ -552,8 +586,8 @@ WEBMANIP_RUN(decoratePocket)
     ItemManipList manips( container, pocket );
     manips.lang = viewerLang( myArgs.target );
 
-    manips.add( "look", "в", pocket );
-    manips.add( "get", "все", pocket );
+    manips.add( "look", manips.inWord( ), pocket );
+    manips.add( "get", manips.allWord( ), pocket );
     buf << manips.toString( );
     return true;
 }
