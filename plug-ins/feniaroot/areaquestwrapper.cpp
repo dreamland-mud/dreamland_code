@@ -78,10 +78,22 @@ NMI_GET( AreaQuestWrapper, title, "название квеста")
     return Register( target->title.get(LANG_DEFAULT) );
 }
 
-NMI_GET( AreaQuestWrapper, description, "описание квеста") 
-{ 
-    checkTarget( ); 
+NMI_INVOKE( AreaQuestWrapper, getTitle, "(lang): название квеста на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    return Register( target->title.getForLang( argnum2lang( args, 1 ) ) );
+}
+
+NMI_GET( AreaQuestWrapper, description, "описание квеста")
+{
+    checkTarget( );
     return Register( target->description.get(LANG_DEFAULT) );
+}
+
+NMI_INVOKE( AreaQuestWrapper, getDescription, "(lang): описание квеста на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    return Register( target->description.getForLang( argnum2lang( args, 1 ) ) );
 }
 
 NMI_GET( AreaQuestWrapper, vnum, "номер квеста") 
