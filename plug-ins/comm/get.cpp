@@ -346,6 +346,17 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
 }
 
 /*
+ * Taking something can kill the taker: an incandescent item burns whoever picks
+ * it up, and death moves them to their altar. Once that happens the bulk loops
+ * must stop -- otherwise the character carries on emptying a room or a corpse
+ * they are no longer standing next to.
+ */
+static bool still_looting( Character *ch, Room *room )
+{
+    return !ch->isDead( ) && ch->in_room == room;
+}
+
+/*
  *
  *  get all
  *  get <name>
@@ -423,6 +434,7 @@ CMDRUNP( get )
              *  get all.'<names list>'
              */
             found = false;
+            Room *startRoom = ch->in_room;
 
             dreamland->removeOption( DL_SAVE_OBJS );
 
@@ -433,7 +445,7 @@ CMDRUNP( get )
                         && ch->can_see( obj ) )
                 {
                     found = true;
-                    
+
                     int rc = can_get_obj( ch, obj );
                     if (rc == GET_OBJ_ERR)
                         continue;
@@ -441,6 +453,9 @@ CMDRUNP( get )
                         break;
 
                     get_obj( ch, obj );
+
+                    if (!still_looting( ch, startRoom ))
+                        break;
                 }
             }
 
@@ -529,6 +544,7 @@ CMDRUNP( get )
             }
                 
             found = false;
+            Room *startRoom = ch->in_room;
 
             for ( obj = container->contains; obj; obj = obj_next )
             {
@@ -558,6 +574,9 @@ CMDRUNP( get )
                     continue;
 
                 get_obj_container( ch, obj, container );
+
+                if (!still_looting( ch, startRoom ))
+                    break;
             }
 
             if (!found) {
