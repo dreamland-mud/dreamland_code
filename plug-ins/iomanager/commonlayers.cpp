@@ -17,6 +17,7 @@
 #include "plugininitializer.h"
 #include "screenreader.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "room.h"
 #include "dreamland.h"
 #include "descriptor.h"
@@ -98,10 +99,11 @@ static bool create_log_entry(InterpretArguments &iargs)
     log["ch"]["remort"] = (int)iargs.ch->getPC()->getRemorts().size();
     log["ch"]["room"] = iargs.ch->in_room->vnum;
 
-    DLString defaultPrompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг {W%X{xоп Вых:{g%d{x %S>%c";
+    // The stock prompt exists in three languages; comparing against the Russian
+    // one alone logged every English and Ukrainian player as having customized it.
     if (!IS_SET(iargs.ch->comm, COMM_PROMPT))
         log["cfg"]["prompt"] = "off";
-    else if (iargs.ch->prompt != defaultPrompt)
+    else if (!Player::isDefaultPrompt(iargs.ch->prompt, false))
         log["cfg"]["prompt"] = "custom";
     else
         log["cfg"]["prompt"] = "default";

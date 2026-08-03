@@ -1,8 +1,10 @@
 #include "commandtemplate.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "arg_utils.h"
 #include "descriptor.h"
 #include "merc.h"
+#include "act.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -27,7 +29,7 @@ CMDRUNP( prompt )
 
     if (arg_is_all( argument )) {
         old = ch->prompt;
-        ch->prompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг {W%X{xоп Вых:{g%d{x %S>%c";
+        ch->prompt = Player::defaultPrompt( Player::displayLang(ch), false );
     }
     else if (arg_is_show( argument )) {
         ch->pecho( _("Текущая строка состояния:") );
@@ -41,7 +43,7 @@ CMDRUNP( prompt )
     }
     
     if (!old.empty( )) {
-            ch->send_to( "Предыдущая строка состояния: " );
+            ch->send_to( fmt( ch, _("Предыдущая строка состояния: ") ) );
             ch->desc->send(  old.c_str( ) );   
                ch->pecho("");
     }
@@ -60,7 +62,7 @@ CMDRUNP( battleprompt )
 
     if (arg_is_all( argument )) {
         old = ch->batle_prompt;
-        ch->batle_prompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг %Xоп Вых:{g%d{x %S> [{r%y{x:{Y%o{x]%c";
+        ch->batle_prompt = Player::defaultPrompt( Player::displayLang(ch), true );
     }
     else if (arg_is_show( argument )) {
         ch->pecho( _("Текущая строка состояния в бою:") );
@@ -74,7 +76,7 @@ CMDRUNP( battleprompt )
     }
 
     if (!old.empty( )) {
-            ch->send_to( "Предыдущая строка состояния в бою: " );
+            ch->send_to( fmt( ch, _("Предыдущая строка состояния в бою: ") ) );
             ch->desc->send(  old.c_str( ) );   
                ch->pecho("");
     }
