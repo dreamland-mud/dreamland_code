@@ -50,6 +50,9 @@ DLString BadNames::checkName( const DLString &name ) const
     if (!nameMobiles(name))
         return "mob";
 
+    if (!nameLegendary(name))
+        return "legendary";
+
     if (!nameReserved(name))
         return "reserved";
 
@@ -74,6 +77,9 @@ DLString BadNames::checkRussianName( const DLString &name ) const
 
     if (!nameMobiles(name))
         return "mob";
+
+    if (!nameLegendary(name))
+        return "legendary";
 
     if (!nameReserved(name))
         return "reserved";
@@ -141,6 +147,22 @@ bool BadNames::nameMobiles( const DLString &name ) const
                 return false;
         }
     }
+
+    return true;
+}
+
+/*
+ * Names that belong to the history of this world -- the founders and immortals
+ * credited in 'help credits' and 'help immortals', and the figures the written
+ * history names. Kept out of circulation so nobody can claim one by accident;
+ * anyone who genuinely is that person can write in and have it handed over.
+ */
+bool BadNames::nameLegendary( const DLString &name ) const
+{
+    NameList::const_iterator n;
+    for (n = legendary.begin( ); n != legendary.end( ); n++)
+        if (String::equalLess( name, *n ))
+            return false;
 
     return true;
 }

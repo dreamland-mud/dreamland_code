@@ -32,12 +32,17 @@ public:
     bool nameRussian( const DLString &name ) const;
     bool nameMobiles( const DLString &name ) const;
     bool nameReserved( const DLString &name ) const;
+    bool nameLegendary( const DLString &name ) const;
     bool nameReligion( const DLString &name, bool fRussian ) const;
 
 protected:
     virtual void initialization( );
 
     XML_VARIABLE NameList names;
+    // Names carrying legendary status: founders, immortals, translators credited in
+    // 'help credits', and figures from the written history. Refused with their own
+    // error code so the nanny can explain why and point at the mailbox.
+    XML_VARIABLE NameList legendary;
     XML_VARIABLE NameList patterns;
     RegexpList regexps;
 };
