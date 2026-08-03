@@ -257,22 +257,22 @@ void MultiCommandList::gatherHints(InterpretArguments &iargs)
     DLString kuzdn = translit(guess_1, cmdName);
     iargs.translitArgs = translit(guess_1, iargs.cmdArgs);
 
+    // Suggest commands in the language the input was typed in, and nothing else:
+    // offering a Russian command to a Ukrainian reader is what the typo was
+    // trying to avoid. Latin input already collapses both guesses to EN, so an
+    // English speller still gets English suggestions.
     for (auto &it: masterMap) {
         Command::Pointer cmd = it.second;
 
         if (cmd->visible(iargs.ch)) {
 
-            for (int i = LANG_MIN; i < LANG_MAX; i++) {
-                lang_t lang = (lang_t)i;
+            if (cmd->name[guess_1].empty())
+                continue;
 
-                if (cmd->name[lang].empty())
-                    continue;  
+            record_distance(cmdName, kuzdn, cmd->name[guess_1], iargs);
 
-                record_distance(cmdName, kuzdn, cmd->name[lang], iargs);
-
-                for (auto &alias: cmd->aliases[lang].split(" ")) 
-                    record_distance(cmdName, kuzdn, alias, iargs);
-            }
+            for (auto &alias: cmd->aliases[guess_1].split(" "))
+                record_distance(cmdName, kuzdn, alias, iargs);
         }
     }
 }

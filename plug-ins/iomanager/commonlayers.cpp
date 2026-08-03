@@ -22,6 +22,7 @@
 #include "descriptor.h"
 #include "wiznet.h"
 #include "merc.h"
+#include "act.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -203,8 +204,8 @@ public:
             return false;
         }
 
-        buf << "Возможно, имелось в виду:" << endl;
-       
+        buf << fmt(iargs.ch, _("Возможно, имелось в виду:")) << endl;
+
         if (total_hints <= 3) {
             const DLString &args = iargs.cmdArgs;
             show_hint_and_argument(buf, iargs.translitCmd, iargs.translitArgs);
@@ -219,7 +220,7 @@ public:
                 buf << endl;
         }
 
-        buf << "Для справки наберите {y{hcкоманды{x или {y{hcсправка{x." << endl;
+        buf << fmt(iargs.ch, _("Для справки наберите {y{hcкоманды{x или {y{hcсправка{x.")) << endl;
         iargs.ch->send_to(buf);
         return false;
     }
