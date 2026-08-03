@@ -57,16 +57,16 @@ MixedEntry::MixedEntry( Pet::Pointer pet, Character *client )
 {
     level = pet->getLevel( client );
     cost = pet->toSilver( client );
-    short_descr = pet->getChar( )->getNPC( )->getShortDescr(LANG_DEFAULT);
+    short_descr = pet->getChar( )->getNPC( )->getShortDescr(viewerLang( client ));
     name = String::toString(pet->getChar( )->getNPC()->getKeyword());
     this->pet = true;
 }
 
-MixedEntry::MixedEntry( Object *obj, int cost )
+MixedEntry::MixedEntry( Object *obj, int cost, Character *client )
 {
     level = obj->level;
     this->cost = cost;
-    short_descr = obj->getShortDescr(LANG_DEFAULT);
+    short_descr = obj->getShortDescr(viewerLang( client ));
     name = String::toString(obj->getKeyword());
     pet = false;
 }
@@ -97,7 +97,7 @@ void MixedPetShopRoom::createMixedList( MixedList &list, Character *client )
                 && ( cost = get_cost( keeper, obj, true, trader ) ) > 0 
                 && client->can_see( obj ))  
             {
-                list.push_back( MixedEntry( obj, cost ) );
+                list.push_back( MixedEntry( obj, cost, client ) );
             }
     }
 
@@ -124,10 +124,12 @@ void MixedPetShopRoom::doList( Character *client )
         return;
     }
 
-    buf << "[ Ном.| Ур.  Цена ] Товар" << endl;
-    
+    // Column-aligned header: every translation has to keep ']' on column 19 and
+    // the goods label on 21, or the header stops lining up with the rows below.
+    buf << l(client, "[ Ном.| Ур.  Цена ] Товар") << endl;
+
     for (i = list.begin( ); i != list.end( ); i++)
-        buf << fmt(0, "[ {Y%3d{x |%3d %5d ] %s\n\r",
+        buf << fmt(client, "[ {Y%3d{x |%3d %5d ] %s\n\r",
                          ++cnt, i->level, i->cost, i->short_descr.ruscase( '1' ).c_str( ) );
 
     client->send_to( buf );

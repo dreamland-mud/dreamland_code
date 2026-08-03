@@ -195,12 +195,20 @@ int find_exit( Character *ch, const char *arg, int flags )
     return door;
 }
 
-// TODO should take lang argument
-const char * direction_doorname(EXIT_DATA *pexit)
+const char * direction_doorname(EXIT_DATA *pexit, lang_t lang)
 {
-    if (!pexit || pexit->short_descr.get(LANG_DEFAULT).empty())
-        return "дверь";
-    return pexit->short_descr.get(LANG_DEFAULT).c_str();
+    // Gate on the RU slot the way direction_doorname_langtext does: RU is the
+    // base form every exit carries, so an empty RU means the exit has no name
+    // at all and the generic word is due. A present RU with an empty EN/UA is
+    // data, not absence -- getForLang degrades it to RU on its own.
+    if (!pexit || pexit->short_descr.get(LANG_RU).empty()) {
+        switch (lang) {
+        case LANG_EN: return "door";
+        case LANG_UA: return "двері";
+        default:      return "дверь";
+        }
+    }
+    return pexit->short_descr.getForLang(lang).c_str();
 }
 
 DoorName direction_doorname_langtext(const XMLMultiString &sd, char rcase)

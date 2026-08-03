@@ -399,12 +399,14 @@ void ItemKeyhole::msgTryPickOther( )
 }
 DLString ItemKeyhole::getDescription( )
 {
+    lang_t lang = viewerLang( ch );
     DLString buf;
 
-    // TODO multi-langage descriptions
-    buf << obj->getShortDescr(LANG_DEFAULT);
-    if (obj->getCarrier( ) == 0)
-        buf << " из '" << obj->getRoom()->getName() << "'";
+    buf << obj->getShortDescr(lang);
+    if (obj->getCarrier( ) == 0) {
+        static const LangText from = { " from '", " из '", " з '" };
+        buf << from.get(lang) << obj->getRoom()->getName(lang) << "'";
+    }
 
     return buf;
 }
@@ -578,7 +580,7 @@ void ExtraExitKeyhole::msgTryPickOther( )
 
 DLString ExtraExitKeyhole::getDescription( )
 {
-    return peexit->short_desc_from.get(LANG_DEFAULT);
+    return peexit->short_desc_from.getForLang(viewerLang( ch ));
 }
 int ExtraExitKeyhole::getKey( )
 {

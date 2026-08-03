@@ -549,12 +549,16 @@ void ExitsMovement::place( Character *wch )
 void ExitsMovement::msgEcho( Character *victim, Character *wch, const char *msg )
 {
     // TODO: Need to use peexit->short_desc_to for entry messages in the target room.
-    if (canHear( victim, wch ))
-        victim->pecho( msg, 
+    if (canHear( victim, wch )) {
+        // The line is echoed to 'victim', so the exit name follows that reader,
+        // not the mover and not LANG_DEFAULT.
+        lang_t lang = viewerLang( victim );
+        victim->pecho( msg,
                        (RIDDEN(wch) ? wch->mount : wch),
                        (MOUNTED(wch) ? wch->mount : wch),
-                       wch, 
-                       peexit ? peexit->short_desc_from.get(LANG_DEFAULT).c_str() : direction_doorname(pexit),
+                       wch,
+                       peexit ? peexit->short_desc_from.getForLang(lang).c_str() : direction_doorname(pexit, lang),
                        boat );
+    }
 }
 

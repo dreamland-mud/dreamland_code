@@ -512,20 +512,22 @@ CMDRUN( list )
         return;
     }
 
-    buf << "[ Ном.| Ур.  Цена Кол-во] Товар" << endl;
+    // Column-aligned header: every translation has to keep ']' on column 25 and
+    // the goods label on 27, or the header stops lining up with the rows below.
+    buf << l(ch, "[ Ном.| Ур.  Цена Кол-во] Товар") << endl;
 
     for (unsigned int i = 0; i < stock.size( ); i++) {
         const StockInfo &si = stock.at( i );
-        
+
         if (IS_OBJ_STAT( si.obj, ITEM_INVENTORY ))
-            buf << fmt(0, "[ {Y%3d{x |%3d %5d   --   ] ",
+            buf << fmt(ch, "[ {Y%3d{x |%3d %5d   --   ] ",
                     i+1, si.obj->level, si.cost );
 
-        else 
-            buf << fmt(0, "[ {Y%3d{x |%3d %5d %6d ] ",
+        else
+            buf << fmt(ch, "[ {Y%3d{x |%3d %5d %6d ] ",
                     i+1, si.obj->level, si.cost, si.count );
 
-        webManipManager->decorateShopItem( buf, si.obj->getShortDescr( '1', LANG_DEFAULT ), si.obj, ch );
+        webManipManager->decorateShopItem( buf, si.obj->getShortDescr( '1', viewerLang( ch ) ), si.obj, ch );
 
         buf << endl;
     }

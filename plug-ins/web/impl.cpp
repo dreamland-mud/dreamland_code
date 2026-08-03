@@ -263,7 +263,7 @@ Json::Value LocationWebPromptListener::jsonRoom( Descriptor *d, Character *ch )
     if (!canSeeLocation( ch ))
         return Json::Value( );
 
-    return Json::Value( DLString( ch->in_room->getName() ).colourStrip( ) );
+    return Json::Value( DLString( ch->in_room->getName( Player::displayLang( ch ) ) ).colourStrip( ) );
 }
 
 Json::Value LocationWebPromptListener::jsonZone( Descriptor *d, Character *ch )
@@ -271,7 +271,7 @@ Json::Value LocationWebPromptListener::jsonZone( Descriptor *d, Character *ch )
     if (!canSeeLocation( ch ))
         return Json::Value( );
 
-    return Json::Value( DLString( ch->in_room->areaName() ).colourStrip( ) );
+    return Json::Value( DLString( ch->in_room->areaName( Player::displayLang( ch ) ) ).colourStrip( ) );
 }
 
 Json::Value LocationWebPromptListener::jsonSector( Descriptor *d, Character *ch )

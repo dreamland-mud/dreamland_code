@@ -85,6 +85,11 @@ DLString Room::areaName(char gcase) const
     return pIndexData->areaIndex->getName(gcase);
 }
 
+DLString Room::areaName(lang_t lang, char gcase) const
+{
+    return pIndexData->areaIndex->getName(lang, gcase);
+}
+
 
 bool Room::isPrivate( ) const
 {
