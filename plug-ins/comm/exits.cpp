@@ -30,14 +30,29 @@ BONUS(thief_skills);
  */
 static DLString cmd_extra_exit(Character *ch, EXTRA_EXIT_DATA *eexit, bool prefereShortDescr)
 {
+    lang_t lg = viewerLang(ch);
     DLString kw_en = Syntax::label_en(eexit->keyword);
     DLString kw_ru = Syntax::label_ru(eexit->keyword);
 
-    DLString nameRus = prefereShortDescr ? eexit->short_desc_from.get(LANG_DEFAULT).ruscase('1') : "";
-    nameRus = nameRus.empty() ? (kw_ru.empty() ? kw_en : kw_ru) : nameRus;
+    // The label follows the reader. It used to be the Russian form for everyone,
+    // which is how an English player got '[Exits: west | трап]'. Only the Russian
+    // and Ukrainian short descriptions carry case pads, so ruscase is for them.
+    DLString name;
+    if (prefereShortDescr) {
+        name = eexit->short_desc_from.getForLang(lg);
+        if (lg != LANG_EN)
+            name = name.ruscase('1');
+    }
+    if (name.empty())
+        name = (lg == LANG_EN && !kw_en.empty()) ? kw_en
+             : (kw_ru.empty() ? kw_en : kw_ru);
 
-    DLString cmd = kw_ru.empty() ? "идти " + kw_en : "идти " + kw_ru;        
-    return web_cmd(ch, cmd, nameRus);
+    // The command is left in Russian on purpose: it goes back to the parser from
+    // the web client, and the Russian keyword is the form every player's parser
+    // resolves today. Same reasoning as cmd_exit below, which is deliberately
+    // 2-valued for exactly this reason.
+    DLString cmd = kw_ru.empty() ? "идти " + kw_en : "идти " + kw_ru;
+    return web_cmd(ch, cmd, name);
 }
 
 /**
