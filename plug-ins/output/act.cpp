@@ -547,7 +547,11 @@ void hint_fmt(Character *ch, const char *format, ...)
     DLString output = vfmt(ch, format, av);
     va_end(av);
 
-    ch->pecho("{y[{GПодсказка{y]{x " + output);
+    // The label follows the reader, like the hint itself. Was a hardcoded
+    // Russian prefix, so English and Ukrainian newbies got Cyrillic here.
+    ch->pecho(DLString(lmsg(viewerLang(ch), "{y[{GHint{y]{x ",
+                             "{y[{GПодсказка{y]{x ",
+                             "{y[{GПідказка{y]{x ")) + output);
 }
 
 void echo_master(Character *ch, const char *format, ...)
@@ -623,7 +627,11 @@ void hint_fmt(Character *ch, const MultiMessage &format, ...)
     DLString output = vfmt(ch, format.getMessage(ch).c_str(), av);
     va_end(av);
 
-    ch->pecho("{y[{GПодсказка{y]{x " + output);
+    // The label follows the reader, like the hint itself. Was a hardcoded
+    // Russian prefix, so English and Ukrainian newbies got Cyrillic here.
+    ch->pecho(DLString(lmsg(viewerLang(ch), "{y[{GHint{y]{x ",
+                             "{y[{GПодсказка{y]{x ",
+                             "{y[{GПідказка{y]{x ")) + output);
 }
 
 void echo_master(Character *ch, const MultiMessage &format, ...)
