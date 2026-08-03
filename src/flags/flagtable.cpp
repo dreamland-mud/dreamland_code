@@ -85,6 +85,26 @@ int FlagTable::index( const DLString &arg, bool strict ) const
                 return i;
     }
 
+    // Ukrainian pads run as a separate second pass rather than inside the loop
+    // above, so a UA form can never outrank an EN name or RU form that already
+    // resolves today. Only input the EN/RU pass rejects outright gets here --
+    // e.g. "тренувати статуру", where the hint prints the UA accusative and the
+    // in-binary message is Russian. russian_cases is the Flexer, so it declines
+    // a UA pad the same way.
+    for (int i = 0; i < size; i++) {
+        DLString ua = resolveMessagePad( this, fields[i], LANG_UA );
+
+        // No UA pad of its own: resolveMessagePad handed back the RU message,
+        // which the pass above already tried.
+        if (fields[i].message && ua == fields[i].message)
+            continue;
+
+        std::list<DLString> cases = russian_cases(ua);
+        for (auto &msg: cases)
+            if (arg.strPrefix(msg))
+                return i;
+    }
+
     return NO_FLAG;
 }
 
