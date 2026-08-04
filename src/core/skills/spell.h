@@ -41,7 +41,7 @@ public:
     virtual bool spellbane( Character *, Character * ) const = 0;
     // Default: no third-party-buff block; DefaultSpell provides the real logic.
     virtual bool blockedByNobuff( Character *, Character * ) const { return false; }
-    virtual void utter( Character * ) = 0;
+    virtual void utter( Character *, Character *victim = 0 ) = 0;
     virtual int getSpellLevel( Character *, int ) = 0;
 
     virtual int getBeats(Character *ch = 0) const = 0;

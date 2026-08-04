@@ -239,7 +239,7 @@ CMDRUN( cast )
         return;
     }
 
-    spell->utter( ch );
+    spell->utter( ch, victim );
 
     if (offensive) {
         UNSET_DEATH_TIME(ch);

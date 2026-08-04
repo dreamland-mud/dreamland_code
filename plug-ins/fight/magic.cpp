@@ -305,7 +305,7 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
     bool offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
 
     if (IS_SET(flags, FSPELL_VERBOSE))
-        spell->utter( ch );
+        spell->utter( ch, target->victim );
 
     if (IS_SET(flags, FSPELL_WAIT)) 
         ch->setWait( spell->getBeats(ch) );
