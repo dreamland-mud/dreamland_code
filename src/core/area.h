@@ -47,11 +47,20 @@ struct AreaIndexData {
     DLString getName(char gcase = '1') const;
     DLString getName(lang_t lang, char gcase = '1') const;
 
+    /** Particle to put in front of getName(lang, '6') to say where someone is:
+     *  "in Midgaard", "в Мидгаарде", but "on Cloudy Mountain", "на Облачной
+     *  Горе". Nothing in the name derives it -- a mountain, an island, a road
+     *  and a square all take "на"/"on" while a city takes "в"/"in" -- so it is
+     *  per-area data. Free-form, because English also carries the article here
+     *  ("on the Chessboard"). Falls back to the commonest value per language. */
+    DLString getPreposition(lang_t lang) const;
+
     XMLMultiString name; // main area name in all languages
     XMLMultiString altname; // alternative names for this area
     DLString authors;
     DLString translator;
     XMLMultiString speedwalk;
+    XMLMultiString preposition;
     int low_range;
     int high_range;
     int min_vnum;

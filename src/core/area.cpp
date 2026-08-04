@@ -64,6 +64,21 @@ DLString AreaIndexData::getName(lang_t lang, char gcase) const
     return name.getForLang(lang).ruscase(gcase);
 }
 
+DLString AreaIndexData::getPreposition(lang_t lang) const
+{
+    // get(), not getForLang(): a missing UA value must not fall back to the RU
+    // preposition, which would read as Russian inside a Ukrainian sentence.
+    const DLString &p = preposition.get(lang);
+    if (!p.empty())
+        return p;
+
+    switch (lang) {
+    case LANG_EN: return "in";
+    case LANG_UA: return "у";
+    default:      return "в";
+    }
+}
+
 Area::Area()
     : empty(true), age(15), nplayer(0),
       area_flag(0), pIndexData(0)

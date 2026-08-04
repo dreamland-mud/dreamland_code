@@ -1,6 +1,9 @@
+#include <sstream>
+
 #include "character.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "area.h"
 #include "commandtemplate.h"
 #include "wrappertarget.h"
 #include "wrapperbase.h"
@@ -27,6 +30,35 @@ static void format_where( Character *ch, Character *victim )
                 fPK  ? "({rPK{x)"  : "    ",
                 fAfk ? "[{CAFK{x]" : "     ",
                 victim->in_room->getName(viewerLang(ch)) );
+}
+
+/* "в {hh1392Мидгаарде{x", "on the {hh2001Chessboard{x": the particle is per-area
+ * data (nothing in the name tells you a mountain takes "на"/"on" while a city
+ * takes "в"/"in"), and the name is flexed into the 6th case.
+ *
+ * The anchor carries the help ID. The idless {hh form makes the client resolve
+ * the article by the anchor TEXT (mudtags.cpp, hyper_tag_start), and a declined
+ * name matches no help keyword -- so an area with no article gets no link at
+ * all rather than a dead one. */
+static DLString where_area_phrase( Character *ch )
+{
+    AreaIndexData *area = ch->in_room->areaIndex( );
+    lang_t lang = viewerLang( ch );
+    ostringstream buf;
+    int helpId = 0;
+
+    for (auto &article: area->helps)
+        if (article->getID( ) > 0) {
+            helpId = article->getID( );
+            break;
+        }
+
+    buf << area->getPreposition( lang ) << " {W";
+    if (helpId > 0)
+        buf << "{hh" << helpId;
+    buf << area->getName( lang, '6' ) << "{x";
+
+    return buf.str( );
 }
 
 static bool rprog_where( Character *ch, const char *arg )
@@ -64,10 +96,11 @@ CMDRUNP( where )
     if (rprog_where( ch, arg.c_str( ) ))
         return;
 
+    DLString areaPhrase = where_area_phrase( ch );
+
     if (arg.empty( ) || fPKonly)
     {
-        ch->pecho( _("Ты находишься в зоне {W{hh%s{x. Недалеко от тебя:"),
-                     ch->in_room->areaIndex()->getName(viewerLang(ch), '1').c_str() );
+        ch->pecho( _("Ты находишься %s. Недалеко от тебя:"), areaPhrase.c_str( ) );
         found = false;
 
         for ( d = descriptor_list; d; d = d->next )
@@ -101,6 +134,9 @@ CMDRUNP( where )
     }
     else
     {
+        // No "Недалеко от тебя" here: a name search still only covers the
+        // current area, but the matches can sit anywhere in it.
+        ch->pecho( _("Ты находишься %s."), areaPhrase.c_str( ) );
         found = false;
         for ( victim = char_list; victim != 0; victim = victim->next )
         {

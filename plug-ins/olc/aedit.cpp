@@ -42,6 +42,7 @@ OLCStateArea::OLCStateArea(AreaIndexData *original) : area_flag(0, &area_flags)
         authors = original->authors;
         translator = original->translator;
         speedwalk = original->speedwalk;
+        preposition = original->preposition;
 
         low_range = original->low_range;
         high_range= original->high_range;
@@ -101,6 +102,7 @@ void OLCStateArea::commit()
     original->translator = translator;
     original->speedwalk = speedwalk;
     original->resetMessage = resetMessage;
+    original->preposition = preposition;
     original->low_range = low_range;
     original->high_range= high_range;
     original->min_vnum  = min_vnum;
@@ -177,7 +179,11 @@ AEDIT(show, "показать", "показать все поля")
           String::stripEOL(speedwalk.get(EN)).c_str(), web_edit_button(ch, "speedwalk", "web").c_str(),   
           String::stripEOL(speedwalk.get(UA)).c_str(), web_edit_button(ch, "uaspeedwalk", "web").c_str(),   
           String::stripEOL(speedwalk.get(RU)).c_str(), web_edit_button(ch, "ruspeedwalk", "web").c_str());   
-    ptc(ch, "Message:    EN [{W%s{x] %s  UA [{W%s{x] %s  RU [{W%s{x] %s\n\r", 
+    ptc(ch, "Preposition:EN [{W%s{x] %s  UA [{W%s{x] %s  RU [{W%s{x] %s\n\r",
+          String::stripEOL(preposition.get(EN)).c_str(), web_edit_button(ch, "preposition", "web").c_str(),
+          String::stripEOL(preposition.get(UA)).c_str(), web_edit_button(ch, "uapreposition", "web").c_str(),
+          String::stripEOL(preposition.get(RU)).c_str(), web_edit_button(ch, "rupreposition", "web").c_str());
+    ptc(ch, "Message:    EN [{W%s{x] %s  UA [{W%s{x] %s  RU [{W%s{x] %s\n\r",
           String::stripEOL(resetMessage.get(EN)).c_str(), web_edit_button(ch, "message", "web").c_str(),   
           String::stripEOL(resetMessage.get(UA)).c_str(), web_edit_button(ch, "uamessage", "web").c_str(),   
           String::stripEOL(resetMessage.get(RU)).c_str(), web_edit_button(ch, "rumessage", "web").c_str());   
@@ -403,6 +409,24 @@ AEDIT(uaspeedwalk, "укмаршрут", "установить маршрут, �
 AEDIT(ruspeedwalk, "румаршрут", "установить маршрут, как добраться от Рыночной Площади")
 {
     return editor(argument, speedwalk[RU], (editor_flags)(ED_NO_NEWLINE));
+}
+
+/* Goes in front of the zone name in the 6th (locative) case: "in Midgaard",
+ * "on the Chessboard". English keeps its article here, hence a free-form string
+ * and not a flag. */
+AEDIT(preposition, "предлог", "установить предлог перед названием зоны: in, on the")
+{
+    return editor(argument, preposition[EN], (editor_flags)(ED_NO_NEWLINE));
+}
+
+AEDIT(uapreposition, "укпредлог", "установить предлог перед названием зоны: в, у, на")
+{
+    return editor(argument, preposition[UA], (editor_flags)(ED_NO_NEWLINE));
+}
+
+AEDIT(rupreposition, "рупредлог", "установить предлог перед названием зоны: в, во, на")
+{
+    return editor(argument, preposition[RU], (editor_flags)(ED_NO_NEWLINE));
 }
 
 AEDIT(flags, "флаги", "установить или сбросить флаги арии (? area_flags)")

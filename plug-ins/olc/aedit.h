@@ -33,7 +33,7 @@ public:
     XML_VARIABLE XMLFlags area_flag;
     XML_VARIABLE XMLString file_name, authors, translator;
     XML_VARIABLE XMLString behavior;
-    XML_VARIABLE XMLMultiString name, altname, resetMessage, speedwalk;
+    XML_VARIABLE XMLMultiString name, altname, resetMessage, speedwalk, preposition;
 
     template <typename T>
     bool cmd(PCharacter *ch, char *argument);
