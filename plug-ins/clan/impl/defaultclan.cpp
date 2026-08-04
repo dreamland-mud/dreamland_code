@@ -27,6 +27,13 @@ DefaultClan::DefaultClan( )
 }
 
 
+void DefaultClan::getCastMessages( StringList &self, StringList &vict, StringList &room ) const
+{
+    self = msgSelf.toList( );
+    vict = msgVict.toList( );
+    room = msgRoom.toList( );
+}
+
 ClanData * DefaultClan::getData( ) 
 {
     return data.getPointer( );

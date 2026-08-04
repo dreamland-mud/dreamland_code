@@ -16,6 +16,10 @@ Clan::~Clan( )
 {
 }
 
+void Clan::getCastMessages( StringList &, StringList &, StringList & ) const
+{
+}
+
 bool Clan::isValid( ) const
 {
     return false;

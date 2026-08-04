@@ -59,6 +59,7 @@ GROUP(benedictions);
 GROUP(curative);
 GROUP(healing);
 GROUP(combat);
+GROUP(clan);
 
 RELIG(none);
 
@@ -205,32 +206,49 @@ DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, 
     return get_char_room(ch, argVict);
 }
 
-/* Catalog file-key for the cast flavour lines. They come from skill-groups/*.xml,
- * not a cpp __FILE__, so they cannot use the _() macro; wrap them in a MultiMessage
- * under this shared key instead. A missing entry falls back to RU byte-for-byte. */
+/* Catalog file-key for every cast flavour line, whether it came from
+ * skill-groups/*.xml or clans/*.xml -- showFlavour cannot tell them apart and one
+ * key keeps identical wording from needing two entries. They are XML data, not a
+ * cpp __FILE__, so they cannot use the _() macro; wrap them in a MultiMessage under
+ * this key instead. A missing entry falls back to RU byte-for-byte. */
 static const DLString GROUPS_L10N_FILE = "skill-groups";
 
-void DefaultSpell::collectFlavours( std::vector<CastFlavour> &result ) const
+/* The three lists are index-parallel: entry N of msgSelf, msgVict and msgRoom describe
+ * the same gesture. Picking them independently would show the room one caster doing
+ * three different things, so they travel as a triple. */
+static void append_flavours( const StringList &self, const StringList &vict,
+                             const StringList &room, std::vector<DefaultSpell::CastFlavour> &result )
+{
+    for (unsigned int i = 0; i < self.size( ); i++) {
+        DefaultSpell::CastFlavour f;
+        f.self = self[i];
+        f.vict = i < vict.size( ) ? vict[i] : DLString::emptyString;
+        f.room = i < room.size( ) ? room[i] : DLString::emptyString;
+        result.push_back( f );
+    }
+}
+
+void DefaultSpell::collectFlavours( Character *ch, std::vector<CastFlavour> &result ) const
 {
     for (auto g: const_cast<Skill *>(*skill)->getGroups( ).toArray( )) {
         DefaultSkillGroup *group = dynamic_cast<DefaultSkillGroup *>(skillGroupManager->find( g ));
         if (!group)
             continue;
 
-        // The three lists are index-parallel: entry N of msgSelf, msgVict and msgRoom
-        // describe the same gesture. Picking them independently would show the room one
-        // caster doing three different things, so they travel as a triple.
-        StringList self = group->msgSelf.toList( );
-        StringList vict = group->msgVict.toList( );
-        StringList room = group->msgRoom.toList( );
-
-        for (unsigned int i = 0; i < self.size( ); i++) {
-            CastFlavour f;
-            f.self = self[i];
-            f.vict = i < vict.size( ) ? vict[i] : DLString::emptyString;
-            f.room = i < room.size( ) ? room[i] : DLString::emptyString;
-            result.push_back( f );
+        // The 'clan' group spans rulers, shapeshifters, shadow walkers and Shalafi
+        // mages, so its own lines can only say something generic. When the caster's
+        // clan carries its own gestures, they win for that group.
+        if (g == group_clan && ch->getClan( )) {
+            StringList self, vict, room;
+            ch->getClan( )->getCastMessages( self, vict, room );
+            if (!self.empty( )) {
+                append_flavours( self, vict, room, result );
+                continue;
+            }
         }
+
+        append_flavours( group->msgSelf.toList( ), group->msgVict.toList( ),
+                         group->msgRoom.toList( ), result );
     }
 }
 
@@ -257,7 +275,7 @@ void DefaultSpell::showFlavour( Character *ch, Character *victim, const CastFlav
 void DefaultSpell::utter( Character *ch, Character *victim )
 {
     std::vector<CastFlavour> flavours;
-    collectFlavours( flavours );
+    collectFlavours( ch, flavours );
 
     // A prayer keeps its own line in the same pool as the group flavours, so a cleric
     // still names their god about as often as they show a gesture (Trello 1518).

@@ -98,13 +98,14 @@ public:
     XML_VARIABLE XMLFlagsNoEmpty damflags; // additional flags other than DAMF_SPELL
     XML_VARIABLE XMLStringList messages; // utterances
 
-protected:
+public:
     /** One index-aligned line triple out of a skill group's msgSelf/msgVict/msgRoom. */
     struct CastFlavour {
         DLString self, vict, room;
     };
 
-    void collectFlavours( std::vector<CastFlavour> & ) const;
+protected:
+    void collectFlavours( Character *ch, std::vector<CastFlavour> & ) const;
     void showFlavour( Character *ch, Character *victim, const CastFlavour & ) const;
     /** The old garbled-words line, still the fallback when no group has messages. */
     void utterGarbled( Character *ch );
