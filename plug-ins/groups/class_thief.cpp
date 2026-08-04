@@ -99,7 +99,6 @@ void BackstabOneHit::calcDamage( )
 {
     damBase( );
     damapply_class(ch, dam);
-    damApplyPosition( );
     damApplyDamroll( );
 
     if (wield != 0) {
@@ -138,7 +137,6 @@ void DualBackstabOneHit::calcDamage( )
 {
     damBase( );
     damapply_class(ch, dam);
-    damApplyPosition( );
     damApplyDamroll( );
 
     if (wield != 0) {
@@ -175,7 +173,6 @@ void CircleOneHit::calcDamage( )
 {
     damBase( );
     damapply_class(ch, dam);
-    damApplyPosition( );
     damApplyDamroll( );
 
     int slevel = skill_level(*gsn_circle, ch);    
@@ -206,7 +203,6 @@ void KnifeOneHit::calcDamage( )
 {
     damBase( );
     damapply_class(ch, dam);
-    damApplyPosition( );
     damApplyDamroll( );
 
     int slevel = skill_level(*gsn_knife, ch);    

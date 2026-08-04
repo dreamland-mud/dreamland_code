@@ -73,7 +73,6 @@ void CleaveOneHit::calcDamage( )
     
     damBase( );
     damapply_class(ch, dam);
-    damApplyPosition( );
 
     if (victim->is_immortal( ))
         chance = 0;

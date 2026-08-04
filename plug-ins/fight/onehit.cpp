@@ -66,7 +66,12 @@ void OneHit::hit( )
         return;
         
     calcDamage( );
-   
+
+    // The position bonus used to be pasted into eleven separate calcDamage overrides,
+    // and every path that forgot it simply did not have it. Applying it here means it
+    // lands exactly once, on every melee hit, after all multipliers and protections.
+    damApplyPosition( );
+
     if (!canDamage( ))
         return;
 
@@ -363,10 +368,22 @@ void OneHit::acApplyPosition( )
  *----------------------------------------------------------------------------*/
 void OneHit::damApplyPosition( )
 {
-    if ( !IS_AWAKE(victim) )
-        dam *= 2;
-    else if (victim->position < POS_FIGHTING)
-        dam = dam * 3 / 2;
+    int num = 1, den = 1;
+
+    if ( !IS_AWAKE(victim) ) {
+        num = 2;
+    }
+    else if (victim->position < POS_FIGHTING) {
+        num = 3;
+        den = 2;
+    }
+
+    dam = dam * num / den;
+
+    // orig_dam is the pre-protection damage the vampire's life drain is based on.
+    // damNormalize sets it and has already run by the time we get here, so it takes
+    // the same multiplier -- otherwise a bite on a sleeper deals double and drains single.
+    orig_dam = orig_dam * num / den;
 }
 
 void OneHit::damApplyDamroll( )

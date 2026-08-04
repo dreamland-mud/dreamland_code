@@ -60,7 +60,6 @@ void TricksterGodOneHit::calcDamage( )
 {
     damBase( );
     damapply_class(ch, dam);
-    damApplyPosition( );
     dam = (ch->getModifyLevel( ) / 30 + 1) * dam + ch->getModifyLevel( );
     damApplyDamroll( );
     damApplyCounter( );

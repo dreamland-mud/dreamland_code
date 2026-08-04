@@ -462,7 +462,6 @@ void AmbushOneHit::calcDamage( )
 {
     damBase( );
     damapply_class(ch, dam);
-    damApplyPosition( );
     damApplyDamroll( );
     dam *= 3;
 
