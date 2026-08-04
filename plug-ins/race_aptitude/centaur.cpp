@@ -75,7 +75,6 @@ void RearKickOneHit::calcDamage( )
 
     damBase( ); 
     damapply_class(ch, dam);
-    damApplyPosition( );
     dam = (level < 50)
         ? (level / 10 + 1) * dam + level
         : (level / 10 ) * dam + level;
