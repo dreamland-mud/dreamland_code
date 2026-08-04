@@ -109,9 +109,14 @@ bool CommunicationChannel::checkIsolator( Character *ch, Character *victim ) con
 }
 
 
+DLString CommunicationChannel::localized( const DLString &format, Character *reader ) const
+{
+    return MultiMessage( format, CHANNELS_L10N_FILE ).getMessage( reader );
+}
+
 DLString CommunicationChannel::outputSelf( Character *ch, const DLString &format, const DLString &msg ) const
 {
-    DLString localFormat = MultiMessage( format, CHANNELS_L10N_FILE ).getMessage( ch );
+    DLString localFormat = localized( format, ch );
     DLString message = fmt( ch, localFormat.c_str( ), ch, msg.c_str( ) );
     return message;
 }
@@ -119,7 +124,7 @@ DLString CommunicationChannel::outputSelf( Character *ch, const DLString &format
 DLString CommunicationChannel::outputVict( Character *ch, Character *victim,
                                 const DLString &format, const DLString &msg ) const
 {
-    DLString localFormat = MultiMessage( format, CHANNELS_L10N_FILE ).getMessage( victim );
+    DLString localFormat = localized( format, victim );
     DLString message = fmt( victim, localFormat.c_str( ), ch, msg.c_str( ), victim );
     return message;
 }
@@ -127,7 +132,7 @@ DLString CommunicationChannel::outputVict( Character *ch, Character *victim,
 DLString CommunicationChannel::outputChar( Character *ch, Character *victim,
                                   const DLString &format, const DLString &msg ) const
 {
-    DLString localFormat = MultiMessage( format, CHANNELS_L10N_FILE ).getMessage( ch );
+    DLString localFormat = localized( format, ch );
     DLString message = fmt( ch, localFormat.c_str( ), ch, msg.c_str( ), victim );
     return message;
 }

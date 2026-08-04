@@ -54,29 +54,29 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
     Listeners listeners;
     
     if (!msgDisable.empty( )) {
-        ch->pecho( msgDisable );
+        ch->pecho( localized( msgDisable, ch ) );
         return;
     }
-    
+
     if (arg.empty( ) && msgOtherNoarg.empty( )) {
         if (off == 0 && !msgSelfNoarg.empty( )) {
-            ch->pecho( msgSelfNoarg );
+            ch->pecho( localized( msgSelfNoarg, ch ) );
             return;
         }
-        
+
         TOGGLE_BIT(ch->comm, off);
 
         if (!IS_SET(ch->comm, off)) {
             if (msgOn.empty( ))
                 ch->pecho( _("Канал %s теперь включен."), getName( ).c_str( ) );
             else
-                ch->pecho( msgOn );
+                ch->pecho( localized( msgOn, ch ) );
         }
         else {
             if (msgOff.empty( ))
                 ch->pecho( _("Канал %s теперь выключен."), getName( ).c_str( ) );
             else
-                ch->pecho( msgOff );
+                ch->pecho( localized( msgOff, ch ) );
         }
 
         return;
@@ -216,7 +216,7 @@ bool GlobalChannel::checkNoChannel( Character *ch ) const
     
     if (has_nochannel( ch )) {
         if (!msgNochan.empty( ))
-            ch->pecho( msgNochan );
+            ch->pecho( localized( msgNochan, ch ) );
         else
             ch->pecho( _("Боги лишили тебя возможности общаться.") );
         

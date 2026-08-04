@@ -92,7 +92,7 @@ bool ReplyChannel::parseArguments( Character *ch, const DLString &constArguments
     msg = constArguments;
 
     if (msg.empty( )) {
-        ch->pecho( msgNoArg );
+        ch->pecho( localized( msgNoArg, ch ) );
         return false;
     }
 
