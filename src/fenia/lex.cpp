@@ -39,6 +39,18 @@ Lex::resolve(const DLString &s)
     return lastid++;
 }
 
+bool
+Lex::find(const DLString &s, id_t &id) const
+{
+    std::map<DLString, id_t>::const_iterator i = str2id.find(s);
+
+    if(i == str2id.end())
+        return false;
+
+    id = i->second;
+    return true;
+}
+
 Lex *
 Lex::getThis()
 {
