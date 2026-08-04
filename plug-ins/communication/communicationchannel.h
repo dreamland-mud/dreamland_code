@@ -27,6 +27,10 @@ protected:
 
     virtual void applyGarble( Character *, DLString & ) const;
 
+    /** Resolve a channels.xml message in the reader's own language. Every message
+     *  taken straight from the XML has to go through here, not to pecho raw. */
+    DLString localized( const DLString &format, Character *reader ) const;
+
     virtual DLString outputVict( Character *, Character *, const DLString &, const DLString & ) const;
     virtual DLString outputChar( Character *, Character *, const DLString &, const DLString & ) const;
     virtual DLString outputSelf( Character *, const DLString &, const DLString & ) const;

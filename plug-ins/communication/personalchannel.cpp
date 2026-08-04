@@ -225,12 +225,12 @@ bool PersonalChannel::parseArguments( Character *ch, const DLString &constArgume
     name = msg.getOneArgument( );
 
     if (name.empty( )) {
-        ch->pecho( msgNoName );
+        ch->pecho( localized( msgNoName, ch ) );
         return false; 
     }
 
     if (msg.empty( )) {
-        ch->pecho( msgNoArg );
+        ch->pecho( localized( msgNoArg, ch ) );
         return false;
     }
 
