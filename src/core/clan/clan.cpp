@@ -68,6 +68,10 @@ const DLString &Clan::getShortFor( lang_t ) const
 {
     return DLString::emptyString;
 }
+const DLString &Clan::getLongNameFor( lang_t ) const
+{
+    return getLongName( );
+}
 
 const DLString& Clan::getChannelPattern() const
 {

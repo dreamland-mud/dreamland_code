@@ -47,6 +47,11 @@ public:
     virtual const DLString &getEnglishName( ) const;
     virtual const DLString &getNameFor( lang_t ) const;
     virtual const DLString &getShortFor( lang_t ) const;
+
+    /** The descriptive line `clan list` puts beside the name ("Defenders of Good
+     *  and Light"). Carries a {hh help link, whose vnum is the same in every
+     *  language -- only the anchor text is translated. */
+    virtual const DLString &getLongNameFor( lang_t ) const;
     
     /** Cast flavour shown when a member casts one of this clan's own spells.
      *  Three index-parallel lists; all empty means fall back to the skill group. */

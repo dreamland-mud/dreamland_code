@@ -209,6 +209,15 @@ const DLString &DefaultClan::getLongName( ) const
 {
     return longName.getValue( );
 }
+const DLString &DefaultClan::getLongNameFor( lang_t lang ) const
+{
+    if (lang == LANG_EN && !longNameEn.getValue( ).empty( ))
+        return longNameEn.getValue( );
+    if (lang == LANG_UA && !longNameUa.getValue( ).empty( ))
+        return longNameUa.getValue( );
+
+    return longName.getValue( );
+}
 const DLString &DefaultClan::getColor( ) const
 {
     return color.getValue( );

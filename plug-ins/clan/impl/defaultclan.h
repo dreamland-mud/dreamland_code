@@ -42,6 +42,7 @@ public:
     virtual const DLString &getUkrainianName( ) const;
     virtual const DLString &getEnglishName( ) const;
     virtual const DLString &getShortFor( lang_t ) const;
+    virtual const DLString &getLongNameFor( lang_t ) const;
     virtual const DLString &getShortName( ) const;
     virtual const DLString &getLongName( ) const;
     virtual const DLString &getColor( ) const;
@@ -74,6 +75,7 @@ protected:
     XML_VARIABLE XMLString shortName, longName, padName, nameRus, nameUa, nameEn;
     // Short forms carry no colour and no padding: the bracket column adds both.
     XML_VARIABLE XMLString shortRus, shortUa, shortEn;
+    XML_VARIABLE XMLString longNameEn, longNameUa;
     XML_VARIABLE XMLString color;
     XML_VARIABLE XMLString channelPattern;
 
