@@ -188,7 +188,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         }
 
         // Unknown garbage.
-        buf << fmt(0, 
+        buf << fmt(ch,
             _("Неверный параметр '%1$s', подходящие фильтры: "
             "заклинания, навыки, пассивные, "
             "активные, название группы умений, диапазон уровней.\r\n"), t.c_str());
@@ -310,13 +310,13 @@ void AllSkillsList::display( std::ostream & buf )
     buf << "{W=========================================================="
         << (bool_long_name ? "{x" : "====================={x")
         << endl
-        << fmt(0, (bool_long_name ? 
+        << fmt(0, (bool_long_name ?
                        "%7s| %-30s| %-7s |%4s{W|{x " :
                        "%7s| %-18s| %-7s |%4s{W|{x "),
-                      "Уровень", "Умение", "Изучено", "Мана" )
-        << fmt(0, (bool_long_name ? 
+                      l(ch, "Уровень"), l(ch, "Умение"), l(ch, "Изучено"), l(ch, "Мана") )
+        << fmt(0, (bool_long_name ?
                        "" : "%-18s| %-7s |%4s"),
-                     "Умение", "Изучено", "Мана")
+                     l(ch, "Умение"), l(ch, "Изучено"), l(ch, "Мана"))
         << endl
         << (bool_long_name ?
             "{W-------+----------------------------------+---------+----+{x" : 
@@ -376,12 +376,12 @@ void AllSkillsList::display( std::ostream & buf )
     if (!firstColumn) 
         buf << "                   |         |" << endl;
 
-    buf << fmt(0, 
+    buf << fmt(ch,
         _("Также используй фильтры "
         "{y{hc%1$s заклинания{x, {y{hc%1$s навыки{x, {y{hc%1$s пассивные{x, "
         "{y{hc%1$s активные{x, группа умений и диапазон уровней (например, 10 или 10 42)\r\n"), mycmd.c_str());
 
-    buf << endl << "См. также {y{hc" << mycmd << " ?{x." << endl;
+    buf << endl << fmt(ch, _("См. также {y{hc%1$s ?{x."), mycmd.c_str()) << endl;
 }
 
 /*
@@ -413,7 +413,9 @@ CMDRUN( skills )
     AllSkillsList slist;
     std::basic_ostringstream<char> buf;
     
-    slist.mycmd = getRussianName();
+    // The usage hints below name the command back to the reader, so it has to
+    // be the spelling their own language accepts, not always the Russian one.
+    slist.mycmd = getNameFor(viewerLang(ch));
 
     if (!slist.parse( argument, buf, ch )) {
         ch->send_to( buf );

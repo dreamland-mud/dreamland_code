@@ -294,7 +294,8 @@ bool GenericSkill::canPractice( PCharacter *ch, std::ostream & buf ) const
         return false;
     
     if (ch->getSkillData(getIndex()).isTemporary()) {
-        buf << "Ты уже знаешь '" << getNameFor(ch) << "' так хорошо, как только можешь." << endl;
+        buf << fmt(ch, _("Ты уже знаешь '%1$s' так хорошо, как только можешь."),
+                   getNameFor(ch).c_str()) << endl;
         return false;
     }
     
@@ -349,26 +350,37 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
 
     const PCSkillData &data = ch->getSkillData(getIndex());
     int percent = data.learned;
+    // The learned percentage carries its own colour code, so it is assembled
+    // separately and handed to the sentence as a plain argument: the colour
+    // letter varies and has no place in a translatable format string.
     if (temporary_skill_active(this, ch)) {
+        ostringstream learnedBuf;
+        learnedBuf << "{C" << percent << "%{x";
+        DLString learned = learnedBuf.str();
+
         if (data.origin == SKILL_DREAM)
-            buf << pad << "Приснилось тебе";
+            buf << pad << fmt(ch, _("Приснилось тебе разученное до %1$s"), learned.c_str());
         else
-            buf << pad << "Досталось тебе";
-        buf << " разученное до {C" << percent << "%{x"
-            << skill_effective_bonus(this, ch) << "." << endl;
+            buf << pad << fmt(ch, _("Досталось тебе разученное до %1$s"), learned.c_str());
+
+        buf << skill_effective_bonus(this, ch) << "." << endl;
         fillRacesClassesInfo();
         return;
     }
 
     if (!available(ch)) {
-        buf << pad << "Станет доступно тебе на уровне {C" << getLevel(ch) << "{x." << endl;
+        buf << pad << fmt(ch, _("Станет доступно тебе на уровне {C%1$d{x."), getLevel(ch)) << endl;
     } else {
-        buf << pad << "Доступно тебе с уровня {C" << getLevel(ch) << "{x, ";
-        if (percent < 2) 
-            buf << "пока не изучено";
-        else 
-            buf << "изучено на {" << skill_learned_colour(this, ch) << percent << "%{x";
-        
+        if (percent < 2) {
+            buf << pad << fmt(ch, _("Доступно тебе с уровня {C%1$d{x, пока не изучено"), getLevel(ch));
+        } else {
+            ostringstream learnedBuf;
+            learnedBuf << "{" << skill_learned_colour(this, ch) << percent << "%{x";
+            DLString learned = learnedBuf.str();
+            buf << pad << fmt(ch, _("Доступно тебе с уровня {C%1$d{x, изучено на %2$s"),
+                              getLevel(ch), learned.c_str());
+        }
+
         buf << skill_effective_bonus(this, ch) << "." << endl;
     }
 
