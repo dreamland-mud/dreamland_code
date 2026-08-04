@@ -59,6 +59,15 @@ bool oprog_get( Object *obj, Character *ch )
     return false;
 }
 
+bool oprog_give_blocked( Object *obj, Character *ch, Character *victim )
+{
+    for (auto &paf: obj->affected.findAllWithHandler())
+        if (paf->type->getAffect() && paf->type->getAffect()->onGive(SpellTarget::Pointer(NEW, obj), paf, ch, victim))
+            return true;
+
+    return false;
+}
+
 bool oprog_drop( Object *obj, Character *ch )
 {
     if (behavior_trigger(obj, "Drop", "OC", obj, ch))

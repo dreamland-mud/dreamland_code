@@ -141,6 +141,11 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
         }
     }
 
+    // Last gate before the item moves: an affect on the item can refuse the
+    // hand-off and echo its own reason. See affect/incandescent/onGive.
+    if ( oprog_give_blocked( obj, ch, victim ) )
+        return;
+
     obj_from_char( obj );
     obj_to_char( obj, victim );
 

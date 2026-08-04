@@ -33,6 +33,8 @@ public:
     bool onHit(const SpellTarget::Pointer &target, Affect *paf, Character *attacker, int dam, const char *damType, Object *wield);
     bool onRemove(const SpellTarget::Pointer &target, Affect *paf);
     bool onGet(const SpellTarget::Pointer &target, Affect *paf, Character *actor);
+    /** Called before an affected item changes hands. Returning true cancels the give. */
+    bool onGive(const SpellTarget::Pointer &target, Affect *paf, Character *actor, Character *victim);
     bool onSpec(const SpellTarget::Pointer &target, Affect *paf);
     bool onPourOut(const SpellTarget::Pointer &target, Affect *paf, Character *actor, Object *out, const char *liqname, int amount);
     bool onUpdate(const SpellTarget::Pointer &target, Affect *paf);
