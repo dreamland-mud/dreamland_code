@@ -52,6 +52,7 @@ XMLAreaHeader::init(AreaIndexData *a)
     translator = a->translator;
     speedwalk = a->speedwalk;
     resetMessage = a->resetMessage;
+    preposition = a->preposition;
 
     security.setValue(a->security);
     
@@ -94,6 +95,7 @@ XMLAreaHeader::compat(area_file *areaFile)
     a->translator = translator;
     a->speedwalk= speedwalk;
     a->resetMessage = resetMessage;
+    a->preposition = preposition;
 
     a->security = security.getValue( );
     
