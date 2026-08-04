@@ -7,6 +7,7 @@
 
 #include "globalregistryelement.h"
 #include "stringlist.h"
+#include "lang.h"
 
 class Character;
 class PCharacter;
@@ -34,6 +35,18 @@ public:
     virtual const DLString &getColor( ) const;
     virtual const DLString &getPaddedName( ) const;
     virtual const DLString &getChannelPattern( ) const;
+
+    /** A clan answers to two display names in each language: the ceremonial one
+     *  ("Invaders Cabal", declinable in ru/ua) and the short one an audience
+     *  already knows it by ("Invaders"). Neither is getName(), which is the
+     *  identity key that pfiles and diplomacy maps are written in.
+     *  getRussianName()/getUkrainianName() come from GlobalRegistryElement and
+     *  hold the ceremonial forms; English needs its own accessor because a
+     *  registry element's getName() is normally the English name, and here it
+     *  is not. Both selectors fall back to Russian rather than to nothing. */
+    virtual const DLString &getEnglishName( ) const;
+    virtual const DLString &getNameFor( lang_t ) const;
+    virtual const DLString &getShortFor( lang_t ) const;
     
     /** Cast flavour shown when a member casts one of this clan's own spells.
      *  Three index-parallel lists; all empty means fall back to the skill group. */

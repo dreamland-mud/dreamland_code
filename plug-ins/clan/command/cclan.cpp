@@ -41,15 +41,39 @@ CLAN(none);
 
 using namespace std;
 
-// Display-only Title Case for the EN clan name from the shortName tag (always
-// populated). NEVER from getName() -- that is the clan identity key (pfiles,
-// diplomacy maps). Fed to the %w LangText for per-viewer / Discord=EN rendering.
-static DLString clanNameEn( const DLString &shortName )
+/* Width of the fixed-width clan cell in the language being rendered. Russian
+ * measures the authored padName, so its column keeps the width it has always
+ * had; the other languages size themselves to their own longest short name --
+ * every Russian and Ukrainian one fits 11 columns, but English needs 15 for
+ * "Flower Children". */
+static size_t clanColumnWidth( lang_t lang )
 {
-    DLString n = shortName;
-    if (n.find_first_of("abcdefghijklmnopqrstuvwxyz") == DLString::npos)
-        return n.capitalize( );
-    return n;
+    size_t width = 0;
+    ClanManager *cm = ClanManager::getThis( );
+
+    for (int i = 0; i < cm->size( ); i++) {
+        Clan *clan = cm->find( i );
+        size_t len = (lang == LANG_RU
+                        ? clan->getPaddedName( ).colourStrip( ).size( )
+                        : clan->getShortFor( lang ).size( ));
+        if (len > width)
+            width = len;
+    }
+
+    return width;
+}
+
+/* The cell itself, right-aligned like the authored Russian one. Russian returns
+ * that string verbatim rather than rebuilding it, so its output cannot drift. */
+static DLString clanPaddedName( Clan *clan, lang_t lang )
+{
+    if (lang == LANG_RU)
+        return clan->getPaddedName( );
+
+    DLString name = clan->getShortFor( lang );
+    size_t width = clanColumnWidth( lang );
+
+    return DLString( string( width > name.size( ) ? width - name.size( ) : 0, ' ' ) ) + name;
 }
 
 #define OBJ_VNUM_DIAMOND          3377
@@ -176,7 +200,7 @@ void CClan::clanList( PCharacter* pc )
         if (!clan->isHidden( )) {
             basic_ostringstream<char> buf;                                          
             buf << setw( 40 ) << clan->getLongName( ) << " [{"
-                << clan->getColor( ) << clan->getPaddedName( ) 
+                << clan->getColor( ) << clanPaddedName( clan, viewerLang(pc) ) 
                 << "{x]" << endl;
             pc->send_to( buf );
         }
@@ -215,7 +239,7 @@ void CClan::clanCount( PCharacter* pc )
         if (!clan->isHidden( )) {
             basic_ostringstream<char> buf;
             buf << "  [{" << clan->getColor( )
-                << clan->getPaddedName( ) << "{x] "
+                << clanPaddedName( clan, viewerLang(pc) ) << "{x] "
                 << setw( 5 ) << counts[i] << endl;
             pc->send_to( buf );
         }
@@ -236,7 +260,7 @@ void CClan::clanRating( PCharacter* pc )
         
         if (!clan->isHidden( ) && clan->getData( )) {
             basic_ostringstream<char> buf;                                          
-            buf << "  [{" << clan->getColor( ) << clan->getPaddedName( ) 
+            buf << "  [{" << clan->getColor( ) << clanPaddedName( clan, viewerLang(pc) ) 
                 << "{x] " << setw( 5 ) << clan->getData( )->rating << endl;
             pc->send_to( buf );
         }
@@ -260,7 +284,7 @@ void CClan::clanStatus( PCharacter* pc )
         if (clan->isHidden( ) || !cd)
             continue;
         
-        buf << "  [{" << clan->getColor( ) << clan->getPaddedName( ) << "{x]{C";
+        buf << "  [{" << clan->getColor( ) << clanPaddedName( clan, viewerLang(pc) ) << "{x]{C";
         
         for (int j = 0; j < 5; j++)
             buf << " " << setw( 5 ) << cd->victory[j] 
@@ -983,7 +1007,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
 
     // Notify about level upgrades otherwise noticeable in 'who'.
     if (oldLevel < i && clan.isRecruiter(victim)) {
-        DLString cnEn = clanNameEn(clan.getShortName());
+        DLString cnEn = clan.getNameFor(LANG_EN);
         DLString cnRu = clan.getRussianName().ruscase('2');
         DLString cnUa = clan.getUkrainianName().ruscase('2');
         LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
@@ -1249,7 +1273,7 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
         if (!found)
             pc->pecho(_("(сейчас в мире нет никого из руководства этого клана)"));
 
-        DLString cnEn = clanNameEn(clan->getShortName());
+        DLString cnEn = clan->getNameFor(LANG_EN);
         DLString cnRu = clan->getRussianName().ruscase('4');
         DLString cnUa = clan->getUkrainianName().ruscase('4');
         LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
@@ -1344,7 +1368,7 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
             send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim));
         }
         else {
-            DLString cnEn = clanNameEn(clan.getShortName());
+            DLString cnEn = clan.getNameFor(LANG_EN);
             DLString cnRu = clan.getRussianName().ruscase('4');
             DLString cnUa = clan.getUkrainianName().ruscase('4');
             LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
@@ -1443,7 +1467,9 @@ void CClan::clanDiplomacyShow( PCharacter *pc )
     }
 
     pc->pecho(_("Клановая дипломатия :"));
-    buf << "********** ";
+    // Same cell as the row labels below (one short, as it always has been).
+    size_t gridWidth = clanColumnWidth( viewerLang(pc) );
+    buf << string( gridWidth > 0 ? gridWidth - 1 : 0, '*' ) << ' ';
     
     for (int i = 0; i < cm->size( ); i++) {
         clan = cm->find( i );
@@ -1465,7 +1491,7 @@ void CClan::clanDiplomacyShow( PCharacter *pc )
         data = clan->getData( );
         
         if (data && clan->hasDiplomacy( )) {
-            buf << clan->getPaddedName( ) << ' ';
+            buf << clanPaddedName( clan, viewerLang(pc) ) << ' ';
             
             for (int j = 0; j < cm->size( ); j++) {
                 Clan *c = cm->find( j );

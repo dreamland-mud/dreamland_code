@@ -185,6 +185,22 @@ const DLString &DefaultClan::getUkrainianName( ) const
 {
     return nameUa;
 }
+const DLString &DefaultClan::getEnglishName( ) const
+{
+    return nameEn;
+}
+const DLString &DefaultClan::getShortFor( lang_t lang ) const
+{
+    if (lang == LANG_EN && !shortEn.getValue( ).empty( ))
+        return shortEn.getValue( );
+    if (lang == LANG_UA && !shortUa.getValue( ).empty( ))
+        return shortUa.getValue( );
+    if (!shortRus.getValue( ).empty( ))
+        return shortRus.getValue( );
+
+    // Nothing authored: the identity key beats an empty column.
+    return getName( );
+}
 const DLString &DefaultClan::getShortName( ) const
 {
     return shortName.getValue( );
