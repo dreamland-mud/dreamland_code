@@ -169,6 +169,17 @@ bool AffectHandler::onGet(const SpellTarget::Pointer &target, Affect *paf, Chara
     return false;
 }
 
+bool AffectHandler::onGive(const SpellTarget::Pointer &target, Affect *paf, Character *actor, Character *victim)
+{
+    AffectHandler *ah = this;
+
+    if (target->type != SpellTarget::OBJECT)
+        return false;
+
+    FENIA_CALL(ah, "Give", "OACC", target->obj, paf, actor, victim);
+    return false;
+}
+
 bool AffectHandler::onSpec(const SpellTarget::Pointer &target, Affect *paf) 
 {
     AffectHandler *ah = this;
