@@ -463,8 +463,12 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
             wch["race"]["en"] = victim->getRace()->getName();
             wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim).ruscase('1');
 
-            if (victim->getClan() != clan_none && victim->getClan()->isValid())
-                wch["clan"]["en"] = victim->getClan()->getRussianName().ruscase('1').colourStrip();
+            if (victim->getClan() != clan_none && victim->getClan()->isValid()) {
+                // The "en" slot used to hold the Russian ceremonial name -- the
+                // clan was the one field on this list with no English form.
+                wch["clan"]["en"] = victim->getClan()->getNameFor(LANG_EN).colourStrip();
+                wch["clan"]["ru"] = victim->getClan()->getRussianName().ruscase('1').colourStrip();
+            }
 
             if (!victim->getPretitle().empty())
                 wch["pretitle"]["en"] = victim->getPretitle().colourStrip();

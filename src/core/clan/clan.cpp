@@ -45,6 +45,29 @@ const DLString &Clan::getPaddedName( ) const
 {
     return DLString::emptyString;
 }
+const DLString &Clan::getEnglishName( ) const
+{
+    return DLString::emptyString;
+}
+const DLString &Clan::getNameFor( lang_t lang ) const
+{
+    if (lang == LANG_EN) {
+        const DLString &en = getEnglishName( );
+        if (!en.empty( ))
+            return en;
+    }
+    if (lang == LANG_UA) {
+        const DLString &ua = getUkrainianName( );
+        if (!ua.empty( ))
+            return ua;
+    }
+
+    return getRussianName( );
+}
+const DLString &Clan::getShortFor( lang_t ) const
+{
+    return DLString::emptyString;
+}
 
 const DLString& Clan::getChannelPattern() const
 {

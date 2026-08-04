@@ -187,23 +187,32 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
     PCSkillData &data = ch->getSkillData( getIndex( ) );    
     const char *pad = SKILL_INFO_PAD;
 
-    buf << print_what(this, ch) << " "
-        << print_names_for(this, ch)
-        << ", навык ";
+    lang_t lang = viewerLang(ch);
 
     for (i = clans.begin( ); i != clans.end( ); i++) {
         Clan *clan = ClanManager::getThis( )->find( i->first );
-        
-        if (clan->isValid())
-            clanNames.push_back(clan->getRussianName( ).ruscase('2'));
+
+        if (!clan->isValid())
+            continue;
+
+        // Russian and Ukrainian put the clan in the genitive; the English
+        // ceremonial name is stored undeclined and has no case to render.
+        DLString name = clan->getNameFor( lang );
+        if (lang != LANG_EN)
+            name = name.ruscase('2');
+
+        clanNames.push_back(name);
     }
 
+    buf << print_what(this, ch) << " "
+        << print_names_for(this, ch);
+
     if (clanNames.empty())
-        buf << "неизвестного клана";
+        buf << l(ch, ", навык неизвестного клана");
     else
-        buf << clanNames.join(", ");
-    
-    buf << "{" << SKILL_HEADER_BG << ".{x" << endl; 
+        buf << fmt(ch, _(", навык %1$s"), clanNames.join(", ").c_str());
+
+    buf << "{" << SKILL_HEADER_BG << ".{x" << endl;
 
     buf << printWaitAndMana(ch);
 

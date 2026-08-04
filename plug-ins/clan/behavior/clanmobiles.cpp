@@ -32,17 +32,6 @@
 #include "def.h"
 #include "l10n.h"
 
-// Display-only Title Case for the EN clan name from the shortName tag (always
-// populated). NEVER from getName() -- that is the clan identity key. Fed to the
-// %w LangText for per-viewer / Discord=EN rendering.
-static DLString clanNameEn( const DLString &shortName )
-{
-    DLString n = shortName;
-    if (n.find_first_of("abcdefghijklmnopqrstuvwxyz") == DLString::npos)
-        return n.capitalize( );
-    return n;
-}
-
 CLAN(battlerager);
 CLAN(none);
 CLAN(flowers);
@@ -104,7 +93,7 @@ bool ClanGuard::death( Character *killer )
     if (!clanArea)
         return false;
 
-    DLString cnEn = clanNameEn(clanArea->getClan()->getShortName());
+    DLString cnEn = clanArea->getClan()->getNameFor(LANG_EN);
     DLString cnRu = clanArea->getClan()->getRussianName().ruscase('3');
     DLString cnUa = clanArea->getClan()->getUkrainianName().ruscase('3');
     LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
@@ -205,7 +194,7 @@ void ClanGuard::doNotify()
         return;
 
     ClanArea::Pointer clanArea = getClanArea();
-    DLString cnEn = clanNameEn(clanArea->getClan()->getShortName());
+    DLString cnEn = clanArea->getClan()->getNameFor(LANG_EN);
     DLString cnRu = clanArea->getClan()->getRussianName().ruscase('2');
     DLString cnUa = clanArea->getClan()->getUkrainianName().ruscase('2');
     LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
