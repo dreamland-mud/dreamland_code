@@ -6,6 +6,7 @@
 #define __CLAN_H__
 
 #include "globalregistryelement.h"
+#include "stringlist.h"
 
 class Character;
 class PCharacter;
@@ -34,6 +35,10 @@ public:
     virtual const DLString &getPaddedName( ) const;
     virtual const DLString &getChannelPattern( ) const;
     
+    /** Cast flavour shown when a member casts one of this clan's own spells.
+     *  Three index-parallel lists; all empty means fall back to the skill group. */
+    virtual void getCastMessages( StringList &self, StringList &vict, StringList &room ) const;
+
     virtual const DLString & getTitle( PCMemoryInterface * ) const;
     virtual bool isLeader( PCMemoryInterface * ) const;
     virtual bool isRecruiter( PCMemoryInterface * ) const;

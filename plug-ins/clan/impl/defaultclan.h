@@ -9,6 +9,7 @@
 #include "xmllimits.h"
 #include "xmlboolean.h"
 #include "xmlstring.h"
+#include "xmlstringlist.h"
 #include "xmlinteger.h"
 #include "dlxmlloader.h"
 
@@ -59,6 +60,7 @@ public:
     virtual bool isLeader( PCMemoryInterface * ) const;
     virtual bool isRecruiter( PCMemoryInterface * ) const;
     virtual bool canInduct( PCharacter * ) const;
+    virtual void getCastMessages( StringList &self, StringList &vict, StringList &room ) const;
     virtual const DLString & getTitle( PCMemoryInterface * ) const;
     
     virtual void handleVictory( PCharacter *, PCharacter * );
@@ -77,6 +79,7 @@ protected:
     XML_VARIABLE XMLVectorBase<XMLString> deities;
     XML_VARIABLE XMLVectorBase<XMLClanReference> enemies;
     XML_VARIABLE XMLString monument, monumentName;
+    XML_VARIABLE XMLStringList msgSelf, msgVict, msgRoom;
     
     XML_VARIABLE XMLInteger leader, recruiter;
     XML_VARIABLE XMLPointer<ClanMembership> membership;
