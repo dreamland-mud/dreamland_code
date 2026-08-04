@@ -30,8 +30,8 @@ struct SpellTemplate<tn, DefaultSpell> : public DefaultSpell, public ClassSelfRe
     virtual bool blockedByNobuff( Character *ch, Character *victim ) const {
         return DefaultSpell::blockedByNobuff( ch, victim );
     }
-    virtual void utter( Character * ch ) { 
-        DefaultSpell::utter( ch );
+    virtual void utter( Character * ch, Character *victim = 0 ) { 
+        DefaultSpell::utter( ch, victim );
     }
     virtual bool checkPosition( Character *ch ) const { 
         return DefaultSpell::checkPosition( ch );

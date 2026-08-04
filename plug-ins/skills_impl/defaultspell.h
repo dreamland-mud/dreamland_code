@@ -65,7 +65,7 @@ public:
     // or a pet/charmy whose PC master -- has 'config nobuff' and the caster is a
     // third party (not self, not group, not same clan). See Trello 709 / Wolfram.
     virtual bool blockedByNobuff( Character *ch, Character *victim ) const;
-    virtual void utter( Character * );
+    virtual void utter( Character *, Character *victim = 0 );
     virtual int getSpellLevel( Character *, int );
 
     virtual SpellTargetPointer locateTargets( Character *, const DLString &, std::ostringstream & );
@@ -99,8 +99,20 @@ public:
     XML_VARIABLE XMLStringList messages; // utterances
 
 protected:
+    /** One index-aligned line triple out of a skill group's msgSelf/msgVict/msgRoom. */
+    struct CastFlavour {
+        DLString self, vict, room;
+    };
+
+    void collectFlavours( std::vector<CastFlavour> & ) const;
+    void showFlavour( Character *ch, Character *victim, const CastFlavour & ) const;
+    /** The old garbled-words line, still the fallback when no group has messages. */
+    void utterGarbled( Character *ch );
+    /** Let onlookers who beat their spell craft roll name the spell being cast. */
+    void utterRecognized( Character *ch );
+
     Character * getCharSpell( Character *, const DLString &, int *, int *, ostringstream &errbuf );
-    
+
     void baneMessage( Character *ch, Character *vch ) const;
     void baneDamage( Character *ch, Character *vch, int dam ) const;
     void baneAround( Character *ch, int failChance, int dam ) const;
@@ -108,7 +120,6 @@ protected:
     bool baneAction( Character *ch, Character *bch, int failChance, int dam ) const;
 
     void utterPrayer(Character *ch);
-    void utterMagicSpell(Character *ch);
 
     bool canPray(Character *ch, int &slevel);
 

@@ -10,6 +10,7 @@
 #include "spelltarget.h"
 #include "spellmanager.h"
 #include "skillgroup.h"
+#include "defaultskillgroup.h"
 #include "skill_utils.h"
 #include "feniaskillaction.h"
 #include "religion.h"
@@ -204,15 +205,83 @@ DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, 
     return get_char_room(ch, argVict);
 }
 
+/* Catalog file-key for the cast flavour lines. They come from skill-groups/*.xml,
+ * not a cpp __FILE__, so they cannot use the _() macro; wrap them in a MultiMessage
+ * under this shared key instead. A missing entry falls back to RU byte-for-byte. */
+static const DLString GROUPS_L10N_FILE = "skill-groups";
+
+void DefaultSpell::collectFlavours( std::vector<CastFlavour> &result ) const
+{
+    for (auto g: const_cast<Skill *>(*skill)->getGroups( ).toArray( )) {
+        DefaultSkillGroup *group = dynamic_cast<DefaultSkillGroup *>(skillGroupManager->find( g ));
+        if (!group)
+            continue;
+
+        // The three lists are index-parallel: entry N of msgSelf, msgVict and msgRoom
+        // describe the same gesture. Picking them independently would show the room one
+        // caster doing three different things, so they travel as a triple.
+        StringList self = group->msgSelf.toList( );
+        StringList vict = group->msgVict.toList( );
+        StringList room = group->msgRoom.toList( );
+
+        for (unsigned int i = 0; i < self.size( ); i++) {
+            CastFlavour f;
+            f.self = self[i];
+            f.vict = i < vict.size( ) ? vict[i] : DLString::emptyString;
+            f.room = i < room.size( ) ? room[i] : DLString::emptyString;
+            result.push_back( f );
+        }
+    }
+}
+
+void DefaultSpell::showFlavour( Character *ch, Character *victim, const CastFlavour &f ) const
+{
+    if (!f.self.empty( ))
+        ch->pecho( MultiMessage( f.self, GROUPS_L10N_FILE ), ch );
+
+    for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {
+        if (rch == ch)
+            continue;
+
+        const DLString &msg = (rch == victim && !f.vict.empty( )) ? f.vict : f.room;
+        if (msg.empty( ))
+            continue;
+
+        rch->pecho( MultiMessage( msg, GROUPS_L10N_FILE ), ch );
+    }
+}
+
 /*
  * Utter mystical words for a spell.
  */
-void DefaultSpell::utter( Character *ch )
+void DefaultSpell::utter( Character *ch, Character *victim )
 {
-    if (isPrayer(ch))
-        utterPrayer(ch);
-    else
-        utterMagicSpell(ch);
+    std::vector<CastFlavour> flavours;
+    collectFlavours( flavours );
+
+    // A prayer keeps its own line in the same pool as the group flavours, so a cleric
+    // still names their god about as often as they show a gesture (Trello 1518).
+    bool fPrayer = isPrayer( ch );
+    int total = flavours.size( ) + (fPrayer ? 1 : 0);
+
+    if (total == 0) {
+        utterGarbled( ch );
+        return;
+    }
+
+    int pick = number_range( 0, total - 1 );
+
+    if (fPrayer && pick == (int)flavours.size( )) {
+        utterPrayer( ch );
+        return;
+    }
+
+    showFlavour( ch, victim, flavours[pick] );
+
+    // The flavour line says nothing about which spell it is, so spell craft would lose
+    // its whole payoff. Only onlookers who beat the roll get the naming line.
+    if (!fPrayer)
+        utterRecognized( ch );
 }
 
 void DefaultSpell::utterPrayer(Character *ch)
@@ -228,7 +297,7 @@ void DefaultSpell::utterPrayer(Character *ch)
     }
 }
 
-void DefaultSpell::utterMagicSpell(Character *ch)
+void DefaultSpell::utterGarbled(Character *ch)
 {
     Character *rch;
     DLString utterance = spell_utterance(*skill);
@@ -237,12 +306,28 @@ void DefaultSpell::utterMagicSpell(Character *ch)
     for (rch = ch->in_room->people; rch; rch = rch->next_in_room) {
         if (rch != ch) {
             int chance = (gsn_spell_craft->getEffective( rch ) * 9) / 10;
-            
+
             if (chance < number_percent( ))
                 oldact( pat, ch, utterance.c_str(), rch, TO_VICT );
             else
                 oldact( pat, ch, skill->getNameFor( rch ).c_str( ), rch, TO_VICT );
         }
+    }
+}
+
+void DefaultSpell::utterRecognized(Character *ch)
+{
+    Character *rch;
+    MultiMessage pat = _("$c1 бормочет '$t'.");
+
+    for (rch = ch->in_room->people; rch; rch = rch->next_in_room) {
+        if (rch == ch)
+            continue;
+
+        int chance = (gsn_spell_craft->getEffective( rch ) * 9) / 10;
+
+        if (chance >= number_percent( ))
+            oldact( pat, ch, skill->getNameFor( rch ).c_str( ), rch, TO_VICT );
     }
 }
 
