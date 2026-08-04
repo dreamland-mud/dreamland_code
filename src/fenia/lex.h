@@ -37,7 +37,11 @@ public:
     
     const DLString &getName(id_t id);
     id_t resolve(const DLString &s);
-    
+    /** Resolve without interning: true and sets id when the name is already known.
+     *  For lookups that must not grow the table on a miss, e.g. reading a field
+     *  by a name that comes from runtime data. */
+    bool find(const DLString &s, id_t &id) const;
+
     static Lex *getThis();
 
 private:
