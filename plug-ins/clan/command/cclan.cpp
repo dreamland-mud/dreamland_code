@@ -199,7 +199,7 @@ void CClan::clanList( PCharacter* pc )
         
         if (!clan->isHidden( )) {
             basic_ostringstream<char> buf;                                          
-            buf << setw( 40 ) << clan->getLongName( ) << " [{"
+            buf << setw( 40 ) << clan->getLongNameFor( viewerLang(pc) ) << " [{"
                 << clan->getColor( ) << clanPaddedName( clan, viewerLang(pc) ) 
                 << "{x]" << endl;
             pc->send_to( buf );
@@ -1500,7 +1500,7 @@ void CClan::clanDiplomacyShow( PCharacter *pc )
                     buf << ' ' 
                         << clan_diplomacy_names_table[data->getDiplomacy( c )].color
                         << setw( 5 ) 
-                        << clan_diplomacy_names_table[data->getDiplomacy( c )].abbr
+                        << l(pc, clan_diplomacy_names_table[data->getDiplomacy( c )].abbr)
                         << "{x";
             }
             
@@ -1512,9 +1512,9 @@ void CClan::clanDiplomacyShow( PCharacter *pc )
 
     for (int i = 0; i <= clan_diplomacy_max; i++) 
         buf << clan_diplomacy_names_table[i].color 
-            << clan_diplomacy_names_table[i].abbr 
+            << l(pc, clan_diplomacy_names_table[i].abbr)
             << "{x - " 
-            << clan_diplomacy_names_table[i].long_name 
+            << l(pc, clan_diplomacy_names_table[i].long_name)
             << (i < clan_diplomacy_max ? ", " : " ");
 
     buf << endl;
@@ -1539,7 +1539,7 @@ void CClan::clanDiplomacyForBlindShow( PCharacter *pc )
         data = clan->getData( );
 
         if (clan->getData( ) && clan->hasDiplomacy( )) {
-            buf << clan->getRussianName( ).ruscase('1').c_str() << " : ";
+            buf << clan->getNameFor( viewerLang(pc) ).ruscase('1').c_str() << " : ";
         } else {
             continue;
         }
@@ -1560,7 +1560,7 @@ void CClan::clanDiplomacyForBlindShow( PCharacter *pc )
             }
             if (itemCount > 0) {
                  buf << clan_diplomacy_names_table[j].color
-                     << clan_diplomacy_names_table[j].state_name << "{x ";
+                     << l(pc, clan_diplomacy_names_table[j].state_name) << "{x ";
                 char rusCase = *clan_diplomacy_names_table[j].state_ruscase;
                 for (int k = 0; k < cm->size( ); k++) {
                     if (i == k)
@@ -1570,7 +1570,7 @@ void CClan::clanDiplomacyForBlindShow( PCharacter *pc )
 
                     if (c->getData( ) && c->hasDiplomacy( ) && j == data->getDiplomacy( c )) {
                         itemCount--;
-                        buf << c->getRussianName( ).ruscase( rusCase ).c_str();
+                        buf << c->getNameFor( viewerLang(pc) ).ruscase( rusCase ).c_str();
                         if (itemCount > 1) {
                             buf << ", ";
                         } else if (itemCount == 1) {
