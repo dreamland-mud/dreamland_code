@@ -210,17 +210,22 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
     if (!visible( ch ))
         return;
 
-    if (temporary_skill_active(this, ch)) {        
-        buf << pad << "Досталось тебе разученным на {" 
-            << skill_learned_colour(this, ch) << data.learned << "%{x";
+    // The colour letter varies with the percentage, so the coloured number is
+    // assembled here and passed into the sentence as a plain argument.
+    ostringstream learnedBuf;
+    learnedBuf << "{" << skill_learned_colour(this, ch) << data.learned << "%{x";
+    DLString learned = learnedBuf.str();
+
+    if (temporary_skill_active(this, ch)) {
+        buf << pad << fmt(ch, _("Досталось тебе разученным на %1$s"), learned.c_str());
     } else {
-        buf << pad << "Доступно тебе с уровня {C" << getLevel( ch ) << "{x";
+        buf << pad << fmt(ch, _("Доступно тебе с уровня {C%1$d{x"), getLevel( ch ));
         if (available( ch ))
-            buf << ", изучено на {" << skill_learned_colour(this, ch) << data.learned << "%{x";
+            buf << fmt(ch, _(", изучено на %1$s"), learned.c_str());
     }
-    
+
     buf << "." << endl
-        << pad << "Практикуется у {gкланового охранника{x." << endl;
+        << pad << l(ch, "Практикуется у {gкланового охранника{x.") << endl;
 
     buf << printLevelBonus(ch);
 }

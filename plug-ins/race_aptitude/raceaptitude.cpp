@@ -112,13 +112,14 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
             rnames.push_back(race->getNameFor(ch, ch).ruscase('1'));
     }
 
-    buf << SKILL_INFO_PAD << "Особенность ";
+    DLString races = rnames.wrap("{W", "{x").join(", ");
+    buf << SKILL_INFO_PAD;
     switch (rnames.size( )) {
-    case 0:  buf << "неизвестной расы"; break;
-    case 1:  buf << "расы "; break;
-    default: buf << "рас "; break;
+    case 0:  buf << l(ch, "Особенность неизвестной расы."); break;
+    case 1:  buf << fmt(ch, _("Особенность расы %1$s."), races.c_str()); break;
+    default: buf << fmt(ch, _("Особенность рас %1$s."), races.c_str()); break;
     }
-    buf << rnames.wrap("{W", "{x").join(", ") << "." << endl;
+    buf << endl;
 
     buf << printWaitAndMana(ch);
     
@@ -127,12 +128,18 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
         return;
     }
         
-    buf << SKILL_INFO_PAD << "Доступно тебе с уровня {C" << getLevel(ch) << "{x";
+    buf << SKILL_INFO_PAD << fmt(ch, _("Доступно тебе с уровня {C%1$d{x"), getLevel(ch));
 
     if (available( ch )) {
         int learned = ch->getSkillData(getIndex()).learned;
-        if (learned > 0)
-            buf << ", изучено на {" << skill_learned_colour(this, ch) << learned << "%{x";
+        if (learned > 0) {
+            // The colour letter varies with the percentage, so the coloured
+            // number is built here and passed in as a plain argument.
+            ostringstream learnedBuf;
+            learnedBuf << "{" << skill_learned_colour(this, ch) << learned << "%{x";
+            DLString learnedStr = learnedBuf.str();
+            buf << fmt(ch, _(", изучено на %1$s"), learnedStr.c_str());
+        }
     }
 
     buf << "." << endl;
