@@ -387,9 +387,14 @@ int BasicSkill::getMana(Character *ch) const
 
     if (mana <= 0)
         return 0;
-        
-    int cost = max( mana.getValue(),
-                100 / (2 + ch->getRealLevel() - getLevel(ch)) );
+
+    // Exactly what the skill is configured with. A ROM-era formula used to raise
+    // this to 100/(2 + level - skillLevel) -- 50 right after learning, then 33,
+    // then 25 -- which silently overrode the configured cost of every skill
+    // cheaper than 50, and pinned an item-granted skill at 50 forever, since
+    // getLevel() returns the wearer's own level for those. Removed on purpose;
+    // the number in skedit and in the help article is the number charged.
+    int cost = mana.getValue();
 
     if (!ch->is_npc() && bonus_mana->isActive(ch->getPC(), time_info))
         cost /= 2;
