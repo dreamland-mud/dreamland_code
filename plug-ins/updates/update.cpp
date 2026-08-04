@@ -1489,13 +1489,15 @@ void check_reboot( void )
     case 15:
         {
             int counter = dreamland->getRebootCounter( );
-            const char *crier = chance( 50 ) ? "Хассан" : "Валькирия";
+            // A plain global echo, not a staged gossip line. The crier used to be a
+            // hardcoded Russian name passed through %s, so it stayed Cyrillic for
+            // every viewer no matter what language the rest resolved to.
             // per-viewer: each player's pecho resolves the MultiMessage in their own language
             for (d = descriptor_list; d != 0; d = d->next)
                 if (d->connected == CON_PLAYING && d->character)
                     d->character->pecho(
-                        _("%1$^s громко кричит '{RВнимание! Через %2$d мину%2$Iту|ты|т будет перезагрузка Мира Мечты!{x'"),
-                        crier, counter );
+                        _("{RВнимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!{x"),
+                        counter );
             if (counter == 5) {
                 msg2 = fmt( NULL, _("Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!"), counter );
                 send_to_discord_stream(":red_circle: " + msg2);
