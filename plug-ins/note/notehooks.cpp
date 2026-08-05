@@ -22,6 +22,63 @@
 #include "def.h"
 #include "l10n.h"
 
+/* "3 непрочитанных истории" and what the other two languages make of it.
+ *
+ * The count agreement and the noun's case are picked by the same rule and have
+ * to move together, so this is a function per language rather than one format
+ * string with holes in it. The Slavic split is 1 / 2-4 / 5+, but the middle
+ * bucket does not agree across the two: Russian takes the genitive singular
+ * ("две истории"), Ukrainian the nominative plural ("дві історії"), which is a
+ * different pad entirely. */
+static DLString unread_phrase( const NoteThread &th, int count, lang_t lang )
+{
+    std::basic_ostringstream<char> buf;
+
+    if (lang == LANG_EN) {
+        buf << "unread "
+            << (count == 1 ? th.getThreadNameFor( lang ) : th.getMltNameFor( lang ));
+        return buf.str( );
+    }
+
+    int gender = th.getGender( ).getValue( );
+    const DLString &one = th.getThreadNameFor( lang );
+    const DLString &many = th.getMltNameFor( lang );
+
+    bool isOne = (count % 10) == 1 && (count % 100) != 11;
+    bool isFew = (count % 10) > 1 && (count % 10) < 5
+                 && ((count % 100) < 11 || (count % 100) > 15);
+
+    if (lang == LANG_UA) {
+        buf << "непрочитан"
+            << (isOne ? (gender == SEX_FEMALE ? "а" : gender == SEX_MALE ? "ий" : "е")
+                      : isFew ? "і" : "их")
+            << " ";
+
+        if (isOne)
+            buf << russian_case( one, '1' );
+        else if (isFew)
+            buf << russian_case( many, '1' );
+        else
+            buf << russian_case( many, '2' );
+
+        return buf.str( );
+    }
+
+    buf << "непрочитанн"
+        << (isOne ? (gender == SEX_FEMALE ? "ая" : gender == SEX_MALE ? "ый" : "ое")
+                  : isFew ? (gender == SEX_FEMALE ? "ые" : "ых") : "ых")
+        << " ";
+
+    if (isOne)
+        buf << russian_case( one, '1' );
+    else if (isFew)
+        buf << russian_case( one, '2' );
+    else
+        buf << russian_case( many, '2' );
+
+    return buf.str( );
+}
+
 void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
 {
     // Notify via crystal orb for all types of messages.
@@ -82,34 +139,29 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
         if (!( pager = get_pager( victim ) ))
             continue;
 
-        buf0 << "{CТихий голос из $o2: {WУ тебя:";
-        
+        lang_t lang = viewerLang( victim );
+
+        buf0 << fmt( victim, _("{CТихий голос из $o2: {WУ тебя:") );
+
         for (i = threads.begin( ); i != threads.end( ); i++) {
-            const char *c1, *c2, *c5;
             const NoteThread &th = **i->second;
             int count = th.countSpool( victim );
-            int gender = th.getGender().getValue();
-            
-            if (count > 0) {
-                c1 = (gender == SEX_FEMALE ? "ая" : gender == SEX_MALE ? "ый" : "ое");
-                c2 = (gender == SEX_FEMALE ? "ые" : "ых");
-                c5 = "ых";
-                
-                if (fFirst) 
-                    fFirst = false;
-                else
-                    buf0 << "                                       ";
 
-                buf0 << " {Y" << count << "{W непрочитанн"
-                     << GET_COUNT(count, c1, c2, c5) << " " 
-                     << GET_COUNT(count, 
-                                    russian_case( th.getRussianThreadName(), '1' ),
-                                    russian_case( th.getRussianThreadName(), '2' ),
-                                    russian_case( th.getRussianMltName(), '2' ) )
-                     << " (" << th.getName() << ").{x" << endl;
-            }
+            if (count <= 0)
+                continue;
+
+            if (fFirst)
+                fFirst = false;
+            else
+                buf0 << "                                       ";
+
+            // The name in brackets is the command to type, so it stays as it is
+            // registered -- unlike the noun in front of it, which follows the
+            // reader.
+            buf0 << " {Y" << count << "{W " << unread_phrase( th, count, lang )
+                 << " (" << th.getName() << ").{x" << endl;
         }
-        
+
         oldact_p( buf0.str( ).c_str( ), victim, pager, 0, TO_CHAR, POS_DEAD );
     }
 }

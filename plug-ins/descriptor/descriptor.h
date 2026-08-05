@@ -43,6 +43,10 @@ enum {
     CON_BREAK_CONNECT,   // for notify only
     CON_CLOSED,
     CON_QUIT,
+    CON_RESUME,          // for notify only: a web client came back to the same
+                         // session, so listeners that greet an arriving player
+                         // should stay quiet. Appended, not inserted, so the
+                         // existing values keep their numbers.
 };
 
 
