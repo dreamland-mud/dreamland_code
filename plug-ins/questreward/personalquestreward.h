@@ -16,7 +16,6 @@ public:
         typedef ::Pointer<PersonalQuestReward> Pointer;
         
         virtual void get( Character * );
-        virtual bool hourly();
 };
 
 #endif
