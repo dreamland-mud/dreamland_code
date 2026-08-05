@@ -50,13 +50,6 @@ LangText direction_langtext(int door, dir_case_t dcase);
 
 extern const struct direction_t dirs [];
 
-extern const char * extra_move_ru [];
-extern const char * extra_move_rp [];
-extern const char * extra_move_rt [];
-extern char const extra_move_rtum [];
-extern char const extra_move_rtpm [];
-
-
 int direction_lookup( char c );
 int direction_lookup( const char *arg );
 

@@ -47,6 +47,7 @@ void ExitsMovement::init( )
     peexit = NULL;
     exit_info = 0;
     door = -1;
+    fArrival = false;
 }
 
 ExitsMovement::ExitsMovement( Character *ch, int door, int movetype )
@@ -406,10 +407,22 @@ static const char * en_arrive_from(int door)
     return "";
 }
 
+// An area string may already end in a full stop; the frame below appends its
+// own one (and a ", riding on ..." clause before it), so drop the builder's.
+static void strip_final_dot( DLString &s )
+{
+    if (!s.empty( ) && s.at( s.size( ) - 1 ) == '.')
+        s.erase( s.size( ) - 1 );
+}
+
 void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
 {
     ostringstream bufRu, bufEn, bufUa;
-    
+
+    // Tell msgEcho which half of the move it is echoing: the departure lines
+    // go to the source room, the arrival lines to the target room.
+    fArrival = !fLeaving;
+
     if (MOUNTED(wch))
         return;
 
@@ -420,12 +433,24 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
         return;
     
     if (peexit) {
+        // Builder-authored line for the traveller alone. Sent raw: it is a
+        // finished sentence, not the subject+verb frame assembled below, so it
+        // gets neither the riding clause nor the trailing full stop.
+        const auto &s = fLeaving ? peexit->msgLeaveSelf : peexit->msgEntrySelf;
+        if (!s.emptyValues( ))
+            msgSelf( wch, s.getForLang(LANG_EN).c_str( ),
+                          s.getForLang(LANG_RU).c_str( ),
+                          s.getForLang(LANG_UA).c_str( ) );
+
         const auto &m = fLeaving ? peexit->msgLeaveRoom : peexit->msgEntryRoom;
         DLString ru = m.get(LANG_RU);
         DLString en = m.get(LANG_EN);
         DLString ua = m.get(LANG_UA);
         if (en.empty()) en = ru;
         if (ua.empty()) ua = ru;
+        strip_final_dot( ru );
+        strip_final_dot( en );
+        strip_final_dot( ua );
         bufRu << ru;
         bufEn << en;
         bufUa << ua;
@@ -461,29 +486,35 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
 
         if ((mt == MOVETYPE_SWIMMING || mt == MOVETYPE_WATER_WALK) && boat) {
             int ncase = 0;
-            DLString part, prep;
-                    
+            DLString partRu, partEn, partUa;
+            DLString prepRu, prepEn, prepUa;
+
             switch (boat->value1()) {
-            case POS_RESTING:  part = "лежа"; break;
-            case POS_SITTING:  part = "сидя"; break;
-            case POS_STANDING: part = "стоя"; break;
+            case POS_RESTING:  partRu = "лежа"; partEn = "lying";    partUa = "лежачи"; break;
+            case POS_SITTING:  partRu = "сидя"; partEn = "sitting";  partUa = "сидячи"; break;
+            case POS_STANDING: partRu = "стоя"; partEn = "standing"; partUa = "стоячи"; break;
             }
-            
+
             switch (boat->value2()) {
-            case PUT_IN:     prep = "в";      ncase = 6; break;
-            case PUT_ON:     prep = "на";     ncase = 6; break;
-            case PUT_AT:     prep = "у";      ncase = 2; break;
-            case PUT_INSIDE: prep = "внутри"; ncase = 2; break;
+            case PUT_IN:     prepRu = "в";      prepEn = "in";     prepUa = "в";          ncase = 6; break;
+            case PUT_ON:     prepRu = "на";     prepEn = "on";     prepUa = "на";         ncase = 6; break;
+            case PUT_AT:     prepRu = "у";      prepEn = "by";     prepUa = "біля";       ncase = 2; break;
+            case PUT_INSIDE: prepRu = "внутри"; prepEn = "inside"; prepUa = "всередині";  ncase = 2; break;
             }
 
-            // Boat clause is RU-only: its %5$O reads an unprovisioned 5th vararg
-            // (msgEcho passes 3 args) -- a pre-existing latent bug, kept
-            // byte-identical for RU rather than propagated into EN/UA.
-            if (!prep.empty( )) {
-                if (!part.empty( ))
-                    bufRu << ", " << part;
+            // %5$O is the boat: msgEcho passes it as the 5th vararg. The case
+            // digit only bites in RU/UA; %O renders the name in the viewer's
+            // own language either way, so all three read naturally.
+            if (!prepRu.empty( )) {
+                if (!partRu.empty( )) {
+                    bufRu << ", " << partRu;
+                    bufEn << ", " << partEn;
+                    bufUa << ", " << partUa;
+                }
 
-                bufRu << " " << prep << " %5$O" << ncase;
+                bufRu << " " << prepRu << " %5$O" << ncase;
+                bufEn << " " << prepEn << " %5$O" << ncase;
+                bufUa << " " << prepUa << " %5$O" << ncase;
             }
         }
     }
@@ -548,17 +579,35 @@ void ExitsMovement::place( Character *wch )
 
 void ExitsMovement::msgEcho( Character *victim, Character *wch, const char *msg )
 {
-    // TODO: Need to use peexit->short_desc_to for entry messages in the target room.
-    if (canHear( victim, wch )) {
-        // The line is echoed to 'victim', so the exit name follows that reader,
-        // not the mover and not LANG_DEFAULT.
-        lang_t lang = viewerLang( victim );
-        victim->pecho( msg,
-                       (RIDDEN(wch) ? wch->mount : wch),
-                       (MOUNTED(wch) ? wch->mount : wch),
-                       wch,
-                       peexit ? peexit->short_desc_from.getForLang(lang).c_str() : direction_doorname(pexit, lang),
-                       boat );
+    if (!canHear( victim, wch ))
+        return;
+
+    // The line is echoed to 'victim', so the exit name follows that reader,
+    // not the mover and not LANG_DEFAULT.
+    lang_t lang = viewerLang( victim );
+    const char *doorName;
+
+    if (peexit) {
+        // The two sides of an extra exit are named separately, and builders
+        // spell each one for the case its own sentence needs: short_desc_from
+        // for the departure line, short_desc_to for the arrival line. Feeding
+        // 'from' to the target room named the wrong object in the wrong case,
+        // e.g. a bookcase announced as arriving through a secret door.
+        const DLString &wanted = fArrival ? peexit->short_desc_to.getForLang(lang)
+                                          : peexit->short_desc_from.getForLang(lang);
+        const DLString &other  = fArrival ? peexit->short_desc_from.getForLang(lang)
+                                          : peexit->short_desc_to.getForLang(lang);
+        doorName = wanted.empty( ) ? other.c_str( ) : wanted.c_str( );
     }
+    else {
+        doorName = direction_doorname(pexit, lang);
+    }
+
+    victim->pecho( msg,
+                   (RIDDEN(wch) ? wch->mount : wch),
+                   (MOUNTED(wch) ? wch->mount : wch),
+                   wch,
+                   doorName,
+                   boat );
 }
 

@@ -53,6 +53,11 @@ protected:
     struct extra_exit_data * peexit;
     int door;
     int exit_info;
+
+    /** True while the arrival half of the move is being echoed, i.e. the lines
+     *  printed in the target room. Set by msgOnMove, read by msgEcho to pick
+     *  the side of the passage the readers can actually see. */
+    bool fArrival;
 };
 
 #endif
