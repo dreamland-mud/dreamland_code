@@ -254,10 +254,6 @@ void do_visible(Character *ch)
     strip_invisibility(ch);
 
     strip_camouflage(ch);
-    
-    if (IS_SET(ch->affected_by, AFF_SNEAK))
-    {
-        affect_bit_strip(ch, &affect_flags, AFF_SNEAK, true);
-        REMOVE_BIT(ch->affected_by, AFF_SNEAK);
-    }
+
+    strip_sneak(ch);
 }
