@@ -171,6 +171,14 @@ NMI_INVOKE( SkillWrapper, usable, "(ch): доступно ли умение дл
     return getTarget()->usable( ch, false );
 }
 
+// The same predicate skillsInfo() filters on, so a Fenia list and the gate that
+// follows it can be built from one rule instead of drifting apart.
+NMI_INVOKE( SkillWrapper, available, "(ch): доступно ли умение персонажу ch в принципе (уровень, класс), без учета текущей формы" )
+{
+    Character *ch = args2character(args);
+    return getTarget()->available( ch );
+}
+
 NMI_INVOKE( SkillWrapper, visible, "(ch): видно ли это умение ch, независимо от уровня, включая временные скилы" )
 {
     Character *ch = args2character(args);
