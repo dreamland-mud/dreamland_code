@@ -78,11 +78,14 @@ bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
     if (arg.empty( )) {
         bool yes = isSetBit(ch);
         printLine( ch );
-        // Each language names the option and the yes/no word its own way, so every
-        // argument is numbered: an un-numbered %s auto-advances from the first
-        // vararg, which spliced the Russian pair into the other two sentences
-        // ("Use the command mode спамбой да to change it").
-        ch->pecho(_("\nИспользуй команду {hc{yрежим %1$s %2$s{x для изменения."),
+        // Each language names the option and the yes/no word its own way. Russian
+        // reads the first pair with un-numbered codes (which auto-advance from the
+        // first vararg); English and Ukrainian must NUMBER theirs, or they consume
+        // that same Russian pair -- that was "Use the command mode спамбой да to
+        // change it". The Russian format stays un-numbered on purpose: it is the
+        // catalog key, so renumbering it would orphan the English and Ukrainian
+        // values until every catalog shard was rewritten in lockstep.
+        ch->pecho(_("\nИспользуй команду {hc{yрежим %s %s{x для изменения."),
                       rname.c_str(), yes ? "нет" : "да",
                       name.c_str(), yes ? "no" : "yes",
                       uaname.empty( ) ? rname.c_str( ) : uaname.c_str( ), yes ? "ні" : "так");
