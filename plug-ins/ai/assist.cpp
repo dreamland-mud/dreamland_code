@@ -277,10 +277,14 @@ Character * BasicMobileBehavior::findAssistVictim( Character *victim )
     Character *target = 0;
     int number = 0;
 
+    // Sleeping players are no more a target for the assist than they are a source
+    // of one (see the IS_AWAKE check in check_assist): joining a fight against a
+    // helpless character would only wake them up.
     for (Character *vch = victim->in_room->people; vch; vch = vch->next_in_room)
         if (ch->can_see( vch )
             && is_same_group( vch, victim )
             && !vch->is_npc( )
+            && IS_AWAKE( vch )
             && number_range( 0, number ) == 0)
         {
             target = vch;
