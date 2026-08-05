@@ -3,6 +3,7 @@
 #include "room.h"
 #include "commandtemplate.h"
 #include "directions.h"
+#include "loadsave.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"
@@ -129,6 +130,14 @@ CMDRUNP(scan)
     if (ch->position == POS_SLEEPING)
     {
         ch->pecho(_("Ты спишь и можешь видеть только сны."));
+        return;
+    }
+
+    // scan_people is filtered by can_see, but the closed-door and NOSCAN branches
+    // print before any visibility test, so a blinded player still read the doors
+    // around them. Refuse outright, the way 'exits' already does.
+    if (eyes_blinded( ch )) {
+        oldact(_("Ты ослепле$gно|н|на и не видишь ничего вокруг себя!"), ch, 0, 0, TO_CHAR );
         return;
     }
 
