@@ -534,6 +534,24 @@ void strip_camouflage( Character *ch )
     }
 }
 
+void strip_sneak(Character *ch)
+{
+    if (IS_AFFECTED(ch, AFF_SNEAK))
+    {
+        bool showMessage = ch->affected.findAllWithBits(&affect_flags, AFF_SNEAK).empty();
+        affect_bit_strip(ch, &affect_flags, AFF_SNEAK, true);
+        REMOVE_BIT(ch->affected_by, AFF_SNEAK);
+
+        // affect_bit_strip only walks ch->affected, so a sneak granted by worn
+        // equipment (or a mob's innate bit) has nothing to strip and prints
+        // nothing, while REMOVE_BIT drops it anyway -- it just vanished silently.
+        // The sneak wearoff is self-only: nobody else can tell you started
+        // walking noisily. TODO remove once sneak-from-item becomes an affect.
+        if (showMessage)
+            ch->pecho(_("Ты чувствуешь, что снова производишь слишком много шума при ходьбе."));
+    }
+}
+
 void strip_hide_and_fade(Character *ch)
 {
     if (IS_AFFECTED(ch, AFF_HIDE | AFF_FADE))

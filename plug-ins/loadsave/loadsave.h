@@ -74,6 +74,7 @@ void undig_earthquake( Character *ch );
 void undig( Character *ch );
 void strip_camouflage( Character *ch );
 void check_camouflage( Character *ch, Room *to_room );
+void strip_sneak(Character *ch);
 void strip_hide_and_fade(Character *ch);
 void strip_invisibility(Character *ch);
 void strip_improved_invisibility(Character *ch);
