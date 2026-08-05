@@ -22,6 +22,7 @@
 
 #include "merc.h"
 #include "def.h"
+#include "l10n.h"
 
 GSN(cavalry);
 CLAN(none);
@@ -79,32 +80,62 @@ static bool dismount_attacked( Character *ch )
     return false;
 }
 
+void stand_up_to_fight( Character *ch )
+{
+    ch->position = POS_FIGHTING;
+
+    // Whoever is on their feet is no longer using the furniture they rested on.
+    // update_pos states the same rule, but it only runs on the character taking
+    // damage, so nothing released the bench for the one who stood up to attack.
+    ch->on = 0;
+}
+
+void stand_up_after_round( Character *victim )
+{
+    if (victim->fighting == 0)
+        return;
+
+    // Already up, or too badly hurt to get up at all.
+    if (victim->position > POS_SITTING || victim->position <= POS_STUNNED)
+        return;
+
+    if (IS_AFFECTED(victim, AFF_SLEEP)) {
+        REMOVE_BIT(victim->affected_by, AFF_SLEEP);
+        affect_bit_strip(victim, &affect_flags, AFF_SLEEP);
+        victim->pecho(_("Ты просыпаешься от внезапной боли."));
+    }
+
+    stand_up_to_fight( victim );
+}
+
 /*
  * Start fights, configuring ch to attack victim and adjusting positions.
  */
-void set_fighting( Character *ch, Character *victim )
+void set_fighting( Character *ch, Character *victim, bool standUp )
 {
     if (ch->fighting != 0)
         return;
 
     if (ch->position <= POS_INCAP)
         return;
-    
-    if (IS_AFFECTED(ch, AFF_SLEEP)) {
+
+    if (standUp && IS_AFFECTED(ch, AFF_SLEEP)) {
         REMOVE_BIT(ch->affected_by, AFF_SLEEP);
         affect_bit_strip(ch, &affect_flags, AFF_SLEEP);
     }
-    
+
     if (dismount_attacked( ch ))
         interpret_raw( ch, "dismount" );
-    
+
     if (dismount_attacked( victim ))
         interpret_raw( victim, "dismount" );
 
     if (ch->in_room == victim->in_room)
     {
         ch->fighting = victim;
-        ch->position = POS_FIGHTING;
+
+        if (standUp)
+            stand_up_to_fight( ch );
     }
 }
 

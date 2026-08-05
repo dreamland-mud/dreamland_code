@@ -221,10 +221,10 @@ void Damage::adjustPosition( )
                 break;
         }
         
-        ch->position = POS_FIGHTING;
+        stand_up_to_fight( ch );
         return;
     }
-    // Don't adjust position for the victim. 
+    // Don't adjust position for the victim.
     // If player hits prone mob, mob should stand up later in this round (when mob is ch).
     // If mob hits prone player, player should stand up only in the next round (when player is ch).
     // If player hits prone player, prone player should not stand up.
@@ -257,9 +257,12 @@ static void rprog_attack( Character *ch, Character *victim )
 void Damage::adjustFighting( )
 {
     if (ch != victim && victim->position > POS_STUNNED) {
+        // Do not put the victim on their feet here. Someone caught lying, sitting or
+        // asleep takes the attacker's whole round at the position penalty, and gets up
+        // at the end of it -- see stand_up_after_round.
         if (victim->fighting == 0)
-            set_fighting( victim, ch );
-        
+            set_fighting( victim, ch, false );
+
         if (ch->fighting == 0) {
             set_fighting( ch, victim );
             rprog_attack( ch, victim );
@@ -547,14 +550,22 @@ void Damage::handlePosition( )
      * Sleep spells and extremely wounded folks.
      * Don't call stop_fighting and wake up from selfdamage when you are not able to wake up
      */
-    if (!IS_AWAKE(victim) 
-        && !(IS_AFFECTED(victim, AFF_SLEEP) && (ch == victim || paf)))
-    { 
-        if(victim->position == POS_SLEEPING){
-            victim->pecho(_("Ты просыпаешься от внезапной боли."));
-        }
-        stop_fighting( victim, false );
-    }
+    if (IS_AWAKE(victim))
+        return;
+
+    // A melee round defers the wake-up: a sleeper takes every strike of it at double
+    // damage and rouses at the end -- see stand_up_after_round. Spells, traps and
+    // affects still rouse their victim on the spot.
+    if (victim->position == POS_SLEEPING && !wakesSleepingVictim( ))
+        return;
+
+    if (IS_AFFECTED(victim, AFF_SLEEP) && (ch == victim || paf))
+        return;
+
+    if (victim->position == POS_SLEEPING)
+        victim->pecho(_("Ты просыпаешься от внезапной боли."));
+
+    stop_fighting( victim, false );
 }
 
 /*-----------------------------------------------------------------------------

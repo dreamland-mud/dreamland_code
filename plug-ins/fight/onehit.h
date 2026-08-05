@@ -15,6 +15,8 @@ public:
     
     void hit( );
 
+    virtual bool wakesSleepingVictim( ) const { return false; }
+
     virtual void init( ) = 0;
     virtual bool canHit( );
     bool checkShadow();
