@@ -76,7 +76,7 @@ void Unread::doUnfinished( PCharacter *ch )
             NoteThread::Pointer thread = NoteManager::getThis( )->findThread( threadName );
 
             ch->pecho(_("Ты не закончи%Gло|л|ла писать {W%N4{x!"), 
-                      ch, thread ? thread->getRussianThreadName( ).c_str( ) : threadName.c_str( ) );
+                      ch, thread ? thread->getThreadNameFor( viewerLang( ch ) ).c_str( ) : threadName.c_str( ) );
         }
 }
 
@@ -121,7 +121,13 @@ void UnreadListener::run( int oldState, int newState, Descriptor *d )
 
     if (!d->character || !( ch = d->character->getPC( ) ))
         return;
-    
+
+    /* A resumed web session is the same sitting continued: the player saw this
+     * summary when they logged in, and repeating it every time their phone
+     * locks turns "you have 11 unread stories" into wallpaper. */
+    if (oldState == CON_RESUME)
+        return;
+
     // For newly created char, reset their 'lastread' counters to 2 months back
     if (oldState == CON_CREATE_DONE && ch->getRemorts( ).size( ) == 0) {
         time_t stamp;

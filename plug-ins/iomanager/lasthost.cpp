@@ -63,7 +63,10 @@ void XMLAttributeLastHostListenerPlugin::run(int oldState, int newState, Descrip
     DLString host = d->getRealHost();
 
     // Don't increment usage counter if reconnecting with the same IP address.
-    if (pch->getLastAccessHost() == host && oldState == CON_BREAK_CONNECT)
+    // A resumed web session counts as reconnecting -- otherwise every screen
+    // lock would bump the counter and write the pfile.
+    if (pch->getLastAccessHost() == host
+            && (oldState == CON_BREAK_CONNECT || oldState == CON_RESUME))
         return;
     
     // Remember current host and increment usage counter.

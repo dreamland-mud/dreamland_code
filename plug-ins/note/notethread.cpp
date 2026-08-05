@@ -77,6 +77,32 @@ DLString NoteThread::getNodeName( ) const
     return NODE_NAME;
 }
 
+/* The thread name is an argument to already-translated sentences ("You have no
+ * unread %N2."), so it has to follow the reader the way the sentence does --
+ * otherwise an English player is told they have no unread историй. Russian is
+ * the fallback because it is the one form every thread has always carried. */
+const DLString &NoteThread::getThreadNameFor( lang_t lang ) const
+{
+    if (lang == LANG_UA && !uaName.empty( ))
+        return uaName;
+
+    if (lang == LANG_EN && !name.empty( ))
+        return name;
+
+    return rusName;
+}
+
+const DLString &NoteThread::getMltNameFor( lang_t lang ) const
+{
+    if (lang == LANG_UA && !uaNameMlt.empty( ))
+        return uaNameMlt;
+
+    if (lang == LANG_EN && !nameMlt.empty( ))
+        return nameMlt;
+
+    return rusNameMlt;
+}
+
 static inline bool __cmp_note_ptr__( const Note *a, const Note *b )
 {
     return *a < *b;

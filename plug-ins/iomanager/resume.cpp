@@ -206,7 +206,10 @@ bool resume_attach(Descriptor *d, const DLString &token)
         d->handle_input.front()->close(d);
     d->associate(twin);
     InterpretHandler::init(d);
-    DescriptorStateManager::getThis()->handle(CON_BREAK_CONNECT, CON_PLAYING, d);
+    /* CON_RESUME rather than CON_BREAK_CONNECT: listeners keyed on
+     * newState == CON_PLAYING still fire, but the ones that greet an arriving
+     * player can tell this apart from a login and keep quiet. */
+    DescriptorStateManager::getThis()->handle(CON_RESUME, CON_PLAYING, d);
 
     // Deliberately quiet: no room echo, no wiznet. This fires every time a
     // phone locks its screen, and "%C1 restored their link" fifty times an

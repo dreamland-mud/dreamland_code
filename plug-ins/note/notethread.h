@@ -17,6 +17,7 @@
 #include "command.h"
 #include "so.h"
 #include "dlxmlloader.h"
+#include "lang.h"
 
 #include "note.h"
 
@@ -123,6 +124,13 @@ public:
     inline const DLString &getRussianThreadName( ) const;
     inline const DLString &getRussianMltName() const;
 
+    /** Thread name in the reader's language, singular and plural. Both feed the
+     *  %N format code, so the RU and UA forms carry Flexer pads and the EN one
+     *  is caseless. A language with nothing declared falls back to Russian
+     *  rather than to a blank. */
+    const DLString &getThreadNameFor( lang_t ) const;
+    const DLString &getMltNameFor( lang_t ) const;
+
     int countSpool( PCharacter * ) const;
     const Note * getNextUnreadNote( PCharacter * ) const;
     void showNoteToChar( PCharacter *, const Note * ) const;
@@ -151,6 +159,8 @@ protected:
     XML_VARIABLE XMLString nameMlt;
     XML_VARIABLE XMLString rusName;
     XML_VARIABLE XMLString rusNameMlt;
+    XML_VARIABLE XMLString uaName;
+    XML_VARIABLE XMLString uaNameMlt;
     XML_VARIABLE XMLEnumeration gender;
     XML_VARIABLE XMLInteger keepDays;
     XML_VARIABLE XMLShort readLevel;
