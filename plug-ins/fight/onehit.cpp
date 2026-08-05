@@ -76,6 +76,15 @@ void OneHit::hit( )
         return;
 
     priorDamageEffects( );
+
+    // Accumulate for the per-round fightspam-OFF summary, exactly as Damage::hit()
+    // does. OneHit reimplements the whole sequence rather than calling it, so
+    // without this melee contributes nothing: canSeeMessage suppresses the per-hit
+    // line and the summary then skips the attacker for having dealt "no" damage,
+    // leaving a fightspam-OFF player watching their hp drop in silence.
+    if (dam > 0 && ch != 0)
+        ch->roundDamage += dam;
+
     message( );
 
     if (dam == 0)
