@@ -131,6 +131,12 @@ public:
     const DLString &getThreadNameFor( lang_t ) const;
     const DLString &getMltNameFor( lang_t ) const;
 
+    /** Gender of the name in this language, for agreement. The two Slavic ones
+     *  disagree often enough to be worth a field: a note is neuter in Russian
+     *  ('письмо') and masculine in Ukrainian ('лист'). Falls back to 'gender'
+     *  when a thread has not declared one. */
+    int getGenderFor( lang_t ) const;
+
     int countSpool( PCharacter * ) const;
     const Note * getNextUnreadNote( PCharacter * ) const;
     void showNoteToChar( PCharacter *, const Note * ) const;
@@ -161,6 +167,7 @@ protected:
     XML_VARIABLE XMLString rusNameMlt;
     XML_VARIABLE XMLString uaName;
     XML_VARIABLE XMLString uaNameMlt;
+    XML_VARIABLE XMLEnumeration uaGender;
     XML_VARIABLE XMLEnumeration gender;
     XML_VARIABLE XMLInteger keepDays;
     XML_VARIABLE XMLShort readLevel;

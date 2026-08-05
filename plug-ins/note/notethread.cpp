@@ -42,7 +42,8 @@ const int NoteThread::HASH_LEN = 16;
 
 NoteThread::NoteThread( const DLString &n ) 
     : name( n ),
-      gender( 0, &sex_table ), 
+      gender( 0, &sex_table ),
+      uaGender( SEX_NEUTRAL, &sex_table ),
       godsSeeAlways( false )
 {
     hash.resize( HASH_LEN );
@@ -90,6 +91,17 @@ const DLString &NoteThread::getThreadNameFor( lang_t lang ) const
         return name;
 
     return rusName;
+}
+
+/* Tied to uaName rather than to a sentinel: a thread that declares a Ukrainian
+ * name declares its gender with it, and one that does not is being read in
+ * Russian anyway. */
+int NoteThread::getGenderFor( lang_t lang ) const
+{
+    if (lang == LANG_UA && !uaName.empty( ))
+        return uaGender.getValue( );
+
+    return gender.getValue( );
 }
 
 const DLString &NoteThread::getMltNameFor( lang_t lang ) const
