@@ -68,7 +68,9 @@ private:
     void setAffect(int location, int modifier) const;
     void setName() const;
     void setShortDescr() const;
+    bool rejectsMetal() const;
     DLString findMaterial() const;
+    DLString nonMetalDefault() const;
     void rememberAffect(Affect &af);
     int calcAffectModifier(const Json::Value &afConfig, const affix_info &info) const;
     int maxDamroll() const;

@@ -16,6 +16,7 @@
 
 #include "damageflags.h"
 #include "morphology.h"
+#include "material.h"
 #include "material-table.h"
 #include "attacks.h"
 #include "loadsave.h"
@@ -29,6 +30,27 @@ WEARLOC(wield);
 WEARLOC(second_wield);
 
 static int get_random_skillgroup(PCharacter *pch);
+
+/** A weapon name is metal-only when its configuration leaves no other option:
+ *  either a metallic material by name, or 'mtypes' listing nothing but metal.
+ *  Names without any material configured are free to take a non-metal default.
+ */
+static bool name_is_metal_only(const Json::Value &nameConfig)
+{
+    const material_t *material = material_by_name(nameConfig["material"].asString());
+    if (material)
+        return IS_SET(material->type, MAT_METAL);
+
+    const Json::Value &mtypes = nameConfig["mtypes"];
+    if (mtypes.empty())
+        return false;
+
+    for (auto const &mtype: mtypes)
+        if (!IS_SET(material_types.bitstring(mtype.asString()), MAT_METAL))
+            return false;
+
+    return true;
+}
 
 Json::Value weapon_classes;
 CONFIGURABLE_LOADED(fight, weapon_classes)
@@ -254,9 +276,28 @@ WeaponGenerator & WeaponGenerator::randomNames()
         return *this;
     }
 
-    int index = number_range(0, configs.size() - 1);
-    nameConfig = configs[index];
+    // Don't offer names that can only be forged of metal to a player who can't wield it.
+    bool noMetal = rejectsMetal();
+    vector<Json::ArrayIndex> allowed;
+    for (Json::ArrayIndex i = 0; i < configs.size(); i++)
+        if (!noMetal || !name_is_metal_only(configs[i]))
+            allowed.push_back(i);
+
+    if (allowed.empty()) {
+        warn("Weapon generator: all names for type %s are metal-only.", wclass.c_str());
+        for (Json::ArrayIndex i = 0; i < configs.size(); i++)
+            allowed.push_back(i);
+    }
+
+    int index = number_range(0, allowed.size() - 1);
+    nameConfig = configs[allowed.at(index)];
     return *this;
+}
+
+/** True when the player this weapon is generated for can never wield metal, e.g. a druid. */
+bool WeaponGenerator::rejectsMetal() const
+{
+    return pch && IS_SET(material_types_forbidden(pch), MAT_METAL);
 }
 
 WeaponGenerator & WeaponGenerator::randomAffixes()
@@ -287,6 +328,13 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 
     for (auto const &affixName: nameConfig["prefers"])
         gen.addPreference(affixName.asString());
+
+    // Material affixes that turn the weapon into a metal one are pointless
+    // for a player who would never be able to wield it.
+    if (rejectsMetal()) {
+        gen.addForbidden("platinum");
+        gen.addForbidden("titanium");
+    }
 
     // Exclude hr/dr affixes that don't have non-zero values at this level and tier.
     if (maxHitroll() <= 0) {
@@ -658,6 +706,8 @@ const WeaponGenerator & WeaponGenerator::assignDamageType() const
  */
 DLString WeaponGenerator::findMaterial() const
 {
+    bool noMetal = rejectsMetal();
+
     // First analyze prefix requirements for material.
     if (!materialName.empty())
         return materialName;
@@ -672,6 +722,11 @@ DLString WeaponGenerator::findMaterial() const
     StringList materials;
     for (auto &mtype: nameConfig["mtypes"]) {
         bitstring_t type = material_types.bitstring(mtype.asString());
+
+        // A single metal part makes the whole weapon metallic, e.g. "pine, steel".
+        if (noMetal && IS_SET(type, MAT_METAL))
+            continue;
+
         auto withType = materials_by_type(type);
 
         if (!withType.empty())
@@ -683,7 +738,27 @@ DLString WeaponGenerator::findMaterial() const
     if (!materials.empty())
         return materials.join(", ");
 
+    if (noMetal)
+        return nonMetalDefault();
+
     return "metal";
+}
+
+/** Default material for weapon classes with nothing configured, for players who
+ *  can't wield metal: bone daggers and stone maces instead of a wooden knife.
+ */
+DLString WeaponGenerator::nonMetalDefault() const
+{
+    const Json::Value &nonmetal = wclassConfig["nonmetal"];
+
+    if (!nonmetal.empty())
+        return nonmetal[number_range(0, nonmetal.size() - 1)].asString();
+
+    auto wooden = materials_by_type(MAT_WOOD);
+    if (!wooden.empty())
+        return wooden.at(number_range(0, wooden.size() - 1))->name;
+
+    return "wood";
 }
 
 // Helper function to get most popular/learned skill group for a player.

@@ -29,10 +29,24 @@ void material_t::fromJson(const Json::Value &value)
     uaname = value["uaname"].asString();
 }
 
+PROF(druid);
+
 json_vector<material_t> material_table;
 CONFIGURABLE_LOADED(fight, material)
 {
     material_table.fromJson(value);
+}
+
+/** Single source of truth for profession-based material restrictions.
+ *  Keep the refusal message in DefaultWearlocation::canEquip in sync
+ *  whenever another profession is added here.
+ */
+int material_types_forbidden( Character *ch )
+{
+    if (ch->getProfession( ) == prof_druid)
+        return MAT_METAL;
+
+    return 0;
 }
 
 static void 
