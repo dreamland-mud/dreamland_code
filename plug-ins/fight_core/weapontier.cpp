@@ -1,6 +1,7 @@
 #include "weapontier.h"
 #include "core/object.h"
 #include "behavior.h"
+#include "dl_math.h"
 #include "merc.h"
 #include "def.h"
 
@@ -27,6 +28,20 @@ json_vector<weapon_tier_t> weapon_tier_table;
 CONFIGURABLE_LOADED(fight, weapon_tiers)
 {
     weapon_tier_table.fromJson(value);
+}
+
+int random_weapon_tier(int bestTier, int legendaryPerMille)
+{
+    int minTier = URANGE(BEST_TIER, bestTier, WORST_TIER);
+
+    if (legendaryPerMille > 0 && number_range(1, 1000) <= legendaryPerMille)
+        return BEST_TIER;
+
+    for (int i = minTier - 1; i < WORST_TIER; i++)
+        if (chance(weapon_tier_table[i].chance))
+            return i + 1;
+
+    return WORST_TIER;
 }
 
 static int valid_tier(const DLString &tierName)

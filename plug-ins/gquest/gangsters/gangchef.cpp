@@ -55,7 +55,8 @@ void GangChef::createBounty(Character *killer)
         .item(weapon)
         .alignment(killer->alignment)
         .player(killer->getPC())
-        .randomTier(2)
+        // Killing the gang chief is the most reliable way in the game to earn a legendary.
+        .randomTier(2, 300)
         .randomizeAll();
 }
 

@@ -106,19 +106,9 @@ WeaponGenerator & WeaponGenerator::tier(int tier)
 }
 
 // Pick target tier according to each tier's chances, but no better than provided bestTier.
-WeaponGenerator & WeaponGenerator::randomTier(int bestTier) 
-{ 
-    int minTier = bestTier;
-    int maxTier = WORST_TIER;
-
-    for (int i = minTier - 1; i < maxTier; i++) {
-        weapon_tier_t &one_tier = weapon_tier_table[i];
-        if (chance(one_tier.chance)) {
-            tier(i+1);
-            break;
-        }
-    }
-
+WeaponGenerator & WeaponGenerator::randomTier(int bestTier, int legendaryPerMille)
+{
+    tier(random_weapon_tier(bestTier, legendaryPerMille));
     return *this;
 }
 

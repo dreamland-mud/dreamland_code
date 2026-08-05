@@ -1507,6 +1507,20 @@ NMI_INVOKE(Root, skills, "(group): вернуть названия всех ум
     return wrap(skills);
 }
 
+NMI_INVOKE(Root, randomWeaponTier, "(bestTier[, legendaryPerMille]): случайный tier по таблице шансов из weapon_tiers.json, не лучше чем bestTier; легендарный tier выдается только явно, с заданным шансом в промилле")
+{
+    int bestTier = argnum2number(args, 1);
+    int legendaryPerMille = args.size() > 1 ? argnum2number(args, 2) : 0;
+
+    if (bestTier < BEST_TIER || bestTier > WORST_TIER)
+        throw Scripting::Exception("Invalid weapon tier.");
+
+    if (legendaryPerMille < 0 || legendaryPerMille > 1000)
+        throw Scripting::Exception("Legendary chance must be between 0 and 1000 per mille.");
+
+    return Register(random_weapon_tier(bestTier, legendaryPerMille));
+}
+
 NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier")
 {
     ::Object *obj = argnum2item(args, 1);

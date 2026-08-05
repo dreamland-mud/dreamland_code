@@ -31,6 +31,14 @@ extern json_vector<weapon_tier_t> weapon_tier_table;
 #define DEFAULT_TIER 3
 #define WORST_TIER   5
 
+/** Roll a tier according to each tier's configured chance, but no better than bestTier.
+ *  Tiers are tried from the best allowed one downwards, so a tier with chance 0 can only
+ *  ever be granted explicitly, never rolled -- which is how the legendary tier works.
+ *  Each drop site decides how often it hands one out, in parts per thousand, because
+ *  the interesting values are well below one percent.
+ */
+int random_weapon_tier(int bestTier, int legendaryPerMille = 0);
+
 // Return tier number stored in this item's properties.
 int get_item_tier(Object *obj);
 

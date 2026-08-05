@@ -34,7 +34,7 @@ struct WeaponGenerator {
     WeaponGenerator & valueIndexBonus(float bonus) { this->aveIndexBonus = bonus; return *this; }
     WeaponGenerator & alignment(int align) { this->align = align; return *this; }
     WeaponGenerator & setRetainChance(int retainChance) { this->retainChance = retainChance; return *this; }
-    WeaponGenerator & randomTier(int bestTier);
+    WeaponGenerator & randomTier(int bestTier, int legendaryPerMille = 0);
     WeaponGenerator & addRequirement(const DLString &req) { this->required.insert(req); return *this; }
     WeaponGenerator & addForbidden(const DLString &fbd) { this->forbidden.insert(fbd); return *this; }
 
