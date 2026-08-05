@@ -40,7 +40,7 @@ static DLString unread_phrase( const NoteThread &th, int count, lang_t lang )
         return buf.str( );
     }
 
-    int gender = th.getGender( ).getValue( );
+    int gender = th.getGenderFor( lang );
     const DLString &one = th.getThreadNameFor( lang );
     const DLString &many = th.getMltNameFor( lang );
 
