@@ -165,8 +165,8 @@ void OLCStateExtraExit::show(PCharacter *ch)
     ptc(ch, "Short to RU:   %s  %s{D(ruto help){x\n", short_desc_to[RU].c_str(), web_edit_button(ch, "ruto", "web").c_str());
 
     ptc(ch, "Leave room EN: %s  %s{D(leaveroom help){x\n", msgLeaveRoom[EN].c_str(), web_edit_button(ch, "leaveroom", "web").c_str());
-    ptc(ch, "Leave room UA: %s  %s{D(ruleaveroom help){x\n", msgLeaveRoom[UA].c_str(), web_edit_button(ch, "ualeaveroom", "web").c_str());
-    ptc(ch, "Leave room RU: %s  %s{D(ualeaveroom help){x\n", msgLeaveRoom[RU].c_str(), web_edit_button(ch, "ruleaveroom", "web").c_str());
+    ptc(ch, "Leave room UA: %s  %s{D(ualeaveroom help){x\n", msgLeaveRoom[UA].c_str(), web_edit_button(ch, "ualeaveroom", "web").c_str());
+    ptc(ch, "Leave room RU: %s  %s{D(ruleaveroom help){x\n", msgLeaveRoom[RU].c_str(), web_edit_button(ch, "ruleaveroom", "web").c_str());
 
     ptc(ch, "Leave self EN: %s  %s{D(leaveself help){x\n", msgLeaveSelf[EN].c_str(), web_edit_button(ch, "leaveself", "web").c_str());
     ptc(ch, "Leave self UA: %s  %s{D(ualeaveself help){x\n", msgLeaveSelf[UA].c_str(), web_edit_button(ch, "ualeaveself", "web").c_str());
