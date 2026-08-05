@@ -17,7 +17,6 @@ public:
         
         virtual bool canLock( Character * );
         virtual bool hourly();
-        virtual void show( Character *victim, ostringstream &buf );
 };
 
 #endif

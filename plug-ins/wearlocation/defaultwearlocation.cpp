@@ -233,6 +233,9 @@ bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
         return false;    
     }
   
+    if (!obj_owner_enforce( obj, ch ))
+        return false;
+
     if (obj->behavior && !obj->behavior->canEquip( ch ))
         return false;
     
