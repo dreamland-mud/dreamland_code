@@ -352,6 +352,13 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
          * or told to start the ordinary login. */
         bool ok = !args.empty() && resume_attach(this, args.front());
         writeWSCommand(ok ? "resume_ok" : "resume_failed", std::vector<DLString>());
+    } else if(name == "ping") {
+        /* Character-less too, and its only job is to prove the socket still
+         * carries traffic in both directions. A phone that has been suspended
+         * hands the tab back with readyState still OPEN over a connection the
+         * OS has already torn down; the client cannot tell the difference
+         * until something it sends comes back. */
+        writeWSCommand("pong", std::vector<DLString>());
     } else if(character) {
         RpcCommandManager::getThis()->run(character, name, args);
     } else {
