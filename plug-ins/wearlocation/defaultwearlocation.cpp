@@ -33,7 +33,6 @@
 
 WEARLOC(none);
 GSN(spellbane);
-PROF(druid);
 
 /*-------------------------------------------------------------------
  * DefaultWearlocation
@@ -227,7 +226,8 @@ bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
         return false;
     }
 
-    if (ch->getProfession( ) == prof_druid && material_is_typed( obj, MAT_METAL )) {
+    int badMaterials = material_types_forbidden( ch );
+    if (badMaterials != 0 && material_is_typed( obj, badMaterials )) {
         echo_master(ch, _("Ты не сможешь надеть %O4: друиды не носят ничего металлического."), obj);
         ch->recho(_("%1$^C1 безуспешно пытается надеть %2$O4."), ch, obj);
         return false;    

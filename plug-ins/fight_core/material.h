@@ -10,6 +10,10 @@ class Character;
 
 bool material_is_typed( Object *, int );
 bool material_is_typed( const char *, int );
+
+/** Material types this character can never wear or wield, e.g. metal for druids. */
+int material_types_forbidden( Character * );
+
 bool material_is_flagged( Object *, int );
 bool material_is_flagged( const char *, int );
 int material_immune( Object *, Character * );
