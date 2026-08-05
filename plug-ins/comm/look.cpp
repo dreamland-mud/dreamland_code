@@ -147,6 +147,22 @@ static void format_loot_mark(Object *obj, ostringstream &buf, Character *ch)
     buf << lmsg(Player::lang(ch), "({cLoot{x) ", "({cДобыча{x) ", "({cЗдобич{x) ");
 }
 
+// Mark someone else's named item, so it is obvious why it cannot be picked up
+static void format_personal_mark(Object *obj, ostringstream &buf, Character *ch)
+{
+    if (obj->getOwner().empty())
+        return;
+
+    // Corpses are owned too, but they carry the loot mark instead.
+    if (obj->item_type == ITEM_CORPSE_PC || obj->item_type == ITEM_CORPSE_NPC)
+        return;
+
+    if (obj->hasOwner( ch ))
+        return;
+
+    buf << lmsg(Player::lang(ch), "({YPersonal{x) ", "({YЛичное{x) ", "({YОсобисте{x) ");
+}
+
 static void oprog_show(Object *obj, Character *ch, ostringstream &buf)
 {
     if (obj->behavior)
@@ -184,6 +200,8 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
         format_screenreader_flags(obj, buf, ch);
 
         format_loot_mark(obj, buf, ch);
+
+        format_personal_mark(obj, buf, ch);
 
         oprog_show(obj, ch, buf);
 

@@ -618,6 +618,13 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 return;
             }
 
+            // Someone else's named item crumbles rather than being saved along.
+            if (!obj_owner_allows( obj, ch )) {
+                oldact(_("$o1 исчезает!"), ch, obj, 0, TO_CHAR);
+                extract_obj( obj );
+                return;
+            }
+
             if (obj->behavior)
                 if (obj->behavior->save( ))
                     return;

@@ -39,6 +39,12 @@ static bool oprog_get_money( Character *ch, Object *obj )
 
 bool oprog_get( Object *obj, Character *ch )
 {
+    // Named items go back on the floor no matter who tried to take them.
+    // oprog_get itself is called last in the give chain, so a quest handler
+    // that consumes what it was given has already had its say by now.
+    if (!obj_owner_enforce( obj, ch ))
+        return true;
+
     aquest_trigger(obj, ch, "Get", "OC", obj, ch);
     FENIA_CALL( obj, "Get", "C", ch );
     FENIA_NDX_CALL( obj, "Get", "OC", obj, ch );

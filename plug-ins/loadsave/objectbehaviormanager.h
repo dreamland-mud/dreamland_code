@@ -24,24 +24,18 @@ public:
         static void save( const Object *, FILE * );
 };
 
-/** 
+/**
  * This behavior is assigned by default to all items. All other object behaviors enhance this class.
- * It deals mainly with the 'owned' item logic
+ * The 'owned' item logic it used to carry now lives in obj_owner_allows and
+ * obj_owner_enforce (loadsave.h), keyed on the owner field rather than on this
+ * class being present.
  */
 class BasicObjectBehavior : public virtual ObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<BasicObjectBehavior> Pointer;
 
-        virtual void get( Character * );
         virtual bool canConfiscate( );
-        virtual bool save( );
-        virtual void delete_( Character * ); 
-        virtual bool canSteal( Character * );
-        virtual bool canEquip( Character * );      
-
-protected:
-        bool checkOwnership(Character *);                          
 };
 
 #endif

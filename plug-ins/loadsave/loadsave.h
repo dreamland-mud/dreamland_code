@@ -134,6 +134,12 @@ Object *find_pit_for_obj(Object *obj);
 Object *find_pit_in_room(int roomVnum);
 NPCharacter * find_mob_with_behavior( Room *room, BehaviorReference &bhv );
 
+/** May this character have that named item? Keyed on the owner field alone. */
+bool obj_owner_allows( Object *obj, Character *ch );
+
+/** Same check, but put the item back on the floor when the answer is no. */
+bool obj_owner_enforce( Object *obj, Character *ch );
+
 bool eyes_blinded( Character *ch );
 bool eyes_darkened( Character *ch );
 void eyes_blinded_msg( Character *ch );

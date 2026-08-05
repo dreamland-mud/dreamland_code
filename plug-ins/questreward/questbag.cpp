@@ -87,8 +87,7 @@ bool QuestBag::hourly()
     return true;
 }
 
-void QuestBag::show( Character *victim, ostringstream &buf )
-{
-    if (!obj->hasOwner(victim))
-        buf << "({YЛичное{x) ";
-}
+/*
+ * The "(Личное)" mark used to be printed here, so only quest bags ever showed
+ * it. It is now on every named item, from format_personal_mark in look.cpp.
+ */

@@ -10,10 +10,13 @@
 #include "logstream.h"
 #include "core/object.h"
 #include "character.h"
+#include "pcharacter.h"
+#include "pcharactermanager.h"
 #include "loadsave.h"
 #include "fread_utils.h"
 #include "act.h"
 
+#include "merc.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -163,6 +166,71 @@ void ObjectBehaviorManager::save( const Object *obj, FILE *fp ) {
 }
 
 /*-----------------------------------------------------------------
+ * Ownership, keyed on the owner field alone
+ *-----------------------------------------------------------------*/
+
+/*
+ * These rules used to live in BasicObjectBehavior, which meant they only ever
+ * applied to items whose single behavior slot happened to hold one of its
+ * descendants. Ownership is handed out from all over the place -- Fenia scripts
+ * (obj.owner = ch.name), clan equipment, quest traders -- and most of those
+ * leave the slot empty, so most named items in the game obeyed no rules at all.
+ * Keying on the field instead covers every one of them, and survives the
+ * eventual removal of C++ behaviors.
+ */
+bool obj_owner_allows( Object *obj, Character *ch )
+{
+    if (!obj || !ch)
+        return true;
+
+    if (obj->getOwner().empty())
+        return true;
+
+    // Corpses carry their owner's name but loot rules of their own, enforced by
+    // the get and fetch commands: killer, group, full loot.
+    if (obj->item_type == ITEM_CORPSE_PC || obj->item_type == ITEM_CORPSE_NPC)
+        return true;
+
+    if (ch->is_immortal())
+        return true;
+
+    if (obj->hasOwner( ch ))
+        return true;
+
+    // Playing with full loot on waives ownership towards everyone else.
+    PCMemoryInterface *pcm = PCharacterManager::find( obj->getOwner() );
+    if (pcm && pcm->getAttributes( ).isAvailable( "fullloot" ))
+        return true;
+
+    return false;
+}
+
+/*
+ * Someone is holding an item they may not own: put it back on the floor.
+ * Mobs are turned away without a word -- they have no business carrying named
+ * items, and a scavenger announcing it in every room would be noise.
+ */
+bool obj_owner_enforce( Object *obj, Character *ch )
+{
+    if (obj_owner_allows( obj, ch ))
+        return true;
+
+    // A trigger further up may already have taken the item off our hands; never
+    // unlink an object from a character that is not holding it.
+    if (obj->carried_by != ch || !ch->in_room)
+        return false;
+
+    if (!ch->is_npc()) {
+        ch->pecho( _("Ты не можешь владеть %1$O5 и бросаешь %1$P2."), obj );
+        ch->recho( _("%2$^C1 не может владеть %1$O5 и бросает %1$P2."), obj, ch );
+    }
+
+    obj_from_char( obj );
+    obj_to_room( obj, ch->in_room );
+    return false;
+}
+
+/*-----------------------------------------------------------------
  * BasicObjectBehavior
  *-----------------------------------------------------------------*/
 
@@ -175,69 +243,11 @@ bool BasicObjectBehavior::canConfiscate()
     return true;
 }
 
-/** Someone else's items disappear on save. */
-bool BasicObjectBehavior::save() 
-{
-    if (obj->getOwner().empty())
-        return false;
-
-    Character *ch = obj->getCarrier( );
-
-    if (!ch || ch->is_immortal( ))
-        return false;
-    
-    if (obj->hasOwner( ch )) 
-        return false;
-    
-    oldact(_("$o1 исчезает!"), ch, obj, 0, TO_CHAR);
-    extract_obj(obj);
-    return true;    
-}
-
-/** Owned items disappear when character is deleted. */
-void BasicObjectBehavior::delete_(Character *ch) 
-{
-    if (obj->hasOwner( ch )) 
-        extract_obj( obj );    
-}
-
-/** Owned items can't be stolen. */
-bool BasicObjectBehavior::canSteal(Character *) 
-{
-    if (!obj->getOwner().empty())
-        return false;
-    
-    return true;
-}
-
-/** Owned items can't be picked up from the floor or container */
-void BasicObjectBehavior::get( Character *ch ) 
-{ 
-    checkOwnership(ch);
-}
-
-/** Owned items can't be equipped */
-bool BasicObjectBehavior::canEquip(Character *ch) 
-{
-    return checkOwnership(ch);
-}
-
-bool BasicObjectBehavior::checkOwnership(Character *ch)
-{
-    if (obj->getOwner().empty())
-        return true;
-
-    if (ch->is_immortal())
-        return true;
-    
-    if (!obj->hasOwner( ch )) {
-        ch->pecho( _("Ты не можешь владеть %1$O5 и бросаешь %1$P2."), obj );
-        ch->recho(_("%2$^C1 не может владеть %1$O5 и бросает %1$P2."), obj, ch);
-        obj_from_char( obj );
-        obj_to_room( obj, ch->in_room );
-        return false;
-    }
-
-    return true;
-}
+/*
+ * The ownership rules that used to live here -- save, delete_, canSteal, get,
+ * canEquip, checkOwnership -- are now obj_owner_allows/obj_owner_enforce above,
+ * called from the generic get, wear and save paths so that every named item is
+ * covered and not just the ones carrying a behavior. canSteal and delete_ had
+ * no dispatch left at all: steal moved to Fenia and asks obj.owner directly.
+ */
 
