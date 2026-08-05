@@ -274,6 +274,10 @@ SKILL_APPLY(guard)
     if (pch->guarded_by == 0 || pch->guarded_by->in_room != ch->in_room)
         return false;
 
+    // No leaping in front of a blow while unconscious.
+    if (!IS_AWAKE(pch->guarded_by))
+        return false;
+
     chance = (gsn_guard->getEffective(pch->guarded_by) -
               (int)(1.5 * (ch->getModifyLevel() - victim->getModifyLevel())));
 

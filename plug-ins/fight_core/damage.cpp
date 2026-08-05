@@ -329,6 +329,16 @@ bool Damage::adjustMasterAttack( )
     if (!IS_CHARMED(victim))
         return false;
 
+    // A charmed follower can outlive its master, e.g. when the master is extracted.
+    if (victim->master == 0)
+        return false;
+
+    // Only switch onto a master who can notice the fight. Dropping an unconscious
+    // owner into combat makes set_fighting strip their sleep, which undoes the very
+    // blackjack that put them there -- see the awake check on the follower above.
+    if (!IS_AWAKE(victim->master))
+        return false;
+
     if (victim->master->in_room != ch->in_room)
         return false;
 
