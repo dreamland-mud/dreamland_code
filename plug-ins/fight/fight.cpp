@@ -512,7 +512,7 @@ void multi_hit( Character *ch, Character *victim, string command )
     }
 }
    
-void multi_hit_nocatch( Character *ch, Character *victim, string command )
+static void multi_hit_strikes( Character *ch, Character *victim, string command )
 {
     /* no attacks for stunnies -- just a check */
     if ( ch->position < POS_RESTING )
@@ -547,12 +547,23 @@ void multi_hit_nocatch( Character *ch, Character *victim, string command )
     
     second_weapon_hit(ch,victim,100);
 
-    ch->fighting == victim 
+    ch->fighting == victim
         && next_attack( ch, victim, *gsn_second_attack, 2 )
         && next_attack( ch, victim, *gsn_third_attack, 3 )
         && next_attack( ch, victim, *gsn_fourth_attack, 3 )
         && next_attack( ch, victim, *gsn_fifth_attack, 3 )
         && forest_attack( ch, victim );
+}
+
+void multi_hit_nocatch( Character *ch, Character *victim, string command )
+{
+    multi_hit_strikes( ch, victim, command );
+
+    // Every strike of the round landed on a victim who was still down, and so carried
+    // the position bonus (OneHit::damApplyPosition, acApplyPosition). Now they get up,
+    // which is also what frees the furniture they were resting on. A victim who died
+    // mid-round never reaches this: the death exception unwinds past it.
+    stand_up_after_round( victim );
 }
 
 void one_hit_nocatch( Character *ch, Character *victim, bool secondary, string command )

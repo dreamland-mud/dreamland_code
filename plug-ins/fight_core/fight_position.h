@@ -8,7 +8,22 @@
 class Character;
 
 void stop_fighting( Character *ch, bool fBoth );
-void set_fighting( Character *ch, Character *victim );
+
+/** Start a fight. 'standUp' is what puts ch on their feet and shakes off sleep;
+ *  pass false for a character who is being attacked while down, so that the whole
+ *  round lands at the position penalty before they get up.
+ */
+void set_fighting( Character *ch, Character *victim, bool standUp = true );
+
+/** On your feet and fighting: also releases the furniture you were resting on. */
+void stand_up_to_fight( Character *ch );
+
+/** Called once per melee round on the character being attacked: someone caught
+ *  lying, sitting or asleep eats that whole round at the position penalty and
+ *  only then wakes up, stands and frees the furniture.
+ */
+void stand_up_after_round( Character *victim );
+
 void update_pos( Character *victim );
 
 void        set_violent( Character *ch, Character *victim, bool fAlways );

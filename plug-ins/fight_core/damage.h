@@ -49,6 +49,13 @@ public:
 
     void inflictDamage( );
     void handlePosition( );
+
+    /** Whether this damage rouses a sleeping victim where it lands. True for spells,
+     *  traps and affects; a melee round defers it to the end (stand_up_after_round),
+     *  so that every strike of it still gets the sleeping victim's damage bonus.
+     */
+    virtual bool wakesSleepingVictim( ) const { return true; }
+
     virtual void reportState( );
     bool checkRetreat( );
     void handleDeath( );
