@@ -16,6 +16,7 @@
 #include "room.h"
 
 #include "dreamland.h"
+#include "fenia_utils.h"
 #include "interp.h"
 #include "loadsave.h"
 #include "directions.h"
@@ -275,10 +276,24 @@ bool BasicMobileBehavior::backHome( bool fAlways )
         }
     }
 
-    transfer_char( ch, 0, home,
-                   "%1$^C1 молит Богов о возвращении.", 
-                   NULL,
-                   "%1$^C1 появляется из дымки." );
+    // The walk branch above goes through Walkment and therefore obeys web,
+    // entangle and the rest; this branch used to be a raw teleport that asked
+    // nobody. Hand it to Fenia so it runs the same transportation guards every
+    // other kind of travel runs, and can be retuned without a rebuild. With no
+    // handler registered gprog returns false and the old behaviour stands.
+    if (!gprog("onRecallAI", "CR", ch, home))
+        transfer_char( ch, 0, home,
+                       "%1$^C1 молит Богов о возвращении.",
+                       NULL,
+                       "%1$^C1 появляется из дымки." );
+
+    // A handler is free to give up on a mob that has nowhere to return to.
+    if (ch->extracted)
+        return true;
+
+    // Refused: keep homeVnum so the mob tries again once it is free.
+    if (ch->in_room != home)
+        return false;
 
     ch->position = ch->default_pos;
     homeVnum = 0;
