@@ -1406,8 +1406,9 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         buf << look_targets_hint( ch, room->getExtraDescr(), lang );
     }
 
-    // 'autoexit' config option retired -- exits are always shown to players.
-    if (ch->getPC( ))
+    // 'autoexit' is a player option again: the exits line is read out loud on
+    // every single move, so screen reader users are the ones who switch it off.
+    if (ch->getPC( ) && IS_SET(ch->getPC( )->act, PLR_AUTOEXIT))
     {
         buf << endl;
         ch->send_to( buf );
