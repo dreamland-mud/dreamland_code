@@ -16,6 +16,9 @@
 #define UPDATE_H
 
 class PCharacter;
+class Object;
+
+bool lost_and_found_sweep( Object * );
 
 void update_handler( );
 void char_update( );

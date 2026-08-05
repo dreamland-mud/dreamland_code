@@ -64,6 +64,10 @@ public:
         Object *obj, *obj_next;
         for (obj = object_list; obj; obj = obj_next) {
             obj_next = obj->next;
+
+            if (lost_and_found_sweep(obj))
+                continue;
+
             if (obj->behavior)
                 obj->behavior->hourly();
         }

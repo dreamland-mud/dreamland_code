@@ -871,6 +871,69 @@ static bool oprog_area( Object *obj )
 }
 
 /*
+ * Personal and quest items left lying around eventually make their way to the
+ * Lost and Found office in the capital.
+ *
+ * The sweep is keyed on the owner field alone. Ownership is handed out from all
+ * over the place -- Fenia scripts, clan equipment, area quests, quest traders --
+ * and almost none of those attach a C++ behavior, while an object has room for
+ * exactly one behavior anyway. Hanging this off a behavior class (as it used to
+ * be) therefore missed nearly every owned item in the game.
+ */
+bool lost_and_found_sweep( Object *obj )
+{
+    if (!obj->pIndexData)
+        return false;
+
+    if (obj->getOwner( ).empty( ))
+        return false;
+
+    if (!obj->in_room)
+        return false;
+
+    if (!obj->can_wear( ITEM_TAKE ))
+        return false;
+
+    // A player corpse carries its owner's name and has to rot where it fell.
+    if (obj->item_type == ITEM_CORPSE_PC || obj->item_type == ITEM_CORPSE_NPC)
+        return false;
+
+    // Anything already counting down will be gone before anyone reclaims it.
+    if (obj->timer > 0)
+        return false;
+
+    if (IS_SET(obj->in_room->room_flags, ROOM_MANSION|ROOM_GODS_ONLY))
+        return false;
+
+    if (obj->in_room->vnum == ROOM_VNUM_BUREAU_1
+            || obj->in_room->vnum == ROOM_VNUM_BUREAU_2
+            || obj->in_room->vnum == ROOM_VNUM_BUREAU_3)
+        return false;
+
+    if (!obj->getProperty( "keepHere" ).empty( ))
+        return false;
+
+    Room *office = get_room_instance( ROOM_VNUM_BUREAU_2 );
+    if (!office)
+        return false;
+
+    Room *from = obj->in_room;
+
+    notice("[cleanup] Item %d %lld of %s transferred from room [%d] [%s] to lost&found.",
+            obj->pIndexData->vnum, obj->getID( ), obj->getOwner( ).c_str( ),
+            from->vnum, from->getName( ));
+
+    obj_from_room( obj );
+    obj_to_room( obj, office );
+
+    // Both room snapshots have to reach the disk, otherwise the next reboot
+    // loads the item straight back into the room it was swept out of.
+    save_items( from );
+    save_items( office );
+    return true;
+}
+
+/*
  * Update all objs.
  * This function is performance sensitive.
  */

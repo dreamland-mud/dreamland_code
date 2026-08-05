@@ -12,6 +12,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "core/object.h"
+#include "save.h"
 
 #include "vnum.h"
 #include "def.h"
@@ -34,11 +35,13 @@ bool QuestBag::canLock( Character *ch )
     return obj->hasOwner( ch );
 }
 
+/*
+ * Takeable personal items are swept to the Lost and Found by the global
+ * lost_and_found_sweep(); what is left here is the old non-takeable chests of
+ * players who have not logged in for years -- those go to the storage room.
+ */
 bool QuestBag::hourly()
 {
-    if (PersonalQuestReward::hourly())
-        return true;
-
     if (!obj->in_room)
         return false;
 
@@ -63,13 +66,24 @@ bool QuestBag::hourly()
     if (owner && owner->getLastAccessTime().getTime() >= 1645679207) // been here since 2022
         return false;
 
-    obj->setProperty("oldRoom", DLString(obj->in_room->vnum));
+    Room *storage = get_room_instance(ROOM_VNUM_BUREAU_3);
+    if (!storage)
+        return false;
+
+    Room *from = obj->in_room;
+
+    obj->setProperty("oldRoom", DLString(from->vnum));
     notice("[cleanup] Chest %d %lld of %s transferred from room [%d] [%s] to storage.",
             obj->pIndexData->vnum, obj->getID(), obj->getOwner().c_str(),
-            obj->in_room->vnum, obj->in_room->getName());
+            from->vnum, from->getName());
 
     obj_from_room(obj);
-    obj_to_room(obj, get_room_instance(ROOM_VNUM_BUREAU_3));
+    obj_to_room(obj, storage);
+
+    // Both room snapshots have to reach the disk, otherwise the next reboot
+    // loads the chest straight back into the room it was swept out of.
+    save_items(from);
+    save_items(storage);
     return true;
 }
 
