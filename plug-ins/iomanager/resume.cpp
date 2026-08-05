@@ -165,24 +165,33 @@ bool resume_attach(Descriptor *d, const DLString &token)
     if (t == tokens.end())
         return false;
 
-    // Spend it before deciding anything else: a token that has been presented
-    // once is finished, whether or not this attempt goes on to succeed.
     DLString name = t->second.name;
-    resume_forget(name);
-
     PCharacter *twin = PCharacterManager::findPlayer(name);
-    if (!twin) {
+
+    /* Someone is already at the keyboard, or the player is an immortal
+     * currently switched into a mob. Both are for the login flow to sort out,
+     * which asks before it evicts anyone.
+     *
+     * Checked BEFORE the token is spent, because the usual occupant here is
+     * the client's own dead socket: a phone that suspends drops the link
+     * without a FIN, so the character keeps its descriptor until a write to
+     * that socket finally fails. Spending the token on that would answer a
+     * returning player with resume_failed -- and the client, holding nothing
+     * to retry with, drops them at the login screen for a condition that
+     * clears itself moments later. The token stays single-use for every
+     * outcome that is actually final, and still dies of its own TTL. */
+    if (twin && (twin->desc || twin->switchedTo)) {
         LogStream::sendNotice() << "Resume: " << d->host << " has a token for "
-                                << name << ", who is no longer in the world" << endl;
+                                << name << ", who is still connected -- token kept for a retry" << endl;
         return false;
     }
 
-    // Someone is already at the keyboard, or the player is an immortal
-    // currently switched into a mob. Both are for the login flow to sort out,
-    // which asks before it evicts anyone.
-    if (twin->desc || twin->switchedTo) {
+    // Every outcome from here on is final, so the token is finished.
+    resume_forget(name);
+
+    if (!twin) {
         LogStream::sendNotice() << "Resume: " << d->host << " has a token for "
-                                << name << ", who is still connected" << endl;
+                                << name << ", who is no longer in the world" << endl;
         return false;
     }
 
