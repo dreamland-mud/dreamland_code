@@ -20,6 +20,7 @@
 #include "clanreference.h"
 
 #include "fight.h"
+#include "skill_utils.h"
 #include "loadsave.h"
 #include "math_utils.h"
 
@@ -39,7 +40,7 @@ GSN(counter);
 GSN(holy_attack);
 GSN(poison);
 
-WeaponOneHit::WeaponOneHit( Character *ch, Character *victiim, bool secondary, string command )
+WeaponOneHit::WeaponOneHit( Character *ch, Character *victim, bool secondary, string command )
                 : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
                   OneHit( ch, victim )
 {
@@ -410,7 +411,84 @@ bool SkillWeaponOneHit::mprog_immune()
     for (auto &paf: victim->affected.findAllWithHandler())
         if (paf->type->getAffect() && paf->type->getAffect()->onImmune(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), wield, dam_flag, sname.c_str()))
             return true;
-            
-    return false; 
+
+    return false;
+}
+
+/*----------------------------------------------------------------------------
+ * Parameterized skill weapon hit
+ *
+ * Backstab, dual backstab, circle, knife, ambush, cleave and friends all share
+ * one shape: base weapon damage, class bonus, damroll, a level-scaled
+ * multiplier, optionally the counter bonus. Only the divisor, the THAC0 tweak
+ * and the counter flag differ. Exposing that shape here lets those skills move
+ * into Fenia without reimplementing THAC0, armor class, the protection stack
+ * and the weapon proc effects on the script side.
+ *---------------------------------------------------------------------------*/
+class GenericSkillOneHit: public SkillWeaponOneHit {
+public:
+    GenericSkillOneHit( Character *ch, Character *victim, Skill *skill,
+                        int damDivisor, int thacCoeff, bool applyCounter );
+
+    virtual void calcTHAC0( );
+    virtual void calcDamage( );
+
+protected:
+    Skill *skillPtr;
+    int damDivisor;
+    int thacCoeff;
+    bool applyCounter;
+};
+
+GenericSkillOneHit::GenericSkillOneHit( Character *ch, Character *victim, Skill *skill,
+                                        int damDivisor, int thacCoeff, bool applyCounter )
+            : Damage(ch, victim, 0, 0, DAMF_WEAPON),
+              SkillWeaponOneHit( ch, victim, skill->getIndex( ) )
+{
+    this->skillPtr = skill;
+    this->damDivisor = damDivisor;
+    this->thacCoeff = thacCoeff;
+    this->applyCounter = applyCounter;
+}
+
+void GenericSkillOneHit::calcDamage( )
+{
+    damBase( );
+    damapply_class(ch, dam);
+    damApplyDamroll( );
+
+    // The multiplier needs a weapon in hand: bare-handed callers keep plain damage.
+    if (wield != 0 && damDivisor > 0) {
+        int slevel = skill_level(*skillPtr, ch);
+        dam = ( slevel / damDivisor + 1 ) * dam + slevel;
+    }
+
+    if (applyCounter)
+        damApplyCounter( );
+
+    WeaponOneHit::calcDamage( );
+}
+
+void GenericSkillOneHit::calcTHAC0( )
+{
+    thacBase( );
+    thacApplyHitroll( );
+    thacApplySkill( );
+
+    if (thacCoeff != 0)
+        thac0 -= thacCoeff * (100 - skillPtr->getEffective( ch ));
+}
+
+void skill_one_hit_nocatch( Character *ch, Character *victim, Skill *skill,
+                            int damDivisor, int thacCoeff, bool applyCounter, bool miss )
+{
+    GenericSkillOneHit onehit( ch, victim, skill, damDivisor, thacCoeff, applyCounter );
+
+    // Lets VictimDeathException through, like damage_nocatch: the Fenia layer
+    // turns it into a "victim is dead" abort of the calling script.
+    if (miss)
+        onehit.miss( );
+    else
+        onehit.hit( );
 }
 

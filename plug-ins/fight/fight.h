@@ -43,6 +43,10 @@ int        move_dec( Character *ch );
 void damapply_class(Character *ch, int &dam);
 int second_weapon_chance(Profession *prof, Object *weapon);
 
+/* parameterized skill weapon hit (onehit_weapon.cpp) */
+void        skill_one_hit_nocatch( Character *ch, Character *victim, Skill *skill,
+                                   int damDivisor, int thacCoeff, bool applyCounter, bool miss );
+
 
 void yell_panic( Character *ch, Character *victim, const char *msgBlind , const char *msg, const char *label = 0 );
 
