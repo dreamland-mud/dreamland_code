@@ -538,9 +538,22 @@ int ExitsMovement::adjustMovetype( Character *wch )
         return MOVETYPE_FLYING;
 
     if (from_room->getSectorType() == SECT_WATER_NOSWIM || to_room->getSectorType() == SECT_WATER_NOSWIM) {
+        // boat_types and boat describe how the PARTY gets across: for a pet
+        // they are the master's (see Walkment::Walkment). That is right for
+        // deciding whether the crossing is possible, but wrong for describing
+        // this character -- a swimming pet was announced as flying because its
+        // owner flew. Prefer wch's own means of travel, and only fall back to
+        // the party's boat when it has none of its own.
+        if (is_flying( wch ))
+            return MOVETYPE_FLYING;
+
+        if (!boat && (IS_AFFECTED( wch, AFF_SWIM )
+                      || wch->getRace( )->getAff( ).isSet( AFF_SWIM )))
+            return MOVETYPE_SWIMMING;
+
         if (IS_SET(boat_types, BOAT_FLY))
             return MOVETYPE_FLYING;
-      
+
         if (IS_SET(boat_types, BOAT_INV|BOAT_EQ))
             return boat->value0();
     }
