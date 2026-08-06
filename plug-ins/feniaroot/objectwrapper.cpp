@@ -45,7 +45,6 @@ using namespace Scripting;
 NMI_INIT(ObjectWrapper, "предмет")
 
 bool oprog_drop(::Object *obj, Character *ch);
-bool omprog_give(::Object *obj, Character *ch, Character *victim);
 
 ObjectWrapper::ObjectWrapper( ) : target( NULL )
 {

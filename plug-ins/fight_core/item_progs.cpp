@@ -1,5 +1,6 @@
 #include "item_progs.h"
 #include "character.h"
+#include "npcharacter.h"
 #include "core/object.h"
 #include "affect.h"
 #include "affecthandler.h"
@@ -86,4 +87,53 @@ bool oprog_drop( Object *obj, Character *ch )
     return false;
 }
 
+/*
+ * A whole hand-over: area quests, behaviors and both sides' Fenia triggers each
+ * get a say, and any of them may take the item back, which is what every
+ * `obj->carried_by != victim` bail-out is checking. Lives here rather than in
+ * the 'give' command because 'request' and the Fenia obj.trigger("Give") wrapper
+ * need the same chain.
+ */
+bool omprog_give( Object *obj, Character *ch, Character *victim )
+{
+    if (aquest_trigger(obj, ch, "Give", "OCC", obj, ch, victim))
+        return true;
+    if (obj->carried_by != victim)
+        return true;
 
+    if (aquest_trigger(victim, ch, "Give", "CCO", victim, ch, obj))
+        return true;
+    if (obj->carried_by != victim)
+        return true;
+
+    if (behavior_trigger(victim, "Give", "CCO", victim, ch, obj))
+        return true;        
+    if (obj->carried_by != victim)
+        return true;
+
+    FENIA_CALL( obj, "Give", "CC", ch, victim )
+    if (obj->carried_by != victim)
+        return true;
+
+    FENIA_NDX_CALL( obj, "Give", "OCC", obj, ch, victim )
+    if (obj->carried_by != victim)
+        return true;
+
+    BEHAVIOR_VOID_CALL( obj, give, ch, victim )
+    if (obj->carried_by != victim)
+        return true;
+    
+    FENIA_CALL( victim, "Give", "CO", ch, obj );
+    if (obj->carried_by != victim)
+        return true;
+
+    FENIA_NDX_CALL( victim->getNPC( ), "Give", "CCO", victim, ch, obj );
+    if (obj->carried_by != victim)
+        return true;
+
+    BEHAVIOR_VOID_CALL( victim->getNPC( ), give, ch, obj );        
+    if (obj->carried_by != victim)
+        return true;
+        
+    return oprog_get( obj, victim );
+}
