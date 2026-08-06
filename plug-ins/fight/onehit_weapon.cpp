@@ -475,8 +475,11 @@ void GenericSkillOneHit::calcTHAC0( )
     thacApplyHitroll( );
     thacApplySkill( );
 
+    // Skill-proportional to-hit bonus, scaled like thacApplySkill: the whole
+    // meaningful range of (thac0 - victim_ac) is about 20 wide, so thacCoeff is
+    // the bonus a fully learned skill is worth.
     if (thacCoeff != 0)
-        thac0 -= thacCoeff * (100 - skillPtr->getEffective( ch ));
+        thac0 -= thacCoeff * skillPtr->getEffective( ch ) / 100;
 }
 
 void skill_one_hit_nocatch( Character *ch, Character *victim, Skill *skill,
