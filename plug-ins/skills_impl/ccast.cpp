@@ -197,6 +197,7 @@ CMDRUN( cast )
 
     victim = target->victim;
     offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
+    bool fizzledFar = false;
 
     if (!spell->properOrder(ch)) {
         if (offensive && victim && !victim->is_npc( ))
@@ -280,6 +281,12 @@ CMDRUN( cast )
         ch->mana -= mana / 2;
         ch->move -= moves / 2;
 
+        // A cast at a target in another room that fizzles never gets there:
+        // nothing is seen or heard on their side, and clearing castFar below
+        // also drops the return shot, so the alarm yell would be its only
+        // trace. Remember it and stay silent. A same-room fizzle still yells --
+        // there the victim watched the attempt and hits back.
+        fizzledFar = target->castFar;
         target->castFar = false;
     }
     else {
@@ -321,7 +328,8 @@ CMDRUN( cast )
     }
     
     if (offensive && victim) {
-        yell_panic(ch, victim, "Помогите! Кто-то напал на меня!", "Помогите! %1$^C1 напа%1$Gло|л|ла на меня!");
+        if (!fizzledFar)
+            yell_panic(ch, victim, "Помогите! Кто-то напал на меня!", "Помогите! %1$^C1 напа%1$Gло|л|ла на меня!");
 
         if (target->castFar && target->door != -1) {
             ch->setLastFightTime( );
