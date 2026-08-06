@@ -23,6 +23,7 @@
 #include "desire.h"
 #include "npcharacter.h"
 #include "race.h"
+#include "raceflags.h"
 #include "object.h"
 #include "room.h"
 
@@ -2372,6 +2373,13 @@ NMI_INVOKE( CharacterWrapper, is_safe, "(vict): защищают ли боги v
     checkTarget( );
     return ::is_safe_nomessage( target, 
                                 arg2character( get_unique_arg( args ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, donatesTo, "(ch): раса этого персонажа отдает свои вещи расе ch по просьбе (кентавры и прочие)" )
+{
+    checkTarget( );
+    Character *other = args2character( args );
+    return getTarget( )->getRace( )->getAttitude( *other->getRace( ) ).isSet( RACE_DONATES );
 }
 
 NMI_INVOKE( CharacterWrapper, is_safe_spell, "(vict): защищают ли боги vict от наших арийных заклинаний" )
