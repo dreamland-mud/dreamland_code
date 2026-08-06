@@ -143,6 +143,11 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     
     rprog_skill( ch->in_room, ch, getName( ).c_str( ), success, victim );
 
+    // No improvement from beating up your own crew: a charmed follower never
+    // fights back, which makes it a risk-free skill trainer.
+    if (victim && victim->is_npc( ) && victim->master == ch)
+        return;
+
     if (data.isTemporary())
         return;
 
