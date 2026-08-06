@@ -25,49 +25,6 @@
 #define GIVE_MODE_USUAL   0
 #define GIVE_MODE_PRESENT 1
 
-bool omprog_give( Object *obj, Character *ch, Character *victim )
-{
-    if (aquest_trigger(obj, ch, "Give", "OCC", obj, ch, victim))
-        return true;
-    if (obj->carried_by != victim)
-        return true;
-
-    if (aquest_trigger(victim, ch, "Give", "CCO", victim, ch, obj))
-        return true;
-    if (obj->carried_by != victim)
-        return true;
-
-    if (behavior_trigger(victim, "Give", "CCO", victim, ch, obj))
-        return true;        
-    if (obj->carried_by != victim)
-        return true;
-
-    FENIA_CALL( obj, "Give", "CC", ch, victim )
-    if (obj->carried_by != victim)
-        return true;
-
-    FENIA_NDX_CALL( obj, "Give", "OCC", obj, ch, victim )
-    if (obj->carried_by != victim)
-        return true;
-
-    BEHAVIOR_VOID_CALL( obj, give, ch, victim )
-    if (obj->carried_by != victim)
-        return true;
-    
-    FENIA_CALL( victim, "Give", "CO", ch, obj );
-    if (obj->carried_by != victim)
-        return true;
-
-    FENIA_NDX_CALL( victim->getNPC( ), "Give", "CCO", victim, ch, obj );
-    if (obj->carried_by != victim)
-        return true;
-
-    BEHAVIOR_VOID_CALL( victim->getNPC( ), give, ch, obj );        
-    if (obj->carried_by != victim)
-        return true;
-        
-    return oprog_get( obj, victim );
-}
 
 static bool oprog_present( Object *obj, Character *ch, Character *victim )
 {
