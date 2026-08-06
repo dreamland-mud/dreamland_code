@@ -503,13 +503,18 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
     {
         int otherAlignKills = 0;
 
+        // Skip N_ALIGN_NULL. ACT_NOALIGN victims land in that bucket, but they
+        // are not "недобрые" in any sense, they never trigger this message (see
+        // the guard above), and 'score' only ever shows good/neutral/evil.
+        // Counting them here made the total disagree with the score screen and
+        // brought the charisma gain forward by one kill per no-align victim.
         for (int a = 0; a < align_table.size; a++)
-            if (a != myAlign)
+            if (a != myAlign && a != N_ALIGN_NULL)
                 otherAlignKills += killed->align[a];
 
         if ((otherAlignKills % 200) == 199)
         {
-            gch->pecho(_("На твоем счету {W%1$d{x труп%1$I|а|ов {W%s{x персонажей."),
+            gch->pecho(_("На твоем счету {W%1$d{x труп%1$I|а|ов {W%2$s{x персонажей."),
                 otherAlignKills,
                 IS_GOOD(gch) ? "недобрых" :
                 IS_NEUTRAL(gch) ? "добрых и злых" :
