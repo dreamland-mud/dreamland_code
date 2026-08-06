@@ -8,15 +8,21 @@
 #include "servlet_utils.h"
 #include "cban.h"
 #include "deny.h"
+#include "reward.h"
 #include "dreamland.h"
 
 
 void reboot_action(const DLString& arg, ostringstream& buf);
 
 /**
- * Discord: /admin reboot|ban|deny args
- * Auth: bottype=discord, token=<discord secret>
- * Args: id, message
+ * Discord or Telegram: /admin reboot|ban|deny|reward args
+ * Auth: bottype=discord|telegram, token=<bot secret>
+ * Args: id, command
+ *
+ * The caller is resolved from their player record rather than an online character,
+ * so these work with no immortal in the game -- which is the point of 'reward':
+ * a queued reward is stored on the target's memory record and handed over on
+ * their next login, so neither side has to be connected.
  */
 SERVLET_HANDLE(cmd_admin, "/admin")
 {
@@ -54,7 +60,10 @@ SERVLET_HANDLE(cmd_admin, "/admin")
     } else if (cmd == "ban") {
         CBan::action(cmdArgs, buf);
 
-    }  else {    
+    } else if (cmd == "reward") {
+        reward_action(cmdArgs, buf);
+
+    }  else {
         servlet_response_404(response, "Command not found");
         return;
     }
