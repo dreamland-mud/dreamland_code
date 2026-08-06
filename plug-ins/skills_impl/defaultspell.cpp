@@ -136,6 +136,19 @@ void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
     }
 }
 
+bool DefaultSpell::preRun( Character *ch, SpellTargetPointer spt, int level )
+{
+    bool rc = true;
+
+    if (!spt)
+        return true;
+
+    // Figure out the applicable preRunXXX method and let it veto. When no such
+    // method is defined, or it returns nothing, 'rc' stays true and the cast goes on.
+    FeniaSkillActionHelper::executeSpellPreRun(this, ch, spt, level, rc);
+    return rc;
+}
+
 bool DefaultSpell::apply( Character *ch, SpellTargetPointer spt, int level )
 {
     bool rc;                                      

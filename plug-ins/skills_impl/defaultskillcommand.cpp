@@ -209,6 +209,16 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
         return;
     }
 
+    // Let the skill refuse before anything is spent. A Fenia 'preRun' returning false
+    // aborts here: no mana, no moves, no lag -- and no setLastFightTime() below either,
+    // because a command that never happened must not mark the character as fighting.
+    // Eligibility checks belong in 'preRun'; 'run' keeps its own copies for the paths
+    // that do get there (and for callers that bypass this method, such as mob AI).
+    bool proceed = true;
+    FeniaSkillActionHelper::executeCommandPreRun(this, ch, target, proceed);
+    if (!proceed)
+        return;
+
     // Do mana and move checks early. TODO: show skill name somehow.
     int mana = skill->getMana(ch);
     if (mana > 0 && ch->mana < mana) {

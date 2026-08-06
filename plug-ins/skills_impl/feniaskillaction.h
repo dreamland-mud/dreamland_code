@@ -97,6 +97,8 @@ public:
     static void extractWrapper(SkillCommand *);
 
     static bool executeSpellRun(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
+    static bool executeSpellPreRun(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level, bool &rc);
+    static bool executeCommandPreRun(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target, bool &rc);
     static bool executeSpellApply(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level, bool &rc);    
     static bool executeCommandRun(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);
     static bool executeCommandApply(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level, bool &rc);

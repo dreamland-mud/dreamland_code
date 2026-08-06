@@ -16,6 +16,7 @@ static DLString ON_ID = "on";
 static DLString POST_ID = "post";
 static DLString RUN_ID = "run";
 static DLString APPLY_ID = "apply";
+static DLString PRERUN_ID = "preRun";
 
 WrapperBase::WrapperBase( ) : alive(false), zombie( false )
 {
@@ -335,9 +336,10 @@ void WrapperBase::collectTriggers(StringSet &triggers, StringSet &misc) const
         Lex::id_t id = g->first;
         const DLString &idName = Lex::getThis()->getName(id);
 
-        if (ON_ID.strPrefix(idName) 
+        if (ON_ID.strPrefix(idName)
             || POST_ID.strPrefix(idName)
             || APPLY_ID.strPrefix(idName)
+            || PRERUN_ID.strPrefix(idName)
             || RUN_ID.strPrefix(idName))
             triggers.insert(idName);
         else
