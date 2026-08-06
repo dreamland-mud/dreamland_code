@@ -28,6 +28,7 @@
 #include "material-table.h"
 #include "material.h"
 #include "fight.h"
+#include "skill_utils.h"
 #include "loadsave.h"
 #include "fenia/exceptions.h"
 #include "nativeext.h"
@@ -1221,6 +1222,12 @@ NMI_INVOKE( BonusWrapper, active, "(ch): вернет true если бонус �
 {
     PCharacter *ch = argnum2player(args, 1);
     return getTarget()->isActive(ch, time_info);
+}
+
+NMI_INVOKE( BonusWrapper, checkAndReport, "(ch): вернет true если бонус активен для ch, попутно напечатав ch сообщение о его срабатывании")
+{
+    Character *ch = argnum2character(args, 1);
+    return bonus_check_and_report(*getTarget(), ch);
 }
 
 NMI_INVOKE( BonusWrapper, give, "(ch,days): дать бонус на days дней. Вернет true, если присвоено успешно.")
