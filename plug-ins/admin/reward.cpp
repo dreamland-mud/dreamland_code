@@ -85,70 +85,74 @@ void XMLAttributeGodRewardListenerPlugin::run( int oldState, int newState, Descr
 }
 
 
-CMDADM( ireward )
+void reward_action(const DLString &constArguments, ostringstream &buf)
 {
     PCMemoryInterface *pci;
-    DLString arguments = constArguments; 
+    DLString arguments = constArguments;
     DLString name = arguments.getOneArgument( );
     DLString qpStr = arguments.getOneArgument( );
-    DLString reason = arguments;
 
-    if (name.empty( )) {
-        ch->pecho( _("Вознаградить кого?") );
-        return;
-    }
-
-    if (qpStr.empty( )) {
-        ch->pecho(_("Использование: \r\n    ireward персонаж кп причина\r\n    ireward персонаж show\r\n    ireward персонаж delete"));
+    if (name.empty( ) || qpStr.empty( )) {
+        buf << "Usage: reward <player> <qp> <reason>" << endl;
+        buf << "Usage: reward <player> show" << endl;
+        buf << "Usage: reward <player> del" << endl;
         return;
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-        ch->pecho( _("Персонаж с таким именем не найден.") );
+        buf << "Player " << name << " not found." << endl;
         return;
     }
 
     if (arg_is(qpStr, "del")) {
         pci->getAttributes().eraseAttribute(ATTRNAME);
         PCharacterManager::saveMemory(pci);
-        ch->pecho(_("Удалены все награды."));
+        buf << "All pending rewards for " << pci->getName() << " removed." << endl;
         return;
-    } 
+    }
 
     XMLAttributeGodReward::Pointer attr = pci->getAttributes().getAttr<XMLAttributeGodReward>(ATTRNAME);
 
     if (arg_is_show(qpStr)) {
         if (attr->isEmpty()) {
-            ch->pecho(_("Наград не найдено."));
+            buf << "No pending rewards for " << pci->getName() << "." << endl;
             return;
         }
 
-        ostringstream buf;
         buf << "Награды для персонажа " << pci->getName() << ":" << endl;
         attr->listRewards(buf);
-        ch->send_to(buf);
         return;
-    } 
-
+    }
 
     int qp;
     try {
         qp = qpStr.toInt( );
     } catch (const ExceptionBadType& e) {
-        ch->pecho(_("Укажите кол-во квестовых единиц.\r\n"));
+        buf << "Quest point amount expected, got '" << qpStr << "'." << endl;
         return;
     }
 
     attr->addReward(qp, arguments);
-    ch->pecho(_("Установлена награда в %d qp, причина: %s."), qp, arguments.c_str());
+    buf << "Reward of " << qp << " qp set for " << pci->getName()
+        << ", reason: " << arguments << "." << endl;
 
-    if (pci->isOnline()) {      
+    // Online players get it straight away; everyone else on their next login.
+    if (pci->isOnline()) {
         PCharacter *vict = pci->getPlayer();
         attr->reward(vict);
         vict->getAttributes().eraseAttribute(ATTRNAME);
         vict->save();
     } else {
         PCharacterManager::saveMemory(pci);
+        buf << "Player is offline, the reward waits for their next login." << endl;
     }
+}
+
+CMDADM( ireward )
+{
+    ostringstream buf;
+
+    reward_action( constArguments, buf );
+    ch->send_to( buf );
 }
     

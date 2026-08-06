@@ -13,6 +13,14 @@
 class PCharacter;
 class XMLReward;
 
+/**
+ * Shared body of the 'ireward' command and of '/admin reward', writing its output
+ * to a buffer so that both an immortal's screen and a bot response can carry it.
+ * Works on the player's memory record, so the target need not be online: the
+ * reward is stored as an attribute and handed over on their next login.
+ */
+void reward_action(const DLString &arguments, std::ostringstream &buf);
+
 class XMLGodReward : public XMLVariableContainer {
 XML_OBJECT
 public: 
