@@ -31,6 +31,12 @@ public:
     virtual void run( Character *, const DLString &, int, int ) = 0;
     virtual void run( Character *, Room *, int, int ) = 0;
 
+    // Fired once the target is resolved but before anything is spent: lag, spoken
+    // words, the violence flag, mana and the caster's skill improvement all come
+    // later. Returning false aborts the cast at zero cost.
+    // Default: nothing to object to, proceed.
+    virtual bool preRun( Character *, SpellTargetPointer, int ) { return true; }
+
     virtual bool apply( Character *, SpellTargetPointer, int ) = 0;
     virtual bool apply( Character *ch, Character *victim, int level) = 0;
     virtual bool apply( Character *ch, ::Object *obj, int level) = 0;

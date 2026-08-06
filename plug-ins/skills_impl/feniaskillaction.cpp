@@ -159,6 +159,18 @@ bool FeniaSkillActionHelper::executeSpellRun(DefaultSpell *spell, Character *ch,
     return executeMethod(spell, "run" + getMethodSuffix(spellTarget), ctx, rcIgnored);
 }
 
+bool FeniaSkillActionHelper::executeSpellPreRun(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level, bool &rc)
+{
+    Scripting::Register ctx = createContext(spell, ch, spellTarget, level);
+    // Figure out applicable preRunXXX method and call it, if defined on the spell wrapper.
+    return executeMethod(spell, "preRun" + getMethodSuffix(spellTarget), ctx, rc);
+}
+
+bool FeniaSkillActionHelper::executeCommandPreRun(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target, bool &rc)
+{
+    return executeMethod(cmd, "preRun", createContext(cmd, ch, target), rc);
+}
+
 bool FeniaSkillActionHelper::executeSpellApply(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level, bool &rc)
 {
     Scripting::Register ctx = createContext(spell, ch, spellTarget, level);

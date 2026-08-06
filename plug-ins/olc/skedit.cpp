@@ -531,8 +531,11 @@ SKEDIT(fenia, "феня", "редактировать тригера закли�
         return false;
     }
     
-    if (trigName == "run" || trigName == "apply") {
-        // Handle 'run' and 'apply' skill command overrides.
+    // Note the order: 'preRun' is an exact match for a skill command, while the spell
+    // branch below matches it as a prefix ("preRun".strPrefix("preRun") is true). The
+    // command test must therefore stay first, or bare 'preRun' would be taken for a spell.
+    if (trigName == "run" || trigName == "apply" || trigName == "preRun") {
+        // Handle 'run', 'apply' and 'preRun' skill command overrides.
         if (!checkCommand(c))
             return false;
 
@@ -545,8 +548,8 @@ SKEDIT(fenia, "феня", "редактировать тригера закли�
             feniaTriggers->openEditor(ch, c, trigName);
         }
 
-    } else if (DLString("run").strPrefix(trigName)) {
-        // Handle spell triggers with runXXX names.        
+    } else if (DLString("run").strPrefix(trigName) || DLString("preRun").strPrefix(trigName)) {
+        // Handle spell triggers with runXXX and preRunXXX names.
         if (!checkSpell(s))
             return false;
 

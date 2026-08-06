@@ -162,9 +162,13 @@ void FeniaTriggerLoader::showTriggers(PCharacter *ch, DefaultSpell *spell) const
     ostringstream buf, bufActive, bufAvailable;
         
     show_one_trigger(ch, spell, "runVict", TAR_CHAR_ROOM|TAR_CHAR_SELF|TAR_CHAR_WORLD, bufActive, bufAvailable);
+    show_one_trigger(ch, spell, "preRunVict", TAR_CHAR_ROOM|TAR_CHAR_SELF|TAR_CHAR_WORLD, bufActive, bufAvailable);
     show_one_trigger(ch, spell, "runObj", TAR_OBJ_EQUIP|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_WORLD, bufActive, bufAvailable);
+    show_one_trigger(ch, spell, "preRunObj", TAR_OBJ_EQUIP|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_WORLD, bufActive, bufAvailable);
     show_one_trigger(ch, spell, "runRoom", TAR_PEOPLE|TAR_ROOM, bufActive, bufAvailable);
+    show_one_trigger(ch, spell, "preRunRoom", TAR_PEOPLE|TAR_ROOM, bufActive, bufAvailable);
     show_one_trigger(ch, spell, "runArg", TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ, bufActive, bufAvailable);
+    show_one_trigger(ch, spell, "preRunArg", TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ, bufActive, bufAvailable);
 
     if (bufActive.str().empty() && bufAvailable.str().empty())
         bufAvailable << "(укажи цель заклинания)";

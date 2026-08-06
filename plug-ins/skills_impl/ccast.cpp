@@ -207,6 +207,14 @@ CMDRUN( cast )
         return;
     }
 
+    // Let the spell refuse while nothing has been spent yet: no lag, no spoken words,
+    // no violence flag, no mana and no skill improvement for a cast that never happens.
+    // 'level' here is the caster's modify level: the real spell level is computed
+    // further down and cannot be hoisted, because getSpellLevel() rolls and improves
+    // 'spell craft' as a side effect.
+    if (!spell->preRun( ch, target, ch->getModifyLevel( ) ))
+        return;
+
     ch->setWait(spell->getBeats(ch) );
 
     if (ch->isAffected( gsn_shielding ) && number_percent( ) > 50) {
