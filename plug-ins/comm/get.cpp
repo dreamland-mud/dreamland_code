@@ -20,6 +20,7 @@
 #include "def.h"
 #include "l10n.h"
 
+WEARLOC(none);
 
 /*
  *   GET OBJECT [[FROM] CONTAINER[:POCKET]]
@@ -371,6 +372,60 @@ static bool still_looting( Character *ch, Room *room )
  *  get <victim> by <name>
  *
  */
+static bool is_container_like( Object *obj )
+{
+    return obj->item_type == ITEM_CONTAINER
+           || obj->item_type == ITEM_CORPSE_NPC
+           || obj->item_type == ITEM_CORPSE_PC;
+}
+
+/*
+ * Find a container by name, searching inventory, then equipment, then the room
+ * -- the same order and visibility rules as get_obj_here, but skipping
+ * everything that cannot hold anything.
+ *
+ * 'взя все сундук' has to mean the chest, not the "ключ от сундучка" lying in
+ * the backpack: get_obj_here returns the first name match in any of those
+ * scopes, and a key whose own name mentions the chest wins over the chest.
+ * Making get_obj_here itself container-preferring would move targeting for
+ * every spell and skill that shares it, so the preference lives here.
+ *
+ * Deliberately limited to a plain name. '2.сундук' and id-targeting must keep
+ * counting exactly what the old scan counted, otherwise they would silently
+ * resolve to a different object than before.
+ */
+static Object * get_container_here( Character *ch, const DLString &argument )
+{
+    Object *obj;
+
+    if (argument.find( '.' ) != DLString::npos)
+        return 0;
+
+    if (get_arg_id( argument ) != 0)
+        return 0;
+
+    for (obj = ch->carrying; obj != 0; obj = obj->next_content)
+        if (obj->wear_loc == wear_none
+            && (ch->can_see( obj ) || ch->can_hear( obj ))
+            && is_container_like( obj )
+            && obj_has_name( obj, argument, ch ))
+            return obj;
+
+    for (obj = ch->carrying; obj != 0; obj = obj->next_content)
+        if (obj->wear_loc != wear_none
+            && is_container_like( obj )
+            && obj_has_name( obj, argument, ch ))
+            return obj;
+
+    for (obj = ch->in_room->contents; obj != 0; obj = obj->next_content)
+        if ((ch->can_see( obj ) || ch->can_hear( obj ))
+            && is_container_like( obj )
+            && obj_has_name( obj, argument, ch ))
+            return obj;
+
+    return 0;
+}
+
 CMDRUNP( get )
 {
     Object *obj;
@@ -498,8 +553,12 @@ CMDRUNP( get )
         // Split out potential pocket argument from <container>:<pocket>.
         pocket = get_pocket_argument( argContainer );
 
+        // Prefer a real container over anything merely named after one.
+        if ( !( container = get_container_here( ch, argContainer ) ) )
+            container = get_obj_here( ch, argContainer );
+
         // Container not found, assume 'get <victim> by <name>' syntax.
-        if ( !( container = get_obj_here( ch, argContainer ) ) )
+        if ( !container )
         {
             Character *victim = get_char_room( ch, argTarget );
             
