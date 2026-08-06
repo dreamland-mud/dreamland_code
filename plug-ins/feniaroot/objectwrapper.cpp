@@ -45,6 +45,7 @@ using namespace Scripting;
 NMI_INIT(ObjectWrapper, "предмет")
 
 bool oprog_drop(::Object *obj, Character *ch);
+bool omprog_give(::Object *obj, Character *ch, Character *victim);
 
 ObjectWrapper::ObjectWrapper( ) : target( NULL )
 {
@@ -923,6 +924,19 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
         if (!target->carried_by)
             throw Scripting::Exception("Call obj_to_char before invoking onGet triggers");
         return oprog_get(target, target->carried_by); 
+    }
+
+    // "Give" is a hand-over between two characters: area quests, behaviors and
+    // both sides' Fenia triggers all get a say, and any of them can take the item
+    // back, so it has to run the same chain the 'give' command does.
+    if (trigName == "Give") {
+        Character *giver = argnum2character(trigArgs, 2);
+        Character *receiver = argnum2character(trigArgs, 3);
+
+        if (target->carried_by != receiver)
+            throw Scripting::Exception("Call obj_to_char before invoking onGive triggers");
+
+        return omprog_give(target, giver, receiver);
     }
 
     // Handle "Drop" trigger here until we figure out how to unify all calls.

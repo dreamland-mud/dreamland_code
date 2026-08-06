@@ -22,6 +22,11 @@ PROF(anti_paladin);
 
 bool omprog_give( Object *obj, Character *ch, Character *victim );
 
+/**
+ * DEAD in normal play: 'request' is overridden in Fenia (command/request/runFunc),
+ * and WrappedCommand::entryPoint never falls through to this body while Fenia is
+ * loaded. Kept as a boot-safety fall-through only -- edit the Fenia override.
+ */
 CMDRUNP(request)
 {
     char arg1[MAX_INPUT_LENGTH];
