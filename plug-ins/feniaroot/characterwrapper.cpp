@@ -2443,6 +2443,20 @@ NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один у�
     return Register();
 }
 
+NMI_INVOKE( CharacterWrapper, skill_one_hit, "(vict,skillName,damDivisor[,thacCoeff[,counter[,miss]]]): нанести vict удар оружием по формуле умения skillName. Урон умножается на (уровень_умения/damDivisor + 1), thacCoeff вычитает thacCoeff*(100-эффективность) из THAC0, counter добавляет бонус контратаки, miss печатает промах вместо удара" )
+{
+    checkTarget( );
+    Character *victim = argnum2character(args, 1);
+    Skill *skill = argnum2skill(args, 2);
+    int damDivisor = argnum2number(args, 3);
+    int thacCoeff = args.size( ) > 3 ? argnum2number(args, 4) : 0;
+    bool applyCounter = args.size( ) > 4 ? argnum2boolean(args, 5) : false;
+    bool miss = args.size( ) > 5 ? argnum2boolean(args, 6) : false;
+
+    ::skill_one_hit_nocatch(target, victim, skill, damDivisor, thacCoeff, applyCounter, miss);
+    return Register();
+}
+
 NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag[,verbose]]): спас-бросок против типа повреждения (.tables.damage_table) с флагом повреждения (.tables.damage_flags)")
 {
     checkTarget();
