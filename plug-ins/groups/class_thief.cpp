@@ -114,7 +114,10 @@ void BackstabOneHit::calcTHAC0( )
     thacBase( );
     thacApplyHitroll( );
     thacApplySkill( );
-    thac0 -= 10 * (100 - gsn_backstab->getEffective( ch ));
+    // Bonus grows with skill, worth 20 at 100%. Used to be
+    // -= 10 * (100 - effective), which handed the biggest bonus to the least
+    // skilled and none at all at 100%, and was ~10x the scale of the d20 roll.
+    thac0 -= 20 * gsn_backstab->getEffective( ch ) / 100;
 }
 
 /*----------------------------------------------------------------------------
@@ -152,7 +155,7 @@ void DualBackstabOneHit::calcTHAC0( )
     thacBase( );
     thacApplyHitroll( );
     thacApplySkill( );
-    thac0 -= 10 * (100 - gsn_dual_backstab->getEffective( ch ));
+    thac0 -= 20 * gsn_dual_backstab->getEffective( ch ) / 100;
 }
 /*----------------------------------------------------------------------------
  * Circle

@@ -2443,7 +2443,7 @@ NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один у�
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, skill_one_hit, "(vict,skillName,damDivisor[,thacCoeff[,counter[,miss]]]): нанести vict удар оружием по формуле умения skillName. Урон умножается на (уровень_умения/damDivisor + 1), thacCoeff вычитает thacCoeff*(100-эффективность) из THAC0, counter добавляет бонус контратаки, miss печатает промах вместо удара" )
+NMI_INVOKE( CharacterWrapper, skill_one_hit, "(vict,skillName,damDivisor[,thacCoeff[,counter[,miss]]]): нанести vict удар оружием по формуле умения skillName. Урон умножается на (уровень_умения/damDivisor + 1), thacCoeff -- бонус к попаданию при 100% умения (вычитает thacCoeff*эффективность/100 из THAC0), counter добавляет бонус контратаки, miss печатает промах вместо удара" )
 {
     checkTarget( );
     Character *victim = argnum2character(args, 1);
