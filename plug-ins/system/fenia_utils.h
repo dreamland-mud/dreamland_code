@@ -14,6 +14,13 @@ namespace Scripting {
 /** Call a global Fenia trigger with given name, argument format and arguments. */
 bool gprog(const DLString &trigName, const char *fmt, ...);
 
+/** Same as gprog, but exceptions raised by the script reach the caller instead
+ *  of being logged and swallowed. Combat paths need this: VictimDeathException
+ *  derives from ::Exception, and filing a killing blow as a script error leaves
+ *  the round running against a corpse. Callers MUST catch what they do not want
+ *  to propagate. */
+bool gprog_nocatch(const DLString &trigName, const char *fmt, ...);
+
 /** Call a trigger with given name and args on an instance (mob, item, room) or its prototype (mob index data etc). */
 bool fenia_trigger(Scripting::Register &rc, const DLString &trigName, const Scripting::RegisterList &args, WrapperBase *instance, WrapperBase *proto);
 
