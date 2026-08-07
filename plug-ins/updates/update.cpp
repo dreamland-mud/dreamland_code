@@ -153,6 +153,10 @@ void lantern_update( Character *ch );
 void idle_update( PCharacter *ch );
 void char_update_affects( Character *ch );
 
+// Defined in plug-ins/loadsave/creation.cpp. Installs the affects a character's
+// race (and, for a mob, its prototype) grants but is currently missing.
+void afprog_refresh( Character *ch, bool verbose );
+
 
 /* used for saving */
 
@@ -412,29 +416,26 @@ void char_update( )
             }
         }
 
-        // Reset native sneak outside of battle. Only announce/re-arm while the
-        // character is actually upright -- otherwise a sitting/resting elf whose
-        // sneak bit got stripped (e.g. by per-tick damage) is spammed with "you
-        // try to move stealthily" every tick. Line 431 keeps the raw bit set
-        // silently regardless, so gating here loses no gameplay.
-        if ( !(ch->fighting) && ch->position > POS_SITTING && !IS_AFFECTED(ch,AFF_SNEAK)
-                && (ch->getRace( )->getAff( ).isSet( AFF_SNEAK )) && !MOUNTED(ch) )
-        {
-            ch->pecho(_("Ты пытаешься двигаться незаметно."));
-            SET_BIT(ch->affected_by ,AFF_SNEAK);
-            room_to_save( ch );
-        }
+        // Race traits are affects now. This used to be two announce blocks for
+        // sneak and hide plus a blanket SET_BIT of the whole race mask, and the
+        // blanket set was the pump behind the sneak spam: combat strips the bit
+        // through do_visible, the next tick put it straight back, and the next
+        // damage event stripped and announced it again.
+        //
+        // afprog_refresh installs whatever the race grants and the character is
+        // missing, and each affect's own onRefresh decides whether it may come
+        // back right now -- the stealth traits refuse while their owner is not in
+        // control of themselves, the passive ones do not care. Every legacy <aff>
+        // bit on all 75 races is covered by that race's <affects> list and has a
+        // handler, so nothing is lost by no longer setting the mask by hand.
+        //
+        // Gated on the cheap bitmask test so the common case -- every racial bit
+        // already present -- costs one AND instead of a walk over every skill
+        // with a Fenia call per granted affect.
+        bitstring_t raceAff = ch->getRace( )->getAff( ).getValue( );
 
-        // Reset native hide outside of battle (upright only, same reasoning).
-        if ( !(ch->fighting) && ch->position > POS_SITTING && !IS_AFFECTED(ch,AFF_HIDE)
-                && (ch->getRace( )->getAff( ).isSet( AFF_HIDE )) && !MOUNTED(ch) )
-        {
-            ch->pecho(_("Ты прячешься обратно в тень."));
-            room_to_save( ch );
-        }
-
-        // Reset race affect bits. 
-        SET_BIT(ch->affected_by, ch->getRace( )->getAff( ) );
+        if ((ch->affected_by.getValue( ) & raceAff) != raceAff)
+            afprog_refresh( ch, true );
 
         // Recover from 'stunned' state if HP is ok.
         if (ch->position == POS_STUNNED && !noupdate) {
