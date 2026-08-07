@@ -295,6 +295,18 @@ void NPCharacter::updateCachedNouns()
             kw = getKeyword(lang);
             if (!kw.empty())
                 forms.push_back(kw);
+
+            // ...and the prototype's keywords on top, not instead. getKeyword
+            // answers with the instance's own keyword whenever it has one, and
+            // mobs persisted under var/db/saved reload carrying a keyword
+            // snapshot frozen at save time -- so every keyword added to the
+            // area file afterwards stopped being typeable for them ('gull' no
+            // longer found the Galeon seagull, whose prototype lists it). This
+            // list is only ever fed to is_name, so a union costs nothing and a
+            // deliberate runtime rename still keeps its new name.
+            const DLString &protoKw = pIndexData->keyword.get(lang);
+            if (!protoKw.empty() && protoKw != kw)
+                forms.push_back(protoKw);
         }
     }
 

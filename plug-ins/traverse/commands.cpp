@@ -9,6 +9,7 @@
 #include "roomutils.h"
 #include "loadsave.h"
 #include "merc.h"
+#include "act.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -197,16 +198,22 @@ CMDRUN( path )
         return;
     }
 
+    // Match against every language's room name, the way mob and object
+    // keywords already match: the player may know the place by its English,
+    // Russian or Ukrainian name, and typing the one they can see on screen has
+    // to work. 'path The Road to the Harbour' used to find nothing at all.
     for (auto &r: myArea->rooms)
-        if (is_name(roomName.c_str(), r.second->getName())) {
-            matches++;
-            if (targets.size() < maxTargets)
-                targets.push_back(r.second);
-        }
+        for (int l = LANG_MIN; l < LANG_MAX; l++)
+            if (is_name(roomName.c_str(), r.second->getName((lang_t)l))) {
+                matches++;
+                if (targets.size() < maxTargets)
+                    targets.push_back(r.second);
+                break;
+            }
 
     if (targets.empty()) {
-        ch->pecho(_("Не могу найти местность с названием '{W%s{x' в зоне {c%s{x."), 
-                  roomName.c_str(), ch->in_room->areaName().c_str());
+        ch->pecho(_("Не могу найти местность с названием '{W%s{x' в зоне {c%s{x."),
+                  roomName.c_str(), ch->in_room->areaName(viewerLang(ch)).c_str());
         return;
     }
 
@@ -230,15 +237,15 @@ CMDRUN( path )
         FindComplete complete(target, elements);
         room_traverse<SameAreaHookIterator>(ch->in_room, iter, complete, radius);
 
-        buf << "    '{W" << target->getName() << "{w'";
+        buf << "    '{W" << target->getName(viewerLang(ch)) << "{w'";
 
         if (elements.empty()) {
             if (ch->in_room == target)
-                buf << ": ты уже здесь!" << endl;
+                buf << fmt(ch, _(": ты уже здесь!")) << endl;
             else if (!target->isCommon())
-                buf << ": ты не сможешь сюда войти" << endl;
+                buf << fmt(ch, _(": ты не сможешь сюда войти")) << endl;
             else
-                buf << ": путь искажен Хаосом" << endl;
+                buf << fmt(ch, _(": путь искажен Хаосом")) << endl;
             continue;
         }
  
@@ -249,7 +256,7 @@ CMDRUN( path )
     }
 
     if (foundPath)
-        ch->pecho(_("Найдены такие местности в зоне {c%s{x:"), ch->in_room->areaName().c_str());
+        ch->pecho(_("Найдены такие местности в зоне {c%s{x:"), ch->in_room->areaName(viewerLang(ch)).c_str());
     else
         ch->pecho(_("Не удалось проложить путь ни к одной из местностей:"));
 

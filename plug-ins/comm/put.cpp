@@ -212,50 +212,47 @@ static bool oprog_put_money_msg(Object *container, Character *ch, int gold, int 
     return false;
 }
 
+/* Whole sentences per branch, never a preposition glued into a half-sentence:
+ * "in" and "on" do not sit in the same place in every language, and the
+ * composed string could not be looked up in the catalog at all -- an English
+ * player was told "Ты кладешь a monocle lens в a horn monocle rim." */
 static bool put_obj_container( Character *ch, Object *obj, Object *container, 
                                DLString &pocket )
 {
-    ostringstream toChar, toRoom;
-
     obj_from_char( obj );
     obj_to_obj( obj, container );
-    
-    if (container->item_type == ITEM_KEYRING) {
-        toRoom << "$c1 нанизывает $o4 на $O4.";
-        toChar << "Ты нанизываешь $o4 на $O4.";
-    }
-    else {
 
-        if (!pocket.empty( )) 
-            obj->pocket = pocket;
+    bool keyring = container->item_type == ITEM_KEYRING;
+    bool putOn = IS_SET( container->value1(), CONT_PUT_ON|CONT_PUT_ON2 );
 
-        toRoom << "$c1 кладет $o4 "
-               << (IS_SET( container->value1(), CONT_PUT_ON|CONT_PUT_ON2 ) ?
-                             "на" : "в")
-               << " $O4.";
-        
-        if (pocket.empty( ))
-            toChar << "Ты кладешь $o4 "
-                   << (IS_SET( container->value1(), CONT_PUT_ON|CONT_PUT_ON2 ) ?
-                             "на" : "в")
-                   << " $O4.";
-        else {
-            toChar << "Ты кладешь $o4 ";
+    if (!keyring && !pocket.empty( ))
+        obj->pocket = pocket;
 
-            if (IS_SET(container->value1(),CONT_PUT_ON|CONT_PUT_ON2)) {
-                toChar << "на $O4 в отделение '" << pocket << "'.";
-            }
-            else if (!container->can_wear(ITEM_TAKE)) {
-                toChar << "на полку $O2 с надписью '" << pocket << "'.";
-            }
-            else
-                toChar << "в карман $O2 с надписью '" << pocket << "'.";
-        }
-    }
-    
     if (!oprog_put_msg( obj, ch, container )) {
-        oldact( toRoom.str( ).c_str( ), ch, obj, container, TO_ROOM );
-        oldact( toChar.str( ).c_str( ), ch, obj, container, TO_CHAR );
+        if (keyring)
+            oldact( _("$c1 нанизывает $o4 на $O4."), ch, obj, container, TO_ROOM );
+        else if (putOn)
+            oldact( _("$c1 кладет $o4 на $O4."), ch, obj, container, TO_ROOM );
+        else
+            oldact( _("$c1 кладет $o4 в $O4."), ch, obj, container, TO_ROOM );
+
+        if (keyring)
+            ch->pecho( _("Ты нанизываешь %1$O4 на %2$O4."), obj, container );
+        else if (pocket.empty( )) {
+            if (putOn)
+                ch->pecho( _("Ты кладешь %1$O4 на %2$O4."), obj, container );
+            else
+                ch->pecho( _("Ты кладешь %1$O4 в %2$O4."), obj, container );
+        }
+        else if (putOn)
+            ch->pecho( _("Ты кладешь %1$O4 на %2$O4 в отделение '%3$s'."),
+                       obj, container, pocket.c_str( ) );
+        else if (!container->can_wear(ITEM_TAKE))
+            ch->pecho( _("Ты кладешь %1$O4 на полку %2$O2 с надписью '%3$s'."),
+                       obj, container, pocket.c_str( ) );
+        else
+            ch->pecho( _("Ты кладешь %1$O4 в карман %2$O2 с надписью '%3$s'."),
+                       obj, container, pocket.c_str( ) );
     }
 
     return oprog_put( obj, ch, container );
@@ -302,9 +299,13 @@ static void put_money_container(Character *ch, int amount, const char *currencyN
 
     if (!oprog_put_money_msg(container, ch, gold, silver)) {
         DLString moneyArg = Money::describe(gold, silver, 4);
-        DLString preposition = IS_SET( container->value1(), CONT_PUT_ON|CONT_PUT_ON2 ) ? "на" : "в";
-        ch->pecho(_("Ты кладешь %s %s %O4."), moneyArg.c_str(), preposition.c_str(), container);
-        ch->recho(_("%^C1 кладет %s %O4 несколько монет."), ch, preposition.c_str(), container);
+        if (IS_SET( container->value1(), CONT_PUT_ON|CONT_PUT_ON2 )) {
+            ch->pecho(_("Ты кладешь %1$s на %2$O4."), moneyArg.c_str(), container);
+            ch->recho(_("%1$^C1 кладет на %2$O4 несколько монет."), ch, container);
+        } else {
+            ch->pecho(_("Ты кладешь %1$s в %2$O4."), moneyArg.c_str(), container);
+            ch->recho(_("%1$^C1 кладет в %2$O4 несколько монет."), ch, container);
+        }
     }
     
     // Add money to the container or merge with existing coins.

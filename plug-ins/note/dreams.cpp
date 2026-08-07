@@ -46,6 +46,11 @@ bool DreamThread::canWrite( const PCharacter *ch ) const
     return !ch->getAttributes( ).isAvailable( "nochannel" );
 }
 
+/* Catalog file-key for the text of every dream. The dreams live in the note
+ * database, not in this source file, so they are keyed under a name of their
+ * own rather than a __FILE__ -- see config/translations/notes.json. */
+static const DLString DREAM_L10N_FILE = "notes/dream";
+
 /*-----------------------------------------------------------------------
  * XMLAttributeDream
  *----------------------------------------------------------------------*/
@@ -114,7 +119,13 @@ void XMLAttributeDream::run( PCharacter *ch )
         if (!note)
             return;
 
-        setLines( note->getText( ) );
+        // Dreams are DATA, not a literal, so they cannot carry an _() wrapper --
+        // key the whole body under a catalog file of its own instead. Anything
+        // the catalog does not know (every dream a god writes from now on)
+        // falls back to its Russian text, byte for byte. Everyone who sleeps
+        // sees the dreams addressed to 'all', so a newbie's first night on the
+        // Galeon was a Russian one whatever language they had chosen.
+        setLines( MultiMessage( note->getText( ), DREAM_L10N_FILE ).getMessage( ch ) );
         currentDreamID = note->getID( );
         LogStream::sendNotice( ) 
             << ch->getName( ) << " sees a dream from " << note->getAuthor( ) 

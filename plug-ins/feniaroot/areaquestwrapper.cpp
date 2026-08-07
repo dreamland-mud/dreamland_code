@@ -16,6 +16,7 @@
 #include "pcharacter.h"
 
 #include "def.h"
+#include "lang.h"
 
 using Scripting::NativeTraits;
 
@@ -219,11 +220,14 @@ NMI_INVOKE( AreaQuestWrapper, info, "(ch): вернет строку с подс
         return DLString::emptyString;
 
     DLString info = aqprog_info(ch, target);
-    
+
     if (!info.empty())
         return info;
 
-    return target->steps[qdata.step]->info.get(LANG_DEFAULT);
+    // Every caller has the reader right here (the onCantMove hints, the quest
+    // command), so answer in their language instead of the default one -- an
+    // English newbie was being told what to do next in Russian.
+    return target->steps[qdata.step]->info.getForLang(viewerLang(ch));
 }
 
 NMI_INVOKE( AreaQuestWrapper, canParticipate, "(ch): персонаж ch удовлетряет всем условиям для начала квеста" ) 
