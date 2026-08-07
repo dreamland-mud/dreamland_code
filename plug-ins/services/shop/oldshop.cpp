@@ -474,12 +474,18 @@ CMDRUN( sell )
     else
     {
         obj_from_char( obj );
-        
+
         if (obj->timer)
             SET_BIT(obj->extra_flags,ITEM_HAD_TIMER);
         else
             obj->timer = number_range(50,100);
-        
+
+        // prevent predatory resale, same as the buy path above: once this has
+        // been through a shop it is second-hand, and selling it again destroys
+        // it. Without the mark, killing the keeper and taking the item back off
+        // his corpse let one item be sold over and over for unlimited gold.
+        SET_BIT( obj->extra_flags, ITEM_SELL_EXTRACT );
+
         obj_to_keeper( obj, keeper );
     }
 
