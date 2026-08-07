@@ -223,12 +223,6 @@ void LevelAdaptivePet::config( PCharacter *client, NPCharacter *pet ) const
     else                    pet->hit = level * number_range( level * 2, level * 2 + 10 );
     pet->max_hit = pet->hit;
 
-    if (level < 20)            pet->mana = number_fuzzy( 100 );
-    else if (level < 50)    pet->mana = number_fuzzy( 500 );
-    else if (level < 80)    pet->mana = number_fuzzy( 800 );
-    else                    pet->mana = number_fuzzy( 1000 );
-    pet->max_mana = pet->mana;
-
     pet->hitroll = number_range( level, level * 2 );
 
     if (level <= 12)            ave = number_range( 2, 5 );
@@ -249,12 +243,26 @@ void LevelAdaptivePet::config( PCharacter *client, NPCharacter *pet ) const
     for (int i = 0; i < 4; i++)
         pet->armor[i] = - 5 * number_fuzzy( level );
 
-    if (pet->getRealLevel( ) <= 20) { 
+    if (pet->getRealLevel( ) <= 20) {
         REMOVE_BIT( pet->act, ACT_CLERIC|ACT_MAGE );
-    } 
-    else if (IS_SET( pet->act, ACT_CLERIC|ACT_MAGE )) {
-        pet->max_mana += level * 10;
+    }
+
+    // Mana is a caster resource: fight/magic.cpp is the only thing that spends a
+    // mob's mana, and ai/caster.cpp only ever picks ACT_CLERIC/ACT_MAGE mobs to
+    // cast. The ladder below used to run for every pet, so a warrior pet was sold
+    // with a mage-sized pool it could never touch. Decided after the bits above,
+    // because a pet at or below level 20 loses its caster bits right there.
+    if (IS_SET( pet->act, ACT_CLERIC|ACT_MAGE )) {
+        if (level < 20)         pet->mana = number_fuzzy( 100 );
+        else if (level < 50)    pet->mana = number_fuzzy( 500 );
+        else if (level < 80)    pet->mana = number_fuzzy( 800 );
+        else                    pet->mana = number_fuzzy( 1000 );
+
+        pet->max_mana = pet->mana + level * 10;
         pet->mana = pet->max_mana;
+    }
+    else {
+        pet->mana = pet->max_mana = 0;
     }
 
     pet->move = pet->max_move = max(100, level * 10);

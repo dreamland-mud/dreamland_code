@@ -137,11 +137,16 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             wiznet(ch, victim, "здоровье", oldParam, ch->max_hit, victim->max_hit);
         }
     }
-    if ( number_percent() * modifier / 100 > 100 )
+    // Only a caster grows mana. Without this a warrior pet farms its way back to
+    // a mage-sized pool it can never spend -- and does it faster the lower it
+    // starts, which would quietly undo the petshop fix. The caster bits above
+    // are restored before this point, so a pet that grows past level 20 into its
+    // prototype's class starts gaining mana from that kill on.
+    if ( IS_SET(ch->act, ACT_CLERIC|ACT_MAGE) && number_percent() * modifier / 100 > 100 )
     {
         int gain;
         const int max_mana = mylevel * 150;
-        
+
         gain = max( 0, victim->max_mana - ch->max_mana );
         gain = gain * number_percent() * 20 / 10000; // 20% max
 
