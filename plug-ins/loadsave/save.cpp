@@ -501,7 +501,7 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
         fprintf(fp, "Size %d\n", mob->size);
         fprintf(fp, "Imm %s\n", print_flags(mob->imm_flags));
         fprintf(fp, "Res %s\n", print_flags(mob->res_flags));
-        fprintf(fp, "Vuln %s\n", print_flags(mob->res_flags));        
+        fprintf(fp, "Vuln %s\n", print_flags(mob->vuln_flags));
 
         if (mob->comm != 0)
                 fprintf(fp, "Comm %s\n", print_flags(mob->comm));
