@@ -1354,26 +1354,70 @@ CMDWIZP( vnum )
 }
 
 
+/**
+ * The whole argument is the search phrase, quoted or not.
+ *
+ * These searches used to take the phrase through one_argument, which stops at
+ * the first space -- so 'vnum obj ключ сундучка' silently searched for 'ключ'
+ * alone and listed every key in the game, while 'vnum obj "ключ сундучка"'
+ * found the one chest key. Nothing said the extra words had been dropped.
+ *
+ * Quotes still have to come off here: is_name() splits the phrase itself, and
+ * a leading quote would be matched as part of the first word.
+ *
+ * Returns an empty string for anything that is not a usable search phrase, so
+ * the caller prints its "find what?" prompt.
+ */
+static DLString find_name_argument( const char *argument )
+{
+    DLString arg = DLString( argument ).stripWhiteSpace( );
+
+    if (arg.size( ) >= 2
+        && (arg.at( 0 ) == '\'' || arg.at( 0 ) == '"')
+        && arg.at( arg.size( ) - 1 ) == arg.at( 0 ))
+    {
+        arg = arg.substr( 1, arg.size( ) - 2 );
+        arg.stripWhiteSpace( );
+    }
+
+    // An unclosed quote is a typo, not a search: refuse it rather than quietly
+    // hunting for something other than what was typed.
+    if (!arg.empty( ) && (arg.at( 0 ) == '\'' || arg.at( 0 ) == '"'))
+        return DLString::emptyString;
+
+    // is_name() colour-strips the needle and THEN tokenizes it with
+    // one_argument(); an empty first token there is reported as a match
+    // against every prototype in the game, which would dump the whole index
+    // at the descriptor. Guard that exact computation instead of guessing at
+    // characters -- the damage is done after colour-stripping, where '{/'
+    // becomes a newline and '{x"' becomes a bare quote, so no look at the
+    // first character of the raw phrase can see it coming.
+    char probe[MAX_INPUT_LENGTH], token[MAX_INPUT_LENGTH];
+    strncpy( probe, arg.colourStrip( ).c_str( ), sizeof( probe ) - 1 );
+    probe[sizeof( probe ) - 1] = '\0';
+    one_argument( probe, token );
+    if (token[0] == '\0')
+        return DLString::emptyString;
+
+    return arg;
+}
+
 /* NOTCOMMAND */ void do_mfind( Character *ch, char *argument )
 {
-    char arg[MAX_INPUT_LENGTH];
-    int nMatch;
     bool found;
 
-    one_argument( argument, arg );
-    if ( arg[0] == '\0' )
+    DLString arg = find_name_argument( argument );
+    if ( arg.empty( ) )
     {
         ch->pecho(_("Найти кого?"));
         return;
     }
 
     found        = false;
-    nMatch        = 0;
 
     for (int i=0; i < MAX_KEY_HASH; i++)
-        for(MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) 
+        for(MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next)
         {
-            nMatch++;
             if (mob_index_has_name(pMob, arg))
             {
                 found = true;
@@ -1393,24 +1437,20 @@ CMDWIZP( vnum )
 
 /* NOTCOMMAND */ void do_ofind( Character *ch, char *argument )
 {
-    char arg[MAX_INPUT_LENGTH];
-    int nMatch;
     bool found;
 
-    one_argument( argument, arg );
-    if ( arg[0] == '\0' )
+    DLString arg = find_name_argument( argument );
+    if ( arg.empty( ) )
     {
         ch->pecho(_("Найти что?"));
         return;
     }
 
     found        = false;
-    nMatch        = 0;
 
     for (int i=0; i<MAX_KEY_HASH; i++)
-        for(OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) 
+        for(OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next)
         {
-            nMatch++;
             if (obj_index_has_name(pObj, arg))
             {
                 found = true;
