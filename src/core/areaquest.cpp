@@ -52,8 +52,17 @@ Scripting::Register QuestStep::toRegister() const
     step->setField(IdRef("rewardExp"), (int)rewardExp);
     step->setField(IdRef("rewardVnum"), (int)rewardVnum);
     step->setField(IdRef("info"), info.get(LANG_DEFAULT));
-    step->setField(IdRef("beginTrigger"), beginTrigger); 
-    step->setField(IdRef("endTrigger"), endTrigger); 
-    return stepReg;    
+    step->setField(IdRef("beginTrigger"), beginTrigger);
+    step->setField(IdRef("endTrigger"), endTrigger);
+    // What the step begins and ends on, not just which trigger fires. Without
+    // these a script can see that a step exists but not what it points at:
+    // reading step.beginType returned null (IdContainer answers an unknown
+    // field with an empty Register, it does not throw), so a guard built on
+    // them silently did nothing at all.
+    step->setField(IdRef("beginType"), beginType);
+    step->setField(IdRef("beginValue"), beginValue);
+    step->setField(IdRef("endType"), endType);
+    step->setField(IdRef("endValue"), endValue);
+    return stepReg;
 
 }

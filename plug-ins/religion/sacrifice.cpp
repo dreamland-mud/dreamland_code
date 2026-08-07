@@ -553,8 +553,15 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
     // (RU nameRus / UA nameUa / EN caseless shortDescr). RU byte-identical.
     const char *rname = religion.getNameFor(ch).c_str();
 
+    // Godless sacrifices name no deity, so the fallback is a plain noun -- and
+    // a hardcoded Russian pad told an English player their offering went
+    // "unrewarded by богов". Only Russian and Ukrainian decline it; the English
+    // form is caseless, which is exactly what %N does with a pad-less string.
     if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
-        rname = "бог|и|ов|ам|ов|ами|ах";
+        rname = lmsg(viewerLang(ch),
+                     "the gods",
+                     "бог|и|ов|ам|ов|ами|ах",
+                     "бог|и|ів|ам|ів|ами|ах");
 
     int silver = -1;
 
@@ -600,8 +607,15 @@ CMDRUNP( sacrifice )
     // (RU nameRus / UA nameUa / EN caseless shortDescr). RU byte-identical.
     const char *rname = religion.getNameFor(ch).c_str();
 
+    // Godless sacrifices name no deity, so the fallback is a plain noun -- and
+    // a hardcoded Russian pad told an English player their offering went
+    // "unrewarded by богов". Only Russian and Ukrainian decline it; the English
+    // form is caseless, which is exactly what %N does with a pad-less string.
     if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
-        rname = "бог|и|ов|ам|ов|ами|ах";
+        rname = lmsg(viewerLang(ch),
+                     "the gods",
+                     "бог|и|ов|ам|ов|ами|ах",
+                     "бог|и|ів|ам|ів|ами|ах");
 
     argument = one_argument( argument, arg );
         
