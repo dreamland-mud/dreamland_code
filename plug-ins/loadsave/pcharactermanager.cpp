@@ -447,18 +447,76 @@ bool PCharacterManager::pfBackup ( const DLString &playerName )
     return true;
 }
 
-bool PCharacterManager::pfRecover ( const DLString &playerName, const DLString &arg, int n ) 
+/**
+ * Find the nonce of the most recent deletion of this player.
+ *
+ * pfDelete stamps both halves of a deleted character with the same random
+ * suffix (<name>.delete.<nonce> and <name>.xml.<nonce>) so that repeated
+ * deletions of one name cannot overwrite each other. Looking up a bare
+ * ".delete" therefore never finds anything, which is why undelete used to
+ * work only against a hand-made symlink.
+ *
+ * Returns false when nothing has been deleted under this name. An empty
+ * nonce means a pre-nonce deletion, where the bare extension is correct.
+ */
+static bool pfFindDeleteNonce( const DLString &name, DLString &nonce )
+{
+    DLString prefix = name + ".delete";
+    DLFile deleteDir = dreamland->getPlayerDeleteDir( );
+    DLDirectory dir( deleteDir );
+    time_t newest = 0;
+    bool found = false;
+
+    try {
+        dir.open( );
+
+        while (true) {
+            DLString entry = dir.nextEntry( ).getPath( );
+
+            if (entry.substr( 0, prefix.size( ) ) != prefix)
+                continue;
+
+            time_t mtime = DLFile( deleteDir, entry ).getModifyTime( );
+
+            if (found && mtime <= newest)
+                continue;
+
+            newest = mtime;
+            nonce = entry.substr( prefix.size( ) );
+            found = true;
+        }
+    }
+    catch (const ExceptionDBIOEOF &) {
+    }
+    catch (const ExceptionDBIO &e) {
+        LogStream::sendError( ) << "pfFindDeleteNonce: " << e.what( ) << endl;
+        return false;
+    }
+
+    return found;
+}
+
+bool PCharacterManager::pfRecover ( const DLString &playerName, const DLString &arg, int n )
 {
     PCharacter *pc;
     DLString name = playerName.toLower( );
-    DLFile oldProfile, oldXml; 
+    DLFile oldProfile, oldXml;
     DLFile newProfile( dreamland->getPlayerDir( ), name, ext );
     DLFile newXml( DLFile( dreamland->getDbDir( ), PLAYER_TABLE ), name, ".xml" );
 
 
     if (arg=="delete") {
-        oldProfile = DLFile( dreamland->getPlayerDeleteDir( ), name, ".delete" );
-        oldXml = DLFile( DLFile( dreamland->getDbDir( ), DELETED_TABLE ), name, ".xml" );
+        // Both halves have to come from the SAME deletion, so the nonce is
+        // resolved once off the profile and reused for the xml.
+        DLString nonce;
+
+        if (!pfFindDeleteNonce( name, nonce )) {
+            LogStream::sendError() << "pfRecover: no deleted profile for " << name << endl;
+            return false;
+        }
+
+        oldProfile = DLFile( dreamland->getPlayerDeleteDir( ), name, ".delete" + nonce );
+        oldXml = DLFile( DLFile( dreamland->getDbDir( ), DELETED_TABLE ), name, ".xml" + nonce );
 
         if (!oldProfile.exist() || !oldXml.exist()) {
             LogStream::sendError() << "pfRecover:  " << oldXml.getPath() << " or " << oldProfile.getPath() << " not found" << endl;
