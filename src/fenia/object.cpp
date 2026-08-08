@@ -18,6 +18,7 @@
 
 #include "register-impl.h"
 #include "object.h"
+#include "xmlregister.h"
 #include "context.h"
 #include "profiler.h"
 
@@ -76,14 +77,35 @@ Object::toXML( XMLNode::Pointer& node ) const
     return true;
 }
 
-void 
+/**
+ * Name the object a broken closure was dropped from.
+ *
+ * The counter is sampled around a single object's serialization because that is
+ * the innermost frame that still knows the owner: the register containers below
+ * carry no id, and without one there is nothing to go looking for afterwards.
+ */
+static void reportBrokenClosures(Object::id_t id, long before)
+{
+    if(brokenClosuresDropped <= before)
+        return;
+
+    LogStream::sendError()
+        << "fenia: object " << id << " held "
+        << (brokenClosuresDropped - before)
+        << " closure(s) into a code source that is gone; saved as null" << endl;
+}
+
+void
 Object::backup()
 {
     if(handler) {
+        long broken = brokenClosuresDropped;
+
         backupNode = XMLNode::Pointer(NEW);
-    
+
         handler.toXML( backupNode );
-        
+        reportBrokenClosures(id, broken);
+
         if(dynamicHandler) {
             handler->backup();
             handler.clear();
@@ -113,8 +135,11 @@ Object::save()
     ostringstream of;
 
     if(handler) {
+        long broken = brokenClosuresDropped;
+
         node.construct( );
         handler.toXML( node );
+        reportBrokenClosures(id, broken);
     } else
         node = backupNode;
 

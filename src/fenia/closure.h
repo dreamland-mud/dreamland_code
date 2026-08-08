@@ -35,7 +35,22 @@ public:
 
     void reverse(ostream &os, const DLString &nextline) const;
     DLString toString() const;
-    void toXMLFunctionRef(XMLFunctionRef &ref);
+
+    /**
+     * Fill in a serializable reference to this closure.
+     * @return false when the closure is broken (see isBroken), i.e. there is
+     *         nothing valid to write out.
+     */
+    bool toXMLFunctionRef(XMLFunctionRef &ref);
+
+    /**
+     * A closure loaded from a reference to a code source that no longer exists.
+     * It cannot be invoked, printed or saved -- see the constructor for why one
+     * can exist at all.
+     */
+    inline bool isBroken() const {
+        return function == 0 || !function->source.source;
+    }
 private:
     Function *function;
 };

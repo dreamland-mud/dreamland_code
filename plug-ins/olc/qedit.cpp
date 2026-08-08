@@ -179,6 +179,12 @@ static void show_active_triggers(PCharacter *ch, ostringstream& buf, const Integ
     if (method.type == Register::NONE)
         return;
 
+    // No code source left to link to: name the trigger, do not offer to open it.
+    if (method.toFunction()->isBroken()) {
+        buf << "{D" << methodId << "{w ";
+        return;
+    }
+
     const CodeSource::Pointer &cs = method.toFunction()->getFunction()->source.source;
 
     DLString cmd = "cs web " + DLString(cs->getId());

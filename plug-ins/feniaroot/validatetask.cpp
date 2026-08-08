@@ -55,10 +55,18 @@ ValidateTask::run( )
     for(si = Scripting::CodeSource::manager->begin(); si != Scripting::CodeSource::manager->end(); si++)
         for(fi = si->functions.begin(); fi != si->functions.end(); fi++)
             if (fi->refcnt <= 0)  {
-                LogStream::sendWarning( ) 
-                    << "fenia fsck:  unreferenced function " 
-                    << " cs: " << fi->source.source->getId() << " (" << fi->source.source->name << ")"
-                    << " line: " << fi->source.line << " (fn:" << fi->getId() << ")" << endl;
+                ostream &os = LogStream::sendWarning( )
+                    << "fenia fsck:  unreferenced function ";
+
+                // A function whose code source is missing is exactly what this
+                // report is for, so it must not be the thing that crashes it.
+                if (fi->source.source)
+                    os << " cs: " << fi->source.source->getId()
+                       << " (" << fi->source.source->name << ")";
+                else
+                    os << " cs: GONE";
+
+                os << " line: " << fi->source.line << " (fn:" << fi->getId() << ")" << endl;
                 // DO NOT free. See the comment on freeList below.
             }
 
