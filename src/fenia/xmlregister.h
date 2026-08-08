@@ -55,6 +55,13 @@ public:
     XML_VARIABLE XMLMapBase<XMLRegister> environment;
 };
 
+/**
+ * Counts closures written out as null because their code source is gone.
+ * Object::backup samples it around one object, which is the only place that
+ * still knows whose field the wreckage was sitting in.
+ */
+extern long brokenClosuresDropped;
+
 }
 
 #endif

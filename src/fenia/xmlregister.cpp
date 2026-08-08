@@ -29,7 +29,9 @@ const DLString XMLRegister::REGTYPE_NUMBER = "number";
 const DLString XMLRegister::REGTYPE_FUNCTION = "function";
 const DLString XMLRegister::REGTYPE_OBJECT = "object";
 
-XMLRegister::XMLRegister() 
+long brokenClosuresDropped = 0;
+
+XMLRegister::XMLRegister()
 {
 }
 
@@ -46,10 +48,21 @@ XMLRegister::toXML( XMLNode::Pointer& parent) const
         return true;
     } else if(type == FUNCTION) {
         XMLFunctionRef ref;
-        
+
+        if(!value.function->toXMLFunctionRef(ref)) {
+            // The code source this closure named is gone, so there is no
+            // reference left to write. Save the field as null: it is already
+            // unusable, and persisting it as null keeps the wreckage from
+            // being loaded again -- and lets this save finish at all, which
+            // before this it did not (SIGSEGV on the null source).
+            brokenClosuresDropped++;
+            parent->setType(XMLNode::XML_LEAF);
+            parent->insertAttribute(ATTRIBUTE_REGTYPE, REGTYPE_NONE);
+            return true;
+        }
+
         parent->setType(XMLNode::XML_NODE);
         parent->insertAttribute(ATTRIBUTE_REGTYPE, REGTYPE_FUNCTION);
-        value.function->toXMLFunctionRef(ref);
 
         ref.toXML(parent);
         return true;

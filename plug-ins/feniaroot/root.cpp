@@ -1449,6 +1449,12 @@ NMI_INVOKE( Root, obj_by_id, "(id): найти феневый объект по 
 NMI_INVOKE(Root, codesource, "(func): номер сценария, в котором объявлена данная функция")
 {
     Register reg = argnum2function(args, 1);
+
+    // Reachable from any script, so a function that outlived its code source has to
+    // come back as an exception rather than as a segfault.
+    if (reg.toFunction()->isBroken())
+        throw Scripting::FunctionNotDefinedException();
+
     Scripting::CodeSourceRef csRef = reg.toFunction()->getFunction()->source;
     return Register((int)csRef.source->getId());
 }

@@ -389,6 +389,13 @@ bool FeniaTriggerLoader::editExisting(Character *ch, Register &retval) const
         return false;
     }
 
+    // The code source this trigger was compiled from is gone, so there is no text to
+    // put in the editor. Setting the field anew is the way out.
+    if (retval.toFunction()->isBroken()) {
+        ch->pecho("Сценарий для этого поля потерян, открывать нечего. Задай функцию заново.");
+        return false;
+    }
+
     Scripting::CodeSourceRef csRef = retval.toFunction()->getFunction()->source;
 
     // Construct cs_edit arguments: subject, editor content and line number.

@@ -35,6 +35,11 @@ class DepsBuilder : public Scripting::DereferenceListener
 public:
 
     virtual void notify(Scripting::Function *f) {
+        // No code source means no bucket to file this under -- and findrefs
+        // walking the object graph is one of the paths that used to die here.
+        if (!f->source.source)
+            return;
+
         cs_deps[f->source.source->getId()][f->getId()].push_back(cur_id);
     }
     virtual void notify(Scripting::Object *o) {

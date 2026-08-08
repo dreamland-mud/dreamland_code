@@ -15,9 +15,34 @@
 #include "xmlregister.h"
 #include "codesource.h"
 #include "closure.h"
+#include "exceptions.h"
 #include "scope.h"
 
 using namespace Scripting;
+
+/**
+ * Find a function without creating one.
+ *
+ * BaseManager::at() inserts a default-constructed entry for an unknown id, so
+ * asking it for a function that is gone quietly hands back an empty Function
+ * with a null CodeSourceRef. That stand-in cannot be told apart from a real
+ * function afterwards, and the first attempt to serialize it dereferences the
+ * null source. Look the ids up instead, and report a miss as a miss.
+ */
+static Function * findFunction(CodeSource::id_t csId, Function::id_t fnId)
+{
+    CodeSource::Manager::iterator cs = CodeSource::manager->find(csId);
+
+    if (cs == CodeSource::manager->end())
+        return 0;
+
+    FunctionManager::iterator fn = cs->functions.find(fnId);
+
+    if (fn == cs->functions.end())
+        return 0;
+
+    return &*fn;
+}
 
 Closure::Closure(Scope *start, Function *f) : function(f)
 {
@@ -25,10 +50,26 @@ Closure::Closure(Scope *start, Function *f) : function(f)
     function->link();
 }
 
-Closure::Closure(XMLFunctionRef &ref)
+/**
+ * Recover a closure from the database.
+ *
+ * The code source it points at can legitimately be missing: every 'cs post'
+ * replaces a file's CodeSource, and a closure stored in a .tmp.* map keeps
+ * naming the id that was current when it was saved. Such a closure is loaded
+ * as broken rather than as a fabricated stand-in, so that it fails loudly at
+ * the point of use and gets written back as null on the next save.
+ */
+Closure::Closure(XMLFunctionRef &ref) : function(0)
 {
-    function = &CodeSource::manager->at(ref.codesource).functions.at(ref.function);
-    function->link();
+    function = findFunction(ref.codesource.getValue(), ref.function.getValue());
+
+    if (function)
+        function->link();
+    else
+        LogStream::sendError()
+            << "fenia: closure points at a function that is gone: cs "
+            << ref.codesource.getValue() << " fn " << ref.function.getValue()
+            << " -- loading it as broken, it will be saved as null" << endl;
 
     clear();
     for(XMLMapBase<XMLRegister>::iterator i=ref.environment.begin();i != ref.environment.end();i++) {
@@ -40,7 +81,8 @@ Closure::Closure(XMLFunctionRef &ref)
 
 Closure::~Closure()
 {
-    function->unlink();
+    if (function)
+        function->unlink();
 }
 
 void
@@ -57,6 +99,9 @@ Closure::copyScope(Scope *scope)
 Register
 Closure::invoke(Register thiz, const RegisterList &args)
 {
+    if (!function)
+        throw FunctionNotDefinedException();
+
     Register dummy(this);
 
     CppScopeClobberRoot root;
@@ -66,9 +111,14 @@ Closure::invoke(Register thiz, const RegisterList &args)
     return function->invoke(root, thiz, args);
 }
 
-void 
+void
 Closure::reverse(ostream &os, const DLString &nextline) const
 {
+    if (!function) {
+        os << "{Rbroken function{x ";
+        return;
+    }
+
     os << "[";
     for(const_iterator i = begin();i != end();i++) {
         if(i != begin()) 
@@ -91,9 +141,12 @@ Closure::toString() const
     return os.str();
 }
 
-void
+bool
 Closure::toXMLFunctionRef(XMLFunctionRef &ref)
 {
+    if (isBroken())
+        return false;
+
     ref.codesource = function->source.source->getId();
     ref.function = function->getId();
 
@@ -103,4 +156,6 @@ Closure::toXMLFunctionRef(XMLFunctionRef &ref)
         DLString name = Lex::getThis()->getName(i->first);
         ref.environment[name] = i->second;
     }
+
+    return true;
 }

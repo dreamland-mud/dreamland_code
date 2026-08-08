@@ -48,7 +48,10 @@ void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const 
         return;
 
     // Try our best to guess the codesource where the buggy code is originating from.
-    if (wrapper && wrapper->triggerFunction(key, prog)) {
+    // A closure that outlived its code source has none to name -- and this is the
+    // crash reporter, so it must never become the second crash. Such a trigger falls
+    // through to the plain message below, which needs nothing but the field name.
+    if (wrapper && wrapper->triggerFunction(key, prog) && !prog.toFunction()->isBroken()) {
         const CodeSource::Pointer &codeSource = prog.toFunction()->getFunction()->source.source;    
 
         header = "Исключение при вызове [" + DLString(codeSource->getId()) + "] " 

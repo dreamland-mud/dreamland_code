@@ -113,7 +113,10 @@ Function::invoke(Scope &sroot, Register thiz, RegisterList const &args)
 void
 Function::finalize()
 {
-    source.source->functions.erase(id);
+    // A function recovered against a missing code source has no manager to be
+    // removed from. It is not owned by anything, so letting it go is enough.
+    if (source.source)
+        source.source->functions.erase(id);
 }
 
 DLString ArgNames::toString() const
