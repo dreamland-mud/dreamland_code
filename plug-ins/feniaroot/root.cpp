@@ -723,6 +723,20 @@ NMI_INVOKE(Root, discord_wiznet, "(msg): послать сообщение в п
     return Register( );
 }
 
+// The only Fenia output channel that needs no character and no Discord. Every
+// other one -- act, ptc, echo, gecho, wiznet -- requires somebody online to
+// print to, and the Discord pair leaves the machine entirely. So verifying a
+// freshly hot-reloaded helper meant waiting for an immortal to log in, or
+// borrowing a player's character to run `eval`, which is not ours to borrow.
+// This writes straight to the runtime log, where a deploy script can read it
+// back over ssh. Named for the level it uses so a logError can join it later.
+NMI_INVOKE(Root, logNotice, "(msg): написать msg в лог сервера (проверка кода без игрока онлайн)")
+{
+    DLString msg = args2string(args);
+    LogStream::sendNotice() << "Fenia: " << msg << endl;
+    return Register( );
+}
+
 NMI_INVOKE(Root, telegram, "(msg): послать сырое сообщение в Telegram")
 {
     ostringstream buf;
