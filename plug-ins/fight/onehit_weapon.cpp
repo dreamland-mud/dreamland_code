@@ -24,8 +24,10 @@
 #include "loadsave.h"
 #include "math_utils.h"
 
-#include "effects.h"
 #include "damageflags.h"
+#include "fight_exception.h"
+#include "fenia_utils.h"
+#include "feniamanager.h"
 #include "magic.h"
 #include "occupations.h"
 #include "act.h"
@@ -38,7 +40,6 @@
 GSN(black_feeble);
 GSN(counter);
 GSN(holy_attack);
-GSN(poison);
 
 WeaponOneHit::WeaponOneHit( Character *ch, Character *victim, bool secondary, string command )
                 : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
@@ -249,86 +250,50 @@ void WeaponOneHit::postDamageEffects( )
     damEffectFeeble( );
 }
 
+/**
+ * Weapon flags whose effects live in the onWeaponEffect Fenia trigger
+ * (dreamland_fenia global/onWeaponEffect/weapons).
+ *
+ * WEAPON_SPELL is deliberately absent: it needs spell_nocatch, and the Fenia
+ * ch.spell() binding is the catching overload, so a weapon-spell kill would be
+ * swallowed and the round would carry on against a corpse.
+ */
+static const bitstring_t FUNKY_WEAPON_FLAGS =
+        WEAPON_POISON|WEAPON_VAMPIRIC|WEAPON_FLAMING|WEAPON_FROST|WEAPON_SHOCKING;
+
 void WeaponOneHit::damEffectFunkyWeapon( )
 {
-    int dam;
-    
     if (!wield)
         return;
-        
+
     if (ch->fighting != victim)
         return;
 
-    if (IS_WEAPON_STAT(wield,WEAPON_POISON))
-    {
-        short level;
-        Affect *poison, af;
+    // Everything poison/vampiric/flaming/frost/shocking weapons do now lives in
+    // Fenia, so that what a burning blade does to the victim's gear runs through
+    // the thermodynamics engine instead of the flat extract_obj() roll in
+    // effects.cpp. weaponSkill tells the script which weapon skill to attribute
+    // the extra damage to -- it knows about the secondary wield, Fenia does not.
+    //
+    // The handler calls ch.damage(), i.e. damage_nocatch, so a killing blow
+    // arrives back here as a VictimDeathException and has to keep travelling.
+    // Plain gprog() would file it as a script error and let the round go on.
+    if (weaponSkill && IS_SET(wield->value4(), FUNKY_WEAPON_FLAGS)) {
+        DLString sname = weaponSkill->getName();
 
-        poison = wield->affected.find(gsn_poison);
-        if (!poison)
-            level = wield->level;
-        else
-            level = poison->level;
-        if ( !saves_spell(level / 2,victim,DAM_POISON) )
-        {
-            msgWeaponVict("Ты чувствуешь, как яд распространяется по твоим венам.");
-            msgWeaponRoom("%2$^C1 отравле%2$Gно|н|на|ны ядом от %3$O2 %1$C2.");
-            msgWeaponChar("%2$^C1 отравле%2$Gно|н|на|ны ядом от %3$O2.");
-
-            af.bitvector.setTable(&affect_flags);
-            af.type      = gsn_poison;
-            af.level     = level * 3/4;
-            af.duration  = level / 2;
-            af.location = APPLY_STR;
-            af.modifier  = -1;
-            af.bitvector.setValue(AFF_POISON);
-            af.sources.add(ch);
-            af.sources.add(wield);
-            affect_join( victim, &af );
+        try {
+            gprog_nocatch("onWeaponEffect", "CCOis",
+                          ch, victim, wield, dam, sname.c_str());
+        }
+        catch (const VictimDeathException &) {
+            throw;
+        }
+        catch (const ::Exception &e) {
+            FeniaManager::getThis()->croak(
+                0, Scripting::Register("onWeaponEffect"), e);
         }
     }
 
-    if (IS_WEAPON_STAT(wield,WEAPON_VAMPIRIC))
-    {
-        msgWeaponVict("Ты чувствуешь как %3$O1 вытягива%3$nет|ют из тебя жизнь.");
-        msgWeaponRoom("%3$^O1 %1$C2 вытягива%3$nет|ют жизнь из %2$C2.");
-        msgWeaponChar("%3$^O1 вытягива%3$nет|ют жизнь из %2$C2.");
-
-        dam = number_range(1, wield->level / 5 + 1);
-        damage_nocatch(ch,victim,dam, weapon_sn,DAM_NEGATIVE,false, DAMF_SPELL);
-        ch->hit += dam*2;
-    }
-    if (IS_WEAPON_STAT(wield,WEAPON_FLAMING) )
-    {
-        msgWeaponVict("%3$^O1 обжига%3$nет|ют тебя.");
-        msgWeaponRoom("%3$^O1 %1$C2 обжига%3$nет|ют %2$C4.");
-        msgWeaponChar("%3$^O1 обжига%3$nет|ют %2$C4.");
-
-        dam = number_range(1,wield->level / 4 + 1);
-        fire_effect( (void *) victim, ch, wield->level/2,dam,TARGET_CHAR);
-        damage_nocatch(ch,victim,dam, weapon_sn,DAM_FIRE,false, DAMF_SPELL);
-    }
-    if (IS_WEAPON_STAT(wield,WEAPON_FROST) )
-    {
-        msgWeaponVict("Ледяное прикосновение %3$O2 обмораживает тебя, покрывая льдом.");
-        msgWeaponRoom("%3$^O1 %1$C2 обморажива%3$nет|ют %2$C4.");
-        msgWeaponChar("%3$^O1 обморажива%3$nет|ют %2$C4.");
-
-        dam = number_range(1,wield->level / 6 + 2);
-        cold_effect(victim, ch, wield->level/2,dam,TARGET_CHAR);
-        damage_nocatch(ch,victim,dam, weapon_sn,DAM_COLD,false, DAMF_SPELL);
-    }
-    if (IS_WEAPON_STAT(wield,WEAPON_SHOCKING))
-    {
-        msgWeaponVict("Ты пораже%2$Gно|н|на разрядом %3$O2.");
-        msgWeaponRoom("%2$^C1 пораже%2$Gно|н|на|ны разрядом %3$O2 %1$C2.");
-        msgWeaponChar("%2$^C1 пораже%2$Gно|н|на|ны разрядом %3$O2.");
-
-        dam = number_range(1,wield->level/5 + 2);
-        shock_effect(victim, ch, wield->level/2,dam,TARGET_CHAR);
-        damage_nocatch(ch,victim,dam, weapon_sn,DAM_LIGHTNING,false, DAMF_SPELL);
-    }
-    
     if (IS_WEAPON_STAT(wield, WEAPON_SPELL)) {
         int lvl;
 

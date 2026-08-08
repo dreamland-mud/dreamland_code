@@ -17,56 +17,85 @@ using namespace Scripting;
  * passing two arguments:
  * - trigger name (e.g. onDeath, onLore, onReset)
  * - a list of trigger parameters (ch, mob, obj, etc)
+ *
+ * Shared body for gprog() and gprog_nocatch(): neither va_start nor va_end
+ * happens here, and nothing is caught.
  */
-bool gprog(const DLString &trigName, const char *fmt, ...)
+static bool gprog_invoke(const DLString &trigName, const char *fmt, va_list ap)
 {
     static IdRef ID_TMP("tmp"), ID_TRIG_HNDL("trigger_handler");
 
+    RegisterList registerList;
+    // Locate trigger_handler function; exception is thrown if not found.
+    Register tmp = *Context::root[ID_TMP];
+    Register trigger_handler = *tmp[ID_TRIG_HNDL];
+
+    if (trigger_handler.type != Register::FUNCTION)
+        return false;
+
+    // Collect *trigger* arguments into registerList, based on the argument
+    // format string "CC", "CO" and so on.
+    WrapperBase::triggerArgs(registerList, fmt, ap);
+
+    // Convert RegisterList into RegList, suitable to be passed as one of the parameters
+    // to the trigger_handler.
+    RegList::Pointer list(NEW);
+    for (RegisterList::const_iterator r = registerList.begin(); r != registerList.end(); r++)
+        list->push_back(*r);
+
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+    listObj->setHandler(list);
+
+    // Collect two trigger_handler arguments into RegisterList.
+    RegisterList args;
+    args.push_front(trigName);
+    args.push_back(listObj);
+
+    // Invoke trigger handler, 'true' result is meaningful for some trigger types.
+    Register result = trigger_handler.toFunction()->invoke(tmp, args);
+    if (result.type == Register::NUMBER)
+        return result.toBoolean();
+
+    return false;
+}
+
+bool gprog(const DLString &trigName, const char *fmt, ...)
+{
     if (!FeniaManager::wrapperManager)
         return false;
 
+    va_list ap;
+    va_start(ap, fmt);
+
     try {
-        va_list ap;
-        RegisterList registerList;
-        // Locate trigger_handler function; exception is thrown if not found.
-        Register tmp = *Context::root[ID_TMP];
-        Register trigger_handler = *tmp[ID_TRIG_HNDL];
-
-        if (trigger_handler.type != Register::FUNCTION)
-            return false;
-
-        // Collect *trigger* arguments into registerList, based on the argument
-        // format string "CC", "CO" and so on.        
-        va_start(ap, fmt);
-        WrapperBase::triggerArgs(registerList, fmt, ap);
+        bool rc = gprog_invoke(trigName, fmt, ap);
         va_end(ap);
-
-        // Convert RegisterList into RegList, suitable to be passed as one of the parameters
-        // to the trigger_handler.
-        RegList::Pointer list(NEW);
-        for (RegisterList::const_iterator r = registerList.begin(); r != registerList.end(); r++)
-            list->push_back(*r);
-
-        Scripting::Object *listObj = &Scripting::Object::manager->allocate();
-        listObj->setHandler(list);
-
-        // Collect two trigger_handler arguments into RegisterList.
-        RegisterList args;
-        args.push_front(trigName);
-        args.push_back(listObj);
-
-        // Invoke trigger handler, 'true' result is meaningful for some trigger types.
-        Register result = trigger_handler.toFunction()->invoke(tmp, args);
-        if (result.type == Register::NUMBER)
-            return result.toBoolean();
-
-        return false;
-
+        return rc;
     }
     catch (const ::Exception &e) {
+        va_end(ap);
         // On error, complain to the logs and to all immortals in the game.
         FeniaManager::getThis()->croak(0, Register(trigName), e);
         return false;
+    }
+}
+
+bool gprog_nocatch(const DLString &trigName, const char *fmt, ...)
+{
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    va_list ap;
+    va_start(ap, fmt);
+
+    try {
+        bool rc = gprog_invoke(trigName, fmt, ap);
+        va_end(ap);
+        return rc;
+    }
+    catch (...) {
+        va_end(ap);
+        throw;
     }
 }
 
