@@ -632,6 +632,9 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         }
     }
 
+    wiznet(WIZ_QUEST, 0, 0, "Failed to start quest %s for %s: 3 attempts declined",
+           (*q)->getName().c_str(), client->getNameC());
+
     tell_fmt(_("Извини, оказывается у меня нет подходящих для тебя заданий на '%3$s'."), client, ch, (*q)->getShortDescr().c_str());
     tell_raw(client, ch, _("Приходи позже или выбери что-то другое."));
 }
