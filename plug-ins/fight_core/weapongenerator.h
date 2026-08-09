@@ -49,6 +49,9 @@ struct WeaponGenerator {
     /** Pin the weapon class instead of rolling one. randomizeAll() then leaves the class
      *  alone. Unknown names are ignored with a warning -- validate with
      *  weapon_class_exists() at the caller's boundary if a hard error is wanted.
+     *  Call after item(); an empty name is a no-op.
+     *  Do NOT combine with randomizeStats(): that path regenerates neither names nor
+     *  damage type, so the weapon would end up wearing its old class's identity.
      */
     WeaponGenerator & weaponClass(const DLString &name);
 

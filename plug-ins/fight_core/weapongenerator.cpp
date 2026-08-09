@@ -80,6 +80,10 @@ WeaponGenerator::WeaponGenerator()
     align = ALIGN_NONE;
     retainChance = 50;
     wclassFixed = false;
+    // Every assign*/random* method dereferences obj; item() is what sets it. Start
+    // it null so a chain built in the wrong order crashes readably instead of
+    // running off an indeterminate pointer.
+    obj = 0;
 }
 
 bool weapon_class_exists(const DLString &name)
@@ -147,6 +151,11 @@ WeaponGenerator & WeaponGenerator::weaponClass(const DLString &name)
     // No class requested: stay chainable and let randomizeAll() roll one.
     if (name.empty())
         return *this;
+
+    if (!obj) {
+        warn("Weapon generator: weaponClass(%s) called before item(); ignored.", name.c_str());
+        return *this;
+    }
 
     if (!weapon_class_exists(name)) {
         warn("Weapon generator: unknown weapon class %s requested, rolling one instead.", name.c_str());
