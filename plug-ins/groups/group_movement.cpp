@@ -48,7 +48,6 @@
 #include "merc.h"
 
 #include "loadsave.h"
-#include "effects.h"
 #include "act.h"
 #include "vnum.h"
 #include "def.h"

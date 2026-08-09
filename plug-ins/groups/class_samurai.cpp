@@ -42,7 +42,7 @@
 #include "weapongenerator.h"
 #include "vnum.h"
 #include "merc.h"
-#include "effects.h"
+#include "elemental_bridge.h"
 #include "loadsave.h"
 #include "act.h"
 #include "interp.h"
@@ -114,7 +114,9 @@ SKILL_RUNP( explode )
 
     if (!(is_safe(ch,victim))) {
         dam = max(hp_dam + dice_dam /10, dice_dam + hp_dam / 10);
-        fire_effect(victim->in_room, ch, level,dam/2,TARGET_ROOM);
+        // The blast reaches the room, so this is the AREA entry: floor items
+        // heat up and the place can catch. Power 10 = the legacy full tier.
+        elemental_effect_room("fire", ch, victim->in_room, 10);
     }
 
     for ( auto &vch : victim->in_room->getPeople()){
@@ -134,7 +136,7 @@ SKILL_RUNP( explode )
 
         if (vch == victim) /* full damage */ {
             try{
-            fire_effect(vch, ch, level,dam,TARGET_CHAR);            
+            elemental_effect("fire", ch, vch, 10);
             damage_nocatch(ch,vch,dam,gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
             }
             catch (const VictimDeathException &){
@@ -143,7 +145,7 @@ SKILL_RUNP( explode )
         }
         else /* partial damage */ {
             try{
-            fire_effect(vch, ch, level/2,dam/4,TARGET_CHAR);
+            elemental_effect("fire", ch, vch, 6); // legacy (level/2, dam/4)
             damage_nocatch(ch,vch,dam/2,gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
             }
             catch (const VictimDeathException &){
@@ -156,7 +158,7 @@ SKILL_RUNP( explode )
     }
 
     if (!ch->is_npc() && number_percent() >= gsn_explode->getEffective( ch )) {        
-        fire_effect(ch, ch, level/4,dam/10,TARGET_CHAR);
+        elemental_effect("fire", ch, ch, 4); // the botched self-burn, legacy (level/4, dam/10)
         damage(ch,ch,(ch->hit / 10),gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
     
     }

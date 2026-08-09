@@ -87,7 +87,6 @@
 #include "descriptor.h"
 #include "comm.h"
 #include "mudtags.h"
-#include "effects.h"
 #include "wiznet.h"
 #include "loadsave.h"
 #include "movetypes.h"

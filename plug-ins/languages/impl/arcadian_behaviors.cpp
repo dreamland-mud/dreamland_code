@@ -19,7 +19,7 @@
 #include "damage.h"
 #include "act.h"
 #include "loadsave.h"
-#include "effects.h"
+#include "elemental_bridge.h"
 #include "fight_extract.h"
 #include "vnum.h"
 #include "def.h"
@@ -151,7 +151,10 @@ bool BeerElementalBehavior::specFight( )
     
     try {
         damage_nocatch( ch, victim, dam, gsn_gas_breath, DAM_POISON, true, DAMF_SPELL);
-        poison_effect( victim, ch, level, dam, TARGET_CHAR );
+        // Fumes, not venom: the victim BREATHES this, so it takes the cloud
+        // entry and the weather gets a say. Power 4 per ELEMENTAL_PHYSICS.md
+        // section 13 -- it is a drunk breathing on you, not a green dragon.
+        elemental_effect( "poisoncloud", ch, victim, 4 );
     } catch (const VictimDeathException &) {
     }
 

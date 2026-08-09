@@ -33,7 +33,6 @@
 #include "damage.h"
 #include "loadsave.h"
 #include "wearloc_utils.h"
-#include "effects.h"
 #include "magic.h"
 #include "clanreference.h"
 #include "interp.h"
@@ -202,6 +201,16 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
 }
         
 
+/*
+ * DEAD IN NORMAL PLAY. Its only caller is send_arrow, itself called only from
+ * SKILL_RUNP(shoot) in class_ranger.cpp, which is the run of the 'bow' skill
+ * (generic-skills/bow.xml declares <command type="SKILL(shoot)">). Fenia
+ * overrides .SkillCommand("bow").run and defaultskillcommand.cpp skips
+ * Command::run whenever a Fenia run exists, so nothing here executes.
+ *
+ * The weapon-flag effects it used to apply now live in the Fenia bow,
+ * dreamland_fenia/skillcommand/bow/run, through .tmp.mob.effectX.
+ */
 static void arrow_damage( Object *arrow, Character *ch, Character *victim,
                           int damroll, int door )
 {
@@ -255,21 +264,18 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     {
         oldact(_("$o1 обжигает $c4."),victim,arrow,0,TO_ROOM);
         oldact(_("$o1 обжигает тебя."),victim,arrow,0,TO_CHAR);
-        fire_effect( (void *) victim, ch, arrow->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(arrow,WEAPON_FROST))
     {
         oldact(_("$o1 обмораживает $c4."),victim,arrow,0,TO_ROOM);
         oldact(_("$o1 обмораживает тебя."),victim,arrow,0,TO_CHAR);
-        cold_effect(victim, ch, arrow->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(arrow,WEAPON_SHOCKING))
     {
         oldact(_("$o1 парализует $c4 разрядом молнии."),victim,arrow,0,TO_ROOM);
         oldact(_("$o1 парализует тебя разрядом молнии."),victim,arrow,0,TO_CHAR);
-        shock_effect(victim, ch, arrow->level,dam,TARGET_CHAR);
     }
 
     if ( dam_type == DAM_PIERCE

@@ -1,7 +1,7 @@
 lib_LTLIBRARIES = libfight.la
 
 libfight_la_SOURCES = \
-effects.cpp \
+elemental_bridge.cpp \
 fight.cpp \
 fight_cmds.cpp \
 fight_death.cpp \
