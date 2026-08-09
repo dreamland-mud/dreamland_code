@@ -26,7 +26,6 @@
 #include "fight.h"
 #include "fight_exception.h"
 #include "religionutils.h"
-#include "effects.h"
 #include "defaultspell.h"
 #include "dl_math.h"
 #include "loadsave.h"
@@ -323,87 +322,6 @@ NMI_INVOKE(FeniaSpellContext, damageItems, "(func): вызвать ф-ию дл�
     return Register();
 }
 
-static bitstring_t my_damage_flags(const Register &ch, const Register &spell)
-{
-    Character *myCh = arg2character(ch);
-    DefaultSpell *mySpell = arg2spell(spell);
-    return mySpell->damflags | (mySpell->isPrayer(myCh) ? DAMF_PRAYER : DAMF_MAGIC);
-}
-
-template <typename Ctx>
-static void call_effect_func_template(effect_fun_t &fun, Ctx *thiz, bitstring_t damflags = 0)
-{
-    void *vo = 0;
-    int target;
-    int level = thiz->level;
-    int dam = thiz->dam;
-    Character *caster = arg2character(thiz->ch);
-
-    if (thiz->vict.type != Register::NONE) {        
-        vo = arg2character(thiz->vict);
-        target = TARGET_CHAR;
-        
-    } else if (thiz->room.type != Register::NONE) {
-        vo = arg2room(thiz->room);
-        target = TARGET_ROOM;
-        
-    } else if (thiz->obj.type != Register::NONE) {
-        vo = arg2item(thiz->obj);
-        target = TARGET_OBJ;
-    } else
-        return;
-
-    fun(vo, caster, level, dam, target, damflags);
-}
-
-static void call_effect_func(effect_fun_t &fun, FeniaSpellContext *thiz)
-{
-    bitstring_t damflags = my_damage_flags(thiz->ch, thiz->spell);
-    call_effect_func_template<FeniaSpellContext>(fun, thiz, damflags);
-}
-
-NMI_INVOKE(FeniaSpellContext, effectCold, "(): применить холодный эффект на жертву, предмет или комнату")
-{
-    call_effect_func(cold_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaSpellContext, effectFire, "(): применить огненный эффект на жертву, предмет или комнату")
-{
-    call_effect_func(fire_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaSpellContext, effectSand, "(): применить эффект песчаной бури на жертву, предмет или комнату")
-{
-    call_effect_func(sand_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaSpellContext, effectAcid, "(): применить кислотный эффект на жертву, предмет или комнату")
-{
-    call_effect_func(acid_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaSpellContext, effectPoison, "(): применить эффект яда на жертву, предмет или комнату")
-{
-    call_effect_func(poison_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaSpellContext, effectShock, "(): применить шоковый эффект на жертву, предмет или комнату")
-{
-    call_effect_func(shock_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaSpellContext, effectScream, "(): применить эффект песчаной бури на жертву, предмет или комнату")
-{
-    call_effect_func(scream_effect, this);
-    return Register();    
-}
-
 
 NMI_INVOKE(FeniaSpellContext, effectBlind, "(): применить на жертву заклинание слепоты")
 {
@@ -651,46 +569,4 @@ NMI_INVOKE(FeniaCommandContext, msgArea, "(fmt[,args]): выдать сообщ�
     DLString message = regfmt(NULL, myArgs);
     area_message(caster, message, true);
     return Register();
-}
-
-NMI_INVOKE(FeniaCommandContext, effectCold, "(): применить холодный эффект на жертву, предмет или комнату")
-{
-    call_effect_func_template(cold_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaCommandContext, effectFire, "(): применить огненный эффект на жертву, предмет или комнату")
-{
-    call_effect_func_template(fire_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaCommandContext, effectSand, "(): применить эффект песчаной бури на жертву, предмет или комнату")
-{
-    call_effect_func_template(sand_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaCommandContext, effectAcid, "(): применить кислотный эффект на жертву, предмет или комнату")
-{
-    call_effect_func_template(acid_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaCommandContext, effectPoison, "(): применить эффект яда на жертву, предмет или комнату")
-{
-    call_effect_func_template(poison_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaCommandContext, effectShock, "(): применить шоковый эффект на жертву, предмет или комнату")
-{
-    call_effect_func_template(shock_effect, this);
-    return Register();    
-}
-
-NMI_INVOKE(FeniaCommandContext, effectScream, "(): применить эффект песчаной бури на жертву, предмет или комнату")
-{
-    call_effect_func_template(scream_effect, this);
-    return Register();    
 }

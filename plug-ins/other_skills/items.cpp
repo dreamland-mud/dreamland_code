@@ -13,7 +13,6 @@
 #include "move_utils.h"
 #include "doors.h"
 
-#include "effects.h"
 #include "damage.h"
 #include "loadsave.h"
 #include "merc.h"

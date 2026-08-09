@@ -21,7 +21,6 @@
 #include "damage.h"
 #include "act.h"
 #include "loadsave.h"
-#include "effects.h"
 
 #include "vnum.h"
 #include "def.h"
