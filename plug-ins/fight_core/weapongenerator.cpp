@@ -79,6 +79,12 @@ WeaponGenerator::WeaponGenerator()
     hrIndexBonus = drIndexBonus = aveIndexBonus = 0;
     align = ALIGN_NONE;
     retainChance = 50;
+    wclassFixed = false;
+}
+
+bool weapon_class_exists(const DLString &name)
+{
+    return !name.empty() && weapon_classes.isMember(name);
 }
 
 WeaponGenerator::~WeaponGenerator()
@@ -130,14 +136,36 @@ WeaponGenerator & WeaponGenerator::randomWeaponClass()
         return *this;
 
     unsigned int random_index = number_range(0, allClasses.size() - 1);
-    wclass = allClasses[random_index];
+    applyWeaponClass(allClasses[random_index]);
+
+    return *this;
+}
+
+// Assign a caller-chosen weapon class and keep randomizeAll() from rolling over it.
+WeaponGenerator & WeaponGenerator::weaponClass(const DLString &name)
+{
+    // No class requested: stay chainable and let randomizeAll() roll one.
+    if (name.empty())
+        return *this;
+
+    if (!weapon_class_exists(name)) {
+        warn("Weapon generator: unknown weapon class %s requested, rolling one instead.", name.c_str());
+        return *this;
+    }
+
+    applyWeaponClass(name);
+    wclassFixed = true;
+    return *this;
+}
+
+void WeaponGenerator::applyWeaponClass(const DLString &name)
+{
+    wclass = name;
     wclassConfig = weapon_classes[wclass];
     obj->value0(weapon_class.value(wclass));
 
     // Keep some extra flags (e.g. for shops) but clean everything else.
     obj->extra_flags &= ITEM_INVENTORY;
-
-    return *this;
 }
 
 const WeaponGenerator & WeaponGenerator::assignValues() const
@@ -486,8 +514,11 @@ WeaponGenerator& WeaponGenerator::randomizeStats()
 
 WeaponGenerator& WeaponGenerator::randomizeAll()
 {
-    randomWeaponClass()
-        .randomNames()
+    // weaponClass() has already pinned and applied the class; don't roll over it.
+    if (!wclassFixed)
+        randomWeaponClass();
+
+    randomNames()
         .randomAffixes()
         .assignHitroll()
         .assignDamroll()

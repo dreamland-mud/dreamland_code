@@ -45,6 +45,13 @@ struct WeaponGenerator {
     WeaponGenerator& randomizeAll();
 
     WeaponGenerator & randomWeaponClass();
+
+    /** Pin the weapon class instead of rolling one. randomizeAll() then leaves the class
+     *  alone. Unknown names are ignored with a warning -- validate with
+     *  weapon_class_exists() at the caller's boundary if a hard error is wanted.
+     */
+    WeaponGenerator & weaponClass(const DLString &name);
+
     WeaponGenerator & randomNames();
     WeaponGenerator & randomAffixes();
 
@@ -65,6 +72,7 @@ struct WeaponGenerator {
     const WeaponGenerator & assignTimers() const;
 
 private:
+    void applyWeaponClass(const DLString &name);
     void setAffect(int location, int modifier) const;
     void setName() const;
     void setShortDescr() const;
@@ -114,9 +122,15 @@ private:
     // A chance for random affix to remain in the initial set.
     int retainChance; 
 
-    Object *obj;    
+    Object *obj;
     DLString wclass;
+
+    // Set by weaponClass(): tells randomizeAll() not to roll a class of its own.
+    bool wclassFixed;
 };
+
+/** True when this weapon class name is present in the weapon_classes config. */
+bool weapon_class_exists(const DLString &name);
 
 
 #endif
