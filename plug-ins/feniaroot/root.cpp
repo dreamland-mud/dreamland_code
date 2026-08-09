@@ -1541,24 +1541,36 @@ NMI_INVOKE(Root, randomWeaponTier, "(bestTier[, legendaryPerMille]): случа�
     return Register(random_weapon_tier(bestTier, legendaryPerMille));
 }
 
-NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier")
+NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
     int bestTier = argnum2number(args, 3);
     bool stats = args.size() > 3 ? argnum2boolean(args, 4) : false;
-    
+    DLString wclass = args.size() > 4 ? argnum2string(args, 5) : DLString::emptyString;
+    int worstTier = args.size() > 5 ? argnum2number(args, 6) : bestTier;
+
     if (obj->item_type != ITEM_WEAPON)
         throw Scripting::Exception("Item is not a weapon for randomize.");
     if (bestTier < BEST_TIER || bestTier > WORST_TIER)
         throw Scripting::Exception("Invalid weapon tier.");
+    if (worstTier < bestTier || worstTier > WORST_TIER)
+        throw Scripting::Exception("Invalid worst weapon tier: must be between tier and WORST_TIER.");
+    if (!wclass.empty() && !weapon_class_exists(wclass))
+        throw Scripting::Exception("Unknown weapon class.");
+    if (!wclass.empty() && stats)
+        throw Scripting::Exception("Weapon class only applies to rand_all: call without stats.");
 
-    if (stats) { 
+    // A single tier stays exactly as the caller decided; a window means the caller
+    // wants the usual weighted roll confined to it.
+    int tier = worstTier > bestTier ? random_weapon_tier_range(bestTier, worstTier, 0) : bestTier;
+
+    if (stats) {
         WeaponGenerator()
             .item(obj)
             .alignment(ch->alignment)
             .player(ch->getPC())
-            .tier(bestTier)
+            .tier(tier)
             .randomizeStats();
     }
     else {
@@ -1566,11 +1578,13 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats]): применить 
             .item(obj)
             .alignment(ch->alignment)
             .player(ch->getPC())
-            // The tier is already decided by caller (Fenia), do not roll it again.
-            .tier(bestTier)
+            // Empty wclass leaves the class to be rolled, as before. A named one bypasses
+            // the player-availability filter on purpose: the caller knows what it wants.
+            .weaponClass(wclass)
+            .tier(tier)
             .randomizeAll();
     }
-        
+
     return Register();
 }
 

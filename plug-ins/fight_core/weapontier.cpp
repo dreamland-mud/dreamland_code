@@ -30,18 +30,26 @@ CONFIGURABLE_LOADED(fight, weapon_tiers)
     weapon_tier_table.fromJson(value);
 }
 
-int random_weapon_tier(int bestTier, int legendaryPerMille)
+int random_weapon_tier_range(int bestTier, int worstTier, int legendaryPerMille)
 {
     int minTier = URANGE(BEST_TIER, bestTier, WORST_TIER);
+    int maxTier = URANGE(minTier, worstTier, WORST_TIER);
 
+    // The legendary jackpot deliberately ignores the requested window: it is the
+    // one way a drop can beat the tier its site asked for.
     if (legendaryPerMille > 0 && number_range(1, 1000) <= legendaryPerMille)
         return BEST_TIER;
 
-    for (int i = minTier - 1; i < WORST_TIER; i++)
+    for (int i = minTier - 1; i < maxTier; i++)
         if (chance(weapon_tier_table[i].chance))
             return i + 1;
 
-    return WORST_TIER;
+    return maxTier;
+}
+
+int random_weapon_tier(int bestTier, int legendaryPerMille)
+{
+    return random_weapon_tier_range(bestTier, WORST_TIER, legendaryPerMille);
 }
 
 static int valid_tier(const DLString &tierName)
