@@ -86,10 +86,19 @@ NMI_GET( MobIndexWrapper, name, "имена, на которые отклика�
     checkTarget( ); 
     return String::toString(target->keyword);
 }
-NMI_GET( MobIndexWrapper, short_descr, "имя, которое видно когда моб совершает действия") 
-{ 
-    checkTarget( ); 
+NMI_GET( MobIndexWrapper, short_descr, "имя, которое видно когда моб совершает действия")
+{
+    checkTarget( );
     return target->short_descr.get(LANG_DEFAULT);
+}
+
+// LANG_DEFAULT (RU) only, like its object-side twin. A script naming a mob to a
+// player -- butcher stamping the victim into a steak's label, for one -- needs
+// the viewer's language. Mirrors AreaIndexWrapper::getName.
+NMI_INVOKE( MobIndexWrapper, getShort, "(lang): короткое описание прототипа на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    return Register( target->getShortDescr( argnum2lang( args, 1 ) ) );
 }
 NMI_GET( MobIndexWrapper, long_descr, "как моба видно в комнате") 
 { 

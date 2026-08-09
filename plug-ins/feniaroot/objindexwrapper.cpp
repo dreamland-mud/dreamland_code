@@ -106,10 +106,20 @@ NMI_GET( ObjIndexWrapper, name, "имена предмета, на которы�
     return Register( String::toString(target->keyword));
 }
 
-NMI_GET( ObjIndexWrapper, short_descr, "описание, видимое в инвентаре и при манипуляциях") 
-{ 
-    checkTarget( ); 
+NMI_GET( ObjIndexWrapper, short_descr, "описание, видимое в инвентаре и при манипуляциях")
+{
+    checkTarget( );
     return Register( target->short_descr.get(LANG_DEFAULT));
+}
+
+// The plain short_descr/description getters above are LANG_DEFAULT (RU) only.
+// Anything printing a prototype's name to a player -- identify's "requires key"
+// line, or a script substituting into a "%s" template the prototype ships --
+// needs the viewer's language instead. Mirrors AreaIndexWrapper::getName.
+NMI_INVOKE( ObjIndexWrapper, getShort, "(lang): короткое описание прототипа на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    return Register( target->getShortDescr( argnum2lang( args, 1 ) ) );
 }
 
 NMI_GET( ObjIndexWrapper, limit , "максимальное кол-во экземпляров существующих одновременно или -1") 
