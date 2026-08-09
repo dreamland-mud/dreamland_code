@@ -10,11 +10,13 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "dreamland.h"
+#include "wiznet.h"
 
 #include "questmanager.h"
 #include "questexceptions.h"
 #include "quest.h"
 #include "questregistrator.h"
+#include "def.h"
 
 
 
@@ -71,7 +73,8 @@ QuestList QuestManager::list(PCharacter *pch) const
 void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) const {
     unsigned int summ, i, dice;
     QuestList qlist;
-    
+    DLString declined;
+
     for (summ = 0, i = 0; i < quests.size( ); i++) {
         if (quests[i]->applicable( pch, true )) {
             summ += quests[i]->getPriority( );
@@ -79,33 +82,51 @@ void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) const {
         }
     }
 
-    while (!qlist.empty( )) {
+    // Nothing applicable, or every applicable type has zero weight. Zero weight is
+    // fatal for the weighted pick below: 'i > dice' never becomes true, so ipos is
+    // left at end() and dereferenced. Priority defaults to 0 for a registrator whose
+    // XML omits <priority>, so this is one config edit away rather than impossible.
+    if (qlist.empty( ) || summ == 0) {
+        wiznet( WIZ_QUEST, 0, 0, "Failed to start quest for %s: %d of %d types applicable, total weight %d",
+                pch->getNameC( ), (int)qlist.size( ), (int)quests.size( ), (int)summ );
+        throw QuestCannotStartException( );
+    }
+
+    while (!qlist.empty( ) && summ > 0) {
         QuestList::iterator ipos;
 
         dice = number_range( 0, summ - 1 );
         for (i = 0, ipos = qlist.begin( ); ipos != qlist.end( ); ipos++) {
             i += (*ipos)->getPriority( );
 
-            if (i > dice) 
+            if (i > dice)
                 break;
         }
-        
+
         try {
-            pch->getAttributes( ).addAttribute( 
+            pch->getAttributes( ).addAttribute(
                          (*ipos)->createQuest( pch, questor ), "quest" );
-            return; 
-        } 
+            return;
+        }
         catch (const QuestCannotStartException &e) {
+            if (!declined.empty( ))
+                declined += ", ";
+            declined += (*ipos)->getName( );
+
             summ -= (*ipos)->getPriority( );
             qlist.erase( ipos );
 
-        } 
+        }
         catch (const Exception &e1) {
             LogStream::sendError( ) << e1.what( ) << endl;
+            wiznet( WIZ_QUEST, 0, 0, "Failed to start quest %s for %s: %s",
+                    (*ipos)->getName( ).c_str( ), pch->getNameC( ), e1.what( ) );
             throw QuestCannotStartException( );
         }
     }
-    
+
+    wiznet( WIZ_QUEST, 0, 0, "Failed to start quest for %s: declined by %s; %d type(s) left unpicked with zero weight",
+            pch->getNameC( ), declined.c_str( ), (int)qlist.size( ) );
     throw QuestCannotStartException( );
 }
 
