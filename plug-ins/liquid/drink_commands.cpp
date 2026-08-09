@@ -197,7 +197,7 @@ static void create_pool( Object *out, int amount )
     Object *pool;
     int time;
     Liquid *liquid;
-    DLString liqShort, liqName;
+    DLString liqName;
     Room *room = out->getRoom();
 
     time = amount / 15;    
@@ -207,26 +207,50 @@ static void create_pool( Object *out, int amount )
         time = std::max( 2, time ); 
 
     pool = get_obj_room_vnum( room, OBJ_VNUM_POOL ); // 75
-	liquid = liquidManager->find( out->value2() );	
-    liqShort = liquid->getShortDescr( );
+	liquid = liquidManager->find( out->value2() );
     liqName  = liquid->getName( );
-	
+
+	// Room::echo resolves the FORMAT per listener but shares one argument list, so a
+	// pre-rendered liquid noun reaches every viewer in a single language -- which is
+	// how an English sentence ended up saying "A puddle of пива". Loop the room and
+	// render the noun in each listener's own language instead.
 	if (pool) {
 		amount = pool->value1() + amount;
 		if (out->value2() != pool->value2()) {
+			Liquid *poured = liquidManager->find(out->value2());
+			Liquid *pooled = liquidManager->find(pool->value2());
+
 			liquid = liquidManager->find(liq_swill); // When liquids mix, make "swill"
-    		liqShort = liquid->getShortDescr( ); // reassign names to swill
-    		liqName  = liquid->getName( );			
-			room->echo( POS_RESTING, _("%^N1 и %N1 смешиваются, образуя лужу %N2."),
-					   liquidManager->find(out->value2())->getShortDescr( ).c_str( ),
-					   liquidManager->find(pool->value2())->getShortDescr( ).c_str( ),
-					   liqShort.c_str( ) );
+    		liqName  = liquid->getName( ); // reassign name to swill
+
+			for (Character *rch = room->people; rch; rch = rch->next_in_room) {
+				if (rch->position < POS_RESTING)
+					continue;
+				lang_t lg = Player::lang(rch);
+				rch->pecho( l(rch, "%^N1 и %N1 смешиваются, образуя лужу %N2."),
+							poured->getShortDescr( lg ).c_str( ),
+							pooled->getShortDescr( lg ).c_str( ),
+							liquid->getShortDescr( lg ).c_str( ) );
+			}
 		}
-		else room->echo( POS_RESTING, _("Лужа %N2 растекается еще шире."), liqShort.c_str( ) );
+		else {
+			for (Character *rch = room->people; rch; rch = rch->next_in_room) {
+				if (rch->position < POS_RESTING)
+					continue;
+				rch->pecho( l(rch, "Лужа %N2 растекается еще шире."),
+							liquid->getShortDescr( Player::lang(rch) ).c_str( ) );
+			}
+		}
 	}
     else {
 		pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);
-		room->echo( POS_RESTING, _("На земле образуется лужа %N2."), liqShort.c_str( ) );
+
+		for (Character *rch = room->people; rch; rch = rch->next_in_room) {
+			if (rch->position < POS_RESTING)
+				continue;
+			rch->pecho( l(rch, "На земле образуется лужа %N2."),
+						liquid->getShortDescr( Player::lang(rch) ).c_str( ) );
+		}
 	}
 	
     // Build the puddle name/description per viewer language: the pool prototype
@@ -273,7 +297,6 @@ void pour_out(Object *out)
 
     Liquid *liq = liquidManager->find(out->value2());
     const char *liqname = liq->getName().c_str();
-    DLString liqShort = liq->getShortDescr();
     Character *ch = out->carried_by;
 
     if (ch && oprog_empty(out, ch, liqname, amount))
@@ -284,16 +307,35 @@ void pour_out(Object *out)
         ch->recho(_("%^C1 переворачивает %O4."), ch, out);
     }
 
-    if (RoomUtils::isWater(room))
-        room->echo(POS_RESTING, _("Поток %N2 из %O2 выплескивается в %N4."), liqShort.c_str(), out, room->getLiquid()->getShortDescr().c_str());
-    else if (room->getSectorType() == SECT_AIR)
-        room->echo(POS_RESTING, _("Поток %N2 из %O2 устремляется куда-то вниз и пропадает."), liqShort.c_str(), out); // TO-DO: move to non-air room downwards
-    else if (room->getSectorType() == SECT_DESERT)
-        room->echo(POS_RESTING, _("Лужа %N2 из %O2 с шипением испаряется на песке."), liqShort.c_str(), out);
-    else {
-        room->echo(POS_RESTING, _("Поток %N2 из %O2 проливается на землю."), liqShort.c_str(), out);
-        create_pool(out, amount);
+    // Decide the destination once, so the message and the puddle can never disagree.
+    bool intoWater = RoomUtils::isWater(room);
+    bool intoAir   = !intoWater && room->getSectorType() == SECT_AIR;
+    bool intoSand  = !intoWater && !intoAir && room->getSectorType() == SECT_DESERT;
+    bool onGround  = !intoWater && !intoAir && !intoSand;
+
+    // Same per-listener loop as create_pool: the liquid noun has to be rendered in
+    // each viewer's language, because the shared argument list cannot vary with the
+    // format Room::echo picks for them.
+    for (Character *rch = room->people; rch; rch = rch->next_in_room) {
+        if (rch->position < POS_RESTING)
+            continue;
+
+        lang_t lg = Player::lang(rch);
+        const char *ln = liq->getShortDescr( lg ).c_str( );
+
+        if (intoWater)
+            rch->pecho(l(rch, "Поток %N2 из %O2 выплескивается в %N4."),
+                       ln, out, room->getLiquid()->getShortDescr( lg ).c_str( ));
+        else if (intoAir)
+            rch->pecho(l(rch, "Поток %N2 из %O2 устремляется куда-то вниз и пропадает."), ln, out); // TO-DO: move to non-air room downwards
+        else if (intoSand)
+            rch->pecho(l(rch, "Лужа %N2 из %O2 с шипением испаряется на песке."), ln, out);
+        else
+            rch->pecho(l(rch, "Поток %N2 из %O2 проливается на землю."), ln, out);
     }
+
+    if (onGround)
+        create_pool(out, amount);
 
     if (ch && out->behavior && out->behavior.getDynamicPointer<DrinkContainer>())
         out->behavior.getDynamicPointer<DrinkContainer>()->pourOut(ch, amount);

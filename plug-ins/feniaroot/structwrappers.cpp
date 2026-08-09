@@ -675,9 +675,13 @@ NMI_INVOKE( LiquidWrapper, getShort, "(lang): название с цветами
 {
     return Scripting::Register( getTarget()->getShortDescr( argnum2lang(args, 1) ) );
 }
-NMI_GET( LiquidWrapper, color, "прилагательное цвета с падежами" ) 
+NMI_GET( LiquidWrapper, color, "прилагательное цвета с падежами" )
 {
     return getTarget()->getColor( );
+}
+NMI_INVOKE( LiquidWrapper, getColor, "(lang): прилагательное цвета с падежами на языке lang (0=en,1=ru,2=ua)" )
+{
+    return Scripting::Register( getTarget()->getColor( argnum2lang(args, 1) ) );
 }
 NMI_GET( LiquidWrapper, sip_size, "размер глотка" ) 
 {
