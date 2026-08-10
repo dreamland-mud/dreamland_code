@@ -441,6 +441,16 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
         if (IS_SET(mob->act, ACT_NOSAVEDROP))
             return;
 
+        // fread_mob re-applies every saved affect through affect_to_char, so what
+        // goes on disk has to be the mob WITHOUT them. Writing the live value
+        // instead means each save/load cycle bakes in another copy of every
+        // modifier: that is how the Anon wall guards reached saving_throw -229 and
+        // became immune to every spell in the game, one point per save/load cycle.
+        // Restored right after the affect block below -- nothing between the two
+        // loops can return early.
+        for (auto &paf: mob->affected)
+            affect_modify( mob, paf, false );
+
         fprintf(fp,"#MOBILE\n");
 
         fprintf(fp,"Vnum %d\n",mob->pIndexData->vnum);
@@ -542,8 +552,13 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
         for (auto &paf: mob->affected)
             fwrite_affect( "Affc", fp, paf );
 
+        // Put the mob back the way it was found. Everything past this point --
+        // behaviors, carried objects -- must see a live mob, not a stripped one.
+        for (auto &paf: mob->affected)
+            affect_modify( mob, paf, true );
+
         fprintf(fp,"End\n");
-        
+
         MobileBehaviorManager::save( mob, fp );
 
         if ( mob->carrying != 0 )
