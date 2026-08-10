@@ -16,7 +16,6 @@ namespace Json { class Value; }
 struct        str_app_type
 {
     int        hit;
-    int        missile;
     int        carry;
     int        wield;
     int web;

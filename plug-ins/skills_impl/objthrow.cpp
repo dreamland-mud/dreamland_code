@@ -36,7 +36,6 @@
 #include "magic.h"
 #include "clanreference.h"
 #include "interp.h"
-#include "stats_apply.h"
 #include "merc.h"
 
 #include "act.h"
@@ -210,6 +209,11 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
  *
  * The weapon-flag effects it used to apply now live in the Fenia bow,
  * dreamland_fenia/skillcommand/bow/run, through .tmp.mob.effectX.
+ *
+ * Archery is a dexterity skill now: the Fenia bow takes its to-hit and its
+ * damage bonus from fight/dex_app missile_hit and missile_damage. The strength
+ * term this used to add (str_app.missile) was the last reference to that field,
+ * so it went with it -- see fight/str_app.json.
  */
 static void arrow_damage( Object *arrow, Character *ch, Character *victim,
                           int damroll, int door )
@@ -228,7 +232,7 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
         dam *= 2;
 
     dam = number_range( dam, 2 * dam );
-    dam += damroll + (get_str_app(ch).missile);
+    dam += damroll;
 
     if (IS_WEAPON_STAT(arrow,WEAPON_POISON))
     {

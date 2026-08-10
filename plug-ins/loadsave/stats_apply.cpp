@@ -62,7 +62,6 @@ const struct dex_app_type & get_dex_app( Character *ch )
 void str_app_type::fromJson(const Json::Value &value)
 {
     hit = value["hit"].asInt();
-    missile = value["missile"].asInt();
     carry = value["carry"].asInt();
     wield = value["wield"].asInt();
     web = value["web"].asInt();
