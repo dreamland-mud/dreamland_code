@@ -28,7 +28,6 @@
 
 #include "def.h"
 
-GSN(compound);
 WEARLOC(none);
 
 #define OBJ_VNUM_WEAPON_STUB 104 // random weapon prototype for rand_all
@@ -464,9 +463,14 @@ void Object::setProperty(const DLString &key, const DLString &subkey, const DLSt
 
 /**
  * How weapon values can be changed:
- * 1) 'compound' prayer - value0, value3.
- * Has a 'compound' affect.
- * 
+ * 1) An affect on the object itself, through APPLY_WEAPON_CLASS,
+ * APPLY_WEAPON_ATTACK, APPLY_DICE_NUMBER or APPLY_DICE_SIZE.
+ * Nothing is written to value[]: the override is folded in at read time by
+ * get_weapon_class() and friends, which is why this case does not appear
+ * below. Writing it would repeat the saved-mob bug, where a live value went to
+ * disk and the affect was applied on top of it again at load. The 'compound'
+ * prayer works this way.
+ *
  * 2) 'randomize all' - value0, value1, value2, value3, value4
  * 'tier' property contains numeric value of the tier.
  * vnum is OBJ_VNUM_WEAPON_STUB.
@@ -498,13 +502,9 @@ void Object::setProperty(const DLString &key, const DLString &subkey, const DLSt
 static bool get_value0_from_proto(const Object *obj)
 {
     switch (obj->item_type) {
-        case ITEM_WEAPON: 
+        case ITEM_WEAPON:
             // value0 (weapon type) is changed on 'rand_all' weapons
             if (obj->pIndexData->vnum == OBJ_VNUM_WEAPON_STUB)
-                return false;
-
-            // value0 is changed on cleric's maces (compound prayer)
-            if (obj->isAffected(gsn_compound))
                 return false;
 
             return true;
@@ -542,13 +542,9 @@ static bool get_value2_from_proto(const Object *obj)
 static bool get_value3_from_proto(const Object *obj)
 {
     switch (obj->item_type) {
-        case ITEM_WEAPON: 
+        case ITEM_WEAPON:
             // value3 (weapon damage type) is changed on 'rand_all' weapons
             if (obj->pIndexData->vnum == OBJ_VNUM_WEAPON_STUB)
-                return false;
-                
-            // value3 is changed on cleric's maces (compound prayer)
-            if (obj->isAffected(gsn_compound))
                 return false;
 
             return true;
@@ -588,6 +584,35 @@ int Object::itemOrProtoValue(int index) const
 void Object::itemOrProtoValue(int index, int v)
 {
     value[index] = v;
+}
+
+
+/**
+ * Walk the affects living on this object -- its own first, then the ones
+ * declared on its prototype, the same two lists affectsOnEquip walks when it
+ * applies them to the wearer -- and fold those matching 'location' into 'base'.
+ *
+ * An absolute location takes the first match and stops. affect_to_obj
+ * push_front()s, so that is the most recently applied one, which is the answer
+ * a player expects when two things fight over the same item.
+ */
+int Object::affectedValue(int location, int base, bool absolute) const
+{
+    const AffectList *lists[2] = { &affected, &pIndexData->affected };
+    int result = base;
+
+    for (const AffectList *list: lists)
+        for (Affect *paf: *list) {
+            if (paf->location.getValue() != location)
+                continue;
+
+            if (absolute)
+                return paf->modifier.getValue();
+
+            result += paf->modifier.getValue();
+        }
+
+    return result;
 }
 
 

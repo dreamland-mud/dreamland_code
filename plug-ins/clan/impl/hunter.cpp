@@ -287,7 +287,7 @@ void HunterWeapon::fight( Character *ch )
     if (number_percent( ) >= 25)
         return;
 
-    switch (obj->value0()) {
+    switch (get_weapon_class(obj)) {
     case WEAPON_SWORD:        fight_sword( ch );  return;
     case WEAPON_MACE:        fight_mace( ch );   return;
     case WEAPON_AXE:        fight_axe( ch );    return;

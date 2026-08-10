@@ -247,15 +247,15 @@ void UndefinedOneHit::damEffectVorpal()
 
     MultiMessage msgAll;
 
-    if (wield->value0() == WEAPON_SWORD)
+    if (get_weapon_class(wield) == WEAPON_SWORD)
         msgAll = _("{mРаз-два, раз-два! Горит трава, взы-взы стрижает меч!{x");
-    else if (wield->value0() == WEAPON_AXE)
+    else if (get_weapon_class(wield) == WEAPON_AXE)
         msgAll = _("{mРаз-два! Раз-два! Горит трава, взы-взы свирчит топор!{x");
-    else if (wield->value0() == WEAPON_POLEARM)
+    else if (get_weapon_class(wield) == WEAPON_POLEARM)
         msgAll = _("{mРаз-два! Раз-два! Горит трава, взы-взы свирчит бердыш!{x");
-    else if (wield->value0() == WEAPON_WHIP)
+    else if (get_weapon_class(wield) == WEAPON_WHIP)
         msgAll = _("{mРаз-два! Раз-два! Горит трава, взы-взы стрижает плеть!{x");
-    else if (wield->value0() == WEAPON_DAGGER)
+    else if (get_weapon_class(wield) == WEAPON_DAGGER)
         msgAll = _("{mРаз-два! Раз-два! Горит трава, взы-взы стрижает нож!{x");
     else
         msgAll = _("{mРаз-два! Раз-два! Горит трава, взы-взы свирчит клинок!{x");
@@ -266,19 +266,19 @@ void UndefinedOneHit::damEffectVorpal()
         return;
 
     MultiMessage msgVict, msgOther;
-    if (wield->value0() == WEAPON_SWORD) {
+    if (get_weapon_class(wield) == WEAPON_SWORD) {
         msgOther = _("{mУва! Ува! И %1$C2 голова барабардает с плеч!{x");
         msgVict = _("{mУва! И твоя голова барабардает с плеч!{x");
-    } else if (wield->value0() == WEAPON_AXE) {
+    } else if (get_weapon_class(wield) == WEAPON_AXE) {
         msgOther = _("{mУва! %1$^C1 без головы остал%1$Gось|ся|ась|ись с этих пор!{x");
         msgVict = _("{mУва! И ты без головы остал%1$Gось|ся|ась|ись с этих пор!{x");
-    } else if (wield->value0() == WEAPON_POLEARM) {
+    } else if (get_weapon_class(wield) == WEAPON_POLEARM) {
         msgOther = _("{mУва! %1$C2 котелок скосило как камыш!{x");
         msgVict = _("{mУва! Ува! Твой котелок скосило как камыш!{x");
-    } else if (wield->value0() == WEAPON_WHIP) {
+    } else if (get_weapon_class(wield) == WEAPON_WHIP) {
         msgOther = _("{mУва! %1$C3 с головой не подружиться впредь!{x");
         msgVict = _("{mУва! И тебе с головой не подружиться впредь!{x");
-    } else if (wield->value0() == WEAPON_DAGGER) {
+    } else if (get_weapon_class(wield) == WEAPON_DAGGER) {
         msgOther = _("{mУва! Ты голову %1$C2 у ног своих найдешь!{x");
         msgVict = _("{mУва! Ты голову свою у ног своих найдешь!{x");
     } else {
@@ -387,7 +387,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     MultiMessage msgCharHeart = _("{RНеожиданно изловчившись, ты наносишь мощнейшую серию ударов $C3 ПРЯМО В СЕРДЦЕ!!!{x");
 
     if (wield) {        
-            switch( wield->value0() ) {
+            switch( get_weapon_class(wield) ) {
             case WEAPON_SWORD:
                         msgVictBasic = _("$c1 наносит тебе внезапный удар мечом в печень!");
                         msgCharBasic = _("Ты наносишь $C3 внезапный удар мечом в печень!");
@@ -451,7 +451,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     }
 
     if ( ch->getProfession( ) == prof_thief ) {
-            if ( (!wield) || (wield->value0() != WEAPON_DAGGER) )
+            if ( (!wield) || (get_weapon_class(wield) != WEAPON_DAGGER) )
                         return;                
             stun_chance = 65;        
     }
@@ -459,7 +459,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             stun_chance = 85;
     }   
     if ( ch->getProfession( ) == prof_samurai ) {
-            if ( (wield) && (wield->value0() == WEAPON_SWORD) ) {
+            if ( (wield) && (get_weapon_class(wield) == WEAPON_SWORD) ) {
                     msgVictBlind = _("{yИспользуя технику кирикаэси, $c1 наносит серию ударов в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x");
                     msgCharBlind = _("{yИспользуя технику кирикаэси, ты ослепляешь $C4. Мэн!{x");
                     msgVictHeart = _("{RИспользуя технику кацуги-вадза, $c1 внезапно наносит удар особой силы!!!{x");

@@ -65,7 +65,7 @@ void WeaponOneHit::init( )
     skill = 20 + weaponSkill->getEffective( ch );
     
     if (wield) 
-        attack = wield->value3();
+        attack = get_weapon_attack(wield);
     else 
         attack = ch->dam_type;
 
@@ -90,7 +90,7 @@ void WeaponOneHit::damBase( )
 {
     int weaponDamage = 0;
     if (wield) {
-        weaponDamage = dice(wield->value1(), wield->value2()) * skill / 100;
+        weaponDamage = dice(get_weapon_dice_number(wield), get_weapon_dice_size(wield)) * skill / 100;
     }
 
     if (ch->is_npc()) {

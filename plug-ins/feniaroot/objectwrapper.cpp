@@ -478,28 +478,52 @@ NMI_GET( ObjectWrapper, ave, "среднее повреждение оружия
     return weapon_ave(target);
 }
 
+NMI_GET( ObjectWrapper, weapon_class, "класс оружия с учетом аффектов на предмете (таблица .tables.weapon_class)")
+{
+    checkTarget();
+    return Register( get_weapon_class(target) );
+}
+
+NMI_GET( ObjectWrapper, weapon_attack, "тип атаки оружия с учетом аффектов на предмете (таблица .tables.weapon_flags)")
+{
+    checkTarget();
+    return Register( get_weapon_attack(target) );
+}
+
+NMI_GET( ObjectWrapper, dice_number, "число кубиков урона оружия с учетом аффектов на предмете")
+{
+    checkTarget();
+    return Register( get_weapon_dice_number(target) );
+}
+
+NMI_GET( ObjectWrapper, dice_size, "грани кубиков урона оружия с учетом аффектов на предмете")
+{
+    checkTarget();
+    return Register( get_weapon_dice_size(target) );
+}
+
 NMI_GET( ObjectWrapper, attack_name, "англ название типа атаки оружия (таблица в коде attack_table)")
 {
     checkTarget();
-    return target->item_type == ITEM_WEAPON ? attack_table[target->value3()].name : "";
+    return target->item_type == ITEM_WEAPON ? attack_table[get_weapon_attack(target)].name : "";
 }
 
 NMI_GET( ObjectWrapper, attack_noun, "русск название типа атаки оружия (таблица в коде attack_table)")
 {
     checkTarget();
-    return target->item_type == ITEM_WEAPON ? attack_table[target->value3()].noun : "";
+    return target->item_type == ITEM_WEAPON ? attack_table[get_weapon_attack(target)].noun : "";
 }
 
 NMI_GET( ObjectWrapper, attack_noun_en, "англ название типа атаки оружия (config/fight/attack_nouns.json)")
 {
     checkTarget();
-    return target->item_type == ITEM_WEAPON ? ::attack_noun_en(target->value3()) : DLString::emptyString;
+    return target->item_type == ITEM_WEAPON ? ::attack_noun_en(get_weapon_attack(target)) : DLString::emptyString;
 }
 
 NMI_GET( ObjectWrapper, attack_noun_ua, "укр название типа атаки оружия (config/fight/attack_nouns.json)")
 {
     checkTarget();
-    return target->item_type == ITEM_WEAPON ? ::attack_noun_ua(target->value3()) : DLString::emptyString;
+    return target->item_type == ITEM_WEAPON ? ::attack_noun_ua(get_weapon_attack(target)) : DLString::emptyString;
 }
 
 NMI_GET( ObjectWrapper, attack_damage, "название типа повреждения оружия (таблица .tables.damage_table)")
@@ -509,7 +533,7 @@ NMI_GET( ObjectWrapper, attack_damage, "название типа поврежд
     if (target->item_type != ITEM_WEAPON)
         return "";
 
-    return damage_table.name(attack_table[target->value3()].damage);
+    return damage_table.name(attack_table[get_weapon_attack(target)].damage);
 }
 
 #define SETGETVALUE(x) \

@@ -146,6 +146,15 @@ DLString AffectOutput::format_affect_location( Affect *paf )
             /* do nothing */
             break;
 
+        // The weapon overrides read their modifier as a table index, not as a
+        // bonus, so the default arm below would announce "changes weapon class
+        // by 4". What they did is already visible on the weapon itself.
+        case APPLY_WEAPON_CLASS:
+        case APPLY_WEAPON_ATTACK:
+        case APPLY_DICE_NUMBER:
+        case APPLY_DICE_SIZE:
+            break;
+
         default:
             if (paf->global.empty()) {
                 buf << fmt( 0, _("изменяет {m%1$s{y на {m%2$d{y").getMessage( lang ).c_str( ),
