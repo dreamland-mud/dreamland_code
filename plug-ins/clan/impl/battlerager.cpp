@@ -127,7 +127,7 @@ SKILL_APPLY( mortalstrike )
         return false;
     }
 
-    int dam_type = attack_table[wield->value3()].damage;
+    int dam_type = attack_table[get_weapon_attack(wield)].damage;
     int dam_flag = DAMF_WEAPON;
     if (immune_check(victim, dam_type, dam_flag) == RESIST_IMMUNE)
         return false;

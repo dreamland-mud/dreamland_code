@@ -142,7 +142,7 @@ static Object * find_arrow( Character *ch, Object *quiver )
     Object *arrow = NULL;
 
     for (Object *obj = quiver->contains; obj != 0; obj = obj->next_content)
-        if (obj->item_type == ITEM_WEAPON && obj->value0() == WEAPON_ARROW) {
+        if (obj->item_type == ITEM_WEAPON && get_weapon_class(obj) == WEAPON_ARROW) {
             arrow = obj;
             break; 
         }
@@ -220,7 +220,7 @@ SKILL_RUNP( shoot )
 
     if ( !wield
             || wield->item_type != ITEM_WEAPON
-            || wield->value0() != WEAPON_BOW )
+            || get_weapon_class(wield) != WEAPON_BOW )
     {
             ch->pecho(_("Для того, чтобы стрелять тебе нужен лук!"));
             return;            
@@ -284,7 +284,7 @@ SKILL_RUNP( shoot )
         if ( paf->location == APPLY_DAMROLL )
             bow_bonus += paf->modifier;
     } 
-    bow_bonus += dice( wield->value1(), wield->value2() );
+    bow_bonus += dice( get_weapon_dice_number(wield), get_weapon_dice_size(wield) );
     
     try {
         success = send_arrow( ch, victim, arrow, direction, chance, bow_bonus );

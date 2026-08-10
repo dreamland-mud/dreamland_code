@@ -463,15 +463,15 @@ bool BasicMobileBehavior::doPickWeapon( )
         }
         else { // while tracking, wield dagger to stab or bow to shoot
             if (gsn_bow->usable( ch )
-                && (!wield || wield->value0() != WEAPON_BOW)
-                && obj->value0() == WEAPON_BOW)
+                && (!wield || get_weapon_class(wield) != WEAPON_BOW)
+                && get_weapon_class(obj) == WEAPON_BOW)
             {
                 isGood = true;
             }
 
             if (gsn_backstab->usable( ch )
-                && (!wield || attack_table[wield->value3()].damage != DAM_PIERCE) 
-                && attack_table[obj->value3()].damage == DAM_PIERCE)
+                && (!wield || attack_table[get_weapon_attack(wield)].damage != DAM_PIERCE) 
+                && attack_table[get_weapon_attack(obj)].damage == DAM_PIERCE)
             {
                 isGood = true;
             }

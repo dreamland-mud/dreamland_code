@@ -163,7 +163,7 @@ SKILL_RUNP( cleave )
         return;
     }
 
-    if (attack_table[obj->value3()].damage != DAM_SLASH) {
+    if (attack_table[get_weapon_attack(obj)].damage != DAM_SLASH) {
         ch->pecho(_("Чтобы рассечь кого-то, нужно вооружится режущим или рубящим оружием."));
         return;
     }

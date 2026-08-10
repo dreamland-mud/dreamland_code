@@ -210,6 +210,21 @@ public:
     void valueByIndex(int index, int value);
     bool getsValueFromProto(int index) const;
 
+    /**
+     * Fold the affects sitting on this object -- its own, then its prototype's
+     * -- into 'base' and return what a reader should actually see.
+     *
+     * 'absolute' picks the first matching affect and returns its modifier
+     * outright, for fields that are an enum rather than a scale; otherwise the
+     * modifiers add up. Nothing is written back to value[]: the override lives
+     * only for as long as the affect does.
+     *
+     * The apply locations themselves are named in the loadsave plugin, which is
+     * built after core, so callers pass the constant in. The weapon readers are
+     * get_weapon_class() and friends in plug-ins/fight_core/weapons.h.
+     */
+    int affectedValue(int location, int base, bool absolute) const;
+
 protected:
     int itemOrProtoValue(int index) const;
     void itemOrProtoValue(int index, int value);

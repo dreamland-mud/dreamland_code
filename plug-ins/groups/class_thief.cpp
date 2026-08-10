@@ -307,7 +307,7 @@ SKILL_RUNP( backstab )
             return;
     }
 
-    if ( attack_table[obj->value3()].damage != DAM_PIERCE && obj->value0() != WEAPON_DAGGER )
+    if ( attack_table[get_weapon_attack(obj)].damage != DAM_PIERCE && get_weapon_class(obj) != WEAPON_DAGGER )
     {
             ch->pecho(_("Чтобы ударить сзади, нужно вооружиться кинжалом или другим колющим оружием."));
             return;
@@ -453,8 +453,8 @@ SKILL_RUNP( circle )
     }
 
     if ( (obj = get_eq_char(ch,wear_wield)) == 0
-            || (attack_table[obj->value3()].damage != DAM_PIERCE 
-            && obj->value0() != WEAPON_DAGGER))
+            || (attack_table[get_weapon_attack(obj)].damage != DAM_PIERCE 
+            && get_weapon_class(obj) != WEAPON_DAGGER))
     {
             ch->pecho(_("Вооружись для этого кинжалом или другим колющим оружием."));
             return;
@@ -524,7 +524,7 @@ SKILL_RUNP( knife )
         return;
     }
 
-    if (knife->value0() != WEAPON_DAGGER) {
+    if (get_weapon_class(knife) != WEAPON_DAGGER) {
         ch->pecho(_("Для этого тебе нужен кинжал."));
         return;
     }

@@ -252,6 +252,17 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
     case APPLY_HEAL_GAIN:     ch->heal_gain             += mod; break;
     case APPLY_BEATS:         ch->mod_beats += mod; break;
 
+    // These four change the weapon they sit on, not the person holding it, and
+    // they are folded in at read time by get_weapon_class() and friends. They
+    // still land here because affectsOnEquip walks every affect on an equipped
+    // item; without a case of their own the default arm below would call them
+    // a bug on every wear and remove.
+    case APPLY_WEAPON_CLASS:
+    case APPLY_WEAPON_ATTACK:
+    case APPLY_DICE_NUMBER:
+    case APPLY_DICE_SIZE:
+        break;
+
     case APPLY_NONE:
     case APPLY_LEARNED: 
         if (!ch->is_npc()) {

@@ -402,7 +402,7 @@ int second_weapon_chance(Profession *prof, Object *weapon)
     int index = 0; /* hand to hand */
 
     if (weapon && weapon->item_type == ITEM_WEAPON)
-        index = weapon->value0() + 1;
+        index = get_weapon_class(weapon) + 1;
 
     for (int i = 0; second_weapon_table[i].prof != prof_none; i++) {
         if (prof->getIndex() == second_weapon_table[i].prof) {

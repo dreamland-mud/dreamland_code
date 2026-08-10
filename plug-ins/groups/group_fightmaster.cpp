@@ -159,7 +159,7 @@ SKILL_APPLY(parry)
     else if (prof == prof_anti_paladin && victim->getClan( ) == clan_shalafi) 
             chance /= 2;
 
-    if (wield && (wield->value0() == WEAPON_FLAIL || wield->value0() == WEAPON_WHIP ))
+    if (wield && (get_weapon_class(wield) == WEAPON_FLAIL || get_weapon_class(wield) == WEAPON_WHIP ))
         return false;
 
     if ( !victim->can_see( ch ) )
@@ -402,9 +402,9 @@ SKILL_APPLY(shieldblock)
         chance += 10;
 
     if (wield) { 
-        if (wield->value0() == WEAPON_FLAIL)
+        if (get_weapon_class(wield) == WEAPON_FLAIL)
             chance /= 2;
-        if (wield->value0() == WEAPON_WHIP)
+        if (get_weapon_class(wield) == WEAPON_WHIP)
             return false;
     }
 

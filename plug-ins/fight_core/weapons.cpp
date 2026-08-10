@@ -11,6 +11,8 @@
 #include "weapons.h"
 #include "math_utils.h"
 #include "itemflags.h"
+#include "affectflags.h"
+#include "attacks.h"
 #include "def.h"
 
 WEARLOC(wield);
@@ -21,9 +23,74 @@ GSN(spear); GSN(mace);        GSN(axe);          GSN(flail);
 GSN(whip);  GSN(polearm);     GSN(bow);          GSN(arrow);
 GSN(lance); GSN(throwing_weapon); GSN(hand_to_hand);
 
+/*
+ * Both overrides come from an affect, so the value is whatever a builder or a
+ * script put in af.modifier -- unlike value0/value3, which OLC validates. Every
+ * caller of these two indexes a fixed table with the answer, so an override
+ * outside the table is refused here and the weapon keeps the value it was built
+ * with. Refusing beats clamping: clamping would silently turn a typo into some
+ * other real weapon.
+ */
+static int attack_table_size()
+{
+    static int size = -1;
+
+    if (size < 0)
+        for (size = 0; attack_table[size].name; size++)
+            ;
+
+    return size;
+}
+
+int get_weapon_class(Object *wield)
+{
+    if (wield->item_type != ITEM_WEAPON)
+        return wield->value0();
+
+    int wclass = wield->affectedValue(APPLY_WEAPON_CLASS, wield->value0(), true);
+
+    if (wclass < 0 || wclass >= WEAPON_MAX)
+        return wield->value0();
+
+    return wclass;
+}
+
+int get_weapon_attack(Object *wield)
+{
+    if (wield->item_type != ITEM_WEAPON)
+        return wield->value3();
+
+    int attack = wield->affectedValue(APPLY_WEAPON_ATTACK, wield->value3(), true);
+
+    if (attack < 0 || attack >= attack_table_size())
+        return wield->value3();
+
+    return attack;
+}
+
+int get_weapon_dice_number(Object *wield)
+{
+    if (wield->item_type != ITEM_WEAPON)
+        return wield->value1();
+
+    // A debuff may take the dice down to nothing, but never past it: dice()
+    // walks the count, and dice_ave multiplies by it.
+    int number = wield->affectedValue(APPLY_DICE_NUMBER, wield->value1(), false);
+    return number < 0 ? 0 : number;
+}
+
+int get_weapon_dice_size(Object *wield)
+{
+    if (wield->item_type != ITEM_WEAPON)
+        return wield->value2();
+
+    int size = wield->affectedValue(APPLY_DICE_SIZE, wield->value2(), false);
+    return size < 0 ? 0 : size;
+}
+
 Skill * get_weapon_skill( Object *wield )
 {
-    switch (wield->value0())
+    switch (get_weapon_class(wield))
     {
         default :               return &*gsn_none;
         case(WEAPON_EXOTIC):    return &*gsn_exotic;
@@ -93,7 +160,7 @@ int get_weapon_sn( Character *ch, bool secondary )
 int weapon_ave(Object *wield)
 {
     if (wield->item_type == ITEM_WEAPON)
-        return dice_ave(wield->value1(), wield->value2());
+        return dice_ave(get_weapon_dice_number(wield), get_weapon_dice_size(wield));
     else
         return 0;
 }

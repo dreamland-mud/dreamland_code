@@ -189,7 +189,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
     int dam_type = 0;
     wield = get_eq_char( victim, wear_wield );
     if ( wield && wield->item_type == ITEM_WEAPON )
-        dam_type = attack_table[wield->value3()].damage;
+        dam_type = attack_table[get_weapon_attack(wield)].damage;
     else
         dam_type = attack_table[victim->dam_type].damage;
     if ( dam_type == -1 )

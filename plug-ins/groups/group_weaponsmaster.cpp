@@ -317,9 +317,9 @@ SKILL_RUNP( shield )
         return;
     }
 
-    if (attack_table[wield->value3()].damage == DAM_SLASH)
+    if (attack_table[get_weapon_attack(wield)].damage == DAM_SLASH)
         weapon = wield;
-    else if (dual && attack_table[dual->value3()].damage == DAM_SLASH)
+    else if (dual && attack_table[get_weapon_attack(dual)].damage == DAM_SLASH)
         weapon = dual;
     else {
         ch->pecho( _("Для этого навыка нужно оружие с рубящей кромкой."));
@@ -348,9 +348,9 @@ SKILL_RUNP( shield )
     chance = 0;
     chance = gsn_shield_cleave->getEffective( ch ) * skill_mod; // 30-50% base
     
-    if (weapon->value0() == WEAPON_AXE || weapon->value0() == WEAPON_POLEARM) {
+    if (get_weapon_class(weapon) == WEAPON_AXE || get_weapon_class(weapon) == WEAPON_POLEARM) {
         chance = chance * 1.2; // 48-60%
-    } else if (weapon->value0() == WEAPON_SWORD) {        
+    } else if (get_weapon_class(weapon) == WEAPON_SWORD) {        
         chance = chance * 0.9;
     } else {
         ch->pecho(_("Для этого ты долж%Gно|ен|на вооружиться топором, мечом или алебардой."), ch);
@@ -458,9 +458,9 @@ SKILL_RUNP( weapon )
         return;
     }
 
-    if (attack_table[wield->value3()].damage == DAM_SLASH)
+    if (attack_table[get_weapon_attack(wield)].damage == DAM_SLASH)
         weapon = wield;
-    else if (dual && attack_table[dual->value3()].damage == DAM_SLASH)
+    else if (dual && attack_table[get_weapon_attack(dual)].damage == DAM_SLASH)
         weapon = dual;
     else {
         ch->pecho( _("Для этого навыка нужно оружие с рубящей кромкой."));
@@ -490,9 +490,9 @@ SKILL_RUNP( weapon )
     chance = 0;
     chance = gsn_weapon_cleave->getEffective( ch ) * skill_mod; // 30-50% base
     
-    if (weapon->value0() == WEAPON_AXE || weapon->value0() == WEAPON_POLEARM) {
+    if (get_weapon_class(weapon) == WEAPON_AXE || get_weapon_class(weapon) == WEAPON_POLEARM) {
         chance = chance * 1.2; // 48-60%
-    } else if (weapon->value0() == WEAPON_SWORD) {
+    } else if (get_weapon_class(weapon) == WEAPON_SWORD) {
         chance = chance * 0.9;
     } else {
         ch->pecho(_("Для этого ты долж%Gно|ен|на вооружиться топором, мечом или алебардой."), ch);
@@ -575,9 +575,9 @@ SKILL_RUNP( lash )
     one_argument(argument, arg);
     
     whip = get_eq_char(ch, wear_wield);
-    if (!whip || whip->item_type != ITEM_WEAPON || whip->value0() != WEAPON_WHIP)
+    if (!whip || whip->item_type != ITEM_WEAPON || get_weapon_class(whip) != WEAPON_WHIP)
         whip = get_eq_char(ch, wear_second_wield);
-    if (!whip || whip->item_type != ITEM_WEAPON || whip->value0() != WEAPON_WHIP) 
+    if (!whip || whip->item_type != ITEM_WEAPON || get_weapon_class(whip) != WEAPON_WHIP) 
     {
         ch->pecho( _("Возьми в руки хлыст.") );
         if(IS_CHARMED(ch) && ch->master->getPC() && Char::canCarryNumber(ch) > 0)
