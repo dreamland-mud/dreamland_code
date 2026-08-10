@@ -123,6 +123,7 @@ int                count_obj_in_obj( Object *container );
 int                count_obj_in_obj( Object *container, int itype );
 Object *        get_obj_wear_carry( Character *ch, const DLString &cArgument, Character *looker = 0 );
 Object * get_key_carry( Character *ch, int vnum );
+Object * get_lockpick_carry( Character *ch, const DLString &cArg );
 
 bool can_see_god(Character *ch, Character *god);
 bool mob_index_has_name( mob_index_data *pMob, const DLString &arg );

@@ -758,6 +758,48 @@ Object * get_key_carry( Character *ch, int vnum )
     return NULL;
 }
 
+// Find a lockpick by name among carried items, looking inside keyrings too.
+// Loose picks are matched first, exactly as before keyrings were searched at
+// all, and only then the rings -- a ring must never jump ahead of a loose pick
+// and get itself selected (and possibly broken) by an implicit "pick door
+// lockpick". The count is shared between both passes, so "2.name" stays one
+// continuous sequence. Unlike get_key_carry this matches by name, not vnum.
+Object * get_lockpick_carry( Character *ch, const DLString &cArg )
+{
+    char arg[MAX_INPUT_LENGTH];
+    char argument[MAX_INPUT_LENGTH];
+    Object *obj, *pick;
+    int number, count;
+
+    strcpy( argument, cArg.c_str( ) );
+    number = number_argument( argument, arg );
+    count = 0;
+
+    for (obj = ch->carrying; obj; obj = obj->next_content)
+        if (obj->item_type == ITEM_LOCKPICK
+            && obj_has_name( obj, arg, ch )
+            && (ch->can_see( obj ) || ch->can_hear( obj ))
+            && ++count == number)
+            return obj;
+
+    for (obj = ch->carrying; obj; obj = obj->next_content) {
+        if (obj->item_type != ITEM_KEYRING)
+            continue;
+
+        if (!ch->can_see( obj ) && !ch->can_hear( obj ))
+            continue;
+
+        for (pick = obj->contains; pick; pick = pick->next_content)
+            if (pick->item_type == ITEM_LOCKPICK
+                && obj_has_name( pick, arg, ch )
+                && (ch->can_see( pick ) || ch->can_hear( pick ))
+                && ++count == number)
+                return pick;
+    }
+
+    return NULL;
+}
+
 // Return true if immortal's config allows them to be seen.
 bool can_see_god(Character *ch, Character *god)
 {
