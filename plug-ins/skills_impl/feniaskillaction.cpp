@@ -61,15 +61,29 @@ CONFIGURABLE_LOADED(spell, damage_tiers)
     damage_tiers.fromJson(value);
 }
 
+// Tiers are 1-based and the table is loaded from a config file, so a spell with
+// no <tier> at all (XMLIntegerNoEmpty defaults to 0) and a truncated config file
+// both have to be rejected before indexing. Returns 0 when there is no such tier.
+static const spell_damage_t * find_damage_tier(int tier)
+{
+    if (tier < 1 || (unsigned int)tier > damage_tiers.size())
+        return 0;
+
+    return &damage_tiers[tier - 1];
+}
+
 // Output a comma-separated list of damage dices for the given tier.
 DLString print_damage_tiers(int tier, int level_step)
 {
-    spell_damage_t &damage = damage_tiers[tier - 1];    
+    const spell_damage_t *damage = find_damage_tier(tier);
+    if (!damage)
+        return DLString::emptyString;
+
     StringList dices;
 
     for (int lev = 0; lev <= MAX_LEVEL; lev += level_step) {
         dices.push_back(
-            fmt(0, "%2d", damage.valueAtLevel(lev))
+            fmt(0, "%2d", damage->valueAtLevel(lev))
         );
     }
 
@@ -428,8 +442,20 @@ NMI_GET(FeniaSpellContext, doorOrExtraExit, "название направлен
 
 void FeniaSpellContext::calcDamage()
 {
-    spell_damage_t &damage = damage_tiers[tier - 1];
-    int d = damage.valueAtLevel(level);
+    // Called unconditionally from createContext for every Fenia spell, and again
+    // per victim from damageRoom, so most of these calls are for spells that
+    // declare no damage tier at all. Those get a zero and have to set dam
+    // themselves; a tier that is present but bogus is a data error worth a log.
+    const spell_damage_t *damage = find_damage_tier(tier);
+    if (!damage) {
+        if (tier != 0)
+            LogStream::sendError() << "Spell " << name << ": damage tier "
+                                   << tier << " out of range" << endl;
+        dam = 0;
+        return;
+    }
+
+    int d = damage->valueAtLevel(level);
     dam = dice(level, d);
 }
 
