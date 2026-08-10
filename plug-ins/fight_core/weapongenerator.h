@@ -135,5 +135,11 @@ private:
 /** True when this weapon class name is present in the weapon_classes config. */
 bool weapon_class_exists(const DLString &name);
 
+/** Weapon class the player has trained highest among those available to them.
+ *  Empty when there is no player or nothing qualifies -- which is the same
+ *  "roll one yourself" sentinel that weaponClass() already treats as a no-op.
+ */
+DLString best_weapon_class(PCharacter *pch);
+
 
 #endif

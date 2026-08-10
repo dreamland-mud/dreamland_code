@@ -91,6 +91,45 @@ bool weapon_class_exists(const DLString &name)
     return !name.empty() && weapon_classes.isMember(name);
 }
 
+DLString best_weapon_class(PCharacter *pch)
+{
+    if (!pch)
+        return DLString::emptyString;
+
+    vector<DLString> best;
+    int bestPercent = 0;
+
+    for (auto const &name: weapon_classes.getMemberNames()) {
+        // Same availability filter randomWeaponClass() uses: a class the player
+        // cannot use at all is not a reward, it is a paperweight.
+        Skill *skill = skillManager->find(name);
+        if (!skill || !skill->available(pch))
+            continue;
+
+        // A skill reporting nothing learned can't win: the base Skill and an
+        // unusable GenericSkill both report 0, and a zero is not a preference.
+        // (The 'arrow' entry never reaches here at all -- it is a BasicSkill, and
+        // those are unavailable by definition, so the filter above drops it.)
+        int percent = skill->getEffective(pch);
+        if (percent < 1 || percent < bestPercent)
+            continue;
+
+        if (percent > bestPercent) {
+            bestPercent = percent;
+            best.clear();
+        }
+
+        best.push_back(name);
+    }
+
+    if (best.empty())
+        return DLString::emptyString;
+
+    // Ties are broken at random on purpose: a fresh character sits at 1% across
+    // every available class, and there is no principled winner among them.
+    return best[number_range(0, best.size() - 1)];
+}
+
 WeaponGenerator::~WeaponGenerator()
 {
 

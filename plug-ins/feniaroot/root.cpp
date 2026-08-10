@@ -1588,6 +1588,15 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier]): 
     return Register();
 }
 
+NMI_INVOKE(Root, bestWeaponClass, "(ch): класс оружия, раскачанный персонажем лучше всего, или пустая строка; годится как параметр wclass для randomizeWeapon")
+{
+    Character *ch = argnum2character(args, 1);
+
+    // NPCs have no skill percentages to compare, so getPC() is null for them and
+    // the empty result reads as 'roll a class as before'.
+    return Register(best_weapon_class(ch->getPC()));
+}
+
 NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]): выставить статы для weapon или улучшить в бою")
 {
     ::Object *weapon = argnum2item(args, 1);
