@@ -424,6 +424,24 @@ Json::Value CalendarWebPromptListener::jsonWeather( Descriptor *d, Character *ch
 
 }
 
+/**
+ * Name of the current season, in the viewer's language and lowercase, to sit
+ * next to the month the same way 'облачно' sits next to its weather icon.
+ * season() hands back the canonical English key out of season_table; that table
+ * carries no Ukrainian nominative, so the three forms live here.
+ */
+static const char * season_name( lang_t lang )
+{
+    DLString s = season( );
+
+    if (s == "winter") return lmsg(lang, "winter", "зима", "зима");
+    if (s == "spring") return lmsg(lang, "spring", "весна", "весна");
+    if (s == "summer") return lmsg(lang, "summer", "лето", "літо");
+    if (s == "autumn") return lmsg(lang, "autumn", "осень", "осінь");
+
+    return "";
+}
+
 Json::Value CalendarWebPromptListener::jsonDate( Descriptor *d, Character *ch )
 {
     if (!canSeeTime( ch ))
@@ -432,7 +450,10 @@ Json::Value CalendarWebPromptListener::jsonDate( Descriptor *d, Character *ch )
     Json::Value date;
     date["d"] = time_info.day + 1;
     date["m"] = calendar_month( Player::displayLang( ch ) );
+    // 'y' is no longer shown in the web widget, which prints the season in its
+    // place, but it stays in the payload: third-party clients read this prompt.
     date["y"] = time_info.year;
+    date["s"] = season_name( Player::displayLang( ch ) );
     return date;
 }
 
