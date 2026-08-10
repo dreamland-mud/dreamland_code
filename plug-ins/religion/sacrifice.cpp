@@ -563,17 +563,28 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
                      "бог|и|ов|ам|ов|ами|ах",
                      "бог|и|ів|ам|ів|ами|ах");
 
+    // An atheist has nobody to offer anything to, so nothing is offered: the item
+    // is junked and no deity pays for it. The altar path refuses outright
+    // (sacrifice_at_altar), this is the loose-item path.
+    bool godless = (pch->getReligion() == god_none);
+
     int silver = -1;
 
     if ( !can_sacrifice(ch, obj, needSpam) )
         return -1;
 
     // sac can't yield more $$ than obj->cost
-    silver = ::min(number_range(1, obj->level), obj->cost);
+    silver = godless ? 0 : ::min(number_range(1, obj->level), obj->cost);
 
     if (needSpam) {
-        ch->recho(_("%^C1 приносит %O4 в жертву %N3."), ch, obj, rname);
-        wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит %O4 в жертву %N3.", ch, obj, rname );
+        if (godless) {
+            ch->pecho(_("Ты выбрасываешь %O4 прочь."), obj);
+            ch->recho(_("%^C1 выбрасывает %O4 прочь."), ch, obj);
+            wiznet( WIZ_SACCING, 0, 0, "%^C1 выбрасывает %O4 прочь.", ch, obj );
+        } else {
+            ch->recho(_("%^C1 приносит %O4 в жертву %N3."), ch, obj, rname);
+            wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит %O4 в жертву %N3.", ch, obj, rname );
+        }
     }
 
     if (oprog_sac( obj, ch ))
@@ -617,16 +628,28 @@ CMDRUNP( sacrifice )
                      "бог|и|ов|ам|ов|ами|ах",
                      "бог|и|ів|ам|ів|ами|ах");
 
+    // See sacrifice_obj: an atheist junks things, nobody accepts an offering from
+    // them and nobody pays. Every deity-naming line below has a godless twin.
+    bool godless = (pch->getReligion() == god_none);
+
     argument = one_argument( argument, arg );
-        
+
     if ( arg[0] == '\0' || is_name( arg, ch->getNameP( '7' ).c_str() ) ) {
-        ch->recho(_("%^C1 предлагает себя в жертву %N3, но слышит в ответ тактичное молчание."), ch, rname);
-        ch->pecho(_("Ты предлагаешь себя в жертву %N3, но слышишь в ответ лишь тактичное молчание."), rname);
+        if (godless) {
+            ch->recho(_("%^C1 предлагает себя в жертву пустоте, но слышит в ответ тактичное молчание."), ch);
+            ch->pecho(_("Ты предлагаешь себя в жертву пустоте и слышишь в ответ лишь тактичное молчание."));
+        } else {
+            ch->recho(_("%^C1 предлагает себя в жертву %N3, но слышит в ответ тактичное молчание."), ch, rname);
+            ch->pecho(_("Ты предлагаешь себя в жертву %N3, но слышишь в ответ лишь тактичное молчание."), rname);
+        }
         return;
     }
 
     if (IS_SET( ch->in_room->room_flags, ROOM_NOSAC )) {
-        ch->pecho(_("В этой местности %N3 не удастся принять твою жертву."), rname);
+        if (godless)
+            ch->pecho(_("Здесь ничего не пропадает бесследно."));
+        else
+            ch->pecho(_("В этой местности %N3 не удастся принять твою жертву."), rname);
         return;
     }
 
@@ -653,9 +676,15 @@ CMDRUNP( sacrifice )
         }
 
         const char *where = terrains[ch->in_room->getSectorType()].where;
-        ch->recho(_("%^C1 приносит в жертву %N3 все, что находится %s."), ch, rname, where);
-        ch->pecho(_("Ты приносишь в жертву %N3 все, что находится %s."), rname, where);
-        wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит в жертву %N3 все, что находится %s в %s.", ch, rname, where, ch->in_room->getName() );
+        if (godless) {
+            ch->recho(_("%^C1 выбрасывает прочь все, что находится %s."), ch, where);
+            ch->pecho(_("Ты выбрасываешь прочь все, что находится %s."), where);
+            wiznet( WIZ_SACCING, 0, 0, "%^C1 выбрасывает прочь все, что находится %s в %s.", ch, where, ch->in_room->getName() );
+        } else {
+            ch->recho(_("%^C1 приносит в жертву %N3 все, что находится %s."), ch, rname, where);
+            ch->pecho(_("Ты приносишь в жертву %N3 все, что находится %s."), rname, where);
+            wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит в жертву %N3 все, что находится %s в %s.", ch, rname, where, ch->in_room->getName() );
+        }
     } // end sac all
     else {
         obj = get_obj_list( ch, arg, ch->in_room->contents );
@@ -669,7 +698,7 @@ CMDRUNP( sacrifice )
             return;
         }
 
-        if (obj->item_type == ITEM_CORPSE_NPC) {
+        if (obj->item_type == ITEM_CORPSE_NPC && !godless) {
             // Some of us among forces are the same that burn crosses
             if (number_percent() < gsn_crusify->getEffective( ch )) {
                 mana_gain = skill_level(*gsn_crusify, ch);
@@ -697,7 +726,8 @@ CMDRUNP( sacrifice )
             ch->silver += bonus;
         }
     }
-    else ch->pecho(_("Твое скудное жертвоприношение остается без награды от %N2."), rname);
+    else if (!godless)
+        ch->pecho(_("Твое скудное жертвоприношение остается без награды от %N2."), rname);
 
     // 'autosplit' config option retired -- coins are always split with the party.
     if (!ch->is_npc( ))

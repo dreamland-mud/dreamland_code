@@ -62,7 +62,16 @@ void LanguageCommand::run( Character *ach, const DLString &constArguments )
     ch = ach->getPC( );
 
     if (!ch) {
-        ch->pecho( _("Муу-у-у.") );
+        ach->pecho( _("Муу-у-у.") );
+        return;
+    }
+
+    // Words arrive in dreams (LanguageManager::run fires only at POS_SLEEPING), so
+    // the command's position is 'sleep' for the sake of reading that list back
+    // without waking up. Nothing else works with your eyes shut -- uttering a word
+    // in your sleep would hand out its effect for free.
+    if (!IS_AWAKE(ch) && !arg_is_list( arg )) {
+        ch->pecho( _("Во сне? Или может сначала проснешься...") );
         return;
     }
 
