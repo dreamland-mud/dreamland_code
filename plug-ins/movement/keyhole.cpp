@@ -269,7 +269,7 @@ bool Keyhole::findLockpick( )
             return false;
         }
     }
-    else if (!( lockpick = get_obj_list_type( ch, argLockpick, ITEM_LOCKPICK, ch->carrying )) ) {
+    else if (!( lockpick = get_lockpick_carry( ch, argLockpick )) ) {
         ch->pecho( _("У тебя нет такой отмычки.") );
         return false;
     }
