@@ -40,6 +40,9 @@
 
 LIQ(none);
 
+GSN(berserk);
+GSN(frenzy);
+
 const        char         go_ahead_str        [] = { (char)IAC, (char)GA, '\0' };
 
 const char * sunlight_ru [4] = { "темно", "светает", "светло", "сумерки" };    
@@ -456,7 +459,14 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
     } else {
         prompt["args"][0]["fight"] = 0;
     }
-    
+
+    /* Rage: berserk or frenzy. The affects panel ships localized labels only, so the
+     * client cannot tell these two apart from any other buff -- hence a flag of its
+     * own. mudjs paints a far heavier blood vignette while it is set (main.css
+     * body.mud-rage). */
+    prompt["args"][0]["rage"] =
+        (ch->isAffected( gsn_berserk ) || ch->isAffected( gsn_frenzy )) ? 1 : 0;
+
     // Call various web prompt handlers to write out complex stuff defined in other plugins,
     // such as group information, weather, time etc.
     WebPromptManager::getThis( )->handle( d, ch, prompt );
