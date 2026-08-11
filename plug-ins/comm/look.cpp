@@ -1380,7 +1380,7 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
 
     if (ch->getConfig( ).holy) 
         buf << " {" << CLR_RVNUM(ch) << "[Room " << room->vnum
-            << "][" << room->areaName() << "{" << CLR_RVNUM(ch) << "]{x";
+            << "][" << room->areaName(lang) << "{" << CLR_RVNUM(ch) << "]{x";
 
     buf << " " << web_edit_button(ch, "redit|show", room->vnum);
     

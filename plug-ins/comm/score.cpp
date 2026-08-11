@@ -146,7 +146,8 @@ static void score_prose( Character *ch )
         room = get_room_instance( ROOM_VNUM_TEMPLE );
 
     buf << fmt( ch, _("  {wДом:{W %1$s{x"),
-                room ? room->areaName( ).c_str( ) : fmt( ch, _("Потерян") ).c_str( ) ) << endl
+                room ? room->areaName( Player::displayLang(ch) ).c_str( )
+                     : fmt( ch, _("Потерян") ).c_str( ) ) << endl
         << fmt(ch, _("У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r"),
                     ch->hit.getValue( ), ch->max_hit.getValue( ), 
                     ch->mana.getValue( ), ch->max_mana.getValue( ), 
@@ -415,7 +416,9 @@ static void do_score_args(Character *ch, const DLString &arg)
     } 
     if (arg_is(arg, "hometown")) {
         Room *room = get_room_instance(pch->getHometown()->getAltar());
-        ch->pecho(_("Твой дом - %s."), room ? room->areaName().c_str() : "потерян");
+        ch->pecho(_("Твой дом - %s."),
+                  room ? room->areaName(Player::displayLang(ch)).c_str()
+                       : fmt(ch, _("потерян")).c_str());
         return;
     } 
     if (arg_is(arg, "religion")) {
@@ -615,10 +618,11 @@ _("     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s
             CLR_FRAME);
 
         ch->pecho(
-            fmt ( 0, _("     %s| %sДом  :{x  %-30.30s %s| {Y%-22s %s|"),
+            fmt ( ch, _("     %s| %sДом  :{x  %-30.30s %s| {Y%-22s %s|"),
                 CLR_FRAME,
                 CLR_CAPT,
-                room ? room->areaName().c_str() : "Потерян",
+                room ? room->areaName(Player::displayLang(ch)).c_str()
+                     : fmt(ch, _("Потерян")).c_str(),
                 CLR_BAR,
                 msgtable_lookup( msg_positions, ch->position ),
                 CLR_FRAME,
