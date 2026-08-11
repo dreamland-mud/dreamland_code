@@ -29,6 +29,49 @@
 WEARLOC(hair);
 WEARLOC(tail);
 
+/* True for anything that can never come off: religious and crafted tattoos.
+ * By item type, not by wearloc -- craft tattoos live in their own wearloc family
+ * (tat_face, tat_arms, tat_wrist_l, tat_wrist_r), so a wearloc test misses them.
+ * Same pair as plug-ins/clan/impl/ruler.cpp:918.
+ *
+ * Deliberately NOT canRemove(): that would also skip cursed gear, and the curse
+ * refusal is something the player wants to hear. */
+static bool is_tattoo( Object *obj )
+{
+    return obj->item_type == ITEM_TATTOO || obj->item_type == ITEM_CRAFT_TATTOO;
+}
+
+/*
+ * Same search as get_obj_wear, minus tattoos.
+ *
+ * A tattoo answers to ordinary words -- 'знак', a god's name, or for a crafted
+ * one its picture ('весы', 'порядок') -- and can never be taken off, so it used
+ * to swallow 'remove <word>' and refuse while the item the player actually meant
+ * sat there still worn. Player idea 16125.
+ */
+static Object *get_obj_wear_no_tattoo( Character *ch, const char *cargument )
+{
+    char argument[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH];
+    Object *obj;
+    int number, count;
+
+    if (get_arg_id( cargument ) != 0)
+        return 0; // an explicit id means the player named this exact object
+
+    strcpy( argument, cargument );
+    number = number_argument( argument, arg );
+    count  = 0;
+
+    for (obj = ch->carrying; obj != 0; obj = obj->next_content)
+        if (obj->wear_loc != wear_none
+            && !is_tattoo( obj )
+            && obj_has_name( obj, arg, ch )
+            && ++count == number)
+                return obj;
+
+    return 0;
+}
+
 static bool oprog_can_dress(Object *obj, Character *ch, Character *victim)
 {
     FENIA_CALL( obj, "CanDress", "CC", ch, victim )
@@ -223,6 +266,14 @@ CMDRUNP( remove )
         if (( obj = get_obj_wear( ch, argObj ) ) == 0) {
             echo_master(ch, _("У тебя нет этого."));
             return;
+        }
+
+        // Prefer something that can actually come off. The tattoo stays the
+        // answer when it is the only match, so its refusal is still reachable.
+        if (is_tattoo( obj )) {
+            Object *other = get_obj_wear_no_tattoo( ch, argObj );
+            if (other != 0)
+                obj = other;
         }
 
         obj->wear_loc->remove( obj, F_WEAR_VERBOSE );
