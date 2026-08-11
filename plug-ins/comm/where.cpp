@@ -16,20 +16,50 @@
 #include "def.h"
 #include "l10n.h"
 
-static void format_where( Character *ch, Character *victim )
+/* 'path' refuses outright in these areas, so a link here would only ever answer
+ * with that refusal. Same flag set the command guards itself with. */
+static bool where_area_allows_path( Character *ch )
+{
+    return !IS_SET(ch->in_room->area->area_flag,
+                   AREA_CLAN|AREA_DUNGEON|AREA_MANSION|AREA_WIZLOCK|AREA_SYSTEM);
+}
+
+/* The room name doubles as a link that plots the route there, so a click
+ * answers "and how do I get to them". Web only: the tag collapses to the plain
+ * name for telnet and screen readers, exactly as before.
+ *
+ * The link carries the vnum rather than the name -- exact, and free of the
+ * multiple-match problem a name like "Коридор" has. No link where 'path' would
+ * answer with a refusal or a shrug: special rooms (isCommon is the engine's own
+ * definition of special) and the viewer's own room. */
+static DLString format_where_room( Character *ch, Room *room, bool areaAllowsPath )
+{
+    DLString name = room->getName( viewerLang( ch ) );
+
+    if (!areaAllowsPath || room == ch->in_room || !room->isCommon( ))
+        return name;
+
+    ostringstream buf;
+    buf << "{hc'path " << room->vnum << "'" << name << "{x";
+    return buf.str( );
+}
+
+static void format_where( Character *ch, Character *victim, bool areaAllowsPath )
 {
     bool fPK, fAfk;
-    
-    fPK = (!victim->is_npc( ) 
-            && victim->getModifyLevel( ) >= PK_MIN_LEVEL 
+
+    fPK = (!victim->is_npc( )
+            && victim->getModifyLevel( ) >= PK_MIN_LEVEL
             && !is_safe_nomessage( ch, victim->getDoppel( ch ) ));
     fAfk = IS_SET(victim->comm, COMM_AFK);
 
-    ch->pecho( "%-25C1 {x%s{x%s %-42s{x",
+    // The room name is the last column, so its old %-42s width only ever added
+    // trailing blanks -- and a width counts the markup bytes, not the letters.
+    ch->pecho( "%-25C1 {x%s{x%s %s{x",
                 victim,
                 fPK  ? "({rPK{x)"  : "    ",
                 fAfk ? "[{CAFK{x]" : "     ",
-                victim->in_room->getName(viewerLang(ch)) );
+                format_where_room( ch, victim->in_room, areaAllowsPath ).c_str( ) );
 }
 
 /* "в {hh1392Мидгаарде{x", "on the {hh2001Chessboard{x": the particle is per-area
@@ -97,6 +127,7 @@ CMDRUNP( where )
         return;
 
     DLString areaPhrase = where_area_phrase( ch );
+    bool areaAllowsPath = where_area_allows_path( ch );
 
     if (arg.empty( ) || fPKonly)
     {
@@ -126,7 +157,7 @@ CMDRUNP( where )
                 continue;
             
             found = true;
-            format_where( ch, victim );
+            format_where( ch, victim, areaAllowsPath );
         }
 
         if (!found)
@@ -149,7 +180,7 @@ CMDRUNP( where )
                     && !IS_SET(victim->in_room->room_flags, ROOM_NOWHERE))
             {
                 found = true;
-                format_where( ch, victim );
+                format_where( ch, victim, areaAllowsPath );
             }
         }
 

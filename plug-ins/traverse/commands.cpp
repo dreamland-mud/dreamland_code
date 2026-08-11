@@ -198,18 +198,37 @@ CMDRUN( path )
         return;
     }
 
+    // A room vnum is an exact, unambiguous target, which is what the clickable
+    // room names in 'where' output send. Nothing is revealed by it: the web
+    // mapper already ships every room's vnum, name and description as a public
+    // static file. Not DLString::isNumber(), which accepts a leading minus.
+    DLString vnumArg = roomName;
+    vnumArg.stripWhiteSpace();
+
+    if (!vnumArg.empty() && vnumArg.find_first_not_of("0123456789") == DLString::npos) {
+        Room *room = get_room_instance(vnumArg.toInt());
+
+        // A vnum outside this area falls through to the name search below, which
+        // finds nothing and prints the ordinary 'no such place here' message.
+        if (room && room->area == myArea) {
+            targets.push_back(room);
+            matches = 1;
+        }
+    }
+
     // Match against every language's room name, the way mob and object
     // keywords already match: the player may know the place by its English,
     // Russian or Ukrainian name, and typing the one they can see on screen has
     // to work. 'path The Road to the Harbour' used to find nothing at all.
-    for (auto &r: myArea->rooms)
-        for (int l = LANG_MIN; l < LANG_MAX; l++)
-            if (is_name(roomName.c_str(), r.second->getName((lang_t)l))) {
-                matches++;
-                if (targets.size() < maxTargets)
-                    targets.push_back(r.second);
-                break;
-            }
+    if (targets.empty())
+        for (auto &r: myArea->rooms)
+            for (int l = LANG_MIN; l < LANG_MAX; l++)
+                if (is_name(roomName.c_str(), r.second->getName((lang_t)l))) {
+                    matches++;
+                    if (targets.size() < maxTargets)
+                        targets.push_back(r.second);
+                    break;
+                }
 
     if (targets.empty()) {
         ch->pecho(_("Не могу найти местность с названием '{W%s{x' в зоне {c%s{x."),
