@@ -339,7 +339,10 @@ bool BasicSkill::matchesSubstring( const DLString &str ) const
 
 const DLString& BasicSkill::getNameFor( Character *ch ) const
 {
-    return name.get(Player::lang(ch));
+    // Delegate rather than call name.get() directly: a raw get returns an empty
+    // string for a language the skill has no name in, and 79 skills still have no
+    // Ukrainian name. The lang_t overload falls back UA -> RU -> EN.
+    return getNameFor( Player::lang(ch) );
 }
 
 const DLString& BasicSkill::getNameFor( lang_t lang ) const

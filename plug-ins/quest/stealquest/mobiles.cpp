@@ -69,7 +69,7 @@ void RobbedVictim::deadFromKill( PCMemoryInterface *pcm, Character *killer )
 void RobbedVictim::show( Character *victim, std::basic_ostringstream<char> &buf ) 
 {
     if (ourHero( victim ) && getQuest( ) && !quest->isComplete( ))
-        buf << "{x({YХныкает{x) ";
+        buf << fmt(victim, _("{x({YХныкает{x) "));
 }
 
 void RobbedVictim::talkToHero( PCharacter *hero )
@@ -123,6 +123,6 @@ void RobbedVictim::talkToHero( PCharacter *hero )
 void Robber::show( Character *victim, std::basic_ostringstream<char> &buf ) 
 {
     if (ourHero( victim )) 
-        buf << "{R[ВОР] {x";
+        buf << fmt(victim, _("{R[ВОР] {x"));
 }
 

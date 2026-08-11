@@ -133,23 +133,31 @@ void Questor::doComplete( PCharacter *client, DLString &args )
 
 void Questor::giveReward(PCharacter *client, Quest::Pointer &quest, QuestReward::Pointer &r)
 {
-    ostringstream msg;
+    bool hinted = quest->hint.getValue( ) > 0 && !Player::isNewbie(client);
+    int amount = r->exp > 0 ? r->exp : r->points;
 
-    if (quest->hint.getValue( ) > 0 && !Player::isNewbie(client)) {
+    if (hinted)
         tell_raw( client, ch,  _("Я припоминаю, что мне пришлось подсказать тебе путь."));
-        msg << "Но за настойчивость я даю тебе";
+
+    // Four whole sentences instead of one assembled from fragments. The catalog is
+    // keyed on the finished Russian line, so a composed string can never be found in
+    // it and always reached non-Russian players in Russian.
+    if (hinted) {
+        if (r->exp > 0)
+            tell_fmt( _("Но за настойчивость я даю тебе {Y%3$d{G очк%3$Iо|а|ов опыта и {Y%4$d{G золот%4$Iую|ые|ых моне%4$Iту|ты|т."),
+                      client, ch, amount, r->gold );
+        else
+            tell_fmt( _("Но за настойчивость я даю тебе {Y%3$d{G квестов%3$Iую|ые|ых едини%3$Iцу|цы|ц и {Y%4$d{G золот%4$Iую|ые|ых моне%4$Iту|ты|т."),
+                      client, ch, amount, r->gold );
     }
     else {
-        msg << "В награду я даю тебе";
+        if (r->exp > 0)
+            tell_fmt( _("В награду я даю тебе {Y%3$d{G очк%3$Iо|а|ов опыта и {Y%4$d{G золот%4$Iую|ые|ых моне%4$Iту|ты|т."),
+                      client, ch, amount, r->gold );
+        else
+            tell_fmt( _("В награду я даю тебе {Y%3$d{G квестов%3$Iую|ые|ых едини%3$Iцу|цы|ц и {Y%4$d{G золот%4$Iую|ые|ых моне%4$Iту|ты|т."),
+                      client, ch, amount, r->gold );
     }
-    
-    msg << " {Y%3$d{G "
-        << (r->exp > 0 ? "очк%3$Iо|а|ов опыта" : "квестов%3$Iую|ые|ых едини%3$Iцу|цы|ц")
-        << " и {Y%4$d{G золот%4$Iую|ые|ых моне%4$Iту|ты|т.";
-    
-    tell_fmt( msg.str( ).c_str( ), client, ch, 
-              r->exp > 0 ? r->exp : r->points,
-              r->gold );
 
     if (client->getReligion() == god_fili && get_eq_char(client, wear_tattoo)) {
         int bonus = r->gold;

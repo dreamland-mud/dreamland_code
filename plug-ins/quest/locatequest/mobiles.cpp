@@ -88,6 +88,6 @@ void LocateCustomer::deadFromKill( PCMemoryInterface *pcm, Character *killer )
 void LocateCustomer::show( Character *victim, std::basic_ostringstream<char> &buf ) 
 {
     if (ourHero( victim ) && getQuest( ) && !quest->isComplete( )) 
-        buf << "{x({YЖдет кого-то{x) ";
+        buf << fmt(victim, _("{x({YЖдет кого-то{x) "));
 }
 
