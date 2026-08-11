@@ -116,7 +116,11 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
             skillName << "{hh";
             if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
                 skillName << skill->getSkillHelp()->getID();
-            skillName << skill->getRussianName() << "{hx";
+            // Not getRussianName(): every other line of this dump already follows
+            // ch (the header, the body text, the profession name), so the skill
+            // list was the one Russian island in an otherwise English or Ukrainian
+            // page on the website.
+            skillName << skill->getNameFor(ch) << "{hx";
 
         } else {
             // For player interactive help, highlight available skills in green.

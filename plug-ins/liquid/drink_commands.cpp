@@ -800,6 +800,34 @@ CMDRUN( drink )
             ch->pecho(_("Ты не можешь пить из %O2."), obj);
             return;
 
+        case ITEM_POTION:
+            // Reaching for 'drink' with a potion is the natural reflex, so hand it
+            // to quaff instead of refusing.
+            //
+            // Only what quaff can actually reach: get_obj_carry skips anything with
+            // a wear_loc, while drink's get_obj_here also sees the room and the
+            // equipment slots. Without these two guards drink would find a potion
+            // and quaff would then deny you own it.
+            if (obj->carried_by != ch) {
+                ch->pecho(_("Сначала подними %O4."), obj);
+                return;
+            }
+            if (obj->wear_loc != wear_none) {
+                ch->pecho(_("Сначала сними %O4."), obj);
+                return;
+            }
+
+            // interpret_cmd, NOT interpret_raw: only interpret_cmd runs the target
+            // command's dispatch. drink carries the 'manacles' extra and quaff does
+            // not, on purpose -- skipping dispatch would let a shackled prisoner
+            // drink a potion of recall straight out of custody.
+            //
+            // By id, not by the typed words: quaff then drinks exactly what drink
+            // resolved. A re-parse would lose the quotes of a two-word name and
+            // could land on a different object entirely.
+            interpret_cmd(ch, "quaff", "%lld", obj->getID());
+            return;
+
         case ITEM_FOUNTAIN:
 			// Source is empty or frozen
     		if (obj->value0() > -1 && obj->value1() == 0) {
