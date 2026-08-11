@@ -1529,6 +1529,21 @@ static bool do_look_direction( Character *ch, const char *arg1 )
     return true;
 }
 
+/* getKeyword(lang) has NO fallback: an object with no keyword in the reader's
+ * language returns "", which would build a hint reading "изучить ." -- fall back
+ * the way plug-ins/web/webitemmanip.cpp:92 does, and take the first word only,
+ * since the hint is a command the player is meant to click or type. */
+static DLString first_keyword_for( Object *obj, lang_t lang )
+{
+    DLString kw = obj->getKeyword( lang );
+    if (kw.empty( ))
+        kw = obj->getKeyword( LANG_RU );
+    if (kw.empty( ))
+        kw = obj->getKeyword( LANG_EN );
+
+    return kw.getOneArgument( );
+}
+
 // TODO show act msg, item type and wear.
 static void do_look_object( Character *ch, Object *obj )
 {
@@ -1582,6 +1597,23 @@ static void do_look_object( Character *ch, Object *obj )
         ostringstream descBuf;
         webManipManager->decorateExtraDescr( descBuf, desc.c_str( ), obj->pIndexData->extraDescriptions, ch );
         ch->send_to( descBuf );
+
+        // Looking at a container says nothing about what is inside it, and nothing
+        // else tells the player that a second verb does. The command name inside
+        // {hc has to be the reader's own, or clicking it types something the parser
+        // will not take -- so the whole line is translated, not just its frame.
+        // Player idea 23111.
+        if (obj->item_type == ITEM_CONTAINER) {
+            DLString kw = first_keyword_for( obj, lang );
+            if (!kw.empty( )) {
+                // A table or a shelf is a container you put things ON, and examine
+                // answers "На столе ты видишь" for it -- so do not promise "inside".
+                if (IS_SET(obj->value1( ), CONT_PUT_ON|CONT_PUT_ON2))
+                    ch->pecho( _("Посмотреть, что сверху: {y{hcизучить %1$s{x."), kw.c_str( ) );
+                else
+                    ch->pecho( _("Заглянуть внутрь: {y{hcизучить %1$s{x."), kw.c_str( ) );
+            }
+        }
 
         oprog_look( obj, ch, keywords.c_str() );
 }
