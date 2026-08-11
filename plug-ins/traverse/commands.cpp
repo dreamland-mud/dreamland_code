@@ -198,18 +198,47 @@ CMDRUN( path )
         return;
     }
 
+    // A room vnum is an exact, unambiguous target, which is what the clickable
+    // room names in 'where' output send. Nothing is revealed by it: the web
+    // mapper already ships every room's vnum, name and description as a public
+    // static file. Not DLString::isNumber(), which accepts a leading minus.
+    DLString vnumArg = roomName;
+    vnumArg.stripWhiteSpace();
+
+    // Length-bounded before conversion, not just charset-bounded: toInt() throws
+    // on overflow and nothing between here and main() catches it, so an
+    // unbounded 'path 9999999999' from any player would take the game down.
+    // Seven digits clears every vnum the game has by two orders of magnitude.
+    //
+    // A digit-led WORD can legitimately belong to a room name ("Floor 1",
+    // "3й Дом"), but a whole argument of nothing but digits never does, so the
+    // name search below loses nothing. That stops being true if some future area
+    // ever pairs a bare-number room name with a colliding vnum.
+    if (!vnumArg.empty() && vnumArg.length() <= 7
+            && vnumArg.find_first_not_of("0123456789") == DLString::npos) {
+        Room *room = get_room_instance(vnumArg.toInt());
+
+        // A vnum outside this area falls through to the name search below, which
+        // finds nothing and prints the ordinary 'no such place here' message.
+        if (room && room->area == myArea) {
+            targets.push_back(room);
+            matches = 1;
+        }
+    }
+
     // Match against every language's room name, the way mob and object
     // keywords already match: the player may know the place by its English,
     // Russian or Ukrainian name, and typing the one they can see on screen has
     // to work. 'path The Road to the Harbour' used to find nothing at all.
-    for (auto &r: myArea->rooms)
-        for (int l = LANG_MIN; l < LANG_MAX; l++)
-            if (is_name(roomName.c_str(), r.second->getName((lang_t)l))) {
-                matches++;
-                if (targets.size() < maxTargets)
-                    targets.push_back(r.second);
-                break;
-            }
+    if (targets.empty())
+        for (auto &r: myArea->rooms)
+            for (int l = LANG_MIN; l < LANG_MAX; l++)
+                if (is_name(roomName.c_str(), r.second->getName((lang_t)l))) {
+                    matches++;
+                    if (targets.size() < maxTargets)
+                        targets.push_back(r.second);
+                    break;
+                }
 
     if (targets.empty()) {
         ch->pecho(_("Не могу найти местность с названием '{W%s{x' в зоне {c%s{x."),

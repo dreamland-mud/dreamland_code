@@ -652,18 +652,61 @@ static DLString collect_number(const char *&p) {
     return number;
 }
 
+// Read a single-quoted payload right after the tag letter: {hc'path 3001'label{x .
+// Lets the visible label differ from the command that gets sent, the way {hh
+// already splits its help id from the anchor text.
+//
+// The payload lands inside a cmd='...' attribute, so every character that could
+// close the attribute or open a tag is escaped here. Today's only caller passes
+// digits, but the tag is generic and the next one will not.
+//
+// The payload cannot itself contain a single quote -- the first one ends it. So
+// a command built out of free text (a room or object name) has to go in as a
+// vnum or another quote-free form, not as the name.
+//
+// Leaves 'p' on the closing quote, so the caller's ++p lands on the label. An
+// unterminated quote rewinds and the whole thing stays ordinary text.
+static DLString collect_quoted(const char *&p)
+{
+    const char *p_backup = p;
+    ostringstream buf;
+
+    if (*(p + 1) != '\'')
+        return DLString::emptyString;
+
+    p++;
+
+    while (*++p && *p != '\'')
+        switch (*p) {
+            case '&': buf << "&amp;"; break;
+            case '<': buf << "&lt;"; break;
+            case '>': buf << "&gt;"; break;
+            case '"': buf << "&quot;"; break;
+            default: buf << *p;
+        }
+
+    if (*p != '\'') {
+        p = p_backup;
+        return DLString::emptyString;
+    }
+
+    return buf.str();
+}
+
 
 // {h
 // close hyper link: x
-// supported hyper link types: c (<hc>command</hc>), l (<hl>hyper link</hl>), h (<hh>help article</hh>
+// supported hyper link types: c (<hc>command</hc> or <hc cmd='path 3001'>label</hc>),
+// l (<hl>hyper link</hl>), h (<hh>help article</hh>
 // or <hh id='234'>article</hh>), g (<hg>skill group names</hg>), s (<hs>speedwalk</hs>)
 void VisibilityTags::hyper_tag_start( ostringstream &out )
 {
-    DLString id;
+    DLString id, cmd;
 
     switch (*++p) {
-    case 'c': 
+    case 'c':
         my_hyper_tag = "hc";
+        cmd = collect_quoted(p);
         break;
 
     case 'l': 
@@ -694,6 +737,8 @@ void VisibilityTags::hyper_tag_start( ostringstream &out )
         out << "\036" << "<" << my_hyper_tag;
         if (!id.empty())
             out << " id='" << id << "'";
+        if (!cmd.empty())
+            out << " cmd='" << cmd << "'";
         out << ">" << "\037";
     }
 }    
