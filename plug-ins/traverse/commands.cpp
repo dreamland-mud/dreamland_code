@@ -205,7 +205,17 @@ CMDRUN( path )
     DLString vnumArg = roomName;
     vnumArg.stripWhiteSpace();
 
-    if (!vnumArg.empty() && vnumArg.find_first_not_of("0123456789") == DLString::npos) {
+    // Length-bounded before conversion, not just charset-bounded: toInt() throws
+    // on overflow and nothing between here and main() catches it, so an
+    // unbounded 'path 9999999999' from any player would take the game down.
+    // Seven digits clears every vnum the game has by two orders of magnitude.
+    //
+    // A digit-led WORD can legitimately belong to a room name ("Floor 1",
+    // "3й Дом"), but a whole argument of nothing but digits never does, so the
+    // name search below loses nothing. That stops being true if some future area
+    // ever pairs a bare-number room name with a colliding vnum.
+    if (!vnumArg.empty() && vnumArg.length() <= 7
+            && vnumArg.find_first_not_of("0123456789") == DLString::npos) {
         Room *room = get_room_instance(vnumArg.toInt());
 
         // A vnum outside this area falls through to the name search below, which
