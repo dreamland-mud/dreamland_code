@@ -6,6 +6,7 @@
 #include "victimbehavior.h"
 
 #include "pcharacter.h"
+#include "act.h"
 #include "l10n.h"
 
 void VictimBehavior::deadFromHunter( PCMemoryInterface *pcm )
@@ -37,9 +38,11 @@ void VictimBehavior::deadFromGroupMember( PCMemoryInterface *pcm, Character *kil
         pcm->getPlayer( )->pecho(_("{Y%1$^C1 помог%1$Gло||ла тебе выполнить задание, поспеши к квестору за наградой.{x"), killer);
 }
 
-void VictimBehavior::show( Character *victim, std::basic_ostringstream<char> &buf ) 
+void VictimBehavior::show( Character *victim, std::basic_ostringstream<char> &buf )
 {
+    // Despite the parameter name, look.cpp passes the VIEWER here, so the marker
+    // can be rendered in their language rather than always in Russian.
     if (ourHero( victim ))
-        buf << "{R[ЦЕЛЬ] {x";
+        buf << fmt(victim, _("{R[ЦЕЛЬ] {x"));
 }
 

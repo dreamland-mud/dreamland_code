@@ -26,7 +26,7 @@ void SteakCustomer::greet( Character *victim )
 void SteakCustomer::show( Character *victim, std::basic_ostringstream<char> &buf ) 
 {
     if (ourHero( victim ) && getQuest( ) && !quest->isComplete( ))
-        buf << "{x({YТерпеливо ждёт{x) ";
+        buf << fmt(victim, _("{x({YТерпеливо ждет{x) "));
 }
 
 bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )

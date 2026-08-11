@@ -128,19 +128,25 @@ static void score_prose( Character *ch )
     buf << endl;
 
     if (ch->getRealLevel( ) != ch->get_trust( ))
-        buf << "Уровень доверия к тебе составляет " << ch->get_trust( ) << "." << endl;
+        buf << fmt( ch, _("Уровень доверия к тебе составляет %1$d."), ch->get_trust( ) ) << endl;
 
-    buf << "{wРаса:{W " << ch->getRace( )->getNameFor( ch, ch ).ruscase('1')
-    << "  {wРазмер:{W " << size_table.message( ch->size, '1', Player::displayLang(ch) )
-        << "  {wПол:{W " << sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) )
-        << "  {wКласс:{W " << ch->getProfession( )->getNameFor( ch );
-    
+    // One whole line rather than streamed label fragments: the catalog is keyed on
+    // the finished Russian string, so fragments can never resolve. Same wording as
+    // the Fenia score (command/score/runFunc), which is the panel players actually
+    // see -- this prose version is the no-Fenia fall-through and `oscore` on an NPC.
+    buf << fmt( ch, _("{wРаса:{W %1$s  {wРазмер:{W %2$s  {wПол:{W %3$s  {wКласс:{W %4$s"),
+                ch->getRace( )->getNameFor( ch, ch ).ruscase('1').c_str( ),
+                size_table.message( ch->size, '1', Player::displayLang(ch) ).c_str( ),
+                sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) ).c_str( ),
+                ch->getProfession( )->getNameFor( ch ).c_str( ) );
+
     if (!ch->is_npc( ))
         room = get_room_instance( ch->getPC()->getHometown( )->getAltar() );
     else
         room = get_room_instance( ROOM_VNUM_TEMPLE );
-    
-    buf << "  {wДом:{W " << (room ? room->areaName().c_str() : "Потерян" ) << "{x" << endl
+
+    buf << fmt( ch, _("  {wДом:{W %1$s{x"),
+                room ? room->areaName( ).c_str( ) : fmt( ch, _("Потерян") ).c_str( ) ) << endl
         << fmt(ch, _("У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r"),
                     ch->hit.getValue( ), ch->max_hit.getValue( ), 
                     ch->mana.getValue( ), ch->max_mana.getValue( ), 

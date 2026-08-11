@@ -134,10 +134,12 @@ void BandaMobile::config(PCharacter *hero)
     configured = true;
 }
 
-void BandaMobile::show( Character *victim, std::basic_ostringstream<char> &buf ) 
+void BandaMobile::show( Character *victim, std::basic_ostringstream<char> &buf )
 {
+    // Despite the parameter name, look.cpp passes the VIEWER here, so the marker
+    // can be rendered in their language rather than always in Russian.
     if (ourHero( victim ))
-        buf << "{1{R[ЦЕЛЬ] {2";
+        buf << fmt(victim, _("{1{R[ЦЕЛЬ] {2"));
 }
 
 BandaItem::~BandaItem()
