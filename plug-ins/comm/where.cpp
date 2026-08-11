@@ -39,9 +39,17 @@ static DLString format_where_room( Character *ch, Room *room, bool areaAllowsPat
     if (!areaAllowsPath || room == ch->in_room || !room->isCommon( ))
         return name;
 
-    // Yellow, the way 'path' paints its own clickables (commands.wrap("{y","{x")
-    // in make_speedwalk) -- these two answer the same question, so they should not
-    // look like different features. The single {x closes colour and tag together.
+    // Yellow for TELNET, where this is the only colour the link will ever get --
+    // the same cue 'path' gives its own typeable answers. On web it changes
+    // nothing: the client paints these links from a CSS class whose colour is
+    // byte-identical, so the tag below is what actually shows there.
+    //
+    // (Not, as an earlier version of this comment claimed, "the way path does it".
+    // Only path's `войти <kw>` entries are yellow from a colour code; its
+    // speedwalks carry a {x that lands before the clickable opens, so their
+    // yellow comes from the client too.)
+    //
+    // The single {x closes colour and hyper tag together.
     ostringstream buf;
     buf << "{y{hc'path " << room->vnum << "'" << name << "{x";
     return buf.str( );
