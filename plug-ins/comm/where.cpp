@@ -39,8 +39,11 @@ static DLString format_where_room( Character *ch, Room *room, bool areaAllowsPat
     if (!areaAllowsPath || room == ch->in_room || !room->isCommon( ))
         return name;
 
+    // Yellow, the way 'path' paints its own clickables (commands.wrap("{y","{x")
+    // in make_speedwalk) -- these two answer the same question, so they should not
+    // look like different features. The single {x closes colour and tag together.
     ostringstream buf;
-    buf << "{hc'path " << room->vnum << "'" << name << "{x";
+    buf << "{y{hc'path " << room->vnum << "'" << name << "{x";
     return buf.str( );
 }
 
