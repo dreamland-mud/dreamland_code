@@ -335,7 +335,7 @@ static void show_pockets_to_char( Object *container, Character *ch, ostringstrea
     }
 
     buf << endl
-        << "Основное отделение:" << endl;
+        << fmt(ch, _("Основное отделение:")) << endl;
 }
 
 
@@ -432,7 +432,7 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
              sd++, item++, iShow++) {
             if (iShow >= 200) {
                 output << "{" << CLR_OBJ(ch)
-                        << "     ...и много чего еще.{x" << endl;
+                        << fmt(ch, _("     ...и много чего еще.{x")) << endl;
                 break;
             }
 
@@ -456,7 +456,11 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
 /*
  * Display PK-flags
  */
-void show_char_pk_flags( PCharacter *ch, ostringstream &buf )
+/* `victim` owns the flags, `to` is the one reading them. The old single
+ * parameter was the flagged player, so the label resolved in that player's
+ * language instead of the reader's; splitting them is what makes the badge
+ * follow whoever is looking. */
+void show_char_pk_flags( PCharacter *victim, Character *to, ostringstream &buf )
 {
     struct PKFlag {
         int bit;
@@ -473,9 +477,9 @@ void show_char_pk_flags( PCharacter *ch, ostringstream &buf )
     static const int size = sizeof(pk_flag_table) / sizeof(*pk_flag_table);
 
     for (int i = 0; i < size; i++)
-        if (IS_SET(ch->PK_flag, pk_flag_table[i].bit))
-            buf << "[{" << pk_flag_table[i].color 
-                << pk_flag_table[i].descr << "{x]";
+        if (IS_SET(victim->PK_flag, pk_flag_table[i].bit))
+            buf << "[{" << pk_flag_table[i].color
+                << l(to, pk_flag_table[i].descr) << "{x]";
 }
 
 static void show_char_blindness(Character* ch, Character* victim, ostringstream& buf)
@@ -602,7 +606,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
         nVict->behavior->show( ch, buf );
     
     if (pVict) {
-        show_char_pk_flags( pVict, buf );
+        show_char_pk_flags( pVict, ch, buf );
 
         if (pVict->desc == 0 )
             buf << fmt(ch, _("[{DБез связи{x]"));
@@ -708,7 +712,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     else {
         if (ch->getConfig( ).holy && origVict != victim)
             buf << "{1" << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ).upperFirstCharacter() << "{2 "
-                << "(под личиной " << ch->sees( victim, '2' ) << ") ";
+                << fmt(ch, _("(под личиной ")) << ch->sees( victim, '2' ) << ") ";
         else {
             buf << "{1" << "{" << CLR_PLAYER(ch);
             webManipManager->decorateCharacter( buf, ch->sees( victim, '1' ).upperFirstCharacter(), victim, ch );
@@ -812,35 +816,38 @@ static void show_char_diagnose( Character *ch, Character *victim, ostringstream 
     if (!CAN_DETECT( ch, DETECT_OBSERVATION ))
         return;
 
+    /* Each line is resolved for the reader as it goes into the buffer, so the
+     * blob handed to fmt() below is already in the reader's language; the
+     * %1$n / %1$G markers inside it still decline against `victim`. */
     if (IS_AFFECTED( victim, AFF_BLIND ))
-        str << "Похоже, ничего не вид%1$nит|ят." << endl;
+        str << l(ch, "Похоже, ничего не вид%1$nит|ят.") << endl;
     if (IS_AFFECTED( victim, AFF_SCREAM ))
-        str << "В ужасе зажима1$nет|ют уши." << endl;
+        str << l(ch, "В ужасе зажима%1$nет|ют уши.") << endl;
     if (IS_AFFECTED( victim,  AFF_PLAGUE ))
-        str << "Покрыт%1$Gо||а|ы чумными язвочками." << endl;
+        str << l(ch, "Покрыт%1$Gо||а|ы чумными язвочками.") << endl;
     if (IS_AFFECTED( victim, AFF_POISON ))
-        str << "Отравлен%1$Gо||а|ы." << endl;
+        str << l(ch, "Отравлен%1$Gо||а|ы.") << endl;
     if (IS_AFFECTED( victim, AFF_SLOW ))
-        str << "Под воздействием З А М Е Д  Л  Е  Н   И    Я." << endl;
+        str << l(ch, "Под воздействием З А М Е Д  Л  Е  Н   И    Я.") << endl;
     if (IS_AFFECTED( victim, AFF_HASTE ))
-        str << "Под воздействием ускорения, уииии!" << endl;
+        str << l(ch, "Под воздействием ускорения, уииии!") << endl;
     if (IS_AFFECTED( victim, AFF_WEAKEN ))
-        str << "Выгляд%1$nит|ят беспомощно и слабо." << endl;
+        str << l(ch, "Выгляд%1$nит|ят беспомощно и слабо.") << endl;
     if (IS_AFFECTED( victim, AFF_CORRUPTION ))
-        str << "Гни%1$nет|ют заживо." << endl;
+        str << l(ch, "Гни%1$nет|ют заживо.") << endl;
     if (CAN_DETECT( victim, ADET_FEAR ))
-        str << "Дрож%1$nит|ат от страха." << endl;
+        str << l(ch, "Дрож%1$nит|ат от страха.") << endl;
     if (IS_AFFECTED( victim, AFF_CURSE ))
-        str << "Проклят%1$Gо||а|ы." << endl;
+        str << l(ch, "Проклят%1$Gо||а|ы.") << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_EVIL ))
-        str << "Защищен%1$Gо||а|ы от зла" << endl;
+        str << l(ch, "Защищен%1$Gо||а|ы от зла.") << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_GOOD ))
-        str << "Защищен%1$Gо||а|ы от добра." << endl;
+        str << l(ch, "Защищен%1$Gо||а|ы от добра.") << endl;
 
     DLString details = str.str();
-    if (!details.empty()) 
-        buf << endl << "Ты замечаешь важные детали:" << endl
-            << fmt(0, details.c_str(), victim) << endl;
+    if (!details.empty())
+        buf << endl << fmt(ch, _("Ты замечаешь важные детали:")) << endl
+            << fmt(ch, details.c_str(), victim) << endl;
 }
 
 /*
@@ -1207,7 +1214,7 @@ struct ExtraDescList : public list<EDInfo> {
             if (obj->in_room)
                 defaultDescr = obj->getDescription(Player::lang(ch));
             else
-                defaultDescr = "Ты не видишь здесь ничего особенного.";
+                defaultDescr = l(ch, "Ты не видишь здесь ничего особенного.");
                 
             push_back( EDInfo(String::toString(obj->getKeyword()), defaultDescr, obj, 0 ) );
         }
@@ -1591,7 +1598,7 @@ static void do_look_object( Character *ch, Object *obj )
                     desc = obj->getDescription(LANG_DEFAULT);
             }
             else
-                desc = "Ты не видишь здесь ничего особенного.";
+                desc = l(ch, "Ты не видишь здесь ничего особенного.");
         }
 
         ostringstream descBuf;

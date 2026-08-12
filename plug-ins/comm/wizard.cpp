@@ -1099,7 +1099,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
 }
 
 
-void show_char_pk_flags( PCharacter *ch, ostringstream &buf );
+void show_char_pk_flags( PCharacter *victim, Character *to, ostringstream &buf );
 
 static bool has_nochannel(Character *ch)
 {
@@ -1230,7 +1230,7 @@ static bool has_nopost(Character *ch)
         
     if (pc) {
         buf << "Поведение: " << plr_flags.names(victim->act) << " ";
-        show_char_pk_flags( pc, buf );
+        show_char_pk_flags( pc, ch, buf );
         buf << endl;
     }
 
