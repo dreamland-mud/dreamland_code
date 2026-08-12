@@ -2390,7 +2390,7 @@ NMI_INVOKE( CharacterWrapper, is_safe_spell, "(vict): защищают ли бо
                            true);
 }
 
-NMI_INVOKE( CharacterWrapper, is_safe_rspell, "(af): защищают ли боги от действия заклинания аf на комнате" )
+NMI_INVOKE( CharacterWrapper, is_safe_rspell, "(af): защищают ли боги от действия заклинания af на комнате" )
 {
     checkTarget();
     Affect *paf = args2affect(args);

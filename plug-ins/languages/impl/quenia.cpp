@@ -183,7 +183,7 @@ DLString QueniaLanguage::concatenate( DLString &prefix, DLString &suffix ) const
        ew, rh, &#156; или iw.
      * никакие эльфийские языки вообще не содержат j, sh, zh. Нет также в
        Q и гласных с циркумфлексом [^].
-     * eсли же начинается оно с mb, b, nd, d, ng, g, lh, mh, rh, dh, gh
+     * если же начинается оно с mb, b, nd, d, ng, g, lh, mh, rh, dh, gh
        или какого-нибудь io -- это никак не Q.
      * а вот mb/b, nd, ld, rd, ng в Q могут встретиться, но только в
        середине слова.

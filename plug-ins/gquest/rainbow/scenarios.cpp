@@ -246,7 +246,7 @@ void RainbowSinsScenario::onQuestFinish( PCharacter *ch ) const
     af.modifier = 0;
     affect_join(ch, &af);
    
-    ch->pecho(_("\r\nИз дымки появляется cекретарша Ада и произносит '{rТы приня%Gто|т|та!{x'."), ch);
+    ch->pecho(_("\r\nИз дымки появляется секретарша Ада и произносит '{rТы приня%Gто|т|та!{x'."), ch);
     oldact(_("\r\nИз дымки появляется секретарша Ада и что-то говорит $c3."), ch, 0, 0, TO_ROOM );
 
     oldact(_("\r\nТебя окутывает демоническая мантия!"), ch, 0, 0, TO_CHAR);
