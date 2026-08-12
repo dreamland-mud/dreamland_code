@@ -26,14 +26,12 @@ public:
     bool available(PCharacter *) const;
 
     bool printText( PCharacter * ) const;
-    void printRow( PCharacter * ) const;
     void printLine( PCharacter * ) const;
 
 protected:
     XML_VARIABLE XMLFlagsWithTable   bit;
     XML_VARIABLE XMLString  name, rname, uaname;
     XML_VARIABLE XMLMultiString  msgOn, msgOff;
-    XML_VARIABLE XMLString  hint;
     XML_VARIABLE XMLIntegerNoEmpty level;
 
 private:

@@ -127,23 +127,6 @@ bool ConfigElement::printText( PCharacter *ch ) const
     return false;
 }
 
-void ConfigElement::printRow( PCharacter *ch ) const
-{
-    bool yes = isSetBit( ch );
-    lang_t lang = Player::displayLang( ch );
-    // Status word per viewer (was hardcoded Cyrillic ВКЛ/ВЫКЛ for every language,
-    // so EN players saw Cyrillic in the config table). Option name stays binary
-    // EN/RU -- ConfigElement carries no UA name field.
-    DLString status = (yes ? _("ВКЛ.") : _("ВЫКЛ.")).getMessage(ch);
-
-    ch->pecho( "| {%s%-14s {x|  {%s%-7s {x|", 
-                      CLR_NAME(ch), 
-                      (lang == LANG_EN ? name : rname).getValue( ).c_str( ),
-                      yes ? CLR_YES(ch) : CLR_NO(ch),
-                      status.c_str( ) );
-}
-
-
 static void print_line(PCharacter *ch, const DLString &name, const DLString &rname, const DLString &uaname, bool yes, const DLString &msgYes, const DLString &msgNo)
 {
     // yes/no word + option name + toggle message all per viewer; RU key "ДА"/"НЕТ"

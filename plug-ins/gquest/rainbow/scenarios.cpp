@@ -28,6 +28,7 @@
 #include "doors.h"
 #include "merc.h"
 #include "descriptor.h"
+#include "dl_ctype.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -175,11 +176,95 @@ void RainbowDefaultScenario::onGivePiece( PCharacter *hero, NPCharacter *mob ) c
     oldact(_("$c1 достает откуда-то цветной булыжник и отламывает от него кусочек."), mob, 0, hero, TO_ROOM);
 }
 
+/* Load a piece that is still in the old on-disk shape.
+ *
+ * Old:  <node>жаб|а|и|і|у|ою|і зелен|а|ої|ій|у|ою|ій</node>
+ * New:  <node><name l="ru">...</name><name l="en">...</name>...</node>
+ *
+ * Every gquest file on disk is still the old shape, and this is not a migration
+ * that can be got wrong quietly: GlobalQuestManager::save() serialises the whole
+ * GlobalQuestInfo back out of memory, and the running server does that a couple
+ * of times a day (105 rewrites of gquests/ in the last 60 days). A load that
+ * produced an empty name would not merely blank the seven pieces on screen, it
+ * would write the blanks to disk within hours and there would be nothing left to
+ * recover. So read the node body into the Russian slot when no <name> child
+ * turned up, and let the next save rewrite it in the new shape.
+ */
+void PieceDescription::fromXML( const XMLNode::Pointer &node )
+{
+    XMLContainer::fromXML( node );
+
+    if (!name.emptyValues( ))
+        return;
+
+    XMLNode::Pointer body = node->getFirstNode( );
+
+    if (body)
+        name[RU] = body->getCData( );
+}
+
+/* Put an adjective in front of a noun phrase that may begin with an article.
+ *
+ * Russian and Ukrainian have no articles, so there the answer is the plain
+ * prepend this scenario always did: "красный" + "кусочек радуги". English puts
+ * the article first, and prepending there gives "red a piece of rainbow", so the
+ * adjective has to slide in BEHIND the article instead.
+ *
+ * The indefinite article is then re-picked from the adjective, because it is the
+ * adjective that now follows it: "a piece" has to become "an orange piece". The
+ * vowel-letter test is the usual approximation -- it is wrong for the likes of
+ * "a unique" and "an hour", and exact for the seven rainbow colours, which are
+ * the only adjectives that reach here. Colours are stripped first so the test
+ * lands on the letter and not on the '{' of a colour tag.
+ *
+ * A phrase with no leading article falls through to the plain prepend, which is
+ * also what happens if it starts with markup -- same output as before. */
+static DLString prepend_adjective( const DLString &adj, const DLString &base )
+{
+    static const char *ARTICLES[] = { "a ", "an ", "the ", 0 };
+
+    for (int i = 0; ARTICLES[i]; i++) {
+        DLString article( ARTICLES[i] );
+
+        if (base.size( ) <= article.size( ) || base.compare( 0, article.size( ), article ) != 0)
+            continue;
+
+        DLString rest( base.substr( article.size( ) ) );
+
+        if (article != "the ") {
+            DLString bare = adj.colourStrip( );
+            char c = bare.empty( ) ? ' ' : dl_tolower( bare.at( 0 ) );
+
+            article = (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') ? "an " : "a ";
+        }
+
+        return article + adj + " " + rest;
+    }
+
+    return adj + " " + base;
+}
+
 void RainbowDefaultScenario::dressItem( Object *obj, int number ) const
 {
-    DLString name = pieces[number].getValue( );
-    DLString shortDescr = name + " " + obj->getShortDescr(LANG_DEFAULT);
-    obj->setShortDescr(shortDescr, LANG_DEFAULT);
+    const XMLMultiString &pieceName = pieces[number].name;
+
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
+        // Only dress a language that has both halves. Object::getShortDescr(lang)
+        // is the strict getter -- it checks the instance, then the prototype, and
+        // returns empty rather than falling back to Russian. Writing every slot
+        // blindly would leave an English player holding "green frog " with the
+        // noun missing, which is worse than the empty slot we have today.
+        const DLString &piece = pieceName.get( lang );
+        if (piece.empty( ))
+            continue;
+
+        const DLString &base = obj->getShortDescr( lang );
+        if (base.empty( ))
+            continue;
+
+        obj->setShortDescr( prepend_adjective( piece, base ), lang );
+    }
 }
 
 /*--------------------------------------------------------------------------
@@ -272,7 +357,17 @@ bool RainbowSinsScenario::checkMobile( NPCharacter *ch ) const
 
 void RainbowSinsScenario::dressItem( Object *obj, int number ) const
 {
-    DLString name = pieces[number].getValue( );
-    obj->setShortDescr( name, LANG_DEFAULT );
+    const XMLMultiString &pieceName = pieces[number].name;
+
+    // Replaces the name outright, so no object text is needed -- but still only
+    // the languages the piece actually has. An empty slot can fall back at
+    // display time; a slot filled with Russian cannot.
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
+        const DLString &piece = pieceName.get( lang );
+
+        if (!piece.empty( ))
+            obj->setShortDescr( piece, lang );
+    }
 }
 

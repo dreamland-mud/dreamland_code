@@ -28,19 +28,25 @@
 RELIG(none);
 PROF(samurai);
 
-static DLString show_money( int g, int s )
+/* Four whole sentences rather than one assembled from pieces. A catalog key has
+ * to be a fixed literal, and the old version built its format string at runtime
+ * out of four fragments, so nothing here could ever be looked up. The branches
+ * pick exactly what the concatenation used to produce, including the detail that
+ * the coin-count placeholder follows whichever number is actually present.
+ * fmt's first argument was NULL, i.e. no viewer at all, so even the Russian
+ * plural forms were resolved blind; it is the caller's character now. */
+static DLString show_money( Character *ch, int g, int s )
 {
-    ostringstream buf;
+    if (g > 0 && s > 0)
+        return fmt( ch, _("{Y%1$d{x золот%1$Iая|ые|ых и {W%2$d{x серебрян%2$Iая|ые|ых моне%2$Iта|ты|т."), g, s );
 
-    if (g > 0 || s > 0)
-        buf << (g > 0 ? "{Y%1$d{x золот%1$Iая|ые|ых" : "")
-            << (g * s == 0 ? "" : " и ")
-            << (s > 0 ? "{W%2$d{x серебрян%2$Iая|ые|ых" : "")
-            << " моне%" << (s == 0 ? "1" : "2") << "$Iта|ты|т.";
-    else
-        buf << "нет денег.";
-    
-    return fmt( NULL, buf.str( ).c_str( ), g, s );
+    if (g > 0)
+        return fmt( ch, _("{Y%1$d{x золот%1$Iая|ые|ых моне%1$Iта|ты|т."), g );
+
+    if (s > 0)
+        return fmt( ch, _("{W%1$d{x серебрян%1$Iая|ые|ых моне%1$Iта|ты|т."), s );
+
+    return fmt( ch, _("нет денег.") );
 }
 
 static DLString show_experience( PCharacter *ch )
@@ -54,8 +60,8 @@ static DLString show_experience( PCharacter *ch )
 
 CMDRUNP( worth )
 {
-    ch->send_to( "У тебя " );
-    ch->pecho( show_money( ch->gold, ch->silver ) );
+    ch->send_to( l(ch, "У тебя ") );
+    ch->pecho( show_money( ch, ch->gold, ch->silver ) );
 
     if ( ch->is_npc() )
             return;
@@ -66,9 +72,9 @@ CMDRUNP( worth )
 
     ch->pecho(_("Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей."),
             ch, 
-            killed->align[N_ALIGN_GOOD], "добрых",
-            killed->align[N_ALIGN_NEUTRAL], "нейтральных",
-            killed->align[N_ALIGN_EVIL], "злых");
+            killed->align[N_ALIGN_GOOD], l(ch, "добрых"),
+            killed->align[N_ALIGN_NEUTRAL], l(ch, "нейтральных"),
+            killed->align[N_ALIGN_EVIL], l(ch, "злых"));
 }
 
 
@@ -192,7 +198,7 @@ static void score_prose( Character *ch )
 
     buf << fmt(ch, _("У тебя {W%d{x очков опыта, и %s\n\r"),
                   ch->exp.getValue( ),
-                  show_money( ch->gold, ch->silver ).c_str( ) );
+                  show_money( ch, ch->gold, ch->silver ).c_str( ) );
 
     /* KIO shows exp to level */
     if (!ch->is_npc() && ch->getRealLevel( ) < LEVEL_HERO - 1)
@@ -207,10 +213,10 @@ static void score_prose( Character *ch )
         buf << fmt( ch, _("У тебя {Y%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. "),
                        pch->getQuestPoints() );
         if (qtime == 0)
-            buf << "У тебя сейчас нет задания.";
+            buf << l(ch, "У тебя сейчас нет задания.");
         else
             buf << fmt( ch, _("До %1$s квеста осталось {Y%2$d{x ти%2$Iк|ка|ков."),
-                       hasQuest ? "конца" : "следующего",
+                       l(ch, hasQuest ? "конца" : "следующего"),
                        qtime );
 
         buf << endl;
@@ -226,7 +232,7 @@ static void score_prose( Character *ch )
             if (ch->getPC()->death > 0)
                 buf << fmt(ch, _("Тебя убили уже {r%1$d{x ра%1$Iз|за|з."), ch->getPC()->death.getValue());
             else
-                buf << "Тебя еще ни разу не убивали.";
+                buf << l(ch, "Тебя еще ни разу не убивали.");
             newline = true;
         }
         
@@ -261,10 +267,10 @@ static void score_prose( Character *ch )
             buf << dbuf.str( ) << endl;
     }
     
-    buf << msgtable_lookup( msg_positions, ch->position );
+    buf << l(ch, msgtable_lookup( msg_positions, ch->position ));
 
     if (ch->is_adrenalined( ) && ch->position > POS_INCAP)
-        buf << " Твоя кровь полна адреналина!";
+        buf << " " << l(ch, "Твоя кровь полна адреналина!");
     
     buf << endl;
 
@@ -281,17 +287,17 @@ static void score_prose( Character *ch )
     
     switch (ch->ethos.getValue( )) {
     case ETHOS_LAWFUL:
-            buf << "Ты почитаешь порядок.\n\r";
+            buf << l(ch, "Ты почитаешь порядок.\n\r");
             break;
     case ETHOS_NEUTRAL:
-            buf << "У тебя нейтральный этос.\n\r";
+            buf << l(ch, "У тебя нейтральный этос.\n\r");
             break;
     case ETHOS_CHAOTIC:
-            buf << "Ты хаотик.\n\r";
+            buf << l(ch, "Ты хаотик.\n\r");
             break;
     default:
             if (!ch->is_npc( ))
-                buf << "У тебя нет этоса, сообщи об этом Богам!\n\r";
+                buf << l(ch, "У тебя нет этоса, сообщи об этом Богам!\n\r");
             else
                 buf << "\n\r";
             break;
@@ -309,15 +315,15 @@ static void score_prose( Character *ch )
 
        buf << fmt(ch, _("Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей.\n\r"),
                         ch, 
-                        killed->align[N_ALIGN_GOOD], "добрых",
-                        killed->align[N_ALIGN_NEUTRAL], "нейтральных",
-                        killed->align[N_ALIGN_EVIL], "злых");
+                        killed->align[N_ALIGN_GOOD], l(ch, "добрых"),
+                        killed->align[N_ALIGN_NEUTRAL], l(ch, "нейтральных"),
+                        killed->align[N_ALIGN_EVIL], l(ch, "злых"));
     }
     
     /* RT wizinvis and holy light */
     if (ch->is_immortal( )) 
         buf << fmt(ch, _("Божественный взор %s. Невидимость %d уровня, инкогнито %d уровня."),
-                   (IS_SET(ch->act, PLR_HOLYLIGHT) ? "включен" : "выключен"),
+                   l(ch, IS_SET(ch->act, PLR_HOLYLIGHT) ? "включен" : "выключен"),
                    ch->getPC( )->invis_level.getValue( ),
                    ch->getPC( )->incog_level.getValue( ) )
             << endl;
@@ -399,7 +405,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
     if (arg_is(arg, "sex")) {   
-        ch->pecho(_("Пол %s."), ch->getSex( ) == 0 ? "потерян" : sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) ).c_str( ));
+        ch->pecho(_("Пол %s."), ch->getSex( ) == 0 ? l(ch, "потерян") : sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) ).c_str( ));
         return;
     }
     if (arg_is(arg, "class")) {
@@ -449,7 +455,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
     if (arg_is(arg, "position")) {
-        ch->pecho(msgtable_lookup(msg_positions, ch->position));
+        ch->pecho(l(ch, msgtable_lookup(msg_positions, ch->position)));
         return;
     }
     if (arg_is(arg, "gold")) {
@@ -561,7 +567,7 @@ _("     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s
             ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR), pch->getMaxStat(STAT_STR),
             CLR_BAR,
             CLR_CAPT,
-            (ch->getReligion() == god_none ? "не определена": ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( )),
+            (ch->getReligion() == god_none ? l(ch, "не определена") : ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( )),
             CLR_FRAME,
 
             CLR_CAPT,
@@ -575,7 +581,7 @@ _("     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s
             CLR_FRAME,
 
             CLR_CAPT,
-            ch->getSex( ) == 0 ? "потерян" : sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) ).c_str( ),
+            ch->getSex( ) == 0 ? l(ch, "потерян") : sex_table.message( ch->getSex( ), '1', Player::displayLang(ch) ).c_str( ),
             CLR_BAR,
             CLR_CAPT,
             ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS), pch->getMaxStat(STAT_WIS),
@@ -612,7 +618,7 @@ _("     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s
             CLR_BAR,
             CLR_CAPT,
             ch->getProfession( ) == prof_samurai 
-                ?  "Смертей  " : "Трусость " ,
+                ?  l(ch, "Смертей  ") : l(ch, "Трусость ") ,
             ch->getProfession( ) == prof_samurai 
                 ? pch->death.getValue( ) : ch->wimpy.getValue( ),
             CLR_FRAME);
@@ -624,7 +630,7 @@ _("     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s
                 room ? room->areaName(Player::displayLang(ch)).c_str()
                      : fmt(ch, _("Потерян")).c_str(),
                 CLR_BAR,
-                msgtable_lookup( msg_positions, ch->position ),
+                l(ch, msgtable_lookup( msg_positions, ch->position )),
                 CLR_FRAME,
                 CLR_BAR, CLR_FRAME) );
 
