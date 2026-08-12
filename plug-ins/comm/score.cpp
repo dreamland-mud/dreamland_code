@@ -358,18 +358,83 @@ static void do_score_args(Character *ch, const DLString &arg)
     if (!pch)
         return;
 
+    /* Match what the player typed against the stat's name in EVERY language, not
+     * just the English bit name and the Russian pad baked into the binary. A
+     * Ukrainian typing "інт" got nothing at all, and the one-line "ум" special
+     * case below was the shape of the problem: a synonym hardcoded because there
+     * was nowhere else to put it.
+     *
+     * stat_table.message() resolves through flagmessages.json, which already
+     * carries all six stats in Ukrainian (інтелект, мудрість, спритність...),
+     * so this works today rather than waiting on data.
+     *
+     * The Russian pad stays matchable for everyone, which is both the historical
+     * behaviour and the point: somebody who switched their config to Ukrainian
+     * still has the Russian word in their fingers, the same argument the card
+     * makes for keeping the old movement aliases.
+     *
+     * The viewer's OWN language is the only thing added, deliberately, rather
+     * than every language to everybody. This block runs before the rest of the
+     * command, and it prefix-matches, so each word it learns can swallow a short
+     * abbreviation that a handler further down was already answering -- Ukrainian
+     * "статура" shadows "стать" at ст/стат. Confining the new vocabulary to the
+     * reader's own language means a Russian or English player sees no change at
+     * all, and the collision is limited to the people the feature is for. The
+     * precedence question it raises (does a two-letter prefix mean the stat or
+     * the gender) is a card, not something to settle inside this loop. */
+    lang_t viewerLanguage = Player::displayLang( ch );
     int stat = -1;
-    for (int i = 0; i < stat_table.size; i++)
-        if (arg.strPrefix( stat_table.fields[i].name )
-            || arg.strPrefix( russian_case(stat_table.fields[i].message, '1') )
-            || arg.strPrefix( russian_case(stat_table.fields[i].message, '4') ))
-        {
+
+    for (int i = 0; i < stat_table.size && stat < 0; i++) {
+        if (arg.strPrefix( stat_table.fields[i].name )) {
             stat = i;
             break;
         }
-    
-    if (arg == "ум")
-        stat = STAT_INT;
+
+        const lang_t langs[] = { LANG_RU, viewerLanguage };
+
+        // Nominative and accusative, the two the pad is asked for elsewhere.
+        for (int l = 0; l < 2 && stat < 0; l++)
+            for (const char *gcase = "14"; *gcase; gcase++) {
+                DLString pad = stat_table.message( stat_table.fields[i].value, *gcase, langs[l] );
+
+                if (!pad.empty( ) && arg.strPrefix( pad )) {
+                    stat = i;
+                    break;
+                }
+            }
+    }
+
+    /* The frame's own stat labels, which are not prefixes of anything above.
+     *
+     * oscore abbreviates them to fit a four-column cell, and an abbreviation is
+     * not a prefix -- that is why "ум" was a hardcoded case in the first place:
+     * the Russian frame says "Ум  :" while the word is "интеллект". Ukrainian
+     * has the same problem four times over, because its labels were abbreviated
+     * differently from its pads: the frame reads Розум, Спрт, Тіло and Чари
+     * while the pads are інтелект, спритність, статура and харизма. So a
+     * Ukrainian typing the word they are looking at got nothing for four of the
+     * six stats. Only Сила and Мудр happened to line up.
+     *
+     * Matched EXACTLY, not by prefix, which is what the old "ум" case did. A
+     * prefix here reaches past the stats: everything further down this function
+     * matches its own localized synonyms, so "у" and "р" were answering with the
+     * level and "т" with the training count. Those are one keystroke and people
+     * use them. Exact match costs nothing the paragraph above asks for -- the
+     * frame prints these strings whole, so typing one whole is exactly "typing
+     * the word you are looking at". */
+    static const struct { const char *label; int stat; } frameLabels[] = {
+        { "ум",    STAT_INT },   // RU frame "Ум  :"
+        { "розум", STAT_INT },   // UA frame "Розум:"
+        { "спрт",  STAT_DEX },   // UA frame "Спрт:"
+        { "тіло",  STAT_CON },   // UA frame "Тіло:"
+        { "чари",  STAT_CHA },   // UA frame "Чари:"
+        { 0, 0 }
+    };
+
+    for (int i = 0; stat < 0 && frameLabels[i].label; i++)
+        if (arg == frameLabels[i].label)
+            stat = frameLabels[i].stat;
 
     if (stat >=0) {
         ch->pecho(_("%^N1 %d (%d), максимум %d."), 
@@ -539,13 +604,26 @@ static void score_ascii( Character *ch )
 "%s\n\r"
 "      /~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/~~\\", 
              CLR_FRAME);
+    /* The age word was GET_COUNT(age, "год", "года", "лет") -- the Russian
+     * three-way plural, straight into the frame, Russian for every reader. The
+     * %I alternation does the same job through the catalog, so English and
+     * Ukrainian get their own forms; the numbered placeholder picks a form
+     * without printing the number, which is what this cell needs.
+     *
+     * The cell had to grow: %4s is a MINIMUM width, not a truncation, and
+     * Ukrainian "років" is five characters -- it would have pushed the right
+     * edge of the box out by one on that one line. %-6s with a single trailing
+     * space spans the same 65 columns the frame's tildes do, so every form from
+     * "год" to "років" now fits without moving anything. */
+    DLString ageWord = fmt( ch, _("%1$Iгод|года|лет"), age );
+
     ch->pecho(
-        fmt ( 0, "     %s|   %s%-50.50s {y%3d{x %4s   %s|____|",
+        fmt ( 0, "     %s|   %s%-50.50s {y%3d{x %-6s %s|____|",
                 CLR_FRAME,
                 CLR_CAPT,
                 name.str( ).c_str( ),
                 age,
-                GET_COUNT(age, "год", "года", "лет"),
+                ageWord.c_str( ),
                 CLR_FRAME ) );
                 
         
