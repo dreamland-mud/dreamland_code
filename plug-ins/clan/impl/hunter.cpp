@@ -166,19 +166,33 @@ HunterEquip::HunterEquip( )
 
 void HunterEquip::config( PCharacter *wch )
 {
-    obj->setShortDescr( fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), wch->getNameP('2').c_str()), LANG_DEFAULT);
+    // Stamp the owner's name into every language slot, declined in that same
+    // language. All eleven hunter items carry a "%s" template in en/ru/ua; writing
+    // only LANG_DEFAULT used to leave EN and UA readers with the raw template.
+    ExtraDescription *ed = obj->pIndexData->extraDescriptions.empty()
+                                ? 0 : obj->pIndexData->extraDescriptions.front();
+
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        const DLString &shortPattern = obj->getShortDescr(lang);
+        if (!shortPattern.empty())
+            obj->setShortDescr( fmt(0, shortPattern.c_str(), wch->getNameP('2', lang).c_str()), lang);
+
+        if (ed) {
+            const DLString &edPattern = ed->description.get(lang);
+            if (!edPattern.empty())
+                obj->addExtraDescr( ed->keyword,
+                                    fmt(0, edPattern.c_str(), wch->getNameP('1', lang).c_str()),
+                                    lang );
+        }
+    }
+
     obj->setOwner( wch->getNameC() );
     obj->from = wch->getNameC();
     obj->level = wch->getRealLevel( );
     obj->cost = 0;
-    
-    if (!obj->pIndexData->extraDescriptions.empty()) {
-        ExtraDescription *&ed = obj->pIndexData->extraDescriptions.front();
-        const DLString &patternText = ed->description.get(LANG_DEFAULT);
-        DLString edText = fmt(0, patternText.c_str(), wch->getNameP('1').c_str());
-        obj->addExtraDescr( ed->keyword, edText, LANG_DEFAULT );
-    }
-}   
+}
 
 void HunterEquip::get( Character *ch )
 {

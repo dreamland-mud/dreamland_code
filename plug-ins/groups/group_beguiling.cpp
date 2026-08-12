@@ -153,16 +153,46 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     jar->from = ch->getNameC();
     jar->level = ch->getRealLevel( );
 
-    // TODO setup all languages
+    // Name the imprisoned soul in every language slot, declined in that same
+    // language: prototype 93 carries a "%s" template in en/ru/ua for the short
+    // descr, the description and the extra description. Only the English keyword
+    // has a "%s", so the others get the name appended. The name is now genitive
+    // rather than the bare login, which is what the surrounding text asks for
+    // ("душа Тайфоэна", not "душа Тайфоэн").
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        const DLString &vname = victim->getNameP('2', lang);
 
-    DLString kw = String::toString(jar->getKeyword());
-    jar->setKeyword( fmt(0, kw.c_str(), victim->getNameC()));
-    jar->setShortDescr( fmt(0, jar->getShortDescr(LANG_DEFAULT).c_str(), victim->getNameC()), LANG_DEFAULT);
-    jar->setDescription( fmt(0, jar->getDescription(LANG_DEFAULT).c_str(), victim->getNameC()), LANG_DEFAULT);
+        const DLString &kw = jar->getKeyword(lang);
+        if (String::contains(kw, "%"))
+            jar->setKeyword( fmt(0, kw.c_str(), vname.c_str()), lang );
+        else
+            jar->setKeyword( kw + DLString::SPACE + vname, lang );
 
-    const DLString &patternText = jar->pIndexData->extraDescriptions.front()->description.get(LANG_DEFAULT);
-    DLString edText = fmt(0, patternText.c_str(), victim->getNameC());
-    jar->addProperDescription()->description[LANG_DEFAULT] = edText;
+        const DLString &shortPattern = jar->getShortDescr(lang);
+        if (!shortPattern.empty())
+            jar->setShortDescr( fmt(0, shortPattern.c_str(), vname.c_str()), lang);
+
+        const DLString &descrPattern = jar->getDescription(lang);
+        if (!descrPattern.empty())
+            jar->setDescription( fmt(0, descrPattern.c_str(), vname.c_str()), lang);
+    }
+
+    // The proper description keys itself on the object's flattened keyword list,
+    // so it can only be created once the keywords above are final.
+    if (!jar->pIndexData->extraDescriptions.empty()) {
+        ExtraDescription *edProto = jar->pIndexData->extraDescriptions.front();
+        ExtraDescription *edOwn = jar->addProperDescription();
+
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+            const DLString &edPattern = edProto->description.get(lang);
+
+            if (!edPattern.empty())
+                edOwn->description[lang] = fmt(0, edPattern.c_str(),
+                                               victim->getNameP('2', lang).c_str());
+        }
+    }
 
     jar->level = ch->getRealLevel( );
     jar->cost = 0;

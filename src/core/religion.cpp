@@ -61,6 +61,11 @@ const DLString& Religion::getNameFor( Character * ) const
     return getShortDescr( );
 }
 
+const DLString& Religion::getNameFor( lang_t ) const
+{
+    return getShortDescr( );
+}
+
 /*-------------------------------------------------------------------
  * ReligionManager
  *------------------------------------------------------------------*/

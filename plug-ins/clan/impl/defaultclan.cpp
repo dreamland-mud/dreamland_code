@@ -112,16 +112,43 @@ void DefaultClan::makeMonument( Character *ch, Character *killer ) const
     obj = create_object( get_obj_index( OBJ_VNUM_MONUMENT ), 0 );
     obj->timer = 24 * 24 * 2; // 48 real life hour
     
-    obj->setDescription( 
+    // The clan's own monument text and keyword blob are single-language fields, so
+    // the description stays Russian until they become multi-language.
+    obj->setDescription(
             fmt( NULL, monument.getValue( ).c_str( ), ch, killer ), LANG_DEFAULT );
 
-    DLString nameFormat = monumentName + " " + String::toString(obj->getKeyword());
-    DLString monumentName = fmt(0, nameFormat.c_str(), ch->getNameC(), killer->getNameC());
-    obj->setKeyword(monumentName.c_str(), LANG_DEFAULT);
+    // Prototype 105 templates the victim and the killer into its short descr and
+    // its English keyword in all three languages. Writing only LANG_DEFAULT left
+    // an EN reader looking at the raw "a monument to %s from %s", and flattened
+    // every language's keywords into the Russian slot. Each slot now carries its
+    // own language; the clan's mixed-alphabet keyword blob rides along on Russian,
+    // which is where it used to land, and stays matchable from any language
+    // because keyword lookup scans every slot.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        DLString victimName = ch->getNameP( '3', lang );
+        DLString killerName = killer->getNameP( '2', lang );
 
-    DLString monumentDescr = fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), ch->getNameP( '3' ).c_str( ), killer->getNameP( '2').c_str( ) );
-    obj->setShortDescr(monumentDescr, LANG_DEFAULT);
-            
+        const DLString &shortPattern = obj->getShortDescr(lang);
+        if (!shortPattern.empty())
+            obj->setShortDescr( fmt(0, shortPattern.c_str(),
+                                    victimName.c_str(), killerName.c_str()), lang );
+
+        DLString victimKey = ch->getNameP( '1', lang );
+        DLString killerKey = killer->getNameP( '1', lang );
+        DLString kw = obj->getKeyword(lang);
+
+        if (String::contains(kw, "%"))
+            kw = fmt(0, kw.c_str(), victimKey.c_str(), killerKey.c_str());
+        else
+            kw = kw + DLString::SPACE + victimKey + DLString::SPACE + killerKey;
+
+        if (lang == LANG_DEFAULT && !monumentName.getValue( ).empty( ))
+            kw = monumentName.getValue( ) + DLString::SPACE + kw;
+
+        obj->setKeyword( kw, lang );
+    }
+
     obj_to_room( obj, ch->in_room );
 }
 

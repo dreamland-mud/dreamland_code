@@ -11,6 +11,7 @@
 #include "globalreference.h"
 #include "bitstring.h"
 #include "xmlglobalreference.h"
+#include "lang.h"
 
 #define RELIG( name ) static ReligionReference god_##name( #name )
 
@@ -40,6 +41,11 @@ public:
     virtual const DLString & getShortDescr( ) const;
     virtual const DLString & getDescription( ) const;
     virtual const DLString& getNameFor( Character * ) const;
+    /** Deity name in one language, with no viewer in scope. Needed when the name
+     *  is baked into an object at creation time and every language slot has to be
+     *  filled at once. The Character overload adds the worshipper-gendered title
+     *  on top of this. Same shape as Clan::getNameFor(lang_t). */
+    virtual const DLString& getNameFor( lang_t ) const;
     virtual void tattooFight( Object *, Character * ) const;
 
 protected:
