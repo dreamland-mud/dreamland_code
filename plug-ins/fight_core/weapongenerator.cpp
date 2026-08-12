@@ -619,6 +619,31 @@ void WeaponGenerator::setName() const
     obj->setKeyword(mynames.join(" ").c_str());
 }
 
+/** Glue one language's weapon name together: "леденящий буздыган боли".
+ *  Shared by generation and by the repair pass below, so the two can never
+ *  disagree about spacing or field order. Empty parts drop out. */
+static DLString compose_short(const DLString &adjective, const DLString &base, const DLString &noun)
+{
+    DLString result;
+
+    if (!adjective.empty())
+        result += adjective + " ";
+    result += base;
+    if (!noun.empty())
+        result += " " + noun;
+
+    return result;
+}
+
+/** pymorphy3 gender tag for the one-letter 'gender' of a weapon_names entry. */
+static DLString gender_tag(const DLString &gender)
+{
+    if (gender == "m") return "masc";
+    if (gender == "f") return "femn";
+    if (gender == "n") return "neut";
+    return "-";
+}
+
 void WeaponGenerator::setShortDescr() const
 {
     obj->gram_gender = MultiGender(nameConfig["gender"].asCString());
@@ -631,43 +656,35 @@ void WeaponGenerator::setShortDescr() const
         n = number_range(0, nouns.size() - 1);
 
     // --- Russian (unchanged) ---
-    DLString myshort;
-    if (a >= 0)
-        myshort += Morphology::adjective(adjectives[a], obj->gram_gender) + " "; // леденящий
-    myshort += nameConfig["short"].asString(); // буздыган
-    if (n >= 0)
-        myshort += " " + nouns[n]; // боли
+    DLString myshort = compose_short(
+        a >= 0 ? Morphology::adjective(adjectives[a], obj->gram_gender) : DLString::emptyString, // леденящий
+        nameConfig["short"].asString(),                                                          // буздыган
+        n >= 0 ? nouns[n] : DLString::emptyString);                                              // боли
 
     obj->setShortDescr(myshort, LANG_RU);
     obj->setProperty("eqName", nameConfig["short"].asString()); // 'буздыган' in sheath wearloc
 
     // --- English: plain per-language forms if authored, else mirror RU ---
     if (nameConfig.isMember("short_en")) {
-        DLString en;
-        if (a >= 0 && a < (int)adjectives_en.size() && !adjectives_en[a].empty())
-            en += adjectives_en[a] + " ";
-        en += nameConfig["short_en"].asString();
-        if (n >= 0 && n < (int)nouns_en.size() && !nouns_en[n].empty())
-            en += " " + nouns_en[n];
-        obj->setShortDescr(en, LANG_EN);
+        obj->setShortDescr(compose_short(
+            a >= 0 && a < (int)adjectives_en.size() ? adjectives_en[a] : DLString::emptyString,
+            nameConfig["short_en"].asString(),
+            n >= 0 && n < (int)nouns_en.size() ? nouns_en[n] : DLString::emptyString), LANG_EN);
     } else {
         obj->setShortDescr(myshort, LANG_EN);
     }
 
     // --- Ukrainian: decline nominative forms via the sidecar, else mirror RU ---
     if (nameConfig.isMember("short_ua")) {
-        DLString g = nameConfig["gender"].asString();
-        DLString gtag = g == "m" ? "masc" : g == "f" ? "femn" : g == "n" ? "neut" : "-";
+        DLString gtag = gender_tag(nameConfig["gender"].asString());
+        DLString adjUa = a >= 0 && a < (int)adjectives_ua.size() ? adjectives_ua[a] : DLString::emptyString;
 
-        DLString ua;
-        if (a >= 0 && a < (int)adjectives_ua.size() && !adjectives_ua[a].empty())
-            ua += Morphology::declineUa(adjectives_ua[a], "ADJF", gtag) + " ";
-        ua += Morphology::declineUa(nameConfig["short_ua"].asString(), "NOUN", gtag);
-        // Suffix nouns ("... of pain") are a fixed genitive -- appended as-is,
-        // like RU, so they stay put when the weapon name declines by case.
-        if (n >= 0 && n < (int)nouns_ua.size() && !nouns_ua[n].empty())
-            ua += " " + nouns_ua[n];
-        obj->setShortDescr(ua, LANG_UA);
+        obj->setShortDescr(compose_short(
+            adjUa.empty() ? adjUa : Morphology::declineUa(adjUa, "ADJF", gtag),
+            Morphology::declineUa(nameConfig["short_ua"].asString(), "NOUN", gtag),
+            // Suffix nouns ("... of pain") are a fixed genitive -- appended as-is,
+            // like RU, so they stay put when the weapon name declines by case.
+            n >= 0 && n < (int)nouns_ua.size() ? nouns_ua[n] : DLString::emptyString), LANG_UA);
     } else {
         obj->setShortDescr(myshort, LANG_UA);
     }
@@ -685,6 +702,235 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
     // Set up provided material or default.
     obj->setMaterial(findMaterial());
     return *this;
+}
+
+/*-----------------------------------------------------------------------------
+ * Repairing weapons generated before the generator spoke all three languages
+ *----------------------------------------------------------------------------*/
+// Object::getShortDescr(lang) is strict per language: own slot, then PROTOTYPE
+// slot, then nothing. It never falls back to Russian. So a weapon carrying a
+// generated Russian name and empty English/Ukrainian slots does not read as
+// "untranslated" to those players -- it reads as the un-randomized prototype,
+// which for the limbo blank (vnum 104) is the debug stub "[dummy random weapon]".
+// Recover the missing languages from the very config the generator used.
+
+/** Locate the weapon_names entry a generated weapon was built from. The 'short'
+ *  values are unique across every weapon class, so the eqName the generator
+ *  stored on the item identifies exactly one entry. */
+static bool find_name_config(const DLString &eqName, Json::Value &result)
+{
+    for (auto &wclass: weapon_names.getMemberNames())
+        for (auto const &config: weapon_names[wclass])
+            if (config["short"].asString() == eqName) {
+                result = config;
+                return true;
+            }
+
+    return false;
+}
+
+/** Find the parallel EN/UA forms of one affix word out of a generated name.
+ *  Adjectives are stored as a declension pattern, so every candidate is declined
+ *  with this weapon's gender before comparing; nouns are appended raw and compare
+ *  directly. The three arrays in weapon_affixes.json are authored index-aligned
+ *  and no Russian form appears twice, which is what makes the recovery exact
+ *  rather than a guess. Returns false when nothing matches. */
+static bool find_affix_form(const DLString &field, const DLString &russian,
+                            const MultiGender &gender, DLString &en, DLString &ua)
+{
+    bool isAdjective = (field == "adjectives");
+
+    for (auto &section: weapon_affixes.getMemberNames())
+        for (auto const &affix: weapon_affixes[section]["values"]) {
+            const Json::Value &forms = affix[field.c_str()];
+
+            for (Json::ArrayIndex k = 0; k < forms.size(); k++) {
+                DLString candidate = forms[k].asString();
+                if (isAdjective)
+                    candidate = Morphology::adjective(candidate, gender);
+                if (candidate != russian)
+                    continue;
+
+                const Json::Value &formsEn = affix[(field + "_en").c_str()];
+                const Json::Value &formsUa = affix[(field + "_ua").c_str()];
+                en = k < formsEn.size() ? DLString(formsEn[k].asString()) : DLString::emptyString;
+                ua = k < formsUa.size() ? DLString(formsUa[k].asString()) : DLString::emptyString;
+                return true;
+            }
+        }
+
+    return false;
+}
+
+/** Morphology::declineUa answers "<word>|||||" -- a pad carrying no case endings
+ *  at all -- whenever the pymorphy3 sidecar is unreachable, and the repair below
+ *  writes whatever it is handed into a saved field. A weapon repaired while the
+ *  sidecar is down would keep that undeclined name forever, so probe with a word
+ *  known to decline and leave Ukrainian alone until the sidecar answers. Failed
+ *  lookups are never cached (morphology.cpp returns the fallback before it
+ *  touches the cache), so a later read picks the repair up by itself. */
+static bool ua_morphology_answers()
+{
+    DLString probe = "меч";
+    return Morphology::declineUa(probe, "NOUN", "masc") != probe + "|||||";
+}
+
+/** Tier colour the generator wrapped this weapon's name in, empty for the tiers
+ *  that carry none. Read from the item so the repair does not need a live
+ *  generator state to match what assignColours() did. */
+static DLString repair_tier_colour(Object *obj)
+{
+    DLString tier = obj->getProperty("tier");
+    if (!tier.isNumber())
+        return DLString::emptyString;
+
+    int num = tier.toInt();
+    if (num < 1 || num > (int)weapon_tier_table.size())
+        return DLString::emptyString;
+
+    return weapon_tier_table[num - 1].colour;
+}
+
+/** Drop the Russian text a pre-trilingual binary pinned into the English and
+ *  Ukrainian slots of a re-statted weapon. Those slots override a prototype that
+ *  names itself perfectly well in both languages, so clearing them is the fix --
+ *  but only ever for a slot that literally holds the prototype's own Russian, and
+ *  only when the prototype has something to show in its place. Anything else is
+ *  somebody's deliberate edit and is left alone. */
+static bool clear_pinned_russian(Object *obj)
+{
+    const XMLMultiString &proto = obj->pIndexData->short_descr;
+    DLString protoRu = proto.get(LANG_RU).colourStrip();
+    bool changed = false;
+
+    if (protoRu.empty())
+        return false;
+
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        if (lang == LANG_RU)
+            continue;
+        if (obj->getRealShortDescr(lang).colourStrip() != protoRu)
+            continue;
+        if (proto.get(lang).empty())
+            continue;
+
+        obj->setShortDescr(DLString::emptyString, lang);
+        changed = true;
+    }
+
+    return changed;
+}
+
+bool weapon_repair_names(Object *obj)
+{
+    if (obj->getProperty("tier").empty())
+        return false;
+
+    // A re-statted weapon keeps the prototype's name and writes no slot of its
+    // own. When only the Russian slot is empty, what the other two hold is the
+    // pinned-Russian leak, not a generated name to complete.
+    // Copied, not referenced: the writes further down touch the same field.
+    DLString ownRu = obj->getRealShortDescr(LANG_RU);
+    if (ownRu.empty())
+        return clear_pinned_russian(obj);
+
+    bool needShort = obj->getRealShortDescr(LANG_EN).empty()
+                     || obj->getRealShortDescr(LANG_UA).empty();
+    bool needDescr = obj->getRealDescription(LANG_EN).empty()
+                     || obj->getRealDescription(LANG_UA).empty();
+    if (!needShort && !needDescr)
+        return false;
+
+    Json::Value config;
+    DLString eqName = obj->getProperty("eqName");
+    if (eqName.empty() || !find_name_config(eqName, config))
+        return false; // not a name this generator composed: nothing to decompose
+
+    bool changed = false;
+
+    if (needShort) {
+        // "леденящий буздыган боли" splits at the base noun, which eqName names
+        // exactly. What sits in front is the declined adjective, what trails is
+        // the suffix noun; either may be absent.
+        DLString bare = ownRu.colourStrip();
+        DLString base = config["short"].asString();
+        DLString::size_type at = bare.find(base);
+
+        // Take the tier colour from what the Russian name actually wears, not
+        // from the table: a tier re-tuned since this weapon was made would
+        // otherwise paint the new languages a colour the Russian does not have.
+        DLString colour = (ownRu == bare) ? DLString::emptyString : repair_tier_colour(obj);
+
+        if (at == DLString::npos) {
+            warn("weapon repair: obj %d has eqName '%s' outside its own name '%s'.",
+                 obj->pIndexData->vnum, eqName.c_str(), bare.c_str());
+            needShort = false; // descriptions below are independent of the name
+        }
+        else {
+            DLString adjRu(bare.substr(0, at));
+            DLString nounRu(bare.substr(at + base.size()));
+            adjRu.stripWhiteSpace();
+            nounRu.stripWhiteSpace();
+
+            MultiGender gender(config["gender"].asCString());
+            DLString adjEn, adjUa, nounEn, nounUa;
+
+            // A word we cannot decode must not be papered over by mirroring the
+            // Russian: that writes the very leak this card exists to close, and
+            // it would be permanent. Give up on the name instead -- with every
+            // affix authored in all three languages and no duplicate Russian
+            // form, this only fires if the affix config drops a word that
+            // already went out on an item.
+            if (!adjRu.empty() && !find_affix_form("adjectives", adjRu, gender, adjEn, adjUa)) {
+                warn("weapon repair: obj %d uses unknown adjective '%s'.",
+                     obj->pIndexData->vnum, adjRu.c_str());
+                needShort = false;
+            }
+            else if (!nounRu.empty() && !find_affix_form("nouns", nounRu, gender, nounEn, nounUa)) {
+                warn("weapon repair: obj %d uses unknown noun '%s'.",
+                     obj->pIndexData->vnum, nounRu.c_str());
+                needShort = false;
+            }
+
+            if (needShort && obj->getRealShortDescr(LANG_EN).empty() && config.isMember("short_en")) {
+                DLString en = compose_short(adjEn, config["short_en"].asString(), nounEn);
+                if (!colour.empty())
+                    en = "{" + colour + en + "{x";
+                obj->setShortDescr(en, LANG_EN);
+                changed = true;
+            }
+
+            // Probed only here, where a wrong answer would be written down.
+            if (needShort && obj->getRealShortDescr(LANG_UA).empty()
+                          && config.isMember("short_ua") && ua_morphology_answers()) {
+                DLString gtag = gender_tag(config["gender"].asString());
+                DLString ua = compose_short(
+                    adjUa.empty() ? adjUa : Morphology::declineUa(adjUa, "ADJF", gtag),
+                    Morphology::declineUa(config["short_ua"].asString(), "NOUN", gtag),
+                    nounUa);
+                if (!colour.empty())
+                    ua = "{" + colour + ua + "{x";
+                obj->setShortDescr(ua, LANG_UA);
+                changed = true;
+            }
+        }
+    }
+
+    // Long descriptions carry no affix parts and need no morphology at all --
+    // they are whole authored sentences on the name entry, so an undecodable
+    // name above does not stop them.
+    if (obj->getRealDescription(LANG_EN).empty() && config.isMember("long_en")) {
+        obj->setDescription(config["long_en"].asCString(), LANG_EN);
+        changed = true;
+    }
+
+    if (obj->getRealDescription(LANG_UA).empty() && config.isMember("long_ua")) {
+        obj->setDescription(config["long_ua"].asCString(), LANG_UA);
+        changed = true;
+    }
+
+    return changed;
 }
 
 const WeaponGenerator & WeaponGenerator::assignColours() const

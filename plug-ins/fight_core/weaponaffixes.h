@@ -144,4 +144,8 @@ private:
     set<DLString> preferences;
 };
 
+/** Whole affix config, as loaded from fight/weapon_affixes.json: one member per
+ *  section, each holding a "values" array. Defined in weaponaffixes.cpp. */
+extern Json::Value weapon_affixes;
+
 #endif
