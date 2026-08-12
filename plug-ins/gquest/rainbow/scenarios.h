@@ -26,11 +26,35 @@ class PCMemoryInterface;
 /*---------------------------------------------------------------------------
  * RainbowScenario base class, and its registrator 
  *---------------------------------------------------------------------------*/
+/* One rainbow piece, in every language.
+ *
+ * It used to be a bare XMLString, i.e. Russian and nothing else, so dressItem
+ * could only ever fill an object's LANG_DEFAULT slot and the English and
+ * Ukrainian short_descr of a quest piece stayed empty for good.
+ *
+ * A container wrapping an XMLMultiString, rather than an XMLMultiString put
+ * straight into the vector: XMLVectorBase builds a NEW element for every <node>
+ * child it meets, while XMLMultiString is written to have fromXML called three
+ * times on ONE object (see the comment on XMLMultiString::fromXML). Swapping the
+ * vector's element type would therefore have turned seven pieces into
+ * twenty-one, each two thirds empty. Wrapped in a container, moc dispatches all
+ * three <name l="..."> children onto the same member, which is the shape we
+ * want. */
+class PieceDescription : public XMLVariableContainer {
+XML_OBJECT
+public:
+    typedef ::Pointer<PieceDescription> Pointer;
+
+    virtual void fromXML( const XMLNode::Pointer & );
+
+    XML_VARIABLE XMLMultiString name;
+};
+
 class RainbowScenario : public XMLVariableContainer {
 XML_OBJECT
 public:
     typedef ::Pointer<RainbowScenario> Pointer;
-    typedef XMLVectorBase<XMLString> PieceDescriptions;
+    typedef XMLVectorBase<PieceDescription> PieceDescriptions;
 
     virtual void canStart( ) const  = 0;
     virtual bool checkArea( AreaIndexData * ) const;
