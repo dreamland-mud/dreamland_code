@@ -15,6 +15,10 @@
 #include "def.h"
 #include "l10n.h"
 
+/* No central place holds the site address -- gmcp/impl.cpp keeps its own and
+ * messengers.cpp inlines one -- so this follows suit. */
+static const DLString MAPS_URL = "https://dreamland.rocks/maps.html#";
+
 /*-------------------------------------------------------------------
  * AreaHelp 
  *------------------------------------------------------------------*/
@@ -215,12 +219,36 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
         in << help_meta_line(l(ch, "Как добраться"), way.str()) << endl;
     }
 
-    /* Web clients turn the marker into a link to the zone's map page. Telnet
-     * has nothing to open, so the whole bullet -- its newline included -- sits
-     * inside the web-only branch. */
-    in << "{Iw"
-       << help_meta_line(l(ch, "Карта"), DLString("[map=") + areafile->file_name + "]")
-       << endl << "{Ix";
+    /* One bullet, two payloads, and the gates wrap ONLY the payloads.
+     *
+     * Wrapping the whole line does not work, which is how this was written and
+     * why it was broken: `{x` resets st_invis to INVIS_NONE, and the bullet pad
+     * in help_meta_line carries a `{x` five characters in, right behind the
+     * star. The gate sprang open at the star and everything after it -- label,
+     * colon, payload -- went to every reader regardless. Telnet has been shown a
+     * bare "Карта: [map=newthalos.are]" all along, minus its star, and the same
+     * half-open gate left an unbalanced raw-region marker in the zone-help JSON
+     * the website serves.
+     *
+     * Neither span below contains a `{x`, so neither springs, and `{Ix` now
+     * arrives with st_invis intact and writes its closing marker.
+     *
+     * Both halves point at the same page. maps.html#<zone> resolves for all 156
+     * zones -- its script reads location.hash on load, so it works from a cold
+     * paste -- while the per-zone /maps/<zone>.html pages are the pre-redesign
+     * site and 404 for twenty of them. That page also carries the text view
+     * screen readers need, which the ASCII-art one does not.
+     *
+     * file_name is copied before replaces(): it mutates in place and returns a
+     * reference, so calling it on the area's own field would rewrite the stored
+     * filename for the rest of the run. */
+    DLString mapZone = areafile->file_name;
+    ostringstream mapValue;
+
+    mapValue << "{Iw[map=" << areafile->file_name << "]{Ix"
+             << "{IW" << MAPS_URL << mapZone.replaces(".are", "") << "{Ix";
+
+    in << help_meta_line(l(ch, "Карта"), mapValue.str()) << endl;
 
     in << "%RESUME%" << endl;
 
