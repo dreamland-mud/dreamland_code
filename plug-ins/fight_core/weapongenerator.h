@@ -132,6 +132,16 @@ private:
     bool wclassFixed;
 };
 
+/** Backfill the English and Ukrainian names of a weapon generated before the
+ *  generator learned all three languages, and drop Russian text an older binary
+ *  pinned into those slots on a re-statted one. Recovers which affix adjective
+ *  and noun the Russian name was built from, so the result is what the generator
+ *  itself would have written. Never touches Russian, never invents a translation:
+ *  a part it cannot decode is logged and the slot left for a later read.
+ *  Returns true when anything changed. Safe to call on any object -- everything
+ *  without a generated name returns immediately. */
+bool weapon_repair_names(Object *obj);
+
 /** True when this weapon class name is present in the weapon_classes config. */
 bool weapon_class_exists(const DLString &name);
 

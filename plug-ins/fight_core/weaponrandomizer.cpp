@@ -130,8 +130,12 @@ void WeaponRandomizer::eventItemRead(const ItemReadEvent &event) const
 
     adjustTimer(obj);
 
+    // Before the early returns below: an already-generated weapon carries 'tier'
+    // but not 'random', so a repair placed after them would never see one.
+    weapon_repair_names(obj);
+
     if (obj->getProperty("random").empty())
-        return; 
+        return;
 
     if (!obj->getProperty("tier").empty())
         return;

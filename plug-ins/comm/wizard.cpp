@@ -84,6 +84,7 @@
 #include "helpmanager.h"
 #include "comm.h"
 #include "weapons.h"
+#include "weapongenerator.h"
 #include "badnames.h"
 #include "wiznet.h"
 #include "json_utils_ext.h"
@@ -1580,6 +1581,39 @@ CMDWIZP( owhere )
         ch->pecho(_("Ни на земле, ни в небесах не найдено. Увы и ах."));
     else
         page_to_char( buffer.str( ).c_str( ), ch );
+}
+
+
+/*
+ * 'weaponnames' -- backfill the English and Ukrainian names of every generated
+ * weapon in the world that is still missing them.
+ *
+ * The repair normally rides ItemReadEvent, which reaches everything saved: player
+ * inventories and room contents alike are re-read from disk. This command exists
+ * for the one case that misses -- the Ukrainian half is skipped whenever the
+ * morphology sidecar is not answering, and an item read at that moment waits for
+ * its next read, which for a weapon lying in a room is the next reboot. Run this
+ * once the sidecar is back and the wait is over.
+ *
+ * Idempotent: a weapon with nothing missing costs one property lookup.
+ */
+CMDWIZP( weaponnames )
+{
+    int seen = 0, repaired = 0;
+
+    for (Object *obj = object_list; obj != 0; obj = obj->next) {
+        if (obj->item_type != ITEM_WEAPON)
+            continue;
+        if (obj->getProperty("tier").empty())
+            continue;
+
+        seen++;
+        if (weapon_repair_names(obj))
+            repaired++;
+    }
+
+    ch->pecho(_("Просмотрено сгенерированных орудий: %1$d, исправлено имён: %2$d."),
+              seen, repaired);
 }
 
 
