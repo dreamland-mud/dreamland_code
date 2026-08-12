@@ -447,7 +447,7 @@ AEDIT(file, "файл", "установить имя файла, в которы
     one_argument(argument, file);        /* Forces Lowercase */
 
     if (!*argument) {
-        stc("Синтаксис:  filename [$имя_file]\n\r", ch);
+        stc("Синтаксис:  filename [$имя_файла]\n\r", ch);
         return false;
     }
 
