@@ -762,17 +762,25 @@ static bool find_affix_form(const DLString &field, const DLString &russian,
     return false;
 }
 
-/** Morphology::declineUa answers "<word>|||||" -- a pad carrying no case endings
- *  at all -- whenever the pymorphy3 sidecar is unreachable, and the repair below
- *  writes whatever it is handed into a saved field. A weapon repaired while the
- *  sidecar is down would keep that undeclined name forever, so probe with a word
- *  known to decline and leave Ukrainian alone until the sidecar answers. Failed
- *  lookups are never cached (morphology.cpp returns the fallback before it
- *  touches the cache), so a later read picks the repair up by itself. */
-static bool ua_morphology_answers()
+/** Decline one Ukrainian word, and say whether the answer is real.
+ *
+ *  Morphology::declineUa signals an unreachable pymorphy3 sidecar only by the
+ *  shape of what it returns: "<word>|||||", five pipes, one cell short of a pad.
+ *  A word that genuinely does not decline comes back as a full "<word>||||||"
+ *  (six), so the two are told apart without asking the sidecar anything.
+ *
+ *  Checking each answer beats probing the sidecar once up front: successful
+ *  lookups are cached forever, so a probe stops measuring the sidecar the moment
+ *  its own word is in the cache -- and a sidecar that died after that would have
+ *  its fallbacks written straight into a saved field, where the idempotency
+ *  guard then blocks any repair from ever trying again. Failed lookups are never
+ *  cached (morphology.cpp returns the fallback before it touches the cache), so
+ *  refusing to write leaves the slot for a later read to fix. */
+static bool decline_ua(const DLString &word, const DLString &pos,
+                       const DLString &gtag, DLString &result)
 {
-    DLString probe = "меч";
-    return Morphology::declineUa(probe, "NOUN", "masc") != probe + "|||||";
+    result = Morphology::declineUa(word, pos, gtag);
+    return result != word + "|||||";
 }
 
 /** Tier colour the generator wrapped this weapon's name in, empty for the tiers
@@ -857,9 +865,10 @@ bool weapon_repair_names(Object *obj)
         DLString base = config["short"].asString();
         DLString::size_type at = bare.find(base);
 
-        // Take the tier colour from what the Russian name actually wears, not
-        // from the table: a tier re-tuned since this weapon was made would
-        // otherwise paint the new languages a colour the Russian does not have.
+        // Only colour the new languages if the Russian name is coloured at all:
+        // a weapon made at a tier that carried no colour must not come back
+        // wearing one. The shade itself still comes from today's tier table, so
+        // a re-tuned tier leaves Russian on the old colour until it regenerates.
         DLString colour = (ownRu == bare) ? DLString::emptyString : repair_tier_colour(obj);
 
         if (at == DLString::npos) {
@@ -873,7 +882,10 @@ bool weapon_repair_names(Object *obj)
             adjRu.stripWhiteSpace();
             nounRu.stripWhiteSpace();
 
-            MultiGender gender(config["gender"].asCString());
+            // asString(), not asCString(): the latter throws Json::LogicError on
+            // a non-string member, uncaught here, and this runs on every item
+            // read rather than only at generation time.
+            MultiGender gender(config["gender"].asString().c_str());
             DLString adjEn, adjUa, nounEn, nounUa;
 
             // A word we cannot decode must not be papered over by mirroring the
@@ -901,18 +913,24 @@ bool weapon_repair_names(Object *obj)
                 changed = true;
             }
 
-            // Probed only here, where a wrong answer would be written down.
-            if (needShort && obj->getRealShortDescr(LANG_UA).empty()
-                          && config.isMember("short_ua") && ua_morphology_answers()) {
+            // Every declension is checked before any of it is written down, so a
+            // sidecar that goes away mid-word leaves the slot empty for a later
+            // read rather than half a name nothing will ever revisit.
+            if (needShort && obj->getRealShortDescr(LANG_UA).empty() && config.isMember("short_ua")) {
                 DLString gtag = gender_tag(config["gender"].asString());
-                DLString ua = compose_short(
-                    adjUa.empty() ? adjUa : Morphology::declineUa(adjUa, "ADJF", gtag),
-                    Morphology::declineUa(config["short_ua"].asString(), "NOUN", gtag),
-                    nounUa);
-                if (!colour.empty())
-                    ua = "{" + colour + ua + "{x";
-                obj->setShortDescr(ua, LANG_UA);
-                changed = true;
+                DLString baseUa, declinedAdj;
+                bool declined = decline_ua(config["short_ua"].asString(), "NOUN", gtag, baseUa);
+
+                if (declined && !adjUa.empty())
+                    declined = decline_ua(adjUa, "ADJF", gtag, declinedAdj);
+
+                if (declined) {
+                    DLString ua = compose_short(declinedAdj, baseUa, nounUa);
+                    if (!colour.empty())
+                        ua = "{" + colour + ua + "{x";
+                    obj->setShortDescr(ua, LANG_UA);
+                    changed = true;
+                }
             }
         }
     }
