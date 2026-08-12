@@ -453,7 +453,7 @@ NMI_INVOKE( ProfessionWrapper, goodPersonality, "(ch): проверить огр
     return true;
 }
 
-NMI_INVOKE(ProfessionWrapper, secondWeaponChance, "([weapon]): модифiкатор шансу атаки weapon у лiвiй руцi або null для hand to hand")
+NMI_INVOKE(ProfessionWrapper, secondWeaponChance, "([weapon]): модифікатор шансу атаки weapon у лівій руці або null для hand to hand")
 {
     ::Object *weapon;
 

@@ -842,7 +842,7 @@ NMI_INVOKE(Root, sync, "(): test for objects sync (системное)")
 }
 
 
-NMI_INVOKE(Root, object, "(id): поиск феневого объекта по феневому ID (cистемное)" )
+NMI_INVOKE(Root, object, "(id): поиск феневого объекта по феневому ID (системное)" )
 {
     Scripting::Object::id_t id;
 
@@ -858,7 +858,7 @@ NMI_INVOKE(Root, object, "(id): поиск феневого объекта по 
     return Register(&*i);
 }
 
-NMI_INVOKE(Root, object2, "(id): поиск феневого объекта по СТРОКЕ с глобальным ID (cистемное)" )
+NMI_INVOKE(Root, object2, "(id): поиск феневого объекта по СТРОКЕ с глобальным ID (системное)" )
 {
     DLString idStr = args2string(args);
     long long id = idStr.toLongLong();

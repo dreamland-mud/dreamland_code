@@ -362,7 +362,7 @@ AEDIT(create, "создать", "создать новую арию")
     ae->attach(ch);
     ae->findCommand(ch, "show")->entryPoint(ch, "");
 
-    stc("Aрия создана.\n\r", ch);
+    stc("Ария создана.\n\r", ch);
     return false;
 }
 

@@ -94,7 +94,7 @@ bool is_safe_nomessage(Character *ch, Character *victim, bool verbose )
 
     if (mprog_safe( ch, victim, verbose ))
         return true;
-    /* мертвi бджоли не гудуть */
+    /* мертві бджоли не гудуть */
     if (victim->isDead( ) || ch->isDead( ))
         return true;
 

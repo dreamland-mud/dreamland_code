@@ -220,7 +220,7 @@ bool Walkment::checkPosition( Character *wch )
 bool Walkment::checkPositionHorse( )
 {
     if (horse->fighting) {
-        msgSelf( ch, "You must dismount first.", "Ты долж%1$Gно|ен|на cперва спешиться.", "Ти мусиш спершу спішитися." ); 
+        msgSelf( ch, "You must dismount first.", "Ты долж%1$Gно|ен|на сперва спешиться.", "Ти мусиш спершу спішитися." ); 
         return false;
     }
 

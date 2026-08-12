@@ -546,7 +546,7 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
 	
 	// Don't fill infinite fountains
     if (in->value0() < 0) {
-		ch->pecho(_("%1$^O1 бездон%1$Gно|eн|на|ны и не нужда%1$nется|ются в заполнении."), in);
+		ch->pecho(_("%1$^O1 бездон%1$Gно|ен|на|ны и не нужда%1$nется|ются в заполнении."), in);
         return;
     }
 	
