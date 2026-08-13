@@ -98,6 +98,21 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
         }
     }
 
+    // A named item handed to a charmed follower used to transfer, announce
+    // itself, and only then get bounced onto the floor by oprog_get -- without
+    // a word, because that path stays silent for mobs. Refuse it up front
+    // instead, so the item never leaves the giver's hands.
+    //
+    // Deliberately narrowed to followers rather than every mob: omprog_give
+    // runs the whole quest and behavior chain BEFORE oprog_get ever looks at
+    // ownership (item_progs.cpp), so a quest handler is allowed to consume a
+    // named item today. A blanket refusal here would silently break that.
+    if ( victim->is_npc( ) && IS_CHARMED( victim ) && !obj_owner_allows( obj, victim ) )
+    {
+        ch->pecho(_("%1$^C1 не смо%1$nжет|гут владеть этой вещью."), victim);
+        return;
+    }
+
     // Last gate before the item moves: an affect on the item can refuse the
     // hand-off and echo its own reason. See affect/incandescent/onGive.
     if ( oprog_give_blocked( obj, ch, victim ) )
