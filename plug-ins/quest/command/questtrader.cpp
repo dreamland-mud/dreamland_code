@@ -209,35 +209,63 @@ PersonalQuestArticle::PersonalQuestArticle( )
 {
 }
 
-void PersonalQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharacter *questman ) 
+/** The adjective the quest master engraves on a hero item. It agrees with the
+ *  gender the article declares -- a Russian property of the noun, recorded once
+ *  per article -- and is declined in the reader's own language: Russian and
+ *  Ukrainian carry the six-case pad, English has neither case nor gender. The
+ *  Ukrainian nouns in limbo therefore have to keep the same gender as the
+ *  Russian ones, or the adjective will not agree with them. */
+static const LangText & hero_adjective( PCharacter *client, int gender )
+{
+    // [alignment: good, neutral, evil][gender: neuter, male, female]
+    static const LangText adjectives[3][3] = {
+        {
+            { "holy", "Священн|ое|ого|ому|ое|ым|ом", "Священн|е|ого|ому|е|им|ому" },
+            { "holy", "Священн|ый|ого|ому|ый|ым|ом", "Священн|ий|ого|ому|ий|им|ому" },
+            { "holy", "Священн|ая|ой|ой|ую|ой|ой",   "Священн|а|ої|ій|у|ою|ій" },
+        },
+        {
+            { "shimmering", "Мерцающ|ее|его|ему|ее|им|ем", "Мерехтлив|е|ого|ому|е|им|ому" },
+            { "shimmering", "Мерцающ|ий|его|ему|ий|им|ем", "Мерехтлив|ий|ого|ому|ий|им|ому" },
+            { "shimmering", "Мерцающ|ая|ей|ей|ую|ей|ей",   "Мерехтлив|а|ої|ій|у|ою|ій" },
+        },
+        {
+            { "devilish", "Дьявольск|ое|ого|ому|ое|им|ом", "Диявольськ|е|ого|ому|е|им|ому" },
+            { "devilish", "Дьявольск|ий|ого|ому|ий|им|ом", "Диявольськ|ий|ого|ому|ий|им|ому" },
+            { "devilish", "Дьявольск|ая|ой|ой|ую|ой|ой",   "Диявольськ|а|ої|ій|у|ою|ій" },
+        },
+    };
+
+    int a = IS_GOOD(client) ? 0 : IS_NEUTRAL(client) ? 1 : 2;
+    int g;
+
+    switch (gender) {
+    case SEX_MALE:   g = 1; break;
+    case SEX_FEMALE: g = 2; break;
+    default:         g = 0; break;
+    }
+
+    return adjectives[a][g];
+}
+
+void PersonalQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharacter *questman )
 {
     obj->setOwner( client->getNameC() );
 
-    const DLString &patterText = obj->getShortDescr(LANG_DEFAULT);
+    // Engrave the adjective and the owner's name into every language slot: all
+    // four hero items template both into their short descr in en/ru/ua. Writing
+    // only LANG_DEFAULT left EN and UA readers with the raw "%s" template, and
+    // every purchase minted another one.
+    const LangText &adjective = hero_adjective( client, gender.getValue( ) );
 
-    switch (gender.getValue( )) {
-    default:
-    case SEX_NEUTRAL:
-        obj->setShortDescr( fmt(0, patterText.c_str(),
-            IS_GOOD(client)    ? "Священн|ое|ого|ому|ое|ым|ом" :
-            IS_NEUTRAL(client) ? "Мерцающ|ее|его|ему|ее|им|ем" :
-                                      "Дьявольск|ое|ого|ому|ое|им|ом", 
-            client->getNameP( '2' ).c_str()), LANG_DEFAULT);
-        break;
-    case SEX_MALE:
-        obj->setShortDescr( fmt(0, patterText.c_str(),
-            IS_GOOD(client)    ? "Священн|ый|ого|ому|ый|ым|ом" :
-            IS_NEUTRAL(client) ? "Мерцающ|ий|его|ему|ий|им|ем" :
-                                 "Дьявольск|ий|ого|ому|ий|им|ом", 
-            client->getNameP( '2' ).c_str()), LANG_DEFAULT);
-        break;
-    case SEX_FEMALE:
-        obj->setShortDescr( fmt(0, patterText.c_str(),
-            IS_GOOD(client)    ? "Священн|ая|ой|ой|ую|ой|ой" :
-            IS_NEUTRAL(client) ? "Мерцающ|ая|ей|ей|ую|ей|ей" :
-                                 "Дьявольск|ая|ой|ой|ую|ой|ой", 
-            client->getNameP( '2' ).c_str()), LANG_DEFAULT);
-        break;
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        const DLString &pattern = obj->getShortDescr(lang);
+
+        if (!pattern.empty())
+            obj->setShortDescr( fmt(0, pattern.c_str(),
+                                    adjective.get(lang),
+                                    client->getNameP('2', lang).c_str()), lang );
     }
 
     if (troubled) {
@@ -377,11 +405,25 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     obj_to_char( keyring, client );
     
     keyring->setOwner( girth->getOwner( ) );
-    keyring->setShortDescr( girth->getShortDescr(LANG_DEFAULT), LANG_DEFAULT );
-    
-    if (!girth->getRealDescription(LANG_DEFAULT).empty())
-        keyring->setDescription( girth->getRealDescription(LANG_DEFAULT), LANG_DEFAULT );
-        
+
+    // The keyring wears the girth's personalised name, so it has to copy every
+    // language slot -- a girth bought after this change carries all three. Copy
+    // only what the girth itself holds: getShortDescr(lang) falls back to the
+    // girth PROTOTYPE, and a girth bought earlier has empty EN/UA instance slots,
+    // so copying through the fallback would stamp the raw "%s" template onto the
+    // keyring instead of leaving it its own clean name. The keyword is already
+    // copied whole below, as an XMLMultiString.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        if (!girth->getRealShortDescr(lang).empty())
+            keyring->setShortDescr( girth->getRealShortDescr(lang), lang );
+
+        if (!girth->getRealDescription(lang).empty())
+            keyring->setDescription( girth->getRealDescription(lang), lang );
+    }
+
+
     if (!girth->getRealKeyword( ).empty())
         keyring->setKeyword( girth->getRealKeyword( ) );
         
@@ -396,7 +438,12 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
         affect_to_obj( keyring, paf );
 
     for (auto &ed: girth->extraDescriptions)
-        keyring->addExtraDescr( ed->keyword, ed->description.get(LANG_DEFAULT), LANG_DEFAULT );
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+
+            if (!ed->description.get(lang).empty())
+                keyring->addExtraDescr( ed->keyword, ed->description.get(lang), lang );
+        }
 
     waist = &*girth->wear_loc;
     waist->unequip( girth );
@@ -546,10 +593,9 @@ RELIG(none);
 
 #define OBJ_VNUM_TATTOO 50
 
-void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer ) 
+void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
 {
     Object *obj;
-    const char *leader = client->getReligion( )->getShortDescr( ).c_str( );
 
     // Use tattoo vnum from religion profile if specified, otherwise use default one.
     DefaultReligion *religion = dynamic_cast<DefaultReligion *>(client->getReligion().getElement());
@@ -561,8 +607,31 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
         tattooVnum = OBJ_VNUM_TATTOO;
 
     obj = create_object( get_obj_index( tattooVnum ), 0 );
-    obj->setKeyword( fmt(0, String::toString(obj->getKeyword( )).c_str(), leader) );
-    obj->setShortDescr( fmt(0, obj->getShortDescr(LANG_DEFAULT).c_str(), leader), LANG_DEFAULT );
+
+    // Bake the deity name into every language slot, taking the name in that same
+    // language. The default tattoo (vnum 50) carries a "%s" template per language;
+    // the per-religion tattoos (27300+) are authored in full and fmt() leaves them
+    // alone. Two things were wrong before: only LANG_DEFAULT was written, so EN/UA
+    // readers kept the raw "%s"; and the single-argument setKeyword() re-splits the
+    // flattened keyword list by alphabet, which merged the UA keywords into the RU
+    // slot and left UA empty. RU now names the deity in Russian instead of Latin.
+    // Only slots whose template asks for the name get it -- nothing is appended to
+    // a keyword list that did not have a "%s", so targeting is otherwise unchanged.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        // nameRus and nameUa are declinable pads (Кронос||а|у|а|ом|е), not fixed
+        // words. Dropped raw into the short descr they would decline in step with
+        // the whole phrase, so the deity would follow the case of the tattoo
+        // instead of staying genitive after "с изображением". Decline once here,
+        // the way score.cpp does it.
+        const DLString &deity = client->getReligion( )->getNameFor( lang );
+        DLString leaderShort = deity.ruscase( '2' );
+        DLString leaderKey = deity.ruscase( '1' );
+
+        obj->setKeyword( fmt(0, obj->getKeyword(lang).c_str(), leaderKey.c_str()), lang );
+        obj->setShortDescr( fmt(0, obj->getShortDescr(lang).c_str(), leaderShort.c_str()), lang );
+    }
 
     obj_to_char( obj, client );
     oldact(_("$C1 наносит тебе $o4!"), client, obj, tattoer, TO_CHAR );

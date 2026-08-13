@@ -259,6 +259,11 @@ const DLString& DefaultReligion::getNameFor( Character *looker ) const
             return nameRusFemale;
     }
 
+    return getNameFor( lang );
+}
+
+const DLString& DefaultReligion::getNameFor( lang_t lang ) const
+{
     // UA: own name when present, else fall back to the RU name below.
     if (lang == LANG_UA && !nameUa.empty( ))
         return nameUa;

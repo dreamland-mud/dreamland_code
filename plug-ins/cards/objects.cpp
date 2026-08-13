@@ -142,10 +142,27 @@ bool CardPackBehavior::use( Character *user, const char *args )
     
         card = create_object( pCardIndex, 0 );
         card->timer = (1 + myAttr->getLevel( )) * 3 * 60 * 60;
-        card->setShortDescr( fmt(0, card->getShortDescr(LANG_DEFAULT).c_str(), victim->getNameP( '2' ).c_str( )), LANG_DEFAULT );
-        DLString kw = String::toString(card->getKeyword());
-        card->setKeyword(fmt(0, kw.c_str(), victim->getNameC()));
-        
+
+        // Name the pictured player in every language slot. Only the English
+        // keyword carries a "%s", so the other languages get the name appended --
+        // same shape as the body-part naming in fight_death.cpp. The old
+        // single-argument setKeyword() re-split the flattened list by alphabet and
+        // left the UA slot empty, so UA readers could not target the card by name.
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+
+            const DLString &shortPattern = card->getShortDescr(lang);
+            if (!shortPattern.empty())
+                card->setShortDescr( fmt(0, shortPattern.c_str(), victim->getNameP('2', lang).c_str()), lang );
+
+            const DLString &kw = card->getKeyword(lang);
+            const DLString &vname = victim->getNameP('1', lang);
+            if (String::contains(kw, "%"))
+                card->setKeyword( fmt(0, kw.c_str(), vname.c_str()), lang );
+            else
+                card->setKeyword( kw + DLString::SPACE + vname, lang );
+        }
+
         CardBehavior::Pointer bhv( NEW );
         bhv->setObj( card );
         bhv->setPlayerName( victim->getName( ) );

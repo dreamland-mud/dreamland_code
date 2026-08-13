@@ -304,10 +304,21 @@ SKILL_RUNP( katana )
                     .assignStartingHitroll()
                     .assignStartingDamroll();
 
-                // TODO update descriptions for all 3 languages
-                DLString patternText = katana->pIndexData->extraDescriptions.front()->description.get(LANG_DEFAULT);
-                DLString edText = fmt(0, patternText.c_str(), ch->getNameP('2').c_str());
-                katana->addProperDescription()->description[LANG_DEFAULT] = edText;
+                // The blade's inscription names its owner in every language:
+                // prototype 98 carries the "property of %s" template in en/ru/ua.
+                if (!katana->pIndexData->extraDescriptions.empty()) {
+                    ExtraDescription *edProto = katana->pIndexData->extraDescriptions.front();
+                    ExtraDescription *edOwn = katana->addProperDescription();
+
+                    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+                        lang_t lang = (lang_t)l;
+                        const DLString &pattern = edProto->description.get(lang);
+
+                        if (!pattern.empty())
+                            edOwn->description[lang] = fmt(0, pattern.c_str(),
+                                                           ch->getNameP('2', lang).c_str());
+                    }
+                }
         
                 obj_to_char(katana, ch);
                 gsn_katana->improve( ch, true );

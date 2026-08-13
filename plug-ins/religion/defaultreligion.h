@@ -88,7 +88,8 @@ public:
     virtual bool available(Character *) const;
     DLString reasonWhy(Character *) const;
     virtual const DLString& getNameFor( Character * ) const;
-    
+    virtual const DLString& getNameFor( lang_t ) const;
+
     inline const Flags & getAlign() const;
     inline const Flags & getEthos() const;
     
