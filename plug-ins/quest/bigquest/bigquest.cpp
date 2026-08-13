@@ -44,7 +44,13 @@ void BigQuest::create( PCharacter *pch, NPCharacter *questman )
     mobsKilled = 0;
     mobsDestroyed = 0;
     objsTotal = 10;
-    areaName = targetArea->getName();
+    // Per language, so info() answers in the reader's own; getForLang() on read
+    // falls back to Russian where a language has no name.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        areaName[lang] = targetArea->getName( lang, '1' );
+    }
     
     try {
         for (int m = 0, o = 0; m < mobsTotal; m++, o++) {
@@ -100,23 +106,27 @@ QuestReward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman )
 void BigQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
     if (isComplete( ))
-        buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-            << "Сообщи об этом квестору командой {yквест сдать{x, до того как выйдет время!" << endl;
+        buf << fmt( ch, _("Твое задание {YВЫПОЛНЕНО{x!") ) << endl
+            << fmt( ch, _("Сообщи об этом квестору командой {yквест сдать{x, до того как выйдет время!") ) << endl;
     else {
         getScenario().onQuestInfo(ch, mobsTotal, buf);
-        buf << "Последний раз их видели в местности '{hh" << areaName << "{hx'." << endl;
+        buf << fmt( ch, _("Последний раз их видели в местности '{hh%1$s{hx'."),
+                    areaName.getForLang( viewerLang( ch ) ).c_str( ) ) << endl;
         if (mobsKilled > 0)
-            buf << "Уже убито " << mobsKilled << ", осталось совсем немного." << endl;
+            buf << fmt( ch, _("Уже убито %1$d, осталось совсем немного."),
+                        mobsKilled.getValue( ) ) << endl;
     }
 }
 
 void BigQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     if (isComplete( ))
-        buf << "Сообщить квестору о выполнении задания.";
+        buf << fmt( ch, _("Сообщить квестору о выполнении задания.") );
     else
-        buf << fmt(0, _("Уничтожить %1$d преступник%1$Iа|ов|ов из '%2$s' (убито %3$d)."),
-                    mobsTotal.getValue(), areaName.c_str(), mobsKilled.getValue());
+        buf << fmt( ch, _("Уничтожить %1$d преступник%1$Iа|ов|ов из '%2$s' (убито %3$d)."),
+                    mobsTotal.getValue(),
+                    areaName.getForLang( viewerLang( ch ) ).c_str( ),
+                    mobsKilled.getValue());
 }
 
 Room * BigQuest::helpLocation( )

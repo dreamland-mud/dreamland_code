@@ -37,8 +37,17 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     findVictims( pch, games );
     pGameIndex  = getRandomMobIndex( games );
     raceName    = pGameIndex->race;
-    raceRusName = pGameIndex->short_descr.get(LANG_DEFAULT);
-    areaName    = pGameIndex->area->getName();
+
+    // Capture the name per language so info() answers in the reader's own.
+    // What lands in a slot is firstNonEmpty(instance, prototype, lang), so an
+    // untranslated language yields either Russian or nothing; getForLang() on
+    // read covers both and nothing can render blank.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        raceRusName[lang] = pGameIndex->short_descr.getForLang( lang );
+        areaName[lang] = pGameIndex->area->getName( lang, '1' );
+    }
     
     if (Player::isNewbie(pch))
         ordered = URANGE( 1, games[pGameIndex].size( ) * 3 / 2, 6 );
@@ -46,9 +55,12 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
         ordered = URANGE( 4, games[pGameIndex].size( ) * 3 / 2, 12 );
         
     customer = getRandomClient( pch );
-    customerName = customer->getNameP( '1' );
-    customerName = customerName.upperFirstCharacter( );
-    customerArea = customer->in_room->areaName();
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        customerName[lang] = customer->getNameP( '1', lang ).upperFirstCharacter( );
+        customerArea[lang] = customer->in_room->areaName( lang );
+    }
     assign<SteakCustomer>( customer );
     save_mobs( customer->in_room );
 
@@ -56,14 +68,15 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     setTime( pch, time );
 
     tell_raw( pch, questman, _("У меня есть для тебя срочное поручение!") );
-    tell_raw( pch, questman, 
-        _("{W%s{G из местности {W{hh%s{hx{G хочет подать к столу {W%d{G кус%s мяса {W%s{G из местности {W{hh%s{hx{G."), 
-        customerName.c_str( ),
-        customerArea.c_str( ),
+    lang_t plang = viewerLang( pch );
+    tell_raw( pch, questman,
+        _("{W%s{G из местности {W{hh%s{hx{G хочет подать к столу {W%d{G кус%s мяса {W%s{G из местности {W{hh%s{hx{G."),
+        customerName.getForLang( plang ).c_str( ),
+        customerArea.getForLang( plang ).c_str( ),
         ordered.getValue( ),
         GET_COUNT(ordered.getValue( ), "ок", "ка", "ков"),
-        raceRusName.ruscase( '2' ).c_str( ),
-        areaName.c_str( ));
+        raceRusName.getForLang( plang ).ruscase( '2' ).c_str( ),
+        areaName.getForLang( plang ).c_str( ));
 
     tell_raw( pch, questman, _("Доставь мясо заказчику и вернись сюда за вознаграждением.") );
     tell_raw( pch, questman, _("У тебя есть {Y%d{G минут%s на выполнение задания."),
@@ -72,8 +85,8 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     wiznet( "", "%d steaks of %s from %s, customer %s.",
                 ordered.getValue( ),
                 raceName.c_str( ),
-                areaName.c_str( ),
-                customerName.c_str( ) );
+                areaName.get( LANG_DEFAULT ).c_str( ),
+                customerName.get( LANG_DEFAULT ).c_str( ) );
 }
 
 bool ButcherQuest::isComplete( ) 
@@ -83,30 +96,37 @@ bool ButcherQuest::isComplete( )
 
 void ButcherQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
-    if (isComplete( ))
-        buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-            << "Вернись за вознаграждением, до того как выйдет время!" << endl;
-    else { 
-        buf << customerName << " из {hh" << customerArea
-            << "{hx просит тебя доставить к столу "
-            << ordered << " кус" << GET_COUNT(ordered.getValue( ), "ок", "ка", "ков")
-            << " мяса " << raceRusName.ruscase( '2' ) 
-            << " из местности {hh" << areaName << "{hx." << endl;
-            
-        if (delivered > 0)
-            buf << "Доставлено кусков: " << delivered << "." << endl;    
-    }        
+    if (isComplete( )) {
+        infoComplete( buf, ch );
+        return;
+    }
+
+    lang_t lang = viewerLang( ch );
+    buf << fmt( ch, _("%1$s из {hh%2$s{hx просит тебя доставить к столу %3$d кус%3$Iок|ка|ков мяса %4$s из местности {hh%5$s{hx."),
+                customerName.getForLang( lang ).c_str( ),
+                customerArea.getForLang( lang ).c_str( ),
+                ordered.getValue( ),
+                raceRusName.getForLang( lang ).ruscase( '2' ).c_str( ),
+                areaName.getForLang( lang ).c_str( ) ) << endl;
+
+    if (delivered > 0)
+        buf << fmt( ch, _("Доставлено кусков: %1$d."), delivered.getValue( ) ) << endl;
 }
 
 void ButcherQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
-    if (isComplete( ))
-        buf << "Вернуться к квестору за наградой.";
-    else { 
-        buf << customerName << " из " << customerArea << " заказал "
-            << ordered << " кус" << GET_COUNT(ordered.getValue( ), "ок", "ка", "ков")
-            << " мяса " << raceRusName.ruscase( '2' )  << " из " << areaName << ".";
-    }        
+    if (isComplete( )) {
+        shortInfoComplete( buf, ch );
+        return;
+    }
+
+    lang_t lang = viewerLang( ch );
+    buf << fmt( ch, _("%1$s из %2$s заказал %3$d кус%3$Iок|ка|ков мяса %4$s из %5$s."),
+                customerName.getForLang( lang ).c_str( ),
+                customerArea.getForLang( lang ).c_str( ),
+                ordered.getValue( ),
+                raceRusName.getForLang( lang ).ruscase( '2' ).c_str( ),
+                areaName.getForLang( lang ).c_str( ) );
 }
 
 QuestReward::Pointer ButcherQuest::reward( PCharacter *ch, NPCharacter *questman ) 
