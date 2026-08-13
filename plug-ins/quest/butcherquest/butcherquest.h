@@ -12,6 +12,7 @@
 #include "questscenario.h"
 
 #include "xmlshort.h"
+#include "xmlmultistring.h"
 
 class ButcherQuest : public ClientQuestModel, public VictimQuestModel {
 friend class SteakCustomer;
@@ -27,11 +28,11 @@ public:
     virtual void destroy( );
 
     XML_VARIABLE XMLString raceName;
-    XML_VARIABLE XMLString raceRusName;
-    XML_VARIABLE XMLString areaName;
-    XML_VARIABLE XMLString customerName;
+    XML_VARIABLE XMLMultiString raceRusName;
+    XML_VARIABLE XMLMultiString areaName;
+    XML_VARIABLE XMLMultiString customerName;
     XML_VARIABLE XMLString customerSex;
-    XML_VARIABLE XMLString customerArea;
+    XML_VARIABLE XMLMultiString customerArea;
     XML_VARIABLE XMLShort  ordered;
     XML_VARIABLE XMLShort  delivered;
 

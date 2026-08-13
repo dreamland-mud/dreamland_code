@@ -46,17 +46,22 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
         return false;
     }
 
+    lang_t hlang = viewerLang( hero );
+
     if (quest->raceName != orig->race) {
         tell_fmt( _("Хороший кусок, но я заказыва%2$Gло|л|ла мясо %3$N2."),
-                  hero, ch, quest->raceRusName.c_str( ) );
+                  hero, ch, quest->raceRusName.getForLang( hlang ).c_str( ) );
         return false;        
         
     } 
     
-    if (quest->areaName != orig->area->getName()) {
+    // Both sides stay Russian: this compares the stored name against the
+    // viewerless getName(), so it must not follow the reader's language.
+    if (quest->areaName.get( LANG_DEFAULT ) != orig->area->getName()) {
         tell_raw( hero, ch, 
                 _("Эти звери водятся в %s, а не в %s."),
-                orig->area->getName().c_str(), quest->areaName.c_str( ) );
+                orig->area->getName( hlang ).c_str( ),
+                quest->areaName.getForLang( hlang ).c_str( ) );
         return false;
     }
 

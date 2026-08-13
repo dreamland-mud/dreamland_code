@@ -13,6 +13,7 @@
 
 #include "xmlshort.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmllimits.h"
 
 class BigQuestScenario;
@@ -42,7 +43,7 @@ public:
     void mobDestroyed(PCMemoryInterface *hero);
 
     XML_VARIABLE XMLShort mode;       
-    XML_VARIABLE XMLString areaName;       
+    XML_VARIABLE XMLMultiString areaName;
     XML_VARIABLE XMLString scenName;
 
     XML_VARIABLE XMLInteger mobsTotal;
