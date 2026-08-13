@@ -49,12 +49,12 @@ public:
     XML_VARIABLE XMLInteger range;
     XML_VARIABLE XMLInteger ambushes;
 
-    XML_VARIABLE XMLString kingName;
-    XML_VARIABLE XMLString kingRoom;
-    XML_VARIABLE XMLString kingArea;
-    XML_VARIABLE XMLString princeName;
-    XML_VARIABLE XMLString princeRoom;
-    XML_VARIABLE XMLString princeArea;
+    XML_VARIABLE XMLMultiString kingName;
+    XML_VARIABLE XMLMultiString kingRoom;
+    XML_VARIABLE XMLMultiString kingArea;
+    XML_VARIABLE XMLMultiString princeName;
+    XML_VARIABLE XMLMultiString princeRoom;
+    XML_VARIABLE XMLMultiString princeArea;
     XML_VARIABLE XMLString scenName;
     XML_VARIABLE XMLInteger kingVnum;
     XML_VARIABLE XMLBooleanNoFalse debug;

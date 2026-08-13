@@ -45,15 +45,15 @@ public:
     virtual void destroy( );
     
     XML_VARIABLE XMLInteger mode;
-    XML_VARIABLE XMLString victimName;
-    XML_VARIABLE XMLString victimArea;
-    XML_VARIABLE XMLString victimRoom;
-    XML_VARIABLE XMLString thiefName;
-    XML_VARIABLE XMLString thiefArea;
-    XML_VARIABLE XMLString thiefRoom;
+    XML_VARIABLE XMLMultiString victimName;
+    XML_VARIABLE XMLMultiString victimArea;
+    XML_VARIABLE XMLMultiString victimRoom;
+    XML_VARIABLE XMLMultiString thiefName;
+    XML_VARIABLE XMLMultiString thiefArea;
+    XML_VARIABLE XMLMultiString thiefRoom;
     XML_VARIABLE XMLInteger thiefSex;
-    XML_VARIABLE XMLString chestRoom;
-    XML_VARIABLE XMLString itemName;
+    XML_VARIABLE XMLMultiString chestRoom;
+    XML_VARIABLE XMLMultiString itemName;
     XML_VARIABLE XMLWearlocationReference itemWear;
     
 protected:
@@ -67,7 +67,11 @@ private:
     void fillChest( PCharacter *, Object * );
     bool isBonus( obj_index_data *, PCharacter * );
     Room * findHideaway( PCharacter *, NPCharacter * );
-    DLString getRoomHint( Room * room, Room *from = NULL, int depth = 0 );
+    /** The room a player is told to look near -- one or two steps out from the
+     *  hideaway, so the hint is a landmark rather than the exact spot. Returns
+     *  the Room so the caller can name it in every language; walking the graph
+     *  once per language would be three identical walks. */
+    Room * getRoomHint( Room * room, Room *from = NULL, int depth = 0 );
 
     Object *item;
 };

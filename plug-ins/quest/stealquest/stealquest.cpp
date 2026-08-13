@@ -85,22 +85,33 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
         throw e;
     }
 
-    name = victim->getShortDescr(LANG_DEFAULT);
-    name.upperFirstCharacter( );
-    victimName = name;
-    victimRoom = victim->in_room->getName();
-    victimArea = victim->in_room->areaName();
-    
-    name = thief->getShortDescr(LANG_DEFAULT);
-    name.upperFirstCharacter( );
-    thiefName = name;
-    thiefArea = thief->in_room->areaName();
-    thiefRoom = thief->in_room->getName();
-    thiefSex = thief->getSex( );
+    // Capture every name per language so info() answers in the reader's own;
+    // getForLang() on read falls back to Russian where a language has none.
+    // getRoomHint walks the exit graph, so it runs once and is named per
+    // language rather than being walked three times.
+    Room *hintRoom = getRoomHint( hideaway );
 
-    itemName = item->getShortDescr(LANG_DEFAULT);
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        name = victim->getShortDescr( lang );
+        name.upperFirstCharacter( );
+        victimName[lang] = name;
+        victimRoom[lang] = victim->in_room->getName( lang );
+        victimArea[lang] = victim->in_room->areaName( lang );
+
+        name = thief->getShortDescr( lang );
+        name.upperFirstCharacter( );
+        thiefName[lang] = name;
+        thiefArea[lang] = thief->in_room->areaName( lang );
+        thiefRoom[lang] = thief->in_room->getName( lang );
+
+        itemName[lang] = item->getShortDescr( lang );
+        chestRoom[lang] = hintRoom ? hintRoom->getName( lang ) : "";
+    }
+
+    thiefSex = thief->getSex( );
     itemWear.assign( item->wear_loc );
-    chestRoom = getRoomHint( hideaway );
 
     obj_from_char( item );
 
@@ -150,7 +161,7 @@ void StealQuest::clear( Object *obj )
     if (obj) {
         if (obj->carried_by 
             && obj->carried_by->is_npc( )
-            && victimName ^ obj->carried_by->getNPC( )->getShortDescr(LANG_DEFAULT))
+            && victimName.get( LANG_DEFAULT ) ^ obj->carried_by->getNPC( )->getShortDescr(LANG_DEFAULT))
         {
             save_mobs( obj->carried_by->in_room );
         }
@@ -181,7 +192,7 @@ QuestReward::Pointer StealQuest::reward( PCharacter *ch, NPCharacter *questman )
     default: r->points = number_range( 22, 26 ); break;
     }
     
-    if (!chestRoom.getValue( ).empty( ))
+    if (!chestRoom.emptyValues( ))
         r->points += number_fuzzy( 10 );
     else    
         r->points += number_fuzzy( 3 );
@@ -211,56 +222,72 @@ QuestReward::Pointer StealQuest::reward( PCharacter *ch, NPCharacter *questman )
 
 void StealQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
+    lang_t lang = viewerLang( ch );
+
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "У " << russian_case( victimName, '2' ) << " какие-то неприятности." << endl
-            << "Пострадавший ждет тебя в районе '" 
-            << victimRoom << "' ({hh" << victimArea << "{hx)." << endl;
+        buf << fmt( ch, _("У %1$s какие-то неприятности."),
+                    russian_case( victimName.getForLang( lang ), '2' ).c_str( ) ) << endl
+            << fmt( ch, _("Пострадавший ждет тебя в районе '%1$s' ({hh%2$s{hx)."),
+                    victimRoom.getForLang( lang ).c_str( ),
+                    victimArea.getForLang( lang ).c_str( ) ) << endl;
         break;
 
     case QSTAT_HUNT_ROBBER:
-        buf << "Тебе стало известно, что у " << russian_case( victimName, '2' ) 
-            << " украли " << russian_case( itemName, '4' ) << ". " << endl
-            << "Вор - " << russian_case( thiefName, '1' ) 
-            << ", скорее всего скрывается в районе '" << thiefRoom << "' ({hh" << thiefArea << "{hx)." << endl;
+        buf << fmt( ch, _("Тебе стало известно, что у %1$s украли %2$s. "),
+                    russian_case( victimName.getForLang( lang ), '2' ).c_str( ),
+                    russian_case( itemName.getForLang( lang ), '4' ).c_str( ) ) << endl
+            << fmt( ch, _("Вор - %1$s, скорее всего скрывается в районе '%2$s' ({hh%3$s{hx)."),
+                    russian_case( thiefName.getForLang( lang ), '1' ).c_str( ),
+                    thiefRoom.getForLang( lang ).c_str( ),
+                    thiefArea.getForLang( lang ).c_str( ) ) << endl;
 
-            if (!chestRoom.getValue( ).empty( ))
-                buf << "По слухам, награбленное добро спрятано где-то около '" << chestRoom << "'" 
-                    << ", ключ от нычки ищи у вора." << endl;
+            if (!chestRoom.emptyValues( ))
+                buf << fmt( ch, _("По слухам, награбленное добро спрятано где-то около '%1$s', ключ от нычки ищи у вора."),
+                            chestRoom.getForLang( lang ).c_str( ) ) << endl;
 
-            buf << "Пострадавший ждет тебя около '" 
-                << victimRoom << "' ({hh" << victimArea << "{hx)." << endl;
+            buf << fmt( ch, _("Пострадавший ждет тебя около '%1$s' ({hh%2$s{hx)."),
+                        victimRoom.getForLang( lang ).c_str( ),
+                        victimArea.getForLang( lang ).c_str( ) ) << endl;
 
         break;
 
     case QSTAT_FINISHED:
-        buf << "Твое задание выполнено!" << endl
-            << "Вернись за вознаграждением до того, как выйдет время." << endl;
+        buf << fmt( ch, _("Твое задание выполнено!") ) << endl
+            << fmt( ch, _("Вернись за вознаграждением до того, как выйдет время.") ) << endl;
         break;
     }
 }
 
 void StealQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
+    lang_t lang = viewerLang( ch );
+
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "Узнать, что случилось у " << russian_case( victimName, '2') << " в "
-            << victimRoom << " (" << victimArea << ").";
+        buf << fmt( ch, _("Узнать, что случилось у %1$s в %2$s (%3$s)."),
+                    russian_case( victimName.getForLang( lang ), '2' ).c_str( ),
+                    victimRoom.getForLang( lang ).c_str( ),
+                    victimArea.getForLang( lang ).c_str( ) );
         break;
 
     case QSTAT_HUNT_ROBBER:
-        buf << "Вернуть " << russian_case( itemName, '4' ) << " " << russian_case( victimName, '3' ) << ". "
-            << "Вор, " << russian_case( thiefName, '1' ) << ", скрывается в " 
-            << thiefRoom << " (" << thiefArea << ")";
+        buf << fmt( ch, _("Вернуть %1$s %2$s. Вор, %3$s, скрывается в %4$s (%5$s)"),
+                    russian_case( itemName.getForLang( lang ), '4' ).c_str( ),
+                    russian_case( victimName.getForLang( lang ), '3' ).c_str( ),
+                    russian_case( thiefName.getForLang( lang ), '1' ).c_str( ),
+                    thiefRoom.getForLang( lang ).c_str( ),
+                    thiefArea.getForLang( lang ).c_str( ) );
 
-            if (!chestRoom.getValue( ).empty( ))
-                buf << ", награбленное прячет около " << chestRoom << ".";
+            if (!chestRoom.emptyValues( ))
+                buf << fmt( ch, _(", награбленное прячет около %1$s."),
+                            chestRoom.getForLang( lang ).c_str( ) );
             else 
                 buf << ".";
         break;
 
     case QSTAT_FINISHED:
-        buf << "Вернуться к квестору за наградой.";
+        shortInfoComplete( buf, ch );
         break;
     }
 }
@@ -272,14 +299,16 @@ bool StealQuest::isComplete( )
 
 void StealQuest::helpMessage( ostringstream &buf )
 {
+    // No viewer in scope: helpMessage's signature carries only the stream, so
+    // this one stays Russian until the base class gains a Character parameter.
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "До " << russian_case( victimName, '2' )
+        buf << "До " << russian_case( victimName.get( LANG_DEFAULT ), '2' )
             << " ты можешь добраться, следуя по такому пути: ";
         break;
 
     case QSTAT_HUNT_ROBBER:
-        buf << "Ты можешь отыскать " << russian_case( thiefName, '4' )
+        buf << "Ты можешь отыскать " << russian_case( thiefName.get( LANG_DEFAULT ), '4' )
             << ", следуя по такому пути: ";
         break;
     }
@@ -483,13 +512,13 @@ Room * StealQuest::findHideaway( PCharacter *pch, NPCharacter *thief )
     throw QuestCannotStartException( );
 }
 
-DLString StealQuest::getRoomHint( Room * room, Room *from, int depth )
+Room * StealQuest::getRoomHint( Room * room, Room *from, int depth )
 {
     if (!room)
-        return "";
+        return NULL;
 
     if (depth >= 2) 
-        return room->getName();
+        return room;
 
     for (int d = 0; d < DIR_SOMEWHERE; d++) {
         Room *r;
@@ -511,7 +540,7 @@ DLString StealQuest::getRoomHint( Room * room, Room *from, int depth )
                 return getRoomHint( r, room, depth + 1 );
     }
 
-    return room->getName();
+    return room;
 }
 
 /*
