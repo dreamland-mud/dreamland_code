@@ -95,17 +95,36 @@ void QuestItemAppearence::dress( Object *obj ) const
     if (!gender.empty())
         obj->gram_gender.fromString(gender.c_str());
 
-    if (!name.empty( ))
-        obj->setKeyword(name + " " + String::toString(obj->pIndexData->keyword));
-        
-    if (!shortDesc.empty( ))
-        obj->setShortDescr( shortDesc, LANG_DEFAULT);
-        
-    if (!desc.empty( ))
-        obj->setDescription( desc, LANG_DEFAULT );
+    // Write every language slot. A slot with no translation of its own gets the
+    // Russian text (getForLang), never nothing: an empty instance slot falls
+    // through to the *prototype* (String::firstNonEmpty), so leaving it blank
+    // would show an EN/UA reader the undressed generic item instead of the
+    // quest one. Same policy XMLItemRestring::dress applies.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
 
-    if (!extraDesc.empty( ))
-        obj->addProperDescription()->description[LANG_DEFAULT] = extraDesc;
+        // Keyword is PREPENDED to the prototype's own list, never replaces it,
+        // so no token a player could already type is lost.
+        if (!name.emptyValues( ))
+            obj->setKeyword( name.getForLang(lang) + " " + obj->pIndexData->keyword.get(lang), lang );
+
+        if (!shortDesc.emptyValues( ))
+            obj->setShortDescr( shortDesc.getForLang(lang), lang );
+
+        if (!desc.emptyValues( ))
+            obj->setDescription( desc.getForLang(lang), lang );
+    }
+
+    // Only after the keyword loop. addProperDescription() stamps ed->keyword
+    // from getKeyword() at call time (object.cpp:234), so calling it earlier
+    // files the extra description under the PROTOTYPE's keywords and `look
+    // <quest name>` misses it. class_thief.cpp:712 spells out the same order.
+    if (!extraDesc.emptyValues( )) {
+        ExtraDescription *ed = obj->addProperDescription();
+
+        for (int l = LANG_MIN; l < LANG_MAX; l++)
+            ed->description[(lang_t)l] = extraDesc.getForLang((lang_t)l);
+    }
 
     if (!material.empty())
         obj->setMaterial(material);
@@ -123,11 +142,24 @@ QuestMobileAppearence::QuestMobileAppearence( )
 
 void QuestMobileAppearence::dress( NPCharacter *mob ) const
 {
-    mob->setKeyword( name + " " + String::toString(mob->pIndexData->keyword));
-    mob->setShortDescr( shortDesc, LANG_RU );
-    mob->setLongDescr( longDesc, LANG_RU );
-    mob->setDescription( desc, LANG_RU );
-    mob->setSex( sex.getValue( ) ); 
+    // Per-language, for the reasons spelled out in QuestItemAppearence::dress.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        if (!name.emptyValues( ))
+            mob->setKeyword( name.getForLang(lang) + " " + mob->pIndexData->keyword.get(lang), lang );
+
+        if (!shortDesc.emptyValues( ))
+            mob->setShortDescr( shortDesc.getForLang(lang), lang );
+
+        if (!longDesc.emptyValues( ))
+            mob->setLongDescr( longDesc.getForLang(lang), lang );
+
+        if (!desc.emptyValues( ))
+            mob->setDescription( desc.getForLang(lang), lang );
+    }
+
+    mob->setSex( sex.getValue( ) );
 
     if (race.getName() != "none") {
         mob->setRace( race.getName( ) );

@@ -8,6 +8,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlmap.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlflags.h"
 #include "xmlinteger.h"
 #include "xmlreversevector.h"
@@ -78,15 +79,22 @@ inline void QuestScenariosContainer::getMyScenarios( PCharacter *pch, NPCharacte
         throw QuestCannotStartException( );
 }
 
+/** Appearance data a quest stamps onto a freshly created item.
+ *
+ * The text fields are XMLMultiString so a quest item reads in the viewer's
+ * language. Data files may keep writing a bare <name>текст</name> with no 'l'
+ * attribute: XMLMultiString::fromXML files an attribute-less Cyrillic node
+ * under RU, so nothing has to be rewritten to keep working.
+ */
 class QuestItemAppearence : public XMLVariableContainer {
 XML_OBJECT
 public:
     QuestItemAppearence( );
 
-    XML_VARIABLE XMLStringNoEmpty name;
-    XML_VARIABLE XMLStringNoEmpty shortDesc;
-    XML_VARIABLE XMLStringNoEmpty desc;
-    XML_VARIABLE XMLStringNoEmpty extraDesc;
+    XML_VARIABLE XMLMultiString name;
+    XML_VARIABLE XMLMultiString shortDesc;
+    XML_VARIABLE XMLMultiString desc;
+    XML_VARIABLE XMLMultiString extraDesc;
     XML_VARIABLE XMLFlagsNoEmpty wear;
     XML_VARIABLE XMLFlagsNoEmpty extra;
     XML_VARIABLE XMLStringNoEmpty gender;
@@ -97,15 +105,16 @@ public:
 
 typedef XMLVectorBase<QuestItemAppearence> QuestItemAppearanceList;
 
+/** Same contract as QuestItemAppearence, for a quest-spawned mobile. */
 class QuestMobileAppearence : public XMLVariableContainer {
 XML_OBJECT
 public:
     QuestMobileAppearence( );
 
-    XML_VARIABLE XMLStringNoEmpty name;
-    XML_VARIABLE XMLStringNoEmpty shortDesc;
-    XML_VARIABLE XMLStringNoEmpty longDesc;
-    XML_VARIABLE XMLStringNoEmpty desc;
+    XML_VARIABLE XMLMultiString name;
+    XML_VARIABLE XMLMultiString shortDesc;
+    XML_VARIABLE XMLMultiString longDesc;
+    XML_VARIABLE XMLMultiString desc;
     XML_VARIABLE XMLEnumeration sex;
     XML_VARIABLE XMLEnumerationNoEmpty align;
     XML_VARIABLE XMLRaceReference race;
