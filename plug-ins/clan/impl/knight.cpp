@@ -250,8 +250,8 @@ SKILL_RUNP(guard)
     for (gch = victim->guarding, cnt = 2; gch; gch = gch->guarding, cnt++)
         if (gch == pch)
         {
-            pch->pecho(_("%d рыцар%s, поставленных стык-в-стык, представляют собой потрясающее зрелище!"),
-                        cnt, GET_COUNT(cnt, "ь", "я", "ей"));
+            pch->pecho(_("%1$d рыцар%1$Iь|я|ей, поставленных стык-в-стык, представляют собой потрясающее зрелище!"),
+                        cnt);
             return;
         }
 

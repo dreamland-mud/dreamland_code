@@ -453,13 +453,12 @@ SKILL_RUNP( manacles )
 
                         if ( paf->duration >= 0 )
                         {
-                                msg = fmt(0, _("$C1 закован менее чем на %d час%s.")
-                                        ,paf->duration.getValue() + 1
-                                        ,GET_COUNT(paf->duration+1, "","а","ов"));
+                                msg = fmt(ch, _("$C1 закован менее чем на %1$d час%1$I|а|ов.")
+                                        ,paf->duration.getValue() + 1);
                         }
                         else
                         {
-                                msg = "$C1 закован навсегда.";
+                                msg = fmt(ch, _("$C1 закован навсегда."));
                         }
 
                         oldact_p(_("Руки $C4 закованы в кандалы!"),
@@ -1024,14 +1023,13 @@ SKILL_RUNP( suspect )
 
                 if ( paf != 0 )   
                 {
-                        msg = fmt(0, _("Повестка $C2 действительна менее %d час%s.")
-                                ,paf->duration.getValue() + 1
-                                ,GET_COUNT(paf->duration + 1, "а","ов","ов"));
+                        msg = fmt(ch, _("Повестка $C2 действительна менее %1$d час%1$Iа|ов|ов.")
+                                ,paf->duration.getValue() + 1);
 
                         victim->pecho(_("Ты чувствуешь - тебя ждут в Суде."));
                 }
                 else
-                        msg = "$C1 не выдавалась повестка в Суд.";
+                        msg = fmt(ch, _("$C1 не выдавалась повестка в Суд."));
 
                 oldact(msg.c_str(), ch, 0, victim, TO_CHAR);
 
@@ -1170,13 +1168,12 @@ SKILL_RUNP( jail )
 
                         if ( paf->duration >= 0 )
                         {
-                                msg = fmt(0, _("$C1 в тюряге менее чем на %d час%s.")
-                                        ,paf->duration.getValue() + 1
-                                        ,GET_COUNT(paf->duration + 1, "","а","ов"));
+                                msg = fmt(ch, _("$C1 в тюряге менее чем на %1$d час%1$I|а|ов.")
+                                        ,paf->duration.getValue() + 1);
                         }
                         else
                         {
-                               msg = "$C1 в тюряге ПОЖИЗНЕННО.";
+                               msg = fmt(ch, _("$C1 в тюряге ПОЖИЗНЕННО."));
                         }
 
                         if ( victim->isAffected(gsn_manacles) )
@@ -1340,13 +1337,12 @@ SKILL_RUNP( dismiss )
 
                         if ( paf->duration >= 0 )
                         {
-                                msg = fmt(0, _("$C1 лише$Gно|н|на своих привилегий Правителя менее чем на %d час%s.")
-                                        ,paf->duration.getValue() + 1
-                                        ,GET_COUNT(paf->duration+1, "","а","ов"));
+                                msg = fmt(ch, _("$C1 лише$Gно|н|на своих привилегий Правителя менее чем на %1$d час%1$I|а|ов.")
+                                        ,paf->duration.getValue() + 1);
                         }
                         else
                         {
-                                msg = "$C1 лише$Gно|н|на своих привилегий Правителя НАВСЕГДА.";
+                                msg = fmt(ch, _("$C1 лише$Gно|н|на своих привилегий Правителя НАВСЕГДА."));
                         }
 
                         oldact(msg.c_str(), ch, 0, victim, TO_CHAR);

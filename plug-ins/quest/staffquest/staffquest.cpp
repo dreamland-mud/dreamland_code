@@ -61,8 +61,7 @@ void StaffQuest::create( PCharacter *pch, NPCharacter *questman )
     lang_t plang = viewerLang( pch );
     tell_raw( pch, questman, _("Место, где оно спрятано, называется {W%s{G"), roomName.getForLang( plang ).c_str( ) );
     tell_raw( pch, questman, _("И находится это место в районе под названием - {W{hh%s{hx{G"), areaName.getForLang( plang ).c_str( ) );
-    tell_raw( pch, questman, _("У тебя есть {Y%d{G минут%s на выполнение задания."),
-                  time, GET_COUNT(time,"а","ы","") ); 
+    tell_raw( pch, questman, _("У тебя есть {Y%1$d{G минут%1$Iа|ы| на выполнение задания."), time ); 
     
     wiznet( scenName.c_str( ), "in room \"%s\" area \"%s\"",
                                roomName.get( LANG_DEFAULT ).c_str( ),

@@ -70,17 +70,15 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     tell_raw( pch, questman, _("У меня есть для тебя срочное поручение!") );
     lang_t plang = viewerLang( pch );
     tell_raw( pch, questman,
-        _("{W%s{G из местности {W{hh%s{hx{G хочет подать к столу {W%d{G кус%s мяса {W%s{G из местности {W{hh%s{hx{G."),
+        _("{W%1$s{G из местности {W{hh%2$s{hx{G хочет подать к столу {W%3$d{G кус%3$Iок|ка|ков мяса {W%4$s{G из местности {W{hh%5$s{hx{G."),
         customerName.getForLang( plang ).c_str( ),
         customerArea.getForLang( plang ).c_str( ),
         ordered.getValue( ),
-        GET_COUNT(ordered.getValue( ), "ок", "ка", "ков"),
         raceRusName.getForLang( plang ).ruscase( '2' ).c_str( ),
         areaName.getForLang( plang ).c_str( ));
 
     tell_raw( pch, questman, _("Доставь мясо заказчику и вернись сюда за вознаграждением.") );
-    tell_raw( pch, questman, _("У тебя есть {Y%d{G минут%s на выполнение задания."),
-                  time, GET_COUNT(time,"а","ы","") ); 
+    tell_raw( pch, questman, _("У тебя есть {Y%1$d{G минут%1$Iа|ы| на выполнение задания."), time ); 
 
     wiznet( "", "%d steaks of %s from %s, customer %s.",
                 ordered.getValue( ),
