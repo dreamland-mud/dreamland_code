@@ -163,11 +163,15 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
         lang_t lang = (lang_t)l;
         const DLString &vname = victim->getNameP('2', lang);
 
+        // Keywords take the nominative -- that is what a player types -- while
+        // the descriptions below take the genitive their sentences ask for.
+        const DLString &vkey = victim->getNameP('1', lang);
         const DLString &kw = jar->getKeyword(lang);
+
         if (String::contains(kw, "%"))
-            jar->setKeyword( fmt(0, kw.c_str(), vname.c_str()), lang );
+            jar->setKeyword( fmt(0, kw.c_str(), vkey.c_str()), lang );
         else
-            jar->setKeyword( kw + DLString::SPACE + vname, lang );
+            jar->setKeyword( kw + DLString::SPACE + vkey, lang );
 
         const DLString &shortPattern = jar->getShortDescr(lang);
         if (!shortPattern.empty())

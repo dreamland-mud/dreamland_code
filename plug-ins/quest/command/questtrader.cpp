@@ -407,12 +407,17 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     keyring->setOwner( girth->getOwner( ) );
 
     // The keyring wears the girth's personalised name, so it has to copy every
-    // language slot -- the girth now carries all three. The keyword is already
+    // language slot -- a girth bought after this change carries all three. Copy
+    // only what the girth itself holds: getShortDescr(lang) falls back to the
+    // girth PROTOTYPE, and a girth bought earlier has empty EN/UA instance slots,
+    // so copying through the fallback would stamp the raw "%s" template onto the
+    // keyring instead of leaving it its own clean name. The keyword is already
     // copied whole below, as an XMLMultiString.
     for (int l = LANG_MIN; l < LANG_MAX; l++) {
         lang_t lang = (lang_t)l;
 
-        keyring->setShortDescr( girth->getShortDescr(lang), lang );
+        if (!girth->getRealShortDescr(lang).empty())
+            keyring->setShortDescr( girth->getRealShortDescr(lang), lang );
 
         if (!girth->getRealDescription(lang).empty())
             keyring->setDescription( girth->getRealDescription(lang), lang );
@@ -433,7 +438,12 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
         affect_to_obj( keyring, paf );
 
     for (auto &ed: girth->extraDescriptions)
-        keyring->addExtraDescr( ed->keyword, ed->description.get(LANG_DEFAULT), LANG_DEFAULT );
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+
+            if (!ed->description.get(lang).empty())
+                keyring->addExtraDescr( ed->keyword, ed->description.get(lang), lang );
+        }
 
     waist = &*girth->wear_loc;
     waist->unequip( girth );
@@ -609,10 +619,18 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
     // a keyword list that did not have a "%s", so targeting is otherwise unchanged.
     for (int l = LANG_MIN; l < LANG_MAX; l++) {
         lang_t lang = (lang_t)l;
-        DLString leader = client->getReligion( )->getNameFor( lang );
 
-        obj->setKeyword( fmt(0, obj->getKeyword(lang).c_str(), leader.c_str()), lang );
-        obj->setShortDescr( fmt(0, obj->getShortDescr(lang).c_str(), leader.c_str()), lang );
+        // nameRus and nameUa are declinable pads (Кронос||а|у|а|ом|е), not fixed
+        // words. Dropped raw into the short descr they would decline in step with
+        // the whole phrase, so the deity would follow the case of the tattoo
+        // instead of staying genitive after "с изображением". Decline once here,
+        // the way score.cpp does it.
+        const DLString &deity = client->getReligion( )->getNameFor( lang );
+        DLString leaderShort = deity.ruscase( '2' );
+        DLString leaderKey = deity.ruscase( '1' );
+
+        obj->setKeyword( fmt(0, obj->getKeyword(lang).c_str(), leaderKey.c_str()), lang );
+        obj->setShortDescr( fmt(0, obj->getShortDescr(lang).c_str(), leaderShort.c_str()), lang );
     }
 
     obj_to_char( obj, client );
