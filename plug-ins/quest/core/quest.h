@@ -76,6 +76,12 @@ public:
     virtual bool help( PCharacter *, NPCharacter * );
     virtual void helpMessage( ostringstream & );
     virtual Room *helpLocation( );
+
+    /** What info() and shortInfo() print once the quest is done. Identical
+     *  wording in most quest models, so it lives here: one catalog key each,
+     *  translated once, instead of the same sentence in seven files. */
+    void infoComplete( std::ostream &, PCharacter * );
+    void shortInfoComplete( std::ostream &, PCharacter * );
     
     void wiznet( const char *status, const char * format = NULL, ... );
 

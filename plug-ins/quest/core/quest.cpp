@@ -25,6 +25,7 @@
 #include "wiznet.h"
 #include "merc.h"
 #include "act.h"
+#include "l10n.h"
 #include "def.h"
 
 Quest::Quest( ) 
@@ -48,6 +49,17 @@ Room * Quest::helpLocation( )
 
 void Quest::shortInfo( std::ostream &, PCharacter * )
 {
+}
+
+void Quest::infoComplete( std::ostream &buf, PCharacter *ch )
+{
+    buf << fmt( ch, _("Твое задание {YВЫПОЛНЕНО{x!") ) << endl
+        << fmt( ch, _("Вернись за вознаграждением, до того как выйдет время!") ) << endl;
+}
+
+void Quest::shortInfoComplete( std::ostream &buf, PCharacter *ch )
+{
+    buf << fmt( ch, _("Вернуться к квестору за наградой.") );
 }
 
 void Quest::wiznet( const char *status, const char *format, ... ) 

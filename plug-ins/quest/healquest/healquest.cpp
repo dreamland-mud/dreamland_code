@@ -75,19 +75,26 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
 
     assign<PatientBehavior>( patient );
     save_mobs( patient->in_room );
-    mobName  = patient->getShortDescr(LANG_DEFAULT);
-    roomName = patient->in_room->getName();
-    areaName = patient->in_room->areaName();
+    // Every language, so info() answers in the reader's own; an untranslated
+    // slot stays empty and getForLang() falls back to Russian when read.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        mobName[lang] = patient->getShortDescr( lang );
+        roomName[lang] = patient->in_room->getName( lang );
+        areaName[lang] = patient->in_room->areaName( lang );
+    }
 
     setTime( pch, time );
 
     tell_raw( pch, questman, _("У меня есть для тебя срочное поручение!") );   
     tell_fmt( _("{W%3$#^C1{G чем-то серьезно бол%3$Gьно|ен|ьна и нуждается в помощи лекаря."),
                pch, questman, patient );
+    lang_t plang = viewerLang( pch );
     tell_fmt( _("Место, где %3$P2 видели в последний раз - {W%4$s{x."),
-              pch, questman, patient, patient->in_room->getName() );
-    tell_fmt( _("Это находится в районе под названием {W{hh%3$s{x."), 
-              pch, questman, patient->in_room->areaName().c_str() );
+              pch, questman, patient, patient->in_room->getName( plang ) );
+    tell_fmt( _("Это находится в районе под названием {W{hh%3$s{x."),
+              pch, questman, patient->in_room->areaName( plang ).c_str() );
     tell_fmt( _("Поторопись, пока болезнь не доконала %3$P2!"), pch, questman, patient );
     tell_fmt( _("У тебя есть {Y%3$d{G мину%3$Iта|ты|т на выполнение задания."), pch, questman, time );
 
@@ -167,22 +174,32 @@ QuestReward::Pointer HealQuest::reward( PCharacter *ch, NPCharacter *questman )
 
 void HealQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
-    if (isComplete( ))
-        buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-            << "Вернись за вознаграждением, до того как выйдет время!" << endl;
-    else 
-        buf << "У тебя задание - вылечить " << russian_case( mobName, '4' ) << "!" << endl
-            << "Место, где пациента видели в последний раз - " << roomName << endl
-            << "Это находится в районе под названием {hh" << areaName << "{hx." << endl;
+    if (isComplete( )) {
+        infoComplete( buf, ch );
+        return;
+    }
+
+    lang_t lang = viewerLang( ch );
+    buf << fmt( ch, _("У тебя задание - вылечить %1$s!"),
+                russian_case( mobName.getForLang( lang ), '4' ).c_str( ) ) << endl
+        << fmt( ch, _("Место, где пациента видели в последний раз - %1$s"),
+                roomName.getForLang( lang ).c_str( ) ) << endl
+        << fmt( ch, _("Это находится в районе под названием {hh%1$s{hx."),
+                areaName.getForLang( lang ).c_str( ) ) << endl;
 }
 
 void HealQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
-    if (isComplete( ))
-        buf << "Вернуться к квестору за наградой.";
-    else 
-        buf << "Вылечить " << russian_case( mobName, '4' ) << " из "
-            << roomName << " (" << areaName << ").";
+    if (isComplete( )) {
+        shortInfoComplete( buf, ch );
+        return;
+    }
+
+    lang_t lang = viewerLang( ch );
+    buf << fmt( ch, _("Вылечить %1$s из %2$s (%3$s)."),
+                russian_case( mobName.getForLang( lang ), '4' ).c_str( ),
+                roomName.getForLang( lang ).c_str( ),
+                areaName.getForLang( lang ).c_str( ) );
 }
 
 Room * HealQuest::helpLocation( )

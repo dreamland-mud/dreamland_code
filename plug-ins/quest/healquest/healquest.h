@@ -6,6 +6,7 @@
 #define HEALQUEST_H
 
 #include "questmodels.h"
+#include "xmlmultistring.h"
 #include "questmodels-impl.h"
 #include "questregistrator.h"
 #include "scenarios.h"
@@ -48,9 +49,9 @@ public:
     virtual void destroy( );
     virtual void clear( NPCharacter * );
     
-    XML_VARIABLE XMLString  mobName;       
-    XML_VARIABLE XMLString  roomName;       
-    XML_VARIABLE XMLString  areaName;       
+    XML_VARIABLE XMLMultiString mobName;
+    XML_VARIABLE XMLMultiString roomName;
+    XML_VARIABLE XMLMultiString areaName;
     XML_VARIABLE HealMaladies maladies;
     XML_VARIABLE XMLInteger mode;
 
