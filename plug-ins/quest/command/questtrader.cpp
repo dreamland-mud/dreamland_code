@@ -12,6 +12,8 @@
 
 #include "affect.h"
 #include "object.h"
+#include "itemevents.h"
+#include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "lang.h"
 #include "npcharacter.h"
@@ -209,32 +211,35 @@ PersonalQuestArticle::PersonalQuestArticle( )
 {
 }
 
-/** The adjective the quest master engraves on a hero item. It agrees with the
- *  gender the article declares -- a Russian property of the noun, recorded once
- *  per article -- and is declined in the reader's own language: Russian and
+/** The adjectives the quest master engraves on a hero item, indexed
+ *  [alignment: good, neutral, evil][gender: neuter, male, female]. Russian and
  *  Ukrainian carry the six-case pad, English has neither case nor gender. The
- *  Ukrainian nouns in limbo therefore have to keep the same gender as the
- *  Russian ones, or the adjective will not agree with them. */
+ *  Ukrainian nouns in limbo have to keep the same gender as the Russian ones,
+ *  or the adjective will not agree with them. Read backwards by
+ *  PersonalNameRepair at the bottom of this file, so keep the Russian strings
+ *  exactly as they have always been written into objects. */
+static const LangText HERO_ADJECTIVES[3][3] = {
+    {
+        { "holy", "Священн|ое|ого|ому|ое|ым|ом", "Священн|е|ого|ому|е|им|ому" },
+        { "holy", "Священн|ый|ого|ому|ый|ым|ом", "Священн|ий|ого|ому|ий|им|ому" },
+        { "holy", "Священн|ая|ой|ой|ую|ой|ой",   "Священн|а|ої|ій|у|ою|ій" },
+    },
+    {
+        { "shimmering", "Мерцающ|ее|его|ему|ее|им|ем", "Мерехтлив|е|ого|ому|е|им|ому" },
+        { "shimmering", "Мерцающ|ий|его|ему|ий|им|ем", "Мерехтлив|ий|ого|ому|ий|им|ому" },
+        { "shimmering", "Мерцающ|ая|ей|ей|ую|ей|ей",   "Мерехтлив|а|ої|ій|у|ою|ій" },
+    },
+    {
+        { "devilish", "Дьявольск|ое|ого|ому|ое|им|ом", "Диявольськ|е|ого|ому|е|им|ому" },
+        { "devilish", "Дьявольск|ий|ого|ому|ий|им|ом", "Диявольськ|ий|ого|ому|ий|им|ому" },
+        { "devilish", "Дьявольск|ая|ой|ой|ую|ой|ой",   "Диявольськ|а|ої|ій|у|ою|ій" },
+    },
+};
+
+/** Pick the adjective for this buyer and this article's declared gender. */
 static const LangText & hero_adjective( PCharacter *client, int gender )
 {
-    // [alignment: good, neutral, evil][gender: neuter, male, female]
-    static const LangText adjectives[3][3] = {
-        {
-            { "holy", "Священн|ое|ого|ому|ое|ым|ом", "Священн|е|ого|ому|е|им|ому" },
-            { "holy", "Священн|ый|ого|ому|ый|ым|ом", "Священн|ий|ого|ому|ий|им|ому" },
-            { "holy", "Священн|ая|ой|ой|ую|ой|ой",   "Священн|а|ої|ій|у|ою|ій" },
-        },
-        {
-            { "shimmering", "Мерцающ|ее|его|ему|ее|им|ем", "Мерехтлив|е|ого|ому|е|им|ому" },
-            { "shimmering", "Мерцающ|ий|его|ему|ий|им|ем", "Мерехтлив|ий|ого|ому|ий|им|ому" },
-            { "shimmering", "Мерцающ|ая|ей|ей|ую|ей|ей",   "Мерехтлив|а|ої|ій|у|ою|ій" },
-        },
-        {
-            { "devilish", "Дьявольск|ое|ого|ому|ое|им|ом", "Диявольськ|е|ого|ому|е|им|ому" },
-            { "devilish", "Дьявольск|ий|ого|ому|ий|им|ом", "Диявольськ|ий|ого|ому|ий|им|ому" },
-            { "devilish", "Дьявольск|ая|ой|ой|ую|ой|ой",   "Диявольськ|а|ої|ій|у|ою|ій" },
-        },
-    };
+    const LangText (&adjectives)[3][3] = HERO_ADJECTIVES;
 
     int a = IS_GOOD(client) ? 0 : IS_NEUTRAL(client) ? 1 : 2;
     int g;
@@ -666,3 +671,143 @@ bool TattooQuestArticle::available( Character *client, NPCharacter *tattoer ) co
 }
 
 
+
+/*----------------------------------------------------------------------------
+ * PersonalNameRepair
+ *---------------------------------------------------------------------------*/
+void PersonalNameRepair::initialization( )
+{
+    eventBus->subscribe( typeid(ItemReadEvent), Pointer(this) );
+}
+
+void PersonalNameRepair::destruction( )
+{
+    eventBus->unsubscribe( typeid(ItemReadEvent), Pointer(this) );
+}
+
+void PersonalNameRepair::handleEvent( const type_index &eventType, const Event &event ) const
+{
+    if (eventType == typeid(ItemReadEvent))
+        eventItemRead( static_cast<const ItemReadEvent &>(event) );
+}
+
+/** How many substitutions the prototype asks for in this language. */
+static int personal_arg_count( const DLString &pattern )
+{
+    int count = 0;
+
+    for (DLString::size_type pos = pattern.find("%s");
+         pos != DLString::npos;
+         pos = pattern.find("%s", pos + 2))
+        count++;
+
+    return count;
+}
+
+/** True when this language slot still needs filling: the instance has nothing
+ *  of its own and the prototype behind it is a template, not a finished name. */
+static bool personal_slot_needs_repair( Object *obj, lang_t lang )
+{
+    if (!obj->getRealShortDescr(lang).empty())
+        return false;
+
+    return personal_arg_count( obj->pIndexData->short_descr.get(lang) ) > 0;
+}
+
+/** Recover which adjective was engraved on a hero item. The buyer's alignment at
+ *  purchase time is recorded nowhere else, so read it back off the Russian name.
+ *  Returns 0 when the name starts with none of them, which is the signal to
+ *  leave the object alone rather than guess. */
+static const LangText * personal_engraved_adjective( const DLString &shortRu )
+{
+    for (int a = 0; a < 3; a++)
+        for (int g = 0; g < 3; g++) {
+            DLString adjective = HERO_ADJECTIVES[a][g].ru;
+
+            if (adjective.strPrefix( shortRu ))
+                return &HERO_ADJECTIVES[a][g];
+        }
+
+    return 0;
+}
+
+/** The prototypes this repair may touch, and nothing else.
+ *
+ *  A "%s" in a short descr is not a promise that the missing word is the owner:
+ *  across the 34 prototypes in the world that have one it can be a material
+ *  (battle poncho), a liquid (puddle), a deity (tattoo), the mob a steak was cut
+ *  from, or the victim pictured on an assassin card. An object carrying an owner
+ *  field does not settle it either -- the dungeon storage box has both an owner
+ *  and a "%s", and they mean the same thing there only by coincidence. So this
+ *  is a list of the objects whose template really is "adjective, owner" or
+ *  "owner", not a rule inferred from the data.
+ *
+ *  Hero quest items take two substitutions, hunter clan gear takes one. */
+static bool personal_repairable( int vnum )
+{
+    switch (vnum) {
+    case 94: case 95: case 96: case 103:                    // hero girth, ring, weapon, bag
+    case 573: case 574: case 575: case 576: case 577:       // hunter clan weapons
+    case 578: case 579: case 580: case 581:
+    case 582:                                               // hunter breastplate
+    case 589:                                               // hunter bow
+        return true;
+    }
+
+    return false;
+}
+
+void PersonalNameRepair::eventItemRead( const ItemReadEvent &event ) const
+{
+    Object *obj = event.obj;
+
+    if (!personal_repairable( obj->pIndexData->vnum ))
+        return;
+
+    if (obj->getOwner( ).empty( ))
+        return;
+
+    bool anyGap = false;
+    for (int l = LANG_MIN; l < LANG_MAX && !anyGap; l++)
+        anyGap = personal_slot_needs_repair( obj, (lang_t)l );
+
+    if (!anyGap)
+        return;
+
+    // The owner may well be offline; a memory record declines per language just
+    // as a live character does. A record can be genuinely gone (deleted player),
+    // and then there is no name to write.
+    PCMemoryInterface *owner = PCharacterManager::find( obj->getOwner( ) );
+    if (!owner)
+        return;
+
+    // Two substitutions means a hero quest item, adjective first and owner
+    // second; one means hunter gear, owner only.
+    const LangText *adjective = 0;
+
+    if (personal_arg_count( obj->pIndexData->short_descr.get(LANG_DEFAULT) ) > 1) {
+        adjective = personal_engraved_adjective( obj->getRealShortDescr(LANG_DEFAULT) );
+
+        if (!adjective)
+            return;
+    }
+
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        if (!personal_slot_needs_repair( obj, lang ))
+            continue;
+
+        const DLString &pattern = obj->pIndexData->short_descr.get(lang);
+        DLString name = owner->getNameP( '2', lang );
+
+        // Only fill a slot whose template asks for exactly what we have, so a
+        // prototype edited later can never be fed the wrong argument count.
+        int args = personal_arg_count( pattern );
+
+        if (adjective && args == 2)
+            obj->setShortDescr( fmt(0, pattern.c_str(), adjective->get(lang), name.c_str()), lang );
+        else if (!adjective && args == 1)
+            obj->setShortDescr( fmt(0, pattern.c_str(), name.c_str()), lang );
+    }
+}
