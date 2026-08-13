@@ -127,9 +127,14 @@ COMMAND(COrder, "order")
     // Check if victim can perform the command. Display verbose failure message to the master.
     rc = iargs.pCommand->dispatchOrder(iargs);
     if (rc != RC_DISPATCH_OK) {        
-        DLString victName = victim->is_npc() ? 
-              Syntax::noun(victim->getNPC()->getShortDescr(LANG_DEFAULT)) 
-            : victim->getNameP('1');
+        // The master is the one reading every message in this block, so the
+        // follower's name is picked in the master's language. Syntax::noun()
+        // itself is language-agnostic: it takes the last word carrying a
+        // Flexer pad, else simply the last word ("dog" out of "a hunting dog").
+        lang_t lang = viewerLang(victim->master);
+        DLString victName = victim->is_npc()
+            ? Syntax::noun(victim->getNPC()->getShortDescr(lang))
+            : victim->getNameP('1', lang);
 
         switch (rc) {
             case RC_DISPATCH_AFK:
@@ -155,9 +160,15 @@ COMMAND(COrder, "order")
             case RC_DISPATCH_POSITION:
                 victim->master->pecho(
                     _("%1$#^C1 %3$sне может ходить и выполнять некоторые команды. Напиши {y{hcприказать %2$N3 встать{x."),
-                    victim, 
-                    victName.c_str(), 
-                    victim->position == POS_SLEEPING ? "спит и " : (victim->position == POS_RESTING || victim->position == POS_SITTING) ? "сидит и " : "");
+                    victim,
+                    victName.c_str(),
+                    // The frame is translated, but this fragment is glued into
+                    // it as a plain argument, so it needs its own three forms.
+                    victim->position == POS_SLEEPING
+                        ? lmsg(lang, "is asleep and ", "спит и ", "спить і ")
+                        : (victim->position == POS_RESTING || victim->position == POS_SITTING)
+                            ? lmsg(lang, "is sitting and ", "сидит и ", "сидить і ")
+                            : "");
                 break;
 
             case RC_DISPATCH_NOT_HERE:

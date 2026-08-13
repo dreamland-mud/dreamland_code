@@ -291,10 +291,10 @@ void HomeRecall::doList( PCharacter *ch )
         point = attr->getPoint( );
         room = get_room_instance( point );
         
-        ch->pecho("%-15s [%-5d] %-25.25s (%s)", 
-                 i->second->getName( ).c_str( ), point, 
-                 (room ? room->getName() : "{Rnull!{x"),
-                 (room ? room->areaName().c_str() : "") );
+        ch->pecho("%-15s [%-5d] %-25.25s (%s)",
+                 i->second->getName( ).c_str( ), point,
+                 (room ? room->getName(viewerLang(ch)) : "{Rnull!{x"),
+                 (room ? room->areaName(viewerLang(ch)).c_str() : "") );
     }
 }
 
@@ -306,7 +306,7 @@ static void print_room_mortal( int vnum, ostringstream &buf, Character *ch )
         return;
     }
 
-    buf << room->getName(viewerLang(ch)) << " (" << room->areaName() << ")" << endl;
+    buf << room->getName(viewerLang(ch)) << " (" << room->areaName(viewerLang(ch)) << ")" << endl;
 }
 
 void HomeRecall::doListMortal( PCharacter * ch )
@@ -328,25 +328,88 @@ void HomeRecall::doListMortal( PCharacter * ch )
     ch->send_to( buf );
 }
 
+// One syntax line: the command form in bold, then the explanation lined up in a
+// fixed column. The command name is no longer a literal, so hand-aligned spaces
+// would drift the moment a language spells it at a different length. Cyrillic is
+// one byte at runtime (-fexec-charset=KOI8-U), so a byte width is a display
+// width here and one column suits all three languages. A form too long for the
+// column takes the whole line and drops its explanation underneath, rather than
+// shoving the column sideways for that row only.
+static const unsigned int USAGE_COLUMN = 38;
+
+static void usage_line( ostringstream &buf, const DLString &syntax, const char *descr )
+{
+    buf << "{W" << syntax << "{x";
+
+    if (syntax.size( ) > USAGE_COLUMN)
+        buf << endl << std::string( USAGE_COLUMN, ' ' );
+    else
+        buf << std::string( USAGE_COLUMN - syntax.size( ), ' ' );
+
+    buf << " - " << descr << endl;
+}
+
 void HomeRecall::doUsage( PCharacter * ch )
 {
     std::basic_ostringstream<char> buf;
+    lang_t lang = viewerLang( ch );
 
-    buf << "Синтаксис: " << endl
-        << "{Wдомой     {x             - переносит в дом" << endl
-        << "{Wдомой метка     {x       - переносит в дом с указанной меткой" << endl;
-    if (ch->is_immortal( ))
-        buf << "{Whomerecall set{x <name> <room vnum>   - установить игроку комнату для homerecall" << endl
-            << "в идеале это комната снаружи дома, от которого он может купить ключ" << endl
-            << "{Whomerecall set{x <name> <room vnum> <label>  " << endl
-            << "                                    - установить homerecall с указанной меткой" << endl
-            << "{Whomerecall show{x <name>              - посмотреть чей-то homerecall" << endl
-            << "{Whomerecall remove{x <name>            - отобрать возможность рекаллиться домой" << endl
-            << "{Whomerecall list{x                     - список всех игроков, имеющих homerecall" << endl;
-    else 
-        buf << "{Wдомой список   {x        - показать список твоих домов и меток" << endl;
+    // Both the command name and the sub-command words are printed in the
+    // viewer's language, because that is what they can actually type: the
+    // command table carries all three names, and arg_is() resolves the
+    // sub-commands through the 'grammar' synonyms table.
+    DLString cmd = getNameFor( lang );
+    DLString argList = lmsg( lang, "list", "список", "список" );
+    DLString argSet = lmsg( lang, "set", "установить", "встановити" );
+    DLString argShow = lmsg( lang, "show", "показать", "показати" );
+    DLString argDel = lmsg( lang, "del", "удалить", "видалити" );
+    DLString argTag = lmsg( lang, "<tag>", "<метка>", "<мітка>" );
+    DLString argName = lmsg( lang, "<name>", "<имя>", "<ім'я>" );
+    DLString argVnum = lmsg( lang, "<room vnum>", "<внум комнаты>", "<внум кімнати>" );
 
-    
+    buf << lmsg( lang, "Syntax:", "Синтаксис:", "Синтаксис:" ) << endl;
+
+    usage_line( buf, cmd,
+                lmsg( lang, "teleports you home",
+                            "переносит в дом",
+                            "переносить додому" ) );
+    usage_line( buf, cmd + " " + argTag,
+                lmsg( lang, "teleports you to the tagged house",
+                            "переносит в дом с указанной меткой",
+                            "переносить у будинок із міткою" ) );
+
+    if (ch->is_immortal( )) {
+        usage_line( buf, cmd + " " + argSet + " " + argName + " " + argVnum,
+                    lmsg( lang, "give a player a room to recall home to",
+                                "установить игроку комнату для возврата",
+                                "задати гравцеві кімнату повернення" ) );
+        buf << lmsg( lang, "ideally a room outside the house whose key they can buy",
+                           "в идеале это комната снаружи дома, от которого он может купить ключ",
+                           "в ідеалі це кімната зовні будинку, від якого він може купити ключ" ) << endl;
+        usage_line( buf, cmd + " " + argSet + " " + argName + " " + argVnum + " " + argTag,
+                    lmsg( lang, "set a home under the given tag",
+                                "установить дом с указанной меткой",
+                                "встановити будинок із міткою" ) );
+        usage_line( buf, cmd + " " + argShow + " " + argName,
+                    lmsg( lang, "look at someone's homes",
+                                "посмотреть чьи-то дома",
+                                "подивитися чиїсь будинки" ) );
+        usage_line( buf, cmd + " " + argDel + " " + argName,
+                    lmsg( lang, "take away the ability to recall home",
+                                "отобрать возможность вернуться домой",
+                                "відібрати можливість повернення додому" ) );
+        usage_line( buf, cmd + " " + argList,
+                    lmsg( lang, "list every player who has a home",
+                                "список всех игроков, имеющих дом",
+                                "список усіх гравців, що мають дім" ) );
+    }
+    else {
+        usage_line( buf, cmd + " " + argList,
+                    lmsg( lang, "show the list of your houses and tags",
+                                "показать список твоих домов и меток",
+                                "показати список твоїх будинків і міток" ) );
+    }
+
     ch->send_to( buf );
 }
 

@@ -61,7 +61,10 @@ void GroupChannel::triggers(Character *ch, const DLString &msg) const
 {
     GlobalChannel::triggers(ch, msg);
 
-    if (!ch->is_npc() && (!str_prefix(msg.c_str(), "where are you?") || !str_prefix(msg.c_str(), "где ты?"))) {
+    // Ukrainian had no phrase of its own here, so a UA owner could not ask at all.
+    if (!ch->is_npc() && (!str_prefix(msg.c_str(), "where are you?")
+                          || !str_prefix(msg.c_str(), "где ты?")
+                          || !str_prefix(msg.c_str(), "де ти?"))) {
         NPCharacter *pet = ch->getPC()->pet;
 
         if (!pet) {
@@ -74,18 +77,26 @@ void GroupChannel::triggers(Character *ch, const DLString &msg) const
             return;
         }
 
+        // The frames are catalog-wrapped, but everything substituted into them
+        // was Russian for every reader: the vocative the pet uses, and the zone
+        // and room it names. Frame text is left untouched so the catalog keys
+        // keep resolving.
+        lang_t lang = viewerLang(ch);
+        const char *master = GET_SEX(ch,
+                                     lmsg(lang, "Master", "Хозяин", "Хазяїне"),
+                                     lmsg(lang, "Master", "Хозяин", "Хазяїне"),
+                                     lmsg(lang, "Mistress", "Хозяйка", "Хазяйко"));
+
         if (pet->position > POS_SLEEPING) {
             if (IS_AFFECTED(pet, AFF_BLIND)) {
-                tell_raw(ch, pet, _("%s, я ничего не вижу!"),
-                         GET_SEX(ch, "Хозяин", "Хозяин", "Хозяйка"));
+                tell_raw(ch, pet, _("%s, я ничего не вижу!"), master);
             } else if (eyes_darkened(pet)) {
-                tell_raw(ch, pet, _("%s, тут слишком темно, я ничего не вижу!"),
-                         GET_SEX(ch, "Хозяин", "Хозяин", "Хозяйка"));
+                tell_raw(ch, pet, _("%s, тут слишком темно, я ничего не вижу!"), master);
             } else {
                 tell_raw(ch, pet, _("%s, я нахожусь в {hh%s{hx - %s"),
-                         GET_SEX(ch, "Хозяин", "Хозяин", "Хозяйка"),
-                         pet->in_room->areaName().c_str(), pet->in_room->getName());
-            } 
+                         master,
+                         pet->in_room->areaName(lang).c_str(), pet->in_room->getName(lang));
+            }
         } else {
             ch->pecho(_("Твой питомец не в состоянии ответить на твой вопрос.")); // dumb wording, for debugging
         }
