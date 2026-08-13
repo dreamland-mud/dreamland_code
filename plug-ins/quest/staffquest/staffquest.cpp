@@ -172,8 +172,8 @@ bool StaffScenario::applicable( PCharacter *pch )  const
 void StaffScenario::onQuestStart( PCharacter *pch, NPCharacter *questman ) const
 {
     if (msg.empty( ))
-        tell_raw( pch, questman, _("Из королевской сокровищницы похитили {W%s{G!"), 
-                  shortDesc.ruscase( '4' ).c_str( ) );
+        tell_raw( pch, questman, _("Из королевской сокровищницы похитили {W%s{G!"),
+                  shortDesc.getForLang( viewerLang( pch ) ).ruscase( '4' ).c_str( ) );
     else
         tell_raw( pch, questman, msg.c_str( ) );
 }

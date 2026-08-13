@@ -219,7 +219,9 @@ void LocateQuest::scatterItems( PCharacter *pch, Room *endPoint, NPCharacter *cu
         throw QuestCannotStartException( );
     
     const LSItemData &itemScen = scen.items[number_range( 0, scen.items.size( ) - 1 )];
-    itemName = itemScen.shortDesc;
+    // itemName/itemMltName are still single-language here; take the Russian slot
+    // so this stays byte-identical until LocateQuest's own fields go trilingual.
+    itemName.setValue( itemScen.shortDesc.getForLang( LANG_DEFAULT ) );
     itemMltName = itemScen.shortMlt;
 
     pObjIndex = get_obj_index( LocateQuestRegistrator::getThis( )->itemVnum );
