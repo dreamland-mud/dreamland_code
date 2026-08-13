@@ -81,8 +81,30 @@ CLAN(hunter);
 CLAN(lion);
 CLAN(flowers);
 
+/** Stamp the "this trap is armed" description onto a trap object.
+ *
+ * The text comes from `activeDescription`, a single-language field in the area
+ * XML, so only the Russian slot can be filled from it. The other two are blanked
+ * on purpose: an empty per-language slot falls through to the prototype's own
+ * translated description, which is what EN and UA readers saw before anything
+ * ever wrote those slots.
+ *
+ * Blanking is what keeps a re-armed trap honest. The sprung-snare and emptied-pit
+ * paths write all three languages; without this, an object that was sprung and
+ * then set again would show the armed text in Russian and the sprung text in
+ * English and Ukrainian for the rest of its life.
+ */
+static void set_trap_active_description( Object *obj, const DLString &descr )
+{
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        obj->setDescription( lang == LANG_DEFAULT ? descr : DLString::emptyString, lang );
+    }
+}
+
 /*--------------------------------------------------------------------------
- * Hunter's Clan Guard 
+ * Hunter's Clan Guard
  *-------------------------------------------------------------------------*/
 void ClanGuardHunter::actPush( PCharacter *wch )
 {
@@ -813,7 +835,7 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
     obj_to_room( obj, ch->in_room );
     REMOVE_BIT( obj->wear_flags, ITEM_TAKE );
     obj->timer = ch->getPC( )->getClanLevel( ) * 5;
-    obj->setDescription( activeDescription.getValue( ), LANG_DEFAULT );
+    set_trap_active_description( obj, activeDescription.getValue( ) );
     
     activated = true;
     victimName = victim->getName( );
@@ -972,7 +994,7 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
     obj_to_room( obj, ch->in_room );
     obj->timer = 24 * 60;
     REMOVE_BIT( obj->wear_flags, ITEM_TAKE );
-    obj->setDescription( activeDescription.getValue( ), LANG_DEFAULT );
+    set_trap_active_description( obj, activeDescription.getValue( ) );
     
     activated = true;
     ownerName = ch->getNameC( );
@@ -1410,7 +1432,7 @@ void HunterPitTrap::setReady( Character *ch )
     ownerName = ch->getNameC( );
     ownerLevel = ch->getModifyLevel( );
     quality = gsn_hunter_pit->getEffective( ch );
-    obj->setDescription( activeDescription.getValue( ), LANG_DEFAULT );
+    set_trap_active_description( obj, activeDescription.getValue( ) );
     obj->timer = 60 * 24;
 }
 
