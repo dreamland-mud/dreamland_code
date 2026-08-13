@@ -807,10 +807,11 @@ void PersonalNameRepair::eventItemRead( const ItemReadEvent &event ) const
 
         if (!adjective) {
             // No adjective means the item was renamed and its Russian slot holds
-            // custom text, not an engraving -- 36 of these exist, restrung before
-            // XMLAttributeRestring::apply learned to write every language. There
-            // is nothing to translate, so mirror Russian into the empty slots,
-            // exactly as a restring does today. Leaving them empty is not neutral:
+            // custom text, not an engraving. Dozens of these exist, all restrung
+            // before XMLItemRestring::dress learned to write every language
+            // (2026-07-24). There is nothing to translate in a custom name, so
+            // mirror Russian into the empty slots, exactly as a restring does
+            // today. Leaving them empty is not neutral:
             // display falls through to the PROTOTYPE, and the prototype is a
             // template, so the reader gets a raw "%s".
             const DLString &restrung = obj->getRealShortDescr(LANG_DEFAULT);
