@@ -75,8 +75,11 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
 
     assign<PatientBehavior>( patient );
     save_mobs( patient->in_room );
-    // Every language, so info() answers in the reader's own; an untranslated
-    // slot stays empty and getForLang() falls back to Russian when read.
+    // Capture the name per language so info() answers in the reader's own.
+    // What lands in a slot is firstNonEmpty(instance, prototype, lang), so an
+    // untranslated language yields either Russian (a dressed item, whose slots
+    // PR #982 mirrored) or nothing. getForLang() on read covers both, and
+    // nothing can render blank.
     for (int l = LANG_MIN; l < LANG_MAX; l++) {
         lang_t lang = (lang_t)l;
 
