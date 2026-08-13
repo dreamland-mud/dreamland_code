@@ -62,8 +62,16 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
         return;
     }
 
-    DLString so = Morphology::preposition_with(scroll->getShortDescr(LANG_DEFAULT));
-    
+    // The preposition has to agree with the scroll's name, so it is chosen once
+    // per language against that language's own name. The room broadcast below
+    // carries all three through a %w LangText and the formatter picks one per
+    // recipient; the messages to the reciter alone just take their own.
+    DLString soEn = Morphology::preposition_with(LANG_EN, scroll->getShortDescr(LANG_EN));
+    DLString soRu = Morphology::preposition_with(LANG_RU, scroll->getShortDescr(LANG_RU));
+    DLString soUa = Morphology::preposition_with(LANG_UA, scroll->getShortDescr(LANG_UA));
+    LangText soLang { soEn.c_str(), soRu.c_str(), soUa.c_str() };
+    DLString so = soLang.get(viewerLang(ch));
+
     if (t->error != 0) {
         switch (t->error) {
         case TARGET_ERR_CAST_ON_WHOM:
@@ -80,7 +88,7 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
         return;
     }
 
-    ch->recho(_("%^C1 зачитывает заклинание %s %O2."), ch, so.c_str(), scroll);
+    ch->recho(_("%^C1 зачитывает заклинание %w %O2."), ch, &soLang, scroll);
     ch->pecho(_("Ты зачитываешь одно из заклинаний %s %O2."), so.c_str(), scroll);
 
     successfulTargets++;

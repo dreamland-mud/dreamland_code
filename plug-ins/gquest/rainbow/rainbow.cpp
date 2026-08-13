@@ -273,23 +273,28 @@ void RainbowGQuest::getQuestDescription( std::ostringstream &str, Character *vie
     if (isHidden( ))
         return;
 
+    // Everything on the participant lines below was Russian for every reader:
+    // fmt(0, ...) discarded the viewer, so even the frame -- which the catalog
+    // does translate -- came out in the source language, and the mob, room and
+    // zone names went in undeclined for anyone else.
+    lang_t lang = viewerLang( viewer );
+
     str << _( getScenario( )->getInfoMsg( ) ).getMessage( viewer ) << endl << endl;
-    
+
     for (ch = char_list; ch; ch = ch->next) {
         if (!ch->is_npc( ))
             continue;
-        
+
         mob = ch->getNPC( );
 
         if (!mob->behavior || !mob->behavior.getDynamicPointer<RainbowMob>( ))
             continue;
-        
-        
-        str << fmt(0, _("%s%-30s%s из %s%s"),
-                     GQChannel::NORMAL, ch->getNameP( '1' ).c_str( ), 
-                     GQChannel::NORMAL, ch->in_room->getName(), GQChannel::NORMAL);
+
+        str << fmt(viewer, _("%s%-30s%s из %s%s"),
+                     GQChannel::NORMAL, ch->getNameP( '1', lang ).c_str( ),
+                     GQChannel::NORMAL, ch->in_room->getName(lang), GQChannel::NORMAL);
         if (t <= 5)
-            str << " ({hh" << ch->in_room->areaName() << "{hx)" << GQChannel::NORMAL;
+            str << " ({hh" << ch->in_room->areaName(lang) << "{hx)" << GQChannel::NORMAL;
         
         str << endl;
     }

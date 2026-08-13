@@ -215,7 +215,51 @@ DLString Morphology::preposition_with(const DLString &noun)
     return s;
 }
 
-DLString Syntax::noun(const DLString &phrase) 
+// Ukrainian euphony has the same shape as the Russian rule above -- the
+// preposition grows a vowel in front of a consonant cluster -- but not the same
+// letters. The pravopys list is з, с, ц, ч, ш, щ; the Russian twin's ж is not
+// in it, and ц and ч are. is_consonant() covers the Cyrillic consonants both
+// alphabets share, which is every letter that can realistically follow one of
+// these; the letters unique to Ukrainian (і, ї, є) are vowels and correctly
+// fall through.
+static DLString preposition_with_ua(const DLString &noun)
+{
+    DLString s = "з", so = "зі";
+    DLString n = noun.toLower();
+
+    if (n.empty())
+        return s;
+
+    char firstLetter = n.at(0);
+    if (firstLetter == 'щ')
+        return so;
+
+    if (n.size() <= 1)
+        return s;
+
+    char nextLetter = n.at(1);
+    if (firstLetter == 'з' || firstLetter == 'с' || firstLetter == 'ц'
+        || firstLetter == 'ч' || firstLetter == 'ш')
+        if (is_consonant(nextLetter))
+            return so;
+
+    return s;
+}
+
+DLString Morphology::preposition_with(lang_t lang, const DLString &noun)
+{
+    switch (lang) {
+    case LANG_EN:
+        // English has no euphonic variant to choose; the noun is irrelevant.
+        return "from";
+    case LANG_UA:
+        return preposition_with_ua(noun);
+    default:
+        return preposition_with(noun);
+    }
+}
+
+DLString Syntax::noun(const DLString &phrase)
 {
     StringList words(phrase.colourStrip().toLower());
     if (words.empty())

@@ -187,9 +187,9 @@ void MKey::doShow( Character *ch, DLString &arguments )
             continue;
         }
         
-        ch->pecho( "[%-4d] %-25N1 [%s]", 
-                    vnum, 
-                    pKeyIndex->getShortDescr(LANG_DEFAULT),
+        ch->pecho( "[%-4d] %-25N1 [%s]",
+                    vnum,
+                    pKeyIndex->getShortDescr(viewerLang(ch)),
                     String::toString(pKeyIndex->keyword).c_str() );
     }
 }
@@ -199,18 +199,43 @@ void MKey::usage( Character *ch )
 {
     std::basic_ostringstream<char> buf;
 
-    buf << "{Wключи список{w" << endl
-        << "     - показать список твоих ключей" << endl
-        << "{Wключи купить{w <имя ключа>" << endl
-        << "     - приобрести ключ" << endl;
-    
-    if (ch->is_immortal( )) 
-        buf << "{Wключи показать{w <victim>" << endl
-            << "     - показать список ключей жертвы" << endl
-            << "{Wключи дать{w <victim> <key vnum>" << endl
-            << "     - дать ключ с заданным внумом жертве" << endl
-            << "{Wключи забрать{w <victim> <key vnum>" << endl
-            << "     - забрать ключ" << endl;
+    lang_t lang = viewerLang( ch );
+
+    // Command name from the command table, sub-commands from the 'grammar'
+    // synonyms arg_is() matches against, so every word printed here is a word
+    // this viewer can actually type.
+    DLString cmd = getNameFor( lang );
+    DLString argList = lmsg( lang, "list", "список", "список" );
+    DLString argBuy = lmsg( lang, "buy", "купить", "купити" );
+    DLString argShow = lmsg( lang, "show", "показать", "показати" );
+    DLString argGive = lmsg( lang, "give", "дать", "дати" );
+    DLString argRemove = lmsg( lang, "remove", "забрать", "забрати" );
+    DLString argVictim = lmsg( lang, "<victim>", "<жертва>", "<жертва>" );
+    DLString argKeyName = lmsg( lang, "<key name>", "<имя ключа>", "<назва ключа>" );
+    DLString argKeyVnum = lmsg( lang, "<key vnum>", "<внум ключа>", "<внум ключа>" );
+
+    buf << "{W" << cmd << " " << argList << "{w" << endl
+        << "     - " << lmsg( lang, "show the list of your keys",
+                                    "показать список твоих ключей",
+                                    "показати список твоїх ключів" ) << endl
+        << "{W" << cmd << " " << argBuy << "{w " << argKeyName << endl
+        << "     - " << lmsg( lang, "buy a key",
+                                    "приобрести ключ",
+                                    "придбати ключ" ) << endl;
+
+    if (ch->is_immortal( ))
+        buf << "{W" << cmd << " " << argShow << "{w " << argVictim << endl
+            << "     - " << lmsg( lang, "show someone else's keys",
+                                        "показать список ключей жертвы",
+                                        "показати список ключів жертви" ) << endl
+            << "{W" << cmd << " " << argGive << "{w " << argVictim << " " << argKeyVnum << endl
+            << "     - " << lmsg( lang, "give the key with this vnum to the victim",
+                                        "дать ключ с заданным внумом жертве",
+                                        "дати ключ із заданим внумом жертві" ) << endl
+            << "{W" << cmd << " " << argRemove << "{w " << argVictim << " " << argKeyVnum << endl
+            << "     - " << lmsg( lang, "take the key away",
+                                        "забрать ключ",
+                                        "забрати ключ" ) << endl;
 
     ch->send_to( buf );
 }
@@ -238,7 +263,10 @@ void MansionKeyMaker::toStream( Character *client, ostringstream &buf )
         if (!pKeyIndex) 
             LogStream::sendError( ) << "Wrong key vnum " << vnum << " for character " << client->getNameC( ) << endl;
         else        
-            buf << "     * " << russian_case( pKeyIndex->getShortDescr(LANG_DEFAULT), '1' )
+            // russian_case() just picks a segment out of a Flexer pad, so it is
+            // the identity on an English name and collapses a Ukrainian one the
+            // same way it does a Russian one.
+            buf << "     * " << russian_case( pKeyIndex->getShortDescr(viewerLang(client)), '1' )
                 << " ({c" << String::toString(pKeyIndex->keyword) << "{x)" << endl;
     }
 }
