@@ -207,8 +207,15 @@ bool obj_owner_allows( Object *obj, Character *ch )
 
 /*
  * Someone is holding an item they may not own: put it back on the floor.
- * Mobs are turned away without a word -- they have no business carrying named
- * items, and a scavenger announcing it in every room would be noise.
+ *
+ * Mobs get no room echo -- a scavenger announcing this everywhere would be
+ * noise. The master of a charmed follower is a different matter: the scavenger
+ * AI already refuses owned objects before it ever calls 'get' (can_take_obj,
+ * plug-ins/ai/specials.cpp gates both pickup paths), so a follower holds a
+ * named item only because its master put it there, and dropping it in silence
+ * reads as the item vanishing for no reason. echo_master speaks only while the
+ * master is actually issuing an order, which is exactly that case; giving is
+ * refused earlier, in give_obj_char.
  */
 bool obj_owner_enforce( Object *obj, Character *ch )
 {
@@ -223,6 +230,8 @@ bool obj_owner_enforce( Object *obj, Character *ch )
     if (!ch->is_npc()) {
         ch->pecho( _("Ты не можешь владеть %1$O5 и бросаешь %1$P2."), obj );
         ch->recho( _("%2$^C1 не может владеть %1$O5 и бросает %1$P2."), obj, ch );
+    } else {
+        echo_master( ch, _("Ты не можешь владеть %1$O5 и бросаешь %1$P2."), obj );
     }
 
     obj_from_char( obj );
