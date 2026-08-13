@@ -328,14 +328,72 @@ SKILL_RUNP( shoot )
 
 
 
+/* How a coloured arrow presents itself, in all three languages.
+ *
+ * These used to be Russian-only strings formatted into the prototype with "%s",
+ * but limbo object 6 has no "%s" in its keyword, short descr or description --
+ * the {1 and {2 in its short descr are colour-push/pop tags, not placeholders --
+ * so fmt() handed the template straight back and every arrow a ranger made came
+ * out named, and targetable, as a plain wooden one. The colour word is written
+ * here instead. The keyword is PREPENDED to the prototype's own list rather than
+ * replacing it, so "get arrow" keeps working and the only change to targeting is
+ * that "get green arrow" now hits. A plain wooden arrow is left entirely to the
+ * prototype, which is what it already rendered as.
+ */
+struct ArrowLook {
+    LangText keyword;
+    LangText shortDescr;
+    LangText description;
+};
+
+static const ArrowLook ARROW_GREEN = {
+    { "green ", "зеленая ", "зелена " },
+    { "{1{Ga green arrow{2",
+      "{1{Gзелен|ая|ой|ой|ую|ой|ой {2стрел|а|ы|е|у|ой|е",
+      "{1{Gзелен|а|ої|ій|у|ою|ій {2стріл|а|и|і|у|ою|і" },
+    { "A green arrow lies on the ground.",
+      "Зеленая стрела лежит на земле.",
+      "Зелена стріла лежить на землі." }
+};
+
+static const ArrowLook ARROW_RED = {
+    { "red ", "красная ", "червона " },
+    { "{1{Ra red arrow{2",
+      "{1{Rкрасн|ая|ой|ой|ую|ой|ой {2стрел|а|ы|е|у|ой|е",
+      "{1{Rчервон|а|ої|ій|у|ою|ій {2стріл|а|и|і|у|ою|і" },
+    { "A red arrow lies on the ground.",
+      "Красная стрела лежит на земле.",
+      "Червона стріла лежить на землі." }
+};
+
+static const ArrowLook ARROW_WHITE = {
+    { "white ", "белая ", "біла " },
+    { "{1{Wa white arrow{2",
+      "{1{Wбел|ая|ой|ой|ую|ой|ой {2стрел|а|ы|е|у|ой|е",
+      "{1{Wбіл|а|ої|ій|у|ою|ій {2стріл|а|и|і|у|ою|і" },
+    { "A white arrow lies on the ground.",
+      "Белая стрела лежит на земле.",
+      "Біла стріла лежить на землі." }
+};
+
+static const ArrowLook ARROW_BLUE = {
+    { "blue ", "голубая ", "блакитна " },
+    { "{1{Ca blue arrow{2",
+      "{1{Cголуб|ая|ой|ой|ую|ой|ой {2стрел|а|ы|е|у|ой|е",
+      "{1{Cблакитн|а|ої|ій|у|ою|ій {2стріл|а|и|і|у|ою|і" },
+    { "A blue arrow lies on the ground.",
+      "Голубая стрела лежит на земле.",
+      "Блакитна стріла лежить на землі." }
+};
+
 /*
- * 'make arrow' skill 
+ * 'make arrow' skill
  */
 static Object * create_arrow( int color, int level )
 {
     Object *arrow;
     Affect tohit, todam;
-    const char *str_long, *str_short, *str_name;
+    const ArrowLook *look = 0;
 
     arrow = create_object(get_obj_index(OBJ_VNUM_RANGER_ARROW), 0 );
     arrow->level = level;
@@ -368,36 +426,28 @@ static Object * create_arrow( int color, int level )
         if ( color == gsn_green_arrow )
         {
             saf.bitvector.setValue(WEAPON_POISON);
-            str_name = "green зеленая";
-            str_long = "{GЗеленая";
-            str_short = "{Gзелен|ая|ой|ой|ую|ой|ой";
+            look = &ARROW_GREEN;
             arrow->value1(4 + level / 12);
             arrow->value2(4 + level / 10);
         }
         else if (color == gsn_red_arrow)
         {
             saf.bitvector.setValue(WEAPON_FLAMING);
-            str_name = "red красная";
-            str_long = "{RКрасная";
-            str_short = "{Rкрасн|ая|ой|ой|ую|ой|ой";
+            look = &ARROW_RED;
             arrow->value1(4 + level / 15);
             arrow->value2(4 + level / 30);
         }
         else if (color == gsn_white_arrow)
         {
             saf.bitvector.setValue(WEAPON_FROST);
-            str_name = "white белая";
-            str_long = "{WБелая";
-            str_short = "{Wбел|ая|ой|ой|ую|ой|ой";
+            look = &ARROW_WHITE;
             arrow->value1(4 + level / 15);
             arrow->value2(4 + level / 30);
         }
         else
         {
             saf.bitvector.setValue(WEAPON_SHOCKING);
-            str_name = "blue голубая";
-            str_long = "{CГолубая";
-            str_short = "{Cголуб|ая|ой|ой|ую|ой|ой";
+            look = &ARROW_BLUE;
             arrow->value1(4 + level / 15);
             arrow->value2(4 + level / 30);
         }
@@ -406,20 +456,22 @@ static Object * create_arrow( int color, int level )
     }
     else
     {
-        str_name = "wooden деревянная";
-        str_long = "{yДеревянная";
-        str_short = "{yдеревянн|ая|ой|ой|ую|ой|ой";
         arrow->value1(4 + level / 12);
         arrow->value2(4 + level / 10);
     }
 
     arrow->timer = Date::SECOND_IN_WEEK;
 
-    DLString kw = String::toString(arrow->getKeyword());
-    arrow->setKeyword( fmt(0, kw.c_str(), str_name ).c_str());
-    arrow->setShortDescr( fmt(0, arrow->getShortDescr(LANG_DEFAULT).c_str(), str_short ), LANG_DEFAULT);        
-    arrow->setDescription( fmt(0, arrow->getDescription(LANG_DEFAULT).c_str(), str_long ), LANG_DEFAULT);        
-    
+    if (look) {
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+
+            arrow->setKeyword( DLString(look->keyword.get(lang)) + arrow->getKeyword(lang), lang );
+            arrow->setShortDescr( look->shortDescr.get(lang), lang );
+            arrow->setDescription( look->description.get(lang), lang );
+        }
+    }
+
     return arrow;
 }
 

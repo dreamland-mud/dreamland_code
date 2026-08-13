@@ -1012,7 +1012,15 @@ void HunterSnareTrap::greet( Character *victim )
     obj_to_char( obj, victim );
     equip_char( victim, obj, wear_hold_leg );
     SET_BIT(obj->wear_flags, ITEM_TAKE);
-    obj->setDescription( fmt(0, _("Разломанный %s лежит тут."), obj->getShortDescr( '1', LANG_DEFAULT ).c_str( )), LANG_DEFAULT );
+    // A sprung snare keeps this description until it decays, so a LANG_DEFAULT-only
+    // write left it Russian for EN and UA viewers. The catalog already carries both
+    // translations; take the trap's own name in the same language as the frame.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        obj->setDescription( fmtLang(lang, _("Разломанный %s лежит тут."),
+                                     obj->getShortDescr( '1', lang ).c_str( )), lang );
+    }
+
     obj->timer = 24;
     activated = false;
     
@@ -1433,9 +1441,16 @@ bool HunterPitTrap::isFresh( ) const
 
 void HunterPitTrap::setDescription( )
 {
-    obj->setDescription( 
-            fmt(0, _("В земле вырыта яма %s размера."), 
-            size_table.message(URANGE( SIZE_TINY, getSize( ), SIZE_GARGANTUAN ), '2' ).c_str( )), LANG_DEFAULT );
+    // The size word came out of size_table with no language argument, so even the
+    // wrapped frame was glued to a Russian noun; and only LANG_DEFAULT was written.
+    // Both halves now follow the viewer's language. EN has no size_table override
+    // and falls back to the bit name (tiny/small/...), which is already English.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        obj->setDescription(
+                fmtLang(lang, _("В земле вырыта яма %s размера."),
+                size_table.message(URANGE( SIZE_TINY, getSize( ), SIZE_GARGANTUAN ), '2', lang ).c_str( )), lang );
+    }
 }
 
 /*

@@ -599,9 +599,6 @@ SKILL_RUNP( forge )
      */
     if (( key = get_obj_list_type( ch, arg, ITEM_KEY, ch->carrying ))) {
         Object *dup;
-        static const char * DUP_NAMES = "дубликат duplicate %s";
-        static const char * DUP_SHORT = "дубликат||а|у||ом|е %s";
-        static const char * DUP_LONG  = "Дубликат %s лежит тут.";
 
         if (!( keyhole = Keyhole::locate( ch, key ) )) {
             ch->pecho( _("Непонятно, что же открывает этот ключ.") );
@@ -629,10 +626,33 @@ SKILL_RUNP( forge )
 
         dup = create_object( key->pIndexData, 0 );
         dup->gram_gender = Grammar::MultiGender::MASCULINE;
-        DLString kw = String::toString(key->getKeyword());
-        dup->setKeyword( fmt(0, DUP_NAMES, kw.c_str()) );
-        dup->setShortDescr( fmt(0, DUP_SHORT, key->getShortDescr( '2', LANG_DEFAULT ).c_str( ) ), LANG_DEFAULT);
-        dup->setDescription( fmt(0, DUP_LONG, key->getShortDescr( '2', LANG_DEFAULT ).c_str( ) ), LANG_DEFAULT);
+
+        // A forged duplicate is named after the key it copies, and all three
+        // strings were written to LANG_DEFAULT only, so EN and UA thieves carried
+        // a Russian item for the rest of its life. The keyword went through the
+        // single-argument setKeyword(), which re-splits a flattened list by
+        // alphabet: Latin words to EN, Cyrillic to RU, nothing to UA. Write each
+        // language from the source key's own name in that language instead. Every
+        // token the old flattened list held still lives in one slot or another,
+        // and matchesUnstrict scans them all, so targeting only widens.
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+            DLString keyName = key->getShortDescr( '2', lang );
+
+            // getShortDescr(case, lang) drops back to LANG_DEFAULT on its own;
+            // getKeyword(lang) does not, so an old key with no UA keyword would
+            // otherwise leave the duplicate with a bare "дублікат" to aim at.
+            DLString keyWords = key->getKeyword( lang );
+            if (keyWords.empty())
+                keyWords = key->getKeyword( LANG_DEFAULT );
+
+            dup->setKeyword( fmtLang(lang, _("дубликат %s"),
+                                     keyWords.c_str()), lang );
+            dup->setShortDescr( fmtLang(lang, _("дубликат||а|у||ом|е %s"),
+                                        keyName.c_str()), lang );
+            dup->setDescription( fmtLang(lang, _("Дубликат %s лежит тут."),
+                                         keyName.c_str()), lang );
+        }
         dup->setMaterial( blank->getMaterial( ) );
         dup->wear_flags  = blank->wear_flags;
         dup->extra_flags = blank->extra_flags;
@@ -654,11 +674,6 @@ SKILL_RUNP( forge )
      * create lockpick for a keyhole
      */
     if (( keyhole = Keyhole::create( ch, arg ) )) {
-        static const char * LOCK_NAMES = "отмычка lockpick";
-        static const char * LOCK_SHORT = "фирменн|ая|ой|ой|ую|ой|ой отмычк|а|и|е|у|ой|е %1$#^C2";
-        static const char * LOCK_LONG  = "Фирменная отмычка (lockpick) %1$#^C2 оставлена тут хозя%1$#Gином|ином|йкой.";
-        static const char * LOCK_EXTRA = "Эта отмычка из 'Фирменного набора %1$#^C2' подходит для замка:\n%2$N2\n";
-
         if (!keyhole->isLockable( )) {
             ch->pecho( _("Здесь нет замочной скважины.") );
             return;
@@ -681,13 +696,41 @@ SKILL_RUNP( forge )
         oldact(_("$o1 в твоих умелых руках постепенно превращается в отмычку для $N2."), ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
         oldact(_("$c1 проделывает манипуляции с $o5."), ch, blank, 0, TO_ROOM );
 
-        // TODO multi-language descriptions
+        // A branded lockpick keeps its owner's name for good, so the old
+        // LANG_DEFAULT-only write meant an EN or UA thief carried a Russian item
+        // and read a Russian extra description every time they looked at it.
+        // setKeyword() with one argument also splits the flattened list by
+        // alphabet and never fills UA, so "відмичка" was untypeable.
         blank->gram_gender = Grammar::MultiGender::FEMININE;
-        blank->setKeyword( LOCK_NAMES );
-        blank->setShortDescr( fmt( 0, LOCK_SHORT, ch ), LANG_DEFAULT );
-        blank->setDescription( fmt( 0, LOCK_LONG, ch ), LANG_DEFAULT );
-        DLString keyholeDescr = fmt(0, LOCK_EXTRA, ch, keyhole->getDescription().c_str());
-        blank->addProperDescription()->description[LANG_DEFAULT] = keyholeDescr;
+
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+
+            blank->setKeyword( lmsg(lang, "lockpick", "отмычка", "відмичка"), lang );
+        }
+
+        // The keyword has to be complete before this: addProperDescription()
+        // stamps the object's whole keyword list onto the new extra description,
+        // and that is what `look отмычка` matches against later.
+        ExtraDescription *ed = blank->addProperDescription();
+
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+
+            // ItemKeyhole and ExtraExitKeyhole name the lock through
+            // viewerLang(), so force the scope to get the lock's name in the
+            // same language as the sentence around it. (DoorKeyhole builds its
+            // text from Russian literals and stays Russian either way.)
+            ForcedViewerLang scope(lang);
+
+            blank->setShortDescr( fmtLang( lang,
+                _("фирменн|ая|ой|ой|ую|ой|ой отмычк|а|и|е|у|ой|е %1$#^C2"), ch ), lang );
+            blank->setDescription( fmtLang( lang,
+                _("Фирменная отмычка (lockpick) %1$#^C2 оставлена тут хозя%1$#Gином|ином|йкой."), ch ), lang );
+            ed->description[lang] = fmtLang( lang,
+                _("Эта отмычка из 'Фирменного набора %1$#^C2' подходит для замка:\n%2$N2\n"),
+                ch, keyhole->getDescription().c_str() );
+        }
 
         blank->value0(keyhole->getLockType( ));
         blank->value1(50 + gsn_key_forgery->getEffective( ch ) / 2);
