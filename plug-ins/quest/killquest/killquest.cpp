@@ -63,9 +63,19 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
     setTime( pch, time );
     
     pRoom = victim->in_room;
-    roomName.setValue( pRoom->getName() );
-    areaName.setValue( pRoom->areaName() );
-    mobName.setValue( victim->getShortDescr(LANG_DEFAULT) );
+
+    // Capture the name per language so info() answers in the reader's own.
+    // What lands in a slot is firstNonEmpty(instance, prototype, lang), so an
+    // untranslated language yields either Russian (a dressed item, whose slots
+    // PR #982 mirrored) or nothing. getForLang() on read covers both, and
+    // nothing can render blank.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        roomName[lang] = pRoom->getName( lang );
+        areaName[lang] = pRoom->areaName( lang );
+        mobName[lang] = victim->getShortDescr( lang );
+    }
 
     wiznet( "", "%s [%d] Lev %d, Qmode %d",
                  victim->getNameP('1').c_str( ),
@@ -87,8 +97,9 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
         tell_fmt( _("В этом винов%3$Gно|ен|на {W%3$#C1{G, я поручаю тебе наказать %3$P2."),  pch, questman, victim );
     }
 
-    tell_fmt( _("Место, где %3$P2 видели в последний раз - {W%4$s{G!"),  pch, questman, victim, pRoom->getName() );
-    tell_fmt( _("Это находится в районе под названием {W{hh%3$s{hx{G."),  pch, questman, pRoom->areaName().c_str() );
+    lang_t lang = viewerLang( pch );
+    tell_fmt( _("Место, где %3$P2 видели в последний раз - {W%4$s{G!"),  pch, questman, victim, pRoom->getName( lang ) );
+    tell_fmt( _("Это находится в районе под названием {W{hh%3$s{hx{G."),  pch, questman, pRoom->areaName( lang ).c_str() );
     tell_fmt( _("У тебя есть {Y%3$d{G мину%3$Iта|ты|т на выполнение задания."),  pch, questman, time );
 }
 
@@ -157,22 +168,32 @@ QuestReward::Pointer KillQuest::reward( PCharacter *ch, NPCharacter *questman )
 
 void KillQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
-    if (isComplete( ))
-        buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-            << "Вернись за вознаграждением, до того как выйдет время!" << endl;
-    else 
-        buf << "У тебя задание - уничтожить " << russian_case( mobName, '4' ) << "!" << endl
-            << "Место, где жертву видели в последний раз - " << roomName << endl
-            << "Это находится в районе под названием {hh" << areaName << "{hx." << endl;
+    if (isComplete( )) {
+        infoComplete( buf, ch );
+        return;
+    }
+
+    lang_t lang = viewerLang( ch );
+    buf << fmt( ch, _("У тебя задание - уничтожить %1$s!"),
+                russian_case( mobName.getForLang( lang ), '4' ).c_str( ) ) << endl
+        << fmt( ch, _("Место, где жертву видели в последний раз - %1$s"),
+                roomName.getForLang( lang ).c_str( ) ) << endl
+        << fmt( ch, _("Это находится в районе под названием {hh%1$s{hx."),
+                areaName.getForLang( lang ).c_str( ) ) << endl;
 }
 
 void KillQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
-    if (isComplete( ))
-        buf << "Вернуться к квестору за наградой.";
-    else 
-        buf << "Уничтожить " << russian_case( mobName, '4' ) << " из "
-            << roomName << " (" << areaName << ").";
+    if (isComplete( )) {
+        shortInfoComplete( buf, ch );
+        return;
+    }
+
+    lang_t lang = viewerLang( ch );
+    buf << fmt( ch, _("Уничтожить %1$s из %2$s (%3$s)."),
+                russian_case( mobName.getForLang( lang ), '4' ).c_str( ),
+                roomName.getForLang( lang ).c_str( ),
+                areaName.getForLang( lang ).c_str( ) );
 }
 
 Room * KillQuest::helpLocation( )

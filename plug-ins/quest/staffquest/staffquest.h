@@ -7,6 +7,7 @@
 #define STAFFQUEST_H
 
 #include "questmodels.h"
+#include "xmlmultistring.h"
 #include "questmodels-impl.h"
 #include "questregistrator.h"
 #include "questscenario.h"
@@ -26,9 +27,9 @@ public:
     virtual QuestReward::Pointer reward( PCharacter *, NPCharacter * );
     virtual void destroy( );
 
-    XML_VARIABLE XMLString roomName;
-    XML_VARIABLE XMLString areaName;
-    XML_VARIABLE XMLString objName;
+    XML_VARIABLE XMLMultiString roomName;
+    XML_VARIABLE XMLMultiString areaName;
+    XML_VARIABLE XMLMultiString objName;
     XML_VARIABLE XMLString scenName;
 
 protected:

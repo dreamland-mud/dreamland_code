@@ -7,6 +7,7 @@
 #define KILLQUEST_H
 
 #include "questmodels.h"
+#include "xmlmultistring.h"
 #include "questmodels-impl.h"
 
 #include "xmlshort.h"
@@ -28,9 +29,9 @@ public:
     virtual void destroy( );
 
     XML_VARIABLE XMLShort mode;       
-    XML_VARIABLE XMLString roomName;       
-    XML_VARIABLE XMLString areaName;       
-    XML_VARIABLE XMLString mobName;       
+    XML_VARIABLE XMLMultiString roomName;
+    XML_VARIABLE XMLMultiString areaName;
+    XML_VARIABLE XMLMultiString mobName;
     
 protected:
     virtual bool checkMobileVictim( PCharacter *, NPCharacter * );

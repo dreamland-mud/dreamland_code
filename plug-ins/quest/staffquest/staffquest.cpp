@@ -39,9 +39,18 @@ void StaffQuest::create( PCharacter *pch, NPCharacter *questman )
         throw e;
     }
 
-    areaName = eyed->in_room->areaName();
-    roomName = eyed->in_room->getName();
-    objName  = eyed->getShortDescr(LANG_DEFAULT);
+    // Capture the name per language so info() answers in the reader's own.
+    // What lands in a slot is firstNonEmpty(instance, prototype, lang), so an
+    // untranslated language yields either Russian (a dressed item, whose slots
+    // PR #982 mirrored) or nothing. getForLang() on read covers both, and
+    // nothing can render blank.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        areaName[lang] = eyed->in_room->areaName( lang );
+        roomName[lang] = eyed->in_room->getName( lang );
+        objName[lang] = eyed->getShortDescr( lang );
+    }
     
     time = number_range( 15, 25 ); 
     setTime( pch, time );
@@ -49,13 +58,15 @@ void StaffQuest::create( PCharacter *pch, NPCharacter *questman )
     getScenario( ).onQuestStart( pch, questman );
     tell_raw( pch, questman, _("Придворные волшебники определили, где спрятано украденное сокровище.") );
     tell_raw( pch, questman, _("Тебе поручается доставить его мне!") );        
-    tell_raw( pch, questman, _("Место, где оно спрятано, называется {W%s{G"), roomName.c_str( ) );
-    tell_raw( pch, questman, _("И находится это место в районе под названием - {W{hh%s{hx{G"), areaName.c_str( ) );
+    lang_t plang = viewerLang( pch );
+    tell_raw( pch, questman, _("Место, где оно спрятано, называется {W%s{G"), roomName.getForLang( plang ).c_str( ) );
+    tell_raw( pch, questman, _("И находится это место в районе под названием - {W{hh%s{hx{G"), areaName.getForLang( plang ).c_str( ) );
     tell_raw( pch, questman, _("У тебя есть {Y%d{G минут%s на выполнение задания."),
                   time, GET_COUNT(time,"а","ы","") ); 
     
-    wiznet( scenName.c_str( ), "in room \"%s\" area \"%s\"", 
-                               roomName.c_str( ), areaName.c_str( ) );
+    wiznet( scenName.c_str( ), "in room \"%s\" area \"%s\"",
+                               roomName.get( LANG_DEFAULT ).c_str( ),
+                               areaName.get( LANG_DEFAULT ).c_str( ) );
 }
 
 bool StaffQuest::isComplete( ) 
@@ -77,22 +88,32 @@ Room * StaffQuest::helpLocation( )
 
 void StaffQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
-    if (isComplete( ))
-        buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-            << "Вернись за вознаграждением, до того как выйдет время!" << endl;
-    else 
-        buf << "У тебя задание - вернуть " << russian_case( objName.getValue( ), '4' ) << "." << endl
-            << "Место, где спрятано сокровище, называется " << roomName << "." << endl
-            << "И находится это место в районе под названием {hh" << areaName << "{hx." << endl;
+    if (isComplete( )) {
+        infoComplete( buf, ch );
+        return;
+    }
+
+    lang_t lang = viewerLang( ch );
+    buf << fmt( ch, _("У тебя задание - вернуть %1$s."),
+                russian_case( objName.getForLang( lang ), '4' ).c_str( ) ) << endl
+        << fmt( ch, _("Место, где спрятано сокровище, называется %1$s."),
+                roomName.getForLang( lang ).c_str( ) ) << endl
+        << fmt( ch, _("И находится это место в районе под названием {hh%1$s{hx."),
+                areaName.getForLang( lang ).c_str( ) ) << endl;
 }
 
 void StaffQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
-    if (isComplete( ))
-        buf << "Вернуться к квестору за наградой.";
-    else 
-        buf << "Доставить квестору " << russian_case( objName.getValue( ), '4' ) << " из "
-            << roomName << " (" << areaName << ").";
+    if (isComplete( )) {
+        shortInfoComplete( buf, ch );
+        return;
+    }
+
+    lang_t lang = viewerLang( ch );
+    buf << fmt( ch, _("Доставить квестору %1$s из %2$s (%3$s)."),
+                russian_case( objName.getForLang( lang ), '4' ).c_str( ),
+                roomName.getForLang( lang ).c_str( ),
+                areaName.getForLang( lang ).c_str( ) );
 }
 
 QuestReward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman ) 
@@ -121,8 +142,18 @@ QuestReward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman )
 
     r->exp = (r->points + r->clanpoints) * 10;
 
-    oldact(_("Ты передаешь $n4 $C3."), ch, objName.getValue( ).c_str( ), questman, TO_CHAR);
-    oldact(_("$c1 передает $n4 $C3."), ch, objName.getValue( ).c_str( ), questman, TO_ROOM);
+    // $w instead of $n4: the room broadcast reaches viewers of every language,
+    // and a plain text arg would show all of them the actor-side Russian. The
+    // accusative each language needs is picked here, once per slot, because $w
+    // substitutes a finished word rather than declining one. The three strings
+    // must outlive the synchronous oldact calls below.
+    DLString objEn = objName.getForLang( LANG_EN ).ruscase( '4' );
+    DLString objRu = objName.getForLang( LANG_RU ).ruscase( '4' );
+    DLString objUa = objName.getForLang( LANG_UA ).ruscase( '4' );
+    LangText objText = { objEn.c_str( ), objRu.c_str( ), objUa.c_str( ) };
+
+    oldact(_("Ты передаешь $w $C3."), ch, &objText, questman, TO_CHAR);
+    oldact(_("$c1 передает $w $C3."), ch, &objText, questman, TO_ROOM);
 
     return r;
 }
