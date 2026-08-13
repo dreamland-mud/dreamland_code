@@ -704,14 +704,31 @@ static int personal_arg_count( const DLString &pattern )
     return count;
 }
 
+/** True when every format spec in the pattern is a plain "%s". Counting "%s"
+ *  alone would let a prototype that grew a "%d" through as long as the "%s"
+ *  count still matched, and handing printf a string where it wants an int is
+ *  undefined. The money objects already carry "%d", so this is not imaginary. */
+static bool personal_args_all_strings( const DLString &pattern )
+{
+    for (DLString::size_type pos = pattern.find('%');
+         pos != DLString::npos;
+         pos = pattern.find('%', pos + 2))
+        if (pos + 1 >= pattern.length( ) || pattern.at(pos + 1) != 's')
+            return false;
+
+    return true;
+}
+
 /** True when this language slot still needs filling: the instance has nothing
- *  of its own and the prototype behind it is a template, not a finished name. */
+ *  of its own and the prototype behind it is a template we know how to fill. */
 static bool personal_slot_needs_repair( Object *obj, lang_t lang )
 {
     if (!obj->getRealShortDescr(lang).empty())
         return false;
 
-    return personal_arg_count( obj->pIndexData->short_descr.get(lang) ) > 0;
+    const DLString &pattern = obj->pIndexData->short_descr.get(lang);
+
+    return personal_args_all_strings( pattern ) && personal_arg_count( pattern ) > 0;
 }
 
 /** Recover which adjective was engraved on a hero item. The buyer's alignment at
@@ -801,8 +818,9 @@ void PersonalNameRepair::eventItemRead( const ItemReadEvent &event ) const
         const DLString &pattern = obj->pIndexData->short_descr.get(lang);
         DLString name = owner->getNameP( '2', lang );
 
-        // Only fill a slot whose template asks for exactly what we have, so a
-        // prototype edited later can never be fed the wrong argument count.
+        // Only fill a slot whose template asks for exactly what we have. Together
+        // with the all-strings check above, a prototype edited later can neither
+        // take the wrong number of arguments nor the wrong kind.
         int args = personal_arg_count( pattern );
 
         if (adjective && args == 2)
