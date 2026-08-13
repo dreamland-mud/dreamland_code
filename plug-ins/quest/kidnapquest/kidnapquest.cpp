@@ -129,22 +129,22 @@ void KidnapQuest::info( std::ostream &buf, PCharacter *ch )
 
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << fmt( ch, _("Тебе нужно попасть в %1$s ({hh%2$s{hx), найти там %3$s и узнать, какая помощь от тебя требуется."),
+        buf << fmt( ch, _("Тебе нужно попасть в %1$s ({hh%2$s{hx), найти там %3$N4 и узнать, какая помощь от тебя требуется."),
                     kingRoom.getForLang( lang ).c_str( ),
                     kingArea.getForLang( lang ).c_str( ),
-                    russian_case( kingName.getForLang( lang ), '4' ).c_str( ) ) << endl;
+                    kingName.getForLang( lang ).c_str( ) ) << endl;
         break;
 
     case QSTAT_MARK_RCVD:
-        buf << fmt( ch, _("Тебе нужно отыскать %1$s в местности под названием {hh%2$s{x."),
-                    russian_case( princeName.getForLang( lang ), '4' ).c_str( ),
+        buf << fmt( ch, _("Тебе нужно отыскать %1$N4 в местности под названием {hh%2$s{x."),
+                    princeName.getForLang( lang ).c_str( ),
                     princeArea.getForLang( lang ).c_str( ) ) << endl;
         break;
     
     case QSTAT_KID_FOUND:
-        buf << fmt( ch, _("Тебе необходимо отвести %1$s к %2$s."),
-                    russian_case( princeName.getForLang( lang ), '4' ).c_str( ),
-                    russian_case( kingName.getForLang( lang ), '3' ).c_str( ) ) << endl
+        buf << fmt( ch, _("Тебе необходимо отвести %1$N4 к %2$N3."),
+                    princeName.getForLang( lang ).c_str( ),
+                    kingName.getForLang( lang ).c_str( ) ) << endl
             << fmt( ch, _("Это находится в %1$s ({hh%2$s{hx)."),
                     kingRoom.getForLang( lang ).c_str( ),
                     kingArea.getForLang( lang ).c_str( ) ) << endl;
@@ -152,8 +152,8 @@ void KidnapQuest::info( std::ostream &buf, PCharacter *ch )
         
     case QSTAT_KING_ACK_WAITING:
         buf << fmt( ch, _("Твое задание почти выполнено!") ) << endl
-            << fmt( ch, _("Вернись к %1$s за благодарностью."),
-                    russian_case( kingName.getForLang( lang ), '3' ).c_str( ) ) << endl;
+            << fmt( ch, _("Вернись к %1$N3 за благодарностью."),
+                    kingName.getForLang( lang ).c_str( ) ) << endl;
         break;
 
     case QSTAT_FINISHED:
@@ -169,29 +169,29 @@ void KidnapQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << fmt( ch, _("Узнать, что случилось у %1$s в %2$s (%3$s)."),
-                    russian_case( kingName.getForLang( lang ), '2' ).c_str( ),
+        buf << fmt( ch, _("Узнать, что случилось у %1$N2 в %2$s (%3$s)."),
+                    kingName.getForLang( lang ).c_str( ),
                     kingRoom.getForLang( lang ).c_str( ),
                     kingArea.getForLang( lang ).c_str( ) );
         break;
 
     case QSTAT_MARK_RCVD:
-        buf << fmt( ch, _("Найти %1$s в %2$s."),
-                    russian_case( princeName.getForLang( lang ), '4' ).c_str( ),
+        buf << fmt( ch, _("Найти %1$N4 в %2$s."),
+                    princeName.getForLang( lang ).c_str( ),
                     princeArea.getForLang( lang ).c_str( ) );
         break;
     
     case QSTAT_KID_FOUND:
-        buf << fmt( ch, _("Отвести %1$s к %2$s в %3$s (%4$s)."),
-                    russian_case( princeName.getForLang( lang ), '4' ).c_str( ),
-                    russian_case( kingName.getForLang( lang ), '3' ).c_str( ),
+        buf << fmt( ch, _("Отвести %1$N4 к %2$N3 в %3$s (%4$s)."),
+                    princeName.getForLang( lang ).c_str( ),
+                    kingName.getForLang( lang ).c_str( ),
                     kingRoom.getForLang( lang ).c_str( ),
                     kingArea.getForLang( lang ).c_str( ) );
         break;
         
     case QSTAT_KING_ACK_WAITING:
-        buf << fmt( ch, _("Вернуться к %1$s за благодарностью."),
-                    russian_case( kingName.getForLang( lang ), '3' ).c_str( ) );
+        buf << fmt( ch, _("Вернуться к %1$N3 за благодарностью."),
+                    kingName.getForLang( lang ).c_str( ) );
         break;
 
     case QSTAT_FINISHED:
