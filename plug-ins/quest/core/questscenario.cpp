@@ -100,8 +100,6 @@ void QuestItemAppearence::dress( Object *obj ) const
     // through to the *prototype* (String::firstNonEmpty), so leaving it blank
     // would show an EN/UA reader the undressed generic item instead of the
     // quest one. Same policy XMLItemRestring::dress applies.
-    ExtraDescription *ed = extraDesc.emptyValues() ? 0 : obj->addProperDescription();
-
     for (int l = LANG_MIN; l < LANG_MAX; l++) {
         lang_t lang = (lang_t)l;
 
@@ -115,9 +113,17 @@ void QuestItemAppearence::dress( Object *obj ) const
 
         if (!desc.emptyValues( ))
             obj->setDescription( desc.getForLang(lang), lang );
+    }
 
-        if (ed)
-            ed->description[lang] = extraDesc.getForLang(lang);
+    // Only after the keyword loop. addProperDescription() stamps ed->keyword
+    // from getKeyword() at call time (object.cpp:234), so calling it earlier
+    // files the extra description under the PROTOTYPE's keywords and `look
+    // <quest name>` misses it. class_thief.cpp:712 spells out the same order.
+    if (!extraDesc.emptyValues( )) {
+        ExtraDescription *ed = obj->addProperDescription();
+
+        for (int l = LANG_MIN; l < LANG_MAX; l++)
+            ed->description[(lang_t)l] = extraDesc.getForLang((lang_t)l);
     }
 
     if (!material.empty())
