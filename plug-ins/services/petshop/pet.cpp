@@ -176,10 +176,19 @@ void Pet::config( PCharacter *client, NPCharacter *pet ) const
     if (IS_SET( pet->act, ACT_NOALIGN ))
         pet->alignment = client->alignment;
     
-    pet->setDescription( fmt(0,
-             _("%s\r\nТы понимаешь, что %s будет защищать и следовать за {C%s{x до самой смерти.\n\r"),
-             pet->getNPC( )->pIndexData->description.get(LANG_DEFAULT).c_str(),
-             pet->getNameP( '1' ).c_str( ), client->getNameP( '5' ).c_str( ) ), LANG_DEFAULT );
+    // The description is baked into the pet once, at purchase, so writing only
+    // LANG_DEFAULT left every EN and UA buyer reading Russian for the life of
+    // the pet. Compose it per language, taking the prototype description and
+    // both names in that same language. getForLang falls back to RU when a
+    // prototype has no EN/UA description, so no slot is ever left blank.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        pet->setDescription( fmtLang(lang,
+                 _("%s\r\nТы понимаешь, что %s будет защищать и следовать за {C%s{x до самой смерти.\n\r"),
+                 pet->getNPC( )->pIndexData->description.getForLang(lang).c_str(),
+                 pet->getNameP( '1', lang ).c_str( ), client->getNameP( '5', lang ).c_str( ) ), lang );
+    }
 }
 
 NPCharacter * Pet::create( PCharacter *client ) const

@@ -81,8 +81,30 @@ CLAN(hunter);
 CLAN(lion);
 CLAN(flowers);
 
+/** Stamp the "this trap is armed" description onto a trap object.
+ *
+ * The text comes from `activeDescription`, a single-language field in the area
+ * XML, so only the Russian slot can be filled from it. The other two are blanked
+ * on purpose: an empty per-language slot falls through to the prototype's own
+ * translated description, which is what EN and UA readers saw before anything
+ * ever wrote those slots.
+ *
+ * Blanking is what keeps a re-armed trap honest. The sprung-snare and emptied-pit
+ * paths write all three languages; without this, an object that was sprung and
+ * then set again would show the armed text in Russian and the sprung text in
+ * English and Ukrainian for the rest of its life.
+ */
+static void set_trap_active_description( Object *obj, const DLString &descr )
+{
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        obj->setDescription( lang == LANG_DEFAULT ? descr : DLString::emptyString, lang );
+    }
+}
+
 /*--------------------------------------------------------------------------
- * Hunter's Clan Guard 
+ * Hunter's Clan Guard
  *-------------------------------------------------------------------------*/
 void ClanGuardHunter::actPush( PCharacter *wch )
 {
@@ -813,7 +835,7 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
     obj_to_room( obj, ch->in_room );
     REMOVE_BIT( obj->wear_flags, ITEM_TAKE );
     obj->timer = ch->getPC( )->getClanLevel( ) * 5;
-    obj->setDescription( activeDescription.getValue( ), LANG_DEFAULT );
+    set_trap_active_description( obj, activeDescription.getValue( ) );
     
     activated = true;
     victimName = victim->getName( );
@@ -972,7 +994,7 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
     obj_to_room( obj, ch->in_room );
     obj->timer = 24 * 60;
     REMOVE_BIT( obj->wear_flags, ITEM_TAKE );
-    obj->setDescription( activeDescription.getValue( ), LANG_DEFAULT );
+    set_trap_active_description( obj, activeDescription.getValue( ) );
     
     activated = true;
     ownerName = ch->getNameC( );
@@ -1012,7 +1034,15 @@ void HunterSnareTrap::greet( Character *victim )
     obj_to_char( obj, victim );
     equip_char( victim, obj, wear_hold_leg );
     SET_BIT(obj->wear_flags, ITEM_TAKE);
-    obj->setDescription( fmt(0, _("Разломанный %s лежит тут."), obj->getShortDescr( '1', LANG_DEFAULT ).c_str( )), LANG_DEFAULT );
+    // A sprung snare keeps this description until it decays, so a LANG_DEFAULT-only
+    // write left it Russian for EN and UA viewers. The catalog already carries both
+    // translations; take the trap's own name in the same language as the frame.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        obj->setDescription( fmtLang(lang, _("Разломанный %s лежит тут."),
+                                     obj->getShortDescr( '1', lang ).c_str( )), lang );
+    }
+
     obj->timer = 24;
     activated = false;
     
@@ -1402,7 +1432,7 @@ void HunterPitTrap::setReady( Character *ch )
     ownerName = ch->getNameC( );
     ownerLevel = ch->getModifyLevel( );
     quality = gsn_hunter_pit->getEffective( ch );
-    obj->setDescription( activeDescription.getValue( ), LANG_DEFAULT );
+    set_trap_active_description( obj, activeDescription.getValue( ) );
     obj->timer = 60 * 24;
 }
 
@@ -1433,9 +1463,16 @@ bool HunterPitTrap::isFresh( ) const
 
 void HunterPitTrap::setDescription( )
 {
-    obj->setDescription( 
-            fmt(0, _("В земле вырыта яма %s размера."), 
-            size_table.message(URANGE( SIZE_TINY, getSize( ), SIZE_GARGANTUAN ), '2' ).c_str( )), LANG_DEFAULT );
+    // The size word came out of size_table with no language argument, so even the
+    // wrapped frame was glued to a Russian noun; and only LANG_DEFAULT was written.
+    // Both halves now follow the viewer's language. EN has no size_table override
+    // and falls back to the bit name (tiny/small/...), which is already English.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        obj->setDescription(
+                fmtLang(lang, _("В земле вырыта яма %s размера."),
+                size_table.message(URANGE( SIZE_TINY, getSize( ), SIZE_GARGANTUAN ), '2', lang ).c_str( )), lang );
+    }
 }
 
 /*

@@ -362,7 +362,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
         Affect af;
         int mirrors,new_mirrors;
         Character *tmp_vict, *gch;
-        DLString long_buf;
+        DLString long_buf[LANG_MAX];
         DLString short_buf;
 
         if (victim->is_npc())
@@ -397,8 +397,18 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
         
         tmp_vict = victim->getDoppel( );
 
-        long_buf = fmt(0, _("{W%s{x%s здесь.\n\r"),
-                tmp_vict->getNameP( '1' ).c_str(), Player::title(tmp_vict->getPC( )).c_str( ));
+        // A mirror image wears the doppelganged character's own name and title,
+        // and both were baked in Russian only, so an EN or UA viewer read a
+        // Russian title in the room list. The login name itself is one string in
+        // every language, so short_buf stays as it was.
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+                lang_t lang = (lang_t)l;
+
+                long_buf[l] = fmtLang(lang, _("{W%s{x%s здесь.\n\r"),
+                        tmp_vict->getNameP( '1', lang ).c_str(),
+                        Player::title(tmp_vict->getPC( ), lang).c_str( ));
+        }
+
         short_buf = tmp_vict->getNameC();
 
         if ( ch == victim )
@@ -424,13 +434,18 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 
                 mch = create_mobile( get_mob_index(MOB_VNUM_MIRROR_IMAGE) );
                 SET_BIT(mch->affected_by ,AFF_SNEAK);
-                // TODO copy all descriptions
-                mch->setShortDescr( short_buf, LANG_DEFAULT );
-                mch->setLongDescr( long_buf, LANG_DEFAULT );
-                mch->setDescription( tmp_vict->getDescription( ) );
-                
+
                 DLString name( tmp_vict->getNameC() );
-                mch->setKeyword( name, LANG_DEFAULT );
+
+                for (int l = LANG_MIN; l < LANG_MAX; l++) {
+                        lang_t lang = (lang_t)l;
+
+                        mch->setShortDescr( short_buf, lang );
+                        mch->setLongDescr( long_buf[l], lang );
+                        mch->setKeyword( name, lang );
+                }
+
+                mch->setDescription( tmp_vict->getDescription( ) );
                 
                 mch->setSex( tmp_vict->getSex( ) );
 
