@@ -126,7 +126,7 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
     oldact(_("$c1 оценивающе смотрит на тебя."), king, 0, hero, TO_VICT);
     oldact(_("$c1 оценивающе смотрит на $C4."), king, 0, hero, TO_NOTVICT);
     interpret_raw(king, "sigh");
-    oldact(_("$c1 говорит тебе '{GПрослыша$gло|л|ла я, что в {W{hh$t{hx{G есть один ребенок.{x"), king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
+    oldact(_("$c1 говорит тебе '{GПрослыша$gло|л|ла я, что в {W{hh$t{hx{G есть один ребенок.{x"), king, quest->princeArea.getForLang( viewerLang( hero ) ).c_str( ), hero, TO_VICT);
     oldact(_("$c1 говорит тебе '{GЗамечательный экземплярчик...{x'"), king, 0, hero, TO_VICT);
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 

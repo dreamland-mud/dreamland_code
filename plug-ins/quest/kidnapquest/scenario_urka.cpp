@@ -113,7 +113,7 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
 {
     oldact(_("$c1 говорит тебе '{GХм, пожалуй, тебе можно доверить ответственное дельце. Слухай сюды:{x"), king, 0, hero, TO_VICT);
     oldact(_("$c1 говорит тебе '{Gнедавно мусора поганые ни за что, ни про что схапали моего братишку{x"), king, 0, hero, TO_VICT);
-    oldact(_("$c1 говорит тебе '{Gи держат, насколько мне известно, в одной из тюрем в местности {W{hh$t{hx{G. Не курорт однако...{x"), king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
+    oldact(_("$c1 говорит тебе '{Gи держат, насколько мне известно, в одной из тюрем в местности {W{hh$t{hx{G. Не курорт однако...{x"), king, quest->princeArea.getForLang( viewerLang( hero ) ).c_str( ), hero, TO_VICT);
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 
 {
@@ -213,7 +213,7 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
     oldact(_("$c1 говорит тебе '{GХм, пожалуй тебе можно доверить ответственное дельце, слушай:'{x"), king, 0, hero, TO_VICT);
     oldact(_("$c1 говорит тебе '{GСовсем недавно под внеочередную облаву попал один из моих лучших головор... товарищей то есть.'{x"), king, 0, hero, TO_VICT);
     oldact(_("$c1 говорит тебе '{GУ НИХ видите ли указ вышел, чтобы камеры не пустовали.'{x"), king, 0, hero, TO_VICT);
-    oldact(_("$c1 говорит тебе '{GВот в одной из тюрем его и держат, по моим сведениям где-то в {W{hh$t{hx{G.'{x"), king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
+    oldact(_("$c1 говорит тебе '{GВот в одной из тюрем его и держат, по моим сведениям где-то в {W{hh$t{hx{G.'{x"), king, quest->princeArea.getForLang( viewerLang( hero ) ).c_str( ), hero, TO_VICT);
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 
 {

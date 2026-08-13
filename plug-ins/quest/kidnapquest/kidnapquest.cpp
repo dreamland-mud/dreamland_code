@@ -45,16 +45,21 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
 
         king = createKing( pch );
         kingVnum = king->pIndexData->vnum;
-        kingRoom = king->in_room->getName();
-        kingArea = king->in_room->areaName();
-        kingName = king->getShortDescr(LANG_DEFAULT);
-
         room = findRefuge( pch, king );
-        princeArea = room->areaName();
-        princeRoom = room->getName();
-
         prince = createPrince( king, room );
-        princeName = prince->getShortDescr(LANG_DEFAULT);
+
+    // Capture the name per language so info() answers in the reader's own;
+    // getForLang() on read falls back to Russian where a language has none.
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+
+            kingRoom[lang] = king->in_room->getName( lang );
+            kingArea[lang] = king->in_room->areaName( lang );
+            kingName[lang] = king->getShortDescr( lang );
+            princeArea[lang] = room->areaName( lang );
+            princeRoom[lang] = room->getName( lang );
+            princeName[lang] = prince->getShortDescr( lang );
+        }
 
     } catch (const QuestCannotStartException &e) {
         destroy( );
@@ -120,60 +125,77 @@ QuestReward::Pointer KidnapQuest::reward( PCharacter *ch, NPCharacter *questman 
 
 void KidnapQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
+    lang_t lang = viewerLang( ch );
+
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "Тебе нужно попасть в " << kingRoom << " ({hh" << kingArea << "{hx), "
-            << "найти там " << russian_case( kingName, '4' ) 
-            << " и узнать, какая помощь от тебя требуется." << endl;
+        buf << fmt( ch, _("Тебе нужно попасть в %1$s ({hh%2$s{hx), найти там %3$s и узнать, какая помощь от тебя требуется."),
+                    kingRoom.getForLang( lang ).c_str( ),
+                    kingArea.getForLang( lang ).c_str( ),
+                    russian_case( kingName.getForLang( lang ), '4' ).c_str( ) ) << endl;
         break;
 
     case QSTAT_MARK_RCVD:
-        buf << "Тебе нужно отыскать " << russian_case( princeName, '4' ) 
-            << " в местности под названием {hh" << princeArea << "{x." << endl;
+        buf << fmt( ch, _("Тебе нужно отыскать %1$s в местности под названием {hh%2$s{x."),
+                    russian_case( princeName.getForLang( lang ), '4' ).c_str( ),
+                    princeArea.getForLang( lang ).c_str( ) ) << endl;
         break;
     
     case QSTAT_KID_FOUND:
-        buf << "Тебе необходимо отвести " << russian_case( princeName, '4' )
-            << " к " << russian_case( kingName, '3' ) << "." << endl
-            << "Это находится в " << kingRoom << " ({hh" << kingArea << "{hx)." << endl;
+        buf << fmt( ch, _("Тебе необходимо отвести %1$s к %2$s."),
+                    russian_case( princeName.getForLang( lang ), '4' ).c_str( ),
+                    russian_case( kingName.getForLang( lang ), '3' ).c_str( ) ) << endl
+            << fmt( ch, _("Это находится в %1$s ({hh%2$s{hx)."),
+                    kingRoom.getForLang( lang ).c_str( ),
+                    kingArea.getForLang( lang ).c_str( ) ) << endl;
         break;
         
     case QSTAT_KING_ACK_WAITING:
-        buf << "Твое задание почти выполнено!" << endl
-            << "Вернись к " << russian_case( kingName, '3' ) << " за благодарностью." << endl;
+        buf << fmt( ch, _("Твое задание почти выполнено!") ) << endl
+            << fmt( ch, _("Вернись к %1$s за благодарностью."),
+                    russian_case( kingName.getForLang( lang ), '3' ).c_str( ) ) << endl;
         break;
 
     case QSTAT_FINISHED:
-        buf << "Твое задание выполнено!" << endl
-            << "Вернись к тому, кто тебе его дал, до того, как выйдет время!" << endl;
+        buf << fmt( ch, _("Твое задание выполнено!") ) << endl
+            << fmt( ch, _("Вернись к тому, кто тебе его дал, до того, как выйдет время!") ) << endl;
         break;
     }
 }
 
 void KidnapQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
+    lang_t lang = viewerLang( ch );
+
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "Узнать, что случилось у " << russian_case( kingName, '2') << " в "
-            << kingRoom << " (" << kingArea << ").";
+        buf << fmt( ch, _("Узнать, что случилось у %1$s в %2$s (%3$s)."),
+                    russian_case( kingName.getForLang( lang ), '2' ).c_str( ),
+                    kingRoom.getForLang( lang ).c_str( ),
+                    kingArea.getForLang( lang ).c_str( ) );
         break;
 
     case QSTAT_MARK_RCVD:
-        buf << "Найти " << russian_case( princeName, '4' ) << " в "
-            << princeArea << ".";
+        buf << fmt( ch, _("Найти %1$s в %2$s."),
+                    russian_case( princeName.getForLang( lang ), '4' ).c_str( ),
+                    princeArea.getForLang( lang ).c_str( ) );
         break;
     
     case QSTAT_KID_FOUND:
-        buf << "Отвести " << russian_case( princeName, '4' ) 
-            << " к " << russian_case( kingName, '3' ) << " в " << kingRoom << " (" << kingArea << ").";
+        buf << fmt( ch, _("Отвести %1$s к %2$s в %3$s (%4$s)."),
+                    russian_case( princeName.getForLang( lang ), '4' ).c_str( ),
+                    russian_case( kingName.getForLang( lang ), '3' ).c_str( ),
+                    kingRoom.getForLang( lang ).c_str( ),
+                    kingArea.getForLang( lang ).c_str( ) );
         break;
         
     case QSTAT_KING_ACK_WAITING:
-        buf << "Вернуться к " << russian_case( kingName, '3' ) << " за благодарностью.";
+        buf << fmt( ch, _("Вернуться к %1$s за благодарностью."),
+                    russian_case( kingName.getForLang( lang ), '3' ).c_str( ) );
         break;
 
     case QSTAT_FINISHED:
-        buf << "Вернуться к квестору за наградой.";
+        shortInfoComplete( buf, ch );
         break;
     }
 }
@@ -215,10 +237,11 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
     if (!Player::isNewbie(ch))
         tell_raw( ch, questman,  _("Я помогу тебе, но награда будет не так велика."));
 
-    tell_raw( ch, questman, 
-            _("Последний раз {W%s{G видели в местности {W{hh%s{hx{G."), 
-            russian_case( princeName, '4' ).c_str( ),
-            room->areaName().c_str() );
+    lang_t hlang = viewerLang( ch );
+    tell_raw( ch, questman,
+            _("Последний раз {W%s{G видели в местности {W{hh%s{hx{G."),
+            russian_case( princeName.getForLang( hlang ), '4' ).c_str( ),
+            room->areaName( hlang ).c_str() );
      
     hint++;
     wiznet( "find", "success, attempt #%d", hint.getValue( ) );
@@ -310,7 +333,8 @@ bool KidnapQuest::checkRoomClient( PCharacter *pch, Room * room )
     if (RoomUtils::isWaterOrAir(room))
         return false;
     
-    if (!kingArea.empty( ) && kingArea == room->areaName())
+    // Both sides stay Russian: this drives room selection, not display.
+    if (!kingArea.emptyValues( ) && kingArea.get( LANG_DEFAULT ) == room->areaName())
         return false;
 
     return true;
