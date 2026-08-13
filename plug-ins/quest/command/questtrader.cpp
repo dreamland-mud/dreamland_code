@@ -805,8 +805,23 @@ void PersonalNameRepair::eventItemRead( const ItemReadEvent &event ) const
     if (personal_arg_count( obj->pIndexData->short_descr.get(LANG_DEFAULT) ) > 1) {
         adjective = personal_engraved_adjective( obj->getRealShortDescr(LANG_DEFAULT) );
 
-        if (!adjective)
+        if (!adjective) {
+            // No adjective means the item was renamed and its Russian slot holds
+            // custom text, not an engraving -- 36 of these exist, restrung before
+            // XMLAttributeRestring::apply learned to write every language. There
+            // is nothing to translate, so mirror Russian into the empty slots,
+            // exactly as a restring does today. Leaving them empty is not neutral:
+            // display falls through to the PROTOTYPE, and the prototype is a
+            // template, so the reader gets a raw "%s".
+            const DLString &restrung = obj->getRealShortDescr(LANG_DEFAULT);
+
+            if (!restrung.empty( ))
+                for (int l = LANG_MIN; l < LANG_MAX; l++)
+                    if (obj->getRealShortDescr((lang_t)l).empty( ))
+                        obj->setShortDescr( restrung, (lang_t)l );
+
             return;
+        }
     }
 
     for (int l = LANG_MIN; l < LANG_MAX; l++) {
