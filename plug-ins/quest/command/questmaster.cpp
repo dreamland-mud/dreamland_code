@@ -46,7 +46,9 @@ static bool my_message(const char *msg)
         return true;
     if (arg_oneof_strict(msg, "хочу"))
         return true;
-    if (arg_contains_someof(msg, "задание квест quest"))
+    // Ukrainian "завдання" was missing, so a UA player could not ask for a quest
+    // in their own language -- same gap the pet's "де ти?" had.
+    if (arg_contains_someof(msg, "задание завдання квест quest"))
         return true;
     
     return false;

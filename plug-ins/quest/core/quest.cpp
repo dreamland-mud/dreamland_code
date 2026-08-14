@@ -37,9 +37,9 @@ bool Quest::help( PCharacter *ch, NPCharacter *questman )
     return false;
 }
 
-void Quest::helpMessage( ostringstream &buf )
+void Quest::helpMessage( ostringstream &buf, PCharacter *ch )
 {
-    buf << "Тебе необходимо следовать по следующему пути: ";
+    buf << fmt( ch, _("Тебе необходимо следовать по следующему пути: ") );
 }
 
 Room * Quest::helpLocation( )

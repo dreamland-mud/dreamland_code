@@ -482,11 +482,20 @@ DLString OwnerPrice::toCurrency( ) const
     return LIFE_NAME + " или " + VICTORY_NAME;
 }
 
+// Both of these deliberately return Flexer PADS, not finished sentences: every
+// caller hands the result on as a declinable argument ($n4 in mkey.cpp, $n2 in
+// the refusal below), so the caller is what picks the case. Wrapping either in a
+// catalog frame would destroy that. Making them trilingual therefore means
+// per-language pads, plus a viewer on Price::toCurrency(), which is a pure
+// virtual shared with MoneyPrice/QuestPointPrice and has none -- its own change.
 DLString OwnerPrice::toString( Character * ) const
 {
     ostringstream buf;
 
-    buf << lifes << " " << LIFE_NAME << " или " << victories << VICTORY_NAME;
+    // The space before VICTORY_NAME was missing, which glued the digit onto the
+    // pad's root ("5побед|ы|...") and printed "5победы в квестах". Flexer resets
+    // at whitespace, so the space also restores that word's declension.
+    buf << lifes << " " << LIFE_NAME << " или " << victories << " " << VICTORY_NAME;
     return buf.str( );
 }
 

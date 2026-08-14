@@ -12,6 +12,7 @@
 #include "dreamland.h"
 #include "wiznet.h"
 #include "msgformatter.h"
+#include "act.h"
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
@@ -73,8 +74,12 @@ bool XMLAttributeQuestData::pull( PCharacter *pch )
             time = quest->getFailTime( pch );
             setTime( time );
 
-            buf << "Через " << time << " минут" << GET_COUNT( time, "у", "ы", "")
-                << " ты можешь снова получить задание." << endl;
+            // The count suffix moves into the frame as %1$I, so each language
+            // brings its own plural rule instead of a Russian ending glued
+            // onto a translated word. Delivery stays send_to(buf) rather than
+            // pecho: pecho would append its own CRLF where endl appends LF.
+            buf << fmt( pch, _("Через %1$d минут%1$Iу|ы| ты можешь снова получить задание."),
+                        time ) << endl;
             pch->send_to( buf );
 
         } else if (time < 6) {
