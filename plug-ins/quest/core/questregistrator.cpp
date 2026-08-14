@@ -25,13 +25,22 @@ int QuestRegistratorBase::getPriority( ) const
     return priority.getValue( );
 }
 
-const DLString& QuestRegistratorBase::getShortDescr( ) const
+const DLString& QuestRegistratorBase::getShortDescr( lang_t lang ) const
 {
-    return shortDesc;
+    return shortDesc.getForLang( lang );
 }
 
-const DLString& QuestRegistratorBase::getDifficulty( ) const
+const DLString& QuestRegistratorBase::getDifficulty( lang_t lang ) const
 {
-    return difficulty;
+    return difficulty.getForLang( lang );
+}
+
+/* Input matching stays language-blind on purpose. A player who has typed
+ * 'задание просить убийство' for years must keep it after the English and
+ * Ukrainian names arrive, whatever language they read the menu in --
+ * matchesUnstrict walks every slot, so the new names only add ways in. */
+bool QuestRegistratorBase::matchesShortDescr( const DLString &arg ) const
+{
+    return shortDesc.matchesUnstrict( arg );
 }
 

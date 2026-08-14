@@ -607,9 +607,10 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         ostringstream buf;
         buf << endl;
         for (index = 1, q = quests.begin(); q != quests.end(); index++, q++) {
-            DLString d = (*q)->getDifficulty();
+            lang_t lang = viewerLang(client);
             buf << fmt(0, "     {W%2d{x. %-25s {D(%s){x \r\n",
-                            index, (*q)->getShortDescr().c_str(), d.c_str());
+                            index, (*q)->getShortDescr(lang).c_str(),
+                            (*q)->getDifficulty(lang).c_str());
         }
         buf << endl;
         client->send_to(buf);
@@ -672,7 +673,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     wiznet(WIZ_QUEST, 0, 0, "Failed to start quest %s for %s: 3 attempts declined",
            (*q)->getName().c_str(), client->getNameC());
 
-    tell_fmt(_("Извини, оказывается у меня нет подходящих для тебя заданий на '%3$s'."), client, ch, (*q)->getShortDescr().c_str());
+    tell_fmt(_("Извини, оказывается у меня нет подходящих для тебя заданий на '%3$s'."), client, ch, (*q)->getShortDescr(viewerLang(client)).c_str());
     tell_raw(client, ch, _("Приходи позже или выбери что-то другое."));
 }
 
@@ -702,13 +703,14 @@ QuestRegistratorBase::Pointer Questor::parseQuestArgument(PCharacter *client, co
     // Player is probably calling quest type by its name.    
     for (auto &q: quests) {
         
-        if (is_name(arg.c_str(), q->getName().c_str()) || is_name(arg.c_str(), q->getShortDescr().c_str())) {
-            
+        if (is_name(arg.c_str(), q->getName().c_str()) || q->matchesShortDescr(arg)) {
+
             // No ambiguity allowed.
             if (result) {
+                lang_t lang = viewerLang(client);
                 tell_fmt(_("У меня есть несколько заданий с таким названием, %1$C1. Скажи конкретнее, что ты хочешь?"), client, ch);
                 tell_fmt(_("Например, {1{y{hcзадание попросить %3$s{hx{2 или {1{y{hcзадание попросить %4$s{hx{2."),
-                        client, ch, result->getShortDescr().c_str(), q->getShortDescr().c_str());
+                        client, ch, result->getShortDescr(lang).c_str(), q->getShortDescr(lang).c_str());
                 return null;
             }
 
