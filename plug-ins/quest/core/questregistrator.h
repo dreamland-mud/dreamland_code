@@ -10,7 +10,9 @@
 #include "xmlvariablecontainer.h"
 #include "xmlinteger.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlattributeplugin.h"
+#include "lang.h"
 
 #include "quest.h"
 #include "questmanager.h"
@@ -28,12 +30,15 @@ public:
 
     virtual bool applicable( PCharacter *, bool fAuto ) const;
     virtual int getPriority( ) const;
-    const DLString& getShortDescr( ) const;
-    const DLString& getDifficulty( ) const;
-    
+    const DLString& getShortDescr( lang_t ) const;
+    const DLString& getDifficulty( lang_t ) const;
+
+    /** True when the player typed a word from this quest's name in ANY language. */
+    bool matchesShortDescr( const DLString & ) const;
+
 protected:
-    XML_VARIABLE XMLString shortDesc;
-    XML_VARIABLE XMLString difficulty;
+    XML_VARIABLE XMLMultiString shortDesc;
+    XML_VARIABLE XMLMultiString difficulty;
     XML_VARIABLE XMLInteger priority;
     XML_VARIABLE XMLIntegerNoEmpty minAutoLevel;
 };

@@ -449,7 +449,7 @@ void CQuest::doStat( PCharacter *ch )
         bool foundSelf = false;
         XMLAttributeStatistic::StatRecordList &records = s->second;
         
-        buf << "{W\"" << qb->getShortDescr( ) << "\"{x" << endl;
+        buf << "{W\"" << qb->getShortDescr( viewerLang(ch) ) << "\"{x" << endl;
 
         // Print top 5 achievers for the current quest type.
         for (r = records.begin( ); r != records.end( ) && cnt < 5; cnt++) {
