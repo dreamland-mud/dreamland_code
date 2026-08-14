@@ -201,11 +201,15 @@ bool StaffScenario::applicable( PCharacter *pch )  const
 
 void StaffScenario::onQuestStart( PCharacter *pch, NPCharacter *questman ) const
 {
-    if (msg.empty( ))
+    // emptyValues, not empty: an empty <msg></msg> still files one blank slot,
+    // so the map is non-empty while the text is not there.
+    if (msg.emptyValues( ))
         tell_raw( pch, questman, _("Из королевской сокровищницы похитили {W%s{G!"),
                   shortDesc.getForLang( viewerLang( pch ) ).ruscase( '4' ).c_str( ) );
     else
-        tell_raw( pch, questman, msg.c_str( ) );
+        // Through %s rather than as the format itself: this is scenario data,
+        // and a stray % in it would be read as a conversion.
+        tell_raw( pch, questman, "%s", msg.getForLang( viewerLang( pch ) ).c_str( ) );
 }
 
 /*
