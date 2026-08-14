@@ -74,8 +74,7 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
     setTime( pch, time );
     
     getScenario( ).onQuestStart( pch, questman, king );
-    tell_raw( pch, questman, _("У тебя есть {Y%d{G минут%s, чтобы добраться туда и узнать, в чем дело."),
-                  time, GET_COUNT(time,"а","ы","") ); 
+    tell_raw( pch, questman, _("У тебя есть {Y%1$d{G минут%1$Iа|ы|, чтобы добраться туда и узнать, в чем дело."), time ); 
 
     wiznet( scenName.c_str( ), "%s in [%d], kid in [%d]",
                  king->getNameP('1').c_str( ),

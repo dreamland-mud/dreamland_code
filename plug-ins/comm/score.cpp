@@ -70,7 +70,10 @@ CMDRUNP( worth )
 
     auto killed = ch->getPC()->getAttributes().getAttr<XMLKillingAttribute>("killed");
 
-    ch->pecho(_("Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей."),
+    // Numbered on purpose: English needs no gender and drops %1$G, and with
+    // sequential args that would shift %d onto the Character* and %s onto a
+    // kill count -- an int read as char*. See the same fix in remort/cmlt.cpp.
+    ch->pecho(_("Ты уби%1$Gло|л|ла {Y%2$d{x %3$s, {W%4$d{x %5$s и {r%6$d{x %7$s персонажей."),
             ch, 
             killed->align[N_ALIGN_GOOD], l(ch, "добрых"),
             killed->align[N_ALIGN_NEUTRAL], l(ch, "нейтральных"),
@@ -313,7 +316,7 @@ static void score_prose( Character *ch )
 
         auto killed = ch->getPC()->getAttributes().getAttr<XMLKillingAttribute>("killed");
 
-       buf << fmt(ch, _("Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей.\n\r"),
+       buf << fmt(ch, _("Ты уби%1$Gло|л|ла {Y%2$d{x %3$s, {W%4$d{x %5$s и {r%6$d{x %7$s персонажей.\n\r"),
                         ch, 
                         killed->align[N_ALIGN_GOOD], l(ch, "добрых"),
                         killed->align[N_ALIGN_NEUTRAL], l(ch, "нейтральных"),

@@ -314,8 +314,7 @@ void CQuest::doPoints( PCharacter *ch )
 {
     int points = ch->getQuestPoints();
 
-    ch->pecho(_("У тебя {Y%d{x квестов%s единиц%s."), 
-             points, GET_COUNT(points, "ая", "ых", "ых"), GET_COUNT(points, "а", "ы", ""));
+    ch->pecho(_("У тебя {Y%1$d{x квестов%1$Iая|ых|ых единиц%1$Iа|ы|."), points);
 }
 
 void CQuest::doTime( PCharacter *ch ) 
