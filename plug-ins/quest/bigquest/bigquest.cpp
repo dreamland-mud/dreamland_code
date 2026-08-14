@@ -207,15 +207,22 @@ const QuestMobileAppearence & BigQuestScenario::getRandomMobile() const
 
 void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, struct AreaIndexData *targetArea, int mobsTotal) const
 {
-    XMLStringVector::const_iterator s;
+    QuestMessageList::const_iterator s;
+    // One recipient, so the language is fixed for the whole briefing. The area
+    // name has to be picked in it too: getName() with no argument is
+    // LANG_DEFAULT, which put a Russian zone name inside every line.
+    lang_t lang = viewerLang(pch);
+    DLString areaName = targetArea->getName(lang, '1');
 
     for (s = msgStart.begin(); s != msgStart.end(); s++)
-        tell_fmt(s->c_str(), pch, questman, targetArea->getName().c_str(), mobsTotal);            
+        tell_fmt(questMessage(s->text), pch, questman, areaName.c_str(), mobsTotal);
 }
 
 void BigQuestScenario::onQuestInfo(PCharacter *pch, int mobsTotal, ostream &buf) const
 {
-    buf << fmt(0, msgInfo.c_str(), pch, 0, mobsTotal) << endl;
+    // fmt's first argument is the viewer; passing 0 threw it away, so a fully
+    // translated line would still have rendered its declensions in Russian.
+    buf << fmt(pch, questMessage(msgInfo), pch, 0, mobsTotal) << endl;
 }
 
 int BigQuestScenario::getPriority() const

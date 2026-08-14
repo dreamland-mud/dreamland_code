@@ -214,3 +214,24 @@ bool NameList::hasName( NPCharacter *mob )
     return false;
 }
 
+
+void QuestMessage::fromXML( const XMLNode::Pointer &node )
+{
+    XMLContainer::fromXML( node );
+
+    if (!text.emptyValues( ))
+        return;
+
+    // Legacy shape: <node>текст</node>, no <text> child at all. Read the body
+    // into Russian so an untouched data file keeps working and a rollback to a
+    // binary that expects the old shape cannot leave the line blank.
+    XMLNode::Pointer body = node->getFirstNode( );
+
+    if (body)
+        text[RU] = body->getCData( );
+}
+
+MultiMessage questMessage( const XMLMultiString &s )
+{
+    return MultiMessage( s.getForLang( EN ), s.getForLang( RU ), s.getForLang( UA ) );
+}

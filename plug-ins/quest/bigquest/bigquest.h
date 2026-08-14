@@ -70,9 +70,9 @@ public:
     XML_VARIABLE XMLLimits criteria;
     XML_VARIABLE QuestMobileAppearanceList mobiles;
     XML_VARIABLE QuestItemAppearence item;
-    XML_VARIABLE XMLStringVector msgStart;
-    XML_VARIABLE XMLString msgInfo;
-    XML_VARIABLE XMLString msgJoin;
+    XML_VARIABLE QuestMessageList msgStart;
+    XML_VARIABLE XMLMultiString msgInfo;
+    XML_VARIABLE XMLMultiString msgJoin;
 };
 
 class BigQuestRegistrator : public QuestRegistrator<BigQuest>,
