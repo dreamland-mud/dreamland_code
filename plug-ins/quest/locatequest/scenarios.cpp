@@ -61,8 +61,11 @@ void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQu
     switch (number_range( 1, 3 )) {
     case 1:
         if (quest->delivered > 1) {
-            oldact(_("$c1 произносит '{gО, ты наш$Gло|ел|ла еще $t!{x'"), 
-                    ch, russian_case( quest->itemName.getValue( ), '4' ).c_str( ), hero, TO_ROOM );
+            // TO_ROOM, so the item name cannot follow each onlooker. It is keyed
+            // to the hero instead of staying Russian for everyone: the sentence
+            // is addressed to them and agrees with their gender already.
+            oldact(_("$c1 произносит '{gО, ты наш$Gло|ел|ла еще $t!{x'"),
+                    ch, russian_case( quest->itemName.getForLang( viewerLang( hero ) ), '4' ).c_str( ), hero, TO_ROOM );
             break;
         }
         /* FALLTHROUGH */

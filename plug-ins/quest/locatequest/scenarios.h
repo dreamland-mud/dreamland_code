@@ -20,7 +20,10 @@ XML_OBJECT
 public:
     typedef ::Pointer<LSItemData> Pointer;
 
-    XML_VARIABLE XMLString shortMlt;
+    // The plural form of the item name, used in the scenario legends. Its
+    // siblings on QuestItemAppearence went trilingual in code#982; this one was
+    // missed because it lives on the subclass.
+    XML_VARIABLE XMLMultiString shortMlt;
 };
 
 class LocateScenario: public QuestScenario, 
