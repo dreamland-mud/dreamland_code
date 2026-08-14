@@ -491,6 +491,7 @@ void CalendarWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &
  * affects with no spell). An affect whose skill sets no <webColumn> still shows --
  * auto-classified offensive->mal, else ->enh -- so new affects are never silently
  * missing; run scripts/lint-affect-labels.py to find those still on the auto-fallback.
+ * To keep an internal/tracking affect out of the panel, say so: <webColumn>none</webColumn>.
  *------------------------------------------------------------------------*/
 
 // config/affectpanel.json -> column -> raw-bit key -> per-language label.
@@ -691,11 +692,16 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
         SpellPointer spell = skill->getSpell( );
 
         if (col.empty( )) {
-            // Not curated: show only real castable spells (skip internal/tracking affects);
-            // auto-classify offensive -> maladictions, everything else -> the enhance bucket.
-            if (!spell || !spell->isCasted( ))
-                continue;
-            col = (spell->getSpellType( ) == SPELL_OFFENSIVE) ? MALAD : ENHANCE;
+            // Not curated: auto-classify. Offensive spell -> maladictions, anything
+            // else -> the enhance bucket.
+            // This used to skip every affect that was not a castable spell, which hid
+            // 92 of them outright -- fire blindness, an arrow in the eye, ability
+            // cooldowns, equipment set bonuses, god blessings. Worse for the three
+            // that set AFF_BLIND themselves: bitOwnedBySpell() then also silenced the
+            // raw "blind" chip, so a blinded player saw an empty panel. Hiding an
+            // internal affect is now explicit -- <webColumn>none</webColumn>.
+            col = (spell && spell->isCasted( )
+                   && spell->getSpellType( ) == SPELL_OFFENSIVE) ? MALAD : ENHANCE;
         }
 
         DLString label = skill->getWebLabel( lang );
