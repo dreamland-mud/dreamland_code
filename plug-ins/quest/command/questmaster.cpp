@@ -2,10 +2,13 @@
  *
  * ruffina, 2005
  */
+#include <vector>
+
 #include "player_utils.h"
 #include "questmaster.h"
 
 #include "npcharacter.h"
+#include "room.h"
 #include "merc.h"
 #include "interp.h"
 #include "arg_utils.h"
@@ -26,7 +29,27 @@ bool QuestMaster::specIdle( )
     if (chance(99))
         return false;
 
-    do_say(ch, "Хочешь получить интересное задание? Напиши {y{hcквест попросить{x.");
+    // do_say hands its text to the `say` command as one baked argument, so an
+    // untargeted ambient line can only ever come out Russian. say_act renders in
+    // a listener's language and still echoes TO_ALL, so the invitation is
+    // addressed to somebody who is actually standing there.
+    //
+    // The filter is deliberately side-effect free: canGiveQuest() routes to
+    // QuestTrader::canServeClient(), which say_acts a refusal at ghosts, charmed
+    // and invisible players -- using it here would have the questmaster scold
+    // the room on every idle tick.
+    std::vector<Character *> listeners;
+
+    for (Character *wch = ch->in_room->people; wch; wch = wch->next_in_room)
+        if (!wch->is_npc( ) && ch->can_see( wch ))
+            listeners.push_back( wch );
+
+    // Nobody to invite: stay quiet rather than talk to an empty room.
+    if (listeners.empty( ))
+        return false;
+
+    say_act( listeners[number_range( 0, listeners.size( ) - 1 )], ch,
+             _("Хочешь получить интересное задание? Напиши {y{hcквест попросить{x.") );
     return true;
 }
 
