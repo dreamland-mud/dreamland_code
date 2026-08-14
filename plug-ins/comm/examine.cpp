@@ -34,21 +34,18 @@ static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
         else if (obj->value1() == 1)
                 ch->pecho(_("Ух ты! Одна золотая монетка!"));
         else
-                ch->pecho(_("Здесь %d золот%s."),
-                        obj->value1(),GET_COUNT(obj->value1(), "ая монета","ые монеты","ых монет"));
+                ch->pecho(_("Здесь %1$d золот%1$Iая|ые|ых монет%1$Iа|ы|."), obj->value1());
     }
     else if (obj->value1() == 0)
     {
         if (obj->value0() == 1)
                 ch->pecho(_("Ух ты! Одна серебряная монетка."));
         else
-                ch->pecho(_("Здесь %d серебрян%s."),
-                        obj->value0(),GET_COUNT(obj->value0(), "ая монета","ые монеты","ых монет"));
+                ch->pecho(_("Здесь %1$d серебрян%1$Iая|ые|ых монет%1$Iа|ы|."), obj->value0());
     }
     else
-        ch->pecho(_("Здесь %d золот%s и %d серебрян%s."),
-                obj->value1(),GET_COUNT(obj->value1(), "ая","ые","ых"),
-                obj->value0(),GET_COUNT(obj->value0(), "ая монета","ые монеты","ых монет"));
+        ch->pecho(_("Здесь %1$d золот%1$Iая|ые|ых и %2$d серебрян%2$Iая|ые|ых монет%2$Iа|ы|."),
+                obj->value1(), obj->value0());
     return true;
 }
 

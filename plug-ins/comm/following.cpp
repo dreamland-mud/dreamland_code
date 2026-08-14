@@ -416,41 +416,33 @@ CMDRUN( split )
     if (share_silver > 0)
     {
         ch->pecho(
-            _("Ты делишь %d серебрянн%s. Ты получаешь %d серебра."),
-             amount_silver,GET_COUNT(amount_silver,"ую монету","ые монеты","ых монет"),
-            share_silver + extra_silver);
+            _("Ты делишь %1$d серебрянн%1$Iую|ые|ых монет%1$Iу|ы|. Ты получаешь %2$d серебра."),
+             amount_silver, share_silver + extra_silver);
     }
 
     if (share_gold > 0)
     {
         ch->pecho(
-            _("Ты делишь %d золот%s. Ты получаешь %d золота."),
-             amount_gold,GET_COUNT(amount_gold,"ую монету","ые монеты","ых монет"),
-             share_gold + extra_gold);
-    }
-
-    if (share_gold == 0)
-    {
-        msgGroup = fmt(0, _("$c1 делит %d серебрянн%s. Ты получаешь %d серебра."),
-                amount_silver,GET_COUNT(amount_silver,"ую монету","ые монеты","ых монет"),
-                share_silver);
-    }
-    else if (share_silver == 0)
-    {
-       msgGroup = fmt(0, _("$c1 делит %d золот%s. Ты получаешь %d золота."),
-                amount_gold,GET_COUNT(amount_gold,"ую монету","ые монеты","ых монет"),
-                share_gold);
-    }
-    else
-    {
-        msgGroup = fmt(0, _("$c1 делит %d серебра и %d золота, дает тебе %d серебра и %d золота."),
-         amount_silver,amount_gold,share_silver,share_gold);
+            _("Ты делишь %1$d золот%1$Iую|ые|ых монет%1$Iу|ы|. Ты получаешь %2$d золота."),
+             amount_gold, share_gold + extra_gold);
     }
 
     for ( gch = ch->in_room->people; gch != 0; gch = gch->next_in_room )
     {
         if ( gch != ch && is_same_group(gch,ch) && !IS_CHARMED(gch))
         {
+            // Formatted per recipient, not once for the group: both the frame
+            // and the plural forms inside it depend on who is reading.
+            if (share_gold == 0)
+                msgGroup = fmt(gch, _("$c1 делит %1$d серебрянн%1$Iую|ые|ых монет%1$Iу|ы|. Ты получаешь %2$d серебра."),
+                        amount_silver, share_silver);
+            else if (share_silver == 0)
+                msgGroup = fmt(gch, _("$c1 делит %1$d золот%1$Iую|ые|ых монет%1$Iу|ы|. Ты получаешь %2$d золота."),
+                        amount_gold, share_gold);
+            else
+                msgGroup = fmt(gch, _("$c1 делит %d серебра и %d золота, дает тебе %d серебра и %d золота."),
+                        amount_silver, amount_gold, share_silver, share_gold);
+
             oldact( msgGroup.c_str(), ch, 0, gch, TO_VICT);
             gch->gold += share_gold;
             gch->silver += share_silver;

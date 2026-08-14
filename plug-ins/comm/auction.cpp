@@ -360,17 +360,16 @@ CMDRUNP( auction )
                         /* show item data here */
                         if (auction->bet > 0)
                         {
-                                ch->pecho(_("Текущая ставка на выставленный лот -- %d золот%s{x."),
-                                        auction->bet,
-                                        GET_COUNT(auction->bet,"ая монета","ые монеты","ых монет"));
+                                ch->pecho(_("Текущая ставка на выставленный лот -- %1$d золот%1$Iая|ые|ых монет%1$Iа|ы|{x."),
+                                        auction->bet);
                         }
                         else
                         {
                                 ch->pecho(_("Ставок на выставленный лот не получено{x."));
                                 if (auction->startbet != 0)
                                 {
-                                        ch->pecho(_("Начальная цена -- %d золот%s{x."), auction->startbet,
-                                                GET_COUNT(auction->startbet,"ая монета","ые монеты","ых монет"));
+                                        ch->pecho(_("Начальная цена -- %1$d золот%1$Iая|ые|ых монет%1$Iа|ы|{x."),
+                                                auction->startbet);
                                 }
                         }
 
