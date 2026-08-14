@@ -201,11 +201,19 @@ bool StaffScenario::applicable( PCharacter *pch )  const
 
 void StaffScenario::onQuestStart( PCharacter *pch, NPCharacter *questman ) const
 {
-    if (msg.empty( ))
+    // emptyValues, not empty: XMLMultiString's constructor pre-fills all three
+    // slots, so the map is never empty and empty() would leave this branch dead.
+    if (msg.emptyValues( ))
         tell_raw( pch, questman, _("Из королевской сокровищницы похитили {W%s{G!"),
                   shortDesc.getForLang( viewerLang( pch ) ).ruscase( '4' ).c_str( ) );
     else
-        tell_raw( pch, questman, msg.c_str( ) );
+        // The text goes through %s rather than being the format itself, because
+        // it is scenario data and a stray % in it would be read as a conversion.
+        // The format has to be a MultiMessage all the same: the const char*
+        // overload of tell_raw hardcodes the Russian speech frame, so a plain
+        // "%s" would wrap English text in "говорит тебе". A catalog miss on "%s"
+        // resolves to "%s" in every language.
+        tell_raw( pch, questman, _("%s"), msg.getForLang( viewerLang( pch ) ).c_str( ) );
 }
 
 /*

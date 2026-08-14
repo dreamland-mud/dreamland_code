@@ -48,7 +48,7 @@ public:
 
     void onQuestStart( PCharacter *, NPCharacter * ) const;
 
-    XML_VARIABLE XMLString msg;
+    XML_VARIABLE XMLMultiString msg;
 };
 
 class StaffQuestRegistrator : public QuestRegistrator<StaffQuest>,
