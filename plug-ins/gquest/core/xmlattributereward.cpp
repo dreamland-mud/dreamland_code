@@ -56,25 +56,30 @@ void XMLAttributeReward::reward( PCharacter *ch )
 
         buf << r->reason.getForLang(viewerLang(ch)) << endl;
 
+        // The line break stays outside the format string: %I scans its slot list
+        // until a terminator (msgformatter.cpp:341-352), and \r is not one, so a
+        // trailing \r\n lands INSIDE the last slot and only prints for counts of
+        // 0, 5+ and 11-15. The experience line below is safe because the space
+        // after its slots ends the scan.
         c = r->gold;
         if (c > 0) {
             ch->gold += c;
-            buf << fmt(ch, _("%1$s%2$s%3$4d %4$sзолот%3$Iую|ые|ых монет%3$Iу|ы|\r\n"),
-                     offset, GQChannel::BOLD, c, GQChannel::NORMAL );
+            buf << fmt(ch, _("%1$s%2$s%3$4d %4$sзолот%3$Iую|ые|ых монет%3$Iу|ы|"),
+                     offset, GQChannel::BOLD, c, GQChannel::NORMAL ) << "\r\n";
         }
 
         c = r->qpoints;
         if (c > 0) {
             ch->addQuestPoints(c);
-            buf << fmt(ch, _("%1$s%2$s%3$4d %4$sквестов%3$Iую|ые|ых едини%3$Iцу|цы|ц\r\n"),
-                     offset, GQChannel::BOLD, c, GQChannel::NORMAL );
+            buf << fmt(ch, _("%1$s%2$s%3$4d %4$sквестов%3$Iую|ые|ых едини%3$Iцу|цы|ц"),
+                     offset, GQChannel::BOLD, c, GQChannel::NORMAL ) << "\r\n";
         }
 
         c = r->practice;
         if (c > 0) {
             ch->practice += c;
-            buf << fmt(ch, _("%1$s%2$s%3$4d %4$sпрактик%3$Iу|и|\r\n"),
-                      offset, GQChannel::BOLD, c, GQChannel::NORMAL );
+            buf << fmt(ch, _("%1$s%2$s%3$4d %4$sпрактик%3$Iу|и|"),
+                      offset, GQChannel::BOLD, c, GQChannel::NORMAL ) << "\r\n";
         }
 
         c = r->experience;
