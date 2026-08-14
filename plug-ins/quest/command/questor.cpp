@@ -396,8 +396,12 @@ void QuestScrollBehavior::createDescription( PCharacter *ch )
         if (skillManager->findExisting( s->first ))
             flavour.push_back( number_range( 1, 3 ) );
 
-    // addProperDescription() stamps ed->keyword at call time, so it is called
-    // once and every language slot is filled on the description it returns.
+    // Hoisted out of the loop for clarity, not for safety: addProperDescription()
+    // is idempotent (object.cpp:227 looks the description up by keyword first and
+    // only allocates when there is none), so calling it per language would hand
+    // back the same one. What DOES matter is that it stamps ed->keyword from the
+    // object's current keyword at call time, so it must run after the object is
+    // named -- it is, the scroll is created and dressed before we get here.
     ExtraDescription *ed = obj->addProperDescription( );
 
     for (int l = LANG_MIN; l < LANG_MAX; l++) {
