@@ -149,14 +149,17 @@ void CMlt::doShowSelf( PCharacter *ch )
             PCRace *race = raceManager->find( life.race )->getPC( );
             int age = 17 + life.time / 20;
 
+            // Every conversion is numbered on purpose. A translation is free to
+            // drop one -- English needs no gender -- and with sequential args
+            // that shifts every later conversion onto the wrong slot.
             str << fmt( ch,
-                        _("     %N1 %N1, переродил%Gось|ся|ась в возрасте %d %s"),
+                        _("     %1$N1 %2$N1, переродил%3$Gось|ся|ась в возрасте %4$d %4$Iгода|лет|лет"),
                         (ch->getSex( ) == SEX_FEMALE ?
                               race->getFemaleName( ).c_str( )
                             : race->getMaleName( ).c_str( )),
                         professionManager->find( life.classCh )->getRusName( ).c_str( ),
                         ch,
-                        age, GET_COUNT(age, "года", "лет", "лет") )
+                        age )
                 << endl;
         }
 
