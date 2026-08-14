@@ -269,7 +269,7 @@ void Questor::doFind( PCharacter *client )
         return;
     }
 
-    quest->helpMessage( buf );
+    quest->helpMessage( buf, client );
     
     if (!makeSpeedwalk( ch->in_room, quest->helpLocation( ), buf )) 
     {
@@ -387,37 +387,63 @@ void Questor::rewardScroll( PCharacter *client )
  *------------------------------------------------------------------------*/
 void QuestScrollBehavior::createDescription( PCharacter *ch )
 {
-    ostringstream bufInfo, bufEmpty, bufSkill;
     XMLMapBase<XMLInteger>::iterator s;
-    
-    bufEmpty << "Ты держишь в руках свиток из желтого пергамента, все надписи на котором размыты так, " << endl
-             << "что невозможно что-либо разобрать." << endl;
+    std::vector<int> flavour;
 
-    bufInfo << "Ты держишь в руках свиток из желтого пергамента, испещренный загадочными значками." << endl
-            << "Значки выведены аккуратным почерком, и, по-видимому, для их написания использовались особые чернила." << endl
-            << "Из пометок рядом со значками ты понимаешь, что они содержат ";
-            
-    for (s = skills.begin( ); s != skills.end( ); s++) {
-        Skill * skill = skillManager->findExisting( s->first );
+    // Roll the wording ONCE, before the language loop. Rolling it inside would
+    // have the same scroll promise three different things to three readers.
+    for (s = skills.begin( ); s != skills.end( ); s++)
+        if (skillManager->findExisting( s->first ))
+            flavour.push_back( number_range( 1, 3 ) );
 
-        if (!skill) 
-            continue;
+    // Hoisted out of the loop for clarity, not for safety: addProperDescription()
+    // is idempotent (object.cpp:227 looks the description up by keyword first and
+    // only allocates when there is none), so calling it per language would hand
+    // back the same one. What DOES matter is that it stamps ed->keyword from the
+    // object's current keyword at call time, so it must run after the object is
+    // named -- it is, the scroll is created and dressed before we get here.
+    ExtraDescription *ed = obj->addProperDescription( );
 
-        if (!bufSkill.str( ).empty( ))
-            bufSkill << " и ";
-        
-        switch (number_range( 1, 3 )) {
-        case 1: bufSkill << "секрет мастерства '" << skill->getNameFor( ch ) << "'"; break;
-        case 2: bufSkill << "неизвестный тебе ранее трюк в искусстве '" << skill->getNameFor( ch ) << "'"; break;
-        case 3: bufSkill << "кое-что новое о '" << skill->getNameFor( ch ) << "'"; break;
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        ostringstream buf, bufSkill;
+        unsigned int i = 0;
+
+        for (s = skills.begin( ); s != skills.end( ); s++) {
+            Skill *skill = skillManager->findExisting( s->first );
+
+            if (!skill)
+                continue;
+
+            if (!bufSkill.str( ).empty( ))
+                bufSkill << fmtLang( lang, _(" и ") );
+
+            switch (flavour[i++]) {
+            case 1:
+                bufSkill << fmtLang( lang, _("секрет мастерства '%1$s'"),
+                                     skill->getNameFor( lang ).c_str( ) );
+                break;
+            case 2:
+                bufSkill << fmtLang( lang, _("неизвестный тебе ранее трюк в искусстве '%1$s'"),
+                                     skill->getNameFor( lang ).c_str( ) );
+                break;
+            case 3:
+                bufSkill << fmtLang( lang, _("кое-что новое о '%1$s'"),
+                                     skill->getNameFor( lang ).c_str( ) );
+                break;
+            }
         }
-    }
 
-    if (bufSkill.str( ).empty( ))
-        obj->addProperDescription()->description[LANG_DEFAULT] = bufEmpty.str();
-    else {
-        bufInfo << bufSkill.str( ) << "." << endl;
-        obj->addProperDescription()->description[LANG_DEFAULT] = bufInfo.str();
+        if (bufSkill.str( ).empty( ))
+            buf << fmtLang( lang, _("Ты держишь в руках свиток из желтого пергамента, все надписи на котором размыты так, ") ) << endl
+                << fmtLang( lang, _("что невозможно что-либо разобрать.") ) << endl;
+        else
+            buf << fmtLang( lang, _("Ты держишь в руках свиток из желтого пергамента, испещренный загадочными значками.") ) << endl
+                << fmtLang( lang, _("Значки выведены аккуратным почерком, и, по-видимому, для их написания использовались особые чернила.") ) << endl
+                << fmtLang( lang, _("Из пометок рядом со значками ты понимаешь, что они содержат %1$s."),
+                            bufSkill.str( ).c_str( ) ) << endl;
+
+        ed->description[lang] = buf.str( );
     }
 }
 
@@ -470,19 +496,22 @@ bool QuestScrollBehavior::examine( Character *ch )
             continue;
 
         if (!skill->canPractice( ch->getPC( ), tmpbuf )) {
-            buf << "Ты не можешь сейчас улучшить свои познания в '" << skill->getNameFor( ch ) << "'." << endl;
+            buf << fmt( ch, _("Ты не можешь сейчас улучшить свои познания в '%1$s'."),
+                        skill->getNameFor( ch ).c_str( ) ) << endl;
             extract = false;
             continue;
         }
 
         PCSkillData &data = ch->getPC( )->getSkillData( skill->getIndex( ) );
-        
+
         if (data.learned >= skill->getMaximum( ch )) {
-            buf << "Искусство '" << skill->getNameFor( ch ) << "' уже изучено тобой в совершенстве." << endl;
+            buf << fmt( ch, _("Искусство '%1$s' уже изучено тобой в совершенстве."),
+                        skill->getNameFor( ch ).c_str( ) ) << endl;
             extract = false;
         }
         else {
-            buf << "Ты узнаешь кое-что новое об искусстве '" << skill->getNameFor( ch ) << "'!" << endl;
+            buf << fmt( ch, _("Ты узнаешь кое-что новое об искусстве '%1$s'!"),
+                        skill->getNameFor( ch ).c_str( ) ) << endl;
             data.learned = URANGE( data.learned.getValue( ), 
                                    data.learned + s->second,
                                    skill->getMaximum( ch ));
@@ -491,7 +520,7 @@ bool QuestScrollBehavior::examine( Character *ch )
     }
     
     if (buf.str( ).empty( ))
-        buf << "Похоже, знаки на этом свитке потеряли силу." << endl;
+        buf << fmt( ch, _("Похоже, знаки на этом свитке потеряли силу.") ) << endl;
 
     ch->send_to( buf );
     if(extract) {

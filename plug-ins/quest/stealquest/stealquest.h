@@ -39,7 +39,7 @@ public:
     virtual QuestReward::Pointer reward( PCharacter *, NPCharacter * );
     virtual bool isComplete( );
     virtual Room * helpLocation( );
-    virtual void helpMessage( ostringstream & );
+    virtual void helpMessage( ostringstream &, PCharacter * );
     virtual void info( std::ostream &, PCharacter * );
     virtual void shortInfo( std::ostream &, PCharacter * );
     virtual void destroy( );

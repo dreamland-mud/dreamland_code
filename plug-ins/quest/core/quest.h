@@ -74,7 +74,7 @@ public:
     virtual void scheduleDestroy( );
 
     virtual bool help( PCharacter *, NPCharacter * );
-    virtual void helpMessage( ostringstream & );
+    virtual void helpMessage( ostringstream &, PCharacter * );
     virtual Room *helpLocation( );
 
     /** What info() and shortInfo() print once the quest is done. Identical

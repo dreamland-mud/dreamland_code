@@ -297,19 +297,19 @@ bool StealQuest::isComplete( )
     return (state == QSTAT_FINISHED);
 }
 
-void StealQuest::helpMessage( ostringstream &buf )
+void StealQuest::helpMessage( ostringstream &buf, PCharacter *ch )
 {
-    // No viewer in scope: helpMessage's signature carries only the stream, so
-    // this one stays Russian until the base class gains a Character parameter.
+    lang_t lang = viewerLang( ch );
+
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "До " << russian_case( victimName.get( LANG_DEFAULT ), '2' )
-            << " ты можешь добраться, следуя по такому пути: ";
+        buf << fmt( ch, _("До %1$s ты можешь добраться, следуя по такому пути: "),
+                    russian_case( victimName.getForLang( lang ), '2' ).c_str( ) );
         break;
 
     case QSTAT_HUNT_ROBBER:
-        buf << "Ты можешь отыскать " << russian_case( thiefName.get( LANG_DEFAULT ), '4' )
-            << ", следуя по такому пути: ";
+        buf << fmt( ch, _("Ты можешь отыскать %1$s, следуя по такому пути: "),
+                    russian_case( thiefName.getForLang( lang ), '4' ).c_str( ) );
         break;
     }
 }
