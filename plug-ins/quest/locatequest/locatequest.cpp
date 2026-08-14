@@ -49,13 +49,25 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
     try {
         scenName = LocateQuestRegistrator::getThis( )->getRandomScenario( pch );
         customer = getRandomClient( pch );
-        customerName = customer->getShortDescr(LANG_DEFAULT);
-        customerRoom = customer->in_room->getName();
-        customerArea = customer->in_room->areaName();
+
+        // Capture every name per language so info() answers in the reader's own;
+        // getForLang() falls back to Russian where a language has none.
+        // customerArea has to be filled before getRandomRoomClient() below, which
+        // reads it back through checkRoomClient to keep the errand out of the
+        // customer's own zone.
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+
+            customerName[lang] = customer->getShortDescr( lang );
+            customerRoom[lang] = customer->in_room->getName( lang );
+            customerArea[lang] = customer->in_room->areaName( lang );
+        }
 
         if (getScenario( ).needsEndPoint( )) {
             endPoint = getRandomRoomClient( pch );
-            targetArea = endPoint->areaName();
+
+            for (int l = LANG_MIN; l < LANG_MAX; l++)
+                targetArea[(lang_t)l] = endPoint->areaName( (lang_t)l );
         }
 
         scatterItems( pch, endPoint, customer );
@@ -76,15 +88,23 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
 
     tell_fmt( _("{W%3$#^C1{G хочет отыскать некоторые принадлежащие %3$P3 вещи."),  
               pch, questman, customer );
-    tell_fmt( _("%3$#^P1 ждет тебя в районе {W%4$s{G ({W{hh%5$s{hx{G)."), 
-               pch, questman, customer, customer->in_room->getName(), customer->in_room->areaName().c_str() );
-    tell_fmt( _("У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности."),  
+    // The frame is translated per recipient, but these two names are resolved at
+    // call time -- so they need the recipient's language explicitly, or a UA
+    // player is told about a room in Russian inside a Ukrainian sentence.
+    lang_t plang = viewerLang( pch );
+
+    tell_fmt( _("%3$#^P1 ждет тебя в районе {W%4$s{G ({W{hh%5$s{hx{G)."),
+               pch, questman, customer,
+               customer->in_room->getName( plang ),
+               customer->in_room->areaName( plang ).c_str( ) );
+    tell_fmt( _("У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности."),
                pch, questman, time );
-    
-    wiznet( scenName.getValue( ).c_str( ), 
+
+    // Wiznet is an immortal channel and deliberately stays Russian.
+    wiznet( scenName.getValue( ).c_str( ),
             "customer [%s], item [%s], count %d, path from [%d] to [%d]",
-            customer->getNameP( '1' ).c_str( ), 
-            itemName.ruscase( '1' ).c_str( ),
+            customer->getNameP( '1' ).c_str( ),
+            russian_case( itemName.get( LANG_DEFAULT ), '1' ).c_str( ),
             total.getValue( ),
             customer->in_room->vnum, (endPoint ? endPoint->vnum : 0) );
 }
@@ -94,27 +114,35 @@ bool LocateQuest::isComplete( )
     return state == QSTAT_FINISHED;
 }
 
-void LocateQuest::info( std::ostream &buf, PCharacter *ch ) 
+void LocateQuest::info( std::ostream &buf, PCharacter *ch )
 {
+    lang_t lang = viewerLang( ch );
+
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << customerName.ruscase( '1' ) <<  " хочет отыскать кое-какие свои вещи." << endl
-            << "Тебя с нетерпением ждут в районе " << customerRoom << "." << endl
-            << "Это находится в местности под названием {hh" << customerArea << "{hx." << endl;
+        buf << fmt( ch, _("%1$s хочет отыскать кое-какие свои вещи."),
+                    russian_case( customerName.getForLang( lang ), '1' ).c_str( ) ) << endl
+            << fmt( ch, _("Тебя с нетерпением ждут в районе %1$s."),
+                    customerRoom.getForLang( lang ).c_str( ) ) << endl
+            << fmt( ch, _("Это находится в местности под названием {hh%1$s{hx."),
+                    customerArea.getForLang( lang ).c_str( ) ) << endl;
         break;
     case QSTAT_SEARCH:
         getScenario( ).getLegend( ch, this, buf );
 
         if (delivered > 0)
-            buf << "Тобой уже доставлено {Y" << delivered << "{x из них." << endl;
-        
-        buf << "Заказчик ждет тебя в районе " << customerRoom << "." << endl
-            << "Это находится в местности под названием {hh" << customerArea << "{hx." << endl;
+            buf << fmt( ch, _("Тобой уже доставлено {Y%1$d{x из них."),
+                        delivered.getValue( ) ) << endl;
+
+        buf << fmt( ch, _("Заказчик ждет тебя в районе %1$s."),
+                    customerRoom.getForLang( lang ).c_str( ) ) << endl
+            << fmt( ch, _("Это находится в местности под названием {hh%1$s{hx."),
+                    customerArea.getForLang( lang ).c_str( ) ) << endl;
 
         break;
     case QSTAT_FINISHED:
-        buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-            << "Вернись за вознаграждением, до того как выйдет время!" << endl;
+        // Same two sentences the base class already carries, word for word.
+        infoComplete( buf, ch );
         break;
     default:
         break;
@@ -123,19 +151,28 @@ void LocateQuest::info( std::ostream &buf, PCharacter *ch )
 
 void LocateQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
+    lang_t lang = viewerLang( ch );
+
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "Помочь " << customerName.ruscase( '3' ) << " из " << customerRoom
-            << " (" << customerArea << ") отыскать свои вещи.";
+        buf << fmt( ch, _("Помочь %1$s из %2$s (%3$s) отыскать свои вещи."),
+                    russian_case( customerName.getForLang( lang ), '3' ).c_str( ),
+                    customerRoom.getForLang( lang ).c_str( ),
+                    customerArea.getForLang( lang ).c_str( ) );
         break;
     case QSTAT_SEARCH:
-        buf << "Найти " << total << " штук" << GET_COUNT(total, "у", "и", "") << " "
-            << russian_case( itemMltName.getValue( ), '2' ) << " для "
-            << russian_case( customerName.getValue( ), '2' ) << " из " << customerRoom 
-            << " (" << customerArea << ").";
+        // The count suffix moves into the frame as %1$I so each language brings
+        // its own plural rule, instead of Russian endings glued onto a
+        // translated word.
+        buf << fmt( ch, _("Найти %1$d штук%1$Iу|и| %2$s для %3$s из %4$s (%5$s)."),
+                    total.getValue( ),
+                    russian_case( itemMltName.getForLang( lang ), '2' ).c_str( ),
+                    russian_case( customerName.getForLang( lang ), '2' ).c_str( ),
+                    customerRoom.getForLang( lang ).c_str( ),
+                    customerArea.getForLang( lang ).c_str( ) );
         break;
     case QSTAT_FINISHED:
-        buf << "Вернуться к квестору за наградой.";
+        shortInfoComplete( buf, ch );
         break;
     default:
         break;
@@ -195,7 +232,10 @@ bool LocateQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 
 bool LocateQuest::checkRoomClient( PCharacter *pch, Room *room )
 {
-    if (!customerArea.empty( ) && customerArea == room->areaName())
+    // Both sides pinned to Russian on purpose: this is a comparison, not display
+    // text. Letting either side follow the viewer would make the same room match
+    // or not depending on who is reading.
+    if (!customerArea.emptyValues( ) && customerArea.get( LANG_DEFAULT ) == room->areaName( ))
         return false;
 
     return ClientQuestModel::checkRoomClient( pch, room );
@@ -219,10 +259,16 @@ void LocateQuest::scatterItems( PCharacter *pch, Room *endPoint, NPCharacter *cu
         throw QuestCannotStartException( );
     
     const LSItemData &itemScen = scen.items[number_range( 0, scen.items.size( ) - 1 )];
-    // itemName/itemMltName are still single-language here; take the Russian slot
-    // so this stays byte-identical until LocateQuest's own fields go trilingual.
-    itemName.setValue( itemScen.shortDesc.getForLang( LANG_DEFAULT ) );
-    itemMltName = itemScen.shortMlt;
+
+    // getForLang() mirrors Russian into any slot the scenario data has not
+    // translated yet, which is what the reader needs: an empty slot would fall
+    // through to the bare prototype instead.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        itemName[lang] = itemScen.shortDesc.getForLang( lang );
+        itemMltName[lang] = itemScen.shortMlt.getForLang( lang );
+    }
 
     pObjIndex = get_obj_index( LocateQuestRegistrator::getThis( )->itemVnum );
         

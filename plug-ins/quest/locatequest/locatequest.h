@@ -37,13 +37,17 @@ public:
 
     const LocateScenario & getScenario( ) const;
 
+    // scenName is a lookup key into the registrator, not display text -- it stays
+    // single-language. Everything below is read back out to the player, so each
+    // is captured per language at create() time; XMLMultiString::fromXML files an
+    // attribute-less node under RU, so quests already in flight load unchanged.
     XML_VARIABLE XMLString scenName;
-    XML_VARIABLE XMLString itemName;
-    XML_VARIABLE XMLString itemMltName;
-    XML_VARIABLE XMLString targetArea;
-    XML_VARIABLE XMLString customerName;
-    XML_VARIABLE XMLString customerRoom;
-    XML_VARIABLE XMLString customerArea;
+    XML_VARIABLE XMLMultiString itemName;
+    XML_VARIABLE XMLMultiString itemMltName;
+    XML_VARIABLE XMLMultiString targetArea;
+    XML_VARIABLE XMLMultiString customerName;
+    XML_VARIABLE XMLMultiString customerRoom;
+    XML_VARIABLE XMLMultiString customerArea;
     XML_VARIABLE XMLInteger total;
     XML_VARIABLE XMLInteger delivered;
 
