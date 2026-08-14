@@ -9,6 +9,8 @@
 #include "xmlmap.h"
 #include "xmlstring.h"
 #include "xmlmultistring.h"
+#include "xmlvector.h"
+#include "multimessage.h"
 #include "xmlflags.h"
 #include "xmlinteger.h"
 #include "xmlreversevector.h"
@@ -135,6 +137,41 @@ typedef XMLReverseVector<XMLString> XMLStringVector;
 struct NameList : public XMLStringVector {
     bool hasName( NPCharacter * );
 };
+
+/** One line of quest narration, in every language.
+ *
+ * A container wrapping an XMLMultiString rather than an XMLMultiString put
+ * straight into a vector: XMLVectorBase builds a NEW element for every <node>
+ * child it meets, while XMLMultiString is written to have fromXML called once
+ * per sibling on ONE object (see the comment on XMLMultiString::fromXML), so
+ * swapping a vector's element type would turn twenty lines into sixty, each two
+ * thirds empty. Wrapped in a container, moc dispatches all three
+ * <text l="..."> children onto the same member. Same shape and same reason as
+ * PieceDescription in the rainbow gquest.
+ *
+ * NameList above must stay an XMLStringVector: it is matched against mob names,
+ * not displayed, so it has no business being per-language.
+ */
+class QuestMessage : public XMLVariableContainer {
+XML_OBJECT
+public:
+    typedef ::Pointer<QuestMessage> Pointer;
+
+    /** Read a legacy bare <node>текст</node> into the Russian slot, so existing
+     *  data files keep working untouched and a rollback cannot blank them. */
+    virtual void fromXML( const XMLNode::Pointer & );
+
+    XML_VARIABLE XMLMultiString text;
+};
+
+typedef XMLVectorBase<QuestMessage> QuestMessageList;
+
+/** Bridge a data-file XMLMultiString into a message that resolves per recipient.
+ *
+ * The three-language MultiMessage ctor stores the slots verbatim and does no
+ * catalog lookup, which is what quest data wants: the translations live in the
+ * data file, not in the phrase catalog. Same idiom as social.cpp:93. */
+MultiMessage questMessage( const XMLMultiString & );
 
 
 #endif

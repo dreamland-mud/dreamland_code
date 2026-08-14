@@ -161,7 +161,10 @@ void BandaItem::getByHero( PCharacter *ch )
     int carries = count_obj_list(obj->pIndexData, ch->carrying);
 
     if (carries == quest->objsTotal) {
-        obj->getRoom()->echo(POS_RESTING, quest->getScenario().msgJoin.c_str());
+        // Room::echo has a MultiMessage overload that resolves per listener, so
+        // everyone in the room reads the announcement in their own language
+        // rather than the finder's.
+        obj->getRoom()->echo(POS_RESTING, questMessage(quest->getScenario().msgJoin));
         ch->pecho(_("Он вспыхивает и исчезает, оставив на своем месте {C1000{x очков опыта."));
         ch->recho(_("Он ярко вспыхивает и исчезает."));
         Player::gainExp(ch, 1000);
