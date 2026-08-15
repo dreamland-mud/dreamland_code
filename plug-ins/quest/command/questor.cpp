@@ -86,9 +86,21 @@ void Questor::doComplete( PCharacter *client, DLString &args )
         return;
     }
 
-    tell_raw( client, ch,  _("Поздравляю с выполнением задания!") );
+    // Same containment as CQuest::autoQuestInfo: a scenario missing from the
+    // config throws out of getScenario and nothing up the stack catches it, so
+    // an uncaught throw here would end the process. Congratulate only once the
+    // reward has actually been computed, so nobody is congratulated and then
+    // told their quest is broken.
+    try {
+        reward = quest->reward( client, ch );
+    } catch (const ::Exception &e) {
+        LogStream::sendError( ) << "Broken quest reward for " << client->getName( )
+                                << ": " << e.what( ) << endl;
+        tell_raw( client, ch, _("Что-то в твоем задании испорчено -- отмени его и возьми новое.") );
+        return;
+    }
 
-    reward = quest->reward( client, ch );
+    tell_raw( client, ch,  _("Поздравляю с выполнением задания!") );
 
     // Issue reward only for quests that allow players to gain quest points.
     if (reward->points > 0) {

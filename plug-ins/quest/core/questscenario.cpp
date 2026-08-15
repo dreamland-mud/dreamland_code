@@ -31,12 +31,6 @@ int QuestScenario::getPriority() const
     return 1;
 }
 
-void QuestScenarioMap::fromXML( const XMLNode::Pointer &node )
-{
-    std::map<DLString, XMLPointer<QuestScenario> >::clear( );
-    XMLContainer::fromXML( node );
-}
-
 const DLString &
 QuestScenariosContainer::getRandomScenario( PCharacter *ch ) const
 {
