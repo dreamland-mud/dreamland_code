@@ -4,6 +4,7 @@
  */
 #include "questregistrator.h"
 #include "questexceptions.h"
+#include "feniaquest.h"
 #include "pcharacter.h"
 #include "feniamanager.h"
 #include "wrappermanagerbase.h"
@@ -60,6 +61,23 @@ void QuestRegistratorBase::unlinkFeniaWrapper( )
 int QuestRegistratorBase::getFeniaId( ) const
 {
     return feniaId.getValue( );
+}
+
+bool QuestRegistratorBase::isFeniaEngine( ) const
+{
+    return engine.getValue( ) == "fenia";
+}
+
+Quest::Pointer QuestRegistratorBase::createFeniaQuest( PCharacter *pch, NPCharacter *questor ) const
+{
+    FeniaQuest::Pointer quest( NEW );
+
+    // The TYPE name, which is also the config file's name and the key every
+    // victory tally is counted under. Set before create(), because create() is
+    // what looks the .AutoQuest() wrapper up by it.
+    quest->setTypeName( getName( ) );
+    quest->create( pch, questor );
+    return quest;
 }
 
 bool QuestRegistratorBase::applicable( PCharacter *pch, bool fAuto ) const
