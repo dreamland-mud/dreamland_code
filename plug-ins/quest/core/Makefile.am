@@ -16,6 +16,8 @@ impl.cpp \
 questexceptions.cpp \
 questmanager.cpp \
 quest.cpp \
+feniaquest.cpp \
+questwrapper.cpp \
 questmodels.cpp \
 questregistrator.cpp \
 questentity.cpp \
@@ -28,6 +30,8 @@ areaquestcleanupplugin.cpp
 libquest_core_la_MOC = \
 questmanager.h \
 quest.h \
+feniaquest.h \
+questwrapper.h \
 questregistrator.h \
 questscenario.h \
 mobquestbehavior.h \

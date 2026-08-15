@@ -16,6 +16,9 @@
 #include "questexceptions.h"
 #include "quest.h"
 #include "questregistrator.h"
+#include "feniaquest.h"
+#include "questwrapper.h"
+#include "class.h"
 #include "def.h"
 
 
@@ -35,9 +38,23 @@ QuestManager::~QuestManager( ) {
 }
 
 void QuestManager::initialization( ) {
+    // Registered here, once, rather than per quest type: one generic class
+    // serves every type that has flipped to <engine>fenia</engine>. It has to be
+    // known before pfiles are read, and this plugin loads long before them.
+    //
+    // Keep it registered forever. Once one player's pfile holds a FeniaQuest, a
+    // binary without this line drops the node with a warning
+    // (XMLAttributes::nodeFromXML catches the bad type) -- that player silently
+    // loses a quest in flight, which is survivable but not free.
+    Class::regMoc<FeniaQuest>( );
+    Class::regMoc<QuestWrapper>( );
+    Class::regMoc<QuestRewardWrapper>( );
 }
 
 void QuestManager::destruction( ) {
+    Class::unregMoc<QuestRewardWrapper>( );
+    Class::unregMoc<QuestWrapper>( );
+    Class::unregMoc<FeniaQuest>( );
 }
 
 DLString QuestManager::getNodeName( ) const
@@ -140,9 +157,23 @@ void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) const {
     throw QuestCannotStartException( );
 }
 
+/** A type set to run on Fenia but with no feniaId has no wrapper to hang its
+ *  scripts on, so every quest of it would fail at onCreate with a message about
+ *  a missing script rather than about the real cause. Say the real cause. */
+static void checkFeniaConfig( QuestRegistratorBase *reg )
+{
+    if (reg->isFeniaEngine( ) && reg->getFeniaId( ) <= 0)
+        LogStream::sendError( )
+            << "Quest type " << reg->getName( )
+            << " is set to <engine>fenia</engine> but has no feniaId, so it has no"
+            << " Fenia wrapper and cannot start a single quest" << endl;
+}
+
 void QuestManager::load( QuestRegistratorBase* reg ) {
     if (!loadXML( reg, reg->getName( ) ))
         return;
+
+    checkFeniaConfig( reg );
 
     // Two types sharing a feniaId key one Fenia DB entry between them, and one
     // type's scripts then run for the other -- the exact collision the explicit
@@ -167,9 +198,12 @@ int QuestManager::reload( ) {
     for (QuestRegistry::iterator i = quests.begin( ); i != quests.end( ); i++) {
         const DLString &name = (*i)->getName( );
 
-        if (loadXML( i->getPointer( ), name ))
+        if (loadXML( i->getPointer( ), name )) {
+            // Reload is how a type is flipped to Fenia and back, so the same
+            // sanity check has to run here and not only at boot.
+            checkFeniaConfig( i->getPointer( ) );
             count++;
-        else
+        } else
             LogStream::sendError( ) << "Quest config reload failed for " << name << endl;
     }
 

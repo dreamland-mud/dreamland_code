@@ -66,12 +66,33 @@ public:
      *  so it can be used to compare types during load. */
     int getFeniaId( ) const;
 
+    /** True when <engine>fenia</engine> is set in this type's config, meaning
+     *  new quests of it are generated as FeniaQuest and their logic is read from
+     *  the .AutoQuest() wrapper instead of from C++.
+     *
+     *  Deliberately a value in the same file every other tunable lives in, so
+     *  `quest set reload` flips a type in both directions without a reboot. The
+     *  C++ class stays registered either way: quests already in a player's pfile
+     *  keep loading and finishing on the class that made them.
+     *
+     *  🛑 To switch a type BACK, write <engine>cpp</engine> -- do not delete the
+     *  node. Reload merges rather than replaces (QuestManager::reload explains
+     *  why), so a node that is absent from the file is never read at all and the
+     *  member keeps the value it already had. Deleting the line looks like a
+     *  rollback and is not one until the next reboot. */
+    bool isFeniaEngine( ) const;
+
 protected:
+    /** Build a Fenia-backed quest of this type. Out of line and out of the
+     *  template so the header need not know about FeniaQuest. */
+    Quest::Pointer createFeniaQuest( PCharacter *, NPCharacter * ) const;
+
     XML_VARIABLE XMLMultiString shortDesc;
     XML_VARIABLE XMLMultiString difficulty;
     XML_VARIABLE XMLInteger priority;
     XML_VARIABLE XMLIntegerNoEmpty minAutoLevel;
     XML_VARIABLE XMLInteger feniaId;
+    XML_VARIABLE XMLString engine;
 };
 
 template<typename QT>
@@ -105,6 +126,9 @@ public:
 
     virtual Quest::Pointer createQuest( PCharacter *pch, NPCharacter *questor ) const
     {
+        if (isFeniaEngine( ))
+            return createFeniaQuest( pch, questor );
+
         ::Pointer<QT> quest( NEW );
         quest->create( pch, questor );
         return quest;

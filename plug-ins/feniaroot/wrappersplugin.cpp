@@ -45,6 +45,7 @@
 #include "autoquestwrapper.h"
 #include "questmanager.h"
 #include "questregistrator.h"
+#include "questwrapper.h"
 #include "behavior.h"
 #include "merc.h"
 
@@ -270,7 +271,12 @@ WrappersPlugin::initialization( )
     traitsAPIJson<FeniaCommandWrapper>("command", apiDump, false);     
     traitsAPIJson<AreaQuestWrapper>("areaquest", apiDump, false);     
     traitsAPIJson<AutoQuestWrapper>("autoquest", apiDump, false);
-    traitsAPIJson<BehaviorWrapper>("behavior", apiDump, false);  
+    // Both are built per call and thrown away, like spellcontext above, so they
+    // are documented here but never registered as wrappers -- quest_core owns
+    // their moc registration.
+    traitsAPIJson<QuestWrapper>("quest", apiDump, false);
+    traitsAPIJson<QuestRewardWrapper>("questreward", apiDump, false);
+    traitsAPIJson<BehaviorWrapper>("behavior", apiDump, false);
     dumpTables(apiDump);
 
     Json::FastWriter writer;
