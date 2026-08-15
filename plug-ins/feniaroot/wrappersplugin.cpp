@@ -42,6 +42,9 @@
 #include "character.h"
 #include "room.h"
 #include "core/object.h"
+#include "autoquestwrapper.h"
+#include "questmanager.h"
+#include "questregistrator.h"
 #include "behavior.h"
 #include "merc.h"
 
@@ -90,6 +93,23 @@ WrappersPlugin::linkTargets()
         if (q.second->wrapper) {
             LogStream::sendNotice() << "Area quest: setting target for " << q.first << endl;
             wrapper_cast<AreaQuestWrapper>(q.second->wrapper)->setTarget(q.second);
+        }
+    }
+
+    // Autoquest types. On a normal boot this loop does nothing: feniaroot is line
+    // 9 of plugin.xml and the quest plugins are 28-36, so QuestManager does not
+    // exist yet and each registrator links its own wrapper later, from its own
+    // initialization(). What this covers is `plug reload feniaroot` on a running
+    // server -- the Fenia DB is recovered into fresh wrapper objects while the
+    // registrators are still alive holding pointers to the destroyed ones, and
+    // without re-pointing them every accessor throws "offline". Same reason the
+    // areaQuests loop above exists.
+    if (QuestManager::getThis()) {
+        for (auto &reg: QuestManager::getThis()->all()) {
+            if (reg->wrapper) {
+                LogStream::sendNotice() << "Autoquest: setting target for " << reg->getName() << endl;
+                wrapper_cast<AutoQuestWrapper>(reg->wrapper)->setTarget(reg.getPointer());
+            }
         }
     }
 
@@ -194,6 +214,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<SkillGroupWrapper>( );
     Class::regMoc<FeniaCommandWrapper>( );
     Class::regMoc<AreaQuestWrapper>( );
+    Class::regMoc<AutoQuestWrapper>( );
     Class::regMoc<BehaviorWrapper>();
     Class::regMoc<PlayerWrapper>();
     
@@ -241,6 +262,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<FeniaString>("string", apiDump, false);
     traitsAPIJson<FeniaCommandWrapper>("command", apiDump, false);     
     traitsAPIJson<AreaQuestWrapper>("areaquest", apiDump, false);     
+    traitsAPIJson<AutoQuestWrapper>("autoquest", apiDump, false);
     traitsAPIJson<BehaviorWrapper>("behavior", apiDump, false);  
     dumpTables(apiDump);
 
@@ -265,6 +287,7 @@ void WrappersPlugin::destruction( ) {
 
     Class::unregMoc<PlayerWrapper>();
     Class::unregMoc<BehaviorWrapper>();
+    Class::unregMoc<AutoQuestWrapper>( );
     Class::unregMoc<AreaQuestWrapper>( );
     Class::unregMoc<WearlocWrapper>( );
     Class::unregMoc<LiquidWrapper>( );

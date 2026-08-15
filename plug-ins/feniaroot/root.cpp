@@ -67,6 +67,9 @@
 #include "schedulerwrapper.h"
 #include "commandwrapper.h"
 #include "areaquestwrapper.h"
+#include "autoquestwrapper.h"
+#include "questmanager.h"
+#include "questregistrator.h"
 #include "behaviorwrapper.h"
 #include "codesource.h"
 #include "context.h"
@@ -1377,6 +1380,27 @@ NMI_INVOKE( Root, AreaQuest, "(vnum): конструктор для арийно
         throw Scripting::Exception("Unknown area quest vnum");
 
     return WrapperManager::getThis()->getWrapper(q->second);
+}
+
+NMI_INVOKE( Root, AutoQuest, "(name): конструктор для типа автоквеста по имени, например KillQuest" )
+{
+    DLString name = argnum2string(args, 1);
+    QuestRegistratorBase::Pointer reg = QuestManager::getThis()->findQuestRegistrator(name);
+
+    if (!reg)
+        throw Scripting::Exception("Unknown autoquest type: " + name);
+
+    return WrapperManager::getThis()->getWrapper(reg.getPointer());
+}
+
+NMI_GET( Root, autoQuests, "список (List) всех типов автоквестов")
+{
+    RegList::Pointer list(NEW);
+
+    for (auto &reg: QuestManager::getThis()->all())
+        list->push_back(WrapperManager::getThis()->getWrapper(reg.getPointer()));
+
+    return ::wrap(list);
 }
 
 NMI_GET( Root, areaQuests, "список (List) всех арийных квестов") 

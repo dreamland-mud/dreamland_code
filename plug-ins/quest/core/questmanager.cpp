@@ -70,6 +70,16 @@ QuestList QuestManager::list(PCharacter *pch) const
     
 }
 
+QuestList QuestManager::all( ) const
+{
+    QuestList result;
+
+    for (unsigned int i = 0; i < quests.size( ); i++)
+        result.push_back( quests[i] );
+
+    return result;
+}
+
 void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) const {
     unsigned int summ, i, dice;
     QuestList qlist;

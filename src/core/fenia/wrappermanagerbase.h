@@ -24,6 +24,7 @@ class SkillCommand;
 class WrappedCommand;
 class AreaQuest;
 class Behavior;
+class QuestRegistratorBase;
 
 class WrapperManagerBase : public virtual DLObject {
 public:
@@ -43,6 +44,7 @@ public:
     virtual Scripting::Register getWrapper( WrappedCommand * ) = 0;
     virtual Scripting::Register getWrapper( AreaQuest * ) = 0;
     virtual Scripting::Register getWrapper( Behavior * ) = 0;
+    virtual Scripting::Register getWrapper( QuestRegistratorBase * ) = 0;
 
     virtual void linkWrapper( Character * ) = 0;
     virtual void linkWrapper( ::Object * ) = 0;
@@ -57,6 +59,7 @@ public:
     virtual void linkWrapper( WrappedCommand * ) = 0;
     virtual void linkWrapper( AreaQuest * ) = 0;
     virtual void linkWrapper( Behavior * ) = 0;
+    virtual void linkWrapper( QuestRegistratorBase * ) = 0;
 
     virtual void getTarget( const Scripting::Register &, Character *& ) = 0;
     void markAlive(long long id);

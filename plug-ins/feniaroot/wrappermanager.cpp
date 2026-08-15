@@ -15,6 +15,8 @@
 #include "skillcommandwrapper.h"
 #include "commandwrapper.h"
 #include "areaquestwrapper.h"
+#include "autoquestwrapper.h"
+#include "questregistrator.h"
 #include "behaviorwrapper.h"
 #include "subr.h"
 #include "fenia/register-impl.h"
@@ -157,6 +159,14 @@ Scripting::Register WrapperManager::getWrapper(Behavior *bhv)
     return wrapperAux<BehaviorWrapper>(bhv->getID(), bhv);
 }
 
+Scripting::Register WrapperManager::getWrapper(QuestRegistratorBase *reg)
+{
+    if (!reg)
+        return Scripting::Register();
+
+    return wrapperAux<AutoQuestWrapper>(reg->getID(), reg);
+}
+
 
 
 template <typename WrapperType, typename TargetType>
@@ -235,6 +245,11 @@ void WrapperManager::linkWrapper(AreaQuest *q)
 void WrapperManager::linkWrapper(Behavior *bhv) 
 {
     linkAux<BehaviorWrapper>(bhv->getID(), bhv);
+}
+
+void WrapperManager::linkWrapper(QuestRegistratorBase *reg)
+{
+    linkAux<AutoQuestWrapper>(reg->getID(), reg);
 }
 
 void WrapperManager::getTarget( const Scripting::Register &reg, Character *& ch )
