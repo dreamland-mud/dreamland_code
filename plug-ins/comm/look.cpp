@@ -1210,13 +1210,22 @@ struct ExtraDescList : public list<EDInfo> {
     void putDefaultDescription( Object *obj )
     {
         if (obj->getKeyword().matchesUnstrict(arg)) {
-            DLString defaultDescr;
-            if (obj->in_room)
-                defaultDescr = obj->getDescription(Player::lang(ch));
-            else
-                defaultDescr = l(ch, "Ты не видишь здесь ничего особенного.");
-                
-            push_back( EDInfo(String::toString(obj->getKeyword()), defaultDescr, obj, 0 ) );
+            if (obj->in_room) {
+                push_back( EDInfo(String::toString(obj->getKeyword()),
+                                  obj->getDescription(Player::lang(ch)), obj, 0 ) );
+                return;
+            }
+
+            // Carried item, keyword matches, but it has nothing to say about this
+            // word. That is a non-answer, and carried items are polled before the
+            // room -- so it used to outrank the room's real extra description and
+            // become result #1. A player holding any of the dozen objects keyworded
+            // `sign` got "you see nothing special" instead of the bakery placard in
+            // room 3009, while the full `read sign вывеска вивіска` still worked,
+            // because three words no longer matched the item. Keep the line as a
+            // last resort, after everything that actually answers.
+            fallbacks.push_back( EDInfo(String::toString(obj->getKeyword()),
+                                        l(ch, "Ты не видишь здесь ничего особенного."), obj, 0 ) );
         }
     }
 
@@ -1232,6 +1241,10 @@ struct ExtraDescList : public list<EDInfo> {
         int count;
         iterator i;
         ostringstream buf;
+
+        // Non-answers from carried items rank below every real description, and
+        // only below: a `2.<word>` still numbers them, just last.
+        splice( end( ), fallbacks );
 
         for (count = 1, i = begin( ); i != end( ); i++, count++)
             if (count == number) {
@@ -1255,6 +1268,9 @@ struct ExtraDescList : public list<EDInfo> {
     Character *ch;
     const char *arg;
     int number;
+    // Keyword-matched carried items with no description for this word. Spliced
+    // onto the end in output(), so they never shadow a real one.
+    list<EDInfo> fallbacks;
 };
 
 bool do_look_extradescr( Character *ch, const char *arg, int number )
