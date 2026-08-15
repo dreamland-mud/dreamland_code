@@ -261,7 +261,25 @@ void CQuest::autoQuestInfo(PCharacter *ch, ostringstream &buf)
         if (ch->getAttributes( ).isAvailable( "quest" )) 
             buf << fmt(ch, _("Твое задание невозможно ни выполнить, ни отменить.")) << endl;
     } else {
-        quest->info( buf, ch );
+        // A quest whose scenario is missing from the config throws
+        // QuestRuntimeException out of getScenario, and nothing between here and
+        // main() catches it: Scheduler::tick rethrows, DreamLand::run does not
+        // catch, so an uncaught throw takes the process down for everyone -- from
+        // the most ordinary command in the game. Contain it and tell the player
+        // to cancel. Built into a scratch stream so a throw part way through
+        // cannot leave a torn half-line in the real output.
+        ostringstream info;
+
+        try {
+            quest->info( info, ch );
+        } catch (const ::Exception &e) {
+            LogStream::sendError( ) << "Broken quest for " << ch->getName( )
+                                    << ": " << e.what( ) << endl;
+            buf << fmt(ch, _("Твое задание испорчено, его придется отменить. См. {y{hcквест ?{x.")) << endl;
+            return;
+        }
+
+        buf << info.str( );
         buf << fmt(ch, _("У тебя {Y%1$d{x минут%1$Iа|ы| на выполнение задания."), time) << endl;
     }
 }
@@ -385,8 +403,23 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
         return;
     }
     
+    if (name == "reload") {
+        int reloaded = QuestManager::getThis( )->reload( );
+
+        // Numbered conversions on purpose: a translation that drops an
+        // un-numbered %-code shifts the argument list and segfaults.
+        ch->pecho(_("Перечитано конфигов автоквестов: %1$d из %2$d."),
+                  reloaded, (int)QuestManager::getThis( )->size( ));
+        // Say what reload cannot do, because the surprising half is the silent
+        // one: a node deleted from the file is simply never read, so the old
+        // value stays live until the next boot.
+        ch->pecho(_("Перечитывание только обновляет -- удаленные из файла узлы и сценарии живут до ребута."));
+        return;
+    }
+
     if (name.empty( ) || questID.empty( ) || number.empty( )) {
         ch->pecho(_("Использование: quest set <player> <quest id> [+]<num. of victories>"));
+        ch->pecho(_("               quest set reload -- перечитать quests/*.xml с диска"));
         return;
     }
 
