@@ -97,18 +97,20 @@ WrappersPlugin::linkTargets()
     }
 
     // Autoquest types. Empty on a normal boot, but NOT because QuestManager is
-    // missing: feniaroot now links libquest_core, so quest_core is loaded as a
-    // dependency before feniaroot rather than at its own line in plugin.xml, and
-    // the manager exists here. It is the quest TYPE plugins that have not
-    // registered yet, so the registry is empty and each type links its own
-    // wrapper later, from its own initialization().
+    // missing: feniaroot links libquest_core, so quest_core is pulled in as a
+    // dependency here at line 9 instead of arriving with the quest plugins at
+    // 28-36, and the manager exists by now. It is the quest TYPE plugins that
+    // have not registered yet, so the registry is empty and each type links its
+    // own wrapper later, from its own initialization().
     //
     // What this loop is really for is `plug reload feniaroot` on a running
-    // server: the registrators survive, still holding pointers to wrapper
-    // objects that recovery has just replaced, and without re-pointing them
+    // server, and the findref sweep in cfindref.cpp, which calls straight into
+    // here: the registrators survive holding a Scripting::Object whose handler
+    // recovery has just rebuilt with a null target, and without re-pointing them
     // every accessor throws "offline". Same reason the areaQuests loop above
     // exists. The null guard covers a stale installed libfeniaroot.xml that
-    // predates the dependency.
+    // predates the dependency, where quest_core is dlopen'd as DT_NEEDED but
+    // initialize_quest_core never runs.
     if (QuestManager::getThis()) {
         for (auto &reg: QuestManager::getThis()->all()) {
             if (reg->wrapper) {
