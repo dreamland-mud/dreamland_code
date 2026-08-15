@@ -38,6 +38,30 @@ void QuestRegistratorBase::linkFeniaWrapper( )
     }
 }
 
+/** Detaching is only safe while feniaroot is still up, and by unload time it
+ *  usually is not.
+ *
+ *  Because feniaroot links libquest_core, the unload cascade takes feniaroot
+ *  down FIRST. Its backup() clears every dynamic handler but leaves our
+ *  'wrapper' pointer non-null, so WrapperTarget::getWrapper() -- which resolves
+ *  the pointer through hasHandler() -- returns NULL, and extractWrapper() would
+ *  then make a virtual call on it. That is a segfault in every graceful shutdown
+ *  and every `plug reload all`, armed the moment one autoquest wrapper exists.
+ *  Same guard as wrappedcommand.cpp:34 and the three skills_impl extract sites.
+ */
+void QuestRegistratorBase::unlinkFeniaWrapper( )
+{
+    if (!FeniaManager::wrapperManager)
+        return;
+
+    extractWrapper( false );
+}
+
+int QuestRegistratorBase::getFeniaId( ) const
+{
+    return feniaId.getValue( );
+}
+
 bool QuestRegistratorBase::applicable( PCharacter *pch, bool fAuto ) const
 {
     if (fAuto && pch->getRemorts().size() == 0 && pch->getRealLevel() < minAutoLevel)

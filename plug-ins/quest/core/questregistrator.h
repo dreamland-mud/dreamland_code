@@ -59,6 +59,13 @@ public:
      *  Fenia are live without anyone having touched .AutoQuest() first. */
     void linkFeniaWrapper( );
 
+    /** Detach it again, if there is still a Fenia side to detach from. */
+    void unlinkFeniaWrapper( );
+
+    /** The raw configured id, 0 when unset. Unlike getID() this never throws,
+     *  so it can be used to compare types during load. */
+    int getFeniaId( ) const;
+
 protected:
     XML_VARIABLE XMLMultiString shortDesc;
     XML_VARIABLE XMLMultiString difficulty;
@@ -88,8 +95,9 @@ public:
     virtual void destruction( )
     {
         // Before unLoad(), so the wrapper is detached while the type is still
-        // registered. Left attached, a `plug reload` would strand it.
-        extractWrapper( false );
+        // registered. Left attached, a `plug reload` would strand it. The Fenia
+        // side may already be gone by now -- see unlinkFeniaWrapper.
+        unlinkFeniaWrapper( );
         XMLAttributePlugin::destruction( );
         QuestManager::getThis( )->unLoad( this );
         Class::unregMoc<QT>( );

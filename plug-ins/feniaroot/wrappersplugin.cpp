@@ -96,14 +96,19 @@ WrappersPlugin::linkTargets()
         }
     }
 
-    // Autoquest types. On a normal boot this loop does nothing: feniaroot is line
-    // 9 of plugin.xml and the quest plugins are 28-36, so QuestManager does not
-    // exist yet and each registrator links its own wrapper later, from its own
-    // initialization(). What this covers is `plug reload feniaroot` on a running
-    // server -- the Fenia DB is recovered into fresh wrapper objects while the
-    // registrators are still alive holding pointers to the destroyed ones, and
-    // without re-pointing them every accessor throws "offline". Same reason the
-    // areaQuests loop above exists.
+    // Autoquest types. Empty on a normal boot, but NOT because QuestManager is
+    // missing: feniaroot now links libquest_core, so quest_core is loaded as a
+    // dependency before feniaroot rather than at its own line in plugin.xml, and
+    // the manager exists here. It is the quest TYPE plugins that have not
+    // registered yet, so the registry is empty and each type links its own
+    // wrapper later, from its own initialization().
+    //
+    // What this loop is really for is `plug reload feniaroot` on a running
+    // server: the registrators survive, still holding pointers to wrapper
+    // objects that recovery has just replaced, and without re-pointing them
+    // every accessor throws "offline". Same reason the areaQuests loop above
+    // exists. The null guard covers a stale installed libfeniaroot.xml that
+    // predates the dependency.
     if (QuestManager::getThis()) {
         for (auto &reg: QuestManager::getThis()->all()) {
             if (reg->wrapper) {
