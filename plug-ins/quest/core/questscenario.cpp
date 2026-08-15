@@ -84,6 +84,16 @@ QuestScenariosContainer::getScenario( const DLString &name ) const
     return i->second;
 }
 
+StringList QuestScenariosContainer::getScenarioNames( ) const
+{
+    StringList names;
+
+    for (Scenarios::const_iterator i = scenarios.begin( ); i != scenarios.end( ); i++)
+        names.push_back( i->first );
+
+    return names;
+}
+
 QuestItemAppearence::QuestItemAppearence( )
                         : wear( 0, &wear_flags ),
                           extra( 0, &extra_flags )

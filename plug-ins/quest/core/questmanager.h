@@ -34,6 +34,10 @@ public:
 
         void generate( PCharacter *, NPCharacter * ) const;
         QuestList list(PCharacter *) const;
+
+        /** Every registered type, unfiltered. list() above answers "what can
+         *  this player be offered", which is a different question. */
+        QuestList all( ) const;
         void load( QuestRegistratorBase* );
         void unLoad( QuestRegistratorBase* );
 

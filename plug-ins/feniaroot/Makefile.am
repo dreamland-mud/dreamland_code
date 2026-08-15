@@ -35,6 +35,7 @@ affecthandlerwrapper.cpp \
 feniaspellext.cpp \
 skillcommandwrapper.cpp \
 areaquestwrapper.cpp \
+autoquestwrapper.cpp \
 wrap_utils.cpp \
 feniacroaker.cpp \
 commandtableloader.cpp \
@@ -63,6 +64,7 @@ spellwrapper.h \
 affecthandlerwrapper.h \
 skillcommandwrapper.h \
 areaquestwrapper.h \
+autoquestwrapper.h \
 characterwrapper.h \
 behaviorwrapper.h \
 behaviorloader.h \
@@ -86,6 +88,7 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/services/petshop \
 -I/usr/include/jsoncpp \
 -I$(top_srcdir)/plug-ins/servlets \
+-I$(top_srcdir)/plug-ins/quest/core \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
 
@@ -105,6 +108,7 @@ $(LIBADD_AI) \
 ../services/core/libservices_core.la \
 ../services/petshop/libservices_petshop.la \
 ../languages/core/liblanguages_core.la \
+../quest/core/libquest_core.la \
 -ljsoncpp
 
 AM_CPPFLAGS += $(plugin_INCLUDES)

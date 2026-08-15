@@ -42,6 +42,9 @@
 #include "character.h"
 #include "room.h"
 #include "core/object.h"
+#include "autoquestwrapper.h"
+#include "questmanager.h"
+#include "questregistrator.h"
 #include "behavior.h"
 #include "merc.h"
 
@@ -90,6 +93,30 @@ WrappersPlugin::linkTargets()
         if (q.second->wrapper) {
             LogStream::sendNotice() << "Area quest: setting target for " << q.first << endl;
             wrapper_cast<AreaQuestWrapper>(q.second->wrapper)->setTarget(q.second);
+        }
+    }
+
+    // Autoquest types. Empty on a normal boot, but NOT because QuestManager is
+    // missing: feniaroot links libquest_core, so quest_core is pulled in as a
+    // dependency here at line 9 instead of arriving with the quest plugins at
+    // 28-36, and the manager exists by now. It is the quest TYPE plugins that
+    // have not registered yet, so the registry is empty and each type links its
+    // own wrapper later, from its own initialization().
+    //
+    // What this loop is really for is `plug reload feniaroot` on a running
+    // server, and the findref sweep in cfindref.cpp, which calls straight into
+    // here: the registrators survive holding a Scripting::Object whose handler
+    // recovery has just rebuilt with a null target, and without re-pointing them
+    // every accessor throws "offline". Same reason the areaQuests loop above
+    // exists. The null guard covers a stale installed libfeniaroot.xml that
+    // predates the dependency, where quest_core is dlopen'd as DT_NEEDED but
+    // initialize_quest_core never runs.
+    if (QuestManager::getThis()) {
+        for (auto &reg: QuestManager::getThis()->all()) {
+            if (reg->wrapper) {
+                LogStream::sendNotice() << "Autoquest: setting target for " << reg->getName() << endl;
+                wrapper_cast<AutoQuestWrapper>(reg->wrapper)->setTarget(reg.getPointer());
+            }
         }
     }
 
@@ -194,6 +221,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<SkillGroupWrapper>( );
     Class::regMoc<FeniaCommandWrapper>( );
     Class::regMoc<AreaQuestWrapper>( );
+    Class::regMoc<AutoQuestWrapper>( );
     Class::regMoc<BehaviorWrapper>();
     Class::regMoc<PlayerWrapper>();
     
@@ -241,6 +269,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<FeniaString>("string", apiDump, false);
     traitsAPIJson<FeniaCommandWrapper>("command", apiDump, false);     
     traitsAPIJson<AreaQuestWrapper>("areaquest", apiDump, false);     
+    traitsAPIJson<AutoQuestWrapper>("autoquest", apiDump, false);
     traitsAPIJson<BehaviorWrapper>("behavior", apiDump, false);  
     dumpTables(apiDump);
 
@@ -265,6 +294,7 @@ void WrappersPlugin::destruction( ) {
 
     Class::unregMoc<PlayerWrapper>();
     Class::unregMoc<BehaviorWrapper>();
+    Class::unregMoc<AutoQuestWrapper>( );
     Class::unregMoc<AreaQuestWrapper>( );
     Class::unregMoc<WearlocWrapper>( );
     Class::unregMoc<LiquidWrapper>( );

@@ -70,6 +70,16 @@ QuestList QuestManager::list(PCharacter *pch) const
     
 }
 
+QuestList QuestManager::all( ) const
+{
+    QuestList result;
+
+    for (unsigned int i = 0; i < quests.size( ); i++)
+        result.push_back( quests[i] );
+
+    return result;
+}
+
 void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) const {
     unsigned int summ, i, dice;
     QuestList qlist;
@@ -131,8 +141,24 @@ void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) const {
 }
 
 void QuestManager::load( QuestRegistratorBase* reg ) {
-    if (loadXML( reg, reg->getName( ) )) 
-        quests.push_back( reg );
+    if (!loadXML( reg, reg->getName( ) ))
+        return;
+
+    // Two types sharing a feniaId key one Fenia DB entry between them, and one
+    // type's scripts then run for the other -- the exact collision the explicit
+    // id exists to prevent, moved into a config typo. Loud, but not fatal: the
+    // type still loads and plays, it just cannot safely carry Fenia logic.
+    int id = reg->getFeniaId( );
+
+    if (id > 0)
+        for (unsigned int i = 0; i < quests.size( ); i++)
+            if (quests[i]->getFeniaId( ) == id)
+                LogStream::sendError( )
+                    << "Quest type " << reg->getName( ) << " shares feniaId " << id
+                    << " with " << quests[i]->getName( )
+                    << " -- their Fenia scripts will collide" << endl;
+
+    quests.push_back( reg );
 }
 
 int QuestManager::reload( ) {

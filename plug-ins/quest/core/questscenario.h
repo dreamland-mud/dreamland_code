@@ -15,6 +15,7 @@
 #include "xmlinteger.h"
 #include "xmlreversevector.h"
 #include "xmlenumeration.h"
+#include "stringlist.h"
 #include "race.h"
 #include "questexceptions.h"
 
@@ -40,6 +41,10 @@ public:
     const DLString & getRandomScenario( PCharacter * ) const;
     const DLString & getWeightedRandomScenario( PCharacter * ) const;
     QuestScenario::Pointer getScenario( const DLString & ) const;
+
+    /** Every scenario name this type declares, for callers outside the class
+     *  hierarchy -- the Fenia wrapper -- that must not reach into the map. */
+    StringList getScenarioNames( ) const;
 
     template<typename S> inline const S * getMyScenario( const DLString & ) const;
     template<typename S> inline void getMyScenarios( PCharacter *, vector< ::Pointer<S> > & ) const;
