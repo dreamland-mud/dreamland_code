@@ -76,7 +76,14 @@ void Quest::wiznet( const char *status, const char *format, ... )
         va_end( ap );
     }
 
-    ::wiznet( WIZ_QUEST, 0, 0, buf.str().c_str() );
+    // "%s" and not the composed line itself. ::wiznet takes a FORMAT and runs it
+    // through vfmt once for the log and once per immortal, both with an empty
+    // va_list, so a percent sign anywhere in the text -- a mob's name, a Fenia
+    // error quoting script source, scenario prose -- makes va_arg read a pointer
+    // that was never passed. That is a possible segfault, not an exception, and
+    // no formatter try/catch helps. Nothing is lost: this string has already had
+    // its own arguments applied above.
+    ::wiznet( WIZ_QUEST, 0, 0, "%s", buf.str().c_str() );
 }
 
 int Quest::getAccidentTime( PCMemoryInterface *pci )

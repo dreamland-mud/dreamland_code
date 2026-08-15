@@ -100,13 +100,70 @@ bool FeniaQuest::tryCallType( const DLString &methodName, const RegisterList &ex
     }
 }
 
-void FeniaQuest::complain( const DLString &methodName, const ::Exception &e )
+void FeniaQuest::complain( const DLString &methodName, const DLString &reason )
 {
-    DLString reason = methodName + ": " + e.what( );
+    DLString message = methodName + ": " + reason;
 
     LogStream::sendError( ) << "Fenia quest " << typeName << " for " << charName
-                            << ": " << reason << endl;
-    wiznet( "error", "%s", reason.c_str( ) );
+                            << ": " << message << endl;
+    wiznet( "error", "%s", message.c_str( ) );
+}
+
+void FeniaQuest::complain( const DLString &methodName, const ::Exception &e )
+{
+    complain( methodName, DLString( e.what( ) ) );
+}
+
+/*--------------------------------------------------------------------------
+ * Reading what a script answered
+ *
+ * Register::toBoolean() throws for anything that is not a number or a string,
+ * and toString() throws for an object. Calling either straight on a return value
+ * would undo the containment below, because the conversion happens AFTER
+ * tryCallType has returned: a scenario whose onIsComplete ends up answering a
+ * List -- the most ordinary mistake there is in a language with no types -- would
+ * throw out of a method whose callers do not catch, and the process would end.
+ * Worse, the quest is in the pfile, so the player's next command after the
+ * restart would do it again.
+ *------------------------------------------------------------------------*/
+bool FeniaQuest::answerBoolean( const DLString &methodName, const Register &rc, bool fallback )
+{
+    switch (rc.type) {
+    case Register::NONE:
+        // No answer at all is not a mistake: it means "use the default".
+        return fallback;
+
+    case Register::NUMBER:
+    case Register::STRING:
+        return rc.toBoolean( );
+
+    default: {
+        // Named local, not the expression inline: Exception has an implicit
+        // constructor from std::string, so a bare concatenation makes the two
+        // complain() overloads ambiguous.
+        DLString reason = DLString( "answered " ) + rc.getTypeName( )
+                          + " where true or false was expected";
+
+        complain( methodName, reason );
+        return fallback;
+    }
+    }
+}
+
+DLString FeniaQuest::answerString( const DLString &methodName, const Register &rc )
+{
+    if (rc.type == Register::NONE)
+        return DLString::emptyString;
+
+    if (rc.type == Register::OBJECT) {
+        DLString reason = DLString( "answered " ) + rc.getTypeName( )
+                          + " where a line of text was expected";
+
+        complain( methodName, reason );
+        return DLString::emptyString;
+    }
+
+    return rc.toString( );
 }
 
 /*--------------------------------------------------------------------------
@@ -158,8 +215,11 @@ void FeniaQuest::create( PCharacter *pch, NPCharacter *questman )
 
     // A script answering false has decided this player cannot have this quest
     // right now. Not an error: generate() drops the type and picks another, and
-    // `quest request <name>` retries twice more.
-    if (rc.type != Register::NONE && !rc.toBoolean( ))
+    // `quest request <name>` retries twice more. Anything that is not an answer
+    // at all means proceed -- the quest is already built by this point, and the
+    // `quest request <name>` path catches only QuestCannotStartException, so a
+    // raw toBoolean() here would escape it.
+    if (!answerBoolean( "onCreate", rc, true ))
         throw QuestCannotStartException( typeName );
 }
 
@@ -178,12 +238,12 @@ bool FeniaQuest::isComplete( )
     RegisterList args;
     Register rc;
 
-    // Contained, and the fallback is what all nine C++ types do anyway, so a
-    // scenario that just sets state and defines no onIsComplete works.
-    if (!tryCallType( "onIsComplete", args, rc ) || rc.type == Register::NONE)
+    // Contained, and the fallback is what nearly every C++ type does anyway, so
+    // a scenario that just sets state and defines no onIsComplete works.
+    if (!tryCallType( "onIsComplete", args, rc ))
         return state == QSTAT_FINISHED;
 
-    return rc.toBoolean( );
+    return answerBoolean( "onIsComplete", rc, state == QSTAT_FINISHED );
 }
 
 bool FeniaQuest::hasPartialRewards( ) const
@@ -195,10 +255,10 @@ bool FeniaQuest::hasPartialRewards( ) const
     RegisterList args;
     Register rc;
 
-    if (!self->tryCallType( "onHasPartialRewards", args, rc ) || rc.type == Register::NONE)
+    if (!self->tryCallType( "onHasPartialRewards", args, rc ))
         return false;
 
-    return rc.toBoolean( );
+    return self->answerBoolean( "onHasPartialRewards", rc, false );
 }
 
 void FeniaQuest::info( std::ostream &buf, PCharacter *ch )
@@ -216,8 +276,14 @@ void FeniaQuest::info( std::ostream &buf, PCharacter *ch )
     if (!callType( "onInfo", args, rc ))
         throw QuestRuntimeException( typeName + ": onInfo is not defined" );
 
-    if (rc.type != Register::NONE)
-        buf << rc.toString( ) << endl;
+    DLString text = answerString( "onInfo", rc );
+
+    // Empty is broken, not quiet: this method IS the quest description, and the
+    // caller's catch turns a throw into "your quest is broken, cancel it".
+    if (text.empty( ))
+        throw QuestRuntimeException( typeName + ": onInfo answered nothing" );
+
+    buf << text << endl;
 }
 
 void FeniaQuest::shortInfo( std::ostream &buf, PCharacter *ch )
@@ -233,8 +299,8 @@ void FeniaQuest::shortInfo( std::ostream &buf, PCharacter *ch )
     Register rc;
 
     // Contained: the only caller is the web prompt, built on every command.
-    if (tryCallType( "onShortInfo", args, rc ) && rc.type != Register::NONE)
-        buf << rc.toString( );
+    if (tryCallType( "onShortInfo", args, rc ))
+        buf << answerString( "onShortInfo", rc );
 }
 
 QuestReward::Pointer FeniaQuest::reward( PCharacter *ch, NPCharacter *questman )
@@ -267,10 +333,10 @@ bool FeniaQuest::help( PCharacter *ch, NPCharacter *questman )
 
     // True means the script handled `quest find` itself and doFind should stop;
     // false falls through to the standard speedwalk built from helpLocation().
-    if (!tryCallType( "onHelp", args, rc ) || rc.type == Register::NONE)
+    if (!tryCallType( "onHelp", args, rc ))
         return false;
 
-    return rc.toBoolean( );
+    return answerBoolean( "onHelp", rc, false );
 }
 
 Room * FeniaQuest::helpLocation( )

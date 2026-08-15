@@ -13,7 +13,7 @@ class WrapperBase;
  *
  *  A single class serves every type: what distinguishes a Fenia KillQuest from
  *  a Fenia StealQuest is 'typeName', which names the .AutoQuest() wrapper each
- *  virtual below delegates to. The nine concrete C++ classes stay compiled and
+ *  virtual below delegates to. The eight concrete C++ classes stay compiled and
  *  registered meanwhile, so a quest already in flight keeps running on the class
  *  it was created with -- flipping a type is about what gets GENERATED next, not
  *  about rewriting what players already hold.
@@ -83,7 +83,16 @@ protected:
     bool tryCallType( const DLString &methodName, const Scripting::RegisterList &extraArgs,
                       Scripting::Register &rc );
 
+    void complain( const DLString &methodName, const DLString &reason );
     void complain( const DLString &methodName, const ::Exception & );
+
+    /** Read a script's answer without the InvalidCastException that
+     *  Register::toBoolean/toString throw on a type they do not handle. The
+     *  conversion happens after tryCallType has returned, i.e. outside its
+     *  containment, so doing it raw would let a scenario that answers a List kill
+     *  the process from a method that promised it could not. */
+    bool answerBoolean( const DLString &methodName, const Scripting::Register &, bool fallback );
+    DLString answerString( const DLString &methodName, const Scripting::Register & );
 };
 
 #endif

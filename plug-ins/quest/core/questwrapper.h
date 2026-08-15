@@ -17,9 +17,14 @@ using Scripting::NativeHandler;
  *  Short-lived on purpose. One is built per call into a Fenia method and thrown
  *  away after, so it is nothing like .AutoQuest() -- that wrapper IS the type and
  *  lives in the Fenia DB, this one only points at a quest somebody currently
- *  holds. It keeps a counted pointer rather than a raw one so a script that
- *  stashes it somewhere gets an error instead of a crash; after a reboot the
- *  target is gone and every accessor says so.
+ *  holds.
+ *
+ *  Stashing one is unsupported, and the two failure modes differ. The counted
+ *  pointer means it can never crash: after a reboot the target is not restored
+ *  and every accessor says "Quest is offline". But within one run the count keeps
+ *  the quest object alive after the player's attribute has been erased, so a
+ *  stashed wrapper goes on answering for a quest nobody holds any more -- quietly
+ *  wrong rather than loudly. Read it, use it, drop it.
  */
 class QuestWrapper : public PluginNativeImpl<QuestWrapper>,
                      public NativeHandler,
