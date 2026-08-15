@@ -385,8 +385,23 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
         return;
     }
     
+    if (name == "reload") {
+        int reloaded = QuestManager::getThis( )->reload( );
+
+        // Numbered conversions on purpose: a translation that drops an
+        // un-numbered %-code shifts the argument list and segfaults.
+        ch->pecho(_("Перечитано конфигов автоквестов: %1$d из %2$d."),
+                  reloaded, (int)QuestManager::getThis( )->size( ));
+        // Pre-existing hazard, now reachable without a reboot: a quest in flight
+        // stores its scenario by name and looks it up on every info/reward, so
+        // deleting a scenario strands whoever is holding one until it expires.
+        ch->pecho(_("Задания в полете ссылаются на сценарии по имени -- удаленный сценарий сломает их до истечения таймера."));
+        return;
+    }
+
     if (name.empty( ) || questID.empty( ) || number.empty( )) {
         ch->pecho(_("Использование: quest set <player> <quest id> [+]<num. of victories>"));
+        ch->pecho(_("               quest set reload -- перечитать quests/*.xml с диска"));
         return;
     }
 

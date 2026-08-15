@@ -32,9 +32,29 @@ public:
     virtual int getPriority() const;
 };
 
+/** Scenario table, keyed by scenario name.
+ *
+ * Exists only to drop its previous contents before reading. XMLMapBase merges
+ * by key (xmlmap.h:38-45) instead of replacing, which is invisible at boot but
+ * wrong for an in-game config reload: a scenario deleted from the data file
+ * would keep being picked until the next reboot. Vectors already clear
+ * themselves in XMLVectorBase::fromXML and a scenario pointer is reallocated
+ * per read by XMLPolymorphPointer::fromXML, so the map is the one container in
+ * this plugin that needed it.
+ */
+// MOC_SKIP_BEGIN
+// Hidden from moc: its parser cannot read a templated base class and dies with
+// "unexpected character: <" on the whole header. Nothing here needs moc anyway,
+// the map is reached through the XML_VARIABLE member below.
+class QuestScenarioMap : public XMLMapBase<XMLPointer<QuestScenario> > {
+public:
+    virtual void fromXML( const XMLNode::Pointer & );
+};
+// MOC_SKIP_END
+
 class QuestScenariosContainer : public virtual XMLVariableContainer {
 public:
-    typedef XMLMapBase<XMLPointer<QuestScenario> > Scenarios;
+    typedef QuestScenarioMap Scenarios;
     typedef vector<QuestScenario> ScenarioList;
     
     const DLString & getRandomScenario( PCharacter * ) const;

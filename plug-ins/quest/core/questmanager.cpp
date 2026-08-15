@@ -135,6 +135,21 @@ void QuestManager::load( QuestRegistratorBase* reg ) {
         quests.push_back( reg );
 }
 
+int QuestManager::reload( ) {
+    int count = 0;
+
+    for (QuestRegistry::iterator i = quests.begin( ); i != quests.end( ); i++) {
+        const DLString &name = (*i)->getName( );
+
+        if (loadXML( i->getPointer( ), name ))
+            count++;
+        else
+            LogStream::sendError( ) << "Quest config reload failed for " << name << endl;
+    }
+
+    return count;
+}
+
 void QuestManager::unLoad( QuestRegistratorBase* reg ) {
 //    saveXML( reg, reg->getName( ) );
     

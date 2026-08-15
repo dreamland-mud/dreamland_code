@@ -36,6 +36,18 @@ public:
         QuestList list(PCharacter *) const;
         void load( QuestRegistratorBase* );
         void unLoad( QuestRegistratorBase* );
+
+        /** Re-read every registered quest type's config from disk.
+         *  Returns how many of them loaded; a type that fails keeps whatever it
+         *  had. Registration, in-flight quests and the pick order are untouched:
+         *  priority and applicability are read live off the registrator. */
+        int reload( );
+
+        /** How many quest types are registered. Not the same as list()'s size,
+         *  which is filtered by what a given player can be offered. */
+        inline size_t size( ) const {
+            return quests.size( );
+        }
         ::Pointer<QuestRegistratorBase> findQuestRegistrator( const DLString& );
         
         static inline QuestManager* getThis( ) {
