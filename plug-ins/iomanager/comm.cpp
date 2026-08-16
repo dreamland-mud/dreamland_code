@@ -67,11 +67,16 @@ bool process_output( Descriptor *d, bool fPrompt )
     /*
      * OS-dependent output.
      */
-    bool rc = d->writeRaw((const unsigned char*)d->outbuf, d->outtop);
+    // writeRaw returns a byte count, or -1 for a socket that is gone. Keeping
+    // that in a bool made every failure read back as success (-1 is true), so
+    // ioWrite() never kicked a dead descriptor: one broken pipe kept the write
+    // loop spinning for 20 hours and 50M log lines before the process had to
+    // be killed by hand.
+    int written = d->writeRaw((const unsigned char*)d->outbuf, d->outtop);
     
     d->outtop = 0;
 
-    return rc;
+    return written >= 0;
 }
 
 void init_descriptor( int control )

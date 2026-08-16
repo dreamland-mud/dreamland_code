@@ -223,9 +223,22 @@ Descriptor::writeFd(const unsigned char *txt, int length)
         nWrite = ::send( descriptor, (const char*)txt + iStart, nBlock, 0 );
 
         if ( nWrite < 0 ) {
+            // A full kernel buffer is not a dead peer. These sockets are
+            // non-blocking (init_descriptor sets FNDELAY), the read path
+            // already treats EWOULDBLOCK as "come back next pulse", and the
+            // caller drops the descriptor on -1 -- so reporting a failure here
+            // would disconnect a player whose buffer merely happened to fill.
+            if ( errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR )
+                return iStart;
+
             LogStream::sendWarning( ) << "Descriptor::writeFd(" << descriptor << "):" << strerror( errno ) << endl;
             return -1;
         }
+
+        // send() made no progress: `iStart += nWrite` would never advance and
+        // this loop would spin forever, taking the whole game loop with it.
+        if ( nWrite == 0 )
+            return iStart;
     }
 
     return iStart;
