@@ -114,6 +114,7 @@ protected:
     virtual bool checkMobileVictim( PCharacter *, NPCharacter * );
     virtual bool checkMobileClient( PCharacter *, NPCharacter * );
     virtual bool checkItem( PCharacter *, ::Object * );
+    virtual bool checkRoomClient( PCharacter *, Room * );
 
     bool passesParams( PCharacter *, NPCharacter * );
 

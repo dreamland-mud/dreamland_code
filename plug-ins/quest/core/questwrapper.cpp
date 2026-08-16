@@ -641,6 +641,110 @@ NMI_SET( QuestSelectWrapper, visible, "цель должна быть видим
     params.visible = arg.toBoolean( );
 }
 
+NMI_GET( QuestSelectWrapper, carriedByNpc, "предмет должен быть в руках NPC, способного отдать его обратно" )
+{
+    return Register( params.carriedByNpc );
+}
+
+NMI_SET( QuestSelectWrapper, carriedByNpc, "предмет должен быть в руках NPC, способного отдать его обратно" )
+{
+    params.carriedByNpc = arg.toBoolean( );
+}
+
+NMI_GET( QuestSelectWrapper, vnums, "список (List) внумов прототипов, из которых можно выбирать" )
+{
+    RegList::Pointer list( NEW );
+
+    for (std::set<int>::const_iterator v = params.vnums.begin( ); v != params.vnums.end( ); v++)
+        list->push_back( Register( *v ) );
+
+    return wrapList( list );
+}
+
+NMI_SET( QuestSelectWrapper, vnums, "список (List) внумов прототипов, из которых можно выбирать" )
+{
+    params.vnums.clear( );
+
+    if (arg.type == Register::NONE)
+        return;
+
+    if (arg.type != Register::OBJECT)
+        throw Scripting::Exception( "vnums wants a List of vnums" );
+
+    Scripting::Object *obj = arg.toObject( );
+
+    if (!obj || !obj->hasHandler( ))
+        throw Scripting::Exception( "vnums wants a List of vnums" );
+
+    RegList *list = obj->getHandler( ).getDynamicPointer<RegList>( );
+
+    if (!list)
+        throw Scripting::Exception( "vnums wants a List of vnums" );
+
+    for (RegList::const_iterator v = list->begin( ); v != list->end( ); v++)
+        params.vnums.insert( v->toNumber( ) );
+}
+
+NMI_GET( QuestSelectWrapper, requireActFlag, "act-флаг, который обязан быть у цели (см. .tables.act_flags)" )
+{
+    if (params.requireActFlag == 0)
+        return Register( DLString::emptyString );
+
+    return Register( act_flags.names( params.requireActFlag ) );
+}
+
+NMI_SET( QuestSelectWrapper, requireActFlag, "act-флаг, который обязан быть у цели (см. .tables.act_flags)" )
+{
+    DLString name = arg.toString( );
+
+    if (name.empty( )) {
+        params.requireActFlag = 0;
+        return;
+    }
+
+    bitstring_t bit = act_flags.bitstring( name, false );
+
+    if (bit == 0)
+        throw Scripting::Exception( "No such act flag: " + name );
+
+    params.requireActFlag = bit;
+}
+
+NMI_GET( QuestSelectWrapper, requireBehavior, "поведение, которое обязано быть у цели; вместе с requireActFlag достаточно ЛЮБОГО из них" )
+{
+    return Register( params.requireBehavior );
+}
+
+NMI_SET( QuestSelectWrapper, requireBehavior, "поведение, которое обязано быть у цели; вместе с requireActFlag достаточно ЛЮБОГО из них" )
+{
+    DLString name = arg.toString( );
+
+    if (!name.empty( ) && !behaviorManager->findExisting( name ))
+        throw Scripting::Exception( "No such behavior: " + name );
+
+    params.requireBehavior = name;
+}
+
+NMI_GET( QuestSelectWrapper, roomNoCast, "не брать комнаты с флагом ROOM_NO_CAST" )
+{
+    return Register( params.roomNoCast );
+}
+
+NMI_SET( QuestSelectWrapper, roomNoCast, "не брать комнаты с флагом ROOM_NO_CAST" )
+{
+    params.roomNoCast = arg.toBoolean( );
+}
+
+NMI_GET( QuestSelectWrapper, excludeAreaName, "русское название зоны, комнаты которой не берем" )
+{
+    return Register( params.excludeAreaName );
+}
+
+NMI_SET( QuestSelectWrapper, excludeAreaName, "русское название зоны, комнаты которой не берем" )
+{
+    params.excludeAreaName = arg.toString( );
+}
+
 NMI_GET( QuestSelectWrapper, noBehaviorInHometown, "имя поведения, которое не берем в цели внутри родных городов" )
 {
     return Register( params.noBehaviorInHometown );
