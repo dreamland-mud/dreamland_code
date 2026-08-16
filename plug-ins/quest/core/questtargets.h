@@ -53,6 +53,13 @@ public:
     XML_VARIABLE XMLString role;
     XML_VARIABLE XMLString questType;
 
+    /** True once this target's own death has given the quest what it was for.
+     *
+     *  Not persisted: the mob is extracted in the same tick that sets it. It
+     *  exists because extract() must not declare the quest broken after a kill
+     *  the hero was sent to make -- see the comment on extract(). */
+    bool dealtWith;
+
 protected:
     /** The idle half of the AI tick, and ONLY the idle half.
      *

@@ -23,6 +23,7 @@
 #include "save.h"
 
 #include "logstream.h"
+#include "fenia/exceptions.h"
 #include "merc.h"
 #include "def.h"
 
@@ -535,6 +536,17 @@ void FeniaQuest::markMobile( NPCharacter *mob, const DLString &role )
     if (!mob)
         return;
 
+    // Refuse anything that already has a mind of its own. Selection can never
+    // hand back such a mob -- checkMobile skips hasDestiny() -- but a scenario
+    // can pass any character it likes, and marking a questor, a shopkeeper or
+    // another hero's target would delete that behavior outright. Marking twice
+    // is worse still: setChar snapshots imm_flags and act_flags before setting
+    // IMM_SUMMON|IMM_CHARM|ACT_NOEYE, so a second snapshot records them as
+    // already set and unsetChar never takes them off again -- permanently, and
+    // saved to disk.
+    if (mob->behavior && mob->behavior->hasDestiny( ))
+        throw Scripting::Exception( "markMob: this mobile already carries a behavior of its own" );
+
     MobQuestTarget::Pointer target( NEW );
 
     target->setHeroName( charName );
@@ -551,8 +563,17 @@ void FeniaQuest::markMobile( NPCharacter *mob, const DLString &role )
 
 void FeniaQuest::markObject( ::Object *obj, const DLString &role, bool mandatory )
 {
+    static const DLString basicName( "BasicObjectBehavior" );
+
     if (!obj)
         return;
+
+    // Same refusal as markMobile, and it matters more here: unlike mobs, item
+    // selection does NOT skip candidates that already carry a behavior, so
+    // randomItem can perfectly well hand back a recipe tome or a generated
+    // weapon whose behavior this would silently destroy.
+    if (obj->behavior && obj->behavior->getType( ) != basicName)
+        throw Scripting::Exception( "markObj: this object already carries a behavior of its own" );
 
     ObjQuestTarget::Pointer target( NEW );
 
@@ -562,6 +583,15 @@ void FeniaQuest::markObject( ::Object *obj, const DLString &role, bool mandatory
     target->setMandatory( mandatory );
     target->setObj( obj );
     obj->behavior.setPointer( *target );
+
+    // The object half of what save_mobs does for a marked mob, and it is NOT
+    // optional. Objects are written out only when they MOVE (obj_to_room and
+    // friends call this themselves), so changing a behavior in place saves
+    // nothing: a scenario that places an item and then marks it would leave an
+    // unmarked copy on disk, and after a reboot the mark, the [ЦЕЛЬ] tag and
+    // every trigger would be gone with no sign anything had happened.
+    // StealQuest has always done the equivalent by hand at stealquest.cpp:166.
+    save_items_at_holder( obj );
 }
 
 NPCharacter * FeniaQuest::findMarkedMobile( const DLString &role )
@@ -629,7 +659,16 @@ void FeniaQuest::clearMarked( )
         if (target
             && target->getHeroName( ) == charName.getValue( )
             && target->questType.getValue( ) == typeName.getValue( ))
+        {
             ItemQuestModel::clear( obj );
+
+            // Unlike the mobile clear, the item one does not save. Without this
+            // the stale disk copy keeps the mark and brings it back on the next
+            // reboot -- harmless for triggers, since the quest is gone by then,
+            // but show() checks only ourHero, so the [ЦЕЛЬ] tag would haunt the
+            // item forever.
+            save_items_at_holder( obj );
+        }
     }
 }
 

@@ -42,7 +42,7 @@ static Register wrapObj( ::Object *obj )
 /*--------------------------------------------------------------------------
  * MobQuestTarget
  *------------------------------------------------------------------------*/
-MobQuestTarget::MobQuestTarget( )
+MobQuestTarget::MobQuestTarget( ) : dealtWith( false )
 {
 }
 
@@ -86,10 +86,12 @@ bool MobQuestTarget::deathAsVictim( Character *killer )
 
     if (ourHero( killer )) {
         quest->state = QSTAT_FINISHED;
+        dealtWith = true;
         how = "hero";
 
     } else if (ourHeroGroup( killer )) {
         quest->state = QSTAT_FINISHED;
+        dealtWith = true;
         how = "group";
 
     } else {
@@ -140,7 +142,15 @@ bool MobQuestTarget::deathAsClient( Character *killer )
     } else {
         quest->setTime( pcm, quest->getAccidentTime( pcm ) );
         quest->state = QSTAT_BROKEN_BY_OTHERS;
-        how = "other";
+
+        // Same state and timer either way -- the C++ ProtectedClient made no
+        // difference there -- but the scenario is told which, because "the man
+        // you were guarding died on his own" and "someone cut him down" want
+        // different words.
+        if (killer && killer->getNPC( ) != ch)
+            how = "other";
+        else
+            how = "suicide";
     }
 
     quest->scheduleDestroy( );
@@ -247,10 +257,21 @@ bool MobQuestTarget::specIdle( )
 
 bool MobQuestTarget::extract( bool count )
 {
-    // Same contract as MandatoryMobile: a target that disappears without being
-    // dealt with leaves the quest unfinishable, so declare it broken rather than
-    // let the player run out the clock chasing something that is gone.
-    mandatoryExtract( );
+    // A target that vanishes with the quest still wanting it leaves the player
+    // chasing nothing, so mandatoryExtract declares the quest broken -- the same
+    // contract MandatoryMobile has always had.
+    //
+    // But NOT after the hero's own kill. mandatoryExtract asks the quest whether
+    // it is complete, and for a Fenia quest that question goes to the scenario's
+    // onIsComplete. A multi-stage scenario -- kill the beast, then bring the
+    // trophy back, which is the first thing anyone will write on this API --
+    // answers no, and the state is FINISHED rather than BROKEN_*, so the guard
+    // below it would fire and tell the player their quest is impossible during
+    // the very kill they were sent to make. The C++ types never saw this because
+    // their isComplete IS the state.
+    if (!dealtWith)
+        mandatoryExtract( );
+
     return MobQuestBehavior::extract( count );
 }
 

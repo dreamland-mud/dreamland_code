@@ -14,6 +14,7 @@
 #include "object.h"
 #include "room.h"
 #include "integer.h"
+#include "behavior.h"
 
 #include "merc.h"
 #include "def.h"
@@ -647,5 +648,14 @@ NMI_GET( QuestSelectWrapper, noBehaviorInHometown, "имя поведения, �
 
 NMI_SET( QuestSelectWrapper, noBehaviorInHometown, "имя поведения, которое не берем в цели внутри родных городов" )
 {
-    params.noBehaviorInHometown = arg.toString( );
+    DLString name = arg.toString( );
+
+    // Checked here rather than in the search: a name nobody recognizes makes the
+    // filter a silent no-op, and "cityGuard" for "cityguard" would quietly put
+    // the town watch back on the menu. The typed wrapper exists so a wrong KNOB
+    // is loud; a wrong VALUE should be too.
+    if (!name.empty( ) && !behaviorManager->findExisting( name ))
+        throw Scripting::Exception( "No such behavior: " + name );
+
+    params.noBehaviorInHometown = name;
 }
