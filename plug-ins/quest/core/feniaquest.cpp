@@ -19,6 +19,7 @@
 #include "room.h"
 #include "profflags.h"
 #include "behavior.h"
+#include "char_weight.h"
 #include "loadsave.h"
 #include "save.h"
 
@@ -433,20 +434,39 @@ NPCharacter * FeniaQuest::selectClient( PCharacter *pch, const QuestSelectParams
     }
 }
 
-Room * FeniaQuest::selectClientRoom( PCharacter *pch )
+/* Both of these install the scope too. Without it the room knobs would be dead
+ * on exactly the path their LocateQuest precedent was written for: that check
+ * exists for the endPoint pick, and is a no-op during customer selection because
+ * the area name is not known yet. And both catch, because findClientRooms throws
+ * on an empty world and the block comment above promises NULL. */
+Room * FeniaQuest::selectClientRoom( PCharacter *pch, const QuestSelectParams &params )
 {
-    return getRandomRoomClient( pch );
+    QuestSelectScope scope( this, params );
+
+    try {
+        return getRandomRoomClient( pch );
+    } catch (const QuestCannotStartException &) {
+        return 0;
+    }
 }
 
-Room * FeniaQuest::selectDistantRoom( PCharacter *pch, Room *from, int range )
+Room * FeniaQuest::selectDistantRoom( PCharacter *pch, Room *from, int range,
+                                      const QuestSelectParams &params )
 {
-    RoomList rooms;
+    QuestSelectScope scope( this, params );
 
-    findClientRooms( pch, rooms );
+    try {
+        RoomList rooms;
 
-    // 20 attempts is what the C++ types that use this pass; it bounds a
-    // room_distance BFS per candidate, so it is a real cost, not a formality.
-    return getDistantRoom( pch, rooms, from, range, 20 );
+        findClientRooms( pch, rooms );
+
+        // 20 attempts is what the C++ types that use this pass; it bounds a
+        // room_distance BFS per candidate, so it is a real cost, not a formality.
+        return getDistantRoom( pch, rooms, from, range, 20 );
+
+    } catch (const QuestCannotStartException &) {
+        return 0;
+    }
 }
 
 bool FeniaQuest::isRoomReachable( PCharacter *pch, Room *room )
@@ -493,6 +513,28 @@ bool FeniaQuest::passesParams( PCharacter *pch, NPCharacter *mob )
             return false;
     }
 
+    if (!p.vnums.empty( ) && p.vnums.count( mob->pIndexData->vnum ) == 0)
+        return false;
+
+    // ANY of the require* that are set is enough, which is StealQuest::isThief's
+    // shape: act flag OR behavior OR a name the scenario keeps for itself.
+    if (p.requireActFlag != 0 || !p.requireBehavior.empty( )) {
+        bool matched = false;
+
+        if (p.requireActFlag != 0 && IS_SET( mob->act, p.requireActFlag ))
+            matched = true;
+
+        if (!matched && !p.requireBehavior.empty( )) {
+            Behavior *bhv = behaviorManager->findExisting( p.requireBehavior );
+
+            if (bhv && mob->pIndexData->behaviors.isSet( bhv ))
+                matched = true;
+        }
+
+        if (!matched)
+            return false;
+    }
+
     return true;
 }
 
@@ -514,15 +556,63 @@ bool FeniaQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 
 bool FeniaQuest::checkItem( PCharacter *pch, ::Object *obj )
 {
+    static const DLString basicName( "BasicObjectBehavior" );
+
     if (!ItemQuestModel::checkItem( pch, obj ))
         return false;
 
-    // Only the two knobs that mean anything for an item. A level window on a
-    // treasure would be a different field, and no type asks for one yet.
-    if (selectParams.maxLevel > 0 && obj->level > selectParams.maxLevel)
+    // Never offer something that already has a behavior of its own -- a recipe
+    // tome, a generated weapon. markObject refuses those outright, so handing one
+    // back would strand the scenario in the middle of building its quest. Not a
+    // knob: there is no case for wanting one.
+    if (obj->behavior && obj->behavior->getType( ) != basicName)
         return false;
 
     if (selectParams.visible && !isItemVisible( obj, pch ))
+        return false;
+
+    // maxLevel is deliberately NOT applied to the item's own level. No C++ type
+    // ever capped it, and with carriedByNpc set below the mob knobs already judge
+    // the CARRIER -- one field meaning two different levels depending on another
+    // field is how a scenario author ends up debugging the engine.
+    //
+    // Below: the whole "an NPC could hand this straight back to you" condition,
+    // which is what makes a steal-style quest finishable at all. Note the carrier
+    // is judged by the client rules, so the mob knobs -- level window, vnum list,
+    // require* -- describe the CARRIER, exactly as StealQuest::checkItem does.
+    if (selectParams.carriedByNpc) {
+        if (!obj->carried_by || !obj->carried_by->is_npc( ))
+            return false;
+
+        NPCharacter *carrier = obj->carried_by->getNPC( );
+
+        if (!checkMobileClient( pch, carrier ))
+            return false;
+
+        if (!carrier->can_see( obj ))
+            return false;
+
+        // Hands almost full: it may not be able to give the item back.
+        if (carrier->carry_number >= Char::canCarryNumber( carrier ))
+            return false;
+
+        if (Char::getCarryWeight( carrier ) >= Char::canCarryWeight( carrier ))
+            return false;
+    }
+
+    return true;
+}
+
+bool FeniaQuest::checkRoomClient( PCharacter *pch, Room *room )
+{
+    if (!RoomQuestModel::checkRoomClient( pch, room ))
+        return false;
+
+    if (selectParams.roomNoCast && IS_SET( room->room_flags, ROOM_NO_CAST ))
+        return false;
+
+    if (!selectParams.excludeAreaName.empty( )
+        && selectParams.excludeAreaName == room->areaName( ))
         return false;
 
     return true;
@@ -568,10 +658,9 @@ void FeniaQuest::markObject( ::Object *obj, const DLString &role, bool mandatory
     if (!obj)
         return;
 
-    // Same refusal as markMobile, and it matters more here: unlike mobs, item
-    // selection does NOT skip candidates that already carry a behavior, so
-    // randomItem can perfectly well hand back a recipe tome or a generated
-    // weapon whose behavior this would silently destroy.
+    // Same refusal as markMobile. Selection no longer hands such items back --
+    // checkItem filters them now -- but a scenario can pass any object it likes,
+    // and clobbering a recipe tome's behavior would be silent and permanent.
     if (obj->behavior && obj->behavior->getType( ) != basicName)
         throw Scripting::Exception( "markObj: this object already carries a behavior of its own" );
 

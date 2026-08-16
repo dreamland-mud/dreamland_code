@@ -15,6 +15,8 @@
 #include "room.h"
 #include "integer.h"
 #include "behavior.h"
+#include "area.h"
+#include "flagtable.h"
 
 #include "merc.h"
 #include "def.h"
@@ -440,7 +442,7 @@ NMI_INVOKE( QuestWrapper, randomItem, "(ch[, selection]): случайный п�
     return wrapEntity( quest->selectItem( ch->getPC( ), argnum2params( args, 2 ) ) );
 }
 
-NMI_INVOKE( QuestWrapper, clientRoom, "(ch): случайная комната, годная для заказчика, или null" )
+NMI_INVOKE( QuestWrapper, clientRoom, "(ch[, selection]): случайная комната, годная для заказчика, или null" )
 {
     FeniaQuest *quest = getTarget( );
     Character *ch = argnum2char( args, 1 );
@@ -448,10 +450,10 @@ NMI_INVOKE( QuestWrapper, clientRoom, "(ch): случайная комната, 
     if (ch->is_npc( ))
         throw Scripting::Exception( "clientRoom: hero must be a player" );
 
-    return wrapEntity( quest->selectClientRoom( ch->getPC( ) ) );
+    return wrapEntity( quest->selectClientRoom( ch->getPC( ), argnum2params( args, 2 ) ) );
 }
 
-NMI_INVOKE( QuestWrapper, distantRoom, "(ch, from, range): комната не ближе range от from, или null" )
+NMI_INVOKE( QuestWrapper, distantRoom, "(ch, from, range[, selection]): комната не ближе range от from, или null" )
 {
     FeniaQuest *quest = getTarget( );
     Character *ch = argnum2char( args, 1 );
@@ -461,7 +463,8 @@ NMI_INVOKE( QuestWrapper, distantRoom, "(ch, from, range): комната не �
 
     return wrapEntity( quest->selectDistantRoom( ch->getPC( ),
                                                  argnum2room( args, 2 ),
-                                                 argnum2number( args, 3 ) ) );
+                                                 argnum2number( args, 3 ),
+                                                 argnum2params( args, 4 ) ) );
 }
 
 NMI_INVOKE( QuestWrapper, roomReachable, "(ch, room): доберется ли герой до комнаты" )
@@ -639,6 +642,141 @@ NMI_GET( QuestSelectWrapper, visible, "цель должна быть видим
 NMI_SET( QuestSelectWrapper, visible, "цель должна быть видима герою прямо сейчас" )
 {
     params.visible = arg.toBoolean( );
+}
+
+NMI_GET( QuestSelectWrapper, carriedByNpc, "предмет должен быть в руках NPC, способного отдать его обратно" )
+{
+    return Register( params.carriedByNpc );
+}
+
+NMI_SET( QuestSelectWrapper, carriedByNpc, "предмет должен быть в руках NPC, способного отдать его обратно" )
+{
+    params.carriedByNpc = arg.toBoolean( );
+}
+
+NMI_INVOKE( QuestSelectWrapper, addVnum, "(vnum): добавить внум прототипа в список допустимых" )
+{
+    const Register &reg = argnum( args, 1 );
+
+    params.vnums.insert( reg.toNumber( ) );
+    return Register( );
+}
+
+NMI_GET( QuestSelectWrapper, vnums, "КОПИЯ списка допустимых внумов -- push_back по ней ничего не меняет, используй addVnum или присвоение" )
+{
+    RegList::Pointer list( NEW );
+
+    for (std::set<int>::const_iterator v = params.vnums.begin( ); v != params.vnums.end( ); v++)
+        list->push_back( Register( *v ) );
+
+    return wrapList( list );
+}
+
+NMI_SET( QuestSelectWrapper, vnums, "заменить список допустимых внумов готовым List; собирай его целиком ДО присваивания" )
+{
+    params.vnums.clear( );
+
+    if (arg.type == Register::NONE)
+        return;
+
+    if (arg.type != Register::OBJECT)
+        throw Scripting::Exception( "vnums wants a List of vnums" );
+
+    Scripting::Object *obj = arg.toObject( );
+
+    if (!obj || !obj->hasHandler( ))
+        throw Scripting::Exception( "vnums wants a List of vnums" );
+
+    RegList *list = obj->getHandler( ).getDynamicPointer<RegList>( );
+
+    if (!list)
+        throw Scripting::Exception( "vnums wants a List of vnums" );
+
+    for (RegList::const_iterator v = list->begin( ); v != list->end( ); v++)
+        params.vnums.insert( v->toNumber( ) );
+}
+
+NMI_GET( QuestSelectWrapper, requireActFlag, "act-флаг, который обязан быть у цели, можно несколько через пробел (см. .tables.act_flags)" )
+{
+    if (params.requireActFlag <= 0)
+        return Register( DLString::emptyString );
+
+    return Register( act_flags.names( params.requireActFlag ) );
+}
+
+NMI_SET( QuestSelectWrapper, requireActFlag, "act-флаг, который обязан быть у цели, можно несколько через пробел (см. .tables.act_flags)" )
+{
+    DLString name = arg.toString( );
+
+    if (name.empty( )) {
+        params.requireActFlag = 0;
+        return;
+    }
+
+    bitstring_t bit = act_flags.bitstring( name, false );
+
+    // NO_FLAG, not 0. An unknown name answers -99, and -99 used as a mask has
+    // bit 0 set -- which is ACT_IS_NPC, carried by every mob alive -- so a typo
+    // would have turned this filter into "match everything" while the getter
+    // read the knob back as unset, because names() maps NO_FLAG to the empty
+    // string. Silent in both directions, which is the one thing this typed
+    // wrapper exists to prevent.
+    if (bit == NO_FLAG || bit <= 0)
+        throw Scripting::Exception( "No such act flag: " + name );
+
+    params.requireActFlag = bit;
+}
+
+NMI_GET( QuestSelectWrapper, requireBehavior, "поведение, которое обязано быть у цели; вместе с requireActFlag достаточно ЛЮБОГО из них" )
+{
+    return Register( params.requireBehavior );
+}
+
+NMI_SET( QuestSelectWrapper, requireBehavior, "поведение, которое обязано быть у цели; вместе с requireActFlag достаточно ЛЮБОГО из них" )
+{
+    DLString name = arg.toString( );
+
+    if (!name.empty( ) && !behaviorManager->findExisting( name ))
+        throw Scripting::Exception( "No such behavior: " + name );
+
+    params.requireBehavior = name;
+}
+
+NMI_GET( QuestSelectWrapper, roomNoCast, "не брать комнаты с флагом ROOM_NO_CAST" )
+{
+    return Register( params.roomNoCast );
+}
+
+NMI_SET( QuestSelectWrapper, roomNoCast, "не брать комнаты с флагом ROOM_NO_CAST" )
+{
+    params.roomNoCast = arg.toBoolean( );
+}
+
+NMI_GET( QuestSelectWrapper, excludeAreaName, "русское название зоны, комнаты которой не берем" )
+{
+    return Register( params.excludeAreaName );
+}
+
+NMI_SET( QuestSelectWrapper, excludeAreaName, "русское название зоны, комнаты которой не берем" )
+{
+    DLString name = arg.toString( );
+
+    // Area names are enumerable, so a wrong one is checkable, and unchecked it
+    // would be the third silent no-op in this class: a name that matches nothing
+    // simply excludes nothing.
+    if (!name.empty( )) {
+        bool found = false;
+
+        for (AreaIndexVector::const_iterator a = areaIndexes.begin( );
+             a != areaIndexes.end( ) && !found; a++)
+            if ((*a)->getName( ) == name)
+                found = true;
+
+        if (!found)
+            throw Scripting::Exception( "No area named: " + name );
+    }
+
+    params.excludeAreaName = name;
 }
 
 NMI_GET( QuestSelectWrapper, noBehaviorInHometown, "имя поведения, которое не берем в цели внутри родных городов" )

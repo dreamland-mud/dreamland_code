@@ -2,7 +2,10 @@
 #ifndef QUESTSELECTPARAMS_H
 #define QUESTSELECTPARAMS_H
 
+#include <set>
+
 #include "dlstring.h"
+#include "bitstring.h"
 
 /** The knobs a Fenia scenario turns before asking the engine to pick a target.
  *
@@ -20,7 +23,8 @@
 struct QuestSelectParams {
     QuestSelectParams( )
         : levelDiffSet( false ), levelDiffMin( 0 ), levelDiffMax( 0 ),
-          maxLevel( 0 ), noCaster( false ), visible( false )
+          maxLevel( 0 ), noCaster( false ), visible( false ),
+          carriedByNpc( false ), requireActFlag( 0 ), roomNoCast( false )
     {
     }
 
@@ -50,6 +54,42 @@ struct QuestSelectParams {
      *  the guards of a town under law are not fair game, the same kind of mob
      *  outside one still is. */
     DLString noBehaviorInHometown;
+
+    /** The item must be in an NPC's hands, and that NPC must be able to hand it
+     *  straight back: it passes the client checks, it can see the item, and it
+     *  is not already at its carry limit in either count or weight. All one
+     *  condition because half of it is useless -- StealQuest::checkItem has
+     *  always tested the four together, and an item held by someone who cannot
+     *  give it away makes an unfinishable quest. */
+    bool carriedByNpc;
+
+    /** Candidate must be one of these prototype vnums; empty for no restriction.
+     *  LocateQuest's scenarios name their customers this way, and so do the big
+     *  and kidnap ones. Not expressible by retrying a random pick: a short list
+     *  against a world of 10^4 mobs effectively never comes up. */
+    std::set<int> vnums;
+
+    /** Candidate must carry this act flag, or this behavior, or both if both are
+     *  set -- ANY match passes, and a field left unset does not restrict.
+     *
+     *  That OR is not a design choice, it is StealQuest::isThief: a mob counts
+     *  as a thief if it has ACT_THIEF, or the `thief` behavior, or its name is in
+     *  the scenario's own list. The third is scenario data and stays in Fenia. */
+    bitstring_t requireActFlag;
+    DLString requireBehavior;
+
+    /** Room filters. They apply wherever a client room is judged: picking a room
+     *  directly with `clientRoom`/`distantRoom`, AND picking a mob, since
+     *  ClientQuestModel::checkMobileClient ends by judging the mob's room. Both
+     *  paths therefore have to be given the selection object -- the room ones
+     *  take it as an optional last argument. */
+    bool roomNoCast;        /**< reject ROOM_NO_CAST; HealQuest cannot heal there */
+    DLString excludeAreaName;  /**< reject rooms in this area, by its RUSSIAN name.
+                                *   Pinned to one language on purpose: LocateQuest
+                                *   compares, it does not display, and a viewer's
+                                *   language deciding whether a room matches would
+                                *   make the same quest behave differently per
+                                *   reader. */
 };
 
 #endif
