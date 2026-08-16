@@ -539,6 +539,15 @@ NPCharacter * VictimQuestModel::getRandomVictim( PCharacter *pch )
     findVictims( pch, victims );
     NPCharacter *result = getRandomMobile( victims );
 
+    // Nothing eligible. getRandomMobile answers NULL for an empty list, and the
+    // accessibility check below would dereference it -- a crash reachable from
+    // `quest request` since 2019 by any player for whom no mob passes the
+    // filters, and much easier to reach now that a Fenia scenario chooses the
+    // level window itself. QuestCannotStartException is what every caller
+    // already handles: drop this type and offer another.
+    if (!result)
+        throw QuestCannotStartException( );
+
     if (!targetRoomAccessible(pch, result->in_room))
         throw QuestCannotStartException( );
 
@@ -604,6 +613,10 @@ NPCharacter * ClientQuestModel::getRandomClient( PCharacter *pch )
 
     findClients( pch, clients );
     NPCharacter *result = getRandomMobile( clients );
+
+    // Same NULL as getRandomVictim above, same fix.
+    if (!result)
+        throw QuestCannotStartException( );
 
     if (!targetRoomAccessible(pch, result->in_room))
         throw QuestCannotStartException( );

@@ -48,6 +48,8 @@ public:
     virtual void linkWrapper( Behavior * );
 
     virtual void getTarget( const Scripting::Register &, Character *& );
+    virtual void getTarget( const Scripting::Register &, ::Object *& );
+    virtual void getTarget( const Scripting::Register &, Room *& );
     
     virtual void initialization( );
     virtual void destruction( );

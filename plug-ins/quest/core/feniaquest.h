@@ -3,11 +3,15 @@
 #define FENIAQUEST_H
 
 #include "quest.h"
+#include "questmodels.h"
+#include "questselectparams.h"
 #include "xmlmap.h"
 #include "xmlstring.h"
 #include "register-decl.h"
 
 class WrapperBase;
+class MobQuestTarget;
+class ObjQuestTarget;
 
 /** One autoquest whose logic lives in Fenia rather than in C++.
  *
@@ -22,8 +26,17 @@ class WrapperBase;
  *  attribute and not a Fenia field on the character: attributes are what the
  *  pfile stores, and the pfile is the only store that survives a reboot AND is
  *  reachable for a player who is offline.
+ *
+ *  It inherits all three selection models because the search functions are quest
+ *  MEMBERS that dispatch through per-quest check* virtuals -- there is no way to
+ *  offer target selection to a scenario without being the thing that searches.
+ *  A concrete type inherits only the models it uses; this one cannot know which
+ *  it will be asked for, so it takes all three. They all derive Quest virtually,
+ *  so there is exactly one Quest in the object.
  */
-class FeniaQuest : public virtual Quest {
+class FeniaQuest : public virtual VictimQuestModel,
+                   public virtual ClientQuestModel,
+                   public virtual ItemQuestModel {
 XML_OBJECT
 public:
     typedef ::Pointer<FeniaQuest> Pointer;
@@ -55,11 +68,54 @@ public:
     using Quest::getHeroWorld;
     using Quest::getHeroMemory;
 
+    /*----------------------------------------------------------------------
+     * Target selection, as offered to a scenario
+     *
+     * Each answers NULL rather than throwing when nothing suitable exists, so
+     * the script decides what to do about it -- widen the window, try a
+     * different shape, or return false from onCreate and let another type have
+     * the player. The C++ models signal the same thing by exception; that is
+     * caught here and turned into NULL at the boundary.
+     *--------------------------------------------------------------------*/
+    NPCharacter *selectVictim( PCharacter *, const QuestSelectParams & );
+    NPCharacter *selectClient( PCharacter *, const QuestSelectParams & );
+    ::Object *selectItem( PCharacter *, const QuestSelectParams & );
+    Room *selectClientRoom( PCharacter * );
+    Room *selectDistantRoom( PCharacter *, Room *from, int range );
+    bool isRoomReachable( PCharacter *, Room * );
+
+    /*----------------------------------------------------------------------
+     * Target marking
+     *
+     * One generic behavior carries a role instead of a class per target kind,
+     * so these take the role as a string rather than a template parameter.
+     *--------------------------------------------------------------------*/
+    void markMobile( NPCharacter *, const DLString &role );
+    /** mandatory: the quest breaks if this item is destroyed while it still
+     *  matters. Report 31038 -- a quest wand blown up by a stray area attack
+     *  inside the target's inventory, leaving the player chasing nothing. */
+    void markObject( ::Object *, const DLString &role, bool mandatory );
+    NPCharacter *findMarkedMobile( const DLString &role );
+    ::Object *findMarkedObject( const DLString &role );
+    void clearMarked( );
+
+    /** The knobs in force for the search currently running. Public because
+     *  QuestSelectScope sets them; nothing else should touch them. */
+    QuestSelectParams selectParams;
+
     XML_VARIABLE XMLString typeName;
     XML_VARIABLE XMLMapBase<XMLString> vars;
 
 protected:
     virtual void destroy( );
+
+    /** Applied on top of whatever the C++ model already decided. The models call
+     *  these while walking the world, so they must stay cheap. */
+    virtual bool checkMobileVictim( PCharacter *, NPCharacter * );
+    virtual bool checkMobileClient( PCharacter *, NPCharacter * );
+    virtual bool checkItem( PCharacter *, ::Object * );
+
+    bool passesParams( PCharacter *, NPCharacter * );
 
     /** This type's Fenia wrapper, or NULL when the type is unknown or carries
      *  no Fenia side at all. */
@@ -93,6 +149,38 @@ protected:
      *  the process from a method that promised it could not. */
     bool answerBoolean( const DLString &methodName, const Scripting::Register &, bool fallback );
     DLString answerString( const DLString &methodName, const Scripting::Register & );
+
+public:
+    /** Public so MobQuestTarget and ObjQuestTarget can hand their events to the
+     *  scenario. They are separate objects living on the mob, not part of this
+     *  class, but they speak to the same type wrapper. */
+    bool callTargetTrigger( const DLString &methodName, const Scripting::RegisterList &extraArgs,
+                            Scripting::Register &rc );
+};
+
+/** Holds the selection knobs for exactly one search and takes them away again
+ *  however the search ends, exception included.
+ *
+ *  The C++ model functions take no parameters -- they walk the world calling the
+ *  quest's own check* virtuals -- so a member is the only way the knobs reach
+ *  those overrides without rewriting questmodels for all eight existing types.
+ *  Everything here is synchronous and single-threaded: a search runs to
+ *  completion inside one command.
+ */
+class QuestSelectScope {
+public:
+    QuestSelectScope( FeniaQuest *q, const QuestSelectParams &p ) : quest( q )
+    {
+        quest->selectParams = p;
+    }
+
+    ~QuestSelectScope( )
+    {
+        quest->selectParams = QuestSelectParams( );
+    }
+
+private:
+    FeniaQuest *quest;
 };
 
 #endif

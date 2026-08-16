@@ -18,6 +18,7 @@ questmanager.cpp \
 quest.cpp \
 feniaquest.cpp \
 questwrapper.cpp \
+questtargets.cpp \
 questmodels.cpp \
 questregistrator.cpp \
 questentity.cpp \
@@ -32,6 +33,7 @@ questmanager.h \
 quest.h \
 feniaquest.h \
 questwrapper.h \
+questtargets.h \
 questregistrator.h \
 questscenario.h \
 mobquestbehavior.h \

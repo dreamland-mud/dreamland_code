@@ -276,6 +276,7 @@ WrappersPlugin::initialization( )
     // their moc registration.
     traitsAPIJson<QuestWrapper>("quest", apiDump, false);
     traitsAPIJson<QuestRewardWrapper>("questreward", apiDump, false);
+    traitsAPIJson<QuestSelectWrapper>("questselection", apiDump, false);
     traitsAPIJson<BehaviorWrapper>("behavior", apiDump, false);
     dumpTables(apiDump);
 

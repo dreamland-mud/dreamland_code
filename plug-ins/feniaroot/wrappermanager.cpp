@@ -257,6 +257,16 @@ void WrapperManager::getTarget( const Scripting::Register &reg, Character *& ch 
     ch = wrapper_cast<CharacterWrapper>( reg )->getTarget( );
 }
 
+void WrapperManager::getTarget( const Scripting::Register &reg, ::Object *& obj )
+{
+    obj = wrapper_cast<ObjectWrapper>( reg )->getTarget( );
+}
+
+void WrapperManager::getTarget( const Scripting::Register &reg, Room *& room )
+{
+    room = wrapper_cast<RoomWrapper>( reg )->getTarget( );
+}
+
 template <typename WrapperType, typename TargetType>
 void WrapperManager::linkAux( long long id, TargetType t )
 {
