@@ -223,9 +223,22 @@ Descriptor::writeFd(const unsigned char *txt, int length)
         nWrite = ::send( descriptor, (const char*)txt + iStart, nBlock, 0 );
 
         if ( nWrite < 0 ) {
+            // A full kernel buffer is not a dead peer. These sockets are
+            // non-blocking (init_descriptor sets FNDELAY), the read path
+            // already treats EWOULDBLOCK as "come back next pulse", and the
+            // caller drops the descriptor on -1 -- so reporting a failure here
+            // would disconnect a player whose buffer merely happened to fill.
+            if ( errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR )
+                return iStart;
+
             LogStream::sendWarning( ) << "Descriptor::writeFd(" << descriptor << "):" << strerror( errno ) << endl;
             return -1;
         }
+
+        // send() made no progress: `iStart += nWrite` would never advance and
+        // this loop would spin forever, taking the whole game loop with it.
+        if ( nWrite == 0 )
+            return iStart;
     }
 
     return iStart;
@@ -280,7 +293,14 @@ Descriptor::writeMccp(const unsigned char *txt, int length)
             if (rc < 0)
                 return -1;
             else if (rc == 0)
-                break;
+                // The socket accepted nothing, and nothing in this loop can
+                // change that: a full compress buffer leaves avail_out at 0,
+                // which skips deflate, which leaves avail_in where it is. A
+                // break only leaves the inner loop, so the outer one would spin
+                // on an unchanged state and take the whole game loop with it.
+                // Give up on the call instead; processMccp keeps the compressed
+                // residue buffered and the next pulse retries it.
+                return length - out_compress->avail_in;
         } while(out_compress->avail_out == 0);
     }
 

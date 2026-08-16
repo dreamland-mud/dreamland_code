@@ -67,11 +67,16 @@ bool process_output( Descriptor *d, bool fPrompt )
     /*
      * OS-dependent output.
      */
-    bool rc = d->writeRaw((const unsigned char*)d->outbuf, d->outtop);
+    // writeRaw returns the number of bytes it consumed, or -1 once the socket
+    // is gone (or the compression stream has failed). Keeping that in a bool
+    // made every failure read back as success, since -1 converts to true, so
+    // ioWrite() never reached kick() and a dead descriptor went on being
+    // written to every pulse for as long as the server stayed up.
+    int written = d->writeRaw((const unsigned char*)d->outbuf, d->outtop);
     
     d->outtop = 0;
 
-    return rc;
+    return written >= 0;
 }
 
 void init_descriptor( int control )
