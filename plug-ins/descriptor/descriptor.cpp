@@ -293,7 +293,14 @@ Descriptor::writeMccp(const unsigned char *txt, int length)
             if (rc < 0)
                 return -1;
             else if (rc == 0)
-                break;
+                // The socket accepted nothing, and nothing in this loop can
+                // change that: a full compress buffer leaves avail_out at 0,
+                // which skips deflate, which leaves avail_in where it is. A
+                // break only leaves the inner loop, so the outer one would spin
+                // on an unchanged state and take the whole game loop with it.
+                // Give up on the call instead; processMccp keeps the compressed
+                // residue buffered and the next pulse retries it.
+                return length - out_compress->avail_in;
         } while(out_compress->avail_out == 0);
     }
 
