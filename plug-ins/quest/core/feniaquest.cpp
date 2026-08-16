@@ -1,6 +1,7 @@
 /* Dream Land, 2026 */
 #include "feniaquest.h"
 #include "questwrapper.h"
+#include "questtargets.h"
 #include "questmanager.h"
 #include "questregistrator.h"
 #include "questexceptions.h"
@@ -14,7 +15,12 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "pcharactermanager.h"
+#include "object.h"
 #include "room.h"
+#include "profflags.h"
+#include "behavior.h"
+#include "loadsave.h"
+#include "save.h"
 
 #include "logstream.h"
 #include "merc.h"
@@ -155,7 +161,11 @@ DLString FeniaQuest::answerString( const DLString &methodName, const Register &r
     if (rc.type == Register::NONE)
         return DLString::emptyString;
 
-    if (rc.type == Register::OBJECT) {
+    // OBJECT is what toString() throws on. FUNCTION it would happily accept, and
+    // that is worse than a throw: Closure::toString decompiles the thing, so a
+    // scenario that assigns a function where it meant to call one would print its
+    // own source code to the player.
+    if (rc.type == Register::OBJECT || rc.type == Register::FUNCTION) {
         DLString reason = DLString( "answered " ) + rc.getTypeName( )
                           + " where a line of text was expected";
 
@@ -231,6 +241,11 @@ void FeniaQuest::destroy( )
     // Contained: destroy runs from eraseAttribute, reached from the 60s timer
     // tick and from quest completion. Neither catches.
     tryCallType( "onDestroy", args, rc );
+
+    // After the script, so onDestroy can still find its own targets. Every C++
+    // type does this in its own destroy(); doing it here means no scenario can
+    // forget and leave a marked mob wandering the world forever.
+    clearMarked( );
 }
 
 bool FeniaQuest::isComplete( )
@@ -280,8 +295,10 @@ void FeniaQuest::info( std::ostream &buf, PCharacter *ch )
 
     // Empty is broken, not quiet: this method IS the quest description, and the
     // caller's catch turns a throw into "your quest is broken, cancel it".
+    // Worded so it stays true when answerString has already complained about a
+    // bad type -- "answered nothing" would have contradicted that first message.
     if (text.empty( ))
-        throw QuestRuntimeException( typeName + ": onInfo answered nothing" );
+        throw QuestRuntimeException( typeName + ": onInfo produced no text" );
 
     buf << text << endl;
 }
@@ -344,11 +361,282 @@ Room * FeniaQuest::helpLocation( )
     RegisterList args;
     Register rc;
 
-    // Answers a room VNUM rather than a room. Turning a Fenia room wrapper back
-    // into a Room* needs feniaroot, and feniaroot links this library, so a number
-    // it is: `return .tmp.quest.victimRoom(quest).vnum;`.
-    if (!tryCallType( "onHelpLocation", args, rc ) || rc.type != Register::NUMBER)
+    if (!tryCallType( "onHelpLocation", args, rc ))
         return 0;
 
-    return get_room_instance( rc.toNumber( ) );
+    // A room or its vnum, whichever the script finds natural. The unwrap can
+    // throw when the answer is some other object, and it happens after
+    // tryCallType has returned, i.e. outside its containment -- the same trap
+    // that made the step 2 blocker, so it gets its own catch.
+    if (rc.type == Register::NUMBER)
+        return get_room_instance( rc.toNumber( ) );
+
+    if (rc.type == Register::OBJECT) {
+        Room *room = 0;
+
+        try {
+            FeniaManager::wrapperManager->getTarget( rc, room );
+        } catch (const ::Exception &e) {
+            complain( "onHelpLocation", e );
+            return 0;
+        }
+
+        return room;
+    }
+
+    return 0;
+}
+
+/*--------------------------------------------------------------------------
+ * Target selection
+ *
+ * Thin wrappers over the C++ quest models, which stay in C++ because a single
+ * pass walks the whole mob or object list -- order 10^4 entries with ten checks
+ * each. Interpreted, that is a visible stall on a player-driven command; native
+ * it is milliseconds. What moves into Fenia is WHICH candidates count, not the
+ * walking.
+ *
+ * Each answers NULL where the model throws, so a scenario can react instead of
+ * having its onCreate torn down mid-sentence.
+ *------------------------------------------------------------------------*/
+NPCharacter * FeniaQuest::selectVictim( PCharacter *pch, const QuestSelectParams &params )
+{
+    QuestSelectScope scope( this, params );
+
+    try {
+        return getRandomVictim( pch );
+    } catch (const QuestCannotStartException &) {
+        return 0;
+    }
+}
+
+NPCharacter * FeniaQuest::selectClient( PCharacter *pch, const QuestSelectParams &params )
+{
+    QuestSelectScope scope( this, params );
+
+    try {
+        return getRandomClient( pch );
+    } catch (const QuestCannotStartException &) {
+        return 0;
+    }
+}
+
+::Object * FeniaQuest::selectItem( PCharacter *pch, const QuestSelectParams &params )
+{
+    QuestSelectScope scope( this, params );
+
+    try {
+        return getRandomItem( pch );
+    } catch (const QuestCannotStartException &) {
+        return 0;
+    }
+}
+
+Room * FeniaQuest::selectClientRoom( PCharacter *pch )
+{
+    return getRandomRoomClient( pch );
+}
+
+Room * FeniaQuest::selectDistantRoom( PCharacter *pch, Room *from, int range )
+{
+    RoomList rooms;
+
+    findClientRooms( pch, rooms );
+
+    // 20 attempts is what the C++ types that use this pass; it bounds a
+    // room_distance BFS per candidate, so it is a real cost, not a formality.
+    return getDistantRoom( pch, rooms, from, range, 20 );
+}
+
+bool FeniaQuest::isRoomReachable( PCharacter *pch, Room *room )
+{
+    if (!room)
+        return false;
+
+    return targetRoomAccessible( pch, room );
+}
+
+/*--------------------------------------------------------------------------
+ * Selection filters
+ *
+ * These run inside the world walk above, once per candidate, so they stay cheap
+ * and they are the ONLY place the scenario's knobs are consulted.
+ *------------------------------------------------------------------------*/
+bool FeniaQuest::passesParams( PCharacter *pch, NPCharacter *mob )
+{
+    const QuestSelectParams &p = selectParams;
+
+    if (p.levelDiffSet) {
+        int diff = mob->getRealLevel( ) - pch->getModifyLevel( );
+
+        if (diff < p.levelDiffMin || diff > p.levelDiffMax)
+            return false;
+    }
+
+    if (p.maxLevel > 0 && mob->getRealLevel( ) > p.maxLevel)
+        return false;
+
+    if (p.noCaster && mob->getProfession( )->getFlags( mob ).isSet( PROF_CASTER ))
+        return false;
+
+    if (p.visible && !isMobileVisible( mob, pch ))
+        return false;
+
+    if (!p.noBehaviorInHometown.empty( )
+        && mob->in_room
+        && IS_SET( mob->in_room->area->area_flag, AREA_HOMETOWN ))
+    {
+        Behavior *bhv = behaviorManager->findExisting( p.noBehaviorInHometown );
+
+        if (bhv && mob->pIndexData->behaviors.isSet( bhv ))
+            return false;
+    }
+
+    return true;
+}
+
+bool FeniaQuest::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
+{
+    if (!VictimQuestModel::checkMobileVictim( pch, mob ))
+        return false;
+
+    return passesParams( pch, mob );
+}
+
+bool FeniaQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
+{
+    if (!ClientQuestModel::checkMobileClient( pch, mob ))
+        return false;
+
+    return passesParams( pch, mob );
+}
+
+bool FeniaQuest::checkItem( PCharacter *pch, ::Object *obj )
+{
+    if (!ItemQuestModel::checkItem( pch, obj ))
+        return false;
+
+    // Only the two knobs that mean anything for an item. A level window on a
+    // treasure would be a different field, and no type asks for one yet.
+    if (selectParams.maxLevel > 0 && obj->level > selectParams.maxLevel)
+        return false;
+
+    if (selectParams.visible && !isItemVisible( obj, pch ))
+        return false;
+
+    return true;
+}
+
+/*--------------------------------------------------------------------------
+ * Target marking
+ *------------------------------------------------------------------------*/
+void FeniaQuest::markMobile( NPCharacter *mob, const DLString &role )
+{
+    if (!mob)
+        return;
+
+    MobQuestTarget::Pointer target( NEW );
+
+    target->setHeroName( charName );
+    target->setQuestType( typeName );
+    target->setRole( role );
+    target->setChar( mob );
+    mob->behavior.setPointer( *target );
+
+    // The behavior is XML-serialized with the mob, so a marked target survives a
+    // reboot -- but only if the room it stands in is written out now.
+    if (mob->in_room)
+        save_mobs( mob->in_room );
+}
+
+void FeniaQuest::markObject( ::Object *obj, const DLString &role, bool mandatory )
+{
+    if (!obj)
+        return;
+
+    ObjQuestTarget::Pointer target( NEW );
+
+    target->setHeroName( charName );
+    target->setQuestType( typeName );
+    target->setRole( role );
+    target->setMandatory( mandatory );
+    target->setObj( obj );
+    obj->behavior.setPointer( *target );
+}
+
+NPCharacter * FeniaQuest::findMarkedMobile( const DLString &role )
+{
+    for (Character *wch = char_list; wch; wch = wch->next) {
+        if (!wch->is_npc( ) || !wch->getNPC( )->behavior)
+            continue;
+
+        MobQuestTarget *target = dynamic_cast<MobQuestTarget *>( *wch->getNPC( )->behavior );
+
+        if (target
+            && target->getHeroName( ) == charName.getValue( )
+            && target->questType.getValue( ) == typeName.getValue( )
+            && (role.empty( ) || target->role.getValue( ) == role))
+            return wch->getNPC( );
+    }
+
+    return 0;
+}
+
+::Object * FeniaQuest::findMarkedObject( const DLString &role )
+{
+    for (::Object *obj = object_list; obj; obj = obj->next) {
+        if (!obj->behavior)
+            continue;
+
+        ObjQuestTarget *target = dynamic_cast<ObjQuestTarget *>( *obj->behavior );
+
+        if (target
+            && target->getHeroName( ) == charName.getValue( )
+            && target->questType.getValue( ) == typeName.getValue( )
+            && (role.empty( ) || target->role.getValue( ) == role))
+            return obj;
+    }
+
+    return 0;
+}
+
+/** Take the marks off, leaving the mobs and objects themselves alone.
+ *
+ *  clear() on either model swaps the basic behavior back in; neither extracts,
+ *  so a quest ending does not make the world it borrowed disappear. A scenario
+ *  that wants its props gone extracts them itself in onDestroy, which runs
+ *  first. */
+void FeniaQuest::clearMarked( )
+{
+    for (Character *wch = char_list; wch; wch = wch->next) {
+        if (!wch->is_npc( ) || !wch->getNPC( )->behavior)
+            continue;
+
+        MobQuestTarget *target = dynamic_cast<MobQuestTarget *>( *wch->getNPC( )->behavior );
+
+        if (target
+            && target->getHeroName( ) == charName.getValue( )
+            && target->questType.getValue( ) == typeName.getValue( ))
+            MobileQuestModel::clear( wch->getNPC( ) );
+    }
+
+    for (::Object *obj = object_list; obj; obj = obj->next) {
+        if (!obj->behavior)
+            continue;
+
+        ObjQuestTarget *target = dynamic_cast<ObjQuestTarget *>( *obj->behavior );
+
+        if (target
+            && target->getHeroName( ) == charName.getValue( )
+            && target->questType.getValue( ) == typeName.getValue( ))
+            ItemQuestModel::clear( obj );
+    }
+}
+
+bool FeniaQuest::callTargetTrigger( const DLString &methodName, const RegisterList &extraArgs,
+                                    Register &rc )
+{
+    // Contained, always. Every caller is a mob or object event -- death, give,
+    // greet, a spec tick -- and not one of them has a catch above it.
+    return tryCallType( methodName, extraArgs, rc );
 }

@@ -61,7 +61,16 @@ public:
     virtual void linkWrapper( Behavior * ) = 0;
     virtual void linkWrapper( QuestRegistratorBase * ) = 0;
 
+    /** Turn a Fenia value back into the engine object behind it.
+     *
+     *  The Character form has been here for years; the other two arrived when
+     *  quest_core needed them. They belong on this interface and not in
+     *  feniaroot's own wrap_utils.h for a linkage reason: feniaroot LIBADDs the
+     *  plugins that want to unwrap, so anything of theirs that reached into
+     *  feniaroot would close a cycle. Everything in core can call these. */
     virtual void getTarget( const Scripting::Register &, Character *& ) = 0;
+    virtual void getTarget( const Scripting::Register &, ::Object *& ) = 0;
+    virtual void getTarget( const Scripting::Register &, Room *& ) = 0;
     void markAlive(long long id);
 
     static WrapperMap map;

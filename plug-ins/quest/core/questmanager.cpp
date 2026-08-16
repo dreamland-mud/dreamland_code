@@ -49,9 +49,11 @@ void QuestManager::initialization( ) {
     Class::regMoc<FeniaQuest>( );
     Class::regMoc<QuestWrapper>( );
     Class::regMoc<QuestRewardWrapper>( );
+    Class::regMoc<QuestSelectWrapper>( );
 }
 
 void QuestManager::destruction( ) {
+    Class::unregMoc<QuestSelectWrapper>( );
     Class::unregMoc<QuestRewardWrapper>( );
     Class::unregMoc<QuestWrapper>( );
     Class::unregMoc<FeniaQuest>( );

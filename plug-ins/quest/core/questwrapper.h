@@ -6,6 +6,7 @@
 #include "fenia/handler.h"
 #include "pluginnativeimpl.h"
 #include "quest.h"
+#include "questselectparams.h"
 
 class FeniaQuest;
 
@@ -78,6 +79,37 @@ protected:
     QuestReward *getTarget( );
 
     QuestReward::Pointer target;
+    Scripting::Object *self;
+};
+
+/** The knobs a scenario sets before asking for a target.
+ *
+ *  A typed object rather than a Fenia Map, for two reasons. A Map keys `m.foo`
+ *  and `m["foo"]` differently, so half the ways a script can spell a knob would
+ *  be silently ignored; and NativeHandler::setField throws on a field that does
+ *  not exist, which turns `p.levelDifMin = 3` into a loud error instead of a
+ *  quest that mysteriously picks the wrong mobs. Same reasoning as
+ *  QuestRewardWrapper above.
+ */
+class QuestSelectWrapper : public PluginNativeImpl<QuestSelectWrapper>,
+                           public NativeHandler,
+                           public XMLVariableContainer
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<QuestSelectWrapper> Pointer;
+
+    QuestSelectWrapper( );
+
+    virtual void setSelf( Scripting::Object *s ) { self = s; }
+    virtual Scripting::Object *getSelf( ) const { return self; }
+
+    static Scripting::Register wrap( );
+
+    QuestSelectParams params;
+
+protected:
     Scripting::Object *self;
 };
 
