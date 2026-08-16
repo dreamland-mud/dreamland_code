@@ -80,8 +80,8 @@ public:
     NPCharacter *selectVictim( PCharacter *, const QuestSelectParams & );
     NPCharacter *selectClient( PCharacter *, const QuestSelectParams & );
     ::Object *selectItem( PCharacter *, const QuestSelectParams & );
-    Room *selectClientRoom( PCharacter * );
-    Room *selectDistantRoom( PCharacter *, Room *from, int range );
+    Room *selectClientRoom( PCharacter *, const QuestSelectParams & );
+    Room *selectDistantRoom( PCharacter *, Room *from, int range, const QuestSelectParams & );
     bool isRoomReachable( PCharacter *, Room * );
 
     /*----------------------------------------------------------------------

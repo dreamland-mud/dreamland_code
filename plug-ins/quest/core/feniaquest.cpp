@@ -434,20 +434,39 @@ NPCharacter * FeniaQuest::selectClient( PCharacter *pch, const QuestSelectParams
     }
 }
 
-Room * FeniaQuest::selectClientRoom( PCharacter *pch )
+/* Both of these install the scope too. Without it the room knobs would be dead
+ * on exactly the path their LocateQuest precedent was written for: that check
+ * exists for the endPoint pick, and is a no-op during customer selection because
+ * the area name is not known yet. And both catch, because findClientRooms throws
+ * on an empty world and the block comment above promises NULL. */
+Room * FeniaQuest::selectClientRoom( PCharacter *pch, const QuestSelectParams &params )
 {
-    return getRandomRoomClient( pch );
+    QuestSelectScope scope( this, params );
+
+    try {
+        return getRandomRoomClient( pch );
+    } catch (const QuestCannotStartException &) {
+        return 0;
+    }
 }
 
-Room * FeniaQuest::selectDistantRoom( PCharacter *pch, Room *from, int range )
+Room * FeniaQuest::selectDistantRoom( PCharacter *pch, Room *from, int range,
+                                      const QuestSelectParams &params )
 {
-    RoomList rooms;
+    QuestSelectScope scope( this, params );
 
-    findClientRooms( pch, rooms );
+    try {
+        RoomList rooms;
 
-    // 20 attempts is what the C++ types that use this pass; it bounds a
-    // room_distance BFS per candidate, so it is a real cost, not a formality.
-    return getDistantRoom( pch, rooms, from, range, 20 );
+        findClientRooms( pch, rooms );
+
+        // 20 attempts is what the C++ types that use this pass; it bounds a
+        // room_distance BFS per candidate, so it is a real cost, not a formality.
+        return getDistantRoom( pch, rooms, from, range, 20 );
+
+    } catch (const QuestCannotStartException &) {
+        return 0;
+    }
 }
 
 bool FeniaQuest::isRoomReachable( PCharacter *pch, Room *room )
@@ -639,10 +658,9 @@ void FeniaQuest::markObject( ::Object *obj, const DLString &role, bool mandatory
     if (!obj)
         return;
 
-    // Same refusal as markMobile, and it matters more here: unlike mobs, item
-    // selection does NOT skip candidates that already carry a behavior, so
-    // randomItem can perfectly well hand back a recipe tome or a generated
-    // weapon whose behavior this would silently destroy.
+    // Same refusal as markMobile. Selection no longer hands such items back --
+    // checkItem filters them now -- but a scenario can pass any object it likes,
+    // and clobbering a recipe tome's behavior would be silent and permanent.
     if (obj->behavior && obj->behavior->getType( ) != basicName)
         throw Scripting::Exception( "markObj: this object already carries a behavior of its own" );
 

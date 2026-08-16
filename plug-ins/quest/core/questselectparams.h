@@ -5,6 +5,7 @@
 #include <set>
 
 #include "dlstring.h"
+#include "bitstring.h"
 
 /** The knobs a Fenia scenario turns before asking the engine to pick a target.
  *
@@ -74,11 +75,14 @@ struct QuestSelectParams {
      *  That OR is not a design choice, it is StealQuest::isThief: a mob counts
      *  as a thief if it has ACT_THIEF, or the `thief` behavior, or its name is in
      *  the scenario's own list. The third is scenario data and stays in Fenia. */
-    int requireActFlag;
+    bitstring_t requireActFlag;
     DLString requireBehavior;
 
-    /** Room filters, applied wherever a client room is judged -- which covers
-     *  both picking a room directly and picking a mob standing in one. */
+    /** Room filters. They apply wherever a client room is judged: picking a room
+     *  directly with `clientRoom`/`distantRoom`, AND picking a mob, since
+     *  ClientQuestModel::checkMobileClient ends by judging the mob's room. Both
+     *  paths therefore have to be given the selection object -- the room ones
+     *  take it as an optional last argument. */
     bool roomNoCast;        /**< reject ROOM_NO_CAST; HealQuest cannot heal there */
     DLString excludeAreaName;  /**< reject rooms in this area, by its RUSSIAN name.
                                 *   Pinned to one language on purpose: LocateQuest
