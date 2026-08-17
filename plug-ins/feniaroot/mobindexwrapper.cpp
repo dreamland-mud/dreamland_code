@@ -125,10 +125,20 @@ NMI_GET( MobIndexWrapper, vnum , "внум, уникальный номер пр
     checkTarget( ); 
     return target->vnum;
 }
-NMI_GET( MobIndexWrapper, size , "численный размер моба или расовый (таблица .tables.size_table)") 
-{ 
-    checkTarget( ); 
+NMI_GET( MobIndexWrapper, size , "численный размер моба или расовый (таблица .tables.size_table)")
+{
+    checkTarget( );
     return target->getSize();
+}
+NMI_GET( MobIndexWrapper, race, "название расы прототипа (строка), например hoofed или rodent")
+{
+    checkTarget( );
+    return target->race;
+}
+NMI_GET( MobIndexWrapper, form, "флаги формы тела прототипа (таблица .tables.form_flags), напр. edible")
+{
+    checkTarget( );
+    return target->form;
 }
 NMI_GET( MobIndexWrapper, imm_flags , "флаги иммунитета (таблица .tables.imm_flags)")
 {
