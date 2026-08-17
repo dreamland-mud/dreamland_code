@@ -166,12 +166,61 @@ bool MobQuestTarget::deathAsClient( Character *killer )
     return false;
 }
 
+bool MobQuestTarget::deathAsNeutral( Character *killer )
+{
+    ::Pointer<FeniaQuest> quest = getFeniaQuest( );
+
+    if (!quest)
+        return false;
+
+    if (quest->isComplete( ))
+        return false;
+
+    killer = quest->getActor( killer );
+
+    DLString how;
+
+    if (ourHero( killer ))
+        how = "hero";
+    else if (ourHeroGroup( killer ))
+        how = "group";
+    else if (killer && killer->getNPC( ) != ch)
+        how = "other";
+    else
+        how = "suicide";
+
+    // Mark the death as accounted for BEFORE the corpse is extracted this same
+    // pulse: extract() runs mandatoryExtract() whenever !dealtWith, which would
+    // break the quest ("задание уже невозможно выполнить") on the very kill the
+    // hero was sent to make. A neutral target that vanishes WITHOUT dying (purge,
+    // area cleanup) never reaches here, so dealtWith stays false and that path
+    // still correctly declares the quest broken.
+    dealtWith = true;
+
+    // No state, timer or scheduleDestroy: this target was meant to be killed.
+    // The scenario's onTargetDeath decides what the death means -- count it
+    // towards a total, drop a key, or say nothing.
+    RegisterList args;
+    args.push_back( wrapChar( ch ) );
+    args.push_back( wrapChar( killer ) );
+    args.push_back( Register( how ) );
+    args.push_back( Register( role.getValue( ) ) );
+
+    Register rc;
+    quest->callTargetTrigger( "onTargetDeath", args, rc );
+    return false;
+}
+
 bool MobQuestTarget::death( Character *killer )
 {
     if (role.getValue( ) == "victim")
         return deathAsVictim( killer );
 
-    return deathAsClient( killer );
+    if (role.getValue( ) == "client")
+        return deathAsClient( killer );
+
+    // gangster, thief, and any future killable-by-design role.
+    return deathAsNeutral( killer );
 }
 
 void MobQuestTarget::give( Character *victim, ::Object *obj )
@@ -282,7 +331,7 @@ void MobQuestTarget::show( Character *viewer, std::basic_ostringstream<char> &bu
 
     // Despite look.cpp's parameter name this is the VIEWER, so the tag renders
     // in their language rather than always in Russian.
-    if (role.getValue( ) == "victim")
+    if (role.getValue( ) == "victim" || role.getValue( ) == "gangster")
         buf << fmt( viewer, _("{R[ЦЕЛЬ] {x") );
     else if (role.getValue( ) == "thief")
         buf << fmt( viewer, _("{R[ВОР] {x") );

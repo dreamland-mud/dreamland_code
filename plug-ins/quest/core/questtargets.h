@@ -53,7 +53,8 @@ public:
     XML_VARIABLE XMLString role;
     XML_VARIABLE XMLString questType;
 
-    /** True once this target's own death has given the quest what it was for.
+    /** True once this target's own death has given the quest what it was for, or
+     *  it was killable by design (gangster/thief) and the death has been reported.
      *
      *  Not persisted: the mob is extracted in the same tick that sets it. It
      *  exists because extract() must not declare the quest broken after a kill
@@ -79,6 +80,14 @@ protected:
     /** A client, i.e. someone the hero was supposed to protect or serve. Killing
      *  one is a failure, and it matters whether the hero did it. */
     bool deathAsClient( Character *killer );
+
+    /** Any other marked role (a gang member to wipe out, a thief to rob): the
+     *  engine changes NO quest state or timer and simply reports the death, with
+     *  its "hero"/"group"/"other"/"suicide" flavour, to onTargetDeath. The
+     *  scenario owns the outcome -- count towards a total, drop loot, or ignore.
+     *  Without this a killable-by-design target (gangster, thief) would route
+     *  through deathAsClient and break the quest the moment the hero touched it. */
+    bool deathAsNeutral( Character *killer );
 };
 
 /** The one object-side quest target. Same reasoning as MobQuestTarget.

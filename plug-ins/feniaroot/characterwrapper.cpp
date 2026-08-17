@@ -536,6 +536,42 @@ NMI_SET( CharacterWrapper, keyword, "ключевые слова моба" )
     target->getNPC()->setKeyword( arg.toString( ) );
 }
 
+/* Per-language dressers, mirroring ObjectWrapper::setShort/setDescr, so a Fenia
+ * script that creates a mob from a prototype can name and describe it in all
+ * three languages (the plain short_descr/long_descr/keyword/description setters
+ * write LANG_DEFAULT only). Used by autoquest scenario mobs. */
+NMI_INVOKE( CharacterWrapper, setShort, "(text, lang): установить короткое описание моба для языка lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    CHK_PC
+    target->getNPC()->setShortDescr( argnum2string( args, 1 ), argnum2lang( args, 2 ) );
+    return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, setLong, "(text, lang): установить длинное описание моба для языка lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    CHK_PC
+    target->getNPC()->setLongDescr( argnum2string( args, 1 ), argnum2lang( args, 2 ) );
+    return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, setDescr, "(text, lang): установить описание (look mob) для языка lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    CHK_PC
+    target->getNPC()->setDescription( argnum2string( args, 1 ), argnum2lang( args, 2 ) );
+    return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, setKeyword, "(text, lang): установить ключевые слова моба для языка lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    CHK_PC
+    target->getNPC()->setKeyword( argnum2string( args, 1 ), argnum2lang( args, 2 ) );
+    return Register( );
+}
+
 NMI_GET( CharacterWrapper, description, "то что видно по look mob" )
 {
     checkTarget( );
