@@ -945,9 +945,16 @@ NMI_GET( ClanWrapper, dispersed, "true для разрозненных клан�
 {
     return clanManager->find(name)->isDispersed();
 }
-NMI_GET( ClanWrapper, recallVnum, "vnum комнаты для кланвозврата" ) 
+NMI_GET( ClanWrapper, recallVnum, "vnum комнаты для кланвозврата" )
 {
     return clanManager->find( name )->getRecallVnum();
+}
+NMI_INVOKE( ClanWrapper, canInduct, "(pc): true если клан может принять этого игрока в свои ряды. Для гейтов автоквестов (напр. kidnap dragon = .Clan(\"knight\").canInduct(ch))" )
+{
+    Character *ch = argnum2character( args, 1 );
+    if (!ch || ch->is_npc( ))
+        return Register( (int)false );
+    return clanManager->find( name )->canInduct( ch->getPC( ) );
 }
 
 static ClanArea::Pointer get_clan_area(const DLString &clanName)
