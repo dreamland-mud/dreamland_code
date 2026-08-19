@@ -161,6 +161,12 @@ protected:
     XML_VARIABLE XMLEnumeration gender;
 
     virtual void buyObject( Object *, PCharacter *, NPCharacter * );
+
+    // Transient (not persisted): true only while trouble() re-creates a lost
+    // item, so buyObject restamps the paid tier ONLY on a recovery and never on
+    // a plain purchase -- a fresh buy must start at T0, or a second copy of a
+    // vnum could be bought cheap and arrive pre-upgraded (two T3 finger rings).
+    bool restoring;
 };
 
 class OwnerPrice : public Price, public XMLVariableContainer {
@@ -229,6 +235,27 @@ class RefitQuestArticle : public QuestTradeArticle {
 XML_OBJECT
 public:
     typedef ::Pointer<RefitQuestArticle> Pointer;
+
+    virtual void toStream( Character *, ostringstream & ) const;
+    virtual bool available( Character *, NPCharacter * ) const;
+    virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
+
+protected:
+    virtual void buy( PCharacter *, NPCharacter * );
+};
+
+/**
+ * Upgrades one carried, unworn hero item (girth/ring/weapon) by one tier,
+ * raising its stats via the .tmp.questreward multiplier. `quest buy upgrade
+ * <item>` picks the item by keyword; the tier is stored on the object as the
+ * questTier property and mirrored onto the owner (XMLAttributeQuestReward) so a
+ * trouble() re-creation keeps the paid tier. Price is a dynamic ladder
+ * (1000/1500/2500 qp for T1/T2/T3), not a catalog Price, so no <price> node.
+ */
+class UpgradeQuestArticle : public QuestTradeArticle {
+XML_OBJECT
+public:
+    typedef ::Pointer<UpgradeQuestArticle> Pointer;
 
     virtual void toStream( Character *, ostringstream & ) const;
     virtual bool available( Character *, NPCharacter * ) const;
