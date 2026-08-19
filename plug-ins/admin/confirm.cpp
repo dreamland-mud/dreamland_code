@@ -293,7 +293,10 @@ void Confirm::doList( Character *ch, bool newOnly )
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
     ostringstream buf;
     int totalRequests = 0, newRequests = 0;
-    static time_t cutoff = 1726804482; // 20/09/2024
+    // Hide requests older than a year -- a rolling window, not a frozen date that
+    // silently stops hiding anything as time passes (Ruffina's ask). Recomputed
+    // each call, so "a year ago" always means a year before now.
+    time_t cutoff = time( NULL ) - 365L * 24 * 3600;
     
     const DLString lineFormat = web_cmd(ch, "confirm show $1", "%-15s") + " %-13s  %-9s %s\r\n";
      

@@ -69,8 +69,19 @@ bool XMLAttributeQuestData::pull( PCharacter *pch )
 
         if (time == 0) {
             pch->pecho(_("Время, отведенное на задание, вышло!"));
+
+            // A small consolation for a genuine attempt: if the hero at least
+            // tried to find the target (spent a hint via `quest find`), grant one
+            // quest point so the effort isn't a total loss. Gated on hint, so
+            // taking a quest and idling it out to expiry still pays nothing --
+            // no AFK farm, and completing pays many times more anyway.
+            if (quest->hint.getValue( ) > 0) {
+                pch->addQuestPoints( 1 );
+                pch->pecho(_("Но за старание квестор все же начисляет тебе {Y1{x квестовое очко."));
+            }
+
             attributes->eraseAttribute( "quest" );
-            
+
             time = quest->getFailTime( pch );
             setTime( time );
 
