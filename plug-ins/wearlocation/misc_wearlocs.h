@@ -7,6 +7,7 @@
 
 #include "defaultwearlocation.h"
 #include "xmlmap.h"
+#include "xmlattribute.h"
 
 class StuckInWearloc : public DefaultWearlocation {
 XML_OBJECT
@@ -90,6 +91,55 @@ public:
     virtual int canWear( Character *ch, Object *obj, int flags );
     virtual bool givesAffects() const { return false; }
 protected:    
+    virtual void affectsOnEquip( Character *ch, Object *obj );
+    virtual void affectsOnUnequip( Character *ch, Object *obj );
+    virtual void triggersOnWear( Character *ch, Object *obj ) { }
+};
+
+/**
+ * Per-player state for the purchasable 'personal' wearlocation: the display
+ * label the player chose for their slot. Ownership of the slot itself lives in
+ * Character::wearloc (the same bitvector the ear piercing purchase sets), so
+ * this attribute only exists once a player names the slot.
+ *
+ * The label is stored sanitized (see slot_label_sanitize in
+ * wearloc_commands.cpp): no color codes, no control characters, capped length.
+ * It is rendered verbatim inside other players' equipment lists, so nothing
+ * unsanitized may ever be written here.
+ */
+class XMLAttributeWearslot : public XMLAttribute, public XMLVariableContainer {
+XML_OBJECT
+public:
+    typedef ::Pointer<XMLAttributeWearslot> Pointer;
+
+    /** Key under which this attribute is stored on a PCharacter. */
+    static const DLString ATTR_NAME;
+
+    const DLString & getLabel( ) const;
+    void setLabel( const DLString & );
+
+protected:
+    XML_VARIABLE XMLString label;
+};
+
+/**
+ * The purchasable 'personal' flavor slot: one item of any type, worn purely
+ * for show. No stats (givesAffects false, affects never applied), no item-type
+ * restriction. Ownership is a Character::wearloc bit sold by the quest trader
+ * (WearslotQuestArticle), so the default matches(Character) is exactly the
+ * gate: needRib && wearloc.isSet(this). The slot label in the equipment list
+ * is player-customizable (XMLAttributeWearslot), hence displayLocation.
+ */
+class PersonalWearloc : public DefaultWearlocation {
+XML_OBJECT
+public:
+    typedef ::Pointer<PersonalWearloc> Pointer;
+
+    virtual int canWear( Character *ch, Object *obj, int flags );
+    virtual DLString displayLocation(Character *ch, Object *obj, lang_t lang);
+    virtual bool givesAffects() const { return false; }
+
+protected:
     virtual void affectsOnEquip( Character *ch, Object *obj );
     virtual void affectsOnUnequip( Character *ch, Object *obj );
     virtual void triggersOnWear( Character *ch, Object *obj ) { }

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "wearloc_utils.h"
+#include "misc_wearlocs.h"
 #include "commandtemplate.h"
 
 #include "wrapperbase.h"
@@ -28,6 +29,7 @@
 
 WEARLOC(hair);
 WEARLOC(tail);
+// wear_personal comes as an extern from wearloc_utils.h
 
 /* True for anything that can never come off: religious and crafted tattoos.
  * By item type, not by wearloc -- craft tattoos live in their own wearloc family
@@ -99,8 +101,9 @@ CMDRUNP( wear )
     char cArg[MAX_INPUT_LENGTH];
     char argObj[MAX_INPUT_LENGTH], argTo[MAX_INPUT_LENGTH], argVict[MAX_INPUT_LENGTH];
     bool fHair = false;
-    bool fTail = false;	
-    
+    bool fTail = false;
+    bool fSlot = false;
+
     strcpy( cArg, argument );
     argument = one_argument( argument, argObj );
     argument = one_argument( argument, argTo );
@@ -117,6 +120,9 @@ CMDRUNP( wear )
         }
         else if (arg_is(argVict, "tail")) {
             fTail = true;
+        }
+        else if (arg_is(argVict, "slot")) {
+            fSlot = true;
         }
         else if (( victim = get_char_room( ch, argVict  ) ) == 0) {
             ch->pecho(_("На кого ты хочешь это надеть?"));
@@ -172,6 +178,16 @@ CMDRUNP( wear )
         }
 
         wear_tail->wear( obj, F_WEAR_VERBOSE );
+        return;
+    }
+
+    if (ch == victim && fSlot) {
+        if (obj->getWeight( ) / 10 > 5) {
+            echo_master(ch, _("%1$^O1 слишком тяжел%1$Gое|ый|ая|ые, чтобы носить %1$Gего|его|ее|их просто так."), obj);
+            return;
+        }
+
+        wear_personal->wear( obj, F_WEAR_VERBOSE );
         return;
     }
 
@@ -308,3 +324,124 @@ CMDRUNP( remove )
 }
 
 
+/*
+ * 'slot' command: the personal flavor wearlocation.
+ * 'slot'             show the slot: label, contents, how to buy if not owned
+ * 'slot name <text>' set the label shown in the equipment list
+ * 'slot name'        reset the label back to the default
+ */
+
+/** Longest allowed label, in bytes. The equipment list renders labels inside a
+ *  21-column field ("<%-21s>"), so anything longer would break the layout. The
+ *  internal charset is single-byte (KOI8), so bytes == characters. */
+#define SLOT_LABEL_MAX 20
+
+/**
+ * The label a player sets here is rendered verbatim inside OTHER players'
+ * equipment lists (look, equipment), which makes it an injection surface:
+ * a '{' starts a color code that would bleed into the rest of the viewer's
+ * screen, control characters reach the viewer's terminal raw, '%' and '$'
+ * are format triggers in various output paths, '|' is the Flexer pad
+ * separator. Strip all of it, collapse runs of spaces, trim, cap the length.
+ */
+static DLString slot_label_sanitize( const DLString &input )
+{
+    DLString result;
+    bool prevSpace = true;
+
+    for (DLString::size_type i = 0; i < input.size( ); i++) {
+        unsigned char c = input.at( i );
+
+        // Color code: drop the brace and whatever single character follows it.
+        if (c == '{') {
+            i++;
+            continue;
+        }
+
+        if (c < ' ')
+            continue;
+
+        if (c == '%' || c == '$' || c == '|' || c == '<' || c == '>'
+            || c == '}' || c == '\\')
+            continue;
+
+        if (c == ' ') {
+            if (prevSpace)
+                continue;
+            prevSpace = true;
+        }
+        else
+            prevSpace = false;
+
+        if (result.size( ) >= SLOT_LABEL_MAX)
+            break;
+
+        result += (char)c;
+    }
+
+    while (!result.empty( ) && result.at( result.size( ) - 1 ) == ' ')
+        result.erase( result.size( ) - 1 );
+
+    return result;
+}
+
+CMDRUNP( slot )
+{
+    DLString args = argument;
+    DLString arg = args.getOneArgument( );
+
+    if (ch->is_npc( ))
+        return;
+
+    PCharacter *pch = ch->getPC( );
+
+    if (!pch->getWearloc( ).isSet( wear_personal )) {
+        ch->pecho(_("У тебя нет личного слота. Его можно купить за квесто-очки у торговца квестовыми вещами ({yквест купить слот{x)."));
+        return;
+    }
+
+    if (arg.empty( )) {
+        XMLAttributeWearslot::Pointer attr =
+            pch->getAttributes( ).findAttr<XMLAttributeWearslot>( XMLAttributeWearslot::ATTR_NAME );
+        Object *obj = wear_personal->find( ch );
+
+        if (obj != NULL)
+            ch->pecho(_("В твоем личном слоте: %1$O1."), obj);
+        else
+            ch->pecho(_("Твой личный слот пуст."));
+
+        if (attr && !attr->getLabel( ).empty( ))
+            ch->pecho(_("В снаряжении он отображается как '{W%1$s{x'."), attr->getLabel( ).c_str( ));
+
+        ch->pecho(_("Задай отображение командой {yслот имя {Dназвание{x, сбрось командой {yслот имя{x."));
+        return;
+    }
+
+    if (arg_is( arg, "name" )) {
+        XMLAttributeWearslot::Pointer attr;
+
+        if (args.empty( )) {
+            attr = pch->getAttributes( ).findAttr<XMLAttributeWearslot>( XMLAttributeWearslot::ATTR_NAME );
+
+            if (attr)
+                attr->setLabel( DLString::emptyString );
+
+            ch->pecho(_("Отображение личного слота сброшено."));
+            return;
+        }
+
+        DLString label = slot_label_sanitize( args );
+
+        if (label.empty( )) {
+            ch->pecho(_("Из такого названия ничего не вышло, попробуй другое."));
+            return;
+        }
+
+        attr = pch->getAttributes( ).getAttr<XMLAttributeWearslot>( XMLAttributeWearslot::ATTR_NAME );
+        attr->setLabel( label );
+        ch->pecho(_("Теперь этот слот отображается в снаряжении как '{W%1$s{x'."), label.c_str( ));
+        return;
+    }
+
+    ch->pecho(_("Задай отображение командой {yслот имя {Dназвание{x, сбрось командой {yслот имя{x."));
+}

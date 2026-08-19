@@ -194,6 +194,24 @@ private:
     XML_VARIABLE OwnerPrice lifePrice;
 };
 
+/**
+ * Sells the 'personal' flavor wearlocation: one purchase forever unlocks an
+ * extra slot that holds a single item of any type, worn purely for show (no
+ * stats). Ownership is a Character::wearloc bit, same mechanism as the ear
+ * piercing below; the slot itself lives in plug-ins/wearlocation.
+ */
+class WearslotQuestArticle : public QuestTradeArticle {
+XML_OBJECT
+public:
+    typedef ::Pointer<WearslotQuestArticle> Pointer;
+
+    virtual bool visible( Character * ) const;
+    virtual bool available( Character *, NPCharacter * ) const;
+
+private:
+    virtual void buy( PCharacter *, NPCharacter * );
+};
+
 class PiercingQuestArticle : public QuestTradeArticle {
 XML_OBJECT
 public:

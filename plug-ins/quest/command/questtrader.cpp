@@ -567,7 +567,37 @@ void OwnerQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharacter 
 }
 
 /*----------------------------------------------------------------------------
- * PiercingQuestArticle 
+ * WearslotQuestArticle
+ *---------------------------------------------------------------------------*/
+void WearslotQuestArticle::buy( PCharacter *client, NPCharacter *questman )
+{
+    client->wearloc.set( wear_personal );
+
+    oldact(_("$C1 учит тебя носить одну любую вещь просто так, для души."), client, 0, questman, TO_CHAR);
+    oldact(_("$C1 что-то доверительно шепчет $c3."), client, 0, questman, TO_ROOM);
+    say_act( client, questman, _("Теперь ты можешь надеть любую вещь командой {yнадеть {Dвещь{x {yв слот{x и назвать это место командой {yслот имя{x.") );
+}
+
+bool WearslotQuestArticle::available( Character *client, NPCharacter *questman ) const
+{
+    if (client->is_npc( ))
+        return false;
+
+    if (client->getWearloc( ).isSet( wear_personal )) {
+        say_act( client, questman, _("У тебя уже есть личный слот, $c1.") );
+        return false;
+    }
+
+    return true;
+}
+
+bool WearslotQuestArticle::visible( Character *client ) const
+{
+    return !client->is_npc( ) && !client->getWearloc( ).isSet( wear_personal );
+}
+
+/*----------------------------------------------------------------------------
+ * PiercingQuestArticle
  *---------------------------------------------------------------------------*/
 void PiercingQuestArticle::buy( PCharacter *client, NPCharacter *tattoer ) 
 {
