@@ -320,6 +320,13 @@ SKILL_RUNP( katana )
                     }
                 }
         
+                // Bind the katana to its maker: the inscription above already names
+                // the owner, and setOwner makes it a true personal item -- it shows
+                // the (Личное) aura in look/inventory and cannot be given, dropped or
+                // sacrificed by anyone else ([22020]). Full-owner by Kit's call: a
+                // samurai's katana is personal and non-tradeable.
+                katana->setOwner( ch->getNameC() );
+
                 obj_to_char(katana, ch);
                 gsn_katana->improve( ch, true );
         
