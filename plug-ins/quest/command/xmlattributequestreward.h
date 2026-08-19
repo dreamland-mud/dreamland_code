@@ -25,6 +25,13 @@ public:
 
         int getCount( int ) const;
         void setCount( int, int );
+
+        // Paid upgrade tier per reward vnum, so a lost item re-created by
+        // trouble() can be restamped to the tier the owner already paid for.
+        // Stored in the same map under a "tier:<vnum>" key, which never
+        // collides with the plain "<vnum>" count keys getCount/setCount use.
+        int getTier( int ) const;
+        void setTier( int, int );
 };
 
 #endif

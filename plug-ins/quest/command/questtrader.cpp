@@ -208,8 +208,8 @@ void ObjectQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharacter
 /*----------------------------------------------------------------------------
  * PersonalQuestArticle 
  *---------------------------------------------------------------------------*/
-PersonalQuestArticle::PersonalQuestArticle( ) 
-                          : gender( 0, &sex_table )
+PersonalQuestArticle::PersonalQuestArticle( )
+                          : gender( 0, &sex_table ), restoring( false )
 {
 }
 
@@ -275,6 +275,23 @@ void PersonalQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharact
                                     client->getNameP('2', lang).c_str()), lang );
     }
 
+    // Restamp the paid upgrade tier ONLY when trouble() is re-creating a lost
+    // item, never on a plain purchase. trouble() refuses to run while a copy
+    // still exists, so the restamp can never leak onto a second copy; a fresh
+    // purchase must start at T0, or a second hero item of the same vnum (a
+    // second finger ring, a dual-wielded weapon) could be bought at the base
+    // price and arrive pre-upgraded off the owner's mirror.
+    if (restoring) {
+        XMLAttributeQuestReward::Pointer tierAttr
+            = client->getAttributes( ).findAttr<XMLAttributeQuestReward>( "questreward" );
+
+        if (tierAttr) {
+            int tier = tierAttr->getTier( vnum );
+            if (tier > 0)
+                obj->setProperty( "questTier", DLString( tier ) );
+        }
+    }
+
     if (troubled) {
         XMLAttributeQuestReward::Pointer attr;
 
@@ -311,7 +328,11 @@ void PersonalQuestArticle::trouble( PCharacter *client, NPCharacter *questman )
         return;
     }
 
+    // Recovery: buyObject restamps the paid tier only while this flag is set.
+    restoring = true;
     buy( client, questman );
+    restoring = false;
+
     tell_act( client, questman, _("Я возвращаю тебе эту вещь $t-й раз."), DLString( count ).c_str( ) );
     
     if (count == 3) 
@@ -451,6 +472,13 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
             if (!ed->description.get(lang).empty())
                 keyring->addExtraDescr( ed->keyword, ed->description.get(lang), lang );
         }
+
+    // Carry the paid upgrade tier onto the keyring: vnum 119 binds the QuestGirth
+    // behavior, so its equip() recomputes affects from .tmp.questreward at this
+    // tier. Without the property the keyring would re-equip at T0 on the next
+    // wear and silently drop the girth's upgrades.
+    if (!girth->getProperty( "questTier" ).empty( ))
+        keyring->setProperty( "questTier", girth->getProperty( "questTier" ) );
 
     waist = &*girth->wear_loc;
     waist->unequip( girth );
@@ -741,6 +769,176 @@ void RefitQuestArticle::buy( PCharacter *, NPCharacter * )
 {
     // Unused: purchase() is fully overridden for dynamic, per-item pricing. The
     // base declares buy() pure virtual, so a body has to exist.
+}
+
+/*---------------------------------------------------------------------------
+ * UpgradeQuestArticle
+ *---------------------------------------------------------------------------*/
+#define QUEST_UPGRADE_MAX_TIER 3
+
+/** The hero items that carry an upgrade tier: girth, ring, weapon, and the
+ *  keyring (a girth clone, vnum 119, binds QuestGirth so its questTier works the
+ *  same way). Including the keyring gives its owner a direct upgrade path --
+ *  otherwise, having replaced the girth, they could never raise the tier again.
+ *  The bag has no stats and is excluded. */
+static bool upgrade_eligible_vnum( int vnum )
+{
+    switch (vnum) {
+    case OBJ_VNUM_QUESTGIRTH:   // 94
+    case OBJ_VNUM_QUESTRING:    // 95
+    case OBJ_VNUM_QUESTWEAPON:  // 96
+    case OBJ_VNUM_QUESTKEYRING: // 119
+        return true;
+    }
+
+    return false;
+}
+
+/** qp to go from `tier` to `tier`+1: T0->T1 1000, T1->T2 1500, T2->T3 2500
+ *  (base item is 1000, so a maxed item totals 6000). A maxed item returns 0 and
+ *  is refused before this is charged. */
+static int upgrade_price( int tier )
+{
+    switch (tier) {
+    case 0: return 1000;
+    case 1: return 1500;
+    case 2: return 2500;
+    }
+
+    return 0;
+}
+
+/** Upgradeable = a hero girth/ring/weapon, not worn (a worn item's live affects
+ *  would drift from its stored level until re-worn -- same reason Refit requires
+ *  unworn), below the tier cap. */
+static bool upgrade_eligible( Object *obj )
+{
+    if (!upgrade_eligible_vnum( obj->pIndexData->vnum ))
+        return false;
+
+    if (obj->wear_loc != wear_none)
+        return false;
+
+    return atoi( obj->getProperty( "questTier" ).c_str( ) ) < QUEST_UPGRADE_MAX_TIER;
+}
+
+void UpgradeQuestArticle::toStream( Character *client, ostringstream &buf ) const
+{
+    DLString myname = viewerLang(client) != LANG_EN && !rname.empty() ? rname : name;
+    buf << "    " << setiosflags( ios::right ) << setw( 7 ) << _("ступень").getMessage( client )
+        << resetiosflags( ios::left )
+        << ".........." << descr.getForLang( viewerLang(client) ) << " ({D" << myname << "{x)" << endl;
+}
+
+bool UpgradeQuestArticle::available( Character *client, NPCharacter *questman ) const
+{
+    if (client->is_npc( ))
+        return false;
+
+    PCharacter *pch = client->getPC( );
+
+    for (Object *obj = pch->carrying; obj; obj = obj->next_content)
+        if (upgrade_eligible( obj ))
+            return true;
+
+    // Distinguish "you own nothing upgradeable" from "take it off first", since
+    // a worn hero item is the common case and reads like a bug otherwise. Skip a
+    // worn item already at the cap: it is not upgradeable at all, so pointing at
+    // it would send the player in circles.
+    for (Object *obj = pch->carrying; obj; obj = obj->next_content)
+        if (upgrade_eligible_vnum( obj->pIndexData->vnum )
+            && obj->wear_loc != wear_none
+            && atoi( obj->getProperty( "questTier" ).c_str( ) ) < QUEST_UPGRADE_MAX_TIER) {
+            say_act( client, questman, _("Сними вещь, которую хочешь улучшить, $c1, и дай ее мне.") );
+            return false;
+        }
+
+    say_act( client, questman, _("Мне нечего улучшать тебе, $c1.") );
+    return false;
+}
+
+bool UpgradeQuestArticle::purchase( Character *client, NPCharacter *questman, const DLString &constArg, int )
+{
+    if (client->is_npc( ))
+        return false;
+
+    PCharacter *pch = client->getPC( );
+
+    // Collect the eligible (hero, unworn, upgradeable) carried items.
+    list<Object *> eligible;
+    for (Object *obj = pch->carrying; obj; obj = obj->next_content)
+        if (upgrade_eligible( obj ))
+            eligible.push_back( obj );
+
+    if (eligible.empty( ))
+        return false;   // available() already explained why
+
+    // Pick the item. With an argument, match it by keyword among the eligible
+    // set only (so a worn item of the same name never shadows the unworn one).
+    // Without an argument, only auto-pick when there is exactly one, else ask.
+    DLString arg = constArg;
+    arg.stripWhiteSpace( );
+
+    Object *target = 0;
+
+    if (arg.empty( )) {
+        if (eligible.size( ) == 1) {
+            target = eligible.front( );
+        } else {
+            say_act( client, questman, _("Что именно улучшить? Уточни название вещи, $c1.") );
+            return false;
+        }
+    } else {
+        for (auto obj: eligible)
+            if (is_name( arg.c_str( ), obj->getKeyword( viewerLang(client) ).c_str( ) )
+                || is_name( arg.c_str( ), obj->getKeyword( RU ).c_str( ) )) {
+                target = obj;
+                break;
+            }
+
+        if (!target) {
+            say_act( client, questman, _("У тебя нет такой вещи, которую я мог бы улучшить, $c1.") );
+            return false;
+        }
+    }
+
+    int tier = atoi( target->getProperty( "questTier" ).c_str( ) );
+    int fee = upgrade_price( tier );
+
+    if (fee <= 0) {
+        say_act( client, questman, _("Эта вещь уже улучшена до предела, $c1.") );
+        return false;
+    }
+
+    if (pch->getQuestPoints( ) < fee) {
+        say_act( client, questman, _("Извини, $c1, но у тебя не хватает квестовых единиц: улучшение стоит $t."),
+                 DLString( fee ).c_str( ) );
+        return false;
+    }
+
+    pch->addQuestPoints( -fee );
+
+    int newTier = tier + 1;
+    target->setProperty( "questTier", DLString( newTier ) );
+
+    // Mirror the paid tier onto the owner so trouble() can restamp a re-created
+    // item to the tier they already bought (see PersonalQuestArticle::buyObject).
+    XMLAttributeQuestReward::Pointer attr
+        = pch->getAttributes( ).getAttr<XMLAttributeQuestReward>( "questreward" );
+    attr->setTier( target->pIndexData->vnum, newTier );
+
+    oldact( _("$C1 вкладывает частицу твоей доблести в $o4, и вещь наливается силой."),
+            client, target, questman, TO_CHAR );
+    oldact( _("$C1 улучшает $o4 для $c2."), client, target, questman, TO_ROOM );
+    say_act( client, questman, _("Улучшение обошлось тебе в $t квестовых единиц. Надень вещь, чтобы почувствовать разницу."),
+             DLString( fee ).c_str( ) );
+
+    return true;
+}
+
+void UpgradeQuestArticle::buy( PCharacter *, NPCharacter * )
+{
+    // Unused: purchase() is fully overridden for the dynamic tier ladder.
 }
 
 /*----------------------------------------------------------------------------
