@@ -45,6 +45,11 @@ public:
     virtual void speech( Character *victim, const char *speech ) { }
     virtual void tell ( Character *victim, const char *speech ) { }
     virtual void show( Character *victim, std::basic_ostringstream<char> &buf ) { }
+    /** True if this mob is a quest target the viewer (or their groupmate) was
+     *  sent after -- the same condition under which show() renders the [ЦЕЛЬ]/
+     *  [ВОР] tag. Lets `scan` colour the target apart from every other mob in a
+     *  room without duplicating the role logic or reparsing show()'s output. */
+    virtual bool isQuestTarget( Character *viewer ) const { return false; }
     virtual bool spell( Character *caster, int sn, bool before ) { return false; }
     virtual void cast( ::Pointer<SpellTarget>, int sn, bool before ) { }
     virtual void stopfol( Character *master ) { }

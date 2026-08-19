@@ -324,17 +324,43 @@ bool MobQuestTarget::extract( bool count )
     return MobQuestBehavior::extract( count );
 }
 
+// Roles that carry a visible kill/steal tag. Client/king/prince and the other
+// served roles are quest mobs too, but were never tagged and stay untagged.
+static bool taggedRole( const DLString &r )
+{
+    return r == "victim" || r == "gangster" || r == "thief";
+}
+
 void MobQuestTarget::show( Character *viewer, std::basic_ostringstream<char> &buf )
 {
-    if (!ourHero( viewer ))
+    bool mine = ourHero( viewer );
+    // A groupmate standing with the hero sees the same target, tagged with the
+    // hero's name so the whole group knows whose quest it is (Zodda's request).
+    bool group = !mine && ourHeroGroup( viewer );
+    if (!mine && !group)
         return;
+
+    const DLString &r = role.getValue( );
 
     // Despite look.cpp's parameter name this is the VIEWER, so the tag renders
     // in their language rather than always in Russian.
-    if (role.getValue( ) == "victim" || role.getValue( ) == "gangster")
-        buf << fmt( viewer, _("{R[ЦЕЛЬ] {x") );
-    else if (role.getValue( ) == "thief")
-        buf << fmt( viewer, _("{R[ВОР] {x") );
+    if (r == "victim" || r == "gangster") {
+        if (mine)
+            buf << fmt( viewer, _("{R[ЦЕЛЬ] {x") );
+        else
+            buf << fmt( viewer, _("{y[ЦЕЛЬ %1$s] {x"), getHeroName( ).c_str( ) );
+    } else if (r == "thief") {
+        if (mine)
+            buf << fmt( viewer, _("{R[ВОР] {x") );
+        else
+            buf << fmt( viewer, _("{y[ВОР %1$s] {x"), getHeroName( ).c_str( ) );
+    }
+}
+
+bool MobQuestTarget::isQuestTarget( Character *viewer ) const
+{
+    return (ourHero( viewer ) || ourHeroGroup( viewer ))
+           && taggedRole( role.getValue( ) );
 }
 
 /*--------------------------------------------------------------------------
@@ -400,9 +426,15 @@ bool ObjQuestTarget::extract( bool count )
 
 void ObjQuestTarget::show( Character *viewer, ostringstream &buf )
 {
-    if (!ourHero( viewer ))
+    bool mine = ourHero( viewer );
+    bool group = !mine && ourHeroGroup( viewer );
+    if (!mine && !group)
         return;
 
-    if (role.getValue( ) == "loot")
-        buf << fmt( viewer, _("{R[ЦЕЛЬ] {x") );
+    if (role.getValue( ) == "loot") {
+        if (mine)
+            buf << fmt( viewer, _("{R[ЦЕЛЬ] {x") );
+        else
+            buf << fmt( viewer, _("{y[ЦЕЛЬ %1$s] {x"), getHeroName( ).c_str( ) );
+    }
 }
