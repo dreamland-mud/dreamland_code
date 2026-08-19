@@ -23,43 +23,13 @@ QuestMaster::QuestMaster( )
 {
 }
 
-bool QuestMaster::specIdle( ) 
-{ 
-    if (chance(99))
-        return false;
-
-    // do_say hands its text to the `say` command as one baked argument, so an
-    // untargeted ambient line can only ever come out Russian. say_act renders in
-    // a listener's language and still echoes TO_ALL, so the invitation is
-    // addressed to somebody who is actually standing there.
-    //
-    // This also leaves the say CHANNEL behind: channel-off and deafness no
-    // longer suppress the line, and drunk garble and translate no longer apply
-    // to it. That is how every other questmaster utterance already behaves --
-    // they are all say_act -- so this makes the mob consistent with itself.
-    //
-    // The filter is deliberately side-effect free: canGiveQuest() routes to
-    // QuestTrader::canServeClient(), which say_acts a refusal at ghosts, charmed
-    // and invisible players -- using it here would have the questmaster scold
-    // the room on every idle tick.
-    //
-    // IS_AWAKE matters because the chosen listener defines the language for the
-    // whole room: oldact's position floor keeps a sleeper from seeing the line
-    // at all, so picking one would render it in a language nobody reading it
-    // asked for.
-    std::vector<Character *> listeners;
-
-    for (Character *wch = ch->in_room->people; wch; wch = wch->next_in_room)
-        if (!wch->is_npc( ) && IS_AWAKE( wch ) && ch->can_see( wch ))
-            listeners.push_back( wch );
-
-    // Nobody to invite: stay quiet rather than talk to an empty room.
-    if (listeners.empty( ))
-        return false;
-
-    say_act( listeners[number_range( 0, listeners.size( ) - 1 )], ch,
-             _("Хочешь получить интересное задание? Напиши {y{hcквест попросить{x.") );
-    return true;
+bool QuestMaster::specIdle( )
+{
+    // The ambient invite moved to the `questmasterchat` Fenia behavior (onSpec),
+    // attached alongside this C++ behavior. Neutered here so the two do not both
+    // announce; this C++ behavior stays attached only for occupation discovery
+    // (getOccupation / canGiveQuest below).
+    return false;
 }
 
 int QuestMaster::getOccupation( )
