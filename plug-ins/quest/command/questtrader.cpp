@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include <iomanip>
+#include <cstdlib>
 
 #include "questtrader.h"
 #include "xmlattributequestreward.h"
@@ -12,6 +13,7 @@
 
 #include "affect.h"
 #include "object.h"
+#include "skill_utils.h"
 #include "itemevents.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
@@ -594,6 +596,151 @@ bool WearslotQuestArticle::available( Character *client, NPCharacter *questman )
 bool WearslotQuestArticle::visible( Character *client ) const
 {
     return !client->is_npc( ) && !client->getWearloc( ).isSet( wear_personal );
+}
+
+/*----------------------------------------------------------------------------
+ * RefitQuestArticle
+ *---------------------------------------------------------------------------*/
+#define OBJ_VNUM_QUESTRING     95
+#define OBJ_VNUM_QUESTWEAPON   96
+
+/** The personalised, level-stamped reward items a remort can strand. Listed by
+ *  vnum, the same way PersonalNameRepair enumerates its own set below: girth,
+ *  ring, weapon, travelling bag, and the keyring (a girth clone, vnum 119). */
+static bool refit_eligible_vnum( int vnum )
+{
+    switch (vnum) {
+    case OBJ_VNUM_QUESTGIRTH:   // 94
+    case OBJ_VNUM_QUESTRING:    // 95
+    case OBJ_VNUM_QUESTWEAPON:  // 96
+    case OBJ_VNUM_QUESTBAG:     // 103
+    case OBJ_VNUM_QUESTKEYRING: // 119
+        return true;
+    }
+
+    return false;
+}
+
+/** The qp fee to refit one item. The bag never charges; a five-level gap or less
+ *  is free so a death de-level does not nickel-and-dime; otherwise the fee scales
+ *  with both the gap and the item's paid tier, landing at a small fraction of the
+ *  item's value. Tier is read forward-compatibly from the questTier property
+ *  (absent today -> 0), so this needs no change when the upgrade ladder ships. */
+static int refit_item_fee( Object *obj, PCharacter *client )
+{
+    int gap = obj->level - client->getRealLevel( );
+
+    if (gap <= 0)
+        return 0;
+
+    if (obj->pIndexData->vnum == OBJ_VNUM_QUESTBAG)
+        return 0;
+
+    if (gap <= 5)
+        return 0;
+
+    int tier = atoi( obj->getProperty( "questTier" ).c_str( ) );
+
+    return gap * (tier + 1);
+}
+
+/** Whether a carried item genuinely needs a refit. Three conditions, all
+ *  required. It must be one of the personal reward items. It must NOT be worn:
+ *  equipment stays on the `carrying` list with wear_loc set, and a worn item is
+ *  by definition already wearable, so touching it would only write its level
+ *  field out of sync with its live affects. And it must fail the real wear gate
+ *  -- get_wear_level is the exact test canWear consults, so "eligible" means
+ *  precisely "unwearable at your real level". A remort-stranded item (stamped
+ *  near 100, owner dropped to 1) qualifies; a merely high-stamped but still
+ *  wearable one (e.g. a few levels of remort bonus while worn, or an item within
+ *  the profession's wear modifier) does not, so the fee is never charged for a
+ *  refit that would do nothing. */
+static bool refit_needed( Object *obj, PCharacter *client )
+{
+    if (!refit_eligible_vnum( obj->pIndexData->vnum ))
+        return false;
+
+    if (obj->wear_loc != wear_none)
+        return false;
+
+    return get_wear_level( client, obj ) > client->getRealLevel( );
+}
+
+void RefitQuestArticle::toStream( Character *client, ostringstream &buf ) const
+{
+    DLString myname = viewerLang(client) != LANG_EN && !rname.empty() ? rname : name;
+    buf << "    " << setiosflags( ios::right ) << setw( 7 ) << _("по ур.").getMessage( client )
+        << resetiosflags( ios::left )
+        << ".........." << descr << " ({D" << myname << "{x)" << endl;
+}
+
+bool RefitQuestArticle::available( Character *client, NPCharacter *questman ) const
+{
+    if (client->is_npc( ))
+        return false;
+
+    PCharacter *pch = client->getPC( );
+
+    for (Object *obj = pch->carrying; obj; obj = obj->next_content)
+        if (refit_needed( obj, pch ))
+            return true;
+
+    say_act( client, questman, _("Мне нечего тебе подгонять, $c1: все твои вещи тебе впору.") );
+    return false;
+}
+
+bool RefitQuestArticle::purchase( Character *client, NPCharacter *questman, const DLString &, int )
+{
+    if (client->is_npc( ))
+        return false;
+
+    PCharacter *pch = client->getPC( );
+
+    // First pass: total the fee across every carried reward item stranded above
+    // the owner's real level. Charge once, then refit all -- carrying does not
+    // change between the passes, so no intermediate list is needed.
+    int totalFee = 0;
+    int count = 0;
+
+    for (Object *obj = pch->carrying; obj; obj = obj->next_content)
+        if (refit_needed( obj, pch )) {
+            totalFee += refit_item_fee( obj, pch );
+            count++;
+        }
+
+    if (count == 0)
+        return false;
+
+    if (totalFee > 0 && pch->getQuestPoints( ) < totalFee) {
+        say_act( client, questman, _("Извини, $c1, но у тебя не хватает квестовых единиц: за подгонку нужно $t."),
+                 DLString( totalFee ).c_str( ) );
+        return false;
+    }
+
+    if (totalFee > 0)
+        pch->addQuestPoints( -totalFee );
+
+    // Second pass: refit. equip() re-stamps and rescales on the next wear, so
+    // just resetting the level here makes each item wearable again.
+    for (Object *obj = pch->carrying; obj; obj = obj->next_content)
+        if (refit_needed( obj, pch )) {
+            obj->level = pch->getRealLevel( );
+            oldact( _("$C1 бережно подгоняет $o4 под твой нынешний уровень."), client, obj, questman, TO_CHAR );
+            oldact( _("$C1 бережно подгоняет $o4 под уровень $c2."), client, obj, questman, TO_ROOM );
+        }
+
+    if (totalFee > 0)
+        say_act( client, questman, _("Подгонка обошлась тебе в $t квестовых единиц."),
+                 DLString( totalFee ).c_str( ) );
+
+    PCharacterManager::save( pch );
+    return true;
+}
+
+void RefitQuestArticle::buy( PCharacter *, NPCharacter * )
+{
+    // Unused: purchase() is fully overridden for dynamic, per-item pricing. The
+    // base declares buy() pure virtual, so a body has to exist.
 }
 
 /*----------------------------------------------------------------------------

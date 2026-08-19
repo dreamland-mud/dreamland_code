@@ -212,6 +212,31 @@ private:
     virtual void buy( PCharacter *, NPCharacter * );
 };
 
+/**
+ * Refits a personalised, level-stamped reward item (hero girth/ring/weapon/bag/
+ * keyring) to the buyer's current real level, so it becomes wearable again after
+ * a remort dropped the character to level 1 while the item stayed stamped near
+ * 100. equip() rescales every affect from the new level on the next wear, so a
+ * refit item is weak at level 1 and grows back as the owner levels -- self
+ * balancing, no extra bookkeeping.
+ *
+ * Price is dynamic rather than a catalog Price: the bag is always free, a gap of
+ * five levels or less is free, otherwise gap * (questTier + 1) qp. Every eligible
+ * carried item is refit in one purchase, and the total is charged once.
+ */
+class RefitQuestArticle : public QuestTradeArticle {
+XML_OBJECT
+public:
+    typedef ::Pointer<RefitQuestArticle> Pointer;
+
+    virtual void toStream( Character *, ostringstream & ) const;
+    virtual bool available( Character *, NPCharacter * ) const;
+    virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
+
+protected:
+    virtual void buy( PCharacter *, NPCharacter * );
+};
+
 class PiercingQuestArticle : public QuestTradeArticle {
 XML_OBJECT
 public:
