@@ -205,6 +205,7 @@ plug-ins/quest/kidnapquest/Makefile \
 plug-ins/quest/stealquest/Makefile \
 plug-ins/quest/locatequest/Makefile \
 plug-ins/quest/bigquest/Makefile \
+plug-ins/quest/charmquest/Makefile \
 plug-ins/questreward/Makefile \
 plug-ins/misc_behaviors/Makefile \
 plug-ins/race/Makefile \
