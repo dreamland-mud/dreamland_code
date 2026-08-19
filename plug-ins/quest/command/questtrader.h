@@ -7,6 +7,7 @@
 
 #include "xmlvariablecontainer.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlboolean.h"
 #include "xmlinteger.h"
 #include "xmlenumeration.h"
@@ -84,7 +85,7 @@ protected:
 
     XML_VARIABLE XMLString name;
     XML_VARIABLE XMLString rname;
-    XML_VARIABLE XMLString descr;
+    XML_VARIABLE XMLMultiString descr;
     XML_VARIABLE XMLPointer<Price> price;
 };
 
