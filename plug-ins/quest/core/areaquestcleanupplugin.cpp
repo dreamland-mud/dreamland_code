@@ -106,6 +106,9 @@ void AreaQuestCleanupPlugin::run( int oldState, int newState, Descriptor *d )
     if (areaQuestAttr)
         cleanupStaleAreaQuests( pch, areaQuestAttr );
 
-    // Independent of area quests: a newbie also gets reminded of their questor task.
-    remindEntryQuest( pch );
+    // Only on a real login (CON_READ_MOTD -> CON_PLAYING), never on a web-session
+    // resume (CON_RESUME, raised on every phone screen-unlock) -- otherwise a newbie
+    // sees the banner dozens of times an evening and learns to tune it out.
+    if (oldState == CON_READ_MOTD)
+        remindEntryQuest( pch );
 }
