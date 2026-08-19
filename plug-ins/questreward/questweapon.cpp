@@ -2,6 +2,12 @@
  *
  * ruffina, 2003
  * logic based on progs from DreamLand 2.0
+ *
+ * The STR/DEX/HIT/MANA affect numbers moved to Fenia (.tmp.questreward, family
+ * "weapon"); the hitroll/damroll/value generator stays here in C++ because its
+ * fine-grained tier configuration has no Fenia binding. equip() is overridden
+ * (not the shared PersonalQuestReward path) because the weapon hangs its
+ * affects conditionally by alignment and then runs the generator.
  */
 
 #include "questweapon.h"
@@ -22,42 +28,75 @@ void QuestWeapon::wear(Character *ch)
     ch->pecho(_("{CТвое оружие ярко вспыхивает.{x"));
 }
 
+DLString QuestWeapon::questFamily( ) const
+{
+    return "weapon";
+}
+
 void QuestWeapon::equip(Character *ch)
 {
+    static const DLString fam = "weapon";
     bool evil = IS_EVIL(ch);
     bool good = IS_GOOD(ch);
     bool neutral = IS_NEUTRAL(ch);
 
-    obj->level = ch->getModifyLevel();
+    short level = ch->getModifyLevel();
+    int tier = questTier(obj);
+
+    obj->level = level;
 
     if (!obj->affected.empty()) {
-        for (auto &paf : obj->affected)
-            addAffect(ch, paf);
-    } else {
-        Affect af;
+        // Re-scale existing affects. STR is skipped for good and DEX for evil,
+        // matching the old addAffect early-returns, so an alignment flip does
+        // not zero an affect the current alignment would not grant.
+        for (auto &paf : obj->affected) {
+            int loc = paf->location;
 
+            if (loc == APPLY_STR && good)
+                continue;
+            if (loc == APPLY_DEX && evil)
+                continue;
+            if (loc != APPLY_STR && loc != APPLY_DEX && loc != APPLY_HIT && loc != APPLY_MANA)
+                continue;
+
+            int mod = 0;
+            if (feniaModifier(ch, fam, loc, tier, mod)) {
+                paf->level = level;
+                paf->modifier = mod;
+            }
+        }
+    } else {
+        // First wear: hang the affects the current alignment grants.
+        Affect af;
         af.type = -1;
         af.duration = -1;
+        af.level = level;
 
-        if (!good) {
+        int mod = 0;
+
+        if (!good && feniaModifier(ch, fam, APPLY_STR, tier, mod)) {
             af.location = APPLY_STR;
-            addAffect(ch, &af);
+            af.modifier = mod;
             affect_to_obj(obj, &af);
         }
 
-        if (!evil) {
+        if (!evil && feniaModifier(ch, fam, APPLY_DEX, tier, mod)) {
             af.location = APPLY_DEX;
-            addAffect(ch, &af);
+            af.modifier = mod;
             affect_to_obj(obj, &af);
         }
 
-        af.location = APPLY_HIT;
-        addAffect(ch, &af);
-        affect_to_obj(obj, &af);
+        if (feniaModifier(ch, fam, APPLY_HIT, tier, mod)) {
+            af.location = APPLY_HIT;
+            af.modifier = mod;
+            affect_to_obj(obj, &af);
+        }
 
-        af.location = APPLY_MANA;
-        addAffect(ch, &af);
-        affect_to_obj(obj, &af);
+        if (feniaModifier(ch, fam, APPLY_MANA, tier, mod)) {
+            af.location = APPLY_MANA;
+            af.modifier = mod;
+            affect_to_obj(obj, &af);
+        }
     }
 
     WeaponGenerator()
@@ -71,35 +110,3 @@ void QuestWeapon::equip(Character *ch)
         .assignHitroll()
         .assignDamroll();
 }
-
-void QuestWeapon::addAffect(Character *ch, Affect *paf)
-{
-    short level = ch->getModifyLevel();
-
-    switch (paf->location) {
-    case APPLY_STR:
-        if (IS_GOOD(ch))
-            return;
-        paf->level = level;
-        paf->modifier = IS_EVIL(ch) ? 2 : 1;
-        return;
-    case APPLY_DEX:
-        if (IS_EVIL(ch))
-            return;
-        paf->level = level;
-        paf->modifier = IS_GOOD(ch) ? 2 : 1;
-        return;
-    case APPLY_HIT:
-        paf->level = level;
-        paf->modifier = level * 2;
-        return;
-    case APPLY_MANA:
-        paf->level = level;
-        paf->modifier = level * 2;
-        if (ch->getProfession()->getFlags().isSet(PROF_CASTER))
-            paf->modifier += paf->modifier * 3 / 2;
-
-        return;
-    }
-}
-
