@@ -140,11 +140,11 @@ void QuestTradeArticle::toStream( Character *client, ostringstream &buf ) const
 {
     DLString myname = viewerLang(client) != LANG_EN && !rname.empty() ? rname : name;
     buf << "    " << setiosflags( ios::right ) << setw( 7 );
-    
+
     price->toStream( client, buf );
 
     buf << resetiosflags( ios::left )
-        << ".........." << descr << " ({D" << myname << "{x)" << endl;
+        << ".........." << descr.getForLang( viewerLang(client) ) << " ({D" << myname << "{x)" << endl;
 }
 
 bool QuestTradeArticle::visible( Character * ) const
@@ -671,7 +671,7 @@ void RefitQuestArticle::toStream( Character *client, ostringstream &buf ) const
     DLString myname = viewerLang(client) != LANG_EN && !rname.empty() ? rname : name;
     buf << "    " << setiosflags( ios::right ) << setw( 7 ) << _("по ур.").getMessage( client )
         << resetiosflags( ios::left )
-        << ".........." << descr << " ({D" << myname << "{x)" << endl;
+        << ".........." << descr.getForLang( viewerLang(client) ) << " ({D" << myname << "{x)" << endl;
 }
 
 bool RefitQuestArticle::available( Character *client, NPCharacter *questman ) const
