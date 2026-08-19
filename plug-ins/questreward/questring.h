@@ -10,20 +10,13 @@
 #include "objectbehaviorplugin.h"
 #include "personalquestreward.h"
 
-class Affect;
-
 class QuestRing : public PersonalQuestReward {
 XML_OBJECT
 public:
         typedef ::Pointer<QuestRing> Pointer;
-    
-        virtual void wear( Character * );                  
-        virtual void equip( Character * );                           
-        
-protected:
-        void addAffect( Character *, Affect * );
+
+        virtual void wear( Character * );
+        virtual DLString questFamily( ) const;
 };
 
-
 #endif
-
