@@ -31,6 +31,7 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<PersonalQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<OwnerQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<PiercingQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<WearslotQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<TattooQuestArticle> >( ppl );
         Plugin::registerPlugin<PersonalNameRepair>( ppl );
 

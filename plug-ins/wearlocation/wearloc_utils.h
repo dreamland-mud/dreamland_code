@@ -44,6 +44,7 @@ _WEARLOC_( head );
 _WEARLOC_( arms );
 _WEARLOC_( hands );
 _WEARLOC_( feet );
+_WEARLOC_( personal );
 
 
 #endif

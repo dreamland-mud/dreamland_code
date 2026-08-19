@@ -7,6 +7,7 @@
 #include "dlxmlloader.h"
 #include "xmltableloaderplugin.h"
 #include "mocregistrator.h"
+#include "xmlattributeplugin.h"
 #include "commandtemplate.h"
 #include "defaultwearlocation.h"
 #include "misc_wearlocs.h"
@@ -32,6 +33,8 @@ extern "C"
             Plugin::registerPlugin<MocRegistrator<HorseWearloc> >( ppl );
             Plugin::registerPlugin<MocRegistrator<SecondWieldWearloc> >( ppl );
             Plugin::registerPlugin<MocRegistrator<TattooWearloc> >( ppl );
+            Plugin::registerPlugin<MocRegistrator<PersonalWearloc> >( ppl );
+            Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeWearslot> >( ppl );
 
             Plugin::registerPlugin<WearlocationLoader>( ppl );
             

@@ -9,6 +9,7 @@
 #include "room.h"
 #include "affect.h"
 #include "character.h"
+#include "pcharacter.h"
 #include "object.h"
 
 #include "stats_apply.h"
@@ -166,7 +167,61 @@ int HairWearloc::canWear( Character *ch, Object *obj, int flags ) {
 }
 
 /*
- * shield 
+ * personal flavor slot
+ */
+const DLString XMLAttributeWearslot::ATTR_NAME = "wearslot";
+
+const DLString & XMLAttributeWearslot::getLabel( ) const
+{
+    return label;
+}
+
+void XMLAttributeWearslot::setLabel( const DLString &l )
+{
+    label = l;
+}
+
+int PersonalWearloc::canWear( Character *ch, Object *obj, int flags )
+{
+    if (find( ch ) != NULL) {
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            echo_master(ch, _("В твоем личном слоте уже что-то есть."));
+        return RC_WEAR_CONFLICT;
+    }
+    return DefaultWearlocation::canWear( ch, obj, flags );
+}
+
+/* Pure flavor: item stats never apply, in either direction. */
+void PersonalWearloc::affectsOnEquip( Character *ch, Object *obj )
+{
+}
+
+void PersonalWearloc::affectsOnUnequip( Character *ch, Object *obj )
+{
+}
+
+/*
+ * The slot label is whatever the owner named it ("на руке", "в зубах", ...),
+ * shown verbatim to every viewer regardless of language: it is player content,
+ * not a catalog string. Falls back to the trilingual msgDisplay default until
+ * the owner sets one. ch here is the equipment OWNER (see Wearlocation::display),
+ * which is exactly whose label we want.
+ */
+DLString PersonalWearloc::displayLocation(Character *ch, Object *obj, lang_t lang)
+{
+    if (ch != 0 && !ch->is_npc( )) {
+        XMLAttributeWearslot::Pointer attr =
+            ch->getPC( )->getAttributes( ).findAttr<XMLAttributeWearslot>( XMLAttributeWearslot::ATTR_NAME );
+
+        if (attr && !attr->getLabel( ).empty( ))
+            return attr->getLabel( );
+    }
+
+    return DefaultWearlocation::displayLocation( ch, obj, lang );
+}
+
+/*
+ * shield
  */
 int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
 {
