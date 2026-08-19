@@ -34,6 +34,7 @@
 	<node>quest_steal</node>
 	<node>quest_locate</node>
 	<node>quest_big</node>
+	<node>quest_charm</node>
 	<node>gquest_command</node>
 	<node>gquest_gangsters</node>
 	<node>gquest_invasion</node>

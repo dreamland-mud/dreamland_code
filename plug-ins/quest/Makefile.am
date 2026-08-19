@@ -8,5 +8,6 @@ healquest    \
 kidnapquest  \
 stealquest   \
 locatequest  \
-bigquest
+bigquest     \
+charmquest
 
