@@ -55,7 +55,17 @@ static void scan_people(Room *room, Character *ch, int depth, int door,
 
         orig = rch->getDoppel(ch);
 
-        buf << "    {" << CLR_SCAN_MOB(ch) << ch->sees(orig, '1') << ".{x";
+        NPCharacter *nrch = rch->getNPC( );
+        if (nrch && nrch->behavior && nrch->behavior->isQuestTarget( ch )) {
+            // A quest target should not blend into the crowd when scanning: give
+            // it its own [ЦЕЛЬ]/[ВОР] tag (group-aware) and a red name, so the
+            // hero -- or a groupmate -- can spot where it is (Zodda's request).
+            ostringstream tagbuf;
+            nrch->behavior->show( ch, tagbuf );
+            buf << "    " << tagbuf.str( ) << "{R" << ch->sees(orig, '1') << ".{x";
+        }
+        else
+            buf << "    {" << CLR_SCAN_MOB(ch) << ch->sees(orig, '1') << ".{x";
 
         if (IS_SET(orig->comm, COMM_AFK))
             buf << lmsg(viewerLang(ch), " {w[{CAFK{x{w]{x",

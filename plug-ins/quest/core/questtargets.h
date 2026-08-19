@@ -46,6 +46,7 @@ public:
      *  game -- the same shape as the blocker found in step 2. The role picks from
      *  a fixed table instead, rendered in the viewer's own language. */
     virtual void show( Character *viewer, std::basic_ostringstream<char> &buf );
+    virtual bool isQuestTarget( Character *viewer ) const;
 
     void setRole( const DLString & );
     void setQuestType( const DLString & );
