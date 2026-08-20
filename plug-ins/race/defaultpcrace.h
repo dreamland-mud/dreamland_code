@@ -40,9 +40,10 @@ public:
     XML_VARIABLE XMLInteger        minAlign, maxAlign;
 
     XML_VARIABLE XMLStringNoEmpty  nameWho; 
-    XML_VARIABLE XMLStringNoEmpty  nameWhoRus; 
-    XML_VARIABLE XMLStringNoEmpty  nameWhoFemale; 
-    XML_VARIABLE XMLStringNoEmpty  nameScore; 
+    XML_VARIABLE XMLStringNoEmpty  nameWhoRus;
+    XML_VARIABLE XMLStringNoEmpty  nameWhoFemale;
+    XML_VARIABLE XMLStringNoEmpty  nameWhoUa;
+    XML_VARIABLE XMLStringNoEmpty  nameScore;
 };
 
 #endif

@@ -529,11 +529,12 @@ DLString DefaultProfession::getNameFor( Character *ch, const Grammar::Case &c ) 
 
 DLString DefaultProfession::getWhoNameFor( Character *ch ) const
 {
-    // EN viewers (and no-viewer) get the latin who-tag; UA reuses the RU 3-char
-    // tag (CLASSES.md).
+    // EN viewers (and no-viewer) get the latin who-tag.
     lang_t lang = ch ? Player::displayLang( ch ) : LANG_EN;
     if (lang == LANG_EN)
         return whoName;
+    if (lang == LANG_UA && !whoNameUa.empty( ))
+        return whoNameUa;
     return whoNameRus;
 }
 
