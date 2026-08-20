@@ -128,7 +128,8 @@ DLString Money::describe( int gold, int silver, const Grammar::Case &gcase, lang
                 msg << " and ";
             msg << silver << " silver";
         }
-        msg << " " << GET_COUNT(coinN, "coin", "coins", "coins");
+        // English pluralizes on count 1 only -- not the Slavic mod-10 rule.
+        msg << " " << (coinN == 1 ? "coin" : "coins");
         return msg;
     }
 
