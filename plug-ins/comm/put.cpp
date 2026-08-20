@@ -298,7 +298,7 @@ static void put_money_container(Character *ch, int amount, const char *currencyN
     oprog_put_money(container, ch, gold, silver); 
 
     if (!oprog_put_money_msg(container, ch, gold, silver)) {
-        DLString moneyArg = Money::describe(gold, silver, 4);
+        DLString moneyArg = Money::describe(gold, silver, 4, viewerLang(ch));
         if (IS_SET( container->value1(), CONT_PUT_ON|CONT_PUT_ON2 )) {
             ch->pecho(_("Ты кладешь %1$s на %2$O4."), moneyArg.c_str(), container);
             ch->recho(_("%1$^C1 кладет на %2$O4 несколько монет."), ch, container);

@@ -115,8 +115,35 @@ Object * Money::create( int gold, int silver )
     return obj;
 }
 
-DLString Money::describe( int gold, int silver, const Grammar::Case &gcase )
+DLString Money::describe( int gold, int silver, const Grammar::Case &gcase, lang_t lang )
 {
+    if (lang == LANG_EN) {
+        DLString msg;
+        if (gold > 0)
+            msg << gold << " gold";
+        if (silver > 0) {
+            if (gold > 0)
+                msg << " and ";
+            msg << silver << " silver";
+        }
+        msg << " coins";
+        return msg;
+    }
+
+    if (lang == LANG_UA) {
+        // Fixed genitive form, consistent with Money::create's Ukrainian slot.
+        DLString msg;
+        if (gold > 0)
+            msg << gold << " золотих";
+        if (silver > 0) {
+            if (gold > 0)
+                msg << " та ";
+            msg << silver << " срібних";
+        }
+        msg << " монет";
+        return msg;
+    }
+
     static const char *cases_gold [] = {
         "золот%1$Iая|ые|ых",
         "золот%1$Iая|ые|ых",
