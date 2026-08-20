@@ -589,9 +589,13 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         return;
     } 
    
-    if (client->getQuestPoints() > 0) { 
+    // Newbies are exempt from the charisma refusal: a first-life character still
+    // learning the questor should never be turned away over low обаяние (Trello
+    // 398). The gate resumes once they stop being a newbie -- past first remort
+    // or 50 wins, exactly when the stat starts mattering.
+    if (client->getQuestPoints() > 0 && !Player::isNewbie(client)) {
         int cha = client->getCurrStat( STAT_CHA );
-        
+
         if (cha < 20 && number_percent( ) < (20 - cha) * 5) {
             tell_raw( client, ch, _("Знаешь, что-то душа не лежит давать тебе задание.") );
             delay_noquest(attr, client);        
