@@ -115,12 +115,20 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
     
     const char *p = pocket.c_str( );
     const char *where;
-    if (obj->in_room)
-        where = terrains[obj->in_room->getSectorType()].where;
+    lang_t elang = viewerLang(ch);
+    if (obj->in_room) {
+        const terrain_t &t = terrains[obj->in_room->getSectorType()];
+        if (elang == LANG_EN)
+            where = t.whereEn;
+        else if (elang == LANG_UA)
+            where = t.whereUa;
+        else
+            where = t.where;
+    }
     else if (obj->wear_loc == wear_none)
-        where = "в твоих руках";
+        where = lmsg(elang, "in your hands", "в твоих руках", "в твоїх руках");
     else
-        where = "в твоей экипировке";
+        where = lmsg(elang, "in your equipment", "в твоей экипировке", "у твоєму спорядженні");
 
     if (IS_SET(obj->value1(),CONT_PUT_ON|CONT_PUT_ON2)) {
         if (!pocket.empty( ))

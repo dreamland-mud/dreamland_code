@@ -14,19 +14,19 @@
 WEARLOC(none);
 
 const struct terrain_t terrains [SECT_MAX] = {
-/* type           move  wait   hit           fall         where*/
- { SECT_INSIDE,       1,  0, "об пол",      "на пол",   "на полу"   },  // inside
- { SECT_CITY,         2,  0, "об мостовую", "на пол",   "на полу"   },  // city
- { SECT_FIELD,        2,  0, "об траву",    "на траву", "на траве"  },  // field
- { SECT_FOREST,       3,  0, "об землю",    "на землю", "на земле"  },  // forest
- { SECT_HILLS,        4,  0, "об землю",    "на землю", "на земле"  },  // hills
- { SECT_MOUNTAIN,     6,  0, "об землю",    "на землю", "на земле"  },  // mountain
- { SECT_WATER_SWIM,   4,  1, "об дно",      "в воду",   "на воде"   },  // water_swim
- { SECT_WATER_NOSWIM, 1,  1, "об воду",     "в воду",   "на воде"   },  // water_noswim
- { SECT_UNUSED,       6,  1, "об землю",    "на землю", "на земле"  },  // <gap> 
- { SECT_AIR,          10, 0, "об облако",   "в облака", "в воздухе" },  // air
- { SECT_DESERT,       6,  1, "об песок",    "на песок", "на песке"  },  // desert
- { SECT_UNUSED,       6,  1, "об землю",    "на землю", "на дне"    },  // underwater
+/* type           move  wait   hit           fall         where         whereEn            whereUa */
+ { SECT_INSIDE,       1,  0, "об пол",      "на пол",   "на полу",   "on the floor",  "на підлозі" },  // inside
+ { SECT_CITY,         2,  0, "об мостовую", "на пол",   "на полу",   "on the floor",  "на підлозі" },  // city
+ { SECT_FIELD,        2,  0, "об траву",    "на траву", "на траве",  "on the grass",  "на траві"   },  // field
+ { SECT_FOREST,       3,  0, "об землю",    "на землю", "на земле",  "on the ground", "на землі"   },  // forest
+ { SECT_HILLS,        4,  0, "об землю",    "на землю", "на земле",  "on the ground", "на землі"   },  // hills
+ { SECT_MOUNTAIN,     6,  0, "об землю",    "на землю", "на земле",  "on the ground", "на землі"   },  // mountain
+ { SECT_WATER_SWIM,   4,  1, "об дно",      "в воду",   "на воде",   "on the water",  "на воді"    },  // water_swim
+ { SECT_WATER_NOSWIM, 1,  1, "об воду",     "в воду",   "на воде",   "on the water",  "на воді"    },  // water_noswim
+ { SECT_UNUSED,       6,  1, "об землю",    "на землю", "на земле",  "on the ground", "на землі"   },  // <gap>
+ { SECT_AIR,          10, 0, "об облако",   "в облака", "в воздухе", "in the air",    "у повітрі"  },  // air
+ { SECT_DESERT,       6,  1, "об песок",    "на песок", "на песке",  "on the sand",   "на піску"   },  // desert
+ { SECT_UNUSED,       6,  1, "об землю",    "на землю", "на дне",    "on the bottom", "на дні"     },  // underwater
 };
 
 /*-----------------------------------------------------------------------------

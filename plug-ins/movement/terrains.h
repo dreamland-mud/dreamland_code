@@ -15,6 +15,8 @@ struct terrain_t {
     const char * hit;
     const char * fall;
     const char * where;
+    const char * whereEn;
+    const char * whereUa;
 };
 
 extern const struct terrain_t terrains [];
