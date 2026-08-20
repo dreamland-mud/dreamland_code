@@ -354,6 +354,25 @@ void MobQuestTarget::show( Character *viewer, std::basic_ostringstream<char> &bu
             buf << fmt( viewer, _("{R[ВОР] {x") );
         else
             buf << fmt( viewer, _("{y[ВОР %1$s] {x"), getHeroName( ).c_str( ) );
+    } else if (r == "client") {
+        // The awaiting-client hint (Report 7587). The C++ concrete quests tagged
+        // their waiting mob per type (RobbedVictim/LocateCustomer/SteakCustomer
+        // ::show); the Fenia port marks role "client" and this branch never
+        // existed, so the hint vanished for every generated item-return quest.
+        // Hero-only, matching the legacy gating. HealQuest also marks "client"
+        // but had no legacy marker, so it stays unmarked here. The !isComplete()
+        // clause matches legacy too: once the hero hands the item over the mob
+        // is no longer waiting, so it falls silent before the walk to turn-in.
+        ::Pointer<FeniaQuest> q = getFeniaQuest( );
+        if (mine && q && !q->isComplete( )) {
+            const DLString &t = questType.getValue( );
+            if (t == "StealQuest")
+                buf << fmt( viewer, _("{x({YХныкает{x) ") );
+            else if (t == "LocateQuest")
+                buf << fmt( viewer, _("{x({YЖдет кого-то{x) ") );
+            else if (t == "ButcherQuest")
+                buf << fmt( viewer, _("{x({YТерпеливо ждет{x) ") );
+        }
     }
 }
 

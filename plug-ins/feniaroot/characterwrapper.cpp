@@ -43,6 +43,7 @@
 #include "fight.h"
 #include "skill_utils.h"
 #include "areaquestutils.h"
+#include "feniaquest.h"
 #include "immunity.h"
 #include "magic.h"
 #include "movetypes.h"
@@ -3758,6 +3759,42 @@ NMI_GET(CharacterWrapper, quest, "статистика побед в авто к
     if (!statAttr)
         return Register();
     return statAttr->toRegister(target->getPC(), "questdata");
+}
+
+NMI_GET(CharacterWrapper, questVictimVnum, "внум цели активного авто-задания на убийство, 0 если такой цели нет")
+{
+    checkTarget();
+    CHK_NPC
+
+    // The running autoquest lives as the "quest" attribute on the hero. Only a
+    // LIVE victim-quest answers. A Fenia kill quest sits at QSTAT_INIT from
+    // hand-out until the target dies -- the kill scenario never sets STARTED
+    // (only steal/locate do, on client greet) -- so both non-terminal states
+    // count. The moment the marked target dies deathAsVictim flips the state to
+    // FINISHED/BROKEN (both >= 42) synchronously inside mprog_death, which runs
+    // BEFORE the global onDeath trigger that reads this -- so the correct kill
+    // reports 0 and never trips the "wrong target" hint. An unmarked same-vnum
+    // kill leaves the quest live and the real victim alive elsewhere, which is
+    // exactly the newbie confusion this teaches (Trello 398).
+    // findMarkedMobile("victim") returns NULL for every non-kill type, so no
+    // extra type check is needed.
+    Quest::Pointer q = target->getPC()->getAttributes().findAttr<Quest>("quest");
+    if (!q)
+        return Register(0);
+
+    int st = q->state.getValue();
+    if (st != QSTAT_INIT && st != QSTAT_STARTED)
+        return Register(0);
+
+    FeniaQuest *fq = q.getDynamicPointer<FeniaQuest>();
+    if (!fq)
+        return Register(0);
+
+    NPCharacter *victim = fq->findMarkedMobile("victim");
+    if (!victim)
+        return Register(0);
+
+    return Register(victim->pIndexData->vnum);
 }
 
 NMI_GET(CharacterWrapper, attributes, "Array всех аттрибутов, ключ - имя аттрибута, значение - Map с полями аттрибута либо пустая строка")
