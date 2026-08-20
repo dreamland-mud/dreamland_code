@@ -267,31 +267,54 @@ void PortalMovement::msgOnMove( Character *wch, bool fLeaving )
     if (fLeaving) {
         if (RIDDEN(wch))
             msgRoomNoParty( wch,
-                            "%1^C1 въезжа%1$nет|ют в %4$O4 верхом на %2$C6." );
-        else        
-            msgRoomNoParty( wch,
-                            "%1^C1 вход%1$nит|ят в %4$O4." );
-        
-        if (isNormalExit( )) 
-            msg = "Ты входишь в %4$O4.";
+                            "%1^C1 ride%1$ns| into %4$O4 on %2$C6.",
+                            "%1^C1 въезжа%1$nет|ют в %4$O4 верхом на %2$C6.",
+                            "%1^C1 в'їжджа%1$nє|ють у %4$O4 верхи на %2$C6." );
         else
-            msg = "Ты входишь в %4$O4 и переносишься в другое место...";
-        
-        msgSelf( wch, msg.c_str( ) );
+            msgRoomNoParty( wch,
+                            "%1^C1 step%1$ns| into %4$O4.",
+                            "%1^C1 вход%1$nит|ят в %4$O4.",
+                            "%1^C1 вход%1$nить|ять у %4$O4." );
+
+        const char *sEn, *sRu, *sUa;
+        if (isNormalExit( )) {
+            sEn = "You step into %4$O4.";
+            sRu = "Ты входишь в %4$O4.";
+            sUa = "Ти входиш у %4$O4.";
+        }
+        else {
+            sEn = "You step into %4$O4 and are swept away to another place...";
+            sRu = "Ты входишь в %4$O4 и переносишься в другое место...";
+            sUa = "Ти входиш у %4$O4 і переносишся в інше місце...";
+        }
+
+        msgSelf( wch, sEn, sRu, sUa );
         if (RIDDEN(wch))
-            msgSelf( RIDDEN(wch), msg.c_str( ) );
+            msgSelf( RIDDEN(wch), sEn, sRu, sUa );
     }
     else {
-        if (isNormalExit( )) 
+        DLString en, uk;
+        if (isNormalExit( )) {
+            en  = "%1$^C1 appear%1$ns|";
             msg = "%1$^C1 появля%1$nется|ются";
-        else
+            uk  = "%1$^C1 з'явля%1$nється|ються";
+        }
+        else {
+            en  = "%1$^C1 appear%1$ns| out of %4$O2";
             msg = "%1$^C1 появля%1$nется|ются из %4$O2";
+            uk  = "%1$^C1 з'явля%1$nється|ються з %4$O2";
+        }
 
-        if (RIDDEN(wch))
+        if (RIDDEN(wch)) {
+            en  << " on %2$C6";
             msg << " верхом на %2$C6";
+            uk  << " верхи на %2$C6";
+        }
 
+        en  << ".";
         msg << ".";
-        msgRoomNoParty( wch, msg.c_str( ) );
+        uk  << ".";
+        msgRoomNoParty( wch, en.c_str( ), msg.c_str( ), uk.c_str( ) );
     }
 }
 
