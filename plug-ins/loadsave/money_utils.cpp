@@ -117,7 +117,9 @@ Object * Money::create( int gold, int silver )
 
 DLString Money::describe( int gold, int silver, const Grammar::Case &gcase, lang_t lang )
 {
+    // The coin noun agrees with the last-mentioned count, as the Russian path does.
     if (lang == LANG_EN) {
+        int coinN = silver > 0 ? silver : gold;
         DLString msg;
         if (gold > 0)
             msg << gold << " gold";
@@ -126,21 +128,23 @@ DLString Money::describe( int gold, int silver, const Grammar::Case &gcase, lang
                 msg << " and ";
             msg << silver << " silver";
         }
-        msg << " coins";
+        msg << " " << GET_COUNT(coinN, "coin", "coins", "coins");
         return msg;
     }
 
     if (lang == LANG_UA) {
-        // Fixed genitive form, consistent with Money::create's Ukrainian slot.
+        // Accusative agreement (the frames govern "на N ..."): numeral 1 -> singular,
+        // 2-4 -> nominative plural, 5+/0 -> genitive plural. Count-keyed like the RU path.
+        int coinN = silver > 0 ? silver : gold;
         DLString msg;
         if (gold > 0)
-            msg << gold << " золотих";
+            msg << gold << " " << GET_COUNT(gold, "золоту", "золоті", "золотих");
         if (silver > 0) {
             if (gold > 0)
                 msg << " та ";
-            msg << silver << " срібних";
+            msg << silver << " " << GET_COUNT(silver, "срібну", "срібні", "срібних");
         }
-        msg << " монет";
+        msg << " " << GET_COUNT(coinN, "монету", "монети", "монет");
         return msg;
     }
 
