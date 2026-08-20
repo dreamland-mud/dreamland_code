@@ -376,7 +376,7 @@ void InterpretHandler::normalPrompt( Character *ch )
                     << "{" << sector_type_color(sector) <<  sector_table.message(sector, '1', Player::displayLang(ch));
                     
                 if (liq_none != liq)
-                    out << "{D|{x" << liq->getShortDescr().ruscase('1');
+                    out << "{D|{x" << liq->getShortDescr(Player::displayLang(ch)).ruscase('1');
 
                 out << "{w"
                     << (indoors ? ")" : "");

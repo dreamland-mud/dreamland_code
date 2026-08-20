@@ -157,15 +157,16 @@ void Player::advanceLevel(PCharacter *pch)
     pch->perm_mana        += add_mana;
     pch->perm_move        += add_move;
     
-    buf << "{CТы получаешь: "
-        << "{Y" << add_hp << "{C/" << pch->max_hit << " здоровья, "
-        << "{Y" << add_mana << "{C/" << pch->max_mana << " маны, "
-        << "{Y" << add_move << "{C/" << pch->max_move << " движения, "
-        <<  endl <<  "              " 
-        << "{Y" << add_prac << "{C/" << pch->practice << " практики";
+    lang_t lang = viewerLang(pch);
+    buf << "{C" << lmsg(lang, "You gain: ", "Ты получаешь: ", "Ти отримуєш: ")
+        << "{Y" << add_hp << "{C/" << pch->max_hit << lmsg(lang, " hp, ", " здоровья, ", " здоров'я, ")
+        << "{Y" << add_mana << "{C/" << pch->max_mana << lmsg(lang, " mana, ", " маны, ", " мани, ")
+        << "{Y" << add_move << "{C/" << pch->max_move << lmsg(lang, " moves, ", " движения, ", " руху, ")
+        <<  endl <<  lmsg(lang, "          ", "              ", "             ")
+        << "{Y" << add_prac << "{C/" << pch->practice << lmsg(lang, " practices", " практики", " практики");
 
     if (add_train > 0)
-        buf << ", {Y" << add_train << "{C/" << pch->train << " тренировку";
+        buf << lmsg(lang, ", ", ", ", ", ") << "{Y" << add_train << "{C/" << pch->train << lmsg(lang, " trains", " тренировку", " тренування");
     
     buf << ".{x";
     pch->pecho( buf.str( ).c_str( ) );
