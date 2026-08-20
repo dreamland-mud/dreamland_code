@@ -499,9 +499,14 @@ NMI_GET( RaceWrapper, name, "английское название" )
     return raceManager->find( name )->getName( );
 }
 
-NMI_GET( RaceWrapper, nameMlt, "русское название во множ.числе с падежами" ) 
+NMI_GET( RaceWrapper, nameMlt, "русское название во множ.числе с падежами" )
 {
     return raceManager->find( name )->getMltName( );
+}
+
+NMI_GET( RaceWrapper, nameMltUa, "украинское название во множ.числе с падежами (пусто, если нет - откати на nameMlt)" )
+{
+    return raceManager->find( name )->getMltNameUa( );
 }
 
 NMI_GET( RaceWrapper, nameMale, "русское название в мужском роде с падежами" ) 

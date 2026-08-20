@@ -186,7 +186,7 @@ public:
     virtual int getMaxAlign( ) const;
 
 protected:
-    XML_VARIABLE XMLString  whoName, whoNameRus, rusName, mltName, uaName;
+    XML_VARIABLE XMLString  whoName, whoNameRus, rusName, mltName, uaName, whoNameUa;
     XML_VARIABLE XMLInteger weapon;
     XML_VARIABLE XMLInteger skillAdept;
     XML_VARIABLE XMLIntegerNoEmpty parentAdept;

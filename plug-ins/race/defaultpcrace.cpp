@@ -54,9 +54,13 @@ int DefaultPCRace::getMaxAlign( ) const
 
 DLString DefaultPCRace::getWhoNameFor( Character *looker, Character *owner ) const
 {
-    // EN (and no viewer) get the latin who-tag; UA reuses the RU tag.
+    // EN (and no viewer) get the latin who-tag.
     if (!looker || Player::displayLang( looker ) == LANG_EN)
         return nameWho;
+
+    // Ukrainian gets its own tag when present, else falls back to the Russian one.
+    if (Player::displayLang( looker ) == LANG_UA && !nameWhoUa.empty( ))
+        return nameWhoUa;
 
     if (!owner || owner->getSex( ) == SEX_MALE)
         return nameWhoRus;
