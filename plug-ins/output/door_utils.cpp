@@ -7,6 +7,12 @@ const char *dir_name_small[] = {"n","e","s","w","u","d"};
 const char **dir_name = dir_name_small;
 const char *ru_dir_name_big[] = {"С","В","Ю","З","П","О"};
 const char *ru_dir_name_small[] = {"с","в","ю","з","п","о"};
+// Ukrainian compass labels are two letters (Пн/Сх/Пд/Зх/Вг/Вн) on purpose: a
+// single Ukrainian letter would collide with the movement aliases (typing "с"
+// walks east/схід, not north). These are display-only -- never fed to
+// find_door_in_array(), which keys on the first byte.
+const char *ua_dir_name_big[] = {"Пн","Сх","Пд","Зх","Вг","Вн"};
+const char *ua_dir_name_small[] = {"пн","сх","пд","зх","вг","вн"};
 
 static int find_door_in_array(char c, const char * doors [])
 {
