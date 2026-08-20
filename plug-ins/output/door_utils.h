@@ -6,6 +6,8 @@ extern const char **dir_name;
 extern const char *dir_name_small[];
 extern const char *ru_dir_name_small[];
 extern const char *ru_dir_name_big[];
+extern const char *ua_dir_name_small[];
+extern const char *ua_dir_name_big[];
 
 
 bool door_is_small(char c);

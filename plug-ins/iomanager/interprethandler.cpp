@@ -214,7 +214,6 @@ void InterpretHandler::normalPrompt( Character *ch )
 
     while( *str ) {
         ostringstream doors;
-        bool fRus = false;
         bool handled = false;
 
         if ( *str != '%' ) {
@@ -246,8 +245,20 @@ void InterpretHandler::normalPrompt( Character *ch )
             break;
 
         case 'd':
-        case 'e':
-            fRus = ch->getPC( ) && Player::displayLang( ch ) != LANG_EN;
+        case 'e': {
+            lang_t dlang = ch->getPC( ) ? Player::displayLang( ch ) : LANG_EN;
+            const char **big_names = dir_name_big;
+            const char **small_names = dir_name_small;
+            const char *none_word = "none";
+            if (dlang == LANG_RU) {
+                big_names = ru_dir_name_big;
+                small_names = ru_dir_name_small;
+                none_word = "нет";
+            } else if (dlang == LANG_UA) {
+                big_names = ua_dir_name_big;
+                small_names = ua_dir_name_small;
+                none_word = "немає";
+            }
 
             for (int door = 0; door < DIR_SOMEWHERE; door++) {
                 EXIT_DATA *pexit = ch->in_room->exit[door];
@@ -255,17 +266,17 @@ void InterpretHandler::normalPrompt( Character *ch )
                 if (!pexit || !ch->can_see( pexit ))
                     continue;
 
-                if (IS_SET(pexit->exit_info, EX_CLOSED)) {
-                    doors << (fRus ? ru_dir_name_small[door] : dir_name_small[door]);
-                } else {
-                    doors << (fRus ? ru_dir_name_big[door] : dir_name_big[door]);
-                }
+                if (IS_SET(pexit->exit_info, EX_CLOSED))
+                    doors << small_names[door];
+                else
+                    doors << big_names[door];
             }
             if (doors.str( ).empty( ))
-                out << (fRus ? "нет" : "none");
+                out << none_word;
             else
                 out << doors.str( );
             break;
+        }
 
         case 'c' :
             out << endl;
