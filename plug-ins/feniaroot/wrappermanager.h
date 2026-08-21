@@ -58,12 +58,12 @@ public:
 
     static WrapperManager* getThis( );
 
-    // Word-effects are not part of the polymorphic WrapperManagerBase interface:
-    // only feniaroot ever links or wraps them (the languagecommand dispatch uses
-    // WordEffect::getWrapper() directly), so these stay non-virtual and are
-    // reached via getThis() to avoid changing the cross-.so base vtable.
+    // getWrapper stays non-virtual (only feniaroot wraps effects, via getThis()).
+    // linkWrapper IS virtual on WrapperManagerBase: the languages plugin binds
+    // effect wrappers at language-load time (Language::initialization), which is
+    // the correct moment -- feniaroot's linkTargets() runs before languages load.
     Scripting::Register getWrapper( WordEffect * );
-    void linkWrapper( WordEffect * );
+    virtual void linkWrapper( WordEffect * );
 
 private:
     template <typename WrapperType, typename TargetType>
