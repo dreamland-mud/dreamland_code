@@ -25,6 +25,7 @@
 
 #include "areaquestutils.h"
 #include "loadsave.h"
+#include "../loadsave/behavior_utils.h"
 #include "immunity.h"
 #include "damageflags.h"
 #include "save.h"
@@ -181,6 +182,8 @@ CMDRUN( fill )
                    || source->isAffected(gsn_poison)))
     	obj->value3(obj->value3() | DRINK_POISONED);
 	
+    behavior_trigger( obj, "Fill", "OCi", obj, ch, amount );
+
     if (obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
         drink->fill( ch, source, amount ); // source can be null here
 }
@@ -337,8 +340,26 @@ void pour_out(Object *out)
             rch->pecho(l(rch, "Поток %N2 из %O2 проливается на землю."), ln, out);
     }
 
-    if (onGround)
+    if (onGround) {
+        // Notify every object already in the room that liquid was poured over
+        // it. Two receiving-side channels, both new for a ground pour: a bedit
+        // behavior (PourOn) and each affect's onPourOut. The latter is what an
+        // incandescent item hisses out on -- water poured on the floor where a
+        // red-hot thing lies (Venzdey / Trello 2633). That handler was written
+        // for "poured onto" but nothing fired it in that direction until now.
+        // Snapshot next first: a reacting handler may extract the item.
+        Object *next;
+        for (Object *item = room->contents; item; item = next) {
+            next = item->next_content;
+            behavior_trigger( item, "PourOn", "OCOsi", item, ch, out, liqname, amount );
+
+            for (auto &paf: item->affected.findAllWithHandler())
+                if (paf->type->getAffect())
+                    paf->type->getAffect()->onPourOut(SpellTarget::Pointer(NEW, item), paf, ch, out, liqname, amount);
+        }
+
         create_pool(out, amount);
+    }
 
     if (ch && out->behavior && out->behavior.getDynamicPointer<DrinkContainer>())
         out->behavior.getDynamicPointer<DrinkContainer>()->pourOut(ch, amount);
@@ -346,6 +367,7 @@ void pour_out(Object *out)
 
 static void oprog_pour_out( Object *obj, Character *ch, Object *out, const char *liqname, int amount )
 {
+    behavior_trigger( obj, "PourOut", "OCOsi", obj, ch, out, liqname, amount );
     FENIA_VOID_CALL( obj, "PourOut", "COsi", ch, out, liqname, amount );
     FENIA_NDX_VOID_CALL( obj, "PourOut", "OCOsi", obj, ch, out, liqname, amount );
 
@@ -752,6 +774,8 @@ static bool mprog_drink( Character *ch, Object *obj, const char *liq, int amount
 /** Call prog for drinking container */
 static bool oprog_drink( Object *obj, Character *ch, const char *liq, int amount )
 {
+    if (behavior_trigger( obj, "Drink", "OCsi", obj, ch, liq, amount ))
+        return true;
     FENIA_CALL( obj, "Drink", "Csi", ch, liq, amount );
     FENIA_NDX_CALL( obj, "Drink", "OCsi", obj, ch, liq, amount );
     return false;
