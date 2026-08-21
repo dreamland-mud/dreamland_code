@@ -35,19 +35,33 @@ DLString collate_speedwalk(const DLString &path)
 /*
  * make_speedwalk: constructs speedwalk string based on Road's vector
  */
-void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf )
+void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf, lang_t lang )
 {
     DLString path;
     StringList commands;
+
+    // The run word is shown to the player AND, when the {hs is clicked, sent
+    // back as a command, so it has to be the run command's name in the viewer's
+    // language. The questor path-hint caller (Wanderer, wanderer.cpp) still
+    // passes LANG_DEFAULT and shows RU "бег" to everyone -- a known cosmetic
+    // follow-up; the clickable still runs. Direction letters stay Latin -- that
+    // is the machine notation the run parser and mapper round-trip on.
+    const char *runword;
+    switch (lang) {
+        case LANG_EN: runword = "run"; break;
+        case LANG_UA: runword = "біг"; break;
+        default:      runword = "бег"; break;
+    }
+    DLString runprefix = DLString("{IW") + runword + " {x{hs";
 
     for (auto &road: elements) {
         if (road.type == Road::DOOR) {
             path << dirs[road.value.door].name[0];
             continue;
-        } 
+        }
 
         if (!path.empty()) {
-            commands.push_back("{IWбег {x{hs" + collate_speedwalk(path));
+            commands.push_back(runprefix + collate_speedwalk(path));
             path.clear();
         }
 
@@ -61,7 +75,7 @@ void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf )
     }
 
     if (!path.empty())
-        commands.push_back("{IWбег {x{hs" + collate_speedwalk(path));
+        commands.push_back(runprefix + collate_speedwalk(path));
 
     buf << commands.wrap("{y", "{x").join(" | ");
 }

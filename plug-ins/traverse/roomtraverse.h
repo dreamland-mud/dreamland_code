@@ -173,7 +173,7 @@ void room_traverse( Room *src, HookIterator &iter,
     traverse( src, limit );
 }
 
-void make_speedwalk( RoomTraverseResult &elements, ostringstream & );
+void make_speedwalk( RoomTraverseResult &elements, ostringstream &, lang_t lang = LANG_DEFAULT );
 int room_distance( Character *ch, Room *src, Room *dst, int limit = 10000 );
 Road room_first_step( Character *ch, Room *start_room, Room *target_room,
                      bool fDoor, bool fExtra, bool fPortal, int limit = 10000 );

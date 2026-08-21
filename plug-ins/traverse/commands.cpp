@@ -101,7 +101,7 @@ CMDRUN( find )
     room_traverse<NoFailHookIterator>( msm, iter, complete, radius );
 
     ostr << "Found path: ";
-    make_speedwalk( elements, ostr );
+    make_speedwalk( elements, ostr, viewerLang(ch) );
     ostr << endl;
     
     ch->send_to( ostr );
@@ -279,7 +279,7 @@ CMDRUN( path )
         }
  
         buf << ": ";
-        make_speedwalk(elements, buf);
+        make_speedwalk(elements, buf, viewerLang(ch));
         buf << endl;
         foundPath = true;
     }
