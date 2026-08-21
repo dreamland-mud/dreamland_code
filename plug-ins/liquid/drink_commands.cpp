@@ -525,6 +525,19 @@ void pour_out( Character *ch, Object * out, Character *victim )
 
     for (Object *obj = victim->carrying; obj; obj = obj->next_content)
         oprog_pour_out( obj, ch, out, liqname, amount );
+
+    // Holy water scalds the undead. A drink container blessed by create-water
+    // carries ITEM_BLESS; splashing it over anything holy-vulnerable burns it,
+    // mirroring the drink-side zap. NPC-only, to stay out of PK. Kept last in
+    // the function: rawdamage may extract the victim, so nothing may touch it
+    // afterwards.
+    if (IS_OBJ_STAT(out, ITEM_BLESS) && !victim->extracted && victim->is_npc( )
+            && immune_check( victim, DAM_HOLY, DAMF_OTHER ) == RESIST_VULNERABLE)
+    {
+        ch->pecho(_("Ты поливаешь %1$C4 святой водой -- она обжигает с шипением!"), victim);
+        ch->recho(victim, _("%1$^C1 поливает %2$C4 святой водой -- она обжигает с шипением!"), ch, victim);
+        rawdamage(ch, victim, DAM_HOLY, victim->hit / 100 + 1, true, "holywater");
+    }
 }
 
 static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
