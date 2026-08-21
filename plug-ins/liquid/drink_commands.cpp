@@ -174,8 +174,11 @@ CMDRUN( fill )
         obj->value1(obj->value0());
     }
 
-    // If the source was poisoned, poison the drink container as well
-    if (source && (IS_SET( source->value3(), DRINK_POISONED ) || source->isAffected(gsn_poison)))
+    // If the source was poisoned, poison the drink container as well. A fountain
+    // source keeps max-people in value3, not drink flags, so only read the poisoned
+    // bit off a real drink container -- a poison affect still counts for either.
+    if (source && ((source->item_type == ITEM_DRINK_CON && IS_SET( source->value3(), DRINK_POISONED ))
+                   || source->isAffected(gsn_poison)))
     	obj->value3(obj->value3() | DRINK_POISONED);
 	
     if (obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
@@ -909,8 +912,11 @@ CMDRUN( drink )
         for (int i = 0; i < desireManager->size( ); i++)
             desireManager->find( i )->drink( ch->getPC( ), amount, liquid );
 
-    /* The drink was poisoned ! */
-    if (obj && (IS_SET( obj->value3(), DRINK_POISONED ) || obj->isAffected(gsn_poison)))
+    /* The drink was poisoned ! (fountain value3 is max-people, not drink flags --
+       read the poisoned bit only on a real drink container; a poison affect on a
+       fountain still counts, so keep the isAffected check for both) */
+    if (obj && ((obj->item_type == ITEM_DRINK_CON && IS_SET( obj->value3(), DRINK_POISONED ))
+                || obj->isAffected(gsn_poison)))
     {
         int level = number_fuzzy(amount);
         Affect af;
