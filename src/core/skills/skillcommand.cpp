@@ -24,10 +24,10 @@ const DLString & SkillCommand::getRussianName( ) const
 
 const DLString& SkillCommand::getNameFor(Character *ch) const
 {
-    if (ch && viewerLang( ch ) != LANG_EN)
-        return getRussianName( );
-    else
-        return getName( );
+    // Delegate to the lang_t overload so DefaultSkillCommand's multilingual
+    // override is honoured -- otherwise a UA viewer fell back to the Russian
+    // name (e.g. practice list showed "толчок" instead of "штовх").
+    return getNameFor( ch ? viewerLang( ch ) : LANG_EN );
 }
 
 const DLString& SkillCommand::getNameFor(lang_t lang) const
