@@ -25,6 +25,7 @@ class WrappedCommand;
 class AreaQuest;
 class Behavior;
 class QuestRegistratorBase;
+class WordEffect;
 
 class WrapperManagerBase : public virtual DLObject {
 public:
@@ -60,6 +61,10 @@ public:
     virtual void linkWrapper( AreaQuest * ) = 0;
     virtual void linkWrapper( Behavior * ) = 0;
     virtual void linkWrapper( QuestRegistratorBase * ) = 0;
+    // Virtual (unlike getWrapper(WordEffect*)) so the languages plugin can bind
+    // effect wrappers at language-load time through the base pointer -- languages
+    // load AFTER feniaroot init, so linkTargets() there is too early to stamp them.
+    virtual void linkWrapper( WordEffect * ) = 0;
 
     /** Turn a Fenia value back into the engine object behind it.
      *

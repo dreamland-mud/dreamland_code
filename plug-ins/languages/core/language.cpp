@@ -112,6 +112,24 @@ void Language::initialization( )
 {
     languageManager->load( this );
 
+    // Stamp each effect with its identity (language:name -> getID) and bind any
+    // persisted Fenia wrapper, NOW that the effects are loaded. This must happen
+    // language-side: languages load after feniaroot's plugin init, so feniaroot's
+    // linkTargets() runs too early to see them (it would stamp nothing, and a
+    // later .WordEffect(...) would throw "identity not stamped"). recover() has
+    // already populated the wrapper map by this point, so linkWrapper rebinds
+    // persisted handlers across reboots. Mirrors how xmlarea links index wrappers.
+    for (Effects::iterator e = effects.begin( ); e != effects.end( ); e++) {
+        WordEffect *effect = e->second.getPointer( );
+        if (effect == NULL)
+            continue;
+
+        effect->setEffectIdentity( getName( ), e->first );
+
+        if (FeniaManager::wrapperManager)
+            FeniaManager::wrapperManager->linkWrapper( effect );
+    }
+
     skillManager->registrate( Pointer( this ) );
 
     if (command)
