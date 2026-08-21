@@ -174,8 +174,11 @@ CMDRUN( fill )
         obj->value1(obj->value0());
     }
 
-    // If the source was poisoned, poison the drink container as well
-    if (source && (IS_SET( source->value3(), DRINK_POISONED ) || source->isAffected(gsn_poison)))
+    // If the source was poisoned, poison the drink container as well. A fountain
+    // source keeps max-people in value3, not drink flags, so only read the poisoned
+    // bit off a real drink container -- a poison affect still counts for either.
+    if (source && ((source->item_type == ITEM_DRINK_CON && IS_SET( source->value3(), DRINK_POISONED ))
+                   || source->isAffected(gsn_poison)))
     	obj->value3(obj->value3() | DRINK_POISONED);
 	
     if (obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
@@ -573,6 +576,13 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
     out->value1(out->value1() - amount);
     in->value2(out->value2());
 
+    // Carry poison across, same as fill does (:178). Only drink containers track
+    // the poisoned flag in value3 -- a fountain's value3 is its max-people count,
+    // so never stamp a drink flag onto a fountain.
+    if (in->item_type == ITEM_DRINK_CON
+        && (IS_SET( out->value3(), DRINK_POISONED ) || out->isAffected(gsn_poison)))
+        in->value3(in->value3() | DRINK_POISONED);
+
     Liquid *liq = liquidManager->find( out->value2() );
     lang_t lang = Player::lang(ch);
     const char *liqShort = liq->getShortDescr( lang ).c_str( );
@@ -774,14 +784,16 @@ CMDRUN( drink )
     int amount = 0;
     Liquid *liquid;
     DrinkContainer::Pointer drink;
-    RoomIndexData *pRoom = ch->in_room->pIndexData;
+    // Instance-aware room liquid (flood / create spring set it on the instance);
+    // reading pIndexData->liquid directly missed those, unlike fill (getLiquid).
+    auto &roomLiquid = ch->in_room->getLiquid();
     DLString arguments = constArguments, arg;
-    
+
     arg = arguments.getOneArgument( );
 
     if (arg.empty( )) {
         obj = get_obj_room_type( ch, ITEM_FOUNTAIN );
-        if (!obj && pRoom->liquid == liq_none) 
+        if (!obj && roomLiquid == liq_none)
             if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
                 ch->pecho(_("Выпить что?"));
                 return;
@@ -839,7 +851,11 @@ CMDRUN( drink )
 
             liquid = liquidManager->find( obj->value2() );
             amount = liquid->getSipSize( ) * 3;
-            amount = min(amount, obj->value1());
+            // Infinite fountains (v0 = -1) are never depleted, so v1 is not a
+            // "remaining" counter. One sitting at v1 = 0 otherwise clamps the
+            // sip to min(3*sip, 0) = 0: messages fire, thirst never moves.
+            if (obj->value0() > -1)
+                amount = min(amount, obj->value1());
             break;
 
         case ITEM_DRINK_CON:
@@ -859,8 +875,8 @@ CMDRUN( drink )
             amount = min(amount, obj->value1());
             break;
         }
-    } else if (pRoom->liquid != liq_none) {
-        liquid = pRoom->liquid.getElement();
+    } else if (roomLiquid != liq_none) {
+        liquid = roomLiquid.getElement();
         amount = liquid->getSipSize( ) * 3;
     } else {
         liquid = liq_water.getElement();
@@ -896,8 +912,11 @@ CMDRUN( drink )
         for (int i = 0; i < desireManager->size( ); i++)
             desireManager->find( i )->drink( ch->getPC( ), amount, liquid );
 
-    /* The drink was poisoned ! */
-    if (obj && (IS_SET( obj->value3(), DRINK_POISONED ) || obj->isAffected(gsn_poison)))
+    /* The drink was poisoned ! (fountain value3 is max-people, not drink flags --
+       read the poisoned bit only on a real drink container; a poison affect on a
+       fountain still counts, so keep the isAffected check for both) */
+    if (obj && ((obj->item_type == ITEM_DRINK_CON && IS_SET( obj->value3(), DRINK_POISONED ))
+                || obj->isAffected(gsn_poison)))
     {
         int level = number_fuzzy(amount);
         Affect af;
