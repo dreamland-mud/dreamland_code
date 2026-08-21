@@ -8,6 +8,7 @@
 #include "word.h"
 #include "wordeffect.h"
 #include "xmlattributelanguage.h"
+#include "fenia/feniamanager.h"
 
 #include "skillmanager.h"                                                       
 #include "commandmanager.h"
@@ -122,8 +123,21 @@ void Language::destruction( )
     if (command)
         command->unsetLanguage();
 
+    // Release Fenia wrappers bound to this language's effects while the effects
+    // are still alive, so an isolated `plug reload languages` (feniaroot NOT
+    // reloaded) doesn't leave a wrapper pointing at freed effects. Parity with
+    // DefaultBehavior::unloaded(). The wrapperManager guard skips this on full
+    // shutdown, where feniaroot has already unloaded and cleared the pointer --
+    // touching a torn-down wrapper there would be the deref we are avoiding.
+    if (FeniaManager::wrapperManager)
+        for (auto &epair: effects) {
+            WordEffect *effect = epair.second.getPointer();
+            if (effect != NULL && effect->wrapper != NULL)
+                effect->extractWrapper(false);
+        }
+
     skillManager->unregistrate( Pointer( this ) );
-        
+
     languageManager->unload( this );
 }
 
