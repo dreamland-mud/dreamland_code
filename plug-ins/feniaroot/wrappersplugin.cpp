@@ -345,6 +345,7 @@ void WrappersPlugin::destruction( ) {
 
     Class::unregMoc<PlayerWrapper>();
     Class::unregMoc<BehaviorWrapper>();
+    Class::unregMoc<WordEffectWrapper>();
     Class::unregMoc<AutoQuestWrapper>( );
     Class::unregMoc<AreaQuestWrapper>( );
     Class::unregMoc<WearlocWrapper>( );
