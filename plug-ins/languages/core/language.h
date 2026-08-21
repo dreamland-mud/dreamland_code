@@ -128,6 +128,7 @@ public:
     
     WordEffectPointer findEffect( const DLString & ) const;
     DLString getEffectName( WordEffectPointer ) const;
+    Effects & getEffects( ) { return effects; }
     bool isNative( PCharacter * ) const;
     virtual DLString createDictum( ) const = 0;
     

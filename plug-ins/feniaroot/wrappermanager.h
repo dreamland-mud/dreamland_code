@@ -14,6 +14,8 @@
 #define MOB_VNUM2ID(v) (((v) << 4) | 3)
 #define AREA_VNUM2ID(v) (((v) << 4) | 4)
 
+class WordEffect;
+
 class WrapperManager: public WrapperManagerBase, public Plugin {
 public:
     
@@ -55,6 +57,13 @@ public:
     virtual void destruction( );
 
     static WrapperManager* getThis( );
+
+    // Word-effects are not part of the polymorphic WrapperManagerBase interface:
+    // only feniaroot ever links or wraps them (the languagecommand dispatch uses
+    // WordEffect::getWrapper() directly), so these stay non-virtual and are
+    // reached via getThis() to avoid changing the cross-.so base vtable.
+    Scripting::Register getWrapper( WordEffect * );
+    void linkWrapper( WordEffect * );
 
 private:
     template <typename WrapperType, typename TargetType>

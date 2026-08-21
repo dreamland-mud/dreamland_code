@@ -43,6 +43,7 @@ codesourcerepo.cpp \
 evalservlet.cpp \
 behaviorwrapper.cpp \
 behaviorloader.cpp \
+wordeffectwrapper.cpp \
 playerwrapper.cpp \
 multimessagewrapper.cpp
 
@@ -68,6 +69,7 @@ autoquestwrapper.h \
 characterwrapper.h \
 behaviorwrapper.h \
 behaviorloader.h \
+wordeffectwrapper.h \
 playerwrapper.h
 
 plugin_INCLUDES = \

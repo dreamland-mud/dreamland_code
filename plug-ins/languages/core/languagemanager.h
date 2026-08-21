@@ -42,6 +42,7 @@ public:
     void load( LanguagePointer );
     void unload( LanguagePointer );
     LanguagePointer findLanguage( const DLString & );
+    const Languages & getLanguages( ) const { return langs; }
     
     virtual DLString getTableName( ) const;
     virtual DLString getNodeName( ) const;

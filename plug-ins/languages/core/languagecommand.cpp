@@ -8,6 +8,8 @@
 #include "wordeffect.h"
 #include "xmlattributelanguage.h"
 #include "fenia/exceptions.h"
+#include "fenia/register-impl.h"
+#include "wrapperbase.h"
 
 #include "commandmanager.h"
 #include "skillreference.h"
@@ -134,6 +136,32 @@ static void locateTargets(WordEffect::Pointer effect, PCharacter *ch, Character 
     victim = get_char_room(ch, arg2);
 }
 
+// Give a Fenia handler first crack at a word-effect. .WordEffect(lang,name).runObj
+// (object target) or .runVict (character target) fully replaces the C++ effect when
+// defined, and its boolean return becomes the "word consumed" flag. Returns false
+// with fUsed untouched when no Fenia handler is present, so the C++ effect runs as
+// before -- this dispatch is additive and shared by all five languages.
+static bool runFeniaEffect( WordEffect::Pointer effect, Character *ch, Object *obj, Character *victim, bool &fUsed )
+{
+    WrapperBase *base = effect->getWrapper( );
+    if (!base)
+        return false;
+
+    if (obj) {
+        static Scripting::IdRef runObjId( "runObj" );
+        if (!base->hasTrigger( "runObj" ))
+            return false;
+        fUsed = base->call( runObjId, "CO", ch, obj );
+        return true;
+    }
+
+    static Scripting::IdRef runVictId( "runVict" );
+    if (!base->hasTrigger( "runVict" ))
+        return false;
+    fUsed = base->call( runVictId, "CC", ch, victim );
+    return true;
+}
+
 void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
 {
     Character *rch, *victim;
@@ -212,13 +240,16 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
         fUsed = false;
     }
     else if (obj) {
-        fUsed = effect->run( ch, obj );
+        if (!runFeniaEffect( effect, ch, obj, NULL, fUsed ))
+            fUsed = effect->run( ch, obj );
     }
     else {
         if (fMiss)
             ch->pecho( _("Твои слова, не достигнув цели, обратились на тебя сам%Gого|ого|у."), ch );
-        
-        fUsed = effect->run( ch, (!victim ? ch : victim) );
+
+        Character *tgt = (!victim ? ch : victim);
+        if (!runFeniaEffect( effect, ch, NULL, tgt, fUsed ))
+            fUsed = effect->run( ch, tgt );
     }
     
     if (fUsed) {

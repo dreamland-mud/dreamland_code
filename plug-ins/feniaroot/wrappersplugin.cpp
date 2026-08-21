@@ -31,6 +31,11 @@
 #include "wrappedcommand.h"
 #include "areaquestwrapper.h"
 #include "behaviorwrapper.h"
+#include "wordeffectwrapper.h"
+#include "wordeffect.h"
+#include "wrappermanager.h"
+#include "language.h"
+#include "languagemanager.h"
 #include "playerwrapper.h"
 
 #include "class.h"
@@ -158,6 +163,43 @@ WrappersPlugin::linkTargets()
             wrapper_cast<BehaviorWrapper>(bhv->wrapper)->setTarget(bhv);
         }
     }
+
+    // Word-effects have no persistent id of their own, so stamp each with its
+    // language + name (getID() hashes that pair) and bind any persisted Fenia
+    // wrapper. Runs on every linkTargets pass -- boot, `plug reload feniaroot`,
+    // and the findref sweep -- so it must stay idempotent. A hash collision is
+    // logged and the loser skipped (it keeps its C++ effect, just can't be
+    // Fenia-overridden) rather than crashing a running server.
+    if (languageManager) {
+        std::map<long long, DLString> effectIds;
+        for (auto &lpair: languageManager->getLanguages()) {
+            Language::Pointer lang = lpair.second;
+            if (!lang)
+                continue;
+            for (auto &epair: lang->getEffects()) {
+                WordEffect *effect = epair.second.getPointer();
+                if (!effect)
+                    continue;
+
+                effect->setEffectIdentity(lang->getName(), epair.first);
+                DLString tag = lang->getName() + ":" + epair.first;
+                long long eid = effect->getID();
+
+                std::pair<std::map<long long, DLString>::iterator, bool> ins
+                    = effectIds.insert(std::make_pair(eid, tag));
+                if (!ins.second) {
+                    LogStream::sendError() << "Word-effect id collision: " << tag
+                                           << " clashes with " << ins.first->second
+                                           << " -- Fenia override disabled for " << tag << endl;
+                    continue;
+                }
+
+                WrapperManager::getThis()->linkWrapper(effect);
+                if (effect->wrapper)
+                    LogStream::sendNotice() << "Word-effect: linked wrapper for " << tag << endl;
+            }
+        }
+    }
 }
 
 static void dumpTables(Json::Value &apiDump)
@@ -224,6 +266,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<AreaQuestWrapper>( );
     Class::regMoc<AutoQuestWrapper>( );
     Class::regMoc<BehaviorWrapper>();
+    Class::regMoc<WordEffectWrapper>();
     Class::regMoc<PlayerWrapper>();
     
     FeniaManager::getThis( )->recover( );
@@ -278,6 +321,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<QuestRewardWrapper>("questreward", apiDump, false);
     traitsAPIJson<QuestSelectWrapper>("questselection", apiDump, false);
     traitsAPIJson<BehaviorWrapper>("behavior", apiDump, false);
+    traitsAPIJson<WordEffectWrapper>("wordeffect", apiDump, false);
     dumpTables(apiDump);
 
     Json::FastWriter writer;
