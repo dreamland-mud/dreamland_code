@@ -523,6 +523,17 @@ void pour_out( Character *ch, Object * out, Character *victim )
 
     mprog_pour_out( victim, ch, out, liqname, amount );
 
+    // Source-container hook for dousing a CHARACTER (the pour-on-victim path).
+    // Distinct name from "PourOut" so a Fenia handler gets a Character target,
+    // not a destination object. Lets an arcadian-enchanted drink react when it
+    // is splashed over someone (sleep/calm/armor). Additive: no handler today
+    // means no-op, and the C++ ArcadianDrinkBehavior at :519 still runs until it
+    // is retired to Fenia. Fired while the victim is still alive -- the holy
+    // water zap below may extract it.
+    behavior_trigger( out, "PourVict", "OCCsi", out, ch, victim, liqname, amount );
+    FENIA_VOID_CALL( out, "PourVict", "CCsi", ch, victim, liqname, amount );
+    FENIA_NDX_VOID_CALL( out, "PourVict", "OCCsi", out, ch, victim, liqname, amount );
+
     for (Object *obj = victim->carrying; obj; obj = obj->next_content)
         oprog_pour_out( obj, ch, out, liqname, amount );
 
