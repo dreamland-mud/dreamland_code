@@ -18,6 +18,8 @@
 #include "autoquestwrapper.h"
 #include "questregistrator.h"
 #include "behaviorwrapper.h"
+#include "wordeffectwrapper.h"
+#include "wordeffect.h"
 #include "subr.h"
 #include "fenia/register-impl.h"
 
@@ -167,6 +169,14 @@ Scripting::Register WrapperManager::getWrapper(QuestRegistratorBase *reg)
     return wrapperAux<AutoQuestWrapper>(reg->getID(), reg);
 }
 
+Scripting::Register WrapperManager::getWrapper(WordEffect *effect)
+{
+    if (!effect)
+        return Scripting::Register();
+
+    return wrapperAux<WordEffectWrapper>(effect->getID(), effect);
+}
+
 
 
 template <typename WrapperType, typename TargetType>
@@ -242,9 +252,14 @@ void WrapperManager::linkWrapper(AreaQuest *q)
     linkAux<AreaQuestWrapper>(q->getID(), q);
 }
 
-void WrapperManager::linkWrapper(Behavior *bhv) 
+void WrapperManager::linkWrapper(Behavior *bhv)
 {
     linkAux<BehaviorWrapper>(bhv->getID(), bhv);
+}
+
+void WrapperManager::linkWrapper(WordEffect *effect)
+{
+    linkAux<WordEffectWrapper>(effect->getID(), effect);
 }
 
 void WrapperManager::linkWrapper(QuestRegistratorBase *reg)

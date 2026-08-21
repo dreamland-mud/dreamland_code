@@ -71,6 +71,8 @@
 #include "questmanager.h"
 #include "questregistrator.h"
 #include "behaviorwrapper.h"
+#include "wordeffectwrapper.h"
+#include "liquid.h"
 #include "codesource.h"
 #include "context.h"
 #include "nodes.h"
@@ -1214,6 +1216,13 @@ NMI_INVOKE( Root, Language, "(name): конструктор для древне�
     return Register::handler<LanguageWrapper>(lang->getName());
 }
 
+NMI_INVOKE( Root, WordEffect, "(language, effect): конструктор для слова-эффекта древнего языка, напр. .WordEffect(\"arcadian\", \"water2wine\")" )
+{
+    DLString language = argnum2string(args, 1);
+    DLString name = argnum2string(args, 2);
+    return WordEffectWrapper::wrap(language, name);
+}
+
 NMI_GET( Root, races, "список всех рас") 
 {
     RegList::Pointer list(NEW);
@@ -1283,6 +1292,15 @@ NMI_INVOKE( Root, Liquid, "(name): конструктор для жидкост�
     }
     
     return LiquidWrapper::wrap( name.empty( ) ? "none" : name );
+}
+
+NMI_INVOKE( Root, randomLiquid, "(flags): случайная жидкость с указанными флагами (.tables.liquid_flags), напр. вино или пиво; null если нет такой" )
+{
+    bitstring_t flags = argnum2number( args, 1 );
+    Liquid *liq = liquidManager->random( flags );
+    if (!liq)
+        return Register( );
+    return LiquidWrapper::wrap( liq->getName( ) );
 }
 
 NMI_INVOKE( Root, Wearloc, "(name): конструктор для слота экипировки по имени" )
