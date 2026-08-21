@@ -363,6 +363,19 @@ void pour_out(Object *out)
 
     if (ch && out->behavior && out->behavior.getDynamicPointer<DrinkContainer>())
         out->behavior.getDynamicPointer<DrinkContainer>()->pourOut(ch, amount);
+
+    // Source-container hook for dumping the drink on the GROUND (no target).
+    // Distinct name from "PourVict" (character target) and "PourOut" (poured into
+    // a destination object): this one carries neither. Lets an arcadian-enchanted
+    // drink react when tipped out -- e.g. a beer elemental rising from the splash.
+    // Guarded on ch: a carried-by pourer, mirroring the C++ behavior above. The
+    // create_pool above already ran, so a Fenia handler can find the fresh pool.
+    // Additive no-op until a Fenia handler exists.
+    if (ch) {
+        behavior_trigger( out, "PourGround", "OCsi", out, ch, liqname, amount );
+        FENIA_VOID_CALL( out, "PourGround", "Csi", ch, liqname, amount );
+        FENIA_NDX_VOID_CALL( out, "PourGround", "OCsi", out, ch, liqname, amount );
+    }
 }
 
 static void oprog_pour_out( Object *obj, Character *ch, Object *out, const char *liqname, int amount )
