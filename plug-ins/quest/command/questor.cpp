@@ -283,7 +283,7 @@ void Questor::doFind( PCharacter *client )
 
     quest->helpMessage( buf, client );
     
-    if (!makeSpeedwalk( ch->in_room, quest->helpLocation( ), buf )) 
+    if (!makeSpeedwalk( ch->in_room, quest->helpLocation( ), buf, viewerLang( client ) ))
     {
         tell_fmt( _("Извини, %1$C1, но я ничем не могу тебе помочь."), client, ch );
         quest->wiznet( "find", "failure, broken path" );

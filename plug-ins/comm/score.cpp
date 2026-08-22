@@ -766,7 +766,7 @@ _("     %s| {yАдреналин кипит в твоих венах!           
     if (IS_GHOST(ch)) {
         ekle = 1;
         ch->pecho( 
-_("     %1$s| {xТы призрак и обретёшь плоть через {Y%2$3d {xсекунд%2$-1Iу|ы|.                  %1$s|"),
+_("     %1$s| {xТы призрак и обретёшь плоть через {Y%2$3d {xсекунд%2$Iу|ы|.                  %1$s|"),
                  CLR_FRAME,
                  pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()),
                  CLR_FRAME );

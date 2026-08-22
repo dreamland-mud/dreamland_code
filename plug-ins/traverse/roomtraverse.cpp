@@ -42,10 +42,10 @@ void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf, lang_t la
 
     // The run word is shown to the player AND, when the {hs is clicked, sent
     // back as a command, so it has to be the run command's name in the viewer's
-    // language. The questor path-hint caller (Wanderer, wanderer.cpp) still
-    // passes LANG_DEFAULT and shows RU "бег" to everyone -- a known cosmetic
-    // follow-up; the clickable still runs. Direction letters stay Latin -- that
-    // is the machine notation the run parser and mapper round-trip on.
+    // language. Every caller now threads the reader's language through, including
+    // the questor path hint (Wanderer::makeSpeedwalk <- questor.cpp). Direction
+    // letters stay Latin -- that is the machine notation the run parser and
+    // mapper round-trip on.
     const char *runword;
     switch (lang) {
         case LANG_EN: runword = "run"; break;
@@ -53,6 +53,16 @@ void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf, lang_t la
         default:      runword = "бег"; break;
     }
     DLString runprefix = DLString("{IW") + runword + " {x{hs";
+
+    // The enter word is shown to the player AND sent back on click, so it has to
+    // be the enter command's name in the viewer's language, just like the run
+    // word above -- otherwise the questor path hint prints "войти" to everyone.
+    const char *enterword;
+    switch (lang) {
+        case LANG_EN: enterword = "enter"; break;
+        case LANG_UA: enterword = "увійти"; break;
+        default:      enterword = "войти"; break;
+    }
 
     for (auto &road: elements) {
         if (road.type == Road::DOOR) {
@@ -65,13 +75,18 @@ void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf, lang_t la
             path.clear();
         }
 
+        // The keyword is targetable in every language, so an EN reader gets its
+        // English label; RU and UA fall back to the Russian label, still a valid
+        // target when clicked (no label_ua helper exists yet).
         DLString kw;
         if (road.type == Road::PORTAL)
-            kw = Syntax::label_ru(road.value.portal->getKeyword());
+            kw = (lang == LANG_EN) ? Syntax::label_en(road.value.portal->getKeyword())
+                                   : Syntax::label_ru(road.value.portal->getKeyword());
         else if (road.type == Road::EEXIT)
-            kw = Syntax::label_ru(road.value.eexit->keyword);
+            kw = (lang == LANG_EN) ? Syntax::label_en(road.value.eexit->keyword)
+                                   : Syntax::label_ru(road.value.eexit->keyword);
 
-        commands.push_back("{hcвойти " + kw);
+        commands.push_back(DLString("{hc") + enterword + " " + kw);
     }
 
     if (!path.empty())
