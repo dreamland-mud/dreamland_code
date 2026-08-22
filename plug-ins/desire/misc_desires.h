@@ -25,6 +25,7 @@ public:
     typedef ::Pointer<ThirstDesire> Pointer;
 
     virtual bool applicable( PCharacter * );
+    virtual void drink( PCharacter *, int, Liquid * );
 protected:
     virtual int getUpdateAmount( PCharacter * );
     virtual void damage( PCharacter * );
@@ -36,6 +37,7 @@ public:
     typedef ::Pointer<HungerDesire> Pointer;
 
     virtual bool applicable( PCharacter * );
+    virtual void eat( PCharacter *, int );
 protected:
     virtual int getUpdateAmount( PCharacter * );
     virtual void damage( PCharacter * );
