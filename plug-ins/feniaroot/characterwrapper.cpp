@@ -3409,7 +3409,18 @@ NMI_INVOKE( CharacterWrapper, eat, "(ob): заполнить желудок та
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, drink, "(obj,amount): заполнить желудок так, будто от obj отхлебнули amount глотков" )
+// Apply every desire's drink() for one liquid, mirroring CMDRUN(drink)'s
+// desireManager loop. Post-hunger-rework the registered desires are exactly
+// these four (FullDesire removed); callers guard on !is_npc, so getPC() is safe.
+static void wrapper_apply_drink( PCharacter *pch, int amount, Liquid *liq )
+{
+    desire_thirst->drink( pch, amount, liq );
+    desire_drunk->drink( pch, amount, liq );
+    desire_hunger->drink( pch, amount, liq );
+    desire_bloodlust->drink( pch, amount, liq );
+}
+
+NMI_INVOKE( CharacterWrapper, drink, "(obj,amount): применить ВСЕ желания как от amount глотков жидкости из obj (drink_con/fountain)" )
 {
     checkTarget( );
     ::Object *obj;
@@ -3421,14 +3432,49 @@ NMI_INVOKE( CharacterWrapper, drink, "(obj,amount): заполнить желу�
     obj = arg2item( args.front( ) );
     amount = args.back( ).toNumber( );
 
-    if (obj->item_type == ITEM_DRINK_CON || obj->item_type == ITEM_FOUNTAIN) {
+    if ((obj->item_type == ITEM_DRINK_CON || obj->item_type == ITEM_FOUNTAIN)
+        && !target->is_npc( ))
+    {
         Liquid *liq = liquidManager->find( obj->value2() );
-
-        desire_thirst->drink( target->getPC( ), amount, liq );
-        desire_drunk->drink( target->getPC( ), amount, liq );
+        if (liq)
+            wrapper_apply_drink( target->getPC( ), amount, liq );
     }
 
     return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, drinkLiquid, "(liqIndex,amount): применить ВСЕ желания как от amount глотков жидкости с индексом liqIndex (питье из комнаты/лужи, без объекта)" )
+{
+    checkTarget( );
+
+    if (args.size( ) != 2)
+        throw Scripting::NotEnoughArgumentsException( );
+
+    Liquid *liq = liquidManager->find( args.front( ).toNumber( ) );
+    int amount = args.back( ).toNumber( );
+
+    if (liq && !target->is_npc( ))
+        wrapper_apply_drink( target->getPC( ), amount, liq );
+
+    return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, canDrink, "(): можно ли пить сейчас; false если желание мешает (напр. слишком пьян). Само печатает причину отказа." )
+{
+    checkTarget( );
+
+    if (target->is_npc( ))
+        return Register( true );
+
+    PCharacter *pch = target->getPC( );
+    // Mirror CMDRUN(drink)'s canDrink gate over all desires; only DrunkDesire
+    // actually blocks (and pechos "*ИК*"), the rest return true silently.
+    if (!desire_thirst->canDrink( pch )) return Register( false );
+    if (!desire_drunk->canDrink( pch )) return Register( false );
+    if (!desire_hunger->canDrink( pch )) return Register( false );
+    if (!desire_bloodlust->canDrink( pch )) return Register( false );
+
+    return Register( true );
 }
 
 NMI_INVOKE(CharacterWrapper, give, "(vict,vnum|obj): дать персонажу vict предмет obj, создав его, если указан внум")
