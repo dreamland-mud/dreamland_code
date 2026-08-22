@@ -278,18 +278,18 @@ void Wanderer::makeOneStep( )
 }
 
 bool 
-Wanderer::makeSpeedwalk( Room *start_room, Room *target_room, ostringstream &buf )
+Wanderer::makeSpeedwalk( Room *start_room, Room *target_room, ostringstream &buf, lang_t lang )
 {
     if (!start_room || !target_room)
         return false;
 
     path.clear( );
     pathToTarget( start_room, target_room, 10000 );
-    
+
     if (path.empty( ))
         return false;
-        
-    make_speedwalk( path, buf );
+
+    make_speedwalk( path, buf, lang );
     path.clear( );
     return true;
 }

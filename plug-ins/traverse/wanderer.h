@@ -23,7 +23,7 @@ public:
         virtual bool canWander( Room *const, EXTRA_EXIT_DATA * );
         virtual bool canWander( Room *const, Object * );
 
-        bool makeSpeedwalk( Room *, Room *, ostringstream & );
+        bool makeSpeedwalk( Room *, Room *, ostringstream &, lang_t lang = LANG_DEFAULT );
 
 protected:
         virtual bool canEnter( Room *const );
