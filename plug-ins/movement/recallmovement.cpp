@@ -101,9 +101,13 @@ bool RecallMovement::checkShadow( )
 bool RecallMovement::checkBloody( Character *wch )
 {
     if (IS_BLOODY(wch)) {
-        msgSelfParty( wch, 
+        msgSelfParty( wch,
+                      "The gods care nothing for you, mortal.",
                       "Богам нет дела до тебя, смертн%1$Gое|ый|ая.",
-                      "Богам нет дела до %1$C2." );
+                      "Богам байдуже до тебе, смертн%1$Gе|ий|а.",
+                      "The gods care nothing for %1$C2.",
+                      "Богам нет дела до %1$C2.",
+                      "Богам байдуже до %1$C2." );
         return false;
     }
 
@@ -113,8 +117,12 @@ bool RecallMovement::checkBloody( Character *wch )
 bool RecallMovement::checkForsaken( Character *wch )
 {
     if (!checkNorecall( wch ) || !checkCurse( wch )) {
-        msgSelfParty( wch, 
+        msgSelfParty( wch,
+                      "The gods have forsaken you.",
                       "Боги покинули тебя.",
+                      "Боги покинули тебе.",
+                      "The gods have forsaken %1$C4.",
+                      "Боги покинули %1$C4.",
                       "Боги покинули %1$C4." );
         return false;
     }
