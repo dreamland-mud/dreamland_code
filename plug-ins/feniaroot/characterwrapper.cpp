@@ -128,7 +128,6 @@ GSN(bash_door);
 DESIRE(hunger);
 DESIRE(bloodlust);
 DESIRE(thirst);
-DESIRE(full);
 DESIRE(drunk);
 
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
@@ -1038,7 +1037,6 @@ NMI_SET( CharacterWrapper, cond_##type, "изменить '" api "' на ука�
 
 CONDITION(hunger,    "голод");
 CONDITION(thirst,    "жажда");
-CONDITION(full,      "заполненность желудка");
 CONDITION(bloodlust, "жажда крови");
 CONDITION(drunk,     "опьянение");
 #undef CONDITION
@@ -3406,7 +3404,6 @@ NMI_INVOKE( CharacterWrapper, eat, "(ob): заполнить желудок та
 
     if (obj->item_type == ITEM_FOOD) {
         desire_hunger->eat( target->getPC( ), obj->value0() * 2 );
-        desire_full->eat( target->getPC( ), obj->value1() * 2 );
     }
 
     return Register( );
@@ -3427,7 +3424,6 @@ NMI_INVOKE( CharacterWrapper, drink, "(obj,amount): заполнить желу�
     if (obj->item_type == ITEM_DRINK_CON || obj->item_type == ITEM_FOUNTAIN) {
         Liquid *liq = liquidManager->find( obj->value2() );
 
-        desire_full->drink( target->getPC( ), amount, liq );
         desire_thirst->drink( target->getPC( ), amount, liq );
         desire_drunk->drink( target->getPC( ), amount, liq );
     }

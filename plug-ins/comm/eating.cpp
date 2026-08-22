@@ -35,7 +35,6 @@ CLAN(battlerager);
 GSN(none);
 GSN(manacles);
 GSN(poison);
-DESIRE(full);
 DESIRE(hunger);
 DESIRE(thirst);
 DESIRE(bloodlust);
@@ -155,9 +154,13 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
     if ( !ch->is_npc() )
     {
         PCharacter *pch = ch->getPC( );
-        
-        desire_hunger->eat( pch, cHunger );
-        desire_full->eat( pch, cFull );
+
+        // cFull is foodHours*2 -- the food's actual nutrition; feed satiety (hunger)
+        // from it. The 'full'/stuffing desire is gone (hunger/thirst rework), and
+        // hunger was previously fed from fullHours (cHunger), which is why a
+        // "nutritious" food stuffed the stomach without feeding you. cHunger is now
+        // vestigial (fullHours no longer drives anything).
+        desire_hunger->eat( pch, cFull );
     }
 
     /* The food was poisoned! */
@@ -352,7 +355,6 @@ CMDRUNP( vomit )
             return;
         }
         
-        desire_full->vomit( ch->getPC( ) );
         desire_hunger->vomit( ch->getPC( ) );
         desire_thirst->vomit( ch->getPC( ) );
     }
