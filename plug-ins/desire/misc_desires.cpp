@@ -160,6 +160,16 @@ bool ThirstDesire::applicable( PCharacter *ch )
     return !isVampire( ch );
 }
 
+void ThirstDesire::drink( PCharacter *ch, int amount, Liquid *liq )
+{
+    DefaultDesire::drink( ch, amount, liq );
+
+    // A drink that lifts thirst off its floor lifts the weakening affect at once
+    // (firing its removeChar), instead of waiting for the short duration to decay.
+    if (ch->desires[getIndex( )] > damageLimit && ch->isAffected( gsn_thirst ))
+        affect_strip( ch, gsn_thirst, true );
+}
+
 /*
  * hunger
  */
@@ -177,5 +187,15 @@ void HungerDesire::damage( PCharacter *ch )
 bool HungerDesire::applicable( PCharacter *ch )
 {
     return !isVampire( ch );
+}
+
+void HungerDesire::eat( PCharacter *ch, int amount )
+{
+    DefaultDesire::eat( ch, amount );
+
+    // Food that lifts hunger off its floor lifts the weakening affect at once
+    // (firing its removeChar), instead of waiting for the short duration to decay.
+    if (ch->desires[getIndex( )] > damageLimit && ch->isAffected( gsn_hunger ))
+        affect_strip( ch, gsn_hunger, true );
 }
 
