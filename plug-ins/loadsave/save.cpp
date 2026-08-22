@@ -114,7 +114,6 @@ GSN(enchant_weapon);
 GSN(enchant_armor);
 GSN(katana);
 DESIRE(drunk);
-DESIRE(full);
 DESIRE(hunger);
 DESIRE(thirst);
 DESIRE(bloodlust);
@@ -920,7 +919,7 @@ static void fread_char_raw( PCharacter *ch, FILE *fp )
             if (!strcmp(word,"CndC"))
             {
                 ch->desires[desire_drunk] = fread_number( fp );
-                ch->desires[desire_full] = fread_number( fp );
+                fread_number( fp ); // legacy 'full' desire slot (removed in the hunger/thirst rework); read and discard to keep the fixed CndC field order parseable
                 ch->desires[desire_thirst] = fread_number( fp );
                 ch->desires[desire_hunger] = fread_number( fp );
                 ch->desires[desire_bloodlust] = fread_number( fp );

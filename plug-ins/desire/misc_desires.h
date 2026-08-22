@@ -41,21 +41,6 @@ protected:
     virtual void damage( PCharacter * );
 };
 
-class FullDesire : public DefaultDesire {
-XML_OBJECT
-public:
-    typedef ::Pointer<FullDesire> Pointer;
-
-    virtual bool applicable( PCharacter * );
-    virtual bool canEat( PCharacter * );
-    virtual bool canDrink( PCharacter * );
-protected:
-    virtual bool isOverflow( PCharacter * );
-    virtual int getUpdateAmount( PCharacter * );
-
-    XML_VARIABLE XMLInteger overflowLimit;     
-};
-
 class DrunkDesire : public DefaultDesire {
 XML_OBJECT
 public:

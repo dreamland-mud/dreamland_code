@@ -103,44 +103,6 @@ bool DrunkDesire::canDrink( PCharacter *ch )
 }
 
 /*
- * full
- */
-int FullDesire::getUpdateAmount( PCharacter *ch )
-{
-    return ch->size > SIZE_MEDIUM ? -4 : -2;
-}
-
-bool FullDesire::applicable( PCharacter *ch )
-{
-    return !isVampire( ch );
-}
-
-bool FullDesire::canDrink( PCharacter *ch )
-{
-    if (isOverflow( ch )) {
-        ch->pecho( _("Твой желудок полон, ты больше не можешь выпить ни капли.") );
-        return false;
-    }
-
-    return true;
-}
-
-bool FullDesire::canEat( PCharacter *ch )
-{
-    if (isOverflow( ch )) {
-        ch->pecho( _("Твой желудок полон, ты больше не можешь съесть ни кусочка.") );
-        return false;
-    }
-
-    return true;
-}
-
-bool FullDesire::isOverflow( PCharacter *ch )
-{
-    return applicable( ch ) && ch->desires[getIndex( )] > overflowLimit;
-}
-
-/*
  * thirst
  */
 int ThirstDesire::getUpdateAmount( PCharacter *ch )
