@@ -7,6 +7,9 @@
 
 #include "pcharacter.h"
 #include "room.h"
+#include "affect.h"
+#include "loadsave.h"
+#include "skillreference.h"
 
 #include "interp.h"
 #include "fight_safe.h"
@@ -17,6 +20,40 @@
 #include "l10n.h"
 
 RELIG(karmina);
+GSN(hunger);
+GSN(thirst);
+
+/*
+ * Starvation / dehydration no longer deal HP damage (hunger/thirst rework). Instead
+ * each hangs an undispellable weakening affect -- reduced strength and slowed -- while
+ * the desire sits at its floor; it clears on its own once the character eats or drinks.
+ *
+ * Refreshed by resetting the duration on the existing affect rather than affect_join,
+ * which ADDS the modifier every call (affects.cpp) and would spiral strength down each
+ * tick. A short positive duration (not a permanent -1) is deliberate: char_update_affects
+ * only ticks POSITIVE-duration affects, so -1 would silence the Fenia onUpdateChar flavor
+ * hook; 2 ticks survives the per-tick decrement while starving and decays off within a
+ * tick or two of feeding, firing the affect's removeChar message.
+ */
+static void refresh_desire_affect( PCharacter *ch, int sn, int strPenalty )
+{
+    if (ch->isAffected( sn )) {
+        for (auto &paf: ch->affected.findAll( sn ))
+            paf->duration = 2;
+        return;
+    }
+
+    Affect af;
+    af.type     = sn;
+    af.level    = ch->getModifyLevel( );
+    af.duration = 2;
+    af.location.setTable( &apply_flags );
+    af.location = APPLY_STR;
+    af.modifier = strPenalty;
+    af.bitvector.setTable( &affect_flags );
+    af.bitvector.setValue( AFF_SLOW );
+    affect_to_char( ch, &af );
+}
 
 /*
  * bloodlust
@@ -115,12 +152,7 @@ int ThirstDesire::getUpdateAmount( PCharacter *ch )
 
 void ThirstDesire::damage( PCharacter *ch )
 {
-    int dam;
-    
-    dam = ch->max_hit * number_range(2, 4) / 100;
-    dam = max( dam, 1 );
-
-    ThirstDamage( ch, dam ).hit( true );
+    refresh_desire_affect( ch, gsn_thirst, -2 );
 }
 
 bool ThirstDesire::applicable( PCharacter *ch )
@@ -139,12 +171,7 @@ int HungerDesire::getUpdateAmount( PCharacter *ch )
 
 void HungerDesire::damage( PCharacter *ch )
 {
-    int dam;
-    
-    dam = ch->max_hit * number_range(2, 4) / 100;
-    dam = max( dam, 1 );
-
-    HungerDamage( ch, dam ).hit( true );
+    refresh_desire_affect( ch, gsn_hunger, -2 );
 }
 
 bool HungerDesire::applicable( PCharacter *ch )
