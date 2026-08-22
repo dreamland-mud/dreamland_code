@@ -148,12 +148,28 @@ WrappersPlugin::linkTargets()
         }
     }
 
+    // Most commands take their wrapper id from their own help id, which the help
+    // manager already keeps unique. Commands that share another command's help
+    // (pourout/fill under pour) fall back to a name-hash id in getID(); guard
+    // against the astronomically unlikely case that two command ids clash by
+    // logging + skipping the loser (it keeps its C++ run(), just no Fenia
+    // override), mirroring the word-effect collision handling below.
+    std::map<long long, DLString> commandIds;
     for (auto &cmd: commandManager->getCommands()) {
         WrappedCommand *wcmd = cmd.getDynamicPointer<WrappedCommand>();
         if (wcmd && wcmd->wrapper) {
+            long long cid = wcmd->getID();
+            std::pair<std::map<long long, DLString>::iterator, bool> ins
+                = commandIds.insert(std::make_pair(cid, wcmd->getName()));
+            if (!ins.second) {
+                LogStream::sendError() << "Fenia command id collision: " << wcmd->getName()
+                                       << " clashes with " << ins.first->second
+                                       << " -- Fenia override disabled for " << wcmd->getName() << endl;
+                continue;
+            }
             LogStream::sendNotice() << "Fenia command: setting target for " << wcmd->getName() << endl;
             wrapper_cast<FeniaCommandWrapper>(wcmd->wrapper)->setTarget(wcmd);
-        }            
+        }
     }
 
     for (int i = 0; i < behaviorManager->size(); i++) {
