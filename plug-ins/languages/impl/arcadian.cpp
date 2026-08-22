@@ -23,14 +23,9 @@ ArcadianLanguage::ArcadianLanguage( ) : Language( LANG_NAME )
 
 void ArcadianLanguage::initialization( )
 {
-    Class::regMoc<WaterToBeerWE>( );
-    Class::regMoc<WaterToWineWE>( );
-    Class::regMoc<WineRefreshWE>( );
-    Class::regMoc<WineAwakeWE>( );
-    Class::regMoc<WineSleepWE>( );
-    Class::regMoc<WineCalmWE>( );
-    Class::regMoc<BeerArmorWE>( );
-    Class::regMoc<BeerElementalWE>( );
+    // The concrete arcadian effects were ported to Fenia; every arcadian.xml
+    // effect node now instantiates the single FeniaWordEffectWE stub.
+    Class::regMoc<FeniaWordEffectWE>( );
     Class::regMoc<ArcadianLanguage>( );
     Language::initialization( );
 }
@@ -39,14 +34,7 @@ void ArcadianLanguage::destruction( )
 {
     Language::destruction( );
     Class::unregMoc<ArcadianLanguage>( );
-    Class::unregMoc<WaterToBeerWE>( );
-    Class::unregMoc<WaterToWineWE>( );
-    Class::unregMoc<WineRefreshWE>( );
-    Class::unregMoc<WineAwakeWE>( );
-    Class::unregMoc<WineSleepWE>( );
-    Class::unregMoc<WineCalmWE>( );
-    Class::unregMoc<BeerArmorWE>( );
-    Class::unregMoc<BeerElementalWE>( );
+    Class::unregMoc<FeniaWordEffectWE>( );
 }
 
 DLString ArcadianLanguage::createDictum( ) const

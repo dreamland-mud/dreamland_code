@@ -26,31 +26,22 @@ protected:
 };
 
 /*
- * water2wine and water2beer effects
- */
-class WaterToWineWE : public LiquidWEBase {
-XML_OBJECT
-public:
-    typedef ::Pointer<WaterToWineWE> Pointer;
-    
-    virtual bool run( PCharacter *, Object * ) const;
-};
-
-class WaterToBeerWE : public LiquidWEBase {
-XML_OBJECT
-public:
-    typedef ::Pointer<WaterToBeerWE> Pointer;
-    
-    virtual bool run( PCharacter *, Object * ) const;
-};
-
-/*
- * DrinkContainerWEBase: base for effects dealing with drink containers
+ * DrinkContainerWEBase: base for effects dealing with drink containers.
+ *
+ * The concrete arcadian word-effects (water2wine/beer, wine_refresh/sleep/
+ * awake/calm, beer_armor/elemental) were ported to Fenia -- see
+ * dreamland_fenia/wordeffect/arcadian/ and utils/arcadia. languagecommand.cpp
+ * gives the Fenia runObj first crack on utter, and the drink/pour instance
+ * triggers (code#1025/#1029/#1030) carry the pour/drink payload, so no C++
+ * effect logic runs anymore. Only FeniaWordEffectWE below stays as the single
+ * instantiable stub. This base is kept because ArcadianDrinkBehavior still
+ * dispatches through its virtuals for any container that carried the old C++
+ * behavior (now a no-op path).
  */
 class DrinkContainerWEBase : public LiquidWEBase {
 public:
     typedef ::Pointer<DrinkContainerWEBase> Pointer;
-    
+
     DrinkContainerWEBase( );
 
     virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, int ) const = 0;
@@ -63,99 +54,27 @@ protected:
 
     bool goodQuality( ArcadianDrinkBehavior::Pointer ) const;
     bool goodVolume( int ) const;
-    
+
     XML_VARIABLE XMLInteger minEffectiveVolume;
 };
 
 /*
- * WineContainerWEBase: base for effects dealing with wine containers
+ * FeniaWordEffectWE: the sole concrete arcadian word-effect. Every <effects>
+ * node in arcadian.xml instantiates this stub; the real behaviour lives in
+ * Fenia (runFeniaEffect intercepts the utter before run(), and the pour/drink
+ * hooks fire the instance triggers). These C++ bodies are unreachable fallbacks
+ * kept only so the class is concrete and XML-instantiable, and so an old saved
+ * container that still carries ArcadianDrinkBehavior degrades to a harmless
+ * no-op instead of crashing.
  */
-class WineContainerWEBase : public DrinkContainerWEBase {
+class FeniaWordEffectWE : public DrinkContainerWEBase {
 XML_OBJECT
 public:
-    typedef ::Pointer<WineContainerWEBase> Pointer;
+    typedef ::Pointer<FeniaWordEffectWE> Pointer;
 
-    virtual bool run( PCharacter *, Object * ) const;
-};
-
-/*
- * wine_refresh, wine_awake, wine_sleep, wine_calm effects
- */
-class WineRefreshWE : public WineContainerWEBase {
-XML_OBJECT
-public:
-    typedef ::Pointer<WineRefreshWE> Pointer;
-
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, Character *, int ) const;
-    virtual void onDrink( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-};
-
-class WineAwakeWE : public WineContainerWEBase {
-XML_OBJECT
-public:
-    typedef ::Pointer<WineAwakeWE> Pointer;
-
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, Character *, int ) const;
-    virtual void onDrink( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-};
-
-class WineSleepWE : public WineContainerWEBase {
-XML_OBJECT
-public:
-    typedef ::Pointer<WineSleepWE> Pointer;
-
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, Character *, int ) const;
-    virtual void onDrink( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-};
-
-class WineCalmWE : public WineContainerWEBase {
-XML_OBJECT
-public:
-    typedef ::Pointer<WineCalmWE> Pointer;
-
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, Character *, int ) const;
-    virtual void onDrink( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-};
-
-/*
- * BeerContainerWEBase: base for effects dealing with beer containers
- */
-class BeerContainerWEBase : public DrinkContainerWEBase {
-XML_OBJECT
-public:
-    typedef ::Pointer<BeerContainerWEBase> Pointer;
-
-    virtual bool run( PCharacter *, Object * ) const;
-};
-
-/*
- * beer_armor, beer_elemental effects
- */
-class BeerArmorWE : public BeerContainerWEBase {
-XML_OBJECT
-public:
-    typedef ::Pointer<BeerArmorWE> Pointer;
-
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, Character *, int ) const;
-    virtual void onDrink( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-};
-
-class BeerElementalWE : public BeerContainerWEBase {
-XML_OBJECT
-public:
-    typedef ::Pointer<BeerElementalWE> Pointer;
-
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, Character *, int ) const;
-    virtual void onDrink( ArcadianDrinkBehavior::Pointer, Character *, int ) const;
-
-private:
-    NPCharacter *createElemental( PCharacter *, ArcadianDrinkBehavior::Pointer ) const;
+    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, int ) const { }
+    virtual void onPourOut( ArcadianDrinkBehavior::Pointer, Character *, Character *, int ) const { }
+    virtual void onDrink( ArcadianDrinkBehavior::Pointer, Character *, int ) const { }
 };
 
 #endif
