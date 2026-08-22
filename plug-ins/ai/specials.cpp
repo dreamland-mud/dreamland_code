@@ -398,6 +398,15 @@ bool BasicMobileBehavior::doScavenge( )
             || v == OBJ_VNUM_TORN_HEART || v == OBJ_VNUM_SLICED_ARM
             || v == OBJ_VNUM_SLICED_LEG || v == OBJ_VNUM_BRAINS )
             continue;
+        // Leave deliberately-placed items where the zone author put them: a
+        // limited object (limit != -1) is a keyed puzzle piece, quest prop or
+        // reset-restored fixture, not loose loot. Same signal the quest system
+        // trusts to keep such items out of random errands (ItemQuestModel::
+        // checkItem). Without it a scavenger hoards the circus dumbbell that
+        // unlocks Binky's Kitchen, and the zone reset just breeds another every
+        // cycle until the mob carries a stack of them.
+        if (obj->pIndexData->limit != -1)
+            continue;
         if (!can_take_obj( ch, obj ))
             continue;
         if (count_obj_list( obj->pIndexData, ch->carrying ) >= 3)
