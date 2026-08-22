@@ -9,20 +9,27 @@
 
 using namespace Scripting;
 
+// Stable, stdlib-independent 64-bit FNV-1a over the command's English name.
+// Mirrors word_effect_hash in languages/core/wordeffect.cpp: used so a command
+// that shares another command's help article (and therefore has no help id of
+// its own) still gets a wrapper id that stays constant across reboots and
+// rebuilds, keeping any persisted Fenia runFunc override bound.
+static unsigned long long command_name_hash( const DLString &s )
+{
+    unsigned long long h = 1469598103934665603ULL;
+    for (size_t i = 0; i < s.size( ); i++) {
+        h ^= (unsigned char)s[i];
+        h *= 1099511628211ULL;
+    }
+    return h;
+}
+
 void WrappedCommand::linkWrapper()
 {
     if (FeniaManager::wrapperManager) {
-        // Guard: linkWrapper() calls getID(), which throws when the command has
-        // no help profile (getHelp() null or id <= 0). That can happen mid
-        // 'plug reload most' if the command's loader was skipped. Skip linking
-        // (no Fenia runFunc override until next boot) rather than throwing and
-        // aborting the reload. Normal boot always has a help id, so this is a
-        // degraded-but-safe fallback, not the common path.
-        if (!getHelp() || getHelp()->getID() <= 0) {
-            LogStream::sendError() << "Fenia command: no help id for " << getName()
-                << ", skipping wrapper link." << endl;
-            return;
-        }
+        // getID() no longer throws: a command with no help id of its own falls
+        // back to a stable name-hash id (see getID()), so commands that share a
+        // help article (pourout/fill under pour's 1075) link their wrapper too.
         FeniaManager::wrapperManager->linkWrapper(this);
         if (wrapper)
             LogStream::sendNotice() << "Fenia command: linked wrapper for " << getName() << endl;
@@ -43,10 +50,21 @@ long long WrappedCommand::getID() const
     if (getHelp())
         myId =getHelp()->getID();
 
-    if (myId <= 0)
-        throw Scripting::Exception(getName() + ": command ID not found or zero");
+    if (myId > 0)
+        return (myId << 4) | 8;
 
-    return (myId << 4) | 8;
+    // The command has no help id of its own because it shares another command's
+    // help article -- e.g. 'pourout' and 'fill' sit under 'pour's help (id 1075)
+    // so players see all the liquid subcommands in one place. Fall back to a
+    // stable hash of the English command name so the command still gets a unique
+    // Fenia wrapper id without splitting the shared help. Mirrors
+    // WordEffect::getID(). Low nibble stays 8 (the command tag, disjoint from
+    // every other wrapper type); the 56-bit hash keeps the value positive and,
+    // being large, stays clear of the small help-id ids ((help_id<<4)|8, help_id
+    // < 2^13). Any residual cross-command collision is detected and logged at
+    // boot in WrappersPlugin::linkTargets.
+    unsigned long long h = command_name_hash(getName()) & 0x00FFFFFFFFFFFFFFULL;
+    return (long long)((h << 4) | 8);
 }
 
 void WrappedCommand::entryPoint( Character *ch, const DLString &constArgs )
