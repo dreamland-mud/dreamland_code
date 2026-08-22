@@ -307,12 +307,16 @@ struct FindPathComplete {
 /**
  * Ensure there is a path between player and target room that doesn't
  * contain locked doors and rooms they can't go to.
+ *
+ * Runs for everyone, not just newbies: a lock-less class (cleric, mage) has no
+ * bash/pick/knock and cannot reach a room sealed behind a locked door whose key
+ * lives inside it. The old newbie-only gate handed those players impossible
+ * fetch/staff errands (e.g. "Royal Treasures" hiding loot in the Kitchen behind
+ * the locked New Ofcol house, key 665 on a mob inside). The traversal stops at
+ * the first path found, so the reachable common case stays cheap.
  */
 bool RoomQuestModel::targetRoomAccessible(PCharacter *pch, Room *target)
 {
-    if (!Player::isNewbie(pch))
-        return true;
-
     std::vector<Room *> rooms;
     DoorFunc goDoor(pch, this); ExtraExitFunc goEExit(pch, this); PortalFunc goPortal(pch, this);
     MyHookIterator hookIterator(goDoor, goEExit, goPortal, 5);
