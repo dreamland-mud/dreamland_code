@@ -52,6 +52,18 @@ LIQ(valerian_tincture);
 LIQ(swill);
 
 /*
+ * NOTE (2026-08): the fill / pour / pourout / drink CMDRUNs below are SUPERSEDED at
+ * runtime by Fenia .FeniaCommand("<name>").runFunc overrides (command/{fill,pour,pourout,
+ * drink}/runFunc). They are NOT dead code -- they are the fallback that runs whenever the
+ * Fenia override is unbound. Do NOT delete them: pour/pourout/fill get their Fenia id from
+ * a name-hash (they share pour's help id 1075), so their overrides are re-bound only by an
+ * explicit post and DIE on every reboot -- until re-posted, these C++ handlers are what
+ * serve those commands. (drink has its own help id 1074, so its override survives a reboot;
+ * its C++ handler is a dormant safety net.) A caller audit confirmed nothing else invokes
+ * them. See project memory "liquids/fountains epic".
+ */
+
+/*
  * 'fill' command
  */
 CMDRUN( fill )
