@@ -49,6 +49,22 @@ public:
     XML_VARIABLE XMLIntegerNoEmpty corkscrew;
 };
 
+// A fountain shares the drink layout for v0-v2 (total/left/liquid) but v3 is its
+// max-people sit count (Item::furnitureMaxPeople -> value3), NOT drink flags, and v4
+// is its furniture stand/sit flags (Item::furnitureFlags -> value4), kept as the raw
+// integer under the legacy 'corkscrew' name. Splitting it off the drink schema stops
+// a fountain's maxPeople from being mangled through drink_flags on the XML round-trip.
+class XMLItemTypeValuesFountain : public XMLVariableContainer {
+XML_OBJECT
+public:
+    XMLItemTypeValuesFountain( );
+
+    XML_VARIABLE XMLIntegerNoEmpty total, left;
+    XML_VARIABLE XMLLiquidReference liquid;
+    XML_VARIABLE XMLInteger maxPeople;
+    XML_VARIABLE XMLIntegerNoEmpty corkscrew;
+};
+
 class XMLItemTypeValuesContainer : public XMLVariableContainer {
 XML_OBJECT
 public:
