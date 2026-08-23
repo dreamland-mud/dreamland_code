@@ -25,6 +25,17 @@ XMLItemType::toXML(XMLNode::Pointer &parent) const
         break;
 
     case ITEM_FOUNTAIN:
+        {
+            XMLItemTypeValuesFountain tmp;
+            tmp.total.setValue(v[0]);
+            tmp.left.setValue(v[1]);
+            tmp.liquid = v[2];
+            tmp.maxPeople.setValue(v[3]);
+            tmp.corkscrew.setValue(v[4]);
+            tmp.toXML(parent);
+        }
+        break;
+
     case ITEM_DRINK_CON:
         {
             XMLItemTypeValuesDrink tmp;
@@ -228,6 +239,17 @@ XMLItemType::fromXML(const XMLNode::Pointer &parent)
         break;
 
     case ITEM_FOUNTAIN:
+        {
+            XMLItemTypeValuesFountain tmp;
+            tmp.fromXML(parent);
+            v[0] = tmp.total.getValue( );
+            v[1] = tmp.left.getValue( );
+            v[2] = tmp.liquid;
+            v[3] = tmp.maxPeople.getValue( );
+            v[4] = tmp.corkscrew.getValue( );
+        }
+        break;
+
     case ITEM_DRINK_CON:
         {
             XMLItemTypeValuesDrink tmp;
@@ -418,6 +440,10 @@ XMLItemTypeValuesFood::XMLItemTypeValuesFood( ) : poisoned(false)
 }
 
 XMLItemTypeValuesDrink::XMLItemTypeValuesDrink( ) : flags(0, &drink_flags)
+{
+}
+
+XMLItemTypeValuesFountain::XMLItemTypeValuesFountain( )
 {
 }
 
