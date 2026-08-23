@@ -2965,6 +2965,15 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile): [pct, optimal, best] -- be
             continue;
         if (pObj->item_type == ITEM_WEAPON)     // Phase 1: armour/wearables only
             continue;
+        // Gear from areas a player can't normally loot -- system holders,
+        // hidden/wizlock dev zones, clan halls, mansions, dungeons. Engine's own
+        // special-area mask (cf. where.cpp / traverse). Rare quest rewards live in
+        // such zones but are legitimately earned -- keep those by vnum.
+        if (pObj->area
+            && IS_SET(pObj->area->area_flag,
+                      AREA_SYSTEM|AREA_HIDDEN|AREA_CLAN|AREA_MANSION|AREA_WIZLOCK|AREA_DUNGEON)
+            && pObj->vnum != 89 /* cassandra -- limbo quest reward */)
+            continue;
         if (!IS_SET(pObj->wear_flags, ITEM_TAKE))
             continue;
         int slot = pObj->wear_flags;
