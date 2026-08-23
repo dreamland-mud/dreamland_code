@@ -214,14 +214,14 @@ AEDIT(show, "показать", "показать все поля")
     if (original) {
         ostringstream buf;
 
-        const DLString lineFormatQuestEdit = 
-            "{W[" + web_cmd(ch, "qedit $1", "%6d") + "{W] {c%s{x, {C%d{x шаг%I|а|ов, уровни {C%d{x-{C%d{x\r\n";
+        const DLString lineFormatQuestEdit =
+            "{W[" + web_cmd(ch, "qedit $1", "%6d") + "{W] {c%s{x, {C%d{x step(s), levels {C%d{x-{C%d{x\r\n";
 
         for (auto &q: original->quests) {
-            buf << fmt(0, lineFormatQuestEdit.c_str(), 
-                    q->vnum.getValue(), 
+            buf << fmt(0, lineFormatQuestEdit.c_str(),
+                    q->vnum.getValue(),
                     q->title.get(LANG_DEFAULT).c_str(),
-                    q->steps.size(), q->steps.size(),
+                    q->steps.size(),
                     q->minLevel.getValue(), q->maxLevel.getValue());
         }
 
