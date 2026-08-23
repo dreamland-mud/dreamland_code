@@ -54,7 +54,16 @@ const DLString & ClanTitlesByClass::build( PCMemoryInterface *pcm, lang_t lang )
         i = find( allName );
     }
 
-    const ClanLevelNames &names = i->second[pcm->getClanLevel( )];
+    // No titles for this class and no "all" fallback -- bail instead of
+    // dereferencing end() / indexing an out-of-range clan level (was UB).
+    if (i == end( ))
+        return DLString::emptyString;
+    const ClanLevelNamesVector &vec = i->second;
+    int cl = pcm->getClanLevel( );
+    if (cl < 0 || cl >= (int)vec.size( ))
+        return DLString::emptyString;
+
+    const ClanLevelNames &names = vec[cl];
     if (lang == LANG_EN && !names.english.getValue( ).empty( ))
         return names.english.getValue( );
     if (lang == LANG_UA && !names.ukrainian.getValue( ).empty( ))
