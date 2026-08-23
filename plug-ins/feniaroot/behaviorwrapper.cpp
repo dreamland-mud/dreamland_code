@@ -97,6 +97,12 @@ NMI_INVOKE(BehaviorWrapper, getDescription, "(lang): описание на яз�
     return Register(target->getDescription( argnum2lang(args, 1) ));
 }
 
+NMI_INVOKE(BehaviorWrapper, getNameFor, "(lang): название на языке lang (0=en,1=ru,2=ua), fallback RU")
+{
+    checkTarget();
+    return Register(target->getNameFor( argnum2lang(args, 1) ));
+}
+
 NMI_GET(BehaviorWrapper, cmd, "имена команд, привязанных к поведению") 
 { 
     checkTarget(); 

@@ -49,12 +49,17 @@ public:
         return description.getForLang( lang );
     }
 
+    // Set/behavior name in the viewer's language (EN/UA fall back to RU).
+    const DLString & getNameFor( lang_t lang = LANG_DEFAULT ) const;
+
     // Internal ID to use as unique ID for Fenia.
     XML_VARIABLE XMLInteger id;
 
     XML_VARIABLE XMLString nameRus;
 
     XML_VARIABLE XMLString nameUa;
+
+    XML_VARIABLE XMLString nameEn;
 
     XML_VARIABLE XMLMultiString description;
 

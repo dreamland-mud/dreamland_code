@@ -38,6 +38,15 @@ const DLString &Behavior::getUkrainianName() const
     return nameRus;
 }
 
+const DLString &Behavior::getNameFor( lang_t lang ) const
+{
+    if (lang == LANG_EN && !nameEn.empty())
+        return nameEn;
+    if (lang == LANG_UA && !nameUa.empty())
+        return nameUa;
+    return nameRus;
+}
+
 long long Behavior::getID() const
 {
     if (id <= 0)
