@@ -148,7 +148,7 @@ void ClanOrgs::doMembers( PCharacter *pch, const DLString &cargs ) const
                    pcm->getProfession( )->getNameFor(pch).c_str(),
                    pcm->getRemorts().size(), 
                    pcm->getLevel(),
-                   pcm->getClan()->getTitle(pcm).c_str());
+                   pcm->getClan()->getTitle(pcm, viewerLang(pch)).c_str());
     }
 
     pch->send_to( buf );

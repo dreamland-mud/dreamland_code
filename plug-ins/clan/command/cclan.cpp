@@ -914,14 +914,14 @@ void CClan::clanLevelShow( PCharacter *pc, PCMemoryInterface *victim )
     }
     else {
         if (victim == pc)
-            pc->pecho( _("Твой ранг [{%s%s{x]."), 
-                        clan->getColor( ).c_str( ), 
-                        clan->getTitle( pc ).c_str( ) );
+            pc->pecho( _("Твой ранг [{%s%s{x]."),
+                        clan->getColor( ).c_str( ),
+                        clan->getTitle( pc, viewerLang(pc) ).c_str( ) );
         else
-            pc->pecho( _("%s имеет ранг [{%s%s{x]."), 
+            pc->pecho( _("%s имеет ранг [{%s%s{x]."),
                         victim->getName( ).c_str( ),
-                        clan->getColor( ).c_str( ), 
-                        clan->getTitle( victim ).c_str( ) );
+                        clan->getColor( ).c_str( ),
+                        clan->getTitle( victim, viewerLang(pc) ).c_str( ) );
     }
     
 }
@@ -1113,7 +1113,7 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
                    pcm->getProfession( )->getNameFor(pc).c_str(),
                    pcm->getRemorts().size(), 
                    pcm->getLevel(),
-                   pcm->getClan()->getTitle(pcm).c_str(),
+                   pcm->getClan()->getTitle(pcm, viewerLang(pc)).c_str(),
                    pcm->getLastAccessTime( ).getTimeAsString("%d/%m/%y %H:%M").c_str());
     }
 
