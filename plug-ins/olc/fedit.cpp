@@ -187,7 +187,7 @@ CMD(fedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online configuration file editor.
 
     Configurable::Pointer cfg = matches.front();
     if (matches.size() > 1) {
-        ch->pecho("Найден%1$I|о|ы {W%1$d{x файл%1$I|а|ов, редактирую 1й в списке:\r\n", matches.size());
+        ch->pecho("Found {W%1$d{x file(s), editing the 1st in the list:\r\n", matches.size());
     }
 
     OLCStateFile::Pointer fe(NEW, cfg);
