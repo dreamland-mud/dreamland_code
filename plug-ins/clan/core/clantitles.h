@@ -8,6 +8,7 @@
 #include "xmlmap.h"
 #include "xmlvector.h"
 #include "xmlstring.h"
+#include "lang.h"
 
 class PCMemoryInterface;
 
@@ -19,7 +20,7 @@ public:
     typedef ::Pointer<ClanTitles> Pointer;
     
     virtual ~ClanTitles( );
-    virtual const DLString & build( PCMemoryInterface * ) const = 0;
+    virtual const DLString & build( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const = 0;
     virtual void toStream( ostringstream & ) const = 0;
     virtual int size( ) const = 0;
 };
@@ -42,6 +43,7 @@ public:
     XML_VARIABLE XMLString female;
     XML_VARIABLE XMLStringNoEmpty abbr;
     XML_VARIABLE XMLStringNoEmpty english;
+    XML_VARIABLE XMLStringNoEmpty ukrainian;
 };
 
 typedef XMLVectorBase<ClanLevelNames> ClanLevelNamesVector;
@@ -54,8 +56,8 @@ class ClanTitlesByClass : public ClanTitles,
 {
 public:
     typedef ::Pointer<ClanTitlesByClass> Pointer;
-    
-    virtual const DLString & build( PCMemoryInterface * ) const;
+
+    virtual const DLString & build( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const;
     virtual void toStream( ostringstream & ) const;
     virtual int size( ) const;
 
@@ -75,8 +77,8 @@ class ClanTitlesByLevel : public ClanTitles,
 {
 public:
     typedef ::Pointer<ClanTitlesByLevel> Pointer;
-    
-    virtual const DLString & build( PCMemoryInterface * ) const;
+
+    virtual const DLString & build( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const;
     virtual void toStream( ostringstream & ) const;
     virtual int size( ) const;
 

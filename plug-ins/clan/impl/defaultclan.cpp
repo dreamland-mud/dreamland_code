@@ -59,20 +59,20 @@ const ClanOrgs * DefaultClan::getOrgs( ) const
     return orgs.getPointer( );
 }
 
-const DLString & DefaultClan::getTitle( PCMemoryInterface *pcm ) const
+const DLString & DefaultClan::getTitle( PCMemoryInterface *pcm, lang_t lang ) const
 {
     if (orgs) {
         ClanOrder::Pointer ord = orgs->findOrder( pcm );
-        
+
         if (ord) {
-            const DLString &title = ord->getTitle( pcm );
+            const DLString &title = ord->getTitle( pcm, lang );
             if (title.size( ) != 0)
                 return title;
         }
     }
-    
+
     if (titles) {
-        return titles->build( pcm );
+        return titles->build( pcm, lang );
     }
 
     return DLString::emptyString;
