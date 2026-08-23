@@ -503,6 +503,49 @@ MEDIT(create)
     return true;
 }
 
+MEDIT(delete)
+{
+    AreaIndexData *pArea;
+    int value;
+
+    value = atoi(argument);
+    if (argument[0] == '\0' || value == 0) {
+        stc("Syntax:  medit delete [vnum]\n\r", ch);
+        return false;
+    }
+
+    pArea = get_vnum_area(value);
+
+    if (!pArea) {
+        stc("OLCStateMobile:  That vnum is not assigned an area.\n\r", ch);
+        return false;
+    }
+
+    if (!can_edit( ch, value )) {
+        stc("OLCStateMobile:  Vnum in an area you cannot build in.\n\r", ch);
+        return false;
+    }
+
+    // Mirror 'oedit delete': flag the prototype for removal. It stays in memory
+    // (and live instances survive) until the next boot; XMLArea::init drops
+    // ACT_DELETED prototypes when writing the area to disk, so 'asave' makes it stick.
+    MOB_INDEX_DATA *pMob = get_mob_index(value);
+    if (!pMob) {
+        ptc(ch, "Моб %d не найден.\n\r", value);
+        return false;
+    }
+
+    pArea->changed = true;
+    SET_BIT(pMob->act, ACT_DELETED);
+    // If we're deleting the mob currently open in this editor, flag the in-memory
+    // snapshot too -- otherwise commit() (on 'done') writes the pre-delete snapshot
+    // back over the prototype and silently clears the flag.
+    if (value == mob.vnum)
+        SET_BIT(mob.act, ACT_DELETED);
+    ptc(ch, "[%u] (%N1) помечен к удалению.\n\r", pMob->vnum, pMob->getShortDescr(LANG_DEFAULT));
+    return true;
+}
+
 static void xml_node_set( Character *ch, XMLNode::Pointer root, const DLString &nodeName, const DLString &nodeValue )
 {
     XMLNode::Pointer node;
@@ -1290,6 +1333,36 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
         OLCStateMobile::Pointer me(NEW, value);
         me->attach(ch);
+        return;
+    }
+    else if (arg_is_strict(arg1, "delete")) {
+        // Top-level delete: no editor attached, so nothing can write a stale
+        // snapshot back over the flag (see the in-editor MEDIT(delete) guard).
+        value = atoi(argument);
+        if (argument[0] == '\0' || value == 0) {
+            stc("Syntax:  medit delete <vnum>\n\r", ch);
+            return;
+        }
+
+        pArea = OLCState::get_vnum_area(value);
+        if (!pArea) {
+            stc("MEdit:  That vnum is not assigned an area.\n\r", ch);
+            return;
+        }
+        if (!OLCState::can_edit( ch, value )) {
+            stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
+            return;
+        }
+
+        pMob = get_mob_index(value);
+        if (!pMob) {
+            ptc(ch, "Моб %d не найден.\n\r", value);
+            return;
+        }
+
+        pArea->changed = true;
+        SET_BIT(pMob->act, ACT_DELETED);
+        ptc(ch, "[%u] (%N1) помечен к удалению.\n\r", pMob->vnum, pMob->getShortDescr(LANG_DEFAULT));
         return;
     } else if(arg_is_strict(arg1, "show")) {
         if(!*argument || !is_number(argument)) {

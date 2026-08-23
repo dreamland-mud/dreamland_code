@@ -148,17 +148,19 @@ XMLArea::init(area_file *af)
     for (auto &q: area->quests)
         quests.push_back(*q);
 
+    // Prototypes flagged for deletion via 'medit delete' / 'oedit delete' are
+    // excluded here, so the flag actually removes them from the area file on save.
     MOB_INDEX_DATA *pMobIndex;
     for (int v = area->min_vnum; v <= area->max_vnum; v++) {
         pMobIndex = get_mob_index(v);
-        if(pMobIndex)
+        if(pMobIndex && !IS_SET(pMobIndex->act, ACT_DELETED))
             mobiles[pMobIndex->vnum].init(pMobIndex);
     }
-    
+
     OBJ_INDEX_DATA *pObjIndex;
     for (int v = area->min_vnum; v <= area->max_vnum; v++) {
         pObjIndex = get_obj_index(v);
-        if(pObjIndex) 
+        if(pObjIndex && !IS_SET(pObjIndex->extra_flags, ITEM_DELETED))
             objects[pObjIndex->vnum].init(pObjIndex);
     }
     
