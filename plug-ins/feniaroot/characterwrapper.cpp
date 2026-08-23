@@ -4,6 +4,9 @@
  */
 
 #include <iostream>
+#include <algorithm>
+#include <vector>
+#include <map>
 #include <jsoncpp/json/json.h>
 
 #include "logstream.h"
@@ -2869,6 +2872,189 @@ NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "(vnum): поиск по вну
             return wrap( obj );
 
     return Register( );
+}
+
+/*----------------------------------------------------------------------------
+ * gearAdvice -- the sage's "service advice". Ranks the world's wearable gear
+ * this character can ACTUALLY wear right now (native per-item-type wear level +
+ * alignment) and scores it by a profile. Returns [pct, optimal[], best[]] as
+ * prototype wrappers for Fenia to render: search stays in C++, output/tone in
+ * Fenia. Phase 1: armour/wearables only (weapons handled later); AC not scored.
+ *--------------------------------------------------------------------------*/
+struct GAWeights {
+    double hp, mana, dr, hr, saves;
+    double stat[6];   // str, int, wis, dex, con, cha
+};
+
+struct GACand {
+    obj_index_data *pObj;
+    int    slot;      // wear_flags without ITEM_TAKE (0 = light)
+    double score;
+    double obtain;    // 0..1 obtainability
+    double value;     // gap * obtain (filled for the 'optimal' ranking)
+};
+
+static double ga_score( obj_index_data *pObj, const GAWeights &w )
+{
+    double s = 0;
+    for (auto &paf: pObj->affected) {
+        int m = paf->modifier;
+        switch (paf->location) {
+        case APPLY_HIT:     s += w.hp   * m; break;
+        case APPLY_MANA:    s += w.mana * m; break;
+        case APPLY_DAMROLL: s += w.dr   * m; break;
+        case APPLY_HITROLL: s += w.hr   * m; break;
+        case APPLY_SAVES:
+        case APPLY_SAVING_ROD:
+        case APPLY_SAVING_PETRI:
+        case APPLY_SAVING_BREATH:
+        case APPLY_SAVING_SPELL: s += w.saves * (-m); break;  // lower save = better
+        case APPLY_STR: s += w.stat[0] * m; break;
+        case APPLY_INT: s += w.stat[1] * m; break;
+        case APPLY_WIS: s += w.stat[2] * m; break;
+        case APPLY_DEX: s += w.stat[3] * m; break;
+        case APPLY_CON: s += w.stat[4] * m; break;
+        case APPLY_CHA: s += w.stat[5] * m; break;
+        }
+    }
+    return s;
+}
+
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile): [pct, optimal, best] -- best gear the char can wear now, ranked. profile=caster|melee" )
+{
+    checkTarget( );
+
+    DLString profile = args2string( args );
+    GAWeights w;
+    if (profile == "melee" || profile == "agile" || profile == "hybrid") {
+        w.hp = 1.0; w.mana = 0.5; w.dr = 10.0; w.hr = 6.0; w.saves = 4.0;
+        w.stat[0] = 3; w.stat[1] = 0; w.stat[2] = 0; w.stat[3] = 2; w.stat[4] = 2; w.stat[5] = 0;
+    } else {                                    // caster (default)
+        w.hp = 1.0; w.mana = 1.5; w.dr = 8.0; w.hr = 2.0; w.saves = 5.0;
+        w.stat[0] = 0; w.stat[1] = 2; w.stat[2] = 3; w.stat[3] = 0; w.stat[4] = 2; w.stat[5] = 0;
+    }
+
+    int chLevel  = target->getRealLevel( );
+    int levelGap = target->getModifyLevel( ) - chLevel;
+
+    // Live spawned-instance count per vnum (single pass over the world).
+    std::map<int,int> spawned;
+    for (::Object *o = object_list; o; o = o->next)
+        spawned[o->pIndexData->vnum]++;
+
+    // Worn gear: best score per slot-type (for the gap + percentile).
+    std::map<int,double> wornSlot;
+    for (::Object *o = target->carrying; o; o = o->next_content) {
+        if (o->wear_loc == wear_none)
+            continue;
+        if (o->pIndexData->item_type == ITEM_WEAPON)   // Phase 1: armour/wearables only
+            continue;
+        int slot = o->pIndexData->wear_flags;
+        REMOVE_BIT( slot, ITEM_TAKE );
+        double sc = ga_score( o->pIndexData, w );
+        if (sc > wornSlot[slot])
+            wornSlot[slot] = sc;
+    }
+
+    // Catalogue every wearable prototype this char can wear right now.
+    std::vector<GACand> cands;
+    std::map<int,double> bestSlot;
+    for (int i = 0; i < MAX_KEY_HASH; i++)
+    for (obj_index_data *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+        if (pObj->level > LEVEL_MORTAL)
+            continue;
+        if (pObj->item_type == ITEM_WEAPON)     // Phase 1: armour/wearables only
+            continue;
+        if (!IS_SET(pObj->wear_flags, ITEM_TAKE))
+            continue;
+        int slot = pObj->wear_flags;
+        REMOVE_BIT( slot, ITEM_TAKE );
+        if (slot == 0 && pObj->item_type != ITEM_LIGHT)
+            continue;
+
+        // Wearable now? native per-item-type wear level (armour +3, weapon +0, ...).
+        int wearMod = target->getProfession( )->getWearModifier( pObj->item_type );
+        int wearLvl = pObj->level - wearMod - levelGap;
+        if (wearLvl < 1) wearLvl = 1;
+        if (wearLvl > chLevel)
+            continue;
+
+        // Alignment restriction.
+        if (IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)    && IS_EVIL(target))    continue;
+        if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)    && IS_GOOD(target))    continue;
+        if (IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(target)) continue;
+
+        double sc = ga_score( pObj, w );
+        if (sc <= 0)
+            continue;
+
+        // Obtainability 0..1: limited-and-none-spawned is hard; deeper items harder.
+        double obtain = 1.0;
+        int sp = spawned[pObj->vnum];
+        if (pObj->limit > 0 && sp == 0)
+            obtain = 0.25;
+        else if (pObj->limit > 0)
+            obtain = 0.7;
+        if (pObj->level > chLevel)
+            obtain *= 0.6;
+
+        GACand c;
+        c.pObj = pObj; c.slot = slot; c.score = sc; c.obtain = obtain; c.value = 0;
+        cands.push_back( c );
+
+        if (sc > bestSlot[slot])
+            bestSlot[slot] = sc;
+    }
+
+    // Percentile: best-worn-per-slot-type vs best-available-per-slot-type (each
+    // slot-type counted once; multi-slot types like two fingers are Phase 2).
+    double wornTotal = 0;
+    for (auto &kv: wornSlot)
+        wornTotal += kv.second;
+    double bestTotal = 0;
+    for (auto &kv: bestSlot)
+        bestTotal += kv.second;
+
+    int pct = 0;
+    if (bestTotal > 0)
+        pct = (int)( 100.0 * wornTotal / bestTotal + 0.5 );
+    if (pct > 100) pct = 100;
+
+    // "best" = raw score.
+    std::vector<GACand> byBest = cands;
+    std::sort( byBest.begin( ), byBest.end( ),
+        []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
+
+    // "optimal" = gap * obtainability (real upgrades only).
+    for (auto &c: cands) {
+        double gap = c.score - wornSlot[c.slot];
+        c.value = gap > 0 ? gap * c.obtain : 0;
+    }
+    std::vector<GACand> byOpt = cands;
+    std::sort( byOpt.begin( ), byOpt.end( ),
+        []( const GACand &a, const GACand &b ){ return a.value > b.value; } );
+
+    // Return [pct, optimal(list of proto wrappers), best(list of proto wrappers)].
+    RegList::Pointer optimal( NEW );
+    int nOpt = 0;
+    for (size_t k = 0; k < byOpt.size( ) && nOpt < 5; k++) {
+        if (byOpt[k].value <= 0) break;
+        optimal->push_back( WrapperManager::getThis( )->getWrapper( byOpt[k].pObj ) );
+        nOpt++;
+    }
+
+    RegList::Pointer best( NEW );
+    int nBest = 0;
+    for (size_t k = 0; k < byBest.size( ) && nBest < 5; k++) {
+        best->push_back( WrapperManager::getThis( )->getWrapper( byBest[k].pObj ) );
+        nBest++;
+    }
+
+    RegList::Pointer result( NEW );
+    result->push_back( Register( pct ) );
+    result->push_back( wrap( optimal ) );
+    result->push_back( wrap( best ) );
+    return wrap( result );
 }
 
 NMI_INVOKE(CharacterWrapper, can_drop_obj, "(obj): может ли избавиться от предмета obj в инвентаре" )
