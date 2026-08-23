@@ -38,11 +38,15 @@ XML_OBJECT
 public:
     typedef ::Pointer<SheathConfig> Pointer;
 
-    // Trilingual (sheath.xml already carries l="en"/"ru"/"ua"): a plain XMLString
-    // would collapse to a single loaded value and show it to every viewer.
+    // Trilingual (sheath.xml carries l="en"/"ru"/"ua"): a plain XMLString would
+    // collapse the variants to one loaded value and show it to every viewer.
+    // msgDisplay and msgSelfWear are read straight (getForLang), so they must be
+    // XMLMultiString. The three room/remove lines flow through the base's _()
+    // wrapper (DefaultWearlocation::wearAtomic/remove), which resolves them per
+    // viewer from the catalog, so they stay plain strings (the RU catalog key).
     XML_VARIABLE XMLMultiString msgDisplay;
     XML_VARIABLE XMLString msgRoomWear;
-    XML_VARIABLE XMLString msgSelfWear;
+    XML_VARIABLE XMLMultiString msgSelfWear;
     XML_VARIABLE XMLString msgRoomRemove;
     XML_VARIABLE XMLString msgSelfRemove;
 };

@@ -675,7 +675,17 @@ CMDRUNP( sacrifice )
             return;
         }
 
-        const char *where = terrains[ch->in_room->getSectorType()].where;
+        // where-noun in the actor's language (mirrors examine.cpp); the bare
+        // .where leaked RU ("everything that is на полу") to EN/UA players.
+        const terrain_t &sacTerr = terrains[ch->in_room->getSectorType()];
+        lang_t wlang = viewerLang(ch);
+        const char *where;
+        if (wlang == LANG_EN)
+            where = sacTerr.whereEn;
+        else if (wlang == LANG_UA)
+            where = sacTerr.whereUa;
+        else
+            where = sacTerr.where;
         if (godless) {
             ch->recho(_("%^C1 выбрасывает прочь все, что находится %s."), ch, where);
             ch->pecho(_("Ты выбрасываешь прочь все, что находится %s."), where);

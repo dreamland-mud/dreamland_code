@@ -843,7 +843,7 @@ Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
             if (is_immortal( ))
                 return cachedNoun.immortal.find(lang)->second;
             else
-                return somebody;
+                return getSomebody( lang );
         }
                 
         if (is_vampire( ) && !wch->is_vampire( )) {

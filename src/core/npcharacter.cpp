@@ -247,7 +247,7 @@ Noun::Pointer NPCharacter::toNoun( const DLObject *forWhom, int flags ) const
     
     if (IS_SET(flags, FMT_INVIS)) {
         if (wch && !wch->can_see( this ))
-            return somebody;
+            return getSomebody( viewerLang( wch ) );
     }
 
     // Render the mob name in the viewer's display language, mirroring

@@ -389,8 +389,8 @@ Noun::Pointer Object::toNoun( const DLObject *forWhom, int flags ) const
     const Character *wch = dynamic_cast<const Character *>(forWhom);
     
     if (IS_SET(flags, FMT_INVIS)) {
-        if (wch && !wch->can_see( this )) 
-            return something;
+        if (wch && !wch->can_see( this ))
+            return getSomething( viewerLang( wch ) );
     }
     
     // Render the object's name in the viewer's display language (shared with

@@ -72,12 +72,39 @@ const PosessivePronoun::PosessionGenders ru_posessive_pronouns =
 const MultiGender masculineSingular(Gender::MASCULINE);
 const MultiGender neutralSingular(Gender::NEUTER);
 
-// TODO remove previous implementation. Add multi-language support.
-
-const InflectedString::Pointer 
+// Invisible-actor placeholders ("некто"/"нечто"), one per display language, so
+// an EN/UA player no longer reads "Некто" / "что-то" in an English or Ukrainian
+// sentence. RU keeps its six declined cases; EN is caseless; UA declines.
+const InflectedString::Pointer
     somebody(NEW, InflectedString({"некто", "кого-то", "кому-то", "кого-то", "кем-то", "ком-то"}, masculineSingular));
+const InflectedString::Pointer
+    somebodyEn(NEW, InflectedString("someone", masculineSingular));
+const InflectedString::Pointer
+    somebodyUa(NEW, InflectedString({"хтось", "когось", "комусь", "когось", "кимось", "комусь"}, masculineSingular));
 
-const InflectedString::Pointer 
+const InflectedString::Pointer
     something(NEW, InflectedString({"нечто", "чего-то", "чему-то", "что-то", "чем-то", "чем-то"}, neutralSingular));
+const InflectedString::Pointer
+    somethingEn(NEW, InflectedString("something", neutralSingular));
+const InflectedString::Pointer
+    somethingUa(NEW, InflectedString({"щось", "чогось", "чомусь", "щось", "чимось", "чомусь"}, neutralSingular));
+
+const InflectedString::Pointer & getSomebody(lang_t lang)
+{
+    switch (lang) {
+    case LANG_EN: return somebodyEn;
+    case LANG_UA: return somebodyUa;
+    default:      return somebody;
+    }
+}
+
+const InflectedString::Pointer & getSomething(lang_t lang)
+{
+    switch (lang) {
+    case LANG_EN: return somethingEn;
+    case LANG_UA: return somethingUa;
+    default:      return something;
+    }
+}
 
 }

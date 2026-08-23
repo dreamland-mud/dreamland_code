@@ -7,6 +7,7 @@
 
 #include "pronouns.h"
 #include "inflectedstring.h"
+#include "lang.h"
 
 namespace Grammar {
 
@@ -16,6 +17,10 @@ extern const PosessivePronoun::PosessionGenders ru_posessive_pronouns;
 
 extern const InflectedString::Pointer somebody;
 extern const InflectedString::Pointer something;
+
+// Invisible-actor placeholder for the viewer's language (see ru_pronouns.cpp).
+const InflectedString::Pointer & getSomebody(lang_t lang);
+const InflectedString::Pointer & getSomething(lang_t lang);
 
 }
 

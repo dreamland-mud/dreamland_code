@@ -323,8 +323,10 @@ void DefaultSpell::utterPrayer(Character *ch)
         ch->pecho(_("Ты неумело молишься, прося богов о помощи."));  
         ch->recho(_("%^C1 неумело молится, прося богов о помощи."), ch); 
     } else {
-        ch->pecho(_("Ты возносишь молитву %N3."), ch->getReligion()->getRussianName().c_str());
-        ch->recho(_("%^C1 возносит молитву %N3."), ch, ch->getReligion()->getRussianName().c_str());
+        // getNameFor(ch) is per-viewer (EN latin shortDescr / RU nameRus / UA nameUa);
+        // getRussianName() leaked the Cyrillic name to EN/UA players ("prayer to Мефисто").
+        ch->pecho(_("Ты возносишь молитву %N3."), ch->getReligion()->getNameFor(ch).c_str());
+        ch->recho(_("%^C1 возносит молитву %N3."), ch, ch->getReligion()->getNameFor(ch).c_str());
     }
 }
 
