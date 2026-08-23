@@ -66,10 +66,19 @@ void FeniaManager::croak(const WrapperBase *wrapper, const Register &key, const 
         if (feniaCroaker)
             feniaCroaker->croak(wrapper, key, e);
 
-        LogStream::sendError() 
-            << "Exception calling Fenia prog " << key.toString() << ": " 
-            << e.what() << endl;
-        
+        // "victim is dead" is an expected, high-frequency signal: a per-second onUpdateHit
+        // prog firing on a not-yet-extracted corpse, not a real error. Log it at notice level
+        // so it stops burying genuine errors in the boot log. FeniaCroaker::isFiltered drops
+        // the same message from wiznet/Discord for the same reason.
+        if (e.getMessage() == "victim is dead")
+            LogStream::sendNotice()
+                << "Fenia prog " << key.toString() << ": "
+                << e.what() << endl;
+        else
+            LogStream::sendError()
+                << "Exception calling Fenia prog " << key.toString() << ": "
+                << e.what() << endl;
+
     } catch(const ::Exception &x) {
         LogStream::sendError() 
             << "Exception trying to report exception " 
