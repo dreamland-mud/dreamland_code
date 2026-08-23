@@ -57,7 +57,7 @@ public:
      *  Three index-parallel lists; all empty means fall back to the skill group. */
     virtual void getCastMessages( StringList &self, StringList &vict, StringList &room ) const;
 
-    virtual const DLString & getTitle( PCMemoryInterface * ) const;
+    virtual const DLString & getTitle( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const;
     virtual bool isLeader( PCMemoryInterface * ) const;
     virtual bool isRecruiter( PCMemoryInterface * ) const;
     virtual bool canInduct( PCharacter * ) const;

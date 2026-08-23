@@ -34,8 +34,10 @@ void ClanLevelNames::toStream( ostringstream &buf ) const
 
     if (!abbr.getValue( ).empty( ))
         buf << fmt(0, "[%2s]  ", abbr.getValue( ).c_str( ) );
-    
+
     buf << english;
+    if (!ukrainian.getValue( ).empty( ))
+        buf << " / " << ukrainian;
 }
 
 /*-----------------------------------------------------------------
@@ -43,17 +45,21 @@ void ClanLevelNames::toStream( ostringstream &buf ) const
  *----------------------------------------------------------------*/
 const DLString ClanTitlesByClass::TYPE = "ClanTitlesByClass";
 
-const DLString & ClanTitlesByClass::build( PCMemoryInterface *pcm ) const
+const DLString & ClanTitlesByClass::build( PCMemoryInterface *pcm, lang_t lang ) const
 {
     const_iterator i = find( pcm->getProfession( )->getName( ) );
-    
+
     if (i == end( )) {
         static DLString allName( "all" );
         i = find( allName );
     }
 
-    const ClanLevelNames &names = i->second[pcm->getClanLevel( )]; 
-    return (pcm->getSex( ) == SEX_FEMALE 
+    const ClanLevelNames &names = i->second[pcm->getClanLevel( )];
+    if (lang == LANG_EN && !names.english.getValue( ).empty( ))
+        return names.english.getValue( );
+    if (lang == LANG_UA && !names.ukrainian.getValue( ).empty( ))
+        return names.ukrainian.getValue( );
+    return (pcm->getSex( ) == SEX_FEMALE
                 ? names.female.getValue( ) : names.male.getValue( ));
 }
 
@@ -92,16 +98,20 @@ int ClanTitlesByClass::size( ) const
  *----------------------------------------------------------------*/
 const DLString ClanTitlesByLevel::TYPE = "ClanTitlesByLevel";
 
-const DLString & ClanTitlesByLevel::build( PCMemoryInterface *pcm ) const
+const DLString & ClanTitlesByLevel::build( PCMemoryInterface *pcm, lang_t lang ) const
 {
     int cl = pcm->getClanLevel( );
 
     if (cl >= size( ))
         return DLString::emptyString;
-        
-    const ClanLevelNames &names = (*this)[cl]; 
 
-    return (pcm->getSex( ) == SEX_FEMALE 
+    const ClanLevelNames &names = (*this)[cl];
+
+    if (lang == LANG_EN && !names.english.getValue( ).empty( ))
+        return names.english.getValue( );
+    if (lang == LANG_UA && !names.ukrainian.getValue( ).empty( ))
+        return names.ukrainian.getValue( );
+    return (pcm->getSex( ) == SEX_FEMALE
                 ? names.female.getValue( ) : names.male.getValue( ));
 }
 

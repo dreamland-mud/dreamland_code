@@ -8,6 +8,7 @@
 #include "xmlinflectedstring.h"
 #include "xmlmap.h"
 #include "xmlstring.h"
+#include "lang.h"
 
 class PCMemoryInterface;
 class PCharacter;
@@ -18,7 +19,7 @@ public:
     typedef ::Pointer<ClanOrder> Pointer;
     
     virtual bool canInduct( PCMemoryInterface * ) const;
-    virtual const DLString &getTitle( PCMemoryInterface * ) const;
+    virtual const DLString &getTitle( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const;
 
     XML_VARIABLE XMLString          name;
     XML_VARIABLE XMLStringNoEmpty   shortDescr;

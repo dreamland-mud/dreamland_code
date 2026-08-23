@@ -93,13 +93,13 @@ DLString Player::title(PCMemoryInterface *pcm, lang_t lang)
                 break;
             
             case 'c':
-                cl = pcm->getClan()->getTitle(pcm);
+                cl = pcm->getClan()->getTitle(pcm, lang);
                 if (!cl.empty())
                     out << "{C[" << "{" << pcm->getClan()->getColor( ) << cl << "{C]{x";
                 break;
-                
+
             case 'C':
-                cl = pcm->getClan()->getTitle(pcm);
+                cl = pcm->getClan()->getTitle(pcm, lang);
                 if (!cl.empty( )) {
                     cl.upperFirstCharacter( );
                     out << "{C[" << "{" << pcm->getClan()->getColor( ) << cl << "{C]{x";

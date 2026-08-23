@@ -21,7 +21,7 @@ bool ClanOrder::canInduct( PCMemoryInterface * ) const
     return true;
 }
 
-const DLString & ClanOrder::getTitle( PCMemoryInterface * ) const
+const DLString & ClanOrder::getTitle( PCMemoryInterface *, lang_t ) const
 {
     return DLString::emptyString;
 }

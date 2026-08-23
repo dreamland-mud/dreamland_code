@@ -29,7 +29,7 @@ public:
     ShalafiFaculty();
     
     virtual bool canInduct( PCMemoryInterface * ) const;
-    virtual const DLString &getTitle( PCMemoryInterface * ) const;
+    virtual const DLString &getTitle( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const;
 
     XML_VARIABLE XMLGlobalBitvector classes;
     XML_VARIABLE ClanTitlesByLevel  titles; 

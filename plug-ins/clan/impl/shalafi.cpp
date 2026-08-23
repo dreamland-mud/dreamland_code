@@ -145,9 +145,9 @@ bool ShalafiFaculty::canInduct(PCMemoryInterface *pci) const
     return classes.isSet(pci->getProfession());
 }
 
-const DLString &ShalafiFaculty::getTitle(PCMemoryInterface *pci) const
+const DLString &ShalafiFaculty::getTitle(PCMemoryInterface *pci, lang_t lang) const
 {
-    return titles.build(pci);
+    return titles.build(pci, lang);
 }
 
 /*--------------------------------------------------------------------------

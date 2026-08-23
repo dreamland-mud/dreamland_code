@@ -64,7 +64,7 @@ public:
     virtual bool isRecruiter( PCMemoryInterface * ) const;
     virtual bool canInduct( PCharacter * ) const;
     virtual void getCastMessages( StringList &self, StringList &vict, StringList &room ) const;
-    virtual const DLString & getTitle( PCMemoryInterface * ) const;
+    virtual const DLString & getTitle( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const;
     
     virtual void handleVictory( PCharacter *, PCharacter * );
     virtual void handleDefeat( PCharacter *, PCharacter * );

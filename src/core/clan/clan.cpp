@@ -77,7 +77,7 @@ const DLString& Clan::getChannelPattern() const
 {
     return DLString::emptyString;
 }
-const DLString & Clan::getTitle( PCMemoryInterface * ) const
+const DLString & Clan::getTitle( PCMemoryInterface *, lang_t ) const
 {
     return DLString::emptyString;
 }
