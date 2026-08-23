@@ -143,22 +143,41 @@ CMD(fedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online configuration file editor.
     if (arg_is_list(arg1)) {
         ostringstream buf;
         const DLString lineFormat = "    " + web_cmd(ch, "fedit $1|text web", "%s");
+        DLString lastFolder = "\x01"; // sentinel: no real folder compares equal
+
+        // Print a folder header whenever the folder prefix changes. getPaths() returns
+        // "folder/file" strings from a sorted map, so same-folder entries are contiguous;
+        // files with no folder are listed without a header.
+        auto groupHeader = [&](const DLString &path) {
+            DLString::size_type slash = path.rfind('/');
+            DLString folder = (slash == DLString::npos) ? DLString("") : path.substr(0, slash);
+            if (folder != lastFolder) {
+                lastFolder = folder;
+                if (!folder.empty())
+                    buf << "{C" << folder << "/{x" << endl;
+            }
+        };
 
         if (arg2.empty()) {
             buf << "Все конфигурационные файлы для редактирования:" << endl;
-            for (auto &path: configReg->getPaths())
+            for (auto &path: configReg->getPaths()) {
+                groupHeader(path);
                 buf << fmt(0, lineFormat.c_str(), path.c_str()) << endl;
+            }
 
         } else {
             buf << "Файлы, содержащие {W" << arg2 << "{x в имени:" << endl;
-            for (auto &path: configReg->getPaths())
-                if (path.find(arg2) != DLString::npos)
-                    buf << fmt(0, lineFormat.c_str(), path.c_str()) << endl;
+            for (auto &path: configReg->getPaths()) {
+                if (path.find(arg2) == DLString::npos)
+                    continue;
+                groupHeader(path);
+                buf << fmt(0, lineFormat.c_str(), path.c_str()) << endl;
+            }
         }
 
         page_to_char(buf.str().c_str(), ch);
         return;
-    } 
+    }
 
     list<Configurable::Pointer> matches = configReg->getAll(arg1);
     if (matches.empty()) {
