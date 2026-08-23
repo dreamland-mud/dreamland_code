@@ -296,8 +296,9 @@ void SheathWearloc::onFight(Character *ch, Object *obj)
         return;
         
     // Change location from sheath to wield; no need to remove and reapply the affects.
-    ch->pecho(getMsgSelfRemove(obj).c_str(), ch, obj);
-    ch->recho(getMsgRoomRemove(obj).c_str(), ch, obj);
+    // Route through the base helper so the draw lines resolve per viewer from the
+    // catalog (keyed under defaultwearlocation.cpp) instead of leaking RU.
+    echoRemoveMessages(ch, obj);
 
     obj->wear_loc = wear_wield;
 }

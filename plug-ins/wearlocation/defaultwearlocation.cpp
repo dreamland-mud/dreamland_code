@@ -324,24 +324,28 @@ const DLString &DefaultWearlocation::getMsgSelfRemove(Object *obj) const
 const DLString MSG_ROOM = "%1$^C1 снимает %2$O4.";
 
 const DLString &DefaultWearlocation::getMsgRoomRemove(Object *obj) const
-{ 
+{
     if (!msgRoomRemove.empty())
         return msgRoomRemove;
 
     return MSG_ROOM;
 }
 
+void DefaultWearlocation::echoRemoveMessages( Character *ch, Object *obj ) const
+{
+    ch->recho( _(getMsgRoomRemove(obj)), ch, obj );
+    ch->pecho( _(getMsgSelfRemove(obj)), ch, obj );
+}
+
 bool DefaultWearlocation::remove( Object *obj, int flags )
 {
     Character *ch = obj->carried_by;
-    
+
     if (!canRemove( ch, obj, flags ))
         return false;
-    
-    if (IS_SET(flags, F_WEAR_VERBOSE)) {
-        ch->recho( _(getMsgRoomRemove(obj)), ch, obj );
-        ch->pecho( _(getMsgSelfRemove(obj)), ch, obj );
-    }
+
+    if (IS_SET(flags, F_WEAR_VERBOSE))
+        echoRemoveMessages( ch, obj );
     
     unequip( obj );
 
