@@ -162,9 +162,13 @@ bool PortalMovement::checkClosedDoor( Character *wch )
     if (rc == RC_MOVE_OK)
         return true;
 
-    msgSelfParty( wch, 
+    msgSelfParty( wch,
+                  "It's closed here, try typing {y{hcopen %4$O1{x.",
                   "Тут закрыто, попробуй написать {y{hcоткрыть %4$O1{x.",
-                  "Тут закрыто, попробуй написать {y{hcоткрыть %4$O1{x." );
+                  "Тут зачинено, спробуй написати {y{hcвідкрити %4$O1{x.",
+                  "It's closed here, try typing {y{hcopen %4$O1{x.",
+                  "Тут закрыто, попробуй написать {y{hcоткрыть %4$O1{x.",
+                  "Тут зачинено, спробуй написати {y{hcвідкрити %4$O1{x." );
     return false;
 }
 
@@ -190,9 +194,13 @@ bool PortalMovement::checkCurse( Character *wch )
     
     if (IS_AFFECTED(wch, AFF_CURSE) && !IS_SET(portal->value2(), GATE_CURSE_ALLOWED))
     {
-        msgSelfParty( wch, 
+        msgSelfParty( wch,
+                      "Your curse keeps you from entering %4$O4.",
                       "Твое проклятье мешает тебе войти в %4$O4.",
-                      "Проклятье %2$C2 мешает %2$P3 войти в %4$O4." );
+                      "Твоє прокляття заважає тобі увійти в %4$O4.",
+                      "%2$C2's curse keeps %2$P3 from entering %4$O4.",
+                      "Проклятье %2$C2 мешает %2$P3 войти в %4$O4.",
+                      "Прокляття %2$C2 заважає %2$P3 увійти в %4$O4." );
         return false;
     }
     
@@ -200,8 +208,12 @@ bool PortalMovement::checkCurse( Character *wch )
          || IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE)) && !IS_SET(portal->value2(), GATE_FROM_NO_RECALL))
     {
         msgSelfParty( wch,
+                      "The curse of this place keeps you from leaving it.",
                       "Проклятье этого места мешает тебе его покинуть.",
-                      "Проклятье этого места мешает %2$C3 его покинуть." );
+                      "Прокляття цього місця заважає тобі його покинути.",
+                      "The curse of this place keeps %2$C3 from leaving it.",
+                      "Проклятье этого места мешает %2$C3 его покинуть.",
+                      "Прокляття цього місця заважає %2$C3 його покинути." );
         return false;
     }
     

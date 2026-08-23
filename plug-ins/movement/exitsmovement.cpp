@@ -219,8 +219,12 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
         return true;
 
     msgSelfParty( wch,
+                    "It's closed here, try typing {y{hcopen %4$N1{x.",
                     "Тут закрыто, попробуй написать {y{hcоткрыть %4$N1{x.",
-                    "Тут закрыто, попробуй написать {y{hcоткрыть %4$N1{x." );
+                    "Тут зачинено, спробуй написати {y{hcвідкрити %4$N1{x.",
+                    "It's closed here, try typing {y{hcopen %4$N1{x.",
+                    "Тут закрыто, попробуй написать {y{hcоткрыть %4$N1{x.",
+                    "Тут зачинено, спробуй написати {y{hcвідкрити %4$N1{x." );
     return false;
 }
 
@@ -229,9 +233,13 @@ bool ExitsMovement::checkVisibility( Character *wch )
     if ((pexit && !wch->can_see( pexit ))
         || (peexit && !wch->can_see( peexit )))
     {
-        msgSelfParty( wch, 
+        msgSelfParty( wch,
+                      "Sorry, but you can't go there.",
                       "Жаль, но ты не можешь туда идти.",
-                      "Жаль, но %2$C1 не может туда идти.");
+                      "Шкода, але ти не можеш туди йти.",
+                      "Sorry, but %2$C1 can't go there.",
+                      "Жаль, но %2$C1 не может туда идти.",
+                      "Шкода, але %2$C1 не може туди йти.");
         return false;
     }
 
@@ -261,9 +269,13 @@ bool ExitsMovement::checkExitFlags( Character *wch )
             total_size += rider->size / 2;
         
         if (total_size > peexit->max_size_pass) {
-            msgSelfParty( wch, 
+            msgSelfParty( wch,
+                        "To do that, you'd need to be a touch smaller.",
                         "Чтобы это сделать, надо быть чуточку поменьше размером.",
-                        "Вам с %2$C5 стоит быть чуточку поменьше размером." );
+                        "Щоб це зробити, треба бути трохи меншим.",
+                        "You and %2$C5 should be a touch smaller.",
+                        "Вам с %2$C5 стоит быть чуточку поменьше размером.",
+                        "Вам із %2$C5 варто бути трохи меншими." );
             return false;
         }
     }
@@ -273,23 +285,35 @@ bool ExitsMovement::checkExitFlags( Character *wch )
     bool flying = is_flying( wch );
 
     if (IS_SET(exit_info, EX_NOFLY) && flying) {
-        msgSelfParty( wch, 
+        msgSelfParty( wch,
+                      "You can't fly through there.",
                       "Ты не сможешь туда пролететь.",
-                      "%2$^C1 не может туда пролететь." );
+                      "Ти не зможеш туди пролетіти.",
+                      "%2$^C1 can't fly through there.",
+                      "%2$^C1 не может туда пролететь.",
+                      "%2$^C1 не може туди пролетіти." );
         return false;
     }
 
     if (IS_SET(exit_info, EX_NOWALK) && !flying) {
-        msgSelfParty( wch, 
+        msgSelfParty( wch,
+                      "You can't get through there.",
                       "Ты не сможешь туда пройти.",
-                      "%2$^C1 не сможет туда пройти." );
+                      "Ти не зможеш туди пройти.",
+                      "%2$^C1 can't get through there.",
+                      "%2$^C1 не сможет туда пройти.",
+                      "%2$^C1 не зможе туди пройти." );
         return false;
     }
 
     if (IS_SET(exit_info, EX_SWIM_ONLY) && !IS_SET(boat_types, BOAT_SWIM)) {
-        msgSelfParty( wch, 
+        msgSelfParty( wch,
+                      "To get {hh2128underwater{x you need gills or a scuba set.",
                       "Чтобы попасть {hh2128под воду{x, нужны жабры или акваланг.",
-                      "%2$^C3 нужны жабры или акваланг, чтобы попасть {hh2128под воду{x." );
+                      "Щоб потрапити {hh2128під воду{x, потрібні зябра або акваланг.",
+                      "%2$^C3 needs gills or a scuba set to get {hh2128underwater{x.",
+                      "%2$^C3 нужны жабры или акваланг, чтобы попасть {hh2128под воду{x.",
+                      "%2$^C3 потрібні зябра або акваланг, щоб потрапити {hh2128під воду{x." );
         return false;
     }
 
