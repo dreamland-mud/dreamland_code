@@ -384,7 +384,9 @@ CMDRUNP( affects )
         PCharacter *pch = ch->getPC();
         lang_t lang = Player::displayLang(viewer);
         bool rus = (lang != LANG_EN);
-        const DLString joiner = " {yна{m ";
+        // The joiner glues a skill name to its modifier ("dagger <joiner> 10%").
+        // RU/UA read "на"; English needs "by" or it leaks "dagger на 10%".
+        const DLString joiner = (lang == LANG_EN) ? " {yby{m " : " {yна{m ";
         StringList learnedSkills;
         StringList learnedGroups = pch->mod_skill_groups.toStringList(rus, joiner);
         StringList levelSkills = pch->mod_level_skills.toStringList(rus, joiner);

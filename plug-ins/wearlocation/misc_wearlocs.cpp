@@ -10,6 +10,7 @@
 #include "affect.h"
 #include "character.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "object.h"
 
 #include "stats_apply.h"
@@ -295,8 +296,9 @@ void SheathWearloc::onFight(Character *ch, Object *obj)
         return;
         
     // Change location from sheath to wield; no need to remove and reapply the affects.
-    ch->pecho(getMsgSelfRemove(obj).c_str(), ch, obj);
-    ch->recho(getMsgRoomRemove(obj).c_str(), ch, obj);
+    // Route through the base helper so the draw lines resolve per viewer from the
+    // catalog (keyed under defaultwearlocation.cpp) instead of leaking RU.
+    echoRemoveMessages(ch, obj);
 
     obj->wear_loc = wear_wield;
 }
@@ -311,9 +313,11 @@ const DLString &SheathWearloc::getMsgRoomRemove(Object *obj) const
     return getConfig(obj).msgRoomRemove;
 }
 
-const DLString &SheathWearloc::getMsgSelfWear(Character *, Object *obj) const
+const DLString &SheathWearloc::getMsgSelfWear(Character *ch, Object *obj) const
 {
-    return getConfig(obj).msgSelfWear;
+    // Self-wear is pecho'd straight (no _() catalog wrap), so resolve the
+    // wearer's own language here or EN/UA players get the collapsed value.
+    return getConfig(obj).msgSelfWear.getForLang(Player::lang(ch));
 }
 
 const DLString &SheathWearloc::getMsgRoomWear(Object *obj) const

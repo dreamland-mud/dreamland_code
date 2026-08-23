@@ -74,6 +74,12 @@ protected:
     virtual const DLString &getMsgRoomWear(Object *obj) const;
     virtual const DLString &getMsgRoomRemove(Object *obj) const;
 
+    // Emit the remove self/room lines wrapped in _() so both resolve per viewer
+    // from the catalog. Defined here (not at a caller) so the catalog key stays
+    // under defaultwearlocation.cpp -- callers outside this file (SheathWearloc::
+    // onFight) reuse the same keyed translations instead of leaking RU.
+    void echoRemoveMessages( Character *ch, Object *obj ) const;
+
     XML_VARIABLE XMLEnumerationNoEmpty itemType;
     XML_VARIABLE XMLFlagsNoEmpty       itemWear;
     XML_VARIABLE XMLWearlocationReference conflict;
