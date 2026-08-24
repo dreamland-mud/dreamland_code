@@ -3005,6 +3005,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
         if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)    && IS_GOOD(target))    continue;
         if (IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(target)) continue;
 
+        // Race body: skip slots the char's race lacks -- e.g. centaur-only horse
+        // (saddle) and hooves (horseshoes). Keeps them out of both recs and the %.
+        if (IS_SET(pObj->wear_flags, ITEM_WEAR_HORSE)  && !target->getWearloc( ).isSet( WEAR_HORSE ))  continue;
+        if (IS_SET(pObj->wear_flags, ITEM_WEAR_HOOVES) && !target->getWearloc( ).isSet( WEAR_HOOVES )) continue;
+
         double sc = ga_score( pObj, w );
         if (sc <= 0)
             continue;
