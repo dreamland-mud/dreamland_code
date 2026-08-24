@@ -25,6 +25,20 @@ const DLString &GlobalRegistryElement::getUkrainianName( ) const
     return DLString::emptyString;
 }
 
+const DLString &GlobalRegistryElement::getNameFor( lang_t lang ) const
+{
+    if (lang == LANG_EN)
+        return getName( );
+
+    if (lang == LANG_UA) {
+        const DLString &ua = getUkrainianName( );
+        if (!ua.empty( ))
+            return ua;
+    }
+
+    return getRussianName( );
+}
+
 bool GlobalRegistryElement::matchesStrict( const DLString &str ) const 
 {
     if (str.empty())

@@ -31,6 +31,7 @@ public:
 
     virtual const DLString &getName( ) const;
     virtual const DLString &getRussianName( ) const;
+    virtual const DLString &getUkrainianName( ) const;
     virtual bool isValid( ) const;
     
     virtual const DLString &getShortDescr( lang_t lang = LANG_DEFAULT ) const;

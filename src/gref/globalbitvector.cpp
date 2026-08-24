@@ -91,16 +91,7 @@ DLString GlobalBitvector::toString( lang_t lang, char gcase, const char *cjoiner
         if (bits[b]) {
             GlobalRegistryElement *e = registry->find(b);
             if (e) {
-                DLString name;
-                if (lang == LANG_EN)
-                    name = e->getName( );
-                else if (lang == LANG_UA) {
-                    name = e->getUkrainianName( );
-                    if (name.empty( ))
-                        name = e->getRussianName( );
-                }
-                else
-                    name = e->getRussianName( );
+                DLString name = e->getNameFor( lang );
                 result.push_back(name.ruscase(gcase).quote());
             }
         }
