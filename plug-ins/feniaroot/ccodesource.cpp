@@ -112,7 +112,7 @@ CMDADM( codesource )
             << "     {Wcopy{x <номер>|<имя> - скопировать cs из списка в буфер редактора" << endl
             << "     {Wsearch{x <строка>    - найти все сценарии, содержащие строку в коде"  << endl
             << "     {Wdups{x               - сценарии с дублирующимися именами (одно имя -> >1 cs)"  << endl
-            << "     {Worphans{x            - счетчики несылаемых cs/объектов/функций (как boot fsck, read-only)"  << endl
+            << "     {Worphans{x            - счетчики неиспользуемых cs/объектов/функций (как boot fsck, read-only)"  << endl
             << endl
             << "Редактирование:" << endl
             << "     {Wweb{x [<номер>|<имя>] - редактировать новый или существующий сценарий в веб-редакторе" << endl
@@ -193,7 +193,7 @@ CMDADM( codesource )
         return;
     }
 
-    if(arg_is(cmd, "dups")) {
+    if(arg_is_soft(cmd, "dups")) {
         // Group registered CodeSources by name; report names carrying more than
         // one live CodeSource. A name is meant to map to exactly one codesource,
         // so extra copies are "duplicate scenarios" held alive by references that
@@ -232,7 +232,7 @@ CMDADM( codesource )
         return;
     }
 
-    if(arg_is(cmd, "orphans")) {
+    if(arg_is_soft(cmd, "orphans")) {
         // Read-only mirror of the boot-time fenia fsck (ValidateTask): count
         // unreferenced CodeSources / objects / functions WITHOUT freeing any of
         // them. Freeing is what SIGSEGV'd four consecutive boots (see the comment
