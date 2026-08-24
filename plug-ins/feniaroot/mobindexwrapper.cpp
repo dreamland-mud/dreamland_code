@@ -125,6 +125,11 @@ NMI_GET( MobIndexWrapper, vnum , "внум, уникальный номер пр
     checkTarget( ); 
     return target->vnum;
 }
+NMI_GET( MobIndexWrapper, level , "уровень прототипа моба")
+{
+    checkTarget( );
+    return target->level;
+}
 NMI_GET( MobIndexWrapper, size , "численный размер моба или расовый (таблица .tables.size_table)")
 {
     checkTarget( );
