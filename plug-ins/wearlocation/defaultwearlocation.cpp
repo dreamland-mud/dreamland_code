@@ -467,6 +467,10 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
             echo_master(ch, _("Тебе необходимо достичь %d уровня, чтобы использовать %O4."), wear_level, obj);
             ch->recho( _("%1$^C3 не хватает опыта, чтобы использовать %2$O4."), ch, obj );
+            // A personal hero reward stranded above its owner's level (typically
+            // after a remort) can be refit down at the quest-trader.
+            if (obj->isPersonalQuestReward( ) && obj->hasOwner( ch ))
+                ch->pecho( _("Это твоя геройская вещь -- перекуй ее под свой уровень у {hh125квестового торговца{x: {y{hcквест купить перековка{x.") );
         }
         return RC_WEAR_YOUNG;
     }

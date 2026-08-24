@@ -173,6 +173,12 @@ public:
 
     bool hasOwner( const Character * ) const;
 
+    /** True for a personal hero quest-reward item (quest girth/ring/weapon/bag/
+     *  keyring). Mirrors OBJ_VNUM_QUEST* / refit_eligible_vnum in questtrader.cpp
+     *  -- the set a remort preserves to the Lost and Found and the quest-trader
+     *  can refit; keep both in sync if the set changes. */
+    bool isPersonalQuestReward( ) const;
+
     /** Return value of a given property or an empty string if not found. */
     DLString getProperty(const DLString &key) const;
 

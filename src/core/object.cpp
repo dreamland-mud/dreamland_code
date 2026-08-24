@@ -382,6 +382,26 @@ bool Object::hasOwner( const Character *ch ) const
     return ch->getNameC() == owner;
 }
 
+bool Object::isPersonalQuestReward( ) const
+{
+    if (!pIndexData)
+        return false;
+
+    // The personal hero-reward vnums: quest girth/ring/weapon/bag/keyring.
+    // Mirrors OBJ_VNUM_QUEST* / refit_eligible_vnum in questtrader.cpp -- keep
+    // both in sync if the set changes.
+    switch (pIndexData->vnum) {
+    case 94:   // quest girth
+    case 95:   // quest ring
+    case 96:   // quest weapon
+    case 103:  // quest bag
+    case 119:  // quest keyring
+        return true;
+    }
+
+    return false;
+}
+
 using namespace Grammar;
 
 Noun::Pointer Object::toNoun( const DLObject *forWhom, int flags ) const

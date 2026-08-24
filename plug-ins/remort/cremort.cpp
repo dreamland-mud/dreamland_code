@@ -20,6 +20,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "pcharactermanager.h"
+#include "object.h"
 #include "race.h"
 #include "room.h"
 #include "remortdata.h"
@@ -31,6 +32,7 @@
 #include "nannyhandler.h"
 #include "fight_extract.h"
 #include "loadsave.h"
+#include "save.h"
 #include "act.h"
 #include "vnum.h"
 #include "def.h"
@@ -69,7 +71,8 @@ CMDRUN( remort )
     
     if (argument.empty( )) {
         pch->pecho(_("{RВнимание! Все вещи в твоем инвентаре и на тебе исчезнут с перерождением!{x"));
-        pch->pecho(_("Вещи можно сохранить в именном сундуке или собственном доме ({y{hcсправка цены{x, {y{hcсправка строительство{x)"));
+        pch->pecho(_("Личные вещи Героя (надетые и в инвентаре) не пропадут: они попадут в бюро находок в Мидгаарде, откуда их можно забрать и перековать под новый уровень ({y{hcквест купить перековка{x)."));
+        pch->pecho(_("Остальные вещи можно сохранить в именном сундуке или собственном доме ({y{hcсправка цены{x, {y{hcсправка строительство{x)"));
         pch->pecho(_("Обязательно прочитай {y{hcсправка перерождение{x"));
         pch->pecho(_("Если хочешь начать новую жизнь, набери {yпереродиться{x пароль."));
         return;
@@ -130,7 +133,27 @@ CMDRUN( remort )
     pch->getAttributes( ).handleEvent( RemortArguments( pch, &newAttributes ) );
     newAttributes.getAttr<XMLEmptyAttribute>( "remorting" );
     new_ch->setAttributes( newAttributes );
-    
+
+    /* Personal hero quest-reward gear survives a remort: move it to the Lost and
+     * Found office instead of letting extract_char destroy it, so the player can
+     * reclaim it and refit it to the new level (квест купить перековка). Both worn
+     * and carried reward items are covered -- obj_from_char unequips worn items
+     * and clears wear_loc before the move. */
+    {
+        Room *office = get_room_instance( ROOM_VNUM_BUREAU_2 );
+        if (office) {
+            Object *obj, *obj_next;
+            for (obj = pch->carrying; obj; obj = obj_next) {
+                obj_next = obj->next_content;
+                if (obj->isPersonalQuestReward( ) && obj->hasOwner( pch )) {
+                    obj_from_char( obj );
+                    obj_to_room( obj, office );
+                }
+            }
+            save_items( office );
+        }
+    }
+
     /* good bye ... */
     PCharacterManager::remove( pch->getName( ) );
     extract_char( pch );
