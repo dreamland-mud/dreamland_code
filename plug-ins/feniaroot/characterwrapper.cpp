@@ -3080,7 +3080,7 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel,
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -3088,6 +3088,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
     DLString profile = (ai != args.end( )) ? (ai++)->toString( ) : DLString("caster");
     int lockedSlots = (ai != args.end( )) ? (int)((ai++)->toNumber( )) : 0;
     REMOVE_BIT( lockedSlots, ITEM_TAKE );   // never let the TAKE bit false-match a real slot
+    int slotFilter = (ai != args.end( )) ? (int)((ai++)->toNumber( )) : 0;
+    REMOVE_BIT( slotFilter, ITEM_TAKE );    // slot-browse mode: rank only this wear slot
     GAWeights w;
     if (profile == "melee" || profile == "agile" || profile == "hybrid") {
         w.hp = 1.0; w.mana = 0.5; w.dr = 10.0; w.hr = 6.0; w.saves = 4.0;
@@ -3324,6 +3326,30 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
     // Path-cost start point, shared by both lists and cached per destination room.
     Room *msm = get_room_instance( GA_START_ROOM );
     std::map<int, std::vector<int> > pathCache;   // destVnum -> [aggros, doors, fly]
+
+    // Slot-browse mode: the char asked for one wear slot ("service advice neck").
+    // Return the top-5 wearable-now items in that slot by raw score (Fenia orders
+    // them by difficulty band). No percentile, no dream list; the caller passes
+    // lockedSlots=0 so an explicit slot browse is never suppressed by a set.
+    if (slotFilter != 0) {
+        std::vector<GACand> slotCands;
+        for (auto &c: cands)
+            if (c.slot & slotFilter)
+                slotCands.push_back( c );
+        std::sort( slotCands.begin( ), slotCands.end( ),
+            []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
+
+        RegList::Pointer slotList( NEW );
+        for (size_t k = 0; k < slotCands.size( ) && k < 5; k++)
+            slotList->push_back( ga_buildEntry( slotCands[k], msm, chLevel, pathCache ) );
+
+        RegList::Pointer emptyBest( NEW );
+        RegList::Pointer result( NEW );
+        result->push_back( Register( 0 ) );
+        result->push_back( wrap( slotList ) );
+        result->push_back( wrap( emptyBest ) );
+        return wrap( result );
+    }
 
     RegList::Pointer optimal( NEW );
     std::map<int,int> optVnum;
