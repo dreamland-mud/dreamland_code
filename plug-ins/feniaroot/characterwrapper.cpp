@@ -3321,6 +3321,12 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
     int nOpt = 0;
     for (size_t k = 0; k < byOpt.size( ) && nOpt < 5; k++) {
         if (byOpt[k].value <= 0) break;
+        // Boss cap (OPTIMAL list only -- the finest/dream list still shows these):
+        // don't tell the char to chase gear whose easiest route is killing/looting
+        // more than 10 levels above them. Buy/quest have no such guard.
+        if ((byOpt[k].acq.method == GA_KILL || byOpt[k].acq.method == GA_PICKUP)
+            && byOpt[k].acq.guard > chLevel + 10)
+            continue;
         if (optSlot.count( byOpt[k].slot )) continue;   // one item per slot-type
         optSlot[byOpt[k].slot] = 1;
         optVnum[byOpt[k].pObj->vnum] = 1;
