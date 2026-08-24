@@ -3055,28 +3055,36 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
     std::sort( byOpt.begin( ), byOpt.end( ),
         []( const GACand &a, const GACand &b ){ return a.value > b.value; } );
 
-    // "optimal" = the practical upgrades (gap * obtainability), top 5. Remember the
-    // best raw score among them and which vnums they are.
+    // "optimal" = the practical upgrades (gap * obtainability): the highest-value
+    // item PER wear-slot-type (never two of the same slot), top 5 slots. Remember
+    // the best raw score among the picks and which vnums/slots they are.
     RegList::Pointer optimal( NEW );
     std::map<int,int> optVnum;
+    std::map<int,int> optSlot;
     double maxOptScore = 0;
     int nOpt = 0;
     for (size_t k = 0; k < byOpt.size( ) && nOpt < 5; k++) {
         if (byOpt[k].value <= 0) break;
+        if (optSlot.count( byOpt[k].slot )) continue;   // one item per slot-type
+        optSlot[byOpt[k].slot] = 1;
         optVnum[byOpt[k].pObj->vnum] = 1;
         if (byOpt[k].score > maxOptScore) maxOptScore = byOpt[k].score;
         optimal->push_back( WrapperManager::getThis( )->getWrapper( byOpt[k].pObj ) );
         nOpt++;
     }
 
-    // "finest" = the dream: raw score STRICTLY above the best optimal target, and not
-    // already in optimal. byBest is sorted desc, so stop at the first non-better item.
-    // May be empty -- Fenia then omits the whole section.
+    // "finest" = the dream: the highest-raw item PER wear-slot-type whose raw score
+    // is STRICTLY above the best optimal target and isn't already an optimal pick.
+    // So where a slot's practical pick isn't its raw-best, the raw-best surfaces
+    // here. byBest is sorted desc; may be empty -- Fenia then omits the section.
     RegList::Pointer best( NEW );
+    std::map<int,int> finestSlot;
     int nBest = 0;
     for (size_t k = 0; k < byBest.size( ) && nBest < 5; k++) {
         if (byBest[k].score <= maxOptScore) break;
         if (optVnum.count( byBest[k].pObj->vnum )) continue;
+        if (finestSlot.count( byBest[k].slot )) continue;   // one item per slot-type
+        finestSlot[byBest[k].slot] = 1;
         best->push_back( WrapperManager::getThis( )->getWrapper( byBest[k].pObj ) );
         nBest++;
     }
