@@ -102,6 +102,10 @@
 #include "wearloc_utils.h"
 #include "char_weight.h"
 
+// gearAdvice v2.1: area-quest reward map + path-cost difficulty (traverse plugin).
+#include "areaquest.h"
+#include "roomtraverse.h"
+
 GSN(dark_shroud);
 GSN(manacles);
 GSN(charm_person);
@@ -2881,6 +2885,33 @@ NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "(vnum): поиск по вну
  * prototype wrappers for Fenia to render: search stays in C++, output/tone in
  * Fenia. Phase 1: armour/wearables only (weapons handled later); AC not scored.
  *--------------------------------------------------------------------------*/
+
+// Where the path to an item starts: Midgaard Market Square, the universal hub.
+#define GA_START_ROOM 3014
+
+// How the sage tells you to get an item.
+enum { GA_KILL = 0, GA_BUY = 1, GA_PICKUP = 2, GA_QUEST = 3, GA_UNKNOWN = 4 };
+
+// Mobs that make a room "guarded": aggressive, or any kind of assist.
+#define GA_ASSIST_MASK (ASSIST_ALL|ASSIST_ALIGN|ASSIST_RACE|ASSIST_PLAYERS|ASSIST_GUARD|ASSIST_VNUM)
+
+// The easiest way to obtain one object vnum.
+struct GAAcq {
+    int method, aux, room, cost, guard;   // aux = holder / shop / quest vnum
+    GAAcq( ) : method(GA_UNKNOWN), aux(0), room(0), cost(0), guard(0) { }
+};
+
+// Keep the lowest-guard source per object vnum (buy beats a kill, an easy room
+// beats a hard one). Ties keep the first seen.
+static void ga_record( std::map<int,GAAcq> &acq, int vnum, int method, int aux, int room, int cost, int guard )
+{
+    std::map<int,GAAcq>::iterator it = acq.find( vnum );
+    if (it != acq.end( ) && it->second.guard <= guard)
+        return;
+    GAAcq a; a.method = method; a.aux = aux; a.room = room; a.cost = cost; a.guard = guard;
+    acq[vnum] = a;
+}
+
 struct GAWeights {
     double hp, mana, dr, hr, saves;
     double stat[6];   // str, int, wis, dex, con, cha
@@ -2892,6 +2923,7 @@ struct GACand {
     double score;
     double obtain;    // 0..1 obtainability
     double value;     // gap * obtain (filled for the 'optimal' ranking)
+    GAAcq  acq;       // how the sage says to get it
 };
 
 static double ga_score( obj_index_data *pObj, const GAWeights &w )
@@ -2920,7 +2952,135 @@ static double ga_score( obj_index_data *pObj, const GAWeights &w )
     return s;
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optimal, best] -- best gear the char can wear now, ranked. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip" )
+// Allow-everything road predicates: pathfind like the immortal 'find' command,
+// crossing locked doors, extra exits and portals. We only COUNT the obstacles on
+// the shortest route, we do not route around them.
+struct GAGoAlwaysDoor   { inline bool operator () ( Room *, EXIT_DATA * )       const { return true; } };
+struct GAGoAlwaysEExit  { inline bool operator () ( Room *, EXTRA_EXIT_DATA * ) const { return true; } };
+struct GAGoAlwaysPortal { inline bool operator () ( Room *, ::Object * )        const { return true; } };
+typedef RoomRoadsIterator<GAGoAlwaysDoor, GAGoAlwaysEExit, GAGoAlwaysPortal> GAHookIterator;
+
+// Records the rooms of the found path (target..start, order irrelevant to us).
+struct GAPathComplete {
+    typedef NodesEntry<RoomTraverseTraits> MyNodesEntry;
+    GAPathComplete( Room *t, std::vector<Room *> &r ) : target( t ), rooms( r ) { }
+    inline bool operator () ( const MyNodesEntry *const head, bool )
+    {
+        if (head->node != target)
+            return false;
+        for (const MyNodesEntry *i = head; i; i = i->prev)
+            rooms.push_back( i->node );
+        return true;
+    }
+    Room *target;
+    std::vector<Room *> &rooms;
+};
+
+// Walk the route from 'start' to room 'destVnum' and tally the danger a player
+// meets: aggressive mobs that reset along it, locked doors crossed, and whether
+// any room needs flight. 0/0/0 for no/unreachable destination. Reset-prototype
+// view (stable), not live wandering mobs.
+static void ga_pathcost( Room *start, int destVnum, int &aggros, int &doors, int &fly )
+{
+    aggros = 0; doors = 0; fly = 0;
+    if (!start || destVnum <= 0)
+        return;
+    Room *dest = get_room_instance( destVnum );
+    if (!dest || dest == start)
+        return;
+
+    for (RoomVector::iterator r = roomInstances.begin( ); r != roomInstances.end( ); r++)
+        REMOVE_BIT( (*r)->room_flags, ROOM_MARKER );
+
+    std::vector<Room *> rooms;
+    GAGoAlwaysDoor gd; GAGoAlwaysEExit ge; GAGoAlwaysPortal gp;
+    GAHookIterator iter( gd, ge, gp );
+    GAPathComplete complete( dest, rooms );
+    room_traverse( start, iter, complete, 10000 );
+
+    if (rooms.empty( ))
+        return;
+
+    // Aggressive resets + flight, per room on the route.
+    for (size_t i = 0; i < rooms.size( ); i++) {
+        Room *rm = rooms[i];
+        if (rm->getSectorType( ) == SECT_AIR)
+            fly = 1;
+        if (rm->pIndexData)
+            for (ResetList::iterator pr = rm->pIndexData->resets.begin( ); pr != rm->pIndexData->resets.end( ); pr++)
+                if ((*pr)->command == 'M') {
+                    MOB_INDEX_DATA *m = get_mob_index( (*pr)->arg1 );
+                    if (m && IS_SET(m->act, ACT_AGGRESSIVE))
+                        aggros++;
+                }
+    }
+
+    // Locked doors between adjacent rooms (check either direction; a portal or
+    // extra-exit hop simply matches nothing and counts zero).
+    for (size_t i = 0; i + 1 < rooms.size( ); i++) {
+        Room *a = rooms[i], *b = rooms[i + 1];
+        bool locked = false;
+        for (int d = 0; d < DIR_SOMEWHERE && !locked; d++) {
+            if (a->exit[d] && a->exit[d]->u1.to_room == b && IS_SET(a->exit[d]->exit_info, EX_LOCKED))
+                locked = true;
+            if (b->exit[d] && b->exit[d]->u1.to_room == a && IS_SET(b->exit[d]->exit_info, EX_LOCKED))
+                locked = true;
+        }
+        if (locked)
+            doors++;
+    }
+}
+
+// Difficulty band 0 easy / 1 medium / 2 hard. Single source of truth; keep the
+// thresholds in sync with Fenia .tmp.advice.difficulty. Quests are always medium.
+// Thresholds are deliberately simple and tunable, like the tone bands.
+static int ga_band( int method, int guard, int chLevel, int aggros, int doors, int fly )
+{
+    if (method == GA_QUEST || method == GA_UNKNOWN)   // no known route -> not "easy"
+        return 1;
+    if (guard <= chLevel && aggros == 0 && doors <= 1 && fly == 0)
+        return 0;
+    if (guard >= chLevel + 6 || aggros >= 4 || doors >= 3)
+        return 2;
+    return 1;
+}
+
+// Build one result row for Fenia: [objW, method, aux, room, cost, guard, aggros,
+// doors, fly, band]. Path cost is computed here (cached per destination room) so
+// it only runs for the <=10 final picks, never the whole candidate set. Quest and
+// sourceless picks carry no path.
+static Register ga_buildEntry( GACand &c, Room *msm, int chLevel,
+                               std::map<int, std::vector<int> > &pathCache )
+{
+    GAAcq &ac = c.acq;
+    int aggros = 0, doors = 0, fly = 0;
+    if (ac.method != GA_QUEST && ac.method != GA_UNKNOWN && ac.room > 0) {
+        std::map<int, std::vector<int> >::iterator ci = pathCache.find( ac.room );
+        if (ci != pathCache.end( )) {
+            aggros = ci->second[0]; doors = ci->second[1]; fly = ci->second[2];
+        } else {
+            ga_pathcost( msm, ac.room, aggros, doors, fly );
+            std::vector<int> v; v.push_back( aggros ); v.push_back( doors ); v.push_back( fly );
+            pathCache[ac.room] = v;
+        }
+    }
+    int band = ga_band( ac.method, ac.guard, chLevel, aggros, doors, fly );
+
+    RegList::Pointer e( NEW );
+    e->push_back( WrapperManager::getThis( )->getWrapper( c.pObj ) );
+    e->push_back( Register( ac.method ) );
+    e->push_back( Register( ac.aux ) );
+    e->push_back( Register( ac.room ) );
+    e->push_back( Register( ac.cost ) );
+    e->push_back( Register( ac.guard ) );
+    e->push_back( Register( aggros ) );
+    e->push_back( Register( doors ) );
+    e->push_back( Register( fly ) );
+    e->push_back( Register( band ) );
+    return wrap( e );
+}
+
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip" )
 {
     checkTarget( );
 
@@ -2944,6 +3104,69 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
     std::map<int,int> spawned;
     for (::Object *o = object_list; o; o = o->next)
         spawned[o->pIndexData->vnum]++;
+
+    // Area-quest reward map: obj vnum -> quest vnum (declarative rewardVnum steps
+    // only; Fenia-generated quest rewards are a separate, deferred task). A quest
+    // reward always wins the acquisition, and is let past the special-area filter.
+    std::map<int,int> questReward;
+    for (std::map<int,AreaQuest *>::iterator qk = areaQuests.begin( ); qk != areaQuests.end( ); qk++) {
+        AreaQuest *q = qk->second;
+        if (!q)
+            continue;
+        for (int s = 0; s < (int)q->steps.size( ); s++) {
+            int rv = q->steps[s]->rewardVnum.getValue( );
+            if (rv > 0 && !questReward.count( rv ))
+                questReward[rv] = q->vnum.getValue( );
+        }
+    }
+
+    // Easiest reset acquisition per object vnum, from the world's resets. Per room:
+    // pass 1 finds roomMax -- the toughest AGGRESSIVE-or-ASSIST mob that resets here,
+    // i.e. the guard you must survive (passive mobs don't guard). Pass 2 walks the
+    // resets in order tracking the last-loaded mob (cleared on 'O'/'R', per the
+    // olc.cpp badresets walk) and records how each object is obtained, keeping the
+    // lowest-guard source: bought from a shopkeeper (guard 0), taken off a mob you
+    // kill (guard roomMax), or picked up off the floor / from a container.
+    Behavior *shopperBhv = behaviorManager->findExisting( "shopper" );
+    std::map<int,GAAcq> acq;
+    for (std::map<int,RoomIndexData *>::iterator rk = roomIndexMap.begin( ); rk != roomIndexMap.end( ); rk++) {
+        RoomIndexData *pRoom = rk->second;
+        int roomVnum = rk->first;
+
+        int roomMax = 0;
+        for (ResetList::iterator pr = pRoom->resets.begin( ); pr != pRoom->resets.end( ); pr++)
+            if ((*pr)->command == 'M') {
+                MOB_INDEX_DATA *m = get_mob_index( (*pr)->arg1 );
+                if (m && (IS_SET(m->act, ACT_AGGRESSIVE) || IS_SET(m->off_flags, GA_ASSIST_MASK))
+                      && m->level > roomMax)
+                    roomMax = m->level;
+            }
+
+        MOB_INDEX_DATA *lastMob = 0;
+        for (ResetList::iterator pr = pRoom->resets.begin( ); pr != pRoom->resets.end( ); pr++) {
+            char cmd = (*pr)->command;
+            int a1 = (*pr)->arg1;
+            if (cmd == 'M') { lastMob = get_mob_index( a1 ); continue; }
+            if (cmd == 'R') { lastMob = 0; continue; }
+            if (cmd == 'O') { ga_record( acq, a1, GA_PICKUP, 0, roomVnum, 0, roomMax ); lastMob = 0; continue; }
+            if (cmd == 'P') { ga_record( acq, a1, GA_PICKUP, 0, roomVnum, 0, roomMax ); continue; }
+            if (cmd == 'G' || cmd == 'E') {
+                if (!lastMob)
+                    continue;
+                // Shop stock is 'G' onto a shopkeeper; 'E' on one is its own worn gear.
+                bool trader = shopperBhv && lastMob->behaviors.isSet( shopperBhv->getIndex( ) );
+                if (trader && cmd == 'G') {
+                    obj_index_data *po = get_obj_index( a1 );
+                    ga_record( acq, a1, GA_BUY, lastMob->vnum, roomVnum, po ? po->cost : 0, 0 );
+                } else {
+                    // You must kill the holder, so its own level floors the fight
+                    // even when it is passive and roomMax (aggro/assist only) is lower.
+                    int killGuard = std::max( roomMax, lastMob->level );
+                    ga_record( acq, a1, GA_KILL, lastMob->vnum, roomVnum, 0, killGuard );
+                }
+            }
+        }
+    }
 
     // Worn gear: best score per slot-type (for the gap + percentile), plus every
     // vnum already worn (so we never recommend re-getting one).
@@ -2975,12 +3198,12 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
             continue;
         // Gear from areas a player can't normally loot -- system holders,
         // hidden/wizlock dev zones, clan halls, mansions, dungeons. Engine's own
-        // special-area mask (cf. where.cpp / traverse). Rare quest rewards live in
-        // such zones but are legitimately earned -- keep those by vnum.
+        // special-area mask (cf. where.cpp / traverse). Area-quest rewards live in
+        // such zones but are legitimately earned -- keep those (e.g. cassandra 89).
         if (pObj->area
             && IS_SET(pObj->area->area_flag,
                       AREA_SYSTEM|AREA_HIDDEN|AREA_CLAN|AREA_MANSION|AREA_WIZLOCK|AREA_DUNGEON)
-            && pObj->vnum != 89 /* cassandra -- limbo quest reward */)
+            && !questReward.count( pObj->vnum ))
             continue;
         if (!IS_SET(pObj->wear_flags, ITEM_TAKE))
             continue;
@@ -3024,8 +3247,32 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
         if (pObj->level > chLevel)
             obtain *= 0.6;
 
+        // How to get it: a quest reward wins; else the easiest reset source; else no
+        // known source. Fold a mild guard demotion into the ranking (cheap, guard
+        // only -- the rich path-cost band is computed later, per final pick).
+        GAAcq ac;
+        if (questReward.count( pObj->vnum )) {
+            ac.method = GA_QUEST; ac.aux = questReward[pObj->vnum]; ac.guard = 0;
+        } else {
+            std::map<int,GAAcq>::iterator it = acq.find( pObj->vnum );
+            if (it != acq.end( ))
+                ac = it->second;
+            else {
+                ac.method = GA_UNKNOWN; ac.guard = pObj->level;
+            }
+        }
+        if (ac.method == GA_QUEST)
+            obtain *= 0.85;
+        else if (ac.guard <= chLevel - 5)
+            ;                        // easy: x1.0
+        else if (ac.guard <= chLevel + 5)
+            obtain *= 0.85;
+        else
+            obtain *= 0.6;
+
         GACand c;
         c.pObj = pObj; c.slot = slot; c.score = sc; c.obtain = obtain; c.value = 0;
+        c.acq = ac;
         cands.push_back( c );
 
         if (sc > bestSlot[slot])
@@ -3063,6 +3310,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
     // "optimal" = the practical upgrades (gap * obtainability): the highest-value
     // item PER wear-slot-type (never two of the same slot), top 5 slots. Remember
     // the best raw score among the picks and which vnums/slots they are.
+    // Path-cost start point, shared by both lists and cached per destination room.
+    Room *msm = get_room_instance( GA_START_ROOM );
+    std::map<int, std::vector<int> > pathCache;   // destVnum -> [aggros, doors, fly]
+
     RegList::Pointer optimal( NEW );
     std::map<int,int> optVnum;
     std::map<int,int> optSlot;
@@ -3074,7 +3325,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
         optSlot[byOpt[k].slot] = 1;
         optVnum[byOpt[k].pObj->vnum] = 1;
         if (byOpt[k].score > maxOptScore) maxOptScore = byOpt[k].score;
-        optimal->push_back( WrapperManager::getThis( )->getWrapper( byOpt[k].pObj ) );
+        optimal->push_back( ga_buildEntry( byOpt[k], msm, chLevel, pathCache ) );
         nOpt++;
     }
 
@@ -3090,7 +3341,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
         if (optVnum.count( byBest[k].pObj->vnum )) continue;
         if (finestSlot.count( byBest[k].slot )) continue;   // one item per slot-type
         finestSlot[byBest[k].slot] = 1;
-        best->push_back( WrapperManager::getThis( )->getWrapper( byBest[k].pObj ) );
+        best->push_back( ga_buildEntry( byBest[k], msm, chLevel, pathCache ) );
         nBest++;
     }
 
