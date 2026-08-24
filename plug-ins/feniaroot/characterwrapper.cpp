@@ -3190,6 +3190,15 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
     // Catalogue every wearable prototype this char can wear right now.
     std::vector<GACand> cands;
     std::map<int,double> bestSlot;
+
+    // Body slots a race may lack -- resolved once (findExisting is what
+    // arg2wearloc / hasWearloc do). WEAR_HORSE/WEAR_HOOVES/WEAR_FEET are
+    // deprecated wear_loc_flags enum codes, NOT wearlocationManager indices, so
+    // getWearloc().isSet() must be handed the slot OBJECT, never the enum code.
+    Wearlocation *horseLoc  = wearlocationManager->findExisting( "horse" );
+    Wearlocation *hoovesLoc = wearlocationManager->findExisting( "hooves" );
+    Wearlocation *feetLoc   = wearlocationManager->findExisting( "feet" );
+
     for (int i = 0; i < MAX_KEY_HASH; i++)
     for (obj_index_data *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
         if (pObj->level > LEVEL_MORTAL)
@@ -3228,10 +3237,12 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optim
         if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)    && IS_GOOD(target))    continue;
         if (IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(target)) continue;
 
-        // Race body: skip slots the char's race lacks -- e.g. centaur-only horse
-        // (saddle) and hooves (horseshoes). Keeps them out of both recs and the %.
-        if (IS_SET(pObj->wear_flags, ITEM_WEAR_HORSE)  && !target->getWearloc( ).isSet( WEAR_HORSE ))  continue;
-        if (IS_SET(pObj->wear_flags, ITEM_WEAR_HOOVES) && !target->getWearloc( ).isSet( WEAR_HOOVES )) continue;
+        // Skip items whose body slot the char's race lacks. Bipeds have no
+        // horse/hooves slot (saddles, horseshoes); quadrupeds like centaurs have
+        // no feet slot (boots). Keeps them out of both the recs and the %.
+        if (IS_SET(pObj->wear_flags, ITEM_WEAR_HORSE)  && horseLoc  && !target->getWearloc( ).isSet( horseLoc ))  continue;
+        if (IS_SET(pObj->wear_flags, ITEM_WEAR_HOOVES) && hoovesLoc && !target->getWearloc( ).isSet( hoovesLoc )) continue;
+        if (IS_SET(pObj->wear_flags, ITEM_WEAR_FEET)   && feetLoc   && !target->getWearloc( ).isSet( feetLoc ))   continue;
 
         double sc = ga_score( pObj, w );
         if (sc <= 0)
