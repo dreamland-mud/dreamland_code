@@ -7,6 +7,7 @@
 
 #include "dlobject.h"
 #include "dlstring.h"
+#include "lang.h"
 
 class GlobalRegistryElement : public virtual DLObject {
 friend class GlobalRegistryBase;
@@ -19,6 +20,13 @@ public:
     virtual const DLString &getName( ) const = 0;
     virtual const DLString &getRussianName( ) const;
     virtual const DLString &getUkrainianName( ) const;
+
+    // Name in the viewer's display language. Default composes it from the three
+    // getters above (EN name / UA-or-RU / RU); elements with a richer per-language
+    // store (Skill, SkillGroup) override this. Callers that render registry names
+    // for a viewer -- GlobalArray::toStringList, GlobalBitvector::toString -- go
+    // through here so UA stops collapsing into RU.
+    virtual const DLString &getNameFor( lang_t lang ) const;
     
     virtual bool matchesStrict( const DLString &str ) const;
     virtual bool matchesUnstrict( const DLString &str ) const;

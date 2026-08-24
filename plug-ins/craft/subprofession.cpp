@@ -105,13 +105,31 @@ void CraftProfessionHelp::unsetProfession( )
 
 void CraftProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    in << "Дополнительная профессия {C" << prof->getRusName( ).ruscase( '1' ) << "{x или {C"
-       << prof->getName( ) << "{x" << endl << endl;
+    lang_t lang = Player::displayLang(ch);
 
-    // Was get(RU): a translated article still read Russian to everyone. The
-    // header above stays Russian on purpose -- the profession has only a
-    // Russian name to put in it, and half a sentence in each language is worse.
-    in << text.getForLang(Player::displayLang(ch)) << endl;
+    // Header in the viewer's language. The old code hardcoded
+    // "Дополнительная профессия <ru> или <en>" for everyone, leaking Russian
+    // into every EN/UA craft-profession help. Name selection mirrors
+    // getTitle(label, lang) above; the profession does carry a UA form.
+    DLString name;
+    if (lang == LANG_EN)
+        name = prof->getName( );
+    else if (lang == LANG_UA && !prof->getUaName( ).empty( ))
+        name = prof->getUaName( ).ruscase( '1' );
+    else
+        name = prof->getRusName( ).ruscase( '1' );
+
+    DLString label;
+    if (lang == LANG_EN)
+        label = "Additional profession: ";
+    else if (lang == LANG_UA)
+        label = "Додаткова професія: ";
+    else
+        label = "Дополнительная профессия ";
+
+    in << label << "{C" << name << "{x" << endl << endl;
+
+    in << text.getForLang(lang) << endl;
 }
 
 /*-------------------------------------------------------------------

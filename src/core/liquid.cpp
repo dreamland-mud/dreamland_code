@@ -31,6 +31,15 @@ const DLString &Liquid::getRussianName( ) const
     return getShortDescr();
 }
 
+// Liquids keep their per-language names in shortDescr (see the <shortDescr
+// l="ua"> forms). getUkrainianName is what GlobalBitvector::toString queries for
+// a UA viewer -- without this it returned empty and the 'poured liquid' affect
+// smell leaked the Russian liquid name ("запах воды" instead of "запах води").
+const DLString &Liquid::getUkrainianName( ) const
+{
+    return getShortDescr( LANG_UA );
+}
+
 bool Liquid::isValid( ) const
 {
     return false;

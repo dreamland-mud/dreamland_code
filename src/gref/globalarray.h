@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "globalregistry.h"
+#include "lang.h"
 
 class GlobalBitvector;
 class StringList;
@@ -24,8 +25,9 @@ public:
     int & operator [] (size_type);
     void applyBitvector(const GlobalBitvector &bitvector, int modifier);
 
-    /** Generate a list of strings describing how much each element is affected: "xxx by 10, yyy by -5". */
-    StringList toStringList(bool fRussian, const DLString &joiner) const;
+    /** Generate a list of strings describing how much each element is affected: "xxx by 10, yyy by -5".
+     *  Names render in the viewer's display language via getNameFor(lang). */
+    StringList toStringList(lang_t lang, const DLString &joiner) const;
 
 protected:
     GlobalRegistryBase *registry;
