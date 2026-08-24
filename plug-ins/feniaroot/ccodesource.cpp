@@ -3,6 +3,8 @@
  * ruffina, 2004
  */
 #include <fstream>
+#include <map>
+#include <vector>
 
 #include "logstream.h"
 #include "exception.h"
@@ -18,6 +20,7 @@
 #include "codesourcerepo.h"
 #include "fenia/register-impl.h"
 #include "fenia/codesource.h"
+#include "fenia/object.h"
 #include "xmlattributecodesource.h"
 #include "wrappermanager.h"
 
@@ -108,6 +111,8 @@ CMDADM( codesource )
             << "     {Wread{x <номер>|<имя> - прочитать cs из списка по номеру или названию" << endl
             << "     {Wcopy{x <номер>|<имя> - скопировать cs из списка в буфер редактора" << endl
             << "     {Wsearch{x <строка>    - найти все сценарии, содержащие строку в коде"  << endl
+            << "     {Wdups{x               - сценарии с дублирующимися именами (одно имя -> >1 cs)"  << endl
+            << "     {Worphans{x            - счетчики несылаемых cs/объектов/функций (как boot fsck, read-only)"  << endl
             << endl
             << "Редактирование:" << endl
             << "     {Wweb{x [<номер>|<имя>] - редактировать новый или существующий сценарий в веб-редакторе" << endl
@@ -187,7 +192,78 @@ CMDADM( codesource )
         page_to_char(buf.str().c_str(), ch);
         return;
     }
-    
+
+    if(arg_is(cmd, "dups")) {
+        // Group registered CodeSources by name; report names carrying more than
+        // one live CodeSource. A name is meant to map to exactly one codesource,
+        // so extra copies are "duplicate scenarios" held alive by references that
+        // were never annulled. Transient engine-internal sources (empty name, or
+        // "<...>" like "<eval command>") are excluded: they are one-off eval/force
+        // fragments, not real duplicates. Output goes through pecho (no pager) so
+        // it comes back through /api/force, unlike list/search's page_to_char.
+        std::map<DLString, std::vector<id_t> > byName;
+        for(CodeSource::Manager::iterator i = CodeSource::manager->begin( );
+                i != CodeSource::manager->end( ); i++) {
+            const DLString &nm = i->name;
+            if (nm.empty( ) || nm[0] == '<')
+                continue;
+            byName[nm].push_back(i->getId( ));
+        }
+
+        int dupNames = 0, dupCopies = 0;
+        ch->pecho("{YДубли сценариев по имени{x (name -> [cs ids]):");
+        for(std::map<DLString, std::vector<id_t> >::iterator p = byName.begin( );
+                p != byName.end( ); p++) {
+            if (p->second.size( ) <= 1)
+                continue;
+            dupNames++;
+            dupCopies += p->second.size( );
+            ostringstream ids;
+            for(size_t k = 0; k < p->second.size( ); k++) {
+                if (k)
+                    ids << ",";
+                ids << p->second[k];
+            }
+            ch->pecho("  %-40s x%d : %s",
+                    p->first.c_str( ), (int)p->second.size( ), ids.str( ).c_str( ));
+        }
+        ch->pecho("{YИтого{x: %d имен с дублями, %d лишних копий.",
+                dupNames, dupCopies - dupNames);
+        return;
+    }
+
+    if(arg_is(cmd, "orphans")) {
+        // Read-only mirror of the boot-time fenia fsck (ValidateTask): count
+        // unreferenced CodeSources / objects / functions WITHOUT freeing any of
+        // them. Freeing is what SIGSEGV'd four consecutive boots (see the comment
+        // in validatetask.cpp); this only reports, so it is safe on live.
+        int csOrphan = 0, objOrphan = 0, fnOrphan = 0;
+
+        for(CodeSource::Manager::iterator i = CodeSource::manager->begin( );
+                i != CodeSource::manager->end( ); i++) {
+            if (i->refcnt == 0)
+                csOrphan++;
+            for(FunctionManager::iterator fi = i->functions.begin( );
+                    fi != i->functions.end( ); fi++)
+                if (fi->refcnt <= 0)
+                    fnOrphan++;
+        }
+
+        // Scripting::Object must be qualified: a global game `class Object`
+        // (items) is forward-declared via clan.h, so bare Object is ambiguous.
+        for(Scripting::Object::Manager::iterator oi = Scripting::Object::manager->begin( );
+                oi != Scripting::Object::manager->end( ); oi++)
+            if (oi->refcnt <= 0 && oi->hasHandler( ))
+                objOrphan++;
+
+        ch->pecho("{YFenia orphans{x (unreferenced, reported not freed):");
+        ch->pecho("  CodeSources:       %d", csOrphan);
+        ch->pecho("  Objects(+handler): %d", objOrphan);
+        ch->pecho("  Functions:         %d", fnOrphan);
+        ch->pecho("  Всего сценариев в базе: %d", (int)CodeSource::manager->size( ));
+        return;
+    }
+
     if(arg_is_copy(cmd)) {
         id_t csid;
         if (!cs_by_number(pch, args, csid))
