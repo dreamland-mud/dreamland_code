@@ -2920,11 +2920,14 @@ static double ga_score( obj_index_data *pObj, const GAWeights &w )
     return s;
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile): [pct, optimal, best] -- best gear the char can wear now, ranked. profile=caster|melee" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots]): [pct, optimal, best] -- best gear the char can wear now, ranked. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip" )
 {
     checkTarget( );
 
-    DLString profile = args2string( args );
+    Scripting::RegisterList::const_iterator ai = args.begin( );
+    DLString profile = (ai != args.end( )) ? (ai++)->toString( ) : DLString("caster");
+    int lockedSlots = (ai != args.end( )) ? (int)((ai++)->toNumber( )) : 0;
+    REMOVE_BIT( lockedSlots, ITEM_TAKE );   // never let the TAKE bit false-match a real slot
     GAWeights w;
     if (profile == "melee" || profile == "agile" || profile == "hybrid") {
         w.hp = 1.0; w.mana = 0.5; w.dr = 10.0; w.hr = 6.0; w.saves = 4.0;
@@ -2942,15 +2945,20 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile): [pct, optimal, best] -- be
     for (::Object *o = object_list; o; o = o->next)
         spawned[o->pIndexData->vnum]++;
 
-    // Worn gear: best score per slot-type (for the gap + percentile).
+    // Worn gear: best score per slot-type (for the gap + percentile), plus every
+    // vnum already worn (so we never recommend re-getting one).
     std::map<int,double> wornSlot;
+    std::map<int,int> wornVnum;
     for (::Object *o = target->carrying; o; o = o->next_content) {
         if (o->wear_loc == wear_none)
             continue;
+        wornVnum[o->pIndexData->vnum] = 1;
         if (o->pIndexData->item_type == ITEM_WEAPON)   // Phase 1: armour/wearables only
             continue;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
+        if (lockedSlots & slot)          // slot held by a complete set -- out of the percentile
+            continue;
         double sc = ga_score( o->pIndexData, w );
         if (sc > wornSlot[slot])
             wornSlot[slot] = sc;
@@ -2979,6 +2987,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile): [pct, optimal, best] -- be
         int slot = pObj->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
         if (slot == 0 && pObj->item_type != ITEM_LIGHT)
+            continue;
+        if (lockedSlots & slot)            // set-locked slot: replacing it would break the set
+            continue;
+        if (wornVnum.count( pObj->vnum ))  // already wearing this exact item
             continue;
 
         // Wearable now? native per-item-type wear level (armour +3, weapon +0, ...).
@@ -3043,18 +3055,28 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile): [pct, optimal, best] -- be
     std::sort( byOpt.begin( ), byOpt.end( ),
         []( const GACand &a, const GACand &b ){ return a.value > b.value; } );
 
-    // Return [pct, optimal(list of proto wrappers), best(list of proto wrappers)].
+    // "optimal" = the practical upgrades (gap * obtainability), top 5. Remember the
+    // best raw score among them and which vnums they are.
     RegList::Pointer optimal( NEW );
+    std::map<int,int> optVnum;
+    double maxOptScore = 0;
     int nOpt = 0;
     for (size_t k = 0; k < byOpt.size( ) && nOpt < 5; k++) {
         if (byOpt[k].value <= 0) break;
+        optVnum[byOpt[k].pObj->vnum] = 1;
+        if (byOpt[k].score > maxOptScore) maxOptScore = byOpt[k].score;
         optimal->push_back( WrapperManager::getThis( )->getWrapper( byOpt[k].pObj ) );
         nOpt++;
     }
 
+    // "finest" = the dream: raw score STRICTLY above the best optimal target, and not
+    // already in optimal. byBest is sorted desc, so stop at the first non-better item.
+    // May be empty -- Fenia then omits the whole section.
     RegList::Pointer best( NEW );
     int nBest = 0;
     for (size_t k = 0; k < byBest.size( ) && nBest < 5; k++) {
+        if (byBest[k].score <= maxOptScore) break;
+        if (optVnum.count( byBest[k].pObj->vnum )) continue;
         best->push_back( WrapperManager::getThis( )->getWrapper( byBest[k].pObj ) );
         nBest++;
     }
