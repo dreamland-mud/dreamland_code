@@ -86,6 +86,8 @@
 #include "nativeext.h"
 #include "idcontainer.h"
 #include "fenia_utils.h"
+#include "wrapperbase.h"
+#include "stringset.h"
 #include "../loadsave/behavior_utils.h"
 #include "wrap_utils.h"
 #include "subr.h"
@@ -2938,6 +2940,20 @@ static double ga_statgain( int base, int delta, int cap )
 // ga_score's stat[] weight order (str,int,wis,dex,con,cha) -> STAT_ index.
 static const int ga_statMap[6] = { STAT_STR, STAT_INT, STAT_WIS, STAT_DEX, STAT_CON, STAT_CHA };
 
+// A prototype carrying any Fenia trigger (onUse/onGet/onExamine/...) is almost
+// always special, high-value gear, so ga_score gives it a flat boost.
+static bool ga_hasFeniaTriggers( obj_index_data *pObj )
+{
+    if (pObj->wrapper == 0)
+        return false;
+    WrapperBase *w = get_wrapper( pObj->wrapper );
+    if (w == 0)
+        return false;
+    StringSet triggers, misc;
+    w->collectTriggers( triggers, misc );
+    return !triggers.empty( );
+}
+
 // Score a prototype for a profile. Flat pools (hp/mana/regen) and combat stats
 // count in full; the six primary stats are cap-aware: a point at the cap adds 0.
 // rawStat[k] = the char's uncapped stat (perm+mod); capStat[k] = its cap. worn =
@@ -2976,6 +2992,8 @@ static double ga_score( obj_index_data *pObj, const GAWeights &w,
         int base = rawStat[k] - (worn ? statDelta[k] : 0);
         s += w.stat[k] * ga_statgain( base, statDelta[k], capStat[k] );
     }
+    if (ga_hasFeniaTriggers( pObj ))
+        s += 50;   // Fenia-triggered gear is almost always something very good.
     return s;
 }
 
@@ -3446,8 +3464,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (byBest[k].score <= maxOptScore) break;
         if (optVnum.count( byBest[k].pObj->vnum )) continue;
         if (finestSlot.count( byBest[k].slot )) continue;   // one item per slot-type
+        double gain = byBest[k].score - wornSlot[byBest[k].slot];
+        if (gain <= 0) continue;   // the dream list is upgrades only, never a downgrade
         finestSlot[byBest[k].slot] = 1;
-        best->push_back( ga_buildEntry( byBest[k], msm, chLevel, pathCache, byBest[k].score - wornSlot[byBest[k].slot] ) );
+        best->push_back( ga_buildEntry( byBest[k], msm, chLevel, pathCache, gain ) );
         nBest++;
     }
 
