@@ -3332,9 +3332,23 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // them by difficulty band). No percentile, no dream list; the caller passes
     // lockedSlots=0 so an explicit slot browse is never suppressed by a set.
     if (slotFilter != 0) {
+        // Only offer gear that beats or ties what the char already wears in this
+        // slot -- never a downgrade. wornScore = best worn item intersecting the
+        // slot (0 for an empty slot, so anything wearable qualifies there).
+        double wornScore = 0;
+        for (::Object *o = target->carrying; o; o = o->next_content) {
+            if (o->wear_loc == wear_none || o->pIndexData->item_type == ITEM_WEAPON)
+                continue;
+            int ws = o->pIndexData->wear_flags;
+            REMOVE_BIT( ws, ITEM_TAKE );
+            if ((ws & slotFilter) == 0)
+                continue;
+            double sc = ga_score( o->pIndexData, w );
+            if (sc > wornScore) wornScore = sc;
+        }
         std::vector<GACand> slotCands;
         for (auto &c: cands)
-            if (c.slot & slotFilter)
+            if ((c.slot & slotFilter) && c.score >= wornScore)
                 slotCands.push_back( c );
         std::sort( slotCands.begin( ), slotCands.end( ),
             []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
