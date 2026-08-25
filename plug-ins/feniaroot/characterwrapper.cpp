@@ -2913,7 +2913,7 @@ static void ga_record( std::map<int,GAAcq> &acq, int vnum, int method, int aux, 
 }
 
 struct GAWeights {
-    double hp, mana, dr, hr, saves;
+    double hp, mana, manaGain, healGain, dr, hr, saves;
     double stat[6];   // str, int, wis, dex, con, cha
 };
 
@@ -2926,28 +2926,55 @@ struct GACand {
     GAAcq  acq;       // how the sage says to get it
 };
 
-static double ga_score( obj_index_data *pObj, const GAWeights &w )
+// Cap-aware stat value: only the points that actually land BELOW the character's
+// stat cap are worth anything. base = the stat WITHOUT the item being scored.
+static double ga_statgain( int base, int delta, int cap )
+{
+    int before = URANGE( MIN_STAT, base,         cap );
+    int after  = URANGE( MIN_STAT, base + delta, cap );
+    return after - before;
+}
+
+// ga_score's stat[] weight order (str,int,wis,dex,con,cha) -> STAT_ index.
+static const int ga_statMap[6] = { STAT_STR, STAT_INT, STAT_WIS, STAT_DEX, STAT_CON, STAT_CHA };
+
+// Score a prototype for a profile. Flat pools (hp/mana/regen) and combat stats
+// count in full; the six primary stats are cap-aware: a point at the cap adds 0.
+// rawStat[k] = the char's uncapped stat (perm+mod); capStat[k] = its cap. worn =
+// true when scoring an item the char already wears, so its own stat contribution
+// is removed from the baseline (a stat held at cap by OTHER gear then scores 0).
+static double ga_score( obj_index_data *pObj, const GAWeights &w,
+                        const int rawStat[6], const int capStat[6], bool worn )
 {
     double s = 0;
+    int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
     for (auto &paf: pObj->affected) {
         int m = paf->modifier;
         switch (paf->location) {
-        case APPLY_HIT:     s += w.hp   * m; break;
-        case APPLY_MANA:    s += w.mana * m; break;
-        case APPLY_DAMROLL: s += w.dr   * m; break;
-        case APPLY_HITROLL: s += w.hr   * m; break;
+        case APPLY_HIT:       s += w.hp       * m; break;
+        case APPLY_MANA:      s += w.mana     * m; break;
+        case APPLY_MANA_GAIN: s += w.manaGain * m; break;
+        case APPLY_HEAL_GAIN: s += w.healGain * m; break;
+        case APPLY_DAMROLL:   s += w.dr       * m; break;
+        case APPLY_HITROLL:   s += w.hr       * m; break;
         case APPLY_SAVES:
         case APPLY_SAVING_ROD:
         case APPLY_SAVING_PETRI:
         case APPLY_SAVING_BREATH:
         case APPLY_SAVING_SPELL: s += w.saves * (-m); break;  // lower save = better
-        case APPLY_STR: s += w.stat[0] * m; break;
-        case APPLY_INT: s += w.stat[1] * m; break;
-        case APPLY_WIS: s += w.stat[2] * m; break;
-        case APPLY_DEX: s += w.stat[3] * m; break;
-        case APPLY_CON: s += w.stat[4] * m; break;
-        case APPLY_CHA: s += w.stat[5] * m; break;
+        case APPLY_STR: statDelta[0] += m; break;
+        case APPLY_INT: statDelta[1] += m; break;
+        case APPLY_WIS: statDelta[2] += m; break;
+        case APPLY_DEX: statDelta[3] += m; break;
+        case APPLY_CON: statDelta[4] += m; break;
+        case APPLY_CHA: statDelta[5] += m; break;
         }
+    }
+    for (int k = 0; k < 6; k++) {
+        if (statDelta[k] == 0 || w.stat[k] == 0)
+            continue;
+        int base = rawStat[k] - (worn ? statDelta[k] : 0);
+        s += w.stat[k] * ga_statgain( base, statDelta[k], capStat[k] );
     }
     return s;
 }
@@ -3092,15 +3119,25 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     REMOVE_BIT( slotFilter, ITEM_TAKE );    // slot-browse mode: rank only this wear slot
     GAWeights w;
     if (profile == "melee" || profile == "agile" || profile == "hybrid") {
-        w.hp = 1.0; w.mana = 0.5; w.dr = 10.0; w.hr = 6.0; w.saves = 4.0;
+        w.hp = 1.0; w.mana = 0.1; w.manaGain = 1.0; w.healGain = 3.0; w.dr = 10.0; w.hr = 6.0; w.saves = 4.0;
         w.stat[0] = 3; w.stat[1] = 0; w.stat[2] = 0; w.stat[3] = 2; w.stat[4] = 2; w.stat[5] = 0;
     } else {                                    // caster (default)
-        w.hp = 1.0; w.mana = 1.5; w.dr = 8.0; w.hr = 2.0; w.saves = 5.0;
-        w.stat[0] = 0; w.stat[1] = 2; w.stat[2] = 3; w.stat[3] = 0; w.stat[4] = 2; w.stat[5] = 0;
+        w.hp = 1.0; w.mana = 0.5; w.manaGain = 4.0; w.healGain = 2.0; w.dr = 8.0; w.hr = 2.0; w.saves = 5.0;
+        w.stat[0] = 1; w.stat[1] = 2; w.stat[2] = 3; w.stat[3] = 1; w.stat[4] = 2; w.stat[5] = 0;
     }
 
     int chLevel  = target->getRealLevel( );
     int levelGap = target->getModifyLevel( ) - chLevel;
+
+    // Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
+    // nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
+    PCharacter *pch = target->getPC( );
+    int rawStat[6], capStat[6];
+    for (int k = 0; k < 6; k++) {
+        int sc = ga_statMap[k];
+        rawStat[k] = target->perm_stat[sc] + target->mod_stat[sc];
+        capStat[k] = pch ? pch->getMaxStat( sc ) : MAX_STAT;
+    }
 
     // Live spawned-instance count per vnum (single pass over the world).
     std::map<int,int> spawned;
@@ -3184,7 +3221,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         REMOVE_BIT( slot, ITEM_TAKE );
         if (lockedSlots & slot)          // slot held by a complete set -- out of the percentile
             continue;
-        double sc = ga_score( o->pIndexData, w );
+        double sc = ga_score( o->pIndexData, w, rawStat, capStat, true );
         if (sc > wornSlot[slot])
             wornSlot[slot] = sc;
     }
@@ -3246,7 +3283,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (IS_SET(pObj->wear_flags, ITEM_WEAR_HOOVES) && hoovesLoc && !target->getWearloc( ).isSet( hoovesLoc )) continue;
         if (IS_SET(pObj->wear_flags, ITEM_WEAR_FEET)   && feetLoc   && !target->getWearloc( ).isSet( feetLoc ))   continue;
 
-        double sc = ga_score( pObj, w );
+        double sc = ga_score( pObj, w, rawStat, capStat, false );
         if (sc <= 0)
             continue;
 
@@ -3292,19 +3329,29 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             bestSlot[slot] = sc;
     }
 
-    // Percentile: best-worn-per-slot-type vs best-available-per-slot-type (each
-    // slot-type counted once; multi-slot types like two fingers are Phase 2).
-    double wornTotal = 0;
+    // Percentile: per slot-type, worn against that slot's own ceiling (best of the
+    // worn item or the best available). Capping each slot at its own best stops a
+    // best-in-slot surplus on one slot from papering over a deficit on another, so
+    // 100% now means best-in-slot everywhere -- i.e. the optimal list is empty.
+    // Each slot-type counted once; multi-slot types (two fingers) are Phase 2.
+    std::map<int,double> slotCeil;
     for (auto &kv: wornSlot)
-        wornTotal += kv.second;
-    double bestTotal = 0;
+        slotCeil[kv.first] = kv.second;
     for (auto &kv: bestSlot)
+        if (kv.second > slotCeil[kv.first])
+            slotCeil[kv.first] = kv.second;
+
+    double wornTotal = 0, bestTotal = 0;
+    for (auto &kv: slotCeil) {
+        std::map<int,double>::iterator wi = wornSlot.find( kv.first );
+        wornTotal += (wi != wornSlot.end( )) ? wi->second : 0.0;
         bestTotal += kv.second;
+    }
 
     int pct = 0;
     if (bestTotal > 0)
         pct = (int)( 100.0 * wornTotal / bestTotal + 0.5 );
-    if (pct > 100) pct = 100;
+    if (pct > 100) pct = 100;   // guard only; the per-slot cap should keep it <=100
 
     // "best" = raw score.
     std::vector<GACand> byBest = cands;
@@ -3343,7 +3390,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             REMOVE_BIT( ws, ITEM_TAKE );
             if ((ws & slotFilter) == 0)
                 continue;
-            double sc = ga_score( o->pIndexData, w );
+            double sc = ga_score( o->pIndexData, w, rawStat, capStat, true );
             if (sc > wornScore) wornScore = sc;
         }
         std::vector<GACand> slotCands;
