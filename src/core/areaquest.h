@@ -83,6 +83,11 @@ public:
     XML_VARIABLE XMLGlobalBitvector hometowns;
     // Class restrictions for player
     XML_VARIABLE XMLGlobalBitvector classes;
+    // Gear vnums this quest yields through its Fenia handlers (a dug-up chest, a
+    // hand-out) instead of a declarative step rewardVnum. Advertised by the gear
+    // sage as a quest source; the engine never grants these (the quest's own
+    // Fenia already delivers them, so a rewardVnum here would double-give).
+    XML_VARIABLE XMLVectorBase<XMLInteger> lootVnums;
 
     AreaIndexData *pAreaIndex;
 };

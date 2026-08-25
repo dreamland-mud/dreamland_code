@@ -3178,9 +3178,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     for (::Object *o = object_list; o; o = o->next)
         spawned[o->pIndexData->vnum]++;
 
-    // Area-quest reward map: obj vnum -> quest vnum (declarative rewardVnum steps
-    // only; Fenia-generated quest rewards are a separate, deferred task). A quest
-    // reward always wins the acquisition, and is let past the special-area filter.
+    // Area-quest reward map: obj vnum -> quest vnum. Two declarative sources: a
+    // step's rewardVnum (the engine grants it) and the quest's lootVnums (gear its
+    // Fenia hands out or buries in a chest, advertised here but granted by Fenia).
+    // A quest source always wins the acquisition, and is let past the special-area
+    // filter.
     std::map<int,int> questReward;
     for (std::map<int,AreaQuest *>::iterator qk = areaQuests.begin( ); qk != areaQuests.end( ); qk++) {
         AreaQuest *q = qk->second;
@@ -3190,6 +3192,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             int rv = q->steps[s]->rewardVnum.getValue( );
             if (rv > 0 && !questReward.count( rv ))
                 questReward[rv] = q->vnum.getValue( );
+        }
+        for (int li = 0; li < (int)q->lootVnums.size( ); li++) {
+            int lv = q->lootVnums[li];
+            if (lv > 0 && !questReward.count( lv ))
+                questReward[lv] = q->vnum.getValue( );
         }
     }
 
