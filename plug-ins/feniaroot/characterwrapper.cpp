@@ -3121,10 +3121,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     REMOVE_BIT( slotFilter, ITEM_TAKE );    // slot-browse mode: rank only this wear slot
     GAWeights w;
     if (profile == "melee" || profile == "agile" || profile == "hybrid") {
-        w.hp = 1.0; w.mana = 0.1; w.manaGain = 1.0; w.healGain = 3.0; w.dr = 12.0; w.hr = 6.0; w.saves = 5.0;
+        w.hp = 1.0; w.mana = 0.1; w.manaGain = 0.05; w.healGain = 0.3; w.dr = 12.0; w.hr = 6.0; w.saves = 5.0;
         w.stat[0] = 3; w.stat[1] = 1; w.stat[2] = 1; w.stat[3] = 2; w.stat[4] = 3; w.stat[5] = 0;
     } else {                                    // caster (default)
-        w.hp = 1.0; w.mana = 0.5; w.manaGain = 4.0; w.healGain = 2.0; w.dr = 6.0; w.hr = 2.0; w.saves = 5.0;
+        w.hp = 1.0; w.mana = 0.5; w.manaGain = 0.25; w.healGain = 0.15; w.dr = 6.0; w.hr = 2.0; w.saves = 5.0;
         w.stat[0] = 1; w.stat[1] = 2; w.stat[2] = 3; w.stat[3] = 1; w.stat[4] = 3; w.stat[5] = 0;
     }
 
