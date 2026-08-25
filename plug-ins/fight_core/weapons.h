@@ -13,6 +13,7 @@ struct obj_index_data;
 Object * get_wield( Character *ch, bool secondary );
 int         get_weapon_sn( Character *ch, bool secondary );
 int          get_weapon_sn( Object *wield );
+int          get_weapon_sn( struct obj_index_data *pWield );
 Skill *  get_weapon_skill( Object *wield );
 
 /*

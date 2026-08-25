@@ -173,4 +173,32 @@ int weapon_ave(struct obj_index_data *pWield)
         return 0;
 }
 
+// Prototype form of get_weapon_sn: a prototype has no APPLY_WEAPON_CLASS affect
+// to resolve, so its base class in value0 maps straight to the wielding skill.
+// Mirrors the get_weapon_skill switch but off the prototype, the way weapon_ave
+// above has a prototype twin. Kept separate so the combat hot path stays put.
+int get_weapon_sn( struct obj_index_data *pWield )
+{
+    if (pWield == 0 || pWield->item_type != ITEM_WEAPON)
+        return gsn_hand_to_hand;
+
+    switch (pWield->value[0])
+    {
+        case WEAPON_EXOTIC:   return gsn_exotic;
+        case WEAPON_SWORD:    return gsn_sword;
+        case WEAPON_DAGGER:   return gsn_dagger;
+        case WEAPON_SPEAR:    return gsn_spear;
+        case WEAPON_MACE:     return gsn_mace;
+        case WEAPON_AXE:      return gsn_axe;
+        case WEAPON_FLAIL:    return gsn_flail;
+        case WEAPON_WHIP:     return gsn_whip;
+        case WEAPON_POLEARM:  return gsn_polearm;
+        case WEAPON_BOW:      return gsn_bow;
+        case WEAPON_ARROW:    return gsn_arrow;
+        case WEAPON_LANCE:    return gsn_lance;
+        case WEAPON_STONE:    return gsn_throwing_weapon;
+        default:              return gsn_none;
+    }
+}
+
 
