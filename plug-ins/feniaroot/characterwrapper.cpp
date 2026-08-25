@@ -44,6 +44,7 @@
 #include "save.h"
 #include "player_exp.h"
 #include "fight.h"
+#include "weapons.h"
 #include "skill_utils.h"
 #include "areaquestutils.h"
 #include "feniaquest.h"
@@ -2885,7 +2886,8 @@ NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "(vnum): поиск по вну
  * this character can ACTUALLY wear right now (native per-item-type wear level +
  * alignment) and scores it by a profile. Returns [pct, optimal[], best[]] as
  * prototype wrappers for Fenia to render: search stays in C++, output/tone in
- * Fenia. Phase 1: armour/wearables only (weapons handled later); AC not scored.
+ * Fenia. Weapons are scored by their dice scaled by the char's weapon skill
+ * (Phase 1.5); AC and weapon flags (sharp/elementals) are not scored yet.
  *--------------------------------------------------------------------------*/
 
 // Where the path to an item starts: Midgaard Market Square, the universal hub.
@@ -2959,7 +2961,7 @@ static bool ga_hasFeniaTriggers( obj_index_data *pObj )
 // rawStat[k] = the char's uncapped stat (perm+mod); capStat[k] = its cap. worn =
 // true when scoring an item the char already wears, so its own stat contribution
 // is removed from the baseline (a stat held at cap by OTHER gear then scores 0).
-static double ga_score( obj_index_data *pObj, const GAWeights &w,
+static double ga_score( Character *target, obj_index_data *pObj, const GAWeights &w,
                         const int rawStat[6], const int capStat[6], bool worn )
 {
     double s = 0;
@@ -2991,6 +2993,18 @@ static double ga_score( obj_index_data *pObj, const GAWeights &w,
             continue;
         int base = rawStat[k] - (worn ? statDelta[k] : 0);
         s += w.stat[k] * ga_statgain( base, statDelta[k], capStat[k] );
+    }
+    // Weapons: the affect loop above already counted a weapon's damroll/hitroll
+    // and stat applies, but not its main worth -- the dice it swings. Per
+    // WeaponOneHit::damBase the landed damage is dice * (20 + weaponSkill%)/100,
+    // the same per-hit currency as damroll, so weight it with the damroll weight.
+    // An unskilled weapon (a cleric holding an axe) collapses toward the 20% dice
+    // floor and scores near nothing -- which is exactly why the sage will never
+    // chase a weapon the character can't actually use.
+    if (pObj->item_type == ITEM_WEAPON) {
+        int sn = get_weapon_sn( pObj );
+        double eff = weapon_ave( pObj ) * (20 + target->getSkill( sn )) / 100.0;
+        s += w.dr * eff;
     }
     if (ga_hasFeniaTriggers( pObj ))
         s += 50;   // Fenia-triggered gear is almost always something very good.
@@ -3235,13 +3249,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (o->wear_loc == wear_none)
             continue;
         wornVnum[o->pIndexData->vnum] = 1;
-        if (o->pIndexData->item_type == ITEM_WEAPON)   // Phase 1: armour/wearables only
-            continue;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
         if (lockedSlots & slot)          // slot held by a complete set -- out of the percentile
             continue;
-        double sc = ga_score( o->pIndexData, w, rawStat, capStat, true );
+        double sc = ga_score( target, o->pIndexData, w, rawStat, capStat, true );
         if (sc > wornSlot[slot])
             wornSlot[slot] = sc;
     }
@@ -3261,8 +3273,6 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     for (int i = 0; i < MAX_KEY_HASH; i++)
     for (obj_index_data *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
         if (pObj->level > LEVEL_MORTAL)
-            continue;
-        if (pObj->item_type == ITEM_WEAPON)     // Phase 1: armour/wearables only
             continue;
         // Gear from areas a player can't normally loot -- system holders,
         // hidden/wizlock dev zones, clan halls, mansions, dungeons. Engine's own
@@ -3303,7 +3313,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (IS_SET(pObj->wear_flags, ITEM_WEAR_HOOVES) && hoovesLoc && !target->getWearloc( ).isSet( hoovesLoc )) continue;
         if (IS_SET(pObj->wear_flags, ITEM_WEAR_FEET)   && feetLoc   && !target->getWearloc( ).isSet( feetLoc ))   continue;
 
-        double sc = ga_score( pObj, w, rawStat, capStat, false );
+        double sc = ga_score( target, pObj, w, rawStat, capStat, false );
         if (sc <= 0)
             continue;
 
@@ -3404,13 +3414,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // slot (0 for an empty slot, so anything wearable qualifies there).
         double wornScore = 0;
         for (::Object *o = target->carrying; o; o = o->next_content) {
-            if (o->wear_loc == wear_none || o->pIndexData->item_type == ITEM_WEAPON)
+            if (o->wear_loc == wear_none)
                 continue;
             int ws = o->pIndexData->wear_flags;
             REMOVE_BIT( ws, ITEM_TAKE );
             if ((ws & slotFilter) == 0)
                 continue;
-            double sc = ga_score( o->pIndexData, w, rawStat, capStat, true );
+            double sc = ga_score( target, o->pIndexData, w, rawStat, capStat, true );
             if (sc > wornScore) wornScore = sc;
         }
         std::vector<GACand> slotCands;
