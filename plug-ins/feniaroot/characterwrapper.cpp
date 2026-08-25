@@ -3077,7 +3077,7 @@ static int ga_band( int method, int guard, int chLevel, int aggros, int doors, i
 // it only runs for the <=10 final picks, never the whole candidate set. Quest and
 // sourceless picks carry no path.
 static Register ga_buildEntry( GACand &c, Room *msm, int chLevel,
-                               std::map<int, std::vector<int> > &pathCache )
+                               std::map<int, std::vector<int> > &pathCache, double gain )
 {
     GAAcq &ac = c.acq;
     int aggros = 0, doors = 0, fly = 0;
@@ -3104,10 +3104,12 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel,
     e->push_back( Register( doors ) );
     e->push_back( Register( fly ) );
     e->push_back( Register( band ) );
+    // Profile-weighted score improvement over the worn item, rounded, for display.
+    e->push_back( Register( gain >= 0 ? (int)(gain + 0.5) : (int)(gain - 0.5) ) );
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit -> optimal is the top-5 for that slot only (pct 0, best empty)" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -3402,7 +3404,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
 
         RegList::Pointer slotList( NEW );
         for (size_t k = 0; k < slotCands.size( ) && k < 5; k++)
-            slotList->push_back( ga_buildEntry( slotCands[k], msm, chLevel, pathCache ) );
+            slotList->push_back( ga_buildEntry( slotCands[k], msm, chLevel, pathCache, slotCands[k].score - wornScore ) );
 
         RegList::Pointer emptyBest( NEW );
         RegList::Pointer result( NEW );
@@ -3429,7 +3431,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         optSlot[byOpt[k].slot] = 1;
         optVnum[byOpt[k].pObj->vnum] = 1;
         if (byOpt[k].score > maxOptScore) maxOptScore = byOpt[k].score;
-        optimal->push_back( ga_buildEntry( byOpt[k], msm, chLevel, pathCache ) );
+        optimal->push_back( ga_buildEntry( byOpt[k], msm, chLevel, pathCache, byOpt[k].score - wornSlot[byOpt[k].slot] ) );
         nOpt++;
     }
 
@@ -3445,7 +3447,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (optVnum.count( byBest[k].pObj->vnum )) continue;
         if (finestSlot.count( byBest[k].slot )) continue;   // one item per slot-type
         finestSlot[byBest[k].slot] = 1;
-        best->push_back( ga_buildEntry( byBest[k], msm, chLevel, pathCache ) );
+        best->push_back( ga_buildEntry( byBest[k], msm, chLevel, pathCache, byBest[k].score - wornSlot[byBest[k].slot] ) );
         nBest++;
     }
 
