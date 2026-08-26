@@ -3432,7 +3432,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         }
         std::vector<GACand> slotCands;
         for (auto &c: cands)
-            if ((c.slot & slotFilter) && c.score >= wornScore)
+            if ((c.slot & slotFilter) && c.acq.method != GA_UNKNOWN && c.score >= wornScore)
                 slotCands.push_back( c );
         std::sort( slotCands.begin( ), slotCands.end( ),
             []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
@@ -3456,6 +3456,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     int nOpt = 0;
     for (size_t k = 0; k < byOpt.size( ) && nOpt < 5; k++) {
         if (byOpt[k].value <= 0) break;
+        // No known route (not a quest reward, no reset/shop source): can't tell the
+        // char how to get it, so never put it on the chase list. Fenia-triggered gear
+        // gets a flat score boost, which can float an unobtainable downgrade up here.
+        if (byOpt[k].acq.method == GA_UNKNOWN)
+            continue;
         // Boss cap (OPTIMAL list only -- the finest/dream list still shows these):
         // don't tell the char to chase gear whose easiest route is killing/looting
         // more than 10 levels above them. Buy/quest have no such guard.
@@ -3479,6 +3484,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     int nBest = 0;
     for (size_t k = 0; k < byBest.size( ) && nBest < 5; k++) {
         if (byBest[k].score <= maxOptScore) break;
+        if (byBest[k].acq.method == GA_UNKNOWN) continue;   // a dream is still un-chaseable
         if (optVnum.count( byBest[k].pObj->vnum )) continue;
         if (finestSlot.count( byBest[k].slot )) continue;   // one item per slot-type
         double gain = byBest[k].score - wornSlot[byBest[k].slot];
