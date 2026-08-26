@@ -281,7 +281,14 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
 
     attr->gainExp(getName(), xp);
 
-    ch->pecho(_("Ты получаешь %1$d очк%1$Iо|а|ов опыта в профессии %2$N2."), xp, getRusName().c_str());
+    // Profession name pad in the recipient's language so %N declines it for
+    // EN/UA players instead of leaking the Russian name. pecho targets ch only.
+    const DLString &profName =
+        Player::displayLang(ch) == LANG_EN ? getName()
+        : (Player::displayLang(ch) == LANG_UA && !uaName.empty()) ? getUaName()
+        : getRusName();
+
+    ch->pecho(_("Ты получаешь %1$d очк%1$Iо|а|ов опыта в профессии %2$N2."), xp, profName.c_str());
 
     if (level >= maxLevel) {
         ch->save();
@@ -294,7 +301,7 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
         level++;
         attr->setProficiencyLevel(getName(), level);
         ch->pecho(_("{CТы достигаешь {Y%1$dго{C уровня мастерства в профессии {Y%2$N2{C!{x"),
-                   level, getRusName().c_str());
+                   level, profName.c_str());
 
         infonet(ch, 0, _("{CРадостный голос из $o2: {W%1$#C1 дости%1$#Gгло|г|гла новой ступени мастерства.{x"), ch);
         wiznet(WIZ_LEVELS, 0, 0, 
