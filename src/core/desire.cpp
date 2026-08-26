@@ -70,6 +70,11 @@ bool Desire::canDrink( PCharacter * )
     return true;
 }
 
+bool Desire::isFull( PCharacter * ) const
+{
+    return false;
+}
+
 /*-------------------------------------------------------------------
  * DesireManager
  *------------------------------------------------------------------*/

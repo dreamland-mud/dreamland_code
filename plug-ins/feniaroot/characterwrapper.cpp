@@ -4101,6 +4101,37 @@ NMI_INVOKE( CharacterWrapper, canDrink, "(): можно ли пить сейча
     return Register( true );
 }
 
+NMI_INVOKE( CharacterWrapper, drinkWasted, "(liqIndex): true если ВСЕ желания, что поит эта жидкость, уже заполнены -- глоток впустую (жажда/голод/алкоголь с запасом -> false)" )
+{
+    checkTarget( );
+
+    if (target->is_npc( ))
+        return Register( false );
+
+    if (args.size( ) < 1)
+        throw Scripting::NotEnoughArgumentsException( );
+
+    Liquid *liq = liquidManager->find( args.front( ).toNumber( ) );
+    if (!liq)
+        return Register( false );
+
+    PCharacter *pch = target->getPC( );
+
+    // Not wasted if the liquid feeds ANY applicable desire that still has room:
+    // covers thirst-not-full, hunger-feeding drinks (milk/juice), and alcohol
+    // (drunk below cap; a maxed drunk already stopped drink() at canDrink).
+    //   `feeds` guards the vacuous case: a liquid that feeds NO applicable desire
+    // -- salt water/ink/swill (thirst <= 0), blood for a mortal, anything but blood
+    // for a vampire -- is NOT wasted; it is a drinkable trap/flavor, let it through.
+    bool feeds = false;
+    if (desire_thirst->applicable( pch )    && liq->getDesires( )[desire_thirst->getIndex( )] > 0)    { feeds = true; if (!desire_thirst->isFull( pch ))    return Register( false ); }
+    if (desire_drunk->applicable( pch )     && liq->getDesires( )[desire_drunk->getIndex( )] > 0)     { feeds = true; if (!desire_drunk->isFull( pch ))     return Register( false ); }
+    if (desire_hunger->applicable( pch )    && liq->getDesires( )[desire_hunger->getIndex( )] > 0)    { feeds = true; if (!desire_hunger->isFull( pch ))    return Register( false ); }
+    if (desire_bloodlust->applicable( pch ) && liq->getDesires( )[desire_bloodlust->getIndex( )] > 0) { feeds = true; if (!desire_bloodlust->isFull( pch )) return Register( false ); }
+
+    return Register( feeds );
+}
+
 NMI_INVOKE(CharacterWrapper, give, "(vict,vnum|obj): дать персонажу vict предмет obj, создав его, если указан внум")
 {
     checkTarget( );

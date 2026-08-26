@@ -49,6 +49,11 @@ bool DefaultDesire::canDrink( PCharacter *ch )
     return true;
 }
 
+bool DefaultDesire::isFull( PCharacter *ch ) const
+{
+    return ch->desires[getIndex( )] >= maxValue;
+}
+
 bool DefaultDesire::canEat( PCharacter *ch )
 {
     return true;
