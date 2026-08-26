@@ -9,6 +9,7 @@
 #include "subr.h"
 
 #include "noun.h"
+#include "inflectedstring.h"
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
 #include "pcharactermemory.h"
@@ -109,6 +110,17 @@ protected:
         return skWrap->getTarget();
     }
     virtual Grammar::Noun::Pointer argNoun(int nounFlags) {
+        // Trilinguality: a %N noun arg may be a Fenia ._(ru)/.mm MultiMessage
+        // carrying a per-language declension pad (e.g. wearloc / body-part
+        // words). Resolve it to the recipient's language and build a noun from
+        // that pad -- Flexer declines it per %N case, exactly like a character
+        // or object name. Mirrors the MM handling in argStr() above. Trello 2594.
+        if (d.type == Register::OBJECT) {
+            MultiMessageWrapper *mmw = d.toHandler( ).getDynamicPointer<MultiMessageWrapper>( );
+            if (mmw != 0)
+                return InflectedString::Pointer( NEW, mmw->getMulti( ).getMessage( to ) );
+        }
+
         CharacterWrapper *chWrap = d.toHandler().getDynamicPointer<CharacterWrapper>();
         if (chWrap != 0)
             return chWrap->getTarget()->toNoun(to, nounFlags);
