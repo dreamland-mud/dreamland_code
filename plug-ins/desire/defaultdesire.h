@@ -44,6 +44,7 @@ public:
 
     virtual bool canEat( PCharacter * );
     virtual bool canDrink( PCharacter * );
+    virtual bool isFull( PCharacter * ) const;
 
 
 protected:
