@@ -308,9 +308,13 @@ bool Walkment::canControlHorse( )
 bool Walkment::checkCyclicRooms( Character *wch )
 {
     if (from_room == to_room) {
-        msgSelfParty( wch, 
+        msgSelfParty( wch,
+                      "You shuffle in place with unclear intentions... now what?",
                       "С непонятными намерениями ты топчешься на месте... и что дальше?",
-                      "%2$^C1 с непонятными намерениями топчется на одном месте." );
+                      "З незрозумілими намірами ти тупцюєш на місці... і що далі?",
+                      "%2$^C1 shuffles in place with unclear intentions.",
+                      "%2$^C1 с непонятными намерениями топчется на одном месте.",
+                      "%2$^C1 з незрозумілими намірами тупцює на одному місці." );
         return false;
     }
 
