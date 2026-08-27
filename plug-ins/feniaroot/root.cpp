@@ -30,6 +30,7 @@
 #include "weapongenerator.h"
 #include "weapontier.h"
 #include "act.h"
+#include "lang.h"
 #include "fight.h"
 #include "configurable.h"
 #include "json_utils_ext.h"
@@ -142,6 +143,26 @@ DLString regfmt(Character *to, const RegisterList &argv);
 NMI_INVOKE( Root, fmt, "(args): отформатировать строку, см. статью вики про функции вывода")
 {
     return regfmt( NULL, args );
+}
+
+NMI_INVOKE( Root, fmtLang, "(lang, fmt, args): как .fmt, но целиком рендерит в фиксированном языке lang (0=EN, 1=RU, 2=UA), включая склонение имён и %N/%C/%O, без зрителя. Для broadcast-склейки: собери по строке на каждый язык и передай их в .mm(en, ru, ua) как %s-аргумент.")
+{
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+
+    int lang = args.front( ).toNumber( );
+    if (lang < 0 || lang >= LANG_MAX)
+        throw Scripting::IllegalArgumentException( );
+
+    // Drop the leading lang arg; the tail is an ordinary (format, args...) list.
+    RegisterList rest = args;
+    rest.pop_front( );
+
+    // Force viewerLang() to `lang` for the whole synchronous render, so the
+    // format frame, any %s MultiMessage args, and declined %N/%C/%O nouns all
+    // resolve to `lang` even with a NULL recipient. Mirrors C++ fmtLang().
+    ForcedViewerLang scope( (lang_t)lang );
+    return regfmt( NULL, rest );
 }
 
 /*----------------------------------------------------------------------------
