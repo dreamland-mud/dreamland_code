@@ -285,7 +285,15 @@ Descriptor::writeMccp(const unsigned char *txt, int length)
             if (out_compress->avail_out) {
                 int status = deflate(out_compress, Z_SYNC_FLUSH);
 
-                if (status != Z_OK)
+                // Z_BUF_ERROR is not a broken stream -- it is zlib reporting "no
+                // progress", which happens benignly when the last input was fully
+                // consumed and nothing is pending (a full-buffer episode that
+                // landed exactly on COMPRESS_BUF_SIZE, then processMccp drained it).
+                // avail_in is 0 in that case, so treating it as OK lets the loop
+                // exit cleanly on its own. Before PR #1002 the caller ignored the
+                // -1 and merely lost the tail; now -1 drops the descriptor, so this
+                // would kick a live player on a rare buffer-boundary hit.
+                if (status != Z_OK && status != Z_BUF_ERROR)
                     return -1;
             }
 
