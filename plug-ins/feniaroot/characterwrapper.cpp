@@ -3038,8 +3038,10 @@ struct GAPathComplete {
 // Walk the route from 'start' to room 'destVnum' and tally the danger a player
 // meets: aggressive mobs that reset along it, locked doors crossed, and whether
 // any room needs flight. 0/0/0 for no/unreachable destination. Reset-prototype
-// view (stable), not live wandering mobs.
-static void ga_pathcost( Room *start, int destVnum, int &aggros, int &doors, int &fly )
+// view (stable), not live wandering mobs. Only mobs that would actually aggress
+// THIS char count (aggression.cpp canAggressNormal): a mob 6+ levels below the
+// char never aggresses, and nothing aggresses a vampire.
+static void ga_pathcost( Room *start, int destVnum, int chLevel, bool isVampire, int &aggros, int &doors, int &fly )
 {
     aggros = 0; doors = 0; fly = 0;
     if (!start || destVnum <= 0)
@@ -3065,11 +3067,11 @@ static void ga_pathcost( Room *start, int destVnum, int &aggros, int &doors, int
         Room *rm = rooms[i];
         if (rm->getSectorType( ) == SECT_AIR)
             fly = 1;
-        if (rm->pIndexData)
+        if (rm->pIndexData && !isVampire)
             for (ResetList::iterator pr = rm->pIndexData->resets.begin( ); pr != rm->pIndexData->resets.end( ); pr++)
                 if ((*pr)->command == 'M') {
                     MOB_INDEX_DATA *m = get_mob_index( (*pr)->arg1 );
-                    if (m && IS_SET(m->act, ACT_AGGRESSIVE))
+                    if (m && IS_SET(m->act, ACT_AGGRESSIVE) && m->level >= chLevel - 5)
                         aggros++;
                 }
     }
@@ -3108,7 +3110,7 @@ static int ga_band( int method, int guard, int chLevel, int aggros, int doors, i
 // doors, fly, band]. Path cost is computed here (cached per destination room) so
 // it only runs for the <=10 final picks, never the whole candidate set. Quest and
 // sourceless picks carry no path.
-static Register ga_buildEntry( GACand &c, Room *msm, int chLevel,
+static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire,
                                std::map<int, std::vector<int> > &pathCache, double gain )
 {
     GAAcq &ac = c.acq;
@@ -3118,7 +3120,7 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel,
         if (ci != pathCache.end( )) {
             aggros = ci->second[0]; doors = ci->second[1]; fly = ci->second[2];
         } else {
-            ga_pathcost( msm, ac.room, aggros, doors, fly );
+            ga_pathcost( msm, ac.room, chLevel, isVampire, aggros, doors, fly );
             std::vector<int> v; v.push_back( aggros ); v.push_back( doors ); v.push_back( fly );
             pathCache[ac.room] = v;
         }
@@ -3162,6 +3164,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
 
     int chLevel  = target->getRealLevel( );
     int levelGap = target->getModifyLevel( ) - chLevel;
+    // Aggressive mobs never touch a vampire, so they add no danger to its routes.
+    bool isVampire = target->getProfession( )->getName( ) == "vampire";
 
     // Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
     // nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
@@ -3187,6 +3191,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     for (std::map<int,AreaQuest *>::iterator qk = areaQuests.begin( ); qk != areaQuests.end( ); qk++) {
         AreaQuest *q = qk->second;
         if (!q)
+            continue;
+        // Outleveled quests can't be started (aquest_can_participate "too old"), so
+        // their rewards are unreachable -- don't advertise them. A too-young char is
+        // left alone: that reward is a legitimate future goal, not a dead one.
+        if (q->maxLevel.getValue( ) < LEVEL_MORTAL && target->getLevel( ) > q->maxLevel.getValue( ))
             continue;
         for (int s = 0; s < (int)q->steps.size( ); s++) {
             int rv = q->steps[s]->rewardVnum.getValue( );
@@ -3320,6 +3329,16 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (IS_SET(pObj->wear_flags, ITEM_WEAR_HOOVES) && hoovesLoc && !target->getWearloc( ).isSet( hoovesLoc )) continue;
         if (IS_SET(pObj->wear_flags, ITEM_WEAR_FEET)   && feetLoc   && !target->getWearloc( ).isSet( feetLoc ))   continue;
 
+        // A limited item crumbles to dust and never saves once the char is more than
+        // 20 levels above its level or more than 3 below it (loadsave/character.cpp
+        // keep-check, limit>0). Outside that band it can be worn but never kept, so it
+        // is not really obtainable -- keep it out of both the recs and the percentile.
+        if (pObj->limit > 0) {
+            int ml = target->getModifyLevel( );
+            if (ml > pObj->level + 20 || ml < pObj->level - 3)
+                continue;
+        }
+
         double sc = ga_score( target, pObj, w, rawStat, capStat, false );
         if (sc <= 0)
             continue;
@@ -3439,7 +3458,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
 
         RegList::Pointer slotList( NEW );
         for (size_t k = 0; k < slotCands.size( ) && k < 5; k++)
-            slotList->push_back( ga_buildEntry( slotCands[k], msm, chLevel, pathCache, slotCands[k].score - wornScore ) );
+            slotList->push_back( ga_buildEntry( slotCands[k], msm, chLevel, isVampire, pathCache, slotCands[k].score - wornScore ) );
 
         RegList::Pointer emptyBest( NEW );
         RegList::Pointer result( NEW );
@@ -3471,7 +3490,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         optSlot[byOpt[k].slot] = 1;
         optVnum[byOpt[k].pObj->vnum] = 1;
         if (byOpt[k].score > maxOptScore) maxOptScore = byOpt[k].score;
-        optimal->push_back( ga_buildEntry( byOpt[k], msm, chLevel, pathCache, byOpt[k].score - wornSlot[byOpt[k].slot] ) );
+        optimal->push_back( ga_buildEntry( byOpt[k], msm, chLevel, isVampire, pathCache, byOpt[k].score - wornSlot[byOpt[k].slot] ) );
         nOpt++;
     }
 
@@ -3490,7 +3509,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         double gain = byBest[k].score - wornSlot[byBest[k].slot];
         if (gain <= 0) continue;   // the dream list is upgrades only, never a downgrade
         finestSlot[byBest[k].slot] = 1;
-        best->push_back( ga_buildEntry( byBest[k], msm, chLevel, pathCache, gain ) );
+        best->push_back( ga_buildEntry( byBest[k], msm, chLevel, isVampire, pathCache, gain ) );
         nBest++;
     }
 
