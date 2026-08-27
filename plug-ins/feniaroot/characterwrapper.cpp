@@ -3381,7 +3381,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         c.acq = ac;
         cands.push_back( c );
 
-        if (sc > bestSlot[slot])
+        // Only gear the char can actually get sets the slot ceiling: an item with no
+        // known route (GA_UNKNOWN -- includes outleveled quest rewards) can't be
+        // obtained or worn, so it must not inflate bestSlot / drag down the percentile.
+        if (ac.method != GA_UNKNOWN && sc > bestSlot[slot])
             bestSlot[slot] = sc;
     }
 
