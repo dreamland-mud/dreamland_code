@@ -113,72 +113,55 @@ list<PCMemoryInterface *> who_find_offline(PCharacter *looker)
     return result;
 }
 
+// One immortal/coder rank cell for the 'who' left column: the rank word in the
+// viewer's language and the victim's gender, centred in the 13-wide column and
+// wrapped in its colour. RU is as authored; EN follows the Anatolia lineage level
+// names (merc.h), UA mirrors that granularity. Male form covers neuter too, as the
+// old GET_SEX calls did.
+static DLString who_rank_cell( PCharacter *viewer, PCharacter *vict, const char *colour,
+                               const char *en_m, const char *en_f,
+                               const char *ru_m, const char *ru_f,
+                               const char *ua_m, const char *ua_f )
+{
+    lang_t lang = Player::displayLang( viewer );
+    bool female = vict->getSex( ) == SEX_FEMALE;
+    const char *word;
+    if (lang == LANG_EN)      word = female ? en_f : en_m;
+    else if (lang == LANG_UA) word = female ? ua_f : ua_m;
+    else                      word = female ? ru_f : ru_m;
+
+    // Colour codes are zero-width; the KOI8 runtime is one byte per glyph, so the
+    // byte length is the visible width to centre within the 13-char cell.
+    int visible = (int) DLString( word ).size( );
+    int left  = (13 - visible) / 2;   if (left  < 0) left  = 0;
+    int right = 13 - visible - left;  if (right < 0) right = 0;
+
+    std::basic_ostringstream<char> buf;
+    buf << colour << std::string( left, ' ' ) << word << std::string( right, ' ' ) << "{x";
+    return buf.str( );
+}
+
 /** Format left column of the 'who' output, with race/class/clan. */
 static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict) 
 {
     std::basic_ostringstream<char> buf, tmp;
     bool coder = vict->getAttributes().isAvailable("coder");
 
-    if (coder && ch->isCoder( ) && vict->getLevel( ) >= LEVEL_HERO) {
+    if (coder && ch->isCoder( ) && vict->getLevel( ) >= LEVEL_HERO)
         /* visible only to each other, like vampires >8) */
-        buf << GET_SEX( vict, "{C    КОДЕР    {x",
-                              "{C    КОДЕР    {x",
-                              "{C   КОДЕРША   {x" );         
-        return buf.str( );
-    }
-    
+        return who_rank_cell( ch, vict, "{C", "Coder", "Coder", "КОДЕР", "КОДЕРША", "Кодер", "Кодерка" );
+
     switch (vict->getLevel( )) {
-
-    case MAX_LEVEL - 0: buf << GET_SEX( vict, "{W   ДЕМИУРГ   {x",
-                                              "{W   ДЕМИУРГ   {x",
-                                              "{W  ДЕМИУРГИНЯ {x" );            
-                        break;
-
-    case MAX_LEVEL - 1: buf << GET_SEX( vict, "{С  ТВОРЯЩИЙ   {x",
-                                              "{С  ТВОРЯЩИЙ   {x",
-                                              "{С  ТВОРЯЩАЯ   {x" );            
-                        break;            
-
-    case MAX_LEVEL - 2: buf << GET_SEX( vict, "{С  ТВОРЯЩИЙ   {x",
-                                              "{С  ТВОРЯЩИЙ   {x",
-                                              "{С  ТВОРЯЩАЯ   {x" );            
-                        break;
-                                       
-    case MAX_LEVEL - 3: buf << GET_SEX( vict, "{С  ТВОРЯЩИЙ   {x",
-                                              "{С  ТВОРЯЩИЙ   {x",
-                                              "{С  ТВОРЯЩАЯ   {x" );            
-                        break;
-            
-    case MAX_LEVEL - 4: buf << GET_SEX( vict, "{С     БОГ     {x",
-                                              "{С     БОГ     {x",
-                                              "{С   БОГИНЯ    {x" );            
-                        break;
-            
-    case MAX_LEVEL - 5: buf << GET_SEX( vict, "{G БЕССМЕРТНЫЙ {x",
-                                              "{G БЕССМЕРТНЫЙ {x",
-                                              "{G БЕССМЕРТНАЯ {x" );            
-                        break;
-            
-    case MAX_LEVEL - 6: buf << GET_SEX( vict, "{G   ПОЛУБОГ   {x",
-                                              "{G   ПОЛУБОГ   {x",
-                                              "{G ПОЛУБОГИНЯ  {x" );            
-                        break;
-
-    case MAX_LEVEL - 7: buf << GET_SEX( vict, "{G    АНГЕЛ    {x",
-                                              "{G    АНГЕЛ    {x",
-                                              "{G    АНГЕЛ    {x" );            
-                        break;
-
-    case MAX_LEVEL - 8: buf << GET_SEX( vict, "{G   АВАТАР    {x",
-                                              "{G   АВАТАР    {x",
-                                              "{G   АВАТАР    {x" );            
-                        break;
-                        
-    case MAX_LEVEL - 9: buf << GET_SEX( vict, "{G ЛЕГЕНДАРНЫЙ {x",
-                                              "{G ЛЕГЕНДАРНЫЙ {x",
-                                              "{y ЛЕГЕНДАРНАЯ {x" );            
-                        break;
-            
+    case MAX_LEVEL - 0: buf << who_rank_cell( ch, vict, "{W", "Implementor", "Implementor", "ДЕМИУРГ", "ДЕМИУРГИНЯ", "Деміург", "Деміургиня" ); break;
+    case MAX_LEVEL - 1: buf << who_rank_cell( ch, vict, "{C", "Creator", "Creator", "ТВОРЯЩИЙ", "ТВОРЯЩАЯ", "Творець", "Творчиня" ); break;
+    case MAX_LEVEL - 2: buf << who_rank_cell( ch, vict, "{C", "Supreme", "Supreme", "ТВОРЯЩИЙ", "ТВОРЯЩАЯ", "Верховний", "Верховна" ); break;
+    case MAX_LEVEL - 3: buf << who_rank_cell( ch, vict, "{C", "Deity", "Deity", "ТВОРЯЩИЙ", "ТВОРЯЩАЯ", "Божество", "Божество" ); break;
+    case MAX_LEVEL - 4: buf << who_rank_cell( ch, vict, "{C", "God", "Goddess", "БОГ", "БОГИНЯ", "Бог", "Богиня" ); break;
+    case MAX_LEVEL - 5: buf << who_rank_cell( ch, vict, "{G", "Immortal", "Immortal", "БЕССМЕРТНЫЙ", "БЕССМЕРТНАЯ", "Безсмертний", "Безсмертна" ); break;
+    case MAX_LEVEL - 6: buf << who_rank_cell( ch, vict, "{G", "Demigod", "Demigod", "ПОЛУБОГ", "ПОЛУБОГИНЯ", "Напівбог", "Напівбогиня" ); break;
+    case MAX_LEVEL - 7: buf << who_rank_cell( ch, vict, "{G", "Angel", "Angel", "АНГЕЛ", "АНГЕЛ", "Янгол", "Янгол" ); break;
+    case MAX_LEVEL - 8: buf << who_rank_cell( ch, vict, "{G", "Avatar", "Avatar", "АВАТАР", "АВАТАР", "Аватар", "Аватар" ); break;
+    case MAX_LEVEL - 9: buf << who_rank_cell( ch, vict, vict->getSex( ) == SEX_FEMALE ? "{y" : "{G", "Legendary", "Legendary", "ЛЕГЕНДАРНЫЙ", "ЛЕГЕНДАРНАЯ", "Легендарний", "Легендарна" ); break;
     }
 
     if (!buf.str( ).empty( ))
