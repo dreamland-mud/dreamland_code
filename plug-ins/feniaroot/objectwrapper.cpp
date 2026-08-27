@@ -690,13 +690,16 @@ NMI_INVOKE( ObjectWrapper, get_extra_descr , "(key): найти экстра-о�
     return Register();
 }
 
-NMI_INVOKE( ObjectWrapper, set_extra_descr , "(key, text): установить экстра-описание text по ключевому слову key")
+NMI_INVOKE( ObjectWrapper, set_extra_descr , "(key, text[, lang]): установить экстра-описание text по ключевому слову key на языке lang (0=en, 1=ru, 2=ua; по умолчанию ru). Повторные вызовы с одним keyword дополняют разные языковые слоты одного экстра-описания.")
 {
     checkTarget();
     DLString keyword = argnum2string(args, 1);
     DLString description = argnum2string(args, 2);
+    lang_t lang = LANG_DEFAULT;
+    if (args.size() > 2)
+        lang = argnum2lang(args, 3);
 
-    target->addExtraDescr(keyword, description, LANG_DEFAULT);    
+    target->addExtraDescr(keyword, description, lang);
     return Register( );
 }
 
