@@ -120,6 +120,12 @@ COMMAND(CClanTalk, "cb")
             << "[" << ch->getClan( )->getShortName( ) << "] " 
             << ch->getNameP('1') << ": " << argument << endl;
 
+    // Drop player-injected {h command tags before the text reaches any clanmate's screen
+    // (self-echo, garbled or plain relay, replay history). The comm log above keeps the
+    // raw text as evidence. This channel is not on the CommunicationChannel framework
+    // (its 2005 TODO), so it strips directly instead of through the base helper.
+    mudtags_strip_web( argument, ch );
+
     if (!ch->isAffected(gsn_deafen)) {
         ostringstream msgBuf;
 

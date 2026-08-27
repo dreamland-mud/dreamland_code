@@ -9,6 +9,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "l10n.h"
+#include "mudtags.h"
 
 CMDRUN( mtalk )
 {
@@ -54,10 +55,15 @@ CMDRUN( mtalk )
         buf0 << "Ты говоришь жене '{G";
     }
 
-    buf << constArguments << "{x'";
+    // Drop player-injected {h command tags before the text reaches the spouse's screen.
+    // This channel is off the CommunicationChannel framework, so it strips directly.
+    DLString msg = constArguments;
+    mudtags_strip_web( msg, ch );
+
+    buf << msg << "{x'";
     remember_history_private(victim, buf.str());
     buf << endl;
-    buf0 << constArguments << "{x'" << endl;
+    buf0 << msg << "{x'" << endl;
 
     victim->send_to( buf );
     ch->send_to( buf0 );

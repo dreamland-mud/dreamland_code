@@ -1013,3 +1013,15 @@ void mudtags_convert( const char *text, ostringstream &out, int flags, Character
         out << result;
     }
 }
+
+// Strip player-injected {h web/command tags from free text. ENFORCE_NOWEB forces the
+// visibility pass into telnet mode (setWeb(false) clears INVIS_WEB), so hyper_tag_start
+// emits no web markup and drops the command an {hc could carry -- only the plain label
+// survives. No TAGS_CONVERT_COLOR, so colour codes pass through for per-recipient render
+// downstream. ch is the speaker: a real viewer, so an injected {I/{L can't deref.
+void mudtags_strip_web( DLString &text, Character *ch )
+{
+    ostringstream buf;
+    mudtags_convert( text.c_str( ), buf, TAGS_CONVERT_VIS | TAGS_ENFORCE_NOWEB, ch );
+    text = buf.str( );
+}

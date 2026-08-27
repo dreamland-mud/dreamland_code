@@ -27,6 +27,12 @@ protected:
 
     virtual void applyGarble( Character *, DLString & ) const;
 
+    // Neutralize player-injected web/command tags ({hc, {hh, ...) in channel text
+    // so they can't reach other players' screens as clickable commands: the tag is
+    // dropped, the label and colours are kept. Mirrors what title.cpp does for
+    // player titles. Applied to the message only, never the server format.
+    void stripWeb( Character *, DLString & ) const;
+
     /** Resolve a channels.xml message in the reader's own language. Every message
      *  taken straight from the XML has to go through here, not to pecho raw. */
     DLString localized( const DLString &format, Character *reader ) const;

@@ -91,7 +91,8 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 
     DLString argGarbled = arg;
     applyGarble(ch, argGarbled);
-    
+    stripWeb(ch, argGarbled);
+
     if (needOutputSelf( ch )) {
         bool fMild = (IS_SET(ch->comm, COMM_MILDCOLOR) && !msgSelfMild.empty( ));
         bool fEmpty = (!msgListEmpty.empty( ) && listeners.size( ) == 0);
