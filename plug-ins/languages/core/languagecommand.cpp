@@ -18,6 +18,7 @@
 #include "object.h"
 
 #include "act.h"
+#include "mudtags.h"
 #include "loadsave.h"
 #include "wiznet.h"
 
@@ -183,7 +184,12 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
         ch->setWait( language->getBeats(ch) / 2 );
         return;
     }
-    
+
+    // Neutralize player-injected {h command tags in the uttered token before it is
+    // echoed to the targeted player and to bystanders -- same injection class the
+    // channel strip closes, but this command is off that framework.
+    mudtags_strip_web( arg1, ch );
+
     obj = NULL;
     victim = NULL;
     fMiss = false;

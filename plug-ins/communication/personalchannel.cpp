@@ -135,7 +135,12 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
     
     if (!parseArguments( ch, constArguments, msg, name ))
         return;
-    
+
+    // Neutralize player-injected {h tags once, before the message feeds any output OR
+    // the mob triggers below -- a "Tell" handler that echoes the text back would
+    // otherwise re-inject a live command for web recipients.
+    stripWeb( ch, msg );
+
     if (!( victim = findListener( ch, name ) ))
         return;
 

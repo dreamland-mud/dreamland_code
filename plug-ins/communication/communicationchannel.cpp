@@ -92,6 +92,14 @@ void CommunicationChannel::applyGarble( Character *ch, DLString &msg ) const
     msg = result;
 }
 
+// Strip player-injected web/command tags from channel text before it reaches any
+// recipient. Only the message is sanitized, never the server format. Shared with the
+// non-framework channels (clan `cb`, spouse `mtalk`) via the free helper.
+void CommunicationChannel::stripWeb( Character *ch, DLString &msg ) const
+{
+    mudtags_strip_web( msg, ch );
+}
+
 bool CommunicationChannel::checkIsolator( Character *ch, Character *victim ) const
 {
     if (!isolate)
