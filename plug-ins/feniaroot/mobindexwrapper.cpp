@@ -100,6 +100,18 @@ NMI_INVOKE( MobIndexWrapper, getShort, "(lang): короткое описани�
     checkTarget( );
     return Register( target->getShortDescr( argnum2lang( args, 1 ) ) );
 }
+// Per-language getters, twins of getShort. A script reverting a mob to its
+// prototype per viewer (imp doppel restore) reads long/description by lang.
+NMI_INVOKE( MobIndexWrapper, getDescr, "(lang): описание прототипа на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    return Register( target->description.get( argnum2lang( args, 1 ) ) );
+}
+NMI_INVOKE( MobIndexWrapper, getLong, "(lang): длинное описание прототипа на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    return Register( target->long_descr.get( argnum2lang( args, 1 ) ) );
+}
 NMI_GET( MobIndexWrapper, long_descr, "как моба видно в комнате") 
 { 
     checkTarget( ); 
