@@ -73,10 +73,28 @@ bool process_output( Descriptor *d, bool fPrompt )
     // ioWrite() never reached kick() and a dead descriptor went on being
     // written to every pulse for as long as the server stayed up.
     int written = d->writeRaw((const unsigned char*)d->outbuf, d->outtop);
-    
-    d->outtop = 0;
 
-    return written >= 0;
+    if (written < 0)
+        return false;
+
+    // A short write means the socket took only part of the buffer. On the raw
+    // and MCCP paths writeRaw returns bytes consumed FROM outbuf (bytes sent on
+    // the raw path, bytes fed to the compressor on the MCCP path), so keep the
+    // unsent tail and let the next pulse retry it instead of dropping a
+    // screenful of text on a briefly stalled link. write_to_buffer caps outbuf
+    // at 6*32000 and closes the descriptor on overflow, so a permanently stuck
+    // link still terminates. On the WebSocket path writeRaw returns
+    // frame-payload bytes -- a different unit -- and a half-sent frame is
+    // unrecoverable at this layer, so keep the old drop-the-buffer behaviour
+    // for WS; the real fix there is a descriptor output queue, tracked apart.
+    if (d->websock.state != WS_ESTABLISHED && written < d->outtop) {
+        memmove(d->outbuf, d->outbuf + written, d->outtop - written);
+        d->outtop -= written;
+    } else {
+        d->outtop = 0;
+    }
+
+    return true;
 }
 
 void init_descriptor( int control )
