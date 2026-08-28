@@ -309,16 +309,22 @@ struct VisibilityTags {
     
     void run( ostringstream & );
     void setWeb( bool );
+    void setKeepLang( bool );
 
-protected:    
+protected:
     void reset( );
 
     bool my_web;
+
+    // When set, {l/{n/{s language tags are emitted verbatim instead of being
+    // resolved, so channel args survive to a per-recipient render downstream.
+    bool keep_lang;
 
     enum {
         LANG_NONE,
         LANG_ENGLISH,
         LANG_RUSSIAN,
+        LANG_UKR,
     };
     void clang_tag_parse( );
     bool clang_tag_work( );
@@ -396,12 +402,40 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
 {
     this->text = text;
     this->ch = ch;
+    this->keep_lang = false;
 
-    // The four legacy per-category channels (commands/skills/names/exits) now
-    // follow the viewer's single display language ('config lang'): EN takes the
-    // English tag forms, RU and UA both take the localized (Russian) ones.
-    int tagLang = (ch && viewerLang( ch ) != LANG_EN) ? LANG_RUSSIAN : LANG_ENGLISH;
-    my_clang = my_slang = my_nlang = my_elang = tagLang;
+    // Per-category inline language tags (commands/skills/names/exits) follow the
+    // viewer's single display language ('config lang'). EN takes the English tag
+    // forms; RU takes the Russian ones. UA takes the Ukrainian ({lu/{nu/{su) forms
+    // where a string provides them, otherwise it falls back to Russian. Exits ({hs)
+    // stay binary EN-vs-localized, so UA rides Russian there.
+    lang_t vl = ch ? viewerLang( ch ) : LANG_EN;
+    my_elang = (vl != LANG_EN) ? LANG_RUSSIAN : LANG_ENGLISH;
+
+    if (vl == LANG_EN) {
+        my_clang = my_nlang = my_slang = LANG_ENGLISH;
+    } else if (vl == LANG_UA) {
+        // Single-pass renderer can't look ahead to see whether a UA segment
+        // exists, so pre-scan once: use LANG_UKR per category only when the text
+        // carries a {lu/{nu/{su for it, else fall back to Russian (legacy strings
+        // with only {le/{lr stay unchanged for UA viewers).
+        bool has_lu = false, has_nu = false, has_su = false;
+        for (const char *q = text; q[0] && q[1] && q[2]; ++q) {
+            if (q[0] != '{')
+                continue;
+            char u = q[2];
+            if (u != 'u' && u != 'U')
+                continue;
+            if (q[1] == 'l') has_lu = true;
+            else if (q[1] == 'n') has_nu = true;
+            else if (q[1] == 's') has_su = true;
+        }
+        my_clang = has_lu ? LANG_UKR : LANG_RUSSIAN;
+        my_nlang = has_nu ? LANG_UKR : LANG_RUSSIAN;
+        my_slang = has_su ? LANG_UKR : LANG_RUSSIAN;
+    } else {
+        my_clang = my_nlang = my_slang = LANG_RUSSIAN;
+    }
 
     my_sex = ch ? ch->getSex( ) : SEX_MALE;
 
@@ -443,7 +477,12 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
     reset( );
 }
 
-void VisibilityTags::setWeb(bool web) 
+void VisibilityTags::setKeepLang(bool keep)
+{
+    keep_lang = keep;
+}
+
+void VisibilityTags::setWeb(bool web)
 {
     my_web = web;
     if (my_web) {
@@ -589,12 +628,16 @@ void VisibilityTags::run( ostringstream &out )
         switch (*++p) {
         // composite two-letter tags
         case 'l':
+            // keep_lang: leave {l.. verbatim for a per-recipient render downstream.
+            if (keep_lang) { out << "{" << *p; break; }
             clang_tag_parse( );
             break;
         case 'n':
+            if (keep_lang) { out << "{" << *p; break; }
             nlang_tag_parse( );
             break;
         case 's':
+            if (keep_lang) { out << "{" << *p; break; }
             slang_tag_parse( );
             break;
         case 'A':
@@ -780,6 +823,8 @@ void VisibilityTags::clang_tag_parse( )
     case 'E': st_clang = LANG_ENGLISH; break;
     case 'r':
     case 'R': st_clang = LANG_RUSSIAN; break;
+    case 'u':
+    case 'U': st_clang = LANG_UKR; break;
     default:  --p; /* FALLTHROUGH */
     case 'X':
     case 'x': st_clang = LANG_NONE; break;
@@ -801,6 +846,8 @@ void VisibilityTags::nlang_tag_parse( )
     case 'E': st_nlang = LANG_ENGLISH; break;
     case 'r':
     case 'R': st_nlang = LANG_RUSSIAN; break;
+    case 'u':
+    case 'U': st_nlang = LANG_UKR; break;
     default:  --p; /* FALLTHROUGH */
     case 'X':
     case 'x': st_nlang = LANG_NONE; break;
@@ -822,6 +869,8 @@ void VisibilityTags::slang_tag_parse( )
     case 'E': st_slang = LANG_ENGLISH; break;
     case 'r':
     case 'R': st_slang = LANG_RUSSIAN; break;
+    case 'u':
+    case 'U': st_slang = LANG_UKR; break;
     default:  --p; /* FALLTHROUGH */
     case 'X':
     case 'x': st_slang = LANG_NONE; break;
@@ -985,10 +1034,12 @@ void mudtags_convert( const char *text, ostringstream &out, int flags, Character
         ostringstream vbuf;
         VisibilityTags vtags(text, ch);
 
-        if (IS_SET(flags, TAGS_ENFORCE_WEB)) 
+        if (IS_SET(flags, TAGS_ENFORCE_WEB))
             vtags.setWeb(true);
-        if (IS_SET(flags, TAGS_ENFORCE_NOWEB)) 
+        if (IS_SET(flags, TAGS_ENFORCE_NOWEB))
             vtags.setWeb(false);
+        if (IS_SET(flags, TAGS_KEEP_LANG))
+            vtags.setKeepLang(true);
 
         vtags.run(vbuf);
         result = vbuf.str();
@@ -1018,10 +1069,13 @@ void mudtags_convert( const char *text, ostringstream &out, int flags, Character
 // visibility pass into telnet mode (setWeb(false) clears INVIS_WEB), so hyper_tag_start
 // emits no web markup and drops the command an {hc could carry -- only the plain label
 // survives. No TAGS_CONVERT_COLOR, so colour codes pass through for per-recipient render
-// downstream. ch is the speaker: a real viewer, so an injected {I/{L can't deref.
+// downstream. TAGS_KEEP_LANG keeps {l/{n/{s intact for the same reason: channel args are
+// resolved once here with the speaker's ch, so collapsing lang tags here would freeze the
+// message to the speaker's language; instead they ride through to each listener's own
+// send_to render. ch is the speaker: a real viewer, so an injected {I/{L can't deref.
 void mudtags_strip_web( DLString &text, Character *ch )
 {
     ostringstream buf;
-    mudtags_convert( text.c_str( ), buf, TAGS_CONVERT_VIS | TAGS_ENFORCE_NOWEB, ch );
+    mudtags_convert( text.c_str( ), buf, TAGS_CONVERT_VIS | TAGS_ENFORCE_NOWEB | TAGS_KEEP_LANG, ch );
     text = buf.str( );
 }
