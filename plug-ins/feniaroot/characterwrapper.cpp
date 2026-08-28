@@ -3490,8 +3490,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
 
     RegList::Pointer optimal( NEW );
     std::map<int,int> optVnum;
-    std::map<int,int> optSlot;
-    double maxOptScore = 0;
+    std::map<int,double> optSlot;   // slot-type -> raw score of its optimal pick
     int nOpt = 0;
     for (size_t k = 0; k < byOpt.size( ) && nOpt < 5; k++) {
         if (byOpt[k].value <= 0) break;
@@ -3507,25 +3506,30 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             && byOpt[k].acq.guard > chLevel + 10)
             continue;
         if (optSlot.count( byOpt[k].slot )) continue;   // one item per slot-type
-        optSlot[byOpt[k].slot] = 1;
+        optSlot[byOpt[k].slot] = byOpt[k].score;
         optVnum[byOpt[k].pObj->vnum] = 1;
-        if (byOpt[k].score > maxOptScore) maxOptScore = byOpt[k].score;
         optimal->push_back( ga_buildEntry( byOpt[k], msm, chLevel, isVampire, pathCache, byOpt[k].score - wornSlot[byOpt[k].slot] ) );
         nOpt++;
     }
 
     // "finest" = the dream: the highest-raw item PER wear-slot-type whose raw score
-    // is STRICTLY above the best optimal target and isn't already an optimal pick.
-    // So where a slot's practical pick isn't its raw-best, the raw-best surfaces
-    // here. byBest is sorted desc; may be empty -- Fenia then omits the section.
+    // is STRICTLY above THAT SLOT'S optimal pick and isn't already an optimal pick.
+    // So where a slot's practical pick isn't its raw-best (a limited or boss-gated
+    // item out-scores the item the char is told to chase), the raw-best surfaces
+    // here. The bar is per-slot, NOT a global max: a strong pick in one slot must
+    // not suppress the whole list, and the scan must not break early on it. Slots
+    // with no optimal pick fall through to the worn score. byBest is sorted desc;
+    // may be empty -- Fenia then omits the section.
     RegList::Pointer best( NEW );
     std::map<int,int> finestSlot;
     int nBest = 0;
     for (size_t k = 0; k < byBest.size( ) && nBest < 5; k++) {
-        if (byBest[k].score <= maxOptScore) break;
         if (byBest[k].acq.method == GA_UNKNOWN) continue;   // a dream is still un-chaseable
         if (optVnum.count( byBest[k].pObj->vnum )) continue;
         if (finestSlot.count( byBest[k].slot )) continue;   // one item per slot-type
+        std::map<int,double>::iterator os = optSlot.find( byBest[k].slot );
+        double slotBar = (os != optSlot.end( )) ? os->second : wornSlot[byBest[k].slot];
+        if (byBest[k].score <= slotBar) continue;   // must beat this slot's own bar
         double gain = byBest[k].score - wornSlot[byBest[k].slot];
         if (gain <= 0) continue;   // the dream list is upgrades only, never a downgrade
         finestSlot[byBest[k].slot] = 1;
