@@ -16,6 +16,7 @@ class DLString;
 #define TAGS_ENFORCE_WEB      (D) // Convert for web client, regardless of player setttings.
 #define TAGS_ENFORCE_NOWEB    (E) // Convert for telnet, regardless of player settings.
 #define TAGS_ENFORCE_RAW      (F) // Output non-color tag as they are; don't use ANSI "clear" sequence.
+#define TAGS_KEEP_LANG        (G) // Pass {l/{n/{s language tags through untouched, to be resolved per-recipient downstream (used for channel args).
 
 /**
  * Resolve various tags inside a block of text and send result to the 'out' stream.
@@ -27,6 +28,9 @@ void mudtags_convert( const char *text, std::ostringstream &out, int flags, Char
  * (and any command an {hc carries) is dropped, the bare label and colours are kept.
  * Use on any player-authored text that will reach another player's screen -- channels,
  * clan chat, spouse chat. ch is the speaker, a valid viewer (never NULL).
+ *
+ * Language tags ({l/{n/{s) are kept intact so they resolve against each recipient's
+ * own display language at final output, not collapsed here to the speaker's language.
  */
 void mudtags_strip_web( DLString &text, Character *ch );
 
