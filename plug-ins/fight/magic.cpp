@@ -86,6 +86,7 @@
 #include "immunity.h"
 #include "material.h"
 #include "fight.h"
+#include "damage.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -120,9 +121,9 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
         case RESIST_IMMUNE:
             if (ch && verbose) {
                 if (ch != victim)
-                    ch->pecho(_("%^N1, похоже, никак не сможет навредить %C3."), damage_table.message(dam_type).c_str(), victim);
+                    ch->pecho(_("%^N1, похоже, никак не сможет навредить %C3."), damage_noun(dam_type, viewerLang(ch)).c_str(), victim);
                 else
-                    ch->pecho(_("%^N1, похоже, никак не сможет навредить тебе."), damage_table.message(dam_type).c_str());
+                    ch->pecho(_("%^N1, похоже, никак не сможет навредить тебе."), damage_noun(dam_type, viewerLang(ch)).c_str());
             }
             return true;
         case RESIST_RESISTANT:
@@ -130,10 +131,10 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
                 if (ch != victim)
                     ch->pecho(_("%^N1 {1{Gочень слабо{2 влияет на %C4."), 
-                        damage_table.message(dam_type).c_str(), victim);
+                        damage_noun(dam_type, viewerLang(ch)).c_str(), victim);
                 else 
                     ch->pecho(_("%^N1 {1{Gочень слабо{2 влияет на тебя."), 
-                        damage_table.message(dam_type).c_str());
+                        damage_noun(dam_type, viewerLang(ch)).c_str());
             }
             break;
         case RESIST_VULNERABLE:
@@ -141,10 +142,10 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
                 if (ch != victim)
                     ch->pecho(_("%^N1 {1{Rособо пагубно{2 влияет на %C4."), 
-                        damage_table.message(dam_type).c_str(), victim);
+                        damage_noun(dam_type, viewerLang(ch)).c_str(), victim);
                 else
                     ch->pecho(_("%^N1 {1{Rособо пагубно{2 влияет на тебя."), 
-                        damage_table.message(dam_type).c_str());
+                        damage_noun(dam_type, viewerLang(ch)).c_str());
             }
             break;
     }

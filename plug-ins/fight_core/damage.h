@@ -17,6 +17,11 @@ class Character;
 class Object;
 class Affect;
 
+/* Nominative damage-class noun in the viewer's language (Trello AXqNSTVz).
+ * RU falls back to the inflected damage_table noun; en/ua come from
+ * config/fight/damage_nouns.json. Defined in damage_impl.cpp. */
+DLString damage_noun(int dam_type, lang_t lang);
+
 class Damage {
 public:
     Damage( Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag = 0 );

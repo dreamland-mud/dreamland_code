@@ -121,6 +121,43 @@ CONFIGURABLE_LOADED(fight, skill_dammsg)
     }
 }
 
+/*-----------------------------------------------------------------------------
+ * Trilingual damage-class nouns (Trello AXqNSTVz)
+ *
+ * damage_table (damageflags.conf) keeps the RU inflected noun byte-identical;
+ * the en/ua nominative forms live in config/fight/damage_nouns.json, indexed
+ * 1:1 with the enumeration. The spell immune/resist lines in magic.cpp route
+ * the noun through damage_noun() so a non-RU viewer sees the damage type in
+ * their own language instead of the Russian fallback.
+ *----------------------------------------------------------------------------*/
+struct DamageNounRow {
+    DLString en, ua;
+    void fromJson(const Json::Value &v)
+    {
+        en = v["en"].asString();
+        ua = v["ua"].asString();
+    }
+};
+static json_vector<DamageNounRow> damageNouns;
+
+CONFIGURABLE_LOADED(fight, damage_nouns)
+{
+    damageNouns.fromJson(value);
+}
+
+DLString damage_noun(int dam_type, lang_t lang)
+{
+    if (dam_type >= 0 && dam_type < (int)damageNouns.size()) {
+        if (lang == LANG_EN && !damageNouns[dam_type].en.empty())
+            return damageNouns[dam_type].en;
+        if (lang == LANG_UA && !damageNouns[dam_type].ua.empty())
+            return damageNouns[dam_type].ua;
+    }
+
+    // RU, or a missing translation: fall back to the inflected RU noun.
+    return damage_table.message(dam_type);
+}
+
 void SkillDamage::message( )
 {
     const InflectedString &dammsg = skillManager->find(sn)->getDammsg( );
