@@ -518,6 +518,23 @@ NMI_INVOKE( CharacterWrapper, getShort, "(lang): короткое описани
     return Register( target->getNPC()->getShortDescr( argnum2lang(args, 1) ) );
 }
 
+// Per-language getters, twins of getShort and of the setLong/setDescr dressers.
+// A script that copies or appends to a mob's long/description per viewer (imp
+// doppel, golem creator note) needs to read the slot it is about to rewrite;
+// the plain long_descr/description getters answer LANG_DEFAULT (RU) only.
+NMI_INVOKE( CharacterWrapper, getLong, "(lang): длинное описание моба на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    CHK_PC
+    return Register( target->getNPC()->getLongDescr( argnum2lang(args, 1) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, getDescr, "(lang): описание (look mob) на языке lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    return Register( target->getDescription( argnum2lang(args, 1) ) );
+}
+
 NMI_GET( CharacterWrapper, long_descr, "длинное описание моба" )
 {
     checkTarget( );
