@@ -15,6 +15,7 @@
 
 #include "skill.h"
 #include "skillmanager.h"
+#include "skillgroup.h"
 #include "spelltarget.h"
 #include "clan.h"
 #include "behavior.h"
@@ -2941,6 +2942,7 @@ struct GAWeights {
     // used to ignore. `caster` picks the melee/caster value for profile-split flags.
     bool   caster;
     double ac, slevel, level, skillLevel, move, beats;
+    double learnSkill, learnGroup, learnAll;   // APPLY_LEARNED %, by global scope
 };
 
 struct GACand {
@@ -3093,6 +3095,13 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     // +N levels to a skill group (defensive/fightmaster/...) via af.global, or to all
     // skills when no group is named.
     case APPLY_LEVEL:       s += (af.global.empty( ) ? w.level : w.skillLevel) * m; break;
+    // +N% skill knowledge; the global scopes it to one skill, a group, or (no global)
+    // all skills -- mirrors affect_modify's APPLY_LEARNED branch.
+    case APPLY_LEARNED:
+        if (af.global.getRegistry( ) == skillManager)           s += w.learnSkill * m;
+        else if (af.global.getRegistry( ) == skillGroupManager) s += w.learnGroup * m;
+        else                                                    s += w.learnAll   * m;
+        break;
     // APPLY_AGE: cosmetic in score, no combat effect -- deliberately unscored.
     }
 
@@ -3350,6 +3359,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     w.skillLevel = 8.0;
     w.move       = 0.05;
     w.beats      = 2.0;
+    // APPLY_LEARNED (+N% skill knowledge), valued per +1% by how broad the scope is:
+    // one skill < a skill group < all skills. 187 live items carry these.
+    w.learnSkill = 0.5;
+    w.learnGroup = 1.5;
+    w.learnAll   = 2.5;
 
     // Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
     // nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
