@@ -47,6 +47,13 @@ void RaceHelp::setRace( DefaultRace::Pointer race )
     addAutoKeyword( race->getMltName( ).ruscase( '1' ) );
     if (!race->getUkrainianName( ).empty( ))
         addAutoKeyword( race->getUkrainianName( ).ruscase( '1' ) );
+    // The header shows the singular UA name (male/female); getUkrainianName above
+    // is the plural, so register the singular forms too or a Ukrainian reader
+    // could not type the very name they are shown.
+    if (!race->getMaleNameUa( ).empty( ))
+        addAutoKeyword( race->getMaleNameUa( ).ruscase( '1' ) );
+    if (!race->getFemaleNameUa( ).empty( ) && race->getFemaleNameUa( ) != race->getMaleNameUa( ))
+        addAutoKeyword( race->getFemaleNameUa( ).ruscase( '1' ) );
     labels.addTransient(LABEL_RACE);
 
     helpManager->registrate( Pointer( this ) );
@@ -158,11 +165,15 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         nameM = race->getMaleName( ).ruscase( '1' );
     }
 
+    // One name, the reader's own (with the other-gender form in parens). Drops
+    // the always-appended English name: it only added a second alphabet, and for
+    // an English reader nameF == nameM == getName() made it print the name twice
+    // ("Race human or human"). The shown name is a registered race-help keyword
+    // in every language, so it still round-trips to this article.
     in << l(ch, "Раса") << " {C" << (ch->getSex( ) == SEX_FEMALE ? nameF : nameM) << "{x";
     if (nameF != nameM)
         in << " ({C" << (ch->getSex( ) == SEX_FEMALE ? nameM : nameF) << "{x)";
-    in << " " << l(ch, "или") << " {C" << race->getName( ) << "{x "
-       << editButton(ch) << endl;
+    in << editButton(ch) << endl;
 
     const PCRace *r = race.getConstPointer<DefaultRace>()->getPC( );
     bool playable = r && r->isValid( );

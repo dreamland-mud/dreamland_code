@@ -84,8 +84,11 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
     // True if it's a help json dump and not a player requesting the article.
     bool autodump = ch->desc == 0;
 
-    in << l(ch, "Навыки и заклинания класса") << " {C" << prof->getNameFor( ch, Grammar::Case('1') ) << "{x, {C"
-       << prof->getName( ) << "{x: " << editButton(ch) << endl << endl;
+    // One name, the reader's own. This is the "skills and spells of class X"
+    // article, found by "<class> skills" keywords, so the header name is not a
+    // lookup key -- the always-appended English name only doubled the alphabet.
+    in << l(ch, "Навыки и заклинания класса") << " {C" << prof->getNameFor( ch, Grammar::Case('1') ) << "{x: "
+       << editButton(ch) << endl << endl;
 
     in << text.getForLang( Player::displayLang(ch) );
 
