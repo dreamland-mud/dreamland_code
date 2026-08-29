@@ -157,6 +157,10 @@ void char_update_affects( Character *ch );
 // race (and, for a mob, its prototype) grants but is currently missing.
 void afprog_refresh( Character *ch, bool verbose );
 
+// Defined in plug-ins/loadsave/creation.cpp. Installs/strips the perma-affects
+// a player's learned passive skills grant (perception -> detect trap). Players only.
+void passive_refresh( Character *ch, bool verbose );
+
 
 /* used for saving */
 
@@ -436,6 +440,12 @@ void char_update( )
 
         if ((ch->affected_by.getValue( ) & raceAff) != raceAff)
             afprog_refresh( ch, true );
+
+        // Perma-affects granted by a player's learned passive skills (perception
+        // -> detect trap). Cheap: a walk over a tiny precomputed pair list, with
+        // a Fenia call only on the tick a grant actually appears or disappears.
+        if (!ch->is_npc( ))
+            passive_refresh( ch, true );
 
         // Recover from 'stunned' state if HP is ok.
         if (ch->position == POS_STUNNED && !noupdate) {

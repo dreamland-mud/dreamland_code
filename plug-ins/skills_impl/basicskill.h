@@ -15,6 +15,7 @@
 #include "xmlinflectedstring.h"
 #include "xmlflags.h"
 #include "xmlmultistring.h"
+#include "xmlglobalbitvector.h"
 
 #include "skill.h"
 #include "affecthandler.h"
@@ -60,6 +61,7 @@ public:
     virtual const InflectedString &getDammsg( ) const;
     virtual int getRating( PCharacter * ) const;
     virtual bool isPassive() const;
+    virtual GlobalBitvector & getGrants();
     virtual bool isValid( ) const
     {
         return true;
@@ -106,6 +108,10 @@ public:
     XML_VARIABLE XMLPointerNoEmpty<Spell> spell;
     XML_VARIABLE XMLPointerNoEmpty<SkillCommand> command;
     XML_VARIABLE XMLPointerNoEmpty<SkillHelp> help;
+
+    // Affect types this (passive) skill grants as a permanent affect while
+    // learned. <grants registry="skill">'detect trap'</grants>. See passive_refresh.
+    XML_VARIABLE XMLGlobalBitvector grants;
 };
 
 #endif

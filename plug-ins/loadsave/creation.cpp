@@ -2,6 +2,10 @@
  *
  * ruffina, 2004
  */
+#include <map>
+#include <vector>
+#include <utility>
+
 #include "loadsave.h"
 #include "logstream.h"
 #include "save.h"
@@ -77,6 +81,97 @@ void afprog_refresh(Character *ch, bool verbose)
                 ah->onRefresh(spellTarget, verbose);
             else
                 warn("AFFECT %s not found for character %s", skill->getName().c_str(), ch->getNameC());
+        }
+    }
+}
+
+// ---- Passive-skill perma-affects (Trello #2758, phase 1) --------------------
+//
+// A passive skill can declare the affects it keeps switched on while learned:
+//   <grants registry="skill">'detect trap'</grants>
+// For each such (source skill, granted affect) pair, a player who has learned
+// the source carries the granted affect as a permanent, non-dispellable affect
+// (duration -2), installed by the granted skill's own onRefresh handler and
+// stripped again the moment no learned source still grants it.
+//
+// The pairs are precomputed once (rebuilt on skill (un)load, see
+// markPassiveGrantsDirty) so the per-tick cost is a walk over a tiny list, not
+// over every skill in the game. Players only -- mobs keep the race path above.
+
+static vector<pair<int,int> > passiveGrants; // (source sn, granted sn)
+static bool passiveGrantsDirty = true;
+
+void markPassiveGrantsDirty()
+{
+    passiveGrantsDirty = true;
+}
+
+static void rebuildPassiveGrants()
+{
+    passiveGrants.clear();
+
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        Skill *src = skillManager->find(sn);
+        if (!src->isPassive())
+            continue;
+
+        GlobalBitvector &grants = src->getGrants();
+        for (int g = 0; g < skillManager->size(); g++) {
+            if (!grants.isSet(g))
+                continue;
+
+            Skill *granted = skillManager->find(g);
+            if (!granted->getAffect()) {
+                warn("passive grant: skill '%s' grants '%s' which has no affect handler, skipped",
+                     src->getName().c_str(), granted->getName().c_str());
+                continue;
+            }
+
+            passiveGrants.push_back(pair<int,int>(sn, g));
+        }
+    }
+
+    passiveGrantsDirty = false;
+}
+
+// Reconcile a player's passive-granted perma-affects: install the ones whose
+// source is learned, strip the ones (our own -2 grants) whose source is gone.
+void passive_refresh(Character *ch, bool verbose)
+{
+    if (passiveGrantsDirty)
+        rebuildPassiveGrants();
+
+    if (passiveGrants.empty())
+        return;
+
+    // granted sn -> is any learned passive source granting it right now.
+    map<int,bool> active;
+    for (vector<pair<int,int> >::const_iterator i = passiveGrants.begin(); i != passiveGrants.end(); i++) {
+        Skill *src = skillManager->find(i->first);
+        bool learned = src->usable(ch, false) && src->getLearned(ch) > 1;
+        active[i->second] = active[i->second] || learned; // [] default-inserts false
+    }
+
+    for (map<int,bool>::const_iterator i = active.begin(); i != active.end(); i++) {
+        int grantedSn = i->first;
+        bool hasSource = i->second;
+        bool affected  = ch->isAffected(grantedSn);
+
+        if (hasSource && !affected) {
+            AffectHandler::Pointer ah = skillManager->find(grantedSn)->getAffect();
+            if (ah) {
+                SpellTarget::Pointer spellTarget(NEW, ch);
+                ah->onRefresh(spellTarget, verbose);
+            }
+        }
+        else if (!hasSource && affected) {
+            // Remove ONLY our own permanent grant(s). A positive-duration copy of
+            // the same affect (e.g. the hunter clan 'detect trap' spell) has its
+            // own owner and lifetime -- leave it in place. findAll returns a copy
+            // of the list, so removing while iterating it is safe.
+            for (auto &paf: ch->affected.findAll(grantedSn))
+                if (paf->duration.getValue() == -2)
+                    affect_remove(ch, paf, verbose);
         }
     }
 }

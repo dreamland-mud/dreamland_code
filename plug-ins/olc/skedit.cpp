@@ -189,6 +189,7 @@ void OLCStateSkill::show( PCharacter *ch )
             r->name[RU].c_str(),
             web_edit_button(ch, "runame", "web").c_str());
     ptc(ch, "Группы:      {C%s {D(group){x\r\n", r->getGroups().toString().c_str());
+    ptc(ch, "Дает:        {C%s {D(grants){x\r\n", r->getGrants().toString().c_str());
     ptc(ch, "Задержка:    {C%d{w пульсов {D(beats){x\r\n", r->getBeats());
     ptc(ch, "Цена, очки:  {C%d мана {D(mana) {C%d шаги {D(move){x \r\n", r->getMana(), r->move.getValue());
     ptc(ch, "Цена, %%:     {C%d%% мана {Dpmana) {C%d%% шаги {D(pmove) {C%d%% здоровье {D(phealth){x\r\n",
@@ -633,6 +634,12 @@ SKEDIT(group, "группа", "группа умений (? practicer)")
 {
     BasicSkill *r = getOriginal();
     return globalBitvectorEdit<SkillGroup>(r->getGroups());
+}
+
+SKEDIT(grants, "дает", "постоянные аффекты, которые пассивное умение держит включенными (? skill)")
+{
+    BasicSkill *r = getOriginal();
+    return globalBitvectorEdit<Skill>(r->getGrants());
 }
 
 SKEDIT(ukrname, "укримя", "украинское имя команды")

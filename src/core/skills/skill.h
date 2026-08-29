@@ -45,6 +45,10 @@ public:
     virtual const DLString &getRussianName( ) const;
     virtual GlobalBitvector & getGroups();
     bool hasGroup(unsigned int group);
+    // Affect types this skill grants as a permanent affect while it is learned
+    // (perception -> 'detect trap'). Base returns empty; BasicSkill overrides.
+    // Consumed by passive_refresh (creation.cpp) for passive skills.
+    virtual GlobalBitvector & getGrants();
     // Affect-panel presentation (web client). Base returns empty: an affect only shows
     // in the panel if its skill sets webColumn, or the builder auto-classifies it.
     virtual const DLString & getWebColumn( ) const;
@@ -81,6 +85,7 @@ public:
     virtual int getCategory( ) const;
 
     static GlobalBitvector zeroGroups;
+    static GlobalBitvector zeroGrants;
 protected:
     DLString elementName;
 };
