@@ -1,5 +1,8 @@
 #include "behaviorwrapper.h"
 #include "behavior.h"
+#include "setbehavior.h"
+#include "affectwrapper.h"
+#include "affect.h"
 #include "json_utils_ext.h"
 
 #include "wrappermanager.h"
@@ -115,10 +118,58 @@ NMI_GET(BehaviorWrapper, target, "чье поведение: obj, mob, room")
     return Register(target->target.name());
 }
 
-NMI_GET(BehaviorWrapper, props, "Map (структура) из свойств поведения") 
+NMI_GET(BehaviorWrapper, props, "Map (структура) из свойств поведения")
 {
     checkTarget();
     return JsonUtils::toIdContainer(target->props);
+}
+
+NMI_GET(BehaviorWrapper, setAffects, "список (List) аффектов, которые дает собранный набор (структура .Affect); пусто для не-наборов")
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    SetBehavior *sb = dynamic_cast<SetBehavior *>(target);
+    if (sb) {
+        for (auto &sa: sb->affects) {
+            Affect af;
+            sa.fill(af);
+            rc->push_back( AffectWrapper::wrap( af ) );
+        }
+    }
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate();
+    sobj->setHandler(rc);
+    return Register( sobj );
+}
+
+NMI_INVOKE(BehaviorWrapper, getSetMessage, "(lang): сообщение при сборке набора на языке lang (0=en,1=ru,2=ua); пусто для не-наборов")
+{
+    checkTarget();
+    SetBehavior *sb = dynamic_cast<SetBehavior *>(target);
+    if (!sb)
+        return Register(DLString::emptyString);
+
+    return Register( sb->getMsgComplete( argnum2lang(args, 1) ) );
+}
+
+NMI_GET(BehaviorWrapper, setSkills, "список (List) названий умений, которые дает собранный набор; пусто для не-наборов")
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    SetBehavior *sb = dynamic_cast<SetBehavior *>(target);
+    if (sb) {
+        for (auto &ref: sb->grantSkills) {
+            Skill *sk = ref.getElement();
+            if (sk != 0)
+                rc->push_back( Register( sk->getName() ) );
+        }
+    }
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate();
+    sobj->setHandler(rc);
+    return Register( sobj );
 }
 
 NMI_INVOKE(BehaviorWrapper, api, "(): печатает этот API")
