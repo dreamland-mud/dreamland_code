@@ -241,6 +241,10 @@ public:
     Character *                        last_fought;
     Descriptor *                desc;
     AffectList                  affected;
+    // Runtime-only cache (never saved): skill types granted by worn items as
+    // permanent affects, so isAffected sees them without materializing an entry
+    // in `affected`. Rebuilt on every equip/unequip. Perma-affects engine #2758.
+    GlobalBitvector             eqAffects;
     Object *                        carrying;
     Object *                        on;
     Room *                        in_room;

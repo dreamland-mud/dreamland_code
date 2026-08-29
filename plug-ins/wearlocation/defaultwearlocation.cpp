@@ -157,13 +157,49 @@ bool DefaultWearlocation::equip( Object *obj )
     return true;
 }
 
+// Rebuild the wearer's eqAffects cache from scratch: the union of grant-typed
+// affects (a real skill type, index > 0) on every worn item's PROTOTYPE affect
+// list. Cheap -- worn items x their few affects -- and always correct, so it runs
+// after any equip or unequip (the only events that change the worn set).
+// Perma-affects derived model, #2758 phase 2.
+//
+// Two deliberate restrictions, both correctness-critical (fable review
+// 2026-08-29):
+//  * givesAffects() only -- skips wear_none and the flavor slots (hair/personal/
+//    tail), whose items apply nothing; scanning them would let a grant item parked
+//    in the purchasable personal slot confer its grant for free.
+//  * pIndexData->affected only -- BOTH grant channels (<grant> in area XML and
+//    oedit addgrant) write PROTOTYPE affects. Instance affects legitimately carry
+//    a real skill type as long-standing bookkeeping (WeaponGenerator types every
+//    generated weapon's affects with its weapon-class skill; ruler items; ~17
+//    runObj spell affects). Those are NOT grants; unioning them would make wearers
+//    isAffected(katana/bless/curse/...) and break real gates (katana craft
+//    cooldown, "already blessed", etc.). So the instance list is never scanned.
+static void rebuild_eq_affects( Character *ch )
+{
+    ch->eqAffects.clear( );
+
+    for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content) {
+        if (!obj->wear_loc->givesAffects( ))
+            continue;
+
+        for (auto &paf: obj->pIndexData->affected) {
+            Skill *g = paf->type.getElement( );
+            if (g != 0 && g->getIndex( ) > 0)
+                ch->eqAffects.set( g->getIndex( ) );
+        }
+    }
+}
+
 void DefaultWearlocation::affectsOnEquip( Character *ch, Object *obj )
-{       
+{
     for (auto &paf: obj->pIndexData->affected)
         affect_modify( ch, paf, true );
 
     for (auto &paf: obj->affected)
         affect_modify( ch, paf, true );
+
+    rebuild_eq_affects( ch );
 }
 
 static bool oprog_cant_equip( Object *obj, Character *ch )
@@ -289,6 +325,8 @@ void DefaultWearlocation::affectsOnUnequip( Character *ch, Object *obj )
         affect_modify( ch, paf, false );
         affect_check(ch, paf);
     }
+
+    rebuild_eq_affects( ch );
 }
 
 void DefaultWearlocation::triggersOnUnequip( Character *ch, Object *obj )
