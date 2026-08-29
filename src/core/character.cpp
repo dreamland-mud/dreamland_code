@@ -543,7 +543,9 @@ Character * Character::getDoppel( const Character *looker )
 
 bool Character::isAffected( int sn ) const
 {
-    return affected.find(sn) != 0;
+    // A worn item can grant an affect type without materializing an entry in
+    // `affected` (perma-affects derived model, #2758): eqAffects carries those.
+    return affected.find(sn) != 0 || eqAffects.isSet(sn);
 }
 
 void Character::dismount( )

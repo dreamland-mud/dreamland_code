@@ -323,6 +323,11 @@ OEDIT(show)
             }
         }
 
+        // Perma-affect grant (#2758): a real skill type means the item confers it.
+        Skill *grantSkill = paf->type.getElement();
+        if (grantSkill != 0 && grantSkill->getIndex() > 0)
+            ptc(ch, "  {Cgrants %s{x", grantSkill->getName().c_str());
+
         ptc(ch, "\n\r");
         cnt++;
     }
@@ -473,6 +478,63 @@ OEDIT(addaffect)
     pObj->affected.push_front(pAf);
 
     stc("Affect added.\n\r", ch);
+    return true;
+}
+
+// Perma-affects engine (#2758 phase 2): make the item permanently grant a
+// skill/affect to its wearer. Unlike addaffect this stamps the affect's TYPE, so
+// isAffected/identify recognise it; an optional flag bit can ride along.
+OEDIT(addgrant)
+{
+    OBJ_INDEX_DATA *pObj;
+    Affect *pAf;
+    const FlagTable *table = 0;
+    bitstring_t bit = 0;
+    DLString args = argument;
+    DLString buf = args.getOneArgument();
+
+    EDIT_OBJ(ch, pObj);
+
+    if (buf.empty()) {
+        stc("Syntax:  addgrant <skill> [table bit]\n\r", ch);
+        stc("The item permanently grants the named skill/affect to its wearer.\n\r", ch);
+        stc("Optionally also set a flag bit, e.g.:  addgrant sanctuary affect_flags sanctuary\n\r", ch);
+        return false;
+    }
+
+    Skill *skill = skillManager->findExisting(buf);
+    if (skill == 0) {
+        ptc(ch, "Skill/affect '%s' not found.\r\n", buf.c_str());
+        return false;
+    }
+
+    buf = args.getOneArgument();
+    if (!buf.empty()) {
+        table = FlagTableRegistry::getTable(buf);
+        if (table == 0) {
+            ptc(ch, "Unknown flag table '%s' (affect_flags, detect_flags, ...).\r\n", buf.c_str());
+            return false;
+        }
+        bit = table->bitstring(args);
+        if (bit == NO_FLAG) {
+            ptc(ch, "Invalid flag, see 'olchelp %s'.\r\n", buf.c_str());
+            return false;
+        }
+    }
+
+    pAf = AffectManager::getThis()->getAffect();
+    pAf->type.assign(skill->getIndex());
+    pAf->duration = -1;
+    pAf->location = APPLY_NONE;
+    pAf->location.setTable(&apply_flags);
+    pAf->modifier = 0;
+    pAf->bitvector.setTable(table);
+    pAf->bitvector.setValue(bit);
+
+    pObj->affected.push_front(pAf);
+
+    ptc(ch, "Grant added: the item now confers '%s'%s.\r\n",
+        skill->getName().c_str(), bit != 0 ? " with a flag bit" : "");
     return true;
 }
 

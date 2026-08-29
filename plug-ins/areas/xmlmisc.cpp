@@ -220,13 +220,22 @@ XMLAffect::init(Affect *pAf)
     global.set(pAf->global);
     apply.location = pAf->location;
     apply.setValue(pAf->modifier);
+
+    // Record an intentional grant (a real skill type, index > 0). Legacy affects
+    // carry type gsn_none (index 0) or -1 (resolves to none) -- leave grant as
+    // "none" so toXML writes no <grant> node (no asave noise).
+    Skill *g = pAf->type.getElement();
+    if (g != 0 && g->getIndex() > 0)
+        grant.assign(g->getIndex());
+    else
+        grant.setName("none");
 }
 
 Affect *
 XMLAffect::compat()
 {
     Affect *paf = AffectManager::getThis()->getAffect();
-    
+
     paf->type.assign(gsn_none);
     paf->duration = -1;
     paf->bitvector.setTable(bits.getTable());
@@ -236,6 +245,13 @@ XMLAffect::compat()
     paf->location.setTable(&apply_flags);
     paf->location = apply.location;
     paf->modifier = apply.getValue( );
+
+    // An authored <grant> sets the affect type to the granted skill, so the
+    // wearer's eqAffects cache and identify can see it. Absent/none leaves the
+    // legacy gsn_none type untouched.
+    Skill *g = grant.getElement();
+    if (g != 0 && g->getIndex() > 0)
+        paf->type.assign(g->getIndex());
 
     return paf;
 }

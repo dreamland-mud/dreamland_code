@@ -14,6 +14,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlglobalbitvector.h"
 #include "xmlmultistring.h"
+#include "skillreference.h"
 
 struct XMLArmor {
     XMLArmor( );
@@ -85,6 +86,10 @@ public:
     XML_VARIABLE XMLFlagsWithTable bits;
     XML_VARIABLE XMLApply apply;
     XML_VARIABLE XMLGlobalBitvector global;
+    // Optional: the skill/affect this item permanently grants its wearer (perma-affects
+    // engine, #2758 phase 2). Absent on every legacy affect -> full back-compat, no asave
+    // noise. Maps to Affect::type; read into the wearer's eqAffects cache on equip.
+    XML_VARIABLE XMLSkillReference grant;
 };
 
 class XMLExitBase : public XMLVariableContainer {
