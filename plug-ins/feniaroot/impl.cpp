@@ -10,6 +10,7 @@
 #include "xmlvariableregistrator.h"
 #include "commandtableloader.h"
 #include "behaviorloader.h"
+#include "setbehavior.h"
 #include "mocregistrator.h"
 #include "so.h"
 
@@ -26,6 +27,7 @@ extern "C"
         Plugin::registerPlugin<CommandTableLoader>(ppl);
         Plugin::registerPlugin<XMLVariableRegistrator<BehaviorHelp> >( ppl );
         Plugin::registerPlugin<MocRegistrator<DefaultBehavior> >(ppl);
+        Plugin::registerPlugin<MocRegistrator<SetBehavior> >(ppl);
         Plugin::registerPlugin<BehaviorLoader>(ppl);
         
         return ppl;

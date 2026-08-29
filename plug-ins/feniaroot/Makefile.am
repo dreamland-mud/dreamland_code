@@ -43,6 +43,7 @@ codesourcerepo.cpp \
 evalservlet.cpp \
 behaviorwrapper.cpp \
 behaviorloader.cpp \
+setbehavior.cpp \
 wordeffectwrapper.cpp \
 playerwrapper.cpp \
 multimessagewrapper.cpp
@@ -69,6 +70,7 @@ autoquestwrapper.h \
 characterwrapper.h \
 behaviorwrapper.h \
 behaviorloader.h \
+setbehavior.h \
 wordeffectwrapper.h \
 playerwrapper.h
 
