@@ -2937,6 +2937,10 @@ static void ga_record( std::map<int,GAAcq> &acq, int vnum, int method, int aux, 
 struct GAWeights {
     double hp, mana, manaGain, healGain, dr, hr, saves;
     double stat[6];   // str, int, wis, dex, con, cha
+    // Phase 3b / F3 additions: affect flags, res/imm/vuln, and the applies ga_score
+    // used to ignore. `caster` picks the melee/caster value for profile-split flags.
+    bool   caster;
+    double ac, slevel, level, skillLevel, move, beats;
 };
 
 struct GACand {
@@ -2974,9 +2978,91 @@ static bool ga_hasFeniaTriggers( obj_index_data *pObj )
     return !triggers.empty( );
 }
 
+// Value of an affect_flags bitvector (sanctuary/haste/stealth; negatives are
+// cursed-gear penalties). Profile-split where it matters. Values + rationale:
+// GEAR_AFFECT_VALUES.md. Owner overrides folded in (imp_invis/camouflage/fade=100,
+// stun=-100). Concentration is a Fenia onEquip skill, not a flag -- deferred to 3c.
+static double ga_affectFlagValue( bitstring_t b, bool caster )
+{
+    double s = 0;
+    if (IS_SET(b, AFF_SANCTUARY))    s += 300;
+    if (IS_SET(b, AFF_HASTE))        s += caster ? 40 : 110;
+    if (IS_SET(b, AFF_SLOW))         s += caster ? -10 : -55;
+    if (IS_SET(b, AFF_PROTECT_EVIL)) s += 60;
+    if (IS_SET(b, AFF_PROTECT_GOOD)) s += 60;
+    if (IS_SET(b, AFF_REGENERATION)) s += caster ? 15 : 30;
+    if (IS_SET(b, AFF_FLYING))       s += 15;
+    if (IS_SET(b, AFF_PASS_DOOR))    s += 15;
+    if (IS_SET(b, AFF_INVISIBLE))    s += 15;
+    if (IS_SET(b, AFF_IMP_INVIS))    s += 100;
+    if (IS_SET(b, AFF_CAMOUFLAGE))   s += 100;
+    if (IS_SET(b, AFF_FADE))         s += 100;
+    if (IS_SET(b, AFF_SNEAK))        s += caster ? 8 : 12;
+    if (IS_SET(b, AFF_HIDE))         s += 6;
+    if (IS_SET(b, AFF_INFRARED))     s += 8;
+    // Cursed-item penalties.
+    if (IS_SET(b, AFF_STUN))         s += -100;
+    if (IS_SET(b, AFF_WEAK_STUN))    s += -40;
+    if (IS_SET(b, AFF_BLIND))        s += -200;
+    if (IS_SET(b, AFF_SLEEP))        s += -250;
+    if (IS_SET(b, AFF_CHARM))        s += -250;
+    if (IS_SET(b, AFF_CURSE))        s += -35;
+    if (IS_SET(b, AFF_POISON))       s += -45;
+    if (IS_SET(b, AFF_PLAGUE))       s += -60;
+    if (IS_SET(b, AFF_CALM))         s += caster ? -5 : -25;
+    if (IS_SET(b, AFF_WEAKEN))       s += -10;
+    if (IS_SET(b, AFF_FAERIE_FIRE))  s += -15;
+    return s;
+}
+
+// Pick the res/imm/vuln column. kind: 0=resist, 1=immune, 2=vulnerable.
+static double ga_rv( int kind, double r, double i, double v )
+{
+    return kind == 1 ? i : (kind == 2 ? v : r);
+}
+
+// Value of a res/imm/vuln bitvector. The three tables share bit positions
+// (immune_from_flags tests ONE bit against imm/res/vuln alike), so IMM_* constants
+// index every table. Resists DO NOT stack (immunity.cpp: a binary RESISTANT bit):
+// res_weapon is the sole physical channel, so bash/pierce/slash are LOW; weapon and
+// spell are the broad channels; elemental/magic types are share-based by how often
+// that damage is dealt to players. spell==magic==prayer collapse -- count once.
+// GEAR_AFFECT_VALUES.md.
+static double ga_resValue( bitstring_t b, int kind )
+{
+    double s = 0;
+    if (IS_SET(b, IMM_WEAPON))                             s += ga_rv(kind, 140, 420, -420);
+    if (IS_SET(b, IMM_SPELL) || IS_SET(b, IMM_MAGIC) || IS_SET(b, IMM_PRAYER))
+                                                           s += ga_rv(kind, 50, 150, -150);
+    if (IS_SET(b, IMM_BASH))                               s += ga_rv(kind, 10, 30, -10);
+    if (IS_SET(b, IMM_PIERCE))                             s += ga_rv(kind, 8, 24, -10);
+    if (IS_SET(b, IMM_SLASH))                              s += ga_rv(kind, 8, 24, -10);
+    if (IS_SET(b, IMM_FIRE))                               s += ga_rv(kind, 13, 40, -40);
+    if (IS_SET(b, IMM_ENERGY))                             s += ga_rv(kind, 13, 40, -40);
+    if (IS_SET(b, IMM_NEGATIVE))                           s += ga_rv(kind, 10, 29, -29);
+    if (IS_SET(b, IMM_LIGHTNING))                          s += ga_rv(kind, 7, 21, -21);
+    if (IS_SET(b, IMM_ACID))                               s += ga_rv(kind, 7, 20, -20);
+    if (IS_SET(b, IMM_HOLY))                               s += ga_rv(kind, 5, 16, -16);
+    if (IS_SET(b, IMM_COLD))                               s += ga_rv(kind, 4, 11, -11);
+    if (IS_SET(b, IMM_POISON))                             s += ga_rv(kind, 3, 18, -8);
+    if (IS_SET(b, IMM_CHARM))                              s += ga_rv(kind, 5, 15, -15);
+    if (IS_SET(b, IMM_MENTAL))                             s += ga_rv(kind, 2, 7, -8);
+    if (IS_SET(b, IMM_DISEASE))                            s += ga_rv(kind, 2, 16, -8);
+    if (IS_SET(b, IMM_DROWNING))                           s += ga_rv(kind, 2, 7, -8);
+    if (IS_SET(b, IMM_LIGHT))                              s += ga_rv(kind, 2, 5, -8);
+    if (IS_SET(b, IMM_SOUND))                              s += ga_rv(kind, 1, 4, -8);
+    if (IS_SET(b, IMM_SUMMON))                             s += ga_rv(kind, 3, 8, -8);
+    if (IS_SET(b, IMM_IRON))                               s += ga_rv(kind, 9, 28, -28);
+    if (IS_SET(b, IMM_WOOD))                               s += ga_rv(kind, 9, 28, -28);
+    if (IS_SET(b, IMM_SILVER))                             s += ga_rv(kind, 1, 3, -8);
+    if (IS_SET(b, IMM_MITHRIL))                            s += ga_rv(kind, 1, 2, -8);
+    return s;
+}
+
 // One affect's profile-weighted worth: flat pools (hp/mana/regen/dr/hr/saves) fold
 // into s; the six primary stats accumulate into statDelta[] for the caller to
-// resolve cap-aware. Shared by ga_score (item affects) and ga_setValue (set bonus).
+// resolve cap-aware; ac/slevel/level/move/beats and any flag/res bits fold in here
+// too. Shared by ga_score (item affects) and ga_setValue (set bonus).
 static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6] )
 {
     int m = af.modifier;
@@ -2998,6 +3084,31 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     case APPLY_DEX: statDelta[3] += m; break;
     case APPLY_CON: statDelta[4] += m; break;
     case APPLY_CHA: statDelta[5] += m; break;
+    case APPLY_AC:          s += w.ac     * (-m); break;   // negative ac = better; w.ac level-scaled
+    case APPLY_SPELL_LEVEL: s += w.slevel * m; break;
+    case APPLY_MOVE:        s += w.move   * m; break;
+    case APPLY_BEATS:       s += w.beats  * (-m); break;   // shorter skill lag = better
+    // +N levels to a skill group (defensive/fightmaster/...) via af.global, or to all
+    // skills when no group is named.
+    case APPLY_LEVEL:       s += (af.global.empty( ) ? w.level : w.skillLevel) * m; break;
+    // APPLY_AGE: cosmetic in score, no combat effect -- deliberately unscored.
+    }
+
+    // Flag affects: sanctuary/haste/stealth (affect_flags) and resist/immune/vuln
+    // (res/imm/vuln_flags) live in the affect's bitvector, not location/modifier. An
+    // APPLY_BITVECTOR affect with a negative modifier REMOVES the flag, so its worth
+    // is negated (stripping a curse is good, stripping sanctuary is bad).
+    const FlagTable *ft = af.bitvector.getTable( );
+    bitstring_t bits = af.bitvector;
+    if (ft != 0 && bits != 0) {
+        double fv = 0;
+        if (ft == &affect_flags)    fv = ga_affectFlagValue( bits, w.caster );
+        else if (ft == &res_flags)  fv = ga_resValue( bits, 0 );
+        else if (ft == &imm_flags)  fv = ga_resValue( bits, 1 );
+        else if (ft == &vuln_flags) fv = ga_resValue( bits, 2 );
+        if (af.location == APPLY_BITVECTOR && af.modifier < 0)
+            fv = -fv;
+        s += fv;
     }
 }
 
@@ -3216,15 +3327,29 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     if (profile == "melee" || profile == "agile" || profile == "hybrid") {
         w.hp = 1.0; w.mana = 0.1; w.manaGain = 0.05; w.healGain = 0.3; w.dr = 12.0; w.hr = 6.0; w.saves = 5.0;
         w.stat[0] = 3; w.stat[1] = 1; w.stat[2] = 1; w.stat[3] = 2; w.stat[4] = 3; w.stat[5] = 0;
+        w.caster = false;
     } else {                                    // caster (default)
         w.hp = 1.0; w.mana = 0.5; w.manaGain = 0.25; w.healGain = 0.15; w.dr = 6.0; w.hr = 2.0; w.saves = 5.0;
         w.stat[0] = 1; w.stat[1] = 2; w.stat[2] = 3; w.stat[3] = 1; w.stat[4] = 3; w.stat[5] = 0;
+        w.caster = true;
     }
 
     int chLevel  = target->getRealLevel( );
     int levelGap = target->getModifyLevel( ) - chLevel;
     // Aggressive mobs never touch a vampire, so they add no danger to its routes.
     bool isVampire = target->getProfession( )->getName( ) == "vampire";
+
+    // F3 applies. ac is near-useless except at low level (owner call): 0.5/pt at
+    // level 1 decaying linearly to 0 by level 40. slevel is caster-heavy; a skill-
+    // group +level and a raw +level are both strong; move is a token; beats (skill
+    // lag) is small. Flag/res values are level-independent (see ga_affectFlagValue /
+    // ga_resValue).
+    w.ac         = 0.5 * std::max( 0, 40 - chLevel ) / 39.0;
+    w.slevel     = w.caster ? 8.0 : 1.0;
+    w.level      = 12.0;
+    w.skillLevel = 8.0;
+    w.move       = 0.05;
+    w.beats      = 2.0;
 
     // Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
     // nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
