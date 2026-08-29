@@ -36,7 +36,7 @@ Skill * skillref_to_pointer(const XMLSkillReference &);
  */
 char skill_learned_colour(const Skill *, PCharacter *ch);
 
-/** Return rus and eng names for the skill, ordered according to 'config ruskill'. */
+/** Return the skill's name in the reader's own language, for the help header. */
 DLString print_names_for(const Skill *skill, Character *ch);
 
 /** Return "Skill" or "Spell" string for the help header. */
