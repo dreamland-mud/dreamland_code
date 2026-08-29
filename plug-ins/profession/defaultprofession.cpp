@@ -261,10 +261,10 @@ static DLString raceMltNameFor( Race *race, Character *ch, char gcase )
 
 void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    // One name, the reader's own: prof->getNameFor is matchable in every
-    // language (GlobalRegistryElement::matchesStrict checks EN/RU/UA), so the
-    // class can still be typed by the shown name and the old always-appended
-    // English second name only put two alphabets in one header line.
+    // One name, the reader's own: getNameFor returns a form that setProfession
+    // registered as a help keyword in every viewer language (EN, RU, UA), so the
+    // reader can always type the shown name and land back on this article. The
+    // old always-appended English second name only put two alphabets in one line.
     in << l(ch, "Класс") << " {C" << prof->getNameFor( ch, Grammar::Case('1') ) << "{x"
        << editButton(ch) << endl << endl;
 
