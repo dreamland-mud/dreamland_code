@@ -261,8 +261,11 @@ static DLString raceMltNameFor( Race *race, Character *ch, char gcase )
 
 void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    in << l(ch, "Класс") << " {C" << prof->getNameFor( ch, Grammar::Case('1') ) << "{x " << l(ch, "или") << " {C"
-       << prof->getName( ) << "{x"
+    // One name, the reader's own: getNameFor returns a form that setProfession
+    // registered as a help keyword in every viewer language (EN, RU, UA), so the
+    // reader can always type the shown name and land back on this article. The
+    // old always-appended English second name only put two alphabets in one line.
+    in << l(ch, "Класс") << " {C" << prof->getNameFor( ch, Grammar::Case('1') ) << "{x"
        << editButton(ch) << endl << endl;
 
     in << text.getForLang( Player::displayLang(ch) ) << endl;
