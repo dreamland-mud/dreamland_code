@@ -3000,6 +3000,7 @@ static double ga_affectFlagValue( bitstring_t b, bool caster )
     if (IS_SET(b, AFF_SNEAK))        s += caster ? 8 : 12;
     if (IS_SET(b, AFF_HIDE))         s += 6;
     if (IS_SET(b, AFF_INFRARED))     s += 8;
+    if (IS_SET(b, AFF_SWIM))         s += 4;
     // Cursed-item penalties.
     if (IS_SET(b, AFF_STUN))         s += -100;
     if (IS_SET(b, AFF_WEAK_STUN))    s += -40;
@@ -3007,6 +3008,7 @@ static double ga_affectFlagValue( bitstring_t b, bool caster )
     if (IS_SET(b, AFF_SLEEP))        s += -250;
     if (IS_SET(b, AFF_CHARM))        s += -250;
     if (IS_SET(b, AFF_CURSE))        s += -35;
+    if (IS_SET(b, AFF_CORRUPTION))   s += -50;
     if (IS_SET(b, AFF_POISON))       s += -45;
     if (IS_SET(b, AFF_PLAGUE))       s += -60;
     if (IS_SET(b, AFF_CALM))         s += caster ? -5 : -25;
@@ -3095,20 +3097,18 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     }
 
     // Flag affects: sanctuary/haste/stealth (affect_flags) and resist/immune/vuln
-    // (res/imm/vuln_flags) live in the affect's bitvector, not location/modifier. An
-    // APPLY_BITVECTOR affect with a negative modifier REMOVES the flag, so its worth
-    // is negated (stripping a curse is good, stripping sanctuary is bad).
+    // (res/imm/vuln_flags) live in the affect's bitvector, not location/modifier.
+    // `affect_modify` ADDS these bits regardless of the modifier sign -- removal on a
+    // negative modifier is implemented only for part_flags (loadsave/affects.cpp),
+    // which we score 0 anyway. So score the flag as GRANTED, never negated (a display
+    // that says "отнимает" on such an item is lying about what the engine does).
     const FlagTable *ft = af.bitvector.getTable( );
     bitstring_t bits = af.bitvector;
     if (ft != 0 && bits != 0) {
-        double fv = 0;
-        if (ft == &affect_flags)    fv = ga_affectFlagValue( bits, w.caster );
-        else if (ft == &res_flags)  fv = ga_resValue( bits, 0 );
-        else if (ft == &imm_flags)  fv = ga_resValue( bits, 1 );
-        else if (ft == &vuln_flags) fv = ga_resValue( bits, 2 );
-        if (af.location == APPLY_BITVECTOR && af.modifier < 0)
-            fv = -fv;
-        s += fv;
+        if (ft == &affect_flags)    s += ga_affectFlagValue( bits, w.caster );
+        else if (ft == &res_flags)  s += ga_resValue( bits, 0 );
+        else if (ft == &imm_flags)  s += ga_resValue( bits, 1 );
+        else if (ft == &vuln_flags) s += ga_resValue( bits, 2 );
     }
 }
 
@@ -3588,10 +3588,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // (assemble = best obtainable members + V_set  >  break = best individual picks),
     // and fold that into the percentile ceiling (ideal-kit model), the chase list,
     // and set protection. On-demand path -- the extra passes over ~a dozen sets and
-    // the candidate pool are cheap. V_set is 0 for a set whose bonus ga_score can't
-    // read -- data-empty (skills-only / full-Fenia) AND those built only of things the
-    // item scorer also ignores (res / slevel / ac, e.g. myrvale, shevale). Such a set
-    // never rates as worth-completing; a worn one is protected and kept neutral in %.
+    // the candidate pool are cheap. V_set is 0 only for a truly data-empty set
+    // (skills-only / full-Fenia: ashigaru, secret of sidhe, master scout). Since F3,
+    // ga_score reads flags/res/slevel/ac too, so res/slevel sets like myrvale/shevale
+    // now score in (they were 0 before F3). A worn set the scorer still can't value
+    // stays protected and neutral in %.
     struct GASet {
         SetBehavior *sb;
         double vset;                   // completion bonus worth for this profile
@@ -3753,6 +3754,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     if (bestTotal > 0)
         pct = (int)( 100.0 * wornTotal / bestTotal + 0.5 );
     if (pct > 100) pct = 100;   // set slots relax the per-slot cap; this is the backstop
+    if (pct < 0)   pct = 0;     // a kit full of cursed maledictions can sum negative
 
     // "best" = raw score.
     std::vector<GACand> byBest = cands;
