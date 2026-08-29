@@ -18,6 +18,7 @@
 #include "spelltarget.h"
 #include "clan.h"
 #include "behavior.h"
+#include "setbehavior.h"
 #include "affect.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
@@ -2973,6 +2974,33 @@ static bool ga_hasFeniaTriggers( obj_index_data *pObj )
     return !triggers.empty( );
 }
 
+// One affect's profile-weighted worth: flat pools (hp/mana/regen/dr/hr/saves) fold
+// into s; the six primary stats accumulate into statDelta[] for the caller to
+// resolve cap-aware. Shared by ga_score (item affects) and ga_setValue (set bonus).
+static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6] )
+{
+    int m = af.modifier;
+    switch (af.location) {
+    case APPLY_HIT:       s += w.hp       * m; break;
+    case APPLY_MANA:      s += w.mana     * m; break;
+    case APPLY_MANA_GAIN: s += w.manaGain * m; break;
+    case APPLY_HEAL_GAIN: s += w.healGain * m; break;
+    case APPLY_DAMROLL:   s += w.dr       * m; break;
+    case APPLY_HITROLL:   s += w.hr       * m; break;
+    case APPLY_SAVES:
+    case APPLY_SAVING_ROD:
+    case APPLY_SAVING_PETRI:
+    case APPLY_SAVING_BREATH:
+    case APPLY_SAVING_SPELL: s += w.saves * (-m); break;  // lower save = better
+    case APPLY_STR: statDelta[0] += m; break;
+    case APPLY_INT: statDelta[1] += m; break;
+    case APPLY_WIS: statDelta[2] += m; break;
+    case APPLY_DEX: statDelta[3] += m; break;
+    case APPLY_CON: statDelta[4] += m; break;
+    case APPLY_CHA: statDelta[5] += m; break;
+    }
+}
+
 // Score a prototype for a profile. Flat pools (hp/mana/regen) and combat stats
 // count in full; the six primary stats are cap-aware: a point at the cap adds 0.
 // rawStat[k] = the char's uncapped stat (perm+mod); capStat[k] = its cap. worn =
@@ -2983,28 +3011,8 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
 {
     double s = 0;
     int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
-    for (auto &paf: pObj->affected) {
-        int m = paf->modifier;
-        switch (paf->location) {
-        case APPLY_HIT:       s += w.hp       * m; break;
-        case APPLY_MANA:      s += w.mana     * m; break;
-        case APPLY_MANA_GAIN: s += w.manaGain * m; break;
-        case APPLY_HEAL_GAIN: s += w.healGain * m; break;
-        case APPLY_DAMROLL:   s += w.dr       * m; break;
-        case APPLY_HITROLL:   s += w.hr       * m; break;
-        case APPLY_SAVES:
-        case APPLY_SAVING_ROD:
-        case APPLY_SAVING_PETRI:
-        case APPLY_SAVING_BREATH:
-        case APPLY_SAVING_SPELL: s += w.saves * (-m); break;  // lower save = better
-        case APPLY_STR: statDelta[0] += m; break;
-        case APPLY_INT: statDelta[1] += m; break;
-        case APPLY_WIS: statDelta[2] += m; break;
-        case APPLY_DEX: statDelta[3] += m; break;
-        case APPLY_CON: statDelta[4] += m; break;
-        case APPLY_CHA: statDelta[5] += m; break;
-        }
-    }
+    for (auto &paf: pObj->affected)
+        ga_accumAffect( *paf, w, s, statDelta );
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
             continue;
@@ -3026,6 +3034,40 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
     if (ga_hasFeniaTriggers( pObj ))
         s += 50;   // Fenia-triggered gear is almost always something very good.
     return s;
+}
+
+// Worth of a completed set's declared <affects> bonus for this profile, cap-aware.
+// The bonus stacks on top of the member items, so its stats score against the
+// char's current baseline (a cheap, honest approximation -- not the post-assembly
+// stats). No weapon dice, no Fenia-trigger boost: a set bonus is pure affects.
+// 0 for a data-empty set (skills-only / full-Fenia), which is exactly why those
+// never rate as "worth completing".
+static double ga_setValue( Character *target, SetBehavior *sb, const GAWeights &w,
+                           const int rawStat[6], const int capStat[6] )
+{
+    double s = 0;
+    int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
+    for (auto &sa: sb->affects) {
+        Affect af;
+        sa.fill( af );
+        ga_accumAffect( af, w, s, statDelta );
+    }
+    for (int k = 0; k < 6; k++) {
+        if (statDelta[k] == 0 || w.stat[k] == 0)
+            continue;
+        s += w.stat[k] * ga_statgain( rawStat[k], statDelta[k], capStat[k] );
+    }
+    return s;
+}
+
+// Read an int/bool from a behavior's props JSON, with a default.
+static int ga_propInt( SetBehavior *sb, const char *key, int def )
+{
+    return sb->props.isMember( key ) ? sb->props[key].asInt( ) : def;
+}
+static bool ga_propBool( SetBehavior *sb, const char *key, bool def )
+{
+    return sb->props.isMember( key ) ? sb->props[key].asBool( ) : def;
 }
 
 // Allow-everything road predicates: pathfind like the immortal 'find' command,
@@ -3284,8 +3326,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         wornVnum[o->pIndexData->vnum] = 1;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
-        if (lockedSlots & slot)          // slot held by a complete set -- out of the percentile
-            continue;
+        // Set slots now score normally: the set optimizer below credits a complete
+        // set's bonus into the ceiling and protects its slots from break-advice.
         double sc = ga_score( target, o->pIndexData, w, rawStat, capStat, true );
         if (sc > wornSlot[slot])
             wornSlot[slot] = sc;
@@ -3321,8 +3363,6 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         int slot = pObj->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
         if (slot == 0 && pObj->item_type != ITEM_LIGHT)
-            continue;
-        if (lockedSlots & slot)            // set-locked slot: replacing it would break the set
             continue;
         if (wornVnum.count( pObj->vnum ))  // already wearing this exact item
             continue;
@@ -3417,17 +3457,151 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (kv.second > slotCeil[kv.first])
             slotCeil[kv.first] = kv.second;
 
+    // ---- Set awareness (perma-affects #2758 phase 3b) --------------------------
+    // Value each data-scorable set's completion bonus (SetBehavior <affects>) with
+    // the same scorer as items, decide which sets are worth assembling
+    // (assemble = best obtainable members + V_set  >  break = best individual picks),
+    // and fold that into the percentile ceiling (ideal-kit model), the chase list,
+    // and set protection. On-demand path -- the extra passes over ~a dozen sets and
+    // the candidate pool are cheap. Data-empty sets (skills-only / full-Fenia) score
+    // V_set 0 and never rate as worth-completing; a worn one is still protected.
+    struct GASet {
+        SetBehavior *sb;
+        double vset;                   // completion bonus worth for this profile
+        int    total;                  // props total_count (pieces needed)
+        bool   dneck, dwrist;          // a doubled neck/wrist slot supplies 2 pieces
+        std::map<int,double> memScore; // slot -> best available member score
+        int    wornSlots;              // slots where the char already wears a member
+        bool   wornComplete;           // char carries this set's completion affect
+    };
+    std::map<int,GASet> gaSets;        // behavior index -> aggregate (data-scorable)
+
+    for (int bi = 0; bi < behaviorManager->size( ); bi++) {
+        SetBehavior *sb = dynamic_cast<SetBehavior *>( behaviorManager->find( bi ) );
+        if (sb == 0 || sb->affects.empty( ))
+            continue;
+        GASet g;
+        g.sb = sb;
+        g.vset = ga_setValue( target, sb, w, rawStat, capStat );
+        g.total = ga_propInt( sb, "total_count", 999 );
+        g.dneck = ga_propBool( sb, "double_neck", false );
+        g.dwrist = ga_propBool( sb, "double_wrist", false );
+        g.wornSlots = 0;
+        g.wornComplete = false;
+        gaSets[bi] = g;
+    }
+
+    // Complete sets the char wears now: each installs a "set <X>" completion affect,
+    // whose skill name equals the set behavior's name. Resolve those to indices so
+    // both data-scorable and data-empty worn sets can be detected and protected.
+    std::map<int,int> wornSetIdx;
+    for (auto &paf: target->affected) {
+        Skill *sk = paf->type.getElement( );
+        if (sk == 0 || sk->getName( ).find( "set " ) != 0)
+            continue;
+        Behavior *b = behaviorManager->findExisting( sk->getName( ) );
+        if (b != 0)
+            wornSetIdx[b->getIndex( )] = 1;
+    }
+
+    // Best obtainable member per slot from the candidate pool (not-worn, has a route).
+    for (auto &c: cands) {
+        if (c.acq.method == GA_UNKNOWN)
+            continue;
+        for (auto &kv: gaSets)
+            if (c.pObj->behaviors.isSet( kv.first ) && c.score > kv.second.memScore[c.slot])
+                kv.second.memScore[c.slot] = c.score;
+    }
+    // Worn members mark their slot filled and float their worn score in; worn
+    // complete sets (data or data-empty) protect their slots from break-advice.
+    int protectedSlots = lockedSlots;   // honor any legacy hint the caller still passes
+    for (::Object *o = target->carrying; o; o = o->next_content) {
+        if (o->wear_loc == wear_none)
+            continue;
+        int slot = o->pIndexData->wear_flags;
+        REMOVE_BIT( slot, ITEM_TAKE );
+        double sc = ga_score( target, o->pIndexData, w, rawStat, capStat, true );
+        for (auto &kv: gaSets)
+            if (o->pIndexData->behaviors.isSet( kv.first )) {
+                kv.second.wornSlots |= slot;
+                if (sc > kv.second.memScore[slot])
+                    kv.second.memScore[slot] = sc;
+            }
+        for (auto &wk: wornSetIdx)
+            if (o->pIndexData->behaviors.isSet( wk.first )) {
+                protectedSlots |= slot;
+                break;
+            }
+    }
+    for (auto &kv: gaSets)
+        kv.second.wornComplete = wornSetIdx.count( kv.first ) > 0;
+
+    // Feasibility (hard: every needed piece obtainable) + worth-it decision, then a
+    // greedy non-overlapping claim by descending margin for the ideal-kit ceiling.
+    struct GAWorth { int bi; double margin; };
+    std::vector<GAWorth> worth;
+    double wornSetBonus = 0;
+    for (auto &kv: gaSets) {
+        GASet &g = kv.second;
+        int fill = 0;
+        double assemble = g.vset, brk = 0;
+        for (auto &ms: g.memScore) {
+            int mslot = ms.first;
+            int pieces = 1;
+            if ((mslot & ITEM_WEAR_NECK) && g.dneck)        pieces = 2;
+            else if ((mslot & ITEM_WEAR_WRIST) && g.dwrist) pieces = 2;
+            fill += pieces;
+            assemble += ms.second;
+            std::map<int,double>::iterator sc = slotCeil.find( mslot );
+            brk += (sc != slotCeil.end( )) ? sc->second : 0.0;
+        }
+        bool feasible = fill >= g.total;
+        if (feasible && g.wornComplete)
+            wornSetBonus += g.vset;
+        if (feasible && assemble > brk)
+            worth.push_back( GAWorth{ kv.first, assemble - brk } );
+    }
+    std::sort( worth.begin( ), worth.end( ),
+        []( const GAWorth &a, const GAWorth &b ){ return a.margin > b.margin; } );
+
+    double bestSetBonus = 0;
+    int claimedSetSlots = 0;
+    std::map<int,int> claimedSets;
+    for (auto &wsel: worth) {
+        GASet &g = gaSets[wsel.bi];
+        int occ = 0;
+        for (auto &ms: g.memScore)
+            occ |= ms.first;
+        if (occ & claimedSetSlots) {    // a higher-margin set already owns a slot here
+            LogStream::sendNotice( ) << "gearAdvice: set '" << g.sb->getName( )
+                << "' shares a slot with a higher-value set; scored conservatively." << endl;
+            continue;                   // no two sets share a slot in current data
+        }
+        claimedSetSlots |= occ;
+        claimedSets[wsel.bi] = 1;
+        bestSetBonus += g.vset;
+        for (auto &ms: g.memScore)      // a member may raise its slot above the individual best
+            if (ms.second > slotCeil[ms.first])
+                slotCeil[ms.first] = ms.second;
+    }
+    // ---- end set awareness (folded into the percentile + chase below) ----------
+
     double wornTotal = 0, bestTotal = 0;
     for (auto &kv: slotCeil) {
         std::map<int,double>::iterator wi = wornSlot.find( kv.first );
         wornTotal += (wi != wornSlot.end( )) ? wi->second : 0.0;
         bestTotal += kv.second;
     }
+    // Set bonuses: a complete worn set is real kit value; the ideal kit assembles the
+    // best worth-it sets. bestSetBonus >= wornSetBonus in the common case (your set is
+    // among the worth-it claimed), so the final clamp only bites on a mixed kit.
+    wornTotal += wornSetBonus;
+    bestTotal += bestSetBonus;
 
     int pct = 0;
     if (bestTotal > 0)
         pct = (int)( 100.0 * wornTotal / bestTotal + 0.5 );
-    if (pct > 100) pct = 100;   // guard only; the per-slot cap should keep it <=100
+    if (pct > 100) pct = 100;   // set slots relax the per-slot cap; this is the backstop
 
     // "best" = raw score.
     std::vector<GACand> byBest = cands;
@@ -3439,6 +3613,15 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         double gap = c.score - wornSlot[c.slot];
         c.value = gap > 0 ? gap * c.obtain : 0;
     }
+    // Nudge the chase toward completing a worth-it set: a member filling a slot the
+    // char has not filled yet earns a share of the completion bonus, so "grab the
+    // last set piece" outranks a marginal individual swap.
+    for (auto &c: cands)
+        for (auto &cs: claimedSets) {
+            GASet &g = gaSets[cs.first];
+            if (c.pObj->behaviors.isSet( cs.first ) && (g.wornSlots & c.slot) == 0)
+                c.value += (g.vset / (g.total > 0 ? g.total : 1)) * c.obtain;
+        }
     std::vector<GACand> byOpt = cands;
     std::sort( byOpt.begin( ), byOpt.end( ),
         []( const GACand &a, const GACand &b ){ return a.value > b.value; } );
@@ -3494,6 +3677,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     int nOpt = 0;
     for (size_t k = 0; k < byOpt.size( ) && nOpt < 5; k++) {
         if (byOpt[k].value <= 0) break;
+        // Slot held by a complete set the char wears: don't advise breaking it (a
+        // set bonus the raw score can't see). Replaces the old Fenia lockedSlots skip.
+        if (protectedSlots & byOpt[k].slot)
+            continue;
         // No known route (not a quest reward, no reset/shop source): can't tell the
         // char how to get it, so never put it on the chase list. Fenia-triggered gear
         // gets a flat score boost, which can float an unobtainable downgrade up here.
