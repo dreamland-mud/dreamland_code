@@ -149,30 +149,21 @@ char skill_learned_colour(const Skill *skill, PCharacter *ch)
     return 'x';
 }
 
-/* Both names a skill answers to, the reader's own first. It used to be a
- * two-way English-or-Russian choice, so a Ukrainian reader was shown the
- * Russian name as the primary one even where the skill carries <name l="ua">
- * (fireball / огненный шар / вогняна куля). getNameFor() falls back to RU, so
- * a skill without a Ukrainian name reads exactly as it did before.
- * The connector between them is a word too, and belongs to the same language
- * as the frame around it.
- * The second name is always the English one: it is the form every client can
- * type. An English reader therefore gets no second name at all, rather than a
- * Cyrillic one they can neither read nor enter. */
+/* The one name a skill header shows: the reader's own. It used to append a
+ * second, always-English name on the theory that English was the only form
+ * every client could type -- so a Ukrainian reader saw the Ukrainian name
+ * paired with the English one, two alphabets in one line. But skill_lookup
+ * resolves a skill by its name in ANY language (XMLMultiString::matchesStrict
+ * iterates every lang), so the reader's own name is already typable; the other
+ * names stay matchable keywords, they just no longer clutter the header.
+ * getNameFor() falls back to RU for a skill with no <name l="ua">, so those
+ * read exactly as before. */
 DLString print_names_for(const Skill *skill, Character *ch)
 {
-    lang_t lang = Player::displayLang(ch);
-    DLString primary = skill->getNameFor(lang);
+    DLString name = skill->getNameFor(Player::displayLang(ch));
 
-    if (lang == LANG_EN)
-        return fmt(0, "'{%c%N1{%c'",
-            SKILL_HEADER_FG, primary.c_str(), SKILL_HEADER_BG);
-
-    DLString format = DLString("'{%c%N1{%c' ") + l(ch, "или") + " '{%c%N1{%c'";
-
-    return fmt(0, format.c_str(),
-        SKILL_HEADER_FG, primary.c_str(), SKILL_HEADER_BG,
-        SKILL_HEADER_FG, skill->getName().c_str(), SKILL_HEADER_BG);
+    return fmt(0, "'{%c%N1{%c'",
+        SKILL_HEADER_FG, name.c_str(), SKILL_HEADER_BG);
 }
 
 /* The word a skill help opens with. It used to be the Russian noun declined
