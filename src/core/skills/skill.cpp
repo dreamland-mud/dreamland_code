@@ -8,12 +8,14 @@
 #include "affecthandler.h"
 #include "skillcommand.h"
 #include "skillgroup.h"
+#include "skillmanager.h"
 #include "character.h"
 #include "helpmanager.h"
 #include "merc.h"
 #include "def.h"
 
 GlobalBitvector Skill::zeroGroups;
+GlobalBitvector Skill::zeroGrants;
 
 Skill::Skill( )
 {
@@ -56,6 +58,12 @@ GlobalBitvector & Skill::getGroups()
 {
     zeroGroups.setRegistry(skillGroupManager);
     return zeroGroups;
+}
+
+GlobalBitvector & Skill::getGrants()
+{
+    zeroGrants.setRegistry(skillManager);
+    return zeroGrants;
 }
 
 bool Skill::hasGroup(unsigned int group)

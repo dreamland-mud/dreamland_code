@@ -214,8 +214,12 @@ void PCharacter::updateSkills( )
     }
 }                        
 
+// Defined in plug-ins/loadsave/creation.cpp. Installs/strips perma-affects
+// granted by the player's learned passive skills (perception -> detect trap).
+void passive_refresh( Character *ch, bool verbose );
+
 /*-------------------------------------------------------------------------
- *  work with profiles 
+ *  work with profiles
  *------------------------------------------------------------------------*/
 bool PCharacter::load( )
 {
@@ -357,6 +361,11 @@ bool PCharacter::load( )
 
     skill_merge(this, gsn_harm, gsn_cause_critical, gsn_cause_light, gsn_cause_critical);
     skill_merge(this, gsn_heal, gsn_cure_critical, gsn_cure_light, gsn_cure_critical);
+
+    // Install passive-skill perma-affects at login instead of waiting a tick.
+    // Silent: the isAffected guard in each onRefresh makes this a no-op for a
+    // grant already restored from the pfile, so no flavor line on every login.
+    passive_refresh( this, false );
 
     // Move player out of the room, to be placed to the start room correctly further down the way.
     char_from_room(this);

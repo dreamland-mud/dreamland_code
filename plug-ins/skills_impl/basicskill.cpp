@@ -48,11 +48,21 @@ BONUS(learning);
 BONUS(mana);
 HOMETOWN(frigate);
 
-BasicSkill::BasicSkill() 
+// Defined in plug-ins/loadsave/creation.cpp: the passive-grant list caches
+// which passive skills grant which affects; skill (re)load invalidates it.
+void markPassiveGrantsDirty();
+
+BasicSkill::BasicSkill()
                 : align( 0, &align_table ),
-                  ethos( 0, &ethos_table )
+                  ethos( 0, &ethos_table ),
+                  grants( skillManager )
 {
-    
+
+}
+
+GlobalBitvector & BasicSkill::getGrants()
+{
+    return grants;
 }
 
 void BasicSkill::loaded( )
@@ -79,10 +89,14 @@ void BasicSkill::loaded( )
 
     if (command)
         FeniaSkillActionHelper::linkWrapper(*command);
+
+    markPassiveGrantsDirty();
 }
 
 void BasicSkill::unloaded( )
 {
+    markPassiveGrantsDirty();
+
     if (command)
         FeniaSkillActionHelper::extractWrapper(*command);
 
