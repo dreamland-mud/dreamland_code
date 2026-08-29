@@ -3463,8 +3463,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // (assemble = best obtainable members + V_set  >  break = best individual picks),
     // and fold that into the percentile ceiling (ideal-kit model), the chase list,
     // and set protection. On-demand path -- the extra passes over ~a dozen sets and
-    // the candidate pool are cheap. Data-empty sets (skills-only / full-Fenia) score
-    // V_set 0 and never rate as worth-completing; a worn one is still protected.
+    // the candidate pool are cheap. V_set is 0 for a set whose bonus ga_score can't
+    // read -- data-empty (skills-only / full-Fenia) AND those built only of things the
+    // item scorer also ignores (res / slevel / ac, e.g. myrvale, shevale). Such a set
+    // never rates as worth-completing; a worn one is protected and kept neutral in %.
     struct GASet {
         SetBehavior *sb;
         double vset;                   // completion bonus worth for this profile
@@ -3479,6 +3481,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     for (int bi = 0; bi < behaviorManager->size( ); bi++) {
         SetBehavior *sb = dynamic_cast<SetBehavior *>( behaviorManager->find( bi ) );
         if (sb == 0 || sb->affects.empty( ))
+            continue;
+        // Outleveled sets can't be completed -- eqset refuses assembly above max_level
+        // ("Ты уже слишком опытен..."), so the sage must neither value nor chase them.
+        if (target->getLevel( ) > ga_propInt( sb, "max_level", 999 ))
             continue;
         GASet g;
         g.sb = sb;
@@ -3515,6 +3521,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // Worn members mark their slot filled and float their worn score in; worn
     // complete sets (data or data-empty) protect their slots from break-advice.
     int protectedSlots = lockedSlots;   // honor any legacy hint the caller still passes
+    // Slots of a worn complete set whose bonus the scorer can't value (data-empty, or
+    // a bonus made only of things ga_score ignores -- res/slevel/ac): kept OUT of the
+    // percentile, exactly as the old lockedSlots did, so wearing such a set is neutral
+    // and never a regression. Valued worn sets instead score in + earn wornSetBonus.
+    int neutralSlots = 0;
     for (::Object *o = target->carrying; o; o = o->next_content) {
         if (o->wear_loc == wear_none)
             continue;
@@ -3530,6 +3541,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         for (auto &wk: wornSetIdx)
             if (o->pIndexData->behaviors.isSet( wk.first )) {
                 protectedSlots |= slot;
+                std::map<int,GASet>::iterator gi = gaSets.find( wk.first );
+                if (gi == gaSets.end( ) || gi->second.vset <= 0)
+                    neutralSlots |= slot;
                 break;
             }
     }
@@ -3547,10 +3561,20 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         double assemble = g.vset, brk = 0;
         for (auto &ms: g.memScore) {
             int mslot = ms.first;
+            // Piece capacity of a slot type = how many equipment locations it fills,
+            // matching .tmp.eqset.count: finger has two locations with NO dedup, a
+            // weapon fills wield + second_wield (dual), neck/wrist have two locations
+            // that dedup a same-vnum pair unless the double flag is set. (Assumes no
+            // set has two distinct neck/wrist members without the flag -- true across
+            // all 18 sets today; a future such set would undercount here.)
             int pieces = 1;
-            if ((mslot & ITEM_WEAR_NECK) && g.dneck)        pieces = 2;
+            if (mslot & ITEM_WEAR_FINGER)                   pieces = 2;
+            else if (mslot & ITEM_WIELD)                    pieces = 2;
+            else if ((mslot & ITEM_WEAR_NECK) && g.dneck)   pieces = 2;
             else if ((mslot & ITEM_WEAR_WRIST) && g.dwrist) pieces = 2;
             fill += pieces;
+            // Value counts each slot type once (the percentile's own two-fingers-is-
+            // Phase-2 limitation), while fill above counts locations for feasibility.
             assemble += ms.second;
             std::map<int,double>::iterator sc = slotCeil.find( mslot );
             brk += (sc != slotCeil.end( )) ? sc->second : 0.0;
@@ -3572,10 +3596,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         int occ = 0;
         for (auto &ms: g.memScore)
             occ |= ms.first;
-        if (occ & claimedSetSlots) {    // a higher-margin set already owns a slot here
+        if (occ & claimedSetSlots) {    // this set overlaps a slot a higher-margin one took
             LogStream::sendNotice( ) << "gearAdvice: set '" << g.sb->getName( )
                 << "' shares a slot with a higher-value set; scored conservatively." << endl;
-            continue;                   // no two sets share a slot in current data
+            continue;                   // rare: two worth-it sets seldom overlap at once
         }
         claimedSetSlots |= occ;
         claimedSets[wsel.bi] = 1;
@@ -3588,6 +3612,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
 
     double wornTotal = 0, bestTotal = 0;
     for (auto &kv: slotCeil) {
+        if (neutralSlots & kv.first)   // unvaluable worn-set slot: neutral, out of the %
+            continue;
         std::map<int,double>::iterator wi = wornSlot.find( kv.first );
         wornTotal += (wi != wornSlot.end( )) ? wi->second : 0.0;
         bestTotal += kv.second;
