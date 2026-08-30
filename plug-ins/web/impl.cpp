@@ -711,6 +711,34 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
         pc.add( col, label, paf->duration );
     }
 
+    // 1b) Gear-granted named affects (eqAffects: <affects registry="skill"> and
+    // <grant> on worn items) never enter ch->affected, so the loop above misses
+    // them. Surface each as a permanent chip, deduped against a real affect of the
+    // same skill already listed.
+    for (int sn: ch->eqAffects.toArray( )) {
+        Skill *skill = skillManager->find( sn );
+        if (skill == 0)
+            continue;
+
+        bool already = false;
+        for (auto &paf: ch->affected)
+            if (paf->type.getElement( ) == skill) { already = true; break; }
+        if (already)
+            continue;
+
+        DLString col = skill->getWebColumn( );
+        SpellPointer spell = skill->getSpell( );
+        if (col.empty( ))
+            col = (spell && spell->isCasted( )
+                   && spell->getSpellType( ) == SPELL_OFFENSIVE) ? MALAD : ENHANCE;
+
+        DLString label = skill->getWebLabel( lang );
+        if (label.empty( ))
+            label = webAbbrev( skill->getNameFor( ch ) );
+
+        pc.add( col, label, -1 );
+    }
+
     // 2) Detect column and 3) raw affect-flag fallbacks (no owning spell).
     addDetectColumn( pc, ch, lang );
     addAffFallbacks( pc, ch, lang );

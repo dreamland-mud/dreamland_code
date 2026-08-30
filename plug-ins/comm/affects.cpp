@@ -355,6 +355,32 @@ CMDRUNP( affects )
     if (HAS_SHADOW(ch))
         output.push_front( ShadowAffectOutput( ch->getPC( )->shadow, viewer ) );
 
+    // Gear-granted named affects (<affects registry="skill"> and <grant> on worn
+    // items) apply through affect_modify / eqAffects and never enter ch->affected,
+    // so the loop above misses them: a sanctuary or fly from a worn item read only
+    // as a raw flag, never as a listed buff. Synthesize a "постоянно" line for each,
+    // deduped against a real affect of the same skill already listed.
+    for (int sn: ch->eqAffects.toArray( )) {
+        bool already = false;
+        for (auto &ao: output)
+            if (ao.type == sn) { already = true; break; }
+        if (already)
+            continue;
+
+        Skill *skill = skillManager->find( sn );
+        if (skill == 0)
+            continue;
+
+        AffectOutput ao;
+        ao.viewer = viewer;
+        ao.lang = Player::displayLang( viewer );
+        ao.type = sn;
+        ao.name = skill->getNameFor( viewer );
+        ao.duration = -1;               // permanent while the item is worn
+        ao.unitMinutes = false;
+        output.push_back( ao );
+    }
+
     DLString words = argument;
     for (auto &word: words.split(" ")) {
         if (arg_is( word, "time" ))
