@@ -13,6 +13,7 @@
 
 #include "core/behavior/behavior_utils.h"
 #include "skillreference.h"
+#include "skillmanager.h"
 #include "room.h"
 #include "affect.h"
 #include "character.h"
@@ -177,7 +178,12 @@ bool DefaultWearlocation::equip( Object *obj )
 //    cooldown, "already blessed", etc.). So the instance list is never scanned.
 static void rebuild_eq_affects( Character *ch )
 {
-    ch->eqAffects.clear( );
+    // setRegistry clears the bits (like clear() did) AND installs the skill
+    // registry -- without it toArray()/toSet()/toString() early-out to empty on a
+    // null registry, so any code that ENUMERATES the cache (the affects command and
+    // web panel gear-affect lines) would silently see nothing. isSet()/set() work
+    // regardless, which is why the perma-affects gate never needed the registry.
+    ch->eqAffects.setRegistry( skillManager );
 
     for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content) {
         if (!obj->wear_loc->givesAffects( ))
