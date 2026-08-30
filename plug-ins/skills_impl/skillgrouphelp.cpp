@@ -42,7 +42,7 @@ DLString SkillGroupHelp::getTitle(const DLString &label) const
     if (!group || !title.get(RU).empty())
         return MarkupHelpArticle::getTitle(label);
 
-    return "Группа умений {c" + group->getRussianName() + "{x, {c" + group->getName() + "{x";
+    return "Группа умений {c" + group->getRussianName() + "{x";
 }
 
 /**
@@ -65,8 +65,7 @@ DLString SkillGroupHelp::getTitle(const DLString &label, lang_t lang) const
     if (label == "toc")
         return name.upperFirstCharacter();
 
-    return help_title_fmt(lang, _("Группа умений {c%1$s{x, {c%2$s{x"),
-                          name, group->getName());
+    return help_title_fmt(lang, _("Группа умений {c%1$s{x"), name);
 }
 
 void SkillGroupHelp::getRawText( Character *ch, ostringstream &buf ) const
