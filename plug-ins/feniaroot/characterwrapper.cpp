@@ -2980,6 +2980,17 @@ static bool ga_hasFeniaTriggers( obj_index_data *pObj )
     return !triggers.empty( );
 }
 
+// An item carrying the 'grantskills' behavior teaches its wearer skills -- the
+// same "special, high-value" class as Fenia-triggered gear. The grantskills
+// migration annulled these items' onEquip/onRemove prototype triggers, so
+// ga_hasFeniaTriggers no longer sees them; credit the behavior here so a
+// skill-teaching item keeps its boost.
+static bool ga_grantsSkills( obj_index_data *pObj )
+{
+    Behavior *b = behaviorManager->findExisting( "grantskills" );
+    return b != 0 && pObj->behaviors.isSet( b->getIndex( ) );
+}
+
 // Value of an affect_flags bitvector (sanctuary/haste/stealth; negatives are
 // cursed-gear penalties). Profile-split where it matters. Values + rationale:
 // GEAR_AFFECT_VALUES.md. Owner overrides folded in (imp_invis/camouflage/fade=100,
@@ -3151,8 +3162,8 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
         double eff = weapon_ave( pObj ) * (20 + target->getSkill( sn )) / 100.0;
         s += w.dr * eff;
     }
-    if (ga_hasFeniaTriggers( pObj ))
-        s += 50;   // Fenia-triggered gear is almost always something very good.
+    if (ga_hasFeniaTriggers( pObj ) || ga_grantsSkills( pObj ))
+        s += 50;   // Fenia-triggered or skill-teaching gear is almost always very good.
     return s;
 }
 
