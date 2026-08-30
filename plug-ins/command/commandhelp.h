@@ -21,6 +21,7 @@ public:
     virtual void save() const;
     
     virtual DLString getTitle(const DLString &label) const;
+    virtual DLString getTitle(const DLString &label, lang_t lang) const;
     inline CommandPointer getCommand( ) const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;

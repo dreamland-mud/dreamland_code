@@ -8,6 +8,8 @@
 #include "commandmanager.h"
 #include "character.h"
 #include "player_utils.h"
+#include "helpmanager.h"
+#include "l10n.h"
 
 const DLString CommandHelp::TYPE = "CommandHelp";
 static const DLString LABEL_COMMAND = "cmd";
@@ -50,11 +52,38 @@ DLString CommandHelp::getTitle(const DLString &label) const
     if (!title.get(RU).empty() || !command)
         return MarkupHelpArticle::getTitle(label);
 
+    // One name. This non-lang path is a fallback (website/toc); prefer the
+    // Russian name, fall back to the English one when a command has no RU name.
     buf << "Команда {c";
     if (!command->getRussianName().empty())
-        buf << command->getRussianName() << "{x, {c";
-    buf << command->getName() << "{x";
+        buf << command->getRussianName();
+    else
+        buf << command->getName();
+    buf << "{x";
     return buf.str();
+}
+
+/**
+ * Same title, composed in the viewer's language. CommandHelp had no per-language
+ * title, so every viewer saw "Команда <ru>, <en>" -- two alphabets, Russian
+ * first. A command is resolvable by its name in every language (setCommand
+ * registers EN/RU/UA names and aliases), so one name in the reader's language
+ * round-trips fine.
+ */
+DLString CommandHelp::getTitle(const DLString &label, lang_t lang) const
+{
+    if (!command || !title.get(RU).empty())
+        return MarkupHelpArticle::getTitle(label, lang);
+
+    if (label == "title")
+        return DLString::emptyString;
+
+    DLString name = command->getNameFor(lang);
+
+    if (label == "toc")
+        return name.upperFirstCharacter();
+
+    return help_title_fmt(lang, _("Команда {c%1$s{x"), name);
 }
 
 void CommandHelp::setCommand( Command::Pointer command )
