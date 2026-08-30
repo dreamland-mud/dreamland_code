@@ -158,6 +158,53 @@ DLString damage_noun(int dam_type, lang_t lang)
     return damage_table.message(dam_type);
 }
 
+/*-----------------------------------------------------------------------------
+ * Combat spell-proc values (gear advisor)
+ *
+ * config/fight/spell_combat_value.json maps a spell name to its relative combat
+ * worth (0-100). The gear advisor's ga_score reads an item's <props>combatcast</props>
+ * and multiplies these values by proc chance, cast count, an item-level scale and a
+ * global weight to replace the flat +50 those items used to get. Damage spells are
+ * Fenia (C++ can't introspect their damage), so the table is modeled, not computed.
+ * Keys starting with '_' are knobs/meta, not spells: _global scales procs against
+ * stats, _level_ref is the item level that scores at 1.0x. COMBAT_PROC_SCORING.md.
+ *----------------------------------------------------------------------------*/
+static std::map<DLString, double> spellCombatValue;
+static double spellComboGlobal   = 1.0;
+static double spellComboLevelRef = 50.0;
+
+CONFIGURABLE_LOADED(fight, spell_combat_value)
+{
+    spellCombatValue.clear();
+    spellComboGlobal   = 1.0;
+    spellComboLevelRef = 50.0;
+
+    for (auto i = value.begin(); i != value.end(); ++i) {
+        DLString key = i.key().asString();
+        if (key.empty())
+            continue;
+        if (key.at(0) == '_') {
+            if (key == "_global")    spellComboGlobal   = (*i).asDouble();
+            if (key == "_level_ref") spellComboLevelRef = (*i).asDouble();
+            continue;
+        }
+        spellCombatValue[key] = (*i).asDouble();
+    }
+
+    // Never divide by zero when scaling by item level.
+    if (spellComboLevelRef <= 0)
+        spellComboLevelRef = 50.0;
+}
+
+double spell_combat_value(const DLString &spell)
+{
+    std::map<DLString, double>::const_iterator i = spellCombatValue.find(spell);
+    return i == spellCombatValue.end() ? 0.0 : i->second;
+}
+
+double spell_combat_global()    { return spellComboGlobal; }
+double spell_combat_level_ref() { return spellComboLevelRef; }
+
 void SkillDamage::message( )
 {
     const InflectedString &dammsg = skillManager->find(sn)->getDammsg( );

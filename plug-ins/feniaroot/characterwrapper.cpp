@@ -47,6 +47,7 @@
 #include "player_exp.h"
 #include "fight.h"
 #include "weapons.h"
+#include "damage.h"
 #include "skill_utils.h"
 #include "areaquestutils.h"
 #include "feniaquest.h"
@@ -2991,6 +2992,36 @@ static bool ga_grantsSkills( obj_index_data *pObj )
     return b != 0 && pObj->behaviors.isSet( b->getIndex( ) );
 }
 
+// Worth of the offensive/heal/buff spells an item casts in combat. The item
+// declares them in <props>combatcast</props> as [{spell, chance, count}]; each
+// spell's relative combat value lives in config/fight/spell_combat_value.json.
+// procScore = SUM value(spell) * chance/100 * count, scaled by item level (a
+// higher-level proc casts harder) and a global proc-vs-stats weight. Returns 0
+// for an item that declares nothing -- ga_score then keeps the flat +50 instead.
+// COMBAT_PROC_SCORING.md.
+static double ga_procScore( obj_index_data *pObj )
+{
+    const Json::Value &casts = pObj->props["combatcast"];
+    if (!casts.isArray( ) || casts.empty( ))
+        return 0;
+
+    double raw = 0;
+    for (auto i = casts.begin( ); i != casts.end( ); ++i) {
+        const Json::Value &c = *i;
+        double v = spell_combat_value( c["spell"].asString( ) );
+        if (v <= 0)
+            continue;
+        double chance = c["chance"].asDouble( );
+        double count  = c.isMember( "count" ) ? c["count"].asDouble( ) : 1.0;
+        if (count <= 0)
+            count = 1.0;
+        raw += v * (chance / 100.0) * count;
+    }
+
+    double levelScale = pObj->level / spell_combat_level_ref( );
+    return raw * levelScale * spell_combat_global( );
+}
+
 // Value of an affect_flags bitvector (sanctuary/haste/stealth; negatives are
 // cursed-gear penalties). Profile-split where it matters. Values + rationale:
 // GEAR_AFFECT_VALUES.md. Owner overrides folded in (imp_invis/camouflage/fade=100,
@@ -3162,8 +3193,20 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
         double eff = weapon_ave( pObj ) * (20 + target->getSkill( sn )) / 100.0;
         s += w.dr * eff;
     }
-    if (ga_hasFeniaTriggers( pObj ) || ga_grantsSkills( pObj ))
+    // Combat spell-procs get scored on what they actually cast (value table x
+    // proc chance x item level). That supersedes the flat +50, which was only a
+    // stand-in for "this triggers something good in a fight" -- the proc IS that
+    // trigger. But a skill-teaching item that ALSO procs still deserves its teach
+    // credit on top (different value), and non-proc special gear keeps the +50.
+    double procScore = ga_procScore( pObj );
+    if (procScore > 0) {
+        s += procScore;
+        if (ga_grantsSkills( pObj ))
+            s += 50;   // it teaches a skill too; procScore only covered the combat cast.
+    }
+    else if (ga_hasFeniaTriggers( pObj ) || ga_grantsSkills( pObj )) {
         s += 50;   // Fenia-triggered or skill-teaching gear is almost always very good.
+    }
     return s;
 }
 

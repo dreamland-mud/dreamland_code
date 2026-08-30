@@ -22,6 +22,14 @@ class Affect;
  * config/fight/damage_nouns.json. Defined in damage_impl.cpp. */
 DLString damage_noun(int dam_type, lang_t lang);
 
+/* Gear advisor combat-proc scoring (COMBAT_PROC_SCORING.md). Relative worth of a
+ * spell cast in combat (config/fight/spell_combat_value.json); 0 for an unlisted
+ * spell. _global scales procs vs stats, _level_ref is the item level that scores
+ * at 1.0x. Defined in damage_impl.cpp. */
+double spell_combat_value(const DLString &spell);
+double spell_combat_global();
+double spell_combat_level_ref();
+
 class Damage {
 public:
     Damage( Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag = 0 );
