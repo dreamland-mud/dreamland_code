@@ -749,6 +749,26 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
     attr->updateIfNew( TRAVEL,  pc.cols[TRAVEL],  prompt );
     attr->updateIfNew( MALAD,   pc.cols[MALAD],   prompt );
     attr->updateIfNew( CLAN,    pc.cols[CLAN],    prompt );
+
+    // Stable English affect keys (sysnames) for the mudjs autobuff manual-entry
+    // gate. The panels above carry localized labels, which the client can't match
+    // against a gate like "haste", so publish a flat, deduped set of active-affect
+    // sysnames: a manual autobuff entry fires only when its affect is absent here.
+    // (Covers cast/prayer affects in ch->affected -- e.g. a pet's haste; raw
+    // equipment/racial affect flags with no owning skill are out of scope for v1.)
+    std::set<DLString> affSeen;
+    Json::Value affsn( Json::arrayValue );
+    for (auto &paf: ch->affected) {
+        Skill *skill = paf->type.getElement( );
+        if (skill == 0)
+            continue;
+        const DLString &sn = skill->getName( );
+        if (affSeen.count( sn ))
+            continue;
+        affSeen.insert( sn );
+        affsn.append( sn.c_str( ) );
+    }
+    prompt["affsn"] = affsn;
 }
 
 /*-------------------------------------------------------------------------
