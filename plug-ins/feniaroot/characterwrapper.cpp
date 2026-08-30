@@ -3022,42 +3022,95 @@ static double ga_procScore( obj_index_data *pObj )
     return raw * levelScale * spell_combat_global( );
 }
 
+// Clerics learn "compound" (lvl 37): it weights any weapon-class weapon into a
+// mace they can wield, so a non-limited weapon a cleric can't natively use is
+// still a real pick -- scored at their MACE skill, not the zero native skill.
+// compound refuses maces (already one), arrows/daggers/bows, limited items,
+// noenchant, and katana/spell weapons (dreamland_world/generic-skills/compound.xml,
+// spell/compound/runObj). The owner check is per-instance so the prototype scorer
+// can't see it; every other gate it can. Trello #2854.
+static bool ga_clericCanCompound( Character *target, obj_index_data *pObj )
+{
+    if (pObj->item_type != ITEM_WEAPON)
+        return false;
+    if (target->getModifyLevel( ) < 37)
+        return false;
+    if (target->getProfession( )->getName( ) != "cleric")
+        return false;
+    if (pObj->limit > 0)
+        return false;
+    if (IS_SET( pObj->extra_flags, ITEM_NOENCHANT ))
+        return false;
+    if (IS_SET( pObj->value[4], WEAPON_KATANA ) || IS_SET( pObj->value[4], WEAPON_SPELL ))
+        return false;
+    switch (pObj->value[0]) {
+    case WEAPON_MACE:      // already a mace: usable natively, no compound needed
+    case WEAPON_DAGGER:
+    case WEAPON_BOW:
+    case WEAPON_ARROW:
+        return false;
+    }
+    return true;
+}
+
+// Does the character already know the spell/skill that produces an affect? Then
+// an item granting it is worth only convenience, not the full effect. Unknown
+// name (or no target) -> false, i.e. keep the full value: a wrong name never
+// over-discounts.
+static bool ga_knowsSpell( Character *target, const char *name )
+{
+    if (target == 0)
+        return false;
+    Skill *sk = skillManager->findExisting( name );
+    return sk != 0 && target->getSkill( sk->getIndex( ) ) > 0;
+}
+
 // Value of an affect_flags bitvector (sanctuary/haste/stealth; negatives are
 // cursed-gear penalties). Profile-split where it matters. Values + rationale:
 // GEAR_AFFECT_VALUES.md. Owner overrides folded in (imp_invis/camouflage/fade=100,
 // stun=-100). Concentration is a Fenia onEquip skill, not a flag -- deferred to 3c.
-static double ga_affectFlagValue( bitstring_t b, bool caster )
+// A positive self-buff the char can already cast on themselves scores at 20% of
+// full (no mana/slot cost, undispellable, works when silenced -- but not a new
+// capability). Curses and gear-only bits (no matching spell) never discount.
+static double ga_affectFlagValue( bitstring_t b, bool caster, Character *target )
 {
     double s = 0;
-    if (IS_SET(b, AFF_SANCTUARY))    s += 300;
-    if (IS_SET(b, AFF_HASTE))        s += caster ? 40 : 110;
-    if (IS_SET(b, AFF_SLOW))         s += caster ? -10 : -55;
-    if (IS_SET(b, AFF_PROTECT_EVIL)) s += 60;
-    if (IS_SET(b, AFF_PROTECT_GOOD)) s += 60;
-    if (IS_SET(b, AFF_REGENERATION)) s += caster ? 15 : 30;
-    if (IS_SET(b, AFF_FLYING))       s += 15;
-    if (IS_SET(b, AFF_PASS_DOOR))    s += 15;
-    if (IS_SET(b, AFF_INVISIBLE))    s += 15;
-    if (IS_SET(b, AFF_IMP_INVIS))    s += 100;
-    if (IS_SET(b, AFF_CAMOUFLAGE))   s += 100;
-    if (IS_SET(b, AFF_FADE))         s += 100;
-    if (IS_SET(b, AFF_SNEAK))        s += caster ? 8 : 12;
-    if (IS_SET(b, AFF_HIDE))         s += 6;
-    if (IS_SET(b, AFF_INFRARED))     s += 8;
-    if (IS_SET(b, AFF_SWIM))         s += 4;
-    // Cursed-item penalties.
-    if (IS_SET(b, AFF_STUN))         s += -100;
-    if (IS_SET(b, AFF_WEAK_STUN))    s += -40;
-    if (IS_SET(b, AFF_BLIND))        s += -200;
-    if (IS_SET(b, AFF_SLEEP))        s += -250;
-    if (IS_SET(b, AFF_CHARM))        s += -250;
-    if (IS_SET(b, AFF_CURSE))        s += -35;
-    if (IS_SET(b, AFF_CORRUPTION))   s += -50;
-    if (IS_SET(b, AFF_POISON))       s += -45;
-    if (IS_SET(b, AFF_PLAGUE))       s += -60;
-    if (IS_SET(b, AFF_CALM))         s += caster ? -5 : -25;
-    if (IS_SET(b, AFF_WEAKEN))       s += -10;
-    if (IS_SET(b, AFF_FAERIE_FIRE))  s += -15;
+    auto v = [&]( bitstring_t flag, double base, const char *spell ) -> double {
+        if (!IS_SET( b, flag ))
+            return 0;
+        if (spell != 0 && ga_knowsSpell( target, spell ))
+            return base * 0.2;
+        return base;
+    };
+    s += v( AFF_SANCTUARY,    300,                "sanctuary" );
+    s += v( AFF_HASTE,        caster ? 40 : 110,  "haste" );
+    s += v( AFF_SLOW,         caster ? -10 : -55, 0 );
+    s += v( AFF_PROTECT_EVIL, 60,                 "protection evil" );
+    s += v( AFF_PROTECT_GOOD, 60,                 "protection good" );
+    s += v( AFF_REGENERATION, caster ? 15 : 30,   0 );
+    s += v( AFF_FLYING,       15,                 "fly" );
+    s += v( AFF_PASS_DOOR,    15,                 "pass door" );
+    s += v( AFF_INVISIBLE,    15,                 "invis" );
+    s += v( AFF_IMP_INVIS,    100,                "improved invis" );
+    s += v( AFF_CAMOUFLAGE,   100,                "camouflage" );
+    s += v( AFF_FADE,         100,                "fade" );
+    s += v( AFF_SNEAK,        caster ? 8 : 12,    "sneak" );
+    s += v( AFF_HIDE,         6,                  "hide" );
+    s += v( AFF_INFRARED,     8,                  "infravision" );
+    s += v( AFF_SWIM,         4,                  0 );
+    // Cursed-item penalties (never discounted).
+    s += v( AFF_STUN,         -100,               0 );
+    s += v( AFF_WEAK_STUN,    -40,                0 );
+    s += v( AFF_BLIND,        -200,               0 );
+    s += v( AFF_SLEEP,        -250,               0 );
+    s += v( AFF_CHARM,        -250,               0 );
+    s += v( AFF_CURSE,        -35,                0 );
+    s += v( AFF_CORRUPTION,   -50,                0 );
+    s += v( AFF_POISON,       -45,                0 );
+    s += v( AFF_PLAGUE,       -60,                0 );
+    s += v( AFF_CALM,         caster ? -5 : -25,  0 );
+    s += v( AFF_WEAKEN,       -10,                0 );
+    s += v( AFF_FAERIE_FIRE,  -15,                0 );
     return s;
 }
 
@@ -3109,7 +3162,8 @@ static double ga_resValue( bitstring_t b, int kind )
 // into s; the six primary stats accumulate into statDelta[] for the caller to
 // resolve cap-aware; ac/slevel/level/move/beats and any flag/res bits fold in here
 // too. Shared by ga_score (item affects) and ga_setValue (set bonus).
-static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6] )
+static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6],
+                            Character *target )
 {
     int m = af.modifier;
     switch (af.location) {
@@ -3156,7 +3210,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     const FlagTable *ft = af.bitvector.getTable( );
     bitstring_t bits = af.bitvector;
     if (ft != 0 && bits != 0) {
-        if (ft == &affect_flags)    s += ga_affectFlagValue( bits, w.caster );
+        if (ft == &affect_flags)    s += ga_affectFlagValue( bits, w.caster, target );
         else if (ft == &res_flags)  s += ga_resValue( bits, 0 );
         else if (ft == &imm_flags)  s += ga_resValue( bits, 1 );
         else if (ft == &vuln_flags) s += ga_resValue( bits, 2 );
@@ -3174,7 +3228,7 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
     double s = 0;
     int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
     for (auto &paf: pObj->affected)
-        ga_accumAffect( *paf, w, s, statDelta );
+        ga_accumAffect( *paf, w, s, statDelta, target );
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
             continue;
@@ -3190,7 +3244,19 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
     // chase a weapon the character can't actually use.
     if (pObj->item_type == ITEM_WEAPON) {
         int sn = get_weapon_sn( pObj );
-        double eff = weapon_ave( pObj ) * (20 + target->getSkill( sn )) / 100.0;
+        int skillPct = target->getSkill( sn );
+        // A cleric who can compound this weapon into a mace wields it at their
+        // mace skill, so it scores like a real mace instead of collapsing to the
+        // 20% unskilled floor. Trello #2854.
+        if (ga_clericCanCompound( target, pObj )) {
+            Skill *mace = skillManager->findExisting( "mace" );
+            if (mace != 0) {
+                int macePct = target->getSkill( mace->getIndex( ) );
+                if (macePct > skillPct)
+                    skillPct = macePct;
+            }
+        }
+        double eff = weapon_ave( pObj ) * (20 + skillPct) / 100.0;
         s += w.dr * eff;
     }
     // Combat spell-procs get scored on what they actually cast (value table x
@@ -3224,7 +3290,7 @@ static double ga_setValue( Character *target, SetBehavior *sb, const GAWeights &
     for (auto &sa: sb->affects) {
         Affect af;
         sa.fill( af );
-        ga_accumAffect( af, w, s, statDelta );
+        ga_accumAffect( af, w, s, statDelta, target );
     }
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
