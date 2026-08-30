@@ -41,6 +41,15 @@ void ReligionHelp::setReligion( DefaultReligion::Pointer religion )
     addAutoKeyword( religion->getRussianName( ).ruscase( '1' ) );
     if (!religion->nameUa.empty( ))
         addAutoKeyword( religion->nameUa.ruscase( '1' ) );
+    // The header now shows only getNameFor(ch); register every form it can return
+    // so the shown name always round-trips. EN readers see shortDescr, and a
+    // female worshipper of the atheist 'none' religion sees the gendered forms.
+    if (!religion->getShortDescr( ).empty( ))
+        addAutoKeyword( religion->getShortDescr( ) );
+    if (!religion->nameRusFemale.empty( ))
+        addAutoKeyword( religion->nameRusFemale.ruscase( '1' ) );
+    if (!religion->nameUaFemale.empty( ))
+        addAutoKeyword( religion->nameUaFemale.ruscase( '1' ) );
     labels.addTransient(LABEL_RELIGION);
 
     helpManager->registrate( Pointer( this ) );
@@ -121,8 +130,12 @@ DLString ReligionHelp::getTitle(const DLString &label, lang_t lang) const
 
 void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    in << l(ch, "Религия") << " {C" << religion->getNameFor(ch).ruscase('1') << "{x ({C"
-       << religion->getShortDescr() << "{x) "
+    // One name, the reader's own. Drops the always-English shortDescr in parens:
+    // it only added a second alphabet, and for an English reader getNameFor(ch)
+    // already returns shortDescr, so the header printed the name twice. Every form
+    // getNameFor can return is a registered keyword (see setReligion), so the shown
+    // name still round-trips to this article.
+    in << l(ch, "Религия") << " {C" << religion->getNameFor(ch).ruscase('1') << "{x "
        << "%PAUSE% " << web_edit_button(ch, "reledit", religion->getName()) << "%RESUME%" << endl;
 
     // Whether you may take it is the one fact the article states about the

@@ -90,9 +90,12 @@ bool DefaultSkillGroup::available( Character *ch ) const
 
 void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
 {
+    // One name, in the reader's own language. This used to print the Russian name
+    // first for every viewer, then the English one -- two alphabets, and never the
+    // reader's own for a Ukrainian viewer. SkillGroupHelp registers the name in all
+    // three languages as keywords, so the shown name round-trips to this article.
     buf << fmt(ch, _("Группа "))
-        << "{Y" << getRussianName( ) << "{w, "
-        << "{Y" << getName( ) << "{w ";
+        << "{Y" << getNameFor( Player::displayLang(ch) ) << "{w ";
         
     if (help)
         buf << web_edit_button(ch, "hedit", help->getID());
