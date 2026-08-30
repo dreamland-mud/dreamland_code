@@ -2697,6 +2697,17 @@ NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName[,verbose]): снять в
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, affectPermanent, "(skillName): сделать все уже висящие аффекты этого типа постоянными (duration -2). Для вещей, дающих аффект при надевании: cast + affectPermanent = аффект держится пока вещь надета, снимается в onRemove" )
+{
+    checkTarget( );
+    Skill *skill = argnum2skill(args, 1);
+    int sn = skill->getIndex( );
+    for (auto &paf: target->affected)
+        if (paf->type == sn)
+            paf->duration = -2;
+    return Register( );
+}
+
 NMI_INVOKE( CharacterWrapper, affectReplace, "(.Affect): удалить все аффекты этого типа и повесить новый" )
 {
     checkTarget( );
