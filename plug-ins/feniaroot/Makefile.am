@@ -5,6 +5,7 @@ include $(top_srcdir)/src/Makefile.inc
 
 libfeniaroot_la_SOURCES = \
 ceval.cpp \
+cautobuff.cpp \
 cfindref.cpp \
 characterwrapper.cpp \
 commandwrapper.cpp \
