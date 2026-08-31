@@ -261,6 +261,27 @@ void MobQuestTarget::greet( Character *victim )
     quest->callTargetTrigger( "onTargetGreet", args, rc );
 }
 
+// Fires when the marked mob ITSELF walks into a room (movement.cpp mprog_entry),
+// as opposed to greet() which fires on the occupants when someone enters. This is
+// the event a "lead the charmed target to the questor" scenario needs: the target
+// arriving is the walker, not a greeter, so onTargetGreet never sees the delivery.
+// The charm scenario finishes here (event-driven), instead of polling onTargetSpec
+// -- which spec() skips whenever the mob is fighting, adrenalined or asleep.
+void MobQuestTarget::entry( )
+{
+    ::Pointer<FeniaQuest> quest = getFeniaQuest( );
+
+    if (!quest)
+        return;
+
+    RegisterList args;
+    args.push_back( wrapChar( ch ) );
+    args.push_back( Register( role.getValue( ) ) );
+
+    Register rc;
+    quest->callTargetTrigger( "onTargetEntry", args, rc );
+}
+
 void MobQuestTarget::speech( Character *victim, const char *speech )
 {
     ::Pointer<FeniaQuest> quest = getFeniaQuest( );
@@ -324,11 +345,11 @@ bool MobQuestTarget::extract( bool count )
     return MobQuestBehavior::extract( count );
 }
 
-// Roles that carry a visible kill/steal tag. Client/king/prince and the other
-// served roles are quest mobs too, but were never tagged and stay untagged.
+// Roles that carry a visible kill/steal/charm tag. Client/king/prince and the
+// other served roles are quest mobs too, but were never tagged and stay untagged.
 static bool taggedRole( const DLString &r )
 {
-    return r == "victim" || r == "gangster" || r == "thief";
+    return r == "victim" || r == "gangster" || r == "thief" || r == "charmtarget";
 }
 
 void MobQuestTarget::show( Character *viewer, std::basic_ostringstream<char> &buf )
@@ -344,7 +365,7 @@ void MobQuestTarget::show( Character *viewer, std::basic_ostringstream<char> &bu
 
     // Despite look.cpp's parameter name this is the VIEWER, so the tag renders
     // in their language rather than always in Russian.
-    if (r == "victim" || r == "gangster") {
+    if (r == "victim" || r == "gangster" || r == "charmtarget") {
         if (mine)
             buf << fmt( viewer, _("{R[ЦЕЛЬ] {x") );
         else
