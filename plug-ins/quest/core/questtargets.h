@@ -35,6 +35,7 @@ public:
     virtual bool death( Character *killer );
     virtual void give( Character *victim, ::Object *obj );
     virtual void greet( Character *victim );
+    virtual void entry( );
     virtual void speech( Character *victim, const char *speech );
     virtual bool extract( bool );
 
