@@ -3133,39 +3133,40 @@ static double ga_rv( int kind, double r, double i, double v )
 
 // Value of a res/imm/vuln bitvector. The three tables share bit positions
 // (immune_from_flags tests ONE bit against imm/res/vuln alike), so IMM_* constants
-// index every table. Resists DO NOT stack (immunity.cpp: a binary RESISTANT bit):
-// res_weapon is the sole physical channel, so bash/pierce/slash are LOW; weapon and
-// spell are the broad channels; elemental/magic types are share-based by how often
-// that damage is dealt to players. spell==magic==prayer collapse -- count once.
-// GEAR_AFFECT_VALUES.md.
+// index every table. Resists DO NOT stack (immunity.cpp: a binary RESISTANT bit),
+// and imm_bash FULLY blocks bash weapon-hits (dam_type=DAM_BASH is set even for a
+// 'none' attack). weapon/spell are the broad channels; bash/pierce/slash are their
+// measured share of the weapon channel; elementals are danger-tiered (fire worst;
+// negative/mental/energy nukes; the rest at the floor). res=imm/3, vuln=-imm/2,
+// floor 10/30/-20. spell==magic==prayer collapse -- count once. DAMTYPE_MODEL.md.
 static double ga_resValue( bitstring_t b, int kind )
 {
     double s = 0;
-    if (IS_SET(b, IMM_WEAPON))                             s += ga_rv(kind, 140, 420, -420);
+    if (IS_SET(b, IMM_WEAPON))                             s += ga_rv(kind, 140, 420, -210);
     if (IS_SET(b, IMM_SPELL) || IS_SET(b, IMM_MAGIC) || IS_SET(b, IMM_PRAYER))
-                                                           s += ga_rv(kind, 50, 150, -150);
-    if (IS_SET(b, IMM_BASH))                               s += ga_rv(kind, 10, 30, -10);
-    if (IS_SET(b, IMM_PIERCE))                             s += ga_rv(kind, 8, 24, -10);
-    if (IS_SET(b, IMM_SLASH))                              s += ga_rv(kind, 8, 24, -10);
-    if (IS_SET(b, IMM_FIRE))                               s += ga_rv(kind, 13, 40, -40);
-    if (IS_SET(b, IMM_ENERGY))                             s += ga_rv(kind, 13, 40, -40);
-    if (IS_SET(b, IMM_NEGATIVE))                           s += ga_rv(kind, 10, 29, -29);
-    if (IS_SET(b, IMM_LIGHTNING))                          s += ga_rv(kind, 7, 21, -21);
-    if (IS_SET(b, IMM_ACID))                               s += ga_rv(kind, 7, 20, -20);
-    if (IS_SET(b, IMM_HOLY))                               s += ga_rv(kind, 5, 16, -16);
-    if (IS_SET(b, IMM_COLD))                               s += ga_rv(kind, 4, 11, -11);
-    if (IS_SET(b, IMM_POISON))                             s += ga_rv(kind, 3, 18, -8);
-    if (IS_SET(b, IMM_CHARM))                              s += ga_rv(kind, 5, 15, -15);
-    if (IS_SET(b, IMM_MENTAL))                             s += ga_rv(kind, 2, 7, -8);
-    if (IS_SET(b, IMM_DISEASE))                            s += ga_rv(kind, 2, 16, -8);
-    if (IS_SET(b, IMM_DROWNING))                           s += ga_rv(kind, 2, 7, -8);
-    if (IS_SET(b, IMM_LIGHT))                              s += ga_rv(kind, 2, 5, -8);
-    if (IS_SET(b, IMM_SOUND))                              s += ga_rv(kind, 1, 4, -8);
-    if (IS_SET(b, IMM_SUMMON))                             s += ga_rv(kind, 3, 8, -8);
-    if (IS_SET(b, IMM_IRON))                               s += ga_rv(kind, 9, 28, -28);
-    if (IS_SET(b, IMM_WOOD))                               s += ga_rv(kind, 9, 28, -28);
-    if (IS_SET(b, IMM_SILVER))                             s += ga_rv(kind, 1, 3, -8);
-    if (IS_SET(b, IMM_MITHRIL))                            s += ga_rv(kind, 1, 2, -8);
+                                                           s += ga_rv(kind, 50, 150, -75);
+    if (IS_SET(b, IMM_BASH))                               s += ga_rv(kind, 72, 216, -108);
+    if (IS_SET(b, IMM_PIERCE))                             s += ga_rv(kind, 34, 103, -52);
+    if (IS_SET(b, IMM_SLASH))                              s += ga_rv(kind, 33, 100, -50);
+    if (IS_SET(b, IMM_FIRE))                               s += ga_rv(kind, 23, 70, -35);
+    if (IS_SET(b, IMM_ENERGY))                             s += ga_rv(kind, 17, 50, -25);
+    if (IS_SET(b, IMM_NEGATIVE))                           s += ga_rv(kind, 17, 50, -25);
+    if (IS_SET(b, IMM_LIGHTNING))                          s += ga_rv(kind, 13, 40, -20);
+    if (IS_SET(b, IMM_ACID))                               s += ga_rv(kind, 13, 40, -20);
+    if (IS_SET(b, IMM_HOLY))                               s += ga_rv(kind, 13, 40, -20);
+    if (IS_SET(b, IMM_COLD))                               s += ga_rv(kind, 13, 40, -20);
+    if (IS_SET(b, IMM_POISON))                             s += ga_rv(kind, 13, 40, -20);
+    if (IS_SET(b, IMM_CHARM))                              s += ga_rv(kind, 10, 30, -20);
+    if (IS_SET(b, IMM_MENTAL))                             s += ga_rv(kind, 17, 50, -25);
+    if (IS_SET(b, IMM_DISEASE))                            s += ga_rv(kind, 10, 30, -20);
+    if (IS_SET(b, IMM_DROWNING))                           s += ga_rv(kind, 10, 30, -20);
+    if (IS_SET(b, IMM_LIGHT))                              s += ga_rv(kind, 10, 30, -20);
+    if (IS_SET(b, IMM_SOUND))                              s += ga_rv(kind, 10, 30, -20);
+    if (IS_SET(b, IMM_SUMMON))                             s += ga_rv(kind, 10, 30, -20);
+    if (IS_SET(b, IMM_IRON))                               s += ga_rv(kind, 10, 30, -20);
+    if (IS_SET(b, IMM_WOOD))                               s += ga_rv(kind, 10, 30, -20);
+    if (IS_SET(b, IMM_SILVER))                             s += ga_rv(kind, 10, 30, -20);
+    if (IS_SET(b, IMM_MITHRIL))                            s += ga_rv(kind, 10, 30, -20);
     return s;
 }
 
