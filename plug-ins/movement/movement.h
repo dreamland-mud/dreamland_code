@@ -42,6 +42,8 @@ protected:
     void msgSelfParty( Character *, const char *sEn, const char *sRu, const char *sUa,
                                     const char *pEn, const char *pRu, const char *pUa );
     void msgSelfRoom( Character *, const char *, const char * );
+    void msgSelfRoom( Character *, const char *sEn, const char *sRu, const char *sUa,
+                                   const char *oEn, const char *oRu, const char *oUa );
     void msgRoomNoParty( Character *, const char * );
     void msgRoomNoParty( Character *, const char *, const char * );
     // Trilingual room broadcast: each recipient gets the format in their own
