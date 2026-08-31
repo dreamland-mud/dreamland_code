@@ -201,8 +201,12 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
 
     if (rc == RC_MOVE_PASS_NEVER) {
         msgSelfRoom( wch,
+                     "There is no seeping through %4$N4.",
                      "Через %4$N4 невозможно пройти насквозь.",
-                     "%2$^C1 стукается лбом о %4$N4." );
+                     "Крізь %4$N4 неможливо пройти наскрізь.",
+                     "%2$^C1 bumps headfirst into %4$N4.",
+                     "%2$^C1 стукается лбом о %4$N4.",
+                     "%2$^C1 стукається лобом об %4$N4." );
         return false;
     }
 
@@ -358,8 +362,12 @@ bool ExitsMovement::applyPassDoor( Character *wch )
     rc = RC_MOVE_PASS_FAILED;
     wch->setWait( 4 );
     msgSelfRoom( wch,
-                 "Твоя попытка просочиться сквозь %4$N4 не удалась, попробуй еще раз.", 
-                 "%2$^C1 стукается лбом о %4$N4." );
+                 "Your attempt to seep through %4$N4 fails -- try again.",
+                 "Твоя попытка просочиться сквозь %4$N4 не удалась, попробуй еще раз.",
+                 "Твоя спроба просочитися крізь %4$N4 не вдалася, спробуй ще раз.",
+                 "%2$^C1 bumps headfirst into %4$N4.",
+                 "%2$^C1 стукается лбом о %4$N4.",
+                 "%2$^C1 стукається лобом об %4$N4." );
     return false;
 }
 

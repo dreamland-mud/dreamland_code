@@ -484,12 +484,20 @@ bool Walkment::checkWater( Character *wch )
 
             if (can_fly(wch))
                 msgSelfParty(wch,
+                    "To go further you must {y{hcfly{x or find a boat.",
                     "Чтобы идти дальше, тебе необходимо {y{hcвзлететь{x или найти лодку.",
-                    "%2$^C3 необходимо {y{hcвзлететь{x или найти лодку, чтобы идти дальше.");
+                    "Щоб іти далі, тобі треба {y{hcзлетіти{x або знайти човен.",
+                    "%2$^C3 must {y{hcfly{x or find a boat to go further.",
+                    "%2$^C3 необходимо {y{hcвзлететь{x или найти лодку, чтобы идти дальше.",
+                    "%2$^C3 треба {y{hcзлетіти{x або знайти човен, щоб іти далі.");
             else
-                msgSelfParty( wch, 
+                msgSelfParty( wch,
+                    "To go further you need a boat, the ability to swim, or flight.",
                     "Чтоб идти дальше тебе нужна лодка, способность плавать или полет.",
-                    "%2$^C1 не умеет перемещаться по воде." );
+                    "Щоб іти далі, тобі потрібен човен, здатність плавати або політ.",
+                    "%2$^C1 cannot move across water.",
+                    "%2$^C1 не умеет перемещаться по воде.",
+                    "%2$^C1 не вміє пересуватися по воді." );
 
             return false;                
     }

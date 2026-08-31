@@ -299,7 +299,20 @@ void Movement::msgSelfParty( Character *wch, const char *sEn, const char *sRu, c
 void Movement::msgSelfRoom( Character *wch, const char *msgSelf, const char *msgOther )
 {
     msgEcho( wch, wch, msgSelf );
-    msgRoom( wch, msgOther ); 
+    msgRoom( wch, msgOther );
+}
+
+// Trilingual self+room: the mover reads the self line in their own language and
+// every other watcher reads the room line in theirs (viewerLang), so a movement
+// message no longer leaks Russian to an English or Ukrainian client.
+void Movement::msgSelfRoom( Character *wch, const char *sEn, const char *sRu, const char *sUa,
+                                            const char *oEn, const char *oRu, const char *oUa )
+{
+    msgEcho( wch, wch, lmsg( viewerLang( wch ), sEn, sRu, sUa ) );
+
+    for (Character *rch = wch->in_room->people; rch; rch = rch->next_in_room)
+        if (rch != wch)
+            msgEcho( rch, wch, lmsg( viewerLang( rch ), oEn, oRu, oUa ) );
 }
 
 void Movement::msgRoomNoParty( Character *wch, const char *msgRoom )
