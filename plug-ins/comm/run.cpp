@@ -18,6 +18,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "act.h"
 
 
 static bool isBigLetter( char c )
@@ -142,22 +143,23 @@ public:
             walk->clearFirstCommand( );
             walk->clearSteps( );
             
-            buf << "Ты натыкаешься на препятствие и ";
-            
-            if (walk->isEmpty( ))
-                buf << "останавливаешься";
+            // Per-viewer: the frame localizes via the catalog and the direction
+            // via direction_word (RU/UA carry the preposition, EN is caseless), so
+            // an EN/UA reader no longer gets a Russian bump message.
+            if (walk->isEmpty( )) {
+                buf << fmt( ch, _("Ты натыкаешься на препятствие и останавливаешься.") );
+            }
             else {
                 int d0 = walk->getFirstDoor( );
-                
-                buf << "продолжаешь свой путь ";
 
-                if (d0 >= 0 && d0 < DIR_SOMEWHERE) 
-                    buf << dirs[d0].leave;
-                else 
-                    buf << "неизвестно куда...";
+                if (d0 >= 0 && d0 < DIR_SOMEWHERE)
+                    buf << fmt( ch, _("Ты натыкаешься на препятствие и продолжаешь свой путь %1$s."),
+                                direction_word( viewerLang( ch ), d0, DIR_CASE_TO ) );
+                else
+                    buf << fmt( ch, _("Ты натыкаешься на препятствие и продолжаешь свой путь неизвестно куда.") );
             }
 
-            buf << "." << endl;
+            buf << endl;
             msgSelf( ch, buf.str( ).c_str( ) );
             return RC_MOVE_OK;
         }
