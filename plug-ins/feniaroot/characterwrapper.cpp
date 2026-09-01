@@ -74,6 +74,7 @@
 #include "act.h"
 #include "player_utils.h"
 #include "religionutils.h"
+#include "religion.h"
 #include "websocketrpc.h"
 
 #include "objectwrapper.h"
@@ -111,6 +112,8 @@
 // gearAdvice v2.1: area-quest reward map + path-cost difficulty (traverse plugin).
 #include "areaquest.h"
 #include "roomtraverse.h"
+
+RELIG(none);   // god_none sentinel for the gear-advisor tattoo-slot filter
 
 GSN(dark_shroud);
 GSN(manacles);
@@ -2949,6 +2952,9 @@ static void ga_record( std::map<int,GAAcq> &acq, int vnum, int method, int aux, 
 
 struct GAWeights {
     double hp, mana, manaGain, healGain, dr, hr, saves;
+    double weaponWeight;   // per-average-weapon-damage weight, split from dr so a
+                           // caster can value a weapon's melee output below its
+                           // damroll (a staff's stats should out-rank a raw sword).
     double stat[6];   // str, int, wis, dex, con, cha
     // Phase 3b / F3 additions: affect flags, res/imm/vuln, and the applies ga_score
     // used to ignore. `caster` picks the melee/caster value for profile-split flags.
@@ -3250,7 +3256,8 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
     // Weapons: the affect loop above already counted a weapon's damroll/hitroll
     // and stat applies, but not its main worth -- the dice it swings. Per
     // WeaponOneHit::damBase the landed damage is dice * (20 + weaponSkill%)/100,
-    // the same per-hit currency as damroll, so weight it with the damroll weight.
+    // the same per-hit currency as damroll, so weight it with weaponWeight (split
+    // from the damroll weight so a caster values weapon output below its damroll).
     // An unskilled weapon (a cleric holding an axe) collapses toward the 20% dice
     // floor and scores near nothing -- which is exactly why the sage will never
     // chase a weapon the character can't actually use.
@@ -3269,7 +3276,7 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
             }
         }
         double eff = weapon_ave( pObj ) * (20 + skillPct) / 100.0;
-        s += w.dr * eff;
+        s += w.weaponWeight * eff;
     }
     // Combat spell-procs get scored on what they actually cast (value table x
     // proc chance x item level). That supersedes the flat +50, which was only a
@@ -3467,10 +3474,12 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     GAWeights w;
     if (profile == "melee" || profile == "agile" || profile == "hybrid") {
         w.hp = 1.0; w.mana = 0.1; w.manaGain = 0.05; w.healGain = 0.3; w.dr = 12.0; w.hr = 6.0; w.saves = 5.0;
+        w.weaponWeight = 12.0;   // melee: weapon output valued the same as its damroll
         w.stat[0] = 3; w.stat[1] = 1; w.stat[2] = 1; w.stat[3] = 2; w.stat[4] = 3; w.stat[5] = 0;
         w.caster = false;
     } else {                                    // caster (default)
-        w.hp = 1.0; w.mana = 0.5; w.manaGain = 0.25; w.healGain = 0.15; w.dr = 6.0; w.hr = 2.0; w.saves = 5.0;
+        w.hp = 1.0; w.mana = 0.5; w.manaGain = 0.6; w.healGain = 0.15; w.dr = 6.0; w.hr = 2.0; w.saves = 5.0;
+        w.weaponWeight = 4.0;    // caster: weapon melee output worth well under its damroll
         w.stat[0] = 1; w.stat[1] = 2; w.stat[2] = 3; w.stat[3] = 1; w.stat[4] = 3; w.stat[5] = 0;
         w.caster = true;
     }
@@ -3649,6 +3658,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)    && IS_EVIL(target))    continue;
         if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)    && IS_GOOD(target))    continue;
         if (IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(target)) continue;
+
+        // A follower's tattoo slot holds their fixed deity sign -- never advise
+        // replacing it. Atheists (no sign) may wear tattoos freely.
+        if (IS_SET(pObj->wear_flags, ITEM_WEAR_TATTOO) && target->getReligion( ) != god_none)
+            continue;
 
         // Skip items whose body slot the char's race lacks. Bipeds have no
         // horse/hooves slot (saddles, horseshoes); quadrupeds like centaurs have

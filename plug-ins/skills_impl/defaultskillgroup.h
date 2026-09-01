@@ -51,6 +51,11 @@ public:
     XML_VARIABLE XMLPointer<SkillGroupHelp> help;
     XML_VARIABLE XMLIntegerNoEmpty   practicer;
     XML_VARIABLE XMLStringList msgRoom, msgSelf, msgVict;
+    // Alignment-tiered cast flavour: optional dark / neutral gesture sets. When a
+    // group defines them, an evil / neutral caster gets these instead of the base
+    // (light) lines -- see DefaultSpell::collectFlavours. Empty = fall back to base.
+    XML_VARIABLE XMLStringList msgRoomEvil, msgSelfEvil, msgVictEvil;
+    XML_VARIABLE XMLStringList msgRoomNeutral, msgSelfNeutral, msgVictNeutral;
     XML_VARIABLE XMLStringNoEmpty path;
     XML_VARIABLE XMLGlobalBitvector gods;
 

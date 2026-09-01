@@ -260,8 +260,20 @@ void DefaultSpell::collectFlavours( Character *ch, std::vector<CastFlavour> &res
             }
         }
 
-        append_flavours( group->msgSelf.toList( ), group->msgVict.toList( ),
-                         group->msgRoom.toList( ), result );
+        // Alignment-tiered flavour: an evil / neutral caster gets the group's dark
+        // or neutral gestures when it defines them; good casters -- and any group
+        // that leaves a tier empty -- fall back to the base (light) lines. Keeps the
+        // light benediction flavour off evil/neutral clerics without touching groups
+        // that define no tiers.
+        if (IS_EVIL(ch) && !group->msgSelfEvil.toList( ).empty( ))
+            append_flavours( group->msgSelfEvil.toList( ), group->msgVictEvil.toList( ),
+                             group->msgRoomEvil.toList( ), result );
+        else if (IS_NEUTRAL(ch) && !group->msgSelfNeutral.toList( ).empty( ))
+            append_flavours( group->msgSelfNeutral.toList( ), group->msgVictNeutral.toList( ),
+                             group->msgRoomNeutral.toList( ), result );
+        else
+            append_flavours( group->msgSelf.toList( ), group->msgVict.toList( ),
+                             group->msgRoom.toList( ), result );
     }
 }
 
