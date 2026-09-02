@@ -29,8 +29,20 @@ TransferMovement::TransferMovement( Character *ch, Character *actor, Room *to_ro
                 const char *mrl, const char *msl, const char *mre, const char *mse )
             : JumpMovement( ch, actor, to_room ),
               msgRoomLeave( mrl ), msgSelfLeave( msl ),
-              msgRoomEnter( mre ), msgSelfEnter( mse )
-            
+              msgRoomEnter( mre ), msgSelfEnter( mse ),
+              multiLang( false )
+{
+}
+
+TransferMovement::TransferMovement( Character *ch, Character *actor, Room *to_room,
+                const MultiMessage &mrl, const MultiMessage &msl,
+                const MultiMessage &mre, const MultiMessage &mse )
+            : JumpMovement( ch, actor, to_room ),
+              msgRoomLeave( 0 ), msgSelfLeave( 0 ),
+              msgRoomEnter( 0 ), msgSelfEnter( 0 ),
+              multiLang( true ),
+              mmRoomLeave( mrl ), mmSelfLeave( msl ),
+              mmRoomEnter( mre ), mmSelfEnter( mse )
 {
 }
 
@@ -49,15 +61,34 @@ void TransferMovement::msgEcho( Character *listener, Character *wch, const char 
 
 void TransferMovement::msgOnMove( Character *wch, bool fLeaving )
 {
-    if (wch) {
-        if (fLeaving) {
-            msgSelf( wch, msgSelfLeave );
-            msgRoomNoActor( wch, msgRoomLeave );
-        }
-        else {
-            msgSelf( wch, msgSelfEnter );
-            msgRoomNoActor( wch, msgRoomEnter );
-        }
+    if (!wch)
+        return;
+
+    // Trilingual path: render each line in every viewer's own display language.
+    // The mover reads the self line in theirs; every other watcher in the room
+    // (minus actor/mount) reads the room line in theirs -- mirrors msgSelfRoom.
+    if (multiLang) {
+        const MultiMessage &selfMsg = fLeaving ? mmSelfLeave : mmSelfEnter;
+        const MultiMessage &roomMsg = fLeaving ? mmRoomLeave : mmRoomEnter;
+
+        if (!selfMsg.empty() && canHear( wch, wch ))
+            wch->pecho( selfMsg, wch, actor );
+
+        if (!roomMsg.empty())
+            for (Character *rch = wch->in_room->people; rch; rch = rch->next_in_room)
+                if (rch != wch && rch != wch->mount && rch != actor && canHear( rch, wch ))
+                    rch->pecho( roomMsg, wch, actor );
+
+        return;
+    }
+
+    if (fLeaving) {
+        msgSelf( wch, msgSelfLeave );
+        msgRoomNoActor( wch, msgRoomLeave );
+    }
+    else {
+        msgSelf( wch, msgSelfEnter );
+        msgRoomNoActor( wch, msgRoomEnter );
     }
 }
 

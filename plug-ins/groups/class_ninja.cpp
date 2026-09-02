@@ -287,11 +287,17 @@ SKILL_RUNP( vanish )
     
     if (victim == 0 || victim == ch) {
         transfer_char( ch, ch, pRoomIndex,
-            "%1$^C1 внезапно исчезает!",
-            "Пользуясь всеобщим замешательством, ты исчезаешь!",
-            "%1$^C1 внезапно появляется у тебя за спиной." );
+            MultiMessage("%1$^C1 suddenly vanishes!",
+                         "%1$^C1 внезапно исчезает!",
+                         "%1$^C1 раптово зникає!"),
+            MultiMessage("Taking advantage of the confusion, you vanish!",
+                         "Пользуясь всеобщим замешательством, ты исчезаешь!",
+                         "Користуючись загальним сум'яттям, ти зникаєш!"),
+            MultiMessage("%1$^C1 suddenly appears right behind you.",
+                         "%1$^C1 внезапно появляется у тебя за спиной.",
+                         "%1$^C1 раптово з'являється в тебе за спиною.") );
         return;
-    }    
+    }
     else {   
             // trying to kidnap
             oldact(_("$c1 пытается взять $C4 в охапку!"), ch, 0, victim, TO_NOTVICT);
