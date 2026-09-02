@@ -620,23 +620,35 @@ bool Walkment::applyWeb( Character *wch )
             affect_bit_strip(wch, &detect_flags, ADET_WEB);
             affect_strip(wch, gsn_web);
             msgSelfRoom( wch,
+                     "You tear apart the web that kept you from leaving this place!",
                      "Ты разрываешь сети, которые мешали тебе покинуть это место!",
-                     "%2$^C1 разрывает сети, которые мешали %2$P3 покинуть это место!" );
+                     "Ти розриваєш павутиння, що заважало тобі покинути це місце!",
+                     "%2$^C1 tears apart the web that kept them from leaving this place!",
+                     "%2$^C1 разрывает сети, которые мешали %2$P3 покинуть это место!",
+                     "%2$^C1 розриває павутиння, що заважало вибратися з цього місця!" );
             return true;
         }
         if ( wch->isAffected(gsn_entangle) ) {      
             affect_strip(wch, gsn_entangle);
             msgSelfRoom( wch,
+                     "You tear through the thornbush shoots that kept you from leaving this place!",
                      "Ты разрываешь побеги терновника, которые мешали тебе покинуть это место!",
-                     "%2$^C1 разрывает побеги терновника, которые мешали %2$P3 покинуть это место!" );
+                     "Ти розриваєш пагони тернику, що заважали тобі покинути це місце!",
+                     "%2$^C1 tears through the thornbush shoots that kept them from leaving this place!",
+                     "%2$^C1 разрывает побеги терновника, которые мешали %2$P3 покинуть это место!",
+                     "%2$^C1 розриває пагони тернику, що заважали вибратися з цього місця!" );
             return true;
         }        
     }
     else {
         rc = RC_MOVE_WEB;
         msgSelfRoom( wch,
+                     "You struggle to break the bonds barring your way, but fail!",
                      "Ты пытаешься разорвать путы, мешающие тебе пройти, но терпишь неудачу!",
-                     "%2$^C1 пытается разорвать путы, преграждающие %2$P3 дорогу, но терпит неудачу!" );
+                     "Ти намагаєшся розірвати пута, що заважають тобі пройти, але зазнаєш невдачі!",
+                     "%2$^C1 struggles to break the bonds barring them from passing, but fails!",
+                     "%2$^C1 пытается разорвать путы, преграждающие %2$P3 дорогу, но терпит неудачу!",
+                     "%2$^C1 намагається розірвати пута, що перегороджують шлях, але зазнає невдачі!" );
         return false;
     }
 
