@@ -42,6 +42,11 @@ LIQ(none);
 
 GSN(berserk);
 GSN(frenzy);
+GSN(hide);
+GSN(fade);
+GSN(poison);
+GSN(charm_person);
+GSN(sleep);
 
 const        char         go_ahead_str        [] = { (char)IAC, (char)GA, '\0' };
 
@@ -477,6 +482,25 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
      * body.mud-rage). */
     prompt["args"][0]["rage"] =
         (ch->isAffected( gsn_berserk ) || ch->isAffected( gsn_frenzy )) ? 1 : 0;
+
+    /* State glows: mudjs paints a coloured inner vignette per state (main.css
+     * body[data-glow=...]). The affects panel ships localized labels only, so the
+     * client can't tell these states apart from any other buff -- hence a flag each,
+     * same as rage above. All flavour, never the only signal: the panel and the
+     * in-game messages carry the real state for screen readers.
+     *   blind  -> white, heavy (blindness spell, dirt kick -- any AFF_BLIND)
+     *   mind   -> purple  (charmed / magically asleep / stunned)
+     *   poison -> green
+     *   fade   -> heavy grey
+     *   hide   -> grey */
+    prompt["args"][0]["blind"]  = IS_AFFECTED( ch, AFF_BLIND ) ? 1 : 0;
+    prompt["args"][0]["hide"]   = ch->isAffected( gsn_hide ) ? 1 : 0;
+    prompt["args"][0]["fade"]   = ch->isAffected( gsn_fade ) ? 1 : 0;
+    prompt["args"][0]["poison"] = ch->isAffected( gsn_poison ) ? 1 : 0;
+    prompt["args"][0]["mind"]   =
+        (ch->isAffected( gsn_charm_person )
+            || ch->isAffected( gsn_sleep )
+            || ch->position == POS_STUNNED) ? 1 : 0;
 
     // Call various web prompt handlers to write out complex stuff defined in other plugins,
     // such as group information, weather, time etc.
