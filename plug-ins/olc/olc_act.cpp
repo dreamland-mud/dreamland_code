@@ -497,10 +497,21 @@ void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json
         for (auto bp = bhvProps.begin(); bp != bhvProps.end(); bp++) {
             DLString editCmd = "prop " + bhvName + " " + bp.key().asString();
 
-            ptc(ch, "       prop %s %s %s  %s\r\n", 
-                bhvName.c_str(), 
+            // Scalar props quote cleanly; a structured value (grantskills stores an
+            // array of {skill,learned,msg} objects) has no scalar form -- render it
+            // as one-line JSON, not the "ERROR" asString() yields for non-scalars.
+            DLString propVal;
+            if ((*bp).isArray() || (*bp).isObject()) {
+                propVal = JsonUtils::toString(*bp);
+                propVal.stripRightWhiteSpace(); // FastWriter appends a newline
+            } else {
+                propVal = JsonUtils::asQuotedString(*bp);
+            }
+
+            ptc(ch, "       prop %s %s %s  %s\r\n",
+                bhvName.c_str(),
                 bp.key().asString().c_str(),
-                JsonUtils::asQuotedString(*bp).c_str(),
+                propVal.c_str(),
                 web_edit_button(ch, editCmd, "web").c_str());
         }
     }
