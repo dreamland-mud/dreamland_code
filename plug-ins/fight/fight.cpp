@@ -269,6 +269,49 @@ static void fightspam_round_summary( )
     }
 }
 
+// Immediate fightspam-OFF summary for damage dealt OUTSIDE the round loop -- a
+// spell or proc resolved between combat rounds. violence_update zeroes
+// roundDamage at the top of every round, so without this the between-round
+// damage is both suppressed (Damage::canSeeMessage) AND wiped before any round
+// summary can see it, leaving a fightspam-OFF caster with no damage number at
+// all. Flush att's accumulated damage as one "att => victim [N]" line to every
+// fightspam-OFF observer in the room, then consume it so the next round neither
+// drops nor double-counts it. `victim` is the spell's target passed in by the
+// caller (att->fighting may not be set yet). No-op when nothing was dealt.
+void fightspam_flush_between_rounds( Character *att, Character *victim )
+{
+    if (att == 0 || att->roundDamage <= 0 || att->in_room == 0)
+        return;
+
+    if (victim == 0 || victim->extracted || victim->position == POS_DEAD
+        || victim->max_hit <= 0)
+    {
+        att->roundDamage = 0; // nothing sensible to show, but still consume it
+        return;
+    }
+
+    int perc = att->roundDamage * 100 / victim->max_hit;
+    char num[64];
+    snprintf( num, sizeof( num ), "{D[{x{%c%d{x{D]{x",
+              round_damage_colour( perc ), att->roundDamage );
+
+    for (Character *to = att->in_room->people; to != 0; to = to->next_in_room) {
+        if (to->getPC( ) == 0 || to->extracted)
+            continue;
+        if (!IS_AWAKE(to) || IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM))
+            continue;
+        if (!to->can_sense( att ) || !to->can_sense( victim ))
+            continue;
+
+        // Args in reference order (1=attacker, 2=victim, 3=number) so the act
+        // formatter reads each va_arg with the right type -- same as the round
+        // summary line above.
+        to->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, victim, num );
+    }
+
+    att->roundDamage = 0;
+}
+
 void violence_update()
 {
     ProfilerBlock profiler("violence_update", 100);

@@ -293,7 +293,12 @@ void Questor::doFind( PCharacter *client )
     if (!Player::isNewbie(client))
         tell_raw( client, ch, _("Я помогу тебе, но награда будет не так велика."));
 
-    tell_raw( client, ch, buf.str( ).c_str( ) );
+    // buf is already composed in the viewer's language (helpMessage via
+    // fmt(ch,...), makeSpeedwalk via viewerLang). Send it through the
+    // MultiMessage overload so the speech frame matches that language too --
+    // the const char* twin would wrap EN/UA content in the RU "говорит тебе".
+    DLString hint = buf.str( );
+    tell_raw( client, ch, MultiMessage( hint, hint, hint ) );
     tell_raw( client, ch,  _("Но помни! Все дороги в этом мире изменчивы и опасны."));
     tell_raw( client, ch,  _("И не забывай открывать двери на своем пути."));
     
