@@ -2951,16 +2951,17 @@ static void ga_record( std::map<int,GAAcq> &acq, int vnum, int method, int aux, 
 }
 
 struct GAWeights {
-    double hp, mana, manaGain, healGain, dr, hr, saves;
-    double weaponWeight;   // per-average-weapon-damage weight, split from dr so a
+    double hp = 0, mana = 0, manaGain = 0, healGain = 0, dr = 0, hr = 0, saves = 0;
+    double weaponWeight = 0;   // per-average-weapon-damage weight, split from dr so a
                            // caster can value a weapon's melee output below its
                            // damroll (a staff's stats should out-rank a raw sword).
-    double stat[6];   // str, int, wis, dex, con, cha
+    double stat[6] = {};   // str, int, wis, dex, con, cha
     // Phase 3b / F3 additions: affect flags, res/imm/vuln, and the applies ga_score
     // used to ignore. `caster` picks the melee/caster value for profile-split flags.
-    bool   caster;
-    double ac, slevel, level, skillLevel, move, beats;
-    double learnSkill, learnGroup, learnAll;   // APPLY_LEARNED %, by global scope
+    bool   caster = false;
+    double ac = 0, slevel = 0, level = 0, skillLevel = 0, skillLevelSkill = 0, move = 0, beats = 0;
+    double spellFactor = 1.0;   // slevel discount for a char with few/no spells (0..1)
+    double learnSkill = 0, learnGroup = 0, learnAll = 0;   // APPLY_LEARNED %, by global scope
 };
 
 struct GACand {
@@ -3208,6 +3209,54 @@ static double ga_resValue( bitstring_t b, int kind )
 // into s; the six primary stats accumulate into statDelta[] for the caller to
 // resolve cap-aware; ac/slevel/level/move/beats and any flag/res bits fold in here
 // too. Shared by ga_score (item affects) and ga_setValue (set bonus).
+// Remort count -> how far past the practice adept (75) gear can still push a skill
+// group toward 100. 0 for an NPC or a null target.
+static int ga_remorts( Character *target )
+{
+    return (target != 0 && target->getPC( ) != 0)
+        ? (int)target->getPC( )->getRemorts( ).size( ) : 0;
+}
+
+// Does the char actually have this skill group -- i.e. know at least one skill in
+// it? A +level to a group the char has no skills in does nothing.
+static bool ga_hasGroup( Character *target, int gi )
+{
+    if (target == 0)
+        return false;
+    for (int i = 0; i < skillManager->size( ); i++) {
+        Skill *sk = skillManager->find( i );
+        if (sk == 0)
+            continue;
+        for (int g: sk->getGroups( ).toArray( ))
+            if (g == gi) {
+                if (target->getSkill( i ) > 0)   // a KNOWN skill in this group -> char has it
+                    return true;
+                break;   // skill is in gi but unknown; no need to scan its other groups
+            }
+    }
+    return false;
+}
+
+// How much slevel gear is worth to THIS char: full for a real caster, ~0 for a
+// warrior with no spells. Ramp on the count of spells the char actually knows
+// (getSpell() != 0 marks a skill as a spell); saturates at 10 known spells.
+static double ga_spellFactor( Character *target )
+{
+    if (target == 0)
+        return 1.0;
+    int spells = 0;
+    for (int i = 0; i < skillManager->size( ); i++) {
+        Skill *sk = skillManager->find( i );
+        if (sk == 0 || !sk->getSpell( ))
+            continue;
+        // Only CASTED spells read mod_level_spell (skill_utils.cpp skill_level_bonus).
+        if (sk->getSpell( )->isCasted( ) && target->getSkill( i ) > 0)
+            spells++;
+    }
+    double f = spells / 10.0;
+    return f > 1.0 ? 1.0 : f;
+}
+
 static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6],
                             Character *target )
 {
@@ -3215,7 +3264,19 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     switch (af.location) {
     case APPLY_HIT:       s += w.hp       * m; break;
     case APPLY_MANA:      s += w.mana     * m; break;
-    case APPLY_MANA_GAIN: s += w.manaGain * m; break;
+    case APPLY_MANA_GAIN:
+        // Diminishing worth: mana_gain is a PERCENT multiplier on base regen
+        // (update_params.cpp), so once regen already outpaces in-combat spend the
+        // next point buys nothing. Discount a positive modifier hyperbolically
+        // against what the char already owns (target->mana_gain). Curses stay full
+        // price; melee's 0.05 is a token, only casters get the curve.
+        if (m > 0 && w.caster && target != 0) {
+            double g0 = target->mana_gain < 0 ? 0.0 : target->mana_gain;
+            s += w.manaGain * m * 100.0 / (100.0 + g0 + m / 2.0);
+        }
+        else
+            s += w.manaGain * m;
+        break;
     case APPLY_HEAL_GAIN: s += w.healGain * m; break;
     case APPLY_DAMROLL:   s += w.dr       * m; break;
     case APPLY_HITROLL:   s += w.hr       * m; break;
@@ -3231,19 +3292,59 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     case APPLY_CON: statDelta[4] += m; break;
     case APPLY_CHA: statDelta[5] += m; break;
     case APPLY_AC:          s += w.ac     * (-m); break;   // negative ac = better; w.ac level-scaled
-    case APPLY_SPELL_LEVEL: s += w.slevel * m; break;
+    case APPLY_SPELL_LEVEL: s += w.slevel * m * w.spellFactor; break;   // ~0 with no spells
     case APPLY_MOVE:        s += w.move   * m; break;
     case APPLY_BEATS:       s += w.beats  * (-m); break;   // shorter skill lag = better
-    // +N levels to a skill group (defensive/fightmaster/...) via af.global, or to all
-    // skills when no group is named.
-    case APPLY_LEVEL:       s += (af.global.empty( ) ? w.level : w.skillLevel) * m; break;
-    // +N% skill knowledge; the global scopes it to one skill, a group, or (no global)
-    // all skills -- mirrors affect_modify's APPLY_LEARNED branch.
-    case APPLY_LEARNED:
-        if (af.global.getRegistry( ) == skillManager)           s += w.learnSkill * m;
-        else if (af.global.getRegistry( ) == skillGroupManager) s += w.learnGroup * m;
-        else                                                    s += w.learnAll   * m;
+    // +N levels: scope-split like APPLY_LEARNED -- one named skill < a group < all --
+    // and capability-gated: +level to a skill the char can't use or a group it doesn't
+    // have is worthless (0); only the unscoped all-skills bonus is unconditional.
+    case APPLY_LEVEL: {
+        bool isSkill = !af.global.empty( ) && af.global.getRegistry( ) == skillManager;
+        bool isGroup = !af.global.empty( ) && af.global.getRegistry( ) == skillGroupManager;
+        if (isSkill) {
+            if (target != 0)
+                for (int sn: af.global.toArray( ))
+                    if (target->getSkill( sn ) > 0)
+                        s += w.skillLevelSkill * m;
+        }
+        else if (isGroup) {
+            for (int gi: af.global.toArray( ))
+                if (ga_hasGroup( target, gi ))
+                    s += w.skillLevel * m;
+        }
+        else
+            s += w.level * m;
         break;
+    }
+    // +N% skill knowledge, cap-aware. APPLY_NONE with a skill/group global reaches the
+    // same mod_skills path (loadsave/affects.cpp), so alias it in -- 9 live items used
+    // it and scored 0. A point above a skill's effective 100 (getEffective clamps) or
+    // above the 25+3*remort window gear can open past the practice adept (75) is worth
+    // nothing, mirroring the cap-aware primary stats. Skill scope reads the char's real
+    // % per named skill (0 for an unknown/off-class skill); group/all use the window.
+    case APPLY_NONE:
+    case APPLY_LEARNED: {
+        bool isSkill = !af.global.empty( ) && af.global.getRegistry( ) == skillManager;
+        bool isGroup = !af.global.empty( ) && af.global.getRegistry( ) == skillGroupManager;
+        if (isSkill) {
+            if (target != 0)
+                for (int sn: af.global.toArray( )) {
+                    int eff = target->getSkill( sn );
+                    int room = 100 - eff;
+                    if (eff > 0 && room > 0)
+                        s += w.learnSkill * (m < room ? m : room);
+                }
+        }
+        else if (isGroup) {
+            int cap = 25 + 3 * ga_remorts( target );
+            s += w.learnGroup * (m < cap ? m : cap);
+        }
+        else if (af.location == APPLY_LEARNED) {   // all-skills scope (empty global)
+            int cap = 25 + 3 * ga_remorts( target );
+            s += w.learnAll * (m < cap ? m : cap);
+        }
+        break;
+    }
     // APPLY_AGE: cosmetic in score, no combat effect -- deliberately unscored.
     }
 
@@ -3525,19 +3626,24 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // F3 applies. ac is near-useless except at low level (owner call): 0.5/pt at
     // level 1 decaying linearly to 0 by level 40. slevel is caster-heavy; a skill-
     // group +level and a raw +level are both strong; move is a token; beats (skill
-    // lag) is small. Flag/res values are level-independent (see ga_affectFlagValue /
-    // ga_resValue).
-    w.ac         = 0.5 * std::max( 0, 40 - chLevel ) / 39.0;
-    w.slevel     = w.caster ? 8.0 : 1.0;
-    w.level      = 12.0;
-    w.skillLevel = 8.0;
-    w.move       = 0.05;
-    w.beats      = 2.0;
+    // lag) is a real action-throughput lever (percent cut of every skill's lag).
+    // Flag/res values are level-independent (see ga_affectFlagValue / ga_resValue).
+    w.ac              = 0.5 * std::max( 0, 40 - chLevel ) / 39.0;
+    w.slevel          = w.caster ? 25.0 : 4.0;
+    w.level           = w.caster ? 40.0 : 14.0;
+    w.skillLevel      = w.caster ? 18.0 : 8.0;    // APPLY_LEVEL, skill-group scope
+    w.skillLevelSkill = w.caster ? 9.0 : 4.0;     // APPLY_LEVEL, single-skill scope
+    w.move            = 0.05;
+    // beats = percent cut of skill lag. Central for casters/ranged (every action is a
+    // lag-gated cast), near-irrelevant for melee whose damage is auto-attacks off the
+    // violence round, not skills. So caster-heavy, melee token.
+    w.beats           = w.caster ? 6.0 : 1.0;
+    w.spellFactor     = ga_spellFactor( target );   // scales slevel by real spell knowledge
     // APPLY_LEARNED (+N% skill knowledge), valued per +1% by how broad the scope is:
     // one skill < a skill group < all skills. 187 live items carry these.
-    w.learnSkill = 0.5;
-    w.learnGroup = 1.5;
-    w.learnAll   = 2.5;
+    w.learnSkill = 2.0;   // cap-aware: x min(m, 100 - effective%) per named skill
+    w.learnGroup = 3.0;   // cap-aware: x min(m, 25 + 3*remort) window
+    w.learnAll   = 4.0;   // cap-aware: x min(m, 25 + 3*remort) window
 
     // Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
     // nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
