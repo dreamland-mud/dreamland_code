@@ -1629,12 +1629,29 @@ static void do_look_object( Character *ch, Object *obj )
         if (obj->item_type == ITEM_CONTAINER) {
             DLString kw = first_keyword_for( obj, lang );
             if (!kw.empty( )) {
+                // Flag only contents the player could actually reveal: examine
+                // shows nothing for a closed or locked container, so promising
+                // "there is something inside" one would leak what it hides. An
+                // item the looker cannot see does not count either.
+                bool full = false;
+                if (!IS_SET(obj->value1( ), CONT_CLOSED|CONT_LOCKED))
+                    for (Object *c = obj->contains; c; c = c->next_content)
+                        if (ch->can_see( c )) { full = true; break; }
+
                 // A table or a shelf is a container you put things ON, and examine
                 // answers "На столе ты видишь" for it -- so do not promise "inside".
-                if (IS_SET(obj->value1( ), CONT_PUT_ON|CONT_PUT_ON2))
-                    ch->pecho( _("Посмотреть, что сверху: {y{hcизучить %1$s{x."), kw.c_str( ) );
-                else
-                    ch->pecho( _("Заглянуть внутрь: {y{hcизучить %1$s{x."), kw.c_str( ) );
+                if (IS_SET(obj->value1( ), CONT_PUT_ON|CONT_PUT_ON2)) {
+                    if (full)
+                        ch->pecho( _("Сверху что-то лежит, посмотреть: {y{hcизучить %1$s{x."), kw.c_str( ) );
+                    else
+                        ch->pecho( _("Посмотреть, что сверху: {y{hcизучить %1$s{x."), kw.c_str( ) );
+                }
+                else {
+                    if (full)
+                        ch->pecho( _("Внутри что-то есть, заглянуть: {y{hcизучить %1$s{x."), kw.c_str( ) );
+                    else
+                        ch->pecho( _("Заглянуть внутрь: {y{hcизучить %1$s{x."), kw.c_str( ) );
+                }
             }
         }
 
