@@ -3539,6 +3539,16 @@ static void ga_pathcost( Room *start, int destVnum, int chLevel, bool isVampire,
     }
 }
 
+// The character who ultimately holds this object (worn or carried), walking out of
+// any nested containers. Null when the item rests in a room / on a shop floor.
+static Character * ga_rootCarrier( ::Object *o )
+{
+    ::Object *top = o;
+    while (top->in_obj != 0)
+        top = top->in_obj;
+    return top->carried_by;
+}
+
 // Difficulty band 0 easy / 1 medium / 2 hard. Single source of truth; keep the
 // thresholds in sync with Fenia .tmp.advice.difficulty. Quests are always medium.
 // Thresholds are deliberately simple and tunable, like the tone bands.
@@ -3655,10 +3665,20 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         capStat[k] = pch ? pch->getMaxStat( sc ) : MAX_STAT;
     }
 
-    // Live spawned-instance count per vnum (single pass over the world).
-    std::map<int,int> spawned;
-    for (::Object *o = object_list; o; o = o->next)
-        spawned[o->pIndexData->vnum]++;
+    // Live instance census per vnum (single pass over the world). `spawned` = every
+    // live copy (feeds the obtainability score below); `gettable` = copies a player
+    // could still get -- those NOT locked in another player's hands (held by an NPC,
+    // lying in a room, on a shop floor, or in a container that roots to either). Zero
+    // gettable copies of a fully-claimed limited item means its reset stands bare (see
+    // the skip below).
+    std::map<int,int> spawned, gettable;
+    for (::Object *o = object_list; o; o = o->next) {
+        int vn = o->pIndexData->vnum;
+        spawned[vn]++;
+        Character *rc = ga_rootCarrier( o );
+        if (rc == 0 || rc->is_npc( ))
+            gettable[vn]++;
+    }
 
     // Area-quest reward map: obj vnum -> quest vnum. Two declarative sources: a
     // step's rewardVnum (the engine grants it) and the quest's lootVnums (gear its
@@ -3839,6 +3859,16 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (ml > pObj->level + 20 || ml < pObj->level - 3)
                 continue;
         }
+
+        // A limited item that is fully claimed -- every allowed copy exists (live, or
+        // in an offline player's profile: both are tallied in pObj->count, the same
+        // count resets gate on, update_areas.cpp) -- and not one of them is reachable
+        // (each is worn/carried by a player). The reset source stands bare and no new
+        // copy will spawn, so no one can get it: keep it out of the recs and the
+        // percentile, like an item with no known route. (count < limit is left in --
+        // the reset can still produce a copy, so it stays a valid, if scarce, goal.)
+        if (pObj->limit > 0 && pObj->count >= pObj->limit && gettable[pObj->vnum] == 0)
+            continue;
 
         double sc = ga_score( target, pObj, w, rawStat, capStat, false );
         if (sc <= 0)
