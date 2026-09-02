@@ -74,6 +74,30 @@ static RegisterList message_args(FeniaCommandContext *thiz, const RegisterList &
     return myArgs;
 }
 
+// Broadcast `myArgs` to every awake char in the caster's area (except the caster
+// and their own room), rendered PER RECIPIENT so ._()/.mm() messages resolve to
+// each viewer's language. Mirrors area_message(everywhere=true)'s filter; the
+// old msgArea collapsed the MultiMessage to RU once via regfmt(NULL,...) before
+// area_message, leaking Russian to EN/UA players.
+static void msgArea_perViewer(Character *caster, const RegisterList &myArgs)
+{
+    if (caster->in_room == 0)
+        return;
+
+    for (Character *wch = char_list; wch != 0; wch = wch->next) {
+        if (wch == caster || wch->in_room == 0)
+            continue;
+        if (wch->in_room->area != caster->in_room->area)
+            continue;
+        if (wch->in_room == caster->in_room)
+            continue;
+        if (!IS_AWAKE(wch))
+            continue;
+
+        wch->pecho(POS_RESTING, regfmt(wch, myArgs).c_str());
+    }
+}
+
 NMI_INVOKE(FeniaSpellContext, msgChar, "(fmt[,args]): выдать сообщение кастеру; кастер 1й аргумент, цель 2й аргумент")
 {
     Character *caster = arg2character(ch);
@@ -147,9 +171,8 @@ NMI_INVOKE(FeniaSpellContext, msgAll, "(fmt[,args]): выдать сообщен
 NMI_INVOKE(FeniaSpellContext, msgArea, "(fmt[,args]): выдать сообщение всем в той же зоне, кроме комнаты кастера")
 {
     Character *caster = arg2character(ch);
-    RegisterList myArgs = message_args(this, args); 
-    DLString message = regfmt(NULL, myArgs);
-    area_message(caster, message, true);
+    RegisterList myArgs = message_args(this, args);
+    msgArea_perViewer(caster, myArgs);
     return Register();
 }
 
@@ -573,8 +596,7 @@ NMI_INVOKE(FeniaCommandContext, damApplyClass, "(): наложить бонус�
 NMI_INVOKE(FeniaCommandContext, msgArea, "(fmt[,args]): выдать сообщение всем в той же зоне, кроме комнаты ch")
 {
     Character *caster = arg2character(ch);
-    RegisterList myArgs = message_args(this, args); 
-    DLString message = regfmt(NULL, myArgs);
-    area_message(caster, message, true);
+    RegisterList myArgs = message_args(this, args);
+    msgArea_perViewer(caster, myArgs);
     return Register();
 }
