@@ -131,8 +131,16 @@ NMI_INVOKE(FeniaSpellContext, msgRoom, "(fmt[,args]): выдать сообще�
 NMI_INVOKE(FeniaSpellContext, msgAll, "(fmt[,args]): выдать сообщение всем в комнате; кастер 1й аргумент, цель 2й аргумент")
 {
     Character *caster = arg2character(ch);
-    RegisterList myArgs = message_args(this, args); 
-    caster->in_room->echo(POS_RESTING, regfmt(NULL, myArgs).c_str());
+    RegisterList myArgs = message_args(this, args);
+
+    // Render per viewer so ._()/.mm() messages resolve to each recipient's
+    // language, the way msgRoom/msgVict/msgNotVict do. The old
+    // regfmt(NULL,...) collapsed the MultiMessage to its RU default once and
+    // broadcast that single string to the whole room, leaking Russian to EN/UA
+    // players. No can_sense filter: msgAll's contract is "everyone in the room",
+    // matching the room->echo it replaces.
+    for (Character *to = caster->in_room->people; to; to = to->next_in_room)
+        to->pecho(POS_RESTING, regfmt(to, myArgs).c_str());
     return Register();
 }
 

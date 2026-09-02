@@ -39,6 +39,9 @@ bool        damage_nocatch( Affect *paf, Character *victim, int dam, int sn, int
 void        rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show, const DLString &deathReason );
 void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show, const DLString &deathReason );
 void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage);
+/* fightspam-OFF: flush damage dealt between rounds (a cast/proc) as one summary
+ * line now, before violence_update's per-round reset drops it. victim = target. */
+void        fightspam_flush_between_rounds( Character *att, Character *victim );
 int        move_dec( Character *ch );
 void damapply_class(Character *ch, int &dam);
 int second_weapon_chance(Profession *prof, Object *weapon);

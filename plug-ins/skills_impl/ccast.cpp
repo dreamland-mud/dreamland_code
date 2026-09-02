@@ -307,6 +307,13 @@ CMDRUN( cast )
             
             mprog_cast( ch, target, skill, true );
 
+            // Baseline the caster's per-round damage so the immediate
+            // fightspam-OFF summary below measures only THIS cast: roundDamage is
+            // reset by violence_update, not by the round summary, so between
+            // rounds it still holds last round's melee total, which the cast
+            // would otherwise be added to and double-shown.
+            ch->roundDamage = 0;
+
             if (!fForbidCasting)
                 spell->run( ch, target, slevel );
 
@@ -315,6 +322,10 @@ CMDRUN( cast )
 
             mprog_cast( ch, target, skill, false );
             skill->improve( ch, true, victim );
+
+            // A fightspam-OFF caster's damage was suppressed per-hit and would be
+            // wiped by the next round's reset -- show it now as one summary line.
+            fightspam_flush_between_rounds( ch, victim );
 
             if (fForbidReaction)
                 return;
