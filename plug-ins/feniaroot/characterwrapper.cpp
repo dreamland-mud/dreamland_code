@@ -2972,6 +2972,34 @@ struct GACand {
     GAAcq  acq;       // how the sage says to get it
 };
 
+// Can the char put a weapon in the off-hand right now? Mirrors SecondWieldWearloc's
+// gate: the second-weapon skill usable, the char actually HAS the off-hand rib (some
+// shapeshifts lose it), no shield or held item in the left hand, and the primary weapon
+// not two-handed. Tests ACTUAL wear locations, not prototype flags -- an arrow stuck in
+// the char or a sheathed weapon carries the wield flag but holds no hand. A shield or
+// two-hander build keeps a single weapon position, so the advisor won't nudge it away.
+// (Conservative gaps, no false "yes": SIZE_HUGE giants may two-hand-plus-offhand; a
+// sheathed weapon reads the off-hand as free -- both only ever under-report capacity.)
+static bool ga_canDualWield( Character *ch )
+{
+    Skill *sk = skillManager->findExisting( "second weapon" );
+    if (sk == 0 || !sk->usable( ch, false ))
+        return false;
+    Wearlocation *offLoc = wearlocationManager->findExisting( "second_wield" );
+    if (offLoc == 0 || !ch->getWearloc( ).isSet( offLoc ))
+        return false;
+    Wearlocation *shieldLoc = wearlocationManager->findExisting( "shield" );
+    Wearlocation *holdLoc   = wearlocationManager->findExisting( "hold" );
+    if ((shieldLoc != 0 && shieldLoc->find( ch ) != 0)
+        || (holdLoc != 0 && holdLoc->find( ch ) != 0))
+        return false;
+    Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
+    ::Object *primary = wieldLoc ? wieldLoc->find( ch ) : 0;
+    if (primary != 0 && IS_WEAPON_STAT( primary, WEAPON_TWO_HANDS ))
+        return false;
+    return true;
+}
+
 // Cap-aware stat value: only the points that actually land BELOW the character's
 // stat cap are worth anything. base = the stat WITHOUT the item being scored.
 static double ga_statgain( int base, int delta, int cap )
@@ -3429,7 +3457,8 @@ static int ga_band( int method, int guard, int chLevel, int aggros, int doors, i
 // it only runs for the <=10 final picks, never the whole candidate set. Quest and
 // sourceless picks carry no path.
 static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire,
-                               std::map<int, std::vector<int> > &pathCache, double gain )
+                               std::map<int, std::vector<int> > &pathCache, double gain,
+                               bool fillsFree = false )
 {
     GAAcq &ac = c.acq;
     int aggros = 0, doors = 0, fly = 0;
@@ -3458,10 +3487,14 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     e->push_back( Register( band ) );
     // Profile-weighted score improvement over the worn item, rounded, for display.
     e->push_back( Register( gain >= 0 ? (int)(gain + 0.5) : (int)(gain - 0.5) ) );
+    // 1 when this pick goes into a still-empty position of a multi-position slot (a
+    // second ring/bracelet, a dual-wield off-hand): an ADDITION, not a swap, so the
+    // render shows it as a fill (gains only, no "Replaces"). 0 for a plain replacement.
+    e->push_back( Register( fillsFree ? 1 : 0 ) );
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit -> optimal is the top-5 for that slot only (pct 0, best empty)" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -3615,6 +3648,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
 
     // Catalogue every wearable prototype this char can wear right now.
     std::vector<GACand> cands;
+    // Second-copy fills for an explicit slot-browse of a paired slot (finger/neck/wrist,
+    // or a dual-wield off-hand): a copy of an already-worn item that could go in its
+    // empty twin position. Collected here so it never touches the percentile/optimal
+    // passes, then merged into slotCands when that slot has a free position.
+    std::vector<GACand> secondCopyCands;
     std::map<int,double> bestSlot;
 
     // Body slots a race may lack -- resolved once (findExisting is what
@@ -3644,8 +3682,18 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         REMOVE_BIT( slot, ITEM_TAKE );
         if (slot == 0 && pObj->item_type != ITEM_LIGHT)
             continue;
-        if (wornVnum.count( pObj->vnum ))  // already wearing this exact item
-            continue;
+        // Already wearing this exact item: normally skip. Exception -- an explicit
+        // slot-browse of a paired slot (finger/neck/wrist, or a dual-wield off-hand)
+        // may advise a SECOND copy for the empty twin position, as long as the world
+        // isn't capped to one instance (limit 1). Route those to secondCopyCands; they
+        // never feed the percentile/optimal path. The free-position gate is applied in
+        // the slot-browse block (worn-count vs capacity).
+        bool secondCopy = false;
+        if (wornVnum.count( pObj->vnum )) {
+            if (slotFilter == 0 || (slot & slotFilter) == 0 || pObj->limit == 1)
+                continue;
+            secondCopy = true;
+        }
 
         // Wearable now? native per-item-type wear level (armour +3, weapon +0, ...).
         int wearMod = target->getProfession( )->getWearModifier( pObj->item_type );
@@ -3721,6 +3769,12 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         GACand c;
         c.pObj = pObj; c.slot = slot; c.score = sc; c.obtain = obtain; c.value = 0;
         c.acq = ac;
+        if (secondCopy) {
+            // A second copy never feeds the percentile, optimal or set passes -- the
+            // char already wears one. Held only for the slot-browse fill list.
+            secondCopyCands.push_back( c );
+            continue;
+        }
         cands.push_back( c );
 
         // Only gear the char can actually get sets the slot ceiling: an item with no
@@ -3951,48 +4005,85 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // them by difficulty band). No percentile, no dream list; the caller passes
     // lockedSlots=0 so an explicit slot browse is never suppressed by a set.
     if (slotFilter != 0) {
-        // The bar a candidate must clear -- never advise a downgrade. Finger, neck
-        // and wrist each have TWO wear positions (compatflags.conf), everything else
-        // one. While a position is still empty the char can add gear with no loss, so
-        // the bar is 0 and anything wearable fills it; once every position is filled,
-        // only an upgrade over the WEAKEST worn piece is worth a swap (the strongest
-        // stays put). A single max-worn bar hid both cases: an empty second wrist read
-        // as "you already wear the best," and a beat-your-worse-ring pick got dropped.
+        bool wieldBrowse = (slotFilter & ITEM_WIELD) != 0;
+        // Worn scores in this slot + its position count. Most slots read the prototype's
+        // wear flag, but the WIELD slot must use the ACTUAL wear locations: an arrow stuck
+        // in the char or a sheathed weapon carries the "wield" flag yet holds no hand, so a
+        // proto-flag count would falsely read the off-hand as occupied. Finger/neck/wrist
+        // have two positions; wield has two for a dual-wielder with a free off-hand.
         std::vector<double> wornScores;
-        for (::Object *o = target->carrying; o; o = o->next_content) {
-            if (o->wear_loc == wear_none)
-                continue;
-            int ws = o->pIndexData->wear_flags;
-            REMOVE_BIT( ws, ITEM_TAKE );
-            if ((ws & slotFilter) == 0)
-                continue;
-            wornScores.push_back( ga_score( target, o->pIndexData, w, rawStat, capStat, true ) );
-        }
         int capacity = 1;
-        if ((slotFilter & ITEM_WEAR_FINGER) || (slotFilter & ITEM_WEAR_NECK) || (slotFilter & ITEM_WEAR_WRIST))
-            capacity = 2;
-        // Paired slot (capacity 2): an empty position means bar 0 (add with no loss),
-        // both filled means beat the WEAKEST worn piece (the stronger stays put). Every
-        // single-position slot keeps the old max bar exactly -- weapons untouched here;
-        // a dual-wield off-hand is a separate follow-up, not this fix.
-        double wornScore = 0;
+        if (wieldBrowse) {
+            Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
+            Wearlocation *offLoc   = wearlocationManager->findExisting( "second_wield" );
+            ::Object *primary = wieldLoc ? wieldLoc->find( target ) : 0;
+            ::Object *offhand = offLoc   ? offLoc->find( target )   : 0;
+            if (primary != 0) wornScores.push_back( ga_score( target, primary->pIndexData, w, rawStat, capStat, true ) );
+            if (offhand != 0) wornScores.push_back( ga_score( target, offhand->pIndexData, w, rawStat, capStat, true ) );
+            if (ga_canDualWield( target ))
+                capacity = 2;
+        } else {
+            for (::Object *o = target->carrying; o; o = o->next_content) {
+                if (o->wear_loc == wear_none)
+                    continue;
+                int ws = o->pIndexData->wear_flags;
+                REMOVE_BIT( ws, ITEM_TAKE );
+                if ((ws & slotFilter) == 0)
+                    continue;
+                wornScores.push_back( ga_score( target, o->pIndexData, w, rawStat, capStat, true ) );
+            }
+            if ((slotFilter & ITEM_WEAR_FINGER) || (slotFilter & ITEM_WEAR_NECK) || (slotFilter & ITEM_WEAR_WRIST))
+                capacity = 2;
+        }
+
+        // The bar a candidate must clear. Multi-position slot (capacity 2): an empty
+        // position means bar 0 (add with no loss), both filled means beat the WEAKEST worn
+        // piece. Single-position slots keep the old max bar exactly. primaryScore (best
+        // worn) is the separate bar a two-handed weapon must clear: it OUSTS the one-hander
+        // instead of joining it, so it is a replacement even when the off-hand is free.
+        double wornScore = 0, primaryScore = 0;
+        for (size_t i = 0; i < wornScores.size( ); i++)
+            if (wornScores[i] > primaryScore) primaryScore = wornScores[i];
         if (capacity >= 2) {
             if ((int)wornScores.size( ) >= capacity)
                 wornScore = *std::min_element( wornScores.begin( ), wornScores.end( ) );
         } else {
-            for (size_t i = 0; i < wornScores.size( ); i++)
-                if (wornScores[i] > wornScore) wornScore = wornScores[i];
+            wornScore = primaryScore;
         }
+        bool freePos = (int)wornScores.size( ) < capacity;
+
         std::vector<GACand> slotCands;
-        for (auto &c: cands)
-            if ((c.slot & slotFilter) && c.acq.method != GA_UNKNOWN && c.score >= wornScore)
+        for (auto &c: cands) {
+            if ((c.slot & slotFilter) == 0 || c.acq.method == GA_UNKNOWN)
+                continue;
+            // A two-handed weapon can never take the off-hand (SecondWieldWearloc refuses
+            // it) -- it replaces the primary, so it must clear the primary's score, not the
+            // free-slot bar.
+            double bar = wornScore;
+            if (wieldBrowse && IS_SET( c.pObj->value[4], WEAPON_TWO_HANDS ))
+                bar = primaryScore;
+            if (c.score >= bar)
                 slotCands.push_back( c );
+        }
+        // A free position in a multi-position slot can take a second copy of a worn item
+        // (a second ring/bracelet, or a same-weapon off-hand) -- offer it too. Second
+        // copies are never two-handed here (a two-handed primary blocks dual capacity).
+        if (freePos)
+            for (auto &c: secondCopyCands)
+                if ((c.slot & slotFilter) && c.acq.method != GA_UNKNOWN && c.score >= wornScore)
+                    slotCands.push_back( c );
         std::sort( slotCands.begin( ), slotCands.end( ),
             []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
 
         RegList::Pointer slotList( NEW );
-        for (size_t k = 0; k < slotCands.size( ) && k < 5; k++)
-            slotList->push_back( ga_buildEntry( slotCands[k], msm, chLevel, isVampire, pathCache, slotCands[k].score - wornScore ) );
+        for (size_t k = 0; k < slotCands.size( ) && k < 5; k++) {
+            // A two-handed weapon replaces the primary rather than filling the off-hand:
+            // show it as a swap (fillsFree 0), gain over the primary, not the fill bar.
+            bool twoHand = wieldBrowse && IS_SET( slotCands[k].pObj->value[4], WEAPON_TWO_HANDS );
+            bool fills = freePos && !twoHand;
+            double gain = twoHand ? (slotCands[k].score - primaryScore) : (slotCands[k].score - wornScore);
+            slotList->push_back( ga_buildEntry( slotCands[k], msm, chLevel, isVampire, pathCache, gain, fills ) );
+        }
 
         RegList::Pointer emptyBest( NEW );
         RegList::Pointer result( NEW );
