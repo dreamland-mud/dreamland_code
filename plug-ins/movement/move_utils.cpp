@@ -47,12 +47,21 @@ int move_char( Character *ch, Object *portal )
 }
 
 
-void transfer_char( Character *ch, Character *actor, Room *to_room, 
-                    const char *msgRoomLeave, const char *msgSelfLeave, 
+void transfer_char( Character *ch, Character *actor, Room *to_room,
+                    const char *msgRoomLeave, const char *msgSelfLeave,
                     const char *msgRoomEnter, const char *msgSelfEnter )
 {
-    TransferMovement( ch, actor, to_room, 
-                      msgRoomLeave, msgSelfLeave, 
+    TransferMovement( ch, actor, to_room,
+                      msgRoomLeave, msgSelfLeave,
+                      msgRoomEnter, msgSelfEnter ).move( );
+}
+
+void transfer_char( Character *ch, Character *actor, Room *to_room,
+                    const MultiMessage &msgRoomLeave, const MultiMessage &msgSelfLeave,
+                    const MultiMessage &msgRoomEnter, const MultiMessage &msgSelfEnter )
+{
+    TransferMovement( ch, actor, to_room,
+                      msgRoomLeave, msgSelfLeave,
                       msgRoomEnter, msgSelfEnter ).move( );
 }
 

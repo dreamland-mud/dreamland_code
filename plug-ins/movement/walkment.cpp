@@ -451,21 +451,29 @@ bool Walkment::checkWater( Character *wch )
     // don't really apply to them yet.
 
     if (RoomUtils::isWater(from_room) && !RoomUtils::isWater(to_room) && IS_SET(wch->form, FORM_FISH)) {
-            msgSelfParty( wch, 
+            msgSelfParty( wch,
+                      "Fish aren't amphibians -- you can't go ashore!",
                       "Рыбы не амфибии, на сушу нельзя!",
-                      "%2$^C1 подплывает к краю воды, но не выходит на берег." );
+                      "Риби не амфібії -- на суходіл не можна!",
+                      "%2$^C1 swims up to the water's edge but doesn't come ashore.",
+                      "%2$^C1 подплывает к краю воды, но не выходит на берег.",
+                      "%2$^C1 підпливає до краю води, але не виходить на берег." );
             rc = RC_MOVE_OUTWATER;
-            return false;         
+            return false;
     }
 
     if (from_room->getSectorType() == SECT_UNDERWATER || 
          to_room->getSectorType() == SECT_UNDERWATER) {
             if (!IS_SET(boat_types, BOAT_SWIM)) {
-               msgSelfParty( wch, 
+               msgSelfParty( wch,
+                      "To get {hh2128underwater{x you need gills or a scuba set.",
                       "Чтобы попасть {hh2128под воду{x, нужны жабры или акваланг.",
-                      "%2$^C3 нужны жабры или акваланг, чтобы попасть {hh2128под воду{x." );
+                      "Щоб потрапити {hh2128під воду{x, потрібні зябра або акваланг.",
+                      "%2$^C3 needs gills or a scuba set to get {hh2128underwater{x.",
+                      "%2$^C3 нужны жабры или акваланг, чтобы попасть {hh2128под воду{x.",
+                      "%2$^C3 потрібні зябра або акваланг, щоб потрапити {hh2128під воду{x." );
                 rc = RC_MOVE_UNDERWATER;
-                return false;                     
+                return false;
             }
     }
                 
