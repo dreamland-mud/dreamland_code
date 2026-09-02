@@ -466,10 +466,10 @@ bool Walkment::checkWater( Character *wch )
          to_room->getSectorType() == SECT_UNDERWATER) {
             if (!IS_SET(boat_types, BOAT_SWIM)) {
                msgSelfParty( wch,
-                      "To get {hh2128underwater{x, you need gills or a scuba.",
+                      "To get {hh2128underwater{x you need gills or a scuba set.",
                       "Чтобы попасть {hh2128под воду{x, нужны жабры или акваланг.",
                       "Щоб потрапити {hh2128під воду{x, потрібні зябра або акваланг.",
-                      "%2$^C3 needs gills or a scuba to get {hh2128underwater{x.",
+                      "%2$^C3 needs gills or a scuba set to get {hh2128underwater{x.",
                       "%2$^C3 нужны жабры или акваланг, чтобы попасть {hh2128под воду{x.",
                       "%2$^C3 потрібні зябра або акваланг, щоб потрапити {hh2128під воду{x." );
                 rc = RC_MOVE_UNDERWATER;
