@@ -3564,10 +3564,15 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         AreaQuest *q = qk->second;
         if (!q)
             continue;
-        // Outleveled quests can't be started (aquest_can_participate "too old"), so
-        // their rewards are unreachable -- don't advertise them. A too-young char is
-        // left alone: that reward is a legitimate future goal, not a dead one.
+        // Quests the char can't yet start are dead ends, so their rewards are
+        // unreachable -- don't advertise them. Mirror both level gates of
+        // aquest_can_participate (areaquestutils.cpp): too old (past maxLevel) and
+        // too young (below minLevel). Both use getLevel() == the real level, so a
+        // remort bonus level bought from Baba Yaga never fakes quest eligibility --
+        // it only lowers an item's wear level, not the quest's entry level.
         if (q->maxLevel.getValue( ) < LEVEL_MORTAL && target->getLevel( ) > q->maxLevel.getValue( ))
+            continue;
+        if (q->minLevel.getValue( ) > 0 && target->getLevel( ) < q->minLevel.getValue( ))
             continue;
         for (int s = 0; s < (int)q->steps.size( ); s++) {
             int rv = q->steps[s]->rewardVnum.getValue( );
