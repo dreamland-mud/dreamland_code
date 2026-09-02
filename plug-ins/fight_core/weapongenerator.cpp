@@ -644,6 +644,10 @@ static DLString gender_tag(const DLString &gender)
     return "-";
 }
 
+// Defined further down (with the lazy-repair path). Forward-declared so
+// setShortDescr can share the same authored-pad override at generation time.
+static bool decline_ua(const DLString &word, const DLString &pos, const DLString &gtag, DLString &result);
+
 void WeaponGenerator::setShortDescr() const
 {
     obj->gram_gender = MultiGender(nameConfig["gender"].asCString());
@@ -679,9 +683,18 @@ void WeaponGenerator::setShortDescr() const
         DLString gtag = gender_tag(nameConfig["gender"].asString());
         DLString adjUa = a >= 0 && a < (int)adjectives_ua.size() ? adjectives_ua[a] : DLString::emptyString;
 
+        // Route through decline_ua (not Morphology::declineUa directly) so an
+        // authored pad in short_ua overrides pymorphy for the words it declines
+        // wrong. The bool return is irrelevant here: at generation time a sidecar
+        // miss still writes what it managed, exactly as the direct call did.
+        DLString baseUa, adjUaDeclined;
+        decline_ua(nameConfig["short_ua"].asString(), "NOUN", gtag, baseUa);
+        if (!adjUa.empty())
+            decline_ua(adjUa, "ADJF", gtag, adjUaDeclined);
+
         obj->setShortDescr(compose_short(
-            adjUa.empty() ? adjUa : Morphology::declineUa(adjUa, "ADJF", gtag),
-            Morphology::declineUa(nameConfig["short_ua"].asString(), "NOUN", gtag),
+            adjUaDeclined,
+            baseUa,
             // Suffix nouns ("... of pain") are a fixed genitive -- appended as-is,
             // like RU, so they stay put when the weapon name declines by case.
             n >= 0 && n < (int)nouns_ua.size() ? nouns_ua[n] : DLString::emptyString), LANG_UA);
@@ -779,6 +792,15 @@ static bool find_affix_form(const DLString &field, const DLString &russian,
 static bool decline_ua(const DLString &word, const DLString &pos,
                        const DLString &gtag, DLString &result)
 {
+    // An authored short_ua may already BE a full Flexer pad (it contains a
+    // pipe) -- the override for the handful of words pymorphy declines wrong
+    // (kukri, tanto, kamcha...). Take such a pad verbatim rather than feeding
+    // an already-declined string back through the sidecar.
+    if (word.find('|') != DLString::npos) {
+        result = word;
+        return true;
+    }
+
     result = Morphology::declineUa(word, pos, gtag);
     return result != word + "|||||";
 }

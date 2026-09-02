@@ -303,7 +303,13 @@ again:
             case 'O':
                 nounFlags = (alternative ? 0 : FMT_INVIS);
                 noun = argNoun(nounFlags)->decline(*f);
+                // Fence the object noun in push/pop colour so its own colour
+                // codes (a tier tint, an unclosed {R...) cannot bleed into the
+                // rest of the sentence. {1 remembers the colour active here, {2
+                // restores it after the noun whatever colour the noun left on.
+                s += "{1";
                 s += noun;
+                s += "{2";
                 break;
             case 'N':
                 s += russian_case( argStr(), *f );

@@ -109,11 +109,11 @@ void CMlt::doShowSelf( PCharacter *ch )
         str << fmt(ch, _("Всего ты выполни%1$Gло|л|ла {W%2$d{x персональн%2$Iый|ых|ых квес%2$Iт|та|тов, "), ch, victoriesTotal);
 
         if (victoriesTotal == victoriesBonus)
-            str << "{Wвсе{x из которых дают право на бонусы." << endl;
+            str << fmt(ch, _("{Wвсе{x из которых дают право на бонусы.")) << endl;
         else if (victoriesBonus > 0)
-            str << "{W" << victoriesBonus << "{x из которых " << (victoriesBonus > 1 ? "дают" : "дает") << " право на бонусы." << endl;
+            str << fmt(ch, _("{W%1$d{x из которых %1$Iдает|дают|дают право на бонусы."), victoriesBonus) << endl;
         else
-            str << "ни один из которых не дает право на бонусы." << endl;
+            str << fmt(ch, _("ни один из которых не дает право на бонусы.")) << endl;
 
         if (victoriesBonus > 0) {
             if (wasted == 0)
@@ -134,14 +134,14 @@ void CMlt::doShowSelf( PCharacter *ch )
 
         if (r_cnt == b_cnt) {
             if (r_cnt == 1)
-                str << "которая дает право на бонусы";
+                str << fmt(ch, _("которая дает право на бонусы"));
             else
-                str << "{Wвсе{x из которых дают право на бонусы";
+                str << fmt(ch, _("{Wвсе{x из которых дают право на бонусы"));
         }
+        else if (b_cnt == 0)
+            str << fmt(ch, _("ни одна из которых не дает право на бонусы"));
         else
-            str << "{W" << b_cnt << "{x из которых "
-                << (b_cnt > 1 ? "дают" : "дает")
-                << " право на бонусы";
+            str << fmt(ch, _("{W%1$d{x из которых %1$Iдает|дают|дают право на бонусы"), b_cnt);
         str << ":" << endl; 
 
         for (int i = 0; i < r_cnt; i++) {
@@ -166,7 +166,7 @@ void CMlt::doShowSelf( PCharacter *ch )
         str << endl;
     }
     else
-        str << "Ты живешь первую жизнь." << endl;
+        str << fmt(ch, _("Ты живешь первую жизнь.")) << endl;
     
     if (r_cnt > 0 || wasted > 0) {
         str << endl
@@ -177,7 +177,7 @@ void CMlt::doShowSelf( PCharacter *ch )
         str << (r.hp > 0          ? fmt( ch, _("     %d здоровья\n"), r.hp.getValue( ) ) : "")
             << (r.mana > 0        ? fmt( ch, _("     %d маны\n"), r.mana.getValue( ) ) : "")
             << (r.level > 0       ? fmt( ch, _("     %1$d уров%1$Iень|ня|ней \n"), r.level.getValue( ) ) : "")
-            << (r.pretitle        ?          "     цветной претитул\n" : "");
+            << (r.pretitle        ? fmt( ch, _("     цветной претитул\n") ) : "");
 
         for (int i = 0; i < stat_table.size; i++)
             if (r.stats[i] > 0)
