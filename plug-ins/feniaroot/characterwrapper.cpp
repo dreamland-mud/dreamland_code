@@ -3951,10 +3951,14 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // them by difficulty band). No percentile, no dream list; the caller passes
     // lockedSlots=0 so an explicit slot browse is never suppressed by a set.
     if (slotFilter != 0) {
-        // Only offer gear that beats or ties what the char already wears in this
-        // slot -- never a downgrade. wornScore = best worn item intersecting the
-        // slot (0 for an empty slot, so anything wearable qualifies there).
-        double wornScore = 0;
+        // The bar a candidate must clear -- never advise a downgrade. Finger, neck
+        // and wrist each have TWO wear positions (compatflags.conf), everything else
+        // one. While a position is still empty the char can add gear with no loss, so
+        // the bar is 0 and anything wearable fills it; once every position is filled,
+        // only an upgrade over the WEAKEST worn piece is worth a swap (the strongest
+        // stays put). A single max-worn bar hid both cases: an empty second wrist read
+        // as "you already wear the best," and a beat-your-worse-ring pick got dropped.
+        std::vector<double> wornScores;
         for (::Object *o = target->carrying; o; o = o->next_content) {
             if (o->wear_loc == wear_none)
                 continue;
@@ -3962,8 +3966,22 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             REMOVE_BIT( ws, ITEM_TAKE );
             if ((ws & slotFilter) == 0)
                 continue;
-            double sc = ga_score( target, o->pIndexData, w, rawStat, capStat, true );
-            if (sc > wornScore) wornScore = sc;
+            wornScores.push_back( ga_score( target, o->pIndexData, w, rawStat, capStat, true ) );
+        }
+        int capacity = 1;
+        if ((slotFilter & ITEM_WEAR_FINGER) || (slotFilter & ITEM_WEAR_NECK) || (slotFilter & ITEM_WEAR_WRIST))
+            capacity = 2;
+        // Paired slot (capacity 2): an empty position means bar 0 (add with no loss),
+        // both filled means beat the WEAKEST worn piece (the stronger stays put). Every
+        // single-position slot keeps the old max bar exactly -- weapons untouched here;
+        // a dual-wield off-hand is a separate follow-up, not this fix.
+        double wornScore = 0;
+        if (capacity >= 2) {
+            if ((int)wornScores.size( ) >= capacity)
+                wornScore = *std::min_element( wornScores.begin( ), wornScores.end( ) );
+        } else {
+            for (size_t i = 0; i < wornScores.size( ); i++)
+                if (wornScores[i] > wornScore) wornScore = wornScores[i];
         }
         std::vector<GACand> slotCands;
         for (auto &c: cands)
