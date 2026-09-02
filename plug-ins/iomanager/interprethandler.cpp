@@ -490,10 +490,12 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
      * in-game messages carry the real state for screen readers.
      *   blind  -> white, heavy (blindness spell, dirt kick -- any AFF_BLIND)
      *   mind   -> purple  (charmed / magically asleep / stunned)
+     *   faerie -> pink    (faerie fire -- lit up, easier to hit)
      *   poison -> green
      *   fade   -> heavy grey
      *   hide   -> grey */
     prompt["args"][0]["blind"]  = IS_AFFECTED( ch, AFF_BLIND ) ? 1 : 0;
+    prompt["args"][0]["faerie"] = IS_AFFECTED( ch, AFF_FAERIE_FIRE ) ? 1 : 0;
     prompt["args"][0]["hide"]   = ch->isAffected( gsn_hide ) ? 1 : 0;
     prompt["args"][0]["fade"]   = ch->isAffected( gsn_fade ) ? 1 : 0;
     prompt["args"][0]["poison"] = ch->isAffected( gsn_poison ) ? 1 : 0;
