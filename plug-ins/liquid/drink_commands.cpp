@@ -50,6 +50,10 @@ LIQ(none);
 LIQ(water);
 LIQ(valerian_tincture);
 LIQ(swill);
+DESIRE(thirst);
+DESIRE(drunk);
+DESIRE(hunger);
+DESIRE(bloodlust);
 
 /*
  * NOTE (2026-08): the fill / pour / pourout / drink CMDRUNs below are SUPERSEDED at
@@ -851,6 +855,38 @@ static bool mprog_drink_near( Character *drinker, Object *obj, const char *liq, 
     return false;
 }
 
+/*
+ * Wasted-sip refusal. Twin of the Fenia drink override's gate
+ * (command/drink/runFunc): that override is a non-persistent in-memory bind that
+ * drops on any `plug reload` / reboot, so THIS C++ handler is what actually runs
+ * most of the time and must carry the same gate.
+ */
+static bool has_drink_prog( Character *ch, Object *obj )
+{
+    // A Drink prog armed on the drinker, the container instance, or its prototype
+    // (heal spring, kender cure, arcadia enchant) can act at full desire, so the
+    // wasted-sip refusal must NOT fire. No Drink *behavior* exists, so only the
+    // onDrink Fenia hooks are checked -- matching the override's hasOnDrink gate.
+    FENIA_HAS_TRIGGER( ch, "Drink" );
+    FENIA_HAS_TRIGGER( obj, "Drink" );
+    FENIA_NDX_HAS_TRIGGER( obj, "Drink" );
+    return false;
+}
+
+static bool drink_wasted( PCharacter *pch, Liquid *liq )
+{
+    // Wasted only if every desire this liquid feeds is already at its cap. A liquid
+    // feeding a below-cap desire (thirst/hunger/alcohol) is not wasted; one feeding
+    // no applicable desire (salt water, ink, blood for a mortal) is a drinkable
+    // trap/flavor, also not wasted. Mirror of CharacterWrapper::drinkWasted.
+    bool feeds = false;
+    if (desire_thirst->applicable( pch )    && liq->getDesires( )[desire_thirst->getIndex( )]    > 0) { feeds = true; if (!desire_thirst->isFull( pch ))    return false; }
+    if (desire_drunk->applicable( pch )     && liq->getDesires( )[desire_drunk->getIndex( )]     > 0) { feeds = true; if (!desire_drunk->isFull( pch ))     return false; }
+    if (desire_hunger->applicable( pch )    && liq->getDesires( )[desire_hunger->getIndex( )]    > 0) { feeds = true; if (!desire_hunger->isFull( pch ))    return false; }
+    if (desire_bloodlust->applicable( pch ) && liq->getDesires( )[desire_bloodlust->getIndex( )] > 0) { feeds = true; if (!desire_bloodlust->isFull( pch )) return false; }
+    return feeds;
+}
+
 CMDRUN( drink )
 {
     Object *obj;
@@ -960,7 +996,24 @@ CMDRUN( drink )
         for (int i = 0; i < desireManager->size( ); i++)
             if (!desireManager->find( i )->canDrink( ch->getPC( ) ))
                 return;
-    
+
+    // Refuse a sip that would do nothing -- every desire this liquid feeds is
+    // already full (e.g. water at max thirst). Skipped when a Drink prog is armed
+    // (heal spring / kender cure / arcadia must fire even at full thirst) and for a
+    // poisoned drink (a trap: let it through so the poison lands).
+    if (!ch->is_npc( ) && !has_drink_prog(ch, obj)) {
+        bool poisoned = obj
+            && ((obj->item_type == ITEM_DRINK_CON && IS_SET( obj->value3(), DRINK_POISONED ))
+                || obj->isAffected(gsn_poison));
+        if (!poisoned && drink_wasted(ch->getPC( ), liquid)) {
+            ch->pecho(lmsg(Player::lang(ch),
+                "A sip of this would do nothing for you.",
+                "Глоток этого тебе ничего не даст.",
+                "Ковток цього тобі нічого не дасть."));
+            return;
+        }
+    }
+
     lang_t lang = Player::lang(ch);
     DLString buf = liquid->getShortDescr( lang ).ruscase( '4' );
 
