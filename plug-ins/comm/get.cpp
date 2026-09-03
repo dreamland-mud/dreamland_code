@@ -266,7 +266,7 @@ static int can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->pecho(_("Осторожно, ты не смог%1$Gло||ла бы поднять такую тяжесть, будучи смертн%1$Gым|ым|ой."), ch);
         else {
-            ch->pecho(_("Ты не можешь нести вес больше %d фунтов и поэтому не сможешь поднять %O4."), Char::canCarryWeight(ch), obj);
+            ch->pecho(_("Ты не можешь нести вес больше %d фунтов и поэтому не сможешь поднять %O4."), Char::canCarryWeight(ch)/10, obj);
             return GET_OBJ_STOP;
         }
     }
