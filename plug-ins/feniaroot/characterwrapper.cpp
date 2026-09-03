@@ -3050,6 +3050,12 @@ static bool ga_grantsSkills( obj_index_data *pObj )
 // COMBAT_PROC_SCORING.md.
 static double ga_procScore( obj_index_data *pObj )
 {
+    // isMember guard FIRST: pObj is non-const, so pObj->props["combatcast"] would
+    // INSERT a null "combatcast" member into the prototype on every scored item
+    // (jsoncpp non-const operator[]), polluting props world-wide and drifting to
+    // disk on the next autosave. Read only after confirming the member exists.
+    if (!pObj->props.isMember( "combatcast" ))
+        return 0;
     const Json::Value &casts = pObj->props["combatcast"];
     if (!casts.isArray( ) || casts.empty( ))
         return 0;

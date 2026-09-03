@@ -1065,7 +1065,10 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
             return false;
         }
 
-        if (!props[bhvName].isMember(propName) && !bhv->props.isMember(propName)) {
+        // Guard props[bhvName] behind props.isMember: a bare props[bhvName] here is
+        // non-const operator[] and INSERTS a null props[bhvName] even when we are
+        // about to REJECT a typo'd prop name, polluting the prototype's props.
+        if (!(props.isMember(bhvName) && props[bhvName].isMember(propName)) && !bhv->props.isMember(propName)) {
             ptc(ch, "У поведения '%s' нету свойства под названием '%s'.\r\n", bhvName.c_str(), propName.c_str());
             return false;
         }
