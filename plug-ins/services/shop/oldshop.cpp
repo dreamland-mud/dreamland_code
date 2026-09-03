@@ -361,8 +361,15 @@ static bool sell_one_item( Character *ch, NPCharacter *keeper, ShopTrader::Point
 
     if ( cost <= 0 )
     {
-        if (verbose)
-            oldact(_("$c1 не интересуется $o5."), keeper, obj, ch, TO_VICT);
+        if (verbose) {
+            // NOSELL items give zero cost just like an unwanted type, but the
+            // reason is different: they can't be sold anywhere, not "this keeper
+            // doesn't deal in them". Say so, so the player stops shopping around.
+            if (IS_OBJ_STAT(obj, ITEM_NOSELL))
+                oldact_p(_("$c1 говорит тебе '{gТакое не продать.{x'"), keeper, 0, ch, TO_VICT, POS_RESTING);
+            else
+                oldact(_("$c1 не интересуется $o5."), keeper, obj, ch, TO_VICT);
+        }
         return false;
     }
 
@@ -668,8 +675,12 @@ static bool value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Point
         cost /= 2;
     
     if (cost <= 0) {
-        if (verbose)
-            ch->pecho(_("%^C1 не интересуется %O5."), keeper, obj);
+        if (verbose) {
+            if (IS_OBJ_STAT(obj, ITEM_NOSELL))
+                ch->pecho(_("%^C1 говорит тебе, что такое не продать."), keeper);
+            else
+                ch->pecho(_("%^C1 не интересуется %O5."), keeper, obj);
+        }
         return false;
     }
 
