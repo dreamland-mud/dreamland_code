@@ -3747,6 +3747,15 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         RoomIndexData *pRoom = rk->second;
         int roomVnum = rk->first;
 
+        // A reset in a system/hidden/wizlock area (Limbo, dev zones) is not a
+        // place a player can walk to, so an item that also resets there must be
+        // found by its real resets -- never record the unreachable one. Bug 3334
+        // advised a hat as "kill a player in Limbo" when it resets in a live zone
+        // too. DUNGEON/CLAN/MANSION stay in: those are legit, reachable loot.
+        if (pRoom->area
+            && IS_SET(pRoom->area->area_flag, AREA_SYSTEM|AREA_HIDDEN|AREA_WIZLOCK))
+            continue;
+
         int roomMax = 0;
         for (ResetList::iterator pr = pRoom->resets.begin( ); pr != pRoom->resets.end( ); pr++)
             if ((*pr)->command == 'M') {
