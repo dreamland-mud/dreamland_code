@@ -2971,6 +2971,9 @@ struct GACand {
     double obtain;    // 0..1 obtainability
     double value;     // gap * obtain (filled for the 'optimal' ranking)
     GAAcq  acq;       // how the sage says to get it
+    bool   present;   // the acquisition route is actionable now. Only a limited item
+                      // (limit>0) can be false: unlimited gear always repops. false ->
+                      // render says whereabouts unknown instead of a stale route.
 };
 
 // Can the char put a weapon in the off-hand right now? Mirrors SecondWieldWearloc's
@@ -3602,10 +3605,14 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     // second ring/bracelet, a dual-wield off-hand): an ADDITION, not a swap, so the
     // render shows it as a fill (gains only, no "Replaces"). 0 for a plain replacement.
     e->push_back( Register( fillsFree ? 1 : 0 ) );
+    // 1 when the acquisition route is actionable now; 0 only for a limited item with no
+    // reachable copy and no quest route -- the render then says its whereabouts are
+    // unknown instead of a kill/pickup route pointing at a copy that isn't there.
+    e->push_back( Register( c.present ? 1 : 0 ) );
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit -> optimal is the top-5 for that slot only (pct 0, best empty)" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -3910,6 +3917,14 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         GACand c;
         c.pObj = pObj; c.slot = slot; c.score = sc; c.obtain = obtain; c.value = 0;
         c.acq = ac;
+        // "present" = the route the render will show is actionable right now. Only a
+        // scarcity-limited item (limit>0) can ever fail it: unlimited gear repops on
+        // every reset, so its "kill X in zone Y" route is good even when the holder is
+        // momentarily dead. A limited item is present iff a copy is physically reachable
+        // now (gettable>0) OR it is a quest reward (route = complete the quest, needs no
+        // copy -- and quest copies sit on the PCs who finished, so gettable==0 is the
+        // norm there). Otherwise (limited, no reachable copy, no quest) -> "unknown".
+        c.present = pObj->limit <= 0 || gettable[pObj->vnum] > 0 || ac.method == GA_QUEST;
         if (secondCopy) {
             // A second copy never feeds the percentile, optimal or set passes -- the
             // char already wears one. Held only for the slot-browse fill list.
