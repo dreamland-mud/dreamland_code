@@ -347,7 +347,21 @@ void mobile_update( )
         try {
             wield_update( ch );
 
+            // A mob spec fired here (mobile_update) can cast a damage spell --
+            // e.g. spec_breath_gas -- OUTSIDE the violence_update round loop. Its
+            // damage lands on roundDamage, but the next violence_update zeroes
+            // roundDamage before the fightspam-OFF round summary runs, so a
+            // fightspam-OFF victim sees the hit with no number. Baseline and flush
+            // around the spec, the same way ccast.cpp does for the in-combat
+            // player cast (bug 13343: gas breath dealt damage with no number).
+            bool wasFighting = ( ch->fighting != 0 );
+            if (wasFighting)
+                ch->roundDamage = 0;
+
             mprog_special( ch );
+
+            if (wasFighting && !ch->extracted && ch->fighting)
+                fightspam_flush_between_rounds( ch, ch->fighting );
         } catch (const VictimDeathException &) {
         }
     }
