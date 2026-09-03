@@ -3578,7 +3578,7 @@ static int ga_band( int method, int guard, int chLevel, int aggros, int doors, i
 // sourceless picks carry no path.
 static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire,
                                std::map<int, std::vector<int> > &pathCache, double gain,
-                               bool fillsFree = false )
+                               bool fillsFree = false, int replaceVnum = 0 )
 {
     GAAcq &ac = c.acq;
     int aggros = 0, doors = 0, fly = 0;
@@ -3615,10 +3615,14 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     // reachable copy and no quest route -- the render then says its whereabouts are
     // unknown instead of a kill/pickup route pointing at a copy that isn't there.
     e->push_back( Register( c.present ? 1 : 0 ) );
+    // vnum of the worn item this pick would replace, when that is not simply the one
+    // piece the render finds by slot -- a paired slot's WEAKER of two. 0 = a fill or a
+    // single-slot swap, and the render falls back to its own .tmp.advice.worn lookup.
+    e->push_back( Register( replaceVnum ) );
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit -> optimal is the top-5 for that slot only (pct 0, best empty)" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -4137,33 +4141,58 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     std::sort( byBest.begin( ), byBest.end( ),
         []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
 
-    // A paired armour slot (two fingers/wrists, or neck's two positions) with an
-    // empty position: the general chase must offer a FILL for it, not only a
-    // replacement that beats the best worn piece -- otherwise a char who is
-    // best-in-slot everywhere but has one empty ring/wrist/neck position gets no
-    // advice at all. Baseline 0 makes filling the empty position register as gain,
-    // mirroring the slot-browse's freePos bar. (Percentile stays Phase 2: each slot
-    // type still counts once, so an empty twin position does not drag the % down.)
-    int wornFinger = 0, wornNeck = 0, wornWrist = 0;
+    // Paired armour slots (finger/neck/wrist) have two positions. The general chase
+    // must (a) offer a FILL when a position is empty (baseline 0 -- a pure gain), and
+    // (b) when both positions are full, measure a candidate against the WEAKER of the
+    // two worn pieces (the one it would replace), not the stronger. Without (a) an
+    // empty ring/wrist/neck yields no advice at all; without (b) a candidate that
+    // beats the weaker piece but not the stronger is wrongly hidden. This mirrors the
+    // slot-browse bar. (Percentile stays Phase 2: one count per slot-type, so none of
+    // this shifts the %.)
+    struct GAPaired { int count; double minScore; int minVnum; };
+    GAPaired pairFinger = { 0, 0.0, 0 }, pairNeck = { 0, 0.0, 0 }, pairWrist = { 0, 0.0, 0 };
     for (::Object *o = target->carrying; o; o = o->next_content) {
         if (o->wear_loc == wear_none)
             continue;
         int ws = o->pIndexData->wear_flags;
         REMOVE_BIT( ws, ITEM_TAKE );
-        if (ws & ITEM_WEAR_FINGER) wornFinger++;
-        if (ws & ITEM_WEAR_NECK)   wornNeck++;
-        if (ws & ITEM_WEAR_WRIST)  wornWrist++;
+        if ((ws & (ITEM_WEAR_FINGER | ITEM_WEAR_NECK | ITEM_WEAR_WRIST)) == 0)
+            continue;
+        double osc = ga_score( target, o->pIndexData, w, rawStat, capStat, true );
+        if (ws & ITEM_WEAR_FINGER) {
+            if (pairFinger.count == 0 || osc < pairFinger.minScore) { pairFinger.minScore = osc; pairFinger.minVnum = o->pIndexData->vnum; }
+            pairFinger.count++;
+        }
+        if (ws & ITEM_WEAR_NECK) {
+            if (pairNeck.count == 0 || osc < pairNeck.minScore) { pairNeck.minScore = osc; pairNeck.minVnum = o->pIndexData->vnum; }
+            pairNeck.count++;
+        }
+        if (ws & ITEM_WEAR_WRIST) {
+            if (pairWrist.count == 0 || osc < pairWrist.minScore) { pairWrist.minScore = osc; pairWrist.minVnum = o->pIndexData->vnum; }
+            pairWrist.count++;
+        }
     }
-    bool freeFinger = wornFinger < 2, freeNeck = wornNeck < 2, freeWrist = wornWrist < 2;
-    auto gaFillsFree = [&]( int slot ) -> bool {
-        return ((slot & ITEM_WEAR_FINGER) && freeFinger)
-            || ((slot & ITEM_WEAR_NECK)   && freeNeck)
-            || ((slot & ITEM_WEAR_WRIST)  && freeWrist);
+    // Bar for a candidate's slot + the vnum a pick there would replace. Free paired
+    // position -> 0 (fills, replaces nothing); both full -> weakest worn (replaces it);
+    // any other slot -> best worn (unchanged single-slot behaviour, and replaceVnum
+    // stays 0 so the render names the one worn piece via .tmp.advice.worn).
+    auto gaBar = [&]( int slot, bool &fills, int &replaceVnum ) -> double {
+        fills = false; replaceVnum = 0;
+        GAPaired *p = 0;
+        if (slot & ITEM_WEAR_FINGER)     p = &pairFinger;
+        else if (slot & ITEM_WEAR_NECK)  p = &pairNeck;
+        else if (slot & ITEM_WEAR_WRIST) p = &pairWrist;
+        if (p == 0)
+            return wornSlot[slot];
+        if (p->count < 2) { fills = true; return 0.0; }
+        replaceVnum = p->minVnum;
+        return p->minScore;
     };
 
     // "optimal" = gap * obtainability (real upgrades only).
     for (auto &c: cands) {
-        double bar = gaFillsFree( c.slot ) ? 0.0 : wornSlot[c.slot];
+        bool fills; int rv;
+        double bar = gaBar( c.slot, fills, rv );
         double gap = c.score - bar;
         c.value = gap > 0 ? gap * c.obtain : 0;
     }
@@ -4304,9 +4333,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (optSlot.count( byOpt[k].slot )) continue;   // one item per slot-type
         optSlot[byOpt[k].slot] = byOpt[k].score;
         optVnum[byOpt[k].pObj->vnum] = 1;
-        bool optFills = gaFillsFree( byOpt[k].slot );
-        double optGain = byOpt[k].score - (optFills ? 0.0 : wornSlot[byOpt[k].slot]);
-        optimal->push_back( ga_buildEntry( byOpt[k], msm, chLevel, isVampire, pathCache, optGain, optFills ) );
+        bool optFills; int optReplace;
+        double optBar = gaBar( byOpt[k].slot, optFills, optReplace );
+        double optGain = byOpt[k].score - optBar;
+        optimal->push_back( ga_buildEntry( byOpt[k], msm, chLevel, isVampire, pathCache, optGain, optFills, optReplace ) );
         nOpt++;
     }
 
