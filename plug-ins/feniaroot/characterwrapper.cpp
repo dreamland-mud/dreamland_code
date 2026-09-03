@@ -4137,9 +4137,34 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     std::sort( byBest.begin( ), byBest.end( ),
         []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
 
+    // A paired armour slot (two fingers/wrists, or neck's two positions) with an
+    // empty position: the general chase must offer a FILL for it, not only a
+    // replacement that beats the best worn piece -- otherwise a char who is
+    // best-in-slot everywhere but has one empty ring/wrist/neck position gets no
+    // advice at all. Baseline 0 makes filling the empty position register as gain,
+    // mirroring the slot-browse's freePos bar. (Percentile stays Phase 2: each slot
+    // type still counts once, so an empty twin position does not drag the % down.)
+    int wornFinger = 0, wornNeck = 0, wornWrist = 0;
+    for (::Object *o = target->carrying; o; o = o->next_content) {
+        if (o->wear_loc == wear_none)
+            continue;
+        int ws = o->pIndexData->wear_flags;
+        REMOVE_BIT( ws, ITEM_TAKE );
+        if (ws & ITEM_WEAR_FINGER) wornFinger++;
+        if (ws & ITEM_WEAR_NECK)   wornNeck++;
+        if (ws & ITEM_WEAR_WRIST)  wornWrist++;
+    }
+    bool freeFinger = wornFinger < 2, freeNeck = wornNeck < 2, freeWrist = wornWrist < 2;
+    auto gaFillsFree = [&]( int slot ) -> bool {
+        return ((slot & ITEM_WEAR_FINGER) && freeFinger)
+            || ((slot & ITEM_WEAR_NECK)   && freeNeck)
+            || ((slot & ITEM_WEAR_WRIST)  && freeWrist);
+    };
+
     // "optimal" = gap * obtainability (real upgrades only).
     for (auto &c: cands) {
-        double gap = c.score - wornSlot[c.slot];
+        double bar = gaFillsFree( c.slot ) ? 0.0 : wornSlot[c.slot];
+        double gap = c.score - bar;
         c.value = gap > 0 ? gap * c.obtain : 0;
     }
     // Nudge the chase toward completing a worth-it set: a member filling a slot the
@@ -4279,7 +4304,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (optSlot.count( byOpt[k].slot )) continue;   // one item per slot-type
         optSlot[byOpt[k].slot] = byOpt[k].score;
         optVnum[byOpt[k].pObj->vnum] = 1;
-        optimal->push_back( ga_buildEntry( byOpt[k], msm, chLevel, isVampire, pathCache, byOpt[k].score - wornSlot[byOpt[k].slot] ) );
+        bool optFills = gaFillsFree( byOpt[k].slot );
+        double optGain = byOpt[k].score - (optFills ? 0.0 : wornSlot[byOpt[k].slot]);
+        optimal->push_back( ga_buildEntry( byOpt[k], msm, chLevel, isVampire, pathCache, optGain, optFills ) );
         nOpt++;
     }
 
