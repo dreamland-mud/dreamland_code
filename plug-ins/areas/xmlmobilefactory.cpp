@@ -37,6 +37,21 @@ XMLMobileFactory::XMLMobileFactory( ) :
 {
 }
 
+// True if p (pointing at '(') opens a (keyword) group: an ASCII letter inside, or a
+// colour code {X followed by a letter. Bounds-safe -- the old inline test read
+// *(p+3) on a string ending "({". KOI8 Cyrillic bytes are not alpha in the C locale,
+// so a Cyrillic "(prose)" is deliberately NOT a keyword group and keeps its parens.
+static bool is_keyword_paren(const char *p)
+{
+    if (*p != '(')
+        return false;
+    if (isalpha(*(p+1)))
+        return true;
+    if (*(p+1) == '{' && *(p+2) != '\0' && isalpha(*(p+3)))
+        return true;
+    return false;
+}
+
 DLString format_longdescr(const DLString &longdescr)
 {
     const char *descr = longdescr.c_str();
@@ -46,11 +61,12 @@ DLString format_longdescr(const DLString &longdescr)
     bool skipChar = false;
 
     for (const char *d = descr; *d; d++) {
-        // Ignore extra space just before the ( bracket.
-        if (*d == ' ' && *(d+1) == '(') 
+        // Eat the space before a ( ONLY when it opens a keyword group we strip;
+        // otherwise (e.g. Cyrillic prose "слово (текст)") the space must stay.
+        if (*d == ' ' && is_keyword_paren(d+1))
             continue;
         // Start ignoring everything after a ( bracket.
-        if (*d == '(' && (isalpha(*(d+1)) || (*(d+1) == '{' && isalpha(*(d+3))))) {
+        if (is_keyword_paren(d)) {
             skipChar = true;
             continue;
         }
