@@ -59,6 +59,10 @@
 #include "logstream.h"
 #include "skill.h"
 #include "skillcommand.h"
+#include "skillmanager.h"
+#include "spell.h"
+#include "spelltarget.h"
+#include "fight_safe.h"
 #include "commonattributes.h"
 #include "profiler.h"
 
@@ -168,6 +172,92 @@ static bool oprog_fight_carry( Object *obj, Character *ch )
 static void wlprog_fight( Object *obj, Character *ch)
 {
     obj->wear_loc->onFight(ch, obj);
+}
+
+/*
+ * combatcast: a worn item declares <props>combatcast</props> as an array of
+ * {spell, chance, count} and casts those spells during combat. Fires once per
+ * combat round per item -- the same cadence as onFightChar affects and the same
+ * cadence ga_procScore (characterwrapper.cpp) values it at, so the mechanic and
+ * the gear advisor stay consistent. Offensive spells hit the current opponent;
+ * heals and self-buffs target the wearer.
+ *
+ * The props live on the PROTOTYPE. isMember() MUST gate the read: jsoncpp's
+ * non-const operator[] would INSERT a null "combatcast" member into the
+ * prototype and drift it to disk on the next asave -- exactly the noise #1127
+ * fixed on the scoring side.
+ *
+ * The proc casts spell->run directly, so it must re-assert the few guards the
+ * real cast path (ccast.cpp) applies that still matter to a passive proc aimed
+ * at the char already being fought: ROOM_NO_CAST, and is_safe for offensive
+ * spells (quietly -- a per-round proc must not spam the "protected" message).
+ * spellbane/blockedByNobuff/preRun parity is deliberately left out: spellbane
+ * deals retributive baneDamage back to the wearer every round, a balance change
+ * that needs its own decision -- see the follow-up card, not a reflex here.
+ */
+static void ocombatcast_fight( Object *obj, Character *ch )
+{
+    if (obj->pIndexData == 0)
+        return;
+
+    Json::Value &props = obj->pIndexData->props;
+    if (!props.isMember( "combatcast" ))
+        return;
+
+    const Json::Value &casts = props["combatcast"];
+    if (!casts.isArray( ))
+        return;
+
+    // No magic works in this room at all -- mirrors ccast.cpp:163.
+    if (ch->in_room != 0 && IS_SET( ch->in_room->room_flags, ROOM_NO_CAST ))
+        return;
+
+    for (auto i = casts.begin( ); i != casts.end( ); ++i) {
+        const Json::Value &c = *i;
+
+        int chance = c["chance"].asInt( );
+        if (chance <= 0)
+            continue;
+        if (number_percent( ) > chance)
+            continue;
+
+        Skill *sk = skillManager->findExisting( c["spell"].asString( ) );
+        if (sk == 0)
+            continue;
+        Spell::Pointer spell = sk->getSpell( );
+        if (!spell)
+            continue;
+
+        bool offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
+
+        // Don't let an offensive proc strike a god-protected target (or one melee
+        // itself can't touch): mirror the real cast's is_safe gate, quietly.
+        if (offensive && (ch->fighting == 0 || is_safe_nomessage( ch, ch->fighting )))
+            continue;
+
+        int level = obj->level;
+        if (level < 1)          // floor: a level-0 item must not cast at level 0
+            level = 1;
+
+        int count = c.isMember( "count" ) ? c["count"].asInt( ) : 1;
+        if (count < 1)
+            count = 1;
+        if (count > 10)          // sanity cap: a mis-authored count must not spam or hang the round
+            count = 10;
+
+        for (int n = 0; n < count; n++) {
+            // The opponent can die from an earlier cast this round (spell->run
+            // throws when it does, which the round loop already tolerates); re-read
+            // ch->fighting each pass so a self-buff still fires and an offensive
+            // cast never targets a dead victim.
+            Character *victim = offensive ? ch->fighting : ch;
+            if (victim == 0)
+                break;
+
+            SpellTarget::Pointer target( NEW, victim );
+            spell->run( ch, target, level );
+        }
+    }
 }
 
 /*
@@ -402,8 +492,10 @@ void violence_update()
                     else
                         oprog_fight_carry(obj, ch);
 
-                    if (obj_is_worn(obj))
+                    if (obj_is_worn(obj)) {
                         wlprog_fight(obj, ch);
+                        ocombatcast_fight(obj, ch);
+                    }
                 }
             }
 
