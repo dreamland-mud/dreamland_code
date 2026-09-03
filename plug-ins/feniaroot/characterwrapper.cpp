@@ -3752,8 +3752,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // found by its real resets -- never record the unreachable one. Bug 3334
         // advised a hat as "kill a player in Limbo" when it resets in a live zone
         // too. DUNGEON/CLAN/MANSION stay in: those are legit, reachable loot.
-        if (pRoom->area
-            && IS_SET(pRoom->area->area_flag, AREA_SYSTEM|AREA_HIDDEN|AREA_WIZLOCK))
+        if (pRoom->areaIndex
+            && IS_SET(pRoom->areaIndex->area_flag, AREA_SYSTEM|AREA_HIDDEN|AREA_WIZLOCK))
             continue;
 
         int roomMax = 0;
