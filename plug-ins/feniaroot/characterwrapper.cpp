@@ -2927,6 +2927,11 @@ NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "(vnum): поиск по вну
 // Where the path to an item starts: Midgaard Market Square, the universal hub.
 #define GA_START_ROOM 3014
 
+// Sentinel slotFilter for a "service advice light" browse. Light items carry
+// item_type LIGHT and NO wear_flags bit (their gearAdvice slot is 0), so a wear-bit
+// mask cannot select them. Fenia's .tmp.advice.LIGHT_SLOT returns this same value.
+#define GA_SLOT_LIGHT (1 << 30)
+
 // How the sage tells you to get an item.
 enum { GA_KILL = 0, GA_BUY = 1, GA_PICKUP = 2, GA_QUEST = 3, GA_UNKNOWN = 4 };
 
@@ -3622,7 +3627,7 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit -> optimal is the top-5 for that slot only (pct 0, best empty)" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -4222,6 +4227,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // lockedSlots=0 so an explicit slot browse is never suppressed by a set.
     if (slotFilter != 0) {
         bool wieldBrowse = (slotFilter & ITEM_WIELD) != 0;
+        bool lightBrowse = (slotFilter == GA_SLOT_LIGHT);
         // Worn scores in this slot + its position count. Most slots read the prototype's
         // wear flag, but the WIELD slot must use the ACTUAL wear locations: an arrow stuck
         // in the char or a sheathed weapon carries the "wield" flag yet holds no hand, so a
@@ -4238,6 +4244,15 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (offhand != 0) wornScores.push_back( ga_score( target, offhand->pIndexData, w, rawStat, capStat, true ) );
             if (ga_canDualWield( target ))
                 capacity = 2;
+        } else if (lightBrowse) {
+            // Light items carry no wear_flags bit -- match on item_type. One light slot.
+            for (::Object *o = target->carrying; o; o = o->next_content) {
+                if (o->wear_loc == wear_none)
+                    continue;
+                if (o->pIndexData->item_type != ITEM_LIGHT)
+                    continue;
+                wornScores.push_back( ga_score( target, o->pIndexData, w, rawStat, capStat, true ) );
+            }
         } else {
             for (::Object *o = target->carrying; o; o = o->next_content) {
                 if (o->wear_loc == wear_none)
@@ -4270,7 +4285,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
 
         std::vector<GACand> slotCands;
         for (auto &c: cands) {
-            if ((c.slot & slotFilter) == 0 || c.acq.method == GA_UNKNOWN)
+            bool inSlot = lightBrowse ? (c.pObj->item_type == ITEM_LIGHT)
+                                      : ((c.slot & slotFilter) != 0);
+            if (!inSlot || c.acq.method == GA_UNKNOWN)
                 continue;
             // A two-handed weapon can never take the off-hand (SecondWieldWearloc refuses
             // it) -- it replaces the primary, so it must clear the primary's score, not the
