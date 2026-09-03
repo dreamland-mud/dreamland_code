@@ -325,72 +325,53 @@ CMDRUN( buy )
         ch->getPC()->save();
 }
 
-/*----------------------------------------------------------------------------
- * 'sell' command
- *---------------------------------------------------------------------------*/
-CMDRUN( sell )
+/*
+ * Sell a single object to the keeper. In bulk mode (verbose == false) the
+ * refusal messages, the haggle theater and the per-item room echo are muted,
+ * but the price math and the haggle skill training still run so 'sell all' is
+ * not a nerf compared to selling item by item. The one-line sale confirmation
+ * is always printed so the player (screen readers included) always knows what
+ * left their inventory. On a successful sale the final price is stored in
+ * *pCost and true is returned.
+ */
+static bool sell_one_item( Character *ch, NPCharacter *keeper, ShopTrader::Pointer trader, Object *obj, bool verbose, int *pCost = 0 )
 {
-    NPCharacter *keeper;
-    ShopTrader::Pointer trader;
-    Object *obj;
     int cost, oldcost;
     int roll;
     int gold, silver;
-    DLString arg = constArguments;
-
-    if (arg.empty( ))
-    {
-        ch->pecho(_("Продать что?"));
-        return;
-    }
-
-    if ( !( trader = find_keeper( ch ) ) )
-        return;
-    
-    keeper = trader->getChar( );
-
-    ShopStock stock = get_stock_keeper( trader, NULL, "" );
-    if (stock.size( ) > 25) {
-        tell_dim( ch, keeper, _("Я ничего не покупаю! Мне некуда ставить товар!"));
-        return;
-    }
-
-    if ( ( obj = get_obj_carry( ch, arg.c_str( ) ) ) == 0 )
-    {
-        oldact_p(_("$c1 говорит тебе '{gУ тебя нет этого.{x'"),
-        keeper, 0, ch, TO_VICT,POS_RESTING );
-        ch->reply = keeper;
-        return;
-    }
 
     if ( !Item::canDrop( ch, obj ) )
     {
-        ch->pecho(_("Ты не можешь избавиться от этого."));
-        return;
+        if (verbose)
+            ch->pecho(_("Ты не можешь избавиться от этого."));
+        return false;
     }
 
     if (!keeper->can_see(obj))
     {
-        oldact(_("$c1 не видит этого."),keeper,0,ch,TO_VICT);
-        return;
+        if (verbose)
+            oldact(_("$c1 не видит этого."),keeper,0,ch,TO_VICT);
+        return false;
     }
 
     cost = get_cost( keeper, obj, false, trader );
     // everyone reaps off druids
     if (ch->getProfession( ) == prof_druid)
         cost /= 2;
-    
+
     if ( cost <= 0 )
     {
-        oldact(_("$c1 не интересуется $o5."), keeper, obj, ch, TO_VICT);
-        return;
+        if (verbose)
+            oldact(_("$c1 не интересуется $o5."), keeper, obj, ch, TO_VICT);
+        return false;
     }
 
     if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
     {
-        oldact_p(_("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'"),
-              keeper,obj,ch,TO_VICT,POS_RESTING);
-        return;
+        if (verbose)
+            oldact_p(_("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'"),
+                  keeper,obj,ch,TO_VICT,POS_RESTING);
+        return false;
     }
 
     /* haggle */
@@ -402,38 +383,46 @@ CMDRUN( sell )
         gold   = cost/100;
         oldcost = cost;
 
-        ch->pecho(_("%^C1 предлагает тебе %s за %O4."), keeper, format_coins(gold, silver).c_str(), obj);
-        
+        if (verbose)
+            ch->pecho(_("%^C1 предлагает тебе %s за %O4."), keeper, format_coins(gold, silver).c_str(), obj);
+
         // make sure this is a positive factor
         roll = ::max(1, gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10 + skill_level_bonus(*gsn_haggle, ch));
 
         cost += obj->cost / 2 * roll / 100;
         // can't increase selling price to more than 125% of the original cost
         cost = ::min(cost, obj->cost * 125 / 100);
-        
+
         if (cost > oldcost) {
-            ch->pecho(_("Ты торгуешься с %C5 и выбиваешь наценок!"), keeper);
-            ch->recho(_("%^C1 торгуется с %C5 и выбивает наценок!"), ch, keeper);
-            gsn_haggle->improve( ch, true );                      
+            if (verbose) {
+                ch->pecho(_("Ты торгуешься с %C5 и выбиваешь наценок!"), keeper);
+                ch->recho(_("%^C1 торгуется с %C5 и выбивает наценок!"), ch, keeper);
+            }
+            gsn_haggle->improve( ch, true );
         }
         else {
-            ch->pecho(_("Ты торгуешься с %C5, но безуспешно."), keeper);
-            ch->recho(_("%^C1 торгуется с %C5, но безуспешно."), ch, keeper);   
-            gsn_haggle->improve( ch, false );            
+            if (verbose) {
+                ch->pecho(_("Ты торгуешься с %C5, но безуспешно."), keeper);
+                ch->recho(_("%^C1 торгуется с %C5, но безуспешно."), ch, keeper);
+            }
+            gsn_haggle->improve( ch, false );
         }
-        
+
         if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
         {
-            oldact_p(_("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'"),
-            keeper,obj,ch,TO_VICT,POS_RESTING);
-            return;
+            if (verbose)
+                oldact_p(_("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'"),
+                keeper,obj,ch,TO_VICT,POS_RESTING);
+            return false;
         }
     }
 
-    oldact(_("$c1 продает $o4."), ch, obj, 0, TO_ROOM);
+    if (verbose)
+        oldact(_("$c1 продает $o4."), ch, obj, 0, TO_ROOM);
     silver = cost - (cost/100) * 100;
     gold   = cost/100;
 
+    int soldFor = cost;
     ch->pecho(_("Ты продаешь %O4 за %s."), obj, format_coins(gold, silver).c_str());
 
     if ( cost <= keeper->silver )
@@ -441,12 +430,13 @@ CMDRUN( sell )
     else
     {
         cost -= keeper->silver;
-        
+
         if ( !dreamland->getFromMerchantBank( cost / 100 + 1 ) )
         {
-            oldact_p(_("$c1 говорит тебе '{GУ меня нет денег.{x'"),
-            keeper,0,ch,TO_VICT,POS_RESTING);
-            return;
+            if (verbose)
+                oldact_p(_("$c1 говорит тебе '{GУ меня нет денег.{x'"),
+                keeper,0,ch,TO_VICT,POS_RESTING);
+            return false;
         }
 
         keeper->silver = ( cost / 100 + 1 ) * 100 - cost;
@@ -489,8 +479,115 @@ CMDRUN( sell )
         obj_to_keeper( obj, keeper );
     }
 
-    if (ch->getPC())
-        ch->getPC()->save();
+    if (pCost)
+        *pCost = soldFor;
+
+    return true;
+}
+
+/*----------------------------------------------------------------------------
+ * 'sell' command
+ *---------------------------------------------------------------------------*/
+CMDRUN( sell )
+{
+    NPCharacter *keeper;
+    ShopTrader::Pointer trader;
+    Object *obj;
+    DLString arguments = constArguments;
+
+    DLString argFirst = arguments.getOneArgument( );
+
+    if (argFirst.empty( ))
+    {
+        ch->pecho(_("Продать что?"));
+        return;
+    }
+
+    if ( !( trader = find_keeper( ch ) ) )
+        return;
+
+    keeper = trader->getChar( );
+
+    ShopStock stock = get_stock_keeper( trader, NULL, "" );
+    if (stock.size( ) > 25) {
+        tell_dim( ch, keeper, _("Я ничего не покупаю! Мне некуда ставить товар!"));
+        return;
+    }
+
+    /*
+     *  sell all
+     *  sell all.<name>
+     */
+    bool all = arg_is_all( argFirst );
+    bool allDot = !all && arg_is_alldot( argFirst );
+
+    if (all || allDot)
+    {
+        DLString objnames;
+        if (allDot) {
+            DLString::size_type dot = argFirst.find( '.' );
+            objnames = argFirst.substr( dot + 1 );
+        }
+
+        if (!ch->carrying) {
+            tell_fmt(_("Но у тебя же ничего нет!"), ch, keeper);
+            return;
+        }
+
+        Object *obj_next;
+        int count = 0;
+        int total = 0;
+
+        for (obj = ch->carrying; obj != 0; obj = obj_next)
+        {
+            obj_next = obj->next_content;
+
+            if (allDot && !obj_has_name( obj, objnames, ch ))
+                continue;
+            // never sell equipment worn on the body, only inventory
+            if (obj->wear_loc != wear_none)
+                continue;
+
+            int paid = 0;
+            if (sell_one_item( ch, keeper, trader, obj, false, &paid )) {
+                count++;
+                total += paid;
+            }
+        }
+
+        if (count == 0) {
+            tell_fmt(_("Я не вижу у тебя ничего, что могло бы меня заинтересовать."), ch, keeper);
+            return;
+        }
+
+        oldact(_("$c1 продает свои вещи."), ch, 0, 0, TO_ROOM);
+
+        int gold = total / 100;
+        int silver = total - gold * 100;
+        ch->pecho(_("Всего продано %1$d предмет%1$I|а|ов на сумму %2$s."),
+                  count, format_coins(gold, silver).c_str());
+
+        if (ch->getPC())
+            ch->getPC()->save();
+
+        return;
+    }
+
+    /*
+     *  sell <name>
+     */
+    if ( ( obj = get_obj_carry( ch, argFirst.c_str( ) ) ) == 0 )
+    {
+        oldact_p(_("$c1 говорит тебе '{gУ тебя нет этого.{x'"),
+        keeper, 0, ch, TO_VICT,POS_RESTING );
+        ch->reply = keeper;
+        return;
+    }
+
+    if (sell_one_item( ch, keeper, trader, obj, true )) {
+        if (ch->getPC())
+            ch->getPC()->save();
+    }
 }
 
 /*----------------------------------------------------------------------------
