@@ -909,8 +909,19 @@ static bool oprog_update_key( Object *obj )
 
 static bool oprog_area( Object *obj )
 {
-    if (behavior_trigger(obj, "Area", "O", obj))
-        return true;
+    // Layer 1 (the proto behaviors' Fenia triggers) builds its whole arg list before it
+    // ever checks whether a behavior handles "Area" -- pure per-tick churn for the many
+    // objects carrying a behavior with no onArea/postArea (coin piles, bottles, random
+    // weapons...). Gate it on the live trigger map: dispatch only if some behavior really
+    // has on/postArea. This reads the same guts the dispatch fires from, so there is no
+    // cache and nothing to invalidate -- a handler added via 'cs post' is honored the next
+    // tick. Layers 2-4 already check presence before building args, so they stay as-is.
+    static Scripting::IdRef onAreaId("onArea");
+    static Scripting::IdRef postAreaId("postArea");
+
+    if (behaviors_have_trigger(obj->pIndexData->behaviors, onAreaId, postAreaId))
+        if (behavior_trigger(obj, "Area", "O", obj))
+            return true;
 
     FENIA_CALL( obj, "Area", "" )
     FENIA_NDX_CALL( obj, "Area", "O", obj )

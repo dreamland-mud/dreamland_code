@@ -43,6 +43,30 @@ list<Register> behavior_trigger_with_result(GlobalBitvector &behaviors, const DL
 }
 
 
+// Presence gate for hot per-tick dispatchers. Mirrors the behavior iteration in
+// behavior_trigger_with_result, but only asks 'does a behavior define this trigger?'
+// via the same triggerFunction (guts lookup) the dispatch fires on -- no arg-building,
+// no cache, never stale. Ids come in pre-resolved so there is no lex lookup per call.
+bool behaviors_have_trigger(GlobalBitvector &behaviors, const Scripting::Register &onId, const Scripting::Register &postId)
+{
+	if (behaviors.empty())
+		return false;
+
+	for (int &bhvIndex: behaviors.toArray()) {
+		Behavior *bhv = behaviorManager->find(bhvIndex);
+		WrapperBase *bhvWrapper = bhv->getWrapper();
+		if (!bhvWrapper)
+			continue;
+
+		Scripting::Register prog;
+		if (bhvWrapper->triggerFunction(onId, prog) || bhvWrapper->triggerFunction(postId, prog))
+			return true;
+	}
+
+	return false;
+}
+
+
 // Invoke 'trigType' trigger on all elements of 'behaviors' array, with args passed in the 'ap' var args.
 // Returns a list of all non-null result registers.
 static list<Register> behavior_trigger_with_result(
