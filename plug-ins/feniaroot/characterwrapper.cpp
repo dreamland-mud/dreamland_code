@@ -3425,8 +3425,10 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
 // Affects come in two lists: protoAff always, and instAff (the instance's own
 // affects -- enchant deltas, a random weapon's rolled stats) when scoring a live
 // item. Summing both mirrors Object::affectedValue, the engine's own view of an
-// item's stats. Everything else -- procs, Fenia triggers, taught skills,
-// cleric-compound eligibility -- is a property of the PROTOTYPE, read from pProto.
+// item's stats. Cleric-compound eligibility is resolved by the caller (from the
+// instance for a worn item, the proto for a candidate) and arrives as canCompound.
+// Everything else -- procs, Fenia triggers, taught skills -- is a property of the
+// PROTOTYPE, read from pProto.
 static double ga_scoreCore( Character *target, const GAWeights &w,
                             const AffectList &protoAff, const AffectList *instAff,
                             int itemType, int weaponSn, int weaponAve, bool canCompound,
