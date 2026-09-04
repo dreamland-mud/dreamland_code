@@ -3093,21 +3093,28 @@ static double ga_procScore( obj_index_data *pObj )
 // noenchant, and katana/spell weapons (dreamland_world/generic-skills/compound.xml,
 // spell/compound/runObj). The owner check is per-instance so the prototype scorer
 // can't see it; every other gate it can. Trello #2854.
-static bool ga_clericCanCompound( Character *target, obj_index_data *pObj )
+// Can this level-37+ cleric compound this weapon into a mace (so it scores at the
+// mace skill rather than the unskilled floor)? itemType/limit/extraFlags plus the
+// weapon class and its type-2 flags are supplied by the caller so a prototype and a
+// live instance can each pass their own -- a random weapon's real class and flags
+// live on the instance; its prototype is the class-exotic, no-flag stub (vnum 104),
+// which would wrongly pass the gate for every worn random weapon.
+static bool ga_clericCanCompoundCore( Character *target, int itemType, int limit,
+                                      int extraFlags, int wclass, int wflags )
 {
-    if (pObj->item_type != ITEM_WEAPON)
+    if (itemType != ITEM_WEAPON)
         return false;
     if (target->getModifyLevel( ) < 37)
         return false;
     if (target->getProfession( )->getName( ) != "cleric")
         return false;
-    if (pObj->limit > 0)
+    if (limit > 0)
         return false;
-    if (IS_SET( pObj->extra_flags, ITEM_NOENCHANT ))
+    if (IS_SET( extraFlags, ITEM_NOENCHANT ))
         return false;
-    if (IS_SET( pObj->value[4], WEAPON_KATANA ) || IS_SET( pObj->value[4], WEAPON_SPELL ))
+    if (IS_SET( wflags, WEAPON_KATANA ) || IS_SET( wflags, WEAPON_SPELL ))
         return false;
-    switch (pObj->value[0]) {
+    switch (wclass) {
     case WEAPON_MACE:      // already a mace: usable natively, no compound needed
     case WEAPON_DAGGER:
     case WEAPON_BOW:
@@ -3115,6 +3122,22 @@ static bool ga_clericCanCompound( Character *target, obj_index_data *pObj )
         return false;
     }
     return true;
+}
+
+// Candidate prototype: class and flags read from the proto.
+static bool ga_clericCanCompound( Character *target, obj_index_data *pObj )
+{
+    return ga_clericCanCompoundCore( target, pObj->item_type, pObj->limit,
+                                     pObj->extra_flags, pObj->value[0], pObj->value[4] );
+}
+
+// Live worn item: weapon class from get_weapon_class (resolves instance-or-proto)
+// and flags from the instance value, so a rolled random weapon is judged on what it
+// actually is, not on the stub prototype it was built from.
+static bool ga_clericCanCompound( Character *target, ::Object *o )
+{
+    return ga_clericCanCompoundCore( target, o->item_type, o->pIndexData->limit,
+                                     o->extra_flags, get_weapon_class( o ), o->value4( ) );
 }
 
 // Does the character already know the spell/skill that produces an affect? Then
@@ -3406,7 +3429,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
 // cleric-compound eligibility -- is a property of the PROTOTYPE, read from pProto.
 static double ga_scoreCore( Character *target, const GAWeights &w,
                             const AffectList &protoAff, const AffectList *instAff,
-                            int itemType, int weaponSn, int weaponAve,
+                            int itemType, int weaponSn, int weaponAve, bool canCompound,
                             obj_index_data *pProto,
                             const int rawStat[6], const int capStat[6], bool worn )
 {
@@ -3435,8 +3458,9 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
         int skillPct = target->getSkill( weaponSn );
         // A cleric who can compound this weapon into a mace wields it at their
         // mace skill, so it scores like a real mace instead of collapsing to the
-        // 20% unskilled floor. Trello #2854.
-        if (ga_clericCanCompound( target, pProto )) {
+        // 20% unskilled floor. Trello #2854. Eligibility is resolved by the caller
+        // (from the instance for a worn item, the proto for a candidate).
+        if (canCompound) {
             Skill *mace = skillManager->findExisting( "mace" );
             if (mace != 0) {
                 int macePct = target->getSkill( mace->getIndex( ) );
@@ -3470,12 +3494,14 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
                         const int rawStat[6], const int capStat[6], bool worn )
 {
     int sn = 0, ave = 0;
+    bool compound = false;
     if (pObj->item_type == ITEM_WEAPON) {
         sn  = get_weapon_sn( pObj );
         ave = weapon_ave( pObj );
+        compound = ga_clericCanCompound( target, pObj );
     }
     return ga_scoreCore( target, w, pObj->affected, 0,
-                         pObj->item_type, sn, ave, pObj, rawStat, capStat, worn );
+                         pObj->item_type, sn, ave, compound, pObj, rawStat, capStat, worn );
 }
 
 // Score a LIVE worn instance from its actual stats, not its reset prototype. A
@@ -3489,12 +3515,14 @@ static double ga_score( Character *target, ::Object *o, const GAWeights &w,
                         const int rawStat[6], const int capStat[6], bool worn )
 {
     int sn = 0, ave = 0;
+    bool compound = false;
     if (o->item_type == ITEM_WEAPON) {
         sn  = get_weapon_sn( o );
         ave = weapon_ave( o );
+        compound = ga_clericCanCompound( target, o );
     }
     return ga_scoreCore( target, w, o->pIndexData->affected, &o->affected,
-                         o->item_type, sn, ave, o->pIndexData, rawStat, capStat, worn );
+                         o->item_type, sn, ave, compound, o->pIndexData, rawStat, capStat, worn );
 }
 
 // Worth of a completed set's declared <affects> bonus for this profile, cap-aware.
