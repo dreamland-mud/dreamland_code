@@ -3396,13 +3396,27 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
 // rawStat[k] = the char's uncapped stat (perm+mod); capStat[k] = its cap. worn =
 // true when scoring an item the char already wears, so its own stat contribution
 // is removed from the baseline (a stat held at cap by OTHER gear then scores 0).
-static double ga_score( Character *target, obj_index_data *pObj, const GAWeights &w,
-                        const int rawStat[6], const int capStat[6], bool worn )
+// The core scorer: affects worth + stat gains + weapon dice + combat-proc / trigger
+// / taught-skill boosts. Weapon output (skill number + dice-average) is passed in
+// precomputed so a reset prototype and a live instance can each supply their own.
+// Affects come in two lists: protoAff always, and instAff (the instance's own
+// affects -- enchant deltas, a random weapon's rolled stats) when scoring a live
+// item. Summing both mirrors Object::affectedValue, the engine's own view of an
+// item's stats. Everything else -- procs, Fenia triggers, taught skills,
+// cleric-compound eligibility -- is a property of the PROTOTYPE, read from pProto.
+static double ga_scoreCore( Character *target, const GAWeights &w,
+                            const AffectList &protoAff, const AffectList *instAff,
+                            int itemType, int weaponSn, int weaponAve,
+                            obj_index_data *pProto,
+                            const int rawStat[6], const int capStat[6], bool worn )
 {
     double s = 0;
     int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
-    for (auto &paf: pObj->affected)
+    for (auto &paf: protoAff)
         ga_accumAffect( *paf, w, s, statDelta, target );
+    if (instAff != 0)
+        for (auto &paf: *instAff)
+            ga_accumAffect( *paf, w, s, statDelta, target );
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
             continue;
@@ -3417,13 +3431,12 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
     // An unskilled weapon (a cleric holding an axe) collapses toward the 20% dice
     // floor and scores near nothing -- which is exactly why the sage will never
     // chase a weapon the character can't actually use.
-    if (pObj->item_type == ITEM_WEAPON) {
-        int sn = get_weapon_sn( pObj );
-        int skillPct = target->getSkill( sn );
+    if (itemType == ITEM_WEAPON) {
+        int skillPct = target->getSkill( weaponSn );
         // A cleric who can compound this weapon into a mace wields it at their
         // mace skill, so it scores like a real mace instead of collapsing to the
         // 20% unskilled floor. Trello #2854.
-        if (ga_clericCanCompound( target, pObj )) {
+        if (ga_clericCanCompound( target, pProto )) {
             Skill *mace = skillManager->findExisting( "mace" );
             if (mace != 0) {
                 int macePct = target->getSkill( mace->getIndex( ) );
@@ -3431,7 +3444,7 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
                     skillPct = macePct;
             }
         }
-        double eff = weapon_ave( pObj ) * (20 + skillPct) / 100.0;
+        double eff = weaponAve * (20 + skillPct) / 100.0;
         s += w.weaponWeight * eff;
     }
     // Combat spell-procs get scored on what they actually cast (value table x
@@ -3439,16 +3452,49 @@ static double ga_score( Character *target, obj_index_data *pObj, const GAWeights
     // stand-in for "this triggers something good in a fight" -- the proc IS that
     // trigger. But a skill-teaching item that ALSO procs still deserves its teach
     // credit on top (different value), and non-proc special gear keeps the +50.
-    double procScore = ga_procScore( pObj );
+    double procScore = ga_procScore( pProto );
     if (procScore > 0) {
         s += procScore;
-        if (ga_grantsSkills( pObj ))
+        if (ga_grantsSkills( pProto ))
             s += 50;   // it teaches a skill too; procScore only covered the combat cast.
     }
-    else if (ga_hasFeniaTriggers( pObj ) || ga_grantsSkills( pObj )) {
+    else if (ga_hasFeniaTriggers( pProto ) || ga_grantsSkills( pProto )) {
         s += 50;   // Fenia-triggered or skill-teaching gear is almost always very good.
     }
     return s;
+}
+
+// Score a reset PROTOTYPE (a candidate the sage might recommend): base stats only,
+// since a candidate has no rolled or enchanted instance yet.
+static double ga_score( Character *target, obj_index_data *pObj, const GAWeights &w,
+                        const int rawStat[6], const int capStat[6], bool worn )
+{
+    int sn = 0, ave = 0;
+    if (pObj->item_type == ITEM_WEAPON) {
+        sn  = get_weapon_sn( pObj );
+        ave = weapon_ave( pObj );
+    }
+    return ga_scoreCore( target, w, pObj->affected, 0,
+                         pObj->item_type, sn, ave, pObj, rawStat, capStat, worn );
+}
+
+// Score a LIVE worn instance from its actual stats, not its reset prototype. A
+// random weapon carries its rolled dice, damroll and affects on the instance (its
+// prototype is the level-0 "dummy random weapon" blank, vnum 104, which scores ~0);
+// an enchanted item carries its enchant deltas on the instance too. Weapon dice come
+// from the instance value getters (weapon_ave / get_weapon_sn resolve
+// instance-or-prototype), and the instance's affects are summed on top of the
+// prototype's, exactly as Object::affectedValue does.
+static double ga_score( Character *target, ::Object *o, const GAWeights &w,
+                        const int rawStat[6], const int capStat[6], bool worn )
+{
+    int sn = 0, ave = 0;
+    if (o->item_type == ITEM_WEAPON) {
+        sn  = get_weapon_sn( o );
+        ave = weapon_ave( o );
+    }
+    return ga_scoreCore( target, w, o->pIndexData->affected, &o->affected,
+                         o->item_type, sn, ave, o->pIndexData, rawStat, capStat, worn );
 }
 
 // Worth of a completed set's declared <affects> bonus for this profile, cap-aware.
@@ -3816,7 +3862,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         REMOVE_BIT( slot, ITEM_TAKE );
         // Set slots now score normally: the set optimizer below credits a complete
         // set's bonus into the ceiling and protects its slots from break-advice.
-        double sc = ga_score( target, o->pIndexData, w, rawStat, capStat, true );
+        double sc = ga_score( target, o, w, rawStat, capStat, true );
         if (sc > wornSlot[slot])
             wornSlot[slot] = sc;
     }
@@ -4064,7 +4110,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             continue;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
-        double sc = ga_score( target, o->pIndexData, w, rawStat, capStat, true );
+        double sc = ga_score( target, o, w, rawStat, capStat, true );
         for (auto &kv: gaSets)
             if (o->pIndexData->behaviors.isSet( kv.first )) {
                 kv.second.wornSlots |= slot;
@@ -4185,7 +4231,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         REMOVE_BIT( ws, ITEM_TAKE );
         if ((ws & (ITEM_WEAR_FINGER | ITEM_WEAR_NECK | ITEM_WEAR_WRIST)) == 0)
             continue;
-        double osc = ga_score( target, o->pIndexData, w, rawStat, capStat, true );
+        double osc = ga_score( target, o, w, rawStat, capStat, true );
         if (ws & ITEM_WEAR_FINGER) {
             if (pairFinger.count == 0 || osc < pairFinger.minScore) { pairFinger.minScore = osc; pairFinger.minVnum = o->pIndexData->vnum; }
             pairFinger.count++;
@@ -4262,8 +4308,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             Wearlocation *offLoc   = wearlocationManager->findExisting( "second_wield" );
             ::Object *primary = wieldLoc ? wieldLoc->find( target ) : 0;
             ::Object *offhand = offLoc   ? offLoc->find( target )   : 0;
-            if (primary != 0) wornScores.push_back( ga_score( target, primary->pIndexData, w, rawStat, capStat, true ) );
-            if (offhand != 0) wornScores.push_back( ga_score( target, offhand->pIndexData, w, rawStat, capStat, true ) );
+            if (primary != 0) wornScores.push_back( ga_score( target, primary, w, rawStat, capStat, true ) );
+            if (offhand != 0) wornScores.push_back( ga_score( target, offhand, w, rawStat, capStat, true ) );
             if (ga_canDualWield( target ))
                 capacity = 2;
         } else if (lightBrowse) {
@@ -4273,7 +4319,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                     continue;
                 if (o->pIndexData->item_type != ITEM_LIGHT)
                     continue;
-                wornScores.push_back( ga_score( target, o->pIndexData, w, rawStat, capStat, true ) );
+                wornScores.push_back( ga_score( target, o, w, rawStat, capStat, true ) );
             }
         } else {
             for (::Object *o = target->carrying; o; o = o->next_content) {
@@ -4283,7 +4329,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 REMOVE_BIT( ws, ITEM_TAKE );
                 if ((ws & slotFilter) == 0)
                     continue;
-                wornScores.push_back( ga_score( target, o->pIndexData, w, rawStat, capStat, true ) );
+                wornScores.push_back( ga_score( target, o, w, rawStat, capStat, true ) );
             }
             if ((slotFilter & ITEM_WEAR_FINGER) || (slotFilter & ITEM_WEAR_NECK) || (slotFilter & ITEM_WEAR_WRIST))
                 capacity = 2;
