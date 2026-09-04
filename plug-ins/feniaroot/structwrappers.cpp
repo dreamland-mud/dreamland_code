@@ -1331,9 +1331,14 @@ NMI_GET( ReligionWrapper, shortDescr, "английское название с 
     return getTarget()->getShortDescr( );
 }
 
-NMI_GET( ReligionWrapper, description, "описание (бог чего именно)" ) 
+NMI_GET( ReligionWrapper, description, "описание (бог чего именно)" )
 {
     return getTarget()->getDescription( );
+}
+
+NMI_INVOKE( ReligionWrapper, getDescription, "(lang): описание на языке lang (0=en,1=ru,2=ua)" )
+{
+    return Scripting::Register( getTarget()->getDescription( argnum2lang(args, 1) ) );
 }
 
 NMI_GET( ReligionWrapper, sex, "пол божества (таблица .tables.sex_table)" ) 

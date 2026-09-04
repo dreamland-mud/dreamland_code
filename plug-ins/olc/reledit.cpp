@@ -167,9 +167,11 @@ RELEDIT(sex, "пол", "установить пол божества")
     return flagValueEdit(getOriginal()->sex);
 }
 
-RELEDIT(desc, "описание", "установить описание божества")
+RELEDIT(desc, "описание", "установить описание божества (русский падеж)")
 {
-    return editor(argument, getOriginal()->description, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+    // description is now an XMLMultiString; this command edits the Russian slot
+    // (the canonical form). EN/UA are authored in the religion XML for now.
+    return editor(argument, getOriginal()->description[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
 }
 
 RELEDIT(flags, "флаги", "выставить флаги религии (? religion_flags)")
