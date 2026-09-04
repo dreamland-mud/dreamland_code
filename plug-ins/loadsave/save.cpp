@@ -1995,9 +1995,14 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             bug( "Fread_obj: incomplete object.", 0 );
                             // ddeallocate() freed the object while it was still linked into
                             // object_list and pIndexData->instances, leaving a dangling
-                            // pointer in both lists. Unlink it properly instead. Mirror the
-                            // create_obj_dropped count bump above so the limit stays balanced;
-                            // a null pIndexData never reached either list, so free it raw.
+                            // pointer in both lists. Unlink it properly instead, and mirror
+                            // the create_obj_dropped count bump above so the limit stays
+                            // balanced. A null pIndexData can't go through extract_obj_1 (it
+                            // derefs pIndexData->area), so fall back to a raw free. The only
+                            // way to reach null here is a doubly-corrupt record (a second bad
+                            // Vnum key, ~2267) that no writer produces; that rare corner keeps
+                            // the old leak and needs the creation-time proto to fix properly
+                            // (separate change).
                             if (obj->pIndexData == 0)
                                 ddeallocate( obj );
                             else if (create_obj_dropped)
