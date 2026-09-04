@@ -2866,6 +2866,13 @@ NMI_INVOKE(CharacterWrapper, list_obj_world, "(arg): поиск по миру в
     RegList::Pointer rc(NEW);
 
     for (::Object *obj = object_list; obj != 0; obj = obj->next) {
+        // Name filter FIRST: it rejects almost every object with a cheap keyword
+        // match, so the level check, visibility, and the two container-chain walks
+        // (getCarrier/getRoom) below run only on the handful that match, not all
+        // ~75k. Pure reorder of AND-ed conditions -- identical result set.
+        if (!obj_has_name(obj, arg, target))
+            continue;
+
         if (target->getRealLevel() < get_wear_level(target, obj))
             continue;
 
@@ -2880,12 +2887,9 @@ NMI_INVOKE(CharacterWrapper, list_obj_world, "(arg): поиск по миру в
         if (location && !target->can_see(location))
             continue;
 
-        if (!obj_has_name(obj, arg, target))
-            continue;
-
         rc->push_back(WrapperManager::getThis( )->getWrapper(obj));
     }
-    
+
     return wrap(rc);
 }
 

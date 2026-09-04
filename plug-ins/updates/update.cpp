@@ -1197,7 +1197,14 @@ void update_handler( void )
 {
     ProfilerBlock profiler("update_handler", 200);
     static  int     pulse_area;           // 110 sec
-    static  int     pulse_mobile;         // 4 sec
+    // The three ~200ms 4s sweeps run on SEPARATE offset pulses so they never stack
+    // on one pulse: each fits the 250ms budget alone, together (~424ms+) they blow it.
+    // Residues mod 16 are distinct (mobile 3 / diving 7 / player 11) and none is a tick
+    // residue (1 = char tick, 15 = obj tick); all are 3 mod 4 so they never align with
+    // violence (6 = 2 mod 4). water_float (8) is likewise distinct and off the violence class.
+    static  int     pulse_mobile = 3;     // 4 sec
+    static  int     pulse_player = 11;    // 4 sec (split off the mobile pulse)
+    static  int     pulse_diving = 7;     // 4 sec (split off the mobile pulse)
     static  int     pulse_violence = 6;   // 3 sec; offset to de-phase off the 4s mobile pulse
     static  int     pulse_point;          // 60 sec
     static  int     pulse_water_float = 8; // 4 sec; offset to de-phase off the 4s mobile pulse
@@ -1224,18 +1231,32 @@ void update_handler( void )
         }
     }
 
-    if ( --pulse_mobile   <= 0 )
+    if ( --pulse_player   <= 0 )
     {
-        pulse_mobile        = PULSE_MOBILE;
+        pulse_player        = PULSE_MOBILE;
 
         LastLogStream::send( ) <<  "Player update"  << endl;
         player_update( );
 
+        heavy = true;
+    }
+
+    if ( --pulse_mobile   <= 0 )
+    {
+        pulse_mobile        = PULSE_MOBILE;
+
         LastLogStream::send( ) <<  "Mobile update"  << endl;
         mobile_update( );
 
+        heavy = true;
+    }
+
+    if ( --pulse_diving   <= 0 )
+    {
+        pulse_diving        = PULSE_MOBILE;
+
         LastLogStream::send( ) <<  "Diving update"  << endl;
-        diving_update( );        
+        diving_update( );
 
         heavy = true;
     }
@@ -1609,6 +1630,7 @@ void check_reboot( void )
 
 void player_update( )
 {
+    ProfilerBlock profiler("player_update", 100);
     PCharacter *ch;
     Descriptor *d;
 
