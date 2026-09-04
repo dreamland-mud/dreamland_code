@@ -131,6 +131,7 @@ GSN(spellbane);
 #define PULSE_RAFFECT                  ( 3 * PULSE_MOBILE + 1)
 #define PULSE_AREA                  (110 * dreamland->getPulsePerSecond( )) /* 97 saniye */
 #define PULSE_TRACK                  ( 7 * dreamland->getPulsePerSecond( ))
+#define PULSE_PERFDUMP              (600 * dreamland->getPulsePerSecond( )) /* cumulative perf stats to log, every 10 min */
 
 
 // A set of update settings defined in config/update.json.
@@ -1197,9 +1198,10 @@ void update_handler( void )
     ProfilerBlock profiler("update_handler", 200);
     static  int     pulse_area;           // 110 sec
     static  int     pulse_mobile;         // 4 sec
-    static  int     pulse_violence;       // 3 sec
+    static  int     pulse_violence = 6;   // 3 sec; offset to de-phase off the 4s mobile pulse
     static  int     pulse_point;          // 60 sec
-    static  int     pulse_water_float;    // 4 sec
+    static  int     pulse_water_float = 8; // 4 sec; offset to de-phase off the 4s mobile pulse
+    static  int     pulse_perfdump = 120 * dreamland->getPulsePerSecond( ); // first perf dump ~2 min after boot
     static  int     pulse_raffect;        // 13 sec
     static  int     pulse_saving;         // 5 sec
     static  int     pulse_track;          // 7 sec
@@ -1346,6 +1348,13 @@ void update_handler( void )
 
     if (!heavy)
         area_update_next(); // Update one of the marked areas
+
+    // Always-on cumulative profiling: dump per-block count/avg/max to the log
+    // periodically, so a whole boot can be analysed without an in-game session.
+    if (--pulse_perfdump <= 0) {
+        pulse_perfdump = PULSE_PERFDUMP;
+        profiler_stats_dump( );
+    }
 }
 
 /*
