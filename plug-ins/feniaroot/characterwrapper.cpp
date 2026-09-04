@@ -3136,6 +3136,10 @@ static bool ga_clericCanCompound( Character *target, obj_index_data *pObj )
 // actually is, not on the stub prototype it was built from.
 static bool ga_clericCanCompound( Character *target, ::Object *o )
 {
+    // The compound prayer (spell/compound/runObj) also refuses a personalized/owned
+    // weapon; an owner exists only on the instance, so it is checked only here.
+    if (!o->getOwner( ).empty( ))
+        return false;
     return ga_clericCanCompoundCore( target, o->item_type, o->pIndexData->limit,
                                      o->extra_flags, get_weapon_class( o ), o->value4( ) );
 }
