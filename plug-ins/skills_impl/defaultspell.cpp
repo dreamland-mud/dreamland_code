@@ -861,10 +861,28 @@ bool DefaultSpell::checkPosition( Character *ch ) const
 {
     if (ch->position < position.getValue( )) {
         const Skill *theSkill = skill.getPointer();
-        ch->pecho(_("Заклинание '%K1' нельзя использовать во время сражения."), theSkill);
+        // Position-appropriate refusal. The old code printed the "during combat"
+        // line for EVERY too-low position, so resting/sitting/sleeping casters were
+        // told they were fighting. Mirror Command::checkPosition's per-position
+        // messages (naming the spell via %K1).
+        switch (ch->position.getValue( )) {
+            case POS_FIGHTING:
+                ch->pecho(_("Заклинание '%K1' нельзя использовать во время сражения."), theSkill);
+                break;
+            case POS_SLEEPING:
+                ch->pecho(_("Во сне заклинание '%K1' не произнести."), theSkill);
+                break;
+            case POS_RESTING:
+            case POS_SITTING:
+                ch->pecho(_("Чтобы произнести заклинание '%K1', надо встать."), theSkill);
+                break;
+            default:
+                ch->pecho(_("Ты не в том состоянии, чтобы произнести заклинание '%K1'."), theSkill);
+                break;
+        }
         return false;
     }
-    
+
     return true;
 }
 
