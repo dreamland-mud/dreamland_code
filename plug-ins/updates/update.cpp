@@ -641,8 +641,22 @@ static void rafprog_spec(Room *room)
 void diving_update( )
 {
     ProfilerBlock profiler("diving_update", 100);
-   
+    static long dv_calls = 0;
+    long rooms = 0, dispatched = 0;
+
     for (auto &r: roomInstances) {
+        rooms++;
+
+        // Provably-safe has-handler gate. All five dispatches below are no-ops for a
+        // room with no instance Fenia wrapper (both FENIA_VOID_CALLs short-circuit on
+        // a null getWrapper), empty prototype behaviors (both behavior_triggers early
+        // out on behaviors.empty), and no affects (rafprog_spec iterates
+        // affected.findAllWithHandler). Skipping those -- the vast majority -- avoids
+        // the per-room dispatch attempt that made this sweep walk ~9.8k rooms blindly.
+        if (r->getWrapper() == 0 && r->pIndexData->behaviors.empty() && r->affected.empty())
+            continue;
+
+        dispatched++;
         try {
             FENIA_VOID_CALL(r, "DiveUpdate", "");
 
@@ -652,13 +666,20 @@ void diving_update( )
                 continue;
 
             rafprog_spec(r);
-            
+
             FENIA_VOID_CALL(r, "Spec", "");
 
         } catch (const VictimDeathException &ex) {
             // DO NOTHING
         }
     }
+
+    // Diagnostic (~every 10 min): how many rooms actually carry a handler. Tells us
+    // whether this gate is enough or a method-specific registry is the next step.
+    if (++dv_calls % 150 == 0)
+        LogStream::sendNotice( ) << "DivingStat: rooms=" << rooms
+            << " dispatched=" << dispatched
+            << " gated=" << (rooms - dispatched) << endl;
 }
 
 static bool oprog_spec( Object *obj )
