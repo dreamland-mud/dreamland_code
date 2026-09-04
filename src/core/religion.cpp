@@ -48,7 +48,7 @@ const DLString & Religion::getShortDescr( ) const
 {
     return DLString::emptyString;
 }
-const DLString & Religion::getDescription( ) const
+const DLString & Religion::getDescription( lang_t ) const
 {
     return DLString::emptyString;
 }

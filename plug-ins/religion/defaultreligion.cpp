@@ -308,9 +308,9 @@ const DLString & DefaultReligion::getShortDescr( ) const
     return shortDescr.getValue( );
 }
 
-const DLString & DefaultReligion::getDescription( ) const
+const DLString & DefaultReligion::getDescription( lang_t lang ) const
 {
-    return description.getValue( );
+    return description.getForLang( lang );
 }
 
 int DefaultReligion::getSex() const

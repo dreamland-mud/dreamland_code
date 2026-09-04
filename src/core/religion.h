@@ -39,7 +39,7 @@ public:
     virtual bool available(Character *) const;
 
     virtual const DLString & getShortDescr( ) const;
-    virtual const DLString & getDescription( ) const;
+    virtual const DLString & getDescription( lang_t lang = LANG_DEFAULT ) const;
     virtual const DLString& getNameFor( Character * ) const;
     /** Deity name in one language, with no viewer in scope. Needed when the name
      *  is baked into an object at creation time and every language slot has to be

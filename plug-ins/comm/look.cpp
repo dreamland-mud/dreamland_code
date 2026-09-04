@@ -1072,7 +1072,7 @@ bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool
         else
             mbuf << objName;
 
-        buf << fmt(0, "<%-21s> %s\r\n", wearName.c_str( ), mbuf.str( ).c_str( ) );
+        buf << fmt(0, "%-21s %s\r\n", wearName.c_str( ), mbuf.str( ).c_str( ) );
         if (obj)
             naked = false;
     }

@@ -7,6 +7,7 @@
 
 #include "lang.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlflags.h"
 #include "xmltableelement.h"
 #include "xmlglobalbitvector.h"
@@ -84,7 +85,7 @@ public:
     virtual void unloaded( );
     
     virtual const DLString &getShortDescr( ) const;
-    virtual const DLString &getDescription( ) const;
+    virtual const DLString &getDescription( lang_t lang = LANG_DEFAULT ) const;
     virtual bool available(Character *) const;
     DLString reasonWhy(Character *) const;
     virtual const DLString& getNameFor( Character * ) const;
@@ -104,7 +105,7 @@ public:
     XML_VARIABLE XMLString  shortDescr;
     XML_VARIABLE XMLString  nameRus, nameRusFemale;
     XML_VARIABLE XMLStringNoEmpty  nameUa, nameUaFemale;
-    XML_VARIABLE XMLString  description;
+    XML_VARIABLE XMLMultiString  description;
     XML_VARIABLE XMLFlags   align, ethos;
     XML_VARIABLE XMLGlobalBitvector  races;
     XML_VARIABLE XMLGlobalBitvector  classes;
