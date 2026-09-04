@@ -49,6 +49,7 @@
 *        By using this code, you have agreed to follow the terms of the           *
 *        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
+#include <sys/time.h>
 #include <jsoncpp/json/json.h>
 
 #include "lastlogstream.h"
@@ -993,6 +994,13 @@ void obj_update( void )
     Character *carrier;
     list<Object *> extracted; // Keep track of all items that are about to die this round.
 
+    // Diagnostic (2026-09-04, Trello xgKK38m6): attribute per-tick obj_update cost to
+    // the two uncertain sections -- the Fenia/behavior Area dispatch (oprog_area) and
+    // the affect decrement -- to decide whether an oprog_area precompute is worth it.
+    // Logged once per call (~60s); lightweight, two gettimeofday() per section.
+    struct timeval dtv0, dtv1;
+    long usOprog = 0, usAffects = 0, objCount = 0;
+
     for ( obj = object_list; obj != 0; obj = obj_next )
     {
         const char *message;
@@ -1001,8 +1009,9 @@ void obj_update( void )
             LogStream::sendError() << "obj_update aborted" << endl;
             return;
         }
-            
+
         obj_next = obj->next;
+        objCount++;
         room = obj->getRoom( );
         carrier = obj->getCarrier( );
         
@@ -1023,40 +1032,52 @@ void obj_update( void )
             continue;
         }
 
-        if (oprog_area( obj ))
-            continue;        
+        gettimeofday( &dtv0, 0 );
+        bool areaSkip = oprog_area( obj );
+        gettimeofday( &dtv1, 0 );
+        usOprog += (dtv1.tv_sec - dtv0.tv_sec) * 1000000L + (dtv1.tv_usec - dtv0.tv_usec);
 
-        /* go through affects and decrement */
-        AffectList affects = obj->affected.clone();
-        for (auto paf_iter = affects.cbegin( ); paf_iter != affects.cend( ); paf_iter++) {
-            Affect *paf = *paf_iter;
+        if (areaSkip)
+            continue;
 
-            if ( paf->duration > 0 )
-            {
-                paf->duration--;
-                if (number_range(0,4) == 0 && paf->level > 0)
-                    paf->level--;  /* spell strength fades with time */
+        /* go through affects and decrement.
+         * Skip the clone() allocation entirely when there are no affects -- the
+         * common case for the vast majority of objects. */
+        gettimeofday( &dtv0, 0 );
+        if (!obj->affected.empty( )) {
+            AffectList affects = obj->affected.clone();
+            for (auto paf_iter = affects.cbegin( ); paf_iter != affects.cend( ); paf_iter++) {
+                Affect *paf = *paf_iter;
 
-                // Issue periodic message or action.
-                if (!affects.hasNext(paf_iter) && paf->type->getAffect( )) 
-                    paf->type->getAffect()->onUpdate(SpellTarget::Pointer(NEW, obj), paf );
+                if ( paf->duration > 0 )
+                {
+                    paf->duration--;
+                    if (number_range(0,4) == 0 && paf->level > 0)
+                        paf->level--;  /* spell strength fades with time */
 
-                room_to_save( obj );
-            }
-            else if ( paf->duration < 0 )
-                ;
-            else
-            {
-                room_to_save( obj );
+                    // Issue periodic message or action.
+                    if (!affects.hasNext(paf_iter) && paf->type->getAffect( ))
+                        paf->type->getAffect()->onUpdate(SpellTarget::Pointer(NEW, obj), paf );
 
-                if (!affects.hasNext(paf_iter))
-                    if (paf->type->getAffect())
-                        paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, obj), paf );
+                    room_to_save( obj );
+                }
+                else if ( paf->duration < 0 )
+                    ;
+                else
+                {
+                    room_to_save( obj );
+
+                    if (!affects.hasNext(paf_iter))
+                        if (paf->type->getAffect())
+                            paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, obj), paf );
 
 
-                affect_remove_obj( obj, paf, false );
+                    affect_remove_obj( obj, paf, false );
+                }
             }
         }
+        gettimeofday( &dtv1, 0 );
+        usAffects += (dtv1.tv_sec - dtv0.tv_sec) * 1000000L + (dtv1.tv_usec - dtv0.tv_usec);
 
         if (!obj->in_obj 
             && room->getSectorType() == SECT_DESERT
@@ -1206,6 +1227,10 @@ void obj_update( void )
         extract_obj(extracted.front());
         extracted.pop_front();
     }
+
+    LogStream::sendNotice( ) << "ObjStat: objs=" << objCount
+        << " oprog_area=" << (usOprog / 1000) << "ms"
+        << " affects=" << (usAffects / 1000) << "ms" << endl;
 }
 
 

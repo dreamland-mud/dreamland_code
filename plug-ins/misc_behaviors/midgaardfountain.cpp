@@ -24,18 +24,21 @@ bool MidgaardFountain::area( ) {
     ProfilerBlock profiler("MidgaardFountain::area", 5);
     
     Character *wch;
-    Object *o;
     int count = 0;
-    
-    for (o = object_list; o; o = o->next)
-        if (o->pIndexData->vnum == OBJ_VNUM_MONUMENT 
-            && o->in_room
-            && o->in_room->area == obj->in_room->area)
-        {
-            count++;
-        }
 
-    wch = obj->in_room->people; 
+    // Only monument instances matter here -- walk the prototype's instance list
+    // rather than the whole object_list. This scan runs inside obj_update once per
+    // tick, and object_list is ~60k while the monuments number a handful.
+    obj_index_data *monumentIndex = get_obj_index(OBJ_VNUM_MONUMENT);
+    if (monumentIndex)
+        for (auto &o: monumentIndex->instances)
+            if (o->in_room
+                && o->in_room->area == obj->in_room->area)
+            {
+                count++;
+            }
+
+    wch = obj->in_room->people;
 
     if (count < 3) {
         if (obj->value2() != obj->pIndexData->value[2] && obj->value2() == liq_blood) {
