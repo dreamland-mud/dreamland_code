@@ -3350,8 +3350,17 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
                 }
         }
         else if (isGroup) {
-            int cap = 25 + 3 * ga_remorts( target );
-            s += w.learnGroup * (m < cap ? m : cap);
+            // Capability-gate like APPLY_LEVEL-group and learned-skill above:
+            // +N% to a skill-group the char doesn't have (necromancy on a cleric,
+            // healing on a warrior) is worthless, so credit it only for a group
+            // the char actually owns.
+            bool owns = false;
+            for (int gi: af.global.toArray( ))
+                if (ga_hasGroup( target, gi )) { owns = true; break; }
+            if (owns) {
+                int cap = 25 + 3 * ga_remorts( target );
+                s += w.learnGroup * (m < cap ? m : cap);
+            }
         }
         else if (af.location == APPLY_LEARNED) {   // all-skills scope (empty global)
             int cap = 25 + 3 * ga_remorts( target );
