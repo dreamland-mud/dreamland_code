@@ -1993,7 +1993,17 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                         if ( !fNest || !fVnum || obj->pIndexData == 0)
                         {
                             bug( "Fread_obj: incomplete object.", 0 );
-                            ddeallocate( obj );
+                            // ddeallocate() freed the object while it was still linked into
+                            // object_list and pIndexData->instances, leaving a dangling
+                            // pointer in both lists. Unlink it properly instead. Mirror the
+                            // create_obj_dropped count bump above so the limit stays balanced;
+                            // a null pIndexData never reached either list, so free it raw.
+                            if (obj->pIndexData == 0)
+                                ddeallocate( obj );
+                            else if (create_obj_dropped)
+                                extract_obj( obj );
+                            else
+                                extract_obj_nocount( obj );
                             return;
                         }
                         else if (obj->pIndexData->vnum == OBJ_VNUM_STUB) {
