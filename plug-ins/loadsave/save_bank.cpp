@@ -363,10 +363,68 @@ bool bank_withdraw_entry( Character *ch, const DLString &kind, const DLString &k
 
     bool clean = bank_read_entry_file( ch, fname );
 
-    // Only unlink when the file read cleanly end to end. A mid-file failure keeps
-    // the file for inspection instead of destroying the unread records.
-    if ( clean )
+    if ( clean ) {
         unlink( fname );
+    }
+    else {
+        // Mid-file failure: the readable prefix was already materialized into ch.
+        // Quarantine the file as <id>.bad instead of leaving it in place -- the
+        // digits-only browse filter then hides it (so the player can't re-run
+        // 'vault get' and re-materialize the prefix into same-Id dupes) and a
+        // later re-deposit writes a fresh <id> without truncating the kept tail.
+        // The records stay on disk under .bad for ops inspection.
+        char badname[MAX_INPUT_LENGTH + 8];   // room for the ".bad" suffix
+        snprintf( badname, sizeof( badname ), "%s.bad", fname );
+        rename( fname, badname );
+    }
 
     return clean;
+}
+
+/*-------------------------------------------------------------------------
+ * owner-tree lifecycle (character delete / rename)
+ *------------------------------------------------------------------------*/
+void bank_drop_owner( const DLString &kind, const DLString &key )
+{
+    char dir[MAX_INPUT_LENGTH];
+    bank_owner_dir( dir, sizeof( dir ), kind, key );
+
+    DIR *d = opendir( dir );
+    if ( d == 0 )
+        return;
+
+    struct dirent *ent;
+    while ( ( ent = readdir( d ) ) != 0 ) {
+        if ( !strcmp( ent->d_name, "." ) || !strcmp( ent->d_name, ".." ) )
+            continue;
+        char path[MAX_INPUT_LENGTH + 260];   // dir + '/' + d_name (<=255)
+        snprintf( path, sizeof( path ), "%s/%s", dir, ent->d_name );
+        unlink( path );
+    }
+    closedir( d );
+
+    rmdir( dir );
+}
+
+void bank_rename_owner( const DLString &kind, const DLString &oldKey, const DLString &newKey )
+{
+    char oldDir[MAX_INPUT_LENGTH], newDir[MAX_INPUT_LENGTH];
+    bank_owner_dir( oldDir, sizeof( oldDir ), kind, oldKey );
+    bank_owner_dir( newDir, sizeof( newDir ), kind, newKey );
+
+    struct stat st;
+    if ( ::stat( oldDir, &st ) != 0 )        // nothing to move
+        return;
+    if ( ::stat( newDir, &st ) == 0 ) {      // don't clobber an existing cell dir
+        bug( "bank_rename_owner: destination cell dir exists, not moving.", 0 );
+        return;
+    }
+
+    // rename needs the parent bank/<kind>/ to exist.
+    char parent[MAX_INPUT_LENGTH];
+    snprintf( parent, sizeof( parent ), "%s/bank/%s",
+              dreamland->getSavedDir( ).getPath( ).c_str( ), kind.c_str( ) );
+    ::mkdir( parent, 0775 );
+
+    rename( oldDir, newDir );
 }

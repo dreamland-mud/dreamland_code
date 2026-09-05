@@ -188,6 +188,20 @@ static const char *WORDS_FIND[]   = { "find", "search", "найти", "иска�
 static const char *WORDS_FILTER[] = { "filter", "type", "фильтр", "фільтр", "тип", 0 };
 static const char *WORDS_LIST[]   = { "list", "all", "список", "все", "усе", 0 };
 
+// Print the entries at the given ORIGINAL full-list indices (so the row numbers
+// match what 'vault get <n>' expects), then the get hint. Used by find/filter.
+static void vault_show_rows( Character *ch, const std::vector<BankEntry> &entries,
+                             const std::vector<int> &hitIdx, lang_t lang )
+{
+    for ( size_t k = 0; k < hitIdx.size( ); k++ )
+        vault_show_entry( ch, hitIdx[k] + 1, entries[ hitIdx[k] ], lang );
+
+    ch->pecho( lmsg( lang,
+        "Take one out with {y'vault get <number>'{x.",
+        "Достать: {y'vault get <номер>'{x.",
+        "Дістати: {y'vault get <номер>'{x." ) );
+}
+
 /*-------------------------------------------------------------------------
  * the command
  *------------------------------------------------------------------------*/
@@ -231,16 +245,26 @@ CMDRUN( vault )
                 "Лише безсмертні можуть відкрити чуже сховище." ) );
             return;
         }
-        DLString owner = vault_capitalize( peek.substr( 1 ) );
-        if ( owner.empty( ) ) {
+        // Owner becomes a directory name: allow only [A-Za-z0-9] so '*../../x'
+        // can't mkdir/write outside the bank tree. PC names are letters anyway.
+        DLString ownerArg = peek.substr( 1 );
+        bool okName = !ownerArg.empty( );
+        for ( size_t i = 0; okName && i < ownerArg.size( ); i++ ) {
+            char c = ownerArg[i];
+            if ( !( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) ) )
+                okName = false;
+        }
+        if ( !okName ) {
             ch->pecho( lmsg( lang,
-                "Usage: vault *<owner> [subcommand]",
-                "Использование: vault *<владелец> [подкоманда]",
-                "Використання: vault *<власник> [підкоманда]" ) );
+                "Usage: vault *<owner> [subcommand]  (letters/digits only)",
+                "Использование: vault *<владелец> [подкоманда]  (только буквы/цифры)",
+                "Використання: vault *<власник> [підкоманда]  (лише літери/цифри)" ) );
             return;
         }
-        key = owner;
-        ownerLabel = owner;
+        // Key is the pfile-canonical lowercase form (so delete/rename cleanup and
+        // the owner's own vault land on the same cell); label stays capitalized.
+        key = ownerArg.toLower( );
+        ownerLabel = vault_capitalize( ownerArg );
         // args now holds the rest; take the real subcommand token below.
         peek = args.getOneArgument( );
     }
@@ -254,7 +278,8 @@ CMDRUN( vault )
                 "У тебе немає сховища." ) );
             return;
         }
-        key = pch->getName( );
+        // Lowercase to match the pfile-canonical key (delete/rename cleanup).
+        key = pch->getName( ).toLower( );
     }
 
     DLString sub = vault_lower( peek );
@@ -317,6 +342,12 @@ CMDRUN( vault )
                 "You store %s in %s's vault.",
                 "Ты убираешь %s в хранилище %s.",
                 "Ти ховаєш %s до сховища %s." ), name.c_str( ), ownerLabel.c_str( ) );
+
+        // Persist the inventory change now: the cell is on disk instantly, so
+        // save ch too or a crash inside the ~60s autosave window would leave the
+        // pfile still holding the item (dupe on withdraw). ch is who lost it,
+        // including the immortal owner-override case.
+        ch->getPC( )->save( );
         return;
     }
 
@@ -331,14 +362,16 @@ CMDRUN( vault )
         std::vector<BankEntry> entries;
         bank_browse( kind, key, entries );
 
-        std::vector<BankEntry> hits;
+        // Keep ORIGINAL indices: 'vault get <n>' numbers the full list, so the
+        // rows shown here must carry their full-list number, not a 1..N reindex.
+        std::vector<int> hitIdx;
         for ( size_t i = 0; i < entries.size( ); i++ ) {
             OBJ_INDEX_DATA *proto = get_obj_index( entries[i].vnum );
             if ( vault_entry_shortdescr( entries[i], proto ).matchesSubstring( kw ) )
-                hits.push_back( entries[i] );
+                hitIdx.push_back( (int)i );
         }
 
-        if ( hits.empty( ) ) {
+        if ( hitIdx.empty( ) ) {
             ch->pecho( lmsg( lang,
                 "Nothing in the vault matches '%s'.",
                 "В хранилище нет ничего похожего на '%s'.",
@@ -346,7 +379,11 @@ CMDRUN( vault )
             return;
         }
 
-        vault_list( ch, hits, lang, ownerLabel );
+        ch->pecho( lmsg( lang,
+            "Vault entries matching '%s':",
+            "Записи хранилища по '%s':",
+            "Записи сховища за '%s':" ), kw.c_str( ) );
+        vault_show_rows( ch, entries, hitIdx, lang );
         return;
     }
 
@@ -373,14 +410,14 @@ CMDRUN( vault )
         std::vector<BankEntry> entries;
         bank_browse( kind, key, entries );
 
-        std::vector<BankEntry> hits;
+        std::vector<int> hitIdx;
         for ( size_t i = 0; i < entries.size( ); i++ ) {
             OBJ_INDEX_DATA *proto = get_obj_index( entries[i].vnum );
             if ( vault_entry_type( entries[i], proto ) == ft )
-                hits.push_back( entries[i] );
+                hitIdx.push_back( (int)i );
         }
 
-        if ( hits.empty( ) ) {
+        if ( hitIdx.empty( ) ) {
             ch->pecho( lmsg( lang,
                 "No %s in the vault.",
                 "В хранилище нет ни одного типа '%s'.",
@@ -388,7 +425,11 @@ CMDRUN( vault )
             return;
         }
 
-        vault_list( ch, hits, lang, ownerLabel );
+        ch->pecho( lmsg( lang,
+            "Vault entries of type %s:",
+            "Записи хранилища типа %s:",
+            "Записи сховища типу %s:" ), item_table.name( ft ).c_str( ) );
+        vault_show_rows( ch, entries, hitIdx, lang );
         return;
     }
 
@@ -493,4 +534,9 @@ CMDRUN( vault )
         "You take %s out of the vault.",
         "Ты достаешь %s из хранилища.",
         "Ти дістаєш %s зі сховища." ), name.c_str( ) );
+
+    // Persist the pickup: the cell was unlinked on disk instantly, so save ch too
+    // or a crash inside the ~60s autosave window would lose the item (gone from
+    // both the vault and the pfile). ch is who received it.
+    ch->getPC( )->save( );
 }

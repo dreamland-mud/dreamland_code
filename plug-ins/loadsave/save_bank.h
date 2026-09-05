@@ -59,9 +59,19 @@ void bank_browse( const DLString &kind, const DLString &key, std::vector<BankEnt
 /* Materialize the single entry file bank/<kind>/<key>/<id> into ch's inventory
  * and unlink it. Reuses the phase-1 whole-file reader (login semantics: no
  * create_obj_dropped, so the proto count is not bumped -- the nocount deposit
- * never dropped it). Returns false and keeps the file if it is missing or a
- * mid-file read fails, so a corrupt entry is preserved for inspection rather
- * than destroyed. */
+ * never dropped it). Returns false on a missing file or a mid-file read failure;
+ * a half-read entry is renamed to <id>.bad (kept for inspection but hidden from
+ * browse and safe from a re-deposit truncate), never left retryable in place. */
 bool bank_withdraw_entry( Character *ch, const DLString &kind, const DLString &key, long long id );
+
+/* Remove an owner's whole bank tree bank/<kind>/<key>/ (all entry files, incl.
+ * any <id>.bad, then the dir). Called on character delete so a freed name can't
+ * hand its stored items to whoever registers it next. No-op if absent. */
+void bank_drop_owner( const DLString &kind, const DLString &key );
+
+/* Move an owner's bank tree from oldKey to newKey (character rename), so the
+ * vault follows the new name. No-op if the source is absent; refuses to clobber
+ * an existing destination. */
+void bank_rename_owner( const DLString &kind, const DLString &oldKey, const DLString &newKey );
 
 #endif

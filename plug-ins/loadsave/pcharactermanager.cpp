@@ -34,6 +34,8 @@
 #include "vnum.h"
 #include "def.h"
 
+#include "save_bank.h"
+
 void fread_to_end_string( FILE *pfile );
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 void limit_count_on_boot( OBJ_INDEX_DATA *pObjIndex, time_t ts, const DLString &playerName );
@@ -341,6 +343,9 @@ void PCharacterManager::rename( const DLString& oldName, const DLString& newName
             {
                 LogStream::sendWarning( ) << ex << endl;
             }
+
+            // Move the object-bank cell tree so the vault follows the new name.
+            bank_rename_owner( "player", oldNameLower, newNameLower );
         }
     }
     else
@@ -400,10 +405,15 @@ bool PCharacterManager::pfDelete ( const DLString& playerName )
     }
                 
     PCharacterManager::remove( name );
+
+    // Drop the object-bank cell tree too, so a freed name can't inherit the
+    // deleted character's stored items (and dead hoards don't linger on disk).
+    bank_drop_owner( "player", name );
+
     return true;
 }
 
-bool PCharacterManager::pfRemort ( PCharacter* pch ) 
+bool PCharacterManager::pfRemort ( PCharacter* pch )
 {
     DLString name = pch->getName( ).toLower( );
     DLString remortExt;
