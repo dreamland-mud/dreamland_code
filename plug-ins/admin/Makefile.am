@@ -44,7 +44,8 @@ reward.cpp \
 confirm.cpp \
 reboot.cpp \
 adminservlet.cpp \
-forceservlet.cpp
+forceservlet.cpp \
+bankpilot.cpp
 
 libplugin_command_la_LIBADD = \
 ../descriptor/libdescriptor.la \
