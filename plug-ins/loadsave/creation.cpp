@@ -176,6 +176,55 @@ void passive_refresh(Character *ch, bool verbose)
     }
 }
 
+// Item-granted stealth as a real affect. Worn gear puts sneak/hide/fade/invis into
+// eqAffects, but historically only as a raw affect_flags bit with no owning affect:
+// do_visible's strip in combat drops the bit (strip_sneak et al.) and nothing puts it
+// back, because afprog_refresh re-arms only RACE grants. Mirror passive_refresh --
+// install the affect while the gear is worn, strip our permanent grant once the gear
+// is gone and the race doesn't grant it. A cast/commanded stealth keeps a finite
+// duration and its own lifetime, so it is never touched here. Retires strip_sneak's
+// "TODO remove once sneak-from-item becomes an affect".
+//
+// Only the volitional traits do_visible strips need this; other worn grants (fly,
+// infravision) are never stripped. Camouflage is excluded -- no onRefresh handler yet.
+static const char * const item_stealth_skills[] = {
+    "sneak", "hide", "fade", "invisibility", "improved invis", 0
+};
+
+void item_stealth_refresh(Character *ch, bool verbose)
+{
+    for (int i = 0; item_stealth_skills[i] != 0; i++) {
+        Skill *skill = skillManager->findExisting( item_stealth_skills[i] );
+        if (skill == 0)
+            continue;
+
+        int sn = skill->getIndex( );
+        bool worn = ch->eqAffects.isSet( sn );
+        // Real affect only -- NOT ch->isAffected(), which folds in eqAffects and so
+        // is always true while the gear is worn (the same silent no-op that would
+        // make onRefresh's own guard refuse to install; the Fenia guards check the
+        // real list too).
+        bool realAffect = ch->affected.find( sn ) != 0;
+
+        if (worn && !realAffect) {
+            AffectHandler::Pointer ah = skill->getAffect( );
+            if (ah) {
+                SpellTarget::Pointer spellTarget( NEW, ch );
+                ah->onRefresh( spellTarget, verbose );
+            }
+        }
+        else if (!worn && realAffect && !ch->getRace( )->getAffects( ).isSet( sn )) {
+            // Gear gone and the race doesn't grant it: strip only our own permanent
+            // grant (duration -1). A cast/commanded stealth (finite duration) and a
+            // racial one (kept by afprog_refresh, excluded above) are left alone.
+            // findAll returns a copy, so removing while iterating is safe.
+            for (auto &paf: ch->affected.findAll( sn ))
+                if (paf->duration.getValue( ) == -1)
+                    affect_remove( ch, paf, verbose );
+        }
+    }
+}
+
 /*
  * Create an instance of a mobile.
  */
