@@ -176,6 +176,22 @@ bool DefaultWearlocation::equip( Object *obj )
 //    runObj spell affects). Those are NOT grants; unioning them would make wearers
 //    isAffected(katana/bless/curse/...) and break real gates (katana craft
 //    cooldown, "already blessed", etc.). So the instance list is never scanned.
+//
+// A stealth trait carried on an item as a bare affect_flags bit (sneak/hide/fade/
+// invis) with no skill type is invisible to the loop, so item_stealth_refresh could
+// not own the bit with a real affect and do_visible would strip it for good in
+// combat. Map the volitional bits to the skill whose onRefresh re-arms them, so a
+// bare-bit stealth item joins eqAffects the same as a <grant>. Skill names match
+// creation.cpp's item_stealth_skills and the affect handlers.
+static const struct { int bit; const char *skill; } item_stealth_bit_skills[] = {
+    { AFF_SNEAK,     "sneak" },
+    { AFF_HIDE,      "hide" },
+    { AFF_FADE,      "fade" },
+    { AFF_INVISIBLE, "invisibility" },
+    { AFF_IMP_INVIS, "improved invis" },
+    { 0, 0 }
+};
+
 static void rebuild_eq_affects( Character *ch )
 {
     // setRegistry clears the bits (like clear() did) AND installs the skill
@@ -191,8 +207,22 @@ static void rebuild_eq_affects( Character *ch )
 
         for (auto &paf: obj->pIndexData->affected) {
             Skill *g = paf->type.getElement( );
-            if (g != 0 && g->getIndex( ) > 0)
+            if (g != 0 && g->getIndex( ) > 0) {
                 ch->eqAffects.set( g->getIndex( ) );
+                continue;
+            }
+
+            // Bare affect_flags stealth bit, no skill type: map it to its skill so
+            // item_stealth_refresh can own it (see item_stealth_bit_skills above).
+            if (paf->bitvector.getTable( ) == &affect_flags) {
+                bitstring_t b = paf->bitvector;
+                for (int i = 0; item_stealth_bit_skills[i].skill != 0; i++)
+                    if (IS_SET( b, item_stealth_bit_skills[i].bit )) {
+                        Skill *s = skillManager->findExisting( item_stealth_bit_skills[i].skill );
+                        if (s != 0)
+                            ch->eqAffects.set( s->getIndex( ) );
+                    }
+            }
         }
     }
 }

@@ -163,6 +163,11 @@ void afprog_refresh( Character *ch, bool verbose );
 // a player's learned passive skills grant (perception -> detect trap). Players only.
 void passive_refresh( Character *ch, bool verbose );
 
+// Defined in plug-ins/loadsave/creation.cpp. Installs/strips the affect that owns an
+// item-granted stealth bit (sneak/hide/fade/invis from worn gear), so it survives
+// combat's do_visible strip like a racial trait does. Players only.
+void item_stealth_refresh( Character *ch, bool verbose );
+
 
 /* used for saving */
 
@@ -462,6 +467,12 @@ void char_update( )
         // a Fenia call only on the tick a grant actually appears or disappears.
         if (!ch->is_npc( ))
             passive_refresh( ch, true );
+
+        // Item-granted stealth (sneak/hide/fade/invis from worn gear) as a real
+        // affect, so it re-arms after do_visible strips it in combat -- same tiny,
+        // per-tick shape as passive_refresh above.
+        if (!ch->is_npc( ))
+            item_stealth_refresh( ch, true );
 
         // Recover from 'stunned' state if HP is ok.
         if (ch->position == POS_STUNNED && !noupdate) {
