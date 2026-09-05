@@ -19,6 +19,7 @@
 #include "character.h"
 #include "pcharacter.h"
 #include "core/object.h"
+#include "inflectedstring.h"
 
 #include "save_bank.h"
 #include "loadsave.h"
@@ -86,6 +87,32 @@ static int vault_entry_level( const BankEntry &be, OBJ_INDEX_DATA *proto )
     return proto != 0 ? proto->level : 0;
 }
 
+/* Resolved NOMINATIVE display name for an entry in the viewer's language. The
+ * stored short_descr is a raw Flexer pad ("кузнечн|ый|ого|... моло|т|та|..."),
+ * so both display and keyword-matching must decline it to case 1 -- printing the
+ * pad verbatim leaks the pipes, and a substring match against the pad never
+ * finds the nominative word ("молот" is not a substring of "моло|т|та"). Uses
+ * the prototype's gender, same as Object::updateCachedNoun. Empty pad -> "". */
+static DLString vault_entry_name( const BankEntry &be, OBJ_INDEX_DATA *proto, lang_t lang )
+{
+    DLString pad = vault_entry_shortdescr( be, proto ).getForLang( lang );
+    if ( pad.empty( ) )
+        return DLString( "" );
+
+    Grammar::MultiGender g = ( proto != 0 ) ? proto->gram_gender : Grammar::MultiGender( );
+    InflectedString noun( pad, g );
+    return noun.decline( '1' );          // '1' = nominative, the codebase idiom
+}
+
+/* Case-insensitive substring match of kwLower against an entry's resolved
+ * nominative name (so 'vault get молот' finds "кузнечный молот"). Match what the
+ * player SEES, not the raw pad. */
+static bool vault_entry_matches( const BankEntry &be, OBJ_INDEX_DATA *proto, lang_t lang, const DLString &kwLower )
+{
+    DLString nm = vault_entry_name( be, proto, lang ).toLower( );
+    return !nm.empty( ) && nm.find( kwLower ) != DLString::npos;
+}
+
 /*-------------------------------------------------------------------------
  * v1 deposit policy: refuse the whole subtree if any node is limited or carries
  * a live timer. Banked objects don't tick, so a timer would freeze mid-count and
@@ -116,7 +143,7 @@ static void vault_show_entry( Character *ch, int num, const BankEntry &be, lang_
 {
     OBJ_INDEX_DATA *proto = get_obj_index( be.vnum );
 
-    DLString name = vault_entry_shortdescr( be, proto ).getForLang( lang );
+    DLString name = vault_entry_name( be, proto, lang );
     if ( name.empty( ) )
         name = lmsg( lang, "(unknown item)", "(неизвестный предмет)", "(невідомий предмет)" );
 
@@ -322,7 +349,7 @@ CMDRUN( vault )
 
         // Capture name BEFORE deposit: bank_deposit extracts obj (obj is gone
         // after a true return, and must not be dereferenced).
-        DLString name = obj->getShortDescr( lang );
+        DLString name = obj->getShortDescr( '1', lang );   // nominative, not the raw pad
 
         if ( !bank_deposit( obj, kind, key ) ) {
             ch->pecho( lmsg( lang,
@@ -364,10 +391,11 @@ CMDRUN( vault )
 
         // Keep ORIGINAL indices: 'vault get <n>' numbers the full list, so the
         // rows shown here must carry their full-list number, not a 1..N reindex.
+        DLString kwLower = kw.toLower( );
         std::vector<int> hitIdx;
         for ( size_t i = 0; i < entries.size( ); i++ ) {
             OBJ_INDEX_DATA *proto = get_obj_index( entries[i].vnum );
-            if ( vault_entry_shortdescr( entries[i], proto ).matchesSubstring( kw ) )
+            if ( vault_entry_matches( entries[i], proto, lang, kwLower ) )
                 hitIdx.push_back( (int)i );
         }
 
@@ -481,10 +509,11 @@ CMDRUN( vault )
     }
     else {
         // keyword: collect matches by display index
+        DLString targetLower = target.toLower( );
         std::vector<int> matchIdx;
         for ( size_t i = 0; i < entries.size( ); i++ ) {
             OBJ_INDEX_DATA *proto = get_obj_index( entries[i].vnum );
-            if ( vault_entry_shortdescr( entries[i], proto ).matchesSubstring( target ) )
+            if ( vault_entry_matches( entries[i], proto, lang, targetLower ) )
                 matchIdx.push_back( (int)i );
         }
 
@@ -524,7 +553,7 @@ CMDRUN( vault )
     DLString name;
     for ( Object *o = ch->carrying; o != 0; o = o->next_content )
         if ( o->getID( ) == targetId ) {
-            name = o->getShortDescr( lang );
+            name = o->getShortDescr( '1', lang );   // nominative, not the raw pad
             break;
         }
     if ( name.empty( ) )
