@@ -75,6 +75,7 @@ csrc()
     CodeSourceRef ref;
 
     ref.source = &parser->source;
+    ref.csId = parser->source.getId();
     ref.line = yylineno;
 
     return ref;
