@@ -24,6 +24,7 @@ placement.cpp \
 limited.cpp \
 save.cpp \
 save_drop.cpp \
+save_bank.cpp \
 character.cpp \
 pcharacter.cpp \
 pcharactermanager.cpp \
