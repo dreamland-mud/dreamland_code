@@ -20,6 +20,7 @@
 #include "pcharacter.h"
 #include "core/object.h"
 #include "inflectedstring.h"
+#include "dl_strings.h"
 
 #include "save_bank.h"
 #include "loadsave.h"
@@ -104,13 +105,20 @@ static DLString vault_entry_name( const BankEntry &be, OBJ_INDEX_DATA *proto, la
     return noun.decline( '1' );          // '1' = nominative, the codebase idiom
 }
 
-/* Case-insensitive substring match of kwLower against an entry's resolved
- * nominative name (so 'vault get молот' finds "кузнечный молот"). Match what the
- * player SEES, not the raw pad. */
+/* Case-insensitive substring match of kwLower against an entry's name across ALL
+ * declined case forms, so 'vault find молот' finds "кузнечный молот" AND a
+ * declined query ('find молота') still finds it. russian_case_all_forms expands
+ * the pad to every case ("молот молота молоту ...") and colour-strips; a
+ * pipe-less name (EN, or a ShortDesc override) expands to itself, so a partial
+ * ('find nis' -> "nishtyak") still matches. Display stays nominative via
+ * vault_entry_name; only matching widens to all forms. */
 static bool vault_entry_matches( const BankEntry &be, OBJ_INDEX_DATA *proto, lang_t lang, const DLString &kwLower )
 {
-    DLString nm = vault_entry_name( be, proto, lang ).toLower( );
-    return !nm.empty( ) && nm.find( kwLower ) != DLString::npos;
+    DLString pad = vault_entry_shortdescr( be, proto ).getForLang( lang );
+    if ( pad.empty( ) )
+        return false;
+    DLString forms = russian_case_all_forms( pad ).toLower( );
+    return forms.find( kwLower ) != DLString::npos;
 }
 
 /*-------------------------------------------------------------------------
@@ -201,9 +209,9 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
         vault_show_entry( ch, (int)i + 1, entries[i], lang );
 
     ch->pecho( lmsg( lang,
-        "Use {y'vault get <number|name>'{x to take one out, {y'vault find <word>'{x to search.",
-        "Команда {y'vault get <номер|название>'{x достанет предмет, {y'vault find <слово>'{x -- поищет.",
-        "Команда {y'vault get <номер|назва>'{x дістане предмет, {y'vault find <слово>'{x -- пошукає." ) );
+        "Use {y'vault get <number|name>'{x to take one out, {y'vault find <word>'{x to search, {y'vault filter <type>'{x to list by item type (weapon, armor, potion...).",
+        "Команда {y'vault get <номер|название>'{x достанет предмет, {y'vault find <слово>'{x -- поищет, {y'vault filter <тип>'{x -- покажет по типу (weapon, armor, potion...).",
+        "Команда {y'vault get <номер|назва>'{x дістане предмет, {y'vault find <слово>'{x -- пошукає, {y'vault filter <тип>'{x -- покаже за типом (weapon, armor, potion...)." ) );
 }
 
 /*-------------------------------------------------------------------------
