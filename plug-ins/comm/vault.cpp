@@ -24,6 +24,7 @@
 #include "loadsave.h"
 #include "lang.h"
 #include "dl_ctype.h"
+#include "dl_strings.h"
 #include "behavior.h"
 #include "room.h"
 
@@ -86,6 +87,31 @@ static int vault_entry_level( const BankEntry &be, OBJ_INDEX_DATA *proto )
     return proto != 0 ? proto->level : 0;
 }
 
+/* Case-insensitive substring match of 'query' anywhere in the entry's name, in
+ * any language, across ALL declined case forms. Replaces the old
+ * XMLMultiString::matchesSubstring call, which prefix-checked the raw Flexer pad
+ * ("ме|ч|ча|...") and so matched almost nothing -- even the full name found zero.
+ * russian_case_all_forms expands the pad to every case ("меч меча мечу ..."), so a
+ * declined query ('find меча') still finds "меч"; a pipe-less name (EN, or a
+ * ShortDesc override) expands to itself, so a partial ('find nis') still finds
+ * "nishtyak". It colour-strips internally. */
+static bool vault_entry_matches( const BankEntry &be, OBJ_INDEX_DATA *proto, const DLString &query )
+{
+    if ( query.empty( ) )
+        return false;
+
+    DLString q = query.toLower( );
+    const XMLMultiString &sd = vault_entry_shortdescr( be, proto );
+
+    for ( int i = LANG_MIN; i < LANG_MAX; i++ ) {
+        DLString name = russian_case_all_forms( sd.get( (lang_t)i ) ).toLower( );
+        if ( !name.empty( ) && strstr( name.c_str( ), q.c_str( ) ) != 0 )
+            return true;
+    }
+
+    return false;
+}
+
 /*-------------------------------------------------------------------------
  * v1 deposit policy: refuse the whole subtree if any node is limited or carries
  * a live timer. Banked objects don't tick, so a timer would freeze mid-count and
@@ -116,7 +142,9 @@ static void vault_show_entry( Character *ch, int num, const BankEntry &be, lang_
 {
     OBJ_INDEX_DATA *proto = get_obj_index( be.vnum );
 
-    DLString name = vault_entry_shortdescr( be, proto ).getForLang( lang );
+    // Decline the Flexer pad to nominative ('1') for display; getForLang alone
+    // returns the raw pad ("ме|ч|ча|...") -- the reason listings showed pipes.
+    DLString name = vault_entry_shortdescr( be, proto ).getForLang( lang ).ruscase( '1' );
     if ( name.empty( ) )
         name = lmsg( lang, "(unknown item)", "(неизвестный предмет)", "(невідомий предмет)" );
 
@@ -174,9 +202,9 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
         vault_show_entry( ch, (int)i + 1, entries[i], lang );
 
     ch->pecho( lmsg( lang,
-        "Use {y'vault get <number|name>'{x to take one out, {y'vault find <word>'{x to search.",
-        "Команда {y'vault get <номер|название>'{x достанет предмет, {y'vault find <слово>'{x -- поищет.",
-        "Команда {y'vault get <номер|назва>'{x дістане предмет, {y'vault find <слово>'{x -- пошукає." ) );
+        "Use {y'vault get <number|name>'{x to take one out, {y'vault find <word>'{x to search, {y'vault filter <type>'{x to list by item type (weapon, armor, potion...).",
+        "Команда {y'vault get <номер|название>'{x достанет предмет, {y'vault find <слово>'{x -- поищет, {y'vault filter <тип>'{x -- покажет по типу (weapon, armor, potion...).",
+        "Команда {y'vault get <номер|назва>'{x дістане предмет, {y'vault find <слово>'{x -- пошукає, {y'vault filter <тип>'{x -- покаже за типом (weapon, armor, potion...)." ) );
 }
 
 /*-------------------------------------------------------------------------
@@ -321,8 +349,9 @@ CMDRUN( vault )
         }
 
         // Capture name BEFORE deposit: bank_deposit extracts obj (obj is gone
-        // after a true return, and must not be dereferenced).
-        DLString name = obj->getShortDescr( lang );
+        // after a true return, and must not be dereferenced). Case '1' declines
+        // the pad -- getShortDescr(lang) alone returns the raw "ме|ч|ча|..." pad.
+        DLString name = obj->getShortDescr( '1', lang );
 
         if ( !bank_deposit( obj, kind, key ) ) {
             ch->pecho( lmsg( lang,
@@ -367,7 +396,7 @@ CMDRUN( vault )
         std::vector<int> hitIdx;
         for ( size_t i = 0; i < entries.size( ); i++ ) {
             OBJ_INDEX_DATA *proto = get_obj_index( entries[i].vnum );
-            if ( vault_entry_shortdescr( entries[i], proto ).matchesSubstring( kw ) )
+            if ( vault_entry_matches( entries[i], proto, kw ) )
                 hitIdx.push_back( (int)i );
         }
 
@@ -484,7 +513,7 @@ CMDRUN( vault )
         std::vector<int> matchIdx;
         for ( size_t i = 0; i < entries.size( ); i++ ) {
             OBJ_INDEX_DATA *proto = get_obj_index( entries[i].vnum );
-            if ( vault_entry_shortdescr( entries[i], proto ).matchesSubstring( target ) )
+            if ( vault_entry_matches( entries[i], proto, target ) )
                 matchIdx.push_back( (int)i );
         }
 
@@ -524,7 +553,7 @@ CMDRUN( vault )
     DLString name;
     for ( Object *o = ch->carrying; o != 0; o = o->next_content )
         if ( o->getID( ) == targetId ) {
-            name = o->getShortDescr( lang );
+            name = o->getShortDescr( '1', lang );   // '1' = nominative, decline the pad
             break;
         }
     if ( name.empty( ) )
