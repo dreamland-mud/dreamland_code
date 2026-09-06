@@ -302,9 +302,9 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
 
     if ( entries.size( ) > 50 && !forceFull ) {
         ch->pecho( lmsg( lang,
-            "Too many to list in full -- pick a type, or narrow with {y'vault find <word>'{x:",
-            "Слишком много, чтобы показать все -- выбери тип или сузь через {y'vault find <слово>'{x:",
-            "Забагато, щоб показати все -- обери тип або звузь через {y'vault find <слово>'{x:" ) );
+            "Too many to list in full -- pick a type, or narrow with {y'%s find <word>'{x:",
+            "Слишком много, чтобы показать все -- выбери тип или сузь через {y'%s find <слово>'{x:",
+            "Забагато, щоб показати все -- обери тип або звузь через {y'%s find <слово>'{x:" ), cmdPrefix.c_str( ) );
         ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix ).c_str( ) );
         ch->pecho( lmsg( lang,
             "({y'%s list'{x shows every entry.)",
@@ -317,9 +317,10 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
         vault_show_entry( ch, (int)i + 1, entries[i], lang, cmdPrefix );
 
     ch->pecho( lmsg( lang,
-        "Use {y'vault get <number|name>'{x to take one out, {y'vault find <word>'{x to search. By type:",
-        "Команда {y'vault get <номер|название>'{x достанет предмет, {y'vault find <слово>'{x -- поищет. По типу:",
-        "Команда {y'vault get <номер|назва>'{x дістане предмет, {y'vault find <слово>'{x -- пошукає. За типом:" ) );
+        "Use {y'%s get <number|name>'{x to take one out, {y'%s find <word>'{x to search. By type:",
+        "Команда {y'%s get <номер|название>'{x достанет предмет, {y'%s find <слово>'{x -- поищет. По типу:",
+        "Команда {y'%s get <номер|назва>'{x дістане предмет, {y'%s find <слово>'{x -- пошукає. За типом:" ),
+        cmdPrefix.c_str( ), cmdPrefix.c_str( ) );
     ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix ).c_str( ) );
 }
 
@@ -341,9 +342,9 @@ static void vault_show_rows( Character *ch, const std::vector<BankEntry> &entrie
         vault_show_entry( ch, hitIdx[k] + 1, entries[ hitIdx[k] ], lang, cmdPrefix );
 
     ch->pecho( lmsg( lang,
-        "Take one out with {y'vault get <number>'{x.",
-        "Достать: {y'vault get <номер>'{x.",
-        "Дістати: {y'vault get <номер>'{x." ) );
+        "Take one out with {y'%s get <number>'{x.",
+        "Достать: {y'%s get <номер>'{x.",
+        "Дістати: {y'%s get <номер>'{x." ), cmdPrefix.c_str( ) );
 }
 
 /*-------------------------------------------------------------------------
@@ -644,8 +645,10 @@ CMDRUN( vault )
 
     /*---- vault list -------------------------------------------------------*/
     // Bare 'vault' collapses a >50 list to the per-type overview; an explicit
-    // 'vault list' / 'vault all' forces the full dump.
-    if ( sub.empty( ) || vault_word_in( sub, WORDS_LIST ) ) {
+    // 'vault list' / 'vault all' forces the full dump. arg_is_all catches every
+    // localized "all" synonym (всі/усі/всё/всем/усім...) so a bare all-token
+    // always LISTS -- bulk withdrawal stays reachable only via 'vault get all'.
+    if ( sub.empty( ) || vault_word_in( sub, WORDS_LIST ) || arg_is_all( sub ) ) {
         std::vector<BankEntry> entries;
         vault_browse_sorted( kind, key, entries, lang );
         vault_list( ch, entries, lang, ownerLabel, cmdPrefix, !sub.empty( ) );
@@ -715,6 +718,13 @@ CMDRUN( vault )
             "You take %d %Iitem|items|items out of the vault.",
             "Ты достаешь %d %Iпредмет|предмета|предметов из хранилища.",
             "Ти дістаєш %d %Iпредмет|предмети|предметів зі сховища." ), got, got );
+
+        int failed = (int)ids.size( ) - got;
+        if ( failed > 0 )
+            ch->pecho( lmsg( lang,
+                "Couldn't retrieve %d %Ientry|entries|entries (kept for a fix).",
+                "Не удалось достать %d %Iзапись|записи|записей (сохранены для починки).",
+                "Не вдалося дістати %d %Iзапис|записи|записів (збережено для полагодження)." ), failed, failed );
         return;
     }
 
