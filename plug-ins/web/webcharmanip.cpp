@@ -40,6 +40,7 @@
 BHV(healer);
 BHV(enchanter);
 BHV(blacksmith);
+BHV(sage);
 
 /*
  * Hold the list of all commands and their arguments that are applicable
@@ -207,7 +208,8 @@ WEBMANIP_RUN(decorateMobile)
 
         if (mob_has_behavior(victim, bhv_healer)
             || mob_has_behavior(victim, bhv_blacksmith)
-            || mob_has_behavior(victim, bhv_enchanter))
+            || mob_has_behavior(victim, bhv_enchanter)
+            || mob_has_behavior(victim, bhv_sage))
             manips.addLocal("service", "");
 
         if (mob_has_occupation(victim, OCC_SHOPPER)) 
