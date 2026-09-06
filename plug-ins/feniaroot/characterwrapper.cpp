@@ -4337,13 +4337,23 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // have two positions; wield has two for a dual-wielder with a free off-hand.
         std::vector<double> wornScores;
         int capacity = 1;
+        int wornMinVnum = 0;      // vnum of the weakest worn piece in this slot (paired/dual)
+        double wornMinScore = 0;  // its score -- the piece a full-slot pick would replace
         if (wieldBrowse) {
             Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
             Wearlocation *offLoc   = wearlocationManager->findExisting( "second_wield" );
             ::Object *primary = wieldLoc ? wieldLoc->find( target ) : 0;
             ::Object *offhand = offLoc   ? offLoc->find( target )   : 0;
-            if (primary != 0) wornScores.push_back( ga_score( target, primary, w, rawStat, capStat, true ) );
-            if (offhand != 0) wornScores.push_back( ga_score( target, offhand, w, rawStat, capStat, true ) );
+            if (primary != 0) {
+                double psc = ga_score( target, primary, w, rawStat, capStat, true );
+                wornScores.push_back( psc );
+                if (wornMinVnum == 0 || psc < wornMinScore) { wornMinScore = psc; wornMinVnum = primary->pIndexData->vnum; }
+            }
+            if (offhand != 0) {
+                double osc = ga_score( target, offhand, w, rawStat, capStat, true );
+                wornScores.push_back( osc );
+                if (wornMinVnum == 0 || osc < wornMinScore) { wornMinScore = osc; wornMinVnum = offhand->pIndexData->vnum; }
+            }
             if (ga_canDualWield( target ))
                 capacity = 2;
         } else if (lightBrowse) {
@@ -4363,7 +4373,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 REMOVE_BIT( ws, ITEM_TAKE );
                 if ((ws & slotFilter) == 0)
                     continue;
-                wornScores.push_back( ga_score( target, o, w, rawStat, capStat, true ) );
+                double osc = ga_score( target, o, w, rawStat, capStat, true );
+                wornScores.push_back( osc );
+                if (wornMinVnum == 0 || osc < wornMinScore) { wornMinScore = osc; wornMinVnum = o->pIndexData->vnum; }
             }
             if ((slotFilter & ITEM_WEAR_FINGER) || (slotFilter & ITEM_WEAR_NECK) || (slotFilter & ITEM_WEAR_WRIST))
                 capacity = 2;
@@ -4384,6 +4396,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             wornScore = primaryScore;
         }
         bool freePos = (int)wornScores.size( ) < capacity;
+        // Both positions of a capacity-2 slot (paired ring/neck/wrist, or a dual-wield pair)
+        // are full: a one-handed / armour pick OUSTS the WEAKER of the two worn pieces -- name
+        // it via replaceVnum so the render doesn't grab whichever the slot lookup finds first.
+        // 0 elsewhere (a fill, or a single-worn slot the render can label on its own). A
+        // two-handed pick is excluded per-entry below: it replaces the primary, not the
+        // weaker. Mirrors gaBar's paired logic, now covering the wield pair too.
+        int slotReplaceVnum = (capacity >= 2 && !freePos) ? wornMinVnum : 0;
 
         std::vector<GACand> slotCands;
         for (auto &c: cands) {
@@ -4400,12 +4419,18 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (c.score >= bar)
                 slotCands.push_back( c );
         }
-        // A free position in a multi-position slot can take a second copy of a worn item
-        // (a second ring/bracelet, or a same-weapon off-hand) -- offer it too. Second
-        // copies are never two-handed here (a two-handed primary blocks dual capacity).
-        if (freePos)
+        // A multi-position slot (paired ring/neck/wrist, or a dual-wield off-hand) can take
+        // a SECOND copy of a worn item -- as a fill when a position is empty, or, when both
+        // are full, as a replacement of the weaker worn piece (a second laerkai power
+        // ousting a lesser bracelet). Same bar as any pick; single-capacity slots never
+        // offer a duplicate. Second copies are never two-handed (a two-handed primary
+        // blocks dual capacity).
+        // Strict > (not >=): every second copy scores > 0 (main-loop gate), so a fill of an
+        // empty position (wornScore 0) still passes, but a full slot only takes a copy that
+        // truly beats the weaker worn piece -- never "replace your laerkai with a laerkai".
+        if (capacity >= 2)
             for (auto &c: secondCopyCands)
-                if ((c.slot & slotFilter) && c.acq.method != GA_UNKNOWN && c.score >= wornScore)
+                if ((c.slot & slotFilter) && c.acq.method != GA_UNKNOWN && c.score > wornScore)
                     slotCands.push_back( c );
         std::sort( slotCands.begin( ), slotCands.end( ),
             []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
@@ -4417,7 +4442,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             bool twoHand = wieldBrowse && IS_SET( slotCands[k].pObj->value[4], WEAPON_TWO_HANDS );
             bool fills = freePos && !twoHand;
             double gain = twoHand ? (slotCands[k].score - primaryScore) : (slotCands[k].score - wornScore);
-            slotList->push_back( ga_buildEntry( slotCands[k], msm, chLevel, isVampire, pathCache, gain, fills ) );
+            // slotReplaceVnum is 0 for fills and single-worn slots; a two-handed pick ousts the
+            // PRIMARY, not the weaker, so it keeps the render's own slot lookup (rv 0).
+            int rv = twoHand ? 0 : slotReplaceVnum;
+            slotList->push_back( ga_buildEntry( slotCands[k], msm, chLevel, isVampire, pathCache, gain, fills, rv ) );
         }
 
         RegList::Pointer emptyBest( NEW );
