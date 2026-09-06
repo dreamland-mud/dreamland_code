@@ -11,8 +11,16 @@
  * Immortal owner-override: 'vault *<owner> <sub...>' operates on another
  * character's cell (get/put still use the immortal's own inventory), so a god
  * can seed, inspect and drain a pilot player's vault without logging in as them.
+ *
+ * Listing is always sorted by item type then name A-Z (vault_browse_sorted), so
+ * the row numbers a viewer sees match what 'vault get <n>' withdraws. Row
+ * numbers and the per-type counts are clickable via {hc (they degrade to plain
+ * text on a telnet/screen-reader client, so nothing is lost for blind players).
  */
 #include <vector>
+#include <utility>
+#include <algorithm>
+#include <sstream>
 #include <string.h>
 
 #include "commandtemplate.h"
@@ -24,6 +32,8 @@
 
 #include "save_bank.h"
 #include "loadsave.h"
+#include "arg_utils.h"
+#include "wearloc_utils.h"
 #include "lang.h"
 #include "dl_ctype.h"
 #include "behavior.h"
@@ -41,6 +51,14 @@ static DLString vault_lower( const DLString &s )
     DLString r = s;
     for ( size_t i = 0; i < r.size( ); i++ )
         r[i] = dl_tolower( r[i] );
+    return r;
+}
+
+static DLString vault_upper( const DLString &s )
+{
+    DLString r = s;
+    for ( size_t i = 0; i < r.size( ); i++ )
+        r[i] = dl_toupper( r[i] );
     return r;
 }
 
@@ -62,6 +80,16 @@ static bool vault_word_in( const DLString &tok, const char *const *set )
         if ( tok == set[i] )
             return true;
     return false;
+}
+
+// The command stem a clickable link should send: "vault" for self, or
+// "vault *<Owner>" for an immortal viewing someone else's cell, so a clicked
+// row/type link stays on the same target.
+static DLString vault_cmd_prefix( const DLString &ownerLabel )
+{
+    if ( ownerLabel.empty( ) )
+        return DLString( "vault" );
+    return DLString( "vault *" ) + ownerLabel;
 }
 
 /* Effective prototype-or-override view of one stored entry, for display and
@@ -122,6 +150,41 @@ static bool vault_entry_matches( const BankEntry &be, OBJ_INDEX_DATA *proto, lan
 }
 
 /*-------------------------------------------------------------------------
+ * sorting: type then name A-Z, so the numbering a viewer sees is stable across
+ * list / get / find / filter (all go through vault_browse_sorted). The type key
+ * is the language-independent canonical item_table name (grouping is the same
+ * for everyone); the name key is colour-stripped + lowered so A-Z isn't thrown
+ * off by a leading colour code. id breaks ties for a deterministic order.
+ *------------------------------------------------------------------------*/
+static void vault_sort_entries( std::vector<BankEntry> &entries, lang_t lang )
+{
+    std::stable_sort( entries.begin( ), entries.end( ),
+        [lang]( const BankEntry &a, const BankEntry &b ) -> bool {
+            OBJ_INDEX_DATA *pa = get_obj_index( a.vnum );
+            OBJ_INDEX_DATA *pb = get_obj_index( b.vnum );
+
+            DLString ta = item_table.name( vault_entry_type( a, pa ) );
+            DLString tb = item_table.name( vault_entry_type( b, pb ) );
+            if ( ta != tb )
+                return ta < tb;
+
+            DLString na = vault_entry_name( a, pa, lang ).colourStrip( ).toLower( );
+            DLString nb = vault_entry_name( b, pb, lang ).colourStrip( ).toLower( );
+            if ( na != nb )
+                return na < nb;
+
+            return a.id < b.id;
+        } );
+}
+
+static void vault_browse_sorted( const DLString &kind, const DLString &key,
+                                 std::vector<BankEntry> &entries, lang_t lang )
+{
+    bank_browse( kind, key, entries );
+    vault_sort_entries( entries, lang );
+}
+
+/*-------------------------------------------------------------------------
  * v1 deposit policy: refuse the whole subtree if any node is limited or carries
  * a live timer. Banked objects don't tick, so a timer would freeze mid-count and
  * a limited item's count/limit accounting is the dupe risk -- both deferred
@@ -147,7 +210,10 @@ static int vault_policy_reason( Object *obj )
 /*-------------------------------------------------------------------------
  * listing
  *------------------------------------------------------------------------*/
-static void vault_show_entry( Character *ch, int num, const BankEntry &be, lang_t lang )
+// One row. The [nn] index is a clickable {hc that sends '<prefix> get <n>'; the
+// label keeps the plain "[ n]" so telnet/screen-reader clients still read it.
+static void vault_show_entry( Character *ch, int num, const BankEntry &be, lang_t lang,
+                              const DLString &cmdPrefix )
 {
     OBJ_INDEX_DATA *proto = get_obj_index( be.vnum );
 
@@ -161,22 +227,50 @@ static void vault_show_entry( Character *ch, int num, const BankEntry &be, lang_
 
     if ( be.contents > 0 )
         ch->pecho( lmsg( lang,
-            "[%2d] %s {D(%s, %d items, lvl %d){x",
-            "[%2d] %s {D(%s, предметов: %d, ур. %d){x",
-            "[%2d] %s {D(%s, предметів: %d, рів. %d){x" ),
-            num, name.c_str( ), typeName.c_str( ), be.contents, lvl );
+            "{hc'%s get %d'[%2d]{x %s {D(%s, %d items, lvl %d){x",
+            "{hc'%s get %d'[%2d]{x %s {D(%s, предметов: %d, ур. %d){x",
+            "{hc'%s get %d'[%2d]{x %s {D(%s, предметів: %d, рів. %d){x" ),
+            cmdPrefix.c_str( ), num, num, name.c_str( ), typeName.c_str( ), be.contents, lvl );
     else
         ch->pecho( lmsg( lang,
-            "[%2d] %s {D(%s, lvl %d){x",
-            "[%2d] %s {D(%s, ур. %d){x",
-            "[%2d] %s {D(%s, рів. %d){x" ),
-            num, name.c_str( ), typeName.c_str( ), lvl );
+            "{hc'%s get %d'[%2d]{x %s {D(%s, lvl %d){x",
+            "{hc'%s get %d'[%2d]{x %s {D(%s, ур. %d){x",
+            "{hc'%s get %d'[%2d]{x %s {D(%s, рів. %d){x" ),
+            cmdPrefix.c_str( ), num, num, name.c_str( ), typeName.c_str( ), lvl );
 }
 
-// List entries, optionally only those whose display index is in 'showIdx' (used
-// by find/filter). showIdx empty -> show all.
+// The per-type overview line: only the types actually present, each a clickable
+// {hc that sends '<prefix> filter <type>'. Built in the sorted (grouped) order.
+// Returns the composed, tag-carrying string; the caller pecho's it.
+static DLString vault_type_summary_line( const std::vector<BankEntry> &entries, lang_t lang,
+                                         const DLString &cmdPrefix )
+{
+    std::vector< std::pair<DLString,int> > tally;   // (canonical type name, count), first-seen order
+    for ( size_t i = 0; i < entries.size( ); i++ ) {
+        OBJ_INDEX_DATA *proto = get_obj_index( entries[i].vnum );
+        DLString t = item_table.name( vault_entry_type( entries[i], proto ) );
+        bool found = false;
+        for ( size_t k = 0; k < tally.size( ); k++ )
+            if ( tally[k].first == t ) { tally[k].second++; found = true; break; }
+        if ( !found )
+            tally.push_back( std::pair<DLString,int>( t, 1 ) );
+    }
+
+    std::ostringstream buf;
+    for ( size_t k = 0; k < tally.size( ); k++ ) {
+        if ( k > 0 )
+            buf << "  ";
+        buf << "{hc'" << cmdPrefix << " filter " << tally[k].first << "'"
+            << vault_upper( tally[k].first ) << " (" << tally[k].second << "){x";
+    }
+    return DLString( buf.str( ) );
+}
+
+// Full listing. Over 50 entries collapses to the per-type overview unless
+// forceFull (explicit 'vault list' / 'vault all').
 static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
-                        lang_t lang, const DLString &ownerLabel )
+                        lang_t lang, const DLString &ownerLabel, const DLString &cmdPrefix,
+                        bool forceFull )
 {
     if ( entries.empty( ) ) {
         if ( ownerLabel.empty( ) )
@@ -192,33 +286,49 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
         return;
     }
 
+    // Count header -- amount-aware noun via %I (1 предмет / 3 предмета / 17 предметов).
     if ( ownerLabel.empty( ) )
         ch->pecho( lmsg( lang,
-            "Your vault holds %d entries:",
-            "В твоем хранилище хранится предметов: %d",
-            "У твоєму сховищі зберігається предметів: %d" ),
-            (int)entries.size( ) );
+            "Your vault holds %d %Iitem|items|items:",
+            "В твоем хранилище хранится %d %Iпредмет|предмета|предметов:",
+            "У твоєму сховищі зберігається %d %Iпредмет|предмети|предметів:" ),
+            (int)entries.size( ), (int)entries.size( ) );
     else
         ch->pecho( lmsg( lang,
-            "%s's vault holds %d entries:",
-            "В хранилище %s хранится предметов: %d",
-            "У сховищі %s зберігається предметів: %d" ),
-            ownerLabel.c_str( ), (int)entries.size( ) );
+            "%s's vault holds %d %Iitem|items|items:",
+            "В хранилище %s хранится %d %Iпредмет|предмета|предметов:",
+            "У сховищі %s зберігається %d %Iпредмет|предмети|предметів:" ),
+            ownerLabel.c_str( ), (int)entries.size( ), (int)entries.size( ) );
+
+    if ( entries.size( ) > 50 && !forceFull ) {
+        ch->pecho( lmsg( lang,
+            "Too many to list in full -- pick a type, or narrow with {y'%s find <word>'{x:",
+            "Слишком много, чтобы показать все -- выбери тип или сузь через {y'%s find <слово>'{x:",
+            "Забагато, щоб показати все -- обери тип або звузь через {y'%s find <слово>'{x:" ), cmdPrefix.c_str( ) );
+        ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix ).c_str( ) );
+        ch->pecho( lmsg( lang,
+            "({y'%s list'{x shows every entry.)",
+            "({y'%s list'{x покажет все записи.)",
+            "({y'%s list'{x покаже всі записи.)" ), cmdPrefix.c_str( ) );
+        return;
+    }
 
     for ( size_t i = 0; i < entries.size( ); i++ )
-        vault_show_entry( ch, (int)i + 1, entries[i], lang );
+        vault_show_entry( ch, (int)i + 1, entries[i], lang, cmdPrefix );
 
     ch->pecho( lmsg( lang,
-        "Use {y'vault get <number|name>'{x to take one out, {y'vault find <word>'{x to search, {y'vault filter <type>'{x to list by item type (weapon, armor, potion...).",
-        "Команда {y'vault get <номер|название>'{x достанет предмет, {y'vault find <слово>'{x -- поищет, {y'vault filter <тип>'{x -- покажет по типу (weapon, armor, potion...).",
-        "Команда {y'vault get <номер|назва>'{x дістане предмет, {y'vault find <слово>'{x -- пошукає, {y'vault filter <тип>'{x -- покаже за типом (weapon, armor, potion...)." ) );
+        "Use {y'%s get <number|name>'{x to take one out, {y'%s find <word>'{x to search. By type:",
+        "Команда {y'%s get <номер|название>'{x достанет предмет, {y'%s find <слово>'{x -- поищет. По типу:",
+        "Команда {y'%s get <номер|назва>'{x дістане предмет, {y'%s find <слово>'{x -- пошукає. За типом:" ),
+        cmdPrefix.c_str( ), cmdPrefix.c_str( ) );
+    ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix ).c_str( ) );
 }
 
 /*-------------------------------------------------------------------------
  * subcommand word sets
  *------------------------------------------------------------------------*/
-static const char *WORDS_PUT[]    = { "put", "store", "положить", "сложить", "покласти", "класти", 0 };
-static const char *WORDS_GET[]    = { "get", "take", "взять", "взяти", "дістати", 0 };
+static const char *WORDS_PUT[]    = { "put", "store", "deposit", "положить", "сложить", "депозит", "покласти", "класти", 0 };
+static const char *WORDS_GET[]    = { "get", "take", "withdraw", "взять", "снять", "взяти", "зняти", "дістати", 0 };
 static const char *WORDS_FIND[]   = { "find", "search", "найти", "искать", "знайти", "шукати", 0 };
 static const char *WORDS_FILTER[] = { "filter", "type", "фильтр", "фільтр", "тип", 0 };
 static const char *WORDS_LIST[]   = { "list", "all", "список", "все", "усе", 0 };
@@ -226,15 +336,15 @@ static const char *WORDS_LIST[]   = { "list", "all", "список", "все", "
 // Print the entries at the given ORIGINAL full-list indices (so the row numbers
 // match what 'vault get <n>' expects), then the get hint. Used by find/filter.
 static void vault_show_rows( Character *ch, const std::vector<BankEntry> &entries,
-                             const std::vector<int> &hitIdx, lang_t lang )
+                             const std::vector<int> &hitIdx, lang_t lang, const DLString &cmdPrefix )
 {
     for ( size_t k = 0; k < hitIdx.size( ); k++ )
-        vault_show_entry( ch, hitIdx[k] + 1, entries[ hitIdx[k] ], lang );
+        vault_show_entry( ch, hitIdx[k] + 1, entries[ hitIdx[k] ], lang, cmdPrefix );
 
     ch->pecho( lmsg( lang,
-        "Take one out with {y'vault get <number>'{x.",
-        "Достать: {y'vault get <номер>'{x.",
-        "Дістати: {y'vault get <номер>'{x." ) );
+        "Take one out with {y'%s get <number>'{x.",
+        "Достать: {y'%s get <номер>'{x.",
+        "Дістати: {y'%s get <номер>'{x." ), cmdPrefix.c_str( ) );
 }
 
 /*-------------------------------------------------------------------------
@@ -318,8 +428,9 @@ CMDRUN( vault )
     }
 
     DLString sub = vault_lower( peek );
+    DLString cmdPrefix = vault_cmd_prefix( ownerLabel );
 
-    /*---- vault put <item> -------------------------------------------------*/
+    /*---- vault put <item> / put all / put all.<kw> ------------------------*/
     if ( vault_word_in( sub, WORDS_PUT ) ) {
         DLString itemArg = args.getOneArgument( );
         if ( itemArg.empty( ) ) {
@@ -327,6 +438,62 @@ CMDRUN( vault )
                 "Store what?",
                 "Убрать в хранилище что?",
                 "Сховати що?" ) );
+            return;
+        }
+
+        bool bulkAll = arg_is_all( itemArg );
+        bool bulkDot = !bulkAll && arg_is_alldot( itemArg );
+
+        if ( bulkAll || bulkDot ) {
+            DLString kw;
+            if ( bulkDot ) {
+                size_t dot = itemArg.find( '.' );
+                kw = ( dot != DLString::npos ) ? DLString( itemArg.substr( dot + 1 ) ) : DLString( "" );
+            }
+
+            int stored = 0, skipped = 0;
+            Object *obj_next = 0;
+            for ( Object *obj = ch->carrying; obj != 0; obj = obj_next ) {
+                obj_next = obj->next_content;                 // capture: bank_deposit extracts obj
+                if ( obj->wear_loc != wear_none )             // never bank worn gear
+                    continue;
+                if ( !ch->can_see( obj ) )
+                    continue;
+                if ( bulkDot && !obj_has_name( obj, kw, ch ) )
+                    continue;
+
+                if ( vault_policy_reason( obj ) != 0 ) { skipped++; continue; }
+                if ( !bank_deposit( obj, kind, key ) )  { skipped++; continue; }
+                stored++;
+            }
+
+            if ( stored > 0 )
+                ch->getPC( )->save( );
+
+            if ( stored == 0 && skipped == 0 ) {
+                ch->pecho( lmsg( lang,
+                    "You have nothing like that to store.",
+                    "У тебя нет такого, чтобы убрать в хранилище.",
+                    "У тебе немає такого, щоб сховати у сховище." ) );
+                return;
+            }
+
+            if ( ownerLabel.empty( ) )
+                ch->pecho( lmsg( lang,
+                    "You store %d %Iitem|items|items in your vault.",
+                    "Ты убираешь %d %Iпредмет|предмета|предметов в свое хранилище.",
+                    "Ти ховаєш %d %Iпредмет|предмети|предметів до свого сховища." ), stored, stored );
+            else
+                ch->pecho( lmsg( lang,
+                    "You store %d %Iitem|items|items in %s's vault.",
+                    "Ты убираешь %d %Iпредмет|предмета|предметов в хранилище %s.",
+                    "Ти ховаєш %d %Iпредмет|предмети|предметів до сховища %s." ), stored, stored, ownerLabel.c_str( ) );
+
+            if ( skipped > 0 )
+                ch->pecho( lmsg( lang,
+                    "Skipped %d %Iitem|items|items (unique, timed or unstorable).",
+                    "Пропущено %d %Iпредмет|предмета|предметов (уникальные, с таймером или несохраняемые).",
+                    "Пропущено %d %Iпредмет|предмети|предметів (унікальні, з таймером або незберігані)." ), skipped, skipped );
             return;
         }
 
@@ -349,9 +516,9 @@ CMDRUN( vault )
         }
         if ( reason == 2 ) {
             ch->pecho( lmsg( lang,
-                "That has a timer running -- let it expire before storing it.",
-                "На нем идет таймер -- дождись, пока он истечет, прежде чем убирать.",
-                "На ньому цокає таймер -- дочекайся, доки він мине, перш ніж ховати." ) );
+                "Items with a running timer can't be stored.",
+                "Предметы с активным таймером нельзя убрать в хранилище.",
+                "Предмети з активним таймером ховати не можна." ) );
             return;
         }
 
@@ -395,7 +562,7 @@ CMDRUN( vault )
         }
 
         std::vector<BankEntry> entries;
-        bank_browse( kind, key, entries );
+        vault_browse_sorted( kind, key, entries, lang );
 
         // Keep ORIGINAL indices: 'vault get <n>' numbers the full list, so the
         // rows shown here must carry their full-list number, not a 1..N reindex.
@@ -419,18 +586,28 @@ CMDRUN( vault )
             "Vault entries matching '%s':",
             "Записи хранилища по '%s':",
             "Записи сховища за '%s':" ), kw.c_str( ) );
-        vault_show_rows( ch, entries, hitIdx, lang );
+        vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix );
         return;
     }
 
-    /*---- vault filter <type> ----------------------------------------------*/
+    /*---- vault filter [<type>] --------------------------------------------*/
     if ( vault_word_in( sub, WORDS_FILTER ) ) {
         DLString typeArg = args.getOneArgument( );
+
+        std::vector<BankEntry> entries;
+        vault_browse_sorted( kind, key, entries, lang );
+
+        // No type given -> show the per-type overview of what's actually there.
         if ( typeArg.empty( ) ) {
+            if ( entries.empty( ) ) {
+                vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true );
+                return;
+            }
             ch->pecho( lmsg( lang,
-                "Filter by which item type? (weapon, armor, potion, ...)",
-                "Отфильтровать по какому типу? (weapon, armor, potion, ...)",
-                "Відфільтрувати за яким типом? (weapon, armor, potion, ...)" ) );
+                "Filter by which item type?",
+                "Отфильтровать по какому типу?",
+                "Відфільтрувати за яким типом?" ) );
+            ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix ).c_str( ) );
             return;
         }
 
@@ -442,9 +619,6 @@ CMDRUN( vault )
                 "Невідомий тип предмета '%s'." ), typeArg.c_str( ) );
             return;
         }
-
-        std::vector<BankEntry> entries;
-        bank_browse( kind, key, entries );
 
         std::vector<int> hitIdx;
         for ( size_t i = 0; i < entries.size( ); i++ ) {
@@ -465,21 +639,25 @@ CMDRUN( vault )
             "Vault entries of type %s:",
             "Записи хранилища типа %s:",
             "Записи сховища типу %s:" ), item_table.name( ft ).c_str( ) );
-        vault_show_rows( ch, entries, hitIdx, lang );
+        vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix );
         return;
     }
 
     /*---- vault list -------------------------------------------------------*/
-    if ( sub.empty( ) || vault_word_in( sub, WORDS_LIST ) ) {
+    // Bare 'vault' collapses a >50 list to the per-type overview; an explicit
+    // 'vault list' / 'vault all' forces the full dump. arg_is_all catches every
+    // localized "all" synonym (всі/усі/всё/всем/усім...) so a bare all-token
+    // always LISTS -- bulk withdrawal stays reachable only via 'vault get all'.
+    if ( sub.empty( ) || vault_word_in( sub, WORDS_LIST ) || arg_is_all( sub ) ) {
         std::vector<BankEntry> entries;
-        bank_browse( kind, key, entries );
-        vault_list( ch, entries, lang, ownerLabel );
+        vault_browse_sorted( kind, key, entries, lang );
+        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, !sub.empty( ) );
         return;
     }
 
-    /*---- vault get <n|word>  (and bare 'vault <n>') -----------------------*/
+    /*---- vault get <n|word> / get all / get all.<kw>  (and bare 'vault <n>') */
     // Anything not matched above is a withdrawal target: an explicit 'get', a
-    // bare number, or a bare keyword.
+    // bare number, a bare keyword, or all / all.<kw>.
     DLString target;
     if ( vault_word_in( sub, WORDS_GET ) )
         target = args.getOneArgument( );
@@ -492,9 +670,61 @@ CMDRUN( vault )
     }
 
     std::vector<BankEntry> entries;
-    bank_browse( kind, key, entries );
+    vault_browse_sorted( kind, key, entries, lang );
     if ( entries.empty( ) ) {
-        vault_list( ch, entries, lang, ownerLabel );   // prints the empty message
+        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true );   // prints the empty message
+        return;
+    }
+
+    bool bulkAll = arg_is_all( target );
+    bool bulkDot = !bulkAll && arg_is_alldot( target );
+
+    if ( bulkAll || bulkDot ) {
+        DLString kw;
+        if ( bulkDot ) {
+            size_t dot = target.find( '.' );
+            kw = ( dot != DLString::npos ) ? DLString( target.substr( dot + 1 ) ).toLower( ) : DLString( "" );
+        }
+
+        // Collect target Ids up front -- Ids are stable across withdrawals, so a
+        // withdrawal that unlinks a cell can't disturb the rest of the loop.
+        std::vector<long long> ids;
+        for ( size_t i = 0; i < entries.size( ); i++ ) {
+            if ( bulkDot ) {
+                OBJ_INDEX_DATA *proto = get_obj_index( entries[i].vnum );
+                if ( !vault_entry_matches( entries[i], proto, lang, kw ) )
+                    continue;
+            }
+            ids.push_back( entries[i].id );
+        }
+
+        if ( ids.empty( ) ) {
+            ch->pecho( lmsg( lang,
+                "Nothing in the vault matches '%s'.",
+                "В хранилище нет ничего похожего на '%s'.",
+                "У сховищі нема нічого схожого на '%s'." ), target.c_str( ) );
+            return;
+        }
+
+        int got = 0;
+        for ( size_t k = 0; k < ids.size( ); k++ )
+            if ( bank_withdraw_entry( ch, kind, key, ids[k] ) )
+                got++;
+
+        if ( got > 0 )
+            ch->getPC( )->save( );
+
+        ch->pecho( lmsg( lang,
+            "You take %d %Iitem|items|items out of the vault.",
+            "Ты достаешь %d %Iпредмет|предмета|предметов из хранилища.",
+            "Ти дістаєш %d %Iпредмет|предмети|предметів зі сховища." ), got, got );
+
+        int failed = (int)ids.size( ) - got;
+        if ( failed > 0 )
+            ch->pecho( lmsg( lang,
+                "Couldn't retrieve %d %Ientry|entries|entries (kept for a fix).",
+                "Не удалось достать %d %Iзапись|записи|записей (сохранены для починки).",
+                "Не вдалося дістати %d %Iзапис|записи|записів (збережено для полагодження)." ), failed, failed );
         return;
     }
 
@@ -538,7 +768,7 @@ CMDRUN( vault )
                 "Несколько записей похожи на '%s' -- выбери номер:",
                 "Декілька записів схожі на '%s' -- обери номер:" ), target.c_str( ) );
             for ( size_t k = 0; k < matchIdx.size( ); k++ )
-                vault_show_entry( ch, matchIdx[k] + 1, entries[ matchIdx[k] ], lang );
+                vault_show_entry( ch, matchIdx[k] + 1, entries[ matchIdx[k] ], lang, cmdPrefix );
             return;
         }
 
