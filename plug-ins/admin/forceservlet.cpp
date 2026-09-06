@@ -6,6 +6,8 @@
 #include "pcharactermanager.h"
 #include "descriptor.h"
 #include "interp.h"
+#include "pluginmanager.h"
+#include "arg_utils.h"
 #include <jsoncpp/json/json.h>
 
 static IconvMap koi2utf("koi8-u", "utf-8");
@@ -148,4 +150,60 @@ SERVLET_HANDLE(api_snoop, "/snoop")
         return;
 
     servlet_output_response(response, buf, startSeqStr.toLongLong());
+}
+
+/**
+ * Servlet for /api/reload endpoint.
+ * Queues a plugin reload WITHOUT requiring an online immortal -- the in-game
+ * 'plug reload' path (cplugin.cpp) needs a keyboard, and /api/force can't run it
+ * when no immortal has an in-game descriptor. This mirrors CPlugin::doReload but
+ * calls the manager directly. The reload itself is deferred to the main loop's
+ * checkReloadRequest() (same as the command), so it stays hot-safe.
+ *
+ * Auth: bottype=telegram|discord, token=<secret>
+ * Args: what (optional) -- most (default) | all | changed | <plugin name>
+ *
+ * Example:
+ *   curl -s 'http://localhost:1235/api/reload' \
+ *     -d '{"token":"<secret>","bottype":"telegram","args":{"what":"most"}}'
+ *   Response (200): {"requested":"most"}
+ */
+SERVLET_HANDLE(api_reload, "/reload")
+{
+    Json::Value params;
+
+    if (!servlet_parse_params(request, response, params))
+        return;
+
+    if (!servlet_auth_bot(params, response))
+        return;
+
+    // 'what' is optional; default to the common 'most' (all but [descriptor]).
+    DLString what;
+    if (!servlet_get_arg(params, "what", what) || what.empty())
+        what = "most";
+
+    PluginManager *manager = PluginManager::getThis();
+    if (!manager) {
+        servlet_response_404(response, "Plugin manager unavailable");
+        return;
+    }
+
+    // Mirror CPlugin::doReload's keyword mapping exactly.
+    if (arg_is_all(what)) {
+        manager->setReloadAllRequest();
+    } else if (arg_is_strict(what, "most")) {
+        manager->setReloadNonCriticalRequest();
+    } else if (arg_is_strict(what, "changed")) {
+        manager->setReloadChangedRequest();
+    } else if (manager->isAvailable(what)) {
+        manager->setReloadOneRequest(what);
+    } else {
+        servlet_response_404(response, "Unknown reload target '" + what + "' (use most|all|changed|<plugin>)");
+        return;
+    }
+
+    Json::Value body;
+    body["requested"] = what.c_str();
+    servlet_response_200_json(response, body);
 }
