@@ -50,6 +50,7 @@
 #include "damage.h"
 #include "skill_utils.h"
 #include "areaquestutils.h"
+#include "material.h"
 #include "feniaquest.h"
 #include "immunity.h"
 #include "magic.h"
@@ -3805,6 +3806,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         AreaQuest *q = qk->second;
         if (!q)
             continue;
+        // Class / alignment / hometown / prerequisite eligibility -- a quest the char
+        // can never start (druid-excluded, wrong align/hometown, prereq unreachable)
+        // is a dead end, so don't advertise its rewards. The min/max level gates
+        // below stay: aquest_can_participate_ever checks eligibility, not level.
+        PCharacter *questPch = target->getPC( );
+        if (questPch && !aquest_can_participate_ever( questPch, q ))
+            continue;
         // Quests the char can't yet start are dead ends, so their rewards are
         // unreachable -- don't advertise them. Mirror both level gates of
         // aquest_can_participate (areaquestutils.cpp): too old (past maxLevel) and
@@ -3918,6 +3926,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     Wearlocation *hoovesLoc = wearlocationManager->findExisting( "hooves" );
     Wearlocation *feetLoc   = wearlocationManager->findExisting( "feet" );
 
+    // Material restriction: some classes/religions can't wear whole material
+    // groups (druids shun metal). Computed once; the per-candidate skip is below.
+    int badMaterials = material_types_forbidden( target );
+
     for (int i = 0; i < MAX_KEY_HASH; i++)
     for (obj_index_data *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
         if (pObj->level > LEVEL_MORTAL)
@@ -3965,6 +3977,12 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // A follower's tattoo slot holds their fixed deity sign -- never advise
         // replacing it. Atheists (no sign) may wear tattoos freely.
         if (IS_SET(pObj->wear_flags, ITEM_WEAR_TATTOO) && target->getReligion( ) != god_none)
+            continue;
+
+        // Forbidden material (e.g. a druid can't wear anything metal) -- mirror
+        // DefaultWearlocation::canEquip so the sage never advises gear the char
+        // would be refused at wear time.
+        if (badMaterials != 0 && material_is_typed( pObj->material.c_str( ), badMaterials ))
             continue;
 
         // Skip items whose body slot the char's race lacks. Bipeds have no
