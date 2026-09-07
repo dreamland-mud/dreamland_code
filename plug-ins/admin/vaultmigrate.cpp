@@ -76,6 +76,20 @@ static int vaultmigrate_count_contents( Object *obj )
     return n;
 }
 
+// How many nodes in the subtree the vault would REFUSE: limited (limit != -1) or
+// carrying a running timer. Mirrors vault_policy_reason's per-node test (vault.cpp).
+// A container with any refused node can't be fully emptied+killed under v1 policy.
+static int vaultmigrate_count_refused( Object *obj )
+{
+    int n = 0;
+    for (Object *c = obj->contains; c != 0; c = c->next_content) {
+        if ( ( c->pIndexData != 0 && c->pIndexData->limit != -1 ) || c->timer > 0 )
+            n++;
+        n += vaultmigrate_count_refused( c );
+    }
+    return n;
+}
+
 // Which bucket a litter container's room falls into, for the report.
 static const char * vaultmigrate_bucket( int vnum )
 {
@@ -112,9 +126,10 @@ CMDADM( vaultmigrate )
     int totalContainers = 0, totalItems = 0;
     int bureauContainers = 0, worldContainers = 0;
     int deletedOwnerContainers = 0, deletedOwnerItems = 0;
+    int totalRefused = 0, affectedContainers = 0;
 
     std::ostringstream dump;
-    dump << "owner\texists\troom\tbucket\ttakeable\tvnum\tid\titems\n";
+    dump << "owner\texists\troom\tbucket\ttakeable\tvnum\tid\titems\trefused\n";
 
     for (Object *obj = object_list; obj != 0; obj = obj->next) {
         if (!vaultmigrate_is_litter( obj ))
@@ -123,6 +138,7 @@ CMDADM( vaultmigrate )
         DLString owner = obj->getOwner( );
         bool exists = PCharacterManager::find( owner ) != 0;
         int items = vaultmigrate_count_contents( obj );
+        int refused = vaultmigrate_count_refused( obj );
         int vnum = obj->in_room->vnum;
         const char *bucket = vaultmigrate_bucket( vnum );
         bool takeable = obj->can_wear( ITEM_TAKE );
@@ -134,6 +150,9 @@ CMDADM( vaultmigrate )
 
         totalContainers++;
         totalItems += items;
+        totalRefused += refused;
+        if (refused > 0)
+            affectedContainers++;
         if (vnum == VM_BUREAU_1 || vnum == VM_BUREAU_2 || vnum == VM_BUREAU_3)
             bureauContainers++;
         else
@@ -146,7 +165,7 @@ CMDADM( vaultmigrate )
         dump << owner << "\t" << (exists ? "yes" : "NO") << "\t"
              << obj->in_room->getName( ) << "\t" << bucket << "\t"
              << (takeable ? "take" : "notake") << "\t"
-             << obj->pIndexData->vnum << "\t" << obj->getID( ) << "\t" << items << "\n";
+             << obj->pIndexData->vnum << "\t" << obj->getID( ) << "\t" << items << "\t" << refused << "\n";
     }
 
     // Full per-container manifest to a file for offline reading.
@@ -168,7 +187,10 @@ CMDADM( vaultmigrate )
     buf << "Items inside them: " << totalItems << "   (these would move to owner vaults)\n";
     buf << "Distinct owners  : " << (int)byOwner.size( ) << "\n";
     buf << "Deleted owners   : " << deletedOwnerContainers << " containers / "
-        << deletedOwnerItems << " items would be PURGED (no vault to receive them)\n\n";
+        << deletedOwnerItems << " items would be PURGED (no vault to receive them)\n";
+    buf << "Policy-refused   : " << totalRefused << " items (limited or timered) in "
+        << affectedContainers << " containers -- the vault refuses these, so those bags\n";
+    buf << "                   can't be fully emptied+killed under v1 policy.\n\n";
     buf << "{Wby owner{x (exists = has a live profile):\n";
     buf << "owner            exists  chests  items\n";
 
