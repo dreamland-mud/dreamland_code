@@ -65,7 +65,8 @@ lock.cpp \
 unlock.cpp \
 wizard.cpp \
 set.cpp \
-vault.cpp
+vault.cpp \
+execservlet.cpp
 
 libcomm_la_MOC = \
 configs.h \
