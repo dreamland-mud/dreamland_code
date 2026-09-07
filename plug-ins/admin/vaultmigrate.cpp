@@ -25,6 +25,10 @@
 #include "room.h"
 #include "clanreference.h"
 #include "comm.h"
+#include "save.h"
+#include "save_bank.h"
+#include "loadsave.h"
+#include "dreamland.h"
 #include "merc.h"
 #include "def.h"
 
@@ -106,6 +110,119 @@ struct VMOwnerTally {
     VMOwnerTally( ) : exists(false), containers(0), items(0) { }
 };
 
+/* Destructive migration (policy B): move each litter bag's contents into the
+ * OWNER's vault, then delete the emptied bag. Limited and timered items migrate
+ * too (they only pause -- the bank freezes the serialized timer and it resumes on
+ * withdrawal); the sole carve-out is NOSAVEDROP, which bank_deposit refuses
+ * because the serializer would silently destroy it, so those items (and their
+ * bag) are left in place. Bags whose owner has no live profile are purged (no
+ * vault to receive). Each affected room is re-saved immediately after its bag
+ * changes, so a deletion cannot respawn on the next reboot from a stale room save
+ * (which would also dupe against the vault copy). Targets one owner (pilot this
+ * first) or `all`. */
+static void vaultmigrate_go( Character *ch, DLString rest )
+{
+    DLString target = rest.getOneArgument( );
+    if (target.empty( )) {
+        ch->pecho( "Usage: vaultmigrate go <owner>   (one owner -- pilot this first)" );
+        ch->pecho( "       vaultmigrate go all       (every litter bag -- destructive)" );
+        return;
+    }
+    DLString targetKey = target.toLower( );
+    bool doAll = (targetKey == "all");
+
+    // Pass 1: snapshot the target bags. bank_deposit/extract_obj mutate
+    // object_list, so we must not delete while walking it. Litter bags sit
+    // directly in rooms and are never nested in one another, so these pointers
+    // stay valid across pass 2.
+    std::vector<Object *> bags;
+    for (Object *obj = object_list; obj != 0; obj = obj->next) {
+        if (!vaultmigrate_is_litter( obj ))
+            continue;
+        if (!doAll && obj->getOwner( ).toLower( ) != targetKey)
+            continue;
+        bags.push_back( obj );
+    }
+
+    if (bags.empty( )) {
+        if (doAll)
+            ch->pecho( "No litter bags found -- nothing to migrate." );
+        else
+            ch->pecho( "No litter bag owned by '" + target + "'." );
+        return;
+    }
+
+    int bagsEmptied = 0, bagsPurged = 0, bagsLeft = 0;
+    int itemsBanked = 0, itemsPurged = 0, itemsLeft = 0;
+
+    for (size_t i = 0; i < bags.size( ); i++) {
+        Object *bag = bags[i];
+        Room *room = bag->in_room;                  // captured before any extract
+        DLString owner = bag->getOwner( );
+        bool exists = PCharacterManager::find( owner ) != 0;
+
+        // Suppress the engine's per-deposit auto-save of the WHOLE room. bank_deposit
+        // -> extract_obj_nocount -> obj_from_obj -> save_items_at_holder re-serializes
+        // every object still in the room on EVERY item removed; on bureau 3083 (36
+        // bags, ~10k items) that is an O(n^2) main-loop freeze. reset_room brackets
+        // its resets the same way. We save the room ONCE per bag, after restoring the
+        // flag -- save_items no-ops while DL_SAVE_OBJS is off, so it must come after
+        // resetOption. One save per bag keeps the crash window per-bag (the same
+        // window `vault put all` already accepts).
+        dreamland->removeOption( DL_SAVE_OBJS );
+
+        if (!exists) {
+            // No vault to receive -- purge the whole bag + subtree.
+            itemsPurged += vaultmigrate_count_contents( bag );
+            extract_obj( bag );                     // recurses into contents
+            bagsPurged++;
+        } else {
+            // Deposit each top-level content item into the owner's vault. Capture the
+            // next pointer BEFORE bank_deposit -- a true return extracts the item, so
+            // reading it->next_content afterwards would be a use-after-free.
+            DLString key = owner.toLower( );
+            Object *next = 0;
+            for (Object *it = bag->contains; it != 0; it = next) {
+                next = it->next_content;
+                if (bank_deposit( it, "player", key ))
+                    itemsBanked++;
+                else
+                    itemsLeft++;                    // NOSAVEDROP / write failure -- stays in the bag
+            }
+
+            if (bag->contains == 0) {
+                extract_obj( bag );                 // fully emptied -> remove the litter bag
+                bagsEmptied++;
+            } else {
+                bagsLeft++;                         // NOSAVEDROP leftovers -> keep the bag
+            }
+        }
+
+        dreamland->resetOption( DL_SAVE_OBJS );
+
+        // Persist the room now (bag deleted, or its contents changed) so a reboot
+        // loading the stale room save can't undo this or dupe the banked items.
+        if (room != 0)
+            save_items( room );
+    }
+
+    std::ostringstream buf;
+    buf << "{WVault migration -- GO";
+    if (!doAll)
+        buf << " (" << target << ")";
+    buf << "{x  --  changes are LIVE and saved.\n\n";
+    buf << "Bags emptied + deleted   : " << bagsEmptied << "\n";
+    buf << "Items banked to vaults   : " << itemsBanked << "\n";
+    if (bagsPurged > 0)
+        buf << "Deleted-owner bags purged: " << bagsPurged
+            << "   (" << itemsPurged << " items, no vault to receive)\n";
+    if (bagsLeft > 0)
+        buf << "{YBags KEPT{x                 : " << bagsLeft
+            << "   (" << itemsLeft << " items couldn't bank -- NOSAVEDROP, or a write error)\n";
+
+    page_to_char( buf.str( ).c_str( ), ch );
+}
+
 CMDADM( vaultmigrate )
 {
     if (!ch->isCoder( )) {
@@ -116,9 +233,16 @@ CMDADM( vaultmigrate )
     DLString rest = constArguments;
     DLString arg = rest.getOneArgument( );
 
+    if (arg == "go") {
+        vaultmigrate_go( ch, rest );
+        return;
+    }
+
     if (arg != "dry") {
-        ch->pecho( "Usage: vaultmigrate dry   (report only -- writes nothing)" );
-        ch->pecho( "The destructive 'go' phase is not built yet: this is the dry run." );
+        ch->pecho( "Usage:" );
+        ch->pecho( "  vaultmigrate dry           report only -- writes nothing" );
+        ch->pecho( "  vaultmigrate go <owner>    migrate one owner's litter bag(s) -- pilot this" );
+        ch->pecho( "  vaultmigrate go all        migrate EVERY litter bag (destructive, one-time)" );
         return;
     }
 
