@@ -17,6 +17,7 @@
 #include "vnum.h"
 #include "arg_utils.h"
 #include "string_utils.h"
+#include "mudtags.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -88,6 +89,7 @@ CMDRUNP( description )
             return;
         }
 
+        mudtags_strip_web( str, ch );
         ch->setDescription(str, LANG_DEFAULT);
         ch->pecho( _("Новое описание вставлено из буфера редактора.") );
         desc_show( ch );
@@ -111,7 +113,9 @@ CMDRUNP( description )
 
         lines.pop_back();
 
-        ch->setDescription(String::fromLines(lines), LANG_DEFAULT);
+        DLString descText = String::fromLines(lines);
+        mudtags_strip_web( descText, ch );
+        ch->setDescription(descText, LANG_DEFAULT);
         desc_show(ch);
         interpret_raw(ch, "confirm", "review");
         return;
@@ -133,6 +137,7 @@ CMDRUNP( description )
             return;
         }
 
+        mudtags_strip_web( text, ch );
         ch->setDescription(text, LANG_DEFAULT);
         desc_show(ch);
         interpret_raw(ch, "confirm", "review");
