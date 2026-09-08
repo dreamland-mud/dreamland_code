@@ -323,7 +323,7 @@ static bool afprog_spec(Character *ch)
 // wall or irreducible per-mob work. Reset in mobile_update, accumulated here, snapshot
 // logged every 150 calls (~10min). Lightweight: gettimeofday is a vDSO read, no syscall.
 static long g_ms_wield = 0, g_ms_btrig = 0, g_ms_fenia = 0, g_ms_behavior = 0, g_ms_tail = 0;
-static long g_ms_chars = 0, g_ms_npc = 0;
+static long g_ms_chars = 0, g_ms_npc = 0, g_ms_specmobs = 0;
 
 // Delta microseconds since t0, and advance t0 to now for the next sequential section.
 static inline long ms_us_since( struct timeval &t0 )
@@ -337,13 +337,17 @@ static inline long ms_us_since( struct timeval &t0 )
 
 static bool mprog_special( Character *ch )
 {
-    // Layer 1 (proto behaviors' Fenia Spec triggers) builds its whole arg list before it
-    // ever checks whether a behavior handles "Spec" -- pure per-tick churn for the ~8k mobs
-    // whose behaviors define no on/postSpec. Measured (MobileStat, boot 19:16): this was
-    // ~85% of mobile_update -- btrig 170-192ms of ~240ms, while the Fenia layers were 6ms.
-    // Gate on the live trigger map, mirroring oprog_area: dispatch only if some behavior
-    // really has on/postSpec. Reads the same guts the dispatch fires from, so there is no
-    // cache and nothing to invalidate -- a handler added via 'cs post' is honored next tick.
+    // ~3k mobs carry a behavior with an onSpec handler (poison/cityguard/thief/fido --
+    // migrated ROM classics); each runs the Fenia interpreter every pulse, and that was
+    // ~85% of mobile_update (MobileStat btrig ~200ms, boot 19:16). A presence-gate alone
+    // (behaviors_have_trigger) is a no-op here: those mobs really define onSpec, so it
+    // passes and they still invoke. But the work is player-facing, so skip it for a mob in
+    // an empty (player-less) zone -- the same area->empty gate aggr_update (update.cpp:1671)
+    // and doWander already use; empty is set on a player-less reset and cleared on entry, so
+    // there is a grace period, not an instant cutoff. behaviors_have_trigger still narrows
+    // populated-zone mobs to the onSpec carriers. The FENIA_NDX layer below (per-vnum area
+    // scripts that may carry cross-zone quest timers) is deliberately NOT gated. in_room is
+    // guarded because mobile_update, unlike char_update, does not pre-skip room-less chars.
     static Scripting::IdRef onSpecId("onSpec");
     static Scripting::IdRef postSpecId("postSpec");
 
@@ -351,8 +355,11 @@ static bool mprog_special( Character *ch )
     gettimeofday( &tv, 0 );
 
     bool btrigFired = false;
-    if (ch->is_npc( ) && behaviors_have_trigger(ch->getNPC( )->pIndexData->behaviors, onSpecId, postSpecId))
+    if (ch->is_npc( ) && ch->in_room != 0 && !ch->in_room->area->empty
+            && behaviors_have_trigger(ch->getNPC( )->pIndexData->behaviors, onSpecId, postSpecId)) {
+        g_ms_specmobs++;
         btrigFired = behavior_trigger(ch, "Spec", "C", ch);
+    }
     g_ms_btrig += ms_us_since( tv );
     if (btrigFired)
         return true;
@@ -398,7 +405,7 @@ void mobile_update( )
 
     // Diagnostic accumulators (Trello xgKK38m6) -- see ms_us_since / mprog_special above.
     g_ms_wield = g_ms_btrig = g_ms_fenia = g_ms_behavior = g_ms_tail = 0;
-    g_ms_chars = g_ms_npc = 0;
+    g_ms_chars = g_ms_npc = g_ms_specmobs = 0;
     struct timeval wtv;
 
     for (ch = char_list; ch; ch = ch_next) {
@@ -437,6 +444,7 @@ void mobile_update( )
     if (++g_ms_logcount % 150 == 0)
         LogStream::sendNotice( ) << "MobileStat: chars=" << g_ms_chars
             << " npc=" << g_ms_npc
+            << " specmobs=" << g_ms_specmobs
             << " wield=" << (g_ms_wield / 1000) << "ms"
             << " btrig=" << (g_ms_btrig / 1000) << "ms"
             << " fenia=" << (g_ms_fenia / 1000) << "ms"
