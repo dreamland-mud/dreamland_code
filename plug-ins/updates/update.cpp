@@ -337,10 +337,22 @@ static inline long ms_us_since( struct timeval &t0 )
 
 static bool mprog_special( Character *ch )
 {
+    // Layer 1 (proto behaviors' Fenia Spec triggers) builds its whole arg list before it
+    // ever checks whether a behavior handles "Spec" -- pure per-tick churn for the ~8k mobs
+    // whose behaviors define no on/postSpec. Measured (MobileStat, boot 19:16): this was
+    // ~85% of mobile_update -- btrig 170-192ms of ~240ms, while the Fenia layers were 6ms.
+    // Gate on the live trigger map, mirroring oprog_area: dispatch only if some behavior
+    // really has on/postSpec. Reads the same guts the dispatch fires from, so there is no
+    // cache and nothing to invalidate -- a handler added via 'cs post' is honored next tick.
+    static Scripting::IdRef onSpecId("onSpec");
+    static Scripting::IdRef postSpecId("postSpec");
+
     struct timeval tv;
     gettimeofday( &tv, 0 );
 
-    bool btrigFired = behavior_trigger(ch, "Spec", "C", ch);
+    bool btrigFired = false;
+    if (ch->is_npc( ) && behaviors_have_trigger(ch->getNPC( )->pIndexData->behaviors, onSpecId, postSpecId))
+        btrigFired = behavior_trigger(ch, "Spec", "C", ch);
     g_ms_btrig += ms_us_since( tv );
     if (btrigFired)
         return true;
