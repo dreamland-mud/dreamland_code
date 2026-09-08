@@ -1447,9 +1447,14 @@ NMI_GET( LanguageWrapper, name, "английское название" )
     return getTarget()->getName( );
 }
 
-NMI_GET( LanguageWrapper, nameRus, "русское название" ) 
+NMI_GET( LanguageWrapper, nameRus, "русское название" )
 {
     return getTarget()->getRussianName( );
+}
+
+NMI_INVOKE( LanguageWrapper, getNameFor, "(lang): название языка на языке зрителя (0=en,1=ru,2=ua), падежный pad" )
+{
+    return Register( getTarget()->getNamePad( argnum2lang(args, 1) ) );
 }
 
 NMI_INVOKE( LanguageWrapper, word, "(): создать одноразовое слово по правилам языка")

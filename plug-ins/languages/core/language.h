@@ -102,6 +102,10 @@ public:
     virtual bool matchesUnstrict( const DLString &str ) const;
     virtual bool matchesSubstring( const DLString &str ) const;
     virtual const DLString& getNameFor( Character * ) const;
+    // Per-language name pad for a given tongue. NOT named getNameFor: that would
+    // silently override Skill::getNameFor(lang_t) and leak declension pads into
+    // every polymorphic skill->getNameFor call (questor scrolls, skill headers).
+    const DLString& getNamePad( lang_t ) const;
     virtual AffectHandler::Pointer getAffect( );
     virtual Spell::Pointer getSpell( ) const;
     virtual HelpArticlePointer getSkillHelp( ) const;
