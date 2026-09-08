@@ -650,25 +650,66 @@ static void rafprog_spec(Room *room)
             paf->type->getAffect()->onSpec(SpellTarget::Pointer(NEW, room), paf);
 }
 
+// A room answers a diving-pulse dispatch iff its instance Fenia wrapper defines
+// on/postDiveUpdate or on/postSpec, or one of its prototype behaviors defines
+// DiveUpdate/Spec (traps, deathtraps, room specs). Read the same guts the dispatch
+// fires from (triggerFunction / behaviors_have_trigger), so the registry can never
+// disagree with what would actually run.
+static bool room_has_diving_handler( Room *r )
+{
+    static Scripting::IdRef onDiveUpdateId("onDiveUpdate"), postDiveUpdateId("postDiveUpdate");
+    static Scripting::IdRef onSpecId("onSpec"), postSpecId("postSpec");
+
+    WrapperBase *base = r->getWrapper( );
+    if (base) {
+        Scripting::Register prog;
+        if (base->triggerFunction(onDiveUpdateId, prog) || base->triggerFunction(postDiveUpdateId, prog)
+         || base->triggerFunction(onSpecId, prog)       || base->triggerFunction(postSpecId, prog))
+            return true;
+    }
+
+    return behaviors_have_trigger(r->pIndexData->behaviors, onDiveUpdateId, postDiveUpdateId)
+        || behaviors_have_trigger(r->pIndexData->behaviors, onSpecId, postSpecId);
+}
+
+// Precomputed diving responders. Trap/room-spec responders are prototype behaviors,
+// fixed for the life of a boot and re-scanned on every rebuild, so the player-facing
+// trap path is never stale. The only runtime-mutable case -- a room method bound live
+// via 'cs post' -- self-heals on the rebuild cadence below; a reboot rebuilds it on the
+// first pulse. No cross-plugin invalidation hook needed.
+static RoomSet roomDiving;
+
+static void rebuild_diving_registry( )
+{
+    roomDiving.clear( );
+    for (auto &r: roomInstances)
+        if (room_has_diving_handler(r))
+            roomDiving.insert(r);
+}
+
 void diving_update( )
 {
     ProfilerBlock profiler("diving_update", 100);
     static long dv_calls = 0;
-    long rooms = 0, dispatched = 0;
 
-    for (auto &r: roomInstances) {
-        rooms++;
+    // First call, then every ~10 min: rebuild the responder set (self-heal for a
+    // live 'cs post' bind) and log its size against the old full-walk count.
+    if (dv_calls % 150 == 0) {
+        rebuild_diving_registry( );
+        LogStream::sendNotice( ) << "DivingStat: responders=" << roomDiving.size( )
+            << " affected=" << roomAffected.size( )
+            << " (was walking " << roomInstances.size( ) << ")" << endl;
+    }
+    dv_calls++;
 
-        // Provably-safe has-handler gate. All five dispatches below are no-ops for a
-        // room with no instance Fenia wrapper (both FENIA_VOID_CALLs short-circuit on
-        // a null getWrapper), empty prototype behaviors (both behavior_triggers early
-        // out on behaviors.empty), and no affects (rafprog_spec iterates
-        // affected.findAllWithHandler). Skipping those -- the vast majority -- avoids
-        // the per-room dispatch attempt that made this sweep walk ~9.8k rooms blindly.
-        if (r->getWrapper() == 0 && r->pIndexData->behaviors.empty() && r->affected.empty())
-            continue;
+    // Dispatch domain = static responders + rooms carrying a live affect (its onSpec
+    // fires through rafprog_spec). roomAffected is the engine's canonical room-affect
+    // set; copy the union so a dispatch that mutates roomAffected can't invalidate the
+    // iterator we are walking.
+    RoomSet todo(roomDiving);
+    todo.insert(roomAffected.begin( ), roomAffected.end( ));
 
-        dispatched++;
+    for (auto &r: todo) {
         try {
             FENIA_VOID_CALL(r, "DiveUpdate", "");
 
@@ -685,13 +726,6 @@ void diving_update( )
             // DO NOTHING
         }
     }
-
-    // Diagnostic (~every 10 min): how many rooms actually carry a handler. Tells us
-    // whether this gate is enough or a method-specific registry is the next step.
-    if (++dv_calls % 150 == 0)
-        LogStream::sendNotice( ) << "DivingStat: rooms=" << rooms
-            << " dispatched=" << dispatched
-            << " gated=" << (rooms - dispatched) << endl;
 }
 
 static bool oprog_spec( Object *obj )
