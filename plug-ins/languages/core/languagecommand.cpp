@@ -166,27 +166,29 @@ static bool runFeniaEffect( WordEffect::Pointer effect, Character *ch, Object *o
     return true;
 }
 
-// Give a Fenia handler the "no runnable effect" outcome so the feedback is
-// trilingual and hot-reloadable (.tmp.language.onOutcome) instead of the single
-// C++ "everything went quiet" line. Phase 1 of the ancient-language migration:
-// a validly composed word that commands no power (or a garbled utterance) now
-// tells the speaker what happened, in their own language. Returns true when
-// Fenia owned the output, so the caller skips the C++ fallback. Additive: a
-// missing module or any error leaves the fallback to C++, exactly as before.
-static bool runFeniaOutcome( Character *ch, const DLString &langName, const DLString &wordStr,
-                             Object *obj, Character *victim, const char *outcome )
+// Hand a doUtter outcome to a Fenia handler under .tmp.language so the feedback
+// is trilingual and hot-reloadable instead of the hardcoded C++ lines. Shared by
+// all four languages; `method` selects the handler and `tail` is its 6th arg:
+//   "onOutcome" -- an uttered word with no runnable effect (tail noword/nopower);
+//   "onEcho"    -- the self/victim/bystander echoes and the pronunciation-fail
+//                  lines (tail echo/garble).
+// Returns true when Fenia owned the output, so the caller skips its C++ fallback.
+// Additive: a missing module or any error leaves the fallback to C++.
+static bool runFeniaHook( Character *ch, const DLString &langName, const DLString &wordStr,
+                          Object *obj, Character *victim, const char *tail, const char *method )
 {
     using namespace Scripting;
 
     if (!FeniaManager::wrapperManager)
         return false;
 
-    static IdRef ID_TMP( "tmp" ), ID_LANGUAGE( "language" ), ID_ONOUTCOME( "onOutcome" );
+    static IdRef ID_TMP( "tmp" ), ID_LANGUAGE( "language" );
+    IdRef methodId( method );
 
     try {
         Register tmp = *Context::root[ID_TMP];
         Register lng = *tmp[ID_LANGUAGE];
-        Register fn  = *lng[ID_ONOUTCOME];
+        Register fn  = *lng[methodId];
 
         if (fn.type != Register::FUNCTION)
             return false;
@@ -197,13 +199,13 @@ static bool runFeniaOutcome( Character *ch, const DLString &langName, const DLSt
         args.push_back( Register( wordStr ) );
         args.push_back( obj ? FeniaManager::wrapperManager->getWrapper( obj ) : Register( ) );
         args.push_back( victim ? FeniaManager::wrapperManager->getWrapper( victim ) : Register( ) );
-        args.push_back( Register( DLString( outcome ) ) );
+        args.push_back( Register( DLString( tail ) ) );
 
         Register rc = fn.toFunction( )->invoke( lng, args );
         return rc.toBoolean( );
 
     } catch (const ::Exception &e) {
-        FeniaManager::getThis( )->croak( 0, Register( DLString( "language.onOutcome" ) ), e );
+        FeniaManager::getThis( )->croak( 0, Register( DLString( "language." ) + method ), e );
     }
 
     return false;
@@ -225,8 +227,10 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
     chance = language->getEffective( ch );
     
     if (number_percent( ) > chance || ch->isAffected( gsn_garble )) {
-        ch->pecho( _("Тебя подвело произношение.") );
-        ch->recho( POS_RESTING, _("%^C1 бормочет что-то неразборчивое."), ch );
+        if (!runFeniaHook( ch, language->getName( ), arg1, 0, 0, "garble", "onEcho" )) {
+            ch->pecho( _("Тебя подвело произношение.") );
+            ch->recho( POS_RESTING, _("%^C1 бормочет что-то неразборчивое."), ch );
+        }
         ch->setWait( language->getBeats(ch) / 2 );
         return;
     }
@@ -245,6 +249,10 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
     locateTargets(effect, ch, victim, obj, arg2);
     fMiss = effect && !effect->isObject() && !victim;
          
+    // Phase 1 M2: delegate the self/victim/bystander echoes to Fenia
+    // (.tmp.language.onEcho) for trilingual, hot-reloadable output. The C++
+    // block below is kept verbatim as the fallback for when the module is absent.
+    if (!runFeniaHook( ch, language->getName( ), arg1, obj, victim, "echo", "onEcho" )) {
     if (obj) {
         if (number_bits( 1 ))
             ch->pecho( _("Ты проводишь рукой над %O5 и изрекаешь '{C%s{x'."), obj, arg1.c_str( ) );
@@ -255,11 +263,11 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
         ch->pecho( _("Ты изрекаешь '{C%s{x'"), arg1.c_str( ) );
     else {
         ch->pecho( _("Ты изрекаешь, указывая на %^C4: '{C%s{x'"), victim, arg1.c_str( ) );
-        
+
         if (IS_AWAKE(victim) && !victim->isAffected( gsn_deafen )) {
             if (language->getEffective( victim ) < number_percent( ))
                 victim->pecho( _("%^C1 что-то произносит, указывая в твою сторону."), ch );
-            else 
+            else
                 victim->pecho( _("%^C1 изрекает на %^N6, указывая в твою сторону: '{C%s{x'"),
                                ch, language->getNameFor(victim).c_str( ), arg1.c_str( ) );
         }
@@ -268,7 +276,7 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
     for (rch = ch->in_room->people; rch; rch = rch->next_in_room) {
         if (!IS_AWAKE(rch))
             continue;
-        
+
         if (rch == ch || rch == victim)
             continue;
 
@@ -277,14 +285,15 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
 
         if (language->getEffective( rch ) < number_percent( ))
             rch->pecho( _("%^C1 что-то бормочет на странном языке."), ch );
-        else 
-            rch->pecho( _("%^C1 изрекает на %^N6 '{C%s{x'"), 
+        else
+            rch->pecho( _("%^C1 изрекает на %^N6 '{C%s{x'"),
                         ch, language->getNameFor(rch).c_str( ), arg1.c_str( ) );
     }
-    
+    }
+
     if (word.empty( ) || !effect) {
         const char *outcome = word.empty( ) ? "noword" : "nopower";
-        if (!runFeniaOutcome( ch, language->getName( ), arg1, obj, victim, outcome ))
+        if (!runFeniaHook( ch, language->getName( ), arg1, obj, victim, outcome, "onOutcome" ))
             oldact(_("{CНа мгновение все вокруг стихло.{x"), ch, 0, 0, TO_ALL );
         return;
     }

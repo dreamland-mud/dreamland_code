@@ -60,6 +60,11 @@ const DLString& Language::getNameFor( Character *ch ) const
     return name.get(Player::lang(ch));
 }
 
+const DLString& Language::getNamePad( lang_t lang ) const
+{
+    return name.get(lang);
+}
+
 bool Language::visible( CharacterMemoryInterface * ch ) const
 {
     if (ch->getPCM() && ch->getLevel( ) >= LEVEL_IMMORTAL)
