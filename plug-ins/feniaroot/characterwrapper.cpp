@@ -1928,9 +1928,15 @@ static bool pad_declined( const DLString &pad )
     return pad.find_first_not_of( '|', bar ) != DLString::npos;
 }
 
-// The nominative out of a Flexer pad -- everything before the first '|', or the
-// whole string when it carries no case forms at all.
-static DLString pad_nominative( const DLString &pad )
+// The STEM of a Flexer pad -- everything before the first '|', or the whole
+// string when it carries no case forms at all. NOTE: this is the common prefix
+// of the six declined forms, NOT the nominative. A pad is
+// stem|nom-cell|gen-cell|dat-cell|acc-cell|instr-cell|loc-cell, so the
+// nominative is stem + the first cell (see pad_case1). Олен|а|и|... has stem
+// "Олен" but nominative "Олена". The two source-derivation call sites below feed
+// this to declineUa; a stem that is a clean prefix of the name works, a
+// stem-alternating one is a known limitation (fable review 2026-09-08).
+static DLString pad_stem( const DLString &pad )
 {
     DLString::size_type bar = pad.find( '|' );
 
@@ -1938,6 +1944,21 @@ static DLString pad_nominative( const DLString &pad )
         return pad;
 
     return pad.substr( 0, bar );
+}
+
+// The nominative a Flexer pad actually produces: stem + first case cell. For a
+// bare pad ("Имя||||||") or an undivided string this is just the name.
+static DLString pad_case1( const DLString &pad )
+{
+    DLString::size_type bar1 = pad.find( '|' );
+    if (bar1 == DLString::npos)
+        return pad;
+
+    DLString::size_type bar2 = pad.find( '|', bar1 + 1 );
+    if (bar2 == DLString::npos)
+        bar2 = pad.size( );
+
+    return pad.substr( 0, bar1 ) + pad.substr( bar1 + 1, bar2 - bar1 - 1 );
 }
 
 // The compiled half of the T8 name auto-fill: romanise / decline the login into
@@ -1974,9 +1995,9 @@ static void autofill_name_forms( PCharacter *pch )
         // deriving it from the Russian form instead would round-trip it through
         // another alphabet for nothing. Only when that slot is empty does the
         // Russian form -- and finally the login -- become the source.
-        DLString source = pad_nominative( pch->getUkrainianName( ).getFullForm( ) );
+        DLString source = pad_stem( pch->getUkrainianName( ).getFullForm( ) );
         if (source.empty( ))
-            source = pad_nominative( pch->getRussianName( ).getFullForm( ) );
+            source = pad_stem( pch->getRussianName( ).getFullForm( ) );
         if (source.empty( ))
             source = pch->getName( );
 
@@ -1995,13 +2016,27 @@ static void autofill_name_forms( PCharacter *pch )
         // a consonant. Leaving the slot empty is right: the name map already
         // falls back to the Russian form, which carries the same single shape.
         if (!String::nameIsIndeclinable( source, pch->getSex( ) == SEX_FEMALE )) {
-            // Store only a pad that really declined. Keeping an undeclinable one
-            // would make the field non-empty, so this autofill would never retry
-            // it AND the "empty Ukrainian falls back to Russian" rule in
-            // PCharacter's name map would stop firing -- leaving Ukrainian
-            // viewers with a bare Latin login.
+            // Store only a pad that really declined AND whose nominative
+            // reproduces the input. nameIsIndeclinable is a front-guard against
+            // classes morphology cannot read at all; this is the back-guard for
+            // the ones it misreads with confidence. pymorphy hands back a full
+            // paradigm for a name it has guessed wrong -- Диабол inflected as a
+            // plural (nominative "Диаболи"), Лариена with its -а dropped
+            // ("Лариен"), Сенька reshaped into "Сенько" -- and pad_declined() is
+            // true for every one of them, because they DID inflect, just into the
+            // wrong word. Compare the pad's actual nominative -- stem + first case
+            // cell, NOT the bare stem (Олен|а|и| is nominative "Олена", stem
+            // "Олен") -- back to the source: if it no longer equals the name we
+            // fed in, the paradigm is invented. Leave the slot empty and let the
+            // name map fall back to the Russian single form (correct), exactly as
+            // for an indeclinable name.
+            //
+            // Note the guard cannot un-stick a bad pad already stored: a
+            // non-empty field makes this autofill skip the character (line
+            // above), and a plural-extension misread that this check let through
+            // in an earlier build stays. Historical re-audit is a separate task.
             DLString pad = Morphology::declineUa( source, "NOUN", gender );
-            if (pad_declined( pad ))
+            if (pad_declined( pad ) && pad_case1( pad ) == source)
                 pch->setUkrainianName( pad );
         }
     }
