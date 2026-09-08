@@ -316,43 +316,90 @@ static bool afprog_spec(Character *ch)
     return rc;
 }
 
+// Diagnostic (2026-09-08, Trello xgKK38m6): attribute per-tick mobile_update cost
+// across the unconditional per-char phases -- wield_update, the layer-1 behavior
+// trigger, the Fenia instance/proto dispatch, the C++ BEHAVIOR_CALL AI tick, and the
+// tail (afprog/spec_fun/gprog) -- to decide whether the 228ms is a gateable dispatch
+// wall or irreducible per-mob work. Reset in mobile_update, accumulated here, snapshot
+// logged every 150 calls (~10min). Lightweight: gettimeofday is a vDSO read, no syscall.
+static long g_ms_wield = 0, g_ms_btrig = 0, g_ms_fenia = 0, g_ms_behavior = 0, g_ms_tail = 0;
+static long g_ms_chars = 0, g_ms_npc = 0;
+
+// Delta microseconds since t0, and advance t0 to now for the next sequential section.
+static inline long ms_us_since( struct timeval &t0 )
+{
+    struct timeval t1;
+    gettimeofday( &t1, 0 );
+    long d = (t1.tv_sec - t0.tv_sec) * 1000000L + (t1.tv_usec - t0.tv_usec);
+    t0 = t1;
+    return d;
+}
+
 static bool mprog_special( Character *ch )
 {
-    if (behavior_trigger(ch, "Spec", "C", ch))
+    struct timeval tv;
+    gettimeofday( &tv, 0 );
+
+    bool btrigFired = behavior_trigger(ch, "Spec", "C", ch);
+    g_ms_btrig += ms_us_since( tv );
+    if (btrigFired)
         return true;
 
+    // NB: FENIA_*_CALL and BEHAVIOR_CALL are macros that `return` from inside when a
+    // handler fires, so the accumulator right after is skipped on the rare fire path.
+    // The common (no-fire) path -- the vast majority of mobs -- reaches every section,
+    // so steady-state attribution is accurate.
     FENIA_CALL( ch, "Spec", "" );
     FENIA_NDX_CALL( ch->getNPC( ), "Spec", "C", ch );
-    BEHAVIOR_CALL( ch->getNPC( ), spec );
+    g_ms_fenia += ms_us_since( tv );
 
-    if (afprog_spec(ch))
+    BEHAVIOR_CALL( ch->getNPC( ), spec );
+    g_ms_behavior += ms_us_since( tv );
+
+    if (afprog_spec(ch)) {
+        g_ms_tail += ms_us_since( tv );
         return true;
-    
+    }
+
     if (ch->is_npc( ) && !IS_CHARMED(ch)) {
-        if (*(ch->getNPC( )->spec_fun) != 0 
-            && (*(ch->getNPC( )->spec_fun))( ch->getNPC( ) ))
+        if (*(ch->getNPC( )->spec_fun) != 0
+            && (*(ch->getNPC( )->spec_fun))( ch->getNPC( ) )) {
+            g_ms_tail += ms_us_since( tv );
             return true;
+        }
     }
 
     if (!ch->is_npc())
         gprog("onSpec", "C", ch);
 
+    g_ms_tail += ms_us_since( tv );
     return false;
 }
 
 /* 
  * Autonomous mobile action 
  */
-void mobile_update( ) 
+void mobile_update( )
 {
     ProfilerBlock profiler("mobile_update", 100);
     Character *ch, *ch_next;
+
+    // Diagnostic accumulators (Trello xgKK38m6) -- see ms_us_since / mprog_special above.
+    g_ms_wield = g_ms_btrig = g_ms_fenia = g_ms_behavior = g_ms_tail = 0;
+    g_ms_chars = g_ms_npc = 0;
+    struct timeval wtv;
 
     for (ch = char_list; ch; ch = ch_next) {
         ch_next = ch->next;
 
         try {
+            g_ms_chars++;
+            if (ch->is_npc( ))
+                g_ms_npc++;
+
+            gettimeofday( &wtv, 0 );
             wield_update( ch );
+            g_ms_wield += ms_us_since( wtv );
 
             // A mob spec fired here (mobile_update) can cast a damage spell --
             // e.g. spec_breath_gas -- OUTSIDE the violence_update round loop. Its
@@ -372,6 +419,17 @@ void mobile_update( )
         } catch (const VictimDeathException &) {
         }
     }
+
+    // Snapshot one call every ~10min so the log isn't spammed every 4s.
+    static int g_ms_logcount = 0;
+    if (++g_ms_logcount % 150 == 0)
+        LogStream::sendNotice( ) << "MobileStat: chars=" << g_ms_chars
+            << " npc=" << g_ms_npc
+            << " wield=" << (g_ms_wield / 1000) << "ms"
+            << " btrig=" << (g_ms_btrig / 1000) << "ms"
+            << " fenia=" << (g_ms_fenia / 1000) << "ms"
+            << " behavior=" << (g_ms_behavior / 1000) << "ms"
+            << " tail=" << (g_ms_tail / 1000) << "ms" << endl;
 }
 
 static bool mprog_area( Character *ch )
