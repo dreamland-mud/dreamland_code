@@ -980,8 +980,8 @@ static bool oprog_update_key( Object *obj )
  * ground away from its reset place, so reset litter drains out of object_list
  * over time instead of piling up forever (obj_update cost scales with N).
  * Mirrors oprog_update_key's ground path: ground-only, and never touches owned,
- * limited, protected, contained, or reset-place items. The existing timer
- * decrement below (line ~1213) extracts it once the clock runs out. Returns true
+ * limited, protected, contained, keepHere, or reset-place items. The existing
+ * obj_update timer decrement extracts it once the clock runs out. Returns true
  * if the timer changed (caller saves the room).
  */
 static bool oprog_update_consumable( Object *obj )
@@ -1005,11 +1005,17 @@ static bool oprog_update_consumable( Object *obj )
         return false;
     if (!obj->getOwner( ).empty( ))
         return false;
+    // keepHere marks a deliberately-placed fixture (honored by lost_and_found_sweep,
+    // questbag, vaultmigrate); never rot one, even loose on the floor.
+    if (!obj->getProperty( "keepHere" ).empty( ))
+        return false;
     if (IS_SET(room->room_flags, ROOM_MANSION))
         return false;
 
     // Sitting on its own reset spot: this is where it belongs, keep it fresh.
     if (reset_check_obj( obj )) {
+        if (obj->timer == 0)
+            return false;
         obj->timer = 0;
         return true;
     }
