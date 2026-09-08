@@ -975,6 +975,56 @@ static bool oprog_update_key( Object *obj )
     return false;
 }
 
+/*
+ * Stamp a rot timer on a consumable (pill/potion/food) abandoned bare on the
+ * ground away from its reset place, so reset litter drains out of object_list
+ * over time instead of piling up forever (obj_update cost scales with N).
+ * Mirrors oprog_update_key's ground path: ground-only, and never touches owned,
+ * limited, protected, contained, or reset-place items. The existing timer
+ * decrement below (line ~1213) extracts it once the clock runs out. Returns true
+ * if the timer changed (caller saves the room).
+ */
+static bool oprog_update_consumable( Object *obj )
+{
+    // Only bare litter on the floor: never carried/worn, never inside any
+    // container (a bag/pit/corpse/keyring all leave in_obj != 0). The cheap
+    // carrier/in_obj gate also keeps reset_check_obj off the hot path for the
+    // common case of carried consumables.
+    if (obj->getCarrier( ) != 0 || obj->in_obj != 0)
+        return false;
+
+    Room *room = obj->getRoom( );
+    if (room == 0)
+        return false;
+
+    // Never rot protected, limited/rare, or owned (bank/quest) property. Mansion
+    // floors are handled by the housekeeper sweep just below, leave them be.
+    if (IS_SET(obj->extra_flags, ITEM_NOPURGE))
+        return false;
+    if (obj->pIndexData->limit != -1)
+        return false;
+    if (!obj->getOwner( ).empty( ))
+        return false;
+    if (IS_SET(room->room_flags, ROOM_MANSION))
+        return false;
+
+    // Sitting on its own reset spot: this is where it belongs, keep it fresh.
+    if (reset_check_obj( obj )) {
+        obj->timer = 0;
+        return true;
+    }
+
+    // Abandoned litter: start the rot clock once. timer==0 means "no active
+    // decay" (the decrement below leaves it alone), so this is the only place
+    // that arms it; a consumable already ticking down is left untouched.
+    if (obj->timer == 0) {
+        obj->timer = 60;      // ~60 obj_update ticks, matching the key rot timer
+        return true;
+    }
+
+    return false;
+}
+
 static bool oprog_area( Object *obj )
 {
     // Layer 1 (the proto behaviors' Fenia triggers) builds its whole arg list before it
@@ -1099,6 +1149,12 @@ void obj_update( void )
 
         if (obj->item_type == ITEM_KEY)
             if (oprog_update_key( obj ))
+                room_to_save( obj );
+
+        if (obj->item_type == ITEM_PILL
+            || obj->item_type == ITEM_POTION
+            || obj->item_type == ITEM_FOOD)
+            if (oprog_update_consumable( obj ))
                 room_to_save( obj );
 
         /* no limits on the floor inside 'mansions' */
