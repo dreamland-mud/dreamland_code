@@ -1995,13 +1995,24 @@ static void autofill_name_forms( PCharacter *pch )
         // a consonant. Leaving the slot empty is right: the name map already
         // falls back to the Russian form, which carries the same single shape.
         if (!String::nameIsIndeclinable( source, pch->getSex( ) == SEX_FEMALE )) {
-            // Store only a pad that really declined. Keeping an undeclinable one
-            // would make the field non-empty, so this autofill would never retry
-            // it AND the "empty Ukrainian falls back to Russian" rule in
-            // PCharacter's name map would stop firing -- leaving Ukrainian
-            // viewers with a bare Latin login.
+            // Store only a pad that really declined AND whose nominative
+            // reproduces the input. nameIsIndeclinable is a front-guard against
+            // classes morphology cannot read at all; this is the back-guard for
+            // the ones it misreads with confidence. pymorphy hands back a full
+            // paradigm for a name it has guessed wrong -- Диабол inflected as a
+            // plural (nominative "Диаболи"), Лариена with its -а dropped
+            // ("Лариен"), Сенька reshaped into "Сенько" -- and pad_declined() is
+            // true for every one of them, because they DID inflect, just into the
+            // wrong word. Compare the pad's own nominative (everything before the
+            // first '|') back to the source: if it no longer equals the name we
+            // fed in, the paradigm is invented. Leave the slot empty and let the
+            // name map fall back to the Russian single form (correct), exactly as
+            // for an indeclinable name.
+            //
+            // Both guards also keep a bad pad from sticking: a non-empty field
+            // makes this autofill skip the character forever after.
             DLString pad = Morphology::declineUa( source, "NOUN", gender );
-            if (pad_declined( pad ))
+            if (pad_declined( pad ) && pad_nominative( pad ) == source)
                 pch->setUkrainianName( pad );
         }
     }
