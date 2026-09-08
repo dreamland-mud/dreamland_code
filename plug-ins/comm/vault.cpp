@@ -38,6 +38,7 @@
 #include "dl_ctype.h"
 #include "behavior.h"
 #include "room.h"
+#include "clanreference.h"
 
 #include "merc.h"
 #include "def.h"
@@ -91,6 +92,24 @@ static DLString vault_cmd_prefix( const DLString &ownerLabel )
         return DLString( "vault" );
     return DLString( "vault *" ) + ownerLabel;
 }
+
+// Sanitize an immortal-override target ('*<name>') to a safe directory name:
+// letters and digits only, so '*../../x' can't escape the bank tree. PC names and
+// clan tags are letters anyway.
+static bool vault_safe_name( const DLString &s )
+{
+    if ( s.empty( ) )
+        return false;
+    for ( size_t i = 0; i < s.size( ); i++ ) {
+        char c = s[i];
+        if ( !( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) ) )
+            return false;
+    }
+    return true;
+}
+
+// The 'none' sentinel clan, for testing whether a room carries a clan tag.
+CLAN( none );
 
 /* Effective prototype-or-override view of one stored entry, for display and
  * matching without materializing the object. */
@@ -270,35 +289,46 @@ static DLString vault_type_summary_line( const std::vector<BankEntry> &entries, 
 // forceFull (explicit 'vault list' / 'vault all').
 static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
                         lang_t lang, const DLString &ownerLabel, const DLString &cmdPrefix,
-                        bool forceFull )
+                        bool forceFull, bool isClan )
 {
     if ( entries.empty( ) ) {
-        if ( ownerLabel.empty( ) )
-            ch->pecho( lmsg( lang,
-                "Your vault is empty.",
-                "Твое хранилище пусто.",
-                "Твоє сховище порожнє." ) );
-        else
+        if ( !ownerLabel.empty( ) )
             ch->pecho( lmsg( lang,
                 "%s's vault is empty.",
                 "Хранилище %s пусто.",
                 "Сховище %s порожнє." ), ownerLabel.c_str( ) );
+        else if ( isClan )
+            ch->pecho( lmsg( lang,
+                "The clan vault is empty.",
+                "Клановое хранилище пусто.",
+                "Кланове сховище порожнє." ) );
+        else
+            ch->pecho( lmsg( lang,
+                "Your vault is empty.",
+                "Твое хранилище пусто.",
+                "Твоє сховище порожнє." ) );
         return;
     }
 
     // Count header -- amount-aware noun via %I (1 предмет / 3 предмета / 17 предметов).
-    if ( ownerLabel.empty( ) )
-        ch->pecho( lmsg( lang,
-            "Your vault holds %d %Iitem|items|items:",
-            "В твоем хранилище хранится %d %Iпредмет|предмета|предметов:",
-            "У твоєму сховищі зберігається %d %Iпредмет|предмети|предметів:" ),
-            (int)entries.size( ), (int)entries.size( ) );
-    else
+    if ( !ownerLabel.empty( ) )
         ch->pecho( lmsg( lang,
             "%s's vault holds %d %Iitem|items|items:",
             "В хранилище %s хранится %d %Iпредмет|предмета|предметов:",
             "У сховищі %s зберігається %d %Iпредмет|предмети|предметів:" ),
             ownerLabel.c_str( ), (int)entries.size( ), (int)entries.size( ) );
+    else if ( isClan )
+        ch->pecho( lmsg( lang,
+            "The clan vault holds %d %Iitem|items|items:",
+            "В клановом хранилище хранится %d %Iпредмет|предмета|предметов:",
+            "У клановому сховищі зберігається %d %Iпредмет|предмети|предметів:" ),
+            (int)entries.size( ), (int)entries.size( ) );
+    else
+        ch->pecho( lmsg( lang,
+            "Your vault holds %d %Iitem|items|items:",
+            "В твоем хранилище хранится %d %Iпредмет|предмета|предметов:",
+            "У твоєму сховищі зберігається %d %Iпредмет|предмети|предметів:" ),
+            (int)entries.size( ), (int)entries.size( ) );
 
     if ( entries.size( ) > 50 && !forceFull ) {
         ch->pecho( lmsg( lang,
@@ -348,87 +378,21 @@ static void vault_show_rows( Character *ch, const std::vector<BankEntry> &entrie
 }
 
 /*-------------------------------------------------------------------------
- * the command
+ * the shared subcommand engine
  *------------------------------------------------------------------------*/
-CMDRUN( vault )
+/* Both the personal vault (bank gate + player key) and
+ * the clan vault (clan-hall gate + clan key) resolve their (kind,key) cell in
+ * CMDRUN(vault) below, then funnel here for put/get/find/filter/list. `args` is
+ * the argument tail after the optional '*<name>' override has been consumed. */
+static void vault_run_ops( Character *ch, const DLString &kind, const DLString &key,
+                           const DLString &ownerLabel, DLString args, lang_t lang )
 {
-    lang_t lang = viewerLang( ch );
-
-    if ( ch->is_npc( ) ) {
-        ch->pecho( lmsg( lang, "Not for mobs.", "Не для мобов.", "Не для мобів." ) );
-        return;
-    }
-
-    // Gate: a bank room (same behavior the money bank uses). ATM-object parity
-    // is a known follow-up.
-    Behavior *bankBhv = behaviorManager->findExisting( "bank" );
-    bool inBank = bankBhv != 0
-        && ch->in_room != 0
-        && ch->in_room->pIndexData->behaviors.isSet( bankBhv->getIndex( ) );
-
-    if ( !inBank ) {
-        ch->pecho( lmsg( lang,
-            "You need to be at a bank to reach your vault.",
-            "Чтобы добраться до хранилища, нужно быть в банке.",
-            "Щоб дістатися до сховища, треба бути в банку." ) );
-        return;
-    }
-
-    DLString args = constArguments;
-
-    // Optional immortal owner-override: '*<owner>' targets another cell.
-    DLString kind = "player";
-    DLString key;
-    DLString ownerLabel;      // non-empty only when overriding, for messages
-
-    DLString peek = args.getOneArgument( );   // consumes the first token
-    if ( !peek.empty( ) && peek.at( 0 ) == '*' ) {
-        if ( !ch->is_immortal( ) ) {
-            ch->pecho( lmsg( lang,
-                "Only immortals can open someone else's vault.",
-                "Только бессмертные могут открыть чужое хранилище.",
-                "Лише безсмертні можуть відкрити чуже сховище." ) );
-            return;
-        }
-        // Owner becomes a directory name: allow only [A-Za-z0-9] so '*../../x'
-        // can't mkdir/write outside the bank tree. PC names are letters anyway.
-        DLString ownerArg = peek.substr( 1 );
-        bool okName = !ownerArg.empty( );
-        for ( size_t i = 0; okName && i < ownerArg.size( ); i++ ) {
-            char c = ownerArg[i];
-            if ( !( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) ) )
-                okName = false;
-        }
-        if ( !okName ) {
-            ch->pecho( lmsg( lang,
-                "Usage: vault *<owner> [subcommand]  (letters/digits only)",
-                "Использование: vault *<владелец> [подкоманда]  (только буквы/цифры)",
-                "Використання: vault *<власник> [підкоманда]  (лише літери/цифри)" ) );
-            return;
-        }
-        // Key is the pfile-canonical lowercase form (so delete/rename cleanup and
-        // the owner's own vault land on the same cell); label stays capitalized.
-        key = ownerArg.toLower( );
-        ownerLabel = vault_capitalize( ownerArg );
-        // args now holds the rest; take the real subcommand token below.
-        peek = args.getOneArgument( );
-    }
-    else {
-        // Self: needs a PC to own the cell.
-        PCharacter *pch = ch->getPC( );
-        if ( pch == 0 ) {
-            ch->pecho( lmsg( lang,
-                "You have no vault.",
-                "У тебя нет хранилища.",
-                "У тебе немає сховища." ) );
-            return;
-        }
-        // Lowercase to match the pfile-canonical key (delete/rename cleanup).
-        key = pch->getName( ).toLower( );
-    }
-
+    DLString peek = args.getOneArgument( );
     DLString sub = vault_lower( peek );
     DLString cmdPrefix = vault_cmd_prefix( ownerLabel );
+    // Clan cell (no override) is labelled "the clan vault" instead of "your vault"
+    // so a member never mistakes the shared store for their personal one.
+    bool isClan = ( kind == "clan" );
 
     /*---- vault put <item> / put all / put all.<kw> ------------------------*/
     if ( vault_word_in( sub, WORDS_PUT ) ) {
@@ -478,16 +442,21 @@ CMDRUN( vault )
                 return;
             }
 
-            if ( ownerLabel.empty( ) )
-                ch->pecho( lmsg( lang,
-                    "You store %d %Iitem|items|items in your vault.",
-                    "Ты убираешь %d %Iпредмет|предмета|предметов в свое хранилище.",
-                    "Ти ховаєш %d %Iпредмет|предмети|предметів до свого сховища." ), stored, stored );
-            else
+            if ( !ownerLabel.empty( ) )
                 ch->pecho( lmsg( lang,
                     "You store %d %Iitem|items|items in %s's vault.",
                     "Ты убираешь %d %Iпредмет|предмета|предметов в хранилище %s.",
                     "Ти ховаєш %d %Iпредмет|предмети|предметів до сховища %s." ), stored, stored, ownerLabel.c_str( ) );
+            else if ( isClan )
+                ch->pecho( lmsg( lang,
+                    "You store %d %Iitem|items|items in the clan vault.",
+                    "Ты убираешь %d %Iпредмет|предмета|предметов в клановое хранилище.",
+                    "Ти ховаєш %d %Iпредмет|предмети|предметів до кланового сховища." ), stored, stored );
+            else
+                ch->pecho( lmsg( lang,
+                    "You store %d %Iitem|items|items in your vault.",
+                    "Ты убираешь %d %Iпредмет|предмета|предметов в свое хранилище.",
+                    "Ти ховаєш %d %Iпредмет|предмети|предметів до свого сховища." ), stored, stored );
 
             if ( skipped > 0 )
                 ch->pecho( lmsg( lang,
@@ -534,16 +503,21 @@ CMDRUN( vault )
             return;
         }
 
-        if ( ownerLabel.empty( ) )
-            ch->pecho( lmsg( lang,
-                "You store %s in your vault.",
-                "Ты убираешь %s в свое хранилище.",
-                "Ти ховаєш %s до свого сховища." ), name.c_str( ) );
-        else
+        if ( !ownerLabel.empty( ) )
             ch->pecho( lmsg( lang,
                 "You store %s in %s's vault.",
                 "Ты убираешь %s в хранилище %s.",
                 "Ти ховаєш %s до сховища %s." ), name.c_str( ), ownerLabel.c_str( ) );
+        else if ( isClan )
+            ch->pecho( lmsg( lang,
+                "You store %s in the clan vault.",
+                "Ты убираешь %s в клановое хранилище.",
+                "Ти ховаєш %s до кланового сховища." ), name.c_str( ) );
+        else
+            ch->pecho( lmsg( lang,
+                "You store %s in your vault.",
+                "Ты убираешь %s в свое хранилище.",
+                "Ти ховаєш %s до свого сховища." ), name.c_str( ) );
 
         // Persist the inventory change now: the cell is on disk instantly, so
         // save ch too or a crash inside the ~60s autosave window would leave the
@@ -600,7 +574,7 @@ CMDRUN( vault )
         // No type given -> show the per-type overview of what's actually there.
         if ( typeArg.empty( ) ) {
             if ( entries.empty( ) ) {
-                vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true );
+                vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true, isClan );
                 return;
             }
             ch->pecho( lmsg( lang,
@@ -651,7 +625,7 @@ CMDRUN( vault )
     if ( sub.empty( ) || vault_word_in( sub, WORDS_LIST ) || arg_is_all( sub ) ) {
         std::vector<BankEntry> entries;
         vault_browse_sorted( kind, key, entries, lang );
-        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, !sub.empty( ) );
+        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, !sub.empty( ), isClan );
         return;
     }
 
@@ -672,7 +646,7 @@ CMDRUN( vault )
     std::vector<BankEntry> entries;
     vault_browse_sorted( kind, key, entries, lang );
     if ( entries.empty( ) ) {
-        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true );   // prints the empty message
+        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true, isClan );   // prints the empty message
         return;
     }
 
@@ -806,4 +780,115 @@ CMDRUN( vault )
     // or a crash inside the ~60s autosave window would lose the item (gone from
     // both the vault and the pfile). ch is who received it.
     ch->getPC( )->save( );
+}
+
+/*-------------------------------------------------------------------------
+ * the command -- resolve which cell the room context opens, then run the ops
+ *
+ * One command, two cells decided by the room: a bank room opens the caller's
+ * PERSONAL vault (kind="player", key=pc name); a clan-hall room (its clan tag ==
+ * the caller's clan) opens the CLAN vault (kind="clan", key=clan tag). Immortals
+ * bypass the clan-membership requirement so they can service any hall they stand
+ * in. The optional immortal override '*<name>' targets another cell of whichever
+ * kind the current room implies (a player at a bank, a clan at a clan hall).
+ * Flowers has no clan-tagged hall rooms, so its members never reach the clan
+ * branch -- no clan vault, by design.
+ *------------------------------------------------------------------------*/
+CMDRUN( vault )
+{
+    lang_t lang = viewerLang( ch );
+
+    if ( ch->is_npc( ) ) {
+        ch->pecho( lmsg( lang, "Not for mobs.", "Не для мобов.", "Не для мобів." ) );
+        return;
+    }
+
+    DLString args = constArguments;
+
+    // Peek at a leading '*<name>' override without committing the consume until we
+    // know it's a legit immortal override.
+    DLString overrideName;
+    {
+        DLString probe = args;
+        DLString first = probe.getOneArgument( );
+        if ( !first.empty( ) && first.at( 0 ) == '*' ) {
+            if ( !ch->is_immortal( ) ) {
+                ch->pecho( lmsg( lang,
+                    "Only immortals can open someone else's vault.",
+                    "Только бессмертные могут открыть чужое хранилище.",
+                    "Лише безсмертні можуть відкрити чуже сховище." ) );
+                return;
+            }
+            overrideName = first.substr( 1 );
+            args = probe;                        // commit: '*name' is now consumed
+        }
+    }
+
+    // Context = the room. Clan hall takes precedence over a bank (a clan hall is
+    // never also a money bank, but the order makes the intent explicit).
+    bool atClanHall = ch->in_room != 0
+        && ch->in_room->pIndexData->clan != clan_none
+        && ( ch->is_immortal( ) || ch->in_room->pIndexData->clan == ch->getClan( ) );
+
+    Behavior *bankBhv = behaviorManager->findExisting( "bank" );
+    bool inBank = bankBhv != 0
+        && ch->in_room != 0
+        && ch->in_room->pIndexData->behaviors.isSet( bankBhv->getIndex( ) );
+
+    DLString kind, key, ownerLabel;
+
+    if ( atClanHall ) {
+        kind = "clan";
+        if ( !overrideName.empty( ) ) {
+            if ( !vault_safe_name( overrideName ) ) {
+                ch->pecho( lmsg( lang,
+                    "Usage: vault *<clan> [subcommand]  (letters/digits only)",
+                    "Использование: vault *<клан> [подкоманда]  (только буквы/цифры)",
+                    "Використання: vault *<клан> [підкоманда]  (лише літери/цифри)" ) );
+                return;
+            }
+            key = overrideName.toLower( );
+            ownerLabel = vault_capitalize( overrideName );
+        }
+        else {
+            // Member (or immortal) opens the hall's own clan cell.
+            key = ch->in_room->pIndexData->clan.getName( ).toLower( );
+        }
+    }
+    else if ( inBank ) {
+        kind = "player";
+        if ( !overrideName.empty( ) ) {
+            if ( !vault_safe_name( overrideName ) ) {
+                ch->pecho( lmsg( lang,
+                    "Usage: vault *<owner> [subcommand]  (letters/digits only)",
+                    "Использование: vault *<владелец> [подкоманда]  (только буквы/цифры)",
+                    "Використання: vault *<власник> [підкоманда]  (лише літери/цифри)" ) );
+                return;
+            }
+            // Key is the pfile-canonical lowercase form (delete/rename cleanup and
+            // the owner's own vault land on the same cell); label stays capitalized.
+            key = overrideName.toLower( );
+            ownerLabel = vault_capitalize( overrideName );
+        }
+        else {
+            PCharacter *pch = ch->getPC( );
+            if ( pch == 0 ) {
+                ch->pecho( lmsg( lang,
+                    "You have no vault.",
+                    "У тебя нет хранилища.",
+                    "У тебе немає сховища." ) );
+                return;
+            }
+            key = pch->getName( ).toLower( );
+        }
+    }
+    else {
+        ch->pecho( lmsg( lang,
+            "You need to be at a bank (for your own vault) or in your clan's hall (for the clan vault).",
+            "Чтобы добраться до своего хранилища, нужно быть в банке, а до кланового -- в зале клана.",
+            "Щоб дістатися до свого сховища, треба бути в банку, а до кланового -- у залі клану." ) );
+        return;
+    }
+
+    vault_run_ops( ch, kind, key, ownerLabel, args, lang );
 }

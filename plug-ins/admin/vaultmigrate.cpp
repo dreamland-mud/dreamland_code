@@ -13,6 +13,7 @@
  * manifest this produces.
  */
 #include <map>
+#include <set>
 #include <vector>
 #include <sstream>
 #include <fstream>
@@ -254,6 +255,223 @@ static void vaultmigrate_go( Character *ch, DLString rest, bool mansion103 )
     page_to_char( buf.str( ).c_str( ), ch );
 }
 
+/*-------------------------------------------------------------------------
+ * Clan-stash migration: empty in-world clan storage (wardrobes, safes, donation
+ * pits, parked bags, relic containers) into per-clan vault cells. Mirror of the
+ * personal migration but keyed by the ROOM's clan tag, with a reset-content
+ * carve-out so items the area re-seeds (e.g. the black rose in the invader skull)
+ * stay put. Owned bags are purged empty like personal litter; unowned area
+ * furniture is left as an empty shell for the Phase-3 area-XML removal (the relic
+ * skull is kept entirely -- only its stashed non-reset contents move).
+ *------------------------------------------------------------------------*/
+
+// A clan-stash container = a container sitting directly in a clan-tagged room, not
+// pinned keepHere. Ownership is NOT a filter (clan furniture has no owner); the
+// go-phase decides per container whether to purge (owned bag) or keep the shell.
+static bool vaultmigrate_is_clanstash( Object *obj )
+{
+    if (obj->pIndexData == 0)
+        return false;
+    if (obj->in_room == 0)                       // sits directly in a room
+        return false;
+    if (obj->item_type != ITEM_CONTAINER)
+        return false;
+    if (obj->in_room->pIndexData->clan == clan_none)   // clan-tagged rooms only
+        return false;
+    if (IS_SET(obj->in_room->room_flags, ROOM_GODS_ONLY|ROOM_MANSION))
+        return false;                                  // spare gods-only / mansion, like is_litter
+    if (!obj->getProperty( "keepHere" ).empty( ))
+        return false;
+    return true;
+}
+
+// Obj vnums an area reset seeds INTO this container ('P' resets whose arg3 is the
+// container's vnum). Those respawn on reset, so migrating them would dupe -- they
+// are left in place. Reads the container's ROOM reset list.
+static void vaultmigrate_clan_reset_vnums( Object *container, std::set<int> &out )
+{
+    if (container->in_room == 0 || container->pIndexData == 0)
+        return;
+    int cvnum = container->pIndexData->vnum;
+    ResetList &resets = container->in_room->pIndexData->resets;
+    for (size_t i = 0; i < resets.size( ); i++) {
+        RESET_DATA *r = resets[i];
+        if (r == 0 || r->command != 'P' || r->arg3 != cvnum)
+            continue;
+        if (r->arg1 > 0)
+            out.insert( r->arg1 );
+        for (size_t k = 0; k < r->vnums.size( ); k++)
+            out.insert( r->vnums[k] );
+    }
+}
+
+// A content item is reset-origin (never migrated) if the engine tagged the
+// instance when a reset placed it (reset_obj != 0), OR the area seeds its vnum
+// into this container. The second catches a rose that came from the container's
+// onFetch replenisher rather than a reset instance.
+static bool vaultmigrate_is_reset_content( Object *item, const std::set<int> &resetVnums )
+{
+    if (item->reset_obj != 0)
+        return true;
+    if (item->pIndexData != 0 && resetVnums.count( item->pIndexData->vnum ) > 0)
+        return true;
+    return false;
+}
+
+static void vaultmigrate_goclan( Character *ch, DLString rest )
+{
+    DLString target = rest.getOneArgument( );
+    if (target.empty( )) {
+        ch->pecho( "Usage: vaultmigrate goclan <clan>   (one clan -- pilot this first)" );
+        ch->pecho( "       vaultmigrate goclan all       (every clan -- destructive)" );
+        return;
+    }
+    DLString targetKey = target.toLower( );
+    bool doAll = (targetKey == "all");
+
+    // Pass 1: snapshot the target containers (bank_deposit mutates object_list, so
+    // we must not walk-and-mutate). Clan-stash containers sit directly in rooms and
+    // are never nested in one another, so these pointers stay valid across pass 2.
+    std::vector<Object *> containers;
+    for (Object *obj = object_list; obj != 0; obj = obj->next) {
+        if (!vaultmigrate_is_clanstash( obj ))
+            continue;
+        DLString clanKey = obj->in_room->pIndexData->clan.getName( ).toLower( );
+        if (!doAll && clanKey != targetKey)
+            continue;
+        containers.push_back( obj );
+    }
+
+    if (containers.empty( )) {
+        if (doAll)
+            ch->pecho( "No clan-stash containers found -- nothing to migrate." );
+        else
+            ch->pecho( "No clan-stash container in clan '" + target + "'." );
+        return;
+    }
+
+    int containersDone = 0, bagsPurged = 0;
+    int itemsBanked = 0, itemsKeptReset = 0, itemsLeft = 0;
+
+    for (size_t i = 0; i < containers.size( ); i++) {
+        Object *cont = containers[i];
+        Room *room = cont->in_room;                  // captured before any extract
+        DLString clanKey = room->pIndexData->clan.getName( ).toLower( );
+        DLString owner = cont->getOwner( );
+
+        std::set<int> resetVnums;
+        vaultmigrate_clan_reset_vnums( cont, resetVnums );
+
+        // Suppress the per-deposit auto-save of the whole room (O(n^2) freeze on a
+        // big hall); save the room ONCE after, with the flag restored. Same idiom
+        // as vaultmigrate_go / reset_room.
+        dreamland->removeOption( DL_SAVE_OBJS );
+
+        Object *next = 0;
+        for (Object *it = cont->contains; it != 0; it = next) {
+            next = it->next_content;                 // capture: bank_deposit extracts it
+            if (vaultmigrate_is_reset_content( it, resetVnums )) {
+                itemsKeptReset++;
+                continue;                            // area re-seeds it -- leave it
+            }
+            if (bank_deposit( it, "clan", clanKey ))
+                itemsBanked++;
+            else
+                itemsLeft++;                         // NOSAVEDROP / write failure
+        }
+
+        // Owned player-parked bag emptied clean -> purge the shell (like personal
+        // litter). Unowned area furniture (wardrobe/safe/pit/relic skull) is left
+        // for the Phase-3 area-XML removal; the relic skull is kept regardless.
+        if (!owner.empty( ) && cont->contains == 0) {
+            extract_obj( cont );
+            bagsPurged++;
+        }
+        containersDone++;
+
+        dreamland->resetOption( DL_SAVE_OBJS );
+
+        if (room != 0)
+            save_items( room );
+    }
+
+    std::ostringstream buf;
+    buf << "{WClan vault migration -- GO";
+    if (!doAll)
+        buf << " (" << target << ")";
+    buf << "{x  --  changes are LIVE and saved.\n\n";
+    buf << "Containers processed       : " << containersDone << "\n";
+    buf << "Items banked to clan vaults: " << itemsBanked << "\n";
+    buf << "Reset items left in place  : " << itemsKeptReset << "\n";
+    if (bagsPurged > 0)
+        buf << "Empty owned bags purged    : " << bagsPurged << "\n";
+    if (itemsLeft > 0)
+        buf << "{YItems KEPT{x                 : " << itemsLeft
+            << "   (NOSAVEDROP, or a write error)\n";
+
+    page_to_char( buf.str( ).c_str( ), ch );
+}
+
+static void vaultmigrate_dryclan( Character *ch )
+{
+    std::ostringstream dump;
+    dump << "clan\troom_vnum\troom\tcontainer_vnum\towner\titems\treset_kept\tto_migrate\n";
+
+    std::map<DLString,int> byClan;
+    int totalContainers = 0, totalMigrate = 0, totalReset = 0;
+
+    for (Object *obj = object_list; obj != 0; obj = obj->next) {
+        if (!vaultmigrate_is_clanstash( obj ))
+            continue;
+
+        DLString clanKey = obj->in_room->pIndexData->clan.getName( ).toLower( );
+        std::set<int> resetVnums;
+        vaultmigrate_clan_reset_vnums( obj, resetVnums );
+
+        int items = 0, resetKept = 0, migrate = 0;
+        for (Object *it = obj->contains; it != 0; it = it->next_content) {
+            items++;
+            if (vaultmigrate_is_reset_content( it, resetVnums ))
+                resetKept++;
+            else
+                migrate++;
+        }
+
+        DLString owner = obj->getOwner( );
+        dump << clanKey << "\t" << obj->in_room->vnum << "\t" << obj->in_room->getName( ) << "\t"
+             << obj->pIndexData->vnum << "\t" << (owner.empty( ) ? "-" : owner) << "\t"
+             << items << "\t" << resetKept << "\t" << migrate << "\n";
+
+        byClan[clanKey]++;
+        totalContainers++;
+        totalMigrate += migrate;
+        totalReset += resetKept;
+    }
+
+    const char *path = "vaultmigrate-clan-dryrun.txt";
+    std::ofstream fout( path );
+    if (fout) { fout << dump.str( ); fout.close( ); }
+
+    std::ostringstream buf;
+    buf << "{WClan-stash migration -- DRY RUN (nothing changed).{x\n\n";
+    buf << "Clan-stash = a container in a clan-tagged room (wardrobe / safe / pit /\n";
+    buf << "parked bag / relic container), sparing keepHere. Reset-seeded contents\n";
+    buf << "(e.g. the black rose in the invader skull) are left; the rest would move\n";
+    buf << "to the room's clan vault.\n\n";
+    buf << "Containers found : " << totalContainers << "\n";
+    buf << "Items to migrate : " << totalMigrate << "   (would move to clan vaults)\n";
+    buf << "Reset items kept : " << totalReset << "   (left in place)\n\n";
+    buf << "{Wby clan{x:\n";
+    for (std::map<DLString,int>::iterator it = byClan.begin( ); it != byClan.end( ); ++it) {
+        buf << it->first;
+        for (int i = (int)it->first.size( ); i < 16; i++) buf << " ";
+        buf << it->second << " container(s)\n";
+    }
+    buf << "\nFull per-container manifest written to: " << path << "\n";
+
+    page_to_char( buf.str( ).c_str( ), ch );
+}
+
 CMDADM( vaultmigrate )
 {
     if (!ch->isCoder( )) {
@@ -270,6 +488,15 @@ CMDADM( vaultmigrate )
         return;
     }
 
+    if (arg == "goclan") {
+        vaultmigrate_goclan( ch, rest );
+        return;
+    }
+    if (arg == "dryclan") {
+        vaultmigrate_dryclan( ch );
+        return;
+    }
+
     if (arg != "dry" && arg != "dry103") {
         ch->pecho( "Usage:" );
         ch->pecho( "  vaultmigrate dry             report only -- writes nothing" );
@@ -277,6 +504,8 @@ CMDADM( vaultmigrate )
         ch->pecho( "  vaultmigrate go all          migrate EVERY litter bag (destructive, one-time)" );
         ch->pecho( "  vaultmigrate dry103          like dry, but quest bags (vnum 103) IN mansions too" );
         ch->pecho( "  vaultmigrate go103 <owner>|all   migrate/purge those mansion quest bags" );
+        ch->pecho( "  vaultmigrate dryclan         report clan-stash containers -- writes nothing" );
+        ch->pecho( "  vaultmigrate goclan <clan>|all   migrate clan stash into clan vaults (destructive)" );
         return;
     }
 
