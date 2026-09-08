@@ -10,6 +10,9 @@
 #include "fenia/exceptions.h"
 #include "fenia/register-impl.h"
 #include "wrapperbase.h"
+#include "feniamanager.h"
+#include "reglist.h"
+#include "regcontainer.h"
 
 #include "commandmanager.h"
 #include "skillreference.h"
@@ -163,6 +166,49 @@ static bool runFeniaEffect( WordEffect::Pointer effect, Character *ch, Object *o
     return true;
 }
 
+// Give a Fenia handler the "no runnable effect" outcome so the feedback is
+// trilingual and hot-reloadable (.tmp.language.onOutcome) instead of the single
+// C++ "everything went quiet" line. Phase 1 of the ancient-language migration:
+// a validly composed word that commands no power (or a garbled utterance) now
+// tells the speaker what happened, in their own language. Returns true when
+// Fenia owned the output, so the caller skips the C++ fallback. Additive: a
+// missing module or any error leaves the fallback to C++, exactly as before.
+static bool runFeniaOutcome( Character *ch, const DLString &langName, const DLString &wordStr,
+                             Object *obj, Character *victim, const char *outcome )
+{
+    using namespace Scripting;
+
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    static IdRef ID_TMP( "tmp" ), ID_LANGUAGE( "language" ), ID_ONOUTCOME( "onOutcome" );
+
+    try {
+        Register tmp = *Context::root[ID_TMP];
+        Register lng = *tmp[ID_LANGUAGE];
+        Register fn  = *lng[ID_ONOUTCOME];
+
+        if (fn.type != Register::FUNCTION)
+            return false;
+
+        RegisterList args;
+        args.push_back( FeniaManager::wrapperManager->getWrapper( ch ) );
+        args.push_back( Register( langName ) );
+        args.push_back( Register( wordStr ) );
+        args.push_back( obj ? FeniaManager::wrapperManager->getWrapper( obj ) : Register( ) );
+        args.push_back( victim ? FeniaManager::wrapperManager->getWrapper( victim ) : Register( ) );
+        args.push_back( Register( DLString( outcome ) ) );
+
+        Register rc = fn.toFunction( )->invoke( lng, args );
+        return rc.toBoolean( );
+
+    } catch (const ::Exception &e) {
+        FeniaManager::getThis( )->croak( 0, Register( DLString( "language.onOutcome" ) ), e );
+    }
+
+    return false;
+}
+
 void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
 {
     Character *rch, *victim;
@@ -237,7 +283,9 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
     }
     
     if (word.empty( ) || !effect) {
-        oldact(_("{CНа мгновение все вокруг стихло.{x"), ch, 0, 0, TO_ALL );
+        const char *outcome = word.empty( ) ? "noword" : "nopower";
+        if (!runFeniaOutcome( ch, language->getName( ), arg1, obj, victim, outcome ))
+            oldact(_("{CНа мгновение все вокруг стихло.{x"), ch, 0, 0, TO_ALL );
         return;
     }
 
