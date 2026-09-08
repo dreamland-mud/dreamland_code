@@ -38,6 +38,7 @@
 #define VM_BUREAU_1 3078
 #define VM_BUREAU_2 3083
 #define VM_BUREAU_3 3084
+#define VM_QUESTBAG  103   // the quest bag; the mansion-103 sweep targets only this vnum
 
 CLAN(none);
 
@@ -62,6 +63,36 @@ static bool vaultmigrate_is_litter( Object *obj )
     if (IS_SET(r->room_flags, ROOM_MANSION|ROOM_GODS_ONLY))
         return false;
     if (r->pIndexData->clan != clan_none)       // spare clan halls
+        return false;
+    if (!obj->getProperty( "keepHere" ).empty( ))
+        return false;
+
+    return true;
+}
+
+// Like is_litter, but for the mansion-103 sweep: only quest bags (VM_QUESTBAG),
+// and mansion rooms are NOT spared -- a dead player's bag parked in a live player's
+// mansion, or a live owner's bag in their own mansion, still counts. Carried and
+// nested bags are excluded (in_room != 0); gods-only / clan / keepHere stay spared.
+// The per-bag owner test in the go-phase keeps a live owner's own non-103 property
+// untouched -- only the owned quest bag is ever acted on.
+static bool vaultmigrate_is_mansion103( Object *obj )
+{
+    if (obj->pIndexData == 0)
+        return false;
+    if (obj->getOwner( ).empty( ))
+        return false;
+    if (obj->in_room == 0)                       // parked on a floor only -- no carried/nested
+        return false;
+    if (obj->item_type != ITEM_CONTAINER)
+        return false;
+    if (obj->pIndexData->vnum != VM_QUESTBAG)    // ONLY the quest bag
+        return false;
+
+    Room *r = obj->in_room;
+    if (IS_SET(r->room_flags, ROOM_GODS_ONLY))   // still spare gods-only (NOT mansion)
+        return false;
+    if (r->pIndexData->clan != clan_none)        // still spare clan halls
         return false;
     if (!obj->getProperty( "keepHere" ).empty( ))
         return false;
@@ -120,7 +151,7 @@ struct VMOwnerTally {
  * changes, so a deletion cannot respawn on the next reboot from a stale room save
  * (which would also dupe against the vault copy). Targets one owner (pilot this
  * first) or `all`. */
-static void vaultmigrate_go( Character *ch, DLString rest )
+static void vaultmigrate_go( Character *ch, DLString rest, bool mansion103 )
 {
     DLString target = rest.getOneArgument( );
     if (target.empty( )) {
@@ -137,7 +168,7 @@ static void vaultmigrate_go( Character *ch, DLString rest )
     // stay valid across pass 2.
     std::vector<Object *> bags;
     for (Object *obj = object_list; obj != 0; obj = obj->next) {
-        if (!vaultmigrate_is_litter( obj ))
+        if (!( mansion103 ? vaultmigrate_is_mansion103( obj ) : vaultmigrate_is_litter( obj ) ))
             continue;
         if (!doAll && obj->getOwner( ).toLower( ) != targetKey)
             continue;
@@ -232,17 +263,20 @@ CMDADM( vaultmigrate )
 
     DLString rest = constArguments;
     DLString arg = rest.getOneArgument( );
+    bool mansion103 = (arg == "go103" || arg == "dry103");
 
-    if (arg == "go") {
-        vaultmigrate_go( ch, rest );
+    if (arg == "go" || arg == "go103") {
+        vaultmigrate_go( ch, rest, mansion103 );
         return;
     }
 
-    if (arg != "dry") {
+    if (arg != "dry" && arg != "dry103") {
         ch->pecho( "Usage:" );
-        ch->pecho( "  vaultmigrate dry           report only -- writes nothing" );
-        ch->pecho( "  vaultmigrate go <owner>    migrate one owner's litter bag(s) -- pilot this" );
-        ch->pecho( "  vaultmigrate go all        migrate EVERY litter bag (destructive, one-time)" );
+        ch->pecho( "  vaultmigrate dry             report only -- writes nothing" );
+        ch->pecho( "  vaultmigrate go <owner>      migrate one owner's litter bag(s) -- pilot this" );
+        ch->pecho( "  vaultmigrate go all          migrate EVERY litter bag (destructive, one-time)" );
+        ch->pecho( "  vaultmigrate dry103          like dry, but quest bags (vnum 103) IN mansions too" );
+        ch->pecho( "  vaultmigrate go103 <owner>|all   migrate/purge those mansion quest bags" );
         return;
     }
 
@@ -256,7 +290,7 @@ CMDADM( vaultmigrate )
     dump << "owner\texists\troom\tbucket\ttakeable\tvnum\tid\titems\trefused\n";
 
     for (Object *obj = object_list; obj != 0; obj = obj->next) {
-        if (!vaultmigrate_is_litter( obj ))
+        if (!( mansion103 ? vaultmigrate_is_mansion103( obj ) : vaultmigrate_is_litter( obj ) ))
             continue;
 
         DLString owner = obj->getOwner( );
@@ -303,9 +337,14 @@ CMDADM( vaultmigrate )
     // Screen summary + per-owner table.
     std::ostringstream buf;
     buf << "{WVault migration -- DRY RUN (nothing was changed).{x\n\n";
-    buf << "Litter = owned containers on the ground, sparing mansion/clan/gods-only rooms\n";
-    buf << "and keepHere fixtures. Loose bureau items (rings/girths) are not containers and\n";
-    buf << "are left alone.\n\n";
+    if (mansion103)
+        buf << "Mansion-103 sweep = owned quest bags (vnum 103) parked in ANY room incl.\n"
+               "mansions, sparing gods-only / clan / keepHere. Carried and nested bags excluded.\n\n";
+    else {
+        buf << "Litter = owned containers on the ground, sparing mansion/clan/gods-only rooms\n";
+        buf << "and keepHere fixtures. Loose bureau items (rings/girths) are not containers and\n";
+        buf << "are left alone.\n\n";
+    }
     buf << "Containers found : " << totalContainers
         << "   (bureau " << bureauContainers << ", world " << worldContainers << ")\n";
     buf << "Items inside them: " << totalItems << "   (these would move to owner vaults)\n";
