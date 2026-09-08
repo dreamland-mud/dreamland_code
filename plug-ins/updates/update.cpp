@@ -650,41 +650,56 @@ static void rafprog_spec(Room *room)
             paf->type->getAffect()->onSpec(SpellTarget::Pointer(NEW, room), paf);
 }
 
-// A room answers a diving-pulse dispatch iff its instance Fenia wrapper defines
-// on/postDiveUpdate or on/postSpec, or one of its prototype behaviors defines
-// DiveUpdate/Spec (traps, deathtraps, room specs). Read the same guts the dispatch
-// fires from (triggerFunction / behaviors_have_trigger), so the registry can never
-// disagree with what would actually run.
-static bool room_has_diving_handler( Room *r )
+// Classify a room's diving responders, reading the same guts the dispatch fires
+// from (triggerFunction / behaviors_have_trigger) so the registry can never disagree
+// with what would run. Returns whether the room responds at all; sets *occupantGated
+// true iff its ONLY responder is a trap/deathtrap-style onDiveUpdate behavior (no
+// instance wrapper handler, no room Spec behavior). Those handlers do all their work
+// inside room.ppl.forEach -- an empty room is a pure no-op -- so an occupant-gated
+// room can be skipped while nobody is present. (Only trap/deathtrap define
+// onDiveUpdate today, and both are occupant-driven; a future occupant-INDEPENDENT
+// onDiveUpdate behavior must not rely on this gate.)
+static bool room_diving_class( Room *r, bool &occupantGated )
 {
     static Scripting::IdRef onDiveUpdateId("onDiveUpdate"), postDiveUpdateId("postDiveUpdate");
     static Scripting::IdRef onSpecId("onSpec"), postSpecId("postSpec");
 
+    bool instance = false;
     WrapperBase *base = r->getWrapper( );
     if (base) {
         Scripting::Register prog;
-        if (base->triggerFunction(onDiveUpdateId, prog) || base->triggerFunction(postDiveUpdateId, prog)
-         || base->triggerFunction(onSpecId, prog)       || base->triggerFunction(postSpecId, prog))
-            return true;
+        instance = base->triggerFunction(onDiveUpdateId, prog) || base->triggerFunction(postDiveUpdateId, prog)
+                || base->triggerFunction(onSpecId, prog)       || base->triggerFunction(postSpecId, prog);
     }
 
-    return behaviors_have_trigger(r->pIndexData->behaviors, onDiveUpdateId, postDiveUpdateId)
-        || behaviors_have_trigger(r->pIndexData->behaviors, onSpecId, postSpecId);
+    bool behDive = behaviors_have_trigger(r->pIndexData->behaviors, onDiveUpdateId, postDiveUpdateId);
+    bool behSpec = behaviors_have_trigger(r->pIndexData->behaviors, onSpecId, postSpecId);
+
+    occupantGated = behDive && !instance && !behSpec;
+    return instance || behDive || behSpec;
 }
 
-// Precomputed diving responders. Trap/room-spec responders are prototype behaviors,
-// fixed for the life of a boot and re-scanned on every rebuild, so the player-facing
-// trap path is never stale. The only runtime-mutable case -- a room method bound live
-// via 'cs post' -- self-heals on the rebuild cadence below; a reboot rebuilds it on the
-// first pulse. No cross-plugin invalidation hook needed.
-static RoomSet roomDiving;
+// Two responder sets, rebuilt on the first pulse and every ~10 min (self-heal for a
+// live 'cs post' bind; a reboot rebuilds on pulse 1). roomDivingAlways: instance
+// handlers or room Spec behaviors, which can do room-level work with nobody present,
+// so they run every pulse. roomDivingOccupant: pure trap/deathtrap rooms, dispatched
+// only when actually occupied.
+static RoomSet roomDivingAlways;
+static RoomSet roomDivingOccupant;
 
 static void rebuild_diving_registry( )
 {
-    roomDiving.clear( );
-    for (auto &r: roomInstances)
-        if (room_has_diving_handler(r))
-            roomDiving.insert(r);
+    roomDivingAlways.clear( );
+    roomDivingOccupant.clear( );
+    for (auto &r: roomInstances) {
+        bool occupantGated = false;
+        if (!room_diving_class(r, occupantGated))
+            continue;
+        if (occupantGated)
+            roomDivingOccupant.insert(r);
+        else
+            roomDivingAlways.insert(r);
+    }
 }
 
 void diving_update( )
@@ -692,22 +707,30 @@ void diving_update( )
     ProfilerBlock profiler("diving_update", 100);
     static long dv_calls = 0;
 
-    // First call, then every ~10 min: rebuild the responder set (self-heal for a
-    // live 'cs post' bind) and log its size against the old full-walk count.
-    if (dv_calls % 150 == 0) {
+    if (dv_calls % 150 == 0)
         rebuild_diving_registry( );
-        LogStream::sendNotice( ) << "DivingStat: responders=" << roomDiving.size( )
-            << " affected=" << roomAffected.size( )
-            << " (was walking " << roomInstances.size( ) << ")" << endl;
-    }
-    dv_calls++;
 
-    // Dispatch domain = static responders + rooms carrying a live affect (its onSpec
-    // fires through rafprog_spec). roomAffected is the engine's canonical room-affect
-    // set; copy the union so a dispatch that mutates roomAffected can't invalidate the
-    // iterator we are walking.
-    RoomSet todo(roomDiving);
+    // Dispatch domain = always-responders + rooms with a live affect (roomAffected,
+    // for the rafprog_spec onSpec branch) + only those trap/deathtrap rooms that hold
+    // someone this pulse -- a cheap C++ people-list check, no Fenia entry. Copy the
+    // union so a dispatch mutating the live sets can't invalidate the iterator.
+    RoomSet todo(roomDivingAlways);
     todo.insert(roomAffected.begin( ), roomAffected.end( ));
+    long occupied = 0;
+    for (auto &r: roomDivingOccupant)
+        if (r->people != 0) {
+            todo.insert(r);
+            occupied++;
+        }
+
+    if (dv_calls % 150 == 0)
+        LogStream::sendNotice( ) << "DivingStat: always=" << roomDivingAlways.size( )
+            << " occupant=" << roomDivingOccupant.size( )
+            << " occupied=" << occupied
+            << " affected=" << roomAffected.size( )
+            << " dispatched=" << todo.size( )
+            << " (was walking " << roomInstances.size( ) << ")" << endl;
+    dv_calls++;
 
     for (auto &r: todo) {
         try {
