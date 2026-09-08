@@ -17,6 +17,7 @@
 #include "merc.h"
 #include "loadsave.h"
 #include "string_utils.h"
+#include "mudtags.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -76,7 +77,8 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
         if (!ed) 
             ed = wall->addProperDescription();
 
-        const DLString &text = wall->getExtraDescr(ed->keyword, LANG_DEFAULT);            
+        mudtags_strip_web( arguments, ch );
+        const DLString &text = wall->getExtraDescr(ed->keyword, LANG_DEFAULT);
         wall->addExtraDescr(ed->keyword, String::addLine(text, arguments), LANG_DEFAULT);
 
         oldact(_("Ты выцарапываешь $O5 надпись на $o6."), ch, wall, nail, TO_CHAR );
@@ -158,7 +160,8 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
                 ed = paper->addExtraDescr(keyword, DLString::emptyString, LANG_DEFAULT);
         }
 
-        const DLString &text = paper->getExtraDescr(ed->keyword, LANG_DEFAULT);            
+        mudtags_strip_web( arguments, ch );
+        const DLString &text = paper->getExtraDescr(ed->keyword, LANG_DEFAULT);
         paper->addExtraDescr(ed->keyword, String::addLine(text, arguments), LANG_DEFAULT);
         
         if (fFace)

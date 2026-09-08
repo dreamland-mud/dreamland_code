@@ -28,6 +28,7 @@
 #include "ban.h"
 #include "descriptor.h"
 #include "act.h"
+#include "mudtags.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -519,6 +520,17 @@ bool NoteCommand::doPost( PCharacter *ch, XMLAttributeNoteData::Pointer attr )
 
     Note note;
     notedata->commit( &note );
+
+    // Strip player-injected {h web/command tags before the note reaches recipients'
+    // screens (mirrors the channel/utter fix #1082). ch is the live author, a valid
+    // viewer, so an injected {I/{L can't deref; colours still render per recipient.
+    DLString noteText = note.getText( );
+    mudtags_strip_web( noteText, ch );
+    note.setText( noteText );
+    DLString noteSubject = note.getSubject( );
+    mudtags_strip_web( noteSubject, ch );
+    note.setSubject( noteSubject );
+
     note.godsSeeAlways = thread->godsSeeAlways;
     thread->attach( &note );
 
