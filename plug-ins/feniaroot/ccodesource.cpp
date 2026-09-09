@@ -265,7 +265,7 @@ CMDADM( codesource )
         return;
     }
 
-    if(arg_is(cmd, "del")) {
+    if(arg_is_strict(cmd, "del")) {
         // Reap one CodeSource by breaking its intra-cs reference cycles: drop
         // every function body, then let reference counting collect. A truly
         // unreachable island (a pre-P2b duplicate, or a cyclic zombie like sigils
@@ -317,7 +317,15 @@ CMDADM( codesource )
             << pch->getNameC( ) << " -- author=" << cs.author
             << " refcnt=" << cs.refcnt << " functions=" << cs.functions.size( ) << endl;
 
-        DLString name = cs.name;   // collection below may free `cs`; keep a copy
+        DLString name = cs.name;   // report after; `cs` may be gone by then
+
+        // Pin the source across the whole sequence, so the last function's
+        // collection can't collapse the CodeSource from INSIDE functions.erase()
+        // -- that nested teardown ends with an rb_tree node_count write into the
+        // just-freed cs chunk (inert on glibc, but real UB; review N2). With the
+        // pin held, functions.erase() returns cleanly and the collapse fires at
+        // top level from keep.clear() below, on an empty function map.
+        CodeSource::Pointer keep(&cs);
 
         // Pin every function first (raw link), so nulling one body -- which fires
         // the ClosureExp dtors that unlink sibling functions -- cannot drop a
@@ -338,6 +346,11 @@ CMDADM( codesource )
         }
         for(size_t k = 0; k < fns.size( ); k++)
             fns[k]->unlink( );
+
+        // Release the pin -- if every function collected, the cs collapses here,
+        // at top level, with an empty function map. Must run BEFORE the survivor
+        // check or a fully-collected source would misreport as survived.
+        keep.clear( );
 
         if (CodeSource::manager->find(csid) == CodeSource::manager->end( ))
             ch->pecho("Сценарий %d (%s) удалён: цикл разорван, сборщик забрал его.",
