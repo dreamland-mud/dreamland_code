@@ -211,6 +211,58 @@ static bool runFeniaHook( Character *ch, const DLString &langName, const DLStrin
     return false;
 }
 
+// Hand a doUtter command-layer *check* to a Fenia handler under .tmp.language.onCheck
+// so the design roll is tunable and hot-reloadable. Unlike runFeniaHook (which emits
+// output and returns "did Fenia handle it"), this returns the check's boolean verdict;
+// `handled` reports whether a Fenia handler actually answered, so the caller can fall
+// back to its own C++ roll when the module is absent. `chance` is the speaker's
+// effective language-skill %. Additive and shared by all four languages: a missing
+// module or any error leaves the decision to C++.
+static bool runFeniaCheck( Character *ch, const DLString &langName, const DLString &wordStr,
+                           const char *kind, int chance, bool &handled )
+{
+    using namespace Scripting;
+
+    handled = false;
+
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    static IdRef ID_TMP( "tmp" ), ID_LANGUAGE( "language" ), ID_ONCHECK( "onCheck" );
+
+    try {
+        Register tmp = *Context::root[ID_TMP];
+        Register lng = *tmp[ID_LANGUAGE];
+        Register fn  = *lng[ID_ONCHECK];
+
+        if (fn.type != Register::FUNCTION)
+            return false;
+
+        RegisterList args;
+        args.push_back( FeniaManager::wrapperManager->getWrapper( ch ) );
+        args.push_back( Register( langName ) );
+        args.push_back( Register( wordStr ) );
+        args.push_back( Register( DLString( kind ) ) );
+        args.push_back( Register( chance ) );
+
+        Register rc = fn.toFunction( )->invoke( lng, args );
+        // Read the verdict BEFORE marking handled, so a malformed future handler --
+        // one whose return makes toBoolean() throw (a NONE/OBJECT/FUNCTION value) --
+        // fails safe to the C++ roll via the catch below, the way the sibling
+        // runFeniaHook does, instead of leaving handled=true and silently skipping
+        // the fallback (never garbling). The shipped "garble" handler returns a bool,
+        // so this path never throws today; the guard is for later onCheck kinds.
+        bool verdict = rc.toBoolean( );
+        handled = true;
+        return verdict;
+
+    } catch (const ::Exception &e) {
+        FeniaManager::getThis( )->croak( 0, Register( DLString( "language.onCheck" ) ), e );
+    }
+
+    return false;
+}
+
 void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
 {
     Character *rch, *victim;
@@ -225,8 +277,21 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
         return;
     
     chance = language->getEffective( ch );
-    
-    if (number_percent( ) > chance || ch->isAffected( gsn_garble )) {
+
+    // The pronunciation/garble roll -- the last command-layer design check that was
+    // still hardcoded here. Fenia (.tmp.language.onCheck, kind "garble") owns the
+    // verdict when the module is present, so the difficulty is hot-reloadable; C++
+    // keeps its own roll as the fallback. The gsn_garble curse forces a garble
+    // regardless and is deliberately not Fenia's call. The garble *output* is already
+    // Fenia (runFeniaHook onEcho, below).
+    bool checkHandled = false;
+    bool garbled = runFeniaCheck( ch, language->getName( ), arg1, "garble", chance, checkHandled );
+    if (!checkHandled)
+        garbled = number_percent( ) > chance;
+    if (ch->isAffected( gsn_garble ))
+        garbled = true;
+
+    if (garbled) {
         if (!runFeniaHook( ch, language->getName( ), arg1, 0, 0, "garble", "onEcho" )) {
             ch->pecho( _("Тебя подвело произношение.") );
             ch->recho( POS_RESTING, _("%^C1 бормочет что-то неразборчивое."), ch );
