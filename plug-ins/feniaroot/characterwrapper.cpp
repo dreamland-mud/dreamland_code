@@ -3770,7 +3770,7 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown/5inpack -- 5 = an upgrade the char already carries unworn, render says put it on), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -3841,12 +3841,19 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // gettable copies of a fully-claimed limited item means its reset stands bare (see
     // the skip below).
     std::map<int,int> spawned, gettable;
+    // Vnums the char carries UNWORN (loose in inventory OR inside a carried bag): an
+    // upgrade in the pack must be routed "put it on" (GA_INPACK), not sent on a
+    // treasure hunt, and must survive the unobtainable gate below. rootCarrier walks
+    // out of nested containers, so a bagged copy the char holds counts too.
+    std::map<int,int> carriedVnum;
     for (::Object *o = object_list; o; o = o->next) {
         int vn = o->pIndexData->vnum;
         spawned[vn]++;
         Character *rc = ga_rootCarrier( o );
         if (rc == 0 || rc->is_npc( ))
             gettable[vn]++;
+        else if (rc == target && o->wear_loc == wear_none)
+            carriedVnum[vn] = 1;
     }
 
     // Area-quest reward map: obj vnum -> quest vnum. Two declarative sources: a
@@ -3981,14 +3988,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // vnum already worn (so we never recommend re-getting one).
     std::map<int,double> wornSlot;
     std::map<int,int> wornVnum;
-    // Vnums the char carries UNWORN. An upgrade sitting in the pack must not be sent
-    // on a treasure hunt ("whereabouts unknown") -- the sage says "put it on" instead.
-    std::map<int,int> carriedVnum;
     for (::Object *o = target->carrying; o; o = o->next_content) {
-        if (o->wear_loc == wear_none) {
-            carriedVnum[o->pIndexData->vnum] = 1;
+        if (o->wear_loc == wear_none)   // unworn -> handled by carriedVnum (census loop above)
             continue;
-        }
         wornVnum[o->pIndexData->vnum] = 1;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
@@ -4097,8 +4099,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // count resets gate on, update_areas.cpp) -- and not one of them is reachable
         // (each is worn/carried by a player). The reset source stands bare and no new
         // copy will spawn, so no one can get it: keep it out of the recs and the
-        // percentile, like an item with no known route. (count < limit is left in --
-        // the reset can still produce a copy, so it stays a valid, if scarce, goal.)
+        // percentile, like an item with no known route. (count < limit passes this
+        // skip -- the reset can still make a copy -- but a count<limit item with no
+        // reachable copy still drops out downstream at the present gate below, unless
+        // the char carries it or it is a quest reward.)
         // ...but if the char is the one holding it (carried unworn), it is reachable
         // to them right now -- keep it so the sage can say "put it on".
         if (pObj->limit > 0 && pObj->count >= pObj->limit && gettable[pObj->vnum] == 0
