@@ -33,10 +33,33 @@ Register
 CodeSource::eval(Register thiz)
 {
     manager->put(id, *this);
+
+    // A re-post / hot reload of an already-compiled source: recompile its
+    // functions IN PLACE (reuseMode) instead of appending new ids, so live
+    // closures over (this->id, fnId) keep a valid pointer and pick up the new
+    // body -- and no duplicate CodeSource is left behind. Pin the source across
+    // the recompile: overwriting every function's back-reference to it churns
+    // this->refcnt and could otherwise let it hit zero and self-collect mid-eval.
+    // See Trello #2857 (P2b).
+    bool reusing = evaled && !functions.empty();
     evaled = true;
 
+    CodeSource::Pointer keep;
+    if (reusing) {
+        keep = this;
+        functions.reuseMode = true;
+        functions.reuseCursor = 1;
+    }
+
     istringstream is(content);
-    return FeniaParser(is, *this).eval( thiz );
+    try {
+        Register result = FeniaParser(is, *this).eval( thiz );
+        functions.reuseMode = false;
+        return result;
+    } catch (...) {
+        functions.reuseMode = false;
+        throw;
+    }
 }
 
 void
@@ -61,6 +84,22 @@ CodeSource::Manager::Manager( )
 CodeSource::Manager::~Manager( )
 {
     manager = 0;
+}
+
+CodeSource *
+CodeSource::Manager::findByName( const DLString &name )
+{
+    // One-off / internal evals ("<eval command>", "<recursive eval>", ...) are
+    // never reused: each is a throwaway, not a named scenario. Only a real named
+    // source collapses to a single CodeSource on re-post.
+    if (name.empty( ) || name.at(0) == '<')
+        return 0;
+
+    for (iterator i = begin( ); i != end( ); i++)
+        if (i->name == name)
+            return &*i;
+
+    return 0;
 }
 
 void

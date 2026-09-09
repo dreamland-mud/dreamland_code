@@ -31,8 +31,18 @@ public:
     inline void erase(id_t id);
     inline T &at(id_t id);
     inline T &allocate();
-    
+
     typename T::id_t lastId;
+
+    // Recompile-in-place support for CodeSource::eval on a re-posted scenario.
+    // While reuseMode is set, allocate() hands back existing slots by sequential
+    // id (reuseCursor) instead of minting fresh ones, so a hot reload overwrites
+    // its Function objects in place -- live closures over (csId, fnId) keep a
+    // valid pointer and pick up the new body -- instead of leaving a duplicate
+    // CodeSource behind. Only ever set on a CodeSource's own `functions` manager
+    // during eval; false everywhere else. See Trello #2857 (P2b).
+    bool reuseMode;
+    typename T::id_t reuseCursor;
 };
 
 }

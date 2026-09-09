@@ -429,8 +429,11 @@ CMDADM( codesource )
             return;
         } 
         
-        CodeSource &cs = CodeSource::manager->allocate();
-        
+        // Reuse the existing source of this name so a re-post replaces it in
+        // place instead of minting a duplicate CodeSource. See P2b, Trello #2857.
+        CodeSource *csReuse = CodeSource::manager->findByName(csa->name);
+        CodeSource &cs = csReuse ? *csReuse : CodeSource::manager->allocate();
+
         cs.author = pch->getNameC();
         cs.name = csa->name;
 
