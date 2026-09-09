@@ -130,7 +130,7 @@ CMDADM( codesource )
             << "     {Wload all{x [<каталог>] - рекурсивно загрузить все сценарии из [под]каталога" << endl
             << "     {Wsave{x <номер>|<имя>   - сохранить сценарий на диск" << endl
             << "     {Wsave all{x             - сохранить все сценарии на диск" << endl
-            << "     {Wdelete{x <ном> [force] - удалить cs из базы и памяти; force -- даже используемый (для циклов, сверься с findrefs)" << endl;
+            << "     {Wdel{x <ном> force      - удалить cs: разорвать циклы, сборщик забирает недостижимый (сверься с findrefs)" << endl;
 
         ch->send_to( buf );
         return;
@@ -265,19 +265,32 @@ CMDADM( codesource )
         return;
     }
 
-    if(arg_is(cmd, "delete")) {
-        // Force-collect one CodeSource: drop it from the Fenia DB and memory.
-        // Without `force` it only reaps a source none of whose functions is
-        // referenced (refcnt<=0 on every one) -- exactly what the boot fsck sweep
-        // would collect, so it is always safe. `force` reaps regardless, for a
-        // cyclic/unreachable zombie that reference counting can never collect
-        // (sigils, Setbat): it is the operator's assertion -- checked with
-        // `findrefs <id>` first -- that nothing live still points into it.
-        // Forcing a still-REACHABLE source frees functions a live closure will
-        // later invoke or save, which crashes; that is on the caller. Engine
-        // one-off names ("<...>") are never deletable. See Trello #2857 (P3).
+    if(arg_is(cmd, "del")) {
+        // Reap one CodeSource by breaking its intra-cs reference cycles: drop
+        // every function body, then let reference counting collect. A truly
+        // unreachable island (a pre-P2b duplicate, or a cyclic zombie like sigils
+        // #61639 / Setbat #41573 that refcount alone can never free) goes away
+        // entirely, DB record included. A source still held from OUTSIDE survives
+        // with dead bodies (invoke throws NullPointer, never a use-after-free) and
+        // is restored intact on the next reboot -- so mis-reaping a still-reachable
+        // source degrades gracefully, it does not crash. `force` is required
+        // because this cannot itself prove unreachability (that is P4); the
+        // operator asserts it with `findrefs <id>` first. Engine one-off names
+        // ("<...>") are never deletable. See Trello #2857 (P3).
+        if (!ch->isCoder( )) {
+            ch->pecho(_("Только для кодеров."));
+            return;
+        }
+
         DLString idarg = args.getOneArgument( );
-        bool force = arg_is(args, "force");
+        DLString flag  = args.getOneArgument( );
+        bool force = (flag == "force");
+
+        Integer num;
+        if (idarg.empty( ) || !Integer::tryParse(num, idarg)) {
+            ch->pecho("Синтаксис: {Wcs del <числовой id> force{x. Сначала сверься с {Wfindrefs <id>{x.");
+            return;
+        }
 
         id_t csid;
         if (!cs_by_number(pch, idarg, csid))
@@ -290,33 +303,49 @@ CMDADM( codesource )
             return;
         }
 
-        bool referenced = false;
-        for(FunctionManager::iterator fi = cs.functions.begin( );
-                fi != cs.functions.end( ); fi++)
-            if (fi->refcnt > 0) {
-                referenced = true;
-                break;
-            }
-
-        if (referenced && !force) {
-            ch->pecho("Сценарий %d (%s) ещё используется (%d функц.). Проверь ссылки "
-                      "через {Wfindrefs %d{x; если недостижим -- {Wcs delete %d force{x.",
-                      csid, cs.name.c_str( ), (int)cs.functions.size( ), csid, csid);
+        if (!force) {
+            ch->pecho("Удаление cs %d (%s) необратимо и может задеть живые ссылки. "
+                      "Проверь {Wfindrefs %d{x; если сценарий недостижим -- {Wcs del %d force{x.",
+                      csid, cs.name.c_str( ), csid, csid);
             return;
         }
 
-        // Snapshot to the log before the point of no return; content stays
-        // recoverable from the DB backup.
+        // Snapshot before the point of no return; content stays recoverable from
+        // the DB backup.
         LogStream::sendWarning( )
-            << "cs delete: reaping cs " << csid << " (" << cs.name << ") by "
+            << "cs del: force-reaping cs " << csid << " (" << cs.name << ") by "
             << pch->getNameC( ) << " -- author=" << cs.author
-            << " refcnt=" << cs.refcnt << " functions=" << cs.functions.size( )
-            << (force ? " [FORCE]" : "") << endl;
+            << " refcnt=" << cs.refcnt << " functions=" << cs.functions.size( ) << endl;
 
-        DLString name = cs.name;   // finalize() erases and frees `cs`
-        cs.finalize( );
+        DLString name = cs.name;   // collection below may free `cs`; keep a copy
 
-        ch->pecho("Сценарий %d (%s) удалён из базы и памяти.", csid, name.c_str( ));
+        // Pin every function first (raw link), so nulling one body -- which fires
+        // the ClosureExp dtors that unlink sibling functions -- cannot drop a
+        // sibling to refcnt 0 and erase it from the map mid-loop. Then null the
+        // bodies (cycles broken), then unpin: a function with no external
+        // reference now collects, and ~ClosureExp never touches a freed sibling
+        // because no body survives into the teardown (the numbered-function UAF,
+        // review F3). Iterate a pointer snapshot, not the live map.
+        std::vector<Function *> fns;
+        FunctionManager::iterator fi;
+        for(fi = cs.functions.begin( ); fi != cs.functions.end( ); fi++) {
+            fns.push_back( &*fi );
+            fi->link( );
+        }
+        for(size_t k = 0; k < fns.size( ); k++) {
+            fns[k]->stmts = StmtNodeList::Pointer( );
+            fns[k]->argNames = ArgNames::Pointer( );
+        }
+        for(size_t k = 0; k < fns.size( ); k++)
+            fns[k]->unlink( );
+
+        if (CodeSource::manager->find(csid) == CodeSource::manager->end( ))
+            ch->pecho("Сценарий %d (%s) удалён: цикл разорван, сборщик забрал его.",
+                    csid, name.c_str( ));
+        else
+            ch->pecho("Сценарий %d (%s): циклы разорваны, но на него ещё есть ВНЕШНИЕ "
+                    "ссылки -- не удалён (перезагрузка восстановит). Проверь {Wfindrefs %d{x.",
+                    csid, name.c_str( ), csid);
         return;
     }
 
