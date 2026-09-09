@@ -53,6 +53,15 @@ public:
     }
 private:
     Function *function;
+
+    // Identity of `function`, captured when the closure is built. Teardown
+    // (~Closure) must NOT dereference the raw `function` pointer: a mass free
+    // (the boot fsck sweep) can destroy the owning CodeSource, and with it this
+    // function, before this closure is freed -- leaving `function` dangling.
+    // These ids let ~Closure re-resolve the function through the managers and
+    // unlink it only while it is genuinely still alive. See Trello #2857 (P2a).
+    uint32_t csId = 0;
+    Function::id_t fnId = 0;
 };
 
 }

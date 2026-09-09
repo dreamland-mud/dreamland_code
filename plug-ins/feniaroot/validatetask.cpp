@@ -8,6 +8,7 @@
 #include "fenia/object.h"
 #include "fenia/function.h"
 #include "fenia/codesource.h"
+#include "fenia/closure.h"
 #include "fenia/handler.h"
 #include "fenia/context.h"
 #include "fenia/phase.h"
@@ -49,7 +50,7 @@ ValidateTask::run( )
             
             os << endl;
 
-            // DO NOT free. See the comment on freeList below.
+            freeList.push_back( Register( &*oi ) );
         }
 
     for(si = Scripting::CodeSource::manager->begin(); si != Scripting::CodeSource::manager->end(); si++)
@@ -67,51 +68,73 @@ ValidateTask::run( )
                     os << " cs: GONE";
 
                 os << " line: " << fi->source.line << " (fn:" << fi->getId() << ")" << endl;
-                // DO NOT free. See the comment on freeList below.
+
+                // Wrap the function in a throwaway Closure so its teardown runs
+                // through Closure::~Closure, whose (csId, fnId) re-resolve keeps
+                // the unlink safe even if the owning CodeSource is freed earlier
+                // in this same sweep. The Closure links the function, pinning it
+                // (and, through it, its CodeSource) until this list is cleared.
+                freeList.push_back( Register( new Closure(NULL, &*fi) ) );
             }
 
-    // freeList and csList are deliberately left EMPTY, so this task reports and
-    // frees nothing. It used to collect every refcnt<=0 object and every
-    // refcnt<=0 function, then destroy them all at once by clearing the list.
+    // Collect first, free second. Both loops above snapshot each orphan behind
+    // its own reference (a Register that links the object; a temporary Closure
+    // that links the function) BEFORE anything is freed, so the managers are
+    // never mutated while still being iterated, and clearing a list then frees
+    // each orphan independently of the others.
     //
-    // That destruction is not safe. Freeing an unreferenced object runs
-    // ~IdContainer -> ~XMLRegister -> ~Closure -> Function::unlink ->
-    // Function::finalize, which calls manager->erase(id) on the function
-    // manager owned by the function's CodeSource. When a hot reload has already
-    // replaced that CodeSource, the manager pointer is dangling and the boot
-    // dies with SIGSEGV inside the fsck (observed 2026-08-08: manager at 0x68,
-    // four consecutive crash-looping boots, game down until the binary changed).
+    // This is the sweep that crash-looped four boots on 2026-08-08 (manager at
+    // 0x68). Freeing an unreferenced object cascades ~Closure ->
+    // Function::unlink -> Function::finalize; back then ~Closure dereferenced a
+    // raw Function* whose CodeSource a hot reload had already replaced, and
+    // finalize walked that freed function manager. It is safe to re-enable now
+    // because two guards landed first: Function::finalize looks the CodeSource
+    // up by a stored id and confirms identity instead of dereferencing
+    // source.source (P1, #1105), and Closure::~Closure re-resolves its function
+    // by (csId, fnId) and skips the unlink when the owner is already gone (P2a).
+    // See the Fenia GC plan, Trello #2857.
     //
-    // Repeatedly hot-reloading a large shared file -- utils/object: destruction
-    // and public/utils/mob were each posted several times in one day -- leaves
-    // exactly this shape behind, because .tmp.object.* / .tmp.mob.* maps hold
-    // closures into the CodeSource that was replaced. The orphans are harmless
-    // where they sit: they are unreferenced, they already persist in the DB
-    // across boots, and nothing dereferences them. Only the attempt to collect
-    // them is fatal.
-    //
-    // So: keep the diagnostics, drop the sweep. A real collector has to prove
-    // the owning CodeSource is still alive before unlinking a function, which
-    // is a bigger change than an outage should carry.
-    if (!freeList.empty( ))
-        LogStream::sendWarning( ) 
-            << "fenia fsck: " << freeList.size( ) 
-            << " unref objects/functions cleared" << endl;
-    
-    freeList.clear( );
+    // Any exception is swallowed with a loud log rather than propagated: a
+    // half-freed graph must not take the boot down. The orphans left behind are
+    // harmless where they sit -- exactly as they were while the sweep was off.
+    size_t freeCount = freeList.size( );
+
+    try {
+        freeList.clear( );
+        if (freeCount)
+            LogStream::sendWarning( )
+                << "fenia fsck: " << freeCount
+                << " unref objects/functions cleared" << endl;
+    } catch (...) {
+        LogStream::sendError( )
+            << "fenia fsck: sweep of unref objects/functions aborted mid-free"
+            << endl;
+    }
 
     for(si = Scripting::CodeSource::manager->begin(); si != Scripting::CodeSource::manager->end(); si++)
-        if (si->refcnt == 0)
+        if (si->refcnt == 0)  {
             LogStream::sendWarning( )
                 << "fenia fsck:  unreferenced source " << si->getId()
-                << " (" << si->name << ") -- reported, not freed" << endl;
-    
-    if (!csList.empty( ))
-        LogStream::sendWarning( ) 
-            << "fenia fsck: " << csList.size( ) 
-            << " unref sources cleared" << endl;
+                << " (" << si->name << ")" << endl;
+            csList.push_back( &*si );
+        }
 
-    csList.clear( );
+    // A refcnt==0 CodeSource is referenced by nothing -- in particular no live
+    // Function names it (each would link it), so its function manager is empty
+    // and erasing it cascades into nothing. This loop never crashed; it was the
+    // object/function sweep above that needed P1+P2a to become safe.
+    size_t csCount = csList.size( );
+
+    try {
+        csList.clear( );
+        if (csCount)
+            LogStream::sendWarning( )
+                << "fenia fsck: " << csCount
+                << " unref sources cleared" << endl;
+    } catch (...) {
+        LogStream::sendError( )
+            << "fenia fsck: sweep of unref sources aborted mid-free" << endl;
+    }
 
     /*can't fail*/
     Scripting::Object *root = Context::current->root.toObject( );
