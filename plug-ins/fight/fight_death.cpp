@@ -49,6 +49,7 @@
 #include "merc.h"
 #include "damage.h"
 #include "fight.h"
+#include "skillmanager.h"
 #include "vnum.h"
 #include "def.h"
 #include "l10n.h"
@@ -148,8 +149,29 @@ protected:
                 return;
             }
             else {
-                killer->pecho(_("{WТы методично обдираешь все вещи с трупа:{x"));
-                interpret_raw(killer, "get", "all %lld", corpse->getID());
+                // Pull each item by id, skipping red-hot (incandescent) ones. An
+                // incandescent item burns whoever picks it up (get.cpp oprog_get) and can
+                // kill the looter the instant autoloot grabs it -- leave it in the corpse
+                // to be taken by hand, deliberately. get_obj_list resolves the item by id.
+                static int gsn_incandescent = SkillManager::getThis( )->lookup("incandescent");
+                Room *startRoom = killer->in_room;
+                bool announced = false;
+                Object *obj_next;
+                for (Object *obj = corpse->contains; obj; obj = obj_next) {
+                    obj_next = obj->next_content;
+
+                    if (gsn_incandescent >= 0 && obj->isAffected(gsn_incandescent))
+                        continue;
+
+                    if (!announced) {
+                        killer->pecho(_("{WТы методично обдираешь все вещи с трупа:{x"));
+                        announced = true;
+                    }
+                    interpret_raw(killer, "get", "%lld %lld", obj->getID(), corpse->getID());
+
+                    if (killer->isDead( ) || killer->in_room != startRoom)
+                        return;
+                }
             }
         }
     }

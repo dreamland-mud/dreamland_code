@@ -176,7 +176,12 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
 
     gain = std::max ( (int)(number_percent( ) < gain * 100 / 24), gain / 24 );
     
-    ch->hit = std::min( (ch->is_npc()?gain*7:gain) + ch->hit, (int)ch->max_hit);
+    // NPCs regenerate at 7x the per-tick player rate. On newbie levels that let low
+    // mobs out-heal a newbie's damage, so halve the NPC bonus below level 15.
+    int npcGain = gain * 7;
+    if (ch->getRealLevel() < 15)
+        npcGain = gain * 7 / 2;
+    ch->hit = std::min( (ch->is_npc()?npcGain:gain) + ch->hit, (int)ch->max_hit);
 }
 
 
