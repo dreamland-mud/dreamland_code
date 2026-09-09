@@ -2973,8 +2973,9 @@ NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "(vnum): поиск по вну
 // mask cannot select them. Fenia's .tmp.advice.LIGHT_SLOT returns this same value.
 #define GA_SLOT_LIGHT (1 << 30)
 
-// How the sage tells you to get an item.
-enum { GA_KILL = 0, GA_BUY = 1, GA_PICKUP = 2, GA_QUEST = 3, GA_UNKNOWN = 4 };
+// How the sage tells you to get an item. GA_INPACK: the char already carries it
+// unworn -- the sage says "put it on" instead of pointing at a route.
+enum { GA_KILL = 0, GA_BUY = 1, GA_PICKUP = 2, GA_QUEST = 3, GA_UNKNOWN = 4, GA_INPACK = 5 };
 
 // Mobs that make a room "guarded": aggressive, or any kind of assist.
 #define GA_ASSIST_MASK (ASSIST_ALL|ASSIST_ALIGN|ASSIST_RACE|ASSIST_PLAYERS|ASSIST_GUARD|ASSIST_VNUM)
@@ -3514,6 +3515,18 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
         double eff = weaponAve * (20 + skillPct) / 100.0;
         s += w.weaponWeight * eff;
     }
+    // Base armour class: an armour item's value[0..2] (pierce/bash/slash AC) is real
+    // defence the affect loop never sees -- APPLY_AC scores enchant/spell deltas only,
+    // so a plate's own plates counted for nothing and a stat-only cloth out-ranked it.
+    // Credit the per-class average (value3/exotic dropped, mirroring the engine's own
+    // `compare`) with the same level-decaying ac weight APPLY_AC uses, so an armour's
+    // N-per-class value scores like an APPLY_AC of -N: real armour counts as armour
+    // where it matters (low level), fading to 0 by L40. Read from the prototype -- the
+    // base class is not rolled or enchanted (enchant armour adds an APPLY_AC affect).
+    if (itemType == ITEM_ARMOR && pProto != 0) {
+        double acAvg = (pProto->value[0] + pProto->value[1] + pProto->value[2]) / 3.0;
+        s += w.ac * acAvg;
+    }
     // Combat spell-procs get scored on what they actually cast (value table x
     // proc chance x item level). That supersedes the flat +50, which was only a
     // stand-in for "this triggers something good in a fight" -- the proc IS that
@@ -3769,7 +3782,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     REMOVE_BIT( slotFilter, ITEM_TAKE );    // slot-browse mode: rank only this wear slot
     GAWeights w;
     if (profile == "melee" || profile == "agile" || profile == "hybrid") {
-        w.hp = 1.0; w.mana = 0.1; w.manaGain = 0.05; w.healGain = 0.3; w.dr = 12.0; w.hr = 6.0; w.saves = 5.0;
+        // saves: a melee's defence is hp/ac, not save-vs-spell, so a save point is
+        // worth less to it than to a caster. 3/pt (was 5) so a pure +save cloth no
+        // longer out-values real body armour (hp/hitroll/dex + armour class). The
+        // caster branch below keeps 5 -- a squishy caster leans on saves defensively.
+        w.hp = 1.0; w.mana = 0.1; w.manaGain = 0.05; w.healGain = 0.3; w.dr = 12.0; w.hr = 6.0; w.saves = 3.0;
         w.weaponWeight = 12.0;   // melee: weapon output valued the same as its damroll
         w.stat[0] = 3; w.stat[1] = 1; w.stat[2] = 1; w.stat[3] = 2; w.stat[4] = 3; w.stat[5] = 0;
         w.caster = false;
@@ -3964,9 +3981,14 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // vnum already worn (so we never recommend re-getting one).
     std::map<int,double> wornSlot;
     std::map<int,int> wornVnum;
+    // Vnums the char carries UNWORN. An upgrade sitting in the pack must not be sent
+    // on a treasure hunt ("whereabouts unknown") -- the sage says "put it on" instead.
+    std::map<int,int> carriedVnum;
     for (::Object *o = target->carrying; o; o = o->next_content) {
-        if (o->wear_loc == wear_none)
+        if (o->wear_loc == wear_none) {
+            carriedVnum[o->pIndexData->vnum] = 1;
             continue;
+        }
         wornVnum[o->pIndexData->vnum] = 1;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
@@ -4077,7 +4099,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // copy will spawn, so no one can get it: keep it out of the recs and the
         // percentile, like an item with no known route. (count < limit is left in --
         // the reset can still produce a copy, so it stays a valid, if scarce, goal.)
-        if (pObj->limit > 0 && pObj->count >= pObj->limit && gettable[pObj->vnum] == 0)
+        // ...but if the char is the one holding it (carried unworn), it is reachable
+        // to them right now -- keep it so the sage can say "put it on".
+        if (pObj->limit > 0 && pObj->count >= pObj->limit && gettable[pObj->vnum] == 0
+            && carriedVnum.count( pObj->vnum ) == 0)
             continue;
 
         double sc = ga_score( target, pObj, w, rawStat, capStat, false );
@@ -4094,11 +4119,15 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (pObj->level > chLevel)
             obtain *= 0.6;
 
-        // How to get it: a quest reward wins; else the easiest reset source; else no
-        // known source. Fold a mild guard demotion into the ranking (cheap, guard
-        // only -- the rich path-cost band is computed later, per final pick).
+        // How to get it: carried-in-pack wins (it is already in hand); then a quest
+        // reward; else the easiest reset source; else no known source. Fold a mild
+        // guard demotion into the ranking (cheap, guard only -- the rich path-cost
+        // band is computed later, per final pick).
+        bool inPack = carriedVnum.count( pObj->vnum ) != 0;
         GAAcq ac;
-        if (questReward.count( pObj->vnum )) {
+        if (inPack) {
+            ac.method = GA_INPACK; ac.aux = 0; ac.guard = 0;
+        } else if (questReward.count( pObj->vnum )) {
             ac.method = GA_QUEST; ac.aux = questReward[pObj->vnum]; ac.guard = 0;
         } else {
             std::map<int,GAAcq>::iterator it = acq.find( pObj->vnum );
@@ -4116,6 +4145,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             obtain *= 0.85;
         else
             obtain *= 0.6;
+        if (inPack)
+            obtain = 1.0;            // in hand -> fully obtainable, no scarcity/guard penalty
 
         GACand c;
         c.pObj = pObj; c.slot = slot; c.score = sc; c.obtain = obtain; c.value = 0;
@@ -4126,8 +4157,17 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // momentarily dead. A limited item is present iff a copy is physically reachable
         // now (gettable>0) OR it is a quest reward (route = complete the quest, needs no
         // copy -- and quest copies sit on the PCs who finished, so gettable==0 is the
-        // norm there). Otherwise (limited, no reachable copy, no quest) -> "unknown".
-        c.present = pObj->limit <= 0 || gettable[pObj->vnum] > 0 || ac.method == GA_QUEST;
+        // norm there), OR the char already carries it (GA_INPACK). Otherwise (limited,
+        // no reachable copy, no quest, not in the pack) -> not obtainable right now.
+        c.present = pObj->limit <= 0 || gettable[pObj->vnum] > 0
+                 || ac.method == GA_QUEST || inPack;
+        // Don't recommend gear the player cannot obtain right now. A limited item whose
+        // every copy sits in other players' hands (none reachable, no quest route) is
+        // present=0: drop it from the recs AND from the slot ceiling, exactly as an
+        // unknown-route item is dropped, instead of surfacing it as a top pick tagged
+        // "whereabouts unknown". Unlimited / quest / in-pack gear is present -> kept.
+        if (!c.present)
+            continue;
         if (secondCopy) {
             // A second copy never feeds the percentile, optimal or set passes -- the
             // char already wears one. Held only for the slot-browse fill list.
