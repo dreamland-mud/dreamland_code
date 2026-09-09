@@ -472,6 +472,73 @@ static void vaultmigrate_dryclan( Character *ch )
     page_to_char( buf.str( ).c_str( ), ch );
 }
 
+/*
+ * goclanforce <vnum> -- force-drain ONE storage-furniture vnum. Migrates EVERY
+ * content item (NO reset-filter: the container and its area reset are removed in
+ * the same window, so nothing respawns and nothing dupes), then purges the
+ * emptied shell and re-saves its room (save_items preserves the room's other
+ * objects). Targeted by vnum so it never touches ritual fixtures (altars, apple
+ * tree, relic skull) -- the operator runs it only on the vnums slated for
+ * removal. NOSAVEDROP items bank_deposit refuses die with the shell (they never
+ * survived a reboot anyway).
+ */
+static void vaultmigrate_goclanforce( Character *ch, DLString rest )
+{
+    DLString arg = rest.getOneArgument( );
+    if (!arg.isNumber( )) {
+        ch->pecho( "Usage: vaultmigrate goclanforce <vnum>   (drain+purge one storage container vnum)" );
+        return;
+    }
+    int vnum = arg.toInt( );
+
+    std::vector<Object *> containers;
+    for (Object *obj = object_list; obj != 0; obj = obj->next) {
+        if (obj->pIndexData == 0 || obj->pIndexData->vnum != vnum)
+            continue;
+        if (!vaultmigrate_is_clanstash( obj ))
+            continue;
+        containers.push_back( obj );
+    }
+
+    if (containers.empty( )) {
+        ch->pecho( "No clan-stash container of vnum " + arg + " found." );
+        return;
+    }
+
+    int containersDone = 0, itemsBanked = 0, itemsDestroyed = 0;
+
+    for (size_t i = 0; i < containers.size( ); i++) {
+        Object *cont = containers[i];
+        Room *room = cont->in_room;                   // captured before any extract
+        DLString clanKey = room->pIndexData->clan.getName( ).toLower( );
+
+        dreamland->removeOption( DL_SAVE_OBJS );       // one save after, not per deposit
+
+        Object *next = 0;
+        for (Object *it = cont->contains; it != 0; it = next) {
+            next = it->next_content;                  // bank_deposit extracts on success
+            if (bank_deposit( it, "clan", clanKey ))
+                itemsBanked++;
+            else
+                itemsDestroyed++;                     // NOSAVEDROP -- dies with the shell
+        }
+
+        extract_obj( cont );                          // purge the emptied shell
+        containersDone++;
+
+        dreamland->resetOption( DL_SAVE_OBJS );
+        if (room != 0)
+            save_items( room );
+    }
+
+    std::ostringstream buf;
+    buf << "{WForce-drain vnum " << vnum << " -- LIVE and saved.{x\n\n";
+    buf << "Containers drained + purged : " << containersDone << "\n";
+    buf << "Items banked to clan vaults : " << itemsBanked << "\n";
+    buf << "Items destroyed (NOSAVEDROP): " << itemsDestroyed << "\n";
+    ch->pecho( buf.str( ).c_str( ) );
+}
+
 CMDADM( vaultmigrate )
 {
     if (!ch->isCoder( )) {
@@ -492,6 +559,10 @@ CMDADM( vaultmigrate )
         vaultmigrate_goclan( ch, rest );
         return;
     }
+    if (arg == "goclanforce") {
+        vaultmigrate_goclanforce( ch, rest );
+        return;
+    }
     if (arg == "dryclan") {
         vaultmigrate_dryclan( ch );
         return;
@@ -506,6 +577,7 @@ CMDADM( vaultmigrate )
         ch->pecho( "  vaultmigrate go103 <owner>|all   migrate/purge those mansion quest bags" );
         ch->pecho( "  vaultmigrate dryclan         report clan-stash containers -- writes nothing" );
         ch->pecho( "  vaultmigrate goclan <clan>|all   migrate clan stash into clan vaults (destructive)" );
+        ch->pecho( "  vaultmigrate goclanforce <vnum>  drain EVERY item from one storage vnum + purge it" );
         return;
     }
 
