@@ -32,18 +32,40 @@ CodeSource::eval()
 Register
 CodeSource::eval(Register thiz)
 {
-    manager->put(id, *this);
-
     // A re-post / hot reload of an already-compiled source: recompile its
     // functions IN PLACE (reuseMode) instead of appending new ids, so live
     // closures over (this->id, fnId) keep a valid pointer and pick up the new
-    // body -- and no duplicate CodeSource is left behind. Pin the source across
-    // the recompile: overwriting every function's back-reference to it churns
-    // this->refcnt and could otherwise let it hit zero and self-collect mid-eval.
-    // See Trello #2857 (P2b).
+    // body -- and no duplicate CodeSource is left behind. See Trello #2857 (P2b).
     bool reusing = evaled && !functions.empty();
+
+    if (reusing) {
+        // Validate the new source on a throwaway BEFORE mutating the live one.
+        // The in-place recompile below overwrites Function bodies as the parser
+        // reduces, so a syntax error mid-file would otherwise leave the running
+        // scenario half new / half old and overwrite its DB record with broken
+        // content. Parse a probe copy first (compile only -- no run, no bindings,
+        // no DB write); on a parse error this throws and the live source and its
+        // DB record are never touched. The probe holds no external references, so
+        // it collects by refcount as this parser tears down (memory only: evaled
+        // stays false, so finalize never calls manager->del). See review F3.
+        //
+        // The numbered `function N` literal claims an explicit id the reuse
+        // cursor does not account for and would cross-wire; that syntax is
+        // obsolete (P2b makes it pointless) and unused on live -- it is
+        // unsupported on re-post rather than guarded here. See review F2.
+        CodeSource &probe = manager->allocate();
+        probe.name = "<recompile probe>";
+        probe.content = content;
+        istringstream pis(content);
+        FeniaParser(pis, probe).compile();
+    }
+
+    manager->put(id, *this);
     evaled = true;
 
+    // Pin the source across an in-place recompile: overwriting every function's
+    // back-reference to it churns this->refcnt and could otherwise let it hit
+    // zero and self-collect mid-eval.
     CodeSource::Pointer keep;
     if (reusing) {
         keep = this;

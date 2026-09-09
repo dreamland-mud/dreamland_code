@@ -67,19 +67,29 @@ Function::reverse(ostream &os, const DLString &nextline) const
 Register
 Function::invoke(Scope &sroot, Register thiz, RegisterList const &args)
 {
-    if (!argNames || !stmts)
+    // Pin the compiled body (and arg names) for the life of this frame. A P2b
+    // in-place recompile -- cs post / hot reload -- can overwrite this Function's
+    // `stmts` while a thread is parked here on a .scheduler.sleep yield. The AST
+    // is Pointer-linked root-to-leaf, so holding the root we started on keeps
+    // every parked frame's nodes alive: the parked frame finishes on the OLD
+    // body, new invocations get the new one. Without this the swap frees the tree
+    // under the parked pthread -> use-after-free on resume. See Trello #2857 (P2b).
+    ArgNames::Pointer argNamesLocal = argNames;
+    StmtNodeList::Pointer stmtsLocal = stmts;
+
+    if (!argNamesLocal || !stmtsLocal)
         throw NullPointerException();
 
     RegisterList::const_iterator ali = args.begin();
-    ArgNames::const_iterator ani = argNames->begin();
+    ArgNames::const_iterator ani = argNamesLocal->begin();
     
     sroot.addVar(ID_THIS);
     sroot.setVar(ID_THIS, thiz);
 
-    DLString expected = argNames->toString();
+    DLString expected = argNamesLocal->toString();
     DLString actual(args.size());
 
-    for(;ani != argNames->end();ani++, ali++) {
+    for(;ani != argNamesLocal->end();ani++, ali++) {
         if(ali == args.end())
             throw NotEnoughArgumentsException(expected, actual);
         else {
@@ -96,7 +106,7 @@ Function::invoke(Scope &sroot, Register thiz, RegisterList const &args)
     BTPushNode bt;
 
     StmtNodeList::iterator i;
-    for(i=stmts->begin();i != stmts->end(); i++) {
+    for(i=stmtsLocal->begin();i != stmtsLocal->end(); i++) {
         FlowCtl fc = (*i)->eval();
         
         if(fc.type == FlowCtl::BREAK)
