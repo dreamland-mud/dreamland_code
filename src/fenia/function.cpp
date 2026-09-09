@@ -115,8 +115,27 @@ Function::finalize()
 {
     // A function recovered against a missing code source has no manager to be
     // removed from. It is not owned by anything, so letting it go is enough.
-    if (source.source)
-        source.source->functions.erase(id);
+    if (!source.source)
+        return;
+
+    // The owning CodeSource may already be gone. A mass free (the boot fsck
+    // sweep) frees objects and code sources in separate passes, so a CodeSource
+    // can be destroyed before a Closure that still holds a raw pointer to one of
+    // its functions; that function's `source.source` is then a non-null DANGLING
+    // pointer, and the old dereference `source.source->functions.erase` walked a
+    // freed function manager -- the 2026-08-08 SIGSEGV (four crash-looping
+    // boots, "manager at 0x68"). Never dereference it: look the CodeSource up by
+    // the stored id and confirm the live entry is the SAME object before
+    // touching its function manager. (Removes the fatal deref; a full sweep must
+    // still order destruction -- closures before their sources -- see the Fenia
+    // GC collector plan, Trello #2857, P2a.)
+    CodeSource::Manager::iterator it = CodeSource::manager->find(source.csId);
+    if (it == CodeSource::manager->end())
+        return;                                  // cs already collected
+    if (&*it != source.source.getPointer())
+        return;                                  // stored id now names a different cs (id wrap)
+
+    it->functions.erase(id);
 }
 
 DLString ArgNames::toString() const

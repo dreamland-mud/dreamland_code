@@ -9,6 +9,7 @@
 #ifndef __CODESOURCEREF_H__
 #define __CODESOURCEREF_H__
 
+#include <stdint.h>
 #include <pointer.h>
 #include <xmlvariable.h>
 #include <xmlnode.h>
@@ -23,6 +24,11 @@ public:
     ~CodeSourceRef();
 
     int line;
+    // Id of the owning CodeSource, stored so a dead source can be looked up in
+    // the manager WITHOUT dereferencing `source`, which can dangle when a mass
+    // free destroys the CodeSource before a Closure that still holds one of its
+    // functions. See Function::finalize.
+    uint32_t csId = 0;
     ::Pointer<CodeSource> source;
 };
 
