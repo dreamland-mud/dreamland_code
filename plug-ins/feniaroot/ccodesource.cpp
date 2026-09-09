@@ -129,7 +129,8 @@ CMDADM( codesource )
             << "     {Wload{x <файл>          - загрузить сценарий из файла в каталоге share/DL/fenia" << endl
             << "     {Wload all{x [<каталог>] - рекурсивно загрузить все сценарии из [под]каталога" << endl
             << "     {Wsave{x <номер>|<имя>   - сохранить сценарий на диск" << endl
-            << "     {Wsave all{x             - сохранить все сценарии на диск" << endl;
+            << "     {Wsave all{x             - сохранить все сценарии на диск" << endl
+            << "     {Wdelete{x <ном> [force] - удалить cs из базы и памяти; force -- даже используемый (для циклов, сверься с findrefs)" << endl;
 
         ch->send_to( buf );
         return;
@@ -261,6 +262,61 @@ CMDADM( codesource )
         ch->pecho("  Objects(+handler): %d", objOrphan);
         ch->pecho("  Functions:         %d", fnOrphan);
         ch->pecho("  Всего сценариев в базе: %d", (int)CodeSource::manager->size( ));
+        return;
+    }
+
+    if(arg_is(cmd, "delete")) {
+        // Force-collect one CodeSource: drop it from the Fenia DB and memory.
+        // Without `force` it only reaps a source none of whose functions is
+        // referenced (refcnt<=0 on every one) -- exactly what the boot fsck sweep
+        // would collect, so it is always safe. `force` reaps regardless, for a
+        // cyclic/unreachable zombie that reference counting can never collect
+        // (sigils, Setbat): it is the operator's assertion -- checked with
+        // `findrefs <id>` first -- that nothing live still points into it.
+        // Forcing a still-REACHABLE source frees functions a live closure will
+        // later invoke or save, which crashes; that is on the caller. Engine
+        // one-off names ("<...>") are never deletable. See Trello #2857 (P3).
+        DLString idarg = args.getOneArgument( );
+        bool force = arg_is(args, "force");
+
+        id_t csid;
+        if (!cs_by_number(pch, idarg, csid))
+            return;
+
+        CodeSource &cs = CodeSource::manager->at(csid);
+
+        if (cs.name.empty( ) || cs.name[0] == '<') {
+            ch->pecho("Нельзя удалить служебный сценарий '%s'.", cs.name.c_str( ));
+            return;
+        }
+
+        bool referenced = false;
+        for(FunctionManager::iterator fi = cs.functions.begin( );
+                fi != cs.functions.end( ); fi++)
+            if (fi->refcnt > 0) {
+                referenced = true;
+                break;
+            }
+
+        if (referenced && !force) {
+            ch->pecho("Сценарий %d (%s) ещё используется (%d функц.). Проверь ссылки "
+                      "через {Wfindrefs %d{x; если недостижим -- {Wcs delete %d force{x.",
+                      csid, cs.name.c_str( ), (int)cs.functions.size( ), csid, csid);
+            return;
+        }
+
+        // Snapshot to the log before the point of no return; content stays
+        // recoverable from the DB backup.
+        LogStream::sendWarning( )
+            << "cs delete: reaping cs " << csid << " (" << cs.name << ") by "
+            << pch->getNameC( ) << " -- author=" << cs.author
+            << " refcnt=" << cs.refcnt << " functions=" << cs.functions.size( )
+            << (force ? " [FORCE]" : "") << endl;
+
+        DLString name = cs.name;   // finalize() erases and frees `cs`
+        cs.finalize( );
+
+        ch->pecho("Сценарий %d (%s) удалён из базы и памяти.", csid, name.c_str( ));
         return;
     }
 
