@@ -299,7 +299,8 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
     }
 
     if (effect->isObject( ) && !obj) {
-        ch->pecho(_("Выбери, на какую вещь произнести слово."));
+        if (!runFeniaHook( ch, language->getName( ), arg1, obj, victim, "needobject", "onOutcome" ))
+            ch->pecho(_("Выбери, на какую вещь произнести слово."));
         fUsed = false;
     }
     else if (obj) {
@@ -307,8 +308,10 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
             fUsed = effect->run( ch, obj );
     }
     else {
-        if (fMiss)
-            ch->pecho( _("Твои слова, не достигнув цели, обратились на тебя сам%Gого|ого|у."), ch );
+        if (fMiss) {
+            if (!runFeniaHook( ch, language->getName( ), arg1, obj, victim, "miss", "onOutcome" ))
+                ch->pecho( _("Твои слова, не достигнув цели, обратились на тебя сам%Gого|ого|у."), ch );
+        }
 
         Character *tgt = (!victim ? ch : victim);
         if (!runFeniaEffect( effect, ch, NULL, tgt, fUsed ))
