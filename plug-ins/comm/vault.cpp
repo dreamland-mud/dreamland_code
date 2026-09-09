@@ -493,7 +493,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
 
         // Capture name BEFORE deposit: bank_deposit extracts obj (obj is gone
         // after a true return, and must not be dereferenced).
-        DLString name = obj->getShortDescr( '1', lang );   // nominative, not the raw pad
+        DLString name = obj->getShortDescr( '4', lang );   // accusative: "store <acc> in the vault"
 
         if ( !bank_deposit( obj, kind, key ) ) {
             ch->pecho( lmsg( lang,
@@ -765,7 +765,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
     DLString name;
     for ( Object *o = ch->carrying; o != 0; o = o->next_content )
         if ( o->getID( ) == targetId ) {
-            name = o->getShortDescr( '1', lang );   // nominative, not the raw pad
+            name = o->getShortDescr( '4', lang );   // accusative: "take <acc> out of the vault"
             break;
         }
     if ( name.empty( ) )
