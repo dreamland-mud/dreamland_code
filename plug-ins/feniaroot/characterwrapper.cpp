@@ -3895,7 +3895,6 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (rk->second->areaIndex && IS_SET( rk->second->room_flags, ROOM_NEWBIES_ONLY ))
                 newbieAreas.insert( rk->second->areaIndex );
 
-    Behavior *shopperBhv = behaviorManager->findExisting( "shopper" );
     std::map<int,GAAcq> acq;
     for (std::map<int,RoomIndexData *>::iterator rk = roomIndexMap.begin( ); rk != roomIndexMap.end( ); rk++) {
         RoomIndexData *pRoom = rk->second;
@@ -3936,7 +3935,18 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 if (!lastMob)
                     continue;
                 // Shop stock is 'G' onto a shopkeeper; 'E' on one is its own worn gear.
-                bool trader = shopperBhv && lastMob->behaviors.isSet( shopperBhv->getIndex( ) );
+                // Shopkeepers are old-style behaviors: the prototype carries a
+                // <behavior type="ShopTrader"> XML doc in ->behavior, NOT a bedit entry
+                // in the ->behaviors bitvector, so behaviorManager->findExisting never
+                // sees them (that lookup returned null and every shop read as GA_KILL).
+                // Read the doc's root type attribute -- the idiom MobileBehaviorManager
+                // ::assign uses. All 276 shop mobs in the world are this old style.
+                bool trader = false;
+                if (lastMob->behavior) {
+                    XMLNode::Pointer root = lastMob->behavior->getFirstNode( );
+                    if (root && root->getAttribute( XMLNode::ATTRIBUTE_TYPE ) == "ShopTrader")
+                        trader = true;
+                }
                 if (trader && cmd == 'G') {
                     obj_index_data *po = get_obj_index( a1 );
                     ga_record( acq, a1, GA_BUY, lastMob->vnum, roomVnum, po ? po->cost : 0, 0 );
