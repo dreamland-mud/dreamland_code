@@ -86,7 +86,7 @@ static DLString localize_keyword_marker(const DLString &blob, const DLString &au
             firstSame = word;
         if (wantCyr) {
             // RU and UA share most letters. Classify by language-specific ones:
-            // ы/э/ъ/ё -> RU, і/ї/є/ґ/ʼ -> UA, neither -> ambiguous (fits either).
+            // ы/э/ъ/ё -> RU, і/ї/є/ґ -> UA, neither -> ambiguous (fits either).
             if (String::hasUaSymbol(word)) {
                 if (uaWord.empty()) uaWord = word;
             } else if (String::hasRuSymbol(word)) {
