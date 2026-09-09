@@ -1345,6 +1345,44 @@ void obj_update( void )
             }
         }
 
+        // Trello SaCYP8jV: a takeable item resting on the floor of an air room
+        // falls through an open down exit to the room below -- one room per tick,
+        // so a stack of air rooms drains it to the first solid ground. ITEM_HOVER
+        // stays aloft (the isles floating stone, float-slot trinkets); mansion
+        // floors are exempt -- that's legit player storage, swept only by the
+        // housekeeper block above.
+        if (!obj->in_obj
+            && !carrier
+            && room->getSectorType() == SECT_AIR
+            && IS_SET(obj->wear_flags, ITEM_TAKE)
+            && !IS_SET(obj->extra_flags, ITEM_HOVER)
+            && !IS_SET(room->room_flags, ROOM_MANSION))
+        {
+            EXIT_DATA *pexit = room->exit[DIR_DOWN];
+            if (pexit
+                && pexit->u1.to_room
+                && pexit->u1.to_room != room
+                && !IS_SET(pexit->exit_info, EX_CLOSED))
+            {
+                Room *below = pexit->u1.to_room;
+
+                room->echo(POS_RESTING, MultiMessage(
+                    "%1$^O1 fall%1$ns| down.",
+                    "%1$^O1 пада%1$nет|ют вниз.",
+                    "%1$^O1 пада%1$nє|ють вниз."), obj);
+
+                obj_from_room( obj );
+                obj_to_room( obj, below );
+
+                below->echo(POS_RESTING, MultiMessage(
+                    "%1$^O1 fall%1$ns| from above.",
+                    "%1$^O1 пада%1$nет|ют сверху.",
+                    "%1$^O1 пада%1$nє|ють згори."), obj);
+
+                continue;
+            }
+        }
+
         // Time stops for auctioned items.
         if (auction->item == obj)
             continue;

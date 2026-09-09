@@ -259,7 +259,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     {
         if (obj->in_room 
                 && RoomUtils::isWater(obj->in_room)
-                && !IS_SET(obj->extra_flags, ITEM_WATER_STAND)) 
+                && !IS_SET(obj->extra_flags, ITEM_HOVER))
         {
             ostringstream msg;
             DLString liq = obj->in_room->getLiquid()->getShortDescr(lang);
