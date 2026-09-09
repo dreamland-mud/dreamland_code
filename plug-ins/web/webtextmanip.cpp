@@ -76,7 +76,7 @@ static DLString localize_keyword_marker(const DLString &blob, const DLString &au
     if (String::hasCyrillic(authored) == wantCyr)
         return authored;
 
-    DLString firstSame, ukrWord, ruWord;
+    DLString firstSame, uaWord, ruWord, ambigWord;
     istringstream is(blob);
     DLString word;
     while (is >> word) {
@@ -85,18 +85,29 @@ static DLString localize_keyword_marker(const DLString &blob, const DLString &au
         if (firstSame.empty())
             firstSame = word;
         if (wantCyr) {
+            // RU and UA share most letters. Classify by language-specific ones:
+            // ы/э/ъ/ё -> RU, і/ї/є/ґ/ʼ -> UA, neither -> ambiguous (fits either).
             if (String::hasUaSymbol(word)) {
-                if (ukrWord.empty()) ukrWord = word;
-            } else {
+                if (uaWord.empty()) uaWord = word;
+            } else if (String::hasRuSymbol(word)) {
                 if (ruWord.empty()) ruWord = word;
+            } else {
+                if (ambigWord.empty()) ambigWord = word;
             }
         }
     }
 
-    if (lang == LANG_UA && !ukrWord.empty())
-        return ukrWord;
-    if (lang == LANG_RU && !ruWord.empty())
-        return ruWord;
+    // Prefer an exact-language word, then an ambiguous one. Never hand a UA viewer
+    // a RU-specific word: that was the bug -- "символи" carries no UA-only letter,
+    // so it landed in the RU bucket and UA viewers were shown "символы".
+    if (lang == LANG_UA) {
+        if (!uaWord.empty()) return uaWord;
+        if (!ambigWord.empty()) return ambigWord;
+    }
+    if (lang == LANG_RU) {
+        if (!ruWord.empty()) return ruWord;
+        if (!ambigWord.empty()) return ambigWord;
+    }
     if (!firstSame.empty())
         return firstSame;
     return authored;
