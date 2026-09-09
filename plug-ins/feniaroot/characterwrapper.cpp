@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <set>
 #include <jsoncpp/json/json.h>
 
 #include "logstream.h"
@@ -3877,6 +3878,23 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // olc.cpp badresets walk) and records how each object is obtained, keeping the
     // lowest-guard source: bought from a shopkeeper (guard 0), taken off a mob you
     // kill (guard roomMax), or picked up off the floor / from a container.
+    // The newbie-only tutorial zones (Moehewa, MUD School) are barred to a char the game
+    // won't let in, so their reset gear must not be advised to one (bug 3334: gremlin
+    // boots in Moehewa recommended to a char who cannot reach the cave). The real gate is
+    // can_see (character.cpp:50, enforced in walkment): getRealLevel() > PK_MIN_LEVEL
+    // cannot enter a newbies_only room -- that is the level-6+ first-lifer the bug hits.
+    // The isNewbie half additionally covers a low remort: Moehewa is a one-way onboarding
+    // zone, so a non-newbie who technically passes the level gate still cannot walk in.
+    // Any room flagged newbies_only marks the whole gated area; collect those areas once,
+    // only for a gated asker (an in-onboarding newbie still gets the advice).
+    bool advGated = !target->is_immortal( )
+        && (target->getRealLevel( ) > PK_MIN_LEVEL || (pch && !Player::isNewbie( pch )));
+    std::set<AreaIndexData *> newbieAreas;
+    if (advGated)
+        for (std::map<int,RoomIndexData *>::iterator rk = roomIndexMap.begin( ); rk != roomIndexMap.end( ); rk++)
+            if (rk->second->areaIndex && IS_SET( rk->second->room_flags, ROOM_NEWBIES_ONLY ))
+                newbieAreas.insert( rk->second->areaIndex );
+
     Behavior *shopperBhv = behaviorManager->findExisting( "shopper" );
     std::map<int,GAAcq> acq;
     for (std::map<int,RoomIndexData *>::iterator rk = roomIndexMap.begin( ); rk != roomIndexMap.end( ); rk++) {
@@ -3890,6 +3908,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // too. DUNGEON/CLAN/MANSION stay in: those are legit, reachable loot.
         if (pRoom->areaIndex
             && IS_SET(pRoom->areaIndex->area_flag, AREA_SYSTEM|AREA_HIDDEN|AREA_WIZLOCK))
+            continue;
+
+        // Newbie-gated zone, gated asker: unreachable to them, skip its reset gear
+        // (bug 3334). Quest rewards bypass this scan and are already onboarding-gated.
+        if (advGated && pRoom->areaIndex && newbieAreas.count( pRoom->areaIndex ))
             continue;
 
         int roomMax = 0;
