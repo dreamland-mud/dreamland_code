@@ -77,8 +77,16 @@ static DLString vault_capitalize( const DLString &s )
 // Is 'tok' one of a small set of subcommand synonyms? (English + RU + UA.)
 static bool vault_word_in( const DLString &tok, const char *const *set )
 {
+    if ( tok.empty( ) )
+        return false;
+    // Prefix-match like every other command word, so "покл" reaches "покласти" and
+    // "dep" reaches "deposit". str_prefix returns false when tok IS a prefix of the
+    // set word. Standard MUD command-beats-keyword semantics: a bare "vault <kw>"
+    // withdrawal whose keyword is a 1-3 char prefix of a subcommand word now routes
+    // to that subcommand instead -- accepted, same as every other prefix-matched
+    // command. Numbers ("vault 3") never collide.
     for ( int i = 0; set[i] != 0; i++ )
-        if ( tok == set[i] )
+        if ( !str_prefix( tok.c_str( ), set[i] ) )
             return true;
     return false;
 }
