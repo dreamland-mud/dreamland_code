@@ -31,6 +31,12 @@ using namespace Scripting;
  */
 static Function * findFunction(CodeSource::id_t csId, Function::id_t fnId)
 {
+    // The global manager is null once CodeSource::Manager::~Manager has run.
+    // ~Closure now calls this at teardown, so guard the pointer here rather than
+    // lean on destruction order keeping every closure death ahead of it.
+    if (!CodeSource::manager)
+        return 0;
+
     CodeSource::Manager::iterator cs = CodeSource::manager->find(csId);
 
     if (cs == CodeSource::manager->end())
@@ -44,7 +50,8 @@ static Function * findFunction(CodeSource::id_t csId, Function::id_t fnId)
     return &*fn;
 }
 
-Closure::Closure(Scope *start, Function *f) : function(f)
+Closure::Closure(Scope *start, Function *f)
+    : function(f), csId(f->source.csId), fnId(f->getId())
 {
     copyScope(start);
     function->link();
@@ -59,16 +66,17 @@ Closure::Closure(Scope *start, Function *f) : function(f)
  * as broken rather than as a fabricated stand-in, so that it fails loudly at
  * the point of use and gets written back as null on the next save.
  */
-Closure::Closure(XMLFunctionRef &ref) : function(0)
+Closure::Closure(XMLFunctionRef &ref)
+    : function(0), csId(ref.codesource.getValue()), fnId(ref.function.getValue())
 {
-    function = findFunction(ref.codesource.getValue(), ref.function.getValue());
+    function = findFunction(csId, fnId);
 
     if (function)
         function->link();
     else
         LogStream::sendError()
             << "fenia: closure points at a function that is gone: cs "
-            << ref.codesource.getValue() << " fn " << ref.function.getValue()
+            << csId << " fn " << fnId
             << " -- loading it as broken, it will be saved as null" << endl;
 
     clear();
@@ -81,7 +89,18 @@ Closure::Closure(XMLFunctionRef &ref) : function(0)
 
 Closure::~Closure()
 {
-    if (function)
+    // Do NOT dereference the raw `function` pointer here. A mass free (the boot
+    // fsck sweep, ValidateTask) can destroy the owning CodeSource -- and, with
+    // it, this function -- before this closure is freed, so `function` may
+    // dangle; the old unconditional `function->unlink()` then wrote refcnt-- to
+    // freed memory (part of the 2026-08-08 crash-loop). Re-resolve by the stored
+    // (csId, fnId) and unlink only when the live function is still the exact
+    // object we linked. If it is gone, or its id was reused by another code
+    // source, there is nothing of ours left to unlink. See Trello #2857 (P2a).
+    if (!function)
+        return;
+
+    if (findFunction(csId, fnId) == function)
         function->unlink();
 }
 
@@ -147,8 +166,11 @@ Closure::toXMLFunctionRef(XMLFunctionRef &ref)
     if (isBroken())
         return false;
 
-    ref.codesource = function->source.source->getId();
-    ref.function = function->getId();
+    // Use the stored ids rather than dereferencing source.source (its raw
+    // CodeSource* is the pointer P1 stopped trusting). csId/fnId are the same
+    // values isBroken() has just confirmed resolve to a live function.
+    ref.codesource = csId;
+    ref.function = fnId;
 
     ref.environment.clear();
 
