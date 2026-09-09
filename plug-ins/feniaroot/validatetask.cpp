@@ -94,22 +94,20 @@ ValidateTask::run( )
     // by (csId, fnId) and skips the unlink when the owner is already gone (P2a).
     // See the Fenia GC plan, Trello #2857.
     //
-    // Any exception is swallowed with a loud log rather than propagated: a
-    // half-freed graph must not take the boot down. The orphans left behind are
-    // harmless where they sit -- exactly as they were while the sweep was off.
+    // Nothing in this teardown throws: Object::finalize is list surgery with no
+    // DB op, the DereferenceListener is null at boot (cfindref installs it only
+    // during a findrefs scan), and CodeSource::finalize's single manager->del
+    // ran identically in the historical sweep. A throw here would escape a
+    // noexcept destructor and terminate the process regardless, so there is no
+    // catchable frame worth a guard -- the same exposure the sweep carried for
+    // two decades. Any orphan left behind is harmless where it sits, exactly as
+    // it was while the sweep was off.
     size_t freeCount = freeList.size( );
-
-    try {
-        freeList.clear( );
-        if (freeCount)
-            LogStream::sendWarning( )
-                << "fenia fsck: " << freeCount
-                << " unref objects/functions cleared" << endl;
-    } catch (...) {
-        LogStream::sendError( )
-            << "fenia fsck: sweep of unref objects/functions aborted mid-free"
-            << endl;
-    }
+    freeList.clear( );
+    if (freeCount)
+        LogStream::sendWarning( )
+            << "fenia fsck: " << freeCount
+            << " unref objects/functions cleared" << endl;
 
     for(si = Scripting::CodeSource::manager->begin(); si != Scripting::CodeSource::manager->end(); si++)
         if (si->refcnt == 0)  {
@@ -124,17 +122,11 @@ ValidateTask::run( )
     // and erasing it cascades into nothing. This loop never crashed; it was the
     // object/function sweep above that needed P1+P2a to become safe.
     size_t csCount = csList.size( );
-
-    try {
-        csList.clear( );
-        if (csCount)
-            LogStream::sendWarning( )
-                << "fenia fsck: " << csCount
-                << " unref sources cleared" << endl;
-    } catch (...) {
-        LogStream::sendError( )
-            << "fenia fsck: sweep of unref sources aborted mid-free" << endl;
-    }
+    csList.clear( );
+    if (csCount)
+        LogStream::sendWarning( )
+            << "fenia fsck: " << csCount
+            << " unref sources cleared" << endl;
 
     /*can't fail*/
     Scripting::Object *root = Context::current->root.toObject( );

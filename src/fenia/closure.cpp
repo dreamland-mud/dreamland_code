@@ -31,6 +31,12 @@ using namespace Scripting;
  */
 static Function * findFunction(CodeSource::id_t csId, Function::id_t fnId)
 {
+    // The global manager is null once CodeSource::Manager::~Manager has run.
+    // ~Closure now calls this at teardown, so guard the pointer here rather than
+    // lean on destruction order keeping every closure death ahead of it.
+    if (!CodeSource::manager)
+        return 0;
+
     CodeSource::Manager::iterator cs = CodeSource::manager->find(csId);
 
     if (cs == CodeSource::manager->end())
