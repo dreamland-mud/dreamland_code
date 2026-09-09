@@ -21,8 +21,8 @@ using namespace std;
 namespace Scripting {
 
 template <typename T>
-BaseManager<T>::BaseManager() : lastId(1) 
-{ 
+BaseManager<T>::BaseManager() : lastId(1), reuseMode(false), reuseCursor(1)
+{
 }
 
 template <typename T>
@@ -55,8 +55,14 @@ BaseManager<T>::at(id_t id)
 
 template <typename T>
 T &
-BaseManager<T>::allocate() 
+BaseManager<T>::allocate()
 {
+    // Recompiling a re-posted CodeSource: hand back existing slots in the same
+    // sequential order a fresh compile would (2, 3, 4, ...), reusing the live
+    // Function object at each id instead of minting a new one past lastId.
+    if (reuseMode)
+        return at(++reuseCursor);
+
     while(T::Map::find(++lastId) != T::Map::end())
         ;
     return at(lastId);

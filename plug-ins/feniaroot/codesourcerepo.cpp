@@ -185,7 +185,10 @@ bool CodeSourceRepo::read(const DLString &csName)
     }
 
     try {
-        CodeSource &cs = CodeSource::manager->allocate();
+        // Reuse the existing source of this name (a re-read / hot reload) so a
+        // re-post replaces it in place instead of minting a duplicate. See P2b.
+        CodeSource *csReuse = CodeSource::manager->findByName(csName);
+        CodeSource &cs = csReuse ? *csReuse : CodeSource::manager->allocate();
         cs.author = "Chronos";
         cs.name = csName;
         cs.content = utf2koi(content.str());

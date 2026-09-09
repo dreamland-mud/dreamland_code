@@ -83,6 +83,11 @@ public:
 
     void put( id_t, CodeSource & );
     virtual void seq( id_t, Data & );
+
+    // Exact-name lookup used to reuse a CodeSource on re-post instead of minting
+    // a duplicate. Returns the first source of that name, or 0. One-off/internal
+    // eval names ("<...>") are never matched -- they are throwaways. See P2b.
+    CodeSource *findByName( const DLString &name );
 };
 
 }

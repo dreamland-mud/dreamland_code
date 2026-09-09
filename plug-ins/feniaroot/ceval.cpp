@@ -112,8 +112,11 @@ RPCRUN(cs_eval)
         Register thiz = WrapperManager::getThis( )->getWrapper( ch );
         
         try {
-            CodeSource &cs = CodeSource::manager->allocate();
-            
+            // Reuse the existing source of this name so a re-post replaces it
+            // in place instead of minting a duplicate CodeSource. See P2b.
+            CodeSource *csReuse = CodeSource::manager->findByName(subject);
+            CodeSource &cs = csReuse ? *csReuse : CodeSource::manager->allocate();
+
             cs.author = pch->getName( );
             cs.name = subject;
 
