@@ -2,8 +2,10 @@
  *
  * ruffina, Dream Land, 2004
  */
+#include <set>
 #include "flagtableregistry.h"
 #include "flagtable.h"
+#include "logstream.h"
 
 /*-------------------------------------------------------------------------*
  * FlagTableRegistry::Entry
@@ -72,7 +74,7 @@ const DLString & FlagTableRegistry::getName( const FlagTable * table )
     return t->second;
 }
 
-const FlagTable * FlagTableRegistry::getTable( const DLString & arg ) 
+const FlagTable * FlagTableRegistry::getTable( const DLString & arg )
 {
     if (arg.empty( ))
         return NULL;
@@ -81,8 +83,27 @@ const FlagTable * FlagTableRegistry::getTable( const DLString & arg )
 
     if (n == names2tables.end( ))
         return NULL;
-    
+
     return n->second;
+}
+
+// A FlagTableWrapper (affect location/bitvector) whose table pointer is non-null
+// but unknown to the registry means memory corruption: something stored a
+// non-table pointer (seen on live: apply_flags.fields, one indirection off
+// &apply_flags). The wrapper's guard then returns empty instead of dereferencing
+// it and crashing. Log once per distinct bad pointer so a recurrence stays
+// visible without spamming a hot display path. Root cause of the write is still
+// open, so this breadcrumb is the only signal it happened again.
+void reportUnregisteredFlagTable( const FlagTable *table )
+{
+    static std::set<const FlagTable *> reported;
+
+    if (reported.insert( table ).second)
+        LogStream::sendError( )
+            << "reportUnregisteredFlagTable: non-table pointer "
+            << (const void *)table
+            << " reached a name/message lookup -- corrupt affect/flags entry, returning empty."
+            << endl;
 }
 
 

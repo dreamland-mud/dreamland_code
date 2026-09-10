@@ -8,6 +8,11 @@
 #include "flagtable.h"
 #include "flagtableregistry.h"
 
+// Logs, rate-limited, when a wrapper holds a non-null pointer the registry does
+// not know -- that only happens through memory corruption. Defined in
+// flagtableregistry.cpp so this header need not pull in logstream.
+void reportUnregisteredFlagTable( const FlagTable * );
+
 /*
  * FlagTableWrapper
  */
@@ -19,6 +24,11 @@ struct FlagTableWrapper {
     inline const FlagTable * getTable( ) const;
     inline void setTable( const FlagTable * );
     inline void setTable( const DLString & );
+
+    // A corrupt affect can hold a table pointer that is not a FlagTable at all.
+    // Dereferencing it (name/message/names) reads garbage and segfaults the whole
+    // server. Trust the pointer only when the registry knows it.
+    inline bool tableIsReal( ) const;
 
 protected:
     const FlagTable * table;
@@ -47,6 +57,15 @@ inline void FlagTableWrapper::setTable( const FlagTable *table )
 inline void FlagTableWrapper::setTable( const DLString &str )
 {
     table = FlagTableRegistry::getTable( str );
+}
+inline bool FlagTableWrapper::tableIsReal( ) const
+{
+    if (table == 0)
+        return false;
+    if (FlagTableRegistry::getTablesMap( ).count( table ) != 0)
+        return true;
+    reportUnregisteredFlagTable( table );
+    return false;
 }
 
 #endif

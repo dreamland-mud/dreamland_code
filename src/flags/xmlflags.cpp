@@ -33,8 +33,11 @@ void XMLFlags::fromXML( const XMLNode::Pointer& parent )
 bool XMLFlags::toXML( XMLNode::Pointer& parent ) const
 {
     XMLNode::Pointer node( NEW );
-    
-    if (table == 0)
+
+    // tableIsReal(), not a bare null check: a corrupt (non-registered) table
+    // would otherwise be written as <bits table=""> and throw on the next boot.
+    // Omitting the node instead heals the affect to no-bits on reload.
+    if (!tableIsReal( ))
         return false;
 
     node->setType( XMLNode::XML_TEXT );

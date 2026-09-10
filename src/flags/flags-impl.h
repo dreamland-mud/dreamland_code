@@ -19,9 +19,12 @@ inline Flags::Flags( bitstring_t v, const FlagTable *t )
 {
 }
 
+// tableIsReal() (not a bare null check) guards against a corrupt table pointer
+// that is non-null but not a real FlagTable -- dereferencing it would segfault
+// the whole server.
 inline DLString Flags::names( ) const
 {
-    if (table)
+    if (tableIsReal( ))
         return table->names( getValue( ) );
     else
         return DLString::emptyString;
@@ -29,7 +32,7 @@ inline DLString Flags::names( ) const
 
 inline DLString Flags::messages( bool comma, char gcase, lang_t lang ) const
 {
-    if (table)
+    if (tableIsReal( ))
         return table->messages( getValue( ), comma, gcase, lang );
     else
         return DLString::emptyString;
@@ -37,7 +40,7 @@ inline DLString Flags::messages( bool comma, char gcase, lang_t lang ) const
 
 inline void Flags::setBits(const DLString &names)
 {
-    if (table) {
+    if (tableIsReal( )) {
         bitstring_t values = table->bitstring(names);
         if (values != NO_FLAG)
             setBit(values);

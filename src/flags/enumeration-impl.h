@@ -19,14 +19,16 @@ inline Enumeration::Enumeration( int v, const FlagTable *t )
                              : FlagTableWrapper( t ), Integer( v )
 {
 }
+// tableIsReal() guards against a corrupt (non-registered) table pointer that
+// would otherwise be dereferenced as a FlagTable and crash the server.
 inline DLString Enumeration::name( ) const
 {
-    return (table ? table->name( getValue( ) ) : DLString::emptyString);
+    return (tableIsReal( ) ? table->name( getValue( ) ) : DLString::emptyString);
 }
 
 inline DLString Enumeration::message( char gcase, lang_t lang ) const
 {
-    return (table ? table->message( getValue( ) , gcase, lang ) : DLString::emptyString);
+    return (tableIsReal( ) ? table->message( getValue( ) , gcase, lang ) : DLString::emptyString);
 }
 
 /*----------------------------------------------------------------------
