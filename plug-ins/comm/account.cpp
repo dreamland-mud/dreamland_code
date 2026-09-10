@@ -117,6 +117,8 @@ static void account_status(PCharacter *ch)
     if (!identities.empty()) {
         ch->pecho(_("Способы входа:"));
         for (Json::Value::const_iterator i = identities.begin(); i != identities.end(); ++i) {
+            if (!(*i).isObject())   // a hand-corrupted account file must not crash a player command
+                continue;
             DLString type = (*i)["type"].asString();
             DLString display = (*i)["display"].asString();
             if (display.empty())

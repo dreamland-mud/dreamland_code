@@ -276,16 +276,17 @@ static void account_resetpw(HttpRequest &request, HttpResponse &response)
         return;
     }
 
-    // Fresh CSPRNG password. Never logged. Until the forced-change nanny step
-    // (Phase 3.2) reads pwreset, this temp password is a full working password --
-    // acceptable while only token-holding bots can call this.
-    DLString temp = create_secure_nonce(8);
-    password_set(pc, temp);
-
+    // Set the forced-change marker first, then password_set persists both it and
+    // the new password in its single saveMemory (Phase 3.2 reads pwreset).
     Json::Value flag;
     flag["forced"] = true;
     set_json_attribute(pc, "pwreset", flag);
-    PCharacterManager::saveMemory(pc);
+
+    // Fresh CSPRNG password. Never logged. Until the forced-change nanny step
+    // reads pwreset, this temp password is a full working password -- acceptable
+    // while only token-holding bots can call this.
+    DLString temp = create_secure_nonce(8);
+    password_set(pc, temp);
 
     LogStream::sendWarning() << "Accounts: password reset for " << pc->getName()
         << " (account " << id << ", via " << type << ")." << endl;
