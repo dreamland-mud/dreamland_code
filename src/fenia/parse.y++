@@ -431,6 +431,13 @@ primary:
         |   T_FUNCTION T_NUM
         {
             Function &f = parser->source.functions.at($2);
+            // Without this an undefined $2 leaves f.source.csId==0 (functions.at
+            // default-inserts an empty Function). The Closure later built from
+            // this at eval then captures csId==0 and links the function, but
+            // ~Closure's findFunction(csId,fnId) can never match cs id 0 -- so the
+            // link is never balanced and the function stays pinned forever. Hand-
+            // written-source-only; matches the full-definition rule above. lcnaEHM2 #2.
+            f.source = csrc();
             $$ = ClosureExp::Pointer(NEW, &f);
 	    $$->source = csrc();
         }
