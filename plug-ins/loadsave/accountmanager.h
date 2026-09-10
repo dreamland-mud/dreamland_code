@@ -42,7 +42,13 @@ public:
 
     // --- mutations (persist immediately) ---
     // No callers until the linking-code / redeem surface lands in a later phase.
-    static DLString create(const DLString &type, const DLString &value, const DLString &display); // -> new id
+    // Caller contract (the redeem surface must honour it):
+    //  - create/addIdentity mark the identity verified, so call them ONLY after the
+    //    identity has actually been proven (emailed-code round-trip, bot DM, OAuth).
+    //  - attachChar does NOT check for an existing link on the char; the surface decides
+    //    the re-attach policy (refuse, or detach first) so a second code can't steal a char.
+    //  - create() returns "" if the on-disk write fails (db/account must exist).
+    static DLString create(const DLString &type, const DLString &value, const DLString &display); // -> new id, "" on failure
     static bool addIdentity(const DLString &id, const DLString &type, const DLString &value, const DLString &display);
     static bool attachChar(const DLString &id, const DLString &charName);
     static bool detachChar(const DLString &charName);

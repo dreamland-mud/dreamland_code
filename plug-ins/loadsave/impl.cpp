@@ -44,8 +44,13 @@ public:
 
     virtual void run( )
     {
-        if (DLScheduler::getThis()->getCurrentTick( ) == 0)
-            AccountManager::load( );
+        // No tick==0 gate (unlike PlayerLoadTask): load() is idempotent, and a
+        // `plug reload most` -- the routine world-deploy step -- dlcloses libloadsave and
+        // reconstructs the registry statics EMPTY. Without a reload here the registry
+        // would stay empty until the next full reboot, and the identity-dedup invariant
+        // would break (duplicate accounts minted). Re-reading a handful of JSON files
+        // one tick after every reload is cheap and correct.
+        AccountManager::load( );
     }
 
     // After the playerbase (SCDP_BOOT + 10), so the reconcile pass can see it.
