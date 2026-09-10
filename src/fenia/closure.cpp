@@ -32,6 +32,7 @@ namespace {
     // (duplicate csId, fnId) -> (canonical csId, fnId).
     std::map<std::pair<uint32_t, uint32_t>, std::pair<uint32_t, uint32_t> > g_dupRedirect;
     bool g_dupRedirectActive = false;
+    bool g_dupRedirectUsed = false;   // consumed once, on the first (boot) build
 }
 
 void feniaDupRedirectAdd(uint32_t dupCs, uint32_t dupFn, uint32_t canonCs, uint32_t canonFn)
@@ -62,6 +63,14 @@ bool feniaDupRedirectLookup(uint32_t &csId, uint32_t &fnId)
 
     csId = i->second.first;
     fnId = i->second.second;
+    return true;
+}
+
+bool feniaDupRedirectFirstUse()
+{
+    if (g_dupRedirectUsed)
+        return false;
+    g_dupRedirectUsed = true;
     return true;
 }
 

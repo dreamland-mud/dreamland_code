@@ -79,6 +79,14 @@ void feniaDupRedirectAdd(uint32_t dupCs, uint32_t dupFn, uint32_t canonCs, uint3
 void feniaDupRedirectActivate();
 void feniaDupRedirectClear();
 bool feniaDupRedirectLookup(uint32_t &csId, uint32_t &fnId);
-void feniaBuildDupRedirect();
+// True exactly once per process -- the real boot's first WrappersPlugin
+// initialization -- and false on every later plug-reload re-initialization, so
+// the collapse arms boot-only. The flag lives in the fenia core, which plug
+// reload does not re-load, so it survives even if the plugin .so is re-dlopened.
+bool feniaDupRedirectFirstUse();
+// Build the boot-time collapse plan and arm the redirect. Returns the number of
+// duplicate copies armed (0 when not the first boot, or nothing to collapse); a
+// positive count tells the caller to force-save objects afterwards (durability).
+int feniaBuildDupRedirect();
 
 #endif

@@ -84,14 +84,13 @@ static std::vector<DupName> computeDupPlan( )
         if (p->second.size( ) <= 1)
             continue;
 
+        // Canonical = lowest id. Manager iteration is ascending, so p->second[0]
+        // is the lowest id, which is also P2b's findByName reuse target -- so a
+        // later `cs post` keeps updating the same survivor. With content-equality
+        // collapse below, the choice among identical copies is behaviour-neutral
+        // anyway; refcnt is NOT used (it counts AST nodes, i.e. code size, not
+        // references, so "most-referenced" would really mean "biggest/oldest").
         id_t canonId = p->second[0];
-        for(size_t k = 1; k < p->second.size( ); k++) {
-            id_t cid = p->second[k];
-            if (CodeSource::manager->at(cid).refcnt > CodeSource::manager->at(canonId).refcnt
-                || (CodeSource::manager->at(cid).refcnt == CodeSource::manager->at(canonId).refcnt
-                    && cid < canonId))
-                canonId = cid;
-        }
 
         CodeSource &canon = CodeSource::manager->at(canonId);
         DupName dn;
@@ -110,21 +109,26 @@ static std::vector<DupName> computeDupPlan( )
             dc.csId = cid;
             dc.fns = (int)c.functions.size( );
             dc.refcnt = c.refcnt;
-            dc.collapse = (c.functions.size( ) == canon.functions.size( ));
+            // Collapse only a BYTE-IDENTICAL copy: the same source text
+            // guarantees a fresh boot recompile produces identical functions, so
+            // redirecting the copy's closures to the canonical's functions is
+            // behaviour-preserving. A different version sharing the name is left
+            // alone -- that is what `cs del force` and human judgement are for.
+            // Content equality also makes the plan state-independent, so `cs gc`'s
+            // preview equals this boot action.
+            dc.collapse = (c.content == canon.content);
 
             if (dc.collapse) {
-                FunctionManager::iterator fa = canon.functions.begin( );
-                FunctionManager::iterator fb = c.functions.begin( );
-                for( ; fa != canon.functions.end( ) && fb != c.functions.end( );
-                        fa++, fb++) {
-                    DLString argsA = fa->argNames ? fa->argNames->toString( ) : DLString::emptyString;
-                    DLString argsB = fb->argNames ? fb->argNames->toString( ) : DLString::emptyString;
-                    if (argsA != argsB) {
-                        dc.collapse = false;
-                        dc.fnMap.clear( );
-                        break;
-                    }
-                    dc.fnMap.push_back(std::make_pair(fb->getId( ), fa->getId( )));
+                if (c.functions.size( ) != canon.functions.size( )) {
+                    // Identical content should yield identical function counts; if
+                    // it somehow does not, refuse rather than risk a mis-pairing.
+                    dc.collapse = false;
+                } else {
+                    FunctionManager::iterator fa = canon.functions.begin( );
+                    FunctionManager::iterator fb = c.functions.begin( );
+                    for( ; fa != canon.functions.end( ) && fb != c.functions.end( );
+                            fa++, fb++)
+                        dc.fnMap.push_back(std::make_pair(fb->getId( ), fa->getId( )));
                 }
             }
 
@@ -143,8 +147,15 @@ static std::vector<DupName> computeDupPlan( )
 // the canonical function instead, the duplicates fall to refcnt 0, and the boot
 // fsck (ValidateTask) reaps them in the same boot. Skipped (different-shape)
 // copies are left untouched. See Trello #2857 (P3.5).
-void feniaBuildDupRedirect( )
+int feniaBuildDupRedirect( )
 {
+    // Boot-only: never re-arm on a plug reload's re-initialization, where the
+    // CodeSources are not freshly recompiled (sparse survivor function sets) and
+    // any positional pairing would be unsafe. The flag lives in the fenia core,
+    // so it holds across plug reloads even if this plugin .so is re-dlopened.
+    if (!feniaDupRedirectFirstUse( ))
+        return 0;
+
     std::vector<DupName> plan = computeDupPlan( );
     int copies = 0, fns = 0;
 
@@ -162,11 +173,15 @@ void feniaBuildDupRedirect( )
         }
     }
 
-    feniaDupRedirectActivate( );
+    if (copies > 0)
+        feniaDupRedirectActivate( );
+
     LogStream::sendNotice( )
         << "fenia dup collapse: redirecting " << copies
         << " duplicate copy(ies), " << fns
         << " function(s) to canonical; boot fsck will reap them" << endl;
+
+    return copies;
 }
 
 static bool cs_by_subj(PCharacter *ch, const DLString &arg, id_t &csid)
