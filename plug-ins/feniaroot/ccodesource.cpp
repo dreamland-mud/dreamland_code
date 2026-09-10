@@ -21,6 +21,7 @@
 #include "fenia/register-impl.h"
 #include "fenia/codesource.h"
 #include "fenia/object.h"
+#include "fenia/closure.h"
 #include "xmlattributecodesource.h"
 #include "wrappermanager.h"
 
@@ -42,6 +43,147 @@ using namespace std;
 
 bool has_fenia_security( PCMemoryInterface *pch );
 bool text_match_with_highlight(const DLString &text, const DLString &args, ostringstream &matchBuf);
+
+// --- Fenia GC duplicate-collapse plan (Trello #2857, P3.5) ------------------
+// One entry per duplicated CodeSource name: the canonical copy (lowest id, which
+// is also P2b's findByName reuse target) and, per other copy, whether it
+// collapses onto the canonical -- BYTE-IDENTICAL content, which guarantees a
+// fresh recompile yields identical positional functions, carrying the
+// (dupFn -> canonFn) pairing -- or is skipped (different content: a genuinely
+// different version sharing the name, left to `cs del force` / human judgement).
+// Shared by `cs gc` (report) and feniaBuildDupRedirect (the boot-recovery
+// redirect) so the dry-run preview matches the boot action.
+struct DupCopy {
+    id_t csId;
+    bool collapse;
+    int fns;
+    int refcnt;
+    std::vector<std::pair<Function::id_t, Function::id_t> > fnMap; // dupFn -> canonFn
+};
+struct DupName {
+    DLString name;
+    id_t canonId;
+    int canonFns;
+    int canonRefcnt;
+    std::vector<DupCopy> copies;
+};
+
+static std::vector<DupName> computeDupPlan( )
+{
+    std::map<DLString, std::vector<id_t> > byName;
+    for(CodeSource::Manager::iterator i = CodeSource::manager->begin( );
+            i != CodeSource::manager->end( ); i++) {
+        const DLString &nm = i->name;
+        if (nm.empty( ) || nm[0] == '<')
+            continue;
+        byName[nm].push_back(i->getId( ));
+    }
+
+    std::vector<DupName> plan;
+    for(std::map<DLString, std::vector<id_t> >::iterator p = byName.begin( );
+            p != byName.end( ); p++) {
+        if (p->second.size( ) <= 1)
+            continue;
+
+        // Canonical = lowest id. Manager iteration is ascending, so p->second[0]
+        // is the lowest id, which is also P2b's findByName reuse target -- so a
+        // later `cs post` keeps updating the same survivor. With content-equality
+        // collapse below, the choice among identical copies is behaviour-neutral
+        // anyway; refcnt is NOT used (it counts AST nodes, i.e. code size, not
+        // references, so "most-referenced" would really mean "biggest/oldest").
+        id_t canonId = p->second[0];
+
+        CodeSource &canon = CodeSource::manager->at(canonId);
+        DupName dn;
+        dn.name = p->first;
+        dn.canonId = canonId;
+        dn.canonFns = (int)canon.functions.size( );
+        dn.canonRefcnt = canon.refcnt;
+
+        for(size_t k = 0; k < p->second.size( ); k++) {
+            id_t cid = p->second[k];
+            if (cid == canonId)
+                continue;
+            CodeSource &c = CodeSource::manager->at(cid);
+
+            DupCopy dc;
+            dc.csId = cid;
+            dc.fns = (int)c.functions.size( );
+            dc.refcnt = c.refcnt;
+            // Collapse only a BYTE-IDENTICAL copy: the same source text
+            // guarantees a fresh boot recompile produces identical functions, so
+            // redirecting the copy's closures to the canonical's functions is
+            // behaviour-preserving. A different version sharing the name is left
+            // alone -- that is what `cs del force` and human judgement are for.
+            // Content equality also makes the plan state-independent, so `cs gc`'s
+            // preview equals this boot action.
+            dc.collapse = (c.content == canon.content);
+
+            if (dc.collapse) {
+                if (c.functions.size( ) != canon.functions.size( )) {
+                    // Identical content should yield identical function counts; if
+                    // it somehow does not, refuse rather than risk a mis-pairing.
+                    dc.collapse = false;
+                } else {
+                    FunctionManager::iterator fa = canon.functions.begin( );
+                    FunctionManager::iterator fb = c.functions.begin( );
+                    for( ; fa != canon.functions.end( ) && fb != c.functions.end( );
+                            fa++, fb++)
+                        dc.fnMap.push_back(std::make_pair(fb->getId( ), fa->getId( )));
+                }
+            }
+
+            dn.copies.push_back(dc);
+        }
+
+        plan.push_back(dn);
+    }
+
+    return plan;
+}
+
+// Boot-recovery entry point (WrappersPlugin::initialization, before object
+// recovery): register every collapsible duplicate's functions for redirect to
+// the canonical copy, then arm the redirect. Closure's restore path then links
+// the canonical function instead, the duplicates fall to refcnt 0, and the boot
+// fsck (ValidateTask) reaps them in the same boot. Skipped (different-shape)
+// copies are left untouched. See Trello #2857 (P3.5).
+int feniaBuildDupRedirect( )
+{
+    // Boot-only: never re-arm on a plug reload's re-initialization, where the
+    // CodeSources are not freshly recompiled (sparse survivor function sets) and
+    // any positional pairing would be unsafe. The flag lives in the fenia core,
+    // so it holds across plug reloads even if this plugin .so is re-dlopened.
+    if (!feniaDupRedirectFirstUse( ))
+        return 0;
+
+    std::vector<DupName> plan = computeDupPlan( );
+    int copies = 0, fns = 0;
+
+    for(size_t n = 0; n < plan.size( ); n++) {
+        for(size_t k = 0; k < plan[n].copies.size( ); k++) {
+            DupCopy &dc = plan[n].copies[k];
+            if (!dc.collapse)
+                continue;
+            copies++;
+            for(size_t f = 0; f < dc.fnMap.size( ); f++) {
+                feniaDupRedirectAdd(dc.csId, dc.fnMap[f].first,
+                                    plan[n].canonId, dc.fnMap[f].second);
+                fns++;
+            }
+        }
+    }
+
+    if (copies > 0)
+        feniaDupRedirectActivate( );
+
+    LogStream::sendNotice( )
+        << "fenia dup collapse: redirecting " << copies
+        << " duplicate copy(ies), " << fns
+        << " function(s) to canonical; boot fsck will reap them" << endl;
+
+    return copies;
+}
 
 static bool cs_by_subj(PCharacter *ch, const DLString &arg, id_t &csid)
 {
@@ -284,68 +426,27 @@ CMDADM( codesource )
             return;
         }
 
-        std::map<DLString, std::vector<id_t> > byName;
-        for(CodeSource::Manager::iterator i = CodeSource::manager->begin( );
-                i != CodeSource::manager->end( ); i++) {
-            const DLString &nm = i->name;
-            if (nm.empty( ) || nm[0] == '<')
-                continue;
-            byName[nm].push_back(i->getId( ));
-        }
-
+        std::vector<DupName> plan = computeDupPlan( );
         int dupNames = 0, collapsible = 0, mismatched = 0;
         ch->pecho("{YFenia GC dry-run{x (canonical <- collapse candidates, ничего не трогается):");
 
-        for(std::map<DLString, std::vector<id_t> >::iterator p = byName.begin( );
-                p != byName.end( ); p++) {
-            if (p->second.size( ) <= 1)
-                continue;
+        for(size_t n = 0; n < plan.size( ); n++) {
+            DupName &dn = plan[n];
             dupNames++;
-
-            id_t canonId = p->second[0];
-            for(size_t k = 1; k < p->second.size( ); k++) {
-                id_t cid = p->second[k];
-                CodeSource &c = CodeSource::manager->at(cid);
-                CodeSource &best = CodeSource::manager->at(canonId);
-                if (c.refcnt > best.refcnt
-                    || (c.refcnt == best.refcnt && cid < canonId))
-                    canonId = cid;
-            }
-
-            CodeSource &canon = CodeSource::manager->at(canonId);
-            ch->pecho("{C%s{x", p->first.c_str( ));
+            ch->pecho("{C%s{x", dn.name.c_str( ));
             ch->pecho("    canonical {W%d{x fns=%d refcnt=%d",
-                    canonId, (int)canon.functions.size( ), canon.refcnt);
+                    dn.canonId, dn.canonFns, dn.canonRefcnt);
 
-            for(size_t k = 0; k < p->second.size( ); k++) {
-                id_t cid = p->second[k];
-                if (cid == canonId)
-                    continue;
-                CodeSource &c = CodeSource::manager->at(cid);
-
-                bool match = (c.functions.size( ) == canon.functions.size( ));
-                if (match) {
-                    FunctionManager::iterator fa = canon.functions.begin( );
-                    FunctionManager::iterator fb = c.functions.begin( );
-                    for( ; fa != canon.functions.end( ) && fb != c.functions.end( );
-                            fa++, fb++) {
-                        DLString argsA = fa->argNames ? fa->argNames->toString( ) : DLString::emptyString;
-                        DLString argsB = fb->argNames ? fb->argNames->toString( ) : DLString::emptyString;
-                        if (argsA != argsB) {
-                            match = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (match) {
+            for(size_t k = 0; k < dn.copies.size( ); k++) {
+                DupCopy &dc = dn.copies[k];
+                if (dc.collapse) {
                     collapsible++;
                     ch->pecho("      collapse {G%d{x fns=%d refcnt=%d",
-                            cid, (int)c.functions.size( ), c.refcnt);
+                            dc.csId, dc.fns, dc.refcnt);
                 } else {
                     mismatched++;
-                    ch->pecho("      {Rskip{x %d fns=%d refcnt=%d (different shape)",
-                            cid, (int)c.functions.size( ), c.refcnt);
+                    ch->pecho("      {Rskip{x %d fns=%d refcnt=%d (different content)",
+                            dc.csId, dc.fns, dc.refcnt);
                 }
             }
         }

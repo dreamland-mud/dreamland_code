@@ -284,9 +284,35 @@ WrappersPlugin::initialization( )
     Class::regMoc<BehaviorWrapper>();
     Class::regMoc<WordEffectWrapper>();
     Class::regMoc<PlayerWrapper>();
-    
+
+    // Fenia GC (Trello #2857, P3.5): on the FIRST (boot) initialization, arm the
+    // duplicate-collapse redirect so a closure that names a byte-identical
+    // duplicate CodeSource resolves to the canonical copy instead. The duplicates
+    // then fall to refcnt 0 and the ValidateTask sweep below reaps them (DB record
+    // included) this same boot. feniaBuildDupRedirect self-gates to boot-only and
+    // returns how many copies it armed; the redirect is cleared right after
+    // recovery so it never touches runtime closure creation.
+    void feniaDupRedirectClear( );   // closure.cpp
+    int feniaBuildDupRedirect( );    // ccodesource.cpp
+    int dupRedirected = feniaBuildDupRedirect( );
+
     FeniaManager::getThis( )->recover( );
-        
+
+    feniaDupRedirectClear( );
+
+    // Durability: the redirect fixed ids in memory, but a straggler object whose
+    // record still names a now-deleted duplicate would load broken next boot and
+    // be saved as null -- silently dropping working logic. Marking every handled
+    // object changed rewrites its record with the canonical ids at the next sync
+    // (and at shutdown), so the next boot is consistent. One-time: once collapsed
+    // and re-saved, later boots find no duplicates and arm nothing.
+    if (dupRedirected > 0) {
+        for(Scripting::Object::Manager::iterator oi = Scripting::Object::manager->begin( );
+                oi != Scripting::Object::manager->end( ); oi++)
+            if (oi->hasHandler( ))
+                oi->changed( );
+    }
+
     DLScheduler::getThis()->putTaskNOW( ValidateTask::Pointer(NEW) );
 
     linkTargets();
