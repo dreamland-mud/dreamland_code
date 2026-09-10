@@ -1,9 +1,15 @@
+#include <jsoncpp/json/json.h>
+
 #include "pcharacter.h"
 #include "commandtemplate.h"
 #include "wiznet.h"
 #include "infonet.h"
 #include "messengers.h"
 #include "player_account.h"
+#include "accountmanager.h"
+#include "linkingcode.h"
+#include "arg_utils.h"
+#include "logstream.h"
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
@@ -84,6 +90,91 @@ CMDRUNP( delete )
     pch->pecho(_("Введи {yудалить <твой пароль>{x для подтверждения команды."));
     pch->pecho(_("Чтобы отменить попытку суицида, введи {yудалить без пароля."));
     pch->getPC( )->confirm_delete = true;
-    wiznet( WIZ_SECURE, 0, pch->get_trust( ), 
+    wiznet( WIZ_SECURE, 0, pch->get_trust( ),
             "%^C1 собирается удалить своего персонажа.", pch );
+}
+
+
+/* The passwordless account layer -- player-facing surface.
+ * See ACCOUNTS_NANNY_ROADMAP.md / Trello 2zFpQBoW. Ships dark: `account link`
+ * minting is gated off (LinkingCode::mintingEnabled) until the Phase 3 redeem
+ * bots exist, so this command shows only status and a "coming soon" line.
+ */
+static void account_status(PCharacter *ch)
+{
+    DLString id = AccountManager::accountOf(ch->getName());
+
+    if (id.empty()) {
+        ch->pecho(_("Твой персонаж не привязан к аккаунту."));
+        ch->pecho(_("Аккаунт связывает твоих персонажей и дает способ восстановить доступ. Набери {yаккаунт связать{x, чтобы начать."));
+        return;
+    }
+
+    ch->pecho(_("Аккаунт {W%1$s{x."), id.c_str());
+
+    Json::Value acc = AccountManager::get(id);
+    const Json::Value &identities = acc["identities"];
+    if (!identities.empty()) {
+        ch->pecho(_("Способы входа:"));
+        for (Json::Value::const_iterator i = identities.begin(); i != identities.end(); ++i) {
+            if (!(*i).isObject())   // a hand-corrupted account file must not crash a player command
+                continue;
+            DLString type = (*i)["type"].asString();
+            DLString display = (*i)["display"].asString();
+            if (display.empty())
+                display = (*i)["value"].asString();
+            ch->pecho("  {W%1$s{x: %2$s", type.c_str(), display.c_str());
+        }
+    }
+
+    ch->pecho(_("Персонажи аккаунта:"));
+    for (const DLString &name : AccountManager::charsOf(id))
+        ch->pecho("  %1$s", name.c_str());
+}
+
+static void account_link(PCharacter *ch)
+{
+    if (!LinkingCode::mintingEnabled()) {
+        ch->pecho(_("Привязка аккаунтов скоро откроется. Немного терпения."));
+        return;
+    }
+
+    DLString code = LinkingCode::mint(ch->getName(), false);
+    LogStream::sendNotice() << "Accounts: link code minted for " << ch->getName() << "." << endl;
+
+    ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
+    ch->pecho(_("Он одноразовый и действует 10 минут. Введи его в боте (Telegram или Discord) или на сайте, чтобы привязать этого персонажа к аккаунту."));
+    ch->pecho(_("Никому не показывай этот код: кто его введет, привяжет персонажа к своему аккаунту."));
+}
+
+CMDRUN( account )
+{
+    if (ch->is_npc())
+        return;
+
+    DLString args(constArguments);
+    DLString cmd = args.getOneArgument();
+
+    if (cmd.empty()) {
+        account_status(ch->getPC());
+        return;
+    }
+
+    // UA matcher form is apostrophe-less on purpose: KOI8 (the exec charset) has no
+    // U+02BC, and a mudjs client strips it from input anyway, so "звязати" is the
+    // form that actually arrives. Help shows the orthographic "звʼязати".
+    if (arg_oneof(cmd, "link", "связать", "звязати")) {
+        account_link(ch->getPC());
+        return;
+    }
+
+    // Email/telnet fallback path is Phase 4 -- acknowledge, do nothing yet.
+    if (arg_oneof(cmd, "email", "почта", "пошта")
+        || arg_oneof(cmd, "code", "код"))
+    {
+        ch->pecho(_("Привязка по почте появится позже."));
+        return;
+    }
+
+    ch->pecho(_("Использование: {yаккаунт{x -- статус, {yаккаунт связать{x -- код привязки."));
 }

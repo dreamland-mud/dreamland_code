@@ -2,6 +2,8 @@
  *
  * See ACCOUNTS_NANNY_ROADMAP.md / Trello 2zFpQBoW.
  */
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <jsoncpp/json/json.h>
 
 #include "accountmanager.h"
@@ -168,6 +170,11 @@ bool AccountManager::saveAccount(const DLString &id)
 
     try {
         DLDirectory dir(dreamland->getDbDir(), ACCOUNT_TABLE);
+        // db/account may not exist on a fresh environment: DLFileStream opens the
+        // output path directly (no mkdir), so the write would throw and the account
+        // would evaporate on the next reboot. Create the table dir first.
+        if (!dir.exist())
+            ::mkdir(dir.getCPath(), 0775);
         DLFileStream(dir, id, ACCOUNT_EXT).fromString(JsonUtils::toString(a->second));
         return true;
     } catch (const ExceptionDBIO &e) {
@@ -178,6 +185,17 @@ bool AccountManager::saveAccount(const DLString &id)
 
 DLString AccountManager::create(const DLString &type, const DLString &value, const DLString &display)
 {
+    // Belt-and-braces: an identity belongs to at most one account. The redeem
+    // surface find-before-creates, so this only fires on a caller bug -- return
+    // the existing owner rather than mint a duplicate that would corrupt the
+    // last-wins identity index (indexIdentities warns and overwrites).
+    DLString owner = findByIdentity(type, value);
+    if (!owner.empty()) {
+        LogStream::sendWarning() << "Accounts: create() for already-owned identity "
+            << type << ":" << value << " -> returning existing " << owner << "." << endl;
+        return owner;
+    }
+
     DLString id = mintId();
 
     Json::Value identity;
@@ -229,7 +247,18 @@ bool AccountManager::addIdentity(const DLString &id, const DLString &type, const
 
     a->second["identities"].append(identity);
     identityIndex[identityKey(type, value)] = id;
-    return saveAccount(id);
+
+    // Roll back the RAM/index append if the write never reached disk, so the
+    // registry does not claim a "verified" identity that vanishes on reboot.
+    if (!saveAccount(id)) {
+        Json::Value &ids = a->second["identities"];
+        if (ids.isArray() && ids.size() > 0)
+            ids.resize(ids.size() - 1);
+        identityIndex.erase(identityKey(type, value));
+        return false;
+    }
+
+    return true;
 }
 
 bool AccountManager::attachChar(const DLString &id, const DLString &charName)
