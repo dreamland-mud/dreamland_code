@@ -45,13 +45,14 @@ bool has_fenia_security( PCMemoryInterface *pch );
 bool text_match_with_highlight(const DLString &text, const DLString &args, ostringstream &matchBuf);
 
 // --- Fenia GC duplicate-collapse plan (Trello #2857, P3.5) ------------------
-// One entry per duplicated CodeSource name: the canonical copy (most-referenced,
-// ties to lowest id) and, per other copy, whether it collapses onto the
-// canonical -- same function count and identical argNames position-by-position,
-// a same-source recompile, carrying the (dupFn -> canonFn) pairing -- or is
-// skipped as a structurally different stale copy that must never be rebound.
+// One entry per duplicated CodeSource name: the canonical copy (lowest id, which
+// is also P2b's findByName reuse target) and, per other copy, whether it
+// collapses onto the canonical -- BYTE-IDENTICAL content, which guarantees a
+// fresh recompile yields identical positional functions, carrying the
+// (dupFn -> canonFn) pairing -- or is skipped (different content: a genuinely
+// different version sharing the name, left to `cs del force` / human judgement).
 // Shared by `cs gc` (report) and feniaBuildDupRedirect (the boot-recovery
-// redirect) so the dry-run preview always matches the destructive action.
+// redirect) so the dry-run preview matches the boot action.
 struct DupCopy {
     id_t csId;
     bool collapse;
@@ -444,7 +445,7 @@ CMDADM( codesource )
                             dc.csId, dc.fns, dc.refcnt);
                 } else {
                     mismatched++;
-                    ch->pecho("      {Rskip{x %d fns=%d refcnt=%d (different shape)",
+                    ch->pecho("      {Rskip{x %d fns=%d refcnt=%d (different content)",
                             dc.csId, dc.fns, dc.refcnt);
                 }
             }
