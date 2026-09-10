@@ -266,7 +266,7 @@ CMDADM( codesource )
         return;
     }
 
-    if(arg_is_strict(cmd, "gc")) {
+    if(arg_is_strict_soft(cmd, "gc")) {
         // Dry-run preview of the boot-time duplicate canonicalization (Fenia GC
         // phase, Trello #2857). Groups CodeSources by name; for every duplicated
         // name it picks a canonical copy (the most-referenced one -- the copy
