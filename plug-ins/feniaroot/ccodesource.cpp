@@ -113,6 +113,7 @@ CMDADM( codesource )
             << "     {Wsearch{x <строка>    - найти все сценарии, содержащие строку в коде"  << endl
             << "     {Wdups{x               - сценарии с дублирующимися именами (одно имя -> >1 cs)"  << endl
             << "     {Worphans{x            - счетчики неиспользуемых cs/объектов/функций (как boot fsck, read-only)"  << endl
+            << "     {Wgc{x                 - dry-run: что схлопнула бы канонизация дублей при загрузке (read-only)"  << endl
             << endl
             << "Редактирование:" << endl
             << "     {Wweb{x [<номер>|<имя>] - редактировать новый или существующий сценарий в веб-редакторе" << endl
@@ -262,6 +263,95 @@ CMDADM( codesource )
         ch->pecho("  Objects(+handler): %d", objOrphan);
         ch->pecho("  Functions:         %d", fnOrphan);
         ch->pecho("  Всего сценариев в базе: %d", (int)CodeSource::manager->size( ));
+        return;
+    }
+
+    if(arg_is_strict(cmd, "gc")) {
+        // Dry-run preview of the boot-time duplicate canonicalization (Fenia GC
+        // phase, Trello #2857). Groups CodeSources by name; for every duplicated
+        // name it picks a canonical copy (the most-referenced one -- the copy
+        // closures mostly point at -- ties broken by lowest id for determinism)
+        // and reports which other copies could be collapsed onto it. A copy is
+        // collapsible only when its function SHAPE matches the canonical: the
+        // same function count and identical argument-name lists position by
+        // position (id order). Same-source recompiles match; a structurally
+        // different stale copy is reported as skipped, never silently collapsed
+        // -- collapsing a mismatched copy would rebind closures to the wrong
+        // function. Reads only: this is the review artifact for the real
+        // collapse, it changes nothing on disk or in memory.
+        if (!ch->isCoder( )) {
+            ch->pecho(_("Только для кодеров."));
+            return;
+        }
+
+        std::map<DLString, std::vector<id_t> > byName;
+        for(CodeSource::Manager::iterator i = CodeSource::manager->begin( );
+                i != CodeSource::manager->end( ); i++) {
+            const DLString &nm = i->name;
+            if (nm.empty( ) || nm[0] == '<')
+                continue;
+            byName[nm].push_back(i->getId( ));
+        }
+
+        int dupNames = 0, collapsible = 0, mismatched = 0;
+        ch->pecho("{YFenia GC dry-run{x (canonical <- collapse candidates, ничего не трогается):");
+
+        for(std::map<DLString, std::vector<id_t> >::iterator p = byName.begin( );
+                p != byName.end( ); p++) {
+            if (p->second.size( ) <= 1)
+                continue;
+            dupNames++;
+
+            id_t canonId = p->second[0];
+            for(size_t k = 1; k < p->second.size( ); k++) {
+                id_t cid = p->second[k];
+                CodeSource &c = CodeSource::manager->at(cid);
+                CodeSource &best = CodeSource::manager->at(canonId);
+                if (c.refcnt > best.refcnt
+                    || (c.refcnt == best.refcnt && cid < canonId))
+                    canonId = cid;
+            }
+
+            CodeSource &canon = CodeSource::manager->at(canonId);
+            ch->pecho("{C%s{x", p->first.c_str( ));
+            ch->pecho("    canonical {W%d{x fns=%d refcnt=%d",
+                    canonId, (int)canon.functions.size( ), canon.refcnt);
+
+            for(size_t k = 0; k < p->second.size( ); k++) {
+                id_t cid = p->second[k];
+                if (cid == canonId)
+                    continue;
+                CodeSource &c = CodeSource::manager->at(cid);
+
+                bool match = (c.functions.size( ) == canon.functions.size( ));
+                if (match) {
+                    FunctionManager::iterator fa = canon.functions.begin( );
+                    FunctionManager::iterator fb = c.functions.begin( );
+                    for( ; fa != canon.functions.end( ) && fb != c.functions.end( );
+                            fa++, fb++) {
+                        DLString aa = fa->argNames ? fa->argNames->toString( ) : DLString::emptyString;
+                        DLString bb = fb->argNames ? fb->argNames->toString( ) : DLString::emptyString;
+                        if (aa != bb) {
+                            match = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (match) {
+                    collapsible++;
+                    ch->pecho("      collapse {G%d{x fns=%d refcnt=%d",
+                            cid, (int)c.functions.size( ), c.refcnt);
+                } else {
+                    mismatched++;
+                    ch->pecho("      {Rskip{x %d fns=%d refcnt=%d (different shape)",
+                            cid, (int)c.functions.size( ), c.refcnt);
+                }
+            }
+        }
+
+        ch->pecho("{YИтого{x: %d имен, %d копий к схлопыванию, %d пропущено (разная сигнатура).",
+                dupNames, collapsible, mismatched);
         return;
     }
 
