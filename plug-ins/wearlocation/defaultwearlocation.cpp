@@ -177,18 +177,31 @@ bool DefaultWearlocation::equip( Object *obj )
 //    isAffected(katana/bless/curse/...) and break real gates (katana craft
 //    cooldown, "already blessed", etc.). So the instance list is never scanned.
 //
-// A stealth trait carried on an item as a bare affect_flags bit (sneak/hide/fade/
-// invis) with no skill type is invisible to the loop, so item_stealth_refresh could
-// not own the bit with a real affect and do_visible would strip it for good in
-// combat. Map the volitional bits to the skill whose onRefresh re-arms them, so a
-// bare-bit stealth item joins eqAffects the same as a <grant>. Skill names match
-// creation.cpp's item_stealth_skills and the affect handlers.
+// A stealth trait carried on an item as a bare affect_flags bit with no skill type
+// is invisible to the loop above, so it would neither show in the gear-affect panel
+// (#1103 enumerates eqAffects) nor, for the combat-stripped traits, be re-armable.
+// Map the bit to its skill so a bare-bit stealth item joins eqAffects the same as a
+// <grant>. Skill names match the affect handlers.
+//
+// sneak/hide/fade/invis ALSO appear in creation.cpp's item_stealth_skills: item_stealth_refresh
+// keeps a real re-armed affect installed on the wearer, so isAffected() stays truthful.
+//
+// Camouflage is harvested here for DISPLAY ONLY and is deliberately NOT in item_stealth_skills:
+// its AffectHandler has no onRefresh (only onEntryChar), so a re-arm entry would install nothing;
+// and camo is stripped by BOTH combat (do_visible) and movement (check_camouflage / Walkment), so
+// a re-arm would ping-pong wearoff messages on movement for a wearer without camouflage-move. The
+// command form is already a real affect (Fenia skillcommand/camouflage); the poncho keeps its bare
+// bit and only gains a permanent gear-affect line. Consequence: with no real affect ever installed,
+// this eqAffects entry makes isAffected(camouflage) fold true for the whole time the poncho is worn
+// even after the raw bit is stripped -- so the camouflage command and ambush must gate on the raw
+// affected_by bit, not isAffected (they do).
 static const struct { int bit; const char *skill; } item_stealth_bit_skills[] = {
-    { AFF_SNEAK,     "sneak" },
-    { AFF_HIDE,      "hide" },
-    { AFF_FADE,      "fade" },
-    { AFF_INVISIBLE, "invisibility" },
-    { AFF_IMP_INVIS, "improved invis" },
+    { AFF_SNEAK,      "sneak" },
+    { AFF_HIDE,       "hide" },
+    { AFF_FADE,       "fade" },
+    { AFF_INVISIBLE,  "invisibility" },
+    { AFF_IMP_INVIS,  "improved invis" },
+    { AFF_CAMOUFLAGE, "camouflage" },   // display-only; NOT re-armed, see note above
     { 0, 0 }
 };
 
