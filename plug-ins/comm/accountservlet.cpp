@@ -93,6 +93,21 @@ static DLString account_canon_value(const DLString &type, const DLString &value)
     return value;
 }
 
+// Account character keys are always the Latin login name. Reject anything else so
+// PCharacterManager::find (which fuzzy-matches declined Cyrillic names) can never
+// resolve a free-typed RU/UA name onto the wrong character.
+static bool account_is_latin_name(const DLString &name)
+{
+    if (name.empty())
+        return false;
+    for (int i = 0; i < (int)name.size(); i++) {
+        char c = name[i];
+        if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')))
+            return false;
+    }
+    return true;
+}
+
 // Pull {identityType(normalized+validated), value(canonicalized)} out of args.
 // Returns false (with the response already filled) on a missing/invalid field.
 static bool account_read_identity(const Json::Value &params, HttpResponse &response,
@@ -160,8 +175,41 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
         return;
     }
 
-    // find-before-create: an identity belongs to at most one account.
+    // find-before-create: an identity belongs to at most one account. Resolve the
+    // target (may be "" -> a new account is minted below), but run EVERY rejection
+    // BEFORE create() so a refused or failed redeem never leaves an orphan account
+    // persisted for the identity.
     DLString id = AccountManager::findByIdentity(type, value);
+
+    // Refuse to move a character already linked to a DIFFERENT account. When id is
+    // "" (a new account would be minted), any existing link is a different one.
+    DLString current = AccountManager::accountOf(entry.charName);
+    if (!current.empty() && current != id) {
+        LogStream::sendWarning() << "Accounts: redeem refused, " << entry.charName
+            << " already on account " << current << " (code offered "
+            << (id.empty() ? DLString("<new>") : id) << ")." << endl;
+        Json::Value a;
+        a["result"] = "refused_other_account";
+        a["char"] = entry.charName;
+        a["account"] = current;
+        AccountAudit::record("code_redeem", a);
+        servlet_response_400(response, "Character is already linked to another account");
+        return;
+    }
+
+    // The character must still exist (deleted/renamed between mint and redeem).
+    // entry.charName is the Latin login minted in-game, so this is an exact lookup.
+    DLString cname = entry.charName;
+    if (PCharacterManager::find(cname.capitalize()) == 0) {
+        Json::Value a;
+        a["result"] = "char_gone";
+        a["char"] = entry.charName;
+        AccountAudit::record("code_redeem", a);
+        servlet_response_404(response, "Character not found: " + entry.charName);
+        return;
+    }
+
+    // All rejections passed -- now mint the account if the identity has none yet.
     bool created = false;
     if (id.empty()) {
         id = AccountManager::create(type, value, display);
@@ -172,20 +220,6 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
             return;
         }
         created = true;
-    }
-
-    // Refuse to steal a character already linked to a DIFFERENT account.
-    DLString current = AccountManager::accountOf(entry.charName);
-    if (!current.empty() && current != id) {
-        LogStream::sendWarning() << "Accounts: redeem refused, " << entry.charName
-            << " already on account " << current << " (code offered " << id << ")." << endl;
-        Json::Value a;
-        a["result"] = "refused_other_account";
-        a["char"] = entry.charName;
-        a["account"] = current;
-        AccountAudit::record("code_redeem", a);
-        servlet_response_400(response, "Character is already linked to another account");
-        return;
     }
 
     if (current != id) {
@@ -208,7 +242,12 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     // paste is caught immediately instead of silently handing the char away.
     PCharacter *online = PCharacterManager::findPlayer(entry.charName);
     if (online) {
-        DLString who = display.empty() ? value : display;
+        // `display` is chosen by the REDEEMER, relayed by the bot -- strip its
+        // colour/mudtag codes and clamp length so it can't paint the minter's
+        // screen or forge a reassuring line. value (email/numeric id) is safe.
+        DLString who = display.empty() ? value : display.colourStrip();
+        if (who.size() > 40)
+            who = who.substr(0, 40) + "...";
         online->pecho(_("Твой код привязки использован (%1$s: %2$s). Если это не ты -- сразу смени пароль командой {yпароль{x."),
                       type.c_str(), who.c_str());
     }
@@ -267,6 +306,11 @@ static void account_resetpw(HttpRequest &request, HttpResponse &response)
     DLString charName;
     if (!servlet_get_arg(params, response, "char", charName))
         return;
+
+    if (!account_is_latin_name(charName)) {
+        servlet_response_400(response, "Character name must be Latin letters (the login name)");
+        return;
+    }
 
     // The identity must own the account the character belongs to.
     DLString id = AccountManager::findByIdentity(type, value);
