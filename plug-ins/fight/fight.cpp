@@ -187,13 +187,26 @@ static void wlprog_fight( Object *obj, Character *ch)
  * prototype and drift it to disk on the next asave -- exactly the noise #1127
  * fixed on the scoring side.
  *
- * The proc casts spell->run directly, so it must re-assert the few guards the
- * real cast path (ccast.cpp) applies that still matter to a passive proc aimed
- * at the char already being fought: ROOM_NO_CAST, and is_safe for offensive
- * spells (quietly -- a per-round proc must not spam the "protected" message).
- * spellbane/blockedByNobuff/preRun parity is deliberately left out: spellbane
- * deals retributive baneDamage back to the wearer every round, a balance change
- * that needs its own decision -- see the follow-up card, not a reflex here.
+ * The proc casts spell->run directly, so it re-asserts the guards the real cast
+ * path (ccast.cpp) applies that still matter to a passive proc aimed at the char
+ * already being fought: ROOM_NO_CAST; is_safe for offensive spells (quietly -- a
+ * per-round proc must not spam the "protected" message); preRun (let a spell veto
+ * itself via its Fenia preRunXXX hook, a no-op when undefined -- the few combat
+ * spells that DO veto, e.g. disintegrate/witch curse/liturgy, emit a refusal
+ * message, but none are used in combatcast today and vetoing them in combat is
+ * correct); and spellbane for OFFENSIVE spells only, CAPPED once per round per
+ * item -- the wearer eats the retributive baneDamage at most once a round no
+ * matter how many offensive casts or how high the count, so proc gear is still
+ * punished vs a spellbane target without count multiplying the punishment (Kit
+ * 2026-09-10, Trello lO5CW0PQ). Defensive-side spellbane (the deflect a manual
+ * heal-cast would suffer) is intentionally NOT mirrored -- offensive-only scope.
+ *
+ * blockedByNobuff is NOT mirrored: it only refuses a THIRD-PARTY beneficial cast,
+ * but combatcast's buffs/heals target the wearer (self) and its offensive spells
+ * are not beneficial, so it can never fire here. Entries must name char-targeted
+ * combat spells (offensive -> the opponent, anything else -> the wearer); an
+ * object/room spell just no-ops harmlessly (Fenia runVict absent, C++ char
+ * variant does nothing useful) -- a data-authoring rule, not a code guard.
  */
 static void ocombatcast_fight( Object *obj, Character *ch )
 {
@@ -211,6 +224,8 @@ static void ocombatcast_fight( Object *obj, Character *ch )
     // No magic works in this room at all -- mirrors ccast.cpp:163.
     if (ch->in_room != 0 && IS_SET( ch->in_room->room_flags, ROOM_NO_CAST ))
         return;
+
+    bool spellbaneFired = false;    // an offensive proc pays spellbane at most once per round per item
 
     for (auto i = casts.begin( ); i != casts.end( ); ++i) {
         const Json::Value &c = *i;
@@ -235,9 +250,42 @@ static void ocombatcast_fight( Object *obj, Character *ch )
         if (offensive && (ch->fighting == 0 || is_safe_nomessage( ch, ch->fighting )))
             continue;
 
+        // Offensive spells hit the current opponent; everything else the wearer.
+        Character *victim = offensive ? ch->fighting : ch;
+        if (victim == 0)
+            continue;
+
         int level = obj->level;
         if (level < 1)          // floor: a level-0 item must not cast at level 0
             level = 1;
+
+        SpellTarget::Pointer target( NEW, victim );
+
+        // preRun parity (ccast.cpp:216): let the spell refuse via its Fenia
+        // preRunXXX hook before anything fires. No-op for spells without one.
+        if (!spell->preRun( ch, target, level ))
+            continue;
+
+        // spellbane parity, capped once per round per item: the first offensive
+        // proc-cast this round lets a spellbane target deal retributive baneDamage
+        // back to the wearer and blocks that one cast; later offensive casts this
+        // round (more entries, higher count) don't re-pay it. Non-offensive procs
+        // never trigger spellbane.
+        if (offensive && !spellbaneFired) {
+            spellbaneFired = true;
+            Room *roomBefore = ch->in_room;
+            if (spell->spellbane( ch, victim )) {
+                // spellbane's baneDamage hits the WEARER (ch) and can kill them,
+                // and spellbane swallows that death (it catches VictimDeathException
+                // internally and returns true). Re-assert the round-loop invariant:
+                // a dead wearer (isDead), or a PC extract_dead_player moved to the
+                // altar (in_room changed), must abandon the round like every other
+                // mid-round death -- not keep casting on its own corpse.
+                if (ch->isDead( ) || ch->in_room != roomBefore)
+                    throw VictimDeathException( );
+                continue;
+            }
+        }
 
         int count = c.isMember( "count" ) ? c["count"].asInt( ) : 1;
         if (count < 1)
@@ -250,12 +298,12 @@ static void ocombatcast_fight( Object *obj, Character *ch )
             // throws when it does, which the round loop already tolerates); re-read
             // ch->fighting each pass so a self-buff still fires and an offensive
             // cast never targets a dead victim.
-            Character *victim = offensive ? ch->fighting : ch;
-            if (victim == 0)
+            Character *v = offensive ? ch->fighting : ch;
+            if (v == 0)
                 break;
 
-            SpellTarget::Pointer target( NEW, victim );
-            spell->run( ch, target, level );
+            SpellTarget::Pointer t( NEW, v );
+            spell->run( ch, t, level );
         }
     }
 }

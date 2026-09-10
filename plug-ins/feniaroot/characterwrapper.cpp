@@ -3117,6 +3117,8 @@ static double ga_procScore( obj_index_data *pObj )
         double count  = c.isMember( "count" ) ? c["count"].asDouble( ) : 1.0;
         if (count <= 0)
             count = 1.0;
+        if (count > 10)          // match the firing cap (ocombatcast_fight) so the score reflects what actually casts
+            count = 10.0;
         raw += v * (chance / 100.0) * count;
     }
 
