@@ -133,6 +133,30 @@ void send_telegram_no_escape(const DLString &content)
     send_to_telegram(koi2utf(content));
 }
 
+/**
+ * Queue one email for the iemail spool drainer (runtime/bin/iemail, cron-driven).
+ * `to` is a plain address (ASCII, unconverted); subject and body are engine KOI8
+ * strings, converted to UTF-8 for the queue file. Mirrors send_to_telegram().
+ */
+void send_email(const DLString &to, const DLString &subject, const DLString &body)
+{
+    try {
+        Json::Value msg;
+        msg["to"] = to;
+        msg["subject"] = koi2utf(subject);
+        msg["body"] = koi2utf(body);
+
+        Json::FastWriter writer;
+        DLDirectory dir( dreamland->getMiscDir( ), "email" );
+        DLFileStream( dir.tempEntry( ) ).fromString(
+            writer.write(msg)
+        );
+
+    } catch (const Exception &e) {
+        LogStream::sendError() << "Send email: " << e.what() << endl;
+    }
+}
+
 /** Prepare string to use inside Discord JSON field. Strip tags and colors and trim to size. */
 static DLString discord_string(const DLString &source)
 {

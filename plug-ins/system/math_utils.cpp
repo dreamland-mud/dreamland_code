@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include <random>
 
 using namespace std;
 
@@ -24,6 +25,35 @@ string create_nonce(int len)
     for (int i = 0; i < len; ++i) {
         buf << alphanum[rand() % (sizeof(alphanum) - 1)];
     }
+    return buf.str();
+}
+
+/**
+ * Generate a random string from an unambiguous alphabet (no 0 O 1 I L), seeded from
+ * the system CSPRNG. For codes that gate identity -- account linking codes and the like.
+ * create_nonce() above is rand()-based and predictable; fine for cosmetic tokens, not these.
+ */
+string create_secure_nonce(int len)
+{
+    static const char alphabet[] = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    std::random_device rd;
+    std::uniform_int_distribution<size_t> dist(0, sizeof(alphabet) - 2);
+
+    ostringstream buf;
+    for (int i = 0; i < len; ++i)
+        buf << alphabet[dist(rd)];
+    return buf.str();
+}
+
+/** CSPRNG-seeded decimal digits, for emailed one-time codes. */
+string create_secure_digits(int len)
+{
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist(0, 9);
+
+    ostringstream buf;
+    for (int i = 0; i < len; ++i)
+        buf << dist(rd);
     return buf.str();
 }
 

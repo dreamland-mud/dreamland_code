@@ -30,4 +30,6 @@ void send_telegram_level(PCharacter *ch);
 void send_telegram(const DLString &content);
 void send_telegram_no_escape(const DLString &content);
 
+void send_email(const DLString &to, const DLString &subject, const DLString &body);
+
 #endif
