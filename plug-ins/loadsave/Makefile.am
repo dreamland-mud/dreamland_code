@@ -51,7 +51,8 @@ money_utils.cpp \
 player_menu.cpp \
 occupations.cpp \
 accountmanager.cpp \
-linkingcode.cpp
+linkingcode.cpp \
+accountaudit.cpp
 
 libloadsave_la_MOC = \
 objectbehaviormanager.h \

@@ -20,7 +20,11 @@
 #include "loadsave.h"
 #include "interp.h"
 #include "wiznet.h"
+#include "accountmanager.h"
+#include "accountaudit.h"
 
+#include "jsoncpp/json/json.h"
+#include "merc.h"
 #include "vnum.h"
 #include "def.h"
 
@@ -66,7 +70,24 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
         d->close( );
         return -1;
     }
-    
+
+    /* Same-account simultaneous-login block (mortals only; a reconnect to the
+     * SAME character is exempt -- conflictingOnlineChar excludes it). */
+    if (pcm->get_trust( ) < LEVEL_IMMORTAL) {
+        DLString conflict = AccountManager::conflictingOnlineChar( pcm->getName( ) );
+        if (!conflict.empty( )) {
+            Json::Value fields;
+            fields["char"] = pcm->getName( );
+            fields["conflict"] = conflict;
+            fields["channel"] = "backdoor";
+            AccountAudit::record( "login_block_conflict", fields );
+
+            d->send( "Another character on your account is already online. Quit it first.\r\n" );
+            d->close( );
+            return -1;
+        }
+    }
+
     d->buffer_handler = new DefaultBufferHandler( num );
     d->send( "Welcome to Dream Land!\r\n" );
     

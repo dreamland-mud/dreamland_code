@@ -40,6 +40,12 @@ public:
     static DLString accountOf(const DLString &charName);        // "" when unattached
     static std::list<DLString> charsOf(const DLString &id);     // member character names
 
+    // A DIFFERENT, mortal, in-world character on the same account as charName, or
+    // "" (the same-account simultaneous-login block). Returns "" for an unattached
+    // char; never reports the char itself (a reconnect is not a conflict) nor an
+    // immortal (gods switch/test). The caller still exempts an immortal logging in.
+    static DLString conflictingOnlineChar(const DLString &charName);
+
     // --- mutations (persist immediately) ---
     // No callers until the linking-code / redeem surface lands in a later phase.
     // Caller contract (the redeem surface must honour it):

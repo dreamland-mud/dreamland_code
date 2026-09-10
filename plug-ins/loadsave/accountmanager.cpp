@@ -10,6 +10,9 @@
 #include "commonattributes.h"
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
+#include "pcharacter.h"
+#include "character.h"
+#include "merc.h"
 #include "math_utils.h"
 #include "json_utils.h"
 
@@ -317,4 +320,33 @@ list<DLString> AccountManager::charsOf(const DLString &id)
     for (PCMemoryInterface *pc : find_players_by_json_attribute("account", "id", id))
         names.push_back(pc->getName());
     return names;
+}
+
+DLString AccountManager::conflictingOnlineChar(const DLString &charName)
+{
+    DLString name = charName;
+    name.capitalize();
+
+    DLString myAccount = accountOf(name);
+    if (myAccount.empty())
+        return DLString::emptyString;   // an unattached char never conflicts
+
+    // char_list is the in-world set: a descriptor still in the nanny (typing name
+    // or password) is not in it yet, so a half-logged-in connection is naturally
+    // exempt. The char itself (a reconnect/reanimate) and immortals are skipped.
+    for (Character *wch = char_list; wch != 0; wch = wch->next) {
+        if (wch->is_npc())
+            continue;
+
+        PCharacter *pch = wch->getPC();
+        if (pch == 0 || pch->getName() == name)
+            continue;
+        if (pch->get_trust() >= LEVEL_IMMORTAL)
+            continue;
+
+        if (accountOf(pch->getName()) == myAccount)
+            return pch->getName();
+    }
+
+    return DLString::emptyString;
 }
