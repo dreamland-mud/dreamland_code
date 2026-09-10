@@ -8,8 +8,8 @@
 #include "player_account.h"
 #include "accountmanager.h"
 #include "linkingcode.h"
+#include "accountaudit.h"
 #include "arg_utils.h"
-#include "logstream.h"
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
@@ -140,11 +140,100 @@ static void account_link(PCharacter *ch)
     }
 
     DLString code = LinkingCode::mint(ch->getName(), false);
-    LogStream::sendNotice() << "Accounts: link code minted for " << ch->getName() << "." << endl;
+
+    Json::Value f;
+    f["char"] = ch->getName();
+    AccountAudit::record("code_mint", f);
 
     ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
     ch->pecho(_("Он одноразовый и действует 10 минут. Введи его в боте (Telegram или Discord) или на сайте, чтобы привязать этого персонажа к аккаунту."));
     ch->pecho(_("Никому не показывай этот код: кто его введет, привяжет персонажа к своему аккаунту."));
+}
+
+/* Immortal-only backstop -- the human vibe-check with real hands (roadmap 2.9).
+ * Every mutation is audited with the acting immortal as `actor`. */
+static void account_admin(PCharacter *ch, DLString &args)
+{
+    DLString sub = args.getOneArgument();
+
+    if (arg_oneof(sub, "info")) {
+        DLString charName = args.getOneArgument();
+        if (charName.empty()) {
+            ch->pecho("Usage: account admin info <char>");
+            return;
+        }
+        DLString id = AccountManager::accountOf(charName);
+        if (id.empty()) {
+            ch->pecho("%1$s is not linked to any account.", charName.c_str());
+            return;
+        }
+        ch->pecho("Account {W%1$s{x:", id.c_str());
+        Json::Value acc = AccountManager::get(id);
+        const Json::Value &identities = acc["identities"];
+        for (Json::Value::const_iterator i = identities.begin(); i != identities.end(); ++i) {
+            if (!(*i).isObject())
+                continue;
+            ch->pecho("  identity %1$s: %2$s", (*i)["type"].asString().c_str(), (*i)["value"].asString().c_str());
+        }
+        for (const DLString &n : AccountManager::charsOf(id))
+            ch->pecho("  char %1$s", n.c_str());
+        return;
+    }
+
+    if (arg_oneof(sub, "attach")) {
+        DLString charName = args.getOneArgument();
+        DLString id = args.getOneArgument();
+        if (charName.empty() || id.empty()) {
+            ch->pecho("Usage: account admin attach <char> <accountId>");
+            return;
+        }
+        if (!AccountManager::exists(id)) {
+            ch->pecho("No such account: %1$s", id.c_str());
+            return;
+        }
+        DLString current = AccountManager::accountOf(charName);
+        if (!current.empty() && current != id) {
+            ch->pecho("%1$s is already on account %2$s -- detach first.", charName.c_str(), current.c_str());
+            return;
+        }
+        if (!AccountManager::attachChar(id, charName)) {
+            ch->pecho("Character not found: %1$s", charName.c_str());
+            return;
+        }
+        Json::Value f;
+        f["actor"] = ch->getName();
+        f["char"] = charName;
+        f["account"] = id;
+        AccountAudit::record("admin_attach", f);
+        ch->pecho("Attached %1$s to %2$s.", charName.c_str(), id.c_str());
+        return;
+    }
+
+    if (arg_oneof(sub, "detach")) {
+        DLString charName = args.getOneArgument();
+        if (charName.empty()) {
+            ch->pecho("Usage: account admin detach <char>");
+            return;
+        }
+        DLString current = AccountManager::accountOf(charName);
+        if (current.empty()) {
+            ch->pecho("%1$s is not linked to any account.", charName.c_str());
+            return;
+        }
+        if (!AccountManager::detachChar(charName)) {
+            ch->pecho("Character not found: %1$s", charName.c_str());
+            return;
+        }
+        Json::Value f;
+        f["actor"] = ch->getName();
+        f["char"] = charName;
+        f["account"] = current;
+        AccountAudit::record("admin_detach", f);
+        ch->pecho("Detached %1$s from %2$s.", charName.c_str(), current.c_str());
+        return;
+    }
+
+    ch->pecho("Usage: account admin info|attach|detach ...");
 }
 
 CMDRUN( account )
@@ -165,6 +254,11 @@ CMDRUN( account )
     // form that actually arrives. Help shows the orthographic "звʼязати".
     if (arg_oneof(cmd, "link", "связать", "звязати")) {
         account_link(ch->getPC());
+        return;
+    }
+
+    if (ch->is_immortal() && arg_oneof(cmd, "admin")) {
+        account_admin(ch->getPC(), args);
         return;
     }
 

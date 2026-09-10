@@ -18,10 +18,13 @@
 #include "serversocketcontainer.h"
 #include "dlfileloader.h"
 
+#include <jsoncpp/json/json.h>
 #include "pcharacter.h"
 #include "player_utils.h"
 #include "npcharacter.h"
 #include "pcharactermanager.h"
+#include "accountmanager.h"
+#include "accountaudit.h"
 #include "room.h"
 #include "object.h"
 #include "configurable.h"
@@ -461,8 +464,34 @@ NMI_INVOKE( NannyHandler, checkBan, "" )
     return Register( );
 }
 
+/*
+ * Same-account simultaneous-login block: the name of ANOTHER of the account's
+ * mortal characters already in the world, or "" to let the login through. Called
+ * by the Fenia nanny after the password is accepted and before the reconnect
+ * step, so it never fires on a legit reconnect (that is the same char, excluded).
+ */
+NMI_INVOKE( NannyHandler, accountConflict, "" )
+{
+    PCharacter *ch = getPlayer( args );
+
+    // Immortals are exempt (they switch, test, run several).
+    if (ch->get_trust( ) >= LEVEL_IMMORTAL)
+        return DLString::emptyString;
+
+    DLString conflict = AccountManager::conflictingOnlineChar( ch->getName( ) );
+    if (!conflict.empty( )) {
+        Json::Value fields;
+        fields["char"] = ch->getName( );
+        fields["conflict"] = conflict;
+        fields["channel"] = "nanny";
+        AccountAudit::record( "login_block_conflict", fields );
+    }
+
+    return conflict;
+}
+
 /*--------------------------------------------------------------------------
- * nanny: character creation 
+ * nanny: character creation
  *-------------------------------------------------------------------------*/
 NMI_INVOKE( NannyHandler, checkName, "" )
 {

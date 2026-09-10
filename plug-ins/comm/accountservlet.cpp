@@ -27,6 +27,7 @@
 #include "servlet_utils.h"
 #include "accountmanager.h"
 #include "linkingcode.h"
+#include "accountaudit.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
@@ -140,8 +141,10 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
 
     LinkingCode::Entry entry;
     if (!LinkingCode::redeem(code, entry)) {
-        LogStream::sendNotice() << "Accounts: redeem miss (invalid/expired) for "
-            << type << ":" << value << "." << endl;
+        Json::Value a;
+        a["result"] = "invalid_or_expired";
+        a["identity"] = type + ":" + value;
+        AccountAudit::record("code_redeem", a);
         servlet_response_400(response, "Invalid or expired code");
         return;
     }
@@ -149,8 +152,10 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     // PR-B only handles a real, saved character. attach-at-creation (a pending
     // code, char not yet on disk) is Phase 4 and rewrites this path.
     if (entry.pendingCreation) {
-        LogStream::sendNotice() << "Accounts: redeem of a pending-creation code for "
-            << entry.charName << " (not supported until Phase 4)." << endl;
+        Json::Value a;
+        a["result"] = "pending_unsupported";
+        a["char"] = entry.charName;
+        AccountAudit::record("code_redeem", a);
         servlet_response_400(response, "Pending-creation codes are not supported yet");
         return;
     }
@@ -174,6 +179,11 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     if (!current.empty() && current != id) {
         LogStream::sendWarning() << "Accounts: redeem refused, " << entry.charName
             << " already on account " << current << " (code offered " << id << ")." << endl;
+        Json::Value a;
+        a["result"] = "refused_other_account";
+        a["char"] = entry.charName;
+        a["account"] = current;
+        AccountAudit::record("code_redeem", a);
         servlet_response_400(response, "Character is already linked to another account");
         return;
     }
@@ -185,9 +195,13 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
         }
     }
 
-    LogStream::sendNotice() << "Accounts: redeem ok -- " << entry.charName
-        << (created ? " created+attached " : " attached ") << id
-        << " via " << type << "." << endl;
+    Json::Value a;
+    a["result"] = "ok";
+    a["char"] = entry.charName;
+    a["account"] = id;
+    a["identity_type"] = type;
+    a["created"] = created;
+    AccountAudit::record("code_redeem", a);
 
     // Minter echo: the code is a bearer credential, so tell the (still-online)
     // minter their code was just consumed and by which identity, so a misdirected
@@ -265,6 +279,11 @@ static void account_resetpw(HttpRequest &request, HttpResponse &response)
     if (charAccount.empty() || charAccount != id) {
         LogStream::sendWarning() << "Accounts: resetpw refused, " << charName
             << " is not on account " << id << "." << endl;
+        Json::Value a;
+        a["result"] = "refused_not_on_account";
+        a["char"] = charName;
+        a["account"] = id;
+        AccountAudit::record("pw_reset", a);
         servlet_response_400(response, "Character is not on this account");
         return;
     }
@@ -288,8 +307,13 @@ static void account_resetpw(HttpRequest &request, HttpResponse &response)
     DLString temp = create_secure_nonce(8);
     password_set(pc, temp);
 
-    LogStream::sendWarning() << "Accounts: password reset for " << pc->getName()
-        << " (account " << id << ", via " << type << ")." << endl;
+    // Audit the event, NEVER the password.
+    Json::Value a;
+    a["result"] = "ok";
+    a["char"] = pc->getName();
+    a["account"] = id;
+    a["identity_type"] = type;
+    AccountAudit::record("pw_reset", a);
 
     Json::Value body;
     body["char"] = pc->getName();
