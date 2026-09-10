@@ -159,7 +159,10 @@ void show_exits_to_char( Character *ch, Room *targetRoom )
             continue;
         }
 
-        extras.push_back(cmd_extra_exit(ch, eexit, false));
+        // prefereShortDescr=true: use the language-aware short_desc_from (like
+        // the verbose `exits` command below) so a UA/EN viewer doesn't get the
+        // RU keyword leaking into the brief line (e.g. "[Виходи: схід : потайная]").
+        extras.push_back(cmd_extra_exit(ch, eexit, true));
     }
 
     if (!extras.empty())
