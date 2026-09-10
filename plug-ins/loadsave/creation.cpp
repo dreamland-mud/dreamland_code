@@ -186,7 +186,12 @@ void passive_refresh(Character *ch, bool verbose)
 // "TODO remove once sneak-from-item becomes an affect".
 //
 // Only the volitional traits do_visible strips need this; other worn grants (fly,
-// infravision) are never stripped. Camouflage is excluded -- no onRefresh handler yet.
+// infravision) are never stripped. Camouflage is excluded on purpose: its AffectHandler
+// has no onRefresh (only onEntryChar), so a re-arm entry here would install nothing; and
+// camo is stripped by BOTH combat (do_visible) and movement (check_camouflage / Walkment),
+// so a re-arm would ping-pong wearoff messages on movement for a wearer without
+// camouflage-move. Its bit is still harvested into eqAffects (item_stealth_bit_skills in
+// defaultwearlocation.cpp) for the gear-affect panel; the command form is already a real affect.
 static const char * const item_stealth_skills[] = {
     "sneak", "hide", "fade", "invisibility", "improved invis", 0
 };
