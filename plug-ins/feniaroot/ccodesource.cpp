@@ -21,6 +21,7 @@
 #include "fenia/register-impl.h"
 #include "fenia/codesource.h"
 #include "fenia/object.h"
+#include "fenia/closure.h"
 #include "xmlattributecodesource.h"
 #include "wrappermanager.h"
 
@@ -42,6 +43,131 @@ using namespace std;
 
 bool has_fenia_security( PCMemoryInterface *pch );
 bool text_match_with_highlight(const DLString &text, const DLString &args, ostringstream &matchBuf);
+
+// --- Fenia GC duplicate-collapse plan (Trello #2857, P3.5) ------------------
+// One entry per duplicated CodeSource name: the canonical copy (most-referenced,
+// ties to lowest id) and, per other copy, whether it collapses onto the
+// canonical -- same function count and identical argNames position-by-position,
+// a same-source recompile, carrying the (dupFn -> canonFn) pairing -- or is
+// skipped as a structurally different stale copy that must never be rebound.
+// Shared by `cs gc` (report) and feniaBuildDupRedirect (the boot-recovery
+// redirect) so the dry-run preview always matches the destructive action.
+struct DupCopy {
+    id_t csId;
+    bool collapse;
+    int fns;
+    int refcnt;
+    std::vector<std::pair<Function::id_t, Function::id_t> > fnMap; // dupFn -> canonFn
+};
+struct DupName {
+    DLString name;
+    id_t canonId;
+    int canonFns;
+    int canonRefcnt;
+    std::vector<DupCopy> copies;
+};
+
+static std::vector<DupName> computeDupPlan( )
+{
+    std::map<DLString, std::vector<id_t> > byName;
+    for(CodeSource::Manager::iterator i = CodeSource::manager->begin( );
+            i != CodeSource::manager->end( ); i++) {
+        const DLString &nm = i->name;
+        if (nm.empty( ) || nm[0] == '<')
+            continue;
+        byName[nm].push_back(i->getId( ));
+    }
+
+    std::vector<DupName> plan;
+    for(std::map<DLString, std::vector<id_t> >::iterator p = byName.begin( );
+            p != byName.end( ); p++) {
+        if (p->second.size( ) <= 1)
+            continue;
+
+        id_t canonId = p->second[0];
+        for(size_t k = 1; k < p->second.size( ); k++) {
+            id_t cid = p->second[k];
+            if (CodeSource::manager->at(cid).refcnt > CodeSource::manager->at(canonId).refcnt
+                || (CodeSource::manager->at(cid).refcnt == CodeSource::manager->at(canonId).refcnt
+                    && cid < canonId))
+                canonId = cid;
+        }
+
+        CodeSource &canon = CodeSource::manager->at(canonId);
+        DupName dn;
+        dn.name = p->first;
+        dn.canonId = canonId;
+        dn.canonFns = (int)canon.functions.size( );
+        dn.canonRefcnt = canon.refcnt;
+
+        for(size_t k = 0; k < p->second.size( ); k++) {
+            id_t cid = p->second[k];
+            if (cid == canonId)
+                continue;
+            CodeSource &c = CodeSource::manager->at(cid);
+
+            DupCopy dc;
+            dc.csId = cid;
+            dc.fns = (int)c.functions.size( );
+            dc.refcnt = c.refcnt;
+            dc.collapse = (c.functions.size( ) == canon.functions.size( ));
+
+            if (dc.collapse) {
+                FunctionManager::iterator fa = canon.functions.begin( );
+                FunctionManager::iterator fb = c.functions.begin( );
+                for( ; fa != canon.functions.end( ) && fb != c.functions.end( );
+                        fa++, fb++) {
+                    DLString argsA = fa->argNames ? fa->argNames->toString( ) : DLString::emptyString;
+                    DLString argsB = fb->argNames ? fb->argNames->toString( ) : DLString::emptyString;
+                    if (argsA != argsB) {
+                        dc.collapse = false;
+                        dc.fnMap.clear( );
+                        break;
+                    }
+                    dc.fnMap.push_back(std::make_pair(fb->getId( ), fa->getId( )));
+                }
+            }
+
+            dn.copies.push_back(dc);
+        }
+
+        plan.push_back(dn);
+    }
+
+    return plan;
+}
+
+// Boot-recovery entry point (WrappersPlugin::initialization, before object
+// recovery): register every collapsible duplicate's functions for redirect to
+// the canonical copy, then arm the redirect. Closure's restore path then links
+// the canonical function instead, the duplicates fall to refcnt 0, and the boot
+// fsck (ValidateTask) reaps them in the same boot. Skipped (different-shape)
+// copies are left untouched. See Trello #2857 (P3.5).
+void feniaBuildDupRedirect( )
+{
+    std::vector<DupName> plan = computeDupPlan( );
+    int copies = 0, fns = 0;
+
+    for(size_t n = 0; n < plan.size( ); n++) {
+        for(size_t k = 0; k < plan[n].copies.size( ); k++) {
+            DupCopy &dc = plan[n].copies[k];
+            if (!dc.collapse)
+                continue;
+            copies++;
+            for(size_t f = 0; f < dc.fnMap.size( ); f++) {
+                feniaDupRedirectAdd(dc.csId, dc.fnMap[f].first,
+                                    plan[n].canonId, dc.fnMap[f].second);
+                fns++;
+            }
+        }
+    }
+
+    feniaDupRedirectActivate( );
+    LogStream::sendNotice( )
+        << "fenia dup collapse: redirecting " << copies
+        << " duplicate copy(ies), " << fns
+        << " function(s) to canonical; boot fsck will reap them" << endl;
+}
 
 static bool cs_by_subj(PCharacter *ch, const DLString &arg, id_t &csid)
 {
@@ -284,68 +410,27 @@ CMDADM( codesource )
             return;
         }
 
-        std::map<DLString, std::vector<id_t> > byName;
-        for(CodeSource::Manager::iterator i = CodeSource::manager->begin( );
-                i != CodeSource::manager->end( ); i++) {
-            const DLString &nm = i->name;
-            if (nm.empty( ) || nm[0] == '<')
-                continue;
-            byName[nm].push_back(i->getId( ));
-        }
-
+        std::vector<DupName> plan = computeDupPlan( );
         int dupNames = 0, collapsible = 0, mismatched = 0;
         ch->pecho("{YFenia GC dry-run{x (canonical <- collapse candidates, ничего не трогается):");
 
-        for(std::map<DLString, std::vector<id_t> >::iterator p = byName.begin( );
-                p != byName.end( ); p++) {
-            if (p->second.size( ) <= 1)
-                continue;
+        for(size_t n = 0; n < plan.size( ); n++) {
+            DupName &dn = plan[n];
             dupNames++;
-
-            id_t canonId = p->second[0];
-            for(size_t k = 1; k < p->second.size( ); k++) {
-                id_t cid = p->second[k];
-                CodeSource &c = CodeSource::manager->at(cid);
-                CodeSource &best = CodeSource::manager->at(canonId);
-                if (c.refcnt > best.refcnt
-                    || (c.refcnt == best.refcnt && cid < canonId))
-                    canonId = cid;
-            }
-
-            CodeSource &canon = CodeSource::manager->at(canonId);
-            ch->pecho("{C%s{x", p->first.c_str( ));
+            ch->pecho("{C%s{x", dn.name.c_str( ));
             ch->pecho("    canonical {W%d{x fns=%d refcnt=%d",
-                    canonId, (int)canon.functions.size( ), canon.refcnt);
+                    dn.canonId, dn.canonFns, dn.canonRefcnt);
 
-            for(size_t k = 0; k < p->second.size( ); k++) {
-                id_t cid = p->second[k];
-                if (cid == canonId)
-                    continue;
-                CodeSource &c = CodeSource::manager->at(cid);
-
-                bool match = (c.functions.size( ) == canon.functions.size( ));
-                if (match) {
-                    FunctionManager::iterator fa = canon.functions.begin( );
-                    FunctionManager::iterator fb = c.functions.begin( );
-                    for( ; fa != canon.functions.end( ) && fb != c.functions.end( );
-                            fa++, fb++) {
-                        DLString argsA = fa->argNames ? fa->argNames->toString( ) : DLString::emptyString;
-                        DLString argsB = fb->argNames ? fb->argNames->toString( ) : DLString::emptyString;
-                        if (argsA != argsB) {
-                            match = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (match) {
+            for(size_t k = 0; k < dn.copies.size( ); k++) {
+                DupCopy &dc = dn.copies[k];
+                if (dc.collapse) {
                     collapsible++;
                     ch->pecho("      collapse {G%d{x fns=%d refcnt=%d",
-                            cid, (int)c.functions.size( ), c.refcnt);
+                            dc.csId, dc.fns, dc.refcnt);
                 } else {
                     mismatched++;
                     ch->pecho("      {Rskip{x %d fns=%d refcnt=%d (different shape)",
-                            cid, (int)c.functions.size( ), c.refcnt);
+                            dc.csId, dc.fns, dc.refcnt);
                 }
             }
         }

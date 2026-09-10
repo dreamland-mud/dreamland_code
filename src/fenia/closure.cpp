@@ -9,6 +9,8 @@
 
 
 #include <sstream>
+#include <map>
+#include <utility>
 
 #include "logstream.h"
 #include "register-impl.h"
@@ -19,6 +21,49 @@
 #include "scope.h"
 
 using namespace Scripting;
+
+// --- Fenia GC duplicate collapse (Trello #2857, P3.5) -----------------------
+// Redirect table plus the lookup the restore constructor consults. See closure.h
+// for the rationale. feniaBuildDupRedirect() (ccodesource.cpp, sharing the same
+// plan as `cs gc`) fills this before boot object recovery, and it is cleared
+// right after -- empty and inactive at every other time, so runtime closures
+// pay only one guarded bool check.
+namespace {
+    // (duplicate csId, fnId) -> (canonical csId, fnId).
+    std::map<std::pair<uint32_t, uint32_t>, std::pair<uint32_t, uint32_t> > g_dupRedirect;
+    bool g_dupRedirectActive = false;
+}
+
+void feniaDupRedirectAdd(uint32_t dupCs, uint32_t dupFn, uint32_t canonCs, uint32_t canonFn)
+{
+    g_dupRedirect[std::make_pair(dupCs, dupFn)] = std::make_pair(canonCs, canonFn);
+}
+
+void feniaDupRedirectActivate()
+{
+    g_dupRedirectActive = true;
+}
+
+void feniaDupRedirectClear()
+{
+    g_dupRedirect.clear();
+    g_dupRedirectActive = false;
+}
+
+bool feniaDupRedirectLookup(uint32_t &csId, uint32_t &fnId)
+{
+    if (!g_dupRedirectActive)
+        return false;
+
+    std::map<std::pair<uint32_t, uint32_t>, std::pair<uint32_t, uint32_t> >::iterator i
+        = g_dupRedirect.find(std::make_pair(csId, fnId));
+    if (i == g_dupRedirect.end())
+        return false;
+
+    csId = i->second.first;
+    fnId = i->second.second;
+    return true;
+}
 
 /**
  * Find a function without creating one.
@@ -69,6 +114,14 @@ Closure::Closure(Scope *start, Function *f)
 Closure::Closure(XMLFunctionRef &ref)
     : function(0), csId(ref.codesource.getValue()), fnId(ref.function.getValue())
 {
+    // Fenia GC (Trello #2857, P3.5): during boot recovery, reroute a closure that
+    // names a non-canonical duplicate CodeSource to the canonical copy's matching
+    // function, so the duplicate ends up unreferenced and the boot fsck reaps it.
+    // Rewriting csId/fnId (not just the resolved function) keeps ~Closure and
+    // toXMLFunctionRef consistent -- teardown re-resolves by the ids and the next
+    // save writes the canonical. A no-op outside recovery (table inactive).
+    feniaDupRedirectLookup(csId, fnId);
+
     function = findFunction(csId, fnId);
 
     if (function)

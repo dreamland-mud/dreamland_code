@@ -284,9 +284,21 @@ WrappersPlugin::initialization( )
     Class::regMoc<BehaviorWrapper>();
     Class::regMoc<WordEffectWrapper>();
     Class::regMoc<PlayerWrapper>();
-    
+
+    // Fenia GC (Trello #2857, P3.5): before object recovery, arm the duplicate
+    // redirect so a closure that names a non-canonical duplicate CodeSource
+    // resolves to the canonical copy's matching function instead. The duplicates
+    // then fall to refcnt 0 and the ValidateTask sweep below reaps them in this
+    // same boot. Cleared right after recovery so it never touches runtime closure
+    // creation.
+    void feniaBuildDupRedirect( );   // ccodesource.cpp
+    void feniaDupRedirectClear( );   // closure.cpp
+    feniaBuildDupRedirect( );
+
     FeniaManager::getThis( )->recover( );
-        
+
+    feniaDupRedirectClear( );
+
     DLScheduler::getThis()->putTaskNOW( ValidateTask::Pointer(NEW) );
 
     linkTargets();

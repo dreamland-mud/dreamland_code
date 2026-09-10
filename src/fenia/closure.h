@@ -66,4 +66,19 @@ private:
 
 }
 
+// Fenia GC duplicate collapse (Trello #2857, P3.5). Pre-P2b hot-reloads minted a
+// fresh same-name CodeSource each time; the old copies persist in the DB, still
+// referenced, so the boot fsck cannot reap them. This redirect makes boot
+// recovery route a closure that names a non-canonical duplicate to the canonical
+// copy's matching function, so every duplicate falls to refcnt 0 and the boot
+// fsck (ValidateTask) reaps it in the same boot. feniaBuildDupRedirect() builds
+// the plan (shared with `cs gc`) before object recovery; Closure's restore
+// constructor consults feniaDupRedirectLookup(); feniaDupRedirectClear() runs
+// right after recovery. The map is empty and inactive at every other time.
+void feniaDupRedirectAdd(uint32_t dupCs, uint32_t dupFn, uint32_t canonCs, uint32_t canonFn);
+void feniaDupRedirectActivate();
+void feniaDupRedirectClear();
+bool feniaDupRedirectLookup(uint32_t &csId, uint32_t &fnId);
+void feniaBuildDupRedirect();
+
 #endif
