@@ -93,6 +93,30 @@ static DLString account_canon_value(const DLString &type, const DLString &value)
     return value;
 }
 
+// Make a redeemer-supplied string safe to echo THROUGH the mudtag renderer:
+// send_to re-parses the composed message (args included) for mudtags, so
+// colourStrip is the WRONG tool -- it un-escapes {{ -> { and re-arms every tag.
+// Instead clamp the raw first (so the clamp can't split a doubled brace), then
+// double every '{' to '{{' (mudtags renders '{{' as a literal '{', so no lone
+// '{'+letter tag can survive), and drop control bytes so no newline/ANSI reaches
+// the minter's terminal. KOI8 high bytes (>= 0x80, Cyrillic) are kept.
+static DLString account_echo_safe(const DLString &raw)
+{
+    DLString clamped = raw;
+    if (clamped.size() > 40)
+        clamped = clamped.substr(0, 40) + "...";
+
+    DLString out;
+    for (int i = 0; i < (int)clamped.size(); i++) {
+        char c = clamped[i];
+        if (c == '{')
+            out += "{{";
+        else if ((unsigned char)c >= 0x20)
+            out += c;
+    }
+    return out;
+}
+
 // Account character keys are always the Latin login name. Reject anything else so
 // PCharacterManager::find (which fuzzy-matches declined Cyrillic names) can never
 // resolve a free-typed RU/UA name onto the wrong character.
@@ -224,6 +248,13 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
 
     if (current != id) {
         if (!AccountManager::attachChar(id, entry.charName)) {
+            // Unreachable in practice (the char-exists check above uses the same
+            // lookup), but audit for symmetry if it ever fires as a safety net.
+            Json::Value a;
+            a["result"] = "attach_failed";
+            a["char"] = entry.charName;
+            a["account"] = id;
+            AccountAudit::record("code_redeem", a);
             servlet_response_404(response, "Character not found: " + entry.charName);
             return;
         }
@@ -242,12 +273,10 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     // paste is caught immediately instead of silently handing the char away.
     PCharacter *online = PCharacterManager::findPlayer(entry.charName);
     if (online) {
-        // `display` is chosen by the REDEEMER, relayed by the bot -- strip its
-        // colour/mudtag codes and clamp length so it can't paint the minter's
-        // screen or forge a reassuring line. value (email/numeric id) is safe.
-        DLString who = display.empty() ? value : display.colourStrip();
-        if (who.size() > 40)
-            who = who.substr(0, 40) + "...";
+        // `display` (and value) come from the REDEEMER via the bot -- escape them
+        // for the mudtag renderer so they can't paint the minter's screen, forge a
+        // line, or hide the warning tail with an invis tag.
+        DLString who = account_echo_safe(display.empty() ? value : display);
         online->pecho(_("Твой код привязки использован (%1$s: %2$s). Если это не ты -- сразу смени пароль командой {yпароль{x."),
                       type.c_str(), who.c_str());
     }
