@@ -30,8 +30,9 @@ void AccountAudit::record(const DLString &event, const Json::Value &fields)
             LogStream::sendError() << "AccountAudit: cannot open " << path << endl;
             return;
         }
-        // JsonUtils::toString renders one line -- one event per line.
-        out << JsonUtils::toString(row) << endl;
+        // JsonUtils::toString (FastWriter) already ends the line with '\n', so no
+        // endl -- that would leave a blank line between every two records.
+        out << JsonUtils::toString(row);
     } catch (const std::exception &e) {
         LogStream::sendError() << "AccountAudit: " << e.what() << endl;
     }

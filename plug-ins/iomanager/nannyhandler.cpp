@@ -474,8 +474,13 @@ NMI_INVOKE( NannyHandler, accountConflict, "" )
 {
     PCharacter *ch = getPlayer( args );
 
-    // Immortals are exempt (they switch, test, run several).
-    if (ch->get_trust( ) >= LEVEL_IMMORTAL)
+    // Immortals are exempt (they switch, test, run several). Read trust from the
+    // persisted memory interface, NOT ch: on the main port ch is the nanny dummy
+    // (a pooled getPCharacter(); the real char is loaded later, in taskGreet), so
+    // ch->get_trust() is the pool's leftover, not this player's. checkBan reads
+    // trust off find() for exactly this reason.
+    PCMemoryInterface *pci = PCharacterManager::find( ch->getName( ) );
+    if (pci != 0 && pci->get_trust( ) >= LEVEL_IMMORTAL)
         return DLString::emptyString;
 
     DLString conflict = AccountManager::conflictingOnlineChar( ch->getName( ) );
