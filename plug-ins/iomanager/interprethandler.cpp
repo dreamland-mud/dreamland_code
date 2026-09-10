@@ -405,9 +405,9 @@ void InterpretHandler::normalPrompt( Character *ch )
         case 'r' :
             if (ch->in_room != 0) {
                 if (can_see_room_details(ch)) {
-                    out << ch->in_room->getName();
+                    out << ch->in_room->getName(viewerLang(ch));
                 } else {
-                    out << "темнота";
+                    out << fmt(ch, _("темнота"));
                 }
             } else {
                 out << " ";
@@ -427,7 +427,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'z' :
             if ( ch->is_immortal() && ch->in_room != 0 )
-                out << ch->in_room->areaName();
+                out << ch->in_room->areaName(viewerLang(ch));
             else
                 out << " ";
             break;
