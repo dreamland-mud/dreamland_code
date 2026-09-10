@@ -3772,7 +3772,7 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown/5inpack -- 5 = an upgrade the char already carries unworn, render says put it on), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. best is retired (always empty, kept for shape): the chase list 'optimal' now carries the single best-obtainable pick per slot, no dream list beside it. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown/5inpack -- 5 = an upgrade the char already carries unworn, render says put it on), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -4111,6 +4111,19 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             && carriedVnum.count( pObj->vnum ) == 0)
             continue;
 
+        // A melee profile is never told to chase a weapon it cannot use. An unskilled
+        // weapon collapses toward the 20% dice floor (ga_scoreCore), so it only ever
+        // floats up as a chase pick for a class starved of real options -- an axe to a
+        // paladin, a staff to a warrior. Drop it from the candidate pool outright.
+        // Candidate path ONLY: the worn overload keeps scoring an unskilled weapon so
+        // "you already wear the best" still holds for a char stuck with one. Casters
+        // are unchanged -- they don't swing, so a weapon is worn for its passive stats.
+        // A cleric who can compound the weapon into a mace DOES wield it: keep it.
+        if (!w.caster && pObj->item_type == ITEM_WEAPON
+            && target->getSkill( get_weapon_sn( pObj ) ) == 0
+            && !ga_clericCanCompound( target, pObj ))
+            continue;
+
         double sc = ga_score( target, pObj, w, rawStat, capStat, false );
         if (sc <= 0)
             continue;
@@ -4375,11 +4388,6 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     if (pct > 100) pct = 100;   // set slots relax the per-slot cap; this is the backstop
     if (pct < 0)   pct = 0;     // a kit full of cursed maledictions can sum negative
 
-    // "best" = raw score.
-    std::vector<GACand> byBest = cands;
-    std::sort( byBest.begin( ), byBest.end( ),
-        []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
-
     // Paired armour slots (finger/neck/wrist) have two positions. The general chase
     // must (a) offer a FILL when a position is empty (baseline 0 -- a pure gain), and
     // (b) when both positions are full, measure a candidate against the WEAKER of the
@@ -4449,9 +4457,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         []( const GACand &a, const GACand &b ){ return a.value > b.value; } );
 
     // "optimal" = the practical upgrades (gap * obtainability): the highest-value
-    // item PER wear-slot-type (never two of the same slot), top 5 slots. Remember
-    // the best raw score among the picks and which vnums/slots they are.
-    // Path-cost start point, shared by both lists and cached per destination room.
+    // item PER wear-slot-type (never two of the same slot), top 5 slots. This is now
+    // the ONLY chase list -- one best-obtainable pick per slot, no dream list beside it.
+    // Path-cost start point, cached per destination room.
     Room *msm = get_room_instance( GA_START_ROOM );
     std::map<int, std::vector<int> > pathCache;   // destVnum -> [aggros, doors, fly]
 
@@ -4589,7 +4597,6 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     }
 
     RegList::Pointer optimal( NEW );
-    std::map<int,int> optVnum;
     std::map<int,double> optSlot;   // slot-type -> raw score of its optimal pick
     int nOpt = 0;
     for (size_t k = 0; k < byOpt.size( ) && nOpt < 5; k++) {
@@ -4611,7 +4618,6 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             continue;
         if (optSlot.count( byOpt[k].slot )) continue;   // one item per slot-type
         optSlot[byOpt[k].slot] = byOpt[k].score;
-        optVnum[byOpt[k].pObj->vnum] = 1;
         bool optFills; int optReplace;
         double optBar = gaBar( byOpt[k].slot, optFills, optReplace );
         double optGain = byOpt[k].score - optBar;
@@ -4619,30 +4625,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         nOpt++;
     }
 
-    // "finest" = the dream: the highest-raw item PER wear-slot-type whose raw score
-    // is STRICTLY above THAT SLOT'S optimal pick and isn't already an optimal pick.
-    // So where a slot's practical pick isn't its raw-best (a limited or boss-gated
-    // item out-scores the item the char is told to chase), the raw-best surfaces
-    // here. The bar is per-slot, NOT a global max: a strong pick in one slot must
-    // not suppress the whole list, and the scan must not break early on it. Slots
-    // with no optimal pick fall through to the worn score. byBest is sorted desc;
-    // may be empty -- Fenia then omits the section.
+    // The "finest / dream" list is retired. It named a SECOND pick per slot -- the
+    // raw-best item even when boss-gated or limited -- which read as two conflicting
+    // recommendations for one wear slot (a cap in the chase list, a helmet in the
+    // dream list). The sage now names ONE best-obtainable pick per slot -- the chase
+    // list above -- and nothing beside it. `best` stays in the return for shape only
+    // (always empty, like the slot-browse path); the renderer omits an empty list.
     RegList::Pointer best( NEW );
-    std::map<int,int> finestSlot;
-    int nBest = 0;
-    for (size_t k = 0; k < byBest.size( ) && nBest < 5; k++) {
-        if (byBest[k].acq.method == GA_UNKNOWN) continue;   // a dream is still un-chaseable
-        if (optVnum.count( byBest[k].pObj->vnum )) continue;
-        if (finestSlot.count( byBest[k].slot )) continue;   // one item per slot-type
-        std::map<int,double>::iterator os = optSlot.find( byBest[k].slot );
-        double slotBar = (os != optSlot.end( )) ? os->second : wornSlot[byBest[k].slot];
-        if (byBest[k].score <= slotBar) continue;   // must beat this slot's own bar
-        double gain = byBest[k].score - wornSlot[byBest[k].slot];
-        if (gain <= 0) continue;   // the dream list is upgrades only, never a downgrade
-        finestSlot[byBest[k].slot] = 1;
-        best->push_back( ga_buildEntry( byBest[k], msm, chLevel, isVampire, pathCache, gain ) );
-        nBest++;
-    }
 
     RegList::Pointer result( NEW );
     result->push_back( Register( pct ) );
