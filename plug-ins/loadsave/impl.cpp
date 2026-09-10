@@ -9,6 +9,7 @@
 #include "objectbehaviorplugin.h"
 #include "mobilebehaviorplugin.h"
 #include "pcharactermanager.h"
+#include "accountmanager.h"
 #include "objectbehaviormanager.h"
 #include "xmlattributeareaquest.h"
 #include "xmlattributeplugin.h"
@@ -34,6 +35,23 @@ public:
     virtual int getPriority( ) const
     {
         return SCDP_BOOT + 10;
+    }
+};
+
+class AccountLoadTask : public SchedulerTaskRoundPlugin {
+public:
+    typedef ::Pointer<AccountLoadTask> Pointer;
+
+    virtual void run( )
+    {
+        if (DLScheduler::getThis()->getCurrentTick( ) == 0)
+            AccountManager::load( );
+    }
+
+    // After the playerbase (SCDP_BOOT + 10), so the reconcile pass can see it.
+    virtual int getPriority( ) const
+    {
+        return SCDP_BOOT + 15;
     }
 };
 
@@ -81,6 +99,7 @@ extern "C" {
         SO::PluginList ppl;
 
         Plugin::registerPlugin<PlayerLoadTask>( ppl );
+        Plugin::registerPlugin<AccountLoadTask>( ppl );
         Plugin::registerPlugin<DropsLoadTask>( ppl );
         Plugin::registerPlugin<LimitedItemsPurgeTask>( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<BasicObjectBehavior> >(ppl);
