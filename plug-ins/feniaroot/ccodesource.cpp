@@ -329,9 +329,9 @@ CMDADM( codesource )
                     FunctionManager::iterator fb = c.functions.begin( );
                     for( ; fa != canon.functions.end( ) && fb != c.functions.end( );
                             fa++, fb++) {
-                        DLString aa = fa->argNames ? fa->argNames->toString( ) : DLString::emptyString;
-                        DLString bb = fb->argNames ? fb->argNames->toString( ) : DLString::emptyString;
-                        if (aa != bb) {
+                        DLString argsA = fa->argNames ? fa->argNames->toString( ) : DLString::emptyString;
+                        DLString argsB = fb->argNames ? fb->argNames->toString( ) : DLString::emptyString;
+                        if (argsA != argsB) {
                             match = false;
                             break;
                         }
