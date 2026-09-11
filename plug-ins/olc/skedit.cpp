@@ -197,6 +197,8 @@ void OLCStateSkill::show( PCharacter *ch )
     ptc(ch, "Характер:    {C%s {D(align) {C%s {D(ethos){x\r\n",
         r->align.getValue() != 0 ? r->align.names().c_str() : "-",
         r->ethos.getValue() != 0 ? r->ethos.names().c_str() : "-");
+    ptc(ch, "Негатив:     {C%s {D(negative){x\r\n",
+        r->isNegative() ? "да - дебафф, в aff красным" : "нет");
     ptc(ch, "Сообщение:   {C%s{x %s {D(dammsg) {C%s {D(damgender){x\r\n",
         r->getDammsg().getFullForm().c_str(),
         web_edit_button(ch, "dammsg", "web").c_str(),
@@ -597,6 +599,15 @@ SKEDIT(beats, "задержка", "wait state в пульсах (секунды 
 {
     BasicSkill *r = getOriginal();
     return numberEdit(0, 60, r->beats);
+}
+
+SKEDIT(negative, "негатив", "аффект умения - дебафф (в 'aff' подсвечивается красным)")
+{
+    BasicSkill *r = getOriginal();
+    r->negative.setValue(!r->negative.getValue());
+    ptc(ch, "Аффект умения теперь %s дебаффом.\n\r",
+        r->negative.getValue() ? "считается" : "НЕ считается");
+    return true;
 }
 
 SKEDIT(mana, "мана", "расход маны, очки")

@@ -53,7 +53,8 @@ HOMETOWN(frigate);
 void markPassiveGrantsDirty();
 
 BasicSkill::BasicSkill()
-                : align( 0, &align_table ),
+                : negative( false ),
+                  align( 0, &align_table ),
                   ethos( 0, &ethos_table ),
                   grants( skillManager )
 {
@@ -466,6 +467,11 @@ bool BasicSkill::isPassive() const
         return false;
 
     return true;
+}
+
+bool BasicSkill::isNegative() const
+{
+    return negative.getValue();
 }
 
 
