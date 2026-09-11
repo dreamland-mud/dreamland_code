@@ -111,6 +111,35 @@ static bool account_is_latin_name(const DLString &name)
     return true;
 }
 
+// After a verified redeem, mirror the identity onto the char's `config` attr so account
+// linking and `config telegram`/`config discord` stop being two separate steps: linking
+// an account via the bot also fills in the char's messenger. Telegram stores the handle
+// label (display); Discord follows /link's one-char-per-id rule (clear the id off every
+// other char first) because the who-list Discord bridge is per-id. email has no config
+// equivalent, so it is skipped. Called only on the bot-redeem path -- the in-game
+// `account discord` adopt already reads an existing config discord.
+static void account_bind_char_config(PCMemoryInterface *pc, const DLString &type,
+                                     const DLString &value, const DLString &display)
+{
+    if (type == "telegram") {
+        DLString handle = display.empty() ? value : display;
+        pc->getAttributes().getAttr<XMLStringAttribute>("telegram")->setValue(handle);
+        PCharacterManager::saveMemory(pc);
+    } else if (type == "discord") {
+        for (PCMemoryInterface *alt : find_players_by_json_attribute("discord", "id", value)) {
+            if (alt != pc) {
+                alt->getAttributes().eraseAttribute("discord");
+                PCharacterManager::saveMemory(alt);
+            }
+        }
+        Json::Value d;
+        d["id"] = value;
+        d["username"] = display;
+        set_json_attribute(pc, "discord", d);
+        PCharacterManager::saveMemory(pc);
+    }
+}
+
 // Pull {identityType(normalized+validated), value(canonicalized)} out of args.
 // Returns false (with the response already filled) on a missing/invalid field.
 static bool account_read_identity(const Json::Value &params, HttpResponse &response,
@@ -238,6 +267,13 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
             return;
         }
     }
+
+    // Auto-bind: mirror the just-verified identity onto the char's config attr so the
+    // player didn't need a separate `config telegram`/`config discord` step. cname was
+    // capitalized by the char-exists check above, so this find reuses that exact key.
+    PCMemoryInterface *boundPc = PCharacterManager::find(cname);
+    if (boundPc)
+        account_bind_char_config(boundPc, type, value, display);
 
     Json::Value a;
     a["result"] = "ok";
