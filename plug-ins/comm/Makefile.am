@@ -17,6 +17,7 @@ libcomm_la_SOURCES = \
 areas.cpp \
 bugs.cpp \
 configs.cpp \
+configweb.cpp \
 corder.cpp \
 impl.cpp \
 run.cpp \
