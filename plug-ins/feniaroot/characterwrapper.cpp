@@ -3235,24 +3235,28 @@ static bool ga_clericCanCompound( Character *target, ::Object *o )
                                      o->extra_flags, get_weapon_class( o ), o->value4( ) );
 }
 
-// Does the character already know the spell/skill that produces an affect? Then
-// an item granting it is worth only convenience, not the full effect. Unknown
-// name (or no target) -> false, i.e. keep the full value: a wrong name never
-// over-discounts.
-static bool ga_knowsSpell( Character *target, const char *name )
+// Can the character produce this buff on themselves -- i.e. does their class get
+// the spell/skill at their level? Then an item granting it is worth only
+// convenience, not the full effect. Keyed on class availability (level + class),
+// NOT on practiced percent: a level-35 paladin can cast sanctuary (a level-27
+// prayer) whether or not she has practiced it yet, so the item is redundant for
+// her; a level-15 paladin cannot reach it, so the grant keeps its full value.
+// Unknown name (or no target) -> false, i.e. keep the full value: a wrong name
+// never over-discounts.
+static bool ga_canSelfCast( Character *target, const char *name )
 {
     if (target == 0)
         return false;
     Skill *sk = skillManager->findExisting( name );
-    return sk != 0 && target->getSkill( sk->getIndex( ) ) > 0;
+    return sk != 0 && sk->available( target );
 }
 
 // Value of an affect_flags bitvector (sanctuary/haste/stealth; negatives are
 // cursed-gear penalties). Profile-split where it matters. Values + rationale:
 // GEAR_AFFECT_VALUES.md. Owner overrides folded in (imp_invis/camouflage/fade=100,
 // stun=-100). Concentration is a Fenia onEquip skill, not a flag -- deferred to 3c.
-// A positive self-buff the char can already cast on themselves scores at 20% of
-// full (no mana/slot cost, undispellable, works when silenced -- but not a new
+// A positive self-buff the char's class can already cast scores at 10% of full
+// (no mana/slot cost, undispellable, works when silenced -- but not a new
 // capability). Curses and gear-only bits (no matching spell) never discount.
 static double ga_affectFlagValue( bitstring_t b, bool caster, Character *target )
 {
@@ -3260,8 +3264,8 @@ static double ga_affectFlagValue( bitstring_t b, bool caster, Character *target 
     auto v = [&]( bitstring_t flag, double base, const char *spell ) -> double {
         if (!IS_SET( b, flag ))
             return 0;
-        if (spell != 0 && ga_knowsSpell( target, spell ))
-            return base * 0.2;
+        if (spell != 0 && ga_canSelfCast( target, spell ))
+            return base * 0.1;
         return base;
     };
     s += v( AFF_SANCTUARY,    300,                "sanctuary" );
