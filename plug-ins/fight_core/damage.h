@@ -22,13 +22,19 @@ class Affect;
  * config/fight/damage_nouns.json. Defined in damage_impl.cpp. */
 DLString damage_noun(int dam_type, lang_t lang);
 
-/* Gear advisor combat-proc scoring (COMBAT_PROC_SCORING.md). Relative worth of a
- * spell cast in combat (config/fight/spell_combat_value.json); 0 for an unlisted
- * spell. _global scales procs vs stats, _level_ref is the item level that scores
- * at 1.0x. Defined in damage_impl.cpp. */
+/* Gear advisor combat-proc scoring (COMBAT_PROC_SCORING.md). A spell's expected
+ * combat value is now damage-based: clean damage nukes derive it from their
+ * <tier> (spell_proc_tier_value, feniaskillaction.cpp), and only spells that do
+ * NOT follow their tier carry an explicit override in the "overrides" map of
+ * config/fight/spell_combat_value.json -- spell_combat_value returns that
+ * override or 0 when there is none. _global maps expected-damage units to the
+ * gear-score currency, _level_ref is the reference item level, _save_factor is
+ * the average damage multiplier applied to tier-derived values for a target's
+ * saving throw. Defined in damage_impl.cpp. */
 double spell_combat_value(const DLString &spell);
 double spell_combat_global();
 double spell_combat_level_ref();
+double spell_combat_save_factor();
 
 class Damage {
 public:

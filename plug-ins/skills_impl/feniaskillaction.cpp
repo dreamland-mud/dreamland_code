@@ -90,7 +90,40 @@ DLString print_damage_tiers(int tier, int level_step)
     return dices.join(", ");
 }
 
-void FeniaSkillActionHelper::linkWrapper(Spell *spell) 
+// Expected (mean) direct damage of a tier-N spell cast at the given level,
+// matching FeniaSpellContext::calcDamage: dam = dice(level, valueAtLevel(level)).
+// The mean of dice(N,S) is N*(S+1)/2. Returns 0 for a spell with no damage tier.
+// The gear advisor's proc scorer uses this so a proc's combat value follows the
+// spell's <tier> automatically -- retune a tier in the skill XML and the score
+// tracks it, no hand-maintained value table to drift. COMBAT_PROC_SCORING.md.
+double spell_tier_avg_damage(int tier, int level)
+{
+    const spell_damage_t *damage = find_damage_tier(tier);
+    if (!damage)
+        return 0.0;
+
+    int d = damage->valueAtLevel(level);
+    return level * (d + 1) / 2.0;
+}
+
+// The same, resolved from a spell name: find the skill, read its DefaultSpell
+// tier, return the tier's expected damage at the given level. Returns 0 when the
+// name is not a spell or the spell declares no damage tier (an effect/buff/heal),
+// which tells the caller to fall back to an explicit override value instead.
+double spell_proc_tier_value(const DLString &spellName, int level)
+{
+    Skill *sk = skillManager->findExisting(spellName);
+    if (sk == 0)
+        return 0.0;
+
+    DefaultSpell *sp = dynamic_cast<DefaultSpell *>(sk->getSpell().getPointer());
+    if (sp == 0)
+        return 0.0;
+
+    return spell_tier_avg_damage(sp->tier, level);
+}
+
+void FeniaSkillActionHelper::linkWrapper(Spell *spell)
 {
     if (!FeniaManager::wrapperManager) {
         LogStream::sendError() << "No Fenia manager when linking spell wrapper for " << spell->getSkill()->getName() << endl;

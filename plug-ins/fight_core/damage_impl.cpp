@@ -169,26 +169,39 @@ DLString damage_noun(int dam_type, lang_t lang)
  * Keys starting with '_' are knobs/meta, not spells: _global scales procs against
  * stats, _level_ref is the item level that scores at 1.0x. COMBAT_PROC_SCORING.md.
  *----------------------------------------------------------------------------*/
-static std::map<DLString, double> spellCombatValue;
-static double spellComboGlobal   = 1.0;
-static double spellComboLevelRef = 50.0;
+static std::map<DLString, double> spellCombatValue;   // per-spell override, expected combat value at _level_ref
+static double spellComboGlobal     = 1.0;
+static double spellComboLevelRef   = 50.0;
+static double spellComboSaveFactor = 0.75;
 
 CONFIGURABLE_LOADED(fight, spell_combat_value)
 {
     spellCombatValue.clear();
-    spellComboGlobal   = 1.0;
-    spellComboLevelRef = 50.0;
+    spellComboGlobal     = 1.0;
+    spellComboLevelRef   = 50.0;
+    spellComboSaveFactor = 0.75;
 
     for (auto i = value.begin(); i != value.end(); ++i) {
         DLString key = i.key().asString();
         if (key.empty())
             continue;
-        if (key.at(0) == '_') {
-            if (key == "_global")    spellComboGlobal   = (*i).asDouble();
-            if (key == "_level_ref") spellComboLevelRef = (*i).asDouble();
-            continue;
+
+        if (key == "_global")      { spellComboGlobal     = (*i).asDouble(); continue; }
+        if (key == "_level_ref")   { spellComboLevelRef   = (*i).asDouble(); continue; }
+        if (key == "_save_factor") { spellComboSaveFactor = (*i).asDouble(); continue; }
+
+        // The "overrides" object carries explicit per-spell values for spells
+        // whose real combat worth does not follow their <tier>: %HP spells,
+        // multi-hit/DoT damage, and tierless effect/buff/heal spells. Clean
+        // damage nukes carry NO entry -- the scorer derives them from tier.
+        // Any other top-level key (a "_doc" string, comments) is ignored.
+        if (key == "overrides" && (*i).isObject()) {
+            for (auto o = (*i).begin(); o != (*i).end(); ++o) {
+                DLString sp = o.key().asString();
+                if (!sp.empty())
+                    spellCombatValue[sp] = (*o).asDouble();
+            }
         }
-        spellCombatValue[key] = (*i).asDouble();
     }
 
     // Never divide by zero when scaling by item level.
@@ -202,8 +215,9 @@ double spell_combat_value(const DLString &spell)
     return i == spellCombatValue.end() ? 0.0 : i->second;
 }
 
-double spell_combat_global()    { return spellComboGlobal; }
-double spell_combat_level_ref() { return spellComboLevelRef; }
+double spell_combat_global()      { return spellComboGlobal; }
+double spell_combat_level_ref()   { return spellComboLevelRef; }
+double spell_combat_save_factor() { return spellComboSaveFactor; }
 
 void SkillDamage::message( )
 {
