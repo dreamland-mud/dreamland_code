@@ -134,7 +134,11 @@ static void account_status(PCharacter *ch)
 
 static void account_link(PCharacter *ch)
 {
-    if (!LinkingCode::mintingEnabled()) {
+    // Non-public rollout: immortals can mint now so the whole loop (mint ->
+    // bot redeem -> account create/attach -> reset) is testable on Taiphoen
+    // while public minting stays gated off. Remove the is_immortal bypass (or
+    // flip ACCOUNTS_MINTING_ENABLED) for the public launch.
+    if (!LinkingCode::mintingEnabled() && !ch->is_immortal()) {
         ch->pecho(_("Привязка аккаунтов скоро откроется. Немного терпения."));
         return;
     }
