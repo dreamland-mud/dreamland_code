@@ -2,6 +2,8 @@
  *
  * ruffina, 2004
  */
+#include <set>
+
 #include "logstream.h"
 #include "defaultwearlocation.h"
 #include "wearloc_codes.h"
@@ -347,18 +349,54 @@ void DefaultWearlocation::triggersOnEquip( Character *ch, Object *obj )
     }
 }
 
+// Backstop: take back every affect this object put on the wearer, the moment the
+// object leaves the equipment slot by ANY path -- the remove command, decay,
+// purge, destruction in combat -- because all of them funnel through unequip().
+// An item-cast skill/spell affect declares its origin with af.source = obj (Fenia)
+// or affectPermanent(name, obj), and is installed permanent-while-worn; this is
+// what strips it again, so no per-item onRemove is needed and the buff can never
+// linger after the item is gone. The affect's item source is persisted by prototype
+// vnum (fwrite_affect writes the "Aff2" variant), and the match is by vnum, so it
+// survives relog/reboot and treats item stacks and re-acquired copies correctly.
+//
+// Deliberately NOT folded into affectsOnUnequip(): that also runs on the enchant
+// reverse-then-reapply dance (affect_to_obj / affect_enhance), where the wearer's
+// affects must survive untouched.
+static void strip_object_sourced_affects( Character *ch, Object *obj )
+{
+    if (ch == 0 || obj->pIndexData == 0)
+        return;
+
+    int vnum = obj->pIndexData->vnum;
+    list<Affect *> doomed;
+
+    for (auto &paf: ch->affected)
+        if (paf->sources.hasObject( vnum ))
+            doomed.push_back( paf );
+
+    // Show each affect type's wear-off once (one item spell may add several affects
+    // of a single type -- inspire = hitroll + saves), then remove every match.
+    set<int> announced;
+    for (auto &paf: doomed) {
+        bool verbose = announced.insert( (int)paf->type ).second;
+        affect_remove( ch, paf, verbose );
+    }
+}
+
 /*-------------------------------------------------------------------
- * unequip 
+ * unequip
  *------------------------------------------------------------------*/
 void DefaultWearlocation::unequip( Object *obj )
 {
     Character *ch = obj->carried_by;
 
     obj->wear_loc.assign( wear_none );
-    
+
     affectsOnUnequip( ch, obj );
-    
+
     triggersOnUnequip( ch, obj );
+
+    strip_object_sourced_affects( ch, obj );
 
     saveDrops( ch );
 }

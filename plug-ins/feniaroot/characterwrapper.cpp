@@ -2738,14 +2738,19 @@ NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName[,verbose]): снять в
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, affectPermanent, "(skillName): сделать все уже висящие аффекты этого типа постоянными (duration -2). Для вещей, дающих аффект при надевании: cast + affectPermanent = аффект держится пока вещь надета, снимается в onRemove" )
+NMI_INVOKE( CharacterWrapper, affectPermanent, "(skillName[,obj]): сделать все уже висящие аффекты этого типа постоянными (duration -2). Для вещей, дающих аффект при надевании: cast + affectPermanent(name, obj) -- аффект держится пока вещь надета и снимается движком автоматически при снятии/распаде/разрушении вещи, onRemove не нужен" )
 {
     checkTarget( );
     Skill *skill = argnum2skill(args, 1);
     int sn = skill->getIndex( );
+    ::Object *src = args.size( ) > 1 ? argnum2item(args, 2) : 0;
+
     for (auto &paf: target->affected)
-        if (paf->type == sn)
+        if (paf->type == sn) {
             paf->duration = -2;
+            if (src)
+                paf->sources.add( src );
+        }
     return Register( );
 }
 

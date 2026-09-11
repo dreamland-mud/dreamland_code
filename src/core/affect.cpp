@@ -108,6 +108,36 @@ void AffectSourceList::remove(const AffectSource &toRemove)
     remove_if(source_equals);
 }
 
+bool AffectSourceList::hasObject(int vnum) const
+{
+    for (auto &s: *this)
+        if (s.type == AFFSRC_ITEM && s.ownerVnum.getValue() == vnum)
+            return true;
+
+    return false;
+}
+
+std::list<int> AffectSourceList::objectVnums() const
+{
+    std::list<int> result;
+    for (auto &s: *this)
+        if (s.type == AFFSRC_ITEM)
+            result.push_back(s.ownerVnum.getValue());
+
+    return result;
+}
+
+void AffectSourceList::addItem(int vnum)
+{
+    if (hasObject(vnum))
+        return;
+
+    AffectSource src;
+    src.type = AFFSRC_ITEM;
+    src.ownerVnum = vnum;
+    this->push_back(src);
+}
+
 void AffectSourceList::add(Character *ch) 
 {
     AffectSource src(ch);

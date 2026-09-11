@@ -183,7 +183,7 @@ static void convert_religion( PCharacter *pc, int number )
     pc->setReligion( religionManager->find( relig_names[number] )->getName( ) );
 }
 
-Affect * fread_affect( FILE *fp ) 
+Affect * fread_affect( FILE *fp, bool withSources = false )
 {
     Affect *paf;
     int sn;
@@ -206,6 +206,15 @@ Affect * fread_affect( FILE *fp )
         paf->location        = fread_number(fp);
         paf->bitvector.setTable(affect_where_to_table(where));
         paf->bitvector.setValue(fread_number(fp));
+
+        // "Aff2" lines carry a count-prefixed block of item-source vnums here,
+        // before the global string. Legacy "Affc" lines pass withSources=false and
+        // skip straight to the global string.
+        if (withSources) {
+            int nsrc = fread_number(fp);
+            for (int i = 0; i < nsrc; i++)
+                paf->sources.addItem( fread_number(fp) );
+        }
 
         globalString    = fread_dlstring_to_eol(fp);
         globalString.substitute('\r', ' ').substitute('\n', ' ');
@@ -238,8 +247,32 @@ void fwrite_affect( const char *label, FILE *fp, Affect *paf )
     if (paf->type == gsn_doppelganger)
         return;
 
-    fprintf( fp, "%s '%s' %3d %3d %3d %3d %3d %10lld %s\n",
-            label, 
+    // Item (object) sources must survive the pfile so a permanent item-cast affect
+    // can still be matched -- and taken back off -- by the unequip backstop after a
+    // relog or reboot. Only char/pet affects ("Affc") carry them; char/room sources
+    // are intentionally not persisted (unchanged behaviour). When present, write the
+    // "Aff2" variant: identical fields plus a count-prefixed vnum block placed BEFORE
+    // the to-end-of-line global string, so the global string stays last and legacy
+    // "Affc" lines keep reading exactly as before.
+    std::list<int> itemVnums;
+    if (!strcmp(label, "Affc"))
+        itemVnums = paf->sources.objectVnums();
+
+    if (itemVnums.empty()) {
+        fprintf( fp, "%s '%s' %3d %3d %3d %3d %3d %10lld %s\n",
+                label,
+                paf->type->getName( ).c_str( ),
+                affect_table_to_where(paf->bitvector.getTable(), paf->global.getRegistry()),
+                paf->level.getValue(),
+                paf->duration.getValue(),
+                paf->modifier.getValue(),
+                paf->location.getValue(),
+                paf->bitvector.getValue(),
+                paf->global.toString( ).c_str( ));
+        return;
+    }
+
+    fprintf( fp, "Aff2 '%s' %3d %3d %3d %3d %3d %10lld %d",
             paf->type->getName( ).c_str( ),
             affect_table_to_where(paf->bitvector.getTable(), paf->global.getRegistry()),
             paf->level.getValue(),
@@ -247,7 +280,10 @@ void fwrite_affect( const char *label, FILE *fp, Affect *paf )
             paf->modifier.getValue(),
             paf->location.getValue(),
             paf->bitvector.getValue(),
-            paf->global.toString( ).c_str( ));
+            (int)itemVnums.size());
+    for (int vnum: itemVnums)
+        fprintf( fp, " %d", vnum );
+    fprintf( fp, " %s\n", paf->global.toString( ).c_str( ));
 }
 
 char *print_flags(int flag)
@@ -877,6 +913,14 @@ static void fread_char_raw( PCharacter *ch, FILE *fp )
                 break;
             }
 
+            if (!strcmp(word, "Aff2"))
+            {
+                Affect *paf = fread_affect( fp, true );
+                ch->affected.push_front(paf);
+                fMatch = true;
+                break;
+            }
+
             if ( !strcmp( word, "AttrMod"  ) || !strcmp(word,"AMod"))
             {
                 int stat;
@@ -1236,7 +1280,16 @@ void fread_pet( PCharacter *ch, FILE *fp )
             if (!strcmp(word,"Affc"))
             {
                 Affect *paf = fread_affect( fp );
-                
+
+                pet->affected.push_front(paf);
+                fMatch          = true;
+                break;
+            }
+
+            if (!strcmp(word,"Aff2"))
+            {
+                Affect *paf = fread_affect( fp, true );
+
                 pet->affected.push_front(paf);
                 fMatch          = true;
                 break;
@@ -1520,7 +1573,17 @@ NPCharacter * fread_mob( FILE *fp )
                     if ( !strcmp(word,"Affc") )
                     {
                             Affect *af = fread_affect( fp );
-                            
+
+                            affect_to_char( mob, af );
+                            ddeallocate( af );
+                            fMatch          = true;
+                            break;
+                    }
+
+                    if ( !strcmp(word,"Aff2") )
+                    {
+                            Affect *af = fread_affect( fp, true );
+
                             affect_to_char( mob, af );
                             ddeallocate( af );
                             fMatch          = true;
