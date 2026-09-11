@@ -161,13 +161,17 @@ DLString damage_noun(int dam_type, lang_t lang)
 /*-----------------------------------------------------------------------------
  * Combat spell-proc values (gear advisor)
  *
- * config/fight/spell_combat_value.json maps a spell name to its relative combat
- * worth (0-100). The gear advisor's ga_score reads an item's <props>combatcast</props>
- * and multiplies these values by proc chance, cast count, an item-level scale and a
- * global weight to replace the flat +50 those items used to get. Damage spells are
- * Fenia (C++ can't introspect their damage), so the table is modeled, not computed.
- * Keys starting with '_' are knobs/meta, not spells: _global scales procs against
- * stats, _level_ref is the item level that scores at 1.0x. COMBAT_PROC_SCORING.md.
+ * A combat proc's value is expected damage. A clean damage nuke gets it from its
+ * <tier> automatically (spell_proc_tier_value, feniaskillaction.cpp) discounted by
+ * _save_factor; ga_score multiplies by proc chance, cast count, an item-level scale
+ * and _global to replace the flat +50 those items used to get. Only spells whose
+ * worth does NOT follow their tier carry an explicit value in the "overrides" map
+ * of config/fight/spell_combat_value.json: %HP or HP-of-wearer damage, multi-hit,
+ * DoT, align-gated anti-evil (the scorer is blind to the wearer's alignment), and
+ * tierless effect/buff/heal spells. spell_combat_value() returns the override or 0.
+ * _global maps expected damage to gear-score currency, _level_ref is the reference
+ * item level, _save_factor is the damage kept after an average save (derived values
+ * only). COMBAT_PROC_SCORING.md.
  *----------------------------------------------------------------------------*/
 static std::map<DLString, double> spellCombatValue;   // per-spell override, expected combat value at _level_ref
 static double spellComboGlobal     = 1.0;
