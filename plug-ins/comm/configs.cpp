@@ -21,6 +21,7 @@
 #include "comm.h"
 #include "descriptor.h"
 #include "servlet_utils.h"
+#include "accountmanager.h"
 #include "math_utils.h"
 #include "act.h"
 #include "arg_utils.h"
@@ -523,10 +524,12 @@ static void config_discord_print(PCharacter *ch)
     get_json_attribute(ch, "discord", discord);
     bool yes = !discord["id"].asString().empty();
 
+    // username/status are free-text relayed from Discord -- escape before the mudtag
+    // renderer so a crafted display name can't inject colour/invis tags. id is numeric.
     DLString msgYes = fmt(ch, _("Пользователь Discord {C%s{w ({C%s{w), статус %s"),
-                          discord["username"].asString().c_str(),
+                          AccountManager::echoSafe(discord["username"].asString()).c_str(),
                           discord["id"].asString().c_str(),
-                          discord["status"].asString().c_str());
+                          AccountManager::echoSafe(discord["status"].asString()).c_str());
     DLString msgNo = l(ch, "Твой персонаж не связан с пользователем Discord, набери {y{hcрежим дискорд{x");
     print_line(ch, "discord", "дискорд", "дискорд", yes, msgYes, msgNo);
 }
@@ -572,9 +575,9 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
             << l(ch, "Для смены секретного слова набери {hc{yрежим дискорд очистить{x.") << endl;
     } else {
         buf << fmt(ch, _("Твой персонаж связан с пользователем {C%s{w ({C%s{w), статус %s"),
-                   discord["username"].asString().c_str(),
+                   AccountManager::echoSafe(discord["username"].asString()).c_str(),
                    discord["id"].asString().c_str(),
-                   discord["status"].asString().c_str()) << endl;
+                   AccountManager::echoSafe(discord["status"].asString()).c_str()) << endl;
         buf << fmt(ch, _("Для повторной линковки набери {W/link %s{x в привате с ботом {WВалькирия{x"),
                    discord["token"].asString().c_str()) << endl
             << l(ch, "Для очистки и смены секретного слова набери {hc{yрежим дискорд очистить{x.") << endl;

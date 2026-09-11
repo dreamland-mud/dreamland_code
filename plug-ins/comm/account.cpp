@@ -324,7 +324,11 @@ static void account_admin(PCharacter *ch, DLString &args)
         for (Json::Value::const_iterator i = identities.begin(); i != identities.end(); ++i) {
             if (!(*i).isObject())
                 continue;
-            ch->pecho("  identity %1$s: %2$s", (*i)["type"].asString().c_str(), (*i)["value"].asString().c_str());
+            // value is an externally-supplied identity string (bot username, email) --
+            // escape it before the mudtag renderer, same as the player-facing status.
+            DLString value = (*i)["value"].asString();
+            ch->pecho("  identity %1$s: %2$s", (*i)["type"].asString().c_str(),
+                      AccountManager::echoSafe(value).c_str());
         }
         for (const DLString &n : AccountManager::charsOf(id))
             ch->pecho("  char %1$s", n.c_str());
