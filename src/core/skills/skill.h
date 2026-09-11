@@ -65,6 +65,10 @@ public:
     virtual int getManaPenalty() const;
     virtual const InflectedString &getDammsg( ) const;
     virtual bool isPassive() const;
+    // True if the affect this skill hangs is a debuff. The 'aff' command
+    // renders such affects red. Data lives on BasicSkill (<negative>),
+    // editable in skedit. Base returns false.
+    virtual bool isNegative() const;
 
     virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;

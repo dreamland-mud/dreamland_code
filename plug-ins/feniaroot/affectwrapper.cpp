@@ -88,6 +88,16 @@ NMI_SET( AffectWrapper, type, "название умения, которым э�
     }
 }
 
+NMI_GET( AffectWrapper, isNegative, "true если аффект - дебафф (берется со скила типа, редактируется в skedit); в 'aff' подсвечивается красным" )
+{
+    int sn = target.type;
+
+    if (sn < 0)
+        return Register( false );
+    else
+        return Register( target.type->isNegative( ) );
+}
+
 NMI_INVOKE(AffectWrapper, apply, "(ch): применить действие аффекта на ch, не вешая его")
 {
     Character *ch = args2character(args);

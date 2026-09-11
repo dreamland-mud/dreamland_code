@@ -116,6 +116,11 @@ bool Skill::isPassive() const
 {
     return false;
 }
+
+bool Skill::isNegative() const
+{
+    return false;
+}
 bool Skill::visible( CharacterMemoryInterface * ) const
 {
     return false;
