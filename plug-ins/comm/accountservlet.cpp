@@ -93,29 +93,8 @@ static DLString account_canon_value(const DLString &type, const DLString &value)
     return value;
 }
 
-// Make a redeemer-supplied string safe to echo THROUGH the mudtag renderer:
-// send_to re-parses the composed message (args included) for mudtags, so
-// colourStrip is the WRONG tool -- it un-escapes {{ -> { and re-arms every tag.
-// Instead clamp the raw first (so the clamp can't split a doubled brace), then
-// double every '{' to '{{' (mudtags renders '{{' as a literal '{', so no lone
-// '{'+letter tag can survive), and drop control bytes so no newline/ANSI reaches
-// the minter's terminal. KOI8 high bytes (>= 0x80, Cyrillic) are kept.
-static DLString account_echo_safe(const DLString &raw)
-{
-    DLString clamped = raw;
-    if (clamped.size() > 40)
-        clamped = clamped.substr(0, 40) + "...";
-
-    DLString out;
-    for (int i = 0; i < (int)clamped.size(); i++) {
-        char c = clamped[i];
-        if (c == '{')
-            out += "{{";
-        else if ((unsigned char)c >= 0x20)
-            out += c;
-    }
-    return out;
-}
+// The mudtag-safe echo escaper now lives on AccountManager (AccountManager::echoSafe),
+// shared with the in-game adopt surface so there is exactly one escaper.
 
 // Account character keys are always the Latin login name. Reject anything else so
 // PCharacterManager::find (which fuzzy-matches declined Cyrillic names) can never
@@ -276,13 +255,14 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
         // `display` (and value) come from the REDEEMER via the bot -- escape them
         // for the mudtag renderer so they can't paint the minter's screen, forge a
         // line, or hide the warning tail with an invis tag.
-        DLString who = account_echo_safe(display.empty() ? value : display);
+        DLString who = AccountManager::echoSafe(display.empty() ? value : display);
         online->pecho(_("Твой код привязки использован (%1$s: %2$s). Если это не ты -- сразу смени пароль командой {yпароль{x."),
                       type.c_str(), who.c_str());
     }
 
     Json::Value body;
     body["account"] = id;
+    body["title"] = AccountManager::titleOf(id);   // the bot shows the title, not the id
     body["char"] = entry.charName;
     body["created"] = created;
     servlet_response_200_json(response, body);
@@ -311,6 +291,7 @@ static void account_info(HttpRequest &request, HttpResponse &response)
     Json::Value acc = AccountManager::get(id);
     Json::Value body;
     body["account"] = id;
+    body["title"] = AccountManager::titleOf(id);
     body["identities"] = acc["identities"];
     for (const DLString &name : AccountManager::charsOf(id))
         body["chars"].append(name);
