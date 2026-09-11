@@ -87,6 +87,7 @@
 #include "structwrappers.h"
 #include "affectwrapper.h"
 #include "areaquestwrapper.h"
+#include "xmlattributequestdata.h"
 #include "xmleditorinputhandler.h"
 #include "reglist.h"
 #include "regcontainer.h"
@@ -5601,6 +5602,30 @@ NMI_GET(CharacterWrapper, quest, "статистика побед в авто к
     if (!statAttr)
         return Register();
     return statAttr->toRegister(target->getPC(), "questdata");
+}
+
+NMI_GET(CharacterWrapper, questNextMinutes, "минут до того, как можно попросить у квестора новое задание; 0 если уже можно прямо сейчас")
+{
+    checkTarget();
+    CHK_NPC
+    // countdown is dual-purpose: while a quest is RUNNING it counts down the
+    // time left to COMPLETE that quest, and only with no active quest does it
+    // mean "minutes until you may request a new one" (xmlattributequestdata
+    // pull() branches on the quest attr; cquest doTime prints two different
+    // sentences off it). Report 0 during an active quest so callers never
+    // mislabel the completion timer as a request cooldown.
+    if (target->getPC()->getAttributes().findAttr<Quest>("quest"))
+        return Register(0);
+
+    // The questor cooldown lives in the questdata attribute's countdown field
+    // (XMLAttributeQuestData::getTime), the same value `quest time` prints and
+    // the questor sets on completion/cancel. A player with no questdata attr yet
+    // (never quested) can quest right away -> 0. Never report a negative.
+    auto attr = target->getPC()->getAttributes().findAttr<XMLAttributeQuestData>("questdata");
+    if (!attr)
+        return Register(0);
+    int t = attr->getTime();
+    return Register(t > 0 ? t : 0);
 }
 
 NMI_GET(CharacterWrapper, questVictimVnum, "внум цели активного авто-задания на убийство, 0 если такой цели нет")

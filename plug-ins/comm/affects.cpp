@@ -5,6 +5,7 @@
 #include "pcharacter.h"
 #include "player_utils.h"
 #include "npcharacter.h"
+#include "object.h"
 #include "affect.h"
 #include "autoflags.h"
 #include "affectflags.h"
@@ -332,6 +333,40 @@ private:
     int my_beats;
 };
 
+// Compact "<stat> +N" for one worn-gear stat apply, in the viewer's language.
+// Returns "" for everything that is NOT a plain stat modifier the player would
+// otherwise only see on `score` / `identify`:
+//   - APPLY_NONE / APPLY_BITVECTOR: not a stat (bits show as their own affects);
+//   - weapon-override slots: their modifier is a table index, not a bonus, and is
+//     already visible on the weapon;
+//   - heal/mana gain: percent regen, already summed by PermanentAffects;
+//   - a non-empty global (skill/group/level applies): shown by the skill-bonus
+//     block at the end of `affects`;
+//   - zero modifier.
+static DLString gear_apply_short( Affect *paf, lang_t lang )
+{
+    switch (paf->location) {
+    case APPLY_NONE:
+    case APPLY_BITVECTOR:
+    case APPLY_WEAPON_CLASS:
+    case APPLY_WEAPON_ATTACK:
+    case APPLY_DICE_NUMBER:
+    case APPLY_DICE_SIZE:
+    case APPLY_HEAL_GAIN:
+    case APPLY_MANA_GAIN:
+        return DLString::emptyString;
+    default:
+        break;
+    }
+    if (!paf->global.empty( ) || paf->modifier == 0)
+        return DLString::emptyString;
+
+    ostringstream o;
+    o << apply_flags.message( paf->location, '1', lang ).c_str( )
+      << " " << (paf->modifier > 0 ? "+" : "") << paf->modifier;
+    return o.str( );
+}
+
 CMDRUNP( affects )
 {
     ostringstream buf;
@@ -402,8 +437,44 @@ CMDRUNP( affects )
             REMOVE_BIT(flags, FSHOW_EMPTY);
     }
 
-    for (o = output.begin( ); o != output.end( ); o++) 
+    for (o = output.begin( ); o != output.end( ); o++)
         o->show_affect( buf, flags );
+
+    // Worn-gear stat bonuses (+str, +hp, +hitroll ...) apply through eqAffects and
+    // change `score`, but they are not named affects and never entered the lists
+    // above -- so `affects` never showed them and a player had to `identify` every
+    // slot to learn WHERE a stat bump came from. List them per worn item. This is
+    // pure display over the engine's own eqAffects: no per-item wiring, every
+    // future <apply> item shows here for free, and the engine handles stacking /
+    // removal / login re-apply, so no orphaned or double-counted bonus. Proto and
+    // instance affect lists are disjoint (base vs enchant) and both apply on equip,
+    // so both are walked. gear_apply_short() drops bits, weapon overrides, regen and
+    // skill/group applies -- only plain stat modifiers survive.
+    {
+        lang_t glang = Player::displayLang( viewer );
+        ostringstream gearBuf;
+        bool anyGear = false;
+        for (Object *wobj = ch->carrying; wobj != 0; wobj = wobj->next_content) {
+            if (!wobj->wear_loc->givesAffects( ))
+                continue;
+            StringList stats;
+            for (auto &paf: wobj->pIndexData->affected) {
+                DLString s = gear_apply_short( paf, glang );
+                if (!s.empty( )) stats.push_back( s );
+            }
+            for (auto &paf: wobj->affected) {
+                DLString s = gear_apply_short( paf, glang );
+                if (!s.empty( )) stats.push_back( s );
+            }
+            if (stats.empty( ))
+                continue;
+            anyGear = true;
+            gearBuf << "  " << wobj->getShortDescr( '1', glang ) << "{x: {y"
+                    << stats.join( ", " ) << "{x" << endl;
+        }
+        if (anyGear)
+            buf << "{y" << _("От снаряжения:").getMessage( glang ) << "{x" << endl << gearBuf.str( );
+    }
 
     // Output skill and level bonuses in the end.
     if (!ch->is_npc()) {
