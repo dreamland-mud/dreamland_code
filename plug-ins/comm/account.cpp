@@ -219,9 +219,10 @@ static bool account_adopt_discord(PCharacter *ch, const DLString &discordId, con
     return true;
 }
 
-// Generic: mint a code and offer BOTH bots. The bot links are client-aware -- web gets a
-// clickable link ({IW ... {hl), telnet/blind gets the URL spelled out ({Iw ...); the code
-// and the typed command sit outside every invis span so every client keeps them.
+// Generic: mint a code and offer BOTH bots. {hl<url>{x is itself client-aware -- web
+// renders it clickable, telnet shows the raw URL -- so the link needs no invis wrapping;
+// a {IW telnet-only verb ("открой"/"в привате") sits before it, and the code + typed
+// command stay outside every invis span so every client keeps them.
 static void account_link(PCharacter *ch)
 {
     if (!LinkingCode::mintingEnabled() && !ch->is_immortal()) {
@@ -238,9 +239,9 @@ static void account_link(PCharacter *ch)
 
     ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
     ch->pecho(_("Он одноразовый и действует 10 минут. Привяжи его в любом из ботов:"));
-    ch->pecho(_("  Telegram {W@%1$s{x -- {IWтапни {hlhttps://t.me/%1$s?start=%2$s{x{Ix{Iwоткрой https://t.me/%1$s?start=%2$s , либо{Ix команда {W/attach %2$s{x"),
+    ch->pecho(_("  Telegram {W@%1$s{x -- {IWоткрой {Ix{hlhttps://t.me/%1$s?start=%2$s{x, команда {W/attach %2$s{x"),
               TELEGRAM_BOT, code.c_str());
-    ch->pecho(_("  Discord Валькирия -- {IW{hlhttps://discord.com/users/%1$s{x{Ix{Iwв привате (discord.com/users/%1$s){Ix команда {W/link %2$s{x"),
+    ch->pecho(_("  Discord Валькирия -- {IWв привате {Ix{hlhttps://discord.com/users/%1$s{x, команда {W/link %2$s{x"),
               DISCORD_BOT_ID, code.c_str());
     ch->pecho(_("Никому не показывай код: кто его введет, привяжет этого персонажа к своему аккаунту."));
 }
@@ -264,7 +265,7 @@ static void account_telegram(PCharacter *ch)
     AccountAudit::record("code_mint", f);
 
     ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
-    ch->pecho(_("  {WA{x) {IWтапни {hlhttps://t.me/%1$s?start=%2$s{x{Ix{Iwоткрой https://t.me/%1$s?start=%2$s{Ix -- бот привяжет этот аккаунт."),
+    ch->pecho(_("  {WA{x) {IWоткрой {Ix{hlhttps://t.me/%1$s?start=%2$s{x -- бот привяжет этот аккаунт."),
               TELEGRAM_BOT, code.c_str());
     ch->pecho(_("  {WB{x) с другого Telegram -- напиши боту {W@%1$s{x команду {W/attach %2$s{x."),
               TELEGRAM_BOT, code.c_str());
@@ -295,7 +296,7 @@ static void account_discord(PCharacter *ch)
     AccountAudit::record("code_mint", f);
 
     ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
-    ch->pecho(_("Напиши боту Валькирия {IW({hlhttps://discord.com/users/%1$s{x){Ix{Iw(в привате, discord.com/users/%1$s){Ix команду {W/link %2$s{x."),
+    ch->pecho(_("Напиши боту Валькирия {IWв привате {Ix{hlhttps://discord.com/users/%1$s{x команду {W/link %2$s{x."),
               DISCORD_BOT_ID, code.c_str());
     ch->pecho(_("Никому не показывай код: кто его введет, привяжет этого персонажа к своему аккаунту."));
 }
