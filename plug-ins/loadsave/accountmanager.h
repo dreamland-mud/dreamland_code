@@ -40,6 +40,17 @@ public:
     static DLString accountOf(const DLString &charName);        // "" when unattached
     static std::list<DLString> charsOf(const DLString &id);     // member character names
 
+    // The player-facing account name (a generated fantasy title, e.g. "Ashen Warden
+    // of Old Thalos"). Falls back to the raw id for a legacy account minted before
+    // titles existed. The id stays the internal key; players only ever see the title.
+    static DLString titleOf(const DLString &id);
+
+    // Make an externally-supplied string (a redeemer's display, a Discord username)
+    // safe to echo THROUGH the mudtag renderer -- doubles '{', drops control bytes,
+    // clamps length. One escaper shared by every account surface (the minter echo,
+    // the in-game adopt). See the definition for why colourStrip is the wrong tool.
+    static DLString echoSafe(const DLString &raw);
+
     // A DIFFERENT, mortal, in-world character on the same account as charName, or
     // "" (the same-account simultaneous-login block). Returns "" for an unattached
     // char; never reports the char itself (a reconnect is not a conflict) nor an
@@ -61,6 +72,7 @@ public:
 
 private:
     static DLString mintId();
+    static DLString mintTitle();
     static bool saveAccount(const DLString &id);
     static DLString identityKey(const DLString &type, const DLString &value);
     static void indexIdentities(const DLString &id, const Json::Value &account);

@@ -165,6 +165,107 @@ DLString AccountManager::mintId()
     return id;
 }
 
+// Player-facing account titles. The id stays the internal key (filename, pfile
+// attr, `account admin` reference); a player only ever sees this fantasy title.
+// Titles do NOT need to be unique -- the id is the key -- so a collision is
+// harmless and we never track used combinations. In-world Thera register.
+// ~84 x ~84 x ~56 = ~395k combinations from three static lists, composed at
+// create() with the merc RNG. No LLM, no data file, no per-creation cost.
+static const char *ACCOUNT_ADJ[] = {
+    "Ashen", "Silent", "Grey", "Pale", "Hollow", "Sundered", "Gilded", "Shattered",
+    "Weeping", "Fallen", "Crimson", "Obsidian", "Ivory", "Molten", "Frostbound",
+    "Thornbound", "Withered", "Ancient", "Nameless", "Wandering", "Ember", "Cinder",
+    "Verdant", "Dusken", "Stormborn", "Riven", "Umbral", "Argent", "Sable", "Feral",
+    "Hallowed", "Cursed", "Dread", "Iron", "Bronze", "Leaden", "Glass", "Starlit",
+    "Moonlit", "Sunless", "Bleak", "Mournful", "Restless", "Forsaken", "Hidden",
+    "Veiled", "Grim", "Vagrant", "Solemn", "Tarnished", "Kindled", "Quiet", "Scarred",
+    "Wan", "Bitter", "Hoary", "Dim", "Radiant", "Ruined", "Drowned", "Blighted",
+    "Wintering", "Wayworn", "Sombre", "Ragged", "Gaunt", "Hushed", "Shrouded",
+    "Errant", "Twilit", "Nightbound", "Stonewrought", "Rimebound", "Wolfish",
+    "Ravenous", "Emberclad", "Palewrought", "Stormworn", "Ghostlit", "Direful",
+    "Lorn", "Wroth", "Waning", "Everdark",
+};
+static const char *ACCOUNT_NOUN[] = {
+    "Warden", "Sidhe", "Herald", "Seeker", "Wyrm", "Raven", "Oracle", "Fox",
+    "Pilgrim", "Sentinel", "Shade", "Revenant", "Wanderer", "Lantern", "Serpent",
+    "Griffin", "Wolf", "Stag", "Sparrow", "Owl", "Mantis", "Reaper", "Scribe",
+    "Keeper", "Hermit", "Vagabond", "Marauder", "Witness", "Mourner", "Harbinger",
+    "Exile", "Nomad", "Ferryman", "Gravedigger", "Bellringer", "Watcher", "Dreamer",
+    "Sleepwalker", "Cartographer", "Wisp", "Basilisk", "Chimera", "Manticore",
+    "Direwolf", "Nightjar", "Heron", "Crane", "Adder", "Viper", "Lynx", "Boar",
+    "Hound", "Kestrel", "Falcon", "Vulture", "Magpie", "Jackdaw", "Wight", "Lich",
+    "Ghoul", "Banshee", "Drake", "Cockatrice", "Salamander", "Golem", "Effigy",
+    "Idol", "Pallbearer", "Almoner", "Beadle", "Verger", "Warlock", "Templar",
+    "Corsair", "Outrider", "Sellsword", "Gravewalker", "Lampwright", "Bonesetter",
+    "Nightwarden", "Stormcaller", "Ashwalker", "Moonhound", "Fenwyrm",
+};
+static const char *ACCOUNT_PLACE[] = {
+    "Old Thalos", "the Elder Days", "the Sundered Marches", "Midgaard's Gate",
+    "the Hollow Vale", "the Frost Marches", "Ninefold Dusk", "the Weeping Vale",
+    "the Ashen Wastes", "the Drowned Coast", "the Silent Fen", "the Broken Spire",
+    "the Last Bastion", "the Grey Expanse", "the Withered Wood", "the Umbral Deep",
+    "the Starless Reach", "the Forgotten Ford", "the Bleeding Hills", "the Kindled Waste",
+    "the Riven Peaks", "the Mournful Shore", "the Endless Steppe", "the Shrouded Isles",
+    "the Dying Light", "the Iron Marches", "the Glass Desert", "the Sleeping Deep",
+    "the Twilit Span", "the Gallows Road", "the Salt Wastes", "the Cinder Reach",
+    "the Thornwood", "the Pale Meridian", "the Long Dark", "the Shattered Crown",
+    "the Wandering Stars", "the Amber Vault", "the Hushed Hollow", "the Nine Gates",
+    "the Sunless Sea", "the Ember Marches", "the Rimebound North", "the Verdant Ruin",
+    "the Widow's Watch", "the Crooked Mile", "the Fallow Reach", "the Sable Fen",
+    "the Quiet Lands", "the Waning Moon", "the Broken Oath", "the First Dark",
+    "the Hanged Wood", "the Weeping Gate", "the Grey Reach", "the Sombre Steppe",
+};
+
+DLString AccountManager::mintTitle()
+{
+    int na = sizeof(ACCOUNT_ADJ) / sizeof(ACCOUNT_ADJ[0]);
+    int nn = sizeof(ACCOUNT_NOUN) / sizeof(ACCOUNT_NOUN[0]);
+    int np = sizeof(ACCOUNT_PLACE) / sizeof(ACCOUNT_PLACE[0]);
+    DLString adj = ACCOUNT_ADJ[number_range(0, na - 1)];
+    DLString noun = ACCOUNT_NOUN[number_range(0, nn - 1)];
+    DLString place = ACCOUNT_PLACE[number_range(0, np - 1)];
+    return adj + " " + noun + " of " + place;
+}
+
+DLString AccountManager::titleOf(const DLString &id)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i != accounts.end()) {
+        // .get (not operator[]) so a title-less legacy record is not MUTATED with a
+        // null "title" that a later saveAccount would then persist.
+        Json::Value t = i->second.get("title", Json::Value());
+        if (t.isString() && !t.asString().empty())
+            return t.asString();
+    }
+    // Legacy account minted before titles, or an unknown id: the id itself is the
+    // only stable thing to show. (No such accounts exist on the live registry.)
+    return id;
+}
+
+// Make an externally-supplied string safe to echo THROUGH the mudtag renderer:
+// send_to re-parses the composed message (args included) for mudtags, so
+// colourStrip is the WRONG tool -- it un-escapes {{ -> { and re-arms every tag.
+// Instead clamp the raw first (so the clamp can't split a doubled brace), then
+// double every '{' to '{{' (mudtags renders '{{' as a literal '{', so no lone
+// '{'+letter tag can survive), and drop control bytes so no newline/ANSI reaches
+// the player's terminal. KOI8 high bytes (>= 0x80, Cyrillic) are kept.
+DLString AccountManager::echoSafe(const DLString &raw)
+{
+    DLString clamped = raw;
+    if (clamped.size() > 40)
+        clamped = clamped.substr(0, 40) + "...";
+
+    DLString out;
+    for (int i = 0; i < (int)clamped.size(); i++) {
+        char c = clamped[i];
+        if (c == '{')
+            out += "{{";
+        else if ((unsigned char)c >= 0x20)
+            out += c;
+    }
+    return out;
+}
+
 bool AccountManager::saveAccount(const DLString &id)
 {
     map<DLString, Json::Value>::iterator a = accounts.find(id);
@@ -209,6 +310,7 @@ DLString AccountManager::create(const DLString &type, const DLString &value, con
 
     Json::Value account;
     account["id"] = id;
+    account["title"] = mintTitle();
     account["identities"].append(identity);
 
     accounts[id] = account;

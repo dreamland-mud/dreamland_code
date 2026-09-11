@@ -9,6 +9,8 @@
 #include "accountmanager.h"
 #include "linkingcode.h"
 #include "accountaudit.h"
+#include "commonattributes.h"
+#include "json_utils.h"
 #include "arg_utils.h"
 #include "act.h"
 #include "def.h"
@@ -100,6 +102,27 @@ CMDRUNP( delete )
  * minting is gated off (LinkingCode::mintingEnabled) until the Phase 3 redeem
  * bots exist, so this command shows only status and a "coming soon" line.
  */
+// A character's bot-VERIFIED Discord identity, or false. The `discord` attribute is
+// set only by the /link servlet after the Discord bot POSTs the confirmed numeric id,
+// so a non-empty id here is trustworthy -- the in-game adopt can create/attach an
+// account from it with no linking code. Probe with findAttr (NOT get_json_attribute)
+// so an unlinked char never gets an empty `discord` attr churned into its pfile.
+static bool char_verified_discord(PCharacter *ch, DLString &discordId, DLString &username)
+{
+    XMLStringAttribute::Pointer attr = ch->getAttributes().findAttr<XMLStringAttribute>("discord");
+    if (!attr)
+        return false;
+
+    Json::Value d;
+    JsonUtils::fromString(attr->getValue(), d);
+    if (!d.isObject())
+        return false;
+
+    discordId = d["id"].asString();
+    username = d["username"].asString();
+    return !discordId.empty();
+}
+
 static void account_status(PCharacter *ch)
 {
     DLString id = AccountManager::accountOf(ch->getName());
@@ -107,10 +130,17 @@ static void account_status(PCharacter *ch)
     if (id.empty()) {
         ch->pecho(_("Твой персонаж не привязан к аккаунту."));
         ch->pecho(_("Аккаунт связывает твоих персонажей и дает способ восстановить доступ. Набери {yаккаунт связать{x, чтобы начать."));
+
+        // A large slice of the playerbase already carries a bot-verified Discord id
+        // from the old /link flow -- offer the one-command adopt, no code dance.
+        DLString discordId, username;
+        if (char_verified_discord(ch, discordId, username))
+            ch->pecho(_("Твой Discord уже подтвержден ({W%1$s{x). Набери {yаккаунт связать дискорд{x, чтобы привязать аккаунт сразу, без кода."),
+                      AccountManager::echoSafe(username).c_str());
         return;
     }
 
-    ch->pecho(_("Аккаунт {W%1$s{x."), id.c_str());
+    ch->pecho(_("Аккаунт {W%1$s{x."), AccountManager::titleOf(id).c_str());
 
     Json::Value acc = AccountManager::get(id);
     const Json::Value &identities = acc["identities"];
@@ -123,7 +153,9 @@ static void account_status(PCharacter *ch)
             DLString display = (*i)["display"].asString();
             if (display.empty())
                 display = (*i)["value"].asString();
-            ch->pecho("  {W%1$s{x: %2$s", type.c_str(), display.c_str());
+            // display is an externally-supplied identity string (a bot username, an
+            // email) -- escape it before it goes through the mudtag renderer.
+            ch->pecho("  {W%1$s{x: %2$s", type.c_str(), AccountManager::echoSafe(display).c_str());
         }
     }
 
@@ -150,8 +182,67 @@ static void account_link(PCharacter *ch)
     AccountAudit::record("code_mint", f);
 
     ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
-    ch->pecho(_("Он одноразовый и действует 10 минут. Введи его в боте (Telegram или Discord) или на сайте, чтобы привязать этого персонажа к аккаунту."));
+    ch->pecho(_("Он одноразовый и действует 10 минут. Введи его так:"));
+    ch->pecho(_("  Telegram: напиши боту команду {y/attach %1$s{x"), code.c_str());
+    ch->pecho(_("  Discord:  напиши боту команду {y/link %1$s{x"), code.c_str());
+    ch->pecho(_("  Сайт:     dreamland.rocks"));
     ch->pecho(_("Никому не показывай этот код: кто его введет, привяжет персонажа к своему аккаунту."));
+}
+
+// One-command adopt for a character that already carries a bot-verified Discord id
+// (the 62%-of-the-playerbase case). No linking code, no bot round-trip: the game
+// already trusts discord.id, so create-or-attach straight from it. Gated the same
+// way as `account link` so the whole layer stays dark until the public launch.
+static void account_link_discord(PCharacter *ch)
+{
+    if (!LinkingCode::mintingEnabled() && !ch->is_immortal()) {
+        ch->pecho(_("Привязка аккаунтов скоро откроется. Немного терпения."));
+        return;
+    }
+
+    DLString discordId, username;
+    if (!char_verified_discord(ch, discordId, username)) {
+        ch->pecho(_("У тебя не подтвержден Discord. Свяжи аккаунт кодом: {yаккаунт связать{x."));
+        return;
+    }
+
+    // Already linked -- never steal a char off its account (mirrors the servlet's
+    // refuse-other-account rule); just show where it is.
+    DLString current = AccountManager::accountOf(ch->getName());
+    if (!current.empty()) {
+        ch->pecho(_("Ты уже привязан к аккаунту {W%1$s{x."), AccountManager::titleOf(current).c_str());
+        return;
+    }
+
+    bool created = false;
+    DLString id = AccountManager::findByIdentity("discord", discordId);
+    if (id.empty()) {
+        id = AccountManager::create("discord", discordId, username);
+        if (id.empty()) {
+            ch->pecho(_("Не удалось создать аккаунт. Попробуй позже."));
+            return;
+        }
+        created = true;
+    }
+
+    if (!AccountManager::attachChar(id, ch->getName())) {
+        ch->pecho(_("Не удалось создать аккаунт. Попробуй позже."));
+        return;
+    }
+
+    Json::Value f;
+    f["char"] = ch->getName();
+    f["account"] = id;
+    f["identity"] = DLString("discord:") + discordId;
+    f["created"] = created;
+    AccountAudit::record("account_adopt", f);
+
+    DLString title = AccountManager::titleOf(id);
+    if (created)
+        ch->pecho(_("Аккаунт {W%1$s{x создан по твоему Discord ({W%2$s{x)."),
+                  title.c_str(), AccountManager::echoSafe(username).c_str());
+    else
+        ch->pecho(_("Персонаж добавлен к аккаунту {W%1$s{x."), title.c_str());
 }
 
 /* Immortal-only backstop -- the human vibe-check with real hands (roadmap 2.9).
@@ -257,7 +348,11 @@ CMDRUN( account )
     // U+02BC, and a mudjs client strips it from input anyway, so "звязати" is the
     // form that actually arrives. Help shows the orthographic "звʼязати".
     if (arg_oneof(cmd, "link", "связать", "звязати")) {
-        account_link(ch->getPC());
+        DLString sub = args.getOneArgument();
+        if (arg_oneof(sub, "discord", "дискорд"))
+            account_link_discord(ch->getPC());
+        else
+            account_link(ch->getPC());
         return;
     }
 
