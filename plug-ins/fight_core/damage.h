@@ -35,6 +35,11 @@ double spell_combat_value(const DLString &spell);
 double spell_combat_global();
 double spell_combat_level_ref();
 double spell_combat_save_factor();
+/* Extra-melee-attack procs (<props>combathits</props>): _hit_value is the expected
+ * damage of one extra swing at _level_ref (rider-inclusive), _round_attacks is how
+ * many swings a multi_hit (a whole extra round) is worth. Both Kit-tuned live. */
+double spell_combat_hit_value();
+double spell_combat_round_attacks();
 
 class Damage {
 public:

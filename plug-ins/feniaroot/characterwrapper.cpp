@@ -3094,53 +3094,79 @@ static bool ga_grantsSkills( obj_index_data *pObj )
 // spell or the spell declares no damage tier.
 double spell_proc_tier_value( const DLString &spellName, int level );
 
-// Worth of the offensive/heal/buff spells an item casts in combat. The item
-// declares them in <props>combatcast</props> as [{spell, chance, count}]. Each
-// spell's value is expressed in expected-damage units: a clean damage nuke
-// derives it from its <tier> automatically (spell_proc_tier_value, discounted by
-// _save_factor for an average save), and only spells whose worth does NOT follow
-// their tier -- %HP damage, multi-hit/DoT, tierless effect/buff/heal -- carry an
-// explicit override in spell_combat_value.json. procScore = SUM value * chance/100
-// * count, scaled by item level (a higher-level proc casts harder) and _global
-// (expected-damage -> gear-score currency). Returns 0 for an item that declares
-// nothing -- ga_score then keeps the flat +50 instead. COMBAT_PROC_SCORING.md.
+// Worth of what an item does in combat each round, in expected-damage units,
+// mapped to gear-score currency by _global and scaled by item level. Two kinds,
+// summed:
+//  <props>combatcast</props> [{spell,chance,count}] -- offensive/heal/buff spells
+//    cast in combat. A clean damage nuke derives its value from its <tier>
+//    (spell_proc_tier_value, discounted by _save_factor); spells whose worth does
+//    not follow their tier carry an explicit override in spell_combat_value.json.
+//  <props>combathits</props> [{one_hit,multi_hit,chance}] -- EXTRA melee attacks
+//    the item's onFight fires (ch.one_hit / ch.multi_hit). Each extra swing is
+//    worth _hit_value (a reference melee hit at the ref level -- miss- and
+//    on-hit-rider-inclusive, since every extra swing also re-triggers weapon
+//    element/procs); a multi_hit is a whole extra round, worth _round_attacks swings.
+// Returns 0 for an item that declares neither -- ga_score then keeps the flat +50.
+// COMBAT_PROC_SCORING.md.
 static double ga_procScore( obj_index_data *pObj )
 {
-    // isMember guard FIRST: pObj is non-const, so pObj->props["combatcast"] would
-    // INSERT a null "combatcast" member into the prototype on every scored item
-    // (jsoncpp non-const operator[]), polluting props world-wide and drifting to
-    // disk on the next autosave. Read only after confirming the member exists.
-    if (!pObj->props.isMember( "combatcast" ))
-        return 0;
-    const Json::Value &casts = pObj->props["combatcast"];
-    if (!casts.isArray( ) || casts.empty( ))
-        return 0;
-
+    // isMember guard FIRST on every prop read: pObj is non-const, so
+    // pObj->props["x"] would INSERT a null member into the prototype on every
+    // scored item (jsoncpp non-const operator[]), polluting props world-wide and
+    // drifting to disk on the next autosave. Read only after isMember confirms it.
     int ref = (int)spell_combat_level_ref( );
     double raw = 0;
-    for (auto i = casts.begin( ); i != casts.end( ); ++i) {
-        const Json::Value &c = *i;
-        DLString spellName = c["spell"].asString( );
 
-        // Explicit override wins (spells whose worth does not follow their tier);
-        // otherwise derive the value from the spell's damage tier at the
-        // reference level, discounted for an average saving throw. A spell with
-        // neither an override nor a damage tier scores 0 and is skipped here --
-        // the flat +50 fallback in ga_score still covers "it triggers something".
-        double v = spell_combat_value( spellName );
-        if (v <= 0)
-            v = spell_proc_tier_value( spellName, ref ) * spell_combat_save_factor( );
-        if (v <= 0)
-            continue;
+    // Spells cast in combat.
+    if (pObj->props.isMember( "combatcast" )) {
+        const Json::Value &casts = pObj->props["combatcast"];
+        if (casts.isArray( )) {
+            for (auto i = casts.begin( ); i != casts.end( ); ++i) {
+                const Json::Value &c = *i;
+                DLString spellName = c["spell"].asString( );
 
-        double chance = c["chance"].asDouble( );
-        double count  = c.isMember( "count" ) ? c["count"].asDouble( ) : 1.0;
-        if (count <= 0)
-            count = 1.0;
-        if (count > 10)          // match the firing cap (ocombatcast_fight) so the score reflects what actually casts
-            count = 10.0;
-        raw += v * (chance / 100.0) * count;
+                // Explicit override wins (spells whose worth does not follow their
+                // tier); otherwise derive from the spell's damage tier at the
+                // reference level, discounted for an average save. Neither -> skip
+                // (the flat +50 fallback in ga_score still covers "it triggers").
+                double v = spell_combat_value( spellName );
+                if (v <= 0)
+                    v = spell_proc_tier_value( spellName, ref ) * spell_combat_save_factor( );
+                if (v <= 0)
+                    continue;
+
+                double chance = c["chance"].asDouble( );
+                double count  = c.isMember( "count" ) ? c["count"].asDouble( ) : 1.0;
+                if (count <= 0)
+                    count = 1.0;
+                if (count > 10)          // match the firing cap (ocombatcast_fight)
+                    count = 10.0;
+                raw += v * (chance / 100.0) * count;
+            }
+        }
     }
+
+    // Extra melee attacks fired from the item's onFight.
+    if (pObj->props.isMember( "combathits" )) {
+        const Json::Value &hits = pObj->props["combathits"];
+        if (hits.isArray( )) {
+            for (auto i = hits.begin( ); i != hits.end( ); ++i) {
+                const Json::Value &h = *i;
+                double chance = h["chance"].asDouble( );
+                if (chance <= 0)
+                    continue;
+                double oneHit   = h.isMember( "one_hit" )   ? h["one_hit"].asDouble( )   : 0.0;
+                double multiHit = h.isMember( "multi_hit" ) ? h["multi_hit"].asDouble( ) : 0.0;
+                double attacks  = oneHit + multiHit * spell_combat_round_attacks( );
+                if (attacks <= 0)
+                    continue;
+                raw += attacks * spell_combat_hit_value( ) * (chance / 100.0);
+            }
+        }
+    }
+
+    if (raw <= 0)
+        return 0;
 
     double levelScale = pObj->level / spell_combat_level_ref( );
     return raw * levelScale * spell_combat_global( );
