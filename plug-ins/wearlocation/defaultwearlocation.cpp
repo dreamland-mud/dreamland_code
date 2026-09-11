@@ -362,6 +362,17 @@ void DefaultWearlocation::triggersOnEquip( Character *ch, Object *obj )
 // Deliberately NOT folded into affectsOnUnequip(): that also runs on the enchant
 // reverse-then-reapply dance (affect_to_obj / affect_enhance), where the wearer's
 // affects must survive untouched.
+// Is the character currently WEARING (not merely carrying) an object of this
+// prototype vnum? Used to keep a shared worn-affect alive while any granting
+// item is still on.
+static bool wearing_object_vnum( Character *ch, int vnum )
+{
+    for (Object *o = ch->carrying; o != 0; o = o->next_content)
+        if (o->wear_loc != wear_none && o->pIndexData && o->pIndexData->vnum == vnum)
+            return true;
+    return false;
+}
+
 static void strip_object_sourced_affects( Character *ch, Object *obj )
 {
     if (ch == 0 || obj->pIndexData == 0)
@@ -370,9 +381,27 @@ static void strip_object_sourced_affects( Character *ch, Object *obj )
     int vnum = obj->pIndexData->vnum;
     list<Affect *> doomed;
 
-    for (auto &paf: ch->affected)
-        if (paf->sources.hasObject( vnum ))
+    // unequip() has already set obj->wear_loc = wear_none above, so obj never
+    // counts as a still-worn source below. An affect this item sourced is kept
+    // while ANOTHER still-worn item also sources it: a matched set (two items
+    // granting the same non-stacking affect, e.g. giant strength on both the
+    // gauntlets and the armbands) holds the buff until the last piece comes off.
+    // Two identical worn copies (same vnum) are handled too -- wearing_object_vnum
+    // finds the other copy.
+    for (auto &paf: ch->affected) {
+        if (!paf->sources.hasObject( vnum ))
+            continue;
+
+        bool keptByAnother = false;
+        for (int srcVnum: paf->sources.objectVnums())
+            if (wearing_object_vnum( ch, srcVnum )) {
+                keptByAnother = true;
+                break;
+            }
+
+        if (!keptByAnother)
             doomed.push_back( paf );
+    }
 
     // Show each affect type's wear-off once (one item spell may add several affects
     // of a single type -- inspire = hitroll + saves), then remove every match.
