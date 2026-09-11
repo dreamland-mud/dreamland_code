@@ -51,6 +51,17 @@ public:
     bool contains(const AffectSource &src) const;
     void remove(const AffectSource &src);
 
+    /** True if this list names an object (item) source with the given prototype vnum. */
+    bool hasObject(int vnum) const;
+
+    /** Prototype vnums of every object (item) source, for player-file persistence. */
+    std::list<int> objectVnums() const;
+
+    /** Add an item source by prototype vnum. Used when loading a saved affect, where
+        the source object's live instance is not known -- vnum is what the wear-off
+        backstop matches on anyway. Deduped by vnum. */
+    void addItem(int vnum);
+
     Character *getOwner() const;
 };
 
