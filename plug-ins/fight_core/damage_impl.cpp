@@ -174,25 +174,31 @@ DLString damage_noun(int dam_type, lang_t lang)
  * only). COMBAT_PROC_SCORING.md.
  *----------------------------------------------------------------------------*/
 static std::map<DLString, double> spellCombatValue;   // per-spell override, expected combat value at _level_ref
-static double spellComboGlobal     = 1.0;
-static double spellComboLevelRef   = 50.0;
-static double spellComboSaveFactor = 0.75;
+static double spellComboGlobal        = 1.0;
+static double spellComboLevelRef      = 50.0;
+static double spellComboSaveFactor    = 0.75;
+static double spellComboHitValue      = 55.0;   // expected damage of one extra melee swing at _level_ref (rider-inclusive)
+static double spellComboRoundAttacks  = 4.0;    // swings in one multi_hit (a whole extra round)
 
 CONFIGURABLE_LOADED(fight, spell_combat_value)
 {
     spellCombatValue.clear();
-    spellComboGlobal     = 1.0;
-    spellComboLevelRef   = 50.0;
-    spellComboSaveFactor = 0.75;
+    spellComboGlobal       = 1.0;
+    spellComboLevelRef     = 50.0;
+    spellComboSaveFactor   = 0.75;
+    spellComboHitValue     = 55.0;
+    spellComboRoundAttacks = 4.0;
 
     for (auto i = value.begin(); i != value.end(); ++i) {
         DLString key = i.key().asString();
         if (key.empty())
             continue;
 
-        if (key == "_global")      { spellComboGlobal     = (*i).asDouble(); continue; }
-        if (key == "_level_ref")   { spellComboLevelRef   = (*i).asDouble(); continue; }
-        if (key == "_save_factor") { spellComboSaveFactor = (*i).asDouble(); continue; }
+        if (key == "_global")        { spellComboGlobal       = (*i).asDouble(); continue; }
+        if (key == "_level_ref")     { spellComboLevelRef     = (*i).asDouble(); continue; }
+        if (key == "_save_factor")   { spellComboSaveFactor   = (*i).asDouble(); continue; }
+        if (key == "_hit_value")     { spellComboHitValue     = (*i).asDouble(); continue; }
+        if (key == "_round_attacks") { spellComboRoundAttacks = (*i).asDouble(); continue; }
 
         // The "overrides" object carries explicit per-spell values for spells
         // whose real combat worth does not follow their <tier>: %HP spells,
@@ -219,9 +225,11 @@ double spell_combat_value(const DLString &spell)
     return i == spellCombatValue.end() ? 0.0 : i->second;
 }
 
-double spell_combat_global()      { return spellComboGlobal; }
-double spell_combat_level_ref()   { return spellComboLevelRef; }
-double spell_combat_save_factor() { return spellComboSaveFactor; }
+double spell_combat_global()        { return spellComboGlobal; }
+double spell_combat_level_ref()     { return spellComboLevelRef; }
+double spell_combat_save_factor()   { return spellComboSaveFactor; }
+double spell_combat_hit_value()     { return spellComboHitValue; }
+double spell_combat_round_attacks() { return spellComboRoundAttacks; }
 
 void SkillDamage::message( )
 {
