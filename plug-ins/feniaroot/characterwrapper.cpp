@@ -3089,13 +3089,21 @@ static bool ga_grantsSkills( obj_index_data *pObj )
     return b != 0 && pObj->behaviors.isSet( b->getIndex( ) );
 }
 
+// Defined in feniaskillaction.cpp (skills_impl, linked into feniaroot): expected
+// damage of a named spell's <tier> at the given level; 0 when the name is not a
+// spell or the spell declares no damage tier.
+double spell_proc_tier_value( const DLString &spellName, int level );
+
 // Worth of the offensive/heal/buff spells an item casts in combat. The item
-// declares them in <props>combatcast</props> as [{spell, chance, count}]; each
-// spell's relative combat value lives in config/fight/spell_combat_value.json.
-// procScore = SUM value(spell) * chance/100 * count, scaled by item level (a
-// higher-level proc casts harder) and a global proc-vs-stats weight. Returns 0
-// for an item that declares nothing -- ga_score then keeps the flat +50 instead.
-// COMBAT_PROC_SCORING.md.
+// declares them in <props>combatcast</props> as [{spell, chance, count}]. Each
+// spell's value is expressed in expected-damage units: a clean damage nuke
+// derives it from its <tier> automatically (spell_proc_tier_value, discounted by
+// _save_factor for an average save), and only spells whose worth does NOT follow
+// their tier -- %HP damage, multi-hit/DoT, tierless effect/buff/heal -- carry an
+// explicit override in spell_combat_value.json. procScore = SUM value * chance/100
+// * count, scaled by item level (a higher-level proc casts harder) and _global
+// (expected-damage -> gear-score currency). Returns 0 for an item that declares
+// nothing -- ga_score then keeps the flat +50 instead. COMBAT_PROC_SCORING.md.
 static double ga_procScore( obj_index_data *pObj )
 {
     // isMember guard FIRST: pObj is non-const, so pObj->props["combatcast"] would
@@ -3108,12 +3116,23 @@ static double ga_procScore( obj_index_data *pObj )
     if (!casts.isArray( ) || casts.empty( ))
         return 0;
 
+    int ref = (int)spell_combat_level_ref( );
     double raw = 0;
     for (auto i = casts.begin( ); i != casts.end( ); ++i) {
         const Json::Value &c = *i;
-        double v = spell_combat_value( c["spell"].asString( ) );
+        DLString spellName = c["spell"].asString( );
+
+        // Explicit override wins (spells whose worth does not follow their tier);
+        // otherwise derive the value from the spell's damage tier at the
+        // reference level, discounted for an average saving throw. A spell with
+        // neither an override nor a damage tier scores 0 and is skipped here --
+        // the flat +50 fallback in ga_score still covers "it triggers something".
+        double v = spell_combat_value( spellName );
+        if (v <= 0)
+            v = spell_proc_tier_value( spellName, ref ) * spell_combat_save_factor( );
         if (v <= 0)
             continue;
+
         double chance = c["chance"].asDouble( );
         double count  = c.isMember( "count" ) ? c["count"].asDouble( ) : 1.0;
         if (count <= 0)
