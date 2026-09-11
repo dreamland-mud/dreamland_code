@@ -200,7 +200,7 @@ static const char *ACCOUNT_NOUN[] = {
     "Nightwarden", "Stormcaller", "Ashwalker", "Moonhound", "Fenwyrm",
 };
 static const char *ACCOUNT_PLACE[] = {
-    "Old Thalos", "the Ninth Epoch", "the Sundered Marches", "Midgaard's Gate",
+    "Old Thalos", "the Elder Days", "the Sundered Marches", "Midgaard's Gate",
     "the Hollow Vale", "the Frost Marches", "Ninefold Dusk", "the Weeping Vale",
     "the Ashen Wastes", "the Drowned Coast", "the Silent Fen", "the Broken Spire",
     "the Last Bastion", "the Grey Expanse", "the Withered Wood", "the Umbral Deep",
@@ -230,10 +230,12 @@ DLString AccountManager::mintTitle()
 DLString AccountManager::titleOf(const DLString &id)
 {
     map<DLString, Json::Value>::iterator i = accounts.find(id);
-    if (i != accounts.end() && i->second["title"].isString()) {
-        DLString t = i->second["title"].asString();
-        if (!t.empty())
-            return t;
+    if (i != accounts.end()) {
+        // .get (not operator[]) so a title-less legacy record is not MUTATED with a
+        // null "title" that a later saveAccount would then persist.
+        Json::Value t = i->second.get("title", Json::Value());
+        if (t.isString() && !t.asString().empty())
+            return t.asString();
     }
     // Legacy account minted before titles, or an unknown id: the id itself is the
     // only stable thing to show. (No such accounts exist on the live registry.)
