@@ -51,6 +51,7 @@
 #include "dl_math.h"
 #include "dl_ctype.h"
 #include "player_utils.h"
+#include "wearloc_utils.h"
 #include "mudtags.h"
 #include "merc.h"
 #include "autoflags.h"
@@ -1052,6 +1053,13 @@ Json::Value CommandPanelWebPromptListener::jsonFightCommands( Character *ch )
 
         // Learned and usable this very moment: no teasing with what they cannot press.
         if (skill->getLearned( ch ) <= 0 || !skill->usable( ch, false ))
+            continue;
+
+        // Disarm strikes the opponent's wielded weapon; hide the button when the
+        // current opponent holds nothing (do_disarm would just refuse with "Твой
+        // противник не вооружен"). ch->fighting is non-null -- the function
+        // returns early otherwise. getName() is the canonical "disarm" sysname.
+        if (skill->getName( ) == "disarm" && get_eq_char( ch->fighting, wear_wield ) == 0)
             continue;
 
         if (!cmd->visible( ch ))
