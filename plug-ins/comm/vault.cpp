@@ -160,19 +160,35 @@ static DLString vault_entry_name( const BankEntry &be, OBJ_INDEX_DATA *proto, la
     return noun.decline( '1' );          // '1' = nominative, the codebase idiom
 }
 
-/* Case-insensitive substring match of kwLower against an entry's name across ALL
- * declined case forms, so 'vault find молот' finds "кузнечный молот" AND a
- * declined query ('find молота') still finds it. russian_case_all_forms expands
- * the pad to every case ("молот молота молоту ...") and colour-strips; a
- * pipe-less name (EN, or a ShortDesc override) expands to itself, so a partial
- * ('find nis' -> "nishtyak") still matches. Display stays nominative via
- * vault_entry_name; only matching widens to all forms. */
-static bool vault_entry_matches( const BankEntry &be, OBJ_INDEX_DATA *proto, lang_t lang, const DLString &kwLower )
+/* Case-insensitive substring match of kwLower against an entry's name, in EVERY
+ * language and across all declined case forms -- a player types a keyword in
+ * whatever tongue they know the item by, not in whatever the vault happens to
+ * render in. The match corpus is the union of:
+ *   - every short-descr language pad (each run through russian_case_all_forms so
+ *     "молот молота молоту ..." matches AND a declined query still hits; a
+ *     pipe-less EN / ShortDesc-override name expands to itself, so 'find nis' ->
+ *     "nishtyak" still works), and
+ *   - the object's own keyword field in every language -- the same keywords a
+ *     plain `get` matches, so 'vault get <kw>' behaves like inventory `get`.
+ * Display stays in the viewer's language via vault_entry_name; only the MATCH
+ * widens. The lang argument is now unused (kept in the signature for callers). */
+static bool vault_entry_matches( const BankEntry &be, OBJ_INDEX_DATA *proto, lang_t, const DLString &kwLower )
 {
-    DLString pad = vault_entry_shortdescr( be, proto ).getForLang( lang );
-    if ( pad.empty( ) )
+    DLString forms;
+
+    const XMLMultiString &sd = vault_entry_shortdescr( be, proto );
+    for (XMLMultiString::const_iterator i = sd.begin( ); i != sd.end( ); ++i)
+        if ( !i->second.empty( ) )
+            forms += " " + russian_case_all_forms( i->second );
+
+    if ( proto != 0 )
+        for (XMLMultiString::const_iterator i = proto->keyword.begin( ); i != proto->keyword.end( ); ++i)
+            if ( !i->second.empty( ) )
+                forms += " " + i->second;
+
+    if ( forms.empty( ) )
         return false;
-    DLString forms = russian_case_all_forms( pad ).toLower( );
+    forms = forms.toLower( );
     return forms.find( kwLower ) != DLString::npos;
 }
 
