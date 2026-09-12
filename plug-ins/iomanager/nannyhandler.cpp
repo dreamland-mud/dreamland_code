@@ -12,6 +12,7 @@
 #include "interprethandler.h"
 #include "ban.h"
 #include "descriptorstatemanager.h"
+#include "resume.h"
 #include "comm.h"
 #include "badnames.h"
 #include "xmlattributecoder.h"
@@ -398,6 +399,10 @@ NMI_INVOKE( NannyHandler, reconnect, "" )
     d->handle_input.front( )->close( d );
     d->associate( twin );
     InterpretHandler::init( d );
+    // This front-door reconnect now owns the character, so any web resume token
+    // for it is stale: drop it, or a suspended tab that still holds it could
+    // later resume in and silently evict this fresh session.
+    resume_token_clear( twin->getPC( ) );
     return Register( );
 }
 
@@ -423,6 +428,8 @@ NMI_INVOKE( NannyHandler, reanimate, "" )
         d->handle_input.front( )->close( d );
         d->associate( twin );
         InterpretHandler::init( d );
+        // See reconnect: a front-door takeover invalidates any web resume token.
+        resume_token_clear( twin->getPC( ) );
         return true;
     }
     catch (const Scripting::Exception &) {

@@ -168,19 +168,20 @@ bool resume_attach(Descriptor *d, const DLString &token)
     DLString name = t->second.name;
     PCharacter *twin = PCharacterManager::findPlayer(name);
 
-    /* Someone is already at the keyboard, or the player is an immortal
-     * currently switched into a mob. Both are for the login flow to sort out,
-     * which asks before it evicts anyone.
-     *
-     * Checked BEFORE the token is spent, because the usual occupant here is
-     * the client's own dead socket: a phone that suspends drops the link
-     * without a FIN, so the character keeps its descriptor until a write to
-     * that socket finally fails. Spending the token on that would answer a
-     * returning player with resume_failed -- and the client, holding nothing
-     * to retry with, drops them at the login screen for a condition that
-     * clears itself moments later. The token stays single-use for every
-     * outcome that is actually final, and still dies of its own TTL. */
-    if (twin && (twin->desc || twin->switchedTo)) {
+    /* Refuse (token kept, dies of its own TTL) for the "still connected" cases
+     * this path must NOT take over -- both are the login flow's job. Checked
+     * BEFORE the token is spent, so it stays single-use:
+     *   - an immortal switched into a mob;
+     *   - a still-attached descriptor that is NOT CON_PLAYING. That is a player
+     *     mid-login or mid-remort sitting on a CON_NANNY descriptor, whose
+     *     close() runs NannyHandler::close -> extractNewbie -> delete on the
+     *     character; closing it here and reattaching below would be a
+     *     use-after-free.
+     * Only a dead-but-still-CON_PLAYING descriptor -- the phone-suspend case
+     * this change exists for -- is safe to evict: its handlers (InterpretHandler,
+     * OLC, Pager) detach the character without freeing it. */
+    if (twin && (twin->switchedTo
+                 || (twin->desc && twin->desc->connected != CON_PLAYING))) {
         LogStream::sendNotice() << "Resume: " << d->host << " has a token for "
                                 << name << ", who is still connected -- token kept for a retry" << endl;
         return false;
@@ -194,6 +195,21 @@ bool resume_attach(Descriptor *d, const DLString &token)
                                 << name << ", who is no longer in the world" << endl;
         return false;
     }
+
+    /* The returning player's own previous descriptor is usually still attached:
+     * a phone that suspends drops the link without a FIN, so the character keeps
+     * that descriptor until a write to the dead socket finally fails -- which on
+     * an idle character can be minutes away, long enough that the player gives
+     * up and logs in by hand. A valid token proves this is the same player
+     * coming back to their own body, so close the stale descriptor now rather
+     * than refusing and waiting for it to die. The guard above guarantees it is
+     * CON_PLAYING, so close() runs only InterpretHandler-family handlers that
+     * detach the character (null twin->desc) without freeing it; the main loop
+     * then reaps the CON_CLOSED descriptor. Desktop is unaffected: its socket
+     * closes cleanly on reconnect, so twin->desc is already null here and this
+     * branch never runs. */
+    if (twin->desc)
+        twin->desc->close();
 
     /* The take-over itself, in the order nanny.reconnect uses: drop the login
      * handler this descriptor was born with, hand it the character, then let
