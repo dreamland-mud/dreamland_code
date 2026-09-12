@@ -9,6 +9,7 @@
 #include "descriptor.h"
 #include "descriptorstatemanager.h"
 #include "defaultbufferhandler.h"
+#include "resume.h"
 #include "comm.h"
 #include "codepage.h"
 #include "colour.h"
@@ -100,6 +101,9 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
         oldState = CON_BREAK_CONNECT;
         if (pch->desc)
             pch->desc->close( );
+        // A front-door takeover invalidates any web resume token for this char,
+        // so a stale tab cannot later resume in and evict this session.
+        resume_token_clear( pch );
     }
     else { /* load and link to the world anew */
         oldState = CON_READ_MOTD;
