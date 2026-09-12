@@ -3580,7 +3580,18 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
                     skillPct = macePct;
             }
         }
-        double eff = weaponAve * (20 + skillPct) / 100.0;
+        // A weapon whose class the character can never learn -- not in the skill's
+        // class table, or below its class level (Skill::available, the same gate
+        // ga_canSelfCast uses) -- and cannot be compounded into a mace scores its
+        // dice at 0 instead of the 20% unskilled floor: the char can't practice it,
+        // so it will never swing above the floor and must not out-rank a weapon they
+        // can actually train (a warlock offered a mace over a skilled dagger was the
+        // report). It is not dropped -- a caster may still wear it for its stat
+        // affixes alone, which the affect loop above already counted.
+        Skill *wsk = skillManager->find( weaponSn );
+        double eff = 0;
+        if (canCompound || wsk == 0 || wsk->available( target ))
+            eff = weaponAve * (20 + skillPct) / 100.0;
         s += w.weaponWeight * eff;
     }
     // Base armour class: an armour item's value[0..2] (pierce/bash/slash AC) is real
