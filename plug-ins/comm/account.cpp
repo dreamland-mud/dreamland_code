@@ -10,14 +10,36 @@
 #include "linkingcode.h"
 #include "accountaudit.h"
 #include "commonattributes.h"
+#include "pcharactermanager.h"
+#include "npcharacter.h"
+#include "descriptor.h"
+#include "descriptorstatemanager.h"
+#include "interprethandler.h"
+#include "resume.h"
+#include "fight_extract.h"
+#include "clanreference.h"
+#include "skillreference.h"
+#include "loadsave.h"
+#include "auction.h"
+#include "room.h"
+#include "vnum.h"
+#include "merc.h"
 #include "json_utils.h"
 #include "arg_utils.h"
 #include "act.h"
+#include "interp.h"
 #include "def.h"
 #include "l10n.h"
 
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
+
+// Per-TU static references the account-switch guards need, same as quit.cpp:97-100
+// (GSN/CLAN create file-scope statics; including the headers gives only the macros).
+CLAN(invader);
+CLAN(none);
+GSN(evil_spirit);
+GSN(suspect);
 
 CMDRUN( password )
 {
@@ -166,9 +188,15 @@ static void account_status(PCharacter *ch)
         }
     }
 
-    ch->pecho(_("Персонажи аккаунта:"));
-    for (const DLString &name : AccountManager::charsOf(id))
-        ch->pecho("  %1$s", name.c_str());
+    ch->pecho(_("Персонажи аккаунта (кликни, чтобы войти):"));
+    for (const DLString &name : AccountManager::charsOf(id)) {
+        if (name == ch->getName())
+            ch->pecho(_("  %1$s {D(сейчас){x"), name.c_str());
+        else
+            // {hc'command'label{x -- shows the name, sends the switch on click; the
+            // typed `account switch <name>` is the keyboard/screen-reader path.
+            ch->pecho("  {hc'account switch %1$s'%1$s{x", name.c_str());
+    }
 }
 
 // A char already on an account can't mint -- one account per char, no stealing.
@@ -391,6 +419,176 @@ static void account_admin(PCharacter *ch, DLString &args)
     ch->pecho("Usage: account admin info|attach|detach ...");
 }
 
+// Switch to another character on the SAME account without a password. Account
+// ownership is the auth: logging in one char (with its own password) authorizes
+// any char the account owns -- so no password is asked and none is ever stored.
+// The alt-login half mirrors backdoorhandler.cpp (the proven load path) and the
+// leave-current half is extract_char (the proven extraction), so this reuses the
+// real login/extract machinery rather than hand-rolling the descriptor lifecycle.
+static void account_switch(PCharacter *ch, DLString &args)
+{
+    DLString id = AccountManager::accountOf(ch->getName());
+    if (id.empty()) {
+        ch->pecho(_("Ты не привязан к аккаунту."));
+        return;
+    }
+
+    DLString target = args.getOneArgument();
+    if (target.empty()) {
+        ch->pecho(_("Кого загрузить? Набери {yаккаунт персонаж <имя>{x или кликни имя в {hh5106аккаунт{x."));
+        return;
+    }
+    target.capitalize();
+
+    if (target == ch->getName()) {
+        ch->pecho(_("Ты уже играешь этим персонажем."));
+        return;
+    }
+
+    // Must be a real character on the SAME account (ownership = the authorization).
+    PCMemoryInterface *pcm = PCharacterManager::find(target);
+    if (pcm == 0 || AccountManager::accountOf(pcm->getName()) != id) {
+        ch->pecho(_("Этот персонаж не на твоем аккаунте."));
+        return;
+    }
+
+    // Already in the world on another connection -- refuse (no takeover in v1).
+    if (pcm->getPlayer() != 0) {
+        ch->pecho(_("Этот персонаж уже в игре."));
+        return;
+    }
+
+    // Leave-cleanly guards, mirroring quit.cpp (a switch is never "forced").
+    if (ch->position == POS_FIGHTING || ch->fighting) {
+        ch->pecho(_("Не сейчас -- сначала закончи бой."));
+        return;
+    }
+    if (!ch->is_immortal()) {
+        if (ch->position < POS_STUNNED) {   // dying/incapacitated -- no death-escape
+            ch->pecho(_("Ты при смерти -- сейчас не переключиться."));
+            return;
+        }
+        if (IS_VIOLENT(ch)) {
+            ch->pecho(_("У тебя слишком много адреналина в крови."));
+            return;
+        }
+        if (IS_SLAIN(ch)) {
+            ch->pecho(_("Правда о твоем поражении еще не забыта."));
+            return;
+        }
+        if (IS_KILLER(ch)) {
+            ch->pecho(_("Боги еще помнят убийство, совершенное тобой."));
+            return;
+        }
+    }
+
+    if (IS_CHARMED(ch)) {
+        ch->pecho(_("Сейчас ты не можешь оставить своего хозяина."));
+        return;
+    }
+
+    if (auction->item != 0 && (ch == auction->buyer || ch == auction->seller)) {
+        ch->pecho(_("Подожди, пока вещь с аукциона будет продана или возвращена."));
+        return;
+    }
+
+    // Full parity with quit's leave-world guards (Kit's rule: block switch wherever
+    // quit is blocked). A switch is never "forced", so each is a plain refusal --
+    // the exact conditions and messages from quit.cpp:209-267. 🛑 Kept as a direct
+    // mirror rather than a shared predicate to avoid refactoring the leave-world
+    // command; if quit's guards change, update these in lockstep (or extract a shared
+    // can-leave predicate then).
+    if (!ch->is_immortal()) {
+        if (IS_SET(ch->act, PLR_NO_EXP)) {
+            ch->pecho(_("Ты не можешь покинуть этот мир! Твой дух во власти противника."));
+            return;
+        }
+        if (IS_ROOM_AFFECTED(ch->in_room, AFF_ROOM_ESPIRIT)) {
+            ch->pecho(_("Злые духи в этой зоне не отпускают тебя."));
+            return;
+        }
+        if (ch->getClan() != clan_invader && ch->isAffected(gsn_evil_spirit)) {
+            ch->pecho(_("Злые духи, овладевшие тобой, не позволяют тебе покинуть этот мир."));
+            return;
+        }
+        if (ch->isAffected(gsn_suspect)) {
+            ch->pecho(_("Ты не можешь этого сделать -- тебя ждет Суд!"));
+            return;
+        }
+        if (ch->death_ground_delay > 0 && ch->trap.isSet(TF_NO_MOVE)) {
+            ch->pecho(_("Сначала выберись из ловушки, а потом можно и покинуть этот мир."));
+            return;
+        }
+        if (ch->in_room->pIndexData->clan != clan_none
+            && ch->getClan() != ch->in_room->pIndexData->clan) {
+            ch->pecho(_("Ты не можешь этого сделать -- здесь не твоя территория!"));
+            return;
+        }
+    }
+
+    Descriptor *d = ch->desc;
+    if (d == 0)
+        return;
+
+    // Refuse from inside an OLC editor / pager / any layered handler: the login below
+    // clears handle_input, which would free the executing handler under the input pump
+    // (only the plain interpreter is safe to switch from). Precedent: CharacterWrapper
+    // isInInterpret.
+    if (d->handle_input.empty()
+        || d->handle_input.front()->getType() != "InterpretHandler") {
+        ch->pecho(_("Нельзя переключиться отсюда -- сначала выйди из редактора."));
+        return;
+    }
+
+    DLString altName = pcm->getName();
+
+    Json::Value f;
+    f["char"] = altName;
+    f["from"] = ch->getName();
+    f["account"] = id;
+    AccountAudit::record("account_switch", f);
+
+    // Leave current: save first (persists pfile, inventory and current room, so a
+    // later switch back lands where we left), then take it out of the world.
+    // 🛑 PCharacterManager::quit snapshots allList[name] -> a memory interface BEFORE
+    // extract_char, which does NOT free the PC -- it pools/recycles the shell. Without
+    // quit(), create(alt) below pops that SAME shell and allList[current]/allList[alt]
+    // collide (switch-back refused, identity map corrupted, resume-token hijack).
+    // Mirrors quit.cpp order. resume_token_clear: this char leaves the descriptor for
+    // good, so a stale web tab can never resume it. After this block ch is invalid --
+    // never touch it again; use d/alt/altName/id.
+    ch->save();
+    PCharacterManager::quit(ch);
+    resume_token_clear(ch);
+    extract_char(ch, false);
+
+    // Log the alt in -- mirrors backdoorhandler.cpp:108-135.
+    PCharacter *alt = PCharacterManager::create(altName);
+    PCharacterManager::update(alt);
+    char_to_list(alt, &char_list);
+
+    Room *start_room = get_room_instance(alt->getStartRoom());
+    if (!start_room)
+        start_room = get_room_instance(ROOM_VNUM_TEMPLE);
+    char_to_room(alt, start_room);
+
+    if (alt->pet) {
+        if (alt->pet->in_room)
+            char_to_room(alt->pet, alt->pet->in_room);
+        else
+            char_to_room(alt->pet, alt->in_room);
+    }
+
+    d->associate(alt);
+    InterpretHandler::init(d);
+    // oldState != CON_PLAYING so the transition fires the CON_PLAYING listeners --
+    // account config-apply (AccountConfigLoginListener) and last-host -- same as the
+    // backdoor's fresh-load path.
+    DescriptorStateManager::getThis()->handle(CON_READ_MOTD, CON_PLAYING, d);
+
+    interpret_raw(alt, "look");
+}
+
 CMDRUN( account )
 {
     if (ch->is_npc())
@@ -425,6 +623,12 @@ CMDRUN( account )
     }
     if (arg_oneof(cmd, "telegram", "телеграм", "телеграмм")) {
         account_telegram(ch->getPC());
+        return;
+    }
+
+    // Passwordless switch to another owned char (the clickable list targets this).
+    if (arg_oneof(cmd, "switch", "персонаж", "персонажі", "перемкнути")) {
+        account_switch(ch->getPC(), args);
         return;
     }
 
