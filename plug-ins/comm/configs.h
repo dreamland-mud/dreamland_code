@@ -10,8 +10,10 @@
 #include "xmlinteger.h"
 #include "xmlpointer.h"
 #include "xmlmultistring.h"
+#include "descriptorstatelistener.h"
 
 class PCharacter;
+class Descriptor;
 
 class ConfigElement : public XMLVariableContainer {
 XML_OBJECT
@@ -28,6 +30,10 @@ public:
     bool printText( PCharacter * ) const;
     void printLine( PCharacter * ) const;
 
+    // Public so the account-config write-through can read an option's new value
+    // after handleArgument toggles it.
+    bool isSetBit( PCharacter * ) const;
+
 protected:
     XML_VARIABLE XMLFlagsWithTable   bit;
     XML_VARIABLE XMLString  name, rname, uaname;
@@ -36,7 +42,6 @@ protected:
 
 private:
     Flags & getField( PCharacter * ) const;
-    bool isSetBit( PCharacter * ) const;
 };
 
 
@@ -77,5 +82,18 @@ private:
     static ConfigCommand *thisClass;
 };
 
+
+/**
+ * On every login/reconnect (transition to CON_PLAYING), push an account's
+ * account-wide config (screenreader, colour, language, spam toggles) onto the
+ * entering character, so alts inherit them without re-typing. Unlinked chars are
+ * untouched. Per-char config stays on the pfile. See ACCOUNTS_NANNY_ROADMAP.md.
+ */
+class AccountConfigLoginListener : public DescriptorStateListener {
+public:
+    typedef ::Pointer<AccountConfigLoginListener> Pointer;
+
+    virtual void run( int, int, Descriptor * );
+};
 
 #endif

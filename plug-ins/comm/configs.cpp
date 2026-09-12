@@ -215,6 +215,32 @@ void ConfigCommand::destruction( )
     thisClass = NULL;
 }
 
+// Account-wide config keys: the subset that syncs across an account's characters
+// (the accessibility / display / spam settings). Everything else stays per-char.
+// The key is the config option's EN name, matching AccountManager::applyConfigKeyToChar.
+static bool config_is_account_wide(const DLString &enName)
+{
+    // These are the config OPTION names (ConfigElement::getName), not the bit names:
+    // the CONFIG_WEAPONSPAM bit's option is "noweaponspam" (inverted -- set = hide
+    // weapon-flag effects), so the honest account key is "noweaponspam" too.
+    return enName == "screenreader"
+        || enName == "fightspam"
+        || enName == "skillspam"
+        || enName == "noweaponspam";
+}
+
+// A linked character changed an account-wide option: record it on the account and
+// push it to the account's OTHER online characters live. An unlinked character keeps
+// the plain per-char behavior -- no account store touched.
+static void account_config_writethrough(PCharacter *ch, const DLString &key, const Json::Value &value)
+{
+    DLString id = AccountManager::accountOf(ch->getName());
+    if (id.empty())
+        return;
+    AccountManager::setConfigKey(id, key, value);
+    AccountManager::propagateConfigKey(id, key, value, ch);
+}
+
 COMMAND(ConfigCommand, "config")
 {
     PCharacter *pch;
@@ -302,6 +328,11 @@ COMMAND(ConfigCommand, "config")
 
                 if (!(*c)->handleArgument( pch, arg2 ))
                     pch->pecho(_("Неправильный переключатель. См. {W? режим{x."));
+                // Sync only on an actual change: an empty value arg is a view
+                // (handleArgument prints and still returns true), not a set.
+                else if (!arg2.empty() && config_is_account_wide((*c)->getName()))
+                    account_config_writethrough(pch, (*c)->getName(),
+                                                Json::Value((*c)->isSetBit(pch)));
 
                 return;
             }
@@ -332,6 +363,7 @@ static void config_lang(PCharacter *ch, const DLString &constArguments)
     }
 
     ch->getAttributes().getAttr<XMLStringAttribute>("lang")->setValue(lang);
+    account_config_writethrough(ch, "lang", Json::Value(lang));
     ch->pecho(_("Ок."));
 }
 
@@ -396,7 +428,18 @@ static void config_color(PCharacter *ch, const DLString &constArguments)
     }
     else {
         ch->pecho(_("Укажи: вкл, выкл или мягкий."));
+        return;
     }
+
+    // A successful colour change on a linked char syncs to the account (tri-state).
+    DLString colorState;
+    if (!IS_SET(ch->act, PLR_COLOR))
+        colorState = "off";
+    else if (IS_SET(ch->comm, COMM_MILDCOLOR))
+        colorState = "mild";
+    else
+        colorState = "on";
+    account_config_writethrough(ch, "color", Json::Value(colorState));
 }
 
 /*-------------------------------------------------------------------------
@@ -774,4 +817,21 @@ SERVLET_HANDLE(cmd_update_one, "/update/one")
     servlet_response_200(response, "Success");
 
     Descriptor::updateMaxOffline(who_find_offline(0).size());
+}
+
+
+/*-------------------------------------------------------------------------
+ * Account-wide config apply-on-login
+ *------------------------------------------------------------------------*/
+// On every transition into the game (fresh login or reconnect), push the account's
+// account-wide config onto the entering character. Unlinked chars are a no-op inside
+// applyConfigToChar (accountOf == ""). Per-char config stays on the pfile untouched.
+void AccountConfigLoginListener::run( int, int newState, Descriptor *d )
+{
+    if (newState != CON_PLAYING)
+        return;
+    if (d == 0 || d->character == 0 || d->character->is_npc())
+        return;
+
+    AccountManager::applyConfigToChar(d->character->getPC());
 }

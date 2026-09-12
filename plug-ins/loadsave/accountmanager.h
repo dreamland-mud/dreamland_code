@@ -11,6 +11,7 @@
 #include "dlstring.h"
 
 class PCMemoryInterface;
+class PCharacter;
 
 /**
  * The account layer.
@@ -57,6 +58,18 @@ public:
     // immortal (gods switch/test). The caller still exempts an immortal logging in.
     static DLString conflictingOnlineChar(const DLString &charName);
 
+    // --- account-wide config (screenreader, colour, language, spam toggles) ---
+    // The account is the source of truth for these keys; per-character config
+    // (prompt, wimpy, auto-flags, aliases) stays on the pfile, untouched. getConfig
+    // returns the account["config"] object (null when none). applyConfigToChar is
+    // called on login (CON_PLAYING) to push the account's keys onto the entering
+    // character. propagateConfigKey pushes one just-changed key to the account's
+    // OTHER online characters live. See ACCOUNTS_NANNY_ROADMAP.md.
+    static Json::Value getConfig(const DLString &id);
+    static void applyConfigToChar(PCharacter *ch);
+    static void propagateConfigKey(const DLString &id, const DLString &key,
+                                   const Json::Value &value, PCharacter *except);
+
     // --- mutations (persist immediately) ---
     // No callers until the linking-code / redeem surface lands in a later phase.
     // Caller contract (the redeem surface must honour it):
@@ -70,7 +83,15 @@ public:
     static bool attachChar(const DLString &id, const DLString &charName);
     static bool detachChar(const DLString &charName);
 
+    // Write one account-wide config key and persist. Used by the `config` command's
+    // write-through when a linked character changes an account-wide option.
+    static bool setConfigKey(const DLString &id, const DLString &key, const Json::Value &value);
+
 private:
+    // Apply a single account-wide config key to a character (maps the key to the
+    // right flag/attribute). Shared by applyConfigToChar and propagateConfigKey.
+    static void applyConfigKeyToChar(PCharacter *ch, const DLString &key, const Json::Value &value);
+
     static DLString mintId();
     static DLString mintTitle();
     static bool saveAccount(const DLString &id);
