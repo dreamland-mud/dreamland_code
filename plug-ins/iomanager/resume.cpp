@@ -15,10 +15,12 @@
 #include "def.h"
 
 /* A token outlives the socket by this much: long enough to walk back from
- * another app, short enough that a stolen one is worth little -- and short
- * because the linkdead body has to stand in the world for the whole of it
- * (see resume.h), able to be attacked while nobody is driving. */
-static const int RESUME_TTL = 90;
+ * another app on a phone, short enough that a stolen one is worth little -- and
+ * this is also exactly how long the linkdead body has to stand in the world
+ * (see resume.h), attackable while nobody is driving. 90s proved too short for
+ * mobile: a phone locked past it dropped the player to a re-login. 180s is the
+ * chosen balance between reconnect resilience and linkdead PK exposure. */
+static const int RESUME_TTL = 180;
 
 struct ResumeEntry {
     DLString name;
