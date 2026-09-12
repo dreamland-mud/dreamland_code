@@ -2981,7 +2981,7 @@ NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "(vnum): поиск по вну
 
 // How the sage tells you to get an item. GA_INPACK: the char already carries it
 // unworn -- the sage says "put it on" instead of pointing at a route.
-enum { GA_KILL = 0, GA_BUY = 1, GA_PICKUP = 2, GA_QUEST = 3, GA_UNKNOWN = 4, GA_INPACK = 5 };
+enum { GA_KILL = 0, GA_BUY = 1, GA_PICKUP = 2, GA_QUEST = 3, GA_UNKNOWN = 4, GA_INPACK = 5, GA_REQUEST = 6 };
 
 // Mobs that make a room "guarded": aggressive, or any kind of assist.
 #define GA_ASSIST_MASK (ASSIST_ALL|ASSIST_ALIGN|ASSIST_RACE|ASSIST_PLAYERS|ASSIST_GUARD|ASSIST_VNUM)
@@ -3015,6 +3015,10 @@ struct GAWeights {
     double ac = 0, slevel = 0, level = 0, skillLevel = 0, skillLevelSkill = 0, move = 0, beats = 0;
     double spellFactor = 1.0;   // slevel discount for a char with few/no spells (0..1)
     double learnSkill = 0, learnGroup = 0, learnAll = 0;   // APPLY_LEARNED %, by global scope
+    // affect_flags the char already has for free (perma affects + worn gear OUTSIDE the
+    // candidate's slot). A CANDIDATE re-granting one scores it 0 in ga_affectFlagValue.
+    // Set PER CANDIDATE before scoring (slot-excluded); stays 0 for the worn baseline.
+    bitstring_t heldFlags = 0;
 };
 
 struct GACand {
@@ -3258,11 +3262,16 @@ static bool ga_canSelfCast( Character *target, const char *name )
 // A positive self-buff the char's class can already cast scores at 10% of full
 // (no mana/slot cost, undispellable, works when silenced -- but not a new
 // capability). Curses and gear-only bits (no matching spell) never discount.
-static double ga_affectFlagValue( bitstring_t b, bool caster, Character *target )
+static double ga_affectFlagValue( bitstring_t b, bool caster, Character *target, bitstring_t heldFlags )
 {
     double s = 0;
     auto v = [&]( bitstring_t flag, double base, const char *spell ) -> double {
         if (!IS_SET( b, flag ))
+            return 0;
+        // Already have this buff for free from other worn gear or a permanent affect?
+        // A second copy is pure redundancy -- worth nothing. Positives only: a curse
+        // penalty bit still counts, you don't "already have" a curse as a boon.
+        if (base > 0 && IS_SET( heldFlags, flag ))
             return 0;
         if (spell != 0 && ga_canSelfCast( target, spell ))
             return base * 0.1;
@@ -3398,7 +3407,7 @@ static double ga_spellFactor( Character *target )
 }
 
 static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6],
-                            Character *target )
+                            Character *target, bool worn )
 {
     int m = af.modifier;
     switch (af.location) {
@@ -3506,7 +3515,9 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     const FlagTable *ft = af.bitvector.getTable( );
     bitstring_t bits = af.bitvector;
     if (ft != 0 && bits != 0) {
-        if (ft == &affect_flags)    s += ga_affectFlagValue( bits, w.caster, target );
+        // Redundancy discount applies to a CANDIDATE only (worn ? 0): never dock the
+        // worn baseline, so a gear delta can only ever shrink, never inflate.
+        if (ft == &affect_flags)    s += ga_affectFlagValue( bits, w.caster, target, worn ? 0 : w.heldFlags );
         else if (ft == &res_flags)  s += ga_resValue( bits, 0 );
         else if (ft == &imm_flags)  s += ga_resValue( bits, 1 );
         else if (ft == &vuln_flags) s += ga_resValue( bits, 2 );
@@ -3537,10 +3548,10 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     double s = 0;
     int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
     for (auto &paf: protoAff)
-        ga_accumAffect( *paf, w, s, statDelta, target );
+        ga_accumAffect( *paf, w, s, statDelta, target, worn );
     if (instAff != 0)
         for (auto &paf: *instAff)
-            ga_accumAffect( *paf, w, s, statDelta, target );
+            ga_accumAffect( *paf, w, s, statDelta, target, worn );
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
             continue;
@@ -3652,7 +3663,8 @@ static double ga_setValue( Character *target, SetBehavior *sb, const GAWeights &
     for (auto &sa: sb->affects) {
         Affect af;
         sa.fill( af );
-        ga_accumAffect( af, w, s, statDelta, target );
+        // A set bonus is a chase reward (candidate), so it gets the redundancy check too.
+        ga_accumAffect( af, w, s, statDelta, target, false );
     }
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
@@ -3827,7 +3839,7 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. best is retired (always empty, kept for shape): the chase list 'optimal' now carries the single best-obtainable pick per slot, no dream list beside it. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown/5inpack -- 5 = an upgrade the char already carries unworn, render says put it on), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. best is retired (always empty, kept for shape): the chase list 'optimal' now carries the single best-obtainable pick per slot, no dream list beside it. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown/5inpack/6request -- 5 = an upgrade the char already carries unworn, render says put it on; 6 = a good char can politely ask a good, roughly-peer mob for it with no fight), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -3875,6 +3887,21 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // violence round, not skills. So caster-heavy, melee token.
     w.beats           = w.caster ? 6.0 : 1.0;
     w.spellFactor     = ga_spellFactor( target );   // scales slevel by real spell knowledge
+
+    // Redundancy discount (bug: unicorn horn out-ranked lion paw on a sanctuary the
+    // char already wore). A flag the char already has for free is worth 0 on a
+    // CANDIDATE. But "already has" must exclude the slot being replaced, or a strictly
+    // better sanctuary body armour scores its sanctuary at 0 against a worn one that
+    // scores it full -> the upgrade goes invisible. So heldFlags is built PER SLOT
+    // (perma affects + every worn item OUTSIDE that slot) and set on w just before each
+    // candidate is scored. gaPerma is the slot-independent floor: permanent (duration
+    // < 0) affect_flags, temp spell buffs excluded. w.heldFlags stays 0 for the worn
+    // baseline (worn -> 0 in ga_accumAffect), so a delta can only shrink, never inflate.
+    bitstring_t gaPerma = 0;
+    for (auto &paf: target->affected)
+        if (paf->duration < 0 && paf->bitvector.getTable( ) == &affect_flags) {
+            bitstring_t hb = paf->bitvector; gaPerma |= hb;
+        }
     // APPLY_LEARNED (+N% skill knowledge), valued per +1% by how broad the scope is:
     // one skill < a skill group < all skills. 187 live items carry these.
     w.learnSkill = 2.0;   // cap-aware: x min(m, 100 - effective%) per named skill
@@ -4035,7 +4062,40 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                     // You must kill the holder, so its own level floors the fight
                     // even when it is passive and roomMax (aggro/assist only) is lower.
                     int killGuard = std::max( roomMax, lastMob->level );
-                    ga_record( acq, a1, GA_KILL, lastMob->vnum, roomVnum, 0, killGuard );
+                    // A good asker can politely REQUEST the item from a good, roughly-peer
+                    // mob (command/request) -- no fight, so the holder's level drops out of
+                    // the difficulty and only the room's other aggro (roomMax) remains.
+                    // Mirrors request/runFunc's core gate: good-to-good, owner under
+                    // asker+10 and under 2x asker level, item not an anti-good limited one
+                    // nor the Knight's key (vnum 520).
+                    obj_index_data *rpo = get_obj_index( a1 );
+                    // Asker level uses getModifyLevel -- the value the command actually
+                    // compares -- so a level-drained char is not over-promised (F4).
+                    int askerLvl = target->getModifyLevel( );
+                    // A cursed item (nodrop, or worn-noremove) can't be handed over via
+                    // request -- UNLESS the asker knows remove curse and can strip it once
+                    // it's theirs (mirrors the relaxed request/runFunc gate; Kit's steer).
+                    bool cursedStuck = rpo
+                        && IS_SET( rpo->extra_flags, ITEM_NODROP|ITEM_NOREMOVE )
+                        && !ga_canSelfCast( target, "remove curse" );
+                    bool canRequest =
+                           IS_GOOD( target )
+                        && lastMob->alignment >= 350
+                        && lastMob->level < askerLvl + 10
+                        && lastMob->level < askerLvl * 2
+                        && a1 != 520
+                        && !( rpo && IS_SET( rpo->extra_flags, ITEM_ANTI_GOOD ) && rpo->limit >= 0 )
+                        && !cursedStuck
+                        // A safe room or an ACT_SAFE mob makes the exchange impossible
+                        // (ch.is_safe -> "под защитой богов"): never route there. The KILL
+                        // fallback is equally blocked, so this is an honest refusal, not a
+                        // regression (F2).
+                        && !IS_SET( pRoom->room_flags, ROOM_SAFE|ROOM_NO_DAMAGE )
+                        && !IS_SET( lastMob->act, ACT_SAFE );
+                    if (canRequest)
+                        ga_record( acq, a1, GA_REQUEST, lastMob->vnum, roomVnum, 0, roomMax );
+                    else
+                        ga_record( acq, a1, GA_KILL, lastMob->vnum, roomVnum, 0, killGuard );
                 }
             }
         }
@@ -4045,17 +4105,43 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // vnum already worn (so we never recommend re-getting one).
     std::map<int,double> wornSlot;
     std::map<int,int> wornVnum;
+    std::map<int,bitstring_t> wornFlagsBySlot;   // slot -> affect_flags its worn item(s) grant
     for (::Object *o = target->carrying; o; o = o->next_content) {
         if (o->wear_loc == wear_none)   // unworn -> handled by carriedVnum (census loop above)
             continue;
         wornVnum[o->pIndexData->vnum] = 1;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
+        // Record which affect_flags this worn item grants, keyed by its slot, so the
+        // per-candidate redundancy set can exclude a candidate's OWN slot (F1).
+        for (auto &paf: o->pIndexData->affected)
+            if (paf->bitvector.getTable( ) == &affect_flags) {
+                bitstring_t hb = paf->bitvector; wornFlagsBySlot[slot] |= hb;
+            }
+        for (auto &paf: o->affected)
+            if (paf->bitvector.getTable( ) == &affect_flags) {
+                bitstring_t hb = paf->bitvector; wornFlagsBySlot[slot] |= hb;
+            }
         // Set slots now score normally: the set optimizer below credits a complete
         // set's bonus into the ceiling and protects its slots from break-advice.
         double sc = ga_score( target, o, w, rawStat, capStat, true );
         if (sc > wornSlot[slot])
             wornSlot[slot] = sc;
+    }
+
+    // Per-slot redundancy set: perma + every worn slot EXCEPT this one, so a same-slot
+    // upgrade is never scored against a flag it would itself preserve. heldExclSlot is
+    // built for occupied slots; a candidate for an empty slot uses heldAll.
+    bitstring_t heldAll = gaPerma;
+    for (std::map<int,bitstring_t>::iterator wi = wornFlagsBySlot.begin( ); wi != wornFlagsBySlot.end( ); wi++)
+        heldAll |= wi->second;
+    std::map<int,bitstring_t> heldExclSlot;
+    for (std::map<int,bitstring_t>::iterator wi = wornFlagsBySlot.begin( ); wi != wornFlagsBySlot.end( ); wi++) {
+        bitstring_t h = gaPerma;
+        for (std::map<int,bitstring_t>::iterator wj = wornFlagsBySlot.begin( ); wj != wornFlagsBySlot.end( ); wj++)
+            if (wj->first != wi->first)
+                h |= wj->second;
+        heldExclSlot[wi->first] = h;
     }
 
     // Catalogue every wearable prototype this char can wear right now.
@@ -4179,6 +4265,12 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             && !ga_clericCanCompound( target, pObj ))
             continue;
 
+        // Redundancy set for THIS candidate: perma + worn items in OTHER slots (never
+        // the slot it would replace). Empty slot -> nothing to exclude, use heldAll.
+        {
+            std::map<int,bitstring_t>::iterator hi = heldExclSlot.find( slot );
+            w.heldFlags = (hi != heldExclSlot.end( )) ? hi->second : heldAll;
+        }
         double sc = ga_score( target, pObj, w, rawStat, capStat, false );
         if (sc <= 0)
             continue;
@@ -4301,6 +4393,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             continue;
         GASet g;
         g.sb = sb;
+        // A set spans several slots and its bonus feeds both the worn and best ceilings,
+        // so discount its flags only against permanent affects (gaPerma), never worn
+        // gear -- otherwise a set's own member items would deflate its bonus (F1-style).
+        w.heldFlags = gaPerma;
         g.vset = ga_setValue( target, sb, w, rawStat, capStat );
         g.total = ga_propInt( sb, "total_count", 999 );
         g.dneck = ga_propBool( sb, "double_neck", false );
