@@ -43,32 +43,19 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments);
 static void config_telegram_print(PCharacter *ch);
 static void config_discord(PCharacter *ch, const DLString &constArguments);
 static void config_discord_print(PCharacter *ch);
+static bool discord_token_live(const Json::Value &discord);
 static void config_lang(PCharacter *ch, const DLString &constArguments);
 static void config_lang_print(PCharacter *ch);
 static void config_color(PCharacter *ch, const DLString &constArguments);
 static void config_color_print(PCharacter *ch);
+DLString config_color_value(PCharacter *ch);
 
 list<PCMemoryInterface *> who_find_offline(PCharacter *looker);
 
 /*-------------------------------------------------------------------------
- * ConfigElement
+ * ConfigOption
  *------------------------------------------------------------------------*/
-const DLString & ConfigElement::getName( ) const
-{
-    return name;
-}
-
-const DLString & ConfigElement::getRussianName( ) const
-{
-    return rname;
-}
-
-const DLString & ConfigElement::getUaName( ) const
-{
-    return uaname;
-}
-
-bool ConfigElement::available(PCharacter *ch) const
+bool ConfigOption::available(PCharacter *ch) const
 {
     if (level > ch->get_trust())
         return false;
@@ -76,6 +63,9 @@ bool ConfigElement::available(PCharacter *ch) const
     return true;
 }
 
+/*-------------------------------------------------------------------------
+ * ConfigElement
+ *------------------------------------------------------------------------*/
 bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
 {
     if (arg.empty( )) {
@@ -200,7 +190,12 @@ ConfigCommand * ConfigCommand::thisClass = NULL;
 void ConfigCommand::initialization( )
 {
     thisClass = this;
+    Class::regMoc<ConfigExample>( );
+    Class::regMoc<ConfigEnumValue>( );
     Class::regMoc<ConfigElement>( );
+    Class::regMoc<ConfigValueElement>( );
+    Class::regMoc<ConfigWebSection>( );
+    Class::regMoc<ConfigWebPage>( );
     Class::regMoc<ConfigGroup>( );
     Class::regMoc<ConfigCommand>( );
     CommandPlugin::initialization( );
@@ -211,7 +206,12 @@ void ConfigCommand::destruction( )
     CommandPlugin::destruction( );
     Class::unregMoc<ConfigCommand>( );
     Class::unregMoc<ConfigGroup>( );
+    Class::unregMoc<ConfigWebPage>( );
+    Class::unregMoc<ConfigWebSection>( );
+    Class::unregMoc<ConfigValueElement>( );
     Class::unregMoc<ConfigElement>( );
+    Class::unregMoc<ConfigEnumValue>( );
+    Class::unregMoc<ConfigExample>( );
     thisClass = NULL;
 }
 
@@ -250,30 +250,11 @@ COMMAND(ConfigCommand, "config")
         return;
     }
 
-    if (arg_is(arg1, "lang")) {
-        config_lang(pch, arg2);
-        return; 
-    }
-
-    if (arg_is(arg1, "color")) {
-        config_color(pch, arg2);
+    // Options that hold a value rather than a flag. The web client changes them
+    // through the very same function, so whichever way the player changes one,
+    // the rules and the messages are the same.
+    if (config_value_run(pch, arg1, arg2))
         return;
-    }
-
-    if (arg_is(arg1, "lines")) {
-        config_scroll(pch, arg2);
-        return;
-    }
-
-    if (arg_is(arg1, "telegram")) {
-        config_telegram(pch, arg2);
-        return;
-    }
-
-    if (arg_is(arg1, "discord")) {
-        config_discord(pch, arg2);
-        return;
-    }
 
     // Exact pass before the abbreviation pass, so a fully typed option name wins
     // over a longer option that the argument merely abbreviates. Otherwise the
@@ -309,6 +290,64 @@ COMMAND(ConfigCommand, "config")
     pch->pecho(_("Опция не найдена. Используй {hc{yрежим{x для списка."));
 }
 
+
+/*-------------------------------------------------------------------------
+ * Value options, shared with the web client
+ *------------------------------------------------------------------------*/
+bool config_value_run(PCharacter *ch, const DLString &key, const DLString &argument)
+{
+    if (arg_is(key, "lang")) {
+        config_lang(ch, argument);
+        return true;
+    }
+
+    if (arg_is(key, "color")) {
+        config_color(ch, argument);
+        return true;
+    }
+
+    if (arg_is(key, "lines")) {
+        config_scroll(ch, argument);
+        return true;
+    }
+
+    if (arg_is(key, "telegram")) {
+        config_telegram(ch, argument);
+        return true;
+    }
+
+    if (arg_is(key, "discord")) {
+        config_discord(ch, argument);
+        return true;
+    }
+
+    return false;
+}
+
+void config_value_json(PCharacter *ch, Json::Value &values)
+{
+    values["lang"] = lang2attr(Player::lang(ch)).c_str();
+    values["color"] = config_color_value(ch).c_str();
+    values["lines"] = ch->lines.getValue( );
+    values["telegram"] = get_string_attribute(ch, "telegram").c_str();
+
+    Json::Value discord;
+    get_json_attribute(ch, "discord", discord);
+    // The secret word travels with the rest: the dialog has to show it, the
+    // player types it to the Discord bot. Everything else here is filled in by
+    // that bot once the link is made.
+    values["discord"]["id"] = discord["id"].asString();
+    values["discord"]["username"] = discord["username"].asString();
+    values["discord"]["status"] = discord["status"].asString();
+    // Only while it is alive. The word expires, and a dialog showing a dead one
+    // would have the player typing it to the bot for nothing; with nothing to
+    // show it offers the button that mints a fresh one instead. The next prompt
+    // after it expires carries the empty value, so the dialog stops showing it
+    // by itself.
+    values["discord"]["token"] = discord_token_live(discord)
+                                     ? discord["token"].asString()
+                                     : std::string();
+}
 
 /*-------------------------------------------------------------------------
  * 'config lang'  
@@ -352,12 +391,24 @@ static void config_lang_print(PCharacter *ch)
  * 'config color'  -- merged on/off/mild (replaces the old color + mildcolor
  * boolean options; a tri-state value handler like 'config lang'/'config scroll').
  *------------------------------------------------------------------------*/
+DLString config_color_value(PCharacter *ch)
+{
+    if (!IS_SET(ch->act, PLR_COLOR))
+        return "off";
+
+    if (IS_SET(ch->comm, COMM_MILDCOLOR))
+        return "mild";
+
+    return "on";
+}
+
 static void config_color_print(PCharacter *ch)
 {
+    DLString value = config_color_value(ch);
     DLString state;
-    if (!IS_SET(ch->act, PLR_COLOR))
+    if (value == "off")
         state = l(ch, "выкл");
-    else if (IS_SET(ch->comm, COMM_MILDCOLOR))
+    else if (value == "mild")
         state = l(ch, "мягкий");
     else
         state = l(ch, "вкл");

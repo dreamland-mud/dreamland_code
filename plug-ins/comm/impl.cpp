@@ -18,6 +18,7 @@
 #include "groupchannel.h"
 #include "corder.h"
 #include "configs.h"
+#include "configweb.h"
 #include "run.h"
 #include "writing.h"
 #include "eating.h"
@@ -30,6 +31,7 @@ extern "C"
                 SO::PluginList ppl;
             
                 Plugin::registerPlugin<ConfigCommand>( ppl );
+                Plugin::registerPlugin<ConfigWebPromptListener>( ppl );
 
                 Plugin::registerPlugin<SpeedWalkUpdateTask>( ppl );
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSpeedWalk> >( ppl );
