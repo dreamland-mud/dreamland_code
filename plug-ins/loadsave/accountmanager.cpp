@@ -13,6 +13,7 @@
 #include "pcharacter.h"
 #include "character.h"
 #include "merc.h"
+#include "def.h"
 #include "math_utils.h"
 #include "json_utils.h"
 
@@ -451,4 +452,116 @@ DLString AccountManager::conflictingOnlineChar(const DLString &charName)
     }
 
     return DLString::emptyString;
+}
+
+Json::Value AccountManager::getConfig(const DLString &id)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end())
+        return Json::Value();
+    // .get (not operator[]) so a config-less record is never mutated with a null
+    // "config" that a later saveAccount would then persist.
+    return i->second.get("config", Json::Value());
+}
+
+bool AccountManager::setConfigKey(const DLString &id, const DLString &key, const Json::Value &value)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end())
+        return false;
+    // operator[] creates the "config" object on first write -- intended.
+    i->second["config"][key] = value;
+    return saveAccount(id);
+}
+
+// Map ONE account-wide config key onto a character. Keys mirror the config option
+// EN names (screenreader / fightspam / skillspam / noweaponspam), plus the special
+// tri-state "color" and the "lang" attribute. An unknown key is ignored, so a newer
+// build can add keys without an older one choking on them.
+void AccountManager::applyConfigKeyToChar(PCharacter *ch, const DLString &key, const Json::Value &value)
+{
+    if (ch == 0)
+        return;
+
+    if (key == "screenreader") {
+        if (value.asBool()) SET_BIT(ch->config, CONFIG_SCREENREADER);
+        else REMOVE_BIT(ch->config, CONFIG_SCREENREADER);
+    }
+    else if (key == "fightspam") {
+        if (value.asBool()) SET_BIT(ch->config, CONFIG_FIGHTSPAM);
+        else REMOVE_BIT(ch->config, CONFIG_FIGHTSPAM);
+    }
+    else if (key == "skillspam") {
+        if (value.asBool()) SET_BIT(ch->config, CONFIG_SKILLSPAM);
+        else REMOVE_BIT(ch->config, CONFIG_SKILLSPAM);
+    }
+    else if (key == "noweaponspam") {
+        // Key is the option name (see config.xml): the CONFIG_WEAPONSPAM bit is
+        // inverted -- set = HIDE weapon-flag effects. We store/apply the raw bit
+        // under the option's own name, so the semantics stay self-consistent.
+        if (value.asBool()) SET_BIT(ch->config, CONFIG_WEAPONSPAM);
+        else REMOVE_BIT(ch->config, CONFIG_WEAPONSPAM);
+    }
+    else if (key == "color") {
+        // Tri-state across two bits, mirroring config_color: off / on / mild.
+        DLString c = value.asString();
+        if (c == "off") {
+            REMOVE_BIT(ch->act, PLR_COLOR);
+            REMOVE_BIT(ch->comm, COMM_MILDCOLOR);
+        } else if (c == "mild") {
+            SET_BIT(ch->act, PLR_COLOR);
+            SET_BIT(ch->comm, COMM_MILDCOLOR);
+        } else if (c == "on") {
+            SET_BIT(ch->act, PLR_COLOR);
+            REMOVE_BIT(ch->comm, COMM_MILDCOLOR);
+        }
+    }
+    else if (key == "lang") {
+        DLString l = value.asString();
+        if (l == "en" || l == "ru" || l == "ua")
+            ch->getAttributes().getAttr<XMLStringAttribute>("lang")->setValue(l);
+    }
+}
+
+void AccountManager::applyConfigToChar(PCharacter *ch)
+{
+    if (ch == 0)
+        return;
+
+    DLString id = accountOf(ch->getName());
+    if (id.empty())
+        return;
+
+    Json::Value cfg = getConfig(id);
+    if (!cfg.isObject())
+        return;
+
+    // A hand-edited account file could hold a wrong-typed value (asBool/asString on
+    // the wrong JSON type throws Json::LogicError); the login path has no upstream
+    // std::exception catch, so guard here -- a corrupt file costs a log line, not the
+    // boot. Same defensive stance as load() (see the malformed-file note there).
+    try {
+        for (Json::Value::const_iterator i = cfg.begin(); i != cfg.end(); ++i)
+            applyConfigKeyToChar(ch, i.key().asString(), *i);
+    } catch (const std::exception &e) {
+        LogStream::sendError() << "Accounts: bad config value applying to "
+            << ch->getName() << ": " << e.what() << endl;
+    }
+}
+
+void AccountManager::propagateConfigKey(const DLString &id, const DLString &key,
+                                        const Json::Value &value, PCharacter *except)
+{
+    // Push a just-changed account-wide key to the account's OTHER online characters,
+    // live. char_list is the in-world set; the char that made the change already has
+    // it (set by the config command), so it is excepted.
+    for (Character *wch = char_list; wch != 0; wch = wch->next) {
+        if (wch->is_npc())
+            continue;
+        PCharacter *pch = wch->getPC();
+        if (pch == 0 || pch == except)
+            continue;
+        if (accountOf(pch->getName()) == id)
+            applyConfigKeyToChar(pch, key, value);
+    }
 }

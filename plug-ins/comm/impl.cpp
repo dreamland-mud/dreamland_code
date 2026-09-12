@@ -30,6 +30,7 @@ extern "C"
                 SO::PluginList ppl;
             
                 Plugin::registerPlugin<ConfigCommand>( ppl );
+                Plugin::registerPlugin<AccountConfigLoginListener>( ppl );
 
                 Plugin::registerPlugin<SpeedWalkUpdateTask>( ppl );
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSpeedWalk> >( ppl );
