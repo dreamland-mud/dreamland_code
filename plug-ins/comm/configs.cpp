@@ -4,6 +4,8 @@
  * command syntax and messages from DreamLand 2.0
  */
 
+#include <ctime>
+
 #include "configs.h"
 #include "jsoncpp/json/json.h"
 
@@ -534,6 +536,31 @@ static void config_discord_print(PCharacter *ch)
     print_line(ch, "discord", "дискорд", "дискорд", yes, msgYes, msgNo);
 }
 
+// The Discord link token gates who may bind a Discord id to this character, and the
+// account adopt path later TRUSTS that id (account.cpp account_adopt_discord). So the
+// token must be unguessable and short-lived: a predictable or never-expiring one lets
+// an attacker bind their own Discord id to a victim's char and, once accounts are
+// public, chain it to /account/resetpw. CSPRNG alphabet + a 10-minute TTL, mirroring
+// the account linking code (LinkingCode::TTL_SECONDS).
+static const long DISCORD_TOKEN_TTL = 600;
+
+static void discord_token_mint(Json::Value &discord)
+{
+    discord["token"] = create_secure_nonce(8);
+    discord["token_ts"] = Json::Int64(time(0));
+}
+
+// A token is usable only while non-empty AND minted within the TTL. A token with no
+// token_ts is a legacy rand()-based one -- treated as expired so it can never link.
+static bool discord_token_live(const Json::Value &discord)
+{
+    if (discord["token"].asString().empty())
+        return false;
+    if (!discord.isMember("token_ts"))
+        return false;
+    return (long)time(0) - (long)discord["token_ts"].asLargestInt() < DISCORD_TOKEN_TTL;
+}
+
 /**
  * Print Discord linking instructions, regenerate token, clear user.
  */
@@ -548,7 +575,7 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
         // Clear out all user data and regenerate token.
         bool linked = !discord["id"].asString().empty();
         discord.clear();
-        discord["token"] = create_nonce(6);
+        discord_token_mint(discord);
         set_json_attribute(ch, "discord", discord);
         PCharacterManager::save(ch);
 
@@ -560,9 +587,10 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
         return;
     }
 
-    // Generate secret token for the first time.
-    if (discord["token"].asString().empty()) {
-        discord["token"] = create_nonce(6);
+    // Mint a fresh secret token if there is none, or the current one has expired /
+    // is a legacy weak token -- so the player always sees a live, secure code.
+    if (!discord_token_live(discord)) {
+        discord_token_mint(discord);
         set_json_attribute(ch, "discord", discord);
         PCharacterManager::save(ch);
     }
@@ -588,7 +616,7 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
 
 
 /**
- * Discord: /link <6-symbol-token>
+ * Discord: /link <token>
  * Auth: bottype=discord, token=<discord secret>
  * Args: link, id, username, status
  */
@@ -617,6 +645,15 @@ SERVLET_HANDLE(cmd_link, "/link")
     PCMemoryInterface *player = players.front();
     Json::Value discord;
     get_json_attribute(player, "discord", discord);
+
+    // Reject an expired or legacy (no timestamp) token even though it still sits in the
+    // pfile: it gates a Discord id the account adopt path trusts, so a stale token must
+    // never link. The player re-mints a fresh secure token via `режим дискорд`.
+    if (!discord_token_live(discord)) {
+        servlet_response_404(response, "Link token expired or invalid");
+        return;
+    }
+
     DLString currentId = discord["id"].asString();
     if (currentId == discordId) {
         servlet_response_200(response, "Already linked");
