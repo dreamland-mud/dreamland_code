@@ -199,16 +199,6 @@ static void account_status(PCharacter *ch)
     }
 }
 
-// A char already on an account can't mint -- one account per char, no stealing.
-static bool account_already_linked(PCharacter *ch)
-{
-    DLString current = AccountManager::accountOf(ch->getName());
-    if (current.empty())
-        return false;
-    ch->pecho(_("Ты уже привязан к аккаунту {W%1$s{x."), AccountManager::titleOf(current).c_str());
-    return true;
-}
-
 // Adopt a char's bot-VERIFIED discord.id straight into an account (choice A of the
 // Discord flow): no code, no round-trip, because the /link servlet already proved the
 // id. Returns false only on a real create/attach failure (already-linked is handled by
@@ -257,21 +247,26 @@ static void account_link(PCharacter *ch)
         ch->pecho(_("Привязка аккаунтов скоро откроется. Немного терпения."));
         return;
     }
-    if (account_already_linked(ch))
-        return;
-
+    DLString current = AccountManager::accountOf(ch->getName());
     DLString code = LinkingCode::mint(ch->getName(), false);
     Json::Value f;
     f["char"] = ch->getName();
     AccountAudit::record("code_mint", f);
 
-    ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
+    if (!current.empty())
+        ch->pecho(_("Добавить способ входа к аккаунту {W%1$s{x. Твой код: {W%2$s{x"),
+                  AccountManager::titleOf(current).c_str(), code.c_str());
+    else
+        ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
     ch->pecho(_("Он одноразовый и действует 10 минут. Привяжи его в любом из ботов:"));
     ch->pecho(_("  Telegram {W@%1$s{x -- {IWоткрой {Ix{hlhttps://t.me/%1$s?start=%2$s{x, команда {W/attach %2$s{x"),
               TELEGRAM_BOT, code.c_str());
     ch->pecho(_("  Discord Валькирия -- {IWв привате {Ix{hlhttps://discord.com/users/%1$s{x, команда {W/link %2$s{x"),
               DISCORD_BOT_ID, code.c_str());
-    ch->pecho(_("Никому не показывай код: кто его введет, привяжет этого персонажа к своему аккаунту."));
+    if (!current.empty())
+        ch->pecho(_("Никому не показывай код: кто его введет, получит доступ к твоему аккаунту и всем персонажам."));
+    else
+        ch->pecho(_("Никому не показывай код: кто его введет, привяжет этого персонажа к своему аккаунту."));
 }
 
 // Telegram: config telegram is a self-typed handle (UNVERIFIED), so there is no adopt --
@@ -283,21 +278,26 @@ static void account_telegram(PCharacter *ch)
         ch->pecho(_("Привязка аккаунтов скоро откроется. Немного терпения."));
         return;
     }
-    if (account_already_linked(ch))
-        return;
-
+    DLString current = AccountManager::accountOf(ch->getName());
     DLString code = LinkingCode::mint(ch->getName(), false);
     Json::Value f;
     f["char"] = ch->getName();
     f["channel"] = "telegram";
     AccountAudit::record("code_mint", f);
 
-    ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
+    if (!current.empty())
+        ch->pecho(_("Добавить способ входа к аккаунту {W%1$s{x. Твой код: {W%2$s{x"),
+                  AccountManager::titleOf(current).c_str(), code.c_str());
+    else
+        ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
     ch->pecho(_("  {WA{x) {IWоткрой {Ix{hlhttps://t.me/%1$s?start=%2$s{x -- бот привяжет этот аккаунт."),
               TELEGRAM_BOT, code.c_str());
     ch->pecho(_("  {WB{x) с другого Telegram -- напиши боту {W@%1$s{x команду {W/attach %2$s{x."),
               TELEGRAM_BOT, code.c_str());
-    ch->pecho(_("Никому не показывай код: кто его введет, привяжет этого персонажа к своему аккаунту."));
+    if (!current.empty())
+        ch->pecho(_("Никому не показывай код: кто его введет, получит доступ к твоему аккаунту и всем персонажам."));
+    else
+        ch->pecho(_("Никому не показывай код: кто его введет, привяжет этого персонажа к своему аккаунту."));
 }
 
 // Discord: config discord.id is bot-VERIFIED, so a char that carries it adopts in one
@@ -308,13 +308,17 @@ static void account_discord(PCharacter *ch)
         ch->pecho(_("Привязка аккаунтов скоро откроется. Немного терпения."));
         return;
     }
-    if (account_already_linked(ch))
-        return;
+    DLString current = AccountManager::accountOf(ch->getName());
 
-    DLString discordId, username;
-    if (char_verified_discord(ch, discordId, username)) {
-        account_adopt_discord(ch, discordId, username);
-        return;
+    // Unlinked + a bot-verified Discord id: adopt it into a fresh account in one
+    // command, no code (choice A). A char already on an account instead mints a code
+    // below, so redeeming it adds Discord as another way in.
+    if (current.empty()) {
+        DLString discordId, username;
+        if (char_verified_discord(ch, discordId, username)) {
+            account_adopt_discord(ch, discordId, username);
+            return;
+        }
     }
 
     DLString code = LinkingCode::mint(ch->getName(), false);
@@ -323,10 +327,17 @@ static void account_discord(PCharacter *ch)
     f["channel"] = "discord";
     AccountAudit::record("code_mint", f);
 
-    ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
+    if (!current.empty())
+        ch->pecho(_("Добавить способ входа к аккаунту {W%1$s{x. Твой код: {W%2$s{x"),
+                  AccountManager::titleOf(current).c_str(), code.c_str());
+    else
+        ch->pecho(_("Твой код привязки: {W%1$s{x"), code.c_str());
     ch->pecho(_("Напиши боту Валькирия {IWв привате {Ix{hlhttps://discord.com/users/%1$s{x команду {W/link %2$s{x."),
               DISCORD_BOT_ID, code.c_str());
-    ch->pecho(_("Никому не показывай код: кто его введет, привяжет этого персонажа к своему аккаунту."));
+    if (!current.empty())
+        ch->pecho(_("Никому не показывай код: кто его введет, получит доступ к твоему аккаунту и всем персонажам."));
+    else
+        ch->pecho(_("Никому не показывай код: кто его введет, привяжет этого персонажа к своему аккаунту."));
 }
 
 /* Immortal-only backstop -- the human vibe-check with real hands (roadmap 2.9).
