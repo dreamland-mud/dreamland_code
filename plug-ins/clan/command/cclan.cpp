@@ -1361,7 +1361,13 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
     else
         PCharacterManager::saveMemory( victim );
     
-    if (victim->getLevel() <= LEVEL_MORTAL) {
+    // Only announce for an ONLINE victim: the broadcasts format the victim as a
+    // character noun (%C1 / fmtLang), which needs a live PCharacter. clanPetition
+    // resolves the victim via PCharacterManager::find (online OR offline), so an
+    // offline memory-record here would crash getNameC() through a dead vtable.
+    // The induct itself (setClan/save + the induct message on next login) is done
+    // above regardless; only the live world announcement is skipped when offline.
+    if (victim->getLevel() <= LEVEL_MORTAL && victim->isOnline()) {
         if (victim->getClan() == clan_none) {
             infonet(victim->getPlayer(), 0, _("{CТихий голос из $o2: {W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim);
             send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim));
