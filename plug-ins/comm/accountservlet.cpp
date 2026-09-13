@@ -213,19 +213,22 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     // persisted for the identity.
     DLString id = AccountManager::findByIdentity(type, value);
 
-    // Refuse to move a character already linked to a DIFFERENT account. When id is
-    // "" (a new account would be minted), any existing link is a different one.
+    // Resolve the character's current account. Three shapes from here:
+    //  * char unlinked             -> create-or-join the identity's account (attach)
+    //  * char linked, identity new -> ADD the identity to the char's OWN account
+    //  * char linked, identity on a DIFFERENT account -> refuse (no cross-account move)
+    // Only the last is a conflict: an identity belongs to at most one account, so a
+    // redeem that would move it away from the account it is already on is refused.
     DLString current = AccountManager::accountOf(entry.charName);
-    if (!current.empty() && current != id) {
+    if (!current.empty() && !id.empty() && current != id) {
         LogStream::sendWarning() << "Accounts: redeem refused, " << entry.charName
-            << " already on account " << current << " (code offered "
-            << (id.empty() ? DLString("<new>") : id) << ")." << endl;
+            << " on account " << current << ", identity belongs to " << id << "." << endl;
         Json::Value a;
         a["result"] = "refused_other_account";
         a["char"] = entry.charName;
         a["account"] = current;
         AccountAudit::record("code_redeem", a);
-        servlet_response_400(response, "Character is already linked to another account");
+        servlet_response_400(response, "This login method belongs to a different account");
         return;
     }
 
@@ -241,20 +244,22 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
         return;
     }
 
-    // All rejections passed -- now mint the account if the identity has none yet.
+    // All rejections passed -- apply the change.
     bool created = false;
-    if (id.empty()) {
-        id = AccountManager::create(type, value, display);
-        if (id.empty()) {
-            response.status = 500;
-            response.message = "Command failed";
-            response.body = "Account creation failed";
-            return;
-        }
-        created = true;
-    }
+    bool identityAdded = false;
 
-    if (current != id) {
+    if (current.empty()) {
+        // Char has no account yet: mint one for the identity if it has none, then attach.
+        if (id.empty()) {
+            id = AccountManager::create(type, value, display);
+            if (id.empty()) {
+                response.status = 500;
+                response.message = "Command failed";
+                response.body = "Account creation failed";
+                return;
+            }
+            created = true;
+        }
         if (!AccountManager::attachChar(id, entry.charName)) {
             // Unreachable in practice (the char-exists check above uses the same
             // lookup), but audit for symmetry if it ever fires as a safety net.
@@ -265,6 +270,20 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
             AccountAudit::record("code_redeem", a);
             servlet_response_404(response, "Character not found: " + entry.charName);
             return;
+        }
+    } else {
+        // Char is already on this account (the conflicting-account case was refused
+        // above). Add the identity as another way in, unless it is already present.
+        bool identityWasNew = id.empty();
+        id = current;
+        if (identityWasNew) {
+            if (!AccountManager::addIdentity(id, type, value, display)) {
+                response.status = 500;
+                response.message = "Command failed";
+                response.body = "Could not add the login method";
+                return;
+            }
+            identityAdded = true;
         }
     }
 
@@ -281,6 +300,7 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     a["account"] = id;
     a["identity_type"] = type;
     a["created"] = created;
+    a["identity_added"] = identityAdded;
     AccountAudit::record("code_redeem", a);
 
     // Minter echo: the code is a bearer credential, so tell the (still-online)
@@ -301,6 +321,7 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     body["title"] = AccountManager::titleOf(id);   // the bot shows the title, not the id
     body["char"] = entry.charName;
     body["created"] = created;
+    body["identity_added"] = identityAdded;
     servlet_response_200_json(response, body);
 }
 
