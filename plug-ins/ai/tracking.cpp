@@ -113,7 +113,25 @@ bool BasicMobileBehavior::trackLastFought( Character *wch )
         lostTrack = true;
         return true;
     }
-    
+
+    // A stay-area mob won't follow the trail out of its home zone: the hunt
+    // ends at the border instead of leaking an aggressive tracker into another
+    // area (e.g. Shalafi ghosts kited into Midgaard). The ACT_STAY_AREA wander
+    // gate (specials.cpp) already blocks random moves across the boundary, but
+    // the hunt path steps via move_char, which does not check it -- so mirror
+    // the gate here. Setting lostTrack (rather than clearing memory) lets a
+    // caster mob fall through to summoning the quarry back home next tick.
+    if (IS_SET(ch->act, ACT_STAY_AREA)
+        && pexit->u1.to_room
+        && pexit->u1.to_room->area != room->area)
+    {
+        if (!lostTrack)
+            oldact(_("$c1 теряет след на границе своих владений и прекращает погоню."),
+                   ch, 0, wch, TO_ROOM);
+        lostTrack = true;
+        return true;
+    }
+
     oldact(_("Следы $C2 ведут $t."), ch, dirs[d].leave, wch, TO_CHAR);
     
     if (!move( d, pexit, wch )) 
