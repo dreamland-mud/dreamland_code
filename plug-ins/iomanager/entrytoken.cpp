@@ -23,8 +23,10 @@
 #include <stdio.h>
 #include <time.h>
 #include <map>
+#include <jsoncpp/json/json.h>
 
 #include "entrytoken.h"
+#include "resume.h"
 #include "interprethandler.h"
 #include "defaultbufferhandler.h"
 #include "descriptorstatemanager.h"
@@ -32,6 +34,9 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "pcharactermanager.h"
+#include "pcmemoryinterface.h"
+#include "accountmanager.h"
+#include "accountaudit.h"
 #include "loadsave.h"
 #include "logstream.h"
 #include "interp.h"
@@ -161,7 +166,10 @@ bool entry_token_redeem(Descriptor *d, const DLString &token)
     if (t == tokens.end())
         return false;
 
+    // Copy what the entry needs out of the map entry now: everything below may
+    // refuse (token kept) or burn (token gone), and after a burn `t` is dead.
     DLString name = t->second.name;
+    DLString mintedAccount = t->second.account;
     PCharacter *twin = PCharacterManager::findPlayer(name);
 
     // The target is already in the world. Mirror resume_attach's refusal for the
@@ -179,15 +187,54 @@ bool entry_token_redeem(Descriptor *d, const DLString &token)
         return false;
     }
 
+    // The account binding the token was minted against must still hold: within the
+    // TTL the character could have been detached (`account admin detach`) or moved
+    // to another account, which would make this a stranger's key. Token kept -- it
+    // is simply stale now and dies by its own TTL.
+    if (AccountManager::accountOf(name) != mintedAccount) {
+        LogStream::sendNotice() << "Entry token: " << d->host << " has a token for "
+                                << name << ", no longer on account " << mintedAccount << endl;
+        return false;
+    }
+
+    // Same-account simultaneous-login block (mortals only), the invariant every
+    // other login door enforces (nannyhandler.cpp, backdoorhandler.cpp): one
+    // account, one character in the world at a time. conflictingOnlineChar returns a
+    // DIFFERENT online character on this account (never the target itself), so it
+    // catches both a cold-load and a linkdead take-over that would add a second.
+    // Trust is read off find(), not a loaded char, exactly as nanny/backdoor do.
+    // Token kept: the player quits the other character and the same click still
+    // works within the TTL.
+    PCMemoryInterface *pci = PCharacterManager::find(name);
+    if (pci != 0 && pci->get_trust() < LEVEL_IMMORTAL) {
+        DLString conflict = AccountManager::conflictingOnlineChar(name);
+        if (!conflict.empty()) {
+            Json::Value fields;
+            fields["char"] = name;
+            fields["conflict"] = conflict;
+            fields["channel"] = "entry";
+            AccountAudit::record("login_block_conflict", fields);
+            LogStream::sendNotice() << "Entry token: " << d->host << " for " << name
+                << " blocked -- " << conflict << " (same account) is already online" << endl;
+            return false;
+        }
+    }
+
     // Every outcome from here on is final, so the token is finished.
     entry_forget_token(t);
 
     if (twin) {
-        // The chosen character is linkdead in the world: take over its body rather
-        // than cold-load a duplicate. Identical to resume_attach's take-over tail;
-        // the guard above proved twin->desc, if any, is a dead CON_PLAYING socket,
-        // so close() runs only the InterpretHandler-family handlers that detach the
-        // character without freeing it.
+        // The chosen character is already in the world: take over its body rather
+        // than cold-load a duplicate, the way resume_attach and the backdoor's
+        // front-door takeover do. The refuse guard above proved twin->desc, if any,
+        // is CON_PLAYING -- which may be a live session on another device, not only
+        // a dead-but-unreaped socket; taking it over (this is the same player,
+        // proven by an owner-authenticated token) is deliberate, resume's semantics.
+        // Either way close() runs only InterpretHandler-family handlers that detach
+        // the character without freeing it (CON_PLAYING keeps NannyHandler off it).
+        // Clear the char's own resume token first, like the backdoor does, so a
+        // stale web tab cannot later `resume` back in and evict this fresh session.
+        resume_token_clear(twin);
         d->buffer_handler = new DefaultBufferHandler(0);   // koi8-r, what the web client decodes
         if (!d->handle_input.empty() && d->handle_input.front())
             d->handle_input.front()->close(d);
@@ -201,7 +248,7 @@ bool entry_token_redeem(Descriptor *d, const DLString &token)
         DescriptorStateManager::getThis()->handle(CON_RESUME, CON_PLAYING, d);
         twin->timer = 0;
         LogStream::sendNotice() << "Entry token: " << d->host << " entered "
-                                << name << " (took over a linkdead body)" << endl;
+                                << name << " (took over the existing session)" << endl;
         return true;
     }
 

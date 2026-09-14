@@ -15,9 +15,12 @@ class PCharacter;
  * (save/quit/resume_token_clear/extract_char), the entry-token redeem first drops
  * the login handler -- so this only does create -> world -> associate -> the
  * CON_READ_MOTD->CON_PLAYING transition (which fires the account config-apply and
- * last-host listeners, exactly like a login) -> look. Returns the new character,
- * or 0 if it could not be created. Mirrors backdoorhandler's fresh-load path
- * (backdoorhandler.cpp:108-133).
+ * last-host listeners, exactly like a login) -> look. Mirrors backdoorhandler's
+ * fresh-load path (backdoorhandler.cpp:108-133). Returns the new character, or 0
+ * on a create failure -- defensive only: PCharacterManager::create currently
+ * always returns a shell (a missing pfile yields a blank char, not 0), so the
+ * REAL "does this character exist" gate is the caller's find()!=0 check before it
+ * hands a name here.
  */
 PCharacter * account_enter_char(Descriptor *d, const DLString &charName);
 
