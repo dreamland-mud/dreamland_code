@@ -1005,20 +1005,25 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
     else
         PCharacterManager::saveMemory( victim );
 
-    // Notify about level upgrades otherwise noticeable in 'who'.
-    if (oldLevel < i && clan.isRecruiter(victim)) {
+    // Notify about level upgrades otherwise noticeable in 'who'. Announce only for
+    // an online victim and pass the live PCharacter* (pcVictim), never raw victim:
+    // the %C1 noun is read as an offset-0 Character*/NounHolder, but victim is a
+    // PCMemoryInterface* (a different subobject offset under PCharacter's multiple
+    // inheritance), so raw victim segfaults getNameC() on a bad vtable. See the
+    // doInduct broadcast a few functions down for the full mechanism.
+    if (pcVictim && oldLevel < i && clan.isRecruiter(victim)) {
         DLString cnEn = clan.getNameFor(LANG_EN);
         DLString cnRu = clan.getRussianName().ruscase('2');
         DLString cnUa = clan.getUkrainianName().ruscase('2');
         LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
         if (clan.isLeader(victim)) {
-            infonet(pcVictim, 0, _("{CТихий голос из $o2: {W%C1 становится лидером %w.{x"), victim, &clanName);
-            send_discord_clan(fmtLang(LANG_EN, _("{W%C1 становится лидером %w.{x"), victim, &clanName));
-            send_telegram(fmtLang(LANG_RU, _("{W%C1 становится лидером %w.{x"), victim, &clanName));
+            infonet(pcVictim, 0, _("{CТихий голос из $o2: {W%C1 становится лидером %w.{x"), pcVictim, &clanName);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%C1 становится лидером %w.{x"), pcVictim, &clanName));
+            send_telegram(fmtLang(LANG_RU, _("{W%C1 становится лидером %w.{x"), pcVictim, &clanName));
         } else {
-            infonet(pcVictim, 0, _("{CТихий голос из $o2: {W%C1 становится рекрутером %w.{x"), victim, &clanName);
-            send_discord_clan(fmtLang(LANG_EN, _("{W%C1 становится рекрутером %w.{x"), victim, &clanName));
-            send_telegram(fmtLang(LANG_RU, _("{W%C1 становится рекрутером %w.{x"), victim, &clanName));
+            infonet(pcVictim, 0, _("{CТихий голос из $o2: {W%C1 становится рекрутером %w.{x"), pcVictim, &clanName);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%C1 становится рекрутером %w.{x"), pcVictim, &clanName));
+            send_telegram(fmtLang(LANG_RU, _("{W%C1 становится рекрутером %w.{x"), pcVictim, &clanName));
         }
     }
 }
@@ -1361,26 +1366,33 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
     else
         PCharacterManager::saveMemory( victim );
     
-    // Only announce for an ONLINE victim: the broadcasts format the victim as a
-    // character noun (%C1 / fmtLang), which needs a live PCharacter. clanPetition
-    // resolves the victim via PCharacterManager::find (online OR offline), so an
-    // offline memory-record here would crash getNameC() through a dead vtable.
-    // The induct itself (setClan/save + the induct message on next login) is done
-    // above regardless; only the live world announcement is skipped when offline.
+    // Announce to the live world only for an online mortal, and always through the
+    // live PCharacter* (getPlayer()), never the raw victim. The broadcasts render
+    // the victim as a %C1 character noun; the act formatter reads that vararg as an
+    // Object* and STATIC-upcasts it to Grammar::NounHolder (Object is-a NounHolder),
+    // so a wrong-subobject pointer is never caught -- no null, no throw, just a bad
+    // vtable and a getNameC() segfault. victim is a PCMemoryInterface*, a different
+    // subobject offset under PCharacter's multiple inheritance
+    // (class PCharacter : public Character, public PCMemoryInterface); only the
+    // offset-0 Character base is a valid NounHolder, and getPlayer() returns exactly
+    // that, non-null once isOnline() holds. Skipping the announce for offline
+    // victims is a product choice -- the induct itself (setClan/save + the induct
+    // message on next login) already ran above regardless.
     if (victim->getLevel() <= LEVEL_MORTAL && victim->isOnline()) {
+        PCharacter *pch = victim->getPlayer();
         if (victim->getClan() == clan_none) {
-            infonet(victim->getPlayer(), 0, _("{CТихий голос из $o2: {W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim);
-            send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim));
-            send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim));
+            infonet(pch, 0, _("{CТихий голос из $o2: {W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), pch);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), pch));
+            send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), pch));
         }
         else {
             DLString cnEn = clan.getNameFor(LANG_EN);
             DLString cnRu = clan.getRussianName().ruscase('4');
             DLString cnUa = clan.getUkrainianName().ruscase('4');
             LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
-            infonet(victim->getPlayer(), 0, _("{CТихий голос из $o2: {W%1$^C1 вступает в %w.{x"), victim, &clanName);
-            send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 вступает в %w.{x"), victim, &clanName));
-            send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 вступает в %w.{x"), victim, &clanName));
+            infonet(pch, 0, _("{CТихий голос из $o2: {W%1$^C1 вступает в %w.{x"), pch, &clanName);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 вступает в %w.{x"), pch, &clanName));
+            send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 вступает в %w.{x"), pch, &clanName));
         }
     }
 }
