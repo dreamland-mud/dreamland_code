@@ -135,6 +135,12 @@ static void format_area_quest(AreaQuest *q, ostringstream &qbuf, Character *ch)
     else // TODO support for 'once per hour' etc
         qbuf << _("сколько угодно раз").getMessage(ch);
 
+    // The per-life cap and the daily cap are independent gates (aquest_can_participate):
+    // a "3 times per life" quest with oncePerDay still blocks a retake for 24h. Say so,
+    // or a player reads "3 times" and thinks the quest is broken when the day gate holds.
+    if (q->oncePerDay)
+        qbuf << _(", но не чаще раза в сутки").getMessage(ch);
+
     qbuf << "." << endl;
 }
 
