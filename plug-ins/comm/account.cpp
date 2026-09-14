@@ -15,6 +15,7 @@
 #include "descriptor.h"
 #include "descriptorstatemanager.h"
 #include "interprethandler.h"
+#include "rpccommandmanager.h"
 #include "resume.h"
 #include "fight_extract.h"
 #include "clanreference.h"
@@ -657,4 +658,40 @@ CMDRUN( account )
     }
 
     ch->pecho(_("Использование: {yаккаунт{x -- статус, {yаккаунт связать{x -- код в любой бот, {yаккаунт дискорд{x / {yаккаунт телеграм{x -- по каналу. Подробнее: {hh5106аккаунт{x."));
+}
+
+/*-----------------------------------------------------------------------------
+ * account_chars rpc: hand the web client the account's characters so the
+ * settings window can draw a roster and switch by click. Read-only, and mirrors
+ * do_account/account_status: current character = the one in the world, chars =
+ * charsOf, no online detection (the `account switch` command's own guard refuses
+ * a same-account character that is already online, same as at the keyboard).
+ * Reply shape (mudjs AccountPage.jsx): { current, account, title, chars:[{name}] }.
+ *---------------------------------------------------------------------------*/
+RPCRUN(account_chars)
+{
+    if (ch == 0 || ch->getPC( ) == 0 || ch->desc == 0)
+        return;
+
+    PCharacter *pch = ch->getPC( );
+
+    Json::Value msg;
+    msg["command"] = "account_chars";
+    Json::Value &data = msg["args"][0];
+
+    DLString id = AccountManager::accountOf(pch->getName( ));
+    data["current"] = pch->getName( ).c_str( );
+    data["account"] = !id.empty( );
+    data["title"] = id.empty( ) ? "" : AccountManager::titleOf(id).c_str( );
+    data["chars"] = Json::Value(Json::arrayValue);
+
+    if (!id.empty( )) {
+        for (const DLString &name : AccountManager::charsOf(id)) {
+            Json::Value entry;
+            entry["name"] = name.c_str( );
+            data["chars"].append(entry);
+        }
+    }
+
+    ch->desc->writeWSCommand(msg);
 }
