@@ -25,6 +25,7 @@
 #include "msgformatter.h"
 #include "follow_utils.h"
 #include "loadsave.h"
+#include "interp.h"
 
 #include "act.h"
 #include "merc.h"
@@ -470,6 +471,13 @@ CMDRUN( nofollow )
     {
       ch->pecho(_("Теперь ты не разрешаешь следовать за собой."));
       SET_BIT(ch->act,PLR_NOFOLLOW);
+      // Dismiss followers the same way 'выгнать всех' (nuke) does, rather than a
+      // bare un-follow: timered summons (golems, zombies) vanish, charmed creatures
+      // are un-charmed and recalled home, PC followers leave the group. Then
+      // follower_die drops any residual master/leader links and stops us following
+      // anyone. Summon detection lives on the Fenia side (mob.creator), so route
+      // through the nuke command rather than reimplementing it in C++.
+      interpret_raw(ch, "nuke", "all");
       follower_die(ch);
     }
 }
