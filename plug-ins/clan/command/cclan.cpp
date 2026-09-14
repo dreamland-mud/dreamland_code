@@ -1361,26 +1361,32 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
     else
         PCharacterManager::saveMemory( victim );
     
-    // Only announce for an ONLINE victim: the broadcasts format the victim as a
-    // character noun (%C1 / fmtLang), which needs a live PCharacter. clanPetition
-    // resolves the victim via PCharacterManager::find (online OR offline), so an
-    // offline memory-record here would crash getNameC() through a dead vtable.
-    // The induct itself (setClan/save + the induct message on next login) is done
-    // above regardless; only the live world announcement is skipped when offline.
+    // Only announce for an ONLINE mortal victim, and always through the live
+    // PCharacter*, never the raw victim. Two ways raw victim kills the server:
+    // (1) offline victim has no live PCharacter, so there is nothing to format;
+    // (2) the broadcasts render the victim as a %C1 character noun, which the act
+    //     formatter reads as a Character*. victim is a PCMemoryInterface*, a
+    //     different subobject pointer under PCharacter's multiple inheritance, so
+    //     handing it over feeds the formatter a mis-offset pointer and getNameC()
+    //     segfaults on a bad vtable -- online or not. getPlayer() returns the
+    //     offset-0 Character base, which the noun slot expects.
+    // The induct itself (setClan/save + the induct message on next login) already
+    // ran above regardless; only the live world announcement is online-gated.
     if (victim->getLevel() <= LEVEL_MORTAL && victim->isOnline()) {
+        PCharacter *pch = victim->getPlayer();
         if (victim->getClan() == clan_none) {
-            infonet(victim->getPlayer(), 0, _("{CТихий голос из $o2: {W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim);
-            send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim));
-            send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), victim));
+            infonet(pch, 0, _("{CТихий голос из $o2: {W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), pch);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), pch));
+            send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x"), pch));
         }
         else {
             DLString cnEn = clan.getNameFor(LANG_EN);
             DLString cnRu = clan.getRussianName().ruscase('4');
             DLString cnUa = clan.getUkrainianName().ruscase('4');
             LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
-            infonet(victim->getPlayer(), 0, _("{CТихий голос из $o2: {W%1$^C1 вступает в %w.{x"), victim, &clanName);
-            send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 вступает в %w.{x"), victim, &clanName));
-            send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 вступает в %w.{x"), victim, &clanName));
+            infonet(pch, 0, _("{CТихий голос из $o2: {W%1$^C1 вступает в %w.{x"), pch, &clanName);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%1$^C1 вступает в %w.{x"), pch, &clanName));
+            send_telegram(fmtLang(LANG_RU, _("{W%1$^C1 вступает в %w.{x"), pch, &clanName));
         }
     }
 }
