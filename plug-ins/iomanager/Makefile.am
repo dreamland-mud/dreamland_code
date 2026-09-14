@@ -29,6 +29,7 @@ badnames.cpp \
 base64.cpp \
 rpccommandmanager.cpp \
 resume.cpp \
+entrytoken.cpp \
 webmanip.cpp \
 lasthost.cpp \
 banflags.cpp \

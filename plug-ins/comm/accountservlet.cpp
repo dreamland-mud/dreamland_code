@@ -28,6 +28,7 @@
 #include "accountmanager.h"
 #include "linkingcode.h"
 #include "accountaudit.h"
+#include "entrytoken.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
@@ -432,6 +433,90 @@ static void account_resetpw(HttpRequest &request, HttpResponse &response)
     servlet_response_200_json(response, body);
 }
 
+// ---- /account/enter --------------------------------------------------------
+//
+// Mint a one-use entry token for a web client that has proven an identity on the
+// site (Phase 5). The broker (holding the web token) posts {identityType, value,
+// char}; this re-resolves the account from the identity server-side, confirms the
+// character is on it -- the same ownership gate as resetpw -- and mints the token
+// via entry_token_issue. The token is a password-equivalent for ~90s: it goes back
+// to the broker (server-to-server, holding the web token) and is NEVER logged. The
+// browser never sees it; the broker hands the client only the moment-to-moment
+// `account_enter <token>` command. Ships dark until the broker exists.
+
+static void account_enter(HttpRequest &request, HttpResponse &response)
+{
+    Json::Value params;
+    if (!servlet_parse_params(request, response, params))
+        return;
+    if (!servlet_auth_account(params, response))
+        return;
+
+    DLString type, value;
+    if (!account_read_identity(params, response, type, value))
+        return;
+
+    DLString charName;
+    if (!servlet_get_arg(params, response, "char", charName))
+        return;
+
+    // Account character keys are the Latin login name; reject anything else so
+    // PCharacterManager::find can't fuzzy-match a declined RU/UA name onto the
+    // wrong character (same guard as resetpw).
+    if (!account_is_latin_name(charName)) {
+        servlet_response_400(response, "Character name must be Latin letters (the login name)");
+        return;
+    }
+
+    // The identity must own the account the character belongs to.
+    DLString id = AccountManager::findByIdentity(type, value);
+    if (id.empty()) {
+        servlet_response_404(response, "No account for this identity");
+        return;
+    }
+
+    DLString charAccount = AccountManager::accountOf(charName);
+    if (charAccount.empty() || charAccount != id) {
+        LogStream::sendWarning() << "Accounts: enter refused, " << charName
+            << " is not on account " << id << "." << endl;
+        Json::Value a;
+        a["result"] = "refused_not_on_account";
+        a["char"] = charName;
+        a["account"] = id;
+        AccountAudit::record("entry_token", a);
+        servlet_response_400(response, "Character is not on this account");
+        return;
+    }
+
+    // The character must still exist (deleted/renamed after the account link).
+    DLString cname = charName;
+    if (PCharacterManager::find(cname.capitalize()) == 0) {
+        servlet_response_404(response, "Character not found: " + charName);
+        return;
+    }
+
+    DLString token = entry_token_issue(id, cname);
+    if (token.empty()) {
+        response.status = 500;
+        response.message = "Command failed";
+        response.body = "Could not mint an entry token";
+        return;
+    }
+
+    // Audit the mint, NEVER the token.
+    Json::Value a;
+    a["result"] = "ok";
+    a["char"] = cname.c_str();
+    a["account"] = id;
+    a["identity_type"] = type;
+    AccountAudit::record("entry_token", a);
+
+    Json::Value body;
+    body["char"] = cname.c_str();
+    body["token"] = token.c_str();   // server-to-server; the broker keeps it, not the browser
+    servlet_response_200_json(response, body);
+}
+
 // ---- registration ----------------------------------------------------------
 
 SERVLET_HANDLE(api_account_redeem, "/account/redeem")
@@ -447,4 +532,9 @@ SERVLET_HANDLE(api_account_info, "/account/info")
 SERVLET_HANDLE(api_account_resetpw, "/account/resetpw")
 {
     account_resetpw(request, response);
+}
+
+SERVLET_HANDLE(api_account_enter, "/account/enter")
+{
+    account_enter(request, response);
 }
