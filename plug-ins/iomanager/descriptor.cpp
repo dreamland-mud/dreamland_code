@@ -14,6 +14,7 @@
 #include "math_utils.h"
 #include "rpccommandmanager.h"
 #include "resume.h"
+#include "entrytoken.h"
 #include "iconvmap.h"
 #include "logstream.h"
 #include "descriptor.h"
@@ -352,6 +353,14 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
          * or told to start the ordinary login. */
         bool ok = !args.empty() && resume_attach(this, args.front());
         writeWSCommand(ok ? "resume_ok" : "resume_failed", std::vector<DLString>());
+    } else if(name == "account_enter") {
+        /* Character-less like `resume`, and necessarily so: the web broker minted
+         * a one-use token after proving the account's identity on the site, and
+         * the client presents it here INSTEAD of a name and password. The token
+         * never goes through console_in, so a password-equivalent stays out of the
+         * command log. See entrytoken.cpp. */
+        bool ok = !args.empty() && entry_token_redeem(this, args.front());
+        writeWSCommand(ok ? "account_enter_ok" : "account_enter_failed", std::vector<DLString>());
     } else if(name == "ping") {
         /* Character-less too, and its only job is to prove the socket still
          * carries traffic in both directions. A phone that has been suspended

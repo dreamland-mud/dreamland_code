@@ -17,6 +17,7 @@
 #include "interprethandler.h"
 #include "rpccommandmanager.h"
 #include "resume.h"
+#include "entrytoken.h"
 #include "fight_extract.h"
 #include "clanreference.h"
 #include "skillreference.h"
@@ -574,31 +575,12 @@ static void account_switch(PCharacter *ch, DLString &args)
     resume_token_clear(ch);
     extract_char(ch, false);
 
-    // Log the alt in -- mirrors backdoorhandler.cpp:108-135.
-    PCharacter *alt = PCharacterManager::create(altName);
-    PCharacterManager::update(alt);
-    char_to_list(alt, &char_list);
-
-    Room *start_room = get_room_instance(alt->getStartRoom());
-    if (!start_room)
-        start_room = get_room_instance(ROOM_VNUM_TEMPLE);
-    char_to_room(alt, start_room);
-
-    if (alt->pet) {
-        if (alt->pet->in_room)
-            char_to_room(alt->pet, alt->pet->in_room);
-        else
-            char_to_room(alt->pet, alt->in_room);
-    }
-
-    d->associate(alt);
-    InterpretHandler::init(d);
-    // oldState != CON_PLAYING so the transition fires the CON_PLAYING listeners --
-    // account config-apply (AccountConfigLoginListener) and last-host -- same as the
-    // backdoor's fresh-load path.
-    DescriptorStateManager::getThis()->handle(CON_READ_MOTD, CON_PLAYING, d);
-
-    interpret_raw(alt, "look");
+    // Load the alt onto this descriptor and into the world. The cold-load half is
+    // shared with the web entry token (account_enter_char, entrytoken.cpp): it does
+    // create -> world -> associate -> the CON_READ_MOTD->CON_PLAYING transition
+    // (which fires account config-apply + last-host) -> look, mirroring the backdoor
+    // fresh-load path. This char (ch) is already out of the world above.
+    account_enter_char(d, altName);
 }
 
 CMDRUN( account )
