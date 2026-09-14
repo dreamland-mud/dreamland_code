@@ -1005,20 +1005,25 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
     else
         PCharacterManager::saveMemory( victim );
 
-    // Notify about level upgrades otherwise noticeable in 'who'.
-    if (oldLevel < i && clan.isRecruiter(victim)) {
+    // Notify about level upgrades otherwise noticeable in 'who'. Announce only for
+    // an online victim and pass the live PCharacter* (pcVictim), never raw victim:
+    // the %C1 noun is read as an offset-0 Character*/NounHolder, but victim is a
+    // PCMemoryInterface* (a different subobject offset under PCharacter's multiple
+    // inheritance), so raw victim segfaults getNameC() on a bad vtable. See the
+    // doInduct broadcast a few functions down for the full mechanism.
+    if (pcVictim && oldLevel < i && clan.isRecruiter(victim)) {
         DLString cnEn = clan.getNameFor(LANG_EN);
         DLString cnRu = clan.getRussianName().ruscase('2');
         DLString cnUa = clan.getUkrainianName().ruscase('2');
         LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
         if (clan.isLeader(victim)) {
-            infonet(pcVictim, 0, _("{CТихий голос из $o2: {W%C1 становится лидером %w.{x"), victim, &clanName);
-            send_discord_clan(fmtLang(LANG_EN, _("{W%C1 становится лидером %w.{x"), victim, &clanName));
-            send_telegram(fmtLang(LANG_RU, _("{W%C1 становится лидером %w.{x"), victim, &clanName));
+            infonet(pcVictim, 0, _("{CТихий голос из $o2: {W%C1 становится лидером %w.{x"), pcVictim, &clanName);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%C1 становится лидером %w.{x"), pcVictim, &clanName));
+            send_telegram(fmtLang(LANG_RU, _("{W%C1 становится лидером %w.{x"), pcVictim, &clanName));
         } else {
-            infonet(pcVictim, 0, _("{CТихий голос из $o2: {W%C1 становится рекрутером %w.{x"), victim, &clanName);
-            send_discord_clan(fmtLang(LANG_EN, _("{W%C1 становится рекрутером %w.{x"), victim, &clanName));
-            send_telegram(fmtLang(LANG_RU, _("{W%C1 становится рекрутером %w.{x"), victim, &clanName));
+            infonet(pcVictim, 0, _("{CТихий голос из $o2: {W%C1 становится рекрутером %w.{x"), pcVictim, &clanName);
+            send_discord_clan(fmtLang(LANG_EN, _("{W%C1 становится рекрутером %w.{x"), pcVictim, &clanName));
+            send_telegram(fmtLang(LANG_RU, _("{W%C1 становится рекрутером %w.{x"), pcVictim, &clanName));
         }
     }
 }
@@ -1361,17 +1366,18 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
     else
         PCharacterManager::saveMemory( victim );
     
-    // Only announce for an ONLINE mortal victim, and always through the live
-    // PCharacter*, never the raw victim. Two ways raw victim kills the server:
-    // (1) offline victim has no live PCharacter, so there is nothing to format;
-    // (2) the broadcasts render the victim as a %C1 character noun, which the act
-    //     formatter reads as a Character*. victim is a PCMemoryInterface*, a
-    //     different subobject pointer under PCharacter's multiple inheritance, so
-    //     handing it over feeds the formatter a mis-offset pointer and getNameC()
-    //     segfaults on a bad vtable -- online or not. getPlayer() returns the
-    //     offset-0 Character base, which the noun slot expects.
-    // The induct itself (setClan/save + the induct message on next login) already
-    // ran above regardless; only the live world announcement is online-gated.
+    // Announce to the live world only for an online mortal, and always through the
+    // live PCharacter* (getPlayer()), never the raw victim. The broadcasts render
+    // the victim as a %C1 character noun; the act formatter reads that vararg as an
+    // Object* and STATIC-upcasts it to Grammar::NounHolder (Object is-a NounHolder),
+    // so a wrong-subobject pointer is never caught -- no null, no throw, just a bad
+    // vtable and a getNameC() segfault. victim is a PCMemoryInterface*, a different
+    // subobject offset under PCharacter's multiple inheritance
+    // (class PCharacter : public Character, public PCMemoryInterface); only the
+    // offset-0 Character base is a valid NounHolder, and getPlayer() returns exactly
+    // that, non-null once isOnline() holds. Skipping the announce for offline
+    // victims is a product choice -- the induct itself (setClan/save + the induct
+    // message on next login) already ran above regardless.
     if (victim->getLevel() <= LEVEL_MORTAL && victim->isOnline()) {
         PCharacter *pch = victim->getPlayer();
         if (victim->getClan() == clan_none) {
