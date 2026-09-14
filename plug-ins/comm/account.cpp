@@ -15,6 +15,7 @@
 #include "descriptor.h"
 #include "descriptorstatemanager.h"
 #include "interprethandler.h"
+#include "rpccommandmanager.h"
 #include "resume.h"
 #include "fight_extract.h"
 #include "clanreference.h"
@@ -657,4 +658,67 @@ CMDRUN( account )
     }
 
     ch->pecho(_("Использование: {yаккаунт{x -- статус, {yаккаунт связать{x -- код в любой бот, {yаккаунт дискорд{x / {yаккаунт телеграм{x -- по каналу. Подробнее: {hh5106аккаунт{x."));
+}
+
+/*-----------------------------------------------------------------------------
+ * account_chars rpc: hand the web client the account's characters so the
+ * settings window can draw a roster and switch by click. Read-only, and mirrors
+ * do_account/account_status: current character = the one in the world, chars =
+ * charsOf, no online detection (the `account switch` command's own guard refuses
+ * a same-account character that is already online, same as at the keyboard).
+ * Reply shape (mudjs AccountPage.jsx): { current, account, title, chars:[{name}] }.
+ *---------------------------------------------------------------------------*/
+RPCRUN(account_chars)
+{
+    if (ch == 0 || ch->getPC( ) == 0 || ch->desc == 0)
+        return;
+
+    // Refuse before login completes. In the nanny the character's name is only
+    // attacker-typed, not an authenticated identity (the nanny sets ch.name as
+    // soon as an existing name is entered, before the password), so keying the
+    // account registry by it would hand any connecting socket a stranger's alt
+    // roster and account title. Only a character actually in the world may ask.
+    if (ch->desc->connected != CON_PLAYING)
+        return;
+
+    PCharacter *pch = ch->getPC( );
+
+    Json::Value msg;
+    msg["command"] = "account_chars";
+    Json::Value &data = msg["args"][0];
+
+    DLString id = AccountManager::accountOf(pch->getName( ));
+    data["current"] = pch->getName( ).c_str( );
+    data["account"] = !id.empty( );
+    data["title"] = id.empty( ) ? "" : AccountManager::titleOf(id).c_str( );
+    data["identities"] = Json::Value(Json::arrayValue);
+    data["chars"] = Json::Value(Json::arrayValue);
+
+    if (!id.empty( )) {
+        // Login methods, same source as account_status. display is an
+        // externally-supplied identity string, but it rides out as a JSON string
+        // value (FastWriter-escaped) and the client renders it as a text node --
+        // never through the mudtag/pecho renderer -- so no echo-injection here.
+        Json::Value acc = AccountManager::get(id);
+        const Json::Value &identities = acc["identities"];
+        for (Json::Value::const_iterator i = identities.begin(); i != identities.end(); ++i) {
+            if (!(*i).isObject( ))   // a hand-corrupted account file must not crash the rpc
+                continue;
+            Json::Value ident;
+            ident["type"] = (*i)["type"].asString( );
+            DLString display = (*i)["display"].asString( );
+            if (display.empty( ))
+                display = (*i)["value"].asString( );
+            ident["display"] = display.c_str( );
+            data["identities"].append(ident);
+        }
+
+        for (const DLString &name : AccountManager::charsOf(id)) {
+            Json::Value entry;
+            entry["name"] = name.c_str( );
+            data["chars"].append(entry);
+        }
+    }
+
+    ch->desc->writeWSCommand(msg);
 }
