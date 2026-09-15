@@ -33,6 +33,17 @@
 class Descriptor;
 class PCharacter;
 
+/** How resume_attach ended. The client needs a dead token (log in now) told
+ *  apart from a not-yet-linkdead own socket (ask again in a moment) -- without
+ *  it, a deliberate quit runs the whole retry budget before reaching the nanny. */
+enum ResumeResult {
+    RESUME_OK,      // attached to the linkdead body; client gets resume_ok
+    RESUME_RETRY,   // token kept: the player's own old socket has not gone
+                    // linkdead yet -- a bounded client retry is the cure
+    RESUME_FINAL    // token unknown/expired/spent, or the body is gone -- no
+                    // retry can help, the client logs in fresh right away
+};
+
 /** This player's token, minted on first call and refreshed thereafter. */
 DLString resume_token_issue(PCharacter *ch);
 
@@ -41,11 +52,13 @@ void resume_token_clear(PCharacter *ch);
 
 /**
  * Attach `d` to the linkdead character the token was issued to.
- * Returns false -- and leaves the descriptor untouched, still at the login
- * prompt -- for any token that is unknown, expired, already spent, or whose
- * character is gone, playing elsewhere, or switched into a mob.
+ * RESUME_OK on success. RESUME_RETRY when the token is still valid but the
+ * player's own previous socket has not gone linkdead yet (the login flow's job).
+ * RESUME_FINAL for any token that is unknown, expired, already spent, or whose
+ * character is gone, playing elsewhere, or switched into a mob -- the descriptor
+ * is left untouched at the login prompt.
  */
-bool resume_attach(Descriptor *d, const DLString &token);
+ResumeResult resume_attach(Descriptor *d, const DLString &token);
 
 /**
  * True while this player has a live token and lost their link recently enough

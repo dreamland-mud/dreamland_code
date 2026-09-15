@@ -351,8 +351,17 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
          * console_in, which would put a password-equivalent into the command
          * log. Either answer puts the client back on a known path -- resumed,
          * or told to start the ordinary login. */
-        bool ok = !args.empty() && resume_attach(this, args.front());
-        writeWSCommand(ok ? "resume_ok" : "resume_failed", std::vector<DLString>());
+        ResumeResult r = args.empty() ? RESUME_FINAL : resume_attach(this, args.front());
+        if (r == RESUME_OK) {
+            writeWSCommand("resume_ok", std::vector<DLString>());
+        } else {
+            // 'final' -> the token is dead, log in now; 'retry' -> our own old
+            // socket may just not be linkdead yet, ask again. Lets a deliberate
+            // quit (token cleared) skip the client's whole retry budget.
+            std::vector<DLString> reason;
+            reason.push_back(r == RESUME_FINAL ? "final" : "retry");
+            writeWSCommand("resume_failed", reason);
+        }
     } else if(name == "account_enter") {
         /* Character-less like `resume`, and necessarily so: the web broker minted
          * a one-use token after proving the account's identity on the site, and
