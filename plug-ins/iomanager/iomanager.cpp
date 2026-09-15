@@ -195,7 +195,13 @@ IOManager::ioRead()
                 continue;
             }
         }
-        
+
+        // readInput() may have processed a websocket command (account_enter /
+        // resume) that swapped this descriptor's character and freed the previous
+        // one, so the `ch` cached above the read can now dangle. Re-read it before
+        // any use below -- otherwise ch->is_npc() dereferences freed memory.
+        ch = d->character;
+
         if (ch) {
             if (ch->daze > 0)
                 --ch->daze;
