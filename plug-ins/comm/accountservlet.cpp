@@ -1,27 +1,34 @@
 /* accountservlet -- redeem/info/resetpw endpoints for the passwordless account
  * layer. See ACCOUNTS_NANNY_ROADMAP.md / Trello 2zFpQBoW.
  *
- * Called by the Telegram/Discord redeem bots (Phase 3); a web caller lands in
- * Phase 5. Auth reuses servlet_auth_bot through the servlet_auth_account() seam
- * below: the shared dreamland_bot.token already gates /api/exec (arbitrary code
- * execution on live), so folding account mutations onto it adds no blast radius
- * over what a token holder can already do. The seam is where Phase 5 introduces a
- * separate `web` token without touching the three handlers.
+ * Called by the Telegram/Discord redeem bots (Phase 3) and the dreamland_web
+ * account broker (Phase 5). Two auth seams below:
+ *   servlet_auth_account     -- bot god token only (redeem, resetpw). The shared
+ *     dreamland_bot.token already gates /api/exec, so folding attach-or-create and
+ *     password reset onto it adds no blast radius over what a bot holder already has.
+ *   servlet_auth_account_web -- god token OR the scoped web token (emailcode,
+ *     emailverify, info, enter). The web token reaches only these four, none of
+ *     which mint a password or attach a character, so a leak stays far below god.
  *
  * 5.1 HARD BLOCKER: dreamland_bot.token must NEVER be placed in the dreamland_web
- * config -- see the roadmap. Web talks to these endpoints with its own token,
- * added at the seam, kept server-side.
+ * config -- see the roadmap. The broker holds its own account_web.token, matched at
+ * the web seam and kept server-side.
  *
  * Endpoints (all POST, JSON body {token, bottype, args:{...}}):
- *   /account/redeem  {code, identityType, value, display?} -> attach-or-create
- *   /account/info    {identityType, value}                 -> account + chars
- *   /account/resetpw {identityType, value, char}           -> temp password
+ *   /account/redeem      {code, identityType, value, display?} -> attach-or-create
+ *   /account/info        {identityType, value}                 -> account + chars
+ *   /account/resetpw     {identityType, value, char}           -> temp password
+ *   /account/enter       {identityType, value, char}           -> one-use entry token
+ *   /account/emailcode   {email}                               -> mail a login code
+ *   /account/emailverify {email, code}                         -> verify + resolve
  *
  * Ships dark: with minting gated off (LinkingCode::mintingEnabled) no live codes
  * exist, so /account/redeem always misses and no account is ever created here
  * until Phase 3 flips the gate.
  */
 #include <string>
+
+#include <sstream>
 
 #include "servlet.h"
 #include "servlet_utils.h"
@@ -39,6 +46,8 @@
 #include "json_utils.h"
 #include "logstream.h"
 #include "l10n.h"
+#include "dlfilestream.h"
+#include "dreamland.h"
 #include "def.h"
 
 using namespace std;
@@ -52,10 +61,68 @@ bool account_is_ascii_email(const DLString &s);
 
 // ---- helpers ---------------------------------------------------------------
 
-// The auth seam. Phase 5 swaps this for a per-surface check without touching the
-// handlers below. Today it is the shared bot token, honest about its scope.
+// A per-surface web token authenticates the dreamland_web /account broker without
+// the god bot token. It is scoped here on purpose: the broker reaches account
+// endpoints only, never /api/exec (execservlet gates on servlet_auth_bot directly,
+// which rejects bottype "web"). The token lives in var/misc/account_web.token,
+// created out of band like dreamland_bot.token. A missing/empty file fails closed,
+// so accounts stay dark on a host that never configured a broker.
+static DLString read_web_token()
+{
+    DLString token;
+
+    try {
+        ostringstream buf;
+        DLFileStream tokenFile(dreamland->getMiscDir(), "account_web.token");
+        tokenFile.toStream(buf);
+        token = buf.str();
+        token.replaces("\n", "");
+        token.replaces("\r", "");   // a CRLF-edited file would otherwise never match
+
+    } catch (const std::exception &) {
+        // No web token file -> no web auth. This is the dark default.
+    }
+
+    return token;
+}
+
+static bool servlet_auth_web(Json::Value &params, HttpResponse &response)
+{
+    DLString myToken = params["token"].asString();
+    DLString token = read_web_token();
+
+    if (myToken.empty() || token.empty() || myToken != token) {
+        LogStream::sendError() << "Account web auth failed: invalid or missing token" << endl;
+        response.status = 403;
+        response.message = "Unauthorized";
+        response.body = "Invalid token";
+        return false;
+    }
+
+    return true;
+}
+
+// Bot-only seam: the god token, bottype discord/telegram. This gates the two
+// endpoints a leaked web token must never reach -- /account/redeem (attach-or-create)
+// and /account/resetpw (mints a working temp password). Default-deny: a new account
+// endpoint added on this seam is bot-only until it explicitly opts into web below.
 static bool servlet_auth_account(Json::Value &params, HttpResponse &response)
 {
+    return servlet_auth_bot(params, response);
+}
+
+// Web-capable seam: the four endpoints the browser broker drives (emailcode,
+// emailverify, info, enter). Accepts the scoped web token as well as the god token.
+// None of these mint a password or attach a character, so the web token stays far
+// below god scope even if it leaks.
+static bool servlet_auth_account_web(Json::Value &params, HttpResponse &response)
+{
+    DLString botType = params["bottype"].asString();
+    botType.toLower();
+
+    if (botType == "web")
+        return servlet_auth_web(params, response);
+
     return servlet_auth_bot(params, response);
 }
 
@@ -339,7 +406,7 @@ static void account_info(HttpRequest &request, HttpResponse &response)
     Json::Value params;
     if (!servlet_parse_params(request, response, params))
         return;
-    if (!servlet_auth_account(params, response))
+    if (!servlet_auth_account_web(params, response))
         return;
 
     DLString type, value;
@@ -455,7 +522,7 @@ static void account_enter(HttpRequest &request, HttpResponse &response)
     Json::Value params;
     if (!servlet_parse_params(request, response, params))
         return;
-    if (!servlet_auth_account(params, response))
+    if (!servlet_auth_account_web(params, response))
         return;
 
     DLString type, value;
@@ -529,15 +596,15 @@ static void account_enter(HttpRequest &request, HttpResponse &response)
 // it (Phase 5.2a). Keyed by the email itself (the browser has no character yet);
 // the in-game path keys the same primitive by character name. Shares EmailCode and
 // account_is_ascii_email with `account email`, so the two surfaces cannot drift.
-// The body is English for now -- the broker passes the viewer's language at 5.1,
-// where the per-surface token also replaces the god-token seam.
+// The body is English for now -- the broker will pass the viewer's language later.
+// Auth is the per-surface web token via servlet_auth_account_web (5.1).
 
 static void account_emailcode(HttpRequest &request, HttpResponse &response)
 {
     Json::Value params;
     if (!servlet_parse_params(request, response, params))
         return;
-    if (!servlet_auth_account(params, response))
+    if (!servlet_auth_account_web(params, response))
         return;
 
     DLString rawEmail;
@@ -566,16 +633,19 @@ static void account_emailcode(HttpRequest &request, HttpResponse &response)
     DLString body = DLString("Your Dream Land verification code: ") + code
         + "\n\nEnter it where the site asked for it. It expires in 10 minutes."
         + "\nIf you did not request this, just delete this message.";
-    send_email(email, subject, body);
+    // Report what actually happened: the code is minted, but if the spool write
+    // failed the visitor never got it, so do not claim "sent". The stale code just
+    // expires on its 10-minute TTL.
+    bool queued = send_email(email, subject, body);
 
     // Audit the request, NEVER the code.
     Json::Value a;
-    a["result"] = "sent";
+    a["result"] = queued ? "sent" : "send_failed";
     a["email"] = email;
     AccountAudit::record("email_request", a);
 
     Json::Value out;
-    out["sent"] = true;
+    out["sent"] = queued;
     servlet_response_200_json(response, out);
 }
 
@@ -591,7 +661,7 @@ static void account_emailverify(HttpRequest &request, HttpResponse &response)
     Json::Value params;
     if (!servlet_parse_params(request, response, params))
         return;
-    if (!servlet_auth_account(params, response))
+    if (!servlet_auth_account_web(params, response))
         return;
 
     DLString rawEmail, code;

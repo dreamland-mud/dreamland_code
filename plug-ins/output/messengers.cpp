@@ -138,7 +138,7 @@ void send_telegram_no_escape(const DLString &content)
  * `to` is a plain address (ASCII, unconverted); subject and body are engine KOI8
  * strings, converted to UTF-8 for the queue file. Mirrors send_to_telegram().
  */
-void send_email(const DLString &to, const DLString &subject, const DLString &body)
+bool send_email(const DLString &to, const DLString &subject, const DLString &body)
 {
     try {
         Json::Value msg;
@@ -152,8 +152,11 @@ void send_email(const DLString &to, const DLString &subject, const DLString &bod
             writer.write(msg)
         );
 
+        return true;
+
     } catch (const Exception &e) {
         LogStream::sendError() << "Send email: " << e.what() << endl;
+        return false;
     }
 }
 
