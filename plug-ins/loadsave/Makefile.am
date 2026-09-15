@@ -52,6 +52,7 @@ player_menu.cpp \
 occupations.cpp \
 accountmanager.cpp \
 linkingcode.cpp \
+emailcode.cpp \
 accountaudit.cpp
 
 libloadsave_la_MOC = \

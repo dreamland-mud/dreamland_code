@@ -8,6 +8,7 @@
 #include "player_account.h"
 #include "accountmanager.h"
 #include "linkingcode.h"
+#include "emailcode.h"
 #include "accountaudit.h"
 #include "commonattributes.h"
 #include "pcharactermanager.h"
@@ -583,6 +584,209 @@ static void account_switch(PCharacter *ch, DLString &args)
     account_enter_char(d, altName);
 }
 
+// A mailable address must be pure ASCII (send_email drops `to` into the queue file
+// unconverted, so a KOI8/high byte there corrupts the UTF-8 JSON and the drainer
+// chokes -- N3) and shaped like an address. '{' and '}' are rejected too: no real
+// address carries them, and it keeps a verified address safe to echo through the
+// mudtag renderer without a separate escaper. Deliberately loose otherwise -- the
+// real proof of a good address is that the code arrives. Non-static: the web
+// email servlet (accountservlet.cpp) shares this one validator.
+bool account_is_ascii_email(const DLString &s)
+{
+    if (s.empty() || s.size() > 254)
+        return false;
+
+    int at = -1;
+    for (int i = 0; i < (int)s.size(); i++) {
+        unsigned char c = (unsigned char)s[i];
+        if (c < 0x21 || c > 0x7e)      // no controls, no space, no high/KOI8 bytes
+            return false;
+        if (c == '{' || c == '}')      // never in an address; keeps echoes tag-safe
+            return false;
+        if (c == '@') {
+            if (at >= 0)               // exactly one '@'
+                return false;
+            at = i;
+        }
+    }
+
+    if (at <= 0 || at == (int)s.size() - 1)          // '@' not first or last
+        return false;
+    if (s.find('.', at) == DLString::npos)           // a dot in the domain half
+        return false;
+    return true;
+}
+
+// Attach a just-verified email address to this character's account as an identity,
+// creating the account if the char has none. Mirrors account_redeem's create-or-
+// attach, including the one-account-per-identity conflict refusal. email has no
+// `config` mirror (unlike telegram/discord), so there is no auto-bind step.
+static void account_email_attach(PCharacter *ch, const DLString &email)
+{
+    DLString current = AccountManager::accountOf(ch->getName());
+    DLString id = AccountManager::findByIdentity("email", email);
+
+    // An identity belongs to at most one account: refuse to move this email away
+    // from an account it already sits on, or the char away from its own account.
+    if (!current.empty() && !id.empty() && current != id) {
+        ch->pecho(_("Эта почта уже привязана к другому аккаунту."));
+        return;
+    }
+
+    bool created = false;
+    bool identityAdded = false;
+    bool charJoined = false;
+
+    if (current.empty()) {
+        if (id.empty()) {
+            id = AccountManager::create("email", email, "");
+            if (id.empty()) {
+                ch->pecho(_("Не удалось создать аккаунт. Попробуй позже."));
+                return;
+            }
+            created = true;
+        } else {
+            // The address already owns an account; the unlinked char joins it (it
+            // just proved the address). Distinct from the no-op below, which writes
+            // nothing.
+            charJoined = true;
+        }
+        if (!AccountManager::attachChar(id, ch->getName())) {
+            ch->pecho(_("Не удалось создать аккаунт. Попробуй позже."));
+            return;
+        }
+    } else {
+        id = current;
+        if (AccountManager::findByIdentity("email", email).empty()) {
+            if (!AccountManager::addIdentity(id, "email", email, "")) {
+                ch->pecho(_("Не удалось добавить способ входа. Попробуй позже."));
+                return;
+            }
+            identityAdded = true;
+        }
+    }
+
+    Json::Value f;
+    f["char"] = ch->getName();
+    f["account"] = id;
+    f["identity"] = DLString("email:") + email;
+    f["created"] = created;
+    f["identity_added"] = identityAdded;
+    f["char_joined"] = charJoined;
+    AccountAudit::record("email_verify", f);
+
+    DLString title = AccountManager::titleOf(id);
+    if (created)
+        ch->pecho(_("Аккаунт {W%1$s{x создан, почта {W%2$s{x подтверждена и привязана."),
+                  title.c_str(), email.c_str());
+    else if (charJoined)
+        ch->pecho(_("Персонаж добавлен к аккаунту {W%1$s{x."), title.c_str());
+    else if (identityAdded)
+        ch->pecho(_("Почта {W%1$s{x подтверждена и привязана к аккаунту {W%2$s{x."),
+                  email.c_str(), title.c_str());
+    else
+        ch->pecho(_("Эта почта уже привязана к твоему аккаунту {W%1$s{x."), title.c_str());
+}
+
+// `account email <addr>`: mint a 6-digit code, mail it, and wait for `account code`.
+// Gated dark like `account link` (immortals bypass) so it ships without offering a
+// flow the playerbase cannot finish yet.
+static void account_email_request(PCharacter *ch, const DLString &rawAddr)
+{
+    if (!LinkingCode::mintingEnabled() && !ch->is_immortal()) {
+        ch->pecho(_("Привязка аккаунтов скоро откроется. Немного терпения."));
+        return;
+    }
+
+    if (rawAddr.empty()) {
+        ch->pecho(_("Укажи адрес почты, например: {yаккаунт почта name@example.com{x."));
+        return;
+    }
+
+    DLString email = rawAddr;
+    email.toLower();
+    if (!account_is_ascii_email(email)) {
+        ch->pecho(_("Это не похоже на адрес почты. Только латиницей, например: {Wname@example.com{x."));
+        return;
+    }
+
+    // Each request queues a real email; slow a mortal down so the command can't be
+    // used to flood an inbox. Immortals test freely.
+    if (!ch->is_immortal())
+        ch->setWait(24);
+
+    // Rate-limited per address and per character (mortals only); over a cap mints
+    // and mails nothing, so neither a mailbox nor the send quota can be flooded.
+    DLString code = EmailCode::issue(ch->getName(), email, !ch->is_immortal());
+    if (code.empty()) {
+        Json::Value rf;
+        rf["char"] = ch->getName();
+        rf["email"] = email;
+        rf["result"] = "rate_limited";
+        AccountAudit::record("email_request", rf);
+        ch->pecho(_("Слишком много запросов на подтверждение почты. Попробуй позже."));
+        return;
+    }
+
+    // send_email does not strip markup (N2), so keep subject and body plain -- no
+    // colour codes, nothing that would leak a tag into the message. l() resolves to
+    // the character's language now (send_email converts KOI8 -> UTF-8 for the mail).
+    DLString subject(l(ch, "Dream Land: подтверждение почты аккаунта"));
+    DLString body(l(ch, "Код подтверждения твоего аккаунта в Dream Land:"));
+    body += " ";
+    body += code;
+    body += "\n\n";
+    body += l(ch, "Введи его в игре: аккаунт код <шесть цифр>. Код действует 10 минут.");
+    body += "\n";
+    body += l(ch, "Если это письмо пришло по ошибке, просто удали его.");
+    send_email(email, subject, body);
+
+    // Audit the request, NEVER the code.
+    Json::Value f;
+    f["char"] = ch->getName();
+    f["email"] = email;
+    AccountAudit::record("email_request", f);
+
+    ch->pecho(_("Код подтверждения отправлен на {W%1$s{x. Он живёт 10 минут -- введи {yаккаунт код{x <шесть цифр>."),
+              email.c_str());
+}
+
+// `account code <NNNNNN>`: check the code and, on success, attach the verified
+// address to this character's account.
+static void account_email_verify_cmd(PCharacter *ch, const DLString &rawCode)
+{
+    if (!LinkingCode::mintingEnabled() && !ch->is_immortal()) {
+        ch->pecho(_("Привязка аккаунтов скоро откроется. Немного терпения."));
+        return;
+    }
+
+    DLString code = rawCode;
+    if (code.empty()) {
+        ch->pecho(_("Введи код из письма: {yаккаунт код{x <шесть цифр>."));
+        return;
+    }
+
+    DLString email;
+    int attemptsLeft = 0;
+    EmailCode::Result r = EmailCode::verify(ch->getName(), code, email, attemptsLeft);
+
+    if (r == EmailCode::NONE) {
+        ch->pecho(_("Нет активного запроса. Сначала: {yаккаунт почта{x <адрес>."));
+        return;
+    }
+    if (r == EmailCode::BADCODE) {
+        if (!ch->is_immortal())
+            ch->setWait(12);   // slow a guesser between tries
+        if (attemptsLeft > 0)
+            ch->pecho(_("Неверный код. Осталось попыток: %1$d."), attemptsLeft);
+        else
+            ch->pecho(_("Неверный код, попытки исчерпаны. Запроси новый: {yаккаунт почта{x <адрес>."));
+        return;
+    }
+
+    account_email_attach(ch, email);
+}
+
 CMDRUN( account )
 {
     if (ch->is_npc())
@@ -631,15 +835,18 @@ CMDRUN( account )
         return;
     }
 
-    // Email/telnet fallback path is Phase 4 -- acknowledge, do nothing yet.
-    if (arg_oneof(cmd, "email", "почта", "пошта")
-        || arg_oneof(cmd, "code", "код"))
-    {
-        ch->pecho(_("Привязка по почте появится позже."));
+    // Email path (scenario 7, blind/telnet-native, and the web login primitive):
+    // `account email <addr>` mails a code, `account code <NNNNNN>` verifies it.
+    if (arg_oneof(cmd, "email", "почта", "пошта")) {
+        account_email_request(ch->getPC(), args.getOneArgument());
+        return;
+    }
+    if (arg_oneof(cmd, "code", "код")) {
+        account_email_verify_cmd(ch->getPC(), args.getOneArgument());
         return;
     }
 
-    ch->pecho(_("Использование: {yаккаунт{x -- статус, {yаккаунт связать{x -- код в любой бот, {yаккаунт дискорд{x / {yаккаунт телеграм{x -- по каналу. Подробнее: {hh5106аккаунт{x."));
+    ch->pecho(_("Использование: {yаккаунт{x -- статус, {yаккаунт связать{x -- код в любой бот, {yаккаунт дискорд{x / {yаккаунт телеграм{x -- по каналу, {yаккаунт почта{x <адрес> -- по почте. Подробнее: {hh5106аккаунт{x."));
 }
 
 /*-----------------------------------------------------------------------------

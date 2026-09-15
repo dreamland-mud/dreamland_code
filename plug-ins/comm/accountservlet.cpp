@@ -27,8 +27,10 @@
 #include "servlet_utils.h"
 #include "accountmanager.h"
 #include "linkingcode.h"
+#include "emailcode.h"
 #include "accountaudit.h"
 #include "entrytoken.h"
+#include "messengers.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
@@ -43,6 +45,10 @@ using namespace std;
 
 // Defined in loadsave/pcharactermanager.cpp; salted hash, same as `password`.
 void password_set(PCMemoryInterface *pci, const DLString &plainText);
+
+// Defined in account.cpp: the one ASCII/shape validator for a mailable address,
+// shared so the in-game and web email paths cannot disagree on what they mail to.
+bool account_is_ascii_email(const DLString &s);
 
 // ---- helpers ---------------------------------------------------------------
 
@@ -517,6 +523,132 @@ static void account_enter(HttpRequest &request, HttpResponse &response)
     servlet_response_200_json(response, body);
 }
 
+// ---- /account/emailcode ----------------------------------------------------
+//
+// Mail a 6-digit code to an address so the web login can prove the visitor owns
+// it (Phase 5.2a). Keyed by the email itself (the browser has no character yet);
+// the in-game path keys the same primitive by character name. Shares EmailCode and
+// account_is_ascii_email with `account email`, so the two surfaces cannot drift.
+// The body is English for now -- the broker passes the viewer's language at 5.1,
+// where the per-surface token also replaces the god-token seam.
+
+static void account_emailcode(HttpRequest &request, HttpResponse &response)
+{
+    Json::Value params;
+    if (!servlet_parse_params(request, response, params))
+        return;
+    if (!servlet_auth_account(params, response))
+        return;
+
+    DLString rawEmail;
+    if (!servlet_get_arg(params, response, "email", rawEmail))
+        return;
+
+    DLString email = account_canon_value("email", rawEmail);   // trim + lower-case
+    if (!account_is_ascii_email(email)) {
+        servlet_response_400(response, "Invalid email address");
+        return;
+    }
+
+    // Rate-limited per address (and per key -- here key == email). Over a cap mints
+    // and mails nothing, so the endpoint cannot be turned into a mail relay.
+    DLString code = EmailCode::issue(email, email, true);
+    if (code.empty()) {
+        servlet_response_400(response, "Too many requests for this address");
+        return;
+    }
+
+    // send_email does not strip markup (N2); the body is plain text, no tags. It
+    // does not name the in-game path -- a web-issued code lives under key=email and
+    // the in-game `account code` looks up key=character, so it would not resolve.
+    DLString subject = "Dream Land: email verification";
+    DLString body = DLString("Your Dream Land verification code: ") + code
+        + "\n\nEnter it where the site asked for it. It expires in 10 minutes."
+        + "\nIf you did not request this, just delete this message.";
+    send_email(email, subject, body);
+
+    // Audit the request, NEVER the code.
+    Json::Value a;
+    a["result"] = "sent";
+    a["email"] = email;
+    AccountAudit::record("email_request", a);
+
+    Json::Value out;
+    out["sent"] = true;
+    servlet_response_200_json(response, out);
+}
+
+// ---- /account/emailverify --------------------------------------------------
+//
+// Check a mailed code and resolve the account behind the address. The web path is
+// LOGIN only: an account is created solely in-game, where a character can own it,
+// so a verified-but-unknown address returns account:null (the broker then offers
+// to link it in-game) rather than minting an ownerless account here.
+
+static void account_emailverify(HttpRequest &request, HttpResponse &response)
+{
+    Json::Value params;
+    if (!servlet_parse_params(request, response, params))
+        return;
+    if (!servlet_auth_account(params, response))
+        return;
+
+    DLString rawEmail, code;
+    if (!servlet_get_arg(params, response, "email", rawEmail))
+        return;
+    if (!servlet_get_arg(params, response, "code", code))
+        return;
+
+    // Validate the key the same way /account/emailcode does, so a caller cannot
+    // aim `verify` at a non-email principal -- e.g. a character login name, whose
+    // pending in-game code this would otherwise probe and burn.
+    DLString email = account_canon_value("email", rawEmail);
+    if (!account_is_ascii_email(email)) {
+        servlet_response_400(response, "Invalid email address");
+        return;
+    }
+
+    DLString verified;
+    int attemptsLeft = 0;
+    EmailCode::Result r = EmailCode::verify(email, code, verified, attemptsLeft);
+
+    if (r == EmailCode::NONE) {
+        servlet_response_400(response, "No pending code for this address");
+        return;
+    }
+    if (r == EmailCode::BADCODE) {
+        Json::Value a;
+        a["result"] = "bad_code";
+        a["email"] = email;
+        a["attempts_left"] = attemptsLeft;
+        AccountAudit::record("email_verify", a);
+        servlet_response_400(response, "Wrong or expired code");
+        return;
+    }
+
+    // OK: ownership proven. Resolve the existing account (login), or report none.
+    DLString id = AccountManager::findByIdentity("email", verified);
+
+    Json::Value a;
+    a["result"] = "ok";
+    a["email"] = verified;
+    a["account"] = id;   // "" when the address is on no account yet
+    AccountAudit::record("email_verify", a);
+
+    Json::Value out;
+    out["verified"] = true;
+    out["email"] = verified;
+    if (id.empty()) {
+        out["account"] = Json::Value(Json::nullValue);
+    } else {
+        out["account"] = id;
+        out["title"] = AccountManager::titleOf(id);
+        for (const DLString &name : AccountManager::charsOf(id))
+            out["chars"].append(name);
+    }
+    servlet_response_200_json(response, out);
+}
+
 // ---- registration ----------------------------------------------------------
 
 SERVLET_HANDLE(api_account_redeem, "/account/redeem")
@@ -537,4 +669,14 @@ SERVLET_HANDLE(api_account_resetpw, "/account/resetpw")
 SERVLET_HANDLE(api_account_enter, "/account/enter")
 {
     account_enter(request, response);
+}
+
+SERVLET_HANDLE(api_account_emailcode, "/account/emailcode")
+{
+    account_emailcode(request, response);
+}
+
+SERVLET_HANDLE(api_account_emailverify, "/account/emailverify")
+{
+    account_emailverify(request, response);
 }
