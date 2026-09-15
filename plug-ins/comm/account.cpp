@@ -745,9 +745,10 @@ static void account_email_request(PCharacter *ch, const DLString &rawAddr)
     Json::Value f;
     f["char"] = ch->getName();
     f["email"] = email;
+    f["result"] = "sent";
     AccountAudit::record("email_request", f);
 
-    ch->pecho(_("Код подтверждения отправлен на {W%1$s{x. Он живёт 10 минут -- введи {yаккаунт код{x <шесть цифр>."),
+    ch->pecho(_("Код подтверждения отправлен на {W%1$s{x. Он живет 10 минут -- введи {yаккаунт код{x <шесть цифр>."),
               email.c_str());
 }
 

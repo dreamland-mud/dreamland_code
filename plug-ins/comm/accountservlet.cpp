@@ -550,8 +550,9 @@ static void account_emailcode(HttpRequest &request, HttpResponse &response)
         return;
     }
 
-    // Rate-limited per address (and per key -- here key == email). Over a cap mints
-    // and mails nothing, so the endpoint cannot be turned into a mail relay.
+    // Rate-limited per address (and per key -- here key == email), under a global
+    // daily cap. Over any cap it mints and mails nothing, so one address takes at
+    // most a few codes an hour and the global cap bounds the total send volume.
     DLString code = EmailCode::issue(email, email, true);
     if (code.empty()) {
         servlet_response_400(response, "Too many requests for this address");

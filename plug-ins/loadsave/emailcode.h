@@ -68,14 +68,18 @@ private:
     static void purgeExpired();
     static long now();
 
-    // Rate-limit bookkeeping: timestamps of recent sends, per address and per key.
+    // Rate-limit bookkeeping: timestamps of recent sends, per address, per key, and
+    // one global list that mirrors the single shared resource (the outbound mail
+    // quota) -- the per-principal caps alone do not bound a caller who re-keys.
     static void purgeSends(long nowT);
+    static int  countRecentVec(const std::vector<long> &v, long nowT, long window);
     static int  countRecent(std::map<DLString, std::vector<long> > &hist,
                             const DLString &k, long nowT, long window);
 
     static std::map<DLString, Entry> codes;   // principal key -> pending entry
     static std::map<DLString, std::vector<long> > sendsByEmail;  // address -> send times
     static std::map<DLString, std::vector<long> > sendsByKey;    // key -> send times
+    static std::vector<long> sendsGlobal;                        // all limited sends
 
     static const int TTL_SECONDS;
     static const int MAX_ATTEMPTS;
@@ -84,6 +88,8 @@ private:
     static const int ADDR_WINDOW_SECONDS;
     static const int KEY_MAX_PER_WINDOW;     // sends from one key per KEY_WINDOW
     static const int KEY_WINDOW_SECONDS;
+    static const int GLOBAL_MAX_PER_WINDOW;  // total sends per GLOBAL_WINDOW
+    static const int GLOBAL_WINDOW_SECONDS;
 };
 
 #endif

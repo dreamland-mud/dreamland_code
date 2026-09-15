@@ -28,9 +28,16 @@ const int EmailCode::ADDR_WINDOW_SECONDS = 3600;
 const int EmailCode::KEY_MAX_PER_WINDOW = 5;
 const int EmailCode::KEY_WINDOW_SECONDS = 86400;
 
+// The one counter that mirrors the protected resource: a griefer who re-keys (many
+// fresh characters, or many distinct addresses) walks past the per-principal caps,
+// but every send still counts here, so the shared mail quota is bounded outright.
+const int EmailCode::GLOBAL_MAX_PER_WINDOW = 200;
+const int EmailCode::GLOBAL_WINDOW_SECONDS = 86400;
+
 map<DLString, EmailCode::Entry> EmailCode::codes;
 map<DLString, vector<long> > EmailCode::sendsByEmail;
 map<DLString, vector<long> > EmailCode::sendsByKey;
+vector<long> EmailCode::sendsGlobal;
 
 long EmailCode::now()
 {
@@ -55,25 +62,46 @@ void EmailCode::purgeExpired()
 
 // Drop send timestamps older than the widest window, and any list left empty, so
 // the history maps do not grow without bound.
+// Drop send timestamps older than the widest window (a day), and any list left
+// empty, so the history maps and the global list do not grow without bound. All
+// three windows are <= a day, and countRecent(Vec) re-filters to the exact window,
+// so one horizon here is correct.
+static void purge_prefix(std::vector<long> &v, long oldest)
+{
+    std::vector<long>::iterator w = v.begin();
+    while (w != v.end() && *w < oldest)
+        ++w;
+    v.erase(v.begin(), w);
+}
+
 void EmailCode::purgeSends(long nowT)
 {
-    long oldest = nowT - (ADDR_WINDOW_SECONDS > KEY_WINDOW_SECONDS
-                          ? ADDR_WINDOW_SECONDS : KEY_WINDOW_SECONDS);
+    int widest = ADDR_WINDOW_SECONDS;
+    if (KEY_WINDOW_SECONDS > widest)    widest = KEY_WINDOW_SECONDS;
+    if (GLOBAL_WINDOW_SECONDS > widest) widest = GLOBAL_WINDOW_SECONDS;
+    long oldest = nowT - widest;
+
     std::map<DLString, std::vector<long> > *maps[2] = { &sendsByEmail, &sendsByKey };
     for (int m = 0; m < 2; m++) {
         for (std::map<DLString, std::vector<long> >::iterator i = maps[m]->begin();
              i != maps[m]->end(); ) {
-            std::vector<long> &v = i->second;
-            std::vector<long>::iterator w = v.begin();
-            while (w != v.end() && *w < oldest)
-                ++w;
-            v.erase(v.begin(), w);
-            if (v.empty())
+            purge_prefix(i->second, oldest);
+            if (i->second.empty())
                 maps[m]->erase(i++);
             else
                 ++i;
         }
     }
+    purge_prefix(sendsGlobal, oldest);
+}
+
+int EmailCode::countRecentVec(const std::vector<long> &v, long nowT, long window)
+{
+    int n = 0;
+    for (std::vector<long>::const_iterator w = v.begin(); w != v.end(); ++w)
+        if (*w >= nowT - window)
+            n++;
+    return n;
 }
 
 int EmailCode::countRecent(std::map<DLString, std::vector<long> > &hist,
@@ -82,11 +110,7 @@ int EmailCode::countRecent(std::map<DLString, std::vector<long> > &hist,
     std::map<DLString, std::vector<long> >::iterator i = hist.find(k);
     if (i == hist.end())
         return 0;
-    int n = 0;
-    for (std::vector<long>::iterator w = i->second.begin(); w != i->second.end(); ++w)
-        if (*w >= nowT - window)
-            n++;
-    return n;
+    return countRecentVec(i->second, nowT, window);
 }
 
 DLString EmailCode::issue(const DLString &key, const DLString &email, bool enforceLimits)
@@ -96,12 +120,17 @@ DLString EmailCode::issue(const DLString &key, const DLString &email, bool enfor
     long t = now();
     if (enforceLimits) {
         purgeSends(t);
+        // Global cap first -- it is the one that mirrors the shared mail quota and
+        // bounds a caller who re-keys past the per-address and per-key caps.
+        if (countRecentVec(sendsGlobal, t, GLOBAL_WINDOW_SECONDS) >= GLOBAL_MAX_PER_WINDOW)
+            return DLString::emptyString;
         if (countRecent(sendsByEmail, email, t, ADDR_WINDOW_SECONDS) >= ADDR_MAX_PER_WINDOW)
             return DLString::emptyString;
         if (countRecent(sendsByKey, key, t, KEY_WINDOW_SECONDS) >= KEY_MAX_PER_WINDOW)
             return DLString::emptyString;
         sendsByEmail[email].push_back(t);
         sendsByKey[key].push_back(t);
+        sendsGlobal.push_back(t);
     }
 
     Entry e;
