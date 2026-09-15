@@ -146,6 +146,29 @@ DLString entry_token_issue(const DLString &accountId, const DLString &charName)
     return token;
 }
 
+/* Drop whatever login-window state this descriptor still carries before it may
+ * claim a character. Closes the WHOLE handler stack -- the same sweep
+ * Descriptor::close runs on a dropped link -- not just the front handler:
+ * NannyHandler::close, wherever it sits in the stack, extracts a pre-login
+ * newbie shell or a half-logged-in character from newbie_list, frees it and
+ * nulls d->character; handlers with nothing to detach (a pager on top, the base
+ * no-op close) are unaffected. If a character somehow survives the sweep,
+ * refuse: associate() over it would abandon it with a stale desc pointer, the
+ * exact dangle the redeem guard exists to prevent. */
+static bool entry_detach_login(Descriptor *d)
+{
+    for (handle_input_t::iterator h = d->handle_input.begin(); h != d->handle_input.end(); h++)
+        (*h)->close(d);
+
+    if (d->character) {
+        LogStream::sendError() << "Entry token: " << d->host
+                               << " still holds a character after closing its login handlers, refusing" << endl;
+        return false;
+    }
+
+    return true;
+}
+
 bool entry_token_redeem(Descriptor *d, const DLString &token)
 {
     entry_purge();
@@ -153,10 +176,18 @@ bool entry_token_redeem(Descriptor *d, const DLString &token)
     if (!d || token.empty())
         return false;
 
-    // Only a descriptor that has not got a character yet may claim one -- the same
-    // reason as resume_attach: otherwise associate() would point a second character
-    // at a descriptor a first still references, dangling the abandoned one.
-    if (d->character) {
+    // A descriptor whose character is in the world (CON_PLAYING) keeps it:
+    // stepping into another character over a live session is `account switch`'s
+    // job, and evicting the current one here would leave it dangling. Anything
+    // ELSE d->character can be is pre-login nanny state: the web client answers
+    // the codepage menu the moment the socket opens, which runs
+    // NannyHandler::doPlace and pins a throwaway newbie shell on the descriptor
+    // under the /newui login overlay -- so a fresh web descriptor is NOT
+    // character-less by the time the roster click sends `account_enter`. That
+    // shell (or a half-finished login/remort on this same socket) is
+    // newbie_list state whose own handler disposes of it on close() exactly as
+    // a dropped link would -- entry_detach_login below, after the token checks.
+    if (d->character && d->connected == CON_PLAYING) {
         LogStream::sendWarning() << "Entry token: " << d->host
                                  << " sent a token from a descriptor that is already playing" << endl;
         return false;
@@ -236,8 +267,8 @@ bool entry_token_redeem(Descriptor *d, const DLString &token)
         // stale web tab cannot later `resume` back in and evict this fresh session.
         resume_token_clear(twin);
         d->buffer_handler = new DefaultBufferHandler(0);   // koi8-r, what the web client decodes
-        if (!d->handle_input.empty() && d->handle_input.front())
-            d->handle_input.front()->close(d);
+        if (!entry_detach_login(d))
+            return false;
         if (twin->desc)
             twin->desc->close();
         d->associate(twin);
@@ -261,11 +292,12 @@ bool entry_token_redeem(Descriptor *d, const DLString &token)
         return false;
     }
 
-    // Drop the login handler this fresh web descriptor was born with (resume_attach
-    // does the same before its take-over), then cold-load the character.
+    // Drop the login state this fresh web descriptor carries -- its handler and,
+    // since the web client has already walked the nanny past the codepage step,
+    // the newbie shell pinned on it -- then cold-load the character.
     d->buffer_handler = new DefaultBufferHandler(0);
-    if (!d->handle_input.empty() && d->handle_input.front())
-        d->handle_input.front()->close(d);
+    if (!entry_detach_login(d))
+        return false;
 
     PCharacter *ch = account_enter_char(d, name);
     if (!ch) {

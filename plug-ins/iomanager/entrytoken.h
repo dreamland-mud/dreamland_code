@@ -35,12 +35,15 @@ PCharacter * account_enter_char(Descriptor *d, const DLString &charName);
 DLString entry_token_issue(const DLString &accountId, const DLString &charName);
 
 /**
- * Redeem a token on the character-less descriptor `d`: cold-load the owned
- * character, or take over its linkdead body if it is already in the world. Burns
- * the token on any final outcome. Returns false and leaves `d` untouched at the
- * login prompt for an unknown/expired/spent token, a descriptor that already has
- * a character, a target being played on a live connection, or a character that no
- * longer exists.
+ * Redeem a token on descriptor `d`: cold-load the owned character, or take over
+ * its linkdead body if it is already in the world. Any pre-login nanny state on
+ * `d` -- the throwaway newbie shell the web client's codepage answer pins on
+ * every fresh descriptor -- is disposed of first, the way a dropped link would
+ * be; a descriptor whose character is in the world (CON_PLAYING) is refused,
+ * that being `account switch`'s job. Burns the token on any final outcome.
+ * Returns false and leaves `d` at the login prompt for an unknown/expired/spent
+ * token, a playing descriptor, a target mid-login on another connection, or a
+ * character that no longer exists.
  */
 bool entry_token_redeem(Descriptor *d, const DLString &token);
 
