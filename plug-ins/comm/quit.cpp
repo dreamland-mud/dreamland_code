@@ -51,6 +51,7 @@
 
 #include "dreamland.h"
 #include "pcharactermanager.h"
+#include "resume.h"
 #include "logstream.h"
 #include "dlfileop.h"
 #include "integer.h"
@@ -133,6 +134,9 @@ CMDRUNP( quit )
         return;
 
     if (pch->desc && pch->desc->connected == CON_NANNY) {
+        // A session deliberately ending at the nanny (mid-login / mid-remort). Drop
+        // the resume token so a stale web tab cannot resume the shell being torn down.
+        resume_token_clear( pch );
         pch->desc->close( );
         return;
     }
@@ -276,7 +280,14 @@ CMDRUNP( quit )
     pch->dismount( );
 
     interpret_raw( pch, "save", "" );
-    
+
+    /* Past every refusal gate (fighting, adrenaline, ...), so this quit is really
+     * happening. Drop the resume token HERE, not at the top: a lostlink auto-quit
+     * that the fighting gate refuses must keep its token so the body stays
+     * resumable. Cleared here, a web client's reconnect gets RESUME_FINAL and lands
+     * on the nanny at once instead of burning its retry budget. */
+    resume_token_clear( pch );
+
     PCharacterManager::quit( pch );
 
     pch->pecho(_("Жаль, но все хорошее когда-нибудь заканчивается."));

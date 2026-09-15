@@ -145,12 +145,12 @@ void resume_token_clear(PCharacter *ch)
         resume_forget(ch->getName());
 }
 
-bool resume_attach(Descriptor *d, const DLString &token)
+ResumeResult resume_attach(Descriptor *d, const DLString &token)
 {
     resume_purge();
 
     if (!d || token.empty())
-        return false;
+        return RESUME_FINAL;
 
     /* Only a descriptor that has not got a character yet may claim one. Without
      * this, a client that sent `resume` mid-session would have associate()
@@ -160,12 +160,12 @@ bool resume_attach(Descriptor *d, const DLString &token)
     if (d->character) {
         LogStream::sendWarning() << "Resume: " << d->host
                                  << " sent a token from a descriptor that is already playing" << endl;
-        return false;
+        return RESUME_FINAL;
     }
 
     TokenMap::iterator t = tokens.find(token);
     if (t == tokens.end())
-        return false;
+        return RESUME_FINAL;
 
     DLString name = t->second.name;
     PCharacter *twin = PCharacterManager::findPlayer(name);
@@ -186,7 +186,7 @@ bool resume_attach(Descriptor *d, const DLString &token)
                  || (twin->desc && twin->desc->connected != CON_PLAYING))) {
         LogStream::sendNotice() << "Resume: " << d->host << " has a token for "
                                 << name << ", who is still connected -- token kept for a retry" << endl;
-        return false;
+        return RESUME_RETRY;
     }
 
     // Every outcome from here on is final, so the token is finished.
@@ -195,7 +195,7 @@ bool resume_attach(Descriptor *d, const DLString &token)
     if (!twin) {
         LogStream::sendNotice() << "Resume: " << d->host << " has a token for "
                                 << name << ", who is no longer in the world" << endl;
-        return false;
+        return RESUME_FINAL;
     }
 
     /* The returning player's own previous descriptor is usually still attached:
@@ -236,5 +236,5 @@ bool resume_attach(Descriptor *d, const DLString &token)
 
     LogStream::sendNotice() << "Resume: " << d->host << " resumed the session of "
                             << name << endl;
-    return true;
+    return RESUME_OK;
 }
