@@ -6,6 +6,7 @@
 #define EMAILCODE_H
 
 #include <map>
+#include <vector>
 #include "dlstring.h"
 
 /**
@@ -36,7 +37,13 @@ public:
     // Mint a fresh 6-digit code for `key`, mailing-address `email`, dropping any
     // prior pending code this key held (one active per key). Returns the code so
     // the caller can hand it to send_email(). Lazy-purges expired entries.
-    static DLString issue(const DLString &key, const DLString &email);
+    //
+    // When `enforceLimits` is true the send is rate-limited: at most a few codes
+    // per address per hour and per key per day, so the command cannot flood a
+    // mailbox or burn the outbound mail quota. Over a limit -> returns "" and mints
+    // nothing (the caller reports "too many requests"). Immortals pass false so
+    // testing is not throttled. Passing sends are recorded; refused ones are not.
+    static DLString issue(const DLString &key, const DLString &email, bool enforceLimits);
 
     // Consume: on a live entry whose code matches, fill `outEmail`, erase the
     // entry, return OK. A wrong code increments the attempt counter and returns
@@ -61,10 +68,22 @@ private:
     static void purgeExpired();
     static long now();
 
-    static std::map<DLString, Entry> codes;   // principal key -> entry
+    // Rate-limit bookkeeping: timestamps of recent sends, per address and per key.
+    static void purgeSends(long nowT);
+    static int  countRecent(std::map<DLString, std::vector<long> > &hist,
+                            const DLString &k, long nowT, long window);
+
+    static std::map<DLString, Entry> codes;   // principal key -> pending entry
+    static std::map<DLString, std::vector<long> > sendsByEmail;  // address -> send times
+    static std::map<DLString, std::vector<long> > sendsByKey;    // key -> send times
+
     static const int TTL_SECONDS;
     static const int MAX_ATTEMPTS;
     static const int CODE_DIGITS;
+    static const int ADDR_MAX_PER_WINDOW;    // sends to one address per ADDR_WINDOW
+    static const int ADDR_WINDOW_SECONDS;
+    static const int KEY_MAX_PER_WINDOW;     // sends from one key per KEY_WINDOW
+    static const int KEY_WINDOW_SECONDS;
 };
 
 #endif

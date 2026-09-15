@@ -19,7 +19,18 @@ const int EmailCode::MAX_ATTEMPTS = 3;
 
 const int EmailCode::CODE_DIGITS = 6;
 
+// Rate limits: bound both a single mailbox (harassment / bounce storm) and a
+// single principal spraying many addresses (quota burn). Small enough to protect
+// the shared Gmail send quota, loose enough for a real recovery: 3 per address per
+// hour, 5 per key per day.
+const int EmailCode::ADDR_MAX_PER_WINDOW = 3;
+const int EmailCode::ADDR_WINDOW_SECONDS = 3600;
+const int EmailCode::KEY_MAX_PER_WINDOW = 5;
+const int EmailCode::KEY_WINDOW_SECONDS = 86400;
+
 map<DLString, EmailCode::Entry> EmailCode::codes;
+map<DLString, vector<long> > EmailCode::sendsByEmail;
+map<DLString, vector<long> > EmailCode::sendsByKey;
 
 long EmailCode::now()
 {
@@ -42,14 +53,61 @@ void EmailCode::purgeExpired()
     }
 }
 
-DLString EmailCode::issue(const DLString &key, const DLString &email)
+// Drop send timestamps older than the widest window, and any list left empty, so
+// the history maps do not grow without bound.
+void EmailCode::purgeSends(long nowT)
+{
+    long oldest = nowT - (ADDR_WINDOW_SECONDS > KEY_WINDOW_SECONDS
+                          ? ADDR_WINDOW_SECONDS : KEY_WINDOW_SECONDS);
+    std::map<DLString, std::vector<long> > *maps[2] = { &sendsByEmail, &sendsByKey };
+    for (int m = 0; m < 2; m++) {
+        for (std::map<DLString, std::vector<long> >::iterator i = maps[m]->begin();
+             i != maps[m]->end(); ) {
+            std::vector<long> &v = i->second;
+            std::vector<long>::iterator w = v.begin();
+            while (w != v.end() && *w < oldest)
+                ++w;
+            v.erase(v.begin(), w);
+            if (v.empty())
+                maps[m]->erase(i++);
+            else
+                ++i;
+        }
+    }
+}
+
+int EmailCode::countRecent(std::map<DLString, std::vector<long> > &hist,
+                           const DLString &k, long nowT, long window)
+{
+    std::map<DLString, std::vector<long> >::iterator i = hist.find(k);
+    if (i == hist.end())
+        return 0;
+    int n = 0;
+    for (std::vector<long>::iterator w = i->second.begin(); w != i->second.end(); ++w)
+        if (*w >= nowT - window)
+            n++;
+    return n;
+}
+
+DLString EmailCode::issue(const DLString &key, const DLString &email, bool enforceLimits)
 {
     purgeExpired();
+
+    long t = now();
+    if (enforceLimits) {
+        purgeSends(t);
+        if (countRecent(sendsByEmail, email, t, ADDR_WINDOW_SECONDS) >= ADDR_MAX_PER_WINDOW)
+            return DLString::emptyString;
+        if (countRecent(sendsByKey, key, t, KEY_WINDOW_SECONDS) >= KEY_MAX_PER_WINDOW)
+            return DLString::emptyString;
+        sendsByEmail[email].push_back(t);
+        sendsByKey[key].push_back(t);
+    }
 
     Entry e;
     e.email = email;
     e.code = DLString(create_secure_digits(CODE_DIGITS));
-    e.mintedAt = now();
+    e.mintedAt = t;
     e.attempts = 0;
     codes[key] = e;   // one active per key: a re-request overwrites the old one
 

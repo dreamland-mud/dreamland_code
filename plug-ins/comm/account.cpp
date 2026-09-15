@@ -635,6 +635,7 @@ static void account_email_attach(PCharacter *ch, const DLString &email)
 
     bool created = false;
     bool identityAdded = false;
+    bool charJoined = false;
 
     if (current.empty()) {
         if (id.empty()) {
@@ -644,6 +645,11 @@ static void account_email_attach(PCharacter *ch, const DLString &email)
                 return;
             }
             created = true;
+        } else {
+            // The address already owns an account; the unlinked char joins it (it
+            // just proved the address). Distinct from the no-op below, which writes
+            // nothing.
+            charJoined = true;
         }
         if (!AccountManager::attachChar(id, ch->getName())) {
             ch->pecho(_("Не удалось создать аккаунт. Попробуй позже."));
@@ -666,12 +672,15 @@ static void account_email_attach(PCharacter *ch, const DLString &email)
     f["identity"] = DLString("email:") + email;
     f["created"] = created;
     f["identity_added"] = identityAdded;
+    f["char_joined"] = charJoined;
     AccountAudit::record("email_verify", f);
 
     DLString title = AccountManager::titleOf(id);
     if (created)
         ch->pecho(_("Аккаунт {W%1$s{x создан, почта {W%2$s{x подтверждена и привязана."),
                   title.c_str(), email.c_str());
+    else if (charJoined)
+        ch->pecho(_("Персонаж добавлен к аккаунту {W%1$s{x."), title.c_str());
     else if (identityAdded)
         ch->pecho(_("Почта {W%1$s{x подтверждена и привязана к аккаунту {W%2$s{x."),
                   email.c_str(), title.c_str());
@@ -706,7 +715,18 @@ static void account_email_request(PCharacter *ch, const DLString &rawAddr)
     if (!ch->is_immortal())
         ch->setWait(24);
 
-    DLString code = EmailCode::issue(ch->getName(), email);
+    // Rate-limited per address and per character (mortals only); over a cap mints
+    // and mails nothing, so neither a mailbox nor the send quota can be flooded.
+    DLString code = EmailCode::issue(ch->getName(), email, !ch->is_immortal());
+    if (code.empty()) {
+        Json::Value rf;
+        rf["char"] = ch->getName();
+        rf["email"] = email;
+        rf["result"] = "rate_limited";
+        AccountAudit::record("email_request", rf);
+        ch->pecho(_("Слишком много запросов на подтверждение почты. Попробуй позже."));
+        return;
+    }
 
     // send_email does not strip markup (N2), so keep subject and body plain -- no
     // colour codes, nothing that would leak a tag into the message. l() resolves to
@@ -755,6 +775,8 @@ static void account_email_verify_cmd(PCharacter *ch, const DLString &rawCode)
         return;
     }
     if (r == EmailCode::BADCODE) {
+        if (!ch->is_immortal())
+            ch->setWait(12);   // slow a guesser between tries
         if (attemptsLeft > 0)
             ch->pecho(_("Неверный код. Осталось попыток: %1$d."), attemptsLeft);
         else

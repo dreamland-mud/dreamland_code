@@ -550,13 +550,20 @@ static void account_emailcode(HttpRequest &request, HttpResponse &response)
         return;
     }
 
-    DLString code = EmailCode::issue(email, email);
+    // Rate-limited per address (and per key -- here key == email). Over a cap mints
+    // and mails nothing, so the endpoint cannot be turned into a mail relay.
+    DLString code = EmailCode::issue(email, email, true);
+    if (code.empty()) {
+        servlet_response_400(response, "Too many requests for this address");
+        return;
+    }
 
-    // send_email does not strip markup (N2); the body is plain text, no tags.
+    // send_email does not strip markup (N2); the body is plain text, no tags. It
+    // does not name the in-game path -- a web-issued code lives under key=email and
+    // the in-game `account code` looks up key=character, so it would not resolve.
     DLString subject = "Dream Land: email verification";
     DLString body = DLString("Your Dream Land verification code: ") + code
-        + "\n\nEnter it on the site, or in-game: account code <six digits>."
-        + " It expires in 10 minutes."
+        + "\n\nEnter it where the site asked for it. It expires in 10 minutes."
         + "\nIf you did not request this, just delete this message.";
     send_email(email, subject, body);
 
@@ -592,9 +599,12 @@ static void account_emailverify(HttpRequest &request, HttpResponse &response)
     if (!servlet_get_arg(params, response, "code", code))
         return;
 
+    // Validate the key the same way /account/emailcode does, so a caller cannot
+    // aim `verify` at a non-email principal -- e.g. a character login name, whose
+    // pending in-game code this would otherwise probe and burn.
     DLString email = account_canon_value("email", rawEmail);
-    if (email.empty()) {
-        servlet_response_400(response, "Empty email address");
+    if (!account_is_ascii_email(email)) {
+        servlet_response_400(response, "Invalid email address");
         return;
     }
 
