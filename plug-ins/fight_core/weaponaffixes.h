@@ -81,11 +81,8 @@ private:
 
     int getAffixIndex(const DLString &name);
 
-    /** Choose a random set element. */
-    bucket_mask_t randomBucket() const;
-
-    /** Recursively produce masks were 1 marks an included affix, 0 marks an excluded affix.
-     *  Each mask denotes a combination of affixes those total price matches prices for the tier. 
+    /** Recursively walk every affix combination whose total price matches the tier,
+     *  reservoir-sampling ONE of them uniformly. 1 marks an included affix, 0 excluded.
      */
     void generateBuckets(int currentTotal, int currentPenalty, long unsigned int index, bucket_mask_t currentMask);
 
@@ -117,8 +114,15 @@ private:
     /** Keeps all avaialble affixes sorted by price. */
     vector<affix_info> affixes;
 
-    /** Keeps all possible combination matching tier's price. If a bit M is set in a bucket mask, then affix M is included. */
-    unordered_set<bucket_mask_t> buckets;
+    /** Reservoir sampler over the valid affix combinations. Storing every matching
+     *  subset made tier 1 enumerate tens of millions of masks -- gigabytes of memory
+     *  and a multi-second freeze of the whole (single-threaded) server. Instead
+     *  generateBuckets keeps ONE uniformly-random valid combination on the fly:
+     *  chosenBucket is that pick, bucketCount how many valid combinations were seen (a
+     *  bit M set means affix M is in), visitCount a hard cap on the walk. */
+    bucket_mask_t chosenBucket;
+    unsigned long bucketCount;
+    unsigned long visitCount;
 
     /** Marks affixes that need to always be included in the result. */
     bucket_mask_t requirements;
