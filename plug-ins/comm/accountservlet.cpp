@@ -41,6 +41,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
+#include "profession.h"
 #include "commonattributes.h"
 #include "math_utils.h"
 #include "json_utils.h"
@@ -371,6 +372,28 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     servlet_response_200_json(response, body);
 }
 
+// A roster entry for the login UI: the character's name plus its level and class,
+// read from the offline memory index (no pfile load -- allList is in RAM from
+// boot). Class ships as {en,ru,ua} so the language-switchable login panel can label
+// it in the player's chosen tongue. A listed name with no loadable memory (a
+// deleted or unreadable profile) degrades to the bare name.
+static Json::Value account_roster_entry(const DLString &name)
+{
+    Json::Value entry;
+    entry["name"] = name.c_str();
+
+    PCMemoryInterface *pci = PCharacterManager::find(name);
+    if (pci != 0) {
+        entry["level"] = pci->getLevel();
+        Json::Value cls;
+        cls["en"] = pci->getProfession()->getName().c_str();
+        cls["ru"] = pci->getProfession()->getRusName().c_str();
+        cls["ua"] = pci->getProfession()->getUaName().c_str();
+        entry["class"] = cls;
+    }
+    return entry;
+}
+
 // ---- /account/info ---------------------------------------------------------
 
 static void account_info(HttpRequest &request, HttpResponse &response)
@@ -397,7 +420,7 @@ static void account_info(HttpRequest &request, HttpResponse &response)
     body["title"] = AccountManager::titleOf(id);
     body["identities"] = acc["identities"];
     for (const DLString &name : AccountManager::charsOf(id))
-        body["chars"].append(name);
+        body["chars"].append(account_roster_entry(name));
 
     servlet_response_200_json(response, body);
 }
@@ -687,7 +710,7 @@ static void account_emailverify(HttpRequest &request, HttpResponse &response)
         out["account"] = id;
         out["title"] = AccountManager::titleOf(id);
         for (const DLString &name : AccountManager::charsOf(id))
-            out["chars"].append(name);
+            out["chars"].append(account_roster_entry(name));
     }
     servlet_response_200_json(response, out);
 }
