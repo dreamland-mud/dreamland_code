@@ -3566,7 +3566,16 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     // An unskilled weapon (a cleric holding an axe) collapses toward the 20% dice
     // floor and scores near nothing -- which is exactly why the sage will never
     // chase a weapon the character can't actually use.
-    if (itemType == ITEM_WEAPON) {
+    //
+    // Dice only count for a weapon that can actually be swung -- one carrying the
+    // WIELD flag (primary hand or a dual-wield off-hand, both wield-flagged). A
+    // weapon that is HOLD-only (a throwing stone, a focus) is never swung as a
+    // melee weapon, so its dice must not count: it competes for the hold slot
+    // against a caster's stat focus and would otherwise out-rank it on raw dice
+    // alone (a caster offered an 8d6 throwing stone over her +100hp/+100mana
+    // scepter was the report). Its stat affixes still count via the affect loop.
+    if (itemType == ITEM_WEAPON && pProto != 0
+        && IS_SET( pProto->wear_flags, ITEM_WIELD )) {
         int skillPct = target->getSkill( weaponSn );
         // A cleric who can compound this weapon into a mace wields it at their
         // mace skill, so it scores like a real mace instead of collapsing to the
@@ -4195,15 +4204,25 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         REMOVE_BIT( slot, ITEM_TAKE );
         if (slot == 0 && pObj->item_type != ITEM_LIGHT)
             continue;
-        // Already wearing this exact item: normally skip. Exception -- an explicit
-        // slot-browse of a paired slot (finger/neck/wrist, or a dual-wield off-hand)
-        // may advise a SECOND copy for the empty twin position, as long as the world
-        // isn't capped to one instance (limit 1). Route those to secondCopyCands; they
-        // never feed the percentile/optimal path. The free-position gate is applied in
-        // the slot-browse block (worn-count vs capacity).
+        // Already wearing this exact item: normally skip. Exception -- a SECOND copy
+        // may fill the empty twin position of a paired slot (finger/neck/wrist, or a
+        // dual-wield off-hand), as long as the world isn't capped to one instance
+        // (limit 1). In an explicit slot browse this covers the browsed slot (wield
+        // included); in the general advice it covers a paired ring/neck/wrist with a
+        // free position, so "get a second <ring>" competes for that slot's optimal
+        // pick instead of a weaker replacement surfacing alone. Route those to
+        // secondCopyCands; they never feed the percentile. The free-position gate is
+        // applied where the lists are built (slot-browse capacity, or the generic
+        // fill merge below).
         bool secondCopy = false;
         if (wornVnum.count( pObj->vnum )) {
-            if (slotFilter == 0 || (slot & slotFilter) == 0 || pObj->limit == 1)
+            bool eligible;
+            if (slotFilter != 0)
+                eligible = (slot & slotFilter) != 0 && pObj->limit != 1;
+            else
+                eligible = (slot & (ITEM_WEAR_FINGER | ITEM_WEAR_NECK | ITEM_WEAR_WRIST)) != 0
+                           && pObj->limit != 1;
+            if (!eligible)
                 continue;
             secondCopy = true;
         }
@@ -4614,6 +4633,27 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (c.pObj->behaviors.isSet( cs.first ) && (g.wornSlots & c.slot) == 0)
                 c.value += (g.vset / (g.total > 0 ? g.total : 1)) * c.obtain;
         }
+    // General advice (not a slot browse): merge in the second-copy FILLS. A ring/
+    // neck/wrist the char already wears can fill an empty twin position -- the same
+    // upgrade "service advice <slot>" surfaces. Score it as a fill (bar 0, so value =
+    // score * obtain, exactly what gaBar gives a free paired position) and let it
+    // compete for that slot's single optimal pick, so a bigger second-<ring> win
+    // beats a weaker plain replacement instead of being hidden by the worn-vnum skip.
+    // Only free-position paired slots qualify; a both-full paired slot and dual-wield
+    // off-hand stay slot-browse-only. secondCopyCands already dropped limit-1 and
+    // unobtainable items.
+    if (slotFilter == 0) {
+        for (auto &c: secondCopyCands) {
+            GAPaired *p = 0;
+            if (c.slot & ITEM_WEAR_FINGER)     p = &pairFinger;
+            else if (c.slot & ITEM_WEAR_NECK)  p = &pairNeck;
+            else if (c.slot & ITEM_WEAR_WRIST) p = &pairWrist;
+            if (p == 0 || p->count >= 2 || c.acq.method == GA_UNKNOWN)
+                continue;
+            c.value = c.score * c.obtain;   // bar 0: fills a free position
+            cands.push_back( c );
+        }
+    }
     std::vector<GACand> byOpt = cands;
     std::sort( byOpt.begin( ), byOpt.end( ),
         []( const GACand &a, const GACand &b ){ return a.value > b.value; } );
