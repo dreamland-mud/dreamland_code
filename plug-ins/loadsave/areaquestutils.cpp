@@ -190,7 +190,7 @@ DLString aquest_find_latest(PCMemoryInterface* ch)
 }
 
 // Return true if ch passes all requirements to participate in this quest
-bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuestData &qdata) 
+bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuestData &qdata, bool ignoreCancelCooldown)
 {
     // Too old?
     if (q->maxLevel < LEVEL_MORTAL && ch->getLevel() > q->maxLevel)
@@ -210,8 +210,9 @@ bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuest
             return false;
     }
 
-    // Standard 1 hour delay after 'q cancel' for non-onboarding quests
-    if (qdata.timecancel > 0 && !q->flags.isSet(AQUEST_ONBOARDING)) {
+    // Standard 1 hour delay after 'q cancel' for non-onboarding quests.
+    // Callers can ignore this one gate to ask "would ch qualify if not for the cooldown?".
+    if (!ignoreCancelCooldown && qdata.timecancel > 0 && !q->flags.isSet(AQUEST_ONBOARDING)) {
         if (dreamland->getCurrentTime() - qdata.timecancel < Date::SECOND_IN_HOUR)
             return false;
     }
@@ -304,8 +305,22 @@ bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLString &tr
         // Check if this inactive quest can be started
         if (!qdata.questActive()) {
             // only limit participation on quest start - otherwise ch can grow out of quest between steps
-            if (!aquest_can_participate(ch, q, qdata)) 
+            if (!aquest_can_participate(ch, q, qdata)) {
+                // If the ONLY thing blocking the start is the recent-'q cancel' cooldown,
+                // and ch just performed the step-0 begin action on this giver (so a start
+                // was actually expected here), tell them instead of silently ignoring it.
+                // Otherwise (too low/high level, wrong align, etc.) stay silent as before.
+                if (aquest_method_for_step_and_stage(methodsByStep, 0, "begin")
+                    && qdata.timecancel > 0
+                    && !q->flags.isSet(AQUEST_ONBOARDING)
+                    && dreamland->getCurrentTime() - qdata.timecancel < Date::SECOND_IN_HOUR
+                    && aquest_can_participate(ch, q, qdata, /*ignoreCancelCooldown*/ true))
+                {
+                    gprog("onQuestCooldown", "CQ", ch, q);
+                }
+
                 continue;
+            }
 
             // Launch quest's onCanStart trigger if defined
             if (aqprog_canstart(ch, q) != DLString::emptyString)
