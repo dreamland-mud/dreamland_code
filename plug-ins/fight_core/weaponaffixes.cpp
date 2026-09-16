@@ -19,6 +19,14 @@ CONFIGURABLE_LOADED(fight, weapon_affixes)
     weapon_affixes = value;
 }
 
+/** Hard ceiling on how many recursion nodes generateBuckets may walk. The price and
+ *  penalty prunes keep a healthy tier well under this, so it is only a safety net
+ *  against a pathological affix pool -- but it guarantees the walk can never freeze the
+ *  server again (the reservoir already holds a valid random pick when it trips). Each
+ *  node is a few integer ops now (no set insert), so this bound is a fraction of a
+ *  second, far below the 26-133s freezes the old full enumeration produced. */
+static const unsigned long MAX_BUCKET_VISITS = 5000000;
+
 /*-----------------------------------------------------------------------------
  * Weapon affixes
  *-----------------------------------------------------------------------------*/
@@ -134,20 +142,22 @@ void affix_generator::run()
     if (affixes.empty())
         setup();
 
+    chosenBucket.reset();
+    bucketCount = 0;
+    visitCount = 0;
     generateBuckets(0, 0, 0, 0L);
 
-    notice("Weapon generator: found %d result buckets for tier %d and %d affixes", 
-            buckets.size(), tier.num, affixes.size());
+    notice("Weapon generator: found %lu result buckets for tier %d and %d affixes (%lu nodes walked)",
+            bucketCount, tier.num, (int)affixes.size(), visitCount);
 }
 
-/** Produces a single random affix combination out of all generated ones. */
+/** Produces the single random affix combination the reservoir landed on. */
 list<affix_info> affix_generator::getSingleResult() const
 {
     list<affix_info> result;
-    bucket_mask_t bucket = randomBucket();
 
     for (unsigned int i = 0; i < affixes.size(); i++)
-        if (bucket.test(i))
+        if (chosenBucket.test(i))
             result.push_back(affixes[i]);
 
     return result;
@@ -155,7 +165,7 @@ list<affix_info> affix_generator::getSingleResult() const
 
 int affix_generator::getResultSize() const
 {
-    return buckets.size();
+    return bucketCount;
 }
 
 list<affix_info *> affix_generator::getAffixes(const DLString &name)
@@ -177,50 +187,65 @@ int affix_generator::getAffixIndex(const DLString &name)
     return -1;
 }
 
-/** Choose a random set element. */
-bucket_mask_t affix_generator::randomBucket() const 
-{
-    vector<bucket_mask_t> random_sample;
-    sample(buckets.begin(), buckets.end(), 
-            back_inserter(random_sample), 1, mt19937{random_device{}()});
-    return random_sample.front();
-}
-
-/** Recursively produce masks where 1 marks included affix, 0 marks excluded affix.
- *  Each mask denotes a combination of affixes those total price matches prices for the tier. 
+/** Recursively walk the affix combinations, reservoir-sampling one uniformly.
+ *
+ *  Affixes are sorted by price ascending. A "bucket" is a complete subset: the affixes
+ *  chosen so far with everything from 'index' on excluded. Such a subset is FINAL --
+ *  and gets recorded -- at exactly one place: either the last affix is decided
+ *  (index == size), or the cheapest remaining affix already overshoots the price
+ *  ceiling, so nothing more can be added. Recording it there, once, is what keeps each
+ *  distinct combination counted a single time, so the reservoir stays uniform (the old
+ *  code recorded at every node and leaned on an unordered_set to dedup -- which is
+ *  exactly the set that grew to tens of millions of entries).
+ *
+ *  Two prunes hold the walk down: the price ceiling stops the include branch, and the
+ *  penalty floor (worstPenalty, from the tier's max_penalty) stops it packing on more
+ *  negative affixes than the tier allows -- without a real floor, tier 1 admitted every
+ *  negative pile and exploded. MAX_BUCKET_VISITS is the final backstop.
  */
-void affix_generator::generateBuckets(int currentTotal, int currentPenalty, long unsigned int index, bucket_mask_t currentMask) 
-{    
-    // Good combo, remember it and continue. Ignore combos that exceed penalty limits.
-    if (currentTotal >= minPrice && currentTotal <= maxPrice)
-        if (currentPenalty >= worstPenalty)
-            buckets.insert(currentMask);
-
-    // Stop now: reached the end of affixes vector.
-    if (index >= affixes.size())
+void affix_generator::generateBuckets(int currentTotal, int currentPenalty, long unsigned int index, bucket_mask_t currentMask)
+{
+    if (visitCount >= MAX_BUCKET_VISITS)
         return;
+    visitCount++;
 
-    int myPrice =  affixes[index].price;
+    // Final subset: no affix left to decide, or the cheapest remaining one (affixes are
+    // ascending) already overshoots the ceiling, so nothing more can be added. Record it
+    // once if it lands in the tier's price window and honours the penalty floor.
+    if (index >= affixes.size()
+        || currentTotal + affixes[index].price > maxPrice)
+    {
+        if (currentTotal >= minPrice && currentTotal <= maxPrice
+            && currentPenalty >= worstPenalty)
+        {
+            bucketCount++;
+            // Reservoir sampling of size 1: the k-th valid combination replaces the
+            // pick with probability 1/k, so chosenBucket ends up uniform over all of
+            // them -- the same distribution the old enumerate-then-sample produced,
+            // without holding them all in memory.
+            if (number_range(1, bucketCount) == 1)
+                chosenBucket = currentMask;
+        }
+        return;
+    }
+
+    int myPrice = affixes[index].price;
     int nextTotal = currentTotal + myPrice;
     int nextPenalty = myPrice < 0 ? (currentPenalty + myPrice) : currentPenalty;
 
-    // Stop now: adding this or any subsequent price will still exceed maxPrice.
-    if (nextTotal > maxPrice)
-        return;
-
-    // First check whether current affix doesn't conflict with any affix chosen earlier.
-    if ((currentMask & exclusions[index]).none()) {
-        // Explore all further combinations that can happen if this affix is included.
+    // Include this affix -- unless it would breach the penalty floor (a negative that
+    // drops the running penalty past worstPenalty can never recover: penalty only
+    // decreases) or conflict with one already chosen. The price ceiling is guaranteed
+    // by the gate above.
+    if (nextPenalty >= worstPenalty && (currentMask & exclusions[index]).none()) {
         currentMask.set(index);
         generateBuckets(nextTotal, nextPenalty, index + 1, currentMask);
+        currentMask.reset(index);
     }
 
-    // First check whether current affix is required and cannot be excluded.
-    if (!requirements.test(index)) {
-        // Explore all further combinations that can happen if this affix is excluded.
-        currentMask.reset(index);
+    // Exclude this affix -- unless it is required and cannot be left out.
+    if (!requirements.test(index))
         generateBuckets(currentTotal, currentPenalty, index + 1, currentMask);
-    }
 }
 
 /** Creates a vector of all affixes that are allowed for the tier, sorted by price in ascending order. */
@@ -288,8 +313,14 @@ void affix_generator::collectAffixesForTier()
         if (checkAlignBonus(ai))
             continue;
 
-        if (ai.price >= 0 && !chance(retainChance/2))
-            toErase.insert(ai.affixName);        
+        // A non-preferred affix has a chance to be evicted from this roll's pool --
+        // negatives too, not only positives. Keeping every negative available on a
+        // legendary was half of why tier 1 branched into tens of millions of combos;
+        // culling them at the same gentle rate keeps per-weapon variety (a weapon still
+        // draws random negatives) while shrinking the walk. Across many weapons every
+        // negative still appears -- a different subset survives each roll.
+        if (!chance(retainChance/2))
+            toErase.insert(ai.affixName);
     }
     
     for (auto &affixName: toErase) {
