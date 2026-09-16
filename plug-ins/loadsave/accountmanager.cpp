@@ -31,6 +31,7 @@ const DLString AccountManager::ACCOUNT_EXT = ".json";
 
 map<DLString, Json::Value> AccountManager::accounts;
 map<DLString, DLString> AccountManager::identityIndex;
+map<DLString, AccountManager::PendingAttach> AccountManager::pendingAttach;
 
 DLString AccountManager::identityKey(const DLString &type, const DLString &value)
 {
@@ -395,6 +396,64 @@ bool AccountManager::detachChar(const DLString &charName)
     pc->getAttributes().eraseAttribute("account");
     PCharacterManager::saveMemory(pc);
     return true;
+}
+
+// --- attach-at-creation -----------------------------------------------------
+// The redeem surface proves an identity for a character that is still in the
+// nanny (not on disk), so attachChar cannot run yet. Park the verified identity
+// against the creating name; the nanny commits it after the character saves.
+
+void AccountManager::recordPendingAttach(const DLString &charName, const DLString &type,
+                                         const DLString &value, const DLString &display)
+{
+    DLString name = charName;
+    name.capitalize();
+
+    PendingAttach p;
+    p.type = type;
+    p.value = value;
+    p.display = display;
+    pendingAttach[name] = p;   // one pending identity per creating character
+}
+
+bool AccountManager::commitPendingAttach(const DLString &charName)
+{
+    DLString name = charName;
+    name.capitalize();
+
+    map<DLString, PendingAttach>::iterator it = pendingAttach.find(name);
+    if (it == pendingAttach.end())
+        return false;
+
+    PendingAttach p = it->second;
+    pendingAttach.erase(it);   // one-shot: clear regardless of the outcome below
+
+    // find-before-create: the identity belongs to at most one account. A freshly
+    // created character has no account of its own, so this is always create-or-join,
+    // never the cross-account move the servlet refuses for a saved character.
+    DLString id = findByIdentity(p.type, p.value);
+    if (id.empty()) {
+        id = create(p.type, p.value, p.display);
+        if (id.empty())
+            return false;
+    }
+
+    if (!attachChar(id, name))
+        return false;
+
+    // Fold a messenger identity down onto the character (the shape the who-list /
+    // bot bridge read); email has no char-side mirror. Mirrors account_redeem.
+    if (p.type == "telegram" || p.type == "discord")
+        setMessengerIdentity(id, p.type, p.value, p.display);
+
+    return true;
+}
+
+void AccountManager::clearPendingAttach(const DLString &charName)
+{
+    DLString name = charName;
+    name.capitalize();
+    pendingAttach.erase(name);
 }
 
 DLString AccountManager::accountOf(const DLString &charName)

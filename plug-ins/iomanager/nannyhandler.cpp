@@ -57,7 +57,14 @@ using namespace std;
 void NannyHandler::extractNewbie(Character *ch)
 {
     ::Object *obj, *obj_next;
-    
+
+    // Creation is being abandoned (droplink / timeout / link close). Drop any
+    // identity a redeem parked against this name, so it can never later attach to a
+    // different person who reuses the freed name. Every abandon path funnels here.
+    // getName lives on the PC interface (Character has only getNameC/getNameP), and
+    // getPC() is valid here -- quit() below dereferences it too.
+    AccountManager::clearPendingAttach( ch->getPC( )->getName( ) );
+
     if (ch->in_room)
         char_from_room( ch );
 
@@ -500,6 +507,29 @@ NMI_INVOKE( NannyHandler, accountConflict, "" )
     }
 
     return conflict;
+}
+
+/*
+ * attach-at-creation commit: apply the verified identity a redeem parked against
+ * this newly created character (nanny V2 / Phase 4). Called by the Fenia nanny at
+ * taskGreetNewbie, AFTER the character is saved and in allList -- attachChar keys
+ * off that in-RAM index, so an earlier call would find nothing. A no-op when
+ * nothing was parked, so it is safe to call on every new character. Returns "ok"
+ * on a real attach, "" otherwise.
+ */
+NMI_INVOKE( NannyHandler, commitPendingAttach, "" )
+{
+    PCharacter *ch = getPlayer( args );
+
+    bool attached = AccountManager::commitPendingAttach( ch->getName( ) );
+    if (attached) {
+        Json::Value fields;
+        fields["char"] = ch->getName( );
+        fields["account"] = AccountManager::accountOf( ch->getName( ) );
+        AccountAudit::record( "pending_attach_commit", fields );
+    }
+
+    return attached ? DLString( "ok" ) : DLString::emptyString;
 }
 
 /*--------------------------------------------------------------------------
