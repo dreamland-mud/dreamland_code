@@ -31,7 +31,7 @@ AreaQuest *get_area_quest(const DLString &questId);
 AreaQuest *get_area_quest(const Integer& questId);
 AreaQuest *get_area_quest(int questId);
 
-bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuestData &qdata);
+bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuestData &qdata, bool ignoreCancelCooldown = false);
 bool aquest_can_participate_ever(PCMemoryInterface *pci, AreaQuest *q);
 
 // Find the most recent area quest id for this player.
