@@ -313,13 +313,14 @@ void affix_generator::collectAffixesForTier()
         if (checkAlignBonus(ai))
             continue;
 
-        // A non-preferred affix has a chance to be evicted from this roll's pool --
-        // negatives too, not only positives. Keeping every negative available on a
-        // legendary was half of why tier 1 branched into tens of millions of combos;
-        // culling them at the same gentle rate keeps per-weapon variety (a weapon still
-        // draws random negatives) while shrinking the walk. Across many weapons every
-        // negative still appears -- a different subset survives each roll.
-        if (!chance(retainChance/2))
+        // Only POSITIVE-price affixes are cullable. Negatives must stay in the pool:
+        // they are what offsets a required or expensive affix back down into the
+        // tier's price window (e.g. a required +25 affix on a tier-5 weapon whose
+        // ceiling is 20 only fits once a -N affix pulls the total back under 20).
+        // Culling negatives too left such weapons with NO valid combination at all,
+        // so they rolled affix-less -- the penalty floor + reservoir + visit cap
+        // already bound the walk, so the pool never needed thinning here.
+        if (ai.price >= 0 && !chance(retainChance/2))
             toErase.insert(ai.affixName);
     }
     
