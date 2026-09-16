@@ -310,11 +310,15 @@ bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLString &tr
                 // and ch just performed the step-0 begin action on this giver (so a start
                 // was actually expected here), tell them instead of silently ignoring it.
                 // Otherwise (too low/high level, wrong align, etc.) stay silent as before.
+                // aqprog_canstart LAST (it runs the quest's onCanStart Fenia trigger):
+                // only consult it once every cheap gate already passed, so the message
+                // never promises a start that onCanStart would still refuse.
                 if (aquest_method_for_step_and_stage(methodsByStep, 0, "begin")
                     && qdata.timecancel > 0
                     && !q->flags.isSet(AQUEST_ONBOARDING)
                     && dreamland->getCurrentTime() - qdata.timecancel < Date::SECOND_IN_HOUR
-                    && aquest_can_participate(ch, q, qdata, /*ignoreCancelCooldown*/ true))
+                    && aquest_can_participate(ch, q, qdata, /*ignoreCancelCooldown*/ true)
+                    && aqprog_canstart(ch, q) == DLString::emptyString)
                 {
                     gprog("onQuestCooldown", "CQ", ch, q);
                 }

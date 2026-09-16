@@ -693,9 +693,14 @@ static void show_char_to_char_0( Character *victim, Character *ch )
         buf << fmt(ch, _("({WЗ{wве{Wзд{wная {WП{wыль{x)"));
 
     // If any prefix marker was shown, separate it from the name/long with a
-    // space so the line can wrap between the markers and the name.
-    if (buf.tellp( ) > prefixStart)
-        buf << " ";
+    // space so the line can wrap between the markers and the name -- unless the
+    // last prefix already ended in a space (some behavior markers do), to avoid
+    // a double space.
+    if (buf.tellp( ) > prefixStart) {
+        std::string prefixSoFar = buf.str( );
+        if (!prefixSoFar.empty( ) && prefixSoFar[prefixSoFar.size( ) - 1] != ' ')
+            buf << " ";
+    }
 
     if (nVict)
         if (can_show_long_descr(nVict)) {
