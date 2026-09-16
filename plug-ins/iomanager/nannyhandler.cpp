@@ -532,6 +532,33 @@ NMI_INVOKE( NannyHandler, commitPendingAttach, "" )
     return attached ? DLString( "ok" ) : DLString::emptyString;
 }
 
+/*
+ * Login-name availability, shared with the /newui web-creation front (the
+ * character-less `check_name` WS command in Descriptor::wsHandlePayload). Runs the
+ * same badnames + connected + existing-character checks the nanny's name step uses,
+ * so the form's inline "name taken" can never disagree with what the nanny will
+ * accept. Letter-format is validated client-side; this answers availability only.
+ * Returns "" when the name is free, else a short reason the client maps to a
+ * message: "empty", "reserved" (badnames), "online" (someone connected under it),
+ * "exists" (a saved character already owns it).
+ */
+DLString nanny_check_login_name(const DLString &rawName)
+{
+    DLString name = rawName;
+    name.capitalize();
+
+    if (name.empty())
+        return "empty";
+    if (!badNames->checkName(name).empty())
+        return "reserved";
+    if (descriptor_find_named(NULL, name))
+        return "online";
+    if (PCharacterManager::find(name) != 0)
+        return "exists";
+
+    return DLString::emptyString;
+}
+
 /*--------------------------------------------------------------------------
  * nanny: character creation
  *-------------------------------------------------------------------------*/
