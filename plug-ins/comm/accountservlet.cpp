@@ -242,14 +242,22 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
         return;
     }
 
-    // PR-B only handles a real, saved character. attach-at-creation (a pending
-    // code, char not yet on disk) is Phase 4 and rewrites this path.
+    // attach-at-creation (Phase 4): the code was minted for a character still in the
+    // nanny, so it is not on disk and attachChar cannot run yet. Park the verified
+    // identity against the creating name; the nanny commits it once the character is
+    // saved. No account is created here, so an abandoned creation leaves nothing.
     if (entry.pendingCreation) {
+        AccountManager::recordPendingAttach(entry.charName, type, value, display);
         Json::Value a;
-        a["result"] = "pending_unsupported";
+        a["result"] = "pending_recorded";
         a["char"] = entry.charName;
+        a["identity"] = type + ":" + value;
         AccountAudit::record("code_redeem", a);
-        servlet_response_400(response, "Pending-creation codes are not supported yet");
+
+        Json::Value body;
+        body["char"] = entry.charName;
+        body["pending"] = true;
+        servlet_response_200_json(response, body);
         return;
     }
 
@@ -385,10 +393,19 @@ static Json::Value account_roster_entry(const DLString &name)
     PCMemoryInterface *pci = PCharacterManager::find(name);
     if (pci != 0) {
         entry["level"] = pci->getLevel();
+
+        // getRusName/getUaName are Flexer declension pads ("паладин||а|у|а|ом|і"),
+        // not display strings -- resolve the nominative (ruscase '1' parses the pad
+        // for RU and UA alike) so the roster never leaks the raw pipe-pad. The EN
+        // name has no pad. UA falls back to the RU nominative for a profession that
+        // carries no UA name (the engine's own display convention).
+        auto prof = pci->getProfession();
+        DLString ru = prof->getRusName().ruscase('1');
+        DLString ua = prof->getUaName().empty() ? ru : prof->getUaName().ruscase('1');
         Json::Value cls;
-        cls["en"] = pci->getProfession()->getName().c_str();
-        cls["ru"] = pci->getProfession()->getRusName().c_str();
-        cls["ua"] = pci->getProfession()->getUaName().c_str();
+        cls["en"] = prof->getName().c_str();
+        cls["ru"] = ru.c_str();
+        cls["ua"] = ua.c_str();
         entry["class"] = cls;
     }
     return entry;

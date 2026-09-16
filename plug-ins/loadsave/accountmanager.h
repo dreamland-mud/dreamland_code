@@ -83,6 +83,24 @@ public:
     static bool attachChar(const DLString &id, const DLString &charName);
     static bool detachChar(const DLString &charName);
 
+    // --- attach-at-creation (Phase 4 / nanny V2) -------------------------------
+    // A character created in the nanny is not on disk yet, so attachChar (which keys
+    // off the in-RAM playerbase index) cannot link it at redeem time. Instead the
+    // redeem surface records the VERIFIED identity against the creating character's
+    // name here (in RAM, reboot-cleared like a linking code); the nanny calls
+    // commitPendingAttach once the character is saved and in allList. No account is
+    // created until commit, so an abandoned creation leaves nothing behind -- the
+    // droplink path drops the entry via clearPendingAttach.
+    static void recordPendingAttach(const DLString &charName, const DLString &type,
+                                    const DLString &value, const DLString &display);
+    // Apply a recorded pending attach: find-or-create the identity's account, attach
+    // the now-saved character, mirror a messenger id down to it. One-shot -- the entry
+    // is cleared whether or not the attach below succeeds. Returns true only when a
+    // pending entry existed AND the character was attached.
+    static bool commitPendingAttach(const DLString &charName);
+    // Drop a pending attach without applying it (creation abandoned / droplink).
+    static void clearPendingAttach(const DLString &charName);
+
     // Write one account-wide config key and persist. Used by the `config` command's
     // write-through when a linked character changes an account-wide option.
     static bool setConfigKey(const DLString &id, const DLString &key, const Json::Value &value);
@@ -121,11 +139,20 @@ private:
     static DLString identityKey(const DLString &type, const DLString &value);
     static void indexIdentities(const DLString &id, const Json::Value &account);
 
+    // A verified identity held for a character still being created (see the
+    // attach-at-creation block above). In-RAM only, keyed by capitalize()d name.
+    struct PendingAttach {
+        DLString type;
+        DLString value;
+        DLString display;
+    };
+
     static const DLString ACCOUNT_TABLE;
     static const DLString ACCOUNT_EXT;
 
     static std::map<DLString, Json::Value> accounts;    // id -> account record
     static std::map<DLString, DLString> identityIndex;  // "type\tvalue" -> id
+    static std::map<DLString, PendingAttach> pendingAttach; // creating char -> identity
 };
 
 #endif
