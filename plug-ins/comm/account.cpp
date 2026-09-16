@@ -202,27 +202,40 @@ static void account_status(PCharacter *ch)
     }
 }
 
-// Adopt a char's bot-VERIFIED discord.id straight into an account (choice A of the
-// Discord flow): no code, no round-trip, because the /link servlet already proved the
-// id. Returns false only on a real create/attach failure (already-linked is handled by
-// the caller). Shared by `account discord` and the `account link discord` alias.
+// Adopt a char's bot-VERIFIED discord.id straight into an account (no code, no round-
+// trip: the /link servlet already proved the id). Three cases, all folded through
+// AccountManager::setMessengerIdentity so the id mirrors to every member character:
+//   - unlinked char, id unknown  -> create an account from it, attach;
+//   - unlinked char, id on an account -> join that account;
+//   - linked char -> add the verified id to the char's own account as an identity.
+// Returns false only on a real create/attach failure.
 static bool account_adopt_discord(PCharacter *ch, const DLString &discordId, const DLString &username)
 {
+    DLString current = AccountManager::accountOf(ch->getName());
+    bool wasLinked = !current.empty();
     bool created = false;
-    DLString id = AccountManager::findByIdentity("discord", discordId);
-    if (id.empty()) {
-        id = AccountManager::create("discord", discordId, username);
+    DLString id;
+
+    if (!wasLinked) {
+        id = AccountManager::findByIdentity("discord", discordId);
         if (id.empty()) {
+            id = AccountManager::create("discord", discordId, username);
+            if (id.empty()) {
+                ch->pecho(_("Не удалось создать аккаунт. Попробуй позже."));
+                return false;
+            }
+            created = true;
+        }
+        if (!AccountManager::attachChar(id, ch->getName())) {
             ch->pecho(_("Не удалось создать аккаунт. Попробуй позже."));
             return false;
         }
-        created = true;
+    } else {
+        id = current;
     }
 
-    if (!AccountManager::attachChar(id, ch->getName())) {
-        ch->pecho(_("Не удалось создать аккаунт. Попробуй позже."));
-        return false;
-    }
+    // Fold the verified id onto the account and mirror it to every member character.
+    AccountManager::setMessengerIdentity(id, "discord", discordId, username);
 
     Json::Value f;
     f["char"] = ch->getName();
@@ -235,8 +248,11 @@ static bool account_adopt_discord(PCharacter *ch, const DLString &discordId, con
     if (created)
         ch->pecho(_("Аккаунт {W%1$s{x создан по твоему Discord ({W%2$s{x)."),
                   title.c_str(), AccountManager::echoSafe(username).c_str());
-    else
+    else if (!wasLinked)
         ch->pecho(_("Персонаж добавлен к аккаунту {W%1$s{x."), title.c_str());
+    else
+        ch->pecho(_("Discord {W%1$s{x привязан к аккаунту {W%2$s{x."),
+                  AccountManager::echoSafe(username).c_str(), title.c_str());
     return true;
 }
 
@@ -250,13 +266,32 @@ static void account_link(PCharacter *ch)
         ch->pecho(_("Привязка аккаунтов скоро откроется. Немного терпения."));
         return;
     }
+
+    // Auto-adopt any channel already VERIFIED on this character (Discord today), no
+    // code: possession of the bot-set discord attribute is the proof. Telegram has no
+    // verified id on an unlinked char (config telegram is a self-typed handle), so it
+    // stays code-only below.
+    bool adopted = false;
+    DLString discordId, discordUser;
+    if (char_verified_discord(ch, discordId, discordUser)) {
+        DLString before = AccountManager::accountOf(ch->getName());
+        DLString owner = AccountManager::findByIdentity("discord", discordId);
+        // Unlinked -> create/join; linked -> add only if the id is unclaimed anywhere.
+        // Never a silent cross-account move on a bare link.
+        if (before.empty() || owner.empty())
+            adopted = account_adopt_discord(ch, discordId, discordUser);
+    }
+
     DLString current = AccountManager::accountOf(ch->getName());
     DLString code = LinkingCode::mint(ch->getName(), false);
     Json::Value f;
     f["char"] = ch->getName();
     AccountAudit::record("code_mint", f);
 
-    if (!current.empty())
+    // A code to add the OTHER channels (Telegram, or a Discord on a different account).
+    if (adopted)
+        ch->pecho(_("Чтобы добавить ещё один способ входа, твой код: {W%1$s{x"), code.c_str());
+    else if (!current.empty())
         ch->pecho(_("Добавить способ входа к аккаунту {W%1$s{x. Твой код: {W%2$s{x"),
                   AccountManager::titleOf(current).c_str(), code.c_str());
     else

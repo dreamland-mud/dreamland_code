@@ -725,6 +725,16 @@ SERVLET_HANDLE(cmd_link, "/link")
     set_json_attribute(player, "discord", discord);
     PCharacterManager::saveMemory(player);
 
+    // Fold into the account: if this character is on one, the verified id becomes an
+    // account identity and mirrors onto every member character (setMessengerIdentity) --
+    // so a bot /link folds the same as `account link`, and the who-list sees every
+    // account character. A character with no account yet stays a per-char bridge link;
+    // it folds when the player runs `account link`. The fresh status set above is kept
+    // (applyMessengersToChar preserves an existing status on the mirror).
+    DLString acct = AccountManager::accountOf(player->getName());
+    if (!acct.empty())
+        AccountManager::setMessengerIdentity(acct, "discord", discordId, discordUsername);
+
     servlet_response_200(response, "Link successful");
 }
 

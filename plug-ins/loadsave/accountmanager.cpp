@@ -474,6 +474,142 @@ bool AccountManager::setConfigKey(const DLString &id, const DLString &key, const
     return saveAccount(id);
 }
 
+bool AccountManager::removeIdentity(const DLString &type, const DLString &value)
+{
+    DLString owner = findByIdentity(type, value);
+    if (owner.empty())
+        return false;
+
+    map<DLString, Json::Value>::iterator a = accounts.find(owner);
+    if (a == accounts.end())
+        return false;
+
+    Json::Value &ids = a->second["identities"];
+    if (ids.isArray()) {
+        Json::Value kept(Json::arrayValue);
+        for (Json::Value::const_iterator i = ids.begin(); i != ids.end(); ++i) {
+            if ((*i).isObject()
+                && (*i)["type"].asString() == type
+                && (*i)["value"].asString() == value)
+                continue;
+            kept.append(*i);
+        }
+        ids = kept;
+    }
+    identityIndex.erase(identityKey(type, value));
+    return saveAccount(owner);
+}
+
+// Write the account's telegram/discord identities onto one character's own attributes,
+// the shape the bridge / who-list already read. Discord stays a json blob {id, username,
+// status} (a live status the /update bridge set is preserved); telegram becomes the raw
+// numeric id string (servlet_find_player looks telegram up by that id). No save here.
+void AccountManager::applyMessengersToChar(PCMemoryInterface *pc, const Json::Value &account)
+{
+    if (pc == 0)
+        return;
+
+    DLString discordId, discordName, telegramId;
+    const Json::Value &identities = account["identities"];
+    for (Json::Value::const_iterator i = identities.begin(); i != identities.end(); ++i) {
+        if (!(*i).isObject())
+            continue;
+        DLString t = (*i)["type"].asString();
+        if (t == "discord") {
+            discordId = (*i)["value"].asString();
+            discordName = (*i)["display"].asString();
+        } else if (t == "telegram") {
+            telegramId = (*i)["value"].asString();
+        }
+    }
+
+    if (!discordId.empty()) {
+        Json::Value d;
+        get_json_attribute(pc, "discord", d);   // keep an existing live status if any
+        if (!d.isObject())                      // a corrupt/absent attr must not throw
+            d = Json::Value(Json::objectValue); // on operator[] off the set-time path
+        d["id"] = discordId;
+        d["username"] = discordName;
+        if (!d.isMember("status"))
+            d["status"] = "offline";
+        set_json_attribute(pc, "discord", d);
+    }
+
+    if (!telegramId.empty())
+        pc->getAttributes().getAttr<XMLStringAttribute>("telegram")->setValue(telegramId);
+}
+
+void AccountManager::mirrorMessengersToAccountChars(const DLString &id)
+{
+    Json::Value account = get(id);
+    if (!account.isObject())
+        return;
+
+    for (const DLString &name : charsOf(id)) {
+        DLString n = name;
+        PCMemoryInterface *pc = PCharacterManager::find(n.capitalize());
+        if (pc == 0)
+            continue;
+        applyMessengersToChar(pc, account);
+        PCharacterManager::saveMemory(pc);
+    }
+}
+
+void AccountManager::setMessengerIdentity(const DLString &id, const DLString &type,
+                                          const DLString &value, const DLString &display)
+{
+    map<DLString, Json::Value>::iterator a = accounts.find(id);
+    if (a == accounts.end())
+        return;
+
+    DLString prevOwner = findByIdentity(type, value);
+    if (prevOwner == id) {
+        // Already ours: refresh the display (a username / @handle changes over time).
+        Json::Value &ids = a->second["identities"];
+        for (Json::Value::iterator i = ids.begin(); i != ids.end(); ++i) {
+            if ((*i).isObject()
+                && (*i)["type"].asString() == type
+                && (*i)["value"].asString() == value) {
+                (*i)["display"] = display;
+                break;
+            }
+        }
+        saveAccount(id);
+    } else {
+        // On another account (or none): move it here -- one id per account.
+        if (!prevOwner.empty())
+            removeIdentity(type, value);
+        if (!addIdentity(id, type, value, display))
+            return;
+    }
+
+    // Mirror onto this account's characters (applyMessengersToChar is set-only).
+    mirrorMessengersToAccountChars(id);
+
+    // One id, one account: strip this messenger id off every character that is NOT a
+    // member of this account -- a char on another account (a move), and, for discord,
+    // a legacy char carrying the id from the old per-char /link with no account (this
+    // is what account_bind_char_config used to do). Telegram numeric ids only ever
+    // arrive through this fold, so the previous owner's chars are the whole foreign set.
+    if (type == "discord") {
+        for (PCMemoryInterface *alt : find_players_by_json_attribute("discord", "id", value)) {
+            if (accountOf(alt->getName()) != id) {
+                alt->getAttributes().eraseAttribute("discord");
+                PCharacterManager::saveMemory(alt);
+            }
+        }
+    } else if (!prevOwner.empty() && prevOwner != id) {
+        for (const DLString &name : charsOf(prevOwner)) {
+            DLString n = name;
+            PCMemoryInterface *pc = PCharacterManager::find(n.capitalize());
+            if (pc == 0)
+                continue;
+            pc->getAttributes().eraseAttribute(type);
+            PCharacterManager::saveMemory(pc);
+        }
+    }
+}
+
 // Map ONE account-wide config key onto a character. Keys mirror the config option
 // EN names (screenreader / fightspam / skillspam / noweaponspam), plus the special
 // tri-state "color" and the "lang" attribute. An unknown key is ignored, so a newer
@@ -532,8 +668,8 @@ void AccountManager::applyConfigToChar(PCharacter *ch)
     if (id.empty())
         return;
 
-    Json::Value cfg = getConfig(id);
-    if (!cfg.isObject())
+    Json::Value account = get(id);
+    if (!account.isObject())
         return;
 
     // A hand-edited account file could hold a wrong-typed value (asBool/asString on
@@ -541,8 +677,14 @@ void AccountManager::applyConfigToChar(PCharacter *ch)
     // std::exception catch, so guard here -- a corrupt file costs a log line, not the
     // boot. Same defensive stance as load() (see the malformed-file note there).
     try {
-        for (Json::Value::const_iterator i = cfg.begin(); i != cfg.end(); ++i)
-            applyConfigKeyToChar(ch, i.key().asString(), *i);
+        const Json::Value &cfg = account["config"];
+        if (cfg.isObject())
+            for (Json::Value::const_iterator i = cfg.begin(); i != cfg.end(); ++i)
+                applyConfigKeyToChar(ch, i.key().asString(), *i);
+
+        // Fold-in: mirror the account's messenger identities onto the entering char,
+        // so a char attached after the last identity change still carries it. Set-only.
+        applyMessengersToChar(ch, account);
     } catch (const std::exception &e) {
         LogStream::sendError() << "Accounts: bad config value applying to "
             << ch->getName() << ": " << e.what() << endl;
