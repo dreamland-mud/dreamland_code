@@ -602,9 +602,15 @@ static void show_char_to_char_0( Character *victim, Character *ch )
         pVict = victim->getPC( );
     }
 
+    // Remember where the affect/aura/status prefixes begin, so we can put a
+    // space between them and the name below. Without it "(Sanctuary)" glued
+    // straight onto the long, and the web client, having no break point there,
+    // wrapped in the middle of a marker instead.
+    std::streamoff prefixStart = buf.tellp( );
+
     if (nVict && nVict->behavior)
         nVict->behavior->show( ch, buf );
-    
+
     if (pVict) {
         show_char_pk_flags( pVict, ch, buf );
 
@@ -686,7 +692,12 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     if (victim->isAffected(gsn_stardust))
         buf << fmt(ch, _("({WЗ{wве{Wзд{wная {WП{wыль{x)"));
 
-    if (nVict) 
+    // If any prefix marker was shown, separate it from the name/long with a
+    // space so the line can wrap between the markers and the name.
+    if (buf.tellp( ) > prefixStart)
+        buf << " ";
+
+    if (nVict)
         if (can_show_long_descr(nVict)) {
             ostringstream longd;
             lang_t lang = Player::lang(ch);
