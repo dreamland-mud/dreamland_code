@@ -87,10 +87,33 @@ public:
     // write-through when a linked character changes an account-wide option.
     static bool setConfigKey(const DLString &id, const DLString &key, const Json::Value &value);
 
+    // --- messenger identities folded into the account (telegram/discord) ---
+    // The account owns a verified messenger identity (a numeric id proven by the bot
+    // /link, the /attach bot, or the web widget). setMessengerIdentity adds-or-moves
+    // that identity onto the account (one id per account -- an id on another account is
+    // moved, and the previous owner's characters lose their mirror) then mirrors it down
+    // to EVERY member character's own attribute, the shape the who-list / bot bridge
+    // already read: discord -> json {id,username,status}; telegram -> the numeric id
+    // string (servlet_find_player resolves telegram by that id). display is username /
+    // @handle, shown but never trusted. A self-typed, UNVERIFIED handle must never reach
+    // this -- it is not a login identity. removeIdentity strips an identity from whatever
+    // account holds it (index + record + disk).
+    static void setMessengerIdentity(const DLString &id, const DLString &type,
+                                     const DLString &value, const DLString &display);
+    static bool removeIdentity(const DLString &type, const DLString &value);
+
 private:
     // Apply a single account-wide config key to a character (maps the key to the
     // right flag/attribute). Shared by applyConfigToChar and propagateConfigKey.
     static void applyConfigKeyToChar(PCharacter *ch, const DLString &key, const Json::Value &value);
+
+    // Mirror the account's telegram/discord identities onto one character's own
+    // attributes (the bridge/who-list read those, online and offline). Preserves a live
+    // discord status. Does not persist -- the caller saves.
+    static void applyMessengersToChar(PCMemoryInterface *pc, const Json::Value &account);
+    // Re-mirror the account's messenger identities onto every member character and
+    // persist each -- so a just-set/moved identity reaches offline pfiles too.
+    static void mirrorMessengersToAccountChars(const DLString &id);
 
     static DLString mintId();
     static DLString mintTitle();
