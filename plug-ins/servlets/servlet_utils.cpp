@@ -22,6 +22,13 @@ bool servlet_parse_params(HttpRequest &request, HttpResponse &response, Json::Va
         if (!reader.parse(request.body, params))
             throw Exception("Cannot parse JSON body");
 
+        // Reject a non-object JSON root ([], "x", 5, true). Every servlet indexes params as
+        // an object (params["bottype"], params["args"]...), and jsoncpp's operator[] on a
+        // non-object root throws Json::LogicError. Member-level type errors (e.g. a non-string
+        // "bottype") can still throw downstream; those are caught at the ServletManager boundary.
+        if (!params.isObject())
+            throw Exception("JSON body must be an object");
+
         return true;
 
     } catch (const std::exception &e) {
