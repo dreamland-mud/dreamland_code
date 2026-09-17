@@ -157,6 +157,16 @@ bool get_json_attribute(PCMemoryInterface *player, const DLString &attrName, Jso
         return false;
     }
 
+    // Every caller treats the result as a JSON object and indexes it with the mutable
+    // operator[], which throws on a non-object. A bare string/number attribute (e.g. a
+    // numeric telegram id stored as a plain XMLStringAttribute, botType-driven /update)
+    // parses as valid non-object JSON, so report "no object here" and hand back a clean
+    // null -- null auto-converts to an object on the next operator[], a scalar would throw.
+    if (!attrValue.isObject()) {
+        attrValue = Json::Value();
+        return false;
+    }
+
     return true;
 }
 
