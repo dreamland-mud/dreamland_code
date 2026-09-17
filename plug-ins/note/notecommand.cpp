@@ -527,15 +527,20 @@ bool NoteCommand::doPost( PCharacter *ch, XMLAttributeNoteData::Pointer attr )
     // The recipient is stripped too: it prints raw in the "To:" line of every
     // reader's copy, and a junk-plus-tag token (e.g. "все {hc'cmd'Label") still
     // delivers via the "все"/"all" token while carrying a clickable command.
-    DLString noteText = note.getText( );
-    mudtags_strip_web( noteText, ch );
-    note.setText( noteText );
-    DLString noteSubject = note.getSubject( );
-    mudtags_strip_web( noteSubject, ch );
-    note.setSubject( noteSubject );
-    DLString noteRecipient = note.getRecipient( );
-    mudtags_strip_web( noteRecipient, ch );
-    note.setRecipient( noteRecipient );
+    // Immortal authors are trusted: their notes -- above all the god board threads
+    // (change/news/questnote/penalty) -- keep {hh/{hc/{hl so announcements can link
+    // help, commands and URLs. The anti-injection strip is only for mortal mail.
+    if (!ch->is_immortal( )) {
+        DLString noteText = note.getText( );
+        mudtags_strip_web( noteText, ch );
+        note.setText( noteText );
+        DLString noteSubject = note.getSubject( );
+        mudtags_strip_web( noteSubject, ch );
+        note.setSubject( noteSubject );
+        DLString noteRecipient = note.getRecipient( );
+        mudtags_strip_web( noteRecipient, ch );
+        note.setRecipient( noteRecipient );
+    }
 
     note.godsSeeAlways = thread->godsSeeAlways;
     thread->attach( &note );
