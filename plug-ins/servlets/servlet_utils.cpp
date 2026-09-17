@@ -114,7 +114,37 @@ PCMemoryInterface * servlet_find_player(Json::Value &params, HttpResponse &respo
     }        
 
     return players.front();
-}   
+}
+
+/**
+ * Like servlet_find_player, but when several characters share the same bot id
+ * (account linking puts one telegram/discord id on all of a person's characters)
+ * return the HIGHEST-TRUST match rather than the first by iteration. The admin
+ * servlet uses this so a shared telegram id resolves to the caller's immortal, not
+ * whichever mortal happens to sort first. No response side effects -- the caller
+ * decides how to reject; returns 0 when nothing matches.
+ */
+PCMemoryInterface * servlet_find_player_best_trust(Json::Value &params)
+{
+    DLString myId = params["args"]["id"].asString();
+    if (myId.empty())
+        return 0;
+
+    DLString botType = params["bottype"].asString();
+    botType.toLower();
+
+    list<PCMemoryInterface *> matches = find_players_by_attribute(botType, myId);
+    list<PCMemoryInterface *> jsonMatches = find_players_by_json_attribute(botType, "id", myId);
+    matches.insert(matches.end(), jsonMatches.begin(), jsonMatches.end());
+
+    PCMemoryInterface *best = 0;
+    for (PCMemoryInterface *player: matches) {
+        if (!best || player->get_trust() > best->get_trust())
+            best = player;
+    }
+
+    return best;
+}
 
 // Grab player name or just use the provided Telegram id.
 DLString servlet_find_username(Json::Value &params, HttpResponse &response)

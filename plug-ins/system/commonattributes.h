@@ -111,5 +111,6 @@ void set_map_attribute_value(PCMemoryInterface *player, const DLString &attrName
 bool get_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue);
 void set_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue);
 PCMemoryInterface * find_player_by_attribute(const DLString &attrName, const DLString &attrValue);
+list<PCMemoryInterface *> find_players_by_attribute(const DLString &attrName, const DLString &attrValue);
 list<PCMemoryInterface *> find_players_by_json_attribute(const DLString &attrName, const DLString &name, const DLString &value);
 #endif
