@@ -198,6 +198,25 @@ PCMemoryInterface * find_player_by_attribute(const DLString &attrName, const DLS
     return 0;
 }
 
+// Same match as find_player_by_attribute, but returns EVERY player carrying the
+// attribute value, not just the first. Account linking can put one telegram/discord
+// id on several of a person's characters, and a caller that must disambiguate (admin
+// auth picks the highest-trust one) needs the whole set, not iteration order.
+list<PCMemoryInterface *> find_players_by_attribute(const DLString &attrName, const DLString &attrValue)
+{
+    list<PCMemoryInterface *> result;
+    const PCharacterMemoryList &pcm = PCharacterManager::getPCM();
+
+    for (const auto &keyValue: pcm) {
+        PCMemoryInterface *player = keyValue.second;
+        XMLStringAttribute::Pointer attr = player->getAttributes().findAttr<XMLStringAttribute>(attrName);
+        if (attr && attr->getValue() == attrValue)
+            result.push_back(player);
+    }
+
+    return result;
+}
+
 /**
  * Locate first player memory with a JSON attribute with given name:value pair.
  */

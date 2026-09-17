@@ -38,6 +38,16 @@ SERVLET_HANDLE(cmd_admin, "/admin")
     if (!player)
         return;
 
+    // Account linking can put one telegram/discord id on several of a person's
+    // characters, and servlet_find_player returns the first by iteration -- which
+    // may be a low-trust mortal. Admin must resolve to the caller's highest-trust
+    // character, so on an under-trust first hit, retry preferring the most trusted.
+    if (player->get_trust() < 110) {
+        PCMemoryInterface *best = servlet_find_player_best_trust(params);
+        if (best)
+            player = best;
+    }
+
     if (player->get_trust() < 110) {
         servlet_response_404(response, "Command not found");
         return;
