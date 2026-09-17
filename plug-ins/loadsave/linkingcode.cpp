@@ -13,9 +13,11 @@ using namespace std;
 // for a player to switch to a bot/browser and paste it.
 const int LinkingCode::TTL_SECONDS = 600;
 
-// Phase 3 flips this. See the header note -- keep it false until a redeem surface
-// exists, or `account link` breaks the "ships dark" property.
-static const bool ACCOUNTS_MINTING_ENABLED = false;
+// Go-public flip: the redeem surfaces are live (Telegram /attach, Discord /link,
+// web OAuth), so minting is enabled. `account link` and the nanny V2 account step
+// now mint real codes for everyone. (The account.cpp !is_immortal() minting-gate
+// bypasses are dead code once this is true -- harmless, left for a cleanup pass.)
+static const bool ACCOUNTS_MINTING_ENABLED = true;
 
 map<DLString, LinkingCode::Entry> LinkingCode::codes;
 
