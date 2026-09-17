@@ -384,8 +384,9 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
 // read from the offline memory index (no pfile load -- allList is in RAM from
 // boot). Class ships as {en,ru,ua} so the language-switchable login panel can label
 // it in the player's chosen tongue. A listed name with no loadable memory (a
-// deleted or unreadable profile) degrades to the bare name.
-static Json::Value account_roster_entry(const DLString &name)
+// deleted or unreadable profile) degrades to the bare name. Shared with account.cpp
+// (the account_chars rpc) so the in-game settings roster matches the login roster.
+Json::Value account_roster_entry(const DLString &name)
 {
     Json::Value entry;
     entry["name"] = name.c_str();

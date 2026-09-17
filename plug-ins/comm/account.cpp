@@ -36,6 +36,8 @@
 
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
+// Defined in accountservlet.cpp: {name, level, class:{en,ru,ua}} for one character.
+Json::Value account_roster_entry( const DLString &name );
 
 // Per-TU static references the account-switch guards need, same as quit.cpp:97-100
 // (GSN/CLAN create file-scope statics; including the headers gives only the macros).
@@ -891,7 +893,9 @@ CMDRUN( account )
  * do_account/account_status: current character = the one in the world, chars =
  * charsOf, no online detection (the `account switch` command's own guard refuses
  * a same-account character that is already online, same as at the keyboard).
- * Reply shape (mudjs AccountPage.jsx): { current, account, title, chars:[{name}] }.
+ * Reply shape (mudjs AccountPage.jsx): { current, account, title,
+ * chars:[{name, level, class:{en,ru,ua}}] } -- same roster entry as the login
+ * panel, so the settings roster can draw the class badge too.
  *---------------------------------------------------------------------------*/
 RPCRUN(account_chars)
 {
@@ -938,11 +942,8 @@ RPCRUN(account_chars)
             data["identities"].append(ident);
         }
 
-        for (const DLString &name : AccountManager::charsOf(id)) {
-            Json::Value entry;
-            entry["name"] = name.c_str( );
-            data["chars"].append(entry);
-        }
+        for (const DLString &name : AccountManager::charsOf(id))
+            data["chars"].append(account_roster_entry(name));
     }
 
     ch->desc->writeWSCommand(msg);
