@@ -27,6 +27,7 @@
 #include "pcharactermanager.h"
 #include "accountmanager.h"
 #include "accountaudit.h"
+#include "linkingcode.h"
 #include "room.h"
 #include "object.h"
 #include "configurable.h"
@@ -531,6 +532,35 @@ NMI_INVOKE( NannyHandler, commitPendingAttach, "" )
     }
 
     return attached ? DLString( "ok" ) : DLString::emptyString;
+}
+
+/*
+ * attach-at-creation code mint (nanny V2 / Phase 4). The Fenia nanny's account
+ * step calls this to hand a still-in-creation character a linking code marked
+ * pendingCreation: a redeem parks the verified identity against the creating
+ * name (recordPendingAttach), and commitPendingAttach applies it after the
+ * character saves. Returns "DL-XXXXX", or "" when minting is not yet open
+ * (LinkingCode::mintingEnabled -- the accounts half of the two-switch cutover,
+ * flipped after the nanny soak). Gating here keeps the account step honest: the
+ * nanny degrades an empty return to a "link later with the account command"
+ * nudge instead of showing a code the redeem surface will refuse. Mirrors the
+ * mintingEnabled/immortal gate in account.cpp account_link.
+ */
+NMI_INVOKE( NannyHandler, mintPendingLink, "" )
+{
+    PCharacter *ch = getPlayer( args );
+
+    if (!LinkingCode::mintingEnabled( ) && !ch->is_immortal( ))
+        return DLString::emptyString;
+
+    DLString code = LinkingCode::mint( ch->getName( ), true );
+
+    Json::Value fields;
+    fields["char"] = ch->getName( );
+    fields["channel"] = "nanny";
+    AccountAudit::record( "code_mint_pending", fields );
+
+    return code;
 }
 
 /*

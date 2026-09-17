@@ -23,6 +23,7 @@
 #include "exceptiondbio.h"
 #include "exceptiondbioeof.h"
 #include "logstream.h"
+#include "accountaudit.h"
 
 using namespace std;
 
@@ -434,12 +435,32 @@ bool AccountManager::commitPendingAttach(const DLString &charName)
     DLString id = findByIdentity(p.type, p.value);
     if (id.empty()) {
         id = create(p.type, p.value, p.display);
-        if (id.empty())
+        if (id.empty()) {
+            // A verified redeem was parked but the account never came to be, so
+            // the identity is dropped on the floor. Was silent (F1); the player
+            // sees creation succeed with no link and no way to know why. Warn +
+            // audit so this is diagnosable before the minting flip.
+            LogStream::sendWarning() << "Accounts: commitPendingAttach create() failed for "
+                << name << " (" << p.type << ":" << p.value << ")" << endl;
+            Json::Value fields;
+            fields["char"] = name;
+            fields["type"] = p.type;
+            fields["stage"] = "create";
+            AccountAudit::record("pending_attach_failed", fields);
             return false;
+        }
     }
 
-    if (!attachChar(id, name))
+    if (!attachChar(id, name)) {
+        LogStream::sendWarning() << "Accounts: commitPendingAttach attachChar failed for "
+            << name << " -> account " << id << endl;
+        Json::Value fields;
+        fields["char"] = name;
+        fields["account"] = id;
+        fields["stage"] = "attach";
+        AccountAudit::record("pending_attach_failed", fields);
         return false;
+    }
 
     // Fold a messenger identity down onto the character (the shape the who-list /
     // bot bridge read); email has no char-side mirror. Mirrors account_redeem.
