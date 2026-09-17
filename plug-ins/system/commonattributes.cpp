@@ -207,6 +207,14 @@ list<PCMemoryInterface *> find_players_by_json_attribute(const DLString &attrNam
         if (!reader.parse(attr->getValue(), attrValue))
             continue;
 
+        // A bare-string/number attribute (e.g. a numeric telegram id stored as a plain
+        // XMLStringAttribute) parses as valid non-object JSON. Indexing it with the mutable
+        // operator[] would throw Json::LogicError ("resolveReference requires objectValue"),
+        // aborting the whole scan and every /api/admin call. Skip non-objects; they can never
+        // hold a name:value pair anyway.
+        if (!attrValue.isObject())
+            continue;
+
         if (attrValue[name].asString() == value)
             result.push_back(player);
     }
