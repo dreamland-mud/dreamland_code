@@ -47,7 +47,11 @@ bool Character::can_see( Room *pRoomIndex ) const
                 && !is_immortal() )
                 return false;
 
+        // A newbies-only room hides itself from over-level PLAYERS, but NPCs
+        // placed in (or tracking within) such a zone -- e.g. the Galeon quest
+        // harpy -- must still see and move through it.
         if ( IS_SET(pRoomIndex->room_flags,ROOM_NEWBIES_ONLY)
+                && !is_npc()
                 && getRealLevel( ) > PK_MIN_LEVEL && !is_immortal())
                 return false;
         
