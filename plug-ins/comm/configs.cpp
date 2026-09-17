@@ -815,7 +815,15 @@ SERVLET_HANDLE(cmd_update_one, "/update/one")
 
     Json::Value discord;
     DLString botType = DLString(params["bottype"].asString()).toLower();
-    get_json_attribute(player, botType, discord);
+
+    // Only write status back onto an existing object attribute. A player reachable by discord
+    // id always has one, so this never no-ops the real Discord flow; but a bare-string attr
+    // (e.g. a raw telegram id) returns false, and writing through it would clobber the raw id
+    // with a status blob and orphan the player from every id lookup. Mirrors cmd_update_all.
+    if (!get_json_attribute(player, botType, discord)) {
+        servlet_response_200(response, "No status object for this player");
+        return;
+    }
 
     discord["username"] = discordUsername;
     discord["status"] = discordStatus;
