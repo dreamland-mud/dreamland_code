@@ -90,14 +90,20 @@ static const int CONFIG_WEB_BURST  = 8;  // clicks in a row, from full
 static const int CONFIG_WEB_REFILL = 2;  // tokens gained per second
 static const int CONFIG_WEB_SAVES  = 4;  // what an option that writes the pfile costs
 
-/** What one change of this option costs. */
-static int config_web_cost(const DLString &key)
+/** Does a change of this option write the pfile there and then? */
+static bool config_web_writes(const DLString &key)
 {
-    return (key == "telegram" || key == "discord") ? CONFIG_WEB_SAVES : 1;
+    return key == "telegram" || key == "discord";
 }
 
-/** Take the price of this change out of the character's bucket, or refuse. */
-static bool config_web_afford(const DLString &name, const DLString &key)
+/** Take a price out of the character's bucket, or refuse.
+ *
+ *  Handling a frame costs one, whatever comes of it. The three that a pfile
+ *  write costs are charged AFTERWARDS, and only when the change was really
+ *  applied: a player mistyping a Telegram handle four times writes nothing, and
+ *  charging them as though they had left the fourth attempt refused for a
+ *  reason that had not happened. */
+static bool config_web_afford(const DLString &name, int price)
 {
     time_t now = time(0);
     ConfigWebBucket &bucket = config_web_bucket[name];
@@ -113,12 +119,21 @@ static bool config_web_afford(const DLString &name, const DLString &key)
         bucket.at = now;
     }
 
-    int price = config_web_cost(key);
     if (bucket.tokens < price)
         return false;
 
     bucket.tokens -= price;
     return true;
+}
+
+/** The rest of the price, once a change has actually been written. Never
+ *  refuses: the write has happened, and the bucket may go empty. */
+static void config_web_spend(const DLString &name, int price)
+{
+    ConfigWebBucket &bucket = config_web_bucket[name];
+    bucket.tokens -= price;
+    if (bucket.tokens < 0)
+        bucket.tokens = 0;
 }
 
 /** Is this character actually in the world? Between the greeting and the first
@@ -383,20 +398,26 @@ RPCRUN(config_set)
     if (!pch || !config_web_playing(ch))
         return;
 
-    if (args.size() < 2) {
-        LogStream::sendWarning() << "config_set: " << args.size() << " argument(s)" << endl;
-        config_web_result(ch, "", false, Json::Value::null, "args", DLString::emptyString);
-        return;
-    }
+    // The bucket is consulted before anything else, including the shape of the
+    // frame: a malformed one used to write a log line every time it arrived, so
+    // a client could fill the log as fast as it could send. Handling any frame
+    // costs a token, whatever comes of it.
+    const DLString &key = args.empty() ? DLString::emptyString : args[0];
 
-    const DLString &key = args[0];
-    const DLString &value = args[1];
-
-    if (!config_web_afford(pch->getName(), key)) {
+    if (!config_web_afford(pch->getName(), 1)) {
         config_web_result(ch, config_web_safe_key(key), false, Json::Value::null,
                           "throttled", DLString::emptyString);
         return;
     }
+
+    if (args.size() < 2) {
+        LogStream::sendWarning() << "config_set: " << args.size() << " argument(s)" << endl;
+        config_web_result(ch, config_web_safe_key(key), false, Json::Value::null,
+                          "args", DLString::emptyString);
+        return;
+    }
+
+    const DLString &value = args[1];
 
     // What this value is allowed to be is a matter of world data: the type, the
     // length, the range and the words all live in config/settings.json.
@@ -439,6 +460,11 @@ RPCRUN(config_set)
                           "unknown", DLString::emptyString);
         return;
     }
+
+    // The pfile has just been written for these two, and that is what the
+    // bucket is really guarding.
+    if (config_web_writes(key))
+        config_web_spend(pch->getName(), CONFIG_WEB_SAVES - 1);
 
     config_web_result(ch, key, true, stored, DLString::emptyString, DLString::emptyString);
 }
