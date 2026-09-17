@@ -3019,6 +3019,11 @@ struct GAWeights {
     // candidate's slot). A CANDIDATE re-granting one scores it 0 in ga_affectFlagValue.
     // Set PER CANDIDATE before scoring (slot-excluded); stays 0 for the worn baseline.
     bitstring_t heldFlags = 0;
+    // Score value of one swing of the char's currently-wielded weapon (weaponWeight*eff),
+    // set once in gearAdvice. A NON-weapon item granting extra melee attacks (a belt, a
+    // ring) scores its combathits on this -- those swings fire the worn weapon, so they use
+    // the same currency a weapon's own combathits do. -1 = no usable weapon wielded.
+    double curWeaponSwing = -1.0;
 };
 
 struct GACand {
@@ -3111,20 +3116,28 @@ double spell_proc_tier_value( const DLString &spellName, int level );
 //    (spell_proc_tier_value, discounted by _save_factor); spells whose worth does
 //    not follow their tier carry an explicit override in spell_combat_value.json.
 //  <props>combathits</props> [{one_hit,multi_hit,chance}] -- EXTRA melee attacks
-//    the item's onFight fires (ch.one_hit / ch.multi_hit). Each extra swing is
-//    worth _hit_value (a reference melee hit at the ref level -- miss- and
-//    on-hit-rider-inclusive, since every extra swing also re-triggers weapon
-//    element/procs); a multi_hit is a whole extra round, worth _round_attacks swings.
+//    the item's onFight fires (ch.one_hit / ch.multi_hit). For a WIELDABLE weapon each
+//    extra swing is worth one base swing of it (weaponWeight * dice*skill, passed in as
+//    weaponSwing) -- already score units, so NOT _global- or level-scaled. A non-weapon
+//    grant (a belt, a ring) is scored on the wearer's current weapon; with no usable
+//    weapon it falls back to _hit_value (a reference hit at the ref level, _global- and
+//    level-scaled like a spell). A multi_hit is a whole extra round, _round_attacks swings.
 // Returns 0 for an item that declares neither -- ga_score then keeps the flat +50.
 // COMBAT_PROC_SCORING.md.
-static double ga_procScore( obj_index_data *pObj )
+static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0 )
 {
     // isMember guard FIRST on every prop read: pObj is non-const, so
     // pObj->props["x"] would INSERT a null member into the prototype on every
     // scored item (jsoncpp non-const operator[]), polluting props world-wide and
     // drifting to disk on the next autosave. Read only after isMember confirms it.
+    // weaponSwing = the SCORE value of one full swing of THIS weapon (weaponWeight*eff),
+    // supplied by the caller for a wieldable weapon; each extra combathits swing is valued as
+    // one base swing (a heuristic, see the combathits loop), already in final score units and
+    // NOT re-scaled by _global. -1 = no known usable weapon (a non-weapon grant, or an
+    // unusable weapon) -> combathits fall back to the flat level-referenced hit. Spell casts
+    // and the flat fallback are damage -> _global + level-scaled; a real swing is neither.
     int ref = (int)spell_combat_level_ref( );
-    double raw = 0;
+    double rawCast = 0, rawFlatHits = 0, swingHits = 0;
 
     // Spells cast in combat.
     if (pObj->props.isMember( "combatcast" )) {
@@ -3150,7 +3163,7 @@ static double ga_procScore( obj_index_data *pObj )
                     count = 1.0;
                 if (count > 10)          // match the firing cap (ocombatcast_fight)
                     count = 10.0;
-                raw += v * (chance / 100.0) * count;
+                rawCast += v * (chance / 100.0) * count;
             }
         }
     }
@@ -3169,16 +3182,31 @@ static double ga_procScore( obj_index_data *pObj )
                 double attacks  = oneHit + multiHit * spell_combat_round_attacks( );
                 if (attacks <= 0)
                     continue;
-                raw += attacks * spell_combat_hit_value( ) * (chance / 100.0);
+                // Each extra swing is a real hit with the char's wielded weapon, valued as
+                // one base swing of it -- weaponSwing (weaponWeight*eff), already a final
+                // score value, skill-aware (exotic on a level+INT char swings for far more
+                // than the flat reference). Heuristic, not exact: base dice are per-hit while
+                // a proc is per-round, but each proc swing also carries the char's damroll
+                // that the base term omits, so charging a full base swing roughly cancels
+                // out. A non-weapon grant has no known swing -> flat level-referenced hit.
+                if (weaponSwing >= 0)
+                    swingHits += attacks * weaponSwing * (chance / 100.0);
+                else
+                    rawFlatHits += attacks * spell_combat_hit_value( ) * (chance / 100.0);
             }
         }
     }
 
-    if (raw <= 0)
+    if (rawCast <= 0 && rawFlatHits <= 0 && swingHits <= 0)
         return 0;
 
+    // rawCast and rawFlatHits are expected DAMAGE -> convert to score currency with
+    // spell_combat_global (calibrated on fireball's true mean, ~2.68 on live) and level-scale
+    // them. swingHits is ALREADY in score units (weaponWeight*eff) and already reflects
+    // level+skill+dice, so it is neither level-scaled nor re-converted by _global -- doing so
+    // would double-convert it (the bug the first cut shipped: everything x2.68).
     double levelScale = pObj->level / spell_combat_level_ref( );
-    return raw * levelScale * spell_combat_global( );
+    return spell_combat_global( ) * (rawCast + rawFlatHits) * levelScale + swingHits;
 }
 
 // Clerics learn "compound" (lvl 37): it weights any weapon-class weapon into a
@@ -3574,6 +3602,10 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     // against a caster's stat focus and would otherwise out-rank it on raw dice
     // alone (a caster offered an 8d6 throwing stone over her +100hp/+100mana
     // scepter was the report). Its stat affixes still count via the affect loop.
+    // Score value of one full swing of this weapon (weaponWeight * dice*skill), reused by
+    // the proc scorer below so the item's own combathits credit each extra swing exactly
+    // like a base swing. -1 = not a wieldable weapon -> ga_procScore keeps its flat fallback.
+    double weaponSwing = -1.0;
     if (itemType == ITEM_WEAPON && pProto != 0
         && IS_SET( pProto->wear_flags, ITEM_WIELD )) {
         int skillPct = target->getSkill( weaponSn );
@@ -3589,19 +3621,31 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
                     skillPct = macePct;
             }
         }
-        // A weapon whose class the character can never learn -- not in the skill's
-        // class table, or below its class level (Skill::available, the same gate
-        // ga_canSelfCast uses) -- and cannot be compounded into a mace scores its
-        // dice at 0 instead of the 20% unskilled floor: the char can't practice it,
-        // so it will never swing above the floor and must not out-rank a weapon they
-        // can actually train (a warlock offered a mace over a skilled dagger was the
-        // report). It is not dropped -- a caster may still wear it for its stat
-        // affixes alone, which the affect loop above already counted.
+        // Score the dice at the char's real skill in this weapon. available() alone is
+        // the wrong gate: an EXOTIC weapon reports available()==false (it can never be
+        // practiced) yet ExoticSkill::getLearned derives its skill from level+INT, so the
+        // char swings it at up to 100%. So also fall through when getSkill() is already
+        // positive. Exotic is the case that matters here: a normal off-class weapon skill
+        // returns 0 once it is unusable (GenericSkill::getLearned), so it stays gated. A
+        // weapon the char can neither train (available) nor already use (getSkill 0), e.g. a
+        // warlock's mace, still scores 0 dice, so the sage never chases a weapon that would
+        // sit at the unskilled floor. The item may still be worn for its stat affixes, which
+        // the affect loop counted.
         Skill *wsk = skillManager->find( weaponSn );
         double eff = 0;
-        if (canCompound || wsk == 0 || wsk->available( target ))
+        if (canCompound || wsk == 0 || wsk->available( target ) || skillPct > 0)
             eff = weaponAve * (20 + skillPct) / 100.0;
         s += w.weaponWeight * eff;
+        // Only a weapon the char can actually swing (eff > 0) feeds its combathits proc; an
+        // unusable weapon keeps weaponSwing -1 so its proc takes the flat fallback instead of
+        // scoring 0 and dropping to the +50 Fenia-trigger bonus, which would over-rate it.
+        if (eff > 0)
+            weaponSwing = w.weaponWeight * eff;   // one swing's score; its combathits reuse it.
+    }
+    else {
+        // A non-weapon item's combathits (a belt, a ring granting extra attacks) fire the
+        // char's currently-worn weapon, so score them on THAT swing, not a flat reference.
+        weaponSwing = w.curWeaponSwing;
     }
     // Base armour class: an armour item's value[0..2] (pierce/bash/slash AC) is real
     // defence the affect loop never sees -- APPLY_AC scores enchant/spell deltas only,
@@ -3620,7 +3664,7 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     // stand-in for "this triggers something good in a fight" -- the proc IS that
     // trigger. But a skill-teaching item that ALSO procs still deserves its teach
     // credit on top (different value), and non-proc special gear keeps the +50.
-    double procScore = ga_procScore( pProto );
+    double procScore = ga_procScore( pProto, weaponSwing );
     if (procScore > 0) {
         s += procScore;
         if (ga_grantsSkills( pProto ))
@@ -3884,6 +3928,21 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         w.weaponWeight = 4.0;    // caster: weapon melee output worth well under its damroll
         w.stat[0] = 1; w.stat[1] = 2; w.stat[2] = 3; w.stat[3] = 1; w.stat[4] = 3; w.stat[5] = 0;
         w.caster = true;
+    }
+
+    // One swing of the char's current weapon, in score units -- the fallback swing value
+    // for a non-weapon item's combathits (its extra attacks fire the worn weapon). Gate
+    // mirrors ga_scoreCore's dice gate so exotic (available()==false, getLearned>0) counts.
+    {
+        Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
+        ::Object *wep = wieldLoc ? wieldLoc->find( target ) : 0;
+        if (wep != 0 && wep->item_type == ITEM_WEAPON) {
+            int wsn  = get_weapon_sn( wep );
+            int wpct = target->getSkill( wsn );
+            Skill *wsk = skillManager->find( wsn );
+            if (wsk == 0 || wsk->available( target ) || wpct > 0)
+                w.curWeaponSwing = w.weaponWeight * weapon_ave( wep ) * (20 + wpct) / 100.0;
+        }
     }
 
     int chLevel  = target->getRealLevel( );
