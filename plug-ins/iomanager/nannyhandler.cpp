@@ -15,6 +15,7 @@
 #include "resume.h"
 #include "comm.h"
 #include "badnames.h"
+#include "dl_ctype.h"
 #include "xmlattributecoder.h"
 #include "serversocketcontainer.h"
 #include "dlfileloader.h"
@@ -530,6 +531,71 @@ NMI_INVOKE( NannyHandler, commitPendingAttach, "" )
     }
 
     return attached ? DLString( "ok" ) : DLString::emptyString;
+}
+
+/*
+ * Login-name availability, shared with the /newui web-creation front (the
+ * character-less `check_name` WS command in Descriptor::wsHandlePayload). Mirrors the
+ * availability half of the nanny's name step so the form's inline result cannot
+ * disagree with what the nanny will accept. Letter-format is validated client-side;
+ * this answers availability only. Returns "" when the name is free, else a short
+ * reason the client maps to a message: "empty", "reserved" (badnames / mixed script),
+ * "online" (someone connected under it), "exists" (a saved character owns it).
+ *
+ * The nanny accepts BOTH Latin and Cyrillic names (a Cyrillic name is transliterated
+ * to a Latin login internally), so the check branches on script exactly as ackName
+ * does. badNames->checkName's isalpha() is ASCII-only (the engine sets no LC_CTYPE),
+ * so feeding it a KOI8 Cyrillic name would reject every RU/UA name -- the majority
+ * here. The inbound WS frame is already koi8, so a Cyrillic name arrives as KOI8 bytes.
+ */
+DLString nanny_check_login_name(const DLString &rawName)
+{
+    DLString name = rawName;
+    name.capitalize();
+
+    if (name.empty())
+        return "empty";
+
+    // Classify the script: all-Latin, all-Cyrillic, or neither. A mixed or junk name
+    // is never a valid login (the old ASCII-only path rejected this by accident; keep
+    // that property explicitly).
+    bool anyLatin = false, anyCyr = false, anyOther = false;
+    for (int i = 0; i < (int)name.size(); i++) {
+        char c = name[i];
+        unsigned char uc = (unsigned char)c;
+        if ((uc >= 'A' && uc <= 'Z') || (uc >= 'a' && uc <= 'z'))
+            anyLatin = true;
+        else if (dl_is_cyrillic(c))
+            anyCyr = true;
+        else
+            anyOther = true;
+    }
+
+    if (anyOther || (anyLatin && anyCyr))
+        return "reserved";
+
+    if (anyCyr) {
+        // Cyrillic name: the Russian badnames list, and find() -- which resolves a
+        // Cyrillic name through the declension-aware russianName scan (the nanny's own
+        // name step relies on the same, newbie/nanny ackName). descriptor_find_named
+        // is Latin-only (deferred debt); the nanny's re-ask covers the rare
+        // mid-creation same-name race for a Cyrillic name.
+        if (!badNames->checkRussianName(name).empty())
+            return "reserved";
+        if (PCharacterManager::find(name) != 0)
+            return "exists";
+        return DLString::emptyString;
+    }
+
+    // All-Latin name.
+    if (!badNames->checkName(name).empty())
+        return "reserved";
+    if (descriptor_find_named(NULL, name))
+        return "online";
+    if (PCharacterManager::find(name) != 0)
+        return "exists";
+
+    return DLString::emptyString;
 }
 
 /*--------------------------------------------------------------------------

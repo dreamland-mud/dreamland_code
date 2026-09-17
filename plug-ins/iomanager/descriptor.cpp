@@ -329,7 +329,11 @@ RPCRUN(editor_save)
     }
 }
 
-bool 
+// Defined in nannyhandler.cpp: the login-name availability check the nanny's name
+// step uses, shared so the web-creation form's inline result cannot drift from it.
+DLString nanny_check_login_name(const DLString &rawName);
+
+bool
 Descriptor::wsHandlePayload(const Json::Value &cmd)
 {
     DLString name = cmd["command"].asString();
@@ -377,6 +381,21 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
          * OS has already torn down; the client cannot tell the difference
          * until something it sends comes back. */
         writeWSCommand("pong", std::vector<DLString>());
+    } else if(name == "check_name") {
+        /* Character-less: the /newui web-creation form asks this while filling
+         * the name field, BEFORE it commits the nanny's name step, so a taken
+         * name shows inline instead of after submit. Availability only (letter
+         * format is validated client-side); the nanny stays the authority and
+         * re-asks if a name is taken in the gap. Echo the candidate so the client
+         * can drop a stale reply that arrived after the field changed. */
+        DLString candidate = args.empty() ? DLString::emptyString : args.front();
+        DLString reason = nanny_check_login_name(candidate);
+        Json::Value out;
+        out["command"] = "check_name_result";
+        out["args"][0]["name"] = candidate;
+        out["args"][0]["ok"] = reason.empty();
+        out["args"][0]["reason"] = reason;
+        writeWSCommand(out);
     } else if(character) {
         RpcCommandManager::getThis()->run(character, name, args);
     } else {
