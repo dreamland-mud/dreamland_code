@@ -333,19 +333,56 @@ RPCRUN(editor_save)
 // step uses, shared so the web-creation form's inline result cannot drift from it.
 DLString nanny_check_login_name(const DLString &rawName);
 
+/** One argument of an rpc frame as a string, or nothing.
+ *
+ * asString() converts a string, a number, a boolean and null; on an array or an
+ * object it throws Json::LogicError. That is not our exception type, nothing on
+ * this path catches it, and it reached std::terminate: ONE frame of the shape
+ * {"command":"console_in","args":[["look"]]} took the whole world down, from any
+ * client, logged in or not. Found by the settings dialog's hostile-input
+ * battery; the hole is older than that command and reachable through every verb
+ * that takes arguments. */
+static bool ws_argument(const Json::Value &arg, DLString &out)
+{
+    if (arg.isArray() || arg.isObject())
+        return false;
+
+    out = arg.asString();
+    return true;
+}
+
 bool
 Descriptor::wsHandlePayload(const Json::Value &cmd)
 {
-    DLString name = cmd["command"].asString();
+    const Json::Value &verb = cmd["command"];
+    if (verb.isArray() || verb.isObject()) {
+        LogStream::sendError() << "WebSocket RPC: command is not a name" << endl;
+        return true;
+    }
+
+    DLString name = verb.asString();
     std::vector<DLString> args;
 
     for(Json::Value::const_iterator i=cmd["args"].begin(); i != cmd["args"].end();i++) {
-        args.push_back(DLString((*i).asString()));
+        DLString arg;
+        if (!ws_argument(*i, arg)) {
+            // A whole frame is dropped rather than half-read: an argument this
+            // side cannot make sense of means the rest of them cannot be
+            // trusted to line up either. The connection stays open, because a
+            // broken client is not a reason to disconnect a player.
+            LogStream::sendError() << "WebSocket RPC: '" << name.substr(0, 32)
+                                   << "' got a non-scalar argument" << endl;
+            return true;
+        }
+
+        args.push_back(arg);
     }
 
     // special case as we don't need Character to run console-in rpc
     if(name == "console_in") {
-        string arg = cmd["args"][0].asString();
+        // The args vector above is already checked; reading the raw json a
+        // second time would walk straight back into the crash.
+        string arg = args.empty() ? string() : args.front().c_str();
         for(string::iterator i = arg.begin();i != arg.end();i++)
             if(inputChar(*i) < 0)
                 return false;
