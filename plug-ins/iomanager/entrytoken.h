@@ -26,8 +26,9 @@ PCharacter * account_enter_char(Descriptor *d, const DLString &charName);
 
 /**
  * Mint a one-use entry token for (accountId, charName). Credential-grade like a
- * resume token: 128 bits from /dev/urandom, ~90s TTL, single-use, one live token
- * per account, never logged. Called by the /account/enter servlet AFTER it has
+ * resume token: 128 bits from /dev/urandom, 180s TTL, single-use, never logged (a
+ * re-mint no longer evicts the previous token, so several can be live at once).
+ * Called by the /account/enter servlet AFTER it has
  * confirmed the character is on the account; the browser never sees the token --
  * the web broker (holding the web token) keeps it server-side and hands the
  * client only the moment-to-moment `account_enter` command.

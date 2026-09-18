@@ -47,9 +47,10 @@
 
 /* Credential-grade and short: the browser has just proven the identity, so this
  * only has to survive the hop from the /account/enter POST to the client's
- * `account_enter` command a page-transition later. Shorter than resume's 180s
- * because nothing linkdead is standing in the world waiting on it. */
-static const int ENTRY_TTL = 90;
+ * `account_enter` command a page-transition later. Matches resume's 180s: a slow
+ * roster page or a phone paused between the mint and the click was expiring the
+ * token inside 90s, which the client could only report as a bare "could not enter". */
+static const int ENTRY_TTL = 180;
 
 struct EntryEntry {
     DLString account;
@@ -59,25 +60,11 @@ struct EntryEntry {
 
 /* In memory on purpose: after a reboot every character has left the world, so a
  * token that survived it could only ever resolve to nothing. */
-typedef std::map<DLString, EntryEntry> TokenMap;   // token   -> {account, char}
-typedef std::map<DLString, DLString> AccountMap;   // account -> token (one live)
+typedef std::map<DLString, EntryEntry> TokenMap;   // token -> {account, char}
 static TokenMap tokens;
-static AccountMap byAccount;
-
-static void entry_forget_account(const DLString &account)
-{
-    AccountMap::iterator a = byAccount.find(account);
-
-    if (a == byAccount.end())
-        return;
-
-    tokens.erase(a->second);
-    byAccount.erase(a);
-}
 
 static void entry_forget_token(TokenMap::iterator t)
 {
-    byAccount.erase(t->second.account);
     tokens.erase(t);
 }
 
@@ -86,12 +73,10 @@ static void entry_purge()
     time_t now = time(0);
 
     for (TokenMap::iterator i = tokens.begin(); i != tokens.end(); ) {
-        if (i->second.expires <= now) {
-            byAccount.erase(i->second.account);
+        if (i->second.expires <= now)
             tokens.erase(i++);
-        } else {
+        else
             i++;
-        }
     }
 }
 
@@ -128,9 +113,11 @@ DLString entry_token_issue(const DLString &accountId, const DLString &charName)
 
     entry_purge();
 
-    // One live token per account: a fresh mint replaces (and so invalidates) any
-    // outstanding one. Only the click that mints this token is meant to be usable.
-    entry_forget_account(accountId);
+    // Several live tokens per account are fine, and deliberately so: a double-tap
+    // or a client re-render that POSTs /account/enter twice used to evict the first
+    // token and leave the client holding a key that opened nothing. Each token is
+    // 128-bit, single-use, account-bound and TTL-bounded, and any one of them opens
+    // the same roster, so keeping them all costs nothing.
 
     DLString token = entry_random();
     if (token.empty())
@@ -141,7 +128,6 @@ DLString entry_token_issue(const DLString &accountId, const DLString &charName)
     entry.name = charName;
     entry.expires = time(0) + ENTRY_TTL;
     tokens[token] = entry;
-    byAccount[accountId] = token;
 
     return token;
 }
@@ -194,8 +180,14 @@ bool entry_token_redeem(Descriptor *d, const DLString &token)
     }
 
     TokenMap::iterator t = tokens.find(token);
-    if (t == tokens.end())
+    if (t == tokens.end()) {
+        // The one redeem failure that used to be silent. A token not on file is
+        // the ordinary end of an expired, already-spent or superseded one -- but
+        // with no line here, a client's "could not enter" had nothing behind it.
+        LogStream::sendNotice() << "Entry token: " << d->host
+                                << " sent a token not on file (expired or already used)" << endl;
         return false;
+    }
 
     // Copy what the entry needs out of the map entry now: everything below may
     // refuse (token kept) or burn (token gone), and after a burn `t` is dead.
