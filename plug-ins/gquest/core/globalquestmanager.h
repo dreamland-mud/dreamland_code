@@ -13,6 +13,7 @@
 #include "xmlstring.h"
 #include "xmlpointer.h"
 #include "dbio.h"
+#include "eventbus.h"
 
 class PCMemoryInterface;
 class GlobalQuestInfo;
@@ -20,9 +21,9 @@ class GlobalQuest;
 class XMLReward;
 struct Descriptor;
 
-class GlobalQuestManager : public SchedulerTaskRoundPlugin, public XMLVariableContainer 
+class GlobalQuestManager : public SchedulerTaskRoundPlugin, public XMLVariableContainer, public EventHandler
 {
-XML_OBJECT    
+XML_OBJECT
 public:
 
     typedef ::Pointer<GlobalQuestManager> Pointer;
@@ -38,6 +39,10 @@ public:
     virtual void run( );
     virtual void after( );
     virtual int getPriority( ) const;
+
+    virtual void initialization( );
+    virtual void destruction( );
+    virtual void handleEvent( const type_index &eventType, const Event &event ) const;
         
     
     void registrate( GlobalQuestInfo * );

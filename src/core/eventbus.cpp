@@ -44,7 +44,12 @@ void EventBus::publish(const Event &event) const
         eventHandler->handleEvent(eventType, event);
 }
 
-Event::~Event() 
+Event::~Event()
 {
-    
+
+}
+
+ShutdownEvent::~ShutdownEvent()
+{
+
 }

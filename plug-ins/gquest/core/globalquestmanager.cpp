@@ -87,6 +87,41 @@ int GlobalQuestManager::getPriority( ) const
     return SCDP_ROUND + 100;
 }
 
+void GlobalQuestManager::initialization( )
+{
+    SchedulerTaskRoundPlugin::initialization( );
+    eventBus->subscribe( typeid( ShutdownEvent ), Pointer( this ) );
+}
+
+void GlobalQuestManager::destruction( )
+{
+    eventBus->unsubscribe( typeid( ShutdownEvent ), Pointer( this ) );
+    SchedulerTaskRoundPlugin::destruction( );
+}
+
+void GlobalQuestManager::handleEvent( const type_index &eventType, const Event & ) const
+{
+    if (eventType != typeid( ShutdownEvent ))
+        return;
+
+    // Graceful shutdown: persist each running quest's runtime state one last time --
+    // the same saveRT the per-tick path does. The skipped ~DreamLand teardown used to
+    // do this via GlobalQuestInfo::destruction(); ShutdownEvent restores it. No
+    // suspend() (pointless on exit -- boot's loadRT + resume re-establishes state).
+    GlobalQuestManager *manager = GlobalQuestManager::getThis( );
+    if (manager == 0)
+        return;
+
+    RunList &running = manager->getRunning( );
+    for (RunList::iterator i = running.begin( ); i != running.end( ); i++) {
+        try {
+            manager->saveRT( *(i->second) );
+        } catch (const Exception &ex) {
+            LogStream::sendError( ) << "ShutdownEvent saveRT: " << ex << endl;
+        }
+    }
+}
+
 void GlobalQuestManager::registrate( GlobalQuestInfo *gqi ) 
 {
     registry[ gqi->getQuestID( ) ] = gqi;
