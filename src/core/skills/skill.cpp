@@ -121,6 +121,11 @@ bool Skill::isNegative() const
 {
     return false;
 }
+
+bool Skill::isAutobuff() const
+{
+    return false;
+}
 bool Skill::visible( CharacterMemoryInterface * ) const
 {
     return false;

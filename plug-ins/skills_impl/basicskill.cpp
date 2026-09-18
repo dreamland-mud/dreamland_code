@@ -54,6 +54,7 @@ void markPassiveGrantsDirty();
 
 BasicSkill::BasicSkill()
                 : negative( false ),
+                  autobuff( false ),
                   align( 0, &align_table ),
                   ethos( 0, &ethos_table ),
                   grants( skillManager )
@@ -472,6 +473,11 @@ bool BasicSkill::isPassive() const
 bool BasicSkill::isNegative() const
 {
     return negative.getValue();
+}
+
+bool BasicSkill::isAutobuff() const
+{
+    return autobuff.getValue();
 }
 
 
