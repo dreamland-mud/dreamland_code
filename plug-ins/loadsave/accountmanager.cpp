@@ -97,6 +97,25 @@ void AccountManager::load()
                     continue;
                 }
 
+                // Scrub identity elements whose type/value are not strings. A
+                // hand-edited file with an array/object-typed field would otherwise
+                // throw Json::LogicError on the first asString() in a display path
+                // (account admin list/info, account status, the account_chars RPC) --
+                // none of those catch it, so it would reach std::terminate. indexIdentities
+                // already skips non-string identities; this keeps the readers safe too.
+                if (account.isMember("identities") && account["identities"].isArray()) {
+                    Json::Value clean(Json::arrayValue);
+                    const Json::Value &raw = account["identities"];
+                    for (Json::Value::const_iterator i = raw.begin(); i != raw.end(); ++i) {
+                        if ((*i).isObject() && (*i)["type"].isString() && (*i)["value"].isString())
+                            clean.append(*i);
+                        else
+                            LogStream::sendWarning() << "Accounts: file " << entry.getFileName()
+                                << " has a malformed identity, dropping it." << endl;
+                    }
+                    account["identities"] = clean;
+                }
+
                 DLString id = account["id"].asString();
                 accounts[id] = account;
                 indexIdentities(id, account);
@@ -511,6 +530,25 @@ list<DLString> AccountManager::allIds()
     for (const auto &a : accounts)
         ids.push_back(a.first);
     return ids;
+}
+
+map<DLString, list<DLString> > AccountManager::allCharsByAccount()
+{
+    map<DLString, list<DLString> > byAccount;
+    // One walk of the in-RAM playerbase, grouping by the pfile "account" attr.
+    // Same probe as accountOf (findAttr, never getAttr -- so no empty attribute is
+    // created on any scanned pfile).
+    for (auto &p : PCharacterManager::getPCM()) {
+        XMLStringAttribute::Pointer attr = p.second->getAttributes().findAttr<XMLStringAttribute>("account");
+        if (!attr)
+            continue;
+
+        Json::Value acc;
+        JsonUtils::fromString(attr->getValue(), acc);
+        if (acc.isObject() && acc["id"].isString())
+            byAccount[acc["id"].asString()].push_back(p.second->getName());
+    }
+    return byAccount;
 }
 
 DLString AccountManager::conflictingOnlineChar(const DLString &charName)

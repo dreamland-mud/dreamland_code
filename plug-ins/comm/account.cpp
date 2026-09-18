@@ -392,6 +392,15 @@ static void account_admin(PCharacter *ch, DLString &args)
             ch->pecho("No accounts registered yet.");
             return;
         }
+
+        // A dump of every account's identities is a PII read -- audit who ran it.
+        Json::Value f;
+        f["actor"] = ch->getName();
+        AccountAudit::record("admin_list", f);
+
+        // One playerbase walk for all accounts, instead of charsOf() per account.
+        std::map<DLString, std::list<DLString> > byAccount = AccountManager::allCharsByAccount();
+
         ch->pecho("{WRegistered accounts ({C%d{W):{x", (int)ids.size());
         for (const DLString &id : ids) {
             Json::Value acc = AccountManager::get(id);
@@ -408,7 +417,7 @@ static void account_admin(PCharacter *ch, DLString &args)
                           AccountManager::echoSafe(value).c_str());
             }
 
-            std::list<DLString> chars = AccountManager::charsOf(id);
+            const std::list<DLString> &chars = byAccount[id];
             if (chars.empty()) {
                 ch->pecho("   (no characters)");
             } else {
