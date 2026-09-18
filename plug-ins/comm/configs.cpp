@@ -1065,11 +1065,21 @@ bool ConfigCommand::webApply( PCharacter *ch, const DLString &key, const DLStrin
             if (!(*c)->available(ch))
                 return false;
 
-            // Exactly on or off, and nothing else: the value has already been
-            // normalised against the world file, and a word that got past that
-            // must not quietly count as 'off' here.
-            bool wanted = arg_is_yes(value) || arg_is_switch_on(value);
-            if (!wanted && !(arg_is_no(value) || arg_is_switch_off(value)))
+            // Exactly on or off, and nothing else: a word that got past the
+            // world file must not quietly count as 'off' here.
+            //
+            // The synonym tables (grammar/synonyms.json) hold the words a
+            // player types -- yes/да/так, on/вкл/увімк and their opposites --
+            // and nothing else: neither 1/0 nor true/false is in them. Those
+            // two pairs are what travels over the socket, so they are spelled
+            // out here rather than left to whoever calls this to know that the
+            // only safe spelling is the one the script happens to normalise to.
+            bool wanted = arg_is_yes(value) || arg_is_switch_on(value)
+                          || value == "1" || value.toLower() == "true";
+            bool refused = arg_is_no(value) || arg_is_switch_off(value)
+                          || value == "0" || value.toLower() == "false";
+
+            if (!wanted && !refused)
                 return false;
 
             // 'toggle' is the one argument no language spells its own way, and

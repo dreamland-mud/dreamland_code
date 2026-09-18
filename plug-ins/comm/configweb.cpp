@@ -89,6 +89,7 @@ static std::map<DLString, ConfigWebBucket> config_web_bucket;
 static const int CONFIG_WEB_BURST  = 8;  // clicks in a row, from full
 static const int CONFIG_WEB_REFILL = 2;  // tokens gained per second
 static const int CONFIG_WEB_SAVES  = 4;  // what an option that writes the pfile costs
+static const int CONFIG_WEB_SCHEMA = 2;  // what building and sending the whole dialog costs
 
 /** Does a change of this option write the pfile there and then? */
 static bool config_web_writes(const DLString &key)
@@ -154,7 +155,11 @@ static DLString config_web_safe_key(const DLString &key)
 
     for (unsigned int i = 0; i < key.size() && result.size() < MAX; i++) {
         char c = key.at(i);
-        if (isalnum(c) || c == '_' || c == '-')
+        // Through unsigned char: isalnum() is defined for EOF and for values a
+        // unsigned char can hold, and a byte above 127 arrives here negative --
+        // which is undefined behaviour, and this is a function whose whole job
+        // is to make bytes from a socket safe.
+        if (isalnum((unsigned char)c) || c == '_' || c == '-')
             result += c;
         else
             result += '?';
@@ -358,6 +363,19 @@ RPCRUN(config_schema)
     if (!pch || !config_web_playing(ch))
         return;
 
+    // The heaviest frame in the feature -- twenty-five options with their help
+    // and samples, some twenty-five kilobytes of it -- and until now the only
+    // one nothing held back. A client asking a thousand times a second would
+    // have been answered a thousand times. It comes out of the same bucket as a
+    // change and costs more, because it costs the server more; a dialog asks
+    // once when it opens and once per language change, and never notices.
+    //
+    // Refused means silence rather than an error frame: the answer to
+    // config_schema IS the capability flag, there is no shape for 'not now',
+    // and a client that asks this often is not one that reads answers.
+    if (!config_web_afford(pch->getName(), CONFIG_WEB_SCHEMA))
+        return;
+
     RegisterList args1;
     args1.push_back(FeniaManager::wrapperManager->getWrapper((Character *)ch));
 
@@ -447,8 +465,15 @@ RPCRUN(config_set)
     }
 
     ConfigCommand *config = ConfigCommand::getThis();
-    if (!config)
+    if (!config) {
+        // The one path that used to answer nothing, in a feature whose promise
+        // is that every config_set gets an answer. A dialog told nothing waits
+        // out its timeout and then reports the server as unsupported, which is
+        // the wrong story: the command is simply not loaded.
+        config_web_result(ch, config_web_safe_key(key), false, Json::Value::null,
+                          "server", DLString::emptyString);
         return;
+    }
 
     Json::Value stored;
     if (!config->webApply(pch, key, verdict["value"].asString(), stored)) {
