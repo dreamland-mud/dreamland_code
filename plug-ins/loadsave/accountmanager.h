@@ -41,6 +41,9 @@ public:
     static DLString accountOf(const DLString &charName);        // "" when unattached
     static std::list<DLString> charsOf(const DLString &id);     // member character names
     static std::list<DLString> allIds();                        // every registered account id
+    // id -> member character names for the WHOLE playerbase in one pass, so a
+    // full-registry report costs O(pfiles) once instead of charsOf per account.
+    static std::map<DLString, std::list<DLString> > allCharsByAccount();
 
     // The player-facing account name (a generated fantasy title, e.g. "Ashen Warden
     // of Old Thalos"). Falls back to the raw id for a legacy account minted before
