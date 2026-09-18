@@ -19,13 +19,38 @@ DLString JsonUtils::toString(const Json::Value &value)
 
 void JsonUtils::fromString(const DLString &text, Json::Value &value)
 {
+    // INTO A TEMPORARY, AND ONLY THEN OVER THE CALLER'S VALUE.
+    //
+    // The result of parse() was ignored, and Json::Reader fills what it is
+    // given with everything it managed to read before the error. A world file
+    // cut short -- a half-finished edit, a truncated copy, a disk that filled --
+    // therefore loaded as a smaller file that looked perfectly valid: no
+    // complaint anywhere, and whoever read it downstream worked from half the
+    // data. On config/settings.json that showed up as a settings dialog with one
+    // option in it instead of twenty-five.
+    //
+    // Parsing straight into the caller's value and clearing it on failure would
+    // trade that bug for another one: 'value' is in-out, and Configurable::
+    // setText hands over the member that holds the CURRENT configuration. A
+    // broken edit saved through fedit would then wipe a table that was working
+    // a moment ago. A failed parse must change nothing at all -- the caller
+    // keeps whatever it had, which at boot is nothing, and the log says why.
+    Json::Value parsed;
+
     try {
         Json::Reader reader;
-        reader.parse(text, value);
+
+        if (!reader.parse(text, parsed)) {
+            LogStream::sendError() << "JSON: " << reader.getFormattedErrorMessages() << endl;
+            return;
+        }
 
     } catch (const std::exception &ex) {
         LogStream::sendError() << "JSON: " << ex.what() << endl;
+        return;
     }
+
+    value = parsed;
 }
 
 bool JsonUtils::validate(const DLString &text, ostringstream &errbuf)
