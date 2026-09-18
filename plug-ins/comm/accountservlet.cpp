@@ -525,7 +525,7 @@ static void account_resetpw(HttpRequest &request, HttpResponse &response)
 // site (Phase 5). The broker (holding the web token) posts {identityType, value,
 // char}; this re-resolves the account from the identity server-side, confirms the
 // character is on it -- the same ownership gate as resetpw -- and mints the token
-// via entry_token_issue. The token is a password-equivalent for ~90s: it goes back
+// via entry_token_issue. The token is a password-equivalent for 180s: it goes back
 // to the broker (server-to-server, holding the web token) and is NEVER logged. The
 // browser never sees it; the broker hands the client only the moment-to-moment
 // `account_enter <token>` command. Ships dark until the broker exists.
