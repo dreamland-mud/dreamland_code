@@ -386,6 +386,44 @@ static void account_admin(PCharacter *ch, DLString &args)
 {
     DLString sub = args.getOneArgument();
 
+    if (arg_oneof(sub, "list")) {
+        std::list<DLString> ids = AccountManager::allIds();
+        if (ids.empty()) {
+            ch->pecho("No accounts registered yet.");
+            return;
+        }
+        ch->pecho("{WRegistered accounts ({C%d{W):{x", (int)ids.size());
+        for (const DLString &id : ids) {
+            Json::Value acc = AccountManager::get(id);
+            ch->pecho("{W%1$s{x  %2$s", id.c_str(), AccountManager::titleOf(id).c_str());
+
+            const Json::Value &identities = acc["identities"];
+            for (Json::Value::const_iterator i = identities.begin(); i != identities.end(); ++i) {
+                if (!(*i).isObject())
+                    continue;
+                // value is externally supplied (bot username, email) -- escape it
+                // before the mudtag renderer, same as `account admin info`.
+                DLString value = (*i)["value"].asString();
+                ch->pecho("   identity %1$s: %2$s", (*i)["type"].asString().c_str(),
+                          AccountManager::echoSafe(value).c_str());
+            }
+
+            std::list<DLString> chars = AccountManager::charsOf(id);
+            if (chars.empty()) {
+                ch->pecho("   (no characters)");
+            } else {
+                DLString line;
+                for (const DLString &n : chars) {
+                    if (!line.empty())
+                        line += ", ";
+                    line += n;
+                }
+                ch->pecho("   chars: %1$s", line.c_str());
+            }
+        }
+        return;
+    }
+
     if (arg_oneof(sub, "info")) {
         DLString charName = args.getOneArgument();
         if (charName.empty()) {
@@ -467,7 +505,7 @@ static void account_admin(PCharacter *ch, DLString &args)
         return;
     }
 
-    ch->pecho("Usage: account admin info|attach|detach ...");
+    ch->pecho("Usage: account admin list|info|attach|detach ...");
 }
 
 // Switch to another character on the SAME account without a password. Account
