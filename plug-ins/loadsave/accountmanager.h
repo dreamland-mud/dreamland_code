@@ -40,6 +40,7 @@ public:
     static DLString findByIdentity(const DLString &type, const DLString &value); // "" when none
     static DLString accountOf(const DLString &charName);        // "" when unattached
     static std::list<DLString> charsOf(const DLString &id);     // member character names
+    static std::list<DLString> allIds();                        // every registered account id
 
     // The player-facing account name (a generated fantasy title, e.g. "Ashen Warden
     // of Old Thalos"). Falls back to the raw id for a legacy account minted before

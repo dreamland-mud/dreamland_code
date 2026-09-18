@@ -505,6 +505,14 @@ list<DLString> AccountManager::charsOf(const DLString &id)
     return names;
 }
 
+list<DLString> AccountManager::allIds()
+{
+    list<DLString> ids;
+    for (const auto &a : accounts)
+        ids.push_back(a.first);
+    return ids;
+}
+
 DLString AccountManager::conflictingOnlineChar(const DLString &charName)
 {
     DLString name = charName;
