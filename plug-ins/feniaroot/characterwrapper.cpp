@@ -5041,6 +5041,7 @@ NMI_INVOKE( CharacterWrapper, skillsInfo, "(): список структур д�
         info->setField(IdRef("origin"), data.origin.getValue());
         info->setField(IdRef("category"), skill->getCategory());
         info->setField(IdRef("groups"), skill->getGroups().toString());
+        info->setField(IdRef("autobuff"), skill->isAutobuff());
 
         if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
             info->setField(IdRef("help_id"), skill->getSkillHelp()->getID());

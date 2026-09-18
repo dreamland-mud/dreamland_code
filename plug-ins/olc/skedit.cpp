@@ -199,6 +199,8 @@ void OLCStateSkill::show( PCharacter *ch )
         r->ethos.getValue() != 0 ? r->ethos.names().c_str() : "-");
     ptc(ch, "Негатив:     {C%s {D(negative){x\r\n",
         r->isNegative() ? "да - дебафф, в aff красным" : "нет");
+    ptc(ch, "Автобафф:    {C%s {D(autobuff){x\r\n",
+        r->isAutobuff() ? "да - кастуется кнопкой автобаффа" : "нет");
     ptc(ch, "Сообщение:   {C%s{x %s {D(dammsg) {C%s {D(damgender){x\r\n",
         r->getDammsg().getFullForm().c_str(),
         web_edit_button(ch, "dammsg", "web").c_str(),
@@ -607,6 +609,15 @@ SKEDIT(negative, "негатив", "аффект умения - дебафф (в
     r->negative.setValue(!r->negative.getValue());
     ptc(ch, "Аффект умения теперь %s дебаффом.\n\r",
         r->negative.getValue() ? "считается" : "НЕ считается");
+    return true;
+}
+
+SKEDIT(autobuff, "автобафф", "умение кастуется кнопкой автобаффа (self-buff)")
+{
+    BasicSkill *r = getOriginal();
+    r->autobuff.setValue(!r->autobuff.getValue());
+    ptc(ch, "Умение теперь %s кнопкой автобаффа.\n\r",
+        r->autobuff.getValue() ? "кастуется" : "НЕ кастуется");
     return true;
 }
 

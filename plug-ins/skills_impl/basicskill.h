@@ -63,6 +63,7 @@ public:
     virtual int getRating( PCharacter * ) const;
     virtual bool isPassive() const;
     virtual bool isNegative() const;
+    virtual bool isAutobuff() const;
     virtual GlobalBitvector & getGrants();
     virtual bool isValid( ) const
     {
@@ -99,6 +100,7 @@ public:
     XML_VARIABLE XMLMultiString webLabel;     // affect-panel short label, per language
     XML_VARIABLE XMLStringNoEmpty webColumn;  // pro|det|trv|enh|mal|cln; empty = auto-classified
     XML_VARIABLE XMLBooleanNoFalse negative;  // the affect this skill hangs is a debuff -> red in 'aff'
+    XML_VARIABLE XMLBooleanNoFalse autobuff;  // the autobuff button casts this self-buff on the caster
     XML_VARIABLE XMLInflectedString dammsg;
     XML_VARIABLE XMLIntegerNoEmpty beats;
     XML_VARIABLE XMLIntegerNoEmpty mana;

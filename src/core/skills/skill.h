@@ -69,6 +69,9 @@ public:
     // renders such affects red. Data lives on BasicSkill (<negative>),
     // editable in skedit. Base returns false.
     virtual bool isNegative() const;
+    // True if the autobuff button should cast this skill on the caster. Data
+    // lives on BasicSkill (<autobuff>), editable in skedit. Base returns false.
+    virtual bool isAutobuff() const;
 
     virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;

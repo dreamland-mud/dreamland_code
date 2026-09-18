@@ -135,10 +135,23 @@ NMI_GET(SkillWrapper, category, "категория умения (.tables.skill_
     return getTarget()->getCategory();
 }
 
+NMI_GET(SkillWrapper, autobuff, "кастуется ли умение кнопкой автобаффа (<autobuff>)")
+{
+    return getTarget()->isAutobuff();
+}
+
 NMI_INVOKE(SkillWrapper, nameFor, "(ch): название умения с учетом языковых настроек персонажа")
 {
     Character *ch = args2character(args);
     return getTarget()->getNameFor(ch);
+}
+
+NMI_INVOKE(SkillWrapper, cmdname, "(ch): имя команды навыка для ch (для interpret_raw), либо пустая строка для заклинаний/пассивок")
+{
+    Character *ch = args2character(args);
+    if (getTarget()->getCommand())
+        return getTarget()->getCommand()->getNameFor(ch);
+    return DLString::emptyString;
 }
 
 NMI_INVOKE(SkillWrapper, beats, "(ch): длина задержки в пульсах для персонажа с учетом бонусов")
