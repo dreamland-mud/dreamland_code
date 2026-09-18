@@ -105,9 +105,11 @@ void GlobalQuestManager::handleEvent( const type_index &eventType, const Event &
         return;
 
     // Graceful shutdown: persist each running quest's runtime state one last time --
-    // the same saveRT the per-tick path does. The skipped ~DreamLand teardown used to
-    // do this via GlobalQuestInfo::destruction(); ShutdownEvent restores it. No
-    // suspend() (pointless on exit -- boot's loadRT + resume re-establishes state).
+    // the same saveRT the per-tick path does, which the skipped ~DreamLand teardown
+    // (GlobalQuestInfo::destruction) used to do at exit. RT only: destruction() also
+    // saved the quest-INFO table (autostart / waitingTime); restoring that half is a
+    // separate follow-up. No suspend() (pointless on exit -- boot's loadRT + resume
+    // re-establishes state).
     GlobalQuestManager *manager = GlobalQuestManager::getThis( );
     if (manager == 0)
         return;
