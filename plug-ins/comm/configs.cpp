@@ -7,6 +7,7 @@
 #include <ctime>
 
 #include "configs.h"
+#include "configweb.h"
 #include "jsoncpp/json/json.h"
 
 #include "player_utils.h"
@@ -47,6 +48,36 @@ static void config_lang(PCharacter *ch, const DLString &constArguments);
 static void config_lang_print(PCharacter *ch);
 static void config_color(PCharacter *ch, const DLString &constArguments);
 static void config_color_print(PCharacter *ch);
+static void config_persist(PCharacter *ch, const DLString &key);
+static bool config_value_read(PCharacter *ch, const DLString &key, Json::Value &value);
+
+/** One of the options the command handles by name: read what it is now, hand the
+ *  argument to its own handler, and see whether anything actually moved.
+ *
+ *  Only a real change is worth anything afterwards -- a refused value ('config
+ *  lines 5', which the handler turns down) and a value that was already there
+ *  are worth neither a frame to an open dialog nor a write to the pfile.
+ *
+ *  'announce' is false for the one option the dialog does not show: the language
+ *  row belongs to the client, and a delta about a key the schema never mentioned
+ *  is noise on the wire. The write still happens -- a setting is a setting. */
+static void config_value_typed(PCharacter *ch, const DLString &key,
+                               void (*handler)(PCharacter *, const DLString &),
+                               const DLString &arg, bool announce)
+{
+    Json::Value before, after;
+    config_value_read(ch, key, before);
+
+    handler(ch, arg);
+
+    if (!config_value_read(ch, key, after) || after == before)
+        return;
+
+    if (announce)
+        web_config_changed(ch, key, after);
+
+    config_persist(ch, key);
+}
 
 list<PCMemoryInterface *> who_find_offline(PCharacter *looker);
 
@@ -239,6 +270,10 @@ static void account_config_writethrough(PCharacter *ch, const DLString &key, con
         return;
     AccountManager::setConfigKey(id, key, value);
     AccountManager::propagateConfigKey(id, key, value, ch);
+
+    // The alts changed under their owners' hands: an open dialog on any of them
+    // shows the new value without waiting for anything.
+    web_config_changed_account(id, key, value, ch);
 }
 
 COMMAND(ConfigCommand, "config")
@@ -276,28 +311,38 @@ COMMAND(ConfigCommand, "config")
         return;
     }
 
+    // The options the command handles by name rather than by bit. All five have
+    // the same shape -- read what it is, let the handler have the argument, and
+    // see whether anything moved -- so they share one line each rather than five
+    // copies of it.
     if (arg_is(arg1, "lang")) {
-        config_lang(pch, arg2);
-        return; 
+        // No delta: the dialog has no language row of its own, that one belongs
+        // to the client, and a frame about a key the schema never mentioned is
+        // noise on the wire.
+        config_value_typed(pch, "lang", config_lang, arg2, false);
+        return;
     }
 
     if (arg_is(arg1, "color")) {
-        config_color(pch, arg2);
+        config_value_typed(pch, "color", config_color, arg2, true);
         return;
     }
 
     if (arg_is(arg1, "lines")) {
-        config_scroll(pch, arg2);
+        config_value_typed(pch, "lines", config_scroll, arg2, true);
         return;
     }
 
     if (arg_is(arg1, "telegram")) {
-        config_telegram(pch, arg2);
+        config_value_typed(pch, "telegram", config_telegram, arg2, true);
         return;
     }
 
     if (arg_is(arg1, "discord")) {
-        config_discord(pch, arg2);
+        // Asking about discord can change it: with no live token the handler
+        // mints one, and that token is what the dialog shows. The before/after
+        // comparison covers that on its own.
+        config_value_typed(pch, "discord", config_discord, arg2, true);
         return;
     }
 
@@ -326,13 +371,38 @@ COMMAND(ConfigCommand, "config")
                 if (!hit)
                     continue;
 
+                // Read before the handler runs, so that 'config brief yes' on
+                // an option that is already yes can be told apart from a real
+                // change: it deserves neither a delta nor a pfile write.
+                bool was = (*c)->isSetBit(pch);
+
                 if (!(*c)->handleArgument( pch, arg2 ))
                     pch->pecho(_("Неправильный переключатель. См. {W? режим{x."));
                 // Sync only on an actual change: an empty value arg is a view
                 // (handleArgument prints and still returns true), not a set.
-                else if (!arg2.empty() && config_is_account_wide((*c)->getName()))
-                    account_config_writethrough(pch, (*c)->getName(),
-                                                Json::Value((*c)->isSetBit(pch)));
+                else if (!arg2.empty()) {
+                    bool now = (*c)->isSetBit(pch);
+
+                    // The account write-through stays on every explicit set,
+                    // even one that changes nothing here: typing the command is
+                    // also how a player re-asserts the value onto an account
+                    // that has drifted from it.
+                    if (config_is_account_wide((*c)->getName()))
+                        account_config_writethrough(pch, (*c)->getName(),
+                                                    Json::Value(now));
+
+                    if (now != was) {
+                        // Typed at the keyboard with the dialog open: the switch
+                        // in the window follows the command instead of going
+                        // stale.
+                        web_config_changed(pch, (*c)->getName(), Json::Value(now ? 1 : 0));
+
+                        // And it is written out, exactly as the dialog's change
+                        // is: one setting must not be more durable for being
+                        // clicked than for being typed.
+                        config_persist(pch, (*c)->getName());
+                    }
+                }
 
                 return;
             }
@@ -852,4 +922,200 @@ void AccountConfigLoginListener::run( int, int newState, Descriptor *d )
         return;
 
     AccountManager::applyConfigToChar(d->character->getPC());
+}
+
+/*-------------------------------------------------------------------------
+ * The same options, reached without a command line
+ *
+ * The web dialog names an option the way the world file names it -- the
+ * canonical EN key -- and hands over a value. Nothing here parses an argument
+ * line, so a renamed command, another display language or a localised on/off
+ * word cannot reach these two functions at all. What the player sees in the
+ * terminal is unchanged: every path below ends in the same handler the keyboard
+ * uses, and that handler prints its usual line.
+ *------------------------------------------------------------------------*/
+
+/** The colour scheme as one word, the way 'config color' takes it. */
+static DLString config_color_state(PCharacter *ch)
+{
+    if (!IS_SET(ch->act, PLR_COLOR))
+        return "off";
+    if (IS_SET(ch->comm, COMM_MILDCOLOR))
+        return "mild";
+    return "on";
+}
+
+/** The four options the command handles by name rather than by bit. Their value
+ *  is read from where each one actually keeps it -- the character field, the
+ *  string attribute, the json attribute -- so what comes back is what the server
+ *  has, not what somebody asked for. Returns false for anything else. */
+static bool config_value_read(PCharacter *ch, const DLString &key, Json::Value &value)
+{
+    if (key == "color") {
+        value = config_color_state(ch);
+        return true;
+    }
+
+    if (key == "lines") {
+        value = ch->lines.getValue( );
+        return true;
+    }
+
+    if (key == "telegram") {
+        value = get_string_attribute(ch, "telegram");
+        return true;
+    }
+
+    // Not an option of the dialog -- the client owns that row -- but it is a
+    // setting like the others, and the command path compares it before and
+    // after for the same reasons: no delta and no pfile write for a language
+    // that was refused, or that was already the one asked for.
+    if (key == "lang") {
+        value = get_string_attribute(ch, "lang");
+        return true;
+    }
+
+    if (key == "discord") {
+        // Only the parts the dialog draws. The linking token is the player's own
+        // secret and travels on their own descriptor; id and status are not the
+        // dialog's business.
+        Json::Value discord;
+        get_json_attribute(ch, "discord", discord);
+
+        value = Json::Value(Json::objectValue);
+        value["username"] = discord["username"].asString();
+        value["token"] = discord["token"].asString();
+        return true;
+    }
+
+    return false;
+}
+
+/** The same four, changed. The value arrives already checked against the world
+ *  file, so this only routes it to the handler the keyboard would have reached. */
+static bool config_value_write(PCharacter *ch, const DLString &key, const DLString &value)
+{
+    if (key == "color") {
+        config_color(ch, value);
+        return true;
+    }
+
+    if (key == "lines") {
+        config_scroll(ch, value);
+        return true;
+    }
+
+    if (key == "telegram") {
+        // An empty box in the dialog means the player wants the handle gone.
+        // Typed at the keyboard an empty argument means 'tell me what it is
+        // now', which is no use to a dialog that can already see it.
+        config_telegram(ch, value.empty() ? DLString("clear") : value);
+        return true;
+    }
+
+    if (key == "discord") {
+        config_discord(ch, value);
+        return true;
+    }
+
+    return false;
+}
+
+/** A setting that has just changed is written out at once.
+ *
+ *  Left in memory until the character leaves properly, it was lost whenever the
+ *  server went down in between -- and to a player who changed a setting and
+ *  watched it change, that reads as the game forgetting on purpose. Both hands
+ *  go through here, the dialog and the keyboard, so the two cannot differ in how
+ *  durable the same setting is.
+ *
+ *  Telegram and discord save inside their own handlers, where the write is part
+ *  of what they do; saving again here would be a second pfile write for one
+ *  change. */
+static void config_persist(PCharacter *ch, const DLString &key)
+{
+    if (key == "telegram" || key == "discord")
+        return;
+
+    PCharacterManager::save(ch);
+}
+
+void ConfigCommand::webValues( PCharacter *ch, Json::Value &values )
+{
+    for (Groups::iterator g = groups.begin( ); g != groups.end( ); g++)
+        for (ConfigGroup::iterator c = g->begin( ); c != g->end( ); c++)
+            if ((*c)->available(ch))
+                values[(*c)->getName().c_str()] = (*c)->isSetBit(ch) ? 1 : 0;
+
+    static const char *VALUE_KEYS[] = { "color", "lines", "telegram", "discord" };
+    for (auto &key: VALUE_KEYS) {
+        Json::Value value;
+        if (config_value_read(ch, key, value))
+            values[key] = value;
+    }
+}
+
+bool ConfigCommand::webApply( PCharacter *ch, const DLString &key, const DLString &value, Json::Value &stored )
+{
+    for (Groups::iterator g = groups.begin( ); g != groups.end( ); g++)
+        for (ConfigGroup::iterator c = g->begin( ); c != g->end( ); c++) {
+            if ((*c)->getName() != key)
+                continue;
+
+            if (!(*c)->available(ch))
+                return false;
+
+            // Exactly on or off, and nothing else: a word that got past the
+            // world file must not quietly count as 'off' here.
+            //
+            // The synonym tables (grammar/synonyms.json) hold the words a
+            // player types -- yes/да/так, on/вкл/увімк and their opposites --
+            // and nothing else: neither 1/0 nor true/false is in them. Those
+            // two pairs are what travels over the socket, so they are spelled
+            // out here rather than left to whoever calls this to know that the
+            // only safe spelling is the one the script happens to normalise to.
+            bool wanted = arg_is_yes(value) || arg_is_switch_on(value)
+                          || value == "1" || value.toLower() == "true";
+            bool refused = arg_is_no(value) || arg_is_switch_off(value)
+                          || value == "0" || value.toLower() == "false";
+
+            if (!wanted && !refused)
+                return false;
+
+            // 'toggle' is the one argument no language spells its own way, and
+            // the bit is read again afterwards rather than assumed: an option
+            // that refuses to change must not answer as though it had.
+            bool was = (*c)->isSetBit(ch);
+            if (was != wanted)
+                (*c)->handleArgument(ch, "toggle");
+
+            bool now = (*c)->isSetBit(ch);
+            stored = now ? 1 : 0;
+
+            // The same write-through the command body runs, on the same keys.
+            if (config_is_account_wide(key))
+                account_config_writethrough(ch, key, Json::Value(now));
+
+            // Clicking a switch that is already where it was asked to be is not
+            // a change, and a pfile write for it is a write for nothing.
+            if (now != was)
+                config_persist(ch, key);
+
+            return true;
+        }
+
+    Json::Value before;
+    config_value_read(ch, key, before);
+
+    if (config_value_write(ch, key, value)) {
+        // The same question the typed path asks: did anything actually move?
+        // config_value_write answers yes for finding the key at all, and the
+        // handler may have turned the value down -- or taken the one it had.
+        if (config_value_read(ch, key, stored) && stored != before)
+            config_persist(ch, key);
+
+        return true;
+    }
+
+    return false;
 }

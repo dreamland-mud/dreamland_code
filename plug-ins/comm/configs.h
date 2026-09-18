@@ -11,6 +11,7 @@
 #include "xmlpointer.h"
 #include "xmlmultistring.h"
 #include "descriptorstatelistener.h"
+#include "jsoncpp/json/json.h"
 
 class PCharacter;
 class Descriptor;
@@ -70,6 +71,21 @@ public:
     {
         return thisClass;
     }
+
+    /** Every option this player may see, by its canonical EN name, with the
+     *  value it has right now: a switch as 1 or 0, a value option as its value.
+     *  The web dialog opens on this and never guesses. */
+    void webValues( PCharacter *, Json::Value &values );
+
+    /** Change one option by its canonical EN name, with no command line to
+     *  parse: no abbreviation pass, no localised on/off word, nothing that a
+     *  renamed command could break. The player sees the same line the typed
+     *  command prints. Returns false when there is no such option or this
+     *  player may not have it; otherwise the value as it now stands -- read
+     *  back from where the option keeps it, not the value that was asked for --
+     *  is written to 'stored'. */
+    bool webApply( PCharacter *, const DLString &key, const DLString &value, Json::Value &stored );
+
    
 protected:
     virtual void initialization( );
