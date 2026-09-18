@@ -15,8 +15,21 @@ using namespace std;
  * for typeid to work correctly, hence virtual destructor.
  */
 class Event {
-public:    
+public:
     virtual ~Event();
+};
+
+/**
+ * Published once from main(), on the main thread, at the graceful-exit point --
+ * after dl.save() and while every plugin .so is still loaded. Lets a plugin flush
+ * last-tick state that the skipped ~DreamLand teardown used to persist (e.g. the
+ * running global quest's runtime file). Payload-less: a subscriber pulls whatever
+ * it needs from its own singleton. Dtor is out-of-line here so the typeinfo has a
+ * single key function in libdreamland and typeid() matches across .so boundaries.
+ */
+class ShutdownEvent : public Event {
+public:
+    virtual ~ShutdownEvent();
 };
 
 /**

@@ -19,6 +19,7 @@
 #include "logstream.h"
 #include "exception.h"
 #include "dreamland.h"
+#include "eventbus.h"
 
 static const DLString DEFAULT_CONFIG_PATH = "etc/dreamland.xml";
 
@@ -41,6 +42,12 @@ int main(int argc, char *argv[])
         }
 
         dl.save();
+
+        // Let plugins flush any last-tick state the skipped destructor teardown used
+        // to persist -- the running global quest's runtime file (saveRT). Main thread,
+        // all .so still loaded, so this one spot covers every graceful-exit path.
+        if (eventBus)
+            eventBus->publish(ShutdownEvent());
 
         // All shutdown work is durable at this point: player files were written in
         // reboot_now(), and dl.save() committed the config and synced the Fenia DB (every
