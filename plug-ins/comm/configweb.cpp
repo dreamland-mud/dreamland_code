@@ -89,7 +89,38 @@ static std::map<DLString, ConfigWebBucket> config_web_bucket;
 static const int CONFIG_WEB_BURST  = 8;  // clicks in a row, from full
 static const int CONFIG_WEB_REFILL = 2;  // tokens gained per second
 static const int CONFIG_WEB_SAVES  = 4;  // what an option that writes the pfile costs
-static const int CONFIG_WEB_SCHEMA = 2;  // what building and sending the whole dialog costs
+
+/** The schema has a limit of its own rather than a price in the bucket above.
+ *
+ *  Sharing the bucket looked tidy and was wrong: a player who had just spent it
+ *  on a burst of switches and then opened the dialog got no answer, and no
+ *  answer is how a client learns that a server has no settings at all. Eight
+ *  clicks and a re-open, and the window says the server does not support
+ *  settings -- a lie, and the exact failure the always-answer rule exists to
+ *  prevent.
+ *
+ *  One per second per character instead. A dialog asks when it opens and when
+ *  the language changes, so it never comes near; a thousand requests in one
+ *  read draw one answer. */
+static std::map<DLString, time_t> config_web_schema_at;
+
+static bool config_web_schema_due(const DLString &name)
+{
+    time_t now = time(0);
+    std::map<DLString, time_t>::iterator last = config_web_schema_at.find(name);
+
+    // The first answer of a session is never refused. A client coming back
+    // from a dropped connection can ask twice inside one second -- the prompt
+    // says it is in the world, and so does config_state -- and dropping one of
+    // those two is dropping the only one there was: the dialog would then show
+    // a server with no settings for as long as it stayed open.
+    if (last != config_web_schema_at.end() && last->second == now
+        && config_web_asked.count(name) > 0)
+        return false;
+
+    config_web_schema_at[name] = now;
+    return true;
+}
 
 /** Does a change of this option write the pfile there and then? */
 static bool config_web_writes(const DLString &key)
@@ -365,15 +396,15 @@ RPCRUN(config_schema)
 
     // The heaviest frame in the feature -- twenty-five options with their help
     // and samples, some twenty-five kilobytes of it -- and until now the only
-    // one nothing held back. A client asking a thousand times a second would
-    // have been answered a thousand times. It comes out of the same bucket as a
-    // change and costs more, because it costs the server more; a dialog asks
-    // once when it opens and once per language change, and never notices.
+    // one nothing held back: a client asking a thousand times was answered a
+    // thousand times.
     //
     // Refused means silence rather than an error frame: the answer to
     // config_schema IS the capability flag, there is no shape for 'not now',
-    // and a client that asks this often is not one that reads answers.
-    if (!config_web_afford(pch->getName(), CONFIG_WEB_SCHEMA))
+    // and a client that asks this often is not one that reads answers. Which is
+    // also why this limit is its own and not a price in the change bucket --
+    // see config_web_schema_due.
+    if (!config_web_schema_due(pch->getName()))
         return;
 
     RegisterList args1;
@@ -412,16 +443,25 @@ RPCRUN(config_schema)
  *  and the same line appears in the terminal. */
 RPCRUN(config_set)
 {
+    const DLString &key = args.empty() ? DLString::emptyString : args[0];
+
     PCharacter *pch = ch->getPC();
-    if (!pch || !config_web_playing(ch))
+    if (!pch || !config_web_playing(ch)) {
+        // Nobody in the world to change anything for: a descriptor sitting at
+        // the login prompt, or an immortal switched into a mob. Saying so is
+        // worth a frame -- a dialog left waiting runs out its timeout and then
+        // reports the server as one without settings, which is a different and
+        // wrong story. No bucket here: there is no character to charge, and the
+        // answer is four dozen bytes.
+        config_web_result(ch, config_web_safe_key(key), false, Json::Value::null,
+                          "notplaying", DLString::emptyString);
         return;
+    }
 
     // The bucket is consulted before anything else, including the shape of the
     // frame: a malformed one used to write a log line every time it arrived, so
     // a client could fill the log as fast as it could send. Handling any frame
     // costs a token, whatever comes of it.
-    const DLString &key = args.empty() ? DLString::emptyString : args[0];
-
     if (!config_web_afford(pch->getName(), 1)) {
         config_web_result(ch, config_web_safe_key(key), false, Json::Value::null,
                           "throttled", DLString::emptyString);
@@ -522,6 +562,7 @@ void ConfigWebStateListener::run( int oldState, int newState, Descriptor *d )
     if (pch) {
         config_web_asked.erase(pch->getName());
         config_web_bucket.erase(pch->getName());
+        config_web_schema_at.erase(pch->getName());
     }
 
     Json::Value body;
