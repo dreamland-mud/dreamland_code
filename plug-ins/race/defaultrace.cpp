@@ -265,7 +265,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
 
     for (int sn = 0; sn < skillManager->size( ); sn++) {
         Skill *skill = skillManager->find( sn );
-        DLString sname = skill->getNameFor( ch );
+        DLString sname = skill->getNameFor( ch ).ruscase('1');
         PCharacter dummy;
         dummy.setRace( race->getName( ) );
         dummy.setLevel( 100 );
