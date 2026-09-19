@@ -104,12 +104,12 @@ void GlobalQuestManager::handleEvent( const type_index &eventType, const Event &
     if (eventType != typeid( ShutdownEvent ))
         return;
 
-    // Graceful shutdown: persist each running quest's runtime state one last time --
-    // the same saveRT the per-tick path does, which the skipped ~DreamLand teardown
-    // (GlobalQuestInfo::destruction) used to do at exit. RT only: destruction() also
-    // saved the quest-INFO table (autostart / waitingTime); restoring that half is a
-    // separate follow-up. No suspend() (pointless on exit -- boot's loadRT + resume
-    // re-establishes state).
+    // Graceful shutdown: persist each quest one last time, both halves the skipped
+    // ~DreamLand teardown (GlobalQuestInfo::destruction) used to do at exit --
+    // saveRT (running quests' runtime state) AND save (the quest-INFO table:
+    // autostart / waitingTime / lastTime, mutated live by `gquest <id> autostart`
+    // and otherwise lost on reboot). No suspend() (pointless on exit -- boot's
+    // loadRT + resume re-establishes state).
     GlobalQuestManager *manager = GlobalQuestManager::getThis( );
     if (manager == 0)
         return;
@@ -120,6 +120,19 @@ void GlobalQuestManager::handleEvent( const type_index &eventType, const Event &
             manager->saveRT( *(i->second) );
         } catch (const Exception &ex) {
             LogStream::sendError( ) << "ShutdownEvent saveRT: " << ex << endl;
+        } catch (const std::exception &ex) {
+            LogStream::sendError( ) << "ShutdownEvent saveRT (std): " << ex.what( ) << endl;
+        }
+    }
+
+    RegistryList &reg = manager->getRegistry( );
+    for (RegistryList::iterator i = reg.begin( ); i != reg.end( ); i++) {
+        try {
+            manager->save( *(i->second) );
+        } catch (const Exception &ex) {
+            LogStream::sendError( ) << "ShutdownEvent save: " << ex << endl;
+        } catch (const std::exception &ex) {
+            LogStream::sendError( ) << "ShutdownEvent save (std): " << ex.what( ) << endl;
         }
     }
 }
