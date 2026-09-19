@@ -406,6 +406,11 @@ CMDRUNP( put )
                 case PUT_OBJ_ERR:
                     break;
                 }
+
+                // A CantPut or Put trigger fired for this item can extract the
+                // container itself; stop before the next iteration touches it.
+                if (container->extracted)
+                    return;
             }
         }
         
