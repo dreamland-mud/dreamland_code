@@ -422,6 +422,11 @@ bool aquest_trigger(::Object *obj, Character *ch, const DLString &trigType, cons
     if (!ch || ch->is_npc())
         return false;
 
+    // A trigger fired earlier this tick can extract obj (Object::extract nulls
+    // pIndexData); bail before the deref, mirroring behavior_trigger(Object*).
+    if (!obj->pIndexData)
+        return false;
+
     WrapperBase *wrapperBase = get_wrapper(obj->pIndexData->wrapper);
     if (wrapperBase == 0)
         return false;
