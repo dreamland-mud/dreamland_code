@@ -17,6 +17,7 @@
 #include "def.h"
 #include "follow_utils.h"
 #include "clanreference.h"
+#include "arg_utils.h"
 #include "l10n.h"
 
 /*
@@ -143,6 +144,64 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
     omprog_give( obj, ch, victim );
 }
 
+// 'give all <victim>' / 'give all.thing <victim>' (same for 'present'). The
+// command never had an all-dot loop the way get/drop/put do, so 'give all.sword
+// pet' just fell into get_obj_carry and answered "у тебя нет этого" -- and when
+// a charmed pet was ordered to do it, that refusal went to the mob (unseen) and
+// the player was left with a bare "Ok." (Zodd, Trello bugs). Each item still
+// passes through give_obj_char, so every per-item gate (weight, notransfer,
+// ownership, anti-align) holds; worn and unseen items are skipped.
+// A Give trigger can extract the receiver mid-loop -- a quest mob that takes the
+// item and vanishes (faeriering 29110). The pointer is reused through init(),
+// which zeroes in_room, so a second give_obj_char to it would deref a null room
+// in can_see. Stop the moment the giver or receiver leaves the room, or the
+// giver dies -- the same guard get.cpp's loot loop uses (still_looting).
+static bool still_giving( Character *ch, Character *victim, Room *room )
+{
+    // Both parties: a killed NPC keeps its in_room until the next pulse sweep,
+    // so death and room-move are complementary signals for giver and receiver
+    // alike. An item can kill the receiver mid-loop (a red-hot item's onGet
+    // burn), and the rest would then pour into a corpse-to-be and vanish.
+    return !ch->isDead( ) && !victim->isDead( )
+        && ch->in_room == room && victim->in_room == room;
+}
+
+static void give_all_char( Character *ch, const DLString &argObj, Character *victim, int mode )
+{
+    bool fAll = arg_is_all( argObj );
+    DLString objnames;
+    if (!fAll) {
+        DLString::size_type dot = argObj.find( '.' );
+        if (dot != DLString::npos)
+            objnames = argObj.substr( dot + 1 );
+    }
+
+    Room *startRoom = ch->in_room;
+    bool found = false;
+    Object *obj_next;
+    for (Object *obj = ch->carrying; obj != 0; obj = obj_next) {
+        obj_next = obj->next_content;
+
+        if (obj->wear_loc != wear_none)
+            continue;
+        if (!ch->can_see( obj ))
+            continue;
+        if (!fAll && !obj_has_name( obj, objnames, ch ))
+            continue;
+
+        found = true;
+        give_obj_char( ch, obj, victim, mode );
+
+        // A per-item trigger may have extracted the receiver or moved either
+        // party out of the room; giving the next item would then crash.
+        if (!still_giving( ch, victim, startRoom ))
+            break;
+    }
+
+    if (!found)
+        ch->pecho( fAll ? _("У тебя ничего нет.") : _("У тебя нет этого.") );
+}
+
 static bool mprog_bribe( Character *victim, Character *giver, int gold, int silver )
 {
     if (behavior_trigger(victim, "Bribe", "CCii", victim, giver, gold, silver))
@@ -267,18 +326,23 @@ CMDRUNP( give )
         return;
     }
 
+    if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
+    {
+        ch->pecho(_("Здесь таких нет."));
+        return;
+    }
+
+    if ( arg_is_alldot( arg1 ) ) {
+        give_all_char( ch, arg1, victim, GIVE_MODE_USUAL );
+        return;
+    }
+
     if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
     {
         ch->pecho(_("У тебя нет этого."));
         return;
     }
 
-    if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
-    {
-        ch->pecho(_("Здесь таких нет."));
-        return;
-    }
-    
     give_obj_char( ch, obj, victim );
 }
 
@@ -302,16 +366,21 @@ CMDRUNP( present )
         return;
     }
 
+    if (( victim = get_char_room( ch, arg2 ) ) == 0) {
+        ch->pecho( _("Они ушли, не дождавшись подарков.") );
+        return;
+    }
+
+    if ( arg_is_alldot( arg1 ) ) {
+        give_all_char( ch, arg1, victim, GIVE_MODE_PRESENT );
+        return;
+    }
+
     if (( obj = get_obj_carry( ch, arg1 ) ) == 0) {
         ch->pecho( _("У тебя нет этого.") );
         return;
     }
 
-    if (( victim = get_char_room( ch, arg2 ) ) == 0) {
-        ch->pecho( _("Они ушли, не дождавшись подарков.") );
-        return;
-    }
-    
     give_obj_char( ch, obj, victim, GIVE_MODE_PRESENT );
 }
 
