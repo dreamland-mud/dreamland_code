@@ -342,7 +342,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
             if (!bank || (pc->getClan( ) != clan && !fAll))
                 continue;
 
-            pc->pecho( "{%s%-16s{x|%16ld|%13ld|%16ld|%11ld|",
+            pc->pecho( "{%s%-16s{x|%16d|%13d|%16d|%11d|",
                     clan->getColor( ).c_str( ), 
                     clan->getShortName( ).c_str( ),
                     bank->questpoints.getValue( ),

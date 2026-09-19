@@ -153,6 +153,20 @@ void UnreadListener::run( int oldState, int newState, Descriptor *d )
     if (newState == CON_PLAYING) {
         Unread::doSpool( ch, false );
         Unread::doUnfinished( ch );
+
+        // If the two-month spool floor (NoteThread::getStamp) actually hid unread
+        // notes on some readable board, the banner above showed only the recent
+        // tail of a longer backlog -- a returning player. Say so once and point at
+        // 'readall'. Gated on real hidden backlog (hasFlooredBacklog), so daily
+        // players, quiet boards and fresh characters are never nagged.
+        NoteManager::Threads::const_iterator i;
+        const NoteManager::Threads &th = NoteManager::getThis( )->getThreads( );
+
+        for (i = th.begin( ); i != th.end( ); i++)
+            if (i->second->canRead( ch ) && i->second->hasFlooredBacklog( ch )) {
+                ch->pecho( _("{DВидны сообщения не старше двух месяцев. Чтобы отметить все прочитанным, набери {hcreadall{x{D.{x") );
+                break;
+            }
     }
 }
 

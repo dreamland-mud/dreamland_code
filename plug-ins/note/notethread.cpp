@@ -13,6 +13,7 @@
 
 #include "pcharacter.h"
 #include "comm.h"
+#include "date.h"
 #include "merc.h"
 #include "def.h"
 
@@ -203,9 +204,41 @@ bool NoteThread::isExpired( const Note *note ) const
                     > keepDays.getValue( ) * 24 * 60 * 60 + note->getID( );
 }
 
+time_t NoteThread::spoolFloor( ) const
+{
+    return dreamland->getCurrentTime( ) - 2 * Date::SECOND_IN_MONTH;
+}
+
 time_t NoteThread::getStamp( PCharacter *ch ) const
 {
-    return ch->getAttributes( ).getAttr<XMLAttributeLastRead>("lastread" )->getStamp( this );
+    // Floor the read cursor to the last two months everywhere it drives "what is
+    // unread" (countSpool, getNextUnreadNote, doList): a returning player whose
+    // stored stamp is years old must not see the whole never-expiring backlog
+    // (keepDays=0) as unread. Mirrors the two-month seed new characters get in
+    // UnreadListener::run. The STORED stamp is untouched -- reading and 'readall'
+    // still advance it -- and reading an old note by number stays reachable.
+    time_t stamp = ch->getAttributes( ).getAttr<XMLAttributeLastRead>("lastread" )->getStamp( this );
+    time_t f = spoolFloor( );
+    return stamp < f ? f : stamp;
+}
+
+// True only when the two-month floor actually hides an unread note this reader
+// would otherwise see (unread, addressed to them, older than the floor). Lets
+// the login notice fire on real hidden backlog rather than on stamp age, so
+// daily players, quiet boards and fresh characters never trigger it.
+bool NoteThread::hasFlooredBacklog( PCharacter *ch ) const
+{
+    time_t raw = ch->getAttributes( ).getAttr<XMLAttributeLastRead>("lastread" )->getStamp( this );
+    time_t f = spoolFloor( );
+
+    if (raw >= f)
+        return false;
+
+    for (NoteList::const_iterator i = xnotes.begin( ); i != xnotes.end( ); i++)
+        if ((*i)->getID( ) <= f && !isNoteHidden( *i, ch, raw ))
+            return true;
+
+    return false;
 }
 
 int NoteThread::countSpool( PCharacter *ch ) const
@@ -217,7 +250,7 @@ int NoteThread::countSpool( PCharacter *ch ) const
     for (i = xnotes.begin( ); i != xnotes.end( ); i++)
         if (!isNoteHidden( *i, ch, stamp ))
             cnt++;
-    
+
     return cnt;
 }
 
