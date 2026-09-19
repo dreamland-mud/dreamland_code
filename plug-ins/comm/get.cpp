@@ -634,7 +634,12 @@ CMDRUNP( get )
 
                 if (!oprog_can_fetch( ch, container, obj, pocket ))
                     continue;
-                
+
+                // A CantFetch trigger can extract the container itself; stop
+                // before can_get_obj / the next iteration touches it.
+                if (container->extracted)
+                    return;
+
                 int rc = can_get_obj( ch, obj );
                 if (rc == GET_OBJ_STOP)
                     return;
@@ -642,6 +647,10 @@ CMDRUNP( get )
                     continue;
 
                 get_obj_container( ch, obj, container );
+
+                // A Fetch/Get trigger can extract the container mid-loop.
+                if (container->extracted)
+                    return;
 
                 if (!still_looting( ch, startRoom ))
                     break;
