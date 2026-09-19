@@ -496,6 +496,10 @@ CMDRUNP( get )
             for ( obj = ch->in_room->contents; obj; obj = obj_next )
             {
                 obj_next = obj->next_content;
+                // A prior get's trigger can extract a neighbour room item;
+                // it then leaves the room -- stop before dereferencing it.
+                if ( obj->in_room != startRoom )
+                    break;
                 if ( (all || obj_has_name( obj, argTarget, ch ))
                         && ch->can_see( obj ) )
                 {
@@ -608,6 +612,11 @@ CMDRUNP( get )
             for ( obj = container->contains; obj; obj = obj_next )
             {
                 obj_next = obj->next_content;
+
+                // A prior get's trigger can extract a neighbour item from this
+                // container; it then leaves it -- stop before dereferencing it.
+                if ( obj->in_obj != container )
+                    break;
 
                 if (!all && !obj_has_name( obj, argTarget, ch ))
                     continue;

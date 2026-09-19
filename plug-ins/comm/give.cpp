@@ -182,6 +182,12 @@ static void give_all_char( Character *ch, const DLString &argObj, Character *vic
     for (Object *obj = ch->carrying; obj != 0; obj = obj_next) {
         obj_next = obj->next_content;
 
+        // A prior item's Give trigger can extract a NEIGHBOUR carried item
+        // (Object::extract zeroes carried_by/pIndexData/next_content); stop
+        // before the loop dereferences it. No live trigger does this today.
+        if (obj->carried_by != ch)
+            break;
+
         if (obj->wear_loc != wear_none)
             continue;
         if (!ch->can_see( obj ))
