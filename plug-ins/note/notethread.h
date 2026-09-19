@@ -138,6 +138,7 @@ public:
     int getGenderFor( lang_t ) const;
 
     int countSpool( PCharacter * ) const;
+    bool hasFlooredBacklog( PCharacter * ) const;
     const Note * getNextUnreadNote( PCharacter * ) const;
     void showNoteToChar( PCharacter *, const Note * ) const;
     const Note * findNote( time_t ) const;
@@ -150,6 +151,7 @@ protected:
     const Note * getNoteAtPosition( PCharacter *, int  ) const;
     int getNoteNumber( PCharacter *, const Note * ) const;
     time_t getStamp( PCharacter * ) const;
+    time_t spoolFloor( ) const;
 
 protected:
     void loadAllBuckets( );
