@@ -136,9 +136,14 @@ bool behavior_trigger(Character *ch, const DLString &trigType, const char *fmt, 
 	return reglist_to_bool(regList);
 }
 
-bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ...) 
+bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ...)
 {
-	va_list ap;    
+	// A trigger fired earlier in the same tick can extract this very object
+	// (Object::extract nulls pIndexData); bail before the deref segfaults.
+	if (!obj->pIndexData)
+		return false;
+
+	va_list ap;
 	va_start(ap, fmt);
 
 	auto regList = behavior_trigger_with_result(obj->pIndexData->behaviors, trigType, fmt, ap);
