@@ -152,6 +152,11 @@ CMDRUNP( drop )
         for (obj = ch->carrying; obj != 0; obj = obj_next) {
             obj_next = obj->next_content;
 
+            // A prior drop's trigger can extract or move a neighbour carried
+            // item; it is then no longer carried by ch -- stop before the deref.
+            if (obj->carried_by != ch)
+                break;
+
             if (!fAll && !obj_has_name( obj, objnames, ch ))
                 continue;
             if (!ch->can_see( obj ))
