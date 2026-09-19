@@ -77,7 +77,7 @@ void CMlt::doShowOther( Character *ch, PCMemoryInterface *pcm )
     for (unsigned int i = 0; i < r.size( ); i++) {
         LifeData &life = r[i];
 
-        ch->pecho( " %-12s %-12s     %5ld      %s", 
+        ch->pecho( " %-12s %-12s     %5d      %s",
                     life.race.getValue( ).c_str( ),
                     life.classCh.getValue( ).c_str( ),
                     life.time.getValue( ),

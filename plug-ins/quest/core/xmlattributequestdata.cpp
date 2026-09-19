@@ -43,7 +43,7 @@ bool XMLAttributeQuestData::pull( PCMemoryInterface *pcm )
     if (!quest)
         return false;
 
-    quest->wiznet( "expired", "started at %lld", startTime.getValue());
+    quest->wiznet( "expired", "started at %d", startTime.getValue());
 
     attributes->eraseAttribute( "quest" );
     setTime(1);

@@ -534,19 +534,19 @@ bool OLCState::numberEdit(long minValue, long maxValue, long &field)
     DLString args = lastArgs;
 
     if (args.empty()) {
-        ptc(ch, "Использование:\r\n{y%s{x число - установить значение в диапазоне от %ld до %ld\r\n",
+        ptc(ch, "Использование:\r\n{y%s{x число - установить значение в диапазоне от %d до %d\r\n",
             cmd, minValue, maxValue);
         return false;
     }
     
     long value = atol(args.getOneArgument().c_str());
     if (value < minValue || value > maxValue) {
-        ptc(ch, "Значение должно лежать в диапазоне от %ld до %ld.\r\n", minValue, maxValue);
+        ptc(ch, "Значение должно лежать в диапазоне от %d до %d.\r\n", minValue, maxValue);
         return false;
     }
 
     field = value;
-    ptc(ch, "Новое значение поля {g%s{x: %ld\r\n", cmd, field);
+    ptc(ch, "Новое значение поля {g%s{x: %d\r\n", cmd, field);
     return true;
 }
 

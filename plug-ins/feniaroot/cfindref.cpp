@@ -107,7 +107,7 @@ CMDADM(findrefs)
             ch->pecho("    %d refs: %d", r.first, r.second);
 
         if (cnt > 0)
-            ch->pecho("Example: %lld", ids.front());
+            ch->pecho("Example: %d", ids.front());
         return;
     }
 
