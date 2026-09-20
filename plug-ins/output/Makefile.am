@@ -4,6 +4,7 @@ liboutput_la_LIBADD = ../descriptor/libdescriptor.la -ljsoncpp
 
 liboutput_la_SOURCES = \
 wiznet.cpp \
+chatframe.cpp \
 infonet.cpp \
 msgformatter.cpp \
 act.cpp \

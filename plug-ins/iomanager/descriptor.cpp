@@ -467,6 +467,29 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
          * command log. See entrytoken.cpp. */
         bool ok = !args.empty() && entry_token_redeem(this, args.front());
         writeWSCommand(ok ? "account_enter_ok" : "account_enter_failed", std::vector<DLString>());
+    } else if(name == "chat_subscribe") {
+        /* Character-less like `ping`, and necessarily so: the chat panel is a
+         * property of this browser tab, not of whoever is playing in it. A
+         * client that reconnects and re-subscribes out of its own stored
+         * preference does so at the login prompt, before there is a character
+         * to hang the flag on; and once it is set, quitting to the prompt and
+         * entering an alt on the same socket keeps the panel fed with no
+         * second request. The flag dies with the descriptor, so there is
+         * nothing to clean up and nothing stored per player. */
+        bool off = !args.empty() && args.front() == "off";
+
+        if (off)
+            REMOVE_BIT(oob_proto, OOB_CHAT);
+        else
+            SET_BIT(oob_proto, OOB_CHAT);
+
+        Json::Value out;
+        out["command"] = "chat_state";
+        out["args"][0]["on"] = off ? 0 : 1;
+        out["args"][0]["playing"] = (character && connected == CON_PLAYING) ? 1 : 0;
+        if (character && !character->is_npc())
+            out["args"][0]["who"] = character->getNameC();
+        writeWSCommand(out);
     } else if(name == "ping") {
         /* Character-less too, and its only job is to prove the socket still
          * carries traffic in both directions. A phone that has been suspended
