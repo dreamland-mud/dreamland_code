@@ -126,17 +126,25 @@ void talk_auction(const char *argument)
     
         bool fRussian = Player::displayLang(ch) != LANG_EN;
         DLString line = fRussian ? msg_ru : msg_en;
-        ch->pecho(POS_SLEEPING, line.c_str());
+
+        // THE STRING GOES AS AN ARGUMENT, NOT AS A FORMAT.
+        //
+        // What is inside is what the player typed: "auction talk <text>"
+        // lands here verbatim. While the string was handed to pecho as a
+        // format, "auction talk %d" printed register garbage to everyone
+        // (verified 2026-09-20: "-1625415662"), and "%s" would dereference
+        // a random pointer -- handing a piece of the server's memory to
+        // every player on the channel, or taking the world down.
+        //
+        // No substitution is needed here at all: every call has already
+        // filled in its own arguments before us.
+        ch->pecho(POS_SLEEPING, "%s", line.c_str());
 
         // Nobody says this: it is the auctioneer's own announcement, so the
         // frame has no peer. COMM_NOAUCTION above is the only gate this path
         // has, and the emitter inherits it by standing after it.
-        //
-        // pecho took the line as a format, so the frame has to take it the same
-        // way: a bid text with a percent sign in it must not read differently
-        // in the panel than it did in the terminal.
         if (chat_subscribed(ch))
-            chat_emit(ch, 0, false, "auction", "world", fmt(ch, line.c_str()));
+            chat_emit(ch, 0, false, "auction", "world", line);
     }
 }
 
@@ -165,9 +173,14 @@ void talk_auction( const MultiMessage &message, ... )
         va_end( ap );
 
         DLString line = DLString("{Y") + prefix.getMessage( ch ) + ": " + body + "{x";
-        ch->pecho( POS_SLEEPING, line.c_str( ) );
+
+        // An argument, not a format: body is already built by vfmt above with
+        // its own arguments, and a second pass over it is pure risk. Players
+        // name their own lots (restring), and a percent sign in a name would
+        // be read as a substitution.
+        ch->pecho( POS_SLEEPING, "%s", line.c_str( ) );
         if (chat_subscribed(ch))
-            chat_emit(ch, 0, false, "auction", "world", fmt(ch, line.c_str( )));
+            chat_emit(ch, 0, false, "auction", "world", line);
     }
 }
 
