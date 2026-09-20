@@ -2291,12 +2291,24 @@ static DLString chat_codesource( )
     if (!ctx || !ctx->nodeTrace || !ctx->nodeTrace->node)
         return DLString::emptyString;
 
-    // Never dereferenced when the source is already gone: a Closure can outlive
-    // the CodeSource that minted it.
-    if (!ctx->nodeTrace->node->source.source)
+    // NEVER DEREFERENCE source.source. It can dangle: a mass free destroys the
+    // CodeSource while a Closure still holds one of its functions, and reading
+    // through the stale pointer is exactly the crash of 2026-08-08 ("manager at
+    // 0x68", four crash-looping boots) that Function::finalize was rewritten to
+    // avoid. Do what that fix does: look the source up by the stored id, and
+    // only use it when the live entry is the SAME object -- ids wrap.
+    const CodeSourceRef &ref = ctx->nodeTrace->node->source;
+    if (!ref.csId || !CodeSource::manager)
         return DLString::emptyString;
 
-    return ctx->nodeTrace->node->source.source->name;
+    CodeSource::Manager::iterator it = CodeSource::manager->find(ref.csId);
+    if (it == CodeSource::manager->end())
+        return DLString::emptyString;
+
+    if (&*it != ref.source.getPointer())
+        return DLString::emptyString;
+
+    return it->name;
 }
 
 /** q<number>_step<number>_ anywhere in the codesource name: the quest and the

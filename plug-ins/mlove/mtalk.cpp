@@ -78,6 +78,8 @@ CMDRUN( mtalk )
 
     // Off the framework as well, and with one listener it checks nothing at
     // all: a spouse who is in the world hears this, and that is the whole rule.
-    chat_emit( victim, ch, false, "mtalk", "personal", lineVict );
-    chat_emit( ch, victim, true, "mtalk", "personal", lineChar );
+    if (chat_subscribed( victim ))
+        chat_emit( victim, ch, false, "mtalk", "personal", lineVict );
+    if (chat_subscribed( ch ))
+        chat_emit( ch, victim, true, "mtalk", "personal", lineChar );
 }

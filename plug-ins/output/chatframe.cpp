@@ -50,13 +50,20 @@ static void chat_peer( Json::Value &body, Character *to, Character *peer )
 
     Json::Value out;
     out["name"] = name.str( );
-    out["npc"] = peer->is_npc( );
     out["anon"] = !seen;
 
-    // The login name: stable across languages and cases, never displayed. A mob
-    // has none, and an unseen speaker must not hand one out.
-    if (seen && !peer->is_npc( ))
-        out["key"] = peer->getNameC( );
+    // Nothing about a speaker the viewer cannot see -- not even whether it is a
+    // mob. The console says "someone" and stops there; a panel that could tell
+    // a hidden thief from a wandering beast would be telling the player
+    // something the game deliberately withheld.
+    if (seen) {
+        out["npc"] = peer->is_npc( );
+
+        // The login name: stable across languages and cases, never displayed.
+        // A mob has none.
+        if (!peer->is_npc( ))
+            out["key"] = peer->getNameC( );
+    }
 
     body["peer"] = out;
 }

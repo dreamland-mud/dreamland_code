@@ -47,10 +47,14 @@ void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLSt
     postOutput(victim, messageVict);
     postOutput(ch, messageChar);
 
-    // Only the sender sees this one now: the addressee is afk, fighting with
-    // autostore, or link-dead, and their console was not written to either --
-    // they pick the message up from replay when they come back.
-    chat_emit(ch, victim, true, getName( ), webKind( ), messageChar);
+    // THE ONE PLACE WHERE A FRAME DOES NOT MIRROR THE CONSOLE. On the deferred
+    // path the console writes NEITHER copy: there is nowhere to tell the
+    // addressee, and the sender is only told that they are away. Both lines go
+    // to replay, and the sender's frame follows replay: you have to see your
+    // own words in the panel, or the conversation breaks off mid-sentence.
+    // The addressee gets no frame -- they read the message when they return.
+    if (chat_subscribed( ch ))
+        chat_emit(ch, victim, true, getName( ), webKind( ), messageChar);
 
     victim->reply = ch;
 }
@@ -186,13 +190,15 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
         postOutput(ch, messageChar);
         // On a personal channel the outgoing copy has a counterpart: who it was
         // said to. A panel threads both halves of a conversation by it.
-        chat_emit(ch, victim, true, getName( ), webKind( ), messageChar);
+        if (chat_subscribed( ch ))
+            chat_emit(ch, victim, true, getName( ), webKind( ), messageChar);
     }
 
     if (needOutputVict( ch, victim )) {
         victim->pecho(messageVict);
         postOutput(victim, messageVict);
-        chat_emit(victim, ch, false, getName( ), webKind( ), messageVict);
+        if (chat_subscribed( victim ))
+            chat_emit(victim, ch, false, getName( ), webKind( ), messageVict);
     }
 
     triggers( ch, victim, msg );

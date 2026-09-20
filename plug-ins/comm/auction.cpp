@@ -135,7 +135,8 @@ void talk_auction(const char *argument)
         // pecho took the line as a format, so the frame has to take it the same
         // way: a bid text with a percent sign in it must not read differently
         // in the panel than it did in the terminal.
-        chat_emit(ch, 0, false, "auction", "world", fmt(ch, line.c_str()));
+        if (chat_subscribed(ch))
+            chat_emit(ch, 0, false, "auction", "world", fmt(ch, line.c_str()));
     }
 }
 
@@ -165,7 +166,8 @@ void talk_auction( const MultiMessage &message, ... )
 
         DLString line = DLString("{Y") + prefix.getMessage( ch ) + ": " + body + "{x";
         ch->pecho( POS_SLEEPING, line.c_str( ) );
-        chat_emit(ch, 0, false, "auction", "world", fmt(ch, line.c_str( )));
+        if (chat_subscribed(ch))
+            chat_emit(ch, 0, false, "auction", "world", fmt(ch, line.c_str( )));
     }
 }
 

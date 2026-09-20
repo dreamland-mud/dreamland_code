@@ -104,7 +104,12 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
         ch->pecho(message);
         postOutput(ch, message);
         // The speaker's own copy: no counterpart on an undirected channel.
-        chat_emit(ch, 0, true, getName( ), webKind( ), message, webArea( ch, ch ));
+        //
+        // Asked first, because the arguments are not free: webArea() builds the
+        // area name in the reader's language, and a world with no panels open
+        // at all should pay nothing for this line.
+        if (chat_subscribed( ch ))
+            chat_emit(ch, 0, true, getName( ), webKind( ), message, webArea( ch, ch ));
     }
     
     if (needOutputOther( ch )) {
@@ -125,7 +130,8 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
             // switch, quiet, the deafen spell, trust, position, the isolator --
             // was decided in isGlobalListener before they got here, so a frame
             // goes exactly where the line went.
-            chat_emit(victim, ch, false, getName( ), webKind( ), message, webArea( victim, ch ));
+            if (chat_subscribed( victim ))
+                chat_emit(victim, ch, false, getName( ), webKind( ), message, webArea( victim, ch ));
         }
     }
 
