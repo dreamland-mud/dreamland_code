@@ -391,7 +391,9 @@ void affect_remove( Character *ch, Affect *paf, bool verbose )
         // expires on the same pulse the char dies would otherwise announce
         // itself right after the death message. Death itself strips affects
         // with verbose=false already; this covers the verbose natural-expiry
-        // path landing on an already-dead char.
+        // path landing on an already-dead char. (Silence during extraction/quit
+        // is enforced one level down, in AffectHandler::onRemove, so every strip
+        // path -- here, affect_strip, checkDispel, char_update -- is covered.)
         if (verbose && !ch->isDead()) {
             if (paf->type->getAffect())
                 paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, ch), paf);

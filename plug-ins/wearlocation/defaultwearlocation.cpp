@@ -447,7 +447,14 @@ void DefaultWearlocation::affectsOnUnequip( Character *ch, Object *obj )
 
 void DefaultWearlocation::triggersOnUnequip( Character *ch, Object *obj )
 {
-    oprog_remove( obj, ch );
+    // On extraction (quit) skip the object's Remove trigger. extract_char runs
+    // after quit.cpp has already saved the character, so nothing a Remove hook does
+    // here is persisted; firing them only spams the leaving player and the room with
+    // fade lines from the bespoke onRemove handlers on grant/clan/set items (trello
+    // Xcs5Tfvv). Affect strips are already silenced at the AffectHandler::onRemove
+    // choke point; this covers the Fenia/behavior Remove triggers that never reach it.
+    if (ch == 0 || !ch->extracted)
+        oprog_remove( obj, ch );
 
     switch (obj->item_type) {
     case ITEM_LIGHT:
