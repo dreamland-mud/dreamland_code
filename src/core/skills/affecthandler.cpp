@@ -149,7 +149,6 @@ bool AffectHandler::onRemove(const SpellTarget::Pointer &target, Affect *paf)
             // via affect_remove, affect_strip, checkDispel or char_update -- and
             // spam the leaving player plus, for room-form wear-offs, the whole
             // room (trello Xcs5Tfvv). This is the one choke point they all share.
-            // Death drops affects with verbose=false and never reaches this call.
             if (target->victim->extracted)
                 break;
             FENIA_CALL(ah, "RemoveChar", "CA", target->victim, paf);
