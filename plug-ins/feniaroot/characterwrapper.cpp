@@ -260,6 +260,18 @@ NMI_SET( CharacterWrapper, dead, "true, если персонажа уничто
     target->setDead();
 }
 
+NMI_GET( CharacterWrapper, extracted, "true, если персонаж извлекается из мира (quit/смерть). Проверяй перед act/echo при снятии предметов, чтобы не спамить уходящему игроку и комнате" )
+{
+    if (zombie)
+        return true;
+
+    if (!target)
+        return true;
+
+    checkTarget();
+    return target->extracted;
+}
+
 NMI_GET( CharacterWrapper, displayLang, "язык вывода для этого зрителя (0=en, 1=ru, 2=ua) с учётом 'config lang'; для мобов -- язык переключённого имма или дефолт. Передавай в .tables.X.messages(bits, gcase, ch.displayLang), чтобы флаги отображались на языке игрока." )
 {
     checkTarget();
