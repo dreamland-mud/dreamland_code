@@ -387,12 +387,17 @@ void affect_remove( Character *ch, Affect *paf, bool verbose )
                 return;
         }
 
-        // A wear-off must stay silent on a corpse: an affect whose duration
-        // expires on the same pulse the char dies would otherwise announce
-        // itself right after the death message. Death itself strips affects
-        // with verbose=false already; this covers the verbose natural-expiry
-        // path landing on an already-dead char.
-        if (verbose && !ch->isDead()) {
+        // A wear-off must stay silent on a corpse or a character being extracted
+        // (quit). An affect whose duration expires on the same pulse the char dies
+        // would otherwise announce itself right after the death message. And on
+        // quit, extract_char unequips every worn item, so each item-cast perma-affect
+        // (fly, concentrate, item-granted skills) funnels through unequip's
+        // strip_object_sourced_affects and would spam its wear-off to the leaving
+        // player and -- for affects carrying a room form (e.g. fly's "loses the
+        // ability to levitate") -- the whole room (trello Xcs5Tfvv). Death already
+        // strips with verbose=false; extract_char sets ch->extracted before the
+        // unequip loop, so the extracted guard covers the quit path.
+        if (verbose && !ch->isDead() && !ch->extracted) {
             if (paf->type->getAffect())
                 paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, ch), paf);
         }
