@@ -42,6 +42,17 @@ protected:
     virtual DLString outputSelf( Character *, const DLString &, const DLString & ) const;
     virtual void postOutput( Character *outputTo, const DLString &message ) const;
 
+    /** The coarse bucket a chat frame from this channel carries: room,
+     *  personal, area, world, race, group. A panel files a channel it has
+     *  never heard of by this, so it is answered by the class and not listed
+     *  anywhere per channel. World is the default because most channels are. */
+    virtual DLString webKind( ) const;
+
+    /** Where the speaker is, in the recipient's language -- only the area
+     *  channel has anything to say here, and a frame from anywhere else
+     *  carries no area at all. */
+    virtual DLString webArea( Character *to, Character *from ) const;
+
     XML_VARIABLE XMLFlagsNoEmpty off;
     XML_VARIABLE XMLBooleanNoFalse garble, isolate, deafen, hook, ooc;
     XML_VARIABLE XMLIntegerNoEmpty trustSpeak, trustHear;

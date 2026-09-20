@@ -47,6 +47,11 @@ DLString RaceChannel::outputVict( Character *ch, Character *victim,
 //    postOutput( victim, message );
 }
 
+DLString RaceChannel::webKind( ) const
+{
+    return "race";
+}
+
 bool RaceChannel::canTalkGlobally( Character *ch ) const
 {
     if (!GlobalChannel::canTalkGlobally( ch ))

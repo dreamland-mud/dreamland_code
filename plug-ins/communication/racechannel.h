@@ -18,6 +18,8 @@ protected:
     virtual bool isGlobalListener( Character *, Character * ) const;
     virtual bool canTalkGlobally( Character * ) const;
 
+    virtual DLString webKind( ) const;
+
     virtual DLString outputVict( Character *, Character *, const DLString &, const DLString & ) const;
     virtual DLString outputSelf( Character *, const DLString &, const DLString & ) const;
 };

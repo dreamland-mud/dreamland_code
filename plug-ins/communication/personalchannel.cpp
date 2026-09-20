@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "personalchannel.h"
+#include "chatframe.h"
 #include "replay.h"
 
 #include "logstream.h"
@@ -45,7 +46,12 @@ void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLSt
 
     postOutput(victim, messageVict);
     postOutput(ch, messageChar);
-    
+
+    // Only the sender sees this one now: the addressee is afk, fighting with
+    // autostore, or link-dead, and their console was not written to either --
+    // they pick the message up from replay when they come back.
+    chat_emit(ch, victim, true, getName( ), webKind( ), messageChar);
+
     victim->reply = ch;
 }
 
@@ -178,11 +184,15 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
     if (needOutputChar( ch )) {
         ch->pecho(messageChar);
         postOutput(ch, messageChar);
+        // On a personal channel the outgoing copy has a counterpart: who it was
+        // said to. A panel threads both halves of a conversation by it.
+        chat_emit(ch, victim, true, getName( ), webKind( ), messageChar);
     }
 
     if (needOutputVict( ch, victim )) {
         victim->pecho(messageVict);
         postOutput(victim, messageVict);
+        chat_emit(victim, ch, false, getName( ), webKind( ), messageVict);
     }
 
     triggers( ch, victim, msg );
@@ -263,5 +273,10 @@ void PersonalChannel::postOutput( Character *outputTo, const DLString &message )
 {
     if (!outputTo->is_npc())
         remember_history_private( outputTo->getPC( ), message );
+}
+
+DLString PersonalChannel::webKind( ) const
+{
+    return "personal";
 }
 

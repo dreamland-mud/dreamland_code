@@ -145,6 +145,16 @@ DLString CommunicationChannel::outputChar( Character *ch, Character *victim,
     return message;
 }
 
+DLString CommunicationChannel::webKind( ) const
+{
+    return "world";
+}
+
+DLString CommunicationChannel::webArea( Character *to, Character *from ) const
+{
+    return DLString::emptyString;
+}
+
 void CommunicationChannel::postOutput( Character *outputTo, const DLString &message ) const
 {
 }

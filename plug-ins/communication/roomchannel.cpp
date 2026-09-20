@@ -31,3 +31,8 @@ void RoomChannel::postOutput( Character *outputTo, const DLString &message ) con
         remember_history_near( outputTo->getPC( ), message );
 }
 
+DLString RoomChannel::webKind( ) const
+{
+    return "room";
+}
+

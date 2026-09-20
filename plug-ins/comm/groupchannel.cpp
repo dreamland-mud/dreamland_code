@@ -122,3 +122,8 @@ void GroupChannel::postOutput( Character *outputTo, const DLString &message ) co
         remember_history_near( outputTo->getPC( ), message );
 }
 
+DLString GroupChannel::webKind( ) const
+{
+    return "group";
+}
+

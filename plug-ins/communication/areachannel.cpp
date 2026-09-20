@@ -3,6 +3,8 @@
  * ruffina, 2004
  */
 #include "areachannel.h"
+#include "player_utils.h"
+#include "area.h"
 #include "replay.h"
 
 #include "wrapperbase.h"
@@ -63,5 +65,21 @@ void AreaChannel::postOutput( Character *outputTo, const DLString &message ) con
 {
     if (!outputTo->is_npc())
         remember_history_near( outputTo->getPC( ), message );
+}
+
+DLString AreaChannel::webKind( ) const
+{
+    return "area";
+}
+
+/** Where the shout came from, named in the reader's own language: a yell from
+ *  two rooms away and a yell from the other end of the area read the same in
+ *  the panel otherwise. */
+DLString AreaChannel::webArea( Character *to, Character *from ) const
+{
+    if (!to || !from || !from->in_room || !from->in_room->areaIndex( ))
+        return DLString::emptyString;
+
+    return from->in_room->areaIndex( )->getName( Player::displayLang( to ), '1' );
 }
 

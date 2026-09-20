@@ -171,6 +171,11 @@ void PageChannel::postOutput( Character *outputTo, const DLString &message ) con
     PersonalChannel::postOutput( outputTo, message );
 }
 
+DLString PageChannel::webKind( ) const
+{
+    return PersonalChannel::webKind( );
+}
+
 
 /*-----------------------------------------------------------------------
  * SpeechChannel
