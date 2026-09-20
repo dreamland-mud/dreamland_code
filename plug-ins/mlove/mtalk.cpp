@@ -10,6 +10,7 @@
 #include "pcharactermanager.h"
 #include "l10n.h"
 #include "mudtags.h"
+#include "chatframe.h"
 
 CMDRUN( mtalk )
 {
@@ -62,9 +63,21 @@ CMDRUN( mtalk )
 
     buf << msg << "{x'";
     remember_history_private(victim, buf.str());
+
+    // The two lines as the consoles will show them, kept before the newline
+    // goes on: a frame carries the line, not the line feed.
+    DLString lineVict = buf.str( );
     buf << endl;
-    buf0 << msg << "{x'" << endl;
+
+    buf0 << msg << "{x'";
+    DLString lineChar = buf0.str( );
+    buf0 << endl;
 
     victim->send_to( buf );
     ch->send_to( buf0 );
+
+    // Off the framework as well, and with one listener it checks nothing at
+    // all: a spouse who is in the world hears this, and that is the whole rule.
+    chat_emit( victim, ch, false, "mtalk", "personal", lineVict );
+    chat_emit( ch, victim, true, "mtalk", "personal", lineChar );
 }

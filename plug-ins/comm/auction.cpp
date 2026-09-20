@@ -61,6 +61,7 @@
 #include "room.h"
 
 #include "dreamland.h"
+#include "chatframe.h"
 #include "merc.h"
 #include "descriptor.h"
 #include "ban.h"
@@ -124,7 +125,17 @@ void talk_auction(const char *argument)
             continue;
     
         bool fRussian = Player::displayLang(ch) != LANG_EN;
-        ch->pecho(POS_SLEEPING, fRussian ? msg_ru.c_str() : msg_en.c_str());
+        DLString line = fRussian ? msg_ru : msg_en;
+        ch->pecho(POS_SLEEPING, line.c_str());
+
+        // Nobody says this: it is the auctioneer's own announcement, so the
+        // frame has no peer. COMM_NOAUCTION above is the only gate this path
+        // has, and the emitter inherits it by standing after it.
+        //
+        // pecho took the line as a format, so the frame has to take it the same
+        // way: a bid text with a percent sign in it must not read differently
+        // in the panel than it did in the terminal.
+        chat_emit(ch, 0, false, "auction", "world", fmt(ch, line.c_str()));
     }
 }
 
@@ -152,8 +163,9 @@ void talk_auction( const MultiMessage &message, ... )
         DLString body = vfmt( ch, message.getMessage( ch ).c_str( ), ap );
         va_end( ap );
 
-        ch->pecho( POS_SLEEPING,
-                   (DLString("{Y") + prefix.getMessage( ch ) + ": " + body + "{x").c_str( ) );
+        DLString line = DLString("{Y") + prefix.getMessage( ch ) + ": " + body + "{x";
+        ch->pecho( POS_SLEEPING, line.c_str( ) );
+        chat_emit(ch, 0, false, "auction", "world", fmt(ch, line.c_str( )));
     }
 }
 
