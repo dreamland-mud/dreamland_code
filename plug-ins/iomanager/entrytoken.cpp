@@ -41,6 +41,7 @@
 #include "logstream.h"
 #include "interp.h"
 #include "room.h"
+#include "wiznet.h"
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"
@@ -339,4 +340,57 @@ PCharacter * account_enter_char(Descriptor *d, const DLString &charName)
 
     interpret_raw(ch, "look");
     return ch;
+}
+
+/**
+ * Reconnect descriptor `d` into the LINKDEAD body `twin` already in the world,
+ * instead of cold-loading a duplicate: the take-over sibling of account_enter_char
+ * that `account switch` uses when the chosen character is lostlink (Player present,
+ * its own descriptor gone). The CALLER owns the same pre-step -- leave the current
+ * character (save/quit/resume_token_clear/extract_char) -- so `d` already carries a
+ * live game buffer and a spent InterpretHandler here: no login shell to detach, no
+ * buffer swap, unlike the entry token's fresh web descriptor. Mirrors the
+ * entry-token/resume take-over (entrytoken.cpp:249-276, resume.cpp:213-235): drop any
+ * stale resume token on the body, close whatever dead descriptor still clings to it,
+ * hand `d` the body, then fire CON_RESUME->CON_PLAYING (config-apply + last-host still
+ * run, arriving-player greeters stay quiet -- this is a reconnect, not a login).
+ */
+PCharacter * account_reconnect_char(Descriptor *d, PCharacter *twin)
+{
+    if (!d || !twin)
+        return 0;
+
+    // A stale web resume token on the body would let a suspended tab `resume` back in
+    // and evict this session -- drop it first, like the backdoor and entry take-over do.
+    resume_token_clear(twin);
+
+    // A descriptor still on the body is a dead-but-unreaped socket. account_switch's
+    // guard already refused a live connection, so this never fires from there -- but
+    // this is a public entry point, and closing a non-CON_PLAYING (nanny-stage)
+    // descriptor would run NannyHandler::close -> extractNewbie -> delete the body out
+    // from under us. Only a CON_PLAYING descriptor closes cleanly (InterpretHandler
+    // handlers detach without freeing); refuse anything else, the way resume.cpp:213 and
+    // entry_token_redeem do.
+    if (twin->desc != 0) {
+        if (twin->desc->connected != CON_PLAYING)
+            return 0;
+        twin->desc->close();
+    }
+
+    d->associate(twin);
+    InterpretHandler::init(d);
+    DescriptorStateManager::getThis()->handle(CON_RESUME, CON_PLAYING, d);
+    twin->timer = 0;
+
+    // Answer the net-death close this reconnect undoes (interprethandler.cpp:586): a
+    // wiznet line and a forensics notice so admins and the log see the link come back.
+    // NOT quiet like web-resume -- a switch is a one-off, not a phone locking its screen
+    // fifty times an evening. No room echo: this TU carries no l10n catalog, and a
+    // player-facing "restored the link" belongs translated, not RU-only.
+    wiznet(WIZ_LINKS, 0, twin->get_trust(), "%C1 has restored the link.", twin);
+    LogStream::sendNotice() << "account switch: " << d->host << " reconnected into "
+                            << twin->getName() << endl;
+
+    interpret_raw(twin, "look");
+    return twin;
 }

@@ -550,10 +550,17 @@ static void account_switch(PCharacter *ch, DLString &args)
         return;
     }
 
-    // Already in the world on another connection -- refuse (no takeover in v1).
-    if (pcm->getPlayer() != 0) {
-        ch->pecho(_("Этот персонаж уже в игре."));
-        return;
+    // Already in the world? A LINKDEAD husk (Player present, its own descriptor gone)
+    // is reconnected below -- the same take-over the entry token and web resume do --
+    // so switching to a lostlink character lands you back in its body instead of
+    // bouncing. Only a GENUINELY LIVE connection (a session on another device, or a
+    // socket not yet reaped) is refused: no live-takeover from `account switch` in v1.
+    {
+        PCharacter *twin = pcm->getPlayer();
+        if (twin != 0 && (twin->desc != 0 || twin->switchedTo != 0)) {
+            ch->pecho(_("Этот персонаж уже в игре."));
+            return;
+        }
     }
 
     // Leave-cleanly guards, mirroring quit.cpp (a switch is never "forced").
@@ -644,6 +651,10 @@ static void account_switch(PCharacter *ch, DLString &args)
     f["char"] = altName;
     f["from"] = ch->getName();
     f["account"] = id;
+    // The guard above already refused a live connection, so a still-in-world alt here
+    // is a linkdead husk that the tail reconnects into rather than cold-loads. Record
+    // which branch ran so forensics can tell a take-over from a fresh entry.
+    f["reconnect"] = pcm->getPlayer() != 0;
     AccountAudit::record("account_switch", f);
 
     // Leave current: save first (persists pfile, inventory and current room, so a
@@ -660,12 +671,24 @@ static void account_switch(PCharacter *ch, DLString &args)
     resume_token_clear(ch);
     extract_char(ch, false);
 
-    // Load the alt onto this descriptor and into the world. The cold-load half is
-    // shared with the web entry token (account_enter_char, entrytoken.cpp): it does
-    // create -> world -> associate -> the CON_READ_MOTD->CON_PLAYING transition
-    // (which fires account config-apply + last-host) -> look, mirroring the backdoor
-    // fresh-load path. This char (ch) is already out of the world above.
-    account_enter_char(d, altName);
+    // Enter the alt onto this descriptor. Two paths, both sharing the web layer's
+    // primitives (entrytoken.cpp): if the alt's LINKDEAD body still hangs in the world,
+    // reconnect INTO it (account_reconnect_char) rather than cold-load a second Player
+    // for the same name -- a duplicate would collide in allList and corrupt the identity
+    // map (the same hazard the save/quit/extract dance above avoids for the outgoing
+    // char). Otherwise cold-load fresh (account_enter_char): create -> world -> associate
+    // -> CON_READ_MOTD->CON_PLAYING (fires account config-apply + last-host) -> look,
+    // mirroring the backdoor fresh-load path. The guard above already refused a live
+    // connection, so any surviving in-world alt here is a lostlink husk. Look it up
+    // through allList again (findPlayer = find()->getPlayer()) rather than trust the
+    // cached pcm: if a Fenia extract hook fired inside extract_char above and pooled the
+    // husk, the fresh lookup returns null (the memory shell) and we cold-load safely
+    // instead of associating a pooled body. ch is invalid from here -- use d/altName.
+    PCharacter *twin = PCharacterManager::findPlayer(altName);
+    if (twin != 0)
+        account_reconnect_char(d, twin);
+    else
+        account_enter_char(d, altName);
 }
 
 // A mailable address must be pure ASCII (send_email drops `to` into the queue file
