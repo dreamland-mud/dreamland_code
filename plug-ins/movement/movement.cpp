@@ -43,7 +43,29 @@ Movement::Movement( Character *ch )
     this->movetype = MOVETYPE_WALK;
     this->doLook = true;
 }
-    
+
+// Fired on the destination room while the walker is still next door, BEFORE the
+// step commits -- unlike Greet/Dive, which fire on or after arrival. A room
+// behavior or a Fenia onEntryNear on the room index may warn the walker of what
+// lies ahead and, by returning true, VETO the step: the walker stays put and the
+// move is silently abandoned (the handler owns any message). Default -- no
+// handler -- is a no-op and the move proceeds. Used for impending doom: a
+// character who can sense a death tile balks at its threshold instead of walking
+// in blind (deathtrap behavior, gated on perception). movetype tells a flee from
+// a deliberate step, but a transfer or recall reports the same "normal" as a walk
+// and cannot be told apart here.
+static bool rprog_entrynear( Character *wch, Room *to_room, const char *movetype )
+{
+    if (!to_room)
+        return false;
+
+    if (behavior_trigger( to_room, "EntryNear", "RCs", to_room, wch, movetype ))
+        return true;
+
+    FENIA_CALL( to_room, "EntryNear", "Cs", wch, movetype );
+    return false;
+}
+
 int Movement::move( )
 {
     rc = RC_MOVE_UNDEF;
@@ -64,7 +86,17 @@ bool Movement::moveRecursive( )
     if (!findTargetRoom( ))
         return false;
 
-    if (!moveAtomic( )) 
+    // Threshold hook: the destination room may warn the walker and veto the step
+    // (impending doom). Walker is still in from_room here; a veto leaves them put.
+    if (rprog_entrynear( ch, to_room, movetypes[movetype].name ))
+        return false;
+
+    // A handler that relocated or killed the walker (rather than just warning)
+    // must not fall through into the move -- mirrors the post-move guard below.
+    if (ch->in_room != from_room)
+        return false;
+
+    if (!moveAtomic( ))
         return false;
 
     callProgs( ch );
