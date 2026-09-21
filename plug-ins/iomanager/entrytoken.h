@@ -25,6 +25,16 @@ class PCharacter;
 PCharacter * account_enter_char(Descriptor *d, const DLString &charName);
 
 /**
+ * Reconnect descriptor `d` into an OWNED character's LINKDEAD body already in the
+ * world, instead of cold-loading a duplicate: the take-over sibling of
+ * account_enter_char that `account switch` uses when the chosen character is
+ * lostlink. Same caller contract (the current character is already left the world),
+ * same quiet CON_RESUME take-over the entry token and web resume do. Returns the
+ * reconnected character, or 0 on a null argument.
+ */
+PCharacter * account_reconnect_char(Descriptor *d, PCharacter *twin);
+
+/**
  * Mint a one-use entry token for (accountId, charName). Credential-grade like a
  * resume token: 128 bits from /dev/urandom, 180s TTL, single-use, never logged (a
  * re-mint no longer evicts the previous token, so several can be live at once).
