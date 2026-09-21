@@ -23,6 +23,7 @@
 #include <jsoncpp/json/json.h>
 #include "pcharacter.h"
 #include "player_utils.h"
+#include "string_utils.h"
 #include "npcharacter.h"
 #include "pcharactermanager.h"
 #include "accountmanager.h"
@@ -605,13 +606,20 @@ DLString nanny_check_login_name(const DLString &rawName)
         return "reserved";
 
     if (anyCyr) {
-        // Cyrillic name: the Russian badnames list, and find() -- which resolves a
+        // Cyrillic name: the Russian badnames list, then find() -- which resolves a
         // Cyrillic name through the declension-aware russianName scan (the nanny's own
-        // name step relies on the same, newbie/nanny ackName). descriptor_find_named
-        // is Latin-only (deferred debt); the nanny's re-ask covers the rare
-        // mid-creation same-name race for a Cyrillic name.
+        // name step relies on the same, newbie/nanny ackName).
         if (!badNames->checkRussianName(name).empty())
             return "reserved";
+        // Best-effort "someone is connecting under this name right now" hint. The stored
+        // login is the ROMANISED name, so match against the Latin transliteration.
+        // translitToLatin (C++) is context-free while the nanny's own login translit
+        // (fenia utils/translit) is positional, so the two can differ for some names
+        // (initial е -> Ye vs E, a few UA letters) and this hint then silently misses --
+        // harmless, because the authoritative online-collision guard is ackName ->
+        // checkName (descriptor_find_named on the real login) at submit, not this pre-check.
+        if (descriptor_find_named(NULL, String::translitToLatin(name)))
+            return "online";
         if (PCharacterManager::find(name) != 0)
             return "exists";
         return DLString::emptyString;
