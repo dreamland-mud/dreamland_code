@@ -90,7 +90,7 @@ CMDRUNP(stand)
     {
         if (ch->position == POS_FIGHTING)
         {
-            ch->pecho(_("Во время сражения есть дела поважнее."));
+            echo_master(ch, _("Во время сражения есть дела поважнее."));
             return;
         }
 
@@ -219,7 +219,7 @@ CMDRUNP(rest)
 
     if (ch->position == POS_FIGHTING)
     {
-        ch->pecho(_("Во время сражения есть дела поважнее."));
+        echo_master(ch, _("Во время сражения есть дела поважнее."));
         return;
     }
 
@@ -419,7 +419,7 @@ CMDRUNP(sit)
 
     if (ch->position == POS_FIGHTING)
     {
-        ch->pecho(_("Во время сражения есть дела поважнее."));
+        echo_master(ch, _("Во время сражения есть дела поважнее."));
         return;
     }
 
@@ -647,7 +647,7 @@ CMDRUNP(sleep)
         return;
 
     case POS_FIGHTING:
-        ch->pecho(_("Но ты же сражаешься!"));
+        echo_master(ch, _("Но ты же сражаешься!"));
         return;
 
     case POS_RESTING:
