@@ -485,6 +485,10 @@ bool LanguageCommand::showDreams( PCharacter *ch ) const
     buf << endl;
     ch->pecho( _("Тебе приснились и запомнились слова на %N6: "), language->getNameFor(ch).c_str( ) );
     ch->send_to( buf );
+    // Words are wielded through the language command, not by saying them aloud --
+    // the recurring point of confusion (bug #3005). Remind on every review.
+    ch->pecho( _("Чтобы пробудить силу слова, изреки: '{c%N1 слово{x'. Подробнее: {hh234древние языки{x."),
+               language->getNameFor(ch).c_str( ) );
     return true;
 }
 
