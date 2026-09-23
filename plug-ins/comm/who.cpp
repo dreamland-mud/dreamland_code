@@ -256,7 +256,13 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
     buf << "{x|" << who_cmd_left_column( ch, victim ) << "{x|";
         
     /* PK */
-    if (victim->getModifyLevel( ) >= PK_MIN_LEVEL && !is_safe_nomessage( ch, victim ))
+    // Report [553]: neither yourself nor an immortal is ever a real PK target
+    // (is_safe(ch,ch) is false by definition, and gods can't be attacked), so
+    // don't tag them (PK) here, and drop them from the 'who pk' filter below.
+    if (victim != ch
+        && !victim->is_immortal( )
+        && victim->getModifyLevel( ) >= PK_MIN_LEVEL
+        && !is_safe_nomessage( ch, victim ))
         tmp << "{x({rPK{x)";
     else if (arg_is_pk( arg1 ) || arg_is_pk( arg2 ))
         return "";
