@@ -1,3 +1,11 @@
+// Fenia bridge headers must precede the game headers, or a partial wrapper
+// declaration pulled in by pcharacter.h clashes with the NativeImpl templates
+// (see plug-ins/questreward/personalquestreward.cpp for the same ordering).
+#include "wrapperbase.h"
+#include "feniamanager.h"
+#include "reglist.h"
+#include "regcontainer.h"
+
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
@@ -58,6 +66,44 @@ static DLString show_experience( PCharacter *ch )
                ch->getExpPerLevel( ch->getLevel( ) + 1 ) - ch->getExpPerLevel( ) );
 }
 
+/* worth's death counter -- the mirror of the kill line. The game keeps no
+ * native mob->PC death tally: pch->death is a penalty streak that resets and
+ * skips some deaths (fight_death.cpp), so it can't be shown as "you died N
+ * times". The real count lives in Fenia .tmp.pve. Ask it for a ready, localized
+ * line the way settings ask .tmp.webconfig (config_web_fenia). A world without
+ * the script, or a char with no mob deaths, answers with an empty string, and
+ * pecho drops an empty line, so worth simply prints nothing extra. */
+static DLString pve_worth_line( Character *ch )
+{
+    using namespace Scripting;
+
+    if (!FeniaManager::wrapperManager)
+        return DLString();
+
+    static IdRef ID_TMP("tmp"), ID_PVE("pve"), ID_FUNC("worthLine");
+
+    try {
+        Register tmp = *Context::root[ID_TMP];
+        Register pve = *tmp[ID_PVE];
+        Register function = *pve[ID_FUNC];
+
+        if (function.type != Register::FUNCTION)
+            return DLString();
+
+        RegisterList args;
+        args.push_back(FeniaManager::wrapperManager->getWrapper(ch));
+        Register result = function.toFunction()->invoke(pve, args);
+
+        if (result.type == Register::STRING)
+            return result.toString();
+
+    } catch (const ::Exception &e) {
+        FeniaManager::getThis()->croak(0, Register(DLString("pve.worthLine")), e);
+    }
+
+    return DLString();
+}
+
 CMDRUNP( worth )
 {
     ch->send_to( l(ch, "У тебя ") );
@@ -74,10 +120,13 @@ CMDRUNP( worth )
     // sequential args that would shift %d onto the Character* and %s onto a
     // kill count -- an int read as char*. See the same fix in remort/cmlt.cpp.
     ch->pecho(_("Ты уби%1$Gло|л|ла {Y%2$d{x %3$s, {W%4$d{x %5$s и {r%6$d{x %7$s персонажей."),
-            ch, 
+            ch,
             killed->align[N_ALIGN_GOOD], l(ch, "добрых"),
             killed->align[N_ALIGN_NEUTRAL], l(ch, "нейтральных"),
             killed->align[N_ALIGN_EVIL], l(ch, "злых"));
+
+    // Mirror line: mob->PC deaths, from Fenia .tmp.pve (empty string -> nothing).
+    ch->pecho( pve_worth_line( ch ) );
 }
 
 
