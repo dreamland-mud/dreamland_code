@@ -132,6 +132,23 @@ static void format_screenreader_flags(Object *obj, ostringstream &buf, Character
         buf << lmsg(Player::lang(ch), "(Bright) ", "(Яркое) ", "(Яскраве) ");
 }
 
+// Jeweler sockets: sighted players get coloured stars appended to the short name
+// (see the fShort branch below); screenreader/no-colour viewers get this tag instead.
+static void format_socket_mark(Object *obj, ostringstream &buf, Character *ch)
+{
+    if (ch->is_npc())
+        return;
+
+    if (!uses_screenreader(ch) && ch->getPC()->getConfig().color)
+        return;
+
+    DLString sockets = obj->getProperty("sockets");
+    if (sockets.empty() || sockets == "0")
+        return;
+
+    buf << lmsg(Player::lang(ch), "(Socketed) ", "(Инкрустированное) ", "(Інкрустоване) ");
+}
+
 // Display aura if the item can be looted from PC corpse
 static void format_loot_mark(Object *obj, ostringstream &buf, Character *ch)
 {
@@ -199,6 +216,8 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     if (wearloc->displayFlags(ch, obj)) {
         format_screenreader_flags(obj, buf, ch);
 
+        format_socket_mark(obj, buf, ch);
+
         format_loot_mark(obj, buf, ch);
 
         format_personal_mark(obj, buf, ch);
@@ -254,6 +273,17 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
         if (obj->pIndexData->vnum > 5)        /* money, gold, etc */
             if (obj->condition <= 99 )
                 buf << " [" << obj->get_cond_alias( lang ) << "]";
+
+        // Jeweler sockets, sighted players: coloured stars next to the short name.
+        // Screenreader/no-colour viewers get format_socket_mark's tag instead (above).
+        if (!ch->is_npc() && !uses_screenreader(ch) && ch->getPC()->getConfig().color) {
+            DLString sockets = obj->getProperty("sockets");
+            if (!sockets.empty() && sockets != "0") {
+                DLString socketstr = obj->getProperty("socketstr");
+                if (!socketstr.empty())
+                    buf << " (" << socketstr << ")";
+            }
+        }
     }
     else
     {
