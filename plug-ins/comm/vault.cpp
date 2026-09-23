@@ -101,6 +101,45 @@ static DLString vault_cmd_prefix( const DLString &ownerLabel )
     return DLString( "vault *" ) + ownerLabel;
 }
 
+// The same stem as the viewer should TYPE it, for {y'...'{x hints: the command
+// name in the viewer's language. Link commands keep the English stem because the
+// web client's clickable-command allowlist only accepts 'vault ...'.
+static DLString vault_say_prefix( const DLString &cmdPrefix, lang_t lang )
+{
+    DLString word = lmsg( lang, "vault", "хранилище", "сховище" );
+    return word + DLString( cmdPrefix.substr( strlen( "vault" ) ) );
+}
+
+// Item type as the viewer reads it (nominative, viewer language).
+static DLString vault_type_label( int itype, lang_t lang )
+{
+    DLString m = item_table.message( itype, '1', lang );
+    return m.empty( ) ? item_table.name( itype ) : m;
+}
+
+// Resolve a typed type name: canonical English first, then the viewer-language
+// label, exact or as a prefix ("кольцо" -> "кольцо для ключей").
+static int vault_type_lookup( const DLString &arg, lang_t lang )
+{
+    int t = item_table.value( arg );
+    if ( t != NO_FLAG )
+        return t;
+
+    DLString a = vault_lower( arg );
+    int prefixHit = NO_FLAG;
+    for ( int i = 0; i <= item_table.max; i++ ) {
+        DLString m = item_table.message( i, '1', lang );
+        if ( m.empty( ) )
+            continue;
+        m = vault_lower( m );
+        if ( m == a )
+            return i;
+        if ( prefixHit == NO_FLAG && m.size( ) > a.size( ) && m.compare( 0, a.size( ), a ) == 0 )
+            prefixHit = i;
+    }
+    return prefixHit;
+}
+
 // Sanitize an immortal-override target ('*<name>') to a safe directory name:
 // letters and digits only, so '*../../x' can't escape the bank tree. PC names and
 // clan tags are letters anyway.
@@ -266,7 +305,7 @@ static void vault_show_entry( Character *ch, int num, const BankEntry &be, lang_
 
     int itype = vault_entry_type( be, proto );
     int lvl   = vault_entry_level( be, proto );
-    DLString typeName = item_table.name( itype );
+    DLString typeName = vault_type_label( itype, lang );
 
     if ( be.contents > 0 )
         ch->pecho( lmsg( lang,
@@ -304,7 +343,8 @@ static DLString vault_type_summary_line( const std::vector<BankEntry> &entries, 
         if ( k > 0 )
             buf << "  ";
         buf << "{hc'" << cmdPrefix << " filter " << tally[k].first << "'"
-            << vault_upper( tally[k].first ) << " (" << tally[k].second << "){x";
+            << vault_upper( vault_type_label( item_table.value( tally[k].first ), lang ) )
+            << " (" << tally[k].second << "){x";
     }
     return DLString( buf.str( ) );
 }
@@ -357,13 +397,14 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
     if ( entries.size( ) > 50 && !forceFull ) {
         ch->pecho( lmsg( lang,
             "Too many to list in full -- pick a type, or narrow with {y'%s find <word>'{x:",
-            "Слишком много, чтобы показать все -- выбери тип или сузь через {y'%s find <слово>'{x:",
-            "Забагато, щоб показати все -- обери тип або звузь через {y'%s find <слово>'{x:" ), cmdPrefix.c_str( ) );
+            "Слишком много, чтобы показать все -- выбери тип или сузь через {y'%s найти <слово>'{x:",
+            "Забагато, щоб показати все -- обери тип або звузь через {y'%s знайти <слово>'{x:" ),
+            vault_say_prefix( cmdPrefix, lang ).c_str( ) );
         ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix ).c_str( ) );
         ch->pecho( lmsg( lang,
             "({y'%s list'{x shows every entry.)",
-            "({y'%s list'{x покажет все записи.)",
-            "({y'%s list'{x покаже всі записи.)" ), cmdPrefix.c_str( ) );
+            "({y'%s список'{x покажет все записи.)",
+            "({y'%s список'{x покаже всі записи.)" ), vault_say_prefix( cmdPrefix, lang ).c_str( ) );
         return;
     }
 
@@ -372,9 +413,9 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
 
     ch->pecho( lmsg( lang,
         "Use {y'%s get <number|name>'{x to take one out, {y'%s find <word>'{x to search. By type:",
-        "Команда {y'%s get <номер|название>'{x достанет предмет, {y'%s find <слово>'{x -- поищет. По типу:",
-        "Команда {y'%s get <номер|назва>'{x дістане предмет, {y'%s find <слово>'{x -- пошукає. За типом:" ),
-        cmdPrefix.c_str( ), cmdPrefix.c_str( ) );
+        "Команда {y'%s взять <номер|название>'{x достанет предмет, {y'%s найти <слово>'{x -- поищет. По типу:",
+        "Команда {y'%s взяти <номер|назва>'{x дістане предмет, {y'%s знайти <слово>'{x -- пошукає. За типом:" ),
+        vault_say_prefix( cmdPrefix, lang ).c_str( ), vault_say_prefix( cmdPrefix, lang ).c_str( ) );
     ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix ).c_str( ) );
 }
 
@@ -397,8 +438,8 @@ static void vault_show_rows( Character *ch, const std::vector<BankEntry> &entrie
 
     ch->pecho( lmsg( lang,
         "Take one out with {y'%s get <number>'{x.",
-        "Достать: {y'%s get <номер>'{x.",
-        "Дістати: {y'%s get <номер>'{x." ), cmdPrefix.c_str( ) );
+        "Достать: {y'%s взять <номер>'{x.",
+        "Дістати: {y'%s взяти <номер>'{x." ), vault_say_prefix( cmdPrefix, lang ).c_str( ) );
 }
 
 /*-------------------------------------------------------------------------
@@ -609,7 +650,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
             return;
         }
 
-        int ft = item_table.value( typeArg );
+        int ft = vault_type_lookup( typeArg, lang );
         if ( ft == NO_FLAG ) {
             ch->pecho( lmsg( lang,
                 "Unknown item type '%s'.",
@@ -629,14 +670,14 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
             ch->pecho( lmsg( lang,
                 "No %s in the vault.",
                 "В хранилище нет ни одного типа '%s'.",
-                "У сховищі нема жодного типу '%s'." ), item_table.name( ft ).c_str( ) );
+                "У сховищі нема жодного типу '%s'." ), vault_type_label( ft, lang ).c_str( ) );
             return;
         }
 
         ch->pecho( lmsg( lang,
             "Vault entries of type %s:",
             "Записи хранилища типа %s:",
-            "Записи сховища типу %s:" ), item_table.name( ft ).c_str( ) );
+            "Записи сховища типу %s:" ), vault_type_label( ft, lang ).c_str( ) );
         vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix );
         return;
     }
