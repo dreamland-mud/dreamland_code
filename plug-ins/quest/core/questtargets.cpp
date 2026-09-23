@@ -394,6 +394,13 @@ void MobQuestTarget::show( Character *viewer, std::basic_ostringstream<char> &bu
             else if (t == "ButcherQuest")
                 buf << fmt( viewer, _("{x({YТерпеливо ждет{x) ") );
         }
+    } else if (r == "prince") {
+        // Kidnap rescue kid (report [551]): a green whimper hint so the hero can
+        // pick the child out of a room. Deliberately NOT a red [ЦЕЛЬ] -- it is a
+        // rescue, not a kill. Hero-only, until the escort is done.
+        ::Pointer<FeniaQuest> q = getFeniaQuest( );
+        if (mine && q && !q->isComplete( ))
+            buf << fmt( viewer, _("{x({YХнычет{x) ") );
     }
 }
 
@@ -471,7 +478,9 @@ void ObjQuestTarget::show( Character *viewer, ostringstream &buf )
     if (!mine && !group)
         return;
 
-    if (role.getValue( ) == "loot") {
+    // "mark" is the kidnap quest's give-item (report [551]): tag it like loot so
+    // the hero can tell at a glance which carried item to hand the child.
+    if (role.getValue( ) == "loot" || role.getValue( ) == "mark") {
         if (mine)
             buf << fmt( viewer, _("{R[ЦЕЛЬ] {x") );
         else
