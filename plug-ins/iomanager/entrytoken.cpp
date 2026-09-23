@@ -273,6 +273,12 @@ bool entry_token_redeem(Descriptor *d, const DLString &token)
         twin->timer = 0;
         LogStream::sendNotice() << "Entry token: " << d->host << " entered "
                                 << name << " (took over the existing session)" << endl;
+
+        // The web client lifts its login overlay on the first prompt, and a prompt
+        // only goes out with output. The quiet take-over produces none, so without
+        // this the client times out and reports a failed entry over a session that
+        // is actually live. Same closing look as account_enter_char/account_reconnect_char.
+        interpret_raw(twin, "look");
         return true;
     }
 
