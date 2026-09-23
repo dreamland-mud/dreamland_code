@@ -131,6 +131,11 @@ void LanguageManager::run( PCharacter *ch )
     attr->lastDreamTime = now; 
      
     lang->dream( word, ch );
+    // A dreamed word is useless until the player learns you wield it through the
+    // language command, not by saying it (bug #3005 / #3014: two players reported
+    // "I say the words and nothing happens"). Hand them the exact line to type.
+    ch->pecho( _("Чтобы пробудить силу слова, изреки его: '{c%N1 %s{x'. Подробнее: {hh234древние языки{x."),
+               lang->getNameFor( ch ).c_str( ), word.toStr( ) );
     wiznet( WIZ_LANGUAGE, 0, 0, "%^C3 снится слово '%s' (%s).", ch, word.toStr( ), word.effect.getValue( ).c_str( ) );
 }
 
