@@ -98,7 +98,7 @@ CMDRUNP(stand)
 
         if (obj == 0)
         {
-            ch->pecho(_("Ты не видишь этого здесь."));
+            echo_master(ch, _("Ты не видишь этого здесь."));
             return;
         }
 
@@ -108,7 +108,7 @@ CMDRUNP(stand)
                                 !IS_SET(furniture_flag, STAND_ON) &&
                                 !IS_SET(furniture_flag, STAND_IN)))
         {
-            ch->pecho(_("Ты не можешь стоять на этом."));
+            echo_master(ch, _("Ты не можешь стоять на этом."));
             return;
         }
 
@@ -126,7 +126,7 @@ CMDRUNP(stand)
     case POS_SLEEPING:
         if (IS_AFFECTED(ch, AFF_SLEEP))
         {
-            ch->pecho(_("Ты не можешь проснуться!"));
+            echo_master(ch, _("Ты не можешь проснуться!"));
             return;
         }
 
@@ -166,7 +166,7 @@ CMDRUNP(stand)
         {
             if (ch->position == POS_STANDING)
             {
-                ch->pecho(_("Ты уже стоишь."));
+                echo_master(ch, _("Ты уже стоишь."));
             }
             else
             {
@@ -198,7 +198,7 @@ CMDRUNP(stand)
         break;
 
     case POS_FIGHTING:
-        ch->pecho(_("Ты уже сражаешься!"));
+        echo_master(ch, _("Ты уже сражаешься!"));
         ch->on = 0;
         break;
     }
@@ -225,19 +225,19 @@ CMDRUNP(rest)
 
     if (MOUNTED(ch))
     {
-        ch->pecho(_("Ты не можешь отдыхать, когда ты в седле."));
+        echo_master(ch, _("Ты не можешь отдыхать, когда ты в седле."));
         return;
     }
 
     if (RIDDEN(ch))
     {
-        ch->pecho(_("Ты не можешь отдыхать, когда ты оседлан%Gо||а."), ch);
+        echo_master(ch, _("Ты не можешь отдыхать, когда ты оседлан%Gо||а."), ch);
         return;
     }
 
     if (IS_AFFECTED(ch, AFF_SLEEP))
     {
-        ch->pecho(_("Ты спишь и не можешь проснуться."));
+        echo_master(ch, _("Ты спишь и не можешь проснуться."));
         return;
     }
 
@@ -254,7 +254,7 @@ CMDRUNP(rest)
 
         if (obj == 0)
         {
-            ch->pecho(_("Ты не видишь этого здесь."));
+            echo_master(ch, _("Ты не видишь этого здесь."));
             return;
         }
     }
@@ -269,7 +269,7 @@ CMDRUNP(rest)
                                 !IS_SET(furniture_flag, REST_ON) &&
                                 !IS_SET(furniture_flag, REST_IN)))
         {
-            ch->pecho(_("Ты не можешь отдыхать на этом."));
+            echo_master(ch, _("Ты не можешь отдыхать на этом."));
             return;
         }
 
@@ -342,7 +342,7 @@ CMDRUNP(rest)
         }
         else
         {
-            ch->pecho(_("Ты уже отдыхаешь."));
+            echo_master(ch, _("Ты уже отдыхаешь."));
         }
         break;
 
@@ -425,19 +425,19 @@ CMDRUNP(sit)
 
     if (MOUNTED(ch))
     {
-        ch->pecho(_("Ты не можешь сесть, когда ты в седле."));
+        echo_master(ch, _("Ты не можешь сесть, когда ты в седле."));
         return;
     }
 
     if (RIDDEN(ch))
     {
-        ch->pecho(_("Ты не можешь сесть, когда ты оседлан%Gо||а."), ch);
+        echo_master(ch, _("Ты не можешь сесть, когда ты оседлан%Gо||а."), ch);
         return;
     }
 
     if (IS_AFFECTED(ch, AFF_SLEEP))
     {
-        ch->pecho(_("Ты спишь и не можешь проснуться."));
+        echo_master(ch, _("Ты спишь и не можешь проснуться."));
         return;
     }
 
@@ -456,11 +456,11 @@ CMDRUNP(sit)
         {
             if (IS_AFFECTED(ch, AFF_SLEEP))
             {
-                ch->pecho(_("Ты спишь и не можешь проснуться."));
+                echo_master(ch, _("Ты спишь и не можешь проснуться."));
                 return;
             }
 
-            ch->pecho(_("Ты не видишь этого здесь."));
+            echo_master(ch, _("Ты не видишь этого здесь."));
             return;
         }
     }
@@ -475,7 +475,7 @@ CMDRUNP(sit)
                                 !IS_SET(furniture_flag, SIT_ON) &&
                                 !IS_SET(furniture_flag, SIT_IN)))
         {
-            ch->pecho(_("Ты не можешь сесть на это."));
+            echo_master(ch, _("Ты не можешь сесть на это."));
             return;
         }
 
@@ -567,7 +567,7 @@ CMDRUNP(sit)
         }
         else
         {
-            ch->pecho(_("Ты уже сидишь."));
+            echo_master(ch, _("Ты уже сидишь."));
         }
         break;
 
@@ -624,13 +624,13 @@ CMDRUNP(sleep)
 
     if (MOUNTED(ch))
     {
-        ch->pecho(_("Ты не можешь спать, когда ты в седле."));
+        echo_master(ch, _("Ты не можешь спать, когда ты в седле."));
         return;
     }
 
     if (RIDDEN(ch))
     {
-        ch->pecho(_("Ты не можешь спать, когда ты оседлан%Gо||а."), ch);
+        echo_master(ch, _("Ты не можешь спать, когда ты оседлан%Gо||а."), ch);
         return;
     }
 
@@ -643,7 +643,7 @@ CMDRUNP(sleep)
     switch (ch->position.getValue())
     {
     case POS_SLEEPING:
-        ch->pecho(_("Ты уже спишь."));
+        echo_master(ch, _("Ты уже спишь."));
         return;
 
     case POS_FIGHTING:
@@ -675,7 +675,7 @@ CMDRUNP(sleep)
 
             if (obj == 0)
             {
-                ch->pecho(_("Ты не видишь этого здесь."));
+                echo_master(ch, _("Ты не видишь этого здесь."));
                 return;
             }
 
@@ -685,7 +685,7 @@ CMDRUNP(sleep)
                                     !IS_SET(furniture_flag, SLEEP_ON) &&
                                     !IS_SET(furniture_flag, SLEEP_IN)))
             {
-                ch->pecho(_("Ты не можешь спать на этом!"));
+                echo_master(ch, _("Ты не можешь спать на этом!"));
                 return;
             }
 
@@ -764,7 +764,7 @@ CMDRUNP(wake)
 
     if (ch == victim)
     {
-        ch->pecho(_("Ты не можешь разбудить сам{Sfа{Sx себя!"));
+        echo_master(ch, _("Ты не можешь разбудить сам{Sfа{Sx себя!"));
         return;
     }
 
