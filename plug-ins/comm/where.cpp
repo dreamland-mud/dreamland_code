@@ -59,7 +59,11 @@ static void format_where( Character *ch, Character *victim, bool areaAllowsPath 
 {
     bool fPK, fAfk;
 
-    fPK = (!victim->is_npc( )
+    // Never tag yourself: is_safe_nomessage(ch, ch) returns false (ch == victim),
+    // which without this guard reads as "PK-eligible" and prints (PK) against your
+    // own line in `where` (bug #3314).
+    fPK = (victim != ch
+            && !victim->is_npc( )
             && victim->getModifyLevel( ) >= PK_MIN_LEVEL
             && !is_safe_nomessage( ch, victim->getDoppel( ch ) ));
     fAfk = IS_SET(victim->comm, COMM_AFK);
