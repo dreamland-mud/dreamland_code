@@ -76,7 +76,6 @@ static DLString clanPaddedName( Clan *clan, lang_t lang )
     return DLString( string( width > name.size( ) ? width - name.size( ) : 0, ' ' ) ) + name;
 }
 
-#define OBJ_VNUM_DIAMOND          3377
 
 enum {
     CB_MODE_DEPOSIT  = 1,
@@ -87,7 +86,6 @@ enum {
     CB_CURR_QP      = 1,
     CB_CURR_GOLD    = 2,
     CB_CURR_SILVER  = 3,
-    CB_CURR_DIAMOND = 4,
 };
 
 struct clan_diplomacy_names {
@@ -329,7 +327,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
         bool fAll = pc->is_immortal( );
 
         pc->pecho(_("{g\t\t  Состояние банка твоего клана{x.\n\r"));
-        pc->pecho(_("Клан            |{BКвестовых единиц{x|{YЗолотых монет{x|{WСеребряных монет{x|{CБриллиантов{x|"));
+        pc->pecho(_("Клан            |{BКвестовых единиц{x|{YЗолотых монет{x|{WСеребряных монет{x|"));
 
         for (int i = 0; i < cm->size( ); i++) {
             clan = cm->find( i );
@@ -342,13 +340,12 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
             if (!bank || (pc->getClan( ) != clan && !fAll))
                 continue;
 
-            pc->pecho( "{%s%-16s{x|%16d|%13d|%16d|%11d|",
+            pc->pecho( "{%s%-16s{x|%16d|%13d|%16d|",
                     clan->getColor( ).c_str( ), 
                     clan->getShortName( ).c_str( ),
                     bank->questpoints.getValue( ),
                     bank->gold.getValue( ),
-                    bank->silver.getValue( ),
-                    bank->diamonds.getValue( ) );
+                    bank->silver.getValue( ) );
         }
 
         return;
@@ -408,7 +405,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     argumentOne = argument.getOneArgument( );
     
     if (argumentOne.empty( )) {
-        pc->pecho(_("Укажи единицу расчета (кп, золото, серебро, бриллианты)."));
+        pc->pecho(_("Укажи единицу расчета (кп, золото, серебро)."));
         return;
     }
     
@@ -418,11 +415,9 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
         currency = CB_CURR_GOLD;
     else if (arg_is(argumentOne, "silver")) 
         currency = CB_CURR_SILVER;
-    else if (arg_is(argumentOne, "diamond")) 
-        currency = CB_CURR_DIAMOND;
     else
     {
-        pc->pecho(_("Кланбанк оперирует только с кп, золото, серебро, бриллианты."));
+        pc->pecho(_("Кланбанк оперирует только с кп, золото, серебро."));
         return;
     }
 
@@ -512,15 +507,6 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
         victim->save( );
 }
 
-static bool obj_is_diamond( Object *obj )
-{
-    if (obj->pIndexData->vnum == OBJ_VNUM_DIAMOND
-        && obj->wear_loc == wear_none)        
-        return true;
-    else
-        return false;
-}
-
 /*
  * clan bank deposit <amount> <currency>
  */
@@ -577,38 +563,6 @@ bool CClan::clanBankDeposit( PCharacter *pc, Clan *acc_clan,
             << "." << endl;
         
         acc_clan->getData( )->getBank( )->silver += amount;
-        return true;
-
-    case CB_CURR_DIAMOND:
-        if (!pc->is_immortal( )) {
-            Object *obj, *obj_next;
-            int count = 0;
-
-            for (obj = pc->carrying; obj; obj = obj->next_content)
-                if (obj_is_diamond( obj ))
-                    count++;
-
-            if (count < amount)
-                return false;
-            
-            for (obj = pc->carrying; obj && count > 0; obj = obj_next) {
-                obj_next = obj->next_content;
-                
-                if (obj_is_diamond( obj )) {
-                    extract_obj( obj );
-                    count--;
-                }
-            }
-
-        }
-
-        buf << "На банковский счет " 
-            << acc_clan->getRussianName( ).ruscase('2')
-            << " переведено: " << amount << " бриллиант"
-            << GET_COUNT(amount,"","а","ов")
-            << "." << endl;
-        
-        acc_clan->getData( )->getBank( )->diamonds += amount;
         return true;
 
     default:
@@ -693,23 +647,6 @@ bool CClan::clanBankWithdraw( PCharacter *pc, PCharacter *victim,
 
         return true;
         
-    case CB_CURR_DIAMOND:
-        if (bank->diamonds < amount)
-            return false;
-
-        bank->diamonds -= amount;
-
-        buf << "Ты снимаешь " << amount << " бриллиан"
-            << GET_COUNT(amount,"т","та","тов")
-            << " со счета клана." << endl;
-
-        if (!pc->is_immortal( )) 
-            for (int i = 0; i < amount; i++)
-                obj_to_char( create_object( get_obj_index(OBJ_VNUM_DIAMOND), 0 ),
-                             pc );
-        
-        return true;
-
     default:
         return false;
     }
@@ -722,11 +659,11 @@ void CClan::clanBankHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf << "{Wклан банк положить{x <кол-во> {Wкп{x|{Wзолото{x|{Wсеребро{x|{Wбриллианты{x" << endl
-        << "          - положить деньги(qp, бриллианты..) в свой кланбанк" << endl
+    buf << "{Wклан банк положить{x <кол-во> {Wкп{x|{Wзолото{x|{Wсеребро{x" << endl
+        << "          - положить деньги (qp, золото, серебро) в свой кланбанк" << endl
         << endl
         << "Для лидеров:" << endl
-        << "{Wклан банк снять {x<кол-во> {Wкп{x|{Wзолото{x|{Wсеребро{x|{Wбриллианты{x" << endl
+        << "{Wклан банк снять {x<кол-во> {Wкп{x|{Wзолото{x|{Wсеребро{x" << endl
         << "          - снять деньги(qp) со счета своего кланбанка" << endl
         << "{Wклан банк снять {x<кол-во> {Wкп клану {x<клан>" << endl
         << "          - перевести qp на кланбанк другого клана" << endl
