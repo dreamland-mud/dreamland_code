@@ -447,8 +447,17 @@ NMI_GET( SkillGroupWrapper, nameRus, "русское название" )
  *  SkillWrapper.nameFor above and silently unregister one of them -- a runtime
  *  "Method not found", never a build error. Same reason AreaWrapper had to
  *  become nameForLang. */
-NMI_INVOKE( SkillGroupWrapper, groupNameFor, "(ch): название группы с учетом языковых настроек персонажа" )
+NMI_INVOKE( SkillGroupWrapper, groupNameFor, "(ch|lang): название группы с учетом языковых настроек персонажа, либо для языка по номеру (0 en, 1 ru, 2 ua)" )
 {
+    // Same numeric form as SkillWrapper.nameFor: identify knows the viewer's
+    // language, not the viewer.
+    if (!args.empty() && args.front().type == Register::NUMBER) {
+        int lang = args.front().toNumber();
+        if (lang < LANG_MIN || lang >= LANG_MAX)
+            throw Scripting::IllegalArgumentException();
+        return getTarget()->getNameFor((lang_t)lang);
+    }
+
     Character *ch = args2character(args);
     return getTarget()->getNameFor(ch);
 }
