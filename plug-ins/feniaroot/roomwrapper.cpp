@@ -334,14 +334,14 @@ NMI_GET( RoomWrapper, down, "комната вниз отсюда или null")
 NMI_INVOKE(RoomWrapper, saveItems, "(): сохраняет все предметы на полу в комнате на диск")
 {
     checkTarget();
-    save_mobs(target);
+    save_items(target);
     return Register();
 }
 
 NMI_INVOKE(RoomWrapper, saveMobs, "(): сохраняет всех мобов в комнате на диск")
 {
     checkTarget();
-    save_items(target);
+    save_mobs(target);
     return Register();
 }
 

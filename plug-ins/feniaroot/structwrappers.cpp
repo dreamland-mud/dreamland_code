@@ -204,6 +204,18 @@ NMI_GET( HometownWrapper, recall, "vnum комнаты возврата (recall)
     return Scripting::Register( hometownManager->find( name )->getRecall( ) );
 }
 
+NMI_GET( HometownWrapper, altar, "vnum комнаты с алтарем, или 0" ) 
+{
+    Hometown *h = hometownManager->find( name );
+    return Scripting::Register( h ? h->getAltar( ) : 0 );
+}
+
+NMI_GET( HometownWrapper, pit, "vnum ямы для пожертвований (куда уходят вещи из трупа), или 0" ) 
+{
+    Hometown *h = hometownManager->find( name );
+    return Scripting::Register( h ? h->getPit( ) : 0 );
+}
+
 NMI_GET( HometownWrapper, areaname, "полное название арии" )
 {
     Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );

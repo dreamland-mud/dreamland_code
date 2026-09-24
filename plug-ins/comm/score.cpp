@@ -83,8 +83,16 @@ static DLString pve_worth_line( Character *ch )
     static IdRef ID_TMP("tmp"), ID_PVE("pve"), ID_FUNC("worthLine");
 
     try {
+        // Check each level: dereferencing a member of a missing (NONE)
+        // namespace throws and would croak on every call.
         Register tmp = *Context::root[ID_TMP];
+        if (tmp.type != Register::OBJECT)
+            return DLString();
+
         Register pve = *tmp[ID_PVE];
+        if (pve.type != Register::OBJECT)
+            return DLString();
+
         Register function = *pve[ID_FUNC];
 
         if (function.type != Register::FUNCTION)
