@@ -151,16 +151,20 @@ static bool runFeniaEffect( WordEffect::Pointer effect, Character *ch, Object *o
     if (!base)
         return false;
 
+    // triggerFunction, not hasTrigger: hasTrigger prepends "on" and would look up
+    // "onrunObj", which never exists, silently routing every utter to the C++ stub.
+    Scripting::Register prog;
+
     if (obj) {
         static Scripting::IdRef runObjId( "runObj" );
-        if (!base->hasTrigger( "runObj" ))
+        if (!base->triggerFunction( runObjId, prog ))
             return false;
         fUsed = base->call( runObjId, "CO", ch, obj );
         return true;
     }
 
     static Scripting::IdRef runVictId( "runVict" );
-    if (!base->hasTrigger( "runVict" ))
+    if (!base->triggerFunction( runVictId, prog ))
         return false;
     fUsed = base->call( runVictId, "CC", ch, victim );
     return true;
