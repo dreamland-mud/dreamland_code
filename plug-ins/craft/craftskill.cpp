@@ -137,7 +137,7 @@ void CraftSkill::show( PCharacter *ch, std::ostream &buf ) const
     }
 
     if (!pnames.empty())
-        buf << SKILL_INFO_PAD << "Доступно профессии " << pnames.wrap("{W", "{x").join(", ") << "." << endl;
+        buf << SKILL_INFO_PAD << fmt(ch, _("Доступно профессии %1$s."), pnames.wrap("{W", "{x").join(", ").c_str()) << endl;
 } 
 
 static void mprog_skill( Character *ch, Character *actor, const char *skill, bool success, Character *victim )
