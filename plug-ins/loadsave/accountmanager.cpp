@@ -616,7 +616,13 @@ bool AccountManager::setVaultUnlocked(const DLString &id)
     if (i == accounts.end())
         return false;
     i->second["vault"] = true;
-    return saveAccount(id);
+    // Roll back on a failed write: callers erase the pfile copy of the unlock
+    // once the account reports it, so RAM must never claim what disk lacks.
+    if (!saveAccount(id)) {
+        i->second.removeMember("vault");
+        return false;
+    }
+    return true;
 }
 
 bool AccountManager::removeIdentity(const DLString &type, const DLString &value)
