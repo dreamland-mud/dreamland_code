@@ -2824,7 +2824,12 @@ NMI_INVOKE( CharacterWrapper, move_char, "(door[,movetype]): перемести�
     else 
         movetypeName = "normal";
 
-    rc = ::move_char( target, door, movetypeName.c_str( ) );
+    // "flee" is the scripted flee step: it may leave while still fighting.
+    if (movetypeName == "flee")
+        rc = ::move_char_flee( target, door );
+    else
+        rc = ::move_char( target, door, movetypeName.c_str( ) );
+
     return Register( rc == RC_MOVE_OK );
 }
 

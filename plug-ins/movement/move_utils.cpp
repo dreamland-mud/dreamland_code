@@ -31,6 +31,56 @@ CLAN(none);
 WEARLOC(none);
 WEARLOC(stuck_in);
 
+/*
+ * Scripted flee step (Fenia doFlee): the caller has already rolled the flee,
+ * so the mover may walk out while still fighting. Only the mover's position
+ * checks are relaxed; followers are moved by plain ExitsMovement and keep the
+ * fighting check. place() ends the fight only once the step succeeds.
+ */
+class ScriptedFleeMovement : public ExitsMovement {
+public:
+    ScriptedFleeMovement( Character *ch, int door )
+                : ExitsMovement( ch, door, MOVETYPE_FLEE )
+    {
+    }
+
+protected:
+    virtual bool canMove( Character *wch )
+    {
+        if (IS_SET(exit_info, EX_NOFLEE))
+            return false;
+
+        return ExitsMovement::canMove( wch );
+    }
+
+    virtual bool checkPositionHorse( )
+    {
+        if (horse->position <= POS_RESTING) {
+            msgSelf( ch, "%2$^C1 must stand up first.",
+                         "%2$^C1 долж%2$Gно|ен|на сначала встать.",
+                         "%2$^C1 мусить спершу встати." );
+            return false;
+        }
+
+        return true;
+    }
+
+    virtual bool checkPositionRider( )
+    {
+        return true;
+    }
+
+    virtual bool checkPositionWalkman( )
+    {
+        return ch->position > POS_RESTING;
+    }
+};
+
+int move_char_flee( Character *ch, int door )
+{
+    return ScriptedFleeMovement( ch, door ).move( );
+}
+
 int move_char( Character *ch, int door, const char *argument )
 {
     return ExitsMovement( ch, door, movetype_resolve( ch, argument ) ).move( );
