@@ -576,7 +576,7 @@ static void corpse_looting( Object *corpse, Character *ch, Character *killer )
 
     if (IS_SET(ch->act, PLR_WANTED)) {
         corpse->killer = "!anybody!";
-        corpse->count = items.size() * loot["wantedCountCoeff"].asFloat();
+        corpse->count = items.size() * loot["wantedCountPercent"].asInt() / 100;
     }
     else {
         corpse->killer = killer->getNameC();
