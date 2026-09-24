@@ -39,6 +39,7 @@
 #include "behavior.h"
 #include "room.h"
 #include "clanreference.h"
+#include "accountmanager.h"
 
 #include "merc.h"
 #include "def.h"
@@ -153,6 +154,17 @@ static bool vault_safe_name( const DLString &s )
             return false;
     }
     return true;
+}
+
+// A personal item (Ownr set) is shown to everyone who can open the cell, but
+// only its owner takes it out: withdrawal skips the get-path owner checks, and a
+// shared (account/clan) cell would otherwise hand one character's personal quest
+// reward to another -- where the save-time mustDisappear check crumbles it.
+static bool vault_entry_foreign( Character *ch, const BankEntry &be )
+{
+    if ( be.owner.empty( ) || ch->is_immortal( ) )
+        return false;
+    return vault_lower( be.owner ) != vault_lower( ch->getNameC( ) );
 }
 
 // The 'none' sentinel clan, for testing whether a room carries a clan tag.
@@ -307,6 +319,10 @@ static void vault_show_entry( Character *ch, int num, const BankEntry &be, lang_
     int lvl   = vault_entry_level( be, proto );
     DLString typeName = vault_type_label( itype, lang );
 
+    if ( vault_entry_foreign( ch, be ) )
+        name = name + " {D[" + lmsg( lang, "owner", "владелец", "власник" )
+               + ": " + vault_capitalize( be.owner ) + "]{x";
+
     if ( be.contents > 0 )
         ch->pecho( lmsg( lang,
             "{hc'%s get %d'[%2d]{x %s {D(%s, %d items, lvl %d){x",
@@ -353,8 +369,11 @@ static DLString vault_type_summary_line( const std::vector<BankEntry> &entries, 
 // forceFull (explicit 'vault list' / 'vault all').
 static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
                         lang_t lang, const DLString &ownerLabel, const DLString &cmdPrefix,
-                        bool forceFull, bool isClan )
+                        bool forceFull, const DLString &kind )
 {
+    bool isClan   = ( kind == "clan" );
+    bool isShared = ( kind == "account" );
+
     if ( entries.empty( ) ) {
         if ( !ownerLabel.empty( ) )
             ch->pecho( lmsg( lang,
@@ -366,6 +385,11 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
                 "The clan vault is empty.",
                 "Клановое хранилище пусто.",
                 "Кланове сховище порожнє." ) );
+        else if ( isShared )
+            ch->pecho( lmsg( lang,
+                "Your account's shared vault is empty.",
+                "Общее хранилище твоей учетной записи пусто.",
+                "Спільне сховище твого облікового запису порожнє." ) );
         else
             ch->pecho( lmsg( lang,
                 "Your vault is empty.",
@@ -386,6 +410,12 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
             "The clan vault holds %d %Iitem|items|items:",
             "В клановом хранилище хранится %d %Iпредмет|предмета|предметов:",
             "У клановому сховищі зберігається %d %Iпредмет|предмети|предметів:" ),
+            (int)entries.size( ), (int)entries.size( ) );
+    else if ( isShared )
+        ch->pecho( lmsg( lang,
+            "Your account's shared vault holds %d %Iitem|items|items:",
+            "В общем хранилище твоей учетной записи хранится %d %Iпредмет|предмета|предметов:",
+            "У спільному сховищі твого облікового запису зберігається %d %Iпредмет|предмети|предметів:" ),
             (int)entries.size( ), (int)entries.size( ) );
     else
         ch->pecho( lmsg( lang,
@@ -639,7 +669,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
         // No type given -> show the per-type overview of what's actually there.
         if ( typeArg.empty( ) ) {
             if ( entries.empty( ) ) {
-                vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true, isClan );
+                vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true, kind );
                 return;
             }
             ch->pecho( lmsg( lang,
@@ -690,7 +720,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
     if ( sub.empty( ) || vault_word_in( sub, WORDS_LIST ) || arg_is_all( sub ) ) {
         std::vector<BankEntry> entries;
         vault_browse_sorted( kind, key, entries, lang );
-        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, !sub.empty( ), isClan );
+        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, !sub.empty( ), kind );
         return;
     }
 
@@ -711,7 +741,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
     std::vector<BankEntry> entries;
     vault_browse_sorted( kind, key, entries, lang );
     if ( entries.empty( ) ) {
-        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true, isClan );   // prints the empty message
+        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true, kind );   // prints the empty message
         return;
     }
 
@@ -728,14 +758,29 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
         // Collect target Ids up front -- Ids are stable across withdrawals, so a
         // withdrawal that unlinks a cell can't disturb the rest of the loop.
         std::vector<long long> ids;
+        int foreign = 0;
         for ( size_t i = 0; i < entries.size( ); i++ ) {
             if ( bulkDot ) {
                 OBJ_INDEX_DATA *proto = get_obj_index( entries[i].vnum );
                 if ( !vault_entry_matches( entries[i], proto, lang, kw ) )
                     continue;
             }
+            if ( vault_entry_foreign( ch, entries[i] ) ) {
+                foreign++;
+                continue;
+            }
             ids.push_back( entries[i].id );
         }
+
+        if ( foreign > 0 )
+            ch->pecho( lmsg( lang,
+                "%d personal %Iitem|items|items %Ibelongs|belong|belong to another character -- only the owner can take %Iit|them|them out.",
+                "%d %Iименной|именных|именных %Iпредмет|предмета|предметов %Iпринадлежит|принадлежат|принадлежат другому персонажу -- достать %Iего|их|их может только владелец.",
+                "%d %Iіменний|іменні|іменних %Iпредмет|предмети|предметів %Iналежить|належать|належать іншому персонажу -- дістати %Iйого|їх|їх може лише власник." ),
+                foreign, foreign, foreign, foreign, foreign );
+
+        if ( ids.empty( ) && foreign > 0 )
+            return;
 
         if ( ids.empty( ) ) {
             ch->pecho( lmsg( lang,
@@ -768,12 +813,14 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
     }
 
     long long targetId = 0;
+    int targetIdx = -1;
     bool found = false;
 
     if ( target.isNumber( ) ) {
         int n = atoi( target.c_str( ) );
         if ( n >= 1 && n <= (int)entries.size( ) ) {
             targetId = entries[n - 1].id;
+            targetIdx = n - 1;
             found = true;
         }
         else {
@@ -812,11 +859,21 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
         }
 
         targetId = entries[ matchIdx[0] ].id;
+        targetIdx = matchIdx[0];
         found = true;
     }
 
     if ( !found )
         return;
+
+    if ( vault_entry_foreign( ch, entries[targetIdx] ) ) {
+        ch->pecho( lmsg( lang,
+            "That is %s's personal item -- only they can take it out.",
+            "Это именной предмет персонажа %s -- достать его может только владелец.",
+            "Це іменний предмет персонажа %s -- дістати його може лише власник." ),
+            vault_capitalize( entries[targetIdx].owner ).c_str( ) );
+        return;
+    }
 
     if ( !bank_withdraw_entry( ch, kind, key, targetId ) ) {
         ch->pecho( lmsg( lang,
@@ -922,6 +979,9 @@ CMDRUN( vault )
     }
     else if ( inBank ) {
         kind = "player";
+        DLString charName;
+        PCharacter *pch = 0;
+
         if ( !overrideName.empty( ) ) {
             if ( !vault_safe_name( overrideName ) ) {
                 ch->pecho( lmsg( lang,
@@ -930,13 +990,11 @@ CMDRUN( vault )
                     "Використання: vault *<власник> [підкоманда]  (лише літери/цифри)" ) );
                 return;
             }
-            // Key is the pfile-canonical lowercase form (delete/rename cleanup and
-            // the owner's own vault land on the same cell); label stays capitalized.
-            key = overrideName.toLower( );
+            charName = overrideName;
             ownerLabel = vault_capitalize( overrideName );
         }
         else {
-            PCharacter *pch = ch->getPC( );
+            pch = ch->getPC( );
             if ( pch == 0 ) {
                 ch->pecho( lmsg( lang,
                     "You have no vault.",
@@ -944,7 +1002,50 @@ CMDRUN( vault )
                     "У тебе немає сховища." ) );
                 return;
             }
-            key = pch->getName( ).toLower( );
+            charName = pch->getName( );
+        }
+
+        // Key is the pfile-canonical lowercase form (delete/rename cleanup and
+        // the owner's own vault land on the same cell); label stays capitalized.
+        key = charName.toLower( );
+
+        // An account-linked character opens the account's SHARED cell. Every
+        // member's old personal cell is folded into it on open (entries are named
+        // by unique object Id, so nothing collides), so an alt's items show up no
+        // matter which character opens the vault first. The same-account login
+        // block keeps a single mortal writer on the cell at a time.
+        DLString acct = AccountManager::accountOf( charName );
+        if ( !acct.empty( ) && vault_safe_name( acct ) ) {
+            bool hadEntries = bank_has_entries( "account", acct );
+            std::list<DLString> members = AccountManager::charsOf( acct );
+            for ( std::list<DLString>::const_iterator m = members.begin( ); m != members.end( ); m++ )
+                if ( bank_merge_owner( "player", m->toLower( ), "account", acct ) > 0 )
+                    hadEntries = true;
+
+            // Grandfather: a vault that already held items before the unlock
+            // existed stays open. So does a per-character unlock bought before
+            // the account link -- lift it onto the account for every alt.
+            if ( !AccountManager::vaultUnlocked( acct ) ) {
+                bool lift = hadEntries;
+                if ( pch != 0 && pch->getAttributes( ).isAvailable( "vaultunlocked" ) )
+                    lift = true;
+                if ( lift )
+                    AccountManager::setVaultUnlocked( acct );
+            }
+
+            kind = "account";
+            key = acct;
+        }
+        else if ( pch != 0 && !bank_vault_unlocked( pch ) && bank_has_entries( "player", key ) ) {
+            bank_vault_unlock( pch );                    // grandfather a pre-unlock vault
+        }
+
+        if ( pch != 0 && !pch->is_immortal( ) && !bank_vault_unlocked( pch ) ) {
+            ch->pecho( lmsg( lang,
+                "Your vault is locked. Any questor opens it for 1000 quest points ({yquest buy vault{x) -- once for every character on your account.",
+                "Твое хранилище закрыто. Любой квестор откроет его за 1000 квестовых очков ({yквест купить хранилище{x) -- один раз для всех персонажей твоей учетной записи.",
+                "Твоє сховище зачинене. Будь-який квестор відчинить його за 1000 квестових очок ({yквест купити сховище{x) -- один раз для всіх персонажів твого облікового запису." ) );
+            return;
         }
     }
     else {

@@ -35,6 +35,10 @@
 #include "fread_utils.h"
 #include "merc.h"
 
+#include "pcharacter.h"
+#include "commonattributes.h"
+#include "accountmanager.h"
+
 #include "def.h"
 
 /*-------------------------------------------------------------------------
@@ -218,6 +222,14 @@ static bool bank_entry_peek( const char *fname, BankEntry &be )
         }
         else if ( !strncmp( line, "Lev ", 4 ) ) {
             be.level = atoi( line + 4 );
+        }
+        else if ( !strncmp( line, "Ownr ", 5 ) ) {
+            // "Ownr <name>~"
+            char *val = line + 5;
+            char *tilde = strrchr( val, '~' );
+            if ( tilde != 0 )
+                *tilde = '\0';
+            be.owner = val;
         }
         else if ( !strcmp( line, "End" ) ) {
             firstDone = true;
@@ -427,4 +439,117 @@ void bank_rename_owner( const DLString &kind, const DLString &oldKey, const DLSt
     ::mkdir( parent, 0775 );
 
     rename( oldDir, newDir );
+}
+
+/*-------------------------------------------------------------------------
+ * owner-tree merge (per-character cell -> shared account cell)
+ *------------------------------------------------------------------------*/
+static bool bank_is_entry_name( const char *name )
+{
+    if ( name[0] == '\0' )
+        return false;
+    for ( const char *p = name; *p != '\0'; p++ )
+        if ( !isdigit( (unsigned char)*p ) )
+            return false;
+    return true;
+}
+
+bool bank_has_entries( const DLString &kind, const DLString &key )
+{
+    char dir[MAX_INPUT_LENGTH];
+    bank_owner_dir( dir, sizeof( dir ), kind, key );
+
+    DIR *d = opendir( dir );
+    if ( d == 0 )
+        return false;
+
+    bool found = false;
+    struct dirent *ent;
+    while ( !found && ( ent = readdir( d ) ) != 0 )
+        found = bank_is_entry_name( ent->d_name );
+
+    closedir( d );
+    return found;
+}
+
+int bank_merge_owner( const DLString &fromKind, const DLString &fromKey,
+                      const DLString &toKind, const DLString &toKey )
+{
+    char fromDir[MAX_INPUT_LENGTH], toDir[MAX_INPUT_LENGTH];
+    bank_owner_dir( fromDir, sizeof( fromDir ), fromKind, fromKey );
+    bank_owner_dir( toDir, sizeof( toDir ), toKind, toKey );
+
+    DIR *d = opendir( fromDir );
+    if ( d == 0 )
+        return 0;
+
+    bank_ensure_dir( toKind, toKey );
+
+    int moved = 0;
+    bool leftover = false;
+    struct dirent *ent;
+    while ( ( ent = readdir( d ) ) != 0 ) {
+        if ( !strcmp( ent->d_name, "." ) || !strcmp( ent->d_name, ".." ) )
+            continue;
+
+        // Only live entries move. A <id>.bad (half-read withdrawal kept for
+        // inspection) stays behind with its source dir, for a human to look at.
+        if ( !bank_is_entry_name( ent->d_name ) ) {
+            leftover = true;
+            continue;
+        }
+
+        char src[MAX_INPUT_LENGTH + 260], dst[MAX_INPUT_LENGTH + 260];
+        snprintf( src, sizeof( src ), "%s/%s", fromDir, ent->d_name );
+        snprintf( dst, sizeof( dst ), "%s/%s", toDir, ent->d_name );
+
+        struct stat st;
+        if ( ::stat( dst, &st ) == 0 ) {
+            LogStream::sendError( ) << "bank_merge_owner: " << dst << " exists, leaving " << src << endl;
+            leftover = true;
+            continue;
+        }
+
+        if ( rename( src, dst ) == 0 )
+            moved++;
+        else {
+            LogStream::sendError( ) << "bank_merge_owner: rename " << src << " failed" << endl;
+            leftover = true;
+        }
+    }
+    closedir( d );
+
+    if ( !leftover )
+        rmdir( fromDir );
+
+    if ( moved > 0 )
+        LogStream::sendNotice( ) << "bank_merge_owner: " << moved << " entries "
+                                 << fromKind << "/" << fromKey << " -> " << toKind << "/" << toKey << endl;
+    return moved;
+}
+
+/*-------------------------------------------------------------------------
+ * personal vault unlock (per account, or per character with no account)
+ *------------------------------------------------------------------------*/
+static const char *VAULT_UNLOCK_ATTR = "vaultunlocked";
+
+bool bank_vault_unlocked( PCharacter *pch )
+{
+    if ( pch->getAttributes( ).isAvailable( VAULT_UNLOCK_ATTR ) )
+        return true;
+
+    DLString acct = AccountManager::accountOf( pch->getName( ) );
+    return !acct.empty( ) && AccountManager::vaultUnlocked( acct );
+}
+
+void bank_vault_unlock( PCharacter *pch )
+{
+    DLString acct = AccountManager::accountOf( pch->getName( ) );
+    if ( !acct.empty( ) && AccountManager::setVaultUnlocked( acct ) )
+        return;
+
+    // No account (or the account write failed): keep the unlock on the pfile, so
+    // the purchase is never lost. It is lifted onto the account on a later open.
+    pch->getAttributes( ).getAttr<XMLEmptyAttribute>( VAULT_UNLOCK_ATTR );
+    pch->save( );
 }

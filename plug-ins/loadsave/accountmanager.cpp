@@ -600,6 +600,25 @@ bool AccountManager::setConfigKey(const DLString &id, const DLString &key, const
     return saveAccount(id);
 }
 
+bool AccountManager::vaultUnlocked(const DLString &id)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end())
+        return false;
+    // .get (not operator[]) so a lookup never writes a null "vault" key.
+    Json::Value v = i->second.get("vault", Json::Value());
+    return v.isBool() && v.asBool();
+}
+
+bool AccountManager::setVaultUnlocked(const DLString &id)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end())
+        return false;
+    i->second["vault"] = true;
+    return saveAccount(id);
+}
+
 bool AccountManager::removeIdentity(const DLString &type, const DLString &value)
 {
     DLString owner = findByIdentity(type, value);

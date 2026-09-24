@@ -35,6 +35,7 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<RefitQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<UpgradeQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<TattooQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<VaultQuestArticle> >( ppl );
         Plugin::registerPlugin<PersonalNameRepair>( ppl );
 
         Plugin::registerPlugin<MobileBehaviorRegistrator<QuestTrader> >( ppl );
