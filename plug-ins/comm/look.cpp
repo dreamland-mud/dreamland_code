@@ -68,6 +68,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "run.h"
 
 #define MILD(ch)     (IS_SET((ch)->comm, COMM_MILDCOLOR))
 
@@ -1510,7 +1511,13 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
 
 static void do_look_move( Character *ch, bool fBrief )
 {
-    if (!ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "speedwalk" )) {
+    XMLAttributeSpeedWalk::Pointer walk;
+
+    if (!ch->is_npc( ))
+        walk = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeSpeedWalk>( "speedwalk" );
+
+    // Mid-run rooms show just the name; the room the run ends in gets the full look.
+    if (walk && !walk->isLastStep( )) {
         if (eyes_darkened( ch ))
             ch->pecho( _("Здесь слишком темно... ") );
         else
