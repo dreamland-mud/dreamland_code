@@ -17,6 +17,9 @@
 #include "so.h"
 #include "plugin.h"
 #include "wrapperbase.h"
+#include "feniamanager.h"
+#include "reglist.h"
+#include "regcontainer.h"
 #include "register-impl.h"
 #include "lex.h"
 #include "fenia_utils.h"
@@ -624,12 +627,10 @@ static void corpse_money( Object *corpse, Character *ch )
     ch->silver = 0;
 }
 
-static void corpse_place( Object *corpse, Character *ch )
+// Where this char's corpse goes: low-level PCs to their altar, others stay.
+static Room * corpse_target_room( Character *ch )
 {
     Room *corpse_room = 0;
-    
-    if (!corpse)
-        return;
 
     if (!ch->is_npc( ) && ch->getModifyLevel( ) < GHOST_MIN_LEVEL) 
         corpse_room = get_room_instance( ch->getPC()->getHometown( )->getAltar( ) );
@@ -637,7 +638,15 @@ static void corpse_place( Object *corpse, Character *ch )
     if (!corpse_room)
         corpse_room = ch->in_room;
 
-    obj_to_room( corpse, corpse_room );
+    return corpse_room;
+}
+
+static void corpse_place( Object *corpse, Character *ch )
+{
+    if (!corpse)
+        return;
+
+    obj_to_room( corpse, corpse_target_room( ch ) );
 }
 
 static void corpse_fill( Object *corpse, Character *ch, int flags = 0 )
@@ -688,14 +697,169 @@ static void corpse_reequip( Character *victim )
     }
 }
 
+/*
+ * This char's corpse lying in room, created after object id minId
+ * (0 = any age). Matches what corpse_create writes: the RU genitive name in
+ * 'from', the mob vnum in value3 for NPCs, the owner for PCs.
+ */
+static Object * corpse_find( Character *ch, Room *room, long long minId )
+{
+    if (!room)
+        return 0;
+
+    DLString name = ch->getNameP( '2' );
+
+    for (Object *obj = room->contents; obj; obj = obj->next_content) {
+        if (obj->getID( ) <= minId || obj->from != name)
+            continue;
+
+        if (ch->is_npc( )
+            && obj->item_type == ITEM_CORPSE_NPC
+            && obj->value3( ) == ch->getNPC( )->pIndexData->vnum)
+            return obj;
+
+        if (!ch->is_npc( )
+            && obj->item_type == ITEM_CORPSE_PC
+            && obj->getOwner( ) == ch->getNameC( ))
+            return obj;
+    }
+
+    return 0;
+}
+
+/*
+ * Today's C++ corpse: create, money, place, fill, looting. If a failed Fenia
+ * maker already made a corpse (created after fenia_min_id), finish that one
+ * instead of making a second body. Returns the vnum of the room the corpse
+ * landed in, or 0 for no corpse.
+ */
+static int make_corpse_legacy( Character *killer, Character *ch, long long fenia_min_id )
+{
+    Object *corpse = 0;
+
+    if (fenia_min_id > 0) {
+        corpse = corpse_find( ch, corpse_target_room( ch ), fenia_min_id );
+        if (!corpse)
+            corpse = corpse_find( ch, ch->in_room, fenia_min_id );
+        // Fenia .create() parks a new object in its storage room (vnum 9,
+        // ROOM_VNUM_FENIA_STORAGE) until it is placed; place it properly.
+        if (!corpse) {
+            corpse = corpse_find( ch, get_room_instance( 9 ), fenia_min_id );
+            if (corpse) {
+                obj_from_room( corpse );
+                corpse_place( corpse, ch );
+            }
+        }
+    }
+
+    bool reused = corpse != 0;
+
+    if (!reused)
+        corpse = corpse_create( ch );
+
+    corpse_money( corpse, ch );
+
+    if (!reused)
+        corpse_place( corpse, ch );
+
+    corpse_fill( corpse, ch );
+    corpse_looting( corpse, ch, killer );
+
+    return corpse && corpse->in_room ? corpse->in_room->vnum : 0;
+}
+
+/*
+ * Ask Fenia .tmp.corpse.make(vict, killer, label, damtype) to make the corpse
+ * (docs/combat/FENIA_MAKE_CORPSE_PLAN.md). It answers with a number: N > 0 --
+ * done, corpse in room N; -1 -- done, no corpse. Anything else, no function
+ * bound, or a throw means "not handled" and the C++ corpse is made instead.
+ * invoked tells whether the maker actually ran (it may have left a corpse).
+ */
+static bool corpse_fenia( Character *killer, Character *ch, const DLString &label, int damtype, int &corpseRoomVnum, bool &invoked )
+{
+    using namespace Scripting;
+
+    invoked = false;
+
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    static IdRef ID_TMP("tmp"), ID_CORPSE("corpse"), ID_FUNC("make");
+
+    try {
+        // Check each level: dereferencing a member of a missing (NONE)
+        // namespace throws, which would croak on every death.
+        Register tmp = *Context::root[ID_TMP];
+        if (tmp.type != Register::OBJECT)
+            return false;
+
+        Register ns = *tmp[ID_CORPSE];
+        if (ns.type != Register::OBJECT)
+            return false;
+
+        Register function = *ns[ID_FUNC];
+        if (function.type != Register::FUNCTION)
+            return false;
+
+        RegisterList args;
+        args.push_back(FeniaManager::wrapperManager->getWrapper(ch));
+        args.push_back(killer ? FeniaManager::wrapperManager->getWrapper(killer) : Register());
+        args.push_back(Register(label));
+        args.push_back(Register(damtype));
+
+        invoked = true;
+        Register result = function.toFunction()->invoke(ns, args);
+
+        if (result.type != Register::NUMBER)
+            return false;
+
+        int rc = result.toNumber();
+        if (rc > 0) {
+            corpseRoomVnum = rc;
+            return true;
+        }
+        if (rc == -1) {
+            corpseRoomVnum = 0;
+            return true;
+        }
+
+    } catch (const ::Exception &e) {
+        FeniaManager::getThis()->croak(0, Register(DLString("corpse.make")), e);
+    }
+
+    return false;
+}
+
+/*
+ * Safety net after either path: nothing but tattoos (and no money) may stay
+ * on the body. Leftovers go into this char's corpse in the corpse room, or
+ * onto the floor, the same way corpse_fill would have put them.
+ */
+static void corpse_sweep_leftovers( Character *ch, int corpseRoomVnum, long long minId )
+{
+    bool leftover = ch->gold > 0 || ch->silver > 0;
+
+    for (Object *obj = ch->carrying; obj && !leftover; obj = obj->next_content)
+        if (obj->wear_loc != wear_tattoo)
+            leftover = true;
+
+    if (!leftover)
+        return;
+
+    LogStream::sendWarning( ) << "corpse: sweeping leftovers from " << ch->getNameC( ) << endl;
+
+    Room *room = corpseRoomVnum > 0 ? get_room_instance( corpseRoomVnum ) : 0;
+    Object *corpse = corpse_find( ch, room, minId );
+
+    corpse_money( corpse, ch );
+    corpse_fill( corpse, ch );
+}
 
 /*
  * Make a corpse out of a character.
  */
-static void make_corpse( Character *killer, Character *ch )
+static void make_corpse( Character *killer, Character *ch, const DLString &label, int damtype )
 {
-    Object *corpse;
-    
     if (ch->is_mirror( ))
         return;
 
@@ -708,25 +872,41 @@ static void make_corpse( Character *killer, Character *ch )
         DyingGuard( Character *c ) : ch( c ), saved( c->dying ) { ch->dying = true; }
         ~DyingGuard( ) { ch->dying = saved; }
     } dyingGuard( ch );
+
+    Room *deathRoom = ch->in_room;
+    int deathRoomVnum = deathRoom ? deathRoom->vnum : 0;
+    int corpseRoomVnum = 0;
+    bool invoked = false;
+    long long feniaMinId = 0;
     
     dreamland->removeOption( DL_SAVE_OBJS );
     dreamland->removeOption( DL_SAVE_MOBS );
 
-    corpse = corpse_create( ch );
-    corpse_money( corpse, ch );
-    corpse_place( corpse, ch );
-    corpse_fill( corpse, ch );
-    corpse_looting( corpse, ch, killer );
+    // A death nested inside the maker (it killed the victim again) takes
+    // the C++ path, so the maker can't recurse into itself.
+    bool handled = false;
+    if (!dyingGuard.saved) {
+        feniaMinId = dreamland->genID( );
+        handled = corpse_fenia( killer, ch, label, damtype, corpseRoomVnum, invoked );
+    }
+
+    if (!handled)
+        corpseRoomVnum = make_corpse_legacy( killer, ch, invoked ? feniaMinId : 0 );
+
+    corpse_sweep_leftovers( ch, corpseRoomVnum, invoked ? feniaMinId : 0 );
     ch->getClan( )->makeMonument( ch, killer );
 
     dreamland->resetOption( DL_SAVE_OBJS );
     dreamland->resetOption( DL_SAVE_MOBS );
 
-    save_items( ch->in_room );
-    save_mobs( ch->in_room );
+    save_items( deathRoom );
+    save_mobs( deathRoom );
 
-    if (corpse && corpse->in_room != ch->in_room)
-        save_items( corpse->in_room );
+    if (corpseRoomVnum > 0 && corpseRoomVnum != deathRoomVnum) {
+        Room *corpseRoom = get_room_instance( corpseRoomVnum );
+        if (corpseRoom)
+            save_items( corpseRoom );
+    }
 }
 
 Object * bodypart_create( int vnum, Character *ch, Object *corpse )
@@ -918,7 +1098,7 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
         group_gain(ch, victim, realKiller);
 
     if (!IS_SET(flags, DEATH_MOB_EXTRACT))
-        make_corpse( ch, victim ); // TO-DO: move this to fenia too
+        make_corpse( ch, victim, label, damtype );
 
     // MOB is killed.
     if (victim->is_npc( )) {
