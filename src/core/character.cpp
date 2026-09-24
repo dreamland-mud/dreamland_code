@@ -124,6 +124,7 @@ void Character::init( )
     fightEmptyStreak = 0;
 
     extracted = false;
+    dying = false;
     reply = 0;
     next = 0;
     prev = 0;
