@@ -14,6 +14,7 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "dlscheduler.h"
+#include "interp.h"
 
 #include "merc.h"
 #include "def.h"
@@ -235,9 +236,22 @@ void SpeedWalkUpdateTask::run( PCharacter *ch )
     if (ch->wait > 0)
         return;
 
-    if (RunMovement( ch, walk ).move( ) != RC_MOVE_OK || walk->isEmpty( )) {
+    Room *before = ch->in_room;
+
+    int rc = RunMovement( ch, walk ).move( );
+
+    if (rc != RC_MOVE_OK || walk->isEmpty( )) {
+        attributes.eraseAttribute( "speedwalk" );
+
+        // A run that ends without a successful step (obstacle, locked door,
+        // out of breath, relocated by a prog mid-step) left the player looking
+        // at a bare room name. A run that ends on a step already got the full
+        // look via isLastStep(). With the attribute gone, 'look move' gives
+        // the same look as that last step.
+        if (!ch->fighting && (rc != RC_MOVE_OK || ch->in_room == before))
+            interpret_raw( ch, "look", "move" );
+
         walk->show(ch);
-        attributes.eraseAttribute( "speedwalk" );        
     }
 }
 
@@ -313,5 +327,11 @@ int XMLAttributeSpeedWalk::getFirstDoor( ) const
 {
     char c = getFirstCommand( );
     return direction_lookup( dl_tolower(c) );
+}
+
+/** True while making the final single step of the route. */
+bool XMLAttributeSpeedWalk::isLastStep( ) const
+{
+    return path.getValue( ).length( ) == 1 && isSmallLetter( getFirstCommand( ) );
 }
 

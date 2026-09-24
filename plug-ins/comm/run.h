@@ -43,6 +43,7 @@ public:
     char getFirstCommand( ) const;
     void clearFirstCommand( );
     int getFirstDoor( ) const;
+    bool isLastStep( ) const;
     void show(PCharacter *) const;
     
 private:
