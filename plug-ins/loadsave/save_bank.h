@@ -95,4 +95,15 @@ bool bank_has_entries( const DLString &kind, const DLString &key );
 bool bank_vault_unlocked( PCharacter *pch );
 void bank_vault_unlock( PCharacter *pch );
 
+/* The account whose shared cell charName's vault opens, or "" when the char is
+ * unattached, or linked to an id the registry does not know (then it behaves as
+ * unattached rather than stranding its items in an unreachable cell). */
+DLString bank_vault_account( const DLString &charName );
+
+/* Grandfather + lift, run before any unlock check (vault command and questor):
+ * a vault that already holds items (the char's own cell, the account cell, or
+ * any member's not-yet-merged cell) counts as unlocked, and a per-character
+ * unlock is moved onto the character's account and cleared from the pfile. */
+void bank_vault_grandfather( PCharacter *pch );
+
 #endif

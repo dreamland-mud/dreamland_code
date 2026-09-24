@@ -1076,6 +1076,10 @@ bool VaultQuestArticle::available( Character *client, NPCharacter *questman ) co
     if (client->is_npc( ))
         return false;
 
+    // Grandfather first: a vault that already holds items is open for free, so
+    // nobody pays 1000 qp for what they already have.
+    bank_vault_grandfather( client->getPC( ) );
+
     if (bank_vault_unlocked( client->getPC( ) )) {
         say_act( client, questman, MultiMessage(
             "Your vault is already open, $c1.",

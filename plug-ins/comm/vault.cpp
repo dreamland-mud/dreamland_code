@@ -159,7 +159,9 @@ static bool vault_safe_name( const DLString &s )
 // A personal item (Ownr set) is shown to everyone who can open the cell, but
 // only its owner takes it out: withdrawal skips the get-path owner checks, and a
 // shared (account/clan) cell would otherwise hand one character's personal quest
-// reward to another -- where the save-time mustDisappear check crumbles it.
+// reward to another -- where the save-time owner check (obj_owner_allows)
+// destroys it. The entry's owner is read from any record, so a bag holding a
+// personal item counts as owned too.
 static bool vault_entry_foreign( Character *ch, const BankEntry &be )
 {
     if ( be.owner.empty( ) || ch->is_immortal( ) )
@@ -1009,35 +1011,23 @@ CMDRUN( vault )
         // the owner's own vault land on the same cell); label stays capitalized.
         key = charName.toLower( );
 
+        // Grandfather/lift first, so a vault that already held items -- or an
+        // unlock bought before the account link -- is never shown as locked.
+        if ( pch != 0 )
+            bank_vault_grandfather( pch );
+
         // An account-linked character opens the account's SHARED cell. Every
         // member's old personal cell is folded into it on open (entries are named
         // by unique object Id, so nothing collides), so an alt's items show up no
-        // matter which character opens the vault first. The same-account login
-        // block keeps a single mortal writer on the cell at a time.
-        DLString acct = AccountManager::accountOf( charName );
-        if ( !acct.empty( ) && vault_safe_name( acct ) ) {
-            bool hadEntries = bank_has_entries( "account", acct );
+        // matter which character opens the vault first.
+        DLString acct = bank_vault_account( charName );
+        if ( !acct.empty( ) ) {
             std::list<DLString> members = AccountManager::charsOf( acct );
             for ( std::list<DLString>::const_iterator m = members.begin( ); m != members.end( ); m++ )
-                if ( bank_merge_owner( "player", m->toLower( ), "account", acct ) > 0 )
-                    hadEntries = true;
-
-            // Grandfather: a vault that already held items before the unlock
-            // existed stays open. So does a per-character unlock bought before
-            // the account link -- lift it onto the account for every alt.
-            if ( !AccountManager::vaultUnlocked( acct ) ) {
-                bool lift = hadEntries;
-                if ( pch != 0 && pch->getAttributes( ).isAvailable( "vaultunlocked" ) )
-                    lift = true;
-                if ( lift )
-                    AccountManager::setVaultUnlocked( acct );
-            }
+                bank_merge_owner( "player", m->toLower( ), "account", acct );
 
             kind = "account";
             key = acct;
-        }
-        else if ( pch != 0 && !bank_vault_unlocked( pch ) && bank_has_entries( "player", key ) ) {
-            bank_vault_unlock( pch );                    // grandfather a pre-unlock vault
         }
 
         if ( pch != 0 && !pch->is_immortal( ) && !bank_vault_unlocked( pch ) ) {

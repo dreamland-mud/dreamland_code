@@ -197,6 +197,21 @@ static bool bank_entry_peek( const char *fname, BankEntry &be )
             continue;
         }
 
+        // Ownr is taken from ANY record, not just the top one: a bag holding a
+        // personal item must read as owned, or a non-owner could withdraw the
+        // bag and the owner check at save would destroy the item inside.
+        if ( !strncmp( line, "Ownr ", 5 ) ) {
+            if ( be.owner.empty( ) ) {
+                // "Ownr <name>~"
+                char *val = line + 5;
+                char *tilde = strrchr( val, '~' );
+                if ( tilde != 0 )
+                    *tilde = '\0';
+                be.owner = val;
+            }
+            continue;
+        }
+
         if ( !inFirst || firstDone )
             continue;
 
@@ -222,14 +237,6 @@ static bool bank_entry_peek( const char *fname, BankEntry &be )
         }
         else if ( !strncmp( line, "Lev ", 4 ) ) {
             be.level = atoi( line + 4 );
-        }
-        else if ( !strncmp( line, "Ownr ", 5 ) ) {
-            // "Ownr <name>~"
-            char *val = line + 5;
-            char *tilde = strrchr( val, '~' );
-            if ( tilde != 0 )
-                *tilde = '\0';
-            be.owner = val;
         }
         else if ( !strcmp( line, "End" ) ) {
             firstDone = true;
@@ -531,25 +538,80 @@ int bank_merge_owner( const DLString &fromKind, const DLString &fromKey,
 /*-------------------------------------------------------------------------
  * personal vault unlock (per account, or per character with no account)
  *------------------------------------------------------------------------*/
+// An XMLStringAttribute, not an empty one: string attributes survive remort,
+// so a bought unlock is never lost to it.
 static const char *VAULT_UNLOCK_ATTR = "vaultunlocked";
+
+static bool bank_alnum( const DLString &s )
+{
+    if ( s.empty( ) )
+        return false;
+    for ( size_t i = 0; i < s.size( ); i++ )
+        if ( !isalnum( (unsigned char)s[i] ) )
+            return false;
+    return true;
+}
+
+DLString bank_vault_account( const DLString &charName )
+{
+    DLString acct = AccountManager::accountOf( charName );
+    if ( acct.empty( ) || !AccountManager::exists( acct ) || !bank_alnum( acct ) )
+        return DLString::emptyString;
+    return acct;
+}
+
+static bool bank_char_unlock_attr( PCharacter *pch )
+{
+    return pch->getAttributes( ).isAvailable( VAULT_UNLOCK_ATTR );
+}
 
 bool bank_vault_unlocked( PCharacter *pch )
 {
-    if ( pch->getAttributes( ).isAvailable( VAULT_UNLOCK_ATTR ) )
+    if ( bank_char_unlock_attr( pch ) )
         return true;
 
-    DLString acct = AccountManager::accountOf( pch->getName( ) );
+    DLString acct = bank_vault_account( pch->getName( ) );
     return !acct.empty( ) && AccountManager::vaultUnlocked( acct );
 }
 
 void bank_vault_unlock( PCharacter *pch )
 {
-    DLString acct = AccountManager::accountOf( pch->getName( ) );
+    DLString acct = bank_vault_account( pch->getName( ) );
     if ( !acct.empty( ) && AccountManager::setVaultUnlocked( acct ) )
         return;
 
     // No account (or the account write failed): keep the unlock on the pfile, so
     // the purchase is never lost. It is lifted onto the account on a later open.
-    pch->getAttributes( ).getAttr<XMLEmptyAttribute>( VAULT_UNLOCK_ATTR );
+    pch->getAttributes( ).getAttr<XMLStringAttribute>( VAULT_UNLOCK_ATTR )->setValue( "1" );
     pch->save( );
+}
+
+void bank_vault_grandfather( PCharacter *pch )
+{
+    DLString name = pch->getName( ).toLower( );
+    DLString acct = bank_vault_account( pch->getName( ) );
+
+    if ( acct.empty( ) ) {
+        if ( !bank_char_unlock_attr( pch ) && bank_has_entries( "player", name ) )
+            bank_vault_unlock( pch );
+        return;
+    }
+
+    if ( !AccountManager::vaultUnlocked( acct ) ) {
+        bool lift = bank_char_unlock_attr( pch ) || bank_has_entries( "account", acct );
+        if ( !lift ) {
+            std::list<DLString> members = AccountManager::charsOf( acct );
+            for ( std::list<DLString>::const_iterator m = members.begin( ); !lift && m != members.end( ); m++ )
+                lift = bank_has_entries( "player", m->toLower( ) );
+        }
+        if ( !lift || !AccountManager::setVaultUnlocked( acct ) )
+            return;
+    }
+
+    // The account holds the unlock now; the pfile copy would only re-lift it onto
+    // whatever account this char is attached to next.
+    if ( bank_char_unlock_attr( pch ) ) {
+        pch->getAttributes( ).eraseAttribute( VAULT_UNLOCK_ATTR );
+        pch->save( );
+    }
 }
