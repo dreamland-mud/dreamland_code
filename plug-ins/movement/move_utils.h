@@ -17,6 +17,7 @@ class Object;
 int  move_char( Character *ch, int door, const char *argument = NULL );
 int  move_char( Character *ch, struct extra_exit_data *peexit, const char *argument = NULL );
 int  move_char( Character *ch, Object *portal );
+int  move_char_flee( Character *ch, int door );
 
 void transfer_char( Character *ch, Character *actor, Room *to_room,
                     const char *msgRoomLeave = NULL, const char *msgSelfLeave = NULL,
