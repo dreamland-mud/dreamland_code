@@ -83,7 +83,7 @@ public:
     void clearAttributes( ) const;
     Character * getActor( Character * ) const;
     void exorcism( Character * ) const;
-    void wipeRoom( Room * ) const;
+    int wipeRoom( Room * ) const;
 
 protected:    
     XML_VARIABLE XMLString  questID;

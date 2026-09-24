@@ -254,10 +254,20 @@ void Gangsters::cleanup( bool performance )
     
     lair = get_room_instance( GangstersInfo::getThis( )->vnumLair );
 
-    if (state == ST_CHEF_KILLED)
-        moveChefCorpseToKillerRoom( this, lair, chefKiller.getValue( ), GangstersInfo::getThis( )->vnumChef );
+    // The chef's killer is moved out of the lair with the corpse before the
+    // wipe, so wipeRoom's own lost-and-found notice would miss them.
+    PCharacter *killerInLair = NULL;
 
-    wipeRoom( lair );
+    if (state == ST_CHEF_KILLED) {
+        PCharacter *killer = PCharacterManager::findPlayer( chefKiller.getValue( ) );
+        if (killer && lair && killer->in_room == lair)
+            killerInLair = killer;
+
+        moveChefCorpseToKillerRoom( this, lair, chefKiller.getValue( ), GangstersInfo::getThis( )->vnumChef );
+    }
+
+    if (wipeRoom( lair ) > 0 && killerInLair)
+        killerInLair->pecho(_("{WВещи, оставшиеся на полу, отправлены в бюро находок.{x"));
 }
 
 void Gangsters::destroy( ) 
