@@ -242,6 +242,18 @@ NMI_GET( CharacterWrapper, online, "true, если персонаж в мире"
     return Register( target != NULL );
 }
 
+NMI_GET( CharacterWrapper, dying, "true, пока из персонажа делают труп: вывод act/recho/rvecho/ptc ему и от него глушится" )
+{
+    checkTarget();
+    return Register( target->dying );
+}
+
+NMI_SET( CharacterWrapper, dying, "true, пока из персонажа делают труп: вывод act/recho/rvecho/ptc ему и от него глушится" )
+{
+    checkTarget();
+    target->dying = arg.toBoolean();
+}
+
 NMI_GET( CharacterWrapper, dead, "true, если персонажа уничтожили или моб только что умер" )
 {
     if (zombie)
@@ -1687,6 +1699,8 @@ NMI_GET( CharacterWrapper, isInInterpret, "true если игрок в сост�
 NMI_INVOKE( CharacterWrapper, ptc, "(msg): print to char, печатает строку msg" )
 {
     checkTarget( );
+    if (target->dying)
+        return Register();
     DLString d = args.front().toString();
     page_to_char(d.c_str(), target);
     return Register();
@@ -2144,6 +2158,12 @@ NMI_INVOKE( CharacterWrapper, print, "(fmt, args): возвращает отфо
 NMI_INVOKE( CharacterWrapper, act, "(fmt, args): печатает нам отформатированную строку (с символом конца строки). " )
 {
     checkTarget();
+
+    // Death strips the body in silence (make_corpse sets dying): Remove
+    // triggers still revoke skills and affects, but their fade lines would
+    // only spam the dying char and the room.
+    if (target->dying)
+        return Register( );
     
     target->pecho( regfmt(target, args) );
     
@@ -2170,7 +2190,7 @@ NMI_INVOKE( CharacterWrapper, echoMaster, "(fmt, args): выдать строк�
 NMI_INVOKE( CharacterWrapper, recho, "(fmt, args): выводит отформатированную строку всем в комнате, кроме нас" )
 {
     checkTarget();
-    if (!target->in_room)
+    if (!target->in_room || target->dying)
         return Register();
 
     for (Character *to = target->in_room->people; to; to = to->next_in_room) {
@@ -2188,7 +2208,7 @@ NMI_INVOKE( CharacterWrapper, recho, "(fmt, args): выводит отформа
 NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...): выводит отформатированную строку всем в комнате, кроме нас и vict" )
 {
     checkTarget();
-    if (!target->in_room)
+    if (!target->in_room || target->dying)
         return Register();
 
     RegisterList myArgs(args);

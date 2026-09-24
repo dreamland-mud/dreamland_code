@@ -394,7 +394,7 @@ void affect_remove( Character *ch, Affect *paf, bool verbose )
         // path landing on an already-dead char. (Silence during extraction/quit
         // is enforced one level down, in AffectHandler::onRemove, so every strip
         // path -- here, affect_strip, checkDispel, char_update -- is covered.)
-        if (verbose && !ch->isDead()) {
+        if (verbose && !ch->isDead() && !ch->dying) {
             if (paf->type->getAffect())
                 paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, ch), paf);
         }
@@ -424,7 +424,7 @@ void affect_strip( Character *ch, int sn, bool verbose )
 {
     auto affectsWithType = ch->affected.findAll(sn);
 
-    if (verbose && !affectsWithType.empty()) {
+    if (verbose && !ch->dying && !affectsWithType.empty()) {
         Affect *firstAffect = affectsWithType.front();
         AffectHandler::Pointer firstHandler = firstAffect->type->getAffect();
 

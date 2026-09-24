@@ -230,6 +230,9 @@ public:
     int                           roundDamage; // total damage dealt this combat round; reset+summarized by violence_update for fightspam-OFF viewers
     int                           fightEmptyStreak; // consecutive fightspam-OFF empty rounds (no damage summary), for the "You're fighting! >>>" indicator
     bool extracted;
+    // True while the corpse is being made: items leave the body and their
+    // Remove triggers and wear-offs still run, but announce nothing.
+    bool dying;
     Character*                         reply;
     Character*                         next;
     Character*                         prev;

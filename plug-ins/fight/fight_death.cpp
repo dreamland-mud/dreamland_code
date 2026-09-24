@@ -698,6 +698,16 @@ static void make_corpse( Character *killer, Character *ch )
     
     if (ch->is_mirror( ))
         return;
+
+    // Items leave the body in silence (trello CfBE2ybI): their Remove triggers
+    // and wear-offs still run, but announce nothing. Save/restore, so a nested
+    // death inside a Remove trigger can't clear the outer window.
+    struct DyingGuard {
+        Character *ch;
+        bool saved;
+        DyingGuard( Character *c ) : ch( c ), saved( c->dying ) { ch->dying = true; }
+        ~DyingGuard( ) { ch->dying = saved; }
+    } dyingGuard( ch );
     
     dreamland->removeOption( DL_SAVE_OBJS );
     dreamland->removeOption( DL_SAVE_MOBS );
