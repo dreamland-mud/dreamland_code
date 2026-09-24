@@ -17,6 +17,7 @@
 #include "xmlmultistring.h"
 
 class Character;
+class PCharacter;
 class Object;
 
 /* One browse row: everything the vault listing needs WITHOUT materializing the
@@ -30,6 +31,7 @@ struct BankEntry {
     int            itemType;    // instance override, or -1 (resolve from prototype)
     int            level;       // instance override, or -1 (resolve from prototype)
     int            contents;    // nested sub-record count (bag contents); 0 = none
+    DLString       owner;       // Ownr of a personal item ("" = unowned)
 
     BankEntry( ) : id( 0 ), vnum( 0 ), itemType( -1 ), level( -1 ), contents( 0 ) { }
 };
@@ -73,5 +75,35 @@ void bank_drop_owner( const DLString &kind, const DLString &key );
  * vault follows the new name. No-op if the source is absent; refuses to clobber
  * an existing destination. */
 void bank_rename_owner( const DLString &kind, const DLString &oldKey, const DLString &newKey );
+
+/* Move every entry file of bank/<fromKind>/<fromKey>/ into bank/<toKind>/<toKey>/
+ * and remove the emptied source dir. Entry files are named by globally unique
+ * object Id, so a merge never collides; an entry whose name already exists at
+ * the destination is left in the source (logged) rather than overwritten.
+ * Returns the number of entries moved. */
+int bank_merge_owner( const DLString &fromKind, const DLString &fromKey,
+                      const DLString &toKind, const DLString &toKey );
+
+/* True if bank/<kind>/<key>/ holds at least one entry (a digits-only file). */
+bool bank_has_entries( const DLString &kind, const DLString &key );
+
+/* Personal vault access. An account-linked character's vault is the account's
+ * shared cell, and its one-time unlock is bought once per account; a character
+ * with no account keeps a per-character unlock on its pfile ("vaultunlocked").
+ * A per-character unlock bought before the account link still counts, and is
+ * lifted onto the account the first time the vault is opened. */
+bool bank_vault_unlocked( PCharacter *pch );
+void bank_vault_unlock( PCharacter *pch );
+
+/* The account whose shared cell charName's vault opens, or "" when the char is
+ * unattached, or linked to an id the registry does not know (then it behaves as
+ * unattached rather than stranding its items in an unreachable cell). */
+DLString bank_vault_account( const DLString &charName );
+
+/* Grandfather + lift, run before any unlock check (vault command and questor):
+ * a vault that already holds items (the char's own cell, the account cell, or
+ * any member's not-yet-merged cell) counts as unlocked, and a per-character
+ * unlock is moved onto the character's account and cleared from the pfile. */
+void bank_vault_grandfather( PCharacter *pch );
 
 #endif

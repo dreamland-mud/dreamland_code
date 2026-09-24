@@ -26,6 +26,8 @@
 #include "wiznet.h"
 #include "interp.h"
 #include "loadsave.h"
+#include "save_bank.h"
+#include "multimessage.h"
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
@@ -1055,6 +1057,49 @@ bool TattooQuestArticle::available( Character *client, NPCharacter *tattoer ) co
 }
 
 
+
+/*----------------------------------------------------------------------------
+ * VaultQuestArticle -- the one-time personal vault unlock. Bought once per
+ * account (every member character shares the account's vault cell); a character
+ * with no account gets a per-character unlock that later lifts onto its account.
+ *---------------------------------------------------------------------------*/
+bool VaultQuestArticle::matches( const DLString &argument ) const
+{
+    if (QuestTradeArticle::matches( argument ))
+        return true;
+    // UA name; rname carries the RU one.
+    return !argument.empty( ) && arg_oneof( argument, "сховище" );
+}
+
+bool VaultQuestArticle::available( Character *client, NPCharacter *questman ) const
+{
+    if (client->is_npc( ))
+        return false;
+
+    // Grandfather first: a vault that already holds items is open for free, so
+    // nobody pays 1000 qp for what they already have.
+    bank_vault_grandfather( client->getPC( ) );
+
+    if (bank_vault_unlocked( client->getPC( ) )) {
+        say_act( client, questman, MultiMessage(
+            "Your vault is already open, $c1.",
+            "Твое хранилище уже открыто, $c1.",
+            "Твоє сховище вже відчинене, $c1." ) );
+        return false;
+    }
+
+    return true;
+}
+
+void VaultQuestArticle::buy( PCharacter *client, NPCharacter *questman )
+{
+    bank_vault_unlock( client );
+
+    say_act( client, questman, MultiMessage(
+        "Done, $c1. Your vault is open at any bank -- for every character on your account.",
+        "Готово, $c1. Твое хранилище открыто в любом банке -- для всех персонажей твоей учетной записи.",
+        "Готово, $c1. Твоє сховище відчинене в будь-якому банку -- для всіх персонажів твого облікового запису." ) );
+}
 
 /*----------------------------------------------------------------------------
  * PersonalNameRepair

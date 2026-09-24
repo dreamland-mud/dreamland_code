@@ -287,4 +287,16 @@ private:
     virtual void buy( PCharacter *, NPCharacter * );
 };
 
+class VaultQuestArticle : public QuestTradeArticle {
+XML_OBJECT
+public:
+    typedef ::Pointer<VaultQuestArticle> Pointer;
+
+    virtual bool available( Character *, NPCharacter * ) const;
+    virtual bool matches( const DLString & ) const;
+
+private:
+    virtual void buy( PCharacter *, NPCharacter * );
+};
+
 #endif

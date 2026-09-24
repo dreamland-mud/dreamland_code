@@ -109,6 +109,12 @@ public:
     // write-through when a linked character changes an account-wide option.
     static bool setConfigKey(const DLString &id, const DLString &key, const Json::Value &value);
 
+    // The shared vault's one-time unlock, bought once per account (top-level
+    // "vault": true in the account record). Every member character opens the same
+    // bank/account/<id>/ cell, so the unlock belongs to the account, not a char.
+    static bool vaultUnlocked(const DLString &id);
+    static bool setVaultUnlocked(const DLString &id);
+
     // --- messenger identities folded into the account (telegram/discord) ---
     // The account owns a verified messenger identity (a numeric id proven by the bot
     // /link, the /attach bot, or the web widget). setMessengerIdentity adds-or-moves
