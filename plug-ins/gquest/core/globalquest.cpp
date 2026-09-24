@@ -247,21 +247,25 @@ void GlobalQuest::exorcism(Character *ch) const
                   NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате.");
 }
 
-void GlobalQuest::wipeRoom( Room *room ) const
+int GlobalQuest::wipeRoom( Room *room ) const
 {
     Object *obj_next, *pit;
     Room *office;
     
     if (!room)
-        return;
+        return 0;
 
     // Move every person in the room to an altar, extract unclaimed mobs.
     // Can't do the usual next_in_room cycle, because mounted chars and mounts
     // are transferred together, breaking the loop.
     list<Character *> people = room->getPeople();
+    list<PCharacter *> players;
     for (auto &rch: people) {
+        if (!rch->is_npc())
+            players.push_back(rch->getPC());
         exorcism( rch );
     }
+    int lostFound = 0;
     
     // Move every item on the floor to the owner's pit or to Lost Property office.
     pit = find_pit_in_room(ROOM_VNUM_ALTAR);
@@ -297,5 +301,14 @@ void GlobalQuest::wipeRoom( Room *room ) const
             obj_to_room( obj, office );
         else 
             obj_to_obj( obj, pit );
+        lostFound++;
     }
+
+    // Tell whoever was just moved out where their dropped gear went --
+    // a disarmed weapon otherwise looks like it vanished with the room.
+    if (lostFound > 0)
+        for (auto &pch: players)
+            pch->pecho(_("{WВещи, оставшиеся на полу, отправлены в бюро находок.{x"));
+
+    return lostFound;
 }
