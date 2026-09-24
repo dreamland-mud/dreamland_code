@@ -140,8 +140,17 @@ NMI_GET(SkillWrapper, autobuff, "кастуется ли умение кнопк
     return getTarget()->isAutobuff();
 }
 
-NMI_INVOKE(SkillWrapper, nameFor, "(ch): название умения с учетом языковых настроек персонажа")
+NMI_INVOKE(SkillWrapper, nameFor, "(ch|lang): название умения с учетом языковых настроек персонажа, либо для языка по номеру (0 en, 1 ru, 2 ua)")
 {
+    // A numeric argument is a lang_t, for callers that know the viewer's
+    // language but not the viewer (identify's printAffects).
+    if (!args.empty() && args.front().type == Register::NUMBER) {
+        int lang = args.front().toNumber();
+        if (lang < LANG_MIN || lang >= LANG_MAX)
+            throw Scripting::IllegalArgumentException();
+        return getTarget()->getNameFor((lang_t)lang);
+    }
+
     Character *ch = args2character(args);
     return getTarget()->getNameFor(ch);
 }
