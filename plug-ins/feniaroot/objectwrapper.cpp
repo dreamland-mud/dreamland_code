@@ -1071,12 +1071,14 @@ NMI_INVOKE( ObjectWrapper, keyLockRoom, "(ch): комната с дверью и
         if (!ch->can_see( room ))
             continue;
 
+        // Hidden doors stay hidden: filter per exit, as Keyhole::locate does.
         for (int d = 0; d < DIR_SOMEWHERE; d++)
             if (room->exit[d] && room->exit[d]->key == keyVnum)
-                return wrap(room);
+                if (!room->exit[d]->u1.to_room || ch->can_see( room->exit[d] ))
+                    return wrap(room);
 
         for (auto &ex: room->extra_exits)
-            if (ex->key == keyVnum)
+            if (ex->key == keyVnum && ch->can_see( ex ))
                 return wrap(room);
     }
 
