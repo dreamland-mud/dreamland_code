@@ -11,6 +11,7 @@
 
 #include "function.h"
 #include "codesource.h"
+#include "exceptions.h"
 #include "register-impl.h"
 #include "object.h"
 
@@ -80,6 +81,9 @@ CodeSource::eval(Register thiz)
         return result;
     } catch (...) {
         functions.reuseMode = false;
+        // Top-level eval callers (eval, cs post, /api/eval, cs read) print and
+        // swallow without a croak; don't let a later exception match this one.
+        Exception::forgetNative();
         throw;
     }
 }
