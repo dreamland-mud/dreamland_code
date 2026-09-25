@@ -189,6 +189,19 @@ InterpretHandler::handle(Descriptor *d, char *arg)
     return 0;
 }
 
+// Health of a combatant in percent, for the %y/%o/%k prompt codes.
+static void prompt_health( ostringstream &out, Character *ch, Character *who )
+{
+    lang_t lang = ch->getPC( ) ? Player::displayLang( ch ) : LANG_EN;
+
+    if (who == 0)
+        out << lmsg(lang, "none", "нет", "нема");
+    else if (who->hit >= 0)
+        out << HEALTH(who) << "%";
+    else
+        out << lmsg(lang, "DYING!", "ПРИ СМЕРТИ!", "ПРИ СМЕРТІ!");
+}
+
 /*
  * Bust a prompt (player settable prompt)
  * coded by Morgenes for Aldara Mud
@@ -292,22 +305,16 @@ void InterpretHandler::normalPrompt( Character *ch )
             break;
 
         case 'y' :
-            if (ch->hit >= 0)
-                out << HEALTH(ch) << "%";
-            else
-                out << "ПРИ СМЕРТИ!";
+            prompt_health( out, ch, ch );
             break;
 
         case 'o' :
-            if (victim != 0)
-            {
-                if (victim->hit >= 0)
-                    out << HEALTH(victim) << "%";
-                else
-                    out << "ПРИ СМЕРТИ!";
-            }
-            else
-                out << "нет";
+            prompt_health( out, ch, victim );
+            break;
+
+        case 'k' :
+            // The tank: whoever your opponent is hitting.
+            prompt_health( out, ch, victim ? victim->fighting : 0 );
             break;
 
         case 'h' :
