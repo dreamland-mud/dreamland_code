@@ -9,12 +9,27 @@
 #include "messengers.h"
 #include "act.h"
 #include "l10n.h"
+#include "fenia/exceptions.h"
 
 using namespace Scripting;
 
 DLString NONCE_PLACEHOLDER = "NONCE";
 
 bool has_fenia_security( PCMemoryInterface *pch );
+
+// The exception text, plus the script location for a native exception that
+// would otherwise arrive as a bare "Unparsed node <DLString::toInteger> <>".
+static DLString describe(const ::Exception &e)
+{
+    DLString where = Scripting::Exception::nativeWhere(e);
+    if (where.empty())
+        return e.what();
+
+    // Callers append their own newline.
+    while (!where.empty() && where.at(where.size() - 1) == '\n')
+        where.erase(where.size() - 1);
+    return DLString(e.what()) + "\n" + where;
+}
 
 DLString FeniaCroaker::lastHeader;
 DLString FeniaCroaker::lastException;
@@ -32,10 +47,11 @@ void FeniaCroaker::destruction()
 void FeniaCroaker::croak(const FeniaProcess *process, const ::Exception &e) const
 {
     DLString header = "Исключение в потоке " + process->name;
-    DLString message = header + ":{x\n" + e.what() + "\n";
+    DLString what = describe(e);
+    DLString message = header + ":{x\n" + what + "\n";
 
     wiznet(message);
-    discord(header, e.what());
+    discord(header, what);
 }
 
 void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const ::Exception &e) const
@@ -46,6 +62,8 @@ void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const 
 
     if (isFiltered(e))
         return;
+
+    DLString what = describe(e);
 
     // Try our best to guess the codesource where the buggy code is originating from.
     // A closure that outlived its code source has none to name -- and this is the
@@ -63,15 +81,15 @@ void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const 
             << web_cmd_placeholder("cs web $1", "%1$d", NONCE_PLACEHOLDER)
             << "] %2$s %3$s:{x\n%4$s\n";
         message = fmt(0, messageFormat.str().c_str(), 
-                       codeSource->getId(), codeSource->name.c_str(), key.toString().c_str(), e.what());
+                       codeSource->getId(), codeSource->name.c_str(), key.toString().c_str(), what.c_str());
 
     } else {
         header = "Исключение при вызове " + key.toString();
-        message = header + ":{x\n" + e.what() + "\n";
+        message = header + ":{x\n" + what + "\n";
     }
     
     wiznet(message);
-    discord(header, e.what());
+    discord(header, what);
 }
 
 void FeniaCroaker::discord(const DLString &header, const DLString &exception)

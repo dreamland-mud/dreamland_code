@@ -23,6 +23,19 @@ public:
     virtual ~Exception( ) throw() ;
 
     static string info(string s);
+
+    // A native C++ exception (e.g. DLString::toInteger's ExceptionBadType) thrown
+    // under a script carries no script location. Node eval records it while the
+    // node trace is still intact; croakers look it up by the caught object.
+    static void recordNative(const ::Exception &e);
+    static string nativeWhere(const ::Exception &e);
+    // Called once an exception is reported or swallowed: the next exception
+    // often reuses the freed object's address, type and message, and must not
+    // match this one's location.
+    static void forgetNative();
+
+private:
+    static void where(ostream &out, const string &prefix);
 };
 // MOC_SKIP_END
 

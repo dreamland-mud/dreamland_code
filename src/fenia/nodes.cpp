@@ -11,6 +11,7 @@
 #include "flow.h"
 #include "context.h"
 #include "reference-impl.h"
+#include "exceptions.h"
 
 namespace Scripting {
 
@@ -54,21 +55,42 @@ FlowCtl
 StmtNode::eval() 
 {
     NodeTrace dummy(this);
-    return evalAux();
+    try {
+        return evalAux();
+    } catch (const Exception &) {
+        throw;  // a script exception already knows where it came from
+    } catch (const ::Exception &e) {
+        Exception::recordNative(e);
+        throw;
+    }
 }
 
 Register 
 ExpNode::eval()
 {
     NodeTrace dummy(this);
-    return evalAux();
+    try {
+        return evalAux();
+    } catch (const Exception &) {
+        throw;  // a script exception already knows where it came from
+    } catch (const ::Exception &e) {
+        Exception::recordNative(e);
+        throw;
+    }
 }
 
 Reference 
 ReferenceNode::eval()
 {
     NodeTrace dummy(this);
-    return evalAux();
+    try {
+        return evalAux();
+    } catch (const Exception &) {
+        throw;  // a script exception already knows where it came from
+    } catch (const ::Exception &e) {
+        Exception::recordNative(e);
+        throw;
+    }
 }
 
 
