@@ -674,9 +674,9 @@ NMI_SET(CharacterWrapper, questpoints, "qp")
 // Shared account bank. The account id is resolved from the char's own pfile
 // link on every call, so a detach/attach takes effect at once. NONE means the
 // char has no (existing) account: the caller falls back to its pfile bank.
-static DLString bank_account_of( Character *ch )
+static DLString bank_account_of( PCharacter *pch )
 {
-    DLString acct = AccountManager::accountOf( ch->getName( ) );
+    DLString acct = AccountManager::accountOf( pch->getName( ) );
     if (acct.empty( ) || !AccountManager::exists( acct ))
         return DLString::emptyString;
     return acct;
@@ -690,7 +690,7 @@ NMI_INVOKE( CharacterWrapper, acctBank, "(currency): баланс общего �
     if (cur != "gold" && cur != "silver" && cur != "qp")
         throw Scripting::Exception( "currency must be gold, silver or qp" );
 
-    DLString acct = bank_account_of( target );
+    DLString acct = bank_account_of( target->getPC( ) );
     if (acct.empty( ))
         return Register( );
     return Register( AccountManager::bankBalance( acct, cur ) );
@@ -703,7 +703,7 @@ NMI_INVOKE( CharacterWrapper, acctBankAdd, "(gold, silver, qp): изменить
     if (args.size( ) < 3)
         throw Scripting::NotEnoughArgumentsException( );
 
-    DLString acct = bank_account_of( target );
+    DLString acct = bank_account_of( target->getPC( ) );
     if (acct.empty( ))
         return Register( false );
     return Register( AccountManager::bankAdd( acct,
