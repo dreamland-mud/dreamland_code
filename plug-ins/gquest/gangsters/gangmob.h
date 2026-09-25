@@ -27,6 +27,8 @@ public:
     
     virtual void entry( );
     virtual void config( int );
+    virtual void show( Character *, std::basic_ostringstream<char> & );
+    virtual bool isQuestTarget( Character * ) const;
 };
 
 class GangMember : public GangMob, public Wanderer {
