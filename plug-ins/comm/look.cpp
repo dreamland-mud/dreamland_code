@@ -403,7 +403,9 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
         if (obj->wear_loc != wear_none)
             continue;
 
-        if (!ch->can_see( obj ))
+        // A humming item is sensed by its vibration, so blindness or darkness
+        // doesn't hide it -- same rule get_obj_* already use for targeting.
+        if (!ch->can_see( obj ) && !ch->can_hear( obj ))
             continue;
             
         if (pocket.empty( ) && !obj->pocket.empty( ))
@@ -1104,7 +1106,7 @@ bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool
             else
                 continue;
         }
-        else if (!ch->can_see( obj )) {
+        else if (!ch->can_see( obj ) && !ch->can_hear( obj )) {
             if (fShowEmpty)
                 objName = lmsg(Player::lang(ch), "something.", "нечто.", "щось.");
             else
@@ -1442,6 +1444,8 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
 
     if (eyes_darkened( ch )) {
         ch->pecho( _("Здесь слишком темно... ") );
+        // Whatever still reaches you in the dark: glowing, lit or humming items.
+        show_list_to_char( room->contents, ch, false, false );
         show_people_to_char( room->people, ch, fShowMount );
         return;
     }
