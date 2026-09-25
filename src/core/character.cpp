@@ -464,16 +464,23 @@ bool Character::can_see( const Object *obj ) const
  */
 bool Character::can_hear( const Object *obj ) const
 {
-    // not sure why this code is here
-    /*
-    if (oprog_invisible( const_cast<Object *>( obj ), this ))
-        return false; */
-        
     if ( !IS_SET(obj->extra_flags, ITEM_HUM)
             || isAffected(gsn_deafen) )
     {
             return false;
     }
+
+    // Humming defeats blindness and darkness only, never the item's own hiding:
+    // death-only, invisible without detect, or hidden by a Fenia/behavior hook
+    // (e.g. a buried object) stays unheard as well as unseen.
+    if (IS_SET(obj->extra_flags, ITEM_VIS_DEATH))
+        return false;
+
+    if (IS_SET(obj->extra_flags, ITEM_INVIS) && !CAN_DETECT(this, DETECT_INVIS))
+        return false;
+
+    if (oprog_invisible( const_cast<Object *>( obj ), this ))
+        return false;
 
     return true;
 }
