@@ -39,6 +39,21 @@ GangMob::~GangMob( )
 {
 }
 
+// Gang members and the chef are fair game for every player in the quest's
+// level range, so tag them as a target for exactly those viewers.
+bool GangMob::isQuestTarget( Character *viewer ) const
+{
+    Gangsters *gquest = Gangsters::getThis( );
+
+    return gquest && gquest->isLevelOK( viewer );
+}
+
+void GangMob::show( Character *viewer, std::basic_ostringstream<char> &buf )
+{
+    if (isQuestTarget( viewer ))
+        buf << fmt(viewer, _("{1{R[ЦЕЛЬ] {2"));
+}
+
 void GangMob::config( int level ) 
 {
     ch->setLevel( level );
