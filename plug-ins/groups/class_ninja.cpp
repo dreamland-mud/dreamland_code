@@ -308,15 +308,27 @@ SKILL_RUNP( vanish )
                     victim->dismount();
 
                     // kidnapping success
+                    // No leave line for the kidnapper: the victim's line below
+                    // already tells the room that both of them are gone.
                     transfer_char( ch, ch, pRoomIndex,
-                        0,
-                        "Пользуясь всеобщим замешательством, ты исчезаешь!",
-                        "%1$^C1 внезапно появляется!");
+                        MultiMessage(),
+                        MultiMessage("Taking advantage of the confusion, you vanish!",
+                                     "Пользуясь всеобщим замешательством, ты исчезаешь!",
+                                     "Користуючись загальним сум'яттям, ти зникаєш!"),
+                        MultiMessage("%1$^C1 suddenly appears!",
+                                     "%1$^C1 внезапно появляется!",
+                                     "%1$^C1 раптово з'являється!") );
 
                     transfer_char( victim, ch, pRoomIndex,
-                        "%1$^C1 исчезает вместе с %2^C5!",
-                        "%2$^C1 хватает тебя и исчезает вместе с тобой!",
-                        "%1$^C1 внезапно появляется, похищенн%1$Gое|ый|ая %2$C5." );
+                        MultiMessage("%1$^C1 vanishes together with %2$C5!",
+                                     "%1$^C1 исчезает вместе с %2$C5!",
+                                     "%1$^C1 зникає разом із %2$C5!"),
+                        MultiMessage("%2$^C1 grabs you and vanishes with you!",
+                                     "%2$^C1 хватает тебя и исчезает вместе с тобой!",
+                                     "%2$^C1 хапає тебе і зникає разом із тобою!"),
+                        MultiMessage("%1$^C1 suddenly appears, kidnapped by %2$C5.",
+                                     "%1$^C1 внезапно появляется, похищенн%1$Gое|ый|ая %2$C5.",
+                                     "%1$^C1 раптово з'являється, викраден%1$Gе|ий|а %2$C5.") );
                     
                     if (!FightingCheck) {
                         yell_panic( ch, victim,
@@ -333,9 +345,15 @@ SKILL_RUNP( vanish )
                     oldact(_("Ты умудряешься вырваться из объятий $c2"), ch, 0, victim, TO_VICT);
 
                     transfer_char( ch, ch, pRoomIndex,
-                        "%1$^C1 внезапно исчезает!",
-                        "Пользуясь всеобщим замешательством, ты исчезаешь!",
-                        "%1$^C1 внезапно появляется у тебя за спиной." );
+                        MultiMessage("%1$^C1 suddenly vanishes!",
+                                     "%1$^C1 внезапно исчезает!",
+                                     "%1$^C1 раптово зникає!"),
+                        MultiMessage("Taking advantage of the confusion, you vanish!",
+                                     "Пользуясь всеобщим замешательством, ты исчезаешь!",
+                                     "Користуючись загальним сум'яттям, ти зникаєш!"),
+                        MultiMessage("%1$^C1 suddenly appears right behind you.",
+                                     "%1$^C1 внезапно появляется у тебя за спиной.",
+                                     "%1$^C1 раптово з'являється в тебе за спиною.") );
             }
       
      }
