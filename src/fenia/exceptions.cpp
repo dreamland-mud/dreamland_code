@@ -8,6 +8,7 @@
  */
 
 #include <sstream>
+#include <typeinfo>
 
 #include "exceptions.h"
 #include "nodes.h"
@@ -21,14 +22,15 @@ Exception::~Exception( ) throw()
 {
 }
 
-string 
-Exception::info(string s) 
+// Same text as the tail of info(): prefix, then where it happened, then the
+// backtrace. The prefix doubles as reverse()'s continuation line, as before.
+void
+Exception::where(ostream &out, const string &prefix)
 {
-    NodeTrace *nt = Context::current->nodeTrace;
+    NodeTrace *nt = Context::current ? Context::current->nodeTrace : 0;
     ostringstream buf;
 
-    buf << "Runtime exception " << s << endl
-        << "    in ";
+    buf << prefix << "    in ";
     
     if(nt) {
         buf << nt->node->source << ": ";
@@ -37,9 +39,69 @@ Exception::info(string s)
         buf << "native code";
 
     buf << endl;
-    BackTrace::report(buf);
+    if (Context::current)
+        BackTrace::report(buf);
 
+    out << buf.str();
+}
+
+string 
+Exception::info(string s) 
+{
+    ostringstream buf;
+    where(buf, "Runtime exception " + s + "\n");
     return buf.str( );
+}
+
+// The last native exception seen unwinding through a node, kept as copies.
+// Never hold the object itself: its destructor may live in a plugin that
+// `plug reload` unloads before the next exception would release it.
+static const void *nativeAddr = 0;
+static string nativeType;
+static string nativeMessage;
+static string nativeLocation;
+
+static bool nativeMatches(const ::Exception &e)
+{
+    return &e == nativeAddr
+        && nativeType == typeid(e).name()
+        && nativeMessage == e.getMessage();
+}
+
+void
+Exception::recordNative(const ::Exception &e)
+{
+    // Unwinding through outer nodes: the innermost one already recorded it.
+    if (nativeMatches(e))
+        return;
+
+    // Runs inside a catch handler: anything thrown here would replace the
+    // exception being reported.
+    try {
+        ostringstream buf;
+        where(buf, "");
+        nativeLocation = buf.str();
+        nativeType = typeid(e).name();
+        nativeMessage = e.getMessage();
+        nativeAddr = &e;
+    } catch (...) {
+        nativeAddr = 0;
+    }
+}
+
+void
+Exception::forgetNative()
+{
+    nativeAddr = 0;
+}
+
+string
+Exception::nativeWhere(const ::Exception &e)
+{
+    if (nativeMatches(e))
+        return nativeLocation;
+
+    return string();
 }
 
 CustomException::~CustomException() throw() 

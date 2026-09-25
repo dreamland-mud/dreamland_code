@@ -482,6 +482,7 @@ TryCatchStmt::evalAux( )
         return body->eval( );
 
     } catch(CustomException ce) {
+        Exception::forgetNative();
         CppScopeClobber scope;
         
         scope.addVar(var);
@@ -489,6 +490,7 @@ TryCatchStmt::evalAux( )
 
         return handle->eval( );
     } catch(::Exception e) {
+        Exception::forgetNative();  // e is a copy: forget by position, not by match
         CppScopeClobber scope;
         
         scope.addVar(var);

@@ -10,6 +10,7 @@
 
 #include "fenia/register-impl.h"
 #include "fenia/context.h"
+#include "fenia/exceptions.h"
 
 #include "feniamanager.h"
 #include "schedulerwrapper.h"
@@ -77,13 +78,16 @@ void FeniaManager::croak(const WrapperBase *wrapper, const Register &key, const 
         else
             LogStream::sendError()
                 << "Exception calling Fenia prog " << key.toString() << ": "
-                << e.what() << endl;
+                << e.what() << endl
+                << Scripting::Exception::nativeWhere(e);
 
     } catch(const ::Exception &x) {
         LogStream::sendError() 
             << "Exception trying to report exception " 
             << e.what() << ": " << x.what() << endl;
     }
+
+    Scripting::Exception::forgetNative();
 }
 
 void FeniaManager::croak(const FeniaProcess *process, const ::Exception &e) const
@@ -94,13 +98,16 @@ void FeniaManager::croak(const FeniaProcess *process, const ::Exception &e) cons
 
         LogStream::sendError() 
             << "Exception in Fenia process " << process->name << ": "
-            << e.what() << endl;
+            << e.what() << endl
+            << Scripting::Exception::nativeWhere(e);
         
     } catch(const ::Exception &x) {
         LogStream::sendError() 
             << "Exception trying to report exception " 
             << e.what() << ": " << x.what() << endl;
     }
+
+    Scripting::Exception::forgetNative();
 }
 
 
