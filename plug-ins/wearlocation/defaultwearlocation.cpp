@@ -216,8 +216,16 @@ static void rebuild_eq_affects( Character *ch )
     // regardless, which is why the perma-affects gate never needed the registry.
     ch->eqAffects.setRegistry( skillManager );
 
+    // Spellbane refuses magic items in canEquip, but the login reset() path
+    // re-applies worn gear without going through canEquip. Read it after the
+    // clear above, so only a real spellbane affect counts, not a gear grant.
+    bool antiMagic = ch->isAffected( gsn_spellbane );
+
     for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content) {
         if (!obj->wear_loc->givesAffects( ))
+            continue;
+
+        if (antiMagic && IS_SET( obj->extra_flags, ITEM_MAGIC ))
             continue;
 
         for (auto &paf: obj->pIndexData->affected) {
