@@ -51,6 +51,7 @@
 #include "ruler.h"
 #include "cclantalk.h"
 #include "l10n.h"
+#include "accountmanager.h"
 
 
 CLAN(chaos);
@@ -675,6 +676,26 @@ SKILL_RUNP( wanted )
 }
 
 /*
+ * Shared account bank for 'fine': the account id of a linked char, or "".
+ */
+static DLString ruler_bank_account( PCharacter *pch )
+{
+        DLString acct = AccountManager::accountOf( pch->getName( ) );
+        if ( acct.empty( ) || !AccountManager::exists( acct ) )
+                return DLString::emptyString;
+        return acct;
+}
+
+// Credit a fine: into the account's shared bank, or the pfile bank when the
+// char has no account or the account write failed -- the money is never lost.
+static void ruler_bank_credit( PCharacter *pch, int amount )
+{
+        DLString acct = ruler_bank_account( pch );
+        if ( acct.empty( ) || !AccountManager::bankAdd( acct, amount, 0, 0 ) )
+                pch->bank_g += amount;
+}
+
+/*
  * 'fine' skill command
  */
 
@@ -685,6 +706,7 @@ SKILL_RUNP( fine )
         Character *recepient = 0;
         int                                value = 0;
         int                                value2;
+        int poolTaken = 0;
         bool                        inroom = 0;
 
      
@@ -757,7 +779,14 @@ SKILL_RUNP( fine )
                 return;
         }
 
-        if ( ( ( (inroom && victim->isAffected(gsn_manacles) ) ? (int)victim->gold : 0 ) + victim->getPC()->bank_g ) < value )
+        // An account-linked char's money sits in the account's shared bank, plus
+        // whatever its pfile bank still holds until the owner next visits a bank.
+        DLString victimAcct = ruler_bank_account( victim->getPC( ) );
+        int victimPfileBank = max( 0, (int)victim->getPC()->bank_g );
+        int victimPool = victimAcct.empty( ) ? 0 : AccountManager::bankBalance( victimAcct, "gold" );
+        int victimPurse = ( inroom && victim->isAffected(gsn_manacles) ) ? (int)victim->gold : 0;
+
+        if ( (long long)victimPurse + victimPfileBank + victimPool < value )
         {
                 oldact_p(_("Ты не можешь забрать столько золотых монет у $C4.")
                         , ch, 0, victim, TO_CHAR, POS_RESTING );
@@ -765,6 +794,21 @@ SKILL_RUNP( fine )
         }
 
         value2 = value;
+
+        // Take the pool's share FIRST: it is the only step that can fail (disk
+        // write), and nothing else has been touched yet if it does.
+        {
+            int fromPurse = min( victimPurse, value );
+            int fromPfile = min( victimPfileBank, value - fromPurse );
+            int fromPool = value - fromPurse - fromPfile;
+
+            if ( fromPool > 0 && !AccountManager::bankAdd( victimAcct, -fromPool, 0, 0 ) )
+            {
+                ch->pecho(_("Банк не смог провести списание, попробуй позже."));
+                return;
+            }
+            poolTaken = fromPool;
+        }
 
         if ( inroom
                 && victim->isAffected(gsn_manacles)
@@ -785,7 +829,7 @@ SKILL_RUNP( fine )
 
         if ( value > 0 )
         {
-                victim->getPC()->bank_g -= value;
+                victim->getPC()->bank_g -= value - poolTaken;
 
                 oldact_p(_("Ты снимаешь у $C4 со счета несколько золотых монет в качестве штрафа.")
                         , ch, 0, victim, TO_CHAR, POS_RESTING );
@@ -804,7 +848,7 @@ SKILL_RUNP( fine )
 
   if ( recepient == 0 )
         {
-                ch->getPC()->bank_g += value2;
+                ruler_bank_credit( ch->getPC( ), value2 );
 
                 oldact_p(_("Ты переводишь на свой счет несколько золотых монет.")
                         , ch, 0, 0, TO_CHAR, POS_RESTING );
@@ -813,7 +857,7 @@ SKILL_RUNP( fine )
         }
         else
         {
-                recepient->getPC()->bank_g += value2;
+                ruler_bank_credit( recepient->getPC( ), value2 );
                 
                 oldact_p(_("Ты переводишь на счет $C4 несколько золотых монет.")
                         , ch, 0, recepient, TO_CHAR, POS_RESTING );

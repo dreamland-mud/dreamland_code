@@ -115,6 +115,15 @@ public:
     static bool vaultUnlocked(const DLString &id);
     static bool setVaultUnlocked(const DLString &id);
 
+    // The shared money bank (top-level "bank": {"gold","silver","qp"}). Every
+    // member character deposits into and withdraws from the same balances, so
+    // the money belongs to the account, not a char. bankBalance answers 0 for an
+    // absent key or account. bankAdd applies all three deltas in ONE write and
+    // refuses (changing nothing) when any balance would go negative or overflow
+    // int, or when the disk write fails -- RAM never claims what disk lacks.
+    static int bankBalance(const DLString &id, const DLString &currency);
+    static bool bankAdd(const DLString &id, int gold, int silver, int qp);
+
     // --- messenger identities folded into the account (telegram/discord) ---
     // The account owns a verified messenger identity (a numeric id proven by the bot
     // /link, the /attach bot, or the web widget). setMessengerIdentity adds-or-moves

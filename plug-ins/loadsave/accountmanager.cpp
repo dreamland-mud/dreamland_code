@@ -2,6 +2,7 @@
  *
  * See ACCOUNTS_NANNY_ROADMAP.md / Trello 2zFpQBoW.
  */
+#include <climits>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <jsoncpp/json/json.h>
@@ -622,6 +623,60 @@ bool AccountManager::setVaultUnlocked(const DLString &id)
         i->second.removeMember("vault");
         return false;
     }
+    return true;
+}
+
+int AccountManager::bankBalance(const DLString &id, const DLString &currency)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end())
+        return 0;
+    // .get (not operator[]) so a lookup never writes a null "bank" key.
+    Json::Value bank = i->second.get("bank", Json::Value());
+    if (!bank.isObject())
+        return 0;
+    Json::Value v = bank.get(currency, Json::Value());
+    return v.isInt() ? v.asInt() : 0;
+}
+
+bool AccountManager::bankAdd(const DLString &id, int gold, int silver, int qp)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end())
+        return false;
+
+    static const char *keys[] = { "gold", "silver", "qp" };
+    int deltas[] = { gold, silver, qp };
+    long long result[3];
+
+    for (int k = 0; k < 3; k++) {
+        result[k] = (long long)bankBalance(id, keys[k]) + deltas[k];
+        if (result[k] < 0 || result[k] > INT_MAX)
+            return false;
+    }
+
+    Json::Value old = i->second.get("bank", Json::Value());
+    Json::Value bank(Json::objectValue);
+    for (int k = 0; k < 3; k++)
+        bank[keys[k]] = (int)result[k];
+    i->second["bank"] = bank;
+
+    if (!saveAccount(id)) {
+        if (old.isNull())
+            i->second.removeMember("bank");
+        else
+            i->second["bank"] = old;
+        return false;
+    }
+
+    // Money and quest points move between characters here, so keep a trail an
+    // abuse investigation can grep after the per-boot logs roll away.
+    Json::Value fields;
+    fields["id"] = id.c_str();
+    fields["gold"] = gold;
+    fields["silver"] = silver;
+    fields["qp"] = qp;
+    AccountAudit::record("bank", fields);
     return true;
 }
 
