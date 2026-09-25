@@ -1059,6 +1059,30 @@ NMI_INVOKE( ObjectWrapper, get_owner_here, "(): вернуть персонаж�
     return Register();    
 }
 
+NMI_INVOKE( ObjectWrapper, keyLockRoom, "(ch): комната с дверью или экстра-выходом, которые отпирает этот ключ (видимая для ch), или null" )
+{
+    checkTarget();
+    Character *ch = argnum2character(args, 1);
+    int keyVnum = target->pIndexData->vnum;
+
+    // Same search order as Keyhole::locate: doors, then extra exits. Containers
+    // and portals are found from Fenia, where the object list is reachable.
+    for (auto &room: roomInstances) {
+        if (!ch->can_see( room ))
+            continue;
+
+        for (int d = 0; d < DIR_SOMEWHERE; d++)
+            if (room->exit[d] && room->exit[d]->key == keyVnum)
+                return wrap(room);
+
+        for (auto &ex: room->extra_exits)
+            if (ex->key == keyVnum)
+                return wrap(room);
+    }
+
+    return Register();
+}
+
 NMI_INVOKE( ObjectWrapper, hasBehavior, "(bhvName): true если среди поведений предмета есть указанное" )
 {
     checkTarget();
