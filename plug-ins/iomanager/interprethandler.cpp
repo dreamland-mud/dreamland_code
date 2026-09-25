@@ -195,7 +195,7 @@ static void prompt_health( ostringstream &out, Character *ch, Character *who )
     lang_t lang = ch->getPC( ) ? Player::displayLang( ch ) : LANG_EN;
 
     if (who == 0)
-        out << lmsg(lang, "none", "нет", "нема");
+        out << lmsg(lang, "none", "нет", "немає");
     else if (who->hit >= 0)
         out << HEALTH(who) << "%";
     else
