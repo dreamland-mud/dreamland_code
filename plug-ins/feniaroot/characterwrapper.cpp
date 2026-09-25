@@ -115,6 +115,7 @@
 // gearAdvice v2.1: area-quest reward map + path-cost difficulty (traverse plugin).
 #include "areaquest.h"
 #include "roomtraverse.h"
+#include "accountmanager.h"
 
 RELIG(none);   // god_none sentinel for the gear-advisor tattoo-slot filter
 
@@ -668,6 +669,45 @@ NMI_SET(CharacterWrapper, questpoints, "qp")
     checkTarget();
     CHK_NPC
     target->getPC()->setQuestPoints(arg.toNumber());
+}
+
+// Shared account bank. The account id is resolved from the char's own pfile
+// link on every call, so a detach/attach takes effect at once. NONE means the
+// char has no (existing) account: the caller falls back to its pfile bank.
+static DLString bank_account_of( Character *ch )
+{
+    DLString acct = AccountManager::accountOf( ch->getName( ) );
+    if (acct.empty( ) || !AccountManager::exists( acct ))
+        return DLString::emptyString;
+    return acct;
+}
+
+NMI_INVOKE( CharacterWrapper, acctBank, "(currency): баланс общего банка аккаунта: gold, silver или qp; NONE без аккаунта" )
+{
+    checkTarget( );
+    CHK_NPC
+    DLString cur = args2string( args );
+    if (cur != "gold" && cur != "silver" && cur != "qp")
+        throw Scripting::Exception( "currency must be gold, silver or qp" );
+
+    DLString acct = bank_account_of( target );
+    if (acct.empty( ))
+        return Register( );
+    return Register( AccountManager::bankBalance( acct, cur ) );
+}
+
+NMI_INVOKE( CharacterWrapper, acctBankAdd, "(gold, silver, qp): изменить общий банк аккаунта одной записью; false если без аккаунта, баланс ушел бы в минус или запись не удалась" )
+{
+    checkTarget( );
+    CHK_NPC
+    if (args.size( ) < 3)
+        throw Scripting::NotEnoughArgumentsException( );
+
+    DLString acct = bank_account_of( target );
+    if (acct.empty( ))
+        return Register( false );
+    return Register( AccountManager::bankAdd( acct,
+        argnum2number( args, 1 ), argnum2number( args, 2 ), argnum2number( args, 3 ) ) );
 }
 NMI_GET( CharacterWrapper, trust, "уровень привилегий" )
 {

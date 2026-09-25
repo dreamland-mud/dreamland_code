@@ -51,6 +51,7 @@
 ***************************************************************************/
 #include <string.h>
 
+#include "accountmanager.h"
 #include "so.h"
 #include "plugin.h"
 
@@ -1177,10 +1178,18 @@ static bool has_nopost(Character *ch)
         buf << "Золота в банке: " << pc->bank_g << "  "
             << "Серебра в банке: " << pc->bank_s << "  "
             << "QP: " << pc->getQuestPoints() 
-            << endl
+            << endl;
+    if (pc) {
+        DLString acct = AccountManager::accountOf( pc->getName( ) );
+        if (!acct.empty( ) && AccountManager::exists( acct ))
+            buf << "Банк аккаунта " << acct << ": золото " << AccountManager::bankBalance( acct, "gold" )
+                << "  серебро " << AccountManager::bankBalance( acct, "silver" )
+                << "  QP " << AccountManager::bankBalance( acct, "qp" ) << endl;
+        buf
             << "Опыт: " << pc->exp << "  "
             << "До уровня: " << pc->getExpToLevel( ) << "  "
             << "На уровень: " << pc->getExpPerLevel( pc->getLevel( ) + 1 ) - pc->getExpPerLevel( );
+    }
     buf << endl;
         
     buf << "Броня: ";
