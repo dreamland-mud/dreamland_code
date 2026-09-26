@@ -270,8 +270,10 @@ static bool __aff_sort_name__( const AffectOutput &a, const AffectOutput &b )
 }
 
 struct PermanentAffects {
-    PermanentAffects(Character *ch) {
+    // viewer is who reads the lines: ch itself, or the master of a charmed ch.
+    PermanentAffects(Character *ch, Character *viewer) {
         this->ch = ch;
+        this->viewer = viewer;
         my_res = ch->res_flags;
         my_vuln = ch->vuln_flags;
         my_imm = ch->imm_flags;
@@ -283,6 +285,17 @@ struct PermanentAffects {
     }
 
     void printAll() const {
+        // A master checking a charmed follower sees its permanent bits in the
+        // third person. Regen, skill lag and the religion penalty are PC concerns.
+        if (viewer != ch) {
+            print(_("У %1$C2 иммунитет к"), my_imm, imm_flags, '2');
+            print(_("%1$^C1 обладает сопротивляемостью к"), my_res, imm_flags, '3');
+            print(_("%1$^C1 уязвим%1$Gо||а к"), my_vuln, imm_flags, '3');
+            print(_("%1$^C1 способ%1$Gно|ен|на обнаружить"), my_det, detect_flags, '4');
+            print(_("%1$^C1 под воздействием"), my_aff, affect_flags, '2');
+            return;
+        }
+
         print(_("У тебя иммунитет к"), my_imm, imm_flags, '2');
         print(_("Ты обладаешь сопротивляемостью к"), my_res, imm_flags, '3');
         print(_("Ты уязвим%1$Gо||а к"), my_vuln, imm_flags, '3');
@@ -321,7 +334,7 @@ private:
         if (my_flags == 0)
             return;
 
-        lang_t lang = Player::displayLang(ch);
+        lang_t lang = Player::displayLang(viewer);
         // imm/res/vuln all read "...до <damage>" in UA, which governs the GENITIVE,
         // so the RU-tuned gcase (dative, for "к") renders the wrong UA case
         // ("вразлив до кислоті" -> should be "кислоти"). RU/EN names are fixed
@@ -329,10 +342,11 @@ private:
         char gc = (lang == LANG_UA) ? '2' : gcase;
         StringList names = my_table.toStringList(my_flags, gc, lang);
         DLString message = prefix.getMessage(lang) + " " + names.wrap("{Y", "{x").join(", ") + ".";
-        ch->pecho(message.c_str(), ch);
+        viewer->pecho(message.c_str(), ch);
     }
 
     Character *ch;
+    Character *viewer;
     int my_res;
     int my_vuln;
     int my_imm;
@@ -354,7 +368,7 @@ CMDRUNP( affects )
     Character *viewer = IS_CHARMED(ch) ? ch->master : ch;
 
     // Keep track of res, vuln, hp/mana gain.
-    PermanentAffects permAff(ch);
+    PermanentAffects permAff(ch, viewer);
 
     for (auto &paf: ch->affected) {
         if (output.empty( ) || output.back( ).type != paf->type)
@@ -454,10 +468,15 @@ CMDRUNP( affects )
     }
 
     if (IS_CHARMED(ch)) {
-        if (buf.str( ).empty( )) 
+        // Raw affected_by/res/imm/detect bits (e.g. fly from worn wings) never
+        // enter ch->affected, so they only surface through permAff.
+        if (buf.str( ).empty( ) && !permAff.isSet( )) {
             oldact(_("$C1 не находится под действием каких-либо аффектов."), ch->master, 0, ch, TO_CHAR);
-        else 
-            oldact(_("$C1 находится под действием следующих аффектов:"), ch->master, 0, ch, TO_CHAR);
+            return;
+        }
+
+        oldact(_("$C1 находится под действием следующих аффектов:"), ch->master, 0, ch, TO_CHAR);
+        permAff.printAll( );
         buf << "{x";
         ch->master->send_to( buf );
         return;
