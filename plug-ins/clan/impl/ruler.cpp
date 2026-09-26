@@ -1162,8 +1162,14 @@ SKILL_RUNP( jail )
                 return;
         }
 
-        /* Jail works only in current room */
-        if ( ( victim = get_char_room( ch, arg ) ) == 0 )
+        // Placing or lifting a sentence needs the prisoner in the same room,
+        // but checking the remaining term works from anywhere.
+        char action[MAX_INPUT_LENGTH];
+        one_argument( argument, action );
+        bool checkOnly = action[0] == '\0' || arg_is_strict(action, "check");
+
+        victim = checkOnly ? get_char_world( ch, arg, FFIND_PLR_ONLY ) : get_char_room( ch, arg );
+        if ( victim == 0 )
         {
                 ch->pecho(_("Нет этого тут."));
                 return;
@@ -1199,10 +1205,12 @@ SKILL_RUNP( jail )
         if ( arg[0] == '\0' || arg_is_strict(arg, "check"))
         {
 
-                oldact_p(_("$c1 пристально смотрит на ТЕБЯ."),
-                                        ch,0,victim,TO_VICT,POS_RESTING);
-                oldact_p(_("$c1 пристально смотрит на $C4."),
-                                        ch,0,victim,TO_NOTVICT,POS_RESTING);
+                if (victim->in_room == ch->in_room) {
+                        oldact_p(_("$c1 пристально смотрит на ТЕБЯ."),
+                                                ch,0,victim,TO_VICT,POS_RESTING);
+                        oldact_p(_("$c1 пристально смотрит на $C4."),
+                                                ch,0,victim,TO_NOTVICT,POS_RESTING);
+                }
 
                 Affect *paf = victim->affected.find (gsn_jail);
                 if (paf)
