@@ -190,6 +190,8 @@ void init_descriptor( int control )
 }
 
 
+extern Descriptor *widget_capture_desc; // defaultbufferhandler.cpp
+
 void page_to_char( const char *txt, Character *ch )
 {
     ostringstream out;
@@ -202,7 +204,14 @@ void page_to_char( const char *txt, Character *ch )
         return;
     
     mudtags_convert( txt, out, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR, ch );
-    
+
+    // widget_help captures the whole text at once: a pager left on the input
+    // stack would swallow the player's next command.
+    if (d == widget_capture_desc) {
+        d->send( out.str( ).c_str( ) );
+        return;
+    }
+
     d->handle_input.push_front(new PagerHandler(out.str( ).c_str( )));
     d->handle_input.front()->handle(d, const_cast<char *>(""));
 }

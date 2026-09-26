@@ -39,6 +39,7 @@
 
 #include "loadsave.h"
 #include "interp.h"
+#include "dl_ctype.h"
 #include "telnet.h"
 #include "colour.h"
 #include "wiznet.h"
@@ -327,6 +328,61 @@ RPCRUN(editor_save)
         LogStream::sendNotice() << "editor_save: " << text << endl;
         mprog_editorsave(pch, text);
     }
+}
+
+extern Descriptor *widget_capture_desc; // defaultbufferhandler.cpp
+extern DLString *widget_capture_sink;
+
+/* Clears the capture even when the command throws. */
+struct WidgetCapture {
+    WidgetCapture(Descriptor *d, DLString *sink) {
+        widget_capture_desc = d;
+        widget_capture_sink = sink;
+    }
+    ~WidgetCapture() {
+        widget_capture_desc = 0;
+        widget_capture_sink = 0;
+    }
+};
+
+/** The web client's widget help sheet: run one read-only info command and send
+ *  its output back as widget_help_result instead of printing it in the terminal.
+ *  Only the commands below: this is not a second console_in. */
+RPCRUN(widget_help)
+{
+    Descriptor *d = ch->desc;
+    if (!d || args.empty())
+        return;
+
+    DLString what = args[0];
+    DLString arg = args.size() > 1 ? args[1] : DLString::emptyString;
+    DLString line;
+
+    if (what == "quest" || what == "affects") {
+        line = what;
+    } else if (what == "whois") {
+        if (arg.empty() || arg.size() > 32)
+            return;
+        for (DLString::size_type i = 0; i < arg.size(); i++)
+            if (!dl_isalpha(arg[i]))
+                return;
+        line = "whois " + arg;
+    } else {
+        return;
+    }
+
+    DLString text;
+    {
+        WidgetCapture capture(d, &text);
+        interpret(ch, line.c_str());
+    }
+
+    Json::Value out;
+    out["command"] = "widget_help_result";
+    out["args"][0]["what"] = what;
+    out["args"][0]["arg"] = arg;
+    out["args"][0]["text"] = text;
+    d->writeWSCommand(out);
 }
 
 // Defined in nannyhandler.cpp: the login-name availability check the nanny's name
