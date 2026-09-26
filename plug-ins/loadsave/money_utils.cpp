@@ -77,7 +77,8 @@ Object * Money::create( int gold, int silver )
         obj->setShortDescr( moneyArg, LANG_RU );
         // Fill the other languages so a non-RU viewer sees a count, not a raw "%d".
         { DLString s; s << gold << " gold coins"; obj->setShortDescr( s, LANG_EN ); }
-        { DLString s; s << gold << " золотих монет"; obj->setShortDescr( s, LANG_UA ); }
+        { DLString s; s << gold << " золот|" << GET_COUNT(gold, "а|ої|ій|у|ою|ій", "і|их|им|і|ими|их", "их|их|им|их|ими|их")
+                             << " монет|" << GET_COUNT(gold, "а|и|і|у|ою|і", "и||ам|и|ами|ах", "||ам||ами|ах"); obj->setShortDescr( s, LANG_UA ); }
         obj->value1(gold);
         obj->cost               = 100 * gold;
         obj->weight                = gold/5;
@@ -90,7 +91,8 @@ Object * Money::create( int gold, int silver )
         << " монет|" << GET_COUNT(silver, "а|ы|е|у|ой|е", "ы||ам|ы|ами|ах", "||ам||ами|ах");
         obj->setShortDescr( moneyArg, LANG_RU );
         { DLString s; s << silver << " silver coins"; obj->setShortDescr( s, LANG_EN ); }
-        { DLString s; s << silver << " срібних монет"; obj->setShortDescr( s, LANG_UA ); }
+        { DLString s; s << silver << " срібн|" << GET_COUNT(silver, "а|ої|ій|у|ою|ій", "і|их|им|і|ими|их", "их|их|им|их|ими|их")
+                             << " монет|" << GET_COUNT(silver, "а|и|і|у|ою|і", "и||ам|и|ами|ах", "||ам||ами|ах"); obj->setShortDescr( s, LANG_UA ); }
         obj->value0(silver);
         obj->cost               = silver;
         obj->weight                = silver/20;
@@ -105,7 +107,9 @@ Object * Money::create( int gold, int silver )
         << " монет|" << GET_COUNT(silver, "а|ы|е|у|ой|е", "ы||ам|ы|ами|ах", "||ам||ами|ах");
         obj->setShortDescr( moneyArg, LANG_RU );
         { DLString s; s << silver << " silver and " << gold << " gold coins"; obj->setShortDescr( s, LANG_EN ); }
-        { DLString s; s << silver << " срібних та " << gold << " золотих монет"; obj->setShortDescr( s, LANG_UA ); }
+        { DLString s; s << gold << " золот|" << GET_COUNT(gold, "а|ої|ій|у|ою|ій", "і|их|им|і|ими|их", "их|их|им|их|ими|их")
+                             << " та " << silver << " срібн|" << GET_COUNT(silver, "а|ої|ій|у|ою|ій", "і|их|им|і|ими|их", "их|их|им|их|ими|их")
+                             << " монет|" << GET_COUNT(silver, "а|и|і|у|ою|і", "и||ам|и|ами|ах", "||ам||ами|ах"); obj->setShortDescr( s, LANG_UA ); }
         obj->value0(silver);
         obj->value1(gold);
         obj->cost                = 100 * gold + silver;
@@ -120,6 +124,9 @@ Object * Money::create( int gold, int silver )
         obj->gram_gender = Grammar::MultiGender::FEMININE;
     else
         obj->gram_gender = Grammar::MultiGender::PLURAL;
+
+    // setShortDescr above cached each noun with the prototype's gender.
+    obj->updateCachedNouns( );
 
     return obj;
 }
