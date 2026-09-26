@@ -7,6 +7,7 @@
 #include "regcontainer.h"
 #include "wrapperbase.h"
 #include "wrappertarget.h"
+#include "feniamanager.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -253,7 +254,16 @@ static bool aquest_method_call(WrapperBase *wrapperBase, MethodLabel &method, co
         if (!wrapperBase->call(rc, method.methodId, progFun, progArgs))
             return false;
 
-        return rc.type != Register::NONE && rc.toBoolean();
+        if (rc.type == Register::NONE)
+            return false;
+
+        // toBoolean() throws on OBJECT/FUNCTION/IDENTIFIER; nothing up the stack catches it.
+        try {
+            return rc.toBoolean();
+        } catch (const ::Exception &e) {
+            FeniaManager::getThis()->croak(wrapperBase, method.methodId, e);
+            return false;
+        }
     }
 
     if (method.trigPrefix == "post") {

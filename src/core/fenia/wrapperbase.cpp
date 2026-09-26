@@ -128,7 +128,17 @@ WrapperBase::call( Register id, const char *fmt, ... )
     
     va_end(ap);
 
-    return success && rc.type != Register::NONE && rc.toBoolean();
+    if (!success || rc.type == Register::NONE)
+        return false;
+
+    // toBoolean() throws on OBJECT/FUNCTION/IDENTIFIER, and C++ trigger sites
+    // (commands, scheduler ticks) have no catch up the stack: contain it here.
+    try {
+        return rc.toBoolean();
+    } catch (const ::Exception &e) {
+        FeniaManager::getThis()->croak(this, id, e);
+        return false;
+    }
 }
 
 bool WrapperBase::call(Register &rc, const Register &progName, const Register &progFun, const RegisterList &progArgs)
@@ -264,8 +274,14 @@ WrapperBase::stringCall( Register id, const char *fmt, ... )
 
     if (!success || rc.type == Register::NONE) 
         return DLString::emptyString;
-        
-    return rc.toString();
+
+    // toString() throws on OBJECT; same containment as in call().
+    try {
+        return rc.toString();
+    } catch (const ::Exception &e) {
+        FeniaManager::getThis()->croak(this, id, e);
+        return DLString::emptyString;
+    }
 }
 
 
