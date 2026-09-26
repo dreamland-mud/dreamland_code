@@ -179,6 +179,13 @@ static int saving_size = 655;   // because 10 savings per tick.
 // 10 * 5 ticks - full saving
 static int saving_position = 0;
 
+// Permanently owned items (no decay timer, owner set) survive environmental
+// destruction. Mirrors .tmp.object.permanentlyOwned on the Fenia side.
+static bool obj_permanently_owned( Object *obj )
+{
+    return obj->timer <= 0 && !obj->getOwner( ).empty( );
+}
+
 void room_to_save( Room * room )
 {
     if ( room == 0 )
@@ -878,6 +885,9 @@ void water_float_update( )
         if (obj->pIndexData->limit > 0)
             continue;
 
+        if (obj_permanently_owned( obj ))
+            continue;
+
         // Don't drown items that reset in this location.
         if (obj->reset_room == obj->in_room->vnum)
             continue;
@@ -1300,7 +1310,8 @@ void obj_update( void )
 
         if (!obj->in_obj 
             && room->getSectorType() == SECT_DESERT
-            && material_is_flagged( obj, MAT_MELTING ))
+            && material_is_flagged( obj, MAT_MELTING )
+            && !obj_permanently_owned( obj ))
         {
             if (obj->isAffected(gsn_protection_heat))
                 continue;
@@ -1321,30 +1332,6 @@ void obj_update( void )
             }
         }
         
-        if (obj->item_type == ITEM_POTION
-            && !obj->in_obj
-            && room->getSectorType() == SECT_DESERT
-            && material_is_flagged( obj, MAT_FRAGILE ))
-        {
-            if (obj->isAffected(gsn_protection_heat))
-                continue;
-            
-            if (carrier) {
-                if (!carrier->is_npc( ) && chance( 20 )) {
-                    obj->setProperty("extract", "%1$^O1 лопа%1$nется|ются от жары.");
-                    extracted.push_back(obj);
-                    continue;
-                }
-            }
-            else {
-                if (chance( 30 )) {
-                    obj->setProperty("extract", "%1$^O1 разбива%1$nется|ются на мелкие осколки.");
-                    extracted.push_back(obj);
-                    continue;
-                }
-            }
-        }
-
         // Trello SaCYP8jV: a takeable item resting on the floor of an air room
         // falls through an open down exit to the room below -- one room per tick,
         // so a stack of air rooms drains it to the first solid ground. ITEM_HOVER
