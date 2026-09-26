@@ -234,11 +234,22 @@ long long DefaultBufferHandler::getCurrentSeq() const
 }
 
 // TODO use convert method.
-void 
-DefaultBufferHandler::write( Descriptor *d, const char *txt ) 
+/* Set only for the duration of one widget_help RPC. */
+Descriptor *widget_capture_desc = 0;
+DLString *widget_capture_sink = 0;
+
+void
+DefaultBufferHandler::write( Descriptor *d, const char *txt )
 {
     int size, length;
     int i;
+
+    // widget_help RPC (descriptor.cpp): this descriptor's output goes to the
+    // capture string, not to the socket, the snoop or the /api/snoop log.
+    if (d == widget_capture_desc && widget_capture_sink) {
+        *widget_capture_sink += txt;
+        return;
+    }
 
     // Capture raw output into the ring buffer with a monotonic sequence number.
     {
