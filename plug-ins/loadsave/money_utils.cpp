@@ -112,6 +112,15 @@ Object * Money::create( int gold, int silver )
         obj->weight                = gold / 5 + silver / 20;
     }
 
+    // The coin noun agrees with the last-mentioned count, so the verb must too:
+    // "21 серебряная монета тонет" but "33 серебряные монеты тонут". The
+    // prototypes are singular, which made every %n verb singular for a pile.
+    int coinN = silver > 0 ? silver : gold;
+    if (coinN % 10 == 1 && coinN % 100 != 11)
+        obj->gram_gender = Grammar::MultiGender::FEMININE;
+    else
+        obj->gram_gender = Grammar::MultiGender::PLURAL;
+
     return obj;
 }
 
