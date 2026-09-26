@@ -39,7 +39,9 @@ void stop_fighting( Character *ch, bool fBoth )
         if( fch == ch || ( fBoth && fch->fighting == ch ) )
         {
             fch->fighting    = 0;
-            fch->position    = fch->is_npc() ? fch->getNPC()->default_pos : POS_STANDING;
+            // A follower (charmie, pet) stays on its feet for its master; only
+            // free mobs fall back to their area default, which can be sleeping.
+            fch->position    = fch->is_npc() && !fch->master ? fch->getNPC()->default_pos : POS_STANDING;
 
             if (IS_AFFECTED(fch, AFF_SLEEP)) {
                 REMOVE_BIT(fch->affected_by, AFF_SLEEP);
