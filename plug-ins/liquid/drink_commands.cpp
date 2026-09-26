@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <functional>
 #include "drink_utils.h"
 #include "drinkcontainer.h"
 #include "liquidflags.h"
@@ -39,6 +40,24 @@
 #include "def.h"
 #include "magic.h"
 #include "l10n.h"
+
+// Bystander echo naming a liquid: the same audience as recho (awake, not ch,
+// not vch, can sense both) but with the liquid noun in each viewer's own
+// language. A plain recho can only carry one fixed noun string.
+static void recho_liquid( Character *ch, Character *vch, Liquid *liq,
+                          std::function<void(Character *, const char *)> say )
+{
+    if (!ch->in_room)
+        return;
+
+    for (Character *to = ch->in_room->people; to; to = to->next_in_room) {
+        if (to == ch || to == vch || to->position < POS_RESTING)
+            continue;
+        if (!to->can_sense( ch ) || (vch && !to->can_sense( vch )))
+            continue;
+        say( to, liq->getShortDescr( viewerLang( to ) ).c_str( ) );
+    }
+}
 
 PROF(vampire);
 GSN(none);
@@ -170,13 +189,17 @@ CMDRUN( fill )
             "You fill %O4 with %N5 from %O2.",
             "Ты наполняешь %O4 %N5 из %O2.",
             "Ти наповнюєш %O4 %N5 з %O2."), obj, liqname, source );
-        ch->recho( _("%^C1 наполняет %O4 %N5 из %O2."),ch, obj, liqname, source );
+        recho_liquid( ch, NULL, liq, [&](Character *to, const char *ln) {
+            to->pecho( _("%^C1 наполняет %O4 %N5 из %O2."), ch, obj, ln, source );
+        } );
     } else {
         ch->pecho( lmsg(lang,
             "You scoop up %N4 and fill %O4.",
             "Ты зачерпываешь %N4 и наполняешь %O4.",
             "Ти зачерпуєш %N4 і наповнюєш %O4."), liqname, obj);
-        ch->recho(_("%^C1 зачерпывает %N4 и наполняет %O4."), ch, liqname, obj);
+        recho_liquid( ch, NULL, liq, [&](Character *to, const char *ln) {
+            to->pecho( _("%^C1 зачерпывает %N4 и наполняет %O4."), ch, ln, obj );
+        } );
     }
 
     if (source && source->value0() > -1) {
@@ -416,8 +439,8 @@ void pour_out( Character *ch, Object * out, Character *victim )
 {
     Liquid *liquid;
     int sips, amount;
-    DLString msgRoom, msgVict, msgChar;
-    DLString msgOther, msgSelf;
+    DLString msgVict, msgChar, msgSelf;
+    MultiMessage msgRoom, msgOther;
 
     liquid = liquidManager->find( out->value2() );
     amount = out->value1();
@@ -439,8 +462,14 @@ void pour_out( Character *ch, Object * out, Character *victim )
             "You tip %3$O4 over yourself, but not a drop comes out.",
             "Ты опрокидываешь на себя %3$O4, однако оттуда не выливается ни капли.",
             "Ти перекидаєш на себе %3$O4, проте звідти не виливається ані краплі.");
-        msgRoom = "%1$^C1 переворачивает над %2$C5 %3$O4, однако оттуда не выливается ни капли.";
-        msgOther= "Приговаривая 'ну котеночек, ну еще капельку', %1$C1 переворачивает и трясет над головой %3$O4.";
+        msgRoom = MultiMessage(
+            "%1$^C1 tips %3$O4 over %2$C4, but not a drop comes out.",
+            "%1$^C1 переворачивает над %2$C5 %3$O4, однако оттуда не выливается ни капли.",
+            "%1$^C1 перекидає над %2$C5 %3$O4, проте звідти не виливається ані краплі.");
+        msgOther = MultiMessage(
+            "Muttering 'come on, kitty, just one more drop', %1$C1 turns %3$O4 upside down and shakes it overhead.",
+            "Приговаривая 'ну котеночек, ну еще капельку', %1$C1 переворачивает и трясет над головой %3$O4.",
+            "Примовляючи 'ну котику, ну ще крапельку', %1$C1 перевертає і трясе над головою %3$O4.");
     }
     else if (sips < 2) {
         msgChar = lmsg(lch,
@@ -455,8 +484,14 @@ void pour_out( Character *ch, Object * out, Character *victim )
             "You splash yourself with %4$N5 from %3$O2.",
             "Ты брызгаешь на себя %4$N5 из %3$O2.",
             "Ти бризкаєш на себе %4$N5 з %3$O2.");
-        msgRoom = "%1$^C1 брызгает на %2$C4 %4$N5 из %3$O2.";
-        msgOther= "%1$^C1 брызгает на себя %4$N5 из %3$O2.";
+        msgRoom = MultiMessage(
+            "%1$^C1 splashes %2$C4 with %4$N5 from %3$O2.",
+            "%1$^C1 брызгает на %2$C4 %4$N5 из %3$O2.",
+            "%1$^C1 бризкає на %2$C4 %4$N5 з %3$O2.");
+        msgOther = MultiMessage(
+            "%1$^C1 splashes %1$Gitself|himself|herself|themselves with %4$N5 from %3$O2.",
+            "%1$^C1 брызгает на себя %4$N5 из %3$O2.",
+            "%1$^C1 бризкає на себе %4$N5 з %3$O2.");
     }
     else if (sips < 25) {
         msgChar = lmsg(lch,
@@ -471,8 +506,14 @@ void pour_out( Character *ch, Object * out, Character *victim )
             "You pour %4$N4 over yourself from %3$O2.",
             "Ты выливаешь на себя %4$N4 из %3$O2.",
             "Ти виливаєш %4$N4 на себе з %3$O2.");
-        msgRoom = "%1$^C1 выливает на %2$C4 %4$N4 из %3$O2.";
-        msgOther= "%1$^C1 выливает на себя %4$N4 из %3$O2.";
+        msgRoom = MultiMessage(
+            "%1$^C1 pours %4$N4 over %2$C4 from %3$O2.",
+            "%1$^C1 выливает на %2$C4 %4$N4 из %3$O2.",
+            "%1$^C1 виливає %4$N4 на %2$C4 з %3$O2.");
+        msgOther = MultiMessage(
+            "%1$^C1 pours %4$N4 over %1$Gitself|himself|herself|themselves from %3$O2.",
+            "%1$^C1 выливает на себя %4$N4 из %3$O2.",
+            "%1$^C1 виливає %4$N4 на себе з %3$O2.");
     }
     else {
         msgChar = lmsg(lch,
@@ -487,17 +528,27 @@ void pour_out( Character *ch, Object * out, Character *victim )
             "You upend %3$O4 over yourself, drenching yourself from head to toe with %4$N5!",
             "Ты опрокидываешь на себя %3$O4, с ног до головы обливаясь %4$N5!",
             "Ти перекидаєш на себе %3$O4, з ніг до голови обливаючись %4$N5!");
-        msgRoom = "%1$^C1 опрокидывает на %2$C4 %3$O4, с ног до головы обливая %2$P2 %4$N5!";
-        msgOther= "%1$^C1 опрокидывает на себя %3$O4, с ног до головы обливаясь %4$N5!";
+        msgRoom = MultiMessage(
+            "%1$^C1 upends %3$O4 over %2$C4, drenching %2$C4 from head to toe with %4$N5!",
+            "%1$^C1 опрокидывает на %2$C4 %3$O4, с ног до головы обливая %2$P2 %4$N5!",
+            "%1$^C1 перекидає %3$O4 на %2$C4, з ніг до голови обливаючи %2$C4 %4$N5!");
+        msgOther = MultiMessage(
+            "%1$^C1 upends %3$O4 over %1$Gitself|himself|herself|themselves, getting drenched from head to toe with %4$N5!",
+            "%1$^C1 опрокидывает на себя %3$O4, с ног до головы обливаясь %4$N5!",
+            "%1$^C1 перекидає на себе %3$O4, з ніг до голови обливаючись %4$N5!");
     }
     
     if (ch == victim) {
         ch->pecho( msgSelf.c_str( ), ch, victim, out, liquid->getShortDescr( Player::lang(ch) ).c_str( ) );
-        ch->recho( msgOther.c_str( ), ch, victim, out, liquid->getShortDescr( ).c_str( ) );
+        recho_liquid( ch, NULL, liquid, [&](Character *to, const char *ln) {
+            to->pecho( msgOther, ch, victim, out, ln );
+        } );
     }
     else {
         ch->pecho( msgChar.c_str( ), ch, victim, out, liquid->getShortDescr( Player::lang(ch) ).c_str( ) );
-        ch->recho( victim, msgRoom.c_str( ), ch, victim, out, liquid->getShortDescr( ).c_str( ) );
+        recho_liquid( ch, victim, liquid, [&](Character *to, const char *ln) {
+            to->pecho( msgRoom, ch, victim, out, ln );
+        } );
 
         if (IS_AWAKE(victim)) {
             victim->pecho( msgVict.c_str( ), ch, victim, out, liquid->getShortDescr( Player::lang(victim) ).c_str( ) );
@@ -667,7 +718,9 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
             "You pour %N4 from %O2 into %O4.",
             "Ты наливаешь %N4 из %O2 в %O4.",
             "Ти наливаєш %N4 з %O2 у %O4."), liqShort, out, in );
-        ch->recho( _("%^C1 наливает %N4 из %O2 в %O4."), ch, liqShort, out, in );
+        recho_liquid( ch, NULL, liq, [&](Character *to, const char *ln) {
+            to->pecho( _("%^C1 наливает %N4 из %O2 в %O4."), ch, ln, out, in );
+        } );
     }
     else {
         if (vch != ch) {
@@ -679,14 +732,18 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
                 "%^C1 pours you %N4.",
                 "%^C1 наливает тебе %N4.",
                 "%^C1 наливає тобі %N4."), ch, liq->getShortDescr( Player::lang(vch) ).c_str( ) );
-            ch->recho( vch, _("%^C1 наливает %N4 для %C2."), ch, liqShort, vch );
+            recho_liquid( ch, vch, liq, [&](Character *to, const char *ln) {
+                to->pecho( _("%^C1 наливает %N4 для %C2."), ch, ln, vch );
+            } );
         }
         else {
             ch->pecho( lmsg(lang,
                 "You pour yourself %N4.",
                 "Ты наливаешь себе %N4.",
                 "Ти наливаєш собі %N4."), liqShort );
-            ch->recho( _("%^C1 наливает себе %N4."), ch, liqShort );
+            recho_liquid( ch, NULL, liq, [&](Character *to, const char *ln) {
+                to->pecho( _("%^C1 наливает себе %N4."), ch, ln );
+            } );
         }
     }
 
