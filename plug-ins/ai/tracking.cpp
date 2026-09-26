@@ -132,6 +132,28 @@ bool BasicMobileBehavior::trackLastFought( Character *wch )
         return true;
     }
 
+    // Same leak for no_mob rooms (arena lobby, temples): move_char does not
+    // check ROOM_NO_MOB, only the wander and flee paths do, so a tracker used
+    // to chase a fleeing player straight into a no_mob room. Mobs that live in
+    // a no_mob room themselves (lair guardians) keep chasing through the no_mob
+    // rooms of their own area.
+    // Everyone else gives up and goes home, like checkLastFoughtHiding, rather
+    // than parking at the border or escalating to summon via lostTrack.
+    Room *resetRoom = get_room_instance( ch->reset_room );
+
+    if (pexit->u1.to_room
+        && IS_SET(pexit->u1.to_room->room_flags, ROOM_NO_MOB)
+        && !(resetRoom && IS_SET(resetRoom->room_flags, ROOM_NO_MOB)
+             && resetRoom->area == pexit->u1.to_room->area))
+    {
+        oldact(_("$c1 упирается в невидимую преграду и прекращает погоню."),
+               ch, 0, wch, TO_ROOM);
+        clearLastFought( );
+        if (isHomesick( ))
+            backHome( false );
+        return true;
+    }
+
     oldact(_("Следы $C2 ведут $t."), ch, dirs[d].leave, wch, TO_CHAR);
     
     if (!move( d, pexit, wch )) 
