@@ -81,6 +81,19 @@ static bool oprog_msg_furniture(Object *obj, Character *ch, const char *tagRoom,
     return true;
 }
 
+// "sit Tio" used to answer "you don't see that here" (only objects count as
+// furniture). Name the creature instead. Returns true if it answered.
+static bool refuse_char_as_furniture(Character *ch, const char *argument, const MultiMessage &msg)
+{
+    Character *victim = get_char_room(ch, argument);
+
+    if (!victim || victim == ch)
+        return false;
+
+    echo_master(ch, msg, victim);
+    return true;
+}
+
 CMDRUNP(stand)
 {
     Object *obj = 0;
@@ -98,6 +111,8 @@ CMDRUNP(stand)
 
         if (obj == 0)
         {
+            if (refuse_char_as_furniture(ch, argument, _("Ты не можешь стоять на %1$C6.")))
+                return;
             echo_master(ch, _("Ты не видишь этого здесь."));
             return;
         }
@@ -254,6 +269,8 @@ CMDRUNP(rest)
 
         if (obj == 0)
         {
+            if (refuse_char_as_furniture(ch, argument, _("Ты не можешь отдыхать на %1$C6.")))
+                return;
             echo_master(ch, _("Ты не видишь этого здесь."));
             return;
         }
@@ -460,6 +477,8 @@ CMDRUNP(sit)
                 return;
             }
 
+            if (refuse_char_as_furniture(ch, argument, _("Ты не можешь сесть на %1$C4.")))
+                return;
             echo_master(ch, _("Ты не видишь этого здесь."));
             return;
         }
@@ -675,6 +694,8 @@ CMDRUNP(sleep)
 
             if (obj == 0)
             {
+                if (refuse_char_as_furniture(ch, argument, _("Ты не можешь спать на %1$C6.")))
+                    return;
                 echo_master(ch, _("Ты не видишь этого здесь."));
                 return;
             }
