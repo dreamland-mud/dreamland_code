@@ -962,6 +962,10 @@ NMI_GET( ClanWrapper, dispersed, "true для разрозненных клан�
 {
     return clanManager->find(name)->isDispersed();
 }
+NMI_GET( ClanWrapper, hidden, "true для скрытого клана: посторонние не видят его в who/whois" )
+{
+    return clanManager->find(name)->isHidden();
+}
 NMI_GET( ClanWrapper, recallVnum, "vnum комнаты для кланвозврата" )
 {
     return clanManager->find( name )->getRecallVnum();
