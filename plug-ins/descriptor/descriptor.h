@@ -80,6 +80,11 @@ typedef std::vector<ViaRecord> ViaVector;
  * Out-of-band protocols support
  */
 #define OOB_GMCP (A)
+/* Structured chat frames, asked for by the web client with chat_subscribe.
+ * It lives on the connection and not on the character on purpose: the panel
+ * belongs to this browser tab, so it survives a character change on the same
+ * socket and dies with the socket itself. */
+#define OOB_CHAT (B)
 
 struct WebSockState {
     int state;

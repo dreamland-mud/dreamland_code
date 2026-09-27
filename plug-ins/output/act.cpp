@@ -14,6 +14,7 @@
 #include "profiler.h"
 #include "noun.h"
 #include "grammar_entities_impl.h"
+#include "chatframe.h"
 #include "inflectedstring.h"
 
 #include "npcharacter.h"
@@ -364,6 +365,48 @@ void tell_fmt( const char *msg, ... )
     va_end( ap0 );
 }
 
+/** One spoken line, to one listener with a chat panel open.
+ *
+ *  A C++ speaker has no codesource to look at, so there is nothing to tag it
+ *  with: it is mob chatter, and a panel files it next to say and emote. The
+ *  quest tagging the Fenia path does is not available here and is not worth
+ *  faking.
+ *
+ *  A player can end up here too -- `report` says its line through say_fmt --
+ *  and filing that under mob chatter would put a player's own words in the
+ *  wrong thread, so it goes out as ordinary room speech instead. */
+static void say_fmt_frame( Character *to, Character *teller, const DLString &line )
+{
+    if (line.empty( ))
+        return;
+
+    bool own = (to == teller);
+    bool mob = teller->is_npc( );
+
+    chat_emit( to, own ? 0 : teller, own,
+               mob ? "mob" : "say", mob ? "mob" : "room", line );
+}
+
+/** The room, filtered the way vecho above filtered it. The filter is repeated
+ *  rather than moved into vecho, which every echo in the game goes through and
+ *  which has no business knowing what speech is. */
+static void say_fmt_frames( Character *teller, const DLString &toRoom,
+                            const DLString &toChar, va_list ap )
+{
+    if (!teller->in_room)
+        return;
+
+    for (Character *to = teller->in_room->people; to; to = to->next_in_room) {
+        if (!chat_subscribed(to) || to->position < POS_RESTING)
+            continue;
+
+        if (to != teller && !to->can_sense(teller))
+            continue;
+
+        say_fmt_frame( to, teller, vfmt(to, (to == teller ? toChar : toRoom).c_str(), ap) );
+    }
+}
+
 void say_fmt( const char *msg, ... )
 {
     va_list ap, ap0;
@@ -380,6 +423,8 @@ void say_fmt( const char *msg, ... )
 
     teller.ch->vecho(POS_RESTING, TO_ROOM, 0, toRoom.str().c_str(), ap0);
     teller.ch->vecho(POS_RESTING, TO_CHAR, 0, toChar.str().c_str(), ap0);
+
+    say_fmt_frames(teller.ch, toRoom.str(), toChar.str(), ap0);
 
     va_end( ap );
     va_end( ap0 );
@@ -523,6 +568,21 @@ void say_fmt( const MultiMessage &content, ... )
 
     teller.ch->vecho(POS_RESTING, TO_ROOM, 0, toRoom, ap0);
     teller.ch->vecho(POS_RESTING, TO_CHAR, 0, toChar, ap0);
+
+    // Per listener, in their own language: the frame text has to be the line
+    // that listener's console received, and these two differ by more than the
+    // teller's name.
+    for (Character *to = teller.ch->in_room ? teller.ch->in_room->people : 0;
+         to; to = to->next_in_room)
+    {
+        if (!chat_subscribed(to) || to->position < POS_RESTING)
+            continue;
+        if (to != teller.ch && !to->can_sense(teller.ch))
+            continue;
+
+        const MultiMessage &mm = (to == teller.ch) ? toChar : toRoom;
+        say_fmt_frame(to, teller.ch, vfmt(to, mm.getMessage(to).c_str(), ap0));
+    }
 
     va_end( ap );
     va_end( ap0 );

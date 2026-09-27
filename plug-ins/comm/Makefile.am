@@ -18,6 +18,7 @@ areas.cpp \
 bugs.cpp \
 configs.cpp \
 configweb.cpp \
+chatweb.cpp \
 corder.cpp \
 impl.cpp \
 run.cpp \

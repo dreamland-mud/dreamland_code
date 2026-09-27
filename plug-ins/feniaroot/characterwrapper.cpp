@@ -82,6 +82,10 @@
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
+#include "chatframe.h"
+#include "context.h"
+#include "nodes.h"
+#include "codesource.h"
 #include "wrappermanager.h"
 #include "mobindexwrapper.h"
 #include "structwrappers.h"
@@ -2267,6 +2271,102 @@ NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...): выводит от
     return Register( );
 }
 
+/*-------------------------------------------------------------------------
+ * Chat frames: who is speaking, and about what
+ *------------------------------------------------------------------------*/
+
+/** The codesource that is running right now, or an empty string when C++ is.
+ *
+ *  The runtime keeps the chain the exception backtrace prints ("in cs #317
+ *  (areas/drow.are/mob/5107.q5100_step0_begin_postGreet) line 47"), so a mob
+ *  line can be filed under the quest that produced it without any script being
+ *  edited. A postponed trigger keeps the chain too -- its body is invoked
+ *  through the ordinary path -- so post* speech is tagged like any other. */
+static DLString chat_codesource( )
+{
+    using namespace Scripting;
+
+    Context *ctx = Context::current;
+
+    if (!ctx || !ctx->nodeTrace || !ctx->nodeTrace->node)
+        return DLString::emptyString;
+
+    // NEVER DEREFERENCE source.source. It can dangle: a mass free destroys the
+    // CodeSource while a Closure still holds one of its functions, and reading
+    // through the stale pointer is exactly the crash of 2026-08-08 ("manager at
+    // 0x68", four crash-looping boots) that Function::finalize was rewritten to
+    // avoid. Do what that fix does: look the source up by the stored id, and
+    // only use it when the live entry is the SAME object -- ids wrap.
+    const CodeSourceRef &ref = ctx->nodeTrace->node->source;
+    if (!ref.csId || !CodeSource::manager)
+        return DLString::emptyString;
+
+    CodeSource::Manager::iterator it = CodeSource::manager->find(ref.csId);
+    if (it == CodeSource::manager->end())
+        return DLString::emptyString;
+
+    if (&*it != ref.source.getPointer())
+        return DLString::emptyString;
+
+    return it->name;
+}
+
+/** q<number>_step<number>_ anywhere in the codesource name: the quest and the
+ *  step this speech belongs to. Everything else is ordinary mob chatter. */
+static bool chat_quest_tag( const DLString &name, int &quest, int &step )
+{
+    static const DLString STEP = "_step";
+
+    for (size_t at = name.find('q'); at != DLString::npos; at = name.find('q', at + 1)) {
+        size_t p = at + 1;
+        size_t digits = p;
+
+        while (p < name.size() && isdigit((unsigned char)name[p]))
+            p++;
+
+        if (p == digits)
+            continue;
+
+        if (name.compare(p, STEP.size(), STEP) != 0)
+            continue;
+
+        int q = atoi(name.substr(digits, p - digits).c_str());
+        p += STEP.size();
+        digits = p;
+
+        while (p < name.size() && isdigit((unsigned char)name[p]))
+            p++;
+
+        if (p == digits || p >= name.size() || name[p] != '_')
+            continue;
+
+        quest = q;
+        step = atoi(name.substr(digits, p - digits).c_str());
+        return true;
+    }
+
+    return false;
+}
+
+/** One mob line, to one listener. Quest speech goes into its own thread, keyed
+ *  by the quest: a dialogue read end to end is the thing a player comes back
+ *  to, and mixing it with room chatter destroys exactly that. */
+static void chat_emit_mob( Character *to, Character *mob, const DLString &line )
+{
+    if (!chat_subscribed( to ))
+        return;
+
+    int quest = -1, step = -1;
+    DLString cs = chat_codesource( );
+
+    if (!cs.empty( ) && chat_quest_tag( cs, quest, step )) {
+        chat_emit( to, mob, false, "quest", "quest", line, DLString::emptyString, quest, step );
+        return;
+    }
+
+    chat_emit( to, mob, false, "mob", "mob", line );
+}
+
 NMI_INVOKE( CharacterWrapper, say, "(format, args...): произносит вслух реплику, отформатированную как в методе act" )
 {
     checkTarget( );
@@ -2279,6 +2379,13 @@ NMI_INVOKE( CharacterWrapper, say, "(format, args...): произносит вс
 
         DLString msg = regfmt(to, args);
         to->pecho(POS_RESTING, _("%^C1 произносит '{g%s{x'"), target, msg.c_str());
+
+        // The same line again for the panel, and only when there is a panel:
+        // the console path above is left exactly as it was, and a listener
+        // without a subscription costs one boolean. The position test is
+        // pecho's own -- a sleeping character is shown neither.
+        if (chat_subscribed(to) && to->position >= POS_RESTING)
+            chat_emit_mob(to, target, fmt(to, _("%^C1 произносит '{g%s{x'"), target, msg.c_str()));
     }
 
     return Register();
@@ -2293,6 +2400,11 @@ NMI_INVOKE( CharacterWrapper, psay, "(ch, format, args...): произносит
 
     DLString msg = regfmt(ch, myArgs);
     ch->pecho(_("%^C1 произносит '{g%s{x'"), target, msg.c_str());
+
+    // One listener, one frame -- psay is a mob speaking to one person, and the
+    // panel files it the same way as anything else the mob says.
+    if (chat_subscribed(ch))
+        chat_emit_mob(ch, target, fmt(ch, _("%^C1 произносит '{g%s{x'"), target, msg.c_str()));
     return Register();
 }
 

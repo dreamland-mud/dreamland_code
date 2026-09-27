@@ -18,6 +18,8 @@ protected:
     virtual bool isGlobalListener( Character *, Character * ) const;
     virtual void triggers( Character *, const DLString & ) const;
     virtual void postOutput( Character *outputTo, const DLString &message ) const;
+    virtual DLString webKind( ) const;
+    virtual DLString webArea( Character *to, Character *from ) const;
 };
 
 #endif

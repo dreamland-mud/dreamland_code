@@ -4,6 +4,7 @@
  */
 #include "logstream.h"
 #include "globalchannel.h"
+#include "chatframe.h"
 #include "messengers.h"
 
 #include "skillreference.h"
@@ -102,6 +103,13 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
         DLString message = outputSelf( ch, fmtSelf, outSelf );
         ch->pecho(message);
         postOutput(ch, message);
+        // The speaker's own copy: no counterpart on an undirected channel.
+        //
+        // Asked first, because the arguments are not free: webArea() builds the
+        // area name in the reader's language, and a world with no panels open
+        // at all should pay nothing for this line.
+        if (chat_subscribed( ch ))
+            chat_emit(ch, 0, true, getName( ), webKind( ), message, webArea( ch, ch ));
     }
     
     if (needOutputOther( ch )) {
@@ -118,6 +126,12 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
             DLString message = outputVict( ch, victim, fmtVict, outVict );
             victim->pecho(message);
             postOutput(victim, message);
+            // Everything that could silence this listener -- the channel's own
+            // switch, quiet, the deafen spell, trust, position, the isolator --
+            // was decided in isGlobalListener before they got here, so a frame
+            // goes exactly where the line went.
+            if (chat_subscribed( victim ))
+                chat_emit(victim, ch, false, getName( ), webKind( ), message, webArea( victim, ch ));
         }
     }
 

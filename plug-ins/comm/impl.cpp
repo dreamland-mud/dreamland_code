@@ -19,6 +19,7 @@
 #include "corder.h"
 #include "configs.h"
 #include "configweb.h"
+#include "chatweb.h"
 #include "run.h"
 #include "writing.h"
 #include "eating.h"
@@ -32,6 +33,7 @@ extern "C"
             
                 Plugin::registerPlugin<ConfigCommand>( ppl );
                 Plugin::registerPlugin<ConfigWebStateListener>( ppl );
+                Plugin::registerPlugin<ChatWebStateListener>( ppl );
                 Plugin::registerPlugin<AccountConfigLoginListener>( ppl );
 
                 Plugin::registerPlugin<SpeedWalkUpdateTask>( ppl );

@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "personalchannel.h"
+#include "chatframe.h"
 #include "replay.h"
 
 #include "logstream.h"
@@ -45,7 +46,16 @@ void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLSt
 
     postOutput(victim, messageVict);
     postOutput(ch, messageChar);
-    
+
+    // THE ONE PLACE WHERE A FRAME DOES NOT MIRROR THE CONSOLE. On the deferred
+    // path the console writes NEITHER copy: there is nowhere to tell the
+    // addressee, and the sender is only told that they are away. Both lines go
+    // to replay, and the sender's frame follows replay: you have to see your
+    // own words in the panel, or the conversation breaks off mid-sentence.
+    // The addressee gets no frame -- they read the message when they return.
+    if (chat_subscribed( ch ))
+        chat_emit(ch, victim, true, getName( ), webKind( ), messageChar);
+
     victim->reply = ch;
 }
 
@@ -178,11 +188,17 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
     if (needOutputChar( ch )) {
         ch->pecho(messageChar);
         postOutput(ch, messageChar);
+        // On a personal channel the outgoing copy has a counterpart: who it was
+        // said to. A panel threads both halves of a conversation by it.
+        if (chat_subscribed( ch ))
+            chat_emit(ch, victim, true, getName( ), webKind( ), messageChar);
     }
 
     if (needOutputVict( ch, victim )) {
         victim->pecho(messageVict);
         postOutput(victim, messageVict);
+        if (chat_subscribed( victim ))
+            chat_emit(victim, ch, false, getName( ), webKind( ), messageVict);
     }
 
     triggers( ch, victim, msg );
@@ -263,5 +279,10 @@ void PersonalChannel::postOutput( Character *outputTo, const DLString &message )
 {
     if (!outputTo->is_npc())
         remember_history_private( outputTo->getPC( ), message );
+}
+
+DLString PersonalChannel::webKind( ) const
+{
+    return "personal";
 }
 

@@ -28,6 +28,7 @@
 
 #include "descriptor.h"
 #include "mudtags.h"
+#include "chatframe.h"
 #include "act.h"
 
 #include "merc.h"
@@ -135,6 +136,12 @@ COMMAND(CClanTalk, "cb")
         if (ch->getPC()) {
             remember_history_public(ch->getPC(), msgBuf.str());
         }
+
+        // This channel is not on the framework (its 2005 TODO), so the emitter
+        // sits after the check this path makes for itself -- the deafen spell
+        // above -- and inherits exactly that decision, right or wrong.
+        if (chat_subscribed(ch))
+            chat_emit(ch, 0, true, getName( ), "world", msgBuf.str( ));
     }
 
     for (d = descriptor_list; d != 0; d = d->next) 
@@ -161,6 +168,11 @@ COMMAND(CClanTalk, "cb")
 
             if (d->character->getPC())
                 remember_history_public(d->character->getPC(), msgBuf.str());
+
+            // The loop above has already dropped everyone this line is not for:
+            // wrong clan, COMM_NOCB, deafened.
+            if (chat_subscribed(d->character))
+                chat_emit(d->character, ch, false, getName( ), "world", msgBuf.str( ));
         }
 }
 

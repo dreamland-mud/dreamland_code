@@ -62,6 +62,9 @@ protected:
     virtual Character * findListener( Character *, const DLString & ) const;
     virtual DLString outputVict( Character *, Character *, const DLString &, const DLString & ) const;
     virtual void postOutput( Character *outputTo, const DLString &message ) const;
+    /** Page is personal and global at once, so the bucket has to be named
+     *  rather than inherited: what a page is, is a message to one person. */
+    virtual DLString webKind( ) const;
 };
 
 class ReplyChannel : public TellChannel {

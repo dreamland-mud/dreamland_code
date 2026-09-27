@@ -22,6 +22,7 @@ public:
 
 protected:
     virtual void postOutput( Character *outputTo, const DLString &message ) const;
+    virtual DLString webKind( ) const;
     virtual void findListeners( Character *, Listeners & ) const;
     virtual bool isGlobalListener( Character *, Character * ) const;
     virtual void triggers( Character *, const DLString & ) const;
