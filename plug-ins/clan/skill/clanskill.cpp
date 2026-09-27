@@ -195,6 +195,10 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
         if (!clan->isValid())
             continue;
 
+        // A hidden clan stays unnamed to outsiders; members and immortals see it.
+        if (clan->isHidden() && !ch->is_immortal() && ch->getClan()->getName() != clan->getName())
+            continue;
+
         // Russian and Ukrainian put the clan in the genitive; the English
         // ceremonial name is stored undeclined and has no case to render.
         DLString name = clan->getNameFor( lang );
