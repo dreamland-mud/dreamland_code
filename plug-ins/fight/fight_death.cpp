@@ -1026,6 +1026,20 @@ static bool oprog_death( Character *victim, Character *killer )
     return false;
 }
 
+// onKill obj trigger for items the killer carries, e.g. a quest tool that
+// takes a trophy. Fires only once the death is certain; can't abort it.
+static void oprog_kill( Character *killer, Character *victim, const DLString &label )
+{
+    Object *obj, *obj_next;
+
+    for (obj = killer->carrying; obj != 0; obj = obj_next) {
+        obj_next = obj->next_content;
+
+        FENIA_VOID_CALL( obj, "Kill", "CCs", killer, victim, label.c_str( ) )
+        FENIA_NDX_VOID_CALL( obj, "Kill", "OCCs", obj, killer, victim, label.c_str( ) )
+    }
+}
+
 // Killing a wanted players increases your loyalty.
 static void loyalty_gain( Character *ch, Character *victim )
 {
@@ -1090,6 +1104,9 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
         return;
 
     // From this point on the death has certainly happened.
+
+    if (ch && ch != victim)
+        oprog_kill( ch, victim, label );
 
     DeathPenalties(ch, victim).run();
 
