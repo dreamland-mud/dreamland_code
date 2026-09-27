@@ -398,10 +398,15 @@ Json::Value WhoWebPromptListener::jsonPlayer( PCharacter *ch, PCharacter *wch )
     // First 2 letters of player race.
     player["r"] = wch->getRace( )->getName( ).substr(0, 2);
 
-    // Clan name (first letter) and colour.
-    player["cn"] = wch->getClan( )->getName( ).substr(0, 1);
+    // Clan name (first letter) and colour. A hidden clan shows only to its
+    // own members and immortals.
+    const Clan *clan = &*wch->getClan( );
+    if (clan->isHidden( ) && !ch->is_immortal( ) && ch->getClan( ) != wch->getClan( ))
+        clan = &*clan_none;
+
+    player["cn"] = clan->getName( ).substr(0, 1);
     
-    DLString clr = wch->getClan( )->getColor( );
+    DLString clr = clan->getColor( );
     if (!clr.empty( )) {
         player["cc"] = DLString(dl_isupper(clr.at(0)) ? "b" : "d") + dl_tolower(clr.at(0));
     }
@@ -452,7 +457,8 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
             wch["race"]["en"] = victim->getRace()->getName();
             wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim).ruscase('1');
 
-            if (victim->getClan() != clan_none && victim->getClan()->isValid()) {
+            if (victim->getClan() != clan_none && victim->getClan()->isValid()
+                && !victim->getClan()->isHidden()) {
                 // The "en" slot used to hold the Russian ceremonial name -- the
                 // clan was the one field on this list with no English form.
                 wch["clan"]["en"] = victim->getClan()->getNameFor(LANG_EN).colourStrip();
