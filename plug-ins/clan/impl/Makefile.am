@@ -19,7 +19,6 @@ defaultclan.cpp \
 battlerager.cpp \
 chaos.cpp \
 ghost.cpp \
-hunter.cpp \
 invader.cpp \
 knight.cpp \
 lion.cpp \
@@ -34,7 +33,6 @@ defaultclan.h \
 battlerager.h \
 chaos.h \
 ghost.h \
-hunter.h \
 invader.h \
 knight.h \
 lion.h \

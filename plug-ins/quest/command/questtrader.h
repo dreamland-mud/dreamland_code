@@ -23,8 +23,8 @@ class ItemReadEvent;
 /**
  * Backfills the English and Ukrainian names of personalised objects created
  * before the engine learned to write every language slot -- the hero quest
- * items and the hunter clan gear, both of which carry their owner in the
- * 'owner' field and a "%s" template in every language of their prototype.
+ * items, which carry their owner in the 'owner' field and a "%s" template
+ * in every language of their prototype.
  *
  * Rides ItemReadEvent, which reaches everything saved: player inventories and
  * room contents alike are re-read from disk, so no separate admin pass is

@@ -114,7 +114,6 @@
 #include "l10n.h"
 
 CLAN(battlerager);
-CLAN(hunter);
 PROF(vampire);
 GSN(ambush);
 GSN(arrow);
@@ -122,7 +121,6 @@ GSN(bonedagger);
 GSN(caltraps);
 GSN(chill_touch);
 GSN(dark_shroud);
-GSN(path_find);
 GSN(protection_heat);
 GSN(spear);
 GSN(spellbane);
@@ -511,20 +509,6 @@ void char_update( )
 
         // Special mobs don't get their HP or position updated automatically.
         bool noupdate = ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE);
-
-        // Reset hunters path find.
-        if (!ch->is_npc() && ch->getClan( ) == clan_hunter)
-        {
-            if (number_percent() < gsn_path_find->getEffective( ch ) )
-            {
-                ch->endur += (gsn_path_find->getEffective( ch ) / 2);
-                gsn_path_find->improve( ch, true );
-            }
-            else
-            {
-                gsn_path_find->improve( ch, false );
-            }
-        }
 
         // Race traits are affects now. This used to be two announce blocks for
         // sneak and hide plus a blanket SET_BIT of the whole race mask, and the

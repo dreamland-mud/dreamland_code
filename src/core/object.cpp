@@ -501,8 +501,8 @@ void Object::setProperty(const DLString &key, const DLString &subkey, const DLSt
  * 4) ranger AI arrows: value1, value2
  * Has a 'make arrow' affect. Level is not equal to proto level. 
  * 
- * 5) hunter weapons: value1, value2
- * Level is not equal to proto level. Has affect of type -1.
+ * 5) artificer multitool: value1, value2
+ * Level is not equal to proto level. Has affects of type 'armor use'.
  * 
  * 6) quest weapon: value1, value2
  * Level is not equal to proto level. Has affect of type -1.

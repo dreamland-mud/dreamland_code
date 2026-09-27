@@ -27,7 +27,6 @@
 #include "ruler.h"
 #include "invader.h"
 #include "knight.h"
-#include "hunter.h"
 #include "lion.h"
 #include "ghost.h"
 #include "flowers.h"
@@ -82,20 +81,6 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<KnightOrder> >( ppl );
         Plugin::registerPlugin<MocRegistrator<DefaultClan> >( ppl );
     
-        /*
-         * hunter
-         */
-        Plugin::registerPlugin<AreaBehaviorRegistrator<ClanAreaHunter> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardHunter > >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<HunterWeapon > >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<HunterArmor > >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<HunterBeaconTrap> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<HunterSnareTrap> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<HunterShovel> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<HunterPitSteaks> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<HunterPitTrap> >( ppl );
-
-        
         /*
          * battlerager
          */
