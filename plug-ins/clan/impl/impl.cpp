@@ -30,6 +30,7 @@
 #include "lion.h"
 #include "ghost.h"
 #include "flowers.h"
+#include "artificer.h"
 
 TABLE_LOADER(ClanLoader, "clans", "Clan");
 
@@ -134,6 +135,7 @@ extern "C"
          */
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardFlowers> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardGhost> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardArtificer> >( ppl );
         
         /*
          * loader

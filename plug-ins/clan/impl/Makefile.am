@@ -38,7 +38,8 @@ knight.h \
 lion.h \
 ruler.h \
 shalafi.h \
-flowers.h 
+flowers.h \
+artificer.h
 
 libclan_impl_la_LIBADD = \
 $(LIBADD_AI) \
