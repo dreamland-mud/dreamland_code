@@ -166,7 +166,7 @@ void passive_refresh(Character *ch, bool verbose)
         }
         else if (!hasSource && affected) {
             // Remove ONLY our own permanent grant(s). A positive-duration copy of
-            // the same affect (e.g. the hunter clan 'detect trap' spell) has its
+            // the same affect (e.g. one laid by a spell or an item) has its
             // own owner and lifetime -- leave it in place. findAll returns a copy
             // of the list, so removing while iterating it is safe.
             for (auto &paf: ch->affected.findAll(grantedSn))

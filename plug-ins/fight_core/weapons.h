@@ -32,7 +32,7 @@ Skill *  get_weapon_skill( Object *wield );
  *
  * Through here: the hit path and damage type, weapon skill and second-weapon
  * chance, every class-specific combat branch (weaponsmaster, fightmaster,
- * antipaladin, thief, ranger, hunter, battlerager), mob combat AI, thrown
+ * antipaladin, thief, ranger, battlerager), mob combat AI, thrown
  * weapons, and on the Fenia side identify, compare, missile damage, the death
  * cry and .tmp.object.getWeaponClass.
  *

@@ -1188,15 +1188,11 @@ static const LangText * personal_engraved_adjective( const DLString &shortRu )
  *  is a list of the objects whose template really is "adjective, owner" or
  *  "owner", not a rule inferred from the data.
  *
- *  Hero quest items take two substitutions, hunter clan gear takes one. */
+ *  Hero quest items take two substitutions, adjective and owner. */
 static bool personal_repairable( int vnum )
 {
     switch (vnum) {
     case 94: case 95: case 96: case 103:                    // hero girth, ring, weapon, bag
-    case 573: case 574: case 575: case 576: case 577:       // hunter clan weapons
-    case 578: case 579: case 580: case 581:
-    case 582:                                               // hunter breastplate
-    case 589:                                               // hunter bow
         return true;
     }
 
@@ -1227,8 +1223,8 @@ void PersonalNameRepair::eventItemRead( const ItemReadEvent &event ) const
     if (!owner)
         return;
 
-    // Two substitutions means a hero quest item, adjective first and owner
-    // second; one means hunter gear, owner only.
+    // Two substitutions mean adjective first and owner second; one means the
+    // owner alone.
     const LangText *adjective = 0;
 
     if (personal_arg_count( obj->pIndexData->short_descr.get(LANG_DEFAULT) ) > 1) {

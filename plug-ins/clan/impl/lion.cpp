@@ -44,7 +44,7 @@
 #include "skill_utils.h"
 #include "l10n.h"
 
-CLAN(hunter);
+CLAN(artificer);
 GSN(acid_arrow);
 GSN(acid_blast);
 GSN(caustic_font);
@@ -179,9 +179,9 @@ VOID_SPELL(EyesOfTiger)::run( Character *ch, Character *victim, int sn, int leve
                 return;
         }
 
-        if (victim->is_npc() || victim->getPC()->getClan() != clan_hunter)
+        if (victim->is_npc() || victim->getPC()->getClan() != clan_artificer)
         {
-                ch->pecho(_("Ты можешь следить только за Охотниками!"));
+                ch->pecho(_("Ты можешь следить только за мастерами Артели!"));
                 return;
         }
         
@@ -206,7 +206,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if (ch->isAffected( sn )) {
-        oldact(_("Ты уже защище$gно|н|на от ловушек Охотников."), ch, 0, 0, TO_CHAR);
+        oldact(_("Ты уже защище$gно|н|на от мин Артели."), ch, 0, 0, TO_CHAR);
         return;
     }
 
@@ -216,7 +216,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Character *victim, int sn, int level )
     
     affect_to_char(ch, &af);  
 
-    ch->pecho( _("Ты защищаешь себя от ловушек Охотников.") );
+    ch->pecho( _("Ты защищаешь себя от мин Артели.") );
 }
 
 VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level ) 
@@ -225,7 +225,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
 
         if ( room->isAffected( sn ))
         {
-                ch->pecho(_("Это место уже защищено от мести и ловушек Охотников."));
+                ch->pecho(_("Это место уже защищено от мин и пневмопочты Артели."));
                 return;
         }
 
@@ -238,14 +238,14 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
         af.bitvector.setValue(AFF_ROOM_PREVENT);
         room->affectTo( &af );
 
-        ch->pecho(_("Ты защищаешь местность от ловушек Охотников и от их мести."));
-        oldact(_("$c1 защищает местность от ловушек Охотников и от их мести."),ch,0,0,TO_ROOM);
+        ch->pecho(_("Ты защищаешь местность от мин и пневмопочты Артели."));
+        oldact(_("$c1 защищает местность от мин и пневмопочты Артели."),ch,0,0,TO_ROOM);
 }
 
 AFFECT_DECL(Prevent);
 VOID_AFFECT(Prevent)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    buf << fmt( 0, _("Местность на {W%1$d{x ча%1$Iс|са|сов защищена от ловушек и мести Охотников."), paf->duration )
+    buf << fmt( 0, _("Местность на {W%1$d{x ча%1$Iс|са|сов защищена от мин и пневмопочты Артели."), paf->duration )
         << endl;
 }
 
