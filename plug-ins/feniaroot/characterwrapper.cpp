@@ -2223,7 +2223,7 @@ NMI_INVOKE( CharacterWrapper, echoMaster, "(fmt, args): выдать строк�
             && target->master->getPC()->getAttributes().isAvailable("ordering");
 
     if (needsOutput) {
-        DLString msg = fmt(0, _("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x\r\n  {W*{x "), target);
+        DLString msg = fmt(target->master, _("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x\r\n  {W*{x "), target);
         target->master->pecho( msg + regfmt(target->master, args) );
         return true;
     }

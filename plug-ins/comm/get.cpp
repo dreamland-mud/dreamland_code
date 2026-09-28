@@ -63,7 +63,10 @@ static void get_obj_on_victim( Character *ch, Character *victim, const char *arg
     Object *obj;
 
     if (( obj = get_obj_wear_victim( victim, arg, ch ) ) == 0) {
-        echo_master(ch, _("У %1$C2 нет ничего похожего на %2$s."), victim, is_number(arg) ? "это" : arg);
+        if (is_number(arg))
+            echo_master(ch, _("У %1$C2 нет этого."), victim);
+        else
+            echo_master(ch, _("У %1$C2 нет ничего похожего на %2$s."), victim, arg);
         return;
     }
     
@@ -151,7 +154,7 @@ bool oprog_can_fetch_corpse_pc( Character *ch, Object *container, Object *obj, b
 {
     if (ch->is_npc( )) {
         if (verbose)
-            ch->pecho(_("Ты не умеешь обшаривать чужие трупы."));
+            echo_master(ch, _("Ты не умеешь обшаривать чужие трупы."));
         return false;
     }
     
@@ -167,20 +170,20 @@ bool oprog_can_fetch_corpse_pc( Character *ch, Object *container, Object *obj, b
     if (container->killer != ch->getNameC() && container->killer != "!anybody!")
     {
         if (verbose)
-            ch->pecho(_("Это не твоя добыча."));
+            echo_master(ch, _("Это не твоя добыча."));
         return false;
     }
     
     if (container->count == 0) {
         if (verbose)
-            ch->pecho(_("Больше взять ничего не получится."));
+            echo_master(ch, _("Больше взять ничего не получится."));
         return false;
     }
 
     // The corpse is someone killed by 'ch', let's check the mark.
     if (obj && obj->getProperty("loot") != "true") {
         if (verbose)
-            ch->pecho(_("Ты не можешь снять %O4 с трупа противника, это не добыча."), obj);
+            echo_master(ch, _("Ты не можешь снять %O4 с трупа противника, это не добыча."), obj);
         return false;
     }
 
@@ -231,7 +234,7 @@ static int can_get_obj( Character *ch, Object *obj )
 
     if ( (!obj->can_wear( ITEM_TAKE )) && (!ch->is_immortal()) )
     {
-        ch->pecho(_("Ты не можешь взять %1$O4."), obj );
+        echo_master(ch, _("Ты не можешь взять %1$O4."), obj );
         return GET_OBJ_ERR;
     }
 
@@ -241,7 +244,7 @@ static int can_get_obj( Character *ch, Object *obj )
             if (ch->is_immortal()) 
                 ch->pecho(_("Осторожно, ты не смог%1$Gло||ла бы владеть этой вещью, будучи смертн%1$Gым|ым|ой."), ch);
             else {
-                ch->pecho(_("%2$^s не позволят тебе владеть %1$O5."),
+                echo_master(ch, _("%2$^s не позволят тебе владеть %1$O5."),
                           obj,
                           IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
                 
@@ -256,7 +259,7 @@ static int can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->pecho(_("Осторожно, ты уже несешь слишком много вещей."));
         else {
-            ch->pecho(_("Ты не можешь унести больше %d вещей и поэтому не сможешь поднять %O4."), Char::canCarryNumber(ch), obj);
+            echo_master(ch, _("Ты не можешь унести больше %d вещей и поэтому не сможешь поднять %O4."), Char::canCarryNumber(ch), obj);
             return GET_OBJ_STOP;
         }
     }
@@ -266,7 +269,7 @@ static int can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->pecho(_("Осторожно, ты не смог%1$Gло||ла бы поднять такую тяжесть, будучи смертн%1$Gым|ым|ой."), ch);
         else {
-            ch->pecho(_("Ты не можешь нести вес больше %d фунтов и поэтому не сможешь поднять %O4."), Char::canCarryWeight(ch)/10, obj);
+            echo_master(ch, _("Ты не можешь нести вес больше %d фунтов и поэтому не сможешь поднять %O4."), Char::canCarryWeight(ch)/10, obj);
             return GET_OBJ_STOP;
         }
     }
@@ -355,6 +358,18 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
 static bool still_looting( Character *ch, Room *room )
 {
     return !ch->isDead( ) && ch->in_room == room;
+}
+
+/*
+ * A bare number can't be echoed back as a noun, and gluing a Russian "этого"
+ * into the frame leaks Cyrillic to EN/UA readers: give it its own line.
+ */
+static void echo_not_here( Character *ch, const DLString &arg )
+{
+    if (is_number( arg.c_str( ) ))
+        echo_master(ch, _("Ты не видишь здесь этого."));
+    else
+        echo_master(ch, _("Ты не видишь здесь %s."), arg.c_str( ));
 }
 
 /*
@@ -466,7 +481,6 @@ CMDRUNP( get )
 
     if(argContainer.empty( ))
     {
-        DLString that = is_number(argTarget.c_str( )) ? "этого" : argTarget;
 
         if (!all && !allDot)
         {
@@ -474,7 +488,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), ch->in_room->contents );
             
             if (!obj) {
-                echo_master(ch, _("Ты не видишь здесь %s."), that.c_str( ));
+                echo_not_here(ch, argTarget);
 
             } else {
                 if (can_get_obj( ch, obj ) == GET_OBJ_OK)
@@ -527,7 +541,7 @@ CMDRUNP( get )
                 else if (allDot)
                     echo_master(ch, _("Ты не видишь ничего подобного здесь."));
                 else
-                    echo_master(ch, _("Ты не видишь здесь %s."), that.c_str( ));
+                    echo_not_here(ch, argTarget);
             }
             else
                 save_items( ch->in_room );
@@ -536,7 +550,6 @@ CMDRUNP( get )
     else
     {
         DLString pocket;
-        DLString that = is_number(argContainer.c_str( )) ? "этого" : argContainer;
 
         /*
          *  get <name> [from] <container>[:<pocket>]
@@ -550,7 +563,7 @@ CMDRUNP( get )
         // Disallow 'get <name> all.<container>' syntax.
         if (arg_is_alldot( argContainer ))
         {
-            ch->pecho(_("Ты не можешь сделать этого."));
+            echo_master(ch, _("Ты не можешь сделать этого."));
             return;
         }
 
@@ -569,7 +582,7 @@ CMDRUNP( get )
             if (victim)
                 get_obj_on_victim( ch, victim, argContainer.c_str( ) );
             else
-                echo_master(ch, _("Ты не видишь здесь %s."), that.c_str( ));
+                echo_not_here(ch, argContainer);
             return;
         }
 
@@ -601,7 +614,7 @@ CMDRUNP( get )
 
             if (IS_PIT(container) && !ch->is_immortal() )
             {
-                ch->pecho(_("Не жадничай, пожертвования могут понадобиться кому-то еще."));
+                echo_master(ch, _("Не жадничай, пожертвования могут понадобиться кому-то еще."));
                 ch->pecho(_("И, кстати, не забудь, что продать вещи из ямы для пожертвований все равно не получится."));             
                 return;
             }
@@ -657,7 +670,7 @@ CMDRUNP( get )
             }
 
             if (!found) {
-                if (!all)
+                if (all)
                     echo_master(ch, _("Ты не видишь ничего в %O6."), container);
                 else
                     echo_master(ch, _("Ты не видишь ничего подобного в %O6."), container);
