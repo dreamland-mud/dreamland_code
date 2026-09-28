@@ -625,11 +625,16 @@ void echo_master(Character *ch, const char *format, ...)
     if (needsOutput)
         ch->master->pecho("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x", ch);
 
+    // vpecho consumes the va_list, so the master's copy needs its own.
+    va_list avMaster;
+    va_copy(avMaster, av);
+
     ch->vpecho(format, av);
 
     if (needsOutput)
-        ch->master->vpecho(format, av);
+        ch->master->vpecho(format, avMaster);
 
+    va_end(avMaster);
     va_end(av);
 }
 
@@ -705,11 +710,16 @@ void echo_master(Character *ch, const MultiMessage &format, ...)
     if (needsOutput)
         ch->master->pecho("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x", ch);
 
+    // vpecho consumes the va_list, so the master's copy needs its own.
+    va_list avMaster;
+    va_copy(avMaster, av);
+
     ch->vpecho(format, av);
 
     if (needsOutput)
-        ch->master->vpecho(format, av);
+        ch->master->vpecho(format, avMaster);
 
+    va_end(avMaster);
     va_end(av);
 }
 

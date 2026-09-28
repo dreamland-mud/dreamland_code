@@ -474,7 +474,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), ch->in_room->contents );
             
             if (!obj) {
-                oldact(_("Ты не видишь здесь $T."), ch, 0, that.c_str( ), TO_CHAR);
+                echo_master(ch, _("Ты не видишь здесь %s."), that.c_str( ));
 
             } else {
                 if (can_get_obj( ch, obj ) == GET_OBJ_OK)
@@ -523,11 +523,11 @@ CMDRUNP( get )
             if ( !found )
             {
                 if (all)
-                    ch->pecho(_("Ты ничего не видишь здесь."));
+                    echo_master(ch, _("Ты ничего не видишь здесь."));
                 else if (allDot)
-                    ch->pecho(_("Ты не видишь ничего подобного здесь."));
+                    echo_master(ch, _("Ты не видишь ничего подобного здесь."));
                 else
-                    oldact(_("Ты не видишь здесь $T."), ch, 0, that.c_str( ), TO_CHAR);
+                    echo_master(ch, _("Ты не видишь здесь %s."), that.c_str( ));
             }
             else
                 save_items( ch->in_room );
@@ -569,7 +569,7 @@ CMDRUNP( get )
             if (victim)
                 get_obj_on_victim( ch, victim, argContainer.c_str( ) );
             else
-                oldact(_("Ты не видишь здесь $T."), ch, 0, that.c_str( ), TO_CHAR);
+                echo_master(ch, _("Ты не видишь здесь %s."), that.c_str( ));
             return;
         }
 
@@ -582,7 +582,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), container->contains, pocket );
 
             if(!obj) {
-                oldact(_("Ты не видишь ничего подобного в $o6."), ch, container, 0, TO_CHAR);
+                echo_master(ch, _("Ты не видишь ничего подобного в %O6."), container);
                 return;
             }
             
@@ -658,9 +658,9 @@ CMDRUNP( get )
 
             if (!found) {
                 if (!all)
-                    oldact(_("Ты не видишь ничего в $o6."), ch, container, 0, TO_CHAR);
+                    echo_master(ch, _("Ты не видишь ничего в %O6."), container);
                 else
-                    oldact(_("Ты не видишь ничего подобного в $o6."), ch, container, 0, TO_CHAR);
+                    echo_master(ch, _("Ты не видишь ничего подобного в %O6."), container);
             }
         }
     }
