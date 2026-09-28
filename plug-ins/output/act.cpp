@@ -28,6 +28,7 @@
 #include "colour.h"
 #include "merc.h"
 #include "lang.h"
+#include "l10n.h"
 
 #include "def.h"
 
@@ -623,9 +624,10 @@ void echo_master(Character *ch, const char *format, ...)
     bool needsOutput = isCharmed && ch->master->getPC() && ch->master->getPC()->getAttributes().isAvailable("ordering");
 
     if (needsOutput)
-        ch->master->pecho("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x", ch);
+        ch->master->pecho(_("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x"), ch);
 
-    // vpecho consumes the va_list, so the master's copy needs its own.
+    // Defensive: keep the master's pass independent of how the formatter
+    // handles the va_list.
     va_list avMaster;
     va_copy(avMaster, av);
 
@@ -708,9 +710,10 @@ void echo_master(Character *ch, const MultiMessage &format, ...)
     bool needsOutput = isCharmed && ch->master->getPC() && ch->master->getPC()->getAttributes().isAvailable("ordering");
 
     if (needsOutput)
-        ch->master->pecho("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x", ch);
+        ch->master->pecho(_("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x"), ch);
 
-    // vpecho consumes the va_list, so the master's copy needs its own.
+    // Defensive: keep the master's pass independent of how the formatter
+    // handles the va_list.
     va_list avMaster;
     va_copy(avMaster, av);
 

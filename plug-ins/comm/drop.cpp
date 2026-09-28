@@ -131,7 +131,7 @@ CMDRUNP( drop )
         /* 'drop obj' */
         if ( ( obj = get_obj_carry( ch, arg ) ) == 0 )
         {
-            echo_master(ch, _("У тебя нет этого."));
+            ch->pecho(_("У тебя нет этого."));
             return;
         }
 
@@ -174,9 +174,9 @@ CMDRUNP( drop )
 
         if (!found) {
             if (arg[3] == '\0')
-                echo_master(ch, _("У тебя ничего нет."));
+                oldact(_("У тебя ничего нет."), ch, 0, arg, TO_CHAR );
             else
-                echo_master(ch, _("У тебя нет %s."), is_number(&arg[4]) ? "этого":&arg[4]);
+                oldact(_("У тебя нет $T."), ch, 0, is_number(&arg[4]) ? "этого":&arg[4], TO_CHAR );
         }
         else {
             save_items( ch->in_room );

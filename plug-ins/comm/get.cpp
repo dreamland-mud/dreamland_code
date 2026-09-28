@@ -63,7 +63,7 @@ static void get_obj_on_victim( Character *ch, Character *victim, const char *arg
     Object *obj;
 
     if (( obj = get_obj_wear_victim( victim, arg, ch ) ) == 0) {
-        oldact(_("У $C2 нет ничего похожего на $t."), ch, is_number(arg) ? "это" : arg, victim, TO_CHAR);
+        echo_master(ch, _("У %1$C2 нет ничего похожего на %2$s."), victim, is_number(arg) ? "это" : arg);
         return;
     }
     
@@ -199,12 +199,12 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
         
     case ITEM_CONTAINER:
         if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
-            oldact(_("Тебе не удалось нашарить ни одного кармана у $o2."),ch,container,0,TO_CHAR);
+            echo_master(ch, _("Тебе не удалось нашарить ни одного кармана у %O2."), container);
             return false;
         }
         
         if (IS_SET( container->value1(), CONT_CLOSED )) {
-            ch->pecho(_("%1$^O4 нужно сперва открыть."), container );
+            echo_master(ch, _("%1$^O4 нужно сперва открыть."), container );
             return false;
         }
 
@@ -215,7 +215,7 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
         return true;
 
     default:
-        ch->pecho(_("%1$^O1 не контейнер, ты не можешь ничего оттуда взять."), container );
+        echo_master(ch, _("%1$^O1 не контейнер, ты не можешь ничего оттуда взять."), container );
         return false;
     }
 }
