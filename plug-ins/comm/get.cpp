@@ -63,7 +63,7 @@ static void get_obj_on_victim( Character *ch, Character *victim, const char *arg
     Object *obj;
 
     if (( obj = get_obj_wear_victim( victim, arg, ch ) ) == 0) {
-        oldact(_("У $C2 нет ничего похожего на $t."), ch, is_number(arg) ? "это" : arg, victim, TO_CHAR);
+        echo_master(ch, _("У %1$C2 нет ничего похожего на %2$s."), victim, is_number(arg) ? "это" : arg);
         return;
     }
     
@@ -199,12 +199,12 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
         
     case ITEM_CONTAINER:
         if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
-            oldact(_("Тебе не удалось нашарить ни одного кармана у $o2."),ch,container,0,TO_CHAR);
+            echo_master(ch, _("Тебе не удалось нашарить ни одного кармана у %O2."), container);
             return false;
         }
         
         if (IS_SET( container->value1(), CONT_CLOSED )) {
-            ch->pecho(_("%1$^O4 нужно сперва открыть."), container );
+            echo_master(ch, _("%1$^O4 нужно сперва открыть."), container );
             return false;
         }
 
@@ -215,7 +215,7 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
         return true;
 
     default:
-        ch->pecho(_("%1$^O1 не контейнер, ты не можешь ничего оттуда взять."), container );
+        echo_master(ch, _("%1$^O1 не контейнер, ты не можешь ничего оттуда взять."), container );
         return false;
     }
 }
@@ -474,7 +474,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), ch->in_room->contents );
             
             if (!obj) {
-                oldact(_("Ты не видишь здесь $T."), ch, 0, that.c_str( ), TO_CHAR);
+                echo_master(ch, _("Ты не видишь здесь %s."), that.c_str( ));
 
             } else {
                 if (can_get_obj( ch, obj ) == GET_OBJ_OK)
@@ -523,11 +523,11 @@ CMDRUNP( get )
             if ( !found )
             {
                 if (all)
-                    ch->pecho(_("Ты ничего не видишь здесь."));
+                    echo_master(ch, _("Ты ничего не видишь здесь."));
                 else if (allDot)
-                    ch->pecho(_("Ты не видишь ничего подобного здесь."));
+                    echo_master(ch, _("Ты не видишь ничего подобного здесь."));
                 else
-                    oldact(_("Ты не видишь здесь $T."), ch, 0, that.c_str( ), TO_CHAR);
+                    echo_master(ch, _("Ты не видишь здесь %s."), that.c_str( ));
             }
             else
                 save_items( ch->in_room );
@@ -569,7 +569,7 @@ CMDRUNP( get )
             if (victim)
                 get_obj_on_victim( ch, victim, argContainer.c_str( ) );
             else
-                oldact(_("Ты не видишь здесь $T."), ch, 0, that.c_str( ), TO_CHAR);
+                echo_master(ch, _("Ты не видишь здесь %s."), that.c_str( ));
             return;
         }
 
@@ -582,7 +582,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), container->contains, pocket );
 
             if(!obj) {
-                oldact(_("Ты не видишь ничего подобного в $o6."), ch, container, 0, TO_CHAR);
+                echo_master(ch, _("Ты не видишь ничего подобного в %O6."), container);
                 return;
             }
             
@@ -658,9 +658,9 @@ CMDRUNP( get )
 
             if (!found) {
                 if (!all)
-                    oldact(_("Ты не видишь ничего в $o6."), ch, container, 0, TO_CHAR);
+                    echo_master(ch, _("Ты не видишь ничего в %O6."), container);
                 else
-                    oldact(_("Ты не видишь ничего подобного в $o6."), ch, container, 0, TO_CHAR);
+                    echo_master(ch, _("Ты не видишь ничего подобного в %O6."), container);
             }
         }
     }
