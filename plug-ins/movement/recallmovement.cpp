@@ -190,10 +190,12 @@ bool RecallMovement::checkSameRoom( )
 }
 
 /*
- * A spellcaster summoned by the master: called through .tmp.mob.callMob, which
- * marks it with the Fenia field 'creator', and flagged as one of the mob kinds
- * the caster AI casts spells for (ai/caster.cpp). Such helpers heal and buff
- * their master, so they pray home with him the way a pet does.
+ * A spellcaster summoned by the master: a charmed follower whose Fenia field
+ * 'creator' is the master (set by .tmp.mob.callMob, animate dead and a few
+ * area scripts), flagged as one of the mob kinds the caster AI casts spells
+ * for (ai/caster.cpp). Such helpers heal and buff their master, so they pray
+ * home with him the way a pet does. Zombies inherit caster flags from their
+ * source corpse, so only caster-corpse zombies qualify.
  */
 static bool is_caster_summon( NPCharacter *mob, Character *master )
 {
@@ -212,7 +214,7 @@ static bool is_caster_summon( NPCharacter *mob, Character *master )
         Scripting::Register creator = base->getField( creatorId );
         return creator.type == Scripting::Register::OBJECT
                && creator.toObject( ) == master->wrapper;
-    } catch (const ::Exception &e) {
+    } catch (const ::Exception &) {
         return false;
     }
 }
@@ -236,8 +238,10 @@ void RecallMovement::moveFollowers( Character *wch )
         if (rch->is_npc( ) && rch != pet && is_caster_summon( rch->getNPC( ), wch ))
             summons.push_back( rch->getNPC( ) );
 
+    // Re-check: an earlier move's triggers may have killed, uncharmed or
+    // recycled a collected mob.
     for (auto &summon: summons)
-        if (summon->in_room == from_room)
+        if (summon->in_room == from_room && is_caster_summon( summon, wch ))
             movePet( summon );
 }
 
