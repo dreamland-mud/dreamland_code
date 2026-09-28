@@ -13,6 +13,9 @@
 #include "skill_utils.h"
 #include "merc.h"
 
+#include "wrapperbase.h"
+#include "register-impl.h"
+
 #include "def.h"
 #include "l10n.h"
 
@@ -186,6 +189,36 @@ bool RecallMovement::checkSameRoom( )
     return true;
 }
 
+/*
+ * A spellcaster summoned by the master: a charmed follower whose Fenia field
+ * 'creator' is the master (set by .tmp.mob.callMob, animate dead and a few
+ * area scripts), flagged as one of the mob kinds the caster AI casts spells
+ * for (ai/caster.cpp). Such helpers heal and buff their master, so they pray
+ * home with him the way a pet does. Zombies inherit caster flags from their
+ * source corpse, so only caster-corpse zombies qualify.
+ */
+static bool is_caster_summon( NPCharacter *mob, Character *master )
+{
+    if (!IS_CHARMED(mob) || mob->master != master)
+        return false;
+
+    if (!IS_SET(mob->act, ACT_CLERIC|ACT_MAGE|ACT_UNDEAD|ACT_NECROMANCER))
+        return false;
+
+    WrapperBase *base = get_wrapper( mob->wrapper );
+    if (!base || !master->wrapper)
+        return false;
+
+    try {
+        static Scripting::IdRef creatorId( "creator" );
+        Scripting::Register creator = base->getField( creatorId );
+        return creator.type == Scripting::Register::OBJECT
+               && creator.toObject( ) == master->wrapper;
+    } catch (const ::Exception &) {
+        return false;
+    }
+}
+
 void RecallMovement::moveFollowers( Character *wch ) 
 {
     NPCharacter *pet;
@@ -193,13 +226,23 @@ void RecallMovement::moveFollowers( Character *wch )
     if (!wch || wch->is_npc( ))
         return;
     
-    if (!( pet = wch->getPC( )->pet ))
-        return;
+    pet = wch->getPC( )->pet;
 
-    if (pet->in_room == to_room)
-        return;
+    if (pet && pet->in_room != to_room)
+        movePet( pet );
 
-    movePet( pet );        
+    // Collect first: moving a summon unlinks it from the list being walked.
+    list<NPCharacter *> summons;
+
+    for (Character *rch = from_room->people; rch; rch = rch->next_in_room)
+        if (rch->is_npc( ) && rch != pet && is_caster_summon( rch->getNPC( ), wch ))
+            summons.push_back( rch->getNPC( ) );
+
+    // Re-check: an earlier move's triggers may have killed, uncharmed or
+    // recycled a collected mob.
+    for (auto &summon: summons)
+        if (summon->in_room == from_room && is_caster_summon( summon, wch ))
+            movePet( summon );
 }
 
 bool RecallMovement::checkPumped( )
