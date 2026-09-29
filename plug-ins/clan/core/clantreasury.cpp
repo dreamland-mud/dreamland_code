@@ -164,8 +164,9 @@ DLString clan_purchase( Clan &clan, const DLString &id, const DLString &buyer )
     return DLString::emptyString;
 }
 
-// saveMemory that reports failure: it logs and skips the write when the
-// offline profile can't be loaded, and ignores a failed save.
+// Like PCharacterManager::saveMemory, which logs and skips an unloadable
+// offline profile and ignores a failed save, but tells whether the profile
+// reached disk.
 static bool clan_save_memory( PCMemoryInterface *pcm )
 {
     if (PCharacter *pc = dynamic_cast<PCharacter *>( pcm ))

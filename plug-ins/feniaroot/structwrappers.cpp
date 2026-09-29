@@ -1356,7 +1356,7 @@ NMI_INVOKE( ClanWrapper, title, "(ch[, lang]): клановый титул дл�
     return clanManager->find(name)->getTitle(pci, argnum2lang(args, 2));
 }
 
-NMI_INVOKE( ClanWrapper, rankTitle, "(rank, sex, lang[, profession]): звание ранга без персонажа (clan rank list); профессия нужна только кланам с титулами по классам, иначе берется 'all'. Пустая строка вне диапазона" )
+NMI_INVOKE( ClanWrapper, rankTitle, "(rank, sex, lang[, profession]): звание ранга без персонажа (clan rank list); profession -- имя профессии строкой, нужно только кланам с титулами по классам, иначе берется 'all'. Пустая строка вне диапазона" )
 {
     const ClanTitles *titles = clanManager->find( name )->getTitles( );
     if (!titles)

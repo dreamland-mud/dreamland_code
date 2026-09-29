@@ -121,6 +121,9 @@ const int clan_diplomacy_max = 5;
 // A treaty that took effect goes to the public channels; an offer stays private.
 static void clan_diplomacy_announce( Clan *a, Clan *b, int dip )
 {
+    if (a->isHidden( ) || b->isHidden( ))
+        return;
+
     send_discord_clan( fmt( 0, "{W%s and %s: %s.{x",
                             a->getShortFor( LANG_EN ).c_str( ), b->getShortFor( LANG_EN ).c_str( ),
                             clan_diplomacy_names_table[dip].eng_name ) );
