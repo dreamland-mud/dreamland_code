@@ -6,6 +6,7 @@
 #include "clantypes.h"
 #include "clanrecords.h"
 #include "clantreasury.h"
+#include "profflags.h"
 
 #include "stringlist.h"
 #include "skillmanager.h"
@@ -67,6 +68,11 @@ bool ClanSkill::visible( CharacterMemoryInterface * ch ) const
     // A reformed clan's catalog skill stays hidden until the leader buys it; learned % is kept.
     if (!ci->catalog.getValue( ).empty( ) && clan_is_reformed( *ch->getClan( ) )
             && !clan_owns( *ch->getClan( ), ci->catalog.getValue( ) ))
+        return false;
+
+    // A reformed clan teaches the skill only to the listed class archetypes; learned % is kept.
+    if (ci->archetypes.getValue( ) != 0 && clan_is_reformed( *ch->getClan( ) )
+            && !ch->getProfession( )->getFlags( ch ).isSet( ci->archetypes.getValue( ) ))
         return false;
 
     return true;
@@ -292,7 +298,8 @@ SkillClanInfo::SkillClanInfo( )
                    clanLevel( 0 ), 
                    needItem( true ), needPractice( true ),
                    maxLevel( LEVEL_MORTAL ),
-                   rankCap( true )
+                   rankCap( true ),
+                   archetypes( 0, &prof_flags )
 {
 }
 

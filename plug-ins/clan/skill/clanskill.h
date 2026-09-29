@@ -81,6 +81,8 @@ public:
     XML_VARIABLE XMLStringNoEmpty catalog;
     /** Reformed clans: cap the maximum by rank. */
     XML_VARIABLE XMLBooleanNoTrue rankCap;
+    /** Reformed clans: class archetypes (prof_flags) that may learn this skill, empty = all. */
+    XML_VARIABLE XMLFlagsNoEmpty archetypes;
 };
 
 #endif
