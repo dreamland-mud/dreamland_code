@@ -18,7 +18,7 @@ public:
 protected:
     virtual bool findTargetRoom( );
     virtual bool canLeaveMaster( Character * );
-    virtual void moveOneFollower( Character *, Character * );
+    virtual int moveOneFollower( Character *, Character * );
     virtual  int getMoveCost( Character * );
     virtual bool moveAtomic( );
     

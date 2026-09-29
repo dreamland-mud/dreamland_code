@@ -121,10 +121,12 @@ int PortalMovement::move( )
     return RC_MOVE_OK;
 }
 
-void PortalMovement::moveOneFollower( Character *wch, Character *fch )
+int PortalMovement::moveOneFollower( Character *wch, Character *fch )
 {
     oldact(_("Ты следуешь за $C5."), fch, 0, wch, TO_CHAR );
-    PortalMovement( fch, portal ).moveRecursive( );
+    // Movement::move, not PortalMovement::move: the leader's move already
+    // handles the portal's charges and gowith.
+    return PortalMovement( fch, portal ).Movement::move( );
 }
 
 bool PortalMovement::moveAtomic( )

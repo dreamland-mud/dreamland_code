@@ -679,18 +679,21 @@ void Walkment::moveFollowers( Character *wch )
     for (f = followers.begin( ); f != followers.end( ); f++)
         if ((*f)->in_room == from_room) {
             fch = *f;
-            moveOneFollower( wch, fch );
+            int frc = moveOneFollower( wch, fch );
 
-            // A charmed pet that can't enter the destination sector (air/water) used
-            // to be left behind silently -- warn its owner why (trello 501).
+            // A charmed pet left behind used to be silent -- warn its owner why
+            // (trello 501). The reason is the follower's own refusal code, not a
+            // guess from the destination sector: a leader who passed a closed door
+            // into a water room must not hear that the pet can't swim.
             if (fch->in_room == from_room && IS_CHARMED(fch) && wch->getPC( )) {
-                int sect = to_room->getSectorType( );
-                if (sect == SECT_AIR)
+                if (frc == RC_MOVE_AIR)
                     wch->pecho(_("%1$^C1 не может взлететь и последовать за тобой."), fch);
-                else if (sect == SECT_UNDERWATER)
+                else if (frc == RC_MOVE_UNDERWATER)
                     wch->pecho(_("%1$^C1 не может нырнуть и последовать за тобой."), fch);
-                else if (sect == SECT_WATER_NOSWIM)
+                else if (frc == RC_MOVE_WATER)
                     wch->pecho(_("%1$^C1 не умеет плавать и не может последовать за тобой."), fch);
+                else if (frc == RC_MOVE_CLOSED)
+                    wch->pecho(_("%1$^C1 не может пройти через закрытую дверь и последовать за тобой."), fch);
                 else
                     wch->pecho(_("%1$^C1 не может последовать за тобой."), fch);
             }
