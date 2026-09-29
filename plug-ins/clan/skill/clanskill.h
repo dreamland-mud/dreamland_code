@@ -11,6 +11,7 @@
 #include "xmlmap.h"
 #include "xmlflags.h"
 #include "xmlboolean.h"
+#include "xmlstring.h"
 #include "xmlglobalbitvector.h"
 
 #include "clanreference.h"
@@ -47,7 +48,13 @@ public:
 
     virtual int getCategory( ) const;
 
+    /** Extra skill levels from the rank in a reformed clan, for skill_level_bonus. */
+    static int rankLevelBonus( Skill &, Character * );
+
 protected:
+    /** Rank caps the maximum only for players of a reformed clan, unless the skill opts out. */
+    bool isRankCapped( Character *, const SkillClanInfo * ) const;
+
     const SkillClanInfo *getClanInfo( CharacterMemoryInterface * ) const;
 
     XML_VARIABLE MobSkillData mob;
@@ -70,6 +77,10 @@ public:
     XML_VARIABLE XMLBoolean needItem;
     XML_VARIABLE XMLBooleanNoFalse needPractice;
     XML_VARIABLE XMLInteger maxLevel;
+    /** Reformed clans: catalog id that unlocks this skill, empty = free. */
+    XML_VARIABLE XMLStringNoEmpty catalog;
+    /** Reformed clans: cap the maximum by rank. */
+    XML_VARIABLE XMLBooleanNoTrue rankCap;
 };
 
 #endif

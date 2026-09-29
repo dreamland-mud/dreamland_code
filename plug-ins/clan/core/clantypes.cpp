@@ -110,6 +110,10 @@ void ClanData::unsetItem( Object *obj )
 /*-----------------------------------------------------------------
  * ClanMembership 
  *----------------------------------------------------------------*/
+ClanCatalogItem::ClanCatalogItem( )
+{
+}
+
 ClanMembership::ClanMembership( )
                 : mode( 0, &petition_table ),
                   minLevel( 999 ),

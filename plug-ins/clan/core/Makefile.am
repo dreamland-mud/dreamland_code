@@ -16,6 +16,7 @@ clantypes.cpp \
 clantitles.cpp \
 clanorg.cpp \
 clanrecords.cpp \
+clantreasury.cpp \
 impl.cpp
 
 libclan_core_la_MOC = \

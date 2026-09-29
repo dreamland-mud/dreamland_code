@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "skill_utils.h"
+#include "skilllevelhook.h"
 #include "skillreference.h"
 #include "skillgroup.h"
 #include "spell.h"
@@ -245,6 +246,8 @@ DLString skill_effective_bonus(const Skill *skill, PCharacter *ch)
     return fmt(ch, _(", работает на {C%1$d%%{x"), eff);
 }
 
+SkillLevelBonusHook skill_level_bonus_hook = 0;
+
 int skill_level(Skill &skill, Character *ch)
 {
     return skill_level_bonus(skill, ch) + ch->getModifyLevel();
@@ -275,6 +278,9 @@ int skill_level_bonus(Skill &skill, Character *ch)
     if (skill.hasGroup(group_defensive) && ch->isAffected(gsn_athena_wisdom) && chance(50)) {
         slevel += number_range(1, 5);
     }
+
+    if (skill_level_bonus_hook)
+        slevel += skill_level_bonus_hook(skill, ch);
     
     return slevel;
 }
