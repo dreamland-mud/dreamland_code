@@ -43,6 +43,8 @@ public:
     typedef ::Pointer<XMLAttributeClanRecords> Pointer;
     typedef XMLMapBase<XMLClanRecord> Records;
 
+    XMLAttributeClanRecords( );
+
     /** Remort drops clan membership: freeze the current clan first, then carry over. */
     virtual bool handle( const RemortArguments & );
     virtual Scripting::Register toRegister() const;

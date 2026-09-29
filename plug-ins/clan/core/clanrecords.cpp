@@ -70,6 +70,12 @@ static bool is_honorary( PCMemoryInterface *pcm )
     return pcm->get_trust( ) >= LEVEL_IMMORTAL;
 }
 
+// Boolean defaults to true; a NoFalse flag that isn't in the XML must read false.
+XMLAttributeClanRecords::XMLAttributeClanRecords( )
+        : lastSeen( 0 ), decayed( false )
+{
+}
+
 XMLClanRecord * clan_record( PCMemoryInterface *pcm, const DLString &clanName, bool create )
 {
     XMLAttributeClanRecords::Pointer attr;
@@ -342,21 +348,32 @@ int clan_tenure_hours( int rank )
     return TENURE_HOURS[rank - TENURE_FIRST_RANK];
 }
 
+/** Queued notices beyond this drop the oldest, so a spammy leader can't grow a pfile. */
+static const unsigned int NOTICES_MAX = 20;
+
 void clan_notice( PCMemoryInterface *pcm, const DLString &msg )
 {
     PCharacter *pc = pcm->getPlayer( );
 
-    if (pc) {
+    // A link-dead player is in the game but can't read; queue it like for an offline one.
+    if (pc && pc->desc) {
         pc->send_to( msg );
         pc->send_to( "\r\n" );
         return;
     }
+
+    // Gods never drain the queue (clan_login skips them).
+    if (is_honorary( pcm ))
+        return;
 
     XMLAttributeClanRecords::Pointer attr = pcm->getAttributes( ).getAttr<XMLAttributeClanRecords>( "clanrec" );
     if (!attr)
         return;
 
     attr->notices.push_back( XMLString( msg ) );
+    while (attr->notices.size( ) > NOTICES_MAX)
+        attr->notices.pop_front( );
+
     PCharacterManager::saveMemory( pcm );
 }
 

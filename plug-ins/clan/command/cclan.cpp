@@ -141,7 +141,8 @@ static bool gprog_clan( PCharacter *pc, const DLString &args )
         return false;
     }
 
-    if (commandFn.type != Scripting::Register::FUNCTION)
+    // A closure whose code source is gone would throw before running anything.
+    if (commandFn.type != Scripting::Register::FUNCTION || commandFn.toFunction( )->isBroken( ))
         return false;
 
     try {
@@ -154,6 +155,7 @@ static bool gprog_clan( PCharacter *pc, const DLString &args )
     }
     catch (const ::Exception &ex) {
         FeniaManager::getThis( )->croak( 0, Scripting::Register( DLString( ".tmp.clan.command" ) ), ex );
+        pc->pecho(_("Попробуй позже."));
         return true;
     }
 }

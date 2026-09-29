@@ -744,7 +744,7 @@ NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Di
     return Register( );
 }
 
-NMI_INVOKE(Root, discord_clan, "(msg): послать сообщение в клановый канал Discord")
+NMI_INVOKE(Root, discord_clan, "(msg): послать сообщение в общий канал Discord со значком клана")
 {
     DLString msg = args2string(args);
     send_discord_clan(msg);
