@@ -4,6 +4,8 @@
  */
 #include "clanskill.h"
 #include "clantypes.h"
+#include "clanrecords.h"
+#include "clantreasury.h"
 
 #include "stringlist.h"
 #include "skillmanager.h"
@@ -60,6 +62,11 @@ bool ClanSkill::visible( CharacterMemoryInterface * ch ) const
         return false;
 
     if (ci->maxLevel.getValue( ) < ch->getLevel() && ci->maxLevel.getValue( ) < LEVEL_MORTAL)
+        return false;
+
+    // A reformed clan's catalog skill stays hidden until the leader buys it; learned % is kept.
+    if (!ci->catalog.getValue( ).empty( ) && clan_is_reformed( *ch->getClan( ) )
+            && !clan_owns( *ch->getClan( ), ci->catalog.getValue( ) ))
         return false;
 
     return true;
@@ -124,17 +131,44 @@ int ClanSkill::getLearned( Character *ch ) const
     if (( ci = getClanInfo( ch ) ) && !ci->needPractice)
         return getMaximum( ch );
 
-    return ch->getPC( )->getSkillData( getIndex( ) ).learned;
+    int learned = ch->getPC( )->getSkillData( getIndex( ) ).learned;
+
+    // The stored value is kept as is, so a rank-up gives the rest back.
+    if (isRankCapped( ch, ci ))
+        learned = min( learned, getMaximum( ch ) );
+
+    return learned;
 }
 
 int ClanSkill::getMaximum( Character *ch ) const
 {
     const SkillClanInfo *ci;
 
-    if (( ci = getClanInfo( ch ) ))
+    if (( ci = getClanInfo( ch ) )) {
+        if (isRankCapped( ch, ci ))
+            return min( ci->maximum.getValue( ),
+                        clan_rank_cap( *ch->getClan( ), ch->getPC( )->getClanLevel( ) ) );
+
         return ci->maximum;
+    }
 
     return BasicSkill::getMaximum( ch );
+}
+
+bool ClanSkill::isRankCapped( Character *ch, const SkillClanInfo *ci ) const
+{
+    return ci && ci->rankCap.getValue( ) && !ch->is_npc( ) && !ch->is_immortal( )
+           && clan_is_reformed( *ch->getClan( ) );
+}
+
+int ClanSkill::rankLevelBonus( Skill &skill, Character *ch )
+{
+    ClanSkill *clanSkill = dynamic_cast<ClanSkill *>( &skill );
+
+    if (!clanSkill || ch->is_npc( ) || !clanSkill->getClanInfo( ch ))
+        return 0;
+
+    return clan_rank_level_bonus( *ch->getClan( ), ch->getPC( )->getClanLevel( ) );
 }
 
 MobSkillData *ClanSkill::getMobSkillData()
@@ -257,7 +291,8 @@ SkillClanInfo::SkillClanInfo( )
                  : level( 1 ), maximum( 100 ), rating( 1 ),
                    clanLevel( 0 ), 
                    needItem( true ), needPractice( true ),
-                   maxLevel( LEVEL_MORTAL )
+                   maxLevel( LEVEL_MORTAL ),
+                   rankCap( true )
 {
 }
 

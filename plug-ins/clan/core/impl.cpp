@@ -21,6 +21,8 @@ public:
         Class::regMoc<ClanData>( );
         Class::regMoc<ClanBank>( );
         Class::regMoc<ClanMembership>( );
+        Class::regMoc<ClanCatalogItem>( );
+        Class::regMoc<ClanPurchase>( );
         Class::regMoc<ClanOrder>( );
         Class::regMoc<ClanOrgs>( );
         Class::regXMLVar<ClanTitlesByClass>( );
@@ -33,6 +35,8 @@ public:
         Class::unregXMLVar<ClanTitlesByLevel>( );
         Class::unregMoc<ClanOrgs>( );
         Class::unregMoc<ClanOrder>( );
+        Class::unregMoc<ClanPurchase>( );
+        Class::unregMoc<ClanCatalogItem>( );
         Class::unregMoc<ClanMembership>( );
         Class::unregMoc<ClanBank>( );
         Class::unregMoc<ClanData>( );

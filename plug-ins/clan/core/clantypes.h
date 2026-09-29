@@ -12,6 +12,7 @@
 #include "xmlmap.h"
 #include "xmlboolean.h"
 #include "xmllonglong.h"
+#include "xmllong.h"
 #include "xmlenumeration.h"
 
 #include "dlxmlloader.h"
@@ -20,6 +21,35 @@
 
 class Object;
 class PCMemoryInterface;
+
+/*
+ * reform catalog: what a reformed clan's leader can buy with treasury qp
+ */
+class ClanCatalogItem : public XMLVariableContainer {
+XML_OBJECT
+public:
+    typedef ::Pointer<ClanCatalogItem> Pointer;
+
+    ClanCatalogItem( );
+
+    /** top (unlocks an existing skill), new (a new skill) or upgrade. */
+    XML_VARIABLE XMLString type;
+    XML_VARIABLE XMLInteger price;
+    /** Catalog id that must be owned before this one can be bought. */
+    XML_VARIABLE XMLStringNoEmpty prerequisite;
+    XML_VARIABLE XMLString nameEn, nameRu, nameUa;
+};
+
+/** One bought catalog item. Kept until the next epoch reset. */
+class ClanPurchase : public XMLVariableContainer {
+XML_OBJECT
+public:
+    typedef ::Pointer<ClanPurchase> Pointer;
+
+    XML_VARIABLE XMLLong time;
+    XML_VARIABLE XMLString buyer;
+    XML_VARIABLE XMLInteger price;
+};
 
 /*
  * membership: clan induction and removal 
@@ -41,6 +71,12 @@ public:
 
     /** Clan reform switch: automatic ranks, offices as flags. Off for clans outside the reform. */
     XML_VARIABLE XMLBooleanNoFalse reformed;
+    /** Reformed clans: treasury gold cap, 0 = default. */
+    XML_VARIABLE XMLIntegerNoEmpty goldCap;
+    /** Reformed clans, one value per rank 0-8, empty = defaults: max skill %, extra skill levels, effect %. */
+    XML_VARIABLE XMLVectorBase<XMLInteger> rankCap, rankLevelBonus, rankPower;
+    /** Reformed clans: catalog id -> item. */
+    XML_VARIABLE XMLMapBase<ClanCatalogItem> catalog;
 };
 
 /*
@@ -89,6 +125,8 @@ public:
 
     XML_VARIABLE PKStatus victory, defeat;
     XML_VARIABLE XMLInteger rating;
+    /** Reformed clans: catalog id -> purchase. */
+    XML_VARIABLE XMLMapBase<ClanPurchase> purchases;
 
 protected:
     

@@ -8,6 +8,23 @@
 
 #include "clanskill.h"
 #include "clanorgskill.h"
+#include "skilllevelhook.h"
+
+/** Plugs clan rank levels into skill_level_bonus while this library is loaded. */
+class ClanSkillLevelHookPlugin : public Plugin {
+public:
+    typedef ::Pointer<ClanSkillLevelHookPlugin> Pointer;
+
+    virtual void initialization( )
+    {
+        skill_level_bonus_hook = &ClanSkill::rankLevelBonus;
+    }
+
+    virtual void destruction( )
+    {
+        skill_level_bonus_hook = 0;
+    }
+};
 
 extern "C"
 {
@@ -17,6 +34,7 @@ extern "C"
         
         Plugin::registerPlugin<MocRegistrator<ClanSkill> >( ppl );
         Plugin::registerPlugin<MocRegistrator<ClanOrgSkill> >( ppl );
+        Plugin::registerPlugin<ClanSkillLevelHookPlugin>( ppl );
         
         return ppl;
     }

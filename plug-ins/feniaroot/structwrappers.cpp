@@ -23,6 +23,7 @@
 #include "clan.h"
 #include "clantypes.h"
 #include "clanrecords.h"
+#include "clantreasury.h"
 #include "pcharactermanager.h"
 #include "wearlocation.h"
 #include "player_utils.h"
@@ -35,6 +36,8 @@
 #include "fenia/exceptions.h"
 #include "nativeext.h"
 #include "regcontainer.h"
+#include "idcontainer.h"
+#include "lex.h"
 #include "reglist.h"
 #include "wrappermanager.h"
 #include "subr.h"
@@ -1056,6 +1059,108 @@ NMI_INVOKE( ClanWrapper, induct, "(name): принять игрока в кла�
     clan_induct( pcm, *clanManager->find( name ) );
     clan_membership_changed( pcm );
     return Register( (int)pcm->getClanLevel( ) );
+}
+
+NMI_GET( ClanWrapper, goldCap, "потолок золота в казне клана после реформы" )
+{
+    return clan_gold_cap( *clanManager->find( name ) );
+}
+
+NMI_INVOKE( ClanWrapper, bankAdd, "(gold, silver, qp): изменить казну на эти суммы, все или ничего; вернет причину отказа или пустую строку" )
+{
+    return clan_bank_add( *clanManager->find( name ),
+                          argnum2number( args, 1 ), argnum2number( args, 2 ), argnum2number( args, 3 ) );
+}
+
+NMI_INVOKE( ClanWrapper, rankTable, "(rank): для клана после реформы -- cap (макс. % скилла), levelBonus (доп. уровни), power (% силы)" )
+{
+    const Clan &clan = *clanManager->find( name );
+    int rank = argnum2number( args, 1 );
+
+    Register tableReg = Register::handler<IdContainer>();
+    IdContainer *table = tableReg.toHandler().getDynamicPointer<IdContainer>();
+
+    table->setField( Scripting::IdRef("cap"), clan_rank_cap( clan, rank ) );
+    table->setField( Scripting::IdRef("levelBonus"), clan_rank_level_bonus( clan, rank ) );
+    table->setField( Scripting::IdRef("power"), clan_rank_power( clan, rank ) );
+    return tableReg;
+}
+
+NMI_GET( ClanWrapper, catalog, "каталог клана после реформы: id -> type, price, prerequisite, nameEn, nameRu, nameUa, owned" )
+{
+    Clan &clan = *clanManager->find( name );
+    Register catalogReg = Register::handler<RegContainer>();
+    RegContainer *catalog = catalogReg.toHandler().getDynamicPointer<RegContainer>();
+
+    if (!clan.getMembership( ))
+        return catalogReg;
+
+    for (auto &i: clan.getMembership( )->catalog) {
+        Register itemReg = Register::handler<IdContainer>();
+        IdContainer *item = itemReg.toHandler().getDynamicPointer<IdContainer>();
+
+        item->setField( Scripting::IdRef("type"), i.second.type.getValue( ) );
+        item->setField( Scripting::IdRef("price"), i.second.price.getValue( ) );
+        item->setField( Scripting::IdRef("prerequisite"), i.second.prerequisite.getValue( ) );
+        item->setField( Scripting::IdRef("nameEn"), i.second.nameEn.getValue( ) );
+        item->setField( Scripting::IdRef("nameRu"), i.second.nameRu.getValue( ) );
+        item->setField( Scripting::IdRef("nameUa"), i.second.nameUa.getValue( ) );
+        item->setField( Scripting::IdRef("owned"), clan_owns( clan, i.first ) );
+        catalog->setField( i.first, itemReg );
+    }
+
+    return catalogReg;
+}
+
+NMI_GET( ClanWrapper, purchases, "купленное кланом: id -> time, buyer, price" )
+{
+    Clan &clan = *clanManager->find( name );
+    Register purchasesReg = Register::handler<RegContainer>();
+    RegContainer *purchases = purchasesReg.toHandler().getDynamicPointer<RegContainer>();
+
+    if (!clan.getData( ))
+        return purchasesReg;
+
+    for (auto &p: clan.getData( )->purchases) {
+        Register itemReg = Register::handler<IdContainer>();
+        IdContainer *item = itemReg.toHandler().getDynamicPointer<IdContainer>();
+
+        item->setField( Scripting::IdRef("time"), (int)p.second.time.getValue( ) );
+        item->setField( Scripting::IdRef("buyer"), p.second.buyer.getValue( ) );
+        item->setField( Scripting::IdRef("price"), p.second.price.getValue( ) );
+        purchases->setField( p.first, itemReg );
+    }
+
+    return purchasesReg;
+}
+
+NMI_INVOKE( ClanWrapper, owns, "(id): true если клан купил этот пункт каталога" )
+{
+    return clan_owns( *clanManager->find( name ), argnum2string( args, 1 ) );
+}
+
+NMI_INVOKE( ClanWrapper, purchase, "(id, buyerName): купить пункт каталога за кп казны; вернет причину отказа или пустую строку" )
+{
+    Clan &clan = *clanManager->find( name );
+    DLString error = clan_purchase( clan, argnum2string( args, 1 ), argnum2string( args, 2 ) );
+
+    // Unlocked skills show up at once for members online.
+    if (error.empty( ))
+        for (auto &p: PCharacterManager::getPCM( ))
+            if (p.second->getClan( ) == clan && p.second->getPlayer( ))
+                p.second->getPlayer( )->updateSkills( );
+
+    return error;
+}
+
+NMI_INVOKE( ClanWrapper, donate, "(name, qp): взнос кп игрока в свой клан после реформы (ранги 1-4 за 1к/2к/4к/8к); вернет причину отказа или пустую строку" )
+{
+    PCMemoryInterface *pcm = arg2player( args, 1 );
+
+    if (pcm->getClan( ) != *clanManager->find( name ))
+        throw Scripting::Exception( pcm->getName( ) + " is not in clan " + name );
+
+    return clan_donate( pcm, argnum2number( args, 2 ) );
 }
 
 NMI_INVOKE( ClanWrapper, expel, "(name[, bySelf]): вывести игрока из этого клана без сообщений, ранг замораживается" )

@@ -82,6 +82,7 @@
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
+#include "clantreasury.h"
 #include "chatframe.h"
 #include "context.h"
 #include "nodes.h"
@@ -2533,6 +2534,12 @@ NMI_INVOKE( CharacterWrapper, setClan, "(name): устанавливает кл�
         target->setClan( clan->getName( ) );
     
     return Register( );
+}
+NMI_GET( CharacterWrapper, clanPower, "сила клановых умений по рангу в клане после реформы, в процентах (100 вне реформы)" )
+{
+    checkTarget();
+    CHK_NPC
+    return clan_rank_power( *target->getClan( ), target->getPC( )->getClanLevel( ) );
 }
 NMI_INVOKE( CharacterWrapper, getClanLevel, "(): клановый уровень, число от 0 до 8" )
 {

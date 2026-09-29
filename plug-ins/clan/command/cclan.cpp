@@ -33,6 +33,7 @@
 #include "clanorg.h"
 #include "cclan.h"
 #include "clanrecords.h"
+#include "clantreasury.h"
 #include "xmlattributeinduct.h"
 #include "msgformatter.h"
 #include "def.h"
@@ -514,6 +515,37 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
 bool CClan::clanBankDeposit( PCharacter *pc, Clan *acc_clan,
                              int currency, int amount, ostringstream &buf )
 {
+    // Reformed clans: qp only as a donation to your own clan (it raises ranks 1-4),
+    // gold up to the treasury cap, no silver.
+    if (clan_is_reformed( *acc_clan )) {
+        DLString error;
+
+        if (currency == CB_CURR_QP) {
+            if (pc->getClan( ) != *acc_clan)
+                error = "квестовые единицы можно вносить только в свой клан";
+            else
+                error = clan_donate( pc, amount );
+        }
+        else if (currency == CB_CURR_GOLD) {
+            if (pc->gold < amount)
+                return false;
+
+            error = clan_bank_add( *acc_clan, amount, 0, 0 );
+            if (error.empty( ))
+                pc->gold -= amount;
+        }
+        else
+            error = "казна клана принимает только золото";
+
+        if (!error.empty( )) {
+            buf << fmt( pc, _("Перевод не удался: %s."), error.c_str( ) ) << endl;
+            return true;
+        }
+
+        buf << fmt( pc, _("Перевод в казну %s принят."), acc_clan->getRussianName( ).ruscase('2').c_str( ) ) << endl;
+        return true;
+    }
+
     switch (currency) {
     case CB_CURR_QP:
         if (!pc->is_immortal( )) {
@@ -583,6 +615,12 @@ bool CClan::clanBankWithdraw( PCharacter *pc, PCharacter *victim,
 
     switch (currency) {
     case CB_CURR_QP:
+        // A reformed clan spends qp only on its catalog, nobody withdraws them.
+        if (clan_is_reformed( *clan )) {
+            buf << fmt( pc, _("Квестовые единицы из казны твоего клана можно только потратить на каталог.") ) << endl;
+            return true;
+        }
+
         if (bank->questpoints < amount)
             return false;
         
