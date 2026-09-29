@@ -49,6 +49,7 @@ translations.cpp \
 configurable.cpp \
 json_utils_ext.cpp \
 xmlkillingattribute.cpp \
+xmlpvpattribute.cpp \
 alignment.cpp \
 player_utils.cpp \
 arg_utils.cpp
@@ -59,7 +60,8 @@ xmlattributestatistic.h \
 xmlattributeticker.h \
 xmlattributecoder.h \
 xmlattributetrust.h \
-xmlkillingattribute.h
+xmlkillingattribute.h \
+xmlpvpattribute.h
 
 
 include $(top_srcdir)/plug-ins/Makefile.inc

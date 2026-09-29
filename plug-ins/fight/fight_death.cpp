@@ -52,6 +52,7 @@
 #include "merc.h"
 #include "damage.h"
 #include "fight.h"
+#include "pvp.h"
 #include "skillmanager.h"
 #include "vnum.h"
 #include "def.h"
@@ -1151,6 +1152,11 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
         set_slain( victim );
         ch->getClan( )->handleVictory( ch->getPC( ), victim->getPC( ) );
         victim->getClan( )->handleDefeat( victim->getPC( ), ch->getPC( ) );
+
+        // A pet's kill flags its master but doesn't count toward clan entry rules.
+        if (realKiller == ch)
+            pvp_count_kill( ch->getPC( ), victim->getPC( ) );
+
         ch->getPC()->save();
     }
 
