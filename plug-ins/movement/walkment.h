@@ -59,7 +59,7 @@ protected:
     virtual  int getMoveCost( Character * ) = 0;
 
     virtual void moveFollowers( Character * );
-    virtual void moveOneFollower( Character *, Character * ) = 0;
+    virtual int moveOneFollower( Character *, Character * ) = 0;
     
     bool autoDismount( Character * );
     void visualize( Character * );

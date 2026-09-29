@@ -30,7 +30,7 @@ protected:
     virtual bool canMove( Character * );
     virtual void setWaitstate( );
     virtual  int getMoveCost( Character * );
-    virtual void moveOneFollower( Character *, Character * );
+    virtual int moveOneFollower( Character *, Character * );
     virtual void place( Character * );
     
     virtual void msgEcho( Character *, Character *, const char * );

@@ -606,14 +606,20 @@ int ExitsMovement::adjustMovetype( Character *wch )
     return movetype;
 }
 
-void ExitsMovement::moveOneFollower( Character *wch, Character *fch )
+int ExitsMovement::moveOneFollower( Character *wch, Character *fch )
 {
     oldact(_("Ты следуешь за $C5."), fch, 0, wch, TO_CHAR );
 
+    int frc;
     if (peexit)
-        ExitsMovement( fch, peexit, movetype ).moveRecursive( ); 
+        frc = ExitsMovement( fch, peexit, movetype ).Movement::move( );
     else
-        ExitsMovement( fch, door, movetype ).moveRecursive( ); 
+        frc = ExitsMovement( fch, door, movetype ).Movement::move( );
+
+    // Door refusals are ExitsMovement-private codes; Walkment only knows "closed".
+    if (frc == RC_MOVE_PASS_NEEDED || frc == RC_MOVE_PASS_NEVER)
+        frc = RC_MOVE_CLOSED;
+    return frc;
 }
 
 void ExitsMovement::place( Character *wch )
