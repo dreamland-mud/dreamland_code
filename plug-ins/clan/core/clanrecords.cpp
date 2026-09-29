@@ -311,7 +311,8 @@ void clan_login( PCharacter *pc )
     time_t now = dreamland->getCurrentTime( );
 
     if (attr && attr->lastSeen.getValue( ) > 0 && now - attr->lastSeen.getValue( ) >= DECAY_OFFLINE)
-        clan_decay_apply( pc );
+        if (clan_decay_apply( pc ))
+            pc->pecho( _("{WТебя слишком долго не было: клановый стаж обнулился, а ранг не выше четвертого.{x") );
 
     clan_bank_tenure( pc );
 }

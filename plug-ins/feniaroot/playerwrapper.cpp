@@ -107,6 +107,13 @@ NMI_SET(PlayerWrapper, petition, "петиция в клан (структура
     save();
 }
 
+static int arg2bounded(int value, int lower, int upper)
+{
+    if (value < lower || value > upper)
+        throw Scripting::Exception("value out of range");
+    return value;
+}
+
 NMI_GET(PlayerWrapper, clanLevel, "клановый уровень, число от 0 до 8")
 {
     return getTarget()->getClanLevel();
@@ -114,7 +121,7 @@ NMI_GET(PlayerWrapper, clanLevel, "клановый уровень, число �
 
 NMI_SET(PlayerWrapper, clanLevel, "клановый уровень, число от 0 до 8")
 {
-    getTarget()->setClanLevel(arg2number(arg, 0, 8));
+    getTarget()->setClanLevel(arg2bounded(arg2number(arg), 0, 8));
     save();
 }
 
@@ -137,13 +144,6 @@ static void check_clan_record_target(PCMemoryInterface *pcm, const Clan &clan)
         throw Scripting::Exception("immortals are honorary patrons and keep no clan records");
     if (!clan_is_real(clan))
         throw Scripting::Exception(clan.getName() + " is not a clan one can belong to");
-}
-
-static int arg2bounded(int value, int lower, int upper)
-{
-    if (value < lower || value > upper)
-        throw Scripting::Exception("value out of range");
-    return value;
 }
 
 /** The record of the player's current clan, created on demand. */
@@ -207,7 +207,10 @@ NMI_INVOKE(PlayerWrapper, clanRecord, "(clan): запись о клане -- ran
 NMI_INVOKE(PlayerWrapper, setClanRecord, "(clan, rank, tenureHours): задать замороженный ранг и стаж для клана, в котором игрок сейчас не состоит")
 {
     PCMemoryInterface *pcm = getTarget();
-    const Clan &clan = *clanManager->find(argnum2string(args, 1));
+    const Clan *found = clanManager->findExisting(argnum2string(args, 1));
+    if (!found)
+        throw Scripting::Exception("no such clan");
+    const Clan &clan = *found;
 
     check_clan_record_target(pcm, clan);
 
