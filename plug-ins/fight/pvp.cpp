@@ -18,7 +18,7 @@ static bool pvp_eligible(PCMemoryInterface *killer, PCMemoryInterface *victim)
     if (killer->getName() == victim->getName())
         return false;
 
-    if (killer->getLevel() >= LEVEL_IMMORTAL || victim->getLevel() >= LEVEL_IMMORTAL)
+    if (killer->get_trust() >= LEVEL_IMMORTAL || victim->get_trust() >= LEVEL_IMMORTAL)
         return false;
 
     return !pvp_same_account(killer, victim);
@@ -55,7 +55,10 @@ bool pvp_count_kill(PCharacter *killer, PCharacter *victim)
     if (!killer->desc || !victim->desc)
         return false;
 
-    if (DLString(killer->desc->getRealHost()) == victim->desc->getRealHost())
+    // The current host can be forged from the client side, so also refuse
+    // pairs that ever played from the same address.
+    if (DLString(killer->desc->getRealHost()) == victim->desc->getRealHost()
+            || pvp_hosts_shared(killer, victim))
         return false;
 
     return pvp_record(killer, victim, dreamland->getCurrentTime());
