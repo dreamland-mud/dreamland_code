@@ -22,6 +22,8 @@
 #include "desire.h"
 #include "clan.h"
 #include "clantypes.h"
+#include "clanrecords.h"
+#include "pcharactermanager.h"
 #include "wearlocation.h"
 #include "player_utils.h"
 #include "spelltarget.h"
@@ -976,6 +978,97 @@ NMI_INVOKE( ClanWrapper, canInduct, "(pc): true если клан может п�
     if (!ch || ch->is_npc( ))
         return Register( (int)false );
     return clanManager->find( name )->canInduct( ch->getPC( ) );
+}
+
+NMI_GET( ClanWrapper, reformed, "true для кланов после реформы: ранги растут сами, лидер и рекрутеры -- флаги" )
+{
+    return clan_is_reformed( *clanManager->find( name ) );
+}
+
+/** Names of players (online and offline) that pass the filter, for the clan wrapper lists below. */
+template <typename Filter>
+static Register clan_player_names( Filter filter )
+{
+    RegList::Pointer rc(NEW);
+
+    for (auto &p: PCharacterManager::getPCM( ))
+        if (filter( p.second ))
+            rc->push_back( Register( p.second->getName( ) ) );
+
+    return ::wrap( rc );
+}
+
+NMI_INVOKE( ClanWrapper, members, "(): список имен всех членов клана, онлайн и офлайн" )
+{
+    const Clan &clan = *clanManager->find( name );
+    return clan_player_names( [&clan]( PCMemoryInterface *pcm ) {
+        return pcm->getClan( ) == clan;
+    } );
+}
+
+NMI_INVOKE( ClanWrapper, formerMembers, "(): имена тех, кто состоял в клане и ушел (с замороженным рангом)" )
+{
+    const Clan &clan = *clanManager->find( name );
+    return clan_player_names( [&clan]( PCMemoryInterface *pcm ) {
+        return pcm->getClan( ) != clan && clan_record( pcm, clan.getName( ), false ) != 0;
+    } );
+}
+
+NMI_INVOKE( ClanWrapper, recruiters, "(): имена рекрутеров клана после реформы (без лидера)" )
+{
+    const Clan &clan = *clanManager->find( name );
+    return clan_player_names( [&clan]( PCMemoryInterface *pcm ) {
+        return pcm->getClan( ) == clan && clan_office( pcm ) == CLAN_OFFICE_RECRUITER;
+    } );
+}
+
+NMI_GET( ClanWrapper, leaderName, "имя лидера клана после реформы или null" )
+{
+    const Clan &clan = *clanManager->find( name );
+
+    for (auto &p: PCharacterManager::getPCM( ))
+        if (p.second->getClan( ) == clan && clan_office( p.second ) == CLAN_OFFICE_LEADER)
+            return Register( p.second->getName( ) );
+
+    return Register( );
+}
+
+static PCMemoryInterface * arg2player( const RegisterList &args, int num )
+{
+    PCMemoryInterface *pcm = PCharacterManager::find( argnum2string( args, num ) );
+    if (!pcm)
+        throw Scripting::Exception( "player not found" );
+    return pcm;
+}
+
+static void clan_membership_changed( PCMemoryInterface *pcm )
+{
+    if (PCharacter *pc = pcm->getPlayer( ))
+        pc->updateSkills( );
+
+    PCharacterManager::saveMemory( pcm );
+}
+
+NMI_INVOKE( ClanWrapper, induct, "(name): принять игрока в клан без проверок и сообщений; реформированный клан вернет замороженный ранг. Возвращает ранг" )
+{
+    PCMemoryInterface *pcm = arg2player( args, 1 );
+
+    clan_induct( pcm, *clanManager->find( name ) );
+    clan_membership_changed( pcm );
+    return Register( (int)pcm->getClanLevel( ) );
+}
+
+NMI_INVOKE( ClanWrapper, expel, "(name[, bySelf]): вывести игрока из этого клана без сообщений, ранг замораживается" )
+{
+    PCMemoryInterface *pcm = arg2player( args, 1 );
+    bool bySelf = args.size( ) > 1 && argnum( args, 2 ).toBoolean( );
+
+    if (pcm->getClan( ) != *clanManager->find( name ))
+        throw Scripting::Exception( pcm->getName( ) + " is not in clan " + name );
+
+    clan_remove( pcm, bySelf );
+    clan_membership_changed( pcm );
+    return Register( );
 }
 
 static ClanArea::Pointer get_clan_area(const DLString &clanName)

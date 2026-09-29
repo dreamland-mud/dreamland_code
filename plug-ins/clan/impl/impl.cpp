@@ -12,6 +12,7 @@
 #include "mocregistrator.h"
 
 #include "schedulertaskroundplugin.h"
+#include "clantasks.h"
 #include "commandtemplate.h"
 #include "xmlattributeplugin.h"
 #include "dlxmlloader.h"
@@ -142,6 +143,8 @@ extern "C"
          */
         Plugin::registerPlugin<ClanLoader>( ppl );
         Plugin::registerPlugin<ClanItemRefreshPlugin>( ppl );
+        Plugin::registerPlugin<ClanTenureTask>( ppl );
+        Plugin::registerPlugin<ClanDecayTask>( ppl );
 
         return ppl;
     }

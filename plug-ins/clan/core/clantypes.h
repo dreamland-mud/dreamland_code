@@ -38,6 +38,9 @@ public:
     XML_VARIABLE XMLBoolean removable;
     XML_VARIABLE XMLClanReference removeSelf;
     XML_VARIABLE XMLClanReference removeBy;
+
+    /** Clan reform switch: automatic ranks, offices as flags. Off for clans outside the reform. */
+    XML_VARIABLE XMLBooleanNoFalse reformed;
 };
 
 /*

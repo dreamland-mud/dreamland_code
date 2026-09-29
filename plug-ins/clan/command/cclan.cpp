@@ -32,6 +32,7 @@
 #include "clantitles.h"
 #include "clanorg.h"
 #include "cclan.h"
+#include "clanrecords.h"
 #include "xmlattributeinduct.h"
 #include "msgformatter.h"
 #include "def.h"
@@ -721,6 +722,7 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
         buf << "Ты решаешь покинуть [" 
             << clan.getRussianName( ).ruscase('4') << "].";
                 
+        clan_freeze( pc );
         pc->setClan( member->removeSelf );
 
     } else {
@@ -748,6 +750,7 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
         }
 
         buf << "Тебя заставили покинуть [" << clan.getRussianName( ).ruscase('4') << "].";
+        clan_freeze( victim );
         victim->setClan( member->removeBy );
     }        
 
@@ -880,6 +883,11 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
         return;
     }
     
+    if (clan_is_reformed( clan ) && !pc->is_immortal( )) {
+        pc->pecho(_("В этом клане ранги растут сами -- от взносов и стажа."));
+        return;
+    }
+
     if (pc->get_trust( ) < CREATOR) {
         if (!pc->getClan( )->isRecruiter( pc )) {
             pc->pecho(_("Это могут сделать только руководители кланов."));
@@ -948,7 +956,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
     // PCMemoryInterface* (a different subobject offset under PCharacter's multiple
     // inheritance), so raw victim segfaults getNameC() on a bad vtable. See the
     // doInduct broadcast a few functions down for the full mechanism.
-    if (pcVictim && oldLevel < i && clan.isRecruiter(victim)) {
+    if (pcVictim && oldLevel < i && !clan_is_reformed(clan) && clan.isRecruiter(victim)) {
         DLString cnEn = clan.getNameFor(LANG_EN);
         DLString cnRu = clan.getRussianName().ruscase('2');
         DLString cnUa = clan.getUkrainianName().ruscase('2');
@@ -1287,9 +1295,8 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
 {
     basic_ostringstream<char> buf;
 
-    victim->setClan( clan.getName( ) );
-    victim->setPetition( clan_none );
-    victim->setClanLevel( 0 );
+    // A reformed clan gives back the rank frozen when the player last left it.
+    clan_induct( victim, clan );
 
     buf << "Ты приня$gто|т|та в [" 
         << clan.getRussianName( ).ruscase('4') 
