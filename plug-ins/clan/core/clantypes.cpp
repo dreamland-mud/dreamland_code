@@ -49,8 +49,9 @@ int ClanData::getProposition( Clan *clan ) const
     
     i = proposition.find( clan->getName( ) );
 
+    // No offer on record means the status quo, not an alliance offer.
     if (i == proposition.end( ))
-        return 0;
+        return getDiplomacy( clan );
     else
         return i->second.getValue( );
 }

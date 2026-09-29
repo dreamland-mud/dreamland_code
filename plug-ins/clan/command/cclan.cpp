@@ -1688,7 +1688,8 @@ void CClan::clanDiplomacyProp( PCharacter *pc )
         if (clan == myclan || !clan->isValid( ) || !data || !clan->hasDiplomacy( ))
             continue;
             
-        if (mydata->getDiplomacy( clan ) == mydata->getProposition( clan )) 
+        // A real offer is always better (lower) than the status quo.
+        if (mydata->getProposition( clan ) >= mydata->getDiplomacy( clan ))
             continue;
         
         buf << '[' << clan->getShortName( ) << "] " 
@@ -1811,6 +1812,7 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
             pc->send_to( buf );
 
             data->setProposition( myclan, dip );
+            data->save( );
         }
     }
     else
