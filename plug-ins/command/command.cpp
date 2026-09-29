@@ -3,6 +3,7 @@
  * ruffina, 2004
  * logic based on interpret() from DreamLand 2.0
  */
+#include "fadeopener.h"
 #include <string.h>
 #include "command.h"
 #include "commandhelp.h"
@@ -251,8 +252,12 @@ int Command::dispatch( const InterpretArguments &iargs )
     return dispatchOrder( iargs );
 }
 
+Character *fade_broken_by = 0;
+
 void Command::visualize( Character *ch )
 {
+    fade_broken_by = (!getExtra( ).isSet( CMD_KEEP_HIDE ) && IS_AFFECTED( ch, AFF_FADE )) ? ch : 0;
+
     if (!getExtra( ).isSet( CMD_KEEP_HIDE ))
         strip_hide_and_fade(ch);
    

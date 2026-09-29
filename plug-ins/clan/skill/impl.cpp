@@ -9,8 +9,18 @@
 #include "clanskill.h"
 #include "clanorgskill.h"
 #include "skilllevelhook.h"
+#include "clanownshook.h"
+#include "clanrecords.h"
+#include "clantreasury.h"
+#include "character.h"
 
-/** Plugs clan rank levels into skill_level_bonus while this library is loaded. */
+static bool char_owns( Character *ch, const DLString &id )
+{
+    Clan &clan = *ch->getClan( );
+    return clan_is_reformed( clan ) && clan_owns( clan, id );
+}
+
+/** Plugs clan rank levels and catalog purchases into fight_core while this library is loaded. */
 class ClanSkillLevelHookPlugin : public Plugin {
 public:
     typedef ::Pointer<ClanSkillLevelHookPlugin> Pointer;
@@ -18,11 +28,13 @@ public:
     virtual void initialization( )
     {
         skill_level_bonus_hook = &ClanSkill::rankLevelBonus;
+        clan_owns_hook = &char_owns;
     }
 
     virtual void destruction( )
     {
         skill_level_bonus_hook = 0;
+        clan_owns_hook = 0;
     }
 };
 

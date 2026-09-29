@@ -40,6 +40,7 @@
 
 #include "def.h"
 #include "clanreference.h"
+#include "clanownshook.h"
 #include "l10n.h"
 
 GSN(spellbane);
@@ -422,6 +423,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     int chance;
     int mlevel = ch->getModifyLevel( );
     bool fPrayer = isPrayer(ch);
+    bool masteryRefund = false;
     
     if (ch->is_npc( ))
         return mlevel;
@@ -526,7 +528,14 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
 
     if (gsn_mastering_spell->usable( ch, false )) {
         if (number_percent() < gsn_mastering_spell->getEffective( ch )) {
-            slevel += ( number_range( 1, 4 ) );
+            // Clan upgrade: a wider range, and a tenth of the mana back (below).
+            if (clan_char_owns( ch, "mastering-spell+" )) {
+                slevel += number_range( 1, 5 );
+                masteryRefund = true;
+            }
+            else
+                slevel += ( number_range( 1, 4 ) );
+
             gsn_mastering_spell->improve( ch, true );
         }
         else
@@ -543,6 +552,10 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         slevel = max( 1, slevel + get_int_app(ch).slevel );
 
     slevel += skill_level_bonus(**skill, ch);
+
+    // ccast charges the full cost right after this and nothing when slevel <= 0.
+    if (masteryRefund && slevel > 0)
+        ch->mana += skill->getMana( ch ) / 10;
 
     return slevel;
 }

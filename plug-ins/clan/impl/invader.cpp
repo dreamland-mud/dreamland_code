@@ -230,18 +230,6 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
         return;
     }
 
-    if (victim->isAffected(gsn_soul_lust))
-    {
-        ch->pecho(ch == victim ? "Жажда душ уже горит в тебе." : "Жажда душ уже горит в %C6.", victim);
-        return;
-    }
-
-    if (victim->isAffected(sn) || victim->isAffected(gsn_shadow_shroud))
-    {
-        ch->pecho(ch == victim ? "Призрачная мантия уже защищает тебя." : "Призрачная мантия уже защищает %C4.", victim);
-        return;
-    }   
-
     if (gsn_shadow_shroud->usable(ch))
     {
         msgVict = "Призрачная мантия окутывает тебя. Ты погружаешься во тьму.";
@@ -259,6 +247,42 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
         msgVict = "Призрачная мантия окутывает тебя.";
         msgChar = "Призрачная мантия окутывает %2$C4.";
     }
+
+    // A reformed clan's caster of the other archetype adds their variant on top of
+    // the one already worn. The cloak's own stats come with the first cast only.
+    bool addVariant = clan_is_reformed(*ch->getClan())
+        && ((sn == gsn_soul_lust && victim->affected.find(gsn_shadow_shroud))
+            || (sn == gsn_shadow_shroud && victim->affected.find(gsn_soul_lust)))
+        && !victim->isAffected(sn);
+
+    if (addVariant)
+    {
+        // The marker ends with the variant it joins, or it would outlive the
+        // cloak's stats and block a full recast until it ran out.
+        Affect *joined = victim->affected.find(sn == gsn_soul_lust ? gsn_shadow_shroud : gsn_soul_lust);
+
+        af.type = sn;
+        af.level = level;
+        af.duration = joined ? joined->duration.getValue( ) : 24;
+        affect_to_char(victim, &af);
+
+        victim->pecho(msgVict.c_str(), ch, victim);
+        if (ch != victim)
+            ch->pecho(msgChar.c_str(), ch, victim);
+        return;
+    }
+
+    if (victim->isAffected(gsn_soul_lust))
+    {
+        ch->pecho(ch == victim ? "Жажда душ уже горит в тебе." : "Жажда душ уже горит в %C6.", victim);
+        return;
+    }
+
+    if (victim->isAffected(sn) || victim->isAffected(gsn_shadow_shroud) || victim->isAffected(gsn_shadow_cloak))
+    {
+        ch->pecho(ch == victim ? "Призрачная мантия уже защищает тебя." : "Призрачная мантия уже защищает %C4.", victim);
+        return;
+    }   
 
     af.type = sn;
     af.level = level;
