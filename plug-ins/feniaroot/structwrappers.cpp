@@ -25,6 +25,7 @@
 #include "clanrecords.h"
 #include "clantreasury.h"
 #include "clanflags.h"
+#include "clantitles.h"
 #include "pcharactermanager.h"
 #include "wearlocation.h"
 #include "player_utils.h"
@@ -1353,6 +1354,20 @@ NMI_INVOKE( ClanWrapper, title, "(ch[, lang]): клановый титул дл�
 {
     PCMemoryInterface *pci = argnum2memory(args, 1);
     return clanManager->find(name)->getTitle(pci, argnum2lang(args, 2));
+}
+
+NMI_INVOKE( ClanWrapper, rankTitle, "(rank, sex, lang[, profession]): звание ранга без персонажа (clan rank list); профессия нужна только кланам с титулами по классам, иначе берется 'all'. Пустая строка вне диапазона" )
+{
+    const ClanTitles *titles = clanManager->find( name )->getTitles( );
+    if (!titles)
+        return DLString::emptyString;
+
+    DLString profession;
+    if (args.size( ) >= 4)
+        profession = argnum2string( args, 4 );
+
+    return titles->buildFor( argnum2number( args, 1 ), argnum2number( args, 2 ),
+                             argnum2lang( args, 3 ), profession );
 }
 
 /*----------------------------------------------------------------------

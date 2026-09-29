@@ -11,6 +11,7 @@
 #include "lang.h"
 
 class PCMemoryInterface;
+class ClanLevelNames;
 
 /*
  * clan titles declaration
@@ -21,8 +22,13 @@ public:
     
     virtual ~ClanTitles( );
     virtual const DLString & build( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const = 0;
+    // Title for a rank without a character, e.g. the rank list. Empty when out of range.
+    virtual const DLString & buildFor( int level, int sex, lang_t lang, const DLString &profession ) const = 0;
     virtual void toStream( ostringstream & ) const = 0;
     virtual int size( ) const = 0;
+
+protected:
+    static const DLString & pick( const ClanLevelNames &, int sex, lang_t );
 };
 
 /*
@@ -58,6 +64,7 @@ public:
     typedef ::Pointer<ClanTitlesByClass> Pointer;
 
     virtual const DLString & build( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const;
+    virtual const DLString & buildFor( int level, int sex, lang_t lang, const DLString &profession ) const;
     virtual void toStream( ostringstream & ) const;
     virtual int size( ) const;
 
@@ -79,6 +86,7 @@ public:
     typedef ::Pointer<ClanTitlesByLevel> Pointer;
 
     virtual const DLString & build( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const;
+    virtual const DLString & buildFor( int level, int sex, lang_t lang, const DLString &profession ) const;
     virtual void toStream( ostringstream & ) const;
     virtual int size( ) const;
 

@@ -19,6 +19,16 @@ ClanTitles::~ClanTitles( )
 {
 }
 
+// English/Ukrainian titles are sexless; Russian falls back for a missing translation.
+const DLString & ClanTitles::pick( const ClanLevelNames &names, int sex, lang_t lang )
+{
+    if (lang == LANG_EN && !names.english.getValue( ).empty( ))
+        return names.english.getValue( );
+    if (lang == LANG_UA && !names.ukrainian.getValue( ).empty( ))
+        return names.ukrainian.getValue( );
+    return (sex == SEX_FEMALE ? names.female.getValue( ) : names.male.getValue( ));
+}
+
 /*-----------------------------------------------------------------
  * ClanLevelNames
  *----------------------------------------------------------------*/
@@ -47,7 +57,12 @@ const DLString ClanTitlesByClass::TYPE = "ClanTitlesByClass";
 
 const DLString & ClanTitlesByClass::build( PCMemoryInterface *pcm, lang_t lang ) const
 {
-    const_iterator i = find( pcm->getProfession( )->getName( ) );
+    return buildFor( pcm->getClanLevel( ), pcm->getSex( ), lang, pcm->getProfession( )->getName( ) );
+}
+
+const DLString & ClanTitlesByClass::buildFor( int level, int sex, lang_t lang, const DLString &profession ) const
+{
+    const_iterator i = find( profession );
 
     if (i == end( )) {
         static DLString allName( "all" );
@@ -59,17 +74,10 @@ const DLString & ClanTitlesByClass::build( PCMemoryInterface *pcm, lang_t lang )
     if (i == end( ))
         return DLString::emptyString;
     const ClanLevelNamesVector &vec = i->second;
-    int cl = pcm->getClanLevel( );
-    if (cl < 0 || cl >= (int)vec.size( ))
+    if (level < 0 || level >= (int)vec.size( ))
         return DLString::emptyString;
 
-    const ClanLevelNames &names = vec[cl];
-    if (lang == LANG_EN && !names.english.getValue( ).empty( ))
-        return names.english.getValue( );
-    if (lang == LANG_UA && !names.ukrainian.getValue( ).empty( ))
-        return names.ukrainian.getValue( );
-    return (pcm->getSex( ) == SEX_FEMALE
-                ? names.female.getValue( ) : names.male.getValue( ));
+    return pick( vec[level], sex, lang );
 }
 
 void ClanTitlesByClass::toStream( ostringstream &buf ) const
@@ -109,19 +117,15 @@ const DLString ClanTitlesByLevel::TYPE = "ClanTitlesByLevel";
 
 const DLString & ClanTitlesByLevel::build( PCMemoryInterface *pcm, lang_t lang ) const
 {
-    int cl = pcm->getClanLevel( );
+    return buildFor( pcm->getClanLevel( ), pcm->getSex( ), lang, DLString::emptyString );
+}
 
-    if (cl >= size( ))
+const DLString & ClanTitlesByLevel::buildFor( int level, int sex, lang_t lang, const DLString & ) const
+{
+    if (level < 0 || level >= size( ))
         return DLString::emptyString;
 
-    const ClanLevelNames &names = (*this)[cl];
-
-    if (lang == LANG_EN && !names.english.getValue( ).empty( ))
-        return names.english.getValue( );
-    if (lang == LANG_UA && !names.ukrainian.getValue( ).empty( ))
-        return names.ukrainian.getValue( );
-    return (pcm->getSex( ) == SEX_FEMALE
-                ? names.female.getValue( ) : names.male.getValue( ));
+    return pick( (*this)[level], sex, lang );
 }
 
 void ClanTitlesByLevel::toStream( ostringstream &buf ) const
