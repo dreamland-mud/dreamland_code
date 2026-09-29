@@ -311,8 +311,13 @@ void clan_login( PCharacter *pc )
     time_t now = dreamland->getCurrentTime( );
 
     if (attr && attr->lastSeen.getValue( ) > 0 && now - attr->lastSeen.getValue( ) >= DECAY_OFFLINE)
-        if (clan_decay_apply( pc ))
-            pc->pecho( _("{WТебя слишком долго не было: клановый стаж обнулился, а ранг не выше четвертого.{x") );
+        if (clan_decay_apply( pc )) {
+            // Only reformed clans lose ranks, elsewhere decay just zeroes tenure.
+            if (clan_is_reformed( *pc->getClan( ) ))
+                pc->pecho( _("{WТебя слишком долго не было: клановый стаж обнулился, а ранг не выше четвертого.{x") );
+            else
+                pc->pecho( _("{WТебя слишком долго не было: клановый стаж обнулился.{x") );
+        }
 
     clan_bank_tenure( pc );
 }

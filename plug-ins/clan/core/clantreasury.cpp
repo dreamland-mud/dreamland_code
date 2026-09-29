@@ -7,6 +7,7 @@
 #include "pcharactermanager.h"
 #include "dreamland.h"
 #include "logstream.h"
+#include "l10n.h"
 #include "merc.h"
 
 static const int DEFAULT_GOLD_CAP = 100000;
@@ -29,7 +30,8 @@ static bool add_overflows( int value, int delta )
     return (delta > 0 && value > INT_MAX - delta) || (delta < 0 && value < INT_MIN - delta);
 }
 
-DLString clan_bank_add( Clan &clan, int gold, int silver, int qp )
+/** Every refusal of clan_bank_add, without touching anything. */
+static DLString clan_bank_check( Clan &clan, int gold, int silver, int qp )
 {
     ClanData *data = clan.getData( );
     if (!data || !data->getBank( ))
@@ -52,13 +54,30 @@ DLString clan_bank_add( Clan &clan, int gold, int silver, int qp )
             return "the treasury can't hold more gold";
     }
 
+    return DLString::emptyString;
+}
+
+/** Apply deltas already passed by clan_bank_check. Doesn't save. */
+static void clan_bank_apply( Clan &clan, int gold, int silver, int qp )
+{
+    ClanBank::Pointer bank = clan.getData( )->getBank( );
+
     bank->gold += gold;
     bank->silver += silver;
     bank->questpoints += qp;
-    data->save( );
 
     LogStream::sendNotice( ) << "Clan bank " << clan.getName( ) << ": gold " << gold
                              << " silver " << silver << " qp " << qp << endl;
+}
+
+DLString clan_bank_add( Clan &clan, int gold, int silver, int qp )
+{
+    DLString error = clan_bank_check( clan, gold, silver, qp );
+    if (!error.empty( ))
+        return error;
+
+    clan_bank_apply( clan, gold, silver, qp );
+    clan.getData( )->save( );
     return DLString::emptyString;
 }
 
@@ -117,10 +136,15 @@ DLString clan_purchase( Clan &clan, const DLString &id, const DLString &buyer )
         return "buy " + prereq + " first";
 
     int price = item->second.price.getValue( );
-    DLString error = clan_bank_add( clan, 0, 0, -price );
+    if (price < 0)
+        return "the catalog price is broken";
+
+    DLString error = clan_bank_check( clan, 0, 0, -price );
     if (!error.empty( ))
         return error;
 
+    // Payment and purchase reach the disk in one save.
+    clan_bank_apply( clan, 0, 0, -price );
     ClanPurchase &purchase = clan.getData( )->purchases[id];
     purchase.time.setValue( dreamland->getCurrentTime( ) );
     purchase.buyer.setValue( buyer );
@@ -152,10 +176,11 @@ DLString clan_donate( PCMemoryInterface *pcm, int qp )
     if (!rec)
         return "clanrec attribute is broken";
 
-    DLString error = clan_bank_add( clan, 0, 0, qp );
+    DLString error = clan_bank_check( clan, 0, 0, qp );
     if (!error.empty( ))
         return error;
 
+    // Player first: a crash between the two saves loses the gift rather than doubling it.
     pcm->setQuestPoints( pcm->getQuestPoints( ) - qp );
 
     int rank = pcm->getClanLevel( );
@@ -172,11 +197,16 @@ DLString clan_donate( PCMemoryInterface *pcm, int qp )
 
         if (rank != pcm->getClanLevel( )) {
             pcm->setClanLevel( rank );
-            if (PCharacter *pc = pcm->getPlayer( ))
+            if (PCharacter *pc = pcm->getPlayer( )) {
+                pc->pecho( _("{WТвой взнос поднимает твой клановый ранг до %d.{x"), rank );
                 pc->updateSkills( );
+            }
         }
     }
 
     PCharacterManager::saveMemory( pcm );
+
+    clan_bank_apply( clan, 0, 0, qp );
+    clan.getData( )->save( );
     return DLString::emptyString;
 }
