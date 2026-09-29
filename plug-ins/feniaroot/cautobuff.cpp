@@ -13,12 +13,12 @@
  * A separate RPC serves the mudjs settings tab -- separate, because the
  * autobuff handler ignores its arguments, so 'autobuff list' sent to a server
  * without this code would START a buff run instead of being ignored:
- *   autobuff_prefs list                     -> 'autobuff_list' frame
+ *   autobuff_prefs list [seq]               -> 'autobuff_list' frame
  *   autobuff_prefs set <order> <off> <own> [seq]
  *                                           -> store, then 'autobuff_list' frame
  *                                              carrying seq back, so the tab can
- *                                              tell the answer to its own change
- *                                              from an answer to a plain list
+ *                                              tell the answer to its latest
+ *                                              request from an older one
  * Everything the client sends goes to Fenia as plain strings. No structure is
  * built from client JSON: a Fenia map keyed by client-chosen names is exactly
  * the record that corrupts the Fenia DB at boot.
@@ -119,7 +119,7 @@ RPCRUN(autobuff_prefs)
         return;
 
     if (args[0] == "list") {
-        send_autobuff_list( pch, DLString::emptyString );
+        send_autobuff_list( pch, args.size( ) >= 2 ? args[1] : DLString::emptyString );
         return;
     }
 
