@@ -21,6 +21,7 @@
 #include "xmlattributetrust.h"
 #include "descriptorstatemanager.h"
 #include "xmlkillingattribute.h"
+#include "xmlpvpattribute.h"
 
 extern "C"
 {
@@ -46,6 +47,7 @@ extern "C"
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCoder> >( ppl );
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeTrust> >( ppl );
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLKillingAttribute> >( ppl );
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLPvpAttribute> >( ppl );
 
         	Plugin::registerPlugin<DescriptorStateManager>( ppl );
 

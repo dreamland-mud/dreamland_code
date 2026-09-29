@@ -3,6 +3,8 @@
 #include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "xmlkillingattribute.h"
+#include "xmlpvpattribute.h"
+#include "pvp.h"
 #include "xmlattributestatistic.h"
 #include "player_utils.h"
 #include "nativeext.h"
@@ -435,6 +437,29 @@ NMI_GET(PlayerWrapper, killed, "статистика убийств мобов")
     PCMemoryInterface *player = getTarget();
     auto killingAttr = player->getAttributes().getAttr<XMLKillingAttribute>("killed");
     return killingAttr->toRegister();
+}
+
+NMI_GET(PlayerWrapper, pvp, "засчитанные убийства игроков (для правил вступления в кланы): kills, unique, victims")
+{
+    XMLPvpAttribute::Pointer attr = getTarget()->getAttributes().findAttr<XMLPvpAttribute>("pvp");
+    if (attr)
+        return attr->toRegister();
+
+    XMLPvpAttribute::Pointer empty(NEW);
+    return empty->toRegister();
+}
+
+NMI_INVOKE(PlayerWrapper, pvpSeed, "(victimName, time): засчитать прошлое убийство из лога ПК с теми же фильтрами, true если засчитано")
+{
+    PCMemoryInterface *victim = PCharacterManager::find(argnum2string(args, 1));
+    if (!victim)
+        return Register(false);
+
+    if (!pvp_seed_kill(getTarget(), victim, argnum2number(args, 2)))
+        return Register(false);
+
+    save();
+    return Register(true);
 }
 
 NMI_GET(PlayerWrapper, loyalty, "лояльность по отношению к закону")
