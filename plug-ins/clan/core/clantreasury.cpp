@@ -17,6 +17,13 @@ static const int DEFAULT_RANK_CAP[RANK_COUNT] = { 75, 78, 81, 84, 88, 91, 94, 97
 static const int DONATION_STEP[] = { 1000, 2000, 4000, 8000 };
 static const int DONATION_TOP_RANK = 4;
 
+int clan_donation_step( int rank )
+{
+    if (rank < 1 || rank > DONATION_TOP_RANK)
+        return 0;
+    return DONATION_STEP[rank - 1];
+}
+
 int clan_gold_cap( const Clan &clan )
 {
     const ClanMembership *m = clan.getMembership( );

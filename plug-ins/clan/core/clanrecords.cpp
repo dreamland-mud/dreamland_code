@@ -311,15 +311,53 @@ void clan_login( PCharacter *pc )
     time_t now = dreamland->getCurrentTime( );
 
     if (attr && attr->lastSeen.getValue( ) > 0 && now - attr->lastSeen.getValue( ) >= DECAY_OFFLINE)
-        if (clan_decay_apply( pc )) {
-            // Only reformed clans lose ranks, elsewhere decay just zeroes tenure.
-            if (clan_is_reformed( *pc->getClan( ) ))
-                pc->pecho( _("{WТебя слишком долго не было: клановый стаж обнулился, а ранг не выше четвертого.{x") );
-            else
-                pc->pecho( _("{WТебя слишком долго не было: клановый стаж обнулился.{x") );
+        clan_decay_apply( pc );
+
+    // The daily sweep decays offline players silently; either way, say it once here.
+    attr = pc->getAttributes( ).findAttr<XMLAttributeClanRecords>( "clanrec" );
+    if (attr && attr->decayed.getValue( )) {
+        // Only reformed clans lose ranks, elsewhere decay just zeroes tenure.
+        if (clan_is_reformed( *pc->getClan( ) ))
+            pc->pecho( _("{WТебя слишком долго не было: клановый стаж обнулился, а ранг не выше четвертого.{x") );
+        else
+            pc->pecho( _("{WТебя слишком долго не было: клановый стаж обнулился.{x") );
+        attr->decayed.setValue( false );
+    }
+
+    if (attr && !attr->notices.empty( )) {
+        for (auto &n: attr->notices) {
+            pc->send_to( n.getValue( ) );
+            pc->send_to( "\r\n" );
         }
+        attr->notices.clear( );
+    }
 
     clan_bank_tenure( pc );
+}
+
+int clan_tenure_hours( int rank )
+{
+    if (rank < TENURE_FIRST_RANK || rank > TENURE_LAST_RANK)
+        return 0;
+    return TENURE_HOURS[rank - TENURE_FIRST_RANK];
+}
+
+void clan_notice( PCMemoryInterface *pcm, const DLString &msg )
+{
+    PCharacter *pc = pcm->getPlayer( );
+
+    if (pc) {
+        pc->send_to( msg );
+        pc->send_to( "\r\n" );
+        return;
+    }
+
+    XMLAttributeClanRecords::Pointer attr = pcm->getAttributes( ).getAttr<XMLAttributeClanRecords>( "clanrec" );
+    if (!attr)
+        return;
+
+    attr->notices.push_back( XMLString( msg ) );
+    PCharacterManager::saveMemory( pcm );
 }
 
 static bool clan_decay_apply( PCMemoryInterface *pcm )
@@ -351,6 +389,12 @@ static bool clan_decay_apply( PCMemoryInterface *pcm )
     if (clan_is_reformed( *pcm->getClan( ) ) && pcm->getClanLevel( ) > DONATION_TOP_RANK) {
         pcm->setClanLevel( DONATION_TOP_RANK );
         changed = true;
+    }
+
+    if (changed) {
+        attr = pcm->getAttributes( ).getAttr<XMLAttributeClanRecords>( "clanrec" );
+        if (attr)
+            attr->decayed.setValue( true );
     }
 
     return changed;

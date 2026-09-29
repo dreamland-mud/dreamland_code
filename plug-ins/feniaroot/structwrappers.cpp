@@ -24,6 +24,7 @@
 #include "clantypes.h"
 #include "clanrecords.h"
 #include "clantreasury.h"
+#include "clanflags.h"
 #include "pcharactermanager.h"
 #include "wearlocation.h"
 #include "player_utils.h"
@@ -971,6 +972,33 @@ NMI_GET( ClanWrapper, hidden, "true для скрытого клана: пост
 {
     return clanManager->find(name)->isHidden();
 }
+NMI_INVOKE( ClanWrapper, displayName, "(lang): название клана на языке lang (0=en,1=ru,2=ua), как в clan list" )
+{
+    return clanManager->find( name )->getNameFor( argnum2lang( args, 1 ) );
+}
+NMI_INVOKE( ClanWrapper, shortName, "(lang): короткое название клана на языке lang (0=en,1=ru,2=ua)" )
+{
+    return clanManager->find( name )->getShortFor( argnum2lang( args, 1 ) );
+}
+NMI_INVOKE( ClanWrapper, longName, "(lang): длинное название клана со ссылкой на справку, на языке lang (0=en,1=ru,2=ua)" )
+{
+    return clanManager->find( name )->getLongNameFor( argnum2lang( args, 1 ) );
+}
+NMI_GET( ClanWrapper, removable, "true, если из клана можно выйти или быть выгнанным" )
+{
+    const ClanMembership *m = clanManager->find( name )->getMembership( );
+    return m ? m->removable.getValue( ) : false;
+}
+NMI_GET( ClanWrapper, joinMinLevel, "минимальный уровень для вступления (0 -- без ограничения)" )
+{
+    const ClanMembership *m = clanManager->find( name )->getMembership( );
+    return m ? m->minLevel.getValue( ) : 0;
+}
+NMI_GET( ClanWrapper, joinMode, "как вступают: never, always (сразу) или verify (по петиции)" )
+{
+    const ClanMembership *m = clanManager->find( name )->getMembership( );
+    return m ? petition_table.name( m->mode.getValue( ) ) : DLString( "never" );
+}
 NMI_GET( ClanWrapper, recallVnum, "vnum комнаты для кланвозврата" )
 {
     return clanManager->find( name )->getRecallVnum();
@@ -1072,7 +1100,7 @@ NMI_INVOKE( ClanWrapper, bankAdd, "(gold, silver, qp): изменить казн
                           argnum2number( args, 1 ), argnum2number( args, 2 ), argnum2number( args, 3 ) );
 }
 
-NMI_INVOKE( ClanWrapper, rankTable, "(rank): для клана после реформы -- cap (макс. % скилла), levelBonus (доп. уровни), power (% силы)" )
+NMI_INVOKE( ClanWrapper, rankTable, "(rank): для клана после реформы -- cap (макс. % скилла), levelBonus (доп. уровни), power (% силы), donationStep (qp за этот ранг 1-4), tenureHours (часы стажа для ранга 5-8)" )
 {
     const Clan &clan = *clanManager->find( name );
     int rank = argnum2number( args, 1 );
@@ -1083,6 +1111,8 @@ NMI_INVOKE( ClanWrapper, rankTable, "(rank): для клана после реф
     table->setField( Scripting::IdRef("cap"), clan_rank_cap( clan, rank ) );
     table->setField( Scripting::IdRef("levelBonus"), clan_rank_level_bonus( clan, rank ) );
     table->setField( Scripting::IdRef("power"), clan_rank_power( clan, rank ) );
+    table->setField( Scripting::IdRef("donationStep"), clan_donation_step( rank ) );
+    table->setField( Scripting::IdRef("tenureHours"), clan_tenure_hours( rank ) );
     return tableReg;
 }
 

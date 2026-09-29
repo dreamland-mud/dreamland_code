@@ -8,6 +8,8 @@
 #include "xmllong.h"
 #include "xmlstring.h"
 #include "xmlmap.h"
+#include "xmlstringlist.h"
+#include "xmlboolean.h"
 #include "playerattributes.h"
 
 class Clan;
@@ -48,6 +50,10 @@ public:
     XML_VARIABLE Records records;
     /** Last time tenure was banked while online, 0 = never. Drives the login decay check. */
     XML_VARIABLE XMLLong lastSeen;
+    /** Decay changed something while the player was away; told and cleared at login. */
+    XML_VARIABLE XMLBooleanNoFalse decayed;
+    /** Clan messages for an offline player (kick, office, rank), shown and cleared at login. */
+    XML_VARIABLE XMLStringList notices;
 };
 
 extern const char *CLAN_OFFICE_LEADER;
@@ -90,6 +96,13 @@ void clan_remove( PCMemoryInterface *pcm, bool bySelf );
 /** Offline for 180 days: ranks 5-8 drop to 4, tenure 0 on every record, offices cleared.
  *  Immortals and online players are skipped. True if anything changed. */
 bool clan_decay( PCMemoryInterface *pcm, time_t now );
+
+/** Hours of tenure a reformed clan needs for this rank (5-8), 0 for any other rank. */
+int clan_tenure_hours( int rank );
+
+/** Tell a player about a clan event: printed now if online, else kept for the next login.
+ *  The text may carry {l language tags. */
+void clan_notice( PCMemoryInterface *pcm, const DLString &msg );
 
 /** On entering the game: apply decay the daily sweep hasn't reached yet, then bank
  *  (creating the current clan's record, so a quick remort can't lose the rank). */

@@ -17,6 +17,8 @@
 #include "wiznet.h"
 #include "infonet.h"
 #include "messengers.h"
+#include "clan.h"
+#include "clanmanager.h"
 #include "commonattributes.h"
 #include "skillgroup.h"
 #include "subprofession.h"
@@ -739,6 +741,13 @@ NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Di
 {
     DLString msg = args2string(args);
     send_to_discord_stream(msg);
+    return Register( );
+}
+
+NMI_INVOKE(Root, discord_clan, "(msg): послать сообщение в клановый канал Discord")
+{
+    DLString msg = args2string(args);
+    send_discord_clan(msg);
     return Register( );
 }
 
@@ -1489,6 +1498,19 @@ NMI_GET( Root, playerNames, "список (List) имен всех игроко�
 
     for (auto &player : players) {
         list->push_back(Register(player.first));
+    }
+
+    return wrap(list);
+}
+
+NMI_GET( Root, clanNames, "список (List) имен всех кланов, в порядке реестра")
+{
+    RegList::Pointer list(NEW);
+
+    for (int i = 0; i < clanManager->size( ); i++) {
+        Clan *clan = clanManager->find( i );
+        if (clan && clan->isValid( ))
+            list->push_back(Register(clan->getName( )));
     }
 
     return wrap(list);
