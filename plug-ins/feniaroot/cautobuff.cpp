@@ -14,7 +14,11 @@
  * autobuff handler ignores its arguments, so 'autobuff list' sent to a server
  * without this code would START a buff run instead of being ignored:
  *   autobuff_prefs list                     -> 'autobuff_list' frame
- *   autobuff_prefs set <order> <off> <own>  -> store, then 'autobuff_list' frame
+ *   autobuff_prefs set <order> <off> <own> [seq]
+ *                                           -> store, then 'autobuff_list' frame
+ *                                              carrying seq back, so the tab can
+ *                                              tell the answer to its own change
+ *                                              from an answer to a plain list
  * Everything the client sends goes to Fenia as plain strings. No structure is
  * built from client JSON: a Fenia map keyed by client-chosen names is exactly
  * the record that corrupts the Fenia DB at boot.
@@ -80,7 +84,7 @@ static void run_autobuff(Character *ch)
 
 /** Send the settings tab its list: every candidate buff in the player's order
  *  with its on/off state, and the player's own lines. */
-static void send_autobuff_list(PCharacter *pch)
+static void send_autobuff_list(PCharacter *pch, const DLString &seq)
 {
     if (!pch->desc)
         return;
@@ -94,6 +98,8 @@ static void send_autobuff_list(PCharacter *pch)
         return;
 
     body["who"] = pch->getName( );
+    if (!seq.empty( ))
+        body["seq"] = seq;
 
     Json::Value frame;
     frame["command"] = "autobuff_list";
@@ -113,7 +119,7 @@ RPCRUN(autobuff_prefs)
         return;
 
     if (args[0] == "list") {
-        send_autobuff_list( pch );
+        send_autobuff_list( pch, DLString::emptyString );
         return;
     }
 
@@ -125,7 +131,7 @@ RPCRUN(autobuff_prefs)
 
         Register ignored;
         autobuff_fenia( "setPrefs", pch, extra, ignored );
-        send_autobuff_list( pch );
+        send_autobuff_list( pch, args.size( ) >= 5 ? args[4] : DLString::emptyString );
     }
 }
 
