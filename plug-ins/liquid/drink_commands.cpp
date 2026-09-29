@@ -339,6 +339,8 @@ void pour_out(Object *out)
     amount = out->value1();
     out->value1(0);
     out->value3(0);
+    if (out->item_type == ITEM_DRINK_CON)
+        affect_strip( out, gsn_poison );
 
     Liquid *liq = liquidManager->find(out->value2());
     const char *liqname = liq->getName().c_str();
@@ -569,6 +571,8 @@ void pour_out( Character *ch, Object * out, Character *victim )
 
     out->value1(0);
     out->value3(0);
+    if (out->item_type == ITEM_DRINK_CON)
+        affect_strip( out, gsn_poison );
     
     if (sips >= 5) {
         if (liq_water == liquid) {
@@ -1101,17 +1105,29 @@ CMDRUN( drink )
     if (obj && ((obj->item_type == ITEM_DRINK_CON && IS_SET( obj->value3(), DRINK_POISONED ))
                 || obj->isAffected(gsn_poison)))
     {
-        int level = number_fuzzy(amount);
+        // Mirrors command/drink/runFunc: poisoner's level from the affect with a
+        // spell-like duration; a bare bit keeps the sip-sized dose and half-level save.
+        Affect *paf = obj->affected.find( gsn_poison );
+        int level, duration, saveLevel;
+        if (paf && paf->level > 0) {
+            level = paf->level;
+            duration = level / 10 + 2;
+            saveLevel = level;
+        } else {
+            level = max( 1, number_fuzzy(amount) );
+            duration = 3 * amount;
+            saveLevel = level / 2;
+        }
         Affect af;
 
-        if ( !saves_spell(level / 2, ch, DAM_POISON) ) {
+        if ( !saves_spell(saveLevel, ch, DAM_POISON) ) {
             ch->recho(_("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а."), ch);
             ch->pecho(_("Тебя начинает тошнить, когда яд проникает в твое тело."));
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
             af.level     = level;
-            af.duration  = 3 * amount;
+            af.duration  = duration;
             af.bitvector.setValue(AFF_POISON);
             affect_join( ch, &af );
         }

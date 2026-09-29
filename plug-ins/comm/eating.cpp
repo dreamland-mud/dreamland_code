@@ -130,7 +130,26 @@ COMMAND(CEat, "eat")
     switch ( obj->item_type )
     {
     case ITEM_FOOD:
-            eatFood( ch, obj->value0()*2, obj->value1()*2, obj->value3() );
+    {
+            // The dose is the poisoner's level, kept on the poison affect, and lasts
+            // like the poison spell. A bare poisoned bit (area trap food) keeps the
+            // old nutrition-sized dose and half-level save.
+            int cFull = obj->value0()*2;
+            int poisonLevel = 0, poisonDuration = 0, saveLevel = 0;
+            if (obj->value3() != 0) {
+                Affect *paf = obj->affected.find( gsn_poison );
+                if (paf && paf->level > 0) {
+                    poisonLevel = paf->level;
+                    poisonDuration = poisonLevel / 10 + 2;
+                    saveLevel = poisonLevel;
+                } else {
+                    poisonLevel = max( 1, number_fuzzy( cFull / 2 ) );
+                    poisonDuration = cFull;
+                    saveLevel = poisonLevel / 2;
+                }
+            }
+            eatFood( ch, cFull, obj->value1()*2, poisonLevel, poisonDuration, saveLevel );
+    }
             break;
 
     case ITEM_PILL:
@@ -149,7 +168,7 @@ COMMAND(CEat, "eat")
     extract_obj( obj );
 }
 
-void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
+void CEat::eatFood( Character *ch, int cFull, int cHunger, int poisonLevel, int poisonDuration, int saveLevel )
 {
     if ( !ch->is_npc() )
     {
@@ -164,19 +183,19 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
     }
 
     /* The food was poisoned! */
-    if (cPoison != 0)
+    if (poisonLevel > 0)
     {
-        int level = number_fuzzy( cFull / 2 );
+        int level = poisonLevel;
         Affect af;
 
-        if ( !saves_spell(level / 2, ch, DAM_POISON) ) {
+        if ( !saves_spell(saveLevel, ch, DAM_POISON) ) {
             ch->recho(_("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а."), ch);
             ch->pecho(_("Тебя начинает тошнить, когда яд проникает в твое тело."));
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
             af.level     = level;
-            af.duration  = cFull;
+            af.duration  = poisonDuration;
             af.bitvector.setValue(AFF_POISON);
             affect_join( ch, &af );
         }
@@ -269,7 +288,8 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         }
         
         extract_char( mob );
-        eatFood( ch, gain, gain, wasPoisoned );
+        // gain holds the mob's level: extract_char has already zeroed mob->level.
+        eatFood( ch, gain, gain, wasPoisoned ? gain : 0, gain / 10 + 2, gain );
     }
     else {
         RawDamage( ch, mob, DAM_PIERCE, dam, "hunt" ).hit( true );

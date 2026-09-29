@@ -19,7 +19,7 @@ public:
     virtual void run( Character *, const DLString & );
         
 private:
-    void eatFood( Character *, int, int, int );
+    void eatFood( Character *, int, int, int poisonLevel, int poisonDuration, int saveLevel );
     void eatCarnivoro( Character *, NPCharacter * );
     
     static const DLString COMMAND_NAME;
