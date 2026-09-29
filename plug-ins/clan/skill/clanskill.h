@@ -19,6 +19,15 @@
 
 class SkillClanInfo;
 
+/** Class archetype flags that warn about every word the table doesn't know:
+ *  an unknown word is skipped, and an empty result opens the skill to everyone. */
+class XMLArchetypes : public XMLFlagsNoEmpty {
+public:
+    XMLArchetypes( );
+
+    virtual void fromXML( const XMLNode::Pointer& );
+};
+
 class ClanSkill : public BasicSkill {
 XML_OBJECT
 public:
@@ -82,7 +91,7 @@ public:
     /** Reformed clans: cap the maximum by rank. */
     XML_VARIABLE XMLBooleanNoTrue rankCap;
     /** Reformed clans: class archetypes (prof_flags) that may learn this skill, empty = all. */
-    XML_VARIABLE XMLFlagsNoEmpty archetypes;
+    XML_VARIABLE XMLArchetypes archetypes;
 };
 
 #endif

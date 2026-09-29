@@ -9,6 +9,7 @@
 #include "profflags.h"
 
 #include "stringlist.h"
+#include "logstream.h"
 #include "skillmanager.h"
 #include "skill_utils.h"
 #include "pcharacter.h"
@@ -299,7 +300,7 @@ SkillClanInfo::SkillClanInfo( )
                    needItem( true ), needPractice( true ),
                    maxLevel( LEVEL_MORTAL ),
                    rankCap( true ),
-                   archetypes( 0, &prof_flags )
+                   archetypes( )
 {
 }
 
@@ -341,12 +342,41 @@ bool ClanSkill::accessFromString(const DLString &newValue, ostringstream &errBuf
     return true;
 }
 
+XMLArchetypes::XMLArchetypes( )
+        : XMLFlagsNoEmpty( 0, &prof_flags )
+{
+}
+
+void XMLArchetypes::fromXML( const XMLNode::Pointer& parent )
+{
+    XMLFlagsNoEmpty::fromXML( parent );
+
+    XMLNode::Pointer node = parent->getFirstNode( );
+    if (!node)
+        return;
+
+    DLString args = node->getCData( );
+    while (!args.empty( )) {
+        DLString word = args.getOneArgument( );
+
+        if (prof_flags.index( word ) == NO_FLAG)
+            LogStream::sendWarning( )
+                << "Unknown archetype '" << word << "' in <archetypes>"
+                << node->getCData( ) << "</archetypes>" << endl;
+    }
+}
+
 DLString ClanSkill::accessToString() const
 {
     StringList result;
 
     for (auto &c: clans) {
-        result.push_back(c.first + " " + c.second.level.toString());
+        DLString entry = c.first + " " + c.second.level.toString();
+
+        if (c.second.archetypes.getValue( ) != 0)
+            entry += " (" + c.second.archetypes.names( ) + ")";
+
+        result.push_back(entry);
     }
 
     return result.join(", ");
