@@ -118,6 +118,20 @@ struct clan_diplomacy_names clan_diplomacy_names_table[] =
 
 const int clan_diplomacy_max = 5;
 
+// A treaty that took effect goes to the public channels; an offer stays private.
+static void clan_diplomacy_announce( Clan *a, Clan *b, int dip )
+{
+    if (a->isHidden( ) || b->isHidden( ))
+        return;
+
+    send_discord_clan( fmt( 0, "{W%s and %s: %s.{x",
+                            a->getShortFor( LANG_EN ).c_str( ), b->getShortFor( LANG_EN ).c_str( ),
+                            clan_diplomacy_names_table[dip].eng_name ) );
+    send_telegram( fmt( 0, "{W%s и %s: %s.{x",
+                        a->getShortFor( LANG_RU ).c_str( ), b->getShortFor( LANG_RU ).c_str( ),
+                        clan_diplomacy_names_table[dip].long_name ) );
+}
+
 /*
  * Reformed clans run the Fenia command .tmp.clan.command(ch, args). It returns
  * false to hand the call to the legacy code below; true, nothing, or an
@@ -1779,6 +1793,7 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
             data->setDiplomacy( myclan, dip );
             data->setProposition( myclan, dip );
             data->save( );
+            clan_diplomacy_announce( myclan, clan, dip );
 
             buf << "Установка политики для "
                 << clan->getRussianName( ).ruscase('2') << " : "
@@ -1809,6 +1824,7 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
         data->setDiplomacy( myclan, dip );
         data->setProposition( myclan, dip );
         data->save( );
+        clan_diplomacy_announce( myclan, clan, dip );
 
         buf << "Установка политики для "
             << clan->getRussianName( ).ruscase('2')
