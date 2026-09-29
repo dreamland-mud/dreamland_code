@@ -204,6 +204,15 @@ NMI_INVOKE(PlayerWrapper, clanRecord, "(clan): запись о клане -- ran
     return recReg;
 }
 
+NMI_INVOKE(PlayerWrapper, clanNotice, "(msg): клановое сообщение игроку -- сразу, если онлайн, иначе при следующем входе; можно с тегами {lE..{lR..{lU..{lx")
+{
+    DLString msg = args2string(args);
+    if (msg.empty())
+        throw Scripting::Exception("empty clan notice");
+    clan_notice(getTarget(), msg);
+    return Register();
+}
+
 NMI_INVOKE(PlayerWrapper, setClanRecord, "(clan, rank, tenureHours): задать замороженный ранг и стаж для клана, в котором игрок сейчас не состоит")
 {
     PCMemoryInterface *pcm = getTarget();

@@ -36,6 +36,11 @@
 #include "clantreasury.h"
 #include "xmlattributeinduct.h"
 #include "msgformatter.h"
+#include "feniamanager.h"
+#include "wrappermanagerbase.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "reglist.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -113,6 +118,48 @@ struct clan_diplomacy_names clan_diplomacy_names_table[] =
 
 const int clan_diplomacy_max = 5;
 
+/*
+ * Reformed clans run the Fenia command .tmp.clan.command(ch, args). It returns
+ * false to hand the call to the legacy code below; true, nothing, or an
+ * exception all count as handled, so code that already moved money never
+ * runs twice. No function there means legacy.
+ */
+static bool gprog_clan( PCharacter *pc, const DLString &args )
+{
+    static Scripting::IdRef ID_TMP( "tmp" ), ID_CLAN( "clan" ), ID_COMMAND( "command" );
+    Scripting::Register tmpClan, commandFn;
+
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    try {
+        Scripting::Register tmp = *Scripting::Context::root[ID_TMP];
+        tmpClan = *tmp[ID_CLAN];
+        commandFn = *tmpClan[ID_COMMAND];
+    }
+    catch (const ::Exception &) {
+        return false;
+    }
+
+    // A closure whose code source is gone would throw before running anything.
+    if (commandFn.type != Scripting::Register::FUNCTION || commandFn.toFunction( )->isBroken( ))
+        return false;
+
+    try {
+        Scripting::RegisterList fnArgs;
+        fnArgs.push_back( FeniaManager::wrapperManager->getWrapper( pc ) );
+        fnArgs.push_back( Scripting::Register( args ) );
+
+        Scripting::Register result = commandFn.toFunction( )->invoke( tmpClan, fnArgs );
+        return !(result.type == Scripting::Register::NUMBER && result.toNumber( ) == 0);
+    }
+    catch (const ::Exception &ex) {
+        FeniaManager::getThis( )->croak( 0, Scripting::Register( DLString( ".tmp.clan.command" ) ), ex );
+        pc->pecho(_("Попробуй позже."));
+        return true;
+    }
+}
+
 COMMAND(CClan, "clan")
 {
     PCharacter *pc = ch->getPC( );
@@ -127,6 +174,9 @@ COMMAND(CClan, "clan")
         pc->pecho(_("Тебя пытаются принудить выдать тайны своего клана, но ты не поддаешься."));
         return;
     }
+
+    if (gprog_clan( pc, constArguments ))
+        return;
 
     if (constArguments.length( ) == 0) {
         clanList( pc );
@@ -1193,6 +1243,12 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
         pc->pecho(_("И не лень тебе в свой клан пытаться еще раз вступить?"));
         return;
     }
+
+    // Reformed clans are joined through the Fenia command; getting here means it is missing.
+    if (clan_is_reformed( *clan )) {
+        pc->pecho(_("Попробуй позже."));
+        return;
+    }
     
     mymember = pc->getClan( )->getMembership( );
     member = clan->getMembership( );
@@ -1321,6 +1377,12 @@ void CClan::clanPetitionAccept( PCharacter *pc, DLString& argument )
     if (victim->getClan( ) == victim->getPetition( )) {
         pc->pecho(_("Но %s и так состоит в твоем клане."), victim->getName( ).c_str( ) ); 
         victim->setPetition( clan_none );
+        return;
+    }
+
+    // Nobody recruits in a reformed clan, and a stale petition must not bypass the join rules.
+    if (clan_is_reformed( *pc->getClan( ) )) {
+        pc->pecho(_("Попробуй позже."));
         return;
     }
 

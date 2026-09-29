@@ -37,4 +37,7 @@ DLString clan_purchase( Clan &clan, const DLString &id, const DLString &buyer );
  */
 DLString clan_donate( PCMemoryInterface *pcm, int qp );
 
+/** qp a reformed clan asks to reach this donation rank (1-4), 0 for any other rank. */
+int clan_donation_step( int rank );
+
 #endif
