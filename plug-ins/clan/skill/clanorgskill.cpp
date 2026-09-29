@@ -4,6 +4,7 @@
  */
 #include "clanorgskill.h"
 #include "clanorg.h"
+#include "clanrecords.h"
 
 #include "commonattributes.h"
 #include "pcharacter.h"
@@ -25,6 +26,10 @@ bool ClanOrgSkill::visible( CharacterMemoryInterface * ch ) const
     if (temporary_skill_active(this, ch))
         return true;
 
+    // Reformed clans have no ordens: the clan skill rules (catalog lock) are enough.
+    if (clan_is_reformed( *ch->getPCM( )->getClan( ) ))
+        return true;
+
     return (getOrgInfo( ch->getPCM( ) ) != NULL);
 }
 
@@ -40,6 +45,9 @@ bool ClanOrgSkill::available( Character * ch ) const
 
     if (ch->is_npc( ))
         return false;
+
+    if (clan_is_reformed( *ch->getClan( ) ))
+        return true;
 
     org = getOrgInfo( ch->getPC( ) );
     
@@ -84,6 +92,8 @@ bool ClanOrgSkill::accessFromString(const DLString &newValue, ostringstream &err
     if (!orgValues.empty()) {
         for (auto &c: clans) {
             const ClanOrgs *orgs = clanManager->find(c.first)->getOrgs();
+            if (!orgs)
+                continue;
             for (auto &o: *orgs) {
                 if (o.first == orgValues) {
                     organizations[ClanOrgs::ATTR_NAME].name = o.first;

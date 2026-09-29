@@ -14,6 +14,7 @@
  ***************************************************************************/
 
 #include "shalafi.h"
+#include "clanrecords.h"
 
 #include "spelltemplate.h"                                                 
 #include "skillcommandtemplate.h"
@@ -176,6 +177,10 @@ bool ShalafiClan::canInduct(PCharacter *ch) const
 void ShalafiClan::onInduct(PCharacter *ch) const
 {
     const DLString &prof = ch->getProfession()->getName();
+
+    // Reformed clans have no faculties, and the XML may carry no <orgs> at all.
+    if (clan_is_reformed(*this) || !getOrgs())
+        return;
 
     for (auto &o: *getOrgs())
         if (o.second->canInduct(ch)) {
