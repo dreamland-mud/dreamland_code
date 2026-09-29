@@ -46,10 +46,15 @@ public:
     virtual Scripting::Register toRegister() const;
 
     XML_VARIABLE Records records;
+    /** Last time tenure was banked while online, 0 = never. Drives the login decay check. */
+    XML_VARIABLE XMLLong lastSeen;
 };
 
 extern const char *CLAN_OFFICE_LEADER;
 extern const char *CLAN_OFFICE_RECRUITER;
+
+/** A clan one can belong to: not 'none' or another dispersed pseudo-clan, not a dumb reference. */
+bool clan_is_real( const Clan &clan );
 
 /** Reform scope switch: <membership><reformed>true</reformed></membership> in the clan XML. */
 bool clan_is_reformed( const Clan &clan );
@@ -85,5 +90,9 @@ void clan_remove( PCMemoryInterface *pcm, bool bySelf );
 /** Offline for 180 days: ranks 5-8 drop to 4, tenure 0 on every record, offices cleared.
  *  Immortals and online players are skipped. True if anything changed. */
 bool clan_decay( PCMemoryInterface *pcm, time_t now );
+
+/** On entering the game: apply decay the daily sweep hasn't reached yet, then bank
+ *  (creating the current clan's record, so a quick remort can't lose the rank). */
+void clan_login( PCharacter *pc );
 
 #endif

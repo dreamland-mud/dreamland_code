@@ -9,6 +9,7 @@
 #include "lex.h"
 #include "regcontainer.h"
 #include "l10n.h"
+#include "dreamland.h"
 #include "merc.h"
 
 using namespace Scripting;
@@ -54,8 +55,7 @@ Scripting::Register XMLAttributeClanRecords::toRegister() const
     return recsReg;
 }
 
-/** A clan one can belong to: not 'none' or another dispersed pseudo-clan, not a dumb reference. */
-static bool clan_is_real( const Clan &clan )
+bool clan_is_real( const Clan &clan )
 {
     return clan.getMembership( ) != 0 && !clan.isDispersed( );
 }
@@ -110,9 +110,22 @@ long clan_tenure( PCMemoryInterface *pcm, const DLString &clanName )
     return tenure;
 }
 
+/** Anyone with clan records, clanless or not, is seen: frozen records decay too. */
+static void clan_stamp_seen( PCharacter *pc )
+{
+    XMLAttributeClanRecords::Pointer attr = pc->getAttributes( ).findAttr<XMLAttributeClanRecords>( "clanrec" );
+    if (attr)
+        attr->lastSeen.setValue( dreamland->getCurrentTime( ) );
+}
+
 void clan_bank_tenure( PCharacter *pc )
 {
-    if (is_honorary( pc ) || !clan_is_real( *pc->getClan( ) ))
+    if (is_honorary( pc ))
+        return;
+
+    clan_stamp_seen( pc );
+
+    if (!clan_is_real( *pc->getClan( ) ))
         return;
 
     XMLClanRecord *rec = clan_record( pc, pc->getClan( )->getName( ), true );
@@ -126,6 +139,7 @@ void clan_bank_tenure( PCharacter *pc )
         rec->tenure.setValue( rec->tenure.getValue( ) + now - rec->since.getValue( ) );
 
     rec->since.setValue( now );
+    clan_stamp_seen( pc );
 }
 
 bool clan_promote_tenure( PCharacter *pc )
@@ -251,6 +265,9 @@ void clan_induct( PCMemoryInterface *pcm, const Clan &clan )
         if (rec) {
             PCharacter *pc = dynamic_cast<PCharacter *>( pcm );
             rec->since.setValue( pc ? pc->age.getTrueTime( ) : -1 );
+            // Offices are granted anew; one left over from a path that skipped
+            // the freeze must not come back.
+            rec->office.setValue( DLString::emptyString );
         }
     }
 }
@@ -271,6 +288,8 @@ void clan_remove( PCMemoryInterface *pcm, bool bySelf )
     ClanOrgs::delAttr( pcm );
 }
 
+static bool clan_decay_apply( PCMemoryInterface *pcm );
+
 bool clan_decay( PCMemoryInterface *pcm, time_t now )
 {
     if (is_honorary( pcm ) || pcm->isOnline( ))
@@ -279,6 +298,26 @@ bool clan_decay( PCMemoryInterface *pcm, time_t now )
     if (now - pcm->getLastAccessTime( ).getTime( ) < DECAY_OFFLINE)
         return false;
 
+    return clan_decay_apply( pcm );
+}
+
+void clan_login( PCharacter *pc )
+{
+    if (is_honorary( pc ))
+        return;
+
+    // lastAccessTime is already rewritten by the login save, our own stamp isn't.
+    XMLAttributeClanRecords::Pointer attr = pc->getAttributes( ).findAttr<XMLAttributeClanRecords>( "clanrec" );
+    time_t now = dreamland->getCurrentTime( );
+
+    if (attr && attr->lastSeen.getValue( ) > 0 && now - attr->lastSeen.getValue( ) >= DECAY_OFFLINE)
+        clan_decay_apply( pc );
+
+    clan_bank_tenure( pc );
+}
+
+static bool clan_decay_apply( PCMemoryInterface *pcm )
+{
     bool changed = false;
     XMLAttributeClanRecords::Pointer attr = pcm->getAttributes( ).findAttr<XMLAttributeClanRecords>( "clanrec" );
 
@@ -298,6 +337,8 @@ bool clan_decay( PCMemoryInterface *pcm, time_t now )
                 rec.office.setValue( DLString::emptyString );
                 changed = true;
             }
+            // Restart the count, the time before the break is gone.
+            rec.since.setValue( -1 );
         }
     }
 

@@ -61,3 +61,12 @@ void ClanDecayTask::after( )
 {
     DLScheduler::getThis( )->putTaskInSecond( Date::SECOND_IN_DAY, Pointer( this ) );
 }
+
+void ClanLoginListener::run( int oldState, int newState, Descriptor *d )
+{
+    if (newState != CON_PLAYING || !d->character)
+        return;
+
+    if (PCharacter *pc = d->character->getPC( ))
+        clan_login( pc );
+}

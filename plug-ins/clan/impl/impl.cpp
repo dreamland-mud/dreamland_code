@@ -145,6 +145,7 @@ extern "C"
         Plugin::registerPlugin<ClanItemRefreshPlugin>( ppl );
         Plugin::registerPlugin<ClanTenureTask>( ppl );
         Plugin::registerPlugin<ClanDecayTask>( ppl );
+        Plugin::registerPlugin<ClanLoginListener>( ppl );
 
         return ppl;
     }
