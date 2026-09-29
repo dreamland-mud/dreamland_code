@@ -35,6 +35,7 @@
 #include "merc.h"
 #include "move_utils.h"
 #include "vnum.h"
+#include "clanownshook.h"
 #include "clanreference.h"
 
 #include "loadsave.h"
@@ -157,7 +158,7 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
   af.level     = level;
   af.duration  = 3 + level / 30;
   af.location = APPLY_DAMROLL;
-  af.modifier  = level / 2;
+  af.modifier  = clan_char_owns( ch, "evolve-lion+" ) ? level * 5 / 8 : level / 2;
   af.bitvector.setValue(AFF_BERSERK);
   affect_to_char( ch, &af );
 

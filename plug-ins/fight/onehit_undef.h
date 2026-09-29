@@ -7,6 +7,9 @@
 
 #include "onehit_weapon.h"
 
+/** Set by kill/murder around the opening multi_hit: that attacker's first lance hit is a charge. */
+extern Character *charge_attacker;
+
 class UndefinedOneHit: public WeaponOneHit {
 public:
     UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command = "" );
@@ -25,6 +28,9 @@ protected:
     void damApplyMasterHand( );
     void damApplyMasterSword( );
     void damApplyDeathblow( );
+    void damApplySoulLust( );
+    void damApplyMounted( );
+    void damApplyFadeOpener( );
     void damApplyReligion();
     
     void damEffectMasterHand( );

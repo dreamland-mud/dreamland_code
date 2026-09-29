@@ -17,6 +17,7 @@
 #include "magic.h"
 #include "fight.h"
 #include "loadsave.h"
+#include "clanownshook.h"
 #include "stats_apply.h"
 
 #include "act.h"
@@ -124,6 +125,10 @@ void OneHit::calcDamage( )
 {
     damNormalize( );
     Damage::calcDamage( );
+
+    if (IS_GOOD( victim ) && ch->isAffected( gsn_soul_lust ) && clan_char_owns( ch, "soul-lust" ))
+        dam += dam * ch->getModifyLevel( ) / 1200;
+
     protectShadowShroud( );
 }
 

@@ -34,6 +34,7 @@
 
 #include "loadsave.h"
 #include "fight.h"
+#include "onehit_undef.h"
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
@@ -95,7 +96,9 @@ CMDRUN( kill )
     if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;
 
+    charge_attacker = ch;
     multi_hit( ch, victim, "murder" );
+    charge_attacker = 0;
 }
 
 CMDRUN( murder )
@@ -148,7 +151,9 @@ CMDRUN( murder )
     if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;
 
+    charge_attacker = ch;
     multi_hit( ch, victim , "murder" );
+    charge_attacker = 0;
 }
 
 

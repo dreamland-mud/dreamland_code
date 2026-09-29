@@ -2,6 +2,7 @@
 
 #include "skill_utils.h"
 #include "skilllevelhook.h"
+#include "clanownshook.h"
 #include "skillreference.h"
 #include "skillgroup.h"
 #include "spell.h"
@@ -247,6 +248,12 @@ DLString skill_effective_bonus(const Skill *skill, PCharacter *ch)
 }
 
 SkillLevelBonusHook skill_level_bonus_hook = 0;
+ClanOwnsHook clan_owns_hook = 0;
+
+bool clan_char_owns( Character *ch, const DLString &id )
+{
+    return ch && clan_owns_hook && clan_owns_hook( ch, id );
+}
 
 int skill_level(Skill &skill, Character *ch)
 {

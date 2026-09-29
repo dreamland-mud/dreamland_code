@@ -45,6 +45,7 @@
 #include "immunity.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "clanownshook.h"
 #include "l10n.h"
 
 using std::max;
@@ -53,6 +54,7 @@ using std::min;
 #define OBJ_VNUM_BATTLE_PONCHO       26
 
 CLAN(battlerager);
+GSN(artificer_bleed);
 GSN(bandage);
 GSN(bloodthirst);
 GSN(cure_blindness);
@@ -60,6 +62,7 @@ GSN(cure_disease);
 GSN(cure_poison);
 GSN(haste);
 GSN(mortal_strike);
+GSN(poison);
 GSN(remove_curse);
 GSN(resistance);
 GSN(spellbane);
@@ -203,7 +206,7 @@ SKILL_RUNP( bloodthirst )
         af.type                = gsn_bloodthirst;
         af.level        = ch->getModifyLevel();
         af.duration        = 2 + slevel / 18;
-        af.modifier        = slevel / 7 + 1;
+        af.modifier        = clan_char_owns( ch, "bloodthirst+" ) ? slevel / 6 + 2 : slevel / 7 + 1;
         af.bitvector.setValue(AFF_BLOODTHIRST);
 
         af.location = APPLY_HITROLL;
@@ -373,16 +376,24 @@ SKILL_RUNP( bandage )
                 oldact(_("$c1 перевязывает свои раны."),ch,0,0,TO_ROOM);
                 gsn_bandage->improve( ch, true );
 
-                heal = ( dice(4, 8 ) + slevel / 2 );
+                bool upgraded = clan_char_owns( ch, "bandage+" );
+
+                heal = dice( 4, 8 ) + (upgraded ? slevel * 3 / 4 : slevel / 2);
                 ch->hit = min( ch->hit + heal, (int)ch->max_hit );
                 update_pos( ch );
                 ch->pecho( _("Тебе становится лучше!") );
+
+                if (upgraded && (ch->isAffected( gsn_poison ) || ch->isAffected( gsn_artificer_bleed ))) {
+                        affect_strip( ch, gsn_poison );
+                        affect_strip( ch, gsn_artificer_bleed );
+                        ch->pecho( _("Тугая повязка останавливает кровь и вытягивает яд.") );
+                }
 
                 af.bitvector.setTable(&affect_flags);
                 af.type                = gsn_bandage;
                 af.level        = slevel;
                 af.duration        = slevel / 10;
-                af.modifier        = ( min( 15, slevel / 2 ) );
+                af.modifier        = min( upgraded ? 20 : 15, slevel / 2 );
                 af.bitvector.setValue(AFF_REGENERATION);
                 
                 affect_to_char(ch,&af);
