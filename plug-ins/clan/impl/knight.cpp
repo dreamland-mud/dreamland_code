@@ -14,6 +14,7 @@
  ***************************************************************************/
 
 #include "knight.h"
+#include "clanrecords.h"
 
 #include "commonattributes.h"
 
@@ -364,7 +365,7 @@ COMMAND(COrden, "orden")
         return;
     }
 
-    if (!(orgs = clan_knight->getOrgs()))
+    if (clan_is_reformed(*clan_knight) || !(orgs = clan_knight->getOrgs()))
     {
         pch->pecho(_("Ордена сейчас недоступны."));
         return;
@@ -408,7 +409,7 @@ COMMAND(COrden, "orden")
 
 bool COrden::visible(Character *ch) const
 {
-    return !ch->is_npc() && ch->getPC()->getClan() == clan_knight;
+    return !ch->is_npc() && ch->getPC()->getClan() == clan_knight && !clan_is_reformed(*clan_knight);
 }
 
 void COrden::doUsage(PCharacter *pch)

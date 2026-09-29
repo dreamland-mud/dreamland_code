@@ -14,6 +14,7 @@
  ***************************************************************************/
 
 #include "invader.h"
+#include "clanrecords.h"
 #include "clanorg.h"
 
 #include "summoncreaturespell.h"
@@ -223,7 +224,7 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
     orgCh = ClanOrgs::getAttr(ch->getPC());
     orgVict = ClanOrgs::getAttr(victim->getPC());
 
-    if (orgCh != orgVict)
+    if (!clan_is_reformed(*ch->getClan()) && orgCh != orgVict)
     {
         ch->pecho(_("Это заклинание ты можешь произнести только на члена твоей организации."));
         return;
@@ -373,7 +374,7 @@ COMMAND(CDarkLeague, "darkleague")
         return;
     }
 
-    if (!(orgs = clan_invader->getOrgs()))
+    if (clan_is_reformed(*clan_invader) || !(orgs = clan_invader->getOrgs()))
     {
         pch->pecho(_("Попробуй позже."));
         return;
@@ -427,7 +428,7 @@ COMMAND(CDarkLeague, "darkleague")
 
 bool CDarkLeague::visible(Character *ch) const
 {
-    return !ch->is_npc() && ch->getPC()->getClan() == clan_invader;
+    return !ch->is_npc() && ch->getPC()->getClan() == clan_invader && !clan_is_reformed(*clan_invader);
 }
 
 void CDarkLeague::doUsage(PCharacter *pch)

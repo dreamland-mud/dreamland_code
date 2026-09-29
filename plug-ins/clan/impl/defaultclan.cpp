@@ -62,7 +62,7 @@ const ClanOrgs * DefaultClan::getOrgs( ) const
 
 const DLString & DefaultClan::getTitle( PCMemoryInterface *pcm, lang_t lang ) const
 {
-    if (orgs) {
+    if (orgs && !clan_is_reformed( *this )) {
         ClanOrder::Pointer ord = orgs->findOrder( pcm );
 
         if (ord) {
