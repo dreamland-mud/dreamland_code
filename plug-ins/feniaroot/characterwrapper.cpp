@@ -1153,10 +1153,17 @@ NMI_GET( CharacterWrapper, wait, "wait state (в пульсах, 1 пульс = 
     return target->wait;
 }
 
-NMI_SET( CharacterWrapper, wait, "wait state (в пульсах, 1 пульс = четверть секунды)")
+NMI_SET( CharacterWrapper, wait, "wait state (в пульсах, 1 пульс = четверть секунды); присваивается как есть, чтобы можно было и снять lag -- добавлять через .max(x.wait, n)")
 {
     checkTarget( );
-    target->setWait( arg.toNumber( ) );
+
+    // A plain assignment, so scripts can also shorten or clear lag. setWait only
+    // ever raises it, which silently broke every restore and refund. Gods keep
+    // setWait's 1-pulse rule.
+    if (target->is_immortal( ))
+        target->setWait( arg.toNumber( ) );
+    else
+        target->wait = max( 0, arg.toNumber( ) );
 }
 
 NMI_GET( CharacterWrapper, boat, "объект лодки" )
