@@ -9,6 +9,8 @@
 #include "clantypes.h"
 #include "clantitles.h"
 #include "clanorg.h"
+#include "clanrecords.h"
+#include "xmlattributeplugin.h"
 
 class ClanCoreRegistrator : public Plugin {
 public:
@@ -44,6 +46,7 @@ extern "C"
         SO::PluginList ppl;
     
         Plugin::registerPlugin<ClanCoreRegistrator>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeClanRecords> >( ppl );
 
         return ppl;
     }

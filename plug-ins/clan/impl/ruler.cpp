@@ -52,6 +52,7 @@
 #include "cclantalk.h"
 #include "l10n.h"
 #include "accountmanager.h"
+#include "clanrecords.h"
 
 
 CLAN(chaos);
@@ -1314,6 +1315,20 @@ SKILL_RUNP( jail )
  * 'dismiss' skill command
  */
 
+/** Who may dismiss whom: in a reformed clan the office outranks any rank, then rank decides. */
+static int ruler_authority( PCharacter *pc )
+{
+    int authority = pc->getClanLevel( );
+    DLString office = clan_office( pc );
+
+    if (office == CLAN_OFFICE_LEADER)
+        authority += 200;
+    else if (office == CLAN_OFFICE_RECRUITER)
+        authority += 100;
+
+    return authority;
+}
+
 SKILL_RUNP( dismiss )
 {
         char                        arg[MAX_INPUT_LENGTH];
@@ -1365,7 +1380,7 @@ SKILL_RUNP( dismiss )
                 return;
         }
 
-        if ( victim->getPC()->getClanLevel() >= ch->getPC()->getClanLevel() )
+        if ( ruler_authority( victim->getPC() ) >= ruler_authority( ch->getPC() ) )
         {
                 ch->pecho(_("Твоих полномочий (кланового ранга) тут явно недостаточно."));
                 return;

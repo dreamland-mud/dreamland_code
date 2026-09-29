@@ -4,6 +4,7 @@
  */
 #include "defaultclan.h"
 #include "clanmanager.h"
+#include "clanrecords.h"
 
 #include "class.h"
 #include "pcharacter.h"
@@ -78,16 +79,25 @@ const DLString & DefaultClan::getTitle( PCMemoryInterface *pcm, lang_t lang ) co
     return DLString::emptyString;
 }
 
+// Reformed clans hold offices as flags in the player's clan record. Ranks there
+// are progression only. Other clans keep the old rank thresholds.
 bool DefaultClan::isLeader( PCMemoryInterface *pcm ) const
 {
+    if (clan_is_reformed( *this ))
+        return pcm->getClan( ) == *this && clan_office( pcm ) == CLAN_OFFICE_LEADER;
+
     if (leader.getValue( ) < 0)
         return false;
         
     return pcm->getClanLevel( ) >= leader.getValue( );
 }
 
+/** Any office holder: the leader counts as a recruiter too. */
 bool DefaultClan::isRecruiter( PCMemoryInterface *pcm ) const
 {
+    if (clan_is_reformed( *this ))
+        return pcm->getClan( ) == *this && !clan_office( pcm ).empty( );
+
     if (recruiter.getValue( ) < 0)
         return false;
         

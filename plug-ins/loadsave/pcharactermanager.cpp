@@ -374,7 +374,14 @@ void PCharacterManager::saveMemory( PCMemoryInterface *pci )
     pc = getPCharacter( );
     pc->setName( pcm->getName( ) );
     
-    load(pc);
+    // A profile that failed to load would be saved back as defaults plus memory,
+    // wiping every field memory doesn't carry.
+    if (!load(pc)) {
+        LogStream::sendError( ) << "saveMemory: cannot load profile of " << pcm->getName( ) << ", not saving" << endl;
+        extract(pc);
+        return;
+    }
+
     pc->setMemory( pcm );
     save(pc);
     extract(pc);

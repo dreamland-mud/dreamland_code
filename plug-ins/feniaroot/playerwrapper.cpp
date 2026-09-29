@@ -5,6 +5,9 @@
 #include "xmlkillingattribute.h"
 #include "xmlpvpattribute.h"
 #include "pvp.h"
+#include "clanrecords.h"
+#include "clanmanager.h"
+#include "clan.h"
 #include "xmlattributestatistic.h"
 #include "player_utils.h"
 #include "nativeext.h"
@@ -113,6 +116,114 @@ NMI_SET(PlayerWrapper, clanLevel, "клановый уровень, число �
 {
     getTarget()->setClanLevel(arg2number(arg, 0, 8));
     save();
+}
+
+NMI_GET(PlayerWrapper, clanOffice, "должность в клане после реформы: leader, recruiter или пустая строка")
+{
+    return clan_office(getTarget());
+}
+
+NMI_SET(PlayerWrapper, clanOffice, "должность в клане после реформы: leader, recruiter или пустая строка")
+{
+    DLString error = clan_set_office(getTarget(), arg2string(arg));
+    if (!error.empty())
+        throw Scripting::Exception(error);
+}
+
+/** Clan records are for mortals in real clans only. */
+static void check_clan_record_target(PCMemoryInterface *pcm, const Clan &clan)
+{
+    if (pcm->get_trust() >= LEVEL_IMMORTAL)
+        throw Scripting::Exception("immortals are honorary patrons and keep no clan records");
+    if (!clan_is_real(clan))
+        throw Scripting::Exception(clan.getName() + " is not a clan one can belong to");
+}
+
+static int arg2bounded(int value, int lower, int upper)
+{
+    if (value < lower || value > upper)
+        throw Scripting::Exception("value out of range");
+    return value;
+}
+
+/** The record of the player's current clan, created on demand. */
+static XMLClanRecord * current_clan_record(PCMemoryInterface *pcm)
+{
+    check_clan_record_target(pcm, *pcm->getClan());
+
+    XMLClanRecord *rec = clan_record(pcm, pcm->getClan()->getName(), true);
+    if (!rec)
+        throw Scripting::Exception("clanrec attribute is held by another type");
+    return rec;
+}
+
+NMI_GET(PlayerWrapper, clanTenure, "стаж в текущем клане, часов настоящего игрового времени")
+{
+    PCMemoryInterface *pcm = getTarget();
+    return (int)(clan_tenure(pcm, pcm->getClan()->getName()) / 3600);
+}
+
+NMI_SET(PlayerWrapper, clanTenure, "стаж в текущем клане, часов настоящего игрового времени")
+{
+    PCMemoryInterface *pcm = getTarget();
+    XMLClanRecord *rec = current_clan_record(pcm);
+
+    rec->tenure.setValue((long)arg2bounded(arg2number(arg), 0, 100000) * 3600);
+    // Count on from now, the old stamp belongs to the value just overwritten.
+    PCharacter *pc = pcm->getPlayer();
+    rec->since.setValue(pc ? pc->age.getTrueTime() : -1);
+    save();
+}
+
+NMI_GET(PlayerWrapper, clanDonated, "кп, внесенные в текущий клан в счет следующего ранга")
+{
+    XMLClanRecord *rec = clan_record(getTarget(), getTarget()->getClan()->getName(), false);
+    return rec ? rec->donated.getValue() : 0;
+}
+
+NMI_SET(PlayerWrapper, clanDonated, "кп, внесенные в текущий клан в счет следующего ранга")
+{
+    current_clan_record(getTarget())->donated.setValue(arg2bounded(arg2number(arg), 0, 1000000));
+    save();
+}
+
+NMI_INVOKE(PlayerWrapper, clanRecord, "(clan): запись о клане -- rank (замороженный), tenure (часы), donated, office -- или null")
+{
+    DLString clanName = argnum2string(args, 1);
+    XMLClanRecord *rec = clan_record(getTarget(), clanName, false);
+    if (!rec)
+        return Register();
+
+    Register recReg = Register::handler<IdContainer>();
+    IdContainer *r = recReg.toHandler().getDynamicPointer<IdContainer>();
+
+    r->setField(IdRef("rank"), rec->rank.getValue());
+    r->setField(IdRef("tenure"), (int)(clan_tenure(getTarget(), clanName) / 3600));
+    r->setField(IdRef("donated"), rec->donated.getValue());
+    r->setField(IdRef("office"), rec->office.getValue());
+    return recReg;
+}
+
+NMI_INVOKE(PlayerWrapper, setClanRecord, "(clan, rank, tenureHours): задать замороженный ранг и стаж для клана, в котором игрок сейчас не состоит")
+{
+    PCMemoryInterface *pcm = getTarget();
+    const Clan &clan = *clanManager->find(argnum2string(args, 1));
+
+    check_clan_record_target(pcm, clan);
+
+    if (pcm->getClan() == clan)
+        throw Scripting::Exception("player is in this clan now: use clanLevel and clanTenure");
+
+    XMLClanRecord *rec = clan_record(pcm, clan.getName(), true);
+    if (!rec)
+        throw Scripting::Exception("clanrec attribute is held by another type");
+
+    rec->rank.setValue(arg2bounded(argnum2number(args, 2), 0, 8));
+    rec->tenure.setValue((long)arg2bounded(argnum2number(args, 3), 0, 100000) * 3600);
+    rec->since.setValue(-1);
+    rec->office.setValue(DLString::emptyString);
+    save();
+    return Register();
 }
 
 NMI_GET(PlayerWrapper, profession, "класс (структура .Profession)")

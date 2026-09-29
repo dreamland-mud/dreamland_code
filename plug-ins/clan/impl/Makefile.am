@@ -26,6 +26,7 @@ ruler.cpp \
 shalafi.cpp \
 flowers.cpp \
 common.cpp \
+clantasks.cpp \
 impl.cpp
 
 libclan_impl_la_MOC = \

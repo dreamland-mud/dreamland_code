@@ -113,7 +113,8 @@ void ClanData::unsetItem( Object *obj )
 ClanMembership::ClanMembership( )
                 : mode( 0, &petition_table ),
                   minLevel( 999 ),
-                  removable( false )
+                  removable( false ),
+                  reformed( false )
 {
 }
 
