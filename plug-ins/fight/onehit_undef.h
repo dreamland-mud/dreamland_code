@@ -7,8 +7,18 @@
 
 #include "onehit_weapon.h"
 
-/** Set by kill/murder around the opening multi_hit: that attacker's first lance hit is a charge. */
+/**
+ * Set by kill/murder around the opening multi_hit and consumed by that attacker's
+ * first landed hit: a mounted lance charge and a fade+ ambush.
+ */
 extern Character *charge_attacker;
+extern Character *ambush_attacker;
+
+/** Resets both opener markers when the opening round ends, however it ends. */
+struct OpenerGuard {
+    OpenerGuard( Character *charge, Character *ambush );
+    ~OpenerGuard( );
+};
 
 class UndefinedOneHit: public WeaponOneHit {
 public:
@@ -31,6 +41,8 @@ protected:
     void damApplySoulLust( );
     void damApplyMounted( );
     void damApplyFadeOpener( );
+    void msgOpeners( );
+    void damEffectDeathblowStun( );
     void damApplyReligion();
     
     void damEffectMasterHand( );
@@ -45,6 +57,10 @@ protected:
     bool canDestroy( Object * );
 
     virtual bool mprog_hit();
+
+    bool deathblowStun;
+    bool charged;
+    bool ambushed;
 };
 
 #endif

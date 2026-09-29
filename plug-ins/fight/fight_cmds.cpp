@@ -35,6 +35,7 @@
 #include "loadsave.h"
 #include "fight.h"
 #include "onehit_undef.h"
+#include "fadeopener.h"
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
@@ -96,9 +97,8 @@ CMDRUN( kill )
     if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;
 
-    charge_attacker = ch;
+    OpenerGuard opener( ch, IS_AFFECTED( ch, AFF_FADE ) ? ch : 0 );
     multi_hit( ch, victim, "murder" );
-    charge_attacker = 0;
 }
 
 CMDRUN( murder )
@@ -151,9 +151,9 @@ CMDRUN( murder )
     if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;
 
-    charge_attacker = ch;
+    // Fade is gone by now (Command::visualize); fade_broken_by remembers it.
+    OpenerGuard opener( ch, fade_broken_by == ch ? ch : 0 );
     multi_hit( ch, victim , "murder" );
-    charge_attacker = 0;
 }
 
 

@@ -383,7 +383,7 @@ SKILL_RUNP( bandage )
                 update_pos( ch );
                 ch->pecho( _("Тебе становится лучше!") );
 
-                if (upgraded && (ch->isAffected( gsn_poison ) || ch->isAffected( gsn_artificer_bleed ))) {
+                if (upgraded && (ch->affected.find( gsn_poison ) || ch->affected.find( gsn_artificer_bleed ))) {
                         affect_strip( ch, gsn_poison );
                         affect_strip( ch, gsn_artificer_bleed );
                         ch->pecho( _("Тугая повязка останавливает кровь и вытягивает яд.") );
@@ -393,10 +393,18 @@ SKILL_RUNP( bandage )
                 af.type                = gsn_bandage;
                 af.level        = slevel;
                 af.duration        = slevel / 10;
-                af.modifier        = min( upgraded ? 20 : 15, slevel / 2 );
+                af.modifier        = ( min( 15, slevel / 2 ) );
                 af.bitvector.setValue(AFF_REGENERATION);
                 
                 affect_to_char(ch,&af);
+
+                // Upgrade: +20% health and moves regeneration while bandaged.
+                if (upgraded) {
+                        af.bitvector.setValue( 0 );
+                        af.location = APPLY_HEAL_GAIN;
+                        af.modifier = 20;
+                        affect_to_char( ch, &af );
+                }
         }
         else
         {

@@ -81,6 +81,7 @@ GSN(nerve);
 GSN(parry);
 GSN(shapeshift);
 GSN(shield_block);
+GSN(shadow_shroud);
 GSN(slice);
 GSN(soul_lust);
 GSN(sword);
@@ -98,7 +99,8 @@ RELIG(deimos);
  *---------------------------------------------------------------------------*/
 UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command )
             : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
-              WeaponOneHit( ch, victim, secondary, command )
+              WeaponOneHit( ch, victim, secondary, command ),
+              deathblowStun( false ), charged( false ), ambushed( false )
 {
     deathReason = "melee";
 }
@@ -189,7 +191,7 @@ void UndefinedOneHit::calcDamage( )
     protectRazer( ); 
 
     // Normal hits get the shroud only from a clan that bought it; skill hits always did.
-    if (clan_char_owns( victim, "shadow-shroud" ))
+    if (IS_GOOD( ch ) && victim->isAffected( gsn_shadow_shroud ) && clan_char_owns( victim, "shadow-shroud" ))
         protectShadowShroud( );
 
     if (wield)
@@ -201,6 +203,7 @@ void UndefinedOneHit::priorDamageEffects( )
     damEffectMasterHand( );
     damEffectMasterSword( );
     damEffectCriticalStrike( );
+    msgOpeners( );
 }
 
 bool UndefinedOneHit::mprog_hit()
@@ -219,6 +222,7 @@ bool UndefinedOneHit::mprog_hit()
 
 void UndefinedOneHit::postDamageEffects( )
 {
+    damEffectDeathblowStun( );
     damEffectDestroyEquipment( );
     damEffectFeeble( );
     damEffectFunkyWeapon( );
@@ -647,8 +651,8 @@ void UndefinedOneHit::damApplyDeathblow( )
     if (ch->is_npc( ) || !gsn_deathblow->usable( ch, false ))
         return;
     
-    bool upgraded = clan_char_owns( ch, "deathblow+" );
     chance = gsn_deathblow->getEffective( ch );
+    bool upgraded = chance > 0 && clan_char_owns( ch, "deathblow+" );
 
     if (victim->is_npc( ) && victim->getNPC( )->behavior && !victim->getNPC( )->behavior->isAfterCharm( )) {
         if (victim->getProfession( )->getFlags( victim ).isSet(PROF_MAGIC))
@@ -671,26 +675,9 @@ void UndefinedOneHit::damApplyDeathblow( )
         oldact(_("Руки $c2 наполняются смертоносной силой!"),ch,0,0,TO_ROOM);
         gsn_deathblow->improve( ch, true, victim );
 
-        // Upgrade: a short stun that never extends one already running.
-        // Mobs lose a round, players are only dazed.
-        if (upgraded && number_percent( ) < 25) {
-            bool stunned = false;
-
-            if (victim->is_npc( ) && victim->wait <= 0) {
-                victim->setWaitViolence( 1 );
-                stunned = true;
-            }
-            else if (!victim->is_npc( ) && victim->daze <= 0) {
-                victim->setDazeViolence( 1 );
-                stunned = true;
-            }
-
-            if (stunned) {
-                oldact(_("Твой смертельный удар оглушает $C4!"), ch, 0, victim, TO_CHAR);
-                oldact(_("Смертельный удар $c2 оглушает тебя!"), ch, 0, victim, TO_VICT);
-                oldact(_("Смертельный удар $c2 оглушает $C4!"), ch, 0, victim, TO_NOTVICT);
-            }
-        }
+        // Upgrade: a short stun, applied once the hit lands (damEffectDeathblowStun).
+        if (upgraded && number_percent( ) < 25)
+            deathblowStun = true;
     }
     else
         gsn_deathblow->improve( ch, false, victim );
@@ -703,6 +690,19 @@ void UndefinedOneHit::damApplySoulLust( )
 }
 
 Character *charge_attacker = 0;
+Character *ambush_attacker = 0;
+
+OpenerGuard::OpenerGuard( Character *charge, Character *ambush )
+{
+    charge_attacker = charge;
+    ambush_attacker = ambush;
+}
+
+OpenerGuard::~OpenerGuard( )
+{
+    charge_attacker = 0;
+    ambush_attacker = 0;
+}
 
 // Mounted fighting from the clan catalog: cavalry, a lance, and the lance charge.
 void UndefinedOneHit::damApplyMounted( )
@@ -710,34 +710,76 @@ void UndefinedOneHit::damApplyMounted( )
     if (!MOUNTED( ch ) || !ch->mount->is_npc( ))
         return;
 
-    if (clan_char_owns( ch, "cavalry" ) && gsn_cavalry->usable( ch, false ))
+    if (gsn_cavalry->usable( ch, false ) && clan_char_owns( ch, "cavalry" ))
         dam += dam * gsn_cavalry->getEffective( ch ) * 15 / 10000;
 
-    if (!wield || get_weapon_class( wield ) != WEAPON_LANCE || !clan_char_owns( ch, "lance" ))
+    if (!wield || get_weapon_class( wield ) != WEAPON_LANCE)
+        return;
+
+    if (!gsn_lance->usable( ch, false ) || !clan_char_owns( ch, "lance" ))
         return;
 
     dam += dam / 5;
 
     if (charge_attacker == ch && !secondary) {
         charge_attacker = 0;
+        charged = true;
         dam *= 2;
+    }
+}
+
+// fade+: the first landed hit of kill or murder started out of fade.
+void UndefinedOneHit::damApplyFadeOpener( )
+{
+    if (ambush_attacker != ch)
+        return;
+
+    ambush_attacker = 0;
+
+    if (!clan_char_owns( ch, "fade+" ))
+        return;
+
+    ambushed = true;
+    dam += dam / 2;
+}
+
+// After canDamage: only a hit that got past parry and dodge announces its opener.
+void UndefinedOneHit::msgOpeners( )
+{
+    if (charged) {
         oldact(_("Ты на полном скаку таранишь $C4 копьем!"), ch, 0, victim, TO_CHAR);
         oldact(_("$c1 на полном скаку таранит тебя копьем!"), ch, 0, victim, TO_VICT);
         oldact(_("$c1 на полном скаку таранит $C4 копьем!"), ch, 0, victim, TO_NOTVICT);
     }
+
+    if (ambushed) {
+        oldact(_("Ты наносишь удар прямо из тени!"), ch, 0, victim, TO_CHAR);
+        oldact(_("$c1 бьет тебя прямо из тени!"), ch, 0, victim, TO_VICT);
+        oldact(_("$c1 бьет $C4 прямо из тени!"), ch, 0, victim, TO_NOTVICT);
+    }
 }
 
-// The first hit out of fade. OneHit::hit runs calcDamage before canDamage strips fade,
-// so only that hit sees it. kill keeps fade until then (keep_hide), murder strips it first.
-void UndefinedOneHit::damApplyFadeOpener( )
+// deathblow+: never extends a stun already running. Mobs lose a round, players are dazed.
+void UndefinedOneHit::damEffectDeathblowStun( )
 {
-    if (!IS_AFFECTED( ch, AFF_FADE ) || !clan_char_owns( ch, "fade+" ))
+    if (!deathblowStun)
         return;
 
-    dam += dam / 2;
-    oldact(_("Ты наносишь удар прямо из тени!"), ch, 0, victim, TO_CHAR);
-    oldact(_("$c1 бьет тебя прямо из тени!"), ch, 0, victim, TO_VICT);
-    oldact(_("$c1 бьет $C4 прямо из тени!"), ch, 0, victim, TO_NOTVICT);
+    if (victim->is_npc( )) {
+        if (victim->wait > 0)
+            return;
+        victim->setWaitViolence( 1 );
+        oldact(_("Твой смертельный удар оглушает $C4!"), ch, 0, victim, TO_CHAR);
+        oldact(_("Смертельный удар $c2 оглушает $C4!"), ch, 0, victim, TO_NOTVICT);
+    }
+    else {
+        if (victim->daze > 0)
+            return;
+        victim->setDazeViolence( 1 );
+        oldact(_("Твой смертельный удар ошеломляет $C4!"), ch, 0, victim, TO_CHAR);
+        oldact(_("Смертельный удар $c2 ошеломляет тебя!"), ch, 0, victim, TO_VICT);
+        oldact(_("Смертельный удар $c2 ошеломляет $C4!"), ch, 0, victim, TO_NOTVICT);
+    }
 }
 
 void UndefinedOneHit::damEffectMasterHand()
