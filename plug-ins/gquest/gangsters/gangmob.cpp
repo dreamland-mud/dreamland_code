@@ -158,7 +158,7 @@ bool GangMember::spec( )
             switch (number_range(1, 200)) {
             case 1: interpret(ch, "pound"); break;
             case 2: interpret(ch, "romeo"); break;
-            case 3: interpret(ch, "buff"); break;
+            case 3: interpret(ch, "polish"); break;
             case 4: interpret(ch, "camel self"); break;
             }
         }
