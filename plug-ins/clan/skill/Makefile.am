@@ -12,12 +12,10 @@ $(INCLUDES_SRC)
 
 libclan_skill_la_SOURCES = \
 clanskill.cpp \
-clanorgskill.cpp \
 impl.cpp
 
 libclan_skill_la_MOC = \
-clanskill.h \
-clanorgskill.h 
+clanskill.h 
 
 libclan_skill_la_LIBADD = \
 $(LIBADD_FIGHT) \

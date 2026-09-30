@@ -922,7 +922,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
 
     if (cmd.empty()) {
         stc("Формат:  skedit умение\r\n", ch);
-        stc("Формат:  skedit create class|clan|orden|race|other <название по-английски>\r\n", ch);
+        stc("Формат:  skedit create class|clan|race|other <название по-английски>\r\n", ch);
         stc("Формат:  skedit list [all|active|passive|magic|prayer|<group>]\r\n", ch);
         return;
     }
@@ -975,8 +975,6 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
             newSkill = SkillAlloc::newClassSkill(args);
         } else if (arg_is(type, "clan")) {
             newSkill = SkillAlloc::newClanSkill(args);
-        } else if (arg_is(type, "orden")) {
-            newSkill = SkillAlloc::newOrdenSkill(args);
         } else if (arg_is(type, "race")) {
             newSkill = SkillAlloc::newRaceSkill(args);
         } else if (arg_is(type, "other")) {

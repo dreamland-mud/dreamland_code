@@ -15,7 +15,6 @@
 
 #include "invader.h"
 #include "clanrecords.h"
-#include "clanorg.h"
 
 #include "summoncreaturespell.h"
 #include "affecthandlertemplate.h"
@@ -213,20 +212,11 @@ SPELL_DECL(ShadowCloak);
 VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level)
 {
     Affect af;
-    DLString msgChar, msgVict, orgCh, orgVict;
+    DLString msgChar, msgVict;
 
     if (ch->is_npc() || victim->is_npc() || ch->getClan() != victim->getClan())
     {
         ch->pecho(_("Это заклинание ты можешь произнести только на члена твоего клана."));
-        return;
-    }
-
-    orgCh = ClanOrgs::getAttr(ch->getPC());
-    orgVict = ClanOrgs::getAttr(victim->getPC());
-
-    if (!clan_is_reformed(*ch->getClan()) && orgCh != orgVict)
-    {
-        ch->pecho(_("Это заклинание ты можешь произнести только на члена твоей организации."));
         return;
     }
 
@@ -377,100 +367,3 @@ VOID_AFFECT(EvilSpirit)::toStream(ostringstream &buf, Affect *paf)
     buf << fmt(0, _("Злые духи воцарились здесь на {W%1$d{x ча%1$Iс|са|сов."), paf->duration)
         << endl;
 }
-
-/*-----------------------------------------------------------------
- * 'darkleague' command 
- *----------------------------------------------------------------*/
-COMMAND(CDarkLeague, "darkleague")
-{
-    PCharacter *pch;
-    const ClanOrgs *orgs;
-    DLString arguments, cmd, arg;
-
-    if (ch->is_npc())
-        return;
-
-    pch = ch->getPC();
-
-    if (pch->getClan() != clan_invader)
-    {
-        pch->pecho(_("Ты не принадлежишь к Кабалу Захватчиков."));
-        return;
-    }
-
-    if (clan_is_reformed(*clan_invader) || !(orgs = clan_invader->getOrgs()))
-    {
-        pch->pecho(_("Попробуй позже."));
-        return;
-    }
-
-    arguments = constArguments;
-    cmd = arguments.getOneArgument();
-    arg = arguments;
-
-    if (cmd.empty() || arg_is_help(cmd))
-    {
-        doUsage(pch);
-        return;
-    }
-
-    if (arg_is_list(cmd))
-    {
-        orgs->doList(pch);
-        return;
-    }
-
-    if (!pch->getClan()->isRecruiter(pch))
-    {
-        pch->pecho(_("Твоих полномочий хватает только посмотреть список организаций."));
-        return;
-    }
-
-    if (arg_is(cmd, "induct"))
-    {
-        if (arg_is_self(arg))
-            orgs->doSelfInduct(pch, arguments);
-        else
-            orgs->doInduct(pch, arg);
-    }
-    else if (arg_is(cmd, "remove"))
-    {
-        if (arg_is_self(arg))
-            orgs->doSelfRemove(pch);
-        else
-            orgs->doRemove(pch, arg);
-    }
-    else if (arg_is(cmd, "member"))
-    {
-        orgs->doMembers(pch, arg);
-    }
-    else
-    {
-        doUsage(pch);
-    }
-}
-
-bool CDarkLeague::visible(Character *ch) const
-{
-    return !ch->is_npc() && ch->getPC()->getClan() == clan_invader && !clan_is_reformed(*clan_invader);
-}
-
-void CDarkLeague::doUsage(PCharacter *pch)
-{
-    ostringstream buf;
-
-    buf << "Для всех: " << endl
-        << "темнаялига{x список{x - посмотреть список групп" << endl
-        << "темнаялига{x члены{x - посмотреть список членов группы" << endl
-        << endl
-        << "Для руководства: " << endl
-        << "темнаялига{x члены{x [{Dгруппа{x] - посмотреть список членов своей или указанной группы" << endl
-        << "темнаялига{x принять{x {Dимя{x [{Dгруппа{x]- принять кого-то в свою или указанную группу" << endl
-        << "темнаялига{x выгнать{x {Dимя{x - выгнать кого-то из группы" << endl
-        << "темнаялига{x выгнать я{x - выйти из группы" << endl
-        << "темнаялига{x принять я{x {Dгруппа{x - принять себя в группу" << endl;
-
-    pch->send_to(buf);
-}
-
-

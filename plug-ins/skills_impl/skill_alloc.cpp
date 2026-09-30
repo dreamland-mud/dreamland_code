@@ -56,11 +56,6 @@ BasicSkill::Pointer SkillAlloc::newClanSkill(const DLString &name)
     return newSkill(name, gsn_garble.getElement(), "ClanSkill");
 }
 
-BasicSkill::Pointer SkillAlloc::newOrdenSkill(const DLString &name)
-{
-    return newSkill(name, gsn_garble.getElement(), "ClanOrgSkill");
-}
-
 BasicSkill::Pointer SkillAlloc::newRaceSkill(const DLString &name)
 {
     return newSkill(name, gsn_rear_kick.getElement(), "RaceAptitude");

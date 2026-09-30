@@ -8,24 +8,8 @@
 
 #include "clanmobiles.h"
 #include "clantitles.h"
-#include "clanorg.h"
 
 #include "xmlglobalbitvector.h"
-#include "commandplugin.h"
-
-class KnightOrder : public ClanOrder {
-XML_OBJECT
-public:
-    typedef ::Pointer<KnightOrder> Pointer;
-    
-    KnightOrder( );
-
-    virtual bool canInduct( PCMemoryInterface * ) const;
-    virtual const DLString &getTitle( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const;
-
-    XML_VARIABLE XMLGlobalBitvector classes;
-    XML_VARIABLE ClanTitlesByLevel  titles; 
-};
 
 class ClanItemKnight : public ClanItem {
 XML_OBJECT
@@ -61,20 +45,6 @@ protected:
         virtual int getCast( Character * );
 };
 
-
-class COrden : public CommandPlugin {
-public:
-    typedef ::Pointer<COrden> Pointer;
-
-    COrden( );
-    virtual void run( Character *, const DLString & );
-    virtual bool visible( Character * ) const;
-
-private:
-    void doUsage( PCharacter * );
-
-    static const DLString COMMAND_NAME;
-};
 
 #endif
 

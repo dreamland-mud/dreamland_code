@@ -6,10 +6,7 @@
 #ifndef SHALAFI_H 
 #define SHALAFI_H 
 
-#include "xmlmap.h"
-#include "xmlglobalbitvector.h"
 #include "clanmobiles.h"
-#include "defaultclan.h"
 
 class ClanGuardShalafi: public ClanGuard {
 XML_OBJECT
@@ -22,26 +19,5 @@ protected:
         virtual int getCast( Character * );
 };
 
-
-class ShalafiFaculty : public ClanOrder {
-XML_OBJECT
-public:
-    ShalafiFaculty();
-    
-    virtual bool canInduct( PCMemoryInterface * ) const;
-    virtual const DLString &getTitle( PCMemoryInterface *, lang_t = LANG_DEFAULT ) const;
-
-    XML_VARIABLE XMLGlobalBitvector classes;
-    XML_VARIABLE ClanTitlesByLevel  titles; 
-};
-
-class ShalafiClan : public DefaultClan {
-XML_OBJECT
-public:
-    typedef ::Pointer<ShalafiClan> Pointer;
-
-    virtual bool canInduct( PCharacter * ) const;
-    virtual void onInduct(PCharacter *) const;
-};
 
 #endif
