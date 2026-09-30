@@ -10,13 +10,11 @@ $(INCLUDES_ANATOLIA) \
 $(INCLUDES_SRC)
 
 libclan_command_la_SOURCES = \
-cclan.cpp \
 xmlattributeinduct.cpp \
 cclantalk.cpp \
 impl.cpp 
 
 libclan_command_la_MOC = \
-cclan.h \
 xmlattributeinduct.h 
 
 libclan_command_la_LIBADD = \
