@@ -170,10 +170,14 @@ DefaultBufferHandler::read( Descriptor *d )
     /*
      * handle backspaces
      */
+    // Walk the converted line: after UTF-8 -> KOI8 it is shorter than 'line',
+    // so indexing 'line' here let control bytes (and backspaces) slip through.
     for(i = 0, k = 0; i < line_length;i++) {
-        if(line[i] == '\b' && k > 0)
-            --k;
-        else if ( (unsigned)line[i] >= ' ' )
+        if(koi8[i] == '\b') {
+            if (k > 0)
+                --k;
+        }
+        else if ( (unsigned char)koi8[i] >= ' ' )
             d->incomm[k++] = koi8[i];
     }
 
