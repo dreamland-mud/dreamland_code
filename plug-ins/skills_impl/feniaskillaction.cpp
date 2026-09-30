@@ -257,7 +257,7 @@ bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLStrin
 
     } catch (const CustomException &ce) {
         // Propagate exception further on victim's death.
-        if (ce.message == "victim is dead")
+        if (ce.message == "victim is dead" || ce.message == "caster is dead")
             throw VictimDeathException();        
 
     } catch (const ::Exception &e) {

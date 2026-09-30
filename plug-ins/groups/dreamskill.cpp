@@ -5,6 +5,7 @@
 #include "skillmanager.h"
 #include "skillgroup.h"
 #include "pcharacter.h"
+#include "rageoath.h"
 #include "room.h"
 #include "dreamland.h"
 #include "dlscheduler.h"
@@ -17,7 +18,6 @@
 #include "act.h"
 #include "l10n.h"
 
-CLAN(battlerager);
 GROUP(fightmaster);
 GROUP(weaponsmaster);
 GROUP(defensive);
@@ -93,10 +93,9 @@ Skill * DreamSkillManager::findRandomProfSkill(PCharacter *ch) const
         if (ch->getSkillData(skill->getIndex()).origin == SKILL_DREAM)
             continue;
         
-        // Reduce spell probability for Battleragers to zero.
-        if (skill->getSpell() && skill->getSpell()->isCasted())
-            if (ch->getClan() == clan_battlerager)
-                continue;
+        // Battleragers never dream of magic: spells, wands, blink and the like.
+        if (rage_skill_forbidden(ch, skill))
+            continue;
 
         // This is not a professional/class skill.
         GenericSkill *genSkill= dynamic_cast<GenericSkill *>(skill);

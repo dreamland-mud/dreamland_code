@@ -84,7 +84,8 @@ bool spell( int sn, int level, Character *ch, char *arg );
 bool spell_nocatch( int sn, int level, Character *ch, ::Pointer<SpellTarget>, int flags = 0 );
 bool spell_nocatch( ::Pointer<Spell> &spell, int level, Character *ch, ::Pointer<SpellTarget> target, int flags );
 
-void spell_by_item( Character *ch, Object *obj );
+/** oathPaid: a Battlerager already rolled his aura for this item, his own aura does not block it again. */
+void spell_by_item( Character *ch, Object *obj, bool oathPaid = false );
 
 bool savesDispel( int dis_level, int spell_level, int duration);
 bool checkDispel( int dis_level, Character *victim, int sn);

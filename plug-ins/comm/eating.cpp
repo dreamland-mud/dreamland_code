@@ -23,6 +23,7 @@
 #include "fight_extract.h"
 #include "damage_impl.h"
 #include "skill_utils.h"
+#include "rageoath.h"
 #include "fight.h"
 #include "act.h"
 #include "vnum.h"
@@ -31,7 +32,6 @@
 #include "def.h"
 #include "l10n.h"
 
-CLAN(battlerager);
 GSN(none);
 GSN(manacles);
 GSN(poison);
@@ -100,12 +100,8 @@ COMMAND(CEat, "eat")
                     return;
             }
 
-            if(!ch->is_npc( ) 
-                && ch->getClan( ) == clan_battlerager 
-                && !ch->is_immortal( )
-                && obj->item_type == ITEM_PILL)
-            {
-                ch->pecho(_("Воинам клана Ярости это ни к чему!"));
+            if (obj->item_type == ITEM_PILL && !rage_magic_allowed( ch, RAGE_POTION )) {
+                rage_magic_refuse( ch );
                 return;
             }
 
@@ -153,7 +149,10 @@ COMMAND(CEat, "eat")
             break;
 
     case ITEM_PILL:
-            spell_by_item( ch, obj );
+            if (!rage_member( ch ))
+                spell_by_item( ch, obj );
+            else if (!rage_own_magic( ch ))
+                spell_by_item( ch, obj, true );
             break;
     }
 
@@ -309,8 +308,8 @@ CMDRUNP( quaff )
 
     one_argument( argument, arg );
 
-    if(!ch->is_npc( ) && ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
-        ch->pecho(_("Ты же воин клана Ярости, а не презренный МАГ!"));
+    if (!rage_magic_allowed( ch, RAGE_POTION )) {
+        rage_magic_refuse( ch );
         return;
     }
 
@@ -345,7 +344,10 @@ CMDRUNP( quaff )
     if (oprog_quaff( obj, ch ))
         return;
 
-    spell_by_item( ch, obj );
+    if (!rage_member( ch ))
+        spell_by_item( ch, obj );
+    else if (!rage_own_magic( ch ))
+        spell_by_item( ch, obj, true );
 
     if (ch->is_adrenalined( ) || ch->fighting)
          ch->setWaitViolence( 2 );

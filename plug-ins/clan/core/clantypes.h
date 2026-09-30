@@ -75,6 +75,8 @@ public:
     XML_VARIABLE XMLIntegerNoEmpty goldCap;
     /** Reformed clans, one value per rank 0-8, empty = defaults: max skill %, extra skill levels, effect %. */
     XML_VARIABLE XMLVectorBase<XMLInteger> rankCap, rankLevelBonus, rankPower;
+    /** Reformed clans: highest rank a divine class (cleric, paladin, druid) reaches, 0 = no cap. */
+    XML_VARIABLE XMLIntegerNoEmpty divineRankCap;
     /** Reformed clans: catalog id -> item. */
     XML_VARIABLE XMLMapBase<ClanCatalogItem> catalog;
 };

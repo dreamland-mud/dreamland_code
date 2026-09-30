@@ -280,6 +280,7 @@ NMI_INVOKE(FeniaSpellContext, groupCast, "(func): вызвать ф-ию для 
 
 NMI_INVOKE(FeniaSpellContext, damageRoom, "(func): вызвать ф-ию для всех в комнате, кто не защищен от заклинания")
 {
+    DefaultSpell *mySpell = arg2spell(spell);
     Character *caster = arg2character(ch);
     RegisterList::const_iterator ai = args.begin();
     Register rfun = *ai++;
@@ -300,6 +301,13 @@ NMI_INVOKE(FeniaSpellContext, damageRoom, "(func): вызвать ф-ию для
             continue;
         if (vch->is_mirror() && number_percent() < 50)
             continue;
+
+        try {
+            if (mySpell->baneVictim(caster, vch))
+                continue;
+        } catch (const VictimDeathException &vde) {
+            throw Scripting::CustomException("caster is dead");
+        }
 
         calcDamage();
         vict = wrap(vch);

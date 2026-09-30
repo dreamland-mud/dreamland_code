@@ -32,6 +32,7 @@ fight_safe.cpp \
 immunity.cpp \
 follow_utils.cpp \
 skill_utils.cpp \
+rageoath.cpp \
 fight_extract.cpp \
 item_progs.cpp
 

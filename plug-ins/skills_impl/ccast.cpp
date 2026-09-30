@@ -16,6 +16,7 @@
 
 #include "dreamland.h"
 #include "clanreference.h"
+#include "rageoath.h"
 #include "fight.h"
 #include "fight_exception.h"
 #include "magic.h"
@@ -129,7 +130,7 @@ CMDRUN( cast )
         return;
     }
 
-    if (ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
+    if (ch->getClan( ) == clan_battlerager && !ch->is_immortal( ) && !rage_divine( ch )) {
         ch->pecho(_("Ты вои{Smн{Sfтельница{Sx {RКлана Ярости{x, а не презренный маг!"));
         return;
     }
@@ -142,6 +143,12 @@ CMDRUN( cast )
     // Find the spell and potentially adjust spell arguments.
     spell = spell_lookup(ch, fullArguments, spellName, spellArgs);
     spellArgs = normalize_string(spellArgs);
+
+    // A cleric or paladin of the Battleragers keeps only the prayers the Rage gods answer.
+    if (spell && rage_divine( ch ) && !rage_cast_allowed( ch, spell->getSkill( )->getName( ) )) {
+        ch->pecho(_("Боги Ярости не ответят на эту молитву."));
+        return;
+    }
     
     if (!spell) {
         if (ch->is_npc( ) && IS_CHARMED(ch)) 

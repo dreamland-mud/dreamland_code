@@ -18,6 +18,7 @@
 #include "spell.h"
 #include "clanreference.h"
 #include "pcharacter.h"
+#include "rageoath.h"
 #include "player_utils.h"
 #include "room.h"
 #include "../loadsave/behavior_utils.h"
@@ -33,7 +34,6 @@
 #include "def.h"
 #include "l10n.h"
 
-CLAN(battlerager);
 
 static bool mprog_cant_teach( PCharacter *client, NPCharacter *teacher, const char *skillName )
 {
@@ -114,9 +114,7 @@ void CPractice::pracShow( PCharacter *ch )
         if (!skill->available( ch ))
             continue;
         
-        if (skill->getSpell( ) 
-                && skill->getSpell( )->isCasted( ) 
-                && ch->getClan( ) == clan_battlerager)
+        if (rage_skill_forbidden( ch, skill ))
             continue;
 
         PCSkillData &data = ch->getSkillData( sn );

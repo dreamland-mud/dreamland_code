@@ -14,4 +14,10 @@ extern ClanOwnsHook clan_owns_hook;
 /** True if ch's clan is reformed and owns catalog item id. False while the clan plugin is unloaded. */
 bool clan_char_owns( Character *ch, const DLString &id );
 
+typedef int (*ClanPowerHook)( Character * );
+extern ClanPowerHook clan_power_hook;
+
+/** rankPower of ch's reformed clan at ch's rank, in percent. -1 while the clan plugin is unloaded. */
+int clan_char_power( Character *ch );
+
 #endif

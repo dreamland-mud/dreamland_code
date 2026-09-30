@@ -11,12 +11,19 @@
 #include "clanownshook.h"
 #include "clanrecords.h"
 #include "clantreasury.h"
-#include "character.h"
+#include "pcharacter.h"
 
 static bool char_owns( Character *ch, const DLString &id )
 {
     Clan &clan = *ch->getClan( );
     return clan_is_reformed( clan ) && clan_owns( clan, id );
+}
+
+static int char_power( Character *ch )
+{
+    if (ch->is_npc( ))
+        return 100;
+    return clan_rank_power( *ch->getClan( ), ch->getPC( )->getClanLevel( ) );
 }
 
 /** Plugs clan rank levels and catalog purchases into fight_core while this library is loaded. */
@@ -28,12 +35,14 @@ public:
     {
         skill_level_bonus_hook = &ClanSkill::rankLevelBonus;
         clan_owns_hook = &char_owns;
+        clan_power_hook = &char_power;
     }
 
     virtual void destruction( )
     {
         skill_level_bonus_hook = 0;
         clan_owns_hook = 0;
+        clan_power_hook = 0;
     }
 };
 
