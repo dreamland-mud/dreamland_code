@@ -16,6 +16,8 @@
 #include "character.h"
 #include "pcharactermanager.h"
 #include "so.h"
+#include "dreamland.h"
+#include "dlfilestream.h"
 
 #include "descriptor.h"
 #include "telnet.h"
@@ -409,34 +411,96 @@ const char * Descriptor::getRealHost( ) const
 
 Descriptor *descriptor_list;
 
-int Descriptor::max_online = 0;
-int Descriptor::max_offline = 0;
+static const DLString PEAK_FILE = "who_peak.json";
+static const int PEAK_DAYS = 7;
 
-void Descriptor::updateMaxOnline( )
+int Descriptor::offline_count = 0;
+
+static int peak_today()
 {
-    Descriptor *d;
-    int count = 0;
+    return time(0) / (24 * 60 * 60);
+}
 
-    for (d = descriptor_list; d != 0; d = d->next )
+// Day number -> peak for that day. Loaded lazily, so plugin reload re-reads the file.
+static Json::Value &peak_days()
+{
+    static Json::Value days;
+    static bool loaded = false;
+
+    if (!loaded) {
+        loaded = true;
+
+        try {
+            ostringstream buf;
+            DLFileStream(dreamland->getMiscDir(), PEAK_FILE).toStream(buf);
+
+            Json::Reader reader;
+            if (!reader.parse(buf.str(), days))
+                LogStream::sendError() << PEAK_FILE << ": " << reader.getFormattedErrorMessages() << endl;
+        } catch (const std::exception &) {
+            // No file yet: start counting from now.
+        }
+
+        if (!days.isObject())
+            days = Json::Value(Json::objectValue);
+    }
+
+    return days;
+}
+
+// The file is hand-editable: a non-integer value must read as 0, not throw.
+static int peak_value(const Json::Value &days, const std::string &key)
+{
+    const Json::Value &value = days[key];
+    return value.isIntegral() ? value.asInt() : 0;
+}
+
+void Descriptor::recordPeak( )
+{
+    int count = offline_count;
+
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next)
         if (d->connected == CON_PLAYING)
             count++;
-    
-    max_online = max( count, max_online );
+
+    Json::Value &days = peak_days();
+    int today = peak_today();
+    DLString key(today);
+
+    if (peak_value(days, key) >= count)
+        return;
+
+    days[key] = count;
+
+    for (const auto &name: days.getMemberNames())
+        if (atoi(name.c_str()) <= today - PEAK_DAYS)
+            days.removeMember(name);
+
+    try {
+        Json::FastWriter writer;
+        DLFileStream(dreamland->getMiscDir(), PEAK_FILE).fromString(writer.write(days));
+    } catch (const std::exception &ex) {
+        LogStream::sendError() << PEAK_FILE << ": " << ex.what() << endl;
+    }
 }
 
-int Descriptor::getMaxOnline( )
+void Descriptor::setOfflineCount(int count)
 {
-    return max_online;
+    offline_count = count;
+    recordPeak();
 }
 
-void Descriptor::updateMaxOffline(int newValue)
+int Descriptor::getWeekPeak()
 {
-    max_offline = max(max_offline, newValue);
-}
+    Json::Value &days = peak_days();
+    int today = peak_today();
+    int peak = 0;
 
-int Descriptor::getMaxOffline()
-{
-    return max_offline;
+    for (const auto &name: days.getMemberNames())
+        if (atoi(name.c_str()) > today - PEAK_DAYS)
+            peak = max(peak, peak_value(days, name));
+
+    return peak;
 }
 
 

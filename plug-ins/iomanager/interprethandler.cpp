@@ -601,7 +601,7 @@ void InterpretHandler::init( Descriptor *d )
     d->handle_input.push_front( new InterpretHandler );
     d->incomm[0] = '\0';
     d->inbuf[0] = '\0';
-    Descriptor::updateMaxOnline( );
+    Descriptor::recordPeak( );
 }
 
 

@@ -857,7 +857,7 @@ SERVLET_HANDLE(cmd_update_all, "/update/all")
 
     servlet_response_200(response, "Success");
 
-    Descriptor::updateMaxOffline(who_find_offline(0).size());
+    Descriptor::setOfflineCount(who_find_offline(0).size());
 }
 
 /**
@@ -904,7 +904,7 @@ SERVLET_HANDLE(cmd_update_one, "/update/one")
 
     servlet_response_200(response, "Success");
 
-    Descriptor::updateMaxOffline(who_find_offline(0).size());
+    Descriptor::setOfflineCount(who_find_offline(0).size());
 }
 
 
