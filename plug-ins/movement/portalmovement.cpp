@@ -19,6 +19,7 @@
 
 #include "fight_exception.h"
 #include "damage_impl.h"
+#include "rageoath.h"
 #include "damageflags.h"
 #include "interp.h"
 #include "act.h"
@@ -28,8 +29,6 @@
 #include "def.h"
 #include "l10n.h"
 
-CLAN(battlerager);
-GSN(spellbane);
 
 PortalMovement::PortalMovement( Character *ch, Object *portal )
                   : Walkment( ch )
@@ -87,7 +86,17 @@ bool PortalMovement::canMove( Character *wch )
 {
     return checkCharges( )
             && Walkment::canMove( wch )
-            && checkCurse( wch );
+            && checkCurse( wch )
+            && checkOath( wch );
+}
+
+bool PortalMovement::checkOath( Character *wch )
+{
+    if (!IS_SET(portal->extra_flags, ITEM_MAGIC) || rage_magic_allowed( wch, RAGE_PORTAL ))
+        return true;
+
+    rage_magic_refuse( wch );
+    return false;
 }
 
 bool PortalMovement::tryMove( Character *wch )
@@ -229,30 +238,16 @@ bool PortalMovement::applyWeb( Character *wch )
 
 bool PortalMovement::applySpellbane( Character *wch )
 {
-    if (wch->is_npc( ))
+    if (!IS_SET(portal->extra_flags, ITEM_MAGIC) || !rage_member( wch ))
         return true;
-    
-    if (!IS_SET(portal->extra_flags, ITEM_MAGIC))
+
+    // The oath still tolerates a portal at low ranks, but the aura rolls against it.
+    if (!rage_own_magic( wch ))
         return true;
-                
-    if (wch->getClan( ) != clan_battlerager)
-        return true;
-    
-    if (!wch->isAffected( gsn_spellbane ))
-        return true;
-    
-    try {
-        oldact(_("Магия $o2 аннигилирует с твоим спеллбаном!"), wch,portal,0,TO_CHAR);
-        oldact(_("Магия $o2 аннигилирует со спеллбаном $c2!"), wch,portal,0,TO_ROOM);
-        SkillDamage( wch, wch, gsn_spellbane, DAM_NEGATIVE, wch->max_hit / 3, DAMF_MAGIC ).hit( true );
-        interpret_raw( wch, "cb", "Меня ударило магическим порталом!" );
-    }
-    catch (const VictimDeathException &) {
-        interpret_raw( wch, "cb", "Меня УБИЛО магическим порталом!" );
-        return false;
-    }
-    
-    return true;
+
+    oldact(_("Магия $o2 гаснет, и проход не пропускает тебя."), wch, portal, 0, TO_CHAR);
+    oldact(_("Магия $o2 гаснет перед $c5."), wch, portal, 0, TO_ROOM);
+    return false;
 }
 
 bool PortalMovement::applyMovepoints( Character *wch )

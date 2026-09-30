@@ -384,7 +384,7 @@ bool spell( int sn, int level, Character *ch, char *arg )
 /*
  * cast a spell using pills or potions
  */
-void spell_by_item( Character *ch, Object *obj )
+void spell_by_item( Character *ch, Object *obj, bool oathPaid )
 {
     for (int i = 1; i <= 4; i++) {
         Skill *skill;
@@ -432,8 +432,11 @@ void spell_by_item( Character *ch, Object *obj )
         }
         
 
+        // A Battlerager's own potion already paid the oath (rage_own_magic at quaff/eat).
+        bool ownOath = oathPaid && result->victim == ch;
+
         try {
-            if (!spell->spellbane( ch, result->victim )) {
+            if (ownOath || !spell->spellbane( ch, result->victim )) {
                 bool fForbidCasting = false;
 
                 if (result->type == SpellTarget::CHAR && result->victim)

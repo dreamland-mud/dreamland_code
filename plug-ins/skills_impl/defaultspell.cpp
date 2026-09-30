@@ -41,6 +41,7 @@
 #include "def.h"
 #include "clanreference.h"
 #include "clanownshook.h"
+#include "rageoath.h"
 #include "l10n.h"
 
 GSN(spellbane);
@@ -61,6 +62,7 @@ GROUP(curative);
 GROUP(healing);
 GROUP(combat);
 GROUP(clan);
+GROUP(transportation);
 
 RELIG(none);
 
@@ -981,6 +983,11 @@ bool DefaultSpell::isPrayer( Character *caster ) const
  *          the victim you or your group is fighting with, near and ranged
  *
  *  - pets of btr block all defensive casts
+ *
+ *  Battlerager oath (rageoath.h): the deflect chance scales with the member's rank,
+ *  offensive prayers bounce off from rank 3, beneficial prayers pass only from a
+ *  Rage-god priest and only a rank-dependent list, transport rolls like magic,
+ *  and room spells roll per victim in baneVictim.
  */
 void DefaultSpell::baneMessage( Character *ch, Character *vch ) const
 {
@@ -1043,7 +1050,7 @@ bool DefaultSpell::baneAction( Character *ch, Character *bch, int failChance, in
     if (is_safe_nomessage( bch, ch )) 
         return false;
 
-    if ((failChance * number_percent( ) / 100) > (2 * bch->getSkill( gsn_spellbane ) / 3))
+    if ((failChance * number_percent( ) / 100) > rage_deflect( bch ))
         return false;
         
     baneMessage( ch, bch );
@@ -1057,6 +1064,8 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
     bool offensive = (type == SPELL_OFFENSIVE);
     bool defensive = (type == SPELL_DEFENSIVE);
     bool bannedVictim = (vch && vch->isAffected( gsn_spellbane ));
+    // Being moved or reached by magic: the aura rolls whoever casts it.
+    bool transport = getSkill( )->hasGroup( group_transportation );
     
     if (vch && vch->is_npc( ) && vch->master && vch->master->isAffected( gsn_spellbane )) {
         if (!offensive) {
@@ -1065,8 +1074,20 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
         }
     }
 
-    if (isPrayer( ch )) {
-        if (!bannedVictim || offensive)
+    if (isPrayer( ch ) && !transport) {
+        if (!bannedVictim)
+            return false;
+
+        if (offensive) {
+            int chance = rage_prayer_deflect( vch );
+            if (chance <= 0 || number_percent( ) > chance)
+                return false;
+
+            baneMessage( ch, vch );
+            return true;
+        }
+
+        if (rage_prayer_accepted( ch, vch, getSkill( )->getName( ) ))
             return false;
         
         baneMessage( ch, vch );
@@ -1074,19 +1095,15 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
     }
     
     try {
-        if (bannedVictim && defensive) {
+        if (bannedVictim && defensive && !transport) {
             baneMessage( ch, vch );
             baneDamage( ch, vch, mlevel );
             return true;
         }
 
-        if (bannedVictim && !defensive) {
-            int chance = gsn_spellbane->getEffective( vch ); 
+        if (bannedVictim) {
+            int chance = rage_deflect( vch );
             int damage = offensive ? 3 * mlevel : mlevel;
-
-            if (!vch->is_npc( )) {
-                chance = 2 * chance / 3;
-            }
 
             if (number_percent( ) > chance) { 
                 gsn_spellbane->improve( vch, false, ch );
@@ -1097,16 +1114,19 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
             baneDamage( ch, vch, damage );
             return true;
         }
+
+        // A priest's transport past nobody's aura: prayers never stir the ones around.
+        if (isPrayer( ch ))
+            return false;
         
         if (!offensive) {
             baneAround( ch, 0, mlevel / 2 );
             return false;
         }
 
-        if (!vch) {
-            baneAround( ch, 100, mlevel );
+        // Offensive room spell: every victim rolls on its own in baneVictim.
+        if (!vch)
             return false;
-        }
         
         baneForAssist( ch, vch );
         return false;
@@ -1114,6 +1134,11 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
     } catch (const VictimDeathException &) {
         return true;
     }
+}
+
+bool DefaultSpell::baneVictim( Character *ch, Character *vch ) const
+{
+    return rage_area_bane( ch, vch, isPrayer( ch ), true );
 }
 
 bool DefaultSpell::blockedByNobuff( Character *ch, Character *victim ) const

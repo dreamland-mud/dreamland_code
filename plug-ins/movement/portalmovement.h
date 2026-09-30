@@ -38,6 +38,7 @@ protected:
     virtual bool applyWeb( Character * );
     virtual bool applyMovepoints( Character * );
             bool applySpellbane( Character * );
+            bool checkOath( Character * );
 
     bool isNormalExit( );
     

@@ -62,6 +62,9 @@ public:
 
     virtual int getMaxRange( Character * ) const;                
     virtual bool spellbane( Character *, Character * ) const;
+    /** A room spell reaching vch: true when a Battlerager aura deflects it (per victim, half chance).
+     *  Retaliation may throw VictimDeathException for the caster. */
+    bool baneVictim( Character *ch, Character *vch ) const;
 
     // True if this (defensive) spell must be refused because the target -- a PC,
     // or a pet/charmy whose PC master -- has 'config nobuff' and the caster is a

@@ -8,6 +8,7 @@
 #include "profession.h"
 #include "room.h"
 #include "pcharacter.h"
+#include "rageoath.h"
 #include "clan.h"
 #include "spelltarget.h"
 #include "fight.h"
@@ -29,7 +30,6 @@
 
 using namespace std;
 
-CLAN(battlerager);
 
 /*----------------------------------------------------------------------
  * Skill
@@ -317,8 +317,8 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): при
     if (skill->available(ch))
         return Register(false);
     
-    // Do nothing for spells and battlerager clan.
-    if (skill->getSpell() && skill->getSpell()->isCasted() && ch->getClan() == clan_battlerager)
+    // Do nothing for magic skills of the battlerager clan.
+    if (rage_skill_forbidden(ch, skill))
         return Register(false);
 
     // Create and save temporary skill data.

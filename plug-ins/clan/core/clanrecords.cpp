@@ -3,6 +3,7 @@
 #include "clanorg.h"
 #include "clanreference.h"
 #include "pcharacter.h"
+#include "profflags.h"
 #include "pcharactermanager.h"
 #include "fenia/register-impl.h"
 #include "idcontainer.h"
@@ -11,6 +12,7 @@
 #include "l10n.h"
 #include "dreamland.h"
 #include "merc.h"
+#include "def.h"
 
 using namespace Scripting;
 
@@ -165,6 +167,12 @@ bool clan_promote_tenure( PCharacter *pc )
     for (int i = 0; i <= TENURE_LAST_RANK - TENURE_FIRST_RANK; i++)
         if (hours >= TENURE_HOURS[i] && TENURE_FIRST_RANK + i > target)
             target = TENURE_FIRST_RANK + i;
+
+    // Some clans keep their priests below the top ranks.
+    const ClanMembership *m = clan.getMembership( );
+    int cap = m ? m->divineRankCap.getValue( ) : 0;
+    if (cap > 0 && pc->getProfession( )->getFlags( pc ).isSet( PROF_DIVINE ))
+        target = min( target, cap );
 
     if (target <= rank)
         return false;

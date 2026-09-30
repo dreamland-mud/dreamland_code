@@ -9,6 +9,7 @@
 #include "skillmanager.h"                                                       
 #include "skillgroup.h"                                                       
 #include "skill_utils.h"
+#include "rageoath.h"
 #include "core/behavior/behavior_utils.h"
 #include "pcharacter.h"
 #include "player_utils.h"
@@ -39,7 +40,9 @@ bool CardSkill::visible( CharacterMemoryInterface * ch ) const
 
 bool CardSkill::available( Character * ch ) const
 {
-    return findCardLevel( ch ) >= cardLevel.getValue( );
+    // A Battlerager zealot gives up the deck with the rest of magic.
+    return findCardLevel( ch ) >= cardLevel.getValue( )
+           && rage_magic_allowed( ch, RAGE_CARDS );
 }
 
 bool CardSkill::usable( Character * ch, bool message = false ) const 

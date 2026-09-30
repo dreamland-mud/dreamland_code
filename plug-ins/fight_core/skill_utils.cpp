@@ -255,6 +255,13 @@ bool clan_char_owns( Character *ch, const DLString &id )
     return ch && clan_owns_hook && clan_owns_hook( ch, id );
 }
 
+ClanPowerHook clan_power_hook = 0;
+
+int clan_char_power( Character *ch )
+{
+    return ch && clan_power_hook ? clan_power_hook( ch ) : -1;
+}
+
 int skill_level(Skill &skill, Character *ch)
 {
     return skill_level_bonus(skill, ch) + ch->getModifyLevel();

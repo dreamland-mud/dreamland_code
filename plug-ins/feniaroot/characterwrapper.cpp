@@ -50,6 +50,7 @@
 #include "weapons.h"
 #include "damage.h"
 #include "skill_utils.h"
+#include "rageoath.h"
 #include "areaquestutils.h"
 #include "material.h"
 #include "feniaquest.h"
@@ -126,6 +127,7 @@ RELIG(none);   // god_none sentinel for the gear-advisor tattoo-slot filter
 
 GSN(dark_shroud);
 GSN(manacles);
+GSN(spellbane);
 GSN(charm_person);
 // Weapon/utility skills excluded from a weaponless pet's report, and the
 // combat-invalid set -- kept in sync with comm/report.cpp's own gsn list.
@@ -2555,6 +2557,27 @@ NMI_INVOKE( CharacterWrapper, setClan, "(name): устанавливает кл�
     
     return Register( );
 }
+NMI_GET( CharacterWrapper, rageDeflect, "шанс ауры ярости (spellbane) отразить прицельное заклинание, в процентах; 0 без ауры" )
+{
+    checkTarget();
+    if (!target->isAffected(gsn_spellbane))
+        return 0;
+    return rage_deflect( target );
+}
+
+NMI_INVOKE( CharacterWrapper, rageAreaBane, "(caster[,retaliate]): колдовство на всю комнату или местность дошло до персонажа; true, если аура ярости его отвела (половинный шанс)" )
+{
+    checkTarget();
+    Character *caster = argnum2character(args, 1);
+    bool retaliate = args.size() >= 2 && argnum2number(args, 2);
+
+    try {
+        return rage_area_bane( caster, target, false, retaliate );
+    } catch (const VictimDeathException &) {
+        return true;
+    }
+}
+
 NMI_GET( CharacterWrapper, clanPower, "сила клановых умений по рангу в клане после реформы, в процентах (100 вне реформы)" )
 {
     checkTarget();
@@ -2825,9 +2848,14 @@ NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane
     if (!victim)
         throw Scripting::IllegalArgumentException( );
 
-    // Figure out the flags.
+    // Figure out the flags. Without an explicit choice a Battlerager's aura
+    // (any spellbane on a player) still gets its roll.
     int flags = 0;
-    if (args.size() >= 4 && argnum2number(args, 4))
+    if (args.size() >= 4) {
+        if (argnum2number(args, 4))
+            SET_BIT(flags, FSPELL_BANE);
+    }
+    else if (!victim->is_npc() && victim->isAffected(gsn_spellbane))
         SET_BIT(flags, FSPELL_BANE);
     if (args.size() >= 5 && argnum2number(args, 5))
         SET_BIT(flags, FSPELL_VERBOSE);
