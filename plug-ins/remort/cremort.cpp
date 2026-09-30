@@ -109,6 +109,7 @@ CMDRUN( remort )
     REMOVE_BIT( new_ch->act, PLR_CONFIRMED|PLR_VAMPIRE|PLR_WANTED|PLR_NO_EXP|PLR_HOLYLIGHT|PLR_DIGGED|PLR_HARA_KIRI|PLR_MISOGI );
     new_ch->comm = pch->comm;
     new_ch->lines = pch->lines;
+    new_ch->setCreated( pch->getCreated( ) );
 
     if (pch->getClan( ) != clan_flowers) {
         new_ch->setQuestPoints(pch->getQuestPoints() +
