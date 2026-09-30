@@ -995,7 +995,7 @@ NMI_GET( ClanWrapper, joinMinLevel, "минимальный уровень дл�
     const ClanMembership *m = clanManager->find( name )->getMembership( );
     return m ? m->minLevel.getValue( ) : 0;
 }
-NMI_GET( ClanWrapper, joinMode, "как вступают: never, always (сразу) или verify (по петиции)" )
+NMI_GET( ClanWrapper, joinMode, "как вступают в клан до реформы: never (только боги) или always (сразу)" )
 {
     const ClanMembership *m = clanManager->find( name )->getMembership( );
     return m ? petition_table.name( m->mode.getValue( ) ) : DLString( "never" );
@@ -1348,6 +1348,93 @@ NMI_INVOKE( ClanWrapper, diplomacy, "(clan): англ название дипл�
               [ diplomacy_number( clanManager->find( name ),
                                   clanManager->findExisting( otherName ) )
               ];
+}
+
+static Clan * arg2clan( const RegisterList &args, int num )
+{
+    const Register &arg = argnum( args, num );
+    DLString otherName;
+
+    if (arg.type == Register::STRING)
+        otherName = arg.toString( );
+    else
+        otherName = wrapper_cast<ClanWrapper>( arg )->name;
+
+    Clan *clan = clanManager->findExisting( otherName );
+    if (!clan)
+        throw Scripting::Exception( "No such clan" );
+    return clan;
+}
+
+// Both sides of a treaty must take part in diplomacy and have stored data.
+static ClanData * diplomacy_data( Clan *clan )
+{
+    if (!clan->hasDiplomacy( ) || !clan->getData( ))
+        throw Scripting::Exception( "clan " + clan->getName( ) + " has no diplomacy" );
+    return clan->getData( );
+}
+
+// Treaties a clan can hold: alliance (0) to oppression (7).
+static int arg2treaty( const RegisterList &args, int num )
+{
+    int dip = argnum2number( args, num );
+    if (dip < 0 || dip >= diplomacy_count - 1)
+        throw Scripting::Exception( "treaty level out of range" );
+    return dip;
+}
+
+NMI_GET( ClanWrapper, hasDiplomacy, "true, если клан участвует в дипломатии" )
+{
+    Clan *clan = clanManager->find( name );
+    return Register( clan->hasDiplomacy( ) && clan->getData( ) != 0 );
+}
+
+NMI_INVOKE( ClanWrapper, diplomacyLevel, "(clan): номер дипломатии с кланом clan, от 0 (альянс) до 7; 8, если у кого-то из двоих нет дипломатии" )
+{
+    Clan *clan = clanManager->find( name );
+    Clan *other = arg2clan( args, 1 );
+
+    if (!clan->getData( ) || !other->getData( ))
+        return Register( diplomacy_count - 1 );
+    return Register( diplomacy_number( clan, other ) );
+}
+
+NMI_INVOKE( ClanWrapper, proposition, "(clan): номер дипломатии, которую клан clan предлагает этому; без предложения равен текущей" )
+{
+    Clan *other = arg2clan( args, 1 );
+    return Register( diplomacy_data( clanManager->find( name ) )->getProposition( other ) );
+}
+
+NMI_INVOKE( ClanWrapper, setTreaty, "(clan, level): установить дипломатию level (0-7) между этим кланом и clan с обеих сторон, предложения сбрасываются" )
+{
+    Clan *clan = clanManager->find( name );
+    Clan *other = arg2clan( args, 1 );
+    int dip = arg2treaty( args, 2 );
+    ClanData *mine = diplomacy_data( clan );
+    ClanData *theirs = diplomacy_data( other );
+
+    mine->setDiplomacy( other, dip );
+    mine->setProposition( other, dip );
+    mine->save( );
+
+    theirs->setDiplomacy( clan, dip );
+    theirs->setProposition( clan, dip );
+    theirs->save( );
+    return Register( );
+}
+
+NMI_INVOKE( ClanWrapper, offer, "(clan, level): предложить клану clan дипломатию level (0-7) от имени этого клана; действующая не меняется" )
+{
+    Clan *clan = clanManager->find( name );
+    Clan *other = arg2clan( args, 1 );
+    int dip = arg2treaty( args, 2 );
+
+    diplomacy_data( clan );
+    ClanData *theirs = diplomacy_data( other );
+
+    theirs->setProposition( clan, dip );
+    theirs->save( );
+    return Register( );
 }
 
 NMI_INVOKE( ClanWrapper, title, "(ch[, lang]): клановый титул для онлайн или офлайн персонажа; с lang (0=en,1=ru,2=ua) -- звание на языке зрителя (падает на русский, если английской формы нет)" )
