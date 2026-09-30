@@ -389,9 +389,7 @@ void Damage::protectSanctuary( )
         dam /= 2;
     }
     else if (victim->isAffected(gsn_dark_shroud)) {
-        if (victim->is_npc( ) 
-                && victim->getNPC( )->behavior
-                && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
+        if (victim->is_npc( ) && mob_has_occupation( victim->getNPC( ), OCC_CLANGUARD ))
             dam /= 2;
         else
             dam = dam * 6 / 10;

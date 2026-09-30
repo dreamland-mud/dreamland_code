@@ -192,9 +192,7 @@ void WeaponOneHit::damApplyCounter( )
     if (!gsn_counter->usable(victim))
         return;
     
-    if (victim->is_npc( ) 
-        && victim->getNPC( )->behavior 
-        && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
+    if (victim->is_npc( ) && mob_has_occupation( victim->getNPC( ), OCC_CLANGUARD ))
         return;
 
     if (is_safe_nomessage(victim, ch) || is_safe_nomessage(ch,victim))

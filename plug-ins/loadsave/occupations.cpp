@@ -67,9 +67,19 @@ bool mob_has_occupation( NPCharacter *mob, const DLString &occName )
     return mob_has_occupation( mob, occType );
 }
 
+// Fenia behavior that grants an occupation, when its name differs from the
+// occupation's own (behavior names may have spaces, occupation names don't).
+static const char * occ_behavior_name( int occType )
+{
+    if (occType == OCC_CLANGUARD)
+        return "clan guard";
+
+    return occ_type2name( occType );
+}
+
 bool mob_has_occupation( NPCharacter *mob, int occType )
 {
-    const char *occName = occ_type2name(occType);
+    const char *occName = occ_behavior_name(occType);
 
     if (!occName)
         return false;
