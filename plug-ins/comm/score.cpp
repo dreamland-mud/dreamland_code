@@ -57,8 +57,17 @@ static DLString show_money( Character *ch, int g, int s )
     return fmt( ch, _("нет денег.") );
 }
 
+/* Exp stops buying levels at LEVEL_HERO - 1: past that there is no next level. */
+static int exp_to_level( PCharacter *ch )
+{
+    return ch->getRealLevel( ) < LEVEL_HERO - 1 ? ch->getExpToLevel( ) : 0;
+}
+
 static DLString show_experience( PCharacter *ch )
 {
+    if (ch->getRealLevel( ) >= LEVEL_HERO - 1)
+        return fmt( ch, _("У тебя %1$d очк%1$Iо|а|ов опыта."), ch->exp.getValue( ) );
+
     return fmt( ch, _("У тебя %1$d очк%1$Iо|а|ов опыта. "
                "До следующего уровня осталось %2$d очк%2$Iо|а|ов из %3$d."),
                ch->exp.getValue( ),
@@ -600,7 +609,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
     if (arg_is(arg, "exp")) {
-        ch->pecho(_("Опыта до уровня %d."), pch->getExpToLevel());
+        ch->pecho(_("Опыта до уровня %d."), exp_to_level(pch));
         return;
     }
     if (arg_is(arg, "age")) {
@@ -902,7 +911,7 @@ _("     %s| %sОпыта до уровня:{x %-6d                              
 "     |                                    %sЖизни:{x %5d / %5d         %s|"),
         CLR_FRAME,
         CLR_CAPT,
-        pch->getExpToLevel( ),
+        exp_to_level( pch ),
         CLR_FRAME,
 
         CLR_CAPT,
