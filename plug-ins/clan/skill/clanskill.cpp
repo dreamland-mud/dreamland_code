@@ -274,8 +274,17 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
         buf << pad << fmt(ch, _("Досталось тебе разученным на %1$s"), learned.c_str());
     } else {
         buf << pad << fmt(ch, _("Доступно тебе с уровня {C%1$d{x"), getLevel( ch ));
-        if (available( ch ))
+        if (available( ch )) {
             buf << fmt(ch, _(", изучено на %1$s"), learned.c_str());
+
+            // getLearned() clamps to the rank cap silently: say so, or a
+            // 100% skill that fails looks like a bug.
+            if (isRankCapped( ch, getClanInfo( ch ) )) {
+                int cap = clan_rank_cap( *ch->getClan( ), ch->getClanLevel( ) );
+                if (cap < data.learned)
+                    buf << fmt(ch, _(", но ранг в клане дает ему работать лишь на {C%1$d%%{x"), cap);
+            }
+        }
     }
 
     buf << "." << endl
