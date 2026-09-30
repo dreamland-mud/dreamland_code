@@ -7,7 +7,6 @@
 #include "mocregistrator.h"
 
 #include "clanskill.h"
-#include "clanorgskill.h"
 #include "skilllevelhook.h"
 #include "clanownshook.h"
 #include "clanrecords.h"
@@ -45,7 +44,6 @@ extern "C"
         SO::PluginList ppl;
         
         Plugin::registerPlugin<MocRegistrator<ClanSkill> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<ClanOrgSkill> >( ppl );
         Plugin::registerPlugin<ClanSkillLevelHookPlugin>( ppl );
         
         return ppl;

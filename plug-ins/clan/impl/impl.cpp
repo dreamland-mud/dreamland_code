@@ -22,6 +22,7 @@
 #include "affecthandlertemplate.h"
 #include "dlscheduler.h"
 
+#include "defaultclan.h"
 #include "battlerager.h"
 #include "shalafi.h"
 #include "chaos.h"
@@ -80,7 +81,6 @@ extern "C"
     {
         SO::PluginList ppl;
         
-        Plugin::registerPlugin<MocRegistrator<KnightOrder> >( ppl );
         Plugin::registerPlugin<MocRegistrator<DefaultClan> >( ppl );
     
         /*
@@ -102,7 +102,6 @@ extern "C"
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardKnight> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanItemKnight> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanAltarKnight> >( ppl );
-        Plugin::registerPlugin<COrden>( ppl );
         
         /*
          * lion
@@ -121,15 +120,12 @@ extern "C"
         /*
          * shalafi
          */
-        Plugin::registerPlugin<MocRegistrator<ShalafiClan> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<ShalafiFaculty> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardShalafi> >( ppl );
         
         /*
          * invader
          */
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardInvader> >( ppl );
-        Plugin::registerPlugin<CDarkLeague>( ppl );
 
         /*
          * other guards

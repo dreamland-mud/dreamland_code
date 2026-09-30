@@ -26,7 +26,6 @@
 #include "object.h"
 #include "room.h"
 #include "affect.h"
-#include "religion.h"
 
 #include "damage.h"
 #include "fight.h"
@@ -131,69 +130,6 @@ int ClanGuardShalafi::getCast( Character *victim )
 
         return sn;
 }
-
-/*--------------------------------------------------------------------------
- * ShalafiFaculty 
- *-------------------------------------------------------------------------*/
-
-ShalafiFaculty::ShalafiFaculty() 
-     : classes(professionManager)
-{    
-}
-
-bool ShalafiFaculty::canInduct(PCMemoryInterface *pci) const
-{
-    return classes.isSet(pci->getProfession());
-}
-
-const DLString &ShalafiFaculty::getTitle(PCMemoryInterface *pci, lang_t lang) const
-{
-    return titles.build(pci, lang);
-}
-
-/*--------------------------------------------------------------------------
- * ShalafiClan 
- *-------------------------------------------------------------------------*/
-
-bool ShalafiClan::canInduct(PCharacter *ch) const
-{
-    if (!DefaultClan::canInduct(ch))
-        return false;
-
-    // TODO these checks can be changed to "ch.religion.path != 'rage'", 
-    // once a Path becomes a separate concept in the code.
-    if (ch->getReligion() == god_alala 
-        || ch->getReligion() == god_ares
-        || ch->getReligion() == god_turlok
-        || ch->getReligion() == god_goktengri)
-        return false;
-
-    if (ch->getCurrStat(STAT_INT) <  23)
-        return false;
-        
-    return true;
-}
-
-void ShalafiClan::onInduct(PCharacter *ch) const
-{
-    const DLString &prof = ch->getProfession()->getName();
-
-    // Reformed clans have no faculties, and the XML may carry no <orgs> at all.
-    if (clan_is_reformed(*this) || !getOrgs())
-        return;
-
-    for (auto &o: *getOrgs())
-        if (o.second->canInduct(ch)) {
-            ClanOrgs::setAttr(ch, o.first);
-            ch->pecho(_("Ты поступаешь на {b%N4{x."), o.second->shortDescr.c_str());
-            return;
-        }
-
-    LogStream::sendWarning() << "Shalafi: no faculty found for class "  << prof << endl;
-}
-
-
-
 
 SPELL_DECL(MentalKnife);
 VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int level ) 

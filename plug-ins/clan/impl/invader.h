@@ -7,7 +7,6 @@
 #define INVADER_H 
 
 #include "clanmobiles.h"
-#include "commandplugin.h"
 
 class ClanGuardInvader: public ClanGuard {
 XML_OBJECT
@@ -18,20 +17,6 @@ protected:
         virtual void actPush( PCharacter * );
         virtual void actGreet( PCharacter * );
         virtual int getCast( Character * );
-};
-
-class CDarkLeague : public CommandPlugin {
-public:
-    typedef ::Pointer<CDarkLeague> Pointer;
-
-    CDarkLeague( );
-    virtual void run( Character *, const DLString & );
-    virtual bool visible( Character * ) const;
-
-private:
-    void doUsage( PCharacter * );
-
-    static const DLString COMMAND_NAME;
 };
 
 
