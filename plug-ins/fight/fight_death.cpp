@@ -70,6 +70,10 @@ CONFIGURABLE_LOADED(fight, loot)
     loot = value;
 }
 
+// Combat AI profiles (fight/combat_ai.json). Read only by Fenia, through
+// .config("fight/combat_ai"): see dreamland_fenia "utils/combat ai".
+CONFIGURABLE_DECL(fight, combat_ai)
+
 enum {
     LOOT_DESTROY,
     LOOT_DROP,

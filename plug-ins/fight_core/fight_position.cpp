@@ -199,9 +199,9 @@ void set_violent( Character *ch, Character *victim, bool fAlways )
             buf << ch->getNameC() << " атакует чармиса " << victim->getNameC();
         } else if (victim->in_room->pIndexData->clan != clan_none && 
                    ch->getClan( ) != victim->in_room->pIndexData->clan && ( 
-            IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)) ||
-            IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_HEALER)) || 
-            IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)) ) ) {
+            mob_has_occupation( victim->getNPC( ), OCC_CLANGUARD ) ||
+            mob_has_occupation( victim->getNPC( ), OCC_HEALER ) ||
+            mob_has_occupation( victim->getNPC( ), OCC_SHOPPER ) ) ) {
             buf << ch->getNameC() << " атакует моба на территории " << victim->in_room->pIndexData->clan->getRussianName().ruscase('2') ;
         } else return;
     } else buf << ch->getNameC() << " атакует " << victim->getNameC();
