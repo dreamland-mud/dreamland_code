@@ -433,7 +433,7 @@ void spell_by_item( Character *ch, Object *obj, bool oathPaid )
         
 
         // A Battlerager's own potion already paid the oath (rage_own_magic at quaff/eat).
-        bool ownOath = oathPaid && result->victim == ch;
+        bool ownOath = oathPaid && (result->victim == ch || result->type == SpellTarget::ROOM);
 
         try {
             if (ownOath || !spell->spellbane( ch, result->victim )) {

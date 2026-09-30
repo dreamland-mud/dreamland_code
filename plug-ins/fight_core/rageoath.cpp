@@ -185,7 +185,7 @@ bool rage_own_magic( Character *ch )
     return burned;
 }
 
-bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retaliate )
+bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retaliate, bool quiet )
 {
     if (!vch->isAffected( gsn_spellbane ))
         return false;
@@ -194,8 +194,10 @@ bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retali
     if (chance <= 0 || number_percent( ) > chance)
         return false;
 
-    oldact( _("Твоя аура ярости отводит от тебя это колдовство."), vch, 0, 0, TO_CHAR );
-    oldact( _("Аура ярости $c2 отводит колдовство в сторону."), vch, 0, 0, TO_ROOM );
+    if (!quiet) {
+        oldact( _("Твоя аура ярости отводит от тебя это колдовство."), vch, 0, 0, TO_CHAR );
+        oldact( _("Аура ярости $c2 отводит колдовство в сторону."), vch, 0, 0, TO_ROOM );
+    }
 
     if (retaliate && !prayer && caster && caster != vch
         && !is_safe_nomessage( vch, caster ) && !is_safe_nomessage( caster, vch ))

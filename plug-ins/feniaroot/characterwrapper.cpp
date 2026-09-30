@@ -2565,14 +2565,20 @@ NMI_GET( CharacterWrapper, rageDeflect, "шанс ауры ярости (spellba
     return rage_deflect( target );
 }
 
-NMI_INVOKE( CharacterWrapper, rageAreaBane, "(caster[,retaliate]): колдовство на всю комнату или местность дошло до персонажа; true, если аура ярости его отвела (половинный шанс)" )
+NMI_INVOKE( CharacterWrapper, rageAreaBane, "(caster[,retaliate[,skillName[,quiet]]]): колдовство на всю комнату или местность дошло до персонажа; true, если аура ярости его отвела (половинный шанс). skillName решает, молитва это или магия; quiet -- без сообщений" )
 {
     checkTarget();
     Character *caster = argnum2character(args, 1);
     bool retaliate = args.size() >= 2 && argnum2number(args, 2);
+    bool prayer = false;
+    if (args.size() >= 3) {
+        Skill *skill = argnum2skill(args, 3);
+        prayer = skill->getSpell() && skill->getSpell()->isPrayer(caster);
+    }
+    bool quiet = args.size() >= 4 && argnum2number(args, 4);
 
     try {
-        return rage_area_bane( caster, target, false, retaliate );
+        return rage_area_bane( caster, target, prayer, retaliate, quiet );
     } catch (const VictimDeathException &) {
         return true;
     }
@@ -2855,7 +2861,7 @@ NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane
         if (argnum2number(args, 4))
             SET_BIT(flags, FSPELL_BANE);
     }
-    else if (!victim->is_npc() && victim->isAffected(gsn_spellbane))
+    else if (victim != target && !victim->is_npc() && victim->isAffected(gsn_spellbane))
         SET_BIT(flags, FSPELL_BANE);
     if (args.size() >= 5 && argnum2number(args, 5))
         SET_BIT(flags, FSPELL_VERBOSE);

@@ -585,6 +585,13 @@ void char_update( )
         {
             interpret_raw( ch, "spellbane" );
         }
+        // Left or kicked out of the clan: the gods of Rage take the aura back.
+        else if (!ch->is_npc( )
+                && ch->getClan( ) != clan_battlerager
+                && ch->isAffected( gsn_spellbane ))
+        {
+            affect_strip( ch, gsn_spellbane, true );
+        }
 
         // Coup de grace.
         if ((ch->position == POS_INCAP && number_range(0, 1) == 0)

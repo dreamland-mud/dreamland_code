@@ -54,8 +54,9 @@ bool rage_own_magic( Character *ch );
 /**
  * Room-wide magic reaches a member: half the targeted chance. On a deflect the member is
  * spared and, when retaliate is set, the caster takes the member's level in damage.
+ * quiet: no messages (a lingering room affect rolling every round).
  * May throw VictimDeathException for the caster.
  */
-bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retaliate );
+bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retaliate, bool quiet = false );
 
 #endif

@@ -286,8 +286,10 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
         return;
     }
 
-    if (rage_member( ch ) && rage_own_magic( ch ))
+    if (rage_member( ch ) && rage_own_magic( ch )) {
+        ch->setWait( language->getBeats(ch) / 2 );
         return;
+    }
     
     chance = language->getEffective( ch );
 
