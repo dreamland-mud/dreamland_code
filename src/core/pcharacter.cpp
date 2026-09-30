@@ -299,6 +299,7 @@ void PCharacter::init( )
     password = "";
     lastAccessTime.setTime( 0 );
     lastAccessHost = "";
+    created.setValue( 0 );
     petition.assign( clan_none );
     clanLevel = 0;
     hometown.assign( home_none );

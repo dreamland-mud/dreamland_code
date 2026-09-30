@@ -2132,6 +2132,19 @@ NMI_SET( CharacterWrapper, baseLang, "язык регистрации; став�
     target->getPC( )->setBaseLang( (lang_t)arg.toNumber( ) );
 }
 
+NMI_GET( CharacterWrapper, created, "unix time the character was created (0 = unknown); survives remort" )
+{
+    checkTarget( );
+    CHK_NPC
+    return Register( (int)target->getPC( )->getCreated( ) );
+}
+NMI_SET( CharacterWrapper, created, "unix creation time; stamped by the nanny (notifyCreated), backfilled for older characters" )
+{
+    checkTarget( );
+    CHK_NPC
+    target->getPC( )->setCreated( arg.toNumber( ) );
+}
+
 NMI_INVOKE( CharacterWrapper, seeName, "(ch[, case]): как мы видим имя и претитул ch в падеже case") 
 {
     checkTarget( );

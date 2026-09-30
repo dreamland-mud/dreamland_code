@@ -143,6 +143,8 @@ public:
     virtual const Date& getLastAccessTime( ) const ;
     virtual void setLastAccessTime( const Date& ) ;
     void setLastAccessTime( );
+    inline long getCreated( ) const { return created.getValue( ); }
+    inline void setCreated( long t ) { created.setValue( t ); }
 
     virtual const DLString& getLastAccessHost( ) const ;
     virtual void setLastAccessHost( const DLString& ) ;
@@ -273,6 +275,7 @@ private:
     XML_VARIABLE XMLString englishName;
     XML_VARIABLE XMLInflectedString ukrainianName;
     XML_VARIABLE XMLIntegerNoEmpty baseLang;   // registration language + 1 (0 = unset)
+    XML_VARIABLE XMLLongNoEmpty created;       // unix time the character was first created (0 = unknown); survives remort
 
     XML_VARIABLE XMLStringNoEmpty title;
     XML_VARIABLE XMLStringNoEmpty pretitle;
