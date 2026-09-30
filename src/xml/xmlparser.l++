@@ -199,6 +199,12 @@ CDATA						"![CDATA["
 	attributeValue += YYText( )[1];
 }
 
+<NS_XMLAttributeValue>"&quot;"	{ attributeValue += '"'; }
+<NS_XMLAttributeValue>"&amp;"	{ attributeValue += '&'; }
+<NS_XMLAttributeValue>"&lt;"	{ attributeValue += '<'; }
+<NS_XMLAttributeValue>"&gt;"	{ attributeValue += '>'; }
+<NS_XMLAttributeValue>"&apos;"	{ attributeValue += '\''; }
+
 <NS_XMLAttributeValue>.	{
 	attributeValue += YYText( )[0];
 }

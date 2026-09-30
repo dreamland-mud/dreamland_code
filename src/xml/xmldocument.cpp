@@ -39,6 +39,35 @@ DLString XMLDocument::encode(const DLString &str) const
     }
 }
 
+/*
+ * XML 1.0 forbids C0 control bytes other than tab/LF/CR, and they can't be
+ * escaped either. Legacy data holds the colour push/pop markers as raw bytes
+ * ({ followed by 0x01/0x02, from before mudtags used {1/{2); rewrite those to
+ * the equivalent {1/{2 and drop any other control byte (e.g. ANSI escapes a
+ * client sent into a channel), so every file we write parses as XML.
+ */
+static DLString sanitize_controls( const DLString &str )
+{
+    DLString out;
+    char prev = 0;
+
+    for (std::string::const_iterator i = str.begin( ); i != str.end( ); i++) {
+        char ch = *i;
+
+        if ((unsigned char)ch < ' ' && ch != '\t' && ch != '\n' && ch != '\r') {
+            if (prev == '{' && (ch == '\001' || ch == '\002'))
+                out += (ch == '\001' ? '1' : '2');
+            prev = 0;
+            continue;
+        }
+
+        out += ch;
+        prev = ch;
+    }
+
+    return out;
+}
+
 void XMLDocument::emit( const XMLNode &node, ostream& ostr, int space, bool& cdataPrev ) const
 {
     const NodeList &nlist = node.getNodeList( );
@@ -50,12 +79,12 @@ void XMLDocument::emit( const XMLNode &node, ostream& ostr, int space, bool& cda
         switch( pnode->getType( ) )
         {
         case XML_CDATA:
-            ostr << "<![CDATA[" << encode(pnode->getCData( )) << "]]>";
+            ostr << "<![CDATA[" << sanitize_controls(encode(pnode->getCData( ))) << "]]>";
             cdataPrev = true;
             break;
         case XML_TEXT:
             {
-                DLString str(encode(pnode->getCData( )));
+                DLString str(sanitize_controls(encode(pnode->getCData( ))));
 
                 for( std::string::const_iterator ipos = str.begin( );ipos != str.end( );ipos++ ) {
                     char ch = *ipos;
@@ -82,10 +111,22 @@ void XMLDocument::emit( const XMLNode &node, ostream& ostr, int space, bool& cda
             const AttributeListType &attrs = pnode->getAttributes( );
             AttributeListType::const_iterator iattr;
             
-            for( iattr = attrs.begin( ); iattr != attrs.end( ); iattr++ )
-                ostr << ' ' << iattr->first << "=\"" 
-                     << encode(iattr->second).substitute('\\', "\\\\").substitute('"', "\\\"")
-                     << '"';
+            // Attribute values: backslash keeps its legacy \\ escape (the parser
+            // still reads old \" files), the rest are standard XML entities.
+            for( iattr = attrs.begin( ); iattr != attrs.end( ); iattr++ ) {
+                ostr << ' ' << iattr->first << "=\"";
+                DLString val(sanitize_controls(encode(iattr->second)));
+                for (std::string::const_iterator ipos = val.begin( ); ipos != val.end( ); ipos++) {
+                    switch (*ipos) {
+                    case '\\': ostr << "\\\\";   break;
+                    case '&':  ostr << "&amp;";  break;
+                    case '<':  ostr << "&lt;";   break;
+                    case '"':  ostr << "&quot;"; break;
+                    default:   ostr << *ipos;
+                    }
+                }
+                ostr << '"';
+            }
             
             if( pnode->getType( ) == XML_LEAF )
                 ostr << "/>";
