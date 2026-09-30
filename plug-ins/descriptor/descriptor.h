@@ -176,13 +176,13 @@ public:
     bool wsHandlePayload(const Json::Value&);
 
 private:
-    static int max_online;
-    static int max_offline;
+    static int offline_count;
 public:
-    static void updateMaxOnline( );
-    static int getMaxOnline( );
-    static void updateMaxOffline(int newValue);
-    static int getMaxOffline();
+    // Peak of simultaneous players (in game + listening on offline channels),
+    // kept per day on disk so the weekly peak survives reboots.
+    static void recordPeak( );
+    static void setOfflineCount(int count);
+    static int getWeekPeak();
 };
 
 extern Descriptor *descriptor_list;

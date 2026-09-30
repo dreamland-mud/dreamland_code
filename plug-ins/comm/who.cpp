@@ -113,6 +113,19 @@ list<PCMemoryInterface *> who_find_offline(PCharacter *looker)
     return result;
 }
 
+// Player files touched in the last week, online ones included.
+static int who_count_week_uniques()
+{
+    time_t cutoff = time(0) - 7 * 24 * 60 * 60;
+    int count = 0;
+
+    for (const auto &i: PCharacterManager::getPCM())
+        if (i.second->isOnline() || i.second->getLastAccessTime().getTime() >= cutoff)
+            count++;
+
+    return count;
+}
+
 // One immortal/coder rank cell for the 'who' left column: the rank word in the
 // viewer's language and the victim's gender, centred in the 13-wide column and
 // wrapped in its colour. RU is as authored; EN follows the Anatolia lineage level
@@ -342,8 +355,9 @@ CMDRUN(who)
     int total = online_count + offline_count;
 
     // Refresh offline player count, just in case.
-    Descriptor::updateMaxOffline(offline_count);
-    int max_total = Descriptor::getMaxOnline() + Descriptor::getMaxOffline();
+    Descriptor::setOfflineCount(offline_count);
+    int week_peak = Descriptor::getWeekPeak();
+    int week_uniques = who_count_week_uniques();
 
     if (online_count > 0)
         buf << fmt(ch, _("Сейчас в мире {W%1$d{w игрок%1$I|а|ов:"), online_count) << endl;
@@ -357,7 +371,8 @@ CMDRUN(who)
 
     buf << endl;
 
-    buf << fmt(ch, _("Всего {W%1$d{w, максимум за последнее время был {W%2$d{w."), total, max_total) << endl;
+    buf << fmt(ch, _("Всего {W%1$d{w, максимум за неделю {W%2$d{w, за неделю заходил%3$I|и|о {W%3$d{w игрок%3$I|а|ов."),
+               total, week_peak, week_uniques) << endl;
 
     if (!IS_SET( ch->act, PLR_CONFIRMED ) && pch->getRemorts( ).size( ) == 0) 
         buf << fmt(ch, _("Буква (U) рядом с твоим именем означает, что твое описание еще не одобрено богами.")) << endl
