@@ -225,8 +225,11 @@ static void load_PLAYER( PCharacter *pc, FILE *pfile )
                     break;
                 case 'P':
                     if (!strcmp( word0, "Pass" )) {
+                        // Hash into memory only. password_set() saves the profile,
+                        // and at this point nothing but the name is loaded, so it
+                        // overwrote the XML with a blank character on every boot.
                         DLString pwd = fread_dlstring( pfile );
-                        password_set( pc, pwd );
+                        pc->setPassword( digestWithRandomSalt( pwd ) );
                     }
                     break;
                 }
