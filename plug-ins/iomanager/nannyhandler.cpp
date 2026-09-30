@@ -369,10 +369,17 @@ NMI_INVOKE( NannyHandler, load, "" )
 
 NMI_INVOKE( NannyHandler, notifyCreated, "" )
 {
+    Character *ch = getCharacter( args );
+
+    // Only the new-character path calls this (remort carries created in cremort),
+    // so stamping here can't clobber a remorted character's original date.
+    if (!ch->is_npc( ) && ch->getPC( )->getCreated( ) == 0)
+        ch->getPC( )->setCreated( dreamland->getCurrentTime( ) );
+
     DescriptorStateManager::getThis( )->handle( 
              CON_CREATE_DONE, 
              CON_READ_MOTD,
-             getCharacter( args )->desc );
+             ch->desc );
     return Register( );
 }
 

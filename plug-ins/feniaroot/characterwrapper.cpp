@@ -2138,7 +2138,7 @@ NMI_GET( CharacterWrapper, created, "unix time the character was created (0 = un
     CHK_NPC
     return Register( (int)target->getPC( )->getCreated( ) );
 }
-NMI_SET( CharacterWrapper, created, "unix creation time; set once by the nanny, backfilled for older characters" )
+NMI_SET( CharacterWrapper, created, "unix creation time; stamped by the nanny (notifyCreated), backfilled for older characters" )
 {
     checkTarget( );
     CHK_NPC
