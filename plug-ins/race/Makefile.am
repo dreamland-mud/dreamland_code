@@ -17,6 +17,7 @@ librace_la_SOURCES = \
 raceflags.cpp \
 defaultrace.cpp \
 defaultpcrace.cpp \
+mobbodyconfig.cpp \
 impl.cpp
 
 librace_la_MOC = \

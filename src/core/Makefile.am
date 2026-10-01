@@ -53,7 +53,10 @@ extradescription.cpp \
 exits.cpp \
 resets.cpp \
 auction.cpp \
-calendar.cpp
+calendar.cpp \
+body.cpp \
+mobtiers.cpp \
+mobbody.cpp
 
 libcore_la_MOC = \
 affect.h \
@@ -71,3 +74,12 @@ behavior.h \
 helpmanager.h
 
 AM_CPPFLAGS += $(src_INCLUDES)
+
+# Mob body resolver unit test (mob reform A3). Not built by default:
+#   make -C src/core body_test && src/core/body_test $(srcdir)/tests/data
+EXTRA_PROGRAMS = body_test
+body_test_SOURCES = body.cpp mobtiers.cpp body_test.cpp
+# own flags so its objects never clash with libcore's libtool objects
+body_test_CXXFLAGS = $(AM_CXXFLAGS)
+body_test_LDADD = -ljsoncpp
+CLEANFILES = body_test
