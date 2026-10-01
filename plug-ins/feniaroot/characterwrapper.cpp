@@ -4247,12 +4247,19 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // treasure hunt, and must survive the unobtainable gate below. rootCarrier walks
     // out of nested containers, so a bagged copy the char holds counts too.
     std::map<int,int> carriedVnum;
+    // NPCs (by prototype vnum) actually holding a live copy right now. A limited item
+    // reset onto several mobs exists on only ONE of them, so its route must name that
+    // holder, not whichever reset source is cheapest (the halberd 15219 sent askers to
+    // Tim while the only copy sat with the Instructor).
+    std::map<int,std::set<int> > liveHolders;
     for (::Object *o = object_list; o; o = o->next) {
         int vn = o->pIndexData->vnum;
         spawned[vn]++;
         Character *rc = ga_rootCarrier( o );
         if (rc == 0 || rc->is_npc( ))
             gettable[vn]++;
+        if (rc != 0 && rc->is_npc( ))
+            liveHolders[vn].insert( rc->getNPC( )->pIndexData->vnum );
         else if (rc == target && o->wear_loc == wear_none)
             carriedVnum[vn] = 1;
     }
@@ -4321,6 +4328,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 newbieAreas.insert( rk->second->areaIndex );
 
     std::map<int,GAAcq> acq;
+    // The same mob-sourced routes keyed by holder: mob vnum -> (obj vnum -> route).
+    std::map<int,std::map<int,GAAcq> > acqByHolder;
     for (std::map<int,RoomIndexData *>::iterator rk = roomIndexMap.begin( ); rk != roomIndexMap.end( ); rk++) {
         RoomIndexData *pRoom = rk->second;
         int roomVnum = rk->first;
@@ -4375,6 +4384,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 if (trader && cmd == 'G') {
                     obj_index_data *po = get_obj_index( a1 );
                     ga_record( acq, a1, GA_BUY, lastMob->vnum, roomVnum, po ? po->cost : 0, 0 );
+                    ga_record( acqByHolder[lastMob->vnum], a1, GA_BUY, lastMob->vnum, roomVnum, po ? po->cost : 0, 0 );
                 } else {
                     // You must kill the holder, so its own level floors the fight
                     // even when it is passive and roomMax (aggro/assist only) is lower.
@@ -4409,10 +4419,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                         // regression (F2).
                         && !IS_SET( pRoom->room_flags, ROOM_SAFE|ROOM_NO_DAMAGE )
                         && !IS_SET( lastMob->act, ACT_SAFE );
-                    if (canRequest)
+                    if (canRequest) {
                         ga_record( acq, a1, GA_REQUEST, lastMob->vnum, roomVnum, 0, roomMax );
-                    else
+                        ga_record( acqByHolder[lastMob->vnum], a1, GA_REQUEST, lastMob->vnum, roomVnum, 0, roomMax );
+                    } else {
                         ga_record( acq, a1, GA_KILL, lastMob->vnum, roomVnum, 0, killGuard );
+                        ga_record( acqByHolder[lastMob->vnum], a1, GA_KILL, lastMob->vnum, roomVnum, 0, killGuard );
+                    }
                 }
             }
         }
@@ -4623,11 +4636,30 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         } else if (questReward.count( pObj->vnum )) {
             ac.method = GA_QUEST; ac.aux = questReward[pObj->vnum]; ac.guard = 0;
         } else {
-            std::map<int,GAAcq>::iterator it = acq.find( pObj->vnum );
-            if (it != acq.end( ))
-                ac = it->second;
-            else {
-                ac.method = GA_UNKNOWN; ac.guard = pObj->level;
+            // A limited item goes through whichever NPC holds a live copy now (easiest
+            // of them). Unlimited gear repops on every source, so the cheapest reset wins.
+            bool fromHolder = false;
+            if (pObj->limit > 0) {
+                std::map<int,std::set<int> >::iterator lh = liveHolders.find( pObj->vnum );
+                if (lh != liveHolders.end( ))
+                    for (std::set<int>::iterator h = lh->second.begin( ); h != lh->second.end( ); h++) {
+                        std::map<int,std::map<int,GAAcq> >::iterator bh = acqByHolder.find( *h );
+                        if (bh == acqByHolder.end( ))
+                            continue;
+                        std::map<int,GAAcq>::iterator r = bh->second.find( pObj->vnum );
+                        if (r != bh->second.end( ) && (!fromHolder || r->second.guard < ac.guard)) {
+                            ac = r->second;
+                            fromHolder = true;
+                        }
+                    }
+            }
+            if (!fromHolder) {
+                std::map<int,GAAcq>::iterator it = acq.find( pObj->vnum );
+                if (it != acq.end( ))
+                    ac = it->second;
+                else {
+                    ac.method = GA_UNKNOWN; ac.guard = pObj->level;
+                }
             }
         }
         if (ac.method == GA_QUEST)
