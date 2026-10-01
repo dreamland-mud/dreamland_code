@@ -134,11 +134,18 @@ void ObjectBehaviorManager::parse( Object * obj, FILE *fp ) {
         obj->behavior.fromStream( istr );
         if (obj->behavior)
             obj->behavior->setObj( obj );
-        else
-            LogStream::sendError( ) << "obj " << obj->pIndexData->vnum << ": saved behavior did not load" << endl;
 
     } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;
+    }
+
+    // The saved behavior did not load: rebuild it the way create_object_org does.
+    if (!obj->behavior) {
+        LogStream::sendError( ) << "obj " << obj->pIndexData->vnum << ": saved behavior did not load, reassigning" << endl;
+        if (obj->pIndexData->behavior)
+            assign( obj );
+        if (!obj->behavior)
+            assignBasic( obj );
     }
 }
 
