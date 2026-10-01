@@ -55,8 +55,15 @@ bool rage_own_magic( Character *ch );
  * Room-wide magic reaches a member: half the targeted chance. On a deflect the member is
  * spared and, when retaliate is set, the caster takes the member's level in damage.
  * quiet: no messages (a lingering room affect rolling every round).
+ * mana: the spell's cost, fed to divine members in the room on a non-prayer deflect.
  * May throw VictimDeathException for the caster.
  */
-bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retaliate, bool quiet = false );
+bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retaliate, bool quiet = false,
+                     int mana = 0 );
+/**
+ * A member's aura turned away hostile magic of the given mana cost: every divine
+ * member in the room draws half of it, at most once a combat round each.
+ */
+void rage_feed_priests( Character *caster, Character *vch, int mana );
 
 #endif

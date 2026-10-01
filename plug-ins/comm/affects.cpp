@@ -141,16 +141,19 @@ DLString AffectOutput::format_affect_location( Affect *paf )
     
     if (paf->location != APPLY_NONE) 
         switch (paf->location) {
+        // The modifier is a percent added on top of the base regeneration
+        // (update_params.cpp: gain += gain * heal_gain / 100), not a rate
+        // around 100: +20 is 20% faster, -50 is half as fast.
         case APPLY_HEAL_GAIN:
         case APPLY_MANA_GAIN:
-            if (paf->modifier > 100)
+            if (paf->modifier > 0)
                 buf << fmt( 0, _("улучшает {m%1$s{y на {m%2$d%%{y").getMessage( lang ).c_str( ),
                                apply_flags.message( paf->location, '1', lang ).c_str( ),
-                               paf->modifier - 100 );
-            else if (paf->modifier < 100 && paf->modifier > 0)
+                               (int)paf->modifier );
+            else if (paf->modifier < 0)
                 buf << fmt( 0, _("ухудшает {m%1$s{y на {m%2$d%%{y").getMessage( lang ).c_str( ),
                                apply_flags.message( paf->location, '1', lang ).c_str( ),
-                               100 - paf->modifier );
+                               -(int)paf->modifier );
             break;
 
         case APPLY_BITVECTOR:
