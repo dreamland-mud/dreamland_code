@@ -111,6 +111,11 @@ struct mob_index_data
     void resolveBody();
     /** Mob reform: tier, centre numbers and enabled off bits (needs vnum and body). */
     void deriveNumbers();
+    /** Saved-mobile stamp (BodyVer): a 64-bit hash of everything a saved
+     *  instance's body and numbers were built from -- the prototype's level,
+     *  tier, race, resolved body and centre numbers. Never the instance level,
+     *  which growth raises (decision 36). */
+    unsigned long long bodyStamp();
     /** The index field holding one bit set (act, off_flags, ..., parts). */
     int &bodyBits(int mobset);
     /** Authored diff for asave: the loaded add/del plus any direct edit made since load. */
