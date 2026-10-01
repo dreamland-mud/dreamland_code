@@ -74,6 +74,8 @@ void NPCharacter::init( )
     behavior.clear( );
     reset_room = 0;
     switchedFrom = 0;
+    for (int i = 0; i < MOBSET_MAX; i++)
+        baseBits[i] = 0;
 }
 
 /**************************************************************************

@@ -168,6 +168,26 @@ static Flags & char_flag_by_table(Character *ch, const FlagTable *table)
     return zeroFlags;
 }
 
+static int npc_set_by_table(const FlagTable *table)
+{
+    if (table == &affect_flags)
+        return MOBSET_AFF;
+    else if (table == &imm_flags)
+        return MOBSET_IMM;
+    else if (table == &res_flags)
+        return MOBSET_RES;
+    else if (table == &act_flags)
+        return MOBSET_ACT;
+    else if (table == &vuln_flags)
+        return MOBSET_VULN;
+    else if (table == &detect_flags)
+        return MOBSET_DET;
+    else if (table == &form_flags)
+        return MOBSET_FORM;
+
+    return -1;
+}
+
 static const Flags & race_flag_by_table(const Race *race, const FlagTable *table)
 {
     if (table == &affect_flags)
@@ -339,9 +359,19 @@ void affect_check(Character *ch, Affect *affect)
     }
 
     if (table && table != &part_flags) {    
-        const Flags &raceFlag = race_flag_by_table(ch->getRace().getElement(), table);
         Flags &charFlag = char_flag_by_table(ch, table);
-        charFlag.setBit(raceFlag.getValue());
+
+        // NPCs get back the body they were built with (index body plus saved
+        // diffs), not the race: a prototype or saved del must survive an
+        // affect wearing off (mob reform, plan §3.6 item 4).
+        if (ch->is_npc()) {
+            int set = npc_set_by_table(table);
+            if (set >= 0)
+                charFlag.setBit(ch->getNPC()->baseBits[set]);
+        } else {
+            const Flags &raceFlag = race_flag_by_table(ch->getRace().getElement(), table);
+            charFlag.setBit(raceFlag.getValue());
+        }
 
         if (table == &affect_flags && affect->bitvector.isSet(AFF_FLYING))
             if (!ch->affected_by.isSet(AFF_FLYING))
