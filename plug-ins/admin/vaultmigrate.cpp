@@ -546,7 +546,10 @@ static void vaultmigrate_goclanforce( Character *ch, DLString rest )
  * Contents move to the owner's vault; reset-seeded contents stay. Area furniture
  * (the room resets that vnum) keeps its shell with the owner stamp cleared, so
  * the mansion reset doesn't re-create a second one; a player-parked container is
- * deleted once empty. Deleted owner -> contents purged, same shell rule.
+ * deleted once empty. A container whose stamped owner no longer exists is NOT
+ * touched: on mansion furniture the stamp gates nothing (the door key does), so a
+ * stale stamp in a resold or shared house can hold a live player's things. Those
+ * are listed with the room's mansion owner for an immortal to decide.
  *------------------------------------------------------------------------*/
 #define VM_CARPENTER_CHEST 170   // craft/carpenter personal chest -- a live feature, never migrated
 
@@ -575,6 +578,18 @@ static bool vaultmigrate_is_mansionchest( Object *obj )
     return true;
 }
 
+// The room's mansion owner (props {"mansion":{"owner":X}}), or "-".
+static DLString vaultmigrate_room_mansion_owner( Room *room )
+{
+    const Json::Value &props = room->pIndexData->props;
+    if (props.isObject( ) && props["mansion"].isObject( ) && props["mansion"]["owner"].isString( )) {
+        DLString o = props["mansion"]["owner"].asString( );
+        if (!o.empty( ))
+            return o;
+    }
+    return "-";
+}
+
 // Area furniture = this room's resets drop this vnum on the floor ('O' reset).
 static bool vaultmigrate_is_room_furniture( Object *obj )
 {
@@ -593,9 +608,10 @@ static bool vaultmigrate_is_room_furniture( Object *obj )
 static void vaultmigrate_drymansion( Character *ch )
 {
     std::ostringstream dump;
-    dump << "owner\texists\troom_vnum\troom\tcontainer_vnum\tfurniture\titems\treset_kept\tto_migrate\n";
+    dump << "owner\texists\tmansion_owner\troom_vnum\troom\tcontainer_vnum\tfurniture\titems\treset_kept\tto_migrate\n";
 
     int total = 0, furniture = 0, migrate = 0, resetKept = 0, deletedOwner = 0, deletedItems = 0;
+    std::ostringstream skipped;
 
     for (Object *obj = object_list; obj != 0; obj = obj->next) {
         if (!vaultmigrate_is_mansionchest( obj ))
@@ -616,15 +632,23 @@ static void vaultmigrate_drymansion( Character *ch )
                 mig++;
         }
 
-        dump << owner << "\t" << (exists ? "yes" : "NO") << "\t" << obj->in_room->vnum << "\t"
+        DLString mowner = vaultmigrate_room_mansion_owner( obj->in_room );
+        dump << owner << "\t" << (exists ? "yes" : "NO") << "\t" << mowner << "\t" << obj->in_room->vnum << "\t"
              << obj->in_room->getName( ) << "\t" << obj->pIndexData->vnum << "\t"
              << (furn ? "furniture" : "parked") << "\t" << items << "\t" << kept << "\t" << mig << "\n";
 
         total++;
         if (furn) furniture++;
+        if (!exists) {
+            deletedOwner++;
+            deletedItems += mig;
+            skipped << "  room " << obj->in_room->vnum << "  stamp " << owner
+                    << "  house " << mowner << "  vnum " << obj->pIndexData->vnum
+                    << "  items " << mig << "\n";
+            continue;
+        }
         migrate += mig;
         resetKept += kept;
-        if (!exists) { deletedOwner++; deletedItems += mig; }
     }
 
     const char *path = "vaultmigrate-mansion-dryrun.txt";
@@ -638,7 +662,9 @@ static void vaultmigrate_drymansion( Character *ch )
     buf << "Containers found : " << total << "   (furniture " << furniture << ", parked " << total - furniture << ")\n";
     buf << "Items to migrate : " << migrate << "   (top-level, would move to owner vaults)\n";
     buf << "Reset items kept : " << resetKept << "\n";
-    buf << "Deleted owners   : " << deletedOwner << " containers / " << deletedItems << " items would be PURGED\n";
+    buf << "Dead-owner stamp : " << deletedOwner << " containers / " << deletedItems << " items SKIPPED (left as is)\n";
+    if (deletedOwner > 0)
+        buf << skipped.str( );
     buf << "\nFull manifest written to: " << path << "\n";
     page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -669,8 +695,9 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
         return;
     }
 
-    int shellsCleared = 0, parkedDeleted = 0, parkedKept = 0;
-    int itemsBanked = 0, itemsPurged = 0, itemsKeptReset = 0, itemsLeft = 0;
+    int shellsCleared = 0, parkedDeleted = 0, parkedKept = 0, skippedDead = 0;
+    int itemsBanked = 0, itemsKeptReset = 0, itemsLeft = 0;
+    std::ostringstream skipped;
 
     for (size_t i = 0; i < containers.size( ); i++) {
         Object *cont = containers[i];
@@ -679,6 +706,15 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
         DLString key = owner.toLower( );
         bool exists = PCharacterManager::find( owner ) != 0;
         bool furn = vaultmigrate_is_room_furniture( cont );
+
+        if (!exists) {
+            // Stale stamp: no vault to receive, and the house may belong to
+            // someone alive. Leave it whole for an immortal to judge.
+            skippedDead++;
+            skipped << "  room " << room->vnum << "  stamp " << owner
+                    << "  house " << vaultmigrate_room_mansion_owner( room ) << "\n";
+            continue;
+        }
 
         std::set<int> resetVnums;
         vaultmigrate_clan_reset_vnums( cont, resetVnums );
@@ -692,10 +728,7 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
                 itemsKeptReset++;
                 continue;
             }
-            if (!exists) {
-                itemsPurged += 1 + vaultmigrate_count_contents( it );
-                extract_obj( it );
-            } else if (bank_deposit( it, "player", key ))
+            if (bank_deposit( it, "player", key ))
                 itemsBanked++;
             else
                 itemsLeft++;                          // NOSAVEDROP / write failure
@@ -724,11 +757,12 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
     buf << "Parked containers deleted : " << parkedDeleted << "\n";
     buf << "Items banked to vaults    : " << itemsBanked << "\n";
     buf << "Reset items left in place : " << itemsKeptReset << "\n";
-    if (itemsPurged > 0)
-        buf << "Deleted-owner items purged: " << itemsPurged << "\n";
-    if (itemsLeft > 0 || parkedKept > 0)
-        buf << "{YItems KEPT{x                : " << itemsLeft << " in " << parkedKept
-            << " parked container(s) (NOSAVEDROP, or a write error)\n";
+    if (itemsLeft > 0)
+        buf << "{YItems not banked{x          : " << itemsLeft << "   (NOSAVEDROP, or a write error -- left in place)\n";
+    if (parkedKept > 0)
+        buf << "{YParked containers kept{x    : " << parkedKept << "   (still hold unbanked or reset-tagged items)\n";
+    if (skippedDead > 0)
+        buf << "{YDead-owner stamp, SKIPPED{x : " << skippedDead << "\n" << skipped.str( );
     page_to_char( buf.str( ).c_str( ), ch );
 }
 
