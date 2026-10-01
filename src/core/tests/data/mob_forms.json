@@ -1,0 +1,904 @@
+{
+ "version": 1,
+ "status": "C1 DRAFT. Lives in dreamland_tools until Phase C moves it to dreamland_world/fight/mob_forms.json.",
+ "source": "Sheet 12gaR7a3 (docs/plans/mob-reform-sheet/*.tsv) with every docs/plans/mob-reform.md §3.2/§3.3/§3.3a correction and §8 decisions 1-50 applied. Resolution order is documented in scripts/body-resolve.py.",
+ "groups": {
+  "functional": "stack freely",
+  "lower": "lower body, at most one",
+  "upper": "upper body, stacks on a lower body, several allowed",
+  "full": "whole body, excludes lower and upper forms except the ones it implies"
+ },
+ "renames": {
+  "undead": "skeletal",
+  "centaur": "quadruped",
+  "animal": "hoofed",
+  "bird": "winged",
+  "_note": "migration-time renames for the data pass. The resolver applies them as compat EXCEPT bird: that name is reused by the new full form, so the data pass picks winged or bird by content"
+ },
+ "deleted_forms": {
+  "edible": "replaced by the derived helper isEdible (rules.edible), decision 24",
+  "other": "replaced by construct, 0 code readers",
+  "intangible": "replaced by instant_decay. Fire elemental race gets mist instead (decision 28)",
+  "cold_blood": "now a PART (decision 29). Forms grant it through parts_add"
+ },
+ "forms": {
+  "poison": {
+   "group": "functional",
+   "res": [
+    "poison"
+   ],
+   "notes": "body parts are poisoned (fight_death.cpp:981)"
+  },
+  "magical": {
+   "group": "functional",
+   "det": [
+    "invis"
+   ],
+   "notes": "may cast and speak without sentient (cast gate is Phase A caster.cpp). Battlerager group rule is a separate ticket"
+  },
+  "instant_decay": {
+   "group": "functional",
+   "notes": "no corpse, no parts, items drop. Absorbs the deleted intangible"
+  },
+  "nonadoptable": {
+   "group": "functional",
+   "notes": "no charm/dominate/befriend"
+  },
+  "sentient": {
+   "group": "functional",
+   "notes": "random/recipe drops, speech, casting, global quests. Unlocks sentient_wearlocs of every part and the sheath slot. canHoldCards = sentient AND hands (decision 27)"
+  },
+  "skeletal": {
+   "group": "functional",
+   "renamed_from": "undead",
+   "implies_forms": [
+    "instant_decay"
+   ],
+   "parts_del": [
+    "brains",
+    "eye",
+    "guts",
+    "ear",
+    "heart",
+    "long_tongue",
+    "eyestalks",
+    "tentacles",
+    "cold_blood"
+   ],
+   "act_add": [
+    "undead"
+   ],
+   "res": [
+    "pierce"
+   ],
+   "vuln": [
+    "holy",
+    "fire"
+   ],
+   "imm": [
+    "disease",
+    "poison",
+    "negative"
+   ],
+   "det": [
+    "life"
+   ],
+   "ac_factor": 6.0,
+   "notes": "look shows '(skeleton <race>)'. act undead no longer implies necromancer casting (decision 23). Zombies/ghouls are NOT skeletal: act undead + biped + mammal torso. No eyes does not blind it (see parts.eye)"
+  },
+  "construct": {
+   "group": "functional",
+   "parts_del_late": [
+    "heart",
+    "brains",
+    "guts",
+    "ear"
+   ],
+   "imm": [
+    "mental",
+    "negative",
+    "holy"
+   ],
+   "vuln": [
+    "sound"
+   ],
+   "ac_factor": 8.0,
+   "notes": "no blood, no animate, no emotions, material drives vulns. parts_del_late runs AFTER the torso ALWAYS-adds (decision 33). isObject should read this form"
+  },
+  "hoofed": {
+   "group": "functional",
+   "renamed_from": "animal",
+   "hooves": {
+    "biped": {
+     "parts_del": [
+      "feet"
+     ],
+     "parts_add": [
+      "two_hooves"
+     ]
+    },
+    "quadruped": {
+     "parts_del": [
+      "feet",
+      "fingers",
+      "claws"
+     ],
+     "parts_add": [
+      "four_hooves"
+     ]
+    }
+   },
+   "off_add": [
+    "kick"
+   ],
+   "notes": "Applied to the LOWER body, before the torso ALWAYS-adds, so a centaur keeps the torso's fingers (§3.3a). Needs a biped or quadruped lower body, else it grants nothing (resolver warns). Rear kick = four_hooves skill gate"
+  },
+  "mist": {
+   "group": "functional",
+   "parts_del_late": [
+    "heart",
+    "brains",
+    "guts",
+    "ear"
+   ],
+   "res": [
+    "slash"
+   ],
+   "vuln": [
+    "lightning"
+   ],
+   "aff": [
+    "flying",
+    "pass_door"
+   ],
+   "ac_factor": 8.0,
+   "notes": "+50% web break, stays bloodless. parts_del_late runs after the torso adds (decision 33) on NPC bodies ONLY (decision 48): PC cloud giants keep heart/brains/guts/ear",
+   "late_del_npc_only": true
+  },
+  "canine": {
+   "group": "functional",
+   "parts_add": [
+    "fangs",
+    "claws",
+    "tail"
+   ],
+   "wearlocs_add": [
+    "hair"
+   ],
+   "vuln": [
+    "fire",
+    "charm"
+   ],
+   "res": [
+    "drowning",
+    "poison"
+   ]
+  },
+  "feline": {
+   "group": "functional",
+   "parts_add": [
+    "fangs",
+    "claws",
+    "tail"
+   ],
+   "wearlocs_add": [
+    "hair"
+   ],
+   "vuln": [
+    "fire",
+    "drowning"
+   ],
+   "res": [
+    "cold"
+   ],
+   "notes": "eats rodents, Bast taboo"
+  },
+  "amphibian": {
+   "group": "functional",
+   "parts_add": [
+    "fins",
+    "cold_blood"
+   ],
+   "vuln": [
+    "fire"
+   ],
+   "imm": [
+    "drowning"
+   ],
+   "res": [
+    "disease"
+   ],
+   "notes": "not MVP, IN (decision 18). Desert drying = follow-up ticket. Movetype slink/swim comes from the parts (fins -> swim)"
+  },
+  "reptile": {
+   "group": "functional",
+   "parts_add": [
+    "long_tongue",
+    "scales",
+    "tail",
+    "cold_blood"
+   ],
+   "res": [
+    "cold",
+    "acid"
+   ],
+   "aff": [
+    "regeneration"
+   ],
+   "notes": "decision 43 / item 49: the reptile FORM grants regeneration, so every dragon and snake gains it (lizard already had it on the race). The race PR prints that"
+  },
+  "biped": {
+   "group": "lower",
+   "parts_add": [
+    "legs",
+    "feet"
+   ],
+   "off_add": [
+    "kick",
+    "trip"
+   ],
+   "moveverb": "walk",
+   "ac_factor": 3.0,
+   "notes": "lower body owns feet, no sentience gate (decision 25)"
+  },
+  "quadruped": {
+   "group": "lower",
+   "renamed_from": "centaur",
+   "parts_add": [
+    "legs",
+    "claws",
+    "fingers",
+    "heart",
+    "guts",
+    "tail",
+    "brains",
+    "head",
+    "ear",
+    "eye"
+   ],
+   "parts_del": [
+    "arms",
+    "hands"
+   ],
+   "off_add": [
+    "berserk",
+    "crush"
+   ],
+   "off_del": [
+    "kick_dirt"
+   ],
+   "moveverb": "trotting",
+   "ac_factor": 5.0,
+   "notes": "act rideable is NOT a flat add: rules.rideable (decision 26). legs map to wrist_l/wrist_r (parts.legs.quadruped_wearlocs). Engine gives riding only for hooves"
+  },
+  "insect": {
+   "group": "lower",
+   "parts_add": [
+    "head",
+    "legs",
+    "eye",
+    "wings"
+   ],
+   "parts_del": [
+    "feet",
+    "arms",
+    "hands",
+    "fingers",
+    "ear"
+   ],
+   "off_add": [
+    "dodge",
+    "fast"
+   ],
+   "res": [
+    "mental",
+    "sound"
+   ],
+   "vuln": [
+    "fire"
+   ],
+   "det": [
+    "acute_vision"
+   ],
+   "moveverb": "crawling",
+   "ac_factor": 7.0,
+   "notes": "walk mechanics (has legs), crawling verb (decision 30). wings imply flying, so the flying verb wins while airborne"
+  },
+  "spider": {
+   "group": "lower",
+   "parts_add": [
+    "head",
+    "legs",
+    "eye",
+    "fangs"
+   ],
+   "parts_del": [
+    "feet",
+    "arms",
+    "hands",
+    "fingers",
+    "ear"
+   ],
+   "off_add": [
+    "dodge"
+   ],
+   "imm": [
+    "poison"
+   ],
+   "res": [
+    "mental"
+   ],
+   "vuln": [
+    "fire"
+   ],
+   "det": [
+    "acute_vision"
+   ],
+   "moveverb": "crawling",
+   "ac_factor": 5.0
+  },
+  "snake": {
+   "group": "lower",
+   "parts_add": [
+    "head",
+    "brains",
+    "eye",
+    "tail",
+    "guts",
+    "heart",
+    "fangs"
+   ],
+   "parts_del": [
+    "feet",
+    "arms",
+    "legs",
+    "hands",
+    "fingers",
+    "ear"
+   ],
+   "off_add": [
+    "tail"
+   ],
+   "det": [
+    "hidden"
+   ],
+   "moveverb": "slithering",
+   "ac_factor": 6.0
+  },
+  "fish": {
+   "group": "lower",
+   "parts_add": [
+    "head",
+    "eye",
+    "guts",
+    "brains",
+    "scales",
+    "fins",
+    "tail",
+    "cold_blood"
+   ],
+   "parts_del": [
+    "feet",
+    "legs",
+    "arms",
+    "hands",
+    "fingers",
+    "ear"
+   ],
+   "vuln": [
+    "sound",
+    "energy"
+   ],
+   "res": [
+    "cold"
+   ],
+   "no_float": true,
+   "moveverb": "swimming",
+   "ac_factor": 6.0,
+   "notes": "can't leave water (walkment.cpp:453, specials.cpp:583)"
+  },
+  "mammal": {
+   "group": "upper",
+   "parts_always": [
+    "head",
+    "arms",
+    "hands",
+    "brains",
+    "fingers",
+    "body",
+    "guts",
+    "heart",
+    "ear",
+    "eye"
+   ],
+   "wearlocs_add": [
+    "hair"
+   ],
+   "off_add": [
+    "parry",
+    "kick_dirt",
+    "disarm",
+    "bash"
+   ],
+   "ac_factor": 2.0,
+   "notes": "= human torso. eye added (§3.2 correction). ALWAYS-adds win over every lower/full/upper DEL before them. 6 'warm animal' Fenia readers are repointed in Phase D"
+  },
+  "winged": {
+   "group": "upper",
+   "renamed_from": "bird",
+   "parts_add": [
+    "wings"
+   ],
+   "ac_factor": 4.0,
+   "notes": "flying comes from parts.wings"
+  },
+  "crustacean": {
+   "group": "upper",
+   "parts_add": [
+    "eye",
+    "eyestalks",
+    "pincers",
+    "guts",
+    "shell",
+    "cold_blood"
+   ],
+   "parts_del": [
+    "arms",
+    "hands",
+    "fingers",
+    "head",
+    "ear",
+    "feet"
+   ],
+   "off_add": [
+    "parry"
+   ],
+   "res": [
+    "pierce",
+    "slash"
+   ],
+   "vuln": [
+    "fire"
+   ],
+   "aff": [
+    "slow"
+   ],
+   "moveverb": "crawling",
+   "ac_factor": 10.0,
+   "notes": "not MVP, IN. OFF_PINCERS is a Fenia innate attack reading the part (decision 31)"
+  },
+  "worm": {
+   "group": "full",
+   "parts_only": [
+    "head",
+    "tail",
+    "scales",
+    "cold_blood"
+   ],
+   "off_add": [
+    "tail"
+   ],
+   "off_del": [
+    "dodge"
+   ],
+   "res": [
+    "light"
+   ],
+   "aff": [
+    "slow",
+    "regeneration",
+    "blind"
+   ],
+   "moveverb": "slithering",
+   "ac_factor": 4.0
+  },
+  "blob": {
+   "group": "full",
+   "parts_only": [
+    "guts",
+    "eye",
+    "eyestalks",
+    "tentacles",
+    "cold_blood"
+   ],
+   "act_add": [
+    "sentinel"
+   ],
+   "off_add": [
+    "area_attack"
+   ],
+   "res": [
+    "weapon",
+    "energy"
+   ],
+   "imm": [
+    "charm",
+    "mental",
+    "disease",
+    "sound"
+   ],
+   "vuln": [
+    "fire",
+    "cold",
+    "acid"
+   ],
+   "aff": [
+    "slow",
+    "regeneration"
+   ],
+   "moveverb": "oozing",
+   "ac_factor": 1.0
+  },
+  "bird": {
+   "group": "full",
+   "parts_only": [
+    "wings",
+    "legs",
+    "fingers",
+    "claws",
+    "head",
+    "brains",
+    "heart",
+    "guts",
+    "beak",
+    "eye",
+    "tail"
+   ],
+   "off_add": [
+    "fast",
+    "dodge"
+   ],
+   "res": [
+    "sound"
+   ],
+   "vuln": [
+    "acid",
+    "disease"
+   ],
+   "det": [
+    "acute_vision"
+   ],
+   "moveverb": "walk",
+   "ac_factor": 3.0,
+   "notes": "new full form on a freed letter. eye and tail added (§3.2 correction). Flying from parts.wings"
+  },
+  "dragon": {
+   "group": "full",
+   "implies_forms": [
+    "quadruped",
+    "reptile",
+    "winged"
+   ],
+   "off_add": [
+    "area_attack"
+   ],
+   "ac_factor": 8.0,
+   "notes": "kept as a real form (3 code readers), composed of quadruped+reptile+winged. The sheet's flat ACT_RIDEABLE is left to rules.rideable (quadruped and size >= large). Flying from parts.wings"
+  }
+ },
+ "parts": {
+  "head": {
+   "wearlocs": [
+    "head",
+    "neck_1",
+    "neck_2"
+   ],
+   "sentient_wearlocs": [
+    "face",
+    "tat_face",
+    "tattoo"
+   ]
+  },
+  "arms": {
+   "wearlocs": [
+    "arms",
+    "wrist_l",
+    "wrist_r",
+    "shield"
+   ],
+   "sentient_wearlocs": [
+    "tat_arms",
+    "tat_wrist_l",
+    "tat_wrist_r"
+   ]
+  },
+  "legs": {
+   "wearlocs": [
+    "legs"
+   ],
+   "quadruped_wearlocs": [
+    "wrist_l",
+    "wrist_r"
+   ],
+   "notes": "a quadruped's forelegs take wrist_l/wrist_r INSTEAD of the legs slot (§3.3a)"
+  },
+  "heart": {},
+  "brains": {
+   "absent_implies": {
+    "imm": [
+     "mental"
+    ]
+   }
+  },
+  "guts": {},
+  "hands": {
+   "wearlocs": [
+    "hands",
+    "wield",
+    "second_wield",
+    "hold"
+   ]
+  },
+  "feet": {
+   "wearlocs": [
+    "feet"
+   ]
+  },
+  "fingers": {
+   "wearlocs": [
+    "finger_l",
+    "finger_r"
+   ],
+   "wearlocs_require_part": "hands",
+   "notes": "decision 41: quadrupeds keep the fingers PART (slice, claws), the ring slots only on bodies that also have hands"
+  },
+  "ear": {
+   "npc_wearlocs": [
+    "ears"
+   ],
+   "notes": "ear slot is NPC only"
+  },
+  "eye": {
+   "absent_implies": {
+    "imm": [
+     "light"
+    ]
+   },
+   "notes": "sheet also lists AFF_BLIND when absent. Not applied: the sheet's own skeletal row says 'cannot be blinded (no eyes)', and no eyeless race today carries blind. Forms that want blind say so (worm)"
+  },
+  "long_tongue": {},
+  "eyestalks": {},
+  "tentacles": {
+   "wearlocs": [
+    "hold"
+   ],
+   "implies": {
+    "off": [
+     "area_attack"
+    ]
+   }
+  },
+  "fins": {
+   "implies": {
+    "aff": [
+     "swim"
+    ]
+   }
+  },
+  "wings": {
+   "implies": {
+    "aff": [
+     "flying"
+    ]
+   }
+  },
+  "tail": {
+   "wearlocs": [
+    "tail"
+   ],
+   "implies": {
+    "off": [
+     "tail"
+    ]
+   }
+  },
+  "two_hooves": {
+   "wearlocs": [
+    "hooves"
+   ],
+   "implies": {
+    "off": [
+     "kick"
+    ]
+   }
+  },
+  "four_hooves": {
+   "wearlocs": [
+    "hooves",
+    "horse"
+   ],
+   "implies": {
+    "off": [
+     "kick"
+    ]
+   },
+   "notes": "rear kick, double kick, movetype riding"
+  },
+  "claws": {
+   "notes": "only leather/cloth gloves (follow-up material rule). Innate attack in Fenia (decision 31)"
+  },
+  "fangs": {
+   "notes": "innate attack in Fenia"
+  },
+  "horns": {
+   "notes": "only leather/cloth helm (follow-up). Innate attack in Fenia"
+  },
+  "tusks": {
+   "notes": "no mask (follow-up). Innate attack in Fenia"
+  },
+  "scales": {},
+  "cold_blood": {
+   "notes": "part since decision 29. Gives NO regeneration (decision 43): regeneration comes only from a FORM (reptile, worm, blob). isBloodless = no heart and no cold_blood"
+  },
+  "spines": {
+   "implies": {
+    "off": [
+     "area_attack"
+    ]
+   },
+   "forbids_wearlocs": [
+    "body",
+    "about"
+   ]
+  },
+  "body": {
+   "wearlocs": [
+    "body"
+   ],
+   "notes": "new part, torso only"
+  },
+  "beak": {
+   "notes": "new part, peck attack in Fenia"
+  },
+  "pincers": {
+   "notes": "new part, innate attack in Fenia"
+  },
+  "shell": {
+   "notes": "new part"
+  }
+ },
+ "wearlocs": {
+  "always": [
+   "light",
+   "waist",
+   "about",
+   "float"
+  ],
+  "no_float_forms": [
+   "fish"
+  ],
+  "special": [
+   "stuck_in",
+   "hold_leg",
+   "none",
+   "sheath",
+   "personal"
+  ],
+  "special_notes": "special slots are engine-managed, never listed on a race, so the race-body comparison ignores them. sheath is sentient only"
+ },
+ "movetype": {
+  "engine_rules": "ExitsMovement::adjustMovetype: ghost or flying -> flying, hooves -> riding, no legs -> slink, AFF_SWIM on no-swim water -> swimming. Mechanics never change",
+  "verb_rows": {
+   "walk": {
+    "base": "walk",
+    "danger": "MOVETYPE_NORMAL",
+    "wait": 1,
+    "text_only": false
+   },
+   "riding": {
+    "base": "riding",
+    "danger": "MOVETYPE_DANGEROUS",
+    "wait": 1,
+    "text_only": false
+   },
+   "slink": {
+    "base": "slink",
+    "danger": "MOVETYPE_MORESAFE",
+    "wait": 3,
+    "text_only": false
+   },
+   "flying": {
+    "base": "flying",
+    "danger": "MOVETYPE_NORMAL",
+    "wait": 1,
+    "text_only": false
+   },
+   "swimming": {
+    "base": "swimming",
+    "danger": "MOVETYPE_NORMAL",
+    "wait": 1,
+    "text_only": false
+   },
+   "galloping": {
+    "base": "riding",
+    "danger": "MOVETYPE_DANGEROUS",
+    "wait": 1,
+    "text_only": true,
+    "en": "gallops in / gallops off"
+   },
+   "clattering": {
+    "base": "riding",
+    "danger": "MOVETYPE_DANGEROUS",
+    "wait": 1,
+    "text_only": true,
+    "en": "clatters in / clatters off",
+    "ru": "процока%1$Gло|л|ла|ли",
+    "ua": "процока%1$Gло|в|ла|ли"
+   },
+   "trotting": {
+    "base": "walk",
+    "danger": "MOVETYPE_NORMAL",
+    "wait": 1,
+    "text_only": true,
+    "en": "trots in / trots off"
+   },
+   "crawling": {
+    "base": "walk",
+    "danger": "MOVETYPE_NORMAL",
+    "wait": 1,
+    "text_only": true,
+    "en": "crawls in / crawls off"
+   },
+   "slithering": {
+    "base": "slink",
+    "danger": "MOVETYPE_MORESAFE",
+    "wait": 3,
+    "text_only": true,
+    "en": "slithers in / slithers off"
+   },
+   "oozing": {
+    "base": "slink",
+    "danger": "MOVETYPE_MORESAFE",
+    "wait": 3,
+    "text_only": true,
+    "en": "oozes in / oozes off"
+   },
+   "hopping": {
+    "base": "walk",
+    "danger": "MOVETYPE_NORMAL",
+    "wait": 1,
+    "text_only": true,
+    "en": "hops in / hops off"
+   }
+  },
+  "verb_by_base": {
+   "flying": "flying",
+   "riding_quadruped": "galloping",
+   "riding_biped": "clattering"
+  },
+  "form_verb_priority": [
+   "blob",
+   "worm",
+   "bird",
+   "snake",
+   "fish",
+   "insect",
+   "spider",
+   "crustacean",
+   "quadruped",
+   "biped"
+  ],
+  "notes": "Text-only rows copy their BASE row's danger and move cost (item 50: galloping and clattering copy riding's MOVETYPE_DANGEROUS, crawling/trotting/hopping copy walk, slithering/oozing copy slink). galloping = hoofed quadruped with NO rider, clattering = hoofed biped with no rider (decision 47), riding when ridden. Otherwise the most specific form verb (priority list), race <moveverb> overrides it, prototype never does (decision 37)"
+ },
+ "ac": {
+  "combine": "max over the forms that carry ac_factor",
+  "normalise": "form_ac = 1 + 0.07 * (factor - 3)",
+  "default_factor": 3.0,
+  "notes": "matches the plan's listed values (blob 0.86 .. crustacean 1.49, biped 1.0). The plan text's '0.8 + 0.07*(f-3)' formula contradicts its own list and is treated as a typo"
+ },
+ "rules": {
+  "rideable": "form quadruped AND (form hoofed OR size >= large)",
+  "edible": "NOT any of construct, skeletal, mist, instant_decay, magical (isEdible, decision 24)",
+  "canHoldCards": "form sentient AND part hands (decision 27)",
+  "bloodless": "no heart AND no cold_blood part, or form skeletal/construct/mist"
+ },
+ "size_order": [
+  "tiny",
+  "small",
+  "medium",
+  "large",
+  "huge",
+  "giant",
+  "gargantuan"
+ ]
+}
