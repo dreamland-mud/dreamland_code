@@ -1084,6 +1084,7 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
                 return false;
 
             baneMessage( ch, vch );
+            rage_feed_priests( ch, vch, getMana( ) );
             return true;
         }
 
@@ -1111,6 +1112,10 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
             }
             
             baneMessage( ch, vch );
+            // Hostile magic only: a buff the aura bounces feeds nobody, even one
+            // from the transportation group (fly, mental block).
+            if (offensive || (transport && !defensive))
+                rage_feed_priests( ch, vch, getMana( ) );
             baneDamage( ch, vch, damage );
             return true;
         }
@@ -1138,7 +1143,7 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
 
 bool DefaultSpell::baneVictim( Character *ch, Character *vch ) const
 {
-    return rage_area_bane( ch, vch, isPrayer( ch ), true );
+    return rage_area_bane( ch, vch, isPrayer( ch ), true, false, getMana( ) );
 }
 
 bool DefaultSpell::blockedByNobuff( Character *ch, Character *victim ) const

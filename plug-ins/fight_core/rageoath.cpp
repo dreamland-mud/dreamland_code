@@ -1,4 +1,8 @@
+#include <algorithm>
+#include <map>
+
 #include "rageoath.h"
+#include "follow_utils.h"
 #include "clanownshook.h"
 #include "damage_impl.h"
 #include "damageflags.h"
@@ -15,6 +19,7 @@
 #include "act.h"
 #include "l10n.h"
 #include "merc.h"
+#include "dreamland.h"
 #include "def.h"
 
 CLAN(battlerager);
@@ -185,7 +190,45 @@ bool rage_own_magic( Character *ch )
     return burned;
 }
 
-bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retaliate, bool quiet )
+/** When each divine member last drew mana from a deflect, by character id. */
+static std::map<long long, time_t> lastFeed;
+
+void rage_feed_priests( Character *caster, Character *vch, int mana )
+{
+    int gain = mana / 2;
+
+    if (!caster || !vch || !vch->in_room || gain <= 0 || !rage_member( vch ))
+        return;
+
+    // The aura feeds on hostile magic only, never on a friend's.
+    if (caster == vch || is_same_group( caster, vch ))
+        return;
+
+    time_t now = dreamland->getCurrentTime( );
+    int round = std::max( 1, dreamland->getPulseViolence( ) / dreamland->getPulsePerSecond( ) );
+
+    for (Character *rch = vch->in_room->people; rch; rch = rch->next_in_room) {
+        if (rch == caster || !rage_divine( rch ) || rch->mana >= rch->max_mana)
+            continue;
+        // A priest fighting on the caster's side gets nothing from his ally's spell.
+        if (is_same_group( caster, rch ))
+            continue;
+
+        auto last = lastFeed.find( rch->getID( ) );
+        if (last != lastFeed.end( ) && now - last->second < round)
+            continue;
+
+        lastFeed[rch->getID( )] = now;
+        rch->mana = std::min( rch->mana + gain, (int)rch->max_mana );
+
+        if (rch == vch)
+            rch->pecho( _("Отведенное тобой колдовство вливается в тебя силой богов Ярости.") );
+        else
+            rch->pecho( _("Аура ярости %1$C2 отводит колдовство, и его сила вливается в тебя."), vch );
+    }
+}
+
+bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retaliate, bool quiet, int mana )
 {
     if (!vch->isAffected( gsn_spellbane ))
         return false;
@@ -198,6 +241,8 @@ bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retali
         oldact( _("Твоя аура ярости отводит от тебя это колдовство."), vch, 0, 0, TO_CHAR );
         oldact( _("Аура ярости $c2 отводит колдовство в сторону."), vch, 0, 0, TO_ROOM );
     }
+
+    rage_feed_priests( caster, vch, mana );
 
     if (retaliate && !prayer && caster && caster != vch
         && !is_safe_nomessage( vch, caster ) && !is_safe_nomessage( caster, vch ))
