@@ -217,9 +217,8 @@ XMLMobileFactory::init(const mob_index_data *mob)
     reviewed.setValue(reviewed_names(mob->reviewed));
 
     // Tier-derived numbers are never written back (plan §3.6 item 6).
+    hit.omit = mana.omit = damage.omit = ac.omit = mob->numbersDerived;
     if (mob->numbersDerived) {
-        hit.omit = mana.omit = damage.omit = true;
-        ac.omit = true;
         hitroll.setValue(0);
         wealth.setValue(0);
     }
@@ -312,7 +311,9 @@ XMLMobileFactory::compat(mob_index_data *mob)
 
     JsonUtils::copy(mob->props, props);
 
-    // Mob reform: authored diffs, tier, reviewed sets, then the body.
+    // Mob reform: authored diffs, tier and reviewed sets. The body and the
+    // numbers are built by the caller once the vnum is known
+    // (resolveBody + deriveNumbers).
     const XMLFlagsDiff *sets[MOBSET_MAX] = { &act, &off, &aff, &detection, &imm, &res, &vuln, &form, &parts };
     for (int s = 0; s < MOBSET_MAX; s++) {
         mob->bodyAdd[s] = sets[s]->add;
@@ -320,7 +321,6 @@ XMLMobileFactory::compat(mob_index_data *mob)
     }
     mob->tierName = tier.getValue();
     mob->reviewed = reviewed_mask(reviewed.getValue());
-    mob->resolveBody();
 
     // Authored numbers lose to the tier curve once mob_tiers.json is loaded
     // (decision 8). Counted here, logged once per area by the loader.

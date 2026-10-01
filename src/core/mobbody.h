@@ -35,7 +35,7 @@ const FlagTable *bitSetTable(int bitSet);
 Body::NameSet names(const FlagTable *table, bitstring_t bits);
 /** Resolver names -> bits. A name the table lacks is logged once and skipped. */
 bitstring_t bits(const FlagTable *table, const Body::NameSet &names);
-/** Resolver wearloc names -> wearloc bitvector. Unknown wearlocs are logged once and skipped. */
+/** Resolver wearloc names -> wearloc bitvector (names are reserved in the registry like XML does). */
 void wearlocs(const Body::NameSet &names, GlobalBitvector &out);
 
 /** A resolved body in engine terms. */
