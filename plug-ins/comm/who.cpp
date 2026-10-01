@@ -481,7 +481,7 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
                 // clan was the one field on this list with no English form.
                 wch["clan"]["en"] = victim->getClan()->getNameFor(LANG_EN).colourStrip();
                 wch["clan"]["ru"] = victim->getClan()->getRussianName().ruscase('1').colourStrip();
-                wch["clan"]["ua"] = victim->getClan()->getNameFor(LANG_UA).colourStrip();
+                wch["clan"]["ua"] = victim->getClan()->getNameFor(LANG_UA).ruscase('1').colourStrip();
             }
 
             if (!victim->getPretitle().empty())
