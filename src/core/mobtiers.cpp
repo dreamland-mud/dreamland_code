@@ -65,6 +65,10 @@ static void readTier(const Json::Value &d, Tier &t)
     t.xp = d.get("xp", 1.0).asDouble();
     t.xpMinLevel = d.get("xp_min_level", 0).asInt();
     t.gold = d.get("gold", 1.0).asDouble();
+    const Json::Value &aa = d["aff_add"];
+    if (aa.isArray())
+        for (const auto &e: aa)
+            t.affAdd.push_back(e.asString());
     const Json::Value &w = d["word"];
     if (w.isObject())
         for (const auto &lang: w.getMemberNames())

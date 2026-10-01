@@ -230,6 +230,14 @@ int main(int argc, char **argv)
                 cout << "FAIL tier parse/interpolation/offCount" << endl;
                 failures++;
             }
+            // item 56: elite and up grant sanctuary, normal and trash do not;
+            // tier 4 sits between elite and champion and keeps the nearer list
+            if (tc.get(5).affAdd != std::vector<std::string>{"sanctuary"}
+                    || tc.get(1).affAdd.size() != 1 || !tc.get(7).affAdd.empty()
+                    || !tc.get(9).affAdd.empty() || tc.get(4).affAdd.size() != 1) {
+                cout << "FAIL tier aff_add" << endl;
+                failures++;
+            }
         }
     }
 
