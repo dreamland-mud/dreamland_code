@@ -19,6 +19,7 @@
  */
 #include <algorithm>
 #include <cmath>
+#include <sstream>
 
 #include "logstream.h"
 #include "mobilefactory.h"
@@ -42,6 +43,28 @@ int &mob_index_data::bodyBits(int mobset)
     case MOBSET_FORM:  return form;
     default:           return parts;
     }
+}
+
+unsigned long long mob_index_data::bodyStamp()
+{
+    std::ostringstream buf;
+    buf << level << '|' << tier << '|' << tierName << '|' << race << '|' << getSize() << '|';
+    for (int s = 0; s < MOBSET_MAX; s++)
+        buf << bodyBits(s) << ',';
+    buf << '|' << wearloc.toString() << '|' << numbersDerived << '|';
+    for (int i = 0; i < 3; i++)
+        buf << hit[i] << ',' << mana[i] << ',' << damage[i] << ',';
+    for (int i = 0; i < 4; i++)
+        buf << ac[i] << ',';
+    buf << hitroll << ',' << wealth << ',' << saves << ',' << statCap;
+
+    // FNV-1a, 64 bit: stable across builds and platforms, unlike std::hash.
+    unsigned long long h = 14695981039346656037ULL;
+    for (unsigned char c: buf.str()) {
+        h ^= c;
+        h *= 1099511628211ULL;
+    }
+    return h;
 }
 
 void mob_index_data::bodyDiff(int mobset, bitstring_t &add, bitstring_t &del)
