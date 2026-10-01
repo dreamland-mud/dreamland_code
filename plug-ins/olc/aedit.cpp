@@ -114,9 +114,16 @@ void OLCStateArea::commit()
 
     if (!behavior.empty( )) 
         try {
+            // A self-closing <behavior/> keeps the behavior the area already had.
+            ::Pointer<AreaBehavior> previous( original->behavior.getPointer( ) );
             istringstream istr( behavior );
             original->behavior.fromStream( istr );
-            original->behavior->setArea( original );
+            if (original->behavior)
+                original->behavior->setArea( original );
+            else {
+                LogStream::sendError( ) << "aedit " << original->getName( ) << ": behavior did not load, keeping the old one" << endl;
+                original->behavior.setPointer( previous.getPointer( ) );
+            }
         } catch (const Exception &e) {
             LogStream::sendError( ) << e.what( ) << endl;
         }
