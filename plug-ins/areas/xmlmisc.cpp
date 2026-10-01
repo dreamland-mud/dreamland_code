@@ -32,6 +32,7 @@ XMLArmor::XMLArmor( )
     bash = 0;
     slash = 0;
     exotic = 0;
+    omit = false;
 }
 
 void
@@ -55,6 +56,9 @@ XMLArmor::fromXML(const XMLNode::Pointer &parent)
 bool
 XMLArmor::toXML(XMLNode::Pointer &parent) const
 {
+    if (omit)
+        return false;
+
     parent->setType(XMLNode::XML_LEAF);
     parent->insertAttribute("pierce", pierce);
     parent->insertAttribute("bash", bash);
@@ -125,6 +129,10 @@ XMLFlagsDiff::toXML(XMLNode::Pointer &parent) const
 /*********************************************************************
  * XMLDice
  *********************************************************************/
+XMLDice::XMLDice( ) : number(0), type(0), bonus(0), omit(false)
+{
+}
+
 void
 XMLDice::set(int n = 0, int t = 0, int b = 0)
 {
@@ -151,6 +159,9 @@ XMLDice::fromXML(const XMLNode::Pointer &parent)
 bool
 XMLDice::toXML(XMLNode::Pointer &parent) const
 {
+    if (omit)
+        return false;
+
     XMLNode::Pointer node( NEW );
     ostringstream os;
 

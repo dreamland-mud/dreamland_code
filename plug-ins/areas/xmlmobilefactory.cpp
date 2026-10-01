@@ -12,8 +12,36 @@
 #include "behavior.h"
 #include "race.h"
 #include "string_utils.h"
+#include "mobbody.h"
+#include "stringlist.h"
 #include "merc.h"
 #include "def.h"
+
+int XMLMobileFactory::ignoredNumbers = 0;
+
+/* <reviewed> names -> mask over Body::BitSet; only the five gated sets count. */
+static int reviewed_mask(const DLString &names)
+{
+    int mask = 0;
+    StringList words(names);
+    for (auto &w: words)
+        for (int k = Body::BS_AFF; k < Body::BS_MAX; k++)
+            if (w == Body::bitSetNames[k])
+                mask |= 1 << k;
+    return mask;
+}
+
+static DLString reviewed_names(int mask)
+{
+    DLString buf;
+    for (int k = Body::BS_AFF; k < Body::BS_MAX; k++)
+        if (mask & (1 << k)) {
+            if (!buf.empty())
+                buf << " ";
+            buf << Body::bitSetNames[k];
+        }
+    return buf;
+}
 
 XMLMobileFactory::XMLMobileFactory( ) : 
                           act(&act_flags),
@@ -93,7 +121,8 @@ DLString format_longdescr(const DLString &longdescr)
 void
 XMLMobileFactory::init(const mob_index_data *mob)
 {
-    Race *mobrace = raceManager->find(mob->race);
+    mob_index_data *m = const_cast<mob_index_data *>(mob);
+    bitstring_t add, del;
 
     keyword = mob->keyword;
     short_descr = mob->short_descr;
@@ -103,8 +132,10 @@ XMLMobileFactory::init(const mob_index_data *mob)
     smell = mob->smell;
 
     race.setValue(mob->race);
-    act.setRealBase(mob->act, mobrace->getAct( ));
-    aff.setRealBase(mob->affected_by, mobrace->getAff( ));
+    m->bodyDiff(MOBSET_ACT, add, del);
+    act.setAddDel(add, del);
+    m->bodyDiff(MOBSET_AFF, add, del);
+    aff.setAddDel(add, del);
     alignment.setValue(mob->alignment);
     group.setValue(mob->group);
     level.setValue(mob->level);
@@ -119,23 +150,30 @@ XMLMobileFactory::init(const mob_index_data *mob)
     ac.slash = mob->ac[AC_SLASH] / 10;
     ac.exotic = mob->ac[AC_EXOTIC] / 10;
 
-    off.setRealBase(mob->off_flags, mobrace->getOff( ));
-    imm.setRealBase(mob->imm_flags, mobrace->getImm( ));
-    res.setRealBase(mob->res_flags, mobrace->getRes( ));
-    vuln.setRealBase(mob->vuln_flags, mobrace->getVuln( ));
+    m->bodyDiff(MOBSET_OFF, add, del);
+    off.setAddDel(add, del);
+    m->bodyDiff(MOBSET_IMM, add, del);
+    imm.setAddDel(add, del);
+    m->bodyDiff(MOBSET_RES, add, del);
+    res.setAddDel(add, del);
+    m->bodyDiff(MOBSET_VULN, add, del);
+    vuln.setAddDel(add, del);
 
     start_pos.setValue(mob->start_pos);
     default_pos.setValue(mob->default_pos);
 
     sex.setValue(mob->sex);
     wealth.setValue(mob->wealth);
-    form.setRealBase(mob->form, mobrace->getForm( ));
-    parts.setRealBase(mob->parts, mobrace->getParts( ));
+    m->bodyDiff(MOBSET_FORM, add, del);
+    form.setAddDel(add, del);
+    m->bodyDiff(MOBSET_PARTS, add, del);
+    parts.setAddDel(add, del);
 
     size.setValue(mob->size);
     material.setValue(mob->material);
 
-    detection.setRealBase(mob->detection, mobrace->getDet( ));
+    m->bodyDiff(MOBSET_DET, add, del);
+    detection.setAddDel(add, del);
 
     const char *c = 0;
     
@@ -163,6 +201,28 @@ XMLMobileFactory::init(const mob_index_data *mob)
         behavior.setNode(mob->behavior->getFirstNode( ));
 
     JsonUtils::copy(props, mob->props);
+
+    // props.olc.*Confirmed are retired (decision 12): never written again.
+    Json::Value &olc = props["olc"];
+    if (olc.isObject()) {
+        for (auto &key: olc.getMemberNames())
+            if (key.size() > 9 && key.compare(key.size() - 9, 9, "Confirmed") == 0)
+                olc.removeMember(key);
+        if (olc.empty())
+            props.removeMember("olc");
+    } else if (olc.isNull())
+        props.removeMember("olc");
+
+    tier.setValue(mob->tierName);
+    reviewed.setValue(reviewed_names(mob->reviewed));
+
+    // Tier-derived numbers are never written back (plan §3.6 item 6).
+    if (mob->numbersDerived) {
+        hit.omit = mana.omit = damage.omit = true;
+        ac.omit = true;
+        hitroll.setValue(0);
+        wealth.setValue(0);
+    }
 }
 
 mob_index_data *
@@ -192,8 +252,6 @@ XMLMobileFactory::compat(mob_index_data *mob)
     mob->smell = smell;
 
     mob->race = mobrace->getName();
-    mob->act = act.get(mobrace->getAct( )) | ACT_IS_NPC;
-    mob->affected_by = aff.get(mobrace->getAff( ));
     mob->alignment = alignment.getValue( );
     mob->group = group.getValue( );
     mob->level = level.getValue( );
@@ -214,23 +272,16 @@ XMLMobileFactory::compat(mob_index_data *mob)
     mob->ac[AC_SLASH] = ac.slash * 10;
     mob->ac[AC_EXOTIC] = ac.exotic * 10;
 
-    mob->off_flags = off.get(mobrace->getOff( ));
-    mob->imm_flags = imm.get(mobrace->getImm( ));
-    mob->res_flags = res.get(mobrace->getRes( ));
-    mob->vuln_flags = vuln.get(mobrace->getVuln( ));
 
     mob->start_pos = start_pos.getValue( );
     mob->default_pos = default_pos.getValue( );
 
     mob->sex = sex.getValue( );
     mob->wealth = wealth.getValue( );
-    mob->form = form.get(mobrace->getForm( ));
-    mob->parts = parts.get(mobrace->getParts( ));
 
     mob->size = size.getValue( );
     mob->material = material;
 
-    mob->detection = detection.get(mobrace->getDet( ));
 
     if(!spec.getValue( ).empty( )) {
         mob->spec_fun.name = spec.getValue( );
@@ -260,4 +311,22 @@ XMLMobileFactory::compat(mob_index_data *mob)
     }
 
     JsonUtils::copy(mob->props, props);
+
+    // Mob reform: authored diffs, tier, reviewed sets, then the body.
+    const XMLFlagsDiff *sets[MOBSET_MAX] = { &act, &off, &aff, &detection, &imm, &res, &vuln, &form, &parts };
+    for (int s = 0; s < MOBSET_MAX; s++) {
+        mob->bodyAdd[s] = sets[s]->add;
+        mob->bodyDel[s] = sets[s]->del;
+    }
+    mob->tierName = tier.getValue();
+    mob->reviewed = reviewed_mask(reviewed.getValue());
+    mob->resolveBody();
+
+    // Authored numbers lose to the tier curve once mob_tiers.json is loaded
+    // (decision 8). Counted here, logged once per area by the loader.
+    if (MobBody::tiers().loaded
+        && (hit.number || hit.type || hit.bonus || mana.number || mana.type || mana.bonus
+            || damage.number || damage.type || damage.bonus || hitroll.getValue() || wealth.getValue()
+            || ac.pierce || ac.bash || ac.slash || ac.exotic))
+        ignoredNumbers++;
 }

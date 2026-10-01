@@ -54,6 +54,14 @@ public:
 
     XML_VARIABLE XMLStringNode behavior;
     XML_VARIABLE XMLJsonValue props;
+
+    // Mob reform: tier by name or 1-10 (empty = default), and the bit sets
+    // whose dels the post-reform review has confirmed ("aff det imm res vuln").
+    XML_VARIABLE XMLStringNoEmpty tier;
+    XML_VARIABLE XMLStringNoEmpty reviewed;
+
+    /** Prototypes in the current load that carried numbers mob_tiers.json overrides. */
+    static int ignoredNumbers;
 };
 
 #endif
