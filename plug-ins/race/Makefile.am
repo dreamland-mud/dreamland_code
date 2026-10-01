@@ -7,11 +7,13 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/alignment \
--I$(top_srcdir)/plug-ins/help
+-I$(top_srcdir)/plug-ins/help \
+-I/usr/include/jsoncpp
 
 librace_la_LIBADD = ../system/libsystem.la \
 ../descriptor/libdescriptor.la \
-../help/libhelp.la
+../help/libhelp.la \
+-ljsoncpp
 
 librace_la_SOURCES = \
 raceflags.cpp \
