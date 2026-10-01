@@ -488,7 +488,7 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
         bufUa << ua;
     }
     else {
-        int mt = adjustMovetype( wch );
+        int mt = adjustMoveVerb( wch, adjustMovetype( wch ) );
 
         if (IS_AFFECTED(wch, AFF_SNEAK | AFF_CAMOUFLAGE) && movetypes[mt].sneak)
             return;
@@ -604,6 +604,43 @@ int ExitsMovement::adjustMovetype( Character *wch )
     }
 
     return movetype;
+}
+
+/*
+ * Mob reform movement verbs (plan §3.6a, decisions 30, 37, 47, 50): swap the
+ * message row for a text-only row that shares the base row's mechanics.
+ * Hooves on a mob that walks on its own: galloping on four, clattering on
+ * two, fixing "a horse rides in". Plain walking and slinking take the body's
+ * verb (form, or the race <moveverb>). Running, fleeing, flying, swimming
+ * and an actual rider keep their own words. NPCs only, players keep theirs.
+ */
+int ExitsMovement::adjustMoveVerb( Character *wch, int mt )
+{
+    if (!wch->is_npc( ))
+        return mt;
+
+    MOB_INDEX_DATA *pIndex = wch->getNPC( )->pIndexData;
+    DLString verb;
+
+    if (mt == MOVETYPE_RIDING && movetype != MOVETYPE_RIDING) {
+        if (IS_SET(wch->parts, PART_FOUR_HOOVES))
+            verb = "galloping";
+        else if (IS_SET(wch->parts, PART_TWO_HOOVES))
+            verb = "clattering";
+    }
+    else if ((mt == MOVETYPE_WALK || mt == MOVETYPE_SLINK) && pIndex->bodyResolved)
+        verb = pIndex->moveverb;
+
+    int row = movetype_text_lookup( verb.c_str( ) );
+    if (row < 0)
+        return mt;
+
+    // A verb only replaces the row it was written for: a trotting cat that
+    // lost its legs slinks, it does not trot.
+    if (movetypes[row].danger != movetypes[mt].danger || movetypes[row].wait != movetypes[mt].wait)
+        return mt;
+
+    return row;
 }
 
 int ExitsMovement::moveOneFollower( Character *wch, Character *fch )
