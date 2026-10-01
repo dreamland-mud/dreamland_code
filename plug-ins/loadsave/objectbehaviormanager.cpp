@@ -27,6 +27,10 @@ void ObjectBehaviorManager::assign( Object *obj ) {
     try {
         clear(obj);
         obj->behavior.fromXML( obj->pIndexData->behavior->getFirstNode( ) );
+        if (!obj->behavior) {
+            LogStream::sendError( ) << "obj " << obj->pIndexData->vnum << ": empty behavior" << endl;
+            return;
+        }
         obj->behavior->setObj( obj );
 
     } catch (const Exception &e) {

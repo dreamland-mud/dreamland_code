@@ -66,6 +66,15 @@ void MobileBehaviorManager::assign( NPCharacter *mob ) {
         // First load behavior from its XML definition in the area file.
         mob->behavior.fromXML( rootNode );
 
+        // A childless <behavior type="X"/> parses as an XML leaf and leaves the
+        // pointer empty; fall back to the basic behavior instead of crashing.
+        if (!mob->behavior) {
+            LogStream::sendError( ) << "mob " << mob->pIndexData->vnum
+                << ": empty behavior '" << type << "', using basic" << endl;
+            assignBasic( mob );
+            return;
+        }
+
         // Try to override behavior definition from a file in 'share/DL/behaviors' folder.
         // Careful here to pass the original pointer, so that fromXML on the underlying class is called,
         // rather than the one on the XMLPolymorphPointer.
@@ -154,6 +163,12 @@ void MobileBehaviorManager::parse( NPCharacter * mob, FILE *fp ) {
         }
         
         mob->behavior.fromStream( istr );
+        if (!mob->behavior) {
+            LogStream::sendError( ) << "mob " << mob->pIndexData->vnum
+                << ": saved behavior is empty, using basic" << endl;
+            assignBasic( mob );
+            return;
+        }
         mob->behavior->setChar( mob );
 
     } catch (Exception e) {
