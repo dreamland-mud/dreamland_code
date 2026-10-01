@@ -539,6 +539,233 @@ static void vaultmigrate_goclanforce( Character *ch, DLString rest )
     ch->pecho( buf.str( ).c_str( ) );
 }
 
+/*-------------------------------------------------------------------------
+ * Mansion-chest migration: owned containers parked on a MANSION floor (the
+ * built-in mansion chest with an owner stamp, or a bag/chest a player left
+ * there). Complements 'go' (spares mansions) and 'go103' (quest bags only).
+ * Contents move to the owner's vault; reset-seeded contents stay. Area furniture
+ * (the room resets that vnum) keeps its shell with the owner stamp cleared, so
+ * the mansion reset doesn't re-create a second one; a player-parked container is
+ * deleted once empty. A container whose stamped owner no longer exists is NOT
+ * touched: on mansion furniture the stamp gates nothing (the door key does), so a
+ * stale stamp in a resold or shared house can hold a live player's things. Those
+ * are listed with the room's mansion owner for an immortal to decide.
+ *------------------------------------------------------------------------*/
+#define VM_CARPENTER_CHEST 170   // craft/carpenter personal chest -- a live feature, never migrated
+
+static bool vaultmigrate_is_mansionchest( Object *obj )
+{
+    if (obj->pIndexData == 0)
+        return false;
+    if (obj->getOwner( ).empty( ))
+        return false;
+    if (obj->in_room == 0)                        // on a floor only -- no carried/nested
+        return false;
+    if (obj->item_type != ITEM_CONTAINER)
+        return false;
+    if (obj->pIndexData->vnum == VM_QUESTBAG || obj->pIndexData->vnum == VM_CARPENTER_CHEST)
+        return false;
+
+    Room *r = obj->in_room;
+    if (!IS_SET(r->room_flags, ROOM_MANSION))     // mansions only -- 'go' covers the rest
+        return false;
+    if (IS_SET(r->room_flags, ROOM_GODS_ONLY))
+        return false;
+    if (r->pIndexData->clan != clan_none)
+        return false;
+    if (!obj->getProperty( "keepHere" ).empty( ))
+        return false;
+    return true;
+}
+
+// The room's mansion owner (props {"mansion":{"owner":X}}), or "-".
+static DLString vaultmigrate_room_mansion_owner( Room *room )
+{
+    const Json::Value &props = room->pIndexData->props;
+    if (props.isObject( ) && props["mansion"].isObject( ) && props["mansion"]["owner"].isString( )) {
+        DLString o = props["mansion"]["owner"].asString( );
+        if (!o.empty( ))
+            return o;
+    }
+    return "-";
+}
+
+// Area furniture = this room's resets drop this vnum on the floor ('O' reset).
+static bool vaultmigrate_is_room_furniture( Object *obj )
+{
+    if (obj->in_room == 0 || obj->pIndexData == 0)
+        return false;
+    int vnum = obj->pIndexData->vnum;
+    ResetList &resets = obj->in_room->pIndexData->resets;
+    for (size_t i = 0; i < resets.size( ); i++) {
+        RESET_DATA *r = resets[i];
+        if (r != 0 && r->command == 'O' && r->arg1 == vnum)
+            return true;
+    }
+    return false;
+}
+
+static void vaultmigrate_drymansion( Character *ch )
+{
+    std::ostringstream dump;
+    dump << "owner\texists\tmansion_owner\troom_vnum\troom\tcontainer_vnum\tfurniture\titems\treset_kept\tto_migrate\n";
+
+    int total = 0, furniture = 0, migrate = 0, resetKept = 0, deletedOwner = 0, deletedItems = 0;
+    std::ostringstream skipped;
+
+    for (Object *obj = object_list; obj != 0; obj = obj->next) {
+        if (!vaultmigrate_is_mansionchest( obj ))
+            continue;
+
+        DLString owner = obj->getOwner( );
+        bool exists = PCharacterManager::find( owner ) != 0;
+        bool furn = vaultmigrate_is_room_furniture( obj );
+        std::set<int> resetVnums;
+        vaultmigrate_clan_reset_vnums( obj, resetVnums );
+
+        int items = 0, kept = 0, mig = 0;
+        for (Object *it = obj->contains; it != 0; it = it->next_content) {
+            items++;
+            if (vaultmigrate_is_reset_content( it, resetVnums ))
+                kept++;
+            else
+                mig++;
+        }
+
+        DLString mowner = vaultmigrate_room_mansion_owner( obj->in_room );
+        dump << owner << "\t" << (exists ? "yes" : "NO") << "\t" << mowner << "\t" << obj->in_room->vnum << "\t"
+             << obj->in_room->getName( ) << "\t" << obj->pIndexData->vnum << "\t"
+             << (furn ? "furniture" : "parked") << "\t" << items << "\t" << kept << "\t" << mig << "\n";
+
+        total++;
+        if (furn) furniture++;
+        if (!exists) {
+            deletedOwner++;
+            deletedItems += mig;
+            skipped << "  room " << obj->in_room->vnum << "  stamp " << owner
+                    << "  house " << mowner << "  vnum " << obj->pIndexData->vnum
+                    << "  items " << mig << "\n";
+            continue;
+        }
+        migrate += mig;
+        resetKept += kept;
+    }
+
+    const char *path = "vaultmigrate-mansion-dryrun.txt";
+    std::ofstream fout( path );
+    if (fout) { fout << dump.str( ); fout.close( ); }
+
+    std::ostringstream buf;
+    buf << "{WMansion-chest migration -- DRY RUN (nothing changed).{x\n\n";
+    buf << "Owned containers on mansion floors (not quest bags 103, not carpenter chests 170).\n";
+    buf << "Furniture keeps its shell with the owner stamp cleared; parked ones are deleted.\n\n";
+    buf << "Containers found : " << total << "   (furniture " << furniture << ", parked " << total - furniture << ")\n";
+    buf << "Items to migrate : " << migrate << "   (top-level, would move to owner vaults)\n";
+    buf << "Reset items kept : " << resetKept << "\n";
+    buf << "Dead-owner stamp : " << deletedOwner << " containers / " << deletedItems << " items SKIPPED (left as is)\n";
+    if (deletedOwner > 0)
+        buf << skipped.str( );
+    buf << "\nFull manifest written to: " << path << "\n";
+    page_to_char( buf.str( ).c_str( ), ch );
+}
+
+static void vaultmigrate_gomansion( Character *ch, DLString rest )
+{
+    DLString target = rest.getOneArgument( );
+    if (target.empty( )) {
+        ch->pecho( "Usage: vaultmigrate gomansion <owner>|all" );
+        return;
+    }
+    DLString targetKey = target.toLower( );
+    bool doAll = (targetKey == "all");
+
+    // Snapshot first: bank_deposit/extract_obj mutate object_list. These containers
+    // sit directly on floors and are never nested in one another.
+    std::vector<Object *> containers;
+    for (Object *obj = object_list; obj != 0; obj = obj->next) {
+        if (!vaultmigrate_is_mansionchest( obj ))
+            continue;
+        if (!doAll && obj->getOwner( ).toLower( ) != targetKey)
+            continue;
+        containers.push_back( obj );
+    }
+
+    if (containers.empty( )) {
+        ch->pecho( "No owned mansion container found for '" + target + "'." );
+        return;
+    }
+
+    int shellsCleared = 0, parkedDeleted = 0, parkedKept = 0, skippedDead = 0;
+    int itemsBanked = 0, itemsKeptReset = 0, itemsLeft = 0;
+    std::ostringstream skipped;
+
+    for (size_t i = 0; i < containers.size( ); i++) {
+        Object *cont = containers[i];
+        Room *room = cont->in_room;                   // captured before any extract
+        DLString owner = cont->getOwner( );
+        DLString key = owner.toLower( );
+        bool exists = PCharacterManager::find( owner ) != 0;
+        bool furn = vaultmigrate_is_room_furniture( cont );
+
+        if (!exists) {
+            // Stale stamp: no vault to receive, and the house may belong to
+            // someone alive. Leave it whole for an immortal to judge.
+            skippedDead++;
+            skipped << "  room " << room->vnum << "  stamp " << owner
+                    << "  house " << vaultmigrate_room_mansion_owner( room ) << "\n";
+            continue;
+        }
+
+        std::set<int> resetVnums;
+        vaultmigrate_clan_reset_vnums( cont, resetVnums );
+
+        dreamland->removeOption( DL_SAVE_OBJS );       // one room save after, not per deposit
+
+        Object *next = 0;
+        for (Object *it = cont->contains; it != 0; it = next) {
+            next = it->next_content;                  // bank_deposit/extract_obj free it
+            if (vaultmigrate_is_reset_content( it, resetVnums )) {
+                itemsKeptReset++;
+                continue;
+            }
+            if (bank_deposit( it, "player", key ))
+                itemsBanked++;
+            else
+                itemsLeft++;                          // NOSAVEDROP / write failure
+        }
+
+        if (furn) {
+            cont->setOwner( "" );                     // shell stays as plain mansion furniture
+            shellsCleared++;
+        } else if (cont->contains == 0) {
+            extract_obj( cont );
+            parkedDeleted++;
+        } else
+            parkedKept++;
+
+        dreamland->resetOption( DL_SAVE_OBJS );
+        if (room != 0)
+            save_items( room );
+    }
+
+    std::ostringstream buf;
+    buf << "{WMansion-chest migration -- GO";
+    if (!doAll)
+        buf << " (" << target << ")";
+    buf << "{x  --  changes are LIVE and saved.\n\n";
+    buf << "Furniture shells un-owned : " << shellsCleared << "\n";
+    buf << "Parked containers deleted : " << parkedDeleted << "\n";
+    buf << "Items banked to vaults    : " << itemsBanked << "\n";
+    buf << "Reset items left in place : " << itemsKeptReset << "\n";
+    if (itemsLeft > 0)
+        buf << "{YItems not banked{x          : " << itemsLeft << "   (NOSAVEDROP, or a write error -- left in place)\n";
+    if (parkedKept > 0)
+        buf << "{YParked containers kept{x    : " << parkedKept << "   (still hold unbanked or reset-tagged items)\n";
+    if (skippedDead > 0)
+        buf << "{YDead-owner stamp, SKIPPED{x : " << skippedDead << "\n" << skipped.str( );
+    page_to_char( buf.str( ).c_str( ), ch );
+}
+
 CMDADM( vaultmigrate )
 {
     if (!ch->isCoder( )) {
@@ -563,6 +790,14 @@ CMDADM( vaultmigrate )
         vaultmigrate_goclanforce( ch, rest );
         return;
     }
+    if (arg == "drymansion") {
+        vaultmigrate_drymansion( ch );
+        return;
+    }
+    if (arg == "gomansion") {
+        vaultmigrate_gomansion( ch, rest );
+        return;
+    }
     if (arg == "dryclan") {
         vaultmigrate_dryclan( ch );
         return;
@@ -575,6 +810,8 @@ CMDADM( vaultmigrate )
         ch->pecho( "  vaultmigrate go all          migrate EVERY litter bag (destructive, one-time)" );
         ch->pecho( "  vaultmigrate dry103          like dry, but quest bags (vnum 103) IN mansions too" );
         ch->pecho( "  vaultmigrate go103 <owner>|all   migrate/purge those mansion quest bags" );
+        ch->pecho( "  vaultmigrate drymansion      report owned containers on mansion floors -- writes nothing" );
+        ch->pecho( "  vaultmigrate gomansion <owner>|all   bank their contents, un-own furniture shells" );
         ch->pecho( "  vaultmigrate dryclan         report clan-stash containers -- writes nothing" );
         ch->pecho( "  vaultmigrate goclan <clan>|all   migrate clan stash into clan vaults (destructive)" );
         ch->pecho( "  vaultmigrate goclanforce <vnum>  drain EVERY item from one storage vnum + purge it" );
