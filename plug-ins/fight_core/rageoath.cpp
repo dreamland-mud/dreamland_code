@@ -197,7 +197,7 @@ void rage_feed_priests( Character *caster, Character *vch, int mana )
 {
     int gain = mana / 2;
 
-    if (!caster || !vch || !vch->in_room || gain <= 0)
+    if (!caster || !vch || !vch->in_room || gain <= 0 || !rage_member( vch ))
         return;
 
     // The aura feeds on hostile magic only, never on a friend's.
@@ -209,6 +209,9 @@ void rage_feed_priests( Character *caster, Character *vch, int mana )
 
     for (Character *rch = vch->in_room->people; rch; rch = rch->next_in_room) {
         if (rch == caster || !rage_divine( rch ) || rch->mana >= rch->max_mana)
+            continue;
+        // A priest fighting on the caster's side gets nothing from his ally's spell.
+        if (is_same_group( caster, rch ))
             continue;
 
         auto last = lastFeed.find( rch->getID( ) );
@@ -239,8 +242,7 @@ bool rage_area_bane( Character *caster, Character *vch, bool prayer, bool retali
         oldact( _("Аура ярости $c2 отводит колдовство в сторону."), vch, 0, 0, TO_ROOM );
     }
 
-    if (!prayer)
-        rage_feed_priests( caster, vch, mana );
+    rage_feed_priests( caster, vch, mana );
 
     if (retaliate && !prayer && caster && caster != vch
         && !is_safe_nomessage( vch, caster ) && !is_safe_nomessage( caster, vch ))

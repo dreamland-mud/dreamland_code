@@ -1112,8 +1112,9 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
             }
             
             baneMessage( ch, vch );
-            // Hostile magic only: a buff the aura bounces feeds nobody.
-            if (offensive || transport)
+            // Hostile magic only: a buff the aura bounces feeds nobody, even one
+            // from the transportation group (fly, mental block).
+            if (offensive || (transport && !defensive))
                 rage_feed_priests( ch, vch, getMana( ) );
             baneDamage( ch, vch, damage );
             return true;
