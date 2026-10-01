@@ -455,6 +455,8 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
 {
     PCharacter dummy;
     dummy.getAttributes( ).getAttr<XMLStringAttribute>( "lang" )->setValue( "ru" );
+    PCharacter dummyUa;
+    dummyUa.getAttributes( ).getAttr<XMLStringAttribute>( "lang" )->setValue( "ua" );
     DLString playerName;
     
     servlet_get_arg(params, "message", playerName);
@@ -471,6 +473,7 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
             wch["name"]["ru"] = victim->getRussianName().decline('1');
             wch["race"]["en"] = victim->getRace()->getName();
             wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim).ruscase('1');
+            wch["race"]["ua"] = victim->getRace()->getNameFor(&dummyUa, victim).ruscase('1');
 
             if (victim->getClan() != clan_none && victim->getClan()->isValid()
                 && !victim->getClan()->isHidden()) {
@@ -478,6 +481,7 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
                 // clan was the one field on this list with no English form.
                 wch["clan"]["en"] = victim->getClan()->getNameFor(LANG_EN).colourStrip();
                 wch["clan"]["ru"] = victim->getClan()->getRussianName().ruscase('1').colourStrip();
+                wch["clan"]["ua"] = victim->getClan()->getNameFor(LANG_UA).colourStrip();
             }
 
             if (!victim->getPretitle().empty())
@@ -501,6 +505,10 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
         }
 
         body["total"] = (int)(online.size() + offline.size());
+
+        Descriptor::setOfflineCount(offline.size());
+        body["weekPeak"] = Descriptor::getWeekPeak();
+        body["weekUniques"] = who_count_week_uniques();
     }
     // 'whois <name>' syntax, lookup player details
     else {        
