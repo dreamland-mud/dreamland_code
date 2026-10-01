@@ -67,13 +67,9 @@ void MobileBehaviorManager::assign( NPCharacter *mob ) {
         mob->behavior.fromXML( rootNode );
 
         // A childless <behavior type="X"/> parses as an XML leaf and leaves the
-        // pointer empty; fall back to the basic behavior instead of crashing.
-        if (!mob->behavior) {
-            LogStream::sendError( ) << "mob " << mob->pIndexData->vnum
-                << ": empty behavior '" << type << "', using basic" << endl;
-            assignBasic( mob );
-            return;
-        }
+        // pointer empty; the fallback below the catch takes over.
+        if (!mob->behavior)
+            throw Exception( "empty behavior '" + type + "'" );
 
         // Try to override behavior definition from a file in 'share/DL/behaviors' folder.
         // Careful here to pass the original pointer, so that fromXML on the underlying class is called,
@@ -85,6 +81,13 @@ void MobileBehaviorManager::assign( NPCharacter *mob ) {
 
     } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;
+    }
+
+    // Unknown class, bad XML or an empty node: never leave a mob without a
+    // behavior, the rest of the engine dereferences it.
+    if (!mob->behavior) {
+        LogStream::sendError( ) << "mob " << mob->pIndexData->vnum << ": no behavior, using basic" << endl;
+        assignBasic( mob );
     }
 }
 
@@ -163,16 +166,20 @@ void MobileBehaviorManager::parse( NPCharacter * mob, FILE *fp ) {
         }
         
         mob->behavior.fromStream( istr );
-        if (!mob->behavior) {
-            LogStream::sendError( ) << "mob " << mob->pIndexData->vnum
-                << ": saved behavior is empty, using basic" << endl;
-            assignBasic( mob );
-            return;
-        }
-        mob->behavior->setChar( mob );
+        if (mob->behavior)
+            mob->behavior->setChar( mob );
 
     } catch (Exception e) {
         LogStream::sendError( ) << e.what( ) << endl;
+    }
+
+    // The saved behavior did not load: rebuild it the way create_mobile_org does.
+    if (!mob->behavior) {
+        LogStream::sendError( ) << "mob " << mob->pIndexData->vnum << ": saved behavior did not load, reassigning" << endl;
+        if (mob->pIndexData->behavior)
+            assign( mob );
+        else
+            assignBasic( mob );
     }
 }
 
