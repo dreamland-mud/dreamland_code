@@ -47,6 +47,30 @@ const struct movetype_t movetypes [] = {
  { MOVETYPE_FLYING,     MOVETYPE_NORMAL,    1, true,  "flying",    "лететь",    "",        "прилете%1$Gло|л|ла|ли",           "улете%1$Gло|л|ла|ли",
    "flies in",                  "flies off",                   "прилеті%1$Gло|в|ла|ли",          "полеті%1$Gло|в|ла|ли",
  },
+ // Text-only rows, mob reform §3.6a. danger/wait/sneak copy the base row
+ // (galloping, clattering: riding; trotting, crawling, hopping: walk;
+ // slithering, oozing: slink). RU/UA wording pending translators' review.
+ { MOVETYPE_GALLOPING,  MOVETYPE_DANGEROUS, 1, true,  "galloping",  "",        "",         "прискака%1$Gло|л|ла|ли",          "ускака%1$Gло|л|ла|ли",
+   "gallops in",                "gallops off",                 "прискака%1$Gло|в|ла|ли",         "поскака%1$Gло|в|ла|ли",
+ },
+ { MOVETYPE_CLATTERING, MOVETYPE_DANGEROUS, 1, true,  "clattering", "",        "",         "процока%1$Gло|л|ла|ли",           "процока%1$Gло|л|ла|ли",
+   "clatters in",               "clatters off",                "процока%1$Gло|в|ла|ли",          "процока%1$Gло|в|ла|ли",
+ },
+ { MOVETYPE_TROTTING,   MOVETYPE_NORMAL,    1, true,  "trotting",   "",        "",         "прибежа%1$Gло|л|ла|ли",           "убежа%1$Gло|л|ла|ли",
+   "trots in",                  "trots off",                   "прибіг%1$Gло||ла|ли",            "побіг%1$Gло||ла|ли",
+ },
+ { MOVETYPE_CRAWLING,   MOVETYPE_NORMAL,    1, true,  "crawling",   "",        "",         "приполз%1$Gло||ла|ли",            "уполз%1$Gло||ла|ли",
+   "crawls in",                 "crawls off",                  "приповз%1$Gло||ла|ли",           "поповз%1$Gло||ла|ли",
+ },
+ { MOVETYPE_SLITHERING, MOVETYPE_MORESAFE,  3, true,  "slithering", "",        "",         "приполз%1$Gло||ла|ли",            "уполз%1$Gло||ла|ли",
+   "slithers in",               "slithers off",                "приповз%1$Gло||ла|ли",           "поповз%1$Gло||ла|ли",
+ },
+ { MOVETYPE_OOZING,     MOVETYPE_MORESAFE,  3, true,  "oozing",     "",        "",         "притек%1$Gло||ла|ли",             "утек%1$Gло||ла|ли",
+   "oozes in",                  "oozes off",                   "при%1$Gтекло|тік|текла|текли",   "по%1$Gтекло|тік|текла|текли",
+ },
+ { MOVETYPE_HOPPING,    MOVETYPE_NORMAL,    1, true,  "hopping",    "",        "",         "прискака%1$Gло|л|ла|ли",          "ускака%1$Gло|л|ла|ли",
+   "hops in",                   "hops off",                    "прискака%1$Gло|в|ла|ли",         "поскака%1$Gло|в|ла|ли",
+ },
  { 0, 0, 0, 0, 0 },
 };
 
@@ -54,7 +78,7 @@ const struct movetype_t movetypes [] = {
 int movetype_lookup( const char *argument )
 {
     if (argument && argument[0])
-        for (int i = 0; movetypes[i].name; i++)
+        for (int i = 0; movetypes[i].name && i < MOVETYPE_TEXT_FIRST; i++)
             if (!str_prefix(argument, movetypes[i].name)
                 || !str_prefix(argument, movetypes[i].rname)
                 || !str_prefix(argument, movetypes[i].uaname))
@@ -63,6 +87,16 @@ int movetype_lookup( const char *argument )
     return MOVETYPE_WALK;
 }
 
+
+int movetype_text_lookup( const char *name )
+{
+    if (name && name[0])
+        for (int i = MOVETYPE_TEXT_FIRST; movetypes[i].name; i++)
+            if (!strcmp(name, movetypes[i].name))
+                return i;
+
+    return -1;
+}
 
 int movetype_resolve( Character *ch, const char *argument )
 {

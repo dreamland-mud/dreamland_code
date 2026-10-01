@@ -46,7 +46,22 @@ enum {
     MOVETYPE_FLEE,
     MOVETYPE_RIDING,
     MOVETYPE_FLYING,
+    // Text-only rows (mob reform, decisions 30, 47, 50): never chosen as a
+    // way of moving, only substituted into the arrive/leave message. Each
+    // copies its base row's danger, wait and sneak; the mechanics and every
+    // Fenia hook keep seeing the base row.
+    MOVETYPE_TEXT_FIRST,
+    MOVETYPE_GALLOPING = MOVETYPE_TEXT_FIRST,
+    MOVETYPE_CLATTERING,
+    MOVETYPE_TROTTING,
+    MOVETYPE_CRAWLING,
+    MOVETYPE_SLITHERING,
+    MOVETYPE_OOZING,
+    MOVETYPE_HOPPING,
 };
+
+/** Text-only row by name ("galloping"), -1 if there is none. */
+int movetype_text_lookup( const char * );
 
 int movetype_lookup( const char * );
 int movetype_resolve( Character *, const char * );

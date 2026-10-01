@@ -47,6 +47,7 @@ protected:
 
     void randomizeExits( );
     int adjustMovetype( Character * );
+    int adjustMoveVerb( Character *, int );
     void init( );
 
     struct exit_data * pexit;
