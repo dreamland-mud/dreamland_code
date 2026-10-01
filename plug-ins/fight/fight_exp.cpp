@@ -29,6 +29,7 @@
 #include "bonus.h"
 #include "fight.h"
 #include "act.h"
+#include "mobbody.h"
 #include "def.h"
 #include "skill_utils.h"
 #include "l10n.h"
@@ -409,6 +410,16 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
 
     base_exp += base_exp_bonus;
 
+    // Mob reform tier XP (decisions 4-5): multiplier before the cap, the cap
+    // scales with it. A tier's xp_min_level keeps trash at full XP up to there.
+    double tier_xp = 1.0;
+    if (victim->is_npc() && MobBody::tiers().loaded) {
+        const MobTiers::Tier &t = MobBody::tiers().get(victim->getNPC()->pIndexData->tier);
+        if (victim->getRealLevel() >= t.xpMinLevel)
+            tier_xp = t.xp;
+    }
+    base_exp = (int)(base_exp * tier_xp);
+
 
     // calculate and apply exp multiplier 
     align_bonus = xp_align_coeff(gch, victim, align_mult, align_div);
@@ -420,7 +431,7 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
         xp += 50 / gch->getModifyLevel();
 
     //limit 
-    xp = std::min(xp, 200);
+    xp = std::min(xp, (int)(200 * tier_xp));
 
     // randomize the rewards 
     xp = number_range(xp * 3 / 4, xp * 5 / 4);
