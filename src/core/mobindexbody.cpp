@@ -365,10 +365,10 @@ void mob_index_data::deriveNumbers()
 
     // Affect bits granted by the tier (item 56: sanctuary from elite up), on top
     // of the body. resolveBody() always runs first, so a tier change never stacks.
-    const MobTiers::Tier &t = tc.get(tier);
-    if (!t.affAdd.empty()) {
-        Body::NameSet aa(t.affAdd.begin(), t.affAdd.end());
-        affected_by |= (int)MobBody::bits(&::affect_flags, aa);
+    const MobTiers::Tier &tierRow = tc.get(tier);
+    if (!tierRow.affAdd.empty()) {
+        Body::NameSet tierAff(tierRow.affAdd.begin(), tierRow.affAdd.end());
+        affected_by |= (int)MobBody::bits(&::affect_flags, tierAff);
         bodySnapshot[MOBSET_AFF] = (unsigned int)affected_by;
     }
 
