@@ -14,7 +14,8 @@
  *
  * deriveNumbers() resolves the tier and, while fight/mob_tiers.json is loaded,
  * replaces the authored hit/mana/damage/hitroll/ac/wealth with the tier
- * centres and picks the enabled off bits (decision 39). Without the file the
+ * centres, picks the enabled off bits (decision 39) and adds the tier's
+ * affect bits (decision 56). Without the file the
  * authored numbers stay, as before the reform.
  */
 #include <algorithm>
@@ -361,6 +362,15 @@ void mob_index_data::deriveNumbers()
     saves = c.saves;
     statCap = c.statCap;
     numbersDerived = true;
+
+    // Affect bits granted by the tier (item 56: sanctuary from elite up), on top
+    // of the body. resolveBody() always runs first, so a tier change never stacks.
+    const MobTiers::Tier &t = tc.get(tier);
+    if (!t.affAdd.empty()) {
+        Body::NameSet aa(t.affAdd.begin(), t.affAdd.end());
+        affected_by |= (int)MobBody::bits(&::affect_flags, aa);
+        bodySnapshot[MOBSET_AFF] = (unsigned int)affected_by;
+    }
 
     if (bodyResolved) {
         bitstring_t enabled = enabled_off(this, tc.offCount(tier, vnum));

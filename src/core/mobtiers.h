@@ -20,6 +20,7 @@
  *            "xp": 1.0, "xp_min_level": 0,       // xp mult applies from this victim level on
  *                                                // (trash "x0.75 above level 10" = 11)
  *            "gold": 1.0,
+ *            "aff_add": [ "sanctuary" ],         // affect bits the tier grants (item 56)
  *            "word": { "en": "...", "ru": "...", "ua": "..." } },
  *     ... missing numbers are interpolated between their neighbours
  *   },
@@ -63,6 +64,7 @@ struct Tier {
     double xp = 1;
     int xpMinLevel = 0;
     double gold = 1;
+    std::vector<std::string> affAdd;  // affect bits every mob of the tier gets (sanctuary, item 56)
     std::map<std::string, std::string> word;
 };
 
