@@ -245,6 +245,12 @@ NMI_GET( CharacterWrapper, id, "уникальный идентификатор 
     return Register( DLString(id) );
 }
 
+NMI_GET( CharacterWrapper, tier, "тир моба числом 1..10 (1 сильнейший), 0 для игроков" )
+{
+    checkTarget();
+    return Register( target->is_npc() ? target->getNPC()->pIndexData->tier : 0 );
+}
+
 NMI_GET( CharacterWrapper, bloodless, "true, если у тела нет крови: скелет, конструкция, туман или нет ни сердца, ни холодной крови" )
 {
     checkTarget();
