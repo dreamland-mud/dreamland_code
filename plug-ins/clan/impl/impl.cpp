@@ -24,15 +24,8 @@
 
 #include "defaultclan.h"
 #include "battlerager.h"
-#include "shalafi.h"
-#include "chaos.h"
 #include "ruler.h"
-#include "invader.h"
 #include "knight.h"
-#include "lion.h"
-#include "ghost.h"
-#include "flowers.h"
-#include "artificer.h"
 
 TABLE_LOADER(ClanLoader, "clans", "Clan");
 
@@ -88,31 +81,26 @@ extern "C"
          */
         Plugin::registerPlugin<ObjectBehaviorRegistrator<BattleragerPoncho> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<PersonalBattleragerPoncho> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardBattlerager> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanHealerBattlerager> >( ppl );
 
         /*
          * chaos
          */
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardChaos> >( ppl );
         
         /*
          * knight
          */
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardKnight> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanItemKnight> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanAltarKnight> >( ppl );
         
         /*
          * lion
          */
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardLion> >( ppl );
         
         /*
          * ruler
          */
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardRulerPre > >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardRuler > >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardRulerJailer > >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<RulerSpecialGuard> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<Stalker> >( ppl );
@@ -120,19 +108,14 @@ extern "C"
         /*
          * shalafi
          */
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardShalafi> >( ppl );
         
         /*
          * invader
          */
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardInvader> >( ppl );
 
         /*
          * other guards
          */
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardFlowers> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardGhost> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardArtificer> >( ppl );
         
         /*
          * loader

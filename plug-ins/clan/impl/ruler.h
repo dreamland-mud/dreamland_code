@@ -25,15 +25,6 @@ protected:
         virtual void actGreet( PCharacter * );
 };
 
-class ClanGuardRuler : public ClanGuard {
-XML_OBJECT
-public:
-        typedef ::Pointer<ClanGuardRuler> Pointer;
-    
-protected:        
-        virtual int getCast( Character * );
-};
-
 class ClanGuardRulerJailer : public ClanGuard {
 XML_OBJECT
 public:

@@ -497,44 +497,8 @@ void ClanHealerBattlerager::speech( Character *wch, const char *cspeech )
 /*--------------------------------------------------------------------------
  * Powerman 
  *-------------------------------------------------------------------------*/
-bool ClanGuardBattlerager::specFight( )
-{
-    Character *victim;
 
-    if ( !ch->isAffected(gsn_spellbane) )
-            interpret( ch, "spellbane" );
 
-    if (!( victim = getVictim( ) ))
-        return true;
-
-    if ( number_percent() < 33 )
-    {
-            oldact(_("Ты наносишь тройной удар смертоносной силы!"),ch,0,0,TO_CHAR);
-            oldact(_("$c1 наносит тройной удар смертоносной силы!"),ch,0,0,TO_ROOM);
-            one_hit( ch, victim );
-            one_hit( ch, victim );
-            one_hit( ch, victim );
-    }
-
-    if ( !ch->isAffected(gsn_resistance) )
-            interpret( ch, "resistance" );
-
-    if ( ch->hit < (ch->max_hit /3) && !IS_AFFECTED(ch, AFF_REGENERATION) )
-            interpret( ch, "bandage" );
-
-    return true;
-}
-
-void ClanGuardBattlerager::actGreet( PCharacter *wch )
-{
-    do_say(ch, "Добро пожаловать. Да прибудет с тобой {1{RЯрость!{2");
-}
-
-void ClanGuardBattlerager::actPush( PCharacter *wch )
-{
-    oldact(_("$C1 отвешивает тебе нехилый подзатыльник..."), wch, 0, ch, TO_CHAR );
-    oldact(_("$C1 отвешивает $c3 подзатыльник...\n\r$c1 -- как ветром сдуло."), wch, 0, ch, TO_ROOM );
-}
 
 
 SKILL_DECL(trophy);

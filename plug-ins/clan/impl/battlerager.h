@@ -32,17 +32,6 @@ public:
 };
 
 
-class ClanGuardBattlerager: public ClanGuard {
-XML_OBJECT
-public:
-        typedef ::Pointer<ClanGuardBattlerager> Pointer;
-    
-protected:        
-        virtual bool specFight( );
-        virtual void actPush( PCharacter * );
-        virtual void actGreet( PCharacter * );
-};
-
 class ClanHealerBattlerager: public ClanMobile, public BasicMobileDestiny {
 XML_OBJECT
 public:

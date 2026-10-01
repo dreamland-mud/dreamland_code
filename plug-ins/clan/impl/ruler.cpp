@@ -146,38 +146,6 @@ bool ClanGuardRulerPre::specFight( )
 /*--------------------------------------------------------------------------
  * Ruler's Clan Guard 
  *------------------------------------------------------------------------*/
-int ClanGuardRuler::getCast( Character *victim )
-{
-    int sn = -1;
-
-    switch ( dice(1,16) ) {
-    case  0:
-    case  1:
-            if (!victim->isAffected( gsn_spellbane ))
-                sn = gsn_dispel_affects;
-            break;
-    case  2:
-    case  3:
-            sn = gsn_acid_arrow;
-            break;
-    case  4:
-    case  5:
-            sn = gsn_caustic_font;
-            break; 
-    case  6:
-    case  7:
-    case  8:
-    case  9:
-    case 10:
-            sn = gsn_acid_blast;
-            break;
-    default:
-            sn = -1;
-            break;
-    }
-
-    return sn;
-}
 
 /*--------------------------------------------------------------------------
  * Ruler's Jailer 
