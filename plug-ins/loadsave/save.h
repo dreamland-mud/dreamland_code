@@ -48,6 +48,8 @@ void load_single_objects_folder( char * subdir, bool remove_after );
 void load_room_objects( Room *room, char * path, bool remove_after );
 
 void load_dropped_mobs( );
+/** Mob reform: one boot-log line about pre-reform saved body lines. */
+void saved_mobiles_report( );
 void load_single_mobiles_folder( char * subdir, bool remove_after );
 void load_room_mobiles( Room *room, char * path, bool remove_after );
 

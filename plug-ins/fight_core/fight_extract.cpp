@@ -217,12 +217,7 @@ void extract_dead_player( PCharacter *ch, int flags )
     ch->mana    = ch->max_mana / 10;
     ch->move    = ch->max_move;
     ch->shadow = -1;
-    // An NPC regrows the body it was built with, not the race's (a prototype
-    // 'parts del' must not grow back), mob reform plan §3.6 item 4.
-    if (ch->is_npc())
-        ch->parts = ch->getNPC()->baseBits[MOBSET_PARTS];
-    else
-        ch->parts = ch->getRace()->getParts();
+    ch->parts = ch->getRace()->getParts();
 
     for (int i = 0; i < desireManager->size( ); i++)
         desireManager->find( i )->reset( ch );

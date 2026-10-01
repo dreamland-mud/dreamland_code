@@ -17,7 +17,8 @@
  *            "saves": -0.05,                     // saving throw per level (-L/20)
  *            "stat_cap": 13,                     // + level * stat_cap_per_level
  *            "off_enabled": 1, "off_parity": true, // count of enabled off bits, -1 = all
- *            "xp": 1.0, "xp_min_level": 0,       // xp mult applies above that level
+ *            "xp": 1.0, "xp_min_level": 0,       // xp mult applies from this victim level on
+ *                                                // (trash "x0.75 above level 10" = 11)
  *            "gold": 1.0,
  *            "word": { "en": "...", "ru": "...", "ua": "..." } },
  *     ... missing numbers are interpolated between their neighbours

@@ -366,7 +366,13 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
     // These aff bits become real affects in create_mob_affects (evil sanctuary
     // even turns into dark shroud); the affects re-apply themselves, the raw
     // bits must not come back through affect_check.
-    mob->baseBits[MOBSET_AFF] &= ~(bitstring_t)(AFF_SANCTUARY|AFF_HASTE|AFF_PROTECT_EVIL|AFF_PROTECT_GOOD|AFF_CORRUPTION);
+    mob->baseBits[MOBSET_AFF] &= ~(bitstring_t)AFF_FROM_AFFECTS;
+    // A mob read from disk gets its real affects from the saved Affc lines;
+    // the raw prototype bits must not ride along (evil sanctuary would sit
+    // under its dark shroud, a dispelled haste would come back for good).
+    // This makes the loader's start equal what fwrite_mob diffed against.
+    if (IS_SET(flags, FCREATE_NOAFFECTS))
+        mob->affected_by.removeBit(AFF_FROM_AFFECTS);
 
     // Override descriptions with formatting symbols that depend on NPC sex.
     for (int l = LANG_MIN; l < LANG_MAX; l++) {

@@ -9,6 +9,8 @@
 #include "mobbody.h"
 #include "merc.h"
 
+bool mob_body_model_active = false;
+
 namespace MobBody {
 
 static Body::Config formsConfig;
@@ -88,6 +90,8 @@ bitstring_t bits(const FlagTable *table, const Body::NameSet &n)
 void wearlocs(const Body::NameSet &n, GlobalBitvector &out)
 {
     out.setRegistry(wearlocationManager);
+    if (!wearlocationManager)
+        return;
 
     // lookup(), not findExisting(): races and areas resolve before the
     // wearlocation plugin registers its elements. lookup() reserves the index

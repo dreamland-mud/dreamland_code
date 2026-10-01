@@ -121,7 +121,7 @@ DLString format_longdescr(const DLString &longdescr)
 void
 XMLMobileFactory::init(const mob_index_data *mob)
 {
-    mob_index_data *m = const_cast<mob_index_data *>(mob);
+    const mob_index_data *m = mob;
     bitstring_t add, del;
 
     keyword = mob->keyword;

@@ -15,6 +15,9 @@
 #include "bitstring.h"
 
 struct FlagTable;
+
+/** True only while fight/mob_forms.json is loaded (see merc.h). */
+extern bool mob_body_model_active;
 class GlobalBitvector;
 
 namespace MobBody {

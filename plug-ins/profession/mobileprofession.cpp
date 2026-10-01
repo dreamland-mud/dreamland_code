@@ -107,7 +107,7 @@ GlobalBitvector MobileProfession::toVector( CharacterMemoryInterface *mem ) cons
     if (mem->getMobile()) {
         NPCharacter *ch = mem->getMobile();
         
-        if (IS_SET(ch->act, ACT_NECROMANCER))  bv.set( prof_necromancer );
+        if (IS_SET(ch->act, NPC_NECRO_ACTS))   bv.set( prof_necromancer );
         if (IS_SET(ch->act, ACT_WARRIOR))      bv.set( prof_warrior );
         if (IS_SET(ch->act, ACT_THIEF))        bv.set( prof_thief );
         if (IS_SET(ch->act, ACT_CLERIC))       bv.set( prof_cleric );

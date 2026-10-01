@@ -170,6 +170,21 @@ bool Config::fromJson(const Json::Value &value, std::string &error)
 
     readList(value["size_order"], sizeOrder);
 
+    // A typo here would only surface at area load, as an out_of_range
+    // thrown past every catch. Refuse the file instead: the loader keeps the
+    // previous config (or none).
+    for (auto &f: forms)
+        for (auto &g: f.second.impliesForms)
+            if (!forms.count(g)) {
+                error = "form " + f.first + " implies unknown form " + g;
+                return false;
+            }
+    for (auto &r: renames)
+        if (!forms.count(r.second)) {
+            error = "rename " + r.first + " -> unknown form " + r.second;
+            return false;
+        }
+
     loaded = true;
     return true;
 }
