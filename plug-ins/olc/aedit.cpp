@@ -114,7 +114,7 @@ void OLCStateArea::commit()
 
     if (!behavior.empty( )) 
         try {
-            // A bad edit keeps the behavior the area already had.
+            // A self-closing <behavior/> keeps the behavior the area already had.
             ::Pointer<AreaBehavior> previous( original->behavior.getPointer( ) );
             istringstream istr( behavior );
             original->behavior.fromStream( istr );
