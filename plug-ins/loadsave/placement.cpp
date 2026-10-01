@@ -163,6 +163,10 @@ void obj_to_char( Object *obj, Character *ch )
         obj->carried_by         = ch;
         obj->in_room         = 0;
         obj->in_obj                 = 0;
+        // A pocket only means something inside a container. A carried item
+        // with a stale one is hidden from 'inventory' and, once put into a
+        // bag without naming a pocket, from a plain 'get' too.
+        obj->pocket = "";
         ch->carry_number        += obj->getNumber( );
         ch->carry_weight        += obj->getWeight( );
 
