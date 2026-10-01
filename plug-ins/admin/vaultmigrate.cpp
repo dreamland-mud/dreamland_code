@@ -605,6 +605,125 @@ static bool vaultmigrate_is_room_furniture( Object *obj )
     return false;
 }
 
+// Every number under a serialized attribute (the mkey <keys><node>N</node>..).
+// Read through toXML so this plugin needs no link to the mansion plugin that
+// owns XMLAttributeMansionKey. Text nodes keep their cdata in the name.
+static void vaultmigrate_collect_numbers( const XMLNode::Pointer &node, std::set<int> &out )
+{
+    if (node.isEmpty( ))
+        return;
+    if (node->getName( ).isNumber( ))
+        out.insert( node->getName( ).toInt( ) );
+    const XMLNode::NodeList &kids = node->getNodeList( );
+    for (size_t i = 0; i < kids.size( ); i++)
+        vaultmigrate_collect_numbers( kids[i], out );
+}
+
+// Mansion key vnums a player holds (mkey attribute), offline players included.
+static std::set<int> vaultmigrate_player_mkeys( PCMemoryInterface *pci )
+{
+    std::set<int> keys;
+    XMLAttributes &attrs = pci->getAttributes( );
+    XMLAttributes::iterator ipos = attrs.find( "mkey" );
+    if (ipos == attrs.end( ))
+        return keys;
+    XMLNode::Pointer node( NEW, "mkey" );
+    if (ipos->second.toXML( node ))
+        vaultmigrate_collect_numbers( node, keys );
+    return keys;
+}
+
+// Door key vnums of the mansion this room belongs to: exits of every room in
+// the same area that carries the same props mansion owner.
+static std::set<int> vaultmigrate_mansion_keys( Room *room )
+{
+    std::set<int> keys;
+    DLString house = vaultmigrate_room_mansion_owner( room );
+    if (house == "-")
+        return keys;
+    for (auto &r: roomInstances) {
+        if (r->areaIndex( ) != room->areaIndex( ))
+            continue;
+        if (vaultmigrate_room_mansion_owner( r ) != house)
+            continue;
+        for (int d = 0; d < DIR_SOMEWHERE; d++)
+            if (r->exit[d] != 0 && r->exit[d]->key > 0)
+                keys.insert( r->exit[d]->key );
+    }
+    return keys;
+}
+
+// Who lives in the house now, for a container stamped by a deleted player.
+// The props owner goes stale on resale, so the door key decides: the one
+// existing player holding one of the mansion's keys. Several holders (a shared
+// house) -> the props owner if they are among them. Returns "" for nobody
+// (empty, abandoned house), "?" when it can't be told (left for an immortal).
+static DLString vaultmigrate_mansion_heir( Room *room, const DLString &deadOwner )
+{
+    std::set<int> keys = vaultmigrate_mansion_keys( room );
+    DLString house = vaultmigrate_room_mansion_owner( room );
+    if (keys.empty( ))
+        return "?";
+
+    std::vector<DLString> holders;
+    for (auto &p: PCharacterManager::getPCM( )) {
+        PCMemoryInterface *pci = p.second;
+        if (!deadOwner.empty( ) && pci->getName( ).toLower( ) == deadOwner.toLower( ))
+            continue;
+        std::set<int> mine = vaultmigrate_player_mkeys( pci );
+        for (std::set<int>::iterator k = mine.begin( ); k != mine.end( ); ++k)
+            if (keys.count( *k )) {
+                holders.push_back( pci->getName( ) );
+                break;
+            }
+    }
+
+    if (holders.size( ) == 1)
+        return holders[0];
+    if (holders.empty( ))
+        return (house != "-" && PCharacterManager::find( house ) != 0) ? "?" : "";
+    for (size_t i = 0; i < holders.size( ); i++)
+        if (holders[i].toLower( ) == house.toLower( ))
+            return holders[i];
+    return "?";
+}
+
+// A loose item on a mansion floor: takeable, not area decor (the room resets
+// that vnum), not a container this mode already handles as a stamped chest,
+// not a quest bag or carpenter chest, not a corpse, not pinned keepHere.
+// Untakeable objects are left: an immortal may have set them as decor.
+static bool vaultmigrate_is_mansionfloor( Object *obj )
+{
+    if (obj->pIndexData == 0 || obj->in_room == 0)
+        return false;
+    Room *r = obj->in_room;
+    if (!IS_SET(r->room_flags, ROOM_MANSION) || IS_SET(r->room_flags, ROOM_GODS_ONLY))
+        return false;
+    if (r->pIndexData->clan != clan_none)
+        return false;
+    if (!obj->can_wear( ITEM_TAKE ))
+        return false;
+    if (obj->item_type == ITEM_CORPSE_PC || obj->item_type == ITEM_CORPSE_NPC)
+        return false;
+    if (obj->pIndexData->vnum == VM_QUESTBAG || obj->pIndexData->vnum == VM_CARPENTER_CHEST)
+        return false;
+    if (vaultmigrate_is_mansionchest( obj ) || vaultmigrate_is_room_furniture( obj ))
+        return false;
+    if (!obj->getProperty( "keepHere" ).empty( ))
+        return false;
+    return true;
+}
+
+// Whose vault a mansion item goes to: its own stamp's owner if alive; a
+// stamp of a deleted player -> purge (only that owner could ever withdraw
+// it); unstamped -> the house heir. "" = purge, "?" = leave in place.
+static DLString vaultmigrate_item_dest( Object *it, const DLString &heir )
+{
+    if (!it->getOwner( ).empty( ))
+        return PCharacterManager::find( it->getOwner( ) ) != 0 ? it->getOwner( ) : DLString( "" );
+    return heir;
+}
+
 static void vaultmigrate_drymansion( Character *ch )
 {
     std::ostringstream dump;
@@ -640,15 +759,37 @@ static void vaultmigrate_drymansion( Character *ch )
         total++;
         if (furn) furniture++;
         if (!exists) {
+            DLString heir = vaultmigrate_mansion_heir( obj->in_room, owner );
             deletedOwner++;
             deletedItems += mig;
             skipped << "  room " << obj->in_room->vnum << "  stamp " << owner
                     << "  house " << mowner << "  vnum " << obj->pIndexData->vnum
-                    << "  items " << mig << "\n";
+                    << "  items " << mig << "  -> "
+                    << (heir == "?" ? DLString( "SKIP (unclear)" ) : heir.empty( ) ? DLString( "PURGE (nobody)" ) : "vault of " + heir)
+                    << "\n";
             continue;
         }
         migrate += mig;
         resetKept += kept;
+    }
+
+    // Loose floor items, by room, with the house heir they would go to.
+    std::map<int, int> floorByRoom;
+    std::map<int, DLString> floorHeir;
+    int floorTotal = 0, floorPurge = 0, floorSkip = 0;
+    for (Object *obj = object_list; obj != 0; obj = obj->next) {
+        if (!vaultmigrate_is_mansionfloor( obj ))
+            continue;
+        int rv = obj->in_room->vnum;
+        if (floorHeir.find( rv ) == floorHeir.end( ))
+            floorHeir[rv] = vaultmigrate_mansion_heir( obj->in_room, "" );
+        DLString dest = vaultmigrate_item_dest( obj, floorHeir[rv] );
+        floorByRoom[rv]++;
+        floorTotal++;
+        if (dest.empty( )) floorPurge++;
+        else if (dest == "?") floorSkip++;
+        dump << "FLOOR\t" << obj->getOwner( ) << "\t" << rv << "\t" << obj->pIndexData->vnum
+             << "\t-> " << (dest.empty( ) ? DLString( "PURGE" ) : dest) << "\n";
     }
 
     const char *path = "vaultmigrate-mansion-dryrun.txt";
@@ -658,13 +799,20 @@ static void vaultmigrate_drymansion( Character *ch )
     std::ostringstream buf;
     buf << "{WMansion-chest migration -- DRY RUN (nothing changed).{x\n\n";
     buf << "Owned containers on mansion floors (not quest bags 103, not carpenter chests 170).\n";
-    buf << "Furniture keeps its shell with the owner stamp cleared; parked ones are deleted.\n\n";
+    buf << "Furniture keeps its shell with the owner stamp cleared; parked ones are deleted.\n";
+    buf << "An item stamped to someone else goes to THEIR vault (purged if they are gone).\n\n";
     buf << "Containers found : " << total << "   (furniture " << furniture << ", parked " << total - furniture << ")\n";
     buf << "Items to migrate : " << migrate << "   (top-level, would move to owner vaults)\n";
     buf << "Reset items kept : " << resetKept << "\n";
-    buf << "Dead-owner stamp : " << deletedOwner << " containers / " << deletedItems << " items SKIPPED (left as is)\n";
+    buf << "Dead-owner stamp : " << deletedOwner << " containers / " << deletedItems << " items -> heir by door key:\n";
     if (deletedOwner > 0)
         buf << skipped.str( );
+    buf << "\nLoose floor items: " << floorTotal << " (purge " << floorPurge << ", unclear/skip " << floorSkip << ")\n";
+    for (std::map<int, int>::iterator f = floorByRoom.begin( ); f != floorByRoom.end( ); ++f) {
+        DLString h = floorHeir[f->first];
+        buf << "  room " << f->first << "  items " << f->second << "  -> "
+            << (h == "?" ? DLString( "SKIP (unclear)" ) : h.empty( ) ? DLString( "PURGE (nobody)" ) : "vault of " + h) << "\n";
+    }
     buf << "\nFull manifest written to: " << path << "\n";
     page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -690,30 +838,34 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
         containers.push_back( obj );
     }
 
-    if (containers.empty( )) {
-        ch->pecho( "No owned mansion container found for '" + target + "'." );
-        return;
-    }
-
     int shellsCleared = 0, parkedDeleted = 0, parkedKept = 0, skippedDead = 0;
-    int itemsBanked = 0, itemsKeptReset = 0, itemsLeft = 0;
+    int inherited = 0, abandoned = 0;
+    int itemsBanked = 0, itemsKeptReset = 0, itemsLeft = 0, itemsPurged = 0;
     std::ostringstream skipped;
 
     for (size_t i = 0; i < containers.size( ); i++) {
         Object *cont = containers[i];
         Room *room = cont->in_room;                   // captured before any extract
         DLString owner = cont->getOwner( );
-        DLString key = owner.toLower( );
         bool exists = PCharacterManager::find( owner ) != 0;
         bool furn = vaultmigrate_is_room_furniture( cont );
 
+        // Stamp of a deleted player: the stamp gates nothing (the door key
+        // does), so the contents go to whoever holds the key now. Nobody ->
+        // abandoned house, purged. Unclear -> left for an immortal.
+        DLString heir = owner;
         if (!exists) {
-            // Stale stamp: no vault to receive, and the house may belong to
-            // someone alive. Leave it whole for an immortal to judge.
-            skippedDead++;
-            skipped << "  room " << room->vnum << "  stamp " << owner
-                    << "  house " << vaultmigrate_room_mansion_owner( room ) << "\n";
-            continue;
+            heir = vaultmigrate_mansion_heir( room, owner );
+            if (heir == "?") {
+                skippedDead++;
+                skipped << "  room " << room->vnum << "  stamp " << owner
+                        << "  house " << vaultmigrate_room_mansion_owner( room ) << "\n";
+                continue;
+            }
+            if (heir.empty( ))
+                abandoned++;
+            else
+                inherited++;
         }
 
         std::set<int> resetVnums;
@@ -728,32 +880,79 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
                 itemsKeptReset++;
                 continue;
             }
-            if (bank_deposit( it, "player", key ))
+            // An item stamped to someone goes to that someone: the vault lets
+            // only the stamp's owner withdraw it, so in the heir's vault it
+            // would be stuck. A stamp of nobody alive, or no heir at all -> purge.
+            DLString dest = vaultmigrate_item_dest( it, heir );
+            if (dest.empty( )) {
+                itemsPurged += 1 + vaultmigrate_count_contents( it );
+                extract_obj( it );
+            } else if (bank_deposit( it, "player", dest.toLower( ) ))
                 itemsBanked++;
             else
                 itemsLeft++;                          // NOSAVEDROP / write failure
         }
 
-        if (furn) {
-            cont->setOwner( "" );                     // shell stays as plain mansion furniture
-            shellsCleared++;
-        } else if (cont->contains == 0) {
+        if (cont->contains == 0) {
+            // Emptied: the shell goes too. Furniture is dropped from its
+            // room's reset in the area file, so it doesn't come back.
             extract_obj( cont );
-            parkedDeleted++;
-        } else
+            if (furn) shellsCleared++;
+            else parkedDeleted++;
+        } else if (furn) {
+            cont->setOwner( "" );                     // leftovers -> plain furniture
             parkedKept++;
+        } else {
+            extract_obj( cont );
+            parkedKept++;
+        }
 
         dreamland->resetOption( DL_SAVE_OBJS );
         if (room != 0)
             save_items( room );
     }
 
+    // Loose floor items. Snapshot first, grouped per room for one save each.
+    std::vector<Object *> floor;
+    for (Object *obj = object_list; obj != 0; obj = obj->next)
+        if (vaultmigrate_is_mansionfloor( obj ))
+            floor.push_back( obj );
+
+    std::map<int, DLString> heirByRoom;
+    std::map<int, Room *> touched;
+    int floorBanked = 0, floorPurged = 0, floorSkipped = 0;
+    dreamland->removeOption( DL_SAVE_OBJS );
+    for (size_t i = 0; i < floor.size( ); i++) {
+        Object *it = floor[i];
+        Room *room = it->in_room;
+        if (heirByRoom.find( room->vnum ) == heirByRoom.end( ))
+            heirByRoom[room->vnum] = vaultmigrate_mansion_heir( room, "" );
+        DLString dest = vaultmigrate_item_dest( it, heirByRoom[room->vnum] );
+        if (!doAll && dest.toLower( ) != targetKey)
+            continue;
+        if (dest == "?") {
+            floorSkipped++;
+            continue;
+        }
+        touched[room->vnum] = room;
+        if (dest.empty( )) {
+            floorPurged += 1 + vaultmigrate_count_contents( it );
+            extract_obj( it );
+        } else if (bank_deposit( it, "player", dest.toLower( ) ))
+            floorBanked++;
+        else
+            floorSkipped++;                       // NOSAVEDROP / write failure
+    }
+    dreamland->resetOption( DL_SAVE_OBJS );
+    for (std::map<int, Room *>::iterator t = touched.begin( ); t != touched.end( ); ++t)
+        save_items( t->second );
+
     std::ostringstream buf;
     buf << "{WMansion-chest migration -- GO";
     if (!doAll)
         buf << " (" << target << ")";
     buf << "{x  --  changes are LIVE and saved.\n\n";
-    buf << "Furniture shells un-owned : " << shellsCleared << "\n";
+    buf << "Furniture shells removed  : " << shellsCleared << "\n";
     buf << "Parked containers deleted : " << parkedDeleted << "\n";
     buf << "Items banked to vaults    : " << itemsBanked << "\n";
     buf << "Reset items left in place : " << itemsKeptReset << "\n";
@@ -761,8 +960,19 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
         buf << "{YItems not banked{x          : " << itemsLeft << "   (NOSAVEDROP, or a write error -- left in place)\n";
     if (parkedKept > 0)
         buf << "{YParked containers kept{x    : " << parkedKept << "   (still hold unbanked or reset-tagged items)\n";
+    buf << "Floor items banked        : " << floorBanked << "\n";
+    if (floorPurged > 0)
+        buf << "Floor items purged        : " << floorPurged << "   (abandoned house, or stamped to a deleted player)\n";
+    if (floorSkipped > 0)
+        buf << "{YFloor items left{x          : " << floorSkipped << "   (heir unclear, NOSAVEDROP or write error)\n";
+    if (inherited > 0)
+        buf << "Dead stamp -> key holder   : " << inherited << " container(s)\n";
+    if (abandoned > 0)
+        buf << "Dead stamp, abandoned house: " << abandoned << " container(s)\n";
+    if (itemsPurged > 0)
+        buf << "{YItems purged{x              : " << itemsPurged << "   (abandoned house, or stamped to a deleted player)\n";
     if (skippedDead > 0)
-        buf << "{YDead-owner stamp, SKIPPED{x : " << skippedDead << "\n" << skipped.str( );
+        buf << "{YDead-owner stamp, SKIPPED{x : " << skippedDead << "   (heir unclear)\n" << skipped.str( );
     page_to_char( buf.str( ).c_str( ), ch );
 }
 
