@@ -48,7 +48,7 @@ bool RainbowScenario::checkArea( AreaIndexData *area ) const
 
 bool RainbowScenario::checkMobile( NPCharacter *ch ) const
 {
-    if (!IS_SET(ch->form, FORM_BIPED))
+    if (!CAN_HOLD_CARDS(ch))
         return false;
     if (IS_SET(ch->imm_flags, IMM_SUMMON|IMM_CHARM))
         return false;

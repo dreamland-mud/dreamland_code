@@ -149,7 +149,7 @@ void VampiricBiteOneHit::postDamageEffects( )
     // vampiric bite gives hp/mana to ch from victim
     int hit_ga, mana_ga;
 
-    if ( !IS_SET( victim->form, FORM_COLD_BLOOD ) ) {
+    if ( !IS_COLD_BLOODED( victim ) ) {
         hit_ga = min( (orig_dam / 2 ), (int)victim->max_hit );
         mana_ga = min( (orig_dam / 2 ), (int)victim->max_mana );
     ch->pecho(_("Твое здоровье и энергия восполняются, когда ты высасываешь кровь из противника."));
@@ -405,7 +405,7 @@ void sucking(Character *ch, Character *victim)
 
     int slevel = skill_level(*gsn_vampiric_bite, ch);
 
-    if (!IS_SET(victim->form, FORM_COLD_BLOOD)) {
+    if (!IS_COLD_BLOODED(victim)) {
         hp_gain = std::min(slevel * 5, (int)victim->max_hit);
         mana_gain = std::min(slevel * 5, (int)victim->max_hit);
     } else {

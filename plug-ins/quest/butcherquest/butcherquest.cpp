@@ -164,7 +164,7 @@ bool ButcherQuest::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     if (mob->size <= SIZE_TINY)
         return false;
 
-    if (!IS_SET(mob->form, FORM_EDIBLE))
+    if (!IS_EDIBLE_FORM(mob->form))
         return false;
 
     if (mob->in_room->areaIndex() != mob->pIndexData->area)
