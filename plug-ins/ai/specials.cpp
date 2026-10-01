@@ -610,7 +610,7 @@ bool BasicMobileBehavior::doHeal( )
         if (healCleric( ch ))
             return true;
 
-    if (IS_SET(ch->act, ACT_NECROMANCER|ACT_UNDEAD))
+    if (IS_SET(ch->act, ACT_NECROMANCER))
         if (healNecro( ch ))
             return true;
 

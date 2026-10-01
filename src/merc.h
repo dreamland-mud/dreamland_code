@@ -202,6 +202,8 @@
 #define IS_EDIBLE_FORM(form) ( !IS_SET((form), FORM_INEDIBLE) )
 /* Deck sixer and rainbow holder: a mind and a pair of hands (decision 27). */
 #define CAN_HOLD_CARDS(ch) ( IS_SET((ch)->form, FORM_SENTIENT) && IS_SET((ch)->parts, PART_HANDS) )
+/* Mob spellcasting AI needs a mind or magic in the body (plan §3.6 item 8). */
+#define NPC_CAN_CAST(ch) ( IS_SET((ch)->form, FORM_SENTIENT|FORM_MAGICAL) )
 
 /*
  * Object macros.
