@@ -308,6 +308,10 @@ static bool bank_read_entry_file( Character *ch, const char *fname )
 
     bool clean = false;
 
+    // obj_to_char prepends, so everything this file adds to the inventory sits
+    // in front of the current head.
+    Object *oldHead = ch->carrying;
+
     try {
         fseek( fp, 0L, SEEK_END );
         if ( ftell( fp ) <= 0 ) {
@@ -369,6 +373,15 @@ static bool bank_read_entry_file( Character *ch, const char *fname )
     }
 
     fclose( fp );
+
+    // A record keeps the pocket it had in its old container ("Pocket food~"),
+    // and an inventory item with a pocket set is skipped by show_list_to_char:
+    // the player could 'put' it but not see it in 'inventory'. Items handed
+    // straight to ch are in no container, so their pocket goes.
+    for ( Object *obj = ch->carrying; obj != 0 && obj != oldHead; obj = obj->next_content )
+        if ( obj->in_obj == 0 )
+            obj->pocket = "";
+
     return clean;
 }
 
