@@ -22,6 +22,9 @@
 #include "logstream.h"
 #include "websocketrpc.h"
 #include "profflags.h"
+#include "body.h"
+#include "mobbody.h"
+#include "stringlist.h"
 
 #include "dreamland.h"
 #include "l10n.h"
@@ -345,7 +348,17 @@ DefaultRace::DefaultRace( ) :
                 wearloc( wearlocationManager ),
                 affects( skillManager ),
                 hunts( raceManager ),
-                donates( raceManager )
+                donates( raceManager ),
+                partsAdd( 0, &part_flags ),
+                partsDel( 0, &part_flags ),
+                actDel( 0, &act_flags ),
+                offDel( 0, &off_flags ),
+                affDel( 0, &affect_flags ),
+                detDel( 0, &detect_flags ),
+                immDel( 0, &imm_flags ),
+                resDel( 0, &res_flags ),
+                vulnDel( 0, &vuln_flags ),
+                damtype( DAMW_NONE, &weapon_flags )
 {
 }
 
@@ -393,39 +406,39 @@ void DefaultRace::unloaded( )
 
 const Flags & DefaultRace::getDet( ) const
 {
-    return det;
+    return hasBodyForms( ) ? resolved( ).det : det;
 }
 const Flags & DefaultRace::getAct( ) const
 {
-    return act;
+    return hasBodyForms( ) ? resolved( ).act : act;
 }
 const Flags & DefaultRace::getAff( ) const
 {
-    return aff;
+    return hasBodyForms( ) ? resolved( ).aff : aff;
 }
 const Flags & DefaultRace::getOff( ) const
 {
-    return off;
+    return hasBodyForms( ) ? resolved( ).off : off;
 }
 const Flags & DefaultRace::getImm( ) const
 {
-    return imm;
+    return hasBodyForms( ) ? resolved( ).imm : imm;
 }
 const Flags & DefaultRace::getRes( ) const
 {
-    return res;
+    return hasBodyForms( ) ? resolved( ).res : res;
 }
 const Flags & DefaultRace::getVuln( ) const
 {
-    return vuln;
+    return hasBodyForms( ) ? resolved( ).vuln : vuln;
 }
 const Flags & DefaultRace::getForm( ) const
 {
-    return form;
+    return hasBodyForms( ) ? resolved( ).form : form;
 }
 const Flags & DefaultRace::getParts( ) const
 {
-    return parts;
+    return hasBodyForms( ) ? resolved( ).parts : parts;
 }
 
 const EnumerationArray & DefaultRace::getStats( ) const 
@@ -435,7 +448,7 @@ const EnumerationArray & DefaultRace::getStats( ) const
 
 const GlobalBitvector & DefaultRace::getWearloc( ) const
 {
-    return wearloc;
+    return hasBodyForms( ) ? resolved( ).wearloc : wearloc;
 }
 
 const GlobalBitvector & DefaultRace::getAffects( ) const
@@ -521,3 +534,97 @@ Flags DefaultRace::getAttitude( const Race &race ) const
     return att;
 }
 
+/*------------------------------------------------------------------
+ * DefaultRace: mob reform body model
+ *------------------------------------------------------------------*/
+bool DefaultRace::hasBodyForms( ) const
+{
+    return !forms.empty( ) && MobBody::forms( ).loaded;
+}
+
+void DefaultRace::getBodyInput( Body::Input &in, bool npc ) const
+{
+    StringList words( forms.getValue( ) );
+    for (auto &w: words)
+        in.forms.push_back( w );
+
+    in.size = size_table.name( size.getValue( ) );
+    in.npc = npc;
+    in.moveverb = moveverb.getValue( );
+
+    in.race.partsAdd = MobBody::names( &part_flags, partsAdd.getValue( ) );
+    in.race.partsDel = MobBody::names( &part_flags, partsDel.getValue( ) );
+
+    const XMLFlagsNoEmpty *adds[Body::BS_MAX] = { &act, &off, &aff, &det, &imm, &res, &vuln };
+    const XMLFlagsNoEmpty *dels[Body::BS_MAX] = { &actDel, &offDel, &affDel, &detDel, &immDel, &resDel, &vulnDel };
+    for (int k = 0; k < Body::BS_MAX; k++) {
+        in.race.bitsAdd[k] = MobBody::names( MobBody::bitSetTable( k ), adds[k]->getValue( ) );
+        in.race.bitsDel[k] = MobBody::names( MobBody::bitSetTable( k ), dels[k]->getValue( ) );
+    }
+
+    // A race's act set historically carries 'npc'; it is the resolver's job now.
+    in.race.bitsAdd[Body::BS_ACT].erase( "npc" );
+}
+
+/** The race body as the resolver builds it: NPC body for NPC races, PC body for PC races. */
+const DefaultRace::ResolvedBody & DefaultRace::resolved( ) const
+{
+    if (body.generation == MobBody::generation( ))
+        return body;
+
+    Body::Input in;
+    getBodyInput( in, !isPC( ) );
+
+    Body::Result r = Body::resolve( MobBody::forms( ), in );
+    for (auto &w: r.warnings)
+        LogStream::sendWarning( ) << "race " << getName( ) << ": " << w << endl;
+
+    MobBody::Engine e;
+    e.fromResult( r );
+
+    body.form = Flags( e.form, &form_flags );
+    body.parts = Flags( e.parts, &part_flags );
+    body.act = Flags( e.bits[Body::BS_ACT], &act_flags );
+    body.off = Flags( e.bits[Body::BS_OFF], &off_flags );
+    body.aff = Flags( e.bits[Body::BS_AFF], &affect_flags );
+    body.det = Flags( e.bits[Body::BS_DET], &detect_flags );
+    body.imm = Flags( e.bits[Body::BS_IMM], &imm_flags );
+    body.res = Flags( e.bits[Body::BS_RES], &res_flags );
+    body.vuln = Flags( e.bits[Body::BS_VULN], &vuln_flags );
+    MobBody::wearlocs( e.wearlocNames, body.wearloc );
+    body.generation = MobBody::generation( );
+    return body;
+}
+
+int DefaultRace::getDamType( ) const
+{
+    return damtype.getValue( );
+}
+
+const DLString & DefaultRace::getMaterial( ) const
+{
+    return material.getValue( );
+}
+
+static double parse_mult( const DLString &value )
+{
+    if (value.empty( ))
+        return 1.0;
+    double d = atof( value.c_str( ) );
+    return d > 0 ? d : 1.0;
+}
+
+double DefaultRace::getHpMult( ) const
+{
+    return parse_mult( hpMult.getValue( ) );
+}
+
+double DefaultRace::getDmgMult( ) const
+{
+    return parse_mult( dmgMult.getValue( ) );
+}
+
+const DLString & DefaultRace::getMoveVerb( ) const
+{
+    return moveverb.getValue( );
+}
