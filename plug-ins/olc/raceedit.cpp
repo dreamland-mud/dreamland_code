@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "raceedit.h"
+#include "mobbody.h"
 #include "olc.h"
 #include "security.h"
 #include "hedit.h"
@@ -100,6 +101,8 @@ void OLCStateRace::statePrompt(Descriptor *d)
 void OLCStateRace::changed( PCharacter *ch )
 {
     isChanged = true;
+    // Resolved race bodies are cached per config generation.
+    MobBody::touch();
 }
 
 static DLString show_flag(const Flags &f)
@@ -156,6 +159,31 @@ void OLCStateRace::show( PCharacter *ch )
 
     ptc(ch, "Размер:        {Y%s{x {D(size){x\r\n", show_enum(r->size).c_str());
     ptc(ch, "Слоты:         {Y%s{x {D(wearloc){x\r\n", r->wearloc.toString().c_str());
+
+    if (!r->forms.empty()) {
+        ptc(ch, "{WМодель тела{x:  формы [{Y%s{x] {D(forms)%s{x\r\n", r->forms.c_str(),
+            r->hasBodyForms() ? "" : " - mob_forms.json не загружен, действуют form/parts/wearloc");
+        ptc(ch, "  +части {Y%s{x {D(partsadd){x  -части {Y%s{x {D(partsdel){x\r\n",
+            show_flag(r->partsAdd).c_str(), show_flag(r->partsDel).c_str());
+        ptc(ch, "  -поведение {Y%s{x -атаки {Y%s{x -аффекты {Y%s{x -обнаружение {Y%s{x {D(actdel offdel affdel detdel){x\r\n",
+            show_flag(r->actDel).c_str(), show_flag(r->offDel).c_str(),
+            show_flag(r->affDel).c_str(), show_flag(r->detDel).c_str());
+        ptc(ch, "  -иммунитет {Y%s{x -сопротивл {Y%s{x -уязвимость {Y%s{x {D(immdel resdel vulndel){x\r\n",
+            show_flag(r->immDel).c_str(), show_flag(r->resDel).c_str(), show_flag(r->vulnDel).c_str());
+        if (r->hasBodyForms()) {
+            ptc(ch, "  {DИтог:{x части {G%s{x\r\n", show_flag(r->getParts()).c_str());
+            ptc(ch, "        формы {G%s{x\r\n", show_flag(r->getForm()).c_str());
+            ptc(ch, "        слоты {G%s{x\r\n", r->getWearloc().toString().c_str());
+            ptc(ch, "        атаки {G%s{x поведение {G%s{x\r\n",
+                show_flag(r->getOff()).c_str(), show_flag(r->getAct()).c_str());
+        }
+    }
+    ptc(ch, "Удар:          {Y%s{x {D(damtype){x  материал {Y%s{x {D(material){x\r\n",
+        show_enum(r->damtype).c_str(), r->material.empty() ? "-" : r->material.c_str());
+    ptc(ch, "Множители:     здоровье {Y%s{x {D(hpmult){x урон {Y%s{x {D(dmgmult){x  походка {Y%s{x {D(moveverb){x\r\n",
+        r->hpMult.empty() ? "1.0" : r->hpMult.c_str(),
+        r->dmgMult.empty() ? "1.0" : r->dmgMult.c_str(),
+        r->moveverb.empty() ? "-" : r->moveverb.c_str());
 
     ptc(ch, "Политика:      охотится [{r%s{x] {D(hunts){x, делится [{g%s{x] {D(donates){x\r\n",
            r->hunts.toString().c_str(), r->donates.toString().c_str());
@@ -267,6 +295,66 @@ RACEEDIT(form, "форма", "формы тела (? form_flags)")
 RACEEDIT(parts, "части", "части тела (? part_flags)")
 {
     return flagBitsEdit(getOriginal()->parts);
+}
+RACEEDIT(forms, "формы", "модель тела: список форм из fight/mob_forms.json")
+{
+    return editor(argument, getOriginal()->forms, ED_NO_NEWLINE);
+}
+RACEEDIT(partsadd, "частидобавить", "модель тела: части сверх форм (? part_flags)")
+{
+    return flagBitsEdit(getOriginal()->partsAdd);
+}
+RACEEDIT(partsdel, "частиубрать", "модель тела: части, которые формы дают, а раса нет (? part_flags)")
+{
+    return flagBitsEdit(getOriginal()->partsDel);
+}
+RACEEDIT(actdel, "поведениеубрать", "модель тела: убрать флаги поведения форм (? act_flags)")
+{
+    return flagBitsEdit(getOriginal()->actDel);
+}
+RACEEDIT(offdel, "атакиубрать", "модель тела: убрать флаги атаки форм (? off_flags)")
+{
+    return flagBitsEdit(getOriginal()->offDel);
+}
+RACEEDIT(affdel, "аффектыубрать", "модель тела: убрать флаги аффектов форм (? affect_flags)")
+{
+    return flagBitsEdit(getOriginal()->affDel);
+}
+RACEEDIT(detdel, "обнаружениеубрать", "модель тела: убрать обнаружения форм (? detect_flags)")
+{
+    return flagBitsEdit(getOriginal()->detDel);
+}
+RACEEDIT(immdel, "иммунитетубрать", "модель тела: убрать иммунитеты форм (? imm_flags)")
+{
+    return flagBitsEdit(getOriginal()->immDel);
+}
+RACEEDIT(resdel, "сопротивляемостьубрать", "модель тела: убрать сопротивляемость форм (? res_flags)")
+{
+    return flagBitsEdit(getOriginal()->resDel);
+}
+RACEEDIT(vulndel, "уязвимостьубрать", "модель тела: убрать уязвимости форм (? vuln_flags)")
+{
+    return flagBitsEdit(getOriginal()->vulnDel);
+}
+RACEEDIT(damtype, "удар", "тип удара по умолчанию для мобов расы (? weapon_flags)")
+{
+    return flagValueEdit(getOriginal()->damtype);
+}
+RACEEDIT(material, "материал", "материал тела по умолчанию для мобов расы")
+{
+    return editor(argument, getOriginal()->material, ED_NO_NEWLINE);
+}
+RACEEDIT(hpmult, "здоровьемножитель", "множитель здоровья мобов расы (1.0 по умолчанию)")
+{
+    return editor(argument, getOriginal()->hpMult, ED_NO_NEWLINE);
+}
+RACEEDIT(dmgmult, "уронмножитель", "множитель урона мобов расы (1.0 по умолчанию)")
+{
+    return editor(argument, getOriginal()->dmgMult, ED_NO_NEWLINE);
+}
+RACEEDIT(moveverb, "походка", "глагол движения мобов расы, перекрывает форму (hopping, crawling...)")
+{
+    return editor(argument, getOriginal()->moveverb, ED_NO_NEWLINE);
 }
 RACEEDIT(size, "размер", "размеры (? size_table)")
 {

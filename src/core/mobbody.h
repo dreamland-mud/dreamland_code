@@ -12,6 +12,10 @@
 
 #include "body.h"
 #include "mobtiers.h"
+#include "bitstring.h"
+
+struct FlagTable;
+class GlobalBitvector;
 
 namespace MobBody {
 
@@ -23,6 +27,28 @@ MobTiers::Config &tiers();
 /** Bumped on every (re)load of either config; resolved caches compare against it. */
 unsigned long generation();
 void touch();
+
+/** Engine bit table of a resolver bit set (act_flags, off_flags, ...). */
+const FlagTable *bitSetTable(int bitSet);
+
+/** Bits -> resolver names. */
+Body::NameSet names(const FlagTable *table, bitstring_t bits);
+/** Resolver names -> bits. A name the table lacks is logged once and skipped. */
+bitstring_t bits(const FlagTable *table, const Body::NameSet &names);
+/** Resolver wearloc names -> wearloc bitvector. Unknown wearlocs are logged once and skipped. */
+void wearlocs(const Body::NameSet &names, GlobalBitvector &out);
+
+/** A resolved body in engine terms. */
+struct Engine {
+    bitstring_t form = 0, parts = 0;
+    bitstring_t bits[Body::BS_MAX] = { 0, 0, 0, 0, 0, 0, 0 };
+    Body::NameSet wearlocNames;
+    std::string movetype, moveverb, movedanger;
+    double acFactor = 3.0, formAc = 1.0;
+    bool edible = true, bloodless = false, canHoldCards = false, rideable = false;
+
+    void fromResult(const Body::Result &r);
+};
 
 }
 
