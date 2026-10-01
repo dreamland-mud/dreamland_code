@@ -1,0 +1,6169 @@
+{
+ "what": "75 races: proposed forms (race-bodies.py minimal proposer) -> resolved body. Shared with the C++ resolver unit test (A3). Regenerate: race-bodies.py --fixtures",
+ "cases": [
+  {
+   "name": "aarakocra",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal",
+     "winged"
+    ],
+    "size": "medium",
+    "npc": true,
+    "race": {
+     "parts_add": [
+      "claws"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient",
+     "winged"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "wings"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [
+     "flying"
+    ],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 4.0,
+    "form_ac": 1.07,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "air elemental",
+   "input": {
+    "forms": [
+     "instant_decay",
+     "magical",
+     "mist",
+     "sentient",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "instant_decay",
+     "magical",
+     "mammal",
+     "mist",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "eye",
+     "fingers",
+     "hands",
+     "head"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick_dirt",
+     "parry"
+    ],
+    "aff": [
+     "flying",
+     "pass_door"
+    ],
+    "det": [
+     "invis"
+    ],
+    "imm": [
+     "mental"
+    ],
+    "res": [
+     "slash"
+    ],
+    "vuln": [
+     "lightning"
+    ],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 8.0,
+    "form_ac": 1.35,
+    "isEdible": false,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": true,
+    "warnings": []
+   }
+  },
+  {
+   "name": "amphibia",
+   "input": {
+    "forms": [
+     "amphibian",
+     "quadruped"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "amphibian",
+     "quadruped"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "cold_blood",
+     "ear",
+     "eye",
+     "fingers",
+     "fins",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [
+     "swim"
+    ],
+    "det": [],
+    "imm": [
+     "drowning"
+    ],
+    "res": [
+     "disease"
+    ],
+    "vuln": [
+     "fire"
+    ],
+    "movetype": "walk",
+    "moveverb": "trotting",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "angel",
+   "input": {
+    "forms": [
+     "magical",
+     "sentient",
+     "biped",
+     "mammal",
+     "winged"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "magical",
+     "mammal",
+     "sentient",
+     "winged"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "wings"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [
+     "flying"
+    ],
+    "det": [
+     "invis"
+    ],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 4.0,
+    "form_ac": 1.07,
+    "isEdible": false,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "arial",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal",
+     "winged"
+    ],
+    "size": "medium",
+    "npc": false,
+    "race": {
+     "parts_add": [
+      "claws"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient",
+     "winged"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "wings"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [
+     "flying"
+    ],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 4.0,
+    "form_ac": 1.07,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "bat",
+   "input": {
+    "forms": [
+     "bird"
+    ],
+    "size": "tiny",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "bird"
+    ],
+    "parts": [
+     "beak",
+     "brains",
+     "claws",
+     "eye",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail",
+     "wings"
+    ],
+    "wearlocs": [
+     "about",
+     "float",
+     "head",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "dodge",
+     "fast",
+     "tail"
+    ],
+    "aff": [
+     "flying"
+    ],
+    "det": [
+     "acute_vision"
+    ],
+    "imm": [],
+    "res": [
+     "sound"
+    ],
+    "vuln": [
+     "acid",
+     "disease"
+    ],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "bear",
+   "input": {
+    "forms": [
+     "quadruped"
+    ],
+    "size": "large",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "quadruped"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc",
+     "rideable"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "trotting",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": true,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "beast",
+   "input": {
+    "forms": [
+     "quadruped"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "quadruped"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "trotting",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "beholder",
+   "input": {
+    "forms": [
+     "sentient"
+    ],
+    "size": "medium",
+    "npc": true,
+    "race": {
+     "parts_add": [
+      "cold_blood"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "sentient"
+    ],
+    "parts": [
+     "cold_blood"
+    ],
+    "wearlocs": [
+     "about",
+     "float",
+     "light",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [],
+    "aff": [],
+    "det": [],
+    "imm": [
+     "light",
+     "mental"
+    ],
+    "res": [],
+    "vuln": [],
+    "movetype": "slink",
+    "moveverb": "slink",
+    "movedanger": "MOVETYPE_MORESAFE",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "bird",
+   "input": {
+    "forms": [
+     "bird"
+    ],
+    "size": "small",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "bird"
+    ],
+    "parts": [
+     "beak",
+     "brains",
+     "claws",
+     "eye",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail",
+     "wings"
+    ],
+    "wearlocs": [
+     "about",
+     "float",
+     "head",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "dodge",
+     "fast",
+     "tail"
+    ],
+    "aff": [
+     "flying"
+    ],
+    "det": [
+     "acute_vision"
+    ],
+    "imm": [],
+    "res": [
+     "sound"
+    ],
+    "vuln": [
+     "acid",
+     "disease"
+    ],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "cat",
+   "input": {
+    "forms": [
+     "feline",
+     "quadruped"
+    ],
+    "size": "small",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "feline",
+     "quadruped"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "fangs",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "hair",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "cold"
+    ],
+    "vuln": [
+     "drowning",
+     "fire"
+    ],
+    "movetype": "walk",
+    "moveverb": "trotting",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "centaur",
+   "input": {
+    "forms": [
+     "hoofed",
+     "sentient",
+     "quadruped",
+     "mammal"
+    ],
+    "size": "large",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "hoofed",
+     "mammal",
+     "quadruped",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "fingers",
+     "four_hooves",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "hooves",
+     "horse",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tail",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "rideable"
+    ],
+    "off": [
+     "bash",
+     "berserk",
+     "crush",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "tail"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "riding",
+    "moveverb": "galloping",
+    "movedanger": "MOVETYPE_DANGEROUS",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": true,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "cloud giant",
+   "input": {
+    "forms": [
+     "mist",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "huge",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "mist",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [
+     "flying",
+     "pass_door"
+    ],
+    "det": [],
+    "imm": [],
+    "res": [
+     "slash"
+    ],
+    "vuln": [
+     "lightning"
+    ],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 8.0,
+    "form_ac": 1.35,
+    "isEdible": false,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": true,
+    "warnings": []
+   }
+  },
+  {
+   "name": "dark-elf",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "demon",
+   "input": {
+    "forms": [
+     "hoofed",
+     "poison",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "hoofed",
+     "mammal",
+     "poison",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "two_hooves"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "hooves",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "riding",
+    "moveverb": "clattering",
+    "movedanger": "MOVETYPE_DANGEROUS",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "dog",
+   "input": {
+    "forms": [
+     "canine",
+     "quadruped"
+    ],
+    "size": "small",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "canine",
+     "quadruped"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "fangs",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "hair",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "drowning",
+     "poison"
+    ],
+    "vuln": [
+     "charm",
+     "fire"
+    ],
+    "movetype": "walk",
+    "moveverb": "trotting",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "draconian",
+   "input": {
+    "forms": [
+     "reptile",
+     "sentient",
+     "biped",
+     "mammal",
+     "winged"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "reptile",
+     "sentient",
+     "winged"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "cold_blood",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "long_tongue",
+     "scales",
+     "tail",
+     "wings"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tail",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "tail",
+     "trip"
+    ],
+    "aff": [
+     "flying",
+     "regeneration"
+    ],
+    "det": [],
+    "imm": [],
+    "res": [
+     "acid",
+     "cold"
+    ],
+    "vuln": [],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 4.0,
+    "form_ac": 1.07,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "dragon",
+   "input": {
+    "forms": [
+     "reptile",
+     "sentient",
+     "dragon"
+    ],
+    "size": "huge",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "dragon",
+     "quadruped",
+     "reptile",
+     "sentient",
+     "winged"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "cold_blood",
+     "ear",
+     "eye",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "long_tongue",
+     "scales",
+     "tail",
+     "wings"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "face",
+     "float",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "tat_face",
+     "tattoo",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc",
+     "rideable"
+    ],
+    "off": [
+     "area_attack",
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [
+     "flying",
+     "regeneration"
+    ],
+    "det": [],
+    "imm": [],
+    "res": [
+     "acid",
+     "cold"
+    ],
+    "vuln": [],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 8.0,
+    "form_ac": 1.35,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": true,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "drow",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "duergar",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "dwarf",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "earth elemental",
+   "input": {
+    "forms": [
+     "construct",
+     "instant_decay",
+     "magical",
+     "nonadoptable",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "large",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "construct",
+     "instant_decay",
+     "magical",
+     "mammal",
+     "nonadoptable",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "eye",
+     "feet",
+     "fingers",
+     "hands",
+     "head",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [
+     "invis"
+    ],
+    "imm": [
+     "holy",
+     "mental",
+     "negative"
+    ],
+    "res": [],
+    "vuln": [
+     "sound"
+    ],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 8.0,
+    "form_ac": 1.35,
+    "isEdible": false,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": true,
+    "warnings": []
+   }
+  },
+  {
+   "name": "elf",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "faery",
+   "input": {
+    "forms": [
+     "magical",
+     "sentient",
+     "biped",
+     "mammal",
+     "winged"
+    ],
+    "size": "small",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "magical",
+     "mammal",
+     "sentient",
+     "winged"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "wings"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [
+     "flying"
+    ],
+    "det": [
+     "invis"
+    ],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 4.0,
+    "form_ac": 1.07,
+    "isEdible": false,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "felar",
+   "input": {
+    "forms": [
+     "feline",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "feline",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "fangs",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tail",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "tail",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "cold"
+    ],
+    "vuln": [
+     "drowning",
+     "fire"
+    ],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "fire elemental",
+   "input": {
+    "forms": [
+     "instant_decay",
+     "magical",
+     "mist",
+     "nonadoptable",
+     "sentient"
+    ],
+    "size": "large",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "instant_decay",
+     "magical",
+     "mist",
+     "nonadoptable",
+     "sentient"
+    ],
+    "parts": [],
+    "wearlocs": [
+     "about",
+     "float",
+     "light",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [],
+    "aff": [
+     "flying",
+     "pass_door"
+    ],
+    "det": [
+     "invis"
+    ],
+    "imm": [
+     "light",
+     "mental"
+    ],
+    "res": [
+     "slash"
+    ],
+    "vuln": [
+     "lightning"
+    ],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 8.0,
+    "form_ac": 1.35,
+    "isEdible": false,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": true,
+    "warnings": []
+   }
+  },
+  {
+   "name": "fire giant",
+   "input": {
+    "forms": [
+     "poison",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "huge",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "fish",
+   "input": {
+    "forms": [
+     "fish"
+    ],
+    "size": "small",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "fish"
+    ],
+    "parts": [
+     "brains",
+     "cold_blood",
+     "eye",
+     "fins",
+     "guts",
+     "head",
+     "scales",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "tail"
+    ],
+    "aff": [
+     "swim"
+    ],
+    "det": [],
+    "imm": [],
+    "res": [
+     "cold"
+    ],
+    "vuln": [
+     "energy",
+     "sound"
+    ],
+    "movetype": "slink",
+    "moveverb": "swimming",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 6.0,
+    "form_ac": 1.21,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "frost giant",
+   "input": {
+    "forms": [
+     "poison",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "huge",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "ghost",
+   "input": {
+    "forms": [
+     "instant_decay",
+     "mist",
+     "nonadoptable",
+     "sentient"
+    ],
+    "size": "medium",
+    "npc": true,
+    "race": {
+     "act_add": [
+      "undead"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "instant_decay",
+     "mist",
+     "nonadoptable",
+     "sentient"
+    ],
+    "parts": [],
+    "wearlocs": [
+     "about",
+     "float",
+     "light",
+     "waist"
+    ],
+    "act": [
+     "npc",
+     "undead"
+    ],
+    "off": [],
+    "aff": [
+     "flying",
+     "pass_door"
+    ],
+    "det": [],
+    "imm": [
+     "light",
+     "mental"
+    ],
+    "res": [
+     "slash"
+    ],
+    "vuln": [
+     "lightning"
+    ],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 8.0,
+    "form_ac": 1.35,
+    "isEdible": false,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": true,
+    "warnings": []
+   }
+  },
+  {
+   "name": "ghoul",
+   "input": {
+    "forms": [
+     "poison",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true,
+    "race": {
+     "act_add": [
+      "undead"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc",
+     "undead"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "giant",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "huge",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "githyanki",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "gnome",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "small",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "goblin",
+   "input": {
+    "forms": [
+     "poison",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "small",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "golem",
+   "input": {
+    "forms": [
+     "construct",
+     "nonadoptable",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "construct",
+     "mammal",
+     "nonadoptable"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "eye",
+     "feet",
+     "fingers",
+     "hands",
+     "head",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [
+     "holy",
+     "mental",
+     "negative"
+    ],
+    "res": [],
+    "vuln": [
+     "sound"
+    ],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 8.0,
+    "form_ac": 1.35,
+    "isEdible": false,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": true,
+    "warnings": []
+   }
+  },
+  {
+   "name": "half-elf",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "hobbit",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "small",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "hobgoblin",
+   "input": {
+    "forms": [
+     "poison",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "hoofed",
+   "input": {
+    "forms": [
+     "hoofed",
+     "quadruped"
+    ],
+    "size": "large",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "hoofed",
+     "quadruped"
+    ],
+    "parts": [
+     "brains",
+     "ear",
+     "eye",
+     "four_hooves",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "head",
+     "hooves",
+     "horse",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc",
+     "rideable"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "kick",
+     "tail"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "riding",
+    "moveverb": "galloping",
+    "movedanger": "MOVETYPE_DANGEROUS",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": true,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "horse",
+   "input": {
+    "forms": [
+     "hoofed",
+     "quadruped"
+    ],
+    "size": "large",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "hoofed",
+     "quadruped"
+    ],
+    "parts": [
+     "brains",
+     "ear",
+     "eye",
+     "four_hooves",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "head",
+     "hooves",
+     "horse",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc",
+     "rideable"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "kick",
+     "tail"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "riding",
+    "moveverb": "galloping",
+    "movedanger": "MOVETYPE_DANGEROUS",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": true,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "human",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "illithid",
+   "input": {
+    "forms": [
+     "poison",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true,
+    "race": {
+     "parts_add": [
+      "cold_blood"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "cold_blood",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "insect",
+   "input": {
+    "forms": [
+     "insect"
+    ],
+    "size": "tiny",
+    "npc": true,
+    "race": {
+     "parts_add": [
+      "cold_blood"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "insect"
+    ],
+    "parts": [
+     "cold_blood",
+     "eye",
+     "head",
+     "legs",
+     "wings"
+    ],
+    "wearlocs": [
+     "about",
+     "float",
+     "head",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "dodge",
+     "fast"
+    ],
+    "aff": [
+     "flying"
+    ],
+    "det": [
+     "acute_vision"
+    ],
+    "imm": [
+     "mental"
+    ],
+    "res": [
+     "mental",
+     "sound"
+    ],
+    "vuln": [
+     "fire"
+    ],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 7.0,
+    "form_ac": 1.28,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "invertebrate",
+   "input": {
+    "forms": [
+     "amphibian",
+     "blob"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "amphibian",
+     "blob"
+    ],
+    "parts": [
+     "cold_blood",
+     "eye",
+     "eyestalks",
+     "fins",
+     "guts",
+     "tentacles"
+    ],
+    "wearlocs": [
+     "about",
+     "float",
+     "hold",
+     "light",
+     "waist"
+    ],
+    "act": [
+     "npc",
+     "sentinel"
+    ],
+    "off": [
+     "area_attack"
+    ],
+    "aff": [
+     "regeneration",
+     "slow",
+     "swim"
+    ],
+    "det": [],
+    "imm": [
+     "charm",
+     "disease",
+     "drowning",
+     "mental",
+     "sound"
+    ],
+    "res": [
+     "disease",
+     "energy",
+     "weapon"
+    ],
+    "vuln": [
+     "acid",
+     "cold",
+     "fire"
+    ],
+    "movetype": "slink",
+    "moveverb": "oozing",
+    "movedanger": "MOVETYPE_MORESAFE",
+    "ac_factor": 1.0,
+    "form_ac": 0.86,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "kender",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "small",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "kobold",
+   "input": {
+    "forms": [
+     "poison",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "small",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "lich",
+   "input": {
+    "forms": [
+     "sentient",
+     "skeletal",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "instant_decay",
+     "mammal",
+     "sentient",
+     "skeletal"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "feet",
+     "fingers",
+     "hands",
+     "head",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc",
+     "undead"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [
+     "life"
+    ],
+    "imm": [
+     "disease",
+     "light",
+     "mental",
+     "negative",
+     "poison"
+    ],
+    "res": [
+     "pierce"
+    ],
+    "vuln": [
+     "fire",
+     "holy"
+    ],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 6.0,
+    "form_ac": 1.21,
+    "isEdible": false,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": true,
+    "warnings": []
+   }
+  },
+  {
+   "name": "lizard",
+   "input": {
+    "forms": [
+     "reptile",
+     "quadruped"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "quadruped",
+     "reptile"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "cold_blood",
+     "ear",
+     "eye",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "long_tongue",
+     "scales",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [
+     "regeneration"
+    ],
+    "det": [],
+    "imm": [],
+    "res": [
+     "acid",
+     "cold"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "trotting",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "mammal",
+   "input": {
+    "forms": [
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "mawg",
+   "input": {
+    "forms": [
+     "canine",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "canine",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "fangs",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tail",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "tail",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "drowning",
+     "poison"
+    ],
+    "vuln": [
+     "charm",
+     "fire"
+    ],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "mermaid",
+   "input": {
+    "forms": [
+     "amphibian",
+     "sentient",
+     "fish",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "amphibian",
+     "fish",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "cold_blood",
+     "ear",
+     "eye",
+     "fingers",
+     "fins",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "scales",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "finger_l",
+     "finger_r",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tail",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick_dirt",
+     "parry",
+     "tail"
+    ],
+    "aff": [
+     "swim"
+    ],
+    "det": [],
+    "imm": [
+     "drowning"
+    ],
+    "res": [
+     "cold",
+     "disease"
+    ],
+    "vuln": [
+     "energy",
+     "fire",
+     "sound"
+    ],
+    "movetype": "slink",
+    "moveverb": "swimming",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 6.0,
+    "form_ac": 1.21,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "minotaur",
+   "input": {
+    "forms": [
+     "hoofed",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "large",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "hoofed",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "two_hooves"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "hooves",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "riding",
+    "moveverb": "clattering",
+    "movedanger": "MOVETYPE_DANGEROUS",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "modron",
+   "input": {
+    "forms": [
+     "construct",
+     "nonadoptable"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "construct",
+     "nonadoptable"
+    ],
+    "parts": [],
+    "wearlocs": [
+     "about",
+     "float",
+     "light",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [],
+    "aff": [],
+    "det": [],
+    "imm": [
+     "holy",
+     "light",
+     "mental",
+     "negative"
+    ],
+    "res": [],
+    "vuln": [
+     "sound"
+    ],
+    "movetype": "slink",
+    "moveverb": "slink",
+    "movedanger": "MOVETYPE_MORESAFE",
+    "ac_factor": 8.0,
+    "form_ac": 1.35,
+    "isEdible": false,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": true,
+    "warnings": []
+   }
+  },
+  {
+   "name": "ogre",
+   "input": {
+    "forms": [
+     "poison",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "large",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "oompa-loompa",
+   "input": {
+    "forms": [
+     "nonadoptable",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "small",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "nonadoptable",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "plant",
+   "input": {
+    "forms": [
+     "construct",
+     "instant_decay",
+     "nonadoptable"
+    ],
+    "size": "large",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "construct",
+     "instant_decay",
+     "nonadoptable"
+    ],
+    "parts": [],
+    "wearlocs": [
+     "about",
+     "float",
+     "light",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [],
+    "aff": [],
+    "det": [],
+    "imm": [
+     "holy",
+     "light",
+     "mental",
+     "negative"
+    ],
+    "res": [],
+    "vuln": [
+     "sound"
+    ],
+    "movetype": "slink",
+    "moveverb": "slink",
+    "movedanger": "MOVETYPE_MORESAFE",
+    "ac_factor": 8.0,
+    "form_ac": 1.35,
+    "isEdible": false,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": true,
+    "warnings": []
+   }
+  },
+  {
+   "name": "rat",
+   "input": {
+    "forms": [
+     "quadruped"
+    ],
+    "size": "small",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "quadruped"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "trotting",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "rockseer",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "rodent",
+   "input": {
+    "forms": [
+     "quadruped"
+    ],
+    "size": "small",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "quadruped"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "trotting",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "satyr",
+   "input": {
+    "forms": [
+     "hoofed",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "hoofed",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs",
+     "two_hooves"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "hooves",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "riding",
+    "moveverb": "clattering",
+    "movedanger": "MOVETYPE_DANGEROUS",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "school monster",
+   "input": {
+    "forms": [
+     "nonadoptable",
+     "poison",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "nonadoptable",
+     "poison"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "snake",
+   "input": {
+    "forms": [
+     "poison",
+     "reptile",
+     "snake"
+    ],
+    "size": "small",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "poison",
+     "reptile",
+     "snake"
+    ],
+    "parts": [
+     "brains",
+     "cold_blood",
+     "eye",
+     "fangs",
+     "guts",
+     "head",
+     "heart",
+     "long_tongue",
+     "scales",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "float",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "tail"
+    ],
+    "aff": [
+     "regeneration"
+    ],
+    "det": [
+     "hidden"
+    ],
+    "imm": [],
+    "res": [
+     "acid",
+     "cold",
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "slink",
+    "moveverb": "slithering",
+    "movedanger": "MOVETYPE_MORESAFE",
+    "ac_factor": 6.0,
+    "form_ac": 1.21,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "spider",
+   "input": {
+    "forms": [
+     "spider"
+    ],
+    "size": "tiny",
+    "npc": true,
+    "race": {
+     "parts_add": [
+      "cold_blood"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "spider"
+    ],
+    "parts": [
+     "cold_blood",
+     "eye",
+     "fangs",
+     "head",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "float",
+     "head",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "dodge"
+    ],
+    "aff": [],
+    "det": [
+     "acute_vision"
+    ],
+    "imm": [
+     "mental",
+     "poison"
+    ],
+    "res": [
+     "mental"
+    ],
+    "vuln": [
+     "fire"
+    ],
+    "movetype": "walk",
+    "moveverb": "crawling",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "storm giant",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "huge",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "svirfnebli",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "small",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "troll",
+   "input": {
+    "forms": [
+     "poison",
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "large",
+    "npc": false,
+    "race": {
+     "parts_add": [
+      "cold_blood"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "cold_blood",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "undead",
+   "input": {
+    "forms": [
+     "poison",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true,
+    "race": {
+     "act_add": [
+      "undead"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc",
+     "undead"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "unique",
+   "input": {
+    "forms": [],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [],
+    "parts": [],
+    "wearlocs": [
+     "about",
+     "float",
+     "light",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [],
+    "aff": [],
+    "det": [],
+    "imm": [
+     "light",
+     "mental"
+    ],
+    "res": [],
+    "vuln": [],
+    "movetype": "slink",
+    "moveverb": "slink",
+    "movedanger": "MOVETYPE_MORESAFE",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": true,
+    "warnings": []
+   }
+  },
+  {
+   "name": "urukhai",
+   "input": {
+    "forms": [
+     "sentient",
+     "biped",
+     "mammal"
+    ],
+    "size": "large",
+    "npc": false
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "sentient"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "face",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "tat_arms",
+     "tat_face",
+     "tat_wrist_l",
+     "tat_wrist_r",
+     "tattoo",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": true,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "water elemental",
+   "input": {
+    "forms": [
+     "amphibian",
+     "instant_decay",
+     "magical",
+     "nonadoptable",
+     "sentient",
+     "blob"
+    ],
+    "size": "large",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "amphibian",
+     "blob",
+     "instant_decay",
+     "magical",
+     "nonadoptable",
+     "sentient"
+    ],
+    "parts": [
+     "cold_blood",
+     "eye",
+     "eyestalks",
+     "fins",
+     "guts",
+     "tentacles"
+    ],
+    "wearlocs": [
+     "about",
+     "float",
+     "hold",
+     "light",
+     "waist"
+    ],
+    "act": [
+     "npc",
+     "sentinel"
+    ],
+    "off": [
+     "area_attack"
+    ],
+    "aff": [
+     "regeneration",
+     "slow",
+     "swim"
+    ],
+    "det": [
+     "invis"
+    ],
+    "imm": [
+     "charm",
+     "disease",
+     "drowning",
+     "mental",
+     "sound"
+    ],
+    "res": [
+     "disease",
+     "energy",
+     "weapon"
+    ],
+    "vuln": [
+     "acid",
+     "cold",
+     "fire"
+    ],
+    "movetype": "slink",
+    "moveverb": "oozing",
+    "movedanger": "MOVETYPE_MORESAFE",
+    "ac_factor": 1.0,
+    "form_ac": 0.86,
+    "isEdible": false,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "wolf",
+   "input": {
+    "forms": [
+     "canine",
+     "quadruped"
+    ],
+    "size": "medium",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "canine",
+     "quadruped"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "ear",
+     "eye",
+     "fangs",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "hair",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "drowning",
+     "poison"
+    ],
+    "vuln": [
+     "charm",
+     "fire"
+    ],
+    "movetype": "walk",
+    "moveverb": "trotting",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 5.0,
+    "form_ac": 1.14,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "worm",
+   "input": {
+    "forms": [
+     "worm"
+    ],
+    "size": "tiny",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "worm"
+    ],
+    "parts": [
+     "cold_blood",
+     "head",
+     "scales",
+     "tail"
+    ],
+    "wearlocs": [
+     "about",
+     "float",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist"
+    ],
+    "act": [
+     "npc"
+    ],
+    "off": [
+     "tail"
+    ],
+    "aff": [
+     "blind",
+     "regeneration",
+     "slow"
+    ],
+    "det": [],
+    "imm": [
+     "light",
+     "mental"
+    ],
+    "res": [
+     "light"
+    ],
+    "vuln": [],
+    "movetype": "slink",
+    "moveverb": "slithering",
+    "movedanger": "MOVETYPE_MORESAFE",
+    "ac_factor": 4.0,
+    "form_ac": 1.07,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "wyvern",
+   "input": {
+    "forms": [
+     "poison",
+     "reptile",
+     "dragon"
+    ],
+    "size": "large",
+    "npc": true
+   },
+   "expected": {
+    "forms": [
+     "dragon",
+     "poison",
+     "quadruped",
+     "reptile",
+     "winged"
+    ],
+    "parts": [
+     "brains",
+     "claws",
+     "cold_blood",
+     "ear",
+     "eye",
+     "fingers",
+     "guts",
+     "head",
+     "heart",
+     "legs",
+     "long_tongue",
+     "scales",
+     "tail",
+     "wings"
+    ],
+    "wearlocs": [
+     "about",
+     "ears",
+     "float",
+     "head",
+     "light",
+     "neck_1",
+     "neck_2",
+     "tail",
+     "waist",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc",
+     "rideable"
+    ],
+    "off": [
+     "area_attack",
+     "berserk",
+     "crush",
+     "tail"
+    ],
+    "aff": [
+     "flying",
+     "regeneration"
+    ],
+    "det": [],
+    "imm": [],
+    "res": [
+     "acid",
+     "cold",
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "flying",
+    "moveverb": "flying",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 8.0,
+    "form_ac": 1.35,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": true,
+    "bloodless": false,
+    "warnings": []
+   }
+  },
+  {
+   "name": "zombie",
+   "input": {
+    "forms": [
+     "poison",
+     "biped",
+     "mammal"
+    ],
+    "size": "medium",
+    "npc": true,
+    "race": {
+     "act_add": [
+      "undead"
+     ]
+    }
+   },
+   "expected": {
+    "forms": [
+     "biped",
+     "mammal",
+     "poison"
+    ],
+    "parts": [
+     "arms",
+     "body",
+     "brains",
+     "ear",
+     "eye",
+     "feet",
+     "fingers",
+     "guts",
+     "hands",
+     "head",
+     "heart",
+     "legs"
+    ],
+    "wearlocs": [
+     "about",
+     "arms",
+     "body",
+     "ears",
+     "feet",
+     "finger_l",
+     "finger_r",
+     "float",
+     "hair",
+     "hands",
+     "head",
+     "hold",
+     "legs",
+     "light",
+     "neck_1",
+     "neck_2",
+     "second_wield",
+     "shield",
+     "waist",
+     "wield",
+     "wrist_l",
+     "wrist_r"
+    ],
+    "act": [
+     "npc",
+     "undead"
+    ],
+    "off": [
+     "bash",
+     "disarm",
+     "kick",
+     "kick_dirt",
+     "parry",
+     "trip"
+    ],
+    "aff": [],
+    "det": [],
+    "imm": [],
+    "res": [
+     "poison"
+    ],
+    "vuln": [],
+    "movetype": "walk",
+    "moveverb": "walk",
+    "movedanger": "MOVETYPE_NORMAL",
+    "ac_factor": 3.0,
+    "form_ac": 1.0,
+    "isEdible": true,
+    "canHoldCards": false,
+    "rideable": false,
+    "bloodless": false,
+    "warnings": []
+   }
+  }
+ ]
+}
