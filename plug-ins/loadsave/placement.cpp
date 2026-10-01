@@ -323,6 +323,13 @@ void obj_to_obj( Object *obj, Object *obj_to )
         obj->in_room                = 0;
         obj->carried_by                = 0;
 
+        // Only a container with pockets has a use for one. A stale pocket
+        // left in a plain bag hides the item from both a plain 'get' and
+        // 'get item bag:pocket' (which a pocketless bag refuses).
+        if (obj_to->item_type != ITEM_CONTAINER
+            || !IS_SET( obj_to->value1( ), CONT_WITH_POCKETS ))
+                obj->pocket = "";
+
         if (IS_PIT(obj_to))
                 obj->cost = 0;
 
