@@ -34,6 +34,7 @@
 #include "room.h"
 
 #include "olc.h"
+#include "body.h"
 #include "olcflags.h"
 #include "olcstate.h"
 #include "security.h"
@@ -311,6 +312,161 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 }
 
+/*
+ * abc body (mob reform, plan §3.6 item 6, §5.6): replaces abc size/part/aff/form.
+ *   abc body                      prototypes with authored body diffs
+ *   abc body dels                 unreviewed dels on aff/det/imm/res/vuln, [keep]/[drop]
+ *   abc body keep|drop <vnum> <set>
+ *   abc body instances            live mobs whose body differs from their prototype's
+ */
+static const char * const abc_set_names[MOBSET_MAX] = {
+    "act", "off", "aff", "det", "imm", "res", "vuln", "form", "parts"
+};
+
+static const FlagTable *abc_set_table(int s)
+{
+    static const FlagTable *tables[MOBSET_MAX] = {
+        &act_flags, &off_flags, &affect_flags, &detect_flags, &imm_flags, &res_flags, &vuln_flags,
+        &form_flags, &part_flags
+    };
+    return tables[s];
+}
+
+static bool abc_set_gated(int s)
+{
+    return s == MOBSET_AFF || s == MOBSET_DET || s == MOBSET_IMM || s == MOBSET_RES || s == MOBSET_VULN;
+}
+
+/* Body::BitSet index of a gated MOBSET_ set, for mob_index_data::reviewed. */
+static int abc_reviewed_bit(int s)
+{
+    switch (s) {
+    case MOBSET_AFF:  return Body::BS_AFF;
+    case MOBSET_DET:  return Body::BS_DET;
+    case MOBSET_IMM:  return Body::BS_IMM;
+    case MOBSET_RES:  return Body::BS_RES;
+    case MOBSET_VULN: return Body::BS_VULN;
+    }
+    return -1;
+}
+
+static void abc_body(Character *ch, DLString &args)
+{
+    const int maxlines = 40;
+    DLString mode = args.getOneArgument();
+    ostringstream buf;
+    int cnt = 0;
+
+    if (mode == "keep" || mode == "drop") {
+        DLString vnumArg = args.getOneArgument();
+        DLString setArg = args.getOneArgument();
+        Integer vnum;
+        if (!Integer::tryParse(vnum, vnumArg))
+            return;
+        MOB_INDEX_DATA *pMob = get_mob_index(vnum);
+        if (!pMob)
+            return;
+
+        for (int s = 0; s < MOBSET_MAX; s++) {
+            if (setArg != abc_set_names[s] || !abc_set_gated(s))
+                continue;
+
+            if (mode == "keep")
+                pMob->reviewed |= 1 << abc_reviewed_bit(s);
+            else
+                pMob->bodyDel[s] = 0;
+
+            pMob->resolveBody();
+            pMob->deriveNumbers();
+            pMob->area->changed = true;
+            ch->pecho("Mob %d: %s dels %s.", vnum.getValue(), setArg.c_str(),
+                      mode == "keep" ? "now apply" : "dropped");
+            DLString again = "body dels";
+            abc_body(ch, again);
+            return;
+        }
+        return;
+    }
+
+    if (mode == "instances") {
+        buf << fmt(0, "%7s %-18s %s", "VNUM", "NAME", "BODY DIFF vs PROTOTYPE") << endl;
+        for (Character *wch = char_list; wch; wch = wch->next) {
+            NPCharacter *mob = wch->getNPC();
+            if (!mob)
+                continue;
+
+            ostringstream diff;
+            for (int s = 0; s < MOBSET_MAX; s++) {
+                bitstring_t produced = (unsigned int)mob->pIndexData->bodyBits(s);
+                bitstring_t base = mob->baseBits[s];
+                if (s == MOBSET_ACT)
+                    produced |= ACT_IS_NPC;
+                if (s == MOBSET_AFF)
+                    produced &= base | ~(bitstring_t)(AFF_SANCTUARY|AFF_HASTE|AFF_PROTECT_EVIL|AFF_PROTECT_GOOD|AFF_CORRUPTION);
+                bitstring_t add = base & ~produced, del = produced & ~base;
+                if (add)
+                    diff << " " << abc_set_names[s] << " +{G" << abc_set_table(s)->names(add) << "{x";
+                if (del)
+                    diff << " " << abc_set_names[s] << " -{r" << abc_set_table(s)->names(del) << "{x";
+            }
+            if (diff.str().empty())
+                continue;
+
+            if (cnt < maxlines)
+                buf << fmt(0, "[%5d] %-18.18N1", mob->pIndexData->vnum, mob->getNameP('1').c_str())
+                    << diff.str() << endl;
+            cnt++;
+        }
+        buf << "Found " << cnt << " mobs." << endl;
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
+    bool dels = (mode == "dels");
+
+    for (int i = 0; i < MAX_KEY_HASH; i++)
+    for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+        ostringstream line;
+        DLString vnum = pMob->vnum;
+
+        for (int s = 0; s < MOBSET_MAX; s++) {
+            if (dels) {
+                if (!abc_set_gated(s) || !pMob->bodyDel[s]
+                        || (pMob->reviewed & (1 << abc_reviewed_bit(s))))
+                    continue;
+                line << " " << abc_set_names[s] << " -{r" << abc_set_table(s)->names(pMob->bodyDel[s]) << "{x "
+                     << "[" << web_cmd(ch, "abc body keep " + vnum + " " + abc_set_names[s], "keep") << "]"
+                     << "[" << web_cmd(ch, "abc body drop " + vnum + " " + abc_set_names[s], "drop") << "]";
+                continue;
+            }
+            bitstring_t add = pMob->bodyAdd[s], del = pMob->bodyDel[s];
+            if (s == MOBSET_ACT)
+                add &= ~(bitstring_t)ACT_IS_NPC;
+            if (add)
+                line << " " << abc_set_names[s] << " +{G" << abc_set_table(s)->names(add) << "{x";
+            if (del)
+                line << " " << abc_set_names[s] << " -{r" << abc_set_table(s)->names(del) << "{x";
+        }
+        if (!dels && pMob->size != NO_FLAG && pMob->size != raceManager->find(pMob->race)->getSize())
+            line << " size {Y" << size_table.name(pMob->size) << "{x";
+
+        if (line.str().empty())
+            continue;
+
+        if (cnt < maxlines) {
+            DLString head = "[" + web_cmd(ch, "medit $1", "%5d") + "] %-18.18N1 {g"
+                            + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x";
+            buf << fmt(0, head.c_str(), pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race.c_str())
+                << (pMob->bodyResolved ? "" : " {D(legacy race){x")
+                << line.str() << endl;
+        }
+        cnt++;
+    }
+
+    buf << "Found " << cnt << " mobs." << endl;
+    page_to_char(buf.str().c_str(), ch);
+}
+
 CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 {
     DLString args = argument;
@@ -518,309 +674,9 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    const int maxlines = 40;
-
-    // Show size info for the first 40 mobs that don't have "sizeConfirmed" attribute. 
-    // [clear] button removes mob's size override, [keep] button confirms size override.
-    // Both buttons hide mob from further output.
-    if (arg == "size") {
-        if (!args.empty()) {
-            DLString arg2 = args.getOneArgument();
-            DLString arg3 = args.getOneArgument();
-            MOB_INDEX_DATA *pMob;
-
-            Integer vnum;
-            if (!Integer::tryParse(vnum, arg3))
-                return;
-            
-            pMob = get_mob_index(vnum);
-            if (!pMob)
-                return;
-
-            DLString verb;
-
-            if (arg2 == "keep") {
-                verb = "confirmed";
-                
-
-            } else if (arg2 == "clear") {
-                verb = "cleared";
-                pMob->size = NO_FLAG;
-
-            } else {
-                return;
-            }
-
-            pMob->props["olc"]["sizeConfirmed"] = "true";
-            pMob->area->changed = true;
-            ch->pecho("Mob %d size is %s. Mob hidden from output.", vnum.getValue(), verb.c_str());
-            __do_abc(ch, const_cast<char *>(arg.c_str()));
-            return;
-        }
-
-        ostringstream buf;
-        int cnt = 0;
-
-        buf << fmt(0, "%7s %18s %10s %10s %10s", "VNUM", "NAME", "RACE", "RACE SIZE", "MOB SIZE")
-            << endl;
-
-        for (int i = 0; i < MAX_KEY_HASH && cnt < maxlines; i++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob && cnt < maxlines; pMob = pMob->next) {
-            Race *race = raceManager->find(pMob->race);
-            if (!race || !race->isValid()) {
-                buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
-                continue;
-            }
-
-            if (!pMob->getProperty("sizeConfirmed").empty())
-                continue;
-
-            bitnumber_t raceSize = race->getSize();
-            bitnumber_t mobSize = pMob->size;            
-            DLString vnum = pMob->vnum;
-            DLString line = 
-                "[" + web_cmd(ch, "medit $1", "%5d") + "] "
-                + "%-18.18N1 {g" 
-                + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
-                + "%10s %10s {C["
-                + web_cmd(ch, "abc size clear " + vnum, "clear") + "{C]   {G["
-                + web_cmd(ch, "abc size keep " + vnum, "keep") + "{G]{x"
-                + "\n\r";
-
-            buf << fmt(0, line.c_str(),
-                pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race,
-                size_table.name(raceSize).c_str(), size_table.name(mobSize).c_str());
-
-            cnt++;
-        }
-
-        page_to_char(buf.str().c_str(), ch);
+    if (arg == "body") {
+        abc_body(ch, args);
         return;
     }
-
-    if (arg == "part") {
-        ostringstream buf;
-        int cnt = 0;
-        buf << endl;
-
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
-            Race *race = raceManager->find(pMob->race);
-            if (!race || !race->isValid()) {
-                buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
-                continue;
-            }
-
-            if (!pMob->getProperty("partConfirmed").empty())
-                continue;
-
-            bitstring_t raceParts = race->getParts();
-            bitstring_t mobParts = pMob->parts;
-
-            if (raceParts == mobParts)
-                continue;
-
-            DLString vnum = pMob->vnum;
-            bitstring_t adds = mobParts & ~raceParts;
-            bitstring_t dels = ~mobParts & raceParts;
-            DLString line = 
-                "[" + web_cmd(ch, "medit $1", "%5d") + "] "
-                + "%-18.18N1 {g" 
-                + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
-                + (adds ? "[{G%s{x " : "%s")
-                + (adds ? web_cmd(ch, "abc reset part " + vnum + " add", "reset") + "]{x" : "")
-                + (dels ? "[{r%s{x " : "%s")
-                + (dels ? web_cmd(ch, "abc reset part " + vnum + " del", "reset") + "]{x" : "")
-                + "   [" + web_cmd(ch, "abc hide part " + vnum, "hide") + "]"
-                + "\n\r";
-
-            if (cnt <= maxlines)
-                buf << fmt(0, line.c_str(),
-                    pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race,
-                    part_flags.names(adds).c_str(), part_flags.names(dels).c_str());
-
-            cnt++;
-        }
-
-        buf << "Found " << cnt << " mobs." << endl;
-        page_to_char(buf.str().c_str(), ch);
-        return;
-    }
-
-    if (arg == "aff") {
-        ostringstream buf;
-        int cnt = 0;
-        buf << endl;
-
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
-            Race *race = raceManager->find(pMob->race);
-            if (!race || !race->isValid()) {
-                buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
-                continue;
-            }
-
-            if (!pMob->getProperty("affConfirmed").empty())
-                continue;
-
-            bitstring_t raceAff = race->getAff();
-            bitstring_t mobAff = pMob->affected_by;
-
-            if (raceAff == mobAff)
-                continue;
-
-            DLString vnum = pMob->vnum;
-            bitstring_t adds = mobAff & ~raceAff;
-            bitstring_t dels = ~mobAff & raceAff;
-            DLString line = 
-                "[" + web_cmd(ch, "medit $1", "%5d") + "] "
-                + "%-18.18N1 {g" 
-                + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
-                + (adds ? "[{G%s{x " : "%s")
-                + (adds ? web_cmd(ch, "abc reset aff " + vnum + " add", "reset") + "]{x" : "")
-                + (dels ? "[{r%s{x " : "%s")
-                + (dels ? web_cmd(ch, "abc reset aff " + vnum + " del", "reset") + "]{x" : "")
-                + "   [" + web_cmd(ch, "abc hide aff " + vnum, "hide") + "]"
-                + "\n\r";
-
-            if (cnt <= maxlines)
-                buf << fmt(0, line.c_str(),
-                    pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race,
-                    affect_flags.names(adds).c_str(), affect_flags.names(dels).c_str());
-
-            cnt++;
-        }
-
-        buf << "Found " << cnt << " mobs." << endl;
-        page_to_char(buf.str().c_str(), ch);
-        return;
-    }
-
-    if (arg == "form") {
-        ostringstream buf;
-        int cnt = 0;
-        buf << endl;
-        
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
-            Race *race = raceManager->find(pMob->race);
-            if (!race || !race->isValid()) {
-                buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
-                continue;
-            }
-
-            if (!pMob->getProperty("formConfirmed").empty())
-               continue;
-
-            bitstring_t raceForm = race->getForm();
-            bitstring_t mobForm = pMob->form;
-
-            if (raceForm == mobForm)
-                continue;
-
-            DLString vnum = pMob->vnum;
-            bitstring_t adds = mobForm & ~raceForm;
-            bitstring_t dels = ~mobForm & raceForm;
-            DLString line = 
-                "[" + web_cmd(ch, "medit $1", "%5d") + "] "
-                + "%-18.18N1 {g" 
-                + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
-                + (adds ? "[{G%s{x " : "%s")
-                + (adds ? web_cmd(ch, "abc reset form " + vnum + " add", "reset") + "]{x" : "")
-                + (dels ? "[{r%s{x " : "%s")
-                + (dels ? web_cmd(ch, "abc reset form " + vnum + " del", "reset") + "]{x" : "")
-                + "   [" + web_cmd(ch, "abc hide form " + vnum, "hide") + "]"
-                + "\n\r";
-
-            if (cnt <= maxlines)
-                buf << fmt(0, line.c_str(),
-                    pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race,
-                    form_flags.names(adds).c_str(), 
-                    form_flags.names(dels).c_str());
-
-            cnt++;
-        }
-
-        buf << "Found " << cnt << " mobs." << endl;
-        page_to_char(buf.str().c_str(), ch);
-        return;
-    }
-
-    DLString arg2 = args.getOneArgument();
-    DLString arg3 = args.getOneArgument();
-    MOB_INDEX_DATA *pMob;
-    Integer vnum;
-    if (!Integer::tryParse(vnum, arg3))
-        return;
-    
-    pMob = get_mob_index(vnum);
-    if (!pMob)
-        return;
-
-    Race *race = raceManager->find(pMob->race);
-    if (!race || !race->isValid())
-        return;
-
-    if (arg == "hide") {
-        DLString propName = arg2 + "Confirmed";
-        pMob->props["olc"][propName] = "true";
-        pMob->area->changed = true;
-        ch->pecho("Mob %d is now hidden from 'abc %s' output.", vnum.getValue(), arg2.c_str());
-        __do_abc(ch, const_cast<char *>(arg2.c_str()));
-        return;
-    }
-
-    if (arg == "reset") {
-
-        if (arg2 == "form") {
-            bitstring_t raceForm = race->getForm();
-            bitstring_t mobForm = pMob->form;            
-            bitstring_t dels = ~mobForm & raceForm;
-
-            if (args == "del")
-                pMob->form = dels | pMob->form;
-            else if (args == "add")
-                pMob->form = raceForm & mobForm;
-            else
-                return;
-
-            ch->pecho("Mob %d has forms [%s].", vnum.getValue(), form_flags.names(pMob->form).c_str());
-        }
-        else if (arg2 == "part") {
-            bitstring_t racePart = race->getParts();
-            bitstring_t mobPart = pMob->parts;
-            bitstring_t dels = ~mobPart & racePart;
-
-            if (args == "del")
-                pMob->parts = dels | pMob->parts;
-            else if (args == "add")
-                pMob->parts = racePart & mobPart;
-            else
-                return;
-
-            ch->pecho("Mob %d has parts [%s].", vnum.getValue(), part_flags.names(pMob->parts).c_str());
-        }
-        else if (arg2 == "aff") {
-            bitstring_t raceAff = race->getAff();
-            bitstring_t mobAff = pMob->affected_by;
-            bitstring_t dels = ~mobAff & raceAff;
-
-            if (args == "del")
-                pMob->affected_by = dels | pMob->affected_by;
-            else if (args == "add")
-                pMob->affected_by = raceAff & mobAff;
-            else
-                return;
-
-            ch->pecho("Mob %d has affect bits [%s].", vnum.getValue(), affect_flags.names(pMob->affected_by).c_str());
-        }
-        else
-            return;
-
-        __do_abc(ch, const_cast<char *>(arg2.c_str()));
-        pMob->area->changed = true;
-        return;
-    }
-
 }
 

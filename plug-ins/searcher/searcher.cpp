@@ -23,6 +23,7 @@
 #include "string_utils.h"
 #include "websocketrpc.h"
 #include "dreamland.h"
+#include "mobbody.h"
 #include "merc.h"
 #include "act.h"
 #include "comm.h"
@@ -1000,7 +1001,7 @@ CMDRUNP(searcher)
             vector<list<DLString> > output(maxLevel+1);
             DLString lineFormat = 
                 web_cmd(ch, "medit $1", "%5d") 
-                    + " {C%3d{x %-20.20s " 
+                    + " {C%3d{x {G%-8.8s{x %-20.20s " 
                     + web_cmd(ch, "raceedit $1", "{y%-12.12s")
                     + " {y%3.3s {M%2s {r%10.10s {D%s{x\n";
 
@@ -1020,6 +1021,7 @@ CMDRUNP(searcher)
                         fmt(NULL, lineFormat.c_str(), 
                                     pMob->vnum,
                                     pMob->level, 
+                                    MobBody::tiers().name(pMob->tier).c_str(),
                                     name.c_str(),
                                     pMob->race.c_str(),
                                     searcher_param_class(pMob).c_str(),
@@ -1040,8 +1042,8 @@ CMDRUNP(searcher)
             } 
     
             ostringstream buf;
-            buf << fmt(0, "{W%5s %3s %-20.20s %-12.12s %-3.3s %2s %10s %s{x\n", 
-                            "VNUM", "LVL", "NAME", "RACE", "CLS", "SX", "DAMTYPE", "AREA");
+            buf << fmt(0, "{W%5s %3s %-8.8s %-20.20s %-12.12s %-3.3s %2s %10s %s{x\n", 
+                            "VNUM", "LVL", "TIER", "NAME", "RACE", "CLS", "SX", "DAMTYPE", "AREA");
             for (size_t lvl = 0; lvl < output.size(); lvl++) {
                 const list<DLString> &lines = output[lvl];
                 for (list<DLString>::const_iterator l = lines.begin(); l != lines.end(); l++)
