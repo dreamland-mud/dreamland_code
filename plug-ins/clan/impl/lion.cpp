@@ -13,7 +13,8 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 
-#include "lion.h"
+#include "objectbehavior.h"
+#include "clanmobiles.h"
 
 #include "summoncreaturespell.h"
 #include "affecthandlertemplate.h"
@@ -59,66 +60,7 @@ GSN(spellbane);
 /*--------------------------------------------------------------------------
  * LionMan 
  *-------------------------------------------------------------------------*/
-void ClanGuardLion::actGreet( PCharacter *wch )
-{
-    do_say(ch, "Добро пожаловать, странник.");
-}
-void ClanGuardLion::actPush( PCharacter *wch )
-{
-    oldact(_("$C1 выпускает когти.\n\rИ ты быстренько убираешься из этой местности."), wch, 0, ch, TO_CHAR );
-    oldact(_("$C1, глядя на $c4, выпускает когти, и $c1 сматывает удочки."), wch, 0, ch, TO_ROOM );
-}
-int ClanGuardLion::getCast( Character *victim )
-{
-        int sn = -1;
 
-        switch ( dice(1,16) )
-        {
-        case  0: 
-        case  1:
-                if (!victim->isAffected( gsn_spellbane ))
-                    sn = gsn_dispel_affects;
-                break;
-        case  2:
-        case  3:
-                sn = gsn_acid_blast;
-                break;
-        case  4: 
-        case  5:
-                sn = gsn_caustic_font;
-                break; 
-        case  6:
-        case  7:
-        case  8:
-                sn = gsn_acid_arrow;
-                break;
-        default:
-                sn = -1;
-                break;
-        }
-
-        return sn;
-}
-
-bool ClanGuardLion::specFight( )
-{
-        Character *victim;
-
-        if (!( victim = getVictim( ) ))
-            return true;
-
-        if ( number_percent() < 33 )
-        {
-                int damage_claw;
-
-                damage_claw = dice(ch->getRealLevel(), 24) + ch->damroll;
-                damage(ch, victim, damage_claw, gsn_claw, DAM_BASH, true, DAMF_WEAPON);
-                return true;
-        }
-
-        spec_cast( victim );
-        return true;
-}
 
 
 SPELL_DECL(EvolveLion);

@@ -24,7 +24,6 @@ knight.cpp \
 lion.cpp \
 ruler.cpp \
 shalafi.cpp \
-flowers.cpp \
 common.cpp \
 clantasks.cpp \
 impl.cpp
@@ -32,15 +31,8 @@ impl.cpp
 libclan_impl_la_MOC = \
 defaultclan.h \
 battlerager.h \
-chaos.h \
-ghost.h \
-invader.h \
 knight.h \
-lion.h \
-ruler.h \
-shalafi.h \
-flowers.h \
-artificer.h
+ruler.h
 
 libclan_impl_la_LIBADD = \
 $(LIBADD_AI) \

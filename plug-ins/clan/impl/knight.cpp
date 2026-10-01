@@ -98,70 +98,11 @@ void ClanAltarKnight::actNotify(Character *ch)
 /*--------------------------------------------------------------------------
  * Protector 
  *-------------------------------------------------------------------------*/
-void ClanGuardKnight::actGreet(PCharacter *wch)
-{
-    do_say(ch, "Добро пожаловать, благородный рыцарь.");
-}
-void ClanGuardKnight::actPush(PCharacter *wch)
-{
-    oldact(_("$C1 кивает тебе, слегка хмурясь, взмахивает рукой.\n\r...и вот уже ты неторопливо несешься в воздухе."), wch, 0, ch, TO_CHAR);
-    oldact(_("$C1 кивает $c3, слегка нахмурившись, взмахивает рукой.\n\r... и $c1 с диким восторгом в глазах улетает."), wch, 0, ch, TO_ROOM);
-}
 
-void ClanGuardKnight::actInvited(PCharacter *wch, Object *obj)
-{
-    do_say(ch, "{WНу что ж! Будь как дома - но не забывай, что ты в гостях!{x");
-}
 
-void ClanGuardKnight::actIntruder(PCharacter *)
-{
-    interpret_raw(ch, "cb", "БЕЗБОЖНИКИ... Безбожникам вход запрещен!");
-}
 
-void ClanGuardKnight::actGhost(PCharacter *)
-{
-    do_say(ch, "{WОбрети плоть и изгони дьявола из души своей сперва!{x");
-}
 
-void ClanGuardKnight::actGiveInvitation(PCharacter *wch, Object *obj)
-{
-    oldact(_("$c1 внимательно сверяется со списком."), ch, 0, 0, TO_ROOM);
-    oldact(_("$c1 ставит Королевскую печать на $o6."), ch, obj, 0, TO_ROOM);
-}
 
-int ClanGuardKnight::getCast(Character *victim)
-{
-    int sn = -1;
-
-    switch (dice(1, 16))
-    {
-    case 0:
-    case 1:
-        if (!victim->isAffected(gsn_spellbane))
-            sn = gsn_dispel_affects;
-        break;
-    case 2:
-    case 3:
-        sn = gsn_acid_arrow;
-        break;
-    case 4:
-    case 5:
-        sn = gsn_caustic_font;
-        break;
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-        sn = gsn_acid_blast;
-        break;
-    default:
-        sn = -1;
-        break;
-    }
-
-    return sn;
-}
 
 /*
  * 'guard' skill command

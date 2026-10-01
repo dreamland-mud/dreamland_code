@@ -14,7 +14,8 @@
  ***************************************************************************/
 #include <string.h>
 
-#include "chaos.h"
+#include "objectbehaviormanager.h"
+#include "clanmobiles.h"
 
 #include "affecthandlertemplate.h"
 #include "spelltemplate.h"                                                 
@@ -63,50 +64,6 @@ GSN(spellbane);
 /*--------------------------------------------------------------------------
  * Ivan 
  *-------------------------------------------------------------------------*/
-void ClanGuardChaos::actGreet( PCharacter *wch )
-{
-    interpret_raw( ch, "say", "Растворись в Хаосе, %s!", wch->getNameP( '1' ).c_str( ) );
-}
-void ClanGuardChaos::actPush( PCharacter *wch )
-{
-    oldact(_("На мгновенье ты теряешь представление о реальности..."), wch, 0, ch, TO_CHAR );
-    oldact(_("$C1 выпускает частицу ХАОСА в $c2\n\r...и $c1 растворяется в нем..."), wch, 0, ch, TO_ROOM );
-}
-int ClanGuardChaos::getCast( Character *victim )
-{
-        int sn = -1;
-
-        switch ( dice(1,16) )
-        {
-        case  0: 
-        case  1:
-                if (!victim->isAffected( gsn_spellbane ))
-                    sn = gsn_dispel_affects;
-                break;
-        case  2:
-        case  3:
-                sn = gsn_acid_arrow;
-                break;
-        case  4: 
-        case  5:
-                sn = gsn_caustic_font;
-                break; 
-        case  6:
-        case  7:
-        case  8:
-                sn = gsn_acid_blast;
-                break;
-        case  9:
-                sn = gsn_disgrace;
-                break;
-        case 10:
-                if ( ch->hit < (ch->max_hit / 3) )
-                        sn = gsn_garble;
-                break;
-        }
-
-        return sn;
-}
 
 
 SPELL_DECL(Confuse);

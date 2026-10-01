@@ -13,7 +13,7 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 
-#include "shalafi.h"
+#include "clanmobiles.h"
 #include "clanrecords.h"
 
 #include "spelltemplate.h"                                                 
@@ -67,69 +67,6 @@ GSN(weaken);
 /*--------------------------------------------------------------------------
  * Seneschal 
  *-------------------------------------------------------------------------*/
-void ClanGuardShalafi::actGreet( PCharacter *wch )
-{
-    do_say(ch, "Приветствую тебя, мудрец.");
-}
-void ClanGuardShalafi::actPush( PCharacter *wch )
-{
-    oldact(_("$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон."), wch, 0, ch, TO_CHAR );
-    oldact(_("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает."), wch, 0, ch, TO_ROOM );
-}
-int ClanGuardShalafi::getCast( Character *victim )
-{
-        int sn = -1;
-
-        switch ( dice(1,16) )
-        {
-        case  0:
-                sn = gsn_blindness;
-                break;
-        case  1:
-                if (!victim->isAffected( gsn_spellbane ))
-                    sn = gsn_dispel_affects;
-                break;
-        case  2:
-                sn = gsn_weaken;
-                break;
-        case  3:
-                sn = gsn_blindness;
-                break;
-        case  4:
-                sn = gsn_acid_arrow;
-                break;
-        case  5:
-                sn = gsn_caustic_font;
-                break;
-        case  6:
-                sn = gsn_energy_drain;
-                break;
-        case  7:
-        case  8:
-        case  9:
-                sn = gsn_acid_blast;
-                break;
-        case 10:
-                sn = gsn_plague;
-                break;
-        case 11:
-                sn = gsn_acid_blast;
-                break;
-        case 12:  
-        case 13:
-                sn = gsn_lightning_breath;
-                break;
-        case 14:
-        case 15:
-                sn = gsn_mental_knife;
-                break;
-        default:
-                sn = -1;
-                break;
-        }
-
-        return sn;
-}
 
 SPELL_DECL(MentalKnife);
 VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int level ) 

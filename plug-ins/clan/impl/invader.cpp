@@ -13,7 +13,7 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 
-#include "invader.h"
+#include "clanmobiles.h"
 #include "clanrecords.h"
 
 #include "summoncreaturespell.h"
@@ -61,64 +61,6 @@ CLAN(invader);
 /*--------------------------------------------------------------------------
  * Neere 
  *-------------------------------------------------------------------------*/
-void ClanGuardInvader::actGreet(PCharacter *wch)
-{
-    say_fmt(_("Приветствую тебя, идущ%2$Gее|ий|ая по Пути Тьмы."), ch, wch);
-}
-void ClanGuardInvader::actPush(PCharacter *wch)
-{
-    oldact(_("$C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься."), wch, 0, ch, TO_CHAR);
-    oldact(_("$C1 сверлит глазами $c4, и $c1 с испугу куда-то уносится."), wch, 0, ch, TO_ROOM);
-}
-int ClanGuardInvader::getCast(Character *victim)
-{
-    int sn = -1;
-
-    switch (dice(1, 16))
-    {
-    case 0:
-    case 1:
-        sn = gsn_blindness;
-        break;
-    case 2:
-    case 3:
-        if (!victim->isAffected(gsn_spellbane))
-            sn = gsn_dispel_affects;
-        break;
-    case 4:
-    case 5:
-        sn = gsn_weaken;
-        break;
-    case 6:
-    case 7:
-        sn = gsn_energy_drain;
-        break;
-    case 8:
-    case 9:
-        sn = gsn_plague;
-        break;
-    case 10:
-    case 11:
-        sn = gsn_acid_arrow;
-        break;
-    case 12:
-    case 13:
-    case 14:
-        sn = gsn_acid_blast;
-        break;
-    case 15:
-        if (ch->hit < (ch->max_hit / 3))
-            sn = gsn_shadow_cloak;
-        else
-            sn = -1;
-        break;
-    default:
-        sn = -1;
-        break;
-    }
-
-    return sn;
-}
 
 /*
  * 'fade' skill command
