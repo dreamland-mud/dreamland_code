@@ -12,8 +12,7 @@
   "undead": "skeletal",
   "centaur": "quadruped",
   "animal": "hoofed",
-  "bird": "winged",
-  "_note": "migration-time renames for the data pass. The resolver applies them as compat EXCEPT bird: that name is reused by the new full form, so the data pass picks winged or bird by content"
+  "_note": "migration-time renames for the data pass, applied by the resolver as compat. bird is not one: the name belongs to the new full form, so the data pass picks winged or bird by content"
  },
  "deleted_forms": {
   "edible": "replaced by the derived helper isEdible (rules.edible), decision 24",

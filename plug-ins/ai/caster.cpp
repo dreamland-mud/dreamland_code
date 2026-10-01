@@ -125,7 +125,7 @@ bool BasicMobileBehavior::specFightCaster( )
         return false;
     
     if (IS_SET( ch->act, ACT_VAMPIRE )) {
-        if (IS_SET( ch->act, ACT_NECROMANCER ) && chance( 50 ))
+        if (IS_SET( ch->act, NPC_NECRO_ACTS ) && chance( 50 ))
             return specFightNecro( );
         else
             return specFightVampire( );
@@ -141,7 +141,7 @@ bool BasicMobileBehavior::specFightCaster( )
             prof = prof_warlock;
     }
     
-    if (IS_SET( ch->act, ACT_NECROMANCER )) {
+    if (IS_SET( ch->act, NPC_NECRO_ACTS )) {
         if (number_range( 0, cnt++ ) == 0) 
             prof = prof_necromancer;
     }
@@ -238,7 +238,7 @@ int BasicMobileBehavior::casterSnRange( Character *victim, int victRange )
     if (castSn == -1 && IS_SET(ch->act, ACT_CLERIC))
         castSn = SpellChanceTable( clericSnRange, ch, victim ).findRangedSpell( victRange );
     
-    if (castSn == -1 && IS_SET(ch->act, ACT_NECROMANCER))
+    if (castSn == -1 && IS_SET(ch->act, NPC_NECRO_ACTS))
         castSn = SpellChanceTable( necroSnRange, ch, victim ).findRangedSpell( victRange );
 
     return castSn;

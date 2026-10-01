@@ -380,8 +380,6 @@ static const char * const saved_set_keys[MOBSET_MAX] = {
     "Act", "Off", "AfBy", "Detect", "Imm", "Res", "Vuln", "Form", "Part"
 };
 
-/* Aff bits create_mob_affects turns into real affects: never part of a body. */
-static const bitstring_t AFF_FROM_AFFECTS = AFF_SANCTUARY|AFF_HASTE|AFF_PROTECT_EVIL|AFF_PROTECT_GOOD|AFF_CORRUPTION;
 
 static bitstring_t npc_set_get(NPCharacter *mob, int set)
 {
@@ -485,13 +483,19 @@ static bool fread_saved_mob_key(const char *word, FILE *fp, SavedMobState &st, b
         return true;
     }
 
+    static DLString addKeys[MOBSET_MAX], delKeys[MOBSET_MAX];
+    if (addKeys[0].empty())
+        for (int s = 0; s < MOBSET_MAX; s++) {
+            addKeys[s] = DLString(saved_set_keys[s]) + "Add";
+            delKeys[s] = DLString(saved_set_keys[s]) + "Del";
+        }
+
     for (int s = 0; s < MOBSET_MAX; s++) {
-        DLString key = saved_set_keys[s];
-        if (key + "Add" == word) {
+        if (addKeys[s] == word) {
             st.add[s] = (unsigned long)fread_flag(fp);
             return true;
         }
-        if (key + "Del" == word) {
+        if (delKeys[s] == word) {
             st.del[s] = (unsigned long)fread_flag(fp);
             return true;
         }
@@ -604,9 +608,27 @@ static void apply_saved_numbers(NPCharacter *mob, const SavedMobState &st)
         mob->saving_throw = st.saveV;
 }
 
+/* Boot forensics: legacy whole-value body lines read past, reported once. */
+static int saved_legacy_body_lines = 0;
+static int saved_legacy_blocks = 0;
+
+void saved_mobiles_report( )
+{
+    if (saved_legacy_body_lines > 0)
+        LogStream::sendNotice( ) << "Saved mobiles: " << saved_legacy_body_lines
+            << " pre-reform body line(s) in " << saved_legacy_blocks
+            << " block(s) ignored, bodies re-derived from the prototypes." << endl;
+    saved_legacy_body_lines = saved_legacy_blocks = 0;
+}
+
 /* fread_mob End: body diffs and numbers if the stamp matches, then the affects. */
 static void apply_saved_mob(NPCharacter *mob, SavedMobState &st)
 {
+    if (st.legacyBody > 0) {
+        saved_legacy_body_lines += st.legacyBody;
+        saved_legacy_blocks++;
+    }
+
     if (st.stampMatches(mob->pIndexData)) {
         for (int s = 0; s < MOBSET_MAX; s++)
             if (st.add[s] || st.del[s])

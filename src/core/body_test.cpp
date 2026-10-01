@@ -137,6 +137,20 @@ int main(int argc, char **argv)
         failures++;
     }
 
+    // A typo in implies_forms or a rename target refuses the whole file.
+    Json::Value bad = forms;
+    bad["forms"]["dragon"]["implies_forms"].append("wingedd");
+    if (empty.fromJson(bad, error)) {
+        cout << "FAIL unknown implies_forms target accepted" << endl;
+        failures++;
+    }
+    bad = forms;
+    bad["renames"]["centaur"] = "quadrupedd";
+    if (empty.fromJson(bad, error)) {
+        cout << "FAIL unknown rename target accepted" << endl;
+        failures++;
+    }
+
     int cases = 0;
     for (const char *file: { "archetypes.json", "races.json" }) {
         Json::Value fx;

@@ -402,7 +402,7 @@ static void abc_body(Character *ch, DLString &args)
                 if (s == MOBSET_ACT)
                     produced |= ACT_IS_NPC;
                 if (s == MOBSET_AFF)
-                    produced &= base | ~(bitstring_t)(AFF_SANCTUARY|AFF_HASTE|AFF_PROTECT_EVIL|AFF_PROTECT_GOOD|AFF_CORRUPTION);
+                    produced &= ~(bitstring_t)AFF_FROM_AFFECTS;
                 bitstring_t add = base & ~produced, del = produced & ~base;
                 if (add)
                     diff << " " << abc_set_names[s] << " +{G" << abc_set_table(s)->names(add) << "{x";

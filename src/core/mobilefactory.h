@@ -119,7 +119,7 @@ struct mob_index_data
     /** The index field holding one bit set (act, off_flags, ..., parts). */
     int &bodyBits(int mobset);
     /** Authored diff for asave: the loaded add/del plus any direct edit made since load. */
-    void bodyDiff(int mobset, bitstring_t &add, bitstring_t &del);
+    void bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) const;
 
     /** Return props value for the key (props[key] or props["xxx"][key]). */
     DLString getProperty(const DLString &key) const;

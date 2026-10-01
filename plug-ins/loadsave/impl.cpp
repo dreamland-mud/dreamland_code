@@ -16,6 +16,8 @@
 #include "player_menu.h"
 
 #include "save.h"
+#include "wearlocation.h"
+#include "logstream.h"
 #include "merc.h"
 #include "def.h"
 
@@ -60,6 +62,30 @@ public:
     }
 };
 
+/*
+ * Mob reform: wearloc names reserved in the registry (by race files, area
+ * files or mob_forms.json) that no wearlocation file ever registered. Every
+ * plugin is loaded by now, so what is still a placeholder is a data gap.
+ */
+static void report_unregistered_wearlocs( )
+{
+    if (!wearlocationManager)
+        return;
+
+    DLString missing;
+    for (int i = 0; i < wearlocationManager->size( ); i++) {
+        GlobalRegistryElement *e = wearlocationManager->find( i );
+        if (e && !e->isValid( )) {
+            if (!missing.empty( ))
+                missing << " ";
+            missing << e->getName( );
+        }
+    }
+
+    if (!missing.empty( ))
+        LogStream::sendWarning( ) << "Wearlocations used but never defined: " << missing << endl;
+}
+
 class DropsLoadTask : public SchedulerTaskRoundPlugin {
 public:
     typedef ::Pointer<DropsLoadTask> Pointer;
@@ -70,6 +96,8 @@ public:
             load_drops( );
             load_dropped_mobs( );
             load_creatures( );
+            saved_mobiles_report( );
+            report_unregistered_wearlocs( );
         }
     }
 

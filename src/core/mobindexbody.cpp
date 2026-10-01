@@ -19,6 +19,7 @@
  */
 #include <algorithm>
 #include <cmath>
+#include <set>
 #include <sstream>
 
 #include "logstream.h"
@@ -48,15 +49,26 @@ int &mob_index_data::bodyBits(int mobset)
 unsigned long long mob_index_data::bodyStamp()
 {
     std::ostringstream buf;
-    buf << level << '|' << tier << '|' << tierName << '|' << race << '|' << getSize() << '|';
+    // Only inputs a saved body or number is built from. Not wealth (gold is
+    // saved whole), not the tier's spelling (tier 3 == tier champion), and the
+    // wearlocs as a sorted name set: registry index order follows the order
+    // race files come off the disk.
+    buf << level << '|' << tier << '|' << race << '|' << getSize() << '|';
     for (int s = 0; s < MOBSET_MAX; s++)
         buf << bodyBits(s) << ',';
-    buf << '|' << wearloc.toString() << '|' << numbersDerived << '|';
+    std::set<DLString> wearNames;
+    if (wearloc.getRegistry())
+        for (int ndx: wearloc.toArray())
+            wearNames.insert(wearloc.getRegistry()->getName(ndx));
+    buf << '|';
+    for (auto &w: wearNames)
+        buf << w << ',';
+    buf << '|' << numbersDerived << '|';
     for (int i = 0; i < 3; i++)
         buf << hit[i] << ',' << mana[i] << ',' << damage[i] << ',';
     for (int i = 0; i < 4; i++)
         buf << ac[i] << ',';
-    buf << hitroll << ',' << wealth << ',' << saves << ',' << statCap;
+    buf << hitroll << ',' << saves << ',' << statCap;
 
     // FNV-1a, 64 bit: stable across builds and platforms, unlike std::hash.
     unsigned long long h = 14695981039346656037ULL;
@@ -67,9 +79,9 @@ unsigned long long mob_index_data::bodyStamp()
     return h;
 }
 
-void mob_index_data::bodyDiff(int mobset, bitstring_t &add, bitstring_t &del)
+void mob_index_data::bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) const
 {
-    bitstring_t now = (unsigned int)bodyBits(mobset);
+    bitstring_t now = (unsigned int)const_cast<mob_index_data *>(this)->bodyBits(mobset);
     bitstring_t on = now & ~bodySnapshot[mobset];
     bitstring_t off = bodySnapshot[mobset] & ~now;
 
@@ -175,8 +187,10 @@ void mob_index_data::resolveBody()
         movetype.clear();
         moveverb.clear();
         formAcPct = 100;
+        // Same rule as IS_BLOODLESS, gated the same way.
         bloodless = IS_SET(form, FORM_SKELETAL|FORM_CONSTRUCT|FORM_MIST)
-                    || (!IS_SET(parts, PART_HEART) && !IS_SET(parts, PART_COLD_BLOOD) && !IS_SET(form, FORM_COLD_BLOOD));
+                    || (mob_body_model_active && !IS_SET(parts, PART_HEART)
+                        && !IS_SET(parts, PART_COLD_BLOOD) && !IS_SET(form, FORM_COLD_BLOOD));
         edible = IS_EDIBLE_FORM(form);
         canHoldCards = CAN_HOLD_CARDS(this);
     } else {

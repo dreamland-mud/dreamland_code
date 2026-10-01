@@ -21,6 +21,7 @@ CONFIGURABLE_LOADED(fight, mob_forms)
 
     if (cfg.fromJson(value, error)) {
         MobBody::forms() = cfg;
+        mob_body_model_active = true;
         LogStream::sendNotice() << "mob_forms: " << cfg.forms.size() << " forms, "
                                 << cfg.parts.size() << " parts loaded." << endl;
     } else if (MobBody::forms().loaded) {
