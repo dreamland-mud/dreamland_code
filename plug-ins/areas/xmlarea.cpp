@@ -234,6 +234,7 @@ XMLArea::load_mobiles(AreaIndexData *a)
         MOB_INDEX_DATA *pMobIndex = mit->second.compat( );
         pMobIndex->vnum = vnum;
         pMobIndex->area = a;
+        pMobIndex->resolveBody( );
         pMobIndex->deriveNumbers( );
 
         iHash = vnum % MAX_KEY_HASH;

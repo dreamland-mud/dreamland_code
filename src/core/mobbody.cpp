@@ -89,12 +89,13 @@ void wearlocs(const Body::NameSet &n, GlobalBitvector &out)
 {
     out.setRegistry(wearlocationManager);
 
+    // lookup(), not findExisting(): races and areas resolve before the
+    // wearlocation plugin registers its elements. lookup() reserves the index
+    // the real element takes later, exactly as XMLGlobalBitvector does.
     for (auto &name: n) {
-        Wearlocation *loc = wearlocationManager->findExisting(name);
-        if (!loc)
-            warnOnce("no wearlocation '" + name + "', skipped");
-        else
-            out.set(loc->getIndex());
+        int ndx = wearlocationManager->lookup(name);
+        if (ndx >= 0)
+            out.set(ndx);
     }
 }
 
