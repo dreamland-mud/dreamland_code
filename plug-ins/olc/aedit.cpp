@@ -116,7 +116,10 @@ void OLCStateArea::commit()
         try {
             istringstream istr( behavior );
             original->behavior.fromStream( istr );
-            original->behavior->setArea( original );
+            if (original->behavior)
+                original->behavior->setArea( original );
+            else
+                LogStream::sendError( ) << "aedit " << original->getName( ) << ": behavior did not load" << endl;
         } catch (const Exception &e) {
             LogStream::sendError( ) << e.what( ) << endl;
         }

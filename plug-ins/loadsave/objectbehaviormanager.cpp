@@ -132,7 +132,10 @@ void ObjectBehaviorManager::parse( Object * obj, FILE *fp ) {
 
         clear(obj);
         obj->behavior.fromStream( istr );
-        obj->behavior->setObj( obj );
+        if (obj->behavior)
+            obj->behavior->setObj( obj );
+        else
+            LogStream::sendError( ) << "obj " << obj->pIndexData->vnum << ": saved behavior did not load" << endl;
 
     } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;

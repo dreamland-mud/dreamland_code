@@ -28,7 +28,10 @@ void AreaBehaviorManager::parse( AreaIndexData * pArea, FILE *fp ) {
         std::basic_istringstream<char> istr( word );
         
         pArea->behavior.fromStream( istr );
-        pArea->behavior->setArea( pArea );
+        if (pArea->behavior)
+            pArea->behavior->setArea( pArea );
+        else
+            LogStream::sendError( ) << "area " << pArea->getName( ) << ": behavior did not load" << endl;
 
     } catch (Exception e) {
         LogStream::sendError( ) << e.what( ) << endl;
