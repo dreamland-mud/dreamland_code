@@ -66,6 +66,11 @@ void MobileBehaviorManager::assign( NPCharacter *mob ) {
         // First load behavior from its XML definition in the area file.
         mob->behavior.fromXML( rootNode );
 
+        // A childless <behavior type="X"/> parses as an XML leaf and leaves the
+        // pointer empty; the fallback below the catch takes over.
+        if (!mob->behavior)
+            throw Exception( "empty behavior '" + type + "'" );
+
         // Try to override behavior definition from a file in 'share/DL/behaviors' folder.
         // Careful here to pass the original pointer, so that fromXML on the underlying class is called,
         // rather than the one on the XMLPolymorphPointer.
@@ -76,6 +81,13 @@ void MobileBehaviorManager::assign( NPCharacter *mob ) {
 
     } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;
+    }
+
+    // Unknown class, bad XML or an empty node: never leave a mob without a
+    // behavior, the rest of the engine dereferences it.
+    if (!mob->behavior) {
+        LogStream::sendError( ) << "mob " << mob->pIndexData->vnum << ": no behavior, using basic" << endl;
+        assignBasic( mob );
     }
 }
 
@@ -154,10 +166,20 @@ void MobileBehaviorManager::parse( NPCharacter * mob, FILE *fp ) {
         }
         
         mob->behavior.fromStream( istr );
-        mob->behavior->setChar( mob );
+        if (mob->behavior)
+            mob->behavior->setChar( mob );
 
     } catch (Exception e) {
         LogStream::sendError( ) << e.what( ) << endl;
+    }
+
+    // The saved behavior did not load: rebuild it the way create_mobile_org does.
+    if (!mob->behavior) {
+        LogStream::sendError( ) << "mob " << mob->pIndexData->vnum << ": saved behavior did not load, reassigning" << endl;
+        if (mob->pIndexData->behavior)
+            assign( mob );
+        else
+            assignBasic( mob );
     }
 }
 

@@ -66,6 +66,10 @@ void RoomBehaviorManager::assign(Room *room)
 
         const XMLNode::Pointer &rootNode = room->pIndexData->behavior->getFirstNode();                
         room->behavior.fromXML( rootNode );
+        if (!room->behavior) {
+            LogStream::sendError( ) << "room " << room->vnum << ": empty behavior" << endl;
+            return;
+        }
         room->behavior->setRoom(room);
 
     } catch (const Exception &e) {
