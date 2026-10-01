@@ -5,6 +5,7 @@
 #include "fenia/register-decl.h"
 #include "xmlmultistring.h"
 #include "bitstring.h"
+#include "mobsets.h"
 #include "globalbitvector.h"
 #include "grammar_entities.h"
 #include "lang.h"
@@ -16,12 +17,6 @@ struct mob_index_data;
 class AreaIndexData;
 
 typedef struct mob_index_data MOB_INDEX_DATA;
-
-/* Mob reform: the nine body bit sets of a prototype, as authored add/del pairs. */
-enum {
-    MOBSET_ACT = 0, MOBSET_OFF, MOBSET_AFF, MOBSET_DET, MOBSET_IMM, MOBSET_RES, MOBSET_VULN,
-    MOBSET_FORM, MOBSET_PARTS, MOBSET_MAX
-};
 
 /* dice */
 #define DICE_NUMBER 0
