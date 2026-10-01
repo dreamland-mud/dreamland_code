@@ -189,7 +189,19 @@
 
 #define HEALTH(ch) ((ch)->hit * 100 / max(1, (ch)->max_hit.getValue( )))
 
-#define IS_BLOODLESS(ch) ( IS_SET(ch->form, FORM_UNDEAD) || IS_SET(ch->form, FORM_CONSTRUCT) || IS_SET(ch->form, FORM_MIST) ) 
+/*
+ * Body helpers, mob reform (plan docs/plans/mob-reform.md §3.2a, §3.6 items 3, 13).
+ * cold_blood is a part now; the legacy form bit still counts until every race
+ * file has moved to <forms>.
+ */
+#define IS_COLD_BLOODED(ch) ( IS_SET((ch)->parts, PART_COLD_BLOOD) || IS_SET((ch)->form, FORM_COLD_BLOOD) )
+#define IS_BLOODLESS(ch) ( IS_SET((ch)->form, FORM_SKELETAL|FORM_CONSTRUCT|FORM_MIST) \
+                           || (!IS_SET((ch)->parts, PART_HEART) && !IS_COLD_BLOODED(ch)) )
+/* What a corpse is good for: construct/skeletal/mist/instant_decay/magical bodies are not food. */
+#define FORM_INEDIBLE ( FORM_CONSTRUCT|FORM_SKELETAL|FORM_MIST|FORM_INSTANT_DECAY|FORM_MAGICAL )
+#define IS_EDIBLE_FORM(form) ( !IS_SET((form), FORM_INEDIBLE) )
+/* Deck sixer and rainbow holder: a mind and a pair of hands (decision 27). */
+#define CAN_HOLD_CARDS(ch) ( IS_SET((ch)->form, FORM_SENTIENT) && IS_SET((ch)->parts, PART_HANDS) )
 
 /*
  * Object macros.

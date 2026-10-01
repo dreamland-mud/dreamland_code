@@ -492,7 +492,7 @@ static Object * corpse_create( Character *ch )
     Object *corpse;
     DLString name;
 
-    if (ch->is_npc( ) && IS_SET( ch->form, FORM_INSTANT_DECAY|FORM_INTANGIBLE )) {
+    if (ch->is_npc( ) && IS_SET( ch->form, FORM_INSTANT_DECAY )) {
         ch->in_room->echo( POS_RESTING, _("%1$^C1 превраща%1$nется|ются в прах и развеива%1$nется|ются по ветру, не оставляя после себя трупа."), ch );
         return NULL;
     }    
@@ -523,7 +523,7 @@ static Object * corpse_create( Character *ch )
         corpse->setDescription( fmt(0, corpse->getDescription(lang).c_str(), lname.c_str()), lang );
     }
 
-    if (IS_SET(ch->form, FORM_EDIBLE))
+    if (IS_EDIBLE_FORM(ch->form))
         corpse->value0((1 << ch->size) - 1);
 
     corpse->value1(ch->getModifyLevel( ));
@@ -980,7 +980,7 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     if (obj->item_type == ITEM_FOOD) {
         if (IS_SET(body_form, FORM_POISON))
             obj->value3(1);
-        else if (!IS_SET(body_form, FORM_EDIBLE))
+        else if (!IS_EDIBLE_FORM(body_form))
             obj->item_type = ITEM_TRASH;
     }
     

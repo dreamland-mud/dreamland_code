@@ -152,10 +152,10 @@ void mob_index_data::resolveBody()
         movetype.clear();
         moveverb.clear();
         formAcPct = 100;
-        bloodless = IS_SET(form, FORM_UNDEAD|FORM_CONSTRUCT|FORM_MIST)
-                    || (!IS_SET(parts, PART_HEART) && !IS_SET(form, FORM_COLD_BLOOD));
-        edible = !IS_SET(form, FORM_CONSTRUCT|FORM_UNDEAD|FORM_MIST|FORM_INSTANT_DECAY|FORM_MAGICAL);
-        canHoldCards = IS_SET(form, FORM_SENTIENT) && IS_SET(parts, PART_HANDS);
+        bloodless = IS_SET(form, FORM_SKELETAL|FORM_CONSTRUCT|FORM_MIST)
+                    || (!IS_SET(parts, PART_HEART) && !IS_SET(parts, PART_COLD_BLOOD) && !IS_SET(form, FORM_COLD_BLOOD));
+        edible = IS_EDIBLE_FORM(form);
+        canHoldCards = CAN_HOLD_CARDS(this);
     } else {
         Body::Input in;
         mobrace->getBodyInput(in, true);

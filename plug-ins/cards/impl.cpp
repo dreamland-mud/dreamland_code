@@ -59,7 +59,7 @@ public:
                 continue;
             if (IS_GOOD(mob))
                 continue;
-            if (!IS_SET(mob->form, FORM_BIPED))
+            if (!CAN_HOLD_CARDS(mob))
                 continue;
             if (IS_SET(mob->in_room->area->area_flag, AREA_HIDDEN|AREA_NOQUEST|AREA_WIZLOCK))
                 continue;

@@ -4,6 +4,7 @@
  */
 
 #include <sstream>
+#include <set>
 
 using namespace std;
 
@@ -14,6 +15,7 @@ using namespace std;
 #include "tableswrapper.h"
 #include "flagtable.h"
 #include "flagtableregistry.h"
+#include "logstream.h"
 
 using namespace Scripting;
 
@@ -101,8 +103,22 @@ TableWrapper::getField(const Register &key)
     else
         rc = table->bitstring( flag, true );
 
-    if(rc == NO_FLAG)
+    if(rc == NO_FLAG) {
+        // Body flags renamed or retired by the mob reform: a script read
+        // between the reform boot and its repointed version being posted
+        // gets an empty flag and one log line, not a dead handler.
+        const DLString &tabName = FlagTableRegistry::getName(table);
+        if (tabName == "form_flags" || tabName == "part_flags") {
+            static std::set<DLString> warned;
+            DLString key = tabName;
+            key << "." << flag;
+            if (warned.insert(key).second)
+                LogStream::sendWarning() << "Fenia: .tables." << tabName << "." << flag
+                                         << " is not defined, reads as 0" << endl;
+            return 0;
+        }
         throw Scripting::Exception("no such flag defined in bits.conf");
+    }
 
     return rc;
 }

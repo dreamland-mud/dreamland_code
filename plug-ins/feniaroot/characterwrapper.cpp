@@ -245,6 +245,24 @@ NMI_GET( CharacterWrapper, id, "уникальный идентификатор 
     return Register( DLString(id) );
 }
 
+NMI_GET( CharacterWrapper, bloodless, "true, если у тела нет крови: скелет, конструкция, туман или нет ни сердца, ни холодной крови" )
+{
+    checkTarget();
+    return Register( IS_BLOODLESS(target) );
+}
+
+NMI_GET( CharacterWrapper, edible, "true, если тело годится в пищу (не конструкция, скелет, туман, мгновенный распад или магическое)" )
+{
+    checkTarget();
+    return Register( IS_EDIBLE_FORM(target->form) );
+}
+
+NMI_GET( CharacterWrapper, canHoldCards, "true, если персонаж разумен и у него есть кисти рук: может держать колоду или радугу" )
+{
+    checkTarget();
+    return Register( CAN_HOLD_CARDS(target) );
+}
+
 NMI_GET( CharacterWrapper, online, "true, если персонаж в мире" )
 {
     return Register( target != NULL );
