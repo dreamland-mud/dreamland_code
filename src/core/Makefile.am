@@ -56,7 +56,8 @@ auction.cpp \
 calendar.cpp \
 body.cpp \
 mobtiers.cpp \
-mobbody.cpp
+mobbody.cpp \
+mobindexbody.cpp
 
 libcore_la_MOC = \
 affect.h \
