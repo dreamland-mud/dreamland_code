@@ -124,6 +124,18 @@ private:
     virtual void buy( PCharacter *, NPCharacter * );
 };
 
+class PracticeQuestArticle : public QuestTradeArticle {
+XML_OBJECT
+public:
+    typedef ::Pointer<PracticeQuestArticle> Pointer;
+
+protected:
+    XML_VARIABLE XMLInteger amount;
+
+private:
+    virtual void buy( PCharacter *, NPCharacter * );
+};
+
 class PocketsQuestArticle : public QuestTradeArticle {
 XML_OBJECT
 public:

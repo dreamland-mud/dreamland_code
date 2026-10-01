@@ -26,6 +26,7 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<ObjectQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<ConQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<GoldQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<PracticeQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<PocketsQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<KeyringQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<PersonalQuestArticle> >( ppl );

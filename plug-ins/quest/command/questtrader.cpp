@@ -355,6 +355,19 @@ void GoldQuestArticle::buy( PCharacter *client, NPCharacter *questman )
 }
 
 /*---------------------------------------------------------------------------
+ * PracticeQI: a pack of practice sessions, no limit. Priced above the remort
+ * conversion rate (CONVERT_PRACTICE_QP), or buying before a remort would pay.
+ * The messages decline for the configured pack of 10.
+ *---------------------------------------------------------------------------*/
+void PracticeQuestArticle::buy( PCharacter *client, NPCharacter *questman ) 
+{
+    client->practice += amount.getValue( );
+    
+    oldact(_("$C1 дает $c3 $t практик."), client, DLString(amount.getValue( )).c_str( ), questman, TO_ROOM );
+    oldact(_("$C1 дает тебе $t практик."), client, DLString(amount.getValue( )).c_str( ), questman, TO_CHAR );
+}
+
+/*---------------------------------------------------------------------------
  * ConQI 
  *---------------------------------------------------------------------------*/
 void ConQuestArticle::buy( PCharacter *client, NPCharacter *questman ) 
