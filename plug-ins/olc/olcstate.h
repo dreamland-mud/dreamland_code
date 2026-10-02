@@ -85,6 +85,10 @@ public:
     /** Find OLC input handler for descriptor. */
     static OLCState::Pointer getOLCState(Descriptor *d);
 
+    /** True only inside handle(), i.e. while input from the editor's own
+     *  descriptor is being processed. owner is set there and nowhere else. */
+    bool isHandling( ) const { return owner != 0; }
+
     /** returns corresponding area pointer for mob/room/obj vnum */
     static AreaIndexData *get_vnum_area( int );
 
