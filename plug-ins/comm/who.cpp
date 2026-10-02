@@ -542,6 +542,8 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
             body["clan"]["nameUa"] = clan.getNameFor(LANG_UA).ruscase('1').colourStrip();
             body["clan"]["level"] = player->getClanLevel();
             body["clan"]["title"] = clan.getTitle(player);
+            body["clan"]["titleEn"] = clan.getTitle(player, LANG_EN);
+            body["clan"]["titleUa"] = clan.getTitle(player, LANG_UA);
             body["clan"]["leader"] = clan.isLeader(player) ? "true" : "false";
             body["clan"]["recruiter"] = clan.isRecruiter(player) ? "true" : "false";
         }
