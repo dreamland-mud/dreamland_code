@@ -49,6 +49,7 @@
 #include "fight.h"
 #include "weapons.h"
 #include "damage.h"
+#include "itemvalue.h"
 #include "skill_utils.h"
 #include "stats_apply.h"
 #include "rageoath.h"
@@ -3564,35 +3565,35 @@ static double ga_affectFlagValue( bitstring_t b, bool caster, Character *target,
             return base * 0.1;
         return base;
     };
-    s += v( AFF_SANCTUARY,    300,                "sanctuary" );
-    s += v( AFF_HASTE,        caster ? 40 : 110,  "haste" );
-    s += v( AFF_SLOW,         caster ? -10 : -55, 0 );
-    s += v( AFF_PROTECT_EVIL, 60,                 "protection evil" );
-    s += v( AFF_PROTECT_GOOD, 60,                 "protection good" );
-    s += v( AFF_REGENERATION, caster ? 15 : 30,   0 );
-    s += v( AFF_FLYING,       15,                 "fly" );
-    s += v( AFF_PASS_DOOR,    15,                 "pass door" );
-    s += v( AFF_INVISIBLE,    15,                 "invis" );
-    s += v( AFF_IMP_INVIS,    100,                "improved invis" );
-    s += v( AFF_CAMOUFLAGE,   100,                "camouflage" );
-    s += v( AFF_FADE,         100,                "fade" );
-    s += v( AFF_SNEAK,        caster ? 8 : 12,    "sneak" );
-    s += v( AFF_HIDE,         6,                  "hide" );
-    s += v( AFF_INFRARED,     8,                  "infravision" );
-    s += v( AFF_SWIM,         4,                  0 );
+    s += v( AFF_SANCTUARY, item_value( "flags", "sanctuary", 300, caster ? 1 : 0 ), "sanctuary" );
+    s += v( AFF_HASTE, item_value( "flags", "haste", caster ? 40 : 110, caster ? 1 : 0 ), "haste" );
+    s += v( AFF_SLOW, item_value( "flags", "slow", caster ? -10 : -55, caster ? 1 : 0 ), 0 );
+    s += v( AFF_PROTECT_EVIL, item_value( "flags", "protect_evil", 60, caster ? 1 : 0 ), "protection evil" );
+    s += v( AFF_PROTECT_GOOD, item_value( "flags", "protect_good", 60, caster ? 1 : 0 ), "protection good" );
+    s += v( AFF_REGENERATION, item_value( "flags", "regeneration", caster ? 15 : 30, caster ? 1 : 0 ), 0 );
+    s += v( AFF_FLYING, item_value( "flags", "flying", 15, caster ? 1 : 0 ), "fly" );
+    s += v( AFF_PASS_DOOR, item_value( "flags", "pass_door", 15, caster ? 1 : 0 ), "pass door" );
+    s += v( AFF_INVISIBLE, item_value( "flags", "invisible", 15, caster ? 1 : 0 ), "invis" );
+    s += v( AFF_IMP_INVIS, item_value( "flags", "imp_invis", 100, caster ? 1 : 0 ), "improved invis" );
+    s += v( AFF_CAMOUFLAGE, item_value( "flags", "camouflage", 100, caster ? 1 : 0 ), "camouflage" );
+    s += v( AFF_FADE, item_value( "flags", "fade", 100, caster ? 1 : 0 ), "fade" );
+    s += v( AFF_SNEAK, item_value( "flags", "sneak", caster ? 8 : 12, caster ? 1 : 0 ), "sneak" );
+    s += v( AFF_HIDE, item_value( "flags", "hide", 6, caster ? 1 : 0 ), "hide" );
+    s += v( AFF_INFRARED, item_value( "flags", "infrared", 8, caster ? 1 : 0 ), "infravision" );
+    s += v( AFF_SWIM, item_value( "flags", "swim", 4, caster ? 1 : 0 ), 0 );
     // Cursed-item penalties (never discounted).
-    s += v( AFF_STUN,         -100,               0 );
-    s += v( AFF_WEAK_STUN,    -40,                0 );
-    s += v( AFF_BLIND,        -200,               0 );
-    s += v( AFF_SLEEP,        -250,               0 );
-    s += v( AFF_CHARM,        -250,               0 );
-    s += v( AFF_CURSE,        -35,                0 );
-    s += v( AFF_CORRUPTION,   -50,                0 );
-    s += v( AFF_POISON,       -45,                0 );
-    s += v( AFF_PLAGUE,       -60,                0 );
-    s += v( AFF_CALM,         caster ? -5 : -25,  0 );
-    s += v( AFF_WEAKEN,       -10,                0 );
-    s += v( AFF_FAERIE_FIRE,  -15,                0 );
+    s += v( AFF_STUN, item_value( "flags", "stun", -100, caster ? 1 : 0 ), 0 );
+    s += v( AFF_WEAK_STUN, item_value( "flags", "weak_stun", -40, caster ? 1 : 0 ), 0 );
+    s += v( AFF_BLIND, item_value( "flags", "blind", -200, caster ? 1 : 0 ), 0 );
+    s += v( AFF_SLEEP, item_value( "flags", "sleep", -250, caster ? 1 : 0 ), 0 );
+    s += v( AFF_CHARM, item_value( "flags", "charm", -250, caster ? 1 : 0 ), 0 );
+    s += v( AFF_CURSE, item_value( "flags", "curse", -35, caster ? 1 : 0 ), 0 );
+    s += v( AFF_CORRUPTION, item_value( "flags", "corruption", -50, caster ? 1 : 0 ), 0 );
+    s += v( AFF_POISON, item_value( "flags", "poison", -45, caster ? 1 : 0 ), 0 );
+    s += v( AFF_PLAGUE, item_value( "flags", "plague", -60, caster ? 1 : 0 ), 0 );
+    s += v( AFF_CALM, item_value( "flags", "calm", caster ? -5 : -25, caster ? 1 : 0 ), 0 );
+    s += v( AFF_WEAKEN, item_value( "flags", "weaken", -10, caster ? 1 : 0 ), 0 );
+    s += v( AFF_FAERIE_FIRE, item_value( "flags", "faerie_fire", -15, caster ? 1 : 0 ), 0 );
     return s;
 }
 
@@ -3600,6 +3601,13 @@ static double ga_affectFlagValue( bitstring_t b, bool caster, Character *target,
 static double ga_rv( int kind, double r, double i, double v )
 {
     return kind == 1 ? i : (kind == 2 ? v : r);
+}
+
+// One damage class's res/imm/vuln worth from config/fight/item_value.json "res"
+// ([res, imm, vuln]); the literals are the defaults when the file lacks the row.
+static double ga_rvc( int kind, const char *name, double r, double i, double v )
+{
+    return ga_rv( kind, item_value( "res", name, r, 0 ), item_value( "res", name, i, 1 ), item_value( "res", name, v, 2 ) );
 }
 
 // Value of a res/imm/vuln bitvector. The three tables share bit positions
@@ -3613,31 +3621,30 @@ static double ga_rv( int kind, double r, double i, double v )
 static double ga_resValue( bitstring_t b, int kind )
 {
     double s = 0;
-    if (IS_SET(b, IMM_WEAPON))                             s += ga_rv(kind, 140, 420, -210);
-    if (IS_SET(b, IMM_SPELL) || IS_SET(b, IMM_MAGIC) || IS_SET(b, IMM_PRAYER))
-                                                           s += ga_rv(kind, 50, 150, -75);
-    if (IS_SET(b, IMM_BASH))                               s += ga_rv(kind, 72, 216, -108);
-    if (IS_SET(b, IMM_PIERCE))                             s += ga_rv(kind, 34, 103, -52);
-    if (IS_SET(b, IMM_SLASH))                              s += ga_rv(kind, 33, 100, -50);
-    if (IS_SET(b, IMM_FIRE))                               s += ga_rv(kind, 23, 70, -35);
-    if (IS_SET(b, IMM_ENERGY))                             s += ga_rv(kind, 17, 50, -25);
-    if (IS_SET(b, IMM_NEGATIVE))                           s += ga_rv(kind, 17, 50, -25);
-    if (IS_SET(b, IMM_LIGHTNING))                          s += ga_rv(kind, 13, 40, -20);
-    if (IS_SET(b, IMM_ACID))                               s += ga_rv(kind, 13, 40, -20);
-    if (IS_SET(b, IMM_HOLY))                               s += ga_rv(kind, 13, 40, -20);
-    if (IS_SET(b, IMM_COLD))                               s += ga_rv(kind, 13, 40, -20);
-    if (IS_SET(b, IMM_POISON))                             s += ga_rv(kind, 13, 40, -20);
-    if (IS_SET(b, IMM_CHARM))                              s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_MENTAL))                             s += ga_rv(kind, 17, 50, -25);
-    if (IS_SET(b, IMM_DISEASE))                            s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_DROWNING))                           s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_LIGHT))                              s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_SOUND))                              s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_SUMMON))                             s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_IRON))                               s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_WOOD))                               s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_SILVER))                             s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_MITHRIL))                            s += ga_rv(kind, 10, 30, -20);
+    if (IS_SET(b, IMM_WEAPON)) s += ga_rvc(kind, "weapon", 140, 420, -210);
+    if (IS_SET(b, IMM_SPELL) || IS_SET(b, IMM_MAGIC) || IS_SET(b, IMM_PRAYER)) s += ga_rvc(kind, "spell", 50, 150, -75);
+    if (IS_SET(b, IMM_BASH)) s += ga_rvc(kind, "bash", 72, 216, -108);
+    if (IS_SET(b, IMM_PIERCE)) s += ga_rvc(kind, "pierce", 34, 103, -52);
+    if (IS_SET(b, IMM_SLASH)) s += ga_rvc(kind, "slash", 33, 100, -50);
+    if (IS_SET(b, IMM_FIRE)) s += ga_rvc(kind, "fire", 23, 70, -35);
+    if (IS_SET(b, IMM_ENERGY)) s += ga_rvc(kind, "energy", 17, 50, -25);
+    if (IS_SET(b, IMM_NEGATIVE)) s += ga_rvc(kind, "negative", 17, 50, -25);
+    if (IS_SET(b, IMM_LIGHTNING)) s += ga_rvc(kind, "lightning", 13, 40, -20);
+    if (IS_SET(b, IMM_ACID)) s += ga_rvc(kind, "acid", 13, 40, -20);
+    if (IS_SET(b, IMM_HOLY)) s += ga_rvc(kind, "holy", 13, 40, -20);
+    if (IS_SET(b, IMM_COLD)) s += ga_rvc(kind, "cold", 13, 40, -20);
+    if (IS_SET(b, IMM_POISON)) s += ga_rvc(kind, "poison", 13, 40, -20);
+    if (IS_SET(b, IMM_CHARM)) s += ga_rvc(kind, "charm", 10, 30, -20);
+    if (IS_SET(b, IMM_MENTAL)) s += ga_rvc(kind, "mental", 17, 50, -25);
+    if (IS_SET(b, IMM_DISEASE)) s += ga_rvc(kind, "disease", 10, 30, -20);
+    if (IS_SET(b, IMM_DROWNING)) s += ga_rvc(kind, "drowning", 10, 30, -20);
+    if (IS_SET(b, IMM_LIGHT)) s += ga_rvc(kind, "light", 10, 30, -20);
+    if (IS_SET(b, IMM_SOUND)) s += ga_rvc(kind, "sound", 10, 30, -20);
+    if (IS_SET(b, IMM_SUMMON)) s += ga_rvc(kind, "summon", 10, 30, -20);
+    if (IS_SET(b, IMM_IRON)) s += ga_rvc(kind, "iron", 10, 30, -20);
+    if (IS_SET(b, IMM_WOOD)) s += ga_rvc(kind, "wood", 10, 30, -20);
+    if (IS_SET(b, IMM_SILVER)) s += ga_rvc(kind, "silver", 10, 30, -20);
+    if (IS_SET(b, IMM_MITHRIL)) s += ga_rvc(kind, "mithril", 10, 30, -20);
     return s;
 }
 
@@ -4307,15 +4314,30 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // worth less to it than to a caster. 3/pt (was 5) so a pure +save cloth no
         // longer out-values real body armour (hp/hitroll/dex + armour class). The
         // caster branch below keeps 5 -- a squishy caster leans on saves defensively.
-        w.hp = 1.0; w.mana = 0.1; w.manaGain = 0.05; w.healGain = 0.3; w.dr = 12.0; w.hr = 6.0; w.saves = 3.0;
-        w.weaponWeight = 12.0;   // melee: weapon output valued the same as its damroll
-        w.stat[0] = 3; w.stat[1] = 1; w.stat[2] = 1; w.stat[3] = 2; w.stat[4] = 3; w.stat[5] = 0;
-        w.caster = false;
+        w.caster = false;   // weights: config/fight/item_value.json "melee", defaults = the old constants
     } else {                                    // caster (default)
-        w.hp = 1.0; w.mana = 0.5; w.manaGain = 0.6; w.healGain = 0.15; w.dr = 6.0; w.hr = 2.0; w.saves = 5.0;
-        w.weaponWeight = 4.0;    // caster: weapon melee output worth well under its damroll
-        w.stat[0] = 1; w.stat[1] = 2; w.stat[2] = 3; w.stat[3] = 1; w.stat[4] = 3; w.stat[5] = 0;
-        w.caster = true;
+        w.caster = true;    // weights: config/fight/item_value.json "caster"
+    }
+    {
+        // Stat weights. Melee: weapon output valued the same as its damroll; caster:
+        // weapon melee output worth well under its damroll. The item generator prices
+        // affixes from the same file, so the advisor and the loot share one scale.
+        const char *pf = w.caster ? "caster" : "melee";
+        bool c = w.caster;
+        w.hp           = item_value(pf, "hp",           1.0);
+        w.mana         = item_value(pf, "mana",         c ? 0.5 : 0.1);
+        w.manaGain     = item_value(pf, "mana_gain",    c ? 0.6 : 0.05);
+        w.healGain     = item_value(pf, "heal_gain",    c ? 0.15 : 0.3);
+        w.dr           = item_value(pf, "damroll",      c ? 6.0 : 12.0);
+        w.hr           = item_value(pf, "hitroll",      c ? 2.0 : 6.0);
+        w.saves        = item_value(pf, "saves",        c ? 5.0 : 3.0);
+        w.weaponWeight = item_value(pf, "weapon_weight", c ? 4.0 : 12.0);
+        w.stat[0]      = item_value(pf, "str", c ? 1 : 3);
+        w.stat[1]      = item_value(pf, "int", c ? 2 : 1);
+        w.stat[2]      = item_value(pf, "wis", c ? 3 : 1);
+        w.stat[3]      = item_value(pf, "dex", c ? 1 : 2);
+        w.stat[4]      = item_value(pf, "con", 3);
+        w.stat[5]      = item_value(pf, "cha", 0);
     }
 
     // One swing of the char's current weapon, in score units -- the fallback swing value
@@ -4343,16 +4365,18 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // group +level and a raw +level are both strong; move is a token; beats (skill
     // lag) is a real action-throughput lever (percent cut of every skill's lag).
     // Flag/res values are level-independent (see ga_affectFlagValue / ga_resValue).
-    w.ac              = 0.5 * std::max( 0, 40 - chLevel ) / 39.0;
-    w.slevel          = w.caster ? 25.0 : 4.0;
-    w.level           = w.caster ? 40.0 : 14.0;
-    w.skillLevel      = w.caster ? 18.0 : 8.0;    // APPLY_LEVEL, skill-group scope
-    w.skillLevelSkill = w.caster ? 9.0 : 4.0;     // APPLY_LEVEL, single-skill scope
-    w.move            = 0.05;
+    const char *pf = w.caster ? "caster" : "melee";
+    double acZero     = item_value( "shared", "ac_zero_level", 40 );
+    w.ac              = item_value( "shared", "ac_base", 0.5 ) * std::max( 0.0, acZero - chLevel ) / std::max( 1.0, acZero - 1 );
+    w.slevel          = item_value( pf, "slevel", w.caster ? 25.0 : 4.0 );
+    w.level           = item_value( pf, "level", w.caster ? 40.0 : 14.0 );
+    w.skillLevel      = item_value( pf, "skill_level_group", w.caster ? 18.0 : 8.0 );   // APPLY_LEVEL, skill-group scope
+    w.skillLevelSkill = item_value( pf, "skill_level_skill", w.caster ? 9.0 : 4.0 );    // APPLY_LEVEL, single-skill scope
+    w.move            = item_value( "shared", "move", 0.05 );
     // beats = percent cut of skill lag. Central for casters/ranged (every action is a
     // lag-gated cast), near-irrelevant for melee whose damage is auto-attacks off the
     // violence round, not skills. So caster-heavy, melee token.
-    w.beats           = w.caster ? 6.0 : 1.0;
+    w.beats           = item_value( pf, "beats", w.caster ? 6.0 : 1.0 );
     w.spellFactor     = ga_spellFactor( target );   // scales slevel by real spell knowledge
 
     // Redundancy discount (bug: unicorn horn out-ranked lion paw on a sanctuary the
@@ -4371,9 +4395,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         }
     // APPLY_LEARNED (+N% skill knowledge), valued per +1% by how broad the scope is:
     // one skill < a skill group < all skills. 187 live items carry these.
-    w.learnSkill = 2.0;   // cap-aware: x min(m, 100 - effective%) per named skill
-    w.learnGroup = 3.0;   // cap-aware: x min(m, 25 + 3*remort) window
-    w.learnAll   = 4.0;   // cap-aware: x min(m, 25 + 3*remort) window
+    w.learnSkill = item_value( "shared", "learn_skill", 2.0 );   // cap-aware: x min(m, 100 - effective%) per named skill
+    w.learnGroup = item_value( "shared", "learn_group", 3.0 );   // cap-aware: x min(m, 25 + 3*remort) window
+    w.learnAll   = item_value( "shared", "learn_all", 4.0 );     // cap-aware: x min(m, 25 + 3*remort) window
 
     // Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
     // nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
