@@ -495,6 +495,7 @@ bool QuestScrollBehavior::examine( Character *ch )
     Skill *skill;
     XMLMapBase<XMLInteger>::iterator s;
     bool extract = true;
+    bool learnedAny = false;
     
     if (!isOwner( ch )) {
         oldact(_("Знания, заключенные в $o6, недоступны тебе."), ch, obj, 0, TO_CHAR);
@@ -533,6 +534,7 @@ bool QuestScrollBehavior::examine( Character *ch )
                                    data.learned + s->second,
                                    skill->getMaximum( ch ));
             s->second = 0;
+            learnedAny = true;
         }
     }
     
@@ -540,6 +542,15 @@ bool QuestScrollBehavior::examine( Character *ch )
         buf << fmt( ch, _("Похоже, знаки на этом свитке потеряли силу.") ) << endl;
 
     ch->send_to( buf );
+
+    // Nothing on the scroll can be learned right now (every skill is maxed or
+    // out of reach): crumble it instead of leaving a dead scroll forever.
+    if (!extract && !learnedAny) {
+        ch->pecho( _("Этот свиток больше ничему не может тебя научить. Чернила меркнут, и %1$O1 рассыпа%1$nется|ются трухой."), obj );
+        extract_obj( obj );
+        return true;
+    }
+
     if(extract) {
         oldact(_("Чернила меркнут, и $o1 рассыпается трухой."), ch, obj, 0, TO_CHAR);
         extract_obj( obj );

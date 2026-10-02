@@ -182,8 +182,17 @@ bool limit_purge( Object *obj )
     if (obj == auction->item)
         return false;
 
+    // The holder learns what they lost even if they cannot see the item
+    // (blind, dark room, invisible object); everyone else gets the usual
+    // visibility-checked line.
+    Character *holder = obj->getCarrier( );
+    if (holder)
+        holder->pecho( _("%1$#^O1 рассыпа%1$nется|ются трухой!"), obj );
+
     if (obj->getRoom( ))
-        obj->getRoom( )->echo( POS_RESTING, _("%1$^O1 рассыпа%1$nется|ются трухой!"), obj );
+        for (Character *rch = obj->getRoom( )->people; rch; rch = rch->next_in_room)
+            if (rch != holder && rch->position >= POS_RESTING)
+                rch->pecho( _("%1$^O1 рассыпа%1$nется|ются трухой!"), obj );
 
     DLString where;
     if (obj->carried_by)

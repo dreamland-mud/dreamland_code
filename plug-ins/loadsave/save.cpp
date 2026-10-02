@@ -663,14 +663,14 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
         {
             if (!obj->hasOwner( ch ) && obj->mustDisappear( ch ))
             {
-                oldact(_("$o1 рассыпается трухой!"),ch,obj,0,TO_CHAR);
+                ch->pecho(_("%1$#^O1 рассыпа%1$nется|ются трухой!"), obj);
                 extract_obj( obj );
                 return;
             }
 
             // Someone else's named item crumbles rather than being saved along.
             if (!obj_owner_allows( obj, ch )) {
-                oldact(_("$o1 исчезает!"), ch, obj, 0, TO_CHAR);
+                ch->pecho(_("%1$#^O1 исчеза%1$nет|ют!"), obj);
                 extract_obj( obj );
                 return;
             }

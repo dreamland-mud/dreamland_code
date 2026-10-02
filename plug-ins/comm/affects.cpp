@@ -332,6 +332,17 @@ struct PermanentAffects {
         return my_res || my_vuln || my_imm || my_aff || my_det;
     }
 
+    // Will printAll() print anything at all (bits, or the PC-only regen,
+    // skill lag and religion lines)? Used for the blank separator line only.
+    bool hasOutput() const {
+        if (isSet())
+            return true;
+        if (viewer != ch)
+            return false;
+        return my_hgain != 0 || my_mgain != 0 || my_beats != 0
+            || (ch->getProfession()->getFlags().isSet(PROF_DIVINE) && ch->getReligion() == god_none);
+    }
+
 private:
     void print(const MultiMessage &prefix, const int &my_flags, const FlagTable &my_table, char gcase) const {
         if (my_flags == 0)
@@ -479,22 +490,22 @@ CMDRUNP( affects )
         }
 
         oldact(_("$C1 находится под действием следующих аффектов:"), ch->master, 0, ch, TO_CHAR);
-        permAff.printAll( );
+        bool listed = !buf.str( ).empty( );
         buf << "{x";
         ch->master->send_to( buf );
+
+        // Permanent bits go below the timed affect list.
+        if (listed && permAff.isSet( ))
+            ch->master->pecho( "" );
+        permAff.printAll( );
         return;
     }
-
-    // Output permanent bits on top.
-    permAff.printAll();
 
     if (buf.str( ).empty( )) {
         if (IS_SET(flags, FSHOW_EMPTY) && !permAff.isSet())
             ch->pecho( _("Ты не находишься под действием каких-либо аффектов.") );
     } 
     else {
-        if (permAff.isSet())
-            ch->pecho("");
         ch->pecho( _("Ты находишься под действием следующих аффектов:") );
         buf << "{x";
 
@@ -505,5 +516,11 @@ CMDRUNP( affects )
         }
         else
             ch->send_to( buf );
+
+        if (permAff.hasOutput( ))
+            ch->pecho( "" );
     }
+
+    // Permanent bits (imm/res/vuln/detect, regen) go below the timed affect list.
+    permAff.printAll();
 }
