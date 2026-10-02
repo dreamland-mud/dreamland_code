@@ -594,6 +594,21 @@ void InterpretHandler::close( Descriptor *d )
     ch->desc = 0;
 }
 
+/* Same wording as the Fenia nanny's taskReconnect, which covers the telnet login
+ * door; the web/mobile/account doors reattach bodies in C++ and call this. */
+void InterpretHandler::announceReconnect( Character *ch, bool takeover )
+{
+    if (!ch)
+        return;
+
+    oldact(_("$c1 восстанови$gло|л|ла связь с этим миром."), ch, 0, 0, TO_ROOM );
+
+    if (takeover)
+        wiznet( WIZ_LINKS, 0, ch->get_trust( ), "%1$^C1 снова вселил%1$Gось|ся|ась в свое тело.", ch );
+    else
+        wiznet( WIZ_LINKS, 0, ch->get_trust( ), "%1$^C1 восстанови%1$Gло|л|ла связь.", ch );
+}
+
 void InterpretHandler::init( Descriptor *d )
 {
     d->connected = CON_PLAYING;
