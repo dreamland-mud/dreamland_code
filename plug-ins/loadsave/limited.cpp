@@ -187,7 +187,7 @@ bool limit_purge( Object *obj )
     // visibility-checked line.
     Character *holder = obj->getCarrier( );
     if (holder)
-        holder->pecho( _("%1$#^O1 рассыпа%1$nется|ются трухой!"), obj );
+        holder->pecho( _("%1$#^O1 рассыпа%1$#nется|ются трухой!"), obj );
 
     if (obj->getRoom( ))
         for (Character *rch = obj->getRoom( )->people; rch; rch = rch->next_in_room)

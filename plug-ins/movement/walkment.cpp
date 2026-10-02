@@ -557,9 +557,9 @@ bool Walkment::checkLawzone( Character *wch )
                    "The city guards won't let you into the city.",
                    "Городская стража не пустит тебя в город.",
                    "Міська варта не пустить тебе до міста.",
-                   "The city guards won't let an aggressive creature into the city: %1$C1 stay%1$ns| behind at the city limits.",
-                   "Городская стража не пустит в город агрессивную тварь: %1$C1 оста%1$nется|ются ждать тебя у городской черты.",
-                   "Міська варта не пустить до міста агресивну тварюку: %1$C1 лиша%1$nється|ються чекати на тебе біля міської межі." );
+                   "The city guards won't let an aggressive creature into the city: %3$C1 stay%3$ns| behind at the city limits.",
+                   "Городская стража не пустит в город агрессивную тварь: %3$C1 оста%3$nется|ются ждать тебя у городской черты.",
+                   "Міська варта не пустить до міста агресивну тварюку: %3$C1 лиша%3$nється|ються чекати на тебе біля міської межі." );
     return false; 
 }
 
