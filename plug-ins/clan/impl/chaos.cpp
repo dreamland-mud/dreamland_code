@@ -501,10 +501,26 @@ VOID_AFFECT(Doppelganger)::remove( Character *victim )
 {
     DefaultAffectHandler::remove( victim );                                     
 
-    if (victim->is_mirror( ))
-        follower_stop(victim);
+    if (!victim->is_mirror( )) {
+        victim->doppel = NULL;
+        return;
+    }
 
+    follower_stop(victim, false);
     victim->doppel = NULL;
+
+    // A mirror image without its original is an orphan wearing a stranger's
+    // name and title forever (owner quit or died, or the image simply ran out).
+    // Shatter it. This can run inside the owner's extract_char (notify_referers
+    // walks char_list) or inside an affect-list walk, so defer the extraction:
+    // the dead-NPC reaper at the top of the next pulse does it.
+    if (victim->isDead( ))
+        return;
+
+    if (victim->in_room)
+        victim->in_room->echo(POS_RESTING, _("%1$^C1 рассыпается осколками стекла."), victim);
+
+    victim->setDead( );
 }
 
 
