@@ -522,23 +522,28 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
 }
 
 
-static int 
-read_uint(std::vector<unsigned char>::iterator begin, std::vector<unsigned char>::iterator end, int l)
-{
-    int rc = 0;
+/** Largest websocket message we take, in payload bytes; past it the socket is
+ *  closed instead of the message being buffered without limit. The big ones
+ *  that are legitimate: editor_save of a web-edited Fenia script (the largest
+ *  is ~140 KB of UTF-8 today, more once JSON-escaped) and script_put (~87 KB of
+ *  base64). Twice the first, with room to grow. */
+static const unsigned long long WS_MAX_MESSAGE = 512 * 1024;
 
-    if(l == 0)
-        return rc;
+/** Big-endian length of l bytes. False when the buffer does not hold them yet. */
+static bool
+read_uint(std::vector<unsigned char>::iterator begin, std::vector<unsigned char>::iterator end, int l, unsigned long long &rc)
+{
+    rc = 0;
 
     for(;l > 0;l--) {
         if(begin == end)
-            return -1;
+            return false;
 
         rc <<= 8;
         rc |= *begin++;
     }
 
-    return rc;
+    return true;
 }
 
 bool 
@@ -552,23 +557,34 @@ Descriptor::wsHandleFrame(unsigned char *buf, int rc)
             return true;
         }
 
-        int hlen = 2, len = websock.frame[1] & 0x7f;
+        int hlen = 2;
+        unsigned long long rawlen = websock.frame[1] & 0x7f;
 
-        if(len == 126) {
-            len = read_uint(websock.frame.begin() + 2, websock.frame.end(), 2);
+        if(rawlen == 126) {
+            if(!read_uint(websock.frame.begin() + 2, websock.frame.end(), 2, rawlen))
+                return true;
             hlen += 2;
-        } else if(len == 127) {
-            len = read_uint(websock.frame.begin() + 2, websock.frame.end(), 8);
+        } else if(rawlen == 127) {
+            if(!read_uint(websock.frame.begin() + 2, websock.frame.end(), 8, rawlen))
+                return true;
             hlen += 8;
         }
+
+        // Checked as soon as the header is in, before the body is waited for: a
+        // declared length past the ceiling, or a fragmented message growing
+        // past it, closes the socket.
+        if(rawlen > WS_MAX_MESSAGE || websock.payload.size() + rawlen > WS_MAX_MESSAGE) {
+            LogStream::sendError() << "WebSock: message over " << WS_MAX_MESSAGE
+                                   << " bytes from " << host << ", closing" << endl;
+            return false;
+        }
+
+        int len = (int)rawlen;
 
         if(websock.frame[1] & 0x80) {
             hlen += 4;
         }
 
-        if(len < 0)
-            return true;
-        
         if(websock.frame.size() < (size_t)(len + hlen))
             return true;
      
