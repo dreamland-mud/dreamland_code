@@ -50,6 +50,7 @@
 #include "weapons.h"
 #include "damage.h"
 #include "skill_utils.h"
+#include "stats_apply.h"
 #include "rageoath.h"
 #include "areaquestutils.h"
 #include "material.h"
@@ -3276,21 +3277,41 @@ struct GACand {
                       // render says whereabouts unknown instead of a stale route.
 };
 
-// Can the char put a weapon in the off-hand right now? Mirrors SecondWieldWearloc's
-// gate: the second-weapon skill usable, the char actually HAS the off-hand rib (some
-// shapeshifts lose it), no shield or held item in the left hand, and the primary weapon
-// not two-handed. Tests ACTUAL wear locations, not prototype flags -- an arrow stuck in
-// the char or a sheathed weapon carries the wield flag but holds no hand. A shield or
-// two-hander build keeps a single weapon position, so the advisor won't nudge it away.
-// (Conservative gaps, no false "yes": SIZE_HUGE giants may two-hand-plus-offhand; a
-// sheathed weapon reads the off-hand as free -- both only ever under-report capacity.)
-static bool ga_canDualWield( Character *ch )
+// The body can fight with an off-hand weapon at all: the second-weapon skill is usable,
+// the char has the off-hand wear location (some shapeshifts lose it), and has hands and
+// both wrists -- second_weapon_hit (fight.cpp) skips the off-hand swing without them.
+static bool ga_dualBody( Character *ch )
 {
     Skill *sk = skillManager->findExisting( "second weapon" );
     if (sk == 0 || !sk->usable( ch, false ))
         return false;
-    Wearlocation *offLoc = wearlocationManager->findExisting( "second_wield" );
-    if (offLoc == 0 || !ch->getWearloc( ).isSet( offLoc ))
+    const char *locs[] = { "second_wield", "hands", "wrist_l", "wrist_r" };
+    for (int i = 0; i < 4; i++) {
+        Wearlocation *loc = wearlocationManager->findExisting( locs[i] );
+        if (loc == 0 || !ch->getWearloc( ).isSet( loc ))
+            return false;
+    }
+    return true;
+}
+
+// A two-handed weapon blocks the other hand unless the race is SIZE_HUGE: giants may wield
+// a two-hander beside an off-hand weapon, or put one IN the off-hand. Mirrors
+// SecondWieldWearloc::canWear and second_weapon_hit.
+static bool ga_twoHandBlocks( Character *ch, bool twoHanded )
+{
+    return twoHanded && ch->getRace( )->getSize( ) < SIZE_HUGE;
+}
+
+// Can the char put a weapon in the off-hand right now? Mirrors SecondWieldWearloc's
+// gate: ga_dualBody, no shield or held item in the left hand, and the primary weapon
+// not two-handed (a giant excepted). Tests ACTUAL wear locations, not prototype flags --
+// an arrow stuck in the char or a sheathed weapon carries the wield flag but holds no
+// hand. A shield build keeps a single weapon position here; the shield-or-second-weapon
+// verdict in gearAdvice weighs that choice separately. (Conservative gap: a sheathed
+// weapon reads the off-hand as free -- only ever under-reports capacity.)
+static bool ga_canDualWield( Character *ch )
+{
+    if (!ga_dualBody( ch ))
         return false;
     Wearlocation *shieldLoc = wearlocationManager->findExisting( "shield" );
     Wearlocation *holdLoc   = wearlocationManager->findExisting( "hold" );
@@ -3299,7 +3320,7 @@ static bool ga_canDualWield( Character *ch )
         return false;
     Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
     ::Object *primary = wieldLoc ? wieldLoc->find( ch ) : 0;
-    if (primary != 0 && IS_WEAPON_STAT( primary, WEAPON_TWO_HANDS ))
+    if (primary != 0 && ga_twoHandBlocks( ch, IS_WEAPON_STAT( primary, WEAPON_TWO_HANDS ) ))
         return false;
     return true;
 }
@@ -3790,6 +3811,44 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     }
 }
 
+// Average landed weapon dice per hit at the char's real skill, the per-hit currency
+// ga_scoreCore scores a weapon in (WeaponOneHit::damBase: dice * (20 + skill%)/100).
+// skillOut (optional) gets the skill % used, for the damroll share OneHit::damApplyDamroll
+// gives a hit (damroll * min(100, 20 + skill%)/100).
+static double ga_weaponEff( Character *target, int weaponSn, int weaponAve, bool canCompound,
+                            int *skillOut = 0 )
+{
+    int skillPct = target->getSkill( weaponSn );
+    // A cleric who can compound this weapon into a mace wields it at their
+    // mace skill, so it scores like a real mace instead of collapsing to the
+    // 20% unskilled floor. Trello #2854. Eligibility is resolved by the caller
+    // (from the instance for a worn item, the proto for a candidate).
+    if (canCompound) {
+        Skill *mace = skillManager->findExisting( "mace" );
+        if (mace != 0) {
+            int macePct = target->getSkill( mace->getIndex( ) );
+            if (macePct > skillPct)
+                skillPct = macePct;
+        }
+    }
+    if (skillOut != 0)
+        *skillOut = skillPct;
+    // Score the dice at the char's real skill in this weapon. available() alone is
+    // the wrong gate: an EXOTIC weapon reports available()==false (it can never be
+    // practiced) yet ExoticSkill::getLearned derives its skill from level+INT, so the
+    // char swings it at up to 100%. So also fall through when getSkill() is already
+    // positive. Exotic is the case that matters here: a normal off-class weapon skill
+    // returns 0 once it is unusable (GenericSkill::getLearned), so it stays gated. A
+    // weapon the char can neither train (available) nor already use (getSkill 0), e.g. a
+    // warlock's mace, still scores 0 dice, so the sage never chases a weapon that would
+    // sit at the unskilled floor. The item may still be worn for its stat affixes, which
+    // the affect loop counted.
+    Skill *wsk = skillManager->find( weaponSn );
+    if (canCompound || wsk == 0 || wsk->available( target ) || skillPct > 0)
+        return weaponAve * (20 + skillPct) / 100.0;
+    return 0;
+}
+
 // Score a prototype for a profile. Flat pools (hp/mana/regen) and combat stats
 // count in full; the six primary stats are cap-aware: a point at the cap adds 0.
 // rawStat[k] = the char's uncapped stat (perm+mod); capStat[k] = its cap. worn =
@@ -3846,33 +3905,7 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     double weaponSwing = -1.0;
     if (itemType == ITEM_WEAPON && pProto != 0
         && IS_SET( pProto->wear_flags, ITEM_WIELD )) {
-        int skillPct = target->getSkill( weaponSn );
-        // A cleric who can compound this weapon into a mace wields it at their
-        // mace skill, so it scores like a real mace instead of collapsing to the
-        // 20% unskilled floor. Trello #2854. Eligibility is resolved by the caller
-        // (from the instance for a worn item, the proto for a candidate).
-        if (canCompound) {
-            Skill *mace = skillManager->findExisting( "mace" );
-            if (mace != 0) {
-                int macePct = target->getSkill( mace->getIndex( ) );
-                if (macePct > skillPct)
-                    skillPct = macePct;
-            }
-        }
-        // Score the dice at the char's real skill in this weapon. available() alone is
-        // the wrong gate: an EXOTIC weapon reports available()==false (it can never be
-        // practiced) yet ExoticSkill::getLearned derives its skill from level+INT, so the
-        // char swings it at up to 100%. So also fall through when getSkill() is already
-        // positive. Exotic is the case that matters here: a normal off-class weapon skill
-        // returns 0 once it is unusable (GenericSkill::getLearned), so it stays gated. A
-        // weapon the char can neither train (available) nor already use (getSkill 0), e.g. a
-        // warlock's mace, still scores 0 dice, so the sage never chases a weapon that would
-        // sit at the unskilled floor. The item may still be worn for its stat affixes, which
-        // the affect loop counted.
-        Skill *wsk = skillManager->find( weaponSn );
-        double eff = 0;
-        if (canCompound || wsk == 0 || wsk->available( target ) || skillPct > 0)
-            eff = weaponAve * (20 + skillPct) / 100.0;
+        double eff = ga_weaponEff( target, weaponSn, weaponAve, canCompound );
         s += w.weaponWeight * eff;
         // Only a weapon the char can actually swing (eff > 0) feeds its combathits proc; an
         // unusable weapon keeps weaponSwing -1 so its proc takes the flat fallback instead of
@@ -3949,6 +3982,123 @@ static double ga_score( Character *target, ::Object *o, const GAWeights &w,
     }
     return ga_scoreCore( target, w, o->pIndexData->affected, &o->affected,
                          o->item_type, sn, ave, compound, o->pIndexData, rawStat, capStat, worn );
+}
+
+// ---- Off-hand model: what a second weapon is worth next to the main one ----------
+// Everything below is in ga_score units, where one main-hand swing of a weapon scores
+// weaponWeight * dice-per-hit. The off-hand is valued per main-hand swing, from the
+// engine's own round (fight.cpp multi_hit_strikes / next_attack / second_weapon_hit):
+//   - the off-hand rolls once after the first main-hand swing (chance 100) and once after
+//     every extra attack (second..fifth) that fires, at that attack's own chance c;
+//   - each roll lands with probability secondWeapon% * (c * m / 100) / 100, m being the
+//     class x off-hand-weapon-class modifier (second_weapon_chance_class);
+//   - an off-hand hit is a full hit (one_hit secondary): dice at its own skill + damroll.
+// So r = off-hand swings per main-hand swing = [P(c=100) + sum_k p_k * P(c_k)] / (1 + sum_k p_k),
+// p_k = c_k / 100. Haste and forest fighting add swings to both sides and are left out.
+struct GAOffhand {
+    int    swPct = 0;                 // second weapon effective %
+    std::vector<double> extra;        // extra-attack chances c_k (0..100+)
+    double mainSwings = 1.0;          // 1 + sum p_k
+    double mainEff = 0;               // main-hand dice per hit
+    double damroll = 0;
+    double blowValue = 0;             // score of one of the char's own main-hand blows
+    double reach = 1.0;               // share of enemy blows that get past parry
+    double pShield = 0;               // shield block chance vs an equal-level attacker
+    double pCross = 0;                // cross block chance vs an equal-level attacker
+};
+
+static double ga_pct( double chance )
+{
+    return URANGE( 0.0, chance, 100.0 ) / 100.0;
+}
+
+// Class bonus the block/parry formulas give warrior, samurai and paladin.
+static bool ga_defenderClass( Character *ch )
+{
+    const DLString &n = ch->getProfession( )->getName( );
+    return n == "warrior" || n == "samurai" || n == "paladin";
+}
+
+static GAOffhand ga_offhandModel( Character *target, const GAWeights &w, ::Object *primary )
+{
+    GAOffhand om;
+    Skill *sw = skillManager->findExisting( "second weapon" );
+    om.swPct = sw ? sw->getEffective( target ) : 0;
+
+    // next_attack: chance = effective / coef + skill_level_bonus, no usable() gate.
+    struct { const char *name; int coef; } atk[] = {
+        { "second attack", 2 }, { "third attack", 3 }, { "fourth attack", 3 }, { "fifth attack", 3 } };
+    for (int i = 0; i < 4; i++) {
+        Skill *sk = skillManager->findExisting( atk[i].name );
+        if (sk == 0)
+            continue;
+        double c = sk->getEffective( target ) / atk[i].coef + skill_level_bonus( *sk, target );
+        if (c <= 0)
+            continue;
+        om.extra.push_back( c );
+        om.mainSwings += ga_pct( c );
+    }
+
+    int mainSk = 0;
+    if (primary != 0 && primary->item_type == ITEM_WEAPON)
+        om.mainEff = ga_weaponEff( target, get_weapon_sn( primary ), weapon_ave( primary ),
+                                   ga_clericCanCompound( target, primary ), &mainSk );
+    om.damroll = target->damroll;
+    om.blowValue = w.weaponWeight
+        * (om.mainEff + om.damroll * std::min( 100, 20 + mainSk ) / 100.0);
+
+    // Defence chain (onehit_undef.cpp canDamage): parry first, then shield block, then
+    // cross block. Both builds parry with the main weapon, so only the blocks differ;
+    // each is reached by the blows parry let through. Attacker = equal level, so the
+    // formulas' "skill_level - attacker level" term is just the skill level bonus.
+    bool defClass = ga_defenderClass( target );
+    Skill *parry = skillManager->findExisting( "parry" );
+    if (parry != 0) {
+        int pe = parry->getEffective( target ) / 2;
+        if (defClass)
+            pe += pe / 5;
+        om.reach = 1.0 - ga_pct( pe + skill_level_bonus( *parry, target ) );
+    }
+    Skill *sb = skillManager->findExisting( "shield block" );
+    if (sb != 0 && sb->getEffective( target ) > 1) {
+        int c = sb->getEffective( target ) / 2 - 10;
+        if (defClass)
+            c += 10;
+        om.pShield = om.reach * ga_pct( c + skill_level_bonus( *sb, target ) );
+    }
+    Skill *cb = skillManager->findExisting( "cross block" );
+    if (cb != 0 && cb->getEffective( target ) > 1) {
+        int c = cb->getEffective( target ) / 3;
+        if (defClass)
+            c += c / 2;
+        om.pCross = om.reach * ga_pct( c + skill_level_bonus( *cb, target ) );
+    }
+    return om;
+}
+
+// Off-hand swings per main-hand swing for an off-hand weapon of this class.
+static double ga_offhandRatio( const GAOffhand &om, Character *target, int weaponClass )
+{
+    int m = second_weapon_chance_class( target->getProfession( ).getElement( ), weaponClass );
+    double off = ga_pct( om.swPct * (100.0 * m / 100) / 100 );
+    for (size_t k = 0; k < om.extra.size( ); k++)
+        off += ga_pct( om.extra[k] ) * ga_pct( om.swPct * (om.extra[k] * m / 100) / 100 );
+    return off / om.mainSwings;
+}
+
+// Worth of a weapon in the OFF hand. score = its ordinary ga_score, which counted its dice
+// as a full main-hand swing (weaponWeight * eff); swap that for r off-hand swings, each
+// with the no-shield +5% on the dice (WeaponOneHit::damApplyShield) and the char's damroll
+// at this weapon's skill (OneHit::damApplyDamroll). Affixes and procs stay as scored.
+static double ga_offhandValue( const GAOffhand &om, Character *target, const GAWeights &w,
+                               double score, int weaponSn, int weaponAve, bool canCompound,
+                               int weaponClass )
+{
+    int sk = 0;
+    double eff = ga_weaponEff( target, weaponSn, weaponAve, canCompound, &sk );
+    double r = ga_offhandRatio( om, target, weaponClass );
+    double perSwing = 1.05 * eff + om.damroll * std::min( 100, 20 + sk ) / 100.0;
+    return score - w.weaponWeight * eff + w.weaponWeight * r * perSwing;
 }
 
 // Worth of a completed set's declared <affects> bonus for this profile, cap-aware.
@@ -4141,7 +4291,7 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. best is retired (always empty, kept for shape): the chase list 'optimal' now carries the single best-obtainable pick per slot, no dream list beside it. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown/5inpack/6request -- 5 = an upgrade the char already carries unworn, render says put it on; 6 = a good char can politely ask a good, roughly-peer mob for it with no fight), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best, dual] -- dual = [state(0 n/a/1 second weapon not yet learned/2 verdict), unlockLevel, dualScore(best off-hand weapon build), keepScore(best shield + held item build), entry(an optimal-style entry for a better off-hand weapon, or null)]. best gear the char can wear now, ranked. best is retired (always empty, kept for shape): the chase list 'optimal' now carries the single best-obtainable pick per slot, no dream list beside it. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown/5inpack/6request -- 5 = an upgrade the char already carries unworn, render says put it on; 6 = a good char can politely ask a good, roughly-peer mob for it with no fight), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -4530,7 +4680,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (slotFilter != 0)
                 eligible = (slot & slotFilter) != 0 && pObj->limit != 1;
             else
-                eligible = (slot & (ITEM_WEAR_FINGER | ITEM_WEAR_NECK | ITEM_WEAR_WRIST)) != 0
+                // ITEM_WIELD: a second copy of the main-hand weapon is an off-hand
+                // option for the shield-or-second-weapon verdict (never a general pick).
+                eligible = (slot & (ITEM_WEAR_FINGER | ITEM_WEAR_NECK | ITEM_WEAR_WRIST | ITEM_WIELD)) != 0
                            && pObj->limit != 1;
             if (!eligible)
                 continue;
@@ -4994,6 +5146,133 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     Room *msm = get_room_instance( GA_START_ROOM );
     std::map<int, std::vector<int> > pathCache;   // destVnum -> [aggros, doors, fly]
 
+    // ---- Second weapon or shield? ---------------------------------------------------
+    // The general chase treats the weapon slot as one position and the slot browse only
+    // offers an off-hand when the left hand is already free, so neither ever says whether
+    // a shield build should go dual. This weighs the two builds, best of each (worn or
+    // obtainable), in per-main-swing score units:
+    //   dual = best off-hand weapon (ga_offhandValue) + the no-shield +5% on main-hand dice
+    //          (only when the other build has a shield) + cross block, if the char has it;
+    //   keep = best shield + best held item + shield block.
+    // A blocked enemy blow is worth one of the char's own blows (the COMBAT_PROC_SCORING
+    // rule for heals): an equal-level enemy swings about as often as the char, so per
+    // main-hand swing the block is worth pBlock * blowValue.
+    // dualInfo = [state(0 n/a / 1 not yet available / 2 verdict), unlockLevel, dualScore,
+    //             keepScore, entry(pick entry for a better off-hand weapon, or null)].
+    Wearlocation *gaWieldLoc  = wearlocationManager->findExisting( "wield" );
+    Wearlocation *gaOffLoc    = wearlocationManager->findExisting( "second_wield" );
+    Wearlocation *gaShieldLoc = wearlocationManager->findExisting( "shield" );
+    Wearlocation *gaHoldLoc   = wearlocationManager->findExisting( "hold" );
+    ::Object *gaPrimary = gaWieldLoc  ? gaWieldLoc->find( target )  : 0;
+    ::Object *gaOffhand = gaOffLoc    ? gaOffLoc->find( target )    : 0;
+    ::Object *gaShield  = gaShieldLoc ? gaShieldLoc->find( target ) : 0;
+    ::Object *gaHold    = gaHoldLoc   ? gaHoldLoc->find( target )   : 0;
+    bool gaHuge = target->getRace( )->getSize( ) >= SIZE_HUGE;
+    GAOffhand om = ga_offhandModel( target, w, gaPrimary );
+
+    // Redundancy set for an off-hand weapon: everything worn stays except what the left
+    // hand gives up (shield, held item).
+    bitstring_t offHeld = gaPerma;
+    for (std::map<int,bitstring_t>::iterator wi = wornFlagsBySlot.begin( ); wi != wornFlagsBySlot.end( ); wi++)
+        if ((wi->first & (ITEM_WEAR_SHIELD | ITEM_HOLD)) == 0)
+            offHeld |= wi->second;
+    int offCap = wield_weight_cap( target, true );
+    // Can this weapon prototype go in the off-hand? Two-hander rule and the off-hand
+    // weight cap (a player gets no native-weapon exemption, see too_heavy_to_wield).
+    auto offhandFits = [&]( obj_index_data *p ) -> bool {
+        return p->item_type == ITEM_WEAPON && IS_SET( p->wear_flags, ITEM_WIELD )
+            && !( IS_SET( p->value[4], WEAPON_TWO_HANDS ) && !gaHuge )
+            && p->weight <= offCap;
+    };
+    auto offhandValueProto = [&]( obj_index_data *p ) -> double {
+        bitstring_t saved = w.heldFlags;
+        w.heldFlags = offHeld;
+        double sc = ga_score( target, p, w, rawStat, capStat, false );
+        w.heldFlags = saved;
+        return ga_offhandValue( om, target, w, sc, get_weapon_sn( p ), weapon_ave( p ),
+                                ga_clericCanCompound( target, p ), p->value[0] );
+    };
+    auto offhandValueWorn = [&]( ::Object *o ) -> double {
+        double sc = ga_score( target, o, w, rawStat, capStat, true );
+        return ga_offhandValue( om, target, w, sc, get_weapon_sn( o ), weapon_ave( o ),
+                                ga_clericCanCompound( target, o ), get_weapon_class( o ) );
+    };
+    double offWornVal = gaOffhand != 0 ? offhandValueWorn( gaOffhand ) : 0.0;
+    // Same reach rule as the chase list: no boss-guarded kill/pickup routes.
+    auto reachable = [&]( const GACand &c ) -> bool {
+        if (c.acq.method == GA_UNKNOWN)
+            return false;
+        if ((c.acq.method == GA_KILL || c.acq.method == GA_PICKUP) && c.acq.guard > chLevel + 10)
+            return false;
+        return true;
+    };
+
+    RegList::Pointer dualInfo( NEW );
+    {
+        int dState = 0, dUnlock = 0;
+        double dualScore = 0, keepScore = 0;
+        Register dEntry;
+        Skill *swSkill = skillManager->findExisting( "second weapon" );
+        if (swSkill != 0 && !swSkill->usable( target, false )) {
+            // Not yet: the class learns it later. Shown only to a char who will get it.
+            int lvl = swSkill->getLevel( target );
+            if (lvl > target->getRealLevel( ) && lvl <= LEVEL_MORTAL) {
+                dState = 1;
+                dUnlock = lvl;
+            }
+        }
+        else if (swSkill != 0 && ga_dualBody( target )
+                 && gaPrimary != 0 && gaPrimary->item_type == ITEM_WEAPON
+                 && !ga_twoHandBlocks( target, IS_WEAPON_STAT( gaPrimary, WEAPON_TWO_HANDS ) )) {
+            // Best off-hand weapon: carried, obtainable, or a second copy of a worn one.
+            const GACand *bestOff = 0;
+            double bestOffVal = 0;
+            for (int pass = 0; pass < 2; pass++) {
+                std::vector<GACand> &pool = pass == 0 ? cands : secondCopyCands;
+                for (auto &c: pool) {
+                    if (!offhandFits( c.pObj ) || !reachable( c ))
+                        continue;
+                    double v = offhandValueProto( c.pObj );
+                    if (bestOff == 0 || v > bestOffVal) { bestOff = &c; bestOffVal = v; }
+                }
+            }
+            bool pickBetter = bestOff != 0 && bestOffVal > offWornVal;
+            if (pickBetter || gaOffhand != 0) {
+                // Keep side: the best shield and the best held item, worn or obtainable.
+                double shieldVal = gaShield ? ga_score( target, gaShield, w, rawStat, capStat, true ) : 0;
+                double holdVal   = gaHold   ? ga_score( target, gaHold,   w, rawStat, capStat, true ) : 0;
+                bool haveShield = gaShield != 0;
+                for (auto &c: cands) {
+                    if (!reachable( c ))
+                        continue;
+                    if ((c.slot & ITEM_WEAR_SHIELD) && c.score > shieldVal) { shieldVal = c.score; haveShield = true; }
+                    if ((c.slot & ITEM_HOLD) && c.score > holdVal) holdVal = c.score;
+                }
+                keepScore = shieldVal + holdVal;
+                if (haveShield)
+                    keepScore += om.pShield * om.blowValue;
+
+                dualScore = pickBetter ? bestOffVal : offWornVal;
+                if (haveShield)
+                    dualScore += w.weaponWeight * 0.05 * om.mainEff;
+                dualScore += om.pCross * om.blowValue;
+
+                if (pickBetter) {
+                    GACand pick = *bestOff;
+                    int rv = gaOffhand != 0 ? gaOffhand->pIndexData->vnum : 0;
+                    dEntry = ga_buildEntry( pick, msm, chLevel, isVampire, pathCache,
+                                            bestOffVal - offWornVal, gaOffhand == 0, rv );
+                }
+                dState = 2;
+            }
+        }
+        dualInfo->push_back( Register( dState ) );
+        dualInfo->push_back( Register( dUnlock ) );
+        dualInfo->push_back( Register( (int)(dualScore + 0.5) ) );
+        dualInfo->push_back( Register( (int)(keepScore + 0.5) ) );
+        dualInfo->push_back( dEntry );
+    }
+
     // Slot-browse mode: the char asked for one wear slot ("service advice neck").
     // Return the top-5 wearable-now items in that slot by raw score (Fenia orders
     // them by difficulty band). No percentile, no dream list; the caller passes
@@ -5050,6 +5329,62 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             }
             if ((slotFilter & ITEM_WEAR_FINGER) || (slotFilter & ITEM_WEAR_NECK) || (slotFilter & ITEM_WEAR_WRIST))
                 capacity = 2;
+        }
+
+        // Dual-wield weapon browse: each weapon is offered where it does the most good --
+        // as the new MAIN weapon (gain over the worn primary; a non-giant's two-hander also
+        // drops the off-hand weapon) or in the OFF hand, valued at its real swing ratio
+        // (ga_offhandValue) instead of as a second primary. An off-hand fill used to show
+        // its whole primary score as the gain, 2-3x what the off-hand actually swings.
+        if (wieldBrowse && capacity >= 2) {
+            double psc = gaPrimary != 0 ? ga_score( target, gaPrimary, w, rawStat, capStat, true ) : 0.0;
+            struct GAWieldOpt { GACand c; double gain; bool fills; int rv; };
+            std::vector<GAWieldOpt> opts;
+            for (int pass = 0; pass < 2; pass++) {
+                // pass 1 = second copies of a worn weapon: they can only join it, off-hand.
+                std::vector<GACand> &pool = pass == 0 ? cands : secondCopyCands;
+                for (auto &c: pool) {
+                    if ((c.slot & ITEM_WIELD) == 0 || c.acq.method == GA_UNKNOWN)
+                        continue;
+                    bool any = false, fills = false;
+                    double best = 0;
+                    int rv = 0;
+                    if (pass == 0) {
+                        bool blocks = ga_twoHandBlocks( target, IS_SET( c.pObj->value[4], WEAPON_TWO_HANDS ) );
+                        best = c.score - psc - (blocks ? offWornVal : 0.0);
+                        any = true;
+                        fills = gaPrimary == 0;
+                        rv = gaPrimary != 0 ? gaPrimary->pIndexData->vnum : 0;
+                    }
+                    if (gaPrimary != 0 && offhandFits( c.pObj )) {
+                        double g = offhandValueProto( c.pObj ) - offWornVal;
+                        if (!any || g > best) {
+                            best = g;
+                            any = true;
+                            fills = gaOffhand == 0;
+                            rv = gaOffhand != 0 ? gaOffhand->pIndexData->vnum : 0;
+                        }
+                    }
+                    // Same bars as the generic path: >= for a new item, strict > for a
+                    // second copy (never "replace your X with an X").
+                    if (!any || (pass == 0 ? best < 0 : best <= 0))
+                        continue;
+                    opts.push_back( GAWieldOpt{ c, best, fills, rv } );
+                }
+            }
+            std::sort( opts.begin( ), opts.end( ),
+                []( const GAWieldOpt &a, const GAWieldOpt &b ){ return a.gain > b.gain; } );
+            RegList::Pointer slotList( NEW );
+            for (size_t k = 0; k < opts.size( ) && k < 5; k++)
+                slotList->push_back( ga_buildEntry( opts[k].c, msm, chLevel, isVampire, pathCache,
+                                                    opts[k].gain, opts[k].fills, opts[k].rv ) );
+            RegList::Pointer emptyBest( NEW );
+            RegList::Pointer result( NEW );
+            result->push_back( Register( 0 ) );
+            result->push_back( wrap( slotList ) );
+            result->push_back( wrap( emptyBest ) );
+            result->push_back( wrap( dualInfo ) );
+            return wrap( result );
         }
 
         // The bar a candidate must clear. Multi-position slot (capacity 2): an empty
@@ -5124,6 +5459,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         result->push_back( Register( 0 ) );
         result->push_back( wrap( slotList ) );
         result->push_back( wrap( emptyBest ) );
+        result->push_back( wrap( dualInfo ) );
         return wrap( result );
     }
 
@@ -5168,6 +5504,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     result->push_back( Register( pct ) );
     result->push_back( wrap( optimal ) );
     result->push_back( wrap( best ) );
+    result->push_back( wrap( dualInfo ) );
     return wrap( result );
 }
 
