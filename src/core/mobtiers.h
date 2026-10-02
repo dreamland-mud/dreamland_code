@@ -87,6 +87,7 @@ struct MobInfo {
     int tier = TIER_NORMAL;
     double formAc = 1.0;
     bool sentient = false;
+    std::string style;               // <tierStyle>, empty = none
     std::set<std::string> acts;      // act flag names of the prototype
 };
 
@@ -104,6 +105,9 @@ struct Config {
     std::set<std::string> casterActs;
     std::set<int> casterVnums;
     std::map<std::string, std::vector<std::string> > offPriority;
+    // Boss styles (Kit 2026-10-02): "fortress" fat but mild, "brute" deadly
+    // but thin. hp and damage multipliers on top of the tier.
+    std::map<std::string, std::pair<double, double> > styles;
 
     bool fromJson(const Json::Value &value, std::string &error);
     void clear();

@@ -330,6 +330,9 @@ void mob_index_data::deriveNumbers()
     m.level = level;
     m.tier = tier;
     m.formAc = formAcPct / 100.0;
+    m.style = tierStyle;
+    if (!tierStyle.empty() && !tc.styles.count(tierStyle))
+        LogStream::sendWarning() << "mob " << vnum << ": unknown tier style '" << tierStyle << "'" << endl;
     m.sentient = IS_SET(form, FORM_SENTIENT);
     m.acts = MobBody::names(&act_flags, (unsigned int)act);
 

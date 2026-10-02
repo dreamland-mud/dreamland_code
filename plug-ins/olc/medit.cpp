@@ -107,6 +107,7 @@ static void copy_reform_fields(mob_index_data &to, const mob_index_data &from)
     }
     to.reviewed = from.reviewed;
     to.tierName = from.tierName;
+    to.tierStyle = from.tierStyle;
     to.tier = from.tier;
     to.bodyResolved = from.bodyResolved;
     to.wearloc.setRegistry(from.wearloc.getRegistry());
@@ -422,6 +423,8 @@ MEDIT(show)
     ptc(ch, "{CLevel{x:       [{W%3d{x]  {CTier{x: [{W%s{x] %s {D(tier){x\n\r", mob.level,
         MobBody::tiers().name(mob.tier).c_str(),
         mob.tierName.empty() ? "{D(по умолчанию){x" : "");
+    if (!mob.tierStyle.empty())
+        ptc(ch, "{CTier style{x:  [{W%s{x] {D(tierstyle){x\n\r", mob.tierStyle.c_str());
     if (mob.numbersDerived)
         ptc(ch, "{DЧисла ниже -- центры тира (fight/mob_tiers.json), правка не сохраняется. Спасброски [%d], кап параметров [%d].{x\n\r",
             mob.saves, mob.statCap);
@@ -1129,6 +1132,32 @@ MEDIT(tier)
 
     refresh_body(mob);
     ptc(ch, "Тир: %s.\n\r", MobBody::tiers().name(mob.tier).c_str());
+    return true;
+}
+
+MEDIT(tierstyle)
+{
+    const MobTiers::Config &tc = MobBody::tiers();
+    DLString arg = DLString(argument).getOneArgument();
+
+    if (arg.empty()) {
+        ptc(ch, "Стиль тира: %s. Синтаксис: tierstyle <fortress|brute|none>\n\r",
+            mob.tierStyle.empty() ? "нет" : mob.tierStyle.c_str());
+        return false;
+    }
+
+    if (arg_is_strict(arg, "none")) {
+        mob.tierStyle.clear();
+    } else {
+        if (tc.loaded && !tc.styles.count(arg)) {
+            stc("Нет такого стиля (fight/mob_tiers.json, styles).\n\r", ch);
+            return false;
+        }
+        mob.tierStyle = arg;
+    }
+
+    refresh_body(mob);
+    ptc(ch, "Стиль тира: %s.\n\r", mob.tierStyle.empty() ? "нет" : mob.tierStyle.c_str());
     return true;
 }
 

@@ -133,6 +133,11 @@ NMI_GET( MobIndexWrapper, tierName, "тир прототипа по имени (
     checkTarget( ); 
     return Register( DLString( MobBody::tiers( ).name( target->tier ) ) );
 }
+NMI_GET( MobIndexWrapper, tierStyle, "стиль тира (fortress, brute) из fight/mob_tiers.json styles, пусто если нет") 
+{ 
+    checkTarget( ); 
+    return Register( target->tierStyle );
+}
 NMI_GET( MobIndexWrapper, moveverb, "глагол движения тела (galloping, crawling...), пусто для старой модели расы") 
 { 
     checkTarget( ); 

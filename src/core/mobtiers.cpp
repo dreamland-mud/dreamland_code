@@ -185,6 +185,13 @@ bool Config::fromJson(const Json::Value &value, std::string &error)
 
     noncasterManaPerLevel = value.get("noncaster_mana_per_level", 5).asDouble();
 
+    const Json::Value &st = value["styles"];
+    if (st.isObject())
+        for (const auto &name: st.getMemberNames())
+            if (st[name].isObject())
+                styles[name] = std::make_pair(st[name].get("hp", 1.0).asDouble(),
+                                              st[name].get("dmg", 1.0).asDouble());
+
     const Json::Value &ca = value["caster_acts"];
     if (ca.isArray())
         for (const auto &e: ca)
@@ -274,8 +281,14 @@ Centres Config::centres(const MobInfo &mob) const
     const Tier &t = get(mob.tier);
     int lvl = std::max(mob.level, 1);
 
-    c.hp = std::max(1, (int)lround(baseHp.at(lvl) * t.hp * classFactor(*this, "hp", mob.acts)));
-    c.dmgAve = std::max(1, (int)lround(baseDmg.at(lvl) * t.dmg * classFactor(*this, "dmg", mob.acts)));
+    double styleHp = 1.0, styleDmg = 1.0;
+    auto s = styles.find(mob.style);
+    if (!mob.style.empty() && s != styles.end()) {
+        styleHp = s->second.first;
+        styleDmg = s->second.second;
+    }
+    c.hp = std::max(1, (int)lround(baseHp.at(lvl) * t.hp * styleHp * classFactor(*this, "hp", mob.acts)));
+    c.dmgAve = std::max(1, (int)lround(baseDmg.at(lvl) * t.dmg * styleDmg * classFactor(*this, "dmg", mob.acts)));
     c.hitrollBonus = (int)lround(lvl * t.hitroll);
     c.ac = (int)lround(baseAc.at(lvl) * t.ac * mob.formAc);
     c.saves = (int)lround(lvl * t.saves);

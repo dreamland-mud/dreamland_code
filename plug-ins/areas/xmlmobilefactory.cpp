@@ -214,6 +214,7 @@ XMLMobileFactory::init(const mob_index_data *mob)
         props.removeMember("olc");
 
     tier.setValue(mob->tierName);
+    tierStyle.setValue(mob->tierStyle);
     reviewed.setValue(reviewed_names(mob->reviewed));
 
     // Tier-derived numbers are never written back (plan §3.6 item 6).
@@ -320,6 +321,7 @@ XMLMobileFactory::compat(mob_index_data *mob)
         mob->bodyDel[s] = sets[s]->del;
     }
     mob->tierName = tier.getValue();
+    mob->tierStyle = tierStyle.getValue();
     mob->reviewed = reviewed_mask(reviewed.getValue());
 
     // Authored numbers lose to the tier curve once mob_tiers.json is loaded
