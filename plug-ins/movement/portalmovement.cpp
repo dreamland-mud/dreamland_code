@@ -276,14 +276,14 @@ void PortalMovement::msgOnMove( Character *wch, bool fLeaving )
     if (fLeaving) {
         if (RIDDEN(wch))
             msgRoomNoParty( wch,
-                            "%1^C1 ride%1$ns| into %4$O4 on %2$C6.",
-                            "%1^C1 въезжа%1$nет|ют в %4$O4 верхом на %2$C6.",
-                            "%1^C1 в'їжджа%1$nє|ють у %4$O4 верхи на %2$C6." );
+                            "%1$^C1 ride%1$ns| into %4$O4 on %2$C6.",
+                            "%1$^C1 въезжа%1$nет|ют в %4$O4 верхом на %2$C6.",
+                            "%1$^C1 в'їжджа%1$nє|ють у %4$O4 верхи на %2$C6." );
         else
             msgRoomNoParty( wch,
-                            "%1^C1 step%1$ns| into %4$O4.",
-                            "%1^C1 вход%1$nит|ят в %4$O4.",
-                            "%1^C1 вход%1$nить|ять у %4$O4." );
+                            "%1$^C1 step%1$ns| into %4$O4.",
+                            "%1$^C1 вход%1$nит|ят в %4$O4.",
+                            "%1$^C1 вход%1$nить|ять у %4$O4." );
 
         const char *sEn, *sRu, *sUa;
         if (isNormalExit( )) {

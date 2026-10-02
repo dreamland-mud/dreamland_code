@@ -231,21 +231,33 @@ void GateMovement::msgOnMove( Character *wch, bool fLeaving )
         return;
 
     if (fLeaving) {
-        if (ch != actor && !spell->msgGroupLeave.empty( ))
-            msgSelf( wch, spell->msgGroupLeave.c_str( ) );
+        if (ch != actor && !spell->msgGroupLeave.emptyValues( ))
+            msgSelfMulti( wch, spell->msgGroupLeave );
         else {
-            msgSelf( wch, spell->msgSelfLeave.c_str( ) );
-            msgRoomNoParty( wch, spell->msgRoomLeave.c_str( ) );     
+            msgSelfMulti( wch, spell->msgSelfLeave );
+            msgRoomMulti( wch, spell->msgRoomLeave );
         }
     }
     else {
-        if (ch != actor && !spell->msgGroupEnter.empty( ))
-            msgSelf( wch, spell->msgGroupEnter.c_str( ) );
+        if (ch != actor && !spell->msgGroupEnter.emptyValues( ))
+            msgSelfMulti( wch, spell->msgGroupEnter );
         else {
-            msgSelf( wch, spell->msgSelfEnter.c_str( ) );
-            msgRoomNoParty( wch, spell->msgRoomEnter.c_str( ) );
+            msgSelfMulti( wch, spell->msgSelfEnter );
+            msgRoomMulti( wch, spell->msgRoomEnter );
         }
     }
+}
+
+// Spell-configured messages are XMLMultiString: hand each listener its own language,
+// falling back to RU/EN so an untranslated field never prints as a blank line.
+void GateMovement::msgSelfMulti( Character *wch, const XMLMultiString &msg )
+{
+    Movement::msgSelf( wch, msg.getForLang( EN ).c_str( ), msg.getForLang( RU ).c_str( ), msg.getForLang( UA ).c_str( ) );
+}
+
+void GateMovement::msgRoomMulti( Character *wch, const XMLMultiString &msg )
+{
+    Movement::msgRoomNoParty( wch, msg.getForLang( EN ).c_str( ), msg.getForLang( RU ).c_str( ), msg.getForLang( UA ).c_str( ) );
 }
 
 void GateMovement::moveFollowers( Character *wch )
