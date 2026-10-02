@@ -43,6 +43,7 @@ void BackdoorHandler::init( Descriptor *d )
 int BackdoorHandler::handle(Descriptor *d, char *arg) 
 {
     int num, oldState;
+    bool takeover = false;
     char *cp, *name, *pwd;
     PCMemoryInterface *pcm;
     PCharacter *pch;
@@ -99,6 +100,7 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
     /* already playing - reconnect or reanimate */
     if (( pch = pcm->getPlayer( ) )) {
         oldState = CON_BREAK_CONNECT;
+        takeover = pch->desc != 0;
         if (pch->desc)
             pch->desc->close( );
         // A front-door takeover invalidates any web resume token for this char,
@@ -131,6 +133,8 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
     InterpretHandler::init( d );
 
     DescriptorStateManager::getThis( )->handle( oldState, CON_PLAYING, d );
+    if (oldState == CON_BREAK_CONNECT)
+        InterpretHandler::announceReconnect( pch, takeover );
     wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%C1 входит в DreamLand через заднюю дверь.", pch );
     return 1;
 }
