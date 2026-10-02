@@ -20,6 +20,7 @@ fight_position.cpp \
 fight_exception.cpp \
 damage.cpp \
 damage_impl.cpp \
+itemvalue.cpp \
 character.cpp \
 weapons.cpp \
 weapontier.cpp \
