@@ -102,12 +102,20 @@ protected:
     {
         if (fLeaving)
             msgRoomNoParty( wch,
+                            "%1$^C1 disappears.",
                             "%1$^C1 исчезает.",
-                            "%1$^C1 и %2$C1 исчезают." );
+                            "%1$^C1 зникає.",
+                            "%1$^C1 and %2$C1 disappear.",
+                            "%1$^C1 и %2$C1 исчезают.",
+                            "%1$^C1 і %2$C1 зникають." );
         else
-            msgRoomNoParty( wch, 
+            msgRoomNoParty( wch,
+                            "%1$^C1 appears in the room.",
                             "%1$^C1 появляется в комнате.",
-                            "%1$^C1 и %2$C1 появляются в комнате." );
+                            "%1$^C1 з'являється в кімнаті.",
+                            "%1$^C1 and %2$C1 appear in the room.",
+                            "%1$^C1 и %2$C1 появляются в комнате.",
+                            "%1$^C1 і %2$C1 з'являються в кімнаті." );
     }
     virtual void movePet( NPCharacter *pet )
     {
