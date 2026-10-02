@@ -2073,24 +2073,6 @@ void char_update_affects( Character *ch )
     }
 }
 
-/*
- * Check for weight of wielded weapon.
- */
-static bool check_native_weapon( Character *ch, Object *obj )
-{
-    if (!ch->is_npc( )
-        || ch->getNPC( )->pIndexData->area != obj->pIndexData->area)
-    {
-        return false;
-    }
-
-    for (auto &paf: ch->affected)
-        if (paf->location == APPLY_STR && paf->modifier < 0)
-            return false;
-    
-    return true;
-}
-
 void wield_update( Character *ch )
 {
     Object *wield, *second;
@@ -2099,8 +2081,7 @@ void wield_update( Character *ch )
     
     if (second 
             && wear_second_wield->canRemove( ch, second, 0 )
-            && second->getWeight( ) > (get_str_app(ch).wield * 5)
-            && !check_native_weapon( ch, second ))
+            && too_heavy_to_wield( ch, second, true ))
     {
         oldact(_("Ты не в силах удержать $o4 в левой руке."), ch, second, 0, TO_CHAR);
         oldact(_("$c1 не в силах удержать $o4."), ch, second, 0, TO_ROOM);
@@ -2111,8 +2092,7 @@ void wield_update( Character *ch )
     
     if (wield 
             && wear_wield->canRemove( ch, wield, 0 )
-            && wield->getWeight( ) > (get_str_app(ch).wield * 10)
-            && !check_native_weapon( ch, wield ))
+            && too_heavy_to_wield( ch, wield, false ))
     {
         oldact(_("Ты не в силах удержать $o4 в правой руке."), ch, wield, 0, TO_CHAR);
         oldact(_("$c1 не в силах удержать $o4."), ch, wield, 0, TO_ROOM);
