@@ -14,4 +14,7 @@
  */
 double item_value(const char *section, const char *key, double def, int idx = -1);
 
+/** item_value.json section.key.sub as a number, def when any level is missing. */
+double item_value_sub(const char *section, const char *key, const char *sub, double def);
+
 #endif

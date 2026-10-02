@@ -30,6 +30,7 @@
 #include "move_utils.h"
 #include "math_utils.h"
 #include "weapongenerator.h"
+#include "armorgenerator.h"
 #include "weapontier.h"
 #include "act.h"
 #include "lang.h"
@@ -1624,6 +1625,29 @@ NMI_INVOKE(Root, randomWeaponTier, "(bestTier[, legendaryPerMille]): случа�
         throw Scripting::Exception("Legendary chance must be between 0 and 1000 per mille.");
 
     return Register(random_weapon_tier(bestTier, legendaryPerMille));
+}
+
+NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile]): случайная броня на базовом прототипе: slot head|body|arms|hands|legs|feet|shield, profile caster берет цены аффиксов для кастера; true если удалось")
+{
+    ::Object *obj = argnum2item(args, 1);
+    Character *ch = argnum2character(args, 2);
+    int tier = argnum2number(args, 3);
+    DLString slot = argnum2string(args, 4);
+    DLString profile = args.size() > 4 ? argnum2string(args, 5) : DLString::emptyString;
+
+    if (obj->item_type != ITEM_ARMOR)
+        throw Scripting::Exception("Item is not armor for randomize.");
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid armor tier.");
+    if (!armor_slot_exists(slot))
+        throw Scripting::Exception("Unknown armor slot.");
+
+    bool ok = ArmorGenerator(obj, ch->getPC(), tier, slot)
+                .caster(profile == "caster")
+                .alignment(ch->alignment)
+                .run();
+
+    return Register(ok);
 }
 
 NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров")
