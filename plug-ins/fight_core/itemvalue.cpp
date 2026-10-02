@@ -27,3 +27,19 @@ double item_value(const char *section, const char *key, double def, int idx)
 
     return v.isNumeric() ? v.asDouble() : def;
 }
+
+double item_value_sub(const char *section, const char *key, const char *sub, double def)
+{
+    if (!itemValue.isObject() || !itemValue.isMember(section))
+        return def;
+
+    const Json::Value &sec = itemValue[section];
+    if (!sec.isObject() || !sec.isMember(key))
+        return def;
+
+    const Json::Value &obj = sec[key];
+    if (!obj.isObject() || !obj.isMember(sub) || !obj[sub].isNumeric())
+        return def;
+
+    return obj[sub].asDouble();
+}

@@ -19,6 +19,10 @@ struct weapon_tier_t {
     int min_points;
     int max_points;
     int worst_penalty;
+    // Budget window for M-priced items (centi-M, 100 = one item measure).
+    int min_m;
+    int max_m;
+    int worst_penalty_m;
     int weeks;
     int chance;
 

@@ -1152,3 +1152,23 @@ static int get_random_skillgroup(PCharacter *pch)
         
     return -1;
 }
+
+DLString random_item_compose_short(const DLString &adjective, const DLString &base, const DLString &noun)
+{
+    return compose_short(adjective, base, noun);
+}
+
+DLString random_item_gender_tag(const DLString &gender)
+{
+    return gender_tag(gender);
+}
+
+bool random_item_decline_ua(const DLString &word, const DLString &pos, const DLString &gtag, DLString &result)
+{
+    return decline_ua(word, pos, gtag, result);
+}
+
+int random_item_skillgroup(PCharacter *pch)
+{
+    return get_random_skillgroup(pch);
+}

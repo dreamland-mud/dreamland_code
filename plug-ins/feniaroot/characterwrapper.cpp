@@ -50,6 +50,7 @@
 #include "weapons.h"
 #include "damage.h"
 #include "itemvalue.h"
+#include "armorgenerator.h"
 #include "skill_utils.h"
 #include "stats_apply.h"
 #include "rageoath.h"
@@ -3384,8 +3385,12 @@ double spell_proc_tier_value( const DLString &spellName, int level );
 //    level-scaled like a spell). A multi_hit is a whole extra round, _round_attacks swings.
 // Returns 0 for an item that declares neither -- ga_score then keeps the flat +50.
 // COMBAT_PROC_SCORING.md.
-static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0 )
+static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::Object *inst = 0 )
 {
+    // A random item carries its procs on the instance (armor generator); they win
+    // over the prototype's, exactly as ocombatcast_fight fires them.
+    const Json::Value &castSrc = (inst != 0 && inst->props.isMember( "combatcast" ))
+                                    ? inst->props : pObj->props;
     // isMember guard FIRST on every prop read: pObj is non-const, so
     // pObj->props["x"] would INSERT a null member into the prototype on every
     // scored item (jsoncpp non-const operator[]), polluting props world-wide and
@@ -3400,8 +3405,8 @@ static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0 )
     double rawCast = 0, rawFlatHits = 0, swingHits = 0;
 
     // Spells cast in combat.
-    if (pObj->props.isMember( "combatcast" )) {
-        const Json::Value &casts = pObj->props["combatcast"];
+    if (castSrc.isMember( "combatcast" )) {
+        const Json::Value &casts = castSrc["combatcast"];
         if (casts.isArray( )) {
             for (auto i = casts.begin( ); i != casts.end( ); ++i) {
                 const Json::Value &c = *i;
@@ -3875,7 +3880,8 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
                             const AffectList &protoAff, const AffectList *instAff,
                             int itemType, int weaponSn, int weaponAve, bool canCompound,
                             obj_index_data *pProto,
-                            const int rawStat[6], const int capStat[6], bool worn )
+                            const int rawStat[6], const int capStat[6], bool worn,
+                            ::Object *inst = 0 )
 {
     double s = 0;
     int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
@@ -3934,21 +3940,38 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     // where it matters (low level), fading to 0 by L40. Read from the prototype -- the
     // base class is not rolled or enchanted (enchant armour adds an APPLY_AC affect).
     if (itemType == ITEM_ARMOR && pProto != 0) {
-        double acAvg = (pProto->value[0] + pProto->value[1] + pProto->value[2]) / 3.0;
+        // A random armor rolls its AC on the instance; everything else matches its prototype.
+        double acAvg = inst != 0 ? (inst->value0( ) + inst->value1( ) + inst->value2( )) / 3.0
+                                 : (pProto->value[0] + pProto->value[1] + pProto->value[2]) / 3.0;
         s += w.ac * acAvg;
+    }
+    // A generated item's worn buff is cast by the base vnum's onEquip, invisible to
+    // the affect loop. Score it at its affix price in M, one M being one measure roll
+    // set (dr + hr + 10 hp + 10 mana) times the rolls at the item's level -- the very
+    // scale the price was measured on. Generated items are recognised by measure_m.
+    bool generated = inst != 0 && !inst->getProperty( "measure_m" ).empty( );
+    if (generated) {
+        DLString buff = inst->getProperty( "wornbuff" );
+        int price = buff.empty( ) ? 0 : item_affix_price( "worn_buff", buff, w.caster );
+        if (price > 0) {
+            int rolls = max( 1, (int)(inst->level / item_value( "measure", "default_factor", 11 )) );
+            s += price / 100.0 * rolls * (w.dr + w.hr + 10 * w.hp + 10 * w.mana);
+        }
     }
     // Combat spell-procs get scored on what they actually cast (value table x
     // proc chance x item level). That supersedes the flat +50, which was only a
     // stand-in for "this triggers something good in a fight" -- the proc IS that
     // trigger. But a skill-teaching item that ALSO procs still deserves its teach
     // credit on top (different value), and non-proc special gear keeps the +50.
-    double procScore = ga_procScore( pProto, weaponSwing );
+    double procScore = ga_procScore( pProto, weaponSwing, inst );
     if (procScore > 0) {
         s += procScore;
         if (ga_grantsSkills( pProto ))
             s += 50;   // it teaches a skill too; procScore only covered the combat cast.
     }
-    else if (ga_hasFeniaTriggers( pProto ) || ga_grantsSkills( pProto )) {
+    // A generated item's base vnum carries the shared worn-buff onEquip: that is
+    // not "special gear", its worth was scored above.
+    else if ((ga_hasFeniaTriggers( pProto ) && !generated) || ga_grantsSkills( pProto )) {
         s += 50;   // Fenia-triggered or skill-teaching gear is almost always very good.
     }
     return s;
@@ -3988,7 +4011,7 @@ static double ga_score( Character *target, ::Object *o, const GAWeights &w,
         compound = ga_clericCanCompound( target, o );
     }
     return ga_scoreCore( target, w, o->pIndexData->affected, &o->affected,
-                         o->item_type, sn, ave, compound, o->pIndexData, rawStat, capStat, worn );
+                         o->item_type, sn, ave, compound, o->pIndexData, rawStat, capStat, worn, o );
 }
 
 // ---- Off-hand model: what a second weapon is worth next to the main one ----------

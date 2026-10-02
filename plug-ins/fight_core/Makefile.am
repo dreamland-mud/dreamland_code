@@ -27,6 +27,7 @@ weapontier.cpp \
 weaponaffixes.cpp \
 weaponcalculator.cpp \
 weapongenerator.cpp \
+armorgenerator.cpp \
 weaponrandomizer.cpp \
 material.cpp \
 fight_safe.cpp \

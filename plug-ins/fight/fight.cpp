@@ -208,16 +208,29 @@ static void wlprog_fight( Object *obj, Character *ch)
  * object/room spell just no-ops harmlessly (Fenia runVict absent, C++ char
  * variant does nothing useful) -- a data-authoring rule, not a code guard.
  */
-static void ocombatcast_fight( Object *obj, Character *ch )
+/*
+ * A random item (the armor generator) carries its procs on the INSTANCE props,
+ * which win over the prototype's. Instance procs are capped per wearer per round
+ * (MAX_INSTANCE_PROCS, Kit 2026-10-02): a kit of seven random pieces must not
+ * turn into a spell turret. Hand-authored prototype procs keep their old,
+ * uncapped behaviour. An entry with hp_below fires only while the wearer's hp
+ * is under that percentage (the heal procs).
+ */
+static const int MAX_INSTANCE_PROCS = 2;
+
+static void ocombatcast_fight( Object *obj, Character *ch, int &instanceProcs )
 {
     if (obj->pIndexData == 0)
         return;
 
-    Json::Value &props = obj->pIndexData->props;
-    if (!props.isMember( "combatcast" ))
+    // isMember before operator[] on both: a non-const read would insert a null
+    // member and drift it to disk.
+    bool fromInstance = obj->props.isMember( "combatcast" );
+    if (!fromInstance && !obj->pIndexData->props.isMember( "combatcast" ))
         return;
 
-    const Json::Value &casts = props["combatcast"];
+    const Json::Value &casts = fromInstance ? obj->props["combatcast"]
+                                            : obj->pIndexData->props["combatcast"];
     if (!casts.isArray( ))
         return;
 
@@ -233,6 +246,11 @@ static void ocombatcast_fight( Object *obj, Character *ch )
         int chance = c["chance"].asInt( );
         if (chance <= 0)
             continue;
+        if (c.isMember( "hp_below" ) && ch->max_hit > 0
+                && ch->hit * 100 / ch->max_hit >= c["hp_below"].asInt( ))
+            continue;
+        if (fromInstance && instanceProcs >= MAX_INSTANCE_PROCS)
+            return;
         if (number_percent( ) > chance)
             continue;
 
@@ -286,6 +304,9 @@ static void ocombatcast_fight( Object *obj, Character *ch )
                 continue;
             }
         }
+
+        if (fromInstance)
+            instanceProcs++;
 
         int count = c.isMember( "count" ) ? c["count"].asInt( ) : 1;
         if (count < 1)
@@ -527,6 +548,8 @@ void violence_update()
             // Affect and item fight progs (in behaviors) will throw exception if victim is killed.
             afprog_fight(ch, victim);
 
+            int instanceProcs = 0;   // random-item procs fired this round, see ocombatcast_fight
+
             for (obj = ch->carrying; obj; obj = obj_next)
             {
                 obj_next = obj->next_content;
@@ -542,7 +565,7 @@ void violence_update()
 
                     if (obj_is_worn(obj)) {
                         wlprog_fight(obj, ch);
-                        ocombatcast_fight(obj, ch);
+                        ocombatcast_fight(obj, ch, instanceProcs);
                     }
                 }
             }
