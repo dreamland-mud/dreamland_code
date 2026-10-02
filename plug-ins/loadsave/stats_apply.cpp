@@ -108,9 +108,14 @@ static bool is_native_weapon( Character *ch, Object *obj )
     return true;
 }
 
+int wield_weight_cap( Character *ch, bool secondary )
+{
+    return get_str_app(ch).wield * (secondary ? 5 : 10);
+}
+
 bool too_heavy_to_wield( Character *ch, Object *obj, bool secondary )
 {
-    int cap = get_str_app(ch).wield * (secondary ? 5 : 10);
+    int cap = wield_weight_cap( ch, secondary );
 
     return obj->getWeight( ) > cap && !is_native_weapon( ch, obj );
 }

@@ -581,11 +581,21 @@ const struct second_weapon_t second_weapon_table [] = {
 
 int second_weapon_chance(Profession *prof, Object *weapon)
 {
-    int chance_modifier = 18;
-    int index = 0; /* hand to hand */
+    int weaponClass = -1; /* hand to hand */
 
     if (weapon && weapon->item_type == ITEM_WEAPON)
-        index = get_weapon_class(weapon) + 1;
+        weaponClass = get_weapon_class(weapon);
+
+    return second_weapon_chance_class(prof, weaponClass);
+}
+
+int second_weapon_chance_class(Profession *prof, int weaponClass)
+{
+    int chance_modifier = 18;
+    int index = weaponClass + 1;
+
+    if (index < 0 || index > WEAPON_MAX)
+        return chance_modifier;
 
     for (int i = 0; second_weapon_table[i].prof != prof_none; i++) {
         if (prof->getIndex() == second_weapon_table[i].prof) {
