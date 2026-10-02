@@ -122,8 +122,16 @@ bool ArmorGenerator::run()
     assignNames();
     assignFlags();
 
-    for (auto &af: affects)
-        affect_enhance(obj, &af);
+    // affect_enhance merges by location and type only: two bit affects (res fire,
+    // res cold: both location none) or two scoped APPLY_LEVEL affects (all skills,
+    // one group) would fold into one and lose a bit or a scope. Only plain stats
+    // may merge.
+    for (auto &af: affects) {
+        if (af.bitvector.getTable() != 0 || !af.global.empty())
+            affect_to_obj(obj, &af);
+        else
+            affect_enhance(obj, &af);
+    }
 
     notice("rand_armor: created item %s [%d] [%lld] slot %s tier %d affixes [%s] level %d",
             obj->getShortDescr('1', LANG_DEFAULT).c_str(),
