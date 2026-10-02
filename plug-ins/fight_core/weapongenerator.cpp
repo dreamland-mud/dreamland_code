@@ -641,6 +641,7 @@ static DLString gender_tag(const DLString &gender)
     if (gender == "m") return "masc";
     if (gender == "f") return "femn";
     if (gender == "n") return "neut";
+    if (gender == "p") return "plur";
     return "-";
 }
 
