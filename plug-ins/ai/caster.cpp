@@ -21,6 +21,7 @@
 #include "terrains.h"
 #include "move_utils.h"
 #include "doors.h"
+#include "fenia_utils.h"
 #include "merc.h"
 
 #include "def.h"
@@ -123,6 +124,13 @@ bool BasicMobileBehavior::specFightCaster( )
     // necromancer on its own (decision 23, the data pass adds act necromancer).
     if (!NPC_CAN_CAST( ch ))
         return false;
+
+    // Mob reform §3.8: elite and up cast through the tier combat AI
+    // (Fenia global onCastAI). The tables below stay for normal and trash,
+    // and for any tier mob the Fenia side declines (no usable spells).
+    int tier = ch->getNPC()->pIndexData->tier;
+    if (tier >= 1 && tier <= 5 && gprog("onCastAI", "C", ch))
+        return true;
     
     if (IS_SET( ch->act, ACT_VAMPIRE )) {
         if (IS_SET( ch->act, NPC_NECRO_ACTS ) && chance( 50 ))

@@ -93,6 +93,8 @@ struct mob_index_data
     // Authored <tier> (name or 1-10, empty = default) and the resolved number.
     DLString           tierName;
     int                tier;
+    // Authored <tierStyle> (fight/mob_tiers.json "styles"), empty = none.
+    DLString           tierStyle;
     // Body: true when it came from the resolver (race with <forms>), else legacy.
     bool               bodyResolved;
     GlobalBitvector    wearloc;
