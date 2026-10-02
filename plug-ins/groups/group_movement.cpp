@@ -128,19 +128,31 @@ protected:
     virtual void msgOnMove( Character *wch, bool fLeaving )
     {
         if (fLeaving)
-            msgRoomNoParty( wch, 
+            msgRoomNoParty( wch,
+                            "%1$^C1 vanishes into thin air.",
                             "%1$^C1 растворил%1$Gось|ся|ась в воздухе.",
-                            "%1$^C1 и %2$C1 растворяются в воздухе." );
+                            "%1$^C1 розчини%1$Gлось|вся|лась у повітрі.",
+                            "%1$^C1 and %2$C1 vanish into thin air.",
+                            "%1$^C1 и %2$C1 растворяются в воздухе.",
+                            "%1$^C1 і %2$C1 розчиняються в повітрі." );
         else
-            msgRoomNoParty( wch, 
+            msgRoomNoParty( wch,
+                            "%1$^C1 appears in the room.",
                             "%1$^C1 появил%1$Gось|ся|ась в комнате.",
-                            "%1$^C1 и %2$C1 появляются в комнате." );
+                            "%1$^C1 з'яви%1$Gлось|вся|лась у кімнаті.",
+                            "%1$^C1 and %2$C1 appear in the room.",
+                            "%1$^C1 и %2$C1 появляются в комнате.",
+                            "%1$^C1 і %2$C1 з'являються в кімнаті." );
     }
     virtual void msgOnStart( )
     {
-        msgRoomNoParty( ch, 
+        msgRoomNoParty( ch,
+                        "%1$^C1 prays for transportation!",
                         "%1$^C1 просит о возвращении!",
-                        "%1$^C1 и %2$C1 просят о возвращении!" );
+                        "%1$^C1 просить про повернення!",
+                        "%1$^C1 and %2$C1 pray for transportation!",
+                        "%1$^C1 и %2$C1 просят о возвращении!",
+                        "%1$^C1 і %2$C1 просять про повернення!" );
     }
     virtual void movePet( NPCharacter *pet )
     {
