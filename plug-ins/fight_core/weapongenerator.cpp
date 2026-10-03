@@ -55,6 +55,14 @@ static bool name_is_metal_only(const Json::Value &nameConfig)
     return true;
 }
 
+static bool json_list_has(const Json::Value &list, const char *name)
+{
+    for (auto const &v: list)
+        if (v.asString() == name)
+            return true;
+    return false;
+}
+
 Json::Value weapon_classes;
 CONFIGURABLE_LOADED(fight, weapon_classes)
 {
@@ -84,6 +92,7 @@ WeaponGenerator::WeaponGenerator()
     isCaster = false;
     mMode = -1;
     aveMult = damrollMult = 1;
+    twoHands = twoHandsDecided = false;
     retainChance = 50;
     wclassFixed = false;
     // Every assign*/random* method dereferences obj; item() is what sets it. Start
@@ -352,8 +361,19 @@ WeaponGenerator & WeaponGenerator::randomNames()
     bool noMetal = rejectsMetal();
     vector<Json::ArrayIndex> allowed;
     for (Json::ArrayIndex i = 0; i < configs.size(); i++)
-        if (!noMetal || !name_is_metal_only(configs[i]))
+        if ((!noMetal || !name_is_metal_only(configs[i])) && nameFitsHands(configs[i]))
             allowed.push_back(i);
+
+    // A two-hander takes a two-handed name when the class has one, else any
+    // name that does not forbid two hands.
+    if (twoHandsDecided && twoHands) {
+        vector<Json::ArrayIndex> twoHanded;
+        for (auto i: allowed)
+            if (json_list_has(configs[i]["requires"], "two_hands"))
+                twoHanded.push_back(i);
+        if (!twoHanded.empty())
+            allowed = twoHanded;
+    }
 
     if (allowed.empty()) {
         warn("Weapon generator: all names for type %s are metal-only.", wclass.c_str());
@@ -567,29 +587,34 @@ bool WeaponGenerator::useM() const
     return weapon_m_config()["use_m"].asBool();
 }
 
-static bool json_list_has(const Json::Value &list, const char *name)
+
+/** Two-handedness is a property of the weapon, decided before the name and the
+ *  affixes: the caller may require or forbid it (re-statting a weapon keeps its
+ *  hands), a class that requires two hands always has them, a class with
+ *  two_hand_chance has them that often, every other class never. */
+void WeaponGenerator::decideTwoHands()
 {
-    for (auto const &v: list)
-        if (v.asString() == name)
-            return true;
-    return false;
+    twoHandsDecided = true;
+
+    if (required.count("two_hands"))
+        twoHands = true;
+    else if (forbidden.count("two_hands"))
+        twoHands = false;
+    else if (json_list_has(wclassConfig["requires"], "two_hands"))
+        twoHands = true;
+    else
+        twoHands = chance(wclassConfig["two_hand_chance"].asInt());
 }
 
-/** Two-handedness is a property of the weapon, decided before the affixes: the
- *  caller, the class and the name may require or forbid it, else a flat chance. */
-bool WeaponGenerator::decideTwoHands() const
+/** A name that requires two hands only for a two-hander, one that forbids them
+ *  only for a one-hander. Anything goes until the hands are decided. */
+bool WeaponGenerator::nameFitsHands(const Json::Value &config) const
 {
-    if (required.count("two_hands")
-            || json_list_has(wclassConfig["requires"], "two_hands")
-            || json_list_has(nameConfig["requires"], "two_hands"))
+    if (!twoHandsDecided)
         return true;
-
-    if (forbidden.count("two_hands")
-            || json_list_has(wclassConfig["forbids"], "two_hands")
-            || json_list_has(nameConfig["forbids"], "two_hands"))
-        return false;
-
-    return chance(weapon_m_config()["two_hand_chance"].asInt());
+    if (twoHands)
+        return !json_list_has(config["forbids"], "two_hands");
+    return !json_list_has(config["requires"], "two_hands");
 }
 
 namespace {
@@ -653,6 +678,14 @@ protected:
     virtual bool valueAllowed(const DLString &secName, const DLString &value) const
     {
         return forbidden.count(value) == 0;
+    }
+
+    /** weapon_tier: a floor for weapons only (damroll/hitroll stats from rare up). */
+    virtual bool candidateAllowed(const Json::Value &section, const Json::Value &affix, int floor) const
+    {
+        if (affix.isMember("weapon_tier"))
+            floor = min(floor, affix["weapon_tier"].asInt());
+        return ItemAffixRoller::candidateAllowed(section, affix, floor);
     }
 
     virtual int candidateWeight(const DLString &secName, const Json::Value &affix) const
@@ -795,7 +828,8 @@ private:
 WeaponGenerator & WeaponGenerator::randomAffixesM()
 {
     const Json::Value &config = weapon_m_config();
-    bool twoHands = decideTwoHands();
+    if (!twoHandsDecided)
+        decideTwoHands();
     float share = twoHands ? config["two_hand_k"].asFloat() : 1;
     if (share < 1)
         share = 1;
@@ -913,6 +947,10 @@ WeaponGenerator& WeaponGenerator::randomizeAll()
     // weaponClass() has already pinned and applied the class; don't roll over it.
     if (!wclassFixed)
         randomWeaponClass();
+
+    // On the M budget the hands come first, so the name can match them.
+    if (useM())
+        decideTwoHands();
 
     randomNames()
         .randomAffixes()
