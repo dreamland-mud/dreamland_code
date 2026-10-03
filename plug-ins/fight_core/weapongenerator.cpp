@@ -488,10 +488,13 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             rememberAffect(af);
 
         } else if (section == "player") {
-            if (pinfo.affixName == "skillgroup") {
+            // A char with no learned skill has no group to boost: -1 would index
+            // the bitvector out of range (live crash 2026-10-03).
+            int gn = (pinfo.affixName == "skillgroup" && pch) ? get_random_skillgroup(pch) : -1;
+            if (gn >= 0) {
                 Affect af;
                 af.global.setRegistry(skillGroupManager);
-                af.global.set(get_random_skillgroup(pch));
+                af.global.set(gn);
                 af.modifier = calcAffectModifier(affix, pinfo);
                 rememberAffect(af);
             }
