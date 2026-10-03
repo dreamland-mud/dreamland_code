@@ -28,10 +28,12 @@ CONFIGURABLE_LOADED(fight, pc_baseline)
 /** bands[*][melee|caster][field] interpolated by band centre, clamped at the ends. */
 static double pc_baseline_field(int level, bool caster, const char *field)
 {
-    if (!pcBaseline.isObject() || !pcBaseline["bands"].isObject())
+    if (!pcBaseline.isObject() || !pcBaseline.isMember("bands"))
         return 0;
 
-    const Json::Value &bands = pcBaseline["bands"];
+    const Json::Value &bands = static_cast<const Json::Value &>(pcBaseline)["bands"];
+    if (!bands.isObject())
+        return 0;
     std::map<int, double> points;
     for (auto const &key: bands.getMemberNames()) {
         const Json::Value &b = bands[key][caster ? "caster" : "melee"];
