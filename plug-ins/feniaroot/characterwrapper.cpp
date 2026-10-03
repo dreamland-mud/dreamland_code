@@ -3269,6 +3269,7 @@ struct GAWeights {
 
 struct GACand {
     obj_index_data *pObj;
+    ::Object *inst = 0; // a rolled item the char carries: scored and shown as itself
     int    slot;      // wear_flags without ITEM_TAKE (0 = light)
     double score;
     double obtain;    // 0..1 obtainability
@@ -3278,6 +3279,12 @@ struct GACand {
                       // (limit>0) can be false: unlimited gear always repops. false ->
                       // render says whereabouts unknown instead of a stale route.
 };
+
+// Weapon flags of a candidate: a rolled weapon keeps them on the instance.
+static int ga_candValue4( const GACand &c )
+{
+    return c.inst ? c.inst->value4( ) : c.pObj->value[4];
+}
 
 // The body can fight with an off-hand weapon at all: the second-weapon skill is usable,
 // the char has the off-hand wear location (some shapeshifts lose it), and has hands and
@@ -4294,7 +4301,10 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     int band = ga_band( ac.method, ac.guard, chLevel, aggros, doors, fly );
 
     RegList::Pointer e( NEW );
-    e->push_back( WrapperManager::getThis( )->getWrapper( c.pObj ) );
+    if (c.inst)
+        e->push_back( WrapperManager::getThis( )->getWrapper( c.inst ) );
+    else
+        e->push_back( WrapperManager::getThis( )->getWrapper( c.pObj ) );
     e->push_back( Register( ac.method ) );
     e->push_back( Register( ac.aux ) );
     e->push_back( Register( ac.room ) );
@@ -4907,6 +4917,59 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             bestSlot[slot] = sc;
     }
 
+    // Rolled items the char carries unworn (random weapons and armor, tagged "tier"
+    // by their generators). Their prototype is an empty stub in a system area, so the
+    // loop above never sees them: score each copy as itself, same wear gates, and
+    // route it "put it on".
+    for (::Object *o = object_list; o; o = o->next) {
+        if (o->wear_loc != wear_none || ga_rootCarrier( o ) != target)
+            continue;
+        if (o->getProperty( "tier" ).empty( ))
+            continue;
+        if (o->level > LEVEL_MORTAL || !IS_SET(o->wear_flags, ITEM_TAKE))
+            continue;
+        int slot = o->wear_flags;
+        REMOVE_BIT( slot, ITEM_TAKE );
+        if (slot == 0)
+            continue;
+
+        int wearMod = target->getProfession( )->getWearModifier( o->item_type );
+        int wearLvl = o->level - wearMod - levelGap;
+        if (wearLvl < 1) wearLvl = 1;
+        if (wearLvl > chLevel)
+            continue;
+
+        if (IS_SET(o->extra_flags, ITEM_ANTI_EVIL)    && IS_EVIL(target))    continue;
+        if (IS_SET(o->extra_flags, ITEM_ANTI_GOOD)    && IS_GOOD(target))    continue;
+        if (IS_SET(o->extra_flags, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(target)) continue;
+        if (badMaterials != 0 && material_is_typed( o->getMaterial( ).c_str( ), badMaterials ))
+            continue;
+        if (IS_SET(o->wear_flags, ITEM_WEAR_HORSE)  && horseLoc  && !target->getWearloc( ).isSet( horseLoc ))  continue;
+        if (IS_SET(o->wear_flags, ITEM_WEAR_HOOVES) && hoovesLoc && !target->getWearloc( ).isSet( hoovesLoc )) continue;
+        if (IS_SET(o->wear_flags, ITEM_WEAR_FEET)   && feetLoc   && !target->getWearloc( ).isSet( feetLoc ))   continue;
+        if (!w.caster && o->item_type == ITEM_WEAPON
+            && target->getSkill( get_weapon_sn( o ) ) == 0
+            && !ga_clericCanCompound( target, o ))
+            continue;
+
+        {
+            std::map<int,bitstring_t>::iterator hi = heldExclSlot.find( slot );
+            w.heldFlags = (hi != heldExclSlot.end( )) ? hi->second : heldAll;
+        }
+        // worn=false: it is not on the char yet, its stats are not in rawStat.
+        double sc = ga_score( target, o, w, rawStat, capStat, false );
+        if (sc <= 0)
+            continue;
+
+        GACand c;
+        c.pObj = o->pIndexData; c.inst = o; c.slot = slot; c.score = sc;
+        c.obtain = 1.0; c.value = 0; c.present = true;
+        c.acq.method = GA_INPACK; c.acq.aux = 0; c.acq.guard = 0;
+        cands.push_back( c );
+        if (sc > bestSlot[slot])
+            bestSlot[slot] = sc;
+    }
+
     // Percentile: per slot-type, worn against that slot's own ceiling (best of the
     // worn item or the best available). Capping each slot at its own best stops a
     // best-in-slot surplus on one slot from papering over a deficit on another, so
@@ -5428,7 +5491,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                     double best = 0;
                     int rv = 0;
                     if (pass == 0) {
-                        bool blocks = ga_twoHandBlocks( target, IS_SET( c.pObj->value[4], WEAPON_TWO_HANDS ) );
+                        bool blocks = ga_twoHandBlocks( target, IS_SET( ga_candValue4( c ), WEAPON_TWO_HANDS ) );
                         best = c.score - psc - (blocks ? offWornVal : 0.0);
                         any = true;
                         fills = gaPrimary == 0;
@@ -5498,7 +5561,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             // it) -- it replaces the primary, so it must clear the primary's score, not the
             // free-slot bar.
             double bar = wornScore;
-            if (wieldBrowse && IS_SET( c.pObj->value[4], WEAPON_TWO_HANDS ))
+            if (wieldBrowse && IS_SET( ga_candValue4( c ), WEAPON_TWO_HANDS ))
                 bar = primaryScore;
             if (c.score >= bar)
                 slotCands.push_back( c );
@@ -5523,7 +5586,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         for (size_t k = 0; k < slotCands.size( ) && k < 5; k++) {
             // A two-handed weapon replaces the primary rather than filling the off-hand:
             // show it as a swap (fillsFree 0), gain over the primary, not the fill bar.
-            bool twoHand = wieldBrowse && IS_SET( slotCands[k].pObj->value[4], WEAPON_TWO_HANDS );
+            bool twoHand = wieldBrowse && IS_SET( ga_candValue4( slotCands[k] ), WEAPON_TWO_HANDS );
             bool fills = freePos && !twoHand;
             double gain = twoHand ? (slotCands[k].score - primaryScore) : (slotCands[k].score - wornScore);
             // slotReplaceVnum is 0 for fills and single-worn slots; a two-handed pick ousts the
