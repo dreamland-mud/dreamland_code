@@ -155,6 +155,52 @@ double item_level_curve(int level)
     return lo->second + (hi->second - lo->second) * (level - lo->first) / (hi->first - lo->first);
 }
 
+static int itemModelOverride = -1;
+
+bool item_model_enabled()
+{
+    if (itemModelOverride >= 0)
+        return itemModelOverride > 0;
+    return item_value("measure", "item_model", 0) != 0;
+}
+
+int item_model_override(int mode)
+{
+    int old = itemModelOverride;
+    itemModelOverride = mode < 0 ? -1 : (mode > 0 ? 1 : 0);
+    return old;
+}
+
+int item_model_cost(int measureCm, int level)
+{
+    return max(0, (int)(item_value("measure", "cost_k", 5.5) * measureCm / 100.0 * level));
+}
+
+double item_points_by_level(const Json::Value &table, int level, int col)
+{
+    if (!table.isObject())
+        return 0;
+
+    std::map<int, double> points;
+    for (auto const &key: table.getMemberNames()) {
+        const Json::Value &v = table[key];
+        const Json::Value &x = (col >= 0 && v.isArray()) ? v[(Json::ArrayIndex)col] : v;
+        if (DLString(key).isNumber() && x.isNumeric())
+            points[DLString(key).toInt()] = x.asDouble();
+    }
+
+    if (points.empty())
+        return 0;
+    if (level <= points.begin()->first)
+        return points.begin()->second;
+    if (level >= points.rbegin()->first)
+        return points.rbegin()->second;
+
+    auto hi = points.upper_bound(level);
+    auto lo = std::prev(hi);
+    return lo->second + (hi->second - lo->second) * (level - lo->first) / (hi->first - lo->first);
+}
+
 bool item_level_window_ok(const Json::Value &affix, int level)
 {
     if (affix.isMember("min_level") && level < affix["min_level"].asInt())

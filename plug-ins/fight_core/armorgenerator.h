@@ -81,6 +81,18 @@ protected:
 
     int rolls() const;
     int modifier(const Json::Value &affix, int count) const;
+
+    /** One item model (fight_core/itemmodel.h), when measure.item_model is on:
+     *  the affix's base points at the item level, false for a section the model
+     *  does not price yet (procs keep their centi-M price until P6). */
+    bool modelPoints(const DLString &secName, const Json::Value &affix, double &points) const;
+    /** Points -> centi-M at the item level for the roller's profile and slot. */
+    int modelPrice(double points) const;
+    /** Fit clauses for the killer (decisions 5, 6): no stat over its cap, no
+     *  resist or immunity it already has. Selection only, prices don't change. */
+    bool fitAllowed(const DLString &secName, const DLString &value) const;
+    /** Tier window multiplier by item level (decision 3); 1 when the model is off. */
+    double windowCurve() const;
     void remember(Affect &af);
 
     /** Generator-specific filters and prices. */

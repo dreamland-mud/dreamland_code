@@ -7,6 +7,7 @@
 #include "weaponaffixes.h"
 #include "armorgenerator.h"
 #include "itemvalue.h"
+#include "itemmodel.h"
 
 #include "logstream.h"
 #include "grammar_entities_impl.h"
@@ -644,7 +645,8 @@ public:
             if (requiredNames.count(pool[i].value))
                 forced.insert(i);
 
-        pickAffixes((int)(t.min_m * share), (int)(t.max_m * share), t.worst_penalty_m,
+        double curve = windowCurve();
+        pickAffixes((int)(t.min_m * share * curve), (int)(t.max_m * share * curve), t.worst_penalty_m,
                     t.max_affixes_m > 0 ? t.max_affixes_m + maxAffixesBonus : 0,
                     t.max_negatives_m, forced);
 
@@ -724,6 +726,7 @@ private:
             return 0;
 
         int level = obj->level, price;
+        double curve = windowCurve();
         if (level <= points.begin()->first)
             price = points.begin()->second;
         else if (level >= points.rbegin()->first)
@@ -734,11 +737,15 @@ private:
             price = lo->second + (hi->second - lo->second) * (level - lo->first) / (hi->first - lo->first);
         }
 
+        // One item model: the flag's points at the item level (combat-effect model).
+        if (item_model_enabled() && affix.isMember("points_by_level"))
+            price = modelPrice(item_points_by_level(affix["points_by_level"], level));
+
         // Allowed on the cheapest tier whose window covers the price, and on every
         // better one; dearer than the legendary window, never.
         int gate = 0;
         for (int t = WORST_TIER; t >= BEST_TIER; t--)
-            if (price <= weapon_tier_table[t - 1].max_m * share) {
+            if (price <= weapon_tier_table[t - 1].max_m * share * curve) {
                 gate = t;
                 break;
             }
@@ -784,7 +791,8 @@ private:
         int ref = (int)item_value("measure", "ref_level", 60);
         double rollsHere = max(1, (int)(obj->level / factor));
         double rollsRef = max(1, (int)(ref / factor));
-        double oneM = item_value(profile, "level", isCaster ? 127 : 107) * rollsHere / rollsRef;
+        double oneM = item_model_enabled() ? item_one_m(obj->level, isCaster)
+                                           : item_value(profile, "level", isCaster ? 127 : 107) * rollsHere / rollsRef;
         if (oneM <= 0)
             return 0;
 
@@ -1425,7 +1433,10 @@ const WeaponGenerator & WeaponGenerator::assignFlags() const
         obj->weight = obj->pIndexData->weight * 5;
 
     // Set standardized cost in silver.
-    obj->cost = 5 * (WORST_TIER + 1 - valTier) * obj->level;
+    if (item_model_enabled() && obj->getProperty("measure_m").isNumber())
+        obj->cost = item_model_cost(obj->getProperty("measure_m").toInt(), obj->level);
+    else
+        obj->cost = 5 * (WORST_TIER + 1 - valTier) * obj->level;
     return *this;
 }
 

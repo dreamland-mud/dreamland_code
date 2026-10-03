@@ -47,6 +47,22 @@ double item_one_m(int level, bool caster, const DLString &slot = DLString::empty
  *  {"level": mult, ...} interpolated; 1.0 when absent (decision 3). */
 double item_level_curve(int level);
 
+/** The generators price with this model instead of the centi-M table
+ *  (item_value.json measure.item_model, default off until P7). */
+bool item_model_enabled();
+
+/** Test override for one eval: 1 on, 0 off, -1 back to the config. Returns the
+ *  previous override. The server is single-threaded: an eval that sets it and
+ *  restores it before returning affects nothing but its own rolls. */
+int item_model_override(int mode);
+
+/** Gold value of a generated item: measure.cost_k x M x level (decision 14). */
+int item_model_cost(int measureCm, int level);
+
+/** {"20": v, "40": v, ...} interpolated at level, clamped at the ends; a value
+ *  that is an array is read at col ([melee, caster]). 0 when empty. */
+double item_points_by_level(const Json::Value &table, int level, int col = -1);
+
 /** An affix's min_level / max_level window; absent = no limit (decisions 3, 4). */
 bool item_level_window_ok(const Json::Value &affix, int level);
 
