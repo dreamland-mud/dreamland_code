@@ -69,8 +69,8 @@ static bool sort_by_ave_distance(const weapon_value_t &w1, const weapon_value_t 
 /*--------------------------------------------------------------------------
  * WeaponCalculator
  *-------------------------------------------------------------------------*/
-WeaponCalculator:: WeaponCalculator(int tier, int level, bitnumber_t wclass, float index_bonus) 
-    : tier(tier), level(level), wclass(wclass), index_bonus(index_bonus)
+WeaponCalculator:: WeaponCalculator(int tier, int level, bitnumber_t wclass, float index_bonus, float ave_mult) 
+    : tier(tier), level(level), wclass(wclass), index_bonus(index_bonus), ave_mult(ave_mult)
 {
     v2_min = v2_max = value1 = value2 = 0;
     ave = real_ave = damroll = 0;
@@ -158,7 +158,7 @@ void WeaponCalculator::calcAve()
     }
 
     float multiplier = weapon_ave_penalty[wclass].asFloat();
-    ave = (int)(multiplier * get_threshold_value(index, index_bonus, one_tier));
+    ave = (int)(multiplier * ave_mult * get_threshold_value(index, index_bonus, one_tier));
 }
 
 /** Calculate value1 and resulting value2 (between min and max) for the requested ave damage. */

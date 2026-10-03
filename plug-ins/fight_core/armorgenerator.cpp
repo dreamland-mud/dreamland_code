@@ -40,6 +40,11 @@ CONFIGURABLE_LOADED(fight, armor_names)
     armor_names = value;
 }
 
+const Json::Value & item_affixes_config()
+{
+    return item_affixes;
+}
+
 bool armor_slot_exists(const DLString &slot)
 {
     return !slot.empty() && slot.at(0) != '_'
@@ -70,11 +75,50 @@ static int proc_chance(int tierFloor)
 }
 
 /*--------------------------------------------------------------------------
+ * ItemAffixRoller
+ *-------------------------------------------------------------------------*/
+ItemAffixRoller::ItemAffixRoller(Object *obj, PCharacter *pch, int tier, const DLString &kind, const DLString &slot)
+        : obj(obj), pch(pch), tier(tier), kind(kind), slot(slot), isCaster(false), align(ALIGN_NONE),
+          chosenTotal(0), extraFlags(0, &extra_flags)
+{
+}
+
+ItemAffixRoller::~ItemAffixRoller()
+{
+}
+
+/** Groups the killer actually uses: a +1 to a group they never touch is a
+ *  paperweight, same reasoning as the weapon class filter. */
+void ItemAffixRoller::learnPlayerGroups()
+{
+    if (!pch)
+        return;
+
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        PCSkillData &data = pch->getSkillData(sn);
+        if (data.learned <= 1 || data.isTemporary())
+            continue;
+        Skill *skill = skillManager->find(sn);
+        for (auto g: skill->getGroups().toArray())
+            playerGroups.insert(g);
+    }
+}
+
+void ItemAffixRoller::flushAffects()
+{
+    for (auto &af: affects) {
+        if (af.bitvector.getTable() != 0 || !af.global.empty())
+            affect_to_obj(obj, &af);
+        else
+            affect_enhance(obj, &af);
+    }
+}
+
+/*--------------------------------------------------------------------------
  * ArmorGenerator
  *-------------------------------------------------------------------------*/
 ArmorGenerator::ArmorGenerator(Object *obj, PCharacter *pch, int tier, const DLString &slot)
-        : obj(obj), pch(pch), tier(tier), slot(slot), isCaster(false), align(ALIGN_NONE),
-          chosenTotal(0), extraFlags(0, &extra_flags), procs(Json::arrayValue)
+        : ItemAffixRoller(obj, pch, tier, "armor", slot), procs(Json::arrayValue)
 {
 }
 
@@ -96,21 +140,11 @@ bool ArmorGenerator::run()
     if (!pickNoun())
         return false;
 
-    // Groups the killer actually uses: a +1 to a group they never touch is a
-    // paperweight, same reasoning as the weapon class filter.
-    if (pch) {
-        for (int sn = 0; sn < skillManager->size(); sn++) {
-            PCSkillData &data = pch->getSkillData(sn);
-            if (data.learned <= 1 || data.isTemporary())
-                continue;
-            Skill *skill = skillManager->find(sn);
-            for (auto g: skill->getGroups().toArray())
-                playerGroups.insert(g);
-        }
-    }
-
+    learnPlayerGroups();
     collectCandidates();
-    pickAffixes();
+
+    const weapon_tier_t &t = weapon_tier_table[tier - 1];
+    pickAffixes(t.min_m, t.max_m, t.worst_penalty_m, t.max_affixes_m, t.max_negatives_m, std::set<int>());
     applyAffixes();
 
     // The material affix, if any, was applied above; otherwise the noun's own.
@@ -122,16 +156,7 @@ bool ArmorGenerator::run()
     assignNames();
     assignFlags();
 
-    // affect_enhance merges by location and type only: two bit affects (res fire,
-    // res cold: both location none) or two scoped APPLY_LEVEL affects (all skills,
-    // one group) would fold into one and lose a bit or a scope. Only plain stats
-    // may merge.
-    for (auto &af: affects) {
-        if (af.bitvector.getTable() != 0 || !af.global.empty())
-            affect_to_obj(obj, &af);
-        else
-            affect_enhance(obj, &af);
-    }
+    flushAffects();
 
     notice("rand_armor: created item %s [%d] [%lld] slot %s tier %d affixes [%s] level %d",
             obj->getShortDescr('1', LANG_DEFAULT).c_str(),
@@ -148,6 +173,12 @@ static bool material_is_metal(const DLString &name)
 {
     const material_t *m = material_by_name(name);
     return m && IS_SET(m->type, MAT_METAL);
+}
+
+/** Materials: only what the chosen noun is made of. */
+bool ArmorGenerator::valueAllowed(const DLString &secName, const DLString &value) const
+{
+    return secName != "material" || materialAllowed(value);
 }
 
 bool ArmorGenerator::materialAllowed(const DLString &name) const
@@ -201,7 +232,7 @@ bool ArmorGenerator::pickNoun()
 /*--------------------------------------------------------------------------
  * Affix pool
  *-------------------------------------------------------------------------*/
-bool ArmorGenerator::candidateAllowed(const Json::Value &section, const Json::Value &affix, int floor) const
+bool ItemAffixRoller::candidateAllowed(const Json::Value &section, const Json::Value &affix, int floor) const
 {
     // tier floor: allowed when the item's tier is that good or better (1 = legendary).
     if (tier > floor)
@@ -230,13 +261,37 @@ bool ArmorGenerator::candidateAllowed(const Json::Value &section, const Json::Va
     return true;
 }
 
-void ArmorGenerator::collectCandidates()
+bool ItemAffixRoller::valueAllowed(const DLString &secName, const DLString &value) const
+{
+    return true;
+}
+
+int ItemAffixRoller::candidatePrice(const DLString &secName, const Json::Value &affix, bool &allowed) const
+{
+    allowed = true;
+    if (tier == BEST_TIER && affix.isMember("price_legendary"))
+        return affix["price_legendary"].asInt();
+    return (isCaster ? affix["price_caster"] : affix["price_melee"]).asInt();
+}
+
+int ItemAffixRoller::candidateWeight(const DLString &secName, const Json::Value &affix) const
+{
+    const Json::Value &section = item_affixes[secName];
+    const Json::Value &slots = affix.isMember("slots") ? affix["slots"] : section["slots"];
+    return slots.isObject() && slots.isMember(slot) ? slots[slot].asInt() : 1;
+}
+
+void ItemAffixRoller::collectCandidates()
 {
     for (auto const &secName: item_affixes.getMemberNames()) {
         if (secName.empty() || secName.at(0) == '_')
             continue;
 
         const Json::Value &section = item_affixes[secName];
+        DLString items = section.isMember("items") ? section["items"].asString() : DLString("armor");
+        if (items != kind && items != "both")
+            continue;
+
         int secFloor = section.isMember("tier") ? section["tier"].asInt() : WORST_TIER;
 
         for (auto const &affix: section["values"]) {
@@ -246,8 +301,7 @@ void ArmorGenerator::collectCandidates()
             if (!candidateAllowed(section, affix, floor))
                 continue;
 
-            // Materials: only what the chosen noun is made of.
-            if (secName == "material" && !materialAllowed(value))
+            if (!valueAllowed(secName, value))
                 continue;
 
             // Skill groups: only groups the killer has a learned skill in.
@@ -260,9 +314,13 @@ void ArmorGenerator::collectCandidates()
                     continue;
             }
 
-            const Json::Value &slots = affix.isMember("slots") ? affix["slots"] : section["slots"];
-            int weight = slots.isObject() && slots.isMember(slot) ? slots[slot].asInt() : 1;
+            int weight = candidateWeight(secName, affix);
             if (weight <= 0)
+                continue;
+
+            bool allowed = true;
+            int price = candidatePrice(secName, affix, allowed);
+            if (!allowed)
                 continue;
 
             Candidate c;
@@ -270,9 +328,7 @@ void ArmorGenerator::collectCandidates()
             c.value = value;
             c.norm = (!value.empty() && (value.at(0) == '-' || value.at(0) == '+')) ? value.substr(1) : value;
             c.affix = &affix;
-            c.price = (isCaster ? affix["price_caster"] : affix["price_melee"]).asInt();
-            if (tier == BEST_TIER && affix.isMember("price_legendary"))
-                c.price = affix["price_legendary"].asInt();
+            c.price = price;
             c.stack = affix.isMember("stack") ? max(1, affix["stack"].asInt()) : 1;
             c.weight = weight;
             c.tierFloor = floor;
@@ -289,7 +345,7 @@ void ArmorGenerator::collectCandidates()
  *  per item, or when they are the same thing under another section or sign:
  *  res fire / vuln fire / imm fire, hit / -hit, regeneration bit / regeneration
  *  buff. Stacking the very same affix is governed by 'stack', not here. */
-bool ArmorGenerator::conflicts(const Candidate &c, const std::map<int, int> &picked) const
+bool ItemAffixRoller::conflicts(const Candidate &c, const std::map<int, int> &picked) const
 {
     for (auto const &p: picked) {
         const Candidate &o = pool[p.first];
@@ -317,19 +373,28 @@ bool ArmorGenerator::conflicts(const Candidate &c, const std::map<int, int> &pic
  *  2026-10-02: an item with 15 crumbs has no character). To reach the budget
  *  inside the cap, a step prefers picks worth at least half of what each free
  *  slot still has to carry; restacking an affix already taken is always open. */
-void ArmorGenerator::pickAffixes()
+void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxAffixesM, int maxNegativesM,
+                                  const std::set<int> &forced)
 {
-    const weapon_tier_t &t = weapon_tier_table[tier - 1];
     std::map<int, int> best;
     int bestDistance = -1, bestTotal = 0;
 
-    int maxAffixes = t.max_affixes_m > 0 ? t.max_affixes_m : 1000;
-    int maxNegatives = t.max_negatives_m > 0 ? t.max_negatives_m : 1000;
+    int maxAffixes = maxAffixesM > 0 ? maxAffixesM : 1000;
+    int maxNegatives = maxNegativesM > 0 ? maxNegativesM : 1000;
 
     for (int attempt = 0; attempt < 30; attempt++) {
         std::map<int, int> picked;
         int total = 0, penalty = 0, negatives = 0;
-        int target = number_range(t.min_m, t.max_m);
+        int target = number_range(minM, maxM);
+
+        for (int i: forced) {
+            picked[i] = 1;
+            total += pool[i].price;
+            if (pool[i].price < 0) {
+                penalty += pool[i].price;
+                negatives++;
+            }
+        }
 
         for (int step = 0; step < 16 && total < target; step++) {
             vector<int> big, small;
@@ -348,9 +413,9 @@ void ArmorGenerator::pickAffixes()
                     continue;
                 if (fresh && c.price < 0 && negatives >= maxNegatives)
                     continue;
-                if (total + c.price > t.max_m)
+                if (total + c.price > maxM)
                     continue;
-                if (c.price < 0 && penalty + c.price < t.worst_penalty_m)
+                if (c.price < 0 && penalty + c.price < worstPenalty)
                     continue;
                 if (fresh && conflicts(c, picked))
                     continue;
@@ -390,7 +455,7 @@ void ArmorGenerator::pickAffixes()
                 penalty += pool[i].price;
         }
 
-        int distance = total < t.min_m ? t.min_m - total : (total > t.max_m ? total - t.max_m : 0);
+        int distance = total < minM ? minM - total : (total > maxM ? total - maxM : 0);
         if (bestDistance < 0 || distance < bestDistance) {
             best = picked;
             bestDistance = distance;
@@ -407,7 +472,7 @@ void ArmorGenerator::pickAffixes()
 /*--------------------------------------------------------------------------
  * Applying the picks
  *-------------------------------------------------------------------------*/
-int ArmorGenerator::rolls() const
+int ItemAffixRoller::rolls() const
 {
     double factor = item_value("measure", "default_factor", 11);
     factor = item_value_sub("measure", "slot_factor", slot.c_str(), factor);
@@ -418,7 +483,7 @@ int ArmorGenerator::rolls() const
 }
 
 /** unit: per measure roll (stats). mult: weapon style, per level. mod: flat. */
-int ArmorGenerator::modifier(const Json::Value &affix, int count) const
+int ItemAffixRoller::modifier(const Json::Value &affix, int count) const
 {
     int result;
 
@@ -432,7 +497,7 @@ int ArmorGenerator::modifier(const Json::Value &affix, int count) const
     return result;
 }
 
-void ArmorGenerator::remember(Affect &af)
+void ItemAffixRoller::remember(Affect &af)
 {
     af.type = gsn_none;
     af.duration = -1;
@@ -440,7 +505,7 @@ void ArmorGenerator::remember(Affect &af)
     affects.push_back(af);
 }
 
-void ArmorGenerator::applyPack(const Json::Value &list, int count)
+void ItemAffixRoller::applyPack(const Json::Value &list, int count)
 {
     for (auto const &one: list) {
         Affect af;
@@ -459,7 +524,7 @@ void ArmorGenerator::applyPack(const Json::Value &list, int count)
     }
 }
 
-void ArmorGenerator::applyOne(const Candidate &c, int count)
+bool ItemAffixRoller::applyShared(const Candidate &c, int count)
 {
     const Json::Value &affix = *c.affix;
     const DLString &sec = c.section;
@@ -470,7 +535,7 @@ void ArmorGenerator::applyOne(const Candidate &c, int count)
     // Any affix that spells out its affects is a pack, whatever its section.
     if (affix.isMember("affects")) {
         applyPack(affix["affects"], count);
-        return;
+        return true;
     }
 
     if (sec == "armor_stats" || sec == "affects_by_level" || sec == "primary_stats") {
@@ -482,7 +547,7 @@ void ArmorGenerator::applyOne(const Candidate &c, int count)
 
     } else if (sec == "skill_group") {
         if (!skillGroupManager->hasElement(c.value))
-            return;
+            return true;
         Affect af;
         af.global.setRegistry(skillGroupManager);
         af.global.fromString(c.value);
@@ -492,12 +557,12 @@ void ArmorGenerator::applyOne(const Candidate &c, int count)
 
     } else if (sec == "player") {
         if (!pch)
-            return;
+            return true;
 
         if (c.value == "skillgroup") {
             int gn = random_item_skillgroup(pch);
             if (gn < 0)
-                return;
+                return true;
             Affect af;
             af.global.setRegistry(skillGroupManager);
             af.global.set(gn);
@@ -514,7 +579,7 @@ void ArmorGenerator::applyOne(const Candidate &c, int count)
                     mine.push_back(sn);
             }
             if (mine.empty())
-                return;
+                return true;
             Affect af;
             af.global.setRegistry(skillManager);
             af.global.set(mine[number_range(0, mine.size() - 1)]);
@@ -525,9 +590,6 @@ void ArmorGenerator::applyOne(const Candidate &c, int count)
 
     } else if (sec == "extra") {
         extraFlags.setBits(c.value);
-
-    } else if (sec == "material") {
-        materialName = c.value;
 
     } else if (sec == "resists" || sec == "vulns" || sec == "immunes"
                 || sec == "senses" || sec == "affects_with_bits") {
@@ -542,7 +604,22 @@ void ArmorGenerator::applyOne(const Candidate &c, int count)
         af.bitvector.setBits(c.value);
         remember(af);
 
-    } else if (sec == "worn_buff") {
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
+void ArmorGenerator::applyOne(const Candidate &c, int count)
+{
+    const Json::Value &affix = *c.affix;
+    const DLString &sec = c.section;
+
+    if (applyShared(c, count))
+        return;
+
+    if (sec == "worn_buff") {
         wornBuff = c.value;
 
     } else if (sec == "proc") {
@@ -552,6 +629,9 @@ void ArmorGenerator::applyOne(const Candidate &c, int count)
         if (affix.isMember("hp_below"))
             p["hp_below"] = affix["hp_below"].asInt();
         procs.append(p);
+
+    } else if (sec == "material") {
+        materialName = c.value;
 
     } else {
         warn("Armor generator: affix %s in unknown section %s.", c.value.c_str(), sec.c_str());
@@ -588,17 +668,10 @@ void ArmorGenerator::assignAC()
 /*--------------------------------------------------------------------------
  * Names
  *-------------------------------------------------------------------------*/
-namespace {
-struct NamePart {
-    int weight;
-    const Json::Value *affix;
-};
-}
-
 /** One prefix and one suffix out of the picks that carry words, the dearer the
  *  likelier. Weight is |price|: a named drawback (curse, glow) shows as often as
  *  a bonus of its size, so the name never hides what the item does to you. */
-static const Json::Value *pick_part(const vector<NamePart> &parts)
+static const Json::Value *pick_part(const vector<ItemAffixRoller::NamePart> &parts)
 {
     int total = 0;
     for (auto const &p: parts)
@@ -615,10 +688,12 @@ static const Json::Value *pick_part(const vector<NamePart> &parts)
     return 0;
 }
 
-void ArmorGenerator::assignNames()
+/** The chosen picks join the caller's own name parts (a weapon's two-handed
+ *  adjective) before one of each is drawn. */
+void ItemAffixRoller::pickNameParts(vector<NamePart> &prefixes, vector<NamePart> &suffixes,
+                                    const Json::Value *&pre, int &a,
+                                    const Json::Value *&suf, int &n) const
 {
-    vector<NamePart> prefixes, suffixes;
-
     for (auto const &p: chosen) {
         const Candidate &c = pool[p.first];
         int weight = max(1, abs(c.price * p.second));
@@ -628,10 +703,18 @@ void ArmorGenerator::assignNames()
             suffixes.push_back({weight, c.affix});
     }
 
-    const Json::Value *pre = pick_part(prefixes);
-    const Json::Value *suf = pick_part(suffixes);
-    int a = pre ? number_range(0, (*pre)["adjectives"].size() - 1) : -1;
-    int n = suf ? number_range(0, (*suf)["nouns"].size() - 1) : -1;
+    pre = pick_part(prefixes);
+    suf = pick_part(suffixes);
+    a = pre ? number_range(0, (*pre)["adjectives"].size() - 1) : -1;
+    n = suf ? number_range(0, (*suf)["nouns"].size() - 1) : -1;
+}
+
+void ArmorGenerator::assignNames()
+{
+    vector<NamePart> prefixes, suffixes;
+    const Json::Value *pre, *suf;
+    int a, n;
+    pickNameParts(prefixes, suffixes, pre, a, suf, n);
 
     auto word = [](const Json::Value *affix, const char *field, int idx) -> DLString {
         if (!affix || idx < 0)
