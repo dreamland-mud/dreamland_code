@@ -311,37 +311,62 @@ bool ArmorGenerator::conflicts(const Candidate &c, const std::map<int, int> &pic
  *  they buy room for more positives, down to the tier's penalty floor. The
  *  exhaustive weapon walk is not reused on purpose: 150 affixes at M prices have
  *  far too many subsets for it, and its depth-first reservoir would lean to the
- *  cheap end of the price list. */
+ *  cheap end of the price list.
+ *
+ *  The tier caps the number of distinct affixes and of negative ones (Kit
+ *  2026-10-02: an item with 15 crumbs has no character). To reach the budget
+ *  inside the cap, a step prefers picks worth at least half of what each free
+ *  slot still has to carry; restacking an affix already taken is always open. */
 void ArmorGenerator::pickAffixes()
 {
     const weapon_tier_t &t = weapon_tier_table[tier - 1];
     std::map<int, int> best;
     int bestDistance = -1, bestTotal = 0;
 
+    int maxAffixes = t.max_affixes_m > 0 ? t.max_affixes_m : 1000;
+    int maxNegatives = t.max_negatives_m > 0 ? t.max_negatives_m : 1000;
+
     for (int attempt = 0; attempt < 30; attempt++) {
         std::map<int, int> picked;
-        int total = 0, penalty = 0;
+        int total = 0, penalty = 0, negatives = 0;
         int target = number_range(t.min_m, t.max_m);
 
         for (int step = 0; step < 16 && total < target; step++) {
-            vector<int> eligible;
-            int weights = 0;
+            vector<int> big, small;
+            int bigWeights = 0, smallWeights = 0;
+            int slotsLeft = max(1, maxAffixes - (int)picked.size());
+            int floorPrice = (target - total) / slotsLeft / 2;
 
             for (int i = 0; i < (int)pool.size(); i++) {
                 const Candidate &c = pool[i];
                 auto it = picked.find(i);
-                if (it != picked.end() && it->second >= c.stack)
+                bool fresh = (it == picked.end());
+
+                if (!fresh && it->second >= c.stack)
+                    continue;
+                if (fresh && (int)picked.size() >= maxAffixes)
+                    continue;
+                if (fresh && c.price < 0 && negatives >= maxNegatives)
                     continue;
                 if (total + c.price > t.max_m)
                     continue;
                 if (c.price < 0 && penalty + c.price < t.worst_penalty_m)
                     continue;
-                if (it == picked.end() && conflicts(c, picked))
+                if (fresh && conflicts(c, picked))
                     continue;
 
-                eligible.push_back(i);
-                weights += c.weight;
+                // A negative buys budget room, it never fills a slot's share.
+                if (c.price < 0 || c.price >= floorPrice) {
+                    big.push_back(i);
+                    bigWeights += c.weight;
+                } else {
+                    small.push_back(i);
+                    smallWeights += c.weight;
+                }
             }
+
+            vector<int> &eligible = big.empty() ? small : big;
+            int weights = big.empty() ? smallWeights : bigWeights;
 
             if (eligible.empty() || weights <= 0)
                 break;
@@ -357,6 +382,8 @@ void ArmorGenerator::pickAffixes()
             if (i < 0)
                 break;
 
+            if (picked.find(i) == picked.end() && pool[i].price < 0)
+                negatives++;
             picked[i]++;
             total += pool[i].price;
             if (pool[i].price < 0)
