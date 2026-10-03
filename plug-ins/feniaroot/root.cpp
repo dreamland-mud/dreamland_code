@@ -1722,7 +1722,7 @@ NMI_INVOKE(Root, weaponBaseRoll, "(tier, level, wclass): базовый hitroll/
 
     if (tier < BEST_TIER || tier > WORST_TIER)
         throw Scripting::Exception("Invalid weapon tier.");
-    if (!weapon_class_exists(weapon_class.name(wclass)))
+    if (weapon_class.name(wclass).empty())
         throw Scripting::Exception("Unknown weapon class.");
 
     return Register(WeaponCalculator(tier, level, wclass).getDamroll());
