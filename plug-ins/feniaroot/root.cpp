@@ -1790,6 +1790,11 @@ NMI_INVOKE(Root, itemProcPoints, "(spell, chance, level, profile): очки оц
     return Register((int)std::round(item_combat_points(v * chance / 100.0, 0, level, profile == "caster")));
 }
 
+NMI_INVOKE(Root, itemModel, "(mode): только для тестов: генераторы предметов считают по единой модели (1), по старым ценам (0) или по конфигу (-1); вернуть -1 до конца того же eval. Возвращает прежний режим")
+{
+    return Register(item_model_override(argnum2number(args, 1)));
+}
+
 NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]): выставить статы для weapon или улучшить в бою")
 {
     ::Object *weapon = argnum2item(args, 1);

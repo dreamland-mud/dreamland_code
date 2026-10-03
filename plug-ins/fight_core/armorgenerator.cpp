@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 
 #include "armorgenerator.h"
 #include "weapongenerator.h"
@@ -145,7 +146,9 @@ bool ArmorGenerator::run()
     collectCandidates();
 
     const weapon_tier_t &t = weapon_tier_table[tier - 1];
-    pickAffixes(t.min_m, t.max_m, t.worst_penalty_m, t.max_affixes_m, t.max_negatives_m, std::set<int>());
+    double curve = windowCurve();
+    pickAffixes((int)(t.min_m * curve), (int)(t.max_m * curve), t.worst_penalty_m,
+                t.max_affixes_m, t.max_negatives_m, std::set<int>());
     applyAffixes();
 
     // The material affix, if any, was applied above; otherwise the noun's own.
@@ -252,6 +255,10 @@ bool ItemAffixRoller::candidateAllowed(const Json::Value &section, const Json::V
             return false;
     }
 
+    // Level windows (one item model): ac ends at 40, sanctuary-family buffs start at 30.
+    if (item_model_enabled() && !item_level_window_ok(affix, obj->level))
+        return false;
+
     // A worn buff that wants a skill of the wearer's own (concentrate).
     if (affix["needs_skill"].asBool()) {
         Skill *skill = skillManager->findExisting(affix["value"].asString());
@@ -272,7 +279,151 @@ int ItemAffixRoller::candidatePrice(const DLString &secName, const Json::Value &
     allowed = true;
     if (tier == BEST_TIER && affix.isMember("price_legendary"))
         return affix["price_legendary"].asInt();
+
+    double points;
+    if (item_model_enabled() && modelPoints(secName, affix, points))
+        return modelPrice(points);
+
     return (isCaster ? affix["price_caster"] : affix["price_melee"]).asInt();
+}
+
+static double table_points(const DLString &table, const DLString &bitNames, bool caster)
+{
+    const FlagTable *t = FlagTableRegistry::getTable(table);
+    if (!t)
+        return 0;
+
+    if (table == "detect_flags") {
+        double s = 0;
+        StringList names(bitNames);
+        for (auto const &n: names)
+            s += item_value("detects", n.c_str(), 0, caster ? 1 : 0);
+        return s;
+    }
+
+    Affect af;
+    af.bitvector.setTable(t);
+    af.bitvector.setBits(bitNames);
+    bitstring_t bits = af.bitvector;
+
+    if (table == "affect_flags")
+        return item_flag_points(bits, caster, 0, 0);
+    if (table == "res_flags")
+        return item_res_points(bits, 0);
+    if (table == "imm_flags")
+        return item_res_points(bits, 1);
+    if (table == "vuln_flags")
+        return item_res_points(bits, 2);
+    return 0;
+}
+
+bool ItemAffixRoller::modelPoints(const DLString &secName, const Json::Value &affix, double &points) const
+{
+    ItemWeights w;
+    item_weights(w, isCaster, obj->level);
+    int col = isCaster ? 1 : 0;
+    DLString value = affix["value"].asString();
+    DLString norm = (!value.empty() && (value.at(0) == '-' || value.at(0) == '+')) ? value.substr(1) : value;
+
+    points = 0;
+
+    // Senses are priced by affix (item_value.json detects), whatever bits they set.
+    if (secName == "senses") {
+        points = item_value("detects", value.c_str(), 0, col);
+        return true;
+    }
+
+    if (affix.isMember("affects")) {
+        for (auto const &one: affix["affects"]) {
+            if (one.isMember("apply"))
+                points += item_apply_points(apply_flags.value(one["apply"].asString()), modifier(one, 1), w);
+            else if (one.isMember("table"))
+                points += table_points(one["table"].asString(), one["bits"].asString(), isCaster);
+        }
+        return true;
+    }
+
+    if (secName == "armor_stats" || secName == "affects_by_level" || secName == "primary_stats") {
+        points = item_apply_points(apply_flags.value(norm), modifier(affix, 1), w);
+        return true;
+    }
+    if (secName == "skill_group") {
+        points = w.skillLevel * max(1, affix["mod"].asInt());
+        return true;
+    }
+    if (secName == "player") {
+        points = (value == "learned" ? w.learnSkill : w.skillLevel) * max(1, affix["mod"].asInt());
+        return true;
+    }
+    if (secName == "extra") {
+        points = item_value("extras", value.c_str(), 0, col);
+        return true;
+    }
+    if (secName == "resists" || secName == "vulns" || secName == "immunes"
+            || secName == "affects_with_bits") {
+        DLString table = affix.isMember("table") ? affix["table"].asString()
+                       : secName == "resists" ? "res_flags"
+                       : secName == "vulns" ? "vuln_flags"
+                       : secName == "immunes" ? "imm_flags"
+                       : "affect_flags";
+        points = table_points(table, value, isCaster);
+        return true;
+    }
+    if (secName == "worn_buff" && affix.isMember("points_by_level")) {
+        points = item_points_by_level(affix["points_by_level"], obj->level, col);
+        return true;
+    }
+    if (secName == "material" || secName == "weapon_material") {
+        points = item_value("materials", value.c_str(), 0, col)
+               + item_points_by_level(item_value_object("materials_combat", value.c_str()), obj->level);
+        return true;
+    }
+
+    return false;
+}
+
+int ItemAffixRoller::modelPrice(double points) const
+{
+    double oneM = item_one_m(obj->level, isCaster, slot);
+    if (oneM <= 0)
+        return 0;
+    return (int)std::round(100 * points / oneM);
+}
+
+bool ItemAffixRoller::fitAllowed(const DLString &secName, const DLString &value) const
+{
+    if (!pch)
+        return true;
+
+    if (secName == "primary_stats") {
+        DLString norm = (!value.empty() && (value.at(0) == '-' || value.at(0) == '+')) ? DLString(value.substr(1)) : value;
+        static const char *names[] = { "str", "int", "wis", "dex", "con", "cha" };
+        static const int stats[] = { STAT_STR, STAT_INT, STAT_WIS, STAT_DEX, STAT_CON, STAT_CHA };
+        for (int k = 0; k < 6; k++)
+            if (norm == names[k] && value.at(0) != '-')
+                return pch->perm_stat[stats[k]] + pch->mod_stat[stats[k]] < pch->getMaxStat(stats[k]);
+        return true;
+    }
+
+    if (secName == "resists" || secName == "immunes") {
+        Affect af;
+        af.bitvector.setTable(FlagTableRegistry::getTable(secName == "resists" ? "res_flags" : "imm_flags"));
+        af.bitvector.setBits(value);
+        bitstring_t bits = af.bitvector;
+        if (bits == 0)
+            return true;
+        if (((bitstring_t)pch->imm_flags & bits) == bits)
+            return false;
+        if (secName == "resists" && ((bitstring_t)pch->res_flags & bits) == bits)
+            return false;
+    }
+
+    return true;
+}
+
+double ItemAffixRoller::windowCurve() const
+{
+    return item_model_enabled() ? item_level_curve(obj->level) : 1.0;
 }
 
 int ItemAffixRoller::candidateWeight(const DLString &secName, const Json::Value &affix) const
@@ -303,6 +454,9 @@ void ItemAffixRoller::collectCandidates()
                 continue;
 
             if (!valueAllowed(secName, value))
+                continue;
+
+            if (item_model_enabled() && !fitAllowed(secName, value))
                 continue;
 
             // Skill groups: only groups the killer has a learned skill in.
@@ -779,7 +933,8 @@ void ArmorGenerator::assignFlags()
     if (t.weeks > 0)
         obj->timer = t.weeks * Date::SECOND_IN_WEEK / Date::SECOND_IN_MINUTE;
 
-    obj->cost = 5 * (WORST_TIER + 1 - tier) * obj->level;
+    obj->cost = item_model_enabled() ? item_model_cost(chosenTotal, obj->level)
+                                     : 5 * (WORST_TIER + 1 - tier) * obj->level;
 
     if (!wornBuff.empty())
         obj->setProperty("wornbuff", wornBuff);
