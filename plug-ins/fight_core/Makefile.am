@@ -21,6 +21,7 @@ fight_exception.cpp \
 damage.cpp \
 damage_impl.cpp \
 itemvalue.cpp \
+itemmodel.cpp \
 character.cpp \
 weapons.cpp \
 weapontier.cpp \
