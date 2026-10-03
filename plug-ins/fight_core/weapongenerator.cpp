@@ -1,9 +1,12 @@
 #include <algorithm>
+#include <cmath>
 
 #include "weapongenerator.h"
 #include "weaponcalculator.h"
 #include "weapontier.h"
 #include "weaponaffixes.h"
+#include "armorgenerator.h"
+#include "itemvalue.h"
 
 #include "logstream.h"
 #include "grammar_entities_impl.h"
@@ -78,6 +81,9 @@ WeaponGenerator::WeaponGenerator()
     hrMinValue = drMinValue = 0;
     hrIndexBonus = drIndexBonus = aveIndexBonus = 0;
     align = ALIGN_NONE;
+    isCaster = false;
+    mMode = -1;
+    aveMult = damrollMult = 1;
     retainChance = 50;
     wclassFixed = false;
     // Every assign*/random* method dereferences obj; item() is what sets it. Start
@@ -218,7 +224,7 @@ void WeaponGenerator::applyWeaponClass(const DLString &name)
 
 const WeaponGenerator & WeaponGenerator::assignValues() const
 {    
-    WeaponCalculator calc(valTier, obj->level, obj->value0(), aveIndexBonus);
+    WeaponCalculator calc(valTier, obj->level, obj->value0(), aveIndexBonus, aveMult);
     obj->value1(calc.getValue1());
     obj->value2(calc.getValue2());
     return *this;
@@ -226,7 +232,7 @@ const WeaponGenerator & WeaponGenerator::assignValues() const
 
 int WeaponGenerator::maxDamroll() const
 {
-    return WeaponCalculator(drTier, obj->level, obj->value0(), drIndexBonus).getDamroll();
+    return (int)(WeaponCalculator(drTier, obj->level, obj->value0(), drIndexBonus).getDamroll() * damrollMult);
 }
 
 int WeaponGenerator::maxHitroll() const
@@ -368,6 +374,9 @@ bool WeaponGenerator::rejectsMetal() const
 
 WeaponGenerator & WeaponGenerator::randomAffixes()
 {
+    if (useM())
+        return randomAffixesM();
+
     affix_generator gen(valTier);
 
     // Set requirements and restrictions assigned directly to the generator.
@@ -536,6 +545,342 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 
     // Remember affixes choice on the item.
     obj->setProperty("affixes", affixNames.toString());
+
+    return *this;
+}
+
+/*--------------------------------------------------------------------------
+ * Weapons on the M budget
+ *-------------------------------------------------------------------------*/
+static const Json::Value & weapon_m_config()
+{
+    return item_affixes_config()["_weapons"];
+}
+
+bool WeaponGenerator::useM() const
+{
+    if (mMode >= 0)
+        return mMode > 0;
+    return weapon_m_config()["use_m"].asBool();
+}
+
+static bool json_list_has(const Json::Value &list, const char *name)
+{
+    for (auto const &v: list)
+        if (v.asString() == name)
+            return true;
+    return false;
+}
+
+/** Two-handedness is a property of the weapon, decided before the affixes: the
+ *  caller, the class and the name may require or forbid it, else a flat chance. */
+bool WeaponGenerator::decideTwoHands() const
+{
+    if (required.count("two_hands")
+            || json_list_has(wclassConfig["requires"], "two_hands")
+            || json_list_has(nameConfig["requires"], "two_hands"))
+        return true;
+
+    if (forbidden.count("two_hands")
+            || json_list_has(wclassConfig["forbids"], "two_hands")
+            || json_list_has(nameConfig["forbids"], "two_hands"))
+        return false;
+
+    return chance(weapon_m_config()["two_hand_chance"].asInt());
+}
+
+namespace {
+
+/** The weapon side of the item affix pool. */
+class WeaponAffixRoller : public ItemAffixRoller {
+public:
+    WeaponAffixRoller(Object *obj, PCharacter *pch, int tier, float share)
+        : ItemAffixRoller(obj, pch, tier, "weapon", "wield"),
+          share(share), weaponFlags(0, &weapon_type2),
+          hrBonus(0), drBonus(0), aveBonus(0)
+    {
+    }
+
+    void setCaster(bool caster) { isCaster = caster; }
+    void setAlign(int a) { align = a; }
+
+    void run(const std::set<DLString> &requiredNames, int maxAffixesBonus)
+    {
+        const weapon_tier_t &t = weapon_tier_table[tier - 1];
+
+        learnPlayerGroups();
+        collectCandidates();
+
+        std::set<int> forced;
+        for (int i = 0; i < (int)pool.size(); i++)
+            if (requiredNames.count(pool[i].value))
+                forced.insert(i);
+
+        pickAffixes((int)(t.min_m * share), (int)(t.max_m * share), t.worst_penalty_m,
+                    t.max_affixes_m > 0 ? t.max_affixes_m + maxAffixesBonus : 0,
+                    t.max_negatives_m, forced);
+
+        for (auto const &p: chosen)
+            applyOne(pool[p.first], p.second);
+    }
+
+    /** One prefix and one suffix, the two-handed adjective among the prefixes. */
+    void names(const Json::Value *twoHands, const Json::Value *&pre, int &a,
+               const Json::Value *&suf, int &n) const
+    {
+        vector<NamePart> prefixes, suffixes;
+        if (twoHands)
+            prefixes.push_back({max(1, chosenTotal / 2), twoHands});
+        pickNameParts(prefixes, suffixes, pre, a, suf, n);
+    }
+
+    const std::list<Affect> & getAffects() const { return affects; }
+    const Flags & getExtraFlags() const { return extraFlags; }
+    const DLString & getMaterial() const { return materialName; }
+    const StringSet & getAffixNames() const { return affixNames; }
+    int getTotal() const { return chosenTotal; }
+
+    std::set<DLString> forbidden;
+    std::set<DLString> preferred;
+    float share;
+    Flags weaponFlags;
+    float hrBonus, drBonus, aveBonus;
+
+protected:
+    virtual bool valueAllowed(const DLString &secName, const DLString &value) const
+    {
+        return forbidden.count(value) == 0;
+    }
+
+    virtual int candidateWeight(const DLString &secName, const Json::Value &affix) const
+    {
+        int weight = ItemAffixRoller::candidateWeight(secName, affix);
+        if (preferred.count(affix["value"].asString()))
+            weight *= 3;
+        return weight;
+    }
+
+    virtual int candidatePrice(const DLString &secName, const Json::Value &affix, bool &allowed) const
+    {
+        if (secName == "flag")
+            return flagPrice(affix, allowed);
+
+        if (affix["dynamic_price"].asBool()) {
+            int price = stepPrice(affix);
+            allowed = (price != 0);
+            return price;
+        }
+
+        return ItemAffixRoller::candidatePrice(secName, affix, allowed);
+    }
+
+private:
+    /** price_by_level interpolated at the item level, clamped to the end points. */
+    int flagPrice(const Json::Value &affix, bool &allowed) const
+    {
+        const Json::Value &table = affix["price_by_level"];
+        std::map<int, int> points;
+        for (auto const &lvl: table.getMemberNames())
+            points[DLString(lvl).toInt()] = table[lvl].asInt();
+
+        allowed = false;
+        if (points.empty())
+            return 0;
+
+        int level = obj->level, price;
+        if (level <= points.begin()->first)
+            price = points.begin()->second;
+        else if (level >= points.rbegin()->first)
+            price = points.rbegin()->second;
+        else {
+            auto hi = points.upper_bound(level);
+            auto lo = std::prev(hi);
+            price = lo->second + (hi->second - lo->second) * (level - lo->first) / (hi->first - lo->first);
+        }
+
+        // Allowed on the cheapest tier whose window covers the price, and on every
+        // better one; dearer than the legendary window, never.
+        int gate = 0;
+        for (int t = WORST_TIER; t >= BEST_TIER; t--)
+            if (price <= weapon_tier_table[t - 1].max_m * share) {
+                gate = t;
+                break;
+            }
+
+        if (affix.isMember("min_tier"))
+            gate = min(gate, affix["min_tier"].asInt());
+
+        allowed = (gate > 0 && tier <= gate);
+        return price;
+    }
+
+    /** A step of the base table (ave, damroll, hitroll index) priced at the item
+     *  level by the item_value weights the gear sage uses: one M is one level's
+     *  worth (item_value "level") at the reference level, scaled by measure rolls. */
+    int stepPrice(const Json::Value &affix) const
+    {
+        DLString value = affix["value"].asString();
+        DLString norm = (!value.empty() && (value.at(0) == '-' || value.at(0) == '+')) ? value.substr(1) : value;
+        float step = affix["step"].asFloat();
+        int wclass = obj->value0();
+        const char *profile = isCaster ? "caster" : "melee";
+
+        double points;
+        if (norm == "ave") {
+            int now = WeaponCalculator(tier, obj->level, wclass, 0, share).getAve();
+            int then = WeaponCalculator(tier, obj->level, wclass, step, share).getAve();
+            points = (then - now) * item_value(profile, "weapon_weight", 12);
+        } else if (norm == "dr") {
+            int now = WeaponCalculator(tier, obj->level, wclass, 0).getDamroll();
+            int then = WeaponCalculator(tier, obj->level, wclass, step).getDamroll();
+            points = (then - now) * share * item_value(profile, "damroll", 12);
+        } else if (norm == "hr") {
+            int now = WeaponCalculator(tier, obj->level, wclass, 0).getDamroll();
+            int then = WeaponCalculator(tier, obj->level, wclass, step).getDamroll();
+            points = (then - now) * item_value(profile, "hitroll", 6);
+        } else {
+            return 0;
+        }
+
+        double factor = item_value("measure", "default_factor", 11);
+        if (factor < 1)
+            factor = 11;
+        int ref = (int)item_value("measure", "ref_level", 60);
+        double rollsHere = max(1, (int)(obj->level / factor));
+        double rollsRef = max(1, (int)(ref / factor));
+        double oneM = item_value(profile, "level", isCaster ? 127 : 107) * rollsHere / rollsRef;
+        if (oneM <= 0)
+            return 0;
+
+        return (int)std::round(100 * points / oneM);
+    }
+
+    void applyOne(const Candidate &c, int count)
+    {
+        const Json::Value &affix = *c.affix;
+        const DLString &sec = c.section;
+
+        if (sec == "flag") {
+            affixNames.insert(c.value);
+            extraFlags.setBits(affix["extra"].asString());
+            weaponFlags.setBits(c.value);
+
+        } else if (sec == "weapon_material") {
+            affixNames.insert(c.value);
+            extraFlags.setBits(affix["extra"].asString());
+            materialName = c.value;
+
+        } else if (sec == "affects_by_tier") {
+            affixNames.insert(c.value);
+            extraFlags.setBits(affix["extra"].asString());
+            float bonus = affix["step"].asFloat() * count;
+            if (c.norm == "hr")
+                hrBonus += bonus;
+            else if (c.norm == "dr")
+                drBonus += bonus;
+            else if (c.norm == "ave")
+                aveBonus += bonus;
+
+        } else if (!applyShared(c, count)) {
+            warn("Weapon generator: affix %s in unknown section %s.", c.value.c_str(), sec.c_str());
+        }
+    }
+};
+
+}
+
+WeaponGenerator & WeaponGenerator::randomAffixesM()
+{
+    const Json::Value &config = weapon_m_config();
+    bool twoHands = decideTwoHands();
+    float share = twoHands ? config["two_hand_k"].asFloat() : 1;
+    if (share < 1)
+        share = 1;
+
+    WeaponAffixRoller roller(obj, pch, valTier, share);
+    roller.setCaster(isCaster);
+    roller.setAlign(align);
+
+    // Same exclusions the points generator honours: the caller's, the class's and
+    // the name's, metal for a druid, hr/dr steps that round to nothing here.
+    set<DLString> requiredNames = required;
+    auto addAll = [](const Json::Value &list, set<DLString> &to) {
+        for (auto const &v: list)
+            to.insert(v.asString());
+    };
+    roller.forbidden = forbidden;
+    addAll(wclassConfig["forbids"], roller.forbidden);
+    addAll(nameConfig["forbids"], roller.forbidden);
+    addAll(wclassConfig["requires"], requiredNames);
+    addAll(nameConfig["requires"], requiredNames);
+    addAll(wclassConfig["prefers"], roller.preferred);
+    addAll(nameConfig["prefers"], roller.preferred);
+
+    if (rejectsMetal()) {
+        roller.forbidden.insert("platinum");
+        roller.forbidden.insert("titanium");
+    }
+    if (maxHitroll() <= 0) {
+        roller.forbidden.insert("hr");
+        roller.forbidden.insert("-hr");
+    }
+    if (maxDamroll() <= 0) {
+        roller.forbidden.insert("dr");
+        roller.forbidden.insert("-dr");
+    }
+
+    roller.run(requiredNames, twoHands ? 1 : 0);
+
+    weaponFlags.setBit(roller.weaponFlags.getValue());
+    if (twoHands) {
+        weaponFlags.setBit(WEAPON_TWO_HANDS);
+        extraFlags.setBits(config["two_hands"]["extra"].asString());
+        aveMult = damrollMult = share;
+    }
+
+    // Additional flags configured for weapon class, as the points generator does.
+    for (auto const &flag: wclassConfig["flags"].getMemberNames())
+        if (chance(wclassConfig["flags"][flag].asInt()))
+            weaponFlags.setBits(flag);
+
+    extraFlags.setBit(roller.getExtraFlags().getValue());
+    if (!roller.getMaterial().empty())
+        materialName = roller.getMaterial();
+    hrIndexBonus += roller.hrBonus;
+    drIndexBonus += roller.drBonus;
+    aveIndexBonus += roller.aveBonus;
+
+    for (auto af: roller.getAffects())
+        affects.push_back(af);
+
+    // One adjective and one noun, so setShortDescr has exactly one of each to take.
+    const Json::Value *pre, *suf;
+    int a, n;
+    roller.names(twoHands ? &config["two_hands"] : 0, pre, a, suf, n);
+
+    auto form = [](const Json::Value *affix, const char *field, int idx) -> DLString {
+        if (!affix || idx < 0)
+            return DLString::emptyString;
+        const Json::Value &forms = (*affix)[field];
+        return idx < (int)forms.size() ? DLString(forms[idx].asString()) : DLString::emptyString;
+    };
+
+    if (pre) {
+        adjectives.push_back(form(pre, "adjectives", a));
+        adjectives_en.push_back(form(pre, "adjectives_en", a));
+        adjectives_ua.push_back(form(pre, "adjectives_ua", a));
+    }
+    if (suf) {
+        nouns.push_back(form(suf, "nouns", n));
+        nouns_en.push_back(form(suf, "nouns_en", n));
+        nouns_ua.push_back(form(suf, "nouns_ua", n));
+    }
+
+    StringSet names = roller.getAffixNames();
+    if (twoHands)
+        names.insert("two_hands");
+    obj->setProperty("affixes", names.toString());
+    obj->setProperty("measure_m", roller.getTotal());
 
     return *this;
 }
@@ -994,8 +1339,15 @@ const WeaponGenerator & WeaponGenerator::assignColours() const
 
 const WeaponGenerator & WeaponGenerator::assignAffects() const
 {
+    // affect_enhance merges by location and type only: two bit affects (haste and
+    // protect evil, both location none) or two scoped skill-group affects would fold
+    // into one and lose a bit or a scope. Only plain stats may merge.
     for (auto &af: affects) {
-        affect_enhance(obj, &af);
+        Affect copy = af;
+        if (copy.bitvector.getTable() != 0 || !copy.global.empty())
+            affect_to_obj(obj, &copy);
+        else
+            affect_enhance(obj, &copy);
     }
 
     return *this;
