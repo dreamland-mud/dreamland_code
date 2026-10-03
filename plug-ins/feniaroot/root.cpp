@@ -30,6 +30,7 @@
 #include "move_utils.h"
 #include "math_utils.h"
 #include "weapongenerator.h"
+#include "weaponcalculator.h"
 #include "armorgenerator.h"
 #include "weapontier.h"
 #include "act.h"
@@ -1711,6 +1712,20 @@ NMI_INVOKE(Root, bestWeaponClass, "(ch): класс оружия, раскача
     // NPCs have no skill percentages to compare, so getPC() is null for them and
     // the empty result reads as 'roll a class as before'.
     return Register(best_weapon_class(ch->getPC()));
+}
+
+NMI_INVOKE(Root, weaponBaseRoll, "(tier, level, wclass): базовый hitroll/damroll оружия этого tier, уровня и класса по таблице weapon_damroll_tiers; цель для enchant weapon и temper")
+{
+    int tier = argnum2number(args, 1);
+    int level = URANGE(1, argnum2number(args, 2), MAX_LEVEL);
+    int wclass = argnum2number(args, 3);
+
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid weapon tier.");
+    if (!weapon_class_exists(weapon_class.name(wclass)))
+        throw Scripting::Exception("Unknown weapon class.");
+
+    return Register(WeaponCalculator(tier, level, wclass).getDamroll());
 }
 
 NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]): выставить статы для weapon или улучшить в бою")
