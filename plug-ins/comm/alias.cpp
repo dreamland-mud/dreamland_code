@@ -52,6 +52,24 @@ public:
 const DLString XMLAttributeAliases::TYPE = "XMLAttributeAliases";
 
 
+/*
+ * A stored body is re-split on a single '|' when the alias fires (get_multi_command),
+ * while typing '||' yields a literal '|'. So the text a player must type to recreate
+ * the body is the stored one with every '|' doubled.
+ */
+static DLString aliasBodyForDisplay( const DLString &body )
+{
+    DLString result;
+
+    for (DLString::size_type i = 0; i < body.size( ); i++) {
+        result.push_back( body[i] );
+        if (body[i] == '|')
+            result.push_back( '|' );
+    }
+
+    return result;
+}
+
 /*-----------------------------------------------------------------------------
  * 'alias' command 
  *----------------------------------------------------------------------------*/
@@ -81,7 +99,7 @@ CMDRUN(alias)
         buf << "Определенные синонимы:" << endl;
         
         for (i = aliases->begin( ); i != aliases->end( ); i++)
-            buf << "    " << i->first << ":  " << i->second << "{x" << endl;
+            buf << "    " << i->first << ":  " << aliasBodyForDisplay( i->second.getValue( ) ) << "{x" << endl;
 
         pch->send_to( buf );
         return;
@@ -97,7 +115,7 @@ CMDRUN(alias)
         i = aliases->find( arg );
         
         if (i != aliases->end( ))
-            pch->pecho( _("%s означает '%s{x'."), arg.c_str( ), i->second.getValue( ).c_str( ) );
+            pch->pecho( _("синоним %s %s{x"), arg.c_str( ), aliasBodyForDisplay( i->second.getValue( ) ).c_str( ) );
         else
             pch->pecho(_("Этот синоним не задан."));
 
@@ -109,7 +127,7 @@ CMDRUN(alias)
     if (i != aliases->end( )) // redefine an alias
     {
         i->second.setValue( argument );
-        pch->pecho( _("%s меняет свое значение на '%s{x'."), arg.c_str( ), argument.c_str( ) );
+        pch->pecho( _("%s меняет свое значение на '%s{x'."), arg.c_str( ), aliasBodyForDisplay( argument ).c_str( ) );
         return;
     }
 
@@ -122,7 +140,7 @@ CMDRUN(alias)
     // make a new alias
     (**aliases) [arg] = argument;
 
-    pch->pecho( _("%s теперь будет означать '%s{x'."), arg.c_str( ), argument.c_str( ) );
+    pch->pecho( _("%s теперь будет означать '%s{x'."), arg.c_str( ), aliasBodyForDisplay( argument ).c_str( ) );
 }
 
 

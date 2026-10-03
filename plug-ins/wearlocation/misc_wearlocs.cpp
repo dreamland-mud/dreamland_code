@@ -269,7 +269,16 @@ bool SheathWearloc::displayFlags(Character *ch, Object *obj)
  */
 DLString SheathWearloc::displayName(Character *ch, Object *obj, lang_t lang)
 {
-    DLString eqName = obj->getProperty("eqName");
+    // Per-language short forms are stored next to the Russian one by the generator.
+    // A viewer whose language has no stored form gets the full default name rather
+    // than the Russian noun.
+    DLString eqName;
+    if (lang == LANG_RU)
+        eqName = obj->getProperty("eqName");
+    else if (lang == LANG_EN)
+        eqName = obj->getProperty("eqName_en");
+    else if (lang == LANG_UA)
+        eqName = obj->getProperty("eqName_ua");
 
     if (!eqName.empty())
         return eqName.ruscase('1');

@@ -482,10 +482,18 @@ CMDRUNP( affects )
     }
 
     if (IS_CHARMED(ch)) {
+        // A summoned pet disappears when its timer runs out. The timer counts down once
+        // per char tick, the same unit as affect durations (shown as hours above).
+        DLString lifeLine;
+        if (ch->is_npc( ) && ch->timer > 0)
+            lifeLine = fmt( 0, _("{yИсчезнет через {m%1$d{y час%1$Iа|ов|ов.{x").getMessage( Player::displayLang( viewer ) ).c_str( ), ch->timer );
+
         // Raw affected_by/res/imm/detect bits (e.g. fly from worn wings) never
         // enter ch->affected, so they only surface through permAff.
         if (buf.str( ).empty( ) && !permAff.isSet( )) {
             oldact(_("$C1 не находится под действием каких-либо аффектов."), ch->master, 0, ch, TO_CHAR);
+            if (!lifeLine.empty( ))
+                ch->master->pecho( lifeLine );
             return;
         }
 
@@ -498,6 +506,9 @@ CMDRUNP( affects )
         if (listed && permAff.isSet( ))
             ch->master->pecho( "" );
         permAff.printAll( );
+
+        if (!lifeLine.empty( ))
+            ch->master->pecho( lifeLine );
         return;
     }
 

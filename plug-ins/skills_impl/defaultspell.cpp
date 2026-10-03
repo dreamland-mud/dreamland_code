@@ -293,7 +293,8 @@ void DefaultSpell::showFlavour( Character *ch, Character *victim, const CastFlav
         if (msg.empty( ))
             continue;
 
-        rch->pecho( MultiMessage( msg, GROUPS_L10N_FILE ), ch );
+        // Sleepers (and below) don't see the cast; resting and above do.
+        rch->pecho( POS_RESTING, MultiMessage( msg, GROUPS_L10N_FILE ), ch );
     }
 }
 
