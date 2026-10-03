@@ -5322,7 +5322,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 }
                 gaLeftBest = std::max( gaLeftWorn, std::max( dualScore, keepScore ) );
                 gaLeftScored = true;
-                gaGoDual = dualScore > keepScore;
+                // Same rounded values the dual line prints, so the list and the verdict agree.
+                gaGoDual = (int)(dualScore + 0.5) > (int)(keepScore + 0.5);
 
                 if (pickBetter) {
                     GACand pick = *bestOff;
