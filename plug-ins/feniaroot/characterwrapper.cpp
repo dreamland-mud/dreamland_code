@@ -5078,24 +5078,26 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // ---- end set awareness (folded into the percentile + chase below) ----------
 
     double wornTotal = 0, bestTotal = 0;
+    // The shield and held-item share of both totals, swapped below for the left-hand
+    // verdict's build scores when there is one.
+    double leftWornSlots = 0, leftBestSlots = 0;
     for (auto &kv: slotCeil) {
         if (neutralSlots & kv.first)   // unvaluable worn-set slot: neutral, out of the %
             continue;
         std::map<int,double>::iterator wi = wornSlot.find( kv.first );
-        wornTotal += (wi != wornSlot.end( )) ? wi->second : 0.0;
+        double wv = (wi != wornSlot.end( )) ? wi->second : 0.0;
+        wornTotal += wv;
         bestTotal += kv.second;
+        if (kv.first & (ITEM_WEAR_SHIELD | ITEM_HOLD)) {
+            leftWornSlots += wv;
+            leftBestSlots += kv.second;
+        }
     }
     // Set bonuses: a complete worn set is real kit value; the ideal kit assembles the
     // best worth-it sets. bestSetBonus >= wornSetBonus in the common case (your set is
     // among the worth-it claimed), so the final clamp only bites on a mixed kit.
     wornTotal += wornSetBonus;
     bestTotal += bestSetBonus;
-
-    int pct = 0;
-    if (bestTotal > 0)
-        pct = (int)( 100.0 * wornTotal / bestTotal + 0.5 );
-    if (pct > 100) pct = 100;   // set slots relax the per-slot cap; this is the backstop
-    if (pct < 0)   pct = 0;     // a kit full of cursed maledictions can sum negative
 
     // Paired armour slots (finger/neck/wrist) have two positions. The general chase
     // must (a) offer a FILL when a position is empty (baseline 0 -- a pure gain), and
@@ -5255,6 +5257,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     };
 
     RegList::Pointer dualInfo( NEW );
+    // Set by a left-hand verdict: the chase list must not push the losing build, and the
+    // percentile scores the left hand as one build instead of shield + hold slots that a
+    // dual-wielder leaves empty on purpose.
+    bool gaGoDual = false, gaLeftScored = false;
+    double gaLeftWorn = 0, gaLeftBest = 0;
     {
         int dState = 0, dUnlock = 0;
         double dualScore = 0, keepScore = 0;
@@ -5299,10 +5306,24 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 if (haveShield)
                     keepScore += om.pShield * om.blowValue;
 
-                dualScore = pickBetter ? bestOffVal : offWornVal;
+                double dualExtra = om.pCross * om.blowValue;
                 if (haveShield)
-                    dualScore += w.weaponWeight * 0.05 * om.mainEff;
-                dualScore += om.pCross * om.blowValue;
+                    dualExtra += w.weaponWeight * 0.05 * om.mainEff;
+                dualScore = (pickBetter ? bestOffVal : offWornVal) + dualExtra;
+
+                // What the left hand holds now, in the same units as the two builds.
+                if (gaOffhand != 0)
+                    gaLeftWorn = offWornVal + dualExtra;
+                else {
+                    gaLeftWorn = (gaShield ? ga_score( target, gaShield, w, rawStat, capStat, true ) : 0)
+                               + (gaHold   ? ga_score( target, gaHold,   w, rawStat, capStat, true ) : 0);
+                    if (gaShield)
+                        gaLeftWorn += om.pShield * om.blowValue;
+                }
+                gaLeftBest = std::max( gaLeftWorn, std::max( dualScore, keepScore ) );
+                gaLeftScored = true;
+                // Same rounded values the dual line prints, so the list and the verdict agree.
+                gaGoDual = (int)(dualScore + 0.5) > (int)(keepScore + 0.5);
 
                 if (pickBetter) {
                     GACand pick = *bestOff;
@@ -5319,6 +5340,16 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         dualInfo->push_back( Register( (int)(keepScore + 0.5) ) );
         dualInfo->push_back( dEntry );
     }
+
+    if (gaLeftScored) {
+        wornTotal += gaLeftWorn - leftWornSlots;
+        bestTotal += gaLeftBest - leftBestSlots;
+    }
+    int pct = 0;
+    if (bestTotal > 0)
+        pct = (int)( 100.0 * wornTotal / bestTotal + 0.5 );
+    if (pct > 100) pct = 100;   // set slots relax the per-slot cap; this is the backstop
+    if (pct < 0)   pct = 0;     // a kit full of cursed maledictions can sum negative
 
     // Slot-browse mode: the char asked for one wear slot ("service advice neck").
     // Return the top-5 wearable-now items in that slot by raw score (Fenia orders
@@ -5529,6 +5560,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // more than 10 levels above them. Buy/quest have no such guard.
         if ((byOpt[k].acq.method == GA_KILL || byOpt[k].acq.method == GA_PICKUP)
             && byOpt[k].acq.guard > chLevel + 10)
+            continue;
+        // The verdict says go dual: a shield or held item would take the off-hand back.
+        if (gaGoDual && (byOpt[k].slot & (ITEM_WEAR_SHIELD | ITEM_HOLD)))
             continue;
         if (optSlot.count( byOpt[k].slot )) continue;   // one item per slot-type
         optSlot[byOpt[k].slot] = byOpt[k].score;
