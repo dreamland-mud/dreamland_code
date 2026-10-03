@@ -34,6 +34,7 @@
 #include "weaponcalculator.h"
 #include "armorgenerator.h"
 #include "itemmodel.h"
+#include "damage.h"
 #include "weapontier.h"
 #include "act.h"
 #include "lang.h"
@@ -1758,6 +1759,35 @@ NMI_INVOKE(Root, itemScore, "(obj, ch, profile): ценность предмет
     DLString profile = argnum2string(args, 3);
 
     return Register((int)std::round(ga_item_score(ch, obj, profile == "caster")));
+}
+
+// Combat proc helpers (fight_core damage_impl.cpp, skills_impl feniaskillaction.cpp).
+double spell_proc_tier_value( const DLString &spellName, int level );
+
+NMI_INVOKE(Root, itemCombatPoints, "(dmgPerRound, controlPct, level, profile): очки оценки боевого эффекта: dmgPerRound доп. урона за раунд и controlPct процентов снятого входящего урона, по эталонному игроку fight/pc_baseline; profile caster|melee")
+{
+    double dmg = argnum2number(args, 1);
+    double control = argnum2number(args, 2) / 100.0;
+    int level = URANGE(1, argnum2number(args, 3), MAX_LEVEL);
+    DLString profile = argnum2string(args, 4);
+
+    return Register((int)std::round(item_combat_points(dmg, control, level, profile == "caster")));
+}
+
+NMI_INVOKE(Root, itemProcPoints, "(spell, chance, level, profile): очки оценки боевого прока: ожидаемый урон заклинания на уровне предмета (тир или явное значение) x шанс за раунд, по эталонному игроку; profile caster|melee")
+{
+    DLString spell = argnum2string(args, 1);
+    double chance = argnum2number(args, 2);
+    int level = URANGE(1, argnum2number(args, 3), MAX_LEVEL);
+    DLString profile = argnum2string(args, 4);
+
+    double v = spell_combat_value(spell);
+    if (v > 0)
+        v *= level / spell_combat_level_ref();
+    else
+        v = spell_proc_tier_value(spell, level) * spell_combat_save_factor();
+
+    return Register((int)std::round(item_combat_points(v * chance / 100.0, 0, level, profile == "caster")));
 }
 
 NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]): выставить статы для weapon или улучшить в бою")
