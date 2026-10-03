@@ -91,7 +91,8 @@ private:
     DLString nonMetalDefault() const;
     void rememberAffect(Affect &af);
     bool useM() const;
-    bool decideTwoHands() const;
+    void decideTwoHands();
+    bool nameFitsHands(const Json::Value &config) const;
     int calcAffectModifier(const Json::Value &afConfig, const affix_info &info) const;
     int maxDamroll() const;
     int maxHitroll() const;
@@ -128,6 +129,8 @@ private:
     int mMode;
 
     // Two-hander share on the M budget: base ave and damroll are scaled by it.
+    bool twoHands;
+    bool twoHandsDecided;
     float aveMult;
     float damrollMult;
 
