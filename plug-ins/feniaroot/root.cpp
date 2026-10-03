@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <cmath>
 #include <math.h>
 #include <string.h>
 
@@ -32,6 +33,7 @@
 #include "weapongenerator.h"
 #include "weaponcalculator.h"
 #include "armorgenerator.h"
+#include "itemmodel.h"
 #include "weapontier.h"
 #include "act.h"
 #include "lang.h"
@@ -1726,6 +1728,36 @@ NMI_INVOKE(Root, weaponBaseRoll, "(tier, level, wclass): базовый hitroll/
         throw Scripting::Exception("Unknown weapon class.");
 
     return Register(WeaponCalculator(tier, level, wclass).getDamroll());
+}
+
+// Gear-sage scorer in characterwrapper.cpp, shared with gearAdvice.
+double ga_item_points( ::Object *o, bool caster );
+double ga_item_score( Character *target, ::Object *o, bool caster );
+
+NMI_INVOKE(Root, itemOneM, "(level, profile[, slot]): одна мера M в очках оценки (dr + hr + 10 hp + 10 mana за бросок, броски = level / коэффициент слота); profile caster|melee")
+{
+    int level = URANGE(1, argnum2number(args, 1), MAX_LEVEL);
+    DLString profile = argnum2string(args, 2);
+    DLString slot = args.size() > 2 ? argnum2string(args, 3) : DLString::emptyString;
+
+    return Register((int)std::round(item_one_m(level, profile == "caster", slot)));
+}
+
+NMI_INVOKE(Root, itemPoints, "(obj, profile): базовая ценность предмета в очках оценки, без поправок на персонажа (AC на уровне предмета); profile caster|melee")
+{
+    ::Object *obj = argnum2item(args, 1);
+    DLString profile = argnum2string(args, 2);
+
+    return Register((int)std::round(ga_item_points(obj, profile == "caster")));
+}
+
+NMI_INVOKE(Root, itemScore, "(obj, ch, profile): ценность предмета для персонажа ch так, как ее считает мудрец (service advice): база с поправками на статы, навыки и уже имеющиеся флаги; profile caster|melee")
+{
+    ::Object *obj = argnum2item(args, 1);
+    Character *ch = argnum2character(args, 2);
+    DLString profile = argnum2string(args, 3);
+
+    return Register((int)std::round(ga_item_score(ch, obj, profile == "caster")));
 }
 
 NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]): выставить статы для weapon или улучшить в бою")

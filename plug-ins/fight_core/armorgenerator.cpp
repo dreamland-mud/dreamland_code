@@ -4,6 +4,7 @@
 #include "weapongenerator.h"
 #include "weapontier.h"
 #include "itemvalue.h"
+#include "itemmodel.h"
 
 #include "logstream.h"
 #include "grammar_entities_impl.h"
@@ -474,12 +475,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
  *-------------------------------------------------------------------------*/
 int ItemAffixRoller::rolls() const
 {
-    double factor = item_value("measure", "default_factor", 11);
-    factor = item_value_sub("measure", "slot_factor", slot.c_str(), factor);
-    if (factor < 1)
-        factor = 11;
-
-    return max(1, (int)(obj->level / factor));
+    return item_rolls(obj->level, slot);
 }
 
 /** unit: per measure roll (stats). mult: weapon style, per level. mod: flat. */

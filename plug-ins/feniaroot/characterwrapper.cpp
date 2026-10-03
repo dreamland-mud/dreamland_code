@@ -50,6 +50,7 @@
 #include "weapons.h"
 #include "damage.h"
 #include "itemvalue.h"
+#include "itemmodel.h"
 #include "armorgenerator.h"
 #include "skill_utils.h"
 #include "stats_apply.h"
@@ -3244,28 +3245,8 @@ static void ga_record( std::map<int,GAAcq> &acq, int vnum, int method, int aux, 
     acq[vnum] = a;
 }
 
-struct GAWeights {
-    double hp = 0, mana = 0, manaGain = 0, healGain = 0, dr = 0, hr = 0, saves = 0;
-    double weaponWeight = 0;   // per-average-weapon-damage weight, split from dr so a
-                           // caster can value a weapon's melee output below its
-                           // damroll (a staff's stats should out-rank a raw sword).
-    double stat[6] = {};   // str, int, wis, dex, con, cha
-    // Phase 3b / F3 additions: affect flags, res/imm/vuln, and the applies ga_score
-    // used to ignore. `caster` picks the melee/caster value for profile-split flags.
-    bool   caster = false;
-    double ac = 0, slevel = 0, level = 0, skillLevel = 0, skillLevelSkill = 0, move = 0, beats = 0;
-    double spellFactor = 1.0;   // slevel discount for a char with few/no spells (0..1)
-    double learnSkill = 0, learnGroup = 0, learnAll = 0;   // APPLY_LEARNED %, by global scope
-    // affect_flags the char already has for free (perma affects + worn gear OUTSIDE the
-    // candidate's slot). A CANDIDATE re-granting one scores it 0 in ga_affectFlagValue.
-    // Set PER CANDIDATE before scoring (slot-excluded); stays 0 for the worn baseline.
-    bitstring_t heldFlags = 0;
-    // Score value of one swing of the char's currently-wielded weapon (weaponWeight*eff),
-    // set once in gearAdvice. A NON-weapon item granting extra melee attacks (a belt, a
-    // ring) scores its combathits on this -- those swings fire the worn weapon, so they use
-    // the same currency a weapon's own combathits do. -1 = no usable weapon wielded.
-    double curWeaponSwing = -1.0;
-};
+// Profile weights: fight_core/itemmodel.h, one table for the sage and the generators.
+typedef ItemWeights GAWeights;
 
 struct GACand {
     obj_index_data *pObj;
@@ -3338,9 +3319,7 @@ static bool ga_canDualWield( Character *ch )
 // stat cap are worth anything. base = the stat WITHOUT the item being scored.
 static double ga_statgain( int base, int delta, int cap )
 {
-    int before = URANGE( MIN_STAT, base,         cap );
-    int after  = URANGE( MIN_STAT, base + delta, cap );
-    return after - before;
+    return item_fit_stat( base, delta, cap );
 }
 
 // ga_score's stat[] weight order (str,int,wis,dex,con,cha) -> STAT_ index.
@@ -3549,10 +3528,7 @@ static bool ga_clericCanCompound( Character *target, ::Object *o )
 // never over-discounts.
 static bool ga_canSelfCast( Character *target, const char *name )
 {
-    if (target == 0)
-        return false;
-    Skill *sk = skillManager->findExisting( name );
-    return sk != 0 && sk->available( target );
+    return item_fit_self_cast( target, name );
 }
 
 // Value of an affect_flags bitvector (sanctuary/haste/stealth; negatives are
@@ -3564,100 +3540,12 @@ static bool ga_canSelfCast( Character *target, const char *name )
 // capability). Curses and gear-only bits (no matching spell) never discount.
 static double ga_affectFlagValue( bitstring_t b, bool caster, Character *target, bitstring_t heldFlags )
 {
-    double s = 0;
-    auto v = [&]( bitstring_t flag, double base, const char *spell ) -> double {
-        if (!IS_SET( b, flag ))
-            return 0;
-        // Already have this buff for free from other worn gear or a permanent affect?
-        // A second copy is pure redundancy -- worth nothing. Positives only: a curse
-        // penalty bit still counts, you don't "already have" a curse as a boon.
-        if (base > 0 && IS_SET( heldFlags, flag ))
-            return 0;
-        if (spell != 0 && ga_canSelfCast( target, spell ))
-            return base * 0.1;
-        return base;
-    };
-    s += v( AFF_SANCTUARY, item_value( "flags", "sanctuary", 300, caster ? 1 : 0 ), "sanctuary" );
-    s += v( AFF_HASTE, item_value( "flags", "haste", caster ? 40 : 110, caster ? 1 : 0 ), "haste" );
-    s += v( AFF_SLOW, item_value( "flags", "slow", caster ? -10 : -55, caster ? 1 : 0 ), 0 );
-    s += v( AFF_PROTECT_EVIL, item_value( "flags", "protect_evil", 60, caster ? 1 : 0 ), "protection evil" );
-    s += v( AFF_PROTECT_GOOD, item_value( "flags", "protect_good", 60, caster ? 1 : 0 ), "protection good" );
-    s += v( AFF_REGENERATION, item_value( "flags", "regeneration", caster ? 15 : 30, caster ? 1 : 0 ), 0 );
-    s += v( AFF_FLYING, item_value( "flags", "flying", 15, caster ? 1 : 0 ), "fly" );
-    s += v( AFF_PASS_DOOR, item_value( "flags", "pass_door", 15, caster ? 1 : 0 ), "pass door" );
-    s += v( AFF_INVISIBLE, item_value( "flags", "invisible", 15, caster ? 1 : 0 ), "invis" );
-    s += v( AFF_IMP_INVIS, item_value( "flags", "imp_invis", 100, caster ? 1 : 0 ), "improved invis" );
-    s += v( AFF_CAMOUFLAGE, item_value( "flags", "camouflage", 100, caster ? 1 : 0 ), "camouflage" );
-    s += v( AFF_FADE, item_value( "flags", "fade", 100, caster ? 1 : 0 ), "fade" );
-    s += v( AFF_SNEAK, item_value( "flags", "sneak", caster ? 8 : 12, caster ? 1 : 0 ), "sneak" );
-    s += v( AFF_HIDE, item_value( "flags", "hide", 6, caster ? 1 : 0 ), "hide" );
-    s += v( AFF_INFRARED, item_value( "flags", "infrared", 8, caster ? 1 : 0 ), "infravision" );
-    s += v( AFF_SWIM, item_value( "flags", "swim", 4, caster ? 1 : 0 ), 0 );
-    // Cursed-item penalties (never discounted).
-    s += v( AFF_STUN, item_value( "flags", "stun", -100, caster ? 1 : 0 ), 0 );
-    s += v( AFF_WEAK_STUN, item_value( "flags", "weak_stun", -40, caster ? 1 : 0 ), 0 );
-    s += v( AFF_BLIND, item_value( "flags", "blind", -200, caster ? 1 : 0 ), 0 );
-    s += v( AFF_SLEEP, item_value( "flags", "sleep", -250, caster ? 1 : 0 ), 0 );
-    s += v( AFF_CHARM, item_value( "flags", "charm", -250, caster ? 1 : 0 ), 0 );
-    s += v( AFF_CURSE, item_value( "flags", "curse", -35, caster ? 1 : 0 ), 0 );
-    s += v( AFF_CORRUPTION, item_value( "flags", "corruption", -50, caster ? 1 : 0 ), 0 );
-    s += v( AFF_POISON, item_value( "flags", "poison", -45, caster ? 1 : 0 ), 0 );
-    s += v( AFF_PLAGUE, item_value( "flags", "plague", -60, caster ? 1 : 0 ), 0 );
-    s += v( AFF_CALM, item_value( "flags", "calm", caster ? -5 : -25, caster ? 1 : 0 ), 0 );
-    s += v( AFF_WEAKEN, item_value( "flags", "weaken", -10, caster ? 1 : 0 ), 0 );
-    s += v( AFF_FAERIE_FIRE, item_value( "flags", "faerie_fire", -15, caster ? 1 : 0 ), 0 );
-    return s;
+    return item_flag_points( b, caster, target, heldFlags );
 }
 
-// Pick the res/imm/vuln column. kind: 0=resist, 1=immune, 2=vulnerable.
-static double ga_rv( int kind, double r, double i, double v )
-{
-    return kind == 1 ? i : (kind == 2 ? v : r);
-}
-
-// One damage class's res/imm/vuln worth from config/fight/item_value.json "res"
-// ([res, imm, vuln]); the literals are the defaults when the file lacks the row.
-static double ga_rvc( int kind, const char *name, double r, double i, double v )
-{
-    return ga_rv( kind, item_value( "res", name, r, 0 ), item_value( "res", name, i, 1 ), item_value( "res", name, v, 2 ) );
-}
-
-// Value of a res/imm/vuln bitvector. The three tables share bit positions
-// (immune_from_flags tests ONE bit against imm/res/vuln alike), so IMM_* constants
-// index every table. Resists DO NOT stack (immunity.cpp: a binary RESISTANT bit),
-// and imm_bash FULLY blocks bash weapon-hits (dam_type=DAM_BASH is set even for a
-// 'none' attack). weapon/spell are the broad channels; bash/pierce/slash are their
-// measured share of the weapon channel; elementals are danger-tiered (fire worst;
-// negative/mental/energy nukes; the rest at the floor). res=imm/3, vuln=-imm/2,
-// floor 10/30/-20. spell==magic==prayer collapse -- count once. DAMTYPE_MODEL.md.
 static double ga_resValue( bitstring_t b, int kind )
 {
-    double s = 0;
-    if (IS_SET(b, IMM_WEAPON)) s += ga_rvc(kind, "weapon", 140, 420, -210);
-    if (IS_SET(b, IMM_SPELL) || IS_SET(b, IMM_MAGIC) || IS_SET(b, IMM_PRAYER)) s += ga_rvc(kind, "spell", 50, 150, -75);
-    if (IS_SET(b, IMM_BASH)) s += ga_rvc(kind, "bash", 72, 216, -108);
-    if (IS_SET(b, IMM_PIERCE)) s += ga_rvc(kind, "pierce", 34, 103, -52);
-    if (IS_SET(b, IMM_SLASH)) s += ga_rvc(kind, "slash", 33, 100, -50);
-    if (IS_SET(b, IMM_FIRE)) s += ga_rvc(kind, "fire", 23, 70, -35);
-    if (IS_SET(b, IMM_ENERGY)) s += ga_rvc(kind, "energy", 17, 50, -25);
-    if (IS_SET(b, IMM_NEGATIVE)) s += ga_rvc(kind, "negative", 17, 50, -25);
-    if (IS_SET(b, IMM_LIGHTNING)) s += ga_rvc(kind, "lightning", 13, 40, -20);
-    if (IS_SET(b, IMM_ACID)) s += ga_rvc(kind, "acid", 13, 40, -20);
-    if (IS_SET(b, IMM_HOLY)) s += ga_rvc(kind, "holy", 13, 40, -20);
-    if (IS_SET(b, IMM_COLD)) s += ga_rvc(kind, "cold", 13, 40, -20);
-    if (IS_SET(b, IMM_POISON)) s += ga_rvc(kind, "poison", 13, 40, -20);
-    if (IS_SET(b, IMM_CHARM)) s += ga_rvc(kind, "charm", 10, 30, -20);
-    if (IS_SET(b, IMM_MENTAL)) s += ga_rvc(kind, "mental", 17, 50, -25);
-    if (IS_SET(b, IMM_DISEASE)) s += ga_rvc(kind, "disease", 10, 30, -20);
-    if (IS_SET(b, IMM_DROWNING)) s += ga_rvc(kind, "drowning", 10, 30, -20);
-    if (IS_SET(b, IMM_LIGHT)) s += ga_rvc(kind, "light", 10, 30, -20);
-    if (IS_SET(b, IMM_SOUND)) s += ga_rvc(kind, "sound", 10, 30, -20);
-    if (IS_SET(b, IMM_SUMMON)) s += ga_rvc(kind, "summon", 10, 30, -20);
-    if (IS_SET(b, IMM_IRON)) s += ga_rvc(kind, "iron", 10, 30, -20);
-    if (IS_SET(b, IMM_WOOD)) s += ga_rvc(kind, "wood", 10, 30, -20);
-    if (IS_SET(b, IMM_SILVER)) s += ga_rvc(kind, "silver", 10, 30, -20);
-    if (IS_SET(b, IMM_MITHRIL)) s += ga_rvc(kind, "mithril", 10, 30, -20);
-    return s;
+    return item_res_points( b, kind );
 }
 
 // One affect's profile-weighted worth: flat pools (hp/mana/regen/dr/hr/saves) fold
@@ -3717,8 +3605,6 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
 {
     int m = af.modifier;
     switch (af.location) {
-    case APPLY_HIT:       s += w.hp       * m; break;
-    case APPLY_MANA:      s += w.mana     * m; break;
     case APPLY_MANA_GAIN:
         // Diminishing worth: mana_gain is a PERCENT multiplier on base regen
         // (update_params.cpp), so once regen already outpaces in-combat spend the
@@ -3730,26 +3616,31 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
             s += w.manaGain * m * 100.0 / (100.0 + g0 + m / 2.0);
         }
         else
-            s += w.manaGain * m;
+            s += item_apply_points( APPLY_MANA_GAIN, m, w );
         break;
-    case APPLY_HEAL_GAIN: s += w.healGain * m; break;
-    case APPLY_DAMROLL:   s += w.dr       * m; break;
-    case APPLY_HITROLL:   s += w.hr       * m; break;
-    case APPLY_SAVES:
-    case APPLY_SAVING_ROD:
-    case APPLY_SAVING_PETRI:
-    case APPLY_SAVING_BREATH:
-    case APPLY_SAVING_SPELL: s += w.saves * (-m); break;  // lower save = better
     case APPLY_STR: statDelta[0] += m; break;
     case APPLY_INT: statDelta[1] += m; break;
     case APPLY_WIS: statDelta[2] += m; break;
     case APPLY_DEX: statDelta[3] += m; break;
     case APPLY_CON: statDelta[4] += m; break;
     case APPLY_CHA: statDelta[5] += m; break;
-    case APPLY_AC:          s += w.ac     * (-m); break;   // negative ac = better; w.ac level-scaled
-    case APPLY_SPELL_LEVEL: s += w.slevel * m * w.spellFactor; break;   // ~0 with no spells
-    case APPLY_MOVE:        s += w.move   * m; break;
-    case APPLY_BEATS:       s += w.beats  * (-m); break;   // shorter skill lag = better
+    // Plain applies: the shared base price (fight_core/itemmodel.cpp).
+    case APPLY_HIT:
+    case APPLY_MANA:
+    case APPLY_HEAL_GAIN:
+    case APPLY_DAMROLL:
+    case APPLY_HITROLL:
+    case APPLY_SAVES:
+    case APPLY_SAVING_ROD:
+    case APPLY_SAVING_PETRI:
+    case APPLY_SAVING_BREATH:
+    case APPLY_SAVING_SPELL:
+    case APPLY_AC:            // w.ac is level-scaled
+    case APPLY_SPELL_LEVEL:   // ~0 with no spells (w.spellFactor)
+    case APPLY_MOVE:
+    case APPLY_BEATS:
+        s += item_apply_points( af.location, m, w );
+        break;
     // +N levels: scope-split like APPLY_LEARNED -- one named skill < a group < all --
     // and capability-gated: +level to a skill the char can't use or a group it doesn't
     // have is worthless (0); only the unscoped all-skills bonus is unconditional.
@@ -3768,7 +3659,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
                     s += w.skillLevel * m;
         }
         else
-            s += w.level * m;
+            s += item_apply_points( APPLY_LEVEL, m, w );
         break;
     }
     // +N% skill knowledge, cap-aware. APPLY_NONE with a skill/group global reaches the
@@ -3837,6 +3728,12 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
 static double ga_weaponEff( Character *target, int weaponSn, int weaponAve, bool canCompound,
                             int *skillOut = 0 )
 {
+    // Base value (.itemPoints): no char, the dice count in full.
+    if (target == 0) {
+        if (skillOut != 0)
+            *skillOut = 100;
+        return weaponAve;
+    }
     int skillPct = target->getSkill( weaponSn );
     // A cleric who can compound this weapon into a mace wields it at their
     // mace skill, so it scores like a real mace instead of collapsing to the
@@ -3961,7 +3858,7 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
         DLString buff = inst->getProperty( "wornbuff" );
         int price = buff.empty( ) ? 0 : item_affix_price( "worn_buff", buff, w.caster );
         if (price > 0) {
-            int rolls = max( 1, (int)(inst->level / item_value( "measure", "default_factor", 11 )) );
+            int rolls = item_rolls( inst->level );
             s += price / 100.0 * rolls * (w.dr + w.hr + 10 * w.hp + 10 * w.mana);
         }
     }
@@ -4015,7 +3912,7 @@ static double ga_score( Character *target, ::Object *o, const GAWeights &w,
     if (o->item_type == ITEM_WEAPON) {
         sn  = get_weapon_sn( o );
         ave = weapon_ave( o );
-        compound = ga_clericCanCompound( target, o );
+        compound = target != 0 && ga_clericCanCompound( target, o );
     }
     return ga_scoreCore( target, w, o->pIndexData->affected, &o->affected,
                          o->item_type, sn, ave, compound, o->pIndexData, rawStat, capStat, worn, o );
@@ -4331,6 +4228,100 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     return wrap( e );
 }
 
+// One swing of the char's current weapon, in score units -- the fallback swing value
+// for a non-weapon item's combathits (its extra attacks fire the worn weapon). Gate
+// mirrors ga_scoreCore's dice gate so exotic (available()==false, getLearned>0) counts.
+static double ga_curWeaponSwing( Character *target, const GAWeights &w )
+{
+    Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
+    ::Object *wep = wieldLoc ? wieldLoc->find( target ) : 0;
+    if (wep != 0 && wep->item_type == ITEM_WEAPON) {
+        int wsn  = get_weapon_sn( wep );
+        int wpct = target->getSkill( wsn );
+        Skill *wsk = skillManager->find( wsn );
+        if (wsk == 0 || wsk->available( target ) || wpct > 0)
+            return w.weaponWeight * weapon_ave( wep ) * (20 + wpct) / 100.0;
+    }
+    return -1.0;
+}
+
+// Permanent (duration < 0) affect_flags: the slot-independent floor of heldFlags.
+// Temp spell buffs excluded.
+static bitstring_t ga_permaFlags( Character *target )
+{
+    bitstring_t perma = 0;
+    for (auto &paf: target->affected)
+        if (paf->duration < 0 && paf->bitvector.getTable( ) == &affect_flags) {
+            bitstring_t hb = paf->bitvector; perma |= hb;
+        }
+    return perma;
+}
+
+// Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
+// nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
+static void ga_statBaseline( Character *target, int rawStat[6], int capStat[6] )
+{
+    PCharacter *pch = target->getPC( );
+    for (int k = 0; k < 6; k++) {
+        int sc = ga_statMap[k];
+        rawStat[k] = target->perm_stat[sc] + target->mod_stat[sc];
+        capStat[k] = pch ? pch->getMaxStat( sc ) : MAX_STAT;
+    }
+}
+
+// Root .itemPoints: an item's BASE value through the sage's scorer -- no char, no fit
+// clauses, weights (AC) at the item's level. Stats uncapped: a baseline far from both
+// ends makes ga_statgain return the delta itself.
+double ga_item_points( ::Object *o, bool caster )
+{
+    GAWeights w;
+    item_weights( w, caster, o->level );
+    int rawStat[6], capStat[6];
+    for (int k = 0; k < 6; k++) {
+        rawStat[k] = 500;
+        capStat[k] = 1000;
+    }
+    return ga_score( 0, o, w, rawStat, capStat, false );
+}
+
+// Root .itemScore: the item scored for one char the way gearAdvice scores a candidate
+// (base x fit): same weights, stat caps, spell factor, weapon skill, and flags the char
+// already holds from perma affects and worn gear outside this item's slot.
+double ga_item_score( Character *target, ::Object *o, bool caster )
+{
+    GAWeights w;
+    w.caster = caster;
+    item_weights( w, caster, target->getRealLevel( ) );
+    w.spellFactor = ga_spellFactor( target );
+    w.curWeaponSwing = ga_curWeaponSwing( target, w );
+
+    int mySlot = o->pIndexData->wear_flags;
+    REMOVE_BIT( mySlot, ITEM_TAKE );
+    bool worn = o->carried_by == target && o->wear_loc != wear_none;
+
+    w.heldFlags = ga_permaFlags( target );
+    for (::Object *wo = target->carrying; wo; wo = wo->next_content) {
+        if (wo == o || wo->wear_loc == wear_none)
+            continue;
+        int slot = wo->pIndexData->wear_flags;
+        REMOVE_BIT( slot, ITEM_TAKE );
+        if (slot == mySlot)
+            continue;
+        for (auto &paf: wo->pIndexData->affected)
+            if (paf->bitvector.getTable( ) == &affect_flags) {
+                bitstring_t hb = paf->bitvector; w.heldFlags |= hb;
+            }
+        for (auto &paf: wo->affected)
+            if (paf->bitvector.getTable( ) == &affect_flags) {
+                bitstring_t hb = paf->bitvector; w.heldFlags |= hb;
+            }
+    }
+
+    int rawStat[6], capStat[6];
+    ga_statBaseline( target, rawStat, capStat );
+    return ga_score( target, o, w, rawStat, capStat, worn );
+}
+
 NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best, dual] -- dual = [state(0 n/a/1 second weapon not yet learned/2 verdict), unlockLevel, dualScore(best off-hand weapon build), keepScore(best shield + held item build), entry(an optimal-style entry for a better off-hand weapon, or null)]. best gear the char can wear now, ranked. best is retired (always empty, kept for shape): the chase list 'optimal' now carries the single best-obtainable pick per slot, no dream list beside it. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown/5inpack/6request -- 5 = an upgrade the char already carries unworn, render says put it on; 6 = a good char can politely ask a good, roughly-peer mob for it with no fight), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
@@ -4351,65 +4342,20 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     } else {                                    // caster (default)
         w.caster = true;    // weights: config/fight/item_value.json "caster"
     }
-    {
-        // Stat weights. Melee: weapon output valued the same as its damroll; caster:
-        // weapon melee output worth well under its damroll. The item generator prices
-        // affixes from the same file, so the advisor and the loot share one scale.
-        const char *pf = w.caster ? "caster" : "melee";
-        bool c = w.caster;
-        w.hp           = item_value(pf, "hp",           1.0);
-        w.mana         = item_value(pf, "mana",         c ? 0.5 : 0.1);
-        w.manaGain     = item_value(pf, "mana_gain",    c ? 0.6 : 0.05);
-        w.healGain     = item_value(pf, "heal_gain",    c ? 0.15 : 0.3);
-        w.dr           = item_value(pf, "damroll",      c ? 6.0 : 12.0);
-        w.hr           = item_value(pf, "hitroll",      c ? 2.0 : 6.0);
-        w.saves        = item_value(pf, "saves",        c ? 5.0 : 3.0);
-        w.weaponWeight = item_value(pf, "weapon_weight", c ? 4.0 : 12.0);
-        w.stat[0]      = item_value(pf, "str", c ? 1 : 3);
-        w.stat[1]      = item_value(pf, "int", c ? 2 : 1);
-        w.stat[2]      = item_value(pf, "wis", c ? 3 : 1);
-        w.stat[3]      = item_value(pf, "dex", c ? 1 : 2);
-        w.stat[4]      = item_value(pf, "con", 3);
-        w.stat[5]      = item_value(pf, "cha", 0);
-    }
+    // Stat weights, applies, AC at the char's level: one table with the generators
+    // (fight_core/itemmodel.cpp item_weights). Melee values weapon output like its
+    // damroll; a caster well under it.
+    item_weights( w, w.caster, target->getRealLevel( ) );
 
-    // One swing of the char's current weapon, in score units -- the fallback swing value
-    // for a non-weapon item's combathits (its extra attacks fire the worn weapon). Gate
-    // mirrors ga_scoreCore's dice gate so exotic (available()==false, getLearned>0) counts.
-    {
-        Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
-        ::Object *wep = wieldLoc ? wieldLoc->find( target ) : 0;
-        if (wep != 0 && wep->item_type == ITEM_WEAPON) {
-            int wsn  = get_weapon_sn( wep );
-            int wpct = target->getSkill( wsn );
-            Skill *wsk = skillManager->find( wsn );
-            if (wsk == 0 || wsk->available( target ) || wpct > 0)
-                w.curWeaponSwing = w.weaponWeight * weapon_ave( wep ) * (20 + wpct) / 100.0;
-        }
-    }
+    w.curWeaponSwing = ga_curWeaponSwing( target, w );
 
     int chLevel  = target->getRealLevel( );
     int levelGap = target->getModifyLevel( ) - chLevel;
     // Aggressive mobs never touch a vampire, so they add no danger to its routes.
     bool isVampire = target->getProfession( )->getName( ) == "vampire";
 
-    // F3 applies. ac is near-useless except at low level (owner call): 0.5/pt at
-    // level 1 decaying linearly to 0 by level 40. slevel is caster-heavy; a skill-
-    // group +level and a raw +level are both strong; move is a token; beats (skill
-    // lag) is a real action-throughput lever (percent cut of every skill's lag).
-    // Flag/res values are level-independent (see ga_affectFlagValue / ga_resValue).
-    const char *pf = w.caster ? "caster" : "melee";
-    double acZero     = item_value( "shared", "ac_zero_level", 40 );
-    w.ac              = item_value( "shared", "ac_base", 0.5 ) * std::max( 0.0, acZero - chLevel ) / std::max( 1.0, acZero - 1 );
-    w.slevel          = item_value( pf, "slevel", w.caster ? 25.0 : 4.0 );
-    w.level           = item_value( pf, "level", w.caster ? 40.0 : 14.0 );
-    w.skillLevel      = item_value( pf, "skill_level_group", w.caster ? 18.0 : 8.0 );   // APPLY_LEVEL, skill-group scope
-    w.skillLevelSkill = item_value( pf, "skill_level_skill", w.caster ? 9.0 : 4.0 );    // APPLY_LEVEL, single-skill scope
-    w.move            = item_value( "shared", "move", 0.05 );
-    // beats = percent cut of skill lag. Central for casters/ranged (every action is a
-    // lag-gated cast), near-irrelevant for melee whose damage is auto-attacks off the
-    // violence round, not skills. So caster-heavy, melee token.
-    w.beats           = item_value( pf, "beats", w.caster ? 6.0 : 1.0 );
+    // slevel only counts as far as the char really casts (ac/slevel/level/beats
+    // weights: item_weights above; flag/res values are level-independent).
     w.spellFactor     = ga_spellFactor( target );   // scales slevel by real spell knowledge
 
     // Redundancy discount (bug: unicorn horn out-ranked lion paw on a sanctuary the
@@ -4421,26 +4367,15 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // candidate is scored. gaPerma is the slot-independent floor: permanent (duration
     // < 0) affect_flags, temp spell buffs excluded. w.heldFlags stays 0 for the worn
     // baseline (worn -> 0 in ga_accumAffect), so a delta can only shrink, never inflate.
-    bitstring_t gaPerma = 0;
-    for (auto &paf: target->affected)
-        if (paf->duration < 0 && paf->bitvector.getTable( ) == &affect_flags) {
-            bitstring_t hb = paf->bitvector; gaPerma |= hb;
-        }
+    bitstring_t gaPerma = ga_permaFlags( target );
     // APPLY_LEARNED (+N% skill knowledge), valued per +1% by how broad the scope is:
     // one skill < a skill group < all skills. 187 live items carry these.
-    w.learnSkill = item_value( "shared", "learn_skill", 2.0 );   // cap-aware: x min(m, 100 - effective%) per named skill
-    w.learnGroup = item_value( "shared", "learn_group", 3.0 );   // cap-aware: x min(m, 25 + 3*remort) window
-    w.learnAll   = item_value( "shared", "learn_all", 4.0 );     // cap-aware: x min(m, 25 + 3*remort) window
+    // learnSkill/learnGroup/learnAll come from item_weights; ga_accumAffect caps them:
+    // x min(m, 100 - effective%) per named skill, x min(m, 25 + 3*remort) for a group/all.
 
-    // Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
-    // nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
     PCharacter *pch = target->getPC( );
     int rawStat[6], capStat[6];
-    for (int k = 0; k < 6; k++) {
-        int sc = ga_statMap[k];
-        rawStat[k] = target->perm_stat[sc] + target->mod_stat[sc];
-        capStat[k] = pch ? pch->getMaxStat( sc ) : MAX_STAT;
-    }
+    ga_statBaseline( target, rawStat, capStat );
 
     // Live instance census per vnum (single pass over the world). `spawned` = every
     // live copy (feeds the obtainability score below); `gettable` = copies a player

@@ -43,3 +43,17 @@ double item_value_sub(const char *section, const char *key, const char *sub, dou
 
     return obj[sub].asDouble();
 }
+
+const Json::Value & item_value_object(const char *section, const char *key)
+{
+    static const Json::Value nullValue;
+
+    if (!itemValue.isObject() || !itemValue.isMember(section))
+        return nullValue;
+
+    const Json::Value &sec = itemValue[section];
+    if (!sec.isObject() || !sec.isMember(key))
+        return nullValue;
+
+    return sec[key];
+}
