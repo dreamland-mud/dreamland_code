@@ -705,6 +705,13 @@ void ArmorGenerator::assignFlags()
     if (!wornBuff.empty())
         obj->setProperty("wornbuff", wornBuff);
 
+    // Shape for the Fenia weight helper (.tmp.weight.calculateWeight): the noun's
+    // heft, and its own coverage where it covers less than the heft says (a circlet).
+    if (nounConfig.isMember("heft"))
+        obj->setProperty("heft", nounConfig["heft"].asString());
+    if (nounConfig.isMember("coverage"))
+        obj->setProperty("coverage", nounConfig["coverage"].asInt());
+
     if (!procs.empty())
         obj->props["combatcast"] = procs;
 }
