@@ -81,7 +81,8 @@ double item_level_curve(int level)
 
     for (auto const &key: curve.getMemberNames()) {
         const Json::Value &v = curve[key];
-        if (v.isNumeric())
+        // A key that is not a level would throw from toInt() on a reset or death path.
+        if (v.isNumeric() && DLString(key).isNumber())
             points[DLString(key).toInt()] = v.asDouble();
     }
 
