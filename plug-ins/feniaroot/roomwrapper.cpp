@@ -640,7 +640,8 @@ NMI_INVOKE(RoomWrapper, zecho, "(msg): выведет сообщение msg д�
     // language (mirrors echo/echoAround/gecho); args2string() cast the arg to a
     // string up front and threw "Invalid cast: got 'OBJECT'" on a ._() wrapper.
     for (wch = char_list; wch; wch = wch->next)
-        if (wch->in_room != 0 && wch->in_room->area == target->area)
+        if (wch->in_room != 0 && wch->in_room->area == target->area
+            && wch->position >= POS_RESTING) // sleepers and below don't hear it
             wch->pecho(regfmt(wch, args));
 
     return Register( );

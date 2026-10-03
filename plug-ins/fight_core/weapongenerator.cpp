@@ -1056,6 +1056,12 @@ void WeaponGenerator::setShortDescr() const
     obj->setProperty("eqName", nameConfig["short"].asString()); // 'буздыган' in sheath wearloc
 
     // --- English: plain per-language forms if authored, else mirror RU ---
+    // eqName stays the Russian base noun (find_name_config keys on it); the sheath
+    // wearloc reads eqName_en / eqName_ua for non-Russian viewers. Left empty when
+    // the form isn't authored, so the sheath falls back to the viewer's full name.
+    obj->setProperty("eqName_en", nameConfig.isMember("short_en") ? DLString(nameConfig["short_en"].asString()) : DLString::emptyString);
+    obj->setProperty("eqName_ua", DLString::emptyString);
+
     if (nameConfig.isMember("short_en")) {
         obj->setShortDescr(compose_short(
             a >= 0 && a < (int)adjectives_en.size() ? adjectives_en[a] : DLString::emptyString,
@@ -1076,6 +1082,7 @@ void WeaponGenerator::setShortDescr() const
         // miss still writes what it managed, exactly as the direct call did.
         DLString baseUa, adjUaDeclined;
         decline_ua(nameConfig["short_ua"].asString(), "NOUN", gtag, baseUa);
+        obj->setProperty("eqName_ua", baseUa); // declined pad, read by the sheath wearloc
         if (!adjUa.empty())
             decline_ua(adjUa, "ADJF", gtag, adjUaDeclined);
 
