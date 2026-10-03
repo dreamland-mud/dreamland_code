@@ -1556,8 +1556,8 @@ NMI_INVOKE(Root, apply, "(func, this, args): вызвать func с указан
     RegisterList registerList;
 
     if (args.size() > 2) {
-        Register params = argnum(args, 3);
-        RegList::Pointer regList = params.toHandler().getDynamicPointer<RegList>();
+        // A non-List third argument throws instead of dereferencing a null cast.
+        RegList *regList = arg2reglist(argnum(args, 3));
 
         for (RegList::const_iterator r = regList->begin(); r != regList->end(); r++)
             registerList.push_back(*r);
