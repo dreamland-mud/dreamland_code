@@ -14,8 +14,65 @@
 #include "character.h"
 #include "merc.h"
 #include "def.h"
+#include "configurable.h"
 
 using std::max;
+
+static Json::Value pcBaseline;
+
+CONFIGURABLE_LOADED(fight, pc_baseline)
+{
+    pcBaseline = value;
+}
+
+/** bands[*][melee|caster][field] interpolated by band centre, clamped at the ends. */
+static double pc_baseline_field(int level, bool caster, const char *field)
+{
+    if (!pcBaseline.isObject() || !pcBaseline.isMember("bands"))
+        return 0;
+
+    const Json::Value &bands = static_cast<const Json::Value &>(pcBaseline)["bands"];
+    if (!bands.isObject())
+        return 0;
+    std::map<int, double> points;
+    for (auto const &key: bands.getMemberNames()) {
+        const Json::Value &b = bands[key][caster ? "caster" : "melee"];
+        if (DLString(key).isNumber() && b.isObject() && b[field].isNumeric())
+            points[DLString(key).toInt()] = b[field].asDouble();
+    }
+
+    if (points.empty())
+        return 0;
+    if (level <= points.begin()->first)
+        return points.begin()->second;
+    if (level >= points.rbegin()->first)
+        return points.rbegin()->second;
+
+    auto hi = points.upper_bound(level);
+    auto lo = std::prev(hi);
+    return lo->second + (hi->second - lo->second) * (level - lo->first) / (hi->first - lo->first);
+}
+
+double item_pc_dmg(int level, bool caster)   { return pc_baseline_field(level, caster, "dmg"); }
+double item_pc_hp(int level, bool caster)    { return pc_baseline_field(level, caster, "hp"); }
+double item_pc_round(int level, bool caster) { return pc_baseline_field(level, caster, "round"); }
+
+double item_combat_points(double dmgPerRound, double controlShare, int level, bool caster)
+{
+    ItemWeights w;
+    item_weights(w, caster, level);
+
+    double points = 0;
+    double round = item_pc_round(level, caster);
+    if (round > 0)
+        points += dmgPerRound / round * item_pc_dmg(level, caster) * w.dr;
+
+    double f = std::min(0.95, controlShare);
+    if (f > 0)
+        points += w.hp * item_pc_hp(level, caster) * f / (1 - f);
+
+    return points;
+}
 
 void item_weights(ItemWeights &w, bool caster, int acLevel)
 {

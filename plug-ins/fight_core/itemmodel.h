@@ -73,6 +73,21 @@ double item_res_points(bitstring_t bits, int kind);
 double item_res_points_fit(bitstring_t bits, int kind, bitstring_t ownedImm, bitstring_t ownedRes);
 
 /*
+ * Combat-effect model (decisions 8, 9, 12, 15). The reference player comes from
+ * config/fight/pc_baseline.json (p50 of active PCs by level band, interpolated).
+ */
+/** Reference player's damage per landed hit, max hp and median round damage. */
+double item_pc_dmg(int level, bool caster);
+double item_pc_hp(int level, bool caster);
+double item_pc_round(int level, bool caster);
+
+/** Points of a combat effect at this level: dmgPerRound extra damage per round
+ *  (x = its share of the median round, worth x * dmg damroll per landed hit) plus
+ *  control f = share of incoming damage removed (worth hp * f / (1 - f) hp).
+ *  0 when pc_baseline.json is missing. Same formula as scripts/item-combat-model.py. */
+double item_combat_points(double dmgPerRound, double controlShare, int level, bool caster);
+
+/*
  * Fit clauses.
  */
 /** Stat points actually gained: base + delta clamped to [MIN_STAT, cap]. */
