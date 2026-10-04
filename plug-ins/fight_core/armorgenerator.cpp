@@ -542,7 +542,16 @@ bool ItemAffixRoller::fitAllowed(const DLString &secName, const DLString &value)
 
 double ItemAffixRoller::windowCurve() const
 {
-    return item_model_enabled() ? item_level_curve(obj->level) : 1.0;
+    if (!item_model_enabled())
+        return 1.0;
+
+    double curve = item_level_curve(obj->level);
+    // measure.armor_budget_mult [melee, caster]: armor tier windows per profile.
+    // Melee armor came out ~1.35x today's stat strength on honest prices; Kit
+    // cut it by a quarter (2026-10-04). Weapons keep the plain curve.
+    if (kind == "armor")
+        curve *= item_value("measure", "armor_budget_mult", 1.0, isCaster ? 1 : 0);
+    return curve;
 }
 
 int ItemAffixRoller::candidateWeight(const DLString &secName, const Json::Value &affix) const
