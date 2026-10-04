@@ -1789,6 +1789,18 @@ NMI_INVOKE(Root, itemModel, "(mode): только для тестов: гене�
     return Register(item_model_override(argnum2number(args, 1)));
 }
 
+NMI_INVOKE(Root, itemModelOn, "(): включена ли единая модель предметов (measure.item_model или тестовый .itemModel) -- 1 или 0")
+{
+    return Register(item_model_enabled() ? 1 : 0);
+}
+
+NMI_INVOKE(Root, itemCost, "(measureCm, level): цена предмета по единой модели: measure.cost_k x M x уровень (M в сотых долях), как у генераторов")
+{
+    int cm = argnum2number(args, 1);
+    int level = URANGE(1, argnum2number(args, 2), MAX_LEVEL);
+    return Register(item_model_cost(cm, level));
+}
+
 NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]): выставить статы для weapon или улучшить в бою")
 {
     ::Object *weapon = argnum2item(args, 1);
