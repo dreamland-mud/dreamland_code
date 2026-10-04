@@ -65,10 +65,15 @@ static void readTier(const Json::Value &d, Tier &t)
     t.xp = d.get("xp", 1.0).asDouble();
     t.xpMinLevel = d.get("xp_min_level", 0).asInt();
     t.gold = d.get("gold", 1.0).asDouble();
-    const Json::Value &affAdd = d["aff_add"];
-    if (affAdd.isArray())
-        for (const auto &e: affAdd)
-            t.affAdd.push_back(e.asString());
+    auto readList = [&d](const char *key, std::vector<std::string> &out) {
+        const Json::Value &v = d[key];
+        if (v.isArray())
+            for (const auto &e: v)
+                out.push_back(e.asString());
+    };
+    readList("aff_add", t.affAdd);
+    readList("off_add", t.offAdd);
+    readList("act_add", t.actAdd);
     const Json::Value &w = d["word"];
     if (w.isObject())
         for (const auto &lang: w.getMemberNames())

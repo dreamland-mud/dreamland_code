@@ -21,6 +21,8 @@
  *                                                // (trash "x0.75 above level 10" = 11)
  *            "gold": 1.0,
  *            "aff_add": [ "sanctuary" ],         // affect bits the tier grants (item 56)
+ *            "off_add": [ "fast" ],              // off bits on top of the count, body-allowed, never on a slow body
+ *            "act_add": [ "warrior" ],           // act bits for non-casters (decision 72)
  *            "word": { "en": "...", "ru": "...", "ua": "..." } },
  *     ... missing numbers are interpolated between their neighbours
  *   },
@@ -65,6 +67,9 @@ struct Tier {
     int xpMinLevel = 0;
     double gold = 1;
     std::vector<std::string> affAdd;  // affect bits every mob of the tier gets (sanctuary, item 56)
+    // Decision 72: off bits the tier enables when the body allows them (fast,
+    // a slow form forbids it), and act bits for non-casters (warrior = extra attacks).
+    std::vector<std::string> offAdd, actAdd;
     std::map<std::string, std::string> word;
 };
 
