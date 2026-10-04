@@ -137,7 +137,7 @@ if ! test -f "$prefix/var/db/fenia/fenia"
 then
     echo "Loading Fenia DB from dump..."
     cat "$srcdir/admin/fenia/fenia.dump" | (cd "$prefix/var/db/fenia" && db_load fenia)
-    cd "$prefix" && tar xvf "$srcdir/admin/fenia/nanny-mobs.tar"
+    (cd "$prefix" && tar xvf "$srcdir/admin/fenia/nanny-mobs.tar")
 fi
 
 AC_CONFIG_COMMANDS([src/moc/moc], [
@@ -164,7 +164,6 @@ src/core/skills/Makefile \
 src/core/clan/Makefile \
 src/io/Makefile \
 src/lang/Makefile \
-src/moc/Makefile \
 src/plugin/Makefile \
 src/scheduler/Makefile \
 src/util/Makefile \
