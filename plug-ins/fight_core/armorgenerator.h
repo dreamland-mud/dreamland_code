@@ -118,6 +118,7 @@ protected:
     int align;
 
     std::set<int> playerGroups;
+    std::map<int, int> groupCounts;     // group -> learned skills of the killer in it
     std::vector<Candidate> pool;
     std::map<int, int> chosen;          // pool index -> stack count
     int chosenTotal;                    // centi-M actually spent
