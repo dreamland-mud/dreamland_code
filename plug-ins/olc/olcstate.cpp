@@ -88,6 +88,12 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
     if (!state) {
         return true;
     }
+
+    // A command that reaches interpret() without going through the editor's
+    // handle() (e.g. /api/force) has no owner, and every OLC command reads
+    // owner->character. Treat it as if no editor were open.
+    if (!state->isHandling( ))
+        return true;
     
     if(iargs.cmdName.empty())
         iargs.cmdName = "show";
@@ -106,7 +112,7 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
 /*--------------------------------------------------------------------------
  * OLCState 
  *-------------------------------------------------------------------------*/
-OLCState::OLCState() : inSedit(false), strEditor(*this)
+OLCState::OLCState() : owner(0), inSedit(false), strEditor(*this)
 {
 }
 

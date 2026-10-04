@@ -332,6 +332,17 @@ struct PermanentAffects {
         return my_res || my_vuln || my_imm || my_aff || my_det;
     }
 
+    // Will printAll() print anything at all (bits, or the PC-only regen,
+    // skill lag and religion lines)? Used for the blank separator line only.
+    bool hasOutput() const {
+        if (isSet())
+            return true;
+        if (viewer != ch)
+            return false;
+        return my_hgain != 0 || my_mgain != 0 || my_beats != 0
+            || (ch->getProfession()->getFlags().isSet(PROF_DIVINE) && ch->getReligion() == god_none);
+    }
+
 private:
     void print(const MultiMessage &prefix, const int &my_flags, const FlagTable &my_table, char gcase) const {
         if (my_flags == 0)
@@ -471,30 +482,41 @@ CMDRUNP( affects )
     }
 
     if (IS_CHARMED(ch)) {
+        // A summoned pet disappears when its timer runs out. The timer counts down once
+        // per char tick, the same unit as affect durations (shown as hours above).
+        DLString lifeLine;
+        if (ch->is_npc( ) && ch->timer > 0)
+            lifeLine = fmt( 0, _("{yИсчезнет через {m%1$d{y час%1$Iа|ов|ов.{x").getMessage( Player::displayLang( viewer ) ).c_str( ), ch->timer );
+
         // Raw affected_by/res/imm/detect bits (e.g. fly from worn wings) never
         // enter ch->affected, so they only surface through permAff.
         if (buf.str( ).empty( ) && !permAff.isSet( )) {
             oldact(_("$C1 не находится под действием каких-либо аффектов."), ch->master, 0, ch, TO_CHAR);
+            if (!lifeLine.empty( ))
+                ch->master->pecho( lifeLine );
             return;
         }
 
         oldact(_("$C1 находится под действием следующих аффектов:"), ch->master, 0, ch, TO_CHAR);
-        permAff.printAll( );
+        bool listed = !buf.str( ).empty( );
         buf << "{x";
         ch->master->send_to( buf );
+
+        // Permanent bits go below the timed affect list.
+        if (listed && permAff.isSet( ))
+            ch->master->pecho( "" );
+        permAff.printAll( );
+
+        if (!lifeLine.empty( ))
+            ch->master->pecho( lifeLine );
         return;
     }
-
-    // Output permanent bits on top.
-    permAff.printAll();
 
     if (buf.str( ).empty( )) {
         if (IS_SET(flags, FSHOW_EMPTY) && !permAff.isSet())
             ch->pecho( _("Ты не находишься под действием каких-либо аффектов.") );
     } 
     else {
-        if (permAff.isSet())
-            ch->pecho("");
         ch->pecho( _("Ты находишься под действием следующих аффектов:") );
         buf << "{x";
 
@@ -505,5 +527,11 @@ CMDRUNP( affects )
         }
         else
             ch->send_to( buf );
+
+        if (permAff.hasOutput( ))
+            ch->pecho( "" );
     }
+
+    // Permanent bits (imm/res/vuln/detect, regen) go below the timed affect list.
+    permAff.printAll();
 }

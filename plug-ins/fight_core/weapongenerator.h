@@ -37,6 +37,11 @@ struct WeaponGenerator {
     WeaponGenerator & randomTier(int bestTier, int legendaryPerMille = 0);
     WeaponGenerator & addRequirement(const DLString &req) { this->required.insert(req); return *this; }
     WeaponGenerator & addForbidden(const DLString &fbd) { this->forbidden.insert(fbd); return *this; }
+    /** Price affixes for a caster killer (item_affixes.json price_caster). */
+    WeaponGenerator & caster(bool caster) { this->isCaster = caster; return *this; }
+    /** Affix budget: 1 = M (item_affixes.json), 0 = old points (weapon_affixes.json),
+     *  -1 = whatever item_affixes.json _weapons.use_m says. */
+    WeaponGenerator & budgetMode(int mode) { this->mMode = mode; return *this; }
 
     // Main method to handle rand_stat logic, after all parameters have been set up by the calls above.
     WeaponGenerator& randomizeStats();
@@ -57,6 +62,8 @@ struct WeaponGenerator {
 
     WeaponGenerator & randomNames();
     WeaponGenerator & randomAffixes();
+    /** randomAffixes() on the M budget, shared pool with random armor. */
+    WeaponGenerator & randomAffixesM();
 
     const WeaponGenerator & assignValues() const;    
     const WeaponGenerator & assignHitroll() const;
@@ -83,6 +90,9 @@ private:
     DLString findMaterial() const;
     DLString nonMetalDefault() const;
     void rememberAffect(Affect &af);
+    bool useM() const;
+    void decideTwoHands();
+    bool nameFitsHands(const Json::Value &config) const;
     int calcAffectModifier(const Json::Value &afConfig, const affix_info &info) const;
     int maxDamroll() const;
     int maxHitroll() const;
@@ -115,6 +125,14 @@ private:
     float drIndexBonus;
     float aveIndexBonus;
     int align;
+    bool isCaster;
+    int mMode;
+
+    // Two-hander share on the M budget: base ave and damroll are scaled by it.
+    bool twoHands;
+    bool twoHandsDecided;
+    float aveMult;
+    float damrollMult;
 
     // Additional requirements set by test suite.
     set<DLString> required; 
@@ -141,6 +159,13 @@ private:
  *  Returns true when anything changed. Safe to call on any object -- everything
  *  without a generated name returns immediately. */
 bool weapon_repair_names(Object *obj);
+
+/* Name helpers shared with the armor generator (armorgenerator.cpp), so random
+ * weapons and random armor glue and decline their names the same way. */
+DLString random_item_compose_short(const DLString &adjective, const DLString &base, const DLString &noun);
+DLString random_item_gender_tag(const DLString &gender);
+bool random_item_decline_ua(const DLString &word, const DLString &pos, const DLString &gtag, DLString &result);
+int random_item_skillgroup(PCharacter *pch);
 
 /** True when this weapon class name is present in the weapon_classes config. */
 bool weapon_class_exists(const DLString &name);

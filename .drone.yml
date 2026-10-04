@@ -11,7 +11,11 @@ clone:
 steps:
 - name: full_rebuild
   commands:
-  - eval `ssh-agent -s`
+  # Not `eval `ssh-agent -s``: drone traces each command with echo "...", which ran the
+  # backticks a second time and leaked one agent per deploy.
+  - ssh-agent -s > /tmp/drone-agent-code.env
+  - . /tmp/drone-agent-code.env
+  - trap 'kill $SSH_AGENT_PID 2>/dev/null || true' EXIT
   - ssh-add /home/dreamland/.ssh/drone
   - cd /home/dreamland/dreamland_code
   - git pull

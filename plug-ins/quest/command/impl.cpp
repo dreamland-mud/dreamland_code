@@ -14,6 +14,27 @@
 #include "questmaster.h"
 #include "questor.h"
 #include "xmlattributequestreward.h"
+#include "questscrollhook.h"
+
+class Object;
+class PCharacter;
+Object * fenia_quest_scroll( PCharacter *client );
+
+/** Plugs the skill scroll into quest_core while this library is loaded. */
+class QuestScrollHookPlugin : public Plugin {
+public:
+    typedef ::Pointer<QuestScrollHookPlugin> Pointer;
+
+    virtual void initialization( )
+    {
+        quest_scroll_hook = &fenia_quest_scroll;
+    }
+
+    virtual void destruction( )
+    {
+        quest_scroll_hook = 0;
+    }
+};
 
 extern "C"
 {
@@ -44,6 +65,7 @@ extern "C"
         Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestScrollBehavior> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<QuestMaster> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<DefaultQuestMaster> >( ppl );
+        Plugin::registerPlugin<QuestScrollHookPlugin>( ppl );
         
         return ppl;
     }

@@ -83,7 +83,7 @@ void OneHit::hit( )
     // without this melee contributes nothing: canSeeMessage suppresses the per-hit
     // line and the summary then skips the attacker for having dealt "no" damage,
     // leaving a fightspam-OFF player watching their hp drop in silence.
-    if (dam > 0 && ch != 0)
+    if (dam > 0 && ch != 0 && (ch->fighting != 0 || victim->fighting != 0))
         ch->roundDamage += dam;
 
     message( );

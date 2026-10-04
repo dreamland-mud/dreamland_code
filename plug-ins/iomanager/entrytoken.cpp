@@ -262,6 +262,7 @@ bool entry_token_redeem(Descriptor *d, const DLString &token)
         d->buffer_handler = new DefaultBufferHandler(0);   // koi8-r, what the web client decodes
         if (!entry_detach_login(d))
             return false;
+        bool takeover = twin->desc != 0;
         if (twin->desc)
             twin->desc->close();
         d->associate(twin);
@@ -270,6 +271,8 @@ bool entry_token_redeem(Descriptor *d, const DLString &token)
         // but the ones that greet an arriving player can tell a take-over from a fresh
         // login and stay quiet -- this is the player's own body coming back.
         DescriptorStateManager::getThis()->handle(CON_RESUME, CON_PLAYING, d);
+        // ...but the room saw the net-death line, so answer it.
+        InterpretHandler::announceReconnect(twin, takeover);
         twin->timer = 0;
         LogStream::sendNotice() << "Entry token: " << d->host << " entered "
                                 << name << " (took over the existing session)" << endl;
@@ -377,6 +380,7 @@ PCharacter * account_reconnect_char(Descriptor *d, PCharacter *twin)
     // from under us. Only a CON_PLAYING descriptor closes cleanly (InterpretHandler
     // handlers detach without freeing); refuse anything else, the way resume.cpp:213 and
     // entry_token_redeem do.
+    bool takeover = twin->desc != 0;
     if (twin->desc != 0) {
         if (twin->desc->connected != CON_PLAYING)
             return 0;
@@ -388,12 +392,9 @@ PCharacter * account_reconnect_char(Descriptor *d, PCharacter *twin)
     DescriptorStateManager::getThis()->handle(CON_RESUME, CON_PLAYING, d);
     twin->timer = 0;
 
-    // Answer the net-death close this reconnect undoes (interprethandler.cpp:586): a
-    // wiznet line and a forensics notice so admins and the log see the link come back.
-    // NOT quiet like web-resume -- a switch is a one-off, not a phone locking its screen
-    // fifty times an evening. No room echo: this TU carries no l10n catalog, and a
-    // player-facing "restored the link" belongs translated, not RU-only.
-    wiznet(WIZ_LINKS, 0, twin->get_trust(), "%C1 has restored the link.", twin);
+    // Answer the net-death close this reconnect undoes: room echo + wiznet, and a
+    // forensics notice so the log sees the link come back.
+    InterpretHandler::announceReconnect(twin, takeover);
     LogStream::sendNotice() << "account switch: " << d->host << " reconnected into "
                             << twin->getName() << endl;
 

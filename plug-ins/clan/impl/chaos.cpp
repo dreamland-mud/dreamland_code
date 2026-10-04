@@ -13,6 +13,7 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 #include <string.h>
+#include <list>
 
 #include "objectbehaviormanager.h"
 #include "clanmobiles.h"
@@ -43,6 +44,7 @@
 #include "vnum.h"
 
 #include "fight.h"
+#include "fight_extract.h"
 #include "magic.h"
 #include "def.h"
 #include "l10n.h"
@@ -330,13 +332,27 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 
         if ( ch->isAffected(sn ) )
         {
-            ch->pecho(_("Ты пытаешься сотворить зеркальные отражения, но безуспешно."));
+            ch->pecho(_("Тебе нужно передохнуть, прежде чем снова творить зеркальные отражения."));
             return;
         }
 
+        // Mirrors left behind in another room (the owner recalled or was
+        // teleported) still counted toward the cap, so the only way to cast
+        // again was to quit. Shatter the strays; only those at hand count.
+        std::list<Character *> strays;
         for (mirrors = 0, gch = char_list; gch != 0; gch = gch->next)
-                if (gch->is_mirror() && gch->doppel == victim)
-                        mirrors++;
+                if (gch->is_mirror() && gch->doppel == victim) {
+                        if (gch->in_room != victim->in_room)
+                                strays.push_back(gch);
+                        else
+                                mirrors++;
+                }
+
+        for (auto &stray: strays) {
+                if (stray->in_room)
+                        stray->in_room->echo(POS_RESTING, _("%1$^C1 рассыпается осколками стекла."), stray);
+                extract_char(stray);
+        }
 
         if ( ( mirrors >= level/5 ) || ( mirrors >= 10 ) )
         {
@@ -485,10 +501,26 @@ VOID_AFFECT(Doppelganger)::remove( Character *victim )
 {
     DefaultAffectHandler::remove( victim );                                     
 
-    if (victim->is_mirror( ))
-        follower_stop(victim);
+    if (!victim->is_mirror( )) {
+        victim->doppel = NULL;
+        return;
+    }
 
+    follower_stop(victim, false);
     victim->doppel = NULL;
+
+    // A mirror image without its original is an orphan wearing a stranger's
+    // name and title forever (owner quit or died, or the image simply ran out).
+    // Shatter it. This can run inside the owner's extract_char (notify_referers
+    // walks char_list) or inside an affect-list walk, so defer the extraction:
+    // the dead-NPC reaper at the top of the next pulse does it.
+    if (victim->isDead( ))
+        return;
+
+    if (victim->in_room)
+        victim->in_room->echo(POS_RESTING, _("%1$^C1 рассыпается осколками стекла."), victim);
+
+    victim->setDead( );
 }
 
 

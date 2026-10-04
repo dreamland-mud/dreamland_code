@@ -550,10 +550,16 @@ bool Walkment::checkLawzone( Character *wch )
     if (!IS_CHARMED(wch))
         return true;
     
+    // The pet is refused at the border and stays where it is; the owner
+    // hears why, so it does not look like the pet just vanished or lagged.
     rc = RC_MOVE_LAWZONE;
-    msgSelfMaster( wch, 
-                   "Ты не можешь отправиться в город.", 
-                   "Ты не можешь взять с собой %1$C4 в город." );
+    msgSelfMaster( wch,
+                   "The city guards won't let you into the city.",
+                   "Городская стража не пустит тебя в город.",
+                   "Міська варта не пустить тебе до міста.",
+                   "The city guards won't let an aggressive creature into the city: %3$C1 stay%3$ns| behind at the city limits.",
+                   "Городская стража не пустит в город агрессивную тварь: %3$C1 оста%3$nется|ются ждать тебя у городской черты.",
+                   "Міська варта не пустить до міста агресивну тварюку: %3$C1 лиша%3$nється|ються чекати на тебе біля міської межі." );
     return false; 
 }
 
@@ -694,6 +700,8 @@ void Walkment::moveFollowers( Character *wch )
                     wch->pecho(_("%1$^C1 не умеет плавать и не может последовать за тобой."), fch);
                 else if (frc == RC_MOVE_CLOSED)
                     wch->pecho(_("%1$^C1 не может пройти через закрытую дверь и последовать за тобой."), fch);
+                else if (frc == RC_MOVE_LAWZONE)
+                    ; // checkLawzone already told the owner why
                 else
                     wch->pecho(_("%1$^C1 не может последовать за тобой."), fch);
             }

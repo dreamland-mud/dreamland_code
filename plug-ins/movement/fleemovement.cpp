@@ -164,9 +164,13 @@ void FleeMovement::msgOnMove( Character *wch, bool fLeaving )
     ExitsMovement::msgOnMove( wch, fLeaving );
 
     if (fLeaving) 
-        msgRoomNoParty( wch, 
+        msgRoomNoParty( wch,
+                        "%1$^C1 has fled!",
                         "%1$^C1 убегает!",
-                        "%1$^C1 и %2$C1 убегают!" );
+                        "%1$^C1 тікає!",
+                        "%1$^C1 and %2$C1 have fled!",
+                        "%1$^C1 и %2$C1 убегают!",
+                        "%1$^C1 і %2$C1 тікають!" );
 }
 
 bool FleeMovement::applySkill( SkillReference &skill ) 

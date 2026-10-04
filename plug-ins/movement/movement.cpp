@@ -374,6 +374,20 @@ void Movement::msgRoomNoParty( Character *wch, const char *en, const char *ru, c
             msgEcho( rch, wch, lmsg( viewerLang( rch ), en, ru, ua ) );
 }
 
+void Movement::msgRoomNoParty( Character *wch, const char *sEn, const char *sRu, const char *sUa,
+                                               const char *mEn, const char *mRu, const char *mUa )
+{
+    for (Character *rch = wch->in_room->people; rch; rch = rch->next_in_room)
+        if (rch != wch && rch != wch->mount) {
+            if (ch->mount) {
+                if (ch->mount == wch)
+                    msgEcho( rch, wch, lmsg( viewerLang( rch ), mEn, mRu, mUa ) );
+            }
+            else
+                msgEcho( rch, wch, lmsg( viewerLang( rch ), sEn, sRu, sUa ) );
+        }
+}
+
 void Movement::msgRoom( Character *wch, const char *msg )
 {
     for (Character *rch = wch->in_room->people; rch; rch = rch->next_in_room)

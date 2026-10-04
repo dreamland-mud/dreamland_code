@@ -853,10 +853,9 @@ void weather_init( )
     if(DLScheduler::getThis()->getCurrentTick( ) == 0) {
 	// Since this is happening on the world startup, let's notify users
 	// the world is up!
-	DLString msg;
-    	msg = "Мир Мечты перезапустился и готов к игре, уииииии!";
-    	send_to_discord_stream(":green_circle: " + msg);
-    	send_telegram(msg);	
+	// Discord is English, Telegram is Ukrainian.
+	send_to_discord_stream(DLString(":green_circle: ") + "Dreamland has restarted and is ready to play, wheeeee!");
+	send_telegram("Світ Мрії перезапустився і готовий до гри, уііііі!");
     }
 }
 

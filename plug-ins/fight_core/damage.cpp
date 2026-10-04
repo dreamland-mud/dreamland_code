@@ -112,7 +112,9 @@ bool Damage::hit( bool show )
     priorDamageEffects( );
 
     // Accumulate for the per-round fightspam-OFF summary (emitted by violence_update).
-    if (dam > 0 && ch != 0)
+    // Out of combat the hit prints its own line instead (canSeeMessage), so it must
+    // not reach a summary as well.
+    if (dam > 0 && ch != 0 && (ch->fighting != 0 || victim->fighting != 0))
         ch->roundDamage += dam;
 
     if (show)
@@ -858,10 +860,13 @@ bool Damage::canSeeMessage(Character *to)
         return false;
 
     // fightspam OFF: suppress the per-hit damage line; violence_update prints
-    // one aggregated summary line per participant per round instead.
+    // one aggregated summary line per participant per round instead. Only in
+    // combat: a hit outside any fight (a mine, a trap) gets no round summary,
+    // so it keeps its own line.
     if (dam > 0
         && !to->is_npc( )
-        && !IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM))
+        && !IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM)
+        && (ch->fighting != 0 || victim->fighting != 0))
         return false;
 
     if (!IS_AWAKE(to) || !to->can_sense( ch ) || !to->can_sense( victim ))

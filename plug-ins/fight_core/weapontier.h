@@ -19,6 +19,13 @@ struct weapon_tier_t {
     int min_points;
     int max_points;
     int worst_penalty;
+    // Budget window for M-priced items (centi-M, 100 = one item measure).
+    int min_m;
+    int max_m;
+    int worst_penalty_m;
+    // Caps for M-priced items: distinct affixes (stacks count once), negative ones. 0 = none.
+    int max_affixes_m;
+    int max_negatives_m;
     int weeks;
     int chance;
 

@@ -20,6 +20,11 @@ void weapon_tier_t::fromJson(const Json::Value &value)
     min_points = value["min_points"].asInt();
     max_points = value["max_points"].asInt();
     worst_penalty = value.isMember("max_penalty") ? value["max_penalty"].asInt() : -1000;
+    min_m = value["min_m"].asInt();
+    max_m = value["max_m"].asInt();
+    worst_penalty_m = value.isMember("max_penalty_m") ? value["max_penalty_m"].asInt() : -1000;
+    max_affixes_m = value["max_affixes_m"].asInt();
+    max_negatives_m = value["max_negatives_m"].asInt();
     weeks = value["weeks"].asInt();
     chance = value["chance"].asInt();
 }

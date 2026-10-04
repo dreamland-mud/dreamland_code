@@ -190,19 +190,22 @@ bool RecallMovement::checkSameRoom( )
 }
 
 /*
- * A spellcaster summoned by the master: a charmed follower whose Fenia field
+ * A summon of the master that can pray: a charmed follower whose Fenia field
  * 'creator' is the master (set by .tmp.mob.callMob, animate dead and a few
- * area scripts), flagged as one of the mob kinds the caster AI casts spells
- * for (ai/caster.cpp). Such helpers heal and buff their master, so they pray
- * home with him the way a pet does. Zombies inherit caster flags from their
- * source corpse, so only caster-corpse zombies qualify.
+ * area scripts), and that is either sentient (squires, automatons, guards)
+ * or one of the mob kinds the caster AI casts spells for (ai/caster.cpp).
+ * Such helpers pray home with him the way a pet does. Beasts and mindless
+ * constructs stay behind.
+ * Zombies inherit caster flags from their source corpse, so only
+ * caster-corpse zombies qualify.
  */
-static bool is_caster_summon( NPCharacter *mob, Character *master )
+static bool is_recall_summon( NPCharacter *mob, Character *master )
 {
     if (!IS_CHARMED(mob) || mob->master != master)
         return false;
 
-    if (!IS_SET(mob->act, ACT_CLERIC|ACT_MAGE|ACT_UNDEAD|ACT_NECROMANCER))
+    if (!mob->form.isSet( FORM_SENTIENT )
+        && !IS_SET(mob->act, ACT_CLERIC|ACT_MAGE|ACT_UNDEAD|ACT_NECROMANCER))
         return false;
 
     WrapperBase *base = get_wrapper( mob->wrapper );
@@ -235,13 +238,13 @@ void RecallMovement::moveFollowers( Character *wch )
     list<NPCharacter *> summons;
 
     for (Character *rch = from_room->people; rch; rch = rch->next_in_room)
-        if (rch->is_npc( ) && rch != pet && is_caster_summon( rch->getNPC( ), wch ))
+        if (rch->is_npc( ) && rch != pet && is_recall_summon( rch->getNPC( ), wch ))
             summons.push_back( rch->getNPC( ) );
 
     // Re-check: an earlier move's triggers may have killed, uncharmed or
     // recycled a collected mob.
     for (auto &summon: summons)
-        if (summon->in_room == from_room && is_caster_summon( summon, wch ))
+        if (summon->in_room == from_room && is_recall_summon( summon, wch ))
             movePet( summon );
 }
 

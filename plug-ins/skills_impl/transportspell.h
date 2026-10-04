@@ -6,6 +6,7 @@
 #define __TRANSPORTSPELL_H__
 
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlinteger.h"
 #include "xmlboolean.h"
 #include "spelltemplate.h"
@@ -23,9 +24,9 @@ public:
 
     XML_VARIABLE XMLBoolean gateShadow, gateViolent;
     XML_VARIABLE XMLBoolean takePet, takeGroup;
-    XML_VARIABLE XMLString  msgRoomLeave, msgRoomEnter;
-    XML_VARIABLE XMLString  msgSelfLeave, msgSelfEnter;
-    XML_VARIABLE XMLString  msgGroupLeave, msgGroupEnter;
+    XML_VARIABLE XMLMultiString msgRoomLeave, msgRoomEnter;
+    XML_VARIABLE XMLMultiString msgSelfLeave, msgSelfEnter;
+    XML_VARIABLE XMLMultiString msgGroupLeave, msgGroupEnter;
     XML_VARIABLE XMLInteger levelDiff;
 };
 
@@ -65,6 +66,8 @@ protected:
     virtual void moveFollowers( Character * );
     virtual void msgOnMove( Character *, bool );
     virtual void msgEcho( Character *, Character *, const char * );
+    void msgSelfMulti( Character *, const XMLMultiString & );
+    void msgRoomMulti( Character *, const XMLMultiString & );
     
     Character *victim;
     GateSpell::Pointer spell;

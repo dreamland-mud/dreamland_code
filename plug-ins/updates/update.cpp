@@ -247,7 +247,14 @@ static void reboot_anatolia( void )
         for ( d = descriptor_list; d != 0; d = d_next )
         {
                 d_next = d->next;
-                d->send("Мир Мечты уходит на перезагрузку ПРЯМО СЕЙЧАС!\n");
+                // Login-screen descriptors have no character, hence no language yet.
+                if (d->character)
+                    d->send(lmsg(viewerLang(d->character),
+                        "Dreamland is rebooting RIGHT NOW!\n",
+                        "Мир Мечты уходит на перезагрузку ПРЯМО СЕЙЧАС!\n",
+                        "Світ Мрії йде на перезавантаження ПРЯМО ЗАРАЗ!\n"));
+                else
+                    d->send("Dreamland is rebooting RIGHT NOW! / Мир Мечты уходит на перезагрузку ПРЯМО СЕЙЧАС! / Світ Мрії йде на перезавантаження ПРЯМО ЗАРАЗ!\n");
 
                 if (d->character && d->connected == CON_PLAYING)
                         d->character->getPC( )->save();
@@ -1867,16 +1874,15 @@ void track_update( )
 void check_reboot( void )
 {
     Descriptor *d;
-    DLString msg2;
 
     switch(dreamland->getRebootCounter( ))
     {
     case -1:
         break;
     case 0:
-        msg2 = "Мир Мечты перезапускается, надо немного подождать.";
-        send_to_discord_stream(":red_circle: " + msg2);
-        send_telegram(msg2);
+        // Discord is English, Telegram is Ukrainian.
+        send_to_discord_stream(DLString(":red_circle: ") + "Dreamland is restarting, hang on a bit.");
+        send_telegram("Світ Мрії перезапускається, треба трохи зачекати.");
         reboot_anatolia();
         return;
     case 1:
@@ -1898,9 +1904,9 @@ void check_reboot( void )
                         _("{RВнимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!{x"),
                         counter );
             if (counter == 5) {
-                msg2 = fmt( NULL, _("Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!"), counter );
-                send_to_discord_stream(":red_circle: " + msg2);
-                send_telegram(msg2);
+                MultiMessage warn = _("Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!");
+                send_to_discord_stream(":red_circle: " + fmtLang(LANG_EN, warn, counter));
+                send_telegram(fmtLang(LANG_UA, warn, counter));
             }
         }
     default:
@@ -2073,24 +2079,6 @@ void char_update_affects( Character *ch )
     }
 }
 
-/*
- * Check for weight of wielded weapon.
- */
-static bool check_native_weapon( Character *ch, Object *obj )
-{
-    if (!ch->is_npc( )
-        || ch->getNPC( )->pIndexData->area != obj->pIndexData->area)
-    {
-        return false;
-    }
-
-    for (auto &paf: ch->affected)
-        if (paf->location == APPLY_STR && paf->modifier < 0)
-            return false;
-    
-    return true;
-}
-
 void wield_update( Character *ch )
 {
     Object *wield, *second;
@@ -2099,8 +2087,7 @@ void wield_update( Character *ch )
     
     if (second 
             && wear_second_wield->canRemove( ch, second, 0 )
-            && second->getWeight( ) > (get_str_app(ch).wield * 5)
-            && !check_native_weapon( ch, second ))
+            && too_heavy_to_wield( ch, second, true ))
     {
         oldact(_("Ты не в силах удержать $o4 в левой руке."), ch, second, 0, TO_CHAR);
         oldact(_("$c1 не в силах удержать $o4."), ch, second, 0, TO_ROOM);
@@ -2111,8 +2098,7 @@ void wield_update( Character *ch )
     
     if (wield 
             && wear_wield->canRemove( ch, wield, 0 )
-            && wield->getWeight( ) > (get_str_app(ch).wield * 10)
-            && !check_native_weapon( ch, wield ))
+            && too_heavy_to_wield( ch, wield, false ))
     {
         oldact(_("Ты не в силах удержать $o4 в правой руке."), ch, wield, 0, TO_CHAR);
         oldact(_("$c1 не в силах удержать $o4."), ch, wield, 0, TO_ROOM);

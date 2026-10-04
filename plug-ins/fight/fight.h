@@ -45,6 +45,8 @@ void        fightspam_flush_between_rounds( Character *att, Character *victim );
 int        move_dec( Character *ch );
 void damapply_class(Character *ch, int &dam);
 int second_weapon_chance(Profession *prof, Object *weapon);
+/* Same table keyed by weapon class (-1 = hand to hand), for a weapon not yet in hand. */
+int second_weapon_chance_class(Profession *prof, int weaponClass);
 
 /* parameterized skill weapon hit (onehit_weapon.cpp) */
 void        skill_one_hit_nocatch( Character *ch, Character *victim, Skill *skill,
