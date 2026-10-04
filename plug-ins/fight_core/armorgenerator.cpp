@@ -547,16 +547,18 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
     int maxNegatives = maxNegativesM > 0 ? maxNegativesM : 1000;
 
     // Model calibration knobs (one item model P7), data-only and off when absent:
-    // measure.stat_floor {level: share} = least share of the target spent on stat
+    // measure.stat_floor {level: share | [melee, caster]} = least share of the target spent on stat
     // sections (measure.stat_sections), so a low-level item is not a bag of flat
     // effects; measure.max_affixes_bonus {level: n} = extra distinct affixes where
     // honest prices make affixes cheap (high level).
     double statFloor = 0;
     std::vector<bool> isStat(pool.size(), false);
     if (item_model_enabled()) {
-        statFloor = item_points_by_level(item_value_object("measure", "stat_floor"), obj->level);
+        // A value may be a number (both profiles) or [melee, caster].
+        int col = isCaster ? 1 : 0;
+        statFloor = item_points_by_level(item_value_object("measure", "stat_floor"), obj->level, col);
         if (maxAffixesM > 0)
-            maxAffixes += (int)std::round(item_points_by_level(item_value_object("measure", "max_affixes_bonus"), obj->level));
+            maxAffixes += (int)std::round(item_points_by_level(item_value_object("measure", "max_affixes_bonus"), obj->level, col));
 
         const Json::Value &secs = item_value_object("measure", "stat_sections");
         std::set<DLString> statSections;
