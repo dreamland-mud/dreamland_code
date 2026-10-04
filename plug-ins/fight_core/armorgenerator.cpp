@@ -771,7 +771,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
 
         for (int step = 0; step < 16 && total < target; step++) {
             vector<int> big, small;
-            int bigWeights = 0, smallWeights = 0;
+            vector<int> exempt;
+            int bigWeights = 0, smallWeights = 0, exemptWeights = 0;
             int slotsLeft = max(1, maxAffixes - (int)picked.size());
             int floorPrice = (target - total) / slotsLeft / 2;
             bool needStats = !relaxed && statFloor > 0 && statSpent < statFloor * target;
@@ -805,6 +806,15 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
                         weightNow[i] = max(1, (int)std::round(c.weight * topRepeat));
                 }
 
+                // While the floor holds, cheap stats all land in `small` and an exempt
+                // affix would be the only `big` one, picked every time whatever its
+                // weight. It joins whichever list is drawn from instead.
+                if (needStats && !isStat[i]) {
+                    exempt.push_back(i);
+                    exemptWeights += weightNow[i];
+                    continue;
+                }
+
                 // A negative buys budget room, it never fills a slot's share.
                 if (c.price < 0 || c.price >= floorPrice) {
                     big.push_back(i);
@@ -815,7 +825,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
                 }
             }
 
-            vector<int> &eligible = big.empty() ? small : big;
+            vector<int> eligible = big.empty() ? small : big;
             int weights = big.empty() ? smallWeights : bigWeights;
 
             if ((eligible.empty() || weights <= 0) && needStats) {
@@ -823,6 +833,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
                 step--;
                 continue;
             }
+            eligible.insert(eligible.end(), exempt.begin(), exempt.end());
+            weights += exemptWeights;
             if (eligible.empty() || weights <= 0)
                 break;
 
