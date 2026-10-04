@@ -16,7 +16,14 @@ static void reboot_now( )
     for ( d = descriptor_list; d != 0; d = d_next )
     {
             d_next = d->next;
-            d->send("Мир Мечты уходит на перезагрузку ПРЯМО СЕЙЧАС!\n");
+            // Login-screen descriptors have no character, hence no language yet.
+            if (d->character)
+                d->send(lmsg(viewerLang(d->character),
+                    "Dreamland is rebooting RIGHT NOW!\n",
+                    "Мир Мечты уходит на перезагрузку ПРЯМО СЕЙЧАС!\n",
+                    "Світ Мрії йде на перезавантаження ПРЯМО ЗАРАЗ!\n"));
+            else
+                d->send("Dreamland is rebooting RIGHT NOW! / Мир Мечты уходит на перезагрузку ПРЯМО СЕЙЧАС! / Світ Мрії йде на перезавантаження ПРЯМО ЗАРАЗ!\n");
 
             if (d->character && d->connected == CON_PLAYING)
                     d->character->getPC( )->save();
@@ -70,7 +77,7 @@ void reboot_action(const DLString& constArguments, ostringstream& buf)
     if (arg.isNumber())
     {
         dreamland->setRebootCounter(arg.toInt());
-        buf << fmt(0, _("Мир Мечты будет ПЕРЕЗАГРУЖЕН через %d тиков!"), dreamland->getRebootCounter()) << endl;
+        buf << fmt(0, "Dreamland will REBOOT in %d ticks!", dreamland->getRebootCounter()) << endl;
         return;
     }
 
