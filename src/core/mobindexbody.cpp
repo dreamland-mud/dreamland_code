@@ -375,8 +375,24 @@ void mob_index_data::deriveNumbers()
         bodySnapshot[MOBSET_AFF] = (unsigned int)affected_by;
     }
 
+    // Act bits granted by the tier (decision 72: warrior from champion up), not
+    // for casters: their kit is spells, and the class bit picks their off list.
+    if (!tierRow.actAdd.empty() && !tc.isCaster(m)) {
+        Body::NameSet tierAct(tierRow.actAdd.begin(), tierRow.actAdd.end());
+        act |= (int)MobBody::bits(&::act_flags, tierAct);
+        bodySnapshot[MOBSET_ACT] = (unsigned int)act;
+    }
+
     if (bodyResolved) {
         bitstring_t enabled = enabled_off(this, tc.offCount(tier, vnum));
+        if (!tierRow.offAdd.empty()) {
+            Body::NameSet tierOff(tierRow.offAdd.begin(), tierRow.offAdd.end());
+            bitstring_t add = MobBody::bits(&::off_flags, tierOff) & (unsigned int)offAllowed;
+            // A slow body (worm, slug, zombie) never turns fast.
+            if (IS_SET(affected_by, AFF_SLOW))
+                add &= ~(bitstring_t)OFF_FAST;
+            enabled |= add;
+        }
         enabled |= bodyAdd[MOBSET_OFF];
         enabled &= ~bodyDel[MOBSET_OFF];
         off_flags = (int)enabled;
