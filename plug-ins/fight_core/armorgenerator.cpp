@@ -546,10 +546,34 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
     int maxAffixes = maxAffixesM > 0 ? maxAffixesM : 1000;
     int maxNegatives = maxNegativesM > 0 ? maxNegativesM : 1000;
 
+    // Model calibration knobs (one item model P7), data-only and off when absent:
+    // measure.stat_floor {level: share} = least share of the target spent on stat
+    // sections (measure.stat_sections), so a low-level item is not a bag of flat
+    // effects; measure.max_affixes_bonus {level: n} = extra distinct affixes where
+    // honest prices make affixes cheap (high level).
+    double statFloor = 0;
+    std::vector<bool> isStat(pool.size(), false);
+    if (item_model_enabled()) {
+        statFloor = item_points_by_level(item_value_object("measure", "stat_floor"), obj->level);
+        if (maxAffixesM > 0)
+            maxAffixes += (int)std::round(item_points_by_level(item_value_object("measure", "max_affixes_bonus"), obj->level));
+
+        const Json::Value &secs = item_value_object("measure", "stat_sections");
+        std::set<DLString> statSections;
+        if (secs.isArray())
+            for (auto const &sec: secs)
+                statSections.insert(sec.asString());
+        else
+            statSections = { "armor_stats", "primary_stats", "affect_packs" };
+        for (int i = 0; i < (int)pool.size(); i++)
+            isStat[i] = statSections.count(pool[i].section) > 0 && pool[i].price > 0;
+    }
+
     for (int attempt = 0; attempt < 30; attempt++) {
         std::map<int, int> picked;
-        int total = 0, penalty = 0, negatives = 0;
+        int total = 0, penalty = 0, negatives = 0, statSpent = 0;
         int target = number_range(minM, maxM);
+        bool relaxed = false;   // no stat pick fits any more: fill freely
 
         for (int i: forced) {
             picked[i] = 1;
@@ -565,11 +589,15 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
             int bigWeights = 0, smallWeights = 0;
             int slotsLeft = max(1, maxAffixes - (int)picked.size());
             int floorPrice = (target - total) / slotsLeft / 2;
+            bool needStats = !relaxed && statFloor > 0 && statSpent < statFloor * target;
 
             for (int i = 0; i < (int)pool.size(); i++) {
                 const Candidate &c = pool[i];
                 auto it = picked.find(i);
                 bool fresh = (it == picked.end());
+
+                if (needStats && !isStat[i])
+                    continue;
 
                 if (!fresh && it->second >= c.stack)
                     continue;
@@ -597,6 +625,11 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
             vector<int> &eligible = big.empty() ? small : big;
             int weights = big.empty() ? smallWeights : bigWeights;
 
+            if ((eligible.empty() || weights <= 0) && needStats) {
+                relaxed = true;   // the floor cannot be met inside the caps: retry this step freely
+                step--;
+                continue;
+            }
             if (eligible.empty() || weights <= 0)
                 break;
 
@@ -617,6 +650,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
             total += pool[i].price;
             if (pool[i].price < 0)
                 penalty += pool[i].price;
+            if (isStat[i])
+                statSpent += pool[i].price;
         }
 
         int distance = total < minM ? minM - total : (total > maxM ? total - maxM : 0);
