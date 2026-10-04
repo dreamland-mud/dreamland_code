@@ -164,7 +164,6 @@ src/core/skills/Makefile \
 src/core/clan/Makefile \
 src/io/Makefile \
 src/lang/Makefile \
-src/moc/Makefile \
 src/plugin/Makefile \
 src/scheduler/Makefile \
 src/util/Makefile \
