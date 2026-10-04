@@ -269,7 +269,16 @@ bool SheathWearloc::displayFlags(Character *ch, Object *obj)
  */
 DLString SheathWearloc::displayName(Character *ch, Object *obj, lang_t lang)
 {
-    DLString eqName = obj->getProperty("eqName");
+    // Per-language short forms are stored next to the Russian one by the generator.
+    // A viewer whose language has no stored form gets the full default name rather
+    // than the Russian noun.
+    DLString eqName;
+    if (lang == LANG_RU)
+        eqName = obj->getProperty("eqName");
+    else if (lang == LANG_EN)
+        eqName = obj->getProperty("eqName_en");
+    else if (lang == LANG_UA)
+        eqName = obj->getProperty("eqName_ua");
 
     if (!eqName.empty())
         return eqName.ruscase('1');
@@ -383,7 +392,7 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
     if (( rc = DefaultWearlocation::canWear( ch, obj, flags ) ) != RC_WEAR_OK)
         return rc;
         
-    if (!ch->is_npc( ) && obj->getWeight( ) > (get_str_app(ch).wield * 10)) {
+    if (too_heavy_to_wield( ch, obj, false )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
             ch->pecho(_("Ты не можешь этим вооружиться. Оно слишком тяжело для тебя."));
             ch->recho(_("%^C1, кряхтя, пытается надеть %O4, но сил к сожалению не хватает."), ch, obj);
@@ -523,7 +532,7 @@ int SecondWieldWearloc::canWear( Character *ch, Object *obj, int flags )
         return RC_WEAR_LARGE;
     }
 
-    if (obj->getWeight( ) > (get_str_app(ch).wield * 5)) {
+    if (too_heavy_to_wield( ch, obj, true )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
             ch->pecho(_("Это оружие слишком тяжело для тебя, чтобы использовать его как вторичное."));
             ch->recho(_("%^C1 пытается взять %O4 в левую руку, но сил явно не хватает."), ch, obj);

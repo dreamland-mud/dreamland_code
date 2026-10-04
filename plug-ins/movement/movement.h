@@ -50,6 +50,10 @@ protected:
     // display language (viewerLang), so an assembled message (verb + direction)
     // resolves per viewer. Args are shared (act codes resolve per recipient).
     void msgRoomNoParty( Character *, const char *en, const char *ru, const char *ua );
+    // Trilingual single/mounted pair: the mounted line goes out when the mover
+    // rides, the single line otherwise, each in the recipient's language.
+    void msgRoomNoParty( Character *, const char *sEn, const char *sRu, const char *sUa,
+                                      const char *mEn, const char *mRu, const char *mUa );
     void msgSelfMaster( Character *, const char *, const char * );
     void msgSelfMaster( Character *, const char *sEn, const char *sRu, const char *sUa,
                                      const char *mEn, const char *mRu, const char *mUa );

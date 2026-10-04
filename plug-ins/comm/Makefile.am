@@ -68,6 +68,7 @@ unlock.cpp \
 wizard.cpp \
 set.cpp \
 vault.cpp \
+webscript.cpp \
 execservlet.cpp \
 accountservlet.cpp
 

@@ -522,16 +522,28 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
         body["name"]["en"] = player->getName();
         body["name"]["ru"] = player->getRussianName().decline('1');
         
+        // "race" and "clan.name" stay Russian for older bot builds; the
+        // per-language variants sit next to them.
         const Race &race = *player->getRace();
-        DLString raceName = player->getSex() == SEX_FEMALE ? race.getFemaleName() : race.getMaleName();
-        body["race"] =raceName.ruscase('1');
+        bool female = player->getSex() == SEX_FEMALE;
+        DLString raceName = female ? race.getFemaleName() : race.getMaleName();
+        DLString raceNameUa = female ? race.getFemaleNameUa() : race.getMaleNameUa();
+        if (raceNameUa.empty())
+            raceNameUa = raceName;
+        body["race"] = raceName.ruscase('1');
+        body["raceEn"] = race.getName();
+        body["raceUa"] = raceNameUa.ruscase('1');
 
         if (!player->getClan( )->isHidden()) {
             const Clan &clan = *player->getClan( );
 
             body["clan"]["name"] = clan.getRussianName().colourStrip().ruscase('1');
+            body["clan"]["nameEn"] = clan.getNameFor(LANG_EN).colourStrip();
+            body["clan"]["nameUa"] = clan.getNameFor(LANG_UA).ruscase('1').colourStrip();
             body["clan"]["level"] = player->getClanLevel();
             body["clan"]["title"] = clan.getTitle(player);
+            body["clan"]["titleEn"] = clan.getTitle(player, LANG_EN);
+            body["clan"]["titleUa"] = clan.getTitle(player, LANG_UA);
             body["clan"]["leader"] = clan.isLeader(player) ? "true" : "false";
             body["clan"]["recruiter"] = clan.isRecruiter(player) ? "true" : "false";
         }

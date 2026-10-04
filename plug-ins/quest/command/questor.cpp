@@ -341,9 +341,10 @@ void Questor::rewardWord( PCharacter *client )
     }        
 }
 
-void Questor::rewardScroll( PCharacter *client )
+/** A skill scroll bound to client, not placed anywhere: 1-2 unfinished skills, +2-4% each.
+ *  NULL when no skill qualifies. report gets "skill (gain%) " per skill. */
+Object * make_quest_scroll( PCharacter *client, ostringstream &report )
 {
-    ostringstream report;
     int sn, i, count;
     int learned, maximum;
     vector<int> skills;
@@ -372,7 +373,7 @@ void Questor::rewardScroll( PCharacter *client )
     }
     
     if (skills.empty( ))
-        return;
+        return 0;
 
     bhv.construct( );
     count = number_range( 1, 2 );
@@ -390,6 +391,27 @@ void Questor::rewardScroll( PCharacter *client )
     bhv->setObj( scroll );
     bhv->setOwner( client );
     bhv->createDescription( client );
+    return scroll;
+}
+
+/** A scroll for Fenia (tier loot drops): same roll as the questor's reward.
+ *  quest_command's QuestScrollHookPlugin installs it as quest_scroll_hook. */
+Object * fenia_quest_scroll( PCharacter *client )
+{
+    ostringstream report;
+    Object *scroll = make_quest_scroll( client, report );
+    if (scroll)
+        ::wiznet( WIZ_QUEST, 0, 0, "%^C1 получает свиток познания (добыча) для умения %s", client, report.str().c_str() );
+    return scroll;
+}
+
+void Questor::rewardScroll( PCharacter *client )
+{
+    ostringstream report;
+    Object *scroll = make_quest_scroll( client, report );
+
+    if (!scroll)
+        return;
 
     obj_to_char( scroll, client );
     tell_raw( client, ch, _("Кроме того, я вручаю тебе свиток, внимательно изучив который, "
@@ -495,6 +517,7 @@ bool QuestScrollBehavior::examine( Character *ch )
     Skill *skill;
     XMLMapBase<XMLInteger>::iterator s;
     bool extract = true;
+    bool learnedAny = false;
     
     if (!isOwner( ch )) {
         oldact(_("Знания, заключенные в $o6, недоступны тебе."), ch, obj, 0, TO_CHAR);
@@ -533,6 +556,7 @@ bool QuestScrollBehavior::examine( Character *ch )
                                    data.learned + s->second,
                                    skill->getMaximum( ch ));
             s->second = 0;
+            learnedAny = true;
         }
     }
     
@@ -540,6 +564,15 @@ bool QuestScrollBehavior::examine( Character *ch )
         buf << fmt( ch, _("Похоже, знаки на этом свитке потеряли силу.") ) << endl;
 
     ch->send_to( buf );
+
+    // Nothing on the scroll can be learned right now (every skill is maxed or
+    // out of reach): crumble it instead of leaving a dead scroll forever.
+    if (!extract && !learnedAny) {
+        ch->pecho( _("Этот свиток больше ничему не может тебя научить. Чернила меркнут, и %1$O1 рассыпа%1$nется|ются трухой."), obj );
+        extract_obj( obj );
+        return true;
+    }
+
     if(extract) {
         oldact(_("Чернила меркнут, и $o1 рассыпается трухой."), ch, obj, 0, TO_CHAR);
         extract_obj( obj );

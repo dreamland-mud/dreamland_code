@@ -94,29 +94,39 @@ protected:
             return true;
 
         if (ch->is_npc( )) {
-            msgSelf( ch, "В лес!" );
+            msgSelf( ch, "Into the forest!",
+                         "В лес!",
+                         "У ліс!" );
             return false;
         }
 
         if (ch->getPC( )->getHometown( ) == home_frigate) {
-            msgSelf( ch, "Близость Хаоса возмущает эфир! Похоже, Галеон сейчас твой единственный вид транспорта." );
+            msgSelf( ch, "The nearness of Chaos stirs the ether! Looks like the Galleon is your only ride for now.",
+                         "Близость Хаоса возмущает эфир! Похоже, Галеон сейчас твой единственный вид транспорта.",
+                         "Близькість Хаосу збурює ефір! Схоже, Галеон зараз твій єдиний транспорт." );
             return false;
         }
 
         attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" );
         if (!attr) {
-            msgSelf( ch, "У тебя нет своего дома." );
+            msgSelf( ch, "You don't have a home of your own.",
+                         "У тебя нет своего дома.",
+                         "У тебе немає власного дому." );
             return false;
         }
 
         int vnum = attr->getLabeledPoint( label );
         if (vnum <= 0 && !label.empty( )) {
-            msgSelf( ch, "У тебя нету дома, помеченного такой меткой." );
+            msgSelf( ch, "You have no home with that label.",
+                         "У тебя нету дома, помеченного такой меткой.",
+                         "У тебе немає дому з такою міткою." );
             return false;
         }
 
         if (!( to_room = get_room_instance( vnum ) )) {
-            msgSelf( ch, "Ты заблудил%1Gось|ся|ась." );
+            msgSelf( ch, "You are lost.",
+                         "Ты заблудил%1Gось|ся|ась.",
+                         "Ти заблука%1Gло|в|ла." );
             return false;
         }
 
@@ -146,18 +156,30 @@ protected:
     virtual void msgOnMove( Character *wch, bool fLeaving )
     {
         if (fLeaving)
-            msgRoomNoParty( wch, 
+            msgRoomNoParty( wch,
+                            "%1$^C1 vanishes into thin air.",
                             "%1$^C1 растворил%1$Gось|ся|ась в воздухе.",
-                            "%1$^C1 и %2$C1 растворяются в воздухе." );
+                            "%1$^C1 розчини%1$Gлось|вся|лась у повітрі.",
+                            "%1$^C1 and %2$C1 vanish into thin air.",
+                            "%1$^C1 и %2$C1 растворяются в воздухе.",
+                            "%1$^C1 і %2$C1 розчиняються в повітрі." );
         else
-            msgRoomNoParty( wch, 
-                            "%1$^C1 появляется рядом с тобой." ,
-                            "%1$^C1 и %2$C1 появляются рядом с тобой." );
+            msgRoomNoParty( wch,
+                            "%1$^C1 appears beside you.",
+                            "%1$^C1 появляется рядом с тобой.",
+                            "%1$^C1 з'являється поруч із тобою.",
+                            "%1$^C1 and %2$C1 appear beside you.",
+                            "%1$^C1 и %2$C1 появляются рядом с тобой.",
+                            "%1$^C1 і %2$C1 з'являються поруч із тобою." );
     }
     virtual void msgOnStart( )
     {
-        msgRoom( ch, "%1$^C1 просит Богов перенести %1$P2 в родной дом." );
-        msgSelf( ch, "Ты просишь Богов перенести тебя в родной дом." );
+        msgSelfRoom( ch, "You ask the Gods to carry you home.",
+                         "Ты просишь Богов перенести тебя в родной дом.",
+                         "Ти просиш Богів перенести тебе до рідного дому.",
+                         "%1$^C1 asks the Gods to be carried home.",
+                         "%1$^C1 просит Богов перенести %1$P2 в родной дом.",
+                         "%1$^C1 просить Богів перенести %1$Gйого|його|її|їх до рідного дому." );
     }
     virtual void movePet( NPCharacter *pet )
     {

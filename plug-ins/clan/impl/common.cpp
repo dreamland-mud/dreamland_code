@@ -47,22 +47,30 @@ protected:
             return true;
 
         if (( point = ch->getClan( )->getRecallVnum( ) ) <= 0) {
-            msgSelf( ch, "Но у тебя нет кланового дома." );
+            msgSelf( ch, "But you have no clan home.",
+                         "Но у тебя нет кланового дома.",
+                         "Але в тебе немає кланового дому." );
             return false;
         }
         
         if (!ch->is_npc() && ch->getPC( )->getHometown( ) == home_frigate) {
-            msgSelf( ch, "Близость Хаоса возмущает эфир! Похоже, Галеон сейчас твой единственный вид транспорта." );
+            msgSelf( ch, "The nearness of Chaos stirs the ether! Looks like the Galleon is your only ride for now.",
+                         "Близость Хаоса возмущает эфир! Похоже, Галеон сейчас твой единственный вид транспорта.",
+                         "Близькість Хаосу збурює ефір! Схоже, Галеон зараз твій єдиний транспорт." );
             return false;
         }
 
         if (!gsn_clanrecall->available( ch )) {
-            msgSelf( ch, "Богам нет дела до твоих просьб." );
+            msgSelf( ch, "The gods do not care about your pleas.",
+                         "Богам нет дела до твоих просьб.",
+                         "Богам байдуже до твоїх прохань." );
             return false;
         }
         
         if (!( to_room = get_room_instance( point ) )) {
-            msgSelf( ch, "Ты заблудил%1Gось|ся|ась." );
+            msgSelf( ch, "You are lost.",
+                         "Ты заблудил%1Gось|ся|ась.",
+                         "Ти заблука%1Gло|в|ла." );
             return false;
         }
 
@@ -94,12 +102,20 @@ protected:
     {
         if (fLeaving)
             msgRoomNoParty( wch,
+                            "%1$^C1 disappears.",
                             "%1$^C1 исчезает.",
-                            "%1$^C1 и %2$C1 исчезают." );
+                            "%1$^C1 зникає.",
+                            "%1$^C1 and %2$C1 disappear.",
+                            "%1$^C1 и %2$C1 исчезают.",
+                            "%1$^C1 і %2$C1 зникають." );
         else
-            msgRoomNoParty( wch, 
+            msgRoomNoParty( wch,
+                            "%1$^C1 appears in the room.",
                             "%1$^C1 появляется в комнате.",
-                            "%1$^C1 и %2$C1 появляются в комнате." );
+                            "%1$^C1 з'являється в кімнаті.",
+                            "%1$^C1 and %2$C1 appear in the room.",
+                            "%1$^C1 и %2$C1 появляются в комнате.",
+                            "%1$^C1 і %2$C1 з'являються в кімнаті." );
     }
     virtual void movePet( NPCharacter *pet )
     {
@@ -108,7 +124,9 @@ protected:
     bool checkPostAffect( )
     {
         if (ch->isAffected( gsn_clanrecall )) {
-            msgSelf( ch, "Слишком мало времени прошло с последней молитвы." );
+            msgSelf( ch, "Too little time has passed since your last prayer.",
+                         "Слишком мало времени прошло с последней молитвы.",
+                         "Надто мало часу минуло від останньої молитви." );
             return false;
         }
 

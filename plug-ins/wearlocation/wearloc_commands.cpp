@@ -268,12 +268,22 @@ CMDRUNP( remove )
             return;
         }
 
+        bool wearsAnything = false;
+
         for (obj = ch->carrying; obj != 0; obj = obj_next) {
             obj_next = obj->next_content;
 
-            if (ch->can_see( obj ))
+            if (ch->can_see( obj )) {
+                if (obj->wear_loc != wear_none)
+                    wearsAnything = true;
                 obj->wear_loc->remove( obj, F_WEAR_VERBOSE );
+            }
         }
+
+        // Otherwise an ordered 'remove all' on a naked pet leaves the master
+        // with nothing but the bare "Ok.".
+        if (!wearsAnything)
+            echo_master(ch, _("Ты ничего не носишь."));
 
         return;
     }

@@ -210,6 +210,7 @@ ResumeResult resume_attach(Descriptor *d, const DLString &token)
      * then reaps the CON_CLOSED descriptor. Desktop is unaffected: its socket
      * closes cleanly on reconnect, so twin->desc is already null here and this
      * branch never runs. */
+    bool takeover = twin->desc != 0;
     if (twin->desc)
         twin->desc->close();
 
@@ -229,9 +230,10 @@ ResumeResult resume_attach(Descriptor *d, const DLString &token)
      * player can tell this apart from a login and keep quiet. */
     DescriptorStateManager::getThis()->handle(CON_RESUME, CON_PLAYING, d);
 
-    // Deliberately quiet: no room echo, no wiznet. This fires every time a
-    // phone locks its screen, and "%C1 restored their link" fifty times an
-    // evening is noise, not information.
+    // The room already saw the net-death line, either when the socket died or
+    // from the close() above, so answer it: a silent return left the player
+    // looking linkdead to everyone around them.
+    InterpretHandler::announceReconnect(twin, takeover);
     twin->timer = 0;
 
     LogStream::sendNotice() << "Resume: " << d->host << " resumed the session of "

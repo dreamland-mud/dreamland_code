@@ -20,12 +20,15 @@ fight_position.cpp \
 fight_exception.cpp \
 damage.cpp \
 damage_impl.cpp \
+itemvalue.cpp \
+itemmodel.cpp \
 character.cpp \
 weapons.cpp \
 weapontier.cpp \
 weaponaffixes.cpp \
 weaponcalculator.cpp \
 weapongenerator.cpp \
+armorgenerator.cpp \
 weaponrandomizer.cpp \
 material.cpp \
 fight_safe.cpp \

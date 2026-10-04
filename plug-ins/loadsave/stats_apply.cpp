@@ -8,9 +8,14 @@
 
 #include "configurable.h"
 #include "character.h"
+#include "npcharacter.h"
+#include "object.h"
+#include "affect.h"
+#include "affectflags.h"
 #include "profession.h"
 #include "pcrace.h"
 #include "merc.h"
+#include "def.h"
 
 /*
  * Attribute bonus tables.
@@ -84,4 +89,33 @@ void wis_app_type::fromJson(const Json::Value &value)
 void dex_app_type::fromJson(const Json::Value &value)
 {
     defensive = value["defensive"].asInt();
+}
+
+static bool is_native_weapon( Character *ch, Object *obj )
+{
+    // Charmed pets mostly live in limbo next to every crafted weapon.
+    if (!ch->is_npc( )
+        || (IS_AFFECTED(ch, AFF_CHARM) && ch->master != NULL)
+        || ch->getNPC( )->pIndexData->area != obj->pIndexData->area)
+    {
+        return false;
+    }
+
+    for (auto &paf: ch->affected)
+        if (paf->location == APPLY_STR && paf->modifier < 0)
+            return false;
+
+    return true;
+}
+
+int wield_weight_cap( Character *ch, bool secondary )
+{
+    return get_str_app(ch).wield * (secondary ? 5 : 10);
+}
+
+bool too_heavy_to_wield( Character *ch, Object *obj, bool secondary )
+{
+    int cap = wield_weight_cap( ch, secondary );
+
+    return obj->getWeight( ) > cap && !is_native_weapon( ch, obj );
 }

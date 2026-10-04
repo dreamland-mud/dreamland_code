@@ -50,7 +50,11 @@
 #include "fight.h"
 #include "weapons.h"
 #include "damage.h"
+#include "itemvalue.h"
+#include "itemmodel.h"
+#include "armorgenerator.h"
 #include "skill_utils.h"
+#include "stats_apply.h"
 #include "rageoath.h"
 #include "areaquestutils.h"
 #include "material.h"
@@ -3280,31 +3284,12 @@ static void ga_record( std::map<int,GAAcq> &acq, int vnum, int method, int aux, 
     acq[vnum] = a;
 }
 
-struct GAWeights {
-    double hp = 0, mana = 0, manaGain = 0, healGain = 0, dr = 0, hr = 0, saves = 0;
-    double weaponWeight = 0;   // per-average-weapon-damage weight, split from dr so a
-                           // caster can value a weapon's melee output below its
-                           // damroll (a staff's stats should out-rank a raw sword).
-    double stat[6] = {};   // str, int, wis, dex, con, cha
-    // Phase 3b / F3 additions: affect flags, res/imm/vuln, and the applies ga_score
-    // used to ignore. `caster` picks the melee/caster value for profile-split flags.
-    bool   caster = false;
-    double ac = 0, slevel = 0, level = 0, skillLevel = 0, skillLevelSkill = 0, move = 0, beats = 0;
-    double spellFactor = 1.0;   // slevel discount for a char with few/no spells (0..1)
-    double learnSkill = 0, learnGroup = 0, learnAll = 0;   // APPLY_LEARNED %, by global scope
-    // affect_flags the char already has for free (perma affects + worn gear OUTSIDE the
-    // candidate's slot). A CANDIDATE re-granting one scores it 0 in ga_affectFlagValue.
-    // Set PER CANDIDATE before scoring (slot-excluded); stays 0 for the worn baseline.
-    bitstring_t heldFlags = 0;
-    // Score value of one swing of the char's currently-wielded weapon (weaponWeight*eff),
-    // set once in gearAdvice. A NON-weapon item granting extra melee attacks (a belt, a
-    // ring) scores its combathits on this -- those swings fire the worn weapon, so they use
-    // the same currency a weapon's own combathits do. -1 = no usable weapon wielded.
-    double curWeaponSwing = -1.0;
-};
+// Profile weights: fight_core/itemmodel.h, one table for the sage and the generators.
+typedef ItemWeights GAWeights;
 
 struct GACand {
     obj_index_data *pObj;
+    ::Object *inst = 0; // a rolled item the char carries: scored and shown as itself
     int    slot;      // wear_flags without ITEM_TAKE (0 = light)
     double score;
     double obtain;    // 0..1 obtainability
@@ -3315,21 +3300,47 @@ struct GACand {
                       // render says whereabouts unknown instead of a stale route.
 };
 
-// Can the char put a weapon in the off-hand right now? Mirrors SecondWieldWearloc's
-// gate: the second-weapon skill usable, the char actually HAS the off-hand rib (some
-// shapeshifts lose it), no shield or held item in the left hand, and the primary weapon
-// not two-handed. Tests ACTUAL wear locations, not prototype flags -- an arrow stuck in
-// the char or a sheathed weapon carries the wield flag but holds no hand. A shield or
-// two-hander build keeps a single weapon position, so the advisor won't nudge it away.
-// (Conservative gaps, no false "yes": SIZE_HUGE giants may two-hand-plus-offhand; a
-// sheathed weapon reads the off-hand as free -- both only ever under-report capacity.)
-static bool ga_canDualWield( Character *ch )
+// Weapon flags of a candidate: a rolled weapon keeps them on the instance.
+static int ga_candValue4( const GACand &c )
+{
+    return c.inst ? c.inst->value4( ) : c.pObj->value[4];
+}
+
+// The body can fight with an off-hand weapon at all: the second-weapon skill is usable,
+// the char has the off-hand wear location (some shapeshifts lose it), and has hands and
+// both wrists -- second_weapon_hit (fight.cpp) skips the off-hand swing without them.
+static bool ga_dualBody( Character *ch )
 {
     Skill *sk = skillManager->findExisting( "second weapon" );
     if (sk == 0 || !sk->usable( ch, false ))
         return false;
-    Wearlocation *offLoc = wearlocationManager->findExisting( "second_wield" );
-    if (offLoc == 0 || !ch->getWearloc( ).isSet( offLoc ))
+    const char *locs[] = { "second_wield", "hands", "wrist_l", "wrist_r" };
+    for (int i = 0; i < 4; i++) {
+        Wearlocation *loc = wearlocationManager->findExisting( locs[i] );
+        if (loc == 0 || !ch->getWearloc( ).isSet( loc ))
+            return false;
+    }
+    return true;
+}
+
+// A two-handed weapon blocks the other hand unless the race is SIZE_HUGE: giants may wield
+// a two-hander beside an off-hand weapon, or put one IN the off-hand. Mirrors
+// SecondWieldWearloc::canWear and second_weapon_hit.
+static bool ga_twoHandBlocks( Character *ch, bool twoHanded )
+{
+    return twoHanded && ch->getRace( )->getSize( ) < SIZE_HUGE;
+}
+
+// Can the char put a weapon in the off-hand right now? Mirrors SecondWieldWearloc's
+// gate: ga_dualBody, no shield or held item in the left hand, and the primary weapon
+// not two-handed (a giant excepted). Tests ACTUAL wear locations, not prototype flags --
+// an arrow stuck in the char or a sheathed weapon carries the wield flag but holds no
+// hand. A shield build keeps a single weapon position here; the shield-or-second-weapon
+// verdict in gearAdvice weighs that choice separately. (Conservative gap: a sheathed
+// weapon reads the off-hand as free -- only ever under-reports capacity.)
+static bool ga_canDualWield( Character *ch )
+{
+    if (!ga_dualBody( ch ))
         return false;
     Wearlocation *shieldLoc = wearlocationManager->findExisting( "shield" );
     Wearlocation *holdLoc   = wearlocationManager->findExisting( "hold" );
@@ -3338,7 +3349,7 @@ static bool ga_canDualWield( Character *ch )
         return false;
     Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
     ::Object *primary = wieldLoc ? wieldLoc->find( ch ) : 0;
-    if (primary != 0 && IS_WEAPON_STAT( primary, WEAPON_TWO_HANDS ))
+    if (primary != 0 && ga_twoHandBlocks( ch, IS_WEAPON_STAT( primary, WEAPON_TWO_HANDS ) ))
         return false;
     return true;
 }
@@ -3347,9 +3358,7 @@ static bool ga_canDualWield( Character *ch )
 // stat cap are worth anything. base = the stat WITHOUT the item being scored.
 static double ga_statgain( int base, int delta, int cap )
 {
-    int before = URANGE( MIN_STAT, base,         cap );
-    int after  = URANGE( MIN_STAT, base + delta, cap );
-    return after - before;
+    return item_fit_stat( base, delta, cap );
 }
 
 // ga_score's stat[] weight order (str,int,wis,dex,con,cha) -> STAT_ index.
@@ -3401,8 +3410,13 @@ double spell_proc_tier_value( const DLString &spellName, int level );
 //    level-scaled like a spell). A multi_hit is a whole extra round, _round_attacks swings.
 // Returns 0 for an item that declares neither -- ga_score then keeps the flat +50.
 // COMBAT_PROC_SCORING.md.
-static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0 )
+static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::Object *inst = 0,
+                            int modelLevel = -1, bool caster = false )
 {
+    // A random item carries its procs on the instance (armor generator); they win
+    // over the prototype's, exactly as ocombatcast_fight fires them.
+    const Json::Value &castSrc = (inst != 0 && inst->props.isMember( "combatcast" ))
+                                    ? inst->props : pObj->props;
     // isMember guard FIRST on every prop read: pObj is non-const, so
     // pObj->props["x"] would INSERT a null member into the prototype on every
     // scored item (jsoncpp non-const operator[]), polluting props world-wide and
@@ -3415,14 +3429,23 @@ static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0 )
     // and the flat fallback are damage -> _global + level-scaled; a real swing is neither.
     int ref = (int)spell_combat_level_ref( );
     double rawCast = 0, rawFlatHits = 0, swingHits = 0;
+    // Model (modelLevel >= 0): each cast is priced by the combat-effect model at the
+    // item level, in final points (item_proc_points, decision 9), not via _global.
+    double modelCast = 0;
 
     // Spells cast in combat.
-    if (pObj->props.isMember( "combatcast" )) {
-        const Json::Value &casts = pObj->props["combatcast"];
+    if (castSrc.isMember( "combatcast" )) {
+        const Json::Value &casts = castSrc["combatcast"];
         if (casts.isArray( )) {
             for (auto i = casts.begin( ); i != casts.end( ); ++i) {
                 const Json::Value &c = *i;
                 DLString spellName = c["spell"].asString( );
+                if (modelLevel >= 0) {
+                    modelCast += item_proc_points( spellName, c["chance"].asDouble( ),
+                                                   c.isMember( "count" ) ? c["count"].asDouble( ) : 1.0,
+                                                   modelLevel, caster );
+                    continue;
+                }
 
                 // Explicit override wins (spells whose worth does not follow their
                 // tier); otherwise derive from the spell's damage tier at the
@@ -3474,7 +3497,7 @@ static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0 )
         }
     }
 
-    if (rawCast <= 0 && rawFlatHits <= 0 && swingHits <= 0)
+    if (rawCast <= 0 && rawFlatHits <= 0 && swingHits <= 0 && modelCast <= 0)
         return 0;
 
     // rawCast and rawFlatHits are expected DAMAGE -> convert to score currency with
@@ -3483,7 +3506,7 @@ static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0 )
     // level+skill+dice, so it is neither level-scaled nor re-converted by _global -- doing so
     // would double-convert it (the bug the first cut shipped: everything x2.68).
     double levelScale = pObj->level / spell_combat_level_ref( );
-    return spell_combat_global( ) * (rawCast + rawFlatHits) * levelScale + swingHits;
+    return spell_combat_global( ) * (rawCast + rawFlatHits) * levelScale + swingHits + modelCast;
 }
 
 // Clerics learn "compound" (lvl 37): it weights any weapon-class weapon into a
@@ -3554,10 +3577,7 @@ static bool ga_clericCanCompound( Character *target, ::Object *o )
 // never over-discounts.
 static bool ga_canSelfCast( Character *target, const char *name )
 {
-    if (target == 0)
-        return false;
-    Skill *sk = skillManager->findExisting( name );
-    return sk != 0 && sk->available( target );
+    return item_fit_self_cast( target, name );
 }
 
 // Value of an affect_flags bitvector (sanctuary/haste/stealth; negatives are
@@ -3569,94 +3589,12 @@ static bool ga_canSelfCast( Character *target, const char *name )
 // capability). Curses and gear-only bits (no matching spell) never discount.
 static double ga_affectFlagValue( bitstring_t b, bool caster, Character *target, bitstring_t heldFlags )
 {
-    double s = 0;
-    auto v = [&]( bitstring_t flag, double base, const char *spell ) -> double {
-        if (!IS_SET( b, flag ))
-            return 0;
-        // Already have this buff for free from other worn gear or a permanent affect?
-        // A second copy is pure redundancy -- worth nothing. Positives only: a curse
-        // penalty bit still counts, you don't "already have" a curse as a boon.
-        if (base > 0 && IS_SET( heldFlags, flag ))
-            return 0;
-        if (spell != 0 && ga_canSelfCast( target, spell ))
-            return base * 0.1;
-        return base;
-    };
-    s += v( AFF_SANCTUARY,    300,                "sanctuary" );
-    s += v( AFF_HASTE,        caster ? 40 : 110,  "haste" );
-    s += v( AFF_SLOW,         caster ? -10 : -55, 0 );
-    s += v( AFF_PROTECT_EVIL, 60,                 "protection evil" );
-    s += v( AFF_PROTECT_GOOD, 60,                 "protection good" );
-    s += v( AFF_REGENERATION, caster ? 15 : 30,   0 );
-    s += v( AFF_FLYING,       15,                 "fly" );
-    s += v( AFF_PASS_DOOR,    15,                 "pass door" );
-    s += v( AFF_INVISIBLE,    15,                 "invis" );
-    s += v( AFF_IMP_INVIS,    100,                "improved invis" );
-    s += v( AFF_CAMOUFLAGE,   100,                "camouflage" );
-    s += v( AFF_FADE,         100,                "fade" );
-    s += v( AFF_SNEAK,        caster ? 8 : 12,    "sneak" );
-    s += v( AFF_HIDE,         6,                  "hide" );
-    s += v( AFF_INFRARED,     8,                  "infravision" );
-    s += v( AFF_SWIM,         4,                  0 );
-    // Cursed-item penalties (never discounted).
-    s += v( AFF_STUN,         -100,               0 );
-    s += v( AFF_WEAK_STUN,    -40,                0 );
-    s += v( AFF_BLIND,        -200,               0 );
-    s += v( AFF_SLEEP,        -250,               0 );
-    s += v( AFF_CHARM,        -250,               0 );
-    s += v( AFF_CURSE,        -35,                0 );
-    s += v( AFF_CORRUPTION,   -50,                0 );
-    s += v( AFF_POISON,       -45,                0 );
-    s += v( AFF_PLAGUE,       -60,                0 );
-    s += v( AFF_CALM,         caster ? -5 : -25,  0 );
-    s += v( AFF_WEAKEN,       -10,                0 );
-    s += v( AFF_FAERIE_FIRE,  -15,                0 );
-    return s;
+    return item_flag_points( b, caster, target, heldFlags );
 }
 
-// Pick the res/imm/vuln column. kind: 0=resist, 1=immune, 2=vulnerable.
-static double ga_rv( int kind, double r, double i, double v )
-{
-    return kind == 1 ? i : (kind == 2 ? v : r);
-}
-
-// Value of a res/imm/vuln bitvector. The three tables share bit positions
-// (immune_from_flags tests ONE bit against imm/res/vuln alike), so IMM_* constants
-// index every table. Resists DO NOT stack (immunity.cpp: a binary RESISTANT bit),
-// and imm_bash FULLY blocks bash weapon-hits (dam_type=DAM_BASH is set even for a
-// 'none' attack). weapon/spell are the broad channels; bash/pierce/slash are their
-// measured share of the weapon channel; elementals are danger-tiered (fire worst;
-// negative/mental/energy nukes; the rest at the floor). res=imm/3, vuln=-imm/2,
-// floor 10/30/-20. spell==magic==prayer collapse -- count once. DAMTYPE_MODEL.md.
 static double ga_resValue( bitstring_t b, int kind )
 {
-    double s = 0;
-    if (IS_SET(b, IMM_WEAPON))                             s += ga_rv(kind, 140, 420, -210);
-    if (IS_SET(b, IMM_SPELL) || IS_SET(b, IMM_MAGIC) || IS_SET(b, IMM_PRAYER))
-                                                           s += ga_rv(kind, 50, 150, -75);
-    if (IS_SET(b, IMM_BASH))                               s += ga_rv(kind, 72, 216, -108);
-    if (IS_SET(b, IMM_PIERCE))                             s += ga_rv(kind, 34, 103, -52);
-    if (IS_SET(b, IMM_SLASH))                              s += ga_rv(kind, 33, 100, -50);
-    if (IS_SET(b, IMM_FIRE))                               s += ga_rv(kind, 23, 70, -35);
-    if (IS_SET(b, IMM_ENERGY))                             s += ga_rv(kind, 17, 50, -25);
-    if (IS_SET(b, IMM_NEGATIVE))                           s += ga_rv(kind, 17, 50, -25);
-    if (IS_SET(b, IMM_LIGHTNING))                          s += ga_rv(kind, 13, 40, -20);
-    if (IS_SET(b, IMM_ACID))                               s += ga_rv(kind, 13, 40, -20);
-    if (IS_SET(b, IMM_HOLY))                               s += ga_rv(kind, 13, 40, -20);
-    if (IS_SET(b, IMM_COLD))                               s += ga_rv(kind, 13, 40, -20);
-    if (IS_SET(b, IMM_POISON))                             s += ga_rv(kind, 13, 40, -20);
-    if (IS_SET(b, IMM_CHARM))                              s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_MENTAL))                             s += ga_rv(kind, 17, 50, -25);
-    if (IS_SET(b, IMM_DISEASE))                            s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_DROWNING))                           s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_LIGHT))                              s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_SOUND))                              s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_SUMMON))                             s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_IRON))                               s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_WOOD))                               s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_SILVER))                             s += ga_rv(kind, 10, 30, -20);
-    if (IS_SET(b, IMM_MITHRIL))                            s += ga_rv(kind, 10, 30, -20);
-    return s;
+    return item_res_points( b, kind );
 }
 
 // One affect's profile-weighted worth: flat pools (hp/mana/regen/dr/hr/saves) fold
@@ -3712,12 +3650,10 @@ static double ga_spellFactor( Character *target )
 }
 
 static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6],
-                            Character *target, bool worn )
+                            Character *target, bool worn, int itemLevel = -1 )
 {
     int m = af.modifier;
     switch (af.location) {
-    case APPLY_HIT:       s += w.hp       * m; break;
-    case APPLY_MANA:      s += w.mana     * m; break;
     case APPLY_MANA_GAIN:
         // Diminishing worth: mana_gain is a PERCENT multiplier on base regen
         // (update_params.cpp), so once regen already outpaces in-combat spend the
@@ -3729,26 +3665,31 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
             s += w.manaGain * m * 100.0 / (100.0 + g0 + m / 2.0);
         }
         else
-            s += w.manaGain * m;
+            s += item_apply_points( APPLY_MANA_GAIN, m, w );
         break;
-    case APPLY_HEAL_GAIN: s += w.healGain * m; break;
-    case APPLY_DAMROLL:   s += w.dr       * m; break;
-    case APPLY_HITROLL:   s += w.hr       * m; break;
-    case APPLY_SAVES:
-    case APPLY_SAVING_ROD:
-    case APPLY_SAVING_PETRI:
-    case APPLY_SAVING_BREATH:
-    case APPLY_SAVING_SPELL: s += w.saves * (-m); break;  // lower save = better
     case APPLY_STR: statDelta[0] += m; break;
     case APPLY_INT: statDelta[1] += m; break;
     case APPLY_WIS: statDelta[2] += m; break;
     case APPLY_DEX: statDelta[3] += m; break;
     case APPLY_CON: statDelta[4] += m; break;
     case APPLY_CHA: statDelta[5] += m; break;
-    case APPLY_AC:          s += w.ac     * (-m); break;   // negative ac = better; w.ac level-scaled
-    case APPLY_SPELL_LEVEL: s += w.slevel * m * w.spellFactor; break;   // ~0 with no spells
-    case APPLY_MOVE:        s += w.move   * m; break;
-    case APPLY_BEATS:       s += w.beats  * (-m); break;   // shorter skill lag = better
+    // Plain applies: the shared base price (fight_core/itemmodel.cpp).
+    case APPLY_HIT:
+    case APPLY_MANA:
+    case APPLY_HEAL_GAIN:
+    case APPLY_DAMROLL:
+    case APPLY_HITROLL:
+    case APPLY_SAVES:
+    case APPLY_SAVING_ROD:
+    case APPLY_SAVING_PETRI:
+    case APPLY_SAVING_BREATH:
+    case APPLY_SAVING_SPELL:
+    case APPLY_AC:            // w.ac is level-scaled
+    case APPLY_SPELL_LEVEL:   // ~0 with no spells (w.spellFactor)
+    case APPLY_MOVE:
+    case APPLY_BEATS:
+        s += item_apply_points( af.location, m, w );
+        break;
     // +N levels: scope-split like APPLY_LEARNED -- one named skill < a group < all --
     // and capability-gated: +level to a skill the char can't use or a group it doesn't
     // have is worthless (0); only the unscoped all-skills bonus is unconditional.
@@ -3767,7 +3708,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
                     s += w.skillLevel * m;
         }
         else
-            s += w.level * m;
+            s += item_apply_points( APPLY_LEVEL, m, w );
         break;
     }
     // +N% skill knowledge, cap-aware. APPLY_NONE with a skill/group global reaches the
@@ -3822,11 +3763,63 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     if (ft != 0 && bits != 0) {
         // Redundancy discount applies to a CANDIDATE only (worn ? 0): never dock the
         // worn baseline, so a gear delta can only ever shrink, never inflate.
-        if (ft == &affect_flags)    s += ga_affectFlagValue( bits, w.caster, target, worn ? 0 : w.heldFlags );
-        else if (ft == &res_flags)  s += ga_resValue( bits, 0 );
-        else if (ft == &imm_flags)  s += ga_resValue( bits, 1 );
-        else if (ft == &vuln_flags) s += ga_resValue( bits, 2 );
+        bool model = item_model_enabled( );
+        int kind = ft == &res_flags ? 0 : ft == &imm_flags ? 1 : ft == &vuln_flags ? 2 : -1;
+        if (ft == &affect_flags)
+            s += item_flag_points( bits, w.caster, target, worn ? 0 : w.heldFlags, model ? itemLevel : -1 );
+        else if (model && ft == &detect_flags)
+            s += item_detect_points( bits, w.caster, target );
+        // Model: a resist the char already owns outside this slot adds nothing
+        // (decision 6). Candidates only, like heldFlags: the worn baseline keeps full price.
+        else if (kind >= 0 && model && !worn && target != 0)
+            s += item_res_points_fit( bits, kind, w.heldImm, w.heldRes );
+        else if (kind >= 0)
+            s += ga_resValue( bits, kind );
     }
+}
+
+// Average landed weapon dice per hit at the char's real skill, the per-hit currency
+// ga_scoreCore scores a weapon in (WeaponOneHit::damBase: dice * (20 + skill%)/100).
+// skillOut (optional) gets the skill % used, for the damroll share OneHit::damApplyDamroll
+// gives a hit (damroll * min(100, 20 + skill%)/100).
+static double ga_weaponEff( Character *target, int weaponSn, int weaponAve, bool canCompound,
+                            int *skillOut = 0 )
+{
+    // Base value (.itemPoints): no char, the dice count in full.
+    if (target == 0) {
+        if (skillOut != 0)
+            *skillOut = 100;
+        return weaponAve;
+    }
+    int skillPct = target->getSkill( weaponSn );
+    // A cleric who can compound this weapon into a mace wields it at their
+    // mace skill, so it scores like a real mace instead of collapsing to the
+    // 20% unskilled floor. Trello #2854. Eligibility is resolved by the caller
+    // (from the instance for a worn item, the proto for a candidate).
+    if (canCompound) {
+        Skill *mace = skillManager->findExisting( "mace" );
+        if (mace != 0) {
+            int macePct = target->getSkill( mace->getIndex( ) );
+            if (macePct > skillPct)
+                skillPct = macePct;
+        }
+    }
+    if (skillOut != 0)
+        *skillOut = skillPct;
+    // Score the dice at the char's real skill in this weapon. available() alone is
+    // the wrong gate: an EXOTIC weapon reports available()==false (it can never be
+    // practiced) yet ExoticSkill::getLearned derives its skill from level+INT, so the
+    // char swings it at up to 100%. So also fall through when getSkill() is already
+    // positive. Exotic is the case that matters here: a normal off-class weapon skill
+    // returns 0 once it is unusable (GenericSkill::getLearned), so it stays gated. A
+    // weapon the char can neither train (available) nor already use (getSkill 0), e.g. a
+    // warlock's mace, still scores 0 dice, so the sage never chases a weapon that would
+    // sit at the unskilled floor. The item may still be worn for its stat affixes, which
+    // the affect loop counted.
+    Skill *wsk = skillManager->find( weaponSn );
+    if (canCompound || wsk == 0 || wsk->available( target ) || skillPct > 0)
+        return weaponAve * (20 + skillPct) / 100.0;
+    return 0;
 }
 
 // Score a prototype for a profile. Flat pools (hp/mana/regen) and combat stats
@@ -3848,15 +3841,18 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
                             const AffectList &protoAff, const AffectList *instAff,
                             int itemType, int weaponSn, int weaponAve, bool canCompound,
                             obj_index_data *pProto,
-                            const int rawStat[6], const int capStat[6], bool worn )
+                            const int rawStat[6], const int capStat[6], bool worn,
+                            ::Object *inst = 0 )
 {
     double s = 0;
     int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
+    int itemLevel = inst != 0 ? inst->level : (pProto != 0 ? pProto->level : -1);
+    bool model = item_model_enabled( );
     for (auto &paf: protoAff)
-        ga_accumAffect( *paf, w, s, statDelta, target, worn );
+        ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel );
     if (instAff != 0)
         for (auto &paf: *instAff)
-            ga_accumAffect( *paf, w, s, statDelta, target, worn );
+            ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel );
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
             continue;
@@ -3885,39 +3881,19 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     double weaponSwing = -1.0;
     if (itemType == ITEM_WEAPON && pProto != 0
         && IS_SET( pProto->wear_flags, ITEM_WIELD )) {
-        int skillPct = target->getSkill( weaponSn );
-        // A cleric who can compound this weapon into a mace wields it at their
-        // mace skill, so it scores like a real mace instead of collapsing to the
-        // 20% unskilled floor. Trello #2854. Eligibility is resolved by the caller
-        // (from the instance for a worn item, the proto for a candidate).
-        if (canCompound) {
-            Skill *mace = skillManager->findExisting( "mace" );
-            if (mace != 0) {
-                int macePct = target->getSkill( mace->getIndex( ) );
-                if (macePct > skillPct)
-                    skillPct = macePct;
-            }
-        }
-        // Score the dice at the char's real skill in this weapon. available() alone is
-        // the wrong gate: an EXOTIC weapon reports available()==false (it can never be
-        // practiced) yet ExoticSkill::getLearned derives its skill from level+INT, so the
-        // char swings it at up to 100%. So also fall through when getSkill() is already
-        // positive. Exotic is the case that matters here: a normal off-class weapon skill
-        // returns 0 once it is unusable (GenericSkill::getLearned), so it stays gated. A
-        // weapon the char can neither train (available) nor already use (getSkill 0), e.g. a
-        // warlock's mace, still scores 0 dice, so the sage never chases a weapon that would
-        // sit at the unskilled floor. The item may still be worn for its stat affixes, which
-        // the affect loop counted.
-        Skill *wsk = skillManager->find( weaponSn );
-        double eff = 0;
-        if (canCompound || wsk == 0 || wsk->available( target ) || skillPct > 0)
-            eff = weaponAve * (20 + skillPct) / 100.0;
+        double eff = ga_weaponEff( target, weaponSn, weaponAve, canCompound );
         s += w.weaponWeight * eff;
         // Only a weapon the char can actually swing (eff > 0) feeds its combathits proc; an
         // unusable weapon keeps weaponSwing -1 so its proc takes the flat fallback instead of
         // scoring 0 and dropping to the +50 Fenia-trigger bonus, which would over-rate it.
         if (eff > 0)
             weaponSwing = w.weaponWeight * eff;   // one swing's score; its combathits reuse it.
+        // Model: weapon flags at the generator's price, x the alignment fit, only for a
+        // weapon the char can swing (its flags fire on hits).
+        if (model && eff > 0) {
+            int wflags = inst != 0 ? inst->value4( ) : pProto->value[4];
+            s += item_weapon_flag_points( wflags, itemLevel, w.caster, target );
+        }
     }
     else {
         // A non-weapon item's combathits (a belt, a ring granting extra attacks) fire the
@@ -3933,21 +3909,52 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     // where it matters (low level), fading to 0 by L40. Read from the prototype -- the
     // base class is not rolled or enchanted (enchant armour adds an APPLY_AC affect).
     if (itemType == ITEM_ARMOR && pProto != 0) {
-        double acAvg = (pProto->value[0] + pProto->value[1] + pProto->value[2]) / 3.0;
+        // A random armor rolls its AC on the instance; everything else matches its prototype.
+        double acAvg = inst != 0 ? (inst->value0( ) + inst->value1( ) + inst->value2( )) / 3.0
+                                 : (pProto->value[0] + pProto->value[1] + pProto->value[2]) / 3.0;
         s += w.ac * acAvg;
+    }
+    // A generated item's worn buff is cast by the base vnum's onEquip, invisible to
+    // the affect loop. Score it at its affix price in M, one M being one measure roll
+    // set (dr + hr + 10 hp + 10 mana) times the rolls at the item's level -- the very
+    // scale the price was measured on. Generated items are recognised by measure_m.
+    bool generated = inst != 0 && !inst->getProperty( "measure_m" ).empty( );
+    if (generated) {
+        DLString buff = inst->getProperty( "wornbuff" );
+        if (model) {
+            if (!buff.empty( ))
+                s += item_wornbuff_points( buff, inst->level, w.caster );
+        }
+        else {
+            int price = buff.empty( ) ? 0 : item_affix_price( "worn_buff", buff, w.caster );
+            if (price > 0) {
+                int rolls = item_rolls( inst->level );
+                s += price / 100.0 * rolls * (w.dr + w.hr + 10 * w.hp + 10 * w.mana);
+            }
+        }
+    }
+    // Model: extra flags (noremove, bless, anti_good...) and the material, at the
+    // generator's prices. A material the char may not wear is worth nothing.
+    if (model && pProto != 0) {
+        int extras = inst != 0 ? inst->extra_flags : pProto->extra_flags;
+        s += item_extra_points( extras, w.caster );
+        DLString mat = inst != 0 ? DLString( inst->getMaterial( ) ) : DLString( pProto->material );
+        s += item_material_points( mat, itemLevel, w.caster ) * item_fit_material( target, mat );
     }
     // Combat spell-procs get scored on what they actually cast (value table x
     // proc chance x item level). That supersedes the flat +50, which was only a
     // stand-in for "this triggers something good in a fight" -- the proc IS that
     // trigger. But a skill-teaching item that ALSO procs still deserves its teach
     // credit on top (different value), and non-proc special gear keeps the +50.
-    double procScore = ga_procScore( pProto, weaponSwing );
+    double procScore = ga_procScore( pProto, weaponSwing, inst, model ? itemLevel : -1, w.caster );
     if (procScore > 0) {
         s += procScore;
         if (ga_grantsSkills( pProto ))
             s += 50;   // it teaches a skill too; procScore only covered the combat cast.
     }
-    else if (ga_hasFeniaTriggers( pProto ) || ga_grantsSkills( pProto )) {
+    // A generated item's base vnum carries the shared worn-buff onEquip: that is
+    // not "special gear", its worth was scored above.
+    else if ((ga_hasFeniaTriggers( pProto ) && !generated) || ga_grantsSkills( pProto )) {
         s += 50;   // Fenia-triggered or skill-teaching gear is almost always very good.
     }
     return s;
@@ -3984,10 +3991,127 @@ static double ga_score( Character *target, ::Object *o, const GAWeights &w,
     if (o->item_type == ITEM_WEAPON) {
         sn  = get_weapon_sn( o );
         ave = weapon_ave( o );
-        compound = ga_clericCanCompound( target, o );
+        compound = target != 0 && ga_clericCanCompound( target, o );
     }
     return ga_scoreCore( target, w, o->pIndexData->affected, &o->affected,
-                         o->item_type, sn, ave, compound, o->pIndexData, rawStat, capStat, worn );
+                         o->item_type, sn, ave, compound, o->pIndexData, rawStat, capStat, worn, o );
+}
+
+// ---- Off-hand model: what a second weapon is worth next to the main one ----------
+// Everything below is in ga_score units, where one main-hand swing of a weapon scores
+// weaponWeight * dice-per-hit. The off-hand is valued per main-hand swing, from the
+// engine's own round (fight.cpp multi_hit_strikes / next_attack / second_weapon_hit):
+//   - the off-hand rolls once after the first main-hand swing (chance 100) and once after
+//     every extra attack (second..fifth) that fires, at that attack's own chance c;
+//   - each roll lands with probability secondWeapon% * (c * m / 100) / 100, m being the
+//     class x off-hand-weapon-class modifier (second_weapon_chance_class);
+//   - an off-hand hit is a full hit (one_hit secondary): dice at its own skill + damroll.
+// So r = off-hand swings per main-hand swing = [P(c=100) + sum_k p_k * P(c_k)] / (1 + sum_k p_k),
+// p_k = c_k / 100. Haste and forest fighting add swings to both sides and are left out.
+struct GAOffhand {
+    int    swPct = 0;                 // second weapon effective %
+    std::vector<double> extra;        // extra-attack chances c_k (0..100+)
+    double mainSwings = 1.0;          // 1 + sum p_k
+    double mainEff = 0;               // main-hand dice per hit
+    double damroll = 0;
+    double blowValue = 0;             // score of one of the char's own main-hand blows
+    double reach = 1.0;               // share of enemy blows that get past parry
+    double pShield = 0;               // shield block chance vs an equal-level attacker
+    double pCross = 0;                // cross block chance vs an equal-level attacker
+};
+
+static double ga_pct( double chance )
+{
+    return URANGE( 0.0, chance, 100.0 ) / 100.0;
+}
+
+// Class bonus the block/parry formulas give warrior, samurai and paladin.
+static bool ga_defenderClass( Character *ch )
+{
+    const DLString &n = ch->getProfession( )->getName( );
+    return n == "warrior" || n == "samurai" || n == "paladin";
+}
+
+static GAOffhand ga_offhandModel( Character *target, const GAWeights &w, ::Object *primary )
+{
+    GAOffhand om;
+    Skill *sw = skillManager->findExisting( "second weapon" );
+    om.swPct = sw ? sw->getEffective( target ) : 0;
+
+    // next_attack: chance = effective / coef + skill_level_bonus, no usable() gate.
+    struct { const char *name; int coef; } atk[] = {
+        { "second attack", 2 }, { "third attack", 3 }, { "fourth attack", 3 }, { "fifth attack", 3 } };
+    for (int i = 0; i < 4; i++) {
+        Skill *sk = skillManager->findExisting( atk[i].name );
+        if (sk == 0)
+            continue;
+        double c = sk->getEffective( target ) / atk[i].coef + skill_level_bonus( *sk, target );
+        if (c <= 0)
+            continue;
+        om.extra.push_back( c );
+        om.mainSwings += ga_pct( c );
+    }
+
+    int mainSk = 0;
+    if (primary != 0 && primary->item_type == ITEM_WEAPON)
+        om.mainEff = ga_weaponEff( target, get_weapon_sn( primary ), weapon_ave( primary ),
+                                   ga_clericCanCompound( target, primary ), &mainSk );
+    om.damroll = target->damroll;
+    om.blowValue = w.weaponWeight
+        * (om.mainEff + om.damroll * std::min( 100, 20 + mainSk ) / 100.0);
+
+    // Defence chain (onehit_undef.cpp canDamage): parry first, then shield block, then
+    // cross block. Both builds parry with the main weapon, so only the blocks differ;
+    // each is reached by the blows parry let through. Attacker = equal level, so the
+    // formulas' "skill_level - attacker level" term is just the skill level bonus.
+    bool defClass = ga_defenderClass( target );
+    Skill *parry = skillManager->findExisting( "parry" );
+    if (parry != 0) {
+        int pe = parry->getEffective( target ) / 2;
+        if (defClass)
+            pe += pe / 5;
+        om.reach = 1.0 - ga_pct( pe + skill_level_bonus( *parry, target ) );
+    }
+    Skill *sb = skillManager->findExisting( "shield block" );
+    if (sb != 0 && sb->getEffective( target ) > 1) {
+        int c = sb->getEffective( target ) / 2 - 10;
+        if (defClass)
+            c += 10;
+        om.pShield = om.reach * ga_pct( c + skill_level_bonus( *sb, target ) );
+    }
+    Skill *cb = skillManager->findExisting( "cross block" );
+    if (cb != 0 && cb->getEffective( target ) > 1) {
+        int c = cb->getEffective( target ) / 3;
+        if (defClass)
+            c += c / 2;
+        om.pCross = om.reach * ga_pct( c + skill_level_bonus( *cb, target ) );
+    }
+    return om;
+}
+
+// Off-hand swings per main-hand swing for an off-hand weapon of this class.
+static double ga_offhandRatio( const GAOffhand &om, Character *target, int weaponClass )
+{
+    int m = second_weapon_chance_class( target->getProfession( ).getElement( ), weaponClass );
+    double off = ga_pct( om.swPct * (100.0 * m / 100) / 100 );
+    for (size_t k = 0; k < om.extra.size( ); k++)
+        off += ga_pct( om.extra[k] ) * ga_pct( om.swPct * (om.extra[k] * m / 100) / 100 );
+    return off / om.mainSwings;
+}
+
+// Worth of a weapon in the OFF hand. score = its ordinary ga_score, which counted its dice
+// as a full main-hand swing (weaponWeight * eff); swap that for r off-hand swings, each
+// with the no-shield +5% on the dice (WeaponOneHit::damApplyShield) and the char's damroll
+// at this weapon's skill (OneHit::damApplyDamroll). Affixes and procs stay as scored.
+static double ga_offhandValue( const GAOffhand &om, Character *target, const GAWeights &w,
+                               double score, int weaponSn, int weaponAve, bool canCompound,
+                               int weaponClass )
+{
+    int sk = 0;
+    double eff = ga_weaponEff( target, weaponSn, weaponAve, canCompound, &sk );
+    double r = ga_offhandRatio( om, target, weaponClass );
+    double perSwing = 1.05 * eff + om.damroll * std::min( 100, 20 + sk ) / 100.0;
+    return score - w.weaponWeight * eff + w.weaponWeight * r * perSwing;
 }
 
 // Worth of a completed set's declared <affects> bonus for this profile, cap-aware.
@@ -4153,7 +4277,10 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     int band = ga_band( ac.method, ac.guard, chLevel, aggros, doors, fly );
 
     RegList::Pointer e( NEW );
-    e->push_back( WrapperManager::getThis( )->getWrapper( c.pObj ) );
+    if (c.inst)
+        e->push_back( WrapperManager::getThis( )->getWrapper( c.inst ) );
+    else
+        e->push_back( WrapperManager::getThis( )->getWrapper( c.pObj ) );
     e->push_back( Register( ac.method ) );
     e->push_back( Register( ac.aux ) );
     e->push_back( Register( ac.room ) );
@@ -4180,7 +4307,132 @@ static Register ga_buildEntry( GACand &c, Room *msm, int chLevel, bool isVampire
     return wrap( e );
 }
 
-NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best] -- best gear the char can wear now, ranked. best is retired (always empty, kept for shape): the chase list 'optimal' now carries the single best-obtainable pick per slot, no dream list beside it. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown/5inpack/6request -- 5 = an upgrade the char already carries unworn, render says put it on; 6 = a good char can politely ask a good, roughly-peer mob for it with no fight), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
+// One swing of the char's current weapon, in score units -- the fallback swing value
+// for a non-weapon item's combathits (its extra attacks fire the worn weapon). Gate
+// mirrors ga_scoreCore's dice gate so exotic (available()==false, getLearned>0) counts.
+static double ga_curWeaponSwing( Character *target, const GAWeights &w )
+{
+    Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
+    ::Object *wep = wieldLoc ? wieldLoc->find( target ) : 0;
+    if (wep != 0 && wep->item_type == ITEM_WEAPON) {
+        int wsn  = get_weapon_sn( wep );
+        int wpct = target->getSkill( wsn );
+        Skill *wsk = skillManager->find( wsn );
+        if (wsk == 0 || wsk->available( target ) || wpct > 0)
+            return w.weaponWeight * weapon_ave( wep ) * (20 + wpct) / 100.0;
+    }
+    return -1.0;
+}
+
+// Permanent (duration < 0) affect_flags: the slot-independent floor of heldFlags.
+// Temp spell buffs excluded.
+static bitstring_t ga_permaFlags( Character *target )
+{
+    bitstring_t perma = 0;
+    for (auto &paf: target->affected)
+        if (paf->duration < 0 && paf->bitvector.getTable( ) == &affect_flags) {
+            bitstring_t hb = paf->bitvector; perma |= hb;
+        }
+    return perma;
+}
+
+// imm/res the char owns regardless of gear: race + permanent affects (decision 6 floor).
+static void ga_permaResist( Character *target, bitstring_t &imm, bitstring_t &res )
+{
+    imm = target->getRace( )->getImm( ).getValue( );
+    res = target->getRace( )->getRes( ).getValue( );
+    for (auto &paf: target->affected) {
+        if (paf->duration >= 0)
+            continue;
+        bitstring_t b = paf->bitvector;
+        if (paf->bitvector.getTable( ) == &imm_flags) imm |= b;
+        if (paf->bitvector.getTable( ) == &res_flags) res |= b;
+    }
+}
+
+// imm/res bits one item grants through its affects (proto + instance).
+static void ga_itemResist( ::Object *o, bitstring_t &imm, bitstring_t &res )
+{
+    for (auto &paf: o->pIndexData->affected) {
+        bitstring_t b = paf->bitvector;
+        if (paf->bitvector.getTable( ) == &imm_flags) imm |= b;
+        if (paf->bitvector.getTable( ) == &res_flags) res |= b;
+    }
+    for (auto &paf: o->affected) {
+        bitstring_t b = paf->bitvector;
+        if (paf->bitvector.getTable( ) == &imm_flags) imm |= b;
+        if (paf->bitvector.getTable( ) == &res_flags) res |= b;
+    }
+}
+
+// Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
+// nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
+static void ga_statBaseline( Character *target, int rawStat[6], int capStat[6] )
+{
+    PCharacter *pch = target->getPC( );
+    for (int k = 0; k < 6; k++) {
+        int sc = ga_statMap[k];
+        rawStat[k] = target->perm_stat[sc] + target->mod_stat[sc];
+        capStat[k] = pch ? pch->getMaxStat( sc ) : MAX_STAT;
+    }
+}
+
+// Root .itemPoints: an item's BASE value through the sage's scorer -- no char, no fit
+// clauses, weights (AC) at the item's level. Stats uncapped: a baseline far from both
+// ends makes ga_statgain return the delta itself.
+double ga_item_points( ::Object *o, bool caster )
+{
+    GAWeights w;
+    item_weights( w, caster, o->level );
+    int rawStat[6], capStat[6];
+    for (int k = 0; k < 6; k++) {
+        rawStat[k] = 500;
+        capStat[k] = 1000;
+    }
+    return ga_score( 0, o, w, rawStat, capStat, false );
+}
+
+// Root .itemScore: the item scored for one char the way gearAdvice scores a candidate
+// (base x fit): same weights, stat caps, spell factor, weapon skill, and flags the char
+// already holds from perma affects and worn gear outside this item's slot.
+double ga_item_score( Character *target, ::Object *o, bool caster )
+{
+    GAWeights w;
+    w.caster = caster;
+    item_weights( w, caster, target->getRealLevel( ) );
+    w.spellFactor = ga_spellFactor( target );
+    w.curWeaponSwing = ga_curWeaponSwing( target, w );
+
+    int mySlot = o->pIndexData->wear_flags;
+    REMOVE_BIT( mySlot, ITEM_TAKE );
+    bool worn = o->carried_by == target && o->wear_loc != wear_none;
+
+    w.heldFlags = ga_permaFlags( target );
+    ga_permaResist( target, w.heldImm, w.heldRes );
+    for (::Object *wo = target->carrying; wo; wo = wo->next_content) {
+        if (wo == o || wo->wear_loc == wear_none)
+            continue;
+        int slot = wo->pIndexData->wear_flags;
+        REMOVE_BIT( slot, ITEM_TAKE );
+        if (slot == mySlot)
+            continue;
+        ga_itemResist( wo, w.heldImm, w.heldRes );
+        for (auto &paf: wo->pIndexData->affected)
+            if (paf->bitvector.getTable( ) == &affect_flags) {
+                bitstring_t hb = paf->bitvector; w.heldFlags |= hb;
+            }
+        for (auto &paf: wo->affected)
+            if (paf->bitvector.getTable( ) == &affect_flags) {
+                bitstring_t hb = paf->bitvector; w.heldFlags |= hb;
+            }
+    }
+
+    int rawStat[6], capStat[6];
+    ga_statBaseline( target, rawStat, capStat );
+    return ga_score( target, o, w, rawStat, capStat, worn );
+}
+
+NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]): [pct, optimal, best, dual] -- dual = [state(0 n/a/1 second weapon not yet learned/2 verdict), unlockLevel, dualScore(best off-hand weapon build), keepScore(best shield + held item build), entry(an optimal-style entry for a better off-hand weapon, or null)]. best gear the char can wear now, ranked. best is retired (always empty, kept for shape): the chase list 'optimal' now carries the single best-obtainable pick per slot, no dream list beside it. Each optimal/best entry is [objW, method(0kill/1buy/2pickup/3quest/4unknown/5inpack/6request -- 5 = an upgrade the char already carries unworn, render says put it on; 6 = a good char can politely ask a good, roughly-peer mob for it with no fight), aux(holder/shop/quest vnum), roomVnum, cost, guardLevel, aggrosOnWay, lockedDoorsOnWay, flyRequired, band(0easy/1med/2hard), scoreGain(profile-weighted score improvement over the worn item, rounded), fillsFree(1 if this pick adds to a still-empty position of a multi-position slot -- second ring/bracelet or dual-wield off-hand -- rather than replacing a worn item; 0 otherwise), present(1 if the route is actionable now; 0 only for a limited item with no reachable copy and no quest route -> render says whereabouts unknown), replaceVnum(vnum of the worn item this pick replaces when it is the weaker of two in a paired finger/neck/wrist slot; 0 = a fill or a single-slot swap -> render names the worn piece via its own slot lookup)]. profile=caster|melee; lockedSlots=wear_flags bitmask of complete-set slots to skip; slotFilter=single wear_flags bit (or GA_SLOT_LIGHT = 1<<30 for the light slot, which has no wear bit) -> optimal is the top-5 for that slot only (pct 0, best empty)" )
 {
     checkTarget( );
 
@@ -4196,52 +4448,24 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // worth less to it than to a caster. 3/pt (was 5) so a pure +save cloth no
         // longer out-values real body armour (hp/hitroll/dex + armour class). The
         // caster branch below keeps 5 -- a squishy caster leans on saves defensively.
-        w.hp = 1.0; w.mana = 0.1; w.manaGain = 0.05; w.healGain = 0.3; w.dr = 12.0; w.hr = 6.0; w.saves = 3.0;
-        w.weaponWeight = 12.0;   // melee: weapon output valued the same as its damroll
-        w.stat[0] = 3; w.stat[1] = 1; w.stat[2] = 1; w.stat[3] = 2; w.stat[4] = 3; w.stat[5] = 0;
-        w.caster = false;
+        w.caster = false;   // weights: config/fight/item_value.json "melee", defaults = the old constants
     } else {                                    // caster (default)
-        w.hp = 1.0; w.mana = 0.5; w.manaGain = 0.6; w.healGain = 0.15; w.dr = 6.0; w.hr = 2.0; w.saves = 5.0;
-        w.weaponWeight = 4.0;    // caster: weapon melee output worth well under its damroll
-        w.stat[0] = 1; w.stat[1] = 2; w.stat[2] = 3; w.stat[3] = 1; w.stat[4] = 3; w.stat[5] = 0;
-        w.caster = true;
+        w.caster = true;    // weights: config/fight/item_value.json "caster"
     }
+    // Stat weights, applies, AC at the char's level: one table with the generators
+    // (fight_core/itemmodel.cpp item_weights). Melee values weapon output like its
+    // damroll; a caster well under it.
+    item_weights( w, w.caster, target->getRealLevel( ) );
 
-    // One swing of the char's current weapon, in score units -- the fallback swing value
-    // for a non-weapon item's combathits (its extra attacks fire the worn weapon). Gate
-    // mirrors ga_scoreCore's dice gate so exotic (available()==false, getLearned>0) counts.
-    {
-        Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
-        ::Object *wep = wieldLoc ? wieldLoc->find( target ) : 0;
-        if (wep != 0 && wep->item_type == ITEM_WEAPON) {
-            int wsn  = get_weapon_sn( wep );
-            int wpct = target->getSkill( wsn );
-            Skill *wsk = skillManager->find( wsn );
-            if (wsk == 0 || wsk->available( target ) || wpct > 0)
-                w.curWeaponSwing = w.weaponWeight * weapon_ave( wep ) * (20 + wpct) / 100.0;
-        }
-    }
+    w.curWeaponSwing = ga_curWeaponSwing( target, w );
 
     int chLevel  = target->getRealLevel( );
     int levelGap = target->getModifyLevel( ) - chLevel;
     // Aggressive mobs never touch a vampire, so they add no danger to its routes.
     bool isVampire = target->getProfession( )->getName( ) == "vampire";
 
-    // F3 applies. ac is near-useless except at low level (owner call): 0.5/pt at
-    // level 1 decaying linearly to 0 by level 40. slevel is caster-heavy; a skill-
-    // group +level and a raw +level are both strong; move is a token; beats (skill
-    // lag) is a real action-throughput lever (percent cut of every skill's lag).
-    // Flag/res values are level-independent (see ga_affectFlagValue / ga_resValue).
-    w.ac              = 0.5 * std::max( 0, 40 - chLevel ) / 39.0;
-    w.slevel          = w.caster ? 25.0 : 4.0;
-    w.level           = w.caster ? 40.0 : 14.0;
-    w.skillLevel      = w.caster ? 18.0 : 8.0;    // APPLY_LEVEL, skill-group scope
-    w.skillLevelSkill = w.caster ? 9.0 : 4.0;     // APPLY_LEVEL, single-skill scope
-    w.move            = 0.05;
-    // beats = percent cut of skill lag. Central for casters/ranged (every action is a
-    // lag-gated cast), near-irrelevant for melee whose damage is auto-attacks off the
-    // violence round, not skills. So caster-heavy, melee token.
-    w.beats           = w.caster ? 6.0 : 1.0;
+    // slevel only counts as far as the char really casts (ac/slevel/level/beats
+    // weights: item_weights above; flag/res values are level-independent).
     w.spellFactor     = ga_spellFactor( target );   // scales slevel by real spell knowledge
 
     // Redundancy discount (bug: unicorn horn out-ranked lion paw on a sanctuary the
@@ -4253,26 +4477,15 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // candidate is scored. gaPerma is the slot-independent floor: permanent (duration
     // < 0) affect_flags, temp spell buffs excluded. w.heldFlags stays 0 for the worn
     // baseline (worn -> 0 in ga_accumAffect), so a delta can only shrink, never inflate.
-    bitstring_t gaPerma = 0;
-    for (auto &paf: target->affected)
-        if (paf->duration < 0 && paf->bitvector.getTable( ) == &affect_flags) {
-            bitstring_t hb = paf->bitvector; gaPerma |= hb;
-        }
+    bitstring_t gaPerma = ga_permaFlags( target );
     // APPLY_LEARNED (+N% skill knowledge), valued per +1% by how broad the scope is:
     // one skill < a skill group < all skills. 187 live items carry these.
-    w.learnSkill = 2.0;   // cap-aware: x min(m, 100 - effective%) per named skill
-    w.learnGroup = 3.0;   // cap-aware: x min(m, 25 + 3*remort) window
-    w.learnAll   = 4.0;   // cap-aware: x min(m, 25 + 3*remort) window
+    // learnSkill/learnGroup/learnAll come from item_weights; ga_accumAffect caps them:
+    // x min(m, 100 - effective%) per named skill, x min(m, 25 + 3*remort) for a group/all.
 
-    // Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
-    // nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
     PCharacter *pch = target->getPC( );
     int rawStat[6], capStat[6];
-    for (int k = 0; k < 6; k++) {
-        int sc = ga_statMap[k];
-        rawStat[k] = target->perm_stat[sc] + target->mod_stat[sc];
-        capStat[k] = pch ? pch->getMaxStat( sc ) : MAX_STAT;
-    }
+    ga_statBaseline( target, rawStat, capStat );
 
     // Live instance census per vnum (single pass over the world). `spawned` = every
     // live copy (feeds the obtainability score below); `gettable` = copies a player
@@ -4286,12 +4499,19 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // treasure hunt, and must survive the unobtainable gate below. rootCarrier walks
     // out of nested containers, so a bagged copy the char holds counts too.
     std::map<int,int> carriedVnum;
+    // NPCs (by prototype vnum) actually holding a live copy right now. A limited item
+    // reset onto several mobs exists on only ONE of them, so its route must name that
+    // holder, not whichever reset source is cheapest (the halberd 15219 sent askers to
+    // Tim while the only copy sat with the Instructor).
+    std::map<int,std::set<int> > liveHolders;
     for (::Object *o = object_list; o; o = o->next) {
         int vn = o->pIndexData->vnum;
         spawned[vn]++;
         Character *rc = ga_rootCarrier( o );
         if (rc == 0 || rc->is_npc( ))
             gettable[vn]++;
+        if (rc != 0 && rc->is_npc( ))
+            liveHolders[vn].insert( rc->getNPC( )->pIndexData->vnum );
         else if (rc == target && o->wear_loc == wear_none)
             carriedVnum[vn] = 1;
     }
@@ -4360,6 +4580,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 newbieAreas.insert( rk->second->areaIndex );
 
     std::map<int,GAAcq> acq;
+    // The same mob-sourced routes keyed by holder: mob vnum -> (obj vnum -> route).
+    std::map<int,std::map<int,GAAcq> > acqByHolder;
     for (std::map<int,RoomIndexData *>::iterator rk = roomIndexMap.begin( ); rk != roomIndexMap.end( ); rk++) {
         RoomIndexData *pRoom = rk->second;
         int roomVnum = rk->first;
@@ -4414,6 +4636,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 if (trader && cmd == 'G') {
                     obj_index_data *po = get_obj_index( a1 );
                     ga_record( acq, a1, GA_BUY, lastMob->vnum, roomVnum, po ? po->cost : 0, 0 );
+                    ga_record( acqByHolder[lastMob->vnum], a1, GA_BUY, lastMob->vnum, roomVnum, po ? po->cost : 0, 0 );
                 } else {
                     // You must kill the holder, so its own level floors the fight
                     // even when it is passive and roomMax (aggro/assist only) is lower.
@@ -4448,10 +4671,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                         // regression (F2).
                         && !IS_SET( pRoom->room_flags, ROOM_SAFE|ROOM_NO_DAMAGE )
                         && !IS_SET( lastMob->act, ACT_SAFE );
-                    if (canRequest)
+                    if (canRequest) {
                         ga_record( acq, a1, GA_REQUEST, lastMob->vnum, roomVnum, 0, roomMax );
-                    else
+                        ga_record( acqByHolder[lastMob->vnum], a1, GA_REQUEST, lastMob->vnum, roomVnum, 0, roomMax );
+                    } else {
                         ga_record( acq, a1, GA_KILL, lastMob->vnum, roomVnum, 0, killGuard );
+                        ga_record( acqByHolder[lastMob->vnum], a1, GA_KILL, lastMob->vnum, roomVnum, 0, killGuard );
+                    }
                 }
             }
         }
@@ -4462,6 +4688,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     std::map<int,double> wornSlot;
     std::map<int,int> wornVnum;
     std::map<int,bitstring_t> wornFlagsBySlot;   // slot -> affect_flags its worn item(s) grant
+    std::map<int,bitstring_t> wornImmBySlot, wornResBySlot;   // slot -> imm/res bits, decision 6
     for (::Object *o = target->carrying; o; o = o->next_content) {
         if (o->wear_loc == wear_none)   // unworn -> handled by carriedVnum (census loop above)
             continue;
@@ -4478,6 +4705,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (paf->bitvector.getTable( ) == &affect_flags) {
                 bitstring_t hb = paf->bitvector; wornFlagsBySlot[slot] |= hb;
             }
+        ga_itemResist( o, wornImmBySlot[slot], wornResBySlot[slot] );
         // Set slots now score normally: the set optimizer below credits a complete
         // set's bonus into the ceiling and protects its slots from break-advice.
         double sc = ga_score( target, o, w, rawStat, capStat, true );
@@ -4498,6 +4726,22 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (wj->first != wi->first)
                 h |= wj->second;
         heldExclSlot[wi->first] = h;
+    }
+    // The same "owned outside this slot" sets for imm/res (decision 6, model only).
+    bitstring_t permaImm, permaRes;
+    ga_permaResist( target, permaImm, permaRes );
+    bitstring_t immAll = permaImm, resAll = permaRes;
+    for (auto &wi: wornImmBySlot) immAll |= wi.second;
+    for (auto &wi: wornResBySlot) resAll |= wi.second;
+    std::map<int,bitstring_t> immExclSlot, resExclSlot;
+    for (auto &wi: wornImmBySlot) {
+        bitstring_t hi = permaImm, hr = permaRes;
+        for (auto &wj: wornImmBySlot)
+            if (wj.first != wi.first) hi |= wj.second;
+        for (auto &wj: wornResBySlot)
+            if (wj.first != wi.first) hr |= wj.second;
+        immExclSlot[wi.first] = hi;
+        resExclSlot[wi.first] = hr;
     }
 
     // Catalogue every wearable prototype this char can wear right now.
@@ -4556,7 +4800,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (slotFilter != 0)
                 eligible = (slot & slotFilter) != 0 && pObj->limit != 1;
             else
-                eligible = (slot & (ITEM_WEAR_FINGER | ITEM_WEAR_NECK | ITEM_WEAR_WRIST)) != 0
+                // ITEM_WIELD: a second copy of the main-hand weapon is an off-hand
+                // option for the shield-or-second-weapon verdict (never a general pick).
+                eligible = (slot & (ITEM_WEAR_FINGER | ITEM_WEAR_NECK | ITEM_WEAR_WRIST | ITEM_WIELD)) != 0
                            && pObj->limit != 1;
             if (!eligible)
                 continue;
@@ -4636,6 +4882,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         {
             std::map<int,bitstring_t>::iterator hi = heldExclSlot.find( slot );
             w.heldFlags = (hi != heldExclSlot.end( )) ? hi->second : heldAll;
+            std::map<int,bitstring_t>::iterator ii = immExclSlot.find( slot );
+            w.heldImm = (ii != immExclSlot.end( )) ? ii->second : immAll;
+            std::map<int,bitstring_t>::iterator ri = resExclSlot.find( slot );
+            w.heldRes = (ri != resExclSlot.end( )) ? ri->second : resAll;
         }
         double sc = ga_score( target, pObj, w, rawStat, capStat, false );
         if (sc <= 0)
@@ -4662,11 +4912,30 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         } else if (questReward.count( pObj->vnum )) {
             ac.method = GA_QUEST; ac.aux = questReward[pObj->vnum]; ac.guard = 0;
         } else {
-            std::map<int,GAAcq>::iterator it = acq.find( pObj->vnum );
-            if (it != acq.end( ))
-                ac = it->second;
-            else {
-                ac.method = GA_UNKNOWN; ac.guard = pObj->level;
+            // A limited item goes through whichever NPC holds a live copy now (easiest
+            // of them). Unlimited gear repops on every source, so the cheapest reset wins.
+            bool fromHolder = false;
+            if (pObj->limit > 0) {
+                std::map<int,std::set<int> >::iterator lh = liveHolders.find( pObj->vnum );
+                if (lh != liveHolders.end( ))
+                    for (std::set<int>::iterator h = lh->second.begin( ); h != lh->second.end( ); h++) {
+                        std::map<int,std::map<int,GAAcq> >::iterator bh = acqByHolder.find( *h );
+                        if (bh == acqByHolder.end( ))
+                            continue;
+                        std::map<int,GAAcq>::iterator r = bh->second.find( pObj->vnum );
+                        if (r != bh->second.end( ) && (!fromHolder || r->second.guard < ac.guard)) {
+                            ac = r->second;
+                            fromHolder = true;
+                        }
+                    }
+            }
+            if (!fromHolder) {
+                std::map<int,GAAcq>::iterator it = acq.find( pObj->vnum );
+                if (it != acq.end( ))
+                    ac = it->second;
+                else {
+                    ac.method = GA_UNKNOWN; ac.guard = pObj->level;
+                }
             }
         }
         if (ac.method == GA_QUEST)
@@ -4712,6 +4981,63 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // known route (GA_UNKNOWN -- includes outleveled quest rewards) can't be
         // obtained or worn, so it must not inflate bestSlot / drag down the percentile.
         if (ac.method != GA_UNKNOWN && sc > bestSlot[slot])
+            bestSlot[slot] = sc;
+    }
+
+    // Rolled items the char carries unworn (random weapons and armor, tagged "tier"
+    // by their generators). Their prototype is an empty stub in a system area, so the
+    // loop above never sees them: score each copy as itself, same wear gates, and
+    // route it "put it on".
+    for (::Object *o = object_list; o; o = o->next) {
+        if (o->wear_loc != wear_none || ga_rootCarrier( o ) != target)
+            continue;
+        if (o->getProperty( "tier" ).empty( ))
+            continue;
+        if (o->level > LEVEL_MORTAL || !IS_SET(o->wear_flags, ITEM_TAKE))
+            continue;
+        int slot = o->wear_flags;
+        REMOVE_BIT( slot, ITEM_TAKE );
+        if (slot == 0)
+            continue;
+
+        int wearMod = target->getProfession( )->getWearModifier( o->item_type );
+        int wearLvl = o->level - wearMod - levelGap;
+        if (wearLvl < 1) wearLvl = 1;
+        if (wearLvl > chLevel)
+            continue;
+
+        if (IS_SET(o->extra_flags, ITEM_ANTI_EVIL)    && IS_EVIL(target))    continue;
+        if (IS_SET(o->extra_flags, ITEM_ANTI_GOOD)    && IS_GOOD(target))    continue;
+        if (IS_SET(o->extra_flags, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(target)) continue;
+        if (badMaterials != 0 && material_is_typed( o->getMaterial( ).c_str( ), badMaterials ))
+            continue;
+        if (IS_SET(o->wear_flags, ITEM_WEAR_HORSE)  && horseLoc  && !target->getWearloc( ).isSet( horseLoc ))  continue;
+        if (IS_SET(o->wear_flags, ITEM_WEAR_HOOVES) && hoovesLoc && !target->getWearloc( ).isSet( hoovesLoc )) continue;
+        if (IS_SET(o->wear_flags, ITEM_WEAR_FEET)   && feetLoc   && !target->getWearloc( ).isSet( feetLoc ))   continue;
+        if (!w.caster && o->item_type == ITEM_WEAPON
+            && target->getSkill( get_weapon_sn( o ) ) == 0
+            && !ga_clericCanCompound( target, o ))
+            continue;
+
+        {
+            std::map<int,bitstring_t>::iterator hi = heldExclSlot.find( slot );
+            w.heldFlags = (hi != heldExclSlot.end( )) ? hi->second : heldAll;
+            std::map<int,bitstring_t>::iterator ii = immExclSlot.find( slot );
+            w.heldImm = (ii != immExclSlot.end( )) ? ii->second : immAll;
+            std::map<int,bitstring_t>::iterator ri = resExclSlot.find( slot );
+            w.heldRes = (ri != resExclSlot.end( )) ? ri->second : resAll;
+        }
+        // worn=false: it is not on the char yet, its stats are not in rawStat.
+        double sc = ga_score( target, o, w, rawStat, capStat, false );
+        if (sc <= 0)
+            continue;
+
+        GACand c;
+        c.pObj = o->pIndexData; c.inst = o; c.slot = slot; c.score = sc;
+        c.obtain = 1.0; c.value = 0; c.present = true;
+        c.acq.method = GA_INPACK; c.acq.aux = 0; c.acq.guard = 0;
+        cands.push_back( c );
+        if (sc > bestSlot[slot])
             bestSlot[slot] = sc;
     }
 
@@ -4886,24 +5212,26 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // ---- end set awareness (folded into the percentile + chase below) ----------
 
     double wornTotal = 0, bestTotal = 0;
+    // The shield and held-item share of both totals, swapped below for the left-hand
+    // verdict's build scores when there is one.
+    double leftWornSlots = 0, leftBestSlots = 0;
     for (auto &kv: slotCeil) {
         if (neutralSlots & kv.first)   // unvaluable worn-set slot: neutral, out of the %
             continue;
         std::map<int,double>::iterator wi = wornSlot.find( kv.first );
-        wornTotal += (wi != wornSlot.end( )) ? wi->second : 0.0;
+        double wv = (wi != wornSlot.end( )) ? wi->second : 0.0;
+        wornTotal += wv;
         bestTotal += kv.second;
+        if (kv.first & (ITEM_WEAR_SHIELD | ITEM_HOLD)) {
+            leftWornSlots += wv;
+            leftBestSlots += kv.second;
+        }
     }
     // Set bonuses: a complete worn set is real kit value; the ideal kit assembles the
     // best worth-it sets. bestSetBonus >= wornSetBonus in the common case (your set is
     // among the worth-it claimed), so the final clamp only bites on a mixed kit.
     wornTotal += wornSetBonus;
     bestTotal += bestSetBonus;
-
-    int pct = 0;
-    if (bestTotal > 0)
-        pct = (int)( 100.0 * wornTotal / bestTotal + 0.5 );
-    if (pct > 100) pct = 100;   // set slots relax the per-slot cap; this is the backstop
-    if (pct < 0)   pct = 0;     // a kit full of cursed maledictions can sum negative
 
     // Paired armour slots (finger/neck/wrist) have two positions. The general chase
     // must (a) offer a FILL when a position is empty (baseline 0 -- a pure gain), and
@@ -5001,6 +5329,162 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     Room *msm = get_room_instance( GA_START_ROOM );
     std::map<int, std::vector<int> > pathCache;   // destVnum -> [aggros, doors, fly]
 
+    // ---- Second weapon or shield? ---------------------------------------------------
+    // The general chase treats the weapon slot as one position and the slot browse only
+    // offers an off-hand when the left hand is already free, so neither ever says whether
+    // a shield build should go dual. This weighs the two builds, best of each (worn or
+    // obtainable), in per-main-swing score units:
+    //   dual = best off-hand weapon (ga_offhandValue) + the no-shield +5% on main-hand dice
+    //          (only when the other build has a shield) + cross block, if the char has it;
+    //   keep = best shield + best held item + shield block.
+    // A blocked enemy blow is worth one of the char's own blows (the COMBAT_PROC_SCORING
+    // rule for heals): an equal-level enemy swings about as often as the char, so per
+    // main-hand swing the block is worth pBlock * blowValue.
+    // dualInfo = [state(0 n/a / 1 not yet available / 2 verdict), unlockLevel, dualScore,
+    //             keepScore, entry(pick entry for a better off-hand weapon, or null)].
+    Wearlocation *gaWieldLoc  = wearlocationManager->findExisting( "wield" );
+    Wearlocation *gaOffLoc    = wearlocationManager->findExisting( "second_wield" );
+    Wearlocation *gaShieldLoc = wearlocationManager->findExisting( "shield" );
+    Wearlocation *gaHoldLoc   = wearlocationManager->findExisting( "hold" );
+    ::Object *gaPrimary = gaWieldLoc  ? gaWieldLoc->find( target )  : 0;
+    ::Object *gaOffhand = gaOffLoc    ? gaOffLoc->find( target )    : 0;
+    ::Object *gaShield  = gaShieldLoc ? gaShieldLoc->find( target ) : 0;
+    ::Object *gaHold    = gaHoldLoc   ? gaHoldLoc->find( target )   : 0;
+    bool gaHuge = target->getRace( )->getSize( ) >= SIZE_HUGE;
+    GAOffhand om = ga_offhandModel( target, w, gaPrimary );
+
+    // Redundancy set for an off-hand weapon: everything worn stays except what the left
+    // hand gives up (shield, held item).
+    bitstring_t offHeld = gaPerma;
+    for (std::map<int,bitstring_t>::iterator wi = wornFlagsBySlot.begin( ); wi != wornFlagsBySlot.end( ); wi++)
+        if ((wi->first & (ITEM_WEAR_SHIELD | ITEM_HOLD)) == 0)
+            offHeld |= wi->second;
+    int offCap = wield_weight_cap( target, true );
+    // Can this weapon prototype go in the off-hand? Two-hander rule and the off-hand
+    // weight cap (a player gets no native-weapon exemption, see too_heavy_to_wield).
+    auto offhandFits = [&]( obj_index_data *p ) -> bool {
+        return p->item_type == ITEM_WEAPON && IS_SET( p->wear_flags, ITEM_WIELD )
+            && !( IS_SET( p->value[4], WEAPON_TWO_HANDS ) && !gaHuge )
+            && p->weight <= offCap;
+    };
+    auto offhandValueProto = [&]( obj_index_data *p ) -> double {
+        bitstring_t saved = w.heldFlags;
+        w.heldFlags = offHeld;
+        double sc = ga_score( target, p, w, rawStat, capStat, false );
+        w.heldFlags = saved;
+        return ga_offhandValue( om, target, w, sc, get_weapon_sn( p ), weapon_ave( p ),
+                                ga_clericCanCompound( target, p ), p->value[0] );
+    };
+    auto offhandValueWorn = [&]( ::Object *o ) -> double {
+        double sc = ga_score( target, o, w, rawStat, capStat, true );
+        return ga_offhandValue( om, target, w, sc, get_weapon_sn( o ), weapon_ave( o ),
+                                ga_clericCanCompound( target, o ), get_weapon_class( o ) );
+    };
+    double offWornVal = gaOffhand != 0 ? offhandValueWorn( gaOffhand ) : 0.0;
+    // Same reach rule as the chase list: no boss-guarded kill/pickup routes.
+    auto reachable = [&]( const GACand &c ) -> bool {
+        if (c.acq.method == GA_UNKNOWN)
+            return false;
+        if ((c.acq.method == GA_KILL || c.acq.method == GA_PICKUP) && c.acq.guard > chLevel + 10)
+            return false;
+        return true;
+    };
+
+    RegList::Pointer dualInfo( NEW );
+    // Set by a left-hand verdict: the chase list must not push the losing build, and the
+    // percentile scores the left hand as one build instead of shield + hold slots that a
+    // dual-wielder leaves empty on purpose.
+    bool gaGoDual = false, gaLeftScored = false;
+    double gaLeftWorn = 0, gaLeftBest = 0;
+    {
+        int dState = 0, dUnlock = 0;
+        double dualScore = 0, keepScore = 0;
+        Register dEntry;
+        Skill *swSkill = skillManager->findExisting( "second weapon" );
+        if (swSkill != 0 && !swSkill->usable( target, false )) {
+            // Not yet: the class learns it later. Shown only to a char who will get it.
+            int lvl = swSkill->getLevel( target );
+            if (lvl > target->getRealLevel( ) && lvl <= LEVEL_MORTAL) {
+                dState = 1;
+                dUnlock = lvl;
+            }
+        }
+        else if (swSkill != 0 && ga_dualBody( target )
+                 && gaPrimary != 0 && gaPrimary->item_type == ITEM_WEAPON
+                 && !ga_twoHandBlocks( target, IS_WEAPON_STAT( gaPrimary, WEAPON_TWO_HANDS ) )) {
+            // Best off-hand weapon: carried, obtainable, or a second copy of a worn one.
+            const GACand *bestOff = 0;
+            double bestOffVal = 0;
+            for (int pass = 0; pass < 2; pass++) {
+                std::vector<GACand> &pool = pass == 0 ? cands : secondCopyCands;
+                for (auto &c: pool) {
+                    if (!offhandFits( c.pObj ) || !reachable( c ))
+                        continue;
+                    double v = offhandValueProto( c.pObj );
+                    if (bestOff == 0 || v > bestOffVal) { bestOff = &c; bestOffVal = v; }
+                }
+            }
+            bool pickBetter = bestOff != 0 && bestOffVal > offWornVal;
+            if (pickBetter || gaOffhand != 0) {
+                // Keep side: the best shield and the best held item, worn or obtainable.
+                double shieldVal = gaShield ? ga_score( target, gaShield, w, rawStat, capStat, true ) : 0;
+                double holdVal   = gaHold   ? ga_score( target, gaHold,   w, rawStat, capStat, true ) : 0;
+                bool haveShield = gaShield != 0;
+                for (auto &c: cands) {
+                    if (!reachable( c ))
+                        continue;
+                    if ((c.slot & ITEM_WEAR_SHIELD) && c.score > shieldVal) { shieldVal = c.score; haveShield = true; }
+                    if ((c.slot & ITEM_HOLD) && c.score > holdVal) holdVal = c.score;
+                }
+                keepScore = shieldVal + holdVal;
+                if (haveShield)
+                    keepScore += om.pShield * om.blowValue;
+
+                double dualExtra = om.pCross * om.blowValue;
+                if (haveShield)
+                    dualExtra += w.weaponWeight * 0.05 * om.mainEff;
+                dualScore = (pickBetter ? bestOffVal : offWornVal) + dualExtra;
+
+                // What the left hand holds now, in the same units as the two builds.
+                if (gaOffhand != 0)
+                    gaLeftWorn = offWornVal + dualExtra;
+                else {
+                    gaLeftWorn = (gaShield ? ga_score( target, gaShield, w, rawStat, capStat, true ) : 0)
+                               + (gaHold   ? ga_score( target, gaHold,   w, rawStat, capStat, true ) : 0);
+                    if (gaShield)
+                        gaLeftWorn += om.pShield * om.blowValue;
+                }
+                gaLeftBest = std::max( gaLeftWorn, std::max( dualScore, keepScore ) );
+                gaLeftScored = true;
+                // Same rounded values the dual line prints, so the list and the verdict agree.
+                gaGoDual = (int)(dualScore + 0.5) > (int)(keepScore + 0.5);
+
+                if (pickBetter) {
+                    GACand pick = *bestOff;
+                    int rv = gaOffhand != 0 ? gaOffhand->pIndexData->vnum : 0;
+                    dEntry = ga_buildEntry( pick, msm, chLevel, isVampire, pathCache,
+                                            bestOffVal - offWornVal, gaOffhand == 0, rv );
+                }
+                dState = 2;
+            }
+        }
+        dualInfo->push_back( Register( dState ) );
+        dualInfo->push_back( Register( dUnlock ) );
+        dualInfo->push_back( Register( (int)(dualScore + 0.5) ) );
+        dualInfo->push_back( Register( (int)(keepScore + 0.5) ) );
+        dualInfo->push_back( dEntry );
+    }
+
+    if (gaLeftScored) {
+        wornTotal += gaLeftWorn - leftWornSlots;
+        bestTotal += gaLeftBest - leftBestSlots;
+    }
+    int pct = 0;
+    if (bestTotal > 0)
+        pct = (int)( 100.0 * wornTotal / bestTotal + 0.5 );
+    if (pct > 100) pct = 100;   // set slots relax the per-slot cap; this is the backstop
+    if (pct < 0)   pct = 0;     // a kit full of cursed maledictions can sum negative
+
     // Slot-browse mode: the char asked for one wear slot ("service advice neck").
     // Return the top-5 wearable-now items in that slot by raw score (Fenia orders
     // them by difficulty band). No percentile, no dream list; the caller passes
@@ -5059,6 +5543,62 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 capacity = 2;
         }
 
+        // Dual-wield weapon browse: each weapon is offered where it does the most good --
+        // as the new MAIN weapon (gain over the worn primary; a non-giant's two-hander also
+        // drops the off-hand weapon) or in the OFF hand, valued at its real swing ratio
+        // (ga_offhandValue) instead of as a second primary. An off-hand fill used to show
+        // its whole primary score as the gain, 2-3x what the off-hand actually swings.
+        if (wieldBrowse && capacity >= 2) {
+            double psc = gaPrimary != 0 ? ga_score( target, gaPrimary, w, rawStat, capStat, true ) : 0.0;
+            struct GAWieldOpt { GACand c; double gain; bool fills; int rv; };
+            std::vector<GAWieldOpt> opts;
+            for (int pass = 0; pass < 2; pass++) {
+                // pass 1 = second copies of a worn weapon: they can only join it, off-hand.
+                std::vector<GACand> &pool = pass == 0 ? cands : secondCopyCands;
+                for (auto &c: pool) {
+                    if ((c.slot & ITEM_WIELD) == 0 || c.acq.method == GA_UNKNOWN)
+                        continue;
+                    bool any = false, fills = false;
+                    double best = 0;
+                    int rv = 0;
+                    if (pass == 0) {
+                        bool blocks = ga_twoHandBlocks( target, IS_SET( ga_candValue4( c ), WEAPON_TWO_HANDS ) );
+                        best = c.score - psc - (blocks ? offWornVal : 0.0);
+                        any = true;
+                        fills = gaPrimary == 0;
+                        rv = gaPrimary != 0 ? gaPrimary->pIndexData->vnum : 0;
+                    }
+                    if (gaPrimary != 0 && offhandFits( c.pObj )) {
+                        double g = offhandValueProto( c.pObj ) - offWornVal;
+                        if (!any || g > best) {
+                            best = g;
+                            any = true;
+                            fills = gaOffhand == 0;
+                            rv = gaOffhand != 0 ? gaOffhand->pIndexData->vnum : 0;
+                        }
+                    }
+                    // Same bars as the generic path: >= for a new item, strict > for a
+                    // second copy (never "replace your X with an X").
+                    if (!any || (pass == 0 ? best < 0 : best <= 0))
+                        continue;
+                    opts.push_back( GAWieldOpt{ c, best, fills, rv } );
+                }
+            }
+            std::sort( opts.begin( ), opts.end( ),
+                []( const GAWieldOpt &a, const GAWieldOpt &b ){ return a.gain > b.gain; } );
+            RegList::Pointer slotList( NEW );
+            for (size_t k = 0; k < opts.size( ) && k < 5; k++)
+                slotList->push_back( ga_buildEntry( opts[k].c, msm, chLevel, isVampire, pathCache,
+                                                    opts[k].gain, opts[k].fills, opts[k].rv ) );
+            RegList::Pointer emptyBest( NEW );
+            RegList::Pointer result( NEW );
+            result->push_back( Register( 0 ) );
+            result->push_back( wrap( slotList ) );
+            result->push_back( wrap( emptyBest ) );
+            result->push_back( wrap( dualInfo ) );
+            return wrap( result );
+        }
+
         // The bar a candidate must clear. Multi-position slot (capacity 2): an empty
         // position means bar 0 (add with no loss), both filled means beat the WEAKEST worn
         // piece. Single-position slots keep the old max bar exactly. primaryScore (best
@@ -5092,7 +5632,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             // it) -- it replaces the primary, so it must clear the primary's score, not the
             // free-slot bar.
             double bar = wornScore;
-            if (wieldBrowse && IS_SET( c.pObj->value[4], WEAPON_TWO_HANDS ))
+            if (wieldBrowse && IS_SET( ga_candValue4( c ), WEAPON_TWO_HANDS ))
                 bar = primaryScore;
             if (c.score >= bar)
                 slotCands.push_back( c );
@@ -5117,7 +5657,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         for (size_t k = 0; k < slotCands.size( ) && k < 5; k++) {
             // A two-handed weapon replaces the primary rather than filling the off-hand:
             // show it as a swap (fillsFree 0), gain over the primary, not the fill bar.
-            bool twoHand = wieldBrowse && IS_SET( slotCands[k].pObj->value[4], WEAPON_TWO_HANDS );
+            bool twoHand = wieldBrowse && IS_SET( ga_candValue4( slotCands[k] ), WEAPON_TWO_HANDS );
             bool fills = freePos && !twoHand;
             double gain = twoHand ? (slotCands[k].score - primaryScore) : (slotCands[k].score - wornScore);
             // slotReplaceVnum is 0 for fills and single-worn slots; a two-handed pick ousts the
@@ -5131,6 +5671,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         result->push_back( Register( 0 ) );
         result->push_back( wrap( slotList ) );
         result->push_back( wrap( emptyBest ) );
+        result->push_back( wrap( dualInfo ) );
         return wrap( result );
     }
 
@@ -5154,6 +5695,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if ((byOpt[k].acq.method == GA_KILL || byOpt[k].acq.method == GA_PICKUP)
             && byOpt[k].acq.guard > chLevel + 10)
             continue;
+        // The verdict says go dual: a shield or held item would take the off-hand back.
+        if (gaGoDual && (byOpt[k].slot & (ITEM_WEAR_SHIELD | ITEM_HOLD)))
+            continue;
         if (optSlot.count( byOpt[k].slot )) continue;   // one item per slot-type
         optSlot[byOpt[k].slot] = byOpt[k].score;
         bool optFills; int optReplace;
@@ -5175,6 +5719,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     result->push_back( Register( pct ) );
     result->push_back( wrap( optimal ) );
     result->push_back( wrap( best ) );
+    result->push_back( wrap( dualInfo ) );
     return wrap( result );
 }
 

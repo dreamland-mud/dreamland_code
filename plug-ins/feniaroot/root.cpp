@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <cmath>
 #include <math.h>
 #include <string.h>
 
@@ -30,6 +31,10 @@
 #include "move_utils.h"
 #include "math_utils.h"
 #include "weapongenerator.h"
+#include "weaponcalculator.h"
+#include "armorgenerator.h"
+#include "itemmodel.h"
+#include "damage.h"
 #include "weapontier.h"
 #include "act.h"
 #include "lang.h"
@@ -73,6 +78,7 @@
 #include "autoquestwrapper.h"
 #include "questmanager.h"
 #include "questregistrator.h"
+#include "questscrollhook.h"
 #include "behaviorwrapper.h"
 #include "wordeffectwrapper.h"
 #include "liquid.h"
@@ -1555,8 +1561,8 @@ NMI_INVOKE(Root, apply, "(func, this, args): вызвать func с указан
     RegisterList registerList;
 
     if (args.size() > 2) {
-        Register params = argnum(args, 3);
-        RegList::Pointer regList = params.toHandler().getDynamicPointer<RegList>();
+        // A non-List third argument throws instead of dereferencing a null cast.
+        RegList *regList = arg2reglist(argnum(args, 3));
 
         for (RegList::const_iterator r = regList->begin(); r != regList->end(); r++)
             registerList.push_back(*r);
@@ -1626,7 +1632,30 @@ NMI_INVOKE(Root, randomWeaponTier, "(bestTier[, legendaryPerMille]): случа�
     return Register(random_weapon_tier(bestTier, legendaryPerMille));
 }
 
-NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров")
+NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile]): случайная броня на базовом прототипе: slot head|body|arms|hands|legs|feet|shield, profile caster берет цены аффиксов для кастера; true если удалось")
+{
+    ::Object *obj = argnum2item(args, 1);
+    Character *ch = argnum2character(args, 2);
+    int tier = argnum2number(args, 3);
+    DLString slot = argnum2string(args, 4);
+    DLString profile = args.size() > 4 ? argnum2string(args, 5) : DLString::emptyString;
+
+    if (obj->item_type != ITEM_ARMOR)
+        throw Scripting::Exception("Item is not armor for randomize.");
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid armor tier.");
+    if (!armor_slot_exists(slot))
+        throw Scripting::Exception("Unknown armor slot.");
+
+    bool ok = ArmorGenerator(obj, ch->getPC(), tier, slot)
+                .caster(profile == "caster")
+                .alignment(ch->alignment)
+                .run();
+
+    return Register(ok);
+}
+
+NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, profile, budget]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров, profile caster берет цены аффиксов для кастера, budget m|points форсирует бюджет (иначе из item_affixes.json)")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
@@ -1634,6 +1663,9 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier]): 
     bool stats = args.size() > 3 ? argnum2boolean(args, 4) : false;
     DLString wclass = args.size() > 4 ? argnum2string(args, 5) : DLString::emptyString;
     int worstTier = args.size() > 5 ? argnum2number(args, 6) : bestTier;
+    DLString profile = args.size() > 6 ? argnum2string(args, 7) : DLString::emptyString;
+    DLString budget = args.size() > 7 ? argnum2string(args, 8) : DLString::emptyString;
+    int mode = budget == "m" ? 1 : budget == "points" ? 0 : -1;
 
     if (obj->item_type != ITEM_WEAPON)
         throw Scripting::Exception("Item is not a weapon for randomize.");
@@ -1655,6 +1687,8 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier]): 
             .item(obj)
             .alignment(ch->alignment)
             .player(ch->getPC())
+            .caster(profile == "caster")
+            .budgetMode(mode)
             .tier(tier)
             .randomizeStats();
     }
@@ -1663,6 +1697,8 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier]): 
             .item(obj)
             .alignment(ch->alignment)
             .player(ch->getPC())
+            .caster(profile == "caster")
+            .budgetMode(mode)
             // Empty wclass leaves the class to be rolled, as before. A named one bypasses
             // the player-availability filter on purpose: the caller knows what it wants.
             .weaponClass(wclass)
@@ -1680,6 +1716,104 @@ NMI_INVOKE(Root, bestWeaponClass, "(ch): класс оружия, раскача
     // NPCs have no skill percentages to compare, so getPC() is null for them and
     // the empty result reads as 'roll a class as before'.
     return Register(best_weapon_class(ch->getPC()));
+}
+
+NMI_INVOKE(Root, weaponBaseRoll, "(tier, level, wclass): базовый hitroll/damroll оружия этого tier, уровня и класса по таблице weapon_damroll_tiers; цель для enchant weapon и temper")
+{
+    int tier = argnum2number(args, 1);
+    int level = URANGE(1, argnum2number(args, 2), MAX_LEVEL);
+    int wclass = argnum2number(args, 3);
+
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid weapon tier.");
+    if (weapon_class.name(wclass).empty())
+        throw Scripting::Exception("Unknown weapon class.");
+
+    return Register(WeaponCalculator(tier, level, wclass).getDamroll());
+}
+
+// Gear-sage scorer in characterwrapper.cpp, shared with gearAdvice.
+double ga_item_points( ::Object *o, bool caster );
+double ga_item_score( Character *target, ::Object *o, bool caster );
+
+NMI_INVOKE(Root, itemOneM, "(level, profile[, slot]): одна мера M в очках оценки (dr + hr + 10 hp + 10 mana за бросок, броски = level / коэффициент слота); profile caster|melee")
+{
+    int level = URANGE(1, argnum2number(args, 1), MAX_LEVEL);
+    DLString profile = argnum2string(args, 2);
+    DLString slot = args.size() > 2 ? argnum2string(args, 3) : DLString::emptyString;
+
+    return Register((int)std::round(item_one_m(level, profile == "caster", slot)));
+}
+
+NMI_INVOKE(Root, itemPoints, "(obj, profile): базовая ценность предмета в очках оценки, без поправок на персонажа (AC на уровне предмета); profile caster|melee")
+{
+    ::Object *obj = argnum2item(args, 1);
+    DLString profile = argnum2string(args, 2);
+
+    return Register((int)std::round(ga_item_points(obj, profile == "caster")));
+}
+
+NMI_INVOKE(Root, itemScore, "(obj, ch, profile): ценность предмета для персонажа ch так, как ее считает мудрец (service advice): база с поправками на статы, навыки и уже имеющиеся флаги; profile caster|melee")
+{
+    ::Object *obj = argnum2item(args, 1);
+    Character *ch = argnum2character(args, 2);
+    DLString profile = argnum2string(args, 3);
+
+    return Register((int)std::round(ga_item_score(ch, obj, profile == "caster")));
+}
+
+// Combat proc helpers (fight_core damage_impl.cpp, skills_impl feniaskillaction.cpp).
+double spell_proc_tier_value( const DLString &spellName, int level );
+
+NMI_INVOKE(Root, itemCombatPoints, "(dmgPerRound, controlPct, level, profile): очки оценки боевого эффекта: dmgPerRound доп. урона за раунд и controlPct процентов снятого входящего урона, по эталонному игроку fight/pc_baseline; profile caster|melee")
+{
+    double dmg = argnum2number(args, 1);
+    double control = argnum2number(args, 2) / 100.0;
+    int level = URANGE(1, argnum2number(args, 3), MAX_LEVEL);
+    DLString profile = argnum2string(args, 4);
+
+    return Register((int)std::round(item_combat_points(dmg, control, level, profile == "caster")));
+}
+
+NMI_INVOKE(Root, itemProcPoints, "(spell, chance, level, profile): очки оценки боевого прока: ожидаемый урон заклинания на уровне предмета (тир или явное значение) x шанс за раунд, по эталонному игроку; profile caster|melee")
+{
+    DLString spell = argnum2string(args, 1);
+    double chance = argnum2number(args, 2);
+    int level = URANGE(1, argnum2number(args, 3), MAX_LEVEL);
+    DLString profile = argnum2string(args, 4);
+
+    return Register((int)std::round(item_proc_points(spell, chance, 1, level, profile == "caster")));
+}
+
+NMI_INVOKE(Root, questScroll, "(ch): свиток познания для игрока ch, как награда квестора (+2-4% к 1-2 недоученным умениям, только для ch); null если учить нечего")
+{
+    Character *ch = argnum2character(args, 1);
+    if (ch->is_npc( ))
+        return Register( );
+
+    ::Object *scroll = quest_scroll_create( ch->getPC( ) );
+    if (!scroll)
+        return Register( );
+
+    obj_to_room( scroll, get_room_instance( ROOM_VNUM_FENIA_STORAGE ) );
+    return WrapperManager::getThis( )->getWrapper( scroll );
+}
+
+NMI_INVOKE(Root, itemModel, "(mode): только для тестов: генераторы предметов считают по единой модели (1), по старым ценам (0) или по конфигу (-1); вернуть -1 до конца того же eval. Возвращает прежний режим")
+{
+    return Register(item_model_override(argnum2number(args, 1)));
+}
+
+NMI_INVOKE(Root, itemModelOn, "(): включена ли единая модель предметов (measure.item_model или тестовый .itemModel) -- 1 или 0")
+{
+    return Register(item_model_enabled() ? 1 : 0);
+}
+
+NMI_INVOKE(Root, itemCost, "(measureCm, level): цена предмета по единой модели: measure.cost_k x M x уровень (M в сотых долях), как у генераторов")
+{
+    int cm = argnum2number(args, 1);
+    int level = URANGE(1, argnum2number(args, 2), MAX_LEVEL);
+    return Register(item_model_cost(cm, level));
 }
 
 NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]): выставить статы для weapon или улучшить в бою")
