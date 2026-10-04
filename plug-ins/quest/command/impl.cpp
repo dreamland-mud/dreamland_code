@@ -14,6 +14,40 @@
 #include "questmaster.h"
 #include "questor.h"
 #include "xmlattributequestreward.h"
+#include "questscrollhook.h"
+#include "pcharacter.h"
+#include "wiznet.h"
+#include "merc.h"
+
+#include <sstream>
+
+Object * make_quest_scroll( PCharacter *client, std::ostringstream &report );
+
+/** A scroll for Fenia (tier loot drops): same roll as the questor's reward. */
+static Object * fenia_quest_scroll( PCharacter *client )
+{
+    std::ostringstream report;
+    Object *scroll = make_quest_scroll( client, report );
+    if (scroll)
+        ::wiznet( WIZ_QUEST, 0, 0, "%^C1 получает свиток познания (добыча) для умения %s", client, report.str().c_str() );
+    return scroll;
+}
+
+/** Plugs the skill scroll into quest_core while this library is loaded. */
+class QuestScrollHookPlugin : public Plugin {
+public:
+    typedef ::Pointer<QuestScrollHookPlugin> Pointer;
+
+    virtual void initialization( )
+    {
+        quest_scroll_hook = &fenia_quest_scroll;
+    }
+
+    virtual void destruction( )
+    {
+        quest_scroll_hook = 0;
+    }
+};
 
 extern "C"
 {
@@ -44,6 +78,7 @@ extern "C"
         Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestScrollBehavior> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<QuestMaster> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<DefaultQuestMaster> >( ppl );
+        Plugin::registerPlugin<QuestScrollHookPlugin>( ppl );
         
         return ppl;
     }
