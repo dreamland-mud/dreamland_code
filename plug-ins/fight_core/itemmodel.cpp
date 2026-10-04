@@ -15,6 +15,8 @@
 #include "merc.h"
 #include "def.h"
 #include "configurable.h"
+#include "armorgenerator.h"
+#include "damage.h"
 
 using std::max;
 
@@ -55,7 +57,13 @@ static double pc_baseline_field(int level, bool caster, const char *field)
 
 double item_pc_dmg(int level, bool caster)   { return pc_baseline_field(level, caster, "dmg"); }
 double item_pc_hp(int level, bool caster)    { return pc_baseline_field(level, caster, "hp"); }
-double item_pc_round(int level, bool caster) { return pc_baseline_field(level, caster, "round"); }
+double item_pc_round(int level, bool caster)
+{
+    double round = pc_baseline_field(level, caster, "round");
+    if (caster)
+        round += pc_baseline_field(level, true, "spell_round");
+    return round;
+}
 
 double item_combat_points(double dmgPerRound, double controlShare, int level, bool caster)
 {
@@ -282,20 +290,26 @@ static const FlagValue flag_values[] = {
     { AFF_FAERIE_FIRE,  "faerie_fire",  -15,  -15,  0 },
 };
 
-static double flag_base(const FlagValue &fv, bool caster)
+static double flag_base(const FlagValue &fv, bool caster, int level)
 {
+    if (level >= 0 && item_model_enabled()) {
+        const Json::Value &byLevel = item_value_object("flags_by_level", fv.key);
+        if (byLevel.isObject())
+            return item_points_by_level(byLevel, level, caster ? 1 : 0);
+    }
     return item_value("flags", fv.key, caster ? fv.caster : fv.melee, caster ? 1 : 0);
 }
 
-double item_flag_base(bitstring_t flag, bool caster)
+double item_flag_base(bitstring_t flag, bool caster, int level)
 {
     for (auto const &fv: flag_values)
         if (fv.flag == flag)
-            return flag_base(fv, caster);
+            return flag_base(fv, caster, level);
     return 0;
 }
 
-double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstring_t heldFlags)
+double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstring_t heldFlags,
+                        int level)
 {
     double s = 0;
 
@@ -303,7 +317,7 @@ double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstr
         if (!IS_SET(bits, fv.flag))
             continue;
 
-        double base = flag_base(fv, caster);
+        double base = flag_base(fv, caster, level);
         // A second copy of a boon the char already has for free is worth nothing.
         // Curses still count: nobody "already has" a curse as a boon.
         if (base > 0 && IS_SET(heldFlags, fv.flag))
@@ -438,9 +452,121 @@ double item_fit_alignment(Character *ch, const DLString &weaponFlag)
         return 1.0;
     if (weaponFlag == "holy")
         return IS_GOOD(ch) ? 1.0 : 0.0;
+    // flag.points_by_level prices vorpal for a good wielder (1% per hit beheads);
+    // anyone else beheads at 0.5% (onehit_undef.cpp damEffectVorpal).
     if (weaponFlag == "vorpal")
-        return IS_GOOD(ch) ? 2.0 : 1.0;
+        return IS_GOOD(ch) ? 1.0 : 0.5;
     if (weaponFlag == "vampiric")
         return IS_EVIL(ch) ? 1.0 : 0.0;
     return 1.0;
+}
+
+/*
+ * What an item carries outside its affect list (P6).
+ */
+static const Json::Value *affix_entry(const char *section, const DLString &value)
+{
+    const Json::Value &all = item_affixes_config();
+    if (!all.isObject() || !all.isMember(section))
+        return 0;
+    const Json::Value &values = all[section]["values"];
+    if (!values.isArray())
+        return 0;
+    for (auto const &affix: values)
+        if (affix["value"].asString() == value)
+            return &affix;
+    return 0;
+}
+
+double item_weapon_flag_points(int weaponFlags, int level, bool caster, Character *target)
+{
+    const Json::Value &all = item_affixes_config();
+    if (weaponFlags == 0 || !all.isObject() || !all.isMember("flag"))
+        return 0;
+
+    double s = 0;
+    for (auto const &affix: all["flag"]["values"]) {
+        if (!affix.isMember("points_by_level"))
+            continue;
+        DLString name = affix["value"].asString();
+        bitnumber_t bit = weapon_type2.value(name);
+        if (bit == (bitnumber_t)NO_FLAG || bit == 0 || !IS_SET(weaponFlags, bit))
+            continue;
+        s += item_points_by_level(affix["points_by_level"], level, caster ? 1 : -1)
+             * item_fit_alignment(target, name);
+    }
+    return s;
+}
+
+double item_detect_points(bitstring_t bits, bool caster, Character *target)
+{
+    double s = 0;
+    for (int i = 0; i < detect_flags.size; i++) {
+        bitstring_t bit = detect_flags.fields[i].value;
+        if (bit == 0 || !IS_SET(bits, bit))
+            continue;
+        const char *name = detect_flags.fields[i].name;
+        double base = item_value("detects", name, 0, caster ? 1 : 0);
+        if (base > 0 && target != 0) {
+            DLString spell = DLString("detect ") + name;
+            if (item_fit_self_cast(target, spell.c_str()) || item_fit_self_cast(target, name))
+                base *= 0.1;
+        }
+        s += base;
+    }
+    return s;
+}
+
+double item_extra_points(bitstring_t bits, bool caster)
+{
+    double s = 0;
+    for (int i = 0; i < extra_flags.size; i++) {
+        bitstring_t bit = extra_flags.fields[i].value;
+        if (bit != 0 && IS_SET(bits, bit))
+            s += item_value("extras", extra_flags.fields[i].name, 0, caster ? 1 : 0);
+    }
+    return s;
+}
+
+double item_material_points(const DLString &material, int level, bool caster)
+{
+    if (material.empty())
+        return 0;
+    return item_value("materials", material.c_str(), 0, caster ? 1 : 0)
+         + item_points_by_level(item_value_object("materials_combat", material.c_str()), level);
+}
+
+double item_wornbuff_points(const DLString &buff, int level, bool caster)
+{
+    const Json::Value *affix = affix_entry("worn_buff", buff);
+    if (affix == 0 || !affix->isMember("points_by_level"))
+        return 0;
+    return item_points_by_level((*affix)["points_by_level"], level, caster ? 1 : 0);
+}
+
+static ItemSpellTierFn spellTierFn = 0;
+
+void item_set_spell_tier_fn(ItemSpellTierFn fn)
+{
+    spellTierFn = fn;
+}
+
+double item_proc_points(const DLString &spell, double chance, double count, int level, bool caster)
+{
+    if (chance <= 0)
+        return 0;
+    if (count <= 0)
+        count = 1;
+    if (count > 10)          // the firing cap (ocombatcast_fight)
+        count = 10;
+
+    double v = spell_combat_value(spell);
+    if (v > 0)
+        v *= level / spell_combat_level_ref();
+    else if (spellTierFn != 0)
+        v = spellTierFn(spell, level) * spell_combat_save_factor();
+    if (v <= 0)
+        return 0;
+
+    return item_combat_points(v * chance / 100.0 * count, 0, level, caster);
 }

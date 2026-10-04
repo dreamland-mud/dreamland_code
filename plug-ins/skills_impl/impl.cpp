@@ -23,7 +23,19 @@
 #include "skillhelp.h"
 #include "skillgrouphelp.h"
 #include "xmlattributerestring.h"
+#include "itemmodel.h"
+#include "plugin.h"
 #include "def.h"
+
+double spell_proc_tier_value(const DLString &spellName, int level);
+
+/** Hands the damage-tier lookup to the item model (fight_core) for proc pricing;
+ *  cleared on unload so fight_core never calls into an unloaded plugin. */
+class ItemSpellTierHook : public Plugin {
+public:
+    virtual void initialization( ) { item_set_spell_tier_fn( &spell_proc_tier_value ); }
+    virtual void destruction( )    { item_set_spell_tier_fn( 0 ); }
+};
 
 TABLE_LOADER(SkillGroupLoader, "skill-groups", "SkillGroup");
 
@@ -48,6 +60,7 @@ extern "C"
                 Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeRestring> >( ppl );
                 Plugin::registerPlugin<MocRegistrator<FeniaSpellContext> > (ppl);
                 Plugin::registerPlugin<MocRegistrator<FeniaCommandContext> > (ppl);
+                Plugin::registerPlugin<ItemSpellTierHook>( ppl );
                 return ppl;
         }
         
