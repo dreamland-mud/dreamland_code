@@ -15,23 +15,10 @@
 #include "questor.h"
 #include "xmlattributequestreward.h"
 #include "questscrollhook.h"
-#include "pcharacter.h"
-#include "wiznet.h"
-#include "merc.h"
 
-#include <sstream>
-
-Object * make_quest_scroll( PCharacter *client, std::ostringstream &report );
-
-/** A scroll for Fenia (tier loot drops): same roll as the questor's reward. */
-static Object * fenia_quest_scroll( PCharacter *client )
-{
-    std::ostringstream report;
-    Object *scroll = make_quest_scroll( client, report );
-    if (scroll)
-        ::wiznet( WIZ_QUEST, 0, 0, "%^C1 получает свиток познания (добыча) для умения %s", client, report.str().c_str() );
-    return scroll;
-}
+class Object;
+class PCharacter;
+Object * fenia_quest_scroll( PCharacter *client );
 
 /** Plugs the skill scroll into quest_core while this library is loaded. */
 class QuestScrollHookPlugin : public Plugin {

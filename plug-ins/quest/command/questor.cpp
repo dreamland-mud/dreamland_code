@@ -394,6 +394,17 @@ Object * make_quest_scroll( PCharacter *client, ostringstream &report )
     return scroll;
 }
 
+/** A scroll for Fenia (tier loot drops): same roll as the questor's reward.
+ *  quest_command's QuestScrollHookPlugin installs it as quest_scroll_hook. */
+Object * fenia_quest_scroll( PCharacter *client )
+{
+    ostringstream report;
+    Object *scroll = make_quest_scroll( client, report );
+    if (scroll)
+        ::wiznet( WIZ_QUEST, 0, 0, "%^C1 получает свиток познания (добыча) для умения %s", client, report.str().c_str() );
+    return scroll;
+}
+
 void Questor::rewardScroll( PCharacter *client )
 {
     ostringstream report;
