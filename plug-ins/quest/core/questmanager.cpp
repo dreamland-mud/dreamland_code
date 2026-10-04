@@ -3,6 +3,7 @@
  * ruffina, 2003
  */
 
+#include "questscrollhook.h"
 #include <sstream>
 
 #include "dbio.h"
@@ -240,4 +241,16 @@ QuestManager::findQuestRegistrator( const DLString& carg )
     }
     
     return QuestRegistratorBase::Pointer( );
+}
+
+/*--------------------------------------------------------------------------
+ * Questor's skill scroll hook (questscrollhook.h)
+ *-------------------------------------------------------------------------*/
+QuestScrollHook quest_scroll_hook = 0;
+
+Object * quest_scroll_create( PCharacter *ch )
+{
+    if (!ch || !quest_scroll_hook)
+        return 0;
+    return quest_scroll_hook( ch );
 }

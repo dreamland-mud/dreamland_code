@@ -341,9 +341,10 @@ void Questor::rewardWord( PCharacter *client )
     }        
 }
 
-void Questor::rewardScroll( PCharacter *client )
+/** A skill scroll bound to client, not placed anywhere: 1-2 unfinished skills, +2-4% each.
+ *  NULL when no skill qualifies. report gets "skill (gain%) " per skill. */
+Object * make_quest_scroll( PCharacter *client, ostringstream &report )
 {
-    ostringstream report;
     int sn, i, count;
     int learned, maximum;
     vector<int> skills;
@@ -372,7 +373,7 @@ void Questor::rewardScroll( PCharacter *client )
     }
     
     if (skills.empty( ))
-        return;
+        return 0;
 
     bhv.construct( );
     count = number_range( 1, 2 );
@@ -390,6 +391,16 @@ void Questor::rewardScroll( PCharacter *client )
     bhv->setObj( scroll );
     bhv->setOwner( client );
     bhv->createDescription( client );
+    return scroll;
+}
+
+void Questor::rewardScroll( PCharacter *client )
+{
+    ostringstream report;
+    Object *scroll = make_quest_scroll( client, report );
+
+    if (!scroll)
+        return;
 
     obj_to_char( scroll, client );
     tell_raw( client, ch, _("Кроме того, я вручаю тебе свиток, внимательно изучив который, "

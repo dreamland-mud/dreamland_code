@@ -78,6 +78,7 @@
 #include "autoquestwrapper.h"
 #include "questmanager.h"
 #include "questregistrator.h"
+#include "questscrollhook.h"
 #include "behaviorwrapper.h"
 #include "wordeffectwrapper.h"
 #include "liquid.h"
@@ -1782,6 +1783,20 @@ NMI_INVOKE(Root, itemProcPoints, "(spell, chance, level, profile): очки оц
     DLString profile = argnum2string(args, 4);
 
     return Register((int)std::round(item_proc_points(spell, chance, 1, level, profile == "caster")));
+}
+
+NMI_INVOKE(Root, questScroll, "(ch): свиток познания для игрока ch, как награда квестора (+2-4% к 1-2 недоученным умениям, только для ch); null если учить нечего")
+{
+    Character *ch = argnum2character(args, 1);
+    if (ch->is_npc( ))
+        return Register( );
+
+    ::Object *scroll = quest_scroll_create( ch->getPC( ) );
+    if (!scroll)
+        return Register( );
+
+    obj_to_room( scroll, get_room_instance( ROOM_VNUM_FENIA_STORAGE ) );
+    return WrapperManager::getThis( )->getWrapper( scroll );
 }
 
 NMI_INVOKE(Root, itemModel, "(mode): только для тестов: генераторы предметов считают по единой модели (1), по старым ценам (0) или по конфигу (-1); вернуть -1 до конца того же eval. Возвращает прежний режим")
