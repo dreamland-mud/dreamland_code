@@ -990,9 +990,18 @@ bool ItemAffixRoller::applyShared(const Candidate &c, int count)
             remember(af);
 
         } else if (c.value == "learned") {
-            // One item model: defensive-group skills x1.5 (Kit 2026-10-04).
-            int defensive = item_model_enabled() && skillGroupManager->hasElement("defensive")
-                          ? skillGroupManager->lookup("defensive") : -1;
+            // One item model: melee picks defensive/fightmaster skills x1.25 (Kit 2026-10-04).
+            vector<int> preferred;
+            if (item_model_enabled() && pickProfile() == "melee")
+                for (const char *g: { "defensive", "fightmaster" })
+                    if (skillGroupManager->hasElement(g))
+                        preferred.push_back(skillGroupManager->lookup(g));
+            auto skillWeight = [&preferred](Skill *skill) {
+                for (int g: preferred)
+                    if (skill->getGroups().isSet(g))
+                        return 5;
+                return 4;
+            };
             vector<int> mine;
             int weights = 0;
             for (int sn = 0; sn < skillManager->size(); sn++) {
@@ -1000,14 +1009,14 @@ bool ItemAffixRoller::applyShared(const Candidate &c, int count)
                 Skill *skill = skillManager->find(sn);
                 if (data.learned > 1 && !data.isTemporary() && skill && skill->available(pch)) {
                     mine.push_back(sn);
-                    weights += (defensive >= 0 && skill->getGroups().isSet(defensive)) ? 3 : 2;
+                    weights += skillWeight(skill);
                 }
             }
             if (mine.empty())
                 return true;
             int dice = number_range(1, weights), sn = mine.back();
             for (int m: mine) {
-                dice -= (defensive >= 0 && skillManager->find(m)->getGroups().isSet(defensive)) ? 3 : 2;
+                dice -= skillWeight(skillManager->find(m));
                 if (dice <= 0) {
                     sn = m;
                     break;
