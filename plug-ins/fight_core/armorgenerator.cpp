@@ -665,6 +665,9 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
     // honest prices make affixes cheap (high level).
     double statFloor = 0;
     std::vector<bool> isStat(pool.size(), false);
+    // floor_exempt (the sanctuary family): may be picked while the floor is unmet,
+    // and once picked the floor is lifted for that item (Kit 2026-10-04).
+    std::vector<bool> floorExempt(pool.size(), false);
     if (item_model_enabled()) {
         // A value may be a number (both profiles) or [melee, caster].
         int col = isCaster ? 1 : 0;
@@ -682,8 +685,10 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
                 statSections.insert(sec.asString());
         else
             statSections = { "armor_stats", "primary_stats", "affect_packs" };
-        for (int i = 0; i < (int)pool.size(); i++)
+        for (int i = 0; i < (int)pool.size(); i++) {
             isStat[i] = statSections.count(pool[i].section) > 0 && pool[i].price > 0;
+            floorExempt[i] = (*pool[i].affix)["floor_exempt"].asBool();
+        }
     }
 
     for (int attempt = 0; attempt < 30; attempt++) {
@@ -713,7 +718,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
                 auto it = picked.find(i);
                 bool fresh = (it == picked.end());
 
-                if (needStats && !isStat[i])
+                if (needStats && !isStat[i] && !floorExempt[i])
                     continue;
 
                 if (!fresh && it->second >= c.stack)
@@ -769,6 +774,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
                 penalty += pool[i].price;
             if (isStat[i])
                 statSpent += pool[i].price;
+            if (floorExempt[i])
+                relaxed = true;
         }
 
         int distance = total < minM ? minM - total : (total > maxM ? total - maxM : 0);
