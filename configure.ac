@@ -9,6 +9,24 @@ AC_CONFIG_HEADER(config.h)
 AC_PREFIX_DEFAULT(`pwd`)
 AM_INIT_AUTOMAKE
 
+dnl Keep the build off the autotools treadmill.
+dnl
+dnl Without this macro automake emits rules that regenerate Makefile.in,
+dnl configure and aclocal.m4 whenever their sources look newer, and those
+dnl rules run on every build machine, not just a maintainer's. One added
+dnl line in a Makefile.am is then enough to start the regeneration cascade,
+dnl and the generated files are not in git, so every tree depends on that
+dnl path converging. It does not always converge: clock skew, an rsync that
+dnl lands sources newer than the generated files, or the second configure
+dnl system under src/moc keep re-running aclocal/automake/autoconf. A build
+dnl that does that spawns tool processes until the machine is out of memory.
+dnl
+dnl With AM_MAINTAINER_MODE those rules are disabled unless configure is
+dnl given --enable-maintainer-mode, so an ordinary build never calls the
+dnl autotools at all. Editing a Makefile.am keeps working exactly as before:
+dnl make -f Makefile.git && ./config.status, as the build docs prescribe.
+AM_MAINTAINER_MODE([disable])
+
 dnl Check for additional compiler/linker options
 AC_CHECK_OPTIMIZATION
    
