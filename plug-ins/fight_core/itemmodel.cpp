@@ -106,11 +106,17 @@ void item_weights(ItemWeights &w, bool caster, int acLevel)
     // AC is near-useless except at low level: ac_base at level 1, linearly 0 by ac_zero_level.
     double acZero     = item_value("shared", "ac_zero_level", 40);
     w.ac              = item_value("shared", "ac_base", 0.5) * max(0.0, acZero - acLevel) / max(1.0, acZero - 1);
+    // One item model: a caster still values AC past ac_zero_level (no parry, hit by everything).
+    if (item_model_enabled())
+        w.ac = max(w.ac, item_value(pf, "ac_floor", 0));
     w.slevel          = item_value(pf, "slevel", c ? 25.0 : 4.0);
     w.level           = item_value(pf, "level", c ? 40.0 : 14.0);
     w.skillLevel      = item_value(pf, "skill_level_group", c ? 18.0 : 8.0);
     w.skillLevelSkill = item_value(pf, "skill_level_skill", c ? 9.0 : 4.0);
     w.move            = item_value("shared", "move", 0.05);
+    // One item model: moves are a melee fighter's mana (Kit 2026-10-04).
+    if (item_model_enabled())
+        w.move = item_value(pf, "move", w.move);
     // beats = percent cut of skill lag: central for casters (every action is a
     // lag-gated cast), a token for melee whose damage is the violence round.
     w.beats           = item_value(pf, "beats", c ? 6.0 : 1.0);
@@ -181,7 +187,9 @@ int item_model_override(int mode)
 
 int item_model_cost(int measureCm, int level)
 {
-    return max(0, (int)(item_value("measure", "cost_k", 5.5) * measureCm / 100.0 * level));
+    int cost = max(0, (int)(item_value("measure", "cost_k", 5.5) * measureCm / 100.0 * level));
+    int cap = (int)item_value("measure", "cost_cap", 0);
+    return cap > 0 ? min(cost, cap) : cost;
 }
 
 double item_points_by_level(const Json::Value &table, int level, int col)

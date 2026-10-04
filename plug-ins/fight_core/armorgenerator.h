@@ -91,6 +91,14 @@ protected:
     /** Fit clauses for the killer (decisions 5, 6): no stat over its cap, no
      *  resist or immunity it already has. Selection only, prices don't change. */
     bool fitAllowed(const DLString &secName, const DLString &value) const;
+    /** One item model: the killer already has this effect from worn gear or an
+     *  active affect (bits, a worn buff's spell, the affix's have / have_bits). */
+    bool alreadyHas(const DLString &secName, const Json::Value &affix) const;
+    /** One item model: the 'pick' weight multiplier for the killer's class or
+     *  profile at the item level (affix first, then section); 1 when absent. */
+    double pickMultiplier(const Json::Value &section, const Json::Value &affix) const;
+    /** caster / hybrid / melee, from the killer's profession flags. */
+    DLString pickProfile() const;
     /** Tier window multiplier by item level (decision 3); 1 when the model is off. */
     double windowCurve() const;
     void remember(Affect &af);
