@@ -1781,13 +1781,7 @@ NMI_INVOKE(Root, itemProcPoints, "(spell, chance, level, profile): очки оц
     int level = URANGE(1, argnum2number(args, 3), MAX_LEVEL);
     DLString profile = argnum2string(args, 4);
 
-    double v = spell_combat_value(spell);
-    if (v > 0)
-        v *= level / spell_combat_level_ref();
-    else
-        v = spell_proc_tier_value(spell, level) * spell_combat_save_factor();
-
-    return Register((int)std::round(item_combat_points(v * chance / 100.0, 0, level, profile == "caster")));
+    return Register((int)std::round(item_proc_points(spell, chance, 1, level, profile == "caster")));
 }
 
 NMI_INVOKE(Root, itemModel, "(mode): только для тестов: генераторы предметов считают по единой модели (1), по старым ценам (0) или по конфигу (-1); вернуть -1 до конца того же eval. Возвращает прежний режим")

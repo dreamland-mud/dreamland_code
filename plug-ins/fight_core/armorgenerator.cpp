@@ -287,7 +287,7 @@ int ItemAffixRoller::candidatePrice(const DLString &secName, const Json::Value &
     return (isCaster ? affix["price_caster"] : affix["price_melee"]).asInt();
 }
 
-static double table_points(const DLString &table, const DLString &bitNames, bool caster)
+static double table_points(const DLString &table, const DLString &bitNames, bool caster, int level)
 {
     const FlagTable *t = FlagTableRegistry::getTable(table);
     if (!t)
@@ -307,7 +307,7 @@ static double table_points(const DLString &table, const DLString &bitNames, bool
     bitstring_t bits = af.bitvector;
 
     if (table == "affect_flags")
-        return item_flag_points(bits, caster, 0, 0);
+        return item_flag_points(bits, caster, 0, 0, level);
     if (table == "res_flags")
         return item_res_points(bits, 0);
     if (table == "imm_flags")
@@ -338,7 +338,7 @@ bool ItemAffixRoller::modelPoints(const DLString &secName, const Json::Value &af
             if (one.isMember("apply"))
                 points += item_apply_points(apply_flags.value(one["apply"].asString()), modifier(one, 1), w);
             else if (one.isMember("table"))
-                points += table_points(one["table"].asString(), one["bits"].asString(), isCaster);
+                points += table_points(one["table"].asString(), one["bits"].asString(), isCaster, obj->level);
         }
         return true;
     }
@@ -366,11 +366,20 @@ bool ItemAffixRoller::modelPoints(const DLString &secName, const Json::Value &af
                        : secName == "vulns" ? "vuln_flags"
                        : secName == "immunes" ? "imm_flags"
                        : "affect_flags";
-        points = table_points(table, value, isCaster);
+        points = table_points(table, value, isCaster, obj->level);
         return true;
     }
     if (secName == "worn_buff" && affix.isMember("points_by_level")) {
         points = item_points_by_level(affix["points_by_level"], obj->level, col);
+        return true;
+    }
+    // Procs: the combat-effect model at the chance this affix will roll with
+    // (applyOne: proc_chance of its tier floor), same as the sage scores it.
+    if (secName == "proc") {
+        const Json::Value &section = item_affixes[secName];
+        int floor = affix.isMember("tier") ? affix["tier"].asInt()
+                  : section.isMember("tier") ? section["tier"].asInt() : WORST_TIER;
+        points = item_proc_points(value, proc_chance(floor), 1, obj->level, isCaster);
         return true;
     }
     if (secName == "material" || secName == "weapon_material") {

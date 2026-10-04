@@ -28,6 +28,9 @@ struct ItemWeights {
     // affect_flags the char already has for free (perma affects + worn gear OUTSIDE the
     // candidate's slot): a candidate re-granting one scores it 0. Sage-only.
     bitstring_t heldFlags = 0;
+    // imm/res bits the char already has (race + perma affects + worn gear outside the
+    // candidate's slot), for the "already have it" clause (decision 6). Model only.
+    bitstring_t heldImm = 0, heldRes = 0;
     // One swing of the char's wielded weapon in points, for a non-weapon item's
     // combathits. -1 = no usable weapon. Sage-only.
     double curWeaponSwing = -1.0;
@@ -72,12 +75,46 @@ bool item_level_window_ok(const Json::Value &affix, int level);
  *  group +level / learned) and APPLY_NONE return 0: they only have a fit value. */
 double item_apply_points(int location, int modifier, const ItemWeights &w);
 
-/** Base points of one affect_flags bit, no fit (one profile column). */
-double item_flag_base(bitstring_t flag, bool caster);
+/** Base points of one affect_flags bit, no fit (one profile column). With the model
+ *  on and level >= 0, item_value.json flags_by_level wins over the flat flags table. */
+double item_flag_base(bitstring_t flag, bool caster, int level = -1);
 
 /** affect_flags bitvector with the sage's fit: a positive bit already held is 0,
  *  a positive bit the char can self-cast is 10%. target 0 / heldFlags 0 = base. */
-double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstring_t heldFlags);
+double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstring_t heldFlags,
+                        int level = -1);
+
+/*
+ * What an item carries outside its affect list, in points (P6). Same prices the
+ * generator buys with (item_affixes.json / item_value.json), so the sage's base score
+ * of a generated item equals its measure_m.
+ */
+/** Weapon flags (value4 bits) from item_affixes.json flag.points_by_level. A flag
+ *  with no entry is 0. target != 0 applies the alignment fit (item_fit_alignment). */
+double item_weapon_flag_points(int weaponFlags, int level, bool caster, Character *target = 0);
+
+/** detect_flags bits from item_value.json detects. target != 0: a detect the char
+ *  can cast itself counts 10% (decision 11). */
+double item_detect_points(bitstring_t bits, bool caster, Character *target = 0);
+
+/** extra_flags bits priced in item_value.json extras (noremove, bless, anti_good...). */
+double item_extra_points(bitstring_t bits, bool caster);
+
+/** Material: durability (materials) + combat side by level (materials_combat). */
+double item_material_points(const DLString &material, int level, bool caster);
+
+/** A generated item's worn buff from item_affixes.json worn_buff.points_by_level. */
+double item_wornbuff_points(const DLString &buff, int level, bool caster);
+
+/** A combat spell proc: expected damage per round (spell_combat_value override scaled
+ *  to the item level, else the spell's damage tier at the item level x save factor)
+ *  x chance% x count, through item_combat_points (decision 9). */
+double item_proc_points(const DLString &spell, double chance, double count, int level, bool caster);
+
+/** Damage-tier lookup lives in skills_impl, which registers it here on load and
+ *  clears it on unload. Unset -> procs without an override value score 0. */
+typedef double (*ItemSpellTierFn)(const DLString &spell, int level);
+void item_set_spell_tier_fn(ItemSpellTierFn fn);
 
 /** res/imm/vuln bitvector, kind 0 res / 1 imm / 2 vuln, no fit. */
 double item_res_points(bitstring_t bits, int kind);
@@ -92,7 +129,8 @@ double item_res_points_fit(bitstring_t bits, int kind, bitstring_t ownedImm, bit
  * Combat-effect model (decisions 8, 9, 12, 15). The reference player comes from
  * config/fight/pc_baseline.json (p50 of active PCs by level band, interpolated).
  */
-/** Reference player's damage per landed hit, max hp and median round damage. */
+/** Reference player's damage per landed hit, max hp and median round damage. A
+ *  caster's round adds one nuke per round (pc_baseline caster.spell_round, Q1-B). */
 double item_pc_dmg(int level, bool caster);
 double item_pc_hp(int level, bool caster);
 double item_pc_round(int level, bool caster);

@@ -3371,7 +3371,8 @@ double spell_proc_tier_value( const DLString &spellName, int level );
 //    level-scaled like a spell). A multi_hit is a whole extra round, _round_attacks swings.
 // Returns 0 for an item that declares neither -- ga_score then keeps the flat +50.
 // COMBAT_PROC_SCORING.md.
-static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::Object *inst = 0 )
+static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::Object *inst = 0,
+                            int modelLevel = -1, bool caster = false )
 {
     // A random item carries its procs on the instance (armor generator); they win
     // over the prototype's, exactly as ocombatcast_fight fires them.
@@ -3389,6 +3390,9 @@ static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::O
     // and the flat fallback are damage -> _global + level-scaled; a real swing is neither.
     int ref = (int)spell_combat_level_ref( );
     double rawCast = 0, rawFlatHits = 0, swingHits = 0;
+    // Model (modelLevel >= 0): each cast is priced by the combat-effect model at the
+    // item level, in final points (item_proc_points, decision 9), not via _global.
+    double modelCast = 0;
 
     // Spells cast in combat.
     if (castSrc.isMember( "combatcast" )) {
@@ -3397,6 +3401,12 @@ static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::O
             for (auto i = casts.begin( ); i != casts.end( ); ++i) {
                 const Json::Value &c = *i;
                 DLString spellName = c["spell"].asString( );
+                if (modelLevel >= 0) {
+                    modelCast += item_proc_points( spellName, c["chance"].asDouble( ),
+                                                   c.isMember( "count" ) ? c["count"].asDouble( ) : 1.0,
+                                                   modelLevel, caster );
+                    continue;
+                }
 
                 // Explicit override wins (spells whose worth does not follow their
                 // tier); otherwise derive from the spell's damage tier at the
@@ -3448,7 +3458,7 @@ static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::O
         }
     }
 
-    if (rawCast <= 0 && rawFlatHits <= 0 && swingHits <= 0)
+    if (rawCast <= 0 && rawFlatHits <= 0 && swingHits <= 0 && modelCast <= 0)
         return 0;
 
     // rawCast and rawFlatHits are expected DAMAGE -> convert to score currency with
@@ -3457,7 +3467,7 @@ static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::O
     // level+skill+dice, so it is neither level-scaled nor re-converted by _global -- doing so
     // would double-convert it (the bug the first cut shipped: everything x2.68).
     double levelScale = pObj->level / spell_combat_level_ref( );
-    return spell_combat_global( ) * (rawCast + rawFlatHits) * levelScale + swingHits;
+    return spell_combat_global( ) * (rawCast + rawFlatHits) * levelScale + swingHits + modelCast;
 }
 
 // Clerics learn "compound" (lvl 37): it weights any weapon-class weapon into a
@@ -3601,7 +3611,7 @@ static double ga_spellFactor( Character *target )
 }
 
 static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6],
-                            Character *target, bool worn )
+                            Character *target, bool worn, int itemLevel = -1 )
 {
     int m = af.modifier;
     switch (af.location) {
@@ -3714,10 +3724,18 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     if (ft != 0 && bits != 0) {
         // Redundancy discount applies to a CANDIDATE only (worn ? 0): never dock the
         // worn baseline, so a gear delta can only ever shrink, never inflate.
-        if (ft == &affect_flags)    s += ga_affectFlagValue( bits, w.caster, target, worn ? 0 : w.heldFlags );
-        else if (ft == &res_flags)  s += ga_resValue( bits, 0 );
-        else if (ft == &imm_flags)  s += ga_resValue( bits, 1 );
-        else if (ft == &vuln_flags) s += ga_resValue( bits, 2 );
+        bool model = item_model_enabled( );
+        int kind = ft == &res_flags ? 0 : ft == &imm_flags ? 1 : ft == &vuln_flags ? 2 : -1;
+        if (ft == &affect_flags)
+            s += item_flag_points( bits, w.caster, target, worn ? 0 : w.heldFlags, model ? itemLevel : -1 );
+        else if (model && ft == &detect_flags)
+            s += item_detect_points( bits, w.caster, target );
+        // Model: a resist the char already owns outside this slot adds nothing
+        // (decision 6). Candidates only, like heldFlags: the worn baseline keeps full price.
+        else if (kind >= 0 && model && !worn && target != 0)
+            s += item_res_points_fit( bits, kind, w.heldImm, w.heldRes );
+        else if (kind >= 0)
+            s += ga_resValue( bits, kind );
     }
 }
 
@@ -3789,11 +3807,13 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
 {
     double s = 0;
     int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
+    int itemLevel = inst != 0 ? inst->level : (pProto != 0 ? pProto->level : -1);
+    bool model = item_model_enabled( );
     for (auto &paf: protoAff)
-        ga_accumAffect( *paf, w, s, statDelta, target, worn );
+        ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel );
     if (instAff != 0)
         for (auto &paf: *instAff)
-            ga_accumAffect( *paf, w, s, statDelta, target, worn );
+            ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel );
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
             continue;
@@ -3829,6 +3849,12 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
         // scoring 0 and dropping to the +50 Fenia-trigger bonus, which would over-rate it.
         if (eff > 0)
             weaponSwing = w.weaponWeight * eff;   // one swing's score; its combathits reuse it.
+        // Model: weapon flags at the generator's price, x the alignment fit, only for a
+        // weapon the char can swing (its flags fire on hits).
+        if (model && eff > 0) {
+            int wflags = inst != 0 ? inst->value4( ) : pProto->value[4];
+            s += item_weapon_flag_points( wflags, itemLevel, w.caster, target );
+        }
     }
     else {
         // A non-weapon item's combathits (a belt, a ring granting extra attacks) fire the
@@ -3856,18 +3882,32 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     bool generated = inst != 0 && !inst->getProperty( "measure_m" ).empty( );
     if (generated) {
         DLString buff = inst->getProperty( "wornbuff" );
-        int price = buff.empty( ) ? 0 : item_affix_price( "worn_buff", buff, w.caster );
-        if (price > 0) {
-            int rolls = item_rolls( inst->level );
-            s += price / 100.0 * rolls * (w.dr + w.hr + 10 * w.hp + 10 * w.mana);
+        if (model) {
+            if (!buff.empty( ))
+                s += item_wornbuff_points( buff, inst->level, w.caster );
         }
+        else {
+            int price = buff.empty( ) ? 0 : item_affix_price( "worn_buff", buff, w.caster );
+            if (price > 0) {
+                int rolls = item_rolls( inst->level );
+                s += price / 100.0 * rolls * (w.dr + w.hr + 10 * w.hp + 10 * w.mana);
+            }
+        }
+    }
+    // Model: extra flags (noremove, bless, anti_good...) and the material, at the
+    // generator's prices. A material the char may not wear is worth nothing.
+    if (model && pProto != 0) {
+        int extras = inst != 0 ? inst->extra_flags : pProto->extra_flags;
+        s += item_extra_points( extras, w.caster );
+        DLString mat = inst != 0 ? DLString( inst->getMaterial( ) ) : DLString( pProto->material );
+        s += item_material_points( mat, itemLevel, w.caster ) * item_fit_material( target, mat );
     }
     // Combat spell-procs get scored on what they actually cast (value table x
     // proc chance x item level). That supersedes the flat +50, which was only a
     // stand-in for "this triggers something good in a fight" -- the proc IS that
     // trigger. But a skill-teaching item that ALSO procs still deserves its teach
     // credit on top (different value), and non-proc special gear keeps the +50.
-    double procScore = ga_procScore( pProto, weaponSwing, inst );
+    double procScore = ga_procScore( pProto, weaponSwing, inst, model ? itemLevel : -1, w.caster );
     if (procScore > 0) {
         s += procScore;
         if (ga_grantsSkills( pProto ))
@@ -4257,6 +4297,35 @@ static bitstring_t ga_permaFlags( Character *target )
     return perma;
 }
 
+// imm/res the char owns regardless of gear: race + permanent affects (decision 6 floor).
+static void ga_permaResist( Character *target, bitstring_t &imm, bitstring_t &res )
+{
+    imm = target->getRace( )->getImm( ).getValue( );
+    res = target->getRace( )->getRes( ).getValue( );
+    for (auto &paf: target->affected) {
+        if (paf->duration >= 0)
+            continue;
+        bitstring_t b = paf->bitvector;
+        if (paf->bitvector.getTable( ) == &imm_flags) imm |= b;
+        if (paf->bitvector.getTable( ) == &res_flags) res |= b;
+    }
+}
+
+// imm/res bits one item grants through its affects (proto + instance).
+static void ga_itemResist( ::Object *o, bitstring_t &imm, bitstring_t &res )
+{
+    for (auto &paf: o->pIndexData->affected) {
+        bitstring_t b = paf->bitvector;
+        if (paf->bitvector.getTable( ) == &imm_flags) imm |= b;
+        if (paf->bitvector.getTable( ) == &res_flags) res |= b;
+    }
+    for (auto &paf: o->affected) {
+        bitstring_t b = paf->bitvector;
+        if (paf->bitvector.getTable( ) == &imm_flags) imm |= b;
+        if (paf->bitvector.getTable( ) == &res_flags) res |= b;
+    }
+}
+
 // Stat baseline + cap for cap-aware scoring (a stat point at the cap is worth
 // nothing). rawStat = perm+mod (uncapped current); capStat = the char's cap.
 static void ga_statBaseline( Character *target, int rawStat[6], int capStat[6] )
@@ -4300,6 +4369,7 @@ double ga_item_score( Character *target, ::Object *o, bool caster )
     bool worn = o->carried_by == target && o->wear_loc != wear_none;
 
     w.heldFlags = ga_permaFlags( target );
+    ga_permaResist( target, w.heldImm, w.heldRes );
     for (::Object *wo = target->carrying; wo; wo = wo->next_content) {
         if (wo == o || wo->wear_loc == wear_none)
             continue;
@@ -4307,6 +4377,7 @@ double ga_item_score( Character *target, ::Object *o, bool caster )
         REMOVE_BIT( slot, ITEM_TAKE );
         if (slot == mySlot)
             continue;
+        ga_itemResist( wo, w.heldImm, w.heldRes );
         for (auto &paf: wo->pIndexData->affected)
             if (paf->bitvector.getTable( ) == &affect_flags) {
                 bitstring_t hb = paf->bitvector; w.heldFlags |= hb;
@@ -4578,6 +4649,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     std::map<int,double> wornSlot;
     std::map<int,int> wornVnum;
     std::map<int,bitstring_t> wornFlagsBySlot;   // slot -> affect_flags its worn item(s) grant
+    std::map<int,bitstring_t> wornImmBySlot, wornResBySlot;   // slot -> imm/res bits, decision 6
     for (::Object *o = target->carrying; o; o = o->next_content) {
         if (o->wear_loc == wear_none)   // unworn -> handled by carriedVnum (census loop above)
             continue;
@@ -4594,6 +4666,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (paf->bitvector.getTable( ) == &affect_flags) {
                 bitstring_t hb = paf->bitvector; wornFlagsBySlot[slot] |= hb;
             }
+        ga_itemResist( o, wornImmBySlot[slot], wornResBySlot[slot] );
         // Set slots now score normally: the set optimizer below credits a complete
         // set's bonus into the ceiling and protects its slots from break-advice.
         double sc = ga_score( target, o, w, rawStat, capStat, true );
@@ -4614,6 +4687,22 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             if (wj->first != wi->first)
                 h |= wj->second;
         heldExclSlot[wi->first] = h;
+    }
+    // The same "owned outside this slot" sets for imm/res (decision 6, model only).
+    bitstring_t permaImm, permaRes;
+    ga_permaResist( target, permaImm, permaRes );
+    bitstring_t immAll = permaImm, resAll = permaRes;
+    for (auto &wi: wornImmBySlot) immAll |= wi.second;
+    for (auto &wi: wornResBySlot) resAll |= wi.second;
+    std::map<int,bitstring_t> immExclSlot, resExclSlot;
+    for (auto &wi: wornImmBySlot) {
+        bitstring_t hi = permaImm, hr = permaRes;
+        for (auto &wj: wornImmBySlot)
+            if (wj.first != wi.first) hi |= wj.second;
+        for (auto &wj: wornResBySlot)
+            if (wj.first != wi.first) hr |= wj.second;
+        immExclSlot[wi.first] = hi;
+        resExclSlot[wi.first] = hr;
     }
 
     // Catalogue every wearable prototype this char can wear right now.
@@ -4754,6 +4843,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         {
             std::map<int,bitstring_t>::iterator hi = heldExclSlot.find( slot );
             w.heldFlags = (hi != heldExclSlot.end( )) ? hi->second : heldAll;
+            std::map<int,bitstring_t>::iterator ii = immExclSlot.find( slot );
+            w.heldImm = (ii != immExclSlot.end( )) ? ii->second : immAll;
+            std::map<int,bitstring_t>::iterator ri = resExclSlot.find( slot );
+            w.heldRes = (ri != resExclSlot.end( )) ? ri->second : resAll;
         }
         double sc = ga_score( target, pObj, w, rawStat, capStat, false );
         if (sc <= 0)
@@ -4890,6 +4983,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         {
             std::map<int,bitstring_t>::iterator hi = heldExclSlot.find( slot );
             w.heldFlags = (hi != heldExclSlot.end( )) ? hi->second : heldAll;
+            std::map<int,bitstring_t>::iterator ii = immExclSlot.find( slot );
+            w.heldImm = (ii != immExclSlot.end( )) ? ii->second : immAll;
+            std::map<int,bitstring_t>::iterator ri = resExclSlot.find( slot );
+            w.heldRes = (ri != resExclSlot.end( )) ? ri->second : resAll;
         }
         // worn=false: it is not on the char yet, its stats are not in rawStat.
         double sc = ga_score( target, o, w, rawStat, capStat, false );
