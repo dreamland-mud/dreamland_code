@@ -383,19 +383,28 @@ void mob_index_data::deriveNumbers()
         bodySnapshot[MOBSET_ACT] = (unsigned int)act;
     }
 
+    // Off bits granted by the tier on top of its count. A body model knows what
+    // the body can do; a legacy body takes them as is. A slow body (worm, slug,
+    // zombie) never turns fast either way.
+    bitstring_t tierOffAdd = 0;
+    if (!tierRow.offAdd.empty()) {
+        Body::NameSet tierOff(tierRow.offAdd.begin(), tierRow.offAdd.end());
+        tierOffAdd = MobBody::bits(&::off_flags, tierOff);
+        if (bodyResolved)
+            tierOffAdd &= (unsigned int)offAllowed;
+        if (IS_SET(affected_by, AFF_SLOW))
+            tierOffAdd &= ~(bitstring_t)OFF_FAST;
+    }
+
     if (bodyResolved) {
         bitstring_t enabled = enabled_off(this, tc.offCount(tier, vnum));
-        if (!tierRow.offAdd.empty()) {
-            Body::NameSet tierOff(tierRow.offAdd.begin(), tierRow.offAdd.end());
-            bitstring_t add = MobBody::bits(&::off_flags, tierOff) & (unsigned int)offAllowed;
-            // A slow body (worm, slug, zombie) never turns fast.
-            if (IS_SET(affected_by, AFF_SLOW))
-                add &= ~(bitstring_t)OFF_FAST;
-            enabled |= add;
-        }
+        enabled |= tierOffAdd;
         enabled |= bodyAdd[MOBSET_OFF];
         enabled &= ~bodyDel[MOBSET_OFF];
         off_flags = (int)enabled;
+        bodySnapshot[MOBSET_OFF] = (unsigned int)off_flags;
+    } else if (tierOffAdd) {
+        off_flags |= (int)tierOffAdd;
         bodySnapshot[MOBSET_OFF] = (unsigned int)off_flags;
     }
 }
