@@ -176,9 +176,9 @@ void NoteHooks::hookDiscord(const NoteThread &thread, const Note &note)
 {
     const DLString threadName = thread.getRussianThreadName().ruscase('1');
 
-    if (thread.getName() == "news" || thread.getName() == "change")
-        send_discord_news(threadName, note.getFrom(), note.getSubject(), note.getText());
-    else
+    // News and changes reach the Discord chat as curated English posts from the
+    // dl-narrative skill, not as raw note text.
+    if (thread.getName() != "news" && thread.getName() != "change")
         send_discord_note(threadName, note.getFrom(), note.getSubject(), note.getText());
       
     send_discord_note_notify(threadName, note.getFrom(), note.getSubject());
