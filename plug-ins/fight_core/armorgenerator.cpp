@@ -678,6 +678,18 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
     // each forced pick from measure.core_affixes[profile] (melee dr/hr/hp, caster
     // hp/mana/regen) before the weighted fill, so armor nearly always carries them.
     std::vector<bool> isCore(pool.size(), false);
+    // Top effects ("top": true -- sanctuary family, haste, resist weapon): at most
+    // measure.top_max per item, and once one is on, the next weighs top_repeat_weight
+    // (Kit 2026-10-04: two tops max, very rarely).
+    std::vector<bool> isTop(pool.size(), false);
+    int topMax = 1000;
+    double topRepeat = 1;
+    if (item_model_enabled()) {
+        for (int i = 0; i < (int)pool.size(); i++)
+            isTop[i] = (*pool[i].affix)["top"].asBool();
+        topMax = (int)item_value("measure", "top_max", 1000);
+        topRepeat = item_value("measure", "top_repeat_weight", 1);
+    }
     std::vector<int> coreChance;
     if (item_model_enabled() && kind == "armor") {
         const Json::Value &core = item_value_object("measure", "core_affixes")[isCaster ? "caster" : "melee"];
@@ -714,7 +726,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
 
     for (int attempt = 0; attempt < 30; attempt++) {
         std::map<int, int> picked;
-        int total = 0, penalty = 0, negatives = 0, statSpent = 0;
+        int total = 0, penalty = 0, negatives = 0, statSpent = 0, tops = 0;
+        std::vector<int> weightNow(pool.size(), 0);
         int target = number_range(minM, maxM);
         bool relaxed = false;   // no stat pick fits any more: fill freely
 
@@ -784,13 +797,21 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
                 if (fresh && conflicts(c, picked))
                     continue;
 
+                weightNow[i] = c.weight;
+                if (fresh && isTop[i]) {
+                    if (tops >= topMax)
+                        continue;
+                    if (tops > 0)
+                        weightNow[i] = max(1, (int)std::round(c.weight * topRepeat));
+                }
+
                 // A negative buys budget room, it never fills a slot's share.
                 if (c.price < 0 || c.price >= floorPrice) {
                     big.push_back(i);
-                    bigWeights += c.weight;
+                    bigWeights += weightNow[i];
                 } else {
                     small.push_back(i);
-                    smallWeights += c.weight;
+                    smallWeights += weightNow[i];
                 }
             }
 
@@ -807,7 +828,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
 
             int dice = number_range(1, weights), i = -1;
             for (int e: eligible) {
-                dice -= pool[e].weight;
+                dice -= weightNow[e];
                 if (dice <= 0) {
                     i = e;
                     break;
@@ -818,6 +839,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
 
             if (picked.find(i) == picked.end() && pool[i].price < 0)
                 negatives++;
+            if (picked.find(i) == picked.end() && isTop[i])
+                tops++;
             picked[i]++;
             total += pool[i].price;
             if (pool[i].price < 0)
