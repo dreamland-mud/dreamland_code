@@ -15,6 +15,8 @@
 #include "skillreference.h"
 #include "core/object.h"
 #include "pcharacter.h"
+#include "profession.h"
+#include "profflags.h"
 #include "flagtableregistry.h"
 
 #include "damageflags.h"
@@ -399,6 +401,108 @@ int ItemAffixRoller::modelPrice(double points) const
     return (int)std::round(100 * points / oneM);
 }
 
+DLString ItemAffixRoller::pickProfile() const
+{
+    if (isCaster)
+        return "caster";
+    if (pch && pch->getProfession()->getFlags(pch).isSet(PROF_HYBRID))
+        return "hybrid";
+    return "melee";
+}
+
+double ItemAffixRoller::pickMultiplier(const Json::Value &section, const Json::Value &affix) const
+{
+    if (!item_model_enabled())
+        return 1;
+
+    DLString cls = pch ? pch->getProfession()->getName() : DLString::emptyString;
+    DLString profile = pickProfile();
+
+    for (const Json::Value *src: { &affix, &section }) {
+        const Json::Value &pick = (*src)["pick"];
+        if (!pick.isObject())
+            continue;
+        for (const DLString &key: { cls, profile, DLString("all") })
+            if (!key.empty() && pick.isMember(key))
+                return item_points_by_level(pick[key], obj->level, -1);
+    }
+
+    return 1;
+}
+
+static Flags & char_flags_by_table(PCharacter *pch, const DLString &table)
+{
+    static Flags none;
+    if (table == "affect_flags")
+        return pch->affected_by;
+    if (table == "detect_flags")
+        return pch->detection;
+    if (table == "res_flags")
+        return pch->res_flags;
+    if (table == "imm_flags")
+        return pch->imm_flags;
+    none.setValue(0);
+    return none;
+}
+
+/** True when the killer carries every bit of 'bits' in 'table' already. */
+static bool char_has_bits(PCharacter *pch, const DLString &table, const DLString &bits)
+{
+    const FlagTable *ft = FlagTableRegistry::getTable(table);
+    if (!ft)
+        return false;
+    Affect af;
+    af.bitvector.setTable(ft);
+    af.bitvector.setBits(bits);
+    bitstring_t b = af.bitvector;
+    return b != 0 && ((bitstring_t)char_flags_by_table(pch, table) & b) == b;
+}
+
+bool ItemAffixRoller::alreadyHas(const DLString &secName, const Json::Value &affix) const
+{
+    if (!pch)
+        return false;
+
+    DLString value = affix["value"].asString();
+
+    // A pack of bits (pack_vis, pack_bigot): owned when every part is.
+    bool anyBits = false, allBits = true;
+    for (auto const &a: affix["affects"]) {
+        if (!a.isMember("table"))
+            continue;
+        anyBits = true;
+        if (!char_has_bits(pch, a["table"].asString(), a["bits"].asString()))
+            allBits = false;
+    }
+    if (anyBits && allBits)
+        return true;
+
+    if (!anyBits && (secName == "senses" || secName == "affects_with_bits")) {
+        DLString table = affix.isMember("table") ? affix["table"].asString()
+                       : secName == "senses" ? "detect_flags" : "affect_flags";
+        if (char_has_bits(pch, table, value))
+            return true;
+    }
+
+    if (secName == "worn_buff") {
+        Skill *skill = skillManager->findExisting(value);
+        if (skill && pch->isAffected(skill->getIndex()))
+            return true;
+    }
+
+    for (auto const &name: affix["have"]) {
+        Skill *skill = skillManager->findExisting(name.asString());
+        if (skill && pch->isAffected(skill->getIndex()))
+            return true;
+    }
+
+    const Json::Value &hb = affix["have_bits"];
+    if (hb.isObject() && char_has_bits(pch, hb["table"].asString(), hb["bits"].asString()))
+        return true;
+
+    return false;
+}
+
 bool ItemAffixRoller::fitAllowed(const DLString &secName, const DLString &value) const
 {
     if (!pch)
@@ -467,6 +571,8 @@ void ItemAffixRoller::collectCandidates()
 
             if (item_model_enabled() && !fitAllowed(secName, value))
                 continue;
+            if (item_model_enabled() && alreadyHas(secName, affix))
+                continue;
 
             // Skill groups: only groups the killer has a learned skill in.
             if (secName == "skill_group" && pch) {
@@ -481,6 +587,12 @@ void ItemAffixRoller::collectCandidates()
             int weight = candidateWeight(secName, affix);
             if (weight <= 0)
                 continue;
+
+            // Weights are relative: x100 leaves room for fractional pick multipliers.
+            double pick = pickMultiplier(section, affix);
+            if (pick <= 0)
+                continue;
+            weight = max(1, (int)std::round(weight * 100 * pick));
 
             bool allowed = true;
             int price = candidatePrice(secName, affix, allowed);
@@ -557,6 +669,9 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
         // A value may be a number (both profiles) or [melee, caster].
         int col = isCaster ? 1 : 0;
         statFloor = item_points_by_level(item_value_object("measure", "stat_floor"), obj->level, col);
+        // Legendary armor keeps a share of its budget in stats (Kit 2026-10-04).
+        if (tier == BEST_TIER && kind == "armor")
+            statFloor = max(statFloor, item_value("measure", "legendary_stat_share", 0));
         if (maxAffixesM > 0)
             maxAffixes += (int)std::round(item_points_by_level(item_value_object("measure", "max_affixes_bonus"), obj->level, col));
 
@@ -767,18 +882,32 @@ bool ItemAffixRoller::applyShared(const Candidate &c, int count)
             remember(af);
 
         } else if (c.value == "learned") {
+            // One item model: defensive-group skills x1.5 (Kit 2026-10-04).
+            int defensive = item_model_enabled() && skillGroupManager->hasElement("defensive")
+                          ? skillGroupManager->lookup("defensive") : -1;
             vector<int> mine;
+            int weights = 0;
             for (int sn = 0; sn < skillManager->size(); sn++) {
                 PCSkillData &data = pch->getSkillData(sn);
                 Skill *skill = skillManager->find(sn);
-                if (data.learned > 1 && !data.isTemporary() && skill && skill->available(pch))
+                if (data.learned > 1 && !data.isTemporary() && skill && skill->available(pch)) {
                     mine.push_back(sn);
+                    weights += (defensive >= 0 && skill->getGroups().isSet(defensive)) ? 3 : 2;
+                }
             }
             if (mine.empty())
                 return true;
+            int dice = number_range(1, weights), sn = mine.back();
+            for (int m: mine) {
+                dice -= (defensive >= 0 && skillManager->find(m)->getGroups().isSet(defensive)) ? 3 : 2;
+                if (dice <= 0) {
+                    sn = m;
+                    break;
+                }
+            }
             Affect af;
             af.global.setRegistry(skillManager);
-            af.global.set(mine[number_range(0, mine.size() - 1)]);
+            af.global.set(sn);
             af.location = APPLY_LEARNED;
             af.modifier = affix["mod"].asInt() * count;
             remember(af);
