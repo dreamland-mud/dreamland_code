@@ -104,8 +104,14 @@ void ItemAffixRoller::learnPlayerGroups()
             continue;
         Skill *skill = skillManager->find(sn);
         for (auto g: skill->getGroups().toArray())
-            playerGroups.insert(g);
+            groupCounts[g]++;
     }
+
+    // One item model: a group needs 2+ learned skills to be worth a +level (Kit 2026-10-04).
+    int need = item_model_enabled() ? 2 : 1;
+    for (auto const &gc: groupCounts)
+        if (gc.second >= need)
+            playerGroups.insert(gc.first);
 }
 
 void ItemAffixRoller::flushAffects()
@@ -668,6 +674,21 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
     // floor_exempt (the sanctuary family): may be picked while the floor is unmet,
     // and once picked the floor is lifted for that item (Kit 2026-10-04).
     std::vector<bool> floorExempt(pool.size(), false);
+    // Core picks (Kit 2026-10-04): measure.core_chance [p1, p2...] = percent chance of
+    // each forced pick from measure.core_affixes[profile] (melee dr/hr/hp, caster
+    // hp/mana/regen) before the weighted fill, so armor nearly always carries them.
+    std::vector<bool> isCore(pool.size(), false);
+    std::vector<int> coreChance;
+    if (item_model_enabled() && kind == "armor") {
+        const Json::Value &core = item_value_object("measure", "core_affixes")[isCaster ? "caster" : "melee"];
+        std::set<DLString> coreNames;
+        for (auto const &n: core)
+            coreNames.insert(n.asString());
+        for (int i = 0; i < (int)pool.size(); i++)
+            isCore[i] = coreNames.count(pool[i].value) > 0 && pool[i].price > 0;
+        for (auto const &c: item_value_object("measure", "core_chance"))
+            coreChance.push_back(c.asInt());
+    }
     if (item_model_enabled()) {
         // A value may be a number (both profiles) or [melee, caster].
         int col = isCaster ? 1 : 0;
@@ -704,6 +725,35 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
                 penalty += pool[i].price;
                 negatives++;
             }
+        }
+
+        for (int chance: coreChance) {
+            if (number_range(1, 100) > chance)
+                continue;
+            std::vector<int> core;
+            int weights = 0;
+            for (int i = 0; i < (int)pool.size(); i++) {
+                if (!isCore[i] || picked.count(i) || total + pool[i].price > maxM)
+                    continue;
+                if ((int)picked.size() >= maxAffixes || conflicts(pool[i], picked))
+                    continue;
+                core.push_back(i);
+                weights += pool[i].weight;
+            }
+            if (core.empty() || weights <= 0)
+                break;
+            int dice = number_range(1, weights), pick = core.back();
+            for (int i: core) {
+                dice -= pool[i].weight;
+                if (dice <= 0) {
+                    pick = i;
+                    break;
+                }
+            }
+            picked[pick] = 1;
+            total += pool[pick].price;
+            if (isStat[pick])
+                statSpent += pool[pick].price;
         }
 
         for (int step = 0; step < 16 && total < target; step++) {
@@ -878,7 +928,23 @@ bool ItemAffixRoller::applyShared(const Candidate &c, int count)
             return true;
 
         if (c.value == "skillgroup") {
-            int gn = random_item_skillgroup(pch);
+            int gn = -1;
+            if (item_model_enabled()) {
+                // Same 2+ skills rule as the named groups, weighted by how many the killer has.
+                int weights = 0;
+                for (int g: playerGroups)
+                    weights += groupCounts[g];
+                int dice = weights > 0 ? number_range(1, weights) : 0;
+                for (int g: playerGroups) {
+                    dice -= groupCounts[g];
+                    if (dice <= 0) {
+                        gn = g;
+                        break;
+                    }
+                }
+            }
+            else
+                gn = random_item_skillgroup(pch);
             if (gn < 0)
                 return true;
             Affect af;
