@@ -208,7 +208,7 @@ bool BasicMobileBehavior::assistGroupHealing( Character *fch )
         if (healCleric( fch ))
             return true;
 
-    if (IS_SET(ch->act, ACT_NECROMANCER|ACT_UNDEAD))
+    if (IS_SET(ch->act, NPC_NECRO_ACTS))
         if (healNecro( fch ))
             return true;
 

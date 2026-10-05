@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 #include <vector>
 #include <map>
 #include <set>
@@ -67,6 +68,8 @@
 #include "transfermovement.h"
 #include "doors.h"
 #include "merc.h"
+#include "mobbody.h"
+#include "mobtiers.h"
 #include "loadsave.h"
 #include "alignment.h"
 #include "wiznet.h"
@@ -247,6 +250,42 @@ Character * CharacterWrapper::getTarget( ) const
 NMI_GET( CharacterWrapper, id, "уникальный идентификатор персонажа" )
 {
     return Register( DLString(id) );
+}
+
+NMI_GET( CharacterWrapper, tier, "тир моба числом 1..10 (1 сильнейший), 0 для игроков" )
+{
+    checkTarget();
+    return Register( target->is_npc() ? target->getNPC()->pIndexData->tier : 0 );
+}
+
+NMI_GET( CharacterWrapper, normalHit, "здоровье обычного (normal) моба этого уровня по fight/mob_tiers.json, 0 для игроков и без файла тиров" )
+{
+    checkTarget();
+    const MobTiers::Config &tc = MobBody::tiers();
+    if (!target->is_npc() || !tc.loaded)
+        return Register( 0 );
+    // Breath and other hp-scaled attacks read this instead of the mob's own hp,
+    // so a tier makes a mob tougher without multiplying its burst damage too.
+    int lvl = std::max(1, (int)target->getRealLevel());
+    return Register( std::max(1, (int)lround(tc.baseHp.at(lvl) * tc.get(MobTiers::TIER_NORMAL).hp)) );
+}
+
+NMI_GET( CharacterWrapper, bloodless, "true, если у тела нет крови: скелет, конструкция, туман или нет ни сердца, ни холодной крови" )
+{
+    checkTarget();
+    return Register( IS_BLOODLESS(target) );
+}
+
+NMI_GET( CharacterWrapper, edible, "true, если тело годится в пищу (не конструкция, скелет, туман, мгновенный распад или магическое)" )
+{
+    checkTarget();
+    return Register( IS_EDIBLE_FORM(target->form) );
+}
+
+NMI_GET( CharacterWrapper, canHoldCards, "true, если персонаж разумен и у него есть кисти рук: может держать колоду или радугу" )
+{
+    checkTarget();
+    return Register( CAN_HOLD_CARDS(target) );
 }
 
 NMI_GET( CharacterWrapper, online, "true, если персонаж в мире" )

@@ -23,6 +23,7 @@
 #include "register-impl.h"
 #include "wrap_utils.h"
 
+#include "mobbody.h"
 #include "def.h"
 
 
@@ -121,6 +122,31 @@ NMI_GET( MobIndexWrapper, description, "описание, видное если 
 { 
     checkTarget( ); 
     return target->description.get(LANG_DEFAULT);
+}
+NMI_GET( MobIndexWrapper, tier, "тир прототипа числом 1..10 (1 сильнейший, 7 обычный), см. fight/mob_tiers.json") 
+{ 
+    checkTarget( ); 
+    return target->tier;
+}
+NMI_GET( MobIndexWrapper, tierName, "тир прототипа по имени (trash, normal, elite, champion, boss) или числом") 
+{ 
+    checkTarget( ); 
+    return Register( DLString( MobBody::tiers( ).name( target->tier ) ) );
+}
+NMI_GET( MobIndexWrapper, tierStyle, "стиль тира (fortress, brute) из fight/mob_tiers.json styles, пусто если нет") 
+{ 
+    checkTarget( ); 
+    return Register( target->tierStyle );
+}
+NMI_GET( MobIndexWrapper, moveverb, "глагол движения тела (galloping, crawling...), пусто для старой модели расы") 
+{ 
+    checkTarget( ); 
+    return Register( target->moveverb );
+}
+NMI_GET( MobIndexWrapper, offAllowed, "флаги атак, которые тело может использовать (таблица .tables.off_flags)") 
+{ 
+    checkTarget( ); 
+    return Register( target->offAllowed );
 }
 NMI_GET( MobIndexWrapper, count, "кол-во экземпляров мобов этого прототипа") 
 { 

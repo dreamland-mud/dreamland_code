@@ -224,6 +224,7 @@ XMLArea::load_mobiles(AreaIndexData *a)
 {
     XMLMapBase<XMLMobileFactory>::iterator mit;
     int i = 0;
+    XMLMobileFactory::ignoredNumbers = 0;
     for(mit = mobiles.begin( ); mit != mobiles.end( ); mit++, i++) {
         int iHash, vnum = mit->first.toInt( );
         
@@ -233,6 +234,8 @@ XMLArea::load_mobiles(AreaIndexData *a)
         MOB_INDEX_DATA *pMobIndex = mit->second.compat( );
         pMobIndex->vnum = vnum;
         pMobIndex->area = a;
+        pMobIndex->resolveBody( );
+        pMobIndex->deriveNumbers( );
 
         iHash = vnum % MAX_KEY_HASH;
         pMobIndex->next = mob_index_hash[iHash];
@@ -241,6 +244,11 @@ XMLArea::load_mobiles(AreaIndexData *a)
         if (FeniaManager::wrapperManager)
             FeniaManager::wrapperManager->linkWrapper( pMobIndex );
     }
+
+    if (XMLMobileFactory::ignoredNumbers > 0)
+        LogStream::sendWarning( ) << "Area " << a->area_file->file_name << ": "
+            << XMLMobileFactory::ignoredNumbers << " mob(s) carry hit/mana/damage/hitroll/ac/wealth, "
+            << "ignored in favour of fight/mob_tiers.json" << endl;
 }
 
 void

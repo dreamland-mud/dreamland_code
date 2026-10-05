@@ -30,6 +30,8 @@
 
 #include "json_utils_ext.h"
 #include "act.h"
+#include <cmath>
+#include "mobbody.h"
 #include "def.h"
 #include "itemevents.h"
 #include "merc.h"
@@ -241,6 +243,16 @@ NPCharacter *create_mobile_nocount(MOB_INDEX_DATA *pMobIndex)
 {
     return create_mobile_org(pMobIndex, FCREATE_NOCOUNT);
 }
+/* Mob reform: a number rolled uniformly within +-variance of its centre (plan §3.5). */
+static int roll_centre(int centre, double variance)
+{
+    if (variance <= 0)
+        return centre;
+    int a = (int)lround(centre * (1.0 - variance));
+    int b = (int)lround(centre * (1.0 + variance));
+    return number_range(min(a, b), max(a, b));
+}
+
 NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
 {
     NPCharacter *mob;
@@ -273,25 +285,44 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
 
     /* read from prototype */
     mob->group = pMobIndex->group;
+    // The instance is the index body, all nine sets. The index already carries
+    // the race bits (unreviewed aff/det/imm/res/vuln dels stay dead there), so
+    // the old '| race' re-OR is gone (mob reform, plan §3.6 item 4).
     mob->act = pMobIndex->act | ACT_IS_NPC;
-    // FIXME: explicitly apply race affect/detect/resist bits to the mob instance, ignoring 'del' attribute values saved in area XML format.
-    // To fix it properly, all mob indexes should have a pair of overrides for every bit field, "bits to delete" and "bits to add".
-    mob->affected_by = pMobIndex->affected_by | race->getAff();
-    mob->detection = pMobIndex->detection | race->getDet();
+    mob->affected_by = pMobIndex->affected_by;
+    mob->detection = pMobIndex->detection;
     mob->alignment = pMobIndex->alignment;
     mob->setLevel(pMobIndex->level);
-    //                mob->hitroll                = (mob->getRealLevel( ) / 2) + pMobIndex->hitroll;
-    mob->hitroll = mob->getRealLevel() + pMobIndex->hitroll;
-    mob->damroll = pMobIndex->damage[DICE_BONUS];
-    mob->max_hit = dice(pMobIndex->hit[DICE_NUMBER], pMobIndex->hit[DICE_TYPE]) + pMobIndex->hit[DICE_BONUS];
+
+    if (pMobIndex->numbersDerived) {
+        // Tier centres in the index, a fresh roll on every spawn (decision 8).
+        const MobTiers::Config &tc = MobBody::tiers();
+        int hpCentre = pMobIndex->hit[DICE_NUMBER] * (pMobIndex->hit[DICE_TYPE] + 1) / 2 + pMobIndex->hit[DICE_BONUS];
+        int dicesAve = pMobIndex->damage[DICE_NUMBER] * (pMobIndex->damage[DICE_TYPE] + 1) / 2;
+        int damCentre = dicesAve + pMobIndex->damage[DICE_BONUS];
+
+        mob->hitroll = roll_centre(mob->getRealLevel() + pMobIndex->hitroll, tc.var("hitroll"));
+        mob->damroll = roll_centre(damCentre, tc.var("dmg")) - dicesAve;
+        mob->max_hit = max(1, roll_centre(hpCentre, tc.var("hp")));
+        mob->max_mana = max(0, roll_centre(pMobIndex->mana[DICE_BONUS], tc.var("mana")));
+        mob->saving_throw = roll_centre(pMobIndex->saves, tc.var("saves"));
+    } else {
+        mob->hitroll = mob->getRealLevel() + pMobIndex->hitroll;
+        mob->damroll = pMobIndex->damage[DICE_BONUS];
+        mob->max_hit = dice(pMobIndex->hit[DICE_NUMBER], pMobIndex->hit[DICE_TYPE]) + pMobIndex->hit[DICE_BONUS];
+        mob->max_mana = dice(pMobIndex->mana[DICE_NUMBER], pMobIndex->mana[DICE_TYPE]) + pMobIndex->mana[DICE_BONUS];
+    }
     mob->hit = mob->max_hit;
-    mob->max_mana = dice(pMobIndex->mana[DICE_NUMBER], pMobIndex->mana[DICE_TYPE]) + pMobIndex->mana[DICE_BONUS];
     mob->mana = mob->max_mana;
     mob->max_move = 200 + 16 * mob->getRealLevel(); // 2 times more than best-trained pc
     mob->move = mob->max_move;
     mob->damage[DICE_NUMBER] = pMobIndex->damage[DICE_NUMBER];
     mob->damage[DICE_TYPE] = pMobIndex->damage[DICE_TYPE];
     mob->dam_type = pMobIndex->dam_type;
+
+    // No authored damage type: the race's, else the historical random pick.
+    if (mob->dam_type == 0)
+        mob->dam_type = race->getDamType();
 
     if (mob->dam_type == 0)
         switch (number_range(1, 3)) {
@@ -310,10 +341,10 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
         mob->armor[i] = pMobIndex->ac[i];
 
     mob->off_flags = pMobIndex->off_flags;
-    mob->imm_flags = pMobIndex->imm_flags | race->getImm();
-    mob->res_flags = pMobIndex->res_flags | race->getRes();
-    mob->vuln_flags = pMobIndex->vuln_flags | race->getVuln();
-    mob->wearloc.set(race->getWearloc());
+    mob->imm_flags = pMobIndex->imm_flags;
+    mob->res_flags = pMobIndex->res_flags;
+    mob->vuln_flags = pMobIndex->vuln_flags;
+    mob->wearloc.set(pMobIndex->wearloc);
     mob->start_pos = pMobIndex->start_pos;
     mob->default_pos = pMobIndex->default_pos;
     mob->setSex(pMobIndex->sex);
@@ -325,7 +356,23 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
     mob->parts = pMobIndex->parts;
     mob->size = pMobIndex->getSize();
     mob->material = pMobIndex->material;
+    if ((mob->material.empty() || mob->material == "none" || mob->material == "0")
+            && !race->getMaterial().empty())
+        mob->material = race->getMaterial();
     mob->extracted = false;
+
+    for (int s = 0; s < MOBSET_MAX; s++)
+        mob->baseBits[s] = (unsigned int)pMobIndex->bodyBits(s);
+    // These aff bits become real affects in create_mob_affects (evil sanctuary
+    // even turns into dark shroud); the affects re-apply themselves, the raw
+    // bits must not come back through affect_check.
+    mob->baseBits[MOBSET_AFF] &= ~(bitstring_t)AFF_FROM_AFFECTS;
+    // A mob read from disk gets its real affects from the saved Affc lines;
+    // the raw prototype bits must not ride along (evil sanctuary would sit
+    // under its dark shroud, a dispelled haste would come back for good).
+    // This makes the loader's start equal what fwrite_mob diffed against.
+    if (IS_SET(flags, FCREATE_NOAFFECTS))
+        mob->affected_by.removeBit(AFF_FROM_AFFECTS);
 
     // Override descriptions with formatting symbols that depend on NPC sex.
     for (int l = LANG_MIN; l < LANG_MAX; l++) {
@@ -342,6 +389,11 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
     // Race and class modifications are applied on-the-fly inside NPCharacter::getCurrStat
     for (i = 0; i < stat_table.size; i++)
         mob->perm_stat[i] = BASE_STAT;
+
+    // Tier stat cap (replaces the Fenia onInit fix_stats cap, plan §3.5).
+    if (pMobIndex->numbersDerived && pMobIndex->statCap > 0)
+        for (i = 0; i < stat_table.size; i++)
+            mob->perm_stat[i] = min(mob->perm_stat[i], pMobIndex->statCap);
 
     /* OBSOLETE: let's get some spell action */
     if (!IS_SET(flags, FCREATE_NOAFFECTS))

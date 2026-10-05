@@ -97,6 +97,14 @@ public:
     virtual const DLString & getUkrainianName( ) const; // wire UA name into gref matching
     virtual DLString getNameFor( Character *looker, Character *me ) const;
 
+    virtual bool hasBodyForms( ) const;
+    virtual void getBodyInput( Body::Input &, bool npc ) const;
+    virtual int getDamType( ) const;
+    virtual const DLString & getMaterial( ) const;
+    virtual double getHpMult( ) const;
+    virtual double getDmgMult( ) const;
+    virtual const DLString & getMoveVerb( ) const;
+
     XML_VARIABLE XMLFlagsNoEmpty         det;
     XML_VARIABLE XMLFlagsNoEmpty         act;
     XML_VARIABLE XMLFlagsNoEmpty         aff;
@@ -120,6 +128,29 @@ public:
     XML_VARIABLE XMLStringNoEmpty  nameMltUa;
 
     XML_VARIABLE XMLPointerNoEmpty<RaceHelp> help;
+
+    // Mob reform body model. With <forms> present and fight/mob_forms.json
+    // loaded, <form>, <parts> and <wearloc> above are ignored, the act/aff/det/
+    // off/imm/res/vuln sets above are the race's own adds on top of its forms,
+    // and the getters return the resolved body.
+    XML_VARIABLE XMLStringNoEmpty  forms;
+    XML_VARIABLE XMLFlagsNoEmpty   partsAdd, partsDel;
+    XML_VARIABLE XMLFlagsNoEmpty   actDel, offDel, affDel, detDel, immDel, resDel, vulnDel;
+    XML_VARIABLE XMLEnumerationNoEmpty damtype;
+    XML_VARIABLE XMLStringNoEmpty  material;
+    XML_VARIABLE XMLStringNoEmpty  hpMult, dmgMult;
+    XML_VARIABLE XMLStringNoEmpty  moveverb;
+
+// MOC_SKIP_BEGIN
+protected:
+    struct ResolvedBody {
+        unsigned long generation = 0;
+        Flags det, act, aff, off, imm, res, vuln, form, parts;
+        GlobalBitvector wearloc;
+    };
+    const ResolvedBody & resolved( ) const;
+    mutable ResolvedBody body;
+// MOC_SKIP_END
 };
 
 #endif

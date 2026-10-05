@@ -189,7 +189,32 @@
 
 #define HEALTH(ch) ((ch)->hit * 100 / max(1, (ch)->max_hit.getValue( )))
 
-#define IS_BLOODLESS(ch) ( IS_SET(ch->form, FORM_UNDEAD) || IS_SET(ch->form, FORM_CONSTRUCT) || IS_SET(ch->form, FORM_MIST) ) 
+/*
+ * Body helpers, mob reform (plan docs/plans/mob-reform.md §3.2a, §3.6 items 3, 13).
+ * cold_blood is a part now; the legacy form bit still counts until every race
+ * file has moved to <forms>.
+ */
+/* True only while fight/mob_forms.json is loaded. Every rule below that would
+ * change today's world on today's data is gated on it, so a boot without the
+ * file behaves as before the reform (plan §8 item 51). Defined in mobbody.cpp. */
+extern bool mob_body_model_active;
+
+#define IS_COLD_BLOODED(ch) ( IS_SET((ch)->parts, PART_COLD_BLOOD) || IS_SET((ch)->form, FORM_COLD_BLOOD) )
+#define IS_BLOODLESS(ch) ( IS_SET((ch)->form, FORM_SKELETAL|FORM_CONSTRUCT|FORM_MIST) \
+                           || (mob_body_model_active && !IS_SET((ch)->parts, PART_HEART) && !IS_COLD_BLOODED(ch)) )
+/* What a corpse is good for: construct/skeletal/mist/instant_decay/magical bodies are not food. */
+#define FORM_INEDIBLE ( FORM_CONSTRUCT|FORM_SKELETAL|FORM_MIST|FORM_INSTANT_DECAY|FORM_MAGICAL )
+#define IS_EDIBLE_FORM(form) ( mob_body_model_active ? !IS_SET((form), FORM_INEDIBLE) : IS_SET((form), FORM_EDIBLE) != 0 )
+/* Deck sixer and rainbow holder: a mind and a pair of hands (decision 27). */
+#define CAN_HOLD_CARDS(ch) ( IS_SET((ch)->form, FORM_SENTIENT) && IS_SET((ch)->parts, PART_HANDS) )
+/* Mob spellcasting AI needs a mind or magic in the body (plan §3.6 item 8). */
+#define NPC_CAN_CAST(ch) ( !mob_body_model_active || IS_SET((ch)->form, FORM_SENTIENT|FORM_MAGICAL) )
+/* act bits that select the necromancer spell table: act undead stops counting
+ * once the body model is on (decision 23). */
+#define NPC_NECRO_ACTS ( mob_body_model_active ? ACT_NECROMANCER : (ACT_NECROMANCER|ACT_UNDEAD) )
+/* Aff bits create_mob_affects turns into real affects: never part of a body,
+ * an instance loaded without affects or a saved diff. */
+#define AFF_FROM_AFFECTS ( AFF_SANCTUARY|AFF_HASTE|AFF_PROTECT_EVIL|AFF_PROTECT_GOOD|AFF_CORRUPTION )
 
 /*
  * Object macros.

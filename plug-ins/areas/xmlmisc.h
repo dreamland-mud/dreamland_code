@@ -18,6 +18,7 @@
 
 struct XMLArmor {
     XMLArmor( );
+    bool omit; // mob reform: tier-derived numbers are never written
 
     void init(int, int, int, int);
 
@@ -44,12 +45,14 @@ struct XMLFlagsDiff {
 
 
 struct XMLDice {
+    XMLDice( );
     void set(int n, int t, int b);
 
     bool toXML( XMLNode::Pointer& ) const;
     void fromXML( const XMLNode::Pointer& ) ;
 
     int number, type, bonus;
+    bool omit; // mob reform: tier-derived numbers are never written
 };
 
 struct XMLExtraDescription : public XMLVariableContainer {

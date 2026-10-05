@@ -79,6 +79,7 @@
 #include "pcharacter.h"
 #include "player_utils.h"
 #include "save.h"
+#include "mobbody.h"
 #include "merc.h"
 #include "descriptor.h"
 #include "desire.h"
@@ -1171,6 +1172,15 @@ static bool has_nopost(Character *ch)
         << "Натура: " << align_table.name(ALIGNMENT(victim)) << " (" << victim->alignment << ")  "
         << "Этос: " << ethos_table.name( victim->ethos ) << "  "
         << endl;
+
+    if (victim->is_npc( )) {
+        MOB_INDEX_DATA *pIndex = victim->getNPC( )->pIndexData;
+        buf << "Тир: " << MobBody::tiers( ).name( pIndex->tier )
+            << (pIndex->numbersDerived ? " (числа от тира)" : " (числа из зоны)")
+            << "  Тело: " << (pIndex->bodyResolved ? "формы расы" : "старая модель")
+            << "  Походка: " << (pIndex->bodyResolved ? pIndex->moveverb.c_str() : "-")
+            << endl;
+    }
 
     buf << "Золото: " << victim->gold << "  "
         << "Серебро: " << victim->silver << "  ";

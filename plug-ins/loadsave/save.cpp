@@ -90,6 +90,7 @@
 #include "room.h"
 #include "desire.h"
 #include "liquid.h"
+#include "wearlocation.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -370,6 +371,327 @@ static void fwrite_multistring(FILE *fp, const DLString &label, const DLString &
     }
 }
 
+/*
+ * Mob reform: saved mobiles as diffs against what create_mobile_org produces
+ * from today's prototype, plus a stamp (plan §3.6 item 10,
+ * docs/plans/mob-reform-fwrite-diff.md variant B, decisions 20 and 36).
+ */
+static const char * const saved_set_keys[MOBSET_MAX] = {
+    "Act", "Off", "AfBy", "Detect", "Imm", "Res", "Vuln", "Form", "Part"
+};
+
+
+static bitstring_t npc_set_get(NPCharacter *mob, int set)
+{
+    switch (set) {
+    case MOBSET_ACT:  return mob->act.getValue();
+    case MOBSET_OFF:  return (unsigned int)mob->off_flags;
+    case MOBSET_AFF:  return mob->affected_by.getValue();
+    case MOBSET_DET:  return mob->detection.getValue();
+    case MOBSET_IMM:  return mob->imm_flags.getValue();
+    case MOBSET_RES:  return mob->res_flags.getValue();
+    case MOBSET_VULN: return mob->vuln_flags.getValue();
+    case MOBSET_FORM: return mob->form.getValue();
+    default:          return mob->parts.getValue();
+    }
+}
+
+static void npc_set_put(NPCharacter *mob, int set, bitstring_t v)
+{
+    switch (set) {
+    case MOBSET_ACT:  mob->act.setValue(v); break;
+    case MOBSET_OFF:  mob->off_flags = (int)v; break;
+    case MOBSET_AFF:  mob->affected_by.setValue(v); break;
+    case MOBSET_DET:  mob->detection.setValue(v); break;
+    case MOBSET_IMM:  mob->imm_flags.setValue(v); break;
+    case MOBSET_RES:  mob->res_flags.setValue(v); break;
+    case MOBSET_VULN: mob->vuln_flags.setValue(v); break;
+    case MOBSET_FORM: mob->form.setValue(v); break;
+    default:          mob->parts.setValue(v); break;
+    }
+}
+
+/* What create_mobile_org builds for one set from the current prototype. */
+static bitstring_t produced_set(MOB_INDEX_DATA *pIndex, int set)
+{
+    bitstring_t v = (unsigned int)pIndex->bodyBits(set);
+    if (set == MOBSET_ACT)
+        v |= ACT_IS_NPC;
+    if (set == MOBSET_AFF)
+        v &= ~AFF_FROM_AFFECTS;
+    return v;
+}
+
+/* One description slot is written only when it is the instance's own text:
+ * set, and neither the prototype's nor what create_mobile_org derives from it. */
+static void fwrite_multistring_diff(FILE *fp, const char *label, NPCharacter *mob,
+                                    const XMLMultiString &field, const XMLMultiString &proto)
+{
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+        const DLString &value = field.get(lang);
+        if (value.empty())
+            continue;
+
+        const DLString &protoValue = proto.get(lang);
+        if (value == protoValue)
+            continue;
+        if (protoValue.find("%1") != DLString::npos && value == fmt(0, protoValue.c_str(), mob))
+            continue;
+
+        fprintf(fp, "%s %s %s~\n", label, lang2attr(lang).c_str(), value.c_str());
+    }
+}
+
+/* Body diffs, numbers and affects read from a #MOBILE/#PET block, applied at End. */
+struct SavedMobState {
+    bool hasStamp = false;
+    unsigned long long stamp = 0;
+    bitstring_t add[MOBSET_MAX] = { 0 }, del[MOBSET_MAX] = { 0 };
+    DLString wearAdd, wearDel;
+    int size = -1;
+    int legacyBody = 0;          // legacy Part/Form/... lines seen (ignored)
+
+    // pets only: Act/AfBy/Detect/Wearloc are still written as whole values
+    bool petAct = false, petAff = false, petDet = false, petWear = false;
+    bitstring_t petActV = 0, petAffV = 0, petDetV = 0;
+    DLString petWearV;
+
+    bool hmv = false;
+    int hmvV[6] = { 0 };
+    bool acs = false;
+    int acsV[4] = { 0 };
+    bool attr = false, amod = false;
+    vector<int> attrV, amodV;
+    bool hasHit = false, hasDam = false, hasDamN = false, hasDamT = false, hasSave = false, hasLevel = false;
+    int hitV = 0, damV = 0, damNV = 0, damTV = 0, saveV = 0, levelV = 0;
+
+    list<Affect *> affects;
+
+    bool stampMatches(MOB_INDEX_DATA *pIndex) const
+    {
+        return hasStamp && stamp == pIndex->bodyStamp();
+    }
+};
+
+/* Consume one saved key that belongs to the body, the numbers or the affects. */
+static bool fread_saved_mob_key(const char *word, FILE *fp, SavedMobState &st, bool pet)
+{
+    if (!strcmp(word, "BodyVer")) {
+        st.hasStamp = true;
+        st.stamp = (unsigned long long)fread_number64(fp);
+        return true;
+    }
+
+    static DLString addKeys[MOBSET_MAX], delKeys[MOBSET_MAX];
+    if (addKeys[0].empty())
+        for (int s = 0; s < MOBSET_MAX; s++) {
+            addKeys[s] = DLString(saved_set_keys[s]) + "Add";
+            delKeys[s] = DLString(saved_set_keys[s]) + "Del";
+        }
+
+    for (int s = 0; s < MOBSET_MAX; s++) {
+        if (addKeys[s] == word) {
+            st.add[s] = (unsigned long)fread_flag(fp);
+            return true;
+        }
+        if (delKeys[s] == word) {
+            st.del[s] = (unsigned long)fread_flag(fp);
+            return true;
+        }
+    }
+
+    if (!strcmp(word, "WearlocAdd")) {
+        st.wearAdd = fread_dlstring(fp);
+        return true;
+    }
+    if (!strcmp(word, "WearlocDel")) {
+        st.wearDel = fread_dlstring(fp);
+        return true;
+    }
+
+    if (pet) {
+        if (!strcmp(word, "Act")) { st.petAct = true; st.petActV = (unsigned long)fread_flag(fp); return true; }
+        if (!strcmp(word, "AfBy")) { st.petAff = true; st.petAffV = (unsigned long)fread_flag(fp); return true; }
+        if (!strcmp(word, "Detect")) { st.petDet = true; st.petDetV = (unsigned long)fread_flag(fp); return true; }
+        if (!strcmp(word, "Wearloc")) { st.petWear = true; st.petWearV = fread_dlstring(fp); return true; }
+    } else {
+        // Whole-value body lines of blocks written before the reform: a body
+        // frozen at save time is exactly what the reform stops, so they are
+        // read past and the body comes from the prototype (fwrite diff §5).
+        static const char * const legacy[] = { "Act", "AfBy", "Detect", "Part", "Form", "Imm", "Res", "Vuln" };
+        for (const char *l: legacy)
+            if (!strcmp(word, l)) {
+                fread_flag(fp);
+                st.legacyBody++;
+                return true;
+            }
+        if (!strcmp(word, "Wearloc")) {
+            fread_dlstring(fp);
+            st.legacyBody++;
+            return true;
+        }
+        if (!strcmp(word, "Size")) {
+            st.size = fread_number(fp);
+            return true;
+        }
+    }
+
+    if (!strcmp(word, "HMV")) {
+        st.hmv = true;
+        for (int i = 0; i < 6; i++)
+            st.hmvV[i] = fread_number(fp);
+        return true;
+    }
+    if (!strcmp(word, "ACs")) {
+        st.acs = true;
+        for (int i = 0; i < 4; i++)
+            st.acsV[i] = fread_number(fp);
+        return true;
+    }
+    if (!strcmp(word, "Attr") || !strcmp(word, "AMod")) {
+        bool isAttr = !strcmp(word, "Attr");
+        vector<int> &v = isAttr ? st.attrV : st.amodV;
+        v.clear();
+        for (int i = 0; i < stat_table.size; i++)
+            v.push_back(fread_number(fp));
+        (isAttr ? st.attr : st.amod) = true;
+        return true;
+    }
+    if (!strcmp(word, "Hit"))  { st.hasHit = true;  st.hitV = fread_number(fp);  return true; }
+    if (!strcmp(word, "Dam"))  { st.hasDam = true;  st.damV = fread_number(fp);  return true; }
+    if (!strcmp(word, "DamN")) { st.hasDamN = true; st.damNV = fread_number(fp); return true; }
+    if (!strcmp(word, "DamT")) { st.hasDamT = true; st.damTV = fread_number(fp); return true; }
+    if (!strcmp(word, "Save")) { st.hasSave = true; st.saveV = fread_number(fp); return true; }
+    if (!strcmp(word, "Levl")) { st.hasLevel = true; st.levelV = fread_number(fp); return true; }
+
+    if (!strcmp(word, "Affc") || !strcmp(word, "Aff2")) {
+        st.affects.push_back(fread_affect(fp, !strcmp(word, "Aff2")));
+        return true;
+    }
+
+    return false;
+}
+
+/* Overlay the saved numbers: the individual roll, and any growth, survives
+ * only while the stamp matches (decision 36). */
+static void apply_saved_numbers(NPCharacter *mob, const SavedMobState &st)
+{
+    if (st.hasLevel)
+        mob->setLevel(st.levelV);
+    if (st.hmv) {
+        mob->hit = st.hmvV[0];
+        mob->max_hit = st.hmvV[1];
+        mob->mana = st.hmvV[2];
+        mob->max_mana = st.hmvV[3];
+        mob->move = st.hmvV[4];
+        mob->max_move = st.hmvV[5];
+    }
+    if (st.acs)
+        for (int i = 0; i < 4; i++)
+            mob->armor[i] = st.acsV[i];
+    if (st.attr)
+        for (int i = 0; i < stat_table.size && i < (int)st.attrV.size(); i++)
+            mob->perm_stat[i] = st.attrV[i];
+    if (st.amod)
+        for (int i = 0; i < stat_table.size && i < (int)st.amodV.size(); i++)
+            mob->mod_stat[i] = st.amodV[i];
+    if (st.hasHit)
+        mob->hitroll = st.hitV;
+    if (st.hasDam)
+        mob->damroll = st.damV;
+    if (st.hasDamN)
+        mob->damage[DICE_NUMBER] = st.damNV;
+    if (st.hasDamT)
+        mob->damage[DICE_TYPE] = st.damTV;
+    if (st.hasSave)
+        mob->saving_throw = st.saveV;
+}
+
+/* Boot forensics: legacy whole-value body lines read past, reported once. */
+static int saved_legacy_body_lines = 0;
+static int saved_legacy_blocks = 0;
+
+void saved_mobiles_report( )
+{
+    if (saved_legacy_body_lines > 0)
+        LogStream::sendNotice( ) << "Saved mobiles: " << saved_legacy_body_lines
+            << " pre-reform body line(s) in " << saved_legacy_blocks
+            << " block(s) ignored, bodies re-derived from the prototypes." << endl;
+    saved_legacy_body_lines = saved_legacy_blocks = 0;
+}
+
+/* fread_mob End: body diffs and numbers if the stamp matches, then the affects. */
+static void apply_saved_mob(NPCharacter *mob, SavedMobState &st)
+{
+    if (st.legacyBody > 0) {
+        saved_legacy_body_lines += st.legacyBody;
+        saved_legacy_blocks++;
+    }
+
+    if (st.stampMatches(mob->pIndexData)) {
+        for (int s = 0; s < MOBSET_MAX; s++)
+            if (st.add[s] || st.del[s])
+                npc_set_put(mob, s, (npc_set_get(mob, s) | st.add[s]) & ~st.del[s]);
+
+        if (!st.wearAdd.empty()) {
+            GlobalBitvector w(wearlocationManager);
+            w.fromString(st.wearAdd);
+            mob->wearloc.set(w);
+        }
+        if (!st.wearDel.empty()) {
+            GlobalBitvector w(wearlocationManager);
+            w.fromString(st.wearDel);
+            mob->wearloc.remove(w);
+        }
+        if (st.size >= 0)
+            mob->size = st.size;
+
+        apply_saved_numbers(mob, st);
+    }
+
+    // The body this instance now has is what affect_check falls back to.
+    for (int s = 0; s < MOBSET_MAX; s++)
+        mob->baseBits[s] = npc_set_get(mob, s) & (s == MOBSET_AFF ? ~AFF_FROM_AFFECTS : ~(bitstring_t)0);
+
+    for (auto &af: st.affects) {
+        affect_to_char(mob, af);
+        ddeallocate(af);
+    }
+    st.affects.clear();
+}
+
+/* fread_pet End. Pets write numbers and act/aff/det/wearloc whole and keep
+ * their affects in those numbers (no affect_modify on load); a stamp mismatch
+ * (or no stamp) re-derives from the prototype, so the affects then have to be
+ * applied for real (decision 36). */
+static void apply_saved_pet(NPCharacter *pet, SavedMobState &st)
+{
+    bool keep = st.stampMatches(pet->pIndexData);
+
+    if (keep) {
+        if (st.petAct)
+            pet->act.setValue(st.petActV);
+        if (st.petAff)
+            pet->affected_by.setValue(st.petAffV);
+        if (st.petDet)
+            pet->detection.setValue(st.petDetV);
+        if (st.petWear)
+            pet->wearloc.fromString(st.petWearV);
+        apply_saved_numbers(pet, st);
+    }
+
+    for (auto &af: st.affects) {
+        if (keep)
+            pet->affected.push_front(af);
+        else {
+            affect_to_char(pet, af);
+            ddeallocate(af);
+        }
+    }
+    st.affects.clear();
+}
+
 /* write a pet */
 void fwrite_pet( NPCharacter *pet, FILE *fp)
 {
@@ -383,6 +705,7 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
             fprintf(fp,"Room %d\n", pet->in_room->vnum);
             
         fprintf( fp, "Id   %s\n", id_to_string(pet->getID()).c_str() );
+        fprintf( fp, "BodyVer %lld\n", (long long)pet->pIndexData->bodyStamp() );
         fwrite_multistring(fp, "Keyword", pet->getRealKeyword());
         fwrite_multistring(fp, "ShortDesc", pet->getRealShortDescr());
         fwrite_multistring(fp, "LongDesc", pet->getRealLongDescr());
@@ -491,11 +814,12 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
         fprintf(fp,"Vnum %d\n",mob->pIndexData->vnum);
 
         fprintf( fp, "Id   %s\n", id_to_string(mob->getID()).c_str() );
+        fprintf( fp, "BodyVer %lld\n", (long long)mob->pIndexData->bodyStamp() );
         
-        fwrite_multistring(fp, "Keyword", mob->getRealKeyword());
-        fwrite_multistring(fp, "ShortDesc", mob->getRealShortDescr());
-        fwrite_multistring(fp, "LongDesc", mob->getRealLongDescr());
-        fwrite_multistring(fp, "Description", mob->getRealDescription());
+        fwrite_multistring_diff(fp, "Keyword", mob, mob->getRealKeyword(), mob->pIndexData->keyword);
+        fwrite_multistring_diff(fp, "ShortDesc", mob, mob->getRealShortDescr(), mob->pIndexData->short_descr);
+        fwrite_multistring_diff(fp, "LongDesc", mob, mob->getRealLongDescr(), mob->pIndexData->long_descr);
+        fwrite_multistring_diff(fp, "Description", mob, mob->getRealDescription(), mob->pIndexData->description);
 
         fprintf( fp, "Room %d\n", mob->in_room->vnum );
 
@@ -524,29 +848,35 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
         if (mob->silver > 0)
                 fprintf(fp,"Silv %d\n",mob->silver.getValue( ));
 
-        fprintf(fp, "Wearloc %s~\n", mob->wearloc.toString().c_str());
-
         if (mob->exp > 0)
                 fprintf(fp, "Exp  %d\n", mob->exp.getValue( ));
 
         if (mob->timer != 0)
                 fprintf( fp, "Timer %d\n", mob->timer );
 
-        if (mob->act != mob->pIndexData->act)
-                fprintf(fp, "Act  %s\n", print_flags(mob->act));
-
-        if (mob->affected_by != mob->pIndexData->affected_by)
-                fprintf(fp, "AfBy %s\n", print_flags(mob->affected_by & ~AFF_CHARM));
-
-        if (mob->detection != mob->pIndexData->detection)
-                fprintf(fp, "Detect %s\n", print_flags(mob->detection));
-
-        fprintf(fp, "Part %s\n", print_flags(mob->parts));
-        fprintf(fp, "Form %s\n", print_flags(mob->form));
-        fprintf(fp, "Size %d\n", mob->size);
-        fprintf(fp, "Imm %s\n", print_flags(mob->imm_flags));
-        fprintf(fp, "Res %s\n", print_flags(mob->res_flags));
-        fprintf(fp, "Vuln %s\n", print_flags(mob->vuln_flags));
+        // Body: diffs against what the prototype produces today, so a
+        // prototype fix reaches this mob at the next boot (mob reform).
+        for (int s = 0; s < MOBSET_MAX; s++) {
+            bitstring_t base = npc_set_get(mob, s), produced = produced_set(mob->pIndexData, s);
+            if (s == MOBSET_AFF)
+                base &= ~(bitstring_t)AFF_CHARM;
+            bitstring_t add = base & ~produced, del = produced & ~base;
+            if (add)
+                fprintf(fp, "%sAdd %s\n", saved_set_keys[s], print_flags((int)add));
+            if (del)
+                fprintf(fp, "%sDel %s\n", saved_set_keys[s], print_flags((int)del));
+        }
+        {
+            GlobalBitvector wadd(mob->wearloc), wdel(mob->pIndexData->wearloc);
+            wadd.remove(mob->pIndexData->wearloc);
+            wdel.remove(mob->wearloc);
+            if (!wadd.empty())
+                fprintf(fp, "WearlocAdd %s~\n", wadd.toString().c_str());
+            if (!wdel.empty())
+                fprintf(fp, "WearlocDel %s~\n", wdel.toString().c_str());
+        }
+        if (mob->size != mob->pIndexData->getSize())
+                fprintf(fp, "Size %d\n", mob->size);
 
         if (mob->comm != 0)
                 fprintf(fp, "Comm %s\n", print_flags(mob->comm));
@@ -1250,10 +1580,15 @@ void fread_pet( PCharacter *ch, FILE *fp )
         pet = create_mobile_org(get_mob_index(MOB_VNUM_FIDO), create_flags);
     }
 
+    SavedMobState saved;
+
     for ( ; ; )
     {
             word         = feof(fp) ? "End" : fread_word(fp);
             fMatch = false;
+
+            if (fread_saved_mob_key(word, fp, saved, true))
+                continue;
 
             switch (dl_toupper(word[0]))
             {
@@ -1354,6 +1689,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
 
              case 'E':
                  if (!strcmp(word, "End")) {
+                     apply_saved_pet(pet, saved);
                      pet->leader = ch;
                      pet->master = ch;
                      ch->pet = pet;
@@ -1541,12 +1877,17 @@ NPCharacter * fread_mob( FILE *fp )
     mob->pIndexData->count++;
     mob->affected.deallocate();
 
+    SavedMobState saved;
+
     try {
         for ( ; ; )
         {
             word         = feof(fp) ? "End" : fread_word(fp);
 
             fMatch = false;
+
+            if (fread_saved_mob_key(word, fp, saved, false))
+                continue;
 
             switch (dl_toupper(word[0]))
             {
@@ -1654,6 +1995,7 @@ NPCharacter * fread_mob( FILE *fp )
             case 'E':
                     if (!strcmp(word,"End"))
                     {
+                            apply_saved_mob(mob, saved);
                             mob->leader = 0;
                             mob->master = 0;
 
@@ -1836,6 +2178,8 @@ NPCharacter * fread_mob( FILE *fp )
         }
 
     } catch (const FileFormatException &e) {
+        for (auto &af: saved.affects)
+            ddeallocate(af);
         extract_mob_baddrop( mob );
         throw e;
     }

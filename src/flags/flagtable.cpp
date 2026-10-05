@@ -59,10 +59,38 @@ static DLString resolveMessagePad( const FlagTable *table, const FlagTable::Fiel
     return field.name;
 }
 
+/*
+ * Retired flag names that still have to parse: area and race files written
+ * before a rename, and Fenia scripts read before their repoint is posted.
+ * The new flag reuses the old bit, so the alias is exact, not a guess.
+ * Mob reform (plan docs/plans/mob-reform.md §3.6 item 14).
+ */
+static const char * compatAlias( const FlagTable *table, const DLString &arg )
+{
+    static const struct { const char *table, *oldName, *newName; } aliases[] = {
+        { "form_flags", "undead",     "skeletal"      },
+        { "form_flags", "centaur",    "quadruped"     },
+        { "form_flags", "animal",     "hoofed"        },
+        { "form_flags", "intangible", "instant_decay" },
+    };
+
+    for (auto &a: aliases)
+        if (arg ^ a.oldName && FlagTableRegistry::getName( table ) == a.table)
+            return a.newName;
+
+    return 0;
+}
+
 int FlagTable::index( const DLString &arg, bool strict ) const
 {
     if (arg.empty( ))
         return NO_FLAG;
+
+    if (const char *alias = compatAlias( this, arg )) {
+        for (int i = 0; i < size; i++)
+            if (DLString( alias ) ^ fields[i].name)
+                return i;
+    }
 
     // Quick strict search 
     if (strict) {

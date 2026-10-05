@@ -5,6 +5,8 @@
 #include <string.h>
 
 #include "medit.h"
+#include "mobbody.h"
+#include "stringlist.h"
 
 
 #include "grammar_entities_impl.h"
@@ -64,6 +66,63 @@ GSN(weaken);
 GSN(berserk);
 
 CLAN(none);
+
+/*
+ * Mob reform: fold the editor's direct flag edits into the authored diffs,
+ * then rebuild the body from the race and the tier numbers, the same way the
+ * area loader does. A race change re-resolves the body here (the old
+ * commented-out block below, done through the resolver).
+ */
+static DLString mob_reviewed_names(int mask)
+{
+    DLString buf;
+    for (int k = Body::BS_AFF; k < Body::BS_MAX; k++)
+        if (mask & (1 << k)) {
+            if (!buf.empty())
+                buf << " ";
+            buf << Body::bitSetNames[k];
+        }
+    return buf.empty() ? DLString("-") : buf;
+}
+
+static void refresh_body(mob_index_data &m)
+{
+    for (int s = 0; s < MOBSET_MAX; s++) {
+        bitstring_t add, del;
+        m.bodyDiff(s, add, del);
+        m.bodyAdd[s] = add;
+        m.bodyDel[s] = del;
+    }
+    m.resolveBody();
+    m.deriveNumbers();
+}
+
+/* Copy the mob reform state of one index into another. */
+static void copy_reform_fields(mob_index_data &to, const mob_index_data &from)
+{
+    for (int s = 0; s < MOBSET_MAX; s++) {
+        to.bodyAdd[s] = from.bodyAdd[s];
+        to.bodyDel[s] = from.bodyDel[s];
+        to.bodySnapshot[s] = from.bodySnapshot[s];
+    }
+    to.reviewed = from.reviewed;
+    to.tierName = from.tierName;
+    to.tierStyle = from.tierStyle;
+    to.tier = from.tier;
+    to.bodyResolved = from.bodyResolved;
+    to.wearloc.setRegistry(from.wearloc.getRegistry());
+    to.wearloc.set(from.wearloc);
+    to.offAllowed = from.offAllowed;
+    to.movetype = from.movetype;
+    to.moveverb = from.moveverb;
+    to.formAcPct = from.formAcPct;
+    to.bloodless = from.bloodless;
+    to.edible = from.edible;
+    to.canHoldCards = from.canHoldCards;
+    to.numbersDerived = from.numbersDerived;
+    to.saves = from.saves;
+    to.statCap = from.statCap;
+}
 
 OLCStateMobile::OLCStateMobile( )
 {
@@ -150,6 +209,7 @@ void OLCStateMobile::copyParameters( MOB_INDEX_DATA *original )
     mob.affects.clear();
     mob.affects.set(original->affects);
     mob.clan = original->clan;
+    copy_reform_fields(mob, *original);
 }
 
 OLCStateMobile::OLCStateMobile( int vnum )
@@ -168,6 +228,9 @@ void OLCStateMobile::commit()
     MOB_INDEX_DATA *original;
 
     original = get_mob_index(mob.vnum);
+
+    // Rebuild the edited body and numbers before anything is copied back.
+    refresh_body(mob);
 
     if(!original) {
         int iHash;
@@ -314,6 +377,7 @@ void OLCStateMobile::commit()
     original->affects.clear();
     original->affects.set(mob.affects);
     original->clan = mob.clan;
+    copy_reform_fields(*original, mob);
 
     for(wch = char_list; wch; wch = wch->next) {
         NPCharacter *victim = wch->getNPC();
@@ -356,7 +420,14 @@ MEDIT(show)
     ptc(ch, "{GLong UA:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(UA)).c_str(), web_edit_button(showWeb, ch, "ualong", "web").c_str());        
     ptc(ch, "{GLong RU:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(RU)).c_str(), web_edit_button(showWeb, ch, "rulong", "web").c_str());        
     
-    ptc(ch, "{CLevel{x:       [{W%3d{x]\n\r", mob.level);
+    ptc(ch, "{CLevel{x:       [{W%3d{x]  {CTier{x: [{W%s{x] %s {D(tier){x\n\r", mob.level,
+        MobBody::tiers().name(mob.tier).c_str(),
+        mob.tierName.empty() ? "{D(по умолчанию){x" : "");
+    if (!mob.tierStyle.empty())
+        ptc(ch, "{CTier style{x:  [{W%s{x] {D(tierstyle){x\n\r", mob.tierStyle.c_str());
+    if (mob.numbersDerived)
+        ptc(ch, "{DЧисла ниже -- центры тира (fight/mob_tiers.json), правка не сохраняется. Спасброски [%d], кап параметров [%d].{x\n\r",
+            mob.saves, mob.statCap);
 
     ptc(ch, "{CRace{x:        [{W%s{x] {D(? race){x Sex: [{W%s{x] {D(? sex_table){x Number: [{W%s{x]\n\r",
         mob.race.c_str(), 
@@ -409,6 +480,13 @@ MEDIT(show)
     ptc(ch, "{CMaterial:{x    [{W%s{x] {D(? material){x\n\r", mob.material.c_str());
     ptc(ch, "{CForm:{x        [{W%s{x] {D(? form_flags){x\n\r", form_flags.names(mob.form).c_str());
     ptc(ch, "{CParts:{x       [{W%s{x] {D(? part_flags){x\n\r", part_flags.names(mob.parts).c_str());
+    ptc(ch, "{CBody:{x        [{W%s{x] слоты [{W%s{x]\n\r",
+        mob.bodyResolved ? "из форм расы" : "старая модель расы", mob.wearloc.toString().c_str());
+    if (mob.bodyResolved)
+        ptc(ch, "             походка [{W%s{x] броня тела [{Wx%.2f{x] атаки разрешены [{W%s{x]\n\r",
+            mob.moveverb.c_str(), mob.formAcPct / 100.0, off_flags.names(mob.offAllowed).c_str());
+    if (mob.reviewed)
+        ptc(ch, "{CReviewed:{x    [{W%s{x] {D(reviewed){x\n\r", mob_reviewed_names(mob.reviewed).c_str());
 
     if (!mob.spec_fun.name.empty())
         ptc(ch, "{CSpec fun:{x    [{W%s{x] {D(? spec){x\n\r", mob.spec_fun.name.c_str());
@@ -1025,6 +1103,98 @@ MEDIT(damdice)
     return diceEdit(mob.damage);
 }
 
+MEDIT(tier)
+{
+    const MobTiers::Config &tc = MobBody::tiers();
+    DLString arg = DLString(argument).getOneArgument();
+
+    if (arg.empty()) {
+        ptc(ch, "Тир: %s. Синтаксис: tier <trash|normal|elite|champion|boss|1-10|default>\n\r",
+            tc.name(mob.tier).c_str());
+        return false;
+    }
+
+    if (arg_is_strict(arg, "default")) {
+        mob.tierName.clear();
+    } else {
+        int t = tc.loaded ? tc.parse(arg) : MobTiers::Config().parse(arg);
+        if (!t && arg.isNumber()) {
+            int n = arg.toInt();
+            if (n >= MobTiers::TIER_BEST && n <= MobTiers::TIER_WORST)
+                t = n;
+        }
+        if (!t) {
+            stc("Нет такого тира.\n\r", ch);
+            return false;
+        }
+        mob.tierName = arg;
+    }
+
+    refresh_body(mob);
+    ptc(ch, "Тир: %s.\n\r", MobBody::tiers().name(mob.tier).c_str());
+    return true;
+}
+
+MEDIT(tierstyle)
+{
+    const MobTiers::Config &tc = MobBody::tiers();
+    DLString arg = DLString(argument).getOneArgument();
+
+    if (arg.empty()) {
+        ptc(ch, "Стиль тира: %s. Синтаксис: tierstyle <fortress|brute|none>\n\r",
+            mob.tierStyle.empty() ? "нет" : mob.tierStyle.c_str());
+        return false;
+    }
+
+    if (arg_is_strict(arg, "none")) {
+        mob.tierStyle.clear();
+    } else {
+        if (tc.loaded && !tc.styles.count(arg)) {
+            stc("Нет такого стиля (fight/mob_tiers.json, styles).\n\r", ch);
+            return false;
+        }
+        mob.tierStyle = arg;
+    }
+
+    refresh_body(mob);
+    ptc(ch, "Стиль тира: %s.\n\r", mob.tierStyle.empty() ? "нет" : mob.tierStyle.c_str());
+    return true;
+}
+
+MEDIT(reviewed)
+{
+    DLString args = argument;
+
+    if (args.empty()) {
+        ptc(ch, "Проверено: [%s]. Синтаксис: reviewed <aff|det|imm|res|vuln|none> ... -- "
+                "удаления (del) этих наборов начинают действовать.\n\r",
+            mob_reviewed_names(mob.reviewed).c_str());
+        return false;
+    }
+
+    int mask = 0;
+    StringList words(args);
+    for (auto &w: words) {
+        if (w == "none")
+            continue;
+        bool found = false;
+        for (int k = Body::BS_AFF; k < Body::BS_MAX; k++)
+            if (w == Body::bitSetNames[k]) {
+                mask |= 1 << k;
+                found = true;
+            }
+        if (!found) {
+            ptc(ch, "Неизвестный набор '%s'.\n\r", w.c_str());
+            return false;
+        }
+    }
+
+    mob.reviewed = mask;
+    refresh_body(mob);
+    ptc(ch, "Проверено: [%s].\n\r", mob_reviewed_names(mob.reviewed).c_str());
+    return true;
+}
+
 MEDIT(race)
 {
     Race *race;
@@ -1044,6 +1214,7 @@ MEDIT(race)
 */            
 
             mob.race = race->getName();
+            refresh_body(mob);
 
 /*
             mob.off_flags |= race->getOff( );

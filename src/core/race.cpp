@@ -6,6 +6,7 @@
 #include "enumeration.h"
 #include "globalbitvector.h"
 #include "race.h"
+#include "body.h"
 #include "pcrace.h"
 
 /*-------------------------------------------------------------------
@@ -190,3 +191,37 @@ const PCRace * RaceManager::findUnstrictPC( const DLString &name )
 
 GLOBALREF_IMPL(Race, ' ')
 XMLGLOBALREF_IMPL(Race)
+
+bool Race::hasBodyForms( ) const
+{
+    return false;
+}
+
+void Race::getBodyInput( Body::Input &, bool ) const
+{
+}
+
+int Race::getDamType( ) const
+{
+    return 0;
+}
+
+const DLString & Race::getMaterial( ) const
+{
+    return DLString::emptyString;
+}
+
+double Race::getHpMult( ) const
+{
+    return 1.0;
+}
+
+double Race::getDmgMult( ) const
+{
+    return 1.0;
+}
+
+const DLString & Race::getMoveVerb( ) const
+{
+    return DLString::emptyString;
+}

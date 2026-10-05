@@ -692,7 +692,7 @@ static void show_char_to_char_0( Character *victim, Character *ch )
 
     if (CAN_DETECT(ch, DETECT_UNDEAD)) {
         bool npcUndead = victim->is_npc() && 
-            (IS_SET(victim->act, ACT_UNDEAD) || IS_SET(victim->form, FORM_UNDEAD));
+            (IS_SET(victim->act, ACT_UNDEAD) || IS_SET(victim->form, FORM_SKELETAL));
     
         if (npcUndead || IS_VAMPIRE(victim))
             buf << fmt(ch, _("({1{rНежить{2)"));

@@ -111,7 +111,9 @@ static bool has_trigger_nuke( Character *ch, Character *victim )
 static bool has_trigger_mount( Character *victim )
 {
     if (!victim->is_npc())
-        return IS_SET(victim->form, FORM_CENTAUR);
+        // Rideable body (decision 26): quadruped and (hoofed or large).
+        return IS_SET(victim->form, FORM_QUADRUPED)
+               && (IS_SET(victim->form, FORM_HOOFED) || victim->size >= SIZE_LARGE);
     else
         return IS_SET(victim->act, ACT_RIDEABLE);
 }

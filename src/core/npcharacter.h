@@ -11,6 +11,7 @@
 #include "xmlstreamable.h"
 #include "character.h"
 #include "merc.h"
+#include "mobsets.h"
 #include "mobilebehavior.h"
 #include "profession.h"
 #include "inflectedstring.h"
@@ -115,6 +116,14 @@ public:
 
     // switch
     PCharacter                *switchedFrom;
+
+// MOC_SKIP_BEGIN
+    /** Mob reform: the body bits this instance was built with (index body plus
+     *  saved diffs), indexed by MOBSET_*. affect_check re-ORs these for NPCs
+     *  instead of the race bits, so an authored or saved del survives an
+     *  affect wearing off. */
+    bitstring_t baseBits[MOBSET_MAX];
+// MOC_SKIP_END
 };
 
 

@@ -21,6 +21,7 @@
 #include "terrains.h"
 #include "move_utils.h"
 #include "doors.h"
+#include "fenia_utils.h"
 #include "merc.h"
 
 #include "def.h"
@@ -118,9 +119,21 @@ bool BasicMobileBehavior::specFightCaster( )
     
     if (ch->wait > 0)
         return false;
+
+    // Casting needs a sentient or magical body; act undead no longer makes a
+    // necromancer on its own (decision 23, the data pass adds act necromancer).
+    if (!NPC_CAN_CAST( ch ))
+        return false;
+
+    // Mob reform §3.8: elite and up cast through the tier combat AI
+    // (Fenia global onCastAI). The tables below stay for normal and trash,
+    // and for any tier mob the Fenia side declines (no usable spells).
+    int tier = ch->getNPC()->pIndexData->tier;
+    if (tier >= 1 && tier <= 5 && gprog("onCastAI", "C", ch))
+        return true;
     
     if (IS_SET( ch->act, ACT_VAMPIRE )) {
-        if (IS_SET( ch->act, ACT_UNDEAD|ACT_NECROMANCER ) && chance( 50 ))
+        if (IS_SET( ch->act, NPC_NECRO_ACTS ) && chance( 50 ))
             return specFightNecro( );
         else
             return specFightVampire( );
@@ -136,7 +149,7 @@ bool BasicMobileBehavior::specFightCaster( )
             prof = prof_warlock;
     }
     
-    if (IS_SET( ch->act, ACT_UNDEAD|ACT_NECROMANCER )) {
+    if (IS_SET( ch->act, NPC_NECRO_ACTS )) {
         if (number_range( 0, cnt++ ) == 0) 
             prof = prof_necromancer;
     }
@@ -224,13 +237,16 @@ int BasicMobileBehavior::casterSnRange( Character *victim, int victRange )
 {
     int castSn = -1;
 
+    if (!NPC_CAN_CAST(ch))
+        return castSn;
+
     if (IS_SET(ch->act, ACT_MAGE))
         castSn = SpellChanceTable( mageSnRange, ch, victim ).findRangedSpell( victRange );
 
     if (castSn == -1 && IS_SET(ch->act, ACT_CLERIC))
         castSn = SpellChanceTable( clericSnRange, ch, victim ).findRangedSpell( victRange );
     
-    if (castSn == -1 && IS_SET(ch->act, ACT_UNDEAD|ACT_NECROMANCER))
+    if (castSn == -1 && IS_SET(ch->act, NPC_NECRO_ACTS))
         castSn = SpellChanceTable( necroSnRange, ch, victim ).findRangedSpell( victRange );
 
     return castSn;

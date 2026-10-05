@@ -12,6 +12,8 @@
 #include "flagtable.h"
 #include "autoflags.h"
 #include "dl_strings.h"
+#include "mobbody.h"
+#include "wearlocation.h"
 #include "def.h"
 
 CLAN(none);
@@ -67,6 +69,21 @@ mob_index_data::mob_index_data( )
     size = SIZE_MEDIUM;
     material = "none";
     area = NULL;
+
+    for (int i = 0; i < MOBSET_MAX; i++)
+        bodyAdd[i] = bodyDel[i] = bodySnapshot[i] = 0;
+    reviewed = 0;
+    tier = MobTiers::TIER_NORMAL;
+    bodyResolved = false;
+    wearloc.setRegistry(wearlocationManager);
+    offAllowed = 0;
+    formAcPct = 100;
+    bloodless = false;
+    edible = true;
+    canHoldCards = false;
+    numbersDerived = false;
+    saves = 0;
+    statCap = 0;
 }
 
 mob_index_data::~mob_index_data()

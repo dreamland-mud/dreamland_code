@@ -1,0 +1,40 @@
+{
+ "version": 1,
+ "status": "SAMPLE for the engine unit test and the schema in src/core/mobtiers.h. The real file is dreamland_world/fight/mob_tiers.json (Phase C, B7 TTK model). Numbers: plan §4.2, base = §2.2 band p50 at band midpoints.",
+ "default_tier": "normal",
+ "names": { "trash": 9, "normal": 7, "elite": 5, "champion": 3, "boss": 1 },
+ "tiers": {
+  "9": { "name": "trash", "hp": 0.6, "dmg": 0.7, "hitroll": 0, "ac": 0.85, "saves": 0, "stat_cap": 11, "mana": 0.5, "off_enabled": 0, "xp": 0.75, "xp_min_level": 11, "gold": 0.5,
+         "word": { "en": "a weakling", "ru": "слабак", "ua": "слабак" } },
+  "7": { "name": "normal", "hp": 1.0, "dmg": 1.0, "hitroll": 0, "ac": 1.0, "saves": -0.05, "stat_cap": 13, "mana": 1.0, "off_enabled": 1, "off_parity": true, "xp": 1.0, "gold": 1.0,
+         "word": { "en": "an ordinary foe", "ru": "обычный", "ua": "звичайний" } },
+  "5": { "name": "elite", "aff_add": [ "sanctuary" ], "hp": 1.8, "dmg": 1.4, "hitroll": 0.1, "ac": 1.15, "saves": -0.1, "stat_cap": 15, "mana": 1.5, "off_enabled": 3, "xp": 1.6, "gold": 2.0,
+         "word": { "en": "a veteran", "ru": "ветеран", "ua": "ветеран" } },
+  "3": { "name": "champion", "aff_add": [ "sanctuary" ], "hp": 3.5, "dmg": 1.8, "hitroll": 0.2, "ac": 1.3, "saves": -0.1667, "stat_cap": 18, "mana": 2.0, "off_enabled": -1, "xp": 2.5, "gold": 4.0,
+         "word": { "en": "a champion", "ru": "чемпион", "ua": "чемпіон" } },
+  "1": { "name": "boss", "aff_add": [ "sanctuary" ], "hp": 7.0, "dmg": 2.5, "hitroll": 0.3333, "ac": 1.5, "saves": -0.25, "stat_cap": 22, "mana": 3.0, "off_enabled": -1, "xp": 4.0, "gold": 8.0,
+         "word": { "en": "a boss", "ru": "босс", "ua": "бос" } }
+ },
+ "stat_cap_per_level": 0.25,
+ "variance": { "hp": 0.15, "dmg": 0.15, "hitroll": 0.10, "saves": 0.10, "mana": 0.20 },
+ "base": {
+  "level":  [ 5,   15,   25,   35,    45,    55,    65,    75,    85,    95,    105 ],
+  "hp":     [ 65,  210,  550,  1225,  2970,  5610,  8710,  11550, 15895, 21185, 26355 ],
+  "dmg":    [ 4.5, 9.5,  17,   27,    36,    44,    62,    94,    115,   145,   256 ],
+  "ac":     [ 5,   -1,   -6,   -11,   -15,   -22,   -35,   -45,   -54,   -66,   -81 ],
+  "mana":   [ 110, 130,  210,  360,   900,   850,   1000,  1030,  1500,  1700,  6050 ],
+  "wealth": [ 10,  78,   400,  1000,  1000,  1000,  1000,  900,   1000,  1000,  1000 ]
+ },
+ "class_mult": { "hp": { "mage": 0.85, "cleric": 0.85 }, "dmg": { "warrior": 1.15 } },
+ "noncaster_mana_per_level": 5,
+ "caster_acts": [ "mage", "cleric", "necromancer", "vampire" ],
+ "caster_vnums": [ ],
+ "off_priority": {
+  "warrior":  [ "bash", "disarm", "parry", "kick", "trip", "kick_dirt", "berserk" ],
+  "thief":    [ "backstab", "dodge", "kick_dirt", "trip", "disarm", "fade" ],
+  "mage":     [ "dodge", "parry", "kick_dirt" ],
+  "cleric":   [ "dodge", "parry", "kick_dirt" ],
+  "sentient": [ "dodge", "kick_dirt", "trip", "parry", "kick", "disarm", "bash" ],
+  "animal":   [ "dodge", "fast", "berserk", "crush", "tail", "kick" ]
+ }
+}

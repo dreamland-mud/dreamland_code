@@ -4,6 +4,8 @@
 #include <jsoncpp/json/json.h>
 #include "fenia/register-decl.h"
 #include "xmlmultistring.h"
+#include "bitstring.h"
+#include "mobsets.h"
 #include "globalbitvector.h"
 #include "grammar_entities.h"
 #include "lang.h"
@@ -79,7 +81,47 @@ struct mob_index_data
     AreaIndexData *                area;
     ClanReference clan;
 
+    // Mob reform (plan docs/plans/mob-reform.md §3.5, §3.6 items 3-6).
+    // Authored add/del per bit set, kept so asave writes back what the builder
+    // wrote even where the instance ignores it (unreviewed dels, item 17).
+    bitstring_t        bodyAdd[MOBSET_MAX];
+    bitstring_t        bodyDel[MOBSET_MAX];
+    // Body bits as resolveBody/deriveNumbers left them, to spot later direct edits.
+    bitstring_t        bodySnapshot[MOBSET_MAX];
+    // Bit sets (Body::BitSet order act..vuln) whose authored dels are honoured: <reviewed>.
+    int                reviewed;
+    // Authored <tier> (name or 1-10, empty = default) and the resolved number.
+    DLString           tierName;
+    int                tier;
+    // Authored <tierStyle> (fight/mob_tiers.json "styles"), empty = none.
+    DLString           tierStyle;
+    // Body: true when it came from the resolver (race with <forms>), else legacy.
+    bool               bodyResolved;
+    GlobalBitvector    wearloc;
+    int                offAllowed;     // off bits the body may use (item 39)
+    DLString           movetype, moveverb;
+    int                formAcPct;      // form AC factor x100
+    bool               bloodless, edible, canHoldCards;
+    // Numbers: true when hit/mana/damage/hitroll/ac/wealth are tier centres.
+    bool               numbersDerived;
+    int                saves;
+    int                statCap;
+
     int getSize() const;
+
+    /** Mob reform: build body bits and wearlocs from race + authored diffs. */
+    void resolveBody();
+    /** Mob reform: tier, centre numbers and enabled off bits (needs vnum and body). */
+    void deriveNumbers();
+    /** Saved-mobile stamp (BodyVer): a 64-bit hash of everything a saved
+     *  instance's body and numbers were built from -- the prototype's level,
+     *  tier, race, resolved body and centre numbers. Never the instance level,
+     *  which growth raises (decision 36). */
+    unsigned long long bodyStamp();
+    /** The index field holding one bit set (act, off_flags, ..., parts). */
+    int &bodyBits(int mobset);
+    /** Authored diff for asave: the loaded add/del plus any direct edit made since load. */
+    void bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) const;
 
     /** Return props value for the key (props[key] or props["xxx"][key]). */
     DLString getProperty(const DLString &key) const;
