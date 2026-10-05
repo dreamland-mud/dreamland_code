@@ -77,6 +77,7 @@
 #include "wiznet.h"
 #include "loadsave.h"
 #include "weapons.h"
+#include "weapontier.h"
 #include "movetypes.h"
 #include "directions.h"
 #include "terrains.h"
@@ -87,7 +88,6 @@
 #include "messengers.h"
 #include "msgformatter.h"
 #include "l10n.h"
-#include "weapontier.h"
 
 GSN(identify);
 
