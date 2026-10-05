@@ -325,7 +325,7 @@ CMDRUN( cast )
             if (!fForbidCasting) {
                 // Released on VictimDeathException too.
                 struct CastDepthGuard {
-                    CastDepthGuard( ) { fightspam_cast_depth++; }
+                    CastDepthGuard( ) { fightspam_cast_depth++; fightspam_cast_serial++; }
                     ~CastDepthGuard( ) { fightspam_cast_depth--; }
                 } castDepthGuard;
 

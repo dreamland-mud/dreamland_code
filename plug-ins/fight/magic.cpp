@@ -83,6 +83,7 @@
 #include "interp.h"
 #include "vnum.h"
 #include "fight_exception.h"
+#include "damage.h"
 #include "immunity.h"
 #include "material.h"
 #include "fight.h"
@@ -96,6 +97,24 @@ GSN(garble);
 GSN(holy_craft);
 GSN(shielding);
 GSN(spell_craft);
+
+/* A multi-hit spell (magic missile) rolls a save per hit: show the
+ * immune/resistant/vulnerable hint once per cast and victim, not per hit. */
+static bool save_hint_once( Character *victim )
+{
+    static long lastSerial = -1;
+    static Character *lastVictim = 0;
+
+    if (fightspam_cast_depth <= 0)
+        return true;
+
+    if (lastSerial == fightspam_cast_serial && lastVictim == victim)
+        return false;
+
+    lastSerial = fightspam_cast_serial;
+    lastVictim = victim;
+    return true;
+}
 
 /*
  * Compute a saving throw.
@@ -119,7 +138,7 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
     
     switch(immune_check(victim, dam_type, dam_flag)) {
         case RESIST_IMMUNE:
-            if (ch && verbose) {
+            if (ch && verbose && save_hint_once( victim )) {
                 if (ch != victim)
                     ch->pecho(_("%^N1, похоже, никак не сможет навредить %C3."), damage_noun(dam_type, viewerLang(ch)).c_str(), victim);
                 else
@@ -128,7 +147,8 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             return true;
         case RESIST_RESISTANT:
             save += mlevel / 5;
-            if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
+            if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )
+                && save_hint_once( victim )) {
                 if (ch != victim)
                     ch->pecho(_("%^N1 {1{Gочень слабо{2 влияет на %C4."), 
                         damage_noun(dam_type, viewerLang(ch)).c_str(), victim);
@@ -139,7 +159,8 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             break;
         case RESIST_VULNERABLE:
             save -= mlevel / 5;
-            if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
+            if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )
+                && save_hint_once( victim )) {
                 if (ch != victim)
                     ch->pecho(_("%^N1 {1{Rособо пагубно{2 влияет на %C4."), 
                         damage_noun(dam_type, viewerLang(ch)).c_str(), victim);
