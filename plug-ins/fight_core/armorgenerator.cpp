@@ -153,11 +153,19 @@ bool ArmorGenerator::run()
     learnPlayerGroups();
     collectCandidates();
 
+    std::set<int> forced;
+    int sig = pickSignature();
+    if (sig >= 0)
+        forced.insert(sig);
+
     const weapon_tier_t &t = weapon_tier_table[tier - 1];
     double curve = windowCurve();
     pickAffixes((int)(t.min_m * curve), (int)(t.max_m * curve), t.worst_penalty_m,
-                t.max_affixes_m, t.max_negatives_m, std::set<int>());
+                t.max_affixes_m, t.max_negatives_m, forced);
     applyAffixes();
+
+    if (sig >= 0)
+        obj->setProperty("signature", pool[sig].section + ":" + pool[sig].value);
 
     // The material affix, if any, was applied above; otherwise the noun's own.
     if (materialName.empty())
@@ -176,6 +184,36 @@ bool ArmorGenerator::run()
             obj->getProperty("affixes").c_str(), obj->level);
 
     return true;
+}
+
+/*--------------------------------------------------------------------------
+ * Boss signature
+ *-------------------------------------------------------------------------*/
+/** Legendary armor from a boss carries one signature affix (Kit 2026-10-05):
+ *  50/50 a resist to the boss's damage type or one of its spells as a proc.
+ *  The affix comes from the ordinary pool, so the killer's fit, the caps and
+ *  the price all apply; when that half has nothing in the pool the other is
+ *  tried, and with neither the item rolls as usual. */
+int ArmorGenerator::pickSignature() const
+{
+    if (tier != BEST_TIER || (sigDamtype.empty() && sigSpells.empty()))
+        return -1;
+
+    int resist = -1;
+    std::vector<int> procIdx;
+    for (int i = 0; i < (int)pool.size(); i++) {
+        const Candidate &c = pool[i];
+        if (c.section == "resists" && c.value == sigDamtype)
+            resist = i;
+        else if (c.section == "proc"
+                 && std::find(sigSpells.begin(), sigSpells.end(), c.value) != sigSpells.end())
+            procIdx.push_back(i);
+    }
+
+    int proc = procIdx.empty() ? -1 : procIdx.at(number_range(0, procIdx.size() - 1));
+    if (number_range(0, 1) == 0)
+        return resist >= 0 ? resist : proc;
+    return proc >= 0 ? proc : resist;
 }
 
 /*--------------------------------------------------------------------------
@@ -250,7 +288,8 @@ bool ItemAffixRoller::candidateAllowed(const Json::Value &section, const Json::V
     if (tier > floor)
         return false;
 
-    // Boss signatures are filled from the dead boss by the drop site, not rolled.
+    // The signature section is a marker: ArmorGenerator::pickSignature forces the
+    // boss's resist or proc from the sections that price them.
     if (section["needs_boss"].asBool() || affix["needs_boss"].asBool())
         return false;
 
