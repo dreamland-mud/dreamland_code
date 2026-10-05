@@ -253,6 +253,55 @@ static int roll_centre(int centre, double variance)
     return number_range(min(a, b), max(a, b));
 }
 
+/*
+ * Mob reform: give an existing mob the numbers a fresh spawn of this level and
+ * tier would roll (summons, quest mobs, pets: Fenia .tmp.mob.config). Same
+ * centres and variance as create_mobile_org; false while mob_tiers.json is
+ * absent, so the caller keeps its own formula.
+ */
+bool apply_mob_tier(NPCharacter *mob, int level, int tier)
+{
+    const MobTiers::Config &tc = MobBody::tiers();
+    if (!tc.loaded)
+        return false;
+
+    level = max(1, level);
+    MobTiers::MobInfo m;
+    m.vnum = mob->pIndexData->vnum;
+    m.level = level;
+    m.tier = tier;
+    m.formAc = mob->pIndexData->formAcPct / 100.0;
+    m.sentient = IS_SET(mob->form, FORM_SENTIENT);
+    m.acts = MobBody::names(&act_flags, (unsigned int)mob->act);
+
+    MobTiers::Centres c = tc.centres(m);
+    Race *race = mob->getRace();
+    int hp = max(1, (int)lround(c.hp * race->getHpMult()));
+    int dam = max(1, (int)lround(c.dmgAve * race->getDmgMult()));
+
+    int n = level / 10 + 1;
+    int t = max(2, (int)lround(2.0 * dam / n - 1));
+    int dicesAve = n * (t + 1) / 2;
+
+    mob->setLevel(level);
+    mob->damage[DICE_NUMBER] = n;
+    mob->damage[DICE_TYPE] = t;
+    mob->damroll = max(0, roll_centre(dam, tc.var("dmg")) - dicesAve);
+    mob->hitroll = roll_centre(level + c.hitrollBonus, tc.var("hitroll"));
+    mob->max_hit = max(1, roll_centre(hp, tc.var("hp")));
+    mob->hit = mob->max_hit;
+    mob->max_mana = max(0, roll_centre(c.mana, tc.var("mana")));
+    mob->mana = mob->max_mana;
+    mob->max_move = 200 + 16 * level;
+    mob->move = mob->max_move;
+    mob->saving_throw = roll_centre(c.saves, tc.var("saves"));
+    for (int i = 0; i < 4; i++)
+        mob->armor[i] = c.ac * 10;
+    for (int i = 0; i < stat_table.size; i++)
+        mob->perm_stat[i] = min(BASE_STAT, c.statCap);
+    return true;
+}
+
 NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
 {
     NPCharacter *mob;

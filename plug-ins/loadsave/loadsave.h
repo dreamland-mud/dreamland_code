@@ -40,6 +40,7 @@ NPCharacter *        create_mobile        ( mob_index_data *pMobIndex );
 NPCharacter *        create_mobile_nocount( mob_index_data * );
 NPCharacter *        create_mobile_org( mob_index_data *pMobIndex, int flags );
 void create_mob_affects(NPCharacter *mob);
+bool apply_mob_tier(NPCharacter *mob, int level, int tier);
 Object *        create_object        ( obj_index_data *pObjIndex, short level );
 Object *        create_object_nocount ( obj_index_data *pObjIndex, short level );
 Object *        create_object_org (obj_index_data *pObjIndex,short level,bool Count);

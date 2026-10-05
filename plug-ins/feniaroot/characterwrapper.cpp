@@ -569,6 +569,17 @@ NMI_INVOKE( CharacterWrapper, setLevel, "(level): установить уров�
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, applyTier, "(level, tier): числа моба как у свежего моба этого уровня и тира по fight/mob_tiers.json (hp, урон, хитролл, AC, мана, сейвы, кап статов); false без файла тиров" )
+{
+    checkTarget();
+    CHK_PC
+
+    if (args.size( ) < 2)
+        throw Scripting::NotEnoughArgumentsException( );
+
+    return Register( apply_mob_tier( target->getNPC( ), argnum2number( args, 1 ), argnum2number( args, 2 ) ) );
+}
+
 NMI_GET( CharacterWrapper, short_descr, "короткое описание моба" )
 {
     checkTarget( );
