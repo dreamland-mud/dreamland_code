@@ -185,9 +185,22 @@ protected:
         cost["treasure"] = total_cost;
     }
 
+    /** Offering worth of random loot by its one-item-model value (measure_m,
+     *  centi-M: common ~50, rare ~150, legendary ~450), worn condition taken
+     *  off; -1 for hand-made items, which keep the old formulas
+     *  (docs/plans/tier-audit.md I8). */
+    int modelValue(Object *obj) {
+        DLString m = obj->getProperty("measure_m");
+        if (!m.isNumber())
+            return -1;
+        return max(50, (100 + m.toInt()) * obj->condition / 100);
+    }
+
     void armor(Object *obj) {
         quantity["armor"]++;
-        int item_cost = max(50, obj->cost / 100);
+        int item_cost = modelValue(obj);
+        if (item_cost < 0)
+            item_cost = max(50, obj->cost / 100);
         int total_cost = min(300, cost["armor"] + item_cost);
         cost["armor"] = total_cost;
     }
@@ -227,7 +240,9 @@ protected:
         if (religion->likesItem(obj)) {
             quantity["weapon"]++;
             // Penalize for worn out weapons.
-            int item_cost = max(100, 500 - (100 - obj->condition) * 10);
+            int item_cost = modelValue(obj);
+            if (item_cost < 0)
+                item_cost = max(100, 500 - (100 - obj->condition) * 10);
             cost["weapon"] = min(500, cost["weapon"] + item_cost);
         }
     }

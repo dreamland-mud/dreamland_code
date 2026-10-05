@@ -87,6 +87,7 @@
 #include "messengers.h"
 #include "msgformatter.h"
 #include "l10n.h"
+#include "weapontier.h"
 
 GSN(identify);
 
@@ -413,6 +414,19 @@ CMDRUNP( auction )
                                 item_table.message(obj->item_type, '1', Player::displayLang(ch)).c_str( ),
                                 extra_flags.messages( obj->extra_flags, true, '1', Player::displayLang(ch)).c_str( ),
                                 obj->weight / 10, obj->cost, obj->level );
+
+                        // Rarity of random loot as text (docs/plans/tier-audit.md I15).
+                        {
+                            lang_t lang = Player::displayLang(ch);
+                            switch (get_item_tier(obj)) {
+                            case 1: ch->pecho(lmsg(lang, "Rarity: legendary.", "Редкость: легендарная.", "Рідкість: легендарна.")); break;
+                            case 2: ch->pecho(lmsg(lang, "Rarity: epic.", "Редкость: эпическая.", "Рідкість: епічна.")); break;
+                            case 3: ch->pecho(lmsg(lang, "Rarity: rare.", "Редкость: редкая.", "Рідкість: рідкісна.")); break;
+                            case 4: ch->pecho(lmsg(lang, "Rarity: uncommon.", "Редкость: необычная.", "Рідкість: незвичайна.")); break;
+                            case 5: ch->pecho(lmsg(lang, "Rarity: common.", "Редкость: обычная.", "Рідкість: звичайна.")); break;
+                            default: break;
+                            }
+                        }
 
                         {        
                             map<DLString, bool> purposes;

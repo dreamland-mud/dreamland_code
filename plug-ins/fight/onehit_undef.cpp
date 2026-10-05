@@ -281,6 +281,11 @@ void UndefinedOneHit::damEffectVorpal()
     if (!chance(IS_GOOD(ch) ? 20 : 10))
         return;
 
+    // A legend (mob tier 1) keeps its head; the verse still rings out above
+    // (docs/plans/tier-audit.md M4).
+    if (victim->is_npc( ) && victim->getNPC( )->pIndexData->tier == 1)
+        return;
+
     MultiMessage msgVict, msgOther;
     if (get_weapon_class(wield) == WEAPON_SWORD) {
         msgOther = _("{mУва! Ува! И %1$C2 голова барабардает с плеч!{x");

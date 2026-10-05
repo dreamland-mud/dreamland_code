@@ -122,10 +122,17 @@ static void format_screenreader_flags(Object *obj, ostringstream &buf, Character
     if (!uses_screenreader(ch) && ch->getPC()->getConfig().color)
         return;
 
-    DLString aura = get_tier_aura(obj);
-    if (!aura.empty()) {
-        buf << aura << " ";
-        return;
+    // weapon_tiers.json "aura" is Russian only and empty for common items:
+    // it decides whether a tag shows, the text comes per viewer language.
+    if (!get_tier_aura(obj).empty()) {
+        lang_t lang = Player::lang(ch);
+        switch (get_item_tier(obj)) {
+        case 1: buf << lmsg(lang, "(Legendary) ", "(Легенда) ", "(Легенда) "); return;
+        case 2: buf << lmsg(lang, "(Epic) ", "(Эпик) ", "(Епік) "); return;
+        case 3: buf << lmsg(lang, "(Rare) ", "(Редкое) ", "(Рідкісне) "); return;
+        case 4: buf << lmsg(lang, "(Uncommon) ", "(Необычное) ", "(Незвичайне) "); return;
+        default: buf << get_tier_aura(obj) << " "; return;
+        }
     }
 
     DLString myshort = obj->getShortDescr(LANG_DEFAULT);

@@ -686,7 +686,12 @@ void AssassinateOneHit::calcDamage( )
     
     Chance mychance(ch, (int) chance, 100);
 
-    if (mychance.reroll()) {
+    // Bosses and legends (mob tier 1-2) never die to a broken neck: the blow
+    // lands as plain damage (docs/plans/tier-audit.md M3).
+    int tier = victim->is_npc( ) ? victim->getNPC( )->pIndexData->tier : 0;
+    bool neckProof = tier >= 1 && tier <= 2;
+
+    if (!neckProof && mychance.reroll()) {
         oldact(_("Ты {R{IS+++ {IxЛОМАЕШЬ ШЕЮ{IS +++{Ix{x $C3!"),ch,0,victim,TO_CHAR);
         oldact(_("$c1 {R{IS+++ {IxЛОМАЕТ ШЕЮ{IS +++{Ix{x $C3!"),ch,0,victim,TO_NOTVICT);
         oldact_p(_("$c1 {R{IS+++ {IxЛОМАЕТ ТЕБЕ ШЕЮ{IS +++{Ix{x!"),ch,0,victim,TO_VICT,POS_DEAD);
