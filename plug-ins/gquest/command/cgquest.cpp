@@ -162,6 +162,7 @@ void CGQuest::doProgress( PCharacter *ch )
     GlobalQuestManager::RunList::iterator i;
     GlobalQuestManager *manager = GlobalQuestManager::getThis( );
     GlobalQuestManager::RunList &rl = manager->getRunning( );
+    bool found = false;
     
     for (i = rl.begin( ); i != rl.end( ); i++) {
         ostringstream buf;
@@ -171,6 +172,8 @@ void CGQuest::doProgress( PCharacter *ch )
 
         if (gq->isHidden( ))
             continue;
+
+        found = true;
 
         if (gq->hasLevels( ))
             buf << fmt( ch, _("{yКвест {Y\"%1$s\"{y (для {Y%2$d-%3$d{y уровней)"),
@@ -184,7 +187,11 @@ void CGQuest::doProgress( PCharacter *ch )
         GQChannel::pecho( ch, buf );
     }
 
-    gqprog_progress( ch );
+    if (gqprog_progress( ch ))
+        found = true;
+
+    if (!found)
+        ch->pecho(_("Сейчас нет ни одного глобального задания."));
 }
 
 void CGQuest::doNoExp( PCharacter *ch, DLString& arguments ) 
