@@ -18,6 +18,7 @@
 #include "object.h"
 #include "room.h"
 #include "profflags.h"
+#include "mobtiers.h"
 #include "behavior.h"
 #include "char_weight.h"
 #include "loadsave.h"
@@ -487,8 +488,17 @@ bool FeniaQuest::passesParams( PCharacter *pch, NPCharacter *mob )
 {
     const QuestSelectParams &p = selectParams;
 
+    int tier = mob->pIndexData->tier;
+    bool tiered = tier >= MobTiers::TIER_BEST && tier <= MobTiers::TIER_WORST;
+
+    if (p.minTier > 0 && tiered && tier < p.minTier)
+        return false;
+
     if (p.levelDiffSet) {
         int diff = mob->getRealLevel( ) - pch->getModifyLevel( );
+
+        if (p.tierOffset != 0 && tiered)
+            diff += p.tierOffset * (MobTiers::TIER_NORMAL - tier) / 2;
 
         if (diff < p.levelDiffMin || diff > p.levelDiffMax)
             return false;

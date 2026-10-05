@@ -23,7 +23,8 @@
 struct QuestSelectParams {
     QuestSelectParams( )
         : levelDiffSet( false ), levelDiffMin( 0 ), levelDiffMax( 0 ),
-          maxLevel( 0 ), noCaster( false ), visible( false ),
+          maxLevel( 0 ), minTier( 0 ), tierOffset( 0 ),
+          noCaster( false ), visible( false ),
           carriedByNpc( false ), requireActFlag( 0 ), roomNoCast( false )
     {
     }
@@ -40,6 +41,17 @@ struct QuestSelectParams {
      *  window alone does not stop that when the hero is level-drained or the
      *  window is wide. */
     int maxLevel;
+
+    /** Mob reform tiers (1 legend .. 7 normal .. 10). Skip candidates whose
+     *  tier is stronger than this, 0 for none. KillQuest sets 3: never a boss
+     *  or a legend (Kit 2026-10-05, docs/plans/tier-audit.md M6). */
+    int minTier;
+
+    /** Levels an elite (tier 5) counts above a normal (tier 7) in the level
+     *  window, 0 for none: the candidate's level for levelDiff* is its real
+     *  level plus tierOffset * (7 - tier) / 2. KillQuest sets 5, so a champion
+     *  counts +10, trash -5, and the window's reward follows real difficulty. */
+    int tierOffset;
 
     /** Skip spellcasters. KillQuest's hardest mode refuses them. */
     bool noCaster;

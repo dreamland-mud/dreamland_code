@@ -624,6 +624,26 @@ NMI_SET( QuestSelectWrapper, maxLevel, "потолок уровня самой �
     params.maxLevel = arg.toNumber( );
 }
 
+NMI_GET( QuestSelectWrapper, minTier, "не брать цели сильнее этого тира (1 легенда .. 7 обычный), 0 если без ограничения" )
+{
+    return Register( params.minTier );
+}
+
+NMI_SET( QuestSelectWrapper, minTier, "не брать цели сильнее этого тира (1 легенда .. 7 обычный), 0 если без ограничения" )
+{
+    params.minTier = arg.toNumber( );
+}
+
+NMI_GET( QuestSelectWrapper, tierOffset, "на сколько уровней элита (тир 5) считается выше обычного моба в окне levelDiff, 0 если не учитывать тир" )
+{
+    return Register( params.tierOffset );
+}
+
+NMI_SET( QuestSelectWrapper, tierOffset, "на сколько уровней элита (тир 5) считается выше обычного моба в окне levelDiff, 0 если не учитывать тир" )
+{
+    params.tierOffset = arg.toNumber( );
+}
+
 NMI_GET( QuestSelectWrapper, noCaster, "не брать в цели заклинателей" )
 {
     return Register( params.noCaster );
