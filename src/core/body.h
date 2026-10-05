@@ -33,6 +33,7 @@ struct Mods {
     NameList formsAdd, formsDel;
     NameSet partsAdd, partsDel;
     NameSet bitsAdd[BS_MAX], bitsDel[BS_MAX];
+    NameSet wearlocsAdd, wearlocsDel;
 
     bool empty() const;
 };

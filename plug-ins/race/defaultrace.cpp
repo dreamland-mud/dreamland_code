@@ -555,6 +555,10 @@ void DefaultRace::getBodyInput( Body::Input &in, bool npc ) const
     in.race.partsAdd = MobBody::names( &part_flags, partsAdd.getValue( ) );
     in.race.partsDel = MobBody::names( &part_flags, partsDel.getValue( ) );
 
+    StringList wa( wearlocAdd.getValue( ) ), wd( wearlocDel.getValue( ) );
+    in.race.wearlocsAdd.insert( wa.begin( ), wa.end( ) );
+    in.race.wearlocsDel.insert( wd.begin( ), wd.end( ) );
+
     const XMLFlagsNoEmpty *adds[Body::BS_MAX] = { &act, &off, &aff, &det, &imm, &res, &vuln };
     const XMLFlagsNoEmpty *dels[Body::BS_MAX] = { &actDel, &offDel, &affDel, &detDel, &immDel, &resDel, &vulnDel };
     for (int k = 0; k < Body::BS_MAX; k++) {
