@@ -77,6 +77,7 @@ mob_index_data::mob_index_data( )
     bodyResolved = false;
     wearloc.setRegistry(wearlocationManager);
     offAllowed = 0;
+    offSignature = 0;
     formAcPct = 100;
     bloodless = false;
     edible = true;

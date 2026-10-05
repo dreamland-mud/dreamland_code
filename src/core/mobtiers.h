@@ -37,7 +37,8 @@
  *   "caster_acts": [ "mage", "cleric", "necromancer", "vampire" ],
  *   "caster_vnums": [ ],
  *   "off_priority": { "warrior": [...], "thief": [...], "mage": [...], "cleric": [...],
- *                     "sentient": [...], "animal": [...] }
+ *                     "sentient": [...], "animal": [...] },
+ *   "off_signature": [ "tail", "area_attack", ... ] // race-body off bits always on, whatever the tier
  * }
  */
 #ifndef MOBTIERS_H
@@ -110,6 +111,9 @@ struct Config {
     std::set<std::string> casterActs;
     std::set<int> casterVnums;
     std::map<std::string, std::vector<std::string> > offPriority;
+    // Off bits that are what a body IS (a dragon's tail, a ghost's area attack):
+    // when the race body has them they stay on below the tier's off count.
+    std::set<std::string> offSignature;
     // Boss styles (Kit 2026-10-02): "fortress" fat but mild, "brute" deadly
     // but thin. hp and damage multipliers on top of the tier.
     std::map<std::string, std::pair<double, double> > styles;

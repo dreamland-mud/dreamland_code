@@ -113,6 +113,7 @@ static void copy_reform_fields(mob_index_data &to, const mob_index_data &from)
     to.wearloc.setRegistry(from.wearloc.getRegistry());
     to.wearloc.set(from.wearloc);
     to.offAllowed = from.offAllowed;
+    to.offSignature = from.offSignature;
     to.movetype = from.movetype;
     to.moveverb = from.moveverb;
     to.formAcPct = from.formAcPct;

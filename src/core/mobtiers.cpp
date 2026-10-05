@@ -216,6 +216,11 @@ bool Config::fromJson(const Json::Value &value, std::string &error)
                 for (const auto &e: op[key])
                     offPriority[key].push_back(e.asString());
 
+    const Json::Value &os = value["off_signature"];
+    if (os.isArray())
+        for (const auto &e: os)
+            offSignature.insert(e.asString());
+
     loaded = true;
     return true;
 }
