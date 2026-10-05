@@ -103,6 +103,8 @@ void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitst
     deathReason = "damage";
 }
 
+int fightspam_cast_depth = 0;
+
 bool Damage::hit( bool show )
 {
     if (!canDamage( ))
@@ -114,7 +116,8 @@ bool Damage::hit( bool show )
     // Accumulate for the per-round fightspam-OFF summary (emitted by violence_update).
     // Out of combat the hit prints its own line instead (canSeeMessage), so it must
     // not reach a summary as well.
-    if (dam > 0 && ch != 0 && (ch->fighting != 0 || victim->fighting != 0))
+    if (dam > 0 && ch != 0
+        && (ch->fighting != 0 || victim->fighting != 0 || fightspam_cast_depth > 0))
         ch->roundDamage += dam;
 
     if (show)
@@ -866,7 +869,7 @@ bool Damage::canSeeMessage(Character *to)
     if (dam > 0
         && !to->is_npc( )
         && !IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM)
-        && (ch->fighting != 0 || victim->fighting != 0))
+        && (ch->fighting != 0 || victim->fighting != 0 || fightspam_cast_depth > 0))
         return false;
 
     if (!IS_AWAKE(to) || !to->can_sense( ch ) || !to->can_sense( victim ))

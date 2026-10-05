@@ -185,6 +185,7 @@ void mob_index_data::resolveBody()
         wearloc.set(mobrace->getWearloc());
         bodyResolved = false;
         offAllowed = off_flags;
+        offSignature = 0;
         movetype.clear();
         moveverb.clear();
         formAcPct = 100;
@@ -257,6 +258,13 @@ void mob_index_data::resolveBody()
         for (auto &d: in.race.bitsDel[Body::BS_OFF])
             allowed.erase(d);
         offAllowed = (int)MobBody::bits(&::off_flags, allowed);
+
+        // Signature bits of the race body stay on whatever the tier picks.
+        Body::NameSet sig;
+        for (auto &b: rr.bits[Body::BS_OFF])
+            if (MobBody::tiers().offSignature.count(b) && allowed.count(b))
+                sig.insert(b);
+        offSignature = (int)MobBody::bits(&::off_flags, sig);
     }
 
     for (int s = 0; s < MOBSET_MAX; s++)
@@ -398,6 +406,7 @@ void mob_index_data::deriveNumbers()
 
     if (bodyResolved) {
         bitstring_t enabled = enabled_off(this, tc.offCount(tier, vnum));
+        enabled |= (unsigned int)offSignature;
         enabled |= tierOffAdd;
         enabled |= bodyAdd[MOBSET_OFF];
         enabled &= ~bodyDel[MOBSET_OFF];

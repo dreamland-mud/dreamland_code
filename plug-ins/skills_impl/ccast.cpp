@@ -19,6 +19,7 @@
 #include "rageoath.h"
 #include "fight.h"
 #include "fight_exception.h"
+#include "damage.h"
 #include "magic.h"
 #include "act.h"
 #include "interp.h"
@@ -321,8 +322,15 @@ CMDRUN( cast )
             // would otherwise be added to and double-shown.
             ch->roundDamage = 0;
 
-            if (!fForbidCasting)
+            if (!fForbidCasting) {
+                // Released on VictimDeathException too.
+                struct CastDepthGuard {
+                    CastDepthGuard( ) { fightspam_cast_depth++; }
+                    ~CastDepthGuard( ) { fightspam_cast_depth--; }
+                } castDepthGuard;
+
                 spell->run( ch, target, slevel );
+            }
 
             if (victim)
                 fForbidReaction = mprog_spell( victim, ch, skill, false );

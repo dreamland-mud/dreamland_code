@@ -41,6 +41,11 @@ double spell_combat_save_factor();
 double spell_combat_hit_value();
 double spell_combat_round_attacks();
 
+/* >0 while a player-typed cast is running (ccast). Hits inside it count as
+ * "in combat" for the fightspam-OFF summary even with no fight started, e.g. a
+ * spell cast into the next room. Defined in damage.cpp. */
+extern int fightspam_cast_depth;
+
 class Damage {
 public:
     Damage( Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag = 0 );

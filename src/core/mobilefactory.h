@@ -99,6 +99,7 @@ struct mob_index_data
     bool               bodyResolved;
     GlobalBitvector    wearloc;
     int                offAllowed;     // off bits the body may use (item 39)
+    int                offSignature;   // race-body off bits always on (Kit 2026-10-05)
     DLString           movetype, moveverb;
     int                formAcPct;      // form AC factor x100
     bool               bloodless, edible, canHoldCards;
