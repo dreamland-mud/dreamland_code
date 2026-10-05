@@ -618,6 +618,35 @@ SKILL_RUNP( bite )
 
 
 /*
+ * 'vampiric bite' apply: the bite has landed. Called from the Fenia 'run' once
+ * its checks and the success roll passed (and the bite affect is on): a
+ * draining hit or a sip of blood, by the vampire's bloodlust. The hit math
+ * stays here because Fenia has no one-hit with this THAC0 and damage table.
+ */
+SKILL_APPLY( bite )
+{
+    int cond;
+
+    if (!ch->is_npc( ))
+        cond = ch->getPC( )->desires[desire_bloodlust];
+    else
+        cond = number_range( -10, 80 );
+
+    try {
+        if ((cond < 0 && number_percent( ) > 50) || IS_BLOODLESS( victim )) {
+            VampiricBiteOneHit vb( ch, victim );
+            vb.hit( );
+        }
+        else
+            sucking( ch, victim );
+    }
+    catch (const VictimDeathException &) {
+    }
+
+    return true;
+}
+
+/*
  * 'vampiric touch' skill command
  */
 
