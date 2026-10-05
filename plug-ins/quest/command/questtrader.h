@@ -10,6 +10,7 @@
 #include "xmlmultistring.h"
 #include "xmlboolean.h"
 #include "xmlinteger.h"
+#include "xmlvector.h"
 #include "xmlenumeration.h"
 
 #include "servicetrader.h"
@@ -257,12 +258,12 @@ protected:
 };
 
 /**
- * Upgrades one carried, unworn hero item (girth/ring/weapon) by one tier,
+ * Upgrades one carried, unworn hero item (girth/ring/weapon/bag) by one tier,
  * raising its stats via the .tmp.questreward multiplier. `quest buy upgrade
  * <item>` picks the item by keyword; the tier is stored on the object as the
  * questTier property and mirrored onto the owner (XMLAttributeQuestReward) so a
- * trouble() re-creation keeps the paid tier. Price is a dynamic ladder
- * (1000/1500/2500 qp for T1/T2/T3), not a catalog Price, so no <price> node.
+ * trouble() re-creation keeps the paid tier. Price is a dynamic ladder, not a
+ * catalog Price: <tierPrices> lists the qp for T0->T1, T1->T2, T2->T3.
  */
 class UpgradeQuestArticle : public QuestTradeArticle {
 XML_OBJECT
@@ -273,8 +274,12 @@ public:
     virtual bool available( Character *, NPCharacter * ) const;
     virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
 
+    XML_VARIABLE XMLVectorBase<XMLInteger> tierPrices;
+
 protected:
     virtual void buy( PCharacter *, NPCharacter * );
+
+    int tierPrice( int tier ) const;
 };
 
 class PiercingQuestArticle : public QuestTradeArticle {

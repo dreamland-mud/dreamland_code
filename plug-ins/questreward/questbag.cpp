@@ -13,6 +13,8 @@
 #include "pcharactermanager.h"
 #include "core/object.h"
 #include "save.h"
+#include "act.h"
+#include "l10n.h"
 
 #include "vnum.h"
 #include "def.h"
@@ -91,3 +93,15 @@ bool QuestBag::hourly()
  * The "(Личное)" mark used to be printed here, so only quest bags ever showed
  * it. It is now on every named item, from format_personal_mark in look.cpp.
  */
+
+void QuestBag::wear( Character *ch )
+{
+    ch->pecho(_("{CТвоя сумка ярко вспыхивает.{x"));
+}
+
+// Stats, tiers and the T3 cleanse proc live in Fenia (.tmp.questreward,
+// family "bag"); the level stamp + affects ride PersonalQuestReward::equip.
+DLString QuestBag::questFamily( ) const
+{
+    return "bag";
+}
