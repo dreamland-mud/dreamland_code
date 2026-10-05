@@ -877,6 +877,10 @@ void water_float_update( )
         if (!RoomUtils::isWater( obj->in_room ))
             continue;
 
+        // Shallow water: items rest on the bottom and can be picked up.
+        if (obj->in_room->getSectorType( ) == SECT_WATER_SWIM)
+            continue;
+
         if (IS_SET( obj->extra_flags, ITEM_NOPURGE ))
             continue;
 
