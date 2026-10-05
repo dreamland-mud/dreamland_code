@@ -42,6 +42,7 @@
 #include "interp.h"
 #include "room.h"
 #include "wiznet.h"
+#include "fenia_utils.h"
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"
@@ -348,6 +349,10 @@ PCharacter * account_enter_char(Descriptor *d, const DLString &charName)
     DescriptorStateManager::getThis()->handle(CON_READ_MOTD, CON_PLAYING, d);
 
     interpret_raw(ch, "look");
+
+    // This path skips the nanny's final step, so Fenia announces the arrival
+    // (crystal ball, Discord, wiznet) and stamps the logon time from here.
+    gprog("onAccountEnter", "C", ch);
     return ch;
 }
 
