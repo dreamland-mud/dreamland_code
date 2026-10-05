@@ -46,6 +46,7 @@ const unsigned char compress2_on_str[] = { IAC, WILL, TELOPT_COMPRESS2 };
 const unsigned char via_qry_str[]  = { IAC, WILL, TELOPT_VIA };
 const unsigned char ttype_do_str[] = { IAC, DO, TELOPT_TTYPE };
 const unsigned char gmcp_on_str[] = { IAC, WILL, GMCP };
+const unsigned char mssp_on_str[] = { IAC, WILL, TELOPT_MSSP };
 
 bool process_output( Descriptor *d, bool fPrompt )
 {
@@ -186,6 +187,7 @@ void init_descriptor( int control )
         dnew->writeFd(via_qry_str, sizeof(via_qry_str));
         dnew->writeFd(ttype_do_str, sizeof(ttype_do_str));
         dnew->writeFd(gmcp_on_str, sizeof(gmcp_on_str));
+        dnew->writeFd(mssp_on_str, sizeof(mssp_on_str));
     }
 }
 

@@ -40,6 +40,9 @@
 #define        IAC_REPL                223
 
 #define GMCP    201             /* Generic MUD Communication Protocol */
+#define TELOPT_MSSP 70          /* Mud Server Status Protocol */
+#define MSSP_VAR 1
+#define MSSP_VAL 2
 #define        IAC        255                /* interpret as command: */
 #define        DONT        254                /* you are not to use option */
 #define        DO        253                /* please, you use option */

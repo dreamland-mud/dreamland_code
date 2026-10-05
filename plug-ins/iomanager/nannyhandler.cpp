@@ -39,6 +39,7 @@
 
 #include "websocketrpc.h"
 #include "nannyhandler.h"
+#include "mssp.h"
 #include "feniamanager.h"
 #include "wrappermanagerbase.h"
 #include "wrapperbase.h"
@@ -189,6 +190,12 @@ void NannyHandler::doInterpret( Descriptor *d, char *arg )
 
 int NannyHandler::handle(Descriptor *d, char *arg) 
 {
+    // MUD-list crawlers without telnet negotiation ask in plain text at the login screen.
+    if (mssp_is_request(arg)) {
+        mssp_send_plain(d);
+        return 0;
+    }
+
     switch (d->connected) {
     case CON_CODEPAGE:
         doCodepage( d, arg );

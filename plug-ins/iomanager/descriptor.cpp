@@ -27,6 +27,7 @@
 #include "comm.h"
 #include "outofband.h"
 #include "backdoorhandler.h"
+#include "mssp.h"
 
 
 #include "dreamland.h"
@@ -244,6 +245,9 @@ int Descriptor::inputTelnet( unsigned char i )
                     break;
                 case GMCP:
                     outOfBandManager->run("protoInit", ProtoInitArgs(this, "GMCP"));
+                    break;
+                case TELOPT_MSSP:
+                    mssp_send_telnet(this);
                     break;
             }
             telnet.state = TNS_NORMAL;

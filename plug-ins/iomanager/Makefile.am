@@ -34,7 +34,8 @@ webmanip.cpp \
 lasthost.cpp \
 banflags.cpp \
 ban.cpp \
-impl.cpp
+impl.cpp \
+mssp.cpp
 
 libiomanager_la_MOC = \
 pagerhandler.h \
