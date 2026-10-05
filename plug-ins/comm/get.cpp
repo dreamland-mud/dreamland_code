@@ -277,10 +277,12 @@ static int can_get_obj( Character *ch, Object *obj )
     return GET_OBJ_OK;
 }
 
-static bool get_obj( Character *ch, Object *obj )
+static bool get_obj( Character *ch, Object *obj, bool echo = true )
 {
-    oldact(_("Ты берешь $o4."), ch, obj, 0, TO_CHAR);
-    oldact(_("$c1 берет $o4."), ch, obj, 0, TO_ROOM);
+    if (echo) {
+        oldact(_("Ты берешь $o4."), ch, obj, 0, TO_CHAR);
+        oldact(_("$c1 берет $o4."), ch, obj, 0, TO_ROOM);
+    }
             
     obj_from_room( obj );
     obj_to_char( obj, ch );
@@ -291,12 +293,12 @@ static bool get_obj( Character *ch, Object *obj )
     return false;
 }
 
-static bool get_obj_container( Character *ch, Object *obj, Object *container )
+/*
+ * The per-preposition lines for taking obj out of / off container: whole
+ * sentences (not a spliced RU prep) so each renders per viewer.
+ */
+static void container_get_lines( Object *container, MultiMessage &mChar, MultiMessage &mRoom )
 {
-    // Whole per-preposition sentences (not a spliced RU prep) so each renders
-    // per viewer through oldact(MultiMessage).
-    MultiMessage mChar, mRoom;
-
     switch (container->item_type) {
     case ITEM_KEYRING:
         mChar = _("Ты снимаешь $o4 с $O2.");
@@ -329,9 +331,17 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
         mRoom = _("$c1 берет $o4 из $O2.");
         break;
     }
+}
 
-    oldact( mChar, ch, obj, container, TO_CHAR );
-    oldact( mRoom, ch, obj, container, TO_ROOM );
+static bool get_obj_container( Character *ch, Object *obj, Object *container, bool echo = true )
+{
+    MultiMessage mChar, mRoom;
+    container_get_lines( container, mChar, mRoom );
+
+    if (echo) {
+        oldact( mChar, ch, obj, container, TO_CHAR );
+        oldact( mRoom, ch, obj, container, TO_ROOM );
+    }
 
     obj_from_obj( obj );
     obj_to_char( obj, ch );
@@ -371,6 +381,126 @@ static void echo_not_here( Character *ch, const DLString &arg )
     else
         echo_master(ch, _("Ты не видишь здесь %s."), arg.c_str( ));
 }
+
+/*
+ * Bulk 'get' prints one line per run of identical items -- same prototype,
+ * same name -- instead of one line per item: "Ты берешь обычную стрелу (x40)."
+ * Forty lines of arrows are noise for everyone and a wall for a screen reader.
+ * A run's line goes out when the run ends, naming an item of the run that is
+ * now in ch's inventory; Get triggers fire first, as each item is taken.
+ */
+struct GetRun {
+    Character *ch;
+    Room *room;                 // where the taking happens
+    Object *container;          // null when taking from the floor
+    Object *first = 0;          // compared as an address only, never dereferenced blindly
+    int vnum = 0;
+    DLString name;
+    int count = 0;
+
+    GetRun( Character *ch, Object *container ) : ch( ch ), room( ch->in_room ), container( container ) { }
+
+    bool sameRun( Object *obj ) const
+    {
+        return count > 0 && obj->pIndexData->vnum == vnum
+               && obj->getShortDescr( LANG_DEFAULT ) == name;
+    }
+
+    // Call BEFORE taking obj: closes the previous run if obj starts a new one.
+    void before( Object *obj )
+    {
+        if (count > 0 && !sameRun( obj ))
+            flush( );
+        if (count == 0) {
+            first = obj;
+            vnum = obj->pIndexData->vnum;
+            name = obj->getShortDescr( LANG_DEFAULT );
+        }
+    }
+
+    void taken( )
+    {
+        count++;
+    }
+
+    // An item of the run still in ch's hands: the first one if a trigger did
+    // not destroy it, else any carried twin. Null if none survived.
+    Object * survivor( ) const
+    {
+        for (Object *o = ch->carrying; o; o = o->next_content)
+            if (o == first)
+                return o;
+        for (Object *o = ch->carrying; o; o = o->next_content)
+            if (o->pIndexData->vnum == vnum && o->getShortDescr( LANG_DEFAULT ) == name)
+                return o;
+        return 0;
+    }
+
+    void flush( )
+    {
+        if (count == 0)
+            return;
+
+        // A burning item killed the taker, or something moved them: the line
+        // would land in the wrong room, after the death.
+        if (ch->isDead( ) || ch->in_room != room) {
+            count = 0;
+            first = 0;
+            return;
+        }
+
+        Object *obj = survivor( );
+        if (obj) {
+            if (count == 1)
+                echoOne( obj );
+            else
+                echoMany( obj );
+        }
+        count = 0;
+        first = 0;
+    }
+
+    void echoOne( Object *obj )
+    {
+        if (!container) {
+            oldact(_("Ты берешь $o4."), ch, obj, 0, TO_CHAR);
+            oldact(_("$c1 берет $o4."), ch, obj, 0, TO_ROOM);
+            return;
+        }
+        MultiMessage mChar, mRoom;
+        container_get_lines( container, mChar, mRoom );
+        oldact( mChar, ch, obj, container, TO_CHAR );
+        oldact( mRoom, ch, obj, container, TO_ROOM );
+    }
+
+    void echoMany( Object *obj )
+    {
+        if (!container) {
+            ch->pecho( _("Ты берешь %1$O4 ({Yx%2$d{x)."), obj, count );
+            ch->recho( _("%1$^C1 бер%1$nет|ут %2$O4 ({Yx%3$d{x)."), ch, obj, count );
+            return;
+        }
+
+        if (container->item_type == ITEM_KEYRING
+            || container->item_type == ITEM_CORPSE_NPC
+            || container->item_type == ITEM_CORPSE_PC) {
+            ch->pecho( _("Ты снимаешь %1$O4 с %2$O2 ({Yx%3$d{x)."), obj, container, count );
+            ch->recho( _("%1$^C1 снима%1$nет|ют %2$O4 с %3$O2 ({Yx%4$d{x)."), ch, obj, container, count );
+        }
+        else if (container->item_type == ITEM_CONTAINER && IS_SET(container->value1(), CONT_PUT_ON)) {
+            ch->pecho( _("Ты берешь %1$O4 со %2$O2 ({Yx%3$d{x)."), obj, container, count );
+            ch->recho( _("%1$^C1 бер%1$nет|ут %2$O4 со %3$O2 ({Yx%4$d{x)."), ch, obj, container, count );
+        }
+        else if (container->item_type == ITEM_CONTAINER && IS_SET(container->value1(), CONT_PUT_ON2)) {
+            ch->pecho( _("Ты берешь %1$O4 с %2$O2 ({Yx%3$d{x)."), obj, container, count );
+            ch->recho( _("%1$^C1 бер%1$nет|ут %2$O4 с %3$O2 ({Yx%4$d{x)."), ch, obj, container, count );
+        }
+        else {
+            ch->pecho( _("Ты берешь %1$O4 из %2$O2 ({Yx%3$d{x)."), obj, container, count );
+            ch->recho( _("%1$^C1 бер%1$nет|ут %2$O4 из %3$O2 ({Yx%4$d{x)."), ch, obj, container, count );
+        }
+    }
+};
 
 /*
  *
@@ -453,6 +583,20 @@ CMDRUNP( get )
     bool all, allDot;
 
     argAllObj = arguments.getOneArgument();
+
+    // 'get N*<name>': take up to N matching items, like all.<name> with a cap.
+    int limit = -1;
+    DLString::size_type star = argAllObj.find( '*' );
+    if (star != DLString::npos && star > 0 && is_number( argAllObj.substr( 0, star ).c_str( ) )) {
+        limit = atoi( argAllObj.substr( 0, star ).c_str( ) );
+        if (limit <= 0) {
+            ch->pecho(_("Взять сколько?"));
+            return;
+        }
+        argAllObj = DLString( "all." ) + DLString( argAllObj.substr( star + 1 ) );
+        origArguments = argAllObj + " " + arguments;
+    }
+
     if (arg_is_all( argAllObj )) {
         argTarget = "";
         all = true;
@@ -504,11 +648,16 @@ CMDRUNP( get )
              */
             found = false;
             Room *startRoom = ch->in_room;
+            GetRun run( ch, 0 );
+            int taken = 0;
 
             dreamland->removeOption( DL_SAVE_OBJS );
 
             for ( obj = ch->in_room->contents; obj; obj = obj_next )
             {
+                if (limit > 0 && taken >= limit)
+                    break;
+
                 obj_next = obj->next_content;
                 // A prior get's trigger can extract a neighbour room item;
                 // it then leaves the room -- stop before dereferencing it.
@@ -525,13 +674,17 @@ CMDRUNP( get )
                     if (rc == GET_OBJ_STOP)
                         break;
 
-                    get_obj( ch, obj );
+                    run.before( obj );
+                    get_obj( ch, obj, false );
+                    run.taken( );
+                    taken++;
 
                     if (!still_looting( ch, startRoom ))
                         break;
                 }
             }
 
+            run.flush( );
             dreamland->resetOption( DL_SAVE_OBJS );
 
             if ( !found )
@@ -621,10 +774,15 @@ CMDRUNP( get )
                 
             found = false;
             Room *startRoom = ch->in_room;
+            GetRun run( ch, container );
+            int taken = 0;
 
             for ( obj = container->contains; obj; obj = obj_next )
             {
                 obj_next = obj->next_content;
+
+                if (limit > 0 && taken >= limit)
+                    break;
 
                 // A prior get's trigger can extract a neighbour item from this
                 // container; it then leaves it -- stop before dereferencing it.
@@ -650,24 +808,37 @@ CMDRUNP( get )
 
                 // A CantFetch trigger can extract the container itself; stop
                 // before can_get_obj / the next iteration touches it.
-                if (container->extracted)
+                if (container->extracted) {
+                    run.container = 0;
+                    run.flush( );
                     return;
+                }
 
                 int rc = can_get_obj( ch, obj );
-                if (rc == GET_OBJ_STOP)
+                if (rc == GET_OBJ_STOP) {
+                    run.flush( );
                     return;
+                }
                 if (rc == GET_OBJ_ERR)
                     continue;
 
-                get_obj_container( ch, obj, container );
+                run.before( obj );
+                get_obj_container( ch, obj, container, false );
+                run.taken( );
+                taken++;
 
                 // A Fetch/Get trigger can extract the container mid-loop.
-                if (container->extracted)
+                if (container->extracted) {
+                    run.container = 0;
+                    run.flush( );
                     return;
+                }
 
                 if (!still_looting( ch, startRoom ))
                     break;
             }
+
+            run.flush( );
 
             if (!found) {
                 if (all)
