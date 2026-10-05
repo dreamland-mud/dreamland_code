@@ -46,6 +46,10 @@ double spell_combat_round_attacks();
  * spell cast into the next room. Defined in damage.cpp. */
 extern int fightspam_cast_depth;
 
+/* Bumped once per player-typed cast (ccast), so per-cast messages that a
+ * multi-hit spell would repeat can be shown once. Defined in damage.cpp. */
+extern long fightspam_cast_serial;
+
 class Damage {
 public:
     Damage( Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag = 0 );
