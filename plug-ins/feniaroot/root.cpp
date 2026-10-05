@@ -1632,13 +1632,22 @@ NMI_INVOKE(Root, randomWeaponTier, "(bestTier[, legendaryPerMille]): случа�
     return Register(random_weapon_tier(bestTier, legendaryPerMille));
 }
 
-NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile]): случайная броня на базовом прототипе: slot head|body|arms|hands|legs|feet|shield, profile caster берет цены аффиксов для кастера; true если удалось")
+NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spells]): случайная броня на базовом прототипе: slot head|body|arms|hands|legs|feet|shield, profile caster берет цены аффиксов для кастера; damtype и spells (через запятую) убитого босса дают легендарке его signature-аффикс; true если удалось")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
     int tier = argnum2number(args, 3);
     DLString slot = argnum2string(args, 4);
     DLString profile = args.size() > 4 ? argnum2string(args, 5) : DLString::emptyString;
+    DLString sigDamtype = args.size() > 5 ? argnum2string(args, 6) : DLString::emptyString;
+    std::vector<DLString> sigSpells;
+    if (args.size() > 6) {
+        for (auto &n: argnum2string(args, 7).split(",")) {
+            n.stripWhiteSpace();
+            if (!n.empty())
+                sigSpells.push_back(n);
+        }
+    }
 
     if (obj->item_type != ITEM_ARMOR)
         throw Scripting::Exception("Item is not armor for randomize.");
@@ -1650,6 +1659,7 @@ NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile]): случай
     bool ok = ArmorGenerator(obj, ch->getPC(), tier, slot)
                 .caster(profile == "caster")
                 .alignment(ch->alignment)
+                .signature(sigDamtype, sigSpells)
                 .run();
 
     return Register(ok);

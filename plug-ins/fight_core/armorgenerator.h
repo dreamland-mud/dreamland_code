@@ -150,6 +150,14 @@ public:
 
     ArmorGenerator & caster(bool caster) { this->isCaster = caster; return *this; }
     ArmorGenerator & alignment(int align) { this->align = align; return *this; }
+    /** Boss signature (legendary only): the dead boss's damage type and the
+     *  spells it casts. One of them goes on the item, 50/50, inside the budget. */
+    ArmorGenerator & signature(const DLString &damtype, const std::vector<DLString> &spells)
+    {
+        this->sigDamtype = damtype;
+        this->sigSpells = spells;
+        return *this;
+    }
 
     /** Roll everything. False when the configuration can't serve this slot. */
     bool run();
@@ -159,6 +167,8 @@ protected:
 
 private:
     bool pickNoun();
+    /** Pool index of the boss signature affix, -1 when there is none. */
+    int pickSignature() const;
     void applyAffixes();
     void applyOne(const Candidate &c, int count);
     void assignAC();
@@ -169,6 +179,8 @@ private:
     DLString defaultMaterial() const;
 
     Json::Value nounConfig;
+    DLString sigDamtype;
+    std::vector<DLString> sigSpells;
     DLString wornBuff;
     Json::Value procs;
 };
