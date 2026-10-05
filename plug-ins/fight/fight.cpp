@@ -454,18 +454,27 @@ void fightspam_flush_between_rounds( Character *att, Character *victim )
     snprintf( num, sizeof( num ), "{D[{x{%c%d{x{D]{x",
               round_damage_colour( perc ), att->roundDamage );
 
-    for (Character *to = att->in_room->people; to != 0; to = to->next_in_room) {
-        if (to->getPC( ) == 0 || to->extracted)
-            continue;
-        if (!IS_AWAKE(to) || IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM))
-            continue;
-        if (!to->can_sense( att ) || !to->can_sense( victim ))
+    // A ranged cast lands in another room: show the line there as well.
+    Room *rooms[2] = { att->in_room,
+                       victim->in_room && victim->in_room != att->in_room ? victim->in_room : 0 };
+
+    for (int r = 0; r < 2; r++) {
+        if (rooms[r] == 0)
             continue;
 
-        // Args in reference order (1=attacker, 2=victim, 3=number) so the act
-        // formatter reads each va_arg with the right type -- same as the round
-        // summary line above.
-        to->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, victim, num );
+        for (Character *to = rooms[r]->people; to != 0; to = to->next_in_room) {
+            if (to->getPC( ) == 0 || to->extracted)
+                continue;
+            if (!IS_AWAKE(to) || IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM))
+                continue;
+            if (!to->can_sense( att ) || !to->can_sense( victim ))
+                continue;
+
+            // Args in reference order (1=attacker, 2=victim, 3=number) so the act
+            // formatter reads each va_arg with the right type -- same as the round
+            // summary line above.
+            to->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, victim, num );
+        }
     }
 
     att->roundDamage = 0;
