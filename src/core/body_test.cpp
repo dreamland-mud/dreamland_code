@@ -64,6 +64,8 @@ static void readMods(const Json::Value &v, Mods &m)
     m.formsDel = listOf(v["forms_del"]);
     m.partsAdd = setOf(v["parts_add"]);
     m.partsDel = setOf(v["parts_del"]);
+    m.wearlocsAdd = setOf(v["wearlocs_add"]);
+    m.wearlocsDel = setOf(v["wearlocs_del"]);
     for (int k = 0; k < BS_MAX; k++) {
         string key = bitSetNames[k];
         m.bitsAdd[k] = setOf(v[key + "_add"]);

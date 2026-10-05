@@ -135,6 +135,7 @@ public:
     // and the getters return the resolved body.
     XML_VARIABLE XMLStringNoEmpty  forms;
     XML_VARIABLE XMLFlagsNoEmpty   partsAdd, partsDel;
+    XML_VARIABLE XMLStringNoEmpty  wearlocAdd, wearlocDel;
     XML_VARIABLE XMLFlagsNoEmpty   actDel, offDel, affDel, detDel, immDel, resDel, vulnDel;
     XML_VARIABLE XMLEnumerationNoEmpty damtype;
     XML_VARIABLE XMLStringNoEmpty  material;

@@ -15,6 +15,8 @@ bool Mods::empty() const
 {
     if (!formsAdd.empty() || !formsDel.empty() || !partsAdd.empty() || !partsDel.empty())
         return false;
+    if (!wearlocsAdd.empty() || !wearlocsDel.empty())
+        return false;
     for (int k = 0; k < BS_MAX; k++)
         if (!bitsAdd[k].empty() || !bitsDel[k].empty())
             return false;
@@ -433,6 +435,11 @@ Result resolve(const Config &cfg, const Input &in)
         if (pi != cfg.parts.end())
             delAll(W, pi->second.forbidsWearlocs);
     }
+    // race, then prototype: slots no part explains (a ghost's wield, no hair on a troll)
+    addAll(W, in.race.wearlocsAdd);
+    delAll(W, in.race.wearlocsDel);
+    addAll(W, in.proto.wearlocsAdd);
+    delAll(W, in.proto.wearlocsDel);
 
     // 9. movetype
     bool hooves = parts.count("two_hooves") || parts.count("four_hooves");
