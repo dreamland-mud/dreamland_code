@@ -272,12 +272,11 @@ bool apply_mob_tier(NPCharacter *mob, int level, int tier)
     m.tier = tier;
     m.formAc = mob->pIndexData->formAcPct / 100.0;
     m.sentient = IS_SET(mob->form, FORM_SENTIENT);
-    m.acts = MobBody::names(&act_flags, (unsigned int)mob->act);
+    m.acts = MobBody::names(&act_flags, (unsigned int)mob->act.getValue());
 
     MobTiers::Centres c = tc.centres(m);
-    Race *race = mob->getRace();
-    int hp = max(1, (int)lround(c.hp * race->getHpMult()));
-    int dam = max(1, (int)lround(c.dmgAve * race->getDmgMult()));
+    int hp = max(1, (int)lround(c.hp * mob->getRace()->getHpMult()));
+    int dam = max(1, (int)lround(c.dmgAve * mob->getRace()->getDmgMult()));
 
     int n = level / 10 + 1;
     int t = max(2, (int)lround(2.0 * dam / n - 1));
