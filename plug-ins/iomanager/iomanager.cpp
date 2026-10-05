@@ -8,8 +8,10 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <map>
 
 #include "so.h"
+#include "logstream.h"
 #include "lastlogstream.h"
 #include "mocregistrator.h"
 
@@ -18,8 +20,27 @@
 #include "serversocketcontainer.h"
 
 #include "dlscheduler.h"
+#include "dreamland.h"
 #include "pcharacter.h"
 #include "descriptor.h"
+
+/*
+ * When each descriptor last sent input, for the login idle timeout. Lives here
+ * in the IO layer rather than on Descriptor, whose header ~110 files include.
+ * The fd guards against a freed descriptor's address being reused.
+ */
+struct InputStamp {
+    int fd;
+    time_t at;
+};
+static std::map<Descriptor *, InputStamp> lastInput;
+
+static void stamp_input( Descriptor *d )
+{
+    InputStamp &s = lastInput[d];
+    s.fd = d->descriptor;
+    s.at = dreamland->getCurrentTime( );
+}
 
 
 void
@@ -150,6 +171,49 @@ IOManager::ioPoll()
         throw Exception(DLString("Game_loop: select: poll::") + strerror( errno ));
 }
 
+int IOManager::idleSeconds( Descriptor *d )
+{
+    auto it = lastInput.find( d );
+
+    if (it == lastInput.end( ) || it->second.fd != d->descriptor) {
+        stamp_input( d );
+        return 0;
+    }
+
+    return dreamland->getCurrentTime( ) - it->second.at;
+}
+
+void IOManager::kickDescriptor( Descriptor *d )
+{
+    if (d->connected != CON_CLOSED)
+        kick( d );
+}
+
+int IOManager::kickIdleLogins( int limit )
+{
+    int cnt = 0;
+
+    for (Descriptor *d = descriptor_list; d; d = d->next) {
+        if (d->connected != CON_NANNY && d->connected != CON_CODEPAGE)
+            continue;
+
+        // Closing a nanny extracts its character; mid-remort that is a life.
+        if (d->character && !d->character->is_npc( )
+            && d->character->getPC( )->getAttributes( ).isAvailable( "remorting" ))
+            continue;
+
+        if (idleSeconds( d ) < limit)
+            continue;
+
+        LogStream::sendNotice( ) << "Login idle timeout: closing descriptor " << d->descriptor
+                                 << " from " << d->host << endl;
+        kick( d );
+        cnt++;
+    }
+
+    return cnt;
+}
+
 void
 IOManager::kick(Descriptor *d)
 {
@@ -174,6 +238,14 @@ IOManager::ioRead()
         if ( FD_ISSET( d->descriptor, &exc_set ) )
             kick(d);
 
+    // Dead login screens, swept once a minute.
+    static time_t lastSweep = 0;
+    time_t now = dreamland->getCurrentTime( );
+    if (now - lastSweep >= 60) {
+        lastSweep = now;
+        kickIdleLogins( LOGIN_IDLE_TIMEOUT );
+    }
+
     /*
      * Process input.
      */
@@ -186,6 +258,7 @@ IOManager::ioRead()
 
         if (FD_ISSET( d->descriptor, &in_set )) {
             LastLogStream::send( ) <<  "Input data"  << endl;
+            stamp_input( d );
 
             if (ch)
                 ch->timer = 0;
@@ -261,6 +334,7 @@ IOManager::ioFinaly()
         if (d->connected != CON_CLOSED)
             continue;
 
+        lastInput.erase( d );
         d->slay( );
     }
 }

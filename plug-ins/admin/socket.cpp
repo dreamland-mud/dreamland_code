@@ -15,6 +15,7 @@
 
 #include "admincommand.h"
 #include "serversocketcontainer.h"
+#include "iomanager.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -27,9 +28,64 @@
 
 const char *ttype_name( int ttype );
 
+/*
+ * socket kick <num>   -- close one descriptor (not your own)
+ * socket kick idle    -- close login screens silent past the idle timeout
+ */
+static void socket_kick( Character *ch, DLString args )
+{
+    IOManager *io = IOManager::getThis( );
+    DLString what = args.getOneArgument( );
+
+    if (what.empty( )) {
+        ch->pecho( "Usage: socket kick <num> | socket kick idle" );
+        return;
+    }
+
+    if (what == "idle") {
+        int cnt = io->kickIdleLogins( IOManager::LOGIN_IDLE_TIMEOUT );
+        ch->pecho( "%d idle login descriptor%s closed.", cnt, cnt == 1 ? "" : "s" );
+        return;
+    }
+
+    if (!what.isNumber( )) {
+        ch->pecho( "Usage: socket kick <num> | socket kick idle" );
+        return;
+    }
+
+    int num = what.toInt( );
+    for (Descriptor *d = descriptor_list; d; d = d->next) {
+        if (d->descriptor != num || d->connected == CON_CLOSED)
+            continue;
+
+        if (d == ch->desc) {
+            ch->pecho( "That is your own connection." );
+            return;
+        }
+
+        if (d->character && d->character->get_trust( ) > ch->get_trust( )) {
+            ch->pecho( "You can't." );
+            return;
+        }
+
+        io->kickDescriptor( d );
+        ch->pecho( "Descriptor %d closed.", num );
+        return;
+    }
+
+    ch->pecho( "No open descriptor %d.", num );
+}
+
 CMDADM( socket )
 {
     DLString arg = constArguments;
+    DLString cmd = arg.getOneArgument( );
+
+    if (cmd == "kick") {
+        socket_kick( ch, arg );
+        return;
+    }
+
     PCMemoryInterface *pcm;
     Descriptor *d;
     DLString name;
@@ -72,8 +128,10 @@ CMDADM( socket )
             idle = fmt(0, "%3d", d->character->timer);
         }
         else {
+            // A login screen's idle is minutes since its last input, so a dead
+            // line (see socket kick idle) shows up as a big number.
             logon = "-----";
-            idle = "   ";
+            idle = fmt(0, "%3d", IOManager::getThis( )->idleSeconds( d ) / 60);
         }
         
         switch (d->connected) {
