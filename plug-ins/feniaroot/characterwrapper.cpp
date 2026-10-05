@@ -2771,6 +2771,19 @@ NMI_INVOKE( CharacterWrapper, donatesTo, "(ch): раса этого персон
     return getTarget( )->getRace( )->getAttitude( *other->getRace( ) ).isSet( RACE_DONATES );
 }
 
+NMI_INVOKE( CharacterWrapper, is_safe_msg, "(vict): то же, что is_safe, но с сообщением 'под защитой богов', как у C++ умений" )
+{
+    checkTarget( );
+    return ::is_safe( target, arg2character( get_unique_arg( args ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, setLastFightTime, "(): отметить персонажа как недавно сражавшегося (адреналин)" )
+{
+    checkTarget( );
+    target->setLastFightTime( );
+    return Register( );
+}
+
 NMI_INVOKE( CharacterWrapper, is_safe_spell, "(vict): защищают ли боги vict от наших арийных заклинаний" )
 {
     checkTarget();
