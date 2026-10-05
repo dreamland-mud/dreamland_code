@@ -496,9 +496,10 @@ double item_weapon_flag_points(int weaponFlags, int level, bool caster, Characte
     for (auto const &affix: all["flag"]["values"]) {
         if (!affix.isMember("points_by_level"))
             continue;
+        // FlagTable values are bit NUMBERS (flaming = 0), not masks.
         DLString name = affix["value"].asString();
         bitnumber_t bit = weapon_type2.value(name);
-        if (bit == (bitnumber_t)NO_FLAG || bit == 0 || !IS_SET(weaponFlags, bit))
+        if (bit == (bitnumber_t)NO_FLAG || !Bitstring(weaponFlags).isSetBitNumber(bit))
             continue;
         s += item_points_by_level(affix["points_by_level"], level, caster ? 1 : -1)
              * item_fit_alignment(target, name);
@@ -510,8 +511,7 @@ double item_detect_points(bitstring_t bits, bool caster, Character *target)
 {
     double s = 0;
     for (int i = 0; i < detect_flags.size; i++) {
-        bitstring_t bit = detect_flags.fields[i].value;
-        if (bit == 0 || !IS_SET(bits, bit))
+        if (!Bitstring(bits).isSetBitNumber(detect_flags.fields[i].value))
             continue;
         const char *name = detect_flags.fields[i].name;
         double base = item_value("detects", name, 0, caster ? 1 : 0);
@@ -529,8 +529,7 @@ double item_extra_points(bitstring_t bits, bool caster)
 {
     double s = 0;
     for (int i = 0; i < extra_flags.size; i++) {
-        bitstring_t bit = extra_flags.fields[i].value;
-        if (bit != 0 && IS_SET(bits, bit))
+        if (Bitstring(bits).isSetBitNumber(extra_flags.fields[i].value))
             s += item_value("extras", extra_flags.fields[i].name, 0, caster ? 1 : 0);
     }
     return s;
