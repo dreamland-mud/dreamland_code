@@ -667,8 +667,7 @@ static bool refit_eligible_vnum( int vnum )
 /** The qp fee to refit one item. The bag never charges; a five-level gap or less
  *  is free so a death de-level does not nickel-and-dime; otherwise the fee scales
  *  with both the gap and the item's paid tier, landing at a small fraction of the
- *  item's value. Tier is read forward-compatibly from the questTier property
- *  (absent today -> 0), so this needs no change when the upgrade ladder ships. */
+ *  item's value. Tier comes from the questTier property (absent -> 0). */
 static int refit_item_fee( Object *obj, PCharacter *client )
 {
     int gap = obj->level - client->getRealLevel( );
@@ -791,17 +790,17 @@ void RefitQuestArticle::buy( PCharacter *, NPCharacter * )
  *---------------------------------------------------------------------------*/
 #define QUEST_UPGRADE_MAX_TIER 3
 
-/** The hero items that carry an upgrade tier: girth, ring, weapon, and the
+/** The hero items that carry an upgrade tier: girth, ring, weapon, bag, and the
  *  keyring (a girth clone, vnum 119, binds QuestGirth so its questTier works the
  *  same way). Including the keyring gives its owner a direct upgrade path --
- *  otherwise, having replaced the girth, they could never raise the tier again.
- *  The bag has no stats and is excluded. */
+ *  otherwise, having replaced the girth, they could never raise the tier again. */
 static bool upgrade_eligible_vnum( int vnum )
 {
     switch (vnum) {
     case OBJ_VNUM_QUESTGIRTH:   // 94
     case OBJ_VNUM_QUESTRING:    // 95
     case OBJ_VNUM_QUESTWEAPON:  // 96
+    case OBJ_VNUM_QUESTBAG:     // 103
     case OBJ_VNUM_QUESTKEYRING: // 119
         return true;
     }
@@ -809,21 +808,23 @@ static bool upgrade_eligible_vnum( int vnum )
     return false;
 }
 
-/** qp to go from `tier` to `tier`+1: T0->T1 1000, T1->T2 1500, T2->T3 2500
- *  (base item is 1000, so a maxed item totals 6000). A maxed item returns 0 and
- *  is refused before this is charged. */
-static int upgrade_price( int tier )
+/** qp to go from `tier` to `tier`+1, read from <tierPrices>; the fallback is the
+ *  shipped ladder 750/1000/1500. A maxed item returns 0 and is refused before
+ *  this is charged. */
+int UpgradeQuestArticle::tierPrice( int tier ) const
 {
-    switch (tier) {
-    case 0: return 1000;
-    case 1: return 1500;
-    case 2: return 2500;
-    }
+    static const int defaults[QUEST_UPGRADE_MAX_TIER] = { 750, 1000, 1500 };
 
-    return 0;
+    if (tier < 0 || tier >= QUEST_UPGRADE_MAX_TIER)
+        return 0;
+
+    if (tier < (int)tierPrices.size( ) && tierPrices[tier].getValue( ) > 0)
+        return tierPrices[tier].getValue( );
+
+    return defaults[tier];
 }
 
-/** Upgradeable = a hero girth/ring/weapon, not worn (a worn item's live affects
+/** Upgradeable = a hero girth/ring/weapon/bag, not worn (a worn item's live affects
  *  would drift from its stored level until re-worn -- same reason Refit requires
  *  unworn), below the tier cap. */
 static bool upgrade_eligible( Object *obj )
@@ -918,7 +919,7 @@ bool UpgradeQuestArticle::purchase( Character *client, NPCharacter *questman, co
     }
 
     int tier = atoi( target->getProperty( "questTier" ).c_str( ) );
-    int fee = upgrade_price( tier );
+    int fee = tierPrice( tier );
 
     if (fee <= 0) {
         say_act( client, questman, _("Эта вещь уже улучшена до предела, $c1.") );

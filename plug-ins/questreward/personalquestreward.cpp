@@ -22,15 +22,14 @@
 
 using namespace Scripting;
 
-// Apply locations a girth/ring hangs, in the exact order the old
-// QuestGirth::equip / QuestRing::equip used. The membership of this list is
-// also the "does this family own the location" test for the re-scale path: an
-// affect on a location outside it (a player's enchant on saves, say) is left
-// untouched, matching the old switch's `default: return`.
+// Apply locations a girth/ring/bag may hang, in the order the old
+// QuestGirth::equip / QuestRing::equip used, saves last (the bag's). Membership
+// is only the candidate set: Fenia answers null for a location the family does
+// not own, and such an affect (a player's enchant, say) is left untouched.
 static const int PERSONAL_APPLIES[] = {
     APPLY_INT, APPLY_WIS, APPLY_CON, APPLY_DEX, APPLY_STR,
     APPLY_AC, APPLY_HIT, APPLY_MANA, APPLY_MOVE,
-    APPLY_HITROLL, APPLY_DAMROLL, -1
+    APPLY_HITROLL, APPLY_DAMROLL, APPLY_SAVES, -1
 };
 
 static bool personal_owns_location( int loc )
@@ -105,7 +104,7 @@ bool PersonalQuestReward::feniaModifier( Character *ch, const DLString &fam, int
  * hang the full personal apply list, sourcing every modifier from Fenia. First
  * wear adds the affects; later wears re-scale them in place. QuestWeapon
  * overrides this for its conditional affects plus the weapon generator; a
- * reward with no family (base, QuestBag) does nothing.
+ * reward with no family (the base class) does nothing.
  */
 void PersonalQuestReward::equip( Character *ch )
 {

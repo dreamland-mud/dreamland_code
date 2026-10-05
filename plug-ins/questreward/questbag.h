@@ -17,6 +17,8 @@ public:
         
         virtual bool canLock( Character * );
         virtual bool hourly();
+        virtual void wear( Character * );
+        virtual DLString questFamily( ) const;
 };
 
 #endif

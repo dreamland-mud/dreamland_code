@@ -24,7 +24,7 @@ public:
         // numbers live in Fenia (.tmp.questreward), the plumbing stays here.
         // Base equip() drives the shared girth/ring path; QuestWeapon overrides
         // it for its conditional affects and weapon generator. A reward family
-        // with an empty questFamily() (base, QuestBag) has no stats and equip()
+        // with an empty questFamily() (the base class) has no stats and equip()
         // is a no-op.
         virtual void equip( Character * );
 
