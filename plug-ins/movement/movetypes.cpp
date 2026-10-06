@@ -49,15 +49,15 @@ const struct movetype_t movetypes [] = {
  },
  // Text-only rows, mob reform §3.6a. danger/wait/sneak copy the base row
  // (galloping, clattering: riding; trotting, crawling, hopping: walk;
- // slithering, oozing: slink). RU/UA wording pending translators' review.
+ // slithering, oozing: slink). RU/UA wording reviewed by Kit 2026-10-05.
  { MOVETYPE_GALLOPING,  MOVETYPE_DANGEROUS, 1, true,  "galloping",  "",        "",         "прискака%1$Gло|л|ла|ли",          "ускака%1$Gло|л|ла|ли",
    "gallops in",                "gallops off",                 "прискака%1$Gло|в|ла|ли",         "поскака%1$Gло|в|ла|ли",
  },
- { MOVETYPE_CLATTERING, MOVETYPE_DANGEROUS, 1, true,  "clattering", "",        "",         "процока%1$Gло|л|ла|ли",           "процока%1$Gло|л|ла|ли",
-   "clatters in",               "clatters off",                "процока%1$Gло|в|ла|ли",          "процока%1$Gло|в|ла|ли",
+ { MOVETYPE_CLATTERING, MOVETYPE_DANGEROUS, 1, true,  "clattering", "",        "",         "прицока%1$Gло|л|ла|ли",           "уцока%1$Gло|л|ла|ли",
+   "clatters in",               "clatters off",                "прицока%1$Gло|в|ла|ли",          "поцока%1$Gло|в|ла|ли",
  },
- { MOVETYPE_TROTTING,   MOVETYPE_NORMAL,    1, true,  "trotting",   "",        "",         "прибежа%1$Gло|л|ла|ли",           "убежа%1$Gло|л|ла|ли",
-   "trots in",                  "trots off",                   "прибіг%1$Gло||ла|ли",            "побіг%1$Gло||ла|ли",
+ { MOVETYPE_TROTTING,   MOVETYPE_NORMAL,    1, true,  "trotting",   "",        "",         "притруси%1$Gло|л|ла|ли",          "утруси%1$Gло|л|ла|ли",
+   "trots in",                  "trots off",                   "притруси%1$Gло|в|ла|ли",         "потруси%1$Gло|в|ла|ли",
  },
  { MOVETYPE_CRAWLING,   MOVETYPE_NORMAL,    1, true,  "crawling",   "",        "",         "приполз%1$Gло||ла|ли",            "уполз%1$Gло||ла|ли",
    "crawls in",                 "crawls off",                  "приповз%1$Gло||ла|ли",           "поповз%1$Gло||ла|ли",
