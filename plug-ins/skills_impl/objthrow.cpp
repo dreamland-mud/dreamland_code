@@ -346,7 +346,10 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
         if ( (bExit = dest_room->exit[opdoor]) == 0
             || bExit->u1.to_room != back_room)
         {
-            errbuf << "Ты не сможешь добраться до них через односторонний проход." << endl;
+            errbuf << lmsg(viewerLang(ch),
+                           "You can't reach them through a one-way passage.",
+                           "Ты не сможешь добраться до них через односторонний проход.",
+                           "Ти не зможеш дістатися до них через односторонній прохід.") << endl;
             return 0;
         }
 
@@ -354,7 +357,11 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
             return target;
     }
     
-    errbuf << "Ты не видишь " << dirs[door].where << " никого с таким именем." << endl;
+    errbuf << fmt(0, lmsg(viewerLang(ch),
+                          "Looking %s, you see no one by that name.",
+                          "Ты не видишь %s никого с таким именем.",
+                          "Ти не бачиш %s нікого з таким імʼям."),
+                  direction_word(viewerLang(ch), door, DIR_CASE_AT)) << endl;
     return 0;
 }
         
