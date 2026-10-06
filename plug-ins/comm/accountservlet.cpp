@@ -60,6 +60,9 @@ void password_set(PCMemoryInterface *pci, const DLString &plainText);
 // shared so the in-game and web email paths cannot disagree on what they mail to.
 bool account_is_ascii_email(const DLString &s);
 
+// Defined in account.cpp: the bank-ceiling notice every link path prints.
+void account_bank_cap_notice(PCharacter *ch, const DLString &id);
+
 // ---- helpers ---------------------------------------------------------------
 
 // A per-surface web token authenticates the dreamland_web /account broker without
@@ -369,6 +372,8 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
         DLString who = AccountManager::echoSafe(display.empty() ? value : display);
         online->pecho(_("Твой код привязки использован (%1$s: %2$s). Если это не ты -- сразу смени пароль командой {yпароль{x."),
                       type.c_str(), who.c_str());
+        if (current.empty())
+            account_bank_cap_notice(online, id);
     }
 
     Json::Value body;

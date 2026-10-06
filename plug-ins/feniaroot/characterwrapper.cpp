@@ -771,6 +771,17 @@ NMI_INVOKE( CharacterWrapper, acctBankAdd, "(gold, silver, qp): изменить
     return Register( AccountManager::bankAdd( acct,
         argnum2number( args, 1 ), argnum2number( args, 2 ), argnum2number( args, 3 ) ) );
 }
+NMI_INVOKE( CharacterWrapper, acctBankCap, "(): сколько золота можно держать в общем банке аккаунта; NONE без аккаунта" )
+{
+    checkTarget( );
+    CHK_NPC
+
+    DLString acct = bank_account_of( target->getPC( ) );
+    if (acct.empty( ))
+        return Register( );
+    return Register( AccountManager::bankCapGold( acct ) );
+}
+
 NMI_GET( CharacterWrapper, trust, "уровень привилегий" )
 {
     PCMemoryInterface *pci;
