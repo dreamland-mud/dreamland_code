@@ -4482,7 +4482,7 @@
    }
   },
   {
-   "name": "modron",
+   "name": "object",
    "input": {
     "forms": [
      "construct",
@@ -5068,7 +5068,7 @@
    }
   },
   {
-   "name": "school monster",
+   "name": "homunculus",
    "input": {
     "forms": [
      "nonadoptable",
