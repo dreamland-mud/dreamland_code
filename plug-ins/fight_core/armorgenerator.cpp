@@ -55,18 +55,6 @@ bool armor_slot_exists(const DLString &slot)
             && armor_names.isMember(slot) && armor_names[slot].isArray();
 }
 
-int item_affix_price(const DLString &section, const DLString &value, bool caster)
-{
-    if (!item_affixes.isMember(section))
-        return 0;
-
-    for (auto const &affix: item_affixes[section]["values"])
-        if (affix["value"].asString() == value)
-            return (caster ? affix["price_caster"] : affix["price_melee"]).asInt();
-
-    return 0;
-}
-
 /** Proc chance per combat round by the affix's tier floor (Kit 2026-10-02):
  *  rare 3%, epic 5%, legendary 8%. */
 static int proc_chance(int tierFloor)
@@ -107,10 +95,9 @@ void ItemAffixRoller::learnPlayerGroups()
             groupCounts[g]++;
     }
 
-    // One item model: a group needs 2+ learned skills to be worth a +level (Kit 2026-10-04).
-    int need = item_model_enabled() ? 2 : 1;
+    // A group needs 2+ learned skills to be worth a +level (Kit 2026-10-04).
     for (auto const &gc: groupCounts)
-        if (gc.second >= need)
+        if (gc.second >= 2)
             playerGroups.insert(gc.first);
 }
 
@@ -303,7 +290,7 @@ bool ItemAffixRoller::candidateAllowed(const Json::Value &section, const Json::V
     }
 
     // Level windows (one item model): ac ends at 40, sanctuary-family buffs start at 30.
-    if (item_model_enabled() && !item_level_window_ok(affix, obj->level))
+    if (!item_level_window_ok(affix, obj->level))
         return false;
 
     // A worn buff that wants a skill of the wearer's own (concentrate).
@@ -328,7 +315,7 @@ int ItemAffixRoller::candidatePrice(const DLString &secName, const Json::Value &
         return affix["price_legendary"].asInt();
 
     double points;
-    if (item_model_enabled() && modelPoints(secName, affix, points))
+    if (modelPoints(secName, affix, points))
         return modelPrice(points);
 
     return (isCaster ? affix["price_caster"] : affix["price_melee"]).asInt();
@@ -457,9 +444,6 @@ DLString ItemAffixRoller::pickProfile() const
 
 double ItemAffixRoller::pickMultiplier(const Json::Value &section, const Json::Value &affix) const
 {
-    if (!item_model_enabled())
-        return 1;
-
     DLString cls = pch ? pch->getProfession()->getName() : DLString::emptyString;
     DLString profile = pickProfile();
 
@@ -581,9 +565,6 @@ bool ItemAffixRoller::fitAllowed(const DLString &secName, const DLString &value)
 
 double ItemAffixRoller::windowCurve() const
 {
-    if (!item_model_enabled())
-        return 1.0;
-
     double curve = item_level_curve(obj->level);
     // measure.armor_budget_mult [melee, caster]: armor tier windows per profile.
     // Melee armor came out ~1.35x today's stat strength on honest prices; Kit
@@ -623,9 +604,9 @@ void ItemAffixRoller::collectCandidates()
             if (!valueAllowed(secName, value))
                 continue;
 
-            if (item_model_enabled() && !fitAllowed(secName, value))
+            if (!fitAllowed(secName, value))
                 continue;
-            if (item_model_enabled() && alreadyHas(secName, affix))
+            if (alreadyHas(secName, affix))
                 continue;
 
             // Skill groups: only groups the killer has a learned skill in.
@@ -730,16 +711,12 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
     // measure.top_max per item, and once one is on, the next weighs top_repeat_weight
     // (Kit 2026-10-04: two tops max, very rarely).
     std::vector<bool> isTop(pool.size(), false);
-    int topMax = 1000;
-    double topRepeat = 1;
-    if (item_model_enabled()) {
-        for (int i = 0; i < (int)pool.size(); i++)
-            isTop[i] = (*pool[i].affix)["top"].asBool();
-        topMax = (int)item_value("measure", "top_max", 1000);
-        topRepeat = item_value("measure", "top_repeat_weight", 1);
-    }
+    for (int i = 0; i < (int)pool.size(); i++)
+        isTop[i] = (*pool[i].affix)["top"].asBool();
+    int topMax = (int)item_value("measure", "top_max", 1000);
+    double topRepeat = item_value("measure", "top_repeat_weight", 1);
     std::vector<int> coreChance;
-    if (item_model_enabled() && kind == "armor") {
+    if (kind == "armor") {
         const Json::Value &core = item_value_object("measure", "core_affixes")[isCaster ? "caster" : "melee"];
         std::set<DLString> coreNames;
         for (auto const &n: core)
@@ -749,27 +726,25 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
         for (auto const &c: item_value_object("measure", "core_chance"))
             coreChance.push_back(c.asInt());
     }
-    if (item_model_enabled()) {
-        // A value may be a number (both profiles) or [melee, caster].
-        int col = isCaster ? 1 : 0;
-        statFloor = item_points_by_level(item_value_object("measure", "stat_floor"), obj->level, col);
-        // Legendary armor keeps a share of its budget in stats (Kit 2026-10-04).
-        if (tier == BEST_TIER && kind == "armor")
-            statFloor = max(statFloor, item_value("measure", "legendary_stat_share", 0));
-        if (maxAffixesM > 0)
-            maxAffixes += (int)std::round(item_points_by_level(item_value_object("measure", "max_affixes_bonus"), obj->level, col));
+    // A value may be a number (both profiles) or [melee, caster].
+    int col = isCaster ? 1 : 0;
+    statFloor = item_points_by_level(item_value_object("measure", "stat_floor"), obj->level, col);
+    // Legendary armor keeps a share of its budget in stats (Kit 2026-10-04).
+    if (tier == BEST_TIER && kind == "armor")
+        statFloor = max(statFloor, item_value("measure", "legendary_stat_share", 0));
+    if (maxAffixesM > 0)
+        maxAffixes += (int)std::round(item_points_by_level(item_value_object("measure", "max_affixes_bonus"), obj->level, col));
 
-        const Json::Value &secs = item_value_object("measure", "stat_sections");
-        std::set<DLString> statSections;
-        if (secs.isArray())
-            for (auto const &sec: secs)
-                statSections.insert(sec.asString());
-        else
-            statSections = { "armor_stats", "primary_stats", "affect_packs" };
-        for (int i = 0; i < (int)pool.size(); i++) {
-            isStat[i] = statSections.count(pool[i].section) > 0 && pool[i].price > 0;
-            floorExempt[i] = (*pool[i].affix)["floor_exempt"].asBool();
-        }
+    const Json::Value &secs = item_value_object("measure", "stat_sections");
+    std::set<DLString> statSections;
+    if (secs.isArray())
+        for (auto const &sec: secs)
+            statSections.insert(sec.asString());
+    else
+        statSections = { "armor_stats", "primary_stats", "affect_packs" };
+    for (int i = 0; i < (int)pool.size(); i++) {
+        isStat[i] = statSections.count(pool[i].section) > 0 && pool[i].price > 0;
+        floorExempt[i] = (*pool[i].affix)["floor_exempt"].asBool();
     }
 
     for (int attempt = 0; attempt < 30; attempt++) {
@@ -1012,22 +987,18 @@ bool ItemAffixRoller::applyShared(const Candidate &c, int count)
 
         if (c.value == "skillgroup") {
             int gn = -1;
-            if (item_model_enabled()) {
-                // Same 2+ skills rule as the named groups, weighted by how many the killer has.
-                int weights = 0;
-                for (int g: playerGroups)
-                    weights += groupCounts[g];
-                int dice = weights > 0 ? number_range(1, weights) : 0;
-                for (int g: playerGroups) {
-                    dice -= groupCounts[g];
-                    if (dice <= 0) {
-                        gn = g;
-                        break;
-                    }
+            // Same 2+ skills rule as the named groups, weighted by how many the killer has.
+            int weights = 0;
+            for (int g: playerGroups)
+                weights += groupCounts[g];
+            int dice = weights > 0 ? number_range(1, weights) : 0;
+            for (int g: playerGroups) {
+                dice -= groupCounts[g];
+                if (dice <= 0) {
+                    gn = g;
+                    break;
                 }
             }
-            else
-                gn = random_item_skillgroup(pch);
             if (gn < 0)
                 return true;
             Affect af;
@@ -1038,9 +1009,9 @@ bool ItemAffixRoller::applyShared(const Candidate &c, int count)
             remember(af);
 
         } else if (c.value == "learned") {
-            // One item model: melee picks defensive/fightmaster skills x1.25 (Kit 2026-10-04).
+            // Melee picks defensive/fightmaster skills x1.25 (Kit 2026-10-04).
             vector<int> preferred;
-            if (item_model_enabled() && pickProfile() == "melee")
+            if (pickProfile() == "melee")
                 for (const char *g: { "defensive", "fightmaster" })
                     if (skillGroupManager->hasElement(g))
                         preferred.push_back(skillGroupManager->lookup(g));
@@ -1273,8 +1244,7 @@ void ArmorGenerator::assignFlags()
     if (t.weeks > 0)
         obj->timer = t.weeks * Date::SECOND_IN_WEEK / Date::SECOND_IN_MINUTE;
 
-    obj->cost = item_model_enabled() ? item_model_cost(chosenTotal, obj->level)
-                                     : 5 * (WORST_TIER + 1 - tier) * obj->level;
+    obj->cost = item_model_cost(chosenTotal, obj->level);
 
     if (!wornBuff.empty())
         obj->setProperty("wornbuff", wornBuff);

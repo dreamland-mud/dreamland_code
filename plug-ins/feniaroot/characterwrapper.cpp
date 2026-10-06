@@ -3874,15 +3874,14 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
         double f0 = s;
         // Redundancy discount applies to a CANDIDATE only (worn ? 0): never dock the
         // worn baseline, so a gear delta can only ever shrink, never inflate.
-        bool model = item_model_enabled( );
         int kind = ft == &res_flags ? 0 : ft == &imm_flags ? 1 : ft == &vuln_flags ? 2 : -1;
         if (ft == &affect_flags)
-            s += item_flag_points( bits, w.caster, target, worn ? 0 : w.heldFlags, model ? itemLevel : -1 );
-        else if (model && ft == &detect_flags)
+            s += item_flag_points( bits, w.caster, target, worn ? 0 : w.heldFlags, itemLevel );
+        else if (ft == &detect_flags)
             s += item_detect_points( bits, w.caster, target );
-        // Model: a resist the char already owns outside this slot adds nothing
+        // A resist the char already owns outside this slot adds nothing
         // (decision 6). Candidates only, like heldFlags: the worn baseline keeps full price.
-        else if (kind >= 0 && model && !worn && target != 0)
+        else if (kind >= 0 && !worn && target != 0)
             s += item_res_points_fit( bits, kind, w.heldImm, w.heldRes );
         else if (kind >= 0)
             s += ga_resValue( bits, kind );
@@ -3963,7 +3962,6 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     double s = 0;
     int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
     int itemLevel = inst != 0 ? inst->level : (pProto != 0 ? pProto->level : -1);
-    bool model = item_model_enabled( );
     for (auto &paf: protoAff)
         ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel );
     if (instAff != 0)
@@ -4008,9 +4006,9 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
         // scoring 0 and dropping to the +50 Fenia-trigger bonus, which would over-rate it.
         if (eff > 0)
             weaponSwing = w.weaponWeight * eff;   // one swing's score; its combathits reuse it.
-        // Model: weapon flags at the generator's price, x the alignment fit, only for a
+        // Weapon flags at the generator's price, x the alignment fit, only for a
         // weapon the char can swing (its flags fire on hits).
-        if (model && eff > 0) {
+        if (eff > 0) {
             int wflags = inst != 0 ? inst->value4( ) : pProto->value[4];
             double pts = item_weapon_flag_points( wflags, itemLevel, w.caster, target );
             ga_note( "weapon_flags", pts, wflags );
@@ -4045,22 +4043,13 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     double t0 = s;
     if (generated) {
         DLString buff = inst->getProperty( "wornbuff" );
-        if (model) {
-            if (!buff.empty( ))
-                s += item_wornbuff_points( buff, inst->level, w.caster );
-        }
-        else {
-            int price = buff.empty( ) ? 0 : item_affix_price( "worn_buff", buff, w.caster );
-            if (price > 0) {
-                int rolls = item_rolls( inst->level );
-                s += price / 100.0 * rolls * (w.dr + w.hr + 10 * w.hp + 10 * w.mana);
-            }
-        }
+        if (!buff.empty( ))
+            s += item_wornbuff_points( buff, inst->level, w.caster );
     }
     ga_note( "worn_buff", s - t0, 0 );
-    // Model: extra flags (noremove, bless, anti_good...) and the material, at the
+    // Extra flags (noremove, bless, anti_good...) and the material, at the
     // generator's prices. A material the char may not wear is worth nothing.
-    if (model && pProto != 0) {
+    if (pProto != 0) {
         int extras = inst != 0 ? inst->extra_flags : pProto->extra_flags;
         double pts = item_extra_points( extras, w.caster );
         ga_note( "extra_flags", pts, extras );
@@ -4076,7 +4065,7 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     // stand-in for "this triggers something good in a fight" -- the proc IS that
     // trigger. But a skill-teaching item that ALSO procs still deserves its teach
     // credit on top (different value), and non-proc special gear keeps the +50.
-    double procScore = ga_procScore( pProto, weaponSwing, inst, model ? itemLevel : -1, w.caster );
+    double procScore = ga_procScore( pProto, weaponSwing, inst, itemLevel, w.caster );
     if (procScore > 0) {
         s += procScore;
         if (ga_grantsSkills( pProto ))

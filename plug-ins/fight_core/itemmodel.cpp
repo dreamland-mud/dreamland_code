@@ -106,17 +106,15 @@ void item_weights(ItemWeights &w, bool caster, int acLevel)
     // AC is near-useless except at low level: ac_base at level 1, linearly 0 by ac_zero_level.
     double acZero     = item_value("shared", "ac_zero_level", 40);
     w.ac              = item_value("shared", "ac_base", 0.5) * max(0.0, acZero - acLevel) / max(1.0, acZero - 1);
-    // One item model: a caster still values AC past ac_zero_level (no parry, hit by everything).
-    if (item_model_enabled())
-        w.ac = max(w.ac, item_value(pf, "ac_floor", 0));
+    // A caster still values AC past ac_zero_level (no parry, hit by everything).
+    w.ac = max(w.ac, item_value(pf, "ac_floor", 0));
     w.slevel          = item_value(pf, "slevel", c ? 25.0 : 4.0);
     w.level           = item_value(pf, "level", c ? 40.0 : 14.0);
     w.skillLevel      = item_value(pf, "skill_level_group", c ? 18.0 : 8.0);
     w.skillLevelSkill = item_value(pf, "skill_level_skill", c ? 9.0 : 4.0);
     w.move            = item_value("shared", "move", 0.05);
-    // One item model: moves are a melee fighter's mana (Kit 2026-10-04).
-    if (item_model_enabled())
-        w.move = item_value(pf, "move", w.move);
+    // Moves are a melee fighter's mana (Kit 2026-10-04).
+    w.move = item_value(pf, "move", w.move);
     // beats = percent cut of skill lag: central for casters (every action is a
     // lag-gated cast), a token for melee whose damage is the violence round.
     w.beats           = item_value(pf, "beats", c ? 6.0 : 1.0);
@@ -167,22 +165,6 @@ double item_level_curve(int level)
     auto hi = points.upper_bound(level);
     auto lo = std::prev(hi);
     return lo->second + (hi->second - lo->second) * (level - lo->first) / (hi->first - lo->first);
-}
-
-static int itemModelOverride = -1;
-
-bool item_model_enabled()
-{
-    if (itemModelOverride >= 0)
-        return itemModelOverride > 0;
-    return item_value("measure", "item_model", 0) != 0;
-}
-
-int item_model_override(int mode)
-{
-    int old = itemModelOverride;
-    itemModelOverride = mode < 0 ? -1 : (mode > 0 ? 1 : 0);
-    return old;
 }
 
 int item_model_cost(int measureCm, int level)
@@ -300,7 +282,7 @@ static const FlagValue flag_values[] = {
 
 static double flag_base(const FlagValue &fv, bool caster, int level)
 {
-    if (level >= 0 && item_model_enabled()) {
+    if (level >= 0) {
         const Json::Value &byLevel = item_value_object("flags_by_level", fv.key);
         if (byLevel.isObject())
             return item_points_by_level(byLevel, level, caster ? 1 : 0);

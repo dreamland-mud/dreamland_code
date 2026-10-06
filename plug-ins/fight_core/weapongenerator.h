@@ -11,7 +11,6 @@
 
 class Object;
 class PCharacter;
-struct affix_info;
 
 /** Weapon generator: calculate and assign various weapon parameters based on requested input data. */
 struct WeaponGenerator {
@@ -39,9 +38,6 @@ struct WeaponGenerator {
     WeaponGenerator & addForbidden(const DLString &fbd) { this->forbidden.insert(fbd); return *this; }
     /** Price affixes for a caster killer (item_affixes.json price_caster). */
     WeaponGenerator & caster(bool caster) { this->isCaster = caster; return *this; }
-    /** Affix budget: 1 = M (item_affixes.json), 0 = old points (weapon_affixes.json),
-     *  -1 = whatever item_affixes.json _weapons.use_m says. */
-    WeaponGenerator & budgetMode(int mode) { this->mMode = mode; return *this; }
 
     // Main method to handle rand_stat logic, after all parameters have been set up by the calls above.
     WeaponGenerator& randomizeStats();
@@ -61,9 +57,8 @@ struct WeaponGenerator {
     WeaponGenerator & weaponClass(const DLString &name);
 
     WeaponGenerator & randomNames();
+    /** Affixes on the M budget, shared pool with random armor. */
     WeaponGenerator & randomAffixes();
-    /** randomAffixes() on the M budget, shared pool with random armor. */
-    WeaponGenerator & randomAffixesM();
 
     const WeaponGenerator & assignValues() const;    
     const WeaponGenerator & assignHitroll() const;
@@ -90,10 +85,8 @@ private:
     DLString findMaterial() const;
     DLString nonMetalDefault() const;
     void rememberAffect(Affect &af);
-    bool useM() const;
     void decideTwoHands();
     bool nameFitsHands(const Json::Value &config) const;
-    int calcAffectModifier(const Json::Value &afConfig, const affix_info &info) const;
     int maxDamroll() const;
     int maxHitroll() const;
     int minDamroll() const;
@@ -126,7 +119,6 @@ private:
     float aveIndexBonus;
     int align;
     bool isCaster;
-    int mMode;
 
     // Two-hander share on the M budget: base ave and damroll are scaled by it.
     bool twoHands;
@@ -165,7 +157,6 @@ bool weapon_repair_names(Object *obj);
 DLString random_item_compose_short(const DLString &adjective, const DLString &base, const DLString &noun);
 DLString random_item_gender_tag(const DLString &gender);
 bool random_item_decline_ua(const DLString &word, const DLString &pos, const DLString &gtag, DLString &result);
-int random_item_skillgroup(PCharacter *pch);
 
 /** True when this weapon class name is present in the weapon_classes config. */
 bool weapon_class_exists(const DLString &name);

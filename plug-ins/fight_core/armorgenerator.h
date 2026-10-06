@@ -18,10 +18,6 @@ class PCharacter;
 /** The seven armor slots the generator knows, in armor_names.json order. */
 bool armor_slot_exists(const DLString &slot);
 
-/** Price of one item_affixes.json affix in centi-M for the profile, 0 when unknown.
- *  The gear sage scores what it can't see as an affect (a worn buff) by this. */
-int item_affix_price(const DLString &section, const DLString &value, bool caster);
-
 /** The whole fight/item_affixes.json, for the weapon side of the pool. */
 const Json::Value & item_affixes_config();
 
@@ -82,9 +78,9 @@ protected:
     int rolls() const;
     int modifier(const Json::Value &affix, int count) const;
 
-    /** One item model (fight_core/itemmodel.h), when measure.item_model is on:
-     *  the affix's base points at the item level, false for a section the model
-     *  does not price yet (procs keep their centi-M price until P6). */
+    /** One item model (fight_core/itemmodel.h): the affix's base points at the
+     *  item level, false for a section the model does not price (those keep their
+     *  price_melee / price_caster). */
     bool modelPoints(const DLString &secName, const Json::Value &affix, double &points) const;
     /** Points -> centi-M at the item level for the roller's profile and slot. */
     int modelPrice(double points) const;
