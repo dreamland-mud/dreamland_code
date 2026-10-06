@@ -50,6 +50,7 @@
 *        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 #include <string.h>
+#include <map>
 
 #include "accountmanager.h"
 #include "so.h"
@@ -82,6 +83,7 @@
 #include "mobbody.h"
 #include "merc.h"
 #include "descriptor.h"
+#include "websocketrpc.h"
 #include "desire.h"
 #include "helpmanager.h"
 #include "comm.h"
@@ -1424,8 +1426,6 @@ static DLString find_name_argument( const char *argument )
 
 /* NOTCOMMAND */ void do_mfind( Character *ch, char *argument )
 {
-    bool found;
-
     DLString arg = find_name_argument( argument );
     if ( arg.empty( ) )
     {
@@ -1433,32 +1433,32 @@ static DLString find_name_argument( const char *argument )
         return;
     }
 
-    found        = false;
-
+    std::map<int, MOB_INDEX_DATA *> found;
     for (int i=0; i < MAX_KEY_HASH; i++)
         for(MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next)
-        {
             if (mob_index_has_name(pMob, arg))
-            {
-                found = true;
-                ch->pecho("[%5d] %N1",
-                    pMob->vnum, 
-                    pMob->getShortDescr(LANG_DEFAULT));
-            }
-        }   
+                found[pMob->vnum] = pMob;
 
-    if ( !found )
+    if (found.empty( )) {
         ch->pecho(_("Мобы с таким именем не найдены."));
+        return;
+    }
 
-    return;
+    // Like searcher: the vnum opens medit, the race opens raceedit.
+    DLString lineFormat = web_cmd(ch, "medit $1", "%5d")
+                          + " {C%3d{x " + web_cmd(ch, "raceedit $1", "{y%-12.12s{x") + " %N1\n";
+    ostringstream buf;
+    buf << fmt(ch, _("{WМобы (%d):{x\n"), (int)found.size( ));
+    for (auto &f: found)
+        buf << fmt(ch, lineFormat.c_str( ), f.second->vnum, f.second->level,
+                   f.second->race.c_str( ), f.second->getShortDescr(LANG_DEFAULT));
+    page_to_char(buf.str( ).c_str( ), ch);
 }
 
 
 
 /* NOTCOMMAND */ void do_ofind( Character *ch, char *argument )
 {
-    bool found;
-
     DLString arg = find_name_argument( argument );
     if ( arg.empty( ) )
     {
@@ -1466,24 +1466,24 @@ static DLString find_name_argument( const char *argument )
         return;
     }
 
-    found        = false;
-
+    std::map<int, OBJ_INDEX_DATA *> found;
     for (int i=0; i<MAX_KEY_HASH; i++)
         for(OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next)
-        {
             if (obj_index_has_name(pObj, arg))
-            {
-                found = true;
-                ch->pecho("[%5d] %N1",
-                    pObj->vnum, 
-                    pObj->getShortDescr(LANG_DEFAULT));
-            }
-        }
+                found[pObj->vnum] = pObj;
 
-    if ( !found )
+    if (found.empty( )) {
         ch->pecho(_("Объекты с таким именем не найдены."));
+        return;
+    }
 
-    return;
+    DLString lineFormat = web_cmd(ch, "oedit $1", "%5d") + " {C%3d{x {y%-10.10s{x %N1\n";
+    ostringstream buf;
+    buf << fmt(ch, _("{WПредметы (%d):{x\n"), (int)found.size( ));
+    for (auto &f: found)
+        buf << fmt(ch, lineFormat.c_str( ), f.second->vnum, f.second->level,
+                   item_table.name(f.second->item_type).c_str( ), f.second->getShortDescr(LANG_DEFAULT));
+    page_to_char(buf.str( ).c_str( ), ch);
 }
 
 /* NOTCOMMAND */ void do_tfind( Character *ch, char *argument )
