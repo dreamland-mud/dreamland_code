@@ -204,6 +204,15 @@ static void account_status(PCharacter *ch)
     }
 }
 
+// Told on every link that brings a char into an account: the char's own bank
+// folds into the shared one at its next login, and the shared one has a ceiling.
+// Shared with accountservlet.cpp (the bot-code redeem).
+void account_bank_cap_notice(PCharacter *ch, const DLString &id)
+{
+    ch->pecho(_("Общий банк аккаунта вмещает до {Y%1$d{x золотых: 100.000 и еще 10.000 за каждого персонажа аккаунта."),
+              AccountManager::bankCapGold(id));
+}
+
 // Adopt a char's bot-VERIFIED discord.id straight into an account (no code, no round-
 // trip: the /link servlet already proved the id). Three cases, all folded through
 // AccountManager::setMessengerIdentity so the id mirrors to every member character:
@@ -255,6 +264,8 @@ static bool account_adopt_discord(PCharacter *ch, const DLString &discordId, con
     else
         ch->pecho(_("Discord {W%1$s{x привязан к аккаунту {W%2$s{x."),
                   AccountManager::echoSafe(username).c_str(), title.c_str());
+    if (!wasLinked)
+        account_bank_cap_notice(ch, id);
     return true;
 }
 
@@ -793,6 +804,9 @@ static void account_email_attach(PCharacter *ch, const DLString &email)
                   email.c_str(), title.c_str());
     else
         ch->pecho(_("Эта почта уже привязана к твоему аккаунту {W%1$s{x."), title.c_str());
+
+    if (created || charJoined)
+        account_bank_cap_notice(ch, id);
 }
 
 // `account email <addr>`: mint a 6-digit code, mail it, and wait for `account code`.

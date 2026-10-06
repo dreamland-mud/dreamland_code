@@ -123,6 +123,10 @@ public:
     // int, or when the disk write fails -- RAM never claims what disk lacks.
     static int bankBalance(const DLString &id, const DLString &currency);
     static bool bankAdd(const DLString &id, int gold, int silver, int qp);
+    // Deposit ceiling in gold: a base plus a slice per member character, so a
+    // bigger account can park more. Silver caps at the same value (x100).
+    // Only deposits check it; folds and fines may run a pool past it.
+    static int bankCapGold(const DLString &id);
 
     // --- messenger identities folded into the account (telegram/discord) ---
     // The account owns a verified messenger identity (a numeric id proven by the bot

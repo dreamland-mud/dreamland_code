@@ -680,6 +680,12 @@ bool AccountManager::bankAdd(const DLString &id, int gold, int silver, int qp)
     return true;
 }
 
+int AccountManager::bankCapGold(const DLString &id)
+{
+    static const int BASE = 100000, PER_CHAR = 10000;
+    return BASE + PER_CHAR * (int)charsOf(id).size();
+}
+
 bool AccountManager::removeIdentity(const DLString &type, const DLString &value)
 {
     DLString owner = findByIdentity(type, value);
