@@ -1665,7 +1665,7 @@ NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spell
     return Register(ok);
 }
 
-NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, profile, budget]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров, profile caster берет цены аффиксов для кастера, budget m|points форсирует бюджет (иначе из item_affixes.json)")
+NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, profile]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров, profile caster берет цены аффиксов для кастера")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
@@ -1674,8 +1674,6 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, pr
     DLString wclass = args.size() > 4 ? argnum2string(args, 5) : DLString::emptyString;
     int worstTier = args.size() > 5 ? argnum2number(args, 6) : bestTier;
     DLString profile = args.size() > 6 ? argnum2string(args, 7) : DLString::emptyString;
-    DLString budget = args.size() > 7 ? argnum2string(args, 8) : DLString::emptyString;
-    int mode = budget == "m" ? 1 : budget == "points" ? 0 : -1;
 
     if (obj->item_type != ITEM_WEAPON)
         throw Scripting::Exception("Item is not a weapon for randomize.");
@@ -1698,7 +1696,6 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, pr
             .alignment(ch->alignment)
             .player(ch->getPC())
             .caster(profile == "caster")
-            .budgetMode(mode)
             .tier(tier)
             .randomizeStats();
     }
@@ -1708,7 +1705,6 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, pr
             .alignment(ch->alignment)
             .player(ch->getPC())
             .caster(profile == "caster")
-            .budgetMode(mode)
             // Empty wclass leaves the class to be rolled, as before. A named one bypasses
             // the player-availability filter on purpose: the caller knows what it wants.
             .weaponClass(wclass)
@@ -1807,16 +1803,6 @@ NMI_INVOKE(Root, questScroll, "(ch): свиток познания для игр
 
     obj_to_room( scroll, get_room_instance( ROOM_VNUM_FENIA_STORAGE ) );
     return WrapperManager::getThis( )->getWrapper( scroll );
-}
-
-NMI_INVOKE(Root, itemModel, "(mode): только для тестов: генераторы предметов считают по единой модели (1), по старым ценам (0) или по конфигу (-1); вернуть -1 до конца того же eval. Возвращает прежний режим")
-{
-    return Register(item_model_override(argnum2number(args, 1)));
-}
-
-NMI_INVOKE(Root, itemModelOn, "(): включена ли единая модель предметов (measure.item_model или тестовый .itemModel) -- 1 или 0")
-{
-    return Register(item_model_enabled() ? 1 : 0);
 }
 
 NMI_INVOKE(Root, itemCost, "(measureCm, level): цена предмета по единой модели: measure.cost_k x M x уровень (M в сотых долях), как у генераторов")

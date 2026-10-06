@@ -33,8 +33,6 @@ GSN(none);
 WEARLOC(wield);
 WEARLOC(second_wield);
 
-static int get_random_skillgroup(PCharacter *pch);
-
 /** A weapon name is metal-only when its configuration leaves no other option:
  *  either a metallic material by name, or 'mtypes' listing nothing but metal.
  *  Names without any material configured are free to take a non-metal default.
@@ -91,7 +89,6 @@ WeaponGenerator::WeaponGenerator()
     hrIndexBonus = drIndexBonus = aveIndexBonus = 0;
     align = ALIGN_NONE;
     isCaster = false;
-    mMode = -1;
     aveMult = damrollMult = 1;
     twoHands = twoHandsDecided = false;
     retainChance = 50;
@@ -393,199 +390,12 @@ bool WeaponGenerator::rejectsMetal() const
     return pch && IS_SET(material_types_forbidden(pch), MAT_METAL);
 }
 
-WeaponGenerator & WeaponGenerator::randomAffixes()
-{
-    if (useM())
-        return randomAffixesM();
-
-    affix_generator gen(valTier);
-
-    // Set requirements and restrictions assigned directly to the generator.
-    for (auto const &reqName: required)
-        gen.addRequired(reqName);
-    for (auto const &fbdName: forbidden)
-        gen.addForbidden(fbdName);
-
-    // Set exclusions or requirements based on chosen names and weapon flags.
-    for (auto const &affixName: wclassConfig["forbids"])
-        gen.addForbidden(affixName.asString());
-
-    for (auto const &affixName: wclassConfig["requires"])
-        gen.addRequired(affixName.asString());
-
-    for (auto const &affixName: wclassConfig["prefers"])
-        gen.addPreference(affixName.asString());
-
-    for (auto const &affixName: nameConfig["forbids"])
-        gen.addForbidden(affixName.asString());
-
-    for (auto const &affixName: nameConfig["requires"])
-        gen.addRequired(affixName.asString());
-
-    for (auto const &affixName: nameConfig["prefers"])
-        gen.addPreference(affixName.asString());
-
-    // Material affixes that turn the weapon into a metal one are pointless
-    // for a player who would never be able to wield it.
-    if (rejectsMetal()) {
-        gen.addForbidden("platinum");
-        gen.addForbidden("titanium");
-    }
-
-    // Exclude hr/dr affixes that don't have non-zero values at this level and tier.
-    if (maxHitroll() <= 0) {
-        gen.addForbidden("hr");
-        gen.addForbidden("-hr");
-    }
-
-    if (maxDamroll() <= 0) {
-        gen.addForbidden("dr");
-        gen.addForbidden("-dr");
-    }
-
-    gen.setPlayer(pch);
-    gen.setAlign(align);
-    gen.setRetainChance(retainChance);
-
-    // Generate all combinations of affixes.
-    gen.run();
-//    LogStream::sendNotice() << gen.dump();
-
-    if (gen.getResultSize() == 0) {
-        warn("Weapon generator: no affixes found for tier %d.", valTier);
-        return *this;
-    }    
-
-    // Collect all configurations mandated by given set of affixes: flags, material, affects.
-    auto result = gen.getSingleResult();
-    int minPrice = result.front().price;
-    int maxPrice = result.back().price;
-    StringSet affixNames;
-
-    for (auto &pinfo: result) {
-        const Json::Value &affix = pinfo.affix;
-        const DLString &section = pinfo.section;
-        affixNames.insert(affix["value"].asCString());
-
-        extraFlags.setBits(affix["extra"].asString());
-
-        if (section == "flag") {
-            weaponFlags.setBits(pinfo.affixName);
-
-        } else if (section == "extra") {
-            extraFlags.setBits(pinfo.affixName);
-
-        } else if (section == "material") {
-            materialName = pinfo.affixName;
-
-        } else if (section == "affects_by_tier") {
-            float bonus = affix["step"].asFloat() * pinfo.stack;
-            DLString aname = pinfo.normalizedName();
-
-            if (aname == "hr")
-                hrIndexBonus += bonus;
-            else if (aname == "dr")
-                drIndexBonus += bonus;
-            else if (aname == "ave") 
-                aveIndexBonus += bonus;
-
-        } else if (section == "affects_by_level") {
-            Affect af;
-            af.modifier = calcAffectModifier(affix, pinfo);
-            af.location = apply_flags.value(pinfo.normalizedName());
-            rememberAffect(af);
-
-        } else if (section == "affects_with_bits") {
-            Affect af;
-            af.bitvector.setTable(&affect_flags);
-            af.bitvector.setBits(pinfo.affixName);
-            rememberAffect(af);
-
-        } else if (section == "skill_group") {
-            Affect af;
-            af.global.setRegistry(skillGroupManager);
-            af.global.fromString(pinfo.affixName);
-            af.modifier = calcAffectModifier(affix, pinfo);
-            rememberAffect(af);
-
-        } else if (section == "player") {
-            // A char with no learned skill has no group to boost: -1 would index
-            // the bitvector out of range (live crash 2026-10-03).
-            int gn = (pinfo.affixName == "skillgroup" && pch) ? get_random_skillgroup(pch) : -1;
-            if (gn >= 0) {
-                Affect af;
-                af.global.setRegistry(skillGroupManager);
-                af.global.set(gn);
-                af.modifier = calcAffectModifier(affix, pinfo);
-                rememberAffect(af);
-            }
-
-        } else if (section == "affect_packs") {
-            for (auto const &affect: affix["affects"]) {
-                Affect af;
-
-                if (affect.isMember("apply")) {
-                    af.modifier = calcAffectModifier(affect, pinfo);
-                    af.location = apply_flags.value(affect["apply"].asString());
-                    rememberAffect(af);
-
-                } else if (affect.isMember("table")) {
-                    af.bitvector.setTable(FlagTableRegistry::getTable(affect["table"].asString()));
-                    af.bitvector.setBits(affect["bits"].asString());
-                    rememberAffect(af);
-                }
-            }
-        }
-
-        // Each adjective or noun has a chance to be chosen, but the most expensive get an advantage.
-        // Push the parallel EN/UA forms under the SAME roll so the vectors stay index-aligned.
-        const Json::Value &adjEn = affix["adjectives_en"], &adjUa = affix["adjectives_ua"];
-        for (Json::ArrayIndex k = 0; k < affix["adjectives"].size(); k++)
-            if (number_range(minPrice - 10, maxPrice) <= pinfo.price) {
-                adjectives.push_back(affix["adjectives"][k].asString());
-                adjectives_en.push_back(k < adjEn.size() ? DLString(adjEn[k].asString()) : DLString::emptyString);
-                adjectives_ua.push_back(k < adjUa.size() ? DLString(adjUa[k].asString()) : DLString::emptyString);
-            }
-
-        const Json::Value &nounEn = affix["nouns_en"], &nounUa = affix["nouns_ua"];
-        for (Json::ArrayIndex k = 0; k < affix["nouns"].size(); k++)
-            if (pinfo.price >= 0 && number_range(minPrice - 10, maxPrice) <= pinfo.price) {
-                nouns.push_back(affix["nouns"][k].asString());
-                nouns_en.push_back(k < nounEn.size() ? DLString(nounEn[k].asString()) : DLString::emptyString);
-                nouns_ua.push_back(k < nounUa.size() ? DLString(nounUa[k].asString()) : DLString::emptyString);
-            }
-    }
-
-    // Additional flags configured for weapon class. 
-    for (auto const &flag: wclassConfig["flags"].getMemberNames()) {
-        int prob = wclassConfig["flags"][flag].asInt();
-        if (chance(prob))
-            weaponFlags.setBits(flag);
-    }
-
-    // Improve ave for two-handed weapons.
-    if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS))
-        aveIndexBonus++;
-
-    // Remember affixes choice on the item.
-    obj->setProperty("affixes", affixNames.toString());
-
-    return *this;
-}
-
 /*--------------------------------------------------------------------------
  * Weapons on the M budget
  *-------------------------------------------------------------------------*/
 static const Json::Value & weapon_m_config()
 {
     return item_affixes_config()["_weapons"];
-}
-
-bool WeaponGenerator::useM() const
-{
-    if (mMode >= 0)
-        return mMode > 0;
-    return weapon_m_config()["use_m"].asBool();
 }
 
 
@@ -737,8 +547,8 @@ private:
             price = lo->second + (hi->second - lo->second) * (level - lo->first) / (hi->first - lo->first);
         }
 
-        // One item model: the flag's points at the item level (combat-effect model).
-        if (item_model_enabled() && affix.isMember("points_by_level"))
+        // The flag's points at the item level (combat-effect model).
+        if (affix.isMember("points_by_level"))
             price = modelPrice(item_points_by_level(affix["points_by_level"], level));
 
         // Allowed on the cheapest tier whose window covers the price, and on every
@@ -785,14 +595,7 @@ private:
             return 0;
         }
 
-        double factor = item_value("measure", "default_factor", 11);
-        if (factor < 1)
-            factor = 11;
-        int ref = (int)item_value("measure", "ref_level", 60);
-        double rollsHere = max(1, (int)(obj->level / factor));
-        double rollsRef = max(1, (int)(ref / factor));
-        double oneM = item_model_enabled() ? item_one_m(obj->level, isCaster)
-                                           : item_value(profile, "level", isCaster ? 127 : 107) * rollsHere / rollsRef;
+        double oneM = item_one_m(obj->level, isCaster);
         if (oneM <= 0)
             return 0;
 
@@ -833,7 +636,7 @@ private:
 
 }
 
-WeaponGenerator & WeaponGenerator::randomAffixesM()
+WeaponGenerator & WeaponGenerator::randomAffixes()
 {
     const Json::Value &config = weapon_m_config();
     if (!twoHandsDecided)
@@ -956,9 +759,8 @@ WeaponGenerator& WeaponGenerator::randomizeAll()
     if (!wclassFixed)
         randomWeaponClass();
 
-    // On the M budget the hands come first, so the name can match them.
-    if (useM())
-        decideTwoHands();
+    // The hands come first, so the name can match them.
+    decideTwoHands();
 
     randomNames()
         .randomAffixes()
@@ -990,19 +792,6 @@ void WeaponGenerator::rememberAffect(Affect &af)
     af.level = obj->level;
 
     affects.push_back(af);
-}
-
-/** Guess affect modifier from json config as (mult * level * stack + mod). */
-int WeaponGenerator::calcAffectModifier(const Json::Value &afConfig, const affix_info &info) const
-{
-    float mult = afConfig.isMember("mult") ? afConfig["mult"].asFloat() : 0;
-    int mod = afConfig.isMember("mod") ? afConfig["mod"].asInt() : 0;
-    int result = mult * info.stack * obj->level + mod;
-
-    if (result != 0)
-        return result;
-    else
-        return signum(mult) * 1; // return a minimum of +1/-1 when level is too small
 }
 
 void WeaponGenerator::setName() const
@@ -1433,7 +1222,7 @@ const WeaponGenerator & WeaponGenerator::assignFlags() const
         obj->weight = obj->pIndexData->weight * 5;
 
     // Set standardized cost in silver.
-    if (item_model_enabled() && obj->getProperty("measure_m").isNumber())
+    if (obj->getProperty("measure_m").isNumber())
         obj->cost = item_model_cost(obj->getProperty("measure_m").toInt(), obj->level);
     else
         obj->cost = 5 * (WORST_TIER + 1 - valTier) * obj->level;
@@ -1528,42 +1317,6 @@ DLString WeaponGenerator::nonMetalDefault() const
     return "wood";
 }
 
-// Helper function to get most popular/learned skill group for a player.
-static int get_random_skillgroup(PCharacter *pch)
-{
-    GlobalArray mygroups(skillGroupManager);
-    set<int> totalGroups;
-    int totalWeight = 0;
-
-    for (int sn = 0; sn < skillManager->size(); sn++) {
-        PCSkillData &myskill = pch->getSkillData(sn);
-
-        if (myskill.learned <= 1)
-            continue;
-        if (myskill.isTemporary())
-            continue;
-
-        Skill *skill = skillManager->find(sn);
-        vector<int> groups = skill->getGroups().toArray();
-        for (auto g: groups) {
-            mygroups[g]++;
-            totalGroups.insert(g);
-        }
-
-        totalWeight++;
-    }
-
-    int currentWeight = 0;
-    int dice = number_range(0, totalWeight - 1);
-    for (auto &group: totalGroups) {
-        currentWeight += mygroups[group];
-        if (currentWeight > dice)
-            return group;
-    }
-        
-    return -1;
-}
-
 DLString random_item_compose_short(const DLString &adjective, const DLString &base, const DLString &noun)
 {
     return compose_short(adjective, base, noun);
@@ -1577,9 +1330,4 @@ DLString random_item_gender_tag(const DLString &gender)
 bool random_item_decline_ua(const DLString &word, const DLString &pos, const DLString &gtag, DLString &result)
 {
     return decline_ua(word, pos, gtag, result);
-}
-
-int random_item_skillgroup(PCharacter *pch)
-{
-    return get_random_skillgroup(pch);
 }
