@@ -483,9 +483,15 @@ MEDIT(show)
     ptc(ch, "{CParts:{x       [{W%s{x] {D(? part_flags){x\n\r", part_flags.names(mob.parts).c_str());
     ptc(ch, "{CBody:{x        [{W%s{x] слоты [{W%s{x]\n\r",
         mob.bodyResolved ? "из форм расы" : "старая модель расы", mob.wearloc.toString().c_str());
-    if (mob.bodyResolved)
-        ptc(ch, "             походка [{W%s{x] броня тела [{Wx%.2f{x] атаки разрешены [{W%s{x]\n\r",
-            mob.moveverb.c_str(), mob.formAcPct / 100.0, off_flags.names(mob.offAllowed).c_str());
+    // No %f here: the act formatters pull every vararg as a union, and a double
+    // travels in an FP register, so %f reads garbage and the next %s crashes.
+    // No %02d either: the formatter pads with spaces, not zeros.
+    if (mob.bodyResolved) {
+        int cents = mob.formAcPct % 100;
+        DLString acMult = DLString(mob.formAcPct / 100) + "." + (cents < 10 ? "0" : "") + DLString(cents);
+        ptc(ch, "             походка [{W%s{x] броня тела [{Wx%s{x] атаки разрешены [{W%s{x]\n\r",
+            mob.moveverb.c_str(), acMult.c_str(), off_flags.names(mob.offAllowed).c_str());
+    }
     if (mob.reviewed)
         ptc(ch, "{CReviewed:{x    [{W%s{x] {D(reviewed){x\n\r", mob_reviewed_names(mob.reviewed).c_str());
 
