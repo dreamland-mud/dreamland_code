@@ -34,6 +34,9 @@ struct ItemWeights {
     // One swing of the char's wielded weapon in points, for a non-weapon item's
     // combathits. -1 = no usable weapon. Sage-only.
     double curWeaponSwing = -1.0;
+    // Apply heldFlags/heldImm/heldRes to a WORN item too. Off for advice deltas (the worn
+    // baseline keeps full price); on only for the percentile's flag-once kit totals.
+    bool heldOnWorn = false;
 };
 
 /** Fill the profile weights. acLevel is the level the AC weight is taken at:
