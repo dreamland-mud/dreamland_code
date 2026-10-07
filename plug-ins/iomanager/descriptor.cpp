@@ -465,7 +465,15 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
          * or told to start the ordinary login. */
         ResumeResult r = args.empty() ? RESUME_FINAL : resume_attach(this, args.front());
         if (r == RESUME_OK) {
-            writeWSCommand("resume_ok", std::vector<DLString>());
+            /* resume_attach spent the token, and the next one used to come
+             * only with a prompt -- which a quiet resume never produces. Until
+             * the player typed, a second drop found no token and the lostlink
+             * sweep quit the body at once. Hand the fresh one over right here;
+             * the client also takes this as "in the world" (keepalive on). */
+            std::vector<DLString> ok;
+            if (character && character->getPC())
+                ok.push_back(resume_token_issue(character->getPC()));
+            writeWSCommand("resume_ok", ok);
         } else {
             // 'final' -> the token is dead, log in now; 'retry' -> our own old
             // socket may just not be linkdead yet, ask again. Lets a deliberate
