@@ -2750,6 +2750,135 @@ NMI_INVOKE( CharacterWrapper, rememberFought, "(ch): запомнить перс
     return Register(true);
 }
 
+// Default C++ brain of a mob (BasicMobileBehavior and descendants), or null.
+static BasicMobileBehavior::Pointer mob_ai( Character *ch )
+{
+    if (!ch->is_npc( ) || !ch->getNPC( )->behavior)
+        return BasicMobileBehavior::Pointer( );
+
+    return ch->getNPC( )->behavior.getDynamicPointer<BasicMobileBehavior>( );
+}
+
+// true if the optional argument 'num' asks for the 'attacked' memory instead of 'fought'
+static bool ai_memory_attacked( const RegisterList &args, int num )
+{
+    return (int)args.size( ) >= num && argnum2boolean( args, num );
+}
+
+NMI_GET( CharacterWrapper, ai_lastFought, "имя игрока, с которым моб сражался последним и которого ищет (пустая строка, если никого)" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( "" );
+    return Register( ai->getLastFoughtName( ) );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_setLastFought, "(ch): запомнить игрока ch как последнего противника, которого моб будет выслеживать" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai || !target->in_room)
+        return Register( false );
+    ai->setLastFought( argnum2character( args, 1 ) );
+    return Register( true );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_clearLastFought, "(): забыть последнего противника и прекратить погоню" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    ai->clearLastFought( );
+    return Register( true );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_memorized, "(ch[, attacked]): помнит ли моб ch среди тех, с кем дрался (или на кого нападал, если attacked)" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    return Register( ai->aiMemorized( argnum2character( args, 1 ), ai_memory_attacked( args, 2 ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_remember, "(ch[, attacked]): запомнить ch среди тех, с кем дрался (или на кого нападал, если attacked)" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    ai->aiRemember( argnum2character( args, 1 ), ai_memory_attacked( args, 2 ) );
+    return Register( true );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_forget, "(ch[, attacked]): забыть ch в памяти о драках (или о нападениях, если attacked)" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    return Register( ai->aiForget( argnum2character( args, 1 ), ai_memory_attacked( args, 2 ) ) );
+}
+
+NMI_GET( CharacterWrapper, ai_lostTrack, "моб потерял след последнего противника" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    return Register( ai->getLostTrack( ) );
+}
+
+NMI_SET( CharacterWrapper, ai_lostTrack, "моб потерял след последнего противника" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (ai)
+        ai->setLostTrack( arg.toBoolean( ) );
+}
+
+NMI_GET( CharacterWrapper, ai_homeVnum, "внум комнаты, где моб начал погоню и куда вернется (0, если не запомнена)" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( 0 );
+    return Register( ai->getHomeVnum( ) );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_goHome, "([always]): вернуться домой после погони; always - исчезнуть, если дороги домой нет (после этого проверять .tmp.mob.valid)" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai || !target->in_room)
+        return Register( false );
+    return Register( ai->goHome( !args.empty( ) && argnum2boolean( args, 1 ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, yellPanic, "(attacker, msgBlind, msg[, label]): крикнуть о помощи против attacker, как кричат жертвы нападения" )
+{
+    checkTarget( );
+    Character *attacker = argnum2character( args, 1 );
+    DLString msgBlind = argnum2string( args, 2 );
+    DLString msg = argnum2string( args, 3 );
+    DLString label = args.size( ) > 3 ? argnum2string( args, 4 ) : DLString::emptyString;
+
+    yell_panic( attacker, target, msgBlind.c_str( ), msg.c_str( ), label.empty( ) ? 0 : label.c_str( ) );
+    return Register( );
+}
+
 NMI_INVOKE( CharacterWrapper, get_random_room, "(): случайная комната, куда можно зайти" )
 {
     checkTarget( );

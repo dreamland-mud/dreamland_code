@@ -56,6 +56,21 @@ public:
 
     void rememberFought(Character *victim);
 
+/*
+ * saved AI state, read and written by the Fenia mob AI (characterwrapper ai_*)
+ */
+    bool hasLastFought( ) const;
+    void setLastFought( Character * );
+    void clearLastFought( );
+    const DLString &getLastFoughtName( ) const;
+    bool aiMemorized( Character *, bool fAttacked );
+    void aiRemember( Character *, bool fAttacked );
+    bool aiForget( Character *, bool fAttacked );
+    bool getLostTrack( ) const;
+    void setLostTrack( bool );
+    int getHomeVnum( ) const;
+    bool goHome( bool fAlways );
+
 protected:
     Character * getMaster( Character * );
     int beforeSpell;
@@ -68,11 +83,8 @@ protected:
  * our last fought victim
  */
 protected:
-    bool hasLastFought( ) const;
-    void setLastFought( Character * );
     PCharacter *getLastFoughtRoom( );
     PCharacter *getLastFoughtWorld( );
-    void clearLastFought( );
     bool isLastFought( Character * );
     bool isAdrenalined( ) const;
     XML_VARIABLE XMLStringNoEmpty lastFought;

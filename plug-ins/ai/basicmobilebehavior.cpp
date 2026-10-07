@@ -8,6 +8,10 @@
 
 #include "logstream.h"
 #include "basicmobilebehavior.h"
+#include "register-impl.h"
+#include "feniamanager.h"
+#include "fight_exception.h"
+#include "aitrigger.h"
 
 #include "skillreference.h"
 #include "npcharacter.h"
@@ -89,6 +93,46 @@ void MobileMemory::poll( int diff )
 
     for (i = fresh.begin( ); i != fresh.end( ); i++)
         (*this)[i->first] = i->second;
+}
+
+/*
+ * Fenia mob AI hand-over, see aitrigger.h
+ */
+int ai_trigger(bool fCombat, Character *mob, const char *trigName, const char *fmt, ...)
+{
+    if (!gprog_registered(trigName))
+        return AI_UNHANDLED;
+
+    va_list ap;
+    va_start(ap, fmt);
+
+    int rc;
+
+    try {
+        rc = vgprog_nocatch(trigName, fmt, ap) ? 1 : 0;
+        va_end(ap);
+    }
+    catch (const VictimDeathException &) {
+        va_end(ap);
+        if (fCombat)
+            throw;
+        return 1;
+    }
+    catch (const ::Exception &e) {
+        va_end(ap);
+        // The decision counts as taken: the handler may have yelled, moved or
+        // attacked before it broke, and running the C++ body on top would do it
+        // twice. The croak reaches the logs and the immortals.
+        FeniaManager::getThis()->croak(0, Scripting::Register(trigName), e);
+        rc = 0;
+    }
+
+    // A handler that extracted its own mob, then returned false or broke, must
+    // still stop the C++ caller: it would go on reading ch->in_room.
+    if (mob->extracted)
+        return 1;
+
+    return rc;
 }
 
 /*
@@ -181,6 +225,49 @@ void BasicMobileBehavior::setLastFought( Character *wch )
             remember( ch->in_room );
         }
     }
+}
+
+const DLString &BasicMobileBehavior::getLastFoughtName( ) const
+{
+    return lastFought.getValue( );
+}
+
+bool BasicMobileBehavior::aiMemorized( Character *wch, bool fAttacked )
+{
+    return fAttacked ? memoryAttacked.memorized( wch ) : memoryFought.memorized( wch );
+}
+
+void BasicMobileBehavior::aiRemember( Character *wch, bool fAttacked )
+{
+    if (fAttacked)
+        memoryAttacked.remember( wch );
+    else
+        memoryFought.remember( wch );
+}
+
+bool BasicMobileBehavior::aiForget( Character *wch, bool fAttacked )
+{
+    return fAttacked ? memoryAttacked.forget( wch ) : memoryFought.forget( wch );
+}
+
+bool BasicMobileBehavior::getLostTrack( ) const
+{
+    return lostTrack.getValue( );
+}
+
+void BasicMobileBehavior::setLostTrack( bool value )
+{
+    lostTrack = value;
+}
+
+int BasicMobileBehavior::getHomeVnum( ) const
+{
+    return homeVnum.getValue( );
+}
+
+bool BasicMobileBehavior::goHome( bool fAlways )
+{
+    return backHome( fAlways );
 }
 
 bool BasicMobileBehavior::isAdrenalined( ) const

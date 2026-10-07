@@ -21,6 +21,7 @@
 #include "doors.h"
 #include "exitsmovement.h"
 #include "interp.h"
+#include "aitrigger.h"
 #include "merc.h"
 
 #include "def.h"
@@ -49,6 +50,10 @@ bool BasicMobileBehavior::track( )
 
     if (!canTrackLastFought( wch ))
         return false;
+
+    int ai = ai_trigger(false, ch, "onTrackAI", "CC", ch, wch);
+    if (ai != AI_UNHANDLED)
+        return ai;
 
     if (trackCaster( wch ))
         return true;

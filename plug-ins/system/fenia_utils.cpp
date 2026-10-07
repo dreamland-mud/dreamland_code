@@ -99,6 +99,43 @@ bool gprog_nocatch(const DLString &trigName, const char *fmt, ...)
     }
 }
 
+bool vgprog_nocatch(const DLString &trigName, const char *fmt, va_list ap)
+{
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    return gprog_invoke(trigName, fmt, ap);
+}
+
+bool gprog_registered(const DLString &trigName)
+{
+    static IdRef ID_TMP("tmp"), ID_GTRIG("gtrig");
+
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    try {
+        Register tmp = *Context::root[ID_TMP];
+        Register gtrig = *tmp[ID_GTRIG];
+        if (gtrig.type != Register::OBJECT)
+            return false;
+
+        RegContainer *all = gtrig.toHandler().getDynamicPointer<RegContainer>();
+        if (!all)
+            return false;
+
+        auto i = all->map.find(Register(trigName));
+        if (i == all->map.end() || i->second.type != Register::OBJECT)
+            return false;
+
+        RegContainer *handlers = i->second.toHandler().getDynamicPointer<RegContainer>();
+        return handlers && !handlers->map.empty();
+    }
+    catch (const ::Exception &) {
+        return false;
+    }
+}
+
 /** 
  * Call a trigger with given name and args on an instance (mob, item, room) or its prototype (mob index data etc). 
  * Return 'true' if one of the triggers also returns true. Invokation result is saved in 'rc' register.

@@ -29,6 +29,7 @@
 #include "magic.h"
 #include "merc.h"
 
+#include "aitrigger.h"
 #include "vnum.h"
 #include "def.h"
 #include "l10n.h"
@@ -146,6 +147,14 @@ bool BasicMobileBehavior::doInvis()
     if (!IS_AWAKE(ch))
         return false;
 
+    bitstring_t innate = ch->getNPC()->pIndexData->affected_by & (AFF_SNEAK|AFF_INVISIBLE|AFF_IMP_INVIS);
+    if (!innate || (ch->affected_by & innate) == innate)
+        return false;
+
+    int ai = ai_trigger(true, ch, "onInvisAI", "C", ch);
+    if (ai != AI_UNHANDLED)
+        return ai;
+
     if (!IS_AFFECTED(ch, AFF_SNEAK)) {
         if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_SNEAK) && !MOUNTED(ch)) {
             ch->pecho(_("Ты пытаешься двигаться незаметно."));
@@ -238,6 +247,25 @@ static bool potion_cure_disease( Object *potion )
     return(false);
 }
 
+// Cheap gates before a Fenia call: is there anything to use at all.
+static bool carries_type( Character *ch, int itemType )
+{
+    for (Object *obj = ch->carrying; obj; obj = obj->next_content)
+        if (obj->item_type == itemType)
+            return true;
+
+    return false;
+}
+
+static bool carries_unworn( Character *ch )
+{
+    for (Object *obj = ch->carrying; obj; obj = obj->next_content)
+        if (obj->wear_loc == wear_none)
+            return true;
+
+    return false;
+}
+
 bool BasicMobileBehavior::doQuaff( )
 {
     Object *obj;
@@ -254,6 +282,13 @@ bool BasicMobileBehavior::doQuaff( )
         && !IS_AFFECTED(ch, AFF_BLIND|AFF_POISON|AFF_PLAGUE)
         && !ch->fighting)
         return false;
+
+    if (!carries_type( ch, ITEM_POTION ))
+        return false;
+
+    int ai = ai_trigger(true, ch, "onQuaffAI", "C", ch);
+    if (ai != AI_UNHANDLED)
+        return ai;
 
     for ( obj=ch->carrying;obj!=0;obj=obj->next_content ) {
         if (obj->item_type != ITEM_POTION)
@@ -391,6 +426,10 @@ bool BasicMobileBehavior::doScavenge( )
     if (number_bits( 6 ))
         return false;
 
+    int ai = ai_trigger(true, ch, "onScavengeAI", "C", ch);
+    if (ai != AI_UNHANDLED)
+        return ai;
+
     for (obj = ch->in_room->contents; obj; obj = obj->next_content) {
     int v = obj->pIndexData->vnum;
     // Mobs shouldn't pick up guts, useless gore    
@@ -451,6 +490,13 @@ bool BasicMobileBehavior::doPickWeapon( )
     
     if (number_bits( 1 ))
         return false;
+
+    if (!ch->in_room->contents && !carries_unworn( ch ))
+        return false;
+
+    int ai = ai_trigger(true, ch, "onPickWeaponAI", "C", ch);
+    if (ai != AI_UNHANDLED)
+        return ai;
 
     wield = get_eq_char( ch, wear_wield );
     shield = get_eq_char( ch, wear_shield );
@@ -556,6 +602,10 @@ bool BasicMobileBehavior::doWander( )
         
     if (RIDDEN(ch))
         return false;
+
+    int ai = ai_trigger(true, ch, "onWanderAI", "C", ch);
+    if (ai != AI_UNHANDLED)
+        return ai;
     
     door = number_door( );
     pexit = ch->in_room->exit[door];
@@ -601,6 +651,13 @@ bool BasicMobileBehavior::doHeal( )
 
     if (number_bits( 4 ))
         return false;
+
+    if (!IS_SET(ch->act, ACT_RANGER|ACT_CLERIC|NPC_NECRO_ACTS))
+        return false;
+
+    int ai = ai_trigger(true, ch, "onHealAI", "C", ch);
+    if (ai != AI_UNHANDLED)
+        return ai;
 
     if (IS_SET(ch->act, ACT_RANGER))
         if (healRanger( ch ))
