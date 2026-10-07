@@ -396,6 +396,14 @@ NMI_GET(ObjectWrapper, reset_mob , "ID моба, с которым предме�
     return Register(DLString(target->reset_mob));
 }
 
+NMI_GET( ObjectWrapper, cppBehavior, "тип C++-поведения предмета (например BasicObjectBehavior) или пустая строка, если его нет")
+{
+    checkTarget( );
+    if (!target->behavior)
+        return Register( "" );
+    return Register( target->behavior->getType( ) );
+}
+
 NMI_GET( ObjectWrapper, owner , "имя персонажа-владельца (для трупов и личных вещей)")
 {
     checkTarget( );
