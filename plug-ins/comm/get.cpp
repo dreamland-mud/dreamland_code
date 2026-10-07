@@ -674,9 +674,16 @@ CMDRUNP( get )
                     if (rc == GET_OBJ_STOP)
                         break;
 
-                    run.before( obj );
-                    get_obj( ch, obj, false );
-                    run.taken( );
+                    if (obj->item_type == ITEM_MONEY) {
+                        // Coins are consumed on pickup: nothing is left for
+                        // the run line to name, so echo them before the take.
+                        run.flush( );
+                        get_obj( ch, obj, true );
+                    } else {
+                        run.before( obj );
+                        get_obj( ch, obj, false );
+                        run.taken( );
+                    }
                     taken++;
 
                     if (!still_looting( ch, startRoom ))
@@ -822,9 +829,16 @@ CMDRUNP( get )
                 if (rc == GET_OBJ_ERR)
                     continue;
 
-                run.before( obj );
-                get_obj_container( ch, obj, container, false );
-                run.taken( );
+                if (obj->item_type == ITEM_MONEY) {
+                    // Coins are consumed on pickup: nothing is left for
+                    // the run line to name, so echo them before the take.
+                    run.flush( );
+                    get_obj_container( ch, obj, container, true );
+                } else {
+                    run.before( obj );
+                    get_obj_container( ch, obj, container, false );
+                    run.taken( );
+                }
                 taken++;
 
                 // A Fetch/Get trigger can extract the container mid-loop.
