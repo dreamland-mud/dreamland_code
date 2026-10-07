@@ -45,6 +45,8 @@ GSN(protection_good);
 GSN(stardust);
 GSN(dark_shroud);
 GSN(corruption);
+GSN(resistance);
+CLAN(battlerager);
 WEARLOC(none);
 WEARLOC(stuck_in);
 RELIG(chronos);
@@ -489,10 +491,20 @@ void create_mob_affects(NPCharacter *mob)
 {
     if (IS_AFFECTED(mob, AFF_SANCTUARY)) {
         Affect af;
-        if (IS_EVIL(mob)) {
+        // Battleragers scorn magic: their clan's own resistance stands in for
+        // sanctuary. Neutral mobs get stardust, evil ones a dark shroud.
+        if (mob->pIndexData->clan == clan_battlerager) {
+            affect_strip(mob, gsn_sanctuary);
+            REMOVE_BIT(mob->affected_by, AFF_SANCTUARY);
+            af.type = gsn_resistance;
+        } else if (IS_EVIL(mob)) {
             affect_strip(mob, gsn_sanctuary);
             REMOVE_BIT(mob->affected_by, AFF_SANCTUARY);
             af.type = gsn_dark_shroud;
+        } else if (IS_NEUTRAL(mob)) {
+            affect_strip(mob, gsn_sanctuary);
+            REMOVE_BIT(mob->affected_by, AFF_SANCTUARY);
+            af.type = gsn_stardust;
         } else {
             af.type = gsn_sanctuary;
             af.bitvector.setValue(AFF_SANCTUARY);
