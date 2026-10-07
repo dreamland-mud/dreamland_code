@@ -2857,12 +2857,12 @@ NMI_GET( CharacterWrapper, ai_homeVnum, "внум комнаты, где моб 
     return Register( ai->getHomeVnum( ) );
 }
 
-NMI_INVOKE( CharacterWrapper, ai_goHome, "([always]): вернуться домой после погони; always - исчезнуть, если дороги домой нет" )
+NMI_INVOKE( CharacterWrapper, ai_goHome, "([always]): вернуться домой после погони; always - исчезнуть, если дороги домой нет (после этого проверять .tmp.mob.valid)" )
 {
     checkTarget( );
     CHK_PC
     BasicMobileBehavior::Pointer ai = mob_ai( target );
-    if (!ai)
+    if (!ai || !target->in_room)
         return Register( false );
     return Register( ai->goHome( !args.empty( ) && argnum2boolean( args, 1 ) ) );
 }

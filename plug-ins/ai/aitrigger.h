@@ -13,9 +13,16 @@
  *
  * C++ keeps the cheap gates that say WHEN a mob should think (dice rolls, flags,
  * hp thresholds); the handler decides WHAT to do and runs every state check.
- * Returns AI_UNHANDLED when no handler is registered, so annulling the Fenia
- * handler brings the C++ fallback back. Otherwise 1 if the handler acted, 0 if
- * it decided to do nothing.
+ * Returns AI_UNHANDLED when no handler is registered in .tmp.gtrig[trigName]
+ * (an .Array(), see global/gtrig), so annulling the Fenia handler brings the C++
+ * fallback back. Otherwise 1 if the handler acted, 0 if it decided to do
+ * nothing. A handler that returns nothing counts as 0 and still owns the
+ * decision, and so does one that throws: no C++ fallback runs on top of what it
+ * may already have done.
+ *
+ * Handlers that destroy their own mob must return true, or the C++ caller goes
+ * on with the next decision on an extracted mob. track_update does not skip
+ * mobs without a room, so onTrackAI must check mob.in_room.
  *
  * fCombat: the caller sits inside a fight round that catches
  * VictimDeathException, so a kill made by the handler keeps travelling instead

@@ -119,8 +119,11 @@ int ai_trigger(bool fCombat, const char *trigName, const char *fmt, ...)
     }
     catch (const ::Exception &e) {
         va_end(ap);
+        // The decision counts as taken: the handler may have yelled, moved or
+        // attacked before it broke, and running the C++ body on top would do it
+        // twice. The croak reaches the logs and the immortals.
         FeniaManager::getThis()->croak(0, Scripting::Register(trigName), e);
-        return AI_UNHANDLED;
+        return 0;
     }
 }
 
