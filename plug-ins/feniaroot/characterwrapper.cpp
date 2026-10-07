@@ -5535,9 +5535,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         }
     }
     // Known limits: the left-hand verdict (keepScore/dualScore) and the sc<=0 candidate
-    // gate still price flags against worn gear outside the slot. The ideal/hybrid choice
-    // skips shield/hold even when no dual verdict replaces them. Both err high (fewer
-    // points short), never a drop after advice in a common case.
+    // gate still price flags against worn gear outside the slot.
 
     // ---- Set awareness (perma-affects #2758 phase 3b) --------------------------
     // Value each data-scorable set's completion bonus (SetBehavior <affects>) with
@@ -5704,34 +5702,25 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // ---- end set awareness (folded into the percentile + chase below) ----------
 
     double wornTotal = 0, bestTotal = 0;
-    // The shield and held-item share of both totals, swapped below for the left-hand
-    // verdict's build scores when there is one.
-    double leftWornSlots = 0, leftBestLegacy = 0, leftBestOnce = 0;
-    // Ideal vs hybrid ceiling, compared over the slots that stay in the % as they are:
-    // neutral set slots drop out, and shield/hold may be replaced by the left-hand verdict.
-    double sumIdeal = 0, sumHybrid = 0;
-    for (auto &kv: slotCeil) {
-        if ((neutralSlots & kv.first) || (kv.first & (ITEM_WEAR_SHIELD | ITEM_HOLD)))
-            continue;
-        sumIdeal  += kv.second;
-        sumHybrid += hybridCeil[kv.first];
-    }
-    bool useIdeal = sumIdeal >= sumHybrid;
+    // The ceiling is summed for both whole allocations (ideal, hybrid), the shield and
+    // held-item share kept apart: the left-hand verdict below may replace it, so the
+    // ideal/hybrid choice is made after the verdict, over what actually counts.
+    double coreIdeal = 0, coreHybrid = 0, leftIdeal = 0, leftHybrid = 0;
+    double leftWornSlots = 0, leftBestLegacy = 0;
     for (auto &kv: slotCeil) {
         if (neutralSlots & kv.first)   // unvaluable worn-set slot: neutral, out of the %
             continue;
         std::map<int,double>::iterator wi = wornPct.find( kv.first );
         double wv = (wi != wornPct.end( )) ? wi->second : 0.0;
-        double cv = useIdeal ? kv.second : hybridCeil[kv.first];
         wornTotal += wv;
-        bestTotal += cv;
-        // The left-hand verdict below swaps these for keepScore/dualScore. A kept build
-        // is full-price per slot, so it replaces the legacy share and cancels exactly;
-        // a dual build wears neither slot, so it replaces the flag-once share.
         if (kv.first & (ITEM_WEAR_SHIELD | ITEM_HOLD)) {
+            leftIdeal      += kv.second;
+            leftHybrid     += hybridCeil[kv.first];
             leftWornSlots  += wornSlot[kv.first];
             leftBestLegacy += legacyCeil[kv.first];
-            leftBestOnce   += cv;
+        } else {
+            coreIdeal  += kv.second;
+            coreHybrid += hybridCeil[kv.first];
         }
     }
     // Set bonuses: a complete worn set is real kit value; the ideal kit assembles the
@@ -5902,7 +5891,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // percentile scores the left hand as one build instead of shield + hold slots that a
     // dual-wielder leaves empty on purpose.
     bool gaGoDual = false, gaLeftScored = false;
-    double gaLeftWorn = 0, gaLeftBest = 0;
+    double gaLeftWorn = 0, gaLeftDual = 0, gaLeftKeepNet = 0;
     {
         int dState = 0, dUnlock = 0;
         double dualScore = 0, keepScore = 0;
@@ -5961,11 +5950,12 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                     if (gaShield)
                         gaLeftWorn += om.pShield * om.blowValue;
                 }
-                // Best left-hand share, net of what the totals loop already counted for
-                // shield + hold: a kept build replaces the legacy (per-slot) share, a dual
-                // build the flag-once share. Taking the max of the two nets keeps the
-                // ceiling continuous where the keep/dual verdict flips.
-                gaLeftBest = std::max( dualScore - leftBestOnce, keepScore - leftBestLegacy );
+                // Best left-hand share: a dual build replaces the shield + hold share
+                // outright, a kept build is full-price per slot, so it is netted against
+                // the legacy share and added to the allocation's own. Taking the max of
+                // the two keeps the ceiling continuous where the keep/dual verdict flips.
+                gaLeftDual = dualScore;
+                gaLeftKeepNet = keepScore - leftBestLegacy;
                 gaLeftScored = true;
                 // Same rounded values the dual line prints, so the list and the verdict agree.
                 gaGoDual = (int)(dualScore + 0.5) > (int)(keepScore + 0.5);
@@ -5986,10 +5976,14 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         dualInfo->push_back( dEntry );
     }
 
-    if (gaLeftScored) {
+    if (gaLeftScored)
         wornTotal += gaLeftWorn - leftWornSlots;
-        bestTotal += gaLeftBest;
-    }
+    // Ideal vs hybrid: whichever whole allocation sums higher, left hand included, never
+    // a per-slot max (that could grant a flag twice).
+    auto leftShare = [&]( double own ) -> double {
+        return gaLeftScored ? std::max( gaLeftDual, own + gaLeftKeepNet ) : own;
+    };
+    bestTotal += std::max( coreIdeal + leftShare( leftIdeal ), coreHybrid + leftShare( leftHybrid ) );
     int pct = 0;
     if (bestTotal > 0)
         pct = (int)( 100.0 * wornTotal / bestTotal + 0.5 );
