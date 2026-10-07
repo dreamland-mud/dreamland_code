@@ -360,7 +360,7 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
     errbuf << fmt(0, lmsg(viewerLang(ch),
                           "Looking %s, you see no one by that name.",
                           "Ты не видишь %s никого с таким именем.",
-                          "Ти не бачиш %s нікого з таким імʼям."),
+                          "Ти не бачиш %s нікого з таким ім'ям."),
                   direction_word(viewerLang(ch), door, DIR_CASE_AT)) << endl;
     return 0;
 }
