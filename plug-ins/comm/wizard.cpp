@@ -1177,7 +1177,11 @@ static bool has_nopost(Character *ch)
 
     if (victim->is_npc( )) {
         MOB_INDEX_DATA *pIndex = victim->getNPC( )->pIndexData;
-        buf << "Тир: " << MobBody::tiers( ).name( pIndex->tier )
+        int tier = victim->getNPC( )->getTier( );
+        buf << "Тир: " << MobBody::tiers( ).name( tier );
+        if (tier != pIndex->tier)
+            buf << " (прототип " << MobBody::tiers( ).name( pIndex->tier ) << ")";
+        buf
             << (pIndex->numbersDerived ? " (числа от тира)" : " (числа из зоны)")
             << "  Тело: " << (pIndex->bodyResolved ? "формы расы" : "старая модель")
             << "  Походка: " << (pIndex->bodyResolved ? pIndex->moveverb.c_str() : "-")
