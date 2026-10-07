@@ -6214,6 +6214,18 @@ NMI_INVOKE( CharacterWrapper, get_eq_char, "(wearloc): предмет экипи
     return wrap( arg2wearloc( get_unique_arg( args ) )->find( target ) );
 }
 
+NMI_INVOKE( CharacterWrapper, canWearAt, "(obj, wearloc): молча проверить, можно ли надеть obj на локацию wearloc: подходит ли предмет, есть ли у тела такое место, хватает ли уровня и сил. Занятость локации не проверяется" )
+{
+    checkTarget( );
+    ::Object *obj = argnum2item( args, 1 );
+    Wearlocation *loc = arg2wearloc( argnum( args, 2 ) );
+
+    if (!loc->matches( obj ))
+        return Register( false );
+
+    return Register( loc->canWear( target, obj, 0 ) == RC_WEAR_OK );
+}
+
 NMI_INVOKE( CharacterWrapper, hasWearloc, "(wearloc): обладает ли данным слотом в экипировке")
 {
     checkTarget( );
