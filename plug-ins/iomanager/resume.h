@@ -7,18 +7,31 @@
  * server or nginx setting can hold that socket open, so the connection is
  * treated as expendable and the SESSION is made to survive it instead.
  *
- * Each web session carries a token, refreshed on every prompt and handed to
- * the client inside the web prompt. When the client comes back it presents the
- * token instead of a name and password, and the new descriptor is attached to
- * the character it left linkdead -- the same take-over `nanny.reconnect` does
- * after a manual re-login, minus the login and minus the announcement.
+ * Each web session carries a token, refreshed on every prompt and on any frame
+ * the playing client sends (the web client pings every ~25s while in the
+ * world), and handed to the client inside the web prompt and the resume_ok
+ * reply. When the client comes back it presents the token instead of a name
+ * and password, and the new descriptor is attached to the character it left
+ * linkdead -- the same take-over `nanny.reconnect` does after a manual
+ * re-login, minus the login and minus the announcement.
  *
- * The token is credential-grade for as long as it lives, so: 90 seconds, one
- * use (burned on presentation, valid or not), one live token per player, never
- * written to a log, and useless unless that character is actually in the world
- * with no descriptor on it.
+ * The token is credential-grade for as long as it lives, so: RESUME_TTL (180s)
+ * past the last sign of life, one use (burned on presentation, valid or not),
+ * one live token per player, never written to a log, and useless unless that
+ * character is actually in the world. It is NOT limited to a linkdead body: a
+ * valid token takes over a body still on a CON_PLAYING descriptor (resume_attach
+ * closes that descriptor -- the phone-suspend case). And since any frame from
+ * the playing socket refreshes it, it lives for the whole connected session,
+ * idle or not: a leaked token can take over a live session at any time until
+ * the player quits or the socket has been silent for RESUME_TTL. Mitigations:
+ * single use, a password login takes the body back, and it travels only in
+ * wss frames and the tab's sessionStorage.
  *
- * The window is 90 seconds and not longer because of what has to be true for a
+ * Every RESUME_OK hands the client a fresh token at once (resume_ok arg 0):
+ * the presented one is spent, and a quiet resume produces no prompt to carry
+ * the next one.
+ *
+ * The window is that short and not longer because of what has to be true for a
  * resume to land: the body must still be in the world. char_update_lostlink()
  * runs every pulse and, with `lostlink: 0`, quits a descriptor-less player out
  * a quarter of a second after the socket dies -- so resume_pending() holds that
@@ -46,6 +59,12 @@ enum ResumeResult {
 
 /** This player's token, minted on first call and refreshed thereafter. */
 DLString resume_token_issue(PCharacter *ch);
+
+/** Push an existing, still-live token's expiry out by a full TTL. Never mints
+ *  and never revives an expired one. Called on traffic from the player's own
+ *  playing descriptor, so an idle player (no prompts) whose client keeps the
+ *  line alive does not lose the resume window before the socket ever drops. */
+void resume_token_touch(PCharacter *ch);
 
 /** Forget this player's token (they quit, or it has just been spent). */
 void resume_token_clear(PCharacter *ch);

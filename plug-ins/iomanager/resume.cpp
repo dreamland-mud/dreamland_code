@@ -120,6 +120,26 @@ DLString resume_token_issue(PCharacter *ch)
     return token;
 }
 
+void resume_token_touch(PCharacter *ch)
+{
+    if (!ch)
+        return;
+
+    NameMap::iterator n = byName.find(ch->getName());
+    if (n == byName.end())
+        return;
+
+    TokenMap::iterator t = tokens.find(n->second);
+    if (t == tokens.end())
+        return;
+
+    /* Extend, never revive: a token that already ran out stays dead, and the
+     * next prompt mints a fresh one the client actually gets to see. */
+    time_t now = time(0);
+    if (t->second.expires > now)
+        t->second.expires = now + RESUME_TTL;
+}
+
 bool resume_pending(PCharacter *ch)
 {
     if (!ch)
@@ -133,7 +153,8 @@ bool resume_pending(PCharacter *ch)
     if (t == tokens.end())
         return false;
 
-    /* The token is refreshed on every prompt, so its expiry is really "last
+    /* The token is refreshed on every prompt and on every frame the playing
+     * client sends (its keepalive ping included), so its expiry is really "last
      * seen + TTL": once the socket dies the refreshes stop and this runs out
      * on its own, without anything having to notice the disconnect. */
     return t->second.expires > time(0);
