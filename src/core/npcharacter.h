@@ -89,6 +89,10 @@ public:
     // configuration
     virtual PlayerConfig getConfig( ) const;
 
+    /** Mob tier (1 legend .. 10 dummy) this instance fights at: the one
+     *  apply_mob_tier gave it, else its prototype's. */
+    int getTier( ) const;
+
 public:
     MOB_INDEX_DATA *        pIndexData;
     AreaIndexData *                zone;
@@ -116,6 +120,10 @@ public:
 
     // switch
     PCharacter                *switchedFrom;
+
+    /** Tier set on this instance by apply_mob_tier (summons, quest spawns);
+     *  0 means the prototype's. Read it through getTier(). */
+    int tier;
 
 // MOC_SKIP_BEGIN
     /** Mob reform: the body bits this instance was built with (index body plus

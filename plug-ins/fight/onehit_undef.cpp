@@ -283,7 +283,7 @@ void UndefinedOneHit::damEffectVorpal()
 
     // A legend (mob tier 1) keeps its head; the verse still rings out above
     // (docs/plans/tier-audit.md M4).
-    if (victim->is_npc( ) && victim->getNPC( )->pIndexData->tier == 1)
+    if (victim->is_npc( ) && victim->getNPC( )->getTier( ) == 1)
         return;
 
     MultiMessage msgVict, msgOther;

@@ -129,7 +129,7 @@ bool BasicMobileBehavior::specFightCaster( )
     // onCastAI). Normal and trash only bring spells, so only class casters are
     // asked. The tables below stay for vampires and for any mob the Fenia side
     // declines (no usable spells).
-    int tier = ch->getNPC()->pIndexData->tier;
+    int tier = ch->getNPC()->getTier();
     bool classCaster = IS_SET( ch->act, ACT_MAGE|ACT_CLERIC|NPC_NECRO_ACTS );
     if (tier >= 1 && tier <= 9 && (tier <= 5 || classCaster) && gprog("onCastAI", "C", ch))
         return true;

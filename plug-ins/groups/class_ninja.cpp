@@ -688,7 +688,7 @@ void AssassinateOneHit::calcDamage( )
 
     // Bosses and legends (mob tier 1-2) never die to a broken neck: the blow
     // lands as plain damage (docs/plans/tier-audit.md M3).
-    int tier = victim->is_npc( ) ? victim->getNPC( )->pIndexData->tier : 0;
+    int tier = victim->is_npc( ) ? victim->getNPC( )->getTier( ) : 0;
     bool neckProof = tier >= 1 && tier <= 2;
 
     if (!neckProof && mychance.reroll()) {

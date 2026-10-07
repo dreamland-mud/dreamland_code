@@ -85,6 +85,7 @@
 #include "objectmanager.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
+#include "mobtiers.h"
 #include "object.h"
 #include "affect.h"
 #include "room.h"
@@ -465,6 +466,7 @@ struct SavedMobState {
     vector<int> attrV, amodV;
     bool hasHit = false, hasDam = false, hasDamN = false, hasDamT = false, hasSave = false, hasLevel = false;
     int hitV = 0, damV = 0, damNV = 0, damTV = 0, saveV = 0, levelV = 0;
+    int tierV = 0;              // instance tier from apply_mob_tier, 0 = prototype's
 
     list<Affect *> affects;
 
@@ -564,6 +566,7 @@ static bool fread_saved_mob_key(const char *word, FILE *fp, SavedMobState &st, b
     if (!strcmp(word, "DamT")) { st.hasDamT = true; st.damTV = fread_number(fp); return true; }
     if (!strcmp(word, "Save")) { st.hasSave = true; st.saveV = fread_number(fp); return true; }
     if (!strcmp(word, "Levl")) { st.hasLevel = true; st.levelV = fread_number(fp); return true; }
+    if (!strcmp(word, "Tier")) { st.tierV = fread_number(fp); return true; }
 
     if (!strcmp(word, "Affc") || !strcmp(word, "Aff2")) {
         st.affects.push_back(fread_affect(fp, !strcmp(word, "Aff2")));
@@ -606,6 +609,8 @@ static void apply_saved_numbers(NPCharacter *mob, const SavedMobState &st)
         mob->damage[DICE_TYPE] = st.damTV;
     if (st.hasSave)
         mob->saving_throw = st.saveV;
+    if (st.tierV >= MobTiers::TIER_BEST && st.tierV <= MobTiers::TIER_WORST)
+        mob->tier = st.tierV;
 }
 
 /* Boot forensics: legacy whole-value body lines read past, reported once. */
@@ -718,6 +723,9 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
 
         if (pet->getRealLevel( ) != pet->pIndexData->level)
                 fprintf(fp,"Levl %d\n", pet->getRealLevel( ) );
+
+        if (pet->tier > 0 && pet->tier != pet->pIndexData->tier)
+                fprintf(fp,"Tier %d\n", pet->tier );
 
         fprintf(fp, "HMV  %d %d %d %d %d %d\n",
                 pet->hit.getValue( ), pet->max_hit.getValue( ), pet->mana.getValue( ), pet->max_mana.getValue( ), pet->move.getValue( ), pet->max_move.getValue( ));
@@ -835,6 +843,9 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
 
         if (mob->getRealLevel( ) != mob->pIndexData->level)
                 fprintf(fp,"Levl %d\n", mob->getRealLevel( ) );
+
+        if (mob->tier > 0 && mob->tier != mob->pIndexData->tier)
+                fprintf(fp,"Tier %d\n", mob->tier );
 
         if (mob->getClan() != clan_none)
             fprintf(fp, "Clan %s~\n", mob->getClan().getName().c_str());

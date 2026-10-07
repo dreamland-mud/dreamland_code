@@ -256,7 +256,7 @@ NMI_GET( CharacterWrapper, id, "уникальный идентификатор 
 NMI_GET( CharacterWrapper, tier, "тир моба числом 1..10 (1 сильнейший), 0 для игроков" )
 {
     checkTarget();
-    return Register( target->is_npc() ? target->getNPC()->pIndexData->tier : 0 );
+    return Register( target->is_npc() ? target->getNPC()->getTier() : 0 );
 }
 
 NMI_GET( CharacterWrapper, normalHit, "здоровье обычного (normal) моба этого уровня по fight/mob_tiers.json, 0 для игроков и без файла тиров" )

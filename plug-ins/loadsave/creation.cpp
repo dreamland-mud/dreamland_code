@@ -284,6 +284,9 @@ bool apply_mob_tier(NPCharacter *mob, int level, int tier)
     int t = max(2, (int)lround(2.0 * dam / n - 1));
     int dicesAve = n * (t + 1) / 2;
 
+    // Remember the tier on the instance: xp, consider, AI and the tier gates
+    // read getTier(), not the prototype this mob was cloned from.
+    mob->tier = (tier >= MobTiers::TIER_BEST && tier <= MobTiers::TIER_WORST) ? tier : tc.defaultTier;
     mob->setLevel(level);
     mob->damage[DICE_NUMBER] = n;
     mob->damage[DICE_TYPE] = t;

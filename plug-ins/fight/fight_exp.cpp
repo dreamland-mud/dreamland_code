@@ -416,7 +416,7 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
     // scales with it. A tier's xp_min_level keeps trash at full XP up to there.
     double tier_xp = 1.0;
     if (victim->is_npc() && MobBody::tiers().loaded) {
-        const MobTiers::Tier &t = MobBody::tiers().get(victim->getNPC()->pIndexData->tier);
+        const MobTiers::Tier &t = MobBody::tiers().get(victim->getNPC()->getTier());
         if (victim->getRealLevel() >= t.xpMinLevel)
             tier_xp = t.xp;
     }

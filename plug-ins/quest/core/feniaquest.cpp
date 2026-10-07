@@ -488,7 +488,7 @@ bool FeniaQuest::passesParams( PCharacter *pch, NPCharacter *mob )
 {
     const QuestSelectParams &p = selectParams;
 
-    int tier = mob->pIndexData->tier;
+    int tier = mob->getTier( );
     bool tiered = tier >= MobTiers::TIER_BEST && tier <= MobTiers::TIER_WORST;
 
     if (p.minTier > 0 && tiered && tier < p.minTier)

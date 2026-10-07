@@ -74,6 +74,7 @@ void NPCharacter::init( )
     behavior.clear( );
     reset_room = 0;
     switchedFrom = 0;
+    tier = 0;
     for (int i = 0; i < MOBSET_MAX; i++)
         baseBits[i] = 0;
 }
@@ -422,5 +423,9 @@ PlayerConfig NPCharacter::getConfig( ) const
         return PlayerConfig();
 }
 
-
-
+int NPCharacter::getTier( ) const
+{
+    if (tier > 0)
+        return tier;
+    return pIndexData ? pIndexData->tier : 0;
+}
