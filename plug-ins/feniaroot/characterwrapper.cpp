@@ -3489,6 +3489,14 @@ struct GACand {
                       // render says whereabouts unknown instead of a stale route.
 };
 
+// Boss cap: gear whose easiest route is killing or looting more than 10 levels
+// above the char. The sage never advises it, so it must not raise the percentile's
+// ceiling either -- otherwise a kit with nothing left to chase still reads below 100%.
+static bool ga_overCap( const GAAcq &acq, int chLevel )
+{
+    return (acq.method == GA_KILL || acq.method == GA_PICKUP) && acq.guard > chLevel + 10;
+}
+
 // Weapon flags of a candidate: a rolled weapon keeps them on the instance.
 static int ga_candValue4( const GACand &c )
 {
@@ -5326,7 +5334,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // Only gear the char can actually get sets the slot ceiling: an item with no
         // known route (GA_UNKNOWN -- includes outleveled quest rewards) can't be
         // obtained or worn, so it must not inflate bestSlot / drag down the percentile.
-        if (ac.method != GA_UNKNOWN && sc > bestSlot[slot])
+        if (ac.method != GA_UNKNOWN && !ga_overCap( ac, chLevel ) && sc > bestSlot[slot])
             bestSlot[slot] = sc;
     }
 
@@ -5431,7 +5439,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             pool[slot].push_back( e );
         }
         for (auto &c: cands) {
-            if (c.acq.method == GA_UNKNOWN)   // same gate as bestSlot
+            if (c.acq.method == GA_UNKNOWN || ga_overCap( c.acq, chLevel ))   // same gate as bestSlot
                 continue;
             GAOnce e = { c.pObj, c.inst, false, 0, 0, 0, c.score };
             ga_grantBits( c.pObj, c.inst, e.aff, e.imm, e.res );
@@ -5582,9 +5590,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             wornSetIdx[b->getIndex( )] = 1;
     }
 
-    // Best obtainable member per slot from the candidate pool (not-worn, has a route).
+    // Best obtainable member per slot from the candidate pool (not-worn, has a route,
+    // not boss-capped -- the chase won't send the char after it).
     for (auto &c: cands) {
-        if (c.acq.method == GA_UNKNOWN)
+        if (c.acq.method == GA_UNKNOWN || ga_overCap( c.acq, chLevel ))
             continue;
         for (auto &kv: gaSets)
             if (c.pObj->behaviors.isSet( kv.first ) && c.score > kv.second.memScore[c.slot])
@@ -5876,7 +5885,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     auto reachable = [&]( const GACand &c ) -> bool {
         if (c.acq.method == GA_UNKNOWN)
             return false;
-        if ((c.acq.method == GA_KILL || c.acq.method == GA_PICKUP) && c.acq.guard > chLevel + 10)
+        if (ga_overCap( c.acq, chLevel ))
             return false;
         return true;
     };
@@ -6187,8 +6196,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // Boss cap (OPTIMAL list only -- the finest/dream list still shows these):
         // don't tell the char to chase gear whose easiest route is killing/looting
         // more than 10 levels above them. Buy/quest have no such guard.
-        if ((byOpt[k].acq.method == GA_KILL || byOpt[k].acq.method == GA_PICKUP)
-            && byOpt[k].acq.guard > chLevel + 10)
+        if (ga_overCap( byOpt[k].acq, chLevel ))
             continue;
         // The verdict says go dual: a shield or held item would take the off-hand back.
         if (gaGoDual && (byOpt[k].slot & (ITEM_WEAR_SHIELD | ITEM_HOLD)))
