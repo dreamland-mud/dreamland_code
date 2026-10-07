@@ -5518,19 +5518,26 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // a plain-slot upgrade can't vanish from the %. The totals loop picks whichever
         // whole allocation sums higher, never a per-slot max (that could grant a flag
         // twice).
+        // A bit slot also takes its best plain item when that beats the worn share:
+        // dropping the worn item's bits can only lower other slots, so the hybrid stays
+        // flag-once and a plain upgrade there still counts.
         for (auto &kv: slotCeil) {
             bool bits = false;
-            for (auto &e: pool[kv.first])
-                if (e.aff | e.imm | e.res) { bits = true; break; }
+            double plain = 0;
+            for (auto &e: pool[kv.first]) {
+                if (e.aff | e.imm | e.res)
+                    bits = true;
+                else if (e.base > plain)
+                    plain = e.base;
+            }
             kv.second = ceilOnce[kv.first];
-            hybridCeil[kv.first] = bits ? wornPct[kv.first] : ceilOnce[kv.first];
+            hybridCeil[kv.first] = bits ? std::max( wornPct[kv.first], plain ) : ceilOnce[kv.first];
         }
     }
     // Known limits: the left-hand verdict (keepScore/dualScore) and the sc<=0 candidate
     // gate still price flags against worn gear outside the slot. The ideal/hybrid choice
-    // skips shield/hold even when no dual verdict replaces them, and a bit slot in the
-    // hybrid takes the worn item even if a plain one in its pool is better. Both err
-    // high (fewer points short), never a drop after advice in a common case.
+    // skips shield/hold even when no dual verdict replaces them. Both err high (fewer
+    // points short), never a drop after advice in a common case.
 
     // ---- Set awareness (perma-affects #2758 phase 3b) --------------------------
     // Value each data-scorable set's completion bonus (SetBehavior <affects>) with
