@@ -98,7 +98,7 @@ void MobileMemory::poll( int diff )
 /*
  * Fenia mob AI hand-over, see aitrigger.h
  */
-int ai_trigger(bool fCombat, const char *trigName, const char *fmt, ...)
+int ai_trigger(bool fCombat, Character *mob, const char *trigName, const char *fmt, ...)
 {
     if (!gprog_registered(trigName))
         return AI_UNHANDLED;
@@ -106,10 +106,11 @@ int ai_trigger(bool fCombat, const char *trigName, const char *fmt, ...)
     va_list ap;
     va_start(ap, fmt);
 
+    int rc;
+
     try {
-        bool rc = vgprog_nocatch(trigName, fmt, ap);
+        rc = vgprog_nocatch(trigName, fmt, ap) ? 1 : 0;
         va_end(ap);
-        return rc ? 1 : 0;
     }
     catch (const VictimDeathException &) {
         va_end(ap);
@@ -123,8 +124,15 @@ int ai_trigger(bool fCombat, const char *trigName, const char *fmt, ...)
         // attacked before it broke, and running the C++ body on top would do it
         // twice. The croak reaches the logs and the immortals.
         FeniaManager::getThis()->croak(0, Scripting::Register(trigName), e);
-        return 0;
+        rc = 0;
     }
+
+    // A handler that extracted its own mob, then returned false or broke, must
+    // still stop the C++ caller: it would go on reading ch->in_room.
+    if (mob->extracted)
+        return 1;
+
+    return rc;
 }
 
 /*

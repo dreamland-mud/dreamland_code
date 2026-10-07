@@ -2780,7 +2780,7 @@ NMI_INVOKE( CharacterWrapper, ai_setLastFought, "(ch): запомнить игр
     checkTarget( );
     CHK_PC
     BasicMobileBehavior::Pointer ai = mob_ai( target );
-    if (!ai)
+    if (!ai || !target->in_room)
         return Register( false );
     ai->setLastFought( argnum2character( args, 1 ) );
     return Register( true );

@@ -20,14 +20,21 @@
  * decision, and so does one that throws: no C++ fallback runs on top of what it
  * may already have done.
  *
- * Handlers that destroy their own mob must return true, or the C++ caller goes
- * on with the next decision on an extracted mob. track_update does not skip
- * mobs without a room, so onTrackAI must check mob.in_room.
+ * mob is the deciding mob. If the handler extracted it, the result is 1 whatever
+ * the handler returned, so the C++ caller stops instead of reading its room.
+ * After a 0 the same handler may be asked again in the same pulse with another
+ * kind (assist master -> offense, aggress lastFought -> memorized -> normal):
+ * handlers check mob.fighting and every other state themselves. A try/catch in
+ * a handler swallows VictimDeathException like in any Fenia trigger, so a kill
+ * inside it no longer stops the fight round. track_update does not skip mobs
+ * without a room, so onTrackAI must check mob.in_room.
  *
  * fCombat: the caller sits inside a fight round that catches
  * VictimDeathException, so a kill made by the handler keeps travelling instead
  * of being filed as a script error. Any other script error is logged.
  */
-int ai_trigger(bool fCombat, const char *trigName, const char *fmt, ...);
+class Character;
+
+int ai_trigger(bool fCombat, Character *mob, const char *trigName, const char *fmt, ...);
 
 #endif

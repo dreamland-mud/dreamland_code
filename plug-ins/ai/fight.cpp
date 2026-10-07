@@ -152,7 +152,7 @@ bool BasicMobileBehavior::doWimpy( )
     if (!mustFlee( ))
         return false;
 
-    int ai = ai_trigger(true, "onWimpyAI", "C", ch);
+    int ai = ai_trigger(true, ch, "onWimpyAI", "C", ch);
     if (ai != AI_UNHANDLED)
         return ai;
 

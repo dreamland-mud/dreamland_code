@@ -74,7 +74,7 @@ bool BasicMobileBehavior::assistOffense( Character *fch, Character *victim )
     if (!canAssistOffense( fch, victim ))
         return false;
 
-    int ai = ai_trigger(true, "onAssistAI", "CCCs", ch, fch, victim, "offense");
+    int ai = ai_trigger(true, ch, "onAssistAI", "CCCs", ch, fch, victim, "offense");
     if (ai != AI_UNHANDLED)
         return ai;
     
@@ -128,7 +128,7 @@ bool BasicMobileBehavior::canAssistOffense( Character *fch, Character *victim )
 bool BasicMobileBehavior::assistMaster( Character *fch, Character *victim )
 {
     if (IS_CHARMED(ch) && is_same_group( fch, ch )) {
-        int ai = ai_trigger(true, "onAssistAI", "CCCs", ch, fch, victim, "master");
+        int ai = ai_trigger(true, ch, "onAssistAI", "CCCs", ch, fch, victim, "master");
         if (ai != AI_UNHANDLED)
             return ai;
 
@@ -196,7 +196,7 @@ bool BasicMobileBehavior::assistGroup( Character *fch, Character *victim )
     if (number_percent( ) < HEALTH(fch))
         return false;
 
-    int ai = ai_trigger(true, "onAssistAI", "CCCs", ch, fch, victim, "group");
+    int ai = ai_trigger(true, ch, "onAssistAI", "CCCs", ch, fch, victim, "group");
     if (ai != AI_UNHANDLED)
         return ai;
 
@@ -420,7 +420,7 @@ bool BasicMobileBehavior::doCallHelp( )
     if (number_bits( 3 ))
         return false;
 
-    int ai = ai_trigger(true, "onCallHelpAI", "C", ch);
+    int ai = ai_trigger(true, ch, "onCallHelpAI", "C", ch);
     if (ai != AI_UNHANDLED)
         return ai;
     

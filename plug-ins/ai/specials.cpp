@@ -151,7 +151,7 @@ bool BasicMobileBehavior::doInvis()
     if (!innate || (ch->affected_by & innate) == innate)
         return false;
 
-    int ai = ai_trigger(true, "onInvisAI", "C", ch);
+    int ai = ai_trigger(true, ch, "onInvisAI", "C", ch);
     if (ai != AI_UNHANDLED)
         return ai;
 
@@ -286,7 +286,7 @@ bool BasicMobileBehavior::doQuaff( )
     if (!carries_type( ch, ITEM_POTION ))
         return false;
 
-    int ai = ai_trigger(true, "onQuaffAI", "C", ch);
+    int ai = ai_trigger(true, ch, "onQuaffAI", "C", ch);
     if (ai != AI_UNHANDLED)
         return ai;
 
@@ -426,7 +426,7 @@ bool BasicMobileBehavior::doScavenge( )
     if (number_bits( 6 ))
         return false;
 
-    int ai = ai_trigger(true, "onScavengeAI", "C", ch);
+    int ai = ai_trigger(true, ch, "onScavengeAI", "C", ch);
     if (ai != AI_UNHANDLED)
         return ai;
 
@@ -494,7 +494,7 @@ bool BasicMobileBehavior::doPickWeapon( )
     if (!ch->in_room->contents && !carries_unworn( ch ))
         return false;
 
-    int ai = ai_trigger(true, "onPickWeaponAI", "C", ch);
+    int ai = ai_trigger(true, ch, "onPickWeaponAI", "C", ch);
     if (ai != AI_UNHANDLED)
         return ai;
 
@@ -603,7 +603,7 @@ bool BasicMobileBehavior::doWander( )
     if (RIDDEN(ch))
         return false;
 
-    int ai = ai_trigger(true, "onWanderAI", "C", ch);
+    int ai = ai_trigger(true, ch, "onWanderAI", "C", ch);
     if (ai != AI_UNHANDLED)
         return ai;
     
@@ -655,7 +655,7 @@ bool BasicMobileBehavior::doHeal( )
     if (!IS_SET(ch->act, ACT_RANGER|ACT_CLERIC|NPC_NECRO_ACTS))
         return false;
 
-    int ai = ai_trigger(true, "onHealAI", "C", ch);
+    int ai = ai_trigger(true, ch, "onHealAI", "C", ch);
     if (ai != AI_UNHANDLED)
         return ai;
 

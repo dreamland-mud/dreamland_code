@@ -146,7 +146,7 @@ bool BasicMobileBehavior::aggressNormal( )
     }
 
     if (victim) {
-        int ai = ai_trigger(false, "onAggressAI", "CCs", ch, victim, "normal");
+        int ai = ai_trigger(false, ch, "onAggressAI", "CCs", ch, victim, "normal");
         if (ai != AI_UNHANDLED)
             return ai;
 
@@ -184,7 +184,7 @@ bool BasicMobileBehavior::aggressLastFought( )
     if (!canAggressLastFought( victim ))
         return false;
 
-    int ai = ai_trigger(false, "onAggressAI", "CCs", ch, victim, "lastFought");
+    int ai = ai_trigger(false, ch, "onAggressAI", "CCs", ch, victim, "lastFought");
     if (ai != AI_UNHANDLED)
         return ai;
 
@@ -220,7 +220,7 @@ bool BasicMobileBehavior::aggressMemorized( )
     }
 
     if (victim) {
-        int ai = ai_trigger(false, "onAggressAI", "CCs", ch, victim, "memorized");
+        int ai = ai_trigger(false, ch, "onAggressAI", "CCs", ch, victim, "memorized");
         if (ai != AI_UNHANDLED)
             return ai;
 
@@ -257,7 +257,7 @@ bool BasicMobileBehavior::aggressRanged( )
         if (!victim)
             return false;
 
-        int ai = ai_trigger(false, "onAggressRangedAI", "CCii", ch, victim, victDoor, victRange);
+        int ai = ai_trigger(false, ch, "onAggressRangedAI", "CCii", ch, victim, victDoor, victRange);
         if (ai != AI_UNHANDLED)
             return ai;
     }

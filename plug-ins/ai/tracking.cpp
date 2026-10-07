@@ -51,7 +51,7 @@ bool BasicMobileBehavior::track( )
     if (!canTrackLastFought( wch ))
         return false;
 
-    int ai = ai_trigger(false, "onTrackAI", "CC", ch, wch);
+    int ai = ai_trigger(false, ch, "onTrackAI", "CC", ch, wch);
     if (ai != AI_UNHANDLED)
         return ai;
 
