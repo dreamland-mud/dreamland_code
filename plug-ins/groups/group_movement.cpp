@@ -80,7 +80,7 @@ SKILL_RUNP( sneak )
 
     if( IS_AFFECTED(ch,AFF_SNEAK)) {
         if(IS_CHARMED(ch))
-        ch->master->pecho(_("%^$#C1 и так двигается бесшумно.\n\r"), ch);
+        ch->master->pecho(_("%1$#^C1 и так двигается бесшумно.\n\r"), ch);
         ch->pecho(_("Ты и так двигаешься бесшумно."));
         return;
     }
