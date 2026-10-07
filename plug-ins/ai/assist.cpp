@@ -28,6 +28,7 @@
 #include "terrains.h"
 #include "move_utils.h"
 #include "doors.h"
+#include "aitrigger.h"
 #include "merc.h"
 
 
@@ -72,6 +73,10 @@ bool BasicMobileBehavior::assistOffense( Character *fch, Character *victim )
 
     if (!canAssistOffense( fch, victim ))
         return false;
+
+    int ai = ai_trigger(true, "onAssistAI", "CCCs", ch, fch, victim, "offense");
+    if (ai != AI_UNHANDLED)
+        return ai;
     
     if (!( target = findAssistVictim( victim ) ))
         return false;
@@ -123,6 +128,10 @@ bool BasicMobileBehavior::canAssistOffense( Character *fch, Character *victim )
 bool BasicMobileBehavior::assistMaster( Character *fch, Character *victim )
 {
     if (IS_CHARMED(ch) && is_same_group( fch, ch )) {
+        int ai = ai_trigger(true, "onAssistAI", "CCCs", ch, fch, victim, "master");
+        if (ai != AI_UNHANDLED)
+            return ai;
+
         attack( victim );
         return true;
     }
@@ -186,6 +195,10 @@ bool BasicMobileBehavior::assistGroup( Character *fch, Character *victim )
 
     if (number_percent( ) < HEALTH(fch))
         return false;
+
+    int ai = ai_trigger(true, "onAssistAI", "CCCs", ch, fch, victim, "group");
+    if (ai != AI_UNHANDLED)
+        return ai;
 
     if (assistGroupHealing( fch )) 
         return true;
@@ -406,6 +419,10 @@ bool BasicMobileBehavior::doCallHelp( )
     
     if (number_bits( 3 ))
         return false;
+
+    int ai = ai_trigger(true, "onCallHelpAI", "C", ch);
+    if (ai != AI_UNHANDLED)
+        return ai;
     
     for (helpers = 0, fighters = 0, fch = ch->in_room->people; fch; fch = fch->next_in_room) {
         if (fch == ch)

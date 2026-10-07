@@ -383,6 +383,23 @@ NMI_INVOKE( RoomWrapper, exits, "(ch): список номеров всех до
     return Register( listObj );
 }
 
+NMI_INVOKE( RoomWrapper, trackDoor, "(ch): номер выхода, через который отсюда ушел ch по следам в комнате, или -1" )
+{
+    checkTarget( );
+    return Register( target->history.went( argnum2character( args, 1 ) ) );
+}
+
+NMI_INVOKE( RoomWrapper, trackRecord, "(ch, door): оставить в комнате след ch, уходящий в выход door" )
+{
+    checkTarget( );
+    Character *ch = argnum2character( args, 1 );
+    int door = argnum2number( args, 2 );
+    if (door < 0 || door >= DIR_SOMEWHERE)
+        throw Scripting::IllegalArgumentException( );
+    target->history.record( ch, door );
+    return Register( );
+}
+
 NMI_INVOKE(RoomWrapper, doorTo, "(room): номер двери, ведущей из этой комнаты в room" )
 {
     Room *room;

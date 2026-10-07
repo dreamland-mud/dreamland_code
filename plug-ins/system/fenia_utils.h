@@ -1,6 +1,8 @@
 #ifndef FENIA_UTILS
 #define FENIA_UTILS
 
+#include <cstdarg>
+
 #include "stringset.h"
 
 class WrapperBase;
@@ -20,6 +22,14 @@ bool gprog(const DLString &trigName, const char *fmt, ...);
  *  the round running against a corpse. Callers MUST catch what they do not want
  *  to propagate. */
 bool gprog_nocatch(const DLString &trigName, const char *fmt, ...);
+
+/** va_list form of gprog_nocatch, for wrappers that forward their own varargs. */
+bool vgprog_nocatch(const DLString &trigName, const char *fmt, va_list ap);
+
+/** True if at least one handler is registered for this global trigger in
+ *  .tmp.gtrig. Cheap: no Fenia call and no allocation, so a per-tick caller can
+ *  ask it to decide whether the C++ fallback still owns a decision. */
+bool gprog_registered(const DLString &trigName);
 
 /** Call a trigger with given name and args on an instance (mob, item, room) or its prototype (mob index data etc). */
 bool fenia_trigger(Scripting::Register &rc, const DLString &trigName, const Scripting::RegisterList &args, WrapperBase *instance, WrapperBase *proto);

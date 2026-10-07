@@ -15,6 +15,8 @@
 
 #include "interp.h"
 #include "act.h"
+#include "fenia_utils.h"
+#include "aitrigger.h"
 #include "merc.h"
 
 #include "def.h"
@@ -144,6 +146,10 @@ bool BasicMobileBehavior::aggressNormal( )
     }
 
     if (victim) {
+        int ai = ai_trigger(false, "onAggressAI", "CCs", ch, victim, "normal");
+        if (ai != AI_UNHANDLED)
+            return ai;
+
         attack( victim );
         return true;
     }
@@ -178,6 +184,10 @@ bool BasicMobileBehavior::aggressLastFought( )
     if (!canAggressLastFought( victim ))
         return false;
 
+    int ai = ai_trigger(false, "onAggressAI", "CCs", ch, victim, "lastFought");
+    if (ai != AI_UNHANDLED)
+        return ai;
+
     yell_panic(victim, ch, "", "%1$^C1! Теперь ты умрешь!", "aggressLastFought");
     attack( victim );
     return true;
@@ -210,6 +220,10 @@ bool BasicMobileBehavior::aggressMemorized( )
     }
 
     if (victim) {
+        int ai = ai_trigger(false, "onAggressAI", "CCs", ch, victim, "memorized");
+        if (ai != AI_UNHANDLED)
+            return ai;
+
         yell_panic(victim, ch, "", "Вот мы и встретились, %1$C1!", "aggressMemorized");        
         attack( victim );
         return true;
@@ -232,11 +246,27 @@ bool BasicMobileBehavior::aggressRanged( )
     if (isAfterCharm( ))
         return false;
 
-    if (IS_SET( ch->act, ACT_RANGER ))
+    bool ranger = IS_SET( ch->act, ACT_RANGER );
+    bool caster = ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER);
+    if (!ranger && !caster)
+        return false;
+
+    if (gprog_registered( "onAggressRangedAI" )) {
+        int victDoor, victRange;
+        Character *victim = findRangeVictim( ch->getModifyLevel( ) / 10 + 1, victDoor, victRange );
+        if (!victim)
+            return false;
+
+        int ai = ai_trigger(false, "onAggressRangedAI", "CCii", ch, victim, victDoor, victRange);
+        if (ai != AI_UNHANDLED)
+            return ai;
+    }
+
+    if (ranger)
         if (aggressRanger( ))
             return true;
 
-    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER))
+    if (caster)
         if (aggressCaster( ))
             return true;
     

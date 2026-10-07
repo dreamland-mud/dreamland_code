@@ -17,6 +17,7 @@
 #include "interp.h"
 #include "loadsave.h"
 #include "magic.h"
+#include "aitrigger.h"
 #include "merc.h"
 
 #include "def.h"
@@ -150,6 +151,10 @@ bool BasicMobileBehavior::doWimpy( )
     
     if (!mustFlee( ))
         return false;
+
+    int ai = ai_trigger(true, "onWimpyAI", "C", ch);
+    if (ai != AI_UNHANDLED)
+        return ai;
 
     // A seated charmie must stand up before it can flee (movement gates flee on standing).
     if (ch->position == POS_SITTING || ch->position == POS_RESTING)

@@ -28,6 +28,10 @@
 
 #include "roomtraverse.h"
 #include "occupations.h"
+#include "fight_exception.h"
+#include "feniamanager.h"
+#include "register-impl.h"
+#include "aitrigger.h"
 
 #include "def.h"
 #include "l10n.h"
@@ -89,6 +93,35 @@ void MobileMemory::poll( int diff )
 
     for (i = fresh.begin( ); i != fresh.end( ); i++)
         (*this)[i->first] = i->second;
+}
+
+/*
+ * Fenia mob AI hand-over, see aitrigger.h
+ */
+int ai_trigger(bool fCombat, const char *trigName, const char *fmt, ...)
+{
+    if (!gprog_registered(trigName))
+        return AI_UNHANDLED;
+
+    va_list ap;
+    va_start(ap, fmt);
+
+    try {
+        bool rc = vgprog_nocatch(trigName, fmt, ap);
+        va_end(ap);
+        return rc ? 1 : 0;
+    }
+    catch (const VictimDeathException &) {
+        va_end(ap);
+        if (fCombat)
+            throw;
+        return 1;
+    }
+    catch (const ::Exception &e) {
+        va_end(ap);
+        FeniaManager::getThis()->croak(0, Scripting::Register(trigName), e);
+        return AI_UNHANDLED;
+    }
 }
 
 /*
@@ -181,6 +214,49 @@ void BasicMobileBehavior::setLastFought( Character *wch )
             remember( ch->in_room );
         }
     }
+}
+
+const DLString &BasicMobileBehavior::getLastFoughtName( ) const
+{
+    return lastFought.getValue( );
+}
+
+bool BasicMobileBehavior::aiMemorized( Character *wch, bool fAttacked )
+{
+    return fAttacked ? memoryAttacked.memorized( wch ) : memoryFought.memorized( wch );
+}
+
+void BasicMobileBehavior::aiRemember( Character *wch, bool fAttacked )
+{
+    if (fAttacked)
+        memoryAttacked.remember( wch );
+    else
+        memoryFought.remember( wch );
+}
+
+bool BasicMobileBehavior::aiForget( Character *wch, bool fAttacked )
+{
+    return fAttacked ? memoryAttacked.forget( wch ) : memoryFought.forget( wch );
+}
+
+bool BasicMobileBehavior::getLostTrack( ) const
+{
+    return lostTrack.getValue( );
+}
+
+void BasicMobileBehavior::setLostTrack( bool value )
+{
+    lostTrack = value;
+}
+
+int BasicMobileBehavior::getHomeVnum( ) const
+{
+    return homeVnum.getValue( );
+}
+
+bool BasicMobileBehavior::goHome( bool fAlways )
+{
+    return backHome( fAlways );
 }
 
 bool BasicMobileBehavior::isAdrenalined( ) const
