@@ -438,6 +438,17 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
         args.push_back(arg);
     }
 
+    /* Any frame from the player's own playing socket is proof the session is
+     * alive, so it keeps the resume window open (resume.h). Without this the
+     * token only moved on prompts: a player who sat idle past RESUME_TTL had
+     * none left, and when the line then dropped the lostlink sweep quit them
+     * at once. The web client pings while in the world for exactly this.
+     * Switched into a mob, getPC() is the immortal (switchedFrom), the same
+     * owner webPrompt issues the token to -- and resume refuses a switched
+     * body anyway. A mob's own frames (never a web socket) give null. */
+    if (character && connected == CON_PLAYING)
+        resume_token_touch(character->getPC());
+
     // special case as we don't need Character to run console-in rpc
     if(name == "console_in") {
         // The args vector above is already checked; reading the raw json a
