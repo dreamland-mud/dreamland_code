@@ -6214,6 +6214,18 @@ NMI_INVOKE( CharacterWrapper, get_eq_char, "(wearloc): предмет экипи
     return wrap( arg2wearloc( get_unique_arg( args ) )->find( target ) );
 }
 
+NMI_INVOKE( CharacterWrapper, pickUp, "(obj): поднять с земли именно этот предмет обычной командой get (со всеми проверками и тригерами); true если он теперь у нас" )
+{
+    checkTarget( );
+    ::Object *obj = argnum2item( args, 1 );
+
+    if (obj->in_room != target->in_room)
+        return Register( false );
+
+    ::interpret_raw( target, "get", "%lld", obj->getID( ) );
+    return Register( !obj->extracted && obj->carried_by == target );
+}
+
 NMI_INVOKE( CharacterWrapper, canWearAt, "(obj, wearloc): молча проверить, можно ли надеть obj на локацию wearloc: подходит ли предмет, есть ли у тела такое место, хватает ли уровня и сил. Занятость локации не проверяется" )
 {
     checkTarget( );
