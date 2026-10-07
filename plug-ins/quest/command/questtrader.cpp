@@ -907,13 +907,14 @@ bool UpgradeQuestArticle::purchase( Character *client, NPCharacter *questman, co
     } else {
         for (auto obj: eligible)
             if (is_name( arg.c_str( ), obj->getKeyword( viewerLang(client) ).c_str( ) )
+                || is_name( arg.c_str( ), obj->getKeyword( LANG_EN ).c_str( ) )
                 || is_name( arg.c_str( ), obj->getKeyword( RU ).c_str( ) )) {
                 target = obj;
                 break;
             }
 
         if (!target) {
-            say_act( client, questman, _("У тебя нет такой вещи, которую я мог бы улучшить, $c1.") );
+            say_act( client, questman, _("У тебя нет такой вещи, которую я мог$Gло||ла бы улучшить, $c1.") );
             return false;
         }
     }
