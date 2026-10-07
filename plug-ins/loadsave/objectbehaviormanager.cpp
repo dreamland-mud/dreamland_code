@@ -211,6 +211,11 @@ bool obj_owner_allows( Object *obj, Character *ch )
     if (obj->hasOwner( ch ))
         return true;
 
+    // A charmed follower (summon, pet, charmie) may carry and wear what its
+    // master owns: the item stays named, so nobody else can keep it.
+    if (ch->is_npc( ) && IS_CHARMED( ch ) && obj->hasOwner( ch->master ))
+        return true;
+
     // Playing with full loot on waives ownership towards everyone else.
     PCMemoryInterface *pcm = PCharacterManager::find( obj->getOwner() );
     if (pcm && pcm->getAttributes( ).isAvailable( "fullloot" ))
