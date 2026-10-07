@@ -6219,7 +6219,7 @@ NMI_INVOKE( CharacterWrapper, pickUp, "(obj): поднять с земли им�
     checkTarget( );
     ::Object *obj = argnum2item( args, 1 );
 
-    if (obj->in_room != target->in_room)
+    if (!target->in_room || obj->in_room != target->in_room)
         return Register( false );
 
     ::interpret_raw( target, "get", "%lld", obj->getID( ) );
