@@ -14,6 +14,7 @@
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
+#include "areaquest.h"
 
 /*-------------------------------------------------------------------
  * AreaHelp 
@@ -137,7 +138,22 @@ static void format_area_quest(AreaQuest *q, ostringstream &qbuf, Character *ch)
     if (q->oncePerDay)
         qbuf << _(", но не чаще раза в сутки").getMessage(ch);
 
-    qbuf << "." << endl;
+    qbuf << ".";
+
+    // A prerequisite quest gates this one (aquest_can_participate); name it,
+    // or the quest looks open and silently refuses to start.
+    if (q->prereq > 0) {
+        auto p = areaQuests.find(q->prereq.getValue());
+        if (p != areaQuests.end()) {
+            DLString pdesc = p->second->description.getForLang(viewerLang(ch));
+            pdesc.stripWhiteSpace();
+            qbuf << " " << _("Сначала выполни задание: ").getMessage(ch) << pdesc;
+            if (p->second->pAreaIndex && p->second->pAreaIndex != q->pAreaIndex)
+                qbuf << " (" << p->second->pAreaIndex->getName(viewerLang(ch)) << ")";
+        }
+    }
+
+    qbuf << endl;
 }
 
 void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
