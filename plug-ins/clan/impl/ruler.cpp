@@ -867,7 +867,7 @@ SKILL_RUNP( confiscate )
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho(_("Синтаксис: confiscate <наказуемый> <% от кол-ва вещей>"));
+                ch->pecho(_("Синтаксис: confiscate <наказуемый> <%% от кол-ва вещей>"));
                 return;
         }
 
