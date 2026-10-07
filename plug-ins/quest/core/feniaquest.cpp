@@ -214,6 +214,11 @@ void FeniaQuest::create( PCharacter *pch, NPCharacter *questman )
 
     } catch (const ::Exception &e) {
         complain( "onCreate", e );
+        // A script can throw after it marked a client or created a target. The
+        // quest object is dropped without destroy(), so undo it here, like the
+        // C++ types do (stealquest): otherwise the marks stay keyed to this hero
+        // and the next quest of the same type finds the stale ones first.
+        destroy( );
         throw QuestCannotStartException( typeName );
     }
 
@@ -232,8 +237,10 @@ void FeniaQuest::create( PCharacter *pch, NPCharacter *questman )
     // at all means proceed -- the quest is already built by this point, and the
     // `quest request <name>` path catches only QuestCannotStartException, so a
     // raw toBoolean() here would escape it.
-    if (!answerBoolean( "onCreate", rc, true ))
+    if (!answerBoolean( "onCreate", rc, true )) {
+        destroy( );
         throw QuestCannotStartException( typeName );
+    }
 }
 
 void FeniaQuest::destroy( )
