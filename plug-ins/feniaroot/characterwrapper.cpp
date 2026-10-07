@@ -253,10 +253,21 @@ NMI_GET( CharacterWrapper, id, "уникальный идентификатор 
     return Register( DLString(id) );
 }
 
-NMI_GET( CharacterWrapper, tier, "тир моба числом 1..10 (1 сильнейший), 0 для игроков" )
+NMI_GET( CharacterWrapper, tier, "тир моба числом 1..10 (1 сильнейший), 0 для игроков; тир экземпляра, если его задали, иначе прототипа" )
 {
     checkTarget();
     return Register( target->is_npc() ? target->getNPC()->getTier() : 0 );
+}
+
+NMI_SET( CharacterWrapper, tier, "задать тир экземпляру моба (1..10), 0 вернет тир прототипа; для квестовых спавнов, не для призванных игроками" )
+{
+    checkTarget();
+    if (!target->is_npc())
+        throw Scripting::Exception( "NPC field requested on PC" );
+    int t = arg.toNumber( );
+    if (t != 0 && (t < MobTiers::TIER_BEST || t > MobTiers::TIER_WORST))
+        throw Scripting::Exception( "tier must be 0 or 1..10" );
+    target->getNPC()->tier = t;
 }
 
 NMI_GET( CharacterWrapper, normalHit, "здоровье обычного (normal) моба этого уровня по fight/mob_tiers.json, 0 для игроков и без файла тиров" )

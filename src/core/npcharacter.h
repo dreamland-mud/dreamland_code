@@ -89,8 +89,8 @@ public:
     // configuration
     virtual PlayerConfig getConfig( ) const;
 
-    /** Mob tier (1 legend .. 10 dummy) this instance fights at: the one
-     *  apply_mob_tier gave it, else its prototype's. */
+    /** Mob tier (1 legend .. 10 dummy) this instance counts as: the one set
+     *  on it (Fenia mob.tier, quest spawns), else its prototype's. */
     int getTier( ) const;
 
 public:
@@ -121,8 +121,9 @@ public:
     // switch
     PCharacter                *switchedFrom;
 
-    /** Tier set on this instance by apply_mob_tier (summons, quest spawns);
-     *  0 means the prototype's. Read it through getTier(). */
+    /** Tier set on this instance (Fenia mob.tier, for quest spawns only:
+     *  player summons keep the prototype's so tier loot and tier gates don't
+     *  apply to them); 0 means the prototype's. Read it through getTier(). */
     int tier;
 
 // MOC_SKIP_BEGIN
