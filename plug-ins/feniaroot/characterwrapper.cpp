@@ -4013,15 +4013,17 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     if (ft != 0 && bits != 0) {
         double f0 = s;
         // Redundancy discount applies to a CANDIDATE only (worn ? 0): never dock the
-        // worn baseline, so a gear delta can only ever shrink, never inflate.
+        // worn baseline, so a gear delta can only ever shrink, never inflate. The
+        // percentile's flag-once totals opt in for worn items via heldOnWorn.
+        bool held = !worn || w.heldOnWorn;
         int kind = ft == &res_flags ? 0 : ft == &imm_flags ? 1 : ft == &vuln_flags ? 2 : -1;
         if (ft == &affect_flags)
-            s += item_flag_points( bits, w.caster, target, worn ? 0 : w.heldFlags, itemLevel );
+            s += item_flag_points( bits, w.caster, target, held ? w.heldFlags : 0, itemLevel );
         else if (ft == &detect_flags)
             s += item_detect_points( bits, w.caster, target );
         // A resist the char already owns outside this slot adds nothing
-        // (decision 6). Candidates only, like heldFlags: the worn baseline keeps full price.
-        else if (kind >= 0 && !worn && target != 0)
+        // (decision 6). Same gate as heldFlags: candidates, or worn with heldOnWorn.
+        else if (kind >= 0 && held && target != 0)
             s += item_res_points_fit( bits, kind, w.heldImm, w.heldRes );
         else if (kind >= 0)
             s += ga_resValue( bits, kind );
@@ -4617,6 +4619,25 @@ static void ga_permaResist( Character *target, bitstring_t &imm, bitstring_t &re
         if (paf->bitvector.getTable( ) == &imm_flags) imm |= b;
         if (paf->bitvector.getTable( ) == &res_flags) res |= b;
     }
+}
+
+// affect_flags and imm/res bits an item grants: prototype affects, plus the instance's
+// own when there is one (a worn item, or a rolled item the char carries).
+static void ga_grantBits( obj_index_data *pObj, ::Object *inst,
+                          bitstring_t &aff, bitstring_t &imm, bitstring_t &res )
+{
+    aff = imm = res = 0;
+    auto take = [&]( const AffectList &list ) {
+        for (auto &paf: list) {
+            bitstring_t b = paf->bitvector;
+            if (paf->bitvector.getTable( ) == &affect_flags) aff |= b;
+            if (paf->bitvector.getTable( ) == &imm_flags)    imm |= b;
+            if (paf->bitvector.getTable( ) == &res_flags)    res |= b;
+        }
+    };
+    take( pObj->affected );
+    if (inst != 0)
+        take( inst->affected );
 }
 
 // imm/res bits one item grants through its affects (proto + instance).
@@ -5378,6 +5399,131 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (kv.second > slotCeil[kv.first])
             slotCeil[kv.first] = kv.second;
 
+    // Flag-once kit totals (percentile only). The per-slot scores above price a flag
+    // against the worn gear OUTSIDE that slot, which is right for a swap delta but not
+    // for a whole-kit sum: take off the only haste item and every other slot's haste
+    // candidate jumps to full price at once, so the ceiling counts haste N times and
+    // the % drops after a good swap. Here both the ideal kit and the worn kit grant
+    // each affect_flags / imm / res bit once: slots are claimed greedily, highest
+    // score first, and a claimed bit is held for every slot after it. Advice deltas
+    // (c.score, wornSlot) are untouched.
+    // legacyCeil keeps the per-slot model for the comparisons that set against c.score /
+    // full-price worn numbers (set worth-it, the left-hand swap): like with like.
+    // hybridCeil is the fallback ceiling the totals loop weighs against the greedy ideal.
+    std::map<int,double> wornPct = wornSlot;
+    std::map<int,double> legacyCeil = slotCeil;
+    std::map<int,double> hybridCeil = slotCeil;
+    if (slotFilter == 0) {   // a slot browse returns pct 0, skip the work
+        struct GAOnce {
+            obj_index_data *pObj; ::Object *inst; bool isWorn;
+            bitstring_t aff, imm, res;
+            double base;   // score as already computed; final when the item grants no bits
+        };
+        std::map<int,std::vector<GAOnce>> pool;
+        for (::Object *o = target->carrying; o; o = o->next_content) {
+            if (o->wear_loc == wear_none)
+                continue;
+            int slot = o->pIndexData->wear_flags;
+            REMOVE_BIT( slot, ITEM_TAKE );
+            GAOnce e = { o->pIndexData, o, true, 0, 0, 0, 0 };
+            ga_grantBits( o->pIndexData, o, e.aff, e.imm, e.res );
+            e.base = ga_score( target, o, w, rawStat, capStat, true );
+            pool[slot].push_back( e );
+        }
+        for (auto &c: cands) {
+            if (c.acq.method == GA_UNKNOWN)   // same gate as bestSlot
+                continue;
+            GAOnce e = { c.pObj, c.inst, false, 0, 0, 0, c.score };
+            ga_grantBits( c.pObj, c.inst, e.aff, e.imm, e.res );
+            pool[c.slot].push_back( e );
+        }
+
+        bitstring_t savedFlags = w.heldFlags, savedImm = w.heldImm, savedRes = w.heldRes;
+        bitstring_t hAff, hImm, hRes;
+        auto best = [&]( int slot, bool wornOnly, const GAOnce *&arg ) -> double {
+            double b = 0;
+            arg = 0;
+            for (auto &e: pool[slot]) {
+                if (wornOnly && !e.isWorn)
+                    continue;
+                double sc = e.base;
+                if (e.aff | e.imm | e.res) {
+                    w.heldFlags = hAff; w.heldImm = hImm; w.heldRes = hRes;
+                    w.heldOnWorn = e.isWorn;
+                    sc = e.inst ? ga_score( target, e.inst, w, rawStat, capStat, e.isWorn )
+                                : ga_score( target, e.pObj, w, rawStat, capStat, false );
+                    w.heldOnWorn = false;
+                }
+                if (sc > b) { b = sc; arg = &e; }   // floor 0, as wornSlot/bestSlot
+            }
+            return b;
+        };
+        auto claim = [&]( bool wornOnly, std::map<int,double> &out ) {
+            hAff = gaPerma; hImm = permaImm; hRes = permaRes;
+            std::map<int,double> cur;
+            std::map<int,const GAOnce *> curArg;
+            for (auto &kv: slotCeil) {
+                const GAOnce *a;
+                cur[kv.first] = best( kv.first, wornOnly, a );
+                curArg[kv.first] = a;
+            }
+            while (!cur.empty( )) {
+                std::map<int,double>::iterator top = cur.begin( );
+                for (std::map<int,double>::iterator ci = cur.begin( ); ci != cur.end( ); ci++)
+                    if (ci->second > top->second)
+                        top = ci;
+                out[top->first] = top->second;
+                const GAOnce *a = curArg[top->first];
+                cur.erase( top );
+                if (a == 0)
+                    continue;
+                bitstring_t nAff = a->aff & ~hAff, nImm = a->imm & ~hImm, nRes = a->res & ~hRes;
+                if ((nAff | nImm | nRes) == 0)
+                    continue;
+                hAff |= nAff; hImm |= nImm; hRes |= nRes;
+                // Only a slot whose contenders grant a newly claimed bit can change.
+                // imm/res don't price bit by bit (an imm zeroes a res on the same element,
+                // spell/magic/prayer are one group), so any new imm/res touches every
+                // contender that carries one.
+                bool resNew = (nImm | nRes) != 0;
+                for (auto &ci: cur) {
+                    bool touched = false;
+                    for (auto &e: pool[ci.first])
+                        if ((e.aff & nAff) || (resNew && (e.imm | e.res))) { touched = true; break; }
+                    if (touched) {
+                        const GAOnce *na;
+                        ci.second = best( ci.first, wornOnly, na );
+                        curArg[ci.first] = na;
+                    }
+                }
+            }
+        };
+        std::map<int,double> ceilOnce;
+        wornPct.clear( );
+        claim( false, ceilOnce );
+        claim( true, wornPct );
+        w.heldFlags = savedFlags; w.heldImm = savedImm; w.heldRes = savedRes;
+
+        // The greedy can misplace a flag and lose to the worn kit. Hybrid = the worn kit's
+        // flag-once allocation on slots where some contender carries a bit, the ideal
+        // on plain slots: still flag-once, achievable, and never below the worn kit, so
+        // a plain-slot upgrade can't vanish from the %. The totals loop picks whichever
+        // whole allocation sums higher, never a per-slot max (that could grant a flag
+        // twice).
+        for (auto &kv: slotCeil) {
+            bool bits = false;
+            for (auto &e: pool[kv.first])
+                if (e.aff | e.imm | e.res) { bits = true; break; }
+            kv.second = ceilOnce[kv.first];
+            hybridCeil[kv.first] = bits ? wornPct[kv.first] : ceilOnce[kv.first];
+        }
+    }
+    // Known limits: the left-hand verdict (keepScore/dualScore) and the sc<=0 candidate
+    // gate still price flags against worn gear outside the slot. The ideal/hybrid choice
+    // skips shield/hold even when no dual verdict replaces them, and a bit slot in the
+    // hybrid takes the worn item even if a plain one in its pool is better. Both err
+    // high (fewer points short), never a drop after advice in a common case.
+
     // ---- Set awareness (perma-affects #2758 phase 3b) --------------------------
     // Value each data-scorable set's completion bonus (SetBehavior <affects>) with
     // the same scorer as items, decide which sets are worth assembling
@@ -5502,8 +5648,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             // Value counts each slot type once (the percentile's own two-fingers-is-
             // Phase-2 limitation), while fill above counts locations for feasibility.
             assemble += ms.second;
-            std::map<int,double>::iterator sc = slotCeil.find( mslot );
-            brk += (sc != slotCeil.end( )) ? sc->second : 0.0;
+            std::map<int,double>::iterator sc = legacyCeil.find( mslot );
+            brk += (sc != legacyCeil.end( )) ? sc->second : 0.0;
         }
         bool feasible = fill >= g.total;
         if (feasible && g.wornComplete)
@@ -5530,26 +5676,46 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         claimedSetSlots |= occ;
         claimedSets[wsel.bi] = 1;
         bestSetBonus += g.vset;
-        for (auto &ms: g.memScore)      // a member may raise its slot above the individual best
+        for (auto &ms: g.memScore) {    // a member may raise its slot above the individual best
             if (ms.second > slotCeil[ms.first])
                 slotCeil[ms.first] = ms.second;
+            if (ms.second > legacyCeil[ms.first])
+                legacyCeil[ms.first] = ms.second;
+            if (ms.second > hybridCeil[ms.first])
+                hybridCeil[ms.first] = ms.second;
+        }
     }
     // ---- end set awareness (folded into the percentile + chase below) ----------
 
     double wornTotal = 0, bestTotal = 0;
     // The shield and held-item share of both totals, swapped below for the left-hand
     // verdict's build scores when there is one.
-    double leftWornSlots = 0, leftBestSlots = 0;
+    double leftWornSlots = 0, leftBestLegacy = 0, leftBestOnce = 0;
+    // Ideal vs hybrid ceiling, compared over the slots that stay in the % as they are:
+    // neutral set slots drop out, and shield/hold may be replaced by the left-hand verdict.
+    double sumIdeal = 0, sumHybrid = 0;
+    for (auto &kv: slotCeil) {
+        if ((neutralSlots & kv.first) || (kv.first & (ITEM_WEAR_SHIELD | ITEM_HOLD)))
+            continue;
+        sumIdeal  += kv.second;
+        sumHybrid += hybridCeil[kv.first];
+    }
+    bool useIdeal = sumIdeal >= sumHybrid;
     for (auto &kv: slotCeil) {
         if (neutralSlots & kv.first)   // unvaluable worn-set slot: neutral, out of the %
             continue;
-        std::map<int,double>::iterator wi = wornSlot.find( kv.first );
-        double wv = (wi != wornSlot.end( )) ? wi->second : 0.0;
+        std::map<int,double>::iterator wi = wornPct.find( kv.first );
+        double wv = (wi != wornPct.end( )) ? wi->second : 0.0;
+        double cv = useIdeal ? kv.second : hybridCeil[kv.first];
         wornTotal += wv;
-        bestTotal += kv.second;
+        bestTotal += cv;
+        // The left-hand verdict below swaps these for keepScore/dualScore. A kept build
+        // is full-price per slot, so it replaces the legacy share and cancels exactly;
+        // a dual build wears neither slot, so it replaces the flag-once share.
         if (kv.first & (ITEM_WEAR_SHIELD | ITEM_HOLD)) {
-            leftWornSlots += wv;
-            leftBestSlots += kv.second;
+            leftWornSlots  += wornSlot[kv.first];
+            leftBestLegacy += legacyCeil[kv.first];
+            leftBestOnce   += cv;
         }
     }
     // Set bonuses: a complete worn set is real kit value; the ideal kit assembles the
@@ -5779,7 +5945,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                     if (gaShield)
                         gaLeftWorn += om.pShield * om.blowValue;
                 }
-                gaLeftBest = std::max( gaLeftWorn, std::max( dualScore, keepScore ) );
+                // Best left-hand share, net of what the totals loop already counted for
+                // shield + hold: a kept build replaces the legacy (per-slot) share, a dual
+                // build the flag-once share. Taking the max of the two nets keeps the
+                // ceiling continuous where the keep/dual verdict flips.
+                gaLeftBest = std::max( dualScore - leftBestOnce, keepScore - leftBestLegacy );
                 gaLeftScored = true;
                 // Same rounded values the dual line prints, so the list and the verdict agree.
                 gaGoDual = (int)(dualScore + 0.5) > (int)(keepScore + 0.5);
@@ -5802,7 +5972,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
 
     if (gaLeftScored) {
         wornTotal += gaLeftWorn - leftWornSlots;
-        bestTotal += gaLeftBest - leftBestSlots;
+        bestTotal += gaLeftBest;
     }
     int pct = 0;
     if (bestTotal > 0)
