@@ -8,6 +8,10 @@
 
 #include "logstream.h"
 #include "basicmobilebehavior.h"
+#include "register-impl.h"
+#include "feniamanager.h"
+#include "fight_exception.h"
+#include "aitrigger.h"
 
 #include "skillreference.h"
 #include "npcharacter.h"
@@ -28,10 +32,6 @@
 
 #include "roomtraverse.h"
 #include "occupations.h"
-#include "fight_exception.h"
-#include "feniamanager.h"
-#include "register-impl.h"
-#include "aitrigger.h"
 
 #include "def.h"
 #include "l10n.h"
