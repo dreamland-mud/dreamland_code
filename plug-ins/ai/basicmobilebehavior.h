@@ -71,6 +71,14 @@ public:
     int getHomeVnum( ) const;
     bool goHome( bool fAlways );
 
+/*
+ * C++ mechanics behind a decision the Fenia mob AI already made (characterwrapper ai_*)
+ */
+    bool aiAttack( Character *victim );
+    bool aiTrackStep( Character *quarry );
+    bool aiRangedAttack( );
+    bool aiAssistGroup( Character *fch, Character *victim );
+
 protected:
     Character * getMaster( Character * );
     int beforeSpell;

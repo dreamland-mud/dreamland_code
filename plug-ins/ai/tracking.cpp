@@ -64,6 +64,20 @@ bool BasicMobileBehavior::track( )
     return false;
 }
 
+/*
+ * Fenia mob AI: one step of the chase, a summon or a step along the trail
+ */
+bool BasicMobileBehavior::aiTrackStep( Character *quarry )
+{
+    if (!ch->in_room || !quarry->in_room || quarry->in_room == ch->in_room)
+        return false;
+
+    if (trackCaster( quarry ))
+        return true;
+
+    return trackLastFought( quarry );
+}
+
 bool BasicMobileBehavior::canTrack( )
 {
     if (!IS_AWAKE(ch))

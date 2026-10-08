@@ -2878,6 +2878,46 @@ NMI_INVOKE( CharacterWrapper, ai_goHome, "([always]): вернуться дом�
     return Register( ai->goHome( !args.empty( ) && argnum2boolean( args, 1 ) ) );
 }
 
+NMI_INVOKE( CharacterWrapper, ai_attack, "(victim): напасть на victim так, как нападает моб (охранник жертвы, onAttackAI); false, если victim не здесь или под защитой богов" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    return Register( ai->aiAttack( argnum2character( args, 1 ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_trackStep, "(quarry): один шаг погони за quarry - призвать его или пройти по следам; после этого проверять .tmp.mob.valid" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    return Register( ai->aiTrackStep( argnum2character( args, 1 ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_rangedAttack, "(): выстрелить или ударить заклинанием по запомненному врагу в соседних комнатах" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    return Register( ai->aiRangedAttack( ) );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_assistGroup, "(fch, victim): помочь соратнику fch против victim - полечить, отойти для стрельбы или вступить в бой" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    return Register( ai->aiAssistGroup( argnum2character( args, 1 ), argnum2character( args, 2 ) ) );
+}
+
 NMI_INVOKE( CharacterWrapper, yellPanic, "(attacker, msgBlind, msg[, label]): крикнуть о помощи против attacker, как кричат жертвы нападения" )
 {
     checkTarget( );
