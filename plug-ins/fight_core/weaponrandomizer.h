@@ -4,6 +4,7 @@
 #include "eventbus.h"
 #include "plugin.h"
 #include "oneallocate.h"
+#include "dlstring.h"
 
 class Object;
 class ItemReadEvent;
@@ -34,6 +35,9 @@ protected:
 
     void randomizeWeaponStats(Object *obj, int bestTierOverride = -1) const;
     void randomizeWeapon(Object *obj, int bestTier) const;
+    void randomizeArmorStats(Object *obj, int bestTierOverride) const;
+    DLString armorSlot(Object *obj) const;
+    bool armorLeansCaster(Object *obj) const;
     void clearWeapon(Object *obj) const;
     void adjustTimer(Object *obj) const;
     int getAlign(Object *obj) const;

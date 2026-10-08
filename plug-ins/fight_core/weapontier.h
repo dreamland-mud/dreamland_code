@@ -63,7 +63,10 @@ int get_item_tier(obj_index_data *pObj);
 // Return a screenreader aura configured for this item's tier.
 DLString get_tier_aura(Object *obj);
 
-// Check if this weapon prototype is a random one.
+// Check if this prototype rolls its stats: 'random weapon' or 'random armor'.
 bool item_is_random(obj_index_data *pObj);
+
+// Hand-made armor that keeps its name and rolls its stats ('random armor').
+bool item_is_random_armor(obj_index_data *pObj);
 
 #endif

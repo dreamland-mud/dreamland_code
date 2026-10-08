@@ -89,6 +89,7 @@ int BehaviorManager::getNextId() const
     return nextId + 1;
 }
 
-GLOBALREF_IMPL(Behavior, '-')
+// Behaviors are named with spaces ('random weapon'): BHV(random_weapon) must match.
+GLOBALREF_IMPL(Behavior, ' ')
 XMLGLOBALREF_IMPL(Behavior)
 
