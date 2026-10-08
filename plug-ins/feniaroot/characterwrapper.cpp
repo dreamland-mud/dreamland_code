@@ -2878,7 +2878,7 @@ NMI_INVOKE( CharacterWrapper, ai_goHome, "([always]): вернуться дом�
     return Register( ai->goHome( !args.empty( ) && argnum2boolean( args, 1 ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, ai_attack, "(victim): напасть на victim так, как нападает моб (охранник жертвы, onAttackAI); false, если victim не здесь или под защитой богов" )
+NMI_INVOKE( CharacterWrapper, ai_attack, "(victim): напасть на victim так, как нападает моб (охранник жертвы, onAttackAI); false, если victim не здесь или под защитой богов. Очарованность не проверяет" )
 {
     checkTarget( );
     CHK_PC
@@ -2898,7 +2898,7 @@ NMI_INVOKE( CharacterWrapper, ai_trackStep, "(quarry): один шаг пого�
     return Register( ai->aiTrackStep( argnum2character( args, 1 ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, ai_rangedAttack, "(): выстрелить или ударить заклинанием по запомненному врагу в соседних комнатах" )
+NMI_INVOKE( CharacterWrapper, ai_rangedAttack, "(): выстрелить или ударить заклинанием по запомненному врагу в соседних комнатах. Очарованность не проверяет" )
 {
     checkTarget( );
     CHK_PC

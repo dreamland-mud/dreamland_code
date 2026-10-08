@@ -103,10 +103,12 @@ int ai_trigger(bool fCombat, Character *mob, const char *trigName, const char *f
     if (!gprog_registered(trigName))
         return AI_UNHANDLED;
 
-    // Immediate extraction hands the freed NPC object to the next mob created,
-    // and its init() resets extracted, so a mob that stood in a room before the
-    // call and has none after it is gone too.
+    // An NPC extraction ends in init(), which resets extracted, in_room and the
+    // ID, and the object goes back to the pool for the next mob created. So a
+    // mob that had a room and lost it is gone, and so is one whose ID changed:
+    // the handler extracted it, then created a mob that got the same object.
     Room *room = mob->in_room;
+    long long id = mob->getID( );
 
     va_list ap;
     va_start(ap, fmt);
@@ -134,7 +136,7 @@ int ai_trigger(bool fCombat, Character *mob, const char *trigName, const char *f
 
     // A handler that extracted its own mob, then returned false or broke, must
     // still stop the C++ caller: it would go on reading ch->in_room.
-    if (mob->extracted || (room && !mob->in_room))
+    if (mob->extracted || (room && !mob->in_room) || mob->getID( ) != id)
         return 1;
 
     return rc;

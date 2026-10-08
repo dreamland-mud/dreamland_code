@@ -20,8 +20,10 @@
  * decision, and so does one that throws: no C++ fallback runs on top of what it
  * may already have done.
  *
- * mob is the deciding mob. If the handler extracted it, the result is 1 whatever
- * the handler returned, so the C++ caller stops instead of reading its room.
+ * mob is the deciding mob. If the handler extracted it (it lost its room or its
+ * ID changed), the result is 1 whatever the handler returned, so the C++ caller
+ * stops instead of reading its room. The caller must return at once then: the
+ * behavior has lost ch and may already be freed.
  * After a 0 the same handler may be asked again in the same pulse with another
  * kind (assist master -> offense, aggress lastFought -> memorized -> normal):
  * handlers check mob.fighting and every other state themselves. A try/catch in
