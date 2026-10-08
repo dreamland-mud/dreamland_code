@@ -52,6 +52,21 @@ void BasicMobileBehavior::attack( Character *victim )
         attackSmart( victim );
 }
 
+/*
+ * Fenia mob AI: attack a victim standing here that the gods do not protect
+ */
+bool BasicMobileBehavior::aiAttack( Character *victim )
+{
+    if (!ch->in_room || victim->in_room != ch->in_room)
+        return false;
+
+    if (is_safe_nomessage( ch, victim ))
+        return false;
+
+    attack( victim );
+    return true;
+}
+
 void BasicMobileBehavior::attackDumb( Character *victim )
 {
     multi_hit( ch, victim , "murder" );

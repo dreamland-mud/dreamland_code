@@ -273,6 +273,23 @@ bool BasicMobileBehavior::aggressRanged( )
     return false;
 }
 
+/*
+ * Fenia mob AI: shoot or cast at a memorized enemy a few rooms away
+ */
+bool BasicMobileBehavior::aiRangedAttack( )
+{
+    if (!ch->in_room)
+        return false;
+
+    if (IS_SET( ch->act, ACT_RANGER ) && aggressRanger( ))
+        return true;
+
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER) && aggressCaster( ))
+        return true;
+
+    return false;
+}
+
 Character * BasicMobileBehavior::findRangeVictim( int maxRange, int &victDoor, int &victRange )
 {
     Character *rch;

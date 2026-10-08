@@ -200,10 +200,22 @@ bool BasicMobileBehavior::assistGroup( Character *fch, Character *victim )
     if (ai != AI_UNHANDLED)
         return ai;
 
+    return aiAssistGroup( fch, victim );
+}
+
+/*
+ * Help fch from the same group against victim: heal it, step back to shoot
+ * or cast from afar, or join the fight. Also the C++ fallback of assistGroup.
+ */
+bool BasicMobileBehavior::aiAssistGroup( Character *fch, Character *victim )
+{
+    if (!ch->in_room || fch->in_room != ch->in_room || victim->in_room != ch->in_room)
+        return false;
+
     if (assistGroupHealing( fch )) 
         return true;
     
-    if (!ch->can_see( victim ))
+    if (!ch->can_see( victim ) || is_safe_nomessage( ch, victim ))
         return false;
 
     if (assistGroupDistance( fch, victim )) 

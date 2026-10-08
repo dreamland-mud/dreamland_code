@@ -95,9 +95,13 @@ void GangChef::fight( Character *victim, string command )
 
     // Fenia (global/onGangChefFightAI) picks which gang members can actually
     // join in; the loop below is the fallback while no handler is registered.
+    // If the handler extracted the chef, the behavior loses ch and would be
+    // freed with it: hold it, and fight on only while ch is still in a room.
+    GangChef::Pointer keep = ch->getNPC( )->behavior.getDynamicPointer<GangChef>( );
+
     if (ai_trigger(true, ch, "onGangChefFightAI", "CCi", ch, victim,
                    GangstersInfo::getThis( )->getMobVnum( )) != AI_UNHANDLED) {
-        if (!ch->extracted)
+        if (ch && ch->in_room && !ch->isDead( ))
             GangMob::fight( victim, command );
         return;
     }
