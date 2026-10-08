@@ -171,6 +171,7 @@ DLString regfmt(Character *to, const RegisterList &argv);
 list< ::Object *> get_objs_list_type( Character *ch, int type, ::Object *list );
 void obj_from_anywhere( ::Object *obj );
 void do_visible( Character * );
+void afprog_refresh( Character *ch, bool verbose );
 
 using namespace std;
 using namespace Scripting;
@@ -2916,6 +2917,24 @@ NMI_INVOKE( CharacterWrapper, ai_assistGroup, "(fch, victim): помочь со�
     if (!ai)
         return Register( false );
     return Register( ai->aiAssistGroup( argnum2character( args, 1 ), argnum2character( args, 2 ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_heal, "(): полечиться по-классовому - травами рейнджера, заклинаниями клерика или некроманта" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    return Register( ai->aiHeal( ) );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_refresh, "(): вернуть себе аффекты расы и прототипа, снятые в бою" )
+{
+    checkTarget( );
+    CHK_PC
+    afprog_refresh( target, true );
+    return Register( );
 }
 
 NMI_INVOKE( CharacterWrapper, yellPanic, "(attacker, msgBlind, msg[, label]): крикнуть о помощи против attacker, как кричат жертвы нападения" )

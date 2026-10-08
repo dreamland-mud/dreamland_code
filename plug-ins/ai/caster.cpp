@@ -179,7 +179,9 @@ bool BasicMobileBehavior::trackCaster( Character *wch )
     if (hasDestiny( ))
         return false;
 
-    if (ch->getRealLevel( ) < 75)
+    // Bosses and legends summon their quarry back at any level.
+    int tier = ch->getTier( );
+    if (ch->getRealLevel( ) < 75 && !(tier > 0 && tier <= 2))
         return false;
 
     if (!isAdrenalined( ))
