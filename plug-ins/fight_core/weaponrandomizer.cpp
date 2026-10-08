@@ -147,7 +147,9 @@ void WeaponRandomizer::eventItemRead(const ItemReadEvent &event) const
 
     // Converted hand-made items (Kit 2026-10-08): copies players already own keep
     // the stats they had; only fresh resets roll.
-    if (obj->getProperty("keepOld") == "true")
+    // A JSON bool reads back as "1".
+    DLString keepOld = obj->getProperty("keepOld");
+    if (keepOld == "true" || keepOld == "1")
         return;
 
     if (!obj->getProperty("tier").empty())

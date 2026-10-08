@@ -1262,9 +1262,11 @@ void ArmorGenerator::assignColours()
     if (colour.empty())
         return;
 
+    // An empty language stays empty, so display still falls back to Russian.
     for (int l = LANG_MIN; l < LANG_MAX; l++) {
         DLString s = obj->getShortDescr((lang_t)l);
-        obj->setShortDescr("{" + colour + s.colourStrip() + "{x", (lang_t)l);
+        if (!s.empty())
+            obj->setShortDescr("{" + colour + s.colourStrip() + "{x", (lang_t)l);
     }
 }
 

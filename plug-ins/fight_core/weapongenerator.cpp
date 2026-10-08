@@ -1176,7 +1176,8 @@ const WeaponGenerator & WeaponGenerator::assignColours() const
     if (!colour.empty())
         for (int l = LANG_MIN; l < LANG_MAX; l++) {
             DLString s = obj->getShortDescr((lang_t)l);
-            obj->setShortDescr("{" + colour + s.colourStrip() + "{x", (lang_t)l);
+            if (!s.empty())
+                obj->setShortDescr("{" + colour + s.colourStrip() + "{x", (lang_t)l);
         }
 
     return *this;

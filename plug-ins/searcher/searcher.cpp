@@ -310,7 +310,8 @@ public:
             // Ignore weapons, they're shown in another table.
             if (pObj->item_type == ITEM_WEAPON) 
                 continue;
-            if (item_is_random(pObj))
+            // Random armor keeps its hand-made name and base stats: still listed.
+            if (item_is_random(pObj) && !item_is_random_armor(pObj))
                 continue;
 
             // Quirk with light wearlocation.
