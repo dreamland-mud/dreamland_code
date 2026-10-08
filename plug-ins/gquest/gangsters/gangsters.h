@@ -69,6 +69,7 @@ protected:
     void populateLair( );
 
     DLString lairHint( );
+    Room * lairHintRoom( );
     Room * pickRandomRoom( );
     static Room * recursiveWalk ( Room *, int, int );
     static bool isPoliceman( Character * );

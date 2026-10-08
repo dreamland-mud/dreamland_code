@@ -26,6 +26,8 @@
 #include "def.h"
 
 #include "fleemovement.h"
+#include "aitrigger.h"
+#include "fenia_utils.h"
 #include "l10n.h"
 
 /*-------------------------------------------------------------------
@@ -95,11 +97,19 @@ void GangMob::config( int level )
 void GangMob::entry( ) 
 {
     Character *mob, *ch_next;
+    Room *room = ch->in_room;
+    // A greet can start a fight that kills this gangster (its behavior gets
+    // cleared and freed) or makes it flee: hold the behavior for the whole
+    // loop and stop once the gangster is no longer standing in this room.
+    GangMob::Pointer keep = ch->getNPC( )->behavior.getDynamicPointer<GangMob>( );
 
-    for (mob = ch->in_room->people; mob; mob = ch_next) {
+    for (mob = room->people; mob; mob = ch_next) {
         ch_next = mob->next_in_room;
         if (mob != ch)
             greet( mob );
+        // An immediate extraction clears ch on the behavior.
+        if (!ch || ch->in_room != room)
+            break;
     }
 }
 
@@ -110,8 +120,17 @@ GangMember::GangMember( ) : confessed( false ), state( STAT_NORMAL )
 {
 }
 
+/*
+ * Every gang member decision below is first handed to the Fenia mob AI
+ * (dreamland_fenia/global/onGang*AI), which runs the state checks the old
+ * bodies skipped: stun, lag, charm, fear, safe rooms. The C++ bodies only run
+ * while no handler is registered, so annulling a handler brings them back.
+ */
 bool GangMember::spec( ) 
 {
+    if (ai_trigger(false, ch, "onGangSpecAI", "C", ch) != AI_UNHANDLED)
+        return true;
+
     if (state == STAT_SLEEP && IS_AWAKE( ch ))
         state = STAT_NORMAL;
     
@@ -180,6 +199,12 @@ void GangMember::bribe( Character *briber, int gold, int silver )
     if (!gquest->isLevelOK( briber ))
         return;
 
+    Room *hint = gquest->lairHintRoom( );
+
+    if (ai_trigger(false, ch, "onGangBribeAI", "CCiii", ch, briber, amount, b,
+                   hint ? hint->vnum : 0) != AI_UNHANDLED)
+        return;
+
     if (state != STAT_NORMAL)
         return;
     
@@ -219,7 +244,14 @@ void GangMember::bribe( Character *briber, int gold, int silver )
 
 void GangMember::greet( Character *mob ) 
 {
-    if (Gangsters::getThis( )->getActor( mob ) != mob)
+    Gangsters *gquest = Gangsters::getThis( );
+
+    if (gquest->getActor( mob ) != mob)
+        return;
+
+    if (ai_trigger(false, ch, "onGangGreetAI", "CCiii", ch, mob,
+                   gquest->getMinLevel( ), gquest->getMaxLevel( ),
+                   Gangsters::isPoliceman( mob ) ? 1 : 0) != AI_UNHANDLED)
         return;
     
     if ((isLastFought( mob ) 
@@ -335,6 +367,14 @@ void GangMember::fight( Character *victim, string command )
     fighting = lastFought;
 
     BasicMobileDestiny::fight( victim, command );
+
+    // The round may have ended the fight or the victim; an NPC victim is then
+    // already recycled, so the Fenia AI is only asked while the fight is on.
+    if (gprog_registered( "onGangFightAI" )) {
+        if (ch->fighting == victim)
+            ai_trigger(true, ch, "onGangFightAI", "CC", ch, victim);
+        return;
+    }
 
     if (victim->hit < victim->max_hit / 4) {
         switch (number_range(1, 3)) {

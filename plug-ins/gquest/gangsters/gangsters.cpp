@@ -899,18 +899,26 @@ Room * Gangsters::pickRandomRoom( )
     return get_room_instance( mobRoomVnums[i] );
 }
 
-DLString Gangsters::lairHint( ) 
+// A room a step or two from a random lair entrance, or NULL.
+Room * Gangsters::lairHintRoom( ) 
 {
     if (!portalRoomVnums.empty( )) {
         int i = number_range(0, portalRoomVnums.size( ) - 1);
         int vnum = portalRoomVnums[i];
         Room *room = get_room_instance( vnum );
 
-        if (room && (room = recursiveWalk( room, 0, number_range( 1, 2 ) )))
-            return room->getName();
+        if (room)
+            return recursiveWalk( room, 0, number_range( 1, 2 ) );
     }
     
-    return "";
+    return NULL;
+}
+
+DLString Gangsters::lairHint( ) 
+{
+    Room *room = lairHintRoom( );
+
+    return room ? room->getName( ) : "";
 }
 
 void Gangsters::populateArea( AreaIndexData *area, RoomList &mobRooms, int numPortal )
