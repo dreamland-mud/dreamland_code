@@ -248,7 +248,11 @@ bool BasicMobileBehavior::aggressRanged( )
 
     bool ranger = IS_SET( ch->act, ACT_RANGER );
     bool caster = ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER);
-    if (!ranger && !caster)
+    // Champions and above are asked too: Fenia lets a melee boss close the
+    // distance on a shooter instead of standing still under fire.
+    int tier = ch->getTier( );
+    bool strong = tier > 0 && tier <= 3;
+    if (!ranger && !caster && !strong)
         return false;
 
     if (gprog_registered( "onAggressRangedAI" )) {

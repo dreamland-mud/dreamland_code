@@ -652,12 +652,26 @@ bool BasicMobileBehavior::doHeal( )
     if (number_bits( 4 ))
         return false;
 
-    if (!IS_SET(ch->act, ACT_RANGER|ACT_CLERIC|NPC_NECRO_ACTS))
+    // Champions and above are asked too: Fenia lets them shake off debuffs.
+    int tier = ch->getTier( );
+    bool strong = tier > 0 && tier <= 3;
+    if (!strong && !IS_SET(ch->act, ACT_RANGER|ACT_CLERIC|NPC_NECRO_ACTS))
         return false;
 
     int ai = ai_trigger(true, ch, "onHealAI", "C", ch);
     if (ai != AI_UNHANDLED)
         return ai;
+
+    return aiHeal( );
+}
+
+/*
+ * Fenia mob AI: the class heal (ranger herbs, cleric and necromancer spells)
+ */
+bool BasicMobileBehavior::aiHeal( )
+{
+    if (!ch->in_room)
+        return false;
 
     if (IS_SET(ch->act, ACT_RANGER))
         if (healRanger( ch ))

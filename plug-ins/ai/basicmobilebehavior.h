@@ -78,6 +78,7 @@ public:
     bool aiTrackStep( Character *quarry );
     bool aiRangedAttack( );
     bool aiAssistGroup( Character *fch, Character *victim );
+    bool aiHeal( );
 
 protected:
     Character * getMaster( Character * );

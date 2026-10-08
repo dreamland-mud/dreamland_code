@@ -927,6 +927,56 @@ NMI_INVOKE( RoomWrapper, traverseTo, "(target, walker, sectorsAllow, sectorsDeny
     return wrap(rooms);
 }
 
+// Breadth-first, so the first node past maxDepth means the target is not
+// within reach and the walk can stop there.
+struct DistanceWithinComplete {
+    typedef NodesEntry<RoomTraverseTraits> MyNodesEntry;
+    DistanceWithinComplete( Room *t, int d, int &r ) : target( t ), maxDepth( d ), result( r )
+    {
+    }
+
+    inline bool operator () ( const MyNodesEntry *const head, bool last )
+    {
+        if (head->generation > maxDepth)
+            return true;
+
+        if (head->node != target)
+            return false;
+
+        result = head->generation;
+        return true;
+    }
+
+    Room *target;
+    int maxDepth;
+    int &result;
+};
+
+NMI_INVOKE( RoomWrapper, distanceTo, "(target, maxDepth[, walker]): сколько шагов до комнаты target для чара walker, или -1, если дальше maxDepth или не дойти" )
+{
+    checkTarget( );
+    Room *targetRoom = argnum2room( args, 1 );
+    int maxDepth = argnum2number( args, 2 );
+    Character *walker = args.size( ) > 2 ? argnum2character( args, 3 ) : 0;
+
+    if (targetRoom == target)
+        return Register( 0 );
+
+    FeniaDoorFunc df( walker );
+    FeniaExtraExitFunc eef;
+    FeniaPortalFunc pf;
+    FeniaHookIterator iter( df, eef, pf, 5 );
+
+    int result = -1;
+    DistanceWithinComplete complete( targetRoom, maxDepth, result );
+
+    // maxDepth is a leash, a few rooms: 3000 nodes covers it and keeps the
+    // per-call node array small.
+    room_traverse( target, iter, complete, 3000 );
+
+    return Register( result );
+}
+
 NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, которые ресетятся в этой комнате") 
 {
     RegList::Pointer rc(NEW);
