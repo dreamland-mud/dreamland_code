@@ -229,22 +229,9 @@ static int item_reset_chance(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCh
         return 10;
     }
 
-    // Shop items and non-random stuff is reset immediately; random items are
-    // delayed: half the time in an empty area, rarely with players around
-    // (Kit 2026-10-08: newbies farming a zone still see its random gear).
-    if (pReset->rand == RAND_NONE && !item_is_random(pObjIndex))
-        return 100;
-
-    if (IS_SET(mob->in_room->area->area_flag, AREA_DUNGEON))
-        return 100;
-
-    if (mob_has_occupation(mob, OCC_SHOPPER))
-        return 100;
-
-    if (mob->in_room->area->nplayer > 0)
-        return 10;
-
-    return 50;
+    // Everything else, random items included, resets every time: rarity comes
+    // from the tier roll, not from the spawn (Kit 2026-10-08).
+    return 100;
 }
 
 
