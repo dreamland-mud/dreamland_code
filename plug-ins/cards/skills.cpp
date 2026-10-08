@@ -101,6 +101,14 @@ SKILL_RUNP( sconce )
     if (is_safe(ch,victim))
         return;
 
+    // Bosses and legends are never knocked out by one blow, the same way the
+    // sleep spell refuses them. Champions and elites get a mental save.
+    int tier = victim->is_npc( ) ? victim->getNPC( )->getTier( ) : 0;
+    if (tier >= 1 && tier <= 2) {
+        ch->pecho(_("%1$^C1 слишком могуществен%1$Gно||на|ны, чтобы отключиться от одного удара."), victim);
+        return;
+    }
+
     int k = victim->getLastFightDelay( );
 
     if ( k >= 0 && k < FIGHT_DELAY_TIME )
@@ -118,7 +126,10 @@ SKILL_RUNP( sconce )
         && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
         chance -= 40;
 
-    if (number_percent( ) < chance * k / 100) {
+    bool resisted = tier >= 3 && tier <= 5
+                    && saves_spell( ch->getModifyLevel( ), victim, DAM_MENTAL, ch, 0, false );
+
+    if (!resisted && number_percent( ) < chance * k / 100) {
         oldact(_("Ты со всей силы бьешь $C4 канделябром по голове!"), ch, 0, victim, TO_CHAR);
         oldact(_("$c1 ударяет тебя канделябром по голове! Ты отключаешься."), ch, 0, victim, TO_VICT);
         oldact(_("$c1 лупит $C4 по голове канделябром."), ch, 0, victim, TO_NOTVICT);
