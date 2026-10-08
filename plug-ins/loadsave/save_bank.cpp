@@ -106,12 +106,17 @@ void bank_strip_temp_affects( Object *obj )
 
 /* fwrite_obj_0 silently writes nothing for a NOSAVEDROP area/item (save.cpp
  * 617-621). Depositing such an object would serialize nothing and then extract
- * it -- a silent destruction. Refuse the whole subtree if any node is affected. */
+ * it -- a silent destruction. Refuse the whole subtree if any node is affected.
+ * Limited items are refused too: nothing counts bank files at boot, so after a
+ * reboot a banked limited item would sit outside its proto count and resets
+ * could repop a second copy. */
 static bool bank_subtree_saveable( Object *obj )
 {
     if ( IS_SET( obj->pIndexData->area->area_flag, AREA_NOSAVEDROP ) )
         return false;
     if ( IS_SET( obj->extra_flags, ITEM_NOSAVEDROP ) )
+        return false;
+    if ( obj->pIndexData->limit != -1 )
         return false;
 
     for ( Object *content = obj->contains; content != 0; content = content->next_content )
@@ -127,7 +132,7 @@ bool bank_deposit( Object *obj, const DLString &kind, const DLString &key )
         return false;
 
     // Refuse before any mutation: nothing NOSAVEDROP may be banked, or the
-    // serializer drops it and we destroy it on extract.
+    // serializer drops it and we destroy it on extract. Nothing limited either.
     if ( !bank_subtree_saveable( obj ) )
         return false;
 

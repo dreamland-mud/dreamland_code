@@ -24,6 +24,15 @@
 
 CLAN(flowers);
 
+// Single rule for whether a limited item instance is included in its proto count:
+// unstamped items and items that were still alive at boot are counted, items that
+// expired before boot are not. Boot counting, drop-file loading, ground decay and
+// expiry purge must all agree on it, or the count leaks and resets stop.
+bool limit_is_counted( time_t ts )
+{
+    return ts <= 0 || ts > dreamland->getBootTime( );
+}
+
 // Decide whether to update item count for this item prototype.
 void limit_count_on_boot( OBJ_INDEX_DATA *pObjIndex, time_t ts, const DLString &playerName )
 {
@@ -41,7 +50,7 @@ void limit_count_on_boot( OBJ_INDEX_DATA *pObjIndex, time_t ts, const DLString &
     }
 
     // Still has time to live.
-    if (ts >= dreamland->getBootTime( )) {
+    if (limit_is_counted( ts )) {
         LogStream::sendNotice( ) << "Limited item " << vnum 
             << " still has " << (ts - dreamland->getBootTime( )) / Date::SECOND_IN_DAY 
             << " days in player profile " << playerName << endl;
@@ -130,9 +139,9 @@ void limit_ground_decay(Object *obj)
     }
 
     Character *ch = obj->carried_by;
-    // limit_purge decides whether to drop the proto count by comparing the
-    // timestamp with boot time, so decay must not push a counted item below it.
-    bool fCounted = obj->timestamp > dreamland->getBootTime( );
+    // Decay must not push a counted item past boot time, or limit_purge
+    // extracts it as uncounted and the proto count never drops.
+    bool fCounted = limit_is_counted( obj->timestamp );
 
     // Speed up decay on the ground: every minute removes 1 day from timer.
     if (obj->in_room) {
@@ -209,7 +218,7 @@ bool limit_purge( Object *obj )
         where = "none";
 
     // If this item was already expired during boot time, its count was not increased.
-    bool fCount = obj->timestamp > dreamland->getBootTime( );
+    bool fCount = limit_is_counted( obj->timestamp );
     LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
         << " (" << obj->getID( ) << ") extracted for " << where 
         << ", " << (fCount ? "count":"nocount") << endl;

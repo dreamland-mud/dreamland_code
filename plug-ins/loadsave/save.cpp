@@ -124,6 +124,7 @@ CLAN(none);
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 const FlagTable * affect_where_to_table(int where);
 int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *registry);
+bool limit_is_counted( time_t ts );
 
 static DLString id_to_string(long long id)
 {
@@ -2482,6 +2483,14 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
                             if (wear_loc != -1)
                                 obj->wear_loc.assign(wear_loc);
+
+                            // The count was bumped at Vnum, before TS was read. Take it
+                            // back for a limited item that expired before boot, the same
+                            // rule limit_count_on_boot applies to player profiles.
+                            if (create_obj_dropped
+                                && obj->pIndexData->limit >= 0
+                                && !limit_is_counted( obj->timestamp ))
+                                obj->pIndexData->count--;
 
                             return;
                         }
