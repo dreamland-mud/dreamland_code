@@ -131,7 +131,19 @@
 #include "roomtraverse.h"
 #include "accountmanager.h"
 
+// Item-granted skill pricing: a skill's align/ethos and class access (BasicSkill), the
+// length of a violence round for a granted spell's casts per round, and the weapon
+// attack types circle needs.
+#include "basicskill.h"
+#include "dreamland.h"
+#include "attacks.h"
+
 RELIG(none);   // god_none sentinel for the gear-advisor tattoo-slot filter
+// Item-granted skill pricing: Flowers never fight players, a Battlerager can't blink,
+// Shalafi cast at half the class penalty.
+CLAN(flowers);
+CLAN(battlerager);
+CLAN(shalafi);
 
 GSN(dark_shroud);
 GSN(manacles);
@@ -3645,16 +3657,33 @@ static bool ga_hasFeniaTriggers( obj_index_data *pObj )
     return !triggers.empty( );
 }
 
-// An item carrying the 'grantskills' behavior teaches its wearer skills -- the
-// same "special, high-value" class as Fenia-triggered gear. The grantskills
-// migration annulled these items' onEquip/onRemove prototype triggers, so
-// ga_hasFeniaTriggers no longer sees them; credit the behavior here so a
-// skill-teaching item keeps its boost.
+// An item carrying the 'grantskills' behavior teaches its wearer skills while worn.
+// The grantskills migration annulled these items' onEquip/onRemove prototype
+// triggers, so ga_hasFeniaTriggers no longer sees them; ga_grantsValue prices what
+// they teach, per character.
 static bool ga_grantsSkills( obj_index_data *pObj )
 {
     Behavior *b = behaviorManager->findExisting( "grantskills" );
     return b != 0 && pObj->behaviors.isSet( b->getIndex( ) );
 }
+
+// The skills a prototype grants: its props "grantskills" list of {skill, learned, msg},
+// exactly what behaviors/grantskills/engine reads. A null value when it grants nothing.
+// Read through a const reference: a non-const operator[] would insert a null member
+// into the prototype's props.
+static const Json::Value & ga_grantList( obj_index_data *pObj )
+{
+    static const Json::Value none;
+    if (pObj == 0 || !ga_grantsSkills( pObj ) || !pObj->props.isMember( "grantskills" ))
+        return none;
+    const Json::Value &list = static_cast<const Json::Value &>( pObj->props )["grantskills"];
+    return list.isArray( ) ? list : none;
+}
+
+// Defined below the off-hand model it uses: what the skills this item grants are worth
+// to target (target 0: the expected value over the played professions).
+static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_data *pProto,
+                              ::Object *inst, bool worn, double swing, int itemLevel );
 
 // Defined in feniaskillaction.cpp (skills_impl, linked into feniaroot): expected
 // damage of a named spell's <tier> at the given level; 0 when the name is not a
@@ -4283,19 +4312,17 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     // Combat spell-procs get scored on what they actually cast (value table x
     // proc chance x item level). That supersedes the flat +50, which was only a
     // stand-in for "this triggers something good in a fight" -- the proc IS that
-    // trigger. But a skill-teaching item that ALSO procs still deserves its teach
-    // credit on top (different value), and non-proc special gear keeps the +50.
+    // trigger. Non-proc Fenia-triggered gear keeps the +50.
     double procScore = ga_procScore( pProto, weaponSwing, inst, itemLevel, w.caster );
-    if (procScore > 0) {
+    if (procScore > 0)
         s += procScore;
-        if (ga_grantsSkills( pProto ))
-            s += 50;   // it teaches a skill too; procScore only covered the combat cast.
-    }
     // A generated item's base vnum carries the shared worn-buff onEquip: that is
     // not "special gear", its worth was scored above.
-    else if ((ga_hasFeniaTriggers( pProto ) && !generated) || ga_grantsSkills( pProto )) {
-        s += 50;   // Fenia-triggered or skill-teaching gear is almost always very good.
-    }
+    else if (ga_hasFeniaTriggers( pProto ) && !generated)
+        s += 50;   // Fenia-triggered gear is almost always very good.
+    // Taught skills, priced for this char (0 for an item that teaches nothing). Filed
+    // under "special" with the procs: the sage's render names that key.
+    s += ga_grantsValue( target, w, pProto, inst, worn, weaponSwing, itemLevel );
     ga_note( "special", s - t0, 0 );
     return s;
 }
@@ -4452,6 +4479,792 @@ static double ga_offhandValue( const GAOffhand &om, Character *target, const GAW
     double r = ga_offhandRatio( om, target, weaponClass );
     double perSwing = 1.05 * eff + om.damroll * std::min( 100, 20 + sk ) / 100.0;
     return score - w.weaponWeight * eff + w.weaponWeight * r * perSwing;
+}
+
+// ---- Item-granted skills (docs/plans/grantskills-pricing.md) ---------------------
+// A 'grantskills' item teaches its wearer skills while worn (behaviors/grantskills:
+// Skill.giveTemporary on equip). What that is worth depends on who wears it, so each
+// granted skill is priced per character, in sage points:
+//   - 0 when the grant would do nothing: the char already has the skill (by class, race
+//     or any other temporary source), another worn item OUTSIDE this slot grants it (the
+//     engine keeps the first grant), the skill's align/ethos rejects the char, a
+//     Battlerager would get a magic skill, or the skill no longer exists;
+//   - a combat formula from the char's own numbers for skills that change a fight;
+//   - fixed [melee, caster] numbers for utility skills.
+// Each skill is PvE + pvp_weight x PvP + QoL. Knobs and the fixed table live in
+// fight/item_value.json "grant_skill"; a missing key keeps the compiled default here.
+// target 0 (the char-less base value, .itemPoints): the same formulas for the reference
+// player at the item level, times the share of played professions the grant can help.
+
+enum {
+    GK_FIXED = 0,   // the fixed table only
+    GK_CRIT,        // critical strike: a proc on every melee hit
+    GK_EXTRA,       // forest fighting: extra hits at the end of the round, nature only
+    GK_NUKE,        // an offensive spell with a damage tier
+    GK_AVOID,       // blink: dodges a share of the melee blows that get past parry
+    GK_BUFF,        // a self-buff, priced as a worn-buff affix x uptime
+    GK_SLEVEL,      // mastering spell: a fixed number of extra spell levels
+    GK_SPELLCRAFT,  // spell craft: casts at full level, giving back the class penalty
+    GK_WEAPON,      // a weapon proficiency: priced jointly for the whole item
+    GK_PET,         // a summon or a charm: a fighting follower
+    GK_CIRCLE,      // circle: a skill hit with a pierce weapon while nobody hits you
+    GK_AMBUSH,      // ambush: worth something only with camouflage
+    GK_XP,          // leadership: group xp, nothing at the max level
+};
+
+struct GAGrantDef {
+    const char *skill;
+    int kind;
+    // Fixed part, added on top of any formula and scaled by learned/100:
+    // [PvE melee, PvE caster, PvP melee, PvP caster, QoL]. Overridden by
+    // grant_skill.fixed.<skill> in item_value.json.
+    double fixed[5];
+    // Kind knobs. GK_NUKE: a = share of fights the spell can be cast in (call
+    // lightning needs outdoors and rain; grant_skill.nuke_cond), b = PvP control share
+    // (grant_skill.nuke_pvp_share). GK_BUFF: a = uptime (grant_skill.buff_uptime),
+    // b = the spell level below which the buff lasts 0 ticks. GK_SLEVEL: a = mean extra
+    // spell levels per cast. GK_PET: a = the pet's damage as a share of the char's
+    // round (grant_skill.pet_round_share), b = the mob vnum the spell summons (the
+    // vnum in spell/<name>/runArg; 0 = a charm, no vnum of its own).
+    double a, b;
+    const char *ref;   // GK_BUFF: the worn_buff affix (item_affixes.json) it is priced as
+};
+
+static const GAGrantDef ga_grantDefs[] = {
+    // Combat formulas.
+    { "critical strike",  GK_CRIT,       { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "forest fighting",  GK_EXTRA,      { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "hellfire",         GK_NUKE,       { 0, 0, 0, 0, 0 },          1.0,  0,  0 },
+    { "fear",             GK_NUKE,       { 0, 0, 0, 0, 0 },          1.0,  0.25, 0 },
+    { "iceball",          GK_NUKE,       { 0, 0, 0, 0, 0 },          1.0,  0,  0 },
+    { "demonfire",        GK_NUKE,       { 0, 0, 0, 0, 0 },          1.0,  0,  0 },
+    { "scourge",          GK_NUKE,       { 0, 0, 0, 0, 0 },          1.0,  0,  0 },
+    { "call lightning",   GK_NUKE,       { 0, 0, 0, 0, 0 },          0.15, 0,  0 },
+    { "blink",            GK_AVOID,      { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "benediction",      GK_BUFF,       { 0, 0, 0, 0, 0 },          0.5,  25, "benediction" },
+    { "warcry",           GK_BUFF,       { 0, 0, 0, 0, 0 },          0.7,  0,  "bless" },
+    { "mastering spell",  GK_SLEVEL,     { 0, 0, 0, 0, 0 },          2.5,  0,  0 },
+    { "spell craft",      GK_SPELLCRAFT, { 0, 0, 0, 0, 3 },          0,    0,  0 },
+    { "sword",            GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "axe",              GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "dagger",           GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "flail",            GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "mace",             GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "polearm",          GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "spear",            GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "whip",             GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "lesser golem",     GK_PET,        { 0, 0, 0, 0, 0 },          0.25, 21, 0 },
+    { "adamantite golem", GK_PET,        { 0, 0, 0, 0, 0 },          0.3,  24, 0 },
+    { "attract other",    GK_PET,        { 0, 0, 60, 60, 0 },        0.15, 0,  0 },
+    { "circle",           GK_CIRCLE,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "ambush",           GK_AMBUSH,     { 77, 0, 230, 0, 0 },       0,    0,  0 },
+    { "leadership",       GK_XP,         { 0, 0, 0, 0, 10 },         0,    0,  0 },
+    // Fixed: escape, stealth, control, utility. Anchored to the flat flag prices
+    // (pass door 15, camouflage/fade/imp invis 100); the plan's table has the reasons.
+    { "disarm",           GK_FIXED,      { 14, 5, 132, 36, 0 },      0,    0,  0 },
+    { "blind fighting",   GK_FIXED,      { 7, 39, 85, 190, 0 },      0,    0,  0 },
+    { "escape",           GK_FIXED,      { 20, 20, 100, 100, 0 },    0,    0,  0 },
+    { "vanish",           GK_FIXED,      { 20, 20, 80, 80, 0 },      0,    0,  0 },
+    { "mist walk",        GK_FIXED,      { 10, 10, 60, 60, 30 },     0,    0,  0 },
+    { "camouflage",       GK_FIXED,      { 20, 20, 60, 60, 0 },      0,    0,  0 },
+    { "camouflage move",  GK_FIXED,      { 0, 0, 0, 0, 0 },          0,    0,  0 },   // camouflage's companion, priced there
+    { "envenom",          GK_FIXED,      { 15, 15, 30, 30, 0 },      0,    0,  0 },
+    { "poison",           GK_FIXED,      { 20, 20, 30, 30, 0 },      0,    0,  0 },
+    { "stone skin",       GK_FIXED,      { 20, 20, 10, 10, 0 },      0,    0,  0 },
+    { "bow",              GK_FIXED,      { 10, 10, 25, 25, 5 },      0,    0,  0 },
+    { "mastering bow",    GK_FIXED,      { 10, 10, 25, 25, 5 },      0,    0,  0 },
+    { "remove fear",      GK_FIXED,      { 0, 0, 20, 20, 0 },        0,    0,  0 },
+    { "lore",             GK_FIXED,      { 0, 0, 0, 0, 10 },         0,    0,  0 },
+    { "pick lock",        GK_FIXED,      { 0, 0, 0, 0, 10 },         0,    0,  0 },
+    { "perception",       GK_FIXED,      { 0, 0, 0, 0, 3 },          0,    0,  0 },
+    { "golden eye",       GK_FIXED,      { 0, 0, 0, 0, 3 },          0,    0,  0 },
+    { "bash door",        GK_FIXED,      { 0, 0, 0, 0, 3 },          0,    0,  0 },
+    { "butcher",          GK_FIXED,      { 0, 0, 0, 0, 2 },          0,    0,  0 },
+    { "soothe",           GK_FIXED,      { 0, 0, 0, 0, 3 },          0,    0,  0 },
+    // A suicide button for anyone but a samurai: never a reason to wear the item.
+    { "hara kiri",        GK_FIXED,      { 0, 0, 0, 0, 0 },          0,    0,  0 },
+};
+
+static const GAGrantDef * ga_grantDef( const DLString &skill )
+{
+    for (auto const &d: ga_grantDefs)
+        if (skill == d.skill)
+            return &d;
+    return 0;
+}
+
+static double ga_gk( const char *key, double def, int idx = -1 )
+{
+    return item_value( "grant_skill", key, def, idx );
+}
+
+// grant_skill.<table>.<skill> (nuke_cond, buff_uptime, ...), else the compiled default.
+static double ga_gkSkill( const char *table, const GAGrantDef &d, double def )
+{
+    return item_value_sub( "grant_skill", table, d.skill, def );
+}
+
+// grant_skill.fixed.<skill>[idx], else the compiled table.
+static double ga_gkFixed( const GAGrantDef &d, int idx )
+{
+    const Json::Value &t = item_value_object( "grant_skill", "fixed" );
+    if (t.isObject( ) && t.isMember( d.skill )) {
+        const Json::Value &v = t[d.skill];
+        if (v.isArray( ) && idx < (int)v.size( ) && v[idx].isNumeric( ))
+            return v[idx].asDouble( );
+    }
+    return d.fixed[idx];
+}
+
+// Rounds in an average fight by level (grant_skill.fight_rounds): how far a mana pool
+// stretches when a granted spell is cast every round.
+static double ga_gkFightRounds( int level )
+{
+    const Json::Value &t = item_value_object( "grant_skill", "fight_rounds" );
+    double r = item_points_by_level( t, level );
+    if (r > 0)
+        return r;
+    // Normal-tier rounds per fight (scripts/item-combat-model.py N_ROUNDS).
+    static const int lv[] = { 20, 40, 60, 90 };
+    static const double rn[] = { 3, 8, 10, 11 };
+    if (level <= lv[0])
+        return rn[0];
+    for (int i = 1; i < 4; i++)
+        if (level <= lv[i])
+            return rn[i - 1] + (rn[i] - rn[i - 1]) * (level - lv[i - 1]) / (lv[i] - lv[i - 1]);
+    return rn[3];
+}
+
+// Would the char hold this skill with the item being scored in place, from some other
+// source? outside / inside = skills granted by worn items outside this item's slot / in
+// it (the item itself, or the one it would replace). A native or race skill, a grant from
+// another slot, or a temporary skill no worn item explains (a dream, a quest) all stay.
+// Used where only having the skill matters (ambush's camouflage); pricing a grant counts
+// a shared skill once, see ga_grantCounted.
+static bool ga_grantHeld( Character *target, Skill *skill, const std::set<int> &outside,
+                          const std::set<int> &inside )
+{
+    if (!skill->available( target ))
+        return false;
+    if (!temporary_skill_active( skill, target ))
+        return true;
+    int sn = skill->getIndex( );
+    return outside.count( sn ) != 0 || inside.count( sn ) == 0;
+}
+
+// Is this skill's value already counted elsewhere, so the item's grant adds nothing to
+// its score? Native, race and unexplained temporary skills: yes. A skill that worn items
+// grant is counted ONCE, on its keeper (see ga_grantsValue): the keeper itself prices
+// it, a worn duplicate scores 0, and a candidate scores 0 only when the keeper sits in
+// another slot -- a candidate for the keeper's own slot is what would carry the skill
+// on after the swap. Pricing every worn copy at 0 (each sees the other) would let the
+// sage advise swapping both away and lose the skill.
+static bool ga_grantCounted( Character *target, Skill *skill, ::Object *inst, bool worn,
+                             int mySlot, const std::map<int, ::Object *> &keeper )
+{
+    if (!skill->available( target ))
+        return false;
+    if (!temporary_skill_active( skill, target ))
+        return true;
+    std::map<int, ::Object *>::const_iterator k = keeper.find( skill->getIndex( ) );
+    if (k == keeper.end( ))
+        return true;
+    if (worn && inst != 0)
+        return k->second != inst;
+    int slot = k->second->pIndexData->wear_flags;
+    REMOVE_BIT( slot, ITEM_TAKE );
+    return slot != mySlot;
+}
+
+// The skill's <align>/<ethos> admits the char: GenericSkill::checkAlignEthos, which
+// makes giveTemporary fail (demonfire evil only, fear and the golems not good...).
+static bool ga_grantAlignOk( Skill *skill, Character *ch )
+{
+    BasicSkill *bs = dynamic_cast<BasicSkill *>( skill );
+    if (bs == 0)
+        return true;
+    if (ch->alignment != ALIGN_NONE && bs->align.getValue( ) != 0
+        && !bs->align.isSetBitNumber( ALIGNMENT( ch ) ))
+        return false;
+    if (ch->ethos != ETHOS_NULL && bs->ethos.getValue( ) != 0
+        && !bs->ethos.isSetBitNumber( ch->ethos ))
+        return false;
+    return true;
+}
+
+// Professions that get this skill by class, with their level: GenericSkill's access
+// string ("cleric 37, druid 61;<races>"), the format the OLC edits and parses back. A
+// clan skill or a plain BasicSkill lists no profession, so nobody has it by class.
+static std::map<DLString, int> ga_grantClassLevels( Skill *skill )
+{
+    std::map<DLString, int> none;
+    BasicSkill *bs = dynamic_cast<BasicSkill *>( skill );
+    if (bs == 0)
+        return none;
+    DLString access = bs->accessToString( );
+    DLString::size_type semi = access.find( ';' );
+    if (semi != DLString::npos)
+        access = DLString( access.substr( 0, semi ) );
+    std::ostringstream err;
+    return bs->parseAccessTokens( access, professionManager, err );
+}
+
+// Share of played professions a grant of this skill at this item level helps: not
+// native by then, and the skill's align/ethos fits the profession's (a paladin can never
+// get fear). The char-less base value is the expected value over those.
+static double ga_grantShare( Skill *skill, int level )
+{
+    std::map<DLString, int> natives = ga_grantClassLevels( skill );
+    BasicSkill *bs = dynamic_cast<BasicSkill *>( skill );
+    int played = 0, gain = 0;
+    for (int i = 0; i < professionManager->size( ); i++) {
+        Profession *prof = professionManager->find( i );
+        if (prof == 0 || !prof->isValid( ) || !prof->isPlayed( ))
+            continue;
+        played++;
+        std::map<DLString, int>::iterator n = natives.find( prof->getName( ) );
+        if (n != natives.end( ) && n->second <= level)
+            continue;
+        if (bs != 0 && bs->align.getValue( ) != 0
+            && (bs->align.getValue( ) & prof->getAlign( ).getValue( )) == 0)
+            continue;
+        if (bs != 0 && bs->ethos.getValue( ) != 0
+            && (bs->ethos.getValue( ) & prof->getEthos( ).getValue( )) == 0)
+            continue;
+        gain++;
+    }
+    return played > 0 ? (double)gain / played : 1.0;
+}
+
+// Class spell-level penalty of DefaultSpell::getSpellLevel. No char: the profile's
+// (caster or melee).
+static int ga_grantSpellPenalty( Character *ch, bool caster, int mlevel )
+{
+    if (ch == 0)
+        return caster ? mlevel / 20 : std::max( 5, mlevel / 10 );
+    Flags f = ch->getProfession( )->getFlags( );
+    if (f.isSet( PROF_CASTER ))
+        return std::max( 0, mlevel / 20 );
+    if (f.isSet( PROF_HYBRID ))
+        return std::max( 2, mlevel / 16 );
+    if (f.isSet( PROF_AGILE ))
+        return std::max( 3, mlevel / 13 );
+    return std::max( 5, mlevel / 10 );
+}
+
+// The spell level a char casts a granted spell at: DefaultSpell::getSpellLevel without
+// its random procs (spell craft, mastering, improved maladiction) and its messages --
+// class penalty, the prayer penalty of a char with no religion (0 = no god answers any
+// more, the cast is refused), Shalafi's half penalty, int/wis and skill level bonuses.
+static int ga_grantSpellLevel( Character *ch, Skill *skill, int mlevel, bool caster )
+{
+    int slevel = mlevel - ga_grantSpellPenalty( ch, caster, mlevel );
+    if (ch == 0)
+        return std::max( 1, slevel );
+    bool prayer = skill->getSpell( ) && skill->getSpell( )->isPrayer( ch );
+    if (prayer && ch->getReligion( ) == god_none && mlevel > 1) {
+        slevel = slevel * (100 - mlevel * 2) / 100;
+        if (slevel <= 0)
+            return 0;
+    }
+    if (ch->getClan( ) == clan_shalafi)
+        slevel = std::max( slevel, (slevel + mlevel) / 2 );
+    if (ch->getReligion( ) == god_none && ch->getClan( ) == clan_shalafi)
+        slevel += 2;
+    slevel = std::max( 1, slevel + (prayer ? get_wis_app( ch ).slevel : get_int_app( ch ).slevel) );
+    return slevel + skill_level_bonus( *skill, ch );
+}
+
+// Charm slots, mirroring Fenia .tmp.mob.overcharmed_new (utils/mob: charm), the gate
+// every summon and charm spell checks: class bonus 4 (druid, necromancer, witch,
+// warlock), 3 (anti-paladin, ranger, vampire), else 2; -1 below 25 cha, -2 below 18;
+// +1 when int or wis is above 25; +1 for a newbie. count = charmed followers now.
+static void ga_charmSlots( Character *ch, int &maxCharm, int &count )
+{
+    const DLString &prof = ch->getProfession( )->getName( );
+    if (prof == "druid" || prof == "necromancer" || prof == "witch" || prof == "warlock")
+        maxCharm = 4;
+    else if (prof == "anti-paladin" || prof == "ranger" || prof == "vampire")
+        maxCharm = 3;
+    else
+        maxCharm = 2;
+    int cha = ch->getCurrStat( STAT_CHA );
+    if (cha < 18)
+        maxCharm -= 2;
+    else if (cha < 25)
+        maxCharm -= 1;
+    if (std::max( ch->getCurrStat( STAT_INT ), ch->getCurrStat( STAT_WIS ) ) > 25)
+        maxCharm++;
+    if (ch->getPC( ) != 0 && Player::isNewbie( ch->getPC( ) ))
+        maxCharm++;
+    count = 0;
+    for (Character *wch = char_list; wch; wch = wch->next)
+        if (IS_CHARMED( wch ) && wch->master == ch)
+            count++;
+}
+
+// Best dice average per weapon skill among the wieldable weapons a player can loot (no
+// system, clan, mansion or dungeon areas). With a char: only what it could wield now --
+// wear level, alignment, forbidden material, the limited-item keep band, like the
+// sage's candidate gates. No char: everything up to level.
+static void ga_grantBestWeapons( Character *target, int level, std::map<int, int> &best )
+{
+    int chLevel = level, levelGap = 0, wearMod = 0, badMaterials = 0;
+    if (target != 0) {
+        chLevel = target->getRealLevel( );
+        levelGap = target->getModifyLevel( ) - chLevel;
+        wearMod = target->getProfession( )->getWearModifier( ITEM_WEAPON );
+        badMaterials = material_types_forbidden( target );
+    }
+    for (int i = 0; i < MAX_KEY_HASH; i++)
+    for (obj_index_data *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+        if (pObj->item_type != ITEM_WEAPON || !IS_SET( pObj->wear_flags, ITEM_WIELD )
+            || !IS_SET( pObj->wear_flags, ITEM_TAKE ) || pObj->level > LEVEL_MORTAL)
+            continue;
+        if (pObj->area
+            && IS_SET( pObj->area->area_flag,
+                       AREA_SYSTEM|AREA_HIDDEN|AREA_CLAN|AREA_MANSION|AREA_WIZLOCK|AREA_DUNGEON ))
+            continue;
+        if (std::max( 1, pObj->level - wearMod - levelGap ) > chLevel)
+            continue;
+        if (target != 0) {
+            if (IS_SET( pObj->extra_flags, ITEM_ANTI_EVIL )    && IS_EVIL( target ))    continue;
+            if (IS_SET( pObj->extra_flags, ITEM_ANTI_GOOD )    && IS_GOOD( target ))    continue;
+            if (IS_SET( pObj->extra_flags, ITEM_ANTI_NEUTRAL ) && IS_NEUTRAL( target )) continue;
+            if (badMaterials != 0 && material_is_typed( pObj->material.c_str( ), badMaterials ))
+                continue;
+            int ml = target->getModifyLevel( );
+            if (pObj->limit > 0 && (ml > pObj->level + 20 || ml < pObj->level - 3))
+                continue;
+        }
+        int sn = get_weapon_sn( pObj );
+        int ave = weapon_ave( pObj );
+        if (ave > best[sn])
+            best[sn] = ave;
+    }
+}
+
+// The weapon proficiencies an item grants (sn -> percent), priced together: the swing
+// growth of the BEST weapon class the char could switch to, over what it swings without
+// the item -- its wielded weapon, or the best weapon of a class it already knows,
+// whichever is more. Kit 2026-10-08. One switch, not one per class: the char wields one
+// weapon. No char: the same growth per played profession, averaged.
+static double ga_grantWeapons( Character *target, const GAWeights &w, int level,
+                               const std::map<int, int> &grants )
+{
+    std::map<int, int> bestAve;
+    ga_grantBestWeapons( target, level, bestAve );
+
+    if (target != 0) {
+        double base = std::max( 0.0, w.curWeaponSwing );
+        // The wielded weapon swings unskilled (0 in the sage) once this item is off.
+        Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
+        ::Object *wep = wieldLoc ? wieldLoc->find( target ) : 0;
+        if (wep != 0 && wep->item_type == ITEM_WEAPON && grants.count( get_weapon_sn( wep ) ))
+            base = 0;
+        for (auto &b: bestAve) {
+            if (grants.count( b.first ))
+                continue;
+            Skill *ws = skillManager->find( b.first );
+            int pct = target->getSkill( b.first );
+            if (ws == 0 || (pct <= 0 && !ws->available( target )))
+                continue;
+            base = std::max( base, w.weaponWeight * b.second * (20 + pct) / 100.0 );
+        }
+        double best = 0;
+        for (auto &g: grants) {
+            std::map<int, int>::const_iterator b = bestAve.find( g.first );
+            if (b != bestAve.end( ))
+                best = std::max( best, w.weaponWeight * b->second * (20 + g.second) / 100.0 );
+        }
+        return std::max( 0.0, best - base );
+    }
+
+    std::map<int, std::map<DLString, int> > natives;
+    for (auto &b: bestAve) {
+        Skill *ws = skillManager->find( b.first );
+        if (ws != 0)
+            natives[b.first] = ga_grantClassLevels( ws );
+    }
+    auto knows = [&]( int sn, const DLString &prof ) -> bool {
+        std::map<int, std::map<DLString, int> >::iterator n = natives.find( sn );
+        if (n == natives.end( ))
+            return false;
+        std::map<DLString, int>::iterator l = n->second.find( prof );
+        return l != n->second.end( ) && l->second <= level;
+    };
+    int played = 0;
+    double sum = 0;
+    for (int i = 0; i < professionManager->size( ); i++) {
+        Profession *prof = professionManager->find( i );
+        if (prof == 0 || !prof->isValid( ) || !prof->isPlayed( ))
+            continue;
+        played++;
+        double own = 0, best = 0;
+        for (auto &b: bestAve)
+            if (knows( b.first, prof->getName( ) ))
+                own = std::max( own, b.second * 1.2 );   // a practised class, at 100%
+        for (auto &g: grants) {
+            std::map<int, int>::iterator b = bestAve.find( g.first );
+            if (b != bestAve.end( ) && !knows( g.first, prof->getName( ) ))
+                best = std::max( best, b->second * (20 + g.second) / 100.0 );
+        }
+        sum += std::max( 0.0, best - own );
+    }
+    return played > 0 ? w.weaponWeight * sum / played : 0;
+}
+
+// The weapon a granted skill strikes with: the scored item when it is a weapon (a live
+// copy, or a candidate prototype), else the char's primary. wclass -1 = no weapon.
+// pierce = the attack's damage class is pierce; a candidate prototype is judged by its
+// class alone, its attack index is not bounds-checked like get_weapon_attack's.
+static void ga_grantHitWeapon( obj_index_data *pProto, ::Object *inst, ::Object *primary,
+                               int &wclass, bool &pierce )
+{
+    wclass = -1;
+    pierce = false;
+    ::Object *wep = primary;
+    if (inst != 0 && inst->item_type == ITEM_WEAPON)
+        wep = inst;
+    else if (pProto->item_type == ITEM_WEAPON) {
+        wclass = pProto->value[0];
+        return;
+    }
+    if (wep == 0 || wep->item_type != ITEM_WEAPON)
+        return;
+    wclass = get_weapon_class( wep );
+    pierce = attack_table[get_weapon_attack( wep )].damage == DAM_PIERCE;
+}
+
+static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_data *pProto,
+                              ::Object *inst, bool worn, double swing, int itemLevel )
+{
+    const Json::Value &list = ga_grantList( pProto );
+    if (!list.isArray( ) || list.empty( ))
+        return 0;
+    if (target != 0 && target->is_npc( ))
+        return 0;   // the grantskills engine skips NPCs
+
+    bool caster = w.caster;
+    int col = caster ? 1 : 0;
+    int lvl = target != 0 ? target->getModifyLevel( ) : std::max( 1, itemLevel );
+    bool quick = target != 0 && IS_QUICK( target );
+    double pvpWeight = ga_gk( "pvp_weight", 0.25 );
+    if (target != 0 && target->getClan( ) == clan_flowers)
+        pvpWeight = 0;   // a Flower can't fight players
+
+    // One melee hit of the char in points: the swing of its weapon (this item, when it
+    // is a usable weapon, else the wielded one) plus its damroll. Multiplying it by a
+    // share x prices "x more of all melee damage". The reference player's landed hit
+    // when there is no char.
+    double perHit = target != 0
+        ? std::max( 0.0, swing ) + w.dr * target->damroll
+        : w.dr * item_pc_dmg( lvl, caster );
+    double sanct = item_flag_base( AFF_SANCTUARY, caster, lvl );
+    double activeUse = ga_gk( "active_use", 0.5 );
+    int pulse = std::max( 1, dreamland->getPulseViolence( ) );
+
+    // Skills worn items grant outside this item's slot and inside it (ga_grantHeld), and
+    // the keeper of each one (ga_grantCounted): when several worn items grant the same
+    // skill, the copy on the lowest wear location. No copy is the true source --
+    // grantskills.unequip's removeTemporary strips the skill whichever copy comes off,
+    // the others never re-grant it -- so the pick only has to be stable, and the carry
+    // list reorders while wear locations do not.
+    std::set<int> outside, inside;
+    std::map<int, ::Object *> keeper;
+    int mySlot = pProto->wear_flags;
+    REMOVE_BIT( mySlot, ITEM_TAKE );
+    if (target != 0) {
+        for (::Object *wo = target->carrying; wo; wo = wo->next_content) {
+            if (wo->wear_loc == wear_none)
+                continue;
+            const Json::Value &gl = ga_grantList( wo->pIndexData );
+            if (!gl.isArray( ))
+                continue;
+            int slot = wo->pIndexData->wear_flags;
+            REMOVE_BIT( slot, ITEM_TAKE );
+            std::set<int> &into = (wo == inst || slot == mySlot) ? inside : outside;
+            for (auto const &e: gl) {
+                if (!e.isObject( ) || !e.isMember( "skill" ))
+                    continue;
+                Skill *s = skillManager->findExisting( e["skill"].asString( ) );
+                if (s == 0)
+                    continue;
+                into.insert( s->getIndex( ) );
+                std::map<int, ::Object *>::iterator k = keeper.find( s->getIndex( ) );
+                if (k == keeper.end( ) || wo->wear_loc->getIndex( ) < k->second->wear_loc->getIndex( ))
+                    keeper[s->getIndex( )] = wo;
+            }
+        }
+    }
+
+    // Ambush needs camouflage: held already, or granted by this same item.
+    bool camouflage = false;
+    Skill *camo = skillManager->findExisting( "camouflage" );
+    for (auto const &e: list)
+        if (e.isObject( ) && e.isMember( "skill" ) && e["skill"].asString( ) == "camouflage")
+            camouflage = true;
+    if (!camouflage && target != 0 && camo != 0 && ga_grantHeld( target, camo, outside, inside ))
+        camouflage = true;
+
+    // The char's round, for the shares that need it: extra attacks, off-hand, parry.
+    Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
+    ::Object *primary = (target != 0 && wieldLoc) ? wieldLoc->find( target ) : 0;
+
+    double total = 0;
+    std::map<int, int> weapons;   // granted proficiencies the char lacks: sn -> percent
+
+    for (auto const &e: list) {
+        if (!e.isObject( ) || !e.isMember( "skill" ) || !e.isMember( "learned" ))
+            continue;
+        DLString name = e["skill"].asString( );
+        int learned = e["learned"].asInt( );
+        // A skill that no longer exists makes the Fenia grant throw: worth nothing.
+        Skill *sk = skillManager->findExisting( name );
+        const GAGrantDef *d = ga_grantDef( name );
+        if (sk == 0 || d == 0 || learned <= 0)
+            continue;
+        if (target != 0) {
+            if (ga_grantCounted( target, sk, inst, worn, mySlot, keeper ))
+                continue;
+            if (rage_skill_forbidden( target, sk ) || !ga_grantAlignOk( sk, target ))
+                continue;
+        }
+        // The percent the engine rolls: BasicSkill::getEffective = learned plus the
+        // char's skill bonuses from affects and gear (skill_learned_from_affects). For a
+        // worn keeper that is exactly the engine's number; for a candidate it assumes the
+        // bonuses the char has now. getEffective's daze and drunk cuts are passing
+        // states, left out.
+        int pct = learned;
+        if (target != 0)
+            pct = URANGE( 0, learned + skill_learned_from_affects( sk, target->getPC( ) ), 100 );
+        if (pct <= 0)
+            continue;
+        if (d->kind == GK_WEAPON) {
+            weapons[sk->getIndex( )] = pct;
+            continue;
+        }
+
+        // Formula parts carry pct themselves; the fixed part is scaled below.
+        double pve = 0, pvp = 0;
+        double use = pct / 100.0;
+        bool gated = false;
+        switch (d->kind) {
+        case GK_CRIT: {
+            // onehit_undef.cpp damEffectCriticalStrike: proc chance per landed hit =
+            // effective/10 + skill level bonus + level lead (an equal-level target, Kit
+            // 2026-10-08) + 5 while hasted by anything (Kit 2026-10-08). The bonus
+            // multiplies the whole hit; blind and stun on a proc take part of the
+            // victim's damage away (pve control, scaled from sanctuary at the reference
+            // proc) and decide duels (pvp share at the reference proc).
+            int chance = pct / 10;
+            if (target != 0) {
+                chance += skill_level_bonus( *sk, target );
+                if (quick)
+                    chance += 5;
+            }
+            double p = std::max( 0, chance ) / 100.0;
+            // The class gates are keyed on profession, and a ranger below 60 or a thief
+            // below 66 wears the grant before the class gives the skill: a druid crits
+            // only shapeshifted, a ranger only in nature rooms, a thief only when the
+            // hitting weapon is a dagger (this item if it is one, else the primary).
+            if (target != 0) {
+                const DLString &prof = target->getProfession( )->getName( );
+                if (prof == "druid")
+                    p *= ga_gk( "shapeshift_share", 0.3 );
+                else if (prof == "ranger")
+                    p *= ga_gk( "nature_share", 0.25 );
+                else if (prof == "thief") {
+                    int wclass;
+                    bool pierce;
+                    ga_grantHitWeapon( pProto, inst, primary, wclass, pierce );
+                    if (wclass != WEAPON_DAGGER) {
+                        gated = true;
+                        break;
+                    }
+                }
+            }
+            double ref = ga_gk( "crit_ref_proc", 0.07 );
+            pve = p * ga_gk( "crit_bonus", 0.9 ) * perHit
+                + ga_gk( "crit_pve_control", 0.31 ) * sanct * p / ref;
+            pvp = item_combat_points( 0, ga_gk( "crit_pvp_share", 0.11 ) * p / ref, lvl, caster );
+            break;
+        }
+        case GK_EXTRA: {
+            // fight.cpp forest_attack, at the end of the round, in nature rooms only:
+            // while d100 < chance { a hit, an off-hand roll at that chance; chance /= 3 }.
+            // Worth those extra hits over the hits the char already makes each round.
+            GAOffhand om;
+            bool dual = false;
+            int m = 0;
+            if (target != 0) {
+                om = ga_offhandModel( target, w, primary );
+                Wearlocation *secLoc = wearlocationManager->findExisting( "second_wield" );
+                ::Object *sec = secLoc ? secLoc->find( target ) : 0;
+                if (sec != 0 && sec->item_type == ITEM_WEAPON && ga_canDualWield( target )) {
+                    dual = true;
+                    m = second_weapon_chance_class( target->getProfession( ).getElement( ),
+                                                    get_weapon_class( sec ) );
+                }
+            }
+            auto off = [&]( double c ) -> double {
+                return dual ? ga_pct( om.swPct * (c * m / 100.0) / 100.0 ) : 0.0;
+            };
+            double extra = 0, pass = 1.0;
+            for (int c = pct; c > 1; c /= 3) {
+                pass *= (c - 1) / 100.0;   // number_percent() < c
+                extra += pass * (1 + off( c ));
+            }
+            double hits;
+            if (target != 0) {
+                hits = om.mainSwings + (quick ? 1 : 0) + off( 100 );
+                for (size_t k = 0; k < om.extra.size( ); k++)
+                    hits += ga_pct( om.extra[k] ) * off( om.extra[k] );
+            }
+            else
+                hits = ga_gk( "ref_swings", 2.5 );
+            if (hits > 0)
+                pve = ga_gk( "nature_share", 0.25 ) * extra / hits * perHit;
+            break;
+        }
+        case GK_NUKE: {
+            // A granted nuke adds on top of melee (violence_update keeps swinging through
+            // cast lag): per cast = tier damage at the char's spell level x the average
+            // save x targets, at most one cast per lag, as many as a share of the mana
+            // pool pays for over a fight, used active_use of the time. A caster already
+            // nukes every round, so only an AoE's extra targets add anything for it.
+            if (!sk->getSpell( ) || !sk->getSpell( )->isCasted( ))
+                break;
+            int slevel = ga_grantSpellLevel( target, sk, lvl, caster );
+            if (slevel <= 0)
+                break;
+            double per = spell_proc_tier_value( name, slevel ) * spell_combat_save_factor( )
+                       * ga_gkSkill( "nuke_cond", *d, d->a );
+            if (per <= 0)
+                break;
+            bool aoe = IS_SET( sk->getSpell( )->getTarget( ), TAR_PEOPLE );
+            double targets = aoe ? ga_gk( "aoe_targets", 1.3 ) : 1.0;
+            double rate = (double)pulse / std::max( 1, sk->getBeats( target ) );
+            int cost = sk->getMana( );
+            double pool = target != 0 ? (double)target->max_mana : ga_gk( "ref_mana_per_level", caster ? 30 : 20, col ) * lvl;
+            if (cost > 0)
+                rate = std::min( rate, ga_gk( "mana_share", 0.25 ) * pool / (cost * ga_gkFightRounds( lvl )) );
+            double dmg = caster ? (aoe ? rate * per * (targets - 1) : 0) : rate * per * targets;
+            pve = item_combat_points( dmg * activeUse, 0, lvl, caster ) * use;
+            pvp = item_combat_points( 0, ga_gkSkill( "nuke_pvp_share", *d, d->b ), lvl, caster ) * use;
+            break;
+        }
+        case GK_AVOID: {
+            // skillcommand/blink/run: effective/2 % (+20 hasted, at most 85) to dodge a
+            // melee blow that got past parry. Priced as sanctuary (which halves damage)
+            // scaled by the share it removes; half when sanctuary already halves what is
+            // left; mana_factor for the level/5 mana each blink costs. PvP caps the share
+            // at the plan's judged duel uptime (blink_pvp_share): f/(1-f) of an
+            // uncapped share runs away for a hasted char with no parry.
+            if (target != 0 && target->getClan( ) == clan_battlerager)
+                break;   // the oath of rage forbids blinking
+            double chance = std::min( 85.0, pct / 2.0 + (quick ? 20 : 0) );
+            double reach = target != 0 ? ga_offhandModel( target, w, primary ).reach
+                                       : ga_gk( "ref_reach", caster ? 0.72 : 0.54, col );
+            double f = chance / 100.0 * reach;
+            bool sanctHeld = target != 0 && IS_AFFECTED( target, AFF_SANCTUARY );
+            pve = sanct * (f / 0.5) * (sanctHeld ? 0.5 : 1.0)
+                * ga_gk( "blink_mana_factor", caster ? 0.7 : 0.8, col );
+            pvp = item_combat_points( 0, std::min( f, ga_gk( "blink_pvp_share", caster ? 0.36 : 0.27, col ) ),
+                                      lvl, caster );
+            break;
+        }
+        case GK_BUFF: {
+            // The measured worn-buff price x the share of the time it is kept up. A
+            // prayer below its minimum spell level lasts 0 ticks. A buff the char casts
+            // itself is worth 10% (the item flag rule).
+            if (d->b > 0) {
+                int slevel = ga_grantSpellLevel( target, sk, lvl, caster );
+                if (slevel < d->b)
+                    break;
+            }
+            pve = item_wornbuff_points( d->ref, lvl, caster )
+                * ga_gkSkill( "buff_uptime", *d, d->a ) * use;
+            if (target != 0 && ga_canSelfCast( target, d->ref ))
+                pve *= 0.1;
+            break;
+        }
+        case GK_SLEVEL:
+            pve = d->a * w.slevel * w.spellFactor * use;
+            break;
+        case GK_SPELLCRAFT:
+            pve = ga_grantSpellPenalty( target, caster, lvl ) * w.slevel * w.spellFactor * use;
+            break;
+        case GK_PET: {
+            // A free fighting follower: its damage as a share of the char's round (Kit
+            // 2026-10-08: "pretty high"). Only with a charm slot to spare -- every summon
+            // and charm refuses an overcharmed caster (Kit: 0 if overcharmed). With the
+            // slots full a worn item keeps its price only when one of the followers is
+            // its own summon, matched by the mob vnum the spell creates: the pet IS the
+            // value. Attract other charms through charm person's affect (add_charmed),
+            // which no follower signal tells apart, so full slots zero it.
+            if (target != 0) {
+                int maxCharm, count;
+                ga_charmSlots( target, maxCharm, count );
+                if (maxCharm - count < 1) {
+                    bool ownPet = false;
+                    if (worn && d->b > 0)
+                        for (Character *wch = char_list; wch && !ownPet; wch = wch->next)
+                            ownPet = wch->is_npc( ) && IS_CHARMED( wch ) && wch->master == target
+                                     && wch->getNPC( )->pIndexData->vnum == (int)d->b;
+                    if (!ownPet) {
+                        gated = true;
+                        break;
+                    }
+                }
+            }
+            pve = item_combat_points( ga_gkSkill( "pet_round_share", *d, d->a ) * item_pc_round( lvl, caster ),
+                                      0, lvl, caster ) * use;
+            break;
+        }
+        case GK_CIRCLE: {
+            // class_thief.cpp circle: a pierce or dagger weapon, nobody hitting you;
+            // (slevel/40 + 1) x (dice + damroll) + slevel, effective% to land, one per lag.
+            double dice = target != 0 ? std::max( 0.0, swing ) / std::max( 1.0, w.weaponWeight )
+                                      : 0.0;
+            double damroll = target != 0 ? (double)target->damroll : item_pc_dmg( lvl, caster );
+            if (target != 0) {
+                int wclass;
+                bool pierce;
+                ga_grantHitWeapon( pProto, inst, primary, wclass, pierce );
+                if (!pierce && wclass != WEAPON_DAGGER) {
+                    gated = true;
+                    break;
+                }
+            }
+            double hit = (lvl / 40 + 1) * (dice + damroll) + lvl;
+            double rate = (double)pulse / std::max( 1, sk->getBeats( target ) );
+            pve = item_combat_points( rate * pct / 100.0 * hit
+                                      * ga_gk( "not_tanking", 0.2 ) * activeUse, 0, lvl, caster );
+            break;
+        }
+        case GK_AMBUSH:
+            gated = !camouflage;
+            break;
+        case GK_XP:
+            // No xp left to gain at the top level.
+            gated = target != 0 && target->getRealLevel( ) >= LEVEL_MORTAL;
+            break;
+        }
+        if (gated)
+            continue;
+
+        pve += ga_gkFixed( *d, col ) * use;
+        pvp += ga_gkFixed( *d, 2 + col ) * use;
+        double v = pve + pvpWeight * pvp + ga_gkFixed( *d, 4 ) * use;
+        if (target == 0)
+            v *= ga_grantShare( sk, lvl );
+        total += v;
+    }
+
+    if (!weapons.empty( ))
+        total += ga_grantWeapons( target, w, lvl, weapons );
+    return total;
 }
 
 // Worth of a completed set's declared <affects> bonus for this profile, cap-aware.
