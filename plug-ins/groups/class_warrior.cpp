@@ -109,7 +109,7 @@ SKILL_RUNP( smithing )
         oldact(_("Ты восстанавливаешь $o4.\n\r"),ch,obj,0,TO_CHAR);
 
         obj->condition += ( gsn_smithing->getEffective( ch ) + skill_level_bonus(*gsn_smithing, ch) ) / 2;
-        obj->condition = max( 100, obj->condition );
+        obj->condition = min( 100, obj->condition );
         hammer->condition -= 25;
     }
     
