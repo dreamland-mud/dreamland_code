@@ -27,6 +27,7 @@
 
 #include "fleemovement.h"
 #include "aitrigger.h"
+#include "fenia_utils.h"
 #include "l10n.h"
 
 /*-------------------------------------------------------------------
@@ -96,11 +97,18 @@ void GangMob::config( int level )
 void GangMob::entry( ) 
 {
     Character *mob, *ch_next;
+    Room *room = ch->in_room;
+    // A greet can start a fight that kills this gangster (its behavior gets
+    // cleared and freed) or makes it flee: hold the behavior for the whole
+    // loop and stop once the gangster is no longer standing in this room.
+    GangMob::Pointer keep = ch->getNPC( )->behavior.getDynamicPointer<GangMob>( );
 
-    for (mob = ch->in_room->people; mob; mob = ch_next) {
+    for (mob = room->people; mob; mob = ch_next) {
         ch_next = mob->next_in_room;
         if (mob != ch)
             greet( mob );
+        if (ch->in_room != room)
+            break;
     }
 }
 
@@ -240,7 +248,9 @@ void GangMember::greet( Character *mob )
     if (gquest->getActor( mob ) != mob)
         return;
 
-    if (ai_trigger(false, ch, "onGangGreetAI", "CCi", ch, mob, gquest->getMaxLevel( )) != AI_UNHANDLED)
+    if (ai_trigger(false, ch, "onGangGreetAI", "CCiii", ch, mob,
+                   gquest->getMinLevel( ), gquest->getMaxLevel( ),
+                   Gangsters::isPoliceman( mob ) ? 1 : 0) != AI_UNHANDLED)
         return;
     
     if ((isLastFought( mob ) 
@@ -357,8 +367,13 @@ void GangMember::fight( Character *victim, string command )
 
     BasicMobileDestiny::fight( victim, command );
 
-    if (ai_trigger(true, ch, "onGangFightAI", "CC", ch, victim) != AI_UNHANDLED)
+    // The round may have ended the fight or the victim; an NPC victim is then
+    // already recycled, so the Fenia AI is only asked while the fight is on.
+    if (gprog_registered( "onGangFightAI" )) {
+        if (ch->fighting == victim)
+            ai_trigger(true, ch, "onGangFightAI", "CC", ch, victim);
         return;
+    }
 
     if (victim->hit < victim->max_hit / 4) {
         switch (number_range(1, 3)) {
