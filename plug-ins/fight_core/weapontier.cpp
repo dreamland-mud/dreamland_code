@@ -6,6 +6,7 @@
 #include "def.h"
 
 BHV(random_weapon);
+BHV(random_armor);
 
 /*-----------------------------------------------------------------------------
  * Weapon tiers
@@ -98,6 +99,11 @@ DLString get_tier_aura(Object *obj)
 
 bool item_is_random(obj_index_data *pObj) 
 {
-    return pObj->behaviors.isSet(bhv_random_weapon);
+    return pObj->behaviors.isSet(bhv_random_weapon) || pObj->behaviors.isSet(bhv_random_armor);
+}
+
+bool item_is_random_armor(obj_index_data *pObj)
+{
+    return pObj->behaviors.isSet(bhv_random_armor);
 }
 

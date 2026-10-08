@@ -9,6 +9,8 @@
 #include "material.h"
 #include "damageflags.h"
 #include "weapongenerator.h"
+#include "armorgenerator.h"
+#include "affectflags.h"
 #include "weapontier.h"
 #include "merc.h"
 #include "json_utils_ext.h"
@@ -93,6 +95,12 @@ void WeaponRandomizer::eventItemReset(const ItemResetEvent &event) const
     Object *obj = event.obj;
     RESET_DATA *pReset = event.pReset;
 
+    if (obj->item_type == ITEM_ARMOR && item_is_random_armor(obj->pIndexData)) {
+        if (obj->getProperty("tier").empty())
+            randomizeArmorStats(obj, pReset->bestTier);
+        return;
+    }
+
     if (obj->item_type != ITEM_WEAPON)
         return;
 
@@ -135,6 +143,11 @@ void WeaponRandomizer::eventItemRead(const ItemReadEvent &event) const
     weapon_repair_names(obj);
 
     if (obj->getProperty("random").empty())
+        return;
+
+    // Converted hand-made items (Kit 2026-10-08): copies players already own keep
+    // the stats they had; only fresh resets roll.
+    if (obj->getProperty("keepOld") == "true")
         return;
 
     if (!obj->getProperty("tier").empty())
@@ -215,6 +228,60 @@ void WeaponRandomizer::randomizeWeaponStats(Object *obj, int bestTierOverride) c
     Character *carrier = obj->getCarrier();
     if (carrier && !carrier->is_npc())
         carrier->pecho(POS_DEAD, _("%^O1 меняет свои характеристики на случайные."), obj);
+}
+
+// Hand-made armor with the 'random armor' behavior: own names, rolled stats.
+// No killer on a reset: the profile leans caster when the prototype's own stats do.
+void WeaponRandomizer::randomizeArmorStats(Object *obj, int bestTierOverride) const
+{
+    DLString slot = armorSlot(obj);
+    if (slot.empty())
+        return;
+
+    ArmorGenerator(obj, 0, random_weapon_tier(getTier(obj, bestTierOverride)), slot)
+        .keepIdentity(true)
+        .caster(armorLeansCaster(obj))
+        .alignment(getAlign(obj))
+        .run();
+}
+
+// The measure slot of a hand-made armor piece, from its wear flags.
+DLString WeaponRandomizer::armorSlot(Object *obj) const
+{
+    static const struct { int bit; const char *slot; } slots[] = {
+        { ITEM_WEAR_SHIELD, "shield" }, { ITEM_WEAR_HEAD, "head" }, { ITEM_WEAR_BODY, "body" },
+        { ITEM_WEAR_ARMS, "arms" }, { ITEM_WEAR_HANDS, "hands" }, { ITEM_WEAR_LEGS, "legs" },
+        { ITEM_WEAR_FEET, "feet" }, { ITEM_WEAR_WAIST, "waist" }, { ITEM_WEAR_NECK, "neck" },
+        { ITEM_WEAR_FINGER, "finger" }, { ITEM_WEAR_WRIST, "wrist" }, { ITEM_WEAR_ABOUT, "about" },
+        { ITEM_WEAR_FLOAT, "float" }, { ITEM_WEAR_FACE, "face" }, { ITEM_WEAR_EARS, "ears" },
+        { ITEM_HOLD, "hold" },
+    };
+
+    for (auto &s: slots)
+        if (IS_SET(obj->wear_flags, s.bit))
+            return s.slot;
+
+    return DLString::emptyString;
+}
+
+bool WeaponRandomizer::armorLeansCaster(Object *obj) const
+{
+    int caster = 0, melee = 0;
+    for (auto &paf: obj->pIndexData->affected) {
+        switch (paf->location.getValue()) {
+        case APPLY_MANA: case APPLY_MANA_GAIN: case APPLY_INT: case APPLY_WIS:
+            if (paf->modifier > 0) caster++;
+            break;
+        case APPLY_HITROLL: case APPLY_DAMROLL: case APPLY_STR: case APPLY_DEX:
+            if (paf->modifier > 0) melee++;
+            break;
+        }
+    }
+
+    if (caster != melee)
+        return caster > melee;
+
+    return number_range(1, 3) == 1;
 }
 
 // Full randomize of a weapon. Most often the weapon will be a fixed "stub" item w/o any properties.

@@ -115,13 +115,13 @@ void ItemAffixRoller::flushAffects()
  * ArmorGenerator
  *-------------------------------------------------------------------------*/
 ArmorGenerator::ArmorGenerator(Object *obj, PCharacter *pch, int tier, const DLString &slot)
-        : ItemAffixRoller(obj, pch, tier, "armor", slot), procs(Json::arrayValue)
+        : ItemAffixRoller(obj, pch, tier, "armor", slot), procs(Json::arrayValue), keepName(false)
 {
 }
 
 bool ArmorGenerator::run()
 {
-    if (!armor_slot_exists(slot)) {
+    if (!keepName && !armor_slot_exists(slot)) {
         warn("Armor generator: no names configured for slot %s.", slot.c_str());
         return false;
     }
@@ -134,7 +134,14 @@ bool ArmorGenerator::run()
     if (obj->level < 1)
         obj->level = 1;
 
-    if (!pickNoun())
+    if (keepName) {
+        // The first listed material decides the AC hardness; material affixes are off.
+        materialName = obj->getMaterial();
+        DLString::size_type comma = materialName.find(',');
+        if (comma != DLString::npos)
+            materialName = materialName.substr(0, comma);
+        materialName.stripWhiteSpace();
+    } else if (!pickNoun())
         return false;
 
     learnPlayerGroups();
@@ -155,12 +162,17 @@ bool ArmorGenerator::run()
         obj->setProperty("signature", pool[sig].section + ":" + pool[sig].value);
 
     // The material affix, if any, was applied above; otherwise the noun's own.
-    if (materialName.empty())
-        materialName = defaultMaterial();
-    obj->setMaterial(materialName.c_str());
+    if (!keepName) {
+        if (materialName.empty())
+            materialName = defaultMaterial();
+        obj->setMaterial(materialName.c_str());
+    }
 
     assignAC();
-    assignNames();
+    if (keepName)
+        assignColours();
+    else
+        assignNames();
     assignFlags();
 
     flushAffects();
@@ -215,6 +227,9 @@ static bool material_is_metal(const DLString &name)
 /** Materials: only what the chosen noun is made of. */
 bool ArmorGenerator::valueAllowed(const DLString &secName, const DLString &value) const
 {
+    if (keepName)
+        return secName != "material" && secName != "worn_buff";
+
     return secName != "material" || materialAllowed(value);
 }
 
@@ -1120,6 +1135,18 @@ void ArmorGenerator::assignAC()
     b = URANGE(1, b, 60);
     int lo = min(a, b), hi = max(a, b);
 
+    // keepIdentity: rings, cloaks, belts and the like keep their own AC; on the
+    // seven armor slots the rolled AC only ever raises the item's own.
+    if (keepName) {
+        if (!armor_slot_exists(slot))
+            return;
+        obj->value0(max(obj->value0(), number_range(lo, hi)));
+        obj->value1(max(obj->value1(), number_range(lo, hi)));
+        obj->value2(max(obj->value2(), number_range(lo, hi)));
+        obj->value3(max(obj->value3(), number_range(lo, hi) / 2));
+        return;
+    }
+
     obj->value0(number_range(lo, hi));
     obj->value1(number_range(lo, hi));
     obj->value2(number_range(lo, hi));
@@ -1227,6 +1254,18 @@ void ArmorGenerator::assignNames()
             DLString s = obj->getShortDescr((lang_t)l);
             obj->setShortDescr("{" + colour + s.colourStrip() + "{x", (lang_t)l);
         }
+}
+
+void ArmorGenerator::assignColours()
+{
+    DLString colour = weapon_tier_table[tier - 1].colour;
+    if (colour.empty())
+        return;
+
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        DLString s = obj->getShortDescr((lang_t)l);
+        obj->setShortDescr("{" + colour + s.colourStrip() + "{x", (lang_t)l);
+    }
 }
 
 void ArmorGenerator::assignFlags()

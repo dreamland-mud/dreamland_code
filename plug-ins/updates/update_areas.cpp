@@ -229,8 +229,9 @@ static int item_reset_chance(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCh
         return 10;
     }
 
-    // Shop items and non-random stuff is reset immediately,
-    // random weapons never appear in populated areas and are otherwise delayed.
+    // Shop items and non-random stuff is reset immediately; random items are
+    // delayed: half the time in an empty area, rarely with players around
+    // (Kit 2026-10-08: newbies farming a zone still see its random gear).
     if (pReset->rand == RAND_NONE && !item_is_random(pObjIndex))
         return 100;
 
@@ -241,9 +242,9 @@ static int item_reset_chance(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCh
         return 100;
 
     if (mob->in_room->area->nplayer > 0)
-        return 0;
+        return 10;
 
-    return 10;
+    return 50;
 }
 
 

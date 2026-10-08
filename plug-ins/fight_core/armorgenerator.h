@@ -146,6 +146,12 @@ public:
 
     ArmorGenerator & caster(bool caster) { this->isCaster = caster; return *this; }
     ArmorGenerator & alignment(int align) { this->align = align; return *this; }
+    /** Hand-made armor ('random armor' behavior): keep the item's own names,
+     *  gender, material and wear slot, roll only affixes, AC, tier and timer.
+     *  The slot may be any wear slot (about, waist, neck...): it only picks the
+     *  measure rolls and the affix slot weights. No worn buff: that needs the
+     *  base vnums' onEquip. */
+    ArmorGenerator & keepIdentity(bool keep) { this->keepName = keep; return *this; }
     /** Boss signature (legendary only): the dead boss's damage type and the
      *  spells it casts. One of them goes on the item, 50/50, inside the budget. */
     ArmorGenerator & signature(const DLString &damtype, const std::vector<DLString> &spells)
@@ -169,6 +175,8 @@ private:
     void applyOne(const Candidate &c, int count);
     void assignAC();
     void assignNames();
+    /** keepIdentity: the tier colour on the item's own names. */
+    void assignColours();
     void assignFlags();
 
     bool materialAllowed(const DLString &name) const;
@@ -179,6 +187,7 @@ private:
     std::vector<DLString> sigSpells;
     DLString wornBuff;
     Json::Value procs;
+    bool keepName;
 };
 
 #endif
