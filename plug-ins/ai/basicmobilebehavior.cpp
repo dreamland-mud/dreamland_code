@@ -714,6 +714,9 @@ void SavedCreature::save( )
 {
     save_creature( ch );
     saved = true;
+    // Recharmed where it waited: drop the uncharmed copy from the room file,
+    // or the boot loads both.
+    save_mobs( ch->in_room );
 }
 
 bool SavedCreature::extract( bool fCount )

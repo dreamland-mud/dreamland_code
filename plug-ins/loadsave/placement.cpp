@@ -70,8 +70,10 @@ void char_from_room( Character *ch )
                         bug( "Char_from_room: ch not found.", 0 );
         }
 
-        if ( ch->is_npc( )
-                && !IS_CHARMED(ch) )
+        // Charmed mobs too: one that waited here uncharmed after its master
+        // quit is still in this room's file, and a stale copy there would load
+        // next to its saved/charmed one at boot.
+        if ( ch->is_npc( ) )
         {
                 save_mobs( ch->in_room );
         }

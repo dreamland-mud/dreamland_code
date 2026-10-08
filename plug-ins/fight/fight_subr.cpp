@@ -31,6 +31,7 @@
 #include "save.h"
 #include "vnum.h"
 #include "fight.h"
+#include "follow_utils.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -184,6 +185,10 @@ void check_bloodthirst( Character *ch )
         if (ch != vch && ch->can_see(vch) && !is_safe_nomessage(ch, vch))
         {
             ch->pecho( _("{RБОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ!!!{x") );
+            // A proper release: a saved charmie must drop its saved/charmed
+            // file (stopfol), or the boot loads it next to the room copy.
+            if (IS_CHARMED(ch))
+                follower_stop(ch);
             REMOVE_BIT(ch->affected_by, AFF_CHARM);
             affect_bit_strip(ch, &affect_flags, AFF_CHARM);
 

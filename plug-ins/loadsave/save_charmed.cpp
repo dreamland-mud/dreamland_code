@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <set>
 #include <string.h>
+#include <strings.h>
 
 #include "fileformatexception.h"
 #include "logstream.h"
@@ -171,7 +172,8 @@ static void load_one_creature( const DLString &path )
                 continue;
             }
             
-            if ( !strcmp( word, "END"    ) ) 
+            // save_creature writes "#End"; older files may carry "#END".
+            if ( !strcasecmp( word, "END" ) )
                 break;
             
             LogStream::sendError( ) << "bad section: " << word << endl;
@@ -193,8 +195,31 @@ static void load_one_creature( const DLString &path )
 
     if (ch && buggy)
         extract_mob_dropped( ch );
-    else if (ch)
+    else if (ch) {
+        // The file kept the charm, but the master link is not saved: drop the
+        // charm like quit does (follower_stop), so the room save below picks
+        // the creature up and it waits there for "follow me".
+        if (IS_AFFECTED( ch, AFF_CHARM )) {
+            REMOVE_BIT( ch->affected_by, AFF_CHARM );
+            affect_bit_strip( ch, &affect_flags, AFF_CHARM );
+        }
         room_markers.insert( ch->in_room->vnum );
+    }
+}
+
+static bool creature_loaded( const char *fnum )
+{
+    for (Character *ch = char_list; ch; ch = ch->next) {
+        if (!ch->is_npc( ))
+            continue;
+
+        DLString id;
+        id << make_fnum( ch->getNPC( ) );
+        if (id == fnum)
+            return true;
+    }
+
+    return false;
 }
 
 void load_creatures( )
@@ -221,6 +246,17 @@ void load_creatures( )
             for (dp = readdir( dirp ); dp; dp = readdir( dirp )) {
                 if (NAMLEN( dp ) <= 0 || dp->d_name[0] == '.')
                     continue;
+
+                // The file name is the mob id. A copy already loaded from
+                // saved/mobiles is the newer one (a release re-saves the
+                // room), so loading this file too would clone the mob and
+                // its gear.
+                if (creature_loaded( dp->d_name )) {
+                    LogStream::sendNotice( ) << "[" << dirname << "/" << dp->d_name
+                        << "]: already loaded from saved mobiles, dropped" << endl;
+                    unlink( (dirname + "/" + dp->d_name).c_str( ) );
+                    continue;
+                }
 
                 try {
                     load_one_creature( dirname + "/" + dp->d_name );
