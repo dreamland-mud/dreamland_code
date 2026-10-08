@@ -4634,11 +4634,12 @@ static double ga_gkFightRounds( int level )
     return rn[3];
 }
 
-// Does the char hold this skill WITHOUT the item being scored? outside / inside = skills
-// granted by worn items outside this item's slot / in it (the item itself, or the one it
-// would replace). A native or race skill, a grant from another slot, or a temporary skill
-// no worn item explains (a dream, a quest) all stay when this item goes on, and
-// giveTemporary refuses an available skill -- so the grant would do nothing.
+// Would the char hold this skill with the item being scored in place, from some other
+// source? outside / inside = skills granted by worn items outside this item's slot / in
+// it (the item itself, or the one it would replace). A native or race skill, a grant from
+// another slot, or a temporary skill no worn item explains (a dream, a quest) all stay.
+// Used where only having the skill matters (ambush's camouflage); pricing a grant counts
+// a shared skill once, see ga_grantCounted.
 static bool ga_grantHeld( Character *target, Skill *skill, const std::set<int> &outside,
                           const std::set<int> &inside )
 {
@@ -4648,6 +4649,30 @@ static bool ga_grantHeld( Character *target, Skill *skill, const std::set<int> &
         return true;
     int sn = skill->getIndex( );
     return outside.count( sn ) != 0 || inside.count( sn ) == 0;
+}
+
+// Is this skill's value already counted elsewhere, so the item's grant adds nothing to
+// its score? Native, race and unexplained temporary skills: yes. A skill that worn items
+// grant is counted ONCE, on its keeper (see ga_grantsValue): the keeper itself prices
+// it, a worn duplicate scores 0, and a candidate scores 0 only when the keeper sits in
+// another slot -- a candidate for the keeper's own slot is what would carry the skill
+// on after the swap. Pricing every worn copy at 0 (each sees the other) would let the
+// sage advise swapping both away and lose the skill.
+static bool ga_grantCounted( Character *target, Skill *skill, ::Object *inst, bool worn,
+                             int mySlot, const std::map<int, ::Object *> &keeper )
+{
+    if (!skill->available( target ))
+        return false;
+    if (!temporary_skill_active( skill, target ))
+        return true;
+    std::map<int, ::Object *>::const_iterator k = keeper.find( skill->getIndex( ) );
+    if (k == keeper.end( ))
+        return true;
+    if (worn && inst != 0)
+        return k->second != inst;
+    int slot = k->second->pIndexData->wear_flags;
+    REMOVE_BIT( slot, ITEM_TAKE );
+    return slot != mySlot;
 }
 
 // The skill's <align>/<ethos> admits the char: GenericSkill::checkAlignEthos, which
@@ -4916,11 +4941,17 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
     double activeUse = ga_gk( "active_use", 0.5 );
     int pulse = std::max( 1, dreamland->getPulseViolence( ) );
 
-    // Skills worn items grant outside this item's slot and inside it (see ga_grantHeld).
+    // Skills worn items grant outside this item's slot and inside it (ga_grantHeld), and
+    // the keeper of each one (ga_grantCounted): when several worn items grant the same
+    // skill, the copy on the lowest wear location. No copy is the true source --
+    // grantskills.unequip's removeTemporary strips the skill whichever copy comes off,
+    // the others never re-grant it -- so the pick only has to be stable, and the carry
+    // list reorders while wear locations do not.
     std::set<int> outside, inside;
+    std::map<int, ::Object *> keeper;
+    int mySlot = pProto->wear_flags;
+    REMOVE_BIT( mySlot, ITEM_TAKE );
     if (target != 0) {
-        int mySlot = pProto->wear_flags;
-        REMOVE_BIT( mySlot, ITEM_TAKE );
         for (::Object *wo = target->carrying; wo; wo = wo->next_content) {
             if (wo->wear_loc == wear_none)
                 continue;
@@ -4934,8 +4965,12 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
                 if (!e.isObject( ) || !e.isMember( "skill" ))
                     continue;
                 Skill *s = skillManager->findExisting( e["skill"].asString( ) );
-                if (s != 0)
-                    into.insert( s->getIndex( ) );
+                if (s == 0)
+                    continue;
+                into.insert( s->getIndex( ) );
+                std::map<int, ::Object *>::iterator k = keeper.find( s->getIndex( ) );
+                if (k == keeper.end( ) || wo->wear_loc->getIndex( ) < k->second->wear_loc->getIndex( ))
+                    keeper[s->getIndex( )] = wo;
             }
         }
     }
@@ -4967,7 +5002,7 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
         if (sk == 0 || d == 0 || learned <= 0)
             continue;
         if (target != 0) {
-            if (ga_grantHeld( target, sk, outside, inside ))
+            if (ga_grantCounted( target, sk, inst, worn, mySlot, keeper ))
                 continue;
             if (rage_skill_forbidden( target, sk ) || !ga_grantAlignOk( sk, target ))
                 continue;
