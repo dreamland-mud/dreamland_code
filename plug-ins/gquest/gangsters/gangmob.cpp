@@ -107,7 +107,8 @@ void GangMob::entry( )
         ch_next = mob->next_in_room;
         if (mob != ch)
             greet( mob );
-        if (ch->in_room != room)
+        // An immediate extraction clears ch on the behavior.
+        if (!ch || ch->in_room != room)
             break;
     }
 }
