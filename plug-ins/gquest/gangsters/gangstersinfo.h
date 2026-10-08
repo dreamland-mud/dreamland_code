@@ -30,6 +30,7 @@ public:
     virtual const DLString & getQuestID( ) const;
 
     inline static GangstersInfo* getThis( ); 
+    inline int getMobVnum( ) const { return vnumMob.getValue( ); }
 
 protected:
 

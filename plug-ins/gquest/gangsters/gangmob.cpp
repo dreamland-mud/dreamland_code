@@ -26,6 +26,7 @@
 #include "def.h"
 
 #include "fleemovement.h"
+#include "aitrigger.h"
 #include "l10n.h"
 
 /*-------------------------------------------------------------------
@@ -110,8 +111,17 @@ GangMember::GangMember( ) : confessed( false ), state( STAT_NORMAL )
 {
 }
 
+/*
+ * Every gang member decision below is first handed to the Fenia mob AI
+ * (dreamland_fenia/global/onGang*AI), which runs the state checks the old
+ * bodies skipped: stun, lag, charm, fear, safe rooms. The C++ bodies only run
+ * while no handler is registered, so annulling a handler brings them back.
+ */
 bool GangMember::spec( ) 
 {
+    if (ai_trigger(false, ch, "onGangSpecAI", "C", ch) != AI_UNHANDLED)
+        return true;
+
     if (state == STAT_SLEEP && IS_AWAKE( ch ))
         state = STAT_NORMAL;
     
@@ -180,6 +190,12 @@ void GangMember::bribe( Character *briber, int gold, int silver )
     if (!gquest->isLevelOK( briber ))
         return;
 
+    Room *hint = gquest->lairHintRoom( );
+
+    if (ai_trigger(false, ch, "onGangBribeAI", "CCiii", ch, briber, amount, b,
+                   hint ? hint->vnum : 0) != AI_UNHANDLED)
+        return;
+
     if (state != STAT_NORMAL)
         return;
     
@@ -219,7 +235,12 @@ void GangMember::bribe( Character *briber, int gold, int silver )
 
 void GangMember::greet( Character *mob ) 
 {
-    if (Gangsters::getThis( )->getActor( mob ) != mob)
+    Gangsters *gquest = Gangsters::getThis( );
+
+    if (gquest->getActor( mob ) != mob)
+        return;
+
+    if (ai_trigger(false, ch, "onGangGreetAI", "CCi", ch, mob, gquest->getMaxLevel( )) != AI_UNHANDLED)
         return;
     
     if ((isLastFought( mob ) 
@@ -335,6 +356,9 @@ void GangMember::fight( Character *victim, string command )
     fighting = lastFought;
 
     BasicMobileDestiny::fight( victim, command );
+
+    if (ai_trigger(true, ch, "onGangFightAI", "CC", ch, victim) != AI_UNHANDLED)
+        return;
 
     if (victim->hit < victim->max_hit / 4) {
         switch (number_range(1, 3)) {

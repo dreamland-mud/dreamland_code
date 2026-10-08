@@ -4,6 +4,8 @@
  */
 
 #include "gangsters.h"
+#include "gangstersinfo.h"
+#include "aitrigger.h"
 #include "xmlattributegangsters.h"
 #include "gangchef.h"
 
@@ -90,6 +92,15 @@ void GangChef::greet( Character *mob )
 void GangChef::fight( Character *victim, string command ) 
 {
     Character *mob, *ch_next;
+
+    // Fenia (global/onGangChefFightAI) picks which gang members can actually
+    // join in; the loop below is the fallback while no handler is registered.
+    if (ai_trigger(true, ch, "onGangChefFightAI", "CCi", ch, victim,
+                   GangstersInfo::getThis( )->getMobVnum( )) != AI_UNHANDLED) {
+        if (!ch->extracted)
+            GangMob::fight( victim, command );
+        return;
+    }
     
     for (mob = ch->in_room->people; mob; mob = ch_next) {
         ch_next = mob->next_in_room;
