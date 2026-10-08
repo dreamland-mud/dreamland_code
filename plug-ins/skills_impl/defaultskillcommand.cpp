@@ -205,7 +205,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
 
     // If argtype was defined in skill profile, enforce argument parsing.
     if (!parseArguments(ch, args, target, errbuf)) {
-        ch->pecho(errbuf.str());
+        echo_master(ch, "%s", errbuf.str().c_str());
         return;
     }
 

@@ -812,6 +812,11 @@ lang_t viewerLang( const Character *wch )
     if (wch->is_npc( )) {
         if (wch->getNPC( )->switchedFrom)
             return viewerLang( wch->getNPC( )->switchedFrom );
+        // A charmed pet's only reader is its PC master: what is rendered for
+        // it is dropped or relayed to the master (echoMaster, echo_master,
+        // order refusals), so render it in the master's language.
+        if (IS_AFFECTED( wch, AFF_CHARM ) && wch->master && !wch->master->is_npc( ))
+            return viewerLang( wch->master );
         return LANG_DEFAULT;
     }
 

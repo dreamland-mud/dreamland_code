@@ -203,7 +203,17 @@ int Command::dispatchOrder( const InterpretArguments &iargs )
     }
 
     if (getExtra( ).isSet( CMD_SPELLOUT ) && !matchesExactly( iargs.cmdName.toLower( ) )) {
-        ch->pecho(_("Команду '%s' необходимо ввести полностью."), getName( ).c_str( ) );
+        // Name it in the language the player typed it in, not the EN key.
+        DLString input = iargs.cmdName.toLower( );
+        DLString fullName = getNameFor( viewerLang( ch ) );
+        for (int i = LANG_MIN; i < LANG_MAX; i++) {
+            const DLString &n = name.get( (lang_t)i );
+            if (!n.empty( ) && input.strPrefix( n )) {
+                fullName = n;
+                break;
+            }
+        }
+        ch->pecho(_("Команду '%s' необходимо ввести полностью."), fullName.c_str( ) );
         return RC_DISPATCH_SPELLOUT;
     }
                     
