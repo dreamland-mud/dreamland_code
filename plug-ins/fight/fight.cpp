@@ -131,6 +131,10 @@ PROF(samurai);
 
 bool rprog_dive(Character *wch, int danger);
 
+// Defined in plug-ins/loadsave/creation.cpp. Installs the affects a character's
+// race (and, for a mob, its prototype) grants but is currently missing.
+void afprog_refresh( Character *ch, bool verbose );
+
 static void afprog_fight(Character *ch, Character *victim)
 {
     SpellTarget::Pointer target(NEW, ch);
@@ -513,6 +517,16 @@ void violence_update()
                 {
                     ch->pecho(_("Адреналин в твоей крови улегся, и ты успокаиваешься."));
                     ch->adrenaline_pending = false;
+
+                    // Once the fight is over a mob gets back whatever its race
+                    // or proto grants and lost: dispelled buffs, and stealth
+                    // that damage stripped. The char_update gate only re-arms
+                    // when a racial <aff> bit is missing, so without this most
+                    // races stayed bare until repop. Each affect's onRefresh
+                    // still decides whether it may come back right now.
+                    // Players are left to that gate.
+                    if (ch->is_npc() && ch->in_room != 0)
+                        afprog_refresh(ch, true);
                 }
                 continue;
             }
