@@ -4524,7 +4524,8 @@ struct GAGrantDef {
     // (grant_skill.nuke_pvp_share). GK_BUFF: a = uptime (grant_skill.buff_uptime),
     // b = the spell level below which the buff lasts 0 ticks. GK_SLEVEL: a = mean extra
     // spell levels per cast. GK_PET: a = the pet's damage as a share of the char's
-    // round (grant_skill.pet_round_share).
+    // round (grant_skill.pet_round_share), b = the mob vnum the spell summons (the
+    // vnum in spell/<name>/runArg; 0 = a charm, no vnum of its own).
     double a, b;
     const char *ref;   // GK_BUFF: the worn_buff affix (item_affixes.json) it is priced as
 };
@@ -4552,8 +4553,8 @@ static const GAGrantDef ga_grantDefs[] = {
     { "polearm",          GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
     { "spear",            GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
     { "whip",             GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
-    { "lesser golem",     GK_PET,        { 0, 0, 0, 0, 0 },          0.25, 0,  0 },
-    { "adamantite golem", GK_PET,        { 0, 0, 0, 0, 0 },          0.3,  0,  0 },
+    { "lesser golem",     GK_PET,        { 0, 0, 0, 0, 0 },          0.25, 21, 0 },
+    { "adamantite golem", GK_PET,        { 0, 0, 0, 0, 0 },          0.3,  24, 0 },
     { "attract other",    GK_PET,        { 0, 0, 60, 60, 0 },        0.15, 0,  0 },
     { "circle",           GK_CIRCLE,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
     { "ambush",           GK_AMBUSH,     { 77, 0, 230, 0, 0 },       0,    0,  0 },
@@ -4843,7 +4844,7 @@ static void ga_grantBestWeapons( Character *target, int level, std::map<int, int
     }
 }
 
-// The weapon proficiencies an item grants (sn -> learned), priced together: the swing
+// The weapon proficiencies an item grants (sn -> percent), priced together: the swing
 // growth of the BEST weapon class the char could switch to, over what it swings without
 // the item -- its wielded weapon, or the best weapon of a class it already knows,
 // whichever is more. Kit 2026-10-08. One switch, not one per class: the char wields one
@@ -4911,6 +4912,28 @@ static double ga_grantWeapons( Character *target, const GAWeights &w, int level,
         sum += std::max( 0.0, best - own );
     }
     return played > 0 ? w.weaponWeight * sum / played : 0;
+}
+
+// The weapon a granted skill strikes with: the scored item when it is a weapon (a live
+// copy, or a candidate prototype), else the char's primary. wclass -1 = no weapon.
+// pierce = the attack's damage class is pierce; a candidate prototype is judged by its
+// class alone, its attack index is not bounds-checked like get_weapon_attack's.
+static void ga_grantHitWeapon( obj_index_data *pProto, ::Object *inst, ::Object *primary,
+                               int &wclass, bool &pierce )
+{
+    wclass = -1;
+    pierce = false;
+    ::Object *wep = primary;
+    if (inst != 0 && inst->item_type == ITEM_WEAPON)
+        wep = inst;
+    else if (pProto->item_type == ITEM_WEAPON) {
+        wclass = pProto->value[0];
+        return;
+    }
+    if (wep == 0 || wep->item_type != ITEM_WEAPON)
+        return;
+    wclass = get_weapon_class( wep );
+    pierce = attack_table[get_weapon_attack( wep )].damage == DAM_PIERCE;
 }
 
 static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_data *pProto,
@@ -4989,7 +5012,7 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
     ::Object *primary = (target != 0 && wieldLoc) ? wieldLoc->find( target ) : 0;
 
     double total = 0;
-    std::map<int, int> weapons;   // granted proficiencies the char lacks: sn -> learned
+    std::map<int, int> weapons;   // granted proficiencies the char lacks: sn -> percent
 
     for (auto const &e: list) {
         if (!e.isObject( ) || !e.isMember( "skill" ) || !e.isMember( "learned" ))
@@ -5007,34 +5030,60 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
             if (rage_skill_forbidden( target, sk ) || !ga_grantAlignOk( sk, target ))
                 continue;
         }
+        // The percent the engine rolls: BasicSkill::getEffective = learned plus the
+        // char's skill bonuses from affects and gear (skill_learned_from_affects). For a
+        // worn keeper that is exactly the engine's number; for a candidate it assumes the
+        // bonuses the char has now. getEffective's daze and drunk cuts are passing
+        // states, left out.
+        int pct = learned;
+        if (target != 0)
+            pct = URANGE( 0, learned + skill_learned_from_affects( sk, target->getPC( ) ), 100 );
+        if (pct <= 0)
+            continue;
         if (d->kind == GK_WEAPON) {
-            weapons[sk->getIndex( )] = learned;
+            weapons[sk->getIndex( )] = pct;
             continue;
         }
 
-        // Formula parts carry learned% themselves; the fixed part is scaled below.
+        // Formula parts carry pct themselves; the fixed part is scaled below.
         double pve = 0, pvp = 0;
-        double use = learned / 100.0;
+        double use = pct / 100.0;
         bool gated = false;
         switch (d->kind) {
         case GK_CRIT: {
             // onehit_undef.cpp damEffectCriticalStrike: proc chance per landed hit =
-            // learned/10 + skill level bonus + level lead (an equal-level target, Kit
+            // effective/10 + skill level bonus + level lead (an equal-level target, Kit
             // 2026-10-08) + 5 while hasted by anything (Kit 2026-10-08). The bonus
             // multiplies the whole hit; blind and stun on a proc take part of the
             // victim's damage away (pve control, scaled from sanctuary at the reference
             // proc) and decide duels (pvp share at the reference proc).
-            int chance = learned / 10;
+            int chance = pct / 10;
             if (target != 0) {
                 chance += skill_level_bonus( *sk, target );
                 if (quick)
                     chance += 5;
             }
             double p = std::max( 0, chance ) / 100.0;
-            // A druid crits only while shapeshifted (thief and ranger gates only bind
-            // natives, who never reach here).
-            if (target != 0 && target->getProfession( )->getName( ) == "druid")
-                p *= ga_gk( "shapeshift_share", 0.3 );
+            // The class gates are keyed on profession, and a ranger below 60 or a thief
+            // below 66 wears the grant before the class gives the skill: a druid crits
+            // only shapeshifted, a ranger only in nature rooms, a thief only when the
+            // hitting weapon is a dagger (this item if it is one, else the primary).
+            if (target != 0) {
+                const DLString &prof = target->getProfession( )->getName( );
+                if (prof == "druid")
+                    p *= ga_gk( "shapeshift_share", 0.3 );
+                else if (prof == "ranger")
+                    p *= ga_gk( "nature_share", 0.25 );
+                else if (prof == "thief") {
+                    int wclass;
+                    bool pierce;
+                    ga_grantHitWeapon( pProto, inst, primary, wclass, pierce );
+                    if (wclass != WEAPON_DAGGER) {
+                        gated = true;
+                        break;
+                    }
+                }
+            }
             double ref = ga_gk( "crit_ref_proc", 0.07 );
             pve = p * ga_gk( "crit_bonus", 0.9 ) * perHit
                 + ga_gk( "crit_pve_control", 0.31 ) * sanct * p / ref;
@@ -5062,7 +5111,7 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
                 return dual ? ga_pct( om.swPct * (c * m / 100.0) / 100.0 ) : 0.0;
             };
             double extra = 0, pass = 1.0;
-            for (int c = learned; c > 1; c /= 3) {
+            for (int c = pct; c > 1; c /= 3) {
                 pass *= (c - 1) / 100.0;   // number_percent() < c
                 extra += pass * (1 + off( c ));
             }
@@ -5106,20 +5155,23 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
             break;
         }
         case GK_AVOID: {
-            // skillcommand/blink/run: learned/2 % (+20 hasted, at most 85) to dodge a
+            // skillcommand/blink/run: effective/2 % (+20 hasted, at most 85) to dodge a
             // melee blow that got past parry. Priced as sanctuary (which halves damage)
             // scaled by the share it removes; half when sanctuary already halves what is
-            // left; mana_factor for the level/5 mana each blink costs.
+            // left; mana_factor for the level/5 mana each blink costs. PvP caps the share
+            // at the plan's judged duel uptime (blink_pvp_share): f/(1-f) of an
+            // uncapped share runs away for a hasted char with no parry.
             if (target != 0 && target->getClan( ) == clan_battlerager)
                 break;   // the oath of rage forbids blinking
-            double pct = std::min( 85.0, learned / 2.0 + (quick ? 20 : 0) );
+            double chance = std::min( 85.0, pct / 2.0 + (quick ? 20 : 0) );
             double reach = target != 0 ? ga_offhandModel( target, w, primary ).reach
                                        : ga_gk( "ref_reach", caster ? 0.72 : 0.54, col );
-            double f = pct / 100.0 * reach;
+            double f = chance / 100.0 * reach;
             bool sanctHeld = target != 0 && IS_AFFECTED( target, AFF_SANCTUARY );
             pve = sanct * (f / 0.5) * (sanctHeld ? 0.5 : 1.0)
                 * ga_gk( "blink_mana_factor", caster ? 0.7 : 0.8, col );
-            pvp = item_combat_points( 0, f, lvl, caster );
+            pvp = item_combat_points( 0, std::min( f, ga_gk( "blink_pvp_share", caster ? 0.36 : 0.27, col ) ),
+                                      lvl, caster );
             break;
         }
         case GK_BUFF: {
@@ -5146,14 +5198,24 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
         case GK_PET: {
             // A free fighting follower: its damage as a share of the char's round (Kit
             // 2026-10-08: "pretty high"). Only with a charm slot to spare -- every summon
-            // and charm refuses an overcharmed caster. A worn item's own pet may already
-            // fill a slot, so a worn item needs one slot at all.
+            // and charm refuses an overcharmed caster (Kit: 0 if overcharmed). With the
+            // slots full a worn item keeps its price only when one of the followers is
+            // its own summon, matched by the mob vnum the spell creates: the pet IS the
+            // value. Attract other charms through charm person's affect (add_charmed),
+            // which no follower signal tells apart, so full slots zero it.
             if (target != 0) {
                 int maxCharm, count;
                 ga_charmSlots( target, maxCharm, count );
-                if ((worn ? maxCharm : maxCharm - count) < 1) {
-                    gated = true;
-                    break;
+                if (maxCharm - count < 1) {
+                    bool ownPet = false;
+                    if (worn && d->b > 0)
+                        for (Character *wch = char_list; wch && !ownPet; wch = wch->next)
+                            ownPet = wch->is_npc( ) && IS_CHARMED( wch ) && wch->master == target
+                                     && wch->getNPC( )->pIndexData->vnum == (int)d->b;
+                    if (!ownPet) {
+                        gated = true;
+                        break;
+                    }
                 }
             }
             pve = item_combat_points( ga_gkSkill( "pet_round_share", *d, d->a ) * item_pc_round( lvl, caster ),
@@ -5162,28 +5224,22 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
         }
         case GK_CIRCLE: {
             // class_thief.cpp circle: a pierce or dagger weapon, nobody hitting you;
-            // (slevel/40 + 1) x (dice + damroll) + slevel, learned% to land, one per lag.
+            // (slevel/40 + 1) x (dice + damroll) + slevel, effective% to land, one per lag.
             double dice = target != 0 ? std::max( 0.0, swing ) / std::max( 1.0, w.weaponWeight )
                                       : 0.0;
             double damroll = target != 0 ? (double)target->damroll : item_pc_dmg( lvl, caster );
             if (target != 0) {
-                bool pierce = false;
-                ::Object *wep = (inst != 0 && inst->item_type == ITEM_WEAPON) ? inst : 0;
-                if (wep == 0 && pProto->item_type != ITEM_WEAPON)
-                    wep = primary;
-                if (wep != 0 && wep->item_type == ITEM_WEAPON)
-                    pierce = attack_table[get_weapon_attack( wep )].damage == DAM_PIERCE
-                          || get_weapon_class( wep ) == WEAPON_DAGGER;
-                else if (wep == 0 && pProto->item_type == ITEM_WEAPON)
-                    pierce = pProto->value[0] == WEAPON_DAGGER;   // a candidate dagger
-                if (!pierce) {
+                int wclass;
+                bool pierce;
+                ga_grantHitWeapon( pProto, inst, primary, wclass, pierce );
+                if (!pierce && wclass != WEAPON_DAGGER) {
                     gated = true;
                     break;
                 }
             }
             double hit = (lvl / 40 + 1) * (dice + damroll) + lvl;
             double rate = (double)pulse / std::max( 1, sk->getBeats( target ) );
-            pve = item_combat_points( rate * std::min( 100, learned ) / 100.0 * hit
+            pve = item_combat_points( rate * pct / 100.0 * hit
                                       * ga_gk( "not_tanking", 0.2 ) * activeUse, 0, lvl, caster );
             break;
         }
