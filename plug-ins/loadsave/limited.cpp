@@ -130,6 +130,9 @@ void limit_ground_decay(Object *obj)
     }
 
     Character *ch = obj->carried_by;
+    // limit_purge decides whether to drop the proto count by comparing the
+    // timestamp with boot time, so decay must not push a counted item below it.
+    bool fCounted = obj->timestamp > dreamland->getBootTime( );
 
     // Speed up decay on the ground: every minute removes 1 day from timer.
     if (obj->in_room) {
@@ -159,6 +162,9 @@ void limit_ground_decay(Object *obj)
     else {
         return;
     }
+
+    if (fCounted && obj->timestamp <= dreamland->getBootTime( ))
+        obj->timestamp = dreamland->getBootTime( ) + 1;
 
     save_items_at_holder(obj);
 }
