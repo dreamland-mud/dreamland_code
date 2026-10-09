@@ -2,6 +2,7 @@
 #include <cmath>
 
 #include "weapongenerator.h"
+#include "vnum.h"
 #include "weaponcalculator.h"
 #include "weapontier.h"
 #include "weaponaffixes.h"
@@ -1217,9 +1218,11 @@ const WeaponGenerator & WeaponGenerator::assignFlags() const
     SET_BIT(obj->extra_flags, weapon_tier_table[valTier-1].extra.getValue());
     obj->value4(weaponFlags.getValue());
 
-    // Set weight: 0.4 kg by default in OLC, 2kg for two hand.
-    // TODO: Weight is very approximate, doesn't depend on weapon type.
-    if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS))
+    // The weightless stub gets a two-handed heft (1 lb -> 5 lb). Any other
+    // prototype carries its builder's weight already: multiplying it made area
+    // greatswords heavier than the max-STR wield cap.
+    if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS)
+        && obj->pIndexData->vnum == OBJ_VNUM_WEAPON_STUB)
         obj->weight = obj->pIndexData->weight * 5;
 
     // Set standardized cost in silver.
