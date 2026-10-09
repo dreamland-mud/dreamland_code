@@ -170,6 +170,8 @@ public:
     virtual void flee( );
 protected:    
     bool move( int, struct exit_data *, Character * );
+    bool afterMove( int, int, void *, Character * );
+    bool trailOpen( Character *, Room * );
     bool canTrack( );
     bool canTrackLastFought( Character * );
     virtual bool trackLastFought( Character * );

@@ -19,6 +19,10 @@ int  move_char( Character *ch, struct extra_exit_data *peexit, const char *argum
 int  move_char( Character *ch, Object *portal );
 int  move_char_flee( Character *ch, int door );
 
+/** The portal or extra exit a room footprint went through, if still in room. */
+Object * trail_portal( Room *room, long long id );
+struct extra_exit_data * trail_eexit( Room *room, struct extra_exit_data *eexit );
+
 void transfer_char( Character *ch, Character *actor, Room *to_room,
                     const char *msgRoomLeave = NULL, const char *msgSelfLeave = NULL,
                     const char *msgRoomEnter = NULL, const char *msgSelfEnter = NULL );
