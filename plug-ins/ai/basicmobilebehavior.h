@@ -79,7 +79,7 @@ public:
     bool aiRangedAttack( );
     bool aiAssistGroup( Character *fch, Character *victim );
     bool aiHeal( );
-    bool aiCast( Skill *skill, Character *victim, int door, int range );
+    int aiCast( Skill *skill, Character *victim, int door, int range );
 
 protected:
     Character * getMaster( Character * );

@@ -2943,13 +2943,13 @@ NMI_INVOKE( CharacterWrapper, ai_heal, "(): полечиться по-класс
     return Register( ai->aiHeal( ) );
 }
 
-NMI_INVOKE( CharacterWrapper, ai_cast, "(spell, victim[, door, range]): скастовать spell по victim так, как кастует моб: с маной, задержкой, спеллбейном и помехами; door и range - victim в range комнатах за выходом door. true, если каст состоялся (даже неудачный), false - если заклинание недоступно или не достает" )
+NMI_INVOKE( CharacterWrapper, ai_cast, "(spell, victim[, door, range]): скастовать spell по victim так, как кастует моб: с маной, задержкой, спеллбейном и помехами; door и range - victim в range комнатах за выходом door. 1 - скастовал, 0 - пытался, но не вышло (спеллбейн, нет маны, помехи), -1 - заклинание недоступно или не достает" )
 {
     checkTarget( );
     CHK_PC
     BasicMobileBehavior::Pointer ai = mob_ai( target );
     if (!ai)
-        return Register( false );
+        return Register( -1 );
     Skill *skill = argnum2skill( args, 1 );
     Character *victim = argnum2character( args, 2 );
     int door = -1, range = 0;
