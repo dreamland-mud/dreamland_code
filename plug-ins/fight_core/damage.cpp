@@ -114,6 +114,11 @@ bool Damage::hit( bool show )
     calcDamage( );
     priorDamageEffects( );
 
+    // A negative amount would heal the victim and print as a miss with a
+    // negative number.
+    if (dam < 0)
+        dam = 0;
+
     // Accumulate for the per-round fightspam-OFF summary (emitted by violence_update).
     // Out of combat the hit prints its own line instead (canSeeMessage), so it must
     // not reach a summary as well.

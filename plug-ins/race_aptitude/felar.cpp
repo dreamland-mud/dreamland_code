@@ -129,7 +129,9 @@ SKILL_RUNP( tail )
         if (Char::hasLegs(victim))
             victim->position = POS_RESTING;
             
-        damage_tail = ch->damroll +
+        // Derived-number mobs can roll a negative damroll (their dice carry the
+        // damage), so it must not drag the tail strike below its own base.
+        damage_tail = max(0, ch->damroll.getValue( )) +
                 ( 2 * number_range(4, 4 + 10 * ch->size + chance/10) );
 
         damage(ch,victim,damage_tail,gsn_tail, DAM_BASH, true, DAMF_WEAPON);
