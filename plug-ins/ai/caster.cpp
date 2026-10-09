@@ -236,6 +236,9 @@ bool BasicMobileBehavior::aggressCaster( )
  * Fenia mob AI picked the spell: cast it the way the C++ tables do (mana,
  * wait, spellbane, obstacles). door < 0 = victim in this room, else victim
  * is range rooms off through door, as findRangeVictim reported.
+ * False only when the spell can't be tried at all. Once it is tried the
+ * decision is spent, landed or not: a spell can fail after the mana, the
+ * wait and a spellbane deflect, and the caller must not try another.
  */
 bool BasicMobileBehavior::aiCast( Skill *skill, Character *victim, int door, int range )
 {
@@ -254,7 +257,8 @@ bool BasicMobileBehavior::aiCast( Skill *skill, Character *victim, int door, int
     if (door < 0) {
         if (victim->in_room != ch->in_room)
             return false;
-        return ::spell( skill->getIndex( ), ch->getModifyLevel( ), ch, victim, flags );
+        ::spell( skill->getIndex( ), ch->getModifyLevel( ), ch, victim, flags );
+        return true;
     }
 
     if (victim == ch || door >= DIR_SOMEWHERE || range < 1 || spell->getMaxRange( ch ) < range)
@@ -267,7 +271,8 @@ bool BasicMobileBehavior::aiCast( Skill *skill, Character *victim, int door, int
     target->range = range;
 
     interpret_cmd(ch, "scan", "%s", dirs[door].name);
-    return ::spell( skill->getIndex( ), ch->getModifyLevel( ), ch, target, flags );
+    ::spell( skill->getIndex( ), ch->getModifyLevel( ), ch, target, flags );
+    return true;
 }
 
 bool BasicMobileBehavior::canAggressDistanceCaster( Character *victim )

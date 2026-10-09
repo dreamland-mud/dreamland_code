@@ -346,8 +346,16 @@ bool BasicMobileBehavior::backHome( bool fAlways, bool fForce )
         return false;
     }
     
-    if (home == ch->in_room)
+    if (home == ch->in_room) {
+        // A forced trip home is an evade: settle back in place even when
+        // the chase never left the lair.
+        if (fForce) {
+            ch->position = ch->default_pos;
+            homeVnum = 0;
+            unsetLastCharmTime();
+        }
         return false;
+    }
 
     // Wimpy mobs are not in a hurry to get back.
     if (!fForce && IS_SET(ch->act, ACT_WIMPY) && ch->getLastFightDelay() <= Date::SECOND_IN_HOUR)
@@ -364,6 +372,8 @@ bool BasicMobileBehavior::backHome( bool fAlways, bool fForce )
         }
 
         interpret_cmd(ch, dirs[door].name, "");
+        if (ch->extracted)
+            return true;
         if (ch->in_room == home) {
             ch->position = ch->default_pos;
             homeVnum = 0;
@@ -379,9 +389,9 @@ bool BasicMobileBehavior::backHome( bool fAlways, bool fForce )
     // handler registered gprog returns false and the old behaviour stands.
     if (fForce || !gprog("onRecallAI", "CR", ch, home))
         transfer_char( ch, 0, home,
-                       "%1$^C1 молит Богов о возвращении.",
-                       NULL,
-                       "%1$^C1 появляется из дымки." );
+                       _("%1$^C1 молит Богов о возвращении."),
+                       MultiMessage( ),
+                       _("%1$^C1 появляется из дымки.") );
 
     // A handler is free to give up on a mob that has nowhere to return to.
     if (ch->extracted)
