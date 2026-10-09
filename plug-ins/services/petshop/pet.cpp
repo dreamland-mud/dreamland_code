@@ -106,7 +106,7 @@ bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     }
 
     if (!canAfford( client )) {
-        client->pecho( _("У тебя не хватает %N2, чтобы заплатить за это."), toCurrency( ).c_str( ) );
+        client->pecho( _("У тебя не хватает денег, чтобы заплатить за это.") );
         return false;
     }
 
@@ -324,7 +324,7 @@ bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
     }
 
     if (!canAfford( client )) {
-        client->pecho( _("У тебя не хватает %N2, чтобы заплатить за это."), toCurrency( ).c_str( ) );
+        client->pecho( _("У тебя не хватает денег, чтобы заплатить за это.") );
         return false;
     }
 

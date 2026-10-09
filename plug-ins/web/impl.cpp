@@ -150,7 +150,7 @@ Json::Value GroupWebPromptListener::jsonGroupMember( Character *ch, Character *g
     json["hit_clr"] = hit_clr;
     json["level"] = gch->getRealLevel( );
 
-    if (gch->is_npc( ))
+    if (gch->is_npc( ) || gch->getRealLevel( ) >= LEVEL_HERO - 1)
         json["tnl"] = "";
     else
         json["tnl"] = gch->getPC( )->getExpToLevel( );
