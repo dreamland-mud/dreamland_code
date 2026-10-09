@@ -9,6 +9,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
+#include "fenia_utils.h"
 
 #include "skillreference.h"
 #include "clanreference.h"
@@ -30,10 +31,11 @@
 #include "l10n.h"
 
 
-PortalMovement::PortalMovement( Character *ch, Object *portal )
+PortalMovement::PortalMovement( Character *ch, Object *portal, Room *leaderRoom )
                   : Walkment( ch )
 {
     this->portal = portal;
+    this->leaderRoom = leaderRoom;
 }
 
 static DLString oprog_portal_location( Object *portal, Character *ch )
@@ -51,15 +53,31 @@ bool PortalMovement::findTargetRoom( )
     if (targetVnum != 0) {
         to_room = get_room_instance( targetVnum );
     }
+    else if (leaderRoom) {
+        // Followers land where the leader did, not on a random roll of their own.
+        to_room = leaderRoom;
+    }
     else if (IS_SET(portal->value2(),GATE_RANDOM) || portal->value3() == -1) {
-        to_room = get_random_room( ch );
-        portal->value3(to_room->vnum); /* keeps record */
+        to_room = pickRandomRoom( );
+        if (to_room)
+            portal->value3(to_room->vnum); /* keeps record */
     }
     else if (IS_SET(portal->value2(), GATE_BUGGY) && (number_percent( ) < 5)) {
-        to_room = get_random_room( ch );
+        to_room = pickRandomRoom( );
     }
     else {
         to_room = get_room_instance( portal->value3() );
+    }
+
+    if (to_room == 0 && (IS_SET(portal->value2(), GATE_RANDOM|GATE_BUGGY) || portal->value3() == -1)) {
+        msgSelfParty( ch,
+                      "%4$^O1 flickers but leads nowhere.",
+                      "%4$^O1 мерцает, но никуда не ведет.",
+                      "%4$^O1 мерехтить, але нікуди не веде.",
+                      "%4$^O1 flickers but leads nowhere.",
+                      "%4$^O1 мерцает, но никуда не ведет.",
+                      "%4$^O1 мерехтить, але нікуди не веде." );
+        return false;
     }
 
     if (to_room == 0) {
@@ -70,6 +88,23 @@ bool PortalMovement::findTargetRoom( )
     }
 
     return true;
+}
+
+/*
+ * A random destination obeys the same rules as the teleport spell: Fenia's
+ * onPortalRandomRoom vetoes a roll by returning true. With no handler every
+ * roll passes and this is the old get_random_room.
+ */
+Room * PortalMovement::pickRandomRoom( )
+{
+    for (int i = 0; i < 10; i++) {
+        Room *room = get_random_room( ch );
+
+        if (!gprog( "onPortalRandomRoom", "COR", ch, portal, room ))
+            return room;
+    }
+
+    return 0;
 }
 
 bool PortalMovement::isNormalExit( )
@@ -86,7 +121,7 @@ bool PortalMovement::canMove( Character *wch )
 {
     return checkCharges( )
             && Walkment::canMove( wch )
-            && checkCurse( wch )
+            && checkScripts( wch )
             && checkOath( wch );
 }
 
@@ -115,11 +150,6 @@ int PortalMovement::move( )
     if (!moveRecursive( )) 
         return RC_MOVE_FAIL;
 
-    if (IS_SET(portal->value2(), GATE_GOWITH)) { 
-        obj_from_room( portal );
-        obj_to_room( portal, to_room );
-    }
-
     if (portal->value0() == -1) {
         portal->getRoom( )->echo( POS_RESTING, 
                                   _("%^O1 медленно исчезает в дымке."), 
@@ -130,12 +160,51 @@ int PortalMovement::move( )
     return RC_MOVE_OK;
 }
 
+/*
+ * A player can't be led into a portal hidden from them by magic (invisible,
+ * or shown only to detect magic). Blindness and darkness don't count: a group
+ * still follows its leader by the hand. Pets go on a leash.
+ */
+static bool portal_hidden_from( Character *fch, Object *portal )
+{
+    if (fch->is_npc( ) || fch->can_see( portal ))
+        return false;
+
+    if (IS_AFFECTED(fch, AFF_BLIND))
+        return false;
+
+    if (fch->in_room->isDark( ) && !IS_AFFECTED(fch, AFF_INFRARED) && !IS_OBJ_STAT(portal, ITEM_GLOW))
+        return false;
+
+    return true;
+}
+
 int PortalMovement::moveOneFollower( Character *wch, Character *fch )
 {
+    if (portal_hidden_from( fch, portal )) {
+        msgSelf( fch,
+                 "You can't see where to follow.",
+                 "Ты не видишь, куда идти следом.",
+                 "Ти не бачиш, куди йти слідом." );
+        return RC_MOVE_FAIL;
+    }
+
     oldact(_("Ты следуешь за $C5."), fch, 0, wch, TO_CHAR );
     // Movement::move, not PortalMovement::move: the leader's move already
     // handles the portal's charges and gowith.
-    return PortalMovement( fch, portal ).Movement::move( );
+    return PortalMovement( fch, portal, to_room ).Movement::move( );
+}
+
+void PortalMovement::place( Character *wch )
+{
+    // A gowith portal arrives before its first passenger, so the arrival
+    // look already shows it lying there.
+    if (IS_SET(portal->value2(), GATE_GOWITH) && portal->in_room == from_room) {
+        obj_from_room( portal );
+        obj_to_room( portal, to_room );
+    }
+
+    Walkment::place( wch );
 }
 
 bool PortalMovement::moveAtomic( )
@@ -196,6 +265,29 @@ bool PortalMovement::checkAir( Character *wch )
 bool PortalMovement::checkWater( Character *wch )
 {
     return !isNormalExit( ) || Walkment::checkWater( wch );
+}
+
+/*
+ * Who may enter which portal is decided in Fenia (global onPortalEnter,
+ * .tmp.transport.checkPortal): curses, no-recall rooms, prisoners, and the
+ * transport-spell rules for magic and portable portals. A refusing handler
+ * returns true and has already told the walker and its master why.
+ * A mount carrying a rider is not asked: the rider's answer covers both.
+ * With no handler registered, the old curse checks below still stand guard.
+ */
+bool PortalMovement::checkScripts( Character *wch )
+{
+    if (RIDDEN(wch))
+        return true;
+
+    if (!gprog_registered( "onPortalEnter" ))
+        return checkCurse( wch );
+
+    if (!gprog( "onPortalEnter", "COR", wch, portal, to_room ))
+        return true;
+
+    rc = RC_MOVE_EXPLAINED;
+    return false;
 }
 
 bool PortalMovement::checkCurse( Character *wch )
