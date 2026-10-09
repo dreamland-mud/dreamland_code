@@ -700,8 +700,8 @@ void Walkment::moveFollowers( Character *wch )
                     wch->pecho(_("%1$^C1 не умеет плавать и не может последовать за тобой."), fch);
                 else if (frc == RC_MOVE_CLOSED)
                     wch->pecho(_("%1$^C1 не может пройти через закрытую дверь и последовать за тобой."), fch);
-                else if (frc == RC_MOVE_LAWZONE)
-                    ; // checkLawzone already told the owner why
+                else if (frc == RC_MOVE_LAWZONE || frc == RC_MOVE_EXPLAINED)
+                    ; // the refusing check already told the owner why
                 else
                     wch->pecho(_("%1$^C1 не может последовать за тобой."), fch);
             }

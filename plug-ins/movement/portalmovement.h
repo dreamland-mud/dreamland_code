@@ -11,7 +11,7 @@ class Object;
 
 class PortalMovement : public Walkment {
 public:
-    PortalMovement( Character *, Object * );
+    PortalMovement( Character *, Object *, Room *leaderRoom = 0 );
     
     virtual int move( );
 
@@ -21,6 +21,7 @@ protected:
     virtual int moveOneFollower( Character *, Character * );
     virtual  int getMoveCost( Character * );
     virtual bool moveAtomic( );
+    virtual void place( Character * );
     
     virtual void msgOnMove( Character *, bool fLeaving );
     virtual void msgEcho( Character *, Character *, const char * );
@@ -31,6 +32,7 @@ protected:
     virtual int getDoorStatus(Character *);    
     virtual bool checkWater( Character * );
     virtual bool checkAir( Character * );
+            bool checkScripts( Character * );
             bool checkCurse( Character * );
             bool checkCharges( );
 
@@ -41,8 +43,10 @@ protected:
             bool checkOath( Character * );
 
     bool isNormalExit( );
+    Room * pickRandomRoom( );
     
     Object *portal;
+    Room *leaderRoom;
 };
 
 #endif

@@ -19,6 +19,7 @@ enum {
     RC_MOVE_RESTING,
     RC_MOVE_WEB,
     RC_MOVE_LAWZONE,
+    RC_MOVE_EXPLAINED, // the refusing check already told the walker and its master why
 };
 
 class Walkment : public Movement {
