@@ -333,6 +333,8 @@ bool BasicMobileBehavior::hasVampirePrey( )
             continue;
         if (wch->is_npc( ) && !IS_CHARMED(wch))
             continue;
+        if (!wch->is_npc( ) && wch->is_immortal( ) && !wch->getPC( )->getAttributes( ).isAvailable( "ai_aggress" ))
+            continue;
         return true;
     }
     return false;
