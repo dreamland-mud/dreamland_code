@@ -23,6 +23,8 @@
 
 WEARLOC(float);
 
+bool limit_is_counted( time_t ts );
+
 /*
  * Extract an object consider limit
  */
@@ -112,7 +114,9 @@ void extract_obj_1( Object *obj, bool count, const char *not_used )
 
         obj_from_list( obj );
 
-        if (count)
+        // A limited item that expired before boot was never counted (see
+        // limit_is_counted), so destroying it must not drop the count either.
+        if (count && (obj->pIndexData->limit < 0 || limit_is_counted( obj->timestamp )))
                 --obj->pIndexData->count;
 
         oprog_extract( obj, count );

@@ -908,8 +908,7 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
             cont->setOwner( "" );                     // leftovers -> plain furniture
             parkedKept++;
         } else {
-            extract_obj( cont );
-            parkedKept++;
+            parkedKept++;                             // refused leftovers -> keep the bag
         }
 
         dreamland->resetOption( DL_SAVE_OBJS );
@@ -969,7 +968,7 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
     if (floorPurged > 0)
         buf << "Floor items purged        : " << floorPurged << "   (abandoned house, or stamped to a deleted player)\n";
     if (floorSkipped > 0)
-        buf << "{YFloor items left{x          : " << floorSkipped << "   (heir unclear, NOSAVEDROP or write error)\n";
+        buf << "{YFloor items left{x          : " << floorSkipped << "   (heir unclear, limited, NOSAVEDROP or write error)\n";
     if (inherited > 0)
         buf << "Dead stamp -> key holder   : " << inherited << " container(s)\n";
     if (abandoned > 0)

@@ -126,6 +126,23 @@ const FlagTable * affect_where_to_table(int where);
 int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *registry);
 bool limit_is_counted( time_t ts );
 
+// fread_obj bumps the proto count at Vnum for drop/charmed/saved-mob files, before
+// TS is read. Take it back for a limited item that expired before boot: that is
+// the rule limit_count_on_boot applies to player profiles, and extract_obj_1 will
+// not decrement such an item either. Call on every exit that keeps or extracts obj.
+static void fread_obj_uncount_expired( Object *obj, Room *room )
+{
+    if (!create_obj_dropped || obj->pIndexData == 0)
+        return;
+    if (obj->pIndexData->limit < 0 || limit_is_counted( obj->timestamp ))
+        return;
+
+    obj->pIndexData->count--;
+    LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum
+        << " (" << obj->getID( ) << ") expired in saved file, room #"
+        << (room ? room->vnum : -1) << ", not counted" << endl;
+}
+
 static DLString id_to_string(long long id)
 {
     ostringstream os;
@@ -2424,8 +2441,10 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             // (separate change).
                             if (obj->pIndexData == 0)
                                 ddeallocate( obj );
-                            else if (create_obj_dropped)
+                            else if (create_obj_dropped) {
+                                fread_obj_uncount_expired( obj, room );
                                 extract_obj( obj );
+                            }
                             else
                                 extract_obj_nocount( obj );
                             return;
@@ -2484,14 +2503,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             if (wear_loc != -1)
                                 obj->wear_loc.assign(wear_loc);
 
-                            // The count was bumped at Vnum, before TS was read. Take it
-                            // back for a limited item that expired before boot, the same
-                            // rule limit_count_on_boot applies to player profiles.
-                            if (create_obj_dropped
-                                && obj->pIndexData->limit >= 0
-                                && !limit_is_counted( obj->timestamp ))
-                                obj->pIndexData->count--;
-
+                            fread_obj_uncount_expired( obj, room );
                             return;
                         }
                     }
@@ -2739,6 +2751,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
         }
 
     } catch (const FileFormatException &e) {
+        fread_obj_uncount_expired( obj, room );
         extract_obj( obj );
         throw e;
     }
