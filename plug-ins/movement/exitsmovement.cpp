@@ -662,7 +662,11 @@ int ExitsMovement::moveOneFollower( Character *wch, Character *fch )
 void ExitsMovement::place( Character *wch )
 {
     Walkment::place( wch );
-    from_room->history.record( wch, door );
+
+    if (peexit)
+        from_room->history.record( wch, peexit );
+    else
+        from_room->history.record( wch, door );
 }
 
 void ExitsMovement::msgEcho( Character *victim, Character *wch, const char *msg )

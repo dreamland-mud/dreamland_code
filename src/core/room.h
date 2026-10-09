@@ -41,20 +41,38 @@ typedef vector<Room *> RoomVector;
 extern RoomVector roomInstances;
 
 
+class Object;
+
+/*
+ * One footprint: who left the room and how. A door sets went to its
+ * direction; a portal or an extra exit sets went to DIR_SOMEWHERE and fills
+ * portal (the object's ID) or eexit. eexit may dangle after OLC: look it up
+ * in the room's extra_exits before following it.
+ */
 struct RoomHistoryEntry {
-    RoomHistoryEntry( DLString n, DLString rn, int w )
-            : name( n ), rname(rn), went( w )
+    RoomHistoryEntry( DLString n, DLString rn, int w,
+                      long long p = 0, extra_exit_data *e = 0 )
+            : name( n ), rname(rn), went( w ), portal( p ), eexit( e )
     {
     }
     DLString name;
     DLString rname;
     int went;
+    long long portal;
+    extra_exit_data *eexit;
 };
 
 struct RoomHistory : public list<RoomHistoryEntry> {
     void record( Character *, int );
+    void record( Character *, Object * );
+    void record( Character *, extra_exit_data * );
     void erase( );
     bool traverse( Room *, Character * ) const;
+    /** The latest footprint of ch here, or 0. */
+    const RoomHistoryEntry * find( Character * ) const;
+    /** The same by a typed name; on a match arg becomes the full name. */
+    const RoomHistoryEntry * find( DLString &, bool ) const;
+    /** Door of the latest footprint, -1 if none or it left by portal/extra exit. */
     int  went( Character * ) const;
     int  went( DLString &, bool ) const;
     void toStream( ostringstream & ) const;

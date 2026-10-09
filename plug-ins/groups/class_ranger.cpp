@@ -110,25 +110,66 @@ SKILL_RUNP( track )
     int slevel;
     slevel = gsn_track->getEffective( ch ) + skill_level_bonus(*gsn_track, ch);  
     
+    const RoomHistoryEntry *h = 0;
+
     if (number_percent() < slevel)
-        if (( d = ch->in_room->history.went( arg, false ) ) != -1) {
-            if (( pexit = ch->in_room->exit[d] )) {
+        h = ch->in_room->history.find( arg, false );
 
-                gsn_track->improve( ch, true );
+    if (h && h->went < DIR_SOMEWHERE) {
+        d = h->went;
 
-                for (Object *obj = ch->carrying; obj; obj = obj->next_content)
-                    if (oprog_track(obj, ch, arg.c_str(), d))
-                        return;
+        if (( pexit = ch->in_room->exit[d] )) {
 
-                ch->pecho(_("Следы %N2 ведут %s."), arg.c_str(), dirs[d].leave);
-                
-                if (IS_SET(pexit->exit_info, EX_CLOSED)) 
-                    open_door_extra( ch, d, pexit );
-                
-                move_char(ch, d );
-                return;
-            }
+            gsn_track->improve( ch, true );
+
+            for (Object *obj = ch->carrying; obj; obj = obj->next_content)
+                if (oprog_track(obj, ch, arg.c_str(), d))
+                    return;
+
+            ch->pecho(_("Следы %N2 ведут %s."), arg.c_str(), dirs[d].leave);
+            
+            if (IS_SET(pexit->exit_info, EX_CLOSED)) 
+                open_door_extra( ch, d, pexit );
+            
+            move_char(ch, d );
+            return;
         }
+    }
+
+    // The trail ends at a portal or a hidden passage: follow it in.
+    Object *portal = (h && h->portal ? trail_portal( ch->in_room, h->portal ) : 0);
+
+    if (portal && ch->can_see( portal )) {
+        gsn_track->improve( ch, true );
+
+        for (Object *obj = ch->carrying; obj; obj = obj->next_content)
+            if (oprog_track(obj, ch, arg.c_str(), DIR_SOMEWHERE))
+                return;
+
+        ch->pecho(_("Следы %N2 ведут в %O4."), arg.c_str(), portal);
+
+        if (!IS_SET(portal->value1( ), EX_CLOSED) || open_portal( ch, portal ))
+            move_char( ch, portal );
+        return;
+    }
+
+    EXTRA_EXIT_DATA *peexit = (h && h->eexit ? trail_eexit( ch->in_room, h->eexit ) : 0);
+
+    if (peexit && ch->can_see( peexit )) {
+        gsn_track->improve( ch, true );
+
+        for (Object *obj = ch->carrying; obj; obj = obj->next_content)
+            if (oprog_track(obj, ch, arg.c_str(), DIR_SOMEWHERE))
+                return;
+
+        ch->pecho(_("Следы %N2 ведут в потайной проход."), arg.c_str());
+
+        if (IS_SET(peexit->exit_info, EX_CLOSED))
+            open_door_extra( ch, DIR_SOMEWHERE, peexit );
+
+        move_char( ch, peexit );
+        return;
+    }
     
     ch->pecho(_("Ты не видишь здесь следов."));
     gsn_track->improve( ch, false );

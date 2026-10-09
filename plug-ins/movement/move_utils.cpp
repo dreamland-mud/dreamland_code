@@ -91,6 +91,29 @@ int move_char( Character *ch, EXTRA_EXIT_DATA *peexit, const char *argument )
     return ExitsMovement( ch, peexit, movetype_resolve( ch, argument ) ).move( );
 }
 
+/*
+ * The portal or extra exit a footprint went through, if it is still here.
+ * An extra exit pointer may be stale after OLC, so it is matched against
+ * the room's own list rather than dereferenced.
+ */
+Object * trail_portal( Room *room, long long id )
+{
+    for (Object *obj = room->contents; obj; obj = obj->next_content)
+        if (obj->getID( ) == id && obj->item_type == ITEM_PORTAL)
+            return obj;
+
+    return 0;
+}
+
+EXTRA_EXIT_DATA * trail_eexit( Room *room, EXTRA_EXIT_DATA *eexit )
+{
+    for (auto &e: room->extra_exits)
+        if (e == eexit)
+            return e;
+
+    return 0;
+}
+
 int move_char( Character *ch, Object *portal )
 {
     return PortalMovement( ch, portal ).move( );

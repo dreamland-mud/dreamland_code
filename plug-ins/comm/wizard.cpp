@@ -883,7 +883,10 @@ static void format_affect(Affect *paf, ostringstream &buf)
             h != r->history.end( );
             h++)
         {
-            b << fmt(0, _("%s проходит через дверь %d.\r\n"), h->name.c_str( ), h->went );
+            if (h->went < DIR_SOMEWHERE)
+                b << fmt(0, _("%s проходит через дверь %d.\r\n"), h->name.c_str( ), h->went );
+            else
+                b << fmt(0, _("%s уходит через портал или потайной проход.\r\n"), h->name.c_str( ) );
         }
     }
 

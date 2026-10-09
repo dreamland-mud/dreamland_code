@@ -6,6 +6,7 @@
 
 #include "room.h"
 #include "pcharacter.h"
+#include "core/object.h"
 
 #include "merc.h"
 
@@ -16,14 +17,38 @@
  */
 const unsigned int RoomHistory::MAX_SIZE = 10;
 
+static RoomHistoryEntry footprint( Character *ch, int door, long long portal, extra_exit_data *eexit )
+{
+    return RoomHistoryEntry( ch->getPC()->getName( ),
+                             ch->getPC()->getRussianName().getFullForm(),
+                             door, portal, eexit );
+}
+
 void RoomHistory::record( Character *ch, int door )
 {
-    if (ch->is_npc( ) || door >= DIR_SOMEWHERE)
+    if (ch->is_npc( ) || door < 0 || door >= DIR_SOMEWHERE)
         return;
 
     erase( );
-    push_front( RoomHistoryEntry( 
-        ch->getPC()->getName( ), ch->getPC()->getRussianName().getFullForm(), door ) );
+    push_front( footprint( ch, door, 0, 0 ) );
+}
+
+void RoomHistory::record( Character *ch, Object *portal )
+{
+    if (ch->is_npc( ) || !portal)
+        return;
+
+    erase( );
+    push_front( footprint( ch, DIR_SOMEWHERE, portal->getID( ), 0 ) );
+}
+
+void RoomHistory::record( Character *ch, extra_exit_data *eexit )
+{
+    if (ch->is_npc( ) || !eexit)
+        return;
+
+    erase( );
+    push_front( footprint( ch, DIR_SOMEWHERE, 0, eexit ) );
 }
 
 void RoomHistory::erase( )
@@ -32,18 +57,16 @@ void RoomHistory::erase( )
         pop_back( );
 }
 
-int RoomHistory::went( Character *ch ) const
+const RoomHistoryEntry * RoomHistory::find( Character *ch ) const
 {
     if (ch->is_npc( ))
-        return -1;
-    else {
-        DLString arg( ch->getPC()->getName( ) );
+        return 0;
 
-        return went( arg, true );
-    }
+    DLString arg( ch->getPC()->getName( ) );
+    return find( arg, true );
 }
 
-int RoomHistory::went( DLString &arg, bool fStrict ) const
+const RoomHistoryEntry * RoomHistory::find( DLString &arg, bool fStrict ) const
 {
     bool rus = arg.isCyrillic();
 
@@ -54,17 +77,32 @@ int RoomHistory::went( DLString &arg, bool fStrict ) const
             || is_name( arg.c_str( ), name.c_str( ) ))
         {
             arg = rus ? h->rname : h->name;
-            return h->went;
+            return &*h;
         }
     }
 
-    return -1;
+    return 0;
+}
+
+int RoomHistory::went( Character *ch ) const
+{
+    const RoomHistoryEntry *h = find( ch );
+    return (h && h->went < DIR_SOMEWHERE ? h->went : -1);
+}
+
+int RoomHistory::went( DLString &arg, bool fStrict ) const
+{
+    const RoomHistoryEntry *h = find( arg, fStrict );
+    return (h && h->went < DIR_SOMEWHERE ? h->went : -1);
 }
 
 void RoomHistory::toStream( ostringstream &buf ) const
 {
     for (const_iterator h = begin( ); h != end( ); h++)
-        buf << h->name << " went " << dirs[h->went].name << "." << endl;
+        if (h->went < DIR_SOMEWHERE)
+            buf << h->name << " went " << dirs[h->went].name << "." << endl;
+        else
+            buf << h->name << " went through a portal or an extra exit." << endl;
 }
 
 bool RoomHistory::traverse( Room *start, Character *ch ) const
@@ -80,7 +118,7 @@ bool RoomHistory::traverse( Room *start, Character *ch ) const
          h++)
     {
         if (h->name == ch->getPC()->getName( )) {
-            if (room->exit[h->went]) 
+            if (h->went < DIR_SOMEWHERE && room->exit[h->went]) 
                 room = room->exit[h->went]->u1.to_room;
             else
                 room = 0;

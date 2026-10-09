@@ -205,6 +205,7 @@ void PortalMovement::place( Character *wch )
     }
 
     Walkment::place( wch );
+    from_room->history.record( wch, portal );
 }
 
 bool PortalMovement::moveAtomic( )
