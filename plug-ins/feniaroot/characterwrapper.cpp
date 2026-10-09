@@ -4639,8 +4639,8 @@ static double ga_gkFightRounds( int level )
 // source? outside / inside = skills granted by worn items outside this item's slot / in
 // it (the item itself, or the one it would replace). A native or race skill, a grant from
 // another slot, or a temporary skill no worn item explains (a dream, a quest) all stay.
-// Used where only having the skill matters (ambush's camouflage); pricing a grant counts
-// a shared skill once, see ga_grantCounted.
+// Used where only having the skill matters (ambush's camouflage, the char's own nukes);
+// pricing a grant counts a shared skill once, see ga_grantCounted.
 static bool ga_grantHeld( Character *target, Skill *skill, const std::set<int> &outside,
                           const std::set<int> &inside )
 {
@@ -4773,6 +4773,102 @@ static int ga_grantSpellLevel( Character *ch, Skill *skill, int mlevel, bool cas
         slevel += 2;
     slevel = std::max( 1, slevel + (prayer ? get_wis_app( ch ).slevel : get_int_app( ch ).slevel) );
     return slevel + skill_level_bonus( *skill, ch );
+}
+
+// Damage a nuke adds to the char's round: one cast at the char's spell level x the share
+// of fights it can be cast in x targets, at most one cast per lag, as many as a share of
+// the mana pool pays for over a fight. One cast = the spell_combat_value override when
+// the spell has one (gated or odd nukes: ray of truth, dispel evil, harm...; overrides
+// bake in their saves), scaled to the spell level like item_proc_points, else the tier
+// damage x the average save. 0 for a spell with neither, or a prayer no god answers.
+static double ga_nukeRound( Character *target, Skill *sk, int lvl, bool caster )
+{
+    if (!sk->getSpell( ) || !sk->getSpell( )->isCasted( ))
+        return 0;
+    int slevel = ga_grantSpellLevel( target, sk, lvl, caster );
+    if (slevel <= 0)
+        return 0;
+    const GAGrantDef *d = ga_grantDef( sk->getName( ) );
+    double cond = (d != 0 && d->kind == GK_NUKE) ? ga_gkSkill( "nuke_cond", *d, d->a ) : 1.0;
+    double per = spell_combat_value( sk->getName( ) );
+    if (per > 0)
+        per *= slevel / spell_combat_level_ref( );
+    else
+        per = spell_proc_tier_value( sk->getName( ), slevel ) * spell_combat_save_factor( );
+    per *= cond;
+    if (per <= 0)
+        return 0;
+    bool aoe = IS_SET( sk->getSpell( )->getTarget( ), TAR_PEOPLE );
+    double targets = aoe ? ga_gk( "aoe_targets", 1.3 ) : 1.0;
+    int pulse = std::max( 1, dreamland->getPulseViolence( ) );
+    double rate = (double)pulse / std::max( 1, sk->getBeats( target ) );
+    int cost = sk->getMana( );
+    double pool = target != 0 ? (double)target->max_mana
+                              : ga_gk( "ref_mana_per_level", caster ? 30 : 20, caster ? 1 : 0 ) * lvl;
+    if (cost > 0)
+        rate = std::min( rate, ga_gk( "mana_share", 0.25 ) * pool / (cost * ga_gkFightRounds( lvl )) );
+    return rate * per * targets;
+}
+
+// Offensive spells that carry a <tier> but are no per-round nuke: no direct damage
+// (blindness, sleep, confuse, faerie fire, DoTs, traps, disperse's teleport, scream's
+// stun), or one shot at a fleeing victim (tesla retribution): never a char's own nuke.
+// grant_skill.own_nuke_skip in item_value.json replaces this list when present.
+static const char *ga_ownNukeSkipDefault[] = {
+    "anathema", "attract other", "black death", "blindness", "charm person", "confuse",
+    "control undead", "corruption", "curse", "cursed lands", "deadly venom", "deafen",
+    "dispel affects", "evil spirit", "faerie fire", "garble", "heating", "insanity",
+    "lethargic mist", "lightning ward", "love potion", "narcotic mist", "nightfall",
+    "paralysis", "plague", "poison", "randomizer", "shielding", "shocking trap", "sleep",
+    "slow", "teleport", "totem", "weaken", "web", "disperse", "scream", "tesla retribution",
+};
+
+static bool ga_ownNukeSkipped( const DLString &name )
+{
+    const Json::Value &t = item_value_object( "grant_skill", "own_nuke_skip" );
+    if (t.isArray( )) {
+        for (auto const &v: t)
+            if (v.isString( ) && name == v.asString( ))
+                return true;
+        return false;
+    }
+    for (auto const &n: ga_ownNukeSkipDefault)
+        if (name == n)
+            return true;
+    return false;
+}
+
+// The char's best own nuke, as damage per round x the percent it lands: any offensive
+// damage spell the char has (class, race, clan, a grant it would keep). A grant from the
+// scored item's own slot leaves with the swap, so it doesn't count (ga_grantHeld), and
+// neither does the granted skill itself: when another worn copy keeps it, the grant was
+// already priced 0 (ga_grantCounted). The percent is read the way the grant side reads
+// it: learned + skill affects, no daze/drunk cuts, and a vampire's spells count outside
+// vamp form too.
+static double ga_bestOwnNuke( Character *target, int lvl, bool caster, int grantSn,
+                              const std::set<int> &outside, const std::set<int> &inside )
+{
+    double best = 0;
+    PCharacter *pch = target->getPC( );
+    for (int sn = 0; sn < skillManager->size( ); sn++) {
+        Skill *sk = skillManager->find( sn );
+        if (sn == grantSn || sk == 0 || !sk->getSpell( ) || !sk->getSpell( )->isCasted( )
+            || sk->getSpell( )->getSpellType( ) != SPELL_OFFENSIVE)
+            continue;
+        if (ga_ownNukeSkipped( sk->getName( ) ))
+            continue;
+        if (!ga_grantHeld( target, sk, outside, inside ))
+            continue;
+        if (rage_skill_forbidden( target, sk ) || !ga_grantAlignOk( sk, target ))
+            continue;
+        int learned = sk->usable( target, false ) ? sk->getLearned( target )
+                                                  : pch->getSkillData( sn ).learned.getValue( );
+        int pct = URANGE( 0, learned + skill_learned_from_affects( sk, pch ), 100 );
+        if (pct <= 0)
+            continue;
+        best = std::max( best, ga_nukeRound( target, sk, lvl, caster ) * pct / 100.0 );
+    }
+    return best;
 }
 
 // Charm slots, mirroring Fenia .tmp.mob.overcharmed_new (utils/mob: charm), the gate
@@ -5128,30 +5224,33 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
             break;
         }
         case GK_NUKE: {
-            // A granted nuke adds on top of melee (violence_update keeps swinging through
-            // cast lag): per cast = tier damage at the char's spell level x the average
-            // save x targets, at most one cast per lag, as many as a share of the mana
-            // pool pays for over a fight, used active_use of the time. A caster already
-            // nukes every round, so only an AoE's extra targets add anything for it.
-            if (!sk->getSpell( ) || !sk->getSpell( )->isCasted( ))
-                break;
-            int slevel = ga_grantSpellLevel( target, sk, lvl, caster );
-            if (slevel <= 0)
-                break;
-            double per = spell_proc_tier_value( name, slevel ) * spell_combat_save_factor( )
-                       * ga_gkSkill( "nuke_cond", *d, d->a );
-            if (per <= 0)
-                break;
-            bool aoe = IS_SET( sk->getSpell( )->getTarget( ), TAR_PEOPLE );
-            double targets = aoe ? ga_gk( "aoe_targets", 1.3 ) : 1.0;
-            double rate = (double)pulse / std::max( 1, sk->getBeats( target ) );
-            int cost = sk->getMana( );
-            double pool = target != 0 ? (double)target->max_mana : ga_gk( "ref_mana_per_level", caster ? 30 : 20, col ) * lvl;
-            if (cost > 0)
-                rate = std::min( rate, ga_gk( "mana_share", 0.25 ) * pool / (cost * ga_gkFightRounds( lvl )) );
-            double dmg = caster ? (aoe ? rate * per * (targets - 1) : 0) : rate * per * targets;
-            pve = item_combat_points( dmg * activeUse, 0, lvl, caster ) * use;
-            pvp = item_combat_points( 0, ga_gkSkill( "nuke_pvp_share", *d, d->b ), lvl, caster ) * use;
+            // A granted nuke is worth what it beats the char's own best nuke by (Kit
+            // 2026-10-08): a paladin's hellfire is priced as hellfire minus ray of truth.
+            // Melee keeps swinging through cast lag (violence_update), so a melee char
+            // with no nuke of its own gets the whole round; used active_use of the time.
+            // Never below a small fixed nuke_floor -- a spare nuke of another damage
+            // type still has its uses -- and the floor never above the grant's own full
+            // price: a weak nuke stays weak, and a better own nuke never raises the price.
+            double dmg = ga_nukeRound( target, sk, lvl, caster ) * use;
+            if (dmg > 0 && target != 0) {
+                double own = ga_bestOwnNuke( target, lvl, caster, sk->getIndex( ), outside, inside );
+                double least = std::min( ga_gk( "nuke_floor", 50 ) * use,
+                                         item_combat_points( dmg * activeUse, 0, lvl, caster ) );
+                pve = std::max( least, item_combat_points( std::max( 0.0, dmg - own ) * activeUse,
+                                                           0, lvl, caster ) );
+            }
+            else if (dmg > 0) {
+                // The char-less base value: a caster already nukes every round, so only
+                // an AoE's extra targets add anything.
+                bool aoe = IS_SET( sk->getSpell( )->getTarget( ), TAR_PEOPLE );
+                double targets = aoe ? ga_gk( "aoe_targets", 1.3 ) : 1.0;
+                if (caster)
+                    dmg = aoe ? dmg * (targets - 1) / targets : 0;
+                pve = item_combat_points( dmg * activeUse, 0, lvl, caster );
+            }
+            // PvP control only for a spell the char can actually cast.
+            if (ga_grantSpellLevel( target, sk, lvl, caster ) > 0)
+                pvp = item_combat_points( 0, ga_gkSkill( "nuke_pvp_share", *d, d->b ), lvl, caster ) * use;
             break;
         }
         case GK_AVOID: {
