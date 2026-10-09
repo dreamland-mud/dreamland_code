@@ -325,6 +325,19 @@ bool BasicMobileBehavior::specFightVampire( )
     return vkill.attack( );
 }
 
+// Anyone aggressVampire would look at: a player or a pet, out of a fight.
+bool BasicMobileBehavior::hasVampirePrey( )
+{
+    for (Character *wch = ch->in_room->people; wch; wch = wch->next_in_room) {
+        if (wch == ch || wch->fighting || wch->position == POS_FIGHTING)
+            continue;
+        if (wch->is_npc( ) && !IS_CHARMED(wch))
+            continue;
+        return true;
+    }
+    return false;
+}
+
 bool BasicMobileBehavior::aggressVampire( )
 {
     Character *wch;

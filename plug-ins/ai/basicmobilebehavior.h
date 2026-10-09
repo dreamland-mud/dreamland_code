@@ -69,7 +69,7 @@ public:
     bool getLostTrack( ) const;
     void setLostTrack( bool );
     int getHomeVnum( ) const;
-    bool goHome( bool fAlways );
+    bool goHome( bool fAlways, bool fForce = false );
 
 /*
  * C++ mechanics behind a decision the Fenia mob AI already made (characterwrapper ai_*)
@@ -79,6 +79,7 @@ public:
     bool aiRangedAttack( );
     bool aiAssistGroup( Character *fch, Character *victim );
     bool aiHeal( );
+    bool aiCast( Skill *skill, Character *victim, int door, int range );
 
 protected:
     Character * getMaster( Character * );
@@ -107,7 +108,7 @@ protected:
 /*
  * home point 
  */
-    bool backHome( bool );
+    bool backHome( bool fAlways, bool fForce = false );
     bool checkLastFoughtHiding();
     virtual bool isHomesick( );
     void remember( Room * );
@@ -266,6 +267,7 @@ protected:
     struct KillVictims;
     bool specFightVampire( );
     bool aggressVampire( );
+    bool hasVampirePrey( );
     virtual bool canAggressVampire( Character * );
 
 /*

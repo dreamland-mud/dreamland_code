@@ -2881,14 +2881,16 @@ NMI_GET( CharacterWrapper, ai_homeVnum, "внум комнаты, где моб 
     return Register( ai->getHomeVnum( ) );
 }
 
-NMI_INVOKE( CharacterWrapper, ai_goHome, "([always]): вернуться домой после погони; always - исчезнуть, если дороги домой нет (после этого проверять .tmp.mob.valid)" )
+NMI_INVOKE( CharacterWrapper, ai_goHome, "([always[, force]]): вернуться домой после погони; always - исчезнуть, если дороги домой нет; force - перенестись домой и из комнаты без возврата, и трусливому (после этого проверять .tmp.mob.valid)" )
 {
     checkTarget( );
     CHK_PC
     BasicMobileBehavior::Pointer ai = mob_ai( target );
     if (!ai || !target->in_room)
         return Register( false );
-    return Register( ai->goHome( !args.empty( ) && argnum2boolean( args, 1 ) ) );
+    bool fAlways = args.size( ) >= 1 && argnum2boolean( args, 1 );
+    bool fForce = args.size( ) >= 2 && argnum2boolean( args, 2 );
+    return Register( ai->goHome( fAlways, fForce ) );
 }
 
 NMI_INVOKE( CharacterWrapper, ai_attack, "(victim): напасть на victim так, как нападает моб (охранник жертвы, onAttackAI); false, если victim не здесь или под защитой богов. Очарованность не проверяет" )
@@ -2939,6 +2941,23 @@ NMI_INVOKE( CharacterWrapper, ai_heal, "(): полечиться по-класс
     if (!ai)
         return Register( false );
     return Register( ai->aiHeal( ) );
+}
+
+NMI_INVOKE( CharacterWrapper, ai_cast, "(spell, victim[, door, range]): скастовать spell по victim так, как кастует моб: с маной, задержкой, спеллбейном и помехами; door и range - victim в range комнатах за выходом door. false, если заклинание недоступно или не достает" )
+{
+    checkTarget( );
+    CHK_PC
+    BasicMobileBehavior::Pointer ai = mob_ai( target );
+    if (!ai)
+        return Register( false );
+    Skill *skill = argnum2skill( args, 1 );
+    Character *victim = argnum2character( args, 2 );
+    int door = -1, range = 0;
+    if (args.size( ) >= 4) {
+        door = argnum2number( args, 3 );
+        range = argnum2number( args, 4 );
+    }
+    return Register( ai->aiCast( skill, victim, door, range ) );
 }
 
 NMI_INVOKE( CharacterWrapper, ai_refresh, "(): вернуть себе аффекты расы и прототипа, снятые в бою" )
