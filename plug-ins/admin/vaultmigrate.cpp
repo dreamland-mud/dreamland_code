@@ -143,9 +143,9 @@ struct VMOwnerTally {
 };
 
 /* Destructive migration (policy B): move each litter bag's contents into the
- * OWNER's vault, then delete the emptied bag. Limited and timered items migrate
- * too (they only pause -- the bank freezes the serialized timer and it resumes on
- * withdrawal); the sole carve-out is NOSAVEDROP, which bank_deposit refuses
+ * OWNER's vault, then delete the emptied bag. Timered items migrate too (they
+ * only pause -- the bank freezes the serialized timer and it resumes on
+ * withdrawal); the carve-outs are limited items and NOSAVEDROP, which bank_deposit refuses
  * because the serializer would silently destroy it, so those items (and their
  * bag) are left in place. Bags whose owner has no live profile are purged (no
  * vault to receive). Each affected room is re-saved immediately after its bag
@@ -219,14 +219,14 @@ static void vaultmigrate_go( Character *ch, DLString rest, bool mansion103 )
                 if (bank_deposit( it, "player", key ))
                     itemsBanked++;
                 else
-                    itemsLeft++;                    // NOSAVEDROP / write failure -- stays in the bag
+                    itemsLeft++;                    // limited / NOSAVEDROP / write failure -- stays in the bag
             }
 
             if (bag->contains == 0) {
                 extract_obj( bag );                 // fully emptied -> remove the litter bag
                 bagsEmptied++;
             } else {
-                bagsLeft++;                         // NOSAVEDROP leftovers -> keep the bag
+                bagsLeft++;                         // limited / NOSAVEDROP leftovers -> keep the bag
             }
         }
 
@@ -250,7 +250,7 @@ static void vaultmigrate_go( Character *ch, DLString rest, bool mansion103 )
             << "   (" << itemsPurged << " items, no vault to receive)\n";
     if (bagsLeft > 0)
         buf << "{YBags KEPT{x                 : " << bagsLeft
-            << "   (" << itemsLeft << " items couldn't bank -- NOSAVEDROP, or a write error)\n";
+            << "   (" << itemsLeft << " items couldn't bank -- limited, NOSAVEDROP, or a write error)\n";
 
     page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -377,7 +377,7 @@ static void vaultmigrate_goclan( Character *ch, DLString rest )
             if (bank_deposit( it, "clan", clanKey ))
                 itemsBanked++;
             else
-                itemsLeft++;                         // NOSAVEDROP / write failure
+                itemsLeft++;                         // limited / NOSAVEDROP / write failure
         }
 
         // Owned player-parked bag emptied clean -> purge the shell (like personal
@@ -407,7 +407,7 @@ static void vaultmigrate_goclan( Character *ch, DLString rest )
         buf << "Empty owned bags purged    : " << bagsPurged << "\n";
     if (itemsLeft > 0)
         buf << "{YItems KEPT{x                 : " << itemsLeft
-            << "   (NOSAVEDROP, or a write error)\n";
+            << "   (limited, NOSAVEDROP, or a write error)\n";
 
     page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -479,8 +479,10 @@ static void vaultmigrate_dryclan( Character *ch )
  * emptied shell and re-saves its room (save_items preserves the room's other
  * objects). Targeted by vnum so it never touches ritual fixtures (altars, apple
  * tree, relic skull) -- the operator runs it only on the vnums slated for
- * removal. NOSAVEDROP items bank_deposit refuses die with the shell (they never
- * survived a reboot anyway).
+ * removal. Anything bank_deposit refuses (limited, NOSAVEDROP, a write error)
+ * drops to the room floor instead of dying with the shell: a player's limited item,
+ * or a bag holding one, must never be destroyed by the drain. NOSAVEDROP items on
+ * the floor vanish at reboot as they always did.
  */
 static void vaultmigrate_goclanforce( Character *ch, DLString rest )
 {
@@ -505,7 +507,7 @@ static void vaultmigrate_goclanforce( Character *ch, DLString rest )
         return;
     }
 
-    int containersDone = 0, itemsBanked = 0, itemsDestroyed = 0;
+    int containersDone = 0, itemsBanked = 0, itemsFloored = 0;
 
     for (size_t i = 0; i < containers.size( ); i++) {
         Object *cont = containers[i];
@@ -519,8 +521,11 @@ static void vaultmigrate_goclanforce( Character *ch, DLString rest )
             next = it->next_content;                  // bank_deposit extracts on success
             if (bank_deposit( it, "clan", clanKey ))
                 itemsBanked++;
-            else
-                itemsDestroyed++;                     // NOSAVEDROP -- dies with the shell
+            else if (room != 0) {
+                obj_from_obj( it );                   // refused -- keep it, on the floor
+                obj_to_room( it, room );
+                itemsFloored++;
+            }
         }
 
         extract_obj( cont );                          // purge the emptied shell
@@ -535,7 +540,7 @@ static void vaultmigrate_goclanforce( Character *ch, DLString rest )
     buf << "{WForce-drain vnum " << vnum << " -- LIVE and saved.{x\n\n";
     buf << "Containers drained + purged : " << containersDone << "\n";
     buf << "Items banked to clan vaults : " << itemsBanked << "\n";
-    buf << "Items destroyed (NOSAVEDROP): " << itemsDestroyed << "\n";
+    buf << "Items left on the floor     : " << itemsFloored << "   (limited, NOSAVEDROP, or a write error)\n";
     ch->pecho( buf.str( ).c_str( ) );
 }
 
@@ -890,7 +895,7 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
             } else if (bank_deposit( it, "player", dest.toLower( ) ))
                 itemsBanked++;
             else
-                itemsLeft++;                          // NOSAVEDROP / write failure
+                itemsLeft++;                          // limited / NOSAVEDROP / write failure
         }
 
         if (cont->contains == 0) {
@@ -903,8 +908,7 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
             cont->setOwner( "" );                     // leftovers -> plain furniture
             parkedKept++;
         } else {
-            extract_obj( cont );
-            parkedKept++;
+            parkedKept++;                             // refused leftovers -> keep the bag
         }
 
         dreamland->resetOption( DL_SAVE_OBJS );
@@ -941,7 +945,7 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
         } else if (bank_deposit( it, "player", dest.toLower( ) ))
             floorBanked++;
         else
-            floorSkipped++;                       // NOSAVEDROP / write failure
+            floorSkipped++;                       // limited / NOSAVEDROP / write failure
     }
     dreamland->resetOption( DL_SAVE_OBJS );
     for (std::map<int, Room *>::iterator t = touched.begin( ); t != touched.end( ); ++t)
@@ -957,14 +961,14 @@ static void vaultmigrate_gomansion( Character *ch, DLString rest )
     buf << "Items banked to vaults    : " << itemsBanked << "\n";
     buf << "Reset items left in place : " << itemsKeptReset << "\n";
     if (itemsLeft > 0)
-        buf << "{YItems not banked{x          : " << itemsLeft << "   (NOSAVEDROP, or a write error -- left in place)\n";
+        buf << "{YItems not banked{x          : " << itemsLeft << "   (limited, NOSAVEDROP, or a write error -- left in place)\n";
     if (parkedKept > 0)
         buf << "{YParked containers kept{x    : " << parkedKept << "   (still hold unbanked or reset-tagged items)\n";
     buf << "Floor items banked        : " << floorBanked << "\n";
     if (floorPurged > 0)
         buf << "Floor items purged        : " << floorPurged << "   (abandoned house, or stamped to a deleted player)\n";
     if (floorSkipped > 0)
-        buf << "{YFloor items left{x          : " << floorSkipped << "   (heir unclear, NOSAVEDROP or write error)\n";
+        buf << "{YFloor items left{x          : " << floorSkipped << "   (heir unclear, limited, NOSAVEDROP or write error)\n";
     if (inherited > 0)
         buf << "Dead stamp -> key holder   : " << inherited << " container(s)\n";
     if (abandoned > 0)
