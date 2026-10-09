@@ -399,7 +399,7 @@ DLString DefaultBufferHandler::convert(const char *txt)
 
     const unsigned char *to = russian_codepages[codepage].to;
 
-    char txt_buf[length];
+    char txt_buf[length + 1];
     strcpy(txt_buf, txt);
     char *txt_ptr = txt_buf;
 

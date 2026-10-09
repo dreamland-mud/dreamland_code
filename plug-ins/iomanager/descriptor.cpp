@@ -245,9 +245,13 @@ int Descriptor::inputTelnet( unsigned char i )
 
                         // Mudlet speaks UTF-8: answer the codepage menu on the player's behalf.
                         // The line goes through the input buffer and the usual nanny path.
-                        if (telnet.ttype == TTYPE_MUDLET && connected == CON_CODEPAGE
-                                && utf8_menu_choice( )) {
-                            inputChar( utf8_menu_choice( ) );
+                        // Backdoor and wrapped sockets sit in CON_CODEPAGE too but read a
+                        // different first line, so they are left alone.
+                        char choice = utf8_menu_choice( );
+                        if (telnet.ttype == TTYPE_MUDLET && connected == CON_CODEPAGE && choice
+                                && !ServerSocketContainer::isBackdoor( control )
+                                && !ServerSocketContainer::isWrapped( control )) {
+                            inputChar( choice );
                             inputChar( '\n' );
                         }
                     }
