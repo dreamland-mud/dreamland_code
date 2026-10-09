@@ -127,10 +127,10 @@ bool BasicMobileBehavior::specFightCaster( )
 
     // Every tier but the dummy (10) casts through the tier combat AI (Fenia global
     // onCastAI). Normal and trash only bring spells, so only class casters are
-    // asked. The tables below stay for vampires and for any mob the Fenia side
-    // declines (no usable spells).
+    // asked. The tables below stay for untiered mobs and for any mob the Fenia
+    // side declines (no usable spells).
     int tier = ch->getNPC()->getTier();
-    bool classCaster = IS_SET( ch->act, ACT_MAGE|ACT_CLERIC|NPC_NECRO_ACTS );
+    bool classCaster = IS_SET( ch->act, ACT_MAGE|ACT_CLERIC|ACT_VAMPIRE|NPC_NECRO_ACTS );
     if (tier >= 1 && tier <= 9 && (tier <= 5 || classCaster) && gprog("onCastAI", "C", ch))
         return true;
     
@@ -230,6 +230,48 @@ bool BasicMobileBehavior::aggressCaster( )
     }
 
     return false;
+}
+
+/*
+ * Fenia mob AI picked the spell: cast it the way the C++ tables do (mana,
+ * wait, spellbane, obstacles). door < 0 = victim in this room, else victim
+ * is range rooms off through door, as findRangeVictim reported.
+ * -1: the spell can't be tried at all (unusable, out of reach): pick another.
+ * 0: tried and failed (spellbane, no mana, a no-cast room...): the decision
+ * is spent, a second spell must not follow, but a melee mob may still close in.
+ * 1: cast.
+ */
+int BasicMobileBehavior::aiCast( Skill *skill, Character *victim, int door, int range )
+{
+    if (!ch->in_room || !victim || !victim->in_room)
+        return -1;
+
+    if (!NPC_CAN_CAST( ch ) || !skill->usable( ch ))
+        return -1;
+
+    Spell::Pointer spell = skill->getSpell( );
+    if (!spell || !spell->isCasted( ))
+        return -1;
+
+    int flags = FSPELL_VERBOSE | FSPELL_BANE | FSPELL_WAIT | FSPELL_OBSTACLES | FSPELL_MANA;
+
+    if (door < 0) {
+        if (victim->in_room != ch->in_room)
+            return -1;
+        return ::spell( skill->getIndex( ), ch->getModifyLevel( ), ch, victim, flags ) ? 1 : 0;
+    }
+
+    if (victim == ch || door >= DIR_SOMEWHERE || range < 1 || spell->getMaxRange( ch ) < range)
+        return -1;
+
+    SpellTarget::Pointer target( NEW );
+    target->type = SpellTarget::CHAR;
+    target->victim = victim;
+    target->castFar = true;
+    target->range = range;
+
+    interpret_cmd(ch, "scan", "%s", dirs[door].name);
+    return ::spell( skill->getIndex( ), ch->getModifyLevel( ), ch, target, flags ) ? 1 : 0;
 }
 
 bool BasicMobileBehavior::canAggressDistanceCaster( Character *victim )

@@ -31,8 +31,18 @@ bool BasicMobileBehavior::aggress( )
     if (!canAggress( ))
         return false;
     
-    if (IS_SET( ch->act, ACT_VAMPIRE ))
+    if (IS_SET( ch->act, ACT_VAMPIRE )) {
+        // Fenia sees the vampire only when it is free to act and someone out
+        // of a fight stands in the room: this runs every pulse.
+        if (gprog_registered( "onVampireAI" )) {
+            if (isAfterCharm( ) || ch->wait > 0 || !hasVampirePrey( ))
+                return false;
+            int ai = ai_trigger(false, ch, "onVampireAI", "C", ch);
+            if (ai != AI_UNHANDLED)
+                return ai;
+        }
         return aggressVampire( );
+    }
 
     if (aggressLastFought( ))
         return true;

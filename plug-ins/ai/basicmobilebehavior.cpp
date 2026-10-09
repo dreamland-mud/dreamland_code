@@ -272,9 +272,9 @@ int BasicMobileBehavior::getHomeVnum( ) const
     return homeVnum.getValue( );
 }
 
-bool BasicMobileBehavior::goHome( bool fAlways )
+bool BasicMobileBehavior::goHome( bool fAlways, bool fForce )
 {
-    return backHome( fAlways );
+    return backHome( fAlways, fForce );
 }
 
 bool BasicMobileBehavior::isAdrenalined( ) const
@@ -322,12 +322,14 @@ void BasicMobileBehavior::remember( Room *room )
         homeVnum = room->vnum;
 }
 
-bool BasicMobileBehavior::backHome( bool fAlways )
+// fForce: the Fenia mob AI gave up a chase (evade) and carries the mob home
+// past the no-recall and wimpy gates and the onRecallAI transport guards.
+bool BasicMobileBehavior::backHome( bool fAlways, bool fForce )
 {
     Room *home;
     int myHomeVnum = homeVnum != 0 ? homeVnum.getValue() : ch->reset_room;
 
-    if (myHomeVnum == 0 || IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL)) {
+    if (myHomeVnum == 0 || (!fForce && IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL))) {
         if (fAlways) {
             oldact(_("$c1 ищет свой дом."), ch, 0, 0, TO_ROOM );
             extract_char( ch );
@@ -344,24 +346,34 @@ bool BasicMobileBehavior::backHome( bool fAlways )
         return false;
     }
     
-    if (home == ch->in_room)
+    if (home == ch->in_room) {
+        // A forced trip home is an evade: settle back in place even when
+        // the chase never left the lair.
+        if (fForce) {
+            ch->position = ch->default_pos;
+            homeVnum = 0;
+            unsetLastCharmTime();
+        }
         return false;
+    }
 
     // Wimpy mobs are not in a hurry to get back.
-    if (IS_SET(ch->act, ACT_WIMPY) && ch->getLastFightDelay() <= Date::SECOND_IN_HOUR)
+    if (!fForce && IS_SET(ch->act, ACT_WIMPY) && ch->getLastFightDelay() <= Date::SECOND_IN_HOUR)
         return false;
 
     // Check if standing in the adjancent room and can just walk back there.
     int door = door_between_rooms(ch->in_room, home);
     if (door >= 0) {
         // See if it's safe to go back for a wimpy mob.
-        if (IS_SET(ch->act, ACT_WIMPY)) {
+        if (!fForce && IS_SET(ch->act, ACT_WIMPY)) {
             interpret_cmd(ch, "scan", "");
             if (findMemoryFoughtRoom(home)) 
                 return false;
         }
 
         interpret_cmd(ch, dirs[door].name, "");
+        if (ch->extracted)
+            return true;
         if (ch->in_room == home) {
             ch->position = ch->default_pos;
             homeVnum = 0;
@@ -375,11 +387,11 @@ bool BasicMobileBehavior::backHome( bool fAlways )
     // nobody. Hand it to Fenia so it runs the same transportation guards every
     // other kind of travel runs, and can be retuned without a rebuild. With no
     // handler registered gprog returns false and the old behaviour stands.
-    if (!gprog("onRecallAI", "CR", ch, home))
+    if (fForce || !gprog("onRecallAI", "CR", ch, home))
         transfer_char( ch, 0, home,
-                       "%1$^C1 молит Богов о возвращении.",
-                       NULL,
-                       "%1$^C1 появляется из дымки." );
+                       _("%1$^C1 молит Богов о возвращении."),
+                       MultiMessage( ),
+                       _("%1$^C1 появляется из дымки.") );
 
     // A handler is free to give up on a mob that has nowhere to return to.
     if (ch->extracted)

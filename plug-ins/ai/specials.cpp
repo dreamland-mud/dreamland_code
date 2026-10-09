@@ -151,7 +151,7 @@ bool BasicMobileBehavior::doInvis()
     if (!innate || (ch->affected_by & innate) == innate)
         return false;
 
-    int ai = ai_trigger(true, ch, "onInvisAI", "C", ch);
+    int ai = ai_trigger(true, ch, "onInvisAI", "Ci", ch, (int)(innate & ~ch->affected_by));
     if (ai != AI_UNHANDLED)
         return ai;
 
