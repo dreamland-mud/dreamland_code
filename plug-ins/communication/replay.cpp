@@ -8,6 +8,7 @@
 #include "dreamland.h"
 #include "arg_utils.h"
 #include "l10n.h"
+#include "date.h"
 
 static const DLString ATTR_PRIVATE = "history_private";
 static const DLString ATTR_NEAR = "history_near";
@@ -73,12 +74,18 @@ bool replay_history_near( ostringstream &buf, PCharacter *ch, int limit = DEFAUL
     return replay_messages( buf, ch, ATTR_NEAR, limit );
 }
 
+/** Prefix a stored message with server time, so replay shows when it was said. */
+static DLString stamped( const DLString &msg )
+{
+    return Date::getCurrentTimeAsString( "{D[%H:%M]{x " ) + msg;
+}
+
 static void remember_one_message( PCharacter *ch, const DLString &msg, const DLString &attrName )
 {
     XMLStringListAttribute::Pointer attr  
                 = ch->getAttributes( ).getAttr<XMLStringListAttribute>( attrName );
 
-    attr->push_front( msg );
+    attr->push_front( stamped( msg ) );
     if (attr->size( ) > MAX_HISTORY_SIZE)
         attr->resize( MAX_HISTORY_SIZE );
 }
@@ -141,7 +148,7 @@ void ReplayAttribute::notify(PCharacter *ch) const
 
 void ReplayAttribute::addMessage(const DLString &msg)
 {
-    tells.push_back(msg);
+    tells.push_back(stamped(msg));
     lastNotified = 0;
 }
 
