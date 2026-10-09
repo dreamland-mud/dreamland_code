@@ -8,14 +8,23 @@
 #include "chatframe.h"
 #include "mudtags.h"
 #include "descriptor.h"
+#include "outofband.h"
 #include "character.h"
 #include "pcharacter.h"
 #include "merc.h"
 #include "def.h"
 
+/* Web clients subscribe with the chat RPC. A telnet client that negotiated GMCP
+ * always gets chat, as Comm.Channel.Text (plug-ins/gmcp). */
 bool chat_subscribed( Descriptor *d )
 {
-    return d && d->websock.state == WS_ESTABLISHED && IS_SET(d->oob_proto, OOB_CHAT);
+    if (!d)
+        return false;
+
+    if (d->websock.state == WS_ESTABLISHED)
+        return IS_SET(d->oob_proto, OOB_CHAT);
+
+    return IS_SET(d->oob_proto, OOB_GMCP);
 }
 
 bool chat_subscribed( Character *ch )
@@ -102,6 +111,11 @@ void chat_emit( Character *to, Character *peer, bool own,
     if (quest >= 0) {
         body["quest"] = quest;
         body["step"] = step;
+    }
+
+    if (to->desc->websock.state != WS_ESTABLISHED) {
+        outOfBandManager->run( "chat", ChatArgs( to->desc, body ) );
+        return;
     }
 
     Json::Value frame;

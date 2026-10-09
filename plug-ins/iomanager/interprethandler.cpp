@@ -13,6 +13,7 @@
 #include "colour.h"
 #include "telnet.h"
 #include "interprethandler.h"
+#include "outofband.h"
 #include "resume.h"
 #include "webprompt.h"
 
@@ -451,10 +452,13 @@ void InterpretHandler::normalPrompt( Character *ch )
 }
 
 
-void
-InterpretHandler::webPrompt(Descriptor *d, Character *ch)
+/*
+ * The structured prompt: vitals, room, affects, group etc. Web clients get it as
+ * the "prompt" frame; telnet clients with GMCP get prompt["args"][0] through the
+ * "prompt" out-of-band command (plug-ins/gmcp).
+ */
+static void build_prompt(Descriptor *d, Character *ch, Json::Value &prompt, bool web)
 {
-    Json::Value prompt;
     prompt["command"] = "prompt";
     prompt["args"][0]["hit"] = ch->hit.getValue();
     prompt["args"][0]["max_hit"] = ch->max_hit.getValue();
@@ -474,7 +478,7 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
     /* Session resume token (resume.h). Rides the prompt because the prompt is
      * the one thing a web client is guaranteed to receive while playing, so the
      * copy in its tab is never more than one command stale. */
-    if (ch->getPC( ))
+    if (web && ch->getPC( ))
         prompt["args"][0]["resume"] = resume_token_issue( ch->getPC( ) ).c_str( );
 
     if (ch->fighting) {
@@ -514,7 +518,14 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
     // Call various web prompt handlers to write out complex stuff defined in other plugins,
     // such as group information, weather, time etc.
     WebPromptManager::getThis( )->handle( d, ch, prompt );
+}
 
+void
+InterpretHandler::webPrompt(Descriptor *d, Character *ch)
+{
+    Json::Value prompt;
+
+    build_prompt( d, ch, prompt, true );
     d->writeWSCommand(prompt);
 }
 
@@ -535,6 +546,12 @@ InterpretHandler::prompt(Descriptor *d)
 
     if (is_websock(d))
         webPrompt(d, d->character);
+    else if (IS_SET(d->oob_proto, OOB_GMCP)) {
+        Json::Value prompt;
+
+        build_prompt( d, d->character, prompt, false );
+        outOfBandManager->run( "prompt", PromptArgs( d, prompt["args"][0] ) );
+    }
 
     // 'compact' config option retired -- the blank line before the prompt is always sent.
     d->send("\n\r");

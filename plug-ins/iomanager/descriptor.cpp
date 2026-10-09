@@ -68,13 +68,24 @@ int ttype_lookup( const char *received )
     notice("telnet: checking %s as terminal type candidate", received);
     for (int i = 0; i < TTYPE_MAX; i++) {
         const char *ttype = TTYPE_NAMES[i]; 
-        if (strncmp(received, ttype, strlen(ttype)) == 0) {
+        // Case-insensitive: Mudlet answers "MUDLET" (MTTS), older builds "Mudlet".
+        if (strncasecmp(received, ttype, strlen(ttype)) == 0) {
             LogStream::sendNotice() << "telnet: received " << ttype << " terminal type" << endl;
             return i;
         }
     }
     return TTYPE_NONE;
 }
+
+/* Number of the utf-8 entry in the codepage menu, as the player would type it. */
+static char utf8_menu_choice( )
+{
+    for (int i = 0; i < NCODEPAGES; i++)
+        if (!strcmp( russian_codepages[i].name, "utf-8" ))
+            return '1' + i;
+    return 0;
+}
+
 const char *ttype_name( int ttype )
 {
     return TTYPE_NAMES[URANGE(TTYPE_NONE, ttype, TTYPE_MAX-1)];
@@ -231,6 +242,18 @@ int Descriptor::inputTelnet( unsigned char i )
                     {
                         telnet.subneg[telnet.sn_ptr] = 0;
                         telnet.ttype = ttype_lookup((const char *)telnet.subneg + 2);
+
+                        // Mudlet speaks UTF-8: answer the codepage menu on the player's behalf.
+                        // The line goes through the input buffer and the usual nanny path.
+                        // Backdoor and wrapped sockets sit in CON_CODEPAGE too but read a
+                        // different first line, so they are left alone.
+                        char choice = utf8_menu_choice( );
+                        if (telnet.ttype == TTYPE_MUDLET && connected == CON_CODEPAGE && choice
+                                && !ServerSocketContainer::isBackdoor( control )
+                                && !ServerSocketContainer::isWrapped( control )) {
+                            inputChar( choice );
+                            inputChar( '\n' );
+                        }
                     }
                     telnet.state = TNS_NORMAL;
                     break;

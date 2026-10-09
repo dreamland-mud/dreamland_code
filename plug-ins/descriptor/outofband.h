@@ -9,6 +9,9 @@
 #include "dlstring.h"
 
 class DLString;
+namespace Json {
+    class Value;
+}
 
 struct OutOfBandArgs;
 struct Descriptor;
@@ -42,6 +45,20 @@ struct ProtoInitArgs : public OutOfBandArgs {
         this->proto = proto;
     }
     DLString proto;
+};
+
+/* The structured prompt a web client gets (prompt["args"][0]), for telnet protocols. */
+struct PromptArgs : public OutOfBandArgs {
+    PromptArgs(Descriptor *d, const Json::Value &prompt) : OutOfBandArgs(d), prompt(prompt) {
+    }
+    const Json::Value &prompt;
+};
+
+/* One chat panel message (see chatframe.h), for telnet protocols. */
+struct ChatArgs : public OutOfBandArgs {
+    ChatArgs(Descriptor *d, const Json::Value &body) : OutOfBandArgs(d), body(body) {
+    }
+    const Json::Value &body;
 };
 
 class OutOfBandManager : public virtual Plugin, public OneAllocate {
