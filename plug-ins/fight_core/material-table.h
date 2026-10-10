@@ -13,6 +13,7 @@ struct material_t {
     int floats;
     int hardness;
     int rho;
+    int price;      // silver per kg, for the item price model (itemeconomy.cpp); 0 = none
     json_flag<&material_types> type;
     json_flag<&material_flags> flags;
     json_flag<&imm_flags> vuln;

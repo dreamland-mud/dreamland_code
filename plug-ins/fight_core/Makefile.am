@@ -22,6 +22,7 @@ damage.cpp \
 damage_impl.cpp \
 itemvalue.cpp \
 itemmodel.cpp \
+itemeconomy.cpp \
 character.cpp \
 weapons.cpp \
 weapontier.cpp \

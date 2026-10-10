@@ -52,7 +52,7 @@ Object::Object( ) :
                 count( 0 ),
                 gram_gender(MultiGender::UNDEF),
                 behavior( ObjectBehavior::NODE_NAME ),
-                reset_obj(0), reset_mob(0), reset_room(0)
+                reset_obj(0), reset_mob(0), reset_room(0), econRev(0)
 {
         for( int i = 0; i < 5; i++ ) value[i] = 0;
 }
@@ -103,6 +103,7 @@ void Object::extract( )
         reset_obj = 0;
         reset_mob = 0;
         reset_room = 0;
+        econRev = 0;
         ID = 0;
         
         for( int i = 0; i < 5; i++ ) value[i] = 0;

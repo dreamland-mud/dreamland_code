@@ -349,6 +349,24 @@ void obj_to_obj( Object *obj, Object *obj_to )
         return;
 }
 
+void obj_set_weight( Object *obj, int weight )
+{
+    int delta = weight - obj->weight;
+
+    if (delta == 0)
+        return;
+
+    obj->weight = weight;
+
+    // Same bookkeeping as obj_to_char / obj_to_obj, for the difference only.
+    if (obj->carried_by != 0)
+        obj->carried_by->carry_weight += delta;
+
+    for (Object *obj_to = obj->in_obj; obj_to != 0; obj_to = obj_to->in_obj)
+        if (obj_to->carried_by != 0)
+            obj_to->carried_by->carry_weight += delta * obj_to->getWeightMultiplier( ) / 100;
+}
+
 void obj_to_obj_random( Object *item, Object *obj_to )
 {
     Object *obj, *obj_prev = 0;

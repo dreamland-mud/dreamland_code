@@ -383,8 +383,6 @@ static bool can_wield_obj( Character *ch, Object *obj )
         return false;
     if (!obj->can_wear( ITEM_WIELD ))
         return false;
-    if (too_heavy_to_wield( ch, obj, false ))
-        return false;
     if (!get_weapon_skill( obj )->usable( ch ))
         return false;
     if (get_wear_level( ch, obj ) > ch->getRealLevel( ))

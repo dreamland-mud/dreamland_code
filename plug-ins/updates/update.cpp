@@ -2098,16 +2098,8 @@ void wield_update( Character *ch )
         unequip_char( ch, second );
     }
     
+    // The primary hand has no weight cap any more (weight-cost-sweep D9).
     wield = get_eq_char( ch, wear_wield );
-    
-    if (wield 
-            && wear_wield->canRemove( ch, wield, 0 )
-            && too_heavy_to_wield( ch, wield, false ))
-    {
-        oldact(_("Ты не в силах удержать $o4 в правой руке."), ch, wield, 0, TO_CHAR);
-        oldact(_("$c1 не в силах удержать $o4."), ch, wield, 0, TO_ROOM);
-        unequip_char( ch, wield );
-    }
     
     if (IS_AWAKE(ch) 
             && (second && second->wear_loc == wear_second_wield) 

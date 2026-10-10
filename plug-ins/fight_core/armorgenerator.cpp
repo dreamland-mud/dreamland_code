@@ -6,6 +6,7 @@
 #include "weapontier.h"
 #include "itemvalue.h"
 #include "itemmodel.h"
+#include "itemeconomy.h"
 
 #include "logstream.h"
 #include "grammar_entities_impl.h"
@@ -1299,4 +1300,8 @@ void ArmorGenerator::assignFlags()
 
     if (!procs.empty())
         obj->props["combatcast"] = procs;
+
+    // Weight once material, heft and coverage are final: the item model's, or
+    // the prototype's for a hand-made piece that keeps its shape.
+    obj_set_weight(obj, item_instance_weight(obj));
 }

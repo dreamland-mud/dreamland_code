@@ -99,6 +99,9 @@ public:
     long long reset_mob;
     /** Room VNUM where this item was reset on the floor. */
     int reset_room;
+    /** Item economy model revision this item's weight and cost follow
+     *  (saved as EconRev; 0 = made before the model, migrated on load). */
+    int econRev;
 
 
     // member funcions.

@@ -57,6 +57,20 @@ void save_items( Room *room );
 void save_items_at_holder( Object * obj );
 void save_room_objects( Room *room );
 
+/*
+ * One-shot economy migration of saved objects. fight_core (itemeconomy.cpp)
+ * sets both from fight/item_weight.json "migration". obj_econ_rev is the
+ * current model revision (0 = off); every new object is stamped with it and
+ * fwrite_obj saves it as EconRev. fread_obj calls the hook for an object saved
+ * with an older revision, twice: stage 0 before the object is placed (weight,
+ * so carry weight stays balanced), stage 1 once its Fenia wrapper is linked
+ * (cost). The hook answers true when it applied the change; the object then
+ * takes the current revision. In dry-run it only logs and answers false.
+ */
+typedef bool (*ObjEconMigrateFn)( Object *obj, int savedRev, int stage );
+extern int obj_econ_rev;
+extern ObjEconMigrateFn obj_econ_migrate_fn;
+
 void save_mobs( Room *room );
 void save_mobs_at( Character *ch );
 void save_room_mobiles( Room *room );

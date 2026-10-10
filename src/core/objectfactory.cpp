@@ -32,6 +32,8 @@ obj_index_data::obj_index_data()
     count = 0;
     weight = 0;
     cost = 0;
+    xml_weight = 0;
+    xml_cost = 0;
 
     for (int i = 0; i < 5; i++)
         value[i] = 0;

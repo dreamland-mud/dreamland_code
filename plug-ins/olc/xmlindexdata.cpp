@@ -144,6 +144,8 @@ XMLObjIndexData::XMLObjIndexData(const obj_index_data &original)
     count        = original.count;
     weight       = original.weight;
     cost         = original.cost;
+    xml_weight   = original.xml_weight;
+    xml_cost     = original.xml_cost;
     memcpy(value, original.value, sizeof(value));
     limit        = original.limit;
     area         = original.area;

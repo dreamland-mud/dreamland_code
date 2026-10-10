@@ -46,8 +46,16 @@ struct        obj_index_data
     int                level;
     int                 condition;
     int                count;
+    /** Effective weight and cost, what instances copy: computed at boot from
+     *  the item model (fight_core itemeconomy.cpp) unless the area file says
+     *  otherwise. */
     int                weight;
     int                        cost;
+    /** The raw area-file values. weight > 0 overrides the model, 0 = the model;
+     *  cost is the most the item may cost (the model only lowers it). Only these
+     *  are written back by asave. */
+    int                xml_weight;
+    int                xml_cost;
     int                        value[5];
     int                 limit;
     Grammar::MultiGender gram_gender;

@@ -341,6 +341,9 @@ char *print_flags(int flag)
  */
 Object *        rgObjNest        [MAX_NEST];
 
+int obj_econ_rev = 0;
+ObjEconMigrateFn obj_econ_migrate_fn = 0;
+
 
 
 
@@ -1094,6 +1097,8 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 if (obj->timer != 0)
                         fprintf( fp, "Time %d\n",        obj->timer             );
                 fprintf( fp, "Cost %d\n",        obj->cost                     );
+                if (obj->econRev > 0)
+                        fprintf( fp, "EconRev %d\n",  obj->econRev            );
                 if ( obj->value0() != obj->pIndexData->value[0]
                         || obj->value1() != obj->pIndexData->value[1]
                         || obj->value2() != obj->pIndexData->value[2]
@@ -2296,6 +2301,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
     bool fPersonal;
     int wear_loc = -1;
     int vnum = 0;
+    int econRev = 0;
     DLString value;
     lang_t lang;
     AffectList affectsOldStyle;
@@ -2322,6 +2328,8 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
             /*this object was already initialized once*/
             obj = create_object_nocount( pObj, -1);
+            // The saved EconRev decides, not the stamp a new object gets.
+            obj->econRev = 0;
             
             /*init pIndexData counter, in case of bootup*/
             if (create_obj_dropped)
@@ -2404,6 +2412,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
                     KEY( "ExtraFlags",        obj->extra_flags,        fread_number( fp ) );
                     KEY( "ExtF",        obj->extra_flags,        fread_number( fp ) );
+                    KEY( "EconRev",     econRev,                 fread_number( fp ) );
 
                     if (!strcmp(word,"ExDe"))
                     {
@@ -2478,6 +2487,12 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                                 }
                             }
 
+                            // Economy migration, weight half: before placement, so the
+                            // carrier's carry weight adds the new weight.
+                            bool econStale = obj_econ_rev > 0 && econRev < obj_econ_rev
+                                             && obj_econ_migrate_fn != 0;
+                            bool econApplied = econStale && obj_econ_migrate_fn( obj, econRev, 0 );
+
                             Object *container = 0;
                             if (iNest > 0 && rgObjNest[iNest])
                                 container = rgObjNest[iNest-1];
@@ -2493,6 +2508,11 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             
                             if (FeniaManager::wrapperManager)
                                 FeniaManager::wrapperManager->linkWrapper( obj );
+
+                            // Cost half: needs the wrapper (personal shop psCost).
+                            if (econStale && obj_econ_migrate_fn != 0)
+                                econApplied = obj_econ_migrate_fn( obj, econRev, 1 ) && econApplied;
+                            obj->econRev = econApplied ? obj_econ_rev : econRev;
 
                             // Notify item load listeners such as weapon randomizer.
                             eventBus->publish(ItemReadEvent(obj));

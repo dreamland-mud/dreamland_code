@@ -392,13 +392,8 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
     if (( rc = DefaultWearlocation::canWear( ch, obj, flags ) ) != RC_WEAR_OK)
         return rc;
         
-    if (too_heavy_to_wield( ch, obj, false )) {
-        if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho(_("Ты не можешь этим вооружиться. Оно слишком тяжело для тебя."));
-            ch->recho(_("%^C1, кряхтя, пытается надеть %O4, но сил к сожалению не хватает."), ch, obj);
-        }
-        return RC_WEAR_HEAVY;
-    }
+    // No weight cap for the primary hand (weight-cost-sweep D9); the off hand
+    // keeps str_app.wield2, see SecondWieldWearloc::canWear.
 
     if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS)
         && !ch->is_npc( )

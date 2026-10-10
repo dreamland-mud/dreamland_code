@@ -619,6 +619,7 @@ Object *create_object_org(OBJ_INDEX_DATA *pObjIndex, short level, bool Count)
     obj->value3(pObjIndex->value[3]);
     obj->value4(pObjIndex->value[4]);
     obj->weight = pObjIndex->weight;
+    obj->econRev = obj_econ_rev;
     obj->extracted = false;
     obj->condition = pObjIndex->condition;
 
@@ -702,6 +703,7 @@ void clone_object(Object *parent, Object *clone)
     clone->wear_flags = parent->wear_flags;
     clone->weight = parent->weight;
     clone->cost = parent->cost;
+    clone->econRev = parent->econRev;
     clone->level = parent->level;
     clone->condition = parent->condition;
 
