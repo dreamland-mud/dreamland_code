@@ -658,6 +658,9 @@ SKILL_RUNP( forge )
         dup->extra_flags = blank->extra_flags;
         dup->condition   = blank->condition;
         dup->weight      = blank->weight;
+        // Worth what the blank was, not what the copied key was: otherwise a
+        // cheap blank turns into an expensive key a shop will buy.
+        dup->cost        = blank->cost;
         dup->value0(1);
         dup->value1(1);
         obj_to_char( dup, ch );

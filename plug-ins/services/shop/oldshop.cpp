@@ -284,6 +284,8 @@ CMDRUN( buy )
     deduct_cost( ch, cost * number );
     mprog_sell( keeper, ch, obj, cost, number );
 
+    int paid = cost;
+
     cost += keeper->silver;
     /* 'number' процентов от цены и кассы - в банк */
     dreamland->putToMerchantBank( cost * number / 100 );
@@ -317,8 +319,9 @@ CMDRUN( buy )
 
         obj_to_char( t_obj, ch );
 
-        if ( cost < t_obj->cost )
-            t_obj->cost = cost;
+        // The resale value is what was paid, so a bought item never sells at a profit.
+        if ( paid < t_obj->cost )
+            t_obj->cost = paid;
     }
 
     if (ch->getPC())
@@ -786,8 +789,10 @@ int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer t
 
         cost = 0;
     
+        // A keeper never pays more than the item's cost: with infinite shop
+        // stock, profitSell above 100 turns buy-and-resell into free gold.
         if (trader->buys.isSetBitNumber( obj->item_type ))
-            cost = obj->cost * trader->profitSell / 100;
+            cost = obj->cost * ::min( (int)trader->profitSell, 100 ) / 100;
 
         if( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) )
             for( obj2 = keeper->carrying; obj2; obj2 = obj2->next_content ) {
@@ -803,7 +808,7 @@ int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer t
         if( !obj->value1() ) 
             cost /= 4;
         else 
-            cost = cost * obj->value2() / obj->value1();
+            cost = cost * ::min( obj->value2(), obj->value1() ) / obj->value1();
     }
 
     return cost;
