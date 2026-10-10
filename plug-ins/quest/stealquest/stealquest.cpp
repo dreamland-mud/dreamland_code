@@ -420,7 +420,8 @@ void StealQuest::fillChest( PCharacter *pch, Object *chest )
             continue;
         if (obj->pIndexData->reset_num <= 0)
             continue;
-        if (obj->pIndexData->cost >= 10000) 
+        // The builder's "too valuable to hand out" line, not the model price.
+        if (obj->pIndexData->xml_cost >= 10000)
             continue;
         if (!IS_SET( obj->wear_flags, ITEM_TAKE ))
             continue;

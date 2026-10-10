@@ -501,7 +501,8 @@ NMI_GET( ObjectWrapper, weight, "вес предмета")
 NMI_SET( ObjectWrapper, weight, "вес предмета")
 {
     checkTarget( );
-    target->weight = arg.toNumber( );
+    // Through obj_set_weight: an item already carried keeps the carry weight right.
+    obj_set_weight( target, arg.toNumber( ) );
 }
 
 NMI_GET( ObjectWrapper, ave, "среднее повреждение оружия или 0")

@@ -19,6 +19,7 @@
 #include "plugininitializer.h"
 #include "logstream.h"
 #include "exception.h"
+#include "character.h"
 #include "wrapperbase.h"
 #include "stringset.h"
 #include "core/object.h"
@@ -40,10 +41,20 @@ CONFIGURABLE_LOADED(fight, item_weight)
     econ_config_loaded( );
 }
 
-/** Read-only view: the non-const operator[] would insert missing keys. */
+/** Read-only view: the non-const operator[] would insert missing keys, and a
+ *  file that is not an object reads as empty instead of throwing. */
 static const Json::Value & IW( )
 {
-    return itemWeightConfig;
+    static const Json::Value none;
+    return itemWeightConfig.isObject( ) ? itemWeightConfig : none;
+}
+
+/** Any wrong-typed config or builder data throws a std::exception (jsoncpp's
+ *  LogicError is not a ::Exception). Every entry point catches it, logs the
+ *  vnum and keeps the area-file value: a typo must not crash the boot. */
+static void econ_error( const char *what, int vnum, const std::exception &e )
+{
+    LogStream::sendError( ) << "Item economy: " << what << " of obj " << vnum << ": " << e.what( ) << endl;
 }
 
 static ItemProtoPointsFn protoPointsFn = 0;
@@ -61,6 +72,21 @@ static double json_num( const Json::Value &v, const char *key, double def )
     if (!v.isObject( ) || !v.isMember( key ) || !v[key].isNumeric( ))
         return def;
     return v[key].asDouble( );
+}
+
+static bool json_true( const Json::Value &v, const char *key )
+{
+    if (!v.isObject( ) || !v.isMember( key ))
+        return false;
+    const Json::Value &x = v[key];
+    return x.isBool( ) ? x.asBool( ) : (x.isNumeric( ) && x.asDouble( ) != 0);
+}
+
+static DLString json_str( const Json::Value &v, const char *key )
+{
+    if (!v.isObject( ) || !v.isMember( key ) || !v[key].isString( ))
+        return DLString::emptyString;
+    return v[key].asString( );
 }
 
 /** kg spec: a number, or {family: kg, default: kg}. */
@@ -91,7 +117,9 @@ static const Json::Value & econ_family( const material_t *mat )
 
     for (unsigned int i = 0; i < families.size( ); i++) {
         const Json::Value &f = families[i];
-        DLString match = f["match"].asString( );
+        if (!f.isObject( ))
+            continue;
+        DLString match = json_str( f, "match" );
         bitstring_t need = 0;
 
         if (!match.empty( )) {
@@ -130,8 +158,8 @@ static const Json::Value & econ_slot_entry( int wearFlags, bool withHold )
         return nullValue;
 
     for (unsigned int i = 0; i < slots.size( ); i++) {
-        DLString wear = slots[i]["wear"].asString( );
-        if (!withHold && wear == "hold")
+        DLString wear = json_str( slots[i], "wear" );
+        if (wear.empty( ) || (!withHold && wear == "hold"))
             continue;
         bitstring_t bit = wear_flags.bitstring( wear, true );
         if (bit == NO_FLAG || bit <= 0)
@@ -153,7 +181,7 @@ static const Json::Value & econ_entry( const EconShape &s, double &def )
 
     // A worn item of such a type (boots of water walking) weighs by its slot.
     if (s.itemType != ITEM_ARMOR && s.itemType != ITEM_CLOTHING
-        && typeEntry.isObject( ) && typeEntry["worn_uses_slot"].asBool( )) {
+        && json_true( typeEntry, "worn_uses_slot" )) {
         const Json::Value &slot = econ_slot_entry( s.wearFlags, false );
         if (!slot.isNull( )) {
             def = json_num( IW( ), "slot_default", 0.5 );
@@ -219,7 +247,8 @@ static int econ_weight( const EconShape &s )
     const Json::Value &blocks = IW( )["blocks"];
     if (blocks.isObject( ) && blocks.isMember( typeName.c_str( ) )) {
         const Json::Value &b = blocks[typeName.c_str( )];
-        if (b.isArray( ) && b.size( ) == 3) {
+        if (b.isArray( ) && b.size( ) == 3
+            && b[0].isNumeric( ) && b[1].isNumeric( ) && b[2].isNumeric( )) {
             double cm3 = b[0].asDouble( ) * b[1].asDouble( ) * b[2].asDouble( ) / 1000.0;
             double grams = 0;
             int i = 0;
@@ -259,7 +288,7 @@ static int econ_weight( const EconShape &s )
             break;
         const material_t *mat = material_by_name( m );
         const Json::Value &fam = econ_family( mat );
-        DLString famName = fam.isObject( ) ? DLString( fam["name"].asString( ) ) : DLString::emptyString;
+        DLString famName = json_str( fam, "name" );
         double famRho = json_num( fam, "rho", 0 );
         double base = kg_of( spec, famName, def );
         double ratio = 1.0;
@@ -287,7 +316,7 @@ static int econ_weight( const EconShape &s )
         }
     }
 
-    if (twoHands && !own2h && !(entry.isObject( ) && entry["inherent_2h"].asBool( )))
+    if (twoHands && !own2h && !json_true( entry, "inherent_2h" ))
         kg *= json_num( IW( ), "two_hands", 2.0 );
 
     if (entry.isObject( ) && entry.isMember( "max_kg" ))
@@ -309,28 +338,40 @@ static int prop_number( const DLString &v )
 
 int item_weight( Object *obj, const DLString &heft )
 {
-    EconShape s;
-    s.itemType = obj->item_type;
-    s.wearFlags = obj->wear_flags;
-    for (int i = 0; i < 5; i++)
-        s.value[i] = obj->valueByIndex( i );
-    s.material = obj->getMaterial( );
-    s.heft = heft.empty( ) ? obj->getProperty( "heft" ) : heft;
-    s.coverage = prop_number( obj->getProperty( "coverage" ) );
-    return econ_weight( s );
+    try {
+        EconShape s;
+        s.itemType = obj->item_type;
+        s.wearFlags = obj->wear_flags;
+        for (int i = 0; i < 5; i++)
+            s.value[i] = obj->valueByIndex( i );
+        s.material = obj->getMaterial( );
+        s.heft = heft.empty( ) ? obj->getProperty( "heft" ) : heft;
+        s.coverage = prop_number( obj->getProperty( "coverage" ) );
+        return econ_weight( s );
+    }
+    catch (const std::exception &e) {
+        econ_error( "weight", obj->pIndexData ? obj->pIndexData->vnum : 0, e );
+        return obj->weight;
+    }
 }
 
 int item_weight( obj_index_data *pObj, const DLString &heft )
 {
-    EconShape s;
-    s.itemType = pObj->item_type;
-    s.wearFlags = pObj->wear_flags;
-    for (int i = 0; i < 5; i++)
-        s.value[i] = pObj->value[i];
-    s.material = pObj->material;
-    s.heft = heft.empty( ) ? pObj->getProperty( "heft" ) : heft;
-    s.coverage = prop_number( pObj->getProperty( "coverage" ) );
-    return econ_weight( s );
+    try {
+        EconShape s;
+        s.itemType = pObj->item_type;
+        s.wearFlags = pObj->wear_flags;
+        for (int i = 0; i < 5; i++)
+            s.value[i] = pObj->value[i];
+        s.material = pObj->material;
+        s.heft = heft.empty( ) ? pObj->getProperty( "heft" ) : heft;
+        s.coverage = prop_number( pObj->getProperty( "coverage" ) );
+        return econ_weight( s );
+    }
+    catch (const std::exception &e) {
+        econ_error( "weight", pObj->vnum, e );
+        return pObj->xml_weight > 0 ? pObj->xml_weight : pObj->weight;
+    }
 }
 
 int item_proto_weight( obj_index_data *pObj )
@@ -511,7 +552,14 @@ int item_measure_cm( obj_index_data *pObj )
     return (int)min( 1000000.0, best * 100 + 0.5 );
 }
 
-int item_auto_cost( obj_index_data *pObj )
+/** Takeable and not coins: the only prototypes the scorer is asked about. */
+static bool econ_priced( obj_index_data *pObj )
+{
+    return IS_SET( pObj->wear_flags, ITEM_TAKE ) && pObj->item_type != ITEM_MONEY;
+}
+
+/** The auto price with the measure already known (the scorer runs once). */
+static int econ_auto_cost( obj_index_data *pObj, int measureCm )
 {
     int cap = item_cost_cap( );
 
@@ -523,8 +571,20 @@ int item_auto_cost( obj_index_data *pObj )
         return min( (long long)cap, max( 0LL, (long long)pObj->value[0] + 100LL * pObj->value[1] ) );
 
     long long base = item_base_cost( pObj );
-    long long magic = item_model_cost( item_measure_cm( pObj ), max( 0, pObj->level ) );
+    long long magic = item_model_cost( measureCm, max( 0, pObj->level ) );
     return (int)min( (long long)cap, base + magic );
+}
+
+int item_auto_cost( obj_index_data *pObj )
+{
+    try {
+        return econ_auto_cost( pObj, econ_priced( pObj ) ? item_measure_cm( pObj ) : 0 );
+    }
+    catch (const std::exception &e) {
+        // The cap makes min(auto, area cost) fall back to the area value.
+        econ_error( "auto cost", pObj->vnum, e );
+        return item_cost_cap( );
+    }
 }
 
 bool item_scripted( obj_index_data *pObj )
@@ -532,7 +592,15 @@ bool item_scripted( obj_index_data *pObj )
     if (pObj->behavior || !pObj->behaviors.empty( ))
         return true;
 
-    WrapperBase *w = get_wrapper( pObj->wrapper );
+    // An OLC copy has no wrapper of its own: ask the real prototype.
+    Scripting::Object *wrapper = pObj->wrapper;
+    if (wrapper == 0) {
+        obj_index_data *orig = get_obj_index( pObj->vnum );
+        if (orig != 0)
+            wrapper = orig->wrapper;
+    }
+
+    WrapperBase *w = get_wrapper( wrapper );
     if (w == 0)
         return false;
 
@@ -545,30 +613,39 @@ int item_proto_cost( obj_index_data *pObj )
 {
     int cap = item_cost_cap( );
 
-    // The model can not see what a script or a behavior does (a surprise egg is
-    // a container with no capacity): a scripted item it finds no stats in keeps
-    // the builder's price.
-    if (pObj->item_type != ITEM_MONEY && pObj->xml_cost > 0
-        && item_measure_cm( pObj ) == 0 && item_scripted( pObj ))
-        return min( pObj->xml_cost, cap );
+    try {
+        int measure = econ_priced( pObj ) ? item_measure_cm( pObj ) : 0;
 
-    // The area value is the most a prototype may cost: 0 stays 0 (D12 clamp).
-    int autoCost = item_auto_cost( pObj );
-    return min( min( autoCost, max( 0, pObj->xml_cost ) ), cap );
+        // The model can not see what a script or a behavior does (a surprise egg
+        // is a container with no capacity): a scripted item it finds no stats in
+        // keeps the builder's price.
+        if (pObj->item_type != ITEM_MONEY && pObj->xml_cost > 0
+            && measure == 0 && item_scripted( pObj ))
+            return min( pObj->xml_cost, cap );
+
+        // The area value is the most a prototype may cost: 0 stays 0 (D12 clamp).
+        int autoCost = econ_auto_cost( pObj, measure );
+        return min( min( autoCost, max( 0, pObj->xml_cost ) ), cap );
+    }
+    catch (const std::exception &e) {
+        econ_error( "cost", pObj->vnum, e );
+        return min( max( 0, pObj->xml_cost ), cap );
+    }
 }
 
 void item_economy_proto( obj_index_data *pObj )
 {
-    // Weight first: the material part of the price reads it.
-    pObj->weight = item_proto_weight( pObj );
-
     try {
+        // Weight first: the material part of the price reads it.
+        pObj->weight = item_proto_weight( pObj );
         pObj->cost = item_proto_cost( pObj );
     }
-    catch (const ::Exception &e) {
-        // A scorer failure must not lose the prototype: keep the area-file price.
-        LogStream::sendError( ) << "Item economy: cost of obj " << pObj->vnum << ": " << e.what( ) << endl;
-        pObj->cost = min( pObj->xml_cost, item_cost_cap( ) );
+    catch (const std::exception &e) {
+        // Keep the area-file values: a bad prototype must not stop the boot.
+        econ_error( "weight and cost", pObj->vnum, e );
+        if (pObj->xml_weight > 0)
+            pObj->weight = pObj->xml_weight;
+        pObj->cost = min( max( 0, pObj->xml_cost ), item_cost_cap( ) );
     }
 }
 
@@ -585,7 +662,14 @@ static void item_economy_boot( )
         for (obj_index_data *p = obj_index_hash[h]; p; p = p->next) {
             int oldW = p->weight, oldC = p->cost;
 
-            item_economy_proto( p );
+            try {
+                item_economy_proto( p );
+            }
+            catch (const std::exception &e) {
+                econ_error( "boot pass", p->vnum, e );
+                p->weight = oldW;
+                p->cost = oldC;
+            }
 
             total++;
             if (p->xml_weight <= 0)
@@ -644,7 +728,10 @@ static void econ_config_loaded( )
 
 static bool econ_vnum_exempt( int vnum )
 {
-    const Json::Value &list = IW( )["migration"]["weight_exempt_vnums"];
+    const Json::Value &m = IW( )["migration"];
+    if (!m.isObject( ))
+        return false;
+    const Json::Value &list = m["weight_exempt_vnums"];
     if (!list.isArray( ))
         return false;
     for (unsigned int i = 0; i < list.size( ); i++)
@@ -692,6 +779,15 @@ static bool econ_cost_exempt( Object *obj )
     WrapperBase *w = get_wrapper( obj->wrapper );
     if (w && w->hasField( "psCost" ))
         return true;
+
+    // On display at a personal shop (its mob carries the Fenia "shop" map):
+    // items put out before psCost existed (fenia 19e2aa01) have none.
+    Character *carrier = obj->getCarrier( );
+    if (carrier && carrier->is_npc( )) {
+        WrapperBase *cw = get_wrapper( carrier->wrapper );
+        if (cw && cw->hasField( "shop" ))
+            return true;
+    }
 
     return false;
 }
@@ -748,13 +844,14 @@ static bool item_econ_migrate_body( Object *obj, int savedRev, int stage )
     return apply;
 }
 
-/** fread_obj has no use for an exception: log it, leave the object as saved. */
+/** fread_obj has no use for an exception (it catches FileFormatException only):
+ *  log it, leave the object as saved. */
 static bool item_econ_migrate( Object *obj, int savedRev, int stage )
 {
     try {
         return item_econ_migrate_body( obj, savedRev, stage );
     }
-    catch (const ::Exception &e) {
+    catch (const std::exception &e) {
         LogStream::sendError( ) << "Item economy: migrating obj " << obj->pIndexData->vnum
                                 << " id " << obj->getID( ) << ": " << e.what( ) << endl;
         return false;
