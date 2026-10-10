@@ -180,10 +180,10 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
     case ITEM_CONTAINER:
         pKey = obj->value[2] > 0 ? get_obj_index(obj->value[2]) : 0;
         ch->pecho(
-            "[v0] Вместимость:[%d кг]\n\r"
+            "[v0] Вместимость:[%d фунтов]\n\r"
             "[v1] Флаги:      [%s] {D(? container_flags){x\n\r"
             "[v2] Ключ:       [%d] %N1\n\r"
-            "[v3] Макс. вес:  [%d]\n\r"
+            "[v3] Макс. вес:  [%d фунтов]\n\r"
             "[v4] Коэф. снижения веса: [%d]\n\r",
             obj->value[0],
             container_flags.names(obj->value[1]).c_str(),
