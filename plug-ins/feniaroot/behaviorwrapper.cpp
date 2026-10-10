@@ -143,6 +143,27 @@ NMI_GET(BehaviorWrapper, setAffects, "список (List) аффектов, ко
     return Register( sobj );
 }
 
+NMI_INVOKE(BehaviorWrapper, setAffectsAt, "(level): аффекты собранного набора, числовые бонусы которого пересчитаны на уровень level (props ref_level); без ref_level -- как setAffects")
+{
+    checkTarget();
+    int level = args2number(args);
+    RegList::Pointer rc(NEW);
+
+    SetBehavior *sb = dynamic_cast<SetBehavior *>(target);
+    if (sb) {
+        int ref = sb->getRefLevel();
+        for (auto &sa: sb->affects) {
+            Affect af;
+            sa.fillScaled(af, level, ref);
+            rc->push_back( AffectWrapper::wrap( af ) );
+        }
+    }
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate();
+    sobj->setHandler(rc);
+    return Register( sobj );
+}
+
 NMI_INVOKE(BehaviorWrapper, getSetMessage, "(lang): сообщение при сборке набора на языке lang (0=en,1=ru,2=ua); пусто для не-наборов")
 {
     checkTarget();
