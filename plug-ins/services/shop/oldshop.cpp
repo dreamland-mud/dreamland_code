@@ -808,7 +808,7 @@ int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer t
         if( !obj->value1() ) 
             cost /= 4;
         else 
-            cost = cost * obj->value2() / obj->value1();
+            cost = cost * ::min( obj->value2(), obj->value1() ) / obj->value1();
     }
 
     return cost;
