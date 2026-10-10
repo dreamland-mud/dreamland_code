@@ -732,6 +732,15 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     obj->setProperty("affixes", names.toString());
     obj->setProperty("measure_m", roller.getTotal());
 
+    // What craft refit needs to recompute the base at another level
+    // (weapon_refit_base): tier, the index bonuses and the two-hand share,
+    // each x1000 because Fenia has no floats.
+    obj->setProperty("wgen", DLString(valTier)
+        + " " + DLString((int)lround(hrIndexBonus * 1000))
+        + " " + DLString((int)lround(drIndexBonus * 1000))
+        + " " + DLString((int)lround(aveIndexBonus * 1000))
+        + " " + DLString((int)lround(aveMult * 1000)));
+
     return *this;
 }
 
@@ -1338,4 +1347,67 @@ DLString random_item_gender_tag(const DLString &gender)
 bool random_item_decline_ua(const DLString &word, const DLString &pos, const DLString &gtag, DLString &result)
 {
     return decline_ua(word, pos, gtag, result);
+}
+
+/** Base dice and hit/dam of a lottery weapon at another level, with the
+ *  generator's own index bonuses and two-hand share (the "wgen" prop written
+ *  by randomAffixes). A weapon made before the prop existed is rebuilt from
+ *  its "tier" and "affixes" props: one step per hr/dr/ave affix named there
+ *  (the stack count was never stored), and the two-hand share only for an
+ *  M-era weapon whose affixes name two_hands. The points generator before M
+ *  had no share, and its two_hands flag can't be trusted on a craft (the
+ *  prototype's hands are ORed back on). False if it is no lottery weapon.
+ */
+bool weapon_refit_base(Object *obj, int level, int &v1, int &v2, int &hr, int &dr)
+{
+    if (obj->item_type != ITEM_WEAPON)
+        return false;
+
+    int tier = 0, hrBonus = 0, drBonus = 0, aveBonus = 0, share = 1000;
+    DLString w = obj->getProperty("wgen");
+
+    if (!w.empty()) {
+        if (sscanf(w.c_str(), "%d %d %d %d %d", &tier, &hrBonus, &drBonus, &aveBonus, &share) != 5)
+            return false;
+    } else {
+        DLString t = obj->getProperty("tier");
+        if (t.empty() || !t.isNumber())
+            return false;
+        tier = t.toInt();
+
+        StringSet names;
+        names.fromString(obj->getProperty("affixes"));
+        const Json::Value &steps = item_affixes_config()["affects_by_tier"]["values"];
+        for (auto const &v: steps) {
+            DLString value = v["value"].asString();
+            if (value.empty() || names.count(value) == 0)
+                continue;
+            DLString norm = (value.at(0) == '-' || value.at(0) == '+') ? DLString(value.substr(1)) : value;
+            int step = (int)lround(v["step"].asFloat() * 1000);
+            if (norm == "hr")
+                hrBonus += step;
+            else if (norm == "dr")
+                drBonus += step;
+            else if (norm == "ave")
+                aveBonus += step;
+        }
+
+        if (!obj->getProperty("measure_m").empty() && names.count("two_hands") > 0)
+            share = (int)lround(max(1.0f, weapon_m_config()["two_hand_k"].asFloat()) * 1000);
+        // The points generator gave a two-handed prototype one ave step.
+        if (obj->getProperty("measure_m").empty() && IS_SET(obj->pIndexData->value[4], WEAPON_TWO_HANDS))
+            aveBonus += 1000;
+    }
+
+    if (tier < BEST_TIER || tier > WORST_TIER || share <= 0)
+        return false;
+
+    level = URANGE(1, level, MAX_LEVEL);
+    float mult = share / 1000.0f;
+    WeaponCalculator calc(tier, level, obj->value0(), aveBonus / 1000.0f, mult);
+    v1 = calc.getValue1();
+    v2 = calc.getValue2();
+    hr = WeaponCalculator(tier, level, obj->value0(), hrBonus / 1000.0f).getDamroll();
+    dr = (int)(WeaponCalculator(tier, level, obj->value0(), drBonus / 1000.0f).getDamroll() * mult);
+    return true;
 }

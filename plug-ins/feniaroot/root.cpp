@@ -1725,6 +1725,22 @@ NMI_INVOKE(Root, bestWeaponClass, "(ch): класс оружия, раскача
     return Register(best_weapon_class(ch->getPC()));
 }
 
+NMI_INVOKE(Root, weaponRefitBase, "(weapon, level): базовые value1, value2, hitroll и damroll оружия из генератора на уровне level, с его собственными поправками (List из 4 чисел); пустой List, если оружие не из генератора")
+{
+    ::Object *obj = argnum2item(args, 1);
+    int level = argnum2number(args, 2);
+    RegList::Pointer list(NEW);
+    int v1, v2, hr, dr;
+
+    if (weapon_refit_base(obj, level, v1, v2, hr, dr)) {
+        list->push_back(Register(v1));
+        list->push_back(Register(v2));
+        list->push_back(Register(hr));
+        list->push_back(Register(dr));
+    }
+    return wrap(list);
+}
+
 NMI_INVOKE(Root, weaponBaseRoll, "(tier, level, wclass): базовый hitroll/damroll оружия этого tier, уровня и класса по таблице weapon_damroll_tiers; цель для enchant weapon и temper")
 {
     int tier = argnum2number(args, 1);

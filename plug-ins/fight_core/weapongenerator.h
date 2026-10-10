@@ -169,4 +169,7 @@ bool weapon_class_exists(const DLString &name);
 DLString best_weapon_class(PCharacter *pch);
 
 
+/** Base dice and hit/dam of a lottery weapon at another level (craft refit). */
+bool weapon_refit_base(Object *obj, int level, int &v1, int &v2, int &hr, int &dr);
+
 #endif
