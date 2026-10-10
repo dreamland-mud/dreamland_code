@@ -116,8 +116,12 @@ bool Walkment::canLeaveMaster( Character *wch )
         return true;
     
     msgSelfParty( wch, 
+                  "What? And leave your master?",
                   "Что? И покинуть своего хозяина?",
-                  "%^C1 не может покинуть своего хозяина." );
+                  "Що? І покинути свого господаря?",
+                  "%^C1 won't leave the master.",
+                  "%^C1 не может покинуть своего хозяина.",
+                  "%^C1 не може покинути свого господаря." );
     return false;
 }
 
@@ -226,8 +230,12 @@ bool Walkment::checkPositionHorse( )
 
     if (horse->position <= POS_RESTING) {
         msgSelfParty( horse,
+                      "You have to be standing to move!",
                       "Исходное положение для передвижения -- стоя!",
-                      "%2$^C1 долж%2$Gно|ен|на сначала встать." );
+                      "Щоб рушити, треба спершу стати на ноги!",
+                      "%2$^C1 must stand up first.",
+                      "%2$^C1 долж%2$Gно|ен|на сначала встать.",
+                      "%2$^C1 має спершу встати." );
         return false;
     }
 
@@ -238,8 +246,12 @@ bool Walkment::checkPositionRider( )
 {
     if (rider->fighting) {
         msgSelfMaster( ch, 
+                       "Your rider is fighting! Throw them off first.",
                        "Твой седок сражается! Сбрось его для начала.",
-                       "Седок %1$C2 сражается, прикажи его сбросить!" );
+                       "Твій вершник б'ється! Скинь його спершу.",
+                       "The rider of %1$C2 is fighting -- order it to throw them off!",
+                       "Седок %1$C2 сражается, прикажи его сбросить!",
+                       "Вершник %1$C2 б'ється, накажи його скинути!" );
         return false;
     }
 
@@ -325,8 +337,12 @@ bool Walkment::checkTrap( Character *wch )
 {
     if (wch->death_ground_delay > 0 && wch->trap.isSet( TF_NO_MOVE )) {
         msgSelfParty( wch, 
+                     "You can't leave this place without help!",
                      "Ты не можешь покинуть это место без посторонней помощи!",
-                     "%2$^C1 не может покинуть это место без посторонней помощи!" );
+                     "Ти не можеш покинути це місце без сторонньої допомоги!",
+                     "%2$^C1 can't leave this place without help!",
+                     "%2$^C1 не может покинуть это место без посторонней помощи!",
+                     "%2$^C1 не може покинути це місце без сторонньої допомоги!" );
         return false;
     }
 
@@ -338,8 +354,12 @@ bool Walkment::checkVisibility( Character *wch )
 {
     if (!wch->can_see( to_room )) {
         msgSelfParty( wch,
+                      "Sorry, but you can't go there.",
                       "Жаль, но ты не можешь туда идти.",
-                      "Жаль, но %2$C1 не может туда идти." );
+                      "Шкода, але ти не можеш туди йти.",
+                      "Sorry, but %2$C1 can't go there.",
+                      "Жаль, но %2$C1 не может туда идти.",
+                      "Шкода, але %2$C1 не може туди йти." );
         return false;
     }
 
@@ -353,8 +373,12 @@ bool Walkment::checkSafe( Character *wch )
         
     if (IS_BLOODY(wch)) {
         msgSelfRoom( wch, 
+                     "Divine powers won't let you go in there in this state.",
                      "Божественные силы не позволяют тебе войти туда в таком состоянии.",
-                     "%2$^C1 предпринимает героическую... и бесполезную попытку войти в комнату." );
+                     "Божественні сили не дозволяють тобі увійти туди в такому стані.",
+                     "%2$^C1 makes a heroic... and useless attempt to enter the room.",
+                     "%2$^C1 предпринимает героическую... и бесполезную попытку войти в комнату.",
+                     "%2$^C1 робить героїчну... і марну спробу увійти до кімнати." );
         return false;
     }
 
@@ -390,15 +414,23 @@ bool Walkment::checkGuild( Character *wch )
     
     if (!to_room->pIndexData->guilds.isSet( wch->getProfession( ) )) {        
         msgSelfParty( wch, 
-                      "Ты не можешь войти в чужую гильдию.", 
-                      "%2$^C1 не может войти в чужую гильдию." );
+                      "You can't enter another class's guild.",
+                      "Ты не можешь войти в чужую гильдию.",
+                      "Ти не можеш увійти до чужої гільдії.",
+                      "%2$^C1 can't enter another class's guild.",
+                      "%2$^C1 не может войти в чужую гильдию.",
+                      "%2$^C1 не може увійти до чужої гільдії." );
         return false;
     }
 
     if (IS_BLOODY(wch)) {
         msgSelfParty( wch, 
+                      "Your guild can't shelter you right now.",
                       "Твоя гильдия не может сейчас служить тебе укрытием.",
-                      "Гильдия не может сейчас служить укрытием для %2$C2." );
+                      "Твоя гільдія не може зараз бути тобі прихистком.",
+                      "The guild can't shelter %2$C4 right now.",
+                      "Гильдия не может сейчас служить укрытием для %2$C2.",
+                      "Гільдія не може зараз бути прихистком для %2$C2." );
         return false;
     }
     
@@ -432,12 +464,20 @@ bool Walkment::checkAir( Character *wch )
 
     if (would_fly)
         msgSelfParty(wch, 
-                    "Сначала тебе надо {y{hcвзлететь{x.", 
-                    "%2$^C1 долж%2$Gно|ен|на сначала взлететь.");
+                    "You need to {y{hcfly{x first.",
+                    "Сначала тебе надо {y{hcвзлететь{x.",
+                    "Спершу тобі треба {y{hcзлетіти{x.",
+                    "%2$^C1 must fly first.",
+                    "%2$^C1 долж%2$Gно|ен|на сначала взлететь.",
+                    "%2$^C1 має спершу злетіти." );
     else
         msgSelfParty( wch, 
-                    "Ты не умеешь летать.", 
-                    "%2$^C1 не умеет летать." );
+                    "You can't fly.",
+                    "Ты не умеешь летать.",
+                    "Ти не вмієш літати.",
+                    "%2$^C1 can't fly.",
+                    "%2$^C1 не умеет летать.",
+                    "%2$^C1 не вміє літати." );
     return false;
 }
 
@@ -531,8 +571,12 @@ bool Walkment::checkRoomCapacity( Character *wch )
 
     if (capacity < (RIDDEN(wch) ? 2 : 1)) {
         msgSelfParty( wch, 
+                      "There's no room for you there now.",
                       "Для тебя нет там сейчас места.",
-                      "Для вас с %2$^C5 нет там сейчас места." );
+                      "Для тебе там зараз немає місця.",
+                      "There's no room there for you and %2$C5 now.",
+                      "Для вас с %2$^C5 нет там сейчас места.",
+                      "Для вас з %2$C5 там зараз немає місця." );
         return false;
     }
 
@@ -588,8 +632,12 @@ bool Walkment::applyMovepoints( Character *wch )
 
     if (wch->move < move) {
         msgSelfParty( wch,
+                      "You are too tired.",
                       "Ты слишком уста%1$Gло|л|ла.",
-                      "%2$^C1 слишком уста%2$Gло|л|ла." );
+                      "Ти надто втоми%1$Gлося|вся|лася.",
+                      "%2$^C1 is too tired.",
+                      "%2$^C1 слишком уста%2$Gло|л|ла.",
+                      "%2$^C1 надто втоми%2$Gлося|вся|лася." );
         return false;
     }
 
@@ -601,8 +649,12 @@ bool Walkment::checkMovepoints( Character *wch )
 {
     if (wch->move < getMoveCost( wch )) {
         msgSelfParty( wch,
+                      "You don't have the strength to move your legs.",
                       "У тебя не хватает сил шевелить ногами.",
-                      "У %2$C2 не хватает сил шевелить ногами." );
+                      "У тебе не вистачає сил ворушити ногами.",
+                      "%2$^C1 lacks the strength to move on.",
+                      "У %2$C2 не хватает сил шевелить ногами.",
+                      "У %2$C2 не вистачає сил ворушити ногами." );
         return false;
     }
     return true;
