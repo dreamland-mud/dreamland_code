@@ -5396,9 +5396,13 @@ static double ga_setValue( Character *target, SetBehavior *sb, const GAWeights &
 {
     double s = 0;
     int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
+    // Level-scaled sets (props ref_level, craft audit D5) are valued at the
+    // char's level with the formula eqset applies (eqset uses the lowest
+    // worn piece level instead, so a worn set can differ).
+    int ref = sb->getRefLevel( );
     for (auto &sa: sb->affects) {
         Affect af;
-        sa.fill( af );
+        sa.fillScaled( af, target->getLevel( ), ref );
         // A set bonus is a chase reward (candidate), so it gets the redundancy check too.
         ga_accumAffect( af, w, s, statDelta, target, false );
     }

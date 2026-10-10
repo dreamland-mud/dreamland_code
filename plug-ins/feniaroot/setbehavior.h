@@ -46,6 +46,11 @@ public:
     // Populate a runtime Affect's location/modifier/bits/global. Leaves
     // type/level/duration to the caller (Fenia sets type="set <X>", -2, level).
     void fill( Affect & ) const;
+    // fill(), then scale a numeric bonus (hp, mana, move, damroll, hitroll,
+    // ac, saves, heal/mana gain) by level / refLevel, keeping its sign and
+    // at least 1. Stats, skill levels and flags stay as authored. refLevel
+    // <= 0 means the set does not scale (craft audit D5).
+    void fillScaled( Affect &, int level, int refLevel ) const;
 
     XML_VARIABLE XMLFlagsWithTable bits;
     XML_VARIABLE SetApply apply;
@@ -61,6 +66,9 @@ public:
 
     // Completion message in the viewer's language (falls back RU->EN).
     const DLString & getMsgComplete( lang_t lang = LANG_DEFAULT ) const;
+    // props "ref_level": the level the <affects> are authored at; 0 when the
+    // set has none and its bonus is flat (quest sets).
+    int getRefLevel( ) const;
 
     XML_VARIABLE XMLListBase<SetAffect> affects;
     XML_VARIABLE XMLMultiString msgComplete;

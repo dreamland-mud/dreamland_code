@@ -7,6 +7,8 @@
 #include "affectflags.h"
 #include "merc.h"
 
+#include <algorithm>
+
 /*********************************************************************
  * SetApply -- mirror of areas' XMLApply
  *********************************************************************/
@@ -49,9 +51,42 @@ SetAffect::fill( Affect &af ) const
     af.modifier = apply.getValue( );
 }
 
+void
+SetAffect::fillScaled( Affect &af, int level, int refLevel ) const
+{
+    fill( af );
+
+    if (refLevel <= 0 || level <= 0 || af.modifier == 0)
+        return;
+
+    switch (apply.location) {
+    case APPLY_HIT: case APPLY_MANA: case APPLY_MOVE:
+    case APPLY_DAMROLL: case APPLY_HITROLL: case APPLY_AC:
+    case APPLY_SAVES: case APPLY_SAVING_SPELL:
+    case APPLY_HEAL_GAIN: case APPLY_MANA_GAIN:
+        break;
+    default:
+        return;
+    }
+
+    int v = af.modifier;
+    int a = (v < 0 ? -v : v);
+    int scaled = std::max( 1, (a * level + refLevel / 2) / refLevel );
+    af.modifier = (v < 0 ? -scaled : scaled);
+}
+
 /*********************************************************************
  * SetBehavior
  *********************************************************************/
+int
+SetBehavior::getRefLevel( ) const
+{
+    if (!props.isObject( ) || !props.isMember( "ref_level" ))
+        return 0;
+    const Json::Value &v = props["ref_level"];
+    return v.isInt( ) ? v.asInt( ) : 0;
+}
+
 const DLString &
 SetBehavior::getMsgComplete( lang_t lang ) const
 {
