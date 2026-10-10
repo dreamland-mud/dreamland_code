@@ -12,7 +12,20 @@
 #include "behaviorloader.h"
 #include "setbehavior.h"
 #include "mocregistrator.h"
+#include "itemeconomy.h"
+#include "plugin.h"
 #include "so.h"
+
+// Gear-sage scorer of a prototype (characterwrapper.cpp).
+double ga_proto_points( obj_index_data *pObj, bool caster );
+
+/** Hands the prototype scorer to the item price model (fight_core); cleared on
+ *  unload so fight_core never calls into an unloaded plugin. */
+class ItemProtoPointsHook : public Plugin {
+public:
+    virtual void initialization( ) { item_set_proto_points_fn( &ga_proto_points ); }
+    virtual void destruction( )    { item_set_proto_points_fn( 0 ); }
+};
 
 extern "C"
 {
@@ -29,6 +42,7 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<DefaultBehavior> >(ppl);
         Plugin::registerPlugin<MocRegistrator<SetBehavior> >(ppl);
         Plugin::registerPlugin<BehaviorLoader>(ppl);
+        Plugin::registerPlugin<ItemProtoPointsHook>(ppl);
         
         return ppl;
     }

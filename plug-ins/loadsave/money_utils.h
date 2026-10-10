@@ -11,6 +11,9 @@ namespace Money {
 
     Object *create( int gold, int silver );
 
+    /** Weight of coins in 1/10 lb, carried or in a pile. */
+    int weight( int gold, int silver );
+
     DLString describe( int gold, int silver, const Grammar::Case &gcase, lang_t lang = LANG_DEFAULT );
 
     bool parse( Character *ch, const char *arg, int amount, int &gold, int &silver );

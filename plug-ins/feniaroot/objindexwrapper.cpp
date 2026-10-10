@@ -9,6 +9,7 @@
 #include "merc.h"
 #include "json_utils_ext.h"
 #include "loadsave.h"
+#include "itemeconomy.h"
 #include "behavior.h"
 #include "string_utils.h"
 
@@ -158,7 +159,7 @@ NMI_SET( ObjIndexWrapper, count, "кол-во экземпляров предм�
     target->count = arg.toNumber();
 }
 
-NMI_GET( ObjIndexWrapper, weight , "вес предмета") 
+NMI_GET( ObjIndexWrapper, weight , "вес предмета в 1/10 фунта: из файла зоны или по модели веса") 
 { 
     checkTarget( ); 
     return target->weight;
@@ -176,10 +177,12 @@ NMI_GET( ObjIndexWrapper, cost , "цена в серебре")
     return target->cost;
 }
 
-NMI_SET( ObjIndexWrapper, cost , "цена в серебре") 
+NMI_SET( ObjIndexWrapper, cost , "цена в серебре: как <cost> в файле зоны, модель цены может ее только понизить") 
 { 
     checkTarget( ); 
-    target->cost = arg.toNumber();
+    int cost = arg.toNumber();
+    target->xml_cost = cost > 0 ? cost : 0;
+    item_economy_proto( target );
 }
 
 #define GETVALUE(x) \
@@ -200,6 +203,9 @@ NMI_INVOKE(ObjIndexWrapper, create, "(): создать экземпляр пр�
 
     checkTarget( );
     obj = ::create_object( target , target->level );
+    // create_object prices a non-zero level by number_fuzzy(level); a script
+    // item is worth what its prototype is (weight-cost-sweep bug 1).
+    obj->cost = target->cost;
     obj_to_room( obj, get_room_instance( ROOM_VNUM_FENIA_STORAGE ) );
     return WrapperManager::getThis( )->getWrapper( obj );
 }

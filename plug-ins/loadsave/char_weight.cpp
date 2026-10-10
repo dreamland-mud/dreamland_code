@@ -6,6 +6,7 @@
 #include "pcharacter.h"
 #include "wearlocation.h"
 #include "char_weight.h"
+#include "money_utils.h"
 
 #include "stats_apply.h"
 #include "merc.h"
@@ -38,6 +39,6 @@ int Char::canCarryWeight(Character *ch)
 
 int Char::getCarryWeight(Character *ch)
 {
-    return ch->carry_weight + ch->silver / 12 + ch->gold * 2 / 5;
+    return ch->carry_weight + Money::weight( ch->gold, ch->silver );
 }
 

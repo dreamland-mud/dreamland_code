@@ -67,6 +67,8 @@ void        obj_from_char        ( Object *obj );
 void        obj_from_room        ( Object *obj );
 void        obj_to_room        ( Object *obj, Room *pRoomIndex );
 void        obj_to_obj        ( Object *obj, Object *obj_to );
+/** Change an object's own weight in place, keeping its carrier's carry weight right. */
+void        obj_set_weight    ( Object *obj, int weight );
 void        obj_to_obj_random( Object *item, Object *obj_to );
 void        obj_from_obj        ( Object *obj );
 void obj_dump_content(Object *obj);

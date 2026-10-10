@@ -4,6 +4,7 @@
  */
 #include "stats_apply.h"
 #include <vector>
+#include <climits>
 #include <jsoncpp/json/json.h>
 
 #include "configurable.h"
@@ -69,6 +70,8 @@ void str_app_type::fromJson(const Json::Value &value)
     hit = value["hit"].asInt();
     carry = value["carry"].asInt();
     wield = value["wield"].asInt();
+    // A table without the column keeps the old off-hand cap.
+    wield2 = value.isMember("wield2") ? value["wield2"].asInt() : wield * 5;
     web = value["web"].asInt();
     damage = value["damage"].asInt();    
 }
@@ -110,11 +113,17 @@ static bool is_native_weapon( Character *ch, Object *obj )
 
 int wield_weight_cap( Character *ch, bool secondary )
 {
-    return get_str_app(ch).wield * (secondary ? 5 : 10);
+    if (!secondary)
+        return INT_MAX;
+
+    return get_str_app(ch).wield2;
 }
 
 bool too_heavy_to_wield( Character *ch, Object *obj, bool secondary )
 {
+    if (!secondary)
+        return false;
+
     int cap = wield_weight_cap( ch, secondary );
 
     return obj->getWeight( ) > cap && !is_native_weapon( ch, obj );

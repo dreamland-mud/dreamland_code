@@ -46,6 +46,13 @@ void Money::dematerialize( Object *list, int &gold, int &silver )
     }
 }
 
+/* One coin weight everywhere (weight-cost-sweep D7): a pile weighs what the same
+ * coins weigh in a purse. A gold coin is 2/5 of a unit (18 g), a silver one 1/12. */
+int Money::weight( int gold, int silver )
+{
+    return gold * 2 / 5 + silver / 12;
+}
+
 /*
  * Create a 'money' obj.
  */
@@ -81,7 +88,7 @@ Object * Money::create( int gold, int silver )
                              << " монет|" << GET_COUNT(gold, "а|и|і|у|ою|і", "и||ам|и|ами|ах", "||ам||ами|ах"); obj->setShortDescr( s, LANG_UA ); }
         obj->value1(gold);
         obj->cost               = 100 * gold;
-        obj->weight                = gold/5;
+        obj->weight                = Money::weight( gold, 0 );
     }
     else if (gold == 0)
     {
@@ -95,7 +102,7 @@ Object * Money::create( int gold, int silver )
                              << " монет|" << GET_COUNT(silver, "а|и|і|у|ою|і", "и||ам|и|ами|ах", "||ам||ами|ах"); obj->setShortDescr( s, LANG_UA ); }
         obj->value0(silver);
         obj->cost               = silver;
-        obj->weight                = silver/20;
+        obj->weight                = Money::weight( 0, silver );
     }
 
     else
@@ -113,7 +120,7 @@ Object * Money::create( int gold, int silver )
         obj->value0(silver);
         obj->value1(gold);
         obj->cost                = 100 * gold + silver;
-        obj->weight                = gold / 5 + silver / 20;
+        obj->weight                = Money::weight( gold, silver );
     }
 
     // The coin noun agrees with the last-mentioned count, so the verb must too:

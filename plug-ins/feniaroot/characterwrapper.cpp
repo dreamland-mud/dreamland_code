@@ -5695,6 +5695,27 @@ double ga_item_points( ::Object *o, bool caster )
     return ga_score( 0, o, w, rawStat, capStat, false );
 }
 
+// Item economy (fight_core itemeconomy.cpp): a PROTOTYPE's base value, the same
+// scorer as .itemPoints on the prototype itself. No char, so no cleric compound
+// (ga_clericCanCompound reads the char).
+double ga_proto_points( obj_index_data *pObj, bool caster )
+{
+    GAWeights w;
+    item_weights( w, caster, pObj->level );
+    int rawStat[6], capStat[6];
+    for (int k = 0; k < 6; k++) {
+        rawStat[k] = 500;
+        capStat[k] = 1000;
+    }
+    int sn = 0, ave = 0;
+    if (pObj->item_type == ITEM_WEAPON) {
+        sn  = get_weapon_sn( pObj );
+        ave = weapon_ave( pObj );
+    }
+    return ga_scoreCore( 0, w, pObj->affected, 0, pObj->item_type, sn, ave, false,
+                         pObj, rawStat, capStat, false );
+}
+
 // Root .itemScore and ch.gearTerms: an item scored for one char the way gearAdvice
 // scores a candidate (base x fit): same weights, stat caps, spell factor, weapon skill,
 // and the flags and resists the char already holds from perma affects and worn gear

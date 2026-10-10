@@ -40,6 +40,7 @@
 #include "behavior.h"
 
 #include "loadsave.h"
+#include "itemeconomy.h"
 
 #include "olc.h"
 #include "security.h"
@@ -103,6 +104,8 @@ void OLCStateObject::copyParameters( OBJ_INDEX_DATA *original )
     obj.condition    = original->condition;
     obj.weight       = original->weight;
     obj.cost         = original->cost;
+    obj.xml_weight   = original->xml_weight;
+    obj.xml_cost     = original->xml_cost;
     obj.limit        = original->limit;
     memcpy(obj.value, original->value, sizeof(obj.value));
 }
@@ -178,12 +181,6 @@ void OLCStateObject::commit()
             
             if(o->condition == original->condition)
                 o->condition = obj.condition;
-            
-            if(o->weight == original->weight)
-                o->weight = obj.weight;
-
-            if(o->cost == original->cost)
-                o->cost = obj.cost;
            
             for (int i = 0; i < 5; i++)
                 if (o->getsValueFromProto(i) && o->valueByIndex(i) == original->value[i])
@@ -207,8 +204,8 @@ void OLCStateObject::commit()
     original->level        = obj.level;
     original->condition    = obj.condition;
     original->gram_gender  = obj.gram_gender;
-    original->weight       = obj.weight;
-    original->cost         = obj.cost;
+    original->xml_weight   = obj.xml_weight;
+    original->xml_cost     = obj.xml_cost;
     memcpy(original->value, obj.value, sizeof(obj.value));
     original->limit        = obj.limit;
 
@@ -216,6 +213,22 @@ void OLCStateObject::commit()
     original->behaviors.set(obj.behaviors);
     original->props.clear();
     JsonUtils::copy(original->props, obj.props);
+
+    // Weight and cost come from the item models on the finished prototype (its
+    // material, values, props); instances still at the old values follow.
+    int oldWeight = original->weight, oldCost = original->cost;
+    item_economy_proto(original);
+    obj.weight = original->weight;
+    obj.cost = original->cost;
+
+    for(o = object_list; o; o = o->next)
+        if(o->pIndexData == original) {
+            if(o->weight == oldWeight)
+                obj_set_weight(o, original->weight);
+
+            if(o->cost == oldCost)
+                o->cost = original->cost;
+        }
 
     for(o = object_list; o; o = o->next)
         if(o->pIndexData == original) {
@@ -267,10 +280,16 @@ OEDIT(show)
 
     ptc(ch, "Condition:[%5d]\n\r", pObj->condition);
     ptc(ch, "Gender:   [%1s]\n\r", pObj->gram_gender.toString());
-    ptc(ch, "Weight:   [%5d]\n\r", pObj->weight);
+    if (pObj->xml_weight > 0)
+        ptc(ch, "Weight:   [%5d] {D(set; model %d, 'weight 0' = model){x\n\r", pObj->xml_weight, item_weight(pObj));
+    else
+        ptc(ch, "Weight:   [%5d] {D(model){x\n\r", item_proto_weight(pObj));
     
-    if (!pObj->behaviors.isSet(bhv_random_weapon))
-        ptc(ch, "Cost:     [%5d]\n\r", pObj->cost);
+    if (!pObj->behaviors.isSet(bhv_random_weapon)) {
+        int autoCost = item_auto_cost(pObj);
+        ptc(ch, "Cost:     [%5d] {D(set %d, model %d: the lower one counts, a scripted item with no stats keeps the set one){x\n\r",
+            item_proto_cost(pObj), pObj->xml_cost, autoCost);
+    }
 
     if (!pObj->extraDescriptions.empty()) {
 
@@ -783,14 +802,17 @@ OEDIT(v4)
     return oedit_values(ch, argument, 4);
 }
 
+// Both edit the area-file value: weight > 0 overrides the model (0 = the model),
+// cost is the most the item may cost (the model only lowers it). The effective
+// values follow on commit.
 OEDIT(weight)
 {
-    return numberEdit(0, 10000, obj.weight);
+    return numberEdit(0, 10000, obj.xml_weight);
 }
 
 OEDIT(cost)
 {
-    return numberEdit(0, 1000000, obj.cost);
+    return numberEdit(0, 1000000, obj.xml_cost);
 }
 
 OEDIT(create)

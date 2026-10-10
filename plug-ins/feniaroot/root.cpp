@@ -34,6 +34,7 @@
 #include "weaponcalculator.h"
 #include "armorgenerator.h"
 #include "itemmodel.h"
+#include "itemeconomy.h"
 #include "damage.h"
 #include "weapontier.h"
 #include "act.h"
@@ -1757,6 +1758,39 @@ NMI_INVOKE(Root, itemPoints, "(obj, profile): базовая ценность п
     DLString profile = argnum2string(args, 2);
 
     return Register((int)std::round(ga_item_points(obj, profile == "caster")));
+}
+
+// An object or a prototype from one argument (gearTerms does the same).
+static void arg2item_or_proto( const Register &r, ::Object *&obj, obj_index_data *&pObj )
+{
+    obj = 0;
+    pObj = 0;
+    if (r.type == Register::OBJECT) {
+        ObjIndexWrapper *iw = r.toHandler( ).getDynamicPointer<ObjIndexWrapper>( );
+        if (iw)
+            pObj = iw->getTarget( );
+    }
+    if (pObj == 0)
+        obj = arg2item( r );
+}
+
+NMI_INVOKE(Root, itemWeight, "(obj[, heft]): вес предмета или прототипа по модели веса (fight/item_weight.json), в 1/10 фунта; heft light|medium|heavy вместо своего; без учета <weight> из файла зоны")
+{
+    ::Object *obj;
+    obj_index_data *pObj;
+    arg2item_or_proto( argnum( args, 1 ), obj, pObj );
+    DLString heft = args.size( ) > 1 ? argnum2string( args, 2 ) : DLString::emptyString;
+
+    return Register( obj ? item_weight( obj, heft ) : item_weight( pObj, heft ) );
+}
+
+NMI_INVOKE(Root, itemAutoCost, "(obj): цена прототипа (или прототипа предмета) по модели цены, в серебре: min(cap, база + 7 x M x level), без учета <cost> из файла зоны")
+{
+    ::Object *obj;
+    obj_index_data *pObj;
+    arg2item_or_proto( argnum( args, 1 ), obj, pObj );
+
+    return Register( item_auto_cost( obj ? obj->pIndexData : pObj ) );
 }
 
 NMI_INVOKE(Root, itemScore, "(obj, ch, profile): ценность предмета для персонажа ch так, как ее считает мудрец (service advice): база с поправками на статы, навыки и уже имеющиеся флаги; profile caster|melee")

@@ -19,6 +19,7 @@ struct        str_app_type
     int        hit;
     int        carry;
     int        wield;
+    int        wield2;     // off-hand weapon weight cap, 1/10 lb
     int web;
     int damage;
 
@@ -55,12 +56,14 @@ const struct wis_app_type & get_wis_app( Character * );
 const struct dex_app_type & get_dex_app( Character * );
 
 /*
- * Weapon weight vs strength: the primary hand holds up to str_app.wield*10,
- * the secondary hand half of that. Uncharmed NPCs are exempt for weapons
- * from their own zone unless their strength is debuffed.
+ * Weapon weight vs strength: only the off hand has a cap, str_app.wield2
+ * (weight-cost-sweep D9/D10: with real weapon weights the primary hand holds
+ * anything). Uncharmed NPCs are exempt for weapons from their own zone unless
+ * their strength is debuffed.
  */
 bool too_heavy_to_wield( Character *ch, Object *obj, bool secondary );
-/* The weight cap too_heavy_to_wield tests against (before the NPC exemption). */
+/* The weight cap too_heavy_to_wield tests against (before the NPC exemption);
+ * the primary hand answers no cap at all (INT_MAX). */
 int wield_weight_cap( Character *ch, bool secondary );
 
 

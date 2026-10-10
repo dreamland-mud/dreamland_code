@@ -33,8 +33,10 @@ XMLObjectFactory::init(const obj_index_data *obj)
     type.type = obj->item_type;
     copy(obj->value, obj->value+5, type.v);
     level.setValue(obj->level);
-    weight.setValue(obj->weight);
-    cost.setValue(obj->cost);
+    // The raw area-file values, not the computed ones: 0 (auto) stays out of
+    // the file, so a model change reaches every auto prototype at the next boot.
+    weight.setValue(obj->xml_weight);
+    cost.setValue(obj->xml_cost);
     condition.setValue(obj->condition);
     extra_flags.setValue(obj->extra_flags);
     wear_flags.setValue(obj->wear_flags);
@@ -89,8 +91,12 @@ XMLObjectFactory::compat(obj_index_data *obj)
     obj->item_type = type.type;
     copy(type.v, type.v + 5, obj->value);
     obj->level = level.getValue( );
-    obj->weight = weight.getValue( );
-    obj->cost = cost.getValue( );
+    // Effective values start as the raw ones; the item economy boot pass
+    // (fight_core itemeconomy.cpp) computes the auto ones once all areas are in.
+    obj->xml_weight = weight.getValue( );
+    obj->xml_cost = cost.getValue( );
+    obj->weight = obj->xml_weight;
+    obj->cost = obj->xml_cost;
     obj->condition = condition.getValue( );
     obj->extra_flags = extra_flags.getValue( );
     obj->wear_flags = wear_flags.getValue( );

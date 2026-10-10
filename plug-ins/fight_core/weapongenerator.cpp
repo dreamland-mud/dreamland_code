@@ -9,6 +9,7 @@
 #include "armorgenerator.h"
 #include "itemvalue.h"
 #include "itemmodel.h"
+#include "itemeconomy.h"
 
 #include "logstream.h"
 #include "grammar_entities_impl.h"
@@ -743,7 +744,8 @@ WeaponGenerator& WeaponGenerator::randomizeStats()
     .assignValues()
     .assignAffects()
     .assignTimers()
-    .assignColours();
+    .assignColours()
+    .assignWeight();
 
     notice("rand_stat: created item %s [%d] [%lld] tier %s affixes [%s]",
             obj->getShortDescr('1', LANG_DEFAULT).c_str(),
@@ -773,7 +775,8 @@ WeaponGenerator& WeaponGenerator::randomizeAll()
         .assignTimers()
         .assignNames()
         .assignDamageType()
-        .assignColours();
+        .assignColours()
+        .assignWeight();
 
     notice("rand_all: created item %s [%d] [%lld] tier %s affixes [%s] level %d",
             obj->getShortDescr('1', LANG_DEFAULT).c_str(),
@@ -1218,18 +1221,19 @@ const WeaponGenerator & WeaponGenerator::assignFlags() const
     SET_BIT(obj->extra_flags, weapon_tier_table[valTier-1].extra.getValue());
     obj->value4(weaponFlags.getValue());
 
-    // The weightless stub gets a two-handed heft (1 lb -> 5 lb). Any other
-    // prototype carries its builder's weight already: multiplying it made area
-    // greatswords heavier than the max-STR wield cap.
-    if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS)
-        && obj->pIndexData->vnum == OBJ_VNUM_WEAPON_STUB)
-        obj->weight = obj->pIndexData->weight * 5;
-
     // Set standardized cost in silver.
     if (obj->getProperty("measure_m").isNumber())
         obj->cost = item_model_cost(obj->getProperty("measure_m").toInt(), obj->level);
     else
         obj->cost = 5 * (WORST_TIER + 1 - valTier) * obj->level;
+    return *this;
+}
+
+/** Weight last, once class, hands and material are final: the item model's
+ *  weight, or the prototype's while the weapon still has its shape. */
+const WeaponGenerator & WeaponGenerator::assignWeight() const
+{
+    obj_set_weight(obj, item_instance_weight(obj));
     return *this;
 }
 

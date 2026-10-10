@@ -75,6 +75,7 @@ struct WeaponGenerator {
     const WeaponGenerator & assignDamageType() const;
     const WeaponGenerator & assignAffects() const;
     const WeaponGenerator & assignTimers() const;
+    const WeaponGenerator & assignWeight() const;
 
 private:
     void applyWeaponClass(const DLString &name);
