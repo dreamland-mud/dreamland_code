@@ -328,6 +328,11 @@ struct PermanentAffects {
                        abs(my_beats), (my_beats > 0 ? _("длиннее") : _("короче")).getMessage(Player::displayLang(ch)).c_str());
     }
 
+    // A raw bit already shown as its own affect row leaves the summary line.
+    void dropAff(bitstring_t bit) {
+        REMOVE_BIT(my_aff, bit);
+    }
+
     bool isSet() const {
         return my_res || my_vuln || my_imm || my_aff || my_det;
     }
@@ -419,6 +424,46 @@ CMDRUNP( affects )
         ao.unitMinutes = false;
         ao.negative = skill->isNegative( );  // a gear-granted debuff still reads red
         output.push_back( ao );
+    }
+
+    // Raw debuff bits with no owning affect (a cursed or slowing generated item,
+    // race) used to read only as a yellow word in the closing "under the effect
+    // of" line, while the web panel showed them as red maladictions. List each
+    // as its own red permanent row and drop it from that line. Same bit set as
+    // the panel's "mal" column (plug-ins/web/impl.cpp addAffFallbacks).
+    static const bitstring_t malBits[] = {
+        AFF_BLIND, AFF_POISON, AFF_PLAGUE, AFF_CORRUPTION, AFF_FAERIE_FIRE,
+        AFF_CHARM, AFF_CURSE, AFF_WEAKEN, AFF_SLOW, AFF_SCREAM, AFF_SLEEP,
+        AFF_BLOODTHIRST, AFF_STUN, AFF_WEAK_STUN,
+    };
+    for (bitstring_t bit: malBits) {
+        if (!IS_AFFECTED( ch, bit ))
+            continue;
+
+        bool owned = false;
+        for (auto &paf: ch->affected)
+            if (paf->bitvector.getTable( ) == &affect_flags && paf->bitvector.isSet( bit )) {
+                owned = true;
+                break;
+            }
+        if (owned)
+            continue;
+
+        AffectOutput ao;
+        ao.viewer = viewer;
+        ao.lang = Player::displayLang( viewer );
+        ao.type = -2;                   // no skill: never matches a real row
+        ao.name = affect_flags.messages( bit, false, '1', ao.lang );
+        ao.duration = -1;
+        ao.unitMinutes = false;
+        ao.negative = true;
+
+        bool dup = false;
+        for (auto &o: output)
+            if (o.name == ao.name) { dup = true; break; }
+        if (!dup)
+            output.push_back( ao );
+        permAff.dropAff( bit );
     }
 
     DLString words = argument;
