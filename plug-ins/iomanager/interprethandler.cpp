@@ -49,7 +49,8 @@ GSN(poison);
 GSN(charm_person);
 GSN(sleep);
 
-const        char         go_ahead_str        [] = { (char)IAC, (char)GA, '\0' };
+static const unsigned char go_ahead_str[] = { IAC, GA };
+static const unsigned char end_of_record_str[] = { IAC, EOR };
 
 const char * sunlight_ru [4] = { "темно", "светает", "светло", "сумерки" };    
 
@@ -559,8 +560,10 @@ InterpretHandler::prompt(Descriptor *d)
     if (IS_SET( ch->comm, COMM_PROMPT ))
         normalPrompt( ch );
 
-    if (IS_SET( ch->comm, COMM_TELNET_GA ))
-        d->send(go_ahead_str);
+    if (IS_SET( d->oob_proto, OOB_EOR ))
+        d->sendTelnet(end_of_record_str, sizeof(end_of_record_str));
+    else if (IS_SET( ch->comm, COMM_TELNET_GA ))
+        d->sendTelnet(go_ahead_str, sizeof(go_ahead_str));
 }
 
 /*

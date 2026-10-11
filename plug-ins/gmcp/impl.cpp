@@ -17,6 +17,7 @@
 #include "affect.h"
 #include "room.h"
 #include "pcharacter.h"
+#include "player_utils.h"
 #include "directions.h"
 #include "door_utils.h"
 #include "stats_apply.h"
@@ -209,10 +210,11 @@ GMCPCOMMAND_RUN(charToRoom)
     if (!ch || !ch->in_room)
         return;
 
+    lang_t lang = Player::displayLang(ch);
     Json::Value data;
     data["num"] = ch->in_room->vnum;
-    data["name"] = DLString(ch->in_room->getName()).colourStrip();
-    data["area"] = ch->in_room->areaName().colourStrip();
+    data["name"] = DLString(ch->in_room->getName(lang)).colourStrip();
+    data["area"] = ch->in_room->areaName(lang).colourStrip();
     DLString areaName = ch->in_room->areaIndex()->area_file->file_name;
     data["map"] = ASCII_MAPS + areaName.replaces(".are", ".html");
     
