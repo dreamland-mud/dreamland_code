@@ -11,6 +11,7 @@
 #include "outofband.h"
 #include "character.h"
 #include "pcharacter.h"
+#include "room.h"
 #include "merc.h"
 #include "def.h"
 
@@ -85,6 +86,12 @@ void chat_emit( Character *to, Character *peer, bool own,
         return;
 
     if (text.empty( ))
+        return;
+
+    // Character creation runs in dumb rooms, where the answers are said
+    // aloud. That is talk to the game, not chat, so keep it off the panel.
+    if ((kind == "room" || kind == "mob")
+            && to->in_room && IS_SET(to->in_room->room_flags, ROOM_DUMB))
         return;
 
     // The line has to reach the panel in the very shape the console received
