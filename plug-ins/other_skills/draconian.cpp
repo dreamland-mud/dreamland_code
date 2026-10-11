@@ -261,7 +261,7 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
     dam = max(hp_dam + dice_dam/10,dice_dam + hp_dam/10);
 
     // Low-level NPC breaths: 20% at level 0 rising to full strength at 30,
-    // the same curve as .tmp.mob.breathScale in Fenia (utils/mob: ai).
+    // the same curve as .tmp.mob.lowLevelScale in Fenia (utils/mob: ai).
     if (ch->is_npc() && level < 30)
         dam = dam * (20 + max(0, level) * 80 / 30) / 100;
 
