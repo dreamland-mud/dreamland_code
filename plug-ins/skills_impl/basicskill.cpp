@@ -428,6 +428,11 @@ int BasicSkill::getMana(Character *ch) const
 
 int BasicSkill::getMoves(Character *ch) const
 {
+    // Same guard as getMana: the web help dump renders skills for a classless
+    // level-1 dummy, which must show the configured cost, not a level-1 discount.
+    if (!ch || !available(ch))
+        return move;
+
     // Level-discounted for players below 50; slook shows this same number.
     return move_cost_discount(ch, move.getValue(), true);
 }

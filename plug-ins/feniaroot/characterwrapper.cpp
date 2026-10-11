@@ -2065,6 +2065,12 @@ NMI_INVOKE( CharacterWrapper, is_npc, "(): true для мобов, false для 
     return Register( (int)target->is_npc( ) );
 }
 
+NMI_INVOKE( CharacterWrapper, moveCostDiscount, "(cost): цена в шагах cost со скидкой по уровню (игрокам до 50-го уровня), дробный остаток разыгрывается случайно" )
+{
+    checkTarget( );
+    return Register( ::move_cost_discount( target, args2number( args ), false ) );
+}
+
 NMI_INVOKE( CharacterWrapper, getName, "(): имя игрока или список имен моба" )
 {
     checkTarget( );
