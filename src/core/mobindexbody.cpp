@@ -231,6 +231,11 @@ void mob_index_data::resolveBody()
         imm_flags = (int)e.bits[Body::BS_IMM];
         res_flags = (int)e.bits[Body::BS_RES];
         vuln_flags = (int)e.bits[Body::BS_VULN];
+        // Immunity always wins in immune_resolve, so a res/vuln bit on top of
+        // the same imm bit (eyeless undead: imm light from the body, vuln
+        // light from the race) only makes affects list both.
+        res_flags &= ~imm_flags;
+        vuln_flags &= ~imm_flags;
         MobBody::wearlocs(e.wearlocNames, wearloc);
         bodyResolved = true;
         movetype = e.movetype;
