@@ -897,12 +897,37 @@ void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage )
     }
 }
 
+// Max moves grow by only ~6 a level from a base of 100, so flat move costs let a
+// fresh character bash twice per full bar. Scaling the cost with level keeps the
+// number of uses per bar about level with what a level-50 character gets.
+static const int MOVE_DISCOUNT_ADD = 15;
+static const int MOVE_DISCOUNT_DIV = 65;
+
+int move_cost_discount( Character *ch, int cost, bool roundUp )
+{
+    if (cost <= 0 || ch == 0 || ch->is_npc( ))
+        return cost;
+
+    int num = ch->getRealLevel( ) + MOVE_DISCOUNT_ADD;
+    if (num >= MOVE_DISCOUNT_DIV)
+        return cost;
+
+    int scaled = cost * num / MOVE_DISCOUNT_DIV;
+    int rest = cost * num % MOVE_DISCOUNT_DIV;
+
+    if (rest > 0 && (roundUp || number_range( 0, MOVE_DISCOUNT_DIV - 1 ) < rest))
+        scaled++;
+
+    return scaled;
+}
+
 int move_dec( Character *ch ) 
 {
     if (ch->is_npc( ))
         return 0;
 
-    return min( max( ch->getModifyLevel( ) / 20, 1 ), (int)ch->move );
+    int cost = move_cost_discount( ch, max( ch->getModifyLevel( ) / 20, 1 ), false );
+    return min( cost, (int)ch->move );
 }
 
 // Apply damange bonus by character class:

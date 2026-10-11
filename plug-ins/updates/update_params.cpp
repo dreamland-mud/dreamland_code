@@ -320,7 +320,7 @@ void CharacterParamsUpdateTask::gainMove( Character *ch )
         gain *= 2;
     
     if ( ch->getCurrStat(STAT_DEX) > 20 )
-        gain *= (14 /10);
+        gain = gain * 14 / 10;
 
     if( ch->isAffected(gsn_bandage ) )
         gain += ch->getRealLevel( ) / 20;

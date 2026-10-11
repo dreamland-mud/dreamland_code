@@ -43,6 +43,9 @@ void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage)
  * line now, before violence_update's per-round reset drops it. victim = target. */
 void        fightspam_flush_between_rounds( Character *att, Character *victim );
 int        move_dec( Character *ch );
+/* Below level 50 a player pays (level+15)/65 of a move cost, full price from 50 on.
+ * roundUp: ceil (a shown, deterministic cost); otherwise the fraction is rolled. */
+int        move_cost_discount( Character *ch, int cost, bool roundUp );
 void damapply_class(Character *ch, int &dam);
 int second_weapon_chance(Profession *prof, Object *weapon);
 /* Same table keyed by weapon class (-1 = hand to hand), for a weapon not yet in hand. */
