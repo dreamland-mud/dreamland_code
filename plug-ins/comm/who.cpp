@@ -31,6 +31,8 @@
 #include "descriptor.h"
 #include "def.h"
 #include "l10n.h"
+#include "dreamland.h"
+#include "dlfilestream.h"
 
 static const DLString WHO = "who";
 
@@ -122,6 +124,24 @@ static int who_count_week_uniques()
     for (const auto &i: PCharacterManager::getPCM())
         if (i.second->isOnline() || i.second->getLastAccessTime().getTime() >= cutoff)
             count++;
+
+    // Characters deleted this week, which have left the list above
+    // (written by pfDelete in loadsave).
+    try {
+        ostringstream buf;
+        DLFileStream(dreamland->getMiscDir(), "who_deleted.json").toStream(buf);
+
+        Json::Value deleted;
+        Json::Reader reader;
+        if (reader.parse(buf.str(), deleted) && deleted.isObject())
+            for (const auto &key: deleted.getMemberNames()) {
+                const Json::Value &when = deleted[key];
+                if (when.isIntegral() && when.asInt64() >= cutoff)
+                    count++;
+            }
+    } catch (const std::exception &) {
+        // No deletions recorded yet.
+    }
 
     return count;
 }
@@ -371,7 +391,7 @@ CMDRUN(who)
 
     buf << endl;
 
-    buf << fmt(ch, _("Всего {W%1$d{w, максимум за неделю {W%2$d{w, за неделю заходил%3$I|и|о {W%3$d{w игрок%3$I|а|ов."),
+    buf << fmt(ch, _("Всего {W%1$d{w, максимум за неделю {W%2$d{w, за неделю заходил%3$I|и|о {W%3$d{w персонаж%3$I|а|ей."),
                total, week_peak, week_uniques) << endl;
 
     if (!IS_SET( ch->act, PLR_CONFIRMED ) && pch->getRemorts( ).size( ) == 0) 
