@@ -23,6 +23,10 @@
 #include "occupations.h"
 
 #include "languagemanager.h"
+#include "feniamanager.h"
+#include "wrappermanagerbase.h"
+#include "register-impl.h"
+#include "subr.h"
 
 #include "quest.h"
 #include "questregistrator.h"
@@ -580,6 +584,27 @@ bool QuestScrollBehavior::examine( Character *ch )
     return true;
 }
 
+// Fenia appends area quest hints to the questor's list: .tmp.quest.requestHint(questor, client).
+// A missing or broken helper only costs the hint, never the list.
+static void gprog_request_hint(NPCharacter *questor, PCharacter *client)
+{
+    static Scripting::IdRef ID_TMP( "tmp" ), ID_QUEST( "quest" ), ID_HINT( "requestHint" );
+    Scripting::RegisterList regList;
+
+    if (!FeniaManager::wrapperManager)
+        return;
+
+    try {
+        Scripting::Register tmpQuest = *(*Scripting::Context::root[ID_TMP])[ID_QUEST];
+        regList.push_back( FeniaManager::wrapperManager->getWrapper( questor ) );
+        regList.push_back( FeniaManager::wrapperManager->getWrapper( client ) );
+        tmpQuest[ID_HINT]( regList );
+    }
+    catch (const Exception &ex) {
+        FeniaManager::getThis()->croak(0, Scripting::Register(".tmp.quest.requestHint"), ex);
+    }
+}
+
 static void delay_noquest(XMLAttributeQuestData::Pointer &attr, PCharacter *client)
 {
     attr->setTime( number_range(1, 3) );
@@ -672,6 +697,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         tell_raw(client, ch, _("Подробнее о каждом из них ты можешь прочитать в справке по теме '{W{hhвиды заданий{hx{G'."));
         tell_raw(client, ch, _("Выбери поручение и укажи его номер, например {yзадание просить 3{x."));
         tell_raw(client, ch, _("Или же попроси у меня задание на мое усмотрение: {yзадание просить любое{x."));
+        gprog_request_hint(ch, client);
         return;
     }
 
