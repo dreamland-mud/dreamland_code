@@ -74,6 +74,25 @@ static Object *get_obj_wear_no_tattoo( Character *ch, const char *cargument )
     return 0;
 }
 
+/*
+ * Without a preposition the whole argument names one object, so
+ * 'remove hatchling cloak' finds the cloak by both words instead of the
+ * first item matching 'hatchling'. A quoted argument keeps the old parsing.
+ */
+static void whole_object_argument( char *cArg, char *argObj )
+{
+    DLString arg = cArg;
+    arg.stripWhiteSpace( );
+
+    if (arg.empty( ) || arg.at( 0 ) == '\'' || arg.at( 0 ) == '"') {
+        one_argument( cArg, argObj );
+        return;
+    }
+
+    strncpy( argObj, arg.c_str( ), MAX_INPUT_LENGTH - 1 );
+    argObj[MAX_INPUT_LENGTH - 1] = '\0';
+}
+
 static bool oprog_can_dress(Object *obj, Character *ch, Character *victim)
 {
     FENIA_CALL( obj, "CanDress", "CC", ch, victim )
@@ -133,7 +152,7 @@ CMDRUNP( wear )
         }
     }
     else 
-        one_argument( cArg, argObj );
+        whole_object_argument( cArg, argObj );
     
     if (arg_is_all( argObj )) {
         Object *obj_next;
@@ -258,7 +277,7 @@ CMDRUNP( remove )
         }
     }
     else
-        one_argument( cArg, argObj );
+        whole_object_argument( cArg, argObj );
     
     if (arg_is_all( argObj )) {
         Object *obj_next;
