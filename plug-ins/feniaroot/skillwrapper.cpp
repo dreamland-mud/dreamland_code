@@ -175,7 +175,7 @@ NMI_INVOKE(SkillWrapper, mana, "(ch): цена этого умения в ман
     return getTarget()->getMana(ch);
 }
 
-NMI_INVOKE(SkillWrapper, moves, "(ch): цена этого умения в шагах для персонажа ch [пока что одинакова для всех]")
+NMI_INVOKE(SkillWrapper, moves, "(ch): цена этого умения в шагах для персонажа ch (игрокам до 50-го уровня со скидкой по уровню)")
 {
     Character *ch = args2character(args);
     return getTarget()->getMoves(ch);
