@@ -273,7 +273,7 @@ void DefaultSkillCommand::run( Character *ch, char *args )
 // Usually just 'does the job' after all the checks were successful.
 bool DefaultSkillCommand::apply( Character *ch, Character *victim, int level )
 {
-    bool feniaRc;
+    bool feniaRc = false;
 
     // See if there is 'apply' method override in Fenia. Pass return code from Fenia further upstream.
     if (FeniaSkillActionHelper::executeCommandApply(this, ch, victim, level, feniaRc))
