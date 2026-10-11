@@ -28,6 +28,9 @@
 #include "save.h"
 #include "merc.h"
 #include "def.h"
+#include "behavior.h"
+
+BHV(component);
 
 using std::min;
 using std::max;
@@ -388,7 +391,9 @@ static bool econ_same_shape( Object *obj )
 
     if (obj->item_type != p->item_type)
         return false;
-    if (DLString( obj->getMaterial( ) ) != p->material)
+    // Salvage chunks and dust take the parent's material as a name only
+    // (inheritMaterial); their weight drives yields and stays the prototype's.
+    if (DLString( obj->getMaterial( ) ) != p->material && !p->behaviors.isSet( bhv_component ))
         return false;
     if (obj->props.isObject( ) && (obj->props.isMember( "heft" ) || obj->props.isMember( "coverage" )))
         return false;
@@ -804,7 +809,29 @@ static bool item_econ_migrate_body( Object *obj, int savedRev, int stage )
         if (econ_weight_exempt( obj ))
             return apply;
 
+        // The old owner coupon stamped "platinum" on personalized rewards as a
+        // marker. Hand-made (no measure_m, no tier) owned platinum on a
+        // non-platinum prototype is that marker: weapons go back to their
+        // prototype's material, everything else becomes dragonskin.
+        DLString oldMaterial = obj->getMaterial( );
+        DLString newMaterial;
+        if (oldMaterial == "platinum" && obj->pIndexData->material != "platinum"
+            && !obj->getOwner( ).empty( )
+            && !(obj->props.isObject( )
+                 && (obj->props.isMember( "measure_m" ) || obj->props.isMember( "tier" ))))
+        {
+            newMaterial = obj->item_type == ITEM_WEAPON
+                ? DLString( obj->pIndexData->material ) : DLString( "dragonskin" );
+            LogStream::sendNotice( )
+                << "econ " << mode << ": obj " << obj->pIndexData->vnum << " id " << obj->getID( )
+                << " rev " << savedRev << " material platinum -> " << newMaterial << endl;
+            obj->setMaterial( newMaterial );
+        }
+
         int w = item_instance_weight( obj );
+
+        if (!apply && !newMaterial.empty( ))
+            obj->setMaterial( oldMaterial );
         if (w != obj->weight) {
             LogStream::sendNotice( )
                 << "econ " << mode << ": obj " << obj->pIndexData->vnum << " id " << obj->getID( )
