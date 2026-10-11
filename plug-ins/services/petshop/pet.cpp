@@ -165,7 +165,7 @@ int Pet::haggle( Character *client ) const
 void Pet::toStream( Character *client, ostringstream &buf ) const
 {
     buf << "[" << setw( 3 ) << getLevel( client ) << "] " << setw( 8 )
-        << toSilver( client ) << " - " << ch->getNameP( '1' );
+        << toSilver( client ) << " - " << ch->getNameP( '1', viewerLang( client ) );
 }
 
 void Pet::config( PCharacter *client, NPCharacter *pet ) const
