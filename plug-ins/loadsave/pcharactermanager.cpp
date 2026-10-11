@@ -36,6 +36,8 @@
 
 #include "save_bank.h"
 #include "fenia_utils.h"
+#include "dlfilestream.h"
+#include <jsoncpp/json/json.h>
 
 void fread_to_end_string( FILE *pfile );
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
@@ -390,7 +392,47 @@ void PCharacterManager::saveMemory( PCMemoryInterface *pci )
     extract(pc);
 }
 
-bool PCharacterManager::pfDelete ( const DLString& playerName ) 
+// Deleted characters drop out of allList, so 'who' would stop counting them
+// as weekly visitors. Remember the recent ones: "name.nonce" -> last access.
+// who.cpp reads the same file; entries older than a week are dropped here.
+static const DLString DELETED_FILE = "who_deleted.json";
+static const time_t DELETED_KEEP = 7 * 24 * 60 * 60;
+
+static void pfRememberDeleted( const DLString &name, const DLString &nonce, time_t lastAccess )
+{
+    time_t cutoff = time(0) - DELETED_KEEP;
+    Json::Value days;
+
+    try {
+        ostringstream buf;
+        DLFileStream(dreamland->getMiscDir(), DELETED_FILE).toStream(buf);
+        Json::Reader reader;
+        reader.parse(buf.str(), days);
+    } catch (const std::exception &) {
+        // No file yet.
+    }
+
+    if (!days.isObject())
+        days = Json::Value(Json::objectValue);
+
+    for (const auto &key: days.getMemberNames()) {
+        const Json::Value &when = days[key];
+        if (!when.isIntegral() || when.asInt64() < cutoff)
+            days.removeMember(key);
+    }
+
+    if (lastAccess >= cutoff)
+        days[name + "." + nonce] = Json::Int64(lastAccess);
+
+    try {
+        Json::FastWriter writer;
+        DLFileStream(dreamland->getMiscDir(), DELETED_FILE).fromString(writer.write(days));
+    } catch (const std::exception &ex) {
+        LogStream::sendError() << DELETED_FILE << ": " << ex.what() << endl;
+    }
+}
+
+bool PCharacterManager::pfDelete ( const DLString& playerName )
 {
     DLString name = playerName.toLower( );
     DLString nonce = create_nonce(6); // random suffix, to avoid profiles overriding each other over time
@@ -417,7 +459,12 @@ bool PCharacterManager::pfDelete ( const DLString& playerName )
     catch( const ExceptionDBIO& ex ) {
         LogStream::sendWarning( ) << ex << endl;
     }
-                
+
+    if (PCMemoryInterface *pcm = PCharacterManager::find( name )) {
+        time_t lastAccess = pcm->isOnline( ) ? time(0) : pcm->getLastAccessTime( ).getTime( );
+        pfRememberDeleted( name, nonce, lastAccess );
+    }
+
     PCharacterManager::remove( name );
 
     // Drop the object-bank cell tree too, so a freed name can't inherit the
