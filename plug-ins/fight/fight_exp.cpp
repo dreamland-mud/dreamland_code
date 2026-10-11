@@ -532,11 +532,14 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
 
         if ((otherAlignKills % 200) == 199)
         {
-            gch->pecho(_("На твоем счету {W%1$d{x труп%1$I|а|ов {W%2$s{x персонажей."),
-                otherAlignKills,
-                IS_GOOD(gch) ? "недобрых" :
-                IS_NEUTRAL(gch) ? "добрых и злых" :
-                IS_EVIL(gch) ? "незлых" : "");
+            // One whole sentence per alignment: an adjective passed in as %s
+            // never reaches the catalog and leaked Russian to EN/UA readers.
+            if (IS_GOOD(gch))
+                gch->pecho(_("На твоем счету {W%1$d{x труп%1$I|а|ов {Wнедобрых{x персонажей."), otherAlignKills);
+            else if (IS_NEUTRAL(gch))
+                gch->pecho(_("На твоем счету {W%1$d{x труп%1$I|а|ов {Wдобрых и злых{x персонажей."), otherAlignKills);
+            else if (IS_EVIL(gch))
+                gch->pecho(_("На твоем счету {W%1$d{x труп%1$I|а|ов {Wнезлых{x персонажей."), otherAlignKills);
 
             if (gch->perm_stat[STAT_CHA] < gch->getMaxTrain(STAT_CHA)
                 && IS_GOOD(gch))
