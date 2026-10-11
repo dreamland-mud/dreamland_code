@@ -85,6 +85,8 @@ typedef std::vector<ViaRecord> ViaVector;
  * belongs to this browser tab, so it survives a character change on the same
  * socket and dies with the socket itself. */
 #define OOB_CHAT (B)
+/* The client answered DO EOR: prompts end with IAC EOR instead of IAC GA. */
+#define OOB_EOR (C)
 
 struct WebSockState {
     int state;
@@ -131,6 +133,8 @@ public:
     /* implemented in iomanager */
     bool noIAC();
     bool noTelnet();
+    /** Append a telnet command to the output buffer, bypassing codepage conversion. */
+    void sendTelnet(const unsigned char *cmd, int len);
     bool readInput();
 private:    
     int inputChar(unsigned char);

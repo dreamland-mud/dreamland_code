@@ -272,6 +272,9 @@ int Descriptor::inputTelnet( unsigned char i )
                 case TELOPT_MSSP:
                     mssp_send_telnet(this);
                     break;
+                case TELOPT_EOR:
+                    SET_BIT(oob_proto, OOB_EOR);
+                    break;
             }
             telnet.state = TNS_NORMAL;
             break;
@@ -293,6 +296,9 @@ int Descriptor::inputTelnet( unsigned char i )
                 case TELOPT_COMPRESS2:
                     if (compressing == i)
                         stopMccp();
+                    break;
+                case TELOPT_EOR:
+                    REMOVE_BIT(oob_proto, OOB_EOR);
                     break;
             }
             telnet.state = TNS_NORMAL;
@@ -841,5 +847,34 @@ bool Descriptor::noTelnet( )
     return connected == CON_PLAYING 
             && character 
             && IS_SET(character->add_comm, COMM_NOTELNET);
+}
+
+/*
+ * Queue a telnet command behind the text already in the output buffer.
+ * send() would run it through the codepage table or iconv, which turns
+ * IAC GA into two Cyrillic letters in UTF-8 mode.
+ */
+void Descriptor::sendTelnet(const unsigned char *cmd, int len)
+{
+    if (websock.state != WS_DISABLED)
+        return;
+
+    while (outtop + len >= outsize) {
+        if (outsize >= 6*32000) {
+            LogStream::sendWarning( ) << "Buffer overflow for " << host << ". Closing." << endl;
+            outtop = 0;
+            close( );
+            return;
+        }
+
+        char *buf = ( char* )malloc( 2 * outsize );
+        memcpy( buf, outbuf, outtop );
+        free( outbuf );
+        outbuf = buf;
+        outsize *= 2;
+    }
+
+    memcpy( outbuf + outtop, cmd, len );
+    outtop += len;
 }
 
