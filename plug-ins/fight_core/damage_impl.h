@@ -29,9 +29,11 @@ struct SkillDamage : public virtual Damage {
     virtual void protectResistance( );
     virtual int msgNoSpamBit( );
     virtual void message( );
+    virtual bool canDamage( );
     
 protected:
     virtual bool mprog_immune();
+    bool shieldBlocks( );
 
     int sn;
 };

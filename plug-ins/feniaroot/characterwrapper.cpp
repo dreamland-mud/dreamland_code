@@ -4452,9 +4452,10 @@ static GAOffhand ga_offhandModel( Character *target, const GAWeights &w, ::Objec
     om.blowValue = w.weaponWeight
         * (om.mainEff + om.damroll * std::min( 100, 20 + mainSk ) / 100.0);
 
-    // Defence chain (onehit_undef.cpp canDamage): parry first, then shield block, then
-    // cross block. Both builds parry with the main weapon, so only the blocks differ;
-    // each is reached by the blows parry let through. Attacker = equal level, so the
+    // Defence chain (onehit_undef.cpp canDamage): shield block or cross block comes
+    // before parry, but the rolls are independent, so a block still adds block * (1 -
+    // parry) on top of parry alone: the same reach-weighted share. Both builds parry
+    // with the main weapon, so only the blocks differ. Attacker = equal level, so the
     // formulas' "skill_level - attacker level" term is just the skill level bonus.
     bool defClass = ga_defenderClass( target );
     Skill *parry = skillManager->findExisting( "parry" );
@@ -4466,10 +4467,22 @@ static GAOffhand ga_offhandModel( Character *target, const GAWeights &w, ::Objec
     }
     Skill *sb = skillManager->findExisting( "shield block" );
     if (sb != 0 && sb->getEffective( target ) > 1) {
-        int c = sb->getEffective( target ) / 2 - 10;
-        if (defClass)
-            c += 10;
-        om.pShield = om.reach * ga_pct( c + skill_level_bonus( *sb, target ) );
+        // skillcommand/shield block/run toBlock: 50% of skill scaled by class
+        // (caster 60, agile 80, hybrid 90, melee 110), +2 per level of bonus, 5..70.
+        // The attacker's weapon factor is left out: it depends on who swings.
+        const Flags &pf = target->getProfession( )->getFlags( target );
+        int mult = 100;
+        if (pf.isSet( PROF_CASTER ))
+            mult = 60;
+        else if (pf.isSet( PROF_AGILE ))
+            mult = 80;
+        else if (pf.isSet( PROF_HYBRID ))
+            mult = 90;
+        else if (pf.isSet( PROF_MELEE ))
+            mult = 110;
+        int c = sb->getEffective( target ) * 50 / 100 * mult / 100;
+        c = URANGE( 5, c + std::min( 15, 2 * skill_level_bonus( *sb, target ) ), 70 );
+        om.pShield = om.reach * ga_pct( c );
     }
     Skill *cb = skillManager->findExisting( "cross block" );
     if (cb != 0 && cb->getEffective( target ) > 1) {

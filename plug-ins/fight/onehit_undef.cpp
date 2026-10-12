@@ -120,12 +120,14 @@ bool UndefinedOneHit::canDamage( )
             return false;
         }
                 
-        if (gsn_parry->getCommand()->apply(ch, victim, secondary)
-            || gsn_hand_block->getCommand()->apply(ch, victim, secondary)
-            || gsn_bat_swarm->getCommand()->apply(ch, victim, secondary) 
-            || gsn_blink->getCommand()->apply(ch, victim, secondary) 
+        // Outermost first: the bat cloud, the shield held out in front, the blink,
+        // then the weapons and hands, and the last-ditch dodge.
+        if (gsn_bat_swarm->getCommand()->apply(ch, victim, secondary)
             || gsn_shield_block->getCommand()->apply(ch, victim, secondary)
+            || gsn_blink->getCommand()->apply(ch, victim, secondary)
             || gsn_cross_block->getCommand()->apply(ch, victim, secondary)
+            || gsn_parry->getCommand()->apply(ch, victim, secondary)
+            || gsn_hand_block->getCommand()->apply(ch, victim, secondary)
             || gsn_dodge->getCommand()->apply(ch, victim, secondary))
         {
             return false;
