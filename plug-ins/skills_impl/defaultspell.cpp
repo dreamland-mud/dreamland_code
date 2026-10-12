@@ -411,7 +411,7 @@ bool DefaultSpell::canPray(Character *ch, int &slevel)
 
     Religion *randomGod = ReligionUtils::setRandomGod(ch);
     if (randomGod)
-        ch->pecho(_("Твою просьбу исполняет %N1 и советует поскорее выбрать себе {hh1религию{x."), randomGod->getRussianName().c_str());
+        ch->pecho(_("Твою просьбу исполняет %N1 и советует поскорее выбрать себе {hh1религию{x."), randomGod->getNameFor(ch).c_str());
 
     return true;
 }
