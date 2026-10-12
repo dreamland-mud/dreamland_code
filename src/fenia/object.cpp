@@ -123,6 +123,20 @@ Object::recover()
     if(!backupNode)
         return;
 
+    // A handler that cannot write itself (a ._() message kept in a persisted
+    // field) is saved as a typeless <object></object>. Allocating a class with
+    // no name throws, which aborts the whole feniaroot load and every boot after
+    // it. Load it as a cleared object instead, the same as the manual DB repair.
+    if(backupNode->getType( ) != XMLNode::XML_LEAF
+            && backupNode->getAttribute( XMLNode::ATTRIBUTE_TYPE ).empty( )) {
+        LogStream::sendError( )
+            << "fenia: object " << id << " was saved without a type, loaded as empty" << endl;
+        backupNode->setType( XMLNode::XML_LEAF );
+        // Nothing else ever touches a handlerless object: queue one save so the
+        // record is rewritten as <object/> and this line does not repeat on every boot.
+        changed( );
+    }
+
     handler.fromXML( backupNode );
     setHandler(handler);
 }
