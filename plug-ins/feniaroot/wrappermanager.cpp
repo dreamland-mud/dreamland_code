@@ -35,6 +35,9 @@
 #include "affect.h"
 #include "behavior.h"
 #include "merc.h"
+#include "dreamland.h"
+#include "npcharacter.h"
+#include "logstream.h"
 
 #include "def.h"
 
@@ -197,12 +200,50 @@ Scripting::Register WrapperManager::wrapperAux( long long id, TargetType t )
  * link methods
  */
 
+/*
+ * Saved rooms and mobiles can carry two live copies with the same ID (2026-10-12:
+ * two vodka bottles in saved room 13034). Linking both to one wrapper repoints it
+ * at the second copy, so when the wrapper is freed only that copy forgets it and
+ * the first keeps a dangling pointer. The later copy gets a fresh ID instead.
+ */
+template <typename WrapperType, typename TargetType>
+static bool wrapper_taken_by_other( long long id, TargetType t )
+{
+    WrapperManagerBase::WrapperMap::iterator i = WrapperManagerBase::map.find( id );
+
+    if (i == WrapperManagerBase::map.end( ))
+        return false;
+
+    try {
+        TargetType owner = wrapper_cast<WrapperType>( i->second )->getTarget( );
+        return owner != 0 && owner != t;
+    } catch (const ::Exception &) {
+        return false; // offline or zombie: nobody holds it
+    }
+}
+
 void WrapperManager::linkWrapper( Character * ch )
 {
+    if (ch->is_npc( ) && wrapper_taken_by_other<CharacterWrapper>( ch->getID( ), ch )) {
+        long long oldID = ch->getID( );
+        ch->setID( dreamland->genID( ) );
+        LogStream::sendError( ) << "fenia: duplicate mob id " << oldID
+            << " [" << ch->getNPC( )->pIndexData->vnum << "], given new id " << ch->getID( ) << endl;
+        return;
+    }
+
     linkAux<CharacterWrapper>( ch->getID( ), ch );
 }
 void WrapperManager::linkWrapper( ::Object * obj )
 {
+    if (wrapper_taken_by_other<ObjectWrapper>( obj->getID( ), obj )) {
+        long long oldID = obj->getID( );
+        obj->setID( dreamland->genID( ) );
+        LogStream::sendError( ) << "fenia: duplicate object id " << oldID
+            << " [" << obj->pIndexData->vnum << "], given new id " << obj->getID( ) << endl;
+        return;
+    }
+
     linkAux<ObjectWrapper>( obj->getID( ), obj );
 }
 void WrapperManager::linkWrapper( Room *room )
