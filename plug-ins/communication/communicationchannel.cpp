@@ -122,6 +122,11 @@ DLString CommunicationChannel::localized( const DLString &format, Character *rea
     return MultiMessage( format, CHANNELS_L10N_FILE ).getMessage( reader );
 }
 
+DLString CommunicationChannel::localizedEn( const DLString &format ) const
+{
+    return MultiMessage( format, CHANNELS_L10N_FILE ).getMessage( LANG_EN );
+}
+
 DLString CommunicationChannel::outputSelf( Character *ch, const DLString &format, const DLString &msg ) const
 {
     DLString localFormat = localized( format, ch );

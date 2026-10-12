@@ -37,6 +37,9 @@ protected:
      *  taken straight from the XML has to go through here, not to pecho raw. */
     DLString localized( const DLString &format, Character *reader ) const;
 
+    /** The same message in English, for the Discord stream. */
+    DLString localizedEn( const DLString &format ) const;
+
     virtual DLString outputVict( Character *, Character *, const DLString &, const DLString & ) const;
     virtual DLString outputChar( Character *, Character *, const DLString &, const DLString & ) const;
     virtual DLString outputSelf( Character *, const DLString &, const DLString & ) const;
