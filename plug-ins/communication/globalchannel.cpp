@@ -277,10 +277,11 @@ void GlobalChannel::triggers( Character *ch, const DLString &msg ) const
     }
     
     if (!msg.empty() && hook) {
+        DLString formatEn = localizedEn( msgOther );
         if (ooc)
-            send_discord_ooc(ch, msgOther, msg);
+            send_discord_ooc(ch, formatEn, msg);
         else
-            send_discord_ic(ch, msgOther, msg);
+            send_discord_ic(ch, formatEn, msg);
     }
 }
 

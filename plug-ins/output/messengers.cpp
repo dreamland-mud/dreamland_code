@@ -226,6 +226,8 @@ void send_discord_wiznet(const DLString &content)
  */
 void send_discord_ooc(Character *ch, const DLString &format, const DLString &msg)
 {
+    // Discord is English-only: render names in EN too.
+    ForcedViewerLang scope(LANG_EN);
     DLString description = fmt(0, format.c_str(), ch, msg.c_str(), 0);
     send_to_discord_stream(":speech_left: `" + description + "`");
 }
@@ -239,10 +241,9 @@ void send_discord_ic(Character *ch, const DLString &format, const DLString &msg)
     // Create a pseudo-player, with just enough parameters in order not to crash.
     PCharacter vict;
     vict.in_room = get_room_instance(2);
-    // No 'lang' attr set: this pseudo-viewer falls back to LANG_DEFAULT (RU) in
-    // viewerLang, so names render in Russian as before (the output plugin can't
-    // reach the plug-ins/system attribute headers to set it explicitly).
-
+    // Discord is English-only: force EN for the names this viewer sees. The
+    // pseudo-viewer still decides visibility (no detects -> 'someone').
+    ForcedViewerLang scope(LANG_EN);
     DLString description = fmt(&vict, format.c_str(), ch, msg.c_str(), 0);
     send_to_discord_stream(":speech_left: `" + description + "`");
 }
