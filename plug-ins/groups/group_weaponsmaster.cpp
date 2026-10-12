@@ -85,6 +85,13 @@ SKILL_RUNP( second )
     wear_second_wield->wear( obj, F_WEAR_REPLACE | F_WEAR_VERBOSE );
 }
 
+/* A failed disarm is a miss: bystanders with fightspam off get the round
+ * summary instead. */
+static bool needsSpam( Character *target )
+{
+    return target->getPC( ) && IS_SET(target->getPC( )->config, CONFIG_FIGHTSPAM);
+}
+
 /*
  * Disarm a creature.
  * Caller must check for successful attack.
@@ -116,7 +123,7 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
         {
                 oldact(_("$S оружие не двигается с места!"),ch,0,victim,TO_CHAR);
                 oldact(_("$c1 пытается обезоружить тебя, но оружие не двигается с места!"), ch,0,victim,TO_VICT);
-                oldact(_("$c1 пытается обезоружить $C4, но оружие не двигается с места."), ch,0,victim,TO_NOTVICT);
+                echo_notvict( ch, victim, needsSpam, _("%1$^C1 пытается обезоружить %2$C4, но оружие не двигается с места."), ch, victim );
                 return;
         }
 
@@ -128,7 +135,7 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
                 {
                         oldact(_("$C1 хватает тебя за руку и ускользает!"), ch,0,victim,TO_CHAR);
                         oldact(_("$c1 пытается обезоружить тебя, но ты хватаешь $s за руку и ускользаешь!"), ch,0,victim,TO_VICT);
-                        oldact(_("$c1 пытается обезоружить $C4, но безуспешно."), ch,0,victim,TO_NOTVICT);
+                        echo_notvict( ch, victim, needsSpam, _("%1$^C1 пытается обезоружить %2$C4, но безуспешно."), ch, victim );
                         gsn_grip->improve( victim, true, ch );
                         return;
                 }
@@ -266,7 +273,7 @@ SKILL_RUNP( disarm )
         {
                 oldact(_("Тебе не удалось обезоружить $C4."), ch,0,victim,TO_CHAR);
                 oldact(_("$c1 пытается обезоружить тебя, но не может."), ch,0,victim,TO_VICT);
-                oldact(_("$c1 пытается обезоружить $C4, но не может."), ch,0,victim,TO_NOTVICT);
+                echo_notvict( ch, victim, needsSpam, _("%1$^C1 пытается обезоружить %2$C4, но не может."), ch, victim );
                 gsn_disarm->improve( ch, false, victim );
         }
 
