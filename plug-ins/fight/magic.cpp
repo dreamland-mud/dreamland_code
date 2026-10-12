@@ -105,7 +105,7 @@ static bool save_hint_once( Character *victim )
     static long lastSerial = -1;
     static Character *lastVictim = 0;
 
-    if (fightspam_cast_depth <= 0)
+    if (fightspam_cast_depth <= 0 && save_hint_scope <= 0)
         return true;
 
     if (lastSerial == fightspam_cast_serial && lastVictim == victim)

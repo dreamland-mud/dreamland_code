@@ -50,6 +50,11 @@ extern int fightspam_cast_depth;
  * multi-hit spell would repeat can be shown once. Defined in damage.cpp. */
 extern long fightspam_cast_serial;
 
+/* >0 while a Fenia ch.spell() runs (item procs). Like fightspam_cast_depth it
+ * lets a multi-hit spell show its save hint once per cast, but it does not
+ * change how damage lines are gated. Defined in damage.cpp. */
+extern int save_hint_scope;
+
 class Damage {
 public:
     Damage( Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag = 0 );

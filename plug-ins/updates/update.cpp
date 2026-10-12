@@ -100,6 +100,7 @@
 #include "nannyhandler.h"
 #include "fight.h"
 #include "damage_impl.h"
+#include "multiinflectedstring.h"
 #include "magic.h"
 #include "loadsave.h"
 #include "save.h"
@@ -1764,32 +1765,24 @@ struct LightVampireDamage : public Damage {
     }
         
     virtual void message( ) {
-        DLString msg;
-        
         if (weather_info.sunlight == SUN_LIGHT) 
-            msg = "Солнечный свет тревожит тебя.";
+            oldact( _("Солнечный свет тревожит тебя."), ch, 0, 0, TO_CHAR );
         else if (weather_info.sunlight == SUN_RISE) 
-            msg = "Лучи восходящего солнца тревожат тебя." ;
+            oldact( _("Лучи восходящего солнца тревожат тебя."), ch, 0, 0, TO_CHAR );
         else if (weather_info.sunlight == SUN_SET) 
-            msg = "Закатные лучи тревожат тебя." ;
-  
-        oldact( msg.c_str( ), ch, 0, 0, TO_CHAR );
+            oldact( _("Закатные лучи тревожат тебя."), ch, 0, 0, TO_CHAR );
 
-        msg.clear();
+        if(ch->in_room->getSectorType() == SECT_FOREST) oldact( _("Листья деревьев частично защищают тебя от солнца."), ch, 0, 0, TO_CHAR );
+        if(ch->in_room->getSectorType() == SECT_INSIDE) oldact( _("Тени в помещении помогают выдержать солнечный свет."), ch, 0, 0, TO_CHAR );
+        if(ch->in_room->getSectorType() == SECT_AIR) oldact( _("В воздухе под открытым небом лучи солнца жалят тебя особенно сильно."), ch, 0, 0, TO_CHAR );
 
-        if(ch->in_room->getSectorType() == SECT_FOREST) msg = "Листья деревьев частично защищают тебя от солнца.";
-        if(ch->in_room->getSectorType() == SECT_INSIDE) msg = "Тени в помещении помогают выдержать солнечный свет.";
-        if(ch->in_room->getSectorType() == SECT_AIR) msg = "В воздухе под открытым небом лучи солнца жалят тебя особенно сильно.";
-
-        if(!msg.empty()) oldact( msg.c_str( ), ch, 0, 0, TO_CHAR );
-
-        InflectedString sunlight("солнечный свет", MultiGender::MASCULINE);
+        MultiInflectedString sunlight("солнечный свет", "sunlight", "сонячне світло", MultiGender::MASCULINE);
         if (dam == 0)
-            msgRoom( "%2$^O1\6%3$C2", dam, sunlight, ch);
+            msgRoom( "%2$^O1\6%3$C2", dam, &sunlight, ch);
         else
-            msgRoom( "%2$^O1\6%3$C4", dam, sunlight, ch);
+            msgRoom( "%2$^O1\6%3$C4", dam, &sunlight, ch);
             
-        msgChar( _("%2$^O1\6тебя"), dam, sunlight );
+        msgChar( _("%2$^O1\6тебя"), dam, &sunlight );
     }
 };
 

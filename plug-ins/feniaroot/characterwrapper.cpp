@@ -3150,6 +3150,14 @@ NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane
 
     Skill *skill = argnum2skill(args, 1);
     int level = argnum2number(args, 2);
+
+    // One cast for the save hint dedupe (magic missile from a ring prints
+    // "weakly affects" once, not per bolt). Released on exceptions too.
+    struct SaveHintGuard {
+        SaveHintGuard( ) { save_hint_scope++; fightspam_cast_serial++; }
+        ~SaveHintGuard( ) { save_hint_scope--; }
+    } saveHintGuard;
+
     if (args.size() == 2) {
         // Room spell.
         spell( skill->getIndex( ), level, target, target->in_room );
