@@ -117,6 +117,8 @@ void QuestTrader::msgListBefore( Character *client )
 
 void QuestTrader::msgListAfter( Character *client )
 {
+    if (!client->is_npc( ))
+        client->pecho( _("У тебя {Y%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц."), client->getPC( )->getQuestPoints( ) );
     client->pecho( _("Для покупки чего-либо используй {yквест купить {Dназвание{x.") );
 }
 
