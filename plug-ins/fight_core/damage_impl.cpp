@@ -15,6 +15,8 @@
 #include "affect.h"
 #include "affecthandler.h"
 #include "skillreference.h"
+#include "skillcommand.h"
+#include "wearlocation.h"
 #include "spell.h"
 #include "skillgroup.h"
 #include "npcharacter.h"
@@ -29,6 +31,13 @@
 GSN(resistance);
 GSN(mental_knife);
 GSN(dragons_breath);
+GSN(shield_block);
+GSN(backstab);
+GSN(dual_backstab);
+GSN(circle);
+GSN(ambush);
+GSN(assassinate);
+WEARLOC(shield);
 GROUP(draconian);
 
 /*-----------------------------------------------------------------------------
@@ -93,6 +102,45 @@ SkillDamage::SkillDamage( Affect *paf, Character *victim, int sn, int dam_type, 
 {
     this->sn = sn;
     this->deathReason = skillManager->find(sn)->getName();
+}
+
+bool SkillDamage::canDamage( )
+{
+    if (!Damage::canDamage( ))
+        return false;
+
+    return !shieldBlocks( );
+}
+
+/*
+ * A raised shield has a small chance to take a spell, breath or combat skill
+ * hit in full. The chance, messages and the wear on the shield live in Fenia,
+ * skillcommand/shield block/run; a negative level there means "not a melee
+ * blow, worth -level damage". Damage over time, self-inflicted damage, blows
+ * from behind and damage a shield cannot stop never ask.
+ */
+bool SkillDamage::shieldBlocks( )
+{
+    if (paf || !ch || ch == victim || dam <= 0)
+        return false;
+
+    if (!wear_shield->find( victim ))
+        return false;
+
+    switch (dam_type) {
+    case DAM_BASH: case DAM_PIERCE: case DAM_SLASH:
+    case DAM_FIRE: case DAM_COLD: case DAM_LIGHTNING: case DAM_ACID:
+    case DAM_ENERGY: case DAM_LIGHT:
+        break;
+    default:
+        return false;
+    }
+
+    if (sn == gsn_backstab || sn == gsn_dual_backstab || sn == gsn_circle
+        || sn == gsn_ambush || sn == gsn_assassinate)
+        return false;
+
+    return gsn_shield_block->getCommand( )->apply( ch, victim, -dam );
 }
 
 int SkillDamage::msgNoSpamBit( )

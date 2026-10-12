@@ -380,6 +380,11 @@ SKILL_APPLY(shieldblock)
     Object *wield;
     bool secondary = !!level;
 
+    // A negative level is a spell or skill hit offered by SkillDamage, which only
+    // the Fenia override knows how to judge. Never block those here.
+    if (level < 0)
+        return false;
+
     if ( !IS_AWAKE(victim) )
         return false;
     
