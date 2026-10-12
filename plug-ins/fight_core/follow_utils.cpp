@@ -114,7 +114,9 @@ void follower_clear( Character * ch, bool verbose )
     if (master == NULL)
         return;
    
-    if (verbose && master->can_see( ch ))
+    // A master being extracted (quit) is past caring who follows them, and a
+    // screenful of these is the last thing they would see on the way out.
+    if (verbose && !master->extracted && master->can_see( ch ))
         master->pecho(_("%1$^C1 больше не следу%1$nет|ют за тобой."), ch);
 
     if (verbose)

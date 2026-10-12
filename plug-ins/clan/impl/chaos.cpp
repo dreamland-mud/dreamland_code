@@ -506,6 +506,10 @@ VOID_AFFECT(Doppelganger)::remove( Character *victim )
         return;
     }
 
+    // The owner quitting is not an event worth a line per mirror; only an
+    // image left behind by death or expiry shatters in view.
+    bool silent = victim->doppel && victim->doppel->extracted;
+
     follower_stop(victim, false);
     victim->doppel = NULL;
 
@@ -517,7 +521,7 @@ VOID_AFFECT(Doppelganger)::remove( Character *victim )
     if (victim->isDead( ))
         return;
 
-    if (victim->in_room)
+    if (victim->in_room && !silent)
         victim->in_room->echo(POS_RESTING, _("%1$^C1 рассыпается осколками стекла."), victim);
 
     victim->setDead( );

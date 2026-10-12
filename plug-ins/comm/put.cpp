@@ -102,7 +102,8 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         return PUT_OBJ_ERR;
 
     if (!Item::canDrop( ch, obj )) {
-        oldact(_("Ты не можешь избавиться от $o2."), ch, obj, 0, TO_CHAR );
+        if (verbose)
+            oldact(_("Ты не можешь избавиться от $o2."), ch, obj, 0, TO_CHAR );
         return PUT_OBJ_ERR;
     }
     
@@ -135,7 +136,8 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
     }
 
     if (obj->pIndexData->limit != -1) {
-        oldact(_("$o4 нельзя хранить в такой дребедени."), ch,obj,0,TO_CHAR );
+        if (verbose)
+            oldact(_("$o4 нельзя хранить в такой дребедени."), ch,obj,0,TO_CHAR );
         return PUT_OBJ_ERR;
     }
 
@@ -160,7 +162,8 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         pcount = count_obj_in_obj( container, ITEM_POTION );
                 
        if (pcount > 15) {
-            oldact(_("Небезопасно далее складывать снадобья в $o4."),ch,container,0, TO_CHAR);
+            if (verbose)
+                oldact(_("Небезопасно далее складывать снадобья в $o4."),ch,container,0, TO_CHAR);
             return PUT_OBJ_ERR;
        }
     }
@@ -378,6 +381,8 @@ CMDRUNP( put )
     {
         Object *obj_next;
         bool found = false;
+        int refused = 0;
+        Object *firstRefused = 0;
 
         /* 'put all container' or 'put all.obj container' */
         for (obj = ch->carrying; obj != 0; obj = obj_next) {
@@ -388,12 +393,18 @@ CMDRUNP( put )
             if (obj->carried_by != ch)
                 break;
 
+            // the container itself is not a candidate, not a refusal
+            if (obj == container)
+                continue;
+
             if ((arg1[3] == '\0' || obj_has_name( obj, &arg1[4], ch ))
                 &&   ch->can_see( obj )
                 &&   obj->wear_loc == wear_none)
             {
 
-                switch (can_put_obj_into( ch, obj, container, pocket, true )) {
+                // One line per refused item turns 'put all' into a wall of
+                // text; they are counted and reported once below instead.
+                switch (can_put_obj_into( ch, obj, container, pocket, false )) {
                 case PUT_OBJ_STOP:
                     return;
 
@@ -404,6 +415,9 @@ CMDRUNP( put )
                     break;
 
                 case PUT_OBJ_ERR:
+                    if (!firstRefused)
+                        firstRefused = obj;
+                    refused++;
                     break;
                 }
 
@@ -414,6 +428,28 @@ CMDRUNP( put )
             }
         }
         
+        // Keyrings and quivers refuse most of an inventory by type; a count
+        // of those is noise, not news.
+        bool typed = container->item_type == ITEM_KEYRING
+                     || IS_SET(container->value1(), CONT_FOR_ARROW);
+
+        if (found && refused > 0 && !typed) {
+            if (IS_SET(container->value1(), CONT_PUT_ON|CONT_PUT_ON2))
+                ch->pecho(_("Кое-что (%1$d шт.) осталось у тебя: это нельзя положить на %2$O4."),
+                          refused, container);
+            else
+                ch->pecho(_("Кое-что (%1$d шт.) осталось у тебя: это нельзя положить в %2$O4."),
+                          refused, container);
+        }
+
+        // Nothing went in but something was turned away: say why once,
+        // for the first refused item, instead of "found nothing".
+        if (!found && firstRefused && !firstRefused->extracted
+            && firstRefused->carried_by == ch && !container->extracted) {
+            can_put_obj_into( ch, firstRefused, container, pocket, true );
+            return;
+        }
+
         if (!found) {
             if (container->item_type == ITEM_KEYRING)
                 oldact(_("Ты не наш$gло|ел|ла ничего, что можно нанизать на $o4."), ch, container, 0, TO_CHAR );
