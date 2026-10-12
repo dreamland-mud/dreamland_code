@@ -1666,6 +1666,34 @@ NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spell
     return Register(ok);
 }
 
+NMI_INVOKE(Root, randomizeNamedArmor, "(obj, ch, tier, slot[, profile]): статы случайной брони для именного предмета, имена, описания и материал остаются свои; slot любой слот носки (shield, about, waist...), profile caster берет цены аффиксов для кастера; true если удалось")
+{
+    ::Object *obj = argnum2item(args, 1);
+    Character *ch = argnum2character(args, 2);
+    int tier = argnum2number(args, 3);
+    DLString slot = argnum2string(args, 4);
+    DLString profile = args.size() > 4 ? argnum2string(args, 5) : DLString::emptyString;
+
+    if (obj->item_type != ITEM_ARMOR)
+        throw Scripting::Exception("Item is not armor for randomize.");
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid armor tier.");
+    if (slot.empty())
+        throw Scripting::Exception("Armor slot is required.");
+    // The generator's affect_to_obj applies each affect to the wearer of a worn
+    // item, and an equip in progress applies them again.
+    if (obj->wear_loc != wear_none)
+        throw Scripting::Exception("Item is worn: randomize it off the body.");
+
+    bool ok = ArmorGenerator(obj, ch->getPC(), tier, slot)
+                .keepIdentity(true)
+                .caster(profile == "caster")
+                .alignment(ch->alignment)
+                .run();
+
+    return Register(ok);
+}
+
 NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, profile]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров, profile caster берет цены аффиксов для кастера")
 {
     ::Object *obj = argnum2item(args, 1);
