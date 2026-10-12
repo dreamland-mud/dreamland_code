@@ -969,8 +969,9 @@ Object *get_obj_keeper( Character *ch, ShopTrader::Pointer trader, const DLStrin
         count = 0;
         
         for( obj = keeper->carrying; obj; obj = obj->next_content ) {
+            // No keeper->can_see: a keeper sells his own stock even when
+            // it rolled invisible, as the list and buy-by-number already do.
             if( obj->wear_loc == wear_none &&
-                keeper->can_see( obj ) &&
                 ch->can_see( obj )  &&
                 get_cost( keeper, obj, true, trader ) > 0 &&
                 ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))))

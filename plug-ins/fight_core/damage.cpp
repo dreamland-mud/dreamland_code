@@ -105,6 +105,7 @@ void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitst
 
 int fightspam_cast_depth = 0;
 long fightspam_cast_serial = 0;
+int save_hint_scope = 0;
 
 bool Damage::hit( bool show )
 {
