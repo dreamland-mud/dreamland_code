@@ -140,7 +140,7 @@ void CGQuest::doInfo( PCharacter *ch )
         if (gq->isHidden( ))
             continue;
 
-        buf << GQChannel::BOLD << "\"" << gqi->getQuestName( ) << "\"" << GQChannel::NORMAL << endl;
+        buf << GQChannel::BOLD << "\"" << gqi->getQuestNameFor( ch ) << "\"" << GQChannel::NORMAL << endl;
         gq->getQuestDescription( buf, ch );
         buf << GQChannel::NORMAL;
         gq->report( buf, ch );
