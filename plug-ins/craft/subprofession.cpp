@@ -5,6 +5,7 @@
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
 #include "player_utils.h"
+#include "player_exp.h"
 #include "alignment.h"
 #include "infonet.h"
 #include "messengers.h"
@@ -311,6 +312,9 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
         // (%s), so no %N russian-case declension -- that only works for RU.
         send_discord_orb(":tools: " + fmtLang(LANG_EN, _("%1$#C1 reached a new level of mastery as a %2$s."),
                             ch, getName().c_str()));
+
+        // Same character XP as mastering a rating-1 skill (BasicSkill::improve: 2 + 98).
+        Player::gainExp(ch, 100);
     }
 
     ch->updateSkills();
