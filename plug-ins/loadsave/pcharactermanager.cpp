@@ -326,6 +326,27 @@ void PCharacterManager::remove( const DLString& name )
     }
 }
 
+/* The web client's per-character triggers (comm/webtriggers.cpp) are files
+ * keyed by the lowercase name: they follow a rename and are retired with a
+ * deleted character, so a recycled name never inherits someone's automation. */
+static const char *WEBTRIGGERS_CHAR_TABLE = "webtriggers_char";
+static const char *WEBTRIGGERS_EXTS[] = { ".json", ".json.prev" };
+
+static void webtriggers_move( const DLString &from, const DLString &toName, const DLString &suffix )
+{
+    DLFile dir( dreamland->getDbDir( ), WEBTRIGGERS_CHAR_TABLE );
+
+    for (const char *ext: WEBTRIGGERS_EXTS) {
+        DLFile src( dir, from, ext );
+        if (!src.exist( ))
+            continue;
+
+        DLFile dst( dir, toName, DLString( ext ) + suffix );
+        if (!src.rename( dst ))
+            LogStream::sendError( ) << "webtriggers: could not move " << from << ext << endl;
+    }
+}
+
 void PCharacterManager::rename( const DLString& oldName, const DLString& newName )
 {
     PCharacterMemoryList::iterator ipos = allList.find( oldName );
@@ -352,6 +373,8 @@ void PCharacterManager::rename( const DLString& oldName, const DLString& newName
 
             // Move the object-bank cell tree so the vault follows the new name.
             bank_rename_owner( "player", oldNameLower, newNameLower );
+
+            webtriggers_move( oldNameLower, newNameLower, DLString::emptyString );
 
             // Let scripts move their own name-keyed records along.
             gprog( "onCharRename", "ss", oldNameLower.c_str( ), newNameLower.c_str( ) );
@@ -470,6 +493,9 @@ bool PCharacterManager::pfDelete ( const DLString& playerName )
     // Drop the object-bank cell tree too, so a freed name can't inherit the
     // deleted character's stored items (and dead hoards don't linger on disk).
     bank_drop_owner( "player", name );
+
+    // Retired with the same nonce as the pfile, never loaded again.
+    webtriggers_move( name, name, ".delete." + nonce );
 
     // Same for name-keyed records in scripts: a freed name starts clean.
     gprog( "onCharDelete", "s", name.c_str( ) );
