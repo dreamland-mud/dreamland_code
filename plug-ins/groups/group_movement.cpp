@@ -66,6 +66,7 @@ GSN(sneak);
  * 'sneak' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/sneak
 SKILL_RUNP( sneak )
 {
     Affect af;
@@ -329,6 +330,7 @@ protected:
  * 'escape' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/escape
 SKILL_RUNP( escape )
 {
     char arg[MAX_STRING_LENGTH];

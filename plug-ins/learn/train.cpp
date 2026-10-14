@@ -231,6 +231,7 @@ void Trainer::showGain(PCharacter *client)
  * fall-through if the Fenia command never loaded. Do NOT l10n/"fix" it expecting
  * an in-game effect -- edit the Fenia override instead.
  */
+// FENIA-OWNED: dreamland_fenia/command/train/runFunc
 CMDRUN( train )
 {
     Trainer::Pointer trainer;

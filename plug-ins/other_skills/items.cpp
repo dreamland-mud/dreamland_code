@@ -46,6 +46,7 @@ VOID_SPELL(HighExplosive)::run( Character *ch, Character *victim, int sn, int le
     damage_nocatch( ch, victim, dam, sn, DAM_PIERCE ,true, DAMF_WEAPON);
 }
 
+// FENIA-OWNED: dreamland_fenia/spell/sebat
 SPELL_DECL(Sebat);
 VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -69,6 +70,7 @@ VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level )
 
 }
 
+// FENIA-OWNED: dreamland_fenia/spell/matandra
 SPELL_DECL(Matandra);
 VOID_SPELL(Matandra)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -87,6 +89,7 @@ VOID_SPELL(Matandra)::run( Character *ch, Character *victim, int sn, int level )
   damage_nocatch(ch,victim,dam,sn,DAM_HOLY, true, DAMF_PRAYER);
 }
 
+// FENIA-OWNED: dreamland_fenia/spell/kassandra
 SPELL_DECL(Kassandra);
 VOID_SPELL(Kassandra)::run( Character *ch, Character *, int sn, int level ) 
 { 
@@ -106,6 +109,7 @@ VOID_SPELL(Kassandra)::run( Character *ch, Character *, int sn, int level )
 }
 
 
+// FENIA-OWNED: dreamland_fenia/spell/detect hidden
 SPELL_DECL(DetectHidden);
 VOID_SPELL(DetectHidden)::run( Character *ch, Character *victim, int sn, int level ) 
 { 

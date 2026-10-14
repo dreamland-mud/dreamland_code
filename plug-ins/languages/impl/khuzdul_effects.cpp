@@ -22,35 +22,8 @@
 
 GSN(ancient_rage);
 GSN(enchant_weapon);
-GSN(fireproof);
 GSN(corrosion);
 GSN(inaction);
-
-bool FireproofWE::run( PCharacter *ch, Character *victim ) const
-{
-    Object *obj;
-    Affect af;
-
-    af.bitvector.setTable(&extra_flags);
-    af.type      = gsn_fireproof;
-    af.level     = ch->getModifyLevel( );
-    af.bitvector.setValue(ITEM_BURN_PROOF);
-
-    for (obj = victim->carrying; obj; obj = obj->next_content) {
-        if (obj->wear_loc == wear_none)
-            continue;
-            
-        if (IS_OBJ_STAT(obj, ITEM_BURN_PROOF))
-            continue;
-
-        af.duration  = number_range( af.level, 200 );
-        affect_to_obj( obj, &af);
-    }
-
-    oldact(_("{CОбмундирование на $c6 вспыхивает ослепительным блеском.{x"), victim, 0, 0, TO_ROOM );
-    oldact(_("{CТвое обмундирование вспыхивает ослепительным блеском.{x"), victim, 0, 0, TO_CHAR );
-    return true;
-}
 
 bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
 {

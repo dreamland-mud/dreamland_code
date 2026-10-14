@@ -27,6 +27,7 @@ bool omprog_give( Object *obj, Character *ch, Character *victim );
  * and WrappedCommand::entryPoint never falls through to this body while Fenia is
  * loaded. Kept as a boot-safety fall-through only -- edit the Fenia override.
  */
+// FENIA-OWNED: dreamland_fenia/command/request/runFunc
 CMDRUNP(request)
 {
     char arg1[MAX_INPUT_LENGTH];

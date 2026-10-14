@@ -47,6 +47,7 @@ GSN(smithing);
  * 'smithing' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/smithing
 SKILL_RUNP( smithing )
 {
     char arg[MAX_INPUT_LENGTH];

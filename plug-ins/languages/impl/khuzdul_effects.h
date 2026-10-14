@@ -7,14 +7,6 @@
 
 #include "wordeffect.h"
 
-class FireproofWE : public WordEffect {
-XML_OBJECT
-public:
-    typedef ::Pointer<FireproofWE> Pointer;
-    
-    virtual bool run( PCharacter *, Character * ) const;
-};
-
 class EnchantWeaponWE : public WordEffect {
 XML_OBJECT
 public:

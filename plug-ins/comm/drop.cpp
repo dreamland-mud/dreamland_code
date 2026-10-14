@@ -70,6 +70,7 @@ static int drop_obj( Character *ch, Object *obj )
  * fires as a boot-safety fall-through if the Fenia command never loaded. Do NOT
  * l10n/"fix" it expecting an in-game effect -- edit the Fenia override instead.
  */
+// FENIA-OWNED: dreamland_fenia/command/drop/runFunc
 CMDRUNP( drop )
 {
     char arg[MAX_INPUT_LENGTH];

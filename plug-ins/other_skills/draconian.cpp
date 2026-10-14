@@ -77,6 +77,7 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
  * .tmp.mob.effectX / .tmp.room.effectX and the Fenia spells call them.
  */
 
+// FENIA-OWNED: dreamland_fenia/spell/acid breath
 SPELL_DECL(AcidBreath);
 VOID_SPELL(AcidBreath)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -107,6 +108,7 @@ VOID_SPELL(AcidBreath)::run( Character *ch, Character *victim, int sn, int level
 
 
 
+// FENIA-OWNED: dreamland_fenia/spell/fire breath
 SPELL_DECL(FireBreath);
 VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -176,6 +178,7 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
 
 }
 
+// FENIA-OWNED: dreamland_fenia/spell/frost breath
 SPELL_DECL(FrostBreath);
 VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -245,6 +248,7 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
 }
 
 
+// FENIA-OWNED: dreamland_fenia/spell/gas breath
 SPELL_DECL(GasBreath);
 VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level ) 
 { 
@@ -305,6 +309,7 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
 }
 
 
+// FENIA-OWNED: dreamland_fenia/spell/lightning breath
 SPELL_DECL(LightningBreath);
 VOID_SPELL(LightningBreath)::run( Character *ch, Character *victim, int sn, int level ) 
 { 

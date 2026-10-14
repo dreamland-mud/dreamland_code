@@ -18,7 +18,6 @@ libclan_impl_la_SOURCES = \
 defaultclan.cpp \
 battlerager.cpp \
 chaos.cpp \
-ghost.cpp \
 invader.cpp \
 knight.cpp \
 lion.cpp \

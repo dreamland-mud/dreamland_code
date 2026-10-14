@@ -67,7 +67,6 @@ GSN(protective_shield);
 GSN(smash);
 GSN(parry);
 GSN(hand_block);
-GSN(bat_swarm);
 GSN(shield_block);
 GSN(cross_block);
 GSN(dodge);
@@ -130,6 +129,7 @@ SKILL_APPLY(areaattack)
 /*
  * 'parry' skill command
  */
+// FENIA-OWNED: dreamland_fenia/skillcommand/parry
 SKILL_DECL(parry);
 SKILL_APPLY(parry)
 {
@@ -341,38 +341,9 @@ SKILL_APPLY(handblock)
     return true;}
 
 /*
- * 'bat swarm' skill command
- */
-SKILL_DECL(batswarm);
-SKILL_APPLY(batswarm)
-{
-    int chance;
-
-    if (!victim->isAffected(gsn_bat_swarm))
-        return false;
-
-    chance = 50 + (victim->getModifyLevel( ) - ch->getModifyLevel( ));
-
-    if (number_percent( ) > chance)
-        return false;
-
-    if (SHADOW(victim)) {
-        echo_char(victim, needsSpam, _("Стая летучих мышей вокруг тебя сбита с толку твоей тенью.") );
-        echo_char(ch, needsSpam, _("Стая летучих мышей вокруг %2$C2 сбита с толку тенью."), ch, victim );
-        echo_notvict( ch, victim, needsSpam, _("Стая летучих мышей вокруг %2$C2 сбита с толку тенью."), ch, victim );
-        return false;
-    }
-    
-    echo_char(ch, needsSpam, _("Ты не смо%1$Gгло|г|гла пробиться сквозь стаю летучих мышей, кружащихся вокруг %2$C2."), ch, victim);
-    echo_char(victim, needsSpam, _("Стая летучих мышей не позволяет %1$C3 повредить тебе."), ch, victim );
-    echo_notvict( ch, victim, needsSpam, _("%1$^C1 пытается разогнать стаю летучих мышей вокруг %2$C2."), ch, victim );
-
-    return true;
-}
-
-/*
  * 'shield block' skill command
  */
+// FENIA-OWNED: dreamland_fenia/skillcommand/shield block
 SKILL_DECL(shieldblock);
 SKILL_APPLY(shieldblock)
 {
@@ -609,10 +580,6 @@ SKILL_APPLY(crossblock)
 /*
  * 'dodge' skill command
  */
+// FENIA-OWNED: dreamland_fenia/skillcommand/dodge
 SKILL_DECL(dodge);
 
-
-/*
- * 'slice' skill command
- */
-SKILL_DECL(slice);

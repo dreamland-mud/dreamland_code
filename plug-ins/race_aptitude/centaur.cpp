@@ -94,6 +94,7 @@ void RearKickOneHit::calcTHAC0( )
 /*
  * 'rear kick' skill command
  */
+// FENIA-OWNED: dreamland_fenia/skillcommand/rear kick
 SKILL_DECL( rearkick );
 SKILL_APPLY( rearkick )
 {

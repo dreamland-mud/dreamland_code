@@ -59,7 +59,6 @@ GSN(confuse);
 GSN(disgrace);
 GSN(dispel_affects);
 GSN(doppelganger);
-GSN(garble);
 GSN(mirror);
 GSN(spellbane);
 
@@ -68,6 +67,7 @@ GSN(spellbane);
  *-------------------------------------------------------------------------*/
 
 
+// FENIA-OWNED: dreamland_fenia/spell/confuse
 SPELL_DECL(Confuse);
 VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -152,6 +152,7 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
 
 
 
+// FENIA-OWNED: dreamland_fenia/spell/disperse
 SPELL_DECL(Disperse);
 VOID_SPELL(Disperse)::run( Character *ch, Room *room, int sn, int level ) 
 { 
@@ -264,53 +265,6 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 
 
 }
-
-
-
-
-SPELL_DECL(Garble);
-BOOL_SPELL(Garble)::apply( Character *ch, Character *victim, int level ) 
-{
-    Affect af;
-
-    af.type      = gsn_garble;
-    af.level     = level;
-    af.duration  = 1;
-    affect_to_char( victim, &af );
-    return true;
-}
-
-VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-  if( ch == victim ) {
-    ch->pecho(_("Это просто глупо."));
-    return;
-  }
-
-  if( victim->isAffected(sn ) )  {
-    oldact_p(_("$C1 и так уже не может ничего внятно произнести."),
-            ch, 0, victim, TO_CHAR,POS_RESTING);
-    return;
-  }
-
-  if( is_safe_nomessage( ch, victim ) ) {
-    ch->pecho(_("Тебе не дано здесь чего-нибудь добиться."));
-    return;
-  }
-
-  if( saves_spell( level, victim, DAM_MENTAL, ch, DAMF_MAGIC ) ) {
-    ch->pecho(_("Хаос остался в тебе."));
-    return;
-  }
-
-    apply(ch, victim, level);
-
-  oldact_p(_("Ты поделил$gось|ся|ась частицей хаоса с языком $C2."),
-          ch, 0, victim, TO_CHAR,POS_RESTING);
-  victim->pecho(_("Такое впечатление, что твой язык завязали узлом."));
-
-}
-
 
 
 
@@ -442,6 +396,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 
 
 
+// FENIA-OWNED: dreamland_fenia/spell/randomizer
 SPELL_DECL(Randomizer);
 VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level ) 
 { 
