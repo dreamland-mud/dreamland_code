@@ -172,6 +172,34 @@ WrappersPlugin::linkTargets()
         }
     }
 
+    // A command registered before the Fenia DB was recovered (a CMDRUN in a
+    // plugin that loads before feniaroot, e.g. liquid) tried to link while the
+    // wrapper map was still empty and stayed unbound, so its persisted runFunc
+    // never ran. Link those now, as the word-effect loop below does. Second pass
+    // on purpose: the commands bound above have claimed their ids first, and the
+    // collision check runs BEFORE linkWrapper, because linking re-targets the
+    // shared wrapper to whoever links last.
+    for (auto &cmd: commandManager->getCommands()) {
+        WrappedCommand *wcmd = cmd.getDynamicPointer<WrappedCommand>();
+        if (!wcmd || wcmd->wrapper)
+            continue;
+
+        long long cid = wcmd->getID();
+        std::map<long long, DLString>::iterator owner = commandIds.find(cid);
+        if (owner != commandIds.end()) {
+            LogStream::sendError() << "Fenia command id collision: " << wcmd->getName()
+                                   << " clashes with " << owner->second
+                                   << " -- Fenia override disabled for " << wcmd->getName() << endl;
+            continue;
+        }
+
+        WrapperManager::getThis()->linkWrapper(wcmd);
+        if (wcmd->wrapper) {
+            commandIds.insert(std::make_pair(cid, wcmd->getName()));
+            LogStream::sendNotice() << "Fenia command: linked wrapper for " << wcmd->getName() << endl;
+        }
+    }
+
     for (int i = 0; i < behaviorManager->size(); i++) {
         Behavior *bhv = behaviorManager->find(i);
         if (bhv->wrapper) {
