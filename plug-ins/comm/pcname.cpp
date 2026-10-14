@@ -12,6 +12,7 @@
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
 #include "inflectedstring.h"
+#include "grammar_entities_impl.h"
 #include "admincommand.h"
 #include "descriptor.h"
 #include "wiznet.h"
