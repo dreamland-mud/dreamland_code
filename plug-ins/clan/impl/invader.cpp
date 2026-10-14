@@ -59,52 +59,6 @@ CLAN(invader);
  * Neere 
  *-------------------------------------------------------------------------*/
 
-/*
- * 'fade' skill command
- */
-
-// FENIA-OWNED: dreamland_fenia/skillcommand/fade
-SKILL_RUNP(fade)
-{
-   
-    if (MOUNTED(ch))
-    {
-        ch->pecho(_("Ты не можешь спрятаться в тенях, когда в седле."));
-        return;
-    }
-
-    if (RIDDEN(ch))
-    {
-        ch->pecho(_("Ты не можешь спрятаться в тенях, когда ты оседлан%Gо||а."), ch);
-        return;
-    }
-
-    if (IS_AFFECTED(ch, AFF_FAERIE_FIRE))
-    {
-        ch->pecho(_("Ты не можешь спрятаться в тенях, когда светишься."));
-        return;
-    }
-
- 
-    int k = ch->getLastFightDelay();
-
-    if (k >= 0 && k < FIGHT_DELAY_TIME)
-        k = k * 100 / FIGHT_DELAY_TIME;
-    else
-        k = 100;
-
-    if (number_percent() < gsn_fade->getEffective(ch) * k / 100)
-    {
-        SET_BIT(ch->affected_by, AFF_FADE);
-        ch->pecho(_("Ты прячешься в тенях."));        
-        gsn_fade->improve(ch, true);
-    }
-    else {        
-        ch->pecho(_("Ты пытаешься спрятаться в тенях, но безуспешно."));        
-        gsn_fade->improve(ch, false);
-    }
-    return;
-}
 
 SPELL_DECL(EyesOfIntrigue);
 VOID_SPELL(EyesOfIntrigue)::run(Character *ch, const DLString &args, int sn, int level)

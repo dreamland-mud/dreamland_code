@@ -129,62 +129,6 @@ TYPE_SPELL(bool, MentalKnife)::spellbane( Character *, Character * ) const
 }
 
 
-
-// FENIA-OWNED: dreamland_fenia/spell/scourge
-SPELL_DECL(Scourge);
-VOID_SPELL(Scourge)::run( Character *ch, Room *room, int sn, int level ) 
-{ 
-
-  int dam;
-
-  if( ch->getModifyLevel() < 40 )
-        dam = dice(level,6);
-  else if( ch->getModifyLevel() < 65)
-        dam = dice(level,9);
-  else dam = dice(level,12);
-
-
-        for(auto &tmp_vict : ch->in_room->getPeople())
-        {
-            if(!tmp_vict->isDead() && tmp_vict->in_room == ch->in_room){
-
-        if ( tmp_vict->is_mirror()
-            && ( number_percent() < 50 ) ) continue;
-                        
-
-      if ( !is_safe_spell(ch,tmp_vict,true))
-        {
-            if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
-                yell_panic(ch, tmp_vict, "Помогите! Кто-то напал на меня!", "Помогите! %1$^C1 напа%1$Gло|л|ла на меня!");
-
-        
-          if (!tmp_vict->isAffected(sn)) {
-        
-          try{
-            if (number_percent() < level)
-              spell(gsn_poison, level, ch, tmp_vict);
-
-            if (number_percent() < level)
-              spell(gsn_blindness,level,ch,tmp_vict);
-
-            if (number_percent() < level)
-              spell(gsn_weaken, level, ch, tmp_vict);
-
-            if (saves_spell(level,tmp_vict, DAM_FIRE, ch, DAMF_MAGIC))
-              dam /= 2;
-            damage_nocatch( ch, tmp_vict, ( dam ), sn, DAM_FIRE, true, DAMF_MAGIC );
-          }
-            catch (const VictimDeathException &) {
-                   continue;
-            }
-          }
-        }
-
-      }
-    }
-}
-
-
 SPELL_DECL(Transform);
 VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level ) 
 { 
@@ -217,7 +161,5 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
   ch->pecho(_("Прилив жизненной силы затмевает твой разум."));
 
 }
-
-
 
 
