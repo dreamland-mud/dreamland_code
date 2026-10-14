@@ -68,7 +68,7 @@ protected:
     void populateArea( AreaIndexData *, RoomList& , int );
     void populateLair( );
 
-    DLString lairHint( );
+    DLString lairHint( lang_t lang );
     Room * lairHintRoom( );
     Room * pickRandomRoom( );
     static Room * recursiveWalk ( Room *, int, int );

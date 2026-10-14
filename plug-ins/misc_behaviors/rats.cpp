@@ -109,7 +109,7 @@ void RatGod::greet( Character *mob ) {
     XMLAttributeRats::Pointer attr;
 
     if (IS_SET( mob->form, FORM_FELINE )) {
-        exorcism( mob, "{DС котами нельзя!{x" );
+        exorcism( mob, _("{DС котами нельзя!{x") );
         return;
     }
     
@@ -121,17 +121,17 @@ void RatGod::greet( Character *mob ) {
 
     if (attr) {
         if (attr->nongrata.getValue( ) == true) {
-            exorcism( mob, "{rКрысоубийце{D не место здесь.{x" );
+            exorcism( mob, _("{rКрысоубийце{D не место здесь.{x") );
             return;
         }
         if (attr->desecrator) {
-            exorcism( mob, "Тебя здесь не желают видеть." );
+            exorcism( mob, _("Тебя здесь не желают видеть.") );
             return;
         }
     }
 }
 
-void RatGod::exorcism( Character *victim, const char *msg ) {
+void RatGod::exorcism( Character *victim, const MultiMessage &msg ) {
     Room *to_room;
     EXIT_DATA *pexit;
     
@@ -143,9 +143,9 @@ void RatGod::exorcism( Character *victim, const char *msg ) {
         to_room = get_room_instance( ROOM_VNUM_TEMPLE );
     
     transfer_char( victim, ch, to_room,
-                   "%1$^C1 улетучивается.",
+                   _("%1$^C1 улетучивается."),
                    msg,
-                   "%1$^C1 появил%1$Gось|ся|ась в комнате." );
+                   _("%1$^C1 появил%1$Gось|ся|ась в комнате.") );
 }
 
 

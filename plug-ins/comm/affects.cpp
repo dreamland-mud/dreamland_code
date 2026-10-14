@@ -6,6 +6,7 @@
 #include "player_utils.h"
 #include "npcharacter.h"
 #include "object.h"
+#include "wearlocation.h"
 #include "affect.h"
 #include "autoflags.h"
 #include "affectflags.h"
@@ -259,6 +260,78 @@ DLString AffectOutput::format_affect_global( Affect *paf )
     return buf;
 }
 
+// What a raw debuff bit does on its own, with no owning spell affect to carry
+// a modifier: the gear-borne case (random-loot affix, prototype grant). Only
+// effects the engine actually applies for the bare bit are listed. Weaken has
+// no mechanical effect without the spell's own modifiers, so its line says
+// what others see (look.cpp).
+static DLString mal_bit_effect( bitstring_t bit, lang_t lang )
+{
+    switch (bit) {
+    case AFF_BLIND:
+        return _("ты ничего не видишь").getMessage( lang );
+    case AFF_POISON:
+        return _("восстановление в {m4{y раза медленнее").getMessage( lang );
+    case AFF_PLAGUE:
+        return _("восстановление в {m8{y раз медленнее").getMessage( lang );
+    case AFF_CURSE:
+        return _("не пускает в порталы, мешает молитве о возвращении и перемещающим заклинаниям").getMessage( lang );
+    case AFF_SLOW:
+        return _("ходьба отнимает вдвое больше шагов, зато силы восстанавливаются вдвое быстрее").getMessage( lang );
+    case AFF_FAERIE_FIRE:
+        return _("ты светишься и не можешь спрятаться или замаскироваться").getMessage( lang );
+    case AFF_WEAKEN:
+        return _("ты выглядишь беспомощно и слабо").getMessage( lang );
+    default:
+        return DLString::emptyString;
+    }
+}
+
+// Effect lines for an affect a worn item grants: real location/global
+// modifiers as usual, and each affect_flags debuff bit as what it does
+// rather than a bare "adds <bit>". Duplicates are skipped.
+static void gear_affect_lines( AffectOutput &ao, Affect *paf )
+{
+    list<DLString> add;
+    DLString l;
+
+    if (!( l = ao.format_affect_location( paf ) ).empty( ))
+        add.push_back( l );
+
+    const FlagTable *table = paf->bitvector.getTable( );
+    bitstring_t b = paf->bitvector;
+    if (table == &affect_flags && b
+        && !(paf->location == APPLY_BITVECTOR && paf->modifier < 0)) {
+        bitstring_t rest = b;
+        for (int i = 0; i < 63; i++) {
+            bitstring_t bit = ((bitstring_t)1) << i;
+            if (!IS_SET( b, bit ))
+                continue;
+            DLString e = mal_bit_effect( bit, ao.lang );
+            if (e.empty( ))
+                continue;
+            add.push_back( e );
+            REMOVE_BIT( rest, bit );
+        }
+        if (rest)
+            add.push_back( _("добавляет").getMessage( ao.lang ) + " {m"
+                           + affect_flags.messages( rest, true, '4', ao.lang ) + "{y" );
+    } else if (!( l = ao.format_affect_bitvector( paf ) ).empty( )) {
+        add.push_back( l );
+    }
+
+    if (!( l = ao.format_affect_global( paf ) ).empty( ))
+        add.push_back( l );
+
+    for (auto &a: add) {
+        bool dup = false;
+        for (auto &e: ao.lines)
+            if (e == a) { dup = true; break; }
+        if (!dup)
+            ao.lines.push_back( a );
+    }
+}
+
 static bool __aff_sort_time__( const AffectOutput &a, const AffectOutput &b )
 {
     if (a.unitMinutes == b.unitMinutes)
@@ -423,6 +496,17 @@ CMDRUNP( affects )
         ao.duration = -1;               // permanent while the item is worn
         ao.unitMinutes = false;
         ao.negative = skill->isNegative( );  // a gear-granted debuff still reads red
+
+        // Effect lines from the granting items' prototype affects (the same
+        // list rebuild_eq_affects reads), or the row is a bare name.
+        for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content) {
+            if (!obj->wear_loc->givesAffects( ))
+                continue;
+            for (auto &paf: obj->pIndexData->affected)
+                if (paf->type.getElement( ) == skill)
+                    gear_affect_lines( ao, paf );
+        }
+
         output.push_back( ao );
     }
 
@@ -457,6 +541,10 @@ CMDRUNP( affects )
         ao.duration = -1;
         ao.unitMinutes = false;
         ao.negative = true;
+
+        DLString effect = mal_bit_effect( bit, ao.lang );
+        if (!effect.empty( ))
+            ao.lines.push_back( effect );
 
         bool dup = false;
         for (auto &o: output)

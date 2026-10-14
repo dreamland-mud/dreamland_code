@@ -620,6 +620,27 @@ static bool can_show_long_descr(NPCharacter *nVict)
     return false;
 }
 
+/** True when a mob has nothing to show: short and long both blank once colour
+ *  codes are stripped, in the reader's language and the default one. Such mobs
+ *  (the rat god, 777) are props meant to be unseen, not "(Aura)  is here." lines.
+ */
+static bool mob_has_no_descr(NPCharacter *nVict, Character *ch)
+{
+    lang_t lang = Player::lang(ch);
+    const DLString *texts[] = {
+        &nVict->getShortDescr(lang), &nVict->getShortDescr(LANG_DEFAULT),
+        &nVict->getLongDescr(lang),  &nVict->getLongDescr(LANG_DEFAULT),
+    };
+
+    for (auto t: texts) {
+        DLString stripped = t->colourStrip();
+        if (!stripped.stripWhiteSpace().empty())
+            return false;
+    }
+
+    return true;
+}
+
 /*
  * Show a character in the room ('look' or 'look auto')
  */
@@ -636,6 +657,9 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     if (victim->is_npc( )) {
         nVict = victim->getNPC( );
         pVict = 0;
+
+        if (mob_has_no_descr( nVict, ch ))
+            return;
     }
     else {
         nVict = 0;
@@ -717,7 +741,11 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     if (IS_GOOD(victim) && CAN_DETECT(ch, DETECT_GOOD))
         buf << fmt(ch, _("({YЗолотая Аура{x)"));
 
-    if (IS_AFFECTED(victim, AFF_SANCTUARY))
+    // Dark shroud and stardust are drawn as their own auras; a White Aura on
+    // top of either reads as two auras at once, so it yields to them.
+    if (IS_AFFECTED(victim, AFF_SANCTUARY)
+        && !victim->isAffected(gsn_dark_shroud)
+        && !victim->isAffected(gsn_stardust))
         buf << fmt(ch, _("({WБелая Аура{x)"));
 
     if (victim->isAffected(gsn_rainbow_shield))
