@@ -153,7 +153,7 @@ CMDRUN( cast )
     
     if (!spell) {
         if (ch->is_npc( ) && IS_CHARMED(ch)) 
-            do_say(ch, "Я не знаю такого заклинания.");
+            say_fmt(_("Я не знаю такого заклинания."), ch, ch->master);
         else
             ch->pecho(_("Ты не знаешь такого заклинания."));
 
