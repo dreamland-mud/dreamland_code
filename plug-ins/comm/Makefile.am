@@ -78,7 +78,8 @@ corder.h \
 run.h \
 writing.h \
 groupchannel.h \
-eating.h
+eating.h \
+pcname.h
 
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
