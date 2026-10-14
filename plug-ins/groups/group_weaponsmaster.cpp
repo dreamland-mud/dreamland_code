@@ -177,6 +177,7 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
  * 'disarm' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/disarm
 SKILL_RUNP( disarm )
 {
         Character *victim;
@@ -285,6 +286,7 @@ SKILL_RUNP( disarm )
  * 'shield cleave' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/shield cleave
 SKILL_RUNP( shield )
 {
     Debug d(ch, "weaponsmaster", "shield");
@@ -426,6 +428,7 @@ SKILL_RUNP( shield )
  * 'weapon cleave' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/weapon cleave
 SKILL_RUNP( weapon )
 {
     Debug d(ch, "weaponsmaster", "weapon");

@@ -53,7 +53,6 @@
 GSN(none);
 GSN(explode);
 GSN(hara_kiri);
-GSN(katana);
 PROF(samurai);
 DESIRE(thirst);
 DESIRE(hunger);
@@ -170,6 +169,7 @@ SKILL_RUNP( explode )
  * 'harakiri' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/hara kiri
 SKILL_RUNP( harakiri )
 {
     int chance;
@@ -231,116 +231,4 @@ SKILL_RUNP( harakiri )
 }
 
 
-/*
- * 'katana' skill command
- */
-
-SKILL_RUNP( katana )
-{
-        Object *katana;
-        Affect af;
-        Object *part;
-        char arg[MAX_INPUT_LENGTH];
-
-        one_argument( argument, arg );
-
-        if ( ch->isAffected(gsn_katana) )
-        {
-                ch->pecho(_("Ты совсем недавно уже изготавливал%Gо||а катану."), ch);
-                return;
-        }
-        
-
-        if ( arg[0] == '\0' )
-        {
-                ch->pecho(_("Сделать катану? Из чего?"));
-                return;
-        }
-
-        if ( ( part = get_obj_carry( ch, arg ) ) == 0 )
-        {
-                ch->pecho(_("У тебя нету ни куска железа."));
-                return;
-        }
-
-        if ( part->pIndexData->vnum != OBJ_VNUM_CHUNK_IRON )
-        {
-                ch->pecho(_("У тебя нет нужного материала -- поищи в Королевстве Дварфов"));
-                return;
-        }
-
-        if (SHADOW(ch))
-        {
-                ch->pecho(_("Твоя тень все время мелькает перед глазами.\n\rТяжеловато сделать катану в таких условиях."));
-                oldact_p(_("$c1 вместе со своей тенью пытаются сделать катану.\n\r...глупое занятие."),
-                        ch, 0, 0, TO_ROOM,POS_RESTING);
-                return;
-        }
-
-        if ( number_percent( ) > ( gsn_katana->getEffective( ch ) / 3 ) * 2 )
-        {
-                ch->pecho(_("Ты понапрасну изводишь брусок хорошего железа."));
-                extract_obj(part);
-                return;
-        }
-
-        if ( !ch->is_npc() && number_percent() < gsn_katana->getEffective( ch ) + skill_level_bonus(*gsn_katana, ch) )
-        {
-                postaffect_to_char(ch, gsn_katana, ch->getModifyLevel());
-
-                katana = create_object( get_obj_index( OBJ_VNUM_KATANA_SWORD), ch->getModifyLevel() );
-                katana->cost  = 0;
-                katana->level = ch->getModifyLevel();
-                        
-                WeaponGenerator()
-                    .item(katana)
-                    .skill(gsn_katana)
-                    .valueTier(2)
-                    .hitrollTier(1)
-                    .damrollTier(1)
-                    .hitrollStartPenalty(0.35)
-                    .damrollStartPenalty(0.35)
-                    .assignValues()
-                    .assignStartingHitroll()
-                    .assignStartingDamroll();
-
-                // The blade's inscription names its owner in every language:
-                // prototype 98 carries the "property of %s" template in en/ru/ua.
-                if (!katana->pIndexData->extraDescriptions.empty()) {
-                    ExtraDescription *edProto = katana->pIndexData->extraDescriptions.front();
-                    ExtraDescription *edOwn = katana->addProperDescription();
-
-                    for (int l = LANG_MIN; l < LANG_MAX; l++) {
-                        lang_t lang = (lang_t)l;
-                        const DLString &pattern = edProto->description.get(lang);
-
-                        if (!pattern.empty())
-                            edOwn->description[lang] = fmt(0, pattern.c_str(),
-                                                           ch->getNameP('2', lang).c_str());
-                    }
-                }
-        
-                // Bind the katana to its maker: the inscription above already names
-                // the owner, and setOwner makes it a true personal item -- it shows
-                // the (Личное) aura in look/inventory and cannot be given, dropped or
-                // sacrificed by anyone else ([22020]). Full-owner by Kit's call: a
-                // samurai's katana is personal and non-tradeable.
-                katana->setOwner( ch->getNameC() );
-
-                obj_to_char(katana, ch);
-                gsn_katana->improve( ch, true );
-        
-                oldact(_("Ты делаешь катану из $o2!"),ch,part,0,TO_CHAR);
-                oldact(_("$c1 делает катану из $o2!"),ch,part,0,TO_ROOM);
-        
-                extract_obj(part);
-                return;
-        }
-        else
-        {
-                oldact(_("Ты понапрасну изводишь $o4."),ch,part,0,TO_CHAR);
-                extract_obj(part);
-                gsn_katana->improve( ch, false );
-        }
-}
 

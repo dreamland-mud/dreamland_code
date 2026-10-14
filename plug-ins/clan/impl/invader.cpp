@@ -44,11 +44,8 @@ GSN(acid_blast);
 GSN(blindness);
 GSN(dispel_affects);
 GSN(energy_drain);
-GSN(evil_spirit);
 GSN(fade);
 GSN(golden_aura);
-GSN(mental_attack);
-GSN(mental_knife);
 GSN(plague);
 GSN(shadow_cloak);
 GSN(shadow_shroud);
@@ -66,6 +63,7 @@ CLAN(invader);
  * 'fade' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/fade
 SKILL_RUNP(fade)
 {
    
@@ -270,42 +268,3 @@ VOID_SPELL(Shadowlife)::run(Character *ch, Character *victim, int sn, int level)
     postaffect_to_char(ch, sn, 24);
 }
 
-AFFECT_DECL(EvilSpirit);
-VOID_AFFECT(EvilSpirit)::update(Character *ch, Affect *paf)
-{
-    DefaultAffectHandler::update(ch, paf);
-
-    if (ch->getClan() == clan_invader)
-        return;
-
-    Spell::Pointer spell = gsn_mental_knife->getSpell();
-
-    if (spell)
-        spell->run(ch, ch, gsn_mental_attack, ch->getModifyLevel());
-}
-
-VOID_AFFECT(EvilSpirit)::update(Room *room, Affect *paf)
-{
-    Affect af;
-    Character *vch;
-
-    af.type = gsn_evil_spirit;
-    af.level = paf->level;
-    af.duration = number_range(1, (af.level / 30));
-
-    for (vch = room->people; vch; vch = vch->next_in_room)
-    {
-        if (!saves_spell(vch->getModifyLevel() + 2, vch, DAM_MENTAL, 0, DAMF_MAGIC) && !vch->is_immortal() && !is_safe_rspell(vch->getModifyLevel() + 2, vch) && !vch->isAffected(gsn_evil_spirit) && number_bits(3) == 0)
-        {
-            vch->pecho(_("Злые духи овладевают тобой."));
-            oldact(_("Злые духи овладевают $c1."), vch, 0, 0, TO_ROOM);
-            affect_join(vch, &af);
-        }
-    }
-}
-
-VOID_AFFECT(EvilSpirit)::toStream(ostringstream &buf, Affect *paf)
-{
-    buf << fmt(0, _("Злые духи воцарились здесь на {W%1$d{x ча%1$Iс|са|сов."), paf->duration)
-        << endl;
-}

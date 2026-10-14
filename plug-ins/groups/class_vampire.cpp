@@ -279,6 +279,7 @@ SKILL_RUNP( grave )
  * 'vampire' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/vampire
 SKILL_RUNP( vampire )
 {
         Affect af;
@@ -650,6 +651,7 @@ SKILL_APPLY( bite )
  * 'vampiric touch' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/vampiric touch
 SKILL_RUNP( touch )
 {
     Character *victim;

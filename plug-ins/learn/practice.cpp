@@ -59,6 +59,7 @@ static void mprog_teach( PCharacter *client, NPCharacter *teacher, const char *s
  * Fenia command never loaded. Do NOT l10n/"fix" it expecting an in-game effect
  * -- edit the Fenia override instead.
  */
+// FENIA-OWNED: dreamland_fenia/command/practice/runFunc
 COMMAND(CPractice, "practice")
 {
     DLString argument = constArguments;

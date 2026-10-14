@@ -130,6 +130,7 @@ TYPE_SPELL(bool, MentalKnife)::spellbane( Character *, Character * ) const
 
 
 
+// FENIA-OWNED: dreamland_fenia/spell/scourge
 SPELL_DECL(Scourge);
 VOID_SPELL(Scourge)::run( Character *ch, Room *room, int sn, int level ) 
 { 

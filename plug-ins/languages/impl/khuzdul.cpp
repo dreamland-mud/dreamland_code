@@ -23,7 +23,6 @@ KhuzdulLanguage::KhuzdulLanguage( ) : Language( LANG_NAME )
 
 void KhuzdulLanguage::initialization( )
 {
-    Class::regMoc<FireproofWE>( );
     Class::regMoc<EnchantWeaponWE>( );
     Class::regMoc<BerserkWE>( );
     Class::regMoc<MendingWE>( );
@@ -35,7 +34,6 @@ void KhuzdulLanguage::destruction( )
 {
     Language::destruction( );
     Class::unregMoc<KhuzdulLanguage>( );
-    Class::unregMoc<FireproofWE>( );
     Class::unregMoc<EnchantWeaponWE>( );
     Class::unregMoc<BerserkWE>( );
     Class::unregMoc<MendingWE>( );

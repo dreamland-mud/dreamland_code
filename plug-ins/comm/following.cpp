@@ -295,6 +295,7 @@ CMDRUN( group )
  * fall-through if the Fenia command never loaded. Do NOT l10n/"fix" it expecting
  * an in-game effect -- edit the Fenia override instead.
  */
+// FENIA-OWNED: dreamland_fenia/command/nuke/runFunc
 CMDRUN( nuke )
 {
     Character *victim;

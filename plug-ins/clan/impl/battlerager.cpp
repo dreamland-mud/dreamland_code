@@ -501,4 +501,5 @@ void ClanHealerBattlerager::speech( Character *wch, const char *cspeech )
 
 
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/trophy
 SKILL_DECL(trophy);

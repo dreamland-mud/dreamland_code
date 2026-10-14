@@ -974,6 +974,7 @@ CMDRUNP( oscore )
  * boot-safety fall-through if the Fenia command is unavailable (e.g. Fenia never
  * loaded): render the linear prose score, honouring a single-parameter query.
  */
+// FENIA-OWNED: dreamland_fenia/command/score/runFunc
 CMDRUNP( score )
 {
     DLString arg = argument;

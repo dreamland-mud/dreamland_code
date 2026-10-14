@@ -206,6 +206,7 @@ static Object * find_arrow( Character *ch, Object *quiver )
  * 'shoot' command for skill 'bow' 
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/bow
 SKILL_RUNP( shoot )
 {
     Character *victim;
@@ -516,23 +517,6 @@ static Object * create_arrow( int color, int level )
     return arrow;
 }
 
-/*
- * 'make arrow' skill command
- */
-
-SKILL_RUNP( makearrow )
-{
-}
-
-
-
-/*
- * 'make bow' skill command
- */
-
-SKILL_RUNP(makebow)
-{
-}
 
 
 /*----------------------------------------------------------------------------
@@ -694,6 +678,7 @@ SKILL_APPLY( ambush )
  * 'camouflage' skill command
  */
 
+// FENIA-OWNED: dreamland_fenia/skillcommand/camouflage
 SKILL_RUNP( camouflage )
 {
         if ( MOUNTED(ch) )
