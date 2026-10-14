@@ -23,6 +23,7 @@
 #include "run.h"
 #include "writing.h"
 #include "eating.h"
+#include "pcname.h"
 #include "so.h"
 
 extern "C"
@@ -43,6 +44,9 @@ extern "C"
                 Plugin::registerPlugin<CWrite>( ppl );
                 
                 Plugin::registerPlugin<CEat>( ppl );
+
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeNameForm> >( ppl );
+                Plugin::registerPlugin<NameFormLoginListener>( ppl );
 
         	Plugin::registerPlugin<GroupChannel>( ppl );
                 return ppl;
