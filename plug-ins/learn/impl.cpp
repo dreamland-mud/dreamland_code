@@ -8,7 +8,6 @@
 #include "commandtemplate.h"
 
 #include "train.h"
-#include "practice.h"
 #include "teach.h"
 
 extern "C"
@@ -19,8 +18,6 @@ extern "C"
 
         Plugin::registerPlugin<MobileBehaviorRegistrator<Trainer> >( ppl );
         
-        Plugin::registerPlugin<CPractice>( ppl );
-
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeTeacher> >( ppl );
         
         return ppl;

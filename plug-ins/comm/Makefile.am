@@ -32,15 +32,12 @@ senses.cpp \
 affects.cpp \
 groupchannel.cpp \
 following.cpp \
-drop.cpp \
 help.cpp \
 helpcategory.cpp \
 score.cpp \
 title.cpp \
 pcname.cpp \
-report.cpp \
 prompt.cpp \
-compare.cpp \
 where.cpp \
 demand.cpp \
 wimpy.cpp \
