@@ -277,7 +277,7 @@ static DLString mal_bit_effect( bitstring_t bit, lang_t lang )
     case AFF_CURSE:
         return _("не пускает в порталы, мешает молитве о возвращении и перемещающим заклинаниям").getMessage( lang );
     case AFF_SLOW:
-        return _("ходьба отнимает вдвое больше шагов").getMessage( lang );
+        return _("ходьба отнимает вдвое больше шагов, зато силы восстанавливаются вдвое быстрее").getMessage( lang );
     case AFF_FAERIE_FIRE:
         return _("ты светишься и не можешь спрятаться или замаскироваться").getMessage( lang );
     case AFF_WEAKEN:
