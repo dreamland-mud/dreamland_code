@@ -10,6 +10,7 @@
 #include "affect.h"
 #include "character.h"
 #include "pcharacter.h"
+#include "npcharacter.h"
 #include "player_utils.h"
 #include "object.h"
 
@@ -597,4 +598,13 @@ int TailWearloc::canWear( Character *ch, Object *obj, int flags ) {
 bool obj_is_worn(Object *obj)
 {
     return obj->wear_loc->givesAffects();
+}
+
+bool wear_is_owned_pet(Character *ch)
+{
+    return ch != 0
+           && ch->is_npc( )
+           && ch->master != 0
+           && !ch->master->is_npc( )
+           && ch->master->getPC( )->pet == ch;
 }

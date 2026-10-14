@@ -300,6 +300,11 @@ static bool oprog_remove( Object *obj, Character *ch )
 
 bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
 {
+    // Backstop for the paths that skip canWear (Fenia obj.equip, equip_char,
+    // corpse re-equip). Arrows still stick in a pet.
+    if (wear_is_owned_pet( ch ) && getName( ) != "stuck_in")
+        return false;
+
     if (obj->isAntiAligned( ch )) {
         echo_master(ch, _("Твоя натура не позволяет тебе носить %O4."), obj);
         ch->recho(_("%1$^C1 безуспешно пытается надеть %2$O4."), ch, obj);
@@ -630,6 +635,12 @@ bool DefaultWearlocation::canWear( Character *ch, int flags )
 
 int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 {
+    if (wear_is_owned_pet( ch )) {
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            echo_master(ch, _("Питомцы не носят снаряжения."));
+        return RC_WEAR_PET;
+    }
+
     int wear_level = get_wear_level( ch, obj );
 
     if (wear_level > ch->getRealLevel( )) {

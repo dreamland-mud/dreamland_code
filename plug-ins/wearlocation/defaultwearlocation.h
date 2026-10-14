@@ -125,4 +125,9 @@ int DefaultWearlocation::getDestroyChance( ) const
 {
     return destroyChance.getValue( );
 }
+// True for a player's own pet (PCharacter::pet). Pets wear nothing: a pet's
+// pfile keeps no items, so anything it wore was lost at the next relog with
+// its bonuses baked into the saved numbers. Defined in misc_wearlocs.cpp.
+bool wear_is_owned_pet( Character *ch );
+
 #endif

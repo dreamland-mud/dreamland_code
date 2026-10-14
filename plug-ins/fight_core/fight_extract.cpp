@@ -18,6 +18,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 GSN(doppelganger);
 
@@ -125,6 +126,13 @@ void extract_char( Character *ch, bool count )
         count = true;
 
     flags = FEXTRACT_TOTAL | (count ? FEXTRACT_COUNT : 0);
+
+    // Every way a player leaves the world ends here (quit, account switch,
+    // remort, deny, exec teardown). Fenia undresses charmed followers before
+    // follower_die frees them and save_mobs writes them out. No save follows,
+    // so reason "extract" tells the handler not to move items to the player.
+    if (!npc)
+        gprog("onLeaveWorld", "Cs", ch, "extract");
 
     if (!npc)
         nuke_pets( pc, flags );

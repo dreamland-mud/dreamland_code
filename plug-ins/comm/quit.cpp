@@ -94,6 +94,7 @@
 #include "loadsave.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 CLAN(invader);
 CLAN(none);
@@ -278,6 +279,11 @@ CMDRUNP( quit )
 
     undig( pch );
     pch->dismount( );
+
+    /* Past every refusal gate, before the save: Fenia hands the pet's pack to
+     * the owner and undresses charmed followers, so the save below keeps the
+     * pet's items and no follower is written out wearing set bonuses. */
+    gprog( "onLeaveWorld", "Cs", (Character *)pch, "quit" );
 
     interpret_raw( pch, "save", "" );
 

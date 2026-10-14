@@ -33,6 +33,7 @@
 #include "interp.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
@@ -677,6 +678,8 @@ static void account_switch(PCharacter *ch, DLString &args)
     // Mirrors quit.cpp order. resume_token_clear: this char leaves the descriptor for
     // good, so a stale web tab can never resume it. After this block ch is invalid --
     // never touch it again; use d/alt/altName/id.
+    // Same leave-world hook as quit, before the save (pet pack, follower gear).
+    gprog("onLeaveWorld", "Cs", (Character *)ch, "switch");
     ch->save();
     PCharacterManager::quit(ch);
     resume_token_clear(ch);

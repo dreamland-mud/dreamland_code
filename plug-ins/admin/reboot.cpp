@@ -6,6 +6,7 @@
 #include "act.h"
 #include "dreamland.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 static void reboot_now( )
 {
@@ -25,8 +26,11 @@ static void reboot_now( )
             else
                 d->send("Dreamland is rebooting RIGHT NOW! / Мир Мечты уходит на перезагрузку ПРЯМО СЕЙЧАС! / Світ Мрії йде на перезавантаження ПРЯМО ЗАРАЗ!\n");
 
-            if (d->character && d->connected == CON_PLAYING)
+            if (d->character && d->connected == CON_PLAYING) {
+                    // Same leave-world hook as quit, before the save.
+                    gprog("onLeaveWorld", "Cs", d->character, "reboot");
                     d->character->getPC( )->save();
+            }
 
             d->close();
     }
