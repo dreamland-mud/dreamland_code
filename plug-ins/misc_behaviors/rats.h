@@ -13,6 +13,8 @@
 #include "pet.h"
 #include "xmlattribute.h"
 
+class MultiMessage;
+
 class Rat : public LevelAdaptivePet {
 XML_OBJECT
 public:
@@ -38,7 +40,7 @@ public:
         
 protected:
         Character * getActor( Character * );
-        void exorcism( Character *, const char * );
+        void exorcism( Character *, const MultiMessage & );
 };
 
 class XMLAttributeRats : public XMLAttribute, public XMLVariableContainer {

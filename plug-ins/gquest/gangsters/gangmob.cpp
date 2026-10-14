@@ -236,7 +236,7 @@ void GangMember::bribe( Character *briber, int gold, int silver )
         oldact(_("$c1 произносит '{gУговорил$G||а, красноречив$Gый|ый|ая{x... Я открою тебе тайну!{x'"), ch, 0, 0, TO_ROOM);
         oldact(_("$c1 что-то говорит на ухо $C3."), ch, 0, briber, TO_NOTVICT);        
         oldact_p(_("$c1 говорит тебе '{GВход в логово я видел около $t. Но больше мне ничего не известно.{x'"),
-               ch, gquest->lairHint( ).c_str( ), briber, TO_VICT, POS_RESTING);
+               ch, gquest->lairHint( viewerLang( briber ) ).c_str( ), briber, TO_VICT, POS_RESTING);
         
         confessed = true;
     }
@@ -445,7 +445,7 @@ bool GangMember::death( Character *killer )
                 oldact(_("$c1 хрипит '{gЭх, все равно помирать... Так слушай же.{x'"), ch, 0, killer, TO_VICT);
 
             oldact_p(_("$c1 хрипит '{gВход в логово найдешь неподалеку от $t...{x'"),
-                   ch, gquest->lairHint( ).c_str( ), killer, TO_VICT, POS_RESTING );
+                   ch, gquest->lairHint( viewerLang( killer ) ).c_str( ), killer, TO_VICT, POS_RESTING );
         }
         
         gquest->rewardMobKiller( killer->getPC( ), ch );

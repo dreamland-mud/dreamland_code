@@ -914,11 +914,12 @@ Room * Gangsters::lairHintRoom( )
     return NULL;
 }
 
-DLString Gangsters::lairHint( ) 
+// The hint room's name in the listener's language (RU fallback).
+DLString Gangsters::lairHint( lang_t lang ) 
 {
     Room *room = lairHintRoom( );
 
-    return room ? room->getName( ) : "";
+    return room ? room->getName( lang ) : "";
 }
 
 void Gangsters::populateArea( AreaIndexData *area, RoomList &mobRooms, int numPortal )

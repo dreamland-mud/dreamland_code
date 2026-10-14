@@ -442,11 +442,23 @@ CMDRUNP( put )
                           refused, container);
         }
 
-        // Nothing went in but something was turned away: say why once,
-        // for the first refused item, instead of "found nothing".
-        if (!found && firstRefused && !firstRefused->extracted
+        // Nothing went in and exactly one item was turned away: say why.
+        if (!found && refused == 1 && firstRefused && !firstRefused->extracted
             && firstRefused->carried_by == ch && !container->extracted) {
             can_put_obj_into( ch, firstRefused, container, pocket, true );
+            return;
+        }
+
+        // Nothing went in and several items were turned away: one collated
+        // line, not the first item's reason dressed up as the whole answer.
+        // Typed containers fall through to the "found nothing" line below.
+        if (!found && refused > 1 && !typed && !container->extracted) {
+            if (IS_SET(container->value1(), CONT_PUT_ON|CONT_PUT_ON2))
+                ch->pecho(_("Ничего не удалось положить на %2$O4: ни одна из вещей (%1$d шт.) не подходит."),
+                          refused, container);
+            else
+                ch->pecho(_("Ничего не удалось положить в %2$O4: ни одна из вещей (%1$d шт.) не подходит."),
+                          refused, container);
             return;
         }
 
