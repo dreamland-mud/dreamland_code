@@ -145,8 +145,14 @@ static void format_area_quest(AreaQuest *q, ostringstream &qbuf, Character *ch)
     if (q->prereq > 0) {
         auto p = areaQuests.find(q->prereq.getValue());
         if (p != areaQuests.end()) {
-            DLString pdesc = p->second->description.getForLang(viewerLang(ch));
+            // The title names the quest; the description would repeat its whole
+            // pitch, reward and all. Older quests without a title fall back to it.
+            DLString pdesc = p->second->title.getForLang(viewerLang(ch));
             pdesc.stripWhiteSpace();
+            if (pdesc.empty()) {
+                pdesc = p->second->description.getForLang(viewerLang(ch));
+                pdesc.stripWhiteSpace();
+            }
             qbuf << " " << _("Сначала выполни задание: ").getMessage(ch) << pdesc;
             if (p->second->pAreaIndex && p->second->pAreaIndex != q->pAreaIndex)
                 qbuf << " (" << p->second->pAreaIndex->getName(viewerLang(ch)) << ")";
