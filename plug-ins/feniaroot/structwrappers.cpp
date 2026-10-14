@@ -1818,6 +1818,20 @@ NMI_INVOKE( LanguageWrapper, runEffect, "(effect, ch, target): выполнит�
     if (!effect)
         throw Scripting::Exception(effectName + " effect not found for language " + name);
 
+    // Fenia first, as on utter (languagecommand.cpp runFeniaEffect): a bound
+    // .WordEffect(lang,name).runVict / runObj replaces the C++ run() entirely.
+    WrapperBase *base = effect->getWrapper();
+    if (base) {
+        static Scripting::IdRef runVictId("runVict"), runObjId("runObj");
+        Scripting::Register prog;
+
+        if (effectTarget->type == SpellTarget::CHAR && base->triggerFunction(runVictId, prog))
+            return Register(base->call(runVictId, "CC", ch, effectTarget->victim));
+
+        if (effectTarget->type == SpellTarget::OBJECT && base->triggerFunction(runObjId, prog))
+            return Register(base->call(runObjId, "CO", ch, effectTarget->obj));
+    }
+
     switch (effectTarget->type) {
     case SpellTarget::CHAR:
         return Register(effect->run(ch, effectTarget->victim));
