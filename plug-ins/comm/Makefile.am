@@ -70,6 +70,7 @@ webblob.cpp \
 webscript.cpp \
 webtriggers.cpp \
 webaliases.cpp \
+webmacros.cpp \
 execservlet.cpp \
 accountservlet.cpp
 

@@ -326,24 +326,27 @@ void PCharacterManager::remove( const DLString& name )
     }
 }
 
-/* The web client's per-character triggers (comm/webtriggers.cpp) are files
- * keyed by the lowercase name: they follow a rename and are retired with a
- * deleted character, so a recycled name never inherits someone's automation. */
-static const char *WEBTRIGGERS_CHAR_TABLE = "webtriggers_char";
-static const char *WEBTRIGGERS_EXTS[] = { ".json", ".json.prev" };
+/* The web client's per-character triggers and macros (comm/webtriggers.cpp,
+ * comm/webmacros.cpp) are files keyed by the lowercase name: they follow a
+ * rename and are retired with a deleted character, so a recycled name never
+ * inherits someone's automation. */
+static const char *WEB_CHAR_TABLES[] = { "webtriggers_char", "webmacros_char" };
+static const char *WEB_CHAR_EXTS[] = { ".json", ".json.prev" };
 
 static void webtriggers_move( const DLString &from, const DLString &toName, const DLString &suffix )
 {
-    DLFile dir( dreamland->getDbDir( ), WEBTRIGGERS_CHAR_TABLE );
+    for (const char *table: WEB_CHAR_TABLES) {
+        DLFile dir( dreamland->getDbDir( ), table );
 
-    for (const char *ext: WEBTRIGGERS_EXTS) {
-        DLFile src( dir, from, ext );
-        if (!src.exist( ))
-            continue;
+        for (const char *ext: WEB_CHAR_EXTS) {
+            DLFile src( dir, from, ext );
+            if (!src.exist( ))
+                continue;
 
-        DLFile dst( dir, toName, DLString( ext ) + suffix );
-        if (!src.rename( dst ))
-            LogStream::sendError( ) << "webtriggers: could not move " << from << ext << endl;
+            DLFile dst( dir, toName, DLString( ext ) + suffix );
+            if (!src.rename( dst ))
+                LogStream::sendError( ) << table << ": could not move " << from << ext << endl;
+        }
     }
 }
 

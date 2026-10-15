@@ -1,6 +1,6 @@
 /* Opaque per-owner blobs the web client keeps on the server: the gear script
- * (webscript.cpp), the player's triggers (webtriggers.cpp) and account aliases
- * (webaliases.cpp).
+ * (webscript.cpp), the player's triggers (webtriggers.cpp), macros
+ * (webmacros.cpp) and account aliases (webaliases.cpp).
  *
  * Stored as base64 of the client's UTF-8 text, because every string in an rpc
  * frame goes through utf-8 -> koi8-u//IGNORE on the way in and would lose what
@@ -15,6 +15,7 @@
 
 #include <time.h>
 #include <map>
+#include <vector>
 #include <jsoncpp/json/json.h>
 
 #include "dlstring.h"
@@ -52,5 +53,30 @@ bool web_blob_caller_ok(Character *ch);
 
 /** The caller's account id, "" for none or for an id that cannot be a file name. */
 DLString web_blob_account(Character *ch);
+
+/** The character's file id: its lowercase name, as the pfile is named. "" for
+ *  a name that cannot be a file name. */
+DLString web_blob_char_id(Character *ch);
+
+/** A list the player keeps twice -- the character's own and the account's,
+ *  shared by every character of the account -- picking per item which one.
+ *  A character without an account has only its own.
+ *
+ *  get: <prefix>_data  {account, acct:{b64,stamp}, char:{b64,stamp}}
+ *  put <acct|char> <b64> -> <prefix>_saved {scope, ok, stamp, reason}
+ *       reason: no_account | bad_scope | too_big | bad_data | rate | io */
+class WebBlobPair {
+public:
+    WebBlobPair(const DLString &prefix, const DLString &charTable, const DLString &acctTable,
+                size_t maxBytes, time_t putGap);
+
+    void get(Character *ch);
+    void put(Character *ch, const std::vector<DLString> &args);
+
+private:
+    DLString prefix;
+    WebBlobTable charTable;
+    WebBlobTable acctTable;
+};
 
 #endif

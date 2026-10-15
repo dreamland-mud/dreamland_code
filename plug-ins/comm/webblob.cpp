@@ -209,3 +209,90 @@ void WebBlobTable::put(Character *ch, const DLString &id, const DLString &b64, J
     LogStream::sendNotice() << table << ": " << ch->getPC()->getName()
                             << " saved " << size << " bytes to " << id << endl;
 }
+
+DLString web_blob_char_id(Character *ch)
+{
+    DLString id = ch->getPC()->getName().toLower();
+
+    for (DLString::size_type i = 0; i < id.size(); i++) {
+        char c = id[i];
+        if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')))
+            return DLString::emptyString;
+    }
+
+    return id;
+}
+
+/** {b64, stamp} of one list, empty when there is none. */
+static Json::Value web_blob_list(WebBlobTable &table, const DLString &id)
+{
+    Json::Value list;
+    list["b64"] = "";
+    list["stamp"] = 0;
+
+    Json::Value stored;
+    if (!id.empty() && table.load(id, stored)) {
+        list["b64"] = stored["b64"];
+        list["stamp"] = stored["stamp"];
+    }
+
+    return list;
+}
+
+WebBlobPair::WebBlobPair(const DLString &prefix, const DLString &charTable, const DLString &acctTable,
+                         size_t maxBytes, time_t putGap)
+    : prefix(prefix), charTable(charTable, maxBytes, putGap), acctTable(acctTable, maxBytes, putGap)
+{
+}
+
+void WebBlobPair::get(Character *ch)
+{
+    if (!web_blob_caller_ok(ch))
+        return;
+
+    DLString acct = web_blob_account(ch);
+
+    Json::Value msg;
+    msg["command"] = prefix + "_data";
+    Json::Value &data = msg["args"][0];
+    data["account"] = !acct.empty();
+    data["acct"] = web_blob_list(acctTable, acct);
+    data["char"] = web_blob_list(charTable, web_blob_char_id(ch));
+
+    ch->desc->writeWSCommand(msg);
+}
+
+void WebBlobPair::put(Character *ch, const std::vector<DLString> &args)
+{
+    if (!web_blob_caller_ok(ch))
+        return;
+
+    const DLString &scope = args.size() > 0 ? args[0] : DLString::emptyString;
+    const DLString &b64 = args.size() > 1 ? args[1] : DLString::emptyString;
+
+    Json::Value msg;
+    msg["command"] = prefix + "_saved";
+    Json::Value &data = msg["args"][0];
+    data["scope"] = scope.c_str();
+    data["ok"] = false;
+    data["stamp"] = 0;
+    data["reason"] = "";
+
+    if (scope == "acct") {
+        DLString acct = web_blob_account(ch);
+        if (acct.empty())
+            data["reason"] = "no_account";
+        else
+            acctTable.put(ch, acct, b64, data);
+    } else if (scope == "char") {
+        DLString id = web_blob_char_id(ch);
+        if (id.empty())
+            data["reason"] = "bad_scope";
+        else
+            charTable.put(ch, id, b64, data);
+    } else {
+        data["reason"] = "bad_scope";
+    }
+
+    ch->desc->writeWSCommand(msg);
+}
