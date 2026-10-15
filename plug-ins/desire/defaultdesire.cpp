@@ -11,6 +11,7 @@
 
 #include "screenreader.h"
 #include "act.h"
+#include "multimessage.h"
 #include "merc.h"
 
 #include "def.h"
@@ -205,8 +206,10 @@ void DefaultDesire::gain( PCharacter *ch, int value )
     if (desire == damageLimit && !isNewbie) {
         if (!msgDamageSelf.getForLang(lang).empty( ))
             ch->pecho( msgDamageSelf.getForLang(lang).c_str( ) );
-        if (!msgDamageRoom.empty( ))
-            ch->recho( msgDamageRoom.c_str( ), ch );
+        if (!msgDamageRoom.emptyValues( ))
+            ch->recho( MultiMessage(msgDamageRoom.getForLang(EN),
+                                    msgDamageRoom.getForLang(RU),
+                                    msgDamageRoom.getForLang(UA)), ch );
         damage( ch );
         return;
     }

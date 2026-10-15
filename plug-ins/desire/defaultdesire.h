@@ -68,7 +68,7 @@ protected:
     XML_VARIABLE XMLMultiString  msgStop, msgStart;
     XML_VARIABLE XMLMultiString  msgActive;
     XML_VARIABLE XMLMultiString  msgDamageSelf;
-    XML_VARIABLE XMLString       msgDamageRoom;
+    XML_VARIABLE XMLMultiString  msgDamageRoom;
     XML_VARIABLE XMLMultiString  msgReport;
 };
 
