@@ -44,8 +44,7 @@ INCLUDES_ANATOLIA= \
 -I$(top_srcdir)/plug-ins/wearlocation \
 -I$(top_srcdir)/plug-ins/race \
 -I$(top_srcdir)/plug-ins/movement \
--I$(top_srcdir)/plug-ins/occupations \
--I$(top_srcdir)/plug-ins/anatolia
+-I$(top_srcdir)/plug-ins/occupations
 
 INCLUDES_FIGHT = \
 $(INCLUDES_ANATOLIA) \

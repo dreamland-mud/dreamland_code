@@ -20,12 +20,8 @@ steps:
   - cd /home/dreamland/dreamland_code
   - git pull
   - kill -9 $SSH_AGENT_PID
-  - make -f Makefile.git
-  - cd ../objs
-  - ../dreamland_code/configure --prefix=/home/dreamland/runtime
-  - rm -f plug-ins/*/lib*cpp plug-ins/*/*/lib*cpp
-  - make -j 2
-  - make install
+  # Full autotools rebuild only when build files changed, see the script.
+  - sh admin/drone-build.sh
 
 - name: discord_failure
   commands:
