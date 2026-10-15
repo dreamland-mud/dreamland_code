@@ -132,6 +132,12 @@ CMDRUNP( wear )
         ch->pecho(_("Надеть, вооружиться или взять это в руки?"));
         return;
     }
+
+    // One line for 'order pet wear all', not a refusal per item.
+    if (wear_is_owned_pet( ch )) {
+        echo_master(ch, _("Питомцы не носят снаряжения."));
+        return;
+    }
     
     if (arg_is_to( argTo ) || arg_is_in( argTo ) || arg_is_on(argTo)) {
         if (arg_is(argVict, "hair")) {
@@ -148,6 +154,10 @@ CMDRUNP( wear )
             return;
         } else if (victim != ch && !victim->is_npc( )) {
             oldact(_("$C1 в состоянии одеться са$Gмо|м|ма!"), ch, 0, victim, TO_CHAR);
+            return;
+        }
+        else if (wear_is_owned_pet( victim )) {
+            ch->pecho(_("%1$^C1 не стан%1$nет|ут ничего надевать: питомцы не носят снаряжения."), victim);
             return;
         }
     }

@@ -17,6 +17,7 @@ enum {
     RC_WEAR_YOUNG,
     RC_WEAR_HEAVY,
     RC_WEAR_LARGE,
+    RC_WEAR_PET,
 };
 
 #endif
