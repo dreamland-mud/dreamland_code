@@ -3,7 +3,7 @@
  * ruffina, 2009
  */
 #include "ahenn.h"
-#include "ahenn_effects.h"
+#include "wordeffect.h"
 #include "language.h"
 #include "languagemanager.h"
 #include "word.h"
@@ -30,8 +30,6 @@ AhennLanguage::AhennLanguage( ) : Language( LANG_NAME )
 
 void AhennLanguage::initialization( )
 {
-    Class::regMoc<BadSpellWE>( );
-    Class::regMoc<InspirationWE>( );
     Class::regMoc<AhennLanguage>( );
     Language::initialization( );
 }
@@ -40,8 +38,6 @@ void AhennLanguage::destruction( )
 {
     Language::destruction( );
     Class::unregMoc<AhennLanguage>( );
-    Class::unregMoc<BadSpellWE>( );
-    Class::unregMoc<InspirationWE>( );
 }
 
 

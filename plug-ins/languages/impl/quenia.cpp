@@ -3,7 +3,7 @@
  * ruffina, 2009
  */
 #include "quenia.h"
-#include "quenia_effects.h"
+#include "wordeffect.h"
 #include "language.h"
 #include "languagemanager.h"
 #include "word.h"
@@ -23,8 +23,6 @@ QueniaLanguage::QueniaLanguage( ) : Language( LANG_NAME )
 
 void QueniaLanguage::initialization( )
 {
-    Class::regMoc<GoodSpellWE>( );
-    Class::regMoc<AccuracyWE>( );
     Class::regMoc<QueniaLanguage>( );
     Language::initialization( );
 }
@@ -33,8 +31,6 @@ void QueniaLanguage::destruction( )
 {
     Language::destruction( );
     Class::unregMoc<QueniaLanguage>( );
-    Class::unregMoc<GoodSpellWE>( );
-    Class::unregMoc<AccuracyWE>( );
 }
 
 static bool is_vowel( char c )
