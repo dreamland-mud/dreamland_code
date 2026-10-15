@@ -86,6 +86,7 @@
 #include "religionutils.h"
 #include "religion.h"
 #include "websocketrpc.h"
+#include "msp.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -7829,6 +7830,23 @@ NMI_INVOKE( CharacterWrapper, writeWSCommand, "(cmd,args...): отправить
     }
 
     return target->desc->writeWSCommand(val);
+}
+
+NMI_INVOKE( CharacterWrapper, sound, "(name[, volume, loops, priority]): MSP-звук из библиотеки веб-клиента (\"alert/bell\"), если клиент чара принимает MSP; true если отправлен" )
+{
+    checkTarget( );
+
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+
+    if (target->is_npc( ) || !target->desc)
+        return Register( false );
+
+    int volume = args.size( ) > 1 ? argnum2number( args, 2 ) : 100;
+    int loops = args.size( ) > 2 ? argnum2number( args, 3 ) : 1;
+    int priority = args.size( ) > 3 ? argnum2number( args, 4 ) : 50;
+
+    return Register( msp_sound( target->desc, argnum2string( args, 1 ), volume, loops, priority ) );
 }
 
 NMI_INVOKE( CharacterWrapper, eat, "(ob): заполнить желудок так, будто obj был съеден" )
