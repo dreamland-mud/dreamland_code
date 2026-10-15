@@ -42,6 +42,7 @@
 #include "configurable.h"
 #include "def.h"
 #include "l10n.h"
+#include "msp.h"
 
 GSN(resistance);
 GSN(dark_shroud);
@@ -507,10 +508,38 @@ void Damage::inflictDamage( )
     if (!ch->is_immortal( ) && !ch->is_npc( ) && dam > 2000) 
         wiznet( WIZ_DAMAGES, 0, 0, "%^C1 : повреждения более 2000 : %d", ch, dam );
 
+    int before = victim->hit;
     victim->hit -= dam;
     
     if (victim->is_immortal( ))
         victim->hit = max( (int)victim->hit, 1 );
+
+    soundDamage( before );
+}
+
+/*
+ * MSP sounds for a hit that matters: a fifth of max hp in one blow, either
+ * way, and the moment the victim's health drops under a fifth. A sound for
+ * every hit would drown the ones that carry news.
+ */
+void Damage::soundDamage( int before )
+{
+    if (dam <= 0)
+        return;
+
+    if (!victim->is_npc( )) {
+        int low = victim->max_hit / 5;
+
+        if (before >= low && victim->hit < low)
+            msp_sound( victim, "alert/lowhp", 100, 1, 80 );
+        else if (dam > victim->max_hit / 5 && ch != victim)
+            msp_sound( victim, "combat/hurt", 100, 1, 60 );
+    }
+
+    if (ch != victim && !ch->is_npc( )
+        && dam > victim->max_hit / 5
+        && victim->getModifyLevel( ) >= ch->getModifyLevel( ))
+        msp_sound( ch, "combat/crit", 100, 1, 60 );
 }
 
 /*-----------------------------------------------------------------------------

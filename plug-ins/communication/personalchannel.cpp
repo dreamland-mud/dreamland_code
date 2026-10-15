@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "personalchannel.h"
+#include "channels.h"
 #include "chatframe.h"
 #include "replay.h"
 
@@ -19,6 +20,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "msp.h"
 
 GSN(deafen);
 
@@ -169,6 +171,11 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
     DLString outVict = msg;
     applyGarble( ch, outVict );
     DLString messageVict = outputVict( ch, victim, fmtVict, outVict );
+
+    // MSP for tell and reply only, and also when the message waits in the
+    // buffer: the sound is how a blind player away from the text learns of it.
+    if (ch != victim && dynamic_cast<TellChannel *>( this ))
+        msp_sound( victim, "chat/tell", 100, 1, 70 );
 
     if (checkAFK( ch, victim, msg )) {
         tellToBuffer( ch, victim, messageChar, messageVict );
