@@ -57,8 +57,9 @@ protected:
     void rewardNobody( );
     void rewardMobKiller( PCharacter *, Character * );
 
-    inline const DLString & getHint( ) const;
-    inline void setHint( const DLString & );
+    const DLString & getHint( lang_t ) const;
+    void setHint( const MultiMessage & );
+    void appendHint( const MultiMessage & );
 
     void createFirstHint( MobileList & );
     Room * findHintRoom( MultiMessage& );
@@ -79,6 +80,8 @@ protected:
     XML_VARIABLE XMLString informerName;
     XML_VARIABLE XMLString informerRoom;
     XML_VARIABLE XMLString hint;
+    XML_VARIABLE XMLString hintEn;
+    XML_VARIABLE XMLString hintUa;
     XML_VARIABLE XMLInteger hintCount;
     XML_VARIABLE XMLString chefKiller;
     XML_VARIABLE XMLInteger keyCount;
@@ -99,16 +102,6 @@ private:
 
     static Gangsters *thisClass;
 };
-
-inline const DLString & Gangsters::getHint( ) const
-{
-    return hint.getValue( );
-}
-
-inline void Gangsters::setHint( const DLString &hint ) 
-{
-    this->hint = hint;
-}
 
 inline Gangsters * Gangsters::getThis( )
 {

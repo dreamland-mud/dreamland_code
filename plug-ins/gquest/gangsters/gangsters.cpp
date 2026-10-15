@@ -394,12 +394,41 @@ void Gangsters::progress( std::ostringstream &buf ) const
     }
 }
 
-void Gangsters::getQuestDescription( std::ostringstream &buf, Character * ) const
+void Gangsters::getQuestDescription( std::ostringstream &buf, Character *viewer ) const
 {
-    // start message + hint interpolate RU-declined mob/room names -- kept RU
-    // (localizing the frame around a RU noun would produce a mixed-language line).
-    getQuestStartMessage( buf );
-    buf << endl        << getHint( ) << endl;
+    lang_t lang = viewerLang( viewer );
+
+    buf << getStartBroadcast( ).getMessage( lang ) << endl
+        << getHint( lang ) << endl;
+}
+
+// The hint is kept per language: each piece interpolates names declined for
+// that language. Saves from before hintEn/hintUa existed fall back to RU.
+const DLString & Gangsters::getHint( lang_t lang ) const
+{
+    if (lang == LANG_EN && !hintEn.getValue( ).empty( ))
+        return hintEn.getValue( );
+    if (lang == LANG_UA && !hintUa.getValue( ).empty( ))
+        return hintUa.getValue( );
+    return hint.getValue( );
+}
+
+void Gangsters::setHint( const MultiMessage &msg )
+{
+    hint = msg.getMessage( LANG_RU );
+    hintEn = msg.getMessage( LANG_EN );
+    hintUa = msg.getMessage( LANG_UA );
+}
+
+void Gangsters::appendHint( const MultiMessage &msg )
+{
+    // Seed from getHint so a quest saved before hintEn/hintUa existed keeps
+    // its first hint (in RU) instead of losing it.
+    DLString en = getHint( LANG_EN ), ua = getHint( LANG_UA );
+
+    hint = DLString( hint.getValue( ) + " " + msg.getMessage( LANG_RU ) );
+    hintEn = DLString( en + " " + msg.getMessage( LANG_EN ) );
+    hintUa = DLString( ua + " " + msg.getMessage( LANG_UA ) );
 }
 
 void Gangsters::getQuestStartMessage( std::ostringstream &buf ) const
@@ -566,7 +595,6 @@ void Gangsters::rewardMobKiller( PCharacter *killer, Character *mob )
  */
 void Gangsters::createFirstHint( MobileList &people )
 {
-    std::basic_ostringstream<char> buf;
     NPCharacter *informer, *mob;
     DLString name;
     
@@ -579,16 +607,26 @@ void Gangsters::createFirstHint( MobileList &people )
     informerName = name;
     informerRoom = informer->in_room->getName();
 
-    buf << "{1" << name << "{2 сообщил" << GET_SEX( informer, "", "о", "а" );
-    
-    switch (number_range(1, 4)) {
-    case 1: case 2: buf << " Хассану"; break;
-    case 3: case 4: buf << " Валькирии"; break;
-    }
-    
-    buf << ", что видел" << GET_SEX( informer, "", "о", "а" )
-        << " бандитов возле местности под названием " << informer->in_room->getName() << ". ";
-    setHint( buf.str( ) );
+    MultiMessage frame = (number_range(1, 2) == 1)
+        ? _("{1%1$s{2 сообщил%2$s Хассану, что видел%2$s бандитов возле местности под названием %3$s.")
+        : _("{1%1$s{2 сообщил%2$s Валькирии, что видел%2$s бандитов возле местности под названием %3$s.");
+
+    DLString nameEn = informer->getNameP( '1', LANG_EN ); nameEn.upperFirstCharacter( );
+    DLString nameUa = informer->getNameP( '1', LANG_UA ); nameUa.upperFirstCharacter( );
+
+    DLString en = frame.getMessage( LANG_EN );
+    en.replaces( "%1$s", nameEn );
+    en.replaces( "%2$s", "" );
+    en.replaces( "%3$s", informer->in_room->getName( LANG_EN ) );
+    DLString ru = frame.getMessage( LANG_RU );
+    ru.replaces( "%1$s", name );
+    ru.replaces( "%2$s", GET_SEX( informer, "", "о", "а" ) );
+    ru.replaces( "%3$s", informer->in_room->getName( LANG_RU ) );
+    DLString ua = frame.getMessage( LANG_UA );
+    ua.replaces( "%1$s", nameUa );
+    ua.replaces( "%2$s", GET_SEX( informer, "в", "ло", "ла" ) );
+    ua.replaces( "%3$s", informer->in_room->getName( LANG_UA ) );
+    setHint( MultiMessage( en, ru, ua ) );
 }            
 
 Room * Gangsters::findHintRoom( MultiMessage &msg )
@@ -625,7 +663,7 @@ Room * Gangsters::findHintRoom( MultiMessage &msg )
             DLString nameRu = ch->getNameP( '1', LANG_RU ); nameRu.upperFirstCharacter( );
             DLString nameUa = ch->getNameP( '1', LANG_UA ); nameUa.upperFirstCharacter( );
 
-            MultiMessage frame = _("%1$s столкнул%2$s с гангстерами возле %3$s.");
+            MultiMessage frame = _("%1$s столкнул%2$s с гангстерами возле местности под названием %3$s.");
             DLString en = frame.getMessage( LANG_EN );
             en.replaces( "%1$s", nameEn );
             en.replaces( "%3$s", room->getName( LANG_EN ) );
@@ -645,7 +683,7 @@ Room * Gangsters::findHintRoom( MultiMessage &msg )
 
     /* cannot find mob, give hint only about a room they're in */
     if (room) {
-        MultiMessage frame = _("Гангстеры были также замечены неподалеку от %1$s.");
+        MultiMessage frame = _("Гангстеры были также замечены возле местности под названием %1$s.");
         DLString en = frame.getMessage( LANG_EN ); en.replaces( "%1$s", room->getName( LANG_EN ) );
         DLString ru = frame.getMessage( LANG_RU ); ru.replaces( "%1$s", room->getName( LANG_RU ) );
         DLString ua = frame.getMessage( LANG_UA ); ua.replaces( "%1$s", room->getName( LANG_UA ) );
@@ -663,8 +701,7 @@ bool Gangsters::createSecondHint( )
     if (room) {
         GQChannel::gecho( this, msg );
 
-        // Stored hint stays RU -- it feeds the RU quest-description display.
-        setHint( getHint( ) + " " + msg.getRu( ) );
+        appendHint( msg );
         char_to_room( createMob( ), room );
     }
 
@@ -673,13 +710,6 @@ bool Gangsters::createSecondHint( )
 
 void Gangsters::createThirdHint( )
 {
-    // Stored hint stays RU (it feeds the RU hint/quest-description display,
-    // which interpolates declined mob/room names and is kept RU by design).
-    std::basic_ostringstream<char> buf;
-    buf << "Больше всего от руки бандитов пострадала местность {hh"
-        << areaName.getForLang( LANG_RU ) << "{hx.";
-    setHint( buf.str( ) );
-
     // Per-viewer broadcast: catalog frame + the area name in each viewer's
     // language (falls back to RU where an EN/UA area name is unset -- same as
     // every other area-name display). Built as an explicit 3-language message;
@@ -688,7 +718,9 @@ void Gangsters::createThirdHint( )
     DLString en = frame.getMessage( LANG_EN ); en.replaces( "%1$s", areaName.getForLang( LANG_EN ) );
     DLString ru = frame.getMessage( LANG_RU ); ru.replaces( "%1$s", areaName.getForLang( LANG_RU ) );
     DLString ua = frame.getMessage( LANG_UA ); ua.replaces( "%1$s", areaName.getForLang( LANG_UA ) );
-    GQChannel::gecho( this, MultiMessage( en, ru, ua ) );
+    MultiMessage msg( en, ru, ua );
+    GQChannel::gecho( this, msg );
+    setHint( msg );
 
     state = ST_NO_MORE_HINTS;
 }
