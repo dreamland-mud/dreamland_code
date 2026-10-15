@@ -26,7 +26,8 @@ questscenario.cpp \
 mobquestbehavior.cpp \
 objquestbehavior.cpp \
 xmlattributequestdata.cpp \
-areaquestcleanupplugin.cpp
+areaquestcleanupplugin.cpp \
+questtypesplugin.cpp
 
 libquest_core_la_MOC = \
 questmanager.h \

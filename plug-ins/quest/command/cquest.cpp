@@ -27,13 +27,15 @@
 #include "loadsave.h"
 
 
+// Before questor.h: it pulls in def.h, whose "#define C 4" breaks the
+// template<typename C> in xmlattributeplugin.h.
+#include "xmlattributequestdata.h"
 #include "cquest.h"
 #include "quest.h"
 #include "questregistrator.h"
 #include "questmanager.h"
 #include "questor.h"
 #include "questtrader.h"
-#include "xmlattributequestdata.h"
 #include "def.h"
 #include "l10n.h"
 

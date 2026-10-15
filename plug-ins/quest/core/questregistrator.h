@@ -11,7 +11,7 @@
 #include "xmlinteger.h"
 #include "xmlstring.h"
 #include "xmlmultistring.h"
-#include "xmlattributeplugin.h"
+#include "xmlboolean.h"
 #include "wrappertarget.h"
 #include "lang.h"
 
@@ -25,16 +25,23 @@ class PCharacter;
  *  logic hangs off. There is exactly one instance per type, alive for the whole
  *  run, which is what makes it the right thing for Fenia to address -- the
  *  per-player quest instance comes and goes, the type does not.
+ *
+ *  A type is data: one quests/<Name>.xml file, loaded by QuestTypesPlugin. All
+ *  scenario logic lives in dreamland_fenia/autoquest/<type>, so every quest of
+ *  every type is a FeniaQuest.
  */
-class QuestRegistratorBase : public XMLAttributePlugin, public virtual XMLVariableContainer,
-                             public WrapperTarget
+class QuestRegistratorBase : public virtual XMLVariableContainer, public WrapperTarget
 {
 XML_OBJECT
 public:
     typedef ::Pointer<QuestRegistratorBase> Pointer;
 
-    virtual Quest::Pointer createQuest( PCharacter *, NPCharacter * ) const = 0;
-    virtual const DLString& getName( ) const = 0;
+    Quest::Pointer createQuest( PCharacter *, NPCharacter * ) const;
+
+    /** The config file's name without .xml, e.g. KillQuest. Also the name
+     *  .AutoQuest() looks the type up by and every victory tally is kept under. */
+    const DLString& getName( ) const;
+    void setName( const DLString & );
 
     /** Key of this type's entry in the Fenia DB.
      *
@@ -44,17 +51,17 @@ public:
      *  script written for one type at another. Low nibble 11 is this class's tag
      *  (1-10 are room, obj, mob, area, spell, affect, skill command, wrapped
      *  command, area quest, behavior). */
-    virtual long long getID( ) const;
-
-    virtual bool applicable( PCharacter *, bool fAuto ) const;
+    long long getID( ) const;
 
     /** Whether this type may be offered to pch: the minAutoLevel gate, then
-     *  .AutoQuest(name).onApplicable(ch, fAuto) when Fenia defines it, else the
-     *  C++ applicable() above. A Fenia answer of true/false is final; no answer,
-     *  or a script error, falls through to C++. Every caller goes through here. */
+     *  .AutoQuest(name).onApplicable(ch, fAuto) when Fenia defines it. A Fenia
+     *  answer of true/false is final. With no answer (hook missing, or a script
+     *  error) the type is offered, unless <needsApplicable> is set: then it is
+     *  withheld, so a lost binding hides the type instead of handing it to
+     *  heroes who cannot finish it. Every caller goes through here. */
     bool isApplicable( PCharacter *, bool fAuto ) const;
 
-    virtual int getPriority( ) const;
+    int getPriority( ) const;
     int getMinAutoLevel( ) const;
     const DLString& getShortDescr( lang_t ) const;
     const DLString& getDifficulty( lang_t ) const;
@@ -73,81 +80,24 @@ public:
      *  so it can be used to compare types during load. */
     int getFeniaId( ) const;
 
-    /** True when <engine>fenia</engine> is set in this type's config, meaning
-     *  new quests of it are generated as FeniaQuest and their logic is read from
-     *  the .AutoQuest() wrapper instead of from C++.
-     *
-     *  Deliberately a value in the same file every other tunable lives in, so
-     *  `quest set reload` flips a type in both directions without a reboot. The
-     *  C++ class stays registered either way: quests already in a player's pfile
-     *  keep loading and finishing on the class that made them.
-     *
-     *  🛑 To switch a type BACK, write <engine>cpp</engine> -- do not delete the
-     *  node. Reload merges rather than replaces (QuestManager::reload explains
-     *  why), so a node that is absent from the file is never read at all and the
-     *  member keeps the value it already had. Deleting the line looks like a
-     *  rollback and is not one until the next reboot. */
-    bool isFeniaEngine( ) const;
+    /** True when <needsApplicable> is set: see isApplicable. */
+    bool needsFeniaApplicable( ) const;
+
+    /** True when the Fenia wrapper has an onApplicable method bound. */
+    bool hasFeniaApplicable( ) const;
 
 protected:
-    /** Build a Fenia-backed quest of this type. Out of line and out of the
-     *  template so the header need not know about FeniaQuest. */
-    Quest::Pointer createFeniaQuest( PCharacter *, NPCharacter * ) const;
-
     /** Ask onApplicable. True when Fenia gave a usable answer, stored in answer. */
     bool askFeniaApplicable( PCharacter *, bool fAuto, bool &answer ) const;
+
+    DLString name;
 
     XML_VARIABLE XMLMultiString shortDesc;
     XML_VARIABLE XMLMultiString difficulty;
     XML_VARIABLE XMLInteger priority;
     XML_VARIABLE XMLIntegerNoEmpty minAutoLevel;
     XML_VARIABLE XMLInteger feniaId;
-    XML_VARIABLE XMLString engine;
-};
-
-template<typename QT>
-class QuestRegistrator : public QuestRegistratorBase {
-public:
-    typedef ::Pointer< QuestRegistrator<QT> > Pointer;
-
-    virtual void initialization( )
-    {
-        Class::regMoc<QT>( );
-        QuestManager::getThis( )->load( this );
-        XMLAttributePlugin::initialization( );
-        // After load(), because getID() reads feniaId out of the config file.
-        // feniaroot is line 9 of plugin.xml and the quest plugins are 28-36, so
-        // wrapperManager already exists here; the guard inside is for a reordered
-        // profile, where the symptom would otherwise be Fenia triggers that
-        // simply never fire.
-        linkFeniaWrapper( );
-    }
-
-    virtual void destruction( )
-    {
-        // Before unLoad(), so the wrapper is detached while the type is still
-        // registered. Left attached, a `plug reload` would strand it. The Fenia
-        // side may already be gone by now -- see unlinkFeniaWrapper.
-        unlinkFeniaWrapper( );
-        XMLAttributePlugin::destruction( );
-        QuestManager::getThis( )->unLoad( this );
-        Class::unregMoc<QT>( );
-    }
-
-    virtual Quest::Pointer createQuest( PCharacter *pch, NPCharacter *questor ) const
-    {
-        if (isFeniaEngine( ))
-            return createFeniaQuest( pch, questor );
-
-        ::Pointer<QT> quest( NEW );
-        quest->create( pch, questor );
-        return quest;
-    }
-
-    virtual const DLString& getName( ) const 
-    {
-        return QT::MOC_TYPE;
-    }
+    XML_VARIABLE XMLBooleanNoFalse needsApplicable;
 };
 
 #endif

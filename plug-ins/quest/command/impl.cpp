@@ -15,6 +15,7 @@
 #include "questor.h"
 #include "xmlattributequestreward.h"
 #include "questscrollhook.h"
+#include "questtypesplugin.h"
 
 class Object;
 class PCharacter;
@@ -42,6 +43,8 @@ extern "C"
     {
         SO::PluginList ppl;
         
+        // Here and not in quest_core: see questtypesplugin.h.
+        Plugin::registerPlugin<QuestTypesPlugin>( ppl );
         Plugin::registerPlugin<CQuest>( ppl );
         Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeQuestReward> >( ppl );
         Plugin::registerPlugin<MocRegistrator<ObjectQuestArticle> >( ppl );

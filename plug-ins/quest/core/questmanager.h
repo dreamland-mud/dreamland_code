@@ -38,7 +38,9 @@ public:
         /** Every registered type, unfiltered. list() above answers "what can
          *  this player be offered", which is a different question. */
         QuestList all( ) const;
-        void load( QuestRegistratorBase* );
+        /** Read the type's config and register it. False when the file did not
+         *  load, in which case the type is not registered. */
+        bool load( QuestRegistratorBase* );
         void unLoad( QuestRegistratorBase* );
 
         /** Re-read every registered quest type's config from disk, returning how
@@ -46,24 +48,15 @@ public:
          *  are untouched: priority and applicability are read live off the
          *  registrator on every generate()/list() call.
          *
-         *  This is a MERGE, not a replacement, and deliberately so. A node absent
-         *  from the file is not read at all, so its member keeps the value it had
-         *  -- true of every scalar, and true of the scenario map, which merges by
-         *  key (xmlmap.h). Deleting something therefore needs a reboot; editing
-         *  does not, which is the case this exists for.
+         *  This is a MERGE, not a replacement. A node absent from the file is
+         *  not read at all, so its member keeps the value it had. Deleting a
+         *  value therefore needs a reboot; editing does not. A new file needs
+         *  a reboot too: types are registered by QuestTypesPlugin at load.
          *
-         *  Making scenarios the one thing reload could delete was tried and
-         *  reverted: a quest already in flight looks its scenario up by name on
-         *  every info()/reward() call and on mob spec ticks, getScenario throws
-         *  QuestRuntimeException when the name is gone, and nothing between there
-         *  and main() catches it. Dropping a key would have turned a config edit
-         *  into a process exit.
-         *
-         *  A file that parses but throws part way through (unregistered scenario
-         *  type, garbage where an integer belongs) still leaves that one type
-         *  half-updated: loadXML only guards the read, not the per-variable
-         *  assignment. Reload is for tuning values, not for rescuing a broken
-         *  file. */
+         *  A file that parses but throws part way through (garbage where an
+         *  integer belongs) still leaves that one type half-updated: loadXML
+         *  only guards the read, not the per-variable assignment. Reload is for
+         *  tuning values, not for rescuing a broken file. */
         int reload( );
 
         /** How many quest types are registered. Not the same as list()'s size,
