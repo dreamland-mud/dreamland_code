@@ -4,7 +4,6 @@ include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/system \
--I$(top_srcdir)/plug-ins/anatolia \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/command \
 -I$(top_srcdir)/plug-ins/help \
