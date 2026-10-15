@@ -104,10 +104,9 @@ WrappersPlugin::linkTargets()
 
     // Autoquest types. Empty on a normal boot, but NOT because QuestManager is
     // missing: feniaroot links libquest_core, so quest_core is pulled in as a
-    // dependency here at line 9 instead of arriving with the quest plugins at
-    // 28-36, and the manager exists by now. It is the quest TYPE plugins that
-    // have not registered yet, so the registry is empty and each type links its
-    // own wrapper later, from its own initialization().
+    // dependency here at line 9, and the manager exists by now. The types are
+    // registered later, by QuestTypesPlugin in quest_command (line 28), which
+    // links each type's wrapper itself.
     //
     // What this loop is really for is `plug reload feniaroot` on a running
     // server, and the findref sweep in cfindref.cpp, which calls straight into

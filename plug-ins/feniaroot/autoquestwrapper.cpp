@@ -3,9 +3,7 @@
 
 #include "autoquestwrapper.h"
 #include "questregistrator.h"
-#include "questscenario.h"
 #include "wrappermanager.h"
-#include "reglist.h"
 #include "register-impl.h"
 #include "nativeext.h"
 #include "wrap_utils.h"
@@ -108,26 +106,6 @@ NMI_INVOKE( AutoQuestWrapper, getDifficulty, "(lang): сложность на я
 {
     checkTarget( );
     return Register( target->getDifficulty( argnum2lang( args, 1 ) ) );
-}
-
-NMI_GET( AutoQuestWrapper, scenarios, "список (List) имен сценариев, пустой если их нет" )
-{
-    checkTarget( );
-    RegList::Pointer list(NEW);
-
-    // Only some quest types are scenario-driven; the rest have no such base and
-    // legitimately answer with an empty list rather than an error.
-    const QuestScenariosContainer *container
-        = dynamic_cast<const QuestScenariosContainer *>( target );
-
-    if (container) {
-        StringList names = container->getScenarioNames( );
-
-        for (StringList::const_iterator n = names.begin( ); n != names.end( ); n++)
-            list->push_back( Register( *n ) );
-    }
-
-    return ::wrap(list);
 }
 
 NMI_INVOKE( AutoQuestWrapper, api, "(): печатает этот API" )
