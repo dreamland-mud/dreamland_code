@@ -4,7 +4,6 @@
  */
 
 #include "teach.h"
-#include "practice.h"
 #include "commandtemplate.h"
 #include "skill.h"
 #include "skillmanager.h"

@@ -183,8 +183,8 @@ msgtable_t msg_positions = {
 
 
 // Classic linear ("prose") score -- a comprehensive, screen-reader-friendly
-// dump of every stat. Used as the fall-through body for the accessible 'score'
-// command and for NPCs; players normally get the Fenia panel or score_ascii.
+// dump of every stat. 'oscore' shows it to NPCs; players get the Fenia 'score'
+// panel or score_ascii.
 static void score_prose( Character *ch )
 {
     ostringstream buf;
