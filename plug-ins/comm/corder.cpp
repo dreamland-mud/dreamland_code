@@ -25,6 +25,7 @@
 #include "def.h"
 #include "morphology.h"
 #include "l10n.h"
+#include "player_utils.h"
 
 static bool mprog_cantorder(Character *victim, Character *master, const char *cmdName, const char *cmdArgs)
 {
@@ -85,7 +86,8 @@ COMMAND(COrder, "order")
         if (followerWorld) {
             ch->pecho(_("Твой последователь должен быть рядом с тобой."));
             if (ch->getPC()->pet && followerWorld->getNPC() && ch->getPC()->pet == followerWorld->getNPC()) {
-                interpret_raw(ch, "gtell", "где ты?");
+                // Ask in the owner's language: the gtell line is echoed back as said.
+                interpret_raw(ch, "gtell", lmsg(Player::lang(ch), "where are you?", "где ты?", "де ти?"));
             }
         } else {
             ch->pecho(_("Среди твоих последователей такого нет."));
