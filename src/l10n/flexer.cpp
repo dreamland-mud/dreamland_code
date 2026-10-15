@@ -38,8 +38,6 @@ DLString Flexer::flex(const DLString &str, int part_num)
 
 DLString Flexer::flexAux(const DLString &str, int part_num, bool fNeedRoot, bool fNeedEnding) 
 {
-    static const DLString closeColour("{x");
-
     int case_counter, iPhase;
     register char tempchar;
     basic_ostringstream<char> buf;
@@ -83,10 +81,49 @@ DLString Flexer::flexAux(const DLString &str, int part_num, bool fNeedRoot, bool
 
     DLString result = buf.str();
 
-    // Close colour just in case.
-    if (hasColour && !closeColour.strSuffix(result))
-        result << closeColour;
+    if (!hasColour)
+        return result;
 
-    return result;
+    // Fence the noun in push/pop colour instead of closing it with {x: {x is a
+    // total reset in mudtags and would also end an enclosing {l/{S section, so a
+    // coloured name inside a localized message leaked the other languages. Inner
+    // resets become pop+push for the same reason; one that closed a {h link
+    // still closes it, as {hx. The push goes right before the first code, not
+    // at index 0, so plain leading text stays first for upperFirstCharacter and
+    // first-word matching; that text prints in the enclosing colour either way.
+    size_t first = result.find( '{' );
+    if (first == DLString::npos)
+        return result;
+
+    DLString fenced( result.substr( 0, first ) );
+    fenced << "{1";
+    bool inLink = false;
+    for (size_t i = first; i < result.size(); i++) {
+        char c = result.at(i);
+        if (c == '{' && i + 1 < result.size()) {
+            char n = result.at(i + 1);
+            if (n == '{') {
+                fenced << "{{";
+                i++;
+                continue;
+            }
+            if (n == 'x' || n == 'X') {
+                if (inLink)
+                    fenced << "{hx";
+                inLink = false;
+                fenced << "{2{1";
+                i++;
+                continue;
+            }
+            if (n == 'h' && i + 2 < result.size())
+                inLink = (result.at(i + 2) != 'x' && result.at(i + 2) != 'X');
+        }
+        fenced << c;
+    }
+    if (inLink)
+        fenced << "{hx";
+    fenced << "{2";
+
+    return fenced;
 }
 
