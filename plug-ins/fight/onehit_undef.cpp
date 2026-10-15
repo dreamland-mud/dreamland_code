@@ -283,10 +283,13 @@ void UndefinedOneHit::damEffectVorpal()
     if (!chance(IS_GOOD(ch) ? 20 : 10))
         return;
 
-    // A legend (mob tier 1) keeps its head; the verse still rings out above
-    // (docs/plans/tier-audit.md M4).
-    if (victim->is_npc( ) && victim->getNPC( )->getTier( ) == 1)
-        return;
+    // Legends and bosses (mob tiers 1-2) keep their heads; the verse still
+    // rings out above (docs/plans/tier-audit.md M4).
+    if (victim->is_npc( )) {
+        int tier = victim->getNPC( )->getTier( );
+        if (tier >= 1 && tier <= 2)
+            return;
+    }
 
     MultiMessage msgVict, msgOther;
     if (get_weapon_class(wield) == WEAPON_SWORD) {
