@@ -7,7 +7,6 @@
 #include "mobilebehaviorplugin.h"
 #include "objectbehaviorplugin.h"
 
-#include "elvish_effects.h"
 #include "quenia.h"
 #include "ahenn.h"
 #include "khuzdul.h"
@@ -20,8 +19,7 @@ extern "C"
     SO::PluginList initialize_languages_impl( ) 
     {
         SO::PluginList ppl;
-                
-        Plugin::registerPlugin<ElvishEffectsPlugin>( ppl );
+
         Plugin::registerPlugin<QueniaLanguage>( ppl );
         Plugin::registerPlugin<AhennLanguage>( ppl );
         Plugin::registerPlugin<KhuzdulLanguage>( ppl );

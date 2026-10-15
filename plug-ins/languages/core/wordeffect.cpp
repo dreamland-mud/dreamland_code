@@ -6,6 +6,7 @@
 #include "word.h"
 #include "language.h"
 #include "languagemanager.h"
+#include "logstream.h"
 
 #include "fenia/exceptions.h"
 #include "merc.h"
@@ -59,13 +60,22 @@ bool WordEffect::isOffensive( ) const
     return offensive.getValue( );
 }
 
+// Every effect lives in Fenia (runVict/runObj, called before run()). Reaching
+// here for the effect's own target kind means its trigger is not bound: the
+// word silently does nothing, so say so in the log.
 bool WordEffect::run( PCharacter *, Character * ) const
 {
+    if (!isObject( ))
+        LogStream::sendError( ) << "Word effect " << languageName << ":" << effectName
+                                << " has no Fenia runVict" << endl;
     return false;
 }
 
 bool WordEffect::run( PCharacter *, Object * ) const
 {
+    if (isObject( ))
+        LogStream::sendError( ) << "Word effect " << languageName << ":" << effectName
+                                << " has no Fenia runObj" << endl;
     return false;
 }
 

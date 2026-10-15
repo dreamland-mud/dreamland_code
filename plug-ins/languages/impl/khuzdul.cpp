@@ -3,7 +3,7 @@
  * ruffina, 2009
  */
 #include "khuzdul.h"
-#include "khuzdul_effects.h"
+#include "wordeffect.h"
 #include "language.h"
 #include "languagemanager.h"
 #include "word.h"
@@ -23,9 +23,6 @@ KhuzdulLanguage::KhuzdulLanguage( ) : Language( LANG_NAME )
 
 void KhuzdulLanguage::initialization( )
 {
-    Class::regMoc<EnchantWeaponWE>( );
-    Class::regMoc<BerserkWE>( );
-    Class::regMoc<MendingWE>( );
     Class::regMoc<KhuzdulLanguage>( );
     Language::initialization( );
 }
@@ -34,9 +31,6 @@ void KhuzdulLanguage::destruction( )
 {
     Language::destruction( );
     Class::unregMoc<KhuzdulLanguage>( );
-    Class::unregMoc<EnchantWeaponWE>( );
-    Class::unregMoc<BerserkWE>( );
-    Class::unregMoc<MendingWE>( );
 }
 
 

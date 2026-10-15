@@ -17,28 +17,20 @@ $(LIBADD_AI)
 
 liblanguages_impl_la_SOURCES = \
 impl.cpp \
-elvish_effects.cpp \
 quenia.cpp \
-quenia_effects.cpp \
 arcadian.cpp \
 arcadian_effects.cpp \
 arcadian_behaviors.cpp \
 ahenn.cpp \
-ahenn_effects.cpp \
-khuzdul.cpp \
-khuzdul_effects.cpp
+khuzdul.cpp
 
 liblanguages_impl_la_MOC = \
-elvish_effects.h \
 quenia.h \
-quenia_effects.h \
 arcadian.h \
 arcadian_effects.h \
 arcadian_behaviors.h \
 ahenn.h \
-ahenn_effects.h \
-khuzdul.h \
-khuzdul_effects.h
+khuzdul.h
 
 
 AM_CPPFLAGS += $(plugin_INCLUDES)
