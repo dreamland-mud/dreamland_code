@@ -9,7 +9,8 @@ libalias_la_LIBADD = \
 ../output/liboutput.la \
 ../system/libsystem.la \
 ../help/libhelp.la \
-../command/libcommand.la 
+../command/libcommand.la \
+-ljsoncpp
 
 libalias_la_SOURCES = alias.cpp
 
@@ -68,6 +69,7 @@ vault.cpp \
 webblob.cpp \
 webscript.cpp \
 webtriggers.cpp \
+webaliases.cpp \
 execservlet.cpp \
 accountservlet.cpp
 

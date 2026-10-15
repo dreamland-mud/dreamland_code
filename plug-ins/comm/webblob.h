@@ -1,5 +1,6 @@
 /* Opaque per-owner blobs the web client keeps on the server: the gear script
- * (webscript.cpp) and the player's triggers (webtriggers.cpp).
+ * (webscript.cpp), the player's triggers (webtriggers.cpp) and account aliases
+ * (webaliases.cpp).
  *
  * Stored as base64 of the client's UTF-8 text, because every string in an rpc
  * frame goes through utf-8 -> koi8-u//IGNORE on the way in and would lose what

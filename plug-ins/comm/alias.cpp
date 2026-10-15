@@ -26,6 +26,7 @@
 #include "descriptor.h"
 #include "loadsave.h"
 #include "comm.h"
+#include "rpccommandmanager.h"
 
 #include "def.h"
 #include "l10n.h"
@@ -71,6 +72,48 @@ static DLString aliasBodyForDisplay( const DLString &body )
 }
 
 /*-----------------------------------------------------------------------------
+ * The web client's Aliases settings page reads the in-game list from here
+ *----------------------------------------------------------------------------*/
+
+/*
+ * aliases_char {max, aliases: [[name, body], ...]}, bodies as stored (single '|').
+ * Pairs, not an object: writeWSCommand recodes string values to UTF-8, not keys.
+ * Sent on request and after every alias/unalias, so the page never shows a list
+ * the player has since changed by typing.
+ */
+static void aliases_web_send( PCharacter *pch )
+{
+    if (!pch->desc || pch->desc->connected != CON_PLAYING)
+        return;
+
+    XMLAttributeAliases::Pointer aliases = pch->getAttributes( ).findAttr<XMLAttributeAliases>( "aliases" );
+
+    Json::Value msg;
+    msg["command"] = "aliases_char";
+    Json::Value &data = msg["args"][0];
+    data["max"] = MAX_ALIASES;
+    data["aliases"] = Json::Value( Json::arrayValue );
+
+    if (aliases)
+        for (XMLAttributeAliases::iterator i = aliases->begin( ); i != aliases->end( ); i++) {
+            Json::Value pair( Json::arrayValue );
+            pair.append( i->first.c_str( ) );
+            pair.append( i->second.getValue( ).c_str( ) );
+            data["aliases"].append( pair );
+        }
+
+    pch->desc->writeWSCommand( msg );
+}
+
+RPCRUN(aliases_get)
+{
+    if (!ch || !ch->getPC( ))
+        return;
+
+    aliases_web_send( ch->getPC( ) );
+}
+
+/*-----------------------------------------------------------------------------
  * 'alias' command 
  *----------------------------------------------------------------------------*/
 CMDRUN(alias) 
@@ -108,6 +151,7 @@ CMDRUN(alias)
     if (arg_is_strict(arg, "flush")) {
         aliases->clear( );
         pch->pecho(_("Все синонимы удалены."));
+        aliases_web_send( pch );
         return;
     }
     
@@ -128,6 +172,7 @@ CMDRUN(alias)
     {
         i->second.setValue( argument );
         pch->pecho( _("%s меняет свое значение на '%s{x'."), arg.c_str( ), aliasBodyForDisplay( argument ).c_str( ) );
+        aliases_web_send( pch );
         return;
     }
 
@@ -141,6 +186,7 @@ CMDRUN(alias)
     (**aliases) [arg] = argument;
 
     pch->pecho( _("%s теперь будет означать '%s{x'."), arg.c_str( ), aliasBodyForDisplay( argument ).c_str( ) );
+    aliases_web_send( pch );
 }
 
 
@@ -174,6 +220,7 @@ CMDRUN(unalias)
     {
         pch->pecho(_("Синоним удален."));
         aliases->erase( i );
+        aliases_web_send( pch );
     }
     else
     {
