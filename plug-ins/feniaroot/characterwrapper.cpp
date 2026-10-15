@@ -6089,6 +6089,16 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         }
     }
 
+    // A ninja with mastering pound fights bare-handed: a weapon turns the skill off,
+    // a shield or held item costs the off-hand punch (fight.cpp second-hand attack).
+    // The hand slots leave the percentile, the set and flag-once totals and the chase
+    // list, and their worn flags stop counting as owned; the slotFilter browse still
+    // lists them. Profession-gated: a dreamt mastering pound changes nothing.
+    const int gaHandSlots = ITEM_WIELD | ITEM_WEAR_SHIELD | ITEM_HOLD;
+    Skill *mpSkill = skillManager->findExisting( "mastering pound" );
+    bool gaBareHanded = target->getProfession( )->getName( ) == "ninja"
+                        && mpSkill != 0 && mpSkill->usable( target, false );
+
     // Worn gear: best score per slot-type (for the gap + percentile), plus every
     // vnum already worn (so we never recommend re-getting one).
     std::map<int,double> wornSlot;
@@ -6101,17 +6111,20 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         wornVnum[o->pIndexData->vnum] = 1;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
+        bool flagsOwned = !(gaBareHanded && (slot & gaHandSlots));
         // Record which affect_flags this worn item grants, keyed by its slot, so the
         // per-candidate redundancy set can exclude a candidate's OWN slot (F1).
-        for (auto &paf: o->pIndexData->affected)
-            if (paf->bitvector.getTable( ) == &affect_flags) {
-                bitstring_t hb = paf->bitvector; wornFlagsBySlot[slot] |= hb;
-            }
-        for (auto &paf: o->affected)
-            if (paf->bitvector.getTable( ) == &affect_flags) {
-                bitstring_t hb = paf->bitvector; wornFlagsBySlot[slot] |= hb;
-            }
-        ga_itemResist( o, wornImmBySlot[slot], wornResBySlot[slot] );
+        if (flagsOwned) {
+            for (auto &paf: o->pIndexData->affected)
+                if (paf->bitvector.getTable( ) == &affect_flags) {
+                    bitstring_t hb = paf->bitvector; wornFlagsBySlot[slot] |= hb;
+                }
+            for (auto &paf: o->affected)
+                if (paf->bitvector.getTable( ) == &affect_flags) {
+                    bitstring_t hb = paf->bitvector; wornFlagsBySlot[slot] |= hb;
+                }
+            ga_itemResist( o, wornImmBySlot[slot], wornResBySlot[slot] );
+        }
         // Set slots now score normally: the set optimizer below credits a complete
         // set's bonus into the ceiling and protects its slots from break-advice.
         double sc = ga_score( target, o, w, rawStat, capStat, true );
@@ -6487,6 +6500,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 continue;
             int slot = o->pIndexData->wear_flags;
             REMOVE_BIT( slot, ITEM_TAKE );
+            if (gaBareHanded && (slot & gaHandSlots))   // out of the totals, claims no bit
+                continue;
             GAOnce e = { o->pIndexData, o, true, 0, 0, 0, 0 };
             ga_grantBits( o->pIndexData, o, e.aff, e.imm, e.res );
             e.base = ga_score( target, o, w, rawStat, capStat, true );
@@ -6494,6 +6509,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         }
         for (auto &c: cands) {
             if (c.acq.method == GA_UNKNOWN || ga_overCap( c.acq, chLevel ))   // same gate as bestSlot
+                continue;
+            if (gaBareHanded && (c.slot & gaHandSlots))
                 continue;
             GAOnce e = { c.pObj, c.inst, false, 0, 0, 0, c.score };
             ga_grantBits( c.pObj, c.inst, e.aff, e.imm, e.res );
@@ -6666,6 +6683,12 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // percentile, exactly as the old lockedSlots did, so wearing such a set is neutral
     // and never a regression. Valued worn sets instead score in + earn wornSetBonus.
     int neutralSlots = 0;
+    if (gaBareHanded)
+        neutralSlots |= gaHandSlots;
+    // Worn complete set -> its worn slots. Protected after the feasibility pass: a set a
+    // bare-handed ninja can no longer complete earns no bonus, so it must not shield
+    // its armour slots from upgrades either.
+    std::map<int,int> wornSetMask;
     for (::Object *o = target->carrying; o; o = o->next_content) {
         if (o->wear_loc == wear_none)
             continue;
@@ -6680,7 +6703,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             }
         for (auto &wk: wornSetIdx)
             if (o->pIndexData->behaviors.isSet( wk.first )) {
-                protectedSlots |= slot;
+                wornSetMask[wk.first] |= slot;
                 std::map<int,GASet>::iterator gi = gaSets.find( wk.first );
                 if (gi == gaSets.end( ) || gi->second.vset <= 0)
                     neutralSlots |= slot;
@@ -6695,12 +6718,16 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     struct GAWorth { int bi; double margin; };
     std::vector<GAWorth> worth;
     double wornSetBonus = 0;
+    std::map<int,bool> setFeasible;
     for (auto &kv: gaSets) {
         GASet &g = kv.second;
         int fill = 0;
         double assemble = g.vset, brk = 0;
         for (auto &ms: g.memScore) {
             int mslot = ms.first;
+            // A bare-handed ninja won't fill a hand slot: a set needing one is out of reach.
+            if (gaBareHanded && (mslot & gaHandSlots))
+                continue;
             // Piece capacity of a slot type = how many equipment locations it fills,
             // matching .tmp.eqset.count: finger has two locations with NO dedup, a
             // weapon fills wield + second_wield (dual), neck/wrist have two locations
@@ -6720,10 +6747,19 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             brk += (sc != legacyCeil.end( )) ? sc->second : 0.0;
         }
         bool feasible = fill >= g.total;
+        setFeasible[kv.first] = feasible;
         if (feasible && g.wornComplete)
             wornSetBonus += g.vset;
         if (feasible && assemble > brk)
             worth.push_back( GAWorth{ kv.first, assemble - brk } );
+    }
+    // Protect a worn set's slots unless the char fights bare-handed and it is a valued
+    // set he can no longer complete (in practice: it needs a hand piece).
+    for (auto &wm: wornSetMask) {
+        std::map<int,GASet>::iterator gi = gaSets.find( wm.first );
+        bool valued = gi != gaSets.end( ) && gi->second.vset > 0;
+        if (!gaBareHanded || !valued || setFeasible[wm.first])
+            protectedSlots |= wm.second;
     }
     std::sort( worth.begin( ), worth.end( ),
         []( const GAWorth &a, const GAWorth &b ){ return a.margin > b.margin; } );
@@ -6951,7 +6987,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         double dualScore = 0, keepScore = 0;
         Register dEntry;
         Skill *swSkill = skillManager->findExisting( "second weapon" );
-        if (swSkill != 0 && !swSkill->usable( target, false )) {
+        if (gaBareHanded) {
+            // No left hand to weigh: no dual line, nothing added to the percentile.
+        }
+        else if (swSkill != 0 && !swSkill->usable( target, false )) {
             // Not yet: the class learns it later. Shown only to a char who will get it.
             int lvl = swSkill->getLevel( target );
             if (lvl > target->getRealLevel( ) && lvl <= LEVEL_MORTAL) {
@@ -7255,6 +7294,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             continue;
         // The verdict says go dual: a shield or held item would take the off-hand back.
         if (gaGoDual && (byOpt[k].slot & (ITEM_WEAR_SHIELD | ITEM_HOLD)))
+            continue;
+        if (gaBareHanded && (byOpt[k].slot & gaHandSlots))
             continue;
         if (optSlot.count( byOpt[k].slot )) continue;   // one item per slot-type
         optSlot[byOpt[k].slot] = byOpt[k].score;
