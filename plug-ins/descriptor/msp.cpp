@@ -2,6 +2,7 @@
 
 #include "msp.h"
 #include "descriptor.h"
+#include "character.h"
 #include "def.h"
 
 /* The web client serves the library here, and Mudlet downloads from the same
@@ -64,4 +65,12 @@ bool msp_sound( Descriptor *d, const DLString &name, int volume, int loops, int 
 
     d->send( buf.str( ).c_str( ) );
     return true;
+}
+
+bool msp_sound( Character *ch, const DLString &name, int volume, int loops, int priority )
+{
+    if (!ch || ch->is_npc( ) || !ch->desc)
+        return false;
+
+    return msp_sound( ch->desc, name, volume, loops, priority );
 }

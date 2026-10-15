@@ -19,6 +19,7 @@
 
 #include "merc.h"
 
+#include "msp.h"
 #include "def.h"
 
 WEARLOC(none);
@@ -393,7 +394,16 @@ void affect_to_char( Character *ch, Affect *paf )
                 && paf->bitvector.isSet(AFF_CHARM)
                 && ch->in_room;
 
+        bool wasBlind = IS_AFFECTED(ch, AFF_BLIND);
+        bool wasPoisoned = IS_AFFECTED(ch, AFF_POISON);
+
         affect_modify( ch, paf, true );
+
+        // MSP: only the moment the state begins, not a refresh of it.
+        if (!wasBlind && IS_AFFECTED(ch, AFF_BLIND))
+            msp_sound( ch, "alert/blind", 100, 1, 70 );
+        else if (!wasPoisoned && IS_AFFECTED(ch, AFF_POISON))
+            msp_sound( ch, "alert/poison", 100, 1, 70 );
 
         if ( need_saving )
                 save_mobs( ch->in_room );

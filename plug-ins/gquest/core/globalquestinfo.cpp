@@ -20,6 +20,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "msp.h"
 
 GSN(jail);
 HOMETOWN(frigate);
@@ -102,6 +103,10 @@ void GlobalQuestInfo::tryStart( const GlobalQuestInfo::Config &config )
         if (!buf.str( ).empty( ))
             GQChannel::gecho( this, buf.str( ) );
     }
+
+    for (Descriptor *d = descriptor_list; d; d = d->next)
+        if (d->connected == CON_PLAYING && d->character && gq->isLevelOK( d->character ))
+            msp_sound( d->character, "alert/gquest", 100, 1, 60 );
 
     gq->resume( );
     manager->saveRT( *gq );

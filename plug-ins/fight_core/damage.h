@@ -86,6 +86,7 @@ public:
 
 
     void inflictDamage( );
+    void soundDamage( int before );
     void handlePosition( );
 
     /** Whether this damage rouses a sleeping victim where it lands. True for spells,

@@ -4,6 +4,7 @@
 #include "dlstring.h"
 
 class Descriptor;
+class Character;
 
 /** Whether this connection takes MSP sound triggers: a telnet client that
  *  answered DO MSP, or the web client, which always does. */
@@ -16,5 +17,8 @@ bool msp_enabled( Descriptor *d );
  * priority 0-100. False when the connection has no MSP or the name is bad.
  */
 bool msp_sound( Descriptor *d, const DLString &name, int volume = 100, int loops = 1, int priority = 50 );
+
+/** The same for a player's own connection; false for mobs and the linkless. */
+bool msp_sound( Character *ch, const DLString &name, int volume = 100, int loops = 1, int priority = 50 );
 
 #endif

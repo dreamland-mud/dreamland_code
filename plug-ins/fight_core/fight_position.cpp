@@ -2,6 +2,8 @@
  *
  * ruffina, 2004
  */
+#include <map>
+
 #include "fight_position.h"
 
 #include "commonattributes.h"
@@ -23,6 +25,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "msp.h"
 
 GSN(cavalry);
 CLAN(none);
@@ -111,6 +114,25 @@ void stand_up_after_round( Character *victim )
 }
 
 /*
+ * MSP sound when a player enters a fight, at most once a minute: a brawl that
+ * stops and restarts every round (flee, a new target) is still one fight.
+ */
+static void sound_fight_start( Character *ch )
+{
+    static std::map<long long, time_t> lastStart;
+
+    if (ch->is_npc( ) || !ch->desc)
+        return;
+
+    time_t &last = lastStart[ch->getID( )];
+    if (dreamland->getCurrentTime( ) - last < 60)
+        return;
+
+    last = dreamland->getCurrentTime( );
+    msp_sound( ch, "combat/start", 100, 1, 50 );
+}
+
+/*
  * Start fights, configuring ch to attack victim and adjusting positions.
  */
 void set_fighting( Character *ch, Character *victim, bool standUp )
@@ -135,6 +157,7 @@ void set_fighting( Character *ch, Character *victim, bool standUp )
     if (ch->in_room == victim->in_room)
     {
         ch->fighting = victim;
+        sound_fight_start( ch );
 
         if (standUp)
             stand_up_to_fight( ch );
