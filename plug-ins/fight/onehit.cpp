@@ -85,6 +85,9 @@ void OneHit::hit( )
     // leaving a fightspam-OFF player watching their hp drop in silence.
     if (dam > 0 && ch != 0 && (ch->fighting != 0 || victim->fighting != 0))
         ch->roundDamage += dam;
+    if (immune && ch != 0 && dam_type >= 0 && dam_type < 32
+        && (ch->fighting != 0 || victim->fighting != 0))
+        ch->roundImmune |= 1u << dam_type;
 
     message( );
 

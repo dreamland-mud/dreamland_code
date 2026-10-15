@@ -321,6 +321,7 @@ CMDRUN( cast )
             // rounds it still holds last round's melee total, which the cast
             // would otherwise be added to and double-shown.
             ch->roundDamage = 0;
+            ch->roundImmune = 0;
 
             if (!fForbidCasting) {
                 // Released on VictimDeathException too.
