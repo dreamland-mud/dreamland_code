@@ -50,9 +50,10 @@ libfight_core_la_LIBADD = \
 ../interpret/libinterpret.la \
 -ljsoncpp
 
-damageflags.cpp: damageflags.conf damageflags.h
-damageflags.h: damageflags.conf
-damageflags.cpp: damageflags.h
+damageflags.cpp: damageflags.conf $(top_builddir)/src/damageflags.h
+$(top_builddir)/src/damageflags.h: damageflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+damageflags.cpp: $(top_builddir)/src/damageflags.h
 
 CLEANFILES = damageflags.cpp $(top_builddir)/src/damageflags.h 
 

@@ -28,9 +28,10 @@ tattoo.h \
 gods_impl.h \
 religionattribute.h
 
-religionflags.cpp: religionflags.conf religionflags.h
-religionflags.h: religionflags.conf
-libreligion_la_moc_xml.cpp: religionflags.h
+religionflags.cpp: religionflags.conf $(top_builddir)/src/religionflags.h
+$(top_builddir)/src/religionflags.h: religionflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+libreligion_la_moc_xml.cpp: $(top_builddir)/src/religionflags.h
 
 CLEANFILES = religionflags.cpp $(top_builddir)/src/religionflags.h 
 AM_CPPFLAGS += $(plugin_INCLUDES)

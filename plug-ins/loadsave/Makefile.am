@@ -67,19 +67,23 @@ libloadsave_la_LIBADD = \
 ../interpret/libinterpret.la \
 -ljsoncpp
 
-affectflags.cpp: affectflags.conf affectflags.h
-affectflags.h: affectflags.conf
+affectflags.cpp: affectflags.conf $(top_builddir)/src/affectflags.h
+$(top_builddir)/src/affectflags.h: affectflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
 
-itemflags.cpp: itemflags.conf itemflags.h
-itemflags.h: itemflags.conf
+itemflags.cpp: itemflags.conf $(top_builddir)/src/itemflags.h
+$(top_builddir)/src/itemflags.h: itemflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
 
-compatflags.cpp: compatflags.conf compatflags.h
-compatflags.h: compatflags.conf
+compatflags.cpp: compatflags.conf $(top_builddir)/src/compatflags.h
+$(top_builddir)/src/compatflags.h: compatflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
 
-recipeflags.cpp: recipeflags.conf recipeflags.h
-recipeflags.h: recipeflags.conf
+recipeflags.cpp: recipeflags.conf $(top_builddir)/src/recipeflags.h
+$(top_builddir)/src/recipeflags.h: recipeflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
 
-libloadsave_la_moc_xml.cpp : compatflags.h itemflags.h affectflags.h recipeflags.h
+libloadsave_la_moc_xml.cpp : $(top_builddir)/src/compatflags.h $(top_builddir)/src/itemflags.h $(top_builddir)/src/affectflags.h $(top_builddir)/src/recipeflags.h
 
 CLEANFILES = \
 affectflags.cpp $(top_builddir)/src/affectflags.h \

@@ -28,9 +28,10 @@ defaultpcrace.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc
 
-raceflags.cpp: raceflags.conf raceflags.h
-raceflags.h: raceflags.conf
-librace_la_moc_xml.cpp: raceflags.h
+raceflags.cpp: raceflags.conf $(top_builddir)/src/raceflags.h
+$(top_builddir)/src/raceflags.h: raceflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+librace_la_moc_xml.cpp: $(top_builddir)/src/raceflags.h
 
 CLEANFILES = raceflags.cpp $(top_builddir)/src/raceflags.h 
 AM_CPPFLAGS += $(plugin_INCLUDES)

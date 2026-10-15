@@ -42,10 +42,11 @@ include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = $(INCLUDES_FIGHT) $(INCLUDES_SRC)
 libskills_impl_la_LIBADD = $(LIBADD_FIGHT) -ljsoncpp
 
-skillsflags.cpp: skillsflags.conf skillsflags.h
-skillsflags.h: skillsflags.conf
-libskills_la_moc_xml.cpp: skillsflags.h
-libskills_impl_la_moc_xml.cpp: skillsflags.h
+skillsflags.cpp: skillsflags.conf $(top_builddir)/src/skillsflags.h
+$(top_builddir)/src/skillsflags.h: skillsflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+libskills_la_moc_xml.cpp: $(top_builddir)/src/skillsflags.h
+libskills_impl_la_moc_xml.cpp: $(top_builddir)/src/skillsflags.h
 
 CLEANFILES = skillsflags.cpp $(top_builddir)/src/skillsflags.h 
 
