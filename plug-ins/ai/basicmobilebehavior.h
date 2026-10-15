@@ -202,9 +202,7 @@ protected:
     bool canAssistGroup( Character *, Character * );
     bool assistSpell( NPCharacter *, SkillReference &, Character * );
 private:
-    struct FindAssistersComplete;
     int findRetreatDoor( );
-    Character * findAssistVictim( Character * );
     
 /*
  * common caster brain
@@ -232,55 +230,31 @@ protected:
     bool canAggressDistanceCaster( Character * );
     int casterSnRange( Character *, int );
     bool trackCaster( Character * );
-private:
-    Character * findCastVictim( );
 
 /*
  * cleric brain
  */
 protected:
     static SpellChance clericSnHealing [];
-    static SpellChance clericSnAttack [];
-    static SpellChance clericSnPanicAttack [];
-    static SpellChance clericSnPassiveDefence [];
     static SpellChance clericSnCurative [];
     static SpellChance clericSnRange [];
-    bool specFightCleric( );
     bool healCleric( Character * );
 
 /*
  * mage brain
  */
-    static SpellChance mageSnAttack [];
-    static SpellChance mageSnPanicAttack [];
-    static SpellChance mageSnPassiveDefence [];
     static SpellChance mageSnRange [];
-    bool specFightMage( );
 
 /*
  * vampire brain
  */
-    struct VampVictims;
-    struct TouchVictims;
-    struct BiteVictims;
-    struct SuckVictims;
-    struct DispelVictims;
-    struct BlindVictims;
-    struct KillVictims;
-    bool specFightVampire( );
-    bool aggressVampire( );
     bool hasVampirePrey( );
-    virtual bool canAggressVampire( Character * );
 
 /*
  * necromancer and undead brain
  */
-    static SpellChance necroSnAttack [];
-    static SpellChance necroSnPanicAttack [];
-    static SpellChance necroSnPassiveDefence[];
     static SpellChance necroSnHealing [];
     static SpellChance necroSnRange [];
-    bool specFightNecro( );
     bool healNecro( Character * );
 
 /*

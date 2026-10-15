@@ -31,14 +31,9 @@
 #include "aitrigger.h"
 #include "merc.h"
 
-
-#include "roomtraverse.h"
-
 #include "def.h"
 #include "behavior.h"
 #include "l10n.h"
-
-GSN(garble);
 
 BHV(cityguard);
 
@@ -66,25 +61,13 @@ bool BasicMobileBehavior::assist( Character *fch, Character *victim )
  */
 bool BasicMobileBehavior::assistOffense( Character *fch, Character *victim )
 {
-    Character *target;
-    
     if (number_bits( 1 ) == 0)
         return false;
 
     if (!canAssistOffense( fch, victim ))
         return false;
 
-    int ai = ai_trigger(true, ch, "onAssistAI", "CCCs", ch, fch, victim, "offense");
-    if (ai != AI_UNHANDLED)
-        return ai;
-    
-    if (!( target = findAssistVictim( victim ) ))
-        return false;
-
-    oldact(_("$c1 вскрикивает и атакует!"), ch, 0, 0, TO_ROOM);
-    memoryAttacked.remember( target );
-    attack( target );
-    return true;
+    return ai_trigger(true, ch, "onAssistAI", "CCCs", ch, fch, victim, "offense") > 0;
 }
 
 bool BasicMobileBehavior::canAssistOffense( Character *fch, Character *victim )
@@ -127,20 +110,9 @@ bool BasicMobileBehavior::canAssistOffense( Character *fch, Character *victim )
  */
 bool BasicMobileBehavior::assistMaster( Character *fch, Character *victim )
 {
-    if (IS_CHARMED(ch) && is_same_group( fch, ch )) {
-        int ai = ai_trigger(true, ch, "onAssistAI", "CCCs", ch, fch, victim, "master");
-        if (ai != AI_UNHANDLED)
-            return ai;
+    if (IS_CHARMED(ch) && is_same_group( fch, ch ))
+        return ai_trigger(true, ch, "onAssistAI", "CCCs", ch, fch, victim, "master") > 0;
 
-        attack( victim );
-        return true;
-    }
-/* 
-    if (RIDDEN(ch) == fch) {
-        attack( victim );
-        return true;
-    }
-*/
     return false;
 }
 
@@ -196,16 +168,12 @@ bool BasicMobileBehavior::assistGroup( Character *fch, Character *victim )
     if (number_percent( ) < HEALTH(fch))
         return false;
 
-    int ai = ai_trigger(true, ch, "onAssistAI", "CCCs", ch, fch, victim, "group");
-    if (ai != AI_UNHANDLED)
-        return ai;
-
-    return aiAssistGroup( fch, victim );
+    return ai_trigger(true, ch, "onAssistAI", "CCCs", ch, fch, victim, "group") > 0;
 }
 
 /*
  * Help fch from the same group against victim: heal it, step back to shoot
- * or cast from afar, or join the fight. Also the C++ fallback of assistGroup.
+ * or cast from afar, or join the fight. Called by the Fenia mob AI (ai_assistGroup).
  */
 bool BasicMobileBehavior::aiAssistGroup( Character *fch, Character *victim )
 {
@@ -297,129 +265,11 @@ int BasicMobileBehavior::findRetreatDoor( )
     return door;
 }
 
-Character * BasicMobileBehavior::findAssistVictim( Character *victim )
-{
-    Character *target = 0;
-    int number = 0;
-
-    // Sleeping players are no more a target for the assist than they are a source
-    // of one (see the IS_AWAKE check in check_assist): joining a fight against a
-    // helpless character would only wake them up.
-    for (Character *vch = victim->in_room->people; vch; vch = vch->next_in_room)
-        if (ch->can_see( vch )
-            && is_same_group( vch, victim )
-            && !vch->is_npc( )
-            && IS_AWAKE( vch )
-            && number_range( 0, number ) == 0)
-        {
-            target = vch;
-            number++;
-        }
-    
-    return target;
-}
-
 /*
  * cry out for help
  */
-struct BasicMobileBehavior::FindAssistersComplete {
-    typedef NodesEntry<RoomTraverseTraits> MyNodesEntry;
-    FindAssistersComplete( int d, int g, vector<Character *> &f, NPCharacter *c ) 
-            : depth( d ), group( g ), fighters( f ), cryer( c )
-    { 
-    }
-    inline bool operator () ( const MyNodesEntry *const head, bool last ) 
-    {
-        for (Character *rch = head->node->people; rch; rch = rch->next_in_room) {
-            BasicMobileBehavior::Pointer bhv;
-            Character *victim;
-            NPCharacter *ach;
-            
-            if (!( ach = rch->getNPC( ) ))
-                continue;
-
-            if (ach->getNPC( )->pIndexData->group == 0)
-                continue;
-        
-            if (!ach->behavior || !( bhv = ach->behavior.getDynamicPointer<BasicMobileBehavior>( ) ))
-                continue;
-            
-            if (!bhv->canTrack( ) || bhv->hasDestiny( ) || bhv->hasLastFought( ))
-                continue;
-
-            victim = fighters[number_range( 0, fighters.size( ) - 1 )];
-            
-            if (!mprog_checkassist( ach, cryer, victim ))
-                continue;
-
-            bhv->setLastFought( victim );
-            bhv->memoryAttacked.remember( victim );
-            
-            for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
-                i->node->history.record( victim,
-                                         dirs[i->hook.value.door].rev );
-        }
-
-        if (head->generation < depth && !last)
-            return false;
-
-        return true;
-    }
-    
-    int depth, group;
-    vector<Character *> &fighters;
-    NPCharacter *cryer;
-};
-
-struct DoorFunc {
-    DoorFunc( ) { 
-    }
-    bool operator () ( Room *const room, EXIT_DATA *exit ) const {
-        EXIT_DATA *pExitRev;
-        Room *toRoom;
-        int thisDoor = exit->orig_door;
-
-        if (!( toRoom = exit->u1.to_room ))
-            return false;
-
-        if (thisDoor < 0 || thisDoor >= DIR_SOMEWHERE) {
-            LogStream::sendWarning() << "Traverse: invalid orig_door on exit from [" << room->vnum << "] to [" << toRoom->vnum << "]" << endl;
-            return false;
-        }
-
-        int reverseDoor = dirs[thisDoor].rev;
-
-        if (!( pExitRev = toRoom->exit[reverseDoor] ))
-            return false;
-
-        if (pExitRev->u1.to_room != room)
-            return false;
-
-        if (IS_SET( pExitRev->exit_info, EX_LOCKED ))
-            return false;
-        
-        return toRoom->isCommon( );
-    }
-};
-
-struct ExtraExitFunc {
-    ExtraExitFunc( ) { }
-    bool operator () ( Room *const, EXTRA_EXIT_DATA * ) const { return false; }
-};
-
-struct PortalFunc {
-    PortalFunc( ) { }
-    bool operator () ( Room *const, Object * ) const { return false; }
-};
-
-typedef RoomRoadsIterator<DoorFunc, ExtraExitFunc, PortalFunc> MyHookIterator;
-
 bool BasicMobileBehavior::doCallHelp( )
 {
-    vector<Character *> pcFighters;
-    Character *fch;
-    int helpers, fighters;
-
     if (ch->pIndexData->group == 0)
         return false;
     
@@ -432,52 +282,7 @@ bool BasicMobileBehavior::doCallHelp( )
     if (number_bits( 3 ))
         return false;
 
-    int ai = ai_trigger(true, ch, "onCallHelpAI", "C", ch);
-    if (ai != AI_UNHANDLED)
-        return ai;
-    
-    for (helpers = 0, fighters = 0, fch = ch->in_room->people; fch; fch = fch->next_in_room) {
-        if (fch == ch)
-            continue;
-
-        if (!fch->fighting)
-            continue;
-        
-        if (fch->fighting == ch || is_same_group( ch->fighting, fch )) {
-            if (!fch->is_npc( )) 
-                pcFighters.push_back( fch );
-
-            fighters++;
-            continue;
-        }
-        
-        if (is_same_group( fch->fighting, ch->fighting )) 
-            helpers++;
-    }
-        
-    if (pcFighters.size( ) < 2) 
-        return false;
-
-    if (fighters < helpers) 
-        return false;
-   
-    yell_panic(ch->fighting, ch, "На помощь!", "На помощь!", "callHelp");
-    
-    if (ch->isAffected( gsn_garble ))
-        return true;
-
-    DoorFunc df; ExtraExitFunc eef; PortalFunc pf;
-    MyHookIterator iter( df, eef, pf );
-    
-    FindAssistersComplete complete( pcFighters.size( ) - 1, 
-                                      ch->pIndexData->group,
-                                      pcFighters, 
-                                      ch );
-
-    room_traverse<MyHookIterator, FindAssistersComplete>( 
-            ch->in_room, iter, complete, 10000 );
-    
-    return true;
+    return ai_trigger(true, ch, "onCallHelpAI", "C", ch) > 0;
 }
 
 /*

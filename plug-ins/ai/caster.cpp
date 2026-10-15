@@ -26,10 +26,6 @@
 
 #include "def.h"
 
-PROF(warlock);
-PROF(necromancer);
-PROF(cleric);
-
 GSN(benediction);
 GSN(bless);
 GSN(blindness);
@@ -65,58 +61,14 @@ GSN(summon);
 GSN(weaken);
 GSN(web);
 
-static inline bool has_sanctuary( Character *ch )
-{
-    return IS_AFFECTED(ch, AFF_SANCTUARY)
-                    || ch->isAffected(gsn_stardust)
-                    || ch->isAffected(gsn_dark_shroud);
-}
-
 /*-----------------------------------------------------------------------------
  * common caster brain 
  *----------------------------------------------------------------------------*/
-Character * BasicMobileBehavior::findCastVictim( )
-{
-    Character *victim = NULL, *rch;
-    int chHpPercent = HEALTH(ch);
-
-    for (rch = ch->in_room->people; rch != 0; rch = rch->next_in_room) {
-        int switch_chance = 0;
-
-        if (rch->fighting != ch && ch->fighting != rch)
-            continue;
-        
-        if (ch->fighting == rch && chHpPercent < 25)
-            return rch;
-
-        if (ch->fighting == rch && IS_AFFECTED(ch, AFF_BLIND))
-            return rch;
-        
-        if (!victim)
-            switch_chance = 100;
-        else {
-            switch_chance += 60 * (victim->hit > rch->hit);
-            switch_chance += 30 * (has_sanctuary( victim ) 
-                                   && !has_sanctuary( rch ));
-        }
-
-        if (number_percent( ) < switch_chance)
-            victim = rch;
-    }
-    
-    if (chance( 60 ))
-        return victim;
-    else
-        return NULL;
-}
-
 /*
  * special: fight
  */
 bool BasicMobileBehavior::specFightCaster( )
 {
-    int prof = -1, cnt = 0;
-    
     if (ch->wait > 0)
         return false;
 
@@ -127,44 +79,16 @@ bool BasicMobileBehavior::specFightCaster( )
 
     // Every tier but the dummy (10) casts through the tier combat AI (Fenia global
     // onCastAI). Normal and trash only bring spells, so only class casters are
-    // asked. The tables below stay for untiered mobs and for any mob the Fenia
-    // side declines (no usable spells).
+    // asked. A class caster the Fenia side declines (no usable spell, no hostile
+    // player) does not cast this round.
     int tier = ch->getNPC()->getTier();
     bool classCaster = IS_SET( ch->act, ACT_MAGE|ACT_CLERIC|ACT_VAMPIRE|NPC_NECRO_ACTS );
     if (tier >= 1 && tier <= 9 && (tier <= 5 || classCaster) && gprog("onCastAI", "C", ch))
         return true;
-    
-    if (IS_SET( ch->act, ACT_VAMPIRE )) {
-        if (IS_SET( ch->act, NPC_NECRO_ACTS ) && chance( 50 ))
-            return specFightNecro( );
-        else
-            return specFightVampire( );
-    }
-    
-    if (IS_SET( ch->act, ACT_CLERIC )) {
-        if (number_range( 0, cnt++ ) == 0) 
-            prof = prof_cleric;
-    }
 
-    if (IS_SET( ch->act, ACT_MAGE )) {
-        if (number_range( 0, cnt++ ) == 0) 
-            prof = prof_warlock;
-    }
-    
-    if (IS_SET( ch->act, NPC_NECRO_ACTS )) {
-        if (number_range( 0, cnt++ ) == 0) 
-            prof = prof_necromancer;
-    }
-    
-    if (prof == prof_cleric)
-        return specFightCleric( );
+    if (classCaster)
+        return false;
 
-    if (prof == prof_warlock)
-        return specFightMage( );
-
-    if (prof == prof_necromancer)
-        return specFightNecro( );
-    
     return specFight( );
 }
 

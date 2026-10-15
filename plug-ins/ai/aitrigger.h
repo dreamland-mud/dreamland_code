@@ -5,7 +5,8 @@
 #ifndef AITRIGGER_H
 #define AITRIGGER_H
 
-/** No Fenia handler is registered: the C++ code below the call decides. */
+/** No Fenia handler is registered. Only the gangsters quest still keeps a C++
+ *  body below the call; every plug-ins/ai caller treats it as "do nothing". */
 #define AI_UNHANDLED (-1)
 
 /**
@@ -14,11 +15,10 @@
  * C++ keeps the cheap gates that say WHEN a mob should think (dice rolls, flags,
  * hp thresholds); the handler decides WHAT to do and runs every state check.
  * Returns AI_UNHANDLED when no handler is registered in .tmp.gtrig[trigName]
- * (an .Array(), see global/gtrig), so annulling the Fenia handler brings the C++
- * fallback back. Otherwise 1 if the handler acted, 0 if it decided to do
- * nothing. A handler that returns nothing counts as 0 and still owns the
- * decision, and so does one that throws: no C++ fallback runs on top of what it
- * may already have done.
+ * (an .Array(), see global/gtrig): a plug-ins/ai mob then makes no decision,
+ * no C++ brain is left behind those hooks. Otherwise 1 if the handler acted,
+ * 0 if it decided to do nothing. A handler that returns nothing counts as 0,
+ * and so does one that throws.
  *
  * mob is the deciding mob. If the handler extracted it (it lost its room or its
  * ID changed), the result is 1 whatever the handler returned, so the C++ caller
