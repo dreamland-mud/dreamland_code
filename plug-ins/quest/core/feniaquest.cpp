@@ -215,18 +215,18 @@ void FeniaQuest::create( PCharacter *pch, NPCharacter *questman )
     } catch (const ::Exception &e) {
         complain( "onCreate", e );
         // A script can throw after it marked a client or created a target. The
-        // quest object is dropped without destroy(), so undo it here, like the
-        // C++ types do (stealquest): otherwise the marks stay keyed to this hero
+        // quest object is dropped without destroy(), so undo it here: otherwise
+        // the marks stay keyed to this hero
         // and the next quest of the same type finds the stale ones first.
         destroy( );
         throw QuestCannotStartException( typeName );
     }
 
-    // The type says <engine>fenia</engine> but nobody has written the script.
+    // The type has a config file but nobody has written the script.
     // Loud, because the alternative is a questor that mysteriously refuses.
     if (!called) {
         LogStream::sendError( ) << "Fenia quest " << typeName
-                                << ": engine is fenia, but onCreate is not defined" << endl;
+                                << ": onCreate is not defined" << endl;
         wiznet( "failed", "onCreate is not defined for this type" );
         throw QuestCannotStartException( typeName );
     }
@@ -696,7 +696,6 @@ void FeniaQuest::markObject( ::Object *obj, const DLString &role, bool mandatory
     // nothing: a scenario that places an item and then marks it would leave an
     // unmarked copy on disk, and after a reboot the mark, the [ЦЕЛЬ] tag and
     // every trigger would be gone with no sign anything had happened.
-    // StealQuest has always done the equivalent by hand at stealquest.cpp:166.
     save_items_at_holder( obj );
 }
 

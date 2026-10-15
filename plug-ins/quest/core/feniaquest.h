@@ -13,14 +13,11 @@ class WrapperBase;
 class MobQuestTarget;
 class ObjQuestTarget;
 
-/** One autoquest whose logic lives in Fenia rather than in C++.
+/** One autoquest, with its logic in Fenia.
  *
- *  A single class serves every type: what distinguishes a Fenia KillQuest from
- *  a Fenia StealQuest is 'typeName', which names the .AutoQuest() wrapper each
- *  virtual below delegates to. The eight concrete C++ classes stay compiled and
- *  registered meanwhile, so a quest already in flight keeps running on the class
- *  it was created with -- flipping a type is about what gets GENERATED next, not
- *  about rewriting what players already hold.
+ *  A single class serves every type: what distinguishes a KillQuest from a
+ *  StealQuest is 'typeName', which names the .AutoQuest() wrapper each virtual
+ *  below delegates to.
  *
  *  'vars' is where a Fenia scenario keeps its own state. It has to be a C++
  *  attribute and not a Fenia field on the character: attributes are what the

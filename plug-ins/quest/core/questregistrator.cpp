@@ -66,12 +66,12 @@ int QuestRegistratorBase::getFeniaId( ) const
     return feniaId.getValue( );
 }
 
-bool QuestRegistratorBase::isFeniaEngine( ) const
+bool QuestRegistratorBase::needsFeniaApplicable( ) const
 {
-    return engine.getValue( ) == "fenia";
+    return needsApplicable.getValue( );
 }
 
-Quest::Pointer QuestRegistratorBase::createFeniaQuest( PCharacter *pch, NPCharacter *questor ) const
+Quest::Pointer QuestRegistratorBase::createQuest( PCharacter *pch, NPCharacter *questor ) const
 {
     FeniaQuest::Pointer quest( NEW );
 
@@ -83,25 +83,30 @@ Quest::Pointer QuestRegistratorBase::createFeniaQuest( PCharacter *pch, NPCharac
     return quest;
 }
 
-bool QuestRegistratorBase::applicable( PCharacter *pch, bool fAuto ) const
-{
-    if (fAuto && pch->getRemorts().size() == 0 && pch->getRealLevel() < minAutoLevel)
-        return false;
-
-    return true;
-}
-
 bool QuestRegistratorBase::isApplicable( PCharacter *pch, bool fAuto ) const
 {
     bool answer;
 
-    if (!QuestRegistratorBase::applicable( pch, fAuto ))
+    if (fAuto && pch->getRemorts().size() == 0 && pch->getRealLevel() < minAutoLevel)
         return false;
 
     if (askFeniaApplicable( pch, fAuto, answer ))
         return answer;
 
-    return applicable( pch, fAuto );
+    // The miss is logged where it happens: croak for a script error, the
+    // boot check in QuestTypesPlugin for a hook that is not bound at all.
+    return !needsFeniaApplicable( );
+}
+
+bool QuestRegistratorBase::hasFeniaApplicable( ) const
+{
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    WrapperBase *wrapper = const_cast<QuestRegistratorBase *>( this )->getWrapper( );
+    Register method;
+
+    return wrapper && wrapper->triggerFunction( Scripting::IdRef( "onApplicable" ), method );
 }
 
 bool QuestRegistratorBase::askFeniaApplicable( PCharacter *pch, bool fAuto, bool &answer ) const
@@ -129,8 +134,8 @@ bool QuestRegistratorBase::askFeniaApplicable( PCharacter *pch, bool fAuto, bool
     try {
         rc = method.toFunction( )->invoke( Register( wrapper->getSelf( ) ), args );
     } catch (const ::Exception &e) {
-        // Croak so the immortals see the backtrace, then let C++ decide: a
-        // broken gate must not hide or hand out a whole quest type.
+        // Croak so the immortals see the backtrace, then treat it as no answer
+        // (isApplicable decides by <needsApplicable>).
         FeniaManager::getThis( )->croak( wrapper, methodId, e );
         return false;
     }
@@ -149,7 +154,12 @@ bool QuestRegistratorBase::askFeniaApplicable( PCharacter *pch, bool fAuto, bool
 
 const DLString& QuestRegistratorBase::getName( ) const
 {
-    return getType( );
+    return name;
+}
+
+void QuestRegistratorBase::setName( const DLString &n )
+{
+    name = n;
 }
 
 int QuestRegistratorBase::getPriority( ) const
