@@ -61,9 +61,10 @@ libiomanager_la_LIBADD = \
 -lcrypto \
 -ljsoncpp
 
-banflags.h: banflags.conf
-banflags.cpp: banflags.conf banflags.h
-libiomanager_la_moc_xml.cpp: banflags.h
+$(top_builddir)/src/banflags.h: banflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+banflags.cpp: banflags.conf $(top_builddir)/src/banflags.h
+libiomanager_la_moc_xml.cpp: $(top_builddir)/src/banflags.h
 
 CLEANFILES = banflags.cpp $(top_builddir)/src/banflags.h 
 

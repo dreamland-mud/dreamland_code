@@ -83,9 +83,10 @@ $(LIBADD_FIGHT) \
 ../servlets/libservlets.la \
 -ljsoncpp
 
-olcflags.cpp: olcflags.conf olcflags.h
-olcflags.h: olcflags.conf
-libolc_la_moc_xml.cpp: olcflags.h
+olcflags.cpp: olcflags.conf $(top_builddir)/src/olcflags.h
+$(top_builddir)/src/olcflags.h: olcflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+libolc_la_moc_xml.cpp: $(top_builddir)/src/olcflags.h
 
 CLEANFILES = olcflags.cpp $(top_builddir)/src/olcflags.h 
 

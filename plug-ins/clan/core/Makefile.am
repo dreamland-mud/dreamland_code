@@ -32,9 +32,10 @@ libclan_core_la_LIBADD = \
 ../../descriptor/libdescriptor.la 
 
 
-clanflags.cpp: clanflags.conf clanflags.h
-clanflags.h: clanflags.conf
-libclan_core_la_moc_xml.cpp: clanflags.h
+clanflags.cpp: clanflags.conf $(top_builddir)/src/clanflags.h
+$(top_builddir)/src/clanflags.h: clanflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+libclan_core_la_moc_xml.cpp: $(top_builddir)/src/clanflags.h
 
 CLEANFILES = clanflags.cpp $(top_builddir)/src/clanflags.h 
 

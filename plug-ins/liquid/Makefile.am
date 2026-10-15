@@ -24,9 +24,10 @@ libliquid_la_LIBADD = \
 ../skills_impl/libskills_impl.la \
 $(LIBADD_FIGHT) 
 
-liquidflags.cpp: liquidflags.conf liquidflags.h
-liquidflags.h: liquidflags.conf
-libliquid_la_moc_xml.cpp: liquidflags.h
+liquidflags.cpp: liquidflags.conf $(top_builddir)/src/liquidflags.h
+$(top_builddir)/src/liquidflags.h: liquidflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+libliquid_la_moc_xml.cpp: $(top_builddir)/src/liquidflags.h
 
 CLEANFILES = liquidflags.cpp $(top_builddir)/src/liquidflags.h 
 

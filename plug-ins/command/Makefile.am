@@ -40,9 +40,10 @@ libcommand_la_MOC = \
 command.h \
 commandelement.h
 
-commandflags.cpp: commandflags.conf commandflags.h
-commandflags.h: commandflags.conf
-libcommand_la_moc_xml.cpp: commandflags.h
+commandflags.cpp: commandflags.conf $(top_builddir)/src/commandflags.h
+$(top_builddir)/src/commandflags.h: commandflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+libcommand_la_moc_xml.cpp: $(top_builddir)/src/commandflags.h
 
 CLEANFILES = commandflags.cpp $(top_builddir)/src/commandflags.h 
 

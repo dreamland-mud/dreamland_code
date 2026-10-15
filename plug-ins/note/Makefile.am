@@ -63,9 +63,10 @@ notethread.h \
 dreams.h \
 unread.h
 
-noteflags.cpp: noteflags.conf noteflags.h
-noteflags.h: noteflags.conf
-libnotes_la_moc_xml.cpp: noteflags.h
+noteflags.cpp: noteflags.conf $(top_builddir)/src/noteflags.h
+$(top_builddir)/src/noteflags.h: noteflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+libnotes_la_moc_xml.cpp: $(top_builddir)/src/noteflags.h
 
 CLEANFILES = listfilter_scan.c++ \
 listfilter_parse.c++ \

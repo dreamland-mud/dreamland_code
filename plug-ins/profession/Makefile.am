@@ -25,9 +25,10 @@ mobileprofession.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc
 
-profflags.cpp: profflags.conf profflags.h
-profflags.h: profflags.conf
-libprofession_la_moc_xml.cpp: profflags.h
+profflags.cpp: profflags.conf $(top_builddir)/src/profflags.h
+$(top_builddir)/src/profflags.h: profflags.conf
+	$(MAKEBITS) -s $< -h -r -f $@
+libprofession_la_moc_xml.cpp: $(top_builddir)/src/profflags.h
 
 CLEANFILES = profflags.cpp $(top_builddir)/src/profflags.h 
 AM_CPPFLAGS += $(plugin_INCLUDES)
