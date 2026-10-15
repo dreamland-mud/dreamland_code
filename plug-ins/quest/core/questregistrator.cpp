@@ -14,6 +14,13 @@
 #include "register-impl.h"
 #include "lex.h"
 
+// XMLBoolean defaults to true: without this, every type whose config omits
+// <needsApplicable> would be withheld from everyone.
+QuestRegistratorBase::QuestRegistratorBase( )
+    : needsApplicable( false )
+{
+}
+
 long long QuestRegistratorBase::getID( ) const
 {
     if (feniaId <= 0)

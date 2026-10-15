@@ -36,6 +36,8 @@ XML_OBJECT
 public:
     typedef ::Pointer<QuestRegistratorBase> Pointer;
 
+    QuestRegistratorBase( );
+
     Quest::Pointer createQuest( PCharacter *, NPCharacter * ) const;
 
     /** The config file's name without .xml, e.g. KillQuest. Also the name
