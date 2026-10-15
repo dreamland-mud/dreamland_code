@@ -108,6 +108,7 @@
 #include "onehit_undef.h"
 #include "damage_impl.h"
 #include "fight.h"
+#include "lang.h"
 #include "material.h"
 #include "def.h"
 #include "l10n.h"
@@ -348,6 +349,23 @@ static char round_damage_colour( int perc )
     return 'R';
 }
 
+// " [immune: fire, charm]" after a fightspam-OFF summary number, in the viewer's
+// language; empty when nothing bounced off this round.
+static DLString round_immune_tag( Character *to, unsigned int mask )
+{
+    DLString list;
+    for (int dt = 0; dt < 32; dt++) {
+        if (!(mask & (1u << dt)))
+            continue;
+        if (!list.empty( ))
+            list << ", ";
+        list << fmt( to, "%1$N1", damage_noun( dt, viewerLang( to ) ).c_str( ) );
+    }
+    if (list.empty( ))
+        return list;
+    return fmt( to, _(" {D[{xиммунитет: %1$s{D]{x"), list.c_str( ) );
+}
+
 // After a combat round, fightspam-OFF players get one aggregated line per
 // participant in their room ("<attacker> => <victim> [N]"), shown only for real
 // damage (>0) against a still-living victim -- a kill already printed its line.
@@ -367,7 +385,7 @@ static void fightspam_round_summary( )
 
         bool anyLine = false;
         for (Character *att = ch->in_room->people; att != 0; att = att->next_in_room) {
-            if (att->extracted || att->roundDamage <= 0)
+            if (att->extracted || (att->roundDamage <= 0 && att->roundImmune == 0))
                 continue;
 
             Character *vic = att->fighting;
@@ -383,7 +401,9 @@ static void fightspam_round_summary( )
 
             // Args in reference order (1=attacker, 2=victim, 3=number string) so
             // the act formatter reads each va_arg with the right type.
-            ch->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, vic, num );
+            DLString line = num;
+            line << round_immune_tag( ch, att->roundImmune );
+            ch->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, vic, line.c_str( ) );
             anyLine = true;
         }
 
@@ -443,13 +463,14 @@ static void fightspam_round_summary( )
 // caller (att->fighting may not be set yet). No-op when nothing was dealt.
 void fightspam_flush_between_rounds( Character *att, Character *victim )
 {
-    if (att == 0 || att->roundDamage <= 0 || att->in_room == 0)
+    if (att == 0 || (att->roundDamage <= 0 && att->roundImmune == 0) || att->in_room == 0)
         return;
 
     if (victim == 0 || victim->extracted || victim->position == POS_DEAD
         || victim->max_hit <= 0)
     {
         att->roundDamage = 0; // nothing sensible to show, but still consume it
+        att->roundImmune = 0;
         return;
     }
 
@@ -477,11 +498,14 @@ void fightspam_flush_between_rounds( Character *att, Character *victim )
             // Args in reference order (1=attacker, 2=victim, 3=number) so the act
             // formatter reads each va_arg with the right type -- same as the round
             // summary line above.
-            to->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, victim, num );
+            DLString line = num;
+            line << round_immune_tag( to, att->roundImmune );
+            to->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, victim, line.c_str( ) );
         }
     }
 
     att->roundDamage = 0;
+    att->roundImmune = 0;
 }
 
 void violence_update()
@@ -492,8 +516,10 @@ void violence_update()
     Object *obj, *obj_next;
 
     // Reset per-round damage accumulators before the hit loop; summarized below.
-    for (ch = char_list; ch != 0; ch = ch->next)
+    for (ch = char_list; ch != 0; ch = ch->next) {
         ch->roundDamage = 0;
+        ch->roundImmune = 0;
+    }
 
     for (ch = char_list; ch != 0; ch = ch->next)
     {

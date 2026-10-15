@@ -228,6 +228,7 @@ public:
     // public: cleared directly by the free function violence_update() in plug-ins/fight
     bool                          adrenaline_pending; // armed by setLastFightTime, fires one "calmed down" line when adrenaline decays
     int                           roundDamage; // total damage dealt this combat round; reset+summarized by violence_update for fightspam-OFF viewers
+    unsigned int                  roundImmune; // damtype bits (1 << dam_type) the victim was immune to this round, for the same summary
     int                           fightEmptyStreak; // consecutive fightspam-OFF empty rounds (no damage summary), for the "You're fighting! >>>" indicator
     bool extracted;
     // True while the corpse is being made: items leave the body and their

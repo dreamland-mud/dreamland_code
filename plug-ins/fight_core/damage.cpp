@@ -128,6 +128,11 @@ bool Damage::hit( bool show )
         && (ch->fighting != 0 || victim->fighting != 0 || fightspam_cast_depth > 0))
         ch->roundDamage += dam;
 
+    // Same summary, immune hits: the line says which damage types bounced off.
+    if (immune && ch != 0 && dam_type >= 0 && dam_type < 32
+        && (ch->fighting != 0 || victim->fighting != 0 || fightspam_cast_depth > 0))
+        ch->roundImmune |= 1u << dam_type;
+
     if (show)
         message( );
 
@@ -896,6 +901,14 @@ bool Damage::canSeeMessage(Character *to)
     if (dam == 0
         && !to->is_npc( )
         && !IS_SET(to->getPC( )->config, msgNoSpamBit( )))
+        return false;
+
+    // fightspam OFF: an immune hit in combat shows up in the round summary as
+    // "[immune: <damtype>]", whatever the skillspam bit says.
+    if (immune
+        && !to->is_npc( )
+        && !IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM)
+        && (ch->fighting != 0 || victim->fighting != 0 || fightspam_cast_depth > 0))
         return false;
 
     // fightspam OFF: suppress the per-hit damage line; violence_update prints

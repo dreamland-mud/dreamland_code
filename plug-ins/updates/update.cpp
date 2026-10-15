@@ -444,8 +444,10 @@ void mobile_update( )
             // around the spec, the same way ccast.cpp does for the in-combat
             // player cast (bug 13343: gas breath dealt damage with no number).
             bool wasFighting = ( ch->fighting != 0 );
-            if (wasFighting)
+            if (wasFighting) {
                 ch->roundDamage = 0;
+                ch->roundImmune = 0;
+            }
 
             mprog_special( ch );
 
