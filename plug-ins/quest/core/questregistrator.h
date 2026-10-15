@@ -47,6 +47,13 @@ public:
     virtual long long getID( ) const;
 
     virtual bool applicable( PCharacter *, bool fAuto ) const;
+
+    /** Whether this type may be offered to pch: the minAutoLevel gate, then
+     *  .AutoQuest(name).onApplicable(ch, fAuto) when Fenia defines it, else the
+     *  C++ applicable() above. A Fenia answer of true/false is final; no answer,
+     *  or a script error, falls through to C++. Every caller goes through here. */
+    bool isApplicable( PCharacter *, bool fAuto ) const;
+
     virtual int getPriority( ) const;
     int getMinAutoLevel( ) const;
     const DLString& getShortDescr( lang_t ) const;
@@ -86,6 +93,9 @@ protected:
     /** Build a Fenia-backed quest of this type. Out of line and out of the
      *  template so the header need not know about FeniaQuest. */
     Quest::Pointer createFeniaQuest( PCharacter *, NPCharacter * ) const;
+
+    /** Ask onApplicable. True when Fenia gave a usable answer, stored in answer. */
+    bool askFeniaApplicable( PCharacter *, bool fAuto, bool &answer ) const;
 
     XML_VARIABLE XMLMultiString shortDesc;
     XML_VARIABLE XMLMultiString difficulty;

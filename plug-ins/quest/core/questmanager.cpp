@@ -81,7 +81,7 @@ QuestList QuestManager::list(PCharacter *pch) const
     QuestList result;
 
     for (i = 0; i < quests.size(); i++) {
-        if (quests[i]->applicable( pch, false )) 
+        if (quests[i]->isApplicable( pch, false )) 
             result.push_back(quests[i]);
     }
     
@@ -106,7 +106,7 @@ void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) const {
     DLString declined;
 
     for (summ = 0, i = 0; i < quests.size( ); i++) {
-        if (quests[i]->applicable( pch, true )) {
+        if (quests[i]->isApplicable( pch, true )) {
             summ += quests[i]->getPriority( );
             qlist.push_back( quests[i] );
         }

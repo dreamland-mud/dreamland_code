@@ -10,6 +10,9 @@
 #include "wrappermanagerbase.h"
 #include "logstream.h"
 #include "fenia/exceptions.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
 
 long long QuestRegistratorBase::getID( ) const
 {
@@ -86,6 +89,62 @@ bool QuestRegistratorBase::applicable( PCharacter *pch, bool fAuto ) const
         return false;
 
     return true;
+}
+
+bool QuestRegistratorBase::isApplicable( PCharacter *pch, bool fAuto ) const
+{
+    bool answer;
+
+    if (!QuestRegistratorBase::applicable( pch, fAuto ))
+        return false;
+
+    if (askFeniaApplicable( pch, fAuto, answer ))
+        return answer;
+
+    return applicable( pch, fAuto );
+}
+
+bool QuestRegistratorBase::askFeniaApplicable( PCharacter *pch, bool fAuto, bool &answer ) const
+{
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    WrapperBase *wrapper = const_cast<QuestRegistratorBase *>( this )->getWrapper( );
+
+    if (!wrapper)
+        return false;
+
+    Scripting::IdRef methodId( "onApplicable" );
+    Register method;
+
+    if (!wrapper->triggerFunction( methodId, method ))
+        return false;
+
+    RegisterList args;
+    args.push_back( FeniaManager::wrapperManager->getWrapper( (Character *)pch ) );
+    args.push_back( Register( (int)fAuto ) );
+
+    Register rc;
+
+    try {
+        rc = method.toFunction( )->invoke( Register( wrapper->getSelf( ) ), args );
+    } catch (const ::Exception &e) {
+        // Croak so the immortals see the backtrace, then let C++ decide: a
+        // broken gate must not hide or hand out a whole quest type.
+        FeniaManager::getThis( )->croak( wrapper, methodId, e );
+        return false;
+    }
+
+    if (rc.type == Register::NUMBER || rc.type == Register::STRING) {
+        answer = rc.toBoolean( );
+        return true;
+    }
+
+    if (rc.type != Register::NONE)
+        LogStream::sendError( ) << "Quest type " << getName( ) << ": onApplicable answered "
+                                << rc.getTypeName( ) << " where true or false was expected" << endl;
+
+    return false;
 }
 
 const DLString& QuestRegistratorBase::getName( ) const
