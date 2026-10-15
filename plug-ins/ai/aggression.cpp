@@ -34,14 +34,9 @@ bool BasicMobileBehavior::aggress( )
     if (IS_SET( ch->act, ACT_VAMPIRE )) {
         // Fenia sees the vampire only when it is free to act and someone out
         // of a fight stands in the room: this runs every pulse.
-        if (gprog_registered( "onVampireAI" )) {
-            if (isAfterCharm( ) || ch->wait > 0 || !hasVampirePrey( ))
-                return false;
-            int ai = ai_trigger(false, ch, "onVampireAI", "C", ch);
-            if (ai != AI_UNHANDLED)
-                return ai;
-        }
-        return aggressVampire( );
+        if (isAfterCharm( ) || ch->wait > 0 || !hasVampirePrey( ))
+            return false;
+        return ai_trigger(false, ch, "onVampireAI", "C", ch) > 0;
     }
 
     if (aggressLastFought( ))
@@ -155,14 +150,8 @@ bool BasicMobileBehavior::aggressNormal( )
             victim = rch;
     }
 
-    if (victim) {
-        int ai = ai_trigger(false, ch, "onAggressAI", "CCs", ch, victim, "normal");
-        if (ai != AI_UNHANDLED)
-            return ai;
-
-        attack( victim );
-        return true;
-    }
+    if (victim)
+        return ai_trigger(false, ch, "onAggressAI", "CCs", ch, victim, "normal") > 0;
 
     return false;
 }
@@ -194,13 +183,7 @@ bool BasicMobileBehavior::aggressLastFought( )
     if (!canAggressLastFought( victim ))
         return false;
 
-    int ai = ai_trigger(false, ch, "onAggressAI", "CCs", ch, victim, "lastFought");
-    if (ai != AI_UNHANDLED)
-        return ai;
-
-    yell_panic(victim, ch, "", "%1$^C1! Теперь ты умрешь!", "aggressLastFought");
-    attack( victim );
-    return true;
+    return ai_trigger(false, ch, "onAggressAI", "CCs", ch, victim, "lastFought") > 0;
 }
 
 /*
@@ -229,15 +212,8 @@ bool BasicMobileBehavior::aggressMemorized( )
             victim = rch;
     }
 
-    if (victim) {
-        int ai = ai_trigger(false, ch, "onAggressAI", "CCs", ch, victim, "memorized");
-        if (ai != AI_UNHANDLED)
-            return ai;
-
-        yell_panic(victim, ch, "", "Вот мы и встретились, %1$C1!", "aggressMemorized");        
-        attack( victim );
-        return true;
-    }
+    if (victim)
+        return ai_trigger(false, ch, "onAggressAI", "CCs", ch, victim, "memorized") > 0;
 
     return false;
 }        
@@ -265,26 +241,12 @@ bool BasicMobileBehavior::aggressRanged( )
     if (!ranger && !caster && !strong)
         return false;
 
-    if (gprog_registered( "onAggressRangedAI" )) {
-        int victDoor, victRange;
-        Character *victim = findRangeVictim( ch->getModifyLevel( ) / 10 + 1, victDoor, victRange );
-        if (!victim)
-            return false;
+    int victDoor, victRange;
+    Character *victim = findRangeVictim( ch->getModifyLevel( ) / 10 + 1, victDoor, victRange );
+    if (!victim)
+        return false;
 
-        int ai = ai_trigger(false, ch, "onAggressRangedAI", "CCii", ch, victim, victDoor, victRange);
-        if (ai != AI_UNHANDLED)
-            return ai;
-    }
-
-    if (ranger)
-        if (aggressRanger( ))
-            return true;
-
-    if (caster)
-        if (aggressCaster( ))
-            return true;
-    
-    return false;
+    return ai_trigger(false, ch, "onAggressRangedAI", "CCii", ch, victim, victDoor, victRange) > 0;
 }
 
 /*

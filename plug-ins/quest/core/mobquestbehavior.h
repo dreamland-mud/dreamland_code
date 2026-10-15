@@ -55,7 +55,6 @@ protected:
 class PeacefulClient : public virtual MobQuestBehavior {
 protected:
     virtual bool canAggressNormal( Character * );
-    virtual bool canAggressVampire( Character * );
 };
 
 class HuntedVictim : public virtual MobQuestBehavior {

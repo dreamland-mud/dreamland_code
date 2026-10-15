@@ -22,21 +22,10 @@
 
 #include "def.h"
 
-GSN(none);
-GSN(blindness);
-GSN(faerie_fire);
-GSN(dispel_affects);
-GSN(curse);
 GSN(second_attack);
 GSN(third_attack);
 GSN(fourth_attack);
 GSN(guard);
-GSN(dirt_kicking);
-GSN(smash);
-GSN(backstab);
-GSN(tiger_power);
-GSN(disarm);
-GSN(bash);
 
 /*
  * Hit victim for the first time 
@@ -167,16 +156,5 @@ bool BasicMobileBehavior::doWimpy( )
     if (!mustFlee( ))
         return false;
 
-    int ai = ai_trigger(true, ch, "onWimpyAI", "C", ch);
-    if (ai != AI_UNHANDLED)
-        return ai;
-
-    // A seated charmie must stand up before it can flee (movement gates flee on standing).
-    if (ch->position == POS_SITTING || ch->position == POS_RESTING)
-        interpret_raw( ch, "stand" );
-
-    interpret_raw( ch, "flee" );
-    clearLastFought( );
-
-    return true;
+    return ai_trigger(true, ch, "onWimpyAI", "C", ch) > 0;
 }

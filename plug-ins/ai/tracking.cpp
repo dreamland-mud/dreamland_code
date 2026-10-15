@@ -52,17 +52,7 @@ bool BasicMobileBehavior::track( )
     if (!canTrackLastFought( wch ))
         return false;
 
-    int ai = ai_trigger(false, ch, "onTrackAI", "CC", ch, wch);
-    if (ai != AI_UNHANDLED)
-        return ai;
-
-    if (trackCaster( wch ))
-        return true;
-
-    if (trackLastFought( wch ))
-        return true;
-
-    return false;
+    return ai_trigger(false, ch, "onTrackAI", "CC", ch, wch) > 0;
 }
 
 /*

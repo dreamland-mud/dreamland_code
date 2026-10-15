@@ -121,12 +121,6 @@ bool PeacefulClient::canAggressNormal( Character *victim )
             && MobQuestBehavior::canAggressNormal( victim );
 }
 
-bool PeacefulClient::canAggressVampire( Character *victim )
-{
-    return !ourHero( victim )
-            && MobQuestBehavior::canAggressVampire( victim );
-}
-
 /*--------------------------------------------------------------------
  * ProtectedClient*
  *--------------------------------------------------------------------*/
