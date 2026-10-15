@@ -14,7 +14,6 @@ liblearn_la_SOURCES = \
 cskills.cpp \
 train.cpp \
 glist.cpp \
-practice.cpp \
 showskill.cpp \
 teach.cpp \
 impl.cpp

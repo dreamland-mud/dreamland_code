@@ -183,8 +183,8 @@ msgtable_t msg_positions = {
 
 
 // Classic linear ("prose") score -- a comprehensive, screen-reader-friendly
-// dump of every stat. Used as the fall-through body for the accessible 'score'
-// command and for NPCs; players normally get the Fenia panel or score_ascii.
+// dump of every stat. 'oscore' shows it to NPCs; players get the Fenia 'score'
+// panel or score_ascii.
 static void score_prose( Character *ch )
 {
     ostringstream buf;
@@ -965,25 +965,6 @@ CMDRUNP( oscore )
     }
 
     score_ascii( ch );
-}
-
-/*
- * 'score' proper is the accessible panel implemented in Fenia
- * (command/score/runFunc). Per WrappedCommand::entryPoint the runFunc override
- * replaces this native handler for PCs and NPCs alike, so it only fires as a
- * boot-safety fall-through if the Fenia command is unavailable (e.g. Fenia never
- * loaded): render the linear prose score, honouring a single-parameter query.
- */
-// FENIA-OWNED: dreamland_fenia/command/score/runFunc
-CMDRUNP( score )
-{
-    DLString arg = argument;
-    if (!arg.empty( )) {
-        do_score_args( ch, arg );
-        return;
-    }
-
-    score_prose( ch );
 }
 
 

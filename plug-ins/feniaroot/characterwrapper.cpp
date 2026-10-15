@@ -7434,7 +7434,7 @@ NMI_INVOKE( CharacterWrapper, skillsInfo, "(): список структур д�
 }
 
 // Weapon/utility skills that make no sense in a weaponless pet's report.
-// Mirrors skill_is_invalid() in comm/report.cpp.
+// Same list the retired C++ 'report' command used.
 static bool report_skill_invalid(int sn, bool noCarry)
 {
     if (!noCarry)

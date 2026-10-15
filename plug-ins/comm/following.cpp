@@ -289,49 +289,6 @@ CMDRUN( group )
 
 
 /*
- * DEAD in normal play. The live 'nuke' is Fenia (command/nuke/runFunc); per
- * WrappedCommand::entryPoint a runFunc override fully replaces this native
- * handler for PCs and NPCs alike, so this body only fires as a boot-safety
- * fall-through if the Fenia command never loaded. Do NOT l10n/"fix" it expecting
- * an in-game effect -- edit the Fenia override instead.
- */
-// FENIA-OWNED: dreamland_fenia/command/nuke/runFunc
-CMDRUN( nuke )
-{
-    Character *victim;
-    DLString argument = constArguments;
-    DLString arg = argument.getOneArgument( );
-
-    if (arg.empty( )) {
-        ch->pecho( _("Чье следование за тобой ты хочешь прекратить?") );
-        return;
-    }
-    
-    victim = get_char_world(ch, arg, FFIND_FOLLOWER | FFIND_INVISIBLE);
-    if (!victim) {
-        ch->pecho( _("Среди твоих последователей нет никого с таким именем.") );
-        return;
-    }
-
-    if (ch == victim) {
-        ch->pecho( _("От себя не убежишь.") );
-        return;
-    }
-    
-    if (is_same_group( victim, ch )) {
-        guarding_nuke( ch, victim );
-        victim->leader = 0;
-        guarding_assert( victim );
-    }
-    
-    oldact(_("$c1 исключает $C4 из числа $s последователей."),ch,0,victim,TO_NOTVICT);
-    oldact_p(_("$c1 исключает тебя из числа $s последователей."),ch,0,victim,TO_VICT,POS_SLEEPING);
-    oldact_p(_("Ты исключаешь $C4 из числа твоих последователей."),ch,0,victim,TO_CHAR,POS_SLEEPING);
-    follower_stop(victim);
-}
-
-
-/*
  * 'Split' originally by Gnort, God of Chaos.
  */
 CMDRUN( split )
