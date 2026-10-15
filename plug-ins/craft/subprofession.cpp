@@ -280,6 +280,10 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
     XMLAttributeCraft::Pointer attr = craft_attr(ch);
     int level = attr->proficiencyLevel(getName());
 
+    // A maxed profession has nothing left to learn: no XP, no message.
+    if (level >= maxLevel)
+        return;
+
     attr->gainExp(getName(), xp);
 
     // Profession name pad in the recipient's language so %N declines it for
@@ -291,11 +295,6 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
 
     ch->pecho(_("Ты получаешь %1$d очк%1$Iо|а|ов опыта в профессии %2$N2."), xp, profName.c_str());
 
-    if (level >= maxLevel) {
-        ch->save();
-        return;
-    }
-   
     ExperienceCalculator::Pointer calc = getCalculator(ch);
  
     while (calc->expToLevel(level) <= 0) {
