@@ -228,7 +228,7 @@ void InterpretHandler::normalPrompt( Character *ch )
     }
 
     if (IS_SET(ch->comm,COMM_AFK)) {
-        ch->send_to("{C<АФК>{x ");
+        ch->send_to(lmsg(viewerLang(ch), "{C<AFK>{x ", "{C<АФК>{x ", "{C<АФК>{x "));
         return;
     }
 
