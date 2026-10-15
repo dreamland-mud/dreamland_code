@@ -49,6 +49,7 @@
 #include "def.h"
 #include "base64.h"
 #include "webeditor.h"
+#include "l10n.h"
 
 using namespace Scripting;
 
@@ -56,8 +57,13 @@ template class AttributeEventHandler<WebEditorSaveArguments>;
 
 static IconvMap utf2koi("utf-8", "koi8-u//IGNORE");
 
-static const char *MSG_FLUSH_BUF = "Входящие команды очищены.\r\n";
-const char *lid = "\n\rЕсли слишком много раз повторять одно и то же, тебя выкинет из игры. Не надо так.\n\r";
+/* Raw socket notices, in the attached character's language (RU before login). */
+DLString msg_spam_warning( Character *ch )
+{
+    return DLString( "\n\r" )
+        + _("Если слишком много раз повторять одно и то же, тебя выкинет из игры. Не надо так.").getMessage( ch )
+        + "\n\r";
+}
 
 /*
  * Negotiated client terminal type.
@@ -112,7 +118,7 @@ bool Descriptor::checkStopSymbol( )
         character->getPC()->getAttributes().eraseAttribute("speedwalk");
     }
 
-    writeConverted(MSG_FLUSH_BUF);
+    writeConverted((_("Входящие команды очищены.").getMessage( character ) + "\r\n").c_str( ));
     return true;
 }
 
@@ -140,7 +146,7 @@ int Descriptor::inputChar( unsigned char i )
 
     inbuf[sizeof(inbuf) - 1] = 0;
     LogStream::sendWarning( ) << host << " input overflow: " << inbuf << endl;
-    writeConverted(lid);
+    writeConverted(msg_spam_warning( character ).c_str( ));
     return -1;
 }
 

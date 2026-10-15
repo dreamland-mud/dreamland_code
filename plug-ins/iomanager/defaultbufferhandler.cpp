@@ -19,7 +19,7 @@
 #include "colour.h"
 #include "def.h"
 
-extern const char *lid;
+DLString msg_spam_warning( Character *ch );
 
 const char *MSG_LINE_TOO_LONG = C_YELLOW "Слишком длинная строка была обрезана. Эта часть не влезла:\n\r" C_WHITE;
 const char *MSG_EOL = "\r\n";
@@ -213,7 +213,7 @@ DefaultBufferHandler::read( Descriptor *d )
 
                     d->repeat = 0;
 
-                    d->writeConverted(lid);
+                    d->writeConverted(msg_spam_warning( d->character ).c_str( ));
                     d->close( );
                     return false;
                 }
