@@ -281,6 +281,9 @@ int Descriptor::inputTelnet( unsigned char i )
                 case TELOPT_EOR:
                     SET_BIT(oob_proto, OOB_EOR);
                     break;
+                case TELOPT_MSP:
+                    SET_BIT(oob_proto, OOB_MSP);
+                    break;
             }
             telnet.state = TNS_NORMAL;
             break;
@@ -305,6 +308,9 @@ int Descriptor::inputTelnet( unsigned char i )
                     break;
                 case TELOPT_EOR:
                     REMOVE_BIT(oob_proto, OOB_EOR);
+                    break;
+                case TELOPT_MSP:
+                    REMOVE_BIT(oob_proto, OOB_MSP);
                     break;
             }
             telnet.state = TNS_NORMAL;
@@ -709,6 +715,14 @@ sendVersion(Descriptor *d)
     val["args"][1] = d->websock.nonce;
     LogStream::sendError( ) << "WebSock: sending server version" << endl;
     d->writeWSCommand(val);
+
+    // The web client plays MSP lines only after this frame, and forgets it
+    // on every 'version', so it goes right behind it.
+    SET_BIT(d->oob_proto, OOB_MSP);
+    Json::Value msp;
+    msp["command"] = "msp";
+    msp["args"][0] = true;
+    d->writeWSCommand(msp);
 }
 
 bool 

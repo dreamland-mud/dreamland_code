@@ -41,6 +41,7 @@
 
 #define GMCP    201             /* Generic MUD Communication Protocol */
 #define TELOPT_MSSP 70          /* Mud Server Status Protocol */
+#define TELOPT_MSP 90           /* MUD Sound Protocol */
 #define MSSP_VAR 1
 #define MSSP_VAL 2
 #define        IAC        255                /* interpret as command: */

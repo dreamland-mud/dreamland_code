@@ -9,6 +9,7 @@ bufferhandler.cpp \
 inputhandler.cpp \
 outofband.cpp \
 websocketrpc.cpp \
+msp.cpp \
 impl.cpp
 
 libdescriptor_la_MOC = \

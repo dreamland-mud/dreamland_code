@@ -87,6 +87,8 @@ typedef std::vector<ViaRecord> ViaVector;
 #define OOB_CHAT (B)
 /* The client answered DO EOR: prompts end with IAC EOR instead of IAC GA. */
 #define OOB_EOR (C)
+/* MSP sound triggers: a telnet client answered DO MSP, or the web client. */
+#define OOB_MSP (D)
 
 struct WebSockState {
     int state;
