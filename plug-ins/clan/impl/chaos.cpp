@@ -67,66 +67,6 @@ GSN(spellbane);
  *-------------------------------------------------------------------------*/
 
 
-// FENIA-OWNED: dreamland_fenia/spell/confuse
-SPELL_DECL(Confuse);
-VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-        Affect af;
-        Character *rch;
-        int count=0;
-
-        if ( victim->isAffected(gsn_confuse) )
-        {
-                oldact_p(_("Кто-то совсем недавно уже ввел в заблуждение $C4."),
-                        ch,0,victim,TO_CHAR,POS_RESTING);
-                return;
-        }
-
-        if ( saves_spell(level,victim, DAM_MENTAL, ch, DAMF_MAGIC) )
-        {
-                ch->pecho(_("Не получилось."));
-                return;
-        }
-
-        victim->pecho(_("Тебя сконфузили!"));
-        oldact(_("$c1 выглядит очень сконфуженно."),victim,0,0,TO_ROOM);
-
-        af.type      = sn;
-        af.level     = level;
-        af.duration  = level / 50;
-        affect_to_char(victim,&af);
-
-        for ( rch = ch->in_room->people; rch != 0; rch = rch->next_in_room )
-        {
-                if ( rch == ch
-                        && !ch->can_see( rch )
-                        && ch->get_trust() < rch->invis_level )
-                {
-                        count++;
-                }
-
-                continue;
-        }
-
-        for ( rch = ch->in_room->people; rch != 0; rch = rch->next_in_room )
-        {
-                if ( rch != ch
-                        && ch->can_see( rch )
-                        && ch->get_trust() >= rch->invis_level
-                        && number_range(1,count) == 1 )
-                        break;
-        }
-
-        if ( rch )
-            interpret_raw( victim, "murder", "%s", rch->getNameC());
-
-        interpret_raw( victim, "murder", "%s", ch->getNameC());
-
-}
-
-
-
-
 SPELL_DECL(Disgrace);
 VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -148,80 +88,6 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
       ch->pecho(_("Твоя попытка закончилась неудачей."));
 
 }
-
-
-
-
-// FENIA-OWNED: dreamland_fenia/spell/disperse
-SPELL_DECL(Disperse);
-VOID_SPELL(Disperse)::run( Character *ch, Room *room, int sn, int level ) 
-{ 
-
-    Room *pRoomIndex;
-    int cnt = 0;
-
-    if ( ch->isAffected(sn ) )
-    {
-        ch->pecho(_("У тебя не хватает сил разогнать эту группу."));
-        return;
-    }
-
-    if (IS_SET(room->room_flags, ROOM_NO_RECALL)) {
-        ch->pecho(_("Отсюда ты никого не сможешь вышвырнуть."));
-        return;
-    }
-
-    for ( auto &vch : room->getPeople() )
-    {
-        
-        if (vch == ch)
-            continue;
-            
-        if (vch->is_immortal())
-            continue;
-
-        if (IS_SET(vch->imm_flags, IMM_SUMMON))
-            continue;
-        
-        if (vch->is_npc( )) {
-            if (IS_SET(vch->act, ACT_AGGRESSIVE))
-                continue;
-
-            if (vch->leader 
-                && !vch->leader->is_npc( )
-                && is_safe_nomessage( ch, vch->leader ))
-                continue;
-        }
-        else {
-            if (vch->getModifyLevel() <= PK_MIN_LEVEL)
-                continue;
-
-            if (is_safe_nomessage( ch, vch ))
-                continue;
-        }
-        
-        for ( ; ; ) {
-            pRoomIndex = get_random_room( vch );
-
-            if (!IS_SET(pRoomIndex->room_flags, ROOM_NO_RECALL) )
-                    break;
-        }
-        
-        cnt++;
-        vch->dismount( );
-        transfer_char( vch, ch, pRoomIndex,
-                "%1$^C1 исчезает!",
-                "Мир закружился вокруг тебя подчиняясь Силам Хаоса!",
-                "%1$^C1 с озадаченным видом появляется рядом с тобой." );
-    }
-    
-    postaffect_to_char( ch, sn, 15 );
-    
-    if (cnt == 0)
-        ch->pecho(_("Подходящей жертвы не нашлось."));
-}
-
-
 
 
 SPELL_DECL(Doppelganger);
@@ -265,8 +131,6 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 
 
 }
-
-
 
 
 SPELL_DECL(Mirror);
@@ -391,55 +255,6 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
                 char_to_room(mch,victim->in_room);
         }
 
-}
-
-
-
-
-// FENIA-OWNED: dreamland_fenia/spell/randomizer
-SPELL_DECL(Randomizer);
-VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level ) 
-{ 
-    Affect af;
-
-    if ( ch->isAffected(sn ) )
-    {
-      ch->pecho(_("Это заклинание использовалось совсем недавно."));
-      return;
-    }
-
-//  if (IS_SET(room->room_flags, ROOM_LAW))
-//    {
-//      ch->pecho("Здесь тебе противостоят Силы Порядка.");
-//      return;
-//    }
-    if (IS_ROOM_AFFECTED(room, AFF_ROOM_RANDOMIZER))
-    {
-        ch->pecho(_("Магические Силы Хаоса уже изменили окружающий мир."));
-        return;
-    }
-
-  if (number_bits(1) == 0)
-    {
-      ch->pecho(_("Несмотря на твои усилия, окружающий мир противостоит Хаосу."));
-      postaffect_to_char(ch, sn, level / 10);
-      return;
-    }
-
-    af.bitvector.setTable(&raffect_flags);
-    af.type      = sn;
-    af.level     = ch->getModifyLevel();
-    af.duration  = level / 15;
-    af.bitvector.setValue(AFF_ROOM_RANDOMIZER);
-    room->affectTo( &af );
-
-    postaffect_to_char(ch, sn, level / 5);
-
-    ch->pecho(_("Окружающее тебя пространство теперь находится под властью Хаоса!"));
-    ch->pecho(_("Использование Магических Сил Хаоса опустошает тебя."));
-    ch->hit -= min(200, ch->hit/2);
-    oldact_p(_("Магические Силы Хаоса изменяют окружающий мир."),
-           ch,0,0,TO_ROOM,POS_RESTING);
 }
 
 

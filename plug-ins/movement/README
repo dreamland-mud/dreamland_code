@@ -11,8 +11,6 @@ Movement
   |                      +--> PushMovement [groups]
   |                      |
   |                      +--> FleeMovement
-  |                              |
-  |                              +--> EscapeMovement [groups]
   |
   +-----> JumpMovement
               |
