@@ -628,6 +628,8 @@ AssassinateOneHit::AssassinateOneHit( Character *ch, Character *victim )
 {
 }
 
+static const int NPC_NECK_CAP = 15;
+
 void AssassinateOneHit::calcDamage( )
 {
     float chance, skill_mod, stat_mod, level_mod, size_mod, vis_mod, sleep_mod, quick_mod, time_mod;
@@ -683,6 +685,12 @@ void AssassinateOneHit::calcDamage( )
     victim->setLastFightTime( );
     
     chance = max( (float)1, chance ); // there's always a chance
+
+    // A mob ninja breaks a player's neck at most this often: groups fight
+    // champions from levels below, and the level term alone pushed a sleeping
+    // healer past 30%.
+    if (ch->is_npc( ) && !victim->is_npc( ))
+        chance = min( (float)NPC_NECK_CAP, chance );
 
     //////////////// THE ROLL ////////////////
     
