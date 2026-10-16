@@ -99,7 +99,11 @@ bool BasicMobileBehavior::canAssistOffense( Character *fch, Character *victim )
     if (IS_SET(ch->off_flags, ASSIST_ALIGN) && ALIGNMENT(ch) == ALIGNMENT(mob))
         return true;
 
-    if (IS_SET(ch->off_flags, ASSIST_VNUM) && ch->pIndexData == mob->pIndexData)
+    // Every mob sides with its own kind (Kit 2026-10-15), assist_vnum or not.
+    // Dummy-tier (10) onboarding mobs only with the flag: a new character must
+    // be able to kill them one by one.
+    if (ch->pIndexData == mob->pIndexData
+        && (IS_SET(ch->off_flags, ASSIST_VNUM) || ch->getTier() != 10))
         return true;
 
     return false;
