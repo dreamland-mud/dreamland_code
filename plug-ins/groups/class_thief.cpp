@@ -70,7 +70,6 @@ GSN(circle);
 GSN(dual_backstab);
 GSN(envenom);
 GSN(key_forgery);
-GSN(knife);
 GSN(pick_lock);
 GSN(poison);
 GSN(push);
@@ -107,37 +106,6 @@ void CircleOneHit::calcDamage( )
 
     WeaponOneHit::calcDamage( );
 }
-
-/*----------------------------------------------------------------------------
- * Knife
- *---------------------------------------------------------------------------*/
-class KnifeOneHit: public SkillWeaponOneHit {
-public:
-    KnifeOneHit( Character *ch, Character *victim );
-
-    virtual void calcDamage( );
-
-};
-
-KnifeOneHit::KnifeOneHit( Character *ch, Character *victim )
-            : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_knife )
-{
-}
-
-void KnifeOneHit::calcDamage( )
-{
-    damBase( );
-    damapply_class(ch, dam);
-    damApplyDamroll( );
-
-    int slevel = skill_level(*gsn_knife, ch);    
-    dam = ( slevel / 30 + 1 ) * dam + slevel;
-
-    damApplyCounter( );
-
-    WeaponOneHit::calcDamage( );
-}
-
 
 /*
  * 'pick lock' skill command
@@ -246,74 +214,6 @@ SKILL_RUNP( circle )
     }
 }
 
-
-/*
- * 'knife' skill command
- */
-
-SKILL_RUNP( knife )
-{
-    char arg[MAX_INPUT_LENGTH];
-    Character *victim;
-    Object *knife;
-    int chance;
-
-    one_argument(argument, arg);
-
-    if (arg[0] == '\0') {
-        ch->pecho(_("Пырнуть ножом кого?"));
-        return;
-    }
-
-    if ((knife = get_eq_char(ch, wear_wield)) == NULL) {
-        ch->pecho(_("Вооружись для начала."));
-        return;
-    }
-
-    if (get_weapon_class(knife) != WEAPON_DAGGER) {
-        ch->pecho(_("Для этого тебе нужен кинжал."));
-        return;
-    }
-
-    if ((victim = get_char_room(ch, arg)) == NULL) {
-        ch->pecho(_("Нет таких здесь."));
-        return;
-    }
-
-    if (ch == victim) {
-        ch->pecho(_("У тебя боязнь себя?"));
-        return;
-    }
-
-    if (victim->fighting != NULL) {
-        ch->pecho(_("Подожди, пока закончится сражение."));
-        return;
-    }
-
-    if (is_safe(ch, victim))
-        return;
-
-    chance = min(100, gsn_knife->getEffective( ch ) + skill_level_bonus(*gsn_knife, ch));
-
-    try {
-        KnifeOneHit khit( ch, victim );
-
-        if (number_percent( ) < chance) {
-            khit.hit( );
-            gsn_knife->improve( ch, true, victim );
-        }
-        else {
-            khit.miss( );
-            gsn_knife->improve( ch, false, victim );
-        }
-
-        yell_panic( ch, victim,
-                    "Помогите! Кто-то пырнул меня ножом!",
-                    "Помогите! %1$^C1 пырну%1$Gло|л|ла меня ножом!" );
-    }
-    catch (const VictimDeathException &e) {
-    }
-}
 
 /*
  * 'key forgery' skill command

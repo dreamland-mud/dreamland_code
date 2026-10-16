@@ -19,7 +19,6 @@
 #include "wiznet.h"
 #include "def.h"
 
-#include "gods_impl.h"
 #include "tattoo.h"
 #include "defaultreligion.h"
 #include "religionattribute.h"
@@ -37,7 +36,6 @@ extern "C"
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeReligion> >( ppl );
         
         Plugin::registerPlugin<MocRegistrator<DefaultReligion> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<ErevanGod> >( ppl );
         Plugin::registerPlugin<ReligionLoader>( ppl );
 
         return ppl;
