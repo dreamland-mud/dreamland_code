@@ -329,15 +329,13 @@ static bool mprog_invisible( Character *ch, const Character *looker )
     return false;
 }
 
-/*
- * True if char can see victim.
- */
 bool Character::seesInDark( ) const
 {
     return IS_AFFECTED(this, AFF_INFRARED) || IS_GHOST(this) || IS_DEATH_TIME(this);
 }
 
 /*
+ * True if char can see victim.
  * ignoreDark: would ch see victim if the room were lit.
  */
 bool Character::can_see( const Character *victim, bool ignoreDark ) const

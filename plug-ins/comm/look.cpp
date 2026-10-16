@@ -1204,6 +1204,7 @@ static void show_people_to_char( Character *list, Character *ch, bool fShowMount
             // Glowing eyes give away only those the dark alone hides: an
             // invisible or hidden infravision user stays unseen.
             if (rch->in_room->isDark( ) && IS_AFFECTED(rch, AFF_INFRARED )
+                && IS_SET(rch->parts, PART_EYE|PART_EYESTALKS)
                 && ch->can_see( rch, true ))
                 ch->pecho( _("{WТы видишь взгляд {Rпылающих красных глаз{W, следящих за ТОБОЙ!{x") );
                 
@@ -1542,7 +1543,8 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
 
     if (heat) {
         buf << "{r" << room->getName(lang) << "{x";
-        if (uses_screenreader( ch ))
+        // Without colour the tint is lost too: same audience as look_targets_hint.
+        if (uses_screenreader( ch ) || (ch->getPC( ) && !ch->getPC( )->getConfig( ).color))
             buf << lmsg(lang, " (in the dark)", " (в темноте)", " (у темряві)");
     }
     else
