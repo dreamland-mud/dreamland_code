@@ -54,7 +54,7 @@ using std::min;
 #define OBJ_VNUM_BATTLE_PONCHO       26
 
 CLAN(battlerager);
-GSN(artificer_bleed);
+GSN(bleeding);
 GSN(bandage);
 GSN(bloodthirst);
 GSN(cure_blindness);
@@ -382,9 +382,9 @@ SKILL_RUNP( bandage )
                 update_pos( ch );
                 ch->pecho( _("Тебе становится лучше!") );
 
-                if (upgraded && (ch->affected.find( gsn_poison ) || ch->affected.find( gsn_artificer_bleed ))) {
+                if (upgraded && (ch->affected.find( gsn_poison ) || ch->affected.find( gsn_bleeding ))) {
                         affect_strip( ch, gsn_poison );
-                        affect_strip( ch, gsn_artificer_bleed );
+                        affect_strip( ch, gsn_bleeding );
                         ch->pecho( _("Тугая повязка останавливает кровь и вытягивает яд.") );
                 }
 
