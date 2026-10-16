@@ -379,6 +379,14 @@ CMDRUN(who)
     int week_peak = Descriptor::getWeekPeak();
     int week_uniques = who_count_week_uniques();
 
+    // 'who summary' (called on every login by the nanny) prints only the head
+    // count, so a newcomer sees right away who else is around.
+    if (arguments == "summary") {
+        ch->pecho(_("Сейчас в мире {W%1$d{w игрок%1$I|а|ов, еще {W%2$d{w в Discord. Всего {W%3$d{w, максимум за неделю {W%4$d{w, за неделю заходил%5$I|и|о {W%5$d{w персонаж%5$I|а|ей."),
+                  online_count, offline_count, total, week_peak, week_uniques);
+        return;
+    }
+
     if (online_count > 0)
         buf << fmt(ch, _("Сейчас в мире {W%1$d{w игрок%1$I|а|ов:"), online_count) << endl;
     for (const auto &victim: online)

@@ -95,6 +95,9 @@ XML_OBJECT
 public:
     typedef ::Pointer<ObjectQuestArticle> Pointer;
 
+    virtual bool visible( Character * ) const;
+    virtual bool available( Character *, NPCharacter * ) const;
+
 protected:
     XML_VARIABLE XMLInteger vnum;
 

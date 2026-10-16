@@ -108,7 +108,7 @@ CMDRUNP( delete )
                    "%1$^C1 превращает себя в помехи в проводах.", pch );
             // In-game info channel per viewer; Discord in English (players asked
             // for the Discord relay explicitly).
-            infonet(pch, 0, _("{CТихий голос из $o2: {1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир."), pch);
+            infonet(pch, 0, _("{CВести: {1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир."), pch);
             send_to_discord_stream(":ghost: " + fmtLang(LANG_EN, _("{1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир."), pch));
             
             Player::quitAndDelete( pch );

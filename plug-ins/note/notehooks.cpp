@@ -117,7 +117,6 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
     NoteManager::Threads &threads = NoteManager::getThis( )->getThreads( );
 
     for (d = descriptor_list; d; d = d->next) {
-        Object *pager;
         std::basic_ostringstream<char> buf0;
         PCharacter *victim;
         bool fFirst = true;
@@ -136,13 +135,12 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
         if (!note.isNoteTo( victim ))
             continue;
          
-        if (!( pager = get_pager( victim ) ))
-            continue;
-
         lang_t lang = viewerLang( victim );
 
-        buf0 << fmt( victim, _("{CТихий голос из $o2: {WУ тебя:") );
+        buf0 << fmt( victim, _("{CВести: {WУ тебя:") );
 
+        // One thread per line under the header, no column padding: screen
+        // readers read a run of spaces out loud.
         for (i = threads.begin( ); i != threads.end( ); i++) {
             const NoteThread &th = **i->second;
             int count = th.countSpool( victim );
@@ -150,10 +148,12 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
             if (count <= 0)
                 continue;
 
-            if (fFirst)
+            if (fFirst) {
                 fFirst = false;
-            else
-                buf0 << "                                       ";
+                buf0 << endl;
+            }
+
+            buf0 << " ";
 
             // The name in brackets is the command to type, so it stays as it is
             // registered -- unlike the noun in front of it, which follows the
@@ -162,7 +162,7 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
                  << " (" << th.getName() << ").{x" << endl;
         }
 
-        oldact_p( buf0.str( ).c_str( ), victim, pager, 0, TO_CHAR, POS_DEAD );
+        oldact_p( buf0.str( ).c_str( ), victim, 0, 0, TO_CHAR, POS_DEAD );
     }
 }
 

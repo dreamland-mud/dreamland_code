@@ -177,7 +177,7 @@ bool ClanAltar::fetch( Character *ch, Object *item )
     DLString cnRu = clanArea->getClan()->getRussianName().ruscase('1');
     DLString cnUa = clanArea->getClan()->getUkrainianName().ruscase('1');
     LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
-    infonet((Character*)0, 0, _("{CЕхидный голос из $o2: {WКлан %w утратил свою святыню.{x"), &clanName);
+    infonet((Character*)0, 0, _("{CВести: {WКлан %w утратил свою святыню.{x"), &clanName);
     send_discord_clan(fmtLang(LANG_EN, _("{WКлан %w утратил свою святыню.{x"), &clanName));
     send_telegram(fmtLang(LANG_RU, _("{WКлан %w утратил свою святыню.{x"), &clanName));
 

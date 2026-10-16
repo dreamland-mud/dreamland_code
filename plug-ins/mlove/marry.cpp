@@ -87,7 +87,7 @@ COMMAND(Marry, "marry")
 
     // Info channel per viewer; Discord is EN-only (names are author content).
     infonet((Character*)0, 0,
-        _("{CВеселый голос из $o2: {Y%1$s{W и {Y%2$s{W теперь муж и жена!!!{x"),
+        _("{CВести: {Y%1$s{W и {Y%2$s{W теперь муж и жена!!!{x"),
         brideName1.c_str( ), brideName2.c_str( ));
 
     send_discord_orb(":heart: " + brideName1 + " and " + brideName2 + " are now husband and wife.");

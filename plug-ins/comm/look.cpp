@@ -1120,7 +1120,19 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
 /*
  * display character equip list
  */
+bool show_char_equip_ex( Character *ch, Character *victim, ostringstream &buf, bool fShowEmpty, bool fShowUnseen );
+
 bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool fShowEmpty )
+{
+    return show_char_equip_ex( ch, victim, buf, fShowEmpty, fShowEmpty );
+}
+
+/*
+ * fShowEmpty: list empty slots as 'nothing.'; fShowUnseen: list worn items the
+ * viewer can't perceive as 'something.' (a blind owner still wears them).
+ * Returns true when no item was listed.
+ */
+bool show_char_equip_ex( Character *ch, Character *victim, ostringstream &buf, bool fShowEmpty, bool fShowUnseen )
 {
     Wearlocation::DisplayList eq;
     Wearlocation::DisplayList::iterator e;
@@ -1142,7 +1154,7 @@ bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool
                 continue;
         }
         else if (!ch->can_see( obj ) && !ch->can_hear( obj )) {
-            if (fShowEmpty)
+            if (fShowUnseen)
                 objName = lmsg(Player::lang(ch), "something.", "нечто.", "щось.");
             else
                 continue;

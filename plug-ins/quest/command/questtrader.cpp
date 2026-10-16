@@ -31,6 +31,7 @@
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
+#include "logstream.h"
 
 /*------------------------------------------------------------------------
  * QuestTrader 
@@ -192,11 +193,30 @@ bool QuestTradeArticle::purchase( Character *client, NPCharacter *questman, cons
 /*----------------------------------------------------------------------------
  * ObjectQuestArticle 
  *---------------------------------------------------------------------------*/
+// Questors are saved mobiles that keep their article list across reboots, so
+// an article can outlive its object prototype: hide it rather than sell it,
+// because create_object() on a missing prototype shuts the server down.
+bool ObjectQuestArticle::visible( Character * ) const
+{
+    return get_obj_index( vnum ) != 0;
+}
+
+bool ObjectQuestArticle::available( Character *, NPCharacter * ) const
+{
+    return get_obj_index( vnum ) != 0;
+}
+
 void ObjectQuestArticle::buy( PCharacter *client, NPCharacter *questman ) 
 {
     Object *obj;
+    OBJ_INDEX_DATA *pObjIndex = get_obj_index( vnum );
 
-    obj = create_object( get_obj_index( vnum ), client->getRealLevel( ) );
+    if (!pObjIndex) {
+        bug( "ObjectQuestArticle: no object prototype %d", vnum.getValue( ) );
+        return;
+    }
+
+    obj = create_object( pObjIndex, client->getRealLevel( ) );
     
     buyObject( obj, client, questman );
 

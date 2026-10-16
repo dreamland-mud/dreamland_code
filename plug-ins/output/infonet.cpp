@@ -3,32 +3,37 @@
  * ruffina, 2004
  */
 #include "pcharacter.h"
-#include "object.h"
 
 #include "infonet.h"
 #include "act.h"
 #include "multimessage.h"
 #include "descriptor.h"
 
-#define OBJ_VNUM_PAGER                        102 
-
 /*
- * Info channel
+ * Info channel: world news (arrivals, departures, levels, deaths, clan raids)
+ * heard by every player in the world. It used to need the crystal orb; the orb
+ * was retired so newcomers see that the world is alive.
  */
-Object * get_pager( Character *ch )
+bool infonet_listener( Descriptor *d, Character *ch, int min_level )
 {
-    Object *obj;
+    if (!d->character || d->connected != CON_PLAYING)
+        return false;
 
-    for (obj = ch->carrying; obj; obj = obj->next_content) 
-        if (obj->pIndexData->vnum == OBJ_VNUM_PAGER)
-            return obj;
-    
-    return NULL;
+    if (ch && ch->is_immortal( ))
+        return false;
+
+    if (d->character->get_trust() < min_level)
+        return false;
+
+    if (d->character == ch)
+        return false;
+
+    return true;
 }
 
 /**
  * Send a infonet message with a bit more flexible formatting.
- * 'prefix' normally contains '{CТихий голос из $o2{x' part but can be anything.
+ * 'prefix' normally contains the '{CNews: ' frame but can be anything.
  */
 void infonet( Character *ch, int min_level, const DLString &prefix, const char *fmt, ...)
 {
@@ -44,26 +49,9 @@ void infonet( Character *ch, int min_level, const DLString &prefix, const char *
 
 void infonet( const char *string, Character *ch, int min_level )
 {
-  Descriptor *d;
-  Object *obj;
-
-  for ( d = descriptor_list; d != 0; d = d->next )
-  {
-      if (!d->character || d->connected != CON_PLAYING)
-          continue;
-
-      if (ch && ch->is_immortal( ))
-          continue;
-
-      if (d->character->get_trust() < min_level)
-          continue;
-      
-      if (d->character == ch)
-          continue;
-        
-      if (( obj = get_pager( d->character ) ))
-           oldact_p( string, d->character, obj, ch, TO_CHAR, POS_DEAD);
-  }
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next)
+        if (infonet_listener( d, ch, min_level ))
+            oldact_p( string, d->character, 0, ch, TO_CHAR, POS_DEAD );
 }
 
 // Per-recipient info channel: resolve `format` in each listener's language and
@@ -71,30 +59,15 @@ void infonet( const char *string, Character *ch, int min_level )
 // const char* overload above, just rendered inside the loop instead of once.
 void infonet( Character *ch, int min_level, const MultiMessage &format, ... )
 {
-  Descriptor *d;
-  Object *obj;
-  va_list args;
+    va_list args;
 
-  for ( d = descriptor_list; d != 0; d = d->next )
-  {
-      if (!d->character || d->connected != CON_PLAYING)
-          continue;
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
+        if (!infonet_listener( d, ch, min_level ))
+            continue;
 
-      if (ch && ch->is_immortal( ))
-          continue;
-
-      if (d->character->get_trust() < min_level)
-          continue;
-
-      if (d->character == ch)
-          continue;
-
-      if (( obj = get_pager( d->character ) )) {
-          va_start( args, format );
-          DLString msg = vfmt( d->character, format.getMessage( d->character ).c_str( ), args );
-          va_end( args );
-          oldact_p( msg.c_str( ), d->character, obj, ch, TO_CHAR, POS_DEAD );
-      }
-  }
+        va_start( args, format );
+        DLString msg = vfmt( d->character, format.getMessage( d->character ).c_str( ), args );
+        va_end( args );
+        oldact_p( msg.c_str( ), d->character, 0, ch, TO_CHAR, POS_DEAD );
+    }
 }
-

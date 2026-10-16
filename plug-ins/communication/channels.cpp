@@ -127,11 +127,6 @@ void PageChannel::run( Character *ch, const DLString &constArguments )
 
     arguments = constArguments;
 
-    if (!get_pager( ch )) {
-        ch->pecho( _("Тебе определенно нужен хрустальный шар и то, что внутри него.") );
-        return;
-    }
-
     if (arguments.getOneArgument( ) == "all")
         GlobalChannel::run( ch, arguments );
     else
@@ -140,29 +135,18 @@ void PageChannel::run( Character *ch, const DLString &constArguments )
 
 bool PageChannel::isPersonalListener( Character *ch, Character *victim, const DLString &msg ) const
 {
-    if (!get_pager( victim )) {
-        oldact_p(_("У $C2 нет хрустального шара."),ch,0,victim,TO_CHAR, position);
-        return false;
-    }
-
     return PersonalChannel::isPersonalListener( ch, victim, msg );
 }
 
 bool PageChannel::isGlobalListener( Character *ch, Character *victim ) const
 {
-    if (!GlobalChannel::isGlobalListener( ch, victim ))
-        return false;
-
-    if (!get_pager( victim ))
-        return false;
-
-    return true;
+    return GlobalChannel::isGlobalListener( ch, victim );
 }
 
 DLString PageChannel::outputVict( Character *ch, Character *victim, 
                               const DLString &format, const DLString &msg ) const
 {
-    DLString message = fmt( victim, format.c_str( ), ch, msg.c_str( ), victim, get_pager( victim ) );
+    DLString message = fmt( victim, format.c_str( ), ch, msg.c_str( ), victim );
     return message;
 }
 

@@ -97,7 +97,7 @@ bool ClanGuard::death( Character *killer )
     DLString cnRu = clanArea->getClan()->getRussianName().ruscase('3');
     DLString cnUa = clanArea->getClan()->getUkrainianName().ruscase('3');
     LangText clanName { cnEn.c_str(), cnRu.c_str(), cnUa.c_str() };
-    infonet((Character*)0, 0, _("{CТихий голос из $o2: %w {Wне удалось удержать оборону.{x"), &clanName);
+    infonet((Character*)0, 0, _("{CВести: %w {Wне удалось удержать оборону.{x"), &clanName);
     send_discord_clan(fmtLang(LANG_EN, _("%w {Wне удалось удержать оборону.{x"), &clanName));
     send_telegram(fmtLang(LANG_RU, _("%w {Wне удалось удержать оборону.{x"), &clanName));
 
