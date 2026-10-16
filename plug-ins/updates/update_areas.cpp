@@ -23,6 +23,11 @@
 #include "wiznet.h"
 #include "weapontier.h"
 #include "../loadsave/behavior_utils.h"
+#include "weapongenerator.h"
+#include "weapons.h"
+#include "attacks.h"
+#include "damageflags.h"
+#include "vnum.h"
 
 #include "descriptor.h"
 #include "occupations.h"
@@ -36,6 +41,8 @@
 WEARLOC(none);
 WEARLOC(wield);
 GSN(track);
+GSN(bow);
+GSN(backstab);
 
 static void rprog_reset( Room *room )
 {
@@ -360,6 +367,14 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
 }
 
 
+// A ranger's bow or a thief's dagger given by arm_class_mob, not by a reset.
+static const char *CLASS_ARM = "classArm";
+
+static bool is_class_arm(Object *obj)
+{
+    return !obj->getProperty(CLASS_ARM).empty();
+}
+
 /** Recreate inventory and equipment for a mob, if an item has been
   * requested or stolen from it.
   */
@@ -427,7 +442,7 @@ static bool reset_one_mob(NPCharacter *mob)
         // Ignore items already in their correct place.
         Wearlocation *wloc = wearlocationManager->find(myReset->arg3);
         Object *worn = wloc->find(mob);
-        if (worn && worn->pIndexData->vnum == myReset->arg1) {
+        if (worn && worn->pIndexData->vnum == myReset->arg1 && !is_class_arm(worn)) {
             eventBus->publish(ItemResetEvent(worn, myReset));
             continue;
         }        
@@ -435,7 +450,7 @@ static bool reset_one_mob(NPCharacter *mob)
         // Item can be in inventory (after disarm) or wielded (after being removed from a sheath).
         Object *self = 0;
         for (Object *obj = mob->carrying; obj; obj = obj->next_content)
-            if (obj->pIndexData->vnum == myReset->arg1
+            if (obj->pIndexData->vnum == myReset->arg1 && !is_class_arm(obj)
                 && (obj->wear_loc == wear_none || obj->wear_loc == wear_wield)) 
             {
                 self = obj;
@@ -461,7 +476,7 @@ static bool reset_one_mob(NPCharacter *mob)
         // Ignore items already in inventory.
         Object *self = 0;
         for (Object *obj = mob->carrying; obj; obj = obj->next_content)
-            if (obj->pIndexData->vnum == myReset->arg1 && obj->wear_loc == wear_none) {
+            if (obj->pIndexData->vnum == myReset->arg1 && obj->wear_loc == wear_none && !is_class_arm(obj)) {
                 self = obj;
                 break;
             }
@@ -472,7 +487,9 @@ static bool reset_one_mob(NPCharacter *mob)
         }
 
         // Item could be worn, just remove it.
-        self = get_obj_list_vnum(mob->carrying, myReset->arg1);
+        for (Object *obj = mob->carrying; obj && !self; obj = obj->next_content)
+            if (obj->pIndexData->vnum == myReset->arg1 && !is_class_arm(obj))
+                self = obj;
         if (self) {
             self->wear_loc->unequip(self);
             eventBus->publish(ItemResetEvent(self, myReset));
@@ -487,6 +504,82 @@ static bool reset_one_mob(NPCharacter *mob)
     }
 
     return changed;
+}
+
+/*
+ * Rangers shoot only with a bow in hand and thieves backstab only with a
+ * piercing blade in hand. A reset ranger or thief that can use the skill and
+ * carries no weapon at all gets a random one of that class: rare for
+ * champions and up, at most rare below them. It is a reset item of the mob
+ * (marked classArm so the mob's own resets never take it for theirs) and
+ * drops like any other rand_all weapon.
+ */
+
+static bool is_bow(Object *obj)
+{
+    return obj->item_type == ITEM_WEAPON && get_weapon_class(obj) == WEAPON_BOW;
+}
+
+static bool is_stabber(Object *obj)
+{
+    return obj->item_type == ITEM_WEAPON
+        && (attack_table[get_weapon_attack(obj)].damage == DAM_PIERCE
+            || get_weapon_class(obj) == WEAPON_DAGGER);
+}
+
+static void arm_class_mob(NPCharacter *mob)
+{
+    if (IS_CHARMED(mob) || mob_has_occupation(mob, OCC_SHOPPER))
+        return;
+    if (!IS_SET(mob->form, FORM_SENTIENT) || !wear_wield->matches(mob))
+        return;
+    if (mob->getRealLevel() < 10)
+        return;
+
+    bool ranger = IS_SET(mob->act, ACT_RANGER) && gsn_bow->usable(mob);
+    bool thief = !ranger && IS_SET(mob->act, ACT_THIEF) && gsn_backstab->usable(mob);
+    if (!ranger && !thief)
+        return;
+
+    if (wear_wield->find(mob))
+        return;
+
+    // Disarmed earlier: take our own weapon back up. Any other weapon the mob
+    // carries is its builder's choice, and then it gets nothing.
+    for (Object *obj = mob->carrying; obj; obj = obj->next_content)
+        if (obj->item_type == ITEM_WEAPON) {
+            if (is_class_arm(obj) && obj->wear_loc == wear_none)
+                wear_wield->equip(obj);
+            return;
+        }
+
+    OBJ_INDEX_DATA *pObjIndex = get_obj_index(OBJ_VNUM_WEAPON_STUB);
+    if (!pObjIndex)
+        return;
+
+    Object *obj = create_object(pObjIndex, 0);
+    obj->reset_mob = mob->getID();
+    obj->level = mob->getRealLevel();
+    obj->setProperty(CLASS_ARM, "1");
+    obj_to_char(obj, mob);
+
+    int tier = mob->getTier();
+    bool champion = tier >= 1 && tier <= 3;
+
+    WeaponGenerator gen;
+    gen.item(obj)
+       .weaponClass(ranger ? "bow" : "dagger")
+       .alignment(mob->alignment);
+    if (champion)
+        gen.tier(3);
+    else
+        gen.randomTier(3);
+    gen.randomizeAll();
+
+    if (!(ranger ? is_bow(obj) : is_stabber(obj)) || !wear_wield->equip(obj)) {
+        extract_obj(obj);
+        return;
+    }
 }
 
 /** Recreate inventory and equipment for all NPC in the room. */
@@ -752,6 +845,16 @@ void reset_room(Room *pRoom, int flags)
         }
     }
     
+    for (Character *rch = pRoom->people; rch; rch = rch->next_in_room)
+        if (rch->is_npc() && rch->getNPC()->reset_room != 0
+            && (rch->getNPC()->zone == 0 || pRoom->areaIndex() == rch->getNPC()->zone)
+            && !wear_wield->find(rch))
+        {
+            arm_class_mob(rch->getNPC());
+            if (wear_wield->find(rch))
+                changedMob = true;
+        }
+
     dreamland->resetOption( DL_SAVE_OBJS );
     dreamland->resetOption( DL_SAVE_MOBS );
 
