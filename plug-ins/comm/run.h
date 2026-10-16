@@ -6,6 +6,7 @@
 #ifndef __RUN_H__
 #define __RUN_H__
 
+#include <set>
 #include "xmlstring.h"
 #include "xmlinteger.h"
 #include "xmlvariablecontainer.h"
@@ -39,6 +40,8 @@ public:
     inline void incSteps( );
     inline void clearSteps( );
     inline int getSteps( ) const;
+    inline void startLeg( int );
+    inline bool visit( int );
 
     char getFirstCommand( ) const;
     void clearFirstCommand( );
@@ -49,6 +52,8 @@ public:
 private:
     XML_VARIABLE XMLString path;
     XML_VARIABLE XMLInteger steps;
+    // Rooms the current run-to-the-end leg has passed; not saved.
+    std::set<int> legRooms;
 };
 
 
@@ -76,6 +81,18 @@ inline void XMLAttributeSpeedWalk::clearSteps( )
 inline int XMLAttributeSpeedWalk::getSteps( ) const
 {
     return steps.getValue( );
+}
+
+inline void XMLAttributeSpeedWalk::startLeg( int vnum )
+{
+    legRooms.clear( );
+    legRooms.insert( vnum );
+}
+
+/** Remember a room on this leg; false if the leg has been there already. */
+inline bool XMLAttributeSpeedWalk::visit( int vnum )
+{
+    return legRooms.insert( vnum ).second;
 }
 
 #endif

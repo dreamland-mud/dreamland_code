@@ -165,6 +165,36 @@ public:
             return RC_MOVE_OK;
         }
 
+        // A run to the end through looped rooms (a mirror maze) would circle
+        // until the runner is out of breath: exits are fixed, so coming back
+        // to any room of this leg means a circle. End the leg there.
+        if (walk->getSteps( ) == 0)
+            walk->startLeg( from_room->vnum );
+
+        if (!walk->visit( to_room->vnum )) {
+            ostringstream buf;
+
+            walk->clearFirstCommand( );
+            walk->clearSteps( );
+
+            if (walk->isEmpty( )) {
+                buf << fmt( ch, _("Ты понимаешь, что бегаешь по кругу, и останавливаешься.") );
+            }
+            else {
+                int d0 = walk->getFirstDoor( );
+
+                if (d0 >= 0 && d0 < DIR_SOMEWHERE)
+                    buf << fmt( ch, _("Ты понимаешь, что бегаешь по кругу, и продолжаешь свой путь %1$s."),
+                                direction_word( viewerLang( ch ), d0, DIR_CASE_TO ) );
+                else
+                    buf << fmt( ch, _("Ты понимаешь, что бегаешь по кругу, и продолжаешь свой путь неизвестно куда.") );
+            }
+
+            buf << endl;
+            msgSelf( ch, buf.str( ).c_str( ) );
+            return RC_MOVE_OK;
+        }
+
         if (moveRecursive( )) {
             walk->incSteps( );
             return RC_MOVE_OK;
