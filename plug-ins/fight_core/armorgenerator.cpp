@@ -71,7 +71,7 @@ static int proc_chance(int tierFloor)
  * ItemAffixRoller
  *-------------------------------------------------------------------------*/
 ItemAffixRoller::ItemAffixRoller(Object *obj, PCharacter *pch, int tier, const DLString &kind, const DLString &slot)
-        : crafted(false), obj(obj), pch(pch), tier(tier), kind(kind), slot(slot), isCaster(false), align(ALIGN_NONE),
+        : crafted(false), rollsOverride(0), obj(obj), pch(pch), tier(tier), kind(kind), slot(slot), isCaster(false), align(ALIGN_NONE),
           chosenTotal(0), extraFlags(0, &extra_flags)
 {
 }
@@ -155,7 +155,7 @@ bool ArmorGenerator::run()
         auto p = parts.begin();
         DLString sec = *p++;
         DLString value = *p;
-        forcedKeys.insert(sec + ":" + value.replaces("_", " "));
+        forcedKeys.insert(sec + ":" + value.replaces("~", " "));
     }
     collectCandidates();
     std::map<int, int> forced = resolveForced(forcedSpec);
@@ -633,15 +633,20 @@ void ItemAffixRoller::collectCandidates()
             DLString value = affix["value"].asString();
             int floor = affix.isMember("tier") ? affix["tier"].asInt() : secFloor;
 
-            if (!candidateAllowed(section, affix, floor))
+            // A crafted piece's forced picks (its material, a refit replay) pass
+            // every gate but the tier floor: the level window, alignment, class
+            // weights, skill groups and the fit clauses. The piece keeps what its
+            // material or its last roll gave it, whoever wears it at what level.
+            bool forcedPick = crafted && forcedKeys.count(secName + ":" + value) > 0;
+            if (forcedPick) {
+                if (tier > floor || section["needs_boss"].asBool() || affix["needs_boss"].asBool())
+                    continue;
+            } else if (!candidateAllowed(section, affix, floor))
                 continue;
 
             if (!valueAllowed(secName, value))
                 continue;
 
-            // A crafted piece's forced picks (its material, a refit replay) skip the
-            // fit clauses: the wearer may own the resist elsewhere, the piece keeps it.
-            bool forcedPick = crafted && forcedKeys.count(secName + ":" + value) > 0;
             if (!forcedPick && !fitAllowed(secName, value))
                 continue;
             if (!forcedPick && alreadyHas(secName, affix))
@@ -653,18 +658,21 @@ void ItemAffixRoller::collectCandidates()
                 if (!skillGroupManager->hasElement(value))
                     continue;
                 int gn = skillGroupManager->lookup(value);
-                if (playerGroups.count(gn) == 0)
+                if (!forcedPick && playerGroups.count(gn) == 0)
                     continue;
             }
 
             int weight = candidateWeight(secName, affix);
-            if (weight <= 0)
+            if (weight <= 0 && !forcedPick)
                 continue;
+            weight = max(1, weight);
 
             // Weights are relative: x100 leaves room for fractional pick multipliers.
             double pick = pickMultiplier(section, affix);
-            if (pick <= 0)
+            if (pick <= 0 && !forcedPick)
                 continue;
+            if (pick <= 0)
+                pick = 1;
             weight = max(1, (int)std::round(weight * 100 * pick));
 
             bool allowed = true;
@@ -722,8 +730,9 @@ std::map<int, int> ItemAffixRoller::resolveForced(const DLString &spec) const
         auto p = parts.begin();
         DLString sec = *p++;
         DLString value = *p++;
-        // Worn buff names carry spaces: written with '_' (dark_shroud).
-        value.replaces("_", " ");
+        // Values with spaces (worn buffs, procs) are written with '~':
+        // '_' is a legal character of values (heal_gain, pack_hp).
+        value.replaces("~", " ");
         int count = p != parts.end() ? max(1, atoi(p->c_str())) : 1;
 
         for (int i = 0; i < (int)pool.size(); i++) {
@@ -744,7 +753,7 @@ DLString ItemAffixRoller::picksSpec() const
     DLString spec;
     for (auto const &p: chosen) {
         DLString value = pool[p.first].value;
-        value.replaces(" ", "_");
+        value.replaces(" ", "~");
         if (!spec.empty())
             spec += " ";
         spec += pool[p.first].section + ":" + value + ":" + DLString(p.second);
@@ -992,6 +1001,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
  *-------------------------------------------------------------------------*/
 int ItemAffixRoller::rolls() const
 {
+    if (rollsOverride > 0)
+        return rollsOverride;
     return item_rolls(obj->level, slot);
 }
 

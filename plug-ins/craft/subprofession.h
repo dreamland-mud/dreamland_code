@@ -95,6 +95,9 @@ public:
     virtual int getLevel( PCharacter * ) const;
     inline virtual int getBaseExp( ) const;
     inline virtual int getMaxLevel( ) const;
+    /** Levels above hardFrom cost hardStepPct% more per level each (0 = flat curve). */
+    inline int getHardFrom( ) const { return hardFrom; }
+    inline int getHardStepPct( ) const { return hardStepPct; }
 
     virtual ExperienceCalculator::Pointer getCalculator(PCharacter *ch) const;
     virtual void gainExp( PCharacter *ch, int xp ) const;
@@ -103,6 +106,7 @@ protected:
     XML_VARIABLE XMLString  name, rusName, mltName, uaName;
     XML_VARIABLE XMLInteger baseExp;
     XML_VARIABLE XMLInteger maxLevel;
+    XML_VARIABLE XMLIntegerNoEmpty hardFrom, hardStepPct;
     XML_VARIABLE XMLPointerNoEmpty<CraftProfessionHelp> help;
 };
 

@@ -1684,7 +1684,7 @@ NMI_INVOKE(Root, randomizeNamedArmor, "(obj, ch, tier, slot[, profile]): ста�
     return Register(ok);
 }
 
-NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, profile]): случайные аффиксы на скрафченную броню в окне minCm..maxCm (centi-M, без кривой уровня); имена, AC и цвет остаются свои; force -- 'секция:значение[:стаки]' через пробел, берутся первыми; выбор пишется в property craft_picks; возвращает centi-M выпавшего или -1")
+NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, profile, rolls]): случайные аффиксы на скрафченную броню в окне minCm..maxCm (centi-M, без кривой уровня); имена, AC и цвет остаются свои; force -- 'секция:значение[:стаки]' через пробел (пробел в значении -- '~'), берутся первыми и проходят мимо всех фильтров кроме тира; rolls -- свое число measure rolls (0 = по уровню и слоту); выбор пишется в property craft_picks; возвращает centi-M выпавшего или -1")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
@@ -1694,6 +1694,7 @@ NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, pr
     int maxCm = argnum2number(args, 6);
     DLString force = args.size() > 6 ? argnum2string(args, 7) : DLString::emptyString;
     DLString profile = args.size() > 7 ? argnum2string(args, 8) : DLString::emptyString;
+    int rolls = args.size() > 8 ? argnum2number(args, 9) : 0;
 
     if (obj->item_type != ITEM_ARMOR)
         throw Scripting::Exception("Item is not armor for a craft roll.");
@@ -1709,6 +1710,7 @@ NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, pr
 
     ArmorGenerator gen(obj, ch->getPC(), tier, slot);
     bool ok = gen.craft(minCm, maxCm, force)
+                .measureRolls(rolls)
                 .caster(profile == "caster")
                 .alignment(ch->alignment)
                 .run();
@@ -1716,7 +1718,7 @@ NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, pr
     return Register(ok ? gen.total() : -1);
 }
 
-NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile]): rand_stat для скрафченного оружия с окном аффиксов minCm..maxCm (centi-M, без кривой уровня, двуручное x1.75); force -- имена аффиксов через пробел, берутся первыми; возвращает measure_m")
+NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile]): rand_stat для скрафченного оружия с окном аффиксов minCm..maxCm (centi-M, без кривой уровня, двуручное x1.75); руки берутся у прототипа; флаги, которые не дал прошлый бросок (закалка), остаются; force -- имена аффиксов через пробел, берутся первыми; возвращает measure_m")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
@@ -1735,6 +1737,16 @@ NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile
     if (obj->wear_loc != wear_none)
         throw Scripting::Exception("Item is worn: roll it off the body.");
 
+    // Flags the last roll did not give (the prototype's, a temper's) survive
+    // this one: the generator rebuilds value4 from scratch.
+    Flags rolledBefore(0, &weapon_type2);
+    for (auto &n: obj->getProperty("affixes").split(" ")) {
+        n.stripWhiteSpace();
+        if (!n.empty() && n != "two_hands" && weapon_type2.value(n, true) != NO_FLAG)
+            rolledBefore.setBit(weapon_type2.value(n, true));
+    }
+    int keep = obj->value4() & ~rolledBefore.getValue() & ~WEAPON_TWO_HANDS;
+
     WeaponGenerator gen;
     gen.item(obj)
         .alignment(ch->alignment)
@@ -1742,12 +1754,18 @@ NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile
         .caster(profile == "caster")
         .tier(tier)
         .craftWindow(minCm, maxCm);
+    // A blueprint's hands are its own: never a jackpot two-hander off a one-handed sword.
+    if (IS_SET(obj->pIndexData->value[4], WEAPON_TWO_HANDS))
+        gen.addRequirement("two_hands");
+    else
+        gen.addForbidden("two_hands");
     for (auto &n: force.split(" ")) {
         n.stripWhiteSpace();
         if (!n.empty())
             gen.addRequirement(n);
     }
     gen.randomizeStats();
+    obj->value4(obj->value4() | keep);
 
     return Register(atoi(obj->getProperty("measure_m").c_str()));
 }
