@@ -3,6 +3,8 @@
  * ruffina, 2004
  */
 #include <string.h>
+#include <vector>
+#include <algorithm>
 
 #include "wearloc_utils.h"
 #include "misc_wearlocs.h"
@@ -44,34 +46,41 @@ static bool is_tattoo( Object *obj )
 }
 
 /*
- * Same search as get_obj_wear, minus tattoos.
+ * 'remove N.<name>' over what the player wears, counted in the order
+ * 'equipment' lists the slots. get_obj_wear counts in inventory-list order,
+ * so with two necklaces '2.necklace' could take off the first neck's one.
  *
- * A tattoo answers to ordinary words -- 'знак', a god's name, or for a crafted
- * one its picture ('весы', 'порядок') -- and can never be taken off, so it used
- * to swallow 'remove <word>' and refuse while the item the player actually meant
- * sat there still worn. Player idea 16125.
+ * skipTattoo: leave tattoos out. A tattoo answers to ordinary words -- 'знак',
+ * a god's name, or for a crafted one its picture ('весы', 'порядок') -- and can
+ * never be taken off, so it used to swallow 'remove <word>' and refuse while the
+ * item the player actually meant sat there still worn. Player idea 16125.
  */
-static Object *get_obj_wear_no_tattoo( Character *ch, const char *cargument )
+static Object *get_obj_worn_nth( Character *ch, const char *cargument, bool skipTattoo )
 {
     char argument[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH];
-    Object *obj;
-    int number, count;
+    vector<Object *> found;
+    int number;
 
-    if (get_arg_id( cargument ) != 0)
-        return 0; // an explicit id means the player named this exact object
+    if (get_arg_id( cargument ) != 0) // an explicit id names this exact object
+        return skipTattoo ? 0 : get_obj_wear( ch, cargument );
 
     strcpy( argument, cargument );
     number = number_argument( argument, arg );
-    count  = 0;
 
-    for (obj = ch->carrying; obj != 0; obj = obj->next_content)
+    for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content)
         if (obj->wear_loc != wear_none
-            && !is_tattoo( obj )
-            && obj_has_name( obj, arg, ch )
-            && ++count == number)
-                return obj;
+            && !(skipTattoo && is_tattoo( obj ))
+            && obj_has_name( obj, arg, ch ))
+            found.push_back( obj );
 
-    return 0;
+    stable_sort( found.begin( ), found.end( ), []( Object *a, Object *b ) {
+        return a->wear_loc->getOrderDisplay( ) < b->wear_loc->getOrderDisplay( );
+    } );
+
+    if (number < 1 || number > (int)found.size( ))
+        return 0;
+
+    return found[number - 1];
 }
 
 /*
@@ -318,7 +327,7 @@ CMDRUNP( remove )
     }
     
     if (ch == victim) {
-        if (( obj = get_obj_wear( ch, argObj ) ) == 0) {
+        if (( obj = get_obj_worn_nth( ch, argObj, false ) ) == 0) {
             echo_master(ch, _("У тебя нет этого."));
             return;
         }
@@ -326,7 +335,7 @@ CMDRUNP( remove )
         // Prefer something that can actually come off. The tattoo stays the
         // answer when it is the only match, so its refusal is still reachable.
         if (is_tattoo( obj )) {
-            Object *other = get_obj_wear_no_tattoo( ch, argObj );
+            Object *other = get_obj_worn_nth( ch, argObj, true );
             if (other != 0)
                 obj = other;
         }
