@@ -77,6 +77,18 @@ CMDRUNP( title )
 
 static bool fix_pretitle( PCharacter *ch, DLString &title )
 {
+    // Only colour codes may pass. Any other tag ({l, {S, {I, {h, push/pop...) leaves
+    // a letter behind after colour stripping and would stay open into the name.
+    static const char *colours = "bcgmrwyBCGMRWYDxX";
+    for (DLString::size_type i = 0; i < title.size( ); i++)
+        if (title[i] == '{') {
+            if (i + 1 >= title.size( ) || title[i + 1] == 0 || !strchr( colours, title[i + 1] )) {
+                ch->pecho( _("В претитуле разрешены только цветовые коды.") );
+                return false;
+            }
+            i++;
+        }
+
     ostringstream buf;
     mudtags_convert( 
         title.c_str( ), buf, 
