@@ -45,7 +45,6 @@ mlove \
 note \
 misc_behaviors \
 race_aptitude \
-other_skills \
 cards \
 web \
 gmcp \
