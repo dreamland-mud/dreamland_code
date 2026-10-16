@@ -198,6 +198,8 @@ struct DefaultExperienceCalculator : public ExperienceCalculator {
         totalExp_ = attr->exp(profession->getName());
         baseExp = profession->getBaseExp();
         maxLevel = profession->getMaxLevel();
+        hardFrom = profession->getHardFrom();
+        hardStepPct = profession->getHardStepPct();
     }
     
     /**
@@ -211,7 +213,15 @@ struct DefaultExperienceCalculator : public ExperienceCalculator {
             
         // Summ[x=1..lvl] (base + maxLevel * x)
         // TNL: base + maxLevel * maxLevel * (level + 1)
-        return baseExp * level_ + maxLevel * maxLevel * level_ * (level_ + 1) / 2;
+        int total = baseExp * level_ + maxLevel * maxLevel * level_ * (level_ + 1) / 2;
+
+        // Top levels get progressively harder (Kit 2026-10-15): the step up to
+        // level n > hardFrom costs hardStepPct% more for each level past it.
+        if (hardFrom > 0 && hardStepPct > 0)
+            for (int n = hardFrom + 1; n <= level_; n++)
+                total += (baseExp + maxLevel * maxLevel * n) * hardStepPct * (n - hardFrom) / 100;
+
+        return total;
     }
 
     /**
@@ -249,6 +259,8 @@ protected:
     int totalExp_;
     int baseExp;
     int maxLevel;
+    int hardFrom;
+    int hardStepPct;
 };
 
 int CraftProfession::getLevel( PCharacter *ch ) const

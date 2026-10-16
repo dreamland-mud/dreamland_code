@@ -71,7 +71,7 @@ static int proc_chance(int tierFloor)
  * ItemAffixRoller
  *-------------------------------------------------------------------------*/
 ItemAffixRoller::ItemAffixRoller(Object *obj, PCharacter *pch, int tier, const DLString &kind, const DLString &slot)
-        : obj(obj), pch(pch), tier(tier), kind(kind), slot(slot), isCaster(false), align(ALIGN_NONE),
+        : crafted(false), rollsOverride(0), obj(obj), pch(pch), tier(tier), kind(kind), slot(slot), isCaster(false), align(ALIGN_NONE),
           chosenTotal(0), extraFlags(0, &extra_flags)
 {
 }
@@ -116,7 +116,8 @@ void ItemAffixRoller::flushAffects()
  * ArmorGenerator
  *-------------------------------------------------------------------------*/
 ArmorGenerator::ArmorGenerator(Object *obj, PCharacter *pch, int tier, const DLString &slot)
-        : ItemAffixRoller(obj, pch, tier, "armor", slot), procs(Json::arrayValue), keepName(false)
+        : ItemAffixRoller(obj, pch, tier, "armor", slot), procs(Json::arrayValue), keepName(false),
+          craftMin(0), craftMax(0)
 {
 }
 
@@ -146,17 +147,30 @@ bool ArmorGenerator::run()
         return false;
 
     learnPlayerGroups();
-    collectCandidates();
 
-    std::set<int> forced;
-    int sig = pickSignature();
+    for (auto const &w: forcedSpec.split(" ")) {
+        std::list<DLString> parts = w.split(":");
+        if (parts.size() < 2)
+            continue;
+        auto p = parts.begin();
+        DLString sec = *p++;
+        DLString value = *p;
+        forcedKeys.insert(sec + ":" + value.replaces("~", " "));
+    }
+    collectCandidates();
+    std::map<int, int> forced = resolveForced(forcedSpec);
+    int sig = crafted ? -1 : pickSignature();
     if (sig >= 0)
-        forced.insert(sig);
+        forced[sig] = 1;
 
     const weapon_tier_t &t = weapon_tier_table[tier - 1];
-    double curve = windowCurve();
-    pickAffixes((int)(t.min_m * curve), (int)(t.max_m * curve), t.worst_penalty_m,
-                t.max_affixes_m, t.max_negatives_m, forced);
+    if (crafted) {
+        pickAffixes(craftMin, craftMax, t.worst_penalty_m, t.max_affixes_m, t.max_negatives_m, forced);
+    } else {
+        double curve = windowCurve();
+        pickAffixes((int)(t.min_m * curve), (int)(t.max_m * curve), t.worst_penalty_m,
+                    t.max_affixes_m, t.max_negatives_m, forced);
+    }
     applyAffixes();
 
     if (sig >= 0)
@@ -169,12 +183,17 @@ bool ArmorGenerator::run()
         obj->setMaterial(materialName.c_str());
     }
 
-    assignAC();
-    if (keepName)
-        assignColours();
-    else
-        assignNames();
+    // A crafted piece keeps the AC and the colour its craft gave it.
+    if (!crafted) {
+        assignAC();
+        if (keepName)
+            assignColours();
+        else
+            assignNames();
+    }
     assignFlags();
+    if (crafted)
+        obj->setProperty("craft_picks", picksSpec());
 
     flushAffects();
 
@@ -614,15 +633,23 @@ void ItemAffixRoller::collectCandidates()
             DLString value = affix["value"].asString();
             int floor = affix.isMember("tier") ? affix["tier"].asInt() : secFloor;
 
-            if (!candidateAllowed(section, affix, floor))
+            // A crafted piece's forced picks (its material, a refit replay) pass
+            // every gate but the tier floor: the level window, alignment, class
+            // weights, skill groups and the fit clauses. The piece keeps what its
+            // material or its last roll gave it, whoever wears it at what level.
+            bool forcedPick = crafted && forcedKeys.count(secName + ":" + value) > 0;
+            if (forcedPick) {
+                if (tier > floor || section["needs_boss"].asBool() || affix["needs_boss"].asBool())
+                    continue;
+            } else if (!candidateAllowed(section, affix, floor))
                 continue;
 
             if (!valueAllowed(secName, value))
                 continue;
 
-            if (!fitAllowed(secName, value))
+            if (!forcedPick && !fitAllowed(secName, value))
                 continue;
-            if (alreadyHas(secName, affix))
+            if (!forcedPick && alreadyHas(secName, affix))
                 continue;
 
             // Skill groups: only groups the killer has a learned skill in.
@@ -631,18 +658,21 @@ void ItemAffixRoller::collectCandidates()
                 if (!skillGroupManager->hasElement(value))
                     continue;
                 int gn = skillGroupManager->lookup(value);
-                if (playerGroups.count(gn) == 0)
+                if (!forcedPick && playerGroups.count(gn) == 0)
                     continue;
             }
 
             int weight = candidateWeight(secName, affix);
-            if (weight <= 0)
+            if (weight <= 0 && !forcedPick)
                 continue;
+            weight = max(1, weight);
 
             // Weights are relative: x100 leaves room for fractional pick multipliers.
             double pick = pickMultiplier(section, affix);
-            if (pick <= 0)
+            if (pick <= 0 && !forcedPick)
                 continue;
+            if (pick <= 0)
+                pick = 1;
             weight = max(1, (int)std::round(weight * 100 * pick));
 
             bool allowed = true;
@@ -690,6 +720,47 @@ bool ItemAffixRoller::conflicts(const Candidate &c, const std::map<int, int> &pi
     return false;
 }
 
+std::map<int, int> ItemAffixRoller::resolveForced(const DLString &spec) const
+{
+    std::map<int, int> forced;
+    for (auto const &w: spec.split(" ")) {
+        std::list<DLString> parts = w.split(":");
+        if (parts.size() < 2)
+            continue;
+        auto p = parts.begin();
+        DLString sec = *p++;
+        DLString value = *p++;
+        // Values with spaces (worn buffs, procs) are written with '~':
+        // '_' is a legal character of values (heal_gain, pack_hp).
+        value.replaces("~", " ");
+        int count = p != parts.end() ? max(1, atoi(p->c_str())) : 1;
+
+        for (int i = 0; i < (int)pool.size(); i++) {
+            if (pool[i].section != sec || pool[i].value != value)
+                continue;
+            if (forced.count(i))
+                break;
+            forced[i] = min(count, pool[i].stack);
+            break;
+        }
+    }
+
+    return forced;
+}
+
+DLString ItemAffixRoller::picksSpec() const
+{
+    DLString spec;
+    for (auto const &p: chosen) {
+        DLString value = pool[p.first].value;
+        value.replaces(" ", "~");
+        if (!spec.empty())
+            spec += " ";
+        spec += pool[p.first].section + ":" + value + ":" + DLString(p.second);
+    }
+    return spec;
+}
+
 /** Weighted random fill of the tier's M window. Negatives are ordinary picks:
  *  they buy room for more positives, down to the tier's penalty floor. The
  *  exhaustive weapon walk is not reused on purpose: 150 affixes at M prices have
@@ -701,7 +772,7 @@ bool ItemAffixRoller::conflicts(const Candidate &c, const std::map<int, int> &pi
  *  inside the cap, a step prefers picks worth at least half of what each free
  *  slot still has to carry; restacking an affix already taken is always open. */
 void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxAffixesM, int maxNegativesM,
-                                  const std::set<int> &forced)
+                                  const std::map<int, int> &forced)
 {
     std::map<int, int> best;
     int bestDistance = -1, bestTotal = 0;
@@ -732,7 +803,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
     int topMax = (int)item_value("measure", "top_max", 1000);
     double topRepeat = item_value("measure", "top_repeat_weight", 1);
     std::vector<int> coreChance;
-    if (kind == "armor") {
+    // A crafted piece already carries the crafter's fixed stats: no core picks.
+    if (kind == "armor" && !crafted) {
         const Json::Value &core = item_value_object("measure", "core_affixes")[isCaster ? "caster" : "melee"];
         std::set<DLString> coreNames;
         for (auto const &n: core)
@@ -748,6 +820,9 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
     // Legendary armor keeps a share of its budget in stats (Kit 2026-10-04).
     if (tier == BEST_TIER && kind == "armor")
         statFloor = max(statFloor, item_value("measure", "legendary_stat_share", 0));
+    // ...and no stat floor either: the crafted fixed share is that floor.
+    if (crafted)
+        statFloor = 0;
     if (maxAffixesM > 0)
         maxAffixes += (int)std::round(item_points_by_level(item_value_object("measure", "max_affixes_bonus"), obj->level, col));
 
@@ -770,13 +845,18 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
         int target = number_range(minM, maxM);
         bool relaxed = false;   // no stat pick fits any more: fill freely
 
-        for (int i: forced) {
-            picked[i] = 1;
-            total += pool[i].price;
+        for (auto const &f: forced) {
+            int i = f.first, n = f.second;
+            picked[i] = n;
+            total += pool[i].price * n;
+            if (isStat[i])
+                statSpent += pool[i].price * n;
             if (pool[i].price < 0) {
-                penalty += pool[i].price;
+                penalty += pool[i].price * n;
                 negatives++;
             }
+            if (isTop[i])
+                tops++;
         }
 
         for (int chance: coreChance) {
@@ -921,6 +1001,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
  *-------------------------------------------------------------------------*/
 int ItemAffixRoller::rolls() const
 {
+    if (rollsOverride > 0)
+        return rollsOverride;
     return item_rolls(obj->level, slot);
 }
 
@@ -1283,8 +1365,8 @@ void ArmorGenerator::assignFlags()
     SET_BIT(obj->extra_flags, extraFlags.getValue());
     SET_BIT(obj->extra_flags, t.extra.getValue());
 
-    if (t.weeks > 0)
-        obj->timer = t.weeks * Date::SECOND_IN_WEEK / Date::SECOND_IN_MINUTE;
+    if (t.timer() > 0)
+        obj->timer = t.timer();
 
     obj->cost = item_model_cost(chosenTotal, obj->level);
 
@@ -1300,6 +1382,9 @@ void ArmorGenerator::assignFlags()
 
     if (!procs.empty())
         obj->props["combatcast"] = procs;
+    // A crafted reroll may roll no proc where the last roll had one.
+    else if (crafted && obj->props.isObject())
+        obj->props.removeMember("combatcast");
 
     // Weight once material, heft and coverage are final: the item model's, or
     // the prototype's for a hand-made piece that keeps its shape.

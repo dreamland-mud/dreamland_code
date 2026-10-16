@@ -91,6 +91,7 @@ WeaponGenerator::WeaponGenerator()
     hrIndexBonus = drIndexBonus = aveIndexBonus = 0;
     align = ALIGN_NONE;
     isCaster = false;
+    craftMin = craftMax = -1;
     aveMult = damrollMult = 1;
     twoHands = twoHandsDecided = false;
     retainChance = 50;
@@ -445,20 +446,30 @@ public:
     void setCaster(bool caster) { isCaster = caster; }
     void setAlign(int a) { align = a; }
 
-    void run(const std::set<DLString> &requiredNames, int maxAffixesBonus)
+    /** minCm >= 0: a crafted weapon's own window in centi-M (two hands still
+     *  scale it), no level curve. */
+    void run(const std::set<DLString> &requiredNames, int maxAffixesBonus, int minCm = -1, int maxCm = -1)
     {
         const weapon_tier_t &t = weapon_tier_table[tier - 1];
 
         learnPlayerGroups();
         collectCandidates();
 
-        std::set<int> forced;
+        std::map<int, int> forced;
         for (int i = 0; i < (int)pool.size(); i++)
             if (requiredNames.count(pool[i].value))
-                forced.insert(i);
+                forced[i] = 1;
 
-        double curve = windowCurve();
-        pickAffixes((int)(t.min_m * share * curve), (int)(t.max_m * share * curve), t.worst_penalty_m,
+        int lo, hi;
+        if (minCm >= 0) {
+            lo = (int)(minCm * share);
+            hi = (int)(max(minCm, maxCm) * share);
+        } else {
+            double curve = windowCurve();
+            lo = (int)(t.min_m * share * curve);
+            hi = (int)(t.max_m * share * curve);
+        }
+        pickAffixes(lo, hi, t.worst_penalty_m,
                     t.max_affixes_m > 0 ? t.max_affixes_m + maxAffixesBonus : 0,
                     t.max_negatives_m, forced);
 
@@ -679,7 +690,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
         roller.forbidden.insert("-dr");
     }
 
-    roller.run(requiredNames, twoHands ? 1 : 0);
+    roller.run(requiredNames, twoHands ? 1 : 0, craftMin, craftMax);
 
     weaponFlags.setBit(roller.weaponFlags.getValue());
     if (twoHands) {
@@ -1216,8 +1227,8 @@ const WeaponGenerator & WeaponGenerator::assignTimers() const
 {
     weapon_tier_t &tier = weapon_tier_table[valTier - 1];
 
-    if (tier.weeks > 0)
-        obj->timer = tier.weeks * Date::SECOND_IN_WEEK / Date::SECOND_IN_MINUTE;
+    if (tier.timer() > 0)
+        obj->timer = tier.timer();
 
     return *this;
 }

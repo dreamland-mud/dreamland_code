@@ -4,6 +4,7 @@
 #include "dl_math.h"
 #include "merc.h"
 #include "def.h"
+#include "date.h"
 
 BHV(random_weapon);
 BHV(random_armor);
@@ -26,8 +27,13 @@ void weapon_tier_t::fromJson(const Json::Value &value)
     worst_penalty_m = value.isMember("max_penalty_m") ? value["max_penalty_m"].asInt() : -1000;
     max_affixes_m = value["max_affixes_m"].asInt();
     max_negatives_m = value["max_negatives_m"].asInt();
-    weeks = value["weeks"].asInt();
+    days = value.isMember("days") ? value["days"].asInt() : value["weeks"].asInt() * 7;
     chance = value["chance"].asInt();
+}
+
+int weapon_tier_t::timer() const
+{
+    return days > 0 ? days * Date::SECOND_IN_DAY / Date::SECOND_IN_MINUTE : 0;
 }
 
 json_vector<weapon_tier_t> weapon_tier_table;

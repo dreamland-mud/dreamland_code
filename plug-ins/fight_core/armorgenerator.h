@@ -55,10 +55,16 @@ public:
 protected:
     void learnPlayerGroups();
     void collectCandidates();
-    /** Weighted fill of [minM, maxM]. 'forced' pool indexes are taken first and
-     *  ignore the window and the caps: a class or name that requires an affix. */
+    /** Weighted fill of [minM, maxM]. 'forced' pool indexes (index -> stacks) are
+     *  taken first and ignore the window and the caps: a class or name that
+     *  requires an affix, a crafted material's own affix, a refit replay. */
     void pickAffixes(int minM, int maxM, int worstPenalty, int maxAffixes, int maxNegatives,
-                     const std::set<int> &forced);
+                     const std::map<int, int> &forced);
+    /** "section:value[:stacks]" words, space separated, to pool indexes. Words
+     *  that are not in this item's pool are dropped: the fill rolls in their place. */
+    std::map<int, int> resolveForced(const DLString &spec) const;
+    /** The picks as resolveForced reads them back. */
+    DLString picksSpec() const;
     bool conflicts(const Candidate &c, const std::map<int, int> &picked) const;
 
     /** Affects, flags and materials of the sections both generators share.
@@ -104,6 +110,14 @@ protected:
     virtual bool valueAllowed(const DLString &secName, const DLString &value) const;
     virtual int candidatePrice(const DLString &secName, const Json::Value &affix, bool &allowed) const;
     virtual int candidateWeight(const DLString &secName, const Json::Value &affix) const;
+
+    /** A crafted piece (craft/armor rollCraft): no core picks and no stat floor,
+     *  the crafter's fixed stats are already on the item. */
+    bool crafted;
+    /** "section:value" of the crafted forced picks. */
+    std::set<DLString> forcedKeys;
+    /** Measure rolls the caller counted (a jeweler's steeper factor), 0 = item_rolls. */
+    int rollsOverride;
 
     Object *obj;
     PCharacter *pch;
@@ -152,6 +166,22 @@ public:
      *  measure rolls and the affix slot weights. No worn buff: that needs the
      *  base vnums' onEquip. */
     ArmorGenerator & keepIdentity(bool keep) { this->keepName = keep; return *this; }
+    /** A crafted piece: own names, AC and colour stay, the window is the
+     *  caller's centi-M as given (no level curve), forced picks first, and the
+     *  picks are written to the "craft_picks" property for a refit replay. */
+    ArmorGenerator & craft(int minCm, int maxCm, const DLString &forcedSpec)
+    {
+        this->keepName = true;
+        this->crafted = true;
+        this->craftMin = minCm;
+        this->craftMax = maxCm;
+        this->forcedSpec = forcedSpec;
+        return *this;
+    }
+    /** Measure rolls to scale the stats with, when the caller counts them its own way. */
+    ArmorGenerator & measureRolls(int rolls) { this->rollsOverride = rolls; return *this; }
+    /** centi-M the rolled affixes cost. */
+    int total() const { return chosenTotal; }
     /** Boss signature (legendary only): the dead boss's damage type and the
      *  spells it casts. One of them goes on the item, 50/50, inside the budget. */
     ArmorGenerator & signature(const DLString &damtype, const std::vector<DLString> &spells)
@@ -188,6 +218,8 @@ private:
     DLString wornBuff;
     Json::Value procs;
     bool keepName;
+    int craftMin, craftMax;
+    DLString forcedSpec;
 };
 
 #endif

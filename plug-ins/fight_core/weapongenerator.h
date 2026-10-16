@@ -38,6 +38,8 @@ struct WeaponGenerator {
     WeaponGenerator & addForbidden(const DLString &fbd) { this->forbidden.insert(fbd); return *this; }
     /** Price affixes for a caster killer (item_affixes.json price_caster). */
     WeaponGenerator & caster(bool caster) { this->isCaster = caster; return *this; }
+    /** A crafted weapon: the affix window in centi-M as given, no level curve. */
+    WeaponGenerator & craftWindow(int minCm, int maxCm) { this->craftMin = minCm; this->craftMax = maxCm; return *this; }
 
     // Main method to handle rand_stat logic, after all parameters have been set up by the calls above.
     WeaponGenerator& randomizeStats();
@@ -120,6 +122,8 @@ private:
     float aveIndexBonus;
     int align;
     bool isCaster;
+    // Crafted affix window in centi-M, -1 = the tier's own.
+    int craftMin, craftMax;
 
     // Two-hander share on the M budget: base ave and damroll are scaled by it.
     bool twoHands;
