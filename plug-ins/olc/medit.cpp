@@ -1302,14 +1302,16 @@ MEDIT(group)
     return numberEdit(0, 100000, mob.group);
 }
 
-MEDIT(practicer)
-{
-    return globalBitvectorEdit<SkillGroup>(mob.practicer);
-}
-
+// Registered before practicer: the chain is prepended, so practicer stays
+// the first match for a "pr" prefix.
 MEDIT(professions)
 {
     return globalBitvectorEdit<Profession>(mob.professions);
+}
+
+MEDIT(practicer)
+{
+    return globalBitvectorEdit<SkillGroup>(mob.practicer);
 }
 
 MEDIT(affects)
