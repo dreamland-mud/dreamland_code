@@ -20,6 +20,7 @@ fight_position.cpp \
 fight_exception.cpp \
 damage.cpp \
 damage_impl.cpp \
+damagelog.cpp \
 itemvalue.cpp \
 itemmodel.cpp \
 itemeconomy.cpp \

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "damage.h"
+#include "damagelog.h"
 #include "damageflags.h"
 
 #include "logstream.h"
@@ -515,6 +516,7 @@ void Damage::inflictDamage( )
 
     int before = victim->hit;
     victim->hit -= dam;
+    damagelog_record( ch, victim, dam, before );
     
     if (victim->is_immortal( ))
         victim->hit = max( (int)victim->hit, 1 );
