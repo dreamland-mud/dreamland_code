@@ -139,6 +139,8 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
 
         buf0 << fmt( victim, _("{CВести: {WУ тебя:") );
 
+        // One thread per line under the header, no column padding: screen
+        // readers read a run of spaces out loud.
         for (i = threads.begin( ); i != threads.end( ); i++) {
             const NoteThread &th = **i->second;
             int count = th.countSpool( victim );
@@ -146,10 +148,12 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
             if (count <= 0)
                 continue;
 
-            if (fFirst)
+            if (fFirst) {
                 fFirst = false;
-            else
-                buf0 << "                                       ";
+                buf0 << endl;
+            }
+
+            buf0 << " ";
 
             // The name in brackets is the command to type, so it stays as it is
             // registered -- unlike the noun in front of it, which follows the
