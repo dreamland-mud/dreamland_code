@@ -115,6 +115,7 @@ GlobalBitvector MobileProfession::toVector( CharacterMemoryInterface *mem ) cons
         if (IS_SET(ch->act, ACT_MAGE))         bv.set( prof_witch );
         if (IS_SET(ch->act, ACT_VAMPIRE))      bv.set( prof_vampire );
         if (IS_SET(ch->act, ACT_RANGER))       bv.set( prof_ranger );
+        bv.set( ch->pIndexData->professions );
     }
 
     return bv;

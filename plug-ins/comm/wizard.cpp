@@ -1335,6 +1335,9 @@ static bool has_nopost(Character *ch)
     if (npc && !npc->pIndexData->practicer.empty( ))
         buf << "Обучает: " << npc->pIndexData->practicer.toString( ) << endl;
 
+    if (npc && !npc->pIndexData->professions.empty())
+        buf << "Доп. классы: " << npc->pIndexData->professions.toString( ) << endl;
+
     if (npc && !npc->pIndexData->religion.empty())
         buf << "Верит в: " << npc->pIndexData->religion.toString( ) << endl;
 

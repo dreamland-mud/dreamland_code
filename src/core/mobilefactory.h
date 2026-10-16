@@ -71,6 +71,9 @@ struct mob_index_data
     int                size;
     DLString           material;
     GlobalBitvector     practicer;
+    // Extra classes on top of the act class flags (ninja, druid...): the mob
+    // gets their skills like an act class (MobileProfession::toVector).
+    GlobalBitvector     professions;
     GlobalBitvector religion;
     GlobalBitvector affects;
     GlobalBitvector behaviors;

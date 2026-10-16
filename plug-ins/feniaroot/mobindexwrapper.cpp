@@ -256,6 +256,12 @@ NMI_GET( MobIndexWrapper, spec_fun, "спец-процедура")
         return Register( );
 }
 
+NMI_GET( MobIndexWrapper, professions, "extra classes on top of the act class flags (ninja druid ...), space-separated, empty if none")
+{
+    checkTarget( );
+    return target->professions.toString( );
+}
+
 NMI_GET( MobIndexWrapper, practicer, "какие группы умений может практиковать (glist или olchelp groups)") 
 {
     checkTarget( );
