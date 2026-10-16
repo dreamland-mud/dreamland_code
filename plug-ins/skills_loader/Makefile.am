@@ -11,7 +11,6 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/craft \
 -I$(top_srcdir)/plug-ins/cards \
 -I$(top_srcdir)/plug-ins/clan/skill \
--I$(top_srcdir)/plug-ins/other_skills \
 $(INCLUDES_FIGHT) \
 $(INCLUDES_SRC)
 
@@ -25,8 +24,7 @@ libskills_loader_la_LIBADD = \
 ../clan/impl/libclan_impl.la \
 ../race_aptitude/librace_aptitude.la \
 ../craft/libcraft.la \
-../cards/libcards.la \
-../other_skills/libother_skills.la
+../cards/libcards.la
 
 libskills_loader_la_SOURCES = impl.cpp
 

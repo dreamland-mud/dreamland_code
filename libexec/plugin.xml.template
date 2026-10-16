@@ -43,6 +43,5 @@
 	<node>gmcp</node>
 	<node>bonus</node>
 	<node>searcher</node>
-	<node>other_skills</node>
 	<node>skills_loader</node>
 </PluginManager>
