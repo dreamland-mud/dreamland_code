@@ -3605,6 +3605,30 @@ struct GACand {
                       // render says whereabouts unknown instead of a stale route.
 };
 
+// A gap below this is a tie: the sage never offers it as an upgrade.
+static const double GA_MIN_GAIN = 1.0;
+
+// Browse lists show the top 5 only. When no in-pack pick made the cut but one
+// sits further down, move the best of them into fifth place: the general
+// advice tells the char to put it on, so the browse must not hide it.
+template <typename Entry, typename GetCand>
+static void ga_keepInPack( std::vector<Entry> &v, GetCand get )
+{
+    const size_t top = 5;
+    if (v.size( ) <= top)
+        return;
+    for (size_t i = 0; i < top; i++)
+        if (get( v[i] ).acq.method == GA_INPACK)
+            return;
+    for (size_t i = top; i < v.size( ); i++)
+        if (get( v[i] ).acq.method == GA_INPACK) {
+            Entry keep = v[i];
+            v.erase( v.begin( ) + i );
+            v.insert( v.begin( ) + (top - 1), keep );
+            return;
+        }
+}
+
 // Boss cap: gear whose easiest route is killing or looting more than 10 levels
 // above the char. The sage never advises it, so it must not raise the percentile's
 // ceiling either -- otherwise a kit with nothing left to chase still reads below 100%.
@@ -3679,10 +3703,17 @@ static const int ga_statMap[6] = { STAT_STR, STAT_INT, STAT_WIS, STAT_DEX, STAT_
 
 // A prototype carrying any Fenia trigger (onUse/onGet/onExamine/...) is almost
 // always special, high-value gear, so ga_score gives it a flat boost.
+// shared.trigger_bonus_skip in item_value.json lists vnums whose scripts are
+// housekeeping only (owner checks, anti-duplicate), not power.
 static bool ga_hasFeniaTriggers( obj_index_data *pObj )
 {
     if (pObj->wrapper == 0)
         return false;
+    const Json::Value &skip = item_value_object( "shared", "trigger_bonus_skip" );
+    if (skip.isArray( ))
+        for (auto const &v: skip)
+            if (v.isInt( ) && v.asInt( ) == pObj->vnum)
+                return false;
     WrapperBase *w = get_wrapper( pObj->wrapper );
     if (w == 0)
         return false;
@@ -6867,12 +6898,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         return p->minScore;
     };
 
-    // "optimal" = gap * obtainability (real upgrades only).
+    // "optimal" = gap * obtainability (real upgrades only). A gap under
+    // GA_MIN_GAIN is a tie and would render as "[+0]".
     for (auto &c: cands) {
         bool fills; int rv;
         double bar = gaBar( c.slot, fills, rv );
         double gap = c.score - bar;
-        c.value = gap > 0 ? gap * c.obtain : 0;
+        c.value = gap >= GA_MIN_GAIN ? gap * c.obtain : 0;
     }
     // Nudge the chase toward completing a worth-it set: a member filling a slot the
     // char has not filled yet earns a share of the completion bonus, so "grab the
@@ -7184,6 +7216,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             }
             std::sort( opts.begin( ), opts.end( ),
                 []( const GAWieldOpt &a, const GAWieldOpt &b ){ return a.gain > b.gain; } );
+            ga_keepInPack( opts, []( const GAWieldOpt &o ) -> const GACand & { return o.c; } );
             RegList::Pointer slotList( NEW );
             for (size_t k = 0; k < opts.size( ) && k < 5; k++)
                 slotList->push_back( ga_buildEntry( opts[k].c, msm, chLevel, isVampire, pathCache,
@@ -7232,7 +7265,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             double bar = wornScore;
             if (wieldBrowse && IS_SET( ga_candValue4( c ), WEAPON_TWO_HANDS ))
                 bar = primaryScore;
-            if (c.score >= bar)
+            if (bar <= 0 ? c.score >= bar : c.score - bar >= GA_MIN_GAIN)
                 slotCands.push_back( c );
         }
         // A multi-position slot (paired ring/neck/wrist, or a dual-wield off-hand) can take
@@ -7250,6 +7283,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                     slotCands.push_back( c );
         std::sort( slotCands.begin( ), slotCands.end( ),
             []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
+        // The top 5 by raw score can push out an upgrade already in the pack,
+        // which the general advice says to put on: keep the best one in view.
+        ga_keepInPack( slotCands, []( const GACand &c ) -> const GACand & { return c; } );
 
         RegList::Pointer slotList( NEW );
         for (size_t k = 0; k < slotCands.size( ) && k < 5; k++) {
