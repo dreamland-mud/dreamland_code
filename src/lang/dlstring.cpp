@@ -7,6 +7,7 @@
  */
 #include <sstream>
 #include <list>
+#include <string.h>
 
 #include "logstream.h"
 #include "dl_ctype.h"
@@ -520,26 +521,35 @@ DLString DLString::quote( ) const
     return q;
 }
 
+// Position of the first visible character, past leading colour codes and
+// push/pop fences ({R, {x, {1, {2). Stops at any other tag: those take arguments
+// ({lr, {hh1576), and skipping two characters would land inside them.
+static DLString::size_type firstVisiblePos( const DLString &str )
+{
+    static const char *skip = "bcgmrwyBCGMRWYDxX12";
+    DLString::size_type pos = 0;
+
+    while (pos + 1 < str.length( ) && str[pos] == '{'
+            && str[pos + 1] != 0 && strchr( skip, str[pos + 1] ))
+        pos += 2;
+
+    return pos;
+}
+
 DLString & DLString::upperFirstCharacter( )
 {
-    if (!empty( ))
-        at( 0 ) = dl_toupper( at( 0 ) );
+    size_type pos = firstVisiblePos( *this );
+
+    if (pos < length( ))
+        at( pos ) = dl_toupper( at( pos ) );
 
     return *this;
 }
 
 DLString DLString::upperFirstCharacter( ) const
 {
-    DLString rc;
-
-    if (empty())
-        return rc;
-    
-    rc << dl_toupper(at(0));
-    for(size_type pos = 1; pos < length(); pos++) 
-        rc << at(pos);
-
-    return rc;
+    DLString rc = *this;
+    return rc.upperFirstCharacter( );
 }
 
 std::list<DLString> DLString::split(const DLString &delim) const
