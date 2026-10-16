@@ -1061,6 +1061,10 @@ bool DefaultSpell::baneAction( Character *ch, Character *bch, int failChance, in
 
 bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
 {
+    // <flags>nobane</flags>: this spell goes through spellbane untouched.
+    if (flags.isSet( SPELL_NOBANE ))
+        return false;
+
     int mlevel = vch ? vch->getModifyLevel( ) : ch->getModifyLevel( );
     bool offensive = (type == SPELL_OFFENSIVE);
     bool defensive = (type == SPELL_DEFENSIVE);

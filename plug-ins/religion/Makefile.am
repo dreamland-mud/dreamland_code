@@ -17,7 +17,6 @@ impl.cpp \
 religionflags.cpp \
 defaultreligion.cpp \
 tattoo.cpp \
-gods_impl.cpp \
 religionattribute.cpp \
 altar.cpp \
 sacrifice.cpp
@@ -25,7 +24,6 @@ sacrifice.cpp
 libreligion_la_MOC = \
 defaultreligion.h \
 tattoo.h \
-gods_impl.h \
 religionattribute.h
 
 religionflags.cpp: religionflags.conf $(top_builddir)/src/religionflags.h
