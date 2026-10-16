@@ -500,7 +500,8 @@ SKILL_RUNP( nerve )
         d.log((int)chance, "final");
         //////////////// THE ROLL ////////////////
             
-        if ( ch->is_npc() || number_percent() < (int) chance )
+        // NPCs roll like players: the tier combat AI uses nerve on players.
+        if ( number_percent() < (int) chance )
         {
                 gsn_nerve->getCommand()->apply(ch, victim);
                 oldact(_("Ты ослабляешь $C4, пережимая нервные окончания."),ch,0,victim,TO_CHAR);
@@ -999,7 +1000,8 @@ SKILL_RUNP( strangle )
 
         Chance mychance(ch, (int) chance, 100);
 
-        if ( ch->is_npc() || mychance.reroll())
+        // NPCs roll like players: the tier combat AI strangles players.
+        if ( mychance.reroll())
         {
                 oldact_p(_("Ты смыкаешь руки на шее $C2 и $E погружается в сон."),
                         ch,0,victim,TO_CHAR,POS_RESTING);
@@ -1076,7 +1078,8 @@ SKILL_RUNP( poison )
 
 SKILL_RUNP( blindness )
 {
-        if (ch->is_npc())
+        // A wild ninja mob throws dust (tier combat AI), a charmed one can't.
+        if (ch->is_npc() && IS_CHARMED(ch))
                 return;
         
         if (number_percent() > gsn_blindness_dust->getEffective( ch ) )

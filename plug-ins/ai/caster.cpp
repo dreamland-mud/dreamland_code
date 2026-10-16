@@ -10,6 +10,7 @@
 #include "spell.h"
 #include "spelltarget.h"
 #include "skillreference.h"
+#include "profession.h"
 
 #include "fight.h"
 
@@ -59,6 +60,7 @@ GSN(spellbane);
 GSN(stardust);
 GSN(summon);
 GSN(weaken);
+PROF(druid);
 GSN(web);
 
 /*-----------------------------------------------------------------------------
@@ -82,7 +84,9 @@ bool BasicMobileBehavior::specFightCaster( )
     // asked. A class caster the Fenia side declines (no usable spell, no hostile
     // player) does not cast this round.
     int tier = ch->getNPC()->getTier();
-    bool classCaster = IS_SET( ch->act, ACT_MAGE|ACT_CLERIC|ACT_VAMPIRE|NPC_NECRO_ACTS );
+    // Druid has no act bit: it comes from the proto's professions list.
+    bool classCaster = IS_SET( ch->act, ACT_MAGE|ACT_CLERIC|ACT_VAMPIRE|NPC_NECRO_ACTS )
+                       || ch->getNPC( )->pIndexData->professions.isSet( prof_druid );
     if (tier >= 1 && tier <= 9 && (tier <= 5 || classCaster) && gprog("onCastAI", "C", ch))
         return true;
 
