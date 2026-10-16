@@ -1469,6 +1469,12 @@ void obj_update( void )
             }
         }
 
+        // Socketed gems outlive their decaying setting: Fenia hands them to
+        // wherever the item was (utils/jeweler spillStones). New objects go
+        // to the head of object_list, so this loop never visits them.
+        if (!obj->getProperty("stones").empty())
+            gprog("onObjDecay", "O", obj);
+
         obj->setProperty("extract", message);
         extracted.push_back(obj);
     }
