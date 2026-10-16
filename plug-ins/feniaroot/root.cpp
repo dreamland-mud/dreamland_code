@@ -790,7 +790,7 @@ NMI_INVOKE(Root, telegram, "(msg): послать сырое сообщение 
     return Register( );
 }
 
-NMI_INVOKE(Root, infonet, "(msg, ch): выдать сообщение msg через хрустальный шар с участием ch" )
+NMI_INVOKE(Root, infonet, "(msg, ch): выдать сообщение msg в новости мира (слышат все игроки) с участием ch" )
 {
     if (args.size() != 2)
         throw Scripting::NotEnoughArgumentsException( );
@@ -803,11 +803,11 @@ NMI_INVOKE(Root, infonet, "(msg, ch): выдать сообщение msg чер
 
 NMI_INVOKE(Root, infonetML, "(ch, fmt, args...): как infonet, но fmt (обычно ._(msg)) переводится в язык каждого получателя" )
 {
-    // Per-recipient info channel: same audience/pager loop as ::infonet(const char*)
-    // above, but the format is rendered per listener via regfmt (resolves a ._()
+    // Per-recipient info channel: same audience as ::infonet(const char*) above,
+    // but the format is rendered per listener via regfmt (resolves a ._()
     // MultiMessage into the viewer's language + its %N$ codes), then oldact_p
-    // resolves the $-codes ($o2 = reader's pager). ch is the actor, excluded and
-    // gating the immortal case, exactly like the const char* overload.
+    // resolves the $-codes. ch is the actor, excluded and gating the immortal
+    // case, exactly like the const char* overload.
     if (args.size( ) < 2)
         throw Scripting::NotEnoughArgumentsException( );
 
@@ -815,19 +815,9 @@ NMI_INVOKE(Root, infonetML, "(ch, fmt, args...): как infonet, но fmt (об�
     Character *ch = args2character( args );
     myArgs.pop_front( );
 
-    if (ch && ch->is_immortal( ))
-        return Register( );
-
-    Descriptor *d;
-    ::Object *obj;   // disambiguate from Scripting::Object in this plugin's scope
-    for (d = descriptor_list; d != 0; d = d->next) {
-        if (!d->character || d->connected != CON_PLAYING)
-            continue;
-        if (d->character == ch)
-            continue;
-        if (( obj = get_pager( d->character ) ))
-            oldact_p( regfmt( d->character, myArgs ).c_str( ), d->character, obj, ch, TO_CHAR, POS_DEAD );
-    }
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next)
+        if (::infonet_listener( d, ch, 0 ))
+            oldact_p( regfmt( d->character, myArgs ).c_str( ), d->character, 0, ch, TO_CHAR, POS_DEAD );
 
     return Register( );
 }

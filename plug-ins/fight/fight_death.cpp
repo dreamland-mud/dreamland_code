@@ -274,14 +274,14 @@ public:
         oldact(_("$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r"), pvict,0,0,TO_ROOM);
         
         // Immortal wiznet + Telegram stay RU (policy); Discord = EN; the info
-        // channel renders per viewer, with the quiet-voice frame prepended in
-        // each language so %C1 (the victim) still resolves per recipient.
+        // channel renders per viewer, with the news frame prepended in each
+        // language so %C1 (the victim) still resolves per recipient.
         DLString msgRu = fmtLang(LANG_RU, msgWiznet, pvict, killer);
         wiznet( 0, 0, 0, msgRu.c_str());
         MultiMessage info(
-            DLString("{CТихий голос из $o2: ") + msgWiznet.getMessage(LANG_EN),
-            DLString("{CТихий голос из $o2: ") + msgWiznet.getMessage(LANG_RU),
-            DLString("{CТихий голос из $o2: ") + msgWiznet.getMessage(LANG_UA));
+            DLString("{CNews: ") + msgWiznet.getMessage(LANG_EN),
+            DLString("{CВести: ") + msgWiznet.getMessage(LANG_RU),
+            DLString("{CВісті: ") + msgWiznet.getMessage(LANG_UA));
         infonet( pvict, 0, info, pvict, killer );
         send_to_discord_stream(":ghost: " + fmtLang(LANG_EN, msgWiznet, pvict, killer));
         send_telegram( msgRu.c_str());
