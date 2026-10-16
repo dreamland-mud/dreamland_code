@@ -15,6 +15,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "webmanip.h"
 
 DLString get_pocket_argument( char *arg );
 void show_char_to_char_1( Character *victim, Character *ch, bool fBrief );
@@ -209,6 +210,8 @@ static bool oprog_examine( Object *obj, Character *ch, const DLString &arg )
 /*-------------------------------------------------------------------------
  * 'examine' helper function, also called from 'look' 
  *-------------------------------------------------------------------------*/
+DLString obj_own_extra_descr( Character *ch, Object *obj );
+
 void do_look_into( Character *ch, char *arg2 )
 {
     DLString pocket;
@@ -266,6 +269,21 @@ CMDRUNP( examine )
 
         show_char_to_char_1( victim, ch, true );
         return;
+    }
+
+    // A container's own description first, then what is in it: examine is the
+    // one verb that should tell the whole story. Look-in keeps contents only.
+    char objarg[MAX_INPUT_LENGTH];
+    strcpy( objarg, arg );
+    DLString pocket = get_pocket_argument( objarg );
+    Object *obj = get_obj_here( ch, objarg );
+    if (obj && obj->item_type == ITEM_CONTAINER && pocket.empty( )) {
+        DLString desc = obj_own_extra_descr( ch, obj );
+        if (!desc.empty( )) {
+            ostringstream descBuf;
+            webManipManager->decorateExtraDescr( descBuf, desc.c_str( ), obj->pIndexData->extraDescriptions, ch );
+            ch->send_to( descBuf );
+        }
     }
 
     do_look_into(ch, arg);

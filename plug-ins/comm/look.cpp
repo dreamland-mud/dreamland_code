@@ -1725,6 +1725,34 @@ static DLString first_keyword_for( Object *obj, lang_t lang )
     return kw.getOneArgument( );
 }
 
+/* The object's own extra description: a Fenia onExtraDescr answer, then the
+ * instance's, then the prototype's ED matching the object's keywords. Empty when
+ * it has none. Shared with 'examine', which shows it above a container's contents. */
+DLString obj_own_extra_descr( Character *ch, Object *obj )
+{
+        lang_t lang = Player::lang(ch);
+        DLString desc = oprog_extra_descr( obj, ch, String::toString(obj->getKeyword()).c_str() );
+        DLString keywords = String::toString(obj->getKeyword());
+
+        if (desc.empty( )) {
+            for (auto &ed: obj->extraDescriptions)
+                if (arg_contains_someof( ed->keyword, keywords.c_str() )) {
+                    desc = ed->description.getForLang(lang);
+                    break;
+                }
+        }
+
+        if (desc.empty( )) {
+            for (auto &ed: obj->pIndexData->extraDescriptions)
+                if (arg_contains_someof( ed->keyword, keywords.c_str() )) {
+                    desc = ed->description.getForLang(lang);
+                    break;
+                }
+        }
+
+        return desc;
+}
+
 // TODO show act msg, item type and wear.
 static void do_look_object( Character *ch, Object *obj )
 {
@@ -1746,24 +1774,8 @@ static void do_look_object( Character *ch, Object *obj )
         buf << "." << endl;
         ch->send_to( buf.str( ) );
 
-        DLString desc = oprog_extra_descr( obj, ch, String::toString(obj->getKeyword()).c_str() );
+        DLString desc = obj_own_extra_descr( ch, obj );
         DLString keywords = String::toString(obj->getKeyword());
-
-        if (desc.empty( )) {
-            for (auto &ed: obj->extraDescriptions)
-                if (arg_contains_someof( ed->keyword, keywords.c_str() )) {
-                    desc = ed->description.getForLang(lang);
-                    break;
-                }
-        }
-
-        if (desc.empty( )) {
-            for (auto &ed: obj->pIndexData->extraDescriptions)
-                if (arg_contains_someof( ed->keyword, keywords.c_str() )) {
-                    desc = ed->description.getForLang(lang);
-                    break;
-                }
-        }
 
         if (desc.empty( )) {
             if (obj->in_room) {
