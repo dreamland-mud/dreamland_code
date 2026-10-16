@@ -502,6 +502,10 @@ void PersonalQuestArticle::trouble( PCharacter *client, NPCharacter *questman )
     
     obj = get_obj_world_unique( vnum, client );
 
+    // A keyring is the girth after an upgrade, so it counts as the girth.
+    if (!obj && vnum.getValue( ) == OBJ_VNUM_QUESTGIRTH)
+        obj = get_obj_world_unique( OBJ_VNUM_QUESTKEYRING, client );
+
     if (obj) {
         tell_act( client, questman, _("Извини, но у тебя уже есть $o1."), obj );
         // extract_obj( obj ); у вас все было 
