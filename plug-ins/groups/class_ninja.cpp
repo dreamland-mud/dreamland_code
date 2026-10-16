@@ -33,6 +33,7 @@
 #include "magic.h"
 #include "occupations.h"
 #include "fight.h"
+#include "follow_utils.h"
 #include "onehit_weapon.h"
 #include "chance.h"
 #include "merc.h"
@@ -1101,6 +1102,12 @@ SKILL_APPLY( blindness )
 {
     for ( auto &tmp_vict : ch->in_room->getPeople() )
     {
+        // A mob throws dust only at its fight: those who fight it and the
+        // group of its victim. Bystanders and other mobs stay out.
+        if (ch->is_npc( ) && tmp_vict != ch && tmp_vict->fighting != ch
+            && !(ch->fighting && is_same_group( tmp_vict, ch->fighting )))
+            continue;
+
         if (!is_safe_spell(ch,tmp_vict,true))
         {
             if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
