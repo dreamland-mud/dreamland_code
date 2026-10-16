@@ -57,8 +57,6 @@ GSN(caustic_font);
 GSN(dispel_affects);
 GSN(energy_drain);
 GSN(lightning_breath);
-GSN(mental_attack);
-GSN(mental_knife);
 GSN(plague);
 GSN(poison);
 GSN(spellbane);
@@ -67,67 +65,6 @@ GSN(weaken);
 /*--------------------------------------------------------------------------
  * Seneschal 
  *-------------------------------------------------------------------------*/
-
-SPELL_DECL(MentalKnife);
-VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-  Affect af;
-  int dam;
-
-  if( ch->getModifyLevel() < 20 )
-    dam = dice( level, 7 );
-  else if( ch->getModifyLevel() < 40 )
-    dam = dice( level, 8 );
-  else if( ch->getModifyLevel() < 65)
-    dam = dice( level, 11 );
-  else if( ch->getModifyLevel() < 85)
-    dam = dice( level, 15 );
-  else if( ch->getModifyLevel() < 95)
-    dam = dice( level, 18 );
-  else dam = dice( level, 20 );
-
-  if (saves_spell(level,victim, DAM_MENTAL, ch, DAMF_MAGIC))
-              dam /= 2;
-  if( victim->is_npc() ) dam /= 4;
-
-  ch->setWait(gsn_mental_attack->getBeats(ch) );
-
-  try {
-      damage_nocatch( ch, victim, ( dam ), sn, DAM_MENTAL, true, DAMF_MAGIC );
-        
-      if(!victim->isAffected(sn) && !saves_spell(level, victim, DAM_MENTAL, ch, DAMF_MAGIC))
-        {
-          af.type               = sn;
-          af.level              = level;
-          af.duration           = level;
-
-          af.modifier           = ( -7 );
-          af.location = APPLY_INT;
-          affect_to_char(victim,&af);
-
-          af.location = APPLY_WIS;
-          affect_to_char(victim,&af);
-
-          if (ch != victim) {
-            oldact(_("Твой ментальный удар повреждает разум $C2!"), ch,0,victim,TO_CHAR);
-            oldact(_("Ментальный удар $c2 повреждает твой разум!"), ch,0,victim,TO_VICT);
-            oldact(_("Ментальный удар $c2 повреждает разум $C2!"), ch,0,victim,TO_NOTVICT);
-          }
-          else {
-            oldact(_("Ментальный удар повреждает твой разум!"), ch,0,0,TO_CHAR);
-            oldact(_("Ментальный удар $c2 повреждает $s разум!"), ch,0,0,TO_ROOM);
-          }
-        }
-  } catch (const VictimDeathException &) {
-  }
-
-}
-
-TYPE_SPELL(bool, MentalKnife)::spellbane( Character *, Character * ) const
-{
-    return false;
-}
-
 
 SPELL_DECL(Transform);
 VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level ) 
