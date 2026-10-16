@@ -234,10 +234,10 @@ bool BasicMobileBehavior::aggressRanged( )
 
     bool ranger = IS_SET( ch->act, ACT_RANGER );
     bool caster = ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER);
-    // Champions and above are asked too: Fenia lets a melee boss close the
-    // distance on a shooter instead of standing still under fire.
+    // Elites and above are asked too: Fenia lets a melee boss close the
+    // distance on a shooter, and gives up on one it cannot reach.
     int tier = ch->getTier( );
-    bool strong = tier > 0 && tier <= 3;
+    bool strong = tier > 0 && tier <= 5;
     if (!ranger && !caster && !strong)
         return false;
 
