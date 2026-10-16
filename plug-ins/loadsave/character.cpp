@@ -140,7 +140,7 @@ bool Character::can_see( EXTRA_EXIT_DATA *peexit ) const
                 && !CAN_DETECT(this, DETECT_FADE) )
                 return false;
 
-        if (in_room->isDark( ) && !IS_AFFECTED(this, AFF_INFRARED) )
+        if (in_room->isDark( ) && !seesInDark( ))
                 return false;
 
         return true;
@@ -223,10 +223,7 @@ bool eyes_darkened( Character *ch )
     if (ch->getConfig( ).holy)
         return false;
 
-    if (ch->is_vampire() || IS_AFFECTED(ch, AFF_INFRARED))
-        return false;
-        
-    if (IS_GHOST(ch) || IS_DEATH_TIME(ch))
+    if (ch->seesInDark( ))
         return false;
 
     return true;

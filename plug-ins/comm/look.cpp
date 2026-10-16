@@ -17,6 +17,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cctype>
+#include <cstring>
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -1199,9 +1200,12 @@ static void show_people_to_char( Character *list, Character *ch, bool fShowMount
         
         if (ch->can_see( rch ))
             show_char_to_char_0( rch, ch );
-// TODO invis & hide checks
         else if (!rch->is_immortal( )) {
-            if (rch->in_room->isDark( ) && IS_AFFECTED(rch, AFF_INFRARED ))
+            // Glowing eyes give away only those the dark alone hides: an
+            // invisible or hidden infravision user stays unseen.
+            if (rch->in_room->isDark( ) && IS_AFFECTED(rch, AFF_INFRARED )
+                && IS_SET(rch->parts, PART_EYE|PART_EYESTALKS)
+                && ch->can_see( rch, true ))
                 ch->pecho( _("{WТы видишь взгляд {Rпылающих красных глаз{W, следящих за ТОБОЙ!{x") );
                 
             life_count++;
@@ -1484,6 +1488,44 @@ static DLString look_targets_hint( Character *ch, const ExtraDescrList &edList, 
     return DLString("\n") + label + targets.join(", ") + ".";
 }
 
+// Seeing a dark room by its heat alone: no light anywhere in it, no holylight.
+static bool sees_by_heat( Character *ch, Room *room )
+{
+    return room->isDark( ) && !ch->getConfig( ).holy && ch->seesInDark( );
+}
+
+// Repaint text in heat-sight grey: drop the builder's colours and push/pop,
+// and re-assert the grey after every total reset ({x also closes links and
+// visibility spans, so those tags stay untouched).
+static DLString heat_tint( const DLString &text )
+{
+    static const char *colours = "bcgmrwyBCGMRWYD12";
+    ostringstream out;
+
+    out << "{D";
+    for (const char *p = text.c_str( ); *p; p++) {
+        if (*p != '{') {
+            out << *p;
+            continue;
+        }
+
+        if (!p[1]) {
+            out << *p;
+            break;
+        }
+
+        ++p;
+        if (strchr( colours, *p ))
+            continue;
+
+        out << '{' << *p;
+        if (*p == 'x' || *p == 'X')
+            out << "{D";
+    }
+    out << "{x";
+    return out.str( );
+}
+
 static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMount )
 {
     ostringstream buf;
@@ -1497,7 +1539,16 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         return;
     }
 
-    buf << "{" << CLR_RNAME(ch) << room->getName(lang) << "{x";
+    bool heat = sees_by_heat( ch, room );
+
+    if (heat) {
+        buf << "{r" << room->getName(lang) << "{x";
+        // Without colour the tint is lost too: same audience as look_targets_hint.
+        if (uses_screenreader( ch ) || (ch->getPC( ) && !ch->getPC( )->getConfig( ).color))
+            buf << lmsg(lang, " (in the dark)", " (в темноте)", " (у темряві)");
+    }
+    else
+        buf << "{" << CLR_RNAME(ch) << room->getName(lang) << "{x";
 
     if (ch->getConfig( ).holy) 
         buf << " {" << CLR_RVNUM(ch) << "[Room " << room->vnum
@@ -1538,7 +1589,10 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         }
 
         // Append resulting room description to the main output buffer.
-        buf << roomDescription;
+        if (heat)
+            buf << heat_tint( roomDescription );
+        else
+            buf << roomDescription;
 
         // For screenreader / colourless clients, list the examinable extras
         // (empty for everyone else).

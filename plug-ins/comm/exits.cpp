@@ -223,7 +223,7 @@ CMDRUNP( exits )
         {
             buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - ";
 
-            if (room->isDark( ) && !cfg.holy && !IS_AFFECTED(ch, AFF_INFRARED ))
+            if (room->isDark( ) && !cfg.holy && !ch->seesInDark( ))
                 buf << l(ch, "Дорога ведет в темноту и неизвестность...");
             else
                 buf << room->getName(viewerLang(ch));
