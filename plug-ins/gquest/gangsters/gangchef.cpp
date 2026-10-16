@@ -12,10 +12,9 @@
 #include "room.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "weapongenerator.h"
+#include "fenia_utils.h"
 #include "fight.h"
 #include "loadsave.h"
-#include "vnum.h"
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
@@ -47,19 +46,11 @@ bool GangChef::death( Character *killer )
     return false;
 }
    
+// The bounty is the boss loot set, rolled in Fenia (global/onGangChefLoot):
+// the gang rolls rarely, so no daily cap and no level gate on it.
 void GangChef::createBounty(Character *killer) 
 {
-    Object *weapon = create_object(get_obj_index(OBJ_VNUM_WEAPON_STUB), 0);
-    obj_to_char(weapon, ch);
-
-    weapon->level = killer->getModifyLevel();
-    WeaponGenerator()
-        .item(weapon)
-        .alignment(killer->alignment)
-        .player(killer->getPC())
-        // Killing the gang chief is the most reliable way in the game to earn a legendary.
-        .randomTier(2, 300)
-        .randomizeAll();
+    gprog("onGangChefLoot", "CC", ch, killer);
 }
 
 void GangChef::greet( Character *mob ) 
