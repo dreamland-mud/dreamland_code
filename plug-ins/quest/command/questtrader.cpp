@@ -2,7 +2,7 @@
  *
  * ruffina, 2004
  */
-#include <iomanip>
+#include <cctype>
 #include <cstdlib>
 
 #include "questtrader.h"
@@ -100,6 +100,48 @@ bool QuestTrader::canServeClient( Character *client )
     return true;
 }
 
+/** `quest list` in sections, each under its own header and only when it holds
+ *  something for this buyer. An article with no known group goes last, without a
+ *  header, so a catalog that predates the grouping still lists everything. */
+void QuestTrader::toStream( Character *client, ostringstream &buf )
+{
+    static const char * const groups[] = { "hero", "service", "supply" };
+    const int groupCount = sizeof( groups ) / sizeof( *groups );
+    ServiceList::const_iterator s;
+
+    for (int g = 0; g <= groupCount; g++) {
+        ostringstream section;
+
+        for (s = services.begin( ); s != services.end( ); s++) {
+            QuestTradeArticle::Pointer art = s->getDynamicPointer<QuestTradeArticle>( );
+            DLString myGroup = art ? art->getGroup( ) : DLString::emptyString;
+            int mine = groupCount;
+
+            for (int i = 0; i < groupCount; i++)
+                if (myGroup == groups[i])
+                    mine = i;
+
+            if (mine == g && (*s)->visible( client ))
+                (*s)->toStream( client, section );
+        }
+
+        if (section.str( ).empty( ))
+            continue;
+
+        if (!buf.str( ).empty( ))
+            buf << endl;
+
+        if (g == 0)
+            buf << "{W" << _("Снаряжение Героя").getMessage( client ) << "{x" << endl;
+        else if (g == 1)
+            buf << "{W" << _("Услуги").getMessage( client ) << "{x" << endl;
+        else if (g == 2)
+            buf << "{W" << _("Расходники").getMessage( client ) << "{x" << endl;
+
+        buf << section.str( );
+    }
+}
+
 void QuestTrader::msgListEmpty( Character *client )
 {
     say_act( client, getKeeper( ), _("Извини, $c1, мне нечего тебе предложить.") );
@@ -114,13 +156,15 @@ void QuestTrader::msgListRequest( Character *client )
 void QuestTrader::msgListBefore( Character *client ) 
 {
     client->pecho(_("Перечень квестовых вещей для покупки:"));
+    client->send_to("\r\n");
 }
 
 void QuestTrader::msgListAfter( Character *client )
 {
+    client->send_to("\r\n");
     if (!client->is_npc( ))
         client->pecho( _("У тебя {Y%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц."), client->getPC( )->getQuestPoints( ) );
-    client->pecho( _("Для покупки чего-либо используй {yквест купить {Dназвание{x.") );
+    client->pecho( _("Для покупки чего-либо используй {yквест купить {Dслово{x.") );
 }
 
 void QuestTrader::msgArticleNotFound( Character *client ) 
@@ -141,15 +185,73 @@ void QuestTrader::msgBuyRequest( Character *client )
 /*----------------------------------------------------------------------------
  * QuestTradeArticle 
  *---------------------------------------------------------------------------*/
+/** Pad to a display width. KOI8-U runtime: one byte is one column once the
+ *  colour codes are stripped. */
+static DLString list_pad( const DLString &text, int width )
+{
+    DLString padded = text;
+
+    for (int len = text.colourStrip( ).size( ); len < width; len++)
+        padded += " ";
+
+    return padded;
+}
+
+#define LIST_KEYWORD_WIDTH 21
+#define LIST_TITLE_WIDTH   32
+#define LIST_PRICE_WIDTH   12
+
+/** One `quest list` row: the word to buy by, the title, the price. The title
+ *  links to its help article. Two kinds of title cannot carry the link, so the
+ *  keyword does: one with colours of its own (its first {x would end the link)
+ *  and one starting with a digit ({hh reads every digit as part of the help id,
+ *  so "10 practices" would link to help 135910). A price the buyer cannot pay
+ *  right now is dimmed. */
 void QuestTradeArticle::toStream( Character *client, ostringstream &buf ) const
 {
-    DLString myname = viewerLang(client) != LANG_EN && !rname.empty() ? rname : name;
-    buf << "    " << setiosflags( ios::right ) << setw( 7 );
+    DLString keyword = viewerLang(client) != LANG_EN && !rname.empty() ? rname : name;
+    DLString title = descr.getForLang( viewerLang(client) );
+    DLString cost = listPrice( client );
+    bool linkKeyword = title.find( '{' ) != DLString::npos
+                       || (!title.empty( ) && isdigit( (unsigned char)title[0] ));
+    DLString link;
+    if (help.getValue( ) > 0)
+        link = "{hh" + DLString( help.getValue( ) );
 
-    price->toStream( client, buf );
+    DLString keywordCol = list_pad( keyword, LIST_KEYWORD_WIDTH );
+    DLString titleCol = list_pad( title, LIST_TITLE_WIDTH );
 
-    buf << resetiosflags( ios::left )
-        << ".........." << descr.getForLang( viewerLang(client) ) << " ({D" << myname << "{x)" << endl;
+    if (!link.empty( )) {
+        if (linkKeyword)
+            keywordCol = link + keyword + "{x" + keywordCol.substr( keyword.size( ) );
+        else
+            titleCol = link + title + "{x" + titleCol.substr( title.size( ) );
+    }
+
+    buf << "  " << keywordCol << titleCol;
+
+    for (int len = cost.colourStrip( ).size( ); len < LIST_PRICE_WIDTH; len++)
+        buf << " ";
+
+    buf << cost << endl;
+}
+
+/** "500 qp", dimmed when the buyer is short of it. */
+DLString QuestTradeArticle::listPrice( Character *client ) const
+{
+    ostringstream amount;
+
+    price->toStream( client, amount );
+
+    DLString text = amount.str( );
+    // QuestPointPrice prints "500qp"; the list wants the unit apart.
+    if (text.size( ) > 2 && text.substr( text.size( ) - 2 ) == "qp")
+        text = text.substr( 0, text.size( ) - 2 ) + " qp";
+
+    if (!price->canAfford( client ))
+        return "{D" + text + "{x";
+
+    return text;
 }
 
 bool QuestTradeArticle::visible( Character * ) const
@@ -233,8 +335,62 @@ void ObjectQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharacter
  * PersonalQuestArticle 
  *---------------------------------------------------------------------------*/
 PersonalQuestArticle::PersonalQuestArticle( )
-                          : gender( 0, &sex_table ), restoring( false )
+                          : gender( 0, &sex_table ), limit( 0 ), restoring( false )
 {
+}
+
+#define OBJ_VNUM_QUESTGIRTH    94
+#define OBJ_VNUM_QUESTKEYRING  119
+
+/** Copies of this hero item the buyer owns anywhere in the world. A girth with a
+ *  keyring attached becomes the keyring object, so it still counts as the girth.
+ *  Items deposited in a bank vault have left the world and are not seen. */
+int PersonalQuestArticle::countOwned( PCharacter *client ) const
+{
+    int count = 0;
+
+    for (Object *obj = object_list; obj; obj = obj->next) {
+        int v = obj->pIndexData->vnum;
+
+        if (v != vnum.getValue( )
+            && !(vnum.getValue( ) == OBJ_VNUM_QUESTGIRTH && v == OBJ_VNUM_QUESTKEYRING))
+            continue;
+
+        if (obj->hasOwner( client ))
+            count++;
+    }
+
+    return count;
+}
+
+bool PersonalQuestArticle::visible( Character *client ) const
+{
+    if (!ObjectQuestArticle::visible( client ))
+        return false;
+
+    if (client->is_npc( ) || limit.getValue( ) <= 0)
+        return true;
+
+    return countOwned( client->getPC( ) ) < limit.getValue( );
+}
+
+bool PersonalQuestArticle::available( Character *client, NPCharacter *questman ) const
+{
+    if (!ObjectQuestArticle::available( client, questman ))
+        return false;
+
+    if (client->is_npc( ))
+        return false;
+
+    if (limit.getValue( ) > 0 && countOwned( client->getPC( ) ) >= limit.getValue( )) {
+        if (troubled)
+            say_act( client, questman, _("У тебя уже есть эта вещь, $c1. Если потеряешь ее, попроси {yквест вернуть{x.") );
+        else
+            say_act( client, questman, _("У тебя уже есть эта вещь, $c1.") );
+        return false;
+    }
+
+    return true;
 }
 
 /** The adjectives the quest master engraves on a hero item, indexed
@@ -400,6 +556,12 @@ void ConQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     oldact(_("$C1 повышает твое телосложение."), client, 0, questman, TO_CHAR );
 }
     
+bool ConQuestArticle::visible( Character *client ) const
+{
+    return !client->is_npc( )
+        && client->perm_stat[STAT_CON] < client->getPC( )->getMaxTrain( STAT_CON );
+}
+
 bool ConQuestArticle::available( Character *client, NPCharacter *questman ) const 
 {
     if (client->is_npc( ))
@@ -440,6 +602,11 @@ void PocketsQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     }
 }
 
+bool PocketsQuestArticle::visible( Character *client ) const
+{
+    return !client->is_npc( ) && findBag( client->getPC( ) ) != 0;
+}
+
 bool PocketsQuestArticle::available( Character *client, NPCharacter *questman ) const 
 {
     if (client->is_npc( ))
@@ -455,9 +622,6 @@ bool PocketsQuestArticle::available( Character *client, NPCharacter *questman ) 
 /*---------------------------------------------------------------------------
  * KeyringQI 
  *---------------------------------------------------------------------------*/
-#define OBJ_VNUM_QUESTGIRTH    94
-#define OBJ_VNUM_QUESTKEYRING  119
-
 void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman ) 
 {
     Object *girth, *keyring;
@@ -524,6 +688,11 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
 
     oldact(_("$C1 прикрепляет огромный брелок к $o3."), client, keyring, questman, TO_CHAR);
     oldact(_("$C1 прикрепляет огромный брелок к $o3."), client, keyring, questman, TO_ROOM);
+}
+
+bool KeyringQuestArticle::visible( Character *client ) const
+{
+    return !client->is_npc( ) && get_obj_carry_vnum( client, OBJ_VNUM_QUESTGIRTH ) != 0;
 }
 
 bool KeyringQuestArticle::available( Character *client, NPCharacter *questman ) const 
@@ -730,12 +899,37 @@ static bool refit_needed( Object *obj, PCharacter *client )
     return get_wear_level( client, obj ) > client->getRealLevel( );
 }
 
-void RefitQuestArticle::toStream( Character *client, ostringstream &buf ) const
+bool RefitQuestArticle::visible( Character *client ) const
 {
-    DLString myname = viewerLang(client) != LANG_EN && !rname.empty() ? rname : name;
-    buf << "    " << setiosflags( ios::right ) << setw( 7 ) << _("по ур.").getMessage( client )
-        << resetiosflags( ios::left )
-        << ".........." << descr.getForLang( viewerLang(client) ) << " ({D" << myname << "{x)" << endl;
+    if (client->is_npc( ))
+        return false;
+
+    for (Object *obj = client->carrying; obj; obj = obj->next_content)
+        if (refit_needed( obj, client->getPC( ) ))
+            return true;
+
+    return false;
+}
+
+/** The exact fee for everything this buyer would get refit right now. */
+DLString RefitQuestArticle::listPrice( Character *client ) const
+{
+    int fee = 0;
+
+    if (client->is_npc( ))
+        return DLString::emptyString;
+
+    for (Object *obj = client->carrying; obj; obj = obj->next_content)
+        if (refit_needed( obj, client->getPC( ) ))
+            fee += refit_item_fee( obj, client->getPC( ) );
+
+    if (fee == 0)
+        return _("даром").getMessage( client );
+
+    if (client->getPC( )->getQuestPoints( ) < fee)
+        return "{D" + DLString( fee ) + " qp{x";
+
+    return DLString( fee ) + " qp";
 }
 
 bool RefitQuestArticle::available( Character *client, NPCharacter *questman ) const
@@ -860,12 +1054,54 @@ static bool upgrade_eligible( Object *obj )
     return atoi( obj->getProperty( "questTier" ).c_str( ) ) < QUEST_UPGRADE_MAX_TIER;
 }
 
-void UpgradeQuestArticle::toStream( Character *client, ostringstream &buf ) const
+/** Listed while the buyer carries a hero item below the cap, worn or not: a worn
+ *  one only has to come off first, and available() says so. */
+bool UpgradeQuestArticle::visible( Character *client ) const
 {
-    DLString myname = viewerLang(client) != LANG_EN && !rname.empty() ? rname : name;
-    buf << "    " << setiosflags( ios::right ) << setw( 7 ) << _("ступень").getMessage( client )
-        << resetiosflags( ios::left )
-        << ".........." << descr.getForLang( viewerLang(client) ) << " ({D" << myname << "{x)" << endl;
+    if (client->is_npc( ))
+        return false;
+
+    for (Object *obj = client->carrying; obj; obj = obj->next_content)
+        if (upgrade_eligible_vnum( obj->pIndexData->vnum )
+            && atoi( obj->getProperty( "questTier" ).c_str( ) ) < QUEST_UPGRADE_MAX_TIER)
+            return true;
+
+    return false;
+}
+
+/** The cheapest next step among the buyer's hero items: "750 qp" when every item
+ *  costs the same, "from 750 qp" when they sit on different tiers. */
+DLString UpgradeQuestArticle::listPrice( Character *client ) const
+{
+    int lowest = 0, highest = 0;
+
+    if (client->is_npc( ))
+        return DLString::emptyString;
+
+    for (Object *obj = client->carrying; obj; obj = obj->next_content) {
+        if (!upgrade_eligible_vnum( obj->pIndexData->vnum ))
+            continue;
+
+        int fee = tierPrice( atoi( obj->getProperty( "questTier" ).c_str( ) ) );
+        if (fee <= 0)
+            continue;
+
+        if (lowest == 0 || fee < lowest)
+            lowest = fee;
+        if (fee > highest)
+            highest = fee;
+    }
+
+    DLString text;
+    if (lowest == highest)
+        text = DLString( lowest ) + " qp";
+    else
+        text = fmt( client, _("от %1$d qp"), lowest );
+
+    if (client->getPC( )->getQuestPoints( ) < lowest)
+        return "{D" + text + "{x";
+
+    return text;
 }
 
 bool UpgradeQuestArticle::available( Character *client, NPCharacter *questman ) const
@@ -1068,6 +1304,13 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
     equip_char( client, obj, wear_tattoo );    
 }
 
+bool TattooQuestArticle::visible( Character *client ) const
+{
+    return !client->is_npc( )
+        && client->getReligion( ) != god_none
+        && !wear_tattoo->find( client );
+}
+
 bool TattooQuestArticle::available( Character *client, NPCharacter *tattoer ) const 
 {
     if (client->is_npc( ))
@@ -1106,6 +1349,18 @@ bool VaultQuestArticle::matches( const DLString &argument ) const
         return true;
     // UA name; rname carries the RU one.
     return !argument.empty( ) && arg_oneof( argument, "сховище" );
+}
+
+bool VaultQuestArticle::visible( Character *client ) const
+{
+    if (client->is_npc( ))
+        return false;
+
+    // Same free grandfathering as available(): a vault that already holds items
+    // is open, so it never shows up for sale.
+    bank_vault_grandfather( client->getPC( ) );
+
+    return !bank_vault_unlocked( client->getPC( ) );
 }
 
 bool VaultQuestArticle::available( Character *client, NPCharacter *questman ) const
