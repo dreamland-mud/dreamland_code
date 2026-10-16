@@ -39,6 +39,8 @@ public:
     inline void incSteps( );
     inline void clearSteps( );
     inline int getSteps( ) const;
+    inline void setLegStart( int );
+    inline int getLegStart( ) const;
 
     char getFirstCommand( ) const;
     void clearFirstCommand( );
@@ -49,6 +51,8 @@ public:
 private:
     XML_VARIABLE XMLString path;
     XML_VARIABLE XMLInteger steps;
+    // Room where the current run-to-the-end leg began; not saved.
+    int legStart = 0;
 };
 
 
@@ -76,6 +80,16 @@ inline void XMLAttributeSpeedWalk::clearSteps( )
 inline int XMLAttributeSpeedWalk::getSteps( ) const
 {
     return steps.getValue( );
+}
+
+inline void XMLAttributeSpeedWalk::setLegStart( int vnum )
+{
+    legStart = vnum;
+}
+
+inline int XMLAttributeSpeedWalk::getLegStart( ) const
+{
+    return legStart;
 }
 
 #endif

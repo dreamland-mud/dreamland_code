@@ -165,6 +165,20 @@ public:
             return RC_MOVE_OK;
         }
 
+        // A run to the end through looped rooms (a mirror maze) would circle
+        // until the runner is out of breath: stop once the leg comes back to
+        // where it began.
+        if (walk->getSteps( ) == 0)
+            walk->setLegStart( from_room->vnum );
+        else if (to_room->vnum == walk->getLegStart( )) {
+            walk->clearFirstCommand( );
+            walk->clearSteps( );
+            ostringstream buf;
+            buf << fmt( ch, _("Ты понимаешь, что бегаешь по кругу, и останавливаешься.") ) << endl;
+            msgSelf( ch, buf.str( ).c_str( ) );
+            return RC_MOVE_OK;
+        }
+
         if (moveRecursive( )) {
             walk->incSteps( );
             return RC_MOVE_OK;
