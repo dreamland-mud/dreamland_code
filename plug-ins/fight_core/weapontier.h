@@ -26,10 +26,13 @@ struct weapon_tier_t {
     // Caps for M-priced items: distinct affixes (stacks count once), negative ones. 0 = none.
     int max_affixes_m;
     int max_negatives_m;
-    int weeks;
+    // Decay timer in days, 0 = none ("weeks" x7 when the config has no "days").
+    int days;
     int chance;
 
     void fromJson(const Json::Value &value);
+    /** The decay timer in ticks (minutes), 0 when the tier never decays. */
+    int timer() const;
 };
 
 extern json_vector<weapon_tier_t> weapon_tier_table;

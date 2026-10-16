@@ -1684,6 +1684,74 @@ NMI_INVOKE(Root, randomizeNamedArmor, "(obj, ch, tier, slot[, profile]): ста�
     return Register(ok);
 }
 
+NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, profile]): случайные аффиксы на скрафченную броню в окне minCm..maxCm (centi-M, без кривой уровня); имена, AC и цвет остаются свои; force -- 'секция:значение[:стаки]' через пробел, берутся первыми; выбор пишется в property craft_picks; возвращает centi-M выпавшего или -1")
+{
+    ::Object *obj = argnum2item(args, 1);
+    Character *ch = argnum2character(args, 2);
+    int tier = argnum2number(args, 3);
+    DLString slot = argnum2string(args, 4);
+    int minCm = argnum2number(args, 5);
+    int maxCm = argnum2number(args, 6);
+    DLString force = args.size() > 6 ? argnum2string(args, 7) : DLString::emptyString;
+    DLString profile = args.size() > 7 ? argnum2string(args, 8) : DLString::emptyString;
+
+    if (obj->item_type != ITEM_ARMOR)
+        throw Scripting::Exception("Item is not armor for a craft roll.");
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid armor tier.");
+    if (slot.empty())
+        throw Scripting::Exception("Armor slot is required.");
+    if (minCm < 0 || maxCm < minCm)
+        throw Scripting::Exception("Bad craft window.");
+    // affect_to_obj applies each affect to the wearer of a worn item.
+    if (obj->wear_loc != wear_none)
+        throw Scripting::Exception("Item is worn: roll it off the body.");
+
+    ArmorGenerator gen(obj, ch->getPC(), tier, slot);
+    bool ok = gen.craft(minCm, maxCm, force)
+                .caster(profile == "caster")
+                .alignment(ch->alignment)
+                .run();
+
+    return Register(ok ? gen.total() : -1);
+}
+
+NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile]): rand_stat для скрафченного оружия с окном аффиксов minCm..maxCm (centi-M, без кривой уровня, двуручное x1.75); force -- имена аффиксов через пробел, берутся первыми; возвращает measure_m")
+{
+    ::Object *obj = argnum2item(args, 1);
+    Character *ch = argnum2character(args, 2);
+    int tier = argnum2number(args, 3);
+    int minCm = argnum2number(args, 4);
+    int maxCm = argnum2number(args, 5);
+    DLString force = args.size() > 5 ? argnum2string(args, 6) : DLString::emptyString;
+    DLString profile = args.size() > 6 ? argnum2string(args, 7) : DLString::emptyString;
+
+    if (obj->item_type != ITEM_WEAPON)
+        throw Scripting::Exception("Item is not a weapon for a craft roll.");
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid weapon tier.");
+    if (minCm < 0 || maxCm < minCm)
+        throw Scripting::Exception("Bad craft window.");
+    if (obj->wear_loc != wear_none)
+        throw Scripting::Exception("Item is worn: roll it off the body.");
+
+    WeaponGenerator gen;
+    gen.item(obj)
+        .alignment(ch->alignment)
+        .player(ch->getPC())
+        .caster(profile == "caster")
+        .tier(tier)
+        .craftWindow(minCm, maxCm);
+    for (auto &n: force.split(" ")) {
+        n.stripWhiteSpace();
+        if (!n.empty())
+            gen.addRequirement(n);
+    }
+    gen.randomizeStats();
+
+    return Register(atoi(obj->getProperty("measure_m").c_str()));
+}
+
 NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, profile]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров, profile caster берет цены аффиксов для кастера")
 {
     ::Object *obj = argnum2item(args, 1);
