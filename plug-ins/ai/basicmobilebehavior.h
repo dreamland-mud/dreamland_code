@@ -160,6 +160,7 @@ protected:
     bool aggressRanged( );
 private:
     Character * findRangeVictim( int, int &, int & );
+    bool rangedLastFought( );
 
 /*
  * tracking

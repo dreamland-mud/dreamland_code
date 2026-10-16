@@ -223,7 +223,7 @@ bool BasicMobileBehavior::aggressMemorized( )
  */
 bool BasicMobileBehavior::aggressRanged( )
 {
-    if (memoryFought.empty( ))
+    if (memoryFought.empty( ) && !rangedLastFought( ))
         return false;
         
     if (ch->wait > 0) 
@@ -266,10 +266,22 @@ bool BasicMobileBehavior::aiRangedAttack( )
     return false;
 }
 
+/*
+ * A notrack mob keeps no fight memory, so it never hunts. An elite or
+ * stronger one still answers the last foe shooting at it from a few rooms
+ * off: sniping a notrack boss must not be free.
+ */
+bool BasicMobileBehavior::rangedLastFought( )
+{
+    int tier = ch->getTier( );
+    return IS_SET( ch->act, ACT_NOTRACK ) && tier > 0 && tier <= 5 && hasLastFought( );
+}
+
 Character * BasicMobileBehavior::findRangeVictim( int maxRange, int &victDoor, int &victRange )
 {
     Character *rch;
     Character *victim = 0;
+    bool lastOnly = rangedLastFought( );
 
     for (int door = 0; door < DIR_SOMEWHERE; door++) {
         Room *room = ch->in_room;
@@ -287,7 +299,8 @@ Character * BasicMobileBehavior::findRangeVictim( int maxRange, int &victDoor, i
             
             room = pExit->u1.to_room;
             for (rch = room->people; rch; rch = rch->next_in_room) 
-                if (memoryFought.memorized( rch ) && canAggress( rch )) 
+                if ((memoryFought.memorized( rch ) || (lastOnly && isLastFought( rch )))
+                        && canAggress( rch )) 
                     if (!victim || victim->hit > rch->hit) {
                         victim = rch;
                         victDoor = door;
