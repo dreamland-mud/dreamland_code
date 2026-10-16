@@ -19,6 +19,9 @@ bool dl_isalnum( char c );
 bool dl_is_arg_separator(char c);
 
 bool dl_is_ukr_specific(char c);
+
+// Case counterpart of a single-byte (koi8) character, for the bundled regex.
+int dl_rx_othercase( int ch );
 bool dl_is_rus_specific(char c);
 
 inline char dl_toupper( char c )

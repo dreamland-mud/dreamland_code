@@ -91,6 +91,19 @@ bool dl_isalpha( char c )
     return isalpha(c) || dl_is_cyrillic( c );
 }
 
+int dl_rx_othercase( int ch )
+{
+    if (ch < 0 || ch > 255)
+        return ch;
+
+    char c = (char)ch;
+    if (dl_isupper( c ))
+        return (unsigned char)dl_tolower( c );
+    if (dl_islower( c ))
+        return (unsigned char)dl_toupper( c );
+    return ch;
+}
+
 bool dl_isupper( char c )
 {
     return isupper( c ) 
