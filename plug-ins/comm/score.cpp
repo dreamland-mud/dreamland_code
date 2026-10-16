@@ -208,7 +208,7 @@ static void score_prose( Character *ch )
     // One whole line rather than streamed label fragments: the catalog is keyed on
     // the finished Russian string, so fragments can never resolve. Same wording as
     // the Fenia score (command/score/runFunc), which is the panel players actually
-    // see -- this prose version is the no-Fenia fall-through and `oscore` on an NPC.
+    // see -- this prose version is what `oscore` prints for an NPC.
     buf << fmt( ch, _("{wРаса:{W %1$s  {wРазмер:{W %2$s  {wПол:{W %3$s  {wКласс:{W %4$s"),
                 ch->getRace( )->getNameFor( ch, ch ).ruscase('1').c_str( ),
                 size_table.message( ch->size, '1', Player::displayLang(ch) ).c_str( ),

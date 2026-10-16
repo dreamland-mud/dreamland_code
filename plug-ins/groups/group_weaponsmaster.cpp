@@ -49,14 +49,7 @@
 #include "l10n.h"
 
 RELIG(godiva);
-GSN(blind_fighting);
-GSN(disarm);
-GSN(grip);
 GSN(lash);
-GSN(shield_block);
-GSN(shield_cleave);
-GSN(spear);
-GSN(weapon_cleave);
 GSN(whip);
 
 /*
@@ -84,95 +77,6 @@ SKILL_RUNP( second )
     
     wear_second_wield->wear( obj, F_WEAR_REPLACE | F_WEAR_VERBOSE );
 }
-
-/* A failed disarm is a miss: bystanders with fightspam off get the round
- * summary instead. */
-static bool needsSpam( Character *target )
-{
-    return target->getPC( ) && IS_SET(target->getPC( )->config, CONFIG_FIGHTSPAM);
-}
-
-/*
- * Disarm a creature.
- * Caller must check for successful attack.
- */
-void disarm( Character *ch, Character *victim ,int disarm_second)
-{
-        Object *obj;
-        Object *obj2;
-        int skill;
-
-        if (disarm_second)
-        {
-                if ((obj=get_eq_char(victim,wear_second_wield)) == 0)
-                {
-                        bug("Disarm second with 0 wear_second_wield",0);
-                        return;
-                }
-        }
-        else
-        {
-                if ((obj=get_eq_char(victim,wear_wield)) == 0)
-                {
-                        bug("Disarm first with 0 wear_wield",0);
-                        return;
-                }
-        }
-
-        if ( IS_OBJ_STAT(obj,ITEM_NOREMOVE))
-        {
-                oldact(_("$S оружие не двигается с места!"),ch,0,victim,TO_CHAR);
-                oldact(_("$c1 пытается обезоружить тебя, но оружие не двигается с места!"), ch,0,victim,TO_VICT);
-                echo_notvict( ch, victim, needsSpam, _("%1$^C1 пытается обезоружить %2$C4, но оружие не двигается с места."), ch, victim );
-                return;
-        }
-
-        if (( skill = gsn_grip->getEffective( victim ) ) > 1)
-        {
-                skill += (victim->getCurrStat(STAT_STR) - ch->getCurrStat(STAT_STR)) * 5;
-
-                if ( number_percent() < skill )
-                {
-                        oldact(_("$C1 хватает тебя за руку и ускользает!"), ch,0,victim,TO_CHAR);
-                        oldact(_("$c1 пытается обезоружить тебя, но ты хватаешь $s за руку и ускользаешь!"), ch,0,victim,TO_VICT);
-                        echo_notvict( ch, victim, needsSpam, _("%1$^C1 пытается обезоружить %2$C4, но безуспешно."), ch, victim );
-                        gsn_grip->improve( victim, true, ch );
-                        return;
-                }
-                else         
-                        gsn_grip->improve( victim, false, ch );
-        }
-
-        oldact(_("Ты обезоруживаешь $C4!"), ch,0, victim, TO_CHAR);
-        oldact( _("$c1 обезоруживает $C4!"),ch, 0, victim,TO_NOTVICT);
-
-        obj_from_char( obj );
-
-        if ( IS_OBJ_STAT(obj,ITEM_NODROP) || IS_OBJ_STAT(obj,ITEM_INVENTORY) ) 
-        {
-                oldact(_("{R$c1 ВЫБИ$gЛО|Л|ЛА {xу тебя оружие!{x"), ch, 0, victim, TO_VICT );
-                obj_to_char( obj, victim );
-        }
-        else
-        {
-                oldact(_("{R$c1 ВЫБИ$gЛО|Л|ЛА {xу тебя оружие, и оно упало на землю!{x"), ch, 0, victim, TO_VICT );
-                obj_to_room( obj, victim->in_room );
-                if (victim->is_npc() && victim->wait == 0 && victim->can_see(obj))
-                        interpret_raw(victim, "get", "%lld", obj->getID());
-        }
-
-        if ( (obj2 = get_eq_char(victim, wear_second_wield)) != 0)
-        {
-                oldact( _("Ты вооружаешься вторичным оружием как основным!"), ch, 0, victim,TO_VICT);
-                oldact( _("$C1 вооружается вторичным оружием как основным!"), ch, 0,victim,TO_CHAR );
-                oldact( _("$C1 вооружается вторичным оружием как основным!"), ch, 0, victim,TO_NOTVICT );
-                unequip_char( victim, obj2);
-                equip_char( victim, obj2 , wear_wield);
-        }
-
-        return;
-}
-
 
 /*
  * 'lash' skill command

@@ -117,7 +117,7 @@
 #include "def.h"
 #include "l10n.h"
 
-// For reportSkills(): the pet-report skill gathering, migrated out of comm/report.cpp.
+// For reportSkills(): the pet-report skill gathering behind the Fenia `report` command.
 #include "spell.h"
 #include "skillcommand.h"
 #include "command.h"
@@ -151,7 +151,7 @@ GSN(manacles);
 GSN(spellbane);
 GSN(charm_person);
 // Weapon/utility skills excluded from a weaponless pet's report, and the
-// combat-invalid set -- kept in sync with comm/report.cpp's own gsn list.
+// combat-invalid set.
 GSN(lash);
 GSN(bash);
 GSN(hand_to_hand);
@@ -7489,7 +7489,6 @@ static bool report_skill_invalid(int sn, bool noCarry)
 }
 
 // Skills that can never be ordered while the pet is fighting.
-// Mirrors skill_is_invalid_in_fight() in comm/report.cpp.
 static bool report_skill_invalid_in_fight(int sn)
 {
     return sn == gsn_recall || sn == gsn_concentrate || sn == gsn_hide
