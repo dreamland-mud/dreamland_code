@@ -6496,7 +6496,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // Percentile: per slot-type, worn against that slot's own ceiling (best of the
     // worn item or the best available). Capping each slot at its own best stops a
     // best-in-slot surplus on one slot from papering over a deficit on another, so
-    // 100% now means best-in-slot everywhere -- i.e. the optimal list is empty.
+    // 100% now means best-in-slot everywhere. The optimal list can be empty a
+    // little below 100%, since gaps under GA_MIN_GAIN are not offered.
     // Each slot-type counted once; multi-slot types (two fingers) are Phase 2.
     std::map<int,double> slotCeil;
     for (auto &kv: wornSlot)
@@ -7207,9 +7208,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                             rv = gaOffhand != 0 ? gaOffhand->pIndexData->vnum : 0;
                         }
                     }
-                    // Same bars as the generic path: >= for a new item, strict > for a
-                    // second copy (never "replace your X with an X").
-                    if (!any || (pass == 0 ? best < 0 : best <= 0))
+                    // Same bars as the generic path: a fill of an empty hand passes
+                    // as is, a swap must gain at least GA_MIN_GAIN (no "[+0]" ties).
+                    if (!any || (fills ? best < 0 : best < GA_MIN_GAIN))
                         continue;
                     opts.push_back( GAWieldOpt{ c, best, fills, rv } );
                 }
@@ -7274,12 +7275,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // ousting a lesser bracelet). Same bar as any pick; single-capacity slots never
         // offer a duplicate. Second copies are never two-handed (a two-handed primary
         // blocks dual capacity).
-        // Strict > (not >=): every second copy scores > 0 (main-loop gate), so a fill of an
-        // empty position (wornScore 0) still passes, but a full slot only takes a copy that
-        // truly beats the weaker worn piece -- never "replace your laerkai with a laerkai".
+        // Every second copy scores > 0 (main-loop gate), so a fill of an empty position
+        // (wornScore 0) still passes, but a full slot only takes a copy that beats the
+        // weaker worn piece by GA_MIN_GAIN -- never "replace your laerkai with a laerkai".
         if (capacity >= 2)
             for (auto &c: secondCopyCands)
-                if ((c.slot & slotFilter) && c.acq.method != GA_UNKNOWN && c.score > wornScore)
+                if ((c.slot & slotFilter) && c.acq.method != GA_UNKNOWN
+                        && (wornScore <= 0 ? c.score > wornScore : c.score - wornScore >= GA_MIN_GAIN))
                     slotCands.push_back( c );
         std::sort( slotCands.begin( ), slotCands.end( ),
             []( const GACand &a, const GACand &b ){ return a.score > b.score; } );
