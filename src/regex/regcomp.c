@@ -82,6 +82,7 @@ int dl_isupper( char );
 int dl_islower( char );
 int dl_isdelim( char );
 int dl_isalnum( char c );
+int dl_rx_othercase( int ch );
 
 /* === regcomp.c === */
 static void p_ere(struct parse *p, int stop);
@@ -943,13 +944,9 @@ static int			/* if no counterpart, return ch */
 othercase(ch)
 int ch;
 {
-	assert(iswalpha(ch));
-	if (iswupper(ch))
-		return(towlower(ch));
-	else if (iswlower(ch))
-		return(towupper(ch));
-	else			/* peculiar, but could happen */
-		return(ch);
+	/* Strings are single-byte koi8 and the locale is "C", where the wide
+	 * ctype calls see no Cyrillic: fold case with the engine's own tables. */
+	return dl_rx_othercase(ch);
 }
 
 /*
@@ -991,7 +988,7 @@ int ch;
 {
 	cset *cs;
 
-	if ((p->g->cflags&REG_ICASE) && iswalpha(ch) && othercase(ch) != ch)
+	if ((p->g->cflags&REG_ICASE) && othercase(ch) != ch)
 		bothcases(p, ch);
 	else if ((ch & OPDMASK) == ch)
 		EMIT(OCHAR, ch);
@@ -1210,9 +1207,7 @@ int ch;
 		cs->wides[cs->nwides++] = ch;
 	}
 	if (cs->icase) {
-		if ((nch = towlower(ch)) < NC)
-			cs->bmp[nch >> 3] |= 1 << (nch & 7);
-		if ((nch = towupper(ch)) < NC)
+		if ((nch = othercase(ch)) < NC)
 			cs->bmp[nch >> 3] |= 1 << (nch & 7);
 	}
 }
