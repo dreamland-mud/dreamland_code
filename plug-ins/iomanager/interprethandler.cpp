@@ -106,9 +106,7 @@ static bool omprog_command( Character *actor, const DLString &cmdName, const DLS
 static bool can_see_room_details(Character *ch)
 {
     if (ch->getConfig( ).holy
-        || ch->is_vampire( )
-        || IS_GHOST(ch) || IS_DEATH_TIME(ch)
-        || (ch->in_room->isDark( ) && IS_AFFECTED(ch, AFF_INFRARED))
+        || (ch->in_room->isDark( ) && ch->seesInDark( ))
         || (!ch->in_room->isDark( ) && !IS_AFFECTED(ch, AFF_BLIND)))
     {
         return true;

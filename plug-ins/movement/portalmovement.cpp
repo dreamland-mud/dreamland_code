@@ -177,7 +177,7 @@ static bool portal_hidden_from( Character *fch, Object *portal )
     if (IS_AFFECTED(fch, AFF_BLIND))
         return false;
 
-    if (fch->in_room->isDark( ) && !IS_AFFECTED(fch, AFF_INFRARED) && !IS_OBJ_STAT(portal, ITEM_GLOW))
+    if (fch->in_room->isDark( ) && !fch->seesInDark( ) && !IS_OBJ_STAT(portal, ITEM_GLOW))
         return false;
 
     return true;

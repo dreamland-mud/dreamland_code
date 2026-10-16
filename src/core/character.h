@@ -169,13 +169,15 @@ public:
     void vecho( int pos, int type, Character *vch, const MultiMessage &f, va_list av, bool (needsOutput)(Character *) );
 
     // visibility of things 
-    bool can_see( const Character *victim ) const;
+    bool can_see( const Character *victim, bool ignoreDark = false ) const;
     bool can_see( const Object *obj ) const;
     bool can_hear( const Object *obj ) const;
     bool can_see( Room *pRoomIndex ) const;
     bool can_see( struct extra_exit_data *peexit ) const;
     bool can_see( struct exit_data *pexit ) const;
     bool can_sense( const Character * ) const;
+    // Infravision, or a dead player's sight: dark rooms don't blind them.
+    bool seesInDark( ) const;
     
     // object manipulations
     short getWearLevel( Object * );

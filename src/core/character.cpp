@@ -332,7 +332,15 @@ static bool mprog_invisible( Character *ch, const Character *looker )
 /*
  * True if char can see victim.
  */
-bool Character::can_see( const Character *victim ) const
+bool Character::seesInDark( ) const
+{
+    return IS_AFFECTED(this, AFF_INFRARED) || IS_GHOST(this) || IS_DEATH_TIME(this);
+}
+
+/*
+ * ignoreDark: would ch see victim if the room were lit.
+ */
+bool Character::can_see( const Character *victim, bool ignoreDark ) const
 {
     // RT changed so that WIZ_INVIS has levels
     if ( this == victim )
@@ -380,7 +388,7 @@ bool Character::can_see( const Character *victim ) const
     if ( !in_room )
         return false;
 
-    if (in_room->isDark( ) && !IS_AFFECTED(this, AFF_INFRARED) )
+    if (!ignoreDark && in_room->isDark( ) && !seesInDark( ))
         return false;
 
     if ( IS_AFFECTED(victim, AFF_INVISIBLE) && !CAN_DETECT(this, DETECT_INVIS) )
@@ -451,7 +459,7 @@ bool Character::can_see( const Object *obj ) const
     if ( IS_OBJ_STAT(obj,ITEM_GLOW))
         return true;
 
-    if (in_room->isDark( ) && !IS_AFFECTED(this, AFF_INFRARED) )
+    if (in_room->isDark( ) && !seesInDark( ))
         return false;
 
     if ( obj->item_type == ITEM_TATTOO )
