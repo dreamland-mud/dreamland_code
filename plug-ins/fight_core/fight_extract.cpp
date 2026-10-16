@@ -12,6 +12,7 @@
 #include "descriptor.h"
 #include "follow_utils.h"
 #include "fight_extract.h"
+#include "damagelog.h"
 #include "fight_position.h"
 #include "interp.h"
 #include "loadsave.h"
@@ -121,6 +122,8 @@ void extract_char( Character *ch, bool count )
 
     NPCharacter *npc = ch->getNPC( );
     PCharacter *pc = ch->getPC( );
+
+    damagelog_forget( ch );
     
     if (char_is_nodrop( ch ))
         count = true;

@@ -74,6 +74,7 @@
 #include "alignment.h"
 #include "wiznet.h"
 #include "fight_extract.h"
+#include "damagelog.h"
 #include "xmlattributecoder.h"
 #include "xmlattributerestring.h"
 #include "commonattributes.h"
@@ -3023,6 +3024,32 @@ NMI_INVOKE( CharacterWrapper, is_safe_msg, "(vict): то же, что is_safe, �
 {
     checkTarget( );
     return ::is_safe( target, arg2character( get_unique_arg( args ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, damageLog, "(): who hurt this champion/boss/legend in the current fight, most damage first: list of [ch, name, dam], ch = the player if still in the world, else null; dam = hit points taken off (a charmed pet's count for its master, overkill not counted). Empty for other mobs and players" )
+{
+    checkTarget( );
+    std::list<DamageLogEntry> entries = damagelog_get( target );
+    entries.sort( []( const DamageLogEntry &a, const DamageLogEntry &b ) { return a.dam > b.dam; } );
+
+    // One pass over the world for every contributor, not one per contributor.
+    std::map<long long, Character *> online;
+    if (!entries.empty( ))
+        for (Character *wch = char_list; wch; wch = wch->next)
+            if (!wch->is_npc( ))
+                online[wch->getID( )] = wch;
+
+    RegList::Pointer rc( NEW );
+    for (auto &e: entries) {
+        auto o = online.find( e.id );
+
+        RegList::Pointer row( NEW );
+        row->push_back( o != online.end( ) ? wrap( o->second ) : Register( ) );
+        row->push_back( Register( e.name ) );
+        row->push_back( Register( e.dam ) );
+        rc->push_back( wrap( row ) );
+    }
+    return wrap( rc );
 }
 
 NMI_INVOKE( CharacterWrapper, setLastFightTime, "(): отметить персонажа как недавно сражавшегося (адреналин)" )
