@@ -58,6 +58,8 @@ public:
     virtual bool canServeClient( Character * );
 
 protected:
+    virtual void toStream( Character *, ostringstream & );
+
     virtual void msgListEmpty( Character * );
     virtual void msgListBefore( Character * ); 
     virtual void msgListAfter( Character * );
@@ -80,14 +82,22 @@ public:
     virtual bool matches( const DLString & ) const;
     virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
     virtual int getQuantity( ) const;
+
+    /** List section: "hero", "service" or "supply" (see QuestTrader::toStream). */
+    const DLString & getGroup( ) const { return group; }
    
 protected:
     virtual void buy( PCharacter *, NPCharacter * ) = 0;
+
+    /** The price column of `quest list`; dynamic articles compute it per buyer. */
+    virtual DLString listPrice( Character * ) const;
 
     XML_VARIABLE XMLString name;
     XML_VARIABLE XMLString rname;
     XML_VARIABLE XMLMultiString descr;
     XML_VARIABLE XMLPointer<Price> price;
+    XML_VARIABLE XMLString group;
+    XML_VARIABLE XMLInteger help;
 };
 
 class ObjectQuestArticle : public QuestTradeArticle {
@@ -110,6 +120,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<ConQuestArticle> Pointer;
 
+    virtual bool visible( Character * ) const;
     virtual bool available( Character *, NPCharacter * ) const;
 
 private:
@@ -145,6 +156,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<PocketsQuestArticle> Pointer;
 
+    virtual bool visible( Character * ) const;
     virtual bool available( Character *, NPCharacter * ) const;
 
 protected:
@@ -157,6 +169,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<KeyringQuestArticle> Pointer;
 
+    virtual bool visible( Character * ) const;
     virtual bool available( Character *, NPCharacter * ) const;
 
 protected:
@@ -170,11 +183,17 @@ public:
     
     PersonalQuestArticle( );
 
+    virtual bool visible( Character * ) const;
+    virtual bool available( Character *, NPCharacter * ) const;
     virtual void trouble( PCharacter *, NPCharacter * );
 
 protected:
     XML_VARIABLE XMLBoolean troubled;
     XML_VARIABLE XMLEnumeration gender;
+    // How many of this item one hero may own (two rings); 0 = no limit.
+    XML_VARIABLE XMLInteger limit;
+
+    int countOwned( PCharacter * ) const;
 
     virtual void buyObject( Object *, PCharacter *, NPCharacter * );
 
@@ -252,12 +271,13 @@ XML_OBJECT
 public:
     typedef ::Pointer<RefitQuestArticle> Pointer;
 
-    virtual void toStream( Character *, ostringstream & ) const;
+    virtual bool visible( Character * ) const;
     virtual bool available( Character *, NPCharacter * ) const;
     virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
 
 protected:
     virtual void buy( PCharacter *, NPCharacter * );
+    virtual DLString listPrice( Character * ) const;
 };
 
 /**
@@ -273,7 +293,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<UpgradeQuestArticle> Pointer;
 
-    virtual void toStream( Character *, ostringstream & ) const;
+    virtual bool visible( Character * ) const;
     virtual bool available( Character *, NPCharacter * ) const;
     virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
 
@@ -281,6 +301,7 @@ public:
 
 protected:
     virtual void buy( PCharacter *, NPCharacter * );
+    virtual DLString listPrice( Character * ) const;
 
     int tierPrice( int tier ) const;
 };
@@ -301,6 +322,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<TattooQuestArticle> Pointer;
 
+    virtual bool visible( Character * ) const;
     virtual bool available( Character *, NPCharacter * ) const;
 
 private:
@@ -312,6 +334,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<VaultQuestArticle> Pointer;
 
+    virtual bool visible( Character * ) const;
     virtual bool available( Character *, NPCharacter * ) const;
     virtual bool matches( const DLString & ) const;
 
