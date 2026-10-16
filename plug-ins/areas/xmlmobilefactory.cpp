@@ -9,6 +9,7 @@
 #include "json_utils_ext.h"
 #include "skillgroup.h"
 #include "religion.h"
+#include "profession.h"
 #include "behavior.h"
 #include "race.h"
 #include "string_utils.h"
@@ -59,6 +60,7 @@ XMLMobileFactory::XMLMobileFactory( ) :
                           size(NO_FLAG, &size_table),
                           detection(&detect_flags),
                           practicer(skillGroupManager),
+                          professions(professionManager),
                           religion(religionManager),
                           affects(skillManager),
                           behaviors(behaviorManager)
@@ -188,6 +190,7 @@ XMLMobileFactory::init(const mob_index_data *mob)
 
     spec.setValue(c);
     practicer.set(mob->practicer);
+    professions.set(mob->professions);
     religion.set(mob->religion);
     affects.set(mob->affects);
     behaviors.set(mob->behaviors);
@@ -295,6 +298,7 @@ XMLMobileFactory::compat(mob_index_data *mob)
     }
 
     mob->practicer.set(practicer);
+    mob->professions.set(professions);
     mob->religion.set(religion);
     mob->affects.set(affects);
     mob->behaviors.set(behaviors);

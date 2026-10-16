@@ -6,6 +6,7 @@
 #include "skillmanager.h"
 #include "skillgroup.h"
 #include "religion.h"
+#include "profession.h"
 #include "behavior.h"
 #include "dlscheduler.h"
 #include "dreamland.h"
@@ -23,6 +24,7 @@ MOB_INDEX_DATA * mob_index_hash[1024];
 
 mob_index_data::mob_index_data( ) 
                      : practicer( skillGroupManager ), 
+                       professions( professionManager ),
                        religion( religionManager ),
                        affects(skillManager),
                        behaviors(behaviorManager),

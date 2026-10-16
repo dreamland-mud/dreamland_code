@@ -17,6 +17,7 @@
 #include <affect.h>
 #include "room.h"
 #include "skillgroup.h"
+#include "profession.h"
 #include "string_utils.h"
 #include "websocketrpc.h"
 #include "comm.h"
@@ -205,6 +206,8 @@ void OLCStateMobile::copyParameters( MOB_INDEX_DATA *original )
     mob.size             = original->size;
     mob.practicer.clear( );
     mob.practicer.set( original->practicer );
+    mob.professions.clear();
+    mob.professions.set(original->professions);
     mob.religion.clear();
     mob.religion.set(original->religion);
     mob.affects.clear();
@@ -373,6 +376,8 @@ void OLCStateMobile::commit()
     mob.behavior = 0;    
     original->practicer.clear( );
     original->practicer.set( mob.practicer );
+    original->professions.clear();
+    original->professions.set(mob.professions);
     original->religion.clear();
     original->religion.set(mob.religion);
     original->affects.clear();
@@ -499,6 +504,8 @@ MEDIT(show)
         ptc(ch, "{CSpec fun:{x    [{W%s{x] {D(? spec){x\n\r", mob.spec_fun.name.c_str());
     ptc(ch, "{CGroup:{x       [{W%d{x]\n\r", mob.group);
     ptc(ch, "{CPracticer:{x   [{W%s{x] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
+    if (!mob.professions.empty())
+        ptc(ch, "{CProfessions:{x [{W%s{x] {D(professions, ? classes){x\n\r", mob.professions.toString().c_str());
     ptc(ch, "{CReligion:{x    [{W%s{x] {D(reledit list){x\n\r", mob.religion.toString().c_str());
     if (mob.clan != clan_none)
         ptc(ch, "{CClan:{x        [{W%s{x] {D(? clan){x\n\r", mob.clan->getName().c_str());
@@ -1298,6 +1305,11 @@ MEDIT(group)
 MEDIT(practicer)
 {
     return globalBitvectorEdit<SkillGroup>(mob.practicer);
+}
+
+MEDIT(professions)
+{
+    return globalBitvectorEdit<Profession>(mob.professions);
 }
 
 MEDIT(affects)
