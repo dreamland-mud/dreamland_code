@@ -1127,6 +1127,17 @@ static bool oprog_update_consumable( Object *obj )
     return false;
 }
 
+// Socketed gems outlive their setting: Fenia hands them to wherever the
+// item was. trigName "onObjDecay" (timer: every stone survives) or
+// "onObjBreak" (desert melt: each stone rolls). Called inside the
+// object_list walk below: new objects go to the head of the list, so it
+// never visits them.
+static void obj_spill_stones( Object *obj, const char *trigName )
+{
+    if (!obj->getProperty("stones").empty())
+        gprog(trigName, "O", obj);
+}
+
 static bool oprog_area( Object *obj )
 {
     // Layer 1 (the proto behaviors' Fenia triggers) builds its whole arg list before it
@@ -1326,6 +1337,7 @@ void obj_update( void )
             
             if (carrier) {
                 if (chance( 40 )) {
+                    obj_spill_stones( obj, "onObjBreak" );
                     obj->setProperty("extract", "%1$^O1 та%1$nет|ют от жара.");
                     extracted.push_back(obj);
                     continue;
@@ -1333,6 +1345,7 @@ void obj_update( void )
             }
             else {
                 if (chance( 50 )) {
+                    obj_spill_stones( obj, "onObjBreak" );
                     obj->setProperty("extract", "%1$^O1 та%1$nет|ют от жара.");
                     extracted.push_back(obj);
                     continue;
@@ -1469,11 +1482,7 @@ void obj_update( void )
             }
         }
 
-        // Socketed gems outlive their decaying setting: Fenia hands them to
-        // wherever the item was (utils/jeweler spillStones). New objects go
-        // to the head of object_list, so this loop never visits them.
-        if (!obj->getProperty("stones").empty())
-            gprog("onObjDecay", "O", obj);
+        obj_spill_stones( obj, "onObjDecay" );
 
         obj->setProperty("extract", message);
         extracted.push_back(obj);
