@@ -917,6 +917,9 @@ void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage )
 
     if (worn->condition < 1) {
         oldact(_("$O1 разлетается на мелкие части."), ch, wield, worn, TO_ROOM);
+        // Socketed gems may survive the shatter (global/onObjBreak/stones).
+        if (!worn->getProperty("stones").empty())
+            gprog("onObjBreak", "O", worn);
         obj_dump_content(worn);
         extract_obj( worn );
         return;
