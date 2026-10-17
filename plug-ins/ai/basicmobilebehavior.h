@@ -149,6 +149,7 @@ protected:
  */
 public: 
     virtual bool aggress( );
+    virtual void pacify( );
 protected:    
     bool canAggress( );
     bool canAggress( Character * );

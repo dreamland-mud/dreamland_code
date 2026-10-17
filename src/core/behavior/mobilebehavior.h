@@ -73,6 +73,8 @@ public:
     virtual bool isAfterCharm( ) const { return false; }
     virtual long long getLastCharmTime() const { return 0; }
     virtual bool hasSpecialName() const { return false; }
+    /** The peace command: forget fights and attackers, stop hunting. */
+    virtual void pacify( ) { }
 
 protected:
     NPCharacter *ch;

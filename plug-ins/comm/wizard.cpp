@@ -2295,6 +2295,8 @@ CMDWIZP( peace )
             stop_fighting( rch, true );
         if (rch->is_npc() && IS_SET(rch->act,ACT_AGGRESSIVE))
             rch->act.removeBit(ACT_AGGRESSIVE);
+        if (rch->is_npc() && rch->getNPC()->behavior)
+            rch->getNPC()->behavior->pacify();
     }
 
     ch->pecho(_("Ты наполняешь комнату миром и спокойствием."));

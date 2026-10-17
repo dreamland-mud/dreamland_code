@@ -257,6 +257,17 @@ bool BasicMobileBehavior::aiForget( Character *wch, bool fAttacked )
     return fAttacked ? memoryAttacked.forget( wch ) : memoryFought.forget( wch );
 }
 
+/*
+ * The peace command stops the fight: without this the mob still remembers
+ * its foe and jumps them again on the next aggression tick.
+ */
+void BasicMobileBehavior::pacify( )
+{
+    clearLastFought( );
+    memoryFought.clear( );
+    memoryAttacked.clear( );
+}
+
 bool BasicMobileBehavior::getLostTrack( ) const
 {
     return lostTrack.getValue( );
