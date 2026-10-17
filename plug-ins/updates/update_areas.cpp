@@ -544,14 +544,20 @@ static void arm_class_mob(NPCharacter *mob)
     if (wear_wield->find(mob))
         return;
 
-    // Disarmed earlier: take our own weapon back up. Any other weapon the mob
-    // carries is its builder's choice, and then it gets nothing.
-    for (Object *obj = mob->carrying; obj; obj = obj->next_content)
-        if (obj->item_type == ITEM_WEAPON) {
-            if (is_class_arm(obj) && obj->wear_loc == wear_none)
+    // Disarmed earlier: take our own weapon back up. A carried weapon that
+    // fits the class is its builder's choice, and then it gets nothing; one
+    // that doesn't (an axe in a ranger's pack) is just loot.
+    for (Object *obj = mob->carrying; obj; obj = obj->next_content) {
+        if (obj->item_type != ITEM_WEAPON)
+            continue;
+        if (is_class_arm(obj)) {
+            if (obj->wear_loc == wear_none)
                 wear_wield->equip(obj);
             return;
         }
+        if (ranger ? is_bow(obj) : is_stabber(obj))
+            return;
+    }
 
     OBJ_INDEX_DATA *pObjIndex = get_obj_index(OBJ_VNUM_WEAPON_STUB);
     if (!pObjIndex)
