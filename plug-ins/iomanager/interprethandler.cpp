@@ -52,6 +52,12 @@ GSN(sleep);
 static const unsigned char go_ahead_str[] = { IAC, GA };
 static const unsigned char end_of_record_str[] = { IAC, EOR };
 
+/* The client gets IAC EOR or IAC GA right after the prompt. */
+static bool marks_prompt_end( Descriptor *d, Character *ch )
+{
+    return IS_SET( d->oob_proto, OOB_EOR ) || IS_SET( ch->comm, COMM_TELNET_GA );
+}
+
 const char * sunlight_ru [4] = { "темно", "светает", "светло", "сумерки" };    
 
 static bool rprog_command( Room *room, Character *actor, const DLString &cmdName, const DLString &cmdArgs )
@@ -447,7 +453,15 @@ void InterpretHandler::normalPrompt( Character *ch )
         ++str;
     }
 
-    ch->send_to( out.str( ) );
+    DLString result = out.str( );
+
+    // A trailing %c would land the GA/EOR marker on an empty line after the prompt,
+    // and Mudlet would treat that empty line as the prompt.
+    if (ch->desc && marks_prompt_end( ch->desc, ch ))
+        while (!result.empty( ) && (result.back( ) == '\n' || result.back( ) == '\r'))
+            result.pop_back( );
+
+    ch->send_to( result );
 }
 
 
@@ -558,9 +572,12 @@ InterpretHandler::prompt(Descriptor *d)
     if (IS_SET( ch->comm, COMM_PROMPT ))
         normalPrompt( ch );
 
+    if (!marks_prompt_end( d, ch ))
+        return;
+
     if (IS_SET( d->oob_proto, OOB_EOR ))
         d->sendTelnet(end_of_record_str, sizeof(end_of_record_str));
-    else if (IS_SET( ch->comm, COMM_TELNET_GA ))
+    else
         d->sendTelnet(go_ahead_str, sizeof(go_ahead_str));
 }
 

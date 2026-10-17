@@ -135,15 +135,17 @@ DLString Player::defaultPrompt(lang_t lang, bool battle)
     if (battle)
         buf << " [{r%y{x:{Y%o{x]";
 
-    buf << "%c";
     return buf;
 }
 
 bool Player::isDefaultPrompt(const DLString &prompt, bool battle)
 {
-    for (int i = LANG_MIN; i < LANG_MAX; i++)
-        if (prompt == Player::defaultPrompt((lang_t)i, battle))
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        // Older defaults ended in %c; pfiles still carry that form.
+        DLString def = Player::defaultPrompt((lang_t)i, battle);
+        if (prompt == def || prompt == def + "%c")
             return true;
+    }
 
     return false;
 }
