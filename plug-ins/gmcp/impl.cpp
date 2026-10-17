@@ -39,6 +39,11 @@ static const DLString GUI_VERSION = "6";
 static const char *GUI_VERSION_FILE = "var/run/mudlet_version";
 static const DLString DISCORD_GAME = "DreamLand";
 static const DLString DISCORD_INVITE = "https://discord.gg/Ds46EpdKaF";
+// Our own Discord application, so presence reads "Playing DreamLand" with our art.
+static const DLString DISCORD_APP_ID = "659914892941328423";
+// Art asset key, as uploaded under the application's Rich Presence > Art Assets.
+static const DLString DISCORD_LARGE_IMAGE = "dl_logo_2026_1024x1024";
+static const DLString DISCORD_LARGE_IMAGE_TEXT = "dreamland.rocks";
 static const DLString GUI_URL = "https://dreamland-mud.github.io/dreamland_mudlet/downloads/Dreamland.zip";
 static const DLString MAP_URL = "https://dreamland-mud.github.io/dreamland_mudlet/downloads/Dreamland-mapping.dat";
 static const DLString ASCII_MAPS = "https://dreamland.rocks/maps/";
@@ -101,8 +106,8 @@ GMCPCOMMAND_RUN(protoInit)
         data["url"] = MAP_URL;
         send(myArgs.d, "Client", "Map", json_to_string(data));
 
-        // No applicationid: Mudlet shows the game under its own Discord application.
         Json::Value discord;
+        discord["applicationid"] = DISCORD_APP_ID;
         discord["inviteurl"] = DISCORD_INVITE;
         send(myArgs.d, "External.Discord", "Info", json_to_string(discord));
     }
@@ -122,6 +127,10 @@ static Json::Value discord_status( PCharacter *ch )
         area = ch->in_room->areaName( LANG_EN ).colourStrip( );
 
     status["game"] = DISCORD_GAME;
+    // Mudlet reads largeimage as an array and takes its first key; with a custom
+    // application id and no largeimage it falls back to a "server-icon" key.
+    status["largeimage"].append( DISCORD_LARGE_IMAGE );
+    status["largeimagetext"] = DISCORD_LARGE_IMAGE_TEXT;
     ostringstream details;
     details << "Level " << ch->getRealLevel( ) << " " << ch->getProfession( )->getName( );
     status["details"] = details.str( );
