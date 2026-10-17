@@ -396,6 +396,12 @@ NMI_GET(ObjectWrapper, reset_mob , "ID моба, с которым предме�
     return Register(DLString(target->reset_mob));
 }
 
+NMI_GET(ObjectWrapper, reset_room , "внум комнаты, где предмет появился на полу при ресете, или 0")
+{
+    checkTarget();
+    return Register(target->reset_room);
+}
+
 NMI_GET( ObjectWrapper, cppBehavior, "тип C++-поведения предмета (например BasicObjectBehavior) или пустая строка, если его нет")
 {
     checkTarget( );

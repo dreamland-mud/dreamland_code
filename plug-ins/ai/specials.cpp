@@ -178,11 +178,11 @@ bool BasicMobileBehavior::doQuaff( )
 }
 
 /* 
- * Scavenge 
+ * Scavenge: a sentient picks up what it can wear (Fenia onScavengeAI)
  */
 bool BasicMobileBehavior::doScavenge( )
 {
-    if (!IS_SET(ch->act, ACT_SCAVENGER))
+    if (!ch->form.isSet( FORM_SENTIENT ))
         return false;
     
     if (!IS_AWAKE(ch))
