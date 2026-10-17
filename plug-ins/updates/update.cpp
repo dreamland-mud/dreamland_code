@@ -584,6 +584,9 @@ void char_update( )
                     oldact(_("$c1 развалил$gось|ся|ась на куски."), ch, 0, 0, TO_ROOM);
                 else
                     oldact(_("$c1 исчезает."), ch, 0, 0, TO_ROOM);
+                // extract_char drops a timer-limited mob's gear only while
+                // its timer is positive: a summon running out drops it too.
+                ch->timer = 1;
                 extract_char( ch );
                 continue;
             }
