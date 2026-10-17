@@ -332,6 +332,19 @@ CMDRUNP( put )
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
 
+    /* 'put N*<name> container': up to N matching items, like all.<name>
+     * with a cap (same syntax as get). */
+    int limit = -1;
+    const char *star = strchr( arg1, '*' );
+    if (star && star > arg1
+        && is_number( DLString( arg1 ).substr( 0, star - arg1 ).c_str( ) )
+        && atoi( arg1 ) > 0)
+    {
+        limit = atoi( arg1 );
+        DLString dotted = DLString( "all." ) + DLString( star + 1 );
+        snprintf( arg1, sizeof( arg1 ), "%s", dotted.c_str( ) );
+    }
+
     /* 'put N gold|silver container' */
     if (is_number(arg1) && get_arg_id(arg1) == 0 && arg_is_money(arg2)) {
         put_money_container(ch, atoi(arg1), arg2, argument);
@@ -382,6 +395,7 @@ CMDRUNP( put )
         Object *obj_next;
         bool found = false;
         int refused = 0;
+        int putCount = 0;
         Object *firstRefused = 0;
 
         /* 'put all container' or 'put all.obj container' */
@@ -412,6 +426,7 @@ CMDRUNP( put )
                     if (put_obj_container( ch, obj, container, pocket ))
                         return;
                     found = true;
+                    putCount++;
                     break;
 
                 case PUT_OBJ_ERR:
@@ -425,6 +440,9 @@ CMDRUNP( put )
                 // container itself; stop before the next iteration touches it.
                 if (container->extracted)
                     return;
+
+                if (limit > 0 && putCount >= limit)
+                    break;
             }
         }
         

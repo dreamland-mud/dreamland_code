@@ -38,9 +38,11 @@ public:
 
     virtual bool applicable( PCharacter * );
     virtual void eat( PCharacter *, int );
+    virtual void drink( PCharacter *, int, Liquid * );
 protected:
     virtual int getUpdateAmount( PCharacter * );
     virtual void damage( PCharacter * );
+    void liftAffect( PCharacter * );
 };
 
 class DrunkDesire : public DefaultDesire {
