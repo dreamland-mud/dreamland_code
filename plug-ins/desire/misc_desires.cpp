@@ -192,9 +192,20 @@ bool HungerDesire::applicable( PCharacter *ch )
 void HungerDesire::eat( PCharacter *ch, int amount )
 {
     DefaultDesire::eat( ch, amount );
+    liftAffect( ch );
+}
 
-    // Food that lifts hunger off its floor lifts the weakening affect at once
-    // (firing its removeChar), instead of waiting for the short duration to decay.
+// A nourishing drink (juice, milk, soup) fills the stomach too.
+void HungerDesire::drink( PCharacter *ch, int amount, Liquid *liq )
+{
+    DefaultDesire::drink( ch, amount, liq );
+    liftAffect( ch );
+}
+
+// Whatever lifts hunger off its floor lifts the weakening affect at once
+// (firing its removeChar), instead of waiting for the short duration to decay.
+void HungerDesire::liftAffect( PCharacter *ch )
+{
     if (ch->desires[getIndex( )] > damageLimit && ch->isAffected( gsn_hunger ))
         affect_strip( ch, gsn_hunger, true );
 }
