@@ -23,6 +23,7 @@
 #include "stats_apply.h"
 #include "loadsave.h"
 #include "telnet.h"
+#include "descriptorstatelistener.h"
 #include "merc.h"
 
 #include "so.h"
@@ -236,6 +237,24 @@ GMCPCOMMAND_RUN(charToRoom)
     send(args.d, "Room", "Info", json_to_string(data));
 }
 
+/*
+ * Room.Info normally rides on char_to_room. Taking over a link-dead body moves
+ * nobody, so resend it on every entry into the game, or the client map stays on
+ * the login room until the first step. A fresh login may get it twice.
+ */
+class GMCPRoomOnEnterListener : public DescriptorStateListener {
+public:
+    typedef ::Pointer<GMCPRoomOnEnterListener> Pointer;
+
+    virtual void run( int, int newState, Descriptor *d )
+    {
+        if (newState != CON_PLAYING || d == 0)
+            return;
+
+        outOfBandManager->run( "charToRoom", CharToRoomArgs( d ) );
+    }
+};
+
 /*-------------------------------------------------------------------------
  * initialize_gmcp
  *------------------------------------------------------------------------*/
@@ -244,6 +263,8 @@ extern "C"
     SO::PluginList initialize_gmcp( )
     {
         SO::PluginList ppl;
+
+        Plugin::registerPlugin<GMCPRoomOnEnterListener>( ppl );
         return ppl;
     }
 }
