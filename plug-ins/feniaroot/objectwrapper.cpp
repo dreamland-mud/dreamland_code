@@ -441,7 +441,6 @@ NMI_SET( ObjectWrapper, personal, "установить или вернуть а
 
     target->setOwner(pci->getName());
     SET_BIT(target->extra_flags, ITEM_NOPURGE|ITEM_NOSAC|ITEM_BURN_PROOF|ITEM_NOSELL);
-    target->setMaterial( "platinum" );
 
     try {
         AllocateClass::Pointer p = Class::allocateClass( "PersonalQuestReward" );
