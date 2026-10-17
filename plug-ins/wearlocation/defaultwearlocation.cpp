@@ -177,7 +177,8 @@ bool DefaultWearlocation::equip( Object *obj )
 //    generated weapon's affects with its weapon-class skill; ruler items; ~17
 //    runObj spell affects). Those are NOT grants; unioning them would make wearers
 //    isAffected(katana/bless/curse/...) and break real gates (katana craft
-//    cooldown, "already blessed", etc.). So the instance list is never scanned.
+//    cooldown, "already blessed", etc.). So the instance list is never scanned
+//    for grants -- only for bare stealth bits, below.
 //
 // A stealth trait carried on an item as a bare affect_flags bit with no skill type
 // is invisible to the loop above, so it would neither show in the gear-affect panel
@@ -206,6 +207,20 @@ static const struct { int bit; const char *skill; } item_stealth_bit_skills[] = 
     { AFF_CAMOUFLAGE, "camouflage" },   // display-only; NOT re-armed, see note above
     { 0, 0 }
 };
+
+static void eq_stealth_bits( Character *ch, Affect *paf )
+{
+    if (paf->bitvector.getTable( ) != &affect_flags)
+        return;
+
+    bitstring_t b = paf->bitvector;
+    for (int i = 0; item_stealth_bit_skills[i].skill != 0; i++)
+        if (IS_SET( b, item_stealth_bit_skills[i].bit )) {
+            Skill *s = skillManager->findExisting( item_stealth_bit_skills[i].skill );
+            if (s != 0)
+                ch->eqAffects.set( s->getIndex( ) );
+        }
+}
 
 static void rebuild_eq_affects( Character *ch )
 {
@@ -237,16 +252,16 @@ static void rebuild_eq_affects( Character *ch )
 
             // Bare affect_flags stealth bit, no skill type: map it to its skill so
             // item_stealth_refresh can own it (see item_stealth_bit_skills above).
-            if (paf->bitvector.getTable( ) == &affect_flags) {
-                bitstring_t b = paf->bitvector;
-                for (int i = 0; item_stealth_bit_skills[i].skill != 0; i++)
-                    if (IS_SET( b, item_stealth_bit_skills[i].bit )) {
-                        Skill *s = skillManager->findExisting( item_stealth_bit_skills[i].skill );
-                        if (s != 0)
-                            ch->eqAffects.set( s->getIndex( ) );
-                    }
-            }
+            eq_stealth_bits( ch, paf );
         }
+
+        // Stealth bits on the INSTANCE too: any instance source puts them
+        // there -- tattoos (all obj 77, design affects added per instance),
+        // generated sneak/hide affixes, jeweler constellations. Bits only,
+        // never the skill type, for the reason given above. affect_remove_obj
+        // refreshes this cache when such an affect leaves a worn item.
+        for (auto &paf: obj->affected)
+            eq_stealth_bits( ch, paf );
     }
 }
 

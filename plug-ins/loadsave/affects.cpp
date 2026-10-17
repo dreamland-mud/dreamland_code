@@ -89,8 +89,18 @@ void affect_remove_obj( Object *obj, Affect *paf, bool verbose )
 
     obj->affected.remove(paf);
 
-    if (obj->carried_by != NULL && obj->wear_loc != wear_none)
+    if (obj->carried_by != NULL && obj->wear_loc != wear_none) {
         affect_check(obj->carried_by, paf);
+
+        // The wearer's eqAffects cache reads stealth bits off instance affects
+        // too (rebuild_eq_affects), so dropping one must refresh it, or
+        // item_stealth_refresh keeps re-arming a trait whose source is gone.
+        // The same unequip/equip pass affect_to_obj does: net zero on stats.
+        if (table == &affect_flags) {
+            obj->wear_loc->affectsOnUnequip(obj->carried_by, obj);
+            obj->wear_loc->affectsOnEquip(obj->carried_by, obj);
+        }
+    }
 
     AffectManager::getThis()->extract(paf);
 }
