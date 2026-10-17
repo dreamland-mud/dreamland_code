@@ -304,7 +304,7 @@ static const DLString COLOR_BLUE = "4514034";
 void send_discord_fenia(const DLString &header, const DLString &exception)
 {
     Json::Value body;
-    body["username"] = koi2utf("Хрустальный Шар Фенера");
+    body["username"] = "Fener's Crystal Orb";
     body["embeds"][0]["title"] = discord_string(header);
     body["embeds"][0]["description"] = discord_string(exception);
     body["embeds"][0]["color"] = COLOR_CRIMSON;
@@ -327,8 +327,8 @@ void send_discord_confirm(PCharacter *ch)
         << ch->getDescription(LANG_DEFAULT) << endl;
 
     Json::Value body;
-    body["username"] = koi2utf("Всевидящее Око Руфины");
-    body["embeds"][0]["title"] = discord_string("Описание изменилось");
+    body["username"] = "Ruffina's All-Seeing Eye";
+    body["embeds"][0]["title"] = "Description changed";
     body["embeds"][0]["description"] = discord_string(d.str());
     body["embeds"][0]["color"] = COLOR_GREEN;
     body["embeds"][0]["author"]["name"] = discord_string(ch->getName());
@@ -340,7 +340,7 @@ void send_discord_confirm(PCharacter *ch)
 void send_discord_note(const DLString &thread, const DLString &author, const DLString &title, const DLString &description)
 {
     Json::Value body;
-    body["username"] = koi2utf(thread.upperFirstCharacter());
+    body["username"] = thread;
     body["embeds"][0]["title"] = discord_string(title);
     body["embeds"][0]["description"] = discord_string(description);
     body["embeds"][0]["color"] = COLOR_GREEN;
@@ -352,7 +352,7 @@ void send_discord_note(const DLString &thread, const DLString &author, const DLS
 void send_discord_news(const DLString &thread, const DLString &author, const DLString &title, const DLString &description)
 {
     Json::Value body;
-    body["username"] = koi2utf(thread.upperFirstCharacter());
+    body["username"] = thread;
     body["embeds"][0]["title"] = discord_string(title);
     body["embeds"][0]["description"] = discord_string(description);
     body["embeds"][0]["url"] = "https://dreamland.rocks/news.html";

@@ -2,6 +2,8 @@
  *
  * ruffina, 2018
  */
+#include <map>
+
 #include "notehooks.h"
 #include "notemanager.h"
 #include "noteflags.h"
@@ -172,9 +174,29 @@ void NoteHooks::hookTelegram(const NoteThread &thread, const Note &note)
     send_telegram_note(threadName, note.getFrom(), note.getSubject(), note.getText());
 }
 
+/** Discord is English-only: name threads the way an English reader expects. */
+static DLString discord_thread_name(const NoteThread &thread)
+{
+    static const map<DLString, DLString> names = {
+        { "note", "Note" },
+        { "story", "Story" },
+        { "news", "News" },
+        { "change", "Change" },
+        { "crime", "Crime report" },
+        { "penalty", "Penalty" },
+        { "qnote", "Quest note" },
+    };
+
+    auto n = names.find(thread.getName());
+    if (n != names.end())
+        return n->second;
+
+    return thread.getName().upperFirstCharacter();
+}
+
 void NoteHooks::hookDiscord(const NoteThread &thread, const Note &note)
 {
-    const DLString threadName = thread.getRussianThreadName().ruscase('1');
+    const DLString threadName = discord_thread_name(thread);
 
     // News and changes reach the Discord chat as curated English posts from the
     // dl-narrative skill, not as raw note text.
