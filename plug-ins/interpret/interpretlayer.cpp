@@ -43,6 +43,12 @@ void InterpretArguments::splitLine( )
         return;
     }
     
+    // "/who" typed Discord-style means the command "who"; a bare "/" stays recall.
+    if (arg[0] == '/' && (dl_isalpha( arg[1] ) || isdigit( arg[1] ))) {
+        line.erase( 0, 1 );
+        arg = line.c_str( );
+    }
+
     if (dl_isalpha( arg[0] )
                 || isdigit( arg[0] )
                 || (arg[0] == '*' && arg[1] != ' '))
