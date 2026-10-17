@@ -314,11 +314,36 @@ void obj_to_room( Object *obj, Room *pRoomIndex )
 
 
 
+// The outermost container holding obj (obj itself when it is not inside one).
+// Only that one can be carried, so it is the only carry weight to keep right.
+static Object * outermost_container( Object *obj )
+{
+    while (obj->in_obj != 0)
+        obj = obj->in_obj;
+    return obj;
+}
+
+// Carry weight changes by exactly what the outermost container's getWeight()
+// changes by, so nested weight multipliers and their rounding match it.
+static int carried_weight( Object *top )
+{
+    return top->carried_by != 0 ? top->getWeight( ) : 0;
+}
+
+static void carry_weight_update( Object *top, int before )
+{
+    if (top->carried_by != 0)
+        top->carried_by->carry_weight += top->getWeight( ) - before;
+}
+
 /*
  * Move an object into an object.
  */
 void obj_to_obj( Object *obj, Object *obj_to )
 {
+        Object *top = outermost_container( obj_to );
+        int before = carried_weight( top );
+
         obj->next_content                = obj_to->contains;
         obj_to->contains                = obj;
         obj->in_obj                        = obj_to;
@@ -335,14 +360,7 @@ void obj_to_obj( Object *obj, Object *obj_to )
         if (IS_PIT(obj_to))
                 obj->cost = 0;
 
-        for ( ; obj_to != 0; obj_to = obj_to->in_obj )
-        {
-                if ( obj_to->carried_by != 0 )
-                {
-                        obj_to->carried_by->carry_weight += obj->getWeight( )
-                                                * obj_to->getWeightMultiplier() / 100;
-                }
-        }
+        carry_weight_update( top, before );
 
         save_items_at_holder( obj );
 
@@ -356,15 +374,12 @@ void obj_set_weight( Object *obj, int weight )
     if (delta == 0)
         return;
 
+    Object *top = outermost_container( obj );
+    int before = carried_weight( top );
+
     obj->weight = weight;
 
-    // Same bookkeeping as obj_to_char / obj_to_obj, for the difference only.
-    if (obj->carried_by != 0)
-        obj->carried_by->carry_weight += delta;
-
-    for (Object *obj_to = obj->in_obj; obj_to != 0; obj_to = obj_to->in_obj)
-        if (obj_to->carried_by != 0)
-            obj_to->carried_by->carry_weight += delta * obj_to->getWeightMultiplier( ) / 100;
+    carry_weight_update( top, before );
 }
 
 void obj_to_obj_random( Object *item, Object *obj_to )
@@ -398,6 +413,8 @@ void obj_from_obj( Object *obj )
         }
 
         Object *u_obj = obj_from;
+        Object *top = outermost_container( obj_from );
+        int before = carried_weight( top );
 
         if ( obj == obj_from->contains )
         {
@@ -427,14 +444,7 @@ void obj_from_obj( Object *obj )
         obj->in_obj       = 0;
         obj->pocket = "";
 
-        for ( ; obj_from != 0; obj_from = obj_from->in_obj )
-        {
-                if ( obj_from->carried_by != 0 )
-                {
-                        obj_from->carried_by->carry_weight -= obj->getWeight( )
-                                        * obj_from->getWeightMultiplier() / 100;
-                }
-        }
+        carry_weight_update( top, before );
 
         save_items_at_holder( u_obj );
 
