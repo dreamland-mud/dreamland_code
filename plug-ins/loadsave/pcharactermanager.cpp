@@ -668,6 +668,11 @@ bool PCharacterManager::pfRecover ( const DLString &playerName, const DLString &
 
 bool PCharacterManager::save( PCharacter* pc )
 {
+    // Synthetic API actors never leave a sidecar either (saveMemory lands here
+    // without going through PCharacter::save).
+    if (pc->getAttributes( ).isAvailable( "nosave" ))
+        return false;
+
     DLString name = pc->getName( );
     
     name.toLower( );

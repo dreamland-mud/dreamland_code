@@ -72,6 +72,7 @@ webtriggers.cpp \
 webaliases.cpp \
 webmacros.cpp \
 execservlet.cpp \
+sandboxservlet.cpp \
 accountservlet.cpp
 
 libcomm_la_MOC = \

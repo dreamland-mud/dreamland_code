@@ -377,6 +377,10 @@ void PCharacter::save( )
     static const char * METHOD = " PCharacter::save()";
     ProfilerBlock profiler(getName() + METHOD, 100);
 
+    // Synthetic API actors (/api/exec, /api/sandbox) must never leave a pfile.
+    if (getAttributes( ).isAvailable( "nosave" ))
+        return;
+
     DLFileWrite tmpfile( dreamland->getBasePath( ), dreamland->getTempFile( ) );
 
     if (!tmpfile.open( )) {
