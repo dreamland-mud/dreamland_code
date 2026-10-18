@@ -4,6 +4,7 @@
 #include "logstream.h"
 #include "iconvmap.h"
 #include "dlfilestream.h"
+#include "dlfile.h"
 #include "servlet.h"
 #include "pcmemoryinterface.h"
 #include "dreamland.h"
@@ -29,6 +30,12 @@ bool servlet_parse_params(HttpRequest &request, HttpResponse &response, Json::Va
         if (!params.isObject())
             throw Exception("JSON body must be an object");
 
+        // Same for args: helpers index params["args"] by key. /update/all takes an array.
+        if (params.isMember("args") && !params["args"].isObject() && !params["args"].isArray()) {
+            servlet_response_400(response, "args must be an object or an array");
+            return false;
+        }
+
         return true;
 
     } catch (const std::exception &e) {
@@ -40,26 +47,36 @@ bool servlet_parse_params(HttpRequest &request, HttpResponse &response, Json::Va
     }
 }
 
-static DLString read_token()
+static DLString read_token(const char *fileName, bool optional = false)
 {
     DLString token;
 
     try {
         ostringstream buf;
-        DLFileStream tokenFile(dreamland->getMiscDir(), "dreamland_bot.token");
+        DLFileStream tokenFile(dreamland->getMiscDir(), fileName);
         tokenFile.toStream(buf);
         token = buf.str();
         token.replaces("\n", "");
+        token.replaces("\r", "");
         
     } catch (const std::exception &ex) {
-        LogStream::sendError() << "Reading bot token: " << ex.what() << endl;
+        if (!optional)
+            LogStream::sendError() << "Reading " << fileName << ": " << ex.what() << endl;
     }
 
     return token;
 }
 
-bool servlet_auth_bot(Json::Value &params, HttpResponse &response)
+// Accepts `token`, or `alt` when it is set: an ops token also opens bot endpoints.
+static bool servlet_check_token(Json::Value &params, HttpResponse &response,
+                                const DLString &token, const DLString &alt)
 {
+    // Type-check before asString: a non-string bottype/token used to throw pre-auth.
+    if (!params["bottype"].isString() || !params["token"].isString()) {
+        servlet_response_400(response, "bottype and token must be strings");
+        return false;
+    }
+
     DLString myBotType = params["bottype"].asString();  
     myBotType.toLower();
 
@@ -71,9 +88,10 @@ bool servlet_auth_bot(Json::Value &params, HttpResponse &response)
     }
 
     DLString myToken = params["token"].asString();
-    DLString token = read_token();
+    bool match = !myToken.empty()
+                 && ((!token.empty() && myToken == token) || (!alt.empty() && myToken == alt));
 
-    if (myToken.empty() || token.empty() || myToken != token) {
+    if (!match) {
         LogStream::sendError() << "Servlet auth failed: invalid or missing token" << endl;
         response.status = 403;
         response.message = "Unathorized";
@@ -82,6 +100,35 @@ bool servlet_auth_bot(Json::Value &params, HttpResponse &response)
     }
 
     return true;
+}
+
+// The bot token: community endpoints and /admin. The Discord and Telegram bots
+// hold it, so it must never reach code execution. The ops token opens these too.
+bool servlet_auth_bot(Json::Value &params, HttpResponse &response)
+{
+    return servlet_check_token(params, response,
+                               read_token("dreamland_bot.token"),
+                               read_token("dreamland_ops.token", true));
+}
+
+// The ops token: endpoints that run code or commands (/eval, /exec, /force,
+// /snoop, /reload, /redit). Only the maintainer tooling holds it. While
+// var/misc/dreamland_ops.token does not exist the bot token is accepted here, so
+// the switch-over needs no downtime. Once the file exists the bot token never
+// passes: an empty or unreadable file locks these endpoints instead of failing open.
+bool servlet_auth_ops(Json::Value &params, HttpResponse &response)
+{
+    DLString token;
+
+    if (!DLFile(dreamland->getMiscDir(), "dreamland_ops.token").exist())
+        token = read_token("dreamland_bot.token");
+    else {
+        token = read_token("dreamland_ops.token");
+        if (token.empty())
+            LogStream::sendError() << "dreamland_ops.token is empty or unreadable, ops endpoints locked" << endl;
+    }
+
+    return servlet_check_token(params, response, token, DLString::emptyString);
 }
 
 /**
@@ -162,6 +209,9 @@ DLString servlet_find_username(Json::Value &params, HttpResponse &response)
 bool servlet_get_arg(const Json::Value &params, const DLString &argName, DLString &argValue)
 {
     if (!params.isMember("args") || !params["args"].isMember(argName))
+        return false;
+
+    if (!params["args"][argName].isConvertibleTo(Json::stringValue))
         return false;
 
     argValue = utf2koi(params["args"][argName].asString());

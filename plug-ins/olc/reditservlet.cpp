@@ -91,7 +91,7 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
     if (!servlet_parse_params(request, response, params))
         return;
 
-    if (!servlet_auth_bot(params, response))
+    if (!servlet_auth_ops(params, response))
         return;
 
     // Extract parameters.
