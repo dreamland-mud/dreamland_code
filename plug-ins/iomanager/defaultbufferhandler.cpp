@@ -17,11 +17,11 @@
 #include "codepage.h"
 
 #include "colour.h"
+#include "l10n.h"
 #include "def.h"
 
 DLString msg_spam_warning( Character *ch );
 
-const char *MSG_LINE_TOO_LONG = C_YELLOW "Слишком длинная строка была обрезана. Эта часть не влезла:\n\r" C_WHITE;
 const char *MSG_EOL = "\r\n";
 
 void
@@ -156,7 +156,10 @@ DefaultBufferHandler::read( Descriptor *d )
 
     // Cut off too long lines and notify the user.
     if(line_length >= MAX_INPUT_LENGTH - 2) {
-        d->writeConverted(MSG_LINE_TOO_LONG);
+        DLString tooLong = DLString(C_YELLOW)
+            + _("Слишком длинная строка была обрезана. Эта часть не влезла:").getMessage(d->character)
+            + "\n\r" + C_WHITE;
+        d->writeConverted(tooLong.c_str());
 
         char remainder[MAX_STRING_LENGTH];
         line_length = MAX_INPUT_LENGTH - 2;
