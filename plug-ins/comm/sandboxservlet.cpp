@@ -160,6 +160,17 @@ static DLString sandbox_start(Room *room, int level, const DLString &race,
     ch->setProfession(prof);
     ch->setSex(sex);
 
+    // The race-derived body, as PCharacter::load applies it after reading a pfile.
+    ch->size        = ch->getRace()->getSize();
+    ch->detection   = ch->getRace()->getDet();
+    ch->affected_by = ch->getRace()->getAff();
+    ch->imm_flags   = ch->getRace()->getImm();
+    ch->res_flags   = ch->getRace()->getRes();
+    ch->vuln_flags  = ch->getRace()->getVuln();
+    ch->form        = ch->getRace()->getForm();
+    ch->parts       = ch->getRace()->getParts();
+    ch->wearloc.set(ch->getRace()->getWearloc());
+
     // Same raise as 'advance' from level 1.
     ch->setLevel(1);
     ch->exp = ch->getExpToLevel();
