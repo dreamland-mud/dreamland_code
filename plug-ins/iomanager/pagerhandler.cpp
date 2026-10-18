@@ -7,8 +7,7 @@
 #include "descriptor.h"
 #include "character.h"
 #include "colour.h"
-
-const char *MSG_HIT_RET       = "\r" C_YELLOW "[Нажмите клавишу Enter для продолжения]" ANSI_COLOR_RESET "\n\r";
+#include "l10n.h"
 
 PagerHandler::PagerHandler()
 {
@@ -80,7 +79,10 @@ PagerHandler::handle(Descriptor *d, char *input)
 void
 PagerHandler::prompt(Descriptor *d)
 {
-    d->send(MSG_HIT_RET);
+    DLString msg = DLString("\r") + C_YELLOW + "["
+        + _("Нажмите клавишу Enter для продолжения").getMessage(d->character)
+        + "]" + ANSI_COLOR_RESET + "\n\r";
+    d->send(msg.c_str());
 }
 
 
