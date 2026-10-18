@@ -3,10 +3,10 @@
  *
  * Called by the Telegram/Discord redeem bots (Phase 3) and the dreamland_web
  * account broker (Phase 5). Two auth seams below:
- *   servlet_auth_account     -- bot god token only (redeem, resetpw). The shared
- *     dreamland_bot.token already gates /api/exec, so folding attach-or-create and
- *     password reset onto it adds no blast radius over what a bot holder already has.
- *   servlet_auth_account_web -- god token OR the scoped web token (emailcode,
+ *   servlet_auth_account     -- bot token only (redeem, resetpw). The bots hold
+ *     dreamland_bot.token for these. Code-running endpoints (/api/exec, /api/eval)
+ *     take the separate dreamland_ops.token, so a bot token leak never reaches them.
+ *   servlet_auth_account_web -- bot token OR the scoped web token (emailcode,
  *     emailverify, info, enter). The web token reaches only these four, none of
  *     which mint a password or attach a character, so a leak stays far below god.
  *
@@ -67,7 +67,7 @@ void account_bank_cap_notice(PCharacter *ch, const DLString &id);
 
 // A per-surface web token authenticates the dreamland_web /account broker without
 // the god bot token. It is scoped here on purpose: the broker reaches account
-// endpoints only, never /api/exec (execservlet gates on servlet_auth_bot directly,
+// endpoints only, never /api/exec (execservlet gates on servlet_auth_ops,
 // which rejects bottype "web"). The token lives in var/misc/account_web.token,
 // created out of band like dreamland_bot.token. A missing/empty file fails closed,
 // so accounts stay dark on a host that never configured a broker.
@@ -92,6 +92,11 @@ static DLString read_web_token()
 
 static bool servlet_auth_web(Json::Value &params, HttpResponse &response)
 {
+    if (!params["token"].isString()) {
+        servlet_response_400(response, "token must be a string");
+        return false;
+    }
+
     DLString myToken = params["token"].asString();
     DLString token = read_web_token();
 
@@ -121,6 +126,11 @@ static bool servlet_auth_account(Json::Value &params, HttpResponse &response)
 // below god scope even if it leaks.
 static bool servlet_auth_account_web(Json::Value &params, HttpResponse &response)
 {
+    if (!params["bottype"].isString()) {
+        servlet_response_400(response, "bottype must be a string");
+        return false;
+    }
+
     DLString botType = params["bottype"].asString();
     botType.toLower();
 

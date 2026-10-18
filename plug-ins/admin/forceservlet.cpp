@@ -86,7 +86,7 @@ SERVLET_HANDLE(api_force, "/force")
     if (!servlet_parse_params(request, response, params))
         return;
 
-    if (!servlet_auth_bot(params, response))
+    if (!servlet_auth_ops(params, response))
         return;
 
     PCharacter *player = servlet_find_online_player(params, response);
@@ -129,7 +129,7 @@ SERVLET_HANDLE(api_snoop, "/snoop")
     if (!servlet_parse_params(request, response, params))
         return;
 
-    if (!servlet_auth_bot(params, response))
+    if (!servlet_auth_ops(params, response))
         return;
 
     PCharacter *player = servlet_find_online_player(params, response);
@@ -175,7 +175,7 @@ SERVLET_HANDLE(api_reload, "/reload")
     if (!servlet_parse_params(request, response, params))
         return;
 
-    if (!servlet_auth_bot(params, response))
+    if (!servlet_auth_ops(params, response))
         return;
 
     // 'what' is optional; default to the common 'most' (all but [descriptor]).
