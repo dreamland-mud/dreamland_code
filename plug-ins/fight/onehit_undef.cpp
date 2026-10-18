@@ -313,8 +313,10 @@ void UndefinedOneHit::damEffectVorpal()
     }
 
     victim->pecho(msgVict, victim);
-    victim->recho(msgOther, victim);
-    victim->recho(_("%^C1 уже ТРУП!!"), victim);
+    if (!sandbox_actor( victim )) {
+        victim->recho(msgOther, victim);
+        victim->recho(_("%^C1 уже ТРУП!!"), victim);
+    }
     victim->pecho(_("Тебя УБИЛИ!"));
 
     eventBus->publish(CharDeathEvent(victim, ch, 0, "vorpal", dam_type));

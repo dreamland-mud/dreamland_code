@@ -234,3 +234,8 @@ void extract_dead_player( PCharacter *ch, int flags )
         desireManager->find( i )->reset( ch );
 }
 
+
+bool sandbox_actor( Character *ch )
+{
+    return ch && !ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "sandbox" );
+}

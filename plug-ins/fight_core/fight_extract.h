@@ -16,5 +16,8 @@ void nuke_pets( PCharacter *ch, int flags );
 
 void notify_referers( Character *ch, int flags );
 
+/** The /api/sandbox test actor: its death is silent and never real. */
+bool sandbox_actor( Character *ch );
+
 
 #endif
