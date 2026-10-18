@@ -24,6 +24,7 @@
 #include "writing.h"
 #include "eating.h"
 #include "pcname.h"
+#include "sandboxservlet.h"
 #include "so.h"
 
 extern "C"
@@ -38,6 +39,7 @@ extern "C"
                 Plugin::registerPlugin<AccountConfigLoginListener>( ppl );
 
                 Plugin::registerPlugin<SpeedWalkUpdateTask>( ppl );
+                Plugin::registerPlugin<SandboxReaper>( ppl );
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSpeedWalk> >( ppl );
 
                 Plugin::registerPlugin<COrder>( ppl );

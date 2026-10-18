@@ -32,6 +32,7 @@
 #include "core/object.h"
 #include "religion.h"
 #include "playerattributes.h"
+#include "commonattributes.h"
 #include "player_account.h"
 #include "room.h"
 #include "affect.h"
@@ -1107,6 +1108,25 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
     // Last chance for the global onDeath handler to interrupt the death.
     if (gprog("onDeath", "CCisi", victim, ch, -1, label.c_str(), damtype))
         return;
+
+    // The /api/sandbox test actor never really dies: no corpse, penalties, ghost
+    // or pfile. It is parked in LIMBO, out of the fight, and the servlet ends the
+    // session when it sees the 'sandbox_died' mark.
+    if (!victim->is_npc( ) && victim->getPC( )->getAttributes( ).isAvailable( "sandbox" )) {
+        victim->getPC( )->getAttributes( ).getAttr<XMLEmptyAttribute>( "sandbox_died" );
+        // Drop affects so a DoT cannot keep "killing" the parked actor every tick.
+        for (auto &paf: victim->affected.clone())
+            affect_remove( victim, paf );
+        victim->hit = 1;
+        victim->position = POS_STANDING;
+        victim->pecho( "[sandbox: died]" );
+        Room *limbo = get_room_instance( ROOM_VNUM_LIMBO );
+        if (limbo && victim->in_room != limbo) {
+            char_from_room( victim );
+            char_to_room( victim, limbo );
+        }
+        return;
+    }
 
     // From this point on the death has certainly happened.
 

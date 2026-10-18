@@ -40,7 +40,8 @@
 
 #include "servlet.h"
 #include "servlet_utils.h"
-#include "bufferhandler.h"
+#include "execcapture.h"
+#include "commonattributes.h"
 #include "iconvmap.h"
 #include "xmlattributecoder.h"
 #include "pcharacter.h"
@@ -62,16 +63,6 @@ static IconvMap koi2utf("koi8-u", "utf-8");
 // LIMBO is empty of players and mobs, so char_to_room fires no greet/aggro.
 #define EXEC_ROOM_LIMBO 2
 
-/* A BufferHandler that captures output to a string instead of a socket. A
- * self-contained copy of olc/CaptureBufferHandler (whose .cpp lives in the olc
- * plugin) so this plugin needs no link against olc. Header-only. */
-class ExecCaptureBuffer : public BufferHandler {
-public:
-    virtual void write(Descriptor *, const char *txt) { captured << txt; }
-    DLString getString() const { return captured.str(); }
-private:
-    std::ostringstream captured;
-};
 
 /* Commands that manage the player's OWN session/pfile are meaningless for a
  * transient synthetic actor and awkward to run headless: quit/save write a junk
@@ -125,7 +116,9 @@ static PCharacter * exec_setup_char(Room *room, ExecCaptureBuffer *&capture, Des
     // characterwrapper.cpp: getAttr<> creates it if absent). get_trust() then
     // reports 0xFFFF, so is_immortal() is true too.
     ch->getAttributes().getAttr<XMLAttributeCoder>("coder");
-    d->associate(ch);                   // ch->desc = d; d->character = ch
+    // PCharacter::save() skips a char carrying 'nosave': no ExecBot pfile ever.
+    ch->getAttributes().getAttr<XMLEmptyAttribute>("nosave");
+    d->associate(ch);                  // ch->desc = d; d->character = ch
 
     // Register for real so commands that move/scan the actor behave and, above all,
     // so extract_char can clean up everything they attach.
