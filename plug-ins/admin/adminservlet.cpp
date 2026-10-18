@@ -62,6 +62,15 @@ SERVLET_HANDLE(cmd_admin, "/admin")
     DLString cmdArgs = message;
 
     if (cmd == "reboot") {
+        // 'reboot abort' dumps core on purpose. Fine for an immortal in the game,
+        // never over HTTP: the bot token plus any immortal's messenger id reaches here.
+        DLString sub = DLString(cmdArgs).getOneArgument();
+        sub.toLower();
+        if (sub == "abort") {
+            servlet_response_400(response, "reboot abort is in-game only");
+            return;
+        }
+
         reboot_action(cmdArgs, buf);
 
     } else if (cmd == "deny") {
