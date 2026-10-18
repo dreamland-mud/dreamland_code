@@ -1093,26 +1093,12 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
 
     stop_fighting( victim, true );
     victim->unsetLastFightTime( );
-    
-    // onDeath obj trigger for carried item can interrupt normal death handling.
-    if (oprog_death( victim, ch ))
-        return;
-    
-    if (ch)
-        mprog_kill( ch, victim );
 
-    // onDeath mob trigger can interrupt normal death handling.
-    if (mprog_death( victim, ch ))
-        return;
-
-    // Last chance for the global onDeath handler to interrupt the death.
-    if (gprog("onDeath", "CCisi", victim, ch, -1, label.c_str(), damtype))
-        return;
-
-    // The /api/sandbox test actor never really dies: no corpse, penalties, ghost
-    // or pfile. It is parked in LIMBO, out of the fight, and the servlet ends the
-    // session when it sees the 'sandbox_died' mark.
-    if (!victim->is_npc( ) && victim->getPC( )->getAttributes( ).isAvailable( "sandbox" )) {
+    // The /api/sandbox test actor never really dies, and nobody hears of it: no
+    // death triggers (Fenia onDeath, onKill, death cry, logs), corpse, penalties,
+    // ghost or pfile. It is parked in LIMBO, out of the fight, and the servlet
+    // ends the session when it sees the 'sandbox_died' mark.
+    if (sandbox_actor( victim )) {
         victim->getPC( )->getAttributes( ).getAttr<XMLEmptyAttribute>( "sandbox_died" );
         // Drop affects so a DoT cannot keep "killing" the parked actor every tick.
         for (auto &paf: victim->affected.clone())
@@ -1127,6 +1113,21 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
         }
         return;
     }
+
+    // onDeath obj trigger for carried item can interrupt normal death handling.
+    if (oprog_death( victim, ch ))
+        return;
+    
+    if (ch)
+        mprog_kill( ch, victim );
+
+    // onDeath mob trigger can interrupt normal death handling.
+    if (mprog_death( victim, ch ))
+        return;
+
+    // Last chance for the global onDeath handler to interrupt the death.
+    if (gprog("onDeath", "CCisi", victim, ch, -1, label.c_str(), damtype))
+        return;
 
     // From this point on the death has certainly happened.
 

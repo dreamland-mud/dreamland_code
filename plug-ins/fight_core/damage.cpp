@@ -20,6 +20,7 @@
 #include "skill.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
+#include "fight_extract.h"
 #include "object.h"
 #include "room.h"
 #include "affect.h"
@@ -647,9 +648,10 @@ void Damage::handlePosition( )
 /*-----------------------------------------------------------------------------
  * Payoff for killing things 
  *----------------------------------------------------------------------------*/
-void Damage::handleDeath( ) 
+void Damage::handleDeath( )
 {
-    oldact(_("$c1 уже {RТРУП{x!!"), victim, 0, 0, TO_ROOM);
+    if (!sandbox_actor( victim ))
+        oldact(_("$c1 уже {RТРУП{x!!"), victim, 0, 0, TO_ROOM);
     victim->pecho(_("Тебя {RУБИЛИ{x!!\n\r"));
     
     eventBus->publish(CharDeathEvent(victim, killer, 0, deathReason, dam_type));
