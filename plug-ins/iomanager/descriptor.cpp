@@ -284,7 +284,18 @@ int Descriptor::inputTelnet( unsigned char i )
                 case TELOPT_MSP:
                     SET_BIT(oob_proto, OOB_MSP);
                     break;
+                case TELOPT_TM:
+                    // Sent after IAC IP/AO (e.g. Ctrl-C): the client drops all
+                    // our output until the timing mark is answered. WONT, not
+                    // WILL: a naive client cannot take it as a fresh offer.
+                    static const unsigned char tm_wont_str[] = { IAC, WONT, TELOPT_TM };
+                    writeRaw(tm_wont_str, sizeof(tm_wont_str));
+                    break;
             }
+            telnet.state = TNS_NORMAL;
+            break;
+
+        case WONT:
             telnet.state = TNS_NORMAL;
             break;
 
