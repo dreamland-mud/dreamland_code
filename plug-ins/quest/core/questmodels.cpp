@@ -72,9 +72,6 @@ bool RoomQuestModel::checkRoom( PCharacter *ch, Room *room )
     if (!room->isCommon( ))
         return false;
 
-    if (!room_has_exits(room)) 
-        return false;
-
     return true;
 }
 
@@ -84,6 +81,9 @@ bool RoomQuestModel::checkRoomClient( PCharacter *pch, Room *room )
         return false;
 
     if (!checkRoom( pch, room ))
+        return false;
+
+    if (!room_has_exits(room)) 
         return false;
 
     // No aggressive mobs standing nearby the client.
@@ -99,6 +99,9 @@ bool RoomQuestModel::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *
         return false;
 
     if (!checkRoom( pch, room ))
+        return false;
+
+    if (victimNeedsExits( ) && !room_has_exits(room)) 
         return false;
 
     // No additional aggrs in victim room for newbie.    
@@ -482,7 +485,7 @@ bool VictimQuestModel::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     if (!checkMobile( pch, mob ))
         return false;
 
-    if (IS_SET( mob->act,  ACT_NOTRACK  ))
+    if (victimRefusesNoTrack( ) && IS_SET( mob->act,  ACT_NOTRACK  ))
         return false;
 
     if (IS_SET( mob->imm_flags, IMM_SPELL|IMM_WEAPON ))

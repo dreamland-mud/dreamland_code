@@ -28,6 +28,7 @@ protected:
     virtual bool checkRoom( PCharacter *, Room * );
     virtual bool checkRoomVictim( PCharacter *, Room *, NPCharacter * );
     virtual bool checkRoomClient( PCharacter *, Room * );
+    virtual bool victimNeedsExits( ) const { return true; }
     bool checkRoomForTraverse(PCharacter *, Room *);
     void findClientRooms( PCharacter *, RoomList & );
     void findClientRooms( PCharacter *, RoomList &, const VnumList & );
@@ -112,6 +113,7 @@ protected:
 class VictimQuestModel : public virtual MobileQuestModel {
 protected:
     virtual bool checkMobileVictim( PCharacter *, NPCharacter * );
+    virtual bool victimRefusesNoTrack( ) const { return true; }
     void findVictims( PCharacter *, MobileList & );
     void findVictims( PCharacter *, MobIndexMap & );
     NPCharacter * getRandomVictim( PCharacter * );

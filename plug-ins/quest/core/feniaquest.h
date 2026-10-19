@@ -112,6 +112,8 @@ protected:
     virtual bool checkMobileClient( PCharacter *, NPCharacter * );
     virtual bool checkItem( PCharacter *, ::Object * );
     virtual bool checkRoomClient( PCharacter *, Room * );
+    virtual bool victimNeedsExits( ) const { return !selectParams.allowNoExits; }
+    virtual bool victimRefusesNoTrack( ) const { return !selectParams.allowNoTrack; }
 
     bool passesParams( PCharacter *, NPCharacter * );
 

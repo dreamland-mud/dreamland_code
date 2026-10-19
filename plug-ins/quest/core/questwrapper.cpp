@@ -674,6 +674,26 @@ NMI_SET( QuestSelectWrapper, carriedByNpc, "предмет должен быть
     params.carriedByNpc = arg.toBoolean( );
 }
 
+NMI_GET( QuestSelectWrapper, allowNoTrack, "брать в жертвы мобов с флагом notrack" )
+{
+    return Register( params.allowNoTrack );
+}
+
+NMI_SET( QuestSelectWrapper, allowNoTrack, "брать в жертвы мобов с флагом notrack" )
+{
+    params.allowNoTrack = arg.toBoolean( );
+}
+
+NMI_GET( QuestSelectWrapper, allowNoExits, "брать в жертвы мобов в комнатах без обычных выходов" )
+{
+    return Register( params.allowNoExits );
+}
+
+NMI_SET( QuestSelectWrapper, allowNoExits, "брать в жертвы мобов в комнатах без обычных выходов" )
+{
+    params.allowNoExits = arg.toBoolean( );
+}
+
 NMI_INVOKE( QuestSelectWrapper, addVnum, "(vnum): добавить внум прототипа в список допустимых" )
 {
     const Register &reg = argnum( args, 1 );
