@@ -218,13 +218,13 @@ WEBMANIP_RUN(decorateMobile)
             manips.addLocal("list", "");
 
         if (mob_has_occupation(victim, OCC_QUEST_MASTER)) {
-            manips.addLocal("quest", "попросить");
-            manips.addLocal("quest", "сдать");
-            manips.addLocal("quest", "отменить");
+            manips.addLocal("quest", LangText{"request", "попросить", "попросити"}.get(manips.lang));
+            manips.addLocal("quest", LangText{"complete", "сдать", "завершити"}.get(manips.lang));
+            manips.addLocal("quest", LangText{"cancel", "отменить", "скасувати"}.get(manips.lang));
         }
 
         if (mob_has_occupation(victim, OCC_QUEST_TRADER)) {
-            manips.addLocal("quest", "список");
+            manips.addLocal("quest", LangText{"list", "список", "список"}.get(manips.lang));
         }
 
         if (has_trigger_mount( victim ))

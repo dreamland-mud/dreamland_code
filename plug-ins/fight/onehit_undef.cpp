@@ -347,7 +347,7 @@ void UndefinedOneHit::message( )
         else {
             msgRoom(_("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %4$C2"), dam, &noun, ch, victim);
             msgChar(_("%2$^T1 %2$O1 бессил%2$Gьно|ен|ьна|ьны против %3$C2"), dam, &noun, victim);
-            msgVict(_("Против тебя %3$O1 %2$C2 бессил%3$Gьно|ен|ьна"), dam, ch, &noun);
+            msgVict(_("Против тебя %3$O1 %2$C2 бессил%3$Gьно|ен|ьна|ьны"), dam, ch, &noun);
         }
     }
     else {
