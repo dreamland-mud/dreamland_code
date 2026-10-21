@@ -140,11 +140,21 @@ int Pet::getLevel( Character * ) const
     return ch->getRealLevel( );
 }
 
+// Price follows the pet's quality: its tier scales the 10 x level^2 base,
+// trash half, elite three times, champion and up eight times.
 int Pet::toSilver( Character *client ) const
 {
     int level = getLevel( client );
+    int base = 10 * level * level;
+    int tier = ch->getNPC( )->getTier( );
 
-    return 10 * level * level;
+    if (tier >= 1 && tier <= 4)
+        return base * 8;
+    if (tier == 5)
+        return base * 3;
+    if (tier == 9)
+        return base / 2;
+    return base;
 }
 
 int Pet::haggle( Character *client ) const
@@ -223,6 +233,18 @@ void LevelAdaptivePet::config( PCharacter *client, NPCharacter *pet ) const
 
     level = getLevel( client );
     pet->setLevel( level );
+
+    // The pet grows by the same tier ruler as every mob of its level; the old
+    // ladder below is only the fallback while mob_tiers.json is absent.
+    // Caster bits go first: the tier centres read the class acts.
+    if (level <= 20)
+        REMOVE_BIT( pet->act, ACT_CLERIC|ACT_MAGE );
+
+    if (apply_mob_tier( pet, level, pet->getTier( ) )) {
+        if (!IS_SET( pet->act, ACT_CLERIC|ACT_MAGE ))
+            pet->mana = pet->max_mana = 0;
+        return;
+    }
 
     if (level <= 13)            pet->hit = level * number_range( 12, 13 );
     else if (level <= 21)   pet->hit = level * number_range( 16, 18 );
