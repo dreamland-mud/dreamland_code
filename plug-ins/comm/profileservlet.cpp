@@ -29,6 +29,7 @@
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
 #include "remortdata.h"
+#include "grammar_entities_impl.h"
 #include "merc.h"
 #include "pcrace.h"
 #include "profession.h"
