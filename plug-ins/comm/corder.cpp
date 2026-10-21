@@ -192,7 +192,10 @@ COMMAND(COrder, "order")
 
     // Run the command without further error feedback. Mark the master, to use later in echoMaster checks.
     ch->getPC()->getAttributes().getAttr<XMLEmptyAttribute>("ordering");
-    iargs.pCommand->entryPoint( victim, iargs.cmdArgs );
+    {
+        InterpretActorGuard guard( victim );
+        iargs.pCommand->entryPoint( victim, iargs.cmdArgs );
+    }
     ch->getPC()->getAttributes().eraseAttribute("ordering");
     
     ch->setWaitViolence( 1 );

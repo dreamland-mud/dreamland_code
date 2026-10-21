@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include "interp.h"
 #include "json/json.h"
 
 #include "wrapperbase.h"
@@ -191,6 +192,7 @@ InterpretHandler::handle(Descriptor *d, char *arg)
     if (omprog_command( iargs.ch, iargs.cmdName, iargs.cmdArgs ))
         return 0;
 
+    InterpretActorGuard guard( iargs.ch );
     iargs.pCommand->entryPoint( iargs.ch, iargs.cmdArgs );
     return 0;
 }
