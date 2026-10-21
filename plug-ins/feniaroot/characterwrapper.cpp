@@ -5600,15 +5600,15 @@ static void ga_pathcost( Room *start, int destVnum, int chLevel, bool isVampire,
     }
 }
 
-// The character who ultimately holds this object (worn or carried), walking out of
-// any nested containers. Null when the item rests in a room / on a shop floor.
-
 // A worn item the sage counts as the char's gear: on the body and in a slot that
 // gives stats. Hair, tail, personal and stuck_in hold trinkets for show only.
 static bool ga_wornCounts( ::Object *o )
 {
     return o->wear_loc != wear_none && o->wear_loc->givesAffects( );
 }
+
+// The character who ultimately holds this object (worn or carried), walking out of
+// any nested containers. Null when the item rests in a room / on a shop floor.
 
 static Character * ga_rootCarrier( ::Object *o )
 {
