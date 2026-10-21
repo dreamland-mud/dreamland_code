@@ -632,3 +632,8 @@ const DLString & DefaultRace::getMoveVerb( ) const
 {
     return moveverb.getValue( );
 }
+
+const DLString & DefaultRace::getSpec( ) const
+{
+    return spec.getValue( );
+}

@@ -225,3 +225,8 @@ const DLString & Race::getMoveVerb( ) const
 {
     return DLString::emptyString;
 }
+
+const DLString & Race::getSpec( ) const
+{
+    return DLString::emptyString;
+}

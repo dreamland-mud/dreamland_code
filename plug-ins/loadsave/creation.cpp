@@ -322,6 +322,14 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
 
     mob->spec_fun = pMobIndex->spec_fun;
 
+    // A race may carry a default spec; the prototype's own spec always wins.
+    if (!mob->spec_fun.func && race && !race->getSpec().empty()) {
+        mob->spec_fun.name = race->getSpec();
+        mob->spec_fun.func = spec_lookup(mob->spec_fun.name.c_str());
+        if (!mob->spec_fun.func)
+            mob->spec_fun.name.clear();
+    }
+
     if (pMobIndex->wealth == 0) {
         mob->silver = 0;
         mob->gold = 0;
