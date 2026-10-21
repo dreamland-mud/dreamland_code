@@ -16,6 +16,7 @@
 
 class Gangsters;
 class Room;
+class MultiMessage;
 
 class GangMob : public BasicMobileDestiny {
 XML_OBJECT    
@@ -62,7 +63,7 @@ protected:
 
     bool eatKey( );
     bool canAttack( Character * );
-    void yell( Character *, const DLString& );
+    void yell( Character *, const MultiMessage& );
     PCharacter * getFightingRoom( Room *const );
     PCharacter * getFightingRoom( );
 

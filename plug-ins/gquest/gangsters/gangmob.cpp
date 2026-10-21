@@ -301,7 +301,7 @@ void GangMember::greet( Character *mob )
                 }
             }
             if (mob->can_see(ch)) {
-                yell( mob, "Смерть преступникам!");
+                yell( mob, _("%1$^C1 пронзительно кричит '{YСмерть преступникам!{x'") );
                 multi_hit( mob, ch );
             }
         }
@@ -326,10 +326,10 @@ void GangMember::greet( Character *mob )
             }
             
             if (mob->can_see( ch )) {
-                yell( mob, "Это преступник! Хватайте его!" );
+                yell( mob, _("%1$^C1 пронзительно кричит '{YЭто преступник! Хватайте его!{x'") );
 
                 if (number_percent( ) < 50 && canAttack( mob ) && ch->can_see( mob )) {
-                    do_say( ch, "Да заткнись ты, зараза!" );
+                    say_fmt( _("Да заткнись ты, зараза!"), ch );
                     multi_hit( ch, mob );
                 }
             }
@@ -481,14 +481,9 @@ bool GangMember::death( Character *killer )
     return false;
 }
 
-void GangMember::yell( Character *mob, const DLString &msg ) 
+void GangMember::yell( Character *mob, const MultiMessage &msg ) 
 {
-    std::basic_ostringstream<char> buf;
-    DLString name = mob->getNameP( '1' );
-    name.upperFirstCharacter( );
-        
-    buf << name << " пронзительно кричит '{Y" << msg << "{x'" << endl;
-    GQChannel::zecho( Gangsters::getThis( ), mob->in_room->area, buf.str( ) );
+    GQChannel::zecho( Gangsters::getThis( ), mob->in_room->area, msg, mob );
 }
 
 bool GangMember::eatKey( ) 
