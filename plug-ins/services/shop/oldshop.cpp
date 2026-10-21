@@ -835,7 +835,7 @@ ShopTrader::Pointer find_keeper( Character *ch )
     if ( IS_SET(keeper->in_room->area->area_flag,AREA_HOMETOWN)
          && !ch->is_npc() && IS_SET(ch->act,PLR_WANTED) )
     {
-        do_say( keeper, "Преступникам не место здесь!" );
+        say_fmt( _("Преступникам не место здесь!"), keeper, ch );
         DLString msg = fmt( 0, _("%1$C1 -- преступни%1$Gк|к|ца|ки! Хватайте %1$P2!"), ch );
         do_yell( keeper, msg.c_str( ) );
         return null;
@@ -846,7 +846,7 @@ ShopTrader::Pointer find_keeper( Character *ch )
     */
     if (time_info.hour > trader->closeHour) 
     {
-        do_say( keeper, "Извини, магазин уже закрыт. Приходи завтра." );
+        say_fmt( _("Извини, магазин уже закрыт. Приходи завтра."), keeper, ch );
         return null;
     }
 
@@ -855,17 +855,17 @@ ShopTrader::Pointer find_keeper( Character *ch )
     */
     if ( !keeper->can_see( ch ) && !ch->is_immortal() )
     {
-        do_say( keeper, "Я не торгую с тем, кого не вижу." );
+        say_fmt( _("Я не торгую с тем, кого не вижу."), keeper, ch );
         return null;
     }
 
     if (keeper->fighting) {
-        do_say( keeper, "Подожди немного, мне сейчас не до тебя." );
+        say_fmt( _("Подожди немного, мне сейчас не до тебя."), keeper, ch );
         return null;
     }
 
     if (!ch->can_see(keeper)) {
-        do_say(keeper, "Ты же меня не видишь, торговать у нас не получится.");
+        say_fmt( _("Ты же меня не видишь, торговать у нас не получится."), keeper, ch );
         return null;
     }
 
