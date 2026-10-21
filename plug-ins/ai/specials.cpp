@@ -134,7 +134,8 @@ bool BasicMobileBehavior::doInvis()
     // Elite and stronger thieves ask for hide too, in a zone with players:
     // the class kit's stealth list in Fenia decides which of them keep it.
     int tier = ch->getNPC()->getTier();
-    if (IS_SET(ch->act, ACT_THIEF) && tier >= 1 && tier <= 5 && !ch->in_room->area->empty)
+    if (IS_SET(ch->act, ACT_THIEF) && tier >= 1 && tier <= 5
+        && ch->in_room && !ch->in_room->area->empty)
         innate |= AFF_HIDE;
     if (!innate || (ch->affected_by & innate) == innate)
         return false;
