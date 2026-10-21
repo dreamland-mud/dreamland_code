@@ -104,6 +104,7 @@ public:
     virtual double getHpMult( ) const;
     virtual double getDmgMult( ) const;
     virtual const DLString & getMoveVerb( ) const;
+    virtual const DLString & getSpec( ) const;
 
     XML_VARIABLE XMLFlagsNoEmpty         det;
     XML_VARIABLE XMLFlagsNoEmpty         act;
@@ -141,6 +142,8 @@ public:
     XML_VARIABLE XMLStringNoEmpty  material;
     XML_VARIABLE XMLStringNoEmpty  hpMult, dmgMult;
     XML_VARIABLE XMLStringNoEmpty  moveverb;
+    // Default spec_fun for mobs of this race whose prototype has none.
+    XML_VARIABLE XMLStringNoEmpty  spec;
 
 // MOC_SKIP_BEGIN
 protected:

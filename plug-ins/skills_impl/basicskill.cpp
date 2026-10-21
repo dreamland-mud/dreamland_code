@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include "basicskill.h"
+#include "skillsflags.h"
 #include "logstream.h"
 
 #include "wrapperbase.h"
@@ -57,6 +58,7 @@ BasicSkill::BasicSkill()
                   autobuff( false ),
                   align( 0, &align_table ),
                   ethos( 0, &ethos_table ),
+                  bodyNeeds( 0, &skill_req_flags ),
                   grants( skillManager )
 {
 

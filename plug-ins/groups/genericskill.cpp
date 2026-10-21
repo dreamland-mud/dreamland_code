@@ -25,6 +25,11 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "skillsflags.h"
+#include "wearlocation.h"
+#include "char_weight.h"
+
+WEARLOC(wield);
 
 PROF(none);
 PROF(vampire);
@@ -146,7 +151,7 @@ bool GenericSkill::usable( Character *ch, bool message = false ) const
         return false;
     
     if (ch->is_npc( ))
-        return true;
+        return npcBodyFits( ch );
 
     // Vampires have a restriction that spells are only available in vamp form.
     if (ch->getProfession( ) != prof_vampire)
@@ -170,6 +175,23 @@ bool GenericSkill::usable( Character *ch, bool message = false ) const
         ch->pecho(_("Для этого необходимо превратиться в вампира!"));
 
     return false;
+}
+
+/*
+ * Does the NPC body meet the skill's <bodyNeeds>: a weapon skill needs a wield
+ * slot and the ability to carry (owned pets carry nothing), a hands skill needs
+ * the hands part.
+ */
+bool GenericSkill::npcBodyFits( Character *ch ) const
+{
+    if (bodyNeeds.isSet( SKILL_REQ_WEAPON )
+        && (Char::canCarryNumber( ch ) <= 0 || !ch->wearloc.isSet( wear_wield )))
+        return false;
+
+    if (bodyNeeds.isSet( SKILL_REQ_HANDS ) && !IS_SET( ch->parts, PART_HANDS ))
+        return false;
+
+    return true;
 }
 
 bool GenericSkill::availableForAll( ) const

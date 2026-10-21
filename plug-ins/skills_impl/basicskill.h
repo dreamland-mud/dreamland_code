@@ -108,6 +108,8 @@ public:
     XML_VARIABLE XMLIntegerNoEmpty manaPenalty, movesPenalty, healthPenalty;
     XML_VARIABLE XMLIntegerNoEmpty hard;
     XML_VARIABLE XMLFlagsNoEmpty   align, ethos;
+    // Body requirements for NPCs (skill_req_flags): <bodyNeeds>weapon</bodyNeeds>
+    XML_VARIABLE XMLFlagsNoEmpty   bodyNeeds;
 
     XML_VARIABLE XMLPointerNoEmpty<AffectHandler> affect;
     XML_VARIABLE XMLPointerNoEmpty<Spell> spell;

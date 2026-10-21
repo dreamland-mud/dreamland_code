@@ -41,6 +41,7 @@ public:
     virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
+    bool npcBodyFits( Character * ) const;
     virtual int getLevel( Character * ) const;
     virtual int getLearned( Character * ) const;
     virtual int getRating( PCharacter * ) const;

@@ -77,6 +77,7 @@ public:
     virtual double getHpMult( ) const;
     virtual double getDmgMult( ) const;
     virtual const DLString & getMoveVerb( ) const;
+    virtual const DLString & getSpec( ) const;
 
 protected:
     DLString name;

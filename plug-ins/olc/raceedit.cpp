@@ -184,6 +184,8 @@ void OLCStateRace::show( PCharacter *ch )
         r->hpMult.empty() ? "1.0" : r->hpMult.c_str(),
         r->dmgMult.empty() ? "1.0" : r->dmgMult.c_str(),
         r->moveverb.empty() ? "-" : r->moveverb.c_str());
+    ptc(ch, "Спецфункция:   {Y%s{x {D(spec){x\r\n",
+        r->spec.empty() ? "-" : r->spec.c_str());
 
     ptc(ch, "Политика:      охотится [{r%s{x] {D(hunts){x, делится [{g%s{x] {D(donates){x\r\n",
            r->hunts.toString().c_str(), r->donates.toString().c_str());
@@ -355,6 +357,10 @@ RACEEDIT(dmgmult, "уронмножитель", "множитель урона �
 RACEEDIT(moveverb, "походка", "глагол движения мобов расы, перекрывает форму (hopping, crawling...)")
 {
     return editor(argument, getOriginal()->moveverb, ED_NO_NEWLINE);
+}
+RACEEDIT(spec, "спец", "спецфункция мобов расы, если у прототипа своей нет (spec_breath_any...)")
+{
+    return editor(argument, getOriginal()->spec, ED_NO_NEWLINE);
 }
 RACEEDIT(size, "размер", "размеры (? size_table)")
 {

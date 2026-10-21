@@ -151,21 +151,7 @@ GSN(dark_shroud);
 GSN(manacles);
 GSN(spellbane);
 GSN(charm_person);
-// Weapon/utility skills excluded from a weaponless pet's report, and the
-// combat-invalid set.
-GSN(lash);
-GSN(bash);
-GSN(hand_to_hand);
-GSN(sword);
-GSN(polearm);
-GSN(dagger);
-GSN(whip);
-GSN(grip);
-GSN(axe);
-GSN(mace);
-GSN(shield_block);
-GSN(flail);
-GSN(slice);
+// The pet report's second-weapon special case and the combat-invalid set.
 GSN(second_weapon);
 GSN(pick_lock);
 GSN(recall);
@@ -7561,19 +7547,6 @@ NMI_INVOKE( CharacterWrapper, skillsInfo, "(): список структур д�
     return ::wrap(list);
 }
 
-// Weapon/utility skills that make no sense in a weaponless pet's report.
-// Same list the retired C++ 'report' command used.
-static bool report_skill_invalid(int sn, bool noCarry)
-{
-    if (!noCarry)
-        return false;
-    return sn == gsn_lash || sn == gsn_bash || sn == gsn_hand_to_hand
-        || sn == gsn_sword || sn == gsn_polearm || sn == gsn_dagger
-        || sn == gsn_whip || sn == gsn_grip || sn == gsn_axe
-        || sn == gsn_mace || sn == gsn_shield_block || sn == gsn_flail
-        || sn == gsn_slice || sn == gsn_second_weapon || sn == gsn_pick_lock;
-}
-
 // Skills that can never be ordered while the pet is fighting.
 static bool report_skill_invalid_in_fight(int sn)
 {
@@ -7593,7 +7566,6 @@ NMI_INVOKE( CharacterWrapper, reportSkills, "(): для очарованного
         return ::wrap(list);
     Character *master = pet->master;
 
-    bool noCarry = Char::canCarryNumber(pet) == 0 || !pet->wearloc.isSet(wear_wield);
     // properOrder inspects the pet's fighting flag to test fight-context
     // orderability; toggle it around the check and restore, never clobber.
     Character *savedFighting = pet->fighting;
@@ -7614,9 +7586,6 @@ NMI_INVOKE( CharacterWrapper, reportSkills, "(): для очарованного
             pet->fighting = pet;
             bool canOrderFight = (cmd->properOrder(pet) == RC_ORDER_OK) && !report_skill_invalid_in_fight(sn);
             pet->fighting = savedFighting;
-
-            if (report_skill_invalid(sn, noCarry))
-                continue;
 
             if (sn == gsn_second_weapon) {
                 if (!(canOrder && pet->wearloc.isSet(wear_second_wield)))
@@ -7639,7 +7608,7 @@ NMI_INVOKE( CharacterWrapper, reportSkills, "(): для очарованного
             bucket = 2;
             showallOnly = !IS_SET(spell->getTarget(), TAR_CHAR_ROOM);
         }
-        else if (passive && !report_skill_invalid(sn, noCarry)) {
+        else if (passive) {
             bucket = 3;
             showallOnly = true;
         }
