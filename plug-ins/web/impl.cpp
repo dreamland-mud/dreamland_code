@@ -75,6 +75,7 @@ static const DLString PROTECT = "pro";
 static const DLString TRAVEL = "trv";
 static const DLString MALAD = "mal";
 static const DLString CLAN = "cln";
+static const DLString COOLDOWN = "cd";
 static const DLString PARAM1 = "p1";
 static const DLString PARAM2 = "p2";
 static const DLString PERM_STAT = "ps";
@@ -487,14 +488,16 @@ void CalendarWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &
 /*-------------------------------------------------------------------------
  * AffectsWebPromptListener
  *
- * Fully data-driven affect panel. Each active affect goes into one of six columns
- * (pro/det/trv/enh/mal/cln) and renders with a short, viewer-language label. Column
+ * Fully data-driven affect panel. Each active affect goes into one of seven columns
+ * (pro/det/trv/enh/mal/cln/cd) and renders with a short, viewer-language label. Column
  * and label come from the skill profile fields <webColumn>/<webLabel> (dreamland_world
  * skills), or from config/affectpanel.json for raw engine bits (detects, item/racial
  * affects with no spell). An affect whose skill sets no <webColumn> still shows --
  * auto-classified offensive->mal, else ->enh -- so new affects are never silently
  * missing; run scripts/lint-affect-labels.py to find those still on the auto-fallback.
  * To keep an internal/tracking affect out of the panel, say so: <webColumn>none</webColumn>.
+ * "cd" holds reuse timers (the "you can do X again" affects): the client gives them
+ * their own colour so they don't read as buffs.
  *------------------------------------------------------------------------*/
 
 // config/affectpanel.json -> column -> raw-bit key -> per-language label.
@@ -752,6 +755,7 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
     attr->updateIfNew( TRAVEL,  pc.cols[TRAVEL],  prompt );
     attr->updateIfNew( MALAD,   pc.cols[MALAD],   prompt );
     attr->updateIfNew( CLAN,    pc.cols[CLAN],    prompt );
+    attr->updateIfNew( COOLDOWN, pc.cols[COOLDOWN], prompt );
 
     // Stable English affect keys (sysnames) for the mudjs autobuff manual-entry
     // gate. The panels above carry localized labels, which the client can't match
