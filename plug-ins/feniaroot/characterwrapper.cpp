@@ -5602,6 +5602,14 @@ static void ga_pathcost( Room *start, int destVnum, int chLevel, bool isVampire,
 
 // The character who ultimately holds this object (worn or carried), walking out of
 // any nested containers. Null when the item rests in a room / on a shop floor.
+
+// A worn item the sage counts as the char's gear: on the body and in a slot that
+// gives stats. Hair, tail, personal and stuck_in hold trinkets for show only.
+static bool ga_wornCounts( ::Object *o )
+{
+    return o->wear_loc != wear_none && o->wear_loc->givesAffects( );
+}
+
 static Character * ga_rootCarrier( ::Object *o )
 {
     ::Object *top = o;
@@ -6568,7 +6576,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         };
         std::map<int,std::vector<GAOnce>> pool;
         for (::Object *o = target->carrying; o; o = o->next_content) {
-            if (o->wear_loc == wear_none)
+            if (!ga_wornCounts( o ))
                 continue;
             int slot = o->pIndexData->wear_flags;
             REMOVE_BIT( slot, ITEM_TAKE );
@@ -6762,7 +6770,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // its armour slots from upgrades either.
     std::map<int,int> wornSetMask;
     for (::Object *o = target->carrying; o; o = o->next_content) {
-        if (o->wear_loc == wear_none)
+        if (!ga_wornCounts( o ))
             continue;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
@@ -6902,7 +6910,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     struct GAPaired { int count; double minScore; int minVnum; };
     GAPaired pairFinger = { 0, 0.0, 0 }, pairNeck = { 0, 0.0, 0 }, pairWrist = { 0, 0.0, 0 };
     for (::Object *o = target->carrying; o; o = o->next_content) {
-        if (o->wear_loc == wear_none)
+        if (!ga_wornCounts( o ))
             continue;
         int ws = o->pIndexData->wear_flags;
         REMOVE_BIT( ws, ITEM_TAKE );
@@ -7192,7 +7200,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         } else if (lightBrowse) {
             // Light items carry no wear_flags bit -- match on item_type. One light slot.
             for (::Object *o = target->carrying; o; o = o->next_content) {
-                if (o->wear_loc == wear_none)
+                if (!ga_wornCounts( o ))
                     continue;
                 if (o->pIndexData->item_type != ITEM_LIGHT)
                     continue;
@@ -7200,7 +7208,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             }
         } else {
             for (::Object *o = target->carrying; o; o = o->next_content) {
-                if (o->wear_loc == wear_none)
+                if (!ga_wornCounts( o ))
                     continue;
                 int ws = o->pIndexData->wear_flags;
                 REMOVE_BIT( ws, ITEM_TAKE );
