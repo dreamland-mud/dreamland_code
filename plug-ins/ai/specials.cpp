@@ -40,6 +40,14 @@
 bool BasicMobileBehavior::spec( )
 {
     if (ch->fighting) {
+        // A charmed mob calls no help, quaffs and scavenges nothing (specFight),
+        // but a player's pet still casts through the tier AI (onCastAI). The
+        // tick stays taken either way, as it was before pets could cast.
+        if (IS_CHARMED( ch )) {
+            specFightCaster( );
+            return true;
+        }
+
         if (specFight( ))
             return true;
         
