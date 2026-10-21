@@ -49,6 +49,17 @@ Rat::Rat( )
     timer.setValue( -1 );
 }
 
+// Rat pups are a first-life perk: remorted characters cannot buy them.
+bool Rat::purchase( Character *client, NPCharacter *keeper, const DLString &arguments, int quantity )
+{
+    if (!client->is_npc( ) && client->getPC( )->getRemorts( ).size( ) > 0) {
+        client->pecho( _("Крысята доверяются только тем, кто живет свою первую жизнь.") );
+        return false;
+    }
+
+    return LevelAdaptivePet::purchase( client, keeper, arguments, quantity );
+}
+
 bool Rat::death( Character *killer ) {
    
     if (!killer || killer == ch)

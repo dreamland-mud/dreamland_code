@@ -22,6 +22,7 @@ public:
     
         Rat( );
 
+        virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
         virtual bool death( Character *killer );
         virtual void stopfol( Character *master );
         virtual bool area( );
