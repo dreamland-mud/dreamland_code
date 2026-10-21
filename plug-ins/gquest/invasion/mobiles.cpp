@@ -82,7 +82,7 @@ void InvasionHelper::tell( Character *victim, const char *speech )
     Object *obj;
     unsigned int size;
     PCharacter *pch;
-    static RegExp help( "help|помогу|помочь|помощь|допоможу|допомогти|допомога" );
+    static RegExp help( "help|помогу|помочь|помощ|допомо" );
     InvasionGQuest *gquest = InvasionGQuest::getThis( );
     
     if (victim->is_npc( ))
