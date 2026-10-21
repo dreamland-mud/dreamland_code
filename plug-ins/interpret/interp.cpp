@@ -14,6 +14,24 @@
 #include "merc.h"
 #include "def.h"
 
+static Character *current_actor = 0;
+
+Character * interpret_actor( )
+{
+    return current_actor;
+}
+
+InterpretActorGuard::InterpretActorGuard( Character *ch )
+        : saved( current_actor )
+{
+    current_actor = ch;
+}
+
+InterpretActorGuard::~InterpretActorGuard( )
+{
+    current_actor = saved;
+}
+
 bool interpret( Character *ch, const char *line )
 {
     InterpretArguments iargs;
@@ -35,8 +53,10 @@ bool interpret( Character *ch, const char *line )
     if (!iargs.pCommand)
         return false;
 
-    if (iargs.pCommand->dispatch( iargs ) == RC_DISPATCH_OK)
+    if (iargs.pCommand->dispatch( iargs ) == RC_DISPATCH_OK) {
+        InterpretActorGuard guard( ch );
         iargs.pCommand->entryPoint( ch, iargs.cmdArgs );
+    }
 
     return true;
 }
@@ -77,6 +97,7 @@ bool interpret_cmd( Character *ch, const char *cmd, const char *argsFormat, ... 
 
     if (iargs.pCommand)
         if (iargs.pCommand->dispatch( iargs ) == RC_DISPATCH_OK) {
+            InterpretActorGuard guard( ch );
             iargs.pCommand->entryPoint( ch, iargs.cmdArgs );
             return true;
         }
@@ -106,8 +127,10 @@ void interpret_raw( Character *ch, const char *cmd, const char *format, ... )
 
     CommandInterpreter::getThis( )->run( iargs );
 
-    if (iargs.pCommand)
+    if (iargs.pCommand) {
+        InterpretActorGuard guard( ch );
         iargs.pCommand->entryPoint( ch, iargs.cmdArgs );
+    }
 //    else
 //        LogStream::sendWarning( ) << "No command '" << cmd << "' for raw interpret!" << endl;
 }

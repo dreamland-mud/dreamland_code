@@ -166,6 +166,7 @@ bool BasicMobileBehavior::trailOpen( Character *wch, Room *to )
 
 bool BasicMobileBehavior::trackLastFought( Character *wch )
 {
+    InterpretActorGuard guard( ch );
     Room *room = ch->in_room;
     EXIT_DATA *pexit = 0;
     EXTRA_EXIT_DATA *peexit = 0;

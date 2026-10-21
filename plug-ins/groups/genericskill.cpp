@@ -147,6 +147,10 @@ bool GenericSkill::available( Character *ch ) const
  */
 bool GenericSkill::usable( Character *ch, bool message = false ) const
 {
+    // Untrained still counts as usable, see getLearned.
+    if (ch->is_npc( ) && mob.untrained.getValue( ) > 0)
+        return npcBodyFits( ch );
+
     if (!available( ch ))
         return false;
     
@@ -256,6 +260,16 @@ int GenericSkill::getLevel( Character *ch ) const
  */
 int GenericSkill::getLearned( Character *ch ) const
 {
+    // A mob wielding a weapon its classes don't train (or not yet, at its
+    // level) still knows the basics.
+    if (ch->is_npc( ) && mob.untrained.getValue( ) > 0) {
+        if (!npcBodyFits( ch ))
+            return 0;
+        if (!visible( ch ) || !available( ch ))
+            return mob.untrained.getValue( );
+        return mob.getLearned( ch->getNPC( ), this );
+    }
+
     if (!usable( ch ))
         return 0;
 

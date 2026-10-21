@@ -120,6 +120,8 @@ void BasicMobileBehavior::fight( Character *victim, string command )
     if (ch->wait > 0)
         return;
 
+    // The AI's choices (tools, blunders) lag the mob itself: its own lag.
+    InterpretActorGuard guard( ch );
     gprog("onFightAI", "C", ch);
 }
 

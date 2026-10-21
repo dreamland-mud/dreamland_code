@@ -234,6 +234,14 @@ static void ocombatcast_fight( Object *obj, Character *ch, int &instanceProcs )
     if (!fromInstance && !obj->pIndexData->props.isMember( "combatcast" ))
         return;
 
+    // A prototype that casts from its own Fenia onFight declares combatcast only
+    // so the gear sage can score the proc; firing it here would cast twice.
+    if (!fromInstance) {
+        WrapperBase *base = get_wrapper( obj->pIndexData->wrapper );
+        if (base && base->hasTrigger( "Fight" ))
+            return;
+    }
+
     const Json::Value &casts = fromInstance ? obj->props["combatcast"]
                                             : obj->pIndexData->props["combatcast"];
     if (!casts.isArray( ))

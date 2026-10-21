@@ -100,7 +100,7 @@ void WeaponOneHit::damBase( )
         NPCharacter *nch = ch->getNPC();
         int handsAve = dice_ave(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
         int handsDamage = dice(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
-        int weaponAve = wield ? weapon_ave(wield) : 0;
+        int weaponAve = wield ? weapon_ave(wield) * skill / 100 : 0;
 
         if (handsAve > weaponAve)
             dam = handsDamage;
