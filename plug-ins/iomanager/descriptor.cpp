@@ -257,9 +257,11 @@ int Descriptor::inputTelnet( unsigned char i )
                         if (telnet.ttype == TTYPE_MUDLET && connected == CON_CODEPAGE && choice
                                 && !ServerSocketContainer::isBackdoor( control )
                                 && !ServerSocketContainer::isWrapped( control )) {
+                            greeting_due = 0;
                             inputChar( choice );
                             inputChar( '\n' );
-                        }
+                        } else
+                            NannyHandler::greet( this );
                     }
                     telnet.state = TNS_NORMAL;
                     break;
@@ -296,6 +298,9 @@ int Descriptor::inputTelnet( unsigned char i )
             break;
 
         case WONT:
+            // A client that will not name itself gets the greeting at once.
+            if (i == TELOPT_TTYPE)
+                NannyHandler::greet( this );
             telnet.state = TNS_NORMAL;
             break;
 

@@ -106,7 +106,30 @@ void NannyHandler::init( Descriptor *d )
     
     d->handle_input.clear( );
     d->handle_input.push_front( nanny );
-    nanny->doGreeting( d );
+
+    /* A plain telnet greeting waits until the client answers the TTYPE
+     * question (Descriptor::inputTelnet calls greet()), at most GREETING_WAIT
+     * seconds (IOManager::ioRead). Mudlet gets its codepage picked for it on
+     * that answer and skips the greeting: otherwise the codepage menu flashed
+     * up and was cleared away a moment later. */
+    if (!is_websock( d )
+        && !ServerSocketContainer::isWrapped( d->control )
+        && !ServerSocketContainer::isBackdoor( d->control ))
+    {
+        d->greeting_due = dreamland->getCurrentTime( ) + GREETING_WAIT;
+        return;
+    }
+
+    doGreeting( d );
+}
+
+void NannyHandler::greet( Descriptor *d )
+{
+    if (!d->greeting_due)
+        return;
+
+    d->greeting_due = 0;
+    doGreeting( d );
 }
 
 void NannyHandler::initRemort( Descriptor *d )
@@ -140,6 +163,9 @@ void NannyHandler::doGreeting( Descriptor *d )
 void NannyHandler::doCodepage( Descriptor *d, char *arg )
 {
     int num;
+
+    // Typed before the greeting went out: the menu below answers instead.
+    d->greeting_due = 0;
 
     if (!arg[0] 
         || (num = arg[0] - '1') < 0

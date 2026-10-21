@@ -179,6 +179,9 @@ public:
     // Where the web visitor came from (?src= label), set by the client_src
     // RPC before character creation and saved on a new character by the nanny.
     DLString            client_src;
+    // When to send the telnet login greeting if the client has not said what
+    // it is yet (0 = sent or not due). See NannyHandler::init.
+    time_t              greeting_due;
     bool wsHandleNeg(unsigned char *buf, int rc);
     bool wsHandleFrame(unsigned char *buf, int rc);
     bool wsHandlePassThrough(unsigned char *buf, int rc);
