@@ -329,8 +329,11 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
     if (IS_SET(flags, FSPELL_VERBOSE))
         spell->utter( ch, target->victim );
 
-    if (IS_SET(flags, FSPELL_WAIT)) 
+    // The caster's own lag: mob AI casts here without going through interpret.
+    if (IS_SET(flags, FSPELL_WAIT)) {
+        InterpretActorGuard guard( ch );
         ch->setWait( spell->getBeats(ch) );
+    }
 
     if (IS_SET(flags, FSPELL_CHECK_SAFE) && offensive && target->victim) {
         if (is_safe(ch, target->victim))

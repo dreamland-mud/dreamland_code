@@ -46,6 +46,8 @@ public:
     int visible( NPCharacter *, const Skill * ) const;
 
     XML_VARIABLE XMLBoolean professional;
+    // Learned percent of a professional skill for a mob whose classes lack it.
+    XML_VARIABLE XMLIntegerNoEmpty untrained;
 };
 
 #endif

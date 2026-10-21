@@ -256,6 +256,11 @@ int GenericSkill::getLevel( Character *ch ) const
  */
 int GenericSkill::getLearned( Character *ch ) const
 {
+    // A mob wielding a weapon none of its classes train still knows the basics.
+    if (ch->is_npc( ) && mob.untrained.getValue( ) > 0
+            && !visible( ch ) && npcBodyFits( ch ))
+        return mob.untrained.getValue( );
+
     if (!usable( ch ))
         return 0;
 

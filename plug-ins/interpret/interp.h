@@ -12,6 +12,21 @@ void        interpret_fmt        ( Character *ch, const char *format, ... );
 void        interpret_raw        ( Character *ch, const char *cmd, const char *format = "", ... );
 bool    interpret_cmd        ( Character *ch, const char *cmd, const char *argsFormat, ... );
 
+/*
+ * The character whose command is running right now, or 0 between commands.
+ * Lets the wait/daze setters tell a char's own command lag from lag that
+ * someone else puts on it.
+ */
+Character * interpret_actor( );
+
+class InterpretActorGuard {
+public:
+    InterpretActorGuard( Character *ch );
+    ~InterpretActorGuard( );
+private:
+    Character *saved;
+};
+
 
 void do_say( Character *, const char * );
 void do_yell( Character *, const char * );

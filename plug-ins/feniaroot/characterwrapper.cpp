@@ -92,6 +92,7 @@
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
+#include "controlresist.h"
 #include "clantreasury.h"
 #include "chatframe.h"
 #include "context.h"
@@ -1249,10 +1250,33 @@ NMI_SET( CharacterWrapper, wait, "wait state (в пульсах, 1 пульс = 
     // A plain assignment, so scripts can also shorten or clear lag. setWait only
     // ever raises it, which silently broke every restore and refund. Gods keep
     // setWait's 1-pulse rule.
+    // A raise from someone else's script is cut on strong mobs (control_resist).
+    int pulses = max( 0, arg.toNumber( ) );
+
     if (target->is_immortal( ))
-        target->setWait( arg.toNumber( ) );
+        target->setWait( pulses );
+    else if (pulses > target->wait)
+        target->wait = control_resist( target, target->wait, pulses );
     else
-        target->wait = max( 0, arg.toNumber( ) );
+        target->wait = pulses;
+}
+
+NMI_GET( CharacterWrapper, daze, "daze state (в пульсах, 1 пульс = четверть секунды)")
+{
+    checkTarget( );
+    return target->daze;
+}
+
+NMI_SET( CharacterWrapper, daze, "daze state (в пульсах, 1 пульс = четверть секунды); присваивается как есть, подъем на сильных мобах режется по тиру")
+{
+    checkTarget( );
+
+    int pulses = max( 0, arg.toNumber( ) );
+
+    if (pulses > target->daze)
+        target->daze = control_resist( target, target->daze, pulses );
+    else
+        target->daze = pulses;
 }
 
 NMI_GET( CharacterWrapper, boat, "объект лодки" )
@@ -1418,7 +1442,6 @@ NMI_SET( CharacterWrapper, x, help) \
 
 INT_FIELD(ethos, "этос")
 INT_FIELD(timer, "сколько минут прошло с последней команды")
-INT_FIELD(daze, "daze state (в пульсах, 1 пульс = четверть секунды)")
 INT_FIELD(hit, "текущее здоровье (hit points)")
 INT_FIELD(max_hit, "максимальное здоровье")
 INT_FIELD(mana, "текущая mana")
