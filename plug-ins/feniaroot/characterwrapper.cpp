@@ -531,6 +531,15 @@ NMI_GET( CharacterWrapper, terminal_type, "тип терминала у mud-кл
     return ttype_name( target->desc->telnet.ttype );
 }
 
+NMI_GET( CharacterWrapper, client_src, "метка ?src= ссылки, по которой пришел веб-посетитель (пустая строка, если нет)" )
+{
+    checkTarget( );
+    CHK_NPC
+    if (!target->desc)
+        return "";
+    return target->desc->client_src;
+}
+
 NMI_GET( CharacterWrapper, webclient, "true если использует вебклиент" )
 {
     checkTarget( );

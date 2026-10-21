@@ -176,6 +176,9 @@ public:
     ViaVector via;
 
     WebSockState        websock;
+    // Where the web visitor came from (?src= label), set by the client_src
+    // RPC before character creation and saved on a new character by the nanny.
+    DLString            client_src;
     bool wsHandleNeg(unsigned char *buf, int rc);
     bool wsHandleFrame(unsigned char *buf, int rc);
     bool wsHandlePassThrough(unsigned char *buf, int rc);

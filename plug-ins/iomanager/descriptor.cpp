@@ -587,6 +587,19 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
         out["args"][0]["ok"] = reason.empty();
         out["args"][0]["reason"] = reason;
         writeWSCommand(out);
+    } else if(name == "client_src") {
+        /* Character-less: the web client sends the ?src= label of the link
+         * the visitor came by as soon as the socket opens, before any
+         * character exists. Only a short slug is kept; the nanny stores it on
+         * a newly created character for the newcomer reports. */
+        DLString label;
+        if (!args.empty())
+            for (const char &c: args.front().substr(0, 32)) {
+                char l = (c >= 'A' && c <= 'Z') ? c - 'A' + 'a' : c;
+                if ((l >= 'a' && l <= 'z') || (l >= '0' && l <= '9') || l == '-' || l == '_')
+                    label += l;
+            }
+        client_src = label;
     } else if(character) {
         RpcCommandManager::getThis()->run(character, name, args);
     } else {
