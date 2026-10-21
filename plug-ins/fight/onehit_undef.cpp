@@ -597,11 +597,15 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     }
 }
 
-void UndefinedOneHit::damApplyMasterSword( ) 
+void UndefinedOneHit::damApplyMasterSword( )
 {
     if (weapon_sn != gsn_sword)
         return;
-        
+
+    // The mastery is the samurai's bond with the katana: other swords get nothing.
+    if (!IS_WEAPON_STAT(wield, WEAPON_KATANA))
+        return;
+
     if (number_percent( ) > gsn_mastering_sword->getEffective( ch ))
         return;
 
