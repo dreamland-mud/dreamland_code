@@ -19,6 +19,9 @@ class PCharacter;
 class Descriptor;
 using Scripting::NativeHandler;
 
+/* Seconds a telnet login greeting waits for the client's TTYPE answer. */
+#define GREETING_WAIT 2
+
 class NannyHandler : public InputHandler, 
                      public NativeHandler,
                      public PluginNativeImpl<NannyHandler> 
@@ -37,8 +40,9 @@ public:
     
     static void init( Descriptor * );
     static void initRemort( Descriptor * );
+    static void greet( Descriptor * );
 
-    void doGreeting( Descriptor * );
+    static void doGreeting( Descriptor * );
     void doPlace( Descriptor * );
     void doCodepage( Descriptor *, char * );
     void doInterpret( Descriptor *, char * );

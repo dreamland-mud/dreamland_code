@@ -23,6 +23,7 @@
 #include "dreamland.h"
 #include "pcharacter.h"
 #include "descriptor.h"
+#include "nannyhandler.h"
 
 /*
  * When each descriptor last sent input, for the login idle timeout. Lives here
@@ -255,6 +256,10 @@ IOManager::ioRead()
 
         d->fcommand = false;
         Character *ch = d->character;
+
+        // Telnet greeting still waiting for a TTYPE answer that never came.
+        if (d->greeting_due && now >= d->greeting_due)
+            NannyHandler::greet( d );
 
         if (FD_ISSET( d->descriptor, &in_set )) {
             LastLogStream::send( ) <<  "Input data"  << endl;
