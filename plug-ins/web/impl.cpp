@@ -332,7 +332,9 @@ Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
     Json::Value exits;
     exits["h"] = hidden.str( );
     exits["e"] = visible.str( );
-    exits["l"] = Player::displayLang( ch ) != LANG_EN ? "r" : "e";
+    // Which letters the client draws: e = N E S W D U, r = Russian, u = Ukrainian.
+    lang_t lang = Player::displayLang( ch );
+    exits["l"] = lang == LANG_UA ? "u" : lang == LANG_RU ? "r" : "e";
     return exits;
 }    
 
