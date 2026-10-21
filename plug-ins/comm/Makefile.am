@@ -25,6 +25,7 @@ impl.cpp \
 run.cpp \
 showtable.cpp \
 who.cpp \
+profileservlet.cpp \
 writing.cpp \
 eating.cpp \
 communication.cpp \

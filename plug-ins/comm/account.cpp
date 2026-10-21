@@ -39,6 +39,11 @@ void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 // Defined in accountservlet.cpp: {name, level, class:{en,ru,ua}} for one character.
 Json::Value account_roster_entry( const DLString &name );
+// Defined in profileservlet.cpp: the public web profile's visibility rules.
+bool account_profile_char_hidden( PCMemoryInterface *pci );
+void account_profile_set_char_hidden( PCMemoryInterface *pci, bool hidden );
+bool account_profile_enabled( const DLString &id );
+bool account_profile_eligible( const DLString &id );
 
 // Per-TU static references the account-switch guards need, same as quit.cpp:97-100
 // (GSN/CLAN create file-scope statics; including the headers gives only the macros).
@@ -912,6 +917,77 @@ static void account_email_verify_cmd(PCharacter *ch, const DLString &rawCode)
     account_email_attach(ch, email);
 }
 
+// `account profile` -- the public web page at dreamland.rocks/player/<id>:
+// status, on|off for the whole account, hide|show for one character.
+static void account_profile(PCharacter *ch, DLString &args)
+{
+    DLString id = AccountManager::accountOf(ch->getName());
+    if (id.empty()) {
+        ch->pecho(_("Ты не привязан к аккаунту."));
+        return;
+    }
+
+    DLString sub = args.getOneArgument();
+
+    if (arg_is(sub, "switchon")) {
+        AccountManager::setConfigKey(id, "profile", Json::Value(true));
+        ch->pecho(_("Публичный профиль аккаунта включен."));
+    }
+    else if (arg_is(sub, "switchoff")) {
+        AccountManager::setConfigKey(id, "profile", Json::Value(false));
+        ch->pecho(_("Публичный профиль аккаунта выключен."));
+        return;
+    }
+    else if (arg_oneof(sub, "hide", "скрыть", "сховати") || arg_is(sub, "show")) {
+        bool hide = arg_oneof(sub, "hide", "скрыть", "сховати");
+        DLString target = args.getOneArgument();
+        if (target.empty()) {
+            ch->pecho(_("Кого? Набери {yаккаунт профиль скрыть <имя>{x или {yаккаунт профиль показать <имя>{x."));
+            return;
+        }
+        target.capitalize();
+
+        PCMemoryInterface *pcm = PCharacterManager::find(target);
+        if (pcm == 0 || AccountManager::accountOf(pcm->getName()) != id) {
+            ch->pecho(_("На твоем аккаунте нет такого персонажа."));
+            return;
+        }
+
+        account_profile_set_char_hidden(pcm, hide);
+        if (hide)
+            ch->pecho(_("%1$s больше не виден в профиле."), pcm->getName().c_str());
+        else
+            ch->pecho(_("%1$s теперь виден в профиле."), pcm->getName().c_str());
+        return;
+    }
+    else if (!sub.empty()) {
+        ch->pecho(_("Использование: {yаккаунт профиль{x [вкл|выкл], {yаккаунт профиль скрыть|показать <имя>{x."));
+        return;
+    }
+
+    if (!account_profile_enabled(id)) {
+        ch->pecho(_("Публичный профиль аккаунта выключен. Включить: {yаккаунт профиль вкл{x."));
+        return;
+    }
+
+    if (!account_profile_eligible(id)) {
+        ch->pecho(_("Публичный профиль появится, когда хотя бы один персонаж аккаунта переродится."));
+        return;
+    }
+
+    ch->pecho(_("Публичный профиль аккаунта: {Whttps://dreamland.rocks/player/%1$s{x"), id.c_str());
+    for (const DLString &name : AccountManager::charsOf(id)) {
+        PCMemoryInterface *pcm = PCharacterManager::find(name);
+        if (pcm == 0)
+            continue;
+        if (account_profile_char_hidden(pcm))
+            ch->pecho(_("  %1$s {D(скрыт){x"), name.c_str());
+        else
+            ch->pecho(_("  %1$s {G(виден){x"), name.c_str());
+    }
+    ch->pecho(_("Спрятать персонажа: {yаккаунт профиль скрыть <имя>{x. Выключить профиль целиком: {yаккаунт профиль выкл{x."));
+}
+
 CMDRUN( account )
 {
     if (ch->is_npc())
@@ -952,6 +1028,11 @@ CMDRUN( account )
     // Passwordless switch to another owned char (the clickable list targets this).
     if (arg_oneof(cmd, "switch", "персонаж", "персонажі", "перемкнути")) {
         account_switch(ch->getPC(), args);
+        return;
+    }
+
+    if (arg_oneof(cmd, "profile", "профиль", "профіль")) {
+        account_profile(ch->getPC(), args);
         return;
     }
 
