@@ -6,12 +6,27 @@
 #include "mobskilldata.h"
 
 #include "npcharacter.h"
+#include "pcharacter.h"
 #include "skill.h"
 #include "spell.h"
 #include "damageflags.h"
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+
+/*
+ * Charmed mobs list and take orders for beneficial spells only, so 'report'
+ * never offers an attack. A player's own pet in a fight is the exception:
+ * the tier AI casts its attacks at the foe it already fights.
+ */
+static bool charm_hides_spell( NPCharacter *mob, const Skill *skill )
+{
+    if (!IS_CHARMED(mob) || !skill->getSpell() || skill->getSpell()->getSpellType() != SPELL_OFFENSIVE)
+        return false;
+
+    bool ownPet = !mob->master->is_npc( ) && mob->master->getPC( )->pet == mob;
+    return !(ownPet && mob->fighting);
+}
 
 /*------------------------------------------------------------------------
  * MobSkillData
@@ -45,7 +60,7 @@ int MobSkillData::visible( NPCharacter *mob, const Skill *skill ) const
     if (!available)
         return MPROF_NONE;
 
-    if (IS_CHARMED(mob) && skill->getSpell() && skill->getSpell()->getSpellType() == SPELL_OFFENSIVE)
+    if (charm_hides_spell( mob, skill ))
         return MPROF_NONE;
 
     if (offense.isSet( mob->off_flags ))
@@ -79,7 +94,7 @@ int MobProfSkillData::visible( NPCharacter *mob, const Skill *skill ) const
     if (!available)
         return MPROF_NONE;
 
-    if (IS_CHARMED(mob) && skill->getSpell() && skill->getSpell()->getSpellType() == SPELL_OFFENSIVE)
+    if (charm_hides_spell( mob, skill ))
         return MPROF_NONE;
 
     if (offense.isSet( mob->off_flags ))
