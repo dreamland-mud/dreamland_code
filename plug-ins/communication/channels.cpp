@@ -51,13 +51,29 @@ Character * TellChannel::findListener( Character *ch, const DLString &name ) con
     return victim;
 }
 
+// A tell to a mob in the same room counts as speech addressed to it: area
+// quest steps and mob onSpeech handlers hear it like a say. Room, object and
+// global speech triggers stay say-only -- a tell is private. Dedicated
+// onTell handlers run before onSpeech and win when they return true.
 static bool mprog_tell( Character *listener, Character *talker, const char *msg )
 {
+    bool asSpeech = listener->is_npc( ) && IS_AWAKE(listener)
+                    && listener->in_room == talker->in_room;
+
+    if (asSpeech)
+        aquest_trigger(listener, talker, "Speech", "CCs", listener, talker, msg);
+
     if (behavior_trigger(listener, "Speech", "CCs", listener, talker, msg))
         return true;
 
     FENIA_CALL( listener, "Tell", "Cs", talker, msg );
     FENIA_NDX_CALL( listener->getNPC( ), "Tell", "CCs", listener, talker, msg );
+
+    if (asSpeech) {
+        FENIA_CALL( listener, "Speech", "Cs", talker, msg );
+        FENIA_NDX_CALL( listener->getNPC( ), "Speech", "CCs", listener, talker, msg );
+    }
+
     BEHAVIOR_VOID_CALL( listener->getNPC( ), tell, talker, msg );
     return false;
 }
