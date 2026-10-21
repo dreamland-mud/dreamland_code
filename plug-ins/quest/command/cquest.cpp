@@ -506,7 +506,7 @@ void CQuest::doStat( PCharacter *ch )
             for (; r != records.end(); r++, cnt++)
                 if (r->first == ch->getName()) {
                     buf << "               {W....{w " << endl;
-                    buf << fmt(0, _("          {W%4d{w %s (%dе место)\r\n"), 
+                    buf << fmt(ch, _("          {W%4d{w %s (%dе место)\r\n"),
                                      r->second, r->first.c_str(), cnt+1);
                     break;
                 }
