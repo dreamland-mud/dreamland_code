@@ -200,32 +200,36 @@ void CachedNoun::update( PCharacter *ch )
 
     for (int l = LANG_MIN; l < LANG_MAX; l++) {
         lang_t lang = (lang_t)l;
+        /* "Создание ночи" and "Божество" are neuter nouns: verbs agree with
+           them, not with the hidden char ("Создание ночи улетело"). EN keeps
+           the char's gender. */
+        MultiGender nounMg = (lang == LANG_EN) ? mg : MultiGender( MultiGender::NEUTER );
 
         /* vampire as visible to non-vampires */
         if (vampire.find(lang) == vampire.end()) {
-            vampire[lang] = InflectedString::Pointer( NEW, vampireNames[lang], mg );
+            vampire[lang] = InflectedString::Pointer( NEW, vampireNames[lang], nounMg );
         }
         else {
-            vampire[lang]->setGender( mg );
+            vampire[lang]->setGender( nounMg );
         }
         
         /* vampire as visible to immortals */
         DLString v2name = vampireNames[lang] + " [" + name[lang]->getFullForm() + "]";
 
         if (vampire2.find(lang) == vampire2.end()) {
-            vampire2[lang] = InflectedString::Pointer( NEW, v2name, mg );
+            vampire2[lang] = InflectedString::Pointer( NEW, v2name, nounMg );
         }
         else {
             vampire2[lang]->setFullForm( v2name );
-            vampire2[lang]->setGender( mg );
+            vampire2[lang]->setGender( nounMg );
         }
         
         /* immortals under wizinvis */
         if (immortal.find(lang) == immortal.end()) {
-            immortal[lang] = InflectedString::Pointer( NEW, immortalNames[lang], mg );
+            immortal[lang] = InflectedString::Pointer( NEW, immortalNames[lang], nounMg );
         }
         else {
-            immortal[lang]->setGender( mg );
+            immortal[lang]->setGender( nounMg );
         }
     }
 

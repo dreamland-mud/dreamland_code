@@ -6176,6 +6176,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (o->wear_loc == wear_none)   // unworn -> handled by carriedVnum (census loop above)
             continue;
         wornVnum[o->pIndexData->vnum] = 1;
+        // Hair, tail and the personal slot hold any trinket for show and give no
+        // stats: a doll worn there is not the char's hold-slot item to replace.
+        if (!o->wear_loc->givesAffects( ))
+            continue;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
         bool flagsOwned = !(gaBareHanded && (slot & gaHandSlots));
@@ -6473,13 +6477,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     }
 
     // Rolled items the char carries unworn (random weapons and armor, tagged "tier"
-    // by their generators). Their prototype is an empty stub in a system area, so the
-    // loop above never sees them: score each copy as itself, same wear gates, and
-    // route it "put it on".
+    // by their generators), and personal hero rewards (girth, ring...). Their
+    // prototypes sit in a system area, so the loop above never sees them: score
+    // each copy as itself, same wear gates, and route it "put it on".
     for (::Object *o = object_list; o; o = o->next) {
         if (o->wear_loc != wear_none || ga_rootCarrier( o ) != target)
             continue;
-        if (o->getProperty( "tier" ).empty( ))
+        if (o->getProperty( "tier" ).empty( ) && !o->isPersonalQuestReward( ))
             continue;
         if (o->level > LEVEL_MORTAL || !IS_SET(o->wear_flags, ITEM_TAKE))
             continue;
