@@ -1521,9 +1521,12 @@ NMI_INVOKE( CraftProfessionWrapper, getTotalExp, "(ch): суммарный оп�
     return getTarget()->getCalculator(ch)->totalExp();
 }
 
-NMI_INVOKE( CraftProfessionWrapper, getExpToLevel, "(ch): кол-во опыта до следующего уровня мастерства в этой профессии" )
+NMI_INVOKE( CraftProfessionWrapper, getExpToLevel, "(ch): кол-во опыта до следующего уровня мастерства в этой профессии, 0 на максимальном уровне" )
 {
     PCharacter *ch = args2player(args);
+    // Mirror oscore: at max level there is no next level to earn toward.
+    if (getTarget()->getLevel(ch) >= getTarget()->getMaxLevel())
+        return 0;
     return getTarget()->getCalculator(ch)->expToLevel();
 }
 
