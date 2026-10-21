@@ -49,7 +49,7 @@ Rat::Rat( )
     timer.setValue( -1 );
 }
 
-// Rats grow with their owner, so only a first life may buy one.
+// Rat pups are a first-life perk: remorted characters cannot buy them.
 bool Rat::purchase( Character *client, NPCharacter *keeper, const DLString &arguments, int quantity )
 {
     if (!client->is_npc( ) && client->getPC( )->getRemorts( ).size( ) > 0) {

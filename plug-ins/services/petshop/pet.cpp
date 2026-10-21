@@ -240,11 +240,8 @@ void LevelAdaptivePet::config( PCharacter *client, NPCharacter *pet ) const
     if (level <= 20)
         REMOVE_BIT( pet->act, ACT_CLERIC|ACT_MAGE );
 
-    if (apply_mob_tier( pet, level, pet->getTier( ) )) {
-        if (!IS_SET( pet->act, ACT_CLERIC|ACT_MAGE ))
-            pet->mana = pet->max_mana = 0;
+    if (apply_mob_tier( pet, level, pet->getTier( ) ))
         return;
-    }
 
     if (level <= 13)            pet->hit = level * number_range( 12, 13 );
     else if (level <= 21)   pet->hit = level * number_range( 16, 18 );
