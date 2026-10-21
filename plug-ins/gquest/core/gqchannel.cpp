@@ -16,6 +16,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "multimessage.h"
+#include "act.h"
 #include "l10n.h"
 
 /* Messenger fan-out convention for every gecho below: the Discord stream is
@@ -25,7 +26,7 @@
 const char * const GQChannel::BOLD = "{Y";
 const char * const GQChannel::NORMAL = "{y";
 
-void GQChannel::zecho( GlobalQuest *gquest, Area *area, const DLString& msg ) 
+void GQChannel::zecho( GlobalQuest *gquest, Area *area, const MultiMessage &msg, Character *actor ) 
 {
     Descriptor *d;
     Character *ch;
@@ -41,7 +42,7 @@ void GQChannel::zecho( GlobalQuest *gquest, Area *area, const DLString& msg )
             continue;
         
         if (gquest->isLevelOK( ch ))
-            ch->send_to( msg );
+            ch->send_to( fmt( ch, msg, actor ) + "\r\n" );
     }
 }
 
@@ -137,18 +138,17 @@ void GQChannel::gecho( const DLString &name, const MultiMessage &msg, PCharacter
 void GQChannel::gecho( const DLString& msg )
 {
     Descriptor *d;
-    std::basic_ostringstream<char> buf;
-
     if (dreamland->isShutdown( ))
         return;
 
-    buf << BOLD << "[" << NORMAL << "Глобал" << BOLD << "] "
-        << NORMAL << msg << "{x" << endl;
-    
     for ( d = descriptor_list; d; d = d->next ) 
         if (d->connected == CON_PLAYING)
-            if (d->character)
+            if (d->character) {
+                std::basic_ostringstream<char> buf;
+                buf << BOLD << "[" << NORMAL << l( d->character, "Глобал" ) << BOLD << "] "
+                    << NORMAL << msg << "{x" << endl;
                 d->character->send_to( buf );
+            }
 }
 
 void GQChannel::pecho( Character *ch, ostringstream& buf ) 

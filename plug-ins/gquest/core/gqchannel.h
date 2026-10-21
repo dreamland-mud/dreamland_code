@@ -20,7 +20,9 @@ class MultiMessage;
 class GQChannel {
 public:
 
-    static void zecho( GlobalQuest *, struct Area*, const DLString& );
+    /* Area-wide line in each recipient's language; the format takes the
+     * speaker as %1$. */
+    static void zecho( GlobalQuest *, struct Area*, const MultiMessage&, Character * );
     static void gecho( GlobalQuestInfo *, const DLString& );
     static void gecho( const DLString& );
     /* Raw-body variants: the body is a plain RU string with no translation, so

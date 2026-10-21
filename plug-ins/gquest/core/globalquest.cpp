@@ -213,7 +213,7 @@ void GlobalQuest::exorcism(Character *ch) const
                     recall = get_room_instance(ROOM_VNUM_TEMPLE);
 
                 transfer_char(ch, ch, recall,
-                              NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате.");
+                              MultiMessage(), MultiMessage(), _("%1$^C1 появил%1$Gось|ся|ась в комнате."));
                 return;
             }
 
@@ -244,7 +244,7 @@ void GlobalQuest::exorcism(Character *ch) const
         recall = get_room_instance(ROOM_VNUM_TEMPLE);
 
     transfer_char(ch, ch, recall,
-                  NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате.");
+                  MultiMessage(), MultiMessage(), _("%1$^C1 появил%1$Gось|ся|ась в комнате."));
 }
 
 int GlobalQuest::wipeRoom( Room *room ) const

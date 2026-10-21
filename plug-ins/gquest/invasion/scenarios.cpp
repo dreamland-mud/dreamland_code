@@ -20,6 +20,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "def.h"
+#include "l10n.h"
 
 CLAN(none);
 
@@ -145,11 +146,11 @@ void InvasionBubblesMob::actDeath( Character *killer )
     else
         buf << "{x";
    
-    buf << "(*)!(*)!(*) ЧПОК !!! (*)!(*)!(*){x\r\n";
-    
     for (d = descriptor_list; d != 0; d = d->next) 
         if (d->connected == CON_PLAYING && d->character)
-            d->character->send_to(buf);
+            d->character->send_to(buf.str( )
+                + _("(*)!(*)!(*) ЧПОК !!! (*)!(*)!(*)").getMessage( d->character )
+                + "{x\r\n");
 }
 
 /*--------------------------------------------------------------------------
