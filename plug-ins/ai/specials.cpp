@@ -131,9 +131,10 @@ bool BasicMobileBehavior::doInvis()
         return false;
 
     bitstring_t innate = ch->getNPC()->pIndexData->affected_by & (AFF_SNEAK|AFF_INVISIBLE|AFF_IMP_INVIS);
-    // Thieves ask for hide too: the class kit's stealth list in Fenia decides
-    // which of them keep it (elite and up).
-    if (IS_SET(ch->act, ACT_THIEF))
+    // Elite and stronger thieves ask for hide too, in a zone with players:
+    // the class kit's stealth list in Fenia decides which of them keep it.
+    int tier = ch->getNPC()->getTier();
+    if (IS_SET(ch->act, ACT_THIEF) && tier >= 1 && tier <= 5 && !ch->in_room->area->empty)
         innate |= AFF_HIDE;
     if (!innate || (ch->affected_by & innate) == innate)
         return false;
