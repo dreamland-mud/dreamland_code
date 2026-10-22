@@ -22,6 +22,7 @@
  */
 #include <algorithm>
 #include <map>
+#include <vector>
 #include <jsoncpp/json/json.h>
 
 #include "servlet.h"
@@ -172,19 +173,23 @@ static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
 }
 
 // Account-wide numbers over the shown characters: the earliest creation date
-// (created survives remort; 0 = a character older than the field), true hours
+// (created survives remort; 0 = a character older than the field, and then the
+// true start is unknown, so no date at all beats a too-recent one), true hours
 // of the current life plus every past one, and the class played the longest.
-static Json::Value profile_account_stats(const DLString &id, const list<PCMemoryInterface *> &shown)
+static Json::Value profile_account_stats(const list<PCMemoryInterface *> &shown)
 {
     Json::Value a;
     long since = 0;
+    bool sinceUnknown = false;
     long hours = 0;
     int lives = 0;
     map<DLString, long> byClass;
 
     for (PCMemoryInterface *pci : shown) {
         long created = pci->getCreated();
-        if (created > 0 && (since == 0 || created < since))
+        if (created <= 0)
+            sinceUnknown = true;
+        else if (since == 0 || created < since)
             since = created;
 
         int now = pci->getPlayedHours();
@@ -200,30 +205,28 @@ static Json::Value profile_account_stats(const DLString &id, const list<PCMemory
         }
     }
 
-    // A registry-era account carries its own date; it only helps when no
-    // character knows when it was made.
-    if (since == 0) {
-        Json::Value acc = AccountManager::get(id);
-        if (acc.isObject() && acc["created"].isIntegral())
-            since = (long)acc["created"].asInt64();
-    }
-
-    if (since > 0)
+    if (since > 0 && !sinceUnknown)
         a["since"] = (Json::Int64)since;
     a["hours"] = (Json::Int64)hours;
     a["lives"] = lives;
 
-    DLString fav;
-    long favHours = 0;
+    // Most hours first; a class name from an old life may no longer resolve,
+    // then the next one takes its place.
+    vector<pair<long, DLString> > ranked;
     for (auto &kv : byClass)
-        if (kv.second > favHours) {
-            fav = kv.first;
-            favHours = kv.second;
-        }
+        if (kv.second > 0)
+            ranked.push_back(make_pair(kv.second, kv.first));
+    sort(ranked.begin(), ranked.end(), [](const pair<long, DLString> &x, const pair<long, DLString> &y) {
+        return x.first > y.first;
+    });
 
-    Profession *prof = fav.empty() ? 0 : professionManager->findExisting(fav);
-    if (prof != 0 && favHours > 0)
-        a["favClass"] = profile_class_json(*prof);
+    for (auto &r : ranked) {
+        Profession *prof = professionManager->findExisting(r.second);
+        if (prof != 0) {
+            a["favClass"] = profile_class_json(*prof);
+            break;
+        }
+    }
 
     return a;
 }
@@ -292,7 +295,7 @@ static void profile_servlet(HttpRequest &request, HttpResponse &response)
     Json::Value body;
     body["id"] = id.c_str();
     body["title"] = AccountManager::titleOf(id).c_str();
-    body["account"] = profile_account_stats(id, shown);
+    body["account"] = profile_account_stats(shown);
     body["chars"] = Json::Value(Json::arrayValue);
 
     for (PCMemoryInterface *pci : shown) {
