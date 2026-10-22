@@ -110,6 +110,18 @@ NMI_GET(PlayerWrapper, ukrainianName, "украинское имя с падеж
     return ua ? Register(ua->getFullForm()) : Register("");
 }
 
+NMI_SET(PlayerWrapper, ukrainianName, "украинское имя с падежами")
+{
+    PCMemoryInterface *pci = getTarget();
+    if (PCharacter *pc = dynamic_cast<PCharacter *>(pci))
+        pc->setUkrainianName(arg2string(arg));
+    else if (PCharacterMemory *pcm = dynamic_cast<PCharacterMemory *>(pci))
+        pcm->setUkrainianName(arg2string(arg));
+    else
+        return;
+    save();
+}
+
 NMI_INVOKE(PlayerWrapper, autofillUaName, "(): разовый бекфил украинской формы имени (онлайн или оффлайн), как при входе в игру, плюс замена старых копий русской формы; true, если форма записана")
 {
     PCMemoryInterface *pci = getTarget();
