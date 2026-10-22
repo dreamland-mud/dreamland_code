@@ -470,8 +470,7 @@ static bool sell_one_item( Character *ch, NPCharacter *keeper, ShopTrader::Point
     // Rolled gear (random loot, raid loot, crafted affixes) is bought but never
     // restocked: its shop price is capped, so resale handed out high-level
     // and legendary items for pocket change.
-    bool rolled = obj->props.isObject( )
-                  && (obj->props.isMember( "measure_m" ) || obj->props.isMember( "tier" ));
+    bool rolled = !obj->getProperty( "measure_m" ).empty( );
 
     if ( obj->item_type == ITEM_TRASH || IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) || rolled )
     {
