@@ -158,13 +158,17 @@ void WeaponRandomizer::eventItemRead(const ItemReadEvent &event) const
     randomizeWeaponStats(obj);
 }
 
-// Remove 'randomness' from a weapon.
+// Remove 'randomness' from a weapon. Flags go back to the prototype too:
+// the stats-only re-roll never passes applyWeaponClass, so a previous roll's
+// extra flags (invis from "ghostly") and weapon flags would otherwise stick.
 void WeaponRandomizer::clearWeapon(Object *obj) const
 {
     obj->props.clear();
     obj->affected.deallocate();
     obj->timer = 0;
     obj->level = obj->pIndexData->level;
+    obj->extra_flags = obj->pIndexData->extra_flags | (obj->extra_flags & ITEM_INVENTORY);
+    obj->value4(obj->pIndexData->value[4]);
 }
 
 void WeaponRandomizer::adjustTimer(Object *obj) const
