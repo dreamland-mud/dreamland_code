@@ -3811,15 +3811,23 @@ static const int ga_statMap[6] = { STAT_STR, STAT_INT, STAT_WIS, STAT_DEX, STAT_
 // always special, high-value gear, so ga_score gives it a flat boost.
 // shared.trigger_bonus_skip in item_value.json lists vnums whose scripts are
 // housekeeping only (owner checks, anti-duplicate), not power.
+// Is vnum listed in the item_value.json shared array `key`?
+static bool ga_vnumListed( const char *key, int vnum )
+{
+    const Json::Value &list = item_value_object( "shared", key );
+    if (list.isArray( ))
+        for (auto const &v: list)
+            if (v.isInt( ) && v.asInt( ) == vnum)
+                return true;
+    return false;
+}
+
 static bool ga_hasFeniaTriggers( obj_index_data *pObj )
 {
     if (pObj->wrapper == 0)
         return false;
-    const Json::Value &skip = item_value_object( "shared", "trigger_bonus_skip" );
-    if (skip.isArray( ))
-        for (auto const &v: skip)
-            if (v.isInt( ) && v.asInt( ) == pObj->vnum)
-                return false;
+    if (ga_vnumListed( "trigger_bonus_skip", pObj->vnum ))
+        return false;
     WrapperBase *w = get_wrapper( pObj->wrapper );
     if (w == 0)
         return false;
@@ -6398,6 +6406,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // DefaultWearlocation::canEquip so the sage never advises gear the char
         // would be refused at wear time.
         if (badMaterials != 0 && material_is_typed( pObj->material.c_str( ), badMaterials ))
+            continue;
+
+        // First-life gear (shared.first_life_only) slips off a remorted wearer
+        // (its Fenia onCantEquip), so it is never advised after a remort.
+        if (ga_remorts( target ) > 0 && ga_vnumListed( "first_life_only", pObj->vnum ))
             continue;
 
         // Skip items whose body slot the char's race lacks. Bipeds have no
