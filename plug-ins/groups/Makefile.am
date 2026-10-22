@@ -59,7 +59,6 @@ impl_classes.cpp \
 class_antipaladin.cpp \
 class_ninja.cpp \
 class_ranger.cpp \
-class_samurai.cpp \
 class_thief.cpp \
 class_vampire.cpp \
 class_warrior.cpp
