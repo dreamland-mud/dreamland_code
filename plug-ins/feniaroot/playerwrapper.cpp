@@ -2,6 +2,8 @@
 #include "playerwrapper.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
+#include "pcharactermemory.h"
+#include "inflectedstring.h"
 #include "xmlkillingattribute.h"
 #include "xmlpvpattribute.h"
 #include "pvp.h"
@@ -29,6 +31,12 @@
 #include "def.h"
 
 using namespace Scripting;
+
+// Defined in characterwrapper.cpp: the Ukrainian name form the login auto-fill
+// derives, or "" to leave the slot alone.
+DLString autofill_ua_form(const DLString &uaPad, const DLString &ruPad,
+                          const DLString &login, short sex, lang_t baseLang,
+                          bool backfill);
 
 NMI_INIT(PlayerWrapper, "Player, персонаж оффлайн или онлайн");
 
@@ -83,6 +91,46 @@ NMI_SET(PlayerWrapper, russianName, "русское имя с падежами")
 {
     getTarget()->setRussianName(arg2string(arg));
     save();
+}
+
+// Online characters are found as PCharacter, offline ones as PCharacterMemory;
+// only those two carry the Ukrainian name and the registration language.
+static const InflectedString *player_ua_name(PCMemoryInterface *pci)
+{
+    if (PCharacter *pc = dynamic_cast<PCharacter *>(pci))
+        return &pc->getUkrainianName();
+    if (PCharacterMemory *pcm = dynamic_cast<PCharacterMemory *>(pci))
+        return &pcm->getUkrainianName();
+    return 0;
+}
+
+NMI_GET(PlayerWrapper, ukrainianName, "украинское имя с падежами")
+{
+    const InflectedString *ua = player_ua_name(getTarget());
+    return ua ? Register(ua->getFullForm()) : Register("");
+}
+
+NMI_INVOKE(PlayerWrapper, autofillUaName, "(): разовый бекфил украинской формы имени (онлайн или оффлайн), как при входе в игру, плюс замена старых копий русской формы; true, если форма записана")
+{
+    PCMemoryInterface *pci = getTarget();
+    PCharacter *pc = dynamic_cast<PCharacter *>(pci);
+    PCharacterMemory *pcm = dynamic_cast<PCharacterMemory *>(pci);
+    if (!pc && !pcm)
+        return Register(false);
+
+    DLString ua = player_ua_name(pci)->getFullForm();
+    lang_t base = pc ? pc->getBaseLang() : pcm->getBaseLang();
+    DLString form = autofill_ua_form(ua, pci->getRussianName().getFullForm(),
+                                     pci->getName(), pci->getSex(), base, true);
+    if (form.empty() || form == ua)
+        return Register(false);
+
+    if (pc)
+        pc->setUkrainianName(form);
+    else
+        pcm->setUkrainianName(form);
+    save();
+    return Register(true);
 }
 
 NMI_GET(PlayerWrapper, clan, "клан (структура .Clan)")
