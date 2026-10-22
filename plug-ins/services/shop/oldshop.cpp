@@ -467,7 +467,13 @@ static bool sell_one_item( Character *ch, NPCharacter *keeper, ShopTrader::Point
         obj_to_room( Money::create( gold, silver ), ch->in_room );
     }
 
-    if ( obj->item_type == ITEM_TRASH || IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) )
+    // Rolled gear (random loot, raid loot, crafted affixes) is bought but never
+    // restocked: its shop price is capped, so resale handed out high-level
+    // and legendary items for pocket change.
+    bool rolled = obj->props.isObject( )
+                  && (obj->props.isMember( "measure_m" ) || obj->props.isMember( "tier" ));
+
+    if ( obj->item_type == ITEM_TRASH || IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) || rolled )
     {
         extract_obj( obj );
     }
