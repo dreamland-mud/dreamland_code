@@ -95,7 +95,12 @@ bool WrappedCommand::feniaOverride(Character *ch, const DLString &constArgs)
         args.push_back(FeniaManager::wrapperManager->getWrapper(ch));
         args.push_back(constArgs);
 
-        method.toFunction()->invoke(Register(wrapperBase->getSelf()), args);
+        Register rc = method.toFunction()->invoke(Register(wrapperBase->getSelf()), args);
+
+        // An override that returns "native" declines this call and lets the
+        // C++ command run, so a Fenia rewrite can ship dark per character.
+        if (rc.type == Register::STRING && rc.toString() == "native")
+            return false;
 
     } catch (const ::Exception &e) {
         // On error, complain to the logs and to all immortals in the game.
