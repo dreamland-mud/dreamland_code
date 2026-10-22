@@ -21,7 +21,8 @@ $(INCLUDES_SRC)
 
 libservices_shop_la_LIBADD = \
 $(LIBADD_AI) \
-../core/libservices_core.la 
+../core/libservices_core.la \
+-ljsoncpp
 
 
 AM_CPPFLAGS += $(plugin_INCLUDES)
