@@ -131,6 +131,11 @@ public:
     virtual Remorts& getRemorts( ) ;
     virtual void setRemorts( const Remorts& remorts ) ;
 
+    virtual long getCreated( ) const ;
+    void setCreated( long t ) ;
+    virtual int getPlayedHours( ) const ;
+    void setPlayedHours( int hours ) ;
+
     virtual const InflectedString& getRussianName( ) const ;
     virtual void setRussianName( const DLString& name ) ;
 
@@ -196,6 +201,11 @@ private:
     XML_VARIABLE PCBonuses bonuses;
     XML_VARIABLE XMLInteger start_room;
     XML_VARIABLE XMLInteger loyalty;
+
+    // Not XML: memory never reaches disk, and setMemory must not copy these
+    // back over the values a fresh pfile load just read.
+    long created;
+    int playedHours;
 };
 
 #endif

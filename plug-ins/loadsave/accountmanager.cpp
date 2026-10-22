@@ -334,6 +334,7 @@ DLString AccountManager::create(const DLString &type, const DLString &value, con
     Json::Value account;
     account["id"] = id;
     account["title"] = mintTitle();
+    account["created"] = (Json::Int64)dreamland->getCurrentTime();
     account["identities"].append(identity);
 
     accounts[id] = account;

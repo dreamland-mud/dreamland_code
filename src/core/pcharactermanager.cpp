@@ -143,6 +143,11 @@ PCharacter* PCharacterManager::getPCharacter( )
     // (and then persist) the previous occupant's englishName/ukrainianName.
     pch->clearNameForms( );
 
+    // Same for the session clock: a pooled object still carries the logon set
+    // when it was extracted, so an offline load+save (saveMemory) would add the
+    // whole idle time to the played hours it writes back. Login re-stamps it.
+    pch->age.setLogon( dreamland->getCurrentTime( ) );
+
     return pch;
 }
 
