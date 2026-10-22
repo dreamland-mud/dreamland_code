@@ -2114,22 +2114,11 @@ static bool pad_declined( const DLString &pad )
     return pad.find_first_not_of( '|', bar ) != DLString::npos;
 }
 
-// The STEM of a Flexer pad -- everything before the first '|', or the whole
-// string when it carries no case forms at all. NOTE: this is the common prefix
-// of the six declined forms, NOT the nominative. A pad is
-// stem|nom-cell|gen-cell|dat-cell|acc-cell|instr-cell|loc-cell, so the
-// nominative is stem + the first cell (see pad_case1). Олен|а|и|... has stem
-// "Олен" but nominative "Олена". The two source-derivation call sites below feed
-// this to declineUa; a stem that is a clean prefix of the name works, a
-// stem-alternating one is a known limitation (fable review 2026-09-08).
+// The stem of a Flexer pad: everything before the first '|'. Not the
+// nominative (Олен|а|и|... has stem "Олен"), see pad_case1.
 static DLString pad_stem( const DLString &pad )
 {
-    DLString::size_type bar = pad.find( '|' );
-
-    if (bar == DLString::npos)
-        return pad;
-
-    return pad.substr( 0, bar );
+    return pad.substr( 0, pad.find( '|' ) );
 }
 
 // The nominative a Flexer pad actually produces: stem + first case cell. For a
@@ -2147,6 +2136,137 @@ static DLString pad_case1( const DLString &pad )
     return pad.substr( 0, bar1 ) + pad.substr( bar1 + 1, bar2 - bar1 - 1 );
 }
 
+// A Russian name spelled with Ukrainian letters. Most names are romanised
+// logins (Fiorine, Dementia), and Ukrainian writes a Latin i as і, so и maps to
+// і (Kit's call, 2jQb5m4W) -- a player who wants и back sets the form in the
+// name editor. Then the four letters Ukrainian lacks: э/ы/ъ/ё. и is mapped
+// first, one byte at a time, so the и that ы becomes stays и.
+static DLString ua_name_letters( const DLString &ru )
+{
+    DLString out;
+
+    for (DLString::size_type i = 0; i < ru.length( ); i++) {
+        char c = ru.at( i );
+        if (c == 'и')
+            out += 'і';
+        else if (c == 'И')
+            out += 'І';
+        else {
+            DLString one;
+            one += c;
+            out += String::ruLettersToUa( one );
+        }
+    }
+
+    return out;
+}
+
+// The Ukrainian name form auto-fill wants in the slot, or "" to leave it as is.
+// Shared by the login auto-fill below and the offline backfill
+// (.Player(name).autofillUaName()), so both write the same thing.
+//
+// What it keeps: a form the player chose -- an explicit '=' pad, a Cyrillic
+// form typed at the nanny or in the name editor, any declined pad that is not
+// the Russian form copied over. What it writes:
+//   - backfill only: a declined pad auto-fill copied from the Russian form
+//     before и was mapped gets the stem rebuilt with і, keeping its Ukrainian
+//     endings, and a pad declined from the Russian stem instead of the name is
+//     derived again;
+//   - an empty, Latin-only or undeclined slot gets the declined pad when the
+//     morphology sidecar produces a sound one, otherwise the single Ukrainian
+//     form (unless it reads exactly like the Russian one, see the end). The
+//     single form is what an indeclinable name reads as anyway, and
+//     leaving the slot empty instead would show the Russian spelling, э and all
+//     (Фиориннэ, Тайфоэн), to every Ukrainian reader.
+DLString autofill_ua_form( const DLString &uaPad, const DLString &ruPad,
+                           const DLString &login, short sex, lang_t baseLang,
+                           bool backfill )
+{
+    if (!uaPad.empty( ) && uaPad.at( 0 ) == '=')
+        return DLString::emptyString;
+
+    // An explicit '=' Russian pad lists full forms: the nominative is the first.
+    DLString ruNom;
+    if (!ruPad.empty( ) && ruPad.at( 0 ) == '=')
+        ruNom = ruPad.substr( 1, ruPad.find( '|' ) - 1 );
+    else
+        ruNom = pad_case1( ruPad );
+    if (ruNom.empty( ))
+        ruNom = login;
+
+    // Is the slot a copy of the Russian form rather than the player's choice?
+    // Earlier builds copied the Russian nominative with only э/ы/ъ/ё rewritten,
+    // or the Russian pad's STEM, which drops the ending (Алатиел|ь stored as
+    // "Алатиел"). Only the one-shot offline backfill asks: from then on a
+    // nominative equal to the Russian one may be the player's own choice in the
+    // name editor (Марина), and the login must not take it back. A Ukrainian
+    // registration is always the player's own.
+    DLString uaNom = pad_case1( uaPad );
+    bool sameNom = uaNom == ruNom || uaNom == String::ruLettersToUa( ruNom );
+    bool copied = backfill && baseLang != LANG_UA
+        && (sameNom || uaNom == String::ruLettersToUa( pad_stem( ruPad ) ));
+
+    if (pad_declined( uaPad )) {
+        if (!copied)
+            return DLString::emptyString;
+
+        // The right word, declined: keep the Ukrainian endings and rebuild the
+        // stem from the Russian name. Not from the stored stem, whose и may be a
+        // former ы (Малиш), which must not become і.
+        if (sameNom) {
+            DLString::size_type bar = uaPad.find( '|' );
+            DLString cell1 = uaNom.substr( bar );
+            DLString nom = ua_name_letters( ruNom );
+            if (nom.size( ) >= cell1.size( )
+                && nom.compare( nom.size( ) - cell1.size( ), cell1.size( ), cell1 ) == 0)
+                return nom.substr( 0, nom.size( ) - cell1.size( ) ) + uaPad.substr( bar );
+        }
+    }
+
+    // Prefer the slot's OWN nominative: a player who registered in Ukrainian has
+    // the name they typed sitting there undeclined, and a single form written by
+    // an earlier pass is already in Ukrainian letters. A copy, an empty slot or
+    // a Latin one ("Login||||||" from an early build) is derived from the
+    // Russian nominative instead, or the login. A Latin login with no Russian
+    // form has nothing to work from.
+    DLString source = uaNom;
+    if (copied || !String::hasCyrillic( source ))
+        source = ua_name_letters( ruNom );
+    if (!String::hasCyrillic( source ))
+        return DLString::emptyString;
+
+    // Names that do not decline must not be handed to the morphology service: it
+    // has no notion of the class and will invent a paradigm -- it declined the
+    // indeclinable Кворо as a feminine noun ("Квор|а|и|і|у|ою|і") and inflected
+    // Тайфоэн, a feminine name ending in a consonant.
+    if (String::nameIsIndeclinable( source, sex == SEX_FEMALE ))
+        return source;
+
+    DLString gender = "-";
+    if (sex == SEX_MALE)   gender = "masc";
+    if (sex == SEX_FEMALE) gender = "femn";
+
+    // Keep only a pad that really declined AND whose nominative reproduces the
+    // input. pymorphy hands back a full paradigm for a name it has guessed wrong
+    // -- Диабол inflected as a plural (nominative "Диаболи"), Лариена with its -а
+    // dropped ("Лариен") -- and pad_declined() is true for each, because they
+    // DID inflect, just into the wrong word. The pad's nominative is stem + first
+    // case cell (Олен|а|и| is "Олена"), see pad_case1.
+    DLString pad = Morphology::declineUa( source, "NOUN", gender );
+    if (pad_declined( pad ) && pad_case1( pad ) == source)
+        return pad;
+
+    // A declinable name the sidecar cannot decline. If it reads the same in both
+    // alphabets, an empty slot is better: the name falls back to the declined
+    // Russian pad (Агат, Агата, Агатом). Otherwise the single Ukrainian form,
+    // which also beats any non-empty slot that got this far (a Latin or broken
+    // copy).
+    if (source == ruNom && uaPad.empty( ))
+        return DLString::emptyString;
+
+    return source;
+}
+
 // The compiled half of the T8 name auto-fill: romanise / decline the login into
 // whatever per-language form the player hasn't set. Kept in C++ for speed; the
 // hot-reloadable global/onConnect trigger just calls autofillNameForms() on
@@ -2161,71 +2281,12 @@ static void autofill_name_forms( PCharacter *pch )
             pch->setEnglishName( en );
     }
 
-    // Ukrainian: decline into a Flexer pad via the morphology sidecar. Feed it the
-    // Russian nominative rather than the login -- Ukrainian morphology can do
-    // nothing with a Latin "Telesyk" and hands back an empty pad, whereas the
-    // Russian form is Cyrillic and declines properly ("Телесик" ->
-    // "Телесик||а|ові|а|ом|ові"). Cyrillic logins with no Russian form yet still
-    // fall back to the login itself.
-    //
-    // The condition covers an undeclined pad as well as a missing one: characters
-    // that went through the earlier, broken version carry a stored "Login||||||",
-    // which counts as "set", so a plain empty() test would never repair them.
-    if (!pad_declined( pch->getUkrainianName( ).getFullForm( ) )) {
-        DLString gender = "-";
-        if (pch->getSex( ) == SEX_MALE)   gender = "masc";
-        if (pch->getSex( ) == SEX_FEMALE) gender = "femn";
-
-        // Prefer the Ukrainian slot's OWN nominative. A player who registered in
-        // Ukrainian has the name they typed sitting right there, undeclined;
-        // deriving it from the Russian form instead would round-trip it through
-        // another alphabet for nothing. Only when that slot is empty does the
-        // Russian form -- and finally the login -- become the source.
-        DLString source = pad_stem( pch->getUkrainianName( ).getFullForm( ) );
-        if (source.empty( ))
-            source = pad_stem( pch->getRussianName( ).getFullForm( ) );
-        if (source.empty( ))
-            source = pch->getName( );
-
-        // Ukrainian has no э/ы/ъ/ё, so a Russian name carrying one is a word the
-        // Ukrainian dictionary simply cannot read: it declines nothing and cannot
-        // even tell the name is animate. Rewriting those four letters first makes
-        // ~60 more of the 602 affected names parse. и is deliberately left alone
-        // -- it is a normal Ukrainian letter, so mapping it to і would be a
-        // judgement about each name rather than transliteration.
-        source = String::ruLettersToUa( source );
-
-        // Names that do not decline must not be handed to the morphology
-        // service: it has no notion of the class and will invent a paradigm --
-        // it declined the indeclinable Кворо as a feminine noun
-        // ("Квор|а|и|і|у|ою|і") and inflected Тайфоэн, a feminine name ending in
-        // a consonant. Leaving the slot empty is right: the name map already
-        // falls back to the Russian form, which carries the same single shape.
-        if (!String::nameIsIndeclinable( source, pch->getSex( ) == SEX_FEMALE )) {
-            // Store only a pad that really declined AND whose nominative
-            // reproduces the input. nameIsIndeclinable is a front-guard against
-            // classes morphology cannot read at all; this is the back-guard for
-            // the ones it misreads with confidence. pymorphy hands back a full
-            // paradigm for a name it has guessed wrong -- Диабол inflected as a
-            // plural (nominative "Диаболи"), Лариена with its -а dropped
-            // ("Лариен"), Сенька reshaped into "Сенько" -- and pad_declined() is
-            // true for every one of them, because they DID inflect, just into the
-            // wrong word. Compare the pad's actual nominative -- stem + first case
-            // cell, NOT the bare stem (Олен|а|и| is nominative "Олена", stem
-            // "Олен") -- back to the source: if it no longer equals the name we
-            // fed in, the paradigm is invented. Leave the slot empty and let the
-            // name map fall back to the Russian single form (correct), exactly as
-            // for an indeclinable name.
-            //
-            // Note the guard cannot un-stick a bad pad already stored: a
-            // non-empty field makes this autofill skip the character (line
-            // above), and a plural-extension misread that this check let through
-            // in an earlier build stays. Historical re-audit is a separate task.
-            DLString pad = Morphology::declineUa( source, "NOUN", gender );
-            if (pad_declined( pad ) && pad_case1( pad ) == source)
-                pch->setUkrainianName( pad );
-        }
-    }
+    const DLString &ua = pch->getUkrainianName( ).getFullForm( );
+    DLString form = autofill_ua_form( ua, pch->getRussianName( ).getFullForm( ),
+                                      pch->getName( ), pch->getSex( ), pch->getBaseLang( ),
+                                      false );
+    if (!form.empty( ) && form != ua)
+        pch->setUkrainianName( form );
 }
 
 NMI_INVOKE( CharacterWrapper, autofillNameForms, "(): заполнить недостающие языковые формы имени игрока (T8)" )

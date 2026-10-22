@@ -96,8 +96,12 @@ static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
 {
     Json::Value c;
 
-    c["name"]["en"] = pci->getName().c_str();
-    c["name"]["ru"] = pci->getRussianName().decline('1').c_str();
+    // The per-language display names the game itself shows: the English form or
+    // the login, the Russian form, the Ukrainian form or the Russian fallback.
+    c["name"]["login"] = pci->getName().c_str();
+    c["name"]["en"] = pci->getNameP('1', LANG_EN).c_str();
+    c["name"]["ru"] = pci->getNameP('1', LANG_RU).c_str();
+    c["name"]["ua"] = pci->getNameP('1', LANG_UA).c_str();
     c["sex"] = pci->getSex() == SEX_FEMALE ? "f" : "m";
 
     const Race &race = *pci->getRace();
