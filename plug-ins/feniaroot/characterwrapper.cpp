@@ -3646,6 +3646,10 @@ NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "(vnum): поиск по вну
 // item_type LIGHT and NO wear_flags bit (their gearAdvice slot is 0), so a wear-bit
 // mask cannot select them. Fenia's .tmp.advice.LIGHT_SLOT returns this same value.
 #define GA_SLOT_LIGHT (1 << 30)
+// Worn-side slot key for a non-light item with no wear bit (a tattoo on a tat_*
+// location). Keeps it out of slot 0, where its score would become the bar a light
+// has to beat. Nothing is ever recommended for this key.
+#define GA_SLOT_NOBIT (1 << 29)
 
 // How the sage tells you to get an item. GA_INPACK: the char already carries it
 // unworn -- the sage says "put it on" instead of pointing at a route.
@@ -6268,6 +6272,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             continue;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
+        if (slot == 0 && o->item_type != ITEM_LIGHT)
+            slot = GA_SLOT_NOBIT;
         bool flagsOwned = !(gaBareHanded && (slot & gaHandSlots));
         // Record which affect_flags this worn item grants, keyed by its slot, so the
         // per-candidate redundancy set can exclude a candidate's OWN slot (F1).
@@ -6663,6 +6669,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 continue;
             int slot = o->pIndexData->wear_flags;
             REMOVE_BIT( slot, ITEM_TAKE );
+            if (slot == 0 && o->item_type != ITEM_LIGHT)
+                slot = GA_SLOT_NOBIT;
             if (gaBareHanded && (slot & gaHandSlots))   // out of the totals, claims no bit
                 continue;
             GAOnce e = { o->pIndexData, o, true, 0, 0, 0, 0 };
