@@ -7,6 +7,7 @@
 #include "move_utils.h"
 
 #include "feniamanager.h"
+#include "fenia_utils.h"
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
@@ -223,7 +224,11 @@ void Movement::callProgs( Character *wch )
     try {
         rafprog_leave( from_room, wch );
         rprog_leave( from_room, wch, to_room, movetypes[movetype].name );
-        
+
+        // Players who do not see the walker come in (samurai zanshin): the
+        // filter keeps the global trigger off the common path.
+        bool unseenEntry = gprog_registered( "onUnseenEntry" );
+
         for (fch = to_room->people; fch!=0; fch = fch_next) {
             fch_next = fch->next_in_room;
 
@@ -232,8 +237,24 @@ void Movement::callProgs( Character *wch )
                     oprog_greet( obj, wch );
 
             /* greet programs for people */
-            if (IS_AWAKE(fch))
+            if (IS_AWAKE(fch)) {
                 mprog_greet( fch, wch );
+
+                if (unseenEntry && !fch->is_npc( ) && fch != wch
+                        && fch->in_room == to_room && wch->in_room == to_room
+                        && !fch->can_see( wch ))
+                {
+                    // A kill must reach the VictimDeathException catch below,
+                    // like a greet attack does; anything else is a script bug.
+                    try {
+                        gprog_nocatch( "onUnseenEntry", "CCs", fch, wch, movetypes[movetype].name );
+                    } catch (const VictimDeathException &) {
+                        throw;
+                    } catch (const ::Exception &e) {
+                        FeniaManager::getThis( )->croak( 0, Scripting::Register( "onUnseenEntry" ), e );
+                    }
+                }
+            }
         }
 
         /* entry programs for items */

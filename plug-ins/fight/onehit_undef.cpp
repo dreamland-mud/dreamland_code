@@ -71,6 +71,8 @@ GSN(cross_block);
 GSN(deathblow);
 GSN(dodge);
 GSN(forest_fighting);
+GSN(fudoshin);
+GSN(hazukure);
 GSN(hand_block);
 GSN(katana);
 GSN(lance);
@@ -175,6 +177,7 @@ void UndefinedOneHit::calcDamage( )
     damapply_class(ch, dam);
     damApplyMasterSword( );
     damApplyDamroll( );
+    damApplyFudoshin( );
     damApplyAttitude( );
     damApplyDeathblow( );
     damApplySoulLust( );
@@ -611,6 +614,29 @@ void UndefinedOneHit::damApplyMasterSword( )
 
     gsn_mastering_sword->improve( ch, true, victim );
     dam = dam * 150 /100;
+}
+
+/*
+ * Fudoshin: a samurai below half health hits harder. The bonus grows
+ * linearly from nothing at 50% hp to +20% at 10% hp and stays there below,
+ * scaled by how well the skill is learned. Shame (hazukure) switches it off.
+ */
+void UndefinedOneHit::damApplyFudoshin( )
+{
+    if (ch->is_npc( ) || ch->max_hit <= 0)
+        return;
+
+    // Cheapest test first: every player weapon hit in the game passes here.
+    int pct = ch->hit * 100 / ch->max_hit;
+    if (pct >= 50)
+        return;
+
+    if (!gsn_fudoshin->usable( ch, false ) || ch->isAffected( gsn_hazukure ))
+        return;
+
+    int band = 50 - max( pct, 10 ); // 0..40
+    dam += dam * band * gsn_fudoshin->getEffective( ch ) / 20000;
+    gsn_fudoshin->improve( ch, true, victim );
 }
 
 void UndefinedOneHit::damEffectMasterSword( ) 
