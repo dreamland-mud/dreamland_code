@@ -37,6 +37,7 @@ public:
 protected:
     void damApplyMasterHand( );
     void damApplyMasterSword( );
+    void damApplyFudoshin( );
     void damApplyDeathblow( );
     void damApplySoulLust( );
     void damApplyMounted( );
