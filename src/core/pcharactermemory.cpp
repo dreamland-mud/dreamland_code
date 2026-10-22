@@ -19,7 +19,7 @@
 #include "def.h"
 
 PCharacterMemory::PCharacterMemory( )
-                   : ethos( ETHOS_NULL, &ethos_table )
+                   : ethos( ETHOS_NULL, &ethos_table ), created( 0 ), playedHours( 0 )
 {
 }
 
@@ -433,7 +433,27 @@ int PCharacterMemory::getLoyalty() const
 
 void PCharacterMemory::setLoyalty(int value)
 {
-    this->loyalty = value;        
+    this->loyalty = value;
+}
+
+long PCharacterMemory::getCreated( ) const
+{
+    return created;
+}
+
+void PCharacterMemory::setCreated( long t )
+{
+    created = t;
+}
+
+int PCharacterMemory::getPlayedHours( ) const
+{
+    return playedHours;
+}
+
+void PCharacterMemory::setPlayedHours( int hours )
+{
+    playedHours = hours;
 }
 
 using namespace Grammar;

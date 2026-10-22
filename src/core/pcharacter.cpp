@@ -452,6 +452,8 @@ PCharacterMemory* PCharacter::getMemory( )
         mem->setBonuses(getBonuses());
         mem->setStartRoom(getStartRoom());
         mem->setLoyalty(getLoyalty());
+        mem->setCreated(getCreated());
+        mem->setPlayedHours(getPlayedHours());
 
         return mem;
 }

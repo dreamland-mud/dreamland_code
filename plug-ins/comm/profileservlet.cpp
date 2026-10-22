@@ -16,10 +16,12 @@
  *
  * Each character carries what an anonymous `whois` shows: race, class, remorts,
  * Legendary/Immortal rank, a non-hidden clan, titles and online state. Level
- * stays out (who conceals it, see can_see_level), and so does anything from
- * the account record beyond its title.
+ * stays out (who conceals it, see can_see_level). The account block sums the
+ * SHOWN characters only (playing since, hours across every life, lives lived,
+ * the class with the most hours), so a hidden alt never moves a number.
  */
 #include <algorithm>
+#include <map>
 #include <jsoncpp/json/json.h>
 
 #include "servlet.h"
@@ -92,6 +94,20 @@ bool account_profile_eligible(const DLString &id)
     return false;
 }
 
+// Same resolution as the roster entry in accountservlet.cpp: the RU/UA names
+// are Flexer pads, ruscase('1') takes the nominative.
+static Json::Value profile_class_json(Profession &prof)
+{
+    Json::Value c;
+    DLString profRu = prof.getRusName().ruscase('1');
+    DLString profUa = prof.getUaName().empty() ? profRu : prof.getUaName().ruscase('1');
+    c["key"] = prof.getName().c_str();
+    c["en"] = prof.getName().c_str();
+    c["ru"] = profRu.c_str();
+    c["ua"] = profUa.c_str();
+    return c;
+}
+
 static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
 {
     Json::Value c;
@@ -114,15 +130,7 @@ static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
     c["race"]["ru"] = raceRu.ruscase('1').c_str();
     c["race"]["ua"] = raceUa.ruscase('1').c_str();
 
-    // Same resolution as the roster entry in accountservlet.cpp: the RU/UA names
-    // are Flexer pads, ruscase('1') takes the nominative.
-    auto prof = pci->getProfession();
-    DLString profRu = prof->getRusName().ruscase('1');
-    DLString profUa = prof->getUaName().empty() ? profRu : prof->getUaName().ruscase('1');
-    c["class"]["key"] = prof->getName().c_str();
-    c["class"]["en"] = prof->getName().c_str();
-    c["class"]["ru"] = profRu.c_str();
-    c["class"]["ua"] = profUa.c_str();
+    c["class"] = profile_class_json(*pci->getProfession());
 
     c["remorts"] = (int)pci->getRemorts().size();
 
@@ -146,6 +154,8 @@ static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
 
     const Clan &clan = *pci->getClan();
     if (pci->getClan() != clan_none && pci->getClan()->isValid() && !clan.isHidden()) {
+        // The internal name keys the clan badge (the who widget's letter).
+        c["clan"]["key"] = clan.getName().c_str();
         c["clan"]["en"] = clan.getNameFor(LANG_EN).colourStrip().c_str();
         c["clan"]["ru"] = clan.getRussianName().ruscase('1').colourStrip().c_str();
         c["clan"]["ua"] = clan.getNameFor(LANG_UA).ruscase('1').colourStrip().c_str();
@@ -159,6 +169,63 @@ static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
 
     c["online"] = online;
     return c;
+}
+
+// Account-wide numbers over the shown characters: the earliest creation date
+// (created survives remort; 0 = a character older than the field), true hours
+// of the current life plus every past one, and the class played the longest.
+static Json::Value profile_account_stats(const DLString &id, const list<PCMemoryInterface *> &shown)
+{
+    Json::Value a;
+    long since = 0;
+    long hours = 0;
+    int lives = 0;
+    map<DLString, long> byClass;
+
+    for (PCMemoryInterface *pci : shown) {
+        long created = pci->getCreated();
+        if (created > 0 && (since == 0 || created < since))
+            since = created;
+
+        int now = pci->getPlayedHours();
+        hours += now;
+        byClass[pci->getProfession()->getName()] += now;
+        lives++;
+
+        Remorts &r = pci->getRemorts();
+        for (unsigned int i = 0; i < r.size(); i++) {
+            hours += r[i].time.getValue();
+            byClass[r[i].classCh.getValue()] += r[i].time.getValue();
+            lives++;
+        }
+    }
+
+    // A registry-era account carries its own date; it only helps when no
+    // character knows when it was made.
+    if (since == 0) {
+        Json::Value acc = AccountManager::get(id);
+        if (acc.isObject() && acc["created"].isIntegral())
+            since = (long)acc["created"].asInt64();
+    }
+
+    if (since > 0)
+        a["since"] = (Json::Int64)since;
+    a["hours"] = (Json::Int64)hours;
+    a["lives"] = lives;
+
+    DLString fav;
+    long favHours = 0;
+    for (auto &kv : byClass)
+        if (kv.second > favHours) {
+            fav = kv.first;
+            favHours = kv.second;
+        }
+
+    Profession *prof = fav.empty() ? 0 : professionManager->findExisting(fav);
+    if (prof != 0 && favHours > 0)
+        a["favClass"] = profile_class_json(*prof);
+
+    return a;
 }
 
 static bool profile_valid_id(const DLString &id)
@@ -225,6 +292,7 @@ static void profile_servlet(HttpRequest &request, HttpResponse &response)
     Json::Value body;
     body["id"] = id.c_str();
     body["title"] = AccountManager::titleOf(id).c_str();
+    body["account"] = profile_account_stats(id, shown);
     body["chars"] = Json::Value(Json::arrayValue);
 
     for (PCMemoryInterface *pci : shown) {

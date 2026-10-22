@@ -143,8 +143,9 @@ public:
     virtual const Date& getLastAccessTime( ) const ;
     virtual void setLastAccessTime( const Date& ) ;
     void setLastAccessTime( );
-    inline long getCreated( ) const { return created.getValue( ); }
+    virtual long getCreated( ) const { return created.getValue( ); }
     inline void setCreated( long t ) { created.setValue( t ); }
+    virtual int getPlayedHours( ) const { return age.getTrueHours( ); }
 
     virtual const DLString& getLastAccessHost( ) const ;
     virtual void setLastAccessHost( const DLString& ) ;

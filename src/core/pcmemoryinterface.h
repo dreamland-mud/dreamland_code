@@ -130,6 +130,12 @@ public:
     virtual Remorts& getRemorts( )  = 0;
     virtual void setRemorts( const Remorts& )  = 0;
 
+    // Unix time the character was first created (0 = unknown) and its true
+    // played hours in the current life. Read-only on memory: a snapshot taken
+    // by PCharacter::getMemory, so offline characters can answer without a pfile load.
+    virtual long getCreated( ) const = 0;
+    virtual int getPlayedHours( ) const = 0;
+
     virtual const InflectedString& getRussianName( ) const  = 0;
     virtual void setRussianName( const DLString& )  = 0;
 
