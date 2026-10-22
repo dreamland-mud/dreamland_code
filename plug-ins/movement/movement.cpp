@@ -3,7 +3,6 @@
  * ruffina, 2004
  */
 #include "movement.h"
-#include "logstream.h"
 #include "movetypes.h"
 #include "move_utils.h"
 
@@ -252,7 +251,7 @@ void Movement::callProgs( Character *wch )
                     } catch (const VictimDeathException &) {
                         throw;
                     } catch (const ::Exception &e) {
-                        warn( "onUnseenEntry: %s", e.what( ) );
+                        FeniaManager::getThis( )->croak( 0, Scripting::Register( "onUnseenEntry" ), e );
                     }
                 }
             }

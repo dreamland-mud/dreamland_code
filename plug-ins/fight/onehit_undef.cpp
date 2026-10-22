@@ -626,11 +626,12 @@ void UndefinedOneHit::damApplyFudoshin( )
     if (ch->is_npc( ) || ch->max_hit <= 0)
         return;
 
-    if (!gsn_fudoshin->usable( ch ) || ch->isAffected( gsn_hazukure ))
-        return;
-
+    // Cheapest test first: every player weapon hit in the game passes here.
     int pct = ch->hit * 100 / ch->max_hit;
     if (pct >= 50)
+        return;
+
+    if (!gsn_fudoshin->usable( ch, false ) || ch->isAffected( gsn_hazukure ))
         return;
 
     int band = 50 - max( pct, 10 ); // 0..40
