@@ -234,10 +234,12 @@ bool FeniaSkillActionHelper::executeCommandRun(DefaultSkillCommand *cmd, Charact
 bool FeniaSkillActionHelper::executeCommandApply(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level, bool &rc)
 {
     Scripting::Register ctx =  createContext(cmd, ch, victim, level);
-    return executeMethod(cmd, "apply", ctx, rc);
+    // A defense that kills the attacker (kaeshi, iaido) must end his blow:
+    // every C++ caller of a Fenia command apply expects VictimDeathException.
+    return executeMethod(cmd, "apply", ctx, rc, true);
 }
 
-bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLString &methodName, Scripting::Register ctx, bool &rc)
+bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLString &methodName, Scripting::Register ctx, bool &rc, bool propagateDeath)
 {
     // Find method defined on the wrapper.
     WrapperBase *wrapper = wtarget->getWrapper();
@@ -259,6 +261,13 @@ bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLStrin
         // Propagate exception further on victim's death.
         if (ce.message == "victim is dead" || ce.message == "caster is dead")
             throw VictimDeathException();        
+
+    } catch (const VictimDeathException &e) {
+        // A native death (damage_nocatch, skill_one_hit) unwinding through the script.
+        if (propagateDeath)
+            throw;
+
+        FeniaManager::getThis()->croak(0, methodId, e);
 
     } catch (const ::Exception &e) {
         // On error, complain to the logs and to all immortals in the game.

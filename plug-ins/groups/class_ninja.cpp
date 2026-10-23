@@ -162,8 +162,13 @@ SKILL_RUNP( vanish )
                 return;
         }
 
-        if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
+        // The rear kick lands on the ninja and may kill him.
+        try {
+            if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
                 return;
+        } catch (const VictimDeathException &) {
+            return;
+        }
         
         if(SHADOW(ch))
         {
@@ -819,8 +824,13 @@ SKILL_RUNP( assassinate )
             return;
     }
 
-    if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
+    // The rear kick lands on the ninja and may kill him.
+    try {
+        if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
+            return;
+    } catch (const VictimDeathException &) {
         return;
+    }
 
     if(SHADOW(ch))
     {
@@ -941,8 +951,13 @@ SKILL_RUNP( strangle )
                 return;
         }
 
-        if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
+        // The rear kick lands on the ninja and may kill him.
+        try {
+            if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
+                return;
+        } catch (const VictimDeathException &) {
             return;
+        }
 
         if(SHADOW(ch))
         {
