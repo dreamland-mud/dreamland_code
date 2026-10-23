@@ -523,14 +523,25 @@ void violence_update()
     Character *victim;
     Object *obj, *obj_next;
 
+    // A char's own round can extract him (onDeath/onFight extract, mob_extract
+    // deaths, quit), which unlinks him from char_list and zeroes his next, so
+    // the rest of the list lost its round. Walk a snapshot instead. Extracted chars go back to a
+    // pool with their ID reset, so a changed ID means "gone, skip him".
+    vector<pair<Character *, long long> > fighters;
+
     // Reset per-round damage accumulators before the hit loop; summarized below.
     for (ch = char_list; ch != 0; ch = ch->next) {
         ch->roundDamage = 0;
         ch->roundImmune = 0;
+        fighters.push_back(make_pair(ch, ch->getID()));
     }
 
-    for (ch = char_list; ch != 0; ch = ch->next)
+    for (auto &f: fighters)
     {
+        ch = f.first;
+        if (ch->getID() != f.second)
+            continue;
+
         try
         {
             if ((victim = ch->fighting) == 0 || ch->in_room == 0)
