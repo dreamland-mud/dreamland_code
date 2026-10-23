@@ -71,6 +71,10 @@ OBJ_INDEX_DATA *get_obj_index( int vnum )
 {
     OBJ_INDEX_DATA *pObjIndex;
 
+    // Negative vnum would index the hash table out of bounds.
+    if (vnum < 0)
+        return 0;
+
     for ( pObjIndex  = obj_index_hash[vnum % 1024];
           pObjIndex != 0;
           pObjIndex  = pObjIndex->next )

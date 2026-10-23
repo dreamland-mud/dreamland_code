@@ -126,6 +126,10 @@ MOB_INDEX_DATA *get_mob_index( int vnum )
 {
     MOB_INDEX_DATA *pMobIndex;
 
+    // Negative vnum would index the hash table out of bounds.
+    if (vnum < 0)
+        return 0;
+
     for ( pMobIndex  = mob_index_hash[vnum % 1024];
           pMobIndex != 0;
           pMobIndex  = pMobIndex->next )
