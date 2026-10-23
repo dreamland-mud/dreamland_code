@@ -528,10 +528,11 @@ NMI_INVOKE(PlayerWrapper, eraseAttribute, "(attr): удаляет аттрибу
     return Register();
 }
 
-NMI_INVOKE(PlayerWrapper, setAttribute, "(name, value): строковый аттрибут name = value (перезаписывает) и сохранение профиля, работает и для офлайн-персонажа")
+NMI_INVOKE(PlayerWrapper, setAttribute, "(name, value[, save]): строковый аттрибут name = value (перезаписывает), работает и для офлайн-персонажа; save=false -- без сохранения профиля (по умолчанию сохраняет)")
 {
     DLString name = argnum2string(args, 1);
     DLString value = argnum2string(args, 2);
+    bool doSave = args.size() < 3 || argnum(args, 3).toBoolean();
     if (name.empty())
         throw Scripting::Exception("attribute name is empty");
 
@@ -541,7 +542,8 @@ NMI_INVOKE(PlayerWrapper, setAttribute, "(name, value): строковый ат�
         throw Scripting::Exception("Attribute " + name + " is not a string attribute");
 
     attrs.getAttr<XMLStringAttribute>(name)->setValue(value);
-    save();
+    if (doSave)
+        save();
     return Register();
 }
 
