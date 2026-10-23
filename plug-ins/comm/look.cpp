@@ -1038,7 +1038,7 @@ static void show_char_sexrace( Character *ch, Character *vict, ostringstream &bu
     } else {
         buf << vict->getRace( )->getNameFor( ch, vict ).ruscase('1');
     }
-    buf << ", " << size_table.message(URANGE(SIZE_TINY, vict->size, SIZE_GARGANTUAN), '2', Player::displayLang(ch))
+    buf << ", " << size_table.message(vict->getSize( ), '2', Player::displayLang(ch))
         << " " << _("размера").getMessage(Player::displayLang(ch));
     buf << ") ";
 }

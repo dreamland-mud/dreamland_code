@@ -172,8 +172,8 @@ SKILL_RUNP( lash )
         dam += number_range(4, 4 + 4 * ch->getCurrStat(STAT_STR) + chance / 10);
         chance /= 2;
 
-        if (ch->size < victim->size)
-            chance += (ch->size - victim->size) * 10; 
+        if (ch->getSize( ) < victim->getSize( ))
+            chance += (ch->getSize( ) - victim->getSize( )) * 10; 
         
         chance += (ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_STR)) * 4;
         

@@ -175,7 +175,7 @@ void ThirstDesire::drink( PCharacter *ch, int amount, Liquid *liq )
  */
 int HungerDesire::getUpdateAmount( PCharacter *ch )
 {
-    return ch->size > SIZE_MEDIUM ? -2 : -1;
+    return ch->getSize( ) > SIZE_MEDIUM ? -2 : -1;
 }
 
 

@@ -41,6 +41,8 @@
 
 #include "dreamland.h"
 #include "def.h"
+#include "autoflags.h"
+#include "dl_math.h"
 
 
 
@@ -233,6 +235,11 @@ void Character::setLevel( short level )
 {
     this->level.setValue( level );
 }
+int Character::getSize( ) const
+{
+    return URANGE( SIZE_TINY, size, SIZE_GARGANTUAN );
+}
+
 short Character::getRealLevel( ) const 
 {
     return level.getValue( );

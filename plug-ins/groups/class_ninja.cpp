@@ -240,7 +240,7 @@ SKILL_RUNP( vanish )
         d.log(kidnap_chance, "stats");
         kidnap_chance += ( skill_level(*gsn_vanish, ch) - victim->getModifyLevel() ) * level_mod * 100;
         d.log(kidnap_chance, "lvl");
-        kidnap_chance += (ch->size - victim->size) * size_mod * 100;
+        kidnap_chance += (ch->getSize( ) - victim->getSize( )) * size_mod * 100;
         d.log(kidnap_chance, "size");
         kidnap_chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
         kidnap_chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);    
@@ -478,7 +478,7 @@ SKILL_RUNP( nerve )
         d.log(chance, "stats");
         chance += ( skill_level(*gsn_nerve, ch) - victim->getModifyLevel() ) * level_mod * 100;
         d.log(chance, "lvl");
-        chance += (ch->size - victim->size) * size_mod * 100;
+        chance += (ch->getSize( ) - victim->getSize( )) * size_mod * 100;
         d.log(chance, "size");
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
         chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);    
@@ -656,7 +656,7 @@ void AssassinateOneHit::calcDamage( )
     chance += gsn_assassinate->getEffective( ch ) * skill_mod;
     chance += ( ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
     chance += ( skill_level(*gsn_assassinate, ch) - victim->getModifyLevel() ) * level_mod * 100;
-    chance += (ch->size - victim->size) * size_mod * 100;
+    chance += (ch->getSize( ) - victim->getSize( )) * size_mod * 100;
     chance += victim->can_see(ch) ? 0 : (vis_mod * 100);    
     chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
 
@@ -976,7 +976,7 @@ SKILL_RUNP( strangle )
         d.log(chance, "stats");
         chance += ( skill_level(*gsn_strangle, ch) - victim->getModifyLevel() ) * level_mod * 100;
         d.log(chance, "lvl");
-        chance += (ch->size - victim->size) * size_mod * 100;
+        chance += (ch->getSize( ) - victim->getSize( )) * size_mod * 100;
         d.log(chance, "size");
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
         chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            

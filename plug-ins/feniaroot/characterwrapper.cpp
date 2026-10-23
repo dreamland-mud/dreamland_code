@@ -1237,6 +1237,18 @@ NMI_GET( CharacterWrapper, sex, "пол (таблица .tables.sex_table)")
     return target->getSex( );
 }
 
+NMI_GET( CharacterWrapper, size, "размер (таблица .tables.size_table), в пределах tiny..gargantuan")
+{
+    checkTarget( );
+    return target->getSize( );
+}
+
+NMI_SET( CharacterWrapper, size, "размер (таблица .tables.size_table): сырое значение, сумма расы и APPLY_SIZE")
+{
+    checkTarget( );
+    target->size = arg.toNumber( );
+}
+
 NMI_GET( CharacterWrapper, wait, "wait state (в пульсах, 1 пульс = четверть секунды)")
 {
     checkTarget( );
@@ -1473,7 +1485,6 @@ INT_FIELD(wimpy, "трусость. при скольки hp чар будет �
 INT_FIELD(dam_type, "тип повреждения (таблица .tables.weapon_flags)")
 INT_FIELD(form, "форма тела (таблица .tables.form_flags)")
 INT_FIELD(parts, "части тела (таблица .tables.part_flags)")
-INT_FIELD(size, "размер (таблица .tables.size_table)")
 INT_FIELD(death_ground_delay, "счетчик ловушки")
 FLAG_FIELD(trap, "флаги ловушки (таблица .tables.trap_flags)")
 INT_FIELD(riding, "если mount!=null: true - мы верхом, false - мы оседланы")

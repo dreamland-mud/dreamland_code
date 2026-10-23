@@ -267,10 +267,10 @@ bool ExitsMovement::checkExitFlags( Character *wch )
 
     // For extra exits, check size of the walker and their horse.
     if (peexit) {
-        int total_size = wch->size;
+        int total_size = wch->getSize( );
         
         if (rider) 
-            total_size += rider->size / 2;
+            total_size += rider->getSize( ) / 2;
         
         if (total_size > peexit->max_size_pass) {
             msgSelfParty( wch,

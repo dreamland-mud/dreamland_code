@@ -60,7 +60,7 @@ static bool check_rock_catching( Character *victim, Object *obj )
         return false;
     if (get_weapon_class(obj) != WEAPON_STONE)
         return false;
-    if (victim->size < SIZE_HUGE) 
+    if (victim->getSize( ) < SIZE_HUGE) 
         return false;
     return true;
 }
