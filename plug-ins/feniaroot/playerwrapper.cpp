@@ -247,7 +247,7 @@ NMI_SET(PlayerWrapper, clanDonated, "кп, внесенные в текущий 
     save();
 }
 
-NMI_INVOKE(PlayerWrapper, clanRecord, "(clan): запись о клане -- rank (замороженный), tenure (часы), donated, office -- или null")
+NMI_INVOKE(PlayerWrapper, clanRecord, "(clan): запись о клане -- rank (замороженный), tenure (часы), donated, totalDonated (всего qp за все время), office -- или null")
 {
     DLString clanName = argnum2string(args, 1);
     XMLClanRecord *rec = clan_record(getTarget(), clanName, false);
@@ -505,7 +505,7 @@ NMI_GET(PlayerWrapper, created, "время (в секундах) создани
     return (int)getTarget()->getCreated();
 }
 
-NMI_GET(PlayerWrapper, playedHours, "сыграно часов в текущей жизни (для онлайн-персонажа -- на момент последнего сохранения)")
+NMI_GET(PlayerWrapper, playedHours, "сыграно часов в текущей жизни")
 {
     return getTarget()->getPlayedHours();
 }
