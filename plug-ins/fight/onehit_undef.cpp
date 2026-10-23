@@ -670,9 +670,6 @@ void UndefinedOneHit::damEffectMasterSword( )
 
     if (weapon_sn != gsn_sword)
         return;
-        
-    if (number_percent( ) > gsn_mastering_sword->getEffective( ch ))
-        return;
 
     if (!IS_WEAPON_STAT(katana, WEAPON_KATANA))
         return;
@@ -690,7 +687,12 @@ void UndefinedOneHit::damEffectMasterSword( )
      
     if (ch->getModifyLevel( ) - victim->getModifyLevel( ) > 10)
         return;
-        
+
+    // Mastery counts every hit it lands on; without it the blade still
+    // grows, three times slower.
+    if (number_percent( ) > gsn_mastering_sword->getEffective( ch ) && number_range( 1, 3 ) != 1)
+        return;
+
     katana->cost++;
     
     if (katana->cost <= 249)
