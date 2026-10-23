@@ -18,6 +18,7 @@
 #include "merc.h"
 
 #include "vnum.h"
+#include "xmlattributevisited.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -134,6 +135,13 @@ void char_to_room( Character *ch, Room *pRoomIndex )
 
         if (!ch->is_npc() && !ch->is_immortal())
         {
+                // Every room ever entered, for the "every room" achievement.
+                // getAttr casts to null over a same-named attribute of another type.
+                XMLAttributeVisited::Pointer visited =
+                        ch->getPC()->getAttributes().getAttr<XMLAttributeVisited>("visited");
+                if (visited)
+                        visited->visit(pRoomIndex->vnum);
+
                 if (ch->in_room->area->empty)
                 {
                         ch->in_room->area->empty = false;
