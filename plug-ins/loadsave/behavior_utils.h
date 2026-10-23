@@ -32,4 +32,7 @@ bool behavior_trigger(Room *room, const DLString &trigType, const char *fmt, ...
 /** For each behavior assigned in RoomIndexData call trigType and return the resulting string. */
 DLString behavior_trigger_str(Room *room, const DLString &trigType, const char *fmt, ...);
 
+/** For each behavior assigned in MOB_INDEX_DATA call trigType and return the concatenated strings. */
+DLString behavior_trigger_str(Character *ch, const DLString &trigType, const char *fmt, ...);
+
 #endif

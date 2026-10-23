@@ -676,6 +676,10 @@ static void show_char_to_char_0( Character *victim, Character *ch )
     if (nVict && nVict->behavior)
         nVict->behavior->show( ch, buf );
 
+    // Fenia behaviors (bedit: blacksmith, healer...) add their own aura tags.
+    if (nVict)
+        buf << behavior_trigger_str( nVict, "Show", "CC", nVict, ch );
+
     if (pVict) {
         show_char_pk_flags( pVict, ch, buf );
 
@@ -1050,8 +1054,15 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
     
     vict = victim->getDoppel( );
     
-    if (!fBrief) 
+    if (!fBrief) {
         show_char_description( ch, vict );
+
+        // Fenia behaviors append a standard hint line: what this mob does, where to read.
+        DLString hint = behavior_trigger_str( vict, "Descr", "CC", vict, ch );
+        hint.stripRightWhiteSpace( );
+        if (!hint.empty( ))
+            ch->send_to( hint + "\n" );
+    }
 
     // ch->sees() already yields the mount/rider name in the viewer's language
     // and grammatical case (toNoun+decline); only the connecting prose needs l10n.
