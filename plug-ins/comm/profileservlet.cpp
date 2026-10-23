@@ -120,8 +120,8 @@ static Json::Value profile_class_json(Profession &prof)
     return c;
 }
 
-// The most hours one life can honestly hold: the character's age, or
-// PROFILE_LIFE_MAX without a creation date. A longer life is a corrupt record
+// The most hours one life can honestly hold: the character's age, but never
+// less than PROFILE_LIFE_MAX (old characters carry an estimated creation date). A longer life is a corrupt record
 // (one pfile carries a 379637-hour life) and counts as 0. Fenia's
 // .tmp.achievements.charHours applies the same rule.
 static const long PROFILE_LIFE_MAX = 50000;
@@ -129,9 +129,10 @@ static const long PROFILE_LIFE_MAX = 50000;
 static long profile_life_cap(PCMemoryInterface *pci)
 {
     long created = pci->getCreated();
-    if (created > 0)
-        return (dreamland->getCurrentTime() - created) / 3600;
-    return PROFILE_LIFE_MAX;
+    long cap = PROFILE_LIFE_MAX;
+    if (created > 0 && (dreamland->getCurrentTime() - created) / 3600 > cap)
+        cap = (dreamland->getCurrentTime() - created) / 3600;
+    return cap;
 }
 
 static long profile_life_hours(long hours, long cap)

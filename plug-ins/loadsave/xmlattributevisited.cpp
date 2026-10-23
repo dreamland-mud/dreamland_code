@@ -35,10 +35,10 @@ void XMLAttributeVisited::parse() const
             from = atoi(part.substr(0, dash).c_str());
             to = atoi(part.substr(dash + 1).c_str());
         }
-        // A corrupt range can't make the set larger than the world.
-        int top = roomIndexMap.empty() ? 0 : roomIndexMap.rbegin()->first;
-        if (to > top)
-            to = top;
+        // A corrupt range can't blow the set up (no world has 65536 rooms
+        // in one run of vnums).
+        if (to - from > 65535)
+            to = from + 65535;
         for (int v = from; v > 0 && v <= to; v++)
             vnums.insert(v);
         pos = comma + 1;
