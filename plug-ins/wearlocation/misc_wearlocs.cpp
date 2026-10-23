@@ -236,7 +236,7 @@ int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
     weapon = wear_wield->find( ch );
     
     if (weapon 
-        && ch->size < SIZE_LARGE 
+        && ch->getSize( ) < SIZE_LARGE 
         && !ch->is_npc()
         && IS_WEAPON_STAT(weapon, WEAPON_TWO_HANDS))
     {
@@ -398,7 +398,7 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
 
     if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS)
         && !ch->is_npc( )
-        && ((ch->size < SIZE_LARGE && wear_shield->find( ch ))
+        && ((ch->getSize( ) < SIZE_LARGE && wear_shield->find( ch ))
             || (ch->getRace( )->getSize( ) < SIZE_HUGE && wear_second_wield->find( ch ))))
     {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {

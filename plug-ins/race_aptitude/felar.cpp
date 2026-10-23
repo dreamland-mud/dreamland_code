@@ -92,10 +92,10 @@ SKILL_RUNP( tail )
     chance -= min(Char::canCarryWeight(victim), victim->carry_weight) / 250;
 
 
-    if (ch->size < victim->size)
-        chance += (ch->size - victim->size) * 25;
+    if (ch->getSize( ) < victim->getSize( ))
+        chance += (ch->getSize( ) - victim->getSize( )) * 25;
     else
-        chance += (ch->size - victim->size) * 10;
+        chance += (ch->getSize( ) - victim->getSize( )) * 10;
 
 
     /* stats */
@@ -132,7 +132,7 @@ SKILL_RUNP( tail )
         // Derived-number mobs can roll a negative damroll (their dice carry the
         // damage), so it must not drag the tail strike below its own base.
         damage_tail = max(0, ch->damroll.getValue( )) +
-                ( 2 * number_range(4, 4 + 10 * ch->size + chance/10) );
+                ( 2 * number_range(4, 4 + 10 * ch->getSize( ) + chance/10) );
 
         damage(ch,victim,damage_tail,gsn_tail, DAM_BASH, true, DAMF_WEAPON);
     }

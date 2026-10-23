@@ -113,7 +113,7 @@ static bool has_trigger_mount( Character *victim )
     if (!victim->is_npc())
         // Rideable body (decision 26): quadruped and (hoofed or large).
         return IS_SET(victim->form, FORM_QUADRUPED)
-               && (IS_SET(victim->form, FORM_HOOFED) || victim->size >= SIZE_LARGE);
+               && (IS_SET(victim->form, FORM_HOOFED) || victim->getSize( ) >= SIZE_LARGE);
     else
         return IS_SET(victim->act, ACT_RIDEABLE);
 }

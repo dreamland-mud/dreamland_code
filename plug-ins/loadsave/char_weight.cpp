@@ -23,7 +23,7 @@ int Char::canCarryNumber(Character *ch)
     if (ch->master && !ch->master->is_npc( ) &&ch-> master->getPC( )->pet == ch)
         return 0;
 
-    return wearlocationManager->size( ) + ch->getCurrStat(STAT_DEX) - 10 + ch->size;
+    return wearlocationManager->size( ) + ch->getCurrStat(STAT_DEX) - 10 + ch->getSize( );
 }
 
 int Char::canCarryWeight(Character *ch) 

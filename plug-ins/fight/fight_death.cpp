@@ -525,7 +525,7 @@ static Object * corpse_create( Character *ch )
     }
 
     if (IS_EDIBLE_FORM(ch->form))
-        corpse->value0((1 << ch->size) - 1);
+        corpse->value0((1 << ch->getSize( )) - 1);
 
     corpse->value1(ch->getModifyLevel( ));
     corpse->value2(ch->parts);
@@ -536,7 +536,7 @@ static Object * corpse_create( Character *ch )
         corpse->value3(ch->getPC( )->getHometown( )->getPit( ));
     
     corpse->value4(ch->alignment);
-    switch ( ch->size ) {
+    switch ( ch->getSize( ) ) {
         default:
         case 0:
             corpse->weight = number_range(20, 120);

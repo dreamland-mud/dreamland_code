@@ -130,6 +130,10 @@ public:
 
     const GlobalBitvector & getWearloc( );
     
+    // size: the `size` field is a raw sum of race size and APPLY_SIZE mods (removal
+    // must subtract exactly what was added), so it can leave the table; read it here.
+    int getSize( ) const;
+
     // level
     short getRealLevel( ) const;
     virtual short getModifyLevel( ) const = 0;

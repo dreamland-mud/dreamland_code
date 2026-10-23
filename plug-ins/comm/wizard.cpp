@@ -1219,7 +1219,7 @@ static bool has_nopost(Character *ch)
     buf << "Хитролл: "   << victim->hitroll << "  "
         << "Дамролл: "   << victim->damroll << "  "
         << "Савесы: " << victim->saving_throw << "  "
-        << "Размер: "  << size_table.name(victim->size) << " (" << victim->size << ")  "
+        << "Размер: "  << size_table.name(victim->getSize( )) << " (" << victim->size << ")  "
         << "Позиция: "   << position_table.name(victim->position) << "  ";
     if (pc)
         buf << "Трусость: " << victim->wimpy;
