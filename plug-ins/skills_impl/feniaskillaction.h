@@ -109,7 +109,7 @@ private:
     static Scripting::Register createContext(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);    
     static Scripting::Register createContext(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level);
     static DLString getMethodSuffix(::Pointer<SpellTarget> &spellTarget);
-    static bool executeMethod(WrapperTarget *wtarget, const DLString &methodName, Scripting::Register ctx, bool &rc);
+    static bool executeMethod(WrapperTarget *wtarget, const DLString &methodName, Scripting::Register ctx, bool &rc, bool propagateDeath = false);
 };
 
 
