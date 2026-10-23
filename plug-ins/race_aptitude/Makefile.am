@@ -15,8 +15,7 @@ $(LIBADD_FIGHT) \
 ../skills_impl/libskills_impl.la
 
 librace_skills_la_SOURCES = \
-hobbit.cpp \
-felar.cpp
+hobbit.cpp
 
 librace_aptitude_la_LIBADD = \
 $(librace_skills_la_LIBADD) \
