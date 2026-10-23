@@ -122,6 +122,20 @@ bool behavior_trigger(Room *room, const DLString &trigType, const char *fmt, ...
 	return reglist_to_bool(regList);
 }
 
+DLString behavior_trigger_str(Character *ch, const DLString &trigType, const char *fmt, ...) 
+{
+	if (!ch->is_npc())
+		return DLString::emptyString;
+
+	va_list ap;    
+	va_start(ap, fmt);
+
+	auto regList = behavior_trigger_with_result(ch->getNPC()->pIndexData->behaviors, trigType, fmt, ap);
+
+	va_end(ap);
+	return reglist_to_str(regList);
+}
+
 bool behavior_trigger(Character *ch, const DLString &trigType, const char *fmt, ...) 
 {
 	if (!ch->is_npc())
