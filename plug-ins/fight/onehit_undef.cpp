@@ -74,6 +74,7 @@ GSN(forest_fighting);
 GSN(fudoshin);
 GSN(hazukure);
 GSN(hand_block);
+GSN(iaido);
 GSN(katana);
 GSN(lance);
 GSN(liturgy);
@@ -109,6 +110,11 @@ UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool seconda
 
 bool UndefinedOneHit::canDamage( )
 {
+    // Read before Damage::canDamage: its adjustFighting() puts the victim into the
+    // fight on this very blow, so afterwards every opener looks like a fight in progress.
+    bool opener = (victim->fighting == 0);
+    int openerPos = victim->position;
+
     if (!OneHit::canDamage( ))
         return false;
 
@@ -122,6 +128,25 @@ bool UndefinedOneHit::canDamage( )
             return false;
         }
                 
+        // A samurai caught outside a fight may draw and cut before the blow lands
+        // (Fenia skillcommand/iaido/apply), on the engagement's first landed blow.
+        if (opener) {
+            if (gsn_iaido->getCommand()->apply(ch, victim, secondary))
+                return false;
+
+            // A samurai feigning sleep springs up even when the draw fails: the
+            // blow lands on a standing man, so take back damApplyPosition's bonus.
+            if (openerPos < POS_FIGHTING && victim->position >= POS_FIGHTING) {
+                int num = 3, den = 2;
+                if (openerPos <= POS_SLEEPING) {
+                    num = 2;
+                    den = 1;
+                }
+                dam = dam * den / num;
+                orig_dam = orig_dam * den / num;
+            }
+        }
+
         // Outermost first: the bat cloud, the shield held out in front, the blink,
         // then the weapons and hands, and the last-ditch dodge.
         if (gsn_bat_swarm->getCommand()->apply(ch, victim, secondary)
