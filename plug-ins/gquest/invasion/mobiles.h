@@ -19,6 +19,8 @@ public:
         InvasionMob( );
 
         virtual bool death( Character * );
+        virtual void show( Character *, std::basic_ostringstream<char> & );
+        virtual bool isQuestTarget( Character * ) const;
         
 protected:    
         virtual void actDeath( Character * );
