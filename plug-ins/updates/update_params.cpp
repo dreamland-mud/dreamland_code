@@ -122,7 +122,8 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
     case POS_SLEEPING:
         if (gsn_curl->usable( ch )) {
             if (number_percent( ) < gsn_curl->getEffective( ch )) {
-                gain += (gain * skill_level_bonus(*gsn_curl, ch) )/ 20 ;
+                // +25% base, +5% per bonus level from gear and affects.
+                gain += gain * (5 + skill_level_bonus(*gsn_curl, ch)) / 20;
                 gsn_curl->improve( ch, true );
             }
         }
