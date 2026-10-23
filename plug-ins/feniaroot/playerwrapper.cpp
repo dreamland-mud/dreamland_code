@@ -1,4 +1,5 @@
 #include <algorithm>
+#include "commonattributes.h"
 #include "playerwrapper.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
@@ -523,6 +524,23 @@ NMI_INVOKE(PlayerWrapper, hasAttribute, "(attr): true если установл�
 NMI_INVOKE(PlayerWrapper, eraseAttribute, "(attr): удаляет аттрибут с именем attr")
 {
     getTarget()->getAttributes().eraseAttribute(args2string(args));
+    save();
+    return Register();
+}
+
+NMI_INVOKE(PlayerWrapper, setAttribute, "(name, value): строковый аттрибут name = value (перезаписывает) и сохранение профиля, работает и для офлайн-персонажа")
+{
+    DLString name = argnum2string(args, 1);
+    DLString value = argnum2string(args, 2);
+    if (name.empty())
+        throw Scripting::Exception("attribute name is empty");
+
+    XMLAttributes &attrs = getTarget()->getAttributes();
+    // getAttr on an attribute of another type casts to null: refuse instead.
+    if (attrs.isAvailable(name) && !attrs.findAttr<XMLStringAttribute>(name))
+        throw Scripting::Exception("Attribute " + name + " is not a string attribute");
+
+    attrs.getAttr<XMLStringAttribute>(name)->setValue(value);
     save();
     return Register();
 }

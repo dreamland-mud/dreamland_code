@@ -120,6 +120,15 @@ static Json::Value profile_class_json(Profession &prof)
     return c;
 }
 
+// True hours of every life of a character: the current one plus the remorts.
+static int profile_char_hours(PCMemoryInterface *pci)
+{
+    int hours = pci->getPlayedHours();
+    for (auto &life : pci->getRemorts())
+        hours += life.time.getValue();
+    return hours;
+}
+
 static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
 {
     Json::Value c;
@@ -178,6 +187,17 @@ static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
         if (!clr.empty())
             c["clan"]["color"] = clr.c_str();
     }
+
+    // The character's own description, as look shows it. Empty is left out.
+    const DLString &dEn = pci->getDescription(LANG_EN);
+    const DLString &dRu = pci->getDescription(LANG_RU);
+    const DLString &dUa = pci->getDescription(LANG_UA);
+    if (!dEn.empty())
+        c["desc"]["en"] = dEn.colourStrip().c_str();
+    if (!dRu.empty())
+        c["desc"]["ru"] = dRu.colourStrip().c_str();
+    if (!dUa.empty())
+        c["desc"]["ua"] = dUa.colourStrip().c_str();
 
     c["online"] = online;
     return c;
@@ -304,8 +324,14 @@ struct AchievementsCacheEntry {
 static map<DLString, AchievementsCacheEntry> achievements_cache;
 static time_t achievements_last_compute = 0;
 
-static bool profile_achievements_cached(const DLString &id, const list<PCMemoryInterface *> &shown, Json::Value &out)
+static bool profile_achievements_cached(const DLString &account, const list<PCMemoryInterface *> &shown, Json::Value &out)
 {
+    // Keyed by the shown names too: hiding a character makes a new key, so an
+    // answer naming it can never be served after the hide.
+    DLString id = account;
+    for (PCMemoryInterface *pci : shown)
+        id << " " << pci->getName();
+
     time_t now = dreamland->getCurrentTime();
     auto it = achievements_cache.find(id);
     bool cached = it != achievements_cache.end();
@@ -395,6 +421,17 @@ static void profile_servlet(HttpRequest &request, HttpResponse &response)
     body["account"] = profile_account_stats(shown);
     body["chars"] = Json::Value(Json::arrayValue);
 
+    // The main character: the one played the longest over all its lives.
+    PCMemoryInterface *mainChar = 0;
+    int mainHours = -1;
+    for (PCMemoryInterface *pci : shown) {
+        int h = profile_char_hours(pci);
+        if (h > mainHours) {
+            mainHours = h;
+            mainChar = pci;
+        }
+    }
+
     for (PCMemoryInterface *pci : shown) {
         bool isOnline = false;
         for (PCharacter *pch : online)
@@ -402,7 +439,10 @@ static void profile_servlet(HttpRequest &request, HttpResponse &response)
                 isOnline = true;
                 break;
             }
-        body["chars"].append(profile_char_entry(pci, isOnline));
+        Json::Value entry = profile_char_entry(pci, isOnline);
+        if (pci == mainChar)
+            entry["main"] = true;
+        body["chars"].append(entry);
     }
 
     Json::Value achievements;
