@@ -408,9 +408,10 @@ bool MobileQuestModel::checkMobile( PCharacter *pch, NPCharacter *mob )
     if (IS_CHARMED(mob))
         return false;
 
-    if (mob->behavior 
-        && (mob->behavior->hasDestiny( ) 
-            || IS_SET(mob->behavior->getOccupation( ), (1 << OCC_SHOPPER))))
+    if (mob->behavior && mob->behavior->hasDestiny( ))
+        return false;
+
+    if (mob_has_occupation( mob, OCC_SHOPPER ))
         return false;
     
     if (IS_SET( mob->pIndexData->area->area_flag, AREA_NOQUEST ))

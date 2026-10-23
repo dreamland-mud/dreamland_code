@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 
+#include <algorithm>
 #include <sys/types.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -40,6 +41,7 @@
 #include "behavior.h"
 
 #include "loadsave.h"
+#include "occupations.h"
 #include "itemeconomy.h"
 
 #include "olc.h"
@@ -1007,6 +1009,19 @@ OEDIT(list)
         pRoom = r.second;
         for(auto &pReset: pRoom->resets)
             switch(pReset->command) {
+                case 'M': {
+                    // A Fenia shop keeper sells its props stock, no G reset needed.
+                    MOB_INDEX_DATA *pMob = get_mob_index( pReset->arg1 );
+                    if (!pMob)
+                        break;
+                    list<int> stock = mob_index_shop_stock( pMob );
+                    if (std::find( stock.begin( ), stock.end( ), pObj->vnum ) != stock.end( )) {
+                        buffer << fmt(0, "{Gshop{x of [{W%d{x] in room [{W%d{x] ({g%s{x)\n\r",
+                                pMob->vnum, pRoom->vnum, pRoom->name.get(LANG_DEFAULT).c_str());
+                        cnt++;
+                    }
+                    break;
+                }
                 case 'G':
                 case 'E':
                 case 'O':

@@ -150,9 +150,11 @@ bool BasicMobileBehavior::isSaved( ) const
     return false;
 }
 
+// Fenia shop keepers can't be charmed, summoned or picked as quest targets,
+// as their C++ ShopTrader couldn't.
 bool BasicMobileBehavior::hasDestiny( )
 {
-    return false;
+    return mob_has_occupation( ch, OCC_SHOPPER );
 }
 
 int BasicMobileBehavior::getOccupation( )

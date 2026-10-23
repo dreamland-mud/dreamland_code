@@ -77,21 +77,120 @@ static const char * occ_behavior_name( int occType )
     return occ_type2name( occType );
 }
 
+// Registry index of the behavior granting an occupation, or -1.
+// findExisting is a linear registry scan with name parsing (~0.2 ms), far too
+// slow for the searcher dump, quest victim scans and gear advice, so the index
+// is resolved once (indexes are stable). A miss is retried only after the
+// registry grows, since bedit can create the behavior at runtime.
+static int occ_behavior_index( int occType )
+{
+    static int index[OCC_MAX];
+    static int sizeSeen[OCC_MAX];
+    static bool init = false;
+
+    if (occType <= 0 || occType >= OCC_MAX)
+        return -1;
+
+    if (!init) {
+        for (int i = 0; i < OCC_MAX; i++) {
+            index[i] = -1;
+            sizeSeen[i] = -1;
+        }
+        init = true;
+    }
+
+    if (index[occType] >= 0)
+        return index[occType];
+
+    if (sizeSeen[occType] == behaviorManager->size( ))
+        return -1;
+
+    sizeSeen[occType] = behaviorManager->size( );
+    Behavior *bhv = behaviorManager->findExisting( occ_behavior_name( occType ) );
+    if (bhv)
+        index[occType] = bhv->getIndex( );
+    return index[occType];
+}
+
 bool mob_has_occupation( NPCharacter *mob, int occType )
 {
-    const char *occName = occ_behavior_name(occType);
-
-    if (!occName)
+    if (!occ_behavior_name(occType))
         return false;
 
-    // Mob behaviors: try to find existing behavior called occName and see if it's assigned
-    Behavior *bhv = behaviorManager->findExisting(occName);
-    if (bhv && mob->pIndexData->behaviors.isSet(bhv))
+    // Mob behaviors: the behavior called after the occupation, if assigned
+    int ndx = occ_behavior_index( occType );
+    if (ndx >= 0 && mob->pIndexData->behaviors.isSet( ndx ))
         return true;
 
     // Old-style behavior
     return mob->behavior 
            && IS_SET(mob->behavior->getOccupation( ), (1 << occType) );
+}
+
+bool mob_index_is_shopper( MOB_INDEX_DATA *pMob )
+{
+    int ndx = occ_behavior_index( OCC_SHOPPER );
+    return ndx >= 0 && pMob->behaviors.isSet( ndx );
+}
+
+// props["shopper"]["stock"]: "3020 3021 104:3", or a bare int for one vnum.
+// Tier tokens count by their vnum. Malformed tokens are skipped.
+list<int> mob_index_shop_stock( MOB_INDEX_DATA *pMob )
+{
+    list<int> vnums;
+
+    // isMember first: a non-const operator[] would add an empty key to the proto.
+    if (!mob_index_is_shopper( pMob ) || !pMob->props.isObject( ) || !pMob->props.isMember( "shopper" ))
+        return vnums;
+
+    const Json::Value &cfg = pMob->props["shopper"];
+    if (!cfg.isObject( ) || !cfg.isMember( "stock" ))
+        return vnums;
+
+    const Json::Value &stock = cfg["stock"];
+    if (stock.isInt( )) {
+        if (stock.asInt( ) > 0)
+            vnums.push_back( stock.asInt( ) );
+        return vnums;
+    }
+    if (!stock.isString( ))
+        return vnums;
+
+    DLString args = stock.asString( );
+    DLString token;
+    while (!( token = args.getOneArgument( ) ).empty( )) {
+        DLString::size_type colon = token.find( ':' );
+        DLString vnumStr = colon == DLString::npos ? token : token.substr( 0, colon );
+        if (!vnumStr.isNumber( ))
+            continue;
+        int vnum = vnumStr.toInt( );
+        if (vnum > 0)
+            vnums.push_back( vnum );
+    }
+    return vnums;
+}
+
+// props["shopper"]["buys"]: item type names, "weapon armor gem".
+bool mob_index_shop_buys( MOB_INDEX_DATA *pMob, int itemType )
+{
+    if (!mob_index_is_shopper( pMob ) || !pMob->props.isObject( ) || !pMob->props.isMember( "shopper" ))
+        return false;
+
+    const Json::Value &cfg = pMob->props["shopper"];
+    if (!cfg.isObject( ) || !cfg.isMember( "buys" ) || !cfg["buys"].isString( ))
+        return false;
+
+    DLString typeName = item_table.name( itemType );
+    if (typeName.empty( ))
+        return false;
+
+    // Whole words only: is_name would let "key" match "keyring".
+    DLString args = cfg["buys"].asString( );
+    DLString word;
+    while (!( word = args.getOneArgument( ) ).empty( ))
+        if (word == typeName)
+            return true;
+    return false;
 }
 
 bool mob_has_behavior(NPCharacter *mob, BehaviorReference& bhv)

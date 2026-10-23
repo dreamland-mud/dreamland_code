@@ -2,6 +2,7 @@
  *
  * ruffina, 2019
  */
+#include <algorithm>
 #include "dlfilestream.h"
 #include <jsoncpp/json/json.h>
 #include "iconvmap.h"
@@ -30,6 +31,8 @@
 #include "weapontier.h"
 #include "weapons.h"
 #include "loadsave.h"
+#include "occupations.h"
+#include "profiler.h"
 
 #include "def.h"
 
@@ -81,10 +84,21 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
     int mobVnum = -1;
     for(auto &pReset: pRoom->resets) {
         switch(pReset->command) {
-            case 'M':
+            case 'M': {
                 // Remember potential carrier in the room.
                 mobVnum = pReset->arg1;
+                // A Fenia shop keeper sells its props stock, no G reset needed.
+                MOB_INDEX_DATA *pMob = get_mob_index( mobVnum );
+                if (pMob) {
+                    list<int> stock = mob_index_shop_stock( pMob );
+                    if (std::find( stock.begin( ), stock.end( ), vnum ) != stock.end( )) {
+                        pArea = pRoom->areaIndex;
+                        where = pMob->short_descr;
+                        return true;
+                    }
+                }
                 break;
+            }
             case 'G':
             case 'E':
                 // Found who carries the object.
@@ -239,6 +253,8 @@ public:
     void dumpAll()
     {
         LogStream::sendNotice() << "Dumping searcher db to disk." << endl;
+        // Runs on the main thread at boot and every 4 hours: log it if slow.
+        ProfilerBlock profiler("searcher_dump", 500);
         dumpArmor();
         dumpWeapon();
         dumpMagic();

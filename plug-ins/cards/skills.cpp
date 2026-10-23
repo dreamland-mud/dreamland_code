@@ -121,9 +121,7 @@ SKILL_RUNP( sconce )
     chance = ( int ) ( 0.5 * gsn_sconce->getEffective( ch ) );
     chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - BASE_STAT) * 2, (MAX_STAT-BASE_STAT) * 2);
     chance += victim->can_see(ch) ? 0 : 5;
-    if (victim->is_npc( ) 
-        && victim->getNPC( )->behavior
-        && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
+    if (victim->is_npc( ) && mob_has_occupation( victim->getNPC( ), OCC_SHOPPER ))
         chance -= 40;
 
     bool resisted = tier >= 3 && tier <= 5

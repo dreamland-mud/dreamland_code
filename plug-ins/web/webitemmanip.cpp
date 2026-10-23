@@ -28,8 +28,6 @@
 #include "comm.h"
 #include "behavior.h"
 #include "occupations.h"
-#include "occupations.h"
-#include "shoptrader.h"
 #include "move_utils.h"
 #include "keyhole.h"
 #include "loadsave.h"
@@ -43,7 +41,6 @@ GSN(steal);
 BHV(sage);
 BHV(blacksmith);
 
-int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader );
 
 /*
  * Hold the list of all commands and their arguments that are applicable
@@ -259,20 +256,20 @@ static bool has_trigger_open( Object *obj )
     }
 }
 
-// Return true if standing by a shop keeper.
+// True when a shop keeper in the room buys this kind of item (Fenia shops:
+// props["shopper"]["buys"] on the keeper's proto).
 static bool has_trade_triggers( Object *obj, Character *ch )
 {
-    // Idiotic interface...
-    NPCharacter *keeper;
-    ShopTrader::Pointer trader;
-
-    trader = find_attracted_mob_behavior<ShopTrader>( ch, OCC_SHOPPER );
-   
-    if (!trader)
+    if (IS_SET( obj->extra_flags, ITEM_NOSELL ) || obj->cost <= 0)
         return false;
 
-    keeper = trader->getChar( );
-    return get_cost( keeper, obj, false, trader ) > 0;
+    for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {
+        if (!rch->is_npc( ) || !mob_has_occupation( rch->getNPC( ), OCC_SHOPPER ))
+            continue;
+        if (mob_index_shop_buys( rch->getNPC( )->pIndexData, obj->item_type ))
+            return true;
+    }
+    return false;
 }
 
 static bool has_trigger_listen( Object *obj, const StringSet &triggers )

@@ -29,6 +29,9 @@ public:
     virtual int toSilver( Character * ) const;
     
     virtual void config( PCharacter *, NPCharacter * ) const;
+
+    // Fenia shops sell pets: the hand-over runs the class's own create().
+    NPCharacter * createFor( PCharacter *client ) const { return create( client ); }
 protected:
     virtual NPCharacter * create( PCharacter * ) const;
 };

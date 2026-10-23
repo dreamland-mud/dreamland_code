@@ -2007,19 +2007,23 @@ NMI_INVOKE( CharacterWrapper, get_obj_wear_vnum, "(vnum): поиск объек�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, get_char_room, "(name[,room]): поиск по имени видимого персонажа, в той же комнате или в room" )
+NMI_INVOKE( CharacterWrapper, get_char_room, "(name[,room[,flags]]): поиск по имени видимого персонажа, в той же комнате или в room; flags из .tables.find_flags (invisible -- искать и невидимых)" )
 {
     checkTarget( );
     
     Room *room;
-    DLString name = args2string( args );
+    DLString name = argnum2string( args, 1 );
+    int flags = 0;
 
-    if (args.size( ) == 2)
-        room = arg2room( args.back( ) );
+    if (args.size( ) >= 2)
+        room = arg2room( argnum( args, 2 ) );
     else
         room = target->in_room;
+
+    if (args.size( ) >= 3)
+        flags = argnum2number( args, 3 );
     
-    return wrap( ::get_char_room( target, room, name ) );
+    return wrap( ::get_char_room( target, room, name, flags ) );
 }
 
 NMI_INVOKE( CharacterWrapper, get_obj_inventory, "(name): поиск объекта в инвентаре, по имени или ID" )
@@ -6186,7 +6190,21 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         for (ResetList::iterator pr = pRoom->resets.begin( ); pr != pRoom->resets.end( ); pr++) {
             char cmd = (*pr)->command;
             int a1 = (*pr)->arg1;
-            if (cmd == 'M') { lastMob = get_mob_index( a1 ); continue; }
+            if (cmd == 'M') {
+                lastMob = get_mob_index( a1 );
+                // Fenia shops keep their stock in the keeper's props, not in G resets.
+                if (lastMob && mob_index_is_shopper( lastMob )) {
+                    list<int> stock = mob_index_shop_stock( lastMob );
+                    for (list<int>::iterator sv = stock.begin( ); sv != stock.end( ); sv++) {
+                        obj_index_data *po = get_obj_index( *sv );
+                        if (!po)
+                            continue;
+                        ga_record( acq, *sv, GA_BUY, lastMob->vnum, roomVnum, po->cost, 0 );
+                        ga_record( acqByHolder[lastMob->vnum], *sv, GA_BUY, lastMob->vnum, roomVnum, po->cost, 0 );
+                    }
+                }
+                continue;
+            }
             if (cmd == 'R') { lastMob = 0; continue; }
             if (cmd == 'O') { ga_record( acq, a1, GA_PICKUP, 0, roomVnum, 0, roomMax, roomTier ); lastMob = 0; continue; }
             if (cmd == 'P') { ga_record( acq, a1, GA_PICKUP, 0, roomVnum, 0, roomMax, roomTier ); continue; }
@@ -6194,14 +6212,11 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 if (!lastMob)
                     continue;
                 // Shop stock is 'G' onto a shopkeeper; 'E' on one is its own worn gear.
-                // Shopkeepers are old-style behaviors: the prototype carries a
-                // <behavior type="ShopTrader"> XML doc in ->behavior, NOT a bedit entry
-                // in the ->behaviors bitvector, so behaviorManager->findExisting never
-                // sees them (that lookup returned null and every shop read as GA_KILL).
-                // Read the doc's root type attribute -- the idiom MobileBehaviorManager
-                // ::assign uses. All 276 shop mobs in the world are this old style.
-                bool trader = false;
-                if (lastMob->behavior) {
+                // A keeper is a bedit 'shopper' proto (Fenia shops) or, in old area
+                // data, one carrying a <behavior type="ShopTrader"> XML doc. The G
+                // resets left on Fenia keepers are their randomly rolled stock.
+                bool trader = mob_index_is_shopper( lastMob );
+                if (!trader && lastMob->behavior) {
                     XMLNode::Pointer root = lastMob->behavior->getFirstNode( );
                     if (root && root->getAttribute( XMLNode::ATTRIBUTE_TYPE ) == "ShopTrader")
                         trader = true;
@@ -7855,6 +7870,49 @@ NMI_INVOKE( CharacterWrapper, add_charmed, "(victim,time): очаровать vi
     }
 
     return Register( );
+}
+
+NMI_GET( CharacterWrapper, cppBehavior, "тип C++-поведения моба (например ShopTrader, Pet, RideablePet) или пустая строка, если его нет" )
+{
+    checkTarget( );
+    if (!target->is_npc( ) || !target->getNPC( )->behavior)
+        return Register( "" );
+    return Register( target->getNPC( )->behavior->getType( ) );
+}
+
+// Pet shop helpers: the target is a pet waiting in a shop storage room, the
+// argument is the buyer. Level, price and hand-over follow the pet's C++ class.
+static Pet::Pointer storage_pet( Character *target )
+{
+    Pet::Pointer bhv;
+    if (target->is_npc( ) && target->getNPC( )->behavior)
+        bhv = target->getNPC( )->behavior.getDynamicPointer<Pet>( );
+    if (!bhv)
+        throw Scripting::Exception( "not a pet for sale" );
+    return bhv;
+}
+
+NMI_INVOKE( CharacterWrapper, petLevel, "(buyer): уровень, с которым этот пет из зоомагазина достанется покупателю" )
+{
+    checkTarget( );
+    Character *buyer = argnum2character( args, 1 );
+    return Register( storage_pet( target )->getLevel( buyer ) );
+}
+
+NMI_INVOKE( CharacterWrapper, petPrice, "(buyer): цена этого пета из зоомагазина для покупателя в серебре, без торга" )
+{
+    checkTarget( );
+    Character *buyer = argnum2character( args, 1 );
+    return Register( storage_pet( target )->toSilver( buyer ) );
+}
+
+NMI_INVOKE( CharacterWrapper, petCreate, "(buyer): создать покупателю копию этого пета из зоомагазина (зачаровать, сделать последователем, скакуна -- без зачарования), вернуть нового моба" )
+{
+    checkTarget( );
+    Character *buyer = argnum2character( args, 1 );
+    if (buyer->is_npc( ))
+        throw Scripting::Exception( "pets are sold to players only" );
+    return wrap( storage_pet( target )->createFor( buyer->getPC( ) ) );
 }
 
 NMI_INVOKE( CharacterWrapper, add_pet, "(pet): добавить пета нам в последователи" )
