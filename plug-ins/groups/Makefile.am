@@ -10,7 +10,6 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/skills_impl \
 -I$(top_srcdir)/plug-ins/liquid \
 -I$(top_srcdir)/plug-ins/services/core \
--I$(top_srcdir)/plug-ins/services/shop \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC) 
 
@@ -65,8 +64,7 @@ class_warrior.cpp
 
 libclass_skills_la_LIBADD = \
 $(libgroup_skills_la_LIBADD) \
-../services/core/libservices_core.la \
-../services/shop/libservices_shop.la 
+../services/core/libservices_core.la
 
 
 

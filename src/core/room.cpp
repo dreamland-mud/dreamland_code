@@ -19,6 +19,8 @@
 #include "merc.h"
 #include "def.h"
 
+BHV(pet_storage);
+
 CLAN(none);
 PROF(none);
 LIQ(none);
@@ -138,7 +140,16 @@ bool Room::isCommon( )
     if (behavior && !behavior->isCommon( ))
         return false;
 
+    if (isPetStorage( ))
+        return false;
+
     return true;
+}
+
+// Pets for sale wait here, out of reach: no one walks in, no random pick lands here.
+bool Room::isPetStorage( )
+{
+    return pIndexData->behaviors.isSet( bhv_pet_storage );
 }
 
 

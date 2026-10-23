@@ -122,6 +122,7 @@ public:
     bool isPrivate( ) const;
     int  getCapacity( ) const;
     bool isCommon( );
+    bool isPetStorage( );
     inline long long getID( ) const;
     inline void setID( long long );
 

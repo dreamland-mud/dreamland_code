@@ -7,13 +7,11 @@
 
 #include "objectbehaviorplugin.h"
 #include "mobilebehaviorplugin.h"
-#include "roombehaviorplugin.h"
 #include "areabehaviorplugin.h"
 
 #include "clanarea.h"
 #include "clanobjects.h"
 #include "clanmobiles.h"
-#include "clanrooms.h"
 
 extern "C"
 {
@@ -26,7 +24,6 @@ extern "C"
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanItem> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanAltar> >( ppl );
 
-        Plugin::registerPlugin<RoomBehaviorRegistrator<ClanPetShopStorage> >( ppl );
 
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanSummonedCreature> >( ppl );
 

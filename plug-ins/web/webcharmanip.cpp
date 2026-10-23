@@ -28,7 +28,6 @@
 #include "comm.h"
 
 #include "occupations.h"
-#include "shoptrader.h"
 #include "lover.h"
 #include "move_utils.h"
 #include "keyhole.h"

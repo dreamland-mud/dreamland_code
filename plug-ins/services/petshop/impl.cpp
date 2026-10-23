@@ -5,12 +5,8 @@
 
 #include "so.h"
 #include "mobilebehaviorplugin.h"
-#include "roombehaviorplugin.h"
 
 #include "pet.h"
-#include "petshoproom.h"
-#include "petshopstorage.h"
-#include "mixedpetshop.h"
 
 extern "C"
 {
@@ -21,9 +17,6 @@ extern "C"
         Plugin::registerPlugin<MobileBehaviorRegistrator<Pet> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<LevelAdaptivePet> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<RideablePet> >( ppl );
-        Plugin::registerPlugin<RoomBehaviorRegistrator<PetShopStorage> >( ppl );
-        Plugin::registerPlugin<RoomBehaviorRegistrator<PetShopRoom> >( ppl );
-        Plugin::registerPlugin<RoomBehaviorRegistrator<MixedPetShopRoom> >( ppl );
             
         return ppl;
     }

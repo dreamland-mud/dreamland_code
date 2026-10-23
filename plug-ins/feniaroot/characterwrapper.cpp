@@ -6212,15 +6212,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 if (!lastMob)
                     continue;
                 // Shop stock is 'G' onto a shopkeeper; 'E' on one is its own worn gear.
-                // A keeper is a bedit 'shopper' proto (Fenia shops) or, in old area
-                // data, one carrying a <behavior type="ShopTrader"> XML doc. The G
-                // resets left on Fenia keepers are their randomly rolled stock.
+                // A keeper is a bedit 'shopper' proto. The G resets left on keepers
+                // are their randomly rolled stock.
                 bool trader = mob_index_is_shopper( lastMob );
-                if (!trader && lastMob->behavior) {
-                    XMLNode::Pointer root = lastMob->behavior->getFirstNode( );
-                    if (root && root->getAttribute( XMLNode::ATTRIBUTE_TYPE ) == "ShopTrader")
-                        trader = true;
-                }
                 if (trader && cmd == 'G') {
                     obj_index_data *po = get_obj_index( a1 );
                     ga_record( acq, a1, GA_BUY, lastMob->vnum, roomVnum, po ? po->cost : 0, 0 );
@@ -7872,7 +7866,7 @@ NMI_INVOKE( CharacterWrapper, add_charmed, "(victim,time): очаровать vi
     return Register( );
 }
 
-NMI_GET( CharacterWrapper, cppBehavior, "тип C++-поведения моба (например ShopTrader, Pet, RideablePet) или пустая строка, если его нет" )
+NMI_GET( CharacterWrapper, cppBehavior, "тип C++-поведения моба (например BasicMobileBehavior, Pet, RideablePet) или пустая строка, если его нет" )
 {
     checkTarget( );
     if (!target->is_npc( ) || !target->getNPC( )->behavior)

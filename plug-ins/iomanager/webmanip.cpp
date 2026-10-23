@@ -55,14 +55,6 @@ void WebManipManager::decorateItem( ostringstream &buf, const DLString &descr, O
                 buf << descr;
 }
 
-void WebManipManager::decorateShopItem( ostringstream &buf, const DLString &descr, Object *item, Character *ch ) const
-{
-        static const DLString COMMAND_NAME = "decorateShopItem";
-        ShopItemManipArgs args( ch, item, descr );
-        if (!run( buf, COMMAND_NAME, args ))
-                buf << descr;
-}
-
 void WebManipManager::decoratePocket( ostringstream &buf, const DLString &pocket, Object *container, Character *ch ) const
 {
         static const DLString COMMAND_NAME = "decoratePocket";

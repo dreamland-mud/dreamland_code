@@ -557,23 +557,6 @@ WEBMANIP_RUN(decorateItem)
 }
 
 
-WEBMANIP_RUN(decorateShopItem)
-{
-    const ShopItemManipArgs &myArgs = static_cast<const ShopItemManipArgs &>( args );
-    const DLString &descr = myArgs.descr;
-    Object *item = myArgs.item;
-
-    ItemManipList manips( item, descr );
-    manips.lang = viewerLang( myArgs.target );
-
-    manips.add( "buy" );
-    if (IS_OBJ_STAT( item, ITEM_INVENTORY )) 
-        manips.add( "properties" );
-
-    buf << manips.toString( );
-    return true;
-}
-
 WEBMANIP_RUN(decoratePocket)
 {
     const PocketManipArgs &myArgs = static_cast<const PocketManipArgs &>( args );

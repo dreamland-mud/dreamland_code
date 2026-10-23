@@ -166,6 +166,21 @@ void MobileBehaviorManager::parse( NPCharacter * mob, FILE *fp ) {
         }
         
         mob->behavior.fromStream( istr );
+
+        // A class deleted for good loads as a stub that keeps its old XML and
+        // does nothing. Rebuild those from the proto. Only the types named here:
+        // a stub of a plugin that merely failed to load must keep its data.
+        if (mob->behavior && mob->behavior->getType( ) == "ShopTrader") {
+            LogStream::sendNotice( ) << "mob " << mob->pIndexData->vnum << ": retired behavior "
+                                     << mob->behavior->getType( ) << ", reassigning" << endl;
+            mob->behavior.clear( );
+            if (mob->pIndexData->behavior)
+                assign( mob );
+            else
+                assignBasic( mob );
+            return;
+        }
+
         if (mob->behavior)
             mob->behavior->setChar( mob );
 

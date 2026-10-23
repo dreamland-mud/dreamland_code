@@ -15,14 +15,12 @@ libclan_behavior_la_SOURCES = \
 clanarea.cpp \
 clanobjects.cpp \
 clanmobiles.cpp \
-clanrooms.cpp \
 impl.cpp
 
 libclan_behavior_la_MOC = \
 clanarea.h \
 clanobjects.h \
-clanmobiles.h \
-clanrooms.h 
+clanmobiles.h
 
 libclan_behavior_la_LIBADD = \
 $(LIBADD_AI) \
