@@ -2007,19 +2007,23 @@ NMI_INVOKE( CharacterWrapper, get_obj_wear_vnum, "(vnum): поиск объек�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, get_char_room, "(name[,room]): поиск по имени видимого персонажа, в той же комнате или в room" )
+NMI_INVOKE( CharacterWrapper, get_char_room, "(name[,room[,flags]]): поиск по имени видимого персонажа, в той же комнате или в room; flags из .tables.find_flags (invisible -- искать и невидимых)" )
 {
     checkTarget( );
     
     Room *room;
-    DLString name = args2string( args );
+    DLString name = argnum2string( args, 1 );
+    int flags = 0;
 
-    if (args.size( ) == 2)
-        room = arg2room( args.back( ) );
+    if (args.size( ) >= 2)
+        room = arg2room( argnum( args, 2 ) );
     else
         room = target->in_room;
+
+    if (args.size( ) >= 3)
+        flags = argnum2number( args, 3 );
     
-    return wrap( ::get_char_room( target, room, name ) );
+    return wrap( ::get_char_room( target, room, name, flags ) );
 }
 
 NMI_INVOKE( CharacterWrapper, get_obj_inventory, "(name): поиск объекта в инвентаре, по имени или ID" )
