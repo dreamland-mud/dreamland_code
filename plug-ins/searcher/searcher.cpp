@@ -32,6 +32,7 @@
 #include "weapons.h"
 #include "loadsave.h"
 #include "occupations.h"
+#include "profiler.h"
 
 #include "def.h"
 
@@ -252,6 +253,8 @@ public:
     void dumpAll()
     {
         LogStream::sendNotice() << "Dumping searcher db to disk." << endl;
+        // Runs on the main thread at boot and every 4 hours: log it if slow.
+        ProfilerBlock profiler("searcher_dump", 500);
         dumpArmor();
         dumpWeapon();
         dumpMagic();
