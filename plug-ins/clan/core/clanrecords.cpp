@@ -51,6 +51,7 @@ Scripting::Register XMLAttributeClanRecords::toRegister() const
         rec->setField(IdRef("tenure"), (int)(r.second.tenure.getValue() / 3600));
         rec->setField(IdRef("donated"), r.second.donated.getValue());
         rec->setField(IdRef("office"), r.second.office.getValue());
+        rec->setField(IdRef("totalDonated"), (int)r.second.totalDonated.getValue());
         recs->setField(r.first, recReg);
     }
 

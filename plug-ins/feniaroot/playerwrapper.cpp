@@ -247,7 +247,7 @@ NMI_SET(PlayerWrapper, clanDonated, "кп, внесенные в текущий 
     save();
 }
 
-NMI_INVOKE(PlayerWrapper, clanRecord, "(clan): запись о клане -- rank (замороженный), tenure (часы), donated, office -- или null")
+NMI_INVOKE(PlayerWrapper, clanRecord, "(clan): запись о клане -- rank (замороженный), tenure (часы), donated, totalDonated (всего qp за все время), office -- или null")
 {
     DLString clanName = argnum2string(args, 1);
     XMLClanRecord *rec = clan_record(getTarget(), clanName, false);
@@ -261,6 +261,7 @@ NMI_INVOKE(PlayerWrapper, clanRecord, "(clan): запись о клане -- ran
     r->setField(IdRef("tenure"), (int)(clan_tenure(getTarget(), clanName) / 3600));
     r->setField(IdRef("donated"), rec->donated.getValue());
     r->setField(IdRef("office"), rec->office.getValue());
+    r->setField(IdRef("totalDonated"), (int)rec->totalDonated.getValue());
     return recReg;
 }
 
@@ -497,6 +498,16 @@ NMI_GET(PlayerWrapper, lastAccessHost, "последний IP адрес")
 NMI_GET(PlayerWrapper, lastAccessTime, "время (в секундах) последнего захода в мир")
 {
     return (int)getTarget()->getLastAccessTime().getTime();
+}
+
+NMI_GET(PlayerWrapper, created, "время (в секундах) создания персонажа, 0 если неизвестно")
+{
+    return (int)getTarget()->getCreated();
+}
+
+NMI_GET(PlayerWrapper, playedHours, "сыграно часов в текущей жизни")
+{
+    return getTarget()->getPlayedHours();
 }
 
 NMI_GET(PlayerWrapper, online, "true если персонаж в мире")

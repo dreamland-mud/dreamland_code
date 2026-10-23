@@ -78,6 +78,7 @@
 #include "areaquestwrapper.h"
 #include "autoquestwrapper.h"
 #include "questmanager.h"
+#include "accountmanager.h"
 #include "questregistrator.h"
 #include "questscrollhook.h"
 #include "behaviorwrapper.h"
@@ -1496,6 +1497,18 @@ NMI_GET( Root, playerNames, "список (List) имен всех игроко�
     for (auto &player : players) {
         list->push_back(Register(player.first));
     }
+
+    return wrap(list);
+}
+
+NMI_INVOKE( Root, accountChars, "(id): список (List) имен персонажей аккаунта id, пустой если такого нет")
+{
+    RegList::Pointer list(NEW);
+    DLString id = args2string(args);
+
+    if (!id.empty( ) && AccountManager::exists( id ))
+        for (const DLString &name : AccountManager::charsOf( id ))
+            list->push_back(Register(name));
 
     return wrap(list);
 }
