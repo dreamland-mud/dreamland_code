@@ -12,6 +12,7 @@
 #include "accountmanager.h"
 #include "objectbehaviormanager.h"
 #include "xmlattributeareaquest.h"
+#include "xmlattributevisited.h"
 #include "xmlattributeplugin.h"
 #include "player_menu.h"
 
@@ -137,6 +138,7 @@ extern "C" {
         Plugin::registerPlugin<LimitedItemsPurgeTask>( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<BasicObjectBehavior> >(ppl);
         Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeAreaQuest> >( ppl );
+        Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeVisited> >( ppl );
         Plugin::registerPlugin<MenuInterpretLayer>( ppl );
 
         return ppl;

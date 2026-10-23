@@ -157,8 +157,9 @@ static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
 
     // Mirrors whois printName: level 101 with mortal trust is a Legend,
     // anything above is a god.
-    if (pci->getLevel() > 100 || pci->getTrust() > 100) {
-        if (pci->getLevel() == 101 && pci->getTrust() <= 101)
+    // get_trust is the effective one: a coder is a god at any level.
+    if (pci->getLevel() > 100 || pci->get_trust() > 100) {
+        if (pci->getLevel() == 101 && pci->get_trust() <= 101)
             c["rank"] = "legendary";
         else
             c["rank"] = "immortal";

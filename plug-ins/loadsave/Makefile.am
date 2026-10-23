@@ -21,6 +21,7 @@ extraction.cpp \
 finding.cpp \
 impl.cpp \
 placement.cpp \
+xmlattributevisited.cpp \
 limited.cpp \
 save.cpp \
 save_drop.cpp \
@@ -57,7 +58,8 @@ accountaudit.cpp
 
 libloadsave_la_MOC = \
 objectbehaviormanager.h \
-xmlattributeareaquest.h
+xmlattributeareaquest.h \
+xmlattributevisited.h
 
 libloadsave_la_LIBADD = \
 ../descriptor/libdescriptor.la \
