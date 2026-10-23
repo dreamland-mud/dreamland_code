@@ -909,7 +909,8 @@ bool Damage::canSeeMessage(Character *to)
         return false;
 
     // fightspam OFF: an immune hit in combat shows up in the round summary as
-    // "[immune: <damtype>]", whatever the skillspam bit says.
+    // "[immune: <damtype>]", whatever the skillspam bit says. A Fenia block
+    // (blocked) gets no tag: the blocking affect prints its own message.
     if (immune
         && !to->is_npc( )
         && !IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM)

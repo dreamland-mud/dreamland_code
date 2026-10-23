@@ -39,6 +39,8 @@ CMDRUNP( areas )
             level = -1;
             maxLevel = arg2.toInt( );
             args.clear( );
+            if (minLevel > maxLevel)
+                std::swap( minLevel, maxLevel );
         }
     } catch (const ExceptionBadType & ) {
         ch->pecho(_("Уровень зоны указан неверно."));

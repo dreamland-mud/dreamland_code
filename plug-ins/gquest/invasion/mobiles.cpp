@@ -46,8 +46,8 @@ void InvasionMob::actDeath( Character *killer )
 {
 }
 
-// Invaders pay out to any player in the quest's level range, except those
-// punished for killing a helper -- tag them as a target for exactly those viewers.
+// Invaders pay out to every player the quest accepts, except those punished
+// for killing a helper -- tag them as a target for exactly those viewers.
 bool InvasionMob::isQuestTarget( Character *viewer ) const
 {
     InvasionGQuest *gquest = InvasionGQuest::getThis( );
