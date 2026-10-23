@@ -74,6 +74,7 @@ GSN(forest_fighting);
 GSN(fudoshin);
 GSN(hazukure);
 GSN(hand_block);
+GSN(iaido);
 GSN(katana);
 GSN(lance);
 GSN(liturgy);
@@ -122,6 +123,11 @@ bool UndefinedOneHit::canDamage( )
             return false;
         }
                 
+        // A samurai caught outside a fight may draw and cut before the blow lands
+        // (Fenia skillcommand/iaido/apply). Openers only: nobody is fighting him yet.
+        if (!victim->fighting && gsn_iaido->getCommand()->apply(ch, victim, secondary))
+            return false;
+
         // Outermost first: the bat cloud, the shield held out in front, the blink,
         // then the weapons and hands, and the last-ditch dodge.
         if (gsn_bat_swarm->getCommand()->apply(ch, victim, secondary)
