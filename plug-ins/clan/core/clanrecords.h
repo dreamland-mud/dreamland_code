@@ -34,6 +34,8 @@ public:
     XML_VARIABLE XMLInteger donated;
     /** CLAN_OFFICE_* or empty. Only meaningful for the current clan. */
     XML_VARIABLE XMLString office;
+    /** Every qp ever given to this clan's treasury. Never reset. */
+    XML_VARIABLE XMLLong totalDonated;
 };
 
 /** Per-clan records of a player (attribute 'clanrec'). Survives remort. */

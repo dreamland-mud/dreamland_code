@@ -23,6 +23,7 @@ public:
         virtual ~XMLAttributeReligion( );
         
         virtual bool handle( const ScoreArguments &args ); 
+        virtual Scripting::Register toRegister() const;
 
         XML_VARIABLE XMLLong attempts;
         XML_VARIABLE XMLLong successes;

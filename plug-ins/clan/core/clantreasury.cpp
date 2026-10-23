@@ -218,6 +218,7 @@ DLString clan_donate( PCMemoryInterface *pcm, int qp )
     int oldQp = pcm->getQuestPoints( );
     int oldRank = pcm->getClanLevel( );
     int oldDonated = rec->donated.getValue( );
+    long oldTotal = rec->totalDonated.getValue( );
 
     // Player first: a crash between the two saves loses the gift rather than doubling it.
     pcm->setQuestPoints( oldQp - qp );
@@ -235,6 +236,7 @@ DLString clan_donate( PCMemoryInterface *pcm, int qp )
         rec->donated.setValue( rank < DONATION_TOP_RANK ? progress : 0 );
         pcm->setClanLevel( rank );
     }
+    rec->totalDonated.setValue( oldTotal + qp );
 
     // An unsaved charge would come back with the old profile after a reboot,
     // while the treasury kept the qp.
@@ -242,6 +244,7 @@ DLString clan_donate( PCMemoryInterface *pcm, int qp )
         pcm->setQuestPoints( oldQp );
         pcm->setClanLevel( oldRank );
         rec->donated.setValue( oldDonated );
+        rec->totalDonated.setValue( oldTotal );
         return "cannot save the player profile";
     }
 

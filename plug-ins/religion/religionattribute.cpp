@@ -6,6 +6,9 @@
 #include "date.h"
 #include "dreamland.h"
 #include "merc.h"
+#include "idcontainer.h"
+
+using namespace Scripting;
 
 BONUS(none);
 
@@ -28,3 +31,14 @@ bool XMLAttributeReligion::handle( const ScoreArguments &args )
     return true;
 }
 
+// attempts, successes and angers of sacrifices, for Fenia (attribute("religion")).
+Register XMLAttributeReligion::toRegister() const
+{
+    Register attrReg = Register::handler<IdContainer>();
+    IdContainer *c = attrReg.toHandler().getDynamicPointer<IdContainer>();
+
+    c->setField(IdRef("attempts"), (int)attempts.getValue());
+    c->setField(IdRef("successes"), (int)successes.getValue());
+    c->setField(IdRef("angers"), (int)angers.getValue());
+    return attrReg;
+}
