@@ -35,6 +35,10 @@ void XMLAttributeVisited::parse() const
             from = atoi(part.substr(0, dash).c_str());
             to = atoi(part.substr(dash + 1).c_str());
         }
+        // A corrupt range can't make the set larger than the world.
+        int top = roomIndexMap.empty() ? 0 : roomIndexMap.rbegin()->first;
+        if (to > top)
+            to = top;
         for (int v = from; v > 0 && v <= to; v++)
             vnums.insert(v);
         pos = comma + 1;
@@ -88,9 +92,15 @@ bool XMLAttributeVisited::isOrdinary(RoomIndexData *pRoom)
     if (IS_SET(pRoom->room_flags,
                ROOM_GODS_ONLY | ROOM_IMP_ONLY | ROOM_NEWBIES_ONLY | ROOM_NOWHERE | ROOM_MANSION))
         return false;
-    return true;
+    // No way out at all: storage rooms for shop pets, voids. Nobody walks in.
+    for (int d = 0; d < 6; d++)
+        if (pRoom->exit[d])
+            return true;
+    return !pRoom->extra_exits.empty();
 }
 
+// Recounted only when rooms are added or removed: a flag edit in OLC shows up
+// at the next boot. Good enough for a progress bar.
 int XMLAttributeVisited::ordinaryTotal()
 {
     static size_t countedSize = 0;

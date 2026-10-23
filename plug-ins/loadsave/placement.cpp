@@ -136,8 +136,11 @@ void char_to_room( Character *ch, Room *pRoomIndex )
         if (!ch->is_npc() && !ch->is_immortal())
         {
                 // Every room ever entered, for the "every room" achievement.
-                ch->getPC()->getAttributes().getAttr<XMLAttributeVisited>("visited")
-                        ->visit(pRoomIndex->vnum);
+                // getAttr casts to null over a same-named attribute of another type.
+                XMLAttributeVisited::Pointer visited =
+                        ch->getPC()->getAttributes().getAttr<XMLAttributeVisited>("visited");
+                if (visited)
+                        visited->visit(pRoomIndex->vnum);
 
                 if (ch->in_room->area->empty)
                 {

@@ -35,8 +35,8 @@ public:
     }
 
     /** A room every mortal can walk into: not in a system, hidden, clan,
-     *  mansion or wizlocked area, and not god-only, imp-only, newbie-only,
-     *  nowhere or a mansion room. */
+     *  mansion or wizlocked area, not god-only, imp-only, newbie-only,
+     *  nowhere or a mansion room, and with at least one exit. */
     static bool isOrdinary(RoomIndexData *pRoom);
 
     /** Ordinary rooms in the world, recounted when the room list changes. */
