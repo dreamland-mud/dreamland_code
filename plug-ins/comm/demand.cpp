@@ -70,8 +70,7 @@ CMDRUNP(demand)
         return;
     }
 
-    if (victim->getNPC()->behavior
-        && IS_SET(victim->getNPC()->behavior->getOccupation(), (1 << OCC_SHOPPER)))
+    if (mob_has_occupation( victim->getNPC( ), OCC_SHOPPER ))
     {
         ch->pecho(_("Хочешь -- купи!"));
         return;

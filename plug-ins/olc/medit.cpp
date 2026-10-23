@@ -638,113 +638,10 @@ MEDIT(delete)
     return true;
 }
 
-static void xml_node_set( Character *ch, XMLNode::Pointer root, const DLString &nodeName, const DLString &nodeValue )
-{
-    XMLNode::Pointer node;
-    
-    if (!root) {
-        stc("Корневой элемент документа пуст!\n\r", ch);
-        return;
-    }
-
-    node = root->selectSingleNode( nodeName );
-    if (node) {
-        if (node->getFirstNode( )) {
-            node->getFirstNode( )->setType( XMLNode::XML_TEXT );
-            node->getFirstNode( )->setName( nodeValue );
-        } else {
-            stc("Ошибка: неправильный элемент.\n\r", ch);
-            return;
-        }
-    }
-    else {
-        node.construct( );
-        node->setName( nodeName );
-        root->appendChild( node );
-
-        XMLNode::Pointer child( NEW );
-        child->setType( XMLNode::XML_TEXT );
-        child->setCData( nodeValue );
-        node->appendChild( child );
-    }
-
-    ptc(ch, "Полю {W%s{x присвоено значение {G%s{x.\n\r", nodeName.c_str( ), nodeValue.c_str( ));
-}
-
 MEDIT(shop)
 {
-    char cmd[MAX_INPUT_LENGTH];
-    int value = -1;
-    bitstring_t itypes = NO_FLAG;
-    DLString nodeValue;
-
-    argument = one_argument( argument, cmd );
-    
-    if (!cmd[0]) {
-        stc("Используйте 'shop help' для справки.\r\n", ch);
-        return false;
-    }
-
-    if (!mob.behavior) {
-        stc("Поведение продавца не задано, используйте 'oldbehavior shopper'.\r\n", ch);
-        return false;
-    }
-
-    if (is_number( argument )) {
-        value = atoi( argument );
-        nodeValue = value;
-    }
-    else {
-        itypes = item_table.bitstring( argument, false );
-        nodeValue = item_table.names( itypes );
-    }
-    
-    XMLNode::Pointer root = mob.behavior->getDocumentElement( );
-
-    if (!str_prefix( cmd, "sellprofit" )) {
-        if (value != -1) {
-            xml_node_set( ch, root, "profitSell", nodeValue );
-            return true;
-        }
-    }
-    else if (!str_prefix( cmd, "buyprofit" )) {
-        if (value != -1) {
-            xml_node_set( ch, root, "profitBuy", nodeValue );
-            return true;
-        }
-    }
-    else if (!str_prefix( cmd, "openhour" )) {
-        if (value >= 0 && value < 24) {
-            xml_node_set( ch, root, "openHour", nodeValue );
-            return true;
-        }
-    }
-    else if (!str_prefix( cmd, "closehour" )) {
-        if (value >= 0 && value < 24) {
-            xml_node_set( ch, root, "closeHour", nodeValue );
-            return true;
-        }
-    }
-    else if (!str_prefix( cmd, "buys" )) {
-        if (itypes != NO_FLAG) {
-            xml_node_set( ch, root, "buys", nodeValue );
-            return true;
-        }
-    }
-    else if (!str_prefix( cmd, "repairs" )) {
-        if (itypes != NO_FLAG) {
-            xml_node_set( ch, root, "repairs", nodeValue );
-            return true;
-        }
-    }
-
-    stc("shop sellprofit <number>  - наценка от продажи, в процентах\r\n"
-        "shop buyprofit  <number>  - наценка от покупки, в процентах\r\n"
-        "shop openhour   <number>  - в котором часу открывается (0..23)\r\n"
-        "shop closehour  <number>  - в котором часу закрывается (0..23)\r\n"
-        "shop buys <item types>    - какие типы предметов покупает \r\n"
-        "shop repairs <item types> - какие типы предметов ремонтирует \r\n",
-        ch);
+    // Shops live in Fenia: props["shopper"] on the proto, edited with shopedit.
+    stc("Магазины теперь настраиваются командой {yshopedit{x, см. {yсправка shopedit{x.\r\n", ch);
     return false;
 }
 
@@ -880,11 +777,7 @@ MEDIT(oldbehavior)
         return false;
     }
 
-    if (arg == "shopper") {
-        static const DLString shopperType( "ShopTrader" );
-        type = shopperType;
-    }
-    else if (arg == "pet") {
+    if (arg == "pet") {
         static const DLString petType( "Pet" );
         type = petType;
     }
@@ -901,7 +794,8 @@ MEDIT(oldbehavior)
         type = savedCreatureType;
     }
     else { 
-        stc("Допустимые значения поведения: savedcreature, shopper, pet, leveladaptivepet, trainer.\r\n", ch);
+        // Shop keepers are bedit 'shopper' plus shopedit now.
+        stc("Допустимые значения поведения: savedcreature, pet, leveladaptivepet, trainer.\r\n", ch);
         return false;
     }
 

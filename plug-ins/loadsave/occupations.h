@@ -31,6 +31,12 @@ bool mob_has_occupation( NPCharacter *, const DLString & );
 bool mob_has_occupation( NPCharacter *, int );
 bool mob_has_behavior(NPCharacter *, BehaviorReference &bhv);
 
+// Fenia shops: a keeper is a mob proto with the bedit 'shopper' behavior, its
+// stock and buys live in props["shopper"] (utils/shop).
+bool mob_index_is_shopper( MOB_INDEX_DATA * );
+list<int> mob_index_shop_stock( MOB_INDEX_DATA * );
+bool mob_index_shop_buys( MOB_INDEX_DATA *, int itemType );
+
 NPCharacter * find_attracted_mob( Character *, int );
 
 template <typename Bhv>
