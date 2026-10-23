@@ -103,6 +103,7 @@ void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitst
     
     killer = ch;
     immune = false;
+    blocked = false;
     deathReason = "damage";
 }
 
@@ -131,7 +132,7 @@ bool Damage::hit( bool show )
         ch->roundDamage += dam;
 
     // Same summary, immune hits: the line says which damage types bounced off.
-    if (immune && ch != 0 && dam_type >= 0 && dam_type < 32
+    if (immune && !blocked && ch != 0 && dam_type >= 0 && dam_type < 32
         && (ch->fighting != 0 || victim->fighting != 0 || fightspam_cast_depth > 0))
         ch->roundImmune |= 1u << dam_type;
 
@@ -464,7 +465,7 @@ void Damage::protectImmune( )
 
     if (mprog_immune()) {
         if (old_dam > 0 && dam == 0)
-            immune = true;
+            immune = blocked = true;
         return;
     }
 
@@ -908,7 +909,8 @@ bool Damage::canSeeMessage(Character *to)
         return false;
 
     // fightspam OFF: an immune hit in combat shows up in the round summary as
-    // "[immune: <damtype>]", whatever the skillspam bit says.
+    // "[immune: <damtype>]", whatever the skillspam bit says. A Fenia block
+    // (blocked) gets no tag: the blocking affect prints its own message.
     if (immune
         && !to->is_npc( )
         && !IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM)

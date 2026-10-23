@@ -46,6 +46,27 @@ void InvasionMob::actDeath( Character *killer )
 {
 }
 
+// Invaders pay out to every player the quest accepts, except those punished
+// for killing a helper -- tag them as a target for exactly those viewers.
+bool InvasionMob::isQuestTarget( Character *viewer ) const
+{
+    InvasionGQuest *gquest = InvasionGQuest::getThis( );
+
+    if (!gquest || !gquest->isLevelOK( viewer ))
+        return false;
+
+    XMLAttributeInvasion::Pointer attr
+        = viewer->getPC( )->getAttributes( ).findAttr<XMLAttributeInvasion>( gquest->getQuestID( ) );
+
+    return !attr || !attr->isPunished( );
+}
+
+void InvasionMob::show( Character *viewer, std::basic_ostringstream<char> &buf )
+{
+    if (isQuestTarget( viewer ))
+        buf << fmt( viewer, _("{1{R[ЦЕЛЬ] {2") );
+}
+
 /*--------------------------------------------------------------------------
  * Invasion Hellper 
  *-------------------------------------------------------------------------*/

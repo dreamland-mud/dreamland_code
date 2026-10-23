@@ -39,6 +39,8 @@ CMDRUNP( areas )
             level = -1;
             maxLevel = arg2.toInt( );
             args.clear( );
+            if (minLevel > maxLevel)
+                std::swap( minLevel, maxLevel );
         }
     } catch (const ExceptionBadType & ) {
         ch->pecho(_("Уровень зоны указан неверно."));
@@ -68,7 +70,12 @@ CMDRUNP( areas )
                 continue;
         }
         else if (minLevel != -1 && maxLevel != -1) {
-            if (pArea->low_range < minLevel || pArea->high_range > maxLevel)
+            // Any overlap with the range counts, but all-level areas (1-100 or
+            // no levels at all) would match every query and drown the list.
+            if (pArea->low_range > maxLevel || pArea->high_range < minLevel)
+                continue;
+            if (!area_has_levels(pArea)
+                || (pArea->low_range <= 1 && pArea->high_range >= LEVEL_MORTAL))
                 continue;
         }
 

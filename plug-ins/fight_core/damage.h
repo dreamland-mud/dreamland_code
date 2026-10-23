@@ -137,6 +137,9 @@ protected:
     int dam_type;
     int dam;
     bool immune;
+    // Zeroed by a Fenia onImmune block (shield, flux state, dark shroud...):
+    // keeps the "powerless" message, but is no immunity of the victim.
+    bool blocked;
     bitstring_t dam_flag;
     
     // What to pass to the death handler as source of death.
