@@ -19,6 +19,10 @@
  * stays out (who conceals it, see can_see_level). The account block sums the
  * SHOWN characters only (playing since, hours across every life, lives lived,
  * the class with the most hours), so a hidden alt never moves a number.
+ *
+ * Achievements come from Fenia (.tmp.achievements.profile in the private
+ * world scripts): definitions, the test gate and the secrets never pass
+ * through here. No script, a throw or a closed gate leave the field out.
  */
 #include <algorithm>
 #include <map>
@@ -39,6 +43,13 @@
 #include "player_utils.h"
 #include "clanreference.h"
 #include "commonattributes.h"
+#include "fenia/register-impl.h"
+#include "fenia/object.h"
+#include "feniamanager.h"
+#include "wrapperbase.h"
+#include "reglist.h"
+#include "json_utils_ext.h"
+#include "dreamland.h"
 #include "logstream.h"
 #include "def.h"
 
@@ -231,6 +242,92 @@ static Json::Value profile_account_stats(const list<PCMemoryInterface *> &shown)
     return a;
 }
 
+// .tmp.achievements.profile(names) over the shown characters. True and the
+// list in out when the script answered with one.
+static bool profile_achievements(const list<PCMemoryInterface *> &shown, Json::Value &out)
+{
+    using namespace Scripting;
+
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    static IdRef ID_TMP("tmp"), ID_ACHIEVEMENTS("achievements"), ID_PROFILE("profile");
+
+    try {
+        Register tmp = *Context::root[ID_TMP];
+        Register ach = *tmp[ID_ACHIEVEMENTS];
+        if (ach.type != Register::OBJECT)
+            return false;
+
+        Register function = *ach[ID_PROFILE];
+
+        if (function.type != Register::FUNCTION)
+            return false;
+
+        RegList::Pointer names(NEW);
+        for (PCMemoryInterface *pci : shown)
+            names->push_back(Register(pci->getName()));
+
+        Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+        listObj->setHandler(names);
+
+        RegisterList args;
+        args.push_back(Register(listObj));
+
+        Register result = function.toFunction()->invoke(ach, args);
+        if (result.type == Register::NONE)
+            return false;
+
+        out = JsonUtils::fromRegister(result);
+        return out.isArray();
+
+    } catch (const ::Exception &e) {
+        FeniaManager::getThis()->croak(0, Register(DLString("achievements.profile")), e);
+        return false;
+    }
+}
+
+// The achievements block costs tens of milliseconds of Fenia per shown
+// character on the game's only thread, and this endpoint is public. Each
+// account's answer is kept for ACH_CACHE_TTL seconds, and at most one fresh
+// computation runs per second across all accounts: past that budget a stale
+// copy is served, or the field is left out. Entries are one per profile-able
+// account, so the map stays small.
+static const time_t ACH_CACHE_TTL = 120;
+
+struct AchievementsCacheEntry {
+    time_t at;
+    bool has;
+    Json::Value value;
+};
+
+static map<DLString, AchievementsCacheEntry> achievements_cache;
+static time_t achievements_last_compute = 0;
+
+static bool profile_achievements_cached(const DLString &id, const list<PCMemoryInterface *> &shown, Json::Value &out)
+{
+    time_t now = dreamland->getCurrentTime();
+    auto it = achievements_cache.find(id);
+    bool cached = it != achievements_cache.end();
+
+    if (!cached || now - it->second.at >= ACH_CACHE_TTL) {
+        if (achievements_last_compute != now) {
+            achievements_last_compute = now;
+            AchievementsCacheEntry &e = achievements_cache[id];
+            e.at = now;
+            e.has = profile_achievements(shown, e.value);
+            it = achievements_cache.find(id);
+            cached = true;
+        }
+    }
+
+    if (!cached || !it->second.has)
+        return false;
+
+    out = it->second.value;
+    return true;
+}
+
 static bool profile_valid_id(const DLString &id)
 {
     if (id.empty() || id.size() > 16)
@@ -307,6 +404,10 @@ static void profile_servlet(HttpRequest &request, HttpResponse &response)
             }
         body["chars"].append(profile_char_entry(pci, isOnline));
     }
+
+    Json::Value achievements;
+    if (profile_achievements_cached(id, shown, achievements))
+        body["achievements"] = achievements;
 
     servlet_response_200_json(response, body);
 }
