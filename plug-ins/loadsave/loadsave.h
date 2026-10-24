@@ -59,6 +59,7 @@ void        affect_bit_strip ( Character *ch, const FlagTable *table, int bits, 
 void        affect_join         ( Character *ch, Affect *paf );
 void        postaffect_to_char( Character *ch, int sn, int duration );
 int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *registry);
+int npc_set_by_table(const FlagTable *table);
 
 void        char_from_room        ( Character *ch );
 void        char_to_room        ( Character *ch, Room *pRoomIndex );

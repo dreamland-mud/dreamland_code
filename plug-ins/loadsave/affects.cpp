@@ -179,7 +179,7 @@ static Flags & char_flag_by_table(Character *ch, const FlagTable *table)
     return zeroFlags;
 }
 
-static int npc_set_by_table(const FlagTable *table)
+int npc_set_by_table(const FlagTable *table)
 {
     if (table == &affect_flags)
         return MOBSET_AFF;
