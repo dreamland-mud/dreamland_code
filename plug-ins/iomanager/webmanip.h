@@ -43,7 +43,6 @@ public:
         void unregistrate( WebManipCommand::Pointer );
 
         void decorateItem( ostringstream &buf, const DLString &descr, Object *item, Character *, const DLString &pocket, int combined ) const;
-        void decorateShopItem( ostringstream &buf, const DLString &descr, Object *item, Character * ) const;
         void decoratePocket( ostringstream &buf, const DLString &pocket, Object *container, Character *ch ) const;
         void decorateExtraDescr( ostringstream &buf, const char *desc, const ExtraDescrList &edList, Character *ch, bool decorateExits = false ) const;
         void decorateCharacter( ostringstream &buf, const DLString &descr, Character *victim, Character *ch ) const;
@@ -78,18 +77,6 @@ struct ItemManipArgs : public ManipCommandArgs {
         DLString descr;
         DLString pocket;
         int combined;
-};
-
-struct ShopItemManipArgs : public ManipCommandArgs {
-        ShopItemManipArgs(Character *target, Object *item, const DLString &descr)
-                : ManipCommandArgs(target)
-        {
-                this->item = item;
-                this->descr = descr;
-        }
-
-        Object *item;
-        DLString descr;
 };
 
 struct PocketManipArgs : public ManipCommandArgs {

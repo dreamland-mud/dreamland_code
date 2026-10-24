@@ -25,7 +25,6 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/quest/core \
 -I$(top_srcdir)/plug-ins/services/core \
 -I$(top_srcdir)/plug-ins/services/petshop \
--I$(top_srcdir)/plug-ins/services/shop \
 -I$(top_srcdir)/plug-ins/skills_impl \
 -I$(top_srcdir)/plug-ins/groups \
 -I/usr/include/jsoncpp \
@@ -44,7 +43,6 @@ $(LIBADD_AI) \
 ../groups/libgenericskill.la \
 ../quest/core/libquest_core.la \
 ../services/core/libservices_core.la \
-../services/shop/libservices_shop.la \
 ../services/petshop/libservices_petshop.la \
 -ljsoncpp
 

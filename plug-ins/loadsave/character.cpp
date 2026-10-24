@@ -163,6 +163,9 @@ bool Character::canEnter( Room *room )
     if (room->behavior && !room->behavior->canEnter( this ))
         return false;
 
+    if (room->isPetStorage( ))
+        return false;
+
     return true;
 }
 
