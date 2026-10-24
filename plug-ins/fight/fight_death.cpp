@@ -1048,7 +1048,8 @@ static void oprog_kill( Character *killer, Character *victim, const DLString &la
 }
 
 // A wanted poster paid out: credit the Ruler who posted it, if online.
-static void wanted_poster_paid( Character *victim )
+// Only a kill counts: not a deathtrap or the victim's own wounds.
+static void wanted_poster_paid( Character *ch, Character *victim )
 {
     if (victim->is_npc( ))
         return;
@@ -1061,7 +1062,7 @@ static void wanted_poster_paid( Character *victim )
     DLString name = by->getValue( );
     attrs.eraseAttribute( "achtrack_wantedby" );
 
-    if (!IS_SET(victim->act, PLR_WANTED))
+    if (!IS_SET(victim->act, PLR_WANTED) || !ch || ch == victim)
         return;
 
     PCharacter *poster = PCharacterManager::findPlayer( name );
@@ -1192,7 +1193,7 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
     // Reset player and move them to the altar.    
     extract_dead_player( victim->getPC( ), FEXTRACT_COUNT );
 
-    wanted_poster_paid( victim );
+    wanted_poster_paid( ch, victim );
     loyalty_gain( ch, victim );
 
     ghost_gain( victim );

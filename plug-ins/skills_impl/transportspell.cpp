@@ -185,7 +185,7 @@ bool GateMovement::checkVictim( )
             return false;
         }
 
-        if (!victim->is_npc( ) && is_safe(ch, victim))
+        if (!victim->is_npc( ) && is_safe_nostrike(ch, victim))
             return false;
     }
     
