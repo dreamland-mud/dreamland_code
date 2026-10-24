@@ -5049,13 +5049,68 @@ static bool ga_ownNukeSkipped( const DLString &name )
     return false;
 }
 
+// Damaging melee skill commands: a char that bashes or grabs every lag already fills
+// the slot a granted nuke's cast would take. Damage mirrors skillcommand/<name>/run:
+//   dr x damroll + flat + n dice of die, n = lvl x level + count,
+//   die = (size x die | str - 20 | die), at least 1;
+// per-skill situational bonuses (fly, shields, hooves, random stun) are left out.
+enum { GAM_CONST = 0, GAM_SIZE, GAM_STR };
+struct GAMeleeNuke {
+    const char *skill;
+    double dr, flat, lvl, count;
+    int dieKind;
+    double die;
+};
+static const GAMeleeNuke ga_meleeNukes[] = {
+    { "bash",  0.5, 0,  0.5, 0, GAM_SIZE,  2   },
+    { "kick",  0.5, 0,  0.5, 0, GAM_SIZE,  0.5 },
+    { "grab",  0.5, 0,  0.5, 0, GAM_STR,   0   },
+    { "crush", 1.0, 0,  1.0, 0, GAM_SIZE,  2   },
+    { "smash", 1.0, 0,  0.5, 0, GAM_SIZE,  2   },
+    { "tail",  1.0, 20, 0,   1, GAM_SIZE,  20  },
+    { "claw",  1.0, 0,  1.0, 0, GAM_CONST, 20  },
+    { "trip",  0,   0,  0.5, 0, GAM_CONST, 2   },
+};
+
+// The best of those per round: one use x the share that lands (grant_skill.melee_nuke_land,
+// a success roll the formula can't see) x uses per round (no mana, only the lag) x learned.
+static double ga_bestMeleeNuke( Character *target, int lvl, int grantSn,
+                                const std::set<int> &outside, const std::set<int> &inside )
+{
+    double best = 0;
+    PCharacter *pch = target->getPC( );
+    int pulse = std::max( 1, dreamland->getPulseViolence( ) );
+    for (auto const &m: ga_meleeNukes) {
+        Skill *sk = skillManager->findExisting( m.skill );
+        if (sk == 0 || sk->getIndex( ) == grantSn || !ga_grantHeld( target, sk, outside, inside ))
+            continue;
+        int learned = sk->usable( target, false ) ? sk->getLearned( target )
+                                                  : pch->getSkillData( sk->getIndex( ) ).learned.getValue( );
+        int pct = URANGE( 0, learned + skill_learned_from_affects( sk, pch ), 100 );
+        if (pct <= 0)
+            continue;
+        double die = m.die;
+        if (m.dieKind == GAM_SIZE)
+            die = floor( target->size * m.die );
+        else if (m.dieKind == GAM_STR)
+            die = target->getCurrStat( STAT_STR ) - 20;
+        die = std::max( 1.0, die );
+        double n = std::max( 0.0, floor( lvl * m.lvl ) ) + m.count;
+        double per = m.dr * std::max( 0, (int)target->damroll ) + m.flat + n * (die + 1) / 2;
+        double land = item_value_sub( "grant_skill", "melee_nuke_land", m.skill, 0.6 );
+        double rate = (double)pulse / std::max( 1, sk->getBeats( target ) );
+        best = std::max( best, per * land * rate * pct / 100.0 );
+    }
+    return best;
+}
+
 // The char's best own nuke, as damage per round x the percent it lands: any offensive
 // damage spell the char has (class, race, clan, a grant it would keep). A grant from the
 // scored item's own slot leaves with the swap, so it doesn't count (ga_grantHeld), and
 // neither does the granted skill itself: when another worn copy keeps it, the grant was
 // already priced 0 (ga_grantCounted). The percent is read the way the grant side reads
 // it: learned + skill affects, no daze/drunk cuts, and a vampire's spells count outside
-// vamp form too.
+// vamp form too. A damaging melee skill (ga_bestMeleeNuke) counts as an own nuke as well.
 static double ga_bestOwnNuke( Character *target, int lvl, bool caster, int grantSn,
                               const std::set<int> &outside, const std::set<int> &inside )
 {
@@ -5079,7 +5134,7 @@ static double ga_bestOwnNuke( Character *target, int lvl, bool caster, int grant
             continue;
         best = std::max( best, ga_nukeRound( target, sk, lvl, caster ) * pct / 100.0 );
     }
-    return best;
+    return std::max( best, ga_bestMeleeNuke( target, lvl, grantSn, outside, inside ) );
 }
 
 // Charm slots, mirroring Fenia .tmp.mob.overcharmed_new (utils/mob: charm), the gate
