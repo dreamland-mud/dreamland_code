@@ -21,6 +21,7 @@
 #include "vnum.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 CLAN(flowers);
 
@@ -223,6 +224,13 @@ bool limit_purge( Object *obj )
         << " (" << obj->getID( ) << ") extracted for " << where 
         << ", " << (fCount ? "count":"nocount") << endl;
     extract_obj_1( obj, fCount );
+
+    // After the extract: the grant saves the pfile, the item must be gone by then.
+    if (holder) {
+        achievement( holder, "dust_to_dust" );
+        if (!holder->is_npc( ) && holder->getClan( ) == clan_flowers)
+            achievement( holder, "not_for_flowers" );
+    }
     return true;
 }
 

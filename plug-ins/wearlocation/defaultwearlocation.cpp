@@ -33,6 +33,7 @@
 #include "def.h"
 #include "material.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 WEARLOC(none);
 GSN(spellbane);
@@ -674,6 +675,7 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
          if (IS_SET(flags, F_WEAR_VERBOSE)) {
             echo_master(ch,_("Твой уровень слишком велик, чтобы использовать %1$O4."), obj );
             ch->recho( _("Уровень %1$^C2 слишком велик, чтобы использовать %2$O4."), ch, obj );
+            achievement( ch, "overqualified" );
          }
         return RC_WEAR_YOUNG;
     }

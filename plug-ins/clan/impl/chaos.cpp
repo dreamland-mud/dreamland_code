@@ -48,6 +48,7 @@
 #include "magic.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 #define MOB_VNUM_MIRROR_IMAGE       17
 #define OBJ_VNUM_CHAOS_BLADE        87
@@ -83,6 +84,7 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
       
       oldact(_("$c1 выглядит гораздо менее уверенн$gым|ым|ой в себе!"), victim, 0, 0, TO_ROOM);
       oldact(_("Ты чувствуешь себя гораздо менее уверенно!"), victim, 0, 0, TO_CHAR);
+      achievement( ch, "disgrace" );
     }
       else
       ch->pecho(_("Твоя попытка закончилась неудачей."));

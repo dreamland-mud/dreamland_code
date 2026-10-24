@@ -19,6 +19,8 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
+#include "pcharactermanager.h"
 
 WEARLOC(none);
 
@@ -347,8 +349,19 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container, bo
     obj_to_char( obj, ch );
 
     // Decrease looting counter before any other 'get' progs have a chance to run.
-    if (container->item_type == ITEM_CORPSE_PC && !ch->is_immortal( ) && !container->hasOwner( ch ))
+    if (container->item_type == ITEM_CORPSE_PC && !ch->is_immortal( ) && !container->hasOwner( ch )) {
         container->count--;
+
+        if (obj->pIndexData->limit > 0) {
+            if (container->killer == ch->getNameC( ))
+                achievement( ch, "spoils_of_war" );
+
+            // Only an online owner is credited.
+            PCharacter *owner = PCharacterManager::findPlayer( container->getOwner( ) );
+            if (owner != 0)
+                achievement( owner, "picked_clean" );
+        }
+    }
 
     if (oprog_get( obj, ch ))
         return true;

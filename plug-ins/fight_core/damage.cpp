@@ -46,6 +46,8 @@
 #include "def.h"
 #include "l10n.h"
 #include "msp.h"
+#include "clanreference.h"
+#include "commonattributes.h"
 
 GSN(resistance);
 GSN(dark_shroud);
@@ -56,6 +58,7 @@ GSN(stardust);
 PROF(cleric);
 PROF(samurai);
 PROF(warrior);
+CLAN(flowers);
 
 void do_visible( Character * );
 
@@ -183,6 +186,15 @@ bool Damage::canDamage( )
     
     if (is_safe( ch, victim ))
         return false;
+
+    // flower_child tracker: a Flower Child who harms a player has struck.
+    // Ungated on purpose, so the mark exists before the achievement opens.
+    if (ch && ch != victim && !ch->is_npc( ) && !victim->is_npc( )
+        && ch->getClan( ) == clan_flowers
+        && !ch->getPC( )->getAttributes( ).isAvailable( "achtrack_struck" ))
+    {
+        ch->getPC( )->getAttributes( ).getAttr<XMLStringAttribute>( "achtrack_struck" )->setValue( "1" );
+    }
     
     if (paf) {
         adjustAdrenaline();

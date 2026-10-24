@@ -33,6 +33,7 @@
 #include "religion.h"
 #include "playerattributes.h"
 #include "commonattributes.h"
+#include "pcharactermanager.h"
 #include "player_account.h"
 #include "room.h"
 #include "affect.h"
@@ -1046,6 +1047,28 @@ static void oprog_kill( Character *killer, Character *victim, const DLString &la
     }
 }
 
+// A wanted poster paid out: credit the Ruler who posted it, if online.
+static void wanted_poster_paid( Character *victim )
+{
+    if (victim->is_npc( ))
+        return;
+
+    XMLAttributes &attrs = victim->getPC( )->getAttributes( );
+    XMLStringAttribute::Pointer by = attrs.findAttr<XMLStringAttribute>( "achtrack_wantedby" );
+    if (!by)
+        return;
+
+    DLString name = by->getValue( );
+    attrs.eraseAttribute( "achtrack_wantedby" );
+
+    if (!IS_SET(victim->act, PLR_WANTED))
+        return;
+
+    PCharacter *poster = PCharacterManager::findPlayer( name );
+    if (poster && poster != victim)
+        achievement( poster, "wanted" );
+}
+
 // Killing a wanted players increases your loyalty.
 static void loyalty_gain( Character *ch, Character *victim )
 {
@@ -1168,7 +1191,8 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
 
     // Reset player and move them to the altar.    
     extract_dead_player( victim->getPC( ), FEXTRACT_COUNT );
-    
+
+    wanted_poster_paid( victim );
     loyalty_gain( ch, victim );
 
     ghost_gain( victim );

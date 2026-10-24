@@ -21,6 +21,7 @@
 #include "skillmanager.h"
 
 #include "pcharactermanager.h"
+#include "commonattributes.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -53,6 +54,7 @@
 #include "l10n.h"
 #include "accountmanager.h"
 #include "clanrecords.h"
+#include "fenia_utils.h"
 
 
 CLAN(chaos);
@@ -534,6 +536,7 @@ SKILL_RUNP( manacles )
                                                 ch,0,victim,TO_VICT,POS_RESTING);
                         oldact_p(_("$c1 заковывает $C4 в кандалы!"),
                                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
+                        achievement( ch, "manacles" );
                 };
         
         } else
@@ -619,8 +622,11 @@ SKILL_RUNP( wanted )
                                 SET_BIT(victim->act, PLR_WANTED);
                                 oldact(_("$c1 теперь в РОЗЫСКЕ!!!"),victim, 0, ch, TO_NOTVICT);
                                 victim->pecho(_("Ты теперь в РОЗЫСКЕ!!!"));
-                                if ( !victim->is_npc() )
+                                if ( !victim->is_npc() ) {
                                         victim->getPC( )->setLoyalty( max ( victim->getPC( )->getLoyalty() - 50, -1000));
+                                        // The poster's author, credited at the victim's death (fight_death.cpp).
+                                        victim->getPC( )->getAttributes( ).getAttr<XMLStringAttribute>( "achtrack_wantedby" )->setValue( ch->getName( ) );
+                                }
                                 ch->pecho("Ok.");
                         }
                         break;
@@ -633,6 +639,8 @@ SKILL_RUNP( wanted )
                         else
                         {
                                 REMOVE_BIT(victim->act, PLR_WANTED);
+                                if ( !victim->is_npc() )
+                                        victim->getPC( )->getAttributes( ).eraseAttribute( "achtrack_wantedby" );
                                 oldact(_("$c1 больше не разыскивается."),victim, 0, ch, TO_NOTVICT);
                                 victim->pecho(_("Тебя больше не разыскивают."));
                                 ch->pecho("Ok.");
@@ -1270,6 +1278,9 @@ SKILL_RUNP( jail )
                                         ch,0,victim,TO_VICT,POS_RESTING);
                 oldact_p(_("$c1 приговаривает $C4 к тюремному заключению."),
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
+
+                achievement( ch, "judge" );
+                achievement( victim, "did_time" );
         } else
         {
                 ch->pecho(_("Ты не можешь этого сделать."));
