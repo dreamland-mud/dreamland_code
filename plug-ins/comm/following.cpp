@@ -38,6 +38,18 @@ CLAN(battlerager);
 CLAN(ruler);
 GSN(manacles);
 GSN(charm_person);
+PROF(mobile);
+
+/* A pet's class tag for the group list: the first real profession its act
+ * flags or prototype give it (MobileProfession::toVector), blank if none. */
+static DLString npc_who_name( Character *ch, Character *gch )
+{
+    GlobalBitvector profs = gch->getProfession( )->toVector( gch );
+    for (int p = 0; p < professionManager->size( ); p++)
+        if (p != prof_mobile->getIndex( ) && profs.isSet( p ))
+            return professionManager->find( p )->getWhoNameFor( ch );
+    return "";
+}
 
 static bool check_mutual_induct( Character *ch, Character *victim, ClanReference &clan )
 {
@@ -154,17 +166,20 @@ CMDRUN( group )
                             charmLeft = paf->duration.getValue( );
                             break;
                         }
+                    DLString whoName = npc_who_name( ch, gch );
                     if (charmLeft >= 0)
-                        ch->pecho( "[%3d    ] %-16.16s{x %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv  charm:%d",
+                        ch->pecho( "[%3d %3s] %-16.16s{x %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv  charm:%d",
                             gch->getRealLevel( ),
+                            whoName.c_str( ),
                             ch->sees( gch, '1' ).c_str( ),
                             gch->hit.getValue( ), gch->max_hit.getValue( ),
                             gch->mana.getValue( ), gch->max_mana.getValue( ),
                             gch->move.getValue( ), gch->max_move.getValue( ),
                             charmLeft );
                     else
-                        ch->pecho( "[%3d    ] %-16.16s{x %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv",
+                        ch->pecho( "[%3d %3s] %-16.16s{x %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv",
                             gch->getRealLevel( ),
+                            whoName.c_str( ),
                             ch->sees( gch, '1' ).c_str( ),
                             gch->hit.getValue( ), gch->max_hit.getValue( ),
                             gch->mana.getValue( ), gch->max_mana.getValue( ),
