@@ -20,6 +20,7 @@
 #include "skill.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
+#include "fenia_utils.h"
 #include "fight_extract.h"
 #include "object.h"
 #include "room.h"
@@ -543,6 +544,11 @@ void Damage::soundDamage( int before )
             msp_sound( victim, "alert/lowhp", 100, 1, 80 );
         else if (dam > victim->max_hit / 5 && ch != victim)
             msp_sound( victim, "combat/hurt", 100, 1, 60 );
+
+        // A boss's blow worth the hurt sound, survived on the last 5%.
+        if (dam > victim->max_hit / 5 && ch != victim && ch->is_npc()
+            && ch->getNPC()->getTier() <= 2 && victim->hit > 0 && victim->hit < victim->max_hit / 20)
+            achievement( victim, "signature" );
     }
 
     if (ch != victim && !ch->is_npc( )

@@ -22,6 +22,7 @@
 #include "act.h"
 #include "occupations.h"
 
+#include "fenia_utils.h"
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
@@ -29,6 +30,21 @@
 
 GSN(cavalry);
 CLAN(none);
+
+static Character *stop_fighting_dying = 0;
+
+void stop_fighting_death( Character *victim )
+{
+    stop_fighting_dying = victim;
+    try {
+        stop_fighting( victim, true );
+    }
+    catch (...) {
+        stop_fighting_dying = 0;
+        throw;
+    }
+    stop_fighting_dying = 0;
+}
 
 /*
  * Stop fights.
@@ -41,6 +57,8 @@ void stop_fighting( Character *ch, bool fBoth )
     {
         if( fch == ch || ( fBoth && fch->fighting == ch ) )
         {
+            bool wasFighting = fch->fighting != 0;
+
             fch->fighting    = 0;
             // A follower (charmie, pet) stays on its feet for its master; only
             // free mobs fall back to their area default, which can be sleeping.
@@ -55,6 +73,11 @@ void stop_fighting( Character *ch, bool fBoth )
             
             if (!fch->is_npc()) {
                 fch->getPC()->getAttributes().handleEvent(StopFightArguments(fch->getPC()));
+
+                // Walked out of a fight on the last hit point.
+                if (wasFighting && fch->hit == 1 && fch->position > POS_DEAD
+                    && fch != stop_fighting_dying)
+                    achievement( fch, "by_a_hair" );
             }
         }
   }

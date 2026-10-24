@@ -7,6 +7,7 @@
 #include "logstream.h"
 
 #include "onehit_undef.h"
+#include "fenia_utils.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -773,6 +774,27 @@ OpenerGuard::~OpenerGuard( )
     ambush_attacker = 0;
 }
 
+static Character *round_striker = 0;
+static int round_landed = 0;
+
+RoundGuard::RoundGuard( Character *striker )
+{
+    round_striker = striker;
+    round_landed = 0;
+}
+
+RoundGuard::~RoundGuard( )
+{
+    round_striker = 0;
+    round_landed = 0;
+}
+
+void round_blow_landed( Character *ch )
+{
+    if (ch == round_striker && ++round_landed == 11)
+        achievement( ch, "eleven_strikes" );
+}
+
 // Mounted fighting from the clan catalog: cavalry, a lance, and the lance charge.
 void UndefinedOneHit::damApplyMounted( )
 {
@@ -794,6 +816,8 @@ void UndefinedOneHit::damApplyMounted( )
         charge_attacker = 0;
         charged = true;
         dam *= 2;
+        // A kill by this blow reads "lance" in onDeath (achievement lanced).
+        deathReason = "lance";
     }
 }
 

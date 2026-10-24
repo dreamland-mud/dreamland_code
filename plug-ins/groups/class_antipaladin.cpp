@@ -40,6 +40,7 @@
 #include "damage_impl.h"
 #include "weapongenerator.h"
 #include "vnum.h"
+#include "fenia_utils.h"
 #include "merc.h"
 #include "act.h"
 #include "interp.h"
@@ -87,6 +88,7 @@ void CleaveOneHit::calcDamage( )
         oldact(_("Ты рассекаешь $C4 {RПОПОЛАМ{x!"),ch,0,victim,TO_CHAR);
         oldact(_("$c1 рассекает тебя {RПОПОЛАМ{x!"),ch,0,victim,TO_VICT);
         oldact(_("$c1 рассекает $C4 {RПОПОЛАМ{x!"),ch,0,victim,TO_NOTVICT);
+        achievement( ch, "sliced_clean_through" );
 
         ch->setWait( 2 );
 

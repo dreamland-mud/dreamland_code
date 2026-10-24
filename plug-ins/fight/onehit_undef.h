@@ -20,6 +20,15 @@ struct OpenerGuard {
     ~OpenerGuard( );
 };
 
+/** A player's melee round (multi_hit): OneHit::hit counts the blows that
+ *  land for achievement eleven_strikes. The destructor clears it on any exit,
+ *  a killing blow's exception included. */
+struct RoundGuard {
+    RoundGuard( Character *striker );
+    ~RoundGuard( );
+};
+void round_blow_landed( Character *ch );
+
 class UndefinedOneHit: public WeaponOneHit {
 public:
     UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command = "" );

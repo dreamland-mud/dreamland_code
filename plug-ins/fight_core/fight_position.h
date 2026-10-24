@@ -8,6 +8,9 @@
 class Character;
 
 void stop_fighting( Character *ch, bool fBoth );
+/** stop_fighting( victim, true ) for a death: the dying victim is not
+ *  "walking out of the fight" (achievement by_a_hair). */
+void stop_fighting_death( Character *victim );
 
 /** Start a fight. 'standUp' is what puts ch on their feet and shakes off sleep;
  *  pass false for a character who is being attacked while down, so that the whole

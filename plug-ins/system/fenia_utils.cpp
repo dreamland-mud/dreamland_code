@@ -7,6 +7,7 @@
 #include "core/object.h"
 #include "behavior.h"
 #include "fenia_utils.h"
+#include "character.h"
 #include "merc.h"
 #include "def.h"
 
@@ -105,6 +106,14 @@ bool vgprog_nocatch(const DLString &trigName, const char *fmt, va_list ap)
         return false;
 
     return gprog_invoke(trigName, fmt, ap);
+}
+
+void achievement(Character *ch, const DLString &id)
+{
+    if (!ch || ch->is_npc() || !gprog_registered("onAchievement"))
+        return;
+
+    gprog("onAchievement", "Cs", ch, id.c_str());
 }
 
 bool gprog_registered(const DLString &trigName)

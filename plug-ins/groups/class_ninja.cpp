@@ -36,6 +36,7 @@
 #include "follow_utils.h"
 #include "onehit_weapon.h"
 #include "chance.h"
+#include "fenia_utils.h"
 #include "merc.h"
 #include "loadsave.h"
 #include "act.h"
@@ -712,6 +713,9 @@ void AssassinateOneHit::calcDamage( )
         oldact_p(_("$c1 {R{IS+++ {IxЛОМАЕТ ТЕБЕ ШЕЮ{IS +++{Ix{x!"),ch,0,victim,TO_VICT,POS_DEAD);
 
         gsn_assassinate->improve( ch, true, victim );
+
+        if (victim->position == POS_SLEEPING)
+            achievement( ch, "sleeping_beauty" );
 
         handleDeath( );
         throw VictimDeathException( );

@@ -813,6 +813,9 @@ static void multi_hit_strikes( Character *ch, Character *victim, string command 
 
     if (ch->is_npc( ))
         return;
+
+    // eleven_strikes counts this round's landed blows; reset on any exit.
+    RoundGuard roundGuard( ch );
    
     one_hit_nocatch( ch, victim, false, command );
 

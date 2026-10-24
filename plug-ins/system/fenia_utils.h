@@ -7,6 +7,7 @@
 
 class WrapperBase;
 class Object;
+class Character;
 
 namespace Scripting {
     class RegisterList;
@@ -30,6 +31,12 @@ bool vgprog_nocatch(const DLString &trigName, const char *fmt, va_list ap);
  *  .tmp.gtrig. Cheap: no Fenia call and no allocation, so a per-tick caller can
  *  ask it to decide whether the C++ fallback still owns a decision. */
 bool gprog_registered(const DLString &trigName);
+
+/** Earn achievement id: hands (ch, id) to the onAchievement global trigger,
+ *  which owns the gate and the bookkeeping. Players only; a no-op while no
+ *  Fenia handler is registered. Callers on hot paths test their own cheap
+ *  condition first and call this only when the event really happened. */
+void achievement(Character *ch, const DLString &id);
 
 /** Call a trigger with given name and args on an instance (mob, item, room) or its prototype (mob index data etc). */
 bool fenia_trigger(Scripting::Register &rc, const DLString &trigName, const Scripting::RegisterList &args, WrapperBase *instance, WrapperBase *proto);

@@ -5,6 +5,7 @@
 #include "logstream.h"
 
 #include "onehit.h"
+#include "onehit_undef.h"
 
 #include "skill.h"
 #include "pcharacter.h"
@@ -95,6 +96,7 @@ void OneHit::hit( )
         return;
 
     inflictDamage( );
+    round_blow_landed( ch );
     postDamageEffects( );
     mprog_hit();
     handlePosition( );
