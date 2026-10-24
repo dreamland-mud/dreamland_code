@@ -267,6 +267,23 @@ void fwrite_affect( const char *label, FILE *fp, Affect *paf )
     if (paf->type == gsn_doppelganger)
         return;
 
+    // where 0 reads back as affect_flags. A table the mapping does not know
+    // (a stale plugin pointer, an unmapped table) must not turn its bits into
+    // blindness or sanctuary on the next load: drop the bits instead.
+    int where = affect_table_to_where(paf->bitvector.getTable(), paf->global.getRegistry());
+    long long bits = paf->bitvector.getValue();
+    if (where == 0 && bits != 0 && paf->bitvector.getTable() != &affect_flags) {
+        static bool reported = false;
+        if (!reported) {
+            reported = true;
+            LogStream::sendError() << "fwrite_affect: affect '" << paf->type->getName()
+                                   << "' has bits " << bits << " on unmapped table '"
+                                   << FlagTableRegistry::getName(paf->bitvector.getTable())
+                                   << "' (empty = stale pointer), saved without them" << endl;
+        }
+        bits = 0;
+    }
+
     // Item (object) sources must survive the pfile so a permanent item-cast affect
     // can still be matched -- and taken back off -- by the unequip backstop after a
     // relog or reboot. Only char/pet affects ("Affc") carry them; char/room sources
@@ -282,24 +299,24 @@ void fwrite_affect( const char *label, FILE *fp, Affect *paf )
         fprintf( fp, "%s '%s' %3d %3d %3d %3d %3d %10lld %s\n",
                 label,
                 paf->type->getName( ).c_str( ),
-                affect_table_to_where(paf->bitvector.getTable(), paf->global.getRegistry()),
+                where,
                 paf->level.getValue(),
                 paf->duration.getValue(),
                 paf->modifier.getValue(),
                 paf->location.getValue(),
-                paf->bitvector.getValue(),
+                bits,
                 paf->global.toString( ).c_str( ));
         return;
     }
 
     fprintf( fp, "Aff2 '%s' %3d %3d %3d %3d %3d %10lld %d",
             paf->type->getName( ).c_str( ),
-            affect_table_to_where(paf->bitvector.getTable(), paf->global.getRegistry()),
+            where,
             paf->level.getValue(),
             paf->duration.getValue(),
             paf->modifier.getValue(),
             paf->location.getValue(),
-            paf->bitvector.getValue(),
+            bits,
             (int)itemVnums.size());
     for (int vnum: itemVnums)
         fprintf( fp, " %d", vnum );
