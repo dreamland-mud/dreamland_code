@@ -313,7 +313,7 @@ int WeaponRandomizer::getAlign(Object *obj) const
 }
 
 // Ensure rand_all weapons always have a level assigned: random one for shops or chests,
-// mob's level for equip/inv resets.
+// mob's level (capped at 103) for equip/inv resets.
 int WeaponRandomizer::getLevel(Object *obj) const
 {
     if (obj->level > 0)
@@ -322,9 +322,11 @@ int WeaponRandomizer::getLevel(Object *obj) const
     if (item_is_sold(obj))
         return number_range(1, LEVEL_MORTAL);
     
+    // Capped like death drops (global/onDeath/drops): loot off a mob above
+    // the mortal range must still be wearable by a remorted hero.
     Character *carrier = obj->getCarrier();
     if (carrier)
-        return carrier->getRealLevel();
+        return std::min( (int)carrier->getRealLevel( ), LEVEL_MORTAL + 3 );
 
     return number_range(1, LEVEL_MORTAL);    
 }

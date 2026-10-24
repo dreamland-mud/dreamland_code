@@ -15,6 +15,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "../loadsave/behavior_utils.h"
 
 /* 'path' refuses outright in these areas, so a link here would only ever answer
  * with that refusal. Same flag set the command guards itself with. */
@@ -106,6 +107,28 @@ static DLString where_area_phrase( Character *ch )
     return buf.str( );
 }
 
+/* "где продавец", "где кузнец": a service mob answers to the role tag its
+ * Fenia behavior shows on look ("(Продавец)"), in the viewer's language, so
+ * the search does not hang on whether the builder put the role into the
+ * keywords. The C++ behavior->show() tags ("[ЦЕЛЬ]") stay out of it on
+ * purpose: they would turn where into a quest target finder. */
+static bool where_matches_role( Character *ch, Character *victim, const DLString &arg )
+{
+    if (!victim->is_npc( ))
+        return false;
+
+    DLString tag = behavior_trigger_str( victim, "Show", "CC", victim, ch );
+    if (tag.empty( ))
+        return false;
+
+    tag = tag.colourStrip( );
+    for (auto &c: tag)
+        if (c == '(' || c == ')' || c == '[' || c == ']')
+            c = ' ';
+
+    return is_name( arg.c_str( ), tag.toLower( ).c_str( ) );
+}
+
 static bool rprog_where( Character *ch, const char *arg )
 {
     FENIA_CALL( ch->in_room, "Where", "Cs", ch, arg );
@@ -191,8 +214,9 @@ CMDRUNP( where )
                     && ( !victim->is_npc()
                     || ( victim->is_npc() && !IS_SET(victim->act, ACT_NOWHERE) ) )
                     && ch->can_see( victim )
-                    && is_name( arg.c_str(), victim->getNameP( '7' ).c_str() )
-                    && !IS_SET(victim->in_room->room_flags, ROOM_NOWHERE))
+                    && !IS_SET(victim->in_room->room_flags, ROOM_NOWHERE)
+                    && (is_name( arg.c_str(), victim->getNameP( '7' ).c_str() )
+                        || where_matches_role( ch, victim, arg )))
             {
                 found = true;
                 format_where( ch, victim, areaAllowsPath );
