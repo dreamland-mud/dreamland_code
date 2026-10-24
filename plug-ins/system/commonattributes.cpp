@@ -105,9 +105,13 @@ Register XMLStringMapAttribute::toRegister() const
     return attrReg;
 }
 
+// A read: never creates the attribute (getAttr would plant an empty one on
+// every pfile it touches, and returns null for an attribute of another type).
 const DLString & get_string_attribute(PCMemoryInterface *player, const DLString &attrName)
 {
-    XMLStringAttribute::Pointer attr = player->getAttributes().getAttr<XMLStringAttribute>(attrName);
+    XMLStringAttribute::Pointer attr = player->getAttributes().findAttr<XMLStringAttribute>(attrName);
+    if (!attr)
+        return DLString::emptyString;
     return attr->getValue();
 }
 
