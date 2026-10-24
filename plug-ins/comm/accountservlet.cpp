@@ -29,6 +29,8 @@
 #include <string>
 
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
 #include "servlet.h"
 #include "servlet_utils.h"
@@ -427,6 +429,32 @@ Json::Value account_roster_entry(const DLString &name)
     return entry;
 }
 
+// Defined in profileservlet.cpp: true hours across every life.
+int profile_char_hours(PCMemoryInterface *pci);
+
+// The account's characters, most played first (the main on top), ties by name.
+// A name with no loadable memory sinks to the bottom. Shared with account.cpp so
+// the login roster and the in-game settings roster list in the same order.
+list<DLString> account_chars_by_played(const DLString &id)
+{
+    vector<pair<int, DLString> > ranked;
+    for (const DLString &name : AccountManager::charsOf(id)) {
+        PCMemoryInterface *pci = PCharacterManager::find(name);
+        ranked.push_back(make_pair(pci != 0 ? profile_char_hours(pci) : -1, name));
+    }
+    sort(ranked.begin(), ranked.end(),
+         [](const pair<int, DLString> &a, const pair<int, DLString> &b) {
+             if (a.first != b.first)
+                 return a.first > b.first;
+             return a.second < b.second;
+         });
+
+    list<DLString> names;
+    for (auto &r : ranked)
+        names.push_back(r.second);
+    return names;
+}
+
 // ---- /account/info ---------------------------------------------------------
 
 static void account_info(HttpRequest &request, HttpResponse &response)
@@ -452,7 +480,7 @@ static void account_info(HttpRequest &request, HttpResponse &response)
     body["account"] = id;
     body["title"] = AccountManager::titleOf(id);
     body["identities"] = acc["identities"];
-    for (const DLString &name : AccountManager::charsOf(id))
+    for (const DLString &name : account_chars_by_played(id))
         body["chars"].append(account_roster_entry(name));
 
     servlet_response_200_json(response, body);
@@ -742,7 +770,7 @@ static void account_emailverify(HttpRequest &request, HttpResponse &response)
     } else {
         out["account"] = id;
         out["title"] = AccountManager::titleOf(id);
-        for (const DLString &name : AccountManager::charsOf(id))
+        for (const DLString &name : account_chars_by_played(id))
             out["chars"].append(account_roster_entry(name));
     }
     servlet_response_200_json(response, out);

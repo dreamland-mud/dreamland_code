@@ -40,6 +40,8 @@ void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 // Defined in accountservlet.cpp: {name, level, class:{en,ru,ua}} for one character.
 Json::Value account_roster_entry( const DLString &name );
+// Defined in accountservlet.cpp: charsOf, most played first.
+list<DLString> account_chars_by_played( const DLString &id );
 // Defined in profileservlet.cpp: the public web profile's visibility rules.
 bool account_profile_char_hidden( PCMemoryInterface *pci );
 void account_profile_set_char_hidden( PCMemoryInterface *pci, bool hidden );
@@ -1125,7 +1127,7 @@ RPCRUN(account_chars)
         // profile: the public page switch per character. blocker is the
         // achievement only this character brings (it cannot hide), "" if none.
         lang_t lang = Player::lang(ch);
-        for (const DLString &name : AccountManager::charsOf(id)) {
+        for (const DLString &name : account_chars_by_played(id)) {
             Json::Value entry = account_roster_entry(name);
             PCMemoryInterface *pcm = PCharacterManager::find(name);
             if (pcm != 0) {

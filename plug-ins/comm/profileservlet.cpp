@@ -146,7 +146,8 @@ static long profile_life_hours(long hours, long cap)
 }
 
 // True hours of every life of a character: the current one plus the remorts.
-static int profile_char_hours(PCMemoryInterface *pci)
+// Shared with accountservlet.cpp (roster order).
+int profile_char_hours(PCMemoryInterface *pci)
 {
     long cap = profile_life_cap(pci);
     long hours = profile_life_hours(pci->getPlayedHours(), cap);
