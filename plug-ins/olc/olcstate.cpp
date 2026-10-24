@@ -786,7 +786,7 @@ bool OLCState::editorCopy(const DLString &original)
     return editorCopy(original.c_str());
 }
 
-static void apply_flags(DLString &original, editor_flags flags)
+static void apply_editor_flags(DLString &original, editor_flags flags)
 {
     if (IS_SET(flags, ED_UPPER_FIRST_CHAR)) {
         original.upperFirstCharacter();
@@ -812,7 +812,7 @@ bool OLCState::editorPaste(DLString &original, editor_flags flags)
 {
     PCharacter *ch = owner->character->getPC();
     original = ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
-    apply_flags(original, flags);
+    apply_editor_flags(original, flags);
     ptc(ch, "Описание вставлено из буфера.\r\n");
     return true;
 }
@@ -900,7 +900,7 @@ bool OLCState::editor(const char *argument, DLString &original, editor_flags fla
         if (!sedit(original)) 
             return false;
         
-        apply_flags(original, flags);
+        apply_editor_flags(original, flags);
         stc("Описание установлено.\n\r", ch);
         return true;
     }
@@ -935,7 +935,7 @@ bool OLCState::editor(const char *argument, DLString &original, editor_flags fla
     }
 
     original = argument;
-    apply_flags(original, flags);
+    apply_editor_flags(original, flags);
     ptc(ch, "Описание установлено в строку %s\r\n", original.c_str());
     return true;
 }

@@ -10,6 +10,7 @@
 
 #include "weapons.h"
 #include "math_utils.h"
+#include "autoflags.h"
 #include "itemflags.h"
 #include "affectflags.h"
 #include "attacks.h"

@@ -88,12 +88,12 @@ const FlagTable * FlagTableRegistry::getTable( const DLString & arg )
 }
 
 // A FlagTableWrapper (affect location/bitvector) whose table pointer is non-null
-// but unknown to the registry means memory corruption: something stored a
-// non-table pointer (seen on live: apply_flags.fields, one indirection off
-// &apply_flags). The wrapper's guard then returns empty instead of dereferencing
-// it and crashing. Log once per distinct bad pointer so a recurrence stays
-// visible without spamming a hot display path. Root cause of the write is still
-// open, so this breadcrumb is the only signal it happened again.
+// but unknown to the registry. Likely cause: the table was defined in a plugin
+// and the plugin was reloaded, so long-lived affects kept the old address
+// (proven for weapon_type2 on 2026-10-24). Affect tables now
+// live in src/bits.conf for that reason; a hit here means a plugin table found
+// its way into a long-lived object again. The wrapper's guard returns empty
+// instead of dereferencing it. Log once per distinct bad pointer.
 void reportUnregisteredFlagTable( const FlagTable *table )
 {
     static std::set<const FlagTable *> reported;
@@ -102,7 +102,7 @@ void reportUnregisteredFlagTable( const FlagTable *table )
         LogStream::sendError( )
             << "reportUnregisteredFlagTable: non-table pointer "
             << (const void *)table
-            << " reached a name/message lookup -- corrupt affect/flags entry, returning empty."
+            << " reached a name/message lookup -- stale or corrupt table pointer, returning empty."
             << endl;
 }
 

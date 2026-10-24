@@ -10,6 +10,7 @@
 #include "grammar_entities_impl.h"
 #include "dlstring.h"
 #include "arg_utils.h"
+#include "autoflags.h"
 #include "affectflags.h"
 #include "itemflags.h"
 #include "compatflags.h"
