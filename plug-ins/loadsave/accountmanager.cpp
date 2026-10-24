@@ -562,13 +562,6 @@ DLString AccountManager::conflictingOnlineChar(const DLString &charName)
     if (myAccount.empty())
         return DLString::emptyString;   // an unattached char never conflicts
 
-    // A god's account (any immortal on it) plays its service chars side by side.
-    for (const DLString &n : charsOf(myAccount)) {
-        PCMemoryInterface *pci = PCharacterManager::find(n);
-        if (pci != 0 && pci->get_trust() >= LEVEL_IMMORTAL)
-            return DLString::emptyString;
-    }
-
     // char_list is the in-world set: a descriptor still in the nanny (typing name
     // or password) is not in it yet, so a half-logged-in connection is naturally
     // exempt. The char itself (a reconnect/reanimate) and immortals are skipped.
@@ -582,8 +575,16 @@ DLString AccountManager::conflictingOnlineChar(const DLString &charName)
         if (pch->get_trust() >= LEVEL_IMMORTAL)
             continue;
 
-        if (accountOf(pch->getName()) == myAccount)
+        if (accountOf(pch->getName()) == myAccount) {
+            // A god's account (any immortal on it) plays its service chars
+            // side by side. Checked only on a real clash: charsOf walks every pfile.
+            for (const DLString &n : charsOf(myAccount)) {
+                PCMemoryInterface *pci = PCharacterManager::find(n);
+                if (pci != 0 && pci->get_trust() >= LEVEL_IMMORTAL)
+                    return DLString::emptyString;
+            }
             return pch->getName();
+        }
     }
 
     return DLString::emptyString;

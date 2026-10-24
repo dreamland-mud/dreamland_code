@@ -18,7 +18,9 @@
  * Legendary/Immortal rank, a non-hidden clan, titles and online state. Level
  * stays out (who conceals it, see can_see_level). The account block sums the
  * SHOWN characters only (playing since, hours across every life, lives lived,
- * the class with the most hours), so a hidden alt never moves a number.
+ * the class with the most hours), so a hidden alt never moves a number. Earned
+ * account achievements are the exception: they belong to the whole account and
+ * stay on the page when the alt holding them is hidden (Kit 2026-10-24).
  *
  * Achievements come from Fenia (.tmp.achievements.profile in the private
  * world scripts): definitions, the test gate and the secrets never pass
