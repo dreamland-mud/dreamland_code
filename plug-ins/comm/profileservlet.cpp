@@ -44,6 +44,9 @@
 #include "profession.h"
 #include "player_utils.h"
 #include "clanreference.h"
+#include "hometown.h"
+#include "room.h"
+#include "area.h"
 #include "commonattributes.h"
 #include "fenia/register-impl.h"
 #include "fenia/object.h"
@@ -222,6 +225,13 @@ static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
         c["desc"]["ru"] = dRu.colourStrip().c_str();
     if (!dUa.empty())
         c["desc"]["ua"] = dUa.colourStrip().c_str();
+
+    // The hometown's area file keys the zone banner behind the profile header.
+    if (pci->getHometown()->isValid()) {
+        RoomIndexData *pRoom = get_room_index(pci->getHometown()->getRecall());
+        if (pRoom && pRoom->areaIndex && pRoom->areaIndex->area_file)
+            c["home"] = pRoom->areaIndex->area_file->file_name.c_str();
+    }
 
     c["online"] = online;
     return c;
