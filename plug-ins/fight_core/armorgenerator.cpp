@@ -244,11 +244,44 @@ static bool material_is_metal(const DLString &name)
     return m && IS_SET(m->type, MAT_METAL);
 }
 
+/** True when the item's own affects (instance or prototype) already carry a
+ *  res/vuln/imm bit for this damage type. */
+static bool obj_has_damtype_bit(Object *obj, const DLString &value)
+{
+    static const char *tables[] = { "res_flags", "vuln_flags", "imm_flags" };
+    for (int k = 0; k < 3; k++) {
+        const FlagTable *ft = FlagTableRegistry::getTable(tables[k]);
+        if (!ft)
+            continue;
+        Affect probe;
+        probe.bitvector.setTable(ft);
+        probe.bitvector.setBits(value);
+        bitstring_t b = probe.bitvector;
+        if (b == 0)
+            continue;
+
+        for (auto &paf: obj->affected)
+            if (paf->bitvector.getTable() == ft && ((bitstring_t)paf->bitvector & b))
+                return true;
+        for (auto &paf: obj->pIndexData->affected)
+            if (paf->bitvector.getTable() == ft && ((bitstring_t)paf->bitvector & b))
+                return true;
+    }
+    return false;
+}
+
 /** Materials: only what the chosen noun is made of. */
 bool ArmorGenerator::valueAllowed(const DLString &secName, const DLString &value) const
 {
-    if (keepName)
+    if (keepName) {
+        // A hand-made piece keeps its own res/vuln/imm: never roll a second one
+        // on the same damage type (res cold twice, res fire next to vuln fire).
+        // Crafted pieces replay their forced picks and are left alone.
+        if (!crafted && (secName == "resists" || secName == "vulns" || secName == "immunes")
+                && obj_has_damtype_bit(obj, value))
+            return false;
         return secName != "material" && secName != "worn_buff";
+    }
 
     return secName != "material" || materialAllowed(value);
 }
