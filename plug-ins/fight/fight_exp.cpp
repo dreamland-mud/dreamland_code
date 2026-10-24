@@ -33,6 +33,7 @@
 #include "def.h"
 #include "skill_utils.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 PROF(samurai);
 BONUS(experience);
@@ -41,9 +42,17 @@ GSN(leadership);
 
 int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus );
 
-/** Report mob's parameter gain to wiznet 'levels'. */
-static void wiznet(NPCharacter *pet, Character *victim, const char *what, int oldPetParam, int petParam, int victParam)
+/**
+ * Report mob's parameter gain to wiznet 'levels', and hand a charmed pet's gain to
+ * Fenia (onPetGrowth: pet, key, delta) so 'report' can tell how much it has grown.
+ * The deltas are exact, unlike a snapshot of hitroll/damroll/armor, which carry
+ * the pet's spells and gear.
+ */
+static void wiznet(NPCharacter *pet, Character *victim, const char *what, const char *key, int oldPetParam, int petParam, int victParam)
 {
+    if (IS_CHARMED(pet))
+        gprog("onPetGrowth", "Csi", static_cast<Character *>(pet), key, petParam - oldPetParam);
+
     Character *master = pet->master;
 
     if (IS_CHARMED(pet))
@@ -91,7 +100,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             ch->setLevel( ch->getRealLevel() + 1 );
             ch->pecho(_("Ты получаешь уровень!"));
             oldact(_("$c1 выглядит более опытн$gым|ым|ой!\n\r"),ch,0,0,TO_ROOM);
-            wiznet(ch, victim, "уровень", oldParam, ch->getRealLevel(), victim->getRealLevel());
+            wiznet(ch, victim, "уровень", "level", oldParam, ch->getRealLevel(), victim->getRealLevel());
 
             // Restore act bits that are removed for low-level adaptive pets.
             if (ch->getRealLevel( ) > 20) {
@@ -109,7 +118,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             ch->hitroll++;
             ch->pecho(_("Теперь ты будешь попадать более метко!"));
             oldact(_("$c1 становится более метк$gим|им|ой!\n\r"),ch,0,0,TO_ROOM);
-            wiznet(ch, victim, "точность", oldParam, ch->hitroll, victim->hitroll);
+            wiznet(ch, victim, "точность", "hitroll", oldParam, ch->hitroll, victim->hitroll);
         }
     }
     if ( number_percent() * modifier / 100 > 110 )
@@ -119,7 +128,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             ch->damroll++;
             ch->pecho(_("Теперь ты будешь больнее бить!"));
             oldact(_("$c1 теперь будет больнее бить!\n\r"),ch,0,0,TO_ROOM);
-            wiznet(ch, victim, "урон", oldParam, ch->damroll, victim->damroll);
+            wiznet(ch, victim, "урон", "damroll", oldParam, ch->damroll, victim->damroll);
         }
     }
     if ( number_percent() * modifier / 100 > 100 )
@@ -135,7 +144,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             ch->max_hit = min(ch->max_hit + gain, max_hp);
             ch->pecho(_("Ты здоровеешь!"));
             oldact(_("Здоровье $c2 растет!\n\r"),ch,0,0,TO_ROOM);
-            wiznet(ch, victim, "здоровье", oldParam, ch->max_hit, victim->max_hit);
+            wiznet(ch, victim, "здоровье", "hp", oldParam, ch->max_hit, victim->max_hit);
         }
     }
     // Only a caster grows mana. Without this a warrior pet farms its way back to
@@ -156,7 +165,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             ch->max_mana = min(ch->max_mana + gain, max_mana);
             ch->pecho(_("Ты чувствуешь прилив энергии!"));
             oldact(_("$c1 наполняется энергией!\n\r"),ch,0,0,TO_ROOM);
-            wiznet(ch, victim, "ману", oldParam, ch->max_mana, victim->max_mana);
+            wiznet(ch, victim, "ману", "mana", oldParam, ch->max_mana, victim->max_mana);
         }
     }
 
@@ -171,7 +180,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
                 ch->damage[DICE_NUMBER]++;
                 ch->pecho(_("Теперь ты будешь наносить больше повреждений!"));
                 oldact(_("$c1 становится более опасн$gым|ым|ой!\n\r"),ch,0,0,TO_ROOM);
-                wiznet(ch, victim, "dice_number", oldParam, ch->damage[DICE_NUMBER], vch->damage[DICE_NUMBER]);
+                wiznet(ch, victim, "dice_number", "dice_number", oldParam, ch->damage[DICE_NUMBER], vch->damage[DICE_NUMBER]);
             }
         }
         if ( number_percent() * modifier / 100 > 110 )
@@ -181,7 +190,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
                 ch->damage[DICE_TYPE]++;
                 ch->pecho(_("Теперь ты будешь наносить больше повреждений!"));
                 oldact(_("$c1 становится более опасн$gым|ым|ой!\n\r"),ch,0,0,TO_ROOM);
-                wiznet(ch, victim, "dice_type", oldParam, ch->damage[DICE_TYPE], vch->damage[DICE_TYPE]);
+                wiznet(ch, victim, "dice_type", "dice_type", oldParam, ch->damage[DICE_TYPE], vch->damage[DICE_TYPE]);
             }
         }
     }
@@ -217,7 +226,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             ch->armor[dam_type] += gain;
             ch->pecho(_("Твоя защита улучшается!"));
             oldact(_("Защита $c2 улучшается!\n\r"),ch,0,0,TO_ROOM);
-            wiznet(ch, victim, "броню", oldParam, ch->armor[dam_type], victim->armor[dam_type]);
+            wiznet(ch, victim, "броню", "armor", oldParam, ch->armor[dam_type], victim->armor[dam_type]);
         }
     }
     
@@ -232,7 +241,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             ch->perm_stat[i] += 1;
             ch->pecho(_("Твои параметры улучшаются!"));
             oldact(_("$c1 улучшает свои параметры!\n\r"),ch,0,0,TO_ROOM);
-            wiznet(ch, victim, stat_table.fields[i].name, oldParam, ch->perm_stat[i], victim->perm_stat[i]);
+            wiznet(ch, victim, stat_table.fields[i].name, stat_table.fields[i].name, oldParam, ch->perm_stat[i], victim->perm_stat[i]);
         }
     }
 }
