@@ -1709,7 +1709,9 @@ NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, pr
     DLString profile = args.size() > 7 ? argnum2string(args, 8) : DLString::emptyString;
     int rolls = args.size() > 8 ? argnum2number(args, 9) : 0;
 
-    if (obj->item_type != ITEM_ARMOR)
+    // A crafted lantern rolls like armor: the light slot is priced by the same
+    // model, and a crafted piece keeps its own values (no AC is written).
+    if (obj->item_type != ITEM_ARMOR && obj->item_type != ITEM_LIGHT)
         throw Scripting::Exception("Item is not armor for a craft roll.");
     if (tier < BEST_TIER || tier > WORST_TIER)
         throw Scripting::Exception("Invalid armor tier.");
