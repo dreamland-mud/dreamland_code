@@ -29,6 +29,7 @@
 #include "merc.h"
 #include "json_utils.h"
 #include "arg_utils.h"
+#include "player_utils.h"
 #include "act.h"
 #include "interp.h"
 #include "def.h"
@@ -42,6 +43,7 @@ Json::Value account_roster_entry( const DLString &name );
 // Defined in profileservlet.cpp: the public web profile's visibility rules.
 bool account_profile_char_hidden( PCMemoryInterface *pci );
 void account_profile_set_char_hidden( PCMemoryInterface *pci, bool hidden );
+DLString account_profile_hide_blocker( const DLString &charName, lang_t lang );
 bool account_profile_enabled( const DLString &id );
 bool account_profile_eligible( const DLString &id );
 
@@ -953,6 +955,15 @@ static void account_profile(PCharacter *ch, DLString &args)
             return;
         }
 
+        if (hide && !account_profile_char_hidden(pcm)) {
+            DLString blocker = account_profile_hide_blocker(pcm->getName(), Player::lang(ch));
+            if (!blocker.empty()) {
+                ch->pecho(_("%1$s приносит аккаунту достижение \"%2$s\", которого нет у других видимых персонажей, -- скрыть нельзя."),
+                          pcm->getName().c_str(), blocker.c_str());
+                return;
+            }
+        }
+
         account_profile_set_char_hidden(pcm, hide);
         if (hide)
             ch->pecho(_("%1$s больше не виден в профиле."), pcm->getName().c_str());
@@ -1062,8 +1073,9 @@ CMDRUN( account )
  * charsOf, no online detection (the `account switch` command's own guard refuses
  * a same-account character that is already online, same as at the keyboard).
  * Reply shape (mudjs AccountPage.jsx): { current, account, title,
- * chars:[{name, level, class:{en,ru,ua}}] } -- same roster entry as the login
- * panel, so the settings roster can draw the class badge too.
+ * chars:[{name, level, class:{en,ru,ua}, profile:{hidden, blocker}}] } -- same
+ * roster entry as the login panel, so the settings roster can draw the class
+ * badge too; profile drives the public-page hide/show switch.
  *---------------------------------------------------------------------------*/
 RPCRUN(account_chars)
 {
@@ -1110,8 +1122,19 @@ RPCRUN(account_chars)
             data["identities"].append(ident);
         }
 
-        for (const DLString &name : AccountManager::charsOf(id))
-            data["chars"].append(account_roster_entry(name));
+        // profile: the public page switch per character. blocker is the
+        // achievement only this character brings (it cannot hide), "" if none.
+        lang_t lang = Player::lang(ch);
+        for (const DLString &name : AccountManager::charsOf(id)) {
+            Json::Value entry = account_roster_entry(name);
+            PCMemoryInterface *pcm = PCharacterManager::find(name);
+            if (pcm != 0) {
+                bool hidden = account_profile_char_hidden(pcm);
+                entry["profile"]["hidden"] = hidden;
+                entry["profile"]["blocker"] = hidden ? "" : account_profile_hide_blocker(name, lang).c_str();
+            }
+            data["chars"].append(entry);
+        }
     }
 
     ch->desc->writeWSCommand(msg);

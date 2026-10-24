@@ -18,7 +18,9 @@
  * Legendary/Immortal rank, a non-hidden clan, titles and online state. Level
  * stays out (who conceals it, see can_see_level). The account block sums the
  * SHOWN characters only (playing since, hours across every life, lives lived,
- * the class with the most hours), so a hidden alt never moves a number.
+ * the class with the most hours), so a hidden alt never moves a number. Earned
+ * account achievements are the exception: they belong to the whole account and
+ * stay on the page when the alt holding them is hidden (Kit 2026-10-24).
  *
  * Achievements come from Fenia (.tmp.achievements.profile in the private
  * world scripts): definitions, the test gate and the secrets never pass
@@ -328,6 +330,45 @@ static bool profile_achievements(const list<PCMemoryInterface *> &shown, Json::V
     } catch (const ::Exception &e) {
         FeniaManager::getThis()->croak(0, Register(DLString("achievements.profile")), e);
         return false;
+    }
+}
+
+// .tmp.achievements.hideBlocker(name, lang): "" when the character may leave
+// the public page, else the name of one achievement only it brings to the
+// account (Kit 2026-10-24: only alts that add nothing new may hide). No
+// script or a throw answer "" -- hiding is the owner's privacy switch, a
+// broken script must not take it away.
+DLString account_profile_hide_blocker(const DLString &charName, lang_t lang)
+{
+    using namespace Scripting;
+
+    if (!FeniaManager::wrapperManager)
+        return DLString::emptyString;
+
+    static IdRef ID_TMP("tmp"), ID_ACHIEVEMENTS("achievements"), ID_HIDEBLOCKER("hideBlocker");
+
+    try {
+        Register tmp = *Context::root[ID_TMP];
+        Register ach = *tmp[ID_ACHIEVEMENTS];
+        if (ach.type != Register::OBJECT)
+            return DLString::emptyString;
+
+        Register function = *ach[ID_HIDEBLOCKER];
+        if (function.type != Register::FUNCTION)
+            return DLString::emptyString;
+
+        RegisterList args;
+        args.push_back(Register(charName));
+        args.push_back(Register((int)lang));
+
+        Register result = function.toFunction()->invoke(ach, args);
+        if (result.type != Register::STRING)
+            return DLString::emptyString;
+        return result.toString();
+
+    } catch (const ::Exception &e) {
+        FeniaManager::getThis()->croak(0, Register(DLString("achievements.hideBlocker")), e);
+        return DLString::emptyString;
     }
 }
 

@@ -575,8 +575,16 @@ DLString AccountManager::conflictingOnlineChar(const DLString &charName)
         if (pch->get_trust() >= LEVEL_IMMORTAL)
             continue;
 
-        if (accountOf(pch->getName()) == myAccount)
+        if (accountOf(pch->getName()) == myAccount) {
+            // A god's account (any immortal on it) plays its service chars
+            // side by side. Checked only on a real clash: charsOf walks every pfile.
+            for (const DLString &n : charsOf(myAccount)) {
+                PCMemoryInterface *pci = PCharacterManager::find(n);
+                if (pci != 0 && pci->get_trust() >= LEVEL_IMMORTAL)
+                    return DLString::emptyString;
+            }
             return pch->getName();
+        }
     }
 
     return DLString::emptyString;
