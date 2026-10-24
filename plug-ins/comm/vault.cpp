@@ -562,9 +562,9 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
 
             if ( skipped > 0 )
                 ch->pecho( lmsg( lang,
-                    "Skipped %d %Iitem|items|items (unique, timed or unstorable).",
-                    "Пропущено %d %Iпредмет|предмета|предметов (уникальные, с таймером или несохраняемые).",
-                    "Пропущено %d %Iпредмет|предмети|предметів (унікальні, з таймером або незберігані)." ), skipped, skipped );
+                    "Skipped %d %Iitem|items|items (unique, timed, hero rewards or unstorable).",
+                    "Пропущено %d %Iпредмет|предмета|предметов (уникальные, с таймером, награды квестора или несохраняемые).",
+                    "Пропущено %d %Iпредмет|предмети|предметів (унікальні, з таймером, нагороди квестора або незберігані)." ), skipped, skipped );
             return;
         }
 
