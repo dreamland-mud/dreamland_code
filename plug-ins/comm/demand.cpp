@@ -16,6 +16,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 PROF(anti_paladin);
 
@@ -161,5 +162,6 @@ CMDRUNP(demand)
     omprog_give(obj, victim, ch);
 
     ch->pecho(_("Твое могущество повергает всех в трепет."));
+    achievement( ch, "your_money_or_your_life" );
 }
 

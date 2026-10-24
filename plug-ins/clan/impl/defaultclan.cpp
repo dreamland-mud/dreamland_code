@@ -17,6 +17,7 @@
 #include "string_utils.h"
 #include "vnum.h"
 #include "def.h"
+#include "fenia_utils.h"
 
 /*-----------------------------------------------------------------
  * DefaultClan 
@@ -160,6 +161,27 @@ void DefaultClan::makeMonument( Character *ch, Character *killer ) const
     }
 
     obj_to_room( obj, ch->in_room );
+
+    // The third monument in an area with the Midgaard fountain (obj 3199,
+    // MidgaardFountain) turns its water to blood.
+    obj_index_data *fountainIndex = get_obj_index( 3199 );
+    obj_index_data *monumentIndex = get_obj_index( OBJ_VNUM_MONUMENT );
+    if (fountainIndex && monumentIndex) {
+        bool hasFountain = false;
+        for (auto &f: fountainIndex->instances)
+            if (f->in_room && f->in_room->area == ch->in_room->area)
+                hasFountain = true;
+
+        if (hasFountain) {
+            int count = 0;
+            for (auto &m: monumentIndex->instances)
+                if (m->in_room && m->in_room->area == ch->in_room->area)
+                    count++;
+
+            if (count == 3)
+                achievement( killer, "red_fountain" );
+        }
+    }
 }
 
 bool DefaultClan::isEnemy( const Clan &clan ) 

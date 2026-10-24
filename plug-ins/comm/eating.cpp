@@ -31,6 +31,7 @@
 
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 GSN(none);
 GSN(manacles);
@@ -279,6 +280,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         
         oldact(_("Ты ешь $C4."), ch, 0, mob, TO_CHAR);
         oldact(_("$c1 ест $C4."), ch, 0, mob, TO_ROOM);
+        achievement( ch, "cat_food" );
 
         for (obj = mob->carrying; obj; obj = obj_next) {
             obj_next = obj->next_content;

@@ -21,6 +21,7 @@
 #include "merc.h"
 #include "dreamland.h"
 #include "def.h"
+#include "fenia_utils.h"
 
 CLAN(battlerager);
 PROF(cleric);
@@ -186,7 +187,10 @@ bool rage_own_magic( Character *ch )
         oldact( _("Клятва ярости напоминает о себе острой болью."), ch, 0, 0, TO_CHAR );
     }
 
+    int before = ch->hit;
     ch->hit = max( 1, ch->hit - dam );
+    if (before > 1 && ch->hit == 1)
+        achievement( ch, "the_oath_remembers" );
     return burned;
 }
 

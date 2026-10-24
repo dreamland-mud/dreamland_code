@@ -495,6 +495,7 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
     {
         oldact(_("Ты уби$gло|л|ла достойного противника, и твое обаяние повысилось на единицу."), gch, 0, 0, TO_CHAR);
         gch->perm_stat[STAT_CHA] += 1;
+        achievement( gch, "a_worthy_opponent" );
     }
 
     if (xp <= 0)

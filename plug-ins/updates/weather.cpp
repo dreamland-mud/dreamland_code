@@ -38,6 +38,7 @@
 
 #include "messengers.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 #include "lang.h"
 
 #include <fstream>
@@ -486,11 +487,16 @@ void sunlight_update( )
 
     // Calendar rollover + new-day bonus -> each viewer's own language. Sent to
     // every awake player in a non-timeless room, indoors included, as before.
+    bool newYear = this_year != time_info.year;
+
     for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
         if (d->connected != CON_PLAYING)
             continue;
 
         Character *ch = d->character;
+        if (ch && newYear)
+            achievement( ch, "happy_new_year" );
+
         if (ch
             && IS_AWAKE(ch)
             && !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))

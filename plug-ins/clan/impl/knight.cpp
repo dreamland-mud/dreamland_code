@@ -50,6 +50,7 @@
 #include "magic.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 CLAN(knight);
 GSN(acid_arrow);
@@ -203,6 +204,7 @@ SKILL_RUNP(guard)
 
     pch->guarding = victim;
     victim->guarded_by = pch;
+    achievement( pch, "shield_brother" );
 }
 
 SKILL_APPLY(guard)

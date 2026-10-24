@@ -38,6 +38,7 @@
 #include "magic.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 GSN(acid_arrow);
 GSN(acid_blast);
@@ -220,5 +221,6 @@ VOID_SPELL(Shadowlife)::run(Character *ch, Character *victim, int sn, int level)
     victim->getPC()->shadow = 4 * ch->getModifyLevel() / 10;
 
     postaffect_to_char(ch, sn, 24);
+    achievement( ch, "shadowlife" );
 }
 

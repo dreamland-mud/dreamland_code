@@ -32,6 +32,7 @@
 #include "descriptor.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 GSN(fetch_card);
 GSN(peek_card);
@@ -213,6 +214,7 @@ bool CardBehavior::use( Character *user, const char *cArgs )
     Room *room;
     int chance;
     bool fSuccess;
+    bool fHorrible = false;
     PCharacter *pch, *victim;
     DLString args = cArgs;
 
@@ -261,8 +263,10 @@ bool CardBehavior::use( Character *user, const char *cArgs )
     if (number_percent( ) >= chance) {
         fSuccess = false;
 
-        if (number_percent( ) <= 5) 
+        if (number_percent( ) <= 5) {
             room = findHorribleRoom( pch );
+            fHorrible = room && room->vnum == 32724;
+        }
         else
             room = get_random_room( pch );
     }
@@ -278,6 +282,9 @@ bool CardBehavior::use( Character *user, const char *cArgs )
                 
     if (pch->pet)
         transfer_char( pch->pet, pch, room );
+
+    if (fHorrible && pch->in_room == room)
+        achievement( pch, "card_trick_gone_wrong" );
     
     gsn_enter_card->improve( pch, fSuccess );
     extract_obj( obj );

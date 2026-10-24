@@ -45,6 +45,7 @@
 #include "def.h"
 #include "skill_utils.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 CLAN(artificer);
 GSN(acid_arrow);
@@ -107,6 +108,7 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
   oldact_p(_("Ты чувствуешь себя немного неповоротлив$gым|ым|ой, но зато намного более сильн$gым|ым|ой."),
                 ch,0,0,TO_CHAR,POS_RESTING);
   oldact(_("Кожа $c2 становится серой!"),ch,0,0,TO_ROOM);
+  achievement( ch, "king_of_beasts" );
 
 }
 

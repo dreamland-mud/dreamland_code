@@ -20,6 +20,7 @@
 #include "mudtags.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 #define log(x) LogStream::sendNotice() << x << endl
 
@@ -83,6 +84,9 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
 
         oldact(_("Ты выцарапываешь $O5 надпись на $o6."), ch, wall, nail, TO_CHAR );
         oldact(_("$c1 выцарапывает $O5 надпись на $o6."), ch, wall, nail, TO_ROOM );
+
+        if (wall->pIndexData->vnum == 50102)
+            achievement( ch, "writing_on_the_wall" );
     }
     else if (cmd == "-" && ch->is_immortal( )) {
         if (ed) {

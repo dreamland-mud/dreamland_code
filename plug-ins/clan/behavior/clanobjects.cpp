@@ -27,6 +27,7 @@
 #include "doors.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 PROF(none);
 
@@ -124,6 +125,7 @@ void ClanItem::give( Character *from, Character *mob )
 bool ClanItem::sac( Character *ch ) 
 { 
     oldact(_("{RБОГИ В ГНЕВЕ!{x"),ch,0,0,TO_ALL);
+    achievement( ch, "sacrilege" );
 
     rawdamage( ch, ch, DAM_HOLY, ch->hit - 10, true, "gods" );
     ch->gold = 0;
@@ -182,6 +184,9 @@ bool ClanAltar::fetch( Character *ch, Object *item )
     send_telegram(fmtLang(LANG_RU, _("{WКлан %w утратил свою святыню.{x"), &clanName));
 
     extract_obj(obj);
+
+    if (!ch->is_npc( ) && ch->getClan( ) != clanArea->getClan( ))
+        achievement( ch, "relic_thief" );
     return true;
 }
 

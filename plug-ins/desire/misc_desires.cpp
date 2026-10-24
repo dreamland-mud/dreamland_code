@@ -18,6 +18,7 @@
 
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 RELIG(karmina);
 GSN(hunger);
@@ -133,6 +134,7 @@ bool DrunkDesire::canDrink( PCharacter *ch )
 {
     if (isActive( ch )) {
         ch->pecho( _("Ты проносишь мимо рта... *ИК*") );
+        achievement( ch, "missed_the_mouth" );
         return false;
     }
 
