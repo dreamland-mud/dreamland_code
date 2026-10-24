@@ -112,6 +112,7 @@
 #include "terrains.h"
 #include "move_utils.h"
 #include "doors.h"
+#include "string_utils.h"
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
@@ -2688,6 +2689,9 @@ CMDWIZP( rename )
 
     victim->setName( newName );
     victim->setRussianName( russianName );
+    // The English form follows the login: left alone it keeps the old name on
+    // every English channel (Discord stream, EN viewers).
+    victim->setEnglishName( String::translitToLatin( newName ) );
 
     victim->save( );
 
