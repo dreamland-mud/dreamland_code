@@ -625,7 +625,7 @@ SKILL_RUNP( wanted )
                                 if ( !victim->is_npc() ) {
                                         victim->getPC( )->setLoyalty( max ( victim->getPC( )->getLoyalty() - 50, -1000));
                                         // The poster's author, credited at the victim's death (fight_death.cpp).
-                                        victim->getPC( )->getAttributes( ).getAttr<XMLStringAttribute>( "achtrack_wantedby" )->setValue( ch->getName( ) );
+                                        victim->getPC( )->getAttributes( ).getAttr<XMLStringAttribute>( "achtrack_wantedby" )->setValue( ch->getNameC( ) );
                                 }
                                 ch->pecho("Ok.");
                         }
