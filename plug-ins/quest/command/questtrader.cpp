@@ -383,12 +383,13 @@ static int bank_count_owned( PCharacter *client, int vnum )
     return count;
 }
 
-/** Copies of this hero item the buyer owns in the world or in a reachable vault.
- *  A girth with a keyring attached becomes the keyring object, so it still counts
- *  as the girth. */
+/** Copies of this hero item the buyer owns anywhere in the world. A girth with a
+ *  keyring attached becomes the keyring object, so it still counts as the girth.
+ *  Vaults are left to available() and trouble(): browsing them reads every cell
+ *  file, too slow to run for each article of every `quest list`. */
 int PersonalQuestArticle::countOwned( PCharacter *client ) const
 {
-    int count = bank_count_owned( client, vnum.getValue( ) );
+    int count = 0;
 
     for (Object *obj = object_list; obj; obj = obj->next) {
         int v = obj->pIndexData->vnum;
@@ -423,7 +424,8 @@ bool PersonalQuestArticle::available( Character *client, NPCharacter *questman )
     if (client->is_npc( ))
         return false;
 
-    if (limit.getValue( ) > 0 && countOwned( client->getPC( ) ) >= limit.getValue( )) {
+    if (limit.getValue( ) > 0
+        && countOwned( client->getPC( ) ) + bank_count_owned( client->getPC( ), vnum.getValue( ) ) >= limit.getValue( )) {
         if (troubled)
             say_act( client, questman, _("У тебя уже есть эта вещь, $c1. Если потеряешь ее, попроси {yквест вернуть{x.") );
         else
