@@ -2689,9 +2689,12 @@ CMDWIZP( rename )
 
     victim->setName( newName );
     victim->setRussianName( russianName );
-    // The English form follows the login: left alone it keeps the old name on
-    // every English channel (Discord stream, EN viewers).
+    // The other forms follow the login: left alone they keep the old name for
+    // EN/UA viewers (Discord stream included). UA re-derives from the new Russian
+    // form at the next login; a name-form request filed under the old name goes.
     victim->setEnglishName( String::translitToLatin( newName ) );
+    victim->setUkrainianName( DLString::emptyString );
+    victim->getAttributes( ).eraseAttribute( "nameform" );
 
     victim->save( );
 
