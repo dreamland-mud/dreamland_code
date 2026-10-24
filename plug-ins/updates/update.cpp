@@ -1788,6 +1788,8 @@ struct LightVampireDamage : public Damage {
     }
         
     virtual void message( ) {
+        achievement( ch, "sunburnt" );
+
         if (weather_info.sunlight == SUN_LIGHT) 
             oldact( _("Солнечный свет тревожит тебя."), ch, 0, 0, TO_CHAR );
         else if (weather_info.sunlight == SUN_RISE) 

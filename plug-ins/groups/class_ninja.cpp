@@ -312,6 +312,11 @@ SKILL_RUNP( vanish )
             oldact(_("$c1 пытается взять тебя в охапку!"), ch, 0, victim, TO_VICT);
 
             if ( number_percent() < kidnap_chance ) {
+                    bool otherPlayersPet = victim->is_npc() && IS_CHARMED(victim)
+                        && !victim->is_mirror()
+                        && victim->master != 0 && !victim->master->is_npc()
+                        && victim->master != ch;
+
                     victim->dismount();
 
                     // kidnapping success
@@ -336,7 +341,10 @@ SKILL_RUNP( vanish )
                         MultiMessage("%1$^C1 suddenly appears, kidnapped by %2$C5.",
                                      "%1$^C1 внезапно появляется, похищенн%1$Gое|ый|ая %2$C5.",
                                      "%1$^C1 раптово з'являється, викраден%1$Gе|ий|а %2$C5.") );
-                    
+
+                    if (otherPlayersPet)
+                        achievement( ch, "where_is_my_pet" );
+
                     if (!FightingCheck) {
                         yell_panic( ch, victim,
                             "Помогите! Меня кто-то похищает!",

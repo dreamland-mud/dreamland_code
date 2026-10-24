@@ -22,6 +22,7 @@
 
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 
 static Character * get_actor( Character *victim ) 
@@ -121,6 +122,7 @@ void RatGod::greet( Character *mob ) {
 
     if (IS_SET( mob->form, FORM_FELINE )) {
         exorcism( mob, _("{DС котами нельзя!{x") );
+        achievement( mob, "no_cats_allowed" );
         return;
     }
     

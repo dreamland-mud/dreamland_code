@@ -42,6 +42,7 @@
 #include "def.h"
 #include "skill_utils.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 PROF(vampire);
 DESIRE(bloodlust);
@@ -179,6 +180,7 @@ void VampiricBiteOneHit::postDamageEffects( )
         af.modifier  = - (level / 10);
         af.bitvector.setValue(AFF_CORRUPTION);
         affect_join( victim, &af );
+        achievement( ch, "rotten_bite" );
 
         oldact_p(_("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!"), ch, 0, victim, TO_VICT, POS_DEAD);
         oldact(_("Рана от твоих клыков на шее $C2 начинает гноиться."), ch, 0, victim, TO_CHAR);
@@ -258,8 +260,10 @@ SKILL_RUNP( grave )
     oldact(_("Ты выкапываешь себе могилку и устраиваешься в ней со всеми удобствами."), ch, 0, 0, TO_CHAR);
     gsn_grave->improve( ch, true );
 
-    if (number_percent( ) < 2) 
+    if (number_percent( ) < 2) {
         oldact(_("Откуда-то сверху раздается громовой голос: \"ЛОПАТУ ВЕРНИ!\""), ch, 0, 0, TO_ALL);
+        achievement( ch, "return_the_shovel" );
+    }
     
     ch->dismount( );
     char_from_room( ch );

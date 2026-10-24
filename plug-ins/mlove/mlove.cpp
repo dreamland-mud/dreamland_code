@@ -23,6 +23,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 #define MLOVE_DAZE(ch)        (ch)->wait = std::max((ch)->wait, 25);
 
@@ -66,6 +67,7 @@ CMDRUN( mlove )
         if (ch == victim) {
             ch->move -= ch->move / 4;
             ch->mana -= ch->mana / 4;
+            achievement( ch, "self_love" );
 
             ch->pecho(_("Да! Ты любишь себя! Еще, еще..!"));
             oldact(_("Страсть $c1 к само$gму|му|й себе пользуется полной взаимностью."), ch, 0, 0, TO_ROOM);
