@@ -1048,7 +1048,8 @@ static void oprog_kill( Character *killer, Character *victim, const DLString &la
 }
 
 // A wanted poster paid out: credit the Ruler who posted it, if online.
-// Only a kill counts: not a deathtrap or the victim's own wounds.
+// Only a kill counts: not a deathtrap or the victim's own wounds. Such a
+// death keeps the mark, so the poster still pays on the real kill.
 static void wanted_poster_paid( Character *ch, Character *victim )
 {
     if (victim->is_npc( ))
@@ -1059,11 +1060,16 @@ static void wanted_poster_paid( Character *ch, Character *victim )
     if (!by)
         return;
 
+    if (!IS_SET(victim->act, PLR_WANTED)) {
+        attrs.eraseAttribute( "achtrack_wantedby" );
+        return;
+    }
+
+    if (!ch || ch == victim)
+        return;
+
     DLString name = by->getValue( );
     attrs.eraseAttribute( "achtrack_wantedby" );
-
-    if (!IS_SET(victim->act, PLR_WANTED) || !ch || ch == victim)
-        return;
 
     PCharacter *poster = PCharacterManager::findPlayer( name );
     if (poster && poster != victim)

@@ -22,7 +22,6 @@
 #include "interp.h"
 #include "loadsave.h"
 #include "clanreference.h"
-#include "commonattributes.h"
 #include "race.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -38,28 +37,7 @@ CLAN(flowers);
     (IS_SET(victim->act, PLR_WANTED) || IS_SET(victim->getPC()->PK_flag, PK_THIEF))
 
 
-// flower_child tracker: a Flower Child who tries to attack a player has struck.
-// Ungated on purpose, so the mark exists before the achievement opens.
-static void flowers_strike_attempt( Character *ch, Character *victim )
-{
-    if (!ch || !victim || ch == victim || ch->is_npc( ) || victim->is_npc( ))
-        return;
-
-    if (ch->getClan( ) != clan_flowers)
-        return;
-
-    XMLAttributes &attrs = ch->getPC( )->getAttributes( );
-    if (!attrs.isAvailable( "achtrack_struck" ))
-        attrs.getAttr<XMLStringAttribute>( "achtrack_struck" )->setValue( "1" );
-}
-
 bool is_safe(Character *ch, Character *victim)
-{
-    flowers_strike_attempt( ch, victim );
-    return is_safe_nostrike( ch, victim );
-}
-
-bool is_safe_nostrike(Character *ch, Character *victim)
 {
     bool verbose = true;
 

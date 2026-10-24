@@ -9,8 +9,6 @@ class Character;
 class Affect;
 
 bool         is_safe( Character *ch, Character *victim );
-// is_safe for a non-hostile target check (portals): no strike-attempt bookkeeping.
-bool         is_safe_nostrike( Character *ch, Character *victim );
 bool         is_safe_nomessage( Character *ch, Character *victim, bool verbose=false );
 bool        is_safe_rspell( short level, Character *victim, bool verbose = true );
 bool        is_safe_rspell( Affect *paf, Character *victim, bool verbose = true );
