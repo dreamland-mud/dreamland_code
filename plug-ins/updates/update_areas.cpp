@@ -565,7 +565,8 @@ static void arm_class_mob(NPCharacter *mob)
 
     Object *obj = create_object(pObjIndex, 0);
     obj->reset_mob = mob->getID();
-    obj->level = mob->getRealLevel();
+    // Capped like death drops: a level 106 boss must not drop a dagger nobody can wear.
+    obj->level = std::min( (int)mob->getRealLevel( ), LEVEL_MORTAL + 3 );
     obj->setProperty(CLASS_ARM, "1");
     obj_to_char(obj, mob);
 
