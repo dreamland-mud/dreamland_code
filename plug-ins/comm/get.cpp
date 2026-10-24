@@ -1,5 +1,6 @@
 #include "core/object.h"
 #include "pcharacter.h"
+#include "pcharactermanager.h"
 #include "npcharacter.h"
 #include "room.h"
 #include "roomutils.h"
@@ -20,7 +21,6 @@
 #include "def.h"
 #include "l10n.h"
 #include "fenia_utils.h"
-#include "pcharactermanager.h"
 
 WEARLOC(none);
 
