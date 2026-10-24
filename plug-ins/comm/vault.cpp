@@ -286,7 +286,10 @@ static void vault_browse_sorted( const DLString &kind, const DLString &key,
  * a limited item's count/limit accounting is the dupe risk -- both deferred
  * until limit-accounting is proven. (NOSAVEDROP is refused deeper, in
  * bank_deposit, because that one would be silently destroyed on serialize.)
- * Returns 0 ok, 1 limited, 2 timer.
+ * Personal hero rewards are refused too: the quest master's `trouble` and
+ * per-item limit only count copies in the world, so a banked one came back as
+ * a free duplicate.
+ * Returns 0 ok, 1 limited, 2 timer, 3 hero reward.
  *------------------------------------------------------------------------*/
 static int vault_policy_reason( Object *obj )
 {
@@ -294,6 +297,8 @@ static int vault_policy_reason( Object *obj )
         return 1;
     if ( obj->timer > 0 )
         return 2;
+    if ( obj->isPersonalQuestReward( ) )
+        return 3;
 
     for ( Object *c = obj->contains; c != 0; c = c->next_content ) {
         int r = vault_policy_reason( c );
@@ -585,6 +590,13 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
                 "Items with a running timer can't be stored.",
                 "Предметы с активным таймером нельзя убрать в хранилище.",
                 "Предмети з активним таймером ховати не можна." ) );
+            return;
+        }
+        if ( reason == 3 ) {
+            ch->pecho( lmsg( lang,
+                "Hero rewards from the quest master can't be stored in a vault.",
+                "Награды квестора нельзя убрать в хранилище.",
+                "Нагороди квестора не можна ховати у сховище." ) );
             return;
         }
 

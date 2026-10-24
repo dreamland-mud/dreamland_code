@@ -344,7 +344,7 @@ PersonalQuestArticle::PersonalQuestArticle( )
 
 /** Copies of this hero item the buyer owns anywhere in the world. A girth with a
  *  keyring attached becomes the keyring object, so it still counts as the girth.
- *  Items deposited in a bank vault have left the world and are not seen. */
+ *  Bank vaults refuse hero items (vault_policy_reason), so the world is all there is. */
 int PersonalQuestArticle::countOwned( PCharacter *client ) const
 {
     int count = 0;
