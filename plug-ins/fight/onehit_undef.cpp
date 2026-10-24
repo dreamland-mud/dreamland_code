@@ -7,6 +7,7 @@
 #include "logstream.h"
 
 #include "onehit_undef.h"
+#include "fenia_utils.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"

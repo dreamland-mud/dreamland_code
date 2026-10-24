@@ -5,6 +5,7 @@
 #include "logstream.h"
 
 #include "onehit.h"
+#include "onehit_undef.h"
 
 #include "skill.h"
 #include "pcharacter.h"
