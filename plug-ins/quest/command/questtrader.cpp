@@ -4,6 +4,8 @@
  */
 #include <cctype>
 #include <cstdlib>
+#include <utility>
+#include <vector>
 
 #include "questtrader.h"
 #include "xmlattributequestreward.h"
@@ -342,9 +344,49 @@ PersonalQuestArticle::PersonalQuestArticle( )
 #define OBJ_VNUM_QUESTGIRTH    94
 #define OBJ_VNUM_QUESTKEYRING  119
 
+/** Copies of a hero vnum the client owns in a bank vault they can open: their
+ *  own cell, their account's shared cell and their clan's cell. Vaults refuse new
+ *  hero deposits (vault_policy_reason), but copies banked before that still sit
+ *  there, out of object_list, and must not let `trouble` or `buy` mint another. */
+static int bank_count_owned( PCharacter *client, int vnum )
+{
+    std::vector<std::pair<DLString, DLString> > cells;
+    cells.push_back( std::make_pair( DLString( "player" ), client->getName( ).toLower( ) ) );
+
+    DLString acct = bank_vault_account( client->getName( ) );
+    if (!acct.empty( ))
+        cells.push_back( std::make_pair( DLString( "account" ), acct ) );
+
+    DLString clan = client->getClan( ).getName( ).toLower( );
+    if (!clan.empty( ))
+        cells.push_back( std::make_pair( DLString( "clan" ), clan ) );
+
+    DLString me = client->getName( ).toLower( );
+    int count = 0;
+
+    for (size_t i = 0; i < cells.size( ); i++) {
+        std::vector<BankEntry> entries;
+        bank_browse( cells[i].first, cells[i].second, entries );
+
+        for (size_t j = 0; j < entries.size( ); j++) {
+            int v = entries[j].vnum;
+
+            if (v != vnum
+                && !(vnum == OBJ_VNUM_QUESTGIRTH && v == OBJ_VNUM_QUESTKEYRING))
+                continue;
+
+            if (entries[j].owner.toLower( ) == me)
+                count++;
+        }
+    }
+
+    return count;
+}
+
 /** Copies of this hero item the buyer owns anywhere in the world. A girth with a
  *  keyring attached becomes the keyring object, so it still counts as the girth.
- *  Items deposited in a bank vault have left the world and are not seen. */
+ *  Vaults are left to available() and trouble(): browsing them reads every cell
+ *  file, too slow to run for each article of every `quest list`. */
 int PersonalQuestArticle::countOwned( PCharacter *client ) const
 {
     int count = 0;
@@ -382,7 +424,8 @@ bool PersonalQuestArticle::available( Character *client, NPCharacter *questman )
     if (client->is_npc( ))
         return false;
 
-    if (limit.getValue( ) > 0 && countOwned( client->getPC( ) ) >= limit.getValue( )) {
+    if (limit.getValue( ) > 0
+        && countOwned( client->getPC( ) ) + bank_count_owned( client->getPC( ), vnum.getValue( ) ) >= limit.getValue( )) {
         if (troubled)
             say_act( client, questman, _("У тебя уже есть эта вещь, $c1. Если потеряешь ее, попроси {yквест вернуть{x.") );
         else
@@ -509,6 +552,11 @@ void PersonalQuestArticle::trouble( PCharacter *client, NPCharacter *questman )
     if (obj) {
         tell_act( client, questman, _("Извини, но у тебя уже есть $o1."), obj );
         // extract_obj( obj ); у вас все было 
+        return;
+    }
+
+    if (bank_count_owned( client, vnum.getValue( ) ) > 0) {
+        tell_act( client, questman, _("Извини, $c1, эта вещь лежит в твоем хранилище.") );
         return;
     }
 
