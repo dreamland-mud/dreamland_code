@@ -4846,6 +4846,25 @@ static double ga_gkFightRounds( int level )
     return rn[3];
 }
 
+// Share of a mob's damage that comes from its spells (grant_skill.opp_active_share by
+// level), what victim lag denies it: the mob census of scripts/item-combat-model.py,
+// 1 - melee share m (casters and breathers, half a caster's damage counted as spell).
+static double ga_gkOppActive( int level )
+{
+    const Json::Value &t = item_value_object( "grant_skill", "opp_active_share" );
+    double r = item_points_by_level( t, level );
+    if (r > 0)
+        return r;
+    static const int lv[] = { 20, 40, 60, 90 };
+    static const double sh[] = { 0.085, 0.145, 0.20, 0.165 };
+    if (level <= lv[0])
+        return sh[0];
+    for (int i = 1; i < 4; i++)
+        if (level <= lv[i])
+            return sh[i - 1] + (sh[i] - sh[i - 1]) * (level - lv[i - 1]) / (lv[i] - lv[i - 1]);
+    return sh[3];
+}
+
 // Would the char hold this skill with the item being scored in place, from some other
 // source? outside / inside = skills granted by worn items outside this item's slot / in
 // it (the item itself, or the one it would replace). A native or race skill, a grant from
@@ -5053,33 +5072,43 @@ static bool ga_ownNukeSkipped( const DLString &name )
 // the slot a granted nuke's cast would take. Damage mirrors skillcommand/<name>/run:
 //   dr x damroll + flat + n dice of die, n = lvl x level + count,
 //   die = (size x die | str - 20 | die), at least 1;
-// per-skill situational bonuses (fly, shields, hooves, random stun) are left out.
+// per-skill situational bonuses (fly, shields, hooves) are left out. ctrl: seconds of
+// lag a landed use puts on the victim (tryProne/dropProne's wait, smash's daze + wait),
+// grant_skill.melee_nuke_control overrides it. Dirt kicking is not here: it blinds once
+// and is locked out while the victim stays blind, so a nuke cast never displaces it.
 enum { GAM_CONST = 0, GAM_SIZE, GAM_STR };
 struct GAMeleeNuke {
     const char *skill;
     double dr, flat, lvl, count;
     int dieKind;
-    double die;
+    double die, ctrl;
 };
 static const GAMeleeNuke ga_meleeNukes[] = {
-    { "bash",  0.5, 0,  0.5, 0, GAM_SIZE,  2   },
-    { "kick",  0.5, 0,  0.5, 0, GAM_SIZE,  0.5 },
-    { "grab",  0.5, 0,  0.5, 0, GAM_STR,   0   },
-    { "crush", 1.0, 0,  1.0, 0, GAM_SIZE,  2   },
-    { "smash", 1.0, 0,  0.5, 0, GAM_SIZE,  2   },
-    { "tail",  1.0, 20, 0,   1, GAM_SIZE,  20  },
-    { "claw",  1.0, 0,  1.0, 0, GAM_CONST, 20  },
-    { "trip",  0,   0,  0.5, 0, GAM_CONST, 2   },
+    { "bash",     0.5, 0,  0.5, 0, GAM_SIZE,  2,   2.5 },
+    { "kick",     0.5, 0,  0.5, 0, GAM_SIZE,  0.5, 0 },
+    { "grab",     0.5, 0,  0.5, 0, GAM_STR,   0,   1 },
+    { "crush",    1.0, 0,  1.0, 0, GAM_SIZE,  2,   2.5 },
+    { "smash",    1.0, 0,  0.5, 0, GAM_SIZE,  2,   3 },
+    { "tail",     1.0, 20, 0,   1, GAM_SIZE,  20,  2 },
+    { "claw",     1.0, 0,  1.0, 0, GAM_CONST, 20,  0 },
+    { "trip",     0,   0,  0.5, 0, GAM_CONST, 2,   1.5 },
 };
 
-// The best of those per round: one use x the share that lands (grant_skill.melee_nuke_land,
-// a success roll the formula can't see) x uses per round (no mana, only the lag) x learned.
-static double ga_bestMeleeNuke( Character *target, int lvl, int grantSn,
+// The best melee skill, in points: one use x the share that lands
+// (grant_skill.melee_nuke_land, a success roll the formula can't see) x uses per round
+// (no mana, only the lag) x learned, used active_use of the time like a nuke. Its lag on
+// the victim is control: the share of the victim's rounds it can't act in, which costs
+// it the nukes and skills it would use there (a mob's caster/AI turn returns on wait,
+// melee keeps swinging), so PvE counts grant_skill.opp_active_share of it by level.
+static double ga_bestMeleeNuke( Character *target, int lvl, bool caster, int grantSn,
                                 const std::set<int> &outside, const std::set<int> &inside )
 {
     double best = 0;
     PCharacter *pch = target->getPC( );
     int pulse = std::max( 1, dreamland->getPulseViolence( ) );
+    int pps = std::max( 1, dreamland->getPulsePerSecond( ) );
+    double activeUse = ga_gk( "active_use", 0.5 );
+    double oppActive = ga_gkOppActive( lvl );
     for (auto const &m: ga_meleeNukes) {
         Skill *sk = skillManager->findExisting( m.skill );
         if (sk == 0 || sk->getIndex( ) == grantSn || !ga_grantHeld( target, sk, outside, inside ))
@@ -5097,20 +5126,24 @@ static double ga_bestMeleeNuke( Character *target, int lvl, int grantSn,
         die = std::max( 1.0, die );
         double n = std::max( 0.0, floor( lvl * m.lvl ) ) + m.count;
         double per = m.dr * std::max( 0, (int)target->damroll ) + m.flat + n * (die + 1) / 2;
-        double land = item_value_sub( "grant_skill", "melee_nuke_land", m.skill, 0.6 );
+        double land = std::max( 0.0, item_value_sub( "grant_skill", "melee_nuke_land", m.skill, 0.6 ) );
         double rate = (double)pulse / std::max( 1, sk->getBeats( target ) );
-        best = std::max( best, per * land * rate * pct / 100.0 );
+        double uses = land * rate * pct / 100.0 * activeUse;
+        double secs = item_value_sub( "grant_skill", "melee_nuke_control", m.skill, m.ctrl );
+        double ctrl = std::min( 1.0, uses * secs * pps / pulse );
+        best = std::max( best, item_combat_points( per * uses, ctrl * oppActive, lvl, caster ) );
     }
     return best;
 }
 
-// The char's best own nuke, as damage per round x the percent it lands: any offensive
-// damage spell the char has (class, race, clan, a grant it would keep). A grant from the
+// The char's best own nuke, in points: any offensive damage spell the char has (class,
+// race, clan, a grant it would keep), as damage per round x the percent it lands x
+// active_use, or a melee skill (ga_bestMeleeNuke) with its control. A grant from the
 // scored item's own slot leaves with the swap, so it doesn't count (ga_grantHeld), and
 // neither does the granted skill itself: when another worn copy keeps it, the grant was
 // already priced 0 (ga_grantCounted). The percent is read the way the grant side reads
 // it: learned + skill affects, no daze/drunk cuts, and a vampire's spells count outside
-// vamp form too. A damaging melee skill (ga_bestMeleeNuke) counts as an own nuke as well.
+// vamp form too.
 static double ga_bestOwnNuke( Character *target, int lvl, bool caster, int grantSn,
                               const std::set<int> &outside, const std::set<int> &inside )
 {
@@ -5134,7 +5167,8 @@ static double ga_bestOwnNuke( Character *target, int lvl, bool caster, int grant
             continue;
         best = std::max( best, ga_nukeRound( target, sk, lvl, caster ) * pct / 100.0 );
     }
-    return std::max( best, ga_bestMeleeNuke( target, lvl, grantSn, outside, inside ) );
+    best = item_combat_points( best * ga_gk( "active_use", 0.5 ), 0, lvl, caster );
+    return std::max( best, ga_bestMeleeNuke( target, lvl, caster, grantSn, outside, inside ) );
 }
 
 // Charm slots, mirroring Fenia .tmp.mob.overcharmed_new (utils/mob: charm), the gate
@@ -5491,7 +5525,8 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
         }
         case GK_NUKE: {
             // A granted nuke is worth what it beats the char's own best nuke by (Kit
-            // 2026-10-08): a paladin's hellfire is priced as hellfire minus ray of truth.
+            // 2026-10-08): a paladin's hellfire is priced as hellfire minus ray of truth,
+            // a warrior's as hellfire minus bash, bash's knockdown lag included.
             // Melee keeps swinging through cast lag (violence_update), so a melee char
             // with no nuke of its own gets the whole round; used active_use of the time.
             // Never below a small fixed nuke_floor -- a spare nuke of another damage
@@ -5499,11 +5534,10 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
             // price: a weak nuke stays weak, and a better own nuke never raises the price.
             double dmg = ga_nukeRound( target, sk, lvl, caster ) * use;
             if (dmg > 0 && target != 0) {
+                double full = item_combat_points( dmg * activeUse, 0, lvl, caster );
                 double own = ga_bestOwnNuke( target, lvl, caster, sk->getIndex( ), outside, inside );
-                double least = std::min( ga_gk( "nuke_floor", 50 ) * use,
-                                         item_combat_points( dmg * activeUse, 0, lvl, caster ) );
-                pve = std::max( least, item_combat_points( std::max( 0.0, dmg - own ) * activeUse,
-                                                           0, lvl, caster ) );
+                double least = std::min( ga_gk( "nuke_floor", 50 ) * use, full );
+                pve = std::max( least, full - own );
             }
             else if (dmg > 0) {
                 // The char-less base value: a caster already nukes every round, so only
