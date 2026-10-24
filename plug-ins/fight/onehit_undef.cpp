@@ -794,6 +794,8 @@ void UndefinedOneHit::damApplyMounted( )
         charge_attacker = 0;
         charged = true;
         dam *= 2;
+        // A kill by this blow reads "lance" in onDeath (achievement lanced).
+        deathReason = "lance";
     }
 }
 

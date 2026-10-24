@@ -108,6 +108,7 @@
 #include "onehit_undef.h"
 #include "damage_impl.h"
 #include "fight.h"
+#include "damage.h"
 #include "lang.h"
 #include "material.h"
 #include "def.h"
@@ -813,6 +814,9 @@ static void multi_hit_strikes( Character *ch, Character *victim, string command 
 
     if (ch->is_npc( ))
         return;
+
+    round_striker = ch;
+    round_landed = 0;
    
     one_hit_nocatch( ch, victim, false, command );
 
@@ -841,6 +845,7 @@ static void multi_hit_strikes( Character *ch, Character *victim, string command 
 void multi_hit_nocatch( Character *ch, Character *victim, string command )
 {
     multi_hit_strikes( ch, victim, command );
+    round_striker = 0;
 
     // Every strike of the round landed on a victim who was still down, and so carried
     // the position bonus (OneHit::damApplyPosition, acApplyPosition). Now they get up,

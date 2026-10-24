@@ -1131,6 +1131,14 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
 
     // From this point on the death has certainly happened.
 
+    // A charmed pet or servant dealt the blow that felled a boss.
+    if (realKiller && realKiller != ch && victim->is_npc() && victim->getNPC()->getTier() <= 2)
+        achievement( ch, "good_boy" );
+
+    // Died while an invader's spell had the victim punching its own shadow.
+    if (HAS_SHADOW(victim))
+        achievement( victim, "shadowboxing" );
+
     if (ch && ch != victim)
         oprog_kill( ch, victim, label );
 

@@ -20,6 +20,7 @@
 #include "skill.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
+#include "fenia_utils.h"
 #include "fight_extract.h"
 #include "object.h"
 #include "room.h"
@@ -109,6 +110,8 @@ void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitst
 
 int fightspam_cast_depth = 0;
 long fightspam_cast_serial = 0;
+Character *round_striker = 0;
+int round_landed = 0;
 int save_hint_scope = 0;
 
 bool Damage::hit( bool show )
@@ -524,6 +527,9 @@ void Damage::inflictDamage( )
         victim->hit = max( (int)victim->hit, 1 );
 
     soundDamage( before );
+
+    if (ch == round_striker && ++round_landed == 11)
+        achievement( ch, "eleven_strikes" );
 }
 
 /*
@@ -543,6 +549,11 @@ void Damage::soundDamage( int before )
             msp_sound( victim, "alert/lowhp", 100, 1, 80 );
         else if (dam > victim->max_hit / 5 && ch != victim)
             msp_sound( victim, "combat/hurt", 100, 1, 60 );
+
+        // A boss's blow worth the hurt sound, survived on the last 5%.
+        if (dam > victim->max_hit / 5 && ch != victim && ch->is_npc()
+            && ch->getNPC()->getTier() <= 2 && victim->hit > 0 && victim->hit < victim->max_hit / 20)
+            achievement( victim, "signature" );
     }
 
     if (ch != victim && !ch->is_npc( )

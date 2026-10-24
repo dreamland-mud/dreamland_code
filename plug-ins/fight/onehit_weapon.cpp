@@ -300,7 +300,15 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             {
                 oldact(_("$o1 ярко вспыхивает!"), ch, wield, 0, TO_ALL);
                 lvl = std::min((int)ch->getModifyLevel(), (int)waf->level);
-                spell_nocatch( waf->type, lvl, ch, victim );
+                try {
+                    spell_nocatch( waf->type, lvl, ch, victim );
+                }
+                catch (const VictimDeathException &) {
+                    // A blade blessed with flame of god burnt its foe to death.
+                    if (waf->type->getName() == "flamestrike")
+                        achievement( ch, "flame_of_god" );
+                    throw;
+                }
             }
     }
 }
