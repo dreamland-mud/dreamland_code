@@ -647,6 +647,33 @@ void saved_mobiles_report( )
     saved_legacy_body_lines = saved_legacy_blocks = 0;
 }
 
+/* Bits each body set gets from these affects (mob affects or a worn item's). */
+template <typename AffectContainer>
+static void affect_borne_bits(const AffectContainer &affects, bitstring_t bits[MOBSET_MAX])
+{
+    for (auto &paf: affects) {
+        const FlagTable *table = paf->bitvector.getTable();
+        if (!table)
+            continue;
+        int set = npc_set_by_table(table);
+        if (set >= 0)
+            bits[set] |= paf->bitvector.getValue();
+    }
+}
+
+/* A saved mob's worn items come back without affectsOnEquip, so their bits
+ * arrive only through the body diff and land in baseBits, and affect_check
+ * would restore them forever once the item comes off. affect_check reapplies
+ * worn-item bits by itself, so they never belong in baseBits. */
+static void npc_unbase_item_bits(NPCharacter *mob, Object *obj)
+{
+    bitstring_t bits[MOBSET_MAX] = { 0 };
+    affect_borne_bits(obj->pIndexData->affected, bits);
+    affect_borne_bits(obj->affected, bits);
+    for (int s = 0; s < MOBSET_MAX; s++)
+        mob->baseBits[s] &= ~(bits[s] & ~produced_set(mob->pIndexData, s));
+}
+
 /* fread_mob End: body diffs and numbers if the stamp matches, then the affects. */
 static void apply_saved_mob(NPCharacter *mob, SavedMobState &st)
 {
@@ -677,8 +704,16 @@ static void apply_saved_mob(NPCharacter *mob, SavedMobState &st)
     }
 
     // The body this instance now has is what affect_check falls back to.
-    for (int s = 0; s < MOBSET_MAX; s++)
-        mob->baseBits[s] = npc_set_get(mob, s) & (s == MOBSET_AFF ? ~AFF_FROM_AFFECTS : ~(bitstring_t)0);
+    // Bits the restored affects carry are body only if the prototype has
+    // them: older saves wrote such innate bits as Del while an affect
+    // mirrored them, so put those back.
+    bitstring_t borne[MOBSET_MAX] = { 0 };
+    affect_borne_bits(st.affects, borne);
+    for (int s = 0; s < MOBSET_MAX; s++) {
+        bitstring_t produced = produced_set(mob->pIndexData, s);
+        bitstring_t own = (npc_set_get(mob, s) & ~(borne[s] & ~produced)) | (borne[s] & produced);
+        mob->baseBits[s] = own & (s == MOBSET_AFF ? ~AFF_FROM_AFFECTS : ~(bitstring_t)0);
+    }
 
     for (auto &af: st.affects) {
         affect_to_char(mob, af);
@@ -888,8 +923,13 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
 
         // Body: diffs against what the prototype produces today, so a
         // prototype fix reaches this mob at the next boot (mob reform).
+        // The strip above also took innate bits an affect mirrors (troll
+        // regeneration, fly): they are still body, not a Del.
+        bitstring_t borne[MOBSET_MAX] = { 0 };
+        affect_borne_bits(mob->affected, borne);
         for (int s = 0; s < MOBSET_MAX; s++) {
             bitstring_t base = npc_set_get(mob, s), produced = produced_set(mob->pIndexData, s);
+            base |= borne[s] & produced;
             if (s == MOBSET_AFF)
                 base &= ~(bitstring_t)AFF_CHARM;
             bitstring_t add = base & ~produced, del = produced & ~base;
@@ -2520,8 +2560,11 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             if (fPersonal) 
                                 convert_personal( obj );
 
-                            if (wear_loc != -1)
+                            if (wear_loc != -1) {
                                 obj->wear_loc.assign(wear_loc);
+                                if (ch && ch->is_npc() && obj->carried_by == ch && obj->wear_loc->givesAffects())
+                                    npc_unbase_item_bits(ch->getNPC(), obj);
+                            }
 
                             fread_obj_uncount_expired( obj, room );
                             return;
