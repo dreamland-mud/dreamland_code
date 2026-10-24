@@ -110,8 +110,6 @@ void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitst
 
 int fightspam_cast_depth = 0;
 long fightspam_cast_serial = 0;
-Character *round_striker = 0;
-int round_landed = 0;
 int save_hint_scope = 0;
 
 bool Damage::hit( bool show )
@@ -527,9 +525,6 @@ void Damage::inflictDamage( )
         victim->hit = max( (int)victim->hit, 1 );
 
     soundDamage( before );
-
-    if (ch == round_striker && ++round_landed == 11)
-        achievement( ch, "eleven_strikes" );
 }
 
 /*

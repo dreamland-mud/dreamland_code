@@ -31,6 +31,21 @@
 GSN(cavalry);
 CLAN(none);
 
+static Character *stop_fighting_dying = 0;
+
+void stop_fighting_death( Character *victim )
+{
+    stop_fighting_dying = victim;
+    try {
+        stop_fighting( victim, true );
+    }
+    catch (...) {
+        stop_fighting_dying = 0;
+        throw;
+    }
+    stop_fighting_dying = 0;
+}
+
 /*
  * Stop fights.
  */
@@ -60,7 +75,8 @@ void stop_fighting( Character *ch, bool fBoth )
                 fch->getPC()->getAttributes().handleEvent(StopFightArguments(fch->getPC()));
 
                 // Walked out of a fight on the last hit point.
-                if (wasFighting && fch->hit == 1 && fch->position > POS_DEAD)
+                if (wasFighting && fch->hit == 1 && fch->position > POS_DEAD
+                    && fch != stop_fighting_dying)
                     achievement( fch, "by_a_hair" );
             }
         }

@@ -55,12 +55,6 @@ extern long fightspam_cast_serial;
  * change how damage lines are gated. Defined in damage.cpp. */
 extern int save_hint_scope;
 
-/* The player whose melee round multi_hit is running, and how many of its
- * blows have landed so far (achievement eleven_strikes). Defined in
- * damage.cpp, set and cleared by multi_hit_nocatch. */
-extern Character *round_striker;
-extern int round_landed;
-
 class Damage {
 public:
     Damage( Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag = 0 );

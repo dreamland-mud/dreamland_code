@@ -714,7 +714,7 @@ void AssassinateOneHit::calcDamage( )
 
         gsn_assassinate->improve( ch, true, victim );
 
-        if (!IS_AWAKE(victim))
+        if (victim->position == POS_SLEEPING)
             achievement( ch, "sleeping_beauty" );
 
         handleDeath( );

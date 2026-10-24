@@ -95,6 +95,7 @@ void OneHit::hit( )
         return;
 
     inflictDamage( );
+    round_blow_landed( ch );
     postDamageEffects( );
     mprog_hit();
     handlePosition( );

@@ -1091,7 +1091,7 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
     if (ch && ch->is_npc() && ch->master && !ch->master->is_npc() && ch != victim)
         ch = ch->master;
 
-    stop_fighting( victim, true );
+    stop_fighting_death( victim );
     victim->unsetLastFightTime( );
 
     // The /api/sandbox test actor never really dies, and nobody hears of it: no
@@ -1134,10 +1134,6 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
     // A charmed pet or servant dealt the blow that felled a boss.
     if (realKiller && realKiller != ch && victim->is_npc() && victim->getNPC()->getTier() <= 2)
         achievement( ch, "good_boy" );
-
-    // Died while an invader's spell had the victim punching its own shadow.
-    if (HAS_SHADOW(victim))
-        achievement( victim, "shadowboxing" );
 
     if (ch && ch != victim)
         oprog_kill( ch, victim, label );
