@@ -4,6 +4,7 @@
  */
 #include "logstream.h"
 #include "helpmanager.h"
+#include "integer.h"
 #include "character.h"
 #include "multimessage.h"
 
@@ -137,9 +138,11 @@ const StringSet & HelpArticle::getRefBy() const
 
 static int alias_id(const StringSet &refby)
 {
-    for (auto &r: refby)
-        if (r.isNumber())
-            return r.toInt();
+    for (auto &r: refby) {
+        Integer v;
+        if (Integer::tryParse(v, r))
+            return v;
+    }
 
     return 0;
 }
