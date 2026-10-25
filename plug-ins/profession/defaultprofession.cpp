@@ -157,6 +157,11 @@ void ClassSkillHelp::setProfession( DefaultProfession::Pointer prof )
     addAutoKeyword("умения " + prof->getMltName().ruscase('2'));
     addAutoKeyword("навыки " + prof->getRusName().ruscase('2'));
     addAutoKeyword("навыки " + prof->getMltName().ruscase('2'));    
+    if (!prof->getUaName().empty()) {
+        addAutoKeyword("заклинання " + prof->getUaName().ruscase('2'));
+        addAutoKeyword("уміння " + prof->getUaName().ruscase('2'));
+        addAutoKeyword("навички " + prof->getUaName().ruscase('2'));
+    }
     labels.addTransient(prof->getName() + "-skills");
 
     helpManager->registrate( Pointer( this ) );

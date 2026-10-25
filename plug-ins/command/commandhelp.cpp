@@ -109,6 +109,7 @@ void CommandHelp::setCommand( Command::Pointer command )
         if (cmd) {
             addAutoKeyword(cmd->getName());
             addAutoKeyword(cmd->getRussianName());
+            addAutoKeyword(cmd->getNameFor(UA));
         }
     }
 

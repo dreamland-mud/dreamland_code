@@ -86,6 +86,7 @@ void BehaviorHelp::setBehavior( DefaultBehavior::Pointer bhv )
     DLString name = bhv->getName();
     addAutoKeyword(name.replaces("_", " "));
     addAutoKeyword(bhv->getRussianName().ruscase('1'));    
+    addAutoKeyword(bhv->getUkrainianName().ruscase('1'));
 
     labels.addTransient("item");
    
