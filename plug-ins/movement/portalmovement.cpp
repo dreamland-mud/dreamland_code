@@ -306,9 +306,9 @@ bool PortalMovement::checkCurse( Character *wch )
                       "Your curse keeps you from entering %4$O4.",
                       "Твое проклятье мешает тебе войти в %4$O4.",
                       "Твоє прокляття заважає тобі увійти в %4$O4.",
-                      "%2$C2's curse keeps %2$P3 from entering %4$O4.",
+                      "%2$C2's curse keeps %2$Git|him|her from entering %4$O4.",
                       "Проклятье %2$C2 мешает %2$P3 войти в %4$O4.",
-                      "Прокляття %2$C2 заважає %2$P3 увійти в %4$O4." );
+                      "Прокляття %2$C2 заважає %2$Gйому|йому|їй увійти в %4$O4." );
         return false;
     }
     
