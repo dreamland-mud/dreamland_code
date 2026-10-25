@@ -6,9 +6,9 @@
  * No token: this is the page anyone can open, same footing as the public /who.
  * Linking characters into one account is information `who`/`whois` never give
  * out, so the profile only exists when all three hold:
- *   - at least one character on the account has been reborn (remorts > 0),
- *     hidden characters included, so hiding the reborn one cannot leave
- *     fresh alts on show;
+ *   - at least one character on the account is past the newbie stage
+ *     (Player::isNewbie: reborn, or more than 50 questor tasks), hidden
+ *     characters included, so hiding that one cannot leave fresh alts on show;
  *   - the owner has not switched it off (account config "profile": false);
  *   - at least one character is not hidden (pfile json attribute
  *     "profile": {"hidden": true}, kept on the char so a rename keeps it hidden).
@@ -100,12 +100,14 @@ bool account_profile_enabled(const DLString &id)
     return !v.isBool() || v.asBool();
 }
 
-// At least one character on the account has been reborn.
+// At least one character on the account is not a newbie (Kit 2026-10-25:
+// the engine's own definition, so a long-time player who never remorted
+// gets a page too).
 bool account_profile_eligible(const DLString &id)
 {
     for (const DLString &name : AccountManager::charsOf(id)) {
         PCMemoryInterface *pci = PCharacterManager::find(name);
-        if (pci != 0 && pci->getRemorts().size() > 0)
+        if (pci != 0 && !Player::isNewbie(pci))
             return true;
     }
     return false;
