@@ -6364,6 +6364,21 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     Skill *mpSkill = skillManager->findExisting( "mastering pound" );
     bool gaBareHanded = target->getProfession( )->getName( ) == "ninja"
                         && mpSkill != 0 && mpSkill->usable( target, false );
+    // A samurai with both own katanas forged (.tmp.samurai.ownKatanaCount: loaded
+    // copies of the katana vnum he owns) keeps them for life, so the sage offers no
+    // hand gear. Unlike the bare-handed ninja the worn blades still count: their flags
+    // stay owned and their slots stay set-fillable, only the hand slots leave the
+    // percentile and the chase list, and the left hand gets no dual/keep verdict.
+    bool gaKatanas = false;
+    if (target->getProfession( )->getName( ) == "samurai") {
+        int own = 0;
+        for (::Object *o = object_list; o && own < 2; o = o->next)
+            if (o->pIndexData->vnum == 98 && o->item_type == ITEM_WEAPON
+                && IS_WEAPON_STAT( o, WEAPON_KATANA ) && o->hasOwner( target ))
+                own++;
+        gaKatanas = own >= 2;
+    }
+    bool gaHandsFixed = gaBareHanded || gaKatanas;
 
     // Worn gear: best score per slot-type (for the gap + percentile), plus every
     // vnum already worn (so we never recommend re-getting one).
@@ -6790,7 +6805,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         for (auto &c: cands) {
             if (c.acq.method == GA_UNKNOWN || ga_overCap( c.acq, chLevel ))   // same gate as bestSlot
                 continue;
-            if (gaBareHanded && (c.slot & gaHandSlots))
+            if (gaHandsFixed && (c.slot & gaHandSlots))
                 continue;
             GAOnce e = { c.pObj, c.inst, false, 0, 0, 0, c.score };
             ga_grantBits( c.pObj, c.inst, e.aff, e.imm, e.res );
@@ -6963,7 +6978,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // percentile, exactly as the old lockedSlots did, so wearing such a set is neutral
     // and never a regression. Valued worn sets instead score in + earn wornSetBonus.
     int neutralSlots = 0;
-    if (gaBareHanded)
+    if (gaHandsFixed)
         neutralSlots |= gaHandSlots;
     // Worn complete set -> its worn slots. Protected after the feasibility pass: a set a
     // bare-handed ninja can no longer complete earns no bonus, so it must not shield
@@ -7268,7 +7283,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         double dualScore = 0, keepScore = 0;
         Register dEntry;
         Skill *swSkill = skillManager->findExisting( "second weapon" );
-        if (gaBareHanded) {
+        if (gaHandsFixed) {
             // No left hand to weigh: no dual line, nothing added to the percentile.
         }
         else if (swSkill != 0 && !swSkill->usable( target, false )) {
@@ -7581,7 +7596,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // The verdict says go dual: a shield or held item would take the off-hand back.
         if (gaGoDual && (byOpt[k].slot & (ITEM_WEAR_SHIELD | ITEM_HOLD)))
             continue;
-        if (gaBareHanded && (byOpt[k].slot & gaHandSlots))
+        if (gaHandsFixed && (byOpt[k].slot & gaHandSlots))
             continue;
         if (optSlot.count( byOpt[k].slot )) continue;   // one item per slot-type
         optSlot[byOpt[k].slot] = byOpt[k].score;
