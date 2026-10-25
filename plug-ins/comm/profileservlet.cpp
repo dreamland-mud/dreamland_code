@@ -534,3 +534,127 @@ SERVLET_HANDLE(api_profile, "/profile")
 {
     profile_servlet(request, response);
 }
+
+/*
+ * /leaderboard -> {"open": bool, "at": unix, "rows": [{"id", "title", "name":
+ * {login, en, ru, ua}, "score", "legendary", "secrets", "earned"}, ...]}
+ *
+ * The account pages by achievement score, from the daily sums Fenia keeps
+ * (.tmp.achievements.boardRows, private world scripts). Only accounts whose
+ * page /profile would show are listed, under their main character (most hours
+ * among the shown ones). "open" is false until the list opens (Fenia decides).
+ * Built at most once per BOARD_CACHE_TTL: the rows only change daily.
+ */
+static const time_t BOARD_CACHE_TTL = 600;
+static const unsigned int BOARD_MAX = 200;
+
+static Json::Value board_cache;
+static time_t board_cache_at = 0;
+
+static bool board_rows(Json::Value &out)
+{
+    using namespace Scripting;
+
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    static IdRef ID_TMP("tmp"), ID_ACHIEVEMENTS("achievements"), ID_BOARDROWS("boardRows");
+
+    try {
+        Register tmp = *Context::root[ID_TMP];
+        Register ach = *tmp[ID_ACHIEVEMENTS];
+        if (ach.type != Register::OBJECT)
+            return false;
+
+        Register function = *ach[ID_BOARDROWS];
+        if (function.type != Register::FUNCTION)
+            return false;
+
+        RegisterList args;
+        Register result = function.toFunction()->invoke(ach, args);
+        if (result.type == Register::NONE)
+            return false;
+
+        out = JsonUtils::fromRegister(result);
+        return out.isArray();
+
+    } catch (const ::Exception &e) {
+        FeniaManager::getThis()->croak(0, Register(DLString("achievements.boardRows")), e);
+        return false;
+    }
+}
+
+static Json::Value board_build()
+{
+    Json::Value body;
+    Json::Value rows;
+
+    body["at"] = (Json::Int64)dreamland->getCurrentTime();
+    body["rows"] = Json::Value(Json::arrayValue);
+    body["open"] = board_rows(rows);
+    if (!body["open"].asBool())
+        return body;
+
+    vector<Json::Value> listed;
+    for (const Json::Value &r : rows) {
+        DLString id = r["id"].asString();
+        id.toUpper();
+        if (!profile_valid_id(id) || !AccountManager::exists(id)
+            || !account_profile_enabled(id) || !account_profile_eligible(id))
+            continue;
+
+        PCMemoryInterface *mainChar = 0;
+        int mainHours = -1;
+        for (const DLString &name : AccountManager::charsOf(id)) {
+            PCMemoryInterface *pci = PCharacterManager::find(name);
+            if (pci == 0 || account_profile_char_hidden(pci))
+                continue;
+            int h = profile_char_hours(pci);
+            if (h > mainHours) {
+                mainHours = h;
+                mainChar = pci;
+            }
+        }
+        if (mainChar == 0)
+            continue;
+
+        Json::Value row;
+        row["id"] = id.c_str();
+        row["title"] = AccountManager::titleOf(id).c_str();
+        row["name"]["login"] = mainChar->getName().c_str();
+        row["name"]["en"] = mainChar->getNameP('1', LANG_EN).c_str();
+        row["name"]["ru"] = mainChar->getNameP('1', LANG_RU).c_str();
+        row["name"]["ua"] = mainChar->getNameP('1', LANG_UA).c_str();
+        row["score"] = r["score"].asInt();
+        row["legendary"] = r["legendary"].asInt();
+        row["secrets"] = r["secrets"].asInt();
+        row["earned"] = r["earned"].asInt();
+        listed.push_back(row);
+    }
+
+    sort(listed.begin(), listed.end(), [](const Json::Value &a, const Json::Value &b) {
+        if (a["score"].asInt() != b["score"].asInt())
+            return a["score"].asInt() > b["score"].asInt();
+        if (a["legendary"].asInt() != b["legendary"].asInt())
+            return a["legendary"].asInt() > b["legendary"].asInt();
+        return a["name"]["login"].asString() < b["name"]["login"].asString();
+    });
+
+    for (unsigned int i = 0; i < listed.size() && i < BOARD_MAX; i++)
+        body["rows"].append(listed[i]);
+    return body;
+}
+
+SERVLET_HANDLE(api_leaderboard, "/leaderboard")
+{
+    Json::Value params;
+    if (!servlet_parse_params(request, response, params))
+        return;
+
+    time_t now = dreamland->getCurrentTime();
+    if (board_cache_at == 0 || now - board_cache_at >= BOARD_CACHE_TTL) {
+        board_cache = board_build();
+        board_cache_at = now;
+    }
+    servlet_response_200_json(response, board_cache);
+}
