@@ -99,8 +99,8 @@ void CommandHelp::setCommand( Command::Pointer command )
     addAutoKeyword(command->aliases.get(RU).split(" "));
     addAutoKeyword(command->aliases.get(UA).split(" "));
 
-    labels.addTransient(
-        command->getCommandCategory().names());
+    // Command categories (info, move, config...) belong to 'commands' output,
+    // not to the help label vocabulary: 'cmd' is the only facet a command adds.
     labels.addTransient(LABEL_COMMAND);
 
     for (r = ref.begin( ); r != ref.end( ); r++) {
