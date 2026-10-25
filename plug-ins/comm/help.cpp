@@ -45,8 +45,10 @@ const int MAX_RESULTS = 5;
 const size_t PREFIX_MIN = 3;
 const size_t STEM_MIN_PREFIX = 5;
 const size_t STEM_ABBR_PREFIX = 4;
-const size_t FUZZY_MIN_LEN = 5;   // shorter query words get no edits at all (шлем/шлеп, моба/мова)
+const size_t FUZZY_MIN_LEN = 5;   // shorter query words get no free edit (шлем/шлеп, моба/мова)
+const size_t SHORT_TYPO_LEN = 4;  // ... except the two typos that stay unambiguous at four letters
 const size_t FLIP_MIN_LEN = 3;    // every word this long before a layout flip is tried (уф -> ea)
+const size_t MAX_WORDS = 8;       // a pasted sentence costs no more than a short question
 const size_t NUMBER_MAX_DIGITS = 6;
 
 // Number row and numpad neighbours of each digit, for one-key typos in an id.
@@ -90,8 +92,11 @@ size_t stem_len(const DLString &q, const DLString &k)
     return 0;
 }
 
-/** Score of one lowercase query word against one lowercase keyword word, 0 for no match. */
-int word_score(const DLString &q, const DLString &k)
+/** Score of one lowercase query word against one lowercase keyword word, 0 for
+ *  no match. Without `stem` only exact, prefix and edit matches count: a word
+ *  pair glued together (fire ball -> fireball) must not match a keyword that
+ *  merely starts it (темный шлем -> темный). */
+int word_score(const DLString &q, const DLString &k, bool stem = true)
 {
     if (q == k)
         return WORD_EXACT;
@@ -112,8 +117,18 @@ int word_score(const DLString &q, const DLString &k)
                 best = WORD_FUZZY - FUZZY_STEP * d;
         }
     }
+    else if (q.size() == SHORT_TYPO_LEN) {
+        // Four letters are too few for a free edit, but two neighbours swapped
+        // (bsah, kcik) or one letter added to a three-letter word (the plural:
+        // шары, мечи) almost always lead to a single keyword word. Weights make
+        // a swap the only distance-1 edit.
+        if (k.size() == SHORT_TYPO_LEN && levenshtein(q, k, 1, 2, 2, 2) == 1)
+            best = WORD_FUZZY - FUZZY_STEP;
+        else if (k.size() + 1 == q.size() && q.compare(0, k.size(), k) == 0)
+            best = WORD_FUZZY - FUZZY_STEP;
+    }
 
-    size_t p = stem_len(q, k);
+    size_t p = stem ? stem_len(q, k) : 0;
     if (p > 0) {
         int sc = WORD_STEM - (int)(max(q.size(), k.size()) - p);
         if (sc > best)
@@ -121,6 +136,34 @@ int word_score(const DLString &q, const DLString &k)
     }
 
     return best;
+}
+
+/** The labels a leading facet word restricts the search to ("help skill
+ *  bash" looks among skills and spells), or false if the word is no facet. */
+bool help_facet_labels(const DLString &word, StringSet &labels)
+{
+    if (arg_is(word, "skill")) {
+        labels.insert("skill");
+        labels.insert("spell");
+    }
+    else if (arg_is(word, "spell"))
+        labels.insert("spell");
+    else if (arg_is(word, "class"))
+        labels.insert("class");
+    else if (arg_is(word, "race"))
+        labels.insert("race");
+    else if (arg_is(word, "command"))
+        labels.insert("cmd");
+    else if (arg_is(word, "area"))
+        labels.insert("area");
+    else if (arg_is(word, "religion"))
+        labels.insert("religion");
+    else if (arg_is(word, "clan"))
+        labels.insert("clan");
+    else
+        return false;
+
+    return true;
 }
 
 /** Append the lowercase words of a query or of one keyword, quotes dropped. */
@@ -255,26 +298,8 @@ private:
         arg1 = argRest.getOneArgument();
 
         // Reduce "help skill bash" to just "help bash".
-        if (!argRest.empty()) {
-            if (arg_is(arg1, "skill")) {
-                preferredLabels.insert("skill");
-                preferredLabels.insert("spell");
-            }
-            else if (arg_is(arg1, "spell"))
-                preferredLabels.insert("spell");
-            else if (arg_is(arg1, "class"))
-                preferredLabels.insert("class");
-            else if (arg_is(arg1, "race"))
-                preferredLabels.insert("race");
-            else if (arg_is(arg1, "command"))
-                preferredLabels.insert("cmd");
-            else if (arg_is(arg1, "area"))
-                preferredLabels.insert("area");
-            else if (arg_is(arg1, "religion"))
-                preferredLabels.insert("religion");
-            else if (arg_is(arg1, "clan"))
-                preferredLabels.insert("clan");
-        }
+        if (!argRest.empty())
+            help_facet_labels(arg1, preferredLabels);
     }
     
     ArticleArray articles;
@@ -297,28 +322,42 @@ struct FuzzySearch {
         Kind kind;
     };
 
-    FuzzySearch(Character *ch, const char *argument)
+    FuzzySearch(Character *ch, const char *argument) : numeric(false)
     {
         DLString query = arg_unquote(argument);
         query.stripWhiteSpace();
 
         Integer id;
         if (Integer::tryParse(id, query)) {
+            numeric = true;
             searchNumber(ch, id);
             return;
         }
 
-        split_words(query, words);
-        if (words.empty())
+        // A leading facet word filters, as in HelpFinder: scored as a word, the
+        // frequent "spell" would outrank the one-off typo it comes with. And as
+        // in HelpFinder, nothing found that way means the whole query is
+        // searched again with no filter: arg_is() takes any prefix, so "re" in
+        // "re scue" reads as "religion" and the glued "rescue" needs the retry.
+        DLString facet, rest = query;
+        StringSet labels;
+        facet = rest.getOneArgument();
+        if (!rest.empty() && help_facet_labels(facet, labels)
+                && search(ch, facet, rest, labels))
             return;
 
-        if (!searchFlipped(ch, query))
-            searchWords(ch);
+        search(ch, DLString::emptyString, query, StringSet());
     }
 
     bool hasResults() const
     {
         return !hits.empty();
+    }
+
+    /** Suggestions for a mistyped id rather than for words. */
+    bool isNumeric() const
+    {
+        return numeric;
     }
 
     void printResults(Character *ch) const
@@ -353,6 +392,23 @@ struct FuzzySearch {
     }
 
 private:
+    /** One pass: the layout flip, then the per-word scoring. True if anything was found. */
+    bool search(Character *ch, const DLString &facet, const DLString &query, const StringSet &labels)
+    {
+        words.clear();
+        split_words(query, words);
+        if (words.size() > MAX_WORDS)
+            words.resize(MAX_WORDS);
+        if (words.empty())
+            return false;
+
+        if (searchFlipped(ch, facet, query))
+            return true;
+
+        searchWords(ch, labels);
+        return !hits.empty();
+    }
+
     /** The matched word, when it tells the viewer something the title does not:
      *  dropped for a fuzzy hit in the other script (a Cyrillic keyword for an
      *  English reader and vice versa), kept for a layout flip, where the flipped
@@ -375,15 +431,21 @@ private:
     }
 
     /** The query typed in the wrong keyboard layout: flip it and run the plain
-     *  prefix match again. Two-letter words flip into a prefix of something
-     *  every time (уф -> ea), so short queries skip this. */
-    bool searchFlipped(Character *ch, const DLString &query)
+     *  prefix match again, the facet word (already in the right layout) kept in
+     *  front. Two-letter words flip into a prefix of something every time
+     *  (уф -> ea), so short queries skip this. The viewer's own Cyrillic layout
+     *  goes first: the two differ only on the і/ы, ї/ъ, є/э, ґ/ё keys. */
+    bool searchFlipped(Character *ch, const DLString &facet, const DLString &query)
     {
         for (auto &w: words)
             if (w.size() < FLIP_MIN_LEN)
                 return false;
 
-        static const lang_t langs[2] = { RU, UA };
+        lang_t langs[2] = { RU, UA };
+        if (Player::displayLang(ch) == UA) {
+            langs[0] = UA;
+            langs[1] = RU;
+        }
         DLString tried;
 
         for (int i = 0; i < 2; i++) {
@@ -393,7 +455,8 @@ private:
                 continue;
             tried = flipped;
 
-            HelpFinder finder(ch, flipped.c_str());
+            DLString lookup = facet.empty() ? flipped : facet + " " + flipped;
+            HelpFinder finder(ch, lookup.c_str());
             const HelpFinder::ArticleArray &found = finder.getArticles();
 
             for (size_t j = 0; j < found.size() && (int)hits.size() < MAX_RESULTS; j++)
@@ -406,10 +469,12 @@ private:
         return false;
     }
 
-    /** Per-word scoring against every keyword word of every visible article.
-     *  Articles matching every query word win; otherwise the ones matching the
-     *  most words, a rare matched word outranking a common one. */
-    void searchWords(Character *ch)
+    /** Per-word scoring against every keyword word of every visible article,
+     *  only among `labels` when given. Articles matching every query word win;
+     *  otherwise the ones matching the most words, a rare matched word
+     *  outranking a common one. Two neighbouring words glued together also
+     *  count, for both of them (fire ball -> fireball). */
+    void searchWords(Character *ch, const StringSet &labels)
     {
         struct Candidate {
             HelpArticle::Pointer article;
@@ -421,6 +486,10 @@ private:
         vector<DLString> kwords;
         size_t n = words.size();
 
+        vector<DLString> pairs;
+        for (size_t i = 0; i + 1 < n; i++)
+            pairs.push_back(words[i] + words[i + 1]);
+
         for (auto &a: helpManager->getArticles()) {
             // An alias answers to its own keywords but shows its target.
             HelpArticle::Pointer self(a);
@@ -428,6 +497,8 @@ private:
             if (!shown)
                 shown = self;
             if (!shown->visible(ch))
+                continue;
+            if (!labels.empty() && !self->labels.all.containsAny(labels))
                 continue;
 
             kwords.clear();
@@ -452,6 +523,31 @@ private:
                 }
                 if (best[i] > 0)
                     any = true;
+            }
+
+            for (size_t i = 0; i < pairs.size(); i++) {
+                int pairBest = 0;
+                DLString pairHint;
+
+                for (auto &k: kwords) {
+                    int sc = word_score(pairs[i], k, false);
+                    if (sc > pairBest) {
+                        pairBest = sc;
+                        pairHint = k;
+                        if (sc == WORD_EXACT)
+                            break;
+                    }
+                }
+
+                if (pairBest <= 0)
+                    continue;
+
+                any = true;
+                for (size_t j = i; j <= i + 1; j++)
+                    if (pairBest > best[j]) {
+                        best[j] = pairBest;
+                        hint[j] = pairHint;
+                    }
             }
 
             if (!any)
@@ -614,6 +710,7 @@ private:
 
     vector<DLString> words;
     vector<Hit> hits;
+    bool numeric;
 };
 
 /*-----------------------------------------------------------------------
@@ -776,6 +873,7 @@ CMDRUNP( help )
     }
 
     // Вариант 2.create? - needs exact match.
+    bool nthMiss = false;
     if (origArgument.size() > 1 && strchr( argument , '.')) {
         char argall[MAX_INPUT_LENGTH];
         int number = number_argument(argument, argall);
@@ -789,6 +887,7 @@ CMDRUNP( help )
             // No such nth match: search the word itself, so the player gets
             // the numbered list to pick from instead of a dead end.
             strcpy(argument, argall);
+            nthMiss = true;
         }
         else {
             // Restore original argument without the dot, assume it was a typo.
@@ -804,6 +903,12 @@ CMDRUNP( help )
             FuzzySearch fs(ch, argument);
             if (fs.hasResults()) {
                 fs.printResults(ch);
+                // A text miss stays in nohelp.txt for analysis and the replay
+                // even when a guess answered it, but no human needs to read
+                // it. Numeric guesses mostly answer someone reading the help
+                // by number, which is not a miss at all.
+                if (!fs.isNumeric())
+                    bugTracker->reportNohelpAnswered( ch->getPC(), origArgument.c_str( ) );
                 return;
             }
         }
@@ -812,6 +917,9 @@ CMDRUNP( help )
         bugTracker->reportNohelp( ch->getPC(), origArgument.c_str( ) );
         return;
     }
+
+    if (nthMiss)
+        bugTracker->reportNohelpAnswered( ch->getPC(), origArgument.c_str( ) );
 
     // Exact match - bingo.
     if (articles.size() == 1) {
