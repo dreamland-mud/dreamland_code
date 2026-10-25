@@ -10,6 +10,8 @@
 #include "xmlvariablecontainer.h"
 #include "xmlstring.h"
 
+#include <map>
+
 class PCharacter;
 
 class BugTracker : public OneAllocate, 
@@ -28,6 +30,8 @@ public:
 protected:
     const DLString &getDirName(const DLString &msgType) const;
     const DLString &getFileName(const DLString &msgType) const;
+    bool nohelpWorthTrello(PCharacter *ch, const DLString &txt) const;
+    void writeMessage(const DLString &msgType, const DLString &authorName, const DLString &message, const DLString &location, bool toTrello) const;
 
     XML_VARIABLE XMLString bugFile;
     XML_VARIABLE XMLString ideaFile;
@@ -37,6 +41,9 @@ protected:
     XML_VARIABLE XMLString nohelpDir;
     XML_VARIABLE XMLString ideaDir;
     XML_VARIABLE XMLString bugDir;
+
+    // Lowercased nohelp query -> last time it was queued for Trello.
+    mutable std::map<DLString, time_t> nohelpSeen;
 };
 
 extern BugTracker *bugTracker;

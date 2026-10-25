@@ -12,6 +12,8 @@
 #include "room.h"
 #include "dreamland.h"
 
+#include <cctype>
+
 BugTracker *bugTracker = NULL;
 
 BugTracker::BugTracker( )
@@ -33,7 +35,45 @@ void BugTracker::reportMessage(const DLString &msgType, PCharacter *ch, const DL
 
 void BugTracker::reportNohelp( PCharacter *ch, const DLString &txt ) const
 {
-    reportMessage("nohelp", ch, txt);
+    writeMessage("nohelp", ch->getName(), txt, ch->in_room->vnum, nohelpWorthTrello(ch, txt));
+}
+
+// nohelp.txt keeps every miss for analysis, the Trello feed only gets what a human should read:
+// no immortals or API bots, no bare numbers or 1-2 char stubs, one copy of a query per 24 hours.
+bool BugTracker::nohelpWorthTrello(PCharacter *ch, const DLString &txt) const
+{
+    static const time_t window = 24 * 60 * 60;
+
+    if (ch->is_immortal() || ch->getName() == "ExecBot" || ch->getName() == "TestBot")
+        return false;
+
+    DLString query = txt;
+    query.stripWhiteSpace();
+    if (query.size() < 3)
+        return false;
+
+    bool digitsOnly = true;
+    for (DLString::size_type i = 0; i < query.size(); i++)
+        if (!isdigit((unsigned char)query[i]) && query[i] != '.' && query[i] != ' ') {
+            digitsOnly = false;
+            break;
+        }
+    if (digitsOnly)
+        return false;
+
+    time_t now = dreamland->getCurrentTime();
+    for (auto it = nohelpSeen.begin(); it != nohelpSeen.end(); )
+        if (now - it->second >= window)
+            it = nohelpSeen.erase(it);
+        else
+            ++it;
+
+    DLString key = query.toLower();
+    if (nohelpSeen.count(key))
+        return false;
+
+    nohelpSeen[key] = now;
+    return true;
 }
 
 const DLString &BugTracker::getDirName(const DLString &msgType) const
@@ -57,6 +97,11 @@ const DLString &BugTracker::getFileName(const DLString &msgType) const
 
 void BugTracker::reportMessage(const DLString &msgType, const DLString &authorName, const DLString &message, const DLString &location) const
 {
+    writeMessage(msgType, authorName, message, location, true);
+}
+
+void BugTracker::writeMessage(const DLString &msgType, const DLString &authorName, const DLString &message, const DLString &location, bool toTrello) const
+{
     DLString filename = getFileName(msgType);
     DLString dirname = getDirName(msgType);
     if (filename.empty() || dirname.empty())
@@ -71,8 +116,10 @@ void BugTracker::reportMessage(const DLString &msgType, const DLString &authorNa
     mbuf << authorName << ": " << message;
 
     // Create temporary file in a subfolder, for trello sync job to pick up.
-    DLDirectory dir( dreamland->getMiscDir( ), dirname );
-    DLFileStream( dir.tempEntry( ) ).fromString( mbuf );
+    if (toTrello) {
+        DLDirectory dir( dreamland->getMiscDir( ), dirname );
+        DLFileStream( dir.tempEntry( ) ).fromString( mbuf );
+    }
     
     // Log typos normally.
     DLFileAppend( dreamland->getMiscDir( ), filename ).printf(
