@@ -324,6 +324,8 @@ static void account_link(PCharacter *ch)
               TELEGRAM_BOT, code.c_str());
     ch->pecho(_("  Discord Валькирия -- {IWв привате {Ix{hlhttps://discord.com/users/%1$s{x, команда {W/link %2$s{x"),
               DISCORD_BOT_ID, code.c_str());
+    if (current.empty())
+        ch->pecho(_("Или введи его в игре персонажем, который уже на аккаунте: {yаккаунт код %1$s{x"), code.c_str());
     if (!current.empty())
         ch->pecho(_("Никому не показывай код: кто его введет, получит доступ к твоему аккаунту и всем персонажам."));
     else
@@ -858,6 +860,10 @@ static void account_email_request(PCharacter *ch, const DLString &rawAddr)
         rf["result"] = "rate_limited";
         AccountAudit::record("email_request", rf);
         ch->pecho(_("Слишком много запросов на подтверждение почты. Попробуй позже."));
+        // The common way to hit the cap is adding alts one by one to an account
+        // this address already owns: point at the mail-free path.
+        if (!AccountManager::findByIdentity("email", email).empty())
+            ch->pecho(_("Добавляешь персонажа к своему аккаунту? Почта не нужна: набери {yаккаунт связать{x этим персонажем и введи код персонажем, который уже на аккаунте: {yаккаунт код{x <код>."));
         return;
     }
 
@@ -885,12 +891,102 @@ static void account_email_request(PCharacter *ch, const DLString &rawAddr)
               email.c_str());
 }
 
+// `account code DL-XXXXX`, typed by a char already on an account: the linking code
+// minted by another (unlinked) char pulls that char into this account. No email:
+// the minter proved it owns its char by being logged in, the redeemer proves it owns
+// the account the same way. Lets an email-only player add alts without spending the
+// per-address mail cap on every one.
+static void account_join_by_code(PCharacter *ch, const DLString &code)
+{
+    DLString id = AccountManager::accountOf(ch->getName());
+    if (id.empty()) {
+        ch->pecho(_("Ты не привязан к аккаунту. Этот код вводят персонажем, который уже на аккаунте."));
+        return;
+    }
+
+    LinkingCode::Entry entry;
+    if (!LinkingCode::redeem(code, entry)) {
+        Json::Value a;
+        a["char"] = ch->getName();
+        a["result"] = "invalid_or_expired";
+        AccountAudit::record("code_join", a);
+        if (!ch->is_immortal())
+            ch->setWait(12);   // slow a guesser between tries
+        ch->pecho(_("Код неверный или истек. Новый: {yаккаунт связать{x персонажем, которого добавляешь."));
+        return;
+    }
+
+    // Refusals below run after redeem, so the code is spent either way: a code that
+    // reached the wrong hands should not stay live for a second try.
+    DLString cname = entry.charName;
+    cname.capitalize();
+
+    if (entry.pendingCreation) {
+        ch->pecho(_("Этот персонаж еще создается. Введи код после того, как он войдет в игру."));
+        return;
+    }
+
+    PCMemoryInterface *pcm = PCharacterManager::find(cname);
+    if (pcm == 0) {
+        ch->pecho(_("Персонаж %1$s не найден."), cname.c_str());
+        return;
+    }
+
+    DLString minterAccount = AccountManager::accountOf(pcm->getName());
+    if (minterAccount == id) {
+        ch->pecho(_("%1$s уже на твоем аккаунте."), pcm->getName().c_str());
+        return;
+    }
+    // Never move a char between accounts on a bare code.
+    if (!minterAccount.empty()) {
+        Json::Value a;
+        a["char"] = ch->getName();
+        a["minter"] = pcm->getName();
+        a["account"] = id;
+        a["result"] = "refused_other_account";
+        AccountAudit::record("code_join", a);
+        ch->pecho(_("%1$s уже привязан к другому аккаунту."), pcm->getName().c_str());
+        return;
+    }
+
+    if (!AccountManager::attachChar(id, pcm->getName())) {
+        ch->pecho(_("Не удалось добавить персонажа. Попробуй позже."));
+        return;
+    }
+
+    Json::Value a;
+    a["char"] = ch->getName();
+    a["minter"] = pcm->getName();
+    a["account"] = id;
+    a["result"] = "ok";
+    AccountAudit::record("code_join", a);
+
+    DLString title = AccountManager::titleOf(id);
+    ch->pecho(_("%1$s добавлен к аккаунту {W%2$s{x."), pcm->getName().c_str(), title.c_str());
+    account_bank_cap_notice(ch, id);
+
+    // Minter echo: the code is a bearer credential, so a misdirected paste must be
+    // caught at once, not discovered later as a char that switches to a stranger.
+    PCharacter *online = PCharacterManager::findPlayer(pcm->getName());
+    if (online)
+        online->pecho(_("Твой код привязки использован: %1$s добавил тебя к аккаунту {W%2$s{x. Если это не ты -- сразу смени пароль командой {yпароль{x."),
+                      ch->getName().c_str(), title.c_str());
+}
+
 // `account code <NNNNNN>`: check the code and, on success, attach the verified
-// address to this character's account.
+// address to this character's account. A `DL-` linking code goes to
+// account_join_by_code instead.
 static void account_email_verify_cmd(PCharacter *ch, const DLString &rawCode)
 {
     if (!LinkingCode::mintingEnabled() && !ch->is_immortal()) {
         ch->pecho(_("Привязка аккаунтов скоро откроется. Немного терпения."));
+        return;
+    }
+
+    DLString upper = rawCode;
+    upper.toUpper();
+    if (upper.find("DL-") == 0) {
+        account_join_by_code(ch, upper);
         return;
     }
 
