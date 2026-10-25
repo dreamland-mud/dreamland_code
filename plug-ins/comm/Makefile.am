@@ -36,6 +36,7 @@ groupchannel.cpp \
 following.cpp \
 help.cpp \
 helpcategory.cpp \
+helpworldindex.cpp \
 score.cpp \
 title.cpp \
 pcname.cpp \
