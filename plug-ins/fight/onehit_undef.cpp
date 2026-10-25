@@ -701,6 +701,19 @@ void UndefinedOneHit::damEffectMasterSword( )
             
     katana->cost = 0;
 
+    // The blade grows with its owner: dice are cut for the blade's level, so a
+    // katana forged at 60 catches up with a samurai who has outgrown it. Done
+    // before the hr/dr step so their caps also follow the new level. Exact
+    // owner only: the ED check above is a substring match. Tier 2 mirrors the
+    // forge in dreamland_fenia craft/blacksmith craftKatanaMakeFn.
+    if (katana->hasOwner( ch ) && katana->level < ch->getRealLevel( )) {
+        katana->level = ch->getRealLevel( );
+        WeaponGenerator()
+            .item(katana)
+            .valueTier(2)
+            .assignValues();
+    }
+
     WeaponGenerator()
         .item(katana)
         .skill(gsn_katana)
