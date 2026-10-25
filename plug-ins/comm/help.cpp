@@ -38,6 +38,7 @@ const int WORD_EXACT = 100;     // query word equals a keyword word
 const int WORD_PREFIX = 90;     // query word of PREFIX_MIN+ letters starts a keyword word
 const int WORD_FUZZY = 80;      // minus FUZZY_STEP per edit
 const int WORD_STEM = 70;       // long common prefix (inflection), minus the unshared tail
+const int WORD_WEAK = 1;        // a 4-letter substitution: ranks below every other match
 const int FUZZY_STEP = 15;
 const int DF_BONUS = 50;        // divided by the number of articles the word matched: rare words win
 const int MULTI_MIN_WORDS = 2;  // union results need this many matched words when the query has 3+
@@ -46,7 +47,7 @@ const size_t PREFIX_MIN = 3;
 const size_t STEM_MIN_PREFIX = 5;
 const size_t STEM_ABBR_PREFIX = 4;
 const size_t FUZZY_MIN_LEN = 5;   // shorter query words get no free edit (шлем/шлеп, моба/мова)
-const size_t SHORT_TYPO_LEN = 4;  // ... except the two typos that stay unambiguous at four letters
+const size_t SHORT_TYPO_LEN = 4;  // ... except a swap or a plural letter, and a weak substitution
 const size_t FLIP_MIN_LEN = 3;    // every word this long before a layout flip is tried (уф -> ea)
 const size_t MAX_WORDS = 8;       // a pasted sentence costs no more than a short question
 const size_t NUMBER_MAX_DIGITS = 6;
@@ -93,10 +94,10 @@ size_t stem_len(const DLString &q, const DLString &k)
 }
 
 /** Score of one lowercase query word against one lowercase keyword word, 0 for
- *  no match. Without `stem` only exact, prefix and edit matches count: a word
- *  pair glued together (fire ball -> fireball) must not match a keyword that
- *  merely starts it (темный шлем -> темный). */
-int word_score(const DLString &q, const DLString &k, bool stem = true)
+ *  no match. A `glued` pair of query words (fire ball -> fireball) gets neither
+ *  the stem rule, or it would match a keyword that merely starts it (темный
+ *  шлем -> темный), nor the weak substitution: that would be a guess on a guess. */
+int word_score(const DLString &q, const DLString &k, bool glued = false)
 {
     if (q == k)
         return WORD_EXACT;
@@ -121,16 +122,20 @@ int word_score(const DLString &q, const DLString &k, bool stem = true)
         // Four letters are too few for a free edit, but two neighbours swapped
         // (bsah, kcik) or one letter added to a three-letter word (the plural:
         // шары, мечи) almost always lead to a single keyword word. Weights make
-        // a swap the only distance-1 edit.
+        // a swap the only distance-1 edit. One substituted letter (lokk) is as
+        // likely a different word (шлем/шлеп), so it only scores WORD_WEAK.
         if (k.size() == SHORT_TYPO_LEN && levenshtein(q, k, 1, 2, 2, 2) == 1)
             best = WORD_FUZZY - FUZZY_STEP;
         else if (k.size() + 1 == q.size() && q.compare(0, k.size(), k) == 0)
             best = WORD_FUZZY - FUZZY_STEP;
+        else if (!glued && k.size() == SHORT_TYPO_LEN && levenshtein(q, k, 1, 1, 1, 1) == 1)
+            best = WORD_WEAK;
     }
 
-    size_t p = stem ? stem_len(q, k) : 0;
+    size_t p = glued ? 0 : stem_len(q, k);
     if (p > 0) {
-        int sc = WORD_STEM - (int)(max(q.size(), k.size()) - p);
+        // Never as low as WORD_WEAK, whatever the unshared tail.
+        int sc = max(WORD_STEM - (int)(max(q.size(), k.size()) - p), WORD_WEAK + 1);
         if (sc > best)
             best = sc;
     }
@@ -530,7 +535,7 @@ private:
                 DLString pairHint;
 
                 for (auto &k: kwords) {
-                    int sc = word_score(pairs[i], k, false);
+                    int sc = word_score(pairs[i], k, true);
                     if (sc > pairBest) {
                         pairBest = sc;
                         pairHint = k;
@@ -570,58 +575,77 @@ private:
         if (cands.empty())
             return;
 
-        // How many articles each query word matched: a word matching one
-        // article says more than a word matching twenty.
+        // How many articles each query word really matched: a word matching
+        // one article says more than a word matching twenty. Weak matches stay
+        // out, so they cannot make a word look rare.
         vector<int> df(n, 0);
         for (auto &c: cands)
             for (size_t i = 0; i < n; i++)
-                if (c.best[i] > 0)
+                if (c.best[i] > WORD_WEAK)
                     df[i]++;
 
         struct Ranked {
-            int matched;
-            int score;
+            int strong;     // words matched by anything but a weak substitution
+            int weak;       // words matched by a weak substitution only
+            int score;      // of the strong words
             size_t cand;
             size_t hintWord;
         };
         vector<Ranked> ranked;
-        bool full = false;
+        int need = n >= 3 ? MULTI_MIN_WORDS : 1;
+        bool full = false, anyStrong = false;
 
         for (size_t ci = 0; ci < cands.size(); ci++) {
-            Ranked r = { 0, 0, ci, 0 };
+            Ranked r = { 0, 0, 0, ci, 0 };
             int bestWord = -1;
 
             for (size_t i = 0; i < n; i++) {
-                if (cands[ci].best[i] <= 0)
-                    continue;
+                int b = cands[ci].best[i];
+                int sc = 0;
 
-                int sc = cands[ci].best[i] + DF_BONUS / df[i];
-                r.matched++;
-                r.score += sc;
+                if (b <= 0)
+                    continue;
+                if (b > WORD_WEAK) {
+                    sc = b + DF_BONUS / df[i];
+                    r.strong++;
+                    r.score += sc;
+                }
+                else
+                    r.weak++;
+
                 if (sc > bestWord) {
                     bestWord = sc;
                     r.hintWord = i;
                 }
             }
 
-            if (r.matched == (int)n)
+            if (r.strong == (int)n)
                 full = true;
+            if (r.strong > 0 && r.strong + r.weak >= need)
+                anyStrong = true;
             ranked.push_back(r);
         }
 
-        int need = full ? (int)n : (n >= 3 ? MULTI_MIN_WORDS : 1);
-
+        // Strong matches decide: an article matching every word that way wins
+        // outright. Otherwise a weak substitution only breaks ties between
+        // strong matches, and an article matched by weak ones alone is shown
+        // only when nothing matched for real.
         sort(ranked.begin(), ranked.end(), [&](const Ranked &x, const Ranked &y) {
-            if (x.matched != y.matched)
-                return x.matched > y.matched;
+            if (x.strong != y.strong)
+                return x.strong > y.strong;
             if (x.score != y.score)
                 return x.score > y.score;
+            if (x.weak != y.weak)
+                return x.weak > y.weak;
             return cands[x.cand].article->getID() < cands[y.cand].article->getID();
         });
 
         for (auto &r: ranked) {
-            if (r.matched < need || (int)hits.size() >= MAX_RESULTS)
+            if ((int)hits.size() >= MAX_RESULTS)
                 break;
+            if (full ? r.strong < (int)n
+                     : r.strong + r.weak < need || (anyStrong && r.strong == 0))
+                continue;
             hits.push_back(Hit{cands[r.cand].article, cands[r.cand].hint[r.hintWord], TEXT});
         }
     }
