@@ -4,6 +4,7 @@
  */
 #include "logstream.h"
 #include "helpmanager.h"
+#include "integer.h"
 #include "character.h"
 #include "multimessage.h"
 
@@ -124,7 +125,41 @@ void HelpArticle::refreshKeywords()
 
 bool HelpArticle::visible( Character *ch ) const
 {
+    if (getAliasTarget())
+        return false;
+
     return ch->get_trust( ) >= level;
+}
+
+const StringSet & HelpArticle::getRefBy() const
+{
+    return refby;
+}
+
+static int alias_id(const StringSet &refby)
+{
+    for (auto &r: refby) {
+        Integer v;
+        if (Integer::tryParse(v, r))
+            return v;
+    }
+
+    return 0;
+}
+
+HelpArticle::Pointer HelpArticle::getAliasTarget() const
+{
+    int id = alias_id(refby);
+
+    if (id <= 0 || id == getID() || !helpManager)
+        return Pointer();
+
+    Pointer target = helpManager->getArticle(id);
+
+    if (!target || alias_id(target->refby) > 0)
+        return Pointer();
+
+    return target;
 }
 
 /*

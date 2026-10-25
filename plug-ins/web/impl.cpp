@@ -1174,6 +1174,14 @@ public:
         Json::Value helps;
         HelpArticles::const_iterator a;
 
+        // Target id -> alias ids.
+        std::multimap<int, int> aliases;
+        for (auto &b: helpManager->getArticles()) {
+            HelpArticle::Pointer target = b->getAliasTarget();
+            if (target && b->getID() > 0)
+                aliases.insert(std::make_pair(target->getID(), b->getID()));
+        }
+
         for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
             if ((*a)->visible(&dummy) && (*a)->getID() > 0) {
                 Json::Value h;
@@ -1199,6 +1207,11 @@ public:
                 // this out from the raw labels; publishing it here means the
                 // site, the in-game browser and the dump cannot disagree.
                 h["cat"] = (*a)->getCategory();
+
+                // Alias ids that open this article, so old '{hh<alias>' links resolve on the site.
+                auto al = aliases.equal_range((*a)->getID());
+                for (auto i = al.first; i != al.second; i++)
+                    h["aliases"].append(i->second);
 
                 for (int i = 0; i < 3; i++) {
                     const DLString suffix = dumpLangs[i].suffix;
