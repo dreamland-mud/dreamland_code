@@ -103,7 +103,7 @@ char translit(lang_t lang, char c)
     case 'і':    return 's';
     case 'э':    return '\'';
     case 'ё':    return '`';
-    case 'я':    return 'я';
+    case 'я':    return 'z';
     case 'ч':    return 'x';
     case 'с':    return 'c';
     case 'м':    return 'v';

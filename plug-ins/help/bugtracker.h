@@ -24,6 +24,9 @@ public:
     virtual ~BugTracker( );
     
     void reportNohelp( PCharacter *ch, const DLString &txt ) const;
+    /** A miss some fallback (a guess, a numbered list) answered: logged to
+     *  the nohelp file with an [fz] tag for analysis, never queued for Trello. */
+    void reportNohelpAnswered( PCharacter *ch, const DLString &txt ) const;
     void reportMessage(const DLString &msgType, PCharacter *ch, const DLString &message) const;
     void reportMessage(const DLString &msgType, const DLString &authorName, const DLString &message, const DLString &location = DLString::emptyString) const;
 

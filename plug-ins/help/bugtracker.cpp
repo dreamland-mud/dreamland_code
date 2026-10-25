@@ -38,6 +38,11 @@ void BugTracker::reportNohelp( PCharacter *ch, const DLString &txt ) const
     writeMessage("nohelp", ch->getName(), txt, ch->in_room->vnum, nohelpWorthTrello(ch, txt));
 }
 
+void BugTracker::reportNohelpAnswered( PCharacter *ch, const DLString &txt ) const
+{
+    writeMessage("nohelp", ch->getName(), "[fz] " + txt, ch->in_room->vnum, false);
+}
+
 // nohelp.txt keeps every miss for analysis, the Trello feed only gets what a human should read:
 // no immortals or API bots, no bare numbers or 1-2 char stubs, one copy of a query per 24 hours.
 bool BugTracker::nohelpWorthTrello(PCharacter *ch, const DLString &txt) const
