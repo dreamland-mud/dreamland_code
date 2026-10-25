@@ -24,9 +24,10 @@ public:
     virtual ~BugTracker( );
     
     void reportNohelp( PCharacter *ch, const DLString &txt ) const;
-    /** A miss some fallback (a guess, a numbered list) answered: logged to
-     *  the nohelp file with an [fz] tag for analysis, never queued for Trello. */
-    void reportNohelpAnswered( PCharacter *ch, const DLString &txt ) const;
+    /** A miss some fallback answered: logged to the nohelp file with a tag
+     *  naming the fallback ([fz] a guess or a numbered list, [wa]/[wr]/[wm]/[wo]
+     *  a zone, room, mob or object name) for analysis, never queued for Trello. */
+    void reportNohelpAnswered( PCharacter *ch, const DLString &txt, const DLString &tag = "fz" ) const;
     void reportMessage(const DLString &msgType, PCharacter *ch, const DLString &message) const;
     void reportMessage(const DLString &msgType, const DLString &authorName, const DLString &message, const DLString &location = DLString::emptyString) const;
 

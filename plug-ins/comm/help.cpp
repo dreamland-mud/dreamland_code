@@ -19,6 +19,9 @@
 #include "helpcategory.h"
 #include "translit.h"
 #include "l10n.h"
+#include "helpworldindex.h"
+#include "areahelp.h"
+#include "area.h"
 
 /*---------------------------------------------------------------------------*
  * Help
@@ -850,6 +853,93 @@ static void help_index_summary(Character *ch, const DLString &cmdName)
     page_to_char(buf.str().c_str(), ch);
 }
 
+/*-----------------------------------------------------------------------
+ * World names -- help revamp Phase 4b
+ *
+ * A miss that is the exact name of a zone, room, creature or item gets the
+ * zones it lives in instead of a dead end. One sentence per kind, zone names
+ * linked to their help, no vnums: a screen reader reads it as plain prose.
+ *-----------------------------------------------------------------------*/
+static const unsigned int WORLD_MAX_ZONES = 5;
+
+static DLString world_zone_list(Character *ch, const std::list<AreaIndexData *> &areas)
+{
+    lang_t lang = Player::displayLang(ch);
+    DLString result;
+    unsigned int shown = 0;
+
+    for (auto area: areas) {
+        if (shown >= WORLD_MAX_ZONES)
+            break;
+
+        if (shown > 0)
+            result += ", ";
+
+        DLString name = area->getName(lang);
+        int hid = area_helpid(area);
+        if (hid > 0)
+            result += fmt(0, "{hh%d%s{x", hid, name.c_str());
+        else
+            result += name;
+
+        shown++;
+    }
+
+    if (areas.size() > shown)
+        result += fmt(ch, _(" и ещё %1$d"), (int)(areas.size() - shown));
+
+    return result;
+}
+
+/** Print what the world knows about the query; false when it knows nothing. */
+static bool help_world_answer(Character *ch, const DLString &query, bool keywords)
+{
+    HelpWorldHits hits = help_world_lookup(query, keywords);
+    if (hits.empty())
+        return false;
+
+    ostringstream buf;
+    buf << l(ch, "Справки с таким названием нет, но в мире оно встречается.") << endl;
+
+    if (!hits.areas[HWK_AREA].empty())
+        buf << fmt(ch, _("Так называется зона: %1$s."),
+                   world_zone_list(ch, hits.areas[HWK_AREA]).c_str()) << endl;
+
+    if (!hits.areas[HWK_ROOM].empty())
+        buf << fmt(ch, _("Так называется место в зонах: %1$s."),
+                   world_zone_list(ch, hits.areas[HWK_ROOM]).c_str()) << endl;
+
+    if (!hits.areas[HWK_MOB].empty()) {
+        if (hits.keywordOnly)
+            buf << fmt(ch, _("Похоже на существо из зон: %1$s."),
+                       world_zone_list(ch, hits.areas[HWK_MOB]).c_str()) << endl;
+        else
+            buf << fmt(ch, _("Так зовут существо из зон: %1$s."),
+                       world_zone_list(ch, hits.areas[HWK_MOB]).c_str()) << endl;
+    }
+
+    if (!hits.areas[HWK_OBJ].empty()) {
+        if (hits.keywordOnly)
+            buf << fmt(ch, _("Похоже на предмет из зон: %1$s."),
+                       world_zone_list(ch, hits.areas[HWK_OBJ]).c_str()) << endl;
+        else
+            buf << fmt(ch, _("Так называется предмет из зон: %1$s."),
+                       world_zone_list(ch, hits.areas[HWK_OBJ]).c_str()) << endl;
+    }
+
+    ch->send_to(buf);
+
+    // One tag for the strongest kind that answered, so 4c can count them.
+    static const char *tags[HWK_MAX] = { "wa", "wr", "wm", "wo" };
+    for (int k = 0; k < HWK_MAX; k++)
+        if (!hits.areas[k].empty()) {
+            bugTracker->reportNohelpAnswered(ch->getPC(), query, tags[k]);
+            break;
+        }
+
+    return true;
+}
+
 CMDRUNP( help )
 {
     std::basic_ostringstream<char> buf;
@@ -921,8 +1011,11 @@ CMDRUNP( help )
     
     // Поиск по строке без чисел.
     HelpFinder::ArticleArray articles = HelpFinder(ch, argument).getArticles();
-    // No match, try fuzzy matching.
+    // No match: a whole world name says more than a guess, a lone keyword says less.
     if (articles.empty()) {
+        if (!nthMiss && help_world_answer(ch, origArgument, false))
+            return;
+
         if (origArgument.size() > 1) {
             FuzzySearch fs(ch, argument);
             if (fs.hasResults()) {
@@ -937,6 +1030,9 @@ CMDRUNP( help )
             }
         }
         
+        if (!nthMiss && help_world_answer(ch, origArgument, true))
+            return;
+
         ch->pecho(_("Нет подсказки по данному слову."));
         bugTracker->reportNohelp( ch->getPC(), origArgument.c_str( ) );
         return;

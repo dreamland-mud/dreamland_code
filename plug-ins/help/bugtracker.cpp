@@ -38,9 +38,9 @@ void BugTracker::reportNohelp( PCharacter *ch, const DLString &txt ) const
     writeMessage("nohelp", ch->getName(), txt, ch->in_room->vnum, nohelpWorthTrello(ch, txt));
 }
 
-void BugTracker::reportNohelpAnswered( PCharacter *ch, const DLString &txt ) const
+void BugTracker::reportNohelpAnswered( PCharacter *ch, const DLString &txt, const DLString &tag ) const
 {
-    writeMessage("nohelp", ch->getName(), "[fz] " + txt, ch->in_room->vnum, false);
+    writeMessage("nohelp", ch->getName(), "[" + tag + "] " + txt, ch->in_room->vnum, false);
 }
 
 // nohelp.txt keeps every miss for analysis, the Trello feed only gets what a human should read:
