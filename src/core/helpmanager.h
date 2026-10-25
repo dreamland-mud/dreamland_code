@@ -42,8 +42,17 @@ public:
     virtual void fromXML( const XMLNode::Pointer& ) ;
     /** Return help article formatted for this char. */
     virtual DLString getText( Character * = NULL ) const;
-    /** True if help article is visible (e.g. via level restrictions). */
+    /** True if help article is visible (e.g. via level restrictions). An alias
+     *  is never visible itself: lookups hand the reader over to its target. */
     virtual bool visible( Character * ) const;
+
+    /** Names from the 'refby' attribute: commands for CommandHelp, or an article id. */
+    const StringSet & getRefBy() const;
+
+    /** The article this one is an alias of, set by a numeric 'refby' ('refby="628"'
+     *  on a behavior article that duplicates skill 628). One hop only: a target that
+     *  is itself an alias, or a missing id, means no alias. */
+    Pointer getAliasTarget() const;
     /** Persist an XML file containing this article to disk. */
     virtual void save() const;
 

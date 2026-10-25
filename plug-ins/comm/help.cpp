@@ -157,8 +157,12 @@ struct HelpFinder {
         if (Integer::tryParse(id, args)) {
             HelpArticle::Pointer exact = helpManager->getArticle(id);
             
-            if (exact)
+            if (exact) {
+                HelpArticle::Pointer target = exact->getAliasTarget();
+                if (target)
+                    exact = target;
                 articles.push_back(exact);
+            }
             return;
         }
 
@@ -190,13 +194,26 @@ private:
         HelpArticles::const_iterator a;
 
         for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-            if (!(*a)->visible( ch ))
+            // An alias answers to its own keywords but shows its target.
+            HelpArticle::Pointer self(*a);
+            HelpArticle::Pointer shown = self->getAliasTarget();
+            if (!shown)
+                shown = self;
+
+            if (!shown->visible( ch ))
                 continue;
 
             if (!articleMatches(*a))
                 continue;
+
+            bool seen = false;
+            for (auto &x: articles)
+                if (x.getPointer() == shown.getPointer())
+                    seen = true;
+            if (seen)
+                continue;
             
-            articles.push_back(*a); 
+            articles.push_back(shown); 
         }
     }
 
