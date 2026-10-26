@@ -16,6 +16,7 @@
 #include "skillreference.h"
 #include "core/object.h"
 #include "pcharacter.h"
+#include "npcharacter.h"
 #include "profession.h"
 #include "profflags.h"
 #include "flagtableregistry.h"
@@ -72,7 +73,7 @@ static int proc_chance(int tierFloor)
  *-------------------------------------------------------------------------*/
 ItemAffixRoller::ItemAffixRoller(Object *obj, PCharacter *pch, int tier, const DLString &kind, const DLString &slot)
         : crafted(false), rollsOverride(0), obj(obj), pch(pch), tier(tier), kind(kind), slot(slot), isCaster(false), align(ALIGN_NONE),
-          chosenTotal(0), extraFlags(0, &extra_flags)
+          sigPool(false), chosenTotal(0), extraFlags(0, &extra_flags)
 {
 }
 
@@ -116,8 +117,8 @@ void ItemAffixRoller::flushAffects()
  * ArmorGenerator
  *-------------------------------------------------------------------------*/
 ArmorGenerator::ArmorGenerator(Object *obj, PCharacter *pch, int tier, const DLString &slot)
-        : ItemAffixRoller(obj, pch, tier, "armor", slot), procs(Json::arrayValue), keepName(false),
-          craftMin(0), craftMax(0)
+        : ItemAffixRoller(obj, pch, tier, "armor", slot), sigIndex(-1),
+          procs(Json::arrayValue), keepName(false), craftMin(0), craftMax(0)
 {
 }
 
@@ -162,6 +163,7 @@ bool ArmorGenerator::run()
     int sig = crafted ? -1 : pickSignature();
     if (sig >= 0)
         forced[sig] = 1;
+    sigIndex = sig;
 
     const weapon_tier_t &t = weapon_tier_table[tier - 1];
     if (crafted) {
@@ -188,7 +190,7 @@ bool ArmorGenerator::run()
         assignAC();
         if (keepName)
             assignColours();
-        else
+        else if (sigIndex < 0 || !assignSignatureNames())
             assignNames();
     }
     assignFlags();
@@ -209,25 +211,33 @@ bool ArmorGenerator::run()
  * Boss signature
  *-------------------------------------------------------------------------*/
 /** Legendary armor from a boss carries one signature affix (Kit 2026-10-05):
- *  50/50 a resist to the boss's damage type or one of its spells as a proc.
- *  The affix comes from the ordinary pool, so the killer's fit, the caps and
- *  the price all apply; when that half has nothing in the pool the other is
- *  tried, and with neither the item rolls as usual. */
+ *  50/50 a defense against the boss's damage type or one of its spells as a
+ *  proc. The defense is a resist, or at signature.imm_pct an immunity when the
+ *  pool has one for that damage type (never a physical one; the elemental
+ *  immunities exist only for signatures, needs_boss). The affix comes from the
+ *  ordinary pool, so the killer's fit, the caps and the price all apply; when
+ *  that half has nothing in the pool the other is tried, and with neither the
+ *  item rolls as usual. */
 int ArmorGenerator::pickSignature() const
 {
     if (tier != BEST_TIER || (sigDamtype.empty() && sigSpells.empty()))
         return -1;
 
-    int resist = -1;
+    int resist = -1, immune = -1;
     std::vector<int> procIdx;
     for (int i = 0; i < (int)pool.size(); i++) {
         const Candidate &c = pool[i];
         if (c.section == "resists" && c.value == sigDamtype)
             resist = i;
+        else if (c.section == "immunes" && c.value == sigDamtype)
+            immune = i;
         else if (c.section == "proc"
                  && std::find(sigSpells.begin(), sigSpells.end(), c.value) != sigSpells.end())
             procIdx.push_back(i);
     }
+
+    if (immune >= 0 && number_percent() <= item_affixes["signature"]["imm_pct"].asInt())
+        resist = immune;
 
     int proc = procIdx.empty() ? -1 : procIdx.at(number_range(0, procIdx.size() - 1));
     if (number_range(0, 1) == 0)
@@ -344,8 +354,12 @@ bool ItemAffixRoller::candidateAllowed(const Json::Value &section, const Json::V
         return false;
 
     // The signature section is a marker: ArmorGenerator::pickSignature forces the
-    // boss's resist or proc from the sections that price them.
-    if (section["needs_boss"].asBool() || affix["needs_boss"].asBool())
+    // boss's resist or proc from the sections that price them. A needs_boss affix
+    // (an elemental immunity) joins the pool only for a signature roll, and only
+    // pickSignature may take it.
+    if (section["needs_boss"].asBool())
+        return false;
+    if (affix["needs_boss"].asBool() && !sigPool)
         return false;
 
     if ((section["needs_player"].asBool() || affix["needs_player"].asBool()) && !pch)
@@ -725,6 +739,7 @@ void ItemAffixRoller::collectCandidates()
             for (auto const &cf: affix["conflicts"])
                 c.conflicts.insert(cf.asString());
             c.conflictsWith = section["conflictsWith"].asString();
+            c.sigOnly = affix["needs_boss"].asBool();
 
             pool.push_back(c);
         }
@@ -898,7 +913,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
             std::vector<int> core;
             int weights = 0;
             for (int i = 0; i < (int)pool.size(); i++) {
-                if (!isCore[i] || picked.count(i) || total + pool[i].price > maxM)
+                if (!isCore[i] || pool[i].sigOnly || picked.count(i) || total + pool[i].price > maxM)
                     continue;
                 if ((int)picked.size() >= maxAffixes || conflicts(pool[i], picked))
                     continue;
@@ -933,6 +948,9 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
                 const Candidate &c = pool[i];
                 auto it = picked.find(i);
                 bool fresh = (it == picked.end());
+
+                if (c.sigOnly)
+                    continue;
 
                 if (needStats && !isStat[i] && !floorExempt[i])
                     continue;
@@ -1370,6 +1388,87 @@ void ArmorGenerator::assignNames()
             DLString s = obj->getShortDescr((lang_t)l);
             obj->setShortDescr("{" + colour + s.colourStrip() + "{x", (lang_t)l);
         }
+}
+
+/** A boss's name for its signature piece: colours off, cut at the first comma
+ *  ("Мизелак, Лич-Повелитель" -> "Мизелак"). */
+static DLString sig_boss_name(NPCharacter *boss, char gcase, lang_t lang)
+{
+    DLString name = boss->getNameP(gcase, lang).colourStrip();
+    DLString::size_type comma = name.find(',');
+    if (comma != DLString::npos)
+        name = name.substr(0, comma);
+    name.stripWhiteSpace();
+    return name;
+}
+
+ArmorGenerator & ArmorGenerator::signatureBoss(Character *boss)
+{
+    if (!boss || !boss->is_npc())
+        return *this;
+
+    NPCharacter *mob = boss->getNPC();
+    sigBossRu = sig_boss_name(mob, '2', LANG_RU);
+    sigBossUa = sig_boss_name(mob, '2', LANG_UA);
+
+    // English shorts carry no article: "the red dragon" -> "red dragon's".
+    DLString en = sig_boss_name(mob, '1', LANG_EN);
+    for (const char *art: { "the ", "a ", "an " }) {
+        DLString a(art);
+        if (en.size() > a.size() && DLString(en.substr(0, a.size())).toLower() == a) {
+            en = en.substr(a.size());
+            break;
+        }
+    }
+    sigBossEn = en;
+    return *this;
+}
+
+/** A signature piece is named after the boss and a random trait from
+ *  item_affixes signature.names: "Jher's malice", "злоба Джэра". The long
+ *  description and keywords still come from the wear noun, so the piece says
+ *  what it is when it lies on the floor. */
+bool ArmorGenerator::assignSignatureNames()
+{
+    const Json::Value &names = item_affixes["signature"]["names"];
+    if (!names.isArray() || names.size() == 0 || sigBossRu.empty())
+        return false;
+
+    const Json::Value &trait = names[(Json::ArrayIndex)number_range(0, names.size() - 1)];
+
+    obj->gram_gender = MultiGender(trait["gender"].asString().c_str());
+
+    obj->setShortDescr(random_item_compose_short(
+        DLString::emptyString, trait["short"].asString(), sigBossRu), LANG_RU);
+    obj->setShortDescr(random_item_compose_short(
+        DLString::emptyString, trait["short_ua"].asString(),
+        sigBossUa.empty() ? sigBossRu : sigBossUa), LANG_UA);
+
+    DLString en = trait["short_en"].asString();
+    if (!sigBossEn.empty()) {
+        char last = sigBossEn.at(sigBossEn.size() - 1);
+        en = sigBossEn + (last == 's' ? "' " : "'s ") + en;
+    }
+    obj->setShortDescr(en, LANG_EN);
+
+    obj->setDescription(nounConfig["long"].asString().c_str(), LANG_RU);
+    obj->setDescription(nounConfig["long_en"].asString().c_str(), LANG_EN);
+    obj->setDescription(nounConfig["long_ua"].asString().c_str(), LANG_UA);
+
+    StringList keywords(nounConfig["name"].asString());
+    StringList traitWords(trait["name"].asString());
+    for (auto const &w: traitWords)
+        keywords.addUnique(w);
+    obj->setKeyword(keywords.join(" ").c_str());
+
+    DLString colour = weapon_tier_table[tier - 1].colour;
+    if (!colour.empty())
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            DLString s = obj->getShortDescr((lang_t)l);
+            obj->setShortDescr("{" + colour + s.colourStrip() + "{x", (lang_t)l);
+        }
+
+    return true;
 }
 
 void ArmorGenerator::assignColours()

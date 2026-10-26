@@ -44,6 +44,7 @@ public:
         int tierFloor;
         std::set<DLString> conflicts;
         DLString conflictsWith;
+        bool sigOnly;       // needs_boss: only a boss signature may pick it
     };
 
     /** One prefix or suffix candidate for the name: an affix entry and its weight. */
@@ -126,6 +127,8 @@ protected:
     DLString slot;
     bool isCaster;
     int align;
+    /** A boss signature is wanted: needs_boss affixes join the pool (sigOnly). */
+    bool sigPool;
 
     std::set<int> playerGroups;
     std::map<int, int> groupCounts;     // group -> learned skills of the killer in it
@@ -188,8 +191,11 @@ public:
     {
         this->sigDamtype = damtype;
         this->sigSpells = spells;
+        this->sigPool = !damtype.empty() || !spells.empty();
         return *this;
     }
+    /** The dead boss, for the signature piece's name ("Jher's malice"). */
+    ArmorGenerator & signatureBoss(Character *boss);
 
     /** Roll everything. False when the configuration can't serve this slot. */
     bool run();
@@ -205,6 +211,8 @@ private:
     void applyOne(const Candidate &c, int count);
     void assignAC();
     void assignNames();
+    /** A signature piece is named after its boss; false when it can't be. */
+    bool assignSignatureNames();
     /** keepIdentity: the tier colour on the item's own names. */
     void assignColours();
     void assignFlags();
@@ -215,6 +223,9 @@ private:
     Json::Value nounConfig;
     DLString sigDamtype;
     std::vector<DLString> sigSpells;
+    /** The boss's name: genitive in Russian and Ukrainian, nominative in English. */
+    DLString sigBossRu, sigBossUa, sigBossEn;
+    int sigIndex;
     DLString wornBuff;
     Json::Value procs;
     bool keepName;
