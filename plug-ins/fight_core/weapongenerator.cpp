@@ -469,7 +469,7 @@ public:
             lo = (int)(t.min_m * share * curve);
             hi = (int)(t.max_m * share * curve);
         }
-        pickAffixes(lo, hi, t.worst_penalty_m,
+        pickAffixes(lo, hi, t.worst_penalty_m, t.min_affixes_m,
                     t.max_affixes_m > 0 ? t.max_affixes_m + maxAffixesBonus : 0,
                     t.max_negatives_m, forced);
 
@@ -513,9 +513,9 @@ protected:
         return ItemAffixRoller::candidateAllowed(section, affix, floor);
     }
 
-    virtual int candidateWeight(const DLString &secName, const Json::Value &affix) const
+    virtual double candidateWeight(const DLString &secName, const Json::Value &affix) const
     {
-        int weight = ItemAffixRoller::candidateWeight(secName, affix);
+        double weight = ItemAffixRoller::candidateWeight(secName, affix);
         if (preferred.count(affix["value"].asString()))
             weight *= 3;
         return weight;
@@ -651,6 +651,9 @@ private:
 
 WeaponGenerator & WeaponGenerator::randomAffixes()
 {
+    // A reroll starts from the plain weight; +weight sets it again if it rolls.
+    obj->removeProperty("weight_pct");
+
     const Json::Value &config = weapon_m_config();
     if (!twoHandsDecided)
         decideTwoHands();

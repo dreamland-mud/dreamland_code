@@ -123,7 +123,11 @@ int Language::getLearned( Character *ch ) const
     learned = ch->getPC( )->getSkillData( getIndex( ) ).learned.getValue( );
     maximum = getMaximum( ch );
     
-    return min( learned, maximum );
+    // Gear adds to a language the speaker already knows (item affix +learned),
+    // up to native mastery.
+    if (learned <= 0)
+        return 0;
+    return URANGE( 0, min( learned, maximum ) + ch->getPC( )->mod_skills[getIndex( )], SKILL_NATIVE );
 }
 
 bool Language::canPractice( PCharacter * ch, std::ostream & ) const
