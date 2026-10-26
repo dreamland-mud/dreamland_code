@@ -1636,7 +1636,7 @@ NMI_INVOKE(Root, randomWeaponTier, "(bestTier[, legendaryPerMille]): случа�
     return Register(random_weapon_tier(bestTier, legendaryPerMille));
 }
 
-NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spells]): случайная броня на базовом прототипе: slot head|body|arms|hands|legs|feet|shield, profile caster берет цены аффиксов для кастера; damtype и spells (через запятую) убитого босса дают легендарке его signature-аффикс; true если удалось")
+NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spells, boss]): случайная броня на базовом прототипе: slot head|body|arms|hands|legs|feet|shield, profile caster берет цены аффиксов для кастера; damtype и spells (через запятую) убитого босса дают легендарке его signature-аффикс, boss -- сам босс, по нему названа легендарка с сигнатурой; true если удалось")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
@@ -1653,6 +1653,8 @@ NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spell
         }
     }
 
+    Character *sigBoss = args.size() > 7 ? argnum2character(args, 8) : 0;
+
     if (obj->item_type != ITEM_ARMOR)
         throw Scripting::Exception("Item is not armor for randomize.");
     if (tier < BEST_TIER || tier > WORST_TIER)
@@ -1664,6 +1666,7 @@ NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spell
                 .caster(profile == "caster")
                 .alignment(ch->alignment)
                 .signature(sigDamtype, sigSpells)
+                .signatureBoss(sigBoss)
                 .run();
 
     return Register(ok);
