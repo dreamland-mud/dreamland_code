@@ -105,10 +105,9 @@ DLString AreaHelp::getTitle(const DLString &label, lang_t lang) const
     return help_title_fmt(lang, _("Зона {c%1$s{x"), name);
 }
 
-static void format_area_quest(AreaQuest *q, ostringstream &qbuf, Character *ch)
+void area_quest_format(AreaQuest *q, ostringstream &qbuf, Character *ch)
 {
-    // %A% is a website map macro -- keep it out of any fmt() format string.
-    qbuf << "{Y%A%{x " << q->description.getForLang(viewerLang(ch))
+    qbuf << q->description.getForLang(viewerLang(ch))
             << "  " << _("Уровни: ").getMessage(ch);
 
     // Restrictions by level and align
@@ -257,8 +256,11 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
         ostringstream qbuf;
 
         for (auto &q: area->quests)
-            if (!q->flags.isSet(AQUEST_HIDDEN))
-                format_area_quest(*q, qbuf, ch);
+            if (!q->flags.isSet(AQUEST_HIDDEN)) {
+                // %A% is a website map macro -- keep it out of any fmt() format string.
+                qbuf << "{Y%A%{x ";
+                area_quest_format(*q, qbuf, ch);
+            }
 
         if (!qbuf.str().empty())
             in << _("{yЗадания{x:").getMessage(ch) << endl << qbuf.str() << endl;

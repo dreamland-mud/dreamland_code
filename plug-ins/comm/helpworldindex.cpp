@@ -55,8 +55,7 @@ DLString help_world_normalize(const DLString &str)
     return result;
 }
 
-/** Zones a player should never be pointed at: unlisted, system and locked ones. */
-static bool area_listed(AreaIndexData *area)
+bool help_world_area_listed(AreaIndexData *area)
 {
     return area && !IS_SET(area->area_flag, AREA_HIDDEN|AREA_SYSTEM|AREA_WIZLOCK);
 }
@@ -107,24 +106,24 @@ static void add_keywords(const XMLMultiString &kw, HelpWorldKind kind, AreaIndex
 static void build_index()
 {
     for (auto area: areaIndexes)
-        if (area_listed(area)) {
+        if (help_world_area_listed(area)) {
             add_multi_name(area->name, HWK_AREA, area);
             add_multi_name(area->altname, HWK_AREA, area);
         }
 
     for (auto &r: roomIndexMap)
-        if (area_listed(r.second->areaIndex))
+        if (help_world_area_listed(r.second->areaIndex))
             add_multi_name(r.second->name, HWK_ROOM, r.second->areaIndex);
 
     for (int i = 0; i < MAX_KEY_HASH; i++) {
         for (MOB_INDEX_DATA *m = mob_index_hash[i]; m; m = m->next)
-            if (area_listed(m->area)) {
+            if (help_world_area_listed(m->area)) {
                 add_multi_name(m->short_descr, HWK_MOB, m->area);
                 add_keywords(m->keyword, HWK_MOB, m->area);
             }
 
         for (OBJ_INDEX_DATA *o = obj_index_hash[i]; o; o = o->next)
-            if (area_listed(o->area)) {
+            if (help_world_area_listed(o->area)) {
                 add_multi_name(o->short_descr, HWK_OBJ, o->area);
                 add_keywords(o->keyword, HWK_OBJ, o->area);
             }

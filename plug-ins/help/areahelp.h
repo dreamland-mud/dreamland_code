@@ -40,6 +40,13 @@ AreaHelp * area_selfhelp(struct AreaIndexData *area);
 /** Get self-help ID for this area, or -1. */
 int area_helpid(struct AreaIndexData *area);
 
+class AreaQuest;
+class Character;
+
+/** One area quest as a line of prose: description, levels, align, how often,
+ *  prerequisite. No bullet, the caller adds one if it lists several. */
+void area_quest_format(AreaQuest *q, ostringstream &qbuf, Character *ch);
+
 /** Return true if this article is empty or consists only of spaces. */
 bool help_is_empty(const HelpArticle &help);
 
