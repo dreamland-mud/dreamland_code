@@ -137,6 +137,9 @@ bool ArmorGenerator::run()
     if (obj->level < 1)
         obj->level = 1;
 
+    // A reroll starts from the plain weight; +weight sets it again if it rolls.
+    obj->removeProperty("weight_pct");
+
     if (keepName) {
         // The first listed material decides the AC hardness; material affixes are off.
         materialName = obj->getMaterial();
@@ -167,10 +170,10 @@ bool ArmorGenerator::run()
 
     const weapon_tier_t &t = weapon_tier_table[tier - 1];
     if (crafted) {
-        pickAffixes(craftMin, craftMax, t.worst_penalty_m, t.max_affixes_m, t.max_negatives_m, forced);
+        pickAffixes(craftMin, craftMax, t.worst_penalty_m, t.min_affixes_m, t.max_affixes_m, t.max_negatives_m, forced);
     } else {
         double curve = windowCurve();
-        pickAffixes((int)(t.min_m * curve), (int)(t.max_m * curve), t.worst_penalty_m,
+        pickAffixes((int)(t.min_m * curve), (int)(t.max_m * curve), t.worst_penalty_m, t.min_affixes_m,
                     t.max_affixes_m, t.max_negatives_m, forced);
     }
     applyAffixes();
@@ -290,7 +293,9 @@ bool ArmorGenerator::valueAllowed(const DLString &secName, const DLString &value
         if (!crafted && (secName == "resists" || secName == "vulns" || secName == "immunes")
                 && obj_has_damtype_bit(obj, value))
             return false;
-        return secName != "material" && secName != "worn_buff";
+        // A crafted piece rolls worn buffs too: any item with a "wornbuff"
+        // property casts it on equip (global onEquipWornBuff).
+        return secName != "material" && (crafted || secName != "worn_buff");
     }
 
     return secName != "material" || materialAllowed(value);
@@ -443,6 +448,14 @@ bool ItemAffixRoller::modelPoints(const DLString &secName, const Json::Value &af
 
     points = 0;
 
+    // A hand-priced affix (the penalties the model has no weight for: size, age,
+    // weight, a language): "points" is a number or [melee, caster].
+    if (affix.isMember("points")) {
+        const Json::Value &p = affix["points"];
+        points = p.isArray() ? p[(Json::ArrayIndex)col].asDouble() : p.asDouble();
+        return true;
+    }
+
     // Senses are priced by affix (item_value.json detects), whatever bits they set.
     if (secName == "senses") {
         points = item_value("detects", value.c_str(), 0, col);
@@ -541,79 +554,6 @@ double ItemAffixRoller::pickMultiplier(const Json::Value &section, const Json::V
     return 1;
 }
 
-static Flags & char_flags_by_table(PCharacter *pch, const DLString &table)
-{
-    static Flags none;
-    if (table == "affect_flags")
-        return pch->affected_by;
-    if (table == "detect_flags")
-        return pch->detection;
-    if (table == "res_flags")
-        return pch->res_flags;
-    if (table == "imm_flags")
-        return pch->imm_flags;
-    none.setValue(0);
-    return none;
-}
-
-/** True when the killer carries every bit of 'bits' in 'table' already. */
-static bool char_has_bits(PCharacter *pch, const DLString &table, const DLString &bits)
-{
-    const FlagTable *ft = FlagTableRegistry::getTable(table);
-    if (!ft)
-        return false;
-    Affect af;
-    af.bitvector.setTable(ft);
-    af.bitvector.setBits(bits);
-    bitstring_t b = af.bitvector;
-    return b != 0 && ((bitstring_t)char_flags_by_table(pch, table) & b) == b;
-}
-
-bool ItemAffixRoller::alreadyHas(const DLString &secName, const Json::Value &affix) const
-{
-    if (!pch)
-        return false;
-
-    DLString value = affix["value"].asString();
-
-    // A pack of bits (pack_vis, pack_bigot): owned when every part is.
-    bool anyBits = false, allBits = true;
-    for (auto const &a: affix["affects"]) {
-        if (!a.isMember("table"))
-            continue;
-        anyBits = true;
-        if (!char_has_bits(pch, a["table"].asString(), a["bits"].asString()))
-            allBits = false;
-    }
-    if (anyBits && allBits)
-        return true;
-
-    if (!anyBits && (secName == "senses" || secName == "affects_with_bits")) {
-        DLString table = affix.isMember("table") ? affix["table"].asString()
-                       : secName == "senses" ? "detect_flags" : "affect_flags";
-        if (char_has_bits(pch, table, value))
-            return true;
-    }
-
-    if (secName == "worn_buff") {
-        Skill *skill = skillManager->findExisting(value);
-        if (skill && pch->isAffected(skill->getIndex()))
-            return true;
-    }
-
-    for (auto const &name: affix["have"]) {
-        Skill *skill = skillManager->findExisting(name.asString());
-        if (skill && pch->isAffected(skill->getIndex()))
-            return true;
-    }
-
-    const Json::Value &hb = affix["have_bits"];
-    if (hb.isObject() && char_has_bits(pch, hb["table"].asString(), hb["bits"].asString()))
-        return true;
-
-    return false;
-}
-
 bool ItemAffixRoller::fitAllowed(const DLString &secName, const DLString &value) const
 {
     if (!pch)
@@ -629,18 +569,6 @@ bool ItemAffixRoller::fitAllowed(const DLString &secName, const DLString &value)
         return true;
     }
 
-    if (secName == "resists" || secName == "immunes") {
-        Affect af;
-        af.bitvector.setTable(FlagTableRegistry::getTable(secName == "resists" ? "res_flags" : "imm_flags"));
-        af.bitvector.setBits(value);
-        bitstring_t bits = af.bitvector;
-        if (bits == 0)
-            return true;
-        if (((bitstring_t)pch->imm_flags & bits) == bits)
-            return false;
-        if (secName == "resists" && ((bitstring_t)pch->res_flags & bits) == bits)
-            return false;
-    }
 
     return true;
 }
@@ -656,15 +584,72 @@ double ItemAffixRoller::windowCurve() const
     return curve;
 }
 
-int ItemAffixRoller::candidateWeight(const DLString &secName, const Json::Value &affix) const
+/** Slot weight: "deny" lists the slots it never rolls on (0), "slots" the
+ *  boosted ones; the affix's own list wins over its section's. Every other
+ *  slot weighs 1. */
+double ItemAffixRoller::candidateWeight(const DLString &secName, const Json::Value &affix) const
 {
     const Json::Value &section = item_affixes[secName];
+    const Json::Value &deny = affix.isMember("deny") ? affix["deny"] : section["deny"];
+    for (auto const &d: deny)
+        if (d.asString() == slot)
+            return 0;
+
     const Json::Value &slots = affix.isMember("slots") ? affix["slots"] : section["slots"];
-    return slots.isObject() && slots.isMember(slot) ? slots[slot].asInt() : 1;
+    return slots.isObject() && slots.isMember(slot) ? slots[slot].asDouble() : 1;
+}
+
+/** Alignment band of an align value: good, evil or neutral, as align_bonus names it. */
+static const char * align_band(int align)
+{
+    if (align >= 350)
+        return "good";
+    if (align <= -350)
+        return "evil";
+    return "neutral";
+}
+
+int ItemAffixRoller::pickTongue(const Json::Value &affix) const
+{
+    if (!pch)
+        return -1;
+
+    vector<int> tongues;
+    for (auto const &name: affix["skills"]) {
+        Skill *skill = skillManager->findExisting(name.asString());
+        if (!skill || !skill->usable(pch, false))
+            continue;
+        int learned = pch->getSkillData(skill->getIndex()).learned;
+        if (learned >= 1 && learned < 100)
+            tongues.push_back(skill->getIndex());
+    }
+
+    if (tongues.empty())
+        return -1;
+    return tongues.at(number_range(0, tongues.size() - 1));
 }
 
 void ItemAffixRoller::collectCandidates()
 {
+    // Weight groups (item_affixes "_groups"): the members of a group (an affix's
+    // or its section's "group") share the group's weight, so a section of
+    // fourteen vulns weighs like one affix, not fourteen.
+    const Json::Value &groupWeights = item_affixes["_groups"];
+    std::map<DLString, int> groupSize;
+    for (auto const &secName: item_affixes.getMemberNames()) {
+        if (secName.empty() || secName.at(0) == '_')
+            continue;
+        const Json::Value &section = item_affixes[secName];
+        DLString items = section.isMember("items") ? section["items"].asString() : DLString("armor");
+        if (items != kind && items != "both")
+            continue;
+        for (auto const &affix: section["values"]) {
+            DLString g = affix.isMember("group") ? affix["group"].asString() : section["group"].asString();
+            if (!g.empty())
+                groupSize[g]++;
+        }
+    }
+
     for (auto const &secName: item_affixes.getMemberNames()) {
         if (secName.empty() || secName.at(0) == '_')
             continue;
@@ -696,7 +681,7 @@ void ItemAffixRoller::collectCandidates()
 
             if (!forcedPick && !fitAllowed(secName, value))
                 continue;
-            if (!forcedPick && alreadyHas(secName, affix))
+            if (affix.isMember("skills") && pickTongue(affix) < 0)
                 continue;
 
             // Skill groups: only groups the killer has a learned skill in.
@@ -709,18 +694,28 @@ void ItemAffixRoller::collectCandidates()
                     continue;
             }
 
-            int weight = candidateWeight(secName, affix);
-            if (weight <= 0 && !forcedPick)
+            double slotWeight = candidateWeight(secName, affix);
+            if (slotWeight <= 0 && !forcedPick)
                 continue;
-            weight = max(1, weight);
+            if (slotWeight <= 0)
+                slotWeight = 1;
 
-            // Weights are relative: x100 leaves room for fractional pick multipliers.
             double pick = pickMultiplier(section, affix);
             if (pick <= 0 && !forcedPick)
                 continue;
             if (pick <= 0)
                 pick = 1;
-            weight = max(1, (int)std::round(weight * 100 * pick));
+
+            // Weights are relative: x1000 leaves room for fractional multipliers.
+            double w = slotWeight * 1000 * pick;
+            DLString group = affix.isMember("group") ? affix["group"].asString() : section["group"].asString();
+            if (!group.empty() && groupSize[group] > 0)
+                w *= (groupWeights.isMember(group) ? groupWeights[group].asDouble() : 1.0) / groupSize[group];
+            // align_bonus: an affix that suits the wearer's alignment comes up twice as often.
+            if (align != ALIGN_NONE && affix.isMember("align_bonus")
+                    && affix["align_bonus"].asString() == align_band(align))
+                w *= 2;
+            int weight = max(1, (int)std::round(w));
 
             bool allowed = true;
             int price = candidatePrice(secName, affix, allowed);
@@ -819,8 +814,8 @@ DLString ItemAffixRoller::picksSpec() const
  *  2026-10-02: an item with 15 crumbs has no character). To reach the budget
  *  inside the cap, a step prefers picks worth at least half of what each free
  *  slot still has to carry; restacking an affix already taken is always open. */
-void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxAffixesM, int maxNegativesM,
-                                  const std::map<int, int> &forced)
+void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minAffixesM, int maxAffixesM,
+                                  int maxNegativesM, const std::map<int, int> &forced)
 {
     std::map<int, int> best;
     int bestDistance = -1, bestTotal = 0;
@@ -840,7 +835,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
     std::vector<bool> floorExempt(pool.size(), false);
     // Core picks (Kit 2026-10-04): measure.core_chance [p1, p2...] = percent chance of
     // each forced pick from measure.core_affixes[profile] (melee dr/hr/hp, caster
-    // hp/mana/regen) before the weighted fill, so armor nearly always carries them.
+    // hp/mana/regen) before the weighted draw.
     std::vector<bool> isCore(pool.size(), false);
     // Top effects ("top": true -- sanctuary family, haste, resist weapon): at most
     // measure.top_max per item, and once one is on, the next weighs top_repeat_weight
@@ -873,6 +868,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
         statFloor = 0;
     if (maxAffixesM > 0)
         maxAffixes += (int)std::round(item_points_by_level(item_value_object("measure", "max_affixes_bonus"), obj->level, col));
+    int minAffixes = URANGE(1, minAffixesM > 0 ? minAffixesM : maxAffixes, maxAffixes);
 
     const Json::Value &secs = item_value_object("measure", "stat_sections");
     std::set<DLString> statSections;
@@ -886,12 +882,37 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
         floorExempt[i] = (*pool[i].affix)["floor_exempt"].asBool();
     }
 
-    for (int attempt = 0; attempt < 30; attempt++) {
+    auto draw = [](const vector<int> &eligible, const std::vector<int> &weightNow) -> int {
+        int weights = 0;
+        for (int e: eligible)
+            weights += weightNow[e];
+        if (weights <= 0)
+            return -1;
+        int dice = number_range(1, weights);
+        for (int e: eligible) {
+            dice -= weightNow[e];
+            if (dice <= 0)
+                return e;
+        }
+        return -1;
+    };
+
+    // The item rolls a random count of distinct positive affixes in the tier's
+    // range (Kit 2026-10-26); penalties come on top, inside max_negatives. Each
+    // is a plain weighted draw: no preference for dear affixes and no hunt for
+    // the best fit, so items differ from each other.
+    // Stacks of what was drawn then fill the budget towards a random target.
+    // Three tries; the one closest to the window wins.
+    for (int attempt = 0; attempt < 3; attempt++) {
         std::map<int, int> picked;
-        int total = 0, penalty = 0, negatives = 0, statSpent = 0, tops = 0;
+        int total = 0, penalty = 0, negatives = 0, positives = 0, statSpent = 0, tops = 0;
         std::vector<int> weightNow(pool.size(), 0);
         int target = number_range(minM, maxM);
-        bool relaxed = false;   // no stat pick fits any more: fill freely
+        int count = number_range(minAffixes, maxAffixes);
+        bool relaxed = false;   // no stat pick fits any more: draw freely
+        // A refit replay (window 0..0) keeps exactly its forced picks.
+        if (maxM <= 0)
+            count = 0;
 
         for (auto const &f: forced) {
             int i = f.first, n = f.second;
@@ -902,135 +923,106 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int maxA
             if (pool[i].price < 0) {
                 penalty += pool[i].price * n;
                 negatives++;
-            }
+            } else
+                positives++;
             if (isTop[i])
                 tops++;
         }
 
         for (int chance: coreChance) {
+            if (positives >= count)
+                break;
             if (number_range(1, 100) > chance)
                 continue;
-            std::vector<int> core;
-            int weights = 0;
+            vector<int> core;
             for (int i = 0; i < (int)pool.size(); i++) {
+                weightNow[i] = pool[i].weight;
                 if (!isCore[i] || pool[i].sigOnly || picked.count(i) || total + pool[i].price > maxM)
                     continue;
-                if ((int)picked.size() >= maxAffixes || conflicts(pool[i], picked))
+                if (conflicts(pool[i], picked))
                     continue;
                 core.push_back(i);
-                weights += pool[i].weight;
             }
-            if (core.empty() || weights <= 0)
+            int pick = draw(core, weightNow);
+            if (pick < 0)
                 break;
-            int dice = number_range(1, weights), pick = core.back();
-            for (int i: core) {
-                dice -= pool[i].weight;
-                if (dice <= 0) {
-                    pick = i;
-                    break;
-                }
-            }
             picked[pick] = 1;
+            positives++;
             total += pool[pick].price;
             if (isStat[pick])
                 statSpent += pool[pick].price;
         }
 
-        for (int step = 0; step < 16 && total < target; step++) {
-            vector<int> big, small;
-            vector<int> exempt;
-            int bigWeights = 0, smallWeights = 0, exemptWeights = 0;
-            int slotsLeft = max(1, maxAffixes - (int)picked.size());
-            int floorPrice = (target - total) / slotsLeft / 2;
+        for (int step = 0; step < 32 && positives < count; step++) {
+            vector<int> eligible;
             bool needStats = !relaxed && statFloor > 0 && statSpent < statFloor * target;
 
             for (int i = 0; i < (int)pool.size(); i++) {
                 const Candidate &c = pool[i];
-                auto it = picked.find(i);
-                bool fresh = (it == picked.end());
 
-                if (c.sigOnly)
+                if (c.sigOnly || picked.count(i))
                     continue;
-
                 if (needStats && !isStat[i] && !floorExempt[i])
                     continue;
-
-                if (!fresh && it->second >= c.stack)
-                    continue;
-                if (fresh && (int)picked.size() >= maxAffixes)
-                    continue;
-                if (fresh && c.price < 0 && negatives >= maxNegatives)
+                if (c.price < 0 && negatives >= maxNegatives)
                     continue;
                 if (total + c.price > maxM)
                     continue;
                 if (c.price < 0 && penalty + c.price < worstPenalty)
                     continue;
-                if (fresh && conflicts(c, picked))
+                if (conflicts(c, picked))
                     continue;
 
                 weightNow[i] = c.weight;
-                if (fresh && isTop[i]) {
+                if (isTop[i]) {
                     if (tops >= topMax)
                         continue;
                     if (tops > 0)
                         weightNow[i] = max(1, (int)std::round(c.weight * topRepeat));
                 }
+                eligible.push_back(i);
+            }
 
-                // While the floor holds, cheap stats all land in `small` and an exempt
-                // affix would be the only `big` one, picked every time whatever its
-                // weight. It joins whichever list is drawn from instead.
-                if (needStats && !isStat[i]) {
-                    exempt.push_back(i);
-                    exemptWeights += weightNow[i];
+            int i = draw(eligible, weightNow);
+            if (i < 0) {
+                if (needStats) {
+                    relaxed = true;   // the floor cannot be met inside the caps: retry this step freely
+                    step--;
                     continue;
                 }
-
-                // A negative buys budget room, it never fills a slot's share.
-                if (c.price < 0 || c.price >= floorPrice) {
-                    big.push_back(i);
-                    bigWeights += weightNow[i];
-                } else {
-                    small.push_back(i);
-                    smallWeights += weightNow[i];
-                }
-            }
-
-            vector<int> eligible = big.empty() ? small : big;
-            int weights = big.empty() ? smallWeights : bigWeights;
-
-            if ((eligible.empty() || weights <= 0) && needStats) {
-                relaxed = true;   // the floor cannot be met inside the caps: retry this step freely
-                step--;
-                continue;
-            }
-            eligible.insert(eligible.end(), exempt.begin(), exempt.end());
-            weights += exemptWeights;
-            if (eligible.empty() || weights <= 0)
                 break;
-
-            int dice = number_range(1, weights), i = -1;
-            for (int e: eligible) {
-                dice -= weightNow[e];
-                if (dice <= 0) {
-                    i = e;
-                    break;
-                }
             }
-            if (i < 0)
-                break;
 
-            if (picked.find(i) == picked.end() && pool[i].price < 0)
+            if (pool[i].price < 0) {
                 negatives++;
-            if (picked.find(i) == picked.end() && isTop[i])
-                tops++;
-            picked[i]++;
-            total += pool[i].price;
-            if (pool[i].price < 0)
                 penalty += pool[i].price;
+            } else
+                positives++;
+            if (isTop[i])
+                tops++;
+            picked[i] = 1;
+            total += pool[i].price;
             if (isStat[i])
                 statSpent += pool[i].price;
             if (floorExempt[i])
                 relaxed = true;
+        }
+
+        // Stacks: more of what the item already has, towards the target.
+        for (int step = 0; step < 16 && total < target; step++) {
+            vector<int> eligible;
+            for (auto const &p: picked) {
+                const Candidate &c = pool[p.first];
+                if (c.sigOnly || c.price <= 0 || p.second >= c.stack || total + c.price > maxM)
+                    continue;
+                weightNow[p.first] = c.weight;
+                eligible.push_back(p.first);
+            }
+            int i = draw(eligible, weightNow);
+            if (i < 0)
+                break;
+            picked[i]++;
+            total += pool[i].price;
         }
 
         int distance = total < minM ? minM - total : (total > maxM ? total - maxM : 0);
@@ -1107,6 +1099,13 @@ bool ItemAffixRoller::applyShared(const Candidate &c, int count)
     affixNames.insert(c.value);
     extraFlags.setBits(affix["extra"].asString());
 
+    // +weight: the piece weighs weight_pct percent of its model weight
+    // (item_weight reads the property).
+    if (affix.isMember("weight_pct")) {
+        obj->setProperty("weight_pct", affix["weight_pct"].asInt());
+        return true;
+    }
+
     // Any affix that spells out its affects is a pack, whatever its section.
     if (affix.isMember("affects")) {
         applyPack(affix["affects"], count);
@@ -1157,7 +1156,19 @@ bool ItemAffixRoller::applyShared(const Candidate &c, int count)
             af.modifier = max(1, affix["mod"].asInt()) * count;
             remember(af);
 
-        } else if (c.value == "learned") {
+        } else if (affix.isMember("skills")) {
+            // An ancient language the wearer knows but not natively.
+            int sn = pickTongue(affix);
+            if (sn < 0)
+                return true;
+            Affect af;
+            af.global.setRegistry(skillManager);
+            af.global.set(sn);
+            af.location = APPLY_LEARNED;
+            af.modifier = affix["mod"].asInt() * count;
+            remember(af);
+
+        } else if (c.norm == "learned") {
             // Melee picks defensive/fightmaster skills x1.25 (Kit 2026-10-04).
             vector<int> preferred;
             if (pickProfile() == "melee")
@@ -1504,6 +1515,8 @@ void ArmorGenerator::assignFlags()
 
     if (!wornBuff.empty())
         obj->setProperty("wornbuff", wornBuff);
+    else
+        obj->removeProperty("wornbuff");
 
     // Shape for the Fenia weight helper (.tmp.weight.calculateWeight): the noun's
     // heft, and its own coverage where it covers less than the heft says (a circlet).

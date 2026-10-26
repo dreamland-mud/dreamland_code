@@ -350,7 +350,12 @@ int item_weight( Object *obj, const DLString &heft )
         s.material = obj->getMaterial( );
         s.heft = heft.empty( ) ? obj->getProperty( "heft" ) : heft;
         s.coverage = prop_number( obj->getProperty( "coverage" ) );
-        return econ_weight( s );
+        int weight = econ_weight( s );
+        // A generated piece with the +weight penalty.
+        int pct = (int)prop_number( obj->getProperty( "weight_pct" ) );
+        if (pct > 0)
+            weight = weight * pct / 100;
+        return weight;
     }
     catch (const std::exception &e) {
         econ_error( "weight", obj->pIndexData ? obj->pIndexData->vnum : 0, e );

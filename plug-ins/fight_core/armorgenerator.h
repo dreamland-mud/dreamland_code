@@ -59,7 +59,7 @@ protected:
     /** Weighted fill of [minM, maxM]. 'forced' pool indexes (index -> stacks) are
      *  taken first and ignore the window and the caps: a class or name that
      *  requires an affix, a crafted material's own affix, a refit replay. */
-    void pickAffixes(int minM, int maxM, int worstPenalty, int maxAffixes, int maxNegatives,
+    void pickAffixes(int minM, int maxM, int worstPenalty, int minAffixes, int maxAffixes, int maxNegatives,
                      const std::map<int, int> &forced);
     /** "section:value[:stacks]" words, space separated, to pool indexes. Words
      *  that are not in this item's pool are dropped: the fill rolls in their place. */
@@ -91,12 +91,9 @@ protected:
     bool modelPoints(const DLString &secName, const Json::Value &affix, double &points) const;
     /** Points -> centi-M at the item level for the roller's profile and slot. */
     int modelPrice(double points) const;
-    /** Fit clauses for the killer (decisions 5, 6): no stat over its cap, no
-     *  resist or immunity it already has. Selection only, prices don't change. */
+    /** Fit clause for the killer: no stat over its cap. What the killer already
+     *  has (resists, bits, buffs) still rolls (Kit 2026-10-26). */
     bool fitAllowed(const DLString &secName, const DLString &value) const;
-    /** One item model: the killer already has this effect from worn gear or an
-     *  active affect (bits, a worn buff's spell, the affix's have / have_bits). */
-    bool alreadyHas(const DLString &secName, const Json::Value &affix) const;
     /** One item model: the 'pick' weight multiplier for the killer's class or
      *  profile at the item level (affix first, then section); 1 when absent. */
     double pickMultiplier(const Json::Value &section, const Json::Value &affix) const;
@@ -110,7 +107,9 @@ protected:
     virtual bool candidateAllowed(const Json::Value &section, const Json::Value &affix, int floor) const;
     virtual bool valueAllowed(const DLString &secName, const DLString &value) const;
     virtual int candidatePrice(const DLString &secName, const Json::Value &affix, bool &allowed) const;
-    virtual int candidateWeight(const DLString &secName, const Json::Value &affix) const;
+    virtual double candidateWeight(const DLString &secName, const Json::Value &affix) const;
+    /** A learned ancient language (affix "skills") short of native, or -1. */
+    int pickTongue(const Json::Value &affix) const;
 
     /** A crafted piece (craft/armor rollCraft): no core picks and no stat floor,
      *  the crafter's fixed stats are already on the item. */

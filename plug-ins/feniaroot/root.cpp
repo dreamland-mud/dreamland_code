@@ -1782,6 +1782,9 @@ NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile
         if (!n.empty())
             gen.addRequirement(n);
     }
+    // A crafted weapon keeps its blueprint's material: no material affix.
+    for (const char *m: { "platinum", "titanium", "wood", "ice" })
+        gen.addForbidden(m);
     gen.randomizeStats();
     obj->value4(obj->value4() | keep);
 

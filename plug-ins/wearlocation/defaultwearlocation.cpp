@@ -365,6 +365,10 @@ void DefaultWearlocation::triggersOnEquip( Character *ch, Object *obj )
 {
     oprog_equip( obj, ch );
 
+    // A generated or crafted piece's worn buff (property "wornbuff"), whatever its vnum.
+    if (!obj->getProperty( "wornbuff" ).empty( ))
+        gprog( "onEquipWornBuff", "OC", obj, ch );
+
     switch (obj->item_type) {
     case ITEM_LIGHT:
         if (ch->in_room != 0)

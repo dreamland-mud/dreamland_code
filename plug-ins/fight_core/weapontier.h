@@ -24,6 +24,9 @@ struct weapon_tier_t {
     int max_m;
     int worst_penalty_m;
     // Caps for M-priced items: distinct affixes (stacks count once), negative ones. 0 = none.
+    // min_affixes_m..max_affixes_m: the item rolls a random count of distinct affixes
+    // in this range (min defaults to max).
+    int min_affixes_m;
     int max_affixes_m;
     int max_negatives_m;
     // Decay timer in days, 0 = none ("weeks" x7 when the config has no "days").
