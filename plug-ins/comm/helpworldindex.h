@@ -37,6 +37,9 @@ struct HelpWorldHits {
     bool empty() const;
 };
 
+/** False for zones a player should never be pointed at: unlisted, system, locked. */
+bool help_world_area_listed(AreaIndexData *area);
+
 /** Look the query up among zone, room, mob and object names in all languages;
  *  with 'keywords', fall back to single mob and object keywords. */
 HelpWorldHits help_world_lookup(const DLString &query, bool keywords);

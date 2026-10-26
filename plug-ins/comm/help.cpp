@@ -14,6 +14,7 @@
 #include "commandtemplate.h"
 #include "comm.h"
 #include "merc.h"
+#include "def.h"
 #include "bugtracker.h"
 #include "screenreader.h"
 #include "helpcategory.h"
@@ -22,6 +23,8 @@
 #include "helpworldindex.h"
 #include "areahelp.h"
 #include "area.h"
+#include "areaquest.h"
+#include "commandmanager.h"
 
 /*---------------------------------------------------------------------------*
  * Help
@@ -940,6 +943,76 @@ static bool help_world_answer(Character *ch, const DLString &query, bool keyword
     return true;
 }
 
+/** A bare number that is no help id but an area quest number, the one 'quest'
+ *  takes: show the quest the way the zone help lists it. */
+static bool help_quest_answer(Character *ch, const DLString &query)
+{
+    Integer vnum;
+    if (!Integer::tryParse(vnum, query))
+        return false;
+
+    auto q = areaQuests.find(vnum.getValue());
+    if (q == areaQuests.end())
+        return false;
+
+    AreaQuest *quest = q->second;
+    if (quest->flags.isSet(AQUEST_HIDDEN) || !help_world_area_listed(quest->pAreaIndex))
+        return false;
+
+    ostringstream buf, line;
+    area_quest_format(quest, line, ch);
+
+    std::list<AreaIndexData *> zone;
+    zone.push_back(quest->pAreaIndex);
+
+    buf << fmt(ch, _("Справки с номером %1$d нет, но так пронумеровано задание из зоны %2$s:"),
+               vnum.getValue(), world_zone_list(ch, zone).c_str())
+        << endl
+        << line.str() << endl;
+    ch->send_to(buf);
+
+    bugTracker->reportNohelpAnswered(ch->getPC(), query, "aq");
+    return true;
+}
+
+/** A miss that starts with a command name ('зоны 10 15', 'кто Вася') was most
+ *  likely meant for the command itself: say so before the guesses. */
+static bool help_command_hint(Character *ch, const DLString &query)
+{
+    DLString rest = query;
+    DLString first = rest.getOneArgument();
+    first.toLower();
+
+    if (first.empty())
+        return false;
+
+    Command::Pointer cmd = commandManager->findExact(first);
+    if (!cmd || !cmd->visible(ch) || cmd->getName() == "help")
+        return false;
+
+    lang_t lang = Player::displayLang(ch);
+    DLString hint = cmd->hint.getForLang(lang);
+    ostringstream buf;
+
+    if (hint.empty())
+        buf << fmt(ch, _("Похоже на команду: {y{hc%1$s{x."), query.c_str()) << endl;
+    else
+        buf << fmt(ch, _("Похоже на команду: {y{hc%1$s{x -- %2$s."), query.c_str(), hint.c_str()) << endl;
+
+    HelpArticle::Pointer help = cmd->getHelp();
+    if (help) {
+        HelpArticle::Pointer target = help->getAliasTarget();
+        if (target)
+            help = target;
+    }
+    if (help && help->getID() > 0 && help->visible(ch))
+        buf << fmt(ch, _("Справка по ней: {hh%1$d%2$s{x."),
+                   help->getID(), help->getTitle(DLString::emptyString, lang).c_str()) << endl;
+
+    ch->send_to(buf);
+    return true;
+}
+
 CMDRUNP( help )
 {
     std::basic_ostringstream<char> buf;
@@ -1011,10 +1084,16 @@ CMDRUNP( help )
     
     // Поиск по строке без чисел.
     HelpFinder::ArticleArray articles = HelpFinder(ch, argument).getArticles();
-    // No match: a whole world name says more than a guess, a lone keyword says less.
+    // No match. A quest number or a whole world name says more than a guess, a
+    // command name goes above the guesses, a lone mob/object keyword below them.
     if (articles.empty()) {
+        if (!nthMiss && help_quest_answer(ch, origArgument))
+            return;
+
         if (!nthMiss && help_world_answer(ch, origArgument, false))
             return;
+
+        bool commandShown = !nthMiss && help_command_hint(ch, origArgument);
 
         if (origArgument.size() > 1) {
             FuzzySearch fs(ch, argument);
@@ -1030,6 +1109,11 @@ CMDRUNP( help )
             }
         }
         
+        if (commandShown) {
+            bugTracker->reportNohelpAnswered(ch->getPC(), origArgument, "cmd");
+            return;
+        }
+
         if (!nthMiss && help_world_answer(ch, origArgument, true))
             return;
 
