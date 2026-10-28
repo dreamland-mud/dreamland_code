@@ -4,8 +4,10 @@
  */
 #include <math.h>
 #include <string.h>
+#include <jsoncpp/json/json.h>
 
 #include "defaultspell.h"
+#include "configurable.h"
 #include "skillreference.h"
 #include "spelltarget.h"
 #include "spellmanager.h"
@@ -244,6 +246,27 @@ static void append_flavours( const StringList &self, const StringList &vict,
     }
 }
 
+/* Gesture-free flavour for NPC casters without hands (spell/handless_flavour.json).
+ * Group and clan lines talk about fingers and palms, which reads absurd on a hoofed
+ * or legless beast. An array of {self, vict, room} objects, one gesture each. */
+struct HandlessFlavourRow {
+    DLString self, vict, room;
+
+    void fromJson( const Json::Value &value )
+    {
+        self = value["self"].asString( );
+        vict = value["vict"].asString( );
+        room = value["room"].asString( );
+    }
+};
+
+static json_vector<HandlessFlavourRow> handlessFlavours;
+
+CONFIGURABLE_LOADED(spell, handless_flavour)
+{
+    handlessFlavours.fromJson( value );
+}
+
 void DefaultSpell::collectFlavours( Character *ch, std::vector<CastFlavour> &result ) const
 {
     for (auto g: const_cast<Skill *>(*skill)->getGroups( ).toArray( )) {
@@ -278,6 +301,28 @@ void DefaultSpell::collectFlavours( Character *ch, std::vector<CastFlavour> &res
             append_flavours( group->msgSelf.toList( ), group->msgVict.toList( ),
                              group->msgRoom.toList( ), result );
     }
+
+    // A handless NPC swaps the whole pool for the gesture-free lines. NPCs only: a
+    // player's body comes from their race and players keep the group lines. Spells
+    // that had no flavour at all keep the garbled-words fallback, and an empty or
+    // missing config leaves the group lines in place.
+    if (result.empty( ) || !ch->is_npc( ) || IS_SET( ch->parts, PART_HANDS ))
+        return;
+
+    std::vector<CastFlavour> handless;
+    for (auto &row: handlessFlavours) {
+        if (row.self.empty( ))
+            continue;
+
+        CastFlavour f;
+        f.self = row.self;
+        f.vict = row.vict;
+        f.room = row.room;
+        handless.push_back( f );
+    }
+
+    if (!handless.empty( ))
+        result.swap( handless );
 }
 
 void DefaultSpell::showFlavour( Character *ch, Character *victim, const CastFlavour &f ) const
