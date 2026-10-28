@@ -62,7 +62,7 @@ bool CardPackBehavior::examine( Character *looker )
         return false;
     
     looker->pecho( _("Сегодня козырь %s."), 
-            russian_case( XMLAttributeCards::getTrumpFace( ).mlt, 1 ).c_str( ) );
+            russian_case( XMLAttributeCards::getSuitNoun( XMLAttributeCards::getTrump( ), viewerLang( looker ) ), 1 ).c_str( ) );
 
     for (d = descriptor_list; d != 0; d = d->next) {
         PCharacter *victim;
@@ -87,7 +87,7 @@ bool CardPackBehavior::examine( Character *looker )
         fEmpty = false;
         looker->pecho( "    %-20s %s", 
                 victim->getNameC(),
-                attr->getFace( '1' ).c_str( ) );
+                attr->getFace( viewerLang( looker ), '1' ).c_str( ) );
     }
     
     if (fEmpty) 
@@ -512,7 +512,8 @@ bool CardBehavior::examine( Character *looker )
 DLString CardBehavior::extraDescription( Character *ch, const DLString &args )
 {
     ostringstream buf;
-    DLString strQuality;
+    DLString strImage;
+    lang_t lang;
     int chance;
     PCharacter *victPlayer;
     PCMemoryInterface *victMemory;
@@ -530,33 +531,36 @@ DLString CardBehavior::extraDescription( Character *ch, const DLString &args )
 
     chance = gsn_card_vision->getEffective( ch );
     
+    lang = viewerLang( ch );
+
     if (chance > 50) {
         if (quality == 100)
-            strQuality = "мастерское ";
+            strImage = _("мастерское изображение").getMessage( lang );
         else if (quality > 90)
-            strQuality = "очень качественное ";
+            strImage = _("очень качественное изображение").getMessage( lang );
         else if (quality > 80)
-            strQuality = "довольно четкое ";
+            strImage = _("довольно четкое изображение").getMessage( lang );
         else if (quality > 70)
-            strQuality = "не очень четкое ";
+            strImage = _("не очень четкое изображение").getMessage( lang );
         else if (quality > 50)
-            strQuality = "небрежно нарисованное ";
+            strImage = _("небрежно нарисованное изображение").getMessage( lang );
         else
-            strQuality = "отвратительно прорисованное ";
+            strImage = _("отвратительно прорисованное изображение").getMessage( lang );
     }
-    
-    buf << "На карте ты видишь " 
-        << strQuality << "изображение " 
-        << getPlayerName( ) << ". ";
+    else
+        strImage = _("изображение").getMessage( lang );
+
+    buf << fmt( ch, _("На карте ты видишь %1$s %2$s. "),
+                strImage.c_str( ), getPlayerName( ).c_str( ) );
 
     if (victPlayer || chance > 90) {
         XMLAttributeCards::Pointer victAttr;
 
         victAttr = victMemory->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
         if (victAttr)
-            buf << "Это " << victAttr->getFace( '1' ) << ".";
+            buf << fmt( ch, _("Это %1$s."), victAttr->getFace( lang, '1' ).c_str( ) );
         else
-            buf << "Это карта неизвестной масти и достоинства.";
+            buf << fmt( ch, _("Это карта неизвестной масти и достоинства.") );
     }
 
     return buf.str( );
