@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "eating.h"
+#include "magicitems.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -301,32 +302,12 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
 }
 
 /*
- * 'quaff' skill command
+ * Drink a potion, called from 'use'.
  */
-CMDRUNP( quaff )
+void use_potion( Character *ch, Object *obj )
 {
-    char arg[MAX_INPUT_LENGTH];
-    Object *obj;
-
-    one_argument( argument, arg );
-
     if (!rage_magic_allowed( ch, RAGE_POTION )) {
         rage_magic_refuse( ch );
-        return;
-    }
-
-    if (arg[0] == '\0') {
-        ch->pecho(_("Осушить что?"));
-        return;
-    }
-
-    if (( obj = get_obj_carry( ch, arg ) ) == 0) {
-        ch->pecho(_("У тебя нет такого снадобья."));
-        return;
-    }
-
-    if (obj->item_type != ITEM_POTION) {
-        ch->pecho(_("Осушать можно только снадобья."));
         return;
     }
 

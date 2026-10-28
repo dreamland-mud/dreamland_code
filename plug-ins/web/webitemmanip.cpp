@@ -355,6 +355,9 @@ WEBMANIP_RUN(decorateItem)
 
     // My inventory or equipment:
     if (item->carried_by == ch) {
+        // Magic items have no commands of their own, they go through 'use'.
+        bool magicUse = false;
+
         // Item type-specific commands.
         switch (item->item_type) {
             case ITEM_FOOD:
@@ -364,11 +367,11 @@ WEBMANIP_RUN(decorateItem)
                 break;
             case ITEM_POTION:
                 if (item->wear_loc == wear_none)
-                    manips.add( "quaff" );
+                    magicUse = true;
                 break;
             case ITEM_SCROLL:
                 if (item->wear_loc == wear_none)
-                    manips.add( "recite" );
+                    magicUse = true;
                 break;
             case ITEM_DRINK_CON:
                 manips.add( "drink" );
@@ -394,12 +397,11 @@ WEBMANIP_RUN(decorateItem)
                 manips.add( "get", manips.allWord( ) );
                 break;
             case ITEM_WAND:
-                if (item->wear_loc == wear_hold) 
-                    manips.add("zap");
+                magicUse = true;
                 break;
             case ITEM_STAFF:
                 if (item->wear_loc == wear_hold) 
-                    manips.add("brandish");
+                    magicUse = true;
                 break;
         }
 
@@ -450,7 +452,7 @@ WEBMANIP_RUN(decorateItem)
         if (has_trigger_listen( item, triggers ))
             manips.add( "listen" );
 
-        if (has_trigger_use( item, triggers ))
+        if (magicUse || has_trigger_use( item, triggers ))
             manips.add( "use" );
 
         if (item->wear_loc == wear_none && gsn_lore->usable( ch )) 

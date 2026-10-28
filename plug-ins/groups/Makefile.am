@@ -39,8 +39,7 @@ exoticskill.cpp \
 group_beguiling.cpp \
 group_fightmaster.cpp \
 group_weaponsmaster.cpp \
-group_movement.cpp \
-group_arcane.cpp
+group_movement.cpp
 
 libgroup_skills_la_MOC = \
 group_vampiric.h \

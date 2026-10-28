@@ -51,6 +51,7 @@ scan.cpp \
 bodyposition.cpp \
 move.cpp \
 use.cpp \
+magicitems.cpp \
 give.cpp \
 put.cpp \
 search.cpp \
