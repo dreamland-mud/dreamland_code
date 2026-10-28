@@ -14,6 +14,7 @@
 #include "affectmanager.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
+#include "mobilefactory.h"
 #include "object.h"
 #include "race.h"
 
@@ -24,6 +25,11 @@
 
 WEARLOC(none);
 WEARLOC(stuck_in);
+GSN(sneak);
+GSN(hide);
+GSN(fade);
+GSN(invisibility);
+GSN(improved_invis);
 
 Affect * Affect::clone() const
 {
@@ -349,6 +355,41 @@ static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affec
         }
 }
 
+static bool lists_trait(Character *ch, int sn)
+{
+    if (ch->getRace()->getAffects().isSet(sn))
+        return true;
+
+    return ch->is_npc() && ch->getNPC()->pIndexData->affects.isSet(sn);
+}
+
+/*
+ * Stealth bits that do_visible strips and a real affect owns: the race or the
+ * prototype lists the trait in <affects>, so afprog_refresh re-arms it under
+ * the affect's own rules. affect_check must not re-OR these from the body or
+ * the race, or the bit comes back bare on any unrelated affect removal: the
+ * next do_visible announces the same reveal a second time, and a dispel or a
+ * wear-off turns the mob invisible again mid-fight. Same list as
+ * item_stealth_skills in creation.cpp (camouflage has no onRefresh).
+ */
+static bitstring_t affect_owned_stealth(Character *ch)
+{
+    bitstring_t bits = 0;
+
+    if (lists_trait(ch, gsn_sneak))
+        bits |= AFF_SNEAK;
+    if (lists_trait(ch, gsn_hide))
+        bits |= AFF_HIDE;
+    if (lists_trait(ch, gsn_fade))
+        bits |= AFF_FADE;
+    if (lists_trait(ch, gsn_invisibility))
+        bits |= AFF_INVISIBLE;
+    if (lists_trait(ch, gsn_improved_invis))
+        bits |= AFF_IMP_INVIS;
+
+    return bits;
+}
+
 /* fix object affects when removing one */
 void affect_check(Character *ch, Affect *affect)
 {
@@ -371,6 +412,7 @@ void affect_check(Character *ch, Affect *affect)
 
     if (table && table != &part_flags) {    
         Flags &charFlag = char_flag_by_table(ch, table);
+        bitstring_t owned = (table == &affect_flags) ? affect_owned_stealth(ch) : 0;
 
         // NPCs get back the body they were built with (index body plus saved
         // diffs), not the race: a prototype or saved del must survive an
@@ -378,10 +420,10 @@ void affect_check(Character *ch, Affect *affect)
         if (ch->is_npc()) {
             int set = npc_set_by_table(table);
             if (set >= 0)
-                charFlag.setBit(ch->getNPC()->baseBits[set]);
+                charFlag.setBit(ch->getNPC()->baseBits[set] & ~owned);
         } else {
             const Flags &raceFlag = race_flag_by_table(ch->getRace().getElement(), table);
-            charFlag.setBit(raceFlag.getValue());
+            charFlag.setBit(raceFlag.getValue() & ~owned);
         }
 
         if (table == &affect_flags && affect->bitvector.isSet(AFF_FLYING))
