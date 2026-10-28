@@ -14,6 +14,7 @@
 #include "xmlattributeplugin.h"
 #include "playerattributes.h"
 #include "scheduledxmlattribute.h"
+#include "lang.h"
 
 class XMLAttributeCards : 
     public AttributeEventHandler<DeathArguments>, 
@@ -36,12 +37,17 @@ public:
         inline void setSuit( int );
         static int getRandomSuit( );
         DLString getFace( char ) const;
+        DLString getFace( lang_t, char ) const;
+        static const char * getSuitNoun( int suit, lang_t );
         bool isTrump( ) const;
         
         static int getMaxLevel( );
+        /* name/ua are Flexer pads; en is indeclinable. */
         struct CardLevelFace {
             const char *name;
             int gender;
+            const char *en;
+            const char *ua;
         };
         static const CardLevelFace levelFaces[];
 
@@ -49,6 +55,10 @@ public:
             const char *mlt;
             const char *male;
             const char *female;
+            const char *en;
+            const char *mltUa;
+            const char *maleUa;
+            const char *femaleUa;
         };
         static const CardSuitFace suitFaces[];
 

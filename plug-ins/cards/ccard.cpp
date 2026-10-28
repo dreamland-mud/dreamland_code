@@ -95,7 +95,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     if (!card)
         ch->pecho( _("%C1 не состоит в Колоде."), pci );
     else
-        ch->pecho( _("%C1 - это %s из Колоды."), pci, card->getFace( '1' ).c_str( ) );
+        ch->pecho( _("%C1 - это %s из Колоды."), pci, card->getFace( viewerLang( ch ), '1' ).c_str( ) );
 
 
     arg = arguments.getOneArgument( );
@@ -128,7 +128,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
         card->setSuit( card->getRandomSuit( ) );
 
     PCharacterManager::saveMemory( pci );
-    ch->pecho( _("%C1 становится %s."), pci, card->getFace( '5' ).c_str( ) );
+    ch->pecho( _("%C1 становится %s."), pci, card->getFace( viewerLang( ch ), '5' ).c_str( ) );
      
 }
 
@@ -152,7 +152,7 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
         if (card) {
             ch->pecho( "%20s %s", 
                         pci->getName( ).c_str( ),
-                        card->getFace( '1' ).c_str( ) );
+                        card->getFace( viewerLang( ch ), '1' ).c_str( ) );
             cnt++;
         }
     }

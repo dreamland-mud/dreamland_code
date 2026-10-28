@@ -83,27 +83,21 @@ bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
     return false;
 }
 
-/* The face a card skill starts appearing at. levelFaces carries Russian Flexer
- * pads only, so the sentence around it could not be translated without leaving a
- * Russian noun inside an English one; these are the same nine faces, in the
- * genitive the sentence needs. */
-static const char * CARD_FACE_GENITIVE[3][9] = {
-    // RU -- declined from levelFaces at runtime, this row is unused
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { "six", "seven", "eight", "nine", "ten", "jack", "queen", "king", "ace" },
-    { "шістки", "сімки", "вісімки", "дев'ятки", "десятки",
-      "валета", "дами", "короля", "туза" },
-};
-
+/* The face a card skill starts appearing at, in the genitive the sentence needs. */
 static DLString card_face_genitive(int level, lang_t lang)
 {
     if (level < 0 || level > XMLAttributeCards::getMaxLevel())
         return DLString::emptyString;
 
-    if (lang == LANG_EN || lang == LANG_UA)
-        return CARD_FACE_GENITIVE[lang == LANG_EN ? 1 : 2][level];
+    const XMLAttributeCards::CardLevelFace &lf = XMLAttributeCards::levelFaces[level];
 
-    return russian_case( XMLAttributeCards::levelFaces[level].name, '2' );
+    if (lang == LANG_EN)
+        return DLString( lf.en ).toLower( );
+
+    if (lang == LANG_UA)
+        return russian_case( lf.ua, '2' );
+
+    return russian_case( lf.name, '2' );
 }
 
 void CardSkill::show( PCharacter *ch, std::ostream & buf ) const
