@@ -1,9 +1,11 @@
 
+#include <algorithm>
 #include <pcharacter.h>
 #include <commandmanager.h>
 #include "room.h"
 #include "areahelp.h"
 #include "helpcontainer.h"
+#include "helprelated.h"
 
 #include "hedit.h"
 #include "olc.h"
@@ -22,11 +24,11 @@ bool text_match_with_highlight(const DLString &text, const DLString &args, ostri
 
 OLC_STATE(OLCStateHelp);
 
-OLCStateHelp::OLCStateHelp() : id(-1), level(-1), isChanged(false)
+OLCStateHelp::OLCStateHelp() : id(-1), level(-1), seeAlsoEdited(false), refByEdited(false), isChanged(false)
 {
 }
 
-OLCStateHelp::OLCStateHelp(HelpArticle *original) : id(-1), level(-1), isChanged(false)
+OLCStateHelp::OLCStateHelp(HelpArticle *original) : id(-1), level(-1), seeAlsoEdited(false), refByEdited(false), isChanged(false)
 {
     if (!original)
         return;
@@ -40,6 +42,8 @@ OLCStateHelp::OLCStateHelp(HelpArticle *original) : id(-1), level(-1), isChanged
     this->labelsAuto = original->labels.transient.toString();
     this->title = original->title;
     this->autotitle = original->getTitle(DLString::emptyString);
+    this->seeAlso = HelpArticle::seeAlsoToString(original->getSeeAlso());
+    this->refBy = original->getRefBy().toString();
 }
 
 OLCStateHelp::~OLCStateHelp() 
@@ -71,6 +75,13 @@ void OLCStateHelp::commit()
     original->labels.persistent.clear();
     original->labels.addPersistent(labels);
     original->extra = extra;
+    if (seeAlsoEdited)
+        original->setSeeAlso(HelpArticle::seeAlsoFromString(seeAlso));
+    if (refByEdited) {
+        StringSet names;
+        names.fromString(refBy);
+        original->setRefBy(names);
+    }
     original->refreshKeywords();
     original->save();
 
@@ -110,6 +121,25 @@ void OLCStateHelp::show( PCharacter *ch ) const
         id.getValue(), 
         labels.empty() ? "-" : labels.c_str(), 
         labelsAuto.empty() ? "-" : labelsAuto.c_str());     
+    HelpArticle::Pointer article = helpManager->getArticle(id);
+    DLString category = article->getCategory();
+    ptc(ch, "{WКатегория{x:            [{C%s{x] %s{D(по сохранённым меткам){x\r\n",
+        category.empty() ? "-" : category.c_str(),
+        category.empty() ? "" : (HelpArticle::isPlayerCategory(category) ? "видна игрокам " : "скрыта от игроков "));
+    ptc(ch, "{WСм. также, вручную{x:   [{C%s{x]\r\n", seeAlso.empty() ? "-" : seeAlso.c_str());
+    for (auto i: HelpArticle::seeAlsoFromString(seeAlso)) {
+        HelpArticle::Pointer a = helpManager->getArticle(i);
+        ptc(ch, "    %6d %s\r\n", i, a ? a->getTitle(DLString::emptyString).c_str() : "{Rнет такой статьи{x");
+    }
+    DLString autoSeeAlso;
+    for (auto &a: help_related(article.getPointer(), ch))
+        autoSeeAlso += fmt(0, " %d", a->getID());
+    ptc(ch, "{DСм. также, итог:      [%s ]{x\r\n", autoSeeAlso.c_str());
+    if (!refBy.empty()) {
+        HelpArticle::Pointer target = article->getAliasTarget();
+        ptc(ch, "{WСсылка refby{x:         [{C%s{x]%s\r\n", refBy.c_str(),
+            target ? fmt(0, " псевдоним статьи {c%d{x", target->getID()).c_str() : "");
+    }
     ptc(ch, "{DВсе ключевые слова:   [%s]\r\n", allKeywords().toString().c_str());
     ptc(ch, "{WКлючевые слова, EN{x:   [{C%s{x] %s\r\n", keyword.get(EN).c_str(), web_edit_button(ch, "keywords", "web").c_str());
     ptc(ch, "{WКлючевые слова, UA{x:   [{C%s{x] %s\r\n", keyword.get(UA).c_str(), web_edit_button(ch, "uakeywords", "web").c_str());
@@ -130,7 +160,7 @@ void OLCStateHelp::show( PCharacter *ch ) const
     ptc(ch, "{WТекст, UA{x: %s\r\n%s{x\r\n", web_edit_button(ch, "uatext", "web").c_str(), String::ellipsis(uatext, 200).c_str());
     ptc(ch, "{WТекст, RU{x: %s\r\n%s{x\r\n", web_edit_button(ch, "rutext", "web").c_str(), String::ellipsis(rutext, 200).c_str());
 
-    ptc(ch, "{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ycancel{x, {hc{ydone{x\r\n");
+    ptc(ch, "{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{yseealso{x, {hc{yalias{x, {hc{ycancel{x, {hc{ydone{x\r\n");
 }
 
 HEDIT(show, "показать", "показать все поля")
@@ -198,6 +228,128 @@ HEDIT(labels, "метки", "установить метки для экспор
     return true;
 }
 
+HEDIT(seealso, "смтакже", "установить или очистить список статей для строки 'См. также'")
+{
+    DLString arg = argument;
+
+    if (arg.empty()) {
+        stc("Синтаксис:   seealso <id> [<id> ...]  - статьи, которые идут первыми в строке 'См. также'\n\r", ch);
+        stc("             seealso clear            - очистить список\n\r", ch);
+        return false;
+    }
+
+    if (arg_is_clear(arg)) {
+        seeAlso.clear();
+        seeAlsoEdited = true;
+        stc("Список 'См. также' очищен.\n\r", ch);
+        return true;
+    }
+
+    std::vector<int> ids;
+    for (DLString a = arg.getOneArgument(); !a.empty(); a = arg.getOneArgument()) {
+        Integer v;
+        if (!Integer::tryParse(v, a) || v <= 0) {
+            ptc(ch, "'%s' не похоже на номер статьи.\n\r", a.c_str());
+            return false;
+        }
+
+        HelpArticle::Pointer target = helpManager->getArticle(v);
+        if (!target) {
+            ptc(ch, "Статьи %d нет.\n\r", v.getValue());
+            return false;
+        }
+
+        if (v == id.getValue()) {
+            stc("Статья не может ссылаться сама на себя.\n\r", ch);
+            return false;
+        }
+
+        if (target->getAliasTarget()) {
+            ptc(ch, "Статья %d -- псевдоним статьи %d, укажи её.\n\r",
+                v.getValue(), target->getAliasTarget()->getID());
+            return false;
+        }
+
+        if (std::find(ids.begin(), ids.end(), (int)v) == ids.end())
+            ids.push_back(v);
+    }
+
+    seeAlso = HelpArticle::seeAlsoToString(ids);
+    seeAlsoEdited = true;
+    ptc(ch, "Список 'См. также': %s\n\r", seeAlso.c_str());
+    if (ids.size() > 4)
+        stc("{YВнимание{x: в строку попадут только первые четыре.\n\r", ch);
+    return true;
+}
+
+HEDIT(alias, "псевдоним", "сделать статью псевдонимом другой или снять это")
+{
+    DLString arg = argument;
+    HelpArticle::Pointer article = helpManager->getArticle(id);
+
+    if (arg.empty()) {
+        stc("Синтаксис:   alias <id>   - справка по этой статье открывает статью <id>\n\r", ch);
+        stc("             alias clear  - снять псевдоним\n\r", ch);
+        return false;
+    }
+
+    for (auto &r: article->getRefBy()) {
+        Integer v;
+        if (!Integer::tryParse(v, r)) {
+            stc("У этой статьи в refby записаны команды, псевдоним её сломает.\n\r", ch);
+            return false;
+        }
+    }
+
+    if (dynamic_cast<AreaHelp *>(article.getPointer())) {
+        stc("Справка зоны не сохраняет refby, псевдоним пропадёт после asave.\n\r", ch);
+        return false;
+    }
+
+    if (arg_is_clear(arg)) {
+        refBy.clear();
+        refByEdited = true;
+        stc("Псевдоним снят.\n\r", ch);
+        return true;
+    }
+
+    Integer v;
+    if (!Integer::tryParse(v, arg) || v <= 0) {
+        stc("Укажи номер статьи.\n\r", ch);
+        return false;
+    }
+
+    HelpArticle::Pointer target = helpManager->getArticle(v);
+    if (!target) {
+        ptc(ch, "Статьи %d нет.\n\r", v.getValue());
+        return false;
+    }
+
+    if (v == id.getValue()) {
+        stc("Статья не может быть псевдонимом самой себя.\n\r", ch);
+        return false;
+    }
+
+    if (target->getAliasTarget()) {
+        ptc(ch, "Статья %d сама псевдоним статьи %d, укажи её.\n\r",
+            v.getValue(), target->getAliasTarget()->getID());
+        return false;
+    }
+
+    // a skill article carries the skill's stats header, an alias would hide it
+    if ((article->labels.all.count("skill") || article->labels.all.count("spell"))
+        && (target->labels.all.count("skill") || target->labels.all.count("spell")))
+    {
+        stc("Справки умений не делают псевдонимами друг друга.\n\r", ch);
+        return false;
+    }
+
+    refBy = DLString(v.getValue());
+    refByEdited = true;
+    ptc(ch, "Справка по этой статье теперь открывает статью %d.\n\r", v.getValue());
+    return true;
+}
+
 HEDIT(level, "уровень", "установить уровень, с которого доступна справка")
 {
     return numberEdit(-1, MAX_LEVEL, level);
@@ -252,9 +404,9 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         stc("         hedit create         - создать новую пустую статью справки\r\n", ch);
         stc("         hedit search <text>  - поиск в тексте статей, включая ссылки (hh123)\r\n", ch);
         stc("         hedit save           - сохранить все статьи справки на диск\r\n", ch);
-        stc("         hedit label          - список всех меток\r\n", ch);
-        stc("         hedit label <name>   - список всех статей у этой метки\r\n", ch);
-        stc("         hedit label none     - список всех статей без единой метки\r\n", ch);
+        stc("         hedit label          - категории и остальные метки с числом статей\r\n", ch);
+        stc("         hedit label <name>   - статьи этой категории, а если таких нет, с этой меткой\r\n", ch);
+        stc("         hedit label none     - статьи без категории\r\n", ch);
         return;
     }
 
@@ -307,37 +459,49 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
     } else if (arg_is_strict(arg1, "label"))  {
         // 'hedit label' - just show total counts
         if (arg2.empty()) {
-            map<DLString, int> activeLabelCount;
-            const DLString lineFormat = "[{c" + web_cmd(ch, "hedit label $1", "%12s") + "{x], статей {W%d{x";
+            map<DLString, int> categoryCount, facetCount;
+            const DLString lineFormat = "[{c" + web_cmd(ch, "hedit label $1", "%12s") + "{x], статей {W%d{x%s";
 
             for (auto &a: helpManager->getArticles()) {
-                for (auto &l: (*a)->labels.all) 
-                    activeLabelCount[l]++;
-                if ((*a)->labels.all.empty())
-                    activeLabelCount["none"]++;
+                DLString category = (*a)->getCategory();
+                categoryCount[category.empty() ? "none" : category]++;
+
+                for (auto &l: (*a)->labels.all)
+                    if (l != category)
+                        facetCount[l]++;
             }
 
-            for (auto &kv: activeLabelCount) {
-                ch->pecho(fmt(0, lineFormat.c_str(), kv.first.c_str(), kv.second));
-            }
+            ch->pecho("{WКатегории{x (одна на статью, по ним строится 'help index'):");
+            for (auto &kv: categoryCount)
+                ch->pecho(fmt(0, lineFormat.c_str(), kv.first.c_str(), kv.second,
+                    kv.first == "none" || HelpArticle::isPlayerCategory(kv.first) ? "" : " {D(скрыта от игроков){x"));
+
+            ch->pecho("\r\n{WОстальные метки{x (фасеты и метки, которые ставит движок):");
+            for (auto &kv: facetCount)
+                ch->pecho(fmt(0, lineFormat.c_str(), kv.first.c_str(), kv.second, ""));
             return;
         }
 
-        // 'hedit label <arg>' - show articles under this label
+        // 'hedit label <arg>' - articles of this category, otherwise of this label
         list<int> labeledIds;
-        for (auto &a: helpManager->getArticles())
-            if (arg2 == "none") {
-                if ((*a)->labels.all.empty())
-                    labeledIds.push_back(a->getID());
-            } else if ((*a)->labels.all.count(arg2) != 0)
+        for (auto &a: helpManager->getArticles()) {
+            DLString category = (*a)->getCategory();
+            if (arg2 == "none" ? category.empty() : category == arg2)
                 labeledIds.push_back(a->getID());
+        }
+
+        bool byCategory = !labeledIds.empty();
+        if (!byCategory)
+            for (auto &a: helpManager->getArticles())
+                if ((*a)->labels.all.count(arg2) != 0)
+                    labeledIds.push_back(a->getID());
 
         if (labeledIds.empty()) {
             ch->pecho("Не найдено ни одной статьи с этой меткой, укажите название полностью.");
             return;
         }
 
-        ch->pecho("Список всех статей с меткой {c%s{x:", arg2.c_str());
+        ch->pecho("Список всех статей %s {c%s{x:", byCategory ? "в категории" : "с меткой", arg2.c_str());
         const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s";
         for (auto &id: labeledIds) {
             HelpArticle::Pointer a = helpManager->getArticle(id);

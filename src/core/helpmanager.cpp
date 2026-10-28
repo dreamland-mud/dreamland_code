@@ -138,6 +138,11 @@ const StringSet & HelpArticle::getRefBy() const
     return refby;
 }
 
+void HelpArticle::setRefBy(const StringSet &names)
+{
+    refby = names;
+}
+
 static int alias_id(const StringSet &refby)
 {
     for (auto &r: refby) {

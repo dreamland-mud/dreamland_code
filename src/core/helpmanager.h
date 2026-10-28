@@ -49,6 +49,7 @@ public:
 
     /** Names from the 'refby' attribute: commands for CommandHelp, or an article id. */
     const StringSet & getRefBy() const;
+    void setRefBy(const StringSet &names);
 
     /** The article this one is an alias of, set by a numeric 'refby' ('refby="628"'
      *  on a behavior article that duplicates skill 628). One hop only: a target that

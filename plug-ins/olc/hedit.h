@@ -27,6 +27,10 @@ public:
 
     XML_VARIABLE XMLInteger id, level;
     XML_VARIABLE XMLString labels, labelsAuto, autotitle;
+    XML_VARIABLE XMLString seeAlso, refBy;
+    /** Set by the seealso/alias subcommands, so commit() never writes fields
+     *  an editor state saved by an older binary did not carry. */
+    XML_VARIABLE XMLBoolean seeAlsoEdited, refByEdited;
     XML_VARIABLE XMLMultiString text, keyword, title, extra;
 
     template <typename T>
