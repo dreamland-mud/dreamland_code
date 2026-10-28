@@ -58,6 +58,7 @@
 #include "profflags.h"
 #include "configurable.h"
 #include "xmlmultistring.h"
+#include "helprelated.h"
 #include "so.h"
 #include "def.h"
 
@@ -1212,6 +1213,12 @@ public:
                 auto al = aliases.equal_range((*a)->getID());
                 for (auto i = al.first; i != al.second; i++)
                     h["aliases"].append(i->second);
+
+                // The automatic "see also" ids; the game appends the same list as
+                // a line after the body, the website draws its own block.
+                HelpArticle::Pointer art(*a);
+                for (auto &r: help_related(art.getPointer(), &dummy))
+                    h["related"].append(r->getID());
 
                 for (int i = 0; i < 3; i++) {
                     const DLString suffix = dumpLangs[i].suffix;

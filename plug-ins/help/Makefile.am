@@ -19,6 +19,7 @@ libhelp_la_SOURCES = \
 helpformatter.cpp \
 helpmeta.cpp \
 markuphelparticle.cpp \
+helprelated.cpp \
 helpcontainer.cpp \
 bugtracker.cpp \
 areahelp.cpp \
