@@ -30,6 +30,9 @@ enum {
     ARG_CHAR = 3
 };
 
+// Wands work from the inventory or any wear slot, no need to hold them.
+static const int WEARLOC_ANY = -1;
+
 struct MagicItemUsage {
     int item_type;
     const char *cmd;
@@ -55,7 +58,7 @@ bool MagicItemUsage::check( Object *obj, int spellSN, Character *user, Character
     if (fSelfOnly && target != user && target != user->fighting) 
         return false;
     
-    if (obj->wear_loc != wearloc)
+    if (wearloc != WEARLOC_ANY && obj->wear_loc != wearloc)
         if (wearlocationManager->find( wearloc )->canWear( user, obj, F_WEAR_REPLACE ) != RC_WEAR_OK) 
             return false;
     
@@ -76,7 +79,7 @@ bool MagicItemUsage::use( Object *obj, Character *user, Character *target ) cons
     if (!cmd)
         return false;
 
-    if (obj->wear_loc != wearloc) 
+    if (wearloc != WEARLOC_ANY && obj->wear_loc != wearloc) 
         if (wearlocationManager->find( wearloc )->wear( obj, F_WEAR_REPLACE|F_WEAR_VERBOSE ) != RC_WEAR_OK) 
             return false;
 
@@ -113,10 +116,10 @@ struct MagicItemTable {
 
 const MagicItemUsage MagicItemTable::usages [] = {
     { ITEM_PILL,   "eat",      ARG_OBJ,     gsn_none,     true, 1, 4, -1, wear_none },
-    { ITEM_POTION, "quaff",    ARG_OBJ,     gsn_none,     true, 1, 4, -1, wear_none },
-    { ITEM_SCROLL, "recite",   ARG_OBJ_CHAR,gsn_scrolls, false, 1, 4, -1, wear_none },
-    { ITEM_WAND,   "zap",      ARG_CHAR,    gsn_wands,   false, 3, 3,  2, wear_hold },
-    { ITEM_STAFF,  "brandish", ARG_CHAR,    gsn_staves,  false, 3, 3,  2, wear_hold },
+    { ITEM_POTION, "use",      ARG_OBJ,     gsn_none,     true, 1, 4, -1, wear_none },
+    { ITEM_SCROLL, "use",      ARG_OBJ_CHAR,gsn_scrolls, false, 1, 4, -1, wear_none },
+    { ITEM_WAND,   "use",      ARG_OBJ_CHAR,gsn_wands,   false, 3, 3,  2, WEARLOC_ANY },
+    { ITEM_STAFF,  "use",      ARG_OBJ,     gsn_staves,  false, 3, 3,  2, wear_hold },
     { -1 }
 };
 

@@ -13,9 +13,9 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 #include "skill.h"
-#include "skillcommandtemplate.h"
+#include "spell.h"
 #include "spelltarget.h"
-#include "defaultspell.h"
+#include "../skills_impl/defaultspell.h"
 
 #include "affect.h"
 #include "pcharacter.h"
@@ -23,11 +23,7 @@
 #include "core/object.h"
 
 #include "dreamland.h"
-#include "movetypes.h"
-#include "directions.h"
 #include "terrains.h"
-#include "move_utils.h"
-#include "doors.h"
 
 #include "magic.h"
 #include "fight.h"
@@ -42,6 +38,7 @@
 #include "def.h"
 #include "skill_utils.h"
 #include "l10n.h"
+#include "magicitems.h"
 
 CLAN(battlerager);
 GSN(scrolls);
@@ -50,8 +47,30 @@ GSN(wands);
 GSN(none);
 
 /*
- * 'recite' skill command
+ * Scrolls, staves and wands are all used via the 'use' command (comm/use.cpp).
+ * They used to be skill commands, so the skill gate, move cost and lag that
+ * DefaultSkillCommand::run applied are repeated here.
  */
+static bool magic_item_skill_gate( Character *ch, Skill &skill )
+{
+    if (!skill.usable( ch )) {
+        ch->pecho(_("Ты не владеешь навыком {y{hh%s{x."), skill.getNameFor( ch ).c_str( ));
+        return false;
+    }
+
+    int moves = skill.getMoves( ch );
+    if (moves > 0 && ch->move < moves) {
+        ch->pecho(_("Ты слишком уста%Gло|л|ла для этого."), ch);
+        return false;
+    }
+
+    if (moves > 0)
+        ch->move -= moves;
+
+    ch->setWait( skill.getBeats( ch ) );
+    return true;
+}
+
 static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spell, const DLString &args,
                              int &successfulSpells, int &successfulTargets)
 {
@@ -116,25 +135,10 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
     }
 }
 
-SKILL_RUNP( recite )
+void use_scroll( Character *ch, Object *scroll, const DLString &args )
 {
-    Object *scroll;
-    DLString args = argument, arg1;
-
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
         ch->pecho(_("Какие еще свитки-шмитки?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!"));
-        return;
-    }
-
-    arg1 = args.getOneArgument( );
-
-    if (( scroll = get_obj_carry( ch, arg1.c_str( ) ) ) == 0) {
-        ch->pecho(_("У тебя нет такого свитка."));
-        return;
-    }
-
-    if (scroll->item_type != ITEM_SCROLL) {
-        ch->pecho(_("С помощью этой команды можно зачитывать только свитки."));
         return;
     }
 
@@ -142,6 +146,9 @@ SKILL_RUNP( recite )
         ch->pecho(_("Этот свиток чересчур сложен для твоего понимания."));
         return;
     }
+
+    if (!magic_item_skill_gate( ch, *gsn_scrolls ))
+        return;
     
     int successfulSpells = 0, successfulTargets = 0;
     int totalSpells = 0;
@@ -173,12 +180,8 @@ SKILL_RUNP( recite )
 
 
 
-/*
- * 'brandish' skill command
- */
-SKILL_RUNP( brandish )
+void use_staff( Character *ch, Object *staff )
 {
-    Object *staff;
     int sn;
     Skill::Pointer skill;
     Spell::Pointer spell;
@@ -188,16 +191,9 @@ SKILL_RUNP( brandish )
         return;
     }
 
-    if (( staff = get_eq_char( ch, wear_hold ) ) == 0) {
-        ch->pecho(_("Чтобы пользоваться посохами, их надо взять в руки."));
+    if (!magic_item_skill_gate( ch, *gsn_staves ))
         return;
-    }
 
-    if (staff->item_type != ITEM_STAFF) {
-        ch->pecho(_("Ты можешь взмахнуть только посохом."));
-        return;
-    }
-    
     sn = staff->value3();
     skill = SkillManager::getThis( )->find( sn );
     
@@ -274,13 +270,9 @@ SKILL_RUNP( brandish )
 }
 
 
-/*
- * 'zap' skill command
- */
-SKILL_RUNP( zap )
+void use_wand( Character *ch, Object *wand, const DLString &argument )
 {
     std::basic_ostringstream<char> buf;
-    Object *wand;
     int sn;
     Skill::Pointer skill;
     Spell::Pointer spell;
@@ -292,16 +284,9 @@ SKILL_RUNP( zap )
         return;
     }
 
-    if (( wand = get_eq_char( ch, wear_hold ) ) == 0) {
-        ch->pecho(_("Жезл нужно сначала взять в руку."));
+    if (!magic_item_skill_gate( ch, *gsn_wands ))
         return;
-    }
 
-    if (wand->item_type != ITEM_WAND) {
-        ch->pecho(_("Ты можешь взмахнуть только волшебным жезлом!"));
-        return;
-    }
-    
     sn = wand->value3();
     skill = SkillManager::getThis( )->find( sn );
 

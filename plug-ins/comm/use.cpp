@@ -12,6 +12,7 @@
 #include "act.h"
 #include "loadsave.h"
 #include "l10n.h"
+#include "magicitems.h"
 
 /*
  * fenia-related commands: use 
@@ -32,30 +33,27 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
         case ITEM_POTION:
             if (obj->carried_by != ch || obj->wear_loc != wear_none) 
                 ch->pecho(_("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре."), obj);
-            else {
-                DLString idArg = DLString( obj->getID( ) ) + " " + argument;
-                interpret_cmd( ch, "quaff", "%s", idArg.c_str( ) );
-             }
+            else
+                use_potion( ch, obj );
             return true;
         case ITEM_SCROLL:
             if (obj->carried_by != ch || obj->wear_loc != wear_none) 
                 ch->pecho(_("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре."), obj);
-            else {
-                DLString idArg = DLString( obj->getID( ) ) + " " + argument;
-                interpret_cmd( ch, "recite", "%s", idArg.c_str( ) );
-            }
+            else
+                use_scroll( ch, obj, argument );
             return true;
         case ITEM_WAND:
-            if (obj->wear_loc != wear_hold) 
-                ch->pecho(_("%1$^O4 сперва необходимо зажать в руках."), obj);
+            // A wand works from the inventory or from any wear slot.
+            if (obj->carried_by != ch) 
+                ch->pecho(_("%1$^O4 сперва нужно взять."), obj);
             else
-                interpret_cmd( ch, "zap", "%s", argument );
+                use_wand( ch, obj, argument );
             return true;
         case ITEM_STAFF:
-            if (obj->wear_loc != wear_hold) 
+            if (obj->carried_by != ch || obj->wear_loc != wear_hold) 
                 ch->pecho(_("%1$^O4 сперва необходимо зажать в руках."), obj);
             else
-                interpret_cmd( ch, "brandish", "%s", argument );
+                use_staff( ch, obj );
             return true;
     }
 
