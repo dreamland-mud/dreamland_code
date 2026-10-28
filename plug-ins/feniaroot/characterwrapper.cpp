@@ -5576,7 +5576,9 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
         case GK_BUFF: {
             // The measured worn-buff price x the share of the time it is kept up. A
             // prayer below its minimum spell level lasts 0 ticks. A buff the char casts
-            // itself is worth 10% (the item flag rule).
+            // itself is worth 10% (the item flag rule) -- but only from another source:
+            // benediction granted by this very slot would otherwise discount the worn
+            // item against itself, and the sage would flip-flop between two picks.
             if (d->b > 0) {
                 int slevel = ga_grantSpellLevel( target, sk, lvl, caster );
                 if (slevel < d->b)
@@ -5584,8 +5586,11 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
             }
             pve = item_wornbuff_points( d->ref, lvl, caster )
                 * ga_gkSkill( "buff_uptime", *d, d->a ) * use;
-            if (target != 0 && ga_canSelfCast( target, d->ref ))
-                pve *= 0.1;
+            if (target != 0) {
+                Skill *self = skillManager->findExisting( d->ref );
+                if (self != 0 && ga_grantHeld( target, self, outside, inside ))
+                    pve *= 0.1;
+            }
             break;
         }
         case GK_SLEVEL:
