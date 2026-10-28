@@ -79,6 +79,7 @@ public:
     bool isLevelOK( Character * ) const;
     
     inline virtual bool isHidden( ) const;
+    void playStartSound( ) const;
 
     void clearAttributes( ) const;
     Character * getActor( Character * ) const;

@@ -104,9 +104,9 @@ void GlobalQuestInfo::tryStart( const GlobalQuestInfo::Config &config )
             GQChannel::gecho( this, buf.str( ) );
     }
 
-    for (Descriptor *d = descriptor_list; d; d = d->next)
-        if (d->connected == CON_PLAYING && d->character && gq->isLevelOK( d->character ))
-            msp_sound( d->character, "alert/gquest", 100, 1, 60 );
+    // A hidden quest is announced later (RainbowGQuest::after), trumpets go with it.
+    if (!gq->isHidden( ))
+        gq->playStartSound( );
 
     gq->resume( );
     manager->saveRT( *gq );

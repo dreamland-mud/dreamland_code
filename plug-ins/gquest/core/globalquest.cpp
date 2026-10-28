@@ -18,6 +18,8 @@
 #include "room.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
+#include "descriptor.h"
+#include "msp.h"
 #include "clan.h"
 #include "npcharacter.h"
 #include "msgformatter.h"
@@ -141,6 +143,15 @@ void GlobalQuest::printRemainedTime( ostringstream &buf, Character *ch ) const
         buf << fmt( ch, _("{Y%1$d{y минут%1$Iа|ы|"), t );
     else
         buf << fmt( ch, _("меньше минуты") );
+}
+
+// Trumpets for everyone in the level range. Sounded when the quest is announced:
+// at start, or for a quest with a hidden setup phase, when it goes public.
+void GlobalQuest::playStartSound( ) const
+{
+    for (Descriptor *d = descriptor_list; d; d = d->next)
+        if (d->connected == CON_PLAYING && d->character && isLevelOK( d->character ))
+            msp_sound( d->character, "alert/gquest", 100, 1, 60 );
 }
 
 bool GlobalQuest::isLevelOK( Character *ch ) const

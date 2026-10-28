@@ -216,6 +216,7 @@ void RainbowGQuest::after( )
     if (state == ST_INIT) {
         GQChannel::gecho( this, _( getScenario( )->getStartMsg( ) ) );
         state = ST_RUNNING;
+        playStartSound( );
     }
     
     GlobalQuest::after( );

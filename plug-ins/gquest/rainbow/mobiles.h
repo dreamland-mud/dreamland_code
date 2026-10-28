@@ -26,6 +26,7 @@ public:
     virtual void entry( );
     virtual void greet( Character * );
     virtual bool death( Character * );
+    virtual void show( Character *, std::basic_ostringstream<char> & );
 
     XML_VARIABLE XMLInteger number;
 

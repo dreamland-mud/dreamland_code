@@ -21,6 +21,7 @@
 #include "def.h"
 #include "l10n.h"
 #include "fenia_utils.h"
+#include "follow_utils.h"
 
 WEARLOC(none);
 
@@ -162,12 +163,28 @@ bool oprog_can_fetch_corpse_pc( Character *ch, Object *container, Object *obj, b
     
     if (ch->is_immortal( ))
         return true;
+
+    // A named item belongs to its owner, whoever's corpse it lies in.
+    if (obj && !obj->getOwner( ).empty( ) && !obj->hasOwner( ch )) {
+        if (verbose)
+            echo_master(ch, _("Это не твоя добыча."));
+        return false;
+    }
         
     if (container->hasOwner( ch ))
         return true;
         
-    if (container->killer.empty())
-        return true;
+    // No player killer (a mob, a trap): only the owner's group may loot.
+    if (container->killer.empty()) {
+        PCharacter *owner = PCharacterManager::findPlayer( container->getOwner( ) );
+
+        if (owner && is_same_group( ch, owner ))
+            return true;
+
+        if (verbose)
+            echo_master(ch, _("Это не твоя добыча."));
+        return false;
+    }
 
     if (container->killer != ch->getNameC() && container->killer != "!anybody!")
     {
