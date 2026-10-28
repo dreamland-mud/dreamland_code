@@ -4,6 +4,7 @@
  */
 #include "markuphelparticle.h"
 #include "helpformatter.h"
+#include "helprelated.h"
 #include "websocketrpc.h"
 #include "character.h"
 #include "pcharacter.h"
@@ -38,6 +39,19 @@ DLString MarkupHelpArticle::getText( Character *ch ) const
 
     getRawText( ch, in );
     applyFormatter( ch, in, out );
+
+    // In game only, like the title header: the website gets the same list as
+    // the 'related' field of the help dump and lays it out itself.
+    if (ch && ch->desc && ch->desc->connected == CON_PLAYING) {
+        DLString related = help_related_line(this, ch);
+
+        if (!related.empty()) {
+            DLString body = out.str();
+            if (!body.empty() && body.at(body.size() - 1) != '\n')
+                out << endl;
+            out << endl << related << endl;
+        }
+    }
 
     return out.str( );
 }

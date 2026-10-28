@@ -8,6 +8,7 @@
 #include "lang.h"
 #include <list>
 #include <map>
+#include <vector>
 
 #include "oneallocate.h"
 #include "xmlstringlist.h"
@@ -53,6 +54,14 @@ public:
      *  on a behavior article that duplicates skill 628). One hop only: a target that
      *  is itself an alias, or a missing id, means no alias. */
     Pointer getAliasTarget() const;
+
+    /** Hand-picked related article ids from the 'seealso' attribute, in the
+     *  author's order. They lead the automatic "see also" line. */
+    const std::vector<int> & getSeeAlso() const;
+    void setSeeAlso(const std::vector<int> &ids);
+    /** The 'seealso' attribute value: ids separated by spaces. */
+    static DLString seeAlsoToString(const std::vector<int> &ids);
+    static std::vector<int> seeAlsoFromString(const DLString &value);
     /** Persist an XML file containing this article to disk. */
     virtual void save() const;
 
@@ -114,6 +123,7 @@ public:
     static const DLString ATTRIBUTE_LEVEL;
     static const DLString ATTRIBUTE_REF;
     static const DLString ATTRIBUTE_REFBY;
+    static const DLString ATTRIBUTE_SEEALSO;
     static const DLString ATTRIBUTE_LABELS;
     static const DLString ATTRIBUTE_ID;
     
@@ -147,6 +157,9 @@ protected:
 
     /** List of help articles that refer to this one, specified as an XML attribute. */
     StringSet refby;
+
+    /** Hand-picked related article ids, specified as an XML attribute. */
+    std::vector<int> seeAlso;
 
     /** Level from which this article is visible. */
     int level;

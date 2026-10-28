@@ -27,6 +27,7 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/services/petshop \
 -I$(top_srcdir)/plug-ins/skills_impl \
 -I$(top_srcdir)/plug-ins/groups \
+-I$(top_srcdir)/plug-ins/help \
 -I/usr/include/jsoncpp \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
@@ -38,6 +39,7 @@ $(LIBADD_AI) \
 ../updates/libupdates.la \
 ../mlove/libmlove.la \
 ../servlets/libservlets.la \
+../help/libhelp.la \
 ../clan/core/libclan_core.la \
 ../skills_impl/libskills_impl.la \
 ../groups/libgenericskill.la \

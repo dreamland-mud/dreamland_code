@@ -35,6 +35,9 @@ bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
     if (id > 0)
         parent->insertAttribute(HelpArticle::ATTRIBUTE_ID, DLString(id));
 
+    if (!seeAlso.empty())
+        parent->insertAttribute(HelpArticle::ATTRIBUTE_SEEALSO, HelpArticle::seeAlsoToString(seeAlso));
+
     return true;    
 }
 
@@ -45,6 +48,7 @@ void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent )
     labels = parent->getAttribute(HelpArticle::ATTRIBUTE_LABELS);
     parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL, level );
     parent->getAttribute(HelpArticle::ATTRIBUTE_ID, id);
+    seeAlso = HelpArticle::seeAlsoFromString(parent->getAttribute(HelpArticle::ATTRIBUTE_SEEALSO));
 }
 
 void XMLAreaHelp::init(AreaHelp *ahelp)
@@ -52,6 +56,7 @@ void XMLAreaHelp::init(AreaHelp *ahelp)
     level = ahelp->getLevel();
     id = ahelp->getID();
     labels = ahelp->labels.persistent.toString();
+    seeAlso = ahelp->getSeeAlso();
 
     title = ahelp->title;
     extra = ahelp->extra;
@@ -70,6 +75,7 @@ AreaHelp::Pointer XMLAreaHelp::compat() const
     help->setLevel(level);
     help->setID(id);
     help->labels.addPersistent(labels);
+    help->setSeeAlso(seeAlso);
 
     return help;
 }
