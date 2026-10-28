@@ -16,13 +16,26 @@ class PCharacter;
  * the login handler -- so this only does create -> world -> associate -> the
  * CON_READ_MOTD->CON_PLAYING transition (which fires the account config-apply and
  * last-host listeners, exactly like a login) -> look. Mirrors backdoorhandler's
- * fresh-load path (backdoorhandler.cpp:108-133). Returns the new character, or 0
+ * fresh-load path (backdoorhandler.cpp:120-143). Returns the new character, or 0
  * on a create failure -- defensive only: PCharacterManager::create currently
  * always returns a shell (a missing pfile yields a blank char, not 0), so the
  * REAL "does this character exist" gate is the caller's find()!=0 check before it
- * hands a name here.
+ * hands a name here. A character saved mid-remort goes to the race interview
+ * instead of the world (account_resume_remort).
  */
 PCharacter * account_enter_char(Descriptor *d, const DLString &charName);
+
+/**
+ * A pfile saved mid-remort (cremort.cpp writes the new body with the "remorting"
+ * attribute, then hands the descriptor to the race interview) must go back to
+ * that interview, never into the world as a raceless level-0 shell. If `ch`
+ * carries the attribute, associate it with `d` and start the remort nanny the
+ * way cremort does, and return true; otherwise touch nothing and return false.
+ * Every C++ cold-load door calls this right after PCharacterManager::create/update,
+ * before placing the character in the world (the Fenia nanny resumes through
+ * taskGreet -> taskRemort instead).
+ */
+bool account_resume_remort(Descriptor *d, PCharacter *ch);
 
 /**
  * Reconnect descriptor `d` into an OWNED character's LINKDEAD body already in the
