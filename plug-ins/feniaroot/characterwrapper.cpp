@@ -7784,15 +7784,33 @@ static bool report_skill_invalid_in_fight(int sn)
         || sn == gsn_bash_door;
 }
 
-NMI_INVOKE( CharacterWrapper, reportSkills, "(): для очарованного NPC -- список структур приказываемых скилов для рапорта. Поля: bucket (0 внебоевая команда, 1 боевая, 2 заклинание, 3 пассив), help_id, cmdname (имя для хозяина), sysname (англ. имя скила), showall_only (показывать только в 'рапорт все')" )
+NMI_INVOKE( CharacterWrapper, reportSkills, "([viewer]): для очарованного NPC -- список структур приказываемых скилов для рапорта. Без хозяина (пет в магазине) -- как если бы его очаровал viewer. Поля: bucket (0 внебоевая команда, 1 боевая, 2 заклинание, 3 пассив), help_id, cmdname (имя для хозяина), sysname (англ. имя скила), showall_only (показывать только в 'рапорт все')" )
 {
     checkTarget();
 
     RegList::Pointer list(NEW);
 
     NPCharacter *pet = target->getNPC();
-    if (!pet || pet->master == 0)
+    if (!pet)
         return ::wrap(list);
+
+    // A pet still in the shop has no master: judge it as if the viewer had
+    // charmed it, so the list is what the buyer gets (DefaultSpell::properOrder
+    // drops offensive spells only for IS_CHARMED). Restored below.
+    bool borrowedMaster = false, borrowedCharm = false;
+    if (pet->master == 0) {
+        if (args.empty())
+            return ::wrap(list);
+        Character *viewer = arg2character(args.front());
+        if (!viewer)
+            return ::wrap(list);
+        pet->master = viewer;
+        borrowedMaster = true;
+        if (!IS_AFFECTED(pet, AFF_CHARM)) {
+            SET_BIT(pet->affected_by, AFF_CHARM);
+            borrowedCharm = true;
+        }
+    }
     Character *master = pet->master;
 
     // properOrder inspects the pet's fighting flag to test fight-context
@@ -7860,6 +7878,11 @@ NMI_INVOKE( CharacterWrapper, reportSkills, "(): для очарованного
         info->setField(IdRef("showall_only"), showallOnly);
         list->push_back(infoReg);
     }
+
+    if (borrowedCharm)
+        REMOVE_BIT(pet->affected_by, AFF_CHARM);
+    if (borrowedMaster)
+        pet->master = 0;
 
     return ::wrap(list);
 }
