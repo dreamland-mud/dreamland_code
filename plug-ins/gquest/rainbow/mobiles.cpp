@@ -119,6 +119,27 @@ bool RainbowMob::death( Character *killer )
 }
 
 
+// Tag the mob for every participant who still lacks its piece, the same
+// viewers specIdle would hand one to.
+void RainbowMob::show( Character *viewer, std::basic_ostringstream<char> &buf )
+{
+    RainbowGQuest *gq = RainbowGQuest::getThis( );
+
+    if (!gq || gq->isHidden( ) || viewer->is_npc( ))
+        return;
+
+    if (!gq->isLevelOK( viewer ))
+        return;
+
+    if (viewer->getPC( )->getAttributes( ).isAvailable( gq->getQuestID( ) ))
+        return;
+
+    if (hasMyNumber( viewer ))
+        return;
+
+    buf << fmt( viewer, _("{1{R[ЦЕЛЬ] {2") );
+}
+
 bool RainbowMob::hasMyNumber( Character *wch )
 {
     Object *obj;

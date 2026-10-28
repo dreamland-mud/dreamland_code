@@ -398,11 +398,25 @@ void DefaultWearlocation::triggersOnEquip( Character *ch, Object *obj )
 // Is the character currently WEARING (not merely carrying) an object of this
 // prototype vnum? Used to keep a shared worn-affect alive while any granting
 // item is still on.
-static bool wearing_object_vnum( Character *ch, int vnum )
+//
+// A worn buff (property "wornbuff") rides generic generator vnums shared by many
+// different items, so the vnum alone proves nothing: when wornBuff is given, a
+// generated or crafted piece (measure_m) counts only if it casts that same buff.
+static bool wearing_object_vnum( Character *ch, int vnum, const DLString &wornBuff )
 {
-    for (Object *o = ch->carrying; o != 0; o = o->next_content)
-        if (o->wear_loc != wear_none && o->pIndexData && o->pIndexData->vnum == vnum)
-            return true;
+    for (Object *o = ch->carrying; o != 0; o = o->next_content) {
+        if (o->wear_loc == wear_none || !o->pIndexData || o->pIndexData->vnum != vnum)
+            continue;
+
+        if (!wornBuff.empty( )) {
+            DLString hers = o->getProperty( "wornbuff" );
+
+            if (hers != wornBuff && (!hers.empty( ) || !o->getProperty( "measure_m" ).empty( )))
+                continue;
+        }
+
+        return true;
+    }
     return false;
 }
 
@@ -425,9 +439,12 @@ static void strip_object_sourced_affects( Character *ch, Object *obj )
         if (!paf->sources.hasObject( vnum ))
             continue;
 
+        DLString skillName = paf->type->getName( );
+        DLString wornBuff = obj->getProperty( "wornbuff" ) == skillName ? skillName : DLString::emptyString;
+
         bool keptByAnother = false;
         for (int srcVnum: paf->sources.objectVnums())
-            if (wearing_object_vnum( ch, srcVnum )) {
+            if (wearing_object_vnum( ch, srcVnum, wornBuff )) {
                 keptByAnother = true;
                 break;
             }

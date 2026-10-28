@@ -487,8 +487,8 @@ bool Walkment::checkWater( Character *wch )
     // water_noswim: can be ridden through only if the horse swims, can get through with any boat
     // underwater: can't get through with any boat, swimming only     
     
-    // TODO: pets still inherit all boat_types from their master, so underwater restrictions
-    // don't really apply to them yet.
+    // boat_types are the party's (a pet travels in its master's boat), which is right
+    // for surface water. Underwater nobody shares gills, so a pet needs its own swimming.
 
     if (RoomUtils::isWater(from_room) && !RoomUtils::isWater(to_room) && IS_SET(wch->form, FORM_FISH)) {
             msgSelfParty( wch,
@@ -504,7 +504,9 @@ bool Walkment::checkWater( Character *wch )
 
     if (from_room->getSectorType() == SECT_UNDERWATER || 
          to_room->getSectorType() == SECT_UNDERWATER) {
-            if (!IS_SET(boat_types, BOAT_SWIM)) {
+            int swimTypes = horse ? boat_types : boat_get_types(wch);
+
+            if (!IS_SET(swimTypes, BOAT_SWIM)) {
                msgSelfParty( wch,
                       "To get {hh2128underwater{x you need gills or a scuba set.",
                       "Чтобы попасть {hh2128под воду{x, нужны жабры или акваланг.",
