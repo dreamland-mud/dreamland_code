@@ -28,6 +28,7 @@
 #include "entrytoken.h"
 #include "resume.h"
 #include "interprethandler.h"
+#include "nannyhandler.h"
 #include "defaultbufferhandler.h"
 #include "descriptorstatemanager.h"
 #include "descriptor.h"
@@ -319,13 +320,18 @@ PCharacter * account_enter_char(Descriptor *d, const DLString &charName)
         return 0;
 
     // Load and link to the world anew -- the fresh-load half of backdoorhandler
-    // (backdoorhandler.cpp:108-133). The caller has already taken any current
+    // (backdoorhandler.cpp:120-143). The caller has already taken any current
     // character out of the world (switch) or dropped the login handler (entry).
     PCharacter *ch = PCharacterManager::create(charName);
     if (!ch)
         return 0;
 
     PCharacterManager::update(ch);
+
+    // A failed nanny start closes d and frees ch, leaving d->character null.
+    if (account_resume_remort(d, ch))
+        return d->character ? ch : 0;
+
     char_to_list(ch, &char_list);
 
     Room *start_room = get_room_instance(ch->getStartRoom());
@@ -356,6 +362,22 @@ PCharacter * account_enter_char(Descriptor *d, const DLString &charName)
     return ch;
 }
 
+bool account_resume_remort(Descriptor *d, PCharacter *ch)
+{
+    if (!d || !ch || !ch->getAttributes().isAvailable("remorting"))
+        return false;
+
+    LogStream::sendNotice() << "Remort resume: " << d->host << " back to the race interview for "
+                            << ch->getName() << endl;
+
+    // Same hand-off as the end of cremort: registered, associated, in no list or
+    // room yet. doPlace puts it on newbie_list and the Fenia nanny resumes at
+    // taskRemort, which clears the attribute when the interview is done.
+    d->associate(ch);
+    NannyHandler::initRemort(d);
+    return true;
+}
+
 /**
  * Reconnect descriptor `d` into the LINKDEAD body `twin` already in the world,
  * instead of cold-loading a duplicate: the take-over sibling of account_enter_char
@@ -364,7 +386,7 @@ PCharacter * account_enter_char(Descriptor *d, const DLString &charName)
  * character (save/quit/resume_token_clear/extract_char) -- so `d` already carries a
  * live game buffer and a spent InterpretHandler here: no login shell to detach, no
  * buffer swap, unlike the entry token's fresh web descriptor. Mirrors the
- * entry-token/resume take-over (entrytoken.cpp:249-276, resume.cpp:213-235): drop any
+ * entry-token/resume take-over (entrytoken.cpp:252-288, resume.cpp:213-235): drop any
  * stale resume token on the body, close whatever dead descriptor still clings to it,
  * hand `d` the body, then fire CON_RESUME->CON_PLAYING (config-apply + last-host still
  * run, arriving-player greeters stay quiet -- this is a reconnect, not a login).

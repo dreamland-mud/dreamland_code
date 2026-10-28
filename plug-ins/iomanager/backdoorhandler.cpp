@@ -10,6 +10,7 @@
 #include "descriptorstatemanager.h"
 #include "defaultbufferhandler.h"
 #include "resume.h"
+#include "entrytoken.h"
 #include "comm.h"
 #include "codepage.h"
 #include "colour.h"
@@ -93,9 +94,18 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
     d->buffer_handler = new DefaultBufferHandler( num );
     d->send( "Welcome to Dream Land!\r\n" );
     
-    /* close other descs for this character, waiting in the nanny */
-    while (( d0 = descriptor_find_named( d, pcm->getName( ), CON_NANNY ) )) 
+    /* close other descs for this character, waiting in the nanny. Closing a
+     * mid-remort nanny frees its registered PCharacter, which may be the very
+     * object pcm points at, so keep the name and look it up again afterwards. */
+    DLString charName = pcm->getName( );
+    while (( d0 = descriptor_find_named( d, charName, CON_NANNY ) )) 
         d0->close( );
+
+    if (!( pcm = PCharacterManager::find( charName ) )) {
+        d->send( "Wrong name.\r\n" );
+        d->close( );
+        return -1;
+    }
     
     /* already playing - reconnect or reanimate */
     if (( pch = pcm->getPlayer( ) )) {
@@ -112,6 +122,9 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
         pch = PCharacterManager::create( pcm->getName( ) );
         PCharacterManager::update( pch );
         
+        if (account_resume_remort( d, pch ))
+            return 1;
+
         char_to_list( pch, &char_list );
 
         Room *start_room = get_room_instance( pch->getStartRoom()  );
