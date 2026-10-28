@@ -59,6 +59,9 @@ public:
      *  author's order. They lead the automatic "see also" line. */
     const std::vector<int> & getSeeAlso() const;
     void setSeeAlso(const std::vector<int> &ids);
+    /** The 'seealso' attribute value: ids separated by spaces. */
+    static DLString seeAlsoToString(const std::vector<int> &ids);
+    static std::vector<int> seeAlsoFromString(const DLString &value);
     /** Persist an XML file containing this article to disk. */
     virtual void save() const;
 

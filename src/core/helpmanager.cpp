@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <algorithm>
 #include "logstream.h"
 #include "helpmanager.h"
 #include "integer.h"
@@ -158,6 +159,34 @@ void HelpArticle::setSeeAlso(const std::vector<int> &ids)
     seeAlso = ids;
 }
 
+DLString HelpArticle::seeAlsoToString(const std::vector<int> &ids)
+{
+    DLString result;
+
+    for (auto i: ids) {
+        if (!result.empty())
+            result += " ";
+        result += DLString(i);
+    }
+
+    return result;
+}
+
+std::vector<int> HelpArticle::seeAlsoFromString(const DLString &value)
+{
+    std::vector<int> ids;
+    DLString rest = value;
+
+    for (DLString arg = rest.getOneArgument(); !arg.empty(); arg = rest.getOneArgument()) {
+        Integer v;
+        if (Integer::tryParse(v, arg) && v > 0
+                && std::find(ids.begin(), ids.end(), (int)v) == ids.end())
+            ids.push_back(v);
+    }
+
+    return ids;
+}
+
 HelpArticle::Pointer HelpArticle::getAliasTarget() const
 {
     int id = alias_id(refby);
@@ -277,15 +306,8 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     if (!refby.empty( ))
         parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
 
-    if (!seeAlso.empty()) {
-        DLString ids;
-        for (auto i: seeAlso) {
-            if (!ids.empty())
-                ids += " ";
-            ids += DLString(i);
-        }
-        parent->insertAttribute(ATTRIBUTE_SEEALSO, ids);
-    }
+    if (!seeAlso.empty())
+        parent->insertAttribute(ATTRIBUTE_SEEALSO, seeAlsoToString(seeAlso));
 
     if (!labels.persistent.empty())
         parent->insertAttribute(ATTRIBUTE_LABELS, labels.persistent.toString());
@@ -305,13 +327,7 @@ void HelpArticle::fromXML( const XMLNode::Pointer &parent )
     ref.fromString( parent->getAttribute( ATTRIBUTE_REF ) );
     refby.fromString( parent->getAttribute( ATTRIBUTE_REFBY ) );
 
-    seeAlso.clear();
-    DLString ids = parent->getAttribute(ATTRIBUTE_SEEALSO);
-    for (DLString arg = ids.getOneArgument(); !arg.empty(); arg = ids.getOneArgument()) {
-        Integer v;
-        if (Integer::tryParse(v, arg) && v > 0)
-            seeAlso.push_back(v);
-    }
+    seeAlso = seeAlsoFromString(parent->getAttribute(ATTRIBUTE_SEEALSO));
     labels.persistent.clear();
     labels.addPersistent(parent->getAttribute(ATTRIBUTE_LABELS));
 

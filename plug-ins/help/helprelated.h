@@ -5,7 +5,9 @@
  * to it, then articles of the same category sharing a rare keyword, then
  * articles of other categories that link to it. Nothing the body already links
  * to is repeated. scripts/help-related.py is the specification and the offline
- * test bench: a change to the ranking goes there first, then here.
+ * test bench: a change to the ranking goes there first, then here. One known
+ * difference: the bench ranks over the public level-1 dump, the engine over
+ * every article, and filters by what the viewer may see after ranking.
  */
 #ifndef HELPRELATED_H
 #define HELPRELATED_H

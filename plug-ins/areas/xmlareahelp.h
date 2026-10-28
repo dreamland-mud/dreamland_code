@@ -31,6 +31,7 @@ public:
     int level;
     DLString labels;
     int id;
+    std::vector<int> seeAlso;
 };
 
 #endif

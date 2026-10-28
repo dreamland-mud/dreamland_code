@@ -1,7 +1,6 @@
 /* Automatic "see also" for help articles -- see helprelated.h. */
 #include <ctime>
 #include <cctype>
-#include <cstring>
 #include <map>
 #include <set>
 #include <sstream>
@@ -59,8 +58,10 @@ void scan_links(const DLString &text, set<int> &ids)
         DLString::size_type d = p + 3;
         int id = 0;
 
-        while (d < text.size() && isdigit((unsigned char)text.at(d)))
-            id = id * 10 + (text.at(d++) - '0');
+        // A real id is at most a few digits; more is garbage, not an overflow.
+        for (int digits = 0; d < text.size() && isdigit((unsigned char)text.at(d)); d++, digits++)
+            if (digits < 9)
+                id = id * 10 + (text.at(d) - '0');
 
         if (id <= 0)
             continue;
@@ -71,9 +72,24 @@ void scan_links(const DLString &text, set<int> &ids)
     }
 }
 
-bool is_separator(char c)
+/** Word characters as in help-related.py's [\w']: letters (any byte above
+ *  ASCII is a KOI8 letter), digits, underscore and the apostrophe, which stays
+ *  inside a word (зв'язок) and is trimmed off its ends. */
+bool is_word_char(char c)
 {
-    return strchr(" '\"-,.:;()/!?", c) != 0;
+    unsigned char u = (unsigned char)c;
+    return u >= 128 || isalnum(u) || c == '_' || c == '\'';
+}
+
+void add_word(Node &n, DLString word)
+{
+    while (!word.empty() && word.at(0) == '\'')
+        word.erase(0, 1);
+    while (!word.empty() && word.at(word.size() - 1) == '\'')
+        word.erase(word.size() - 1);
+
+    if (word.size() >= MIN_WORD && !word.isNumber())
+        n.words.insert(word);
 }
 
 void add_keyword(Node &n, const DLString &keyword)
@@ -92,12 +108,11 @@ void add_keyword(Node &n, const DLString &keyword)
 
     DLString word;
     for (DLString::size_type i = 0; i <= kw.size(); i++) {
-        if (i < kw.size() && !is_separator(kw.at(i))) {
+        if (i < kw.size() && is_word_char(kw.at(i))) {
             word += kw.at(i);
             continue;
         }
-        if (word.size() >= MIN_WORD && !word.isNumber())
-            n.words.insert(word);
+        add_word(n, word);
         word.clear();
     }
 }
@@ -172,14 +187,15 @@ void build()
             add(j, w + OUTDEG / max(1, (int)from->second.linked.size()));
         }
 
-        if (!n.cat.empty()) {
-            set<DLString> mine;
+        set<DLString> mine;
+        if (!n.cat.empty())
             for (auto &w: n.words)
                 if (df[w] <= RARE_DF)
                     mine.insert(w);
 
+        if (!mine.empty()) {
             for (auto j: byCat[n.cat]) {
-                if (j == id || mine.empty())
+                if (j == id)
                     continue;
 
                 const Node &other = nodes[j];
@@ -222,6 +238,8 @@ void ensure_built()
 DLString link(const HelpArticle *a, lang_t lang)
 {
     DLString label = a->getTitle("toc", lang).colourStrip();
+    if (label.empty())
+        label = DLString(a->getID());
 
     // The tag parser swallows every digit after the id, so a title that
     // starts with one needs a separator.
@@ -239,7 +257,7 @@ vector<HelpArticle::Pointer> help_related(const HelpArticle *article, Character 
 {
     vector<HelpArticle::Pointer> result;
 
-    if (!article || !helpManager || article->getID() <= 0)
+    if (!article || !ch || !helpManager || article->getID() <= 0)
         return result;
 
     ensure_built();
