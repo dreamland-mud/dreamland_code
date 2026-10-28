@@ -4181,6 +4181,23 @@ static DLString ga_termKey( const Affect &af )
     return key;
 }
 
+// The char's percent in a skill as a +m% learned affect sees it. A worn item's own +m is
+// already inside getSkill, and getSkill clamps at 100, so it would leave itself no room
+// and score 0 while the same item in the pack scores full -- the sage then flip-flops.
+// Worn: the percent without this item's bonus. A skill the char holds only temporarily
+// (perhaps granted by this very item) keeps the plain reading.
+static int ga_skillBefore( Character *target, int sn, bool worn, int m )
+{
+    int eff = target->getSkill( sn );
+    if (!worn || m <= 0 || eff <= 0 || target->getPC( ) == 0)
+        return eff;
+    Skill *sk = skillManager->find( sn );
+    if (sk == 0 || temporary_skill_active( sk, target ))
+        return eff;
+    int raw = sk->getLearned( target ) + skill_learned_from_affects( sk, target->getPC( ) ) - m;
+    return URANGE( 0, raw, 100 );
+}
+
 static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6],
                             Character *target, bool worn, int itemLevel = -1 )
 {
@@ -4257,7 +4274,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
         if (isSkill) {
             if (target != 0)
                 for (int sn: af.global.toArray( )) {
-                    int eff = target->getSkill( sn );
+                    int eff = ga_skillBefore( target, sn, worn, m );
                     int room = 100 - eff;
                     if (eff > 0 && room > 0)
                         s += w.learnSkill * item_learn_skill_mult( sn ) * (m < room ? m : room);
@@ -4282,7 +4299,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
                     bool inGroup = false;
                     for (int g: sk->getGroups( ).toArray( ))
                         if (groups.count( g )) { inGroup = true; break; }
-                    int eff = inGroup ? target->getSkill( i ) : 0;
+                    int eff = inGroup ? ga_skillBefore( target, i, worn, m ) : 0;
                     if (eff <= 0)
                         continue;
                     owns = true;
