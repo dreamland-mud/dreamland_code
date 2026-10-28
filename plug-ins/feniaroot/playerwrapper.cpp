@@ -123,6 +123,28 @@ NMI_SET(PlayerWrapper, ukrainianName, "украинское имя с падеж
     save();
 }
 
+NMI_GET(PlayerWrapper, englishName, "английская форма имени, как ее видят EN-зрители; пусто -- транслит логина при входе")
+{
+    PCMemoryInterface *pci = getTarget();
+    if (PCharacter *pc = dynamic_cast<PCharacter *>(pci))
+        return Register(pc->getEnglishName());
+    if (PCharacterMemory *pcm = dynamic_cast<PCharacterMemory *>(pci))
+        return Register(pcm->getEnglishName());
+    return Register("");
+}
+
+NMI_SET(PlayerWrapper, englishName, "английская форма имени, как ее видят EN-зрители; пусто -- транслит логина при входе")
+{
+    PCMemoryInterface *pci = getTarget();
+    if (PCharacter *pc = dynamic_cast<PCharacter *>(pci))
+        pc->setEnglishName(arg2string(arg));
+    else if (PCharacterMemory *pcm = dynamic_cast<PCharacterMemory *>(pci))
+        pcm->setEnglishName(arg2string(arg));
+    else
+        return;
+    save();
+}
+
 NMI_INVOKE(PlayerWrapper, autofillUaName, "(): разовый бекфил украинской формы имени (онлайн или оффлайн), как при входе в игру, плюс замена старых копий русской формы; true, если форма записана")
 {
     PCMemoryInterface *pci = getTarget();
