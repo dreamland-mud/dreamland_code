@@ -15,6 +15,7 @@
 #include "affect.h"
 #include "affecthandler.h"
 #include "skillreference.h"
+#include "skillmanager.h"
 #include "skillcommand.h"
 #include "wearlocation.h"
 #include "spell.h"
@@ -37,6 +38,7 @@ GSN(dual_backstab);
 GSN(circle);
 GSN(ambush);
 GSN(assassinate);
+GSN(iaido);
 WEARLOC(shield);
 GROUP(draconian);
 
@@ -106,10 +108,36 @@ SkillDamage::SkillDamage( Affect *paf, Character *victim, int sn, int dam_type, 
 
 bool SkillDamage::canDamage( )
 {
+    // Read before Damage::canDamage: adjustFighting starts the fight right there.
+    bool opener = !paf && ch && ch != victim && victim->fighting == 0;
+
     if (!Damage::canDamage( ))
         return false;
 
+    if (opener && iaidoDraws( ))
+        return false;
+
     return !shieldBlocks( );
+}
+
+/*
+ * A contact skill aimed at a samurai outside a fight, landed or missed, gets the
+ * same draw from the scabbard as the first landed blow of an engagement
+ * (UndefinedOneHit::canDamage, Fenia skillcommand/iaido/apply). True cancels it.
+ */
+bool SkillDamage::iaidoDraws( )
+{
+    static const char *contact[] = { "dirt kicking", "bash", "trip", "kick", "crush", "tail", 0 };
+    Skill *skill = skillManager->find( sn );
+
+    if (!skill)
+        return false;
+
+    for (int i = 0; contact[i]; i++)
+        if (skill->getName( ) == contact[i])
+            return gsn_iaido->getCommand( )->apply( ch, victim, 0 );
+
+    return false;
 }
 
 /*

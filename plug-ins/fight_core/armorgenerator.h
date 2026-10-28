@@ -110,6 +110,7 @@ protected:
     virtual double candidateWeight(const DLString &secName, const Json::Value &affix) const;
     /** A learned ancient language (affix "skills") short of native, or -1. */
     int pickTongue(const Json::Value &affix) const;
+    double learnedValueMult() const;
 
     /** A crafted piece (craft/armor rollCraft): no core picks and no stat floor,
      *  the crafter's fixed stats are already on the item. */
