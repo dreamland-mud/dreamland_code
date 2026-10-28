@@ -141,6 +141,14 @@ double item_one_m(int level, bool caster, const DLString &slot)
     return item_rolls(level, slot) * (w.dr + w.hr + 10 * w.hp + 10 * w.mana);
 }
 
+double item_learn_skill_mult(int sn)
+{
+    Skill *skill = skillManager->find(sn);
+    if (!skill)
+        return 1.0;
+    return item_value_sub("shared", "learn_skill_value", skill->getName().c_str(), 1.0);
+}
+
 double item_level_curve(int level)
 {
     std::map<int, double> points;

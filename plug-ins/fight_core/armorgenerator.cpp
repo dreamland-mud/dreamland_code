@@ -481,7 +481,7 @@ bool ItemAffixRoller::modelPoints(const DLString &secName, const Json::Value &af
         return true;
     }
     if (secName == "player") {
-        points = (value == "learned" ? w.learnSkill : w.skillLevel) * max(1, affix["mod"].asInt());
+        points = (value == "learned" ? w.learnSkill * learnedValueMult() : w.skillLevel) * max(1, affix["mod"].asInt());
         return true;
     }
     if (secName == "extra") {
@@ -627,6 +627,27 @@ int ItemAffixRoller::pickTongue(const Json::Value &affix) const
     if (tongues.empty())
         return -1;
     return tongues.at(number_range(0, tongues.size() - 1));
+}
+
+// The +N% "learned" affix lands on a random skill the wearer knows (see apply),
+// so price it at the mean value of those skills: a thief full of sneak/haggle
+// pays less for it than a warrior whose picks are all combat skills.
+double ItemAffixRoller::learnedValueMult() const
+{
+    if (!pch)
+        return 1.0;
+
+    double sum = 0;
+    int cnt = 0;
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        PCSkillData &data = pch->getSkillData(sn);
+        Skill *skill = skillManager->find(sn);
+        if (data.learned > 1 && !data.isTemporary() && skill && skill->available(pch)) {
+            sum += item_learn_skill_mult(sn);
+            cnt++;
+        }
+    }
+    return cnt > 0 ? sum / cnt : 1.0;
 }
 
 void ItemAffixRoller::collectCandidates()
@@ -845,6 +866,23 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
         isTop[i] = (*pool[i].affix)["top"].asBool();
     int topMax = (int)item_value("measure", "top_max", 1000);
     double topRepeat = item_value("measure", "top_repeat_weight", 1);
+    // measure.primary_stat_cap: at most this many points of str/int/wis/dex/con/cha
+    // per item, summed over every affix and stack (Kit 2026-10-27: +5).
+    static const std::set<DLString> primaryNames = { "str", "int", "wis", "dex", "con", "cha" };
+    std::vector<int> statPts(pool.size(), 0);
+    for (int i = 0; i < (int)pool.size(); i++) {
+        if (pool[i].price <= 0)
+            continue;
+        const Json::Value &affix = *pool[i].affix;
+        if (pool[i].section == "primary_stats" && primaryNames.count(pool[i].norm))
+            statPts[i] = max(0, modifier(affix, 1));
+        else if (affix.isMember("affects"))
+            for (auto const &one: affix["affects"])
+                if (one.isMember("apply") && primaryNames.count(one["apply"].asString()))
+                    statPts[i] += max(0, modifier(one, 1));
+    }
+    int statCap = (int)item_value("measure", "primary_stat_cap", 1000);
+
     std::vector<int> coreChance;
     // A crafted piece already carries the crafter's fixed stats: no core picks.
     if (kind == "armor" && !crafted) {
@@ -905,7 +943,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
     // Three tries; the one closest to the window wins.
     for (int attempt = 0; attempt < 3; attempt++) {
         std::map<int, int> picked;
-        int total = 0, penalty = 0, negatives = 0, positives = 0, statSpent = 0, tops = 0;
+        int total = 0, penalty = 0, negatives = 0, positives = 0, statSpent = 0, tops = 0, statSum = 0;
         std::vector<int> weightNow(pool.size(), 0);
         int target = number_range(minM, maxM);
         int count = number_range(minAffixes, maxAffixes);
@@ -918,6 +956,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
             int i = f.first, n = f.second;
             picked[i] = n;
             total += pool[i].price * n;
+            statSum += statPts[i] * n;
             if (isStat[i])
                 statSpent += pool[i].price * n;
             if (pool[i].price < 0) {
@@ -939,6 +978,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
                 weightNow[i] = pool[i].weight;
                 if (!isCore[i] || pool[i].sigOnly || picked.count(i) || total + pool[i].price > maxM)
                     continue;
+                if (statSum + statPts[i] > statCap)
+                    continue;
                 if (conflicts(pool[i], picked))
                     continue;
                 core.push_back(i);
@@ -949,6 +990,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
             picked[pick] = 1;
             positives++;
             total += pool[pick].price;
+            statSum += statPts[pick];
             if (isStat[pick])
                 statSpent += pool[pick].price;
         }
@@ -967,6 +1009,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
                 if (c.price < 0 && negatives >= maxNegatives)
                     continue;
                 if (total + c.price > maxM)
+                    continue;
+                if (statSum + statPts[i] > statCap)
                     continue;
                 if (c.price < 0 && penalty + c.price < worstPenalty)
                     continue;
@@ -1002,6 +1046,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
                 tops++;
             picked[i] = 1;
             total += pool[i].price;
+            statSum += statPts[i];
             if (isStat[i])
                 statSpent += pool[i].price;
             if (floorExempt[i])
@@ -1015,6 +1060,8 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
                 const Candidate &c = pool[p.first];
                 if (c.sigOnly || c.price <= 0 || p.second >= c.stack || total + c.price > maxM)
                     continue;
+                if (statSum + statPts[p.first] > statCap)
+                    continue;
                 weightNow[p.first] = c.weight;
                 eligible.push_back(p.first);
             }
@@ -1023,6 +1070,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
                 break;
             picked[i]++;
             total += pool[i].price;
+            statSum += statPts[i];
         }
 
         int distance = total < minM ? minM - total : (total > maxM ? total - maxM : 0);

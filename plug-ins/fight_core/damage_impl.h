@@ -34,6 +34,7 @@ struct SkillDamage : public virtual Damage {
 protected:
     virtual bool mprog_immune();
     bool shieldBlocks( );
+    bool iaidoDraws( );
 
     int sn;
 };

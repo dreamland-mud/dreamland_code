@@ -43,6 +43,11 @@ struct ItemWeights {
  *  the asking char's level in the sage, the item's level for a base price. */
 void item_weights(ItemWeights &w, bool caster, int acLevel);
 
+/** Value multiplier of +N% to one skill, item_value.json shared.learn_skill_value
+ *  {skill name: mult}: a utility or economy skill is worth less than a combat one.
+ *  1.0 for an unlisted skill. */
+double item_learn_skill_mult(int sn);
+
 /** Measure rolls at this level: level / slot factor, at least 1. */
 int item_rolls(int level, const DLString &slot = DLString::emptyString);
 

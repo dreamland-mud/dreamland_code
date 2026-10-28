@@ -4260,7 +4260,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
                     int eff = target->getSkill( sn );
                     int room = 100 - eff;
                     if (eff > 0 && room > 0)
-                        s += w.learnSkill * (m < room ? m : room);
+                        s += w.learnSkill * item_learn_skill_mult( sn ) * (m < room ? m : room);
                 }
         }
         else if (isGroup) {
@@ -4288,7 +4288,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
                     owns = true;
                     int room = 100 - eff;
                     if (room > 0)
-                        perSkill += w.learnSkill * (m < room ? m : room);
+                        perSkill += w.learnSkill * item_learn_skill_mult( i ) * (m < room ? m : room);
                 }
                 if (owns) {
                     int cap = 25 + 3 * ga_remorts( target );
