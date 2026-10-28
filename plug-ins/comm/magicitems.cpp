@@ -53,6 +53,13 @@ GSN(none);
  */
 static bool magic_item_skill_gate( Character *ch, Skill &skill )
 {
+    // The old recite/zap/brandish commands were player_only for 'order';
+    // 'use' is orderable, so charmed followers are refused here instead.
+    if (ch->is_npc( ) && IS_CHARMED(ch)) {
+        ch->master->pecho(_("%1$^C1 не умеет пользоваться такими вещами по приказу."), ch);
+        return false;
+    }
+
     if (!skill.usable( ch )) {
         ch->pecho(_("Ты не владеешь навыком {y{hh%s{x."), skill.getNameFor( ch ).c_str( ));
         return false;
@@ -281,6 +288,12 @@ void use_wand( Character *ch, Object *wand, const DLString &argument )
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
         ch->pecho(_("Ты долж%1$Gно|ен|на уничтожать магию, а не использовать её!"), ch);
+        return;
+    }
+
+    // Wands work from the inventory now, so the wear-level check no longer covers them.
+    if (get_wear_level( ch, wand ) > ch->getRealLevel( )) {
+        ch->pecho(_("%1$^O1 чересчур слож%1$Gно|ен|на|ны для твоего понимания."), wand);
         return;
     }
 
