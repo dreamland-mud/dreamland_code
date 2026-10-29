@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "logstream.h"
+#include "helpsave.h"
 #include "commandhelp.h"
 #include "commandplugin.h"
 #include "commandmanager.h"
@@ -36,7 +37,7 @@ void CommandHelp::save() const
     if (command && command->saveCommand())
         return;
 
-    LogStream::sendError() << "Failed to save command help on command " << command->getName() << endl;
+    help_save_failed(this, command ? "command " + command->getName() : DLString("no command"));
 }
 
 DLString CommandHelp::getTitle(const DLString &label) const

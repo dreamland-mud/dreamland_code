@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "skill.h"
+#include "helpsave.h"
 #include "skillmanager.h"
 #include "skillgrouphelp.h"
 #include "character.h"
@@ -19,7 +20,7 @@ void SkillGroupHelp::save() const
     if (group) {
         const XMLTableElement *element = group.getDynamicPointer<XMLTableElement>();
         if (element)
-            element->save();
+            help_save_owner(this, element);
     }
 }
 

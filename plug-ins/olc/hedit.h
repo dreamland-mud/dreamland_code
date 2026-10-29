@@ -8,6 +8,7 @@
 #include "xmlstringlist.h"
 #include "helpmanager.h"
 #include "markuphelparticle.h"
+#include "helpcontainer.h"
 #include "olc.h"
 
 class OLCStateHelp : public OLCStateTemplate<OLCStateHelp>,
@@ -84,7 +85,42 @@ bool help_subcommand(PCharacter *ch, const DLString &argument, HelpPointer &help
         return true;
     }   
 
-    ptc(ch, "Использование: {y{hchelp{x, {y{hchelp create{x\r\n");
+    // An article written as a plain help file before the entity had its own:
+    // move it over under the same id, so links to it keep working.
+    if (arg.isNumber()) {
+        if (help && help->getID() > 0) {
+            ptc(ch, "Справка уже существует, используй команду {y{hchelp{x для редактирования.\r\n");
+            return false;
+        }
+
+        int id = arg.toInt();
+        HelpArticle::Pointer old = helpManager->getArticle(id);
+        GenericHelp *generic = old ? dynamic_cast<GenericHelp *>(old.getPointer()) : 0;
+
+        if (!generic) {
+            ptc(ch, "Статьи %d нет среди общих справок из папки helps, присоединить можно только такую.\r\n", id);
+            return false;
+        }
+
+        XMLNode::Pointer node(NEW);
+        generic->toXML(node);
+        generic->detach();
+
+        if (!help)
+            help.construct();
+
+        help->fromXML(node);
+        postCreateAction(help);
+        help->save();
+
+        ptc(ch, "Справка %d теперь принадлежит этой сущности.\r\n", id);
+        OLCStateHelp::Pointer hedit(NEW, help.getPointer());
+        hedit->attach(ch);
+        hedit->show(ch);
+        return true;
+    }
+
+    ptc(ch, "Использование: {y{hchelp{x, {y{hchelp create{x, {y{hchelp{x {Dномер_статьи{x\r\n");
     return false;
 }
 

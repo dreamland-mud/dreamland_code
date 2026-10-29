@@ -5,6 +5,7 @@
 #include <set>
 
 #include "defaultrace.h"
+#include "helpsave.h"
 #include "helpmeta.h"
 #include "defaultpcrace.h"
 #include "raceflags.h"
@@ -75,7 +76,7 @@ void RaceHelp::unsetRace( )
 void RaceHelp::save() const
 {
     if (race)
-        race->save();
+        help_save_owner(this, race.getPointer());
 }
 
 DLString RaceHelp::getTitle(const DLString &label) const

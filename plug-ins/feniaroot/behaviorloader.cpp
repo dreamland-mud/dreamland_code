@@ -1,4 +1,5 @@
 #include "behaviorloader.h"
+#include "helpsave.h"
 #include "dreamland.h"
 #include "feniamanager.h"
 #include "logstream.h"
@@ -15,7 +16,7 @@ const DLString BehaviorHelp::TYPE = "BehaviorHelp";
 void BehaviorHelp::save() const
 {
     if (bhv)
-        bhv->save();
+        help_save_owner(this, bhv.getPointer());
 }
 
 DLString BehaviorHelp::getTitle(const DLString &label) const
