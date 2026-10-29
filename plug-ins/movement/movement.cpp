@@ -185,7 +185,11 @@ static void rprog_leave(Room *from_room, Character *walker, Room *to_room, const
 
 static bool mprog_greet( Character *rch, Character *walker )
 {
-    aquest_trigger(rch, walker, "Greet", "CC", rch, walker);
+    // A quest giver that cannot see the walker (dark room, invisibility) must not
+    // start or advance a quest: the step handlers stay silent for an unseen
+    // walker, so the quest would begin with no dialogue at all.
+    if (rch->can_see( walker ))
+        aquest_trigger(rch, walker, "Greet", "CC", rch, walker);
 
     if (behavior_trigger(rch, "Greet", "CC", rch, walker))
         return true;
