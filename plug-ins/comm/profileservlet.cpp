@@ -687,12 +687,15 @@ SERVLET_HANDLE(api_playermeta, "/playermeta")
 
 /*
  * /leaderboard -> {"open": bool, "at": unix, "rows": [{"id", "title", "name":
- * {login, en, ru, ua}, "score", "legendary", "secrets", "earned"}, ...]}
+ * {login, en, ru, ua}, "score", "legendary", "secrets", "earned"}, ...],
+ * "names": [{login, en, ru, ua}, ...]}
  *
  * The account pages by achievement score, from the daily sums Fenia keeps
  * (.tmp.achievements.boardRows, private world scripts). Only accounts whose
  * page /profile would show are listed, under their main character (most hours
  * among the shown ones). "open" is false until the list opens (Fenia decides).
+ * "names" feeds the site's player search autocomplete: every character a
+ * /player page shows, listed or not (Kit 2026-10-29: these names are public).
  * Built at most once per BOARD_CACHE_TTL: the rows only change daily.
  */
 static const time_t BOARD_CACHE_TTL = 600;
@@ -734,6 +737,34 @@ static bool board_rows(Json::Value &out)
     }
 }
 
+// Every character shown on some /player page, for the search autocomplete.
+static Json::Value board_names()
+{
+    Json::Value names(Json::arrayValue);
+    map<DLString, bool> pageOf;
+
+    for (auto &pair: PCharacterManager::getPCM()) {
+        PCMemoryInterface *pci = pair.second;
+        DLString id = AccountManager::accountOf(pci->getName());
+        if (id.empty() || account_profile_char_hidden(pci))
+            continue;
+
+        auto it = pageOf.find(id);
+        if (it == pageOf.end())
+            it = pageOf.insert(make_pair(id, account_profile_enabled(id) && account_profile_eligible(id))).first;
+        if (!it->second)
+            continue;
+
+        Json::Value n;
+        n["login"] = pci->getName().c_str();
+        n["en"] = pci->getNameP('1', LANG_EN).c_str();
+        n["ru"] = pci->getNameP('1', LANG_RU).c_str();
+        n["ua"] = pci->getNameP('1', LANG_UA).c_str();
+        names.append(n);
+    }
+    return names;
+}
+
 static Json::Value board_build()
 {
     Json::Value body;
@@ -741,6 +772,7 @@ static Json::Value board_build()
 
     body["at"] = (Json::Int64)dreamland->getCurrentTime();
     body["rows"] = Json::Value(Json::arrayValue);
+    body["names"] = board_names();
     body["open"] = board_rows(rows);
     if (!body["open"].asBool())
         return body;
