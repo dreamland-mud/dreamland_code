@@ -300,11 +300,8 @@ bool PCharacter::load( )
     time_t lastSave = getLastAccessTime( ).getTime( );
     if (lastSave > 0) {
         long minutes = (dreamland->getCurrentTime( ) - lastSave) / Date::SECOND_IN_MINUTE;
-        if (minutes > 0) {
+        if (minutes > 0)
             obj_charge_offline_time( carrying, minutes );
-            if (pet)
-                obj_charge_offline_time( pet->carrying, minutes );
-        }
     }
 
     if (!get_room_instance( start_room )) {
