@@ -143,6 +143,9 @@ void OLCStateReligion::show( PCharacter *ch )
          r->patronsClasses.empty() ? "-": r->patronsClasses.toString().c_str(),
          r->patronsClans.empty() ? "-": r->patronsClans.toString().c_str());
          
+    ptc(ch, "Пути:              {Y%s{x {D(paths: light dark reason rage order chaos nature society freedom){x\r\n",
+        r->paths.empty() ? "-" : r->paths.c_str());
+
     ptc(ch, "{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        
 }
 
@@ -268,6 +271,11 @@ RELEDIT(pclans, "пкланы", "покровительство кланам")
     return globalBitvectorEdit<Clan>(getOriginal()->patronsClans);
 }
 
+
+RELEDIT(paths, "пути", "пути божества через пробел: light dark reason rage order chaos nature society freedom")
+{
+    return editor(argument, getOriginal()->paths, ED_NO_NEWLINE);
+}
 
 RELEDIT(commands, "команды", "показать список встроенных команд edit")
 {

@@ -11,6 +11,8 @@
 #include "pcharacter.h"
 #include "player_utils.h"
 #include "race.h"
+#include "profession.h"
+#include "clan.h"
 #include "liquid.h"
 #include "object.h"
 #include "skill.h"
@@ -21,6 +23,8 @@
 #include "liquidflags.h"
 #include "websocketrpc.h"
 #include "l10n.h"
+#include "act.h"
+#include "stringlist.h"
 #include "merc.h"
 #include "def.h"
 
@@ -128,6 +132,60 @@ DLString ReligionHelp::getTitle(const DLString &label, lang_t lang) const
     return "{c" + name.upperFirstCharacter() + "{x";
 }
 
+// The Path keys a religion lists, with the help article of each Path.
+static const struct {
+    const char *key;
+    int help;
+    const char *name;
+} religion_paths[] = {
+    { "light",   6,    "Свет" },
+    { "dark",    7,    "Тьма" },
+    { "reason",  8,    "Разум" },
+    { "rage",    10,   "Ярость" },
+    { "order",   23,   "Порядок" },
+    { "chaos",   25,   "Хаос" },
+    { "nature",  49,   "Природа" },
+    { "society", 52,   "Общество" },
+    { "freedom", 1497, "Свобода" },
+};
+
+static DLString religion_paths_line(const DefaultReligion *religion, Character *ch)
+{
+    StringList result;
+
+    for (auto &key: religion->paths.getValue().split(" "))
+        for (auto &p: religion_paths)
+            if (key == p.key)
+                result.push_back(DLString("{hh") + DLString(p.help) + l(ch, p.name) + "{x");
+
+    return result.join(", ");
+}
+
+// Races, classes and clans the god looks after, each in the reader's language.
+static DLString religion_patrons_line(const DefaultReligion *religion, Character *ch)
+{
+    lang_t lang = Player::displayLang(ch);
+    StringList result;
+
+    for (auto i: religion->patronsRaces.toArray()) {
+        Race *race = raceManager->find(i);
+        if (lang == LANG_EN)
+            result.push_back(race->getName());
+        else if (lang == LANG_UA && !race->getMaleNameUa().empty())
+            result.push_back(race->getMaleNameUa().ruscase('1'));
+        else
+            result.push_back(race->getMaleName().ruscase('1'));
+    }
+
+    for (auto i: religion->patronsClasses.toArray())
+        result.push_back(professionManager->find(i)->getNameFor(ch, Grammar::Case('1')));
+
+    for (auto i: religion->patronsClans.toArray())
+        result.push_back(fmt(ch, _("клан %1$s"), clanManager->find(i)->getNameFor(lang).c_str()));
+
+    return result.join(", ");
+}
+
 void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     // One name, the reader's own. Drops the always-English shortDescr in parens:
@@ -150,6 +208,15 @@ void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
                                  ? DLString("{g") + l(ch, "открыт") + "{x"
                                  : DLString("{r") + l(ch, "закрыт") + "{x")
            << "%RESUME%" << endl;
+
+    // Facts about the god, the same for every reader, so the website shows them too.
+    DLString paths = religion_paths_line(religion.getPointer(), ch);
+    if (!paths.empty())
+        in << "%PAUSE%" << help_meta_line(l(ch, "Пути"), paths) << "%RESUME%" << endl;
+
+    DLString patrons = religion_patrons_line(religion.getPointer(), ch);
+    if (!patrons.empty())
+        in << "%PAUSE%" << help_meta_line(l(ch, "Подопечные"), patrons) << "%RESUME%" << endl;
 
     in << endl << text.getForLang(Player::displayLang(ch));
 }

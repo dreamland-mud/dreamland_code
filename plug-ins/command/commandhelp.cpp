@@ -9,6 +9,9 @@
 #include "character.h"
 #include "player_utils.h"
 #include "helpmanager.h"
+#include "helpmeta.h"
+#include "stringlist.h"
+#include "descriptor.h"
 #include "l10n.h"
 
 const DLString CommandHelp::TYPE = "CommandHelp";
@@ -84,6 +87,36 @@ DLString CommandHelp::getTitle(const DLString &label, lang_t lang) const
         return name.upperFirstCharacter();
 
     return help_title_fmt(lang, _("Команда {c%1$s{x"), name);
+}
+
+/**
+ * In game the header names the command the way skill and religion articles name
+ * theirs: "Команда смотреть", then its synonyms in the reader's language as a
+ * metadata line. An article with an authored title is about a topic rather than
+ * one command and keeps the generic "Справка на тему" header.
+ */
+void CommandHelp::getRawText( Character *ch, ostringstream &in ) const
+{
+    if (!command || !title.get(RU).empty()
+        || !(ch && ch->desc && ch->desc->connected == CON_PLAYING))
+    {
+        MarkupHelpArticle::getRawText(ch, in);
+        return;
+    }
+
+    lang_t lang = Player::displayLang(ch);
+
+    in << l(ch, "Команда") << " {C" << command->getNameFor(lang) << "{x " << editButton(ch) << endl;
+
+    // No fallback: an English reader gets no Russian synonyms.
+    StringList aliases;
+    for (auto &a: command->aliases.get(lang).split(" "))
+        if (!a.empty())
+            aliases.push_back(a);
+    if (!aliases.empty())
+        in << "%PAUSE%" << help_meta_line(l(ch, "Синонимы"), aliases.join(", ")) << "%RESUME%" << endl;
+
+    in << endl << text.getForLang(lang);
 }
 
 void CommandHelp::setCommand( Command::Pointer command )
