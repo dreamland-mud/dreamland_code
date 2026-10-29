@@ -894,15 +894,38 @@ static DLString world_zone_list(Character *ch, const std::list<AreaIndexData *> 
     return result;
 }
 
-/** Print what the world knows about the query; false when it knows nothing. */
-static bool help_world_answer(Character *ch, const DLString &query, bool keywords)
+static const unsigned int WORLD_MAX_NAMES = 3;
+
+/** Print what the world knows about the query; false when it knows nothing.
+ *  A partial query names the names it completed to first. */
+static bool help_world_answer(Character *ch, const DLString &query, bool keywords, bool partial = false)
 {
-    HelpWorldHits hits = help_world_lookup(query, keywords);
+    HelpWorldHits hits = partial ? help_world_prefix_lookup(query, keywords)
+                                 : help_world_lookup(query, keywords);
     if (hits.empty())
         return false;
 
     ostringstream buf;
-    buf << l(ch, "Справки с таким названием нет, но в мире оно встречается.") << endl;
+    if (hits.partial) {
+        DLString names;
+        unsigned int shown = 0;
+
+        for (auto &n: hits.matchedNames) {
+            if (shown >= WORLD_MAX_NAMES)
+                break;
+            if (shown > 0)
+                names += ", ";
+            names += n;
+            shown++;
+        }
+
+        if (hits.matchedNames.size() > shown)
+            names += fmt(ch, _(" и ещё %1$d"), (int)(hits.matchedNames.size() - shown));
+
+        buf << fmt(ch, _("Справки с таким названием нет, но в мире есть похожее: %1$s."), names.c_str()) << endl;
+    } else {
+        buf << l(ch, "Справки с таким названием нет, но в мире оно встречается.") << endl;
+    }
 
     if (!hits.areas[HWK_AREA].empty())
         buf << fmt(ch, _("Так называется зона: %1$s."),
@@ -934,6 +957,11 @@ static bool help_world_answer(Character *ch, const DLString &query, bool keyword
 
     // One tag for the strongest kind that answered, so 4c can count them.
     static const char *tags[HWK_MAX] = { "wa", "wr", "wm", "wo" };
+    if (hits.partial) {
+        bugTracker->reportNohelpAnswered(ch->getPC(), query, "wp");
+        return true;
+    }
+
     for (int k = 0; k < HWK_MAX; k++)
         if (!hits.areas[k].empty()) {
             bugTracker->reportNohelpAnswered(ch->getPC(), query, tags[k]);
@@ -1093,6 +1121,11 @@ CMDRUNP( help )
         if (!nthMiss && help_world_answer(ch, origArgument, false))
             return;
 
+        // The start of a world name beats a guess: "заброшенный тов" is a
+        // room, not a typo of some article.
+        if (!nthMiss && help_world_answer(ch, origArgument, false, true))
+            return;
+
         bool commandShown = !nthMiss && help_command_hint(ch, origArgument);
 
         if (origArgument.size() > 1) {
@@ -1115,6 +1148,9 @@ CMDRUNP( help )
         }
 
         if (!nthMiss && help_world_answer(ch, origArgument, true))
+            return;
+
+        if (!nthMiss && help_world_answer(ch, origArgument, true, true))
             return;
 
         ch->pecho(_("Нет подсказки по данному слову."));

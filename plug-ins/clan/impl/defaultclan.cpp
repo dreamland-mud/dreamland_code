@@ -56,6 +56,19 @@ const ClanTitles * DefaultClan::getTitles( ) const
     return titles.getPointer( );
 }
 
+StringList DefaultClan::getRankTitles( lang_t lang, int sex ) const
+{
+    StringList result;
+
+    if (!titles)
+        return result;
+
+    for (int i = 0; i < titles->size( ); i++)
+        result.push_back( titles->buildFor( i, sex, lang, DLString::emptyString ) );
+
+    return result;
+}
+
 const ClanOrgs * DefaultClan::getOrgs( ) const
 {
     return orgs.getPointer( );

@@ -53,6 +53,7 @@ public:
     virtual const ClanMembership * getMembership( ) const;
     virtual ClanMembership * getMembership( );
     virtual const ClanTitles * getTitles( ) const;
+    virtual StringList getRankTitles( lang_t, int sex ) const;
     virtual const ClanOrgs * getOrgs( ) const;
 
     virtual bool isDispersed( ) const;

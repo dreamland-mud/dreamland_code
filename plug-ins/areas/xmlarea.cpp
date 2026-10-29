@@ -7,6 +7,8 @@
 #include "dlfileop.h"
 #include "xmlarea.h"
 #include "areahelp.h"
+#include "clanmanager.h"
+#include "clan.h"
 #include "feniamanager.h"
 #include "fileformatexception.h"
 #include "room.h"
@@ -172,6 +174,51 @@ XMLArea::init(area_file *af)
     }
 }
 
+/*
+ * A clan's article answers to the clan's rank titles and to "ranks", so that
+ * `help <title>` lands on the clan the title belongs to. A word another
+ * article already answers to stays out: it would turn that article's direct
+ * hit into a list. Clans load before areas, so the clan is known here.
+ */
+static void add_clan_rank_keywords(AreaHelp::Pointer help)
+{
+    if (!clanManager)
+        return;
+
+    Clan *clan = clanManager->findByHelpId(help->getID());
+    if (!clan)
+        return;
+
+    static const lang_t langs[] = { LANG_RU, LANG_EN, LANG_UA };
+    static const int sexes[] = { SEX_MALE, SEX_FEMALE };
+    StringSet candidates;
+
+    for (auto lang: langs)
+        for (auto sex: sexes)
+            for (auto &title: clan->getRankTitles(lang, sex)) {
+                DLString t = title.colourStrip();
+                if (!t.empty())
+                    candidates.insert(t);
+            }
+
+    candidates.insert("ranks");
+    candidates.insert("ранги");
+
+    for (auto &other: helpManager->getArticles()) {
+        if (other.getPointer() == help.getPointer())
+            continue;
+
+        const DLString &kw = other->getAllKeywordsString();
+        for (auto c = candidates.begin(); c != candidates.end(); )
+            if (is_name(c->c_str(), kw.c_str()))
+                c = candidates.erase(c);
+            else
+                c++;
+    }
+
+    help->addAutoKeyword(candidates);
+}
+
 void
 XMLArea::load_helps(AreaIndexData *a)
 {
@@ -181,6 +228,7 @@ XMLArea::load_helps(AreaIndexData *a)
     for (h = helps.begin( ); h != helps.end( ); h++) {
         AreaHelp::Pointer help = h->compat();
         help->setAreaIndex(a);
+        add_clan_rank_keywords(help);
         helpManager->registrate(help);
 
         if (help->selfHelp)

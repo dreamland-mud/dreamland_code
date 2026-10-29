@@ -22,6 +22,8 @@ public:
     inline static ClanManager *getThis( );
     void addClanHall(const DLString &clanName, area_file *areaFile);
     area_file * findClanHall(const DLString &clanName);
+    /** The valid clan whose long name links to this help article, or 0. */
+    Clan * findByHelpId(int helpId);
     
 private:
     virtual GlobalRegistryElement::Pointer getDumbElement( const DLString & ) const;

@@ -11,6 +11,10 @@
 #include "player_utils.h"
 #include "descriptor.h"
 #include "l10n.h"
+#include "helpmeta.h"
+#include "clanmanager.h"
+#include "clan.h"
+#include "merc.h"
 
 // Get a list of additional keywords not mentioned in the title.
 DLString help_article_disambig(const HelpArticle *help, lang_t lang)
@@ -83,6 +87,52 @@ DLString MarkupHelpArticle::editButton(Character *ch) const
     return buf.str();
 }
 
+/** A clan's article ends with the clan's ranks, lowest first, read from the
+ *  clan's title table so the list never goes stale. One line per rank. */
+static void help_clan_ranks(const HelpArticle *help, Character *ch, ostringstream &in)
+{
+    if (!clanManager)
+        return;
+
+    Clan *clan = clanManager->findByHelpId(help->getID());
+    if (!clan)
+        return;
+
+    lang_t lang = Player::displayLang(ch);
+    StringList male = clan->getRankTitles(lang, SEX_MALE);
+    StringList female = clan->getRankTitles(lang, SEX_FEMALE);
+    if (male.empty())
+        return;
+
+    ostringstream buf;
+    StringList::const_iterator f = female.begin();
+    int level = 0;
+
+    for (auto &m: male) {
+        DLString name = m;
+
+        if (f != female.end()) {
+            if (!f->empty() && *f != m) {
+                if (name.empty())
+                    name = *f;
+                else
+                    name = name + "/" + *f;
+            }
+            f++;
+        }
+
+        if (!name.empty())
+            buf << help_meta_line(DLString(level), name) << endl;
+        level++;
+    }
+
+    if (buf.str().empty())
+        return;
+
+    in << endl << endl << "%PAUSE%{W" << l(ch, "Ранги клана") << "{x" << endl
+       << buf.str() << "%RESUME%";
+}
+
 void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
 {
     if (ch && ch->desc && ch->desc->connected == CON_PLAYING) {
@@ -95,6 +145,7 @@ void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
     }
 
     in << text.getForLang(Player::displayLang(ch));
+    help_clan_ranks(this, ch, in);
 }
 
 void MarkupHelpArticle::applyFormatter( Character *ch, ostringstream &in, ostringstream &out ) const

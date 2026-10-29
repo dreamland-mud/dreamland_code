@@ -34,6 +34,20 @@ void ClanManager::addClanHall(const DLString &clanName, area_file *areaFile)
     clanHalls[clanName] = areaFile;
 }
 
+Clan * ClanManager::findByHelpId(int helpId)
+{
+    if (helpId <= 0)
+        return 0;
+
+    for (int i = 0; i < size(); i++) {
+        Clan *clan = find(i);
+        if (clan && clan->isValid() && clan->getHelpId() == helpId)
+            return clan;
+    }
+
+    return 0;
+}
+
 area_file * ClanManager::findClanHall(const DLString &clanName)
 {
     auto c = clanHalls.find(clanName);

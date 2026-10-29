@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <ctype.h>
 #include "clan.h"
 
 Clan::Clan( )
@@ -144,6 +145,26 @@ const ClanTitles * Clan::getTitles( ) const
 {
     return NULL;
 }
+StringList Clan::getRankTitles( lang_t, int ) const
+{
+    return StringList( );
+}
+
+int Clan::getHelpId( ) const
+{
+    const DLString &longName = getLongNameFor( LANG_RU );
+    DLString::size_type p = longName.find( "{hh" );
+    int id = 0;
+
+    if (p == DLString::npos)
+        return 0;
+
+    for (p += 3; p < longName.size( ) && isdigit( (unsigned char) longName[p] ); p++)
+        id = id * 10 + (longName[p] - '0');
+
+    return id;
+}
+
 const ClanOrgs * Clan::getOrgs( ) const
 {
     return NULL;
