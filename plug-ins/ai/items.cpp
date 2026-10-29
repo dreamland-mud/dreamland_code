@@ -168,7 +168,8 @@ bool MagicItemTable::checkCharged( Object *obj, int spellSN, Character *user )
         return false;
 
     Skill *spell = skillManager->find( spellSN );
-    return spell && c.isMember( "spell" ) && spell->getName( ) == c["spell"].asString( );
+    return spell && c.isMember( "spell" ) && c["spell"].isString( )
+           && spell->getName( ) == c["spell"].asString( );
 }
 
 int MagicItemTable::findIndex( Object *obj )

@@ -9,6 +9,7 @@
  * copied onto the instance the first time charges change, so charges are per
  * instance and saved with the instance props.
  */
+#include <stdlib.h>
 #include <jsoncpp/json/json.h>
 #include "object.h"
 #include "objectfactory.h"
@@ -40,12 +41,38 @@ inline Json::Value & charged_own( Object *obj )
 
 inline bool charged_wielded( const Json::Value &c )
 {
-    return c.isMember( "where" ) && c["where"].asString( ) == "wielded";
+    return c.isMember( "where" ) && c["where"].isString( ) && c["where"].asString( ) == "wielded";
+}
+
+// Props set by hand (OLC, setProperty) arrive as strings; asInt() on a
+// non-numeric string throws, so read numbers and flags leniently.
+inline int charged_int( const Json::Value &c, const char *key, int def )
+{
+    if (!c.isMember( key ))
+        return def;
+
+    const Json::Value &v = c[key];
+    if (v.isNumeric( ) || v.isBool( ))
+        return v.asInt( );
+    if (v.isString( ))
+        return atoi( v.asCString( ) );
+    return def;
+}
+
+inline bool charged_flag( const Json::Value &c, const char *key )
+{
+    if (!c.isMember( key ))
+        return false;
+
+    const Json::Value &v = c[key];
+    if (v.isString( ))
+        return v.asString( ) == "true" || atoi( v.asCString( ) ) != 0;
+    return (v.isNumeric( ) || v.isBool( )) && v.asInt( ) != 0;
 }
 
 inline int charged_charges( const Json::Value &c )
 {
-    return c.isMember( "charges" ) ? c["charges"].asInt( ) : 0;
+    return charged_int( c, "charges", 0 );
 }
 
 #endif
