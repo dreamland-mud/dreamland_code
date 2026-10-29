@@ -29,6 +29,7 @@ $(INCLUDES_SRC)
 
 libai_la_LIBADD = \
 $(LIBADD_FIGHT) \
-../traverse/libtraverse.la 
+../traverse/libtraverse.la \
+-ljsoncpp
 
 AM_CPPFLAGS += $(plugin_INCLUDES)
