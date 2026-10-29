@@ -702,6 +702,10 @@ SERVLET_HANDLE(api_playermeta, "/playermeta")
  * "names" feeds the site's player search autocomplete: every character a
  * /player page shows, listed or not (Kit 2026-10-29: these names are public).
  *
+ * scope "players" -> the same columns per character, every mortal character
+ * opt-out or not, rows {name, link, race, class, <columns>}; "link" is true
+ * where the /player page opens. No "names".
+ *
  * board "world" -> {"board", "open": true, "at", "days", "active", "races",
  * "classes", "religions": [{key, en, ru, ua, n}], "clans": [{key, en, ru, ua,
  * color, n, members}]}: who plays what, over the mortals that entered the
@@ -727,14 +731,16 @@ static const char *BOARD_SORTABLE[] = {
 
 static map<DLString, pair<time_t, Json::Value> > board_cache;
 
-static bool board_rows(Json::Value &out)
+static bool board_rows(const char *fn, Json::Value &out)
 {
     using namespace Scripting;
 
     if (!FeniaManager::wrapperManager)
         return false;
 
-    static IdRef ID_TMP("tmp"), ID_ACHIEVEMENTS("achievements"), ID_BOARDROWS("boardRows");
+    static IdRef ID_TMP("tmp"), ID_ACHIEVEMENTS("achievements"),
+                 ID_BOARDROWS("boardRows"), ID_CHARROWS("charRows");
+    IdRef &ID_ROWS = strcmp(fn, "charRows") == 0 ? ID_CHARROWS : ID_BOARDROWS;
 
     try {
         Register tmp = *Context::root[ID_TMP];
@@ -742,7 +748,7 @@ static bool board_rows(Json::Value &out)
         if (ach.type != Register::OBJECT)
             return false;
 
-        Register function = *ach[ID_BOARDROWS];
+        Register function = *ach[ID_ROWS];
         if (function.type != Register::FUNCTION)
             return false;
 
@@ -755,7 +761,7 @@ static bool board_rows(Json::Value &out)
         return out.isArray();
 
     } catch (const ::Exception &e) {
-        FeniaManager::getThis()->croak(0, Register(DLString("achievements.boardRows")), e);
+        FeniaManager::getThis()->croak(0, Register(DLString("achievements.") + fn), e);
         return false;
     }
 }
@@ -797,7 +803,7 @@ static Json::Value board_build(const DLString &board)
     body["at"] = (Json::Int64)dreamland->getCurrentTime();
     body["rows"] = Json::Value(Json::arrayValue);
     body["names"] = board_names();
-    body["open"] = board_rows(rows);
+    body["open"] = board_rows("boardRows", rows);
     if (!body["open"].asBool())
         return body;
 
@@ -842,6 +848,77 @@ static Json::Value board_build(const DLString &board)
             return a["score"].asInt() > b["score"].asInt();
         if (a["legendary"].asInt() != b["legendary"].asInt())
             return a["legendary"].asInt() > b["legendary"].asInt();
+        return a["name"]["login"].asString() < b["name"]["login"].asString();
+    });
+
+    for (unsigned int i = 0; i < listed.size() && i < BOARD_MAX; i++)
+        body["rows"].append(listed[i]);
+    return body;
+}
+
+// Every character on its own, opt-out or not (Kit 2026-10-29): rows from
+// .tmp.achievements.charRows, keyed by login. "link" is true only where the
+// character's /player page opens.
+static Json::Value players_build(const DLString &board)
+{
+    Json::Value body;
+    Json::Value rows;
+
+    body["scope"] = "players";
+    body["board"] = board.c_str();
+    body["at"] = (Json::Int64)dreamland->getCurrentTime();
+    body["rows"] = Json::Value(Json::arrayValue);
+    body["open"] = board_rows("charRows", rows);
+    if (!body["open"].asBool())
+        return body;
+
+    const char *col = board.c_str();
+    vector<Json::Value> listed;
+    map<DLString, bool> pageOf;
+    for (const Json::Value &r : rows) {
+        if (r[col].asInt() <= 0)
+            continue;
+
+        PCMemoryInterface *pci = PCharacterManager::find(r["id"].asString());
+        if (pci == 0)
+            continue;
+
+        bool link = false;
+        DLString id = AccountManager::accountOf(pci->getName());
+        if (!id.empty() && !account_profile_char_hidden(pci)) {
+            auto it = pageOf.find(id);
+            if (it == pageOf.end())
+                it = pageOf.insert(make_pair(id, account_profile_enabled(id) && account_profile_eligible(id))).first;
+            link = it->second;
+        }
+
+        const Race &race = *pci->getRace();
+        bool female = pci->getSex() == SEX_FEMALE;
+        DLString raceRu = female ? race.getFemaleName() : race.getMaleName();
+        DLString raceUa = female ? race.getFemaleNameUa() : race.getMaleNameUa();
+        if (raceUa.empty())
+            raceUa = raceRu;
+
+        Json::Value row;
+        row["name"]["login"] = pci->getName().c_str();
+        row["name"]["en"] = pci->getNameP('1', LANG_EN).c_str();
+        row["name"]["ru"] = pci->getNameP('1', LANG_RU).c_str();
+        row["name"]["ua"] = pci->getNameP('1', LANG_UA).c_str();
+        row["link"] = link;
+        row["race"]["en"] = race.getName().c_str();
+        row["race"]["ru"] = raceRu.ruscase('1').c_str();
+        row["race"]["ua"] = raceUa.ruscase('1').c_str();
+        row["class"] = profile_class_json(*pci->getProfession());
+        for (int i = 0; BOARD_COLUMNS[i]; i++)
+            row[BOARD_COLUMNS[i]] = r[BOARD_COLUMNS[i]].asInt();
+        listed.push_back(row);
+    }
+
+    sort(listed.begin(), listed.end(), [col](const Json::Value &a, const Json::Value &b) {
+        if (a[col].asInt() != b[col].asInt())
+            return a[col].asInt() > b[col].asInt();
+        if (a["score"].asInt() != b["score"].asInt())
+            return a["score"].asInt() > b["score"].asInt();
         return a["name"]["login"].asString() < b["name"]["login"].asString();
     });
 
@@ -967,19 +1044,29 @@ SERVLET_HANDLE(api_leaderboard, "/leaderboard")
     if (!servlet_parse_params(request, response, params))
         return;
 
-    DLString board;
+    DLString board, scope;
     servlet_get_arg(params, "board", board);
+    servlet_get_arg(params, "scope", scope);
     bool known = board == "world";
     for (int i = 0; !known && BOARD_SORTABLE[i]; i++)
         known = board == BOARD_SORTABLE[i];
     if (!known)
         board = BOARD_SORTABLE[0];
+    if (board == "world" || scope != "players")
+        scope = "accounts";
 
+    DLString key = scope + ":" + board;
     time_t now = dreamland->getCurrentTime();
-    auto it = board_cache.find(board);
+    auto it = board_cache.find(key);
     if (it == board_cache.end() || now - it->second.first >= BOARD_CACHE_TTL) {
-        Json::Value body = board == "world" ? world_build() : board_build(board);
-        it = board_cache.insert_or_assign(board, make_pair(now, body)).first;
+        Json::Value body;
+        if (board == "world")
+            body = world_build();
+        else if (scope == "players")
+            body = players_build(board);
+        else
+            body = board_build(board);
+        it = board_cache.insert_or_assign(key, make_pair(now, body)).first;
     }
     servlet_response_200_json(response, it->second.second);
 }
