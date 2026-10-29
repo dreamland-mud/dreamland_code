@@ -705,7 +705,7 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
             ch->pecho( msgSelfNoRib.getForLang( Player::lang( ch ) ).c_str( ), ch, obj );
             if (!msgRoomNoRib.empty())
-                ch->recho( msgRoomNoRib.c_str( ), ch, obj );
+                ch->recho( _(msgRoomNoRib), ch, obj );
             else
                 ch->recho(_("%^C1 пытается надеть %O4 на несуществующую часть тела."), ch, obj);
         }
@@ -714,7 +714,7 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 
     if (conflict->find( ch )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) 
-            echo_master(ch, msgSelfConflict.c_str(), ch, obj);
+            echo_master(ch, _(msgSelfConflict), ch, obj);
         return RC_WEAR_CONFLICT;
     }
     

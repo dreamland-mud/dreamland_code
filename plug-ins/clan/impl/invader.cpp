@@ -151,21 +151,21 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
         af.duration = joined ? joined->duration.getValue( ) : 24;
         affect_to_char(victim, &af);
 
-        victim->pecho(msgVict.c_str(), ch, victim);
+        victim->pecho(_(msgVict), ch, victim);
         if (ch != victim)
-            ch->pecho(msgChar.c_str(), ch, victim);
+            ch->pecho(_(msgChar), ch, victim);
         return;
     }
 
     if (victim->isAffected(gsn_soul_lust))
     {
-        ch->pecho(ch == victim ? "Жажда душ уже горит в тебе." : "Жажда душ уже горит в %C6.", victim);
+        ch->pecho(ch == victim ? _("Жажда душ уже горит в тебе.") : _("Жажда душ уже горит в %C6."), victim);
         return;
     }
 
     if (victim->isAffected(sn) || victim->isAffected(gsn_shadow_shroud) || victim->isAffected(gsn_shadow_cloak))
     {
-        ch->pecho(ch == victim ? "Призрачная мантия уже защищает тебя." : "Призрачная мантия уже защищает %C4.", victim);
+        ch->pecho(ch == victim ? _("Призрачная мантия уже защищает тебя.") : _("Призрачная мантия уже защищает %C4."), victim);
         return;
     }   
 
@@ -185,9 +185,9 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
     af.location = APPLY_AC;
     affect_to_char(victim, &af);
 
-    victim->pecho(msgVict.c_str(), ch, victim);
+    victim->pecho(_(msgVict), ch, victim);
     if (ch != victim)
-        ch->pecho(msgChar.c_str(), ch, victim);
+        ch->pecho(_(msgChar), ch, victim);
 }
 
 SPELL_DECL(Shadowlife);
