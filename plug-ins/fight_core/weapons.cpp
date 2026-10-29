@@ -22,7 +22,7 @@ WEARLOC(second_wield);
 GSN(none);  GSN(exotic);      GSN(sword);        GSN(dagger);
 GSN(spear); GSN(mace);        GSN(axe);          GSN(flail);
 GSN(whip);  GSN(polearm);     GSN(bow);          GSN(arrow);
-GSN(lance); GSN(throwing_weapon); GSN(hand_to_hand);
+GSN(lance); GSN(throwing_weapon); GSN(hand_to_hand); GSN(staff);
 
 /*
  * Both overrides come from an affect, so the value is whatever a builder or a
@@ -106,7 +106,8 @@ Skill * get_weapon_skill( Object *wield )
         case(WEAPON_BOW):       return &*gsn_bow;
         case(WEAPON_ARROW):     return &*gsn_arrow;
         case(WEAPON_LANCE):     return &*gsn_lance;
-        case(WEAPON_STONE):     return &*gsn_throwing_weapon;                                
+        case(WEAPON_STONE):     return &*gsn_throwing_weapon;
+        case(WEAPON_STAFF):     return &*gsn_staff;
    }
 }
 
@@ -130,6 +131,8 @@ bitnumber_t get_weapon_for_skill(Skill *skill)
         return WEAPON_POLEARM; 
     else if (sn == gsn_bow)
         return WEAPON_BOW; 
+    else if (sn == gsn_staff)
+        return WEAPON_STAFF; 
     else
         return -1;
 }
@@ -198,6 +201,7 @@ int get_weapon_sn( struct obj_index_data *pWield )
         case WEAPON_ARROW:    return gsn_arrow;
         case WEAPON_LANCE:    return gsn_lance;
         case WEAPON_STONE:    return gsn_throwing_weapon;
+        case WEAPON_STAFF:    return gsn_staff;
         default:              return gsn_none;
     }
 }
