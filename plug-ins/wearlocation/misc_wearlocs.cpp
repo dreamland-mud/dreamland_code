@@ -354,6 +354,7 @@ const SheathConfig & SheathWearloc::getConfig(Object *obj) const
                 break;
             case WEAPON_SPEAR:
             case WEAPON_POLEARM:
+            case WEAPON_STAFF:
             case WEAPON_LANCE:
             case WEAPON_BOW:
                 key = "back";

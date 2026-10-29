@@ -4780,6 +4780,7 @@ static const GAGrantDef ga_grantDefs[] = {
     { "mace",             GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
     { "polearm",          GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
     { "spear",            GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
+    { "staff",            GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
     { "whip",             GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
     { "lesser golem",     GK_PET,        { 0, 0, 0, 0, 0 },          0.25, 21, 0 },
     { "adamantite golem", GK_PET,        { 0, 0, 0, 0, 0 },          0.3,  24, 0 },
