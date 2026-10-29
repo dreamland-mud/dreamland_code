@@ -13,6 +13,7 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 #include "skill.h"
+#include "skillmanager.h"
 #include "spell.h"
 #include "spelltarget.h"
 #include "../skills_impl/defaultspell.h"
@@ -39,11 +40,14 @@
 #include "skill_utils.h"
 #include "l10n.h"
 #include "magicitems.h"
+#include "chargedprops.h"
+#include "wearloc_utils.h"
 
 CLAN(battlerager);
 GSN(scrolls);
 GSN(staves);
 GSN(wands);
+GSN(staff);
 GSN(none);
 
 /*
@@ -277,14 +281,94 @@ void use_staff( Character *ch, Object *staff )
 }
 
 
-void use_wand( Character *ch, Object *wand, const DLString &argument )
+/*
+ * The wand cast, shared by legacy wands and charged items. Returns false when no
+ * target was found: then no charge is spent. A failed skill roll still spends it.
+ */
+static bool zap_cast( Character *ch, Object *wand, Spell::Pointer &spell, int slevel,
+                      Skill &skill, const DLString &argument, bool hasCharge )
 {
     std::basic_ostringstream<char> buf;
+    DLString args = argument;
+    SpellTarget::Pointer target = spell->locateTargets( ch, args, buf );
+
+    if (target->error != 0) {
+        switch (target->error) {
+        case TARGET_ERR_CAST_ON_WHAT:
+            ch->pecho(_("Взмахнуть жезлом на что?"));
+            break;
+        case TARGET_ERR_CAST_ON_WHOM:
+            ch->pecho(_("Взмахнуть жезлом на кого именно?"));
+            break;
+        default:
+            ch->pecho(buf.str());
+            break;
+        }
+
+        return false;
+    }
+        
+    if (target->castFar && target->door != -1) {
+        ch->pecho(_("Твой жезл не дотягивается до соседней комнаты."));
+        return false;
+    }
+    
+    if (!hasCharge)
+        return true;
+
+    Character *victim = target->victim;
+
+    if (victim && victim->in_room == ch->in_room) {
+        if (ch != victim) {
+            oldact(_("$c1 взмахивает $o5 на тебя!"), ch, wand, victim, TO_VICT );
+            oldact(_("$c1 взмахивает $o5 на $C4."), ch, wand, victim, TO_NOTVICT );
+            oldact(_("Ты взмахиваешь $o5 на $C4."), ch, wand, victim, TO_CHAR );
+        }
+        else {
+            oldact(_("$c1 взмахивает $o5 на себя."), ch, wand, 0, TO_ROOM );
+            oldact(_("Ты взмахиваешь $o5 на себя."), ch, wand, 0, TO_CHAR );
+        }
+    }
+    else if (target->obj && target->obj->getRoom( ) == ch->in_room) {
+        oldact(_("$c1 взмахивает $o5 на $O4."), ch, wand, target->obj, TO_ROOM );
+        oldact(_("Ты взмахиваешь $o5 на $O4."), ch, wand, target->obj, TO_CHAR );
+    }
+    else {
+        oldact(_("$c1 взмахивает $o5."), ch, wand, 0, TO_ROOM );
+        oldact(_("Ты взмахиваешь $o5."), ch, wand, 0, TO_CHAR );
+    }
+
+    if (number_percent() >= skill.getEffective( ch )) {
+        oldact_p(_("Твои усиленные манипуляции с $o5 приводят лишь к дыму и искрам."),
+                ch,wand,0,TO_CHAR,POS_RESTING);
+        oldact_p(_("Усиленные манипуляции $c2 с $o5 приводят лишь к дыму и искрам."),
+                ch,wand,0,TO_ROOM,POS_RESTING);
+        skill.improve( ch, false, victim );
+    }
+    else {
+        try {
+            bitstring_t zap_flags = FSPELL_CHECK_SAFE|FSPELL_BANE|FSPELL_ATTACK_CASTER;
+            
+            if (::spell_nocatch(spell, slevel, ch, target, zap_flags))
+                if (spell->getSpellType( ) == SPELL_OFFENSIVE)
+                    yell_panic( ch, victim,
+                                "Помогите! Кто-то размахивает около меня волшебным жезлом!",
+                                "Помогите! %1$^C1 пугает меня своим жезлом!" );
+
+        } catch (const VictimDeathException &e) {
+        }
+
+        skill.improve( ch, true, victim );
+    }
+
+    return true;
+}
+
+void use_wand( Character *ch, Object *wand, const DLString &argument )
+{
     int sn;
     Skill::Pointer skill;
     Spell::Pointer spell;
-    SpellTarget::Pointer target;
-    DLString args = argument;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
         ch->pecho(_("Ты долж%1$Gно|ен|на уничтожать магию, а не использовать её!"), ch);
@@ -308,83 +392,89 @@ void use_wand( Character *ch, Object *wand, const DLString &argument )
         return;
     }
 
-    target = spell->locateTargets( ch, args, buf );
+    int slevel = wand->value0() + skill_level_bonus(*gsn_wands, ch);
 
-    if (target->error != 0) {
-        switch (target->error) {
-        case TARGET_ERR_CAST_ON_WHAT:
-            ch->pecho(_("Взмахнуть жезлом на что?"));
-            break;
-        case TARGET_ERR_CAST_ON_WHOM:
-            ch->pecho(_("Взмахнуть жезлом на кого именно?"));
-            break;
-        default:
-            ch->pecho(buf.str());
-            break;
-        }
-
+    if (!zap_cast( ch, wand, spell, slevel, *gsn_wands, argument, wand->value2() > 0 ))
         return;
-    }
-        
-    if (target->castFar && target->door != -1) {
-        ch->pecho(_("Твой жезл не дотягивается до соседней комнаты."));
-        return;
-    }
-    
-    if (wand->value2() > 0) {
-        Character *victim = target->victim;
-
-        if (victim && victim->in_room == ch->in_room) {
-            if (ch != victim) {
-                oldact(_("$c1 взмахивает $o5 на тебя!"), ch, wand, victim, TO_VICT );
-                oldact(_("$c1 взмахивает $o5 на $C4."), ch, wand, victim, TO_NOTVICT );
-                oldact(_("Ты взмахиваешь $o5 на $C4."), ch, wand, victim, TO_CHAR );
-            }
-            else {
-                oldact(_("$c1 взмахивает $o5 на себя."), ch, wand, 0, TO_ROOM );
-                oldact(_("Ты взмахиваешь $o5 на себя."), ch, wand, 0, TO_CHAR );
-            }
-        }
-        else if (target->obj && target->obj->getRoom( ) == ch->in_room) {
-            oldact(_("$c1 взмахивает $o5 на $O4."), ch, wand, target->obj, TO_ROOM );
-            oldact(_("Ты взмахиваешь $o5 на $O4."), ch, wand, target->obj, TO_CHAR );
-        }
-        else {
-            oldact(_("$c1 взмахивает $o5."), ch, wand, 0, TO_ROOM );
-            oldact(_("Ты взмахиваешь $o5."), ch, wand, 0, TO_CHAR );
-        }
-
-        if (number_percent() >= gsn_wands->getEffective( ch )) {
-            oldact_p(_("Твои усиленные манипуляции с $o5 приводят лишь к дыму и искрам."),
-                    ch,wand,0,TO_CHAR,POS_RESTING);
-            oldact_p(_("Усиленные манипуляции $c2 с $o5 приводят лишь к дыму и искрам."),
-                    ch,wand,0,TO_ROOM,POS_RESTING);
-            gsn_wands->improve( ch, false, victim );
-        }
-        else {
-            try {
-                bitstring_t zap_flags = FSPELL_CHECK_SAFE|FSPELL_BANE|FSPELL_ATTACK_CASTER;
-                
-                int slevel;
-                slevel = wand->value0() + skill_level_bonus(*gsn_wands, ch);
-              
-                if (::spell_nocatch(spell, slevel, ch, target, zap_flags))
-                    if (spell->getSpellType( ) == SPELL_OFFENSIVE)
-                        yell_panic( ch, victim,
-                                    "Помогите! Кто-то размахивает около меня волшебным жезлом!",
-                                    "Помогите! %1$^C1 пугает меня своим жезлом!" );
-
-            } catch (const VictimDeathException &e) {
-            }
-
-            gsn_wands->improve( ch, true, victim );
-        }
-    }
 
     wand->value2(wand->value2() - 1);
     if (wand->value2() <= 0) {
         ch->recho( _("%1$^O1 %2$C2 развалива%1$nется|ются на куски."), wand, ch );
         ch->pecho( _("Тво%1$Gе|й|я|и %1$O1 развалива%1$nется|ются на куски."), wand );
         extract_obj( wand );
+    }
+}
+
+/*
+ * Charged items (props "charged", see chargedprops.h): a wand that can be any item.
+ * "carried" charges work from the inventory or any wear slot and roll 'wands';
+ * "wielded" ones (staff weapons) need the item wielded and roll 'staff'.
+ */
+void use_charged( Character *ch, Object *obj, const DLString &argument )
+{
+    const Json::Value *c = charged_props( obj );
+    bool wielded = charged_wielded( *c );
+    Skill &skill = wielded ? *gsn_staff : *gsn_wands;
+
+    if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
+        ch->pecho(_("Ты долж%1$Gно|ен|на уничтожать магию, а не использовать её!"), ch);
+        return;
+    }
+
+    if (wielded && obj->wear_loc != wear_wield && obj->wear_loc != wear_second_wield) {
+        ch->pecho(_("%1$^O4 сперва нужно вооружиться."), obj);
+        return;
+    }
+
+    if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
+        ch->pecho(_("%1$^O1 чересчур слож%1$Gно|ен|на|ны для твоего понимания."), obj);
+        return;
+    }
+
+    if (charged_charges( *c ) <= 0) {
+        ch->pecho(_("В %1$O6 не осталось ни одного заряда."), obj);
+        return;
+    }
+
+    Skill *spellSkill = skillManager->findExisting( (*c)["spell"].asString( ) );
+    Spell::Pointer spell;
+    if (!spellSkill || !( spell = spellSkill->getSpell( ) )) {
+        LogStream::sendWarning( ) << "Charged item [" << obj->pIndexData->vnum << "] has bad spell "
+                                  << (*c)["spell"].asString( ) << endl;
+        return;
+    }
+
+    if (!magic_item_skill_gate( ch, skill ))
+        return;
+
+    // A weapon skill has no beats of its own: a staff cast lags like a wand.
+    if (wielded)
+        ch->setWait( gsn_wands->getBeats( ch ) );
+
+    int level = c->isMember( "level" ) ? (*c)["level"].asInt( ) : obj->level;
+    int slevel = level + skill_level_bonus( skill, ch );
+    bool crumble = c->isMember( "crumble" ) && (*c)["crumble"].asBool( );
+
+    if (!zap_cast( ch, obj, spell, slevel, skill, argument, true ))
+        return;
+
+    // The cast may have killed the user or destroyed the item.
+    if (obj->extracted)
+        return;
+
+    Json::Value &own = charged_own( obj );
+    int left = charged_charges( own ) - 1;
+    own["charges"] = left;
+
+    if (left > 0)
+        return;
+
+    if (crumble) {
+        ch->recho( _("%1$^O1 %2$C2 развалива%1$nется|ются на куски."), obj, ch );
+        ch->pecho( _("Тво%1$Gе|й|я|и %1$O1 развалива%1$nется|ются на куски."), obj );
+        extract_obj( obj );
+    }
+    else {
+        ch->pecho( _("%1$^O1 тускне%1$nет|ют: заряды кончились."), obj );
     }
 }
