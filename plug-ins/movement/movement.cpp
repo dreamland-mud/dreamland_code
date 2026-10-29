@@ -188,7 +188,7 @@ static bool mprog_greet( Character *rch, Character *walker )
     // A quest giver that cannot see the walker (dark room, invisibility) must not
     // start or advance a quest: the step handlers stay silent for an unseen
     // walker, so the quest would begin with no dialogue at all.
-    if (rch->can_see( walker ))
+    if (rch->is_npc( ) && rch->can_see( walker ))
         aquest_trigger(rch, walker, "Greet", "CC", rch, walker);
 
     if (behavior_trigger(rch, "Greet", "CC", rch, walker))
