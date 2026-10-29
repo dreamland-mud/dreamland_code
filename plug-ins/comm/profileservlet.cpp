@@ -2,6 +2,7 @@
  * dreamland.rocks/player/<id>. Trello dIW1M9t8.
  *
  *   /profile {args:{id}} or {args:{char}} -> account title + its visible characters
+ *   GET /playermeta/<id or name> -> the page's <title> and og:* tags (nginx SSI)
  *
  * No token: this is the page anyone can open, same footing as the public /who.
  * Linking characters into one account is information `who`/`whois` never give
@@ -55,6 +56,7 @@
 #include "reglist.h"
 #include "json_utils_ext.h"
 #include "dreamland.h"
+#include "iconvmap.h"
 #include "logstream.h"
 #include "def.h"
 
@@ -443,6 +445,73 @@ static bool profile_valid_id(const DLString &id)
     return true;
 }
 
+// A character by login first, then by any name the game shows for it
+// (English, Russian, Ukrainian): the site's search box sends whatever the
+// player typed. A name match must be visible and on an account.
+static PCMemoryInterface *profile_find_char(const DLString &name)
+{
+    DLString login = name;
+    PCMemoryInterface *pci = PCharacterManager::find(login.capitalize());
+    if (pci != 0)
+        return pci;
+
+    for (auto &pair: PCharacterManager::getPCM()) {
+        PCMemoryInterface *p = pair.second;
+        if (!(name ^ p->getNameP('1', LANG_RU)) && !(name ^ p->getNameP('1', LANG_UA))
+            && !(name ^ p->getNameP('1', LANG_EN)))
+            continue;
+        if (account_profile_char_hidden(p) || AccountManager::accountOf(p->getName()).empty())
+            continue;
+        return p;
+    }
+    return 0;
+}
+
+// The account whose page an id or a character name opens, and its shown
+// characters. False when there is no page: a missing or hidden character, an
+// unknown account, a page switched off or not open yet. By name the character
+// must itself be visible, so a hidden alt's name never leads to the account.
+static bool profile_resolve(DLString id, const DLString &charName, DLString &account,
+                            PCMemoryInterface *&byChar, list<PCMemoryInterface *> &shown)
+{
+    byChar = 0;
+    if (id.empty() && !charName.empty()) {
+        byChar = profile_find_char(charName);
+        if (byChar == 0 || account_profile_char_hidden(byChar))
+            return false;
+        id = AccountManager::accountOf(byChar->getName());
+    }
+
+    id.toUpper();
+    if (!profile_valid_id(id) || !AccountManager::exists(id)
+        || !account_profile_enabled(id) || !account_profile_eligible(id))
+        return false;
+
+    for (const DLString &name : AccountManager::charsOf(id)) {
+        PCMemoryInterface *pci = PCharacterManager::find(name);
+        if (pci != 0 && !account_profile_char_hidden(pci))
+            shown.push_back(pci);
+    }
+
+    account = id;
+    return !shown.empty();
+}
+
+// The main character: the one played the longest over all its lives.
+static PCMemoryInterface *profile_main_char(const list<PCMemoryInterface *> &shown)
+{
+    PCMemoryInterface *mainChar = 0;
+    int mainHours = -1;
+    for (PCMemoryInterface *pci : shown) {
+        int h = profile_char_hours(pci);
+        if (h > mainHours) {
+            mainHours = h;
+            mainChar = pci;
+        }
+    }
+    return mainChar;
+}
+
 static void profile_servlet(HttpRequest &request, HttpResponse &response)
 {
     Json::Value params;
@@ -453,37 +522,14 @@ static void profile_servlet(HttpRequest &request, HttpResponse &response)
     servlet_get_arg(params, "id", id);
     servlet_get_arg(params, "char", charName);
 
-    // By character name: the character must itself be visible, so a hidden
-    // alt's name never leads to the account.
-    if (id.empty() && !charName.empty()) {
-        PCMemoryInterface *pci = PCharacterManager::find(charName.capitalize());
-        if (pci == 0 || account_profile_char_hidden(pci)) {
-            servlet_response_404(response, "Not found");
-            return;
-        }
-        id = AccountManager::accountOf(pci->getName());
-    }
-
-    id.toUpper();
-    if (!profile_valid_id(id) || !AccountManager::exists(id)
-        || !account_profile_enabled(id) || !account_profile_eligible(id)) {
+    PCMemoryInterface *byChar;
+    list<PCMemoryInterface *> shown;
+    if (!profile_resolve(id, charName, id, byChar, shown)) {
         servlet_response_404(response, "Not found");
         return;
     }
 
     list<PCharacter *> online = who_find_online(0);
-
-    list<PCMemoryInterface *> shown;
-    for (const DLString &name : AccountManager::charsOf(id)) {
-        PCMemoryInterface *pci = PCharacterManager::find(name);
-        if (pci != 0 && !account_profile_char_hidden(pci))
-            shown.push_back(pci);
-    }
-
-    if (shown.empty()) {
-        servlet_response_404(response, "Not found");
-        return;
-    }
 
     // Most reborn first, then by name.
     shown.sort([](PCMemoryInterface *a, PCMemoryInterface *b) {
@@ -499,16 +545,7 @@ static void profile_servlet(HttpRequest &request, HttpResponse &response)
     body["account"] = profile_account_stats(shown);
     body["chars"] = Json::Value(Json::arrayValue);
 
-    // The main character: the one played the longest over all its lives.
-    PCMemoryInterface *mainChar = 0;
-    int mainHours = -1;
-    for (PCMemoryInterface *pci : shown) {
-        int h = profile_char_hours(pci);
-        if (h > mainHours) {
-            mainHours = h;
-            mainChar = pci;
-        }
-    }
+    PCMemoryInterface *mainChar = profile_main_char(shown);
 
     for (PCMemoryInterface *pci : shown) {
         bool isOnline = false;
@@ -533,6 +570,119 @@ static void profile_servlet(HttpRequest &request, HttpResponse &response)
 SERVLET_HANDLE(api_profile, "/profile")
 {
     profile_servlet(request, response);
+}
+
+/*
+ * GET /playermeta/<id or login> -> <title>, description and og:* tags for
+ * the head of /player/<...>. Link previews (Telegram, Discord, Facebook) never
+ * run the page's script, so nginx pulls this block in with SSI; on a 404 its
+ * stub keeps the generic tags. The key follows player.js: six capitals and
+ * digits are an account id, anything else a character name. A name previews
+ * that character, an id the main one. No Fenia, nothing cached: lookups only.
+ */
+static IconvMap meta_koi2utf("koi8-u", "utf-8");
+static const DLString::size_type META_DESC_MAX = 200;
+
+static DLString meta_escape(const DLString &text)
+{
+    DLString out;
+    for (char ch : text) {
+        switch (ch) {
+        case '&': out << "&amp;"; break;
+        case '<': out << "&lt;"; break;
+        case '>': out << "&gt;"; break;
+        case '"': out << "&quot;"; break;
+        case '\'': out << "&#39;"; break;
+        case '\n': case '\r': case '\t': out << ' '; break;
+        default: out << ch;
+        }
+    }
+    return out;
+}
+
+// The character's own description, English first, cut at a word under
+// META_DESC_MAX (KOI8 is one byte a letter, so this counts letters).
+static DLString meta_description(PCMemoryInterface *pci)
+{
+    DLString desc = pci->getDescription(LANG_EN);
+    if (desc.empty())
+        desc = pci->getDescription(LANG_UA);
+    if (desc.empty())
+        desc = pci->getDescription(LANG_RU);
+    desc = desc.colourStrip();
+    desc.replaces("\r", "");
+    desc.replaces("\n", " ");
+    while (desc.find("  ") != DLString::npos)
+        desc.replaces("  ", " ");
+    desc.stripWhiteSpace();
+
+    if (desc.size() > META_DESC_MAX) {
+        DLString::size_type cut = desc.rfind(' ', META_DESC_MAX);
+        if (cut == DLString::npos || cut < META_DESC_MAX / 2)
+            cut = META_DESC_MAX;
+        desc = desc.substr(0, cut);
+        desc << "...";
+    }
+    return desc;
+}
+
+SERVLET_HANDLE(api_playermeta, "/playermeta")
+{
+    DLString key = request.uri.substr(DLString("/playermeta").size());
+    DLString::size_type q = key.find('?');
+    if (q != DLString::npos)
+        key = key.substr(0, q);
+    while (!key.empty() && key.at(0) == '/')
+        key.erase(0, 1);
+    while (!key.empty() && key.at(key.size() - 1) == '/')
+        key.erase(key.size() - 1);
+
+    bool isId = key.size() == 6;
+    for (char ch : key)
+        if (!isupper((unsigned char)ch) && !isdigit((unsigned char)ch))
+            isId = false;
+
+    DLString account;
+    PCMemoryInterface *byChar;
+    list<PCMemoryInterface *> shown;
+    if (key.empty() || key.size() > 16
+        || !profile_resolve(isId ? key : DLString::emptyString, isId ? DLString::emptyString : key,
+                            account, byChar, shown)) {
+        servlet_response_404(response, "Not found");
+        return;
+    }
+
+    PCMemoryInterface *pci = byChar != 0 ? byChar : profile_main_char(shown);
+    DLString name = pci->getNameP('1', LANG_EN);
+    DLString title = AccountManager::titleOf(account);
+    DLString desc = meta_description(pci);
+    if (desc.empty())
+        desc = "A DreamLand MUD player's characters: races, classes, rebirths and clans.";
+
+    DLString head = name;
+    if (!title.empty())
+        head << ", " << title;
+    head = meta_escape(head);
+    desc = meta_escape(desc);
+    DLString url = "https://dreamland.rocks/player/" + account;
+
+    DLString html;
+    html << "<title>" << head << " &#8212; DreamLand</title>\n"
+         << "<meta name=\"description\" content=\"" << desc << "\"/>\n"
+         << "<meta property=\"og:type\" content=\"profile\"/>\n"
+         << "<meta property=\"og:site_name\" content=\"DreamLand MUD\"/>\n"
+         << "<meta property=\"og:title\" content=\"" << head << "\"/>\n"
+         << "<meta property=\"og:description\" content=\"" << desc << "\"/>\n"
+         << "<meta property=\"og:url\" content=\"" << url << "\"/>\n"
+         << "<meta property=\"og:image\" content=\"https://dreamland.rocks/site/assets/og-card.jpg\"/>\n"
+         << "<meta property=\"og:image:width\" content=\"1200\"/>\n"
+         << "<meta property=\"og:image:height\" content=\"630\"/>\n"
+         << "<meta property=\"og:image:alt\" content=\"The DreamLand logo over a purple map of Thera\"/>\n"
+         << "<meta name=\"twitter:card\" content=\"summary_large_image\"/>\n"
+         << "<link rel=\"canonical\" href=\"" << url << "\"/>\n";
+
+    servlet_response_200(response, meta_koi2utf(html));
+    response.headers["content-type"] = "text/html; charset=utf-8";
 }
 
 /*
@@ -603,18 +753,13 @@ static Json::Value board_build()
             || !account_profile_enabled(id) || !account_profile_eligible(id))
             continue;
 
-        PCMemoryInterface *mainChar = 0;
-        int mainHours = -1;
+        list<PCMemoryInterface *> shown;
         for (const DLString &name : AccountManager::charsOf(id)) {
             PCMemoryInterface *pci = PCharacterManager::find(name);
-            if (pci == 0 || account_profile_char_hidden(pci))
-                continue;
-            int h = profile_char_hours(pci);
-            if (h > mainHours) {
-                mainHours = h;
-                mainChar = pci;
-            }
+            if (pci != 0 && !account_profile_char_hidden(pci))
+                shown.push_back(pci);
         }
+        PCMemoryInterface *mainChar = profile_main_char(shown);
         if (mainChar == 0)
             continue;
 
