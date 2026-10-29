@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include <string.h>
+#include <set>
 
 #include "logstream.h"
 
@@ -14,6 +15,7 @@
 #include "lex.h"
 
 #include "skill.h"
+#include "skillmanager.h"
 #include "skillcommand.h"
 #include "affect.h"
 #include "affecthandler.h"
@@ -43,6 +45,11 @@
 #include "act.h"
 
 #include "configurable.h"
+#include "chargedprops.h"
+#include "spell.h"
+#include "spelltarget.h"
+#include "magic.h"
+#include "fight_exception.h"
 #include "multiinflectedstring.h"
 #include "merc.h"
 #include "vnum.h"
@@ -88,6 +95,8 @@ GSN(shield_block);
 GSN(shadow_shroud);
 GSN(slice);
 GSN(soul_lust);
+GSN(staff);
+GSN(mastering_staff);
 GSN(sword);
 GSN(trip);
 
@@ -202,6 +211,7 @@ void UndefinedOneHit::calcDamage( )
     damApplyMasterHand( );
     damapply_class(ch, dam);
     damApplyMasterSword( );
+    damApplyMasterStaff( );
     damApplyDamroll( );
     damApplyFudoshin( );
     damApplyAttitude( );
@@ -257,6 +267,7 @@ void UndefinedOneHit::postDamageEffects( )
     damEffectDestroyEquipment( );
     damEffectFeeble( );
     damEffectFunkyWeapon( );
+    damEffectMasterStaff( );
     gsn_slice->getCommand()->apply(ch, victim, secondary);
     damEffectVorpal();
 }
@@ -640,6 +651,101 @@ void UndefinedOneHit::damApplyMasterSword( )
 
     gsn_mastering_sword->improve( ch, true, victim );
     dam = dam * 150 /100;
+}
+
+/*
+ * Shalafi staff mastery, part one: a staff hits harder for any class, so the
+ * order's warriors get something out of it too.
+ */
+void UndefinedOneHit::damApplyMasterStaff( )
+{
+    if (weapon_sn != gsn_staff || ch->is_npc( ))
+        return;
+
+    if (!gsn_mastering_staff->usable( ch, false ))
+        return;
+
+    if (number_percent( ) > gsn_mastering_staff->getEffective( ch ))
+        return;
+
+    gsn_mastering_staff->improve( ch, true, victim );
+    dam = dam * 125 / 100;
+}
+
+/*
+ * Spells a staff never fires on its own in melee: instant kills and the like.
+ * Merged from "blocked" and "autocast_blocked" in fight/magic_items.json.
+ */
+static std::set<DLString> staffAutocastBlocked;
+
+CONFIGURABLE_LOADED(fight, magic_items)
+{
+    staffAutocastBlocked.clear();
+
+    const char *keys[] = { "blocked", "autocast_blocked" };
+    for (const char *key: keys) {
+        const Json::Value &list = value[key];
+        if (!list.isArray( ))
+            continue;
+
+        for (const auto &name: list)
+            if (name.isString( ))
+                staffAutocastBlocked.insert( name.asString( ) );
+    }
+}
+
+/*
+ * Shalafi staff mastery, part two: an imbued staff sometimes casts its offensive
+ * spell at the foe by itself, about 1 hit in 20 at full mastery. The charge is
+ * not spent, but an empty staff stays silent.
+ */
+void UndefinedOneHit::damEffectMasterStaff( )
+{
+    if (!wield || weapon_sn != gsn_staff || ch->is_npc( ))
+        return;
+
+    if (ch->fighting != victim || victim->in_room != ch->in_room)
+        return;
+
+    if (!gsn_mastering_staff->usable( ch, false ))
+        return;
+
+    int skill = gsn_mastering_staff->getEffective( ch );
+    if (skill <= 1 || number_range( 1, 2000 ) > skill)
+        return;
+
+    const Json::Value *c = charged_props( wield );
+    if (!c || !charged_wielded( *c ) || charged_charges( *c ) <= 0)
+        return;
+
+    DLString spellName = (*c).isMember( "spell" ) && (*c)["spell"].isString( ) ? (*c)["spell"].asString( ) : "";
+    if (staffAutocastBlocked.count( spellName ))
+        return;
+
+    Skill *spellSkill = skillManager->findExisting( spellName );
+    Spell::Pointer spell;
+    if (!spellSkill || !( spell = spellSkill->getSpell( ) ))
+        return;
+
+    if (spell->getSpellType( ) != SPELL_OFFENSIVE)
+        return;
+
+    SpellTarget::Pointer target;
+    int t = spell->getTarget( );
+    if (IS_SET( t, TAR_CHAR_ROOM ))
+        target = SpellTarget::Pointer( NEW, victim );
+    else if (IS_SET( t, TAR_ROOM|TAR_PEOPLE ))
+        target = SpellTarget::Pointer( NEW, ch->in_room );
+    else
+        return;
+
+    int level = std::min( (int)ch->getModifyLevel( ), charged_int( *c, "level", wield->level ) );
+
+    oldact(_("$o1 в твоих руках отзывается на удар, и с навершия срывается заклинание!"), ch, wield, 0, TO_CHAR);
+    oldact(_("$o1 в руках $c2 отзывается на удар, и с навершия срывается заклинание!"), ch, wield, 0, TO_ROOM);
+
+    // A kill travels on as VictimDeathException, like a WEAPON_SPELL kill.
+    spell_nocatch( spell, level, ch, target, 0 );
 }
 
 /*
