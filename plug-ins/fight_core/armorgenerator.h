@@ -45,6 +45,8 @@ public:
         std::set<DLString> conflicts;
         DLString conflictsWith;
         bool sigOnly;       // needs_boss: only a boss signature may pick it
+        DLString spell;     // section "charged": the spell and its charges
+        int charges;
     };
 
     /** One prefix or suffix candidate for the name: an affix entry and its weight. */
@@ -110,6 +112,10 @@ protected:
     virtual bool valueAllowed(const DLString &secName, const DLString &value) const;
     virtual int candidatePrice(const DLString &secName, const Json::Value &affix, bool &allowed) const;
     virtual double candidateWeight(const DLString &secName, const Json::Value &affix) const;
+    /** Section "charged": a spell from the affix's magic_items pool for this
+     *  item kind and its charges, priced charge x charges (centi-M) inside the
+     *  section's share of the tier window. False when nothing fits. */
+    bool chargedPick(const Json::Value &section, const Json::Value &affix, Candidate &c) const;
     /** A learned ancient language (affix "skills") short of native, or -1. */
     int pickTongue(const Json::Value &affix) const;
     double learnedValueMult() const;

@@ -25,6 +25,18 @@ double magic_spell_charge(const DLString &spell);
  *  ("scroll", "wand", "staff") that rolls one of its kinds. */
 bool magic_item_kind_exists(const DLString &kind);
 
+/** A spell a magic item may carry, and one charge of it in M. */
+struct MagicSpellPick {
+    DLString spell;
+    int sn;
+    double price;
+};
+
+/** The spells of a kind ("wand_def", "staff_off"...) an item of this tier and
+ *  level may carry: level reach, AoE rule, top spells from the kind's min_tier,
+ *  the sanctuary family by alignment, Kit's exclusions. False when none. */
+bool magic_item_pool(const DLString &kind, int tier, int level, int align, std::vector<MagicSpellPick> &out);
+
 /**
  * Random pills, potions, scrolls and charged trinkets (magic_items_revamp.md D1).
  * Spells come from the kind's pool, priced by their charge in spell_value.json,
@@ -44,11 +56,7 @@ public:
     int total() const { return chosenTotal; }
 
 private:
-    struct Pick {
-        DLString spell;
-        int sn;
-        double price;
-    };
+    typedef MagicSpellPick Pick;
 
     bool roll();
     bool collect(std::vector<Pick> &cands) const;

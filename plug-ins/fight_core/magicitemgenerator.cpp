@@ -160,9 +160,16 @@ MagicItemGenerator & MagicItemGenerator::alignment(int align)
 
 bool MagicItemGenerator::collect(std::vector<Pick> &cands) const
 {
-    const Json::Value &kc = *kindConfig;
+    return magic_item_pool( kind, tier, obj->level, hasAlign ? align : (ch ? (int)ch->alignment : 0), cands );
+}
+
+bool magic_item_pool(const DLString &kind, int tier, int level, int a, std::vector<MagicSpellPick> &cands)
+{
+    if (!cfg["kinds"].isMember( kind ))
+        return false;
+
+    const Json::Value &kc = cfg["kinds"][kind];
     const Json::Value &reach = cfg["level_reach"];
-    int level = obj->level;
     int maxLevel = level + (level <= reach["low_level_max"].asInt( )
                                 ? reach["low"].asInt( ) : reach["high"].asInt( ));
 
@@ -181,7 +188,6 @@ bool MagicItemGenerator::collect(std::vector<Pick> &cands) const
         alignSpells.insert( top["by_align"][a].asString( ) );
 
     DLString alignKey = "neutral";
-    int a = hasAlign ? align : (ch ? (int)ch->alignment : 0);
     if (a >= 350)
         alignKey = "good";
     else if (a <= -350)
@@ -226,7 +232,7 @@ bool MagicItemGenerator::collect(std::vector<Pick> &cands) const
         if (!skill || !skill->getSpell( ))
             continue;
 
-        cands.push_back( Pick{ name, skill->getIndex( ), price } );
+        cands.push_back( MagicSpellPick{ name, skill->getIndex( ), price } );
     }
 
     return !cands.empty( );
@@ -361,7 +367,7 @@ bool MagicItemGenerator::roll()
     kindConfig = &cfg["kinds"][kind];
     DLString itemType = (*kindConfig)["item_type"].asString( );
 
-    // Staves are weapons: the weapon generator rolls them (P2b).
+    // Staves are weapons: WeaponGenerator imbues them (item_affixes "charged").
     if (itemType == "staff")
         return false;
 
