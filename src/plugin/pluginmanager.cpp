@@ -128,8 +128,11 @@ void PluginManager::reloadChanged( )
     list<DLString> todo;
     iterator i;
 
+    // Critical plugins ([descriptor]) are skipped as in reloadNonCritical:
+    // after a full rebuild every .so is changed, and unloading [descriptor]
+    // drops every connection. Reload one by name to do that on purpose.
     for (i = begin( ); i != end( ); i++)
-        if (i->second.isChanged( ))
+        if (i->second.isChanged( ) && !i->second.isCritical( ))
             todo.push_back( i->first );
 
     while (!todo.empty( )) {
