@@ -78,6 +78,13 @@ public:
     virtual const ClanMembership * getMembership( ) const;
     virtual ClanMembership * getMembership( );
     virtual const ClanTitles * getTitles( ) const;
+
+    /** Rank titles from the lowest rank up, in this language and sex: the
+     *  list a clan's help article prints. Empty without a title table. */
+    virtual StringList getRankTitles( lang_t, int sex ) const;
+
+    /** The help article the long name links to with {hh, or 0. */
+    int getHelpId( ) const;
     virtual const ClanOrgs * getOrgs( ) const;
 
 protected:

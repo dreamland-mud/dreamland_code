@@ -32,7 +32,13 @@ struct HelpWorldHits {
      *  mob/object keywords, a weaker signal worth saying so. */
     bool keywordOnly;
 
-    HelpWorldHits() : keywordOnly(false) { }
+    /** True when the query is only the start of the names in matchedNames. */
+    bool partial;
+
+    /** Display forms of the names a partial query completed to. */
+    std::list<DLString> matchedNames;
+
+    HelpWorldHits() : keywordOnly(false), partial(false) { }
 
     bool empty() const;
 };
@@ -43,6 +49,11 @@ bool help_world_area_listed(AreaIndexData *area);
 /** Look the query up among zone, room, mob and object names in all languages;
  *  with 'keywords', fall back to single mob and object keywords. */
 HelpWorldHits help_world_lookup(const DLString &query, bool keywords);
+
+/** Names (or, with keywords, single keywords) the query is the start of:
+ *  "заброшенный тов" for the room "Заброшенный Товарный Склад". Empty when the
+ *  query is shorter than four letters or starts more than ten names. */
+HelpWorldHits help_world_prefix_lookup(const DLString &query, bool keywords);
 
 /** Lowercase, colour-free, single-spaced, quotes and a leading English article
  *  removed: the form both the index keys and the query are reduced to. */
