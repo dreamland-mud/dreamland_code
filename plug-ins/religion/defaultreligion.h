@@ -120,6 +120,9 @@ public:
     XML_VARIABLE XMLGlobalBitvector patronsRaces;
     XML_VARIABLE XMLGlobalBitvector patronsClasses;
     XML_VARIABLE XMLGlobalBitvector patronsClans;
+    // The god's Eight Paths, space-separated keys: light dark reason rage
+    // order chaos nature society freedom (docs/lore/RELIGIONS.md).
+    XML_VARIABLE XMLStringNoEmpty paths;
 };
 
 inline const Flags & DefaultReligion::getAlign() const

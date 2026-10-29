@@ -26,6 +26,8 @@
 #include "hometown.h"
 #include "feniaskillaction.h"
 #include "defaultspell.h"
+#include "defaultskillcommand.h"
+#include "affecthandler.h"
 #include "command.h"
 #include "player_utils.h"
 #include "fight.h"
@@ -672,10 +674,44 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
 
     if (dspell && spell->isCasted() && spell->getTarget() != 0) {
         DLString targets = target_table.messages(spell->getTarget(), true, '1', viewerLang(ch));
-        if (dspell->getMaxRange(ch) > 0)
-            targets << l(ch, " или по направлению (дальнобойное)");
+        int range = dspell->getMaxRange(ch);
+        if (range > 0)
+            targets << fmt(ch, _(" или по направлению (дальнобойное, дальность %1$d)"), range);
 
         outputLines.push_back(fmt(ch, _("Цель: {W%1$s{x. "), targets.c_str()));
+    }
+
+    // A skill with its own command: the target its argument parser demands.
+    if (!(dspell && spell->isCasted())) {
+        DefaultSkillCommand::Pointer dcmd = command.getDynamicPointer<DefaultSkillCommand>();
+        const char *target = 0;
+
+        if (dcmd) {
+            switch (dcmd->argtype.getValue()) {
+            case ARG_OBJ_HERE:   target = l(ch, "предмет рядом"); break;
+            case ARG_OBJ_CARRY:  target = l(ch, "предмет в инвентаре или экипировке"); break;
+            case ARG_CHAR_ROOM:  target = l(ch, "персонаж рядом"); break;
+            case ARG_CHAR_FIGHT: target = l(ch, "противник в бою или персонаж рядом"); break;
+            case ARG_CHAR_SELF:  target = l(ch, "персонаж рядом или ты сам"); break;
+            case ARG_EXIT:       target = l(ch, "выход или направление"); break;
+            }
+        }
+
+        if (target)
+            outputLines.push_back(fmt(ch, _("Цель: {W%1$s{x. "), target));
+    }
+
+    // Lasting effects that the two removal spells can strip.
+    AffectHandler::Pointer ah = getAffect();
+    if (ah) {
+        bool dispel = ah->isDispelled(), cancel = ah->isCancelled();
+
+        if (dispel && cancel)
+            outputLines.push_back(l(ch, "Эффект снимают {hh808снятие воздействий{x и {hh821отмена{x."));
+        else if (dispel)
+            outputLines.push_back(l(ch, "Эффект снимает {hh808снятие воздействий{x."));
+        else if (cancel)
+            outputLines.push_back(l(ch, "Эффект снимает {hh821отмена{x."));
     }
 
     if (isPassive()) {

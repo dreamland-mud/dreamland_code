@@ -40,20 +40,35 @@ DLString MarkupHelpArticle::getText( Character *ch ) const
     getRawText( ch, in );
     applyFormatter( ch, in, out );
 
-    // In game only, like the title header: the website gets the same list as
-    // the 'related' field of the help dump and lays it out itself.
+    DLString body = out.str();
+
+    // In game only, like the title header: the website has its own address for
+    // an article and gets the related list as the 'related' field of the dump.
     if (ch && ch->desc && ch->desc->connected == CON_PLAYING) {
+        // The id closes the header line, so 'help <id>' brings the reader back.
+        if (getID() > 0) {
+            DLString tag = DLString(" {D[") + DLString(getID()) + "]{x";
+            DLString::size_type eol = body.find('\n');
+
+            if (eol == DLString::npos)
+                body << tag;
+            else {
+                if (eol > 0 && body.at(eol - 1) == '\r')
+                    eol--;
+                body.insert(eol, tag);
+            }
+        }
+
         DLString related = help_related_line(this, ch);
 
         if (!related.empty()) {
-            DLString body = out.str();
             if (!body.empty() && body.at(body.size() - 1) != '\n')
-                out << endl;
-            out << endl << related << endl;
+                body << "\n";
+            body << "\n" << related << "\n";
         }
     }
 
-    return out.str( );
+    return body;
 }
 
 void MarkupHelpArticle::editButton(Character *ch, ostringstream &in) const

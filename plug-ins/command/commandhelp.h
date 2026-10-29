@@ -30,6 +30,7 @@ public:
     CommandHelp::Pointer getReferencedBy();
     
 protected:
+    virtual void getRawText( Character *, ostringstream & ) const;
     virtual void applyFormatter( Character *, ostringstream &, ostringstream & ) const;
 
     CommandPointer command;

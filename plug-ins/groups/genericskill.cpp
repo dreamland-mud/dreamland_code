@@ -365,10 +365,19 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
     const char *pad = SKILL_INFO_PAD;
 
     auto fillRacesClassesInfo = [&]() {
-        if (!classes.empty())
-            buf << pad << l(ch, "Доступно классам:") << " {D" << this->skillClassesList(ch) << "{x" << endl;
+        DLString classList = this->skillClassesList(ch);
+        if (!classList.empty())
+            buf << pad << l(ch, "Доступно классам:") << " {D" << classList << "{x" << endl;
         if (!raceBonuses.empty())
             buf << pad << l(ch, "Бонус для рас:") << " {D" << this->skillRacesList(ch) << "{x" << endl;
+        // align/ethos hold bit numbers of align_table/ethos_table; the *_flags
+        // tables use the same bits and carry the adjective forms.
+        if (align.getValue() != 0)
+            buf << pad << fmt(ch, _("Только для натуры: {W%1$s{x."),
+                              align_flags.messages(align.getValue(), true, '1', viewerLang(ch)).c_str()) << endl;
+        if (ethos.getValue() != 0)
+            buf << pad << fmt(ch, _("Только для этоса: {W%1$s{x."),
+                              ethos_flags.messages(ethos.getValue(), true, '1', viewerLang(ch)).c_str()) << endl;
     };
 
     buf << print_what(this, ch) << " "
@@ -537,8 +546,14 @@ DLString GenericSkill::skillClassesList(Character *ch) const
 {
     StringList result;
 
+    // Each class with the level it learns the skill at; classes that can never
+    // learn it (rating 0 or an immortal level) are left out.
     for (auto &c: classes) {
-        result.push_back(professionManager->find(c.first)->getNameFor(ch, Grammar::Case('1')));
+        if (!c.second.visible())
+            continue;
+
+        result.push_back(professionManager->find(c.first)->getNameFor(ch, Grammar::Case('1'))
+                         + " {W" + DLString(c.second.getLevel()) + "{D");
     }
 
     return result.join("{x, {D");
