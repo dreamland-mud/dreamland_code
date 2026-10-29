@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "defaultreligion.h"
+#include "helpsave.h"
 #include "helpmeta.h"
 #include "religionattribute.h"
 #include "logstream.h"
@@ -73,7 +74,7 @@ void ReligionHelp::unsetReligion( )
 void ReligionHelp::save() const
 {
     if (religion)
-        religion->save();
+        help_save_owner(this, religion.getPointer());
 
 }
 DLString ReligionHelp::getTitle(const DLString &label) const

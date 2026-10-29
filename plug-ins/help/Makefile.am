@@ -18,6 +18,7 @@ libhelp_la_LIBADD = \
 libhelp_la_SOURCES = \
 helpformatter.cpp \
 helpmeta.cpp \
+helpsave.cpp \
 markuphelparticle.cpp \
 helprelated.cpp \
 helpcontainer.cpp \

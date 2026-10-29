@@ -21,6 +21,9 @@ public:
     virtual const DLString & getType( ) const;
     virtual void save() const;
     void setContainer(::Pointer<HelpContainer> container);
+    /** Take the article out of its help file: unregister it and save the file
+     *  without it. Used when an OLC editor adopts it for an entity. */
+    void detach();
 
     static const DLString TYPE;
 protected:

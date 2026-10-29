@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "helpcontainer.h"
+#include "helpsave.h"
 
 HelpContainer::~HelpContainer( )
 {
@@ -40,8 +41,28 @@ void GenericHelp::setContainer(::Pointer<HelpContainer> container)
     this->container = container;
 }
 
+void GenericHelp::detach()
+{
+    // The container's list may hold the last reference.
+    HelpArticle::Pointer keep(static_cast<HelpArticle *>(this));
+
+    helpManager->unregistrate(keep);
+
+    if (!container)
+        return;
+
+    for (auto i = container->begin(); i != container->end(); i++)
+        if (i->getPointer() == this) {
+            container->erase(i);
+            break;
+        }
+
+    help_save_owner(this, container.getPointer());
+    container.clear();
+}
+
 void GenericHelp::save() const
 {
     if (container)
-        container->save();
+        help_save_owner(this, container.getPointer());
 }

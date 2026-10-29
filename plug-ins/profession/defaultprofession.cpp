@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "defaultprofession.h"
+#include "helpsave.h"
 #include "profflags.h"
 
 #include "stringlist.h"
@@ -142,7 +143,7 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
 void ClassSkillHelp::save() const
 {
     if (prof)
-        prof->save();
+        help_save_owner(this, prof.getPointer());
 }
 
 void ClassSkillHelp::setProfession( DefaultProfession::Pointer prof )
@@ -185,7 +186,7 @@ const DLString ProfessionHelp::TYPE = "ProfessionHelp";
 void ProfessionHelp::save() const
 {
     if (prof)
-        prof->save();
+        help_save_owner(this, prof.getPointer());
 }
 
 void ProfessionHelp::setProfession( DefaultProfession::Pointer prof )

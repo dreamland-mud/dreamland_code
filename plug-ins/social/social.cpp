@@ -8,6 +8,7 @@
  */
 
 #include "social.h"
+#include "helpsave.h"
 #include "socialmanager.h"
 
 #include "logstream.h"
@@ -66,7 +67,7 @@ void SocialHelp::unsetSocial()
 void SocialHelp::save() const
 {
     if (social)
-        social->save();
+        help_save_owner(this, social.getPointer());
 }
 
 const DLString &Social::getNameFor( lang_t lang ) const

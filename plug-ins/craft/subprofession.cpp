@@ -1,4 +1,5 @@
 #include "subprofession.h"
+#include "helpsave.h"
 #include "craft_utils.h"
 #include "craftattribute.h"
 #include "logstream.h"
@@ -28,7 +29,7 @@ const DLString CraftProfessionHelp::TYPE = "CraftProfessionHelp";
 void CraftProfessionHelp::save() const
 {
     if (prof)
-        prof->save();
+        help_save_owner(this, prof.getPointer());
 }
 
 DLString CraftProfessionHelp::getTitle(const DLString &label) const

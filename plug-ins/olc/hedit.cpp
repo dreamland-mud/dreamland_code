@@ -215,16 +215,48 @@ HEDIT(rutitle, "рузаголовок", "установить или очист
 }
 
 
+// Every label some article already carries: the vocabulary 'labels' suggests from.
+static StringSet help_known_labels()
+{
+    StringSet known;
+
+    for (auto &a: helpManager->getArticles())
+        known.insert(a->labels.all.begin(), a->labels.all.end());
+
+    return known;
+}
+
 HEDIT(labels, "метки", "установить метки для экспорта на сайт")
 {
+    StringSet known = help_known_labels();
+
     if (!*argument) {
         stc("Синтаксис:   labels <new labels>\n\r", ch);
+        ptc(ch, "Метки в ходу: %s\n\r", known.toString().c_str());
         return false;
     }
 
     labels = argument;
     labels.toLower();
     ptc(ch, "Новые метки: %s\n\r", labels.c_str());
+
+    // A label nobody uses yet is usually a typo: name the close ones.
+    StringSet given;
+    given.fromString(labels);
+    for (auto &l: given) {
+        if (known.count(l))
+            continue;
+
+        StringSet close;
+        for (auto &k: known)
+            if (k.size() >= 2 && l.size() >= 2 && k.substr(0, 2) == l.substr(0, 2))
+                close.insert(k);
+
+        ptc(ch, "{YМетки '%s' нет ни у одной статьи.{x%s%s\n\r", l.c_str(),
+            close.empty() ? "" : " Похожие: ",
+            close.empty() ? "" : close.toString().c_str());
+    }
+
     return true;
 }
 

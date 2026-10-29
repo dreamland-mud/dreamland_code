@@ -6,6 +6,7 @@
 #include <set>
 
 #include "logstream.h"
+#include "helpsave.h"
 #include "skill_utils.h"
 #include "skillhelp.h"    
 #include "skill.h"
@@ -101,7 +102,7 @@ void SkillHelp::save() const
     if (skill) {
         const XMLTableElement *element = skill.getDynamicPointer<XMLTableElement>();
         if (element)
-            element->save();
+            help_save_owner(this, element);
     }
 }
 
