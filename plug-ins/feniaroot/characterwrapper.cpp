@@ -4006,7 +4006,7 @@ static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::O
 // Clerics learn "compound" (lvl 37): it weights any weapon-class weapon into a
 // mace they can wield, so a non-limited weapon a cleric can't natively use is
 // still a real pick -- scored at their MACE skill, not the zero native skill.
-// compound refuses maces (already one), arrows/daggers/bows, limited items,
+// compound refuses maces (already one), arrows/daggers/bows/staves, limited items,
 // noenchant, and katana/spell weapons (dreamland_world/generic-skills/compound.xml,
 // spell/compound/runObj). The owner check is per-instance so the prototype scorer
 // can't see it; every other gate it can. Trello #2854.
@@ -4036,6 +4036,7 @@ static bool ga_clericCanCompoundCore( Character *target, int itemType, int limit
     case WEAPON_DAGGER:
     case WEAPON_BOW:
     case WEAPON_ARROW:
+    case WEAPON_STAFF:     // clerics wield staves natively
         return false;
     }
     return true;
@@ -4598,6 +4599,7 @@ struct GAOffhand {
     double damroll = 0;
     double blowValue = 0;             // score of one of the char's own main-hand blows
     double reach = 1.0;               // share of enemy blows that get past parry
+    double pGrip = 0;                 // share more parried when a staff is held alone
     double pShield = 0;               // shield block chance vs an equal-level attacker
     double pCross = 0;                // cross block chance vs an equal-level attacker
 };
@@ -4647,13 +4649,28 @@ static GAOffhand ga_offhandModel( Character *target, const GAWeights &w, ::Objec
     // parry) on top of parry alone: the same reach-weighted share. Both builds parry
     // with the main weapon, so only the blocks differ. Attacker = equal level, so the
     // formulas' "skill_level - attacker level" term is just the skill level bonus.
+    // parry/run toParry scales the skill share by the weapon's parry_with factor
+    // (fight/weapon_defense.json). A staff held alone, with no shield, held item or
+    // second weapon, parries at parry_with_grip instead: pGrip is what the grip adds.
+    // No weapon in hand: priced from the skill alone, as before.
     bool defClass = ga_defenderClass( target );
     Skill *parry = skillManager->findExisting( "parry" );
     if (parry != 0) {
-        int pe = parry->getEffective( target ) / 2;
-        if (defClass)
-            pe += pe / 5;
-        om.reach = 1.0 - ga_pct( pe + skill_level_bonus( *parry, target ) );
+        int wclass = -1, with = 100;
+        if (primary != 0 && primary->item_type == ITEM_WEAPON) {
+            wclass = get_weapon_class( primary );
+            with = weapon_defense_factor( wclass, "parry_with", 100 );
+        }
+        auto parryChance = [&]( int factor ) -> double {
+            int pe = parry->getEffective( target ) / 2 * factor / 100;
+            if (defClass)
+                pe += pe / 5;
+            return ga_pct( pe + skill_level_bonus( *parry, target ) );
+        };
+        double p = parryChance( with );
+        om.reach = 1.0 - p;
+        if (wclass == WEAPON_STAFF)
+            om.pGrip = parryChance( weapon_defense_factor( wclass, "parry_with_grip", with ) ) - p;
     }
     Skill *sb = skillManager->findExisting( "shield block" );
     if (sb != 0 && sb->getEffective( target ) > 1) {
@@ -7294,6 +7311,31 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             return false;
         return true;
     };
+    // Keep side: the best shield (when one fits) and the best held item, worn or
+    // obtainable, plus shield block when a shield is in it (haveShield).
+    auto keepSide = [&]( bool shieldFits, bool &haveShield ) -> double {
+        double shieldVal = gaShield ? ga_score( target, gaShield, w, rawStat, capStat, true ) : 0;
+        double holdVal   = gaHold   ? ga_score( target, gaHold,   w, rawStat, capStat, true ) : 0;
+        haveShield = gaShield != 0;
+        for (auto &c: cands) {
+            if (!reachable( c ))
+                continue;
+            if (shieldFits && (c.slot & ITEM_WEAR_SHIELD) && c.score > shieldVal) { shieldVal = c.score; haveShield = true; }
+            if ((c.slot & ITEM_HOLD) && c.score > holdVal) holdVal = c.score;
+        }
+        double keep = shieldVal + holdVal;
+        if (haveShield)
+            keep += om.pShield * om.blowValue;
+        return keep;
+    };
+    // The worn shield and held item, in the same units.
+    auto keepWorn = [&]( ) -> double {
+        double v = (gaShield ? ga_score( target, gaShield, w, rawStat, capStat, true ) : 0)
+                 + (gaHold   ? ga_score( target, gaHold,   w, rawStat, capStat, true ) : 0);
+        if (gaShield)
+            v += om.pShield * om.blowValue;
+        return v;
+    };
 
     RegList::Pointer dualInfo( NEW );
     // Set by a left-hand verdict: the chase list must not push the losing build, and the
@@ -7334,19 +7376,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             }
             bool pickBetter = bestOff != 0 && bestOffVal > offWornVal;
             if (pickBetter || gaOffhand != 0) {
-                // Keep side: the best shield and the best held item, worn or obtainable.
-                double shieldVal = gaShield ? ga_score( target, gaShield, w, rawStat, capStat, true ) : 0;
-                double holdVal   = gaHold   ? ga_score( target, gaHold,   w, rawStat, capStat, true ) : 0;
-                bool haveShield = gaShield != 0;
-                for (auto &c: cands) {
-                    if (!reachable( c ))
-                        continue;
-                    if ((c.slot & ITEM_WEAR_SHIELD) && c.score > shieldVal) { shieldVal = c.score; haveShield = true; }
-                    if ((c.slot & ITEM_HOLD) && c.score > holdVal) holdVal = c.score;
-                }
-                keepScore = shieldVal + holdVal;
-                if (haveShield)
-                    keepScore += om.pShield * om.blowValue;
+                bool haveShield;
+                keepScore = keepSide( true, haveShield );
 
                 double dualExtra = om.pCross * om.blowValue;
                 if (haveShield)
@@ -7356,12 +7387,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 // What the left hand holds now, in the same units as the two builds.
                 if (gaOffhand != 0)
                     gaLeftWorn = offWornVal + dualExtra;
-                else {
-                    gaLeftWorn = (gaShield ? ga_score( target, gaShield, w, rawStat, capStat, true ) : 0)
-                               + (gaHold   ? ga_score( target, gaHold,   w, rawStat, capStat, true ) : 0);
-                    if (gaShield)
-                        gaLeftWorn += om.pShield * om.blowValue;
-                }
+                else
+                    gaLeftWorn = keepWorn( );
                 // Best left-hand share: a dual build replaces the shield + hold share
                 // outright, a kept build is full-price per slot, so it is netted against
                 // the legacy share and added to the allocation's own. Taking the max of
@@ -7386,6 +7413,29 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         dualInfo->push_back( Register( (int)(dualScore + 0.5) ) );
         dualInfo->push_back( Register( (int)(keepScore + 0.5) ) );
         dualInfo->push_back( dEntry );
+    }
+
+    // ---- Staff grip --------------------------------------------------------------------
+    // A staff held alone parries better (om.pGrip), so an empty left hand is a build of
+    // its own, worth the blows the grip adds. It joins the dual/keep weighing: the
+    // percentile takes the best of the three, and when the grip beats keeping a shield
+    // or held item, the chase list stops pushing one. A non-large two-hander can't take
+    // a shield (ShieldWearloc::canWear), so its keep side is the held item alone.
+    bool gaGoGrip = false;
+    double gripScore = om.pGrip * om.blowValue;
+    if (!gaHandsFixed && gripScore > 0) {
+        bool shieldFits = !(IS_WEAPON_STAT( gaPrimary, WEAPON_TWO_HANDS ) && target->getSize( ) < SIZE_LARGE);
+        bool haveShield;
+        double keepScore = keepSide( shieldFits, haveShield );
+        if (!gaLeftScored) {
+            gaLeftWorn = keepWorn( );
+            gaLeftKeepNet = keepScore - leftBestLegacy;
+            gaLeftScored = true;
+        }
+        if (gaShield == 0 && gaHold == 0 && gaOffhand == 0)
+            gaLeftWorn = gripScore;
+        gaLeftDual = std::max( gaLeftDual, gripScore );   // best build that keeps no shield/hold
+        gaGoGrip = (int)(gripScore + 0.5) > (int)(keepScore + 0.5);
     }
 
     if (gaLeftScored)
@@ -7616,8 +7666,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // more than 10 levels above them. Buy/quest have no such guard.
         if (ga_overCap( byOpt[k].acq, chLevel ))
             continue;
-        // The verdict says go dual: a shield or held item would take the off-hand back.
-        if (gaGoDual && (byOpt[k].slot & (ITEM_WEAR_SHIELD | ITEM_HOLD)))
+        // The verdict says go dual or keep the staff grip: a shield or held item would
+        // take the left hand back.
+        if ((gaGoDual || gaGoGrip) && (byOpt[k].slot & (ITEM_WEAR_SHIELD | ITEM_HOLD)))
             continue;
         if (gaHandsFixed && (byOpt[k].slot & gaHandSlots))
             continue;

@@ -3,6 +3,8 @@
  * ruffina, 2004
  */
 
+#include <jsoncpp/json/json.h>
+
 #include "skill.h"
 #include "skillreference.h"
 #include "core/object.h"
@@ -14,6 +16,7 @@
 #include "itemflags.h"
 #include "affectflags.h"
 #include "attacks.h"
+#include "configurable.h"
 #include "def.h"
 
 WEARLOC(wield);
@@ -206,4 +209,23 @@ int get_weapon_sn( struct obj_index_data *pWield )
     }
 }
 
+// Defence factors per weapon class (fight/weapon_defense.json), the table Fenia
+// reads as .tmp.combat.wtf / .config("fight/weapon_defense").
+Json::Value weapon_defense;
+CONFIGURABLE_LOADED(fight, weapon_defense)
+{
+    weapon_defense = value;
+}
 
+int weapon_defense_factor( int wclass, const char *key, int def )
+{
+    const Json::Value &table = weapon_defense;   // const: a lookup never adds members
+    DLString name = "unarmed";
+    if (wclass >= 0 && wclass < WEAPON_MAX)
+        name = weapon_class.name( wclass );
+    if (!table.isMember( name ))
+        name = "unarmed";
+
+    const Json::Value &f = table[name][key];
+    return f.isInt( ) ? f.asInt( ) : def;
+}
