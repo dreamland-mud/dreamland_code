@@ -20,7 +20,6 @@
 GSN(none);
 GSN(scrolls);
 GSN(wands);
-GSN(staves);
 GSN(staff);
 
 /*
@@ -122,7 +121,7 @@ const MagicItemUsage MagicItemTable::usages [] = {
     { ITEM_POTION, "use",      ARG_OBJ,     gsn_none,     true, 1, 4, -1, wear_none },
     { ITEM_SCROLL, "use",      ARG_OBJ_CHAR,gsn_scrolls, false, 1, 4, -1, wear_none },
     { ITEM_WAND,   "use",      ARG_OBJ_CHAR,gsn_wands,   false, 3, 3,  2, WEARLOC_ANY },
-    { ITEM_STAFF,  "use",      ARG_OBJ,     gsn_staves,  false, 3, 3,  2, wear_hold },
+    { ITEM_STAFF,  "use",      ARG_OBJ_CHAR,gsn_staff,   false, 3, 3,  2, wear_hold },
     { -1 }
 };
 

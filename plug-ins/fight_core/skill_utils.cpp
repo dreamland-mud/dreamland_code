@@ -33,7 +33,7 @@ GSN(none);
 GSN(turlok_fury);
 GSN(athena_wisdom);
 GSN(scrolls);
-GSN(staves);
+GSN(staff);
 GSN(wands);
 RELIG(none);
 
@@ -305,7 +305,7 @@ static Skill & skill_for_item_type(Object *obj)
     switch (obj->item_type) {
         case ITEM_SCROLL: return *gsn_scrolls;
         case ITEM_WAND:   return *gsn_wands;
-        case ITEM_STAFF:  return *gsn_staves;
+        case ITEM_STAFF:  return *gsn_staff;
         default:          return *gsn_none;
     }
 }

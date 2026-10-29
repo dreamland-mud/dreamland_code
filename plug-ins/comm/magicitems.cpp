@@ -45,7 +45,6 @@
 
 CLAN(battlerager);
 GSN(scrolls);
-GSN(staves);
 GSN(wands);
 GSN(staff);
 GSN(none);
@@ -191,7 +190,14 @@ void use_scroll( Character *ch, Object *scroll, const DLString &args )
 
 
 
-void use_staff( Character *ch, Object *staff )
+static bool zap_cast( Character *ch, Object *wand, Spell::Pointer &spell, int slevel,
+                      Skill &skill, const DLString &argument, bool hasCharge );
+
+/*
+ * Legacy staves roll the 'staff' weapon skill. Spells on a character or an object
+ * take a target like a wand; room-wide and targetless spells strike the ground.
+ */
+void use_staff( Character *ch, Object *staff, const DLString &argument )
 {
     int sn;
     Skill::Pointer skill;
@@ -202,75 +208,51 @@ void use_staff( Character *ch, Object *staff )
         return;
     }
 
-    if (!magic_item_skill_gate( ch, *gsn_staves ))
+    if (!magic_item_skill_gate( ch, *gsn_staff ))
         return;
 
     sn = staff->value3();
     skill = SkillManager::getThis( )->find( sn );
     
     if (!skill || !( spell = skill->getSpell( ) )) { 
-        bug( "brandish: bad sn %d.", sn );
+        bug( "staff: bad sn %d.", sn );
         return;
     }
 
-    if (staff->value2() > 0) {
+    int level = staff->value0() + skill_level_bonus(*gsn_staff, ch);
+    int t = spell->getTarget( );
+
+    if (!IS_SET( t, TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ|TAR_ROOM|TAR_PEOPLE )) {
+        if (!zap_cast( ch, staff, spell, level, *gsn_staff, argument, staff->value2() > 0 ))
+            return;
+    }
+    else if (staff->value2() > 0) {
         const char *terrain = terrains[ch->in_room->getSectorType()].hit;
         
         oldact(_("$c1 ударяет $o5 $T."), ch, staff, terrain, TO_ROOM );
         oldact(_("Ты ударяешь $o5 $T."), ch, staff, terrain, TO_CHAR );
 
-        if ( number_percent( ) >= gsn_staves->getEffective( ch ))
+        if ( number_percent( ) >= gsn_staff->getEffective( ch ))
         {
             oldact(_("Ты не смо$gгло|г|гла активировать $o4."),ch,staff,0,TO_CHAR);
             oldact(_("...и ничего не происходит."),ch,0,0,TO_ROOM);
-            gsn_staves->improve( ch, false );
+            gsn_staff->improve( ch, false );
         }
         else {
-            Character *vch, *vch_next;
-            bool offensive;
-            int level, t;
-            
-            level = staff->value0() + skill_level_bonus(*gsn_staves, ch);
-            offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
-            t = spell->getTarget( );            
-
             try {
-                if (IS_SET( t, TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ )) {
+                if (IS_SET( t, TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ ))
                     ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, DLString::emptyString), 0);
-                    gsn_staves->improve( ch, true );
-                }
-                else if (IS_SET( t, TAR_ROOM|TAR_PEOPLE )) {
+                else
                     ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, ch->in_room), 0);
-                    gsn_staves->improve( ch, true );
-                }
-                else if (IS_SET( t, TAR_CHAR_SELF )) {
-                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, ch), 0);
-                    gsn_staves->improve( ch, true, ch );
-                }
-                else if (IS_SET( t, TAR_CHAR_ROOM )) {
-                    bitstring_t brandish_flags = 
-                        FSPELL_BANE|FSPELL_ATTACK_CASTER|FSPELL_CHECK_GROUP|FSPELL_CHECK_SAFE;
-
-                    for (vch = ch->in_room->people; vch; vch = vch_next) {
-                        vch_next = vch->next_in_room;
-
-                        if (::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, vch), brandish_flags))
-                            if (offensive)
-                                yell_panic( ch, vch,
-                                            "Помогите! Кто-то размахивает около меня посохом!",
-                                            "Помогите! %1$^C1 пугает меня посохом!" );
-
-                        gsn_staves->improve( ch, true, vch );
-                    }
-                }
-                else {
-                    bug( "brandish: bad target for sn %d.", sn );
-                    return;
-                }
             } catch (const VictimDeathException &e) {
             }
+
+            gsn_staff->improve( ch, true );
         }
     }
+
+    if (staff->extracted)
+        return;
 
     staff->value2(staff->value2() - 1);
     if (staff->value2() <= 0) {
@@ -447,10 +429,6 @@ void use_charged( Character *ch, Object *obj, const DLString &argument )
 
     if (!magic_item_skill_gate( ch, skill ))
         return;
-
-    // A weapon skill has no beats of its own: a staff cast lags like a wand.
-    if (wielded)
-        ch->setWait( gsn_wands->getBeats( ch ) );
 
     int level = charged_int( *c, "level", obj->level );
     int slevel = level + skill_level_bonus( skill, ch );
