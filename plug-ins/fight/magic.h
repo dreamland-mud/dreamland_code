@@ -85,7 +85,9 @@ bool spell_nocatch( int sn, int level, Character *ch, ::Pointer<SpellTarget>, in
 bool spell_nocatch( ::Pointer<Spell> &spell, int level, Character *ch, ::Pointer<SpellTarget> target, int flags );
 
 /** oathPaid: a Battlerager already rolled his aura for this item, his own aura does not block it again. */
-void spell_by_item( Character *ch, Object *obj, bool oathPaid = false );
+/** oathPaid: a Battlerager paid the oath for this item. burned: the oath burned its magic,
+ *  only natural remedies on a pill still work. */
+void spell_by_item( Character *ch, Object *obj, bool oathPaid = false, bool burned = false );
 
 bool savesDispel( int dis_level, int spell_level, int duration);
 bool checkDispel( int dis_level, Character *victim, int sn);

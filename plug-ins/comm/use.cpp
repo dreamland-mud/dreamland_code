@@ -36,6 +36,12 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
             else
                 use_potion( ch, obj );
             return true;
+        case ITEM_PILL:
+            if (obj->carried_by != ch || obj->wear_loc != wear_none) 
+                ch->pecho(_("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре."), obj);
+            else
+                use_pill( ch, obj );
+            return true;
         case ITEM_SCROLL:
             if (obj->carried_by != ch || obj->wear_loc != wear_none) 
                 ch->pecho(_("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре."), obj);

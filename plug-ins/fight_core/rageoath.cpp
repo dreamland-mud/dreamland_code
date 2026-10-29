@@ -12,6 +12,8 @@
 #include "skillgroup.h"
 #include "spell.h"
 #include "skill.h"
+#include "skillmanager.h"
+#include "core/object.h"
 #include "clanreference.h"
 #include "profession.h"
 #include "religion.h"
@@ -58,11 +60,33 @@ static const char * const DIVINE_EXTRA[] = {
     "blade barrier", "hymn of rage", 0
 };
 
+/** Natural remedies: pills with only these spells are herbs, not magic (magic_items.json `natural`). */
+static const char * const NATURAL[] = {
+    "heal", "superior heal", "refresh", "cure blindness", "acute vision", "infravision",
+    "cure poison", "cure disease", "fervor", "remove fear", "regeneration", "second wind",
+    "venom ward", 0
+};
+
 static bool listed( const char * const *list, const DLString &name )
 {
     for (int i = 0; list[i]; i++)
         if (name == list[i])
             return true;
+    return false;
+}
+
+bool rage_natural_spell( const DLString &skillName )
+{
+    return listed( NATURAL, skillName );
+}
+
+bool rage_pill_magic( Object *pill )
+{
+    for (int i = 1; i <= 4; i++) {
+        Skill *skill = SkillManager::getThis( )->find( pill->valueByIndex( i ) );
+        if (skill && !rage_natural_spell( skill->getName( ) ))
+            return true;
+    }
     return false;
 }
 
