@@ -247,7 +247,7 @@ DLString link(const HelpArticle *a, lang_t lang)
         label = " " + label;
 
     ostringstream buf;
-    buf << "{hh" << a->getID() << label << "{x (" << a->getID() << ")";
+    buf << "{hh" << a->getID() << label << "{x {D[" << a->getID() << "]{x";
     return buf.str();
 }
 
