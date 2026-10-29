@@ -554,21 +554,45 @@ double ItemAffixRoller::pickMultiplier(const Json::Value &section, const Json::V
     return 1;
 }
 
-bool ItemAffixRoller::fitAllowed(const DLString &secName, const DLString &value) const
+bool ItemAffixRoller::fitAllowed(const DLString &secName, const Json::Value &affix) const
 {
     if (!pch)
         return true;
 
-    if (secName == "primary_stats") {
-        DLString norm = (!value.empty() && (value.at(0) == '-' || value.at(0) == '+')) ? DLString(value.substr(1)) : value;
-        static const char *names[] = { "str", "int", "wis", "dex", "con", "cha" };
-        static const int stats[] = { STAT_STR, STAT_INT, STAT_WIS, STAT_DEX, STAT_CON, STAT_CHA };
+    static const char *names[] = { "str", "int", "wis", "dex", "con", "cha" };
+    static const int stats[] = { STAT_STR, STAT_INT, STAT_WIS, STAT_DEX, STAT_CON, STAT_CHA };
+    auto capped = [this](const DLString &name) {
         for (int k = 0; k < 6; k++)
-            if (norm == names[k] && value.at(0) != '-')
-                return pch->perm_stat[stats[k]] + pch->mod_stat[stats[k]] < pch->getMaxStat(stats[k]);
-        return true;
+            if (name == names[k])
+                return pch->perm_stat[stats[k]] >= pch->getMaxStat(stats[k]);
+        return false;
+    };
+
+    DLString value = affix["value"].asString();
+
+    if (secName == "primary_stats") {
+        if (!value.empty() && value.at(0) == '-')
+            return true;
+        DLString norm = (!value.empty() && value.at(0) == '+') ? DLString(value.substr(1)) : value;
+        return !capped(norm);
     }
 
+    // A pack with anything besides primary stats (mana, hitroll) keeps its worth.
+    if (affix.isMember("affects")) {
+        bool anyCapped = false;
+        for (auto const &one: affix["affects"]) {
+            DLString apply = one["apply"].asString();
+            bool primary = false;
+            for (int k = 0; k < 6; k++)
+                if (apply == names[k])
+                    primary = true;
+            if (!primary)
+                return true;
+            if (capped(apply))
+                anyCapped = true;
+        }
+        return !anyCapped;
+    }
 
     return true;
 }
@@ -700,7 +724,7 @@ void ItemAffixRoller::collectCandidates()
             if (!valueAllowed(secName, value))
                 continue;
 
-            if (!forcedPick && !fitAllowed(secName, value))
+            if (!forcedPick && !fitAllowed(secName, affix))
                 continue;
             if (affix.isMember("skills") && pickTongue(affix) < 0)
                 continue;

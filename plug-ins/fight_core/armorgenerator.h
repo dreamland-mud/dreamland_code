@@ -91,9 +91,11 @@ protected:
     bool modelPoints(const DLString &secName, const Json::Value &affix, double &points) const;
     /** Points -> centi-M at the item level for the roller's profile and slot. */
     int modelPrice(double points) const;
-    /** Fit clause for the killer: no stat over its cap. What the killer already
-     *  has (resists, bits, buffs) still rolls (Kit 2026-10-26). */
-    bool fitAllowed(const DLString &secName, const DLString &value) const;
+    /** Fit clause for the killer: no stat over its cap, counted on perm stats
+     *  (worn gear changes, the item stays). A pack of nothing but primary stats
+     *  is out when any of them is capped (Kit 2026-10-28). What the killer
+     *  already has (resists, bits, buffs) still rolls (Kit 2026-10-26). */
+    bool fitAllowed(const DLString &secName, const Json::Value &affix) const;
     /** One item model: the 'pick' weight multiplier for the killer's class or
      *  profile at the item level (affix first, then section); 1 when absent. */
     double pickMultiplier(const Json::Value &section, const Json::Value &affix) const;
