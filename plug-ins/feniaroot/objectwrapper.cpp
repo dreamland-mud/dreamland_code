@@ -22,6 +22,7 @@
 #include "grammar_entities_impl.h"
 #include "personalquestreward.h"
 #include "objectwrapper.h"
+#include "chargedprops.h"
 #include "roomwrapper.h"
 #include "structwrappers.h"
 #include "characterwrapper.h"
@@ -949,6 +950,25 @@ NMI_GET(ObjectWrapper, props, "Map (структура) из свойств по
 {
     checkTarget();
     return JsonUtils::toRegister(target->props);
+}
+
+NMI_GET(ObjectWrapper, charged, "Map заряженной вещи (spell, level, charges, max, where, crumble): с экземпляра, иначе с прототипа; null если зарядов нет")
+{
+    checkTarget();
+    const Json::Value *c = charged_props(target);
+    if (!c)
+        return Register();
+    return JsonUtils::toRegister(*c);
+}
+
+NMI_INVOKE(ObjectWrapper, setCharges, "(n): записать число зарядов заряженной вещи на экземпляр")
+{
+    checkTarget();
+    if (!charged_props(target))
+        throw Scripting::Exception("Object is not charged");
+
+    charged_own(target)["charges"] = args2number(args);
+    return Register();
 }
 
 NMI_INVOKE(ObjectWrapper, property, "(name, defaultValue): свойство предмета с именем name или значение по умолчанию")

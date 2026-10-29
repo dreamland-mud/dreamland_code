@@ -13,6 +13,7 @@
 #include "loadsave.h"
 #include "l10n.h"
 #include "magicitems.h"
+#include "chargedprops.h"
 
 /*
  * fenia-related commands: use 
@@ -28,6 +29,15 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
     FENIA_CALL( obj, "Use", "Cs", ch, argument );
     FENIA_NDX_CALL( obj, "Use", "OCs", obj, ch, argument );
     BEHAVIOR_CALL( obj, use, ch, argument );
+
+    // Legacy wands and staves keep their value-based path.
+    if (obj->item_type != ITEM_WAND && obj->item_type != ITEM_STAFF && charged_props( obj )) {
+        if (obj->carried_by != ch) 
+            ch->pecho(_("%1$^O4 сперва нужно взять."), obj);
+        else
+            use_charged( ch, obj, argument );
+        return true;
+    }
 
     switch(obj->item_type) {
         case ITEM_POTION:

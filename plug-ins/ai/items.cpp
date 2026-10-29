@@ -15,11 +15,13 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
+#include "chargedprops.h"
 
 GSN(none);
 GSN(scrolls);
 GSN(wands);
 GSN(staves);
+GSN(staff);
 
 /*
  * MagicItemUsage
@@ -108,6 +110,7 @@ bool MagicItemUsage::use( Object *obj, Character *user, Character *target ) cons
  */
 struct MagicItemTable {
     static Object * find( Object *list, int sn, Character *user, Character *target );
+    static bool checkCharged( Object *obj, int sn, Character *user );
     static int findIndex( Object *obj );
     static bool use( Object *obj, Character *user, Character *target );
 
@@ -133,6 +136,12 @@ Object * MagicItemTable::find( Object *list, int sn, Character *user, Character 
             
         if (user->getRealLevel( ) < obj->level)
             continue;
+
+        if (obj->item_type != ITEM_WAND && obj->item_type != ITEM_STAFF && charged_props( obj )) {
+            if (checkCharged( obj, sn, user ))
+                return obj;
+            continue;
+        }
         
         if (( i = findIndex( obj ) ) >= 0)
             if (usages[i].check( obj, sn, user, target ))
@@ -140,6 +149,26 @@ Object * MagicItemTable::find( Object *list, int sn, Character *user, Character 
     }
 
     return NULL;
+}
+
+// Charged items (chargedprops.h): fired with 'use', like a wand. A staff
+// weapon has to be wielded already: the AI does not swap weapons to cast.
+bool MagicItemTable::checkCharged( Object *obj, int spellSN, Character *user )
+{
+    const Json::Value &c = *charged_props( obj );
+    bool wielded = charged_wielded( c );
+
+    if (charged_charges( c ) <= 0)
+        return false;
+
+    if (wielded && obj->wear_loc != wear_wield && obj->wear_loc != wear_second_wield)
+        return false;
+
+    if (!( wielded ? gsn_staff : gsn_wands )->usable( user ))
+        return false;
+
+    Skill *spell = skillManager->find( spellSN );
+    return spell && c.isMember( "spell" ) && spell->getName( ) == c["spell"].asString( );
 }
 
 int MagicItemTable::findIndex( Object *obj )
@@ -153,6 +182,10 @@ int MagicItemTable::findIndex( Object *obj )
 
 bool MagicItemTable::use( Object *obj, Character *user, Character *target )
 {
+    if (obj->item_type != ITEM_WAND && obj->item_type != ITEM_STAFF && charged_props( obj ))
+        return interpret_cmd( user, "use", "%s %s",
+                              DLString(obj->getID()).c_str( ), DLString(target->getID()).c_str( ) );
+
     int i = findIndex( obj );
 
     if (i < 0)
