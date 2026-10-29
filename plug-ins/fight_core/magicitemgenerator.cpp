@@ -54,14 +54,16 @@ CONFIGURABLE_LOADED(fight, magic_items)
     }
 }
 
-// Only what the generator needs from the spell price table: one charge in M,
-// and Kit's per-spell exclusion from magic items.
+// What the generator and the gear sage need from the spell price table: one
+// charge and the worn price in M, and Kit's per-spell exclusion from magic items.
 static std::map<DLString, double> spellCharge;
+static std::map<DLString, double> spellWorn;
 static std::set<DLString> spellExcluded;
 
 CONFIGURABLE_LOADED(fight, spell_value)
 {
     spellCharge.clear();
+    spellWorn.clear();
     spellExcluded.clear();
 
     const Json::Value &spells = value["spells"];
@@ -73,6 +75,8 @@ CONFIGURABLE_LOADED(fight, spell_value)
         const Json::Value &s = *i;
         if (s["charge"].isNumeric( ))
             spellCharge[name] = s["charge"].asDouble( );
+        if (s["worn"].isNumeric( ))
+            spellWorn[name] = s["worn"].asDouble( );
         if (s["excluded"].isBool( ) && s["excluded"].asBool( ))
             spellExcluded.insert( name );
     }
@@ -92,6 +96,12 @@ double magic_spell_charge(const DLString &spell)
 {
     auto i = spellCharge.find( spell );
     return i == spellCharge.end( ) ? -1 : i->second;
+}
+
+double magic_spell_worn(const DLString &spell)
+{
+    auto i = spellWorn.find( spell );
+    return i == spellWorn.end( ) ? -1 : i->second;
 }
 
 // A family stands for its kinds: "scroll" is scroll_buff or scroll_combat.

@@ -52,6 +52,7 @@
 #include "damage.h"
 #include "itemvalue.h"
 #include "itemmodel.h"
+#include "magicitemgenerator.h"
 #include "armorgenerator.h"
 #include "skill_utils.h"
 #include "stats_apply.h"
@@ -3855,6 +3856,27 @@ static bool ga_hasFeniaTriggers( obj_index_data *pObj )
     return !triggers.empty( );
 }
 
+// Spells a prototype's onEquip script casts on its wearer for as long as it is
+// worn (shared.trigger_spells in item_value.json, {vnum: [spell, ...]}), summed
+// at their worn price in M. The affect loop cannot see a script-cast affect, so
+// without this a transform amulet scored as the flat trigger bonus.
+static double ga_triggerSpellsM( obj_index_data *pObj )
+{
+    if (pObj == 0)
+        return 0;
+    const Json::Value &map = item_value_object( "shared", "trigger_spells" );
+    if (!map.isObject( ))
+        return 0;
+    const Json::Value &list = map[DLString( pObj->vnum ).c_str( )];
+    if (!list.isArray( ))
+        return 0;
+    double m = 0;
+    for (auto const &v: list)
+        if (v.isString( ))
+            m += std::max( 0.0, magic_spell_worn( v.asString( ) ) );
+    return m;
+}
+
 // An item carrying the 'grantskills' behavior teaches its wearer skills while worn.
 // The grantskills migration annulled these items' onEquip/onRemove prototype
 // triggers, so ga_hasFeniaTriggers no longer sees them; ga_grantsValue prices what
@@ -4511,6 +4533,9 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
         if (!buff.empty( ))
             s += item_wornbuff_points( buff, inst->level, w.caster );
     }
+    double triggerM = ga_triggerSpellsM( pProto );
+    if (triggerM > 0)
+        s += triggerM * item_one_m( itemLevel, w.caster );
     ga_note( "worn_buff", s - t0, 0 );
     // Extra flags (noremove, bless, anti_good...) and the material, at the
     // generator's prices. A material the char may not wear is worth nothing.
@@ -4534,7 +4559,8 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
         s += procScore;
     // A generated item's base vnum carries the shared worn-buff onEquip: that is
     // not "special gear", its worth was scored above.
-    else if (ga_hasFeniaTriggers( pProto ) && !generated)
+    // A script-cast worn spell was likewise scored above, at its own price.
+    else if (ga_hasFeniaTriggers( pProto ) && !generated && triggerM <= 0)
         s += 50;   // Fenia-triggered gear is almost always very good.
     // Taught skills, priced for this char (0 for an item that teaches nothing). Filed
     // under "special" with the procs: the sage's render names that key.
