@@ -183,7 +183,7 @@ static DLString religion_patrons_line(const DefaultReligion *religion, Character
         result.push_back(professionManager->find(i)->getNameFor(ch, Grammar::Case('1')));
 
     for (auto i: religion->patronsClans.toArray())
-        result.push_back(fmt(ch, _("клан %1$s"), clanManager->find(i)->getNameFor(lang).c_str()));
+        result.push_back(fmt(ch, _("клан %1$s"), clanManager->find(i)->getNameFor(lang).ruscase('2').c_str()));
 
     return result.join(", ");
 }
