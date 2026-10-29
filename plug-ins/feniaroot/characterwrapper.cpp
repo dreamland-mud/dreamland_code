@@ -3906,6 +3906,48 @@ static const Json::Value & ga_grantList( obj_index_data *pObj )
     return list.isArray( ) ? list : none;
 }
 
+// Skills worn items grant outside the scored item's slot and inside it (the item
+// itself, or the one it would replace), for ga_grantHeld. keeper (optional) gets each
+// skill's keeper: when several worn items grant it, the copy on the lowest wear location.
+// No copy is the true source -- grantskills.unequip's removeTemporary strips the skill
+// whichever copy comes off, the others never re-grant it -- so the pick only has to be
+// stable, and the carry list reorders while wear locations do not.
+static void ga_grantSlots( Character *target, obj_index_data *pProto, ::Object *inst,
+                           std::set<int> &outside, std::set<int> &inside,
+                           std::map<int, ::Object *> *keeper = 0 )
+{
+    if (target == 0 || pProto == 0)
+        return;
+    int mySlot = pProto->wear_flags;
+    REMOVE_BIT( mySlot, ITEM_TAKE );
+    for (::Object *wo = target->carrying; wo; wo = wo->next_content) {
+        if (wo->wear_loc == wear_none)
+            continue;
+        const Json::Value &gl = ga_grantList( wo->pIndexData );
+        if (!gl.isArray( ))
+            continue;
+        int slot = wo->pIndexData->wear_flags;
+        REMOVE_BIT( slot, ITEM_TAKE );
+        std::set<int> &into = (wo == inst || slot == mySlot) ? inside : outside;
+        for (auto const &e: gl) {
+            if (!e.isObject( ) || !e.isMember( "skill" ))
+                continue;
+            Skill *s = skillManager->findExisting( e["skill"].asString( ) );
+            if (s == 0)
+                continue;
+            into.insert( s->getIndex( ) );
+            if (keeper == 0)
+                continue;
+            std::map<int, ::Object *>::iterator k = keeper->find( s->getIndex( ) );
+            if (k == keeper->end( ) || wo->wear_loc->getIndex( ) < k->second->wear_loc->getIndex( ))
+                (*keeper)[s->getIndex( )] = wo;
+        }
+    }
+}
+
+static bool ga_grantHeld( Character *target, Skill *skill, const std::set<int> &outside,
+                          const std::set<int> &inside );
+
 // Defined below the off-hand model it uses: what the skills this item grants are worth
 // to target (target 0: the expected value over the played professions).
 static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_data *pProto,
@@ -4227,8 +4269,29 @@ static int ga_skillBefore( Character *target, int sn, bool worn, int m )
     return URANGE( 0, raw, 100 );
 }
 
+// The scored item's grant slots (ga_grantSlots), for the flags' self-cast discount: a
+// spell the char can cast only thanks to a grant in this very slot leaves with the swap,
+// so it must not discount the item -- the sage would flip-flop on it. Built on the first
+// ask: most scored items carry no self-castable flag.
+struct GAGrantCtx {
+    Character *target;
+    obj_index_data *pProto;
+    ::Object *inst;
+    mutable bool built = false;
+    mutable std::set<int> outside, inside;
+
+    bool held( Skill *sk ) const {
+        if (!built) {
+            ga_grantSlots( target, pProto, inst, outside, inside );
+            built = true;
+        }
+        return ga_grantHeld( target, sk, outside, inside );
+    }
+};
+
 static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6],
-                            Character *target, bool worn, int itemLevel = -1 )
+                            Character *target, bool worn, int itemLevel = -1,
+                            const GAGrantCtx *grants = 0 )
 {
     int m = af.modifier;
     double s0 = s;
@@ -4368,10 +4431,16 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
         // percentile's flag-once totals opt in for worn items via heldOnWorn.
         bool held = !worn || w.heldOnWorn;
         int kind = ft == &res_flags ? 0 : ft == &imm_flags ? 1 : ft == &vuln_flags ? 2 : -1;
+        ItemSelfCast selfCast = [target, grants]( const char *spell ) {
+            if (grants == 0)
+                return item_fit_self_cast( target, spell );
+            Skill *sk = skillManager->findExisting( spell );
+            return sk != 0 && grants->held( sk );
+        };
         if (ft == &affect_flags)
-            s += item_flag_points( bits, w.caster, target, held ? w.heldFlags : 0, itemLevel );
+            s += item_flag_points( bits, w.caster, target, held ? w.heldFlags : 0, itemLevel, selfCast );
         else if (ft == &detect_flags)
-            s += item_detect_points( bits, w.caster, target );
+            s += item_detect_points( bits, w.caster, target, selfCast );
         // A resist the char already owns outside this slot adds nothing
         // (decision 6). Same gate as heldFlags: candidates, or worn with heldOnWorn.
         else if (kind >= 0 && held && target != 0)
@@ -4455,11 +4524,13 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     double s = 0;
     int statDelta[6] = { 0, 0, 0, 0, 0, 0 };
     int itemLevel = inst != 0 ? inst->level : (pProto != 0 ? pProto->level : -1);
+    GAGrantCtx grants{ target, pProto, inst };
+    const GAGrantCtx *gp = (target != 0 && pProto != 0) ? &grants : 0;
     for (auto &paf: protoAff)
-        ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel );
+        ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel, gp );
     if (instAff != 0)
         for (auto &paf: *instAff)
-            ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel );
+            ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel, gp );
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
             continue;
@@ -5495,38 +5566,12 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
     int pulse = std::max( 1, dreamland->getPulseViolence( ) );
 
     // Skills worn items grant outside this item's slot and inside it (ga_grantHeld), and
-    // the keeper of each one (ga_grantCounted): when several worn items grant the same
-    // skill, the copy on the lowest wear location. No copy is the true source --
-    // grantskills.unequip's removeTemporary strips the skill whichever copy comes off,
-    // the others never re-grant it -- so the pick only has to be stable, and the carry
-    // list reorders while wear locations do not.
+    // the keeper of each one (ga_grantCounted).
     std::set<int> outside, inside;
     std::map<int, ::Object *> keeper;
     int mySlot = pProto->wear_flags;
     REMOVE_BIT( mySlot, ITEM_TAKE );
-    if (target != 0) {
-        for (::Object *wo = target->carrying; wo; wo = wo->next_content) {
-            if (wo->wear_loc == wear_none)
-                continue;
-            const Json::Value &gl = ga_grantList( wo->pIndexData );
-            if (!gl.isArray( ))
-                continue;
-            int slot = wo->pIndexData->wear_flags;
-            REMOVE_BIT( slot, ITEM_TAKE );
-            std::set<int> &into = (wo == inst || slot == mySlot) ? inside : outside;
-            for (auto const &e: gl) {
-                if (!e.isObject( ) || !e.isMember( "skill" ))
-                    continue;
-                Skill *s = skillManager->findExisting( e["skill"].asString( ) );
-                if (s == 0)
-                    continue;
-                into.insert( s->getIndex( ) );
-                std::map<int, ::Object *>::iterator k = keeper.find( s->getIndex( ) );
-                if (k == keeper.end( ) || wo->wear_loc->getIndex( ) < k->second->wear_loc->getIndex( ))
-                    keeper[s->getIndex( )] = wo;
-            }
-        }
-    }
+    ga_grantSlots( target, pProto, inst, outside, inside, &keeper );
 
     // Ambush needs camouflage: held already, or granted by this same item.
     bool camouflage = false;
