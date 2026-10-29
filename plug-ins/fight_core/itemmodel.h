@@ -10,6 +10,7 @@
  */
 #include "dlstring.h"
 #include "bitstring.h"
+#include <functional>
 
 namespace Json { class Value; }
 class Character;
@@ -83,6 +84,13 @@ double item_flag_base(bitstring_t flag, bool caster, int level = -1);
 double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstring_t heldFlags,
                         int level = -1);
 
+/** "Can the char cast this spell itself?" for the 10% self-cast discount. The plain
+ *  overloads use item_fit_self_cast; the gear sage passes its own, slot-aware one so a
+ *  skill granted only by the scored item's own slot does not discount the item. */
+typedef std::function<bool(const char *)> ItemSelfCast;
+double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstring_t heldFlags,
+                        int level, const ItemSelfCast &selfCast);
+
 /*
  * What an item carries outside its affect list, in points (P6). Same prices the
  * generator buys with (item_affixes.json / item_value.json), so the sage's base score
@@ -95,6 +103,8 @@ double item_weapon_flag_points(int weaponFlags, int level, bool caster, Characte
 /** detect_flags bits from item_value.json detects. target != 0: a detect the char
  *  can cast itself counts 10% (decision 11). */
 double item_detect_points(bitstring_t bits, bool caster, Character *target = 0);
+double item_detect_points(bitstring_t bits, bool caster, Character *target,
+                          const ItemSelfCast &selfCast);
 
 /** extra_flags bits priced in item_value.json extras (noremove, bless, anti_good...). */
 double item_extra_points(bitstring_t bits, bool caster);

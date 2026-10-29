@@ -309,6 +309,13 @@ double item_flag_base(bitstring_t flag, bool caster, int level)
 double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstring_t heldFlags,
                         int level)
 {
+    return item_flag_points(bits, caster, target, heldFlags, level,
+                            [target](const char *spell) { return item_fit_self_cast(target, spell); });
+}
+
+double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstring_t heldFlags,
+                        int level, const ItemSelfCast &selfCast)
+{
     double s = 0;
 
     for (auto const &fv: flag_values) {
@@ -320,7 +327,7 @@ double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstr
         // Curses still count: nobody "already has" a curse as a boon.
         if (base > 0 && IS_SET(heldFlags, fv.flag))
             continue;
-        if (fv.spell != 0 && item_fit_self_cast(target, fv.spell))
+        if (fv.spell != 0 && target != 0 && selfCast(fv.spell))
             s += base * 0.1;
         else
             s += base;
@@ -499,6 +506,13 @@ double item_weapon_flag_points(int weaponFlags, int level, bool caster, Characte
 
 double item_detect_points(bitstring_t bits, bool caster, Character *target)
 {
+    return item_detect_points(bits, caster, target,
+                              [target](const char *spell) { return item_fit_self_cast(target, spell); });
+}
+
+double item_detect_points(bitstring_t bits, bool caster, Character *target,
+                          const ItemSelfCast &selfCast)
+{
     double s = 0;
     for (int i = 0; i < detect_flags.size; i++) {
         if (!Bitstring(bits).isSetBitNumber(detect_flags.fields[i].value))
@@ -507,7 +521,7 @@ double item_detect_points(bitstring_t bits, bool caster, Character *target)
         double base = item_value("detects", name, 0, caster ? 1 : 0);
         if (base > 0 && target != 0) {
             DLString spell = DLString("detect ") + name;
-            if (item_fit_self_cast(target, spell.c_str()) || item_fit_self_cast(target, name))
+            if (selfCast(spell.c_str()) || selfCast(name))
                 base *= 0.1;
         }
         s += base;
