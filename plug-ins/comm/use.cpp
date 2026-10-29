@@ -69,7 +69,7 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
             if (obj->carried_by != ch || obj->wear_loc != wear_hold) 
                 ch->pecho(_("%1$^O4 сперва необходимо зажать в руках."), obj);
             else
-                use_staff( ch, obj );
+                use_staff( ch, obj, argument );
             return true;
     }
 
