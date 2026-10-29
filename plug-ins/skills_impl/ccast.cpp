@@ -107,7 +107,7 @@ CMDRUN( cast )
         return;
 
     if (ch->is_npc( ) && IS_CHARMED(ch)) {
-        if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER)) {
+        if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER | PROF_HYBRID)) {
             ch->master->pecho(_("%1$^C1 хотел%1$Gо||а|и бы помочь, но, к сожалению, совершенно не способ%1$Gно|ен|на|ны колдовать."), ch);
             return;
         }

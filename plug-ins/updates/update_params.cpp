@@ -36,6 +36,7 @@
 #include "merc.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "profflags.h"
 
 GSN(bandage);
 GSN(magic_concentrate);
@@ -210,11 +211,11 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
     number = number_percent();
     gain += number * gain / 100;
 
-    if ( ch->getProfession()->getManaRate() > 70 )
+    Flags archetype = ch->getProfession( )->getFlags( ch );
+
+    if (archetype.isSet( PROF_CASTER ))
         gain += number * gain / 100;
-
-
-    if (rate < 70)
+    else if (archetype.isSet( PROF_MELEE | PROF_AGILE ))
         gain /= 2;
 
     switch ( ch->position.getValue( ) ) {
