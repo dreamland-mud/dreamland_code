@@ -32,6 +32,7 @@ weaponcalculator.cpp \
 weapongenerator.cpp \
 armorgenerator.cpp \
 weaponrandomizer.cpp \
+magicitemreconcile.cpp \
 material.cpp \
 fight_safe.cpp \
 immunity.cpp \

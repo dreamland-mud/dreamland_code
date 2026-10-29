@@ -2387,6 +2387,8 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
             obj = create_object_nocount( pObj, -1);
             // The saved EconRev decides, not the stamp a new object gets.
             obj->econRev = 0;
+            // Same for the magic revision: the saved props decide.
+            obj->props.removeMember("magic_rev");
             
             /*init pIndexData counter, in case of bootup*/
             if (create_obj_dropped)
