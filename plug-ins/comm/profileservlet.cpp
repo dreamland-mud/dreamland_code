@@ -819,10 +819,13 @@ static Json::Value board_build(const DLString &board)
             || !account_profile_enabled(id) || !account_profile_eligible(id))
             continue;
 
+        // The board sums mortals only (Fenia), so its face is a mortal too:
+        // an immortal never fronts an account row.
         list<PCMemoryInterface *> shown;
         for (const DLString &name : AccountManager::charsOf(id)) {
             PCMemoryInterface *pci = PCharacterManager::find(name);
-            if (pci != 0 && !account_profile_char_hidden(pci))
+            if (pci != 0 && !account_profile_char_hidden(pci)
+                && pci->getLevel() <= LEVEL_MORTAL + 1 && pci->getTrust() <= LEVEL_MORTAL + 1)
                 shown.push_back(pci);
         }
         PCMemoryInterface *mainChar = profile_main_char(shown);
