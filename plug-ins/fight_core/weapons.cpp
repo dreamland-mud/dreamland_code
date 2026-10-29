@@ -223,8 +223,12 @@ int weapon_defense_factor( int wclass, const char *key, int def )
     DLString name = "unarmed";
     if (wclass >= 0 && wclass < WEAPON_MAX)
         name = weapon_class.name( wclass );
+    if (!table.isObject( ))
+        return def;
     if (!table.isMember( name ))
         name = "unarmed";
+    if (!table[name].isObject( ))
+        return def;
 
     const Json::Value &f = table[name][key];
     return f.isInt( ) ? f.asInt( ) : def;

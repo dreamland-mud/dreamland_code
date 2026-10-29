@@ -59,8 +59,9 @@ int weapon_ave(struct obj_index_data *pWield);
 /**
  * A defence factor in percent (100 = normal) from fight/weapon_defense.json, e.g.
  * "parry_with" for a weapon class (WEAPON_xxx, -1 = no weapon). A class missing from
- * the table reads as "unarmed", as in Fenia .tmp.combat.weaponTypeFactor; a missing
- * key (or the config not loaded) gives def.
+ * the table takes the "unarmed" row, as in Fenia .tmp.combat.weaponTypeFactor, so it
+ * gets unarmed's numbers (parry_with 0), not def. def comes back only for a missing
+ * key, a malformed row or the config not loaded.
  */
 int weapon_defense_factor( int wclass, const char *key, int def );
 

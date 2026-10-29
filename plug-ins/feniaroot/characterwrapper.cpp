@@ -4600,6 +4600,7 @@ struct GAOffhand {
     double blowValue = 0;             // score of one of the char's own main-hand blows
     double reach = 1.0;               // share of enemy blows that get past parry
     double pGrip = 0;                 // share more parried when a staff is held alone
+    double reachNow = 1.0;            // reach in the char's current grip state (blink)
     double pShield = 0;               // shield block chance vs an equal-level attacker
     double pCross = 0;                // cross block chance vs an equal-level attacker
 };
@@ -4614,6 +4615,23 @@ static bool ga_defenderClass( Character *ch )
 {
     const DLString &n = ch->getProfession( )->getName( );
     return n == "warrior" || n == "samurai" || n == "paladin";
+}
+
+// Is the char holding a staff in the grip right now (dreamland_fenia .tmp.combat.staffGrip):
+// a staff-class weapon wielded, shield, hold and second_wield all empty?
+static bool ga_staffGripNow( Character *ch )
+{
+    const char *locs[] = { "shield", "hold", "second_wield" };
+    Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
+    ::Object *wield = wieldLoc ? wieldLoc->find( ch ) : 0;
+    if (wield == 0 || wield->item_type != ITEM_WEAPON || get_weapon_class( wield ) != WEAPON_STAFF)
+        return false;
+    for (int i = 0; i < 3; i++) {
+        Wearlocation *loc = wearlocationManager->findExisting( locs[i] );
+        if (loc != 0 && loc->find( ch ) != 0)
+            return false;
+    }
+    return true;
 }
 
 static GAOffhand ga_offhandModel( Character *target, const GAWeights &w, ::Object *primary )
@@ -4650,27 +4668,45 @@ static GAOffhand ga_offhandModel( Character *target, const GAWeights &w, ::Objec
     // with the main weapon, so only the blocks differ. Attacker = equal level, so the
     // formulas' "skill_level - attacker level" term is just the skill level bonus.
     // parry/run toParry scales the skill share by the weapon's parry_with factor
-    // (fight/weapon_defense.json). A staff held alone, with no shield, held item or
-    // second weapon, parries at parry_with_grip instead: pGrip is what the grip adds.
-    // No weapon in hand: priced from the skill alone, as before.
+    // (fight/weapon_defense.json); no weapon in hand or a factor of 0 = no parry. A staff
+    // held alone (no shield, held item or second weapon) parries at parry_with_grip, and
+    // there the staff guard joins in: any char with the staff skill may parry off it at
+    // half the parry baseline (toParry 30% of staff vs 60% of parry), the larger base
+    // wins. pGrip is what the grip adds over parrying without it.
     bool defClass = ga_defenderClass( target );
     Skill *parry = skillManager->findExisting( "parry" );
-    if (parry != 0) {
-        int wclass = -1, with = 100;
-        if (primary != 0 && primary->item_type == ITEM_WEAPON) {
-            wclass = get_weapon_class( primary );
-            with = weapon_defense_factor( wclass, "parry_with", 100 );
+    Skill *staff = skillManager->findExisting( "staff" );
+    int wclass = -1, with = 0;
+    if (primary != 0 && primary->item_type == ITEM_WEAPON) {
+        wclass = get_weapon_class( primary );
+        with = weapon_defense_factor( wclass, "parry_with", 100 );
+    }
+    auto parryChance = [&]( int factor, bool guard ) -> double {
+        if (factor <= 0)
+            return 0;
+        int pe = 0, bonus = 0;
+        if (parry != 0) {
+            pe = parry->getEffective( target ) / 2;
+            bonus = skill_level_bonus( *parry, target );
         }
-        auto parryChance = [&]( int factor ) -> double {
-            int pe = parry->getEffective( target ) / 2 * factor / 100;
-            if (defClass)
-                pe += pe / 5;
-            return ga_pct( pe + skill_level_bonus( *parry, target ) );
-        };
-        double p = parryChance( with );
-        om.reach = 1.0 - p;
-        if (wclass == WEAPON_STAFF)
-            om.pGrip = parryChance( weapon_defense_factor( wclass, "parry_with_grip", with ) ) - p;
+        if (guard && staff != 0 && staff->getEffective( target ) / 4 > pe) {
+            pe = staff->getEffective( target ) / 4;
+            bonus = skill_level_bonus( *staff, target );
+        }
+        if (pe <= 0)
+            return 0;
+        pe = pe * factor / 100;
+        if (defClass)
+            pe += pe / 5;
+        return ga_pct( pe + bonus );
+    };
+    double p = parryChance( with, false );
+    om.reach = om.reachNow = 1.0 - p;
+    if (wclass == WEAPON_STAFF) {
+        double pg = parryChance( weapon_defense_factor( wclass, "parry_with_grip", with ), true );
+        om.pGrip = std::max( 0.0, pg - p );
+        if (ga_staffGripNow( target ))
+            om.reachNow = 1.0 - pg;
     }
     Skill *sb = skillManager->findExisting( "shield block" );
     if (sb != 0 && sb->getEffective( target ) > 1) {
@@ -5598,7 +5634,7 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
             if (target != 0 && target->getClan( ) == clan_battlerager)
                 break;   // the oath of rage forbids blinking
             double chance = std::min( 85.0, pct / 2.0 + (quick ? 20 : 0) );
-            double reach = target != 0 ? ga_offhandModel( target, w, primary ).reach
+            double reach = target != 0 ? ga_offhandModel( target, w, primary ).reachNow
                                        : ga_gk( "ref_reach", caster ? 0.72 : 0.54, col );
             double f = chance / 100.0 * reach;
             bool sanctHeld = target != 0 && IS_AFFECTED( target, AFF_SANCTUARY );
@@ -7343,6 +7379,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // dual-wielder leaves empty on purpose.
     bool gaGoDual = false, gaLeftScored = false;
     double gaLeftWorn = 0, gaLeftDual = 0, gaLeftKeepNet = 0;
+    int gaDualState = 0;          // the dual verdict, for the staff grip line below
+    double gaDualScore = 0;
     {
         int dState = 0, dUnlock = 0;
         double dualScore = 0, keepScore = 0;
@@ -7408,6 +7446,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 dState = 2;
             }
         }
+        gaDualState = dState;
+        gaDualScore = dualScore;
         dualInfo->push_back( Register( dState ) );
         dualInfo->push_back( Register( dUnlock ) );
         dualInfo->push_back( Register( (int)(dualScore + 0.5) ) );
@@ -7421,12 +7461,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // percentile takes the best of the three, and when the grip beats keeping a shield
     // or held item, the chase list stops pushing one. A non-large two-hander can't take
     // a shield (ShieldWearloc::canWear), so its keep side is the held item alone.
-    bool gaGoGrip = false;
-    double gripScore = om.pGrip * om.blowValue;
+    bool gaGoGrip = false, gripWins = false;
+    double gripScore = om.pGrip * om.blowValue, gripKeep = 0;
     if (!gaHandsFixed && gripScore > 0) {
         bool shieldFits = !(IS_WEAPON_STAT( gaPrimary, WEAPON_TWO_HANDS ) && target->getSize( ) < SIZE_LARGE);
         bool haveShield;
         double keepScore = keepSide( shieldFits, haveShield );
+        gripKeep = keepScore;
         if (!gaLeftScored) {
             gaLeftWorn = keepWorn( );
             gaLeftKeepNet = keepScore - leftBestLegacy;
@@ -7436,7 +7477,14 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             gaLeftWorn = gripScore;
         gaLeftDual = std::max( gaLeftDual, gripScore );   // best build that keeps no shield/hold
         gaGoGrip = (int)(gripScore + 0.5) > (int)(keepScore + 0.5);
+        // Best of the three builds: the line tells the player to hold the staff alone.
+        gripWins = gaGoGrip && (gaDualState != 2 || (int)(gripScore + 0.5) >= (int)(gaDualScore + 0.5));
     }
+    // dualInfo tail for the staff grip: [5] grip score, [6] keep score it was weighed
+    // against, [7] 1 when the grip is the best left-hand build.
+    dualInfo->push_back( Register( (int)(gripScore + 0.5) ) );
+    dualInfo->push_back( Register( (int)(gripKeep + 0.5) ) );
+    dualInfo->push_back( Register( gripWins ? 1 : 0 ) );
 
     if (gaLeftScored)
         wornTotal += gaLeftWorn - leftWornSlots;
