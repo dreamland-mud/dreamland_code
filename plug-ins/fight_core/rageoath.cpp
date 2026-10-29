@@ -2,6 +2,7 @@
 #include <map>
 
 #include "rageoath.h"
+#include "magicitemgenerator.h"
 #include "follow_utils.h"
 #include "clanownshook.h"
 #include "damage_impl.h"
@@ -63,7 +64,7 @@ static const char * const DIVINE_EXTRA[] = {
 /** Natural remedies: pills with only these spells are herbs, not magic (magic_items.json `natural`). */
 static const char * const NATURAL[] = {
     "heal", "superior heal", "refresh", "cure blindness", "acute vision", "infravision",
-    "cure poison", "cure disease", "fervor", "remove fear", "regeneration", "second wind",
+    "cure poison", "cure disease", "fervor", "remove fear", "regeneration", "rally",
     "venom ward", 0
 };
 
@@ -75,14 +76,27 @@ static bool listed( const char * const *list, const DLString &name )
     return false;
 }
 
+// The list lives in fight/magic_items.json "natural" (the generator's pill pool
+// reads it too); the built-in copy only covers a config that failed to load.
 bool rage_natural_spell( const DLString &skillName )
 {
-    return listed( NATURAL, skillName );
+    const Json::Value &natural = magic_items_config( )["natural"];
+    if (!natural.isArray( ) || natural.empty( ))
+        return listed( NATURAL, skillName );
+
+    for (auto const &n: natural)
+        if (n.isString( ) && skillName == n.asString( ))
+            return true;
+    return false;
 }
 
 bool rage_pill_magic( Object *pill )
 {
     for (int i = 1; i <= 4; i++) {
+        // Slot 0 is the "none" skill: an empty slot, not magic.
+        if (pill->valueByIndex( i ) <= 0)
+            continue;
+
         Skill *skill = SkillManager::getThis( )->find( pill->valueByIndex( i ) );
         if (skill && !rage_natural_spell( skill->getName( ) ))
             return true;

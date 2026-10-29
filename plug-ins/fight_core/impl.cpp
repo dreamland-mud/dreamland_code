@@ -7,6 +7,7 @@
 #include "plugin.h"
 #include "weaponrandomizer.h"
 #include "magicitemreconcile.h"
+#include "magicitemgenerator.h"
 
 extern "C"
 {
@@ -16,6 +17,7 @@ extern "C"
 
         Plugin::registerPlugin<WeaponRandomizer>( ppl );
         Plugin::registerPlugin<MagicItemReconcile>( ppl );
+        Plugin::registerPlugin<MagicItemRandomizer>( ppl );
         return ppl;
     }
 }
