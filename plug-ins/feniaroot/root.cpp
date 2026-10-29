@@ -33,6 +33,7 @@
 #include "weapongenerator.h"
 #include "weaponcalculator.h"
 #include "armorgenerator.h"
+#include "magicitemgenerator.h"
 #include "itemmodel.h"
 #include "itemeconomy.h"
 #include "damage.h"
@@ -1670,6 +1671,27 @@ NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spell
                 .run();
 
     return Register(ok);
+}
+
+NMI_INVOKE(Root, randomizeMagic, "(obj, ch, tier, kind[, level]): случайный волшебный предмет на базовом прототипе: kind pill|potion|scroll_buff|scroll_combat|wand_off|wand_def или семейство scroll|wand, level -- уровень предмета (иначе уже выставленный); ch может быть null; true если удалось")
+{
+    ::Object *obj = argnum2item(args, 1);
+    Character *ch = argnum(args, 2).type == Register::NONE ? 0 : argnum2character(args, 2);
+    int tier = argnum2number(args, 3);
+    DLString kind = argnum2string(args, 4);
+
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid magic item tier.");
+    if (!magic_item_kind_exists(kind))
+        throw Scripting::Exception("Unknown magic item kind.");
+
+    MagicItemGenerator gen(obj, ch, tier, kind);
+    if (args.size() > 4)
+        gen.level(argnum2number(args, 5));
+    if (ch)
+        gen.alignment(ch->alignment);
+
+    return Register(gen.run());
 }
 
 NMI_INVOKE(Root, randomizeNamedArmor, "(obj, ch, tier, slot[, profile]): статы случайной брони для именного предмета, имена, описания и материал остаются свои; slot любой слот носки (shield, about, waist...), profile caster берет цены аффиксов для кастера; true если удалось")

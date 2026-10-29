@@ -417,6 +417,10 @@ void spell_by_item( Character *ch, Object *obj, bool oathPaid, bool burned )
         SpellTarget::Pointer result( NEW );
         int target;
 
+        // Slot 0 is the "none" skill: an empty slot, not a bad spell.
+        if (obj->valueByIndex(i) <= 0)
+            continue;
+
         skill = SkillManager::getThis( )->find( obj->valueByIndex(i) );
 
         if (!skill)

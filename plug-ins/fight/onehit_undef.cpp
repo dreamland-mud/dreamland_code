@@ -3,7 +3,6 @@
  * ruffina, 2004
  */
 #include <string.h>
-#include <set>
 
 #include "logstream.h"
 
@@ -46,6 +45,7 @@
 
 #include "configurable.h"
 #include "chargedprops.h"
+#include "magicitemgenerator.h"
 #include "spell.h"
 #include "spelltarget.h"
 #include "magic.h"
@@ -684,28 +684,6 @@ void UndefinedOneHit::damApplyMasterStaff( )
 }
 
 /*
- * Spells a staff never fires on its own in melee: instant kills and the like.
- * Merged from "blocked" and "autocast_blocked" in fight/magic_items.json.
- */
-static std::set<DLString> staffAutocastBlocked;
-
-CONFIGURABLE_LOADED(fight, magic_items)
-{
-    staffAutocastBlocked.clear();
-
-    const char *keys[] = { "blocked", "autocast_blocked" };
-    for (const char *key: keys) {
-        const Json::Value &list = value[key];
-        if (!list.isArray( ))
-            continue;
-
-        for (const auto &name: list)
-            if (name.isString( ))
-                staffAutocastBlocked.insert( name.asString( ) );
-    }
-}
-
-/*
  * Shalafi staff mastery, part two: an imbued staff sometimes casts its offensive
  * spell at the foe by itself, about 1 hit in 20 at full mastery. The charge is
  * not spent, but an empty staff stays silent.
@@ -730,7 +708,7 @@ void UndefinedOneHit::damEffectMasterStaff( )
         return;
 
     DLString spellName = (*c).isMember( "spell" ) && (*c)["spell"].isString( ) ? (*c)["spell"].asString( ) : "";
-    if (staffAutocastBlocked.count( spellName ))
+    if (magic_item_autocast_blocked( spellName ))
         return;
 
     Skill *spellSkill = skillManager->findExisting( spellName );
