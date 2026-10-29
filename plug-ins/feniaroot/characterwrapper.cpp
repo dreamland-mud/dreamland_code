@@ -4764,7 +4764,7 @@ static double ga_offendRatio( const GAOffhand &om, Character *target, ::Object *
             return 0;
     }
     Skill *sw = skillManager->findExisting( "second weapon" );
-    if (sw != 0 && sw->usable( target, false )
+    if (sw != 0 && sw->usable( target, false ) && sw->getEffective( target ) > 1
         && !ga_twoHandBlocks( target, IS_WEAPON_STAT( primary, WEAPON_TWO_HANDS ) ))
         return 0;
     int m = weapon_defense_factor( WEAPON_STAFF, "offend_grip", 0 );

@@ -717,7 +717,9 @@ static bool staff_offend_hit( Character *ch, Character *victim, int chance )
         || get_eq_char( ch, wear_second_wield ))
         return false;
 
-    if (gsn_second_weapon->usable( ch, false )
+    // A trained second weapon owns the free hand; an untrained one (learned 1%,
+    // e.g. a ranger just past its level) must not trade the off-end for a 0.6% punch.
+    if (gsn_second_weapon->usable( ch, false ) && gsn_second_weapon->getEffective( ch ) > 1
         && (!IS_WEAPON_STAT( staff, WEAPON_TWO_HANDS ) || ch->getRace( )->getSize( ) >= SIZE_HUGE))
         return false;
 

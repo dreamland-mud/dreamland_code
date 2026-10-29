@@ -115,7 +115,7 @@ UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool seconda
               WeaponOneHit( ch, victim, secondary, command ),
               deathblowStun( false ), charged( false ), ambushed( false ), offEnd( offEnd )
 {
-    deathReason = "melee";
+    deathReason = offEnd ? "staff offend" : "melee";
 }
 
 bool UndefinedOneHit::canDamage( )
