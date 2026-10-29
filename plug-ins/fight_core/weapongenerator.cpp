@@ -438,7 +438,7 @@ class WeaponAffixRoller : public ItemAffixRoller {
 public:
     WeaponAffixRoller(Object *obj, PCharacter *pch, int tier, float share)
         : ItemAffixRoller(obj, pch, tier, "weapon", "wield"),
-          share(share), weaponFlags(0, &weapon_type2),
+          share(share), craftRoll(false), weaponFlags(0, &weapon_type2),
           hrBonus(0), drBonus(0), aveBonus(0)
     {
     }
@@ -451,6 +451,8 @@ public:
     void run(const std::set<DLString> &requiredNames, int maxAffixesBonus, int minCm = -1, int maxCm = -1)
     {
         const weapon_tier_t &t = weapon_tier_table[tier - 1];
+        craftRoll = (minCm >= 0);
+        required = requiredNames;
 
         learnPlayerGroups();
         collectCandidates();
@@ -496,6 +498,10 @@ public:
     std::set<DLString> forbidden;
     std::set<DLString> preferred;
     float share;
+    /** A crafted weapon's roll: no_craft sections stay out. */
+    bool craftRoll;
+    /** The caller's required affixes: a required_only section rolls only these. */
+    std::set<DLString> required;
     Flags weaponFlags;
     float hrBonus, drBonus, aveBonus;
 
@@ -510,6 +516,16 @@ protected:
     {
         if (affix.isMember("weapon_tier"))
             floor = min(floor, affix["weapon_tier"].asInt());
+        // A section for one weapon class (charged: staves only).
+        if (section.isMember("weapon_class")
+                && obj->value0() != weapon_class.value(section["weapon_class"].asString()))
+            return false;
+        if (craftRoll && section["no_craft"].asBool())
+            return false;
+        // An imbued staff comes only from where the caller asks for one (D2).
+        if (section["by_kind"]["weapon"]["required_only"].asBool()
+                && required.count(affix["value"].asString()) == 0)
+            return false;
         return ItemAffixRoller::candidateAllowed(section, affix, floor);
     }
 

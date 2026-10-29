@@ -7,6 +7,7 @@
 #include "itemvalue.h"
 #include "itemmodel.h"
 #include "itemeconomy.h"
+#include "magicitemgenerator.h"
 
 #include "logstream.h"
 #include "grammar_entities_impl.h"
@@ -370,6 +371,9 @@ bool ItemAffixRoller::candidateAllowed(const Json::Value &section, const Json::V
     if ((section["needs_player"].asBool() || affix["needs_player"].asBool()) && !pch)
         return false;
 
+    if (crafted && section["no_craft"].asBool())
+        return false;
+
     if (affix.isMember("align") && align != ALIGN_NONE) {
         const Json::Value &range = affix["align"];
         if (range.size() == 2 && (align < range[0u].asInt() || align > range[1u].asInt()))
@@ -620,7 +624,10 @@ double ItemAffixRoller::candidateWeight(const DLString &secName, const Json::Val
             return 0;
 
     const Json::Value &slots = affix.isMember("slots") ? affix["slots"] : section["slots"];
-    return slots.isObject() && slots.isMember(slot) ? slots[slot].asDouble() : 1;
+    if (slots.isObject() && slots.isMember(slot))
+        return slots[slot].asDouble();
+    // slots_only: the listed slots are the only ones it rolls on.
+    return section["slots_only"].asBool() ? 0 : 1;
 }
 
 /** Alignment band of an align value: good, evil or neutral, as align_bonus names it. */
@@ -631,6 +638,54 @@ static const char * align_band(int align)
     if (align <= -350)
         return "evil";
     return "neutral";
+}
+
+bool ItemAffixRoller::chargedPick(const Json::Value &section, const Json::Value &affix, Candidate &c) const
+{
+    const Json::Value &rule = section["by_kind"][kind];
+    const Json::Value &tc = magic_items_config()["tiers"][DLString(tier).c_str()];
+    if (!rule.isObject() || !tc.isObject())
+        return false;
+
+    std::vector<MagicSpellPick> cands;
+    int a = align != ALIGN_NONE ? align : (pch ? (int)pch->alignment : 0);
+    if (!magic_item_pool(rule["pool_prefix"].asString() + affix["pool"].asString(), tier, obj->level, a, cands))
+        return false;
+
+    // The charges may take this share of the tier window, the stats get the rest.
+    const Json::Value &share = rule["share_pct"];
+    double top = weapon_tier_table[tier - 1].max_m * windowCurve();
+    double lo = top * share[0u].asInt() / 100.0;
+    double hi = top * share[1u].asInt() / 100.0;
+
+    // A charge range (wand_charges) runs from 1, a single number (staff_charges) is fixed.
+    const Json::Value &range = tc[rule["charges"].asString()];
+    int cmin = 1, cmax;
+    if (range.isArray())
+        cmax = range[1u].asInt();
+    else
+        cmin = cmax = range.asInt();
+    cmax = min(cmax, magic_items_config()["max_charges"].asInt());
+    if (cmax < cmin)
+        return false;
+
+    for (int i = (int)cands.size() - 1; i > 0; i--)
+        std::swap(cands[i], cands[number_range(0, i)]);
+
+    for (auto const &p: cands) {
+        double one = p.price * 100;
+        int fitLo = max(cmin, (int)ceil(lo / one));
+        int fitHi = min(cmax, (int)floor(hi / one));
+        if (fitLo > fitHi)
+            continue;
+
+        c.spell = p.spell;
+        c.charges = number_range(fitLo, fitHi);
+        c.price = (int)std::round(one * c.charges);
+        return true;
+    }
+
+    return false;
 }
 
 int ItemAffixRoller::pickTongue(const Json::Value &affix) const
@@ -762,12 +817,21 @@ void ItemAffixRoller::collectCandidates()
                 w *= 2;
             int weight = max(1, (int)std::round(w));
 
-            bool allowed = true;
-            int price = candidatePrice(secName, affix, allowed);
-            if (!allowed)
-                continue;
-
             Candidate c;
+            c.charges = 0;
+
+            bool allowed = true;
+            int price;
+            if (secName == "charged") {
+                if (!chargedPick(section, affix, c))
+                    continue;
+                price = c.price;
+            } else {
+                price = candidatePrice(secName, affix, allowed);
+                if (!allowed)
+                    continue;
+            }
+
             c.section = secName;
             c.value = value;
             c.norm = (!value.empty() && (value.at(0) == '-' || value.at(0) == '+')) ? value.substr(1) : value;
@@ -1283,6 +1347,21 @@ bool ItemAffixRoller::applyShared(const Candidate &c, int count)
 
     } else if (sec == "extra") {
         extraFlags.setBits(c.value);
+
+    } else if (sec == "charged") {
+        // Read by 'use' (chargedprops.h). A charged ring or staff keeps its
+        // stats at 0 charges; recharge refills it.
+        const Json::Value &affixes = item_affixes;
+        const Json::Value &rule = affixes[sec]["by_kind"][kind];
+        const Json::Value &tc = magic_items_config()["tiers"][DLString(tier).c_str()];
+        Json::Value ch;
+        ch["spell"] = c.spell;
+        ch["level"] = max(1, obj->level + tc["cast_offset"].asInt());
+        ch["charges"] = c.charges;
+        ch["max"] = c.charges;
+        ch["where"] = rule["where"].asString();
+        ch["crumble"] = false;
+        obj->props["charged"] = ch;
 
     } else if (sec == "resists" || sec == "vulns" || sec == "immunes"
                 || sec == "senses" || sec == "affects_with_bits") {

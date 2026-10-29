@@ -1813,7 +1813,7 @@ NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile
     return Register(atoi(obj->getProperty("measure_m").c_str()));
 }
 
-NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, profile]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров, profile caster берет цены аффиксов для кастера")
+NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, profile, imbue]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров, profile caster берет цены аффиксов для кастера, imbue true -- посох (wclass staff, тир rare+) с зарядами заклинания")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
@@ -1822,6 +1822,7 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, pr
     DLString wclass = args.size() > 4 ? argnum2string(args, 5) : DLString::emptyString;
     int worstTier = args.size() > 5 ? argnum2number(args, 6) : bestTier;
     DLString profile = args.size() > 6 ? argnum2string(args, 7) : DLString::emptyString;
+    bool imbue = args.size() > 7 ? argnum2boolean(args, 8) : false;
 
     if (obj->item_type != ITEM_WEAPON)
         throw Scripting::Exception("Item is not a weapon for randomize.");
@@ -1833,6 +1834,8 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, pr
         throw Scripting::Exception("Unknown weapon class.");
     if (!wclass.empty() && stats)
         throw Scripting::Exception("Weapon class only applies to rand_all: call without stats.");
+    if (imbue && wclass != "staff")
+        throw Scripting::Exception("Only a staff can be imbued: pass wclass staff.");
 
     // A single tier stays exactly as the caller decided; a window means the caller
     // wants the usual weighted roll confined to it.
@@ -1848,7 +1851,13 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, pr
             .randomizeStats();
     }
     else {
-        WeaponGenerator()
+        WeaponGenerator gen;
+        // An imbued staff: one of the two charged affixes is forced, if a spell
+        // of the item's tier and level fits (item_affixes "charged").
+        if (imbue)
+            gen.addRequirement(number_percent() <= 50 ? "charged_def" : "charged_off");
+
+        gen
             .item(obj)
             .alignment(ch->alignment)
             .player(ch->getPC())
