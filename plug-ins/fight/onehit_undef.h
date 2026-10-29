@@ -46,6 +46,7 @@ public:
 protected:
     void damApplyMasterHand( );
     void damApplyMasterSword( );
+    void damApplyMasterStaff( );
     void damApplyFudoshin( );
     void damApplyDeathblow( );
     void damApplySoulLust( );
@@ -57,6 +58,7 @@ protected:
     
     void damEffectMasterHand( );
     void damEffectMasterSword( );
+    void damEffectMasterStaff( );
     void damEffectDestroyEquipment( );
     void damEffectCriticalStrike( );
     void damEffectVorpal();
