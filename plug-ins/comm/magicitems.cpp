@@ -436,11 +436,12 @@ void use_charged( Character *ch, Object *obj, const DLString &argument )
         return;
     }
 
-    Skill *spellSkill = skillManager->findExisting( (*c)["spell"].asString( ) );
+    DLString spellName = (*c).isMember( "spell" ) && (*c)["spell"].isString( ) ? (*c)["spell"].asString( ) : "";
+    Skill *spellSkill = skillManager->findExisting( spellName );
     Spell::Pointer spell;
     if (!spellSkill || !( spell = spellSkill->getSpell( ) )) {
         LogStream::sendWarning( ) << "Charged item [" << obj->pIndexData->vnum << "] has bad spell "
-                                  << (*c)["spell"].asString( ) << endl;
+                                  << spellName << endl;
         return;
     }
 
@@ -451,9 +452,9 @@ void use_charged( Character *ch, Object *obj, const DLString &argument )
     if (wielded)
         ch->setWait( gsn_wands->getBeats( ch ) );
 
-    int level = c->isMember( "level" ) ? (*c)["level"].asInt( ) : obj->level;
+    int level = charged_int( *c, "level", obj->level );
     int slevel = level + skill_level_bonus( skill, ch );
-    bool crumble = c->isMember( "crumble" ) && (*c)["crumble"].asBool( );
+    bool crumble = charged_flag( *c, "crumble" );
 
     if (!zap_cast( ch, obj, spell, slevel, skill, argument, true ))
         return;
