@@ -825,7 +825,7 @@ static Json::Value board_build(const DLString &board)
         for (const DLString &name : AccountManager::charsOf(id)) {
             PCMemoryInterface *pci = PCharacterManager::find(name);
             if (pci != 0 && !account_profile_char_hidden(pci)
-                && pci->getLevel() <= LEVEL_MORTAL + 1 && pci->getTrust() <= LEVEL_MORTAL + 1)
+                && pci->getLevel() <= LEVEL_MORTAL + 1 && pci->get_trust() <= LEVEL_MORTAL + 1)
                 shown.push_back(pci);
         }
         PCMemoryInterface *mainChar = profile_main_char(shown);
@@ -972,7 +972,7 @@ static Json::Value world_build()
 
     for (auto &pair: PCharacterManager::getPCM()) {
         PCMemoryInterface *pci = pair.second;
-        if (pci->getLevel() > LEVEL_MORTAL + 1 || pci->getTrust() > LEVEL_MORTAL + 1)
+        if (pci->getLevel() > LEVEL_MORTAL + 1 || pci->get_trust() > LEVEL_MORTAL + 1)
             continue;
 
         bool recent = pci->getLastAccessTime().getTime() >= cutoff;
