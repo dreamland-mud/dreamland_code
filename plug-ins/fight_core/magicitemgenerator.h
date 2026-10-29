@@ -24,6 +24,9 @@ double magic_spell_charge(const DLString &spell);
 /** A spell worn permanently, in M at L50, from fight/spell_value.json; negative when unpriced. */
 double magic_spell_worn(const DLString &spell);
 
+/** A spell or skill granted by an item at learned 100, in M at L50; negative when unpriced. */
+double magic_spell_grant(const DLString &spell);
+
 /** A kind of fight/magic_items.json ("potion", "wand_off"...), or a family
  *  ("scroll", "wand", "staff") that rolls one of its kinds. */
 bool magic_item_kind_exists(const DLString &kind);

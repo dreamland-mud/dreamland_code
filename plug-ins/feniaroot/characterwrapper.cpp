@@ -3858,7 +3858,8 @@ static bool ga_hasFeniaTriggers( obj_index_data *pObj )
 
 // Spells a prototype's onEquip script casts on its wearer for as long as it is
 // worn (shared.trigger_spells in item_value.json, {vnum: [spell, ...]}), summed
-// at their worn price in M. The affect loop cannot see a script-cast affect, so
+// at their worn price in M; a "grant:<skill>" entry is a skill the script lends
+// (giveTemporary), at its grant price. The affect loop cannot see a script-cast affect, so
 // without this a transform amulet scored as the flat trigger bonus.
 static double ga_triggerSpellsM( obj_index_data *pObj )
 {
@@ -3872,8 +3873,13 @@ static double ga_triggerSpellsM( obj_index_data *pObj )
         return 0;
     double m = 0;
     for (auto const &v: list)
-        if (v.isString( ))
-            m += std::max( 0.0, magic_spell_worn( v.asString( ) ) );
+        if (v.isString( )) {
+            DLString name = v.asString( );
+            if (name.compare( 0, 6, "grant:" ) == 0)
+                m += std::max( 0.0, magic_spell_grant( name.substr( 6 ) ) );
+            else
+                m += std::max( 0.0, magic_spell_worn( name ) );
+        }
     return m;
 }
 
