@@ -73,6 +73,7 @@
 #include "act.h"
 
 #include "magic.h"
+#include "rageoath.h"
 #include "clanreference.h"
 #include "movetypes.h"
 #include "directions.h"
@@ -408,7 +409,7 @@ bool spell( int sn, int level, Character *ch, char *arg )
 /*
  * cast a spell using pills or potions
  */
-void spell_by_item( Character *ch, Object *obj, bool oathPaid )
+void spell_by_item( Character *ch, Object *obj, bool oathPaid, bool burned )
 {
     for (int i = 1; i <= 4; i++) {
         Skill *skill;
@@ -419,6 +420,9 @@ void spell_by_item( Character *ch, Object *obj, bool oathPaid )
         skill = SkillManager::getThis( )->find( obj->valueByIndex(i) );
 
         if (!skill)
+            continue;
+
+        if (burned && !rage_natural_spell( skill->getName( ) ))
             continue;
 
         spell = skill->getSpell( );

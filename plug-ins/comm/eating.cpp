@@ -87,26 +87,18 @@ COMMAND(CEat, "eat")
         return;
     }
 
+    if (obj->item_type == ITEM_PILL) {
+        use_pill( ch, obj );
+        return;
+    }
+
     if ( !ch->is_immortal() )
     {
-            if ( obj->item_type != ITEM_FOOD && obj->item_type != ITEM_PILL )
+            if ( obj->item_type != ITEM_FOOD )
             {
                     ch->pecho(_("Это несъедобно."));
                     return;
             }
-
-            if ( ch->isAffected(gsn_manacles)
-                    && obj->item_type == ITEM_PILL )
-            {
-                    ch->pecho(_("Ты не можешь принимать снадобья в кандалах."));
-                    return;
-            }
-
-            if (obj->item_type == ITEM_PILL && !rage_magic_allowed( ch, RAGE_POTION )) {
-                rage_magic_refuse( ch );
-                return;
-            }
-
 
             if (!ch->is_npc( ))
                 for (int i = 0; i < desireManager->size( ); i++)
@@ -148,13 +140,6 @@ COMMAND(CEat, "eat")
             }
             eatFood( ch, cFull, obj->value1()*2, poisonLevel, poisonDuration, saveLevel );
     }
-            break;
-
-    case ITEM_PILL:
-            if (!rage_member( ch ))
-                spell_by_item( ch, obj );
-            else if (!rage_own_magic( ch ))
-                spell_by_item( ch, obj, true );
             break;
     }
 
@@ -302,11 +287,61 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
 }
 
 /*
- * Drink a potion, called from 'use'.
+ * Swallow a pill, called from 'eat' and 'use'. Natural remedies work for everyone,
+ * Battleragers included; other spells on a pill are magic to the oath.
+ */
+void use_pill( Character *ch, Object *obj )
+{
+    bool magic = rage_pill_magic( obj );
+
+    if (!ch->is_immortal( )) {
+        if (ch->isAffected( gsn_manacles )) {
+            ch->pecho(_("Ты не можешь принимать снадобья в кандалах."));
+            return;
+        }
+
+        if (magic && !rage_magic_allowed( ch, RAGE_POTION )) {
+            rage_magic_refuse( ch );
+            return;
+        }
+
+        if (!ch->is_npc( ))
+            for (int i = 0; i < desireManager->size( ); i++)
+                if (!desireManager->find( i )->canEat( ch->getPC( ) ))
+                    return;
+
+        if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
+            ch->pecho(_("Тебе надо подрасти, чтобы заглотить это."));
+            return;
+        }
+    }
+
+    oldact(_("$c1 ест $o4."),  ch, obj, 0, TO_ROOM);
+    oldact(_("Ты ешь $o4."), ch, obj, 0, TO_CHAR);
+    if (ch->fighting != 0)
+        ch->setWaitViolence( 3 );
+
+    if (!rage_member( ch ))
+        spell_by_item( ch, obj );
+    else
+        spell_by_item( ch, obj, true, magic && rage_own_magic( ch ) );
+
+    if (ch->is_adrenalined( ) || ch->fighting)
+        ch->setWaitViolence( 2 );
+
+    if (oprog_eat( obj, ch ))
+        return;
+
+    extract_obj( obj );
+}
+
+/*
+ * Drink a potion, called from 'use'. Potions are synthetic magic: the Battlerager
+ * oath refuses them at every rank, druids won't touch them.
  */
 void use_potion( Character *ch, Object *obj )
 {
-    if (!rage_magic_allowed( ch, RAGE_POTION )) {
+    if (rage_member( ch )) {
         rage_magic_refuse( ch );
         return;
     }
@@ -327,10 +362,7 @@ void use_potion( Character *ch, Object *obj )
     if (oprog_quaff( obj, ch ))
         return;
 
-    if (!rage_member( ch ))
-        spell_by_item( ch, obj );
-    else if (!rage_own_magic( ch ))
-        spell_by_item( ch, obj, true );
+    spell_by_item( ch, obj );
 
     if (ch->is_adrenalined( ) || ch->fighting)
          ch->setWaitViolence( 2 );

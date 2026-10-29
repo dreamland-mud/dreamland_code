@@ -1169,6 +1169,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 {
                 case ITEM_POTION:
                 case ITEM_SCROLL:
+                case ITEM_PILL:
                         if ( obj->value1() > 0 )
                                 fprintf( fp, "Spell 1 '%s'\n", skillname(obj->value1()).c_str() );
                         if ( obj->value2() > 0 )
@@ -1179,7 +1180,6 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                                 fprintf( fp, "Spell 4 '%s'\n", skillname(obj->value4()).c_str() );
                         break;
 
-                case ITEM_PILL:
                 case ITEM_STAFF:
                 case ITEM_WAND:
                         if ( obj->value3() > 0 )

@@ -3,6 +3,7 @@
 
 class Character;
 class Skill;
+class Object;
 class DLString;
 
 /*
@@ -13,7 +14,7 @@ class DLString;
 
 /** Magic a low-rank member may still touch, each one up to its own highest rank. */
 enum RageMagic {
-    RAGE_POTION,    // quaff, eat pills
+    RAGE_POTION,    // eat pills that carry non-natural spells (potions are refused at every rank)
     RAGE_PORTAL,    // walk through a magic portal
     RAGE_LANGUAGE,  // utter a word of an ancient language
     RAGE_CARDS      // skills of the card deck
@@ -41,6 +42,11 @@ bool rage_prayer_accepted( Character *caster, Character *vch, const DLString &sk
 bool rage_cast_allowed( Character *ch, const DLString &skillName );
 /** Magic-origin skill the member must not see or use (practice, dreams, temporary gifts). */
 bool rage_skill_forbidden( Character *ch, Skill *skill );
+
+/** A spell a pill casts as a natural remedy: no spellbane, no oath pain, any rank. */
+bool rage_natural_spell( const DLString &skillName );
+/** The pill carries a spell that is not a natural remedy, so the oath treats it as magic. */
+bool rage_pill_magic( Object *pill );
 
 /** Whether the member's rank still tolerates this kind of magic. True for non-members. */
 bool rage_magic_allowed( Character *ch, RageMagic kind );
