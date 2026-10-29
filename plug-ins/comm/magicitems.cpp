@@ -42,6 +42,7 @@
 #include "magicitems.h"
 #include "chargedprops.h"
 #include "wearloc_utils.h"
+#include "fenia_utils.h"
 
 CLAN(battlerager);
 GSN(scrolls);
@@ -474,6 +475,8 @@ void use_charged( Character *ch, Object *obj, const DLString &argument )
         ch->recho( _("%1$^O1 %2$C2 развалива%1$nется|ются на куски."), obj, ch );
         ch->pecho( _("Тво%1$Gе|й|я|и %1$O1 развалива%1$nется|ются на куски."), obj );
         extract_obj( obj );
+        if (!ch->is_npc( ))
+            achievement( ch, "last_drop" );
     }
     else {
         ch->pecho( _("%1$^O1 тускне%1$nет|ют: заряды кончились."), obj );
