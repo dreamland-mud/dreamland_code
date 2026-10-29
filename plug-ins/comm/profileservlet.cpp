@@ -45,6 +45,7 @@
 #include "profession.h"
 #include "player_utils.h"
 #include "clanreference.h"
+#include "religion.h"
 #include "hometown.h"
 #include "room.h"
 #include "area.h"
@@ -63,6 +64,7 @@
 using namespace std;
 
 CLAN(none);
+RELIG(none);
 
 // Defined in who.cpp: online players as the public who list shows them
 // (wizinvis gods and nowho characters left out).
@@ -686,23 +688,44 @@ SERVLET_HANDLE(api_playermeta, "/playermeta")
 }
 
 /*
- * /leaderboard -> {"open": bool, "at": unix, "rows": [{"id", "title", "name":
- * {login, en, ru, ua}, "score", "legendary", "secrets", "earned"}, ...],
- * "names": [{login, en, ru, ua}, ...]}
+ * /leaderboard {args:{board}} -> {"board", "open": bool, "at": unix, "rows":
+ * [{"id", "title", "name": {login, en, ru, ua}, "score", "legendary",
+ * "secrets", "earned", "month", "lives", "quests", "aquests", "gquests",
+ * "kills", "bosses", "craft", "deaths", "rooms"}, ...], "names": [{login, en,
+ * ru, ua}, ...]}
  *
- * The account pages by achievement score, from the daily sums Fenia keeps
- * (.tmp.achievements.boardRows, private world scripts). Only accounts whose
- * page /profile would show are listed, under their main character (most hours
- * among the shown ones). "open" is false until the list opens (Fenia decides).
+ * The account pages ranked by one column (board, default "score") of the daily
+ * sums Fenia keeps (.tmp.achievements.boardRows, private world scripts). Only
+ * accounts whose page /profile would show are listed, under their main
+ * character (most hours among the shown ones), and only with a non-zero value
+ * in that column. "open" is false until the list opens (Fenia decides).
  * "names" feeds the site's player search autocomplete: every character a
  * /player page shows, listed or not (Kit 2026-10-29: these names are public).
- * Built at most once per BOARD_CACHE_TTL: the rows only change daily.
+ *
+ * board "world" -> {"board", "open": true, "at", "days", "active", "races",
+ * "classes", "religions": [{key, en, ru, ua, n}], "clans": [{key, en, ru, ua,
+ * color, n, members}]}: who plays what, over the mortals that entered the
+ * world in the last WORLD_DAYS. Counts only, no names. Hidden and dispersed
+ * clans stay out.
+ *
+ * Each board is built at most once per BOARD_CACHE_TTL: the rows only change
+ * daily.
  */
 static const time_t BOARD_CACHE_TTL = 600;
 static const unsigned int BOARD_MAX = 200;
+static const int WORLD_DAYS = 30;
 
-static Json::Value board_cache;
-static time_t board_cache_at = 0;
+static const char *BOARD_COLUMNS[] = {
+    "score", "legendary", "secrets", "earned", "month", "lives", "quests", "aquests",
+    "gquests", "kills", "bosses", "craft", "deaths", "rooms", 0
+};
+// The columns a page may rank by; the first one is the default.
+static const char *BOARD_SORTABLE[] = {
+    "score", "month", "lives", "quests", "aquests", "gquests", "kills", "bosses",
+    "craft", "deaths", "rooms", 0
+};
+
+static map<DLString, pair<time_t, Json::Value> > board_cache;
 
 static bool board_rows(Json::Value &out)
 {
@@ -765,11 +788,12 @@ static Json::Value board_names()
     return names;
 }
 
-static Json::Value board_build()
+static Json::Value board_build(const DLString &board)
 {
     Json::Value body;
     Json::Value rows;
 
+    body["board"] = board.c_str();
     body["at"] = (Json::Int64)dreamland->getCurrentTime();
     body["rows"] = Json::Value(Json::arrayValue);
     body["names"] = board_names();
@@ -777,8 +801,12 @@ static Json::Value board_build()
     if (!body["open"].asBool())
         return body;
 
+    const char *col = board.c_str();
     vector<Json::Value> listed;
     for (const Json::Value &r : rows) {
+        if (r[col].asInt() <= 0)
+            continue;
+
         DLString id = r["id"].asString();
         id.toUpper();
         if (!profile_valid_id(id) || !AccountManager::exists(id)
@@ -802,14 +830,14 @@ static Json::Value board_build()
         row["name"]["en"] = mainChar->getNameP('1', LANG_EN).c_str();
         row["name"]["ru"] = mainChar->getNameP('1', LANG_RU).c_str();
         row["name"]["ua"] = mainChar->getNameP('1', LANG_UA).c_str();
-        row["score"] = r["score"].asInt();
-        row["legendary"] = r["legendary"].asInt();
-        row["secrets"] = r["secrets"].asInt();
-        row["earned"] = r["earned"].asInt();
+        for (int i = 0; BOARD_COLUMNS[i]; i++)
+            row[BOARD_COLUMNS[i]] = r[BOARD_COLUMNS[i]].asInt();
         listed.push_back(row);
     }
 
-    sort(listed.begin(), listed.end(), [](const Json::Value &a, const Json::Value &b) {
+    sort(listed.begin(), listed.end(), [col](const Json::Value &a, const Json::Value &b) {
+        if (a[col].asInt() != b[col].asInt())
+            return a[col].asInt() > b[col].asInt();
         if (a["score"].asInt() != b["score"].asInt())
             return a["score"].asInt() > b["score"].asInt();
         if (a["legendary"].asInt() != b["legendary"].asInt())
@@ -822,16 +850,136 @@ static Json::Value board_build()
     return body;
 }
 
+struct WorldCount {
+    Json::Value names;
+    int n = 0;
+    int members = 0;
+};
+
+// map -> array sorted by n (then members), most first.
+static Json::Value world_list(map<DLString, WorldCount> &counts, bool withMembers)
+{
+    vector<pair<DLString, WorldCount> > v(counts.begin(), counts.end());
+    sort(v.begin(), v.end(), [](const pair<DLString, WorldCount> &a, const pair<DLString, WorldCount> &b) {
+        if (a.second.n != b.second.n)
+            return a.second.n > b.second.n;
+        if (a.second.members != b.second.members)
+            return a.second.members > b.second.members;
+        return a.first < b.first;
+    });
+
+    Json::Value out(Json::arrayValue);
+    for (auto &p: v) {
+        if (p.second.n == 0 && (!withMembers || p.second.members == 0))
+            continue;
+        Json::Value e = p.second.names;
+        e["key"] = p.first.c_str();
+        e["n"] = p.second.n;
+        if (withMembers)
+            e["members"] = p.second.members;
+        out.append(e);
+    }
+    return out;
+}
+
+static Json::Value world_build()
+{
+    Json::Value body;
+    time_t now = dreamland->getCurrentTime();
+    time_t cutoff = now - WORLD_DAYS * 86400;
+    map<DLString, WorldCount> races, classes, religions, clans;
+    int active = 0;
+
+    for (auto &pair: PCharacterManager::getPCM()) {
+        PCMemoryInterface *pci = pair.second;
+        if (pci->getLevel() > LEVEL_MORTAL + 1 || pci->getTrust() > LEVEL_MORTAL + 1)
+            continue;
+
+        bool recent = pci->getLastAccessTime().getTime() >= cutoff;
+
+        // Clan members count every pfile, the rest only the recent ones.
+        const Clan &clan = *pci->getClan();
+        if (pci->getClan() != clan_none && pci->getClan()->isValid()
+            && !clan.isHidden() && !clan.isDispersed()) {
+            WorldCount &c = clans[clan.getName()];
+            if (c.names.isNull()) {
+                c.names["en"] = clan.getNameFor(LANG_EN).colourStrip().c_str();
+                c.names["ru"] = clan.getRussianName().ruscase('1').colourStrip().c_str();
+                c.names["ua"] = clan.getNameFor(LANG_UA).ruscase('1').colourStrip().c_str();
+                DLString clr = clan.getColor();
+                if (!clr.empty())
+                    c.names["color"] = clr.c_str();
+            }
+            c.members++;
+            if (recent)
+                c.n++;
+        }
+
+        if (!recent)
+            continue;
+        active++;
+
+        const Race &race = *pci->getRace();
+        WorldCount &r = races[race.getName()];
+        if (r.names.isNull()) {
+            DLString ua = race.getMaleNameUa().empty() ? race.getMaleName() : race.getMaleNameUa();
+            r.names["en"] = race.getName().c_str();
+            r.names["ru"] = race.getMaleName().ruscase('1').c_str();
+            r.names["ua"] = ua.ruscase('1').c_str();
+        }
+        r.n++;
+
+        Profession &prof = *pci->getProfession();
+        WorldCount &p = classes[prof.getName()];
+        if (p.names.isNull()) {
+            p.names = profile_class_json(prof);
+            p.names.removeMember("key");
+        }
+        p.n++;
+
+        if (pci->getReligion() != god_none && pci->getReligion()->isValid()) {
+            const Religion &rel = *pci->getReligion();
+            WorldCount &g = religions[rel.getName()];
+            if (g.names.isNull()) {
+                g.names["en"] = rel.getNameFor(LANG_EN).colourStrip().c_str();
+                g.names["ru"] = rel.getNameFor(LANG_RU).ruscase('1').colourStrip().c_str();
+                g.names["ua"] = rel.getNameFor(LANG_UA).ruscase('1').colourStrip().c_str();
+            }
+            g.n++;
+        }
+    }
+
+    body["board"] = "world";
+    body["open"] = true;
+    body["at"] = (Json::Int64)now;
+    body["days"] = WORLD_DAYS;
+    body["active"] = active;
+    body["races"] = world_list(races, false);
+    body["classes"] = world_list(classes, false);
+    body["religions"] = world_list(religions, false);
+    body["clans"] = world_list(clans, true);
+    return body;
+}
+
 SERVLET_HANDLE(api_leaderboard, "/leaderboard")
 {
     Json::Value params;
     if (!servlet_parse_params(request, response, params))
         return;
 
+    DLString board;
+    servlet_get_arg(params, "board", board);
+    bool known = board == "world";
+    for (int i = 0; !known && BOARD_SORTABLE[i]; i++)
+        known = board == BOARD_SORTABLE[i];
+    if (!known)
+        board = BOARD_SORTABLE[0];
+
     time_t now = dreamland->getCurrentTime();
-    if (board_cache_at == 0 || now - board_cache_at >= BOARD_CACHE_TTL) {
-        board_cache = board_build();
-        board_cache_at = now;
+    auto it = board_cache.find(board);
+    if (it == board_cache.end() || now - it->second.first >= BOARD_CACHE_TTL) {
+        Json::Value body = board == "world" ? world_build() : board_build(board);
+        it = board_cache.insert_or_assign(board, make_pair(now, body)).first;
     }
-    servlet_response_200_json(response, board_cache);
+    servlet_response_200_json(response, it->second.second);
 }
