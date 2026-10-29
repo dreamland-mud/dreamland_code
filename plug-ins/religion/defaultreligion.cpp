@@ -12,6 +12,7 @@
 #include "player_utils.h"
 #include "race.h"
 #include "profession.h"
+#include "grammar_entities_impl.h"
 #include "clan.h"
 #include "liquid.h"
 #include "object.h"
