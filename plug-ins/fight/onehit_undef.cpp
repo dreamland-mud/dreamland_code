@@ -110,12 +110,12 @@ RELIG(deimos);
 /*----------------------------------------------------------------------------
  * Hit by weapon or bare hands
  *---------------------------------------------------------------------------*/
-UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command )
+UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command, bool offEnd )
             : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
               WeaponOneHit( ch, victim, secondary, command ),
-              deathblowStun( false ), charged( false ), ambushed( false )
+              deathblowStun( false ), charged( false ), ambushed( false ), offEnd( offEnd )
 {
-    deathReason = "melee";
+    deathReason = offEnd ? "staff offend" : "melee";
 }
 
 bool UndefinedOneHit::canDamage( )
@@ -374,10 +374,21 @@ void UndefinedOneHit::damEffectVorpal()
  *----------------------------------------------------------------------------*/
 void UndefinedOneHit::message( )
 {
+    DLString ru = attack_table[attack].noun;
     DLString en = attack_noun_en(attack);
     DLString ua = attack_noun_ua(attack);
-    MultiInflectedString noun(attack_table[attack].noun, en, ua,
-                              attack_table[attack].gender);
+    Grammar::MultiGender gender = attack_table[attack].gender;
+
+    // A staff's other end (fight.cpp staff_offend_hit) has a noun of its own. Never the
+    // bare "other end": the room line would read as the striker's own other end.
+    if (offEnd) {
+        ru = "удар другим концом посоха";
+        en = "strike with the other end";
+        ua = "удар іншим кінцем посоха";
+        gender = Grammar::MultiGender::MASCULINE;
+    }
+
+    MultiInflectedString noun(ru, en, ua, gender);
 
     if (immune) {
         if (ch == victim) {

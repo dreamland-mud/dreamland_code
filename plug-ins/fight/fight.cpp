@@ -120,6 +120,7 @@ GSN(fourth_attack);
 GSN(paralysis);
 GSN(second_attack);
 GSN(second_weapon);
+GSN(staff);
 GSN(third_attack);
 
 PROF(none);
@@ -660,13 +661,13 @@ struct second_weapon_t {
 };
 
 const struct second_weapon_t second_weapon_table [] = {
-/*                  HAND EXOT SWRD DAG STF MACE AXE FLA WHI POLE BOW ARR LAN */
-{ prof_warrior,     { 60, 45,  45, 90, 18, 18,  90, 18, 18, 18,  18, 18, 18 } },
-{ prof_paladin,     { 60, 45,  45, 90, 18, 60,  18, 90, 18, 60,  18, 18, 18 } },
-{ prof_anti_paladin,{ 45, 45,  60, 60, 18, 18,  18, 45, 18, 18,  18, 18, 18 } },
-{ prof_ninja,       { 90, 45,  45, 90, 60, 18,  18, 18, 18, 18,  18, 18, 18 } }, 
-{ prof_ranger,      { 60, 45,  40, 90, 90, 18,  18, 18, 60, 18,  18, 60, 18 } },
-{ prof_samurai,     { 60, 45,  90, 90, 18, 18,  18, 18, 18, 18,  18, 18, 18 } },
+/*                  HAND EXOT SWRD DAG SPR MACE AXE FLA WHI POLE BOW ARR LAN STON STF */
+{ prof_warrior,     { 60, 45,  45, 90, 18, 18,  90, 18, 18, 18,  18, 18, 18, 18,  18 } },
+{ prof_paladin,     { 60, 45,  45, 90, 18, 60,  18, 90, 18, 60,  18, 18, 18, 18,  18 } },
+{ prof_anti_paladin,{ 45, 45,  60, 60, 18, 18,  18, 45, 18, 18,  18, 18, 18, 18,  18 } },
+{ prof_ninja,       { 90, 45,  45, 90, 60, 18,  18, 18, 18, 18,  18, 18, 18, 18,  60 } }, 
+{ prof_ranger,      { 60, 45,  40, 90, 90, 18,  18, 18, 60, 18,  18, 60, 18, 18,  90 } },
+{ prof_samurai,     { 60, 45,  90, 90, 18, 18,  18, 18, 18, 18,  18, 18, 18, 18,  18 } },
 { prof_none,        { 0,                                                    } },
 };
 
@@ -698,6 +699,42 @@ int second_weapon_chance_class(Profession *prof, int weaponClass)
     return chance_modifier;
 }
 
+// A PC holding a staff in both hands (staff wielded; shield, hold and second_wield
+// empty, as .tmp.combat.staffGrip in Fenia) strikes with its other end where a free
+// off hand would roll. Not for a char who already has an off-hand attack of its own
+// (second weapon with a one-handed staff, or a huge race): that one keeps its punch.
+// Returns true when the grip took the off-hand roll, whether or not it struck.
+static bool staff_offend_hit( Character *ch, Character *victim, int chance )
+{
+    if (ch->is_npc( ))
+        return false;
+
+    Object *staff = get_eq_char( ch, wear_wield );
+    if (!staff || staff->item_type != ITEM_WEAPON || get_weapon_class( staff ) != WEAPON_STAFF)
+        return false;
+
+    if (get_eq_char( ch, wear_shield ) || get_eq_char( ch, wear_hold )
+        || get_eq_char( ch, wear_second_wield ))
+        return false;
+
+    // A trained second weapon owns the free hand; an untrained one (learned 1%,
+    // e.g. a ranger just past its level) must not trade the off-end for a 0.6% punch.
+    if (gsn_second_weapon->usable( ch, false ) && gsn_second_weapon->getEffective( ch ) > 1
+        && (!IS_WEAPON_STAT( staff, WEAPON_TWO_HANDS ) || ch->getRace( )->getSize( ) >= SIZE_HUGE))
+        return false;
+
+    int m = weapon_defense_factor( WEAPON_STAFF, "offend_grip", 0 );
+    if (m <= 0)
+        return false;
+
+    chance = chance * m / 100;
+
+    if (number_percent( ) < gsn_staff->getEffective( ch ) * chance / 100)
+        UndefinedOneHit( ch, victim, false, "", true ).hit( );
+
+    return true;
+}
+
 void second_weapon_hit( Character *ch, Character *victim, int chance )
 {
     Object *weapon;
@@ -708,6 +745,9 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
         || !loc.isSet( wear_wrist_l )
         || !loc.isSet( wear_wrist_r ))        
         return; 
+
+    if (staff_offend_hit( ch, victim, chance ))
+        return;
     
     weapon = get_eq_char(ch, wear_wield);
     if (weapon != 0 

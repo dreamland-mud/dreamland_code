@@ -4747,6 +4747,37 @@ static double ga_offhandRatio( const GAOffhand &om, Character *target, int weapo
     return off / om.mainSwings;
 }
 
+// Off-end strikes per main-hand swing for a staff held in the grip (fight.cpp
+// staff_offend_hit): the off-hand roll shape above at the staff skill and the
+// "offend_grip" modifier of fight/weapon_defense.json. 0 when the grip can't strike:
+// no staff, no hands, or the char keeps an off-hand attack of its own (second weapon
+// with a one-handed staff, or a huge race).
+static double ga_offendRatio( const GAOffhand &om, Character *target, ::Object *primary )
+{
+    if (target->is_npc( ) || primary == 0 || primary->item_type != ITEM_WEAPON
+        || get_weapon_class( primary ) != WEAPON_STAFF)
+        return 0;
+    const char *locs[] = { "hands", "wrist_l", "wrist_r" };
+    for (int i = 0; i < 3; i++) {
+        Wearlocation *loc = wearlocationManager->findExisting( locs[i] );
+        if (loc == 0 || !target->getWearloc( ).isSet( loc ))
+            return 0;
+    }
+    Skill *sw = skillManager->findExisting( "second weapon" );
+    if (sw != 0 && sw->usable( target, false ) && sw->getEffective( target ) > 1
+        && !ga_twoHandBlocks( target, IS_WEAPON_STAT( primary, WEAPON_TWO_HANDS ) ))
+        return 0;
+    int m = weapon_defense_factor( WEAPON_STAFF, "offend_grip", 0 );
+    Skill *staff = skillManager->findExisting( "staff" );
+    if (m <= 0 || staff == 0)
+        return 0;
+    int st = staff->getEffective( target );
+    double off = ga_pct( st * (100.0 * m / 100) / 100 );
+    for (size_t k = 0; k < om.extra.size( ); k++)
+        off += ga_pct( om.extra[k] ) * ga_pct( st * (om.extra[k] * m / 100) / 100 );
+    return off / om.mainSwings;
+}
+
 // Worth of a weapon in the OFF hand. score = its ordinary ga_score, which counted its dice
 // as a full main-hand swing (weaponWeight * eff); swap that for r off-hand swings, each
 // with the no-shield +5% on the dice (WeaponOneHit::damApplyShield) and the char's damroll
@@ -7456,13 +7487,14 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     }
 
     // ---- Staff grip --------------------------------------------------------------------
-    // A staff held alone parries better (om.pGrip), so an empty left hand is a build of
+    // A staff held alone parries better (om.pGrip) and now and then strikes with its other
+    // end (ga_offendRatio, a full main-hand blow), so an empty left hand is a build of
     // its own, worth the blows the grip adds. It joins the dual/keep weighing: the
     // percentile takes the best of the three, and when the grip beats keeping a shield
     // or held item, the chase list stops pushing one. A non-large two-hander can't take
     // a shield (ShieldWearloc::canWear), so its keep side is the held item alone.
     bool gaGoGrip = false, gripWins = false;
-    double gripScore = om.pGrip * om.blowValue, gripKeep = 0;
+    double gripScore = (om.pGrip + ga_offendRatio( om, target, gaPrimary )) * om.blowValue, gripKeep = 0;
     if (!gaHandsFixed && gripScore > 0) {
         bool shieldFits = !(IS_WEAPON_STAT( gaPrimary, WEAPON_TWO_HANDS ) && target->getSize( ) < SIZE_LARGE);
         bool haveShield;
