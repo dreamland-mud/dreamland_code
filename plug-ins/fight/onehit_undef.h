@@ -31,7 +31,7 @@ void round_blow_landed( Character *ch );
 
 class UndefinedOneHit: public WeaponOneHit {
 public:
-    UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command = "" );
+    UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command = "", bool offEnd = false );
     
     virtual bool canHit( );
     bool checkHands( );
@@ -73,6 +73,7 @@ protected:
     bool deathblowStun;
     bool charged;
     bool ambushed;
+    bool offEnd;          // the staff's other end, struck from the grip (fight.cpp staff_offend_hit)
 };
 
 #endif
