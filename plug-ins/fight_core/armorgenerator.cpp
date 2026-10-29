@@ -601,15 +601,20 @@ bool ItemAffixRoller::fitAllowed(const DLString &secName, const Json::Value &aff
     return true;
 }
 
-double ItemAffixRoller::windowCurve() const
+static double affix_window_curve(int level, const DLString &kind, bool caster)
 {
-    double curve = item_level_curve(obj->level);
+    double curve = item_level_curve(level);
     // measure.armor_budget_mult [melee, caster]: armor tier windows per profile.
     // Melee armor came out ~1.35x today's stat strength on honest prices; Kit
     // cut it by a quarter (2026-10-04). Weapons keep the plain curve.
     if (kind == "armor")
-        curve *= item_value("measure", "armor_budget_mult", 1.0, isCaster ? 1 : 0);
+        curve *= item_value("measure", "armor_budget_mult", 1.0, caster ? 1 : 0);
     return curve;
+}
+
+double ItemAffixRoller::windowCurve() const
+{
+    return affix_window_curve(obj->level, kind, isCaster);
 }
 
 /** Slot weight: "deny" lists the slots it never rolls on (0), "slots" the
@@ -640,23 +645,18 @@ static const char * align_band(int align)
     return "neutral";
 }
 
-bool ItemAffixRoller::chargedPick(const Json::Value &section, const Json::Value &affix, Candidate &c) const
+bool charged_charge_range(const DLString &kind, int tier, int level, bool caster, double price, int &lo, int &hi)
 {
-    const Json::Value &rule = section["by_kind"][kind];
+    const Json::Value &rule = item_affixes_config()["charged"]["by_kind"][kind];
     const Json::Value &tc = magic_items_config()["tiers"][DLString(tier).c_str()];
-    if (!rule.isObject() || !tc.isObject())
-        return false;
-
-    std::vector<MagicSpellPick> cands;
-    int a = align != ALIGN_NONE ? align : (pch ? (int)pch->alignment : 0);
-    if (!magic_item_pool(rule["pool_prefix"].asString() + affix["pool"].asString(), tier, obj->level, a, cands))
+    if (!rule.isObject() || !tc.isObject() || price <= 0 || tier < 1 || tier > (int)weapon_tier_table.size())
         return false;
 
     // The charges may take this share of the tier window, the stats get the rest.
     const Json::Value &share = rule["share_pct"];
-    double top = weapon_tier_table[tier - 1].max_m * windowCurve();
-    double lo = top * share[0u].asInt() / 100.0;
-    double hi = top * share[1u].asInt() / 100.0;
+    double top = weapon_tier_table[tier - 1].max_m * affix_window_curve(level, kind, caster);
+    double wlo = top * share[0u].asInt() / 100.0;
+    double whi = top * share[1u].asInt() / 100.0;
 
     // A charge range (wand_charges) runs from 1, a single number (staff_charges) is fixed.
     const Json::Value &range = tc[rule["charges"].asString()];
@@ -666,22 +666,83 @@ bool ItemAffixRoller::chargedPick(const Json::Value &section, const Json::Value 
     else
         cmin = cmax = range.asInt();
     cmax = min(cmax, magic_items_config()["max_charges"].asInt());
-    if (cmax < cmin)
+
+    double one = price * 100;
+    lo = max(cmin, (int)ceil(wlo / one));
+    hi = min(cmax, (int)floor(whi / one));
+    return lo <= hi;
+}
+
+void charged_write(Object *obj, const DLString &kind, int tier, const DLString &spell, int charges, int level)
+{
+    // Read by 'use' (chargedprops.h). A charged ring or staff keeps its
+    // stats at 0 charges; recharge refills it.
+    const Json::Value &rule = item_affixes_config()["charged"]["by_kind"][kind];
+    const Json::Value &tc = magic_items_config()["tiers"][DLString(tier).c_str()];
+    Json::Value ch;
+    ch["spell"] = spell;
+    ch["level"] = max(1, level + tc["cast_offset"].asInt());
+    ch["charges"] = charges;
+    ch["max"] = charges;
+    ch["where"] = rule["where"].asString();
+    ch["crumble"] = false;
+    obj->props["charged"] = ch;
+}
+
+int magic_item_imbue(Object *obj, const DLString &spell, int tier, const DLString &kind, int level, int align, bool write)
+{
+    const Json::Value &rule = item_affixes_config()["charged"]["by_kind"][kind];
+    if (!rule.isObject())
+        return IMBUE_NO_SPELL;
+
+    // Only what this item could have dropped with: its tier, level reach and alignment.
+    bool found = false;
+    double price = 0;
+    for (const char *pool: { "def", "off" }) {
+        std::vector<MagicSpellPick> cands;
+        if (!magic_item_pool(rule["pool_prefix"].asString() + pool, tier, obj->level, align, cands))
+            continue;
+        for (auto const &p: cands)
+            if (p.spell == spell) {
+                found = true;
+                price = p.price;
+            }
+    }
+
+    if (!found)
+        return IMBUE_NO_SPELL;
+
+    int lo, hi;
+    if (!charged_charge_range(kind, tier, obj->level, true, price, lo, hi))
+        return IMBUE_TOO_WEAK;
+
+    if (write)
+        charged_write(obj, kind, tier, spell, hi, level);
+    return hi;
+}
+
+bool ItemAffixRoller::chargedPick(const Json::Value &section, const Json::Value &affix, Candidate &c) const
+{
+    const Json::Value &rule = section["by_kind"][kind];
+    if (!rule.isObject())
+        return false;
+
+    std::vector<MagicSpellPick> cands;
+    int a = align != ALIGN_NONE ? align : (pch ? (int)pch->alignment : 0);
+    if (!magic_item_pool(rule["pool_prefix"].asString() + affix["pool"].asString(), tier, obj->level, a, cands))
         return false;
 
     for (int i = (int)cands.size() - 1; i > 0; i--)
         std::swap(cands[i], cands[number_range(0, i)]);
 
     for (auto const &p: cands) {
-        double one = p.price * 100;
-        int fitLo = max(cmin, (int)ceil(lo / one));
-        int fitHi = min(cmax, (int)floor(hi / one));
-        if (fitLo > fitHi)
+        int fitLo, fitHi;
+        if (!charged_charge_range(kind, tier, obj->level, isCaster, p.price, fitLo, fitHi))
             continue;
 
         c.spell = p.spell;
         c.charges = number_range(fitLo, fitHi);
-        c.price = (int)std::round(one * c.charges);
+        c.price = (int)std::round(p.price * 100 * c.charges);
         return true;
     }
 
@@ -1349,19 +1410,7 @@ bool ItemAffixRoller::applyShared(const Candidate &c, int count)
         extraFlags.setBits(c.value);
 
     } else if (sec == "charged") {
-        // Read by 'use' (chargedprops.h). A charged ring or staff keeps its
-        // stats at 0 charges; recharge refills it.
-        const Json::Value &affixes = item_affixes;
-        const Json::Value &rule = affixes[sec]["by_kind"][kind];
-        const Json::Value &tc = magic_items_config()["tiers"][DLString(tier).c_str()];
-        Json::Value ch;
-        ch["spell"] = c.spell;
-        ch["level"] = max(1, obj->level + tc["cast_offset"].asInt());
-        ch["charges"] = c.charges;
-        ch["max"] = c.charges;
-        ch["where"] = rule["where"].asString();
-        ch["crumble"] = false;
-        obj->props["charged"] = ch;
+        charged_write(obj, kind, tier, c.spell, c.charges, obj->level);
 
     } else if (sec == "resists" || sec == "vulns" || sec == "immunes"
                 || sec == "senses" || sec == "affects_with_bits") {

@@ -21,6 +21,24 @@ bool armor_slot_exists(const DLString &slot);
 /** The whole fight/item_affixes.json, for the weapon side of the pool. */
 const Json::Value & item_affixes_config();
 
+/** Section "charged" of item_affixes.json: how many charges a spell of this
+ *  one-charge price (M) can take on an item of this tier and level. kind
+ *  "armor" = jewelry and held items cast from anywhere, "weapon" = staves cast
+ *  wielded. False when it does not fit. */
+bool charged_charge_range(const DLString &kind, int tier, int level, bool caster, double price, int &lo, int &hi);
+
+/** Writes props "charged"; level is the cast level before the tier's cast_offset. */
+void charged_write(Object *obj, const DLString &kind, int tier, const DLString &spell, int charges, int level);
+
+#define IMBUE_NO_SPELL  (-1)
+#define IMBUE_TOO_WEAK  (-2)
+
+/** Shalafi imbue: one chosen spell as charges, the most the charged affix
+ *  rules allow at this tier. The spell must be in the item's pool (its level
+ *  reach, AoE rule, alignment). Returns the charges, or IMBUE_NO_SPELL /
+ *  IMBUE_TOO_WEAK; write false only measures. */
+int magic_item_imbue(Object *obj, const DLString &spell, int tier, const DLString &kind, int level, int align, bool write = true);
+
 /**
  * The shared half of the random item generators: the affix pool from
  * fight/item_affixes.json, the weighted fill of a tier's M window, the shared

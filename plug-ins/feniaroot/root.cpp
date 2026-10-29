@@ -1694,6 +1694,24 @@ NMI_INVOKE(Root, randomizeMagic, "(obj, ch, tier, kind[, level]): случайн
     return Register(gen.run());
 }
 
+NMI_INVOKE(Root, imbueMagic, "(obj, spell, tier, kind, level[, align[, dry]]): зачаровать предмет зарядами одного заклинания по правилам аффикса charged; kind armor (носимое и в руку, работает отовсюду) или weapon (посох, работает когда им вооружен), level -- уровень каста до поправки тира; dry true только считает заряды, ничего не записывая; вернет число зарядов, -1 если заклинания нет в пуле предмета, -2 если оно не влезает в тир")
+{
+    ::Object *obj = argnum2item(args, 1);
+    DLString spell = argnum2string(args, 2);
+    int tier = argnum2number(args, 3);
+    DLString kind = argnum2string(args, 4);
+    int level = argnum2number(args, 5);
+    int align = args.size() > 5 ? argnum2number(args, 6) : 0;
+    bool dry = args.size() > 6 && argnum2boolean(args, 7);
+
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid magic item tier.");
+    if (kind != "armor" && kind != "weapon")
+        throw Scripting::Exception("Imbue kind is armor or weapon.");
+
+    return Register(magic_item_imbue(obj, spell, tier, kind, level, align, !dry));
+}
+
 NMI_INVOKE(Root, randomizeNamedArmor, "(obj, ch, tier, slot[, profile]): статы случайной брони для именного предмета, имена, описания и материал остаются свои; slot любой слот носки (shield, about, waist...), profile caster берет цены аффиксов для кастера; true если удалось")
 {
     ::Object *obj = argnum2item(args, 1);
