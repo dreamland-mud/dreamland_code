@@ -225,6 +225,21 @@ void passive_refresh( Character *ch, bool verbose );
 /*-------------------------------------------------------------------------
  *  work with profiles
  *------------------------------------------------------------------------*/
+
+// obj_update only ticks objects in the world, so item timers froze while the
+// owner was offline. Charge the offline minutes on load so every item timer runs
+// on real time, like limited items do. An expired item is left at 1 minute: it
+// crumbles on the first tick after login, with the usual message.
+static void obj_charge_offline_time( Object *list, long minutes )
+{
+    for (Object *obj = list; obj; obj = obj->next_content) {
+        if (obj->timer > 0)
+            obj->timer = max( 1L, obj->timer - minutes );
+
+        obj_charge_offline_time( obj->contains, minutes );
+    }
+}
+
 bool PCharacter::load( )
 {
     static const char * METHOD = "PCharacter::load( )";
@@ -280,7 +295,18 @@ bool PCharacter::load( )
             break;
         }
     }
-    
+
+    // lastAccessTime is stamped on every save, so this is the time since the profile was written.
+    time_t lastSave = getLastAccessTime( ).getTime( );
+    if (lastSave > 0) {
+        long minutes = (dreamland->getCurrentTime( ) - lastSave) / Date::SECOND_IN_MINUTE;
+        if (minutes > 0) {
+            obj_charge_offline_time( carrying, minutes );
+            if (pet)
+                obj_charge_offline_time( pet->carrying, minutes );
+        }
+    }
+
     if (!get_room_instance( start_room )) {
         if (is_immortal( ))
             start_room = ROOM_VNUM_CHAT;
