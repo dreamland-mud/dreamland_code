@@ -4,7 +4,6 @@
  */
 #include "clanmobiles.h"
 #include "clanreference.h"
-#include "clantypes.h"
 #include "skillreference.h"
 #include "occupations.h"
 #include "pcharacter.h"
@@ -133,8 +132,6 @@ bool ClanGuard::aggress( )
             continue;
         if (clanArea->findInvitation( pch ))
             continue;
-        if (isAlly( pch ))
-            continue;
         if (checkPush( pch ) || checkGhost( pch ))
             continue;
         
@@ -176,11 +173,6 @@ void ClanGuard::greet( Character *wch )
     
     if (( obj = clanArea->findInvitation( pch ) )) {
         actInvited( pch, obj );
-        return;
-    }
-
-    if (isAlly( pch )) {
-        actAlly( pch );
         return;
     }
     
@@ -284,28 +276,6 @@ void ClanGuard::actInvited( PCharacter *wch, Object *obj )
 
 void ClanGuard::actPush( PCharacter *wch )
 {
-}
-
-void ClanGuard::actAlly( PCharacter *wch )
-{
-    say_act( wch, ch, _("Союзникам нашего клана здесь рады, $c1. Проходи.") );
-}
-
-/* Alliance and peace are both friendly: the guard's own clan decides,
- * so a one-sided peace offer from the visitor's clan does not count. */
-bool ClanGuard::isAlly( PCharacter *wch )
-{
-    Clan *other = &*wch->getClan( );
-
-    if (!clan->hasDiplomacy( ) || !other->hasDiplomacy( ))
-        return false;
-
-    ClanData *data = clan->getData( );
-    if (!data)
-        return false;
-
-    int dip = data->getDiplomacy( other );
-    return dip == 0 || dip == 1;
 }
 
 void ClanGuard::actGreet( PCharacter *wch )

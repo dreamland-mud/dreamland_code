@@ -40,12 +40,10 @@ public:
 protected:        
         virtual bool checkPush( PCharacter * );
         virtual bool checkGhost( PCharacter * ); 
-        bool isAlly( PCharacter * );
         
         virtual void actInvited( PCharacter *, Object * );
         virtual void actPush( PCharacter * );
         virtual void actGreet( PCharacter * );
-        virtual void actAlly( PCharacter * );
         virtual void actIntruder( PCharacter * );
         virtual void actGhost( PCharacter * );
         virtual void actGiveInvitation( PCharacter *, Object * );
