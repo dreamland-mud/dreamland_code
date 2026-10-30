@@ -438,16 +438,33 @@ void BandageCommand::run( Character *ch, const DLString &args )
         return;
     }
 
-    // Already bandaged or out of energy: a fresh wound still takes a plain
-    // dressing, like anyone else's.
     SkillPointer skill = getSkill( );
-    if (!skill->usable( ch, false ) || ch->isAffected( gsn_bandage )
-        || ch->mana < skill->getMana( ch ) || ch->move < skill->getMoves( ch )) {
-        if (ch->isAffected( gsn_bandage ) && !ch->isAffected( gsn_bleeding )) {
+    bool bleeding = ch->isAffected( gsn_bleeding );
+
+    // No wound: only the clan bandage has anything to do. Its own refusals
+    // (no clan power, no energy) come from DefaultSkillCommand::run.
+    if (!bleeding) {
+        if (ch->isAffected( gsn_bandage )) {
             oldact(_("Ты уже перевяза$gло|л|ла свои раны!"),ch,0,0,TO_CHAR);
             return;
         }
 
+        if (!skill->visible( ch )) {
+            bandage_first_aid( ch );
+            return;
+        }
+
+        if (skill->usable( ch, false ) && !bandage_has_cloth( ch ))
+            return;
+
+        DefaultSkillCommand::run( ch, args );
+        return;
+    }
+
+    // A wound: the clan bandage when it can be had, else a plain dressing,
+    // like anyone else's (already bandaged, no clan power, no energy).
+    if (!skill->usable( ch, false ) || ch->isAffected( gsn_bandage )
+        || ch->mana < skill->getMana( ch ) || ch->move < skill->getMoves( ch )) {
         bandage_first_aid( ch );
         return;
     }

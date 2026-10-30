@@ -367,6 +367,15 @@ static bool mprog_special( Character *ch )
     static Scripting::IdRef onSpecId("onSpec");
     static Scripting::IdRef postSpecId("postSpec");
 
+    // Affects first: every mob has a behavior, and one that acts this pulse
+    // (a fighting pet always does) returns early below, which would freeze
+    // its bleeding wound and the like. A wound can kill: then nothing else.
+    bool afFired = afprog_spec(ch);
+    if (ch->extracted || ch->isDead( ))
+        return true;
+    if (afFired)
+        return true;
+
     struct timeval tv;
     gettimeofday( &tv, 0 );
 
@@ -390,11 +399,6 @@ static bool mprog_special( Character *ch )
 
     BEHAVIOR_CALL( ch->getNPC( ), spec );
     g_ms_behavior += ms_us_since( tv );
-
-    if (afprog_spec(ch)) {
-        g_ms_tail += ms_us_since( tv );
-        return true;
-    }
 
     if (ch->is_npc( ) && !IS_CHARMED(ch)) {
         if (*(ch->getNPC( )->spec_fun) != 0
