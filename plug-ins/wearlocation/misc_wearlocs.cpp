@@ -397,6 +397,19 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
     // No weight cap for the primary hand (weight-cost-sweep D9); the off hand
     // keeps str_app.wield2, see SecondWieldWearloc::canWear.
 
+    // 'config twohands': take the shield off by itself to free the hand.
+    Object *shield;
+    if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS)
+        && IS_SET(flags, F_WEAR_VERBOSE)
+        && !ch->is_npc( )
+        && IS_SET(ch->getPC( )->config, CONFIG_TWOHANDS)
+        && ch->getSize( ) < SIZE_LARGE
+        && !(ch->getRace( )->getSize( ) < SIZE_HUGE && wear_second_wield->find( ch ))
+        && ( shield = wear_shield->find( ch ) ))
+    {
+        wear_shield->remove( shield, F_WEAR_VERBOSE );
+    }
+
     if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS)
         && !ch->is_npc( )
         && ((ch->getSize( ) < SIZE_LARGE && wear_shield->find( ch ))
