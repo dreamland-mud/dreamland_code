@@ -8,6 +8,7 @@
 
 #include "onehit_undef.h"
 #include "fenia_utils.h"
+#include "feniamanager.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -269,7 +270,37 @@ void UndefinedOneHit::postDamageEffects( )
     damEffectFunkyWeapon( );
     damEffectMasterStaff( );
     gsn_slice->getCommand()->apply(ch, victim, secondary);
+    damEffectCriticalWound( );
     damEffectVorpal();
+}
+
+/**
+ * A critical slash or pierce opens a bleeding wound. What the wound does
+ * (who bleeds, how long, how much) lives in the onWeaponCrit Fenia trigger
+ * (dreamland_fenia global/onWeaponCrit/bleed). wield is null for natural
+ * attacks: claws and fangs bleed too.
+ */
+void UndefinedOneHit::damEffectCriticalWound( )
+{
+    if (!critical || dam <= 0)
+        return;
+
+    if (dam_type != DAM_SLASH && dam_type != DAM_PIERCE)
+        return;
+
+    if (victim->in_room != ch->in_room)
+        return;
+
+    try {
+        gprog_nocatch("onWeaponCrit", "CCOi", ch, victim, wield, dam);
+    }
+    catch (const VictimDeathException &) {
+        throw;
+    }
+    catch (const ::Exception &e) {
+        FeniaManager::getThis()->croak(
+            0, Scripting::Register("onWeaponCrit"), e);
+    }
 }
 
 /**

@@ -45,6 +45,7 @@ OneHit::OneHit( Character *ch, Character *victim )
     thac0 = 0;
     victim_ac = 0;
     orig_dam = 0;
+    critical = false;
 }
 
 void OneHit::hit( )
@@ -161,15 +162,19 @@ bool OneHit::diceroll()
     // critical miss
     // lucky little hobbits do not miss critically. for them, critical miss is treated as a critical hit instead
     if(dice == 0){
-        if (ch->getRace() == race_hobbit)
+        if (ch->getRace() == race_hobbit) {
+            critical = true;
             return true;
+        }
         else
             return false;
     }
 
     // critical hit
-    if(dice == 19)
+    if(dice == 19) {
+        critical = true;
         return true;
+    }
 
     d.log(dice, "dice");
     d.log(thac0-victim_ac, "thac0 - victim_ac");

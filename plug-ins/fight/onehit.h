@@ -62,6 +62,8 @@ protected:
     int thac0;
     int victim_ac;
     int orig_dam;
+    // The to-hit roll was a natural 20 (or a lucky hobbit's natural 1).
+    bool critical;
 };
 
 #endif
