@@ -795,8 +795,20 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                     return result;
                 }
             }
-            else 
+            else {
                 victim = get_char_room( ch, carg );
+
+                // "dir.victim" for a spell that has no range: say so instead of
+                // the generic "no one by that name" below.
+                DLString argDoor, argVict;
+                int door;
+                if (!victim && direction_range_argument( arg, argDoor, argVict, door )) {
+                    buf.str( "" );
+                    buf << l(ch, "Это заклинание нельзя направить в соседнюю местность.");
+                    result->error = TARGET_ERR_TOO_FAR;
+                    return result;
+                }
+            }
         }
 
         if (victim) {

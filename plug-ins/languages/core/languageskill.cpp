@@ -60,6 +60,17 @@ const DLString& Language::getNameFor( Character *ch ) const
     return name.get(Player::lang(ch));
 }
 
+const DLString& Language::getNameFor( lang_t lang ) const
+{
+    const DLString &pad = name.get(lang);
+    if (pad.empty())
+        return getName();
+
+    DLString &nom = nominatives[lang];
+    nom = pad.ruscase('1');
+    return nom;
+}
+
 const DLString& Language::getNamePad( lang_t lang ) const
 {
     return name.get(lang);
