@@ -94,7 +94,7 @@ static bool refuse_char_as_furniture(Character *ch, const char *argument, const 
     return true;
 }
 
-CMDRUNP(stand)
+static void stand_body(Character *ch, char *argument)
 {
     Object *obj = 0;
     int furniture_flag = 0;
@@ -226,7 +226,7 @@ CMDRUNP(stand)
 
 }
 
-CMDRUNP(rest)
+static void rest_body(Character *ch, char *argument)
 {
     Object *obj = 0;
     Object *obj_current = ch->on;
@@ -428,7 +428,7 @@ CMDRUNP(rest)
     return;
 }
 
-CMDRUNP(sit)
+static void sit_body(Character *ch, char *argument)
 {
     Object *obj = 0;
     Object *obj_current = ch->on;
@@ -627,7 +627,7 @@ CMDRUNP(sit)
     return;
 }
 
-CMDRUNP(sleep)
+static void sleep_body(Character *ch, char *argument)
 {
     Object *obj = 0;
     ostringstream toMe, toRoomRu, toRoomEn, toRoomUa;
@@ -756,6 +756,48 @@ CMDRUNP(sleep)
     ch->pecho(toMe.str().c_str(), ch, obj);
     ch->recho(POS_RESTING, MultiMessage(toRoomEn.str(), toRoomRu.str(), toRoomUa.str()), ch, obj);
 }
+
+/*
+ * NPC followers (pets, charmies) take the same body position as their
+ * master, so nobody has to type "order all sleep" every time.
+ */
+static void followers_mimic(Character *ch, int oldPos, const char *cmd)
+{
+    if (ch->is_npc() || ch->position.getValue() == oldPos || ch->fighting)
+        return;
+
+    Character *fch, *fch_next;
+
+    for (fch = ch->in_room->people; fch; fch = fch_next) {
+        fch_next = fch->next_in_room;
+
+        if (fch == ch || !fch->is_npc() || fch->master != ch)
+            continue;
+        if (fch->position.getValue() == ch->position.getValue() || fch->position < POS_SLEEPING)
+            continue;
+        if (fch->fighting || fch->position == POS_FIGHTING)
+            continue;
+        if (MOUNTED(fch) || RIDDEN(fch))
+            continue;
+        if (!IS_AWAKE(fch) && IS_AFFECTED(fch, AFF_SLEEP))
+            continue;
+
+        interpret_raw(fch, cmd);
+    }
+}
+
+#define CMD_MIMIC(x) \
+CMDRUNP(x) \
+{ \
+    int oldPos = ch->position.getValue(); \
+    x##_body(ch, argument); \
+    followers_mimic(ch, oldPos, #x); \
+}
+
+CMD_MIMIC(stand)
+CMD_MIMIC(rest)
+CMD_MIMIC(sit)
+CMD_MIMIC(sleep)
 
 CMDRUNP(wake)
 {
