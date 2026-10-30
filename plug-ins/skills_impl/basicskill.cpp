@@ -141,6 +141,28 @@ static void rprog_skill( Room *room, Character *actor, const char *skill, bool s
         mprog_skill( rch, actor, skill, success, victim );
 }
 
+/*
+ * A newbie who keeps failing a barely learned skill gets told to spend
+ * practice sessions on it. hint_fmt itself skips everyone past newbie age.
+ */
+void BasicSkill::hintPractice( PCharacter *pch, int learned ) const
+{
+    static map<long long, time_t> lastHint;
+    const time_t HINT_DELAY = 10 * Date::SECOND_IN_MINUTE;
+
+    if (learned >= 50 || learned >= getAdept( pch ) || pch->practice <= 0)
+        return;
+
+    time_t now = dreamland->getCurrentTime( );
+    time_t &last = lastHint[pch->getID( )];
+    if (last > now - HINT_DELAY)
+        return;
+    last = now;
+
+    hint_fmt( pch, _("У тебя пока плохо получается {y%1$s{x. Потрать на это сессии практики у гильдмастера: {y{hcпрактиковать{x."),
+              getNameFor( pch ).c_str( ) );
+}
+
 void 
 BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_type, int dam_flags ) const 
 {
@@ -172,6 +194,9 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         return;
 
     data.timer = 0;
+
+    if (!success)
+        hintPractice( pch, data.learned );
 
     if (pch->getRealLevel( ) > 19  && !IS_SET( pch->act, PLR_CONFIRMED ))
         return;
