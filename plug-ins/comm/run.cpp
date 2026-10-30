@@ -132,7 +132,7 @@ public:
         if (isSmallLetter( walk->getFirstCommand( ) )) {
             if (moveRecursive( )) {
                 walk->clearFirstCommand( );
-                return RC_MOVE_OK;
+                return waitForParty( );
             }
             else
                 return RC_MOVE_FAIL;
@@ -197,13 +197,25 @@ public:
 
         if (moveRecursive( )) {
             walk->incSteps( );
-            return RC_MOVE_OK;
+            return waitForParty( );
         }
 
         return RC_MOVE_FAIL;
     }
 
 protected:
+    // A groupmate or charmed follower who could not keep up ends the run. On the
+    // last step the run is over anyway and the look is already shown, so only
+    // the warning is printed.
+    int waitForParty( )
+    {
+        if (!leftBehind || ch->in_room != to_room)
+            return RC_MOVE_OK;
+
+        ch->pecho( _("%1$^C1 отста%1$Gло|л|ла, и ты останавливаешься."), leftBehind );
+        return walk->isEmpty( ) ? RC_MOVE_OK : RC_MOVE_FAIL;
+    }
+
     void init( )
     {
         door = walk->getFirstDoor( );
@@ -231,6 +243,9 @@ protected:
             
         rc = getDoorStatus( ch );
         if (rc == RC_MOVE_OK || rc == RC_MOVE_CLOSED || rc == RC_MOVE_PASS_ALWAYS || rc == RC_MOVE_PASS_POSSIBLE)
+            return true;
+
+        if (rc == RC_MOVE_PASS_NEEDED && runnerHasKey( ))
             return true;
 
         return false;

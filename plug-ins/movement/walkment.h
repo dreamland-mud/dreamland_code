@@ -69,6 +69,10 @@ protected:
 
 
     bool silence;
+    // First groupmate or charmed follower who was standing next to the walker
+    // and did not make it this step; a run stops on it. Valid only during
+    // this movement.
+    Character *leftBehind;
     Object *boat;
     int boat_types;
 };

@@ -16,55 +16,6 @@
 #include "def.h"
 #include "l10n.h"
 
-/*--------------------------------------------------------------------
- *    unlock 
- *-------------------------------------------------------------------*/
-static void unlock_door( Character *ch, int door )
-{
-    // 'unlock door'
-    Object *key;
-    EXIT_DATA *pexit;
-    EXIT_DATA *pexit_rev = 0;
-    Room *room = ch->in_room;
-
-    pexit = ch->in_room->exit[door];
-
-    if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
-    {
-            ch->pecho( _("Здесь уже не заперто.") );
-            return;
-    }
-
-    if ( pexit->key <= 0 )
-    {
-            ch->pecho( _("К этой двери не существует ключа.") );
-            return;
-    }
-
-    if (!(key = get_key_carry( ch, pexit->key)))
-    {
-            ch->pecho( _("У тебя нет ключа.") );
-            return;
-    }
-
-    DoorName dn = direction_doorname_langtext(pexit, '4');
-    LangText doorname = dn.lt();
-
-    ch->pecho(_("Ты отпираешь %O5 и открываешь %w."), key, &doorname);
-    ch->recho(_("%^C1 отпирает %O5 и открывает %w."), ch, key, &doorname);
-
-    REMOVE_BIT(pexit->exit_info, EX_LOCKED | EX_CLOSED);
-
-    // unlock the other side
-    if ((pexit_rev = direction_reverse(room, door)))
-    {
-            REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED | EX_CLOSED );
-            DoorName dnr = direction_doorname_langtext(pexit_rev, '1');
-            LangText dnrlt = dnr.lt();
-            direction_target(room, door)->echo(POS_RESTING, _("%^w щелкает."), &dnrlt);
-    }
-}
-
 CMDRUNP( unlock )
 {
     char arg[MAX_INPUT_LENGTH];

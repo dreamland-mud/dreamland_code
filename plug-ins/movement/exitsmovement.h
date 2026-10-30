@@ -38,6 +38,8 @@ protected:
 
     virtual bool checkVisibility( Character * );
     virtual bool checkClosedDoor( Character * );
+    // A running walker carries the key to this locked door.
+    bool runnerHasKey( ) const;
     virtual int getDoorStatus(Character *);
             bool checkExitFlags( Character * );
 
