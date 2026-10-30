@@ -67,7 +67,9 @@ static void override_description(NPCharacter *mob, const XMLMultiString &cProtoF
 }
 
 // Does the race hand this trait to the character? A prototype can opt out of
-// a race trait with <affectsDel> (a grounded seagull, a wingless drake).
+// a race trait with <affectsDel>. Always pair `noaffects X` with a reviewed
+// aff del of X's bit (and drop X from the prototype's own <affects>), or the
+// body bit stays and char_update / affect_check keep putting it back.
 bool race_grants_trait(Character *ch, int sn)
 {
     if (!ch->getRace()->getAffects().isSet(sn))

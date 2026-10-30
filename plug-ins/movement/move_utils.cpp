@@ -14,6 +14,7 @@
 #include "lex.h"
 
 #include "character.h"
+#include "npcharacter.h"
 #include "affect.h"
 #include "skill.h"
 #include "room.h"
@@ -207,10 +208,12 @@ bool can_fly( Character *ch )
     if (IS_AFFECTED(ch, AFF_FLYING))
         return true;
         
-    // NPC bodies already carry the race bits (resolveBody), so the race mask
-    // only adds something for players. Reading it for NPCs would override a
-    // prototype that deliberately grounded a winged race.
-    if (!ch->is_npc( ) && ch->getRace( )->getAff( ).isSet( AFF_FLYING ))
+    // An NPC body already carries its prototype's race bits (resolveBody), so
+    // the race mask only matters for players and for NPCs whose race was
+    // changed after spawn (autoquest gangs, Fenia race setter). Reading it for
+    // an NPC in its own race would override a prototype that grounded it.
+    if (ch->getRace( )->getAff( ).isSet( AFF_FLYING )
+        && (!ch->is_npc( ) || ch->getRace( )->getName( ) != ch->getNPC( )->pIndexData->race))
         return true;
             
     for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content) {
