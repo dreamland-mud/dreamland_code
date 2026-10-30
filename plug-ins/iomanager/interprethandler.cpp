@@ -22,6 +22,7 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "player_utils.h"
+#include "char_weight.h"
 #include "lang.h"
 #include "commandinterpreter.h"
 #include "commandbase.h"
@@ -339,6 +340,14 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'M' :
             out << ch->max_mana;
+            break;
+
+        case 'b' :
+            out << Char::getCarryWeight( ch ) / 10;
+            break;
+
+        case 'B' :
+            out << Char::canCarryWeight( ch ) / 10;
             break;
 
         case 'T':
