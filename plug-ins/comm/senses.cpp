@@ -2,6 +2,8 @@
  *
  * ruffina, 2004
  */
+#include <algorithm>
+
 #include "commandtemplate.h"
 
 #include "wrapperbase.h"
@@ -10,8 +12,11 @@
 
 #include "commonattributes.h"
 #include "skill.h"
+#include "skillreference.h"
+#include "skill_utils.h"
 #include "affecthandler.h"
 #include "pcharacter.h"
+#include "pcharactermanager.h"
 #include "npcharacter.h"
 #include "room.h"
 #include "core/object.h"
@@ -24,6 +29,8 @@
 
 #include "def.h"
 #include "l10n.h"
+
+GSN(track);
 
 bool oprog_smell_liquid(Liquid *liq, Character *ch);
 
@@ -96,6 +103,47 @@ CMDRUNP( listen )
 
     oldact(_("Ты не видишь здесь этого."), ch, 0, 0, TO_CHAR);
 }        
+
+/*
+ * Trackers (rangers, mawgs by race) sniff out who left the room recently.
+ * Footprints of immortals hidden from the sniffer are skipped.
+ */
+static bool smell_tracks( Character *ch )
+{
+    if (!gsn_track->usable( ch ))
+        return false;
+
+    if (number_percent( ) >= gsn_track->getEffective( ch ) + skill_level_bonus( *gsn_track, ch ))
+        return false;
+
+    list<DLString> names;
+
+    for (auto &h: ch->in_room->history) {
+        if (!ch->is_npc( ) && h.name == ch->getPC( )->getName( ))
+            continue;
+
+        PCharacter *pc = PCharacterManager::findPlayer( h.name );
+        if (pc && (pc->invis_level > ch->get_trust( ) || pc->incog_level > ch->get_trust( )))
+            continue;
+
+        if (std::find( names.begin( ), names.end( ), h.name ) == names.end( ))
+            names.push_back( h.name );
+    }
+
+    if (names.empty( ))
+        return false;
+
+    DLString buf;
+    for (auto &n: names) {
+        if (!buf.empty( ))
+            buf << ", ";
+        buf << n;
+    }
+
+    ch->pecho( _("Ты чуешь здесь свежие следы: %s."), buf.c_str( ) );
+    gsn_track->improve( ch, true );
+    return true;
+}
 
 /*---------------------------------------------------------------------------
  * smell 
@@ -181,6 +229,7 @@ CMDRUNP( smell )
         }
 
         rc = afprog_smell( ch->in_room, ch, argument ) || rc;
+        rc = smell_tracks( ch ) || rc;
 
         if (!rc)
             ch->pecho(_("Вокруг пахнет вполне обычно."));
