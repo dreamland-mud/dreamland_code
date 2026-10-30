@@ -222,7 +222,7 @@ CMDRUNP( smell )
 
         if (!rc) {
             auto &smell = ch->in_room->pIndexData->smell;
-            if (!smell.empty()) {
+            if (!smell.emptyValues()) {
                 ch->pecho(smell);
                 rc = true;
             }
@@ -285,7 +285,7 @@ CMDRUNP( smell )
         if (oprog_smell( obj, ch, argument ))
             rc = true;
         
-        if (!rc && !obj->pIndexData->smell.empty( )) {
+        if (!rc && !obj->pIndexData->smell.emptyValues( )) {
             ch->pecho( obj->pIndexData->smell );
             rc = true;
         }
@@ -323,7 +323,7 @@ CMDRUNP( smell )
 
         if (!( rc = mprog_smell( victim, ch, argument ) )) {
             if (victim->is_npc( )) {
-                if (!victim->getNPC( )->pIndexData->smell.empty( )) {
+                if (!victim->getNPC( )->pIndexData->smell.emptyValues( )) {
                     ch->pecho( victim->getNPC( )->pIndexData->smell );
                     rc = true;
                 }
