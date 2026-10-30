@@ -180,6 +180,10 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     if (!usable( pch, false )) 
         return;     
 
+    // Before the learned <= 1 cut: a never practiced skill is the newbie case.
+    if (!success && !data.isTemporary( ))
+        hintPractice( pch, data.learned );
+
     if (data.learned <= 1)
         return;
     
@@ -194,9 +198,6 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         return;
 
     data.timer = 0;
-
-    if (!success)
-        hintPractice( pch, data.learned );
 
     if (pch->getRealLevel( ) > 19  && !IS_SET( pch->act, PLR_CONFIRMED ))
         return;
