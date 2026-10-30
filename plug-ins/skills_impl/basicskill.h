@@ -72,6 +72,7 @@ public:
     
     virtual int getEffective( Character * ) const;
     virtual int getAdept( PCharacter * ) const;
+    void hintPractice( PCharacter *, int learned ) const;
     virtual void practice( PCharacter * ) const;
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
     virtual int getMaximum( Character * ) const;
