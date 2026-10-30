@@ -56,6 +56,7 @@ protected:
     void damEffectDeathblowStun( );
     void damApplyReligion();
     
+    void damEffectCriticalWound( );
     void damEffectMasterHand( );
     void damEffectMasterSword( );
     void damEffectMasterStaff( );

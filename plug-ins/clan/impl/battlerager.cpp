@@ -344,25 +344,140 @@ SKILL_RUNP( truesight )
 
 /*
  * 'bandage' skill command
+ *
+ * Anyone can bandage a bleeding wound with a length of cloth (first aid). The
+ * battleragers' clan skill on top of that heals and speeds up regeneration.
+ * Hand-rolled instead of SKILL_RUNP: the template's run refuses everyone who
+ * cannot use the clan skill before the command body is reached.
  */
+#define OBJ_VNUM_LENGTH_OF_CLOTH 31237
 
-SKILL_RUNP( bandage )
+const char *bandageCommandTypeName = "SKILL(bandage)";
+
+struct BandageCommand : public DefaultSkillCommand,
+                        public ClassSelfRegistratorPlugin<bandageCommandTypeName> {
+    typedef ::Pointer<BandageCommand> Pointer;
+
+    BandageCommand( ) {
+        name[EN] = "bandage";
+    }
+
+    virtual void run( Character *ch, const DLString &args );
+    virtual void run( Character *ch, char *args );
+
+    virtual bool visible( Character *ch ) const {
+        return Command::visible( ch );
+    }
+
+    virtual const DLString &getType( ) const {
+        return ClassSelfRegistratorPlugin<bandageCommandTypeName>::getType( );
+    }
+};
+
+PluginInitializer<BandageCommand> dummyBandageCommand_init;
+
+/** The length of cloth a player needs for a bandage, or null. Mobs need none. */
+static Object * bandage_cloth( Character *ch )
+{
+    return get_obj_carry_vnum( ch, OBJ_VNUM_LENGTH_OF_CLOTH );
+}
+
+static bool bandage_has_cloth( Character *ch )
+{
+    if (ch->is_npc( ) || bandage_cloth( ch ))
+        return true;
+
+    ch->pecho( _("Для повязки нужен отрез ткани.") );
+    return false;
+}
+
+static void bandage_use_cloth( Character *ch )
+{
+    if (ch->is_npc( ))
+        return;
+
+    Object *cloth = bandage_cloth( ch );
+    if (cloth)
+        extract_obj( cloth );
+}
+
+/** Close a bleeding wound. True if there was one. */
+static bool bandage_stop_bleeding( Character *ch )
+{
+    if (!ch->isAffected( gsn_bleeding ))
+        return false;
+
+    affect_strip( ch, gsn_bleeding );
+    ch->pecho( _("Ты туго перетягиваешь рану, и кровь останавливается.") );
+    oldact( _("$c1 туго перетягивает свою рану."), ch, 0, 0, TO_ROOM );
+    return true;
+}
+
+/** Anyone: a length of cloth on a bleeding wound. No healing, no mana. */
+static void bandage_first_aid( Character *ch )
+{
+    if (!ch->isAffected( gsn_bleeding )) {
+        ch->pecho( _("Ты не истекаешь кровью, перевязывать нечего.") );
+        return;
+    }
+
+    if (!bandage_has_cloth( ch ))
+        return;
+
+    bandage_use_cloth( ch );
+    bandage_stop_bleeding( ch );
+    ch->setWaitViolence( 1 );
+}
+
+void BandageCommand::run( Character *ch, const DLString &args )
+{
+    if (SHADOW(ch)) {
+        ch->pecho( _("Как это наверное интересно смотрится со стороны -- бинтовать собственную тень.") );
+        oldact_p(_("$c1 пытается забинтовать свою собственную тень\n\r...похоже кому-то нужен доктор."),
+                ch, 0, 0, TO_ROOM,POS_RESTING);
+        return;
+    }
+
+    SkillPointer skill = getSkill( );
+    bool bleeding = ch->isAffected( gsn_bleeding );
+
+    // No wound: only the clan bandage has anything to do. Its own refusals
+    // (no clan power, no energy) come from DefaultSkillCommand::run.
+    if (!bleeding) {
+        if (ch->isAffected( gsn_bandage )) {
+            oldact(_("Ты уже перевяза$gло|л|ла свои раны!"),ch,0,0,TO_CHAR);
+            return;
+        }
+
+        if (!skill->visible( ch )) {
+            bandage_first_aid( ch );
+            return;
+        }
+
+        if (skill->usable( ch, false ) && !bandage_has_cloth( ch ))
+            return;
+
+        DefaultSkillCommand::run( ch, args );
+        return;
+    }
+
+    // A wound: the clan bandage when it can be had, else a plain dressing,
+    // like anyone else's (already bandaged, no clan power, no energy).
+    if (!skill->usable( ch, false ) || ch->isAffected( gsn_bandage )
+        || ch->mana < skill->getMana( ch ) || ch->move < skill->getMoves( ch )) {
+        bandage_first_aid( ch );
+        return;
+    }
+
+    if (!bandage_has_cloth( ch ))
+        return;
+
+    DefaultSkillCommand::run( ch, args );
+}
+
+void BandageCommand::run( Character* ch, char *argument )
 {
         int heal;
-
-        if (ch->isAffected(gsn_bandage))
-        {
-                oldact(_("Ты уже перевяза$gло|л|ла свои раны!"),ch,0,0,TO_CHAR);
-                return;
-        }
-
-        if (SHADOW(ch))
-        {
-                ch->pecho( _("Как это наверное интересно смотрится со стороны -- бинтовать собственную тень.") );
-                oldact_p(_("$c1 пытается забинтовать свою собственную тень\n\r...похоже кому-то нужен доктор."),
-                        ch, 0, 0, TO_ROOM,POS_RESTING);
-                return;
-        }
 
         int skill = ch->is_npc() ? 100 : gsn_bandage->getEffective( ch );
         if ( number_percent() < skill )
@@ -374,6 +489,8 @@ SKILL_RUNP( bandage )
                 ch->pecho( _("Ты накладываешь повязку на свою рану!") );
                 oldact(_("$c1 перевязывает свои раны."),ch,0,0,TO_ROOM);
                 gsn_bandage->improve( ch, true );
+                bandage_use_cloth( ch );
+                bandage_stop_bleeding( ch );
 
                 bool upgraded = clan_char_owns( ch, "bandage+" );
 
@@ -382,10 +499,9 @@ SKILL_RUNP( bandage )
                 update_pos( ch );
                 ch->pecho( _("Тебе становится лучше!") );
 
-                if (upgraded && (ch->affected.find( gsn_poison ) || ch->affected.find( gsn_bleeding ))) {
+                if (upgraded && ch->affected.find( gsn_poison )) {
                         affect_strip( ch, gsn_poison );
-                        affect_strip( ch, gsn_bleeding );
-                        ch->pecho( _("Тугая повязка останавливает кровь и вытягивает яд.") );
+                        ch->pecho( _("Тугая повязка вытягивает яд.") );
                 }
 
                 af.bitvector.setTable(&affect_flags);
