@@ -8,6 +8,7 @@
 #include "movetypes.h"
 #include "move_utils.h"
 #include "doors.h"
+#include "loadsave.h"
 
 #include "feniamanager.h"
 #include "wrapperbase.h"
@@ -192,6 +193,13 @@ int ExitsMovement::getDoorStatus(Character *wch)
         return RC_MOVE_CLOSED;
 }
 
+bool ExitsMovement::runnerHasKey( ) const
+{
+    return movetype == MOVETYPE_RUNNING && pexit
+           && IS_SET(pexit->exit_info, EX_LOCKED)
+           && pexit->key > 0 && get_key_carry( ch, pexit->key );
+}
+
 bool ExitsMovement::checkClosedDoor( Character *wch )
 {
     rc = getDoorStatus(wch);
@@ -210,7 +218,16 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
         return false;
     }
 
-    // Attempt to open closed door when running.
+    // Attempt to open closed door when running, unlocking it first if
+    // the runner carries the key.
+    if (runnerHasKey( ))
+    {
+        unlock_door(ch, door);
+        rc = RC_MOVE_OK;
+        exit_info = pexit->exit_info;
+        return true;
+    }
+
     if (movetype == MOVETYPE_RUNNING && pexit && !IS_SET(pexit->exit_info, EX_LOCKED)) 
     {
         open_door(ch, door);

@@ -24,6 +24,7 @@
 #include "act.h"
 #include "loadsave.h"
 #include "interp.h"
+#include "follow_utils.h"
 #include "merc.h"
 
 #include "def.h"
@@ -38,6 +39,7 @@ Walkment::Walkment( Character *ch )
             : Movement( ch )
 {
     silence = false;
+    leftBehind = 0;
 
     Character *whoHasBoat;
 
@@ -740,6 +742,10 @@ void Walkment::moveFollowers( Character *wch )
         if ((*f)->in_room == from_room) {
             fch = *f;
             int frc = moveOneFollower( wch, fch );
+
+            if (fch->in_room == from_room && from_room != to_room && !leftBehind
+                && (IS_CHARMED(fch) || is_same_group( wch, fch )))
+                leftBehind = fch;
 
             // A charmed pet left behind used to be silent -- warn its owner why
             // (trello 501). The reason is the follower's own refusal code, not a
