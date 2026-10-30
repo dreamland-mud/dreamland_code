@@ -80,6 +80,11 @@ unsigned long long mob_index_data::bodyStamp()
     return h;
 }
 
+bitstring_t mob_index_data::honouredAffDel() const
+{
+    return (reviewed & (1 << Body::BS_AFF)) ? bodyDel[MOBSET_AFF] : 0;
+}
+
 void mob_index_data::bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) const
 {
     bitstring_t now = (unsigned int)const_cast<mob_index_data *>(this)->bodyBits(mobset);

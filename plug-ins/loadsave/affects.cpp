@@ -355,9 +355,11 @@ static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affec
         }
 }
 
+bool race_grants_trait(Character *ch, int sn);
+
 static bool lists_trait(Character *ch, int sn)
 {
-    if (ch->getRace()->getAffects().isSet(sn))
+    if (race_grants_trait(ch, sn))
         return true;
 
     return ch->is_npc() && ch->getNPC()->pIndexData->affects.isSet(sn);

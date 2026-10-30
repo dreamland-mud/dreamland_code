@@ -545,6 +545,11 @@ void char_update( )
         // with a Fenia call per granted affect.
         bitstring_t raceAff = ch->getRace( )->getAff( ).getValue( );
 
+        // A prototype that removed a race bit from its body (reviewed aff del)
+        // must not trip the refresh on every tick for the bit it gave up.
+        if (ch->is_npc( ))
+            raceAff &= ~ch->getNPC( )->pIndexData->honouredAffDel( );
+
         if ((ch->affected_by.getValue( ) & raceAff) != raceAff)
             afprog_refresh( ch, true );
 

@@ -76,6 +76,8 @@ struct mob_index_data
     GlobalBitvector     professions;
     GlobalBitvector religion;
     GlobalBitvector affects;
+    // Race traits (race <affects>) this prototype opts out of: <affectsDel>.
+    GlobalBitvector affectsDel;
     GlobalBitvector behaviors;
     Json::Value props;
     Grammar::Number     gram_number;
@@ -126,6 +128,8 @@ struct mob_index_data
     int &bodyBits(int mobset);
     /** Authored diff for asave: the loaded add/del plus any direct edit made since load. */
     void bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) const;
+    /** Aff bits the body resolver actually removed: authored dels, honoured only under <reviewed>aff. */
+    bitstring_t honouredAffDel() const;
 
     /** Return props value for the key (props[key] or props["xxx"][key]). */
     DLString getProperty(const DLString &key) const;
