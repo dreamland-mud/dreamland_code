@@ -36,6 +36,7 @@ GSN(dispel_affects);
 GSN(dispel_magic);
 GSN(bat_sworm);
 GSN(bat_swarm);
+GSN(manacles);
 GSN(ground_strike);
 GSN(critical_strike);
 GSN(dominate);
@@ -226,9 +227,27 @@ void passive_refresh( Character *ch, bool verbose );
  *  work with profiles
  *------------------------------------------------------------------------*/
 
-// obj_update only ticks objects in the world, so item timers froze while the
-// owner was offline. Charge the offline minutes on load so every item timer runs
-// on real time, like limited items do. An expired item is left at 1 minute: it
+// Affect durations count ticks (one tick is a minute). An expired affect is left
+// at 0: the first tick after login removes it through the usual onRemove path.
+// Debuffs on a character stay frozen, so quitting does not wait out a curse or
+// the ruler manacles (onUpdate damage is not replayed either).
+static void affects_charge_offline_time( AffectList &affects, long minutes, bool keepDebuffs )
+{
+    for (auto &paf: affects) {
+        if (paf->duration <= 0)
+            continue;
+
+        if (keepDebuffs && (paf->type == gsn_manacles
+                            || ((int)paf->type >= 0 && paf->type->isNegative( ))))
+            continue;
+
+        paf->duration = max( 0L, paf->duration - minutes );
+    }
+}
+
+// obj_update only ticks objects in the world, so item timers and enchantments froze
+// while the owner was offline. Charge the offline minutes on load so they run on
+// real time, like limited items do. An expired item is left at 1 minute: it
 // crumbles on the first tick after login, with the usual message.
 static void obj_charge_offline_time( Object *list, long minutes )
 {
@@ -236,6 +255,7 @@ static void obj_charge_offline_time( Object *list, long minutes )
         if (obj->timer > 0)
             obj->timer = max( 1L, obj->timer - minutes );
 
+        affects_charge_offline_time( obj->affected, minutes, false );
         obj_charge_offline_time( obj->contains, minutes );
     }
 }
@@ -300,8 +320,13 @@ bool PCharacter::load( )
     time_t lastSave = getLastAccessTime( ).getTime( );
     if (lastSave > 0) {
         long minutes = (dreamland->getCurrentTime( ) - lastSave) / Date::SECOND_IN_MINUTE;
-        if (minutes > 0)
+        if (minutes > 0) {
             obj_charge_offline_time( carrying, minutes );
+            affects_charge_offline_time( affected, minutes, true );
+
+            if (pet)
+                affects_charge_offline_time( pet->affected, minutes, true );
+        }
     }
 
     if (!get_room_instance( start_room )) {
