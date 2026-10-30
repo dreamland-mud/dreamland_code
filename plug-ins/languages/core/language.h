@@ -102,9 +102,10 @@ public:
     virtual bool matchesUnstrict( const DLString &str ) const;
     virtual bool matchesSubstring( const DLString &str ) const;
     virtual const DLString& getNameFor( Character * ) const;
-    // Per-language name pad for a given tongue. NOT named getNameFor: that would
-    // silently override Skill::getNameFor(lang_t) and leak declension pads into
-    // every polymorphic skill->getNameFor call (questor scrolls, skill headers).
+    // Nominative name in a tongue, pads stripped: polymorphic skill->getNameFor
+    // callers (affect lines, questor scrolls, skill headers) print it raw.
+    virtual const DLString& getNameFor( lang_t ) const;
+    // Full declension pad for a given tongue.
     const DLString& getNamePad( lang_t ) const;
     virtual AffectHandler::Pointer getAffect( );
     virtual Spell::Pointer getSpell( ) const;
@@ -160,6 +161,10 @@ protected:
     static const int MAX_POWER_WORLD;
     static const int MAX_POWER_DREAM;
     static const Enumeration defaultPosition;
+
+private:
+    // getNameFor(lang_t) storage: it returns a reference.
+    mutable std::map<lang_t, DLString> nominatives;
 };
 
 
