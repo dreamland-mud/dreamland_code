@@ -745,10 +745,15 @@ NMI_GET(PlayerWrapper, aquest, "статистика побед в арийны�
 
         availableTotal++;
 
-        if (aquest_can_participate_ever(player, quest))
-            availableThisLife++;
-
         AreaQuestData &qdata = aquest_data(player, quest->vnum.toString());
+
+        // A quest won this life always counts. Otherwise it must still be
+        // reachable: mutually exclusive ones (one craft per life) drop out
+        // once the choice is made.
+        if (qdata.thisLife > 0
+            || (aquest_can_participate_ever(player, quest)
+                && !aquest_closed_this_life(player, quest)))
+            availableThisLife++;
 
         if (qdata.total > 0)
             victoriesTotal++;

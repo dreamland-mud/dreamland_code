@@ -235,8 +235,10 @@ int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
 
     weapon = wear_wield->find( ch );
     
+    // Race size, not the current one: a +size item or spell would let both on,
+    // and nothing takes either off when it wears out.
     if (weapon 
-        && ch->getSize( ) < SIZE_LARGE 
+        && ch->getRace( )->getSize( ) < SIZE_LARGE 
         && !ch->is_npc()
         && IS_WEAPON_STAT(weapon, WEAPON_TWO_HANDS))
     {
@@ -403,7 +405,7 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
         && IS_SET(flags, F_WEAR_VERBOSE)
         && !ch->is_npc( )
         && IS_SET(ch->getPC( )->config, CONFIG_TWOHANDS)
-        && ch->getSize( ) < SIZE_LARGE
+        && ch->getRace( )->getSize( ) < SIZE_LARGE
         && !(ch->getRace( )->getSize( ) < SIZE_HUGE && wear_second_wield->find( ch ))
         && ( shield = wear_shield->find( ch ) ))
     {
@@ -412,7 +414,7 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
 
     if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS)
         && !ch->is_npc( )
-        && ((ch->getSize( ) < SIZE_LARGE && wear_shield->find( ch ))
+        && ((ch->getRace( )->getSize( ) < SIZE_LARGE && wear_shield->find( ch ))
             || (ch->getRace( )->getSize( ) < SIZE_HUGE && wear_second_wield->find( ch ))))
     {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
