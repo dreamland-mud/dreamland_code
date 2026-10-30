@@ -352,6 +352,26 @@ static bool taggedRole( const DLString &r )
     return r == "victim" || r == "gangster" || r == "thief" || r == "charmtarget";
 }
 
+// A served mob the hero must find and hand something to: the waiting client of an
+// item-return quest, or the kidnapped child. Tagged green (not a kill) until the
+// quest is complete, so it stands out in a crowded room and in scan.
+bool MobQuestTarget::awaitsHero( ) const
+{
+    const DLString &r = role.getValue( );
+    if (r != "client" && r != "prince")
+        return false;
+
+    ::Pointer<FeniaQuest> q = getFeniaQuest( );
+    if (!q || q->isComplete( ))
+        return false;
+
+    if (r == "prince")
+        return true;
+
+    const DLString &t = questType.getValue( );
+    return t == "StealQuest" || t == "LocateQuest" || t == "ButcherQuest";
+}
+
 void MobQuestTarget::show( Character *viewer, std::basic_ostringstream<char> &buf )
 {
     bool mine = ourHero( viewer );
@@ -375,39 +395,34 @@ void MobQuestTarget::show( Character *viewer, std::basic_ostringstream<char> &bu
             buf << fmt( viewer, _("{R[ВОР] {x") );
         else
             buf << fmt( viewer, _("{y[ВОР %1$s] {x"), getHeroName( ).c_str( ) );
-    } else if (r == "client") {
-        // The awaiting-client hint (Report 7587). The C++ concrete quests tagged
-        // their waiting mob per type (RobbedVictim/LocateCustomer/SteakCustomer
-        // ::show); the Fenia port marks role "client" and this branch never
-        // existed, so the hint vanished for every generated item-return quest.
-        // Hero-only, matching the legacy gating. HealQuest also marks "client"
-        // but had no legacy marker, so it stays unmarked here. The !isComplete()
-        // clause matches legacy too: once the hero hands the item over the mob
-        // is no longer waiting, so it falls silent before the walk to turn-in.
-        ::Pointer<FeniaQuest> q = getFeniaQuest( );
-        if (mine && q && !q->isComplete( )) {
-            const DLString &t = questType.getValue( );
-            if (t == "StealQuest")
-                buf << fmt( viewer, _("{x({YХныкает{x) ") );
-            else if (t == "LocateQuest")
-                buf << fmt( viewer, _("{x({YЖдет кого-то{x) ") );
-            else if (t == "ButcherQuest")
-                buf << fmt( viewer, _("{x({YТерпеливо ждет{x) ") );
+    } else if (awaitsHero( )) {
+        // Item-return client (Report 7587) and kidnap child (report [551]): a green
+        // [ЦЕЛЬ] -- deliberately not red, nobody is to be killed -- plus the legacy
+        // per-type hint for the hero. HealQuest also marks "client" but never had a
+        // marker, so it stays unmarked.
+        if (!mine) {
+            buf << fmt( viewer, _("{y[ЦЕЛЬ %1$s] {x"), getHeroName( ).c_str( ) );
+            return;
         }
-    } else if (r == "prince") {
-        // Kidnap rescue kid (report [551]): a green whimper hint so the hero can
-        // pick the child out of a room. Deliberately NOT a red [ЦЕЛЬ] -- it is a
-        // rescue, not a kill. Hero-only, until the escort is done.
-        ::Pointer<FeniaQuest> q = getFeniaQuest( );
-        if (mine && q && !q->isComplete( ))
+
+        buf << fmt( viewer, _("{G[ЦЕЛЬ] {x") );
+
+        const DLString &t = questType.getValue( );
+        if (r == "prince")
             buf << fmt( viewer, _("{x({YХнычет{x) ") );
+        else if (t == "StealQuest")
+            buf << fmt( viewer, _("{x({YХныкает{x) ") );
+        else if (t == "LocateQuest")
+            buf << fmt( viewer, _("{x({YЖдет кого-то{x) ") );
+        else if (t == "ButcherQuest")
+            buf << fmt( viewer, _("{x({YТерпеливо ждет{x) ") );
     }
 }
 
 bool MobQuestTarget::isQuestTarget( Character *viewer ) const
 {
     return (ourHero( viewer ) || ourHeroGroup( viewer ))
-           && taggedRole( role.getValue( ) );
+           && (taggedRole( role.getValue( ) ) || awaitsHero( ));
 }
 
 /*--------------------------------------------------------------------------
@@ -478,9 +493,11 @@ void ObjQuestTarget::show( Character *viewer, ostringstream &buf )
     if (!mine && !group)
         return;
 
-    // "mark" is the kidnap quest's give-item (report [551]): tag it like loot so
-    // the hero can tell at a glance which carried item to hand the child.
-    if (role.getValue( ) == "loot" || role.getValue( ) == "mark") {
+    // "mark" is the kidnap quest's give-item (report [551]), "chest"/"key" the
+    // steal quest's locked stash: tag them like loot so the hero can tell at a
+    // glance which item the quest is about.
+    const DLString &r = role.getValue( );
+    if (r == "loot" || r == "mark" || r == "chest" || r == "key") {
         if (mine)
             buf << fmt( viewer, _("{R[ЦЕЛЬ] {x") );
         else

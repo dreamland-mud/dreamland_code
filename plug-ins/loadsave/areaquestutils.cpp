@@ -136,6 +136,24 @@ static DLString aqprog_canstart(PCharacter *ch, AreaQuest *q)
     return DLString::emptyString;
 }
 
+/** Non-empty if the quest's onCanEverStart closes it for the rest of ch's life
+ *  (e.g. the one craft slot is already taken). Unlike onCanStart it must not
+ *  refuse for passing reasons such as time of day or too many followers. */
+static DLString aqprog_canever(PCharacter *ch, AreaQuest *q)
+{
+    FENIA_STR_CALL(q, "CanEverStart", "C", ch);
+    return DLString::emptyString;
+}
+
+bool aquest_closed_this_life(PCMemoryInterface *pci, AreaQuest *q)
+{
+    PCharacter *ch = pci->getPlayer();
+    if (!ch)
+        return false;
+
+    return !aqprog_canever(ch, q).empty();
+}
+
 // Return true if player can satisfy all requirements at some point in life
 bool aquest_can_participate_ever(PCMemoryInterface *pci, AreaQuest *q) 
 {

@@ -73,6 +73,7 @@ protected:
     virtual bool specIdle( );
 
     ::Pointer<FeniaQuest> getFeniaQuest( ) const;
+    bool awaitsHero( ) const;
 
     /** How this mob died, as the scenario sees it: "hero", "group", "other" or
      *  "suicide". Also applies the timer and state change each case has always

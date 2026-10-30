@@ -33,6 +33,8 @@ AreaQuest *get_area_quest(int questId);
 
 bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuestData &qdata, bool ignoreCancelCooldown = false);
 bool aquest_can_participate_ever(PCMemoryInterface *pci, AreaQuest *q);
+// Online players only: the quest's onCanEverStart says it is out of reach this life.
+bool aquest_closed_this_life(PCMemoryInterface *pci, AreaQuest *q);
 
 // Find the most recent area quest id for this player.
 DLString aquest_find_latest(PCMemoryInterface *ch);
