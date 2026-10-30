@@ -1524,23 +1524,38 @@ static DLString find_name_argument( const char *argument )
 CMDWIZP( rwhere )
 {
     ostringstream buf;
-    bool found = false;
+    int found = 0, max_found = 200;
+    lang_t lang = Player::lang( ch );
+    DLString pattern = DLString( argument ).colourStrip( ).toLower( );
 
-    if (argument[0] == '\0') {
+    pattern.stripWhiteSpace( );
+    if (pattern.empty( )) {
         ch->pecho(_("Найти какую комнату?"));
         return;
     }
 
-    for (auto &r: roomInstances)
-        if (is_name(argument, r->getName())) {
-            buf << fmt(0, "[%6d] %-30s %s\r\n", r->vnum, r->getName(), r->areaName().c_str());
-            found = true;
+    // Case-insensitive substring over the room's EN, RU and UA names.
+    for (auto &r: roomInstances) {
+        bool match = false;
+
+        for (int l = LANG_MIN; l < LANG_MAX && !match; l++) {
+            DLString name = DLString( r->pIndexData->name.get( (lang_t)l ) ).colourStrip( ).toLower( );
+            match = name.find( pattern ) != DLString::npos;
         }
+
+        if (!match)
+            continue;
+
+        buf << fmt(0, "[%6d] %-30s %s\r\n", r->vnum, r->getName( lang ), r->areaName( lang ).c_str( ));
+
+        if (++found >= max_found)
+            break;
+    }
 
     if (!found)
         ch->pecho(_("Комната с таким именем не найдена."));
     else
-        ch->send_to(buf);
+        page_to_char( buf.str( ).c_str( ), ch );
 }
 
 CMDWIZP( owhere )
