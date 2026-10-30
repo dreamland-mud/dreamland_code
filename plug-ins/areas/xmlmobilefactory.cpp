@@ -63,6 +63,7 @@ XMLMobileFactory::XMLMobileFactory( ) :
                           professions(professionManager),
                           religion(religionManager),
                           affects(skillManager),
+                          affectsDel(skillManager),
                           behaviors(behaviorManager)
 {
 }
@@ -193,6 +194,7 @@ XMLMobileFactory::init(const mob_index_data *mob)
     professions.set(mob->professions);
     religion.set(mob->religion);
     affects.set(mob->affects);
+    affectsDel.set(mob->affectsDel);
     behaviors.set(mob->behaviors);
     
     if (mob->gram_number != Grammar::Number::SINGULAR)
@@ -301,6 +303,7 @@ XMLMobileFactory::compat(mob_index_data *mob)
     mob->professions.set(professions);
     mob->religion.set(religion);
     mob->affects.set(affects);
+    mob->affectsDel.set(affectsDel);
     mob->behaviors.set(behaviors);
     
     if(!gram_number.getValue( ).empty( ))

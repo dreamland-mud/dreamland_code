@@ -207,7 +207,10 @@ bool can_fly( Character *ch )
     if (IS_AFFECTED(ch, AFF_FLYING))
         return true;
         
-    if (ch->getRace( )->getAff( ).isSet( AFF_FLYING ))
+    // NPC bodies already carry the race bits (resolveBody), so the race mask
+    // only adds something for players. Reading it for NPCs would override a
+    // prototype that deliberately grounded a winged race.
+    if (!ch->is_npc( ) && ch->getRace( )->getAff( ).isSet( AFF_FLYING ))
         return true;
             
     for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content) {

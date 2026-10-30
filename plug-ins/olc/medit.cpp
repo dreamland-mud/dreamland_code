@@ -212,6 +212,8 @@ void OLCStateMobile::copyParameters( MOB_INDEX_DATA *original )
     mob.religion.set(original->religion);
     mob.affects.clear();
     mob.affects.set(original->affects);
+    mob.affectsDel.clear();
+    mob.affectsDel.set(original->affectsDel);
     mob.clan = original->clan;
     copy_reform_fields(mob, *original);
 }
@@ -382,6 +384,8 @@ void OLCStateMobile::commit()
     original->religion.set(mob.religion);
     original->affects.clear();
     original->affects.set(mob.affects);
+    original->affectsDel.clear();
+    original->affectsDel.set(mob.affectsDel);
     original->clan = mob.clan;
     copy_reform_fields(*original, mob);
 
@@ -469,6 +473,7 @@ MEDIT(show)
 
     ptc(ch, "{CAff:{x         [{W%s{x] {D(oaff){x\n\r", affect_flags.names(mob.affected_by).c_str());
     ptc(ch, "{CAffects:{x     [{W%s{x] {D(aff){x\n\r", mob.affects.toString().c_str());
+    ptc(ch, "{CNoAffects:{x   [{W%s{x] {D(race traits dropped, noaffects){x\n\r", mob.affectsDel.toString().c_str());
     ptc(ch, "{CDet:{x         [{W%s{x] {D(? detect_flags){x\n\r", detect_flags.names(mob.detection).c_str());
 
     ptc(ch, "{CPosition:{x    starting [{W%s{x]  default [{W%s{x] {D(? position_table){x\n\r",
@@ -843,6 +848,11 @@ MEDIT(uashort)
 MEDIT(rushort)
 {
     return editor(argument, mob.short_descr[RU], ED_NO_NEWLINE);
+}
+
+MEDIT(noaffects)
+{
+    return globalBitvectorEdit<Skill>(mob.affectsDel);
 }
 
 MEDIT(name)

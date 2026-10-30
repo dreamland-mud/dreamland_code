@@ -27,6 +27,7 @@ mob_index_data::mob_index_data( )
                        professions( professionManager ),
                        religion( religionManager ),
                        affects(skillManager),
+                       affectsDel(skillManager),
                        behaviors(behaviorManager),
                        wrapper ( 0 ),
                        clan(clan_none)

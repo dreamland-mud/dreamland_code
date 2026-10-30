@@ -49,6 +49,7 @@ public:
     XML_VARIABLE XMLGlobalBitvector professions;
     XML_VARIABLE XMLGlobalBitvector religion;
     XML_VARIABLE XMLGlobalBitvector affects;
+    XML_VARIABLE XMLGlobalBitvector affectsDel;
     XML_VARIABLE XMLGlobalBitvector behaviors;
     XML_VARIABLE XMLStringNoEmpty gram_number; // TODO
     XML_VARIABLE XMLClanReference clan;

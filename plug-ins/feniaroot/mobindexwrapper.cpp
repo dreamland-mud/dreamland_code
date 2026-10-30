@@ -274,6 +274,12 @@ NMI_GET( MobIndexWrapper, affects, "какие аффекты вешаются �
     return target->affects.toString( );
 }
 
+NMI_GET( MobIndexWrapper, affectsDel, "какие расовые аффекты прототип отменяет (medit noaffects)") 
+{
+    checkTarget( );
+    return target->affectsDel.toString( );
+}
+
 NMI_GET( MobIndexWrapper, religion, "какие религии исповедует (reledit list)") 
 {
     checkTarget( );

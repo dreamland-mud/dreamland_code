@@ -66,13 +66,23 @@ static void override_description(NPCharacter *mob, const XMLMultiString &cProtoF
         (mob->*method)(result, lang);
 }
 
+// Does the race hand this trait to the character? A prototype can opt out of
+// a race trait with <affectsDel> (a grounded seagull, a wingless drake).
+bool race_grants_trait(Character *ch, int sn)
+{
+    if (!ch->getRace()->getAffects().isSet(sn))
+        return false;
+
+    return !ch->is_npc() || !ch->getNPC()->pIndexData->affectsDel.isSet(sn);
+}
+
 // Refresh race (and proto) affects on a character. Called when a character is created or periodically from char_update().
 void afprog_refresh(Character *ch, bool verbose)
 {
     SpellTarget::Pointer spellTarget(NEW, ch);
 
     for (int sn = 0; sn < skillManager->size(); sn++) {
-        bool hasAffect = ch->getRace()->getAffects().isSet(sn);
+        bool hasAffect = race_grants_trait(ch, sn);
 
         if (ch->is_npc()) {
             hasAffect |= ch->getNPC()->pIndexData->affects.isSet(sn);
@@ -222,7 +232,7 @@ void item_stealth_refresh(Character *ch, bool verbose)
                 ah->onRefresh( spellTarget, verbose );
             }
         }
-        else if (!worn && realAffect && !ch->getRace( )->getAffects( ).isSet( sn )) {
+        else if (!worn && realAffect && !race_grants_trait( ch, sn )) {
             // Gear gone and the race doesn't grant it: strip only our own permanent
             // grant (duration -1). A cast/commanded stealth (finite duration) and a
             // racial one (kept by afprog_refresh, excluded above) are left alone.
