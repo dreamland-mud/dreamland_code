@@ -147,7 +147,8 @@ static bool is_retired_behavior( const DLString &type )
 {
     return type == "ShopTrader"
         || type == "MansionKeyMaker"
-        || type == "CardSellerBehavior";
+        || type == "CardSellerBehavior"
+        || type == "QuestTrader";
 }
 
 void MobileBehaviorManager::parse( NPCharacter * mob, FILE *fp ) {

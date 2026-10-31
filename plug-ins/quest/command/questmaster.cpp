@@ -4,6 +4,7 @@
  */
 #include <vector>
 
+#include "pcharacter.h"
 #include "player_utils.h"
 #include "questmaster.h"
 
@@ -27,19 +28,42 @@ bool QuestMaster::specIdle( )
 {
     // The ambient invite moved to the `questmasterchat` Fenia behavior (onSpec),
     // attached alongside this C++ behavior. Neutered here so the two do not both
-    // announce; this C++ behavior stays attached only for occupation discovery
+    // announce; this C++ behavior stays attached for the questor commands
     // (getOccupation / canGiveQuest below).
     return false;
 }
 
 int QuestMaster::getOccupation( )
 {
-    return Questor::getOccupation( ) | QuestTrader::getOccupation( );
+    return Questor::getOccupation( ) | BasicMobileDestiny::getOccupation( );
 }
 
-bool QuestMaster::canGiveQuest( Character *ach )
+bool QuestMaster::canGiveQuest( Character *client )
 {
-    return QuestTrader::canServeClient( ach );
+    if (client->is_npc( ))
+        return false;
+
+    if (IS_GHOST( client )) {
+        say_act( client, ch, _("Наслажденье жизнью недоступно призракам.") );
+        return false;
+    }
+
+    if (IS_CHARMED(client)) {
+        say_act( client, ch, _("Ты не можешь сделать этого, пока ты не владеешь собой!") );
+        return false;
+    }
+
+    if (ch->fighting) {
+        say_act( client, ch, _("Подожди немного, $c1, мне сейчас не до тебя.") );
+        return false;
+    }
+
+    if (!ch->can_see( client )) {
+        say_act( client, ch, _("Я не общаюсь с невидимками.") );
+        return false;
+    }
+
+    return true;
 }
 
 static bool my_message(const char *msg)

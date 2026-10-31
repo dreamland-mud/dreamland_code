@@ -177,7 +177,7 @@ public:
     bool hasOwner( const Character * ) const;
 
     /** True for a personal hero quest-reward item (quest girth/ring/weapon/bag/
-     *  keyring). Mirrors OBJ_VNUM_QUEST* / refit_eligible_vnum in questtrader.cpp
+     *  keyring). Mirrors OBJ_VNUM_QUEST* / isHero in dreamland_fenia utils/questtrade
      *  -- the set a remort preserves to the Lost and Found and the quest-trader
      *  can refit; keep both in sync if the set changes. */
     bool isPersonalQuestReward( ) const;
