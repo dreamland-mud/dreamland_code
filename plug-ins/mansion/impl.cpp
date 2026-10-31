@@ -20,7 +20,6 @@ extern "C"
         Plugin::registerPlugin<HomeRecall>( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeHomeRecall> >( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeMansionKey> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<MansionKeyMaker> >( ppl );
             
         return ppl;
     }

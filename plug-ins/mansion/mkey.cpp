@@ -6,11 +6,14 @@
 
 #include "mkey.h"
 
+#include "register-impl.h"
+#include "reglist.h"
+
 #include "logstream.h"
 #include "class.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "core/behavior/behavior_utils.h"
+#include "interp.h"
 #include "pcharactermanager.h"
 #include "arg_utils.h"
 #include "act.h"
@@ -48,26 +51,14 @@ COMMAND(MKey, "mkey")
         }
     }
     
-    if (arg_is_list( cmd ) || arg_is(cmd, "buy")) {
-        MansionKeyMaker::Pointer maker;
+    // The key maker is a Fenia shop now (utils/keymaker): route to list/buy.
+    if (arg_is_list( cmd )) {
+        interpret_raw( ch, "list" );
+        return;
+    }
 
-        maker = find_people_behavior<MansionKeyMaker>( ch->in_room );
-
-        if (!maker) {
-            ch->pecho(_("Здесь нет ключника."));
-            return;
-        }
-
-        if (ch->is_npc( )) {
-            ch->pecho(_("Ты бездомное."));
-            return;
-        }
-        
-        if (arg_is_list( cmd ))
-            maker->doList( ch->getPC( ) );
-        else
-            maker->doBuy( ch->getPC( ), arguments );
-
+    if (arg_is(cmd, "buy")) {
+        interpret_raw( ch, "buy", "%s", arguments.c_str( ) );
         return;
     }
         
@@ -241,155 +232,16 @@ void MKey::usage( Character *ch )
 }
 
 /*-------------------------------------------------------------------------
- * MansionKeyMaker 
+ * XMLAttributeMansionKey
  *------------------------------------------------------------------------*/
-void MansionKeyMaker::toStream( Character *client, ostringstream &buf ) 
+Scripting::Register XMLAttributeMansionKey::toRegister() const
 {
-    XMLAttributeMansionKey::Pointer attr;
-    XMLVectorBase<XMLInteger>::iterator i;
-    
-    if (client->is_npc( ))
-        return;
+    using namespace Scripting;
+    Register attrReg = Register::handler<RegList>();
+    RegList *attrList = attrReg.toHandler().getDynamicPointer<RegList>();
 
-    attr = client->getPC( )->getAttributes( ).findAttr<XMLAttributeMansionKey>( "mkey" );
-    
-    if (!attr) 
-        return;
+    for (auto &k: keys)
+        attrList->push_back(Register(k.getValue()));
 
-    for (i = attr->keys.begin( ); i != attr->keys.end( ); i++) {
-        int vnum = i->getValue( );
-        OBJ_INDEX_DATA *pKeyIndex = get_obj_index( vnum );
-
-        if (!pKeyIndex) 
-            LogStream::sendError( ) << "Wrong key vnum " << vnum << " for character " << client->getNameC( ) << endl;
-        else        
-            // russian_case() just picks a segment out of a Flexer pad, so it is
-            // the identity on an English name and collapses a Ukrainian one the
-            // same way it does a Russian one.
-            buf << "     * " << russian_case( pKeyIndex->getShortDescr(viewerLang(client)), '1' )
-                << " ({c" << String::toString(pKeyIndex->keyword) << "{x)" << endl;
-    }
-}
-
-void MansionKeyMaker::msgListEmpty( Character *client ) 
-{
-    say_act( client, getKeeper( ), _("У тебя нет ключей ни от какого дома.") );
-}
-
-void MansionKeyMaker::msgListBefore( Character *client ) 
-{
-    tell_dim( client, getKeeper( ), _("Я могу изготовить для тебя такие ключи: ") );
-}
-
-void MansionKeyMaker::msgListAfter( Character *client ) 
-{
-    client->pecho("");
-    tell_dim( client, getKeeper( ), _("За свою работу я потребую $n4."), price->toString( client ).c_str( ) );
-}
-
-void MansionKeyMaker::msgArticleNotFound( Character *client ) 
-{
-}
-
-bool MansionKeyMaker::canServeClient( Character * )
-{
-    return true;
-}
-
-void MansionKeyMaker::msgListRequest( Character *client )
-{
-    oldact(_("$c1 просит $C4 показать список ключей."), client, 0, getKeeper( ), TO_ROOM );
-    oldact(_("Ты просишь у $C4 показать список ключей."), client, 0, getKeeper( ), TO_CHAR );
-}
-
-void MansionKeyMaker::msgBuyRequest( Character *client )
-{
-}
-
-void MansionKeyMaker::msgArticleTooFew( Character *, Article::Pointer )
-{
-}
-
-Article::Pointer 
-MansionKeyMaker::findArticle( Character *client, DLString &arg )
-{
-    MansionKeyArticle::Pointer article;
-    int vnum ;
-    
-    if (client->is_npc( ))
-        return article;
-
-    if (!( vnum = findKeyVnum( client->getPC( ), arg ) ))
-        return article;
-
-    article.construct( );
-    article->setPrice( price );
-    article->setVnum( vnum );
-    return article;
-}
-
-int MansionKeyMaker::findKeyVnum( PCharacter *client, const DLString& arg ) 
-{
-    XMLVectorBase<XMLInteger>::iterator i;
-    XMLAttributeMansionKey::Pointer attr;
-
-    attr = client->getAttributes( ).findAttr<XMLAttributeMansionKey>( "mkey" );
-
-    if (!attr || attr->keys.empty( )) {
-        tell_act( client, getKeeper( ), _("Извини, $c1, но тебе не принадлежит ни одного ключа. ") );
-        return 0;
-    }
-
-    if (arg.empty( )) {
-        tell_act( client, getKeeper( ), _("Какой именно ключ ты хочешь купить?") );
-        return 0;
-    }
-
-    for (i = attr->keys.begin( ); i != attr->keys.end( ); i++) {
-        OBJ_INDEX_DATA *pKeyIndex = get_obj_index( i->getValue( ) );
-
-        if (!pKeyIndex)
-            continue;
-
-        if (pKeyIndex->keyword.matchesUnstrict(arg))
-            continue;
-        
-        return i->getValue( );
-    }
-
-    tell_act( client, getKeeper( ), _("Извини, $c1, но тебе не принадлежит ключ с таким именем.") );
-    return 0;
-}
-
-/*-------------------------------------------------------------------------
- * MansionKeyArticle
- *------------------------------------------------------------------------*/
-bool MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const DLString &, int ) 
-{
-    Object *key;
-    
-    if (!price->canAfford( client )) {
-        tell_act( client, maker, 
-                  _("У тебя недостаточно $n2, чтобы оплатить мою работу, $c1."), 
-                  price->toCurrency( ).c_str( ) );
-        return false;
-    }
-    
-    price->deduct( client );
-    key = create_object( get_obj_index( vnum ), 1 );
-    obj_to_char( key, client );
-
-    oldact(_("$C1 вручает тебе $o4."), client, key, maker, TO_CHAR );
-    oldact(_("$C1 вручает $c3 $o4.") , client, key, maker, TO_ROOM );
-    return true;
-}
-
-bool MansionKeyArticle::available( Character *client, NPCharacter *maker ) const
-{
-    return true;
-}
-
-int MansionKeyArticle::getQuantity( ) const
-{
-    return 1;
+    return attrReg;
 }

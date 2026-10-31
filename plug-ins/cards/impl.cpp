@@ -101,7 +101,6 @@ extern "C"
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCards> >( ppl );
 
         Plugin::registerPlugin<MobileBehaviorRegistrator<CardStarterBehavior> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<CardSellerBehavior> >( ppl );
         
         Plugin::registerPlugin<ObjectBehaviorRegistrator<CardPackBehavior> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<CardBehavior> >( ppl );
