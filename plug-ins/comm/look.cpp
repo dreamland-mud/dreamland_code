@@ -1809,6 +1809,9 @@ static void do_look_object( Character *ch, Object *obj )
 
         ostringstream descBuf;
         webManipManager->decorateExtraDescr( descBuf, desc.c_str( ), obj->pIndexData->extraDescriptions, ch );
+        // A long description on the floor has no line break of its own.
+        if (!desc.empty( ) && desc.at( desc.size( ) - 1 ) != '\n')
+            descBuf << endl;
         ch->send_to( descBuf );
 
         // Looking at a container says nothing about what is inside it, and nothing
