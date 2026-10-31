@@ -107,48 +107,6 @@ static bool buyer_can_trade()
     return true;
 }
 
-void talk_auction(const char *argument)
-{
-    DLString msg_en = DLString("{YAUCTION: ") + argument + "{x";
-    DLString msg_ru = DLString("{YАУКЦИОН: ") + argument + "{x";
-    Descriptor *d;
-
-    for (d = descriptor_list; d != 0; d = d->next) {
-        if (d->connected != CON_PLAYING)
-            continue;
-
-        Character *ch = d->character;
-
-        if (!ch)
-            continue;
-
-        if (IS_SET(ch->getPC( )->comm, COMM_NOAUCTION))
-            continue;
-    
-        bool fRussian = Player::displayLang(ch) != LANG_EN;
-        DLString line = fRussian ? msg_ru : msg_en;
-
-        // THE STRING GOES AS AN ARGUMENT, NOT AS A FORMAT.
-        //
-        // What is inside is what the player typed: "auction talk <text>"
-        // lands here verbatim. While the string was handed to pecho as a
-        // format, "auction talk %d" printed register garbage to everyone
-        // (verified 2026-09-20: "-1625415662"), and "%s" would dereference
-        // a random pointer -- handing a piece of the server's memory to
-        // every player on the channel, or taking the world down.
-        //
-        // No substitution is needed here at all: every call has already
-        // filled in its own arguments before us.
-        ch->pecho(POS_SLEEPING, "%s", line.c_str());
-
-        // Nobody says this: it is the auctioneer's own announcement, so the
-        // frame has no peer. COMM_NOAUCTION above is the only gate this path
-        // has, and the emitter inherits it by standing after it.
-        if (chat_subscribed(ch))
-            chat_emit(ch, 0, false, "auction", "world", line);
-    }
-}
-
 /* Per-viewer auction broadcast: resolves the MultiMessage (and its args) in
    each listener's own language, then prepends the localized "AUCTION:" prefix.
    Item/char args (%O/%C) and count inflections (%I) localize per recipient. */
@@ -466,22 +424,6 @@ CMDRUNP( auction )
                 ch->pecho(_("Канал Аукциона теперь {Rвыключен{x."));
                 SET_BIT(ch->comm,COMM_NOAUCTION);
                 return;
-        }
-        
-        if (arg_is_strict(arg1, "talk"))
-        {
-            if ( ch != auction->seller ) {
-                ch->pecho(_("Ты ничего не выставлял%Gо||а на аукцион -- рекламировать тебе нечего."), ch);
-                return;
-            }
-            if (argument[0] == '\0') {
-                ch->pecho(_("Как ты хочешь разрекламировать товар?"));
-                return;
-            }
-            
-            REMOVE_BIT(ch->comm,COMM_NOAUCTION);
-            talk_auction( argument );
-            return;
         }
         
         if (ch->is_immortal() && arg_is_strict(arg1, "stop"))

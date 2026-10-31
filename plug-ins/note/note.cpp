@@ -129,6 +129,18 @@ bool Note::isNoteToAll( ) const
     return false;
 }
 
+bool Note::isNoteToImmortal( ) const
+{
+    DLString arg, arguments = getRecipient( );
+
+    while (!( arg = arguments.getOneArgument( ) ).empty( )) {
+        if (argIsImmortal( arg ))
+            return true;
+    }
+
+    return false;
+}
+
 bool Note::parseRecipient( PCharacter *ch, const DLString &cArguments, ostringstream &buf )
 {
     Race *race;

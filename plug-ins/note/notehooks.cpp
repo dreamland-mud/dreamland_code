@@ -81,6 +81,26 @@ static DLString unread_phrase( const NoteThread &th, int count, lang_t lang )
     return buf.str( );
 }
 
+/** Discord is English-only: name threads the way an English reader expects. */
+static DLString discord_thread_name(const NoteThread &thread)
+{
+    static const map<DLString, DLString> names = {
+        { "note", "Note" },
+        { "story", "Story" },
+        { "news", "News" },
+        { "change", "Change" },
+        { "crime", "Crime report" },
+        { "penalty", "Penalty" },
+        { "qnote", "Quest note" },
+    };
+
+    auto n = names.find(thread.getName());
+    if (n != names.end())
+        return n->second;
+
+    return thread.getName().upperFirstCharacter();
+}
+
 void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
 {
     // Notify via crystal orb for all types of messages.
@@ -88,6 +108,12 @@ void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
 
     if (dreamland->hasOption(DL_BUILDPLOT))
         return;
+
+    // Gods who are offline still learn that mortals wrote to them.
+    if (note.isNoteToImmortal( ) && thread.getName() != "dream")
+        send_discord_wiznet(":envelope: " + discord_thread_name(thread)
+                            + " to immortals from " + note.getFrom()
+                            + " re: " + note.getSubject());
 
     if (!note.isNoteToAll( ))
         return;
@@ -172,26 +198,6 @@ void NoteHooks::hookTelegram(const NoteThread &thread, const Note &note)
 {        
     const DLString threadName = thread.getRussianThreadName().ruscase('1');        
     send_telegram_note(threadName, note.getFrom(), note.getSubject(), note.getText());
-}
-
-/** Discord is English-only: name threads the way an English reader expects. */
-static DLString discord_thread_name(const NoteThread &thread)
-{
-    static const map<DLString, DLString> names = {
-        { "note", "Note" },
-        { "story", "Story" },
-        { "news", "News" },
-        { "change", "Change" },
-        { "crime", "Crime report" },
-        { "penalty", "Penalty" },
-        { "qnote", "Quest note" },
-    };
-
-    auto n = names.find(thread.getName());
-    if (n != names.end())
-        return n->second;
-
-    return thread.getName().upperFirstCharacter();
 }
 
 void NoteHooks::hookDiscord(const NoteThread &thread, const Note &note)
