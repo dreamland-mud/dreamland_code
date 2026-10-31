@@ -28,6 +28,8 @@ GSN(acute_vision);
 GSN(improved_detect);
 
 BHV(cutthroat);
+BHV(trap);
+BHV(deathtrap);
 
 // Check if room has at least one normal exit leading somewhere.
 static bool room_has_exits(Room *room)
@@ -70,6 +72,20 @@ bool RoomQuestModel::checkRoom( PCharacter *ch, Room *room )
         return false;
     
     if (!room->isCommon( ))
+        return false;
+
+    // Targets must be reachable on foot; a trap would drop or kill the questor on arrival.
+    switch (room->getSectorType( )) {
+    case SECT_WATER_NOSWIM:
+    case SECT_UNDERWATER:
+    case SECT_AIR:
+        return false;
+    default:
+        break;
+    }
+
+    if (room->pIndexData->behaviors.isSet(bhv_trap)
+        || room->pIndexData->behaviors.isSet(bhv_deathtrap))
         return false;
 
     return true;
