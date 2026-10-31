@@ -16,8 +16,10 @@
 #include "loadsave.h"
 #include "string_utils.h"
 #include "vnum.h"
-#include "def.h"
 #include "fenia_utils.h"
+#include "lang.h"
+#include "damageflags.h"
+#include "def.h"
 
 /*-----------------------------------------------------------------
  * DefaultClan 
@@ -123,7 +125,7 @@ bool DefaultClan::canInduct( PCharacter *ch ) const
     return induct.allow( ch );
 }
 
-void DefaultClan::makeMonument( Character *ch, Character *killer ) const
+void DefaultClan::makeMonument( Character *ch, Character *killer, int damtype ) const
 {
     Object *obj;
 
@@ -132,25 +134,32 @@ void DefaultClan::makeMonument( Character *ch, Character *killer ) const
 
     if (ch->is_npc( ) || killer->is_npc( ))
         return;
-    
-    obj = create_object( get_obj_index( OBJ_VNUM_MONUMENT ), 0 );
-    obj->timer = 24 * 24 * 2; // 48 real life hour
-    
-    // The clan's own monument text and keyword blob are single-language fields, so
-    // the description stays Russian until they become multi-language.
-    obj->setDescription(
-            fmt( NULL, monument.getValue( ).c_str( ), ch, killer ), LANG_DEFAULT );
 
-    // Prototype 105 templates the victim and the killer into its short descr and
-    // its English keyword in all three languages. Writing only LANG_DEFAULT left
-    // an EN reader looking at the raw "a monument to %s from %s", and flattened
-    // every language's keywords into the Russian slot. Each slot now carries its
-    // own language; the clan's mixed-alphabet keyword blob rides along on Russian,
-    // which is where it used to land, and stays matchable from any language
-    // because keyword lookup scans every slot.
+    // Burnt to death: no clan monument, only an urn of ashes. The urn keeps its
+    // prototype long description and is not counted by the Midgaard fountain.
+    bool urn = (damtype == DAM_FIRE && get_obj_index( OBJ_VNUM_URN ) != 0);
+
+    obj = create_object( get_obj_index( urn ? OBJ_VNUM_URN : OBJ_VNUM_MONUMENT ), 0 );
+    obj->timer = 24 * 24 * 2; // 48 real life hour
+
+    bool hasMonumentText = !monument.emptyValues( );
+
+    // Prototypes 105/102 template the victim and the killer into their short
+    // descr and English keyword in all three languages. The clan's monument
+    // text and keywords are per-language too; a language missing from the clan
+    // file falls back to Russian (getForLang).
     for (int l = LANG_MIN; l < LANG_MAX; l++) {
         lang_t lang = (lang_t)l;
-        DLString victimName = ch->getNameP( '3', lang );
+
+        if (!urn && hasMonumentText) {
+            // Declined names inside the template resolve via viewerLang().
+            ForcedViewerLang forced( lang );
+            obj->setDescription(
+                    fmt( NULL, monument.getForLang( lang ).c_str( ), ch, killer ), lang );
+        }
+
+        // Monument: "to <dative> from <genitive>"; urn: "ashes of <genitive>".
+        DLString victimName = ch->getNameP( urn ? '2' : '3', lang );
         DLString killerName = killer->getNameP( '2', lang );
 
         const DLString &shortPattern = obj->getShortDescr(lang);
@@ -167,13 +176,18 @@ void DefaultClan::makeMonument( Character *ch, Character *killer ) const
         else
             kw = kw + DLString::SPACE + victimKey + DLString::SPACE + killerKey;
 
-        if (lang == LANG_DEFAULT && !monumentName.getValue( ).empty( ))
-            kw = monumentName.getValue( ) + DLString::SPACE + kw;
+        if (!urn && !monumentName.get( lang ).empty( ))
+            kw = monumentName.get( lang ) + DLString::SPACE + kw;
 
         obj->setKeyword( kw, lang );
     }
 
     obj_to_room( obj, ch->in_room );
+
+    if (urn) {
+        achievement( killer, "ashes_to_ashes" );
+        return;
+    }
 
     // The third monument in an area with the Midgaard fountain (obj 3199,
     // MidgaardFountain) turns its water to blood.

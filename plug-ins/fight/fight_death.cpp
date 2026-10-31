@@ -905,7 +905,7 @@ static void make_corpse( Character *killer, Character *ch, const DLString &label
         corpseRoomVnum = make_corpse_legacy( killer, ch, invoked ? feniaMinId : 0 );
 
     corpse_sweep_leftovers( ch, corpseRoomVnum, invoked ? feniaMinId : 0 );
-    ch->getClan( )->makeMonument( ch, killer );
+    ch->getClan( )->makeMonument( ch, killer, damtype );
 
     dreamland->resetOption( DL_SAVE_OBJS );
     dreamland->resetOption( DL_SAVE_MOBS );

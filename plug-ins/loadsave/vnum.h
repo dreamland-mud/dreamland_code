@@ -47,6 +47,7 @@
 #define OBJ_VNUM_CHUNK_IRON                6521
 
 #define OBJ_VNUM_MONUMENT                105
+#define OBJ_VNUM_URN                     102 // PK death by fire: replaces the monument
 
 #define OBJ_VNUM_POOL 75 
 

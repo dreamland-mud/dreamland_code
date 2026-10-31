@@ -63,7 +63,7 @@ public:
     virtual bool canInduct( PCharacter * ) const;
     virtual void onInduct(PCharacter *) const;
     
-    virtual void makeMonument( Character *, Character * ) const;
+    virtual void makeMonument( Character *, Character *, int damtype ) const;
     virtual void handleVictory( PCharacter *, PCharacter * );
     virtual void handleDefeat( PCharacter *, PCharacter * );
 
