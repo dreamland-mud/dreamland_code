@@ -74,6 +74,10 @@ static const char * occ_behavior_name( int occType )
     if (occType == OCC_CLANGUARD)
         return "clan guard";
 
+    // bedit names allow letters and spaces only
+    if (occType == OCC_QUEST_TRADER)
+        return "questtrader";
+
     return occ_type2name( occType );
 }
 
