@@ -61,6 +61,9 @@ public:
     virtual void affectsOnEquip( Character *ch, Object *obj );
     virtual void affectsOnUnequip( Character *ch, Object *obj );
 
+    int getArmorCoef( ) const { return armorCoef.getValue( ); }
+    int getItemWear( ) const { return itemWear.getValue( ); }
+
 protected:
     bool canEquip( Character *ch, Object *obj );
     void triggersOnEquip( Character *ch, Object *obj );

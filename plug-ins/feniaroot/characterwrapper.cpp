@@ -59,6 +59,7 @@
 #include "armorgenerator.h"
 #include "skill_utils.h"
 #include "stats_apply.h"
+#include "tohit.h"
 #include "rageoath.h"
 #include "areaquestutils.h"
 #include "material.h"
@@ -476,6 +477,19 @@ ARMOR(1)
 ARMOR(2)
 ARMOR(3)
 #undef ARMOR
+
+#define DEFENSE(x) \
+NMI_GET( CharacterWrapper, defense##x, "броня на шкале модели 1: чем больше, тем лучше, без ловкости" ) \
+{ \
+    checkTarget(); \
+    return GET_DEFENSE( target, x ); \
+}
+
+DEFENSE(0)
+DEFENSE(1)
+DEFENSE(2)
+DEFENSE(3)
+#undef DEFENSE
 
 NMI_GET( CharacterWrapper, pc, "экземпляр игрока" )
 {
@@ -3339,7 +3353,7 @@ NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один у�
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, skill_one_hit, "(vict,skillName,damDivisor[,thacCoeff[,counter[,miss]]]): нанести vict удар оружием по формуле умения skillName. Урон умножается на (уровень_умения/damDivisor + 1), thacCoeff -- бонус к попаданию при 100% умения (вычитает thacCoeff*эффективность/100 из THAC0), counter добавляет бонус контратаки, miss печатает промах вместо удара" )
+NMI_INVOKE( CharacterWrapper, skill_one_hit, "(vict,skillName,damDivisor[,thacCoeff[,counter[,miss]]]): нанести vict удар оружием по формуле умения skillName. Урон умножается на (уровень_умения/damDivisor + 1), thacCoeff -- бонус к точности при 100% умения: при модели брони умножает точность на (1 + thacCoeff*эффективность/2000), иначе вычитает thacCoeff*эффективность/100 из THAC0, counter добавляет бонус контратаки, miss печатает промах вместо удара" )
 {
     checkTarget( );
     Character *victim = argnum2character(args, 1);
@@ -4708,10 +4722,18 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     // N-per-class value scores like an APPLY_AC of -N: real armour counts as armour
     // where it matters (low level), fading to 0 by L40. Read from the prototype -- the
     // base class is not rolled or enchanted (enchant armour adds an APPLY_AC affect).
+    // Under the armor model the weight is per composite armor point, so the piece counts
+    // at its slot's armorCoef, the way equip adds it, and the exotic column counts too:
+    // it now cuts elemental spells.
     if (itemType == ITEM_ARMOR && pProto != 0) {
         // A random armor rolls its AC on the instance; everything else matches its prototype.
         double acAvg = inst != 0 ? (inst->value0( ) + inst->value1( ) + inst->value2( )) / 3.0
                                  : (pProto->value[0] + pProto->value[1] + pProto->value[2]) / 3.0;
+        if (to_hit_model( ) == 1) {
+            int acExotic = inst != 0 ? inst->value3( ) : pProto->value[3];
+            acAvg = acAvg * (1 - w.acExotic) + acExotic * w.acExotic;
+            acAvg *= armor_coef_for_flags( inst != 0 ? inst->wear_flags : pProto->wear_flags );
+        }
         s += w.ac * acAvg;
         ga_note( "armor", w.ac * acAvg, (int)(acAvg + 0.5) );
     }
@@ -6197,6 +6219,50 @@ static double ga_curWeaponSwing( Character *target, const GAWeights &w )
     return -1.0;
 }
 
+// Under the armor model hitroll is worth what it adds to this char's blows against a
+// normal mob of its level: a lot while it is short of the evasion curve, little past it.
+// c4.py scale: 20 pts per hitroll at HR 63 and L100, 3 at 166, 1.6 at 254, which is
+// hitroll_pts_per_pct (16) per 1% of output. Casters keep their profile's discount.
+static void ga_modelHitroll( Character *target, GAWeights &w )
+{
+    if (to_hit_model( ) != 1)
+        return;
+
+    const MobTiers::Config &tc = MobBody::tiers( );
+    int level = target->getModifyLevel( );
+    double mobArmor = 0;
+
+    if (tc.loaded) {
+        MobTiers::MobInfo mob;
+        mob.level = level;
+        mobArmor = -tc.centres( mob ).ac * 10;
+    }
+
+    Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
+    ::Object *wep = wieldLoc ? wieldLoc->find( target ) : 0;
+    int skillPct = 20 + target->getSkill( get_weapon_sn( wep ) );
+    int classBase = max( 1, 20 - interpolate( level, target->getProfession( )->getThac00( target ),
+                                              target->getProfession( )->getThac32( target ) ) );
+    static const int MOB_DEX_DEFENSIVE = -10;   // a mob's dex 15, the curves' reference
+    double evasion = to_hit_evasion( level, MOB_DEX_DEFENSIVE );
+
+    auto output = [&]( int hitroll ) {
+        double eff = max( 0, hitroll ) * skillPct / 100.0 * (1 + get_str_app( target ).hit / 100.0);
+        return to_hit_chance( to_hit_accuracy( classBase, eff ), evasion )
+               * (1 - to_hit_reduction( mobArmor, level, eff ));
+    };
+
+    int hitroll = target->hitroll.getValue( );
+    double now = output( hitroll );
+    if (now <= 0)
+        return;
+
+    double pct = 100 * (output( hitroll + 1 ) / now - 1);
+    double profile = w.hr / max( 0.1, item_value( "melee", "hitroll", 6.0 ) );
+    double weight = pct * item_value( "shared", "hitroll_pts_per_pct", 16 ) * profile;
+    w.hr = URANGE( 0.5, weight, item_value( "shared", "hitroll_weight_cap", 30 ) );
+}
+
 // Permanent (duration < 0) affect_flags: the slot-independent floor of heldFlags.
 // Temp spell buffs excluded.
 static bitstring_t ga_permaFlags( Character *target )
@@ -6314,6 +6380,7 @@ static void ga_itemContext( Character *target, int mySlot, ::Object *self, bool 
 {
     w.caster = caster;
     item_weights( w, caster, target->getRealLevel( ) );
+    ga_modelHitroll( target, w );
     w.spellFactor = ga_spellFactor( target );
     w.curWeaponSwing = ga_curWeaponSwing( target, w );
 
@@ -6420,6 +6487,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // (fight_core/itemmodel.cpp item_weights). Melee values weapon output like its
     // damroll; a caster well under it.
     item_weights( w, w.caster, target->getRealLevel( ) );
+    ga_modelHitroll( target, w );
 
     w.curWeaponSwing = ga_curWeaponSwing( target, w );
 

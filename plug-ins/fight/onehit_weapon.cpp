@@ -20,6 +20,7 @@
 #include "clanreference.h"
 
 #include "fight.h"
+#include "tohit.h"
 #include "skill_utils.h"
 #include "loadsave.h"
 #include "math_utils.h"
@@ -403,6 +404,7 @@ public:
 
     virtual void calcTHAC0( );
     virtual void calcDamage( );
+    virtual double hitrollEff( ) const;
 
 protected:
     Skill *skillPtr;
@@ -451,6 +453,11 @@ void GenericSkillOneHit::calcTHAC0( )
     // the bonus a fully learned skill is worth.
     if (thacCoeff != 0)
         thac0 -= thacCoeff * skillPtr->getEffective( ch ) / 100;
+}
+
+double GenericSkillOneHit::hitrollEff( ) const
+{
+    return to_hit_skill_eff( WeaponOneHit::hitrollEff( ), thacCoeff, skillPtr->getEffective( ch ) );
 }
 
 void skill_one_hit_nocatch( Character *ch, Character *victim, Skill *skill,

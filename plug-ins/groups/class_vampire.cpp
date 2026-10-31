@@ -35,6 +35,7 @@
 #include "onehit_weapon.h"
 #include "damage_impl.h"
 #include "vnum.h"
+#include "tohit.h"
 #include "merc.h"
 #include "loadsave.h"
 #include "act.h"
@@ -69,6 +70,7 @@ public:
     
     virtual void init( );
     virtual void calcTHAC0( );
+    virtual double hitrollEff( ) const;
     virtual void calcDamage( );
     void damBase( );
     virtual void postDamageEffects( );
@@ -132,6 +134,11 @@ void VampiricBiteOneHit::calcDamage( )
     damApplyDamroll( );
     
     OneHit::calcDamage( );
+}
+
+double VampiricBiteOneHit::hitrollEff( ) const
+{
+    return to_hit_skill_eff( OneHit::hitrollEff( ), 20, gsn_vampiric_bite->getEffective( ch ) );
 }
 
 void VampiricBiteOneHit::calcTHAC0( )
@@ -495,6 +502,7 @@ public:
     BonedaggerOneHit( Character *ch, Character *victim );
 
     virtual void calcTHAC0( );
+    virtual double hitrollEff( ) const;
     virtual void calcDamage( );
     void damApplyReligion();
 };
@@ -527,6 +535,11 @@ void BonedaggerOneHit::calcDamage( )
 
     WeaponOneHit::calcDamage( );
 }    
+
+double BonedaggerOneHit::hitrollEff( ) const
+{
+    return to_hit_skill_eff( SkillWeaponOneHit::hitrollEff( ), 20, gsn_bonedagger->getEffective( ch ) );
+}
 
 void BonedaggerOneHit::calcTHAC0( )
 {

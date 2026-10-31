@@ -48,6 +48,7 @@
 #include "loadsave.h"
 #include "weather.h"
 #include "stats_apply.h"
+#include "tohit.h"
 #include "dl_math.h"
 #include "dl_ctype.h"
 #include "player_utils.h"
@@ -822,7 +823,7 @@ Json::Value ParamsWebPromptListener::jsonParam2( Descriptor *d, Character *ch )
     p2["h"] = DLString(ch->hitroll);
     p2["d"] = DLString(ch->damroll);
     // Armor class (pierce only) and saves.
-    p2["a"] = DLString(GET_AC(ch,AC_PIERCE));
+    p2["a"] = DLString(to_hit_shown_armor(ch, AC_PIERCE));
     p2["s"] = DLString(ch->saving_throw);
     // Position and flying status.
     p2["pos"] = position_table.name(ch->position);

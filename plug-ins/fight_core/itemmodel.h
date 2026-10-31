@@ -23,6 +23,7 @@ struct ItemWeights {
                                // can value a weapon's melee output below its damroll
     double stat[6] = {};       // str, int, wis, dex, con, cha
     bool   caster = false;
+    double acExotic = 0;       // share of incoming damage the exotic column answers
     double ac = 0, slevel = 0, level = 0, skillLevel = 0, skillLevelSkill = 0, move = 0, beats = 0;
     double spellFactor = 1.0;  // slevel discount for a char with few/no spells (0..1)
     double learnSkill = 0, learnGroup = 0, learnAll = 0;   // APPLY_LEARNED %, by scope

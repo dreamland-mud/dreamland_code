@@ -2346,6 +2346,43 @@ static void convert_personal( Object *obj )
 
 #define OBJ_VNUM_STUB 127
 
+/*
+ * A prototype refitted to the armor profiles carries props.refit.from, its old
+ * value0..3. A saved instance still on exactly those numbers is plain stock and
+ * takes the new ones. Anything crafted, rolled or enchanted keeps what it has and
+ * ages out. A second load sees numbers other than 'from' and does nothing, so no
+ * stamp is needed. Stock whose values match its prototype writes no Val line and
+ * follows the prototype by itself: this only catches records that did write one.
+ */
+static void obj_refit_migrate( Object *obj )
+{
+    const Json::Value &props = obj->pIndexData->props;
+
+    if (!props.isObject( ) || !props["refit"].isObject( ))
+        return;
+
+    const Json::Value &from = props["refit"]["from"];
+
+    if (!from.isArray( ) || from.size( ) != 4 || obj->item_type != obj->pIndexData->item_type)
+        return;
+
+    for (Json::ArrayIndex i = 0; i < 4; i++)
+        if (!from[i].isInt( ))
+            return;
+
+    for (const char *mark: { "measure_m", "craft_picks", "tier", "enchanted" })
+        if (!obj->getProperty( mark ).empty( ))
+            return;
+
+    for (int i = 0; i < 4; i++)
+        if (obj->valueByIndex( i ) != from[(Json::ArrayIndex)i].asInt( ))
+            return;
+
+    // The jewelry, clothing and treasure a prototype became have no AC columns.
+    for (int i = 0; i < 4; i++)
+        obj->valueByIndex( i, obj->item_type == ITEM_ARMOR ? obj->pIndexData->value[i] : 0 );
+}
+
 void fread_obj( Character *ch, Room *room, FILE *fp )
 {
     Object *obj;
@@ -2545,6 +2582,8 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                                             obj->affected.push_back(paf);
                                 }
                             }
+
+                            obj_refit_migrate( obj );
 
                             // Economy migration, weight half: before placement, so the
                             // carrier's carry weight adds the new weight.

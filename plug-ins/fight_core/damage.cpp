@@ -43,6 +43,9 @@
 #include "immunity.h"
 #include "material.h"
 #include "configurable.h"
+#include "tohit.h"
+#include "stats_apply.h"
+#include "debug_utils.h"
 #include "def.h"
 #include "l10n.h"
 #include "msp.h"
@@ -106,6 +109,7 @@ void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitst
     immune = false;
     blocked = false;
     deathReason = "damage";
+    defenseBonus = 0;
 }
 
 int fightspam_cast_depth = 0;
@@ -496,7 +500,7 @@ void Damage::protectPrayer( )
         dam -= dam * victim->getModifyLevel( ) / 1200;
 }
 
-void Damage::calcDamage( )
+void Damage::protectAll( )
 {
     protectSanctuary( );
     protectAlign( );
@@ -504,6 +508,61 @@ void Damage::calcDamage( )
     protectPrayer( );
     protectImmune( );
     protectRazer( ); // >8)
+    protectArmor( );
+}
+
+void Damage::calcDamage( )
+{
+    protectAll( );
+}
+
+double Damage::hitrollEff( ) const
+{
+    return ch != 0 ? to_hit_hitroll_eff( ch, 100 ) : 0;
+}
+
+void Damage::protectArmor( )
+{
+    if (to_hit_model( ) != 1 || dam <= 0 || dam_type < 0)
+        return;
+
+    const ToHitConfig &cfg = to_hit_config( );
+    DLString typeName = damage_table.name( dam_type );
+    bool physical = cfg.physical_types.count( typeName ) > 0;
+    int column;
+
+    if (physical) {
+        switch (dam_type) {
+        case DAM_PIERCE: column = AC_PIERCE; break;
+        case DAM_BASH:   column = AC_BASH;   break;
+        case DAM_SLASH:  column = AC_SLASH;  break;
+        default:         column = AC_EXOTIC; break;
+        }
+    }
+    else if (cfg.exotic_types.count( typeName ) > 0)
+        column = AC_EXOTIC;
+    else
+        return;
+
+    int armor = GET_DEFENSE( victim, column ) + defenseBonus;
+    int victimLevel = victim->getModifyLevel( );
+    double reduction;
+
+    if (physical)
+        reduction = to_hit_reduction( armor, victimLevel, hitrollEff( ) );
+    else
+        reduction = to_hit_reduction_spell( armor, victimLevel,
+                                            ch != 0 ? ch->getModifyLevel( ) : victimLevel );
+
+    if (ch != 0) {
+        Debug d( ch, "debug_onehit", "protectArmor" );
+        d.log( armor, "armor" );
+        d.log( reduction * 100, "reduction%" );
+        d.log( dam, "dam before" );
+    }
+
+    // A bad dr_cap must not take a blow past zero: OneHit::hit would heal the victim.
+    dam -= (int)(dam * URANGE( 0.0, reduction, 0.99 ));
 }
 
 /*-----------------------------------------------------------------------------

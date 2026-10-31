@@ -35,6 +35,12 @@ public:
     void acApplyBlindFighting( );
     void acApplyPosition( );
 
+    /** Armor model: accuracy against evasion, replaces thac0 against armor class. */
+    void calcAccuracy( );
+    void calcEvasion( );
+    bool rollToHit( );
+    virtual double hitrollEff( ) const;
+
     virtual void calcDamage( );
     void damNormalize( );
     void damApplyPosition( );
@@ -61,6 +67,8 @@ protected:
     int skill;
     int thac0;
     int victim_ac;
+    double accuracy;
+    double evasion;
     int orig_dam;
     // The to-hit roll was a natural 20 (or a lucky hobbit's natural 1).
     bool critical;

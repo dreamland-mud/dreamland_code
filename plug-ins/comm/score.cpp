@@ -24,6 +24,7 @@
 #include "interp.h"
 #include "arg_utils.h"
 #include "stats_apply.h"
+#include "tohit.h"
 #include "mudtags.h"
 #include "string_utils.h"
 #include "char_weight.h"
@@ -345,10 +346,10 @@ static void score_prose( Character *ch )
 
     /* print AC values */
     buf << fmt(ch, _("Защита от укола {W%d{x, от удара {W%d{x, от разрезания {W%d{x, от экзотики {W%d{x.\n\r"),
-            GET_AC(ch,AC_PIERCE),
-            GET_AC(ch,AC_BASH),
-            GET_AC(ch,AC_SLASH),
-            GET_AC(ch,AC_EXOTIC));
+            to_hit_shown_armor(ch, AC_PIERCE),
+            to_hit_shown_armor(ch, AC_BASH),
+            to_hit_shown_armor(ch, AC_SLASH),
+            to_hit_shown_armor(ch, AC_EXOTIC));
     buf << fmt(ch, _("Точность: {C%d{x  Урон: {C%d{x  Защита от заклинаний: {C%d{x\n\r"),
                 ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
 
@@ -627,8 +628,8 @@ static void do_score_args(Character *ch, const DLString &arg)
     } 
     if (arg_is(arg, "ac")) {
         ch->pecho(_("Защита от уколов %d, ударов %d, разрезов %d, экзотики %d."), 
-                    GET_AC(ch, AC_PIERCE), GET_AC(ch, AC_BASH),
-                    GET_AC(ch, AC_SLASH), GET_AC(ch, AC_EXOTIC));
+                    to_hit_shown_armor(ch, AC_PIERCE), to_hit_shown_armor(ch, AC_BASH),
+                    to_hit_shown_armor(ch, AC_SLASH), to_hit_shown_armor(ch, AC_EXOTIC));
         return;
     }
     if (arg_is(arg, "saves")) {
@@ -879,25 +880,25 @@ _("     %s| %sВещи          :{x     %3d/%-4d        %sЗащита от ук
         CLR_CAPT,
         ch->carry_number, Char::canCarryNumber(ch),
         CLR_CAPT,
-        GET_AC(ch,AC_PIERCE),
+        to_hit_shown_armor(ch, AC_PIERCE),
         CLR_FRAME,
 
         CLR_CAPT,
         Char::getCarryWeight(ch)/10, Char::canCarryWeight(ch)/10,
         CLR_CAPT,
-        GET_AC(ch,AC_BASH),
+        to_hit_shown_armor(ch, AC_BASH),
         CLR_FRAME,
 
         CLR_CAPT,
         ch->gold.getValue( ),
         CLR_CAPT,
-        GET_AC(ch,AC_SLASH),
+        to_hit_shown_armor(ch, AC_SLASH),
         CLR_FRAME,
 
         CLR_CAPT,
         ch->silver.getValue( ),
         CLR_CAPT,
-        GET_AC(ch,AC_EXOTIC),
+        to_hit_shown_armor(ch, AC_EXOTIC),
         CLR_FRAME,
 
         CLR_CAPT,

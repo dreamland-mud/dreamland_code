@@ -54,6 +54,7 @@
 #include "onehit_weapon.h"
 #include "damage_impl.h"
 #include "vnum.h"
+#include "tohit.h"
 #include "merc.h"
 #include "loadsave.h"
 #include "save.h"
@@ -167,6 +168,7 @@ public:
     AmbushOneHit( Character *ch, Character *victim );
 
     virtual void calcTHAC0( );
+    virtual double hitrollEff( ) const;
     virtual void calcDamage( );
 };
 
@@ -184,6 +186,11 @@ void AmbushOneHit::calcDamage( )
 
     WeaponOneHit::calcDamage( );
 }    
+
+double AmbushOneHit::hitrollEff( ) const
+{
+    return to_hit_skill_eff( SkillWeaponOneHit::hitrollEff( ), 20, gsn_ambush->getEffective( ch ) );
+}
 
 void AmbushOneHit::calcTHAC0( )
 {

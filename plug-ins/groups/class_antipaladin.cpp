@@ -41,6 +41,7 @@
 #include "weapongenerator.h"
 #include "vnum.h"
 #include "fenia_utils.h"
+#include "tohit.h"
 #include "merc.h"
 #include "act.h"
 #include "interp.h"
@@ -60,6 +61,7 @@ public:
     CleaveOneHit( Character *ch, Character *victim );
     
     virtual void calcTHAC0( );
+    virtual double hitrollEff( ) const;
     virtual void calcDamage( );
 };
 
@@ -103,13 +105,23 @@ void CleaveOneHit::calcDamage( )
     
     damNormalize( );
 
-    if (number_percent( ) < 50)
-        protectSanctuary( );
+    if (to_hit_model( ) == 1)
+        protectAll( );
+    else {
+        if (number_percent( ) < 50)
+            protectSanctuary( );
 
-    protectAlign( );
-    protectImmune( );
-    protectRazer( ); 
+        protectAlign( );
+        protectImmune( );
+        protectRazer( ); 
+    }
+
     protectMaterial( wield );
+}
+
+double CleaveOneHit::hitrollEff( ) const
+{
+    return to_hit_skill_eff( SkillWeaponOneHit::hitrollEff( ), 20, gsn_cleave->getEffective( ch ) );
 }
 
 void CleaveOneHit::calcTHAC0( )

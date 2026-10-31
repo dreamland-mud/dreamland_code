@@ -225,12 +225,7 @@ void UndefinedOneHit::calcDamage( )
 
     damNormalize( );
 
-    protectSanctuary( );
-    protectAlign( );
-    protectTemperature( );
-    protectPrayer( ); 
-    protectImmune( );
-    protectRazer( ); 
+    protectAll( );
 
     // Normal hits get the shroud only from a clan that bought it; skill hits always did.
     if (IS_GOOD( ch ) && victim->isAffected( gsn_shadow_shroud ) && clan_char_owns( victim, "shadow-shroud" ))
