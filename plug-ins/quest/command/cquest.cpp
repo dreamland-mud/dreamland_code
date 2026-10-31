@@ -107,17 +107,19 @@ static Questor::Pointer find_questor( PCharacter *pch, DLString &arguments )
     std::vector<DLString> words;
     DLString rest = arguments;
 
+    rest.stripWhiteSpace( );
     while (!rest.empty( )) {
         DLString w = rest.getOneArgument( );
-        if (!w.empty( ))
-            words.push_back( w );
+        if (w.empty( ))
+            break;
+        words.push_back( w );
     }
 
     for (size_t i = 0; i + 1 < words.size( ); i++) {
         if (!arg_is_strict( words[i], "from" ) && !arg_is_strict( words[i], "in" ))
             continue;
 
-        Character *rch = get_char_room( pch, join_words( words, i + 1, words.size( ) ) );
+        Character *rch = get_char_room( pch, join_words( words, i + 1, words.size( ) ), FFIND_MOB_ONLY );
         NPCharacter *mob = rch ? rch->getNPC( ) : 0;
 
         if (mob && mob->behavior
