@@ -10,7 +10,7 @@
 #include "mocregistrator.h"
 
 #include "cquest.h"
-#include "questtrader.h"
+#include "personalnamerepair.h"
 #include "questmaster.h"
 #include "questor.h"
 #include "questscrollhook.h"
@@ -45,23 +45,8 @@ extern "C"
         // Here and not in quest_core: see questtypesplugin.h.
         Plugin::registerPlugin<QuestTypesPlugin>( ppl );
         Plugin::registerPlugin<CQuest>( ppl );
-        Plugin::registerPlugin<MocRegistrator<ObjectQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<ConQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<GoldQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<PracticeQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<PocketsQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<KeyringQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<PersonalQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<OwnerQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<PiercingQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<WearslotQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<RefitQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<UpgradeQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<TattooQuestArticle> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<VaultQuestArticle> >( ppl );
         Plugin::registerPlugin<PersonalNameRepair>( ppl );
 
-        Plugin::registerPlugin<MobileBehaviorRegistrator<QuestTrader> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<Questor> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestScrollBehavior> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<QuestMaster> >( ppl );
