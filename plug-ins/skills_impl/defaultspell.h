@@ -87,7 +87,7 @@ public:
     virtual bool properOrder( Character * ) const;
 
     bool targetIsObj() const;
-    bool targetIsRoom() const;
+    virtual bool targetIsRoom() const;
     bool targetIsChar() const;
     bool targetIsRanged() const;
 
