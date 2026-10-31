@@ -84,10 +84,6 @@ static bool gprog_quest( PCharacter *ch, const DLString &cmd, const DLString &ar
     } 
 }
 
-/** The questor pch talks to. A trailing "from/у <name>" naming a questor here
- *  picks it and is cut off arguments. Otherwise the first questor that can see
- *  pch and is not fighting, else the first one in the room (its own refusal
- *  then explains why). */
 static DLString join_words( const std::vector<DLString> &words, size_t from, size_t to )
 {
     DLString out;
@@ -101,6 +97,10 @@ static DLString join_words( const std::vector<DLString> &words, size_t from, siz
     return out;
 }
 
+/** The questor pch talks to. A trailing "from/у <name>" naming a questor here
+ *  picks it and is cut off arguments. Otherwise the first questor that can see
+ *  pch and is not fighting, else the first one in the room (its own refusal
+ *  then explains why). */
 static Questor::Pointer find_questor( PCharacter *pch, DLString &arguments )
 {
     Questor::Pointer named, ready, first;
@@ -120,7 +120,8 @@ static Questor::Pointer find_questor( PCharacter *pch, DLString &arguments )
         Character *rch = get_char_room( pch, join_words( words, i + 1, words.size( ) ) );
         NPCharacter *mob = rch ? rch->getNPC( ) : 0;
 
-        if (mob && mob->behavior)
+        if (mob && mob->behavior
+            && IS_SET( mob->behavior->getOccupation( ), (1 << OCC_QUEST_MASTER) ))
             named = mob->behavior.getDynamicPointer<Questor>( );
 
         if (named) {
@@ -131,7 +132,8 @@ static Questor::Pointer find_questor( PCharacter *pch, DLString &arguments )
 
     for (Character *rch = pch->in_room->people; rch; rch = rch->next_in_room) {
         NPCharacter *mob = rch->getNPC( );
-        if (!mob || !mob->behavior)
+        if (!mob || !mob->behavior
+            || !IS_SET( mob->behavior->getOccupation( ), (1 << OCC_QUEST_MASTER) ))
             continue;
 
         Questor::Pointer q = mob->behavior.getDynamicPointer<Questor>( );
