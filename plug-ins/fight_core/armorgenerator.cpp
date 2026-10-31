@@ -601,7 +601,7 @@ bool ItemAffixRoller::fitAllowed(const DLString &secName, const Json::Value &aff
     return true;
 }
 
-static double affix_window_curve(int level, const DLString &kind, bool caster)
+double affix_window_curve(int level, const DLString &kind, bool caster)
 {
     double curve = item_level_curve(level);
     // measure.armor_budget_mult [melee, caster]: armor tier windows per profile.

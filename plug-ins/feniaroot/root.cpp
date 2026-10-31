@@ -1776,6 +1776,14 @@ NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, pr
     return Register(ok ? gen.total() : -1);
 }
 
+NMI_INVOKE(Root, itemWindowCurve, "(level, kind[, profile]): множитель окна аффиксов лута в тысячных: кривая уровня, для kind \"armor\" еще armor_budget_mult по профилю (\"caster\" или melee)")
+{
+    int level = argnum2number(args, 1);
+    DLString kind = argnum2string(args, 2);
+    DLString profile = args.size() > 2 ? argnum2string(args, 3) : DLString::emptyString;
+    return Register((int)(affix_window_curve(level, kind, profile == "caster") * 1000 + 0.5));
+}
+
 NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile]): rand_stat для скрафченного оружия с окном аффиксов minCm..maxCm (centi-M, без кривой уровня, двуручное x1.75); руки берутся у прототипа; флаги, которые не дал прошлый бросок (закалка), остаются; force -- имена аффиксов через пробел, берутся первыми; возвращает measure_m")
 {
     ::Object *obj = argnum2item(args, 1);
