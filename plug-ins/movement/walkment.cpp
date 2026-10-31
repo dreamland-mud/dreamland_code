@@ -534,7 +534,17 @@ bool Walkment::checkWater( Character *wch )
             
             rc = RC_MOVE_WATER;
 
-            if (can_fly(wch))
+            // A ridden horse is checked on its own, but on foot it travels in its
+            // master's boat. Tell the rider why the same beast swims once dismounted.
+            if (RIDDEN(wch) && RIDDEN(wch) == ch && boat_get_types(ch) != BOAT_NONE)
+                msgSelfParty( wch,
+                    "You can't swim.",
+                    "Ты не умеешь плавать.",
+                    "Ти не вмієш плавати.",
+                    "%2$^C1 can't swim with a rider. Dismount ({y{hcdismount{x) and you will cross the water together.",
+                    "%2$^C1 не может плыть с всадником. Спешься ({y{hcспешиться{x), и вы переправитесь вместе.",
+                    "%2$^C1 не може пливти з вершником. Злізь ({y{hcзлізти{x), і ви переправитеся разом." );
+            else if (can_fly(wch))
                 msgSelfParty(wch,
                     "To go further you must {y{hcfly{x or find a boat.",
                     "Чтобы идти дальше, тебе необходимо {y{hcвзлететь{x или найти лодку.",

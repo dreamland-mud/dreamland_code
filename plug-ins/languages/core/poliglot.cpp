@@ -13,6 +13,7 @@
 #include "occupations.h"
 
 #include "poliglot.h"
+#include "merc.h"
 
 GSN(fly);
 GSN(pass_door);
@@ -33,7 +34,14 @@ static bool room_has_exits(Room *room)
 bool Poliglot::specIdle( ) 
 {
     if (number_range( 0, 900 ) == 0 || !room_has_exits(ch->in_room)) {
-        Room *room = get_random_room( ch );
+        // Players can't reach him underwater without gills: skip those rooms.
+        Room *room = 0;
+        for (int tries = 0; tries < 20; tries++) {
+            room = get_random_room( ch );
+            if (room && room->getSectorType( ) != SECT_UNDERWATER)
+                break;
+            room = 0;
+        }
 
         if (!room)
             return false;
