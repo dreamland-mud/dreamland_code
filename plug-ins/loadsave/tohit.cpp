@@ -93,6 +93,11 @@ double to_hit_hitroll_eff( Character *ch, int skillPercent )
            * (1 + get_str_app( ch ).hit / 100.0);
 }
 
+double to_hit_skill_eff( double hitrollEff, int thacCoeff, int skillEffective )
+{
+    return hitrollEff * (1 + thacCoeff * skillEffective / 100.0 / 20.0);
+}
+
 double to_hit_accuracy( int classBase, double hitrollEff )
 {
     return config.base_w * classBase + hitrollEff;

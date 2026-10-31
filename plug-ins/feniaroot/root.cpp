@@ -2133,9 +2133,15 @@ NMI_INVOKE(Root, config, "(name): read-only доступ до конфигура
     return JsonUtils::toRegister(cfg->getValue());
 }
 
-NMI_INVOKE(Root, configReload, "(name): перечитать конфигурационный json-файл с диска, с вызовом его обработчика загрузки")
+NMI_INVOKE(Root, configReload, "(name): перечитать с диска fight/to_hit, fight/mob_tiers, fight/item_value или fight/armor_profiles, с вызовом обработчика загрузки")
 {
     DLString fileName = args2string(args);
+
+    // Not every handler survives a broken file: weapon_names crashes the next reset.
+    if (fileName != "fight/to_hit" && fileName != "fight/mob_tiers"
+        && fileName != "fight/item_value" && fileName != "fight/armor_profiles")
+        throw Scripting::Exception("This config does not reload at runtime");
+
     Configurable::Pointer cfg = configReg->get(fileName);
 
     if (!cfg)

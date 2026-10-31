@@ -61,6 +61,7 @@ public:
     CleaveOneHit( Character *ch, Character *victim );
     
     virtual void calcTHAC0( );
+    virtual double hitrollEff( ) const;
     virtual void calcDamage( );
 };
 
@@ -116,6 +117,11 @@ void CleaveOneHit::calcDamage( )
     }
 
     protectMaterial( wield );
+}
+
+double CleaveOneHit::hitrollEff( ) const
+{
+    return to_hit_skill_eff( SkillWeaponOneHit::hitrollEff( ), 20, gsn_cleave->getEffective( ch ) );
 }
 
 void CleaveOneHit::calcTHAC0( )

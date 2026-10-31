@@ -561,8 +561,8 @@ void Damage::protectArmor( )
         d.log( dam, "dam before" );
     }
 
-    // The cap is under 100%, so a blow never rounds away to nothing here.
-    dam -= (int)(dam * reduction);
+    // A bad dr_cap must not take a blow past zero: OneHit::hit would heal the victim.
+    dam -= (int)(dam * URANGE( 0.0, reduction, 0.99 ));
 }
 
 /*-----------------------------------------------------------------------------

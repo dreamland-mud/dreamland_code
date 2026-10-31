@@ -37,8 +37,10 @@ struct ToHitConfig {
     double spell_pierce_level = 1.2;  // a caster's effective hitroll per level
     double armor_use_bonus = 3;  // armor per victim level on an armor use success
     double blind_factor = 1.25;  // evasion multiplier against a blind attacker
-    std::set<std::string> physical_types = { "bash", "pierce", "slash" };
-    std::set<std::string> exotic_types = { "fire", "cold", "lightning", "acid" };
+    // Physical: full reduction, hitroll pierces. Energy has no column of its own
+    // and reads the exotic one. Exotic: spell factor, caster level pierces.
+    std::set<std::string> physical_types = { "bash", "pierce", "slash", "energy" };
+    std::set<std::string> exotic_types = { "fire", "cold", "lightning", "acid", "light" };
 };
 
 const ToHitConfig & to_hit_config( );
@@ -50,6 +52,8 @@ void to_hit_model_override( int model );
 
 /** The attacker's hitroll as it reaches the roll: skill% and strength applied. */
 double to_hit_hitroll_eff( Character *ch, int skillPercent );
+/** thacCoeff was points on a d20, hence the 20. A skill's bonus aims and pierces. */
+double to_hit_skill_eff( double hitrollEff, int thacCoeff, int skillEffective );
 double to_hit_accuracy( int classBase, double hitrollEff );
 /** dexDefensive is the dex_app value: negative is good. */
 double to_hit_evasion( int victimLevel, int dexDefensive );
