@@ -18,6 +18,7 @@
 #include "webmanip.h"
 
 DLString get_pocket_argument( char *arg );
+bool do_look_extradescr( Character *ch, const char *arg, int number );
 void show_char_to_char_1( Character *victim, Character *ch, bool fBrief );
 void show_list_to_char( Object *list, Character *ch, bool fShort, 
                         bool fShowNothing, DLString pocket = "", Object *container = NULL );
@@ -277,6 +278,16 @@ CMDRUNP( examine )
     strcpy( objarg, arg );
     DLString pocket = get_pocket_argument( objarg );
     Object *obj = get_obj_here( ch, objarg );
+
+    // Not an object: a detail of the room or of an item, the target of the
+    // web client's clickable (marker) links.
+    if (!obj && pocket.empty( )) {
+        char edarg[MAX_INPUT_LENGTH];
+        int number = number_argument( arg, edarg );
+        if (do_look_extradescr( ch, edarg, number ))
+            return;
+    }
+
     if (obj && obj->item_type == ITEM_CONTAINER && pocket.empty( )) {
         DLString desc = obj_own_extra_descr( ch, obj );
         if (!desc.empty( )) {
