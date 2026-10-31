@@ -46,7 +46,6 @@ extern "C"
         // Here and not in quest_core: see questtypesplugin.h.
         Plugin::registerPlugin<QuestTypesPlugin>( ppl );
         Plugin::registerPlugin<CQuest>( ppl );
-        Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeQuestReward> >( ppl );
         Plugin::registerPlugin<MocRegistrator<ObjectQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<ConQuestArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<GoldQuestArticle> >( ppl );

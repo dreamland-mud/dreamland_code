@@ -28,7 +28,9 @@ questring.cpp \
 questweapon.cpp \
 questbag.cpp \
 valentineprise.cpp \
-ownercoupon.cpp
+ownercoupon.cpp \
+xmlattributequestreward.cpp \
+heroitems.cpp
 
 libquestreward_la_MOC = \
 questreward.h \
@@ -38,7 +40,8 @@ questring.h \
 questweapon.h \
 questbag.h \
 valentineprise.h \
-ownercoupon.h
+ownercoupon.h \
+xmlattributequestreward.h
 
 
 AM_CPPFLAGS += $(plugin_INCLUDES)

@@ -35,6 +35,9 @@
 #include "room.h"
 
 #include "xmlattributestatistic.h"
+#include "xmlattributequestreward.h"
+#include "heroitems.h"
+#include "save_bank.h"
 #include "xmlattributetrust.h"
 #include "xmlkillingattribute.h"
 #include "fight_exception.h"
@@ -968,6 +971,109 @@ NMI_INVOKE( CharacterWrapper, spendVictories, "(n): списать n квест�
     attr->setWasted( attr->getWasted( ) + n );
     target->getPC( )->save( );
     return Register( true );
+}
+
+NMI_GET( CharacterWrapper, bonusVictories, "квестовые победы, которые засчитываются в ремортные бонусы (без учета потраченных)" )
+{
+    checkTarget( );
+    CHK_NPC
+    XMLAttributeStatistic::Pointer attr
+        = target->getPC( )->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" );
+    return Register( attr ? attr->getBonusVictoriesCount( ) : 0 );
+}
+
+NMI_GET( CharacterWrapper, bonusLifes, "бонусные жизни от ремортов (с учетом лимита)" )
+{
+    checkTarget( );
+    CHK_NPC
+    return Register( target->getPC( )->getRemorts( ).countBonusLifes( ) );
+}
+
+NMI_GET( CharacterWrapper, remortOwners, "сколько купонов владельца уже куплено" )
+{
+    checkTarget( );
+    CHK_NPC
+    return Register( target->getPC( )->getRemorts( ).owners.getValue( ) );
+}
+
+NMI_SET( CharacterWrapper, remortOwners, "сколько купонов владельца уже куплено" )
+{
+    checkTarget( );
+    CHK_NPC
+    int n = arg.toNumber( );
+    target->getPC( )->getRemorts( ).owners = n < 0 ? 0 : n;
+}
+
+NMI_INVOKE( CharacterWrapper, questRewardCount, "(vnum): сколько раз квестор выдавал (и возвращал) эту геройскую вещь, 0 если ни разу" )
+{
+    checkTarget( );
+    CHK_NPC
+    XMLAttributeQuestReward::Pointer attr
+        = target->getPC( )->getAttributes( ).findAttr<XMLAttributeQuestReward>( "questreward" );
+    return Register( attr ? attr->getCount( argnum2number( args, 1 ) ) : 0 );
+}
+
+NMI_INVOKE( CharacterWrapper, setQuestRewardCount, "(vnum, n): записать счетчик выдач геройской вещи vnum" )
+{
+    checkTarget( );
+    CHK_NPC
+    int vnum = argnum2number( args, 1 );
+    int n = argnum2number( args, 2 );
+    if (vnum <= 0 || n < 0)
+        throw Scripting::Exception( "setQuestRewardCount: vnum must be positive and count non-negative" );
+
+    target->getPC( )->getAttributes( ).getAttr<XMLAttributeQuestReward>( "questreward" )->setCount( vnum, n );
+    return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, questRewardTier, "(vnum): самый высокий оплаченный тир улучшения геройской вещи vnum, 0 если не улучшалась" )
+{
+    checkTarget( );
+    CHK_NPC
+    XMLAttributeQuestReward::Pointer attr
+        = target->getPC( )->getAttributes( ).findAttr<XMLAttributeQuestReward>( "questreward" );
+    return Register( attr ? attr->getTier( argnum2number( args, 1 ) ) : 0 );
+}
+
+NMI_INVOKE( CharacterWrapper, raiseQuestRewardTier, "(vnum, tier): запомнить оплаченный тир геройской вещи vnum; меньший тир не перезаписывает больший" )
+{
+    checkTarget( );
+    CHK_NPC
+    int vnum = argnum2number( args, 1 );
+    if (vnum <= 0)
+        throw Scripting::Exception( "raiseQuestRewardTier: vnum must be positive" );
+
+    target->getPC( )->getAttributes( ).getAttr<XMLAttributeQuestReward>( "questreward" )->setTier( vnum, argnum2number( args, 2 ) );
+    return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, heroAdjective, "(gender, lang): прилагательное геройской вещи по натуре персонажа (Flexer-pad), gender = .tables.sex_table, lang 0=en,1=ru,2=ua" )
+{
+    checkTarget( );
+    return Register( DLString( hero_adjective( target, argnum2number( args, 1 ) ).get( argnum2lang( args, 2 ) ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, vaultUnlocked, "(): открыто ли личное хранилище в банке (заодно бесплатно открывает непустое старое)" )
+{
+    checkTarget( );
+    CHK_NPC
+    bank_vault_grandfather( target->getPC( ) );
+    return Register( bank_vault_unlocked( target->getPC( ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, vaultUnlock, "(): открыть личное хранилище (для всей учетной записи, если она есть)" )
+{
+    checkTarget( );
+    CHK_NPC
+    bank_vault_unlock( target->getPC( ) );
+    return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, vaultOwned, "(vnum): сколько предметов vnum, принадлежащих персонажу, лежит в его хранилищах (свое, учетной записи, клана). Читает файлы: не звать в циклах" )
+{
+    checkTarget( );
+    CHK_NPC
+    return Register( hero_vault_count( target->getPC( ), argnum2number( args, 1 ) ) );
 }
 
 NMI_INVOKE( CharacterWrapper, remortBonusMax, "(kind): сколько ещё бонуса kind (str..con|hp|mana|level|pretitle) можно получить" )
