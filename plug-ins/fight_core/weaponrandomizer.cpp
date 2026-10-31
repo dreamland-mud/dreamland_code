@@ -12,6 +12,7 @@
 #include "armorgenerator.h"
 #include "affectflags.h"
 #include "weapontier.h"
+#include "wearlocation.h"
 #include "merc.h"
 #include "json_utils_ext.h"
 
@@ -68,15 +69,26 @@ void WeaponRandomizer::eventItemEdited(const ItemEditedEvent &event) const
     if (IS_SET(obj->pIndexData->area->area_flag, AREA_SYSTEM))
         return;
 
-    if (obj->getProperty("random").empty() && !obj->getProperty("tier").empty()) {
-        clearWeapon(obj);
-        return;
-    }
+    bool clear = obj->getProperty("random").empty() && !obj->getProperty("tier").empty();
+    bool roll = !obj->getProperty("random").empty() && obj->getProperty("tier").empty();
 
-    if (!obj->getProperty("random").empty() && obj->getProperty("tier").empty()) {
-        randomizeWeaponStats(obj);
+    if (!clear && !roll)
         return;
-    }
+
+    // The old roll is on whoever wields this: take it off before it goes, or
+    // removing the weapon later subtracts the new one.
+    Character *carrier = obj->carried_by;
+
+    if (carrier)
+        obj->wear_loc->affectsOnUnequip(carrier, obj);
+
+    if (clear)
+        clearWeapon(obj);
+    else
+        randomizeWeaponStats(obj);
+
+    if (carrier)
+        obj->wear_loc->affectsOnEquip(carrier, obj);
 }
 
 static bool item_is_sold(Object *obj)
