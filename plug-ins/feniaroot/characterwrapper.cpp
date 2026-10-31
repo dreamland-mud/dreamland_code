@@ -3990,8 +3990,11 @@ static bool ga_hasFeniaTriggers( obj_index_data *pObj )
 // worn (shared.trigger_spells in item_value.json, {vnum: [spell, ...]}), summed
 // at their worn price in M; a "grant:<skill>" entry is a skill the script lends
 // (giveTemporary), at its grant price. The affect loop cannot see a script-cast affect, so
-// without this a transform amulet scored as the flat trigger bonus.
-static double ga_triggerSpellsM( obj_index_data *pObj )
+// without this a transform amulet scored as the flat trigger bonus. A worn spell the
+// char can cast itself is worth 10%, as for the item flags (ga_canSelfCast).
+static bool ga_canSelfCast( Character *target, const char *name );
+
+static double ga_triggerSpellsM( obj_index_data *pObj, Character *target )
 {
     if (pObj == 0)
         return 0;
@@ -4007,8 +4010,12 @@ static double ga_triggerSpellsM( obj_index_data *pObj )
             DLString name = v.asString( );
             if (name.compare( 0, 6, "grant:" ) == 0)
                 m += std::max( 0.0, magic_spell_grant( name.substr( 6 ) ) );
-            else
-                m += std::max( 0.0, magic_spell_worn( name ) );
+            else {
+                double worn = std::max( 0.0, magic_spell_worn( name ) );
+                if (ga_canSelfCast( target, name.c_str( ) ))
+                    worn *= 0.1;
+                m += worn;
+            }
         }
     return m;
 }
@@ -4745,10 +4752,14 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     double t0 = s;
     if (generated) {
         DLString buff = inst->getProperty( "wornbuff" );
-        if (!buff.empty( ))
-            s += item_wornbuff_points( buff, inst->level, w.caster );
+        if (!buff.empty( )) {
+            double pts = item_wornbuff_points( buff, inst->level, w.caster );
+            if (ga_canSelfCast( target, buff.c_str( ) ))
+                pts *= 0.1;
+            s += pts;
+        }
     }
-    double triggerM = ga_triggerSpellsM( pProto );
+    double triggerM = ga_triggerSpellsM( pProto, target );
     if (triggerM > 0)
         s += triggerM * item_one_m( itemLevel, w.caster );
     ga_note( "worn_buff", s - t0, 0 );
