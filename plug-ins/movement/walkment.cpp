@@ -2,6 +2,8 @@
  *
  * ruffina, 2004
  */
+#include <map>
+
 #include "walkment.h"
 #include "movetypes.h"
 #include "move_utils.h"
@@ -26,6 +28,7 @@
 #include "interp.h"
 #include "follow_utils.h"
 #include "merc.h"
+#include "dreamland.h"
 
 #include "def.h"
 #include "l10n.h"
@@ -40,6 +43,7 @@ Walkment::Walkment( Character *ch )
 {
     silence = false;
     leftBehind = 0;
+    fDrownConfirmed = false;
 
     Character *whoHasBoat;
 
@@ -508,6 +512,15 @@ bool Walkment::checkWater( Character *wch )
          to_room->getSectorType() == SECT_UNDERWATER) {
             int swimTypes = horse ? boat_types : boat_get_types(wch);
 
+            if (!IS_SET(swimTypes, BOAT_SWIM) && canRiskDrowning( wch )) {
+                // Already underwater: swim on, the room drowns you either way.
+                if (from_room->getSectorType() == SECT_UNDERWATER || confirmDrowning( wch ))
+                    return true;
+
+                rc = RC_MOVE_EXPLAINED;
+                return false;
+            }
+
             if (!IS_SET(swimTypes, BOAT_SWIM)) {
                msgSelfParty( wch,
                       "To get {hh2128underwater{x you need gills or a scuba set.",
@@ -566,6 +579,37 @@ bool Walkment::checkWater( Character *wch )
  
     // for water_swim horses could splash water around, fun!  
     return true;
+}
+
+bool Walkment::canRiskDrowning( Character *wch )
+{
+    return wch == ch && !wch->is_npc( ) && !horse;
+}
+
+// Last warning per player: when and into which room. Repeating the same move
+// within a minute confirms the dive.
+static map<long long, pair<time_t, int> > drownWarned;
+
+bool Walkment::confirmDrowning( Character *wch )
+{
+    if (fDrownConfirmed)
+        return true;
+
+    time_t now = dreamland->getCurrentTime( );
+    auto w = drownWarned.find( wch->getID( ) );
+
+    if (w != drownWarned.end( ) && w->second.second == to_room->vnum && now - w->second.first <= 60) {
+        drownWarned.erase( w );
+        fDrownConfirmed = true;
+        return true;
+    }
+
+    drownWarned[wch->getID( )] = make_pair( now, to_room->vnum );
+    msgEcho( wch, wch, lmsg( viewerLang( wch ),
+        "You can't breathe {hh2128underwater{x and may drown if you go on. If you are sure, repeat the command.",
+        "Ты не умеешь дышать {hh2128под водой{x и можешь погибнуть, если поплывешь дальше. Если уверен{Sfа{Sx, набери команду еще раз.",
+        "Ти не вмієш дихати {hh2128під водою{x і можеш загинути, якщо попливеш далі. Якщо впевнен{Sfа{Smий{Sx, набери команду ще раз." ) );
+    return false;
 }
 
 bool Walkment::checkRoomCapacity( Character *wch )

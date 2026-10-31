@@ -47,6 +47,7 @@ protected:
             bool applyPassDoor( Character * );
              int getPassDoorLevel( Character * );
 
+    void swimUnderwater( int & );
     void randomizeExits( );
     int adjustMovetype( Character * );
     int adjustMoveVerb( Character *, int );
@@ -61,6 +62,8 @@ protected:
      *  printed in the target room. Set by msgOnMove, read by msgEcho to pick
      *  the side of the passage the readers can actually see. */
     bool fArrival;
+    /** The walker crosses a swim-only exit without gills. */
+    bool fDrownSwim;
 };
 
 #endif

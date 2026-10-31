@@ -28,6 +28,11 @@
 #include "itemflags.h"
 #include "act.h"
 #include "merc.h"
+#include "dreamland.h"
+#include "damage_impl.h"
+#include "immunity.h"
+#include "damageflags.h"
+#include "fight_exception.h"
 
 #include "def.h"
 #include "l10n.h"
@@ -49,6 +54,7 @@ void ExitsMovement::init( )
     exit_info = 0;
     door = -1;
     fArrival = false;
+    fDrownSwim = false;
 }
 
 ExitsMovement::ExitsMovement( Character *ch, int door, int movetype )
@@ -327,6 +333,16 @@ bool ExitsMovement::checkExitFlags( Character *wch )
         return false;
     }
 
+    if (IS_SET(exit_info, EX_SWIM_ONLY) && !IS_SET(boat_types, BOAT_SWIM) && canRiskDrowning( wch )) {
+        if (!confirmDrowning( wch )) {
+            rc = RC_MOVE_EXPLAINED;
+            return false;
+        }
+
+        fDrownSwim = true;
+        return true;
+    }
+
     if (IS_SET(exit_info, EX_SWIM_ONLY) && !IS_SET(boat_types, BOAT_SWIM)) {
         msgSelfParty( wch,
                       "To get {hh2128underwater{x you need gills or a scuba set.",
@@ -435,8 +451,49 @@ void ExitsMovement::setWaitstate( )
     
     waittime += movetypes[movetype].wait;
     waittime += terrains[from_room->getSectorType()].wait;
-    
+
+    if (fDrownSwim)
+        swimUnderwater( waittime );
+    // Diving without gills is slow: about three drowning ticks per room.
+    else if (fDrownConfirmed || (to_room->getSectorType( ) == SECT_UNDERWATER
+                                 && !ch->is_npc( ) && !IS_SET(boat_types, BOAT_SWIM)))
+        waittime += 12 * dreamland->getPulsePerSecond( );
+
     ch->setWait( waittime );
+}
+
+/*
+ * A long swim through a flooded passage: 5 to 10 drowning ticks depending on
+ * dexterity, dealt at once on arrival, plus the time it took.
+ */
+void ExitsMovement::swimUnderwater( int &waittime )
+{
+    int ticks = URANGE( 5, 10 - (ch->getCurrStat( STAT_DEX ) - 15) / 2, 10 );
+
+    waittime += ticks * 4 * dreamland->getPulsePerSecond( );
+
+    if (ch->is_immortal( ))
+        return;
+
+    int dam = max( 1, (int)ch->max_hit / 30 ) * ticks;
+
+    switch (immune_check( ch, DAM_DROWNING )) {
+    case RESIST_IMMUNE:
+        return;
+    case RESIST_VULNERABLE:
+        dam *= 2;
+        break;
+    }
+
+    ch->pecho( lmsg( viewerLang( ch ),
+        "You swim a long way underwater, {Rchoking{x for air!",
+        "Ты долго плывешь под водой, {Rзадыхаясь{x от недостатка воздуха!",
+        "Ти довго пливеш під водою, {Rзадихаючись{x від нестачі повітря!" ) );
+
+    try {
+        RawDamage( ch, ch, DAM_DROWNING, dam, "drowning" ).hit( true );
+    } catch (const VictimDeathException &) {
+    }
 }
 
 // TODO all movement messages should be multi-lingual based on the looker lang config

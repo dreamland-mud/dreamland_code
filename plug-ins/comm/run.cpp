@@ -117,6 +117,12 @@ public:
     virtual ~RunMovement( )
     {
     }
+
+    // A run stops before deep water instead of diving without gills.
+    virtual bool canRiskDrowning( Character * )
+    {
+        return false;
+    }
     
     virtual int move( )
     {
