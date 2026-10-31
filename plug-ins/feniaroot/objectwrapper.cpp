@@ -1041,7 +1041,7 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
     return result;
 }
 
-NMI_INVOKE( ObjectWrapper, getKeyword, "(lang): ключевые слова предмета на языке lang (0=en,1=ru,2=ua)" )
+NMI_INVOKE( ObjectWrapper, getKeyword, "(lang): ключевые слова предмета на языке lang (0=en,1=ru,2=ua), с откатом на прототип" )
 {
     checkTarget( );
     return Register( target->getKeyword( argnum2lang( args, 1 ) ) );
@@ -1055,7 +1055,7 @@ NMI_INVOKE( ObjectWrapper, setKeyword, "(text, lang): установить кл�
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, morph, "(vnum): заменить предмет в инвентаре на новый vnum, перенеся его собственные имена, описания, экстры, материал, флаги, состояние, уровень, владельца, аффекты и questTier; надетый остается надетым. Старый предмет уничтожается, возвращает новый" )
+NMI_INVOKE( ObjectWrapper, morph, "(vnum): заменить предмет в инвентаре на новый vnum, перенеся его собственные имена, описания, экстры, материал, флаги, состояние, уровень, владельца, аффекты и questTier; надетый остается надетым. Fenia-поля, Id, таймер и прочие properties не переносятся; непустой контейнер не превращается. Старый предмет уничтожается, возвращает новый" )
 {
     checkTarget( );
     int vnum = argnum2number( args, 1 );
@@ -1069,6 +1069,11 @@ NMI_INVOKE( ObjectWrapper, morph, "(vnum): заменить предмет в и
     Character *ch = target->carried_by;
     if (!ch)
         throw Scripting::Exception( "morph: object not in inventory" );
+    if (target->contains)
+        throw Scripting::Exception( "morph: container not empty" );
+
+    // The caller's register keeps this wrapper alive past extract_obj.
+    Register thiz( self );
 
     ::Object *old = target;
     ::Object *obj = create_object( pIndex, 0 );

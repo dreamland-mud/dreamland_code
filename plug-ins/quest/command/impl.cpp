@@ -13,7 +13,6 @@
 #include "questtrader.h"
 #include "questmaster.h"
 #include "questor.h"
-#include "xmlattributequestreward.h"
 #include "questscrollhook.h"
 #include "questtypesplugin.h"
 

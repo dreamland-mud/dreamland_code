@@ -7,6 +7,10 @@
 
 const DLString XMLAttributeQuestReward::TYPE = "XMLAttributeQuestReward";
 
+XMLAttributeQuestReward::~XMLAttributeQuestReward( )
+{
+}
+
 int XMLAttributeQuestReward::getCount( int vnum ) const
 {
     DLString vnumStr( vnum );

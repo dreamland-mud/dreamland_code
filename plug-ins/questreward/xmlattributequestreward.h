@@ -16,6 +16,12 @@ class XMLAttributeQuestReward : public XMLAttribute,
 public: 
         typedef ::Pointer<XMLAttributeQuestReward> Pointer;
 
+        // Key function: keeps the vtable and typeinfo in libquestreward only.
+        // quest_command and feniaroot construct this attribute too; with inline
+        // virtuals each would carry its own vtable copy, and unloading one of them
+        // would leave live attributes pointing into unmapped code.
+        virtual ~XMLAttributeQuestReward( );
+
         static const DLString TYPE;
 
         virtual const DLString & getType( ) const

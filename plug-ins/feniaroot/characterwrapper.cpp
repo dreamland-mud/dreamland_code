@@ -996,7 +996,7 @@ NMI_GET( CharacterWrapper, remortOwners, "сколько купонов влад
     return Register( target->getPC( )->getRemorts( ).owners.getValue( ) );
 }
 
-NMI_SET( CharacterWrapper, remortOwners, "сколько купонов владельца уже куплено" )
+NMI_SET( CharacterWrapper, remortOwners, "сколько купонов владельца уже куплено; не сохраняет профайл, вызови ch.save()" )
 {
     checkTarget( );
     CHK_NPC
@@ -1013,7 +1013,7 @@ NMI_INVOKE( CharacterWrapper, questRewardCount, "(vnum): сколько раз �
     return Register( attr ? attr->getCount( argnum2number( args, 1 ) ) : 0 );
 }
 
-NMI_INVOKE( CharacterWrapper, setQuestRewardCount, "(vnum, n): записать счетчик выдач геройской вещи vnum" )
+NMI_INVOKE( CharacterWrapper, setQuestRewardCount, "(vnum, n): записать счетчик выдач геройской вещи vnum; не сохраняет профайл, вызови ch.save()" )
 {
     checkTarget( );
     CHK_NPC
@@ -1022,7 +1022,12 @@ NMI_INVOKE( CharacterWrapper, setQuestRewardCount, "(vnum, n): записать 
     if (vnum <= 0 || n < 0)
         throw Scripting::Exception( "setQuestRewardCount: vnum must be positive and count non-negative" );
 
-    target->getPC( )->getAttributes( ).getAttr<XMLAttributeQuestReward>( "questreward" )->setCount( vnum, n );
+    XMLAttributeQuestReward::Pointer attr
+        = target->getPC( )->getAttributes( ).getAttr<XMLAttributeQuestReward>( "questreward" );
+    if (!attr)
+        throw Scripting::Exception( "questreward attribute has a foreign type" );
+
+    attr->setCount( vnum, n );
     return Register( );
 }
 
@@ -1035,7 +1040,7 @@ NMI_INVOKE( CharacterWrapper, questRewardTier, "(vnum): самый высоки�
     return Register( attr ? attr->getTier( argnum2number( args, 1 ) ) : 0 );
 }
 
-NMI_INVOKE( CharacterWrapper, raiseQuestRewardTier, "(vnum, tier): запомнить оплаченный тир геройской вещи vnum; меньший тир не перезаписывает больший" )
+NMI_INVOKE( CharacterWrapper, raiseQuestRewardTier, "(vnum, tier): запомнить оплаченный тир геройской вещи vnum; меньший тир не перезаписывает больший; не сохраняет профайл, вызови ch.save()" )
 {
     checkTarget( );
     CHK_NPC
@@ -1043,7 +1048,12 @@ NMI_INVOKE( CharacterWrapper, raiseQuestRewardTier, "(vnum, tier): запомн�
     if (vnum <= 0)
         throw Scripting::Exception( "raiseQuestRewardTier: vnum must be positive" );
 
-    target->getPC( )->getAttributes( ).getAttr<XMLAttributeQuestReward>( "questreward" )->setTier( vnum, argnum2number( args, 2 ) );
+    XMLAttributeQuestReward::Pointer attr
+        = target->getPC( )->getAttributes( ).getAttr<XMLAttributeQuestReward>( "questreward" );
+    if (!attr)
+        throw Scripting::Exception( "questreward attribute has a foreign type" );
+
+    attr->setTier( vnum, argnum2number( args, 2 ) );
     return Register( );
 }
 
@@ -1069,7 +1079,7 @@ NMI_INVOKE( CharacterWrapper, vaultUnlock, "(): открыть личное хр
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, vaultOwned, "(vnum): сколько предметов vnum, принадлежащих персонажу, лежит в его хранилищах (свое, учетной записи, клана). Читает файлы: не звать в циклах" )
+NMI_INVOKE( CharacterWrapper, vaultOwned, "(vnum): сколько предметов ровно этого vnum, принадлежащих персонажу, лежит в его хранилищах (свое, учетной записи, клана); пояс с брелком (119) считай отдельно. Читает файлы: не звать в циклах" )
 {
     checkTarget( );
     CHK_NPC
