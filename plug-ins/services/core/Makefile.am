@@ -15,14 +15,10 @@ libservices_core_la_LIBADD = \
 libservices_core_la_SOURCES = \
 article.cpp \
 price.cpp \
-service.cpp \
-trader.cpp \
-servicetrader.cpp \
 impl.cpp
 
 libservices_core_la_MOC = \
-price.h \
-servicetrader.h
+price.h
 
 
 include $(top_srcdir)/plug-ins/Makefile.inc

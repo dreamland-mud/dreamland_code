@@ -6,10 +6,12 @@
 #ifndef QUESTMASTER_H
 #define QUESTMASTER_H
 
-#include "questtrader.h"
+#include "basicmobilebehavior.h"
 #include "questor.h"
 
-class QuestMaster : public QuestTrader, public Questor {
+// Quest trade moved to Fenia (utils/questtrade). BasicMobileDestiny used to come
+// in through the C++ QuestTrader: it carries the questor AI, saving and destiny.
+class QuestMaster : public Questor, public virtual BasicMobileDestiny {
 XML_OBJECT
 public:
         typedef ::Pointer<QuestMaster> Pointer;

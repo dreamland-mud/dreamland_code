@@ -35,7 +35,8 @@
 #include "questregistrator.h"
 #include "questmanager.h"
 #include "questor.h"
-#include "questtrader.h"
+#include <vector>
+#include "arg_utils.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -81,6 +82,70 @@ static bool gprog_quest( PCharacter *ch, const DLString &cmd, const DLString &ar
         FeniaManager::getThis()->croak(0, Scripting::Register(".tmp.quest"), ex);
         return false;
     } 
+}
+
+/** The questor pch talks to. A trailing "from/у <name>" naming a questor here
+ *  picks it and is cut off arguments. Otherwise the first questor that can see
+ *  pch and is not fighting, else the first one in the room (its own refusal
+ *  then explains why). */
+static DLString join_words( const std::vector<DLString> &words, size_t from, size_t to )
+{
+    DLString out;
+
+    for (size_t i = from; i < to; i++) {
+        if (!out.empty( ))
+            out += " ";
+        out += words[i];
+    }
+
+    return out;
+}
+
+static Questor::Pointer find_questor( PCharacter *pch, DLString &arguments )
+{
+    Questor::Pointer named, ready, first;
+    std::vector<DLString> words;
+    DLString rest = arguments;
+
+    while (!rest.empty( )) {
+        DLString w = rest.getOneArgument( );
+        if (!w.empty( ))
+            words.push_back( w );
+    }
+
+    for (size_t i = 0; i + 1 < words.size( ); i++) {
+        if (!arg_is_strict( words[i], "from" ) && !arg_is_strict( words[i], "in" ))
+            continue;
+
+        Character *rch = get_char_room( pch, join_words( words, i + 1, words.size( ) ) );
+        NPCharacter *mob = rch ? rch->getNPC( ) : 0;
+
+        if (mob && mob->behavior)
+            named = mob->behavior.getDynamicPointer<Questor>( );
+
+        if (named) {
+            arguments = join_words( words, 0, i );
+            return named;
+        }
+    }
+
+    for (Character *rch = pch->in_room->people; rch; rch = rch->next_in_room) {
+        NPCharacter *mob = rch->getNPC( );
+        if (!mob || !mob->behavior)
+            continue;
+
+        Questor::Pointer q = mob->behavior.getDynamicPointer<Questor>( );
+        if (!q)
+            continue;
+
+        if (!first)
+            first = q;
+
+        if (!ready && !mob->fighting && mob->can_see( pch ))
+            ready = q;
+    }
+
+    return ready ? ready : first;
 }
 
 static void see_also( PCharacter *pch )
@@ -136,42 +201,11 @@ COMMAND(CQuest, "quest")
     }
    
     int qcmd = QCMD_NONE;
-    
-    // Parse quest trading commands.
-    if (arg_is_list( cmd ))
-        qcmd = QCMD_LIST;
-    else if (arg_is(cmd, "buy"))
-        qcmd = QCMD_BUY;
-    else if (arg_is(cmd, "trouble"))
-        qcmd = QCMD_TROUBLE;
 
-    // Execute quest trading commands.
-    if (qcmd != QCMD_NONE) { 
-        QuestTrader::Pointer trader;
-
-        trader = find_attracted_mob_behavior<QuestTrader>( pch, OCC_QUEST_TRADER );
-
-        if (!trader) {
-            pch->pecho(_("Здесь нет торговца квестовыми наградами."));
-            see_also( pch );
-            return;
-        }
-
-        switch(qcmd) {
-            case QCMD_LIST:
-                trader->doList( pch );
-                break;
-            case QCMD_BUY:
-                trader->doBuy( pch, arguments );
-                break;
-            case QCMD_TROUBLE:
-                trader->doTrouble( pch, arguments );
-                break;
-            default:
-                return;
-        }
-    
-        mprog_quest(trader->getChar(), pch, qcmd_names[qcmd], arguments);
+    // Quest trade lives in Fenia (utils/questtrade, command/quest/runFunc).
+    // Reaching here means the Fenia engine is not loaded.
+    if (arg_is_list( cmd ) || arg_is(cmd, "buy") || arg_is(cmd, "trouble")) {
+        pch->pecho(_("Торговля квестовыми наградами временно закрыта."));
         return;
     }
    
@@ -190,13 +224,14 @@ COMMAND(CQuest, "quest")
         return;
     }
 
+    questman = find_questor( pch, arguments );
+
     // 'quest cancel <number>' is handled separately by Fenia.
     if (qcmd == QCMD_CANCEL && !arguments.empty()) {
         gprog_quest(pch, "cancel", arguments.getOneArgument());
         return;
     }
 
-    questman = find_attracted_mob_behavior<Questor>( pch, OCC_QUEST_MASTER );
     if (!questman) {
         if (pch->getHometown( ) != home_frigate) {
             switch (qcmd) {
