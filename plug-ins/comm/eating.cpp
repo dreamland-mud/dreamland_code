@@ -40,6 +40,7 @@ GSN(poison);
 DESIRE(hunger);
 DESIRE(thirst);
 DESIRE(bloodlust);
+RACE(bat);
 RACE(fish);
 RACE(mouse);
 RACE(rat);
@@ -190,7 +191,7 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int poisonLevel, int 
 
 void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
 {
-    bool isCat, isRodent, isFish;
+    bool isCat, isRodent, isFish, isBat;
     bool wasPoisoned;
     int diff, dam, gain;
     
@@ -209,9 +210,10 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     isCat = (IS_SET( ch->form, FORM_FELINE ));
     isRodent = (mob->getRace( ) == race_mouse || mob->getRace( ) == race_rat || mob->getRace( ) == race_rodent);
     isFish = (mob->getRace( ) == race_fish);
+    isBat = (mob->getRace( ) == race_bat);
     
     if (!isCat) {
-        if (!isRodent && !isFish) {
+        if (!isRodent && !isFish && !isBat) {
             ch->pecho(_("Это животное не сделало тебе ничего плохого!"));
         }
         else {
@@ -222,7 +224,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         return;
     }
     else {
-        if (!isRodent && !isFish) {
+        if (!isRodent && !isFish && !isBat) {
             oldact(_("$c1, похоже, приня$gло|л|ла $C4 за маааленького грызунчика."), ch, 0, mob, TO_ROOM);
             oldact(_("Это не грызун! Даже и не думай за $Y гоняться."), ch, 0, mob, TO_CHAR);
             return;
@@ -267,6 +269,8 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         oldact(_("Ты ешь $C4."), ch, 0, mob, TO_CHAR);
         oldact(_("$c1 ест $C4."), ch, 0, mob, TO_ROOM);
         achievement( ch, "cat_food" );
+        if (isBat)
+            achievement( ch, "bat_catcher" );
 
         for (obj = mob->carrying; obj; obj = obj_next) {
             obj_next = obj->next_content;
