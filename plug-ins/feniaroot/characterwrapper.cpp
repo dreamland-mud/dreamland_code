@@ -2589,7 +2589,7 @@ NMI_INVOKE( CharacterWrapper, recho, "(fmt, args): выводит отформа
         if (!to->can_sense(target))
             continue;
 
-        to->pecho(POS_RESTING, regfmt(to, args).c_str());
+        to->pecho(POS_RESTING, "%s", regfmt(to, args).c_str());
     }
 
     return Register();
@@ -2611,7 +2611,7 @@ NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...): выводит от
         if (!to->can_sense(target))
             continue;
 
-        to->pecho(POS_RESTING, regfmt(to, myArgs).c_str());
+        to->pecho(POS_RESTING, "%s", regfmt(to, myArgs).c_str());
     }
 
     return Register( );

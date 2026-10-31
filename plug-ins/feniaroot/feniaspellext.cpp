@@ -94,7 +94,7 @@ static void msgArea_perViewer(Character *caster, const RegisterList &myArgs)
         if (!IS_AWAKE(wch))
             continue;
 
-        wch->pecho(POS_RESTING, regfmt(wch, myArgs).c_str());
+        wch->pecho(POS_RESTING, "%s", regfmt(wch, myArgs).c_str());
     }
 }
 
@@ -130,7 +130,7 @@ NMI_INVOKE(FeniaSpellContext, msgNotVict, "(fmt[,args]): выдать сообщ
         if (!to->can_sense(caster))
             continue;
 
-        to->pecho(POS_RESTING, regfmt(to, myArgs).c_str());
+        to->pecho(POS_RESTING, "%s", regfmt(to, myArgs).c_str());
     }
 
     return Register();
@@ -147,7 +147,7 @@ NMI_INVOKE(FeniaSpellContext, msgRoom, "(fmt[,args]): выдать сообще�
         if (!to->can_sense(caster))
             continue;
 
-        to->pecho(POS_RESTING, regfmt(to, myArgs).c_str());
+        to->pecho(POS_RESTING, "%s", regfmt(to, myArgs).c_str());
     }
     return Register();
 }
@@ -164,7 +164,7 @@ NMI_INVOKE(FeniaSpellContext, msgAll, "(fmt[,args]): выдать сообщен
     // players. No can_sense filter: msgAll's contract is "everyone in the room",
     // matching the room->echo it replaces.
     for (Character *to = caster->in_room->people; to; to = to->next_in_room)
-        to->pecho(POS_RESTING, regfmt(to, myArgs).c_str());
+        to->pecho(POS_RESTING, "%s", regfmt(to, myArgs).c_str());
     return Register();
 }
 

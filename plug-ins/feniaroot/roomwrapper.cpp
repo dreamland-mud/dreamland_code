@@ -632,7 +632,7 @@ NMI_INVOKE( RoomWrapper, echo, "(fmt, args): выводит отформатир
     checkTarget( );
 
     for (Character *to = target->people; to; to = to->next_in_room) {
-        to->pecho(POS_RESTING, regfmt(to, args).c_str());
+        to->pecho(POS_RESTING, "%s", regfmt(to, args).c_str());
     }
 
     return Register( );
@@ -644,7 +644,7 @@ NMI_INVOKE( RoomWrapper, echoAround, "(fmt, args): выводит отформа
 
     for (auto room: RoomUtils::adjancentRooms(target)) {
         for (Character *to = room->people; to; to = to->next_in_room) {
-            to->pecho(POS_RESTING, regfmt(to, args).c_str());
+            to->pecho(POS_RESTING, "%s", regfmt(to, args).c_str());
         }
     }
 

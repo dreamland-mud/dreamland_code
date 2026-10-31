@@ -741,7 +741,7 @@ NMI_INVOKE(Root, gecho, "(fmt, args): выдать отформатирован�
     for (d = descriptor_list; d != 0; d = d->next) {
         Character *wch = d->character;
         if (d->connected == CON_PLAYING && wch && wch->in_room)
-            wch->pecho(POS_RESTING, regfmt(wch, args).c_str());
+            wch->pecho(POS_RESTING, "%s", regfmt(wch, args).c_str());
     }
     
     return Register( );
