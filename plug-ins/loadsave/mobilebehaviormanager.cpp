@@ -142,6 +142,14 @@ void MobileBehaviorManager::parse( MOB_INDEX_DATA * pMobIndex, FILE *fp ) {
     }
 }
 
+// C++ mobile behaviors deleted for good (their mobs moved to Fenia behaviors).
+static bool is_retired_behavior( const DLString &type )
+{
+    return type == "ShopTrader"
+        || type == "MansionKeyMaker"
+        || type == "CardSellerBehavior";
+}
+
 void MobileBehaviorManager::parse( NPCharacter * mob, FILE *fp ) {
     char letter;
     DLString word;
@@ -170,7 +178,7 @@ void MobileBehaviorManager::parse( NPCharacter * mob, FILE *fp ) {
         // A class deleted for good loads as a stub that keeps its old XML and
         // does nothing. Rebuild those from the proto. Only the types named here:
         // a stub of a plugin that merely failed to load must keep its data.
-        if (mob->behavior && mob->behavior->getType( ) == "ShopTrader") {
+        if (mob->behavior && is_retired_behavior( mob->behavior->getType( ) )) {
             LogStream::sendNotice( ) << "mob " << mob->pIndexData->vnum << ": retired behavior "
                                      << mob->behavior->getType( ) << ", reassigning" << endl;
             mob->behavior.clear( );

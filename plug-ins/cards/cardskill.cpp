@@ -3,7 +3,7 @@
  * ruffina, 2005
  */
 #include "cardskill.h"
-#include "mobiles.h"
+#include "behavior.h"
 #include "xmlattributecards.h"
 
 #include "skillmanager.h"                                                       
@@ -22,6 +22,8 @@
 #include "l10n.h"
 
 GROUP(card_pack);
+// Fenia behavior of the card sharp (behaviors/card seller).
+static BehaviorReference bhv_card_seller("card seller");
 static GlobalBitvector cardGroups(skillGroupManager, group_card_pack);
 
 CardSkill::CardSkill( )
@@ -70,7 +72,7 @@ bool CardSkill::canPractice( PCharacter * ch, std::ostream & ) const
 
 bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose ) 
 {
-    if (mob && mob->behavior && mob->behavior.getDynamicPointer<CardSellerBehavior>( ))
+    if (mob && mob->pIndexData->behaviors.isSet(bhv_card_seller))
         return true;
 
     if (verbose) {    
