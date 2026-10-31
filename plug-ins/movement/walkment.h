@@ -50,6 +50,9 @@ protected:
     virtual bool checkSafe( Character * );
     virtual bool checkAir( Character * );
     virtual bool checkWater( Character * );
+    // A player without gills may dive after repeating the move; a run never dives.
+    virtual bool canRiskDrowning( Character * );
+    bool confirmDrowning( Character * );
     virtual bool checkMovepoints( Character * );
 
     virtual bool tryMove( Character * );
@@ -75,6 +78,8 @@ protected:
     Character *leftBehind;
     Object *boat;
     int boat_types;
+    // This step is a confirmed dive without gills.
+    bool fDrownConfirmed;
 };
 
 
