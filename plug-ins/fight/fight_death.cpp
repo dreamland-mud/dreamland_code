@@ -76,6 +76,10 @@ CONFIGURABLE_LOADED(fight, loot)
 // .config("fight/combat_ai"): see dreamland_fenia "utils/combat ai".
 CONFIGURABLE_DECL(fight, combat_ai)
 
+// Boss signature moves and phase scenes (fight/boss_mods.json), split out of
+// combat_ai.json so hot combat_ai reads stay small. Read only by Fenia.
+CONFIGURABLE_DECL(fight, boss_mods)
+
 enum {
     LOOT_DESTROY,
     LOOT_DROP,
