@@ -221,6 +221,9 @@ CMDRUN( cast )
     // 'level' here is the caster's modify level: the real spell level is computed
     // further down and cannot be hoisted, because getSpellLevel() rolls and improves
     // 'spell craft' as a side effect.
+    if (offensive && victim && groupmate_attack_held( ch, victim ))
+        return;
+
     if (!spell->preRun( ch, target, ch->getModifyLevel( ) ))
         return;
 

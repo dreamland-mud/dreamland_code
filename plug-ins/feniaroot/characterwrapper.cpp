@@ -3245,10 +3245,10 @@ NMI_INVOKE( CharacterWrapper, donatesTo, "(ch): раса этого персон
     return getTarget( )->getRace( )->getAttitude( *other->getRace( ) ).isSet( RACE_DONATES );
 }
 
-NMI_INVOKE( CharacterWrapper, is_safe_msg, "(vict): то же, что is_safe, но с сообщением 'под защитой богов', как у C++ умений" )
+NMI_INVOKE( CharacterWrapper, is_safe_msg, "(vict): то же, что is_safe, но с сообщением 'под защитой богов', как у C++ умений; первую атаку игрока на согруппника придерживает с предупреждением" )
 {
     checkTarget( );
-    return ::is_safe( target, arg2character( get_unique_arg( args ) ) );
+    return ::is_safe_attack( target, arg2character( get_unique_arg( args ) ) );
 }
 
 NMI_INVOKE( CharacterWrapper, damageLog, "(): who hurt this champion/boss/legend in the current fight, most damage first: list of [ch, name, dam], ch = the player if still in the world, else null; dam = hit points taken off (a charmed pet's count for its master, overkill not counted). Empty for other mobs and players" )

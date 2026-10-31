@@ -337,7 +337,7 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
     }
 
     if (IS_SET(flags, FSPELL_CHECK_SAFE) && offensive && target->victim) {
-        if (is_safe(ch, target->victim))
+        if (is_safe_attack(ch, target->victim))
             return false;
     }
 

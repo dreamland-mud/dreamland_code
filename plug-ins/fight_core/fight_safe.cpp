@@ -5,6 +5,8 @@
 #include "fight_safe.h"
 #include "fight_position.h"
 
+#include <map>
+
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -29,6 +31,7 @@
 #include "def.h"
 #include "vnum.h"
 #include "l10n.h"
+#include "follow_utils.h"
 
 CLAN(none);
 CLAN(flowers);
@@ -53,6 +56,63 @@ bool is_safe(Character *ch, Character *victim)
     }
 
     return true;
+}
+
+/*
+ * A player's first attack on someone in their own group is held back with a
+ * warning: the same attack typed again within WARN_WINDOW seconds goes
+ * through, and attacks on that groupmate stay allowed for CONFIRM_TIME.
+ * Only commands the player typed are held, never damage from ticks or AI.
+ */
+struct GroupmateWarning {
+    long long victim = 0;
+    long serial = -1;
+    time_t warnedAt = 0;
+    time_t confirmedUntil = 0;
+};
+
+static const time_t WARN_WINDOW = 20;
+static const time_t CONFIRM_TIME = 60;
+static std::map<long long, GroupmateWarning> groupmateWarnings;
+
+bool groupmate_attack_held( Character *ch, Character *victim )
+{
+    if (!ch || !victim || ch == victim)
+        return false;
+    if (ch->is_npc( ) || interpret_actor( ) != ch)
+        return false;
+    if (ch->fighting == victim || victim->fighting == ch)
+        return false;
+    if (!is_same_group( ch, victim ))
+        return false;
+
+    GroupmateWarning &w = groupmateWarnings[ch->getID( )];
+    time_t now = dreamland->getCurrentTime( );
+    long serial = interpret_serial( );
+
+    if (w.victim == victim->getID( )) {
+        if (w.confirmedUntil >= now)
+            return false;
+        // preRun and run of the same command: warned once already
+        if (w.serial == serial)
+            return true;
+        if (now - w.warnedAt <= WARN_WINDOW) {
+            w.confirmedUntil = now + CONFIRM_TIME;
+            return false;
+        }
+    }
+
+    w.victim = victim->getID( );
+    w.serial = serial;
+    w.warnedAt = now;
+    w.confirmedUntil = 0;
+    ch->pecho( _("{1{Y%1$^C1 в твоей группе. Повтори команду, если правда хочешь напасть.{2"), victim );
+    return true;
+}
+
+bool is_safe_attack( Character *ch, Character *victim )
+{
+    return is_safe( ch, victim ) || groupmate_attack_held( ch, victim );
 }
 
 static bool mprog_safe( Character *ch, Character *victim, bool verbose ) 

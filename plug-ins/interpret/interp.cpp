@@ -15,10 +15,16 @@
 #include "def.h"
 
 static Character *current_actor = 0;
+static long current_serial = 0;
 
 Character * interpret_actor( )
 {
     return current_actor;
+}
+
+long interpret_serial( )
+{
+    return current_serial;
 }
 
 InterpretActorGuard::InterpretActorGuard( Character *ch )
@@ -54,6 +60,7 @@ bool interpret( Character *ch, const char *line )
         return false;
 
     if (iargs.pCommand->dispatch( iargs ) == RC_DISPATCH_OK) {
+        current_serial++;
         InterpretActorGuard guard( ch );
         iargs.pCommand->entryPoint( ch, iargs.cmdArgs );
     }

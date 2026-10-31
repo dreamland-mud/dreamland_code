@@ -169,7 +169,7 @@ SKILL_RUNP( cleave )
         return;
     }
 
-    if (is_safe( ch, victim ))
+    if (is_safe_attack( ch, victim ))
         return;
 
     if ( ( obj = get_eq_char( ch, wear_wield ) ) == 0) {

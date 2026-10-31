@@ -63,7 +63,7 @@ CMDRUN( kill )
         return;
     }
 
-    if ( is_safe( ch, victim ) )
+    if ( is_safe_attack( ch, victim ) )
         return;
 
     if ( ch->position == POS_FIGHTING )
@@ -127,7 +127,7 @@ CMDRUN( murder )
         return;
     }
 
-    if ( is_safe( ch, victim ) )
+    if ( is_safe_attack( ch, victim ) )
         return;
 
     if ( IS_CHARMED(ch) && ch->master == victim )

@@ -123,7 +123,7 @@ SKILL_RUNP( lash )
         return;
     }
 
-    if (is_safe(ch, victim))
+    if (is_safe_attack(ch, victim))
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
