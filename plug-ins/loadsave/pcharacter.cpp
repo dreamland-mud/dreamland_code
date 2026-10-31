@@ -21,6 +21,7 @@
 #include "object.h"
 #include "affect.h"
 #include "skillreference.h"
+#include "spell.h"
 #include "room.h"
 
 #include "merc.h"
@@ -227,6 +228,21 @@ void passive_refresh( Character *ch, bool verbose );
  *  work with profiles
  *------------------------------------------------------------------------*/
 
+// A negative room spell (narcotic mist, cursed lands) leaves on its caster
+// only the recast cooldown, of the spell's own type. That is not a debuff:
+// it must run out offline like any other timer.
+static bool affect_is_frozen_debuff( Affect *paf )
+{
+    if (paf->type == gsn_manacles)
+        return true;
+
+    if ((int)paf->type < 0 || !paf->type->isNegative( ))
+        return false;
+
+    Spell::Pointer spell = paf->type->getSpell( );
+    return !spell || !spell->targetIsRoom( );
+}
+
 // Affect durations count ticks (one tick is a minute). An expired affect is left
 // at 0: the first tick after login removes it through the usual onRemove path.
 // Debuffs on a character stay frozen, so quitting does not wait out a curse or
@@ -237,8 +253,7 @@ static void affects_charge_offline_time( AffectList &affects, long minutes, bool
         if (paf->duration <= 0)
             continue;
 
-        if (keepDebuffs && (paf->type == gsn_manacles
-                            || ((int)paf->type >= 0 && paf->type->isNegative( ))))
+        if (keepDebuffs && affect_is_frozen_debuff( paf ))
             continue;
 
         paf->duration = max( 0L, paf->duration - minutes );

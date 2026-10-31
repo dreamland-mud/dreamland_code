@@ -53,6 +53,8 @@ public:
     virtual int getBeats(Character *ch = 0) const = 0;
     virtual int getMana( ) const = 0;
     virtual int getTarget( ) const = 0;
+    // True for a spell cast on the room itself (target 'room').
+    virtual bool targetIsRoom( ) const { return false; }
     virtual int getSpellType( ) const = 0;
     virtual int getPosition() const = 0;
     virtual bool isCasted( ) const = 0;
