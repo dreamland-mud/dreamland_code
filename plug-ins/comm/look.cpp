@@ -106,6 +106,7 @@ void do_look_into( Character *ch, char *arg2 );
  * Local functions.
  */
 static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort );
+static void do_look_object( Character *ch, Object *obj );
 static void show_pockets_to_char( Object *container, Character *ch, ostringstream &buf );
 void show_list_to_char( Object *list, Character *ch, bool fShort, 
                         bool fShowNothing, DLString pocket = "", Object *container = NULL );
@@ -1278,8 +1279,8 @@ static DLString oprog_extra_descr(Object *obj, Character *ch, const char *arg)
 }
 
 struct EDInfo {
-    EDInfo( DLString k, DLString d, Object *o, Room *r ) :
-        keyword( k ), description( d ), source( o ), sourceRoom( r )
+    EDInfo( DLString k, DLString d, Object *o, Room *r, bool def = false ) :
+        keyword( k ), description( d ), source( o ), sourceRoom( r ), isDefault( def )
     {
     }
 
@@ -1287,6 +1288,9 @@ struct EDInfo {
     DLString description;
     Object *source;
     Room *sourceRoom;
+    // Keyword matched the object itself, no extra description answered:
+    // shown as a full 'look at object', same as the web client's click.
+    bool isDefault;
 };
 
 struct ExtraDescList : public list<EDInfo> {
@@ -1323,7 +1327,7 @@ struct ExtraDescList : public list<EDInfo> {
         if (obj->getKeyword().matchesUnstrict(arg)) {
             if (obj->in_room) {
                 push_back( EDInfo(String::toString(obj->getKeyword()),
-                                  obj->getDescription(Player::lang(ch)), obj, 0 ) );
+                                  obj->getDescription(Player::lang(ch)), obj, 0, true ) );
                 return;
             }
 
@@ -1336,7 +1340,7 @@ struct ExtraDescList : public list<EDInfo> {
             // because three words no longer matched the item. Keep the line as a
             // last resort, after everything that actually answers.
             fallbacks.push_back( EDInfo(String::toString(obj->getKeyword()),
-                                        l(ch, "Ты не видишь здесь ничего особенного."), obj, 0 ) );
+                                        l(ch, "Ты не видишь здесь ничего особенного."), obj, 0, true ) );
         }
     }
 
@@ -1359,6 +1363,11 @@ struct ExtraDescList : public list<EDInfo> {
 
         for (count = 1, i = begin( ); i != end( ); i++, count++)
             if (count == number) {
+                if (i->isDefault && i->source) {
+                    do_look_object( ch, i->source );
+                    return true;
+                }
+
                 const ExtraDescrList &sourceEdList = i->source ? i->source->pIndexData->extraDescriptions : i->sourceRoom->getExtraDescr();
                 buf << "{x";
                 webManipManager->decorateExtraDescr( buf, i->description.c_str( ), sourceEdList, ch );
