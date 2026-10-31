@@ -149,7 +149,7 @@ void PersonalQuestReward::equip( Character *ch )
 
             af.location = PERSONAL_APPLIES[i];
             af.modifier = mod;
-            affect_to_obj( obj, &af );
+            affect_to_obj_unapplied( obj, &af );
         }
     }
 }

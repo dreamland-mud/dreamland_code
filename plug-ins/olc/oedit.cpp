@@ -30,6 +30,7 @@
 #include "json_utils_ext.h"
 #include "itemevents.h"
 #include "oedit.h"
+#include "wearlocation.h"
 #include "feniatriggers.h"
 #include "ovalues.h"
 #include "comm.h"
@@ -159,15 +160,23 @@ void OLCStateObject::commit()
     }
     obj.extraDescriptions.clear();
     
+    // Worn instances carry the prototype's affects on their wearer: take the old
+    // list off before it goes, or removing the item later subtracts the new one.
+    for(o = object_list; o; o = o->next)
+        if(o->pIndexData == original && o->carried_by)
+            o->wear_loc->affectsOnUnequip(o->carried_by, o);
+
     original->affected.deallocate();
     original->affected.assign(obj.affected.begin(), obj.affected.end());
     obj.affected.clear();
     
     for(o = object_list; o; o = o->next)
+        if(o->pIndexData == original && o->carried_by)
+            o->wear_loc->affectsOnEquip(o->carried_by, o);
+
+    for(o = object_list; o; o = o->next)
         if(o->pIndexData == original) {
             /*object instance hase separate extra descr*/
-            
-            /*XXX - add/strip affects?*/
             
             if(o->item_type == original->item_type)
                 o->item_type = obj.item_type;

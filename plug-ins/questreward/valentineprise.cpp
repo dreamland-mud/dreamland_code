@@ -55,7 +55,7 @@ void ValentinePrise::equip( Character *ch )
         } else {
             af.location = locs[i];
             addAffect( &af, level );
-            affect_to_obj( obj, &af );
+            affect_to_obj_unapplied( obj, &af );
         }
     }
 }

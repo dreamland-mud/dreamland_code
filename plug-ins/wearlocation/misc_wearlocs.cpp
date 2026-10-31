@@ -34,17 +34,12 @@ WEARLOC(hair);
 /*
  * stuck-in
  */
-bool StuckInWearloc::equip( Character *ch, Object *obj )
+void StuckInWearloc::affectsOnEquip( Character *ch, Object *obj )
 {
-    obj->wear_loc.assign( this );
-    saveDrops( ch );
-    return true;
 }
 
-void StuckInWearloc::unequip( Character *ch, Object *obj )
+void StuckInWearloc::affectsOnUnequip( Character *ch, Object *obj )
 {
-    obj->wear_loc.assign( wear_none );
-    saveDrops( ch );
 }
 
 /*
@@ -143,18 +138,6 @@ bool HairWearloc::matches( Character *ch )
     return true;
 }
 
-bool HairWearloc::equip( Character *ch, Object *obj )
-{
-    obj->wear_loc.assign( this );
-    saveDrops( ch );
-    return true;
-}
-
-void HairWearloc::unequip( Character *ch, Object *obj )
-{
-    obj->wear_loc.assign( wear_none );
-    saveDrops( ch );
-}
 void HairWearloc::affectsOnEquip( Character *ch, Object *obj ) { 
 }
 
@@ -577,19 +560,6 @@ bool TattooWearloc::canRemove( Character *ch, Object *obj, int flags )
 /*
  * tail 
  */
-bool TailWearloc::equip( Character *ch, Object *obj )
-{
-    obj->wear_loc.assign( this );
-    saveDrops( ch );
-    return true;
-}
-
-void TailWearloc::unequip( Character *ch, Object *obj )
-{
-    obj->wear_loc.assign( wear_none );
-    saveDrops( ch );
-}
-
 void TailWearloc::affectsOnEquip( Character *ch, Object *obj ) 
 { 
 }

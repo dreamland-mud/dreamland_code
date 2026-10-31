@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <sstream>
 #include <jsoncpp/json/json.h>
 
 #include "configurable.h"
@@ -182,6 +183,66 @@ bool armor_recompute( PCharacter *ch, int columns[4] )
         columns[i] += acMod;
 
     return true;
+}
+
+static void roll_sum( const AffectList &affects, int &hitroll, int &damroll )
+{
+    for (auto &paf: affects) {
+        if (paf->location == APPLY_HITROLL)
+            hitroll += paf->modifier;
+        else if (paf->location == APPLY_DAMROLL)
+            damroll += paf->modifier;
+    }
+}
+
+void roll_recompute( PCharacter *ch, int &hitroll, int &damroll )
+{
+    hitroll = damroll = 0;
+
+    roll_sum( ch->affected, hitroll, damroll );
+
+    for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content) {
+        if (!obj->wear_loc->givesAffects( ))
+            continue;
+
+        roll_sum( obj->pIndexData->affected, hitroll, damroll );
+        roll_sum( obj->affected, hitroll, damroll );
+    }
+}
+
+void roll_drift_log( PCharacter *ch )
+{
+    int hitroll, damroll;
+
+    // While the wearlocation plugin is away no slot gives stats.
+    if (!wearloc_armor_coef_fn)
+        return;
+
+    roll_recompute( ch, hitroll, damroll );
+
+    if (ch->hitroll == hitroll && ch->damroll == damroll)
+        return;
+
+    std::ostringstream buf;
+    buf << "Roll drift " << ch->getName( )
+        << ": hitroll " << ch->hitroll.getValue( ) << " should be " << hitroll
+        << ", damroll " << ch->damroll.getValue( ) << " should be " << damroll
+        << ", worn (hr proto/own, dr proto/own):";
+
+    for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content) {
+        if (!obj->wear_loc->givesAffects( ))
+            continue;
+
+        int protoHr = 0, protoDr = 0, ownHr = 0, ownDr = 0;
+        roll_sum( obj->pIndexData->affected, protoHr, protoDr );
+        roll_sum( obj->affected, ownHr, ownDr );
+
+        if (protoHr || protoDr || ownHr || ownDr)
+            buf << " " << obj->pIndexData->vnum << "@" << obj->wear_loc->getName( )
+                << " " << protoHr << "/" << ownHr << " " << protoDr << "/" << ownDr;
+    }
+
+    LogStream::sendWarning( ) << buf.str( ) << endl;
 }
 
 int armor_version_of( PCharacter *ch )
