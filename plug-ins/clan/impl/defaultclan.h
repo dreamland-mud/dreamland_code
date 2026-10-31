@@ -9,6 +9,7 @@
 #include "xmllimits.h"
 #include "xmlboolean.h"
 #include "xmlstring.h"
+#include "xmlmultistring.h"
 #include "xmlstringlist.h"
 #include "xmlinteger.h"
 #include "dlxmlloader.h"
@@ -69,7 +70,7 @@ public:
     
     virtual void handleVictory( PCharacter *, PCharacter * );
     virtual void handleDefeat( PCharacter *, PCharacter * );
-    virtual void makeMonument( Character *, Character * ) const;
+    virtual void makeMonument( Character *, Character *, int damtype ) const;
     virtual bool isEnemy( const Clan & );
 
 protected:
@@ -85,7 +86,7 @@ protected:
 
     XML_VARIABLE XMLVectorBase<XMLString> deities;
     XML_VARIABLE XMLVectorBase<XMLClanReference> enemies;
-    XML_VARIABLE XMLString monument, monumentName;
+    XML_VARIABLE XMLMultiString monument, monumentName;
     XML_VARIABLE XMLStringList msgSelf, msgVict, msgRoom;
     
     XML_VARIABLE XMLInteger leader, recruiter;

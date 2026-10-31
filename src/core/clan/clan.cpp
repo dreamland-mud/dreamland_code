@@ -99,7 +99,7 @@ void Clan::onInduct(PCharacter *) const
 {
 }
 
-void Clan::makeMonument( Character *, Character * ) const
+void Clan::makeMonument( Character *, Character *, int ) const
 {
 }
 void Clan::handleVictory( PCharacter *, PCharacter * )
