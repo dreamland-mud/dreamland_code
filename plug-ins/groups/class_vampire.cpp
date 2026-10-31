@@ -295,7 +295,7 @@ void sucking(Character *ch, Character *victim)
         return;
     }
 
-    if (is_safe(ch, victim))
+    if (is_safe_attack(ch, victim))
         return;
 
     if (IS_AWAKE(victim)) {

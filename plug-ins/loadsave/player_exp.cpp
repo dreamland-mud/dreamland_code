@@ -19,6 +19,7 @@
 #include "messengers.h"
 #include "act.h"
 #include "stats_apply.h"
+#include "screenreader.h"
 
 #include "merc.h"
 #include "def.h"
@@ -112,6 +113,10 @@ void Player::gainExp(PCharacter *pch, int gain)
 
         pch->save( );
     }
+
+    // A screen reader has no prompt bar to glance at: say how far the next level is.
+    if (gain > 0 && uses_screenreader( pch ) && pch->getLevel( ) < LEVEL_HERO - 1)
+        pch->pecho(_("До следующего уровня: %1$d очк%1$Iо|а|ов опыта."), pch->getExpToLevel( ));
 }
 
 /*

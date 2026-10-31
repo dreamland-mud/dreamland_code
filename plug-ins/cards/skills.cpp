@@ -98,7 +98,7 @@ SKILL_RUNP( sconce )
         return;
     }
 
-    if (is_safe(ch,victim))
+    if (is_safe_attack(ch,victim))
         return;
 
     // Bosses and legends are never knocked out by one blow, the same way the
@@ -220,7 +220,7 @@ SKILL_RUNP( joker )
         return;
     }
 
-    if (is_safe( ch, victim ))
+    if (is_safe_attack( ch, victim ))
         return;
 
     if (victim->is_immortal( )) {

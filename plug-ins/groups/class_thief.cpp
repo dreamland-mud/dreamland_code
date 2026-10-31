@@ -174,7 +174,7 @@ SKILL_RUNP( circle )
             return;
     }
 
-    if (is_safe(ch,victim))
+    if (is_safe_attack(ch,victim))
             return;
 
     for ( person = ch->in_room->people; person != 0; person = person->next_in_room )

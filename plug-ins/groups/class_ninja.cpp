@@ -437,7 +437,7 @@ SKILL_RUNP( nerve )
                 return;
         }
 
-        if (is_safe(ch,victim))
+        if (is_safe_attack(ch,victim))
         {            
                 return;
         }
@@ -789,7 +789,7 @@ SKILL_RUNP( assassinate )
             return;
     }
 
-    if ( is_safe( ch, victim ) )
+    if ( is_safe_attack( ch, victim ) )
             return;
 
     if ( victim->is_immortal() && !victim->is_npc() )
@@ -951,7 +951,7 @@ SKILL_RUNP( strangle )
                 return;
         }
     
-        if ( is_safe(ch,victim) )
+        if ( is_safe_attack(ch,victim) )
         {
                 return;
         }

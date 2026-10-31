@@ -19,6 +19,12 @@ bool    interpret_cmd        ( Character *ch, const char *cmd, const char *argsF
  */
 Character * interpret_actor( );
 
+/*
+ * Grows by one with every command interpret() runs, so a check made twice
+ * inside one command (preRun and run) can tell itself from a repeated one.
+ */
+long interpret_serial( );
+
 class InterpretActorGuard {
 public:
     InterpretActorGuard( Character *ch );

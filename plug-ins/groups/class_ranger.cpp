@@ -260,7 +260,7 @@ SKILL_RUNP( ambush )
             return;
     }
 
-    if ( is_safe( ch, victim ) )
+    if ( is_safe_attack( ch, victim ) )
             return;
 
     AmbushOneHit amb( ch, victim );
