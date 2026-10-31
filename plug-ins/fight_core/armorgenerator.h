@@ -21,6 +21,10 @@ bool armor_slot_exists(const DLString &slot);
 /** The whole fight/item_affixes.json, for the weapon side of the pool. */
 const Json::Value & item_affixes_config();
 
+/** Loot affix window multiplier: item_level_curve(level), times
+ *  measure.armor_budget_mult[melee, caster] when kind is "armor". */
+double affix_window_curve(int level, const DLString &kind, bool caster);
+
 /** Section "charged" of item_affixes.json: how many charges a spell of this
  *  one-charge price (M) can take on an item of this tier and level. kind
  *  "armor" = jewelry and held items cast from anywhere, "weapon" = staves cast
