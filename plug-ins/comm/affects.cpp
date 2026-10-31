@@ -157,6 +157,16 @@ DLString AffectOutput::format_affect_location( Affect *paf )
                                -(int)paf->modifier );
             break;
 
+        // Negative is better in armor[], players only ever see the positive scale.
+        case APPLY_AC:
+            if (paf->modifier < 0)
+                buf << fmt( 0, _("улучшает {mброню{y на {m%1$d{y").getMessage( lang ).c_str( ),
+                               -(int)paf->modifier );
+            else if (paf->modifier > 0)
+                buf << fmt( 0, _("ухудшает {mброню{y на {m%1$d{y").getMessage( lang ).c_str( ),
+                               (int)paf->modifier );
+            break;
+
         case APPLY_BITVECTOR:
             /* do nothing */
             break;
