@@ -1041,6 +1041,93 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
     return result;
 }
 
+NMI_INVOKE( ObjectWrapper, getKeyword, "(lang): ключевые слова предмета на языке lang (0=en,1=ru,2=ua), с откатом на прототип" )
+{
+    checkTarget( );
+    return Register( target->getKeyword( argnum2lang( args, 1 ) ) );
+}
+
+NMI_INVOKE( ObjectWrapper, setKeyword, "(text, lang): установить ключевые слова предмета только для языка lang (0=en,1=ru,2=ua)" )
+{
+    checkTarget( );
+    DLString text = argnum2string( args, 1 );
+    target->setKeyword( text, argnum2lang( args, 2 ) );
+    return Register( );
+}
+
+NMI_INVOKE( ObjectWrapper, morph, "(vnum): заменить предмет в инвентаре на новый vnum, перенеся его собственные имена, описания, экстры, материал, флаги, состояние, уровень, владельца, аффекты и questTier; надетый остается надетым. Fenia-поля, Id, таймер и прочие properties не переносятся; непустой контейнер не превращается. Старый предмет уничтожается, возвращает новый" )
+{
+    checkTarget( );
+    int vnum = argnum2number( args, 1 );
+    if (vnum <= 0)
+        throw Scripting::Exception( "morph: vnum must be positive" );
+
+    OBJ_INDEX_DATA *pIndex = get_obj_index( vnum );
+    if (!pIndex)
+        throw Scripting::Exception( "morph: no such object vnum" );
+
+    Character *ch = target->carried_by;
+    if (!ch)
+        throw Scripting::Exception( "morph: object not in inventory" );
+    if (target->contains)
+        throw Scripting::Exception( "morph: container not empty" );
+
+    // The caller's register keeps this wrapper alive past extract_obj.
+    Register thiz( self );
+
+    ::Object *old = target;
+    ::Object *obj = create_object( pIndex, 0 );
+    obj_to_char( obj, ch );
+
+    obj->setOwner( old->getOwner( ) );
+
+    // Copy only what the old object holds itself: the getters fall back to its
+    // prototype, and a template there must not overwrite the new object's own text.
+    for (int l = LANG_MIN; l < LANG_MAX; l++) {
+        lang_t lang = (lang_t)l;
+
+        if (!old->getRealShortDescr( lang ).empty( ))
+            obj->setShortDescr( old->getRealShortDescr( lang ), lang );
+
+        if (!old->getRealDescription( lang ).empty( ))
+            obj->setDescription( old->getRealDescription( lang ), lang );
+    }
+
+    if (!old->getRealKeyword( ).empty( ))
+        obj->setKeyword( old->getRealKeyword( ) );
+
+    if (!old->getRealMaterial( ).empty( ))
+        obj->setMaterial( old->getRealMaterial( ) );
+
+    obj->extra_flags = old->extra_flags;
+    obj->condition = old->condition;
+    obj->level = old->level;
+
+    for (auto &paf: old->affected)
+        affect_to_obj( obj, paf );
+
+    for (auto &ed: old->extraDescriptions)
+        for (int l = LANG_MIN; l < LANG_MAX; l++) {
+            lang_t lang = (lang_t)l;
+
+            if (!ed->description.get( lang ).empty( ))
+                obj->addExtraDescr( ed->keyword, ed->description.get( lang ), lang );
+        }
+
+    // Hero items rescale their affects from this tier on equip.
+    if (!old->getProperty( "questTier" ).empty( ))
+        obj->setProperty( "questTier", old->getProperty( "questTier" ) );
+
+    if (old->wear_loc != wear_none) {
+        Wearlocation *loc = &*old->wear_loc;
+        loc->unequip( old );
+        loc->equip( obj );
+    }
+
+    extract_obj( old );
+    return wrap( obj );
+}
+
 NMI_INVOKE(ObjectWrapper, clone, "(): создать полную копию этого объекта")
 {
     checkTarget();

@@ -4,6 +4,8 @@
  */
 
 #include "so.h"
+#include "xmlattributeplugin.h"
+#include "xmlattributequestreward.h"
 #include "questreward.h"
 #include "personalquestreward.h"
 #include "questgirth.h"
@@ -19,6 +21,7 @@ extern "C"
         {
                 SO::PluginList ppl;
                 
+                Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeQuestReward> >( ppl );
                 Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestReward> >( ppl );
                 Plugin::registerPlugin<ObjectBehaviorRegistrator<PersonalQuestReward> >( ppl );
                 Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestGirth> >( ppl );

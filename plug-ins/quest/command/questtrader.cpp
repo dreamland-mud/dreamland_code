@@ -9,6 +9,7 @@
 
 #include "questtrader.h"
 #include "xmlattributequestreward.h"
+#include "heroitems.h"
 #include "xmlattributequestdata.h"
 #include "occupations.h"
 #include "defaultreligion.h"
@@ -344,41 +345,16 @@ PersonalQuestArticle::PersonalQuestArticle( )
 #define OBJ_VNUM_QUESTGIRTH    94
 #define OBJ_VNUM_QUESTKEYRING  119
 
-/** Copies of a hero vnum the client owns in a bank vault they can open: their
- *  own cell, their account's shared cell and their clan's cell. Vaults refuse new
- *  hero deposits (vault_policy_reason), but copies banked before that still sit
- *  there, out of object_list, and must not let `trouble` or `buy` mint another. */
+/** Copies of a hero vnum the client owns in a bank vault they can open. Vaults
+ *  refuse new hero deposits (vault_policy_reason), but copies banked before that
+ *  still sit there, out of object_list, and must not let `trouble` or `buy` mint
+ *  another. A girth with a keyring attached counts as the girth. */
 static int bank_count_owned( PCharacter *client, int vnum )
 {
-    std::vector<std::pair<DLString, DLString> > cells;
-    cells.push_back( std::make_pair( DLString( "player" ), client->getName( ).toLower( ) ) );
+    int count = hero_vault_count( client, vnum );
 
-    DLString acct = bank_vault_account( client->getName( ) );
-    if (!acct.empty( ))
-        cells.push_back( std::make_pair( DLString( "account" ), acct ) );
-
-    DLString clan = client->getClan( ).getName( ).toLower( );
-    if (!clan.empty( ))
-        cells.push_back( std::make_pair( DLString( "clan" ), clan ) );
-
-    DLString me = client->getName( ).toLower( );
-    int count = 0;
-
-    for (size_t i = 0; i < cells.size( ); i++) {
-        std::vector<BankEntry> entries;
-        bank_browse( cells[i].first, cells[i].second, entries );
-
-        for (size_t j = 0; j < entries.size( ); j++) {
-            int v = entries[j].vnum;
-
-            if (v != vnum
-                && !(vnum == OBJ_VNUM_QUESTGIRTH && v == OBJ_VNUM_QUESTKEYRING))
-                continue;
-
-            if (entries[j].owner.toLower( ) == me)
-                count++;
-        }
-    }
+    if (vnum == OBJ_VNUM_QUESTGIRTH)
+        count += hero_vault_count( client, OBJ_VNUM_QUESTKEYRING );
 
     return count;
 }
@@ -434,48 +410,6 @@ bool PersonalQuestArticle::available( Character *client, NPCharacter *questman )
     }
 
     return true;
-}
-
-/** The adjectives the quest master engraves on a hero item, indexed
- *  [alignment: good, neutral, evil][gender: neuter, male, female]. Russian and
- *  Ukrainian carry the six-case pad, English has neither case nor gender. The
- *  Ukrainian nouns in limbo have to keep the same gender as the Russian ones,
- *  or the adjective will not agree with them. Read backwards by
- *  PersonalNameRepair at the bottom of this file, so keep the Russian strings
- *  exactly as they have always been written into objects. */
-static const LangText HERO_ADJECTIVES[3][3] = {
-    {
-        { "holy", "Священн|ое|ого|ому|ое|ым|ом", "Священн|е|ого|ому|е|им|ому" },
-        { "holy", "Священн|ый|ого|ому|ый|ым|ом", "Священн|ий|ого|ому|ий|им|ому" },
-        { "holy", "Священн|ая|ой|ой|ую|ой|ой",   "Священн|а|ої|ій|у|ою|ій" },
-    },
-    {
-        { "shimmering", "Мерцающ|ее|его|ему|ее|им|ем", "Мерехтлив|е|ого|ому|е|им|ому" },
-        { "shimmering", "Мерцающ|ий|его|ему|ий|им|ем", "Мерехтлив|ий|ого|ому|ий|им|ому" },
-        { "shimmering", "Мерцающ|ая|ей|ей|ую|ей|ей",   "Мерехтлив|а|ої|ій|у|ою|ій" },
-    },
-    {
-        { "devilish", "Дьявольск|ое|ого|ому|ое|им|ом", "Диявольськ|е|ого|ому|е|им|ому" },
-        { "devilish", "Дьявольск|ий|ого|ому|ий|им|ом", "Диявольськ|ий|ого|ому|ий|им|ому" },
-        { "devilish", "Дьявольск|ая|ой|ой|ую|ой|ой",   "Диявольськ|а|ої|ій|у|ою|ій" },
-    },
-};
-
-/** Pick the adjective for this buyer and this article's declared gender. */
-static const LangText & hero_adjective( PCharacter *client, int gender )
-{
-    const LangText (&adjectives)[3][3] = HERO_ADJECTIVES;
-
-    int a = IS_GOOD(client) ? 0 : IS_NEUTRAL(client) ? 1 : 2;
-    int g;
-
-    switch (gender) {
-    case SEX_MALE:   g = 1; break;
-    case SEX_FEMALE: g = 2; break;
-    default:         g = 0; break;
-    }
-
-    return adjectives[a][g];
 }
 
 void PersonalQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharacter *questman )

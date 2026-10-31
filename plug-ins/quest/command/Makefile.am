@@ -6,6 +6,7 @@ include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 -I$(srcdir)/../core \
 -I$(top_srcdir)/plug-ins/services/core \
+-I$(top_srcdir)/plug-ins/questreward \
 -I$(top_srcdir)/plug-ins/religion \
 -I$(top_srcdir)/plug-ins/clan/core \
 -I$(top_srcdir)/plug-ins/languages/core \
@@ -15,6 +16,7 @@ $(INCLUDES_SRC)
 libquest_command_la_LIBADD = \
 ../../clan/core/libclan_core.la \
 ../../services/core/libservices_core.la \
+../../questreward/libquestreward.la \
 ../../languages/core/liblanguages_core.la \
 ../../religion/libreligion.la \
 ../core/libquest_core.la \
@@ -25,13 +27,11 @@ impl.cpp \
 questtrader.cpp \
 questmaster.cpp \
 questor.cpp \
-cquest.cpp \
-xmlattributequestreward.cpp 
+cquest.cpp
 
 libquest_command_la_MOC = \
 cquest.h \
 questtrader.h \
-xmlattributequestreward.h \
 questmaster.h \
 questor.h
 
