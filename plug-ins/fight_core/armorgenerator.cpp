@@ -30,6 +30,7 @@
 #include "dl_math.h"
 #include "alignment.h"
 #include "date.h"
+#include "tohit.h"
 #include "merc.h"
 #include "def.h"
 
@@ -39,6 +40,12 @@ static Json::Value item_affixes;
 CONFIGURABLE_LOADED(fight, item_affixes)
 {
     item_affixes = value;
+}
+
+static Json::Value armorProfiles;
+CONFIGURABLE_LOADED(fight, armor_profiles)
+{
+    armorProfiles = value;
 }
 
 static Json::Value armor_names;
@@ -1468,8 +1475,39 @@ void ArmorGenerator::applyAffixes()
 /** Crafted armor's AC (craft/armor generateAC): level 0..100 -> 1..40, the tier
  *  shifts the top by 10% a step around rare, harder material adds, capped at 60.
  *  Indestructible materials (hardness -1) count as the hardest. */
+/** Per column multipliers of the prototype's armor construction (pierce, bash,
+ *  slash, exotic). All 1 until the armor model runs and the prototype names a
+ *  profile fight/armor_profiles.json knows; "custom" is not in the table. */
+static void armor_profile_columns(Object *obj, double columns[4])
+{
+    static const char *names[4] = { "pierce", "bash", "slash", "exotic" };
+
+    for (int i = 0; i < 4; i++)
+        columns[i] = 1;
+
+    if (to_hit_model() != 1 || !armorProfiles.isObject())
+        return;
+
+    DLString name = obj->pIndexData->getProperty("armor_profile");
+    if (name.empty())
+        return;
+
+    const Json::Value &table = armorProfiles.isMember("profiles") ? armorProfiles["profiles"] : armorProfiles;
+    if (!table.isObject() || !table.isMember(name.c_str()) || !table[name.c_str()].isObject())
+        return;
+
+    const Json::Value &profile = table[name.c_str()];
+    for (int i = 0; i < 4; i++)
+        if (profile[names[i]].isNumeric())
+            columns[i] = profile[names[i]].asDouble();
+}
+
 void ArmorGenerator::assignAC()
 {
+    // A piece refit to jewelry, clothing or treasure rolls stats, never AC columns.
+    if (obj->item_type != ITEM_ARMOR)
+        return;
+
     const material_t *m = material_by_name(materialName);
     int hardness = m ? m->hardness : 5;
     if (hardness < 0)
@@ -1485,10 +1523,14 @@ void ArmorGenerator::assignAC()
     if (keepName) {
         if (!armor_slot_exists(slot))
             return;
-        obj->value0(max(obj->value0(), number_range(lo, hi)));
-        obj->value1(max(obj->value1(), number_range(lo, hi)));
-        obj->value2(max(obj->value2(), number_range(lo, hi)));
-        obj->value3(max(obj->value3(), number_range(lo, hi) / 2));
+        // The roll keeps its budget and takes the piece's construction, or a flat
+        // roll would flatten the profile the item's own columns were refit to.
+        double shape[4];
+        armor_profile_columns(obj, shape);
+        obj->value0(max(obj->value0(), (int)lround(number_range(lo, hi) * shape[0])));
+        obj->value1(max(obj->value1(), (int)lround(number_range(lo, hi) * shape[1])));
+        obj->value2(max(obj->value2(), (int)lround(number_range(lo, hi) * shape[2])));
+        obj->value3(max(obj->value3(), (int)lround((number_range(lo, hi) / 2) * shape[3])));
         return;
     }
 

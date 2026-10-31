@@ -95,7 +95,11 @@ void WeaponRandomizer::eventItemReset(const ItemResetEvent &event) const
     Object *obj = event.obj;
     RESET_DATA *pReset = event.pReset;
 
-    if (obj->item_type == ITEM_ARMOR && item_is_random_armor(obj->pIndexData)) {
+    // The refit moved some 'random armor' pieces to these types: they keep their stats.
+    bool wornType = obj->item_type == ITEM_ARMOR || obj->item_type == ITEM_JEWELRY
+                    || obj->item_type == ITEM_CLOTHING || obj->item_type == ITEM_TREASURE;
+
+    if (wornType && item_is_random_armor(obj->pIndexData)) {
         if (obj->getProperty("tier").empty())
             randomizeArmorStats(obj, pReset->bestTier);
         return;

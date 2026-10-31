@@ -41,6 +41,7 @@
 #include "weapongenerator.h"
 #include "vnum.h"
 #include "fenia_utils.h"
+#include "tohit.h"
 #include "merc.h"
 #include "act.h"
 #include "interp.h"
@@ -103,12 +104,17 @@ void CleaveOneHit::calcDamage( )
     
     damNormalize( );
 
-    if (number_percent( ) < 50)
-        protectSanctuary( );
+    if (to_hit_model( ) == 1)
+        protectAll( );
+    else {
+        if (number_percent( ) < 50)
+            protectSanctuary( );
 
-    protectAlign( );
-    protectImmune( );
-    protectRazer( ); 
+        protectAlign( );
+        protectImmune( );
+        protectRazer( ); 
+    }
+
     protectMaterial( wield );
 }
 

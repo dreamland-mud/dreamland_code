@@ -45,7 +45,8 @@ confirm.cpp \
 reboot.cpp \
 adminservlet.cpp \
 forceservlet.cpp \
-vaultmigrate.cpp
+vaultmigrate.cpp \
+recalc.cpp
 
 libplugin_command_la_LIBADD = \
 ../descriptor/libdescriptor.la \

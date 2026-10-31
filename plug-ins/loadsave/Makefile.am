@@ -46,6 +46,7 @@ areaquestutils.cpp \
 xmlattributeareaquest.cpp \
 behavior_utils.cpp \
 stats_apply.cpp \
+tohit.cpp \
 player_exp.cpp \
 player_account.cpp \
 money_utils.cpp \

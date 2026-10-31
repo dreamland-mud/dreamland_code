@@ -103,11 +103,18 @@ void item_weights(ItemWeights &w, bool caster, int acLevel)
     w.stat[4]      = item_value(pf, "con", 3);
     w.stat[5]      = item_value(pf, "cha", 0);
 
-    // AC is near-useless except at low level: ac_base at level 1, linearly 0 by ac_zero_level.
-    double acZero     = item_value("shared", "ac_zero_level", 40);
-    w.ac              = item_value("shared", "ac_base", 0.5) * max(0.0, acZero - acLevel) / max(1.0, acZero - 1);
-    // A caster still values AC past ac_zero_level (no parry, hit by everything).
-    w.ac = max(w.ac, item_value(pf, "ac_floor", 0));
+    // shared.ac_weight: armor is worth the same at every level under the armor model.
+    double acFlat = item_value("shared", "ac_weight", -1);
+    if (acFlat >= 0) {
+        w.ac = acFlat;
+    } else {
+        // AC is near-useless except at low level: ac_base at level 1, linearly 0 by ac_zero_level.
+        double acZero = item_value("shared", "ac_zero_level", 40);
+        w.ac          = item_value("shared", "ac_base", 0.5) * max(0.0, acZero - acLevel) / max(1.0, acZero - 1);
+        // A caster still values AC past ac_zero_level (no parry, hit by everything).
+        w.ac = max(w.ac, item_value(pf, "ac_floor", 0));
+    }
+    w.acExotic = item_value(pf, "ac_exotic", c ? 0.25 : 0.1);
     w.slevel          = item_value(pf, "slevel", c ? 25.0 : 4.0);
     w.level           = item_value(pf, "level", c ? 40.0 : 14.0);
     w.skillLevel      = item_value(pf, "skill_level_group", c ? 18.0 : 8.0);

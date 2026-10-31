@@ -403,6 +403,7 @@ public:
 
     virtual void calcTHAC0( );
     virtual void calcDamage( );
+    virtual double hitrollEff( ) const;
 
 protected:
     Skill *skillPtr;
@@ -451,6 +452,17 @@ void GenericSkillOneHit::calcTHAC0( )
     // the bonus a fully learned skill is worth.
     if (thacCoeff != 0)
         thac0 -= thacCoeff * skillPtr->getEffective( ch ) / 100;
+}
+
+// Armor model: thacCoeff was points on a d20, hence the 20. It both aims and pierces.
+double GenericSkillOneHit::hitrollEff( ) const
+{
+    double eff = WeaponOneHit::hitrollEff( );
+
+    if (thacCoeff != 0)
+        eff *= 1 + thacCoeff * skillPtr->getEffective( ch ) / 100.0 / 20.0;
+
+    return eff;
 }
 
 void skill_one_hit_nocatch( Character *ch, Character *victim, Skill *skill,

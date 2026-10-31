@@ -22,6 +22,7 @@
 #include "affect.h"
 #include "skillreference.h"
 #include "room.h"
+#include "tohit.h"
 
 #include "merc.h"
 
@@ -377,6 +378,8 @@ bool PCharacter::load( )
      */
     for (Object *obj = carrying; obj != 0; obj = obj->next_content) 
         obj->wear_loc->reset( obj );
+
+    recalc_armor_if_stale( this );
 
     position = (position == POS_FIGHTING ? POS_STANDING: position);
     REMOVE_BIT(act, PLR_NO_EXP|PLR_DIGGED); 

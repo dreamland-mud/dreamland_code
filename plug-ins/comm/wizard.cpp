@@ -106,6 +106,7 @@
 #include "loadsave.h"
 #include "fread_utils.h"
 #include "stats_apply.h"
+#include "tohit.h"
 #include "wizard.h"
 #include "movetypes.h"
 #include "directions.h"
@@ -1214,7 +1215,7 @@ static bool has_nopost(Character *ch)
         
     buf << "Броня: ";
     for (int a = 0; a < ac_type.size; a++)
-        buf << ac_type.name(a) << ": " << GET_AC(victim, a) << "  ";
+        buf << ac_type.name(a) << ": " << to_hit_shown_armor(victim, a) << "  ";
     buf << endl;
     
     buf << "Хитролл: "   << victim->hitroll << "  "

@@ -20,6 +20,7 @@
 #include "loadsave.h"
 #include "clanownshook.h"
 #include "stats_apply.h"
+#include "tohit.h"
 
 #include "act.h"
 
@@ -44,6 +45,8 @@ OneHit::OneHit( Character *ch, Character *victim )
     skill = 0;
     thac0 = 0;
     victim_ac = 0;
+    accuracy = 0;
+    evasion = 0;
     orig_dam = 0;
     critical = false;
 }
@@ -57,10 +60,20 @@ void OneHit::hit( )
 
     init( );
     
-    calcTHAC0( );
-    calcArmorClass( );
+    bool landed;
 
-    if (!diceroll( )) {
+    if (to_hit_model( ) == 1) {
+        calcAccuracy( );
+        calcEvasion( );
+        landed = rollToHit( );
+    }
+    else {
+        calcTHAC0( );
+        calcArmorClass( );
+        landed = diceroll( );
+    }
+
+    if (!landed) {
         miss( );
         return;
     }
@@ -179,6 +192,38 @@ bool OneHit::diceroll()
     d.log(dice, "dice");
     d.log(thac0-victim_ac, "thac0 - victim_ac");
     return dice >= thac0 - victim_ac;
+}
+
+/*
+ * The d20 still decides fumbles and crits, the 5% at each end. The rest of the
+ * roll is rescaled so that the total chance to hit stays exactly to_hit_chance(),
+ * the number the armor curves were tuned on. A plain "percent < P" after the d20
+ * would squeeze 95% down to 90.5%.
+ */
+bool OneHit::rollToHit( )
+{
+    Debug d(ch, "debug_onehit", "rollToHit");
+    double chance = to_hit_chance( accuracy, evasion );
+    int dice = number_range( 0, 19 );
+
+    d.log(accuracy, "accuracy");
+    d.log(evasion, "evasion");
+    d.log(chance * 100, "chance%");
+
+    if (dice == 0) {
+        if (ch->getRace() == race_hobbit) {
+            critical = true;
+            return true;
+        }
+        return false;
+    }
+
+    if (dice == 19) {
+        critical = true;
+        return true;
+    }
+
+    return number_range( 1, 10000 ) <= (chance - 0.05) / 0.9 * 10000;
 }
 
 bool OneHit::checkShadow( )
@@ -385,6 +430,57 @@ void OneHit::acApplyPosition( )
 
     if ( !victim->move )
         victim_ac += 10;
+}
+
+/*----------------------------------------------------------------------------
+ * Armor model: accuracy against evasion
+ *----------------------------------------------------------------------------*/
+double OneHit::hitrollEff( ) const
+{
+    double eff = to_hit_hitroll_eff( ch, skill );
+
+    if (IS_GOOD(victim) && ch->isAffected( gsn_soul_lust ))
+        eff += 1 + eff / 100;
+
+    return eff;
+}
+
+void OneHit::calcAccuracy( )
+{
+    int classBase = 20 - interpolate( ch->getModifyLevel( ),
+                                      ch->getProfession( )->getThac00( ch ),
+                                      ch->getProfession( )->getThac32( ch ) );
+
+    accuracy = to_hit_accuracy( std::max( 1, classBase ), hitrollEff( ) );
+}
+
+void OneHit::calcEvasion( )
+{
+    const ToHitConfig &cfg = to_hit_config( );
+    int victimLevel = victim->getModifyLevel( );
+
+    evasion = to_hit_evasion( victimLevel, IS_AWAKE(victim) ? get_dex_app( victim ).defensive : 0 );
+
+    if (victim->position < POS_FIGHTING || !victim->move)
+        evasion /= 2;
+
+    int sk_armor_use = gsn_armor_use->getEffective( victim );
+
+    if (sk_armor_use > 1) {
+        if (number_percent( ) < sk_armor_use) {
+            gsn_armor_use->improve( victim, true, ch );
+            defenseBonus = (int)(cfg.armor_use_bonus * victimLevel);
+        }
+        else
+            gsn_armor_use->improve( victim, false, ch );
+    }
+
+    if (!ch->can_see( victim )) {
+        if (number_percent( ) < gsn_blind_fighting->getEffective( ch ))
+            gsn_blind_fighting->improve( ch, true, victim );
+        else
+            evasion *= cfg.blind_factor;
+    }
 }
 
 /*-----------------------------------------------------------------------------

@@ -51,6 +51,7 @@
 #include "calendar_utils.h"
 #include "material-table.h"
 #include "stats_apply.h"
+#include "tohit.h"
 #include "mudtags.h"
 #include "behavior.h"
 
@@ -1752,9 +1753,9 @@ NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, pr
     DLString profile = args.size() > 7 ? argnum2string(args, 8) : DLString::emptyString;
     int rolls = args.size() > 8 ? argnum2number(args, 9) : 0;
 
-    // A crafted lantern rolls like armor: the light slot is priced by the same
+    // A crafted lantern or ring rolls like armor: its slot is priced by the same
     // model, and a crafted piece keeps its own values (no AC is written).
-    if (obj->item_type != ITEM_ARMOR && obj->item_type != ITEM_LIGHT)
+    if (obj->item_type != ITEM_ARMOR && obj->item_type != ITEM_LIGHT && obj->item_type != ITEM_JEWELRY)
         throw Scripting::Exception("Item is not armor for a craft roll.");
     if (tier < BEST_TIER || tier > WORST_TIER)
         throw Scripting::Exception("Invalid armor tier.");
@@ -2130,6 +2131,32 @@ NMI_INVOKE(Root, config, "(name): read-only доступ до конфигура
         throw Scripting::Exception("Configurable not found");
 
     return JsonUtils::toRegister(cfg->getValue());
+}
+
+NMI_INVOKE(Root, configReload, "(name): перечитать конфигурационный json-файл с диска, с вызовом его обработчика загрузки")
+{
+    DLString fileName = args2string(args);
+    Configurable::Pointer cfg = configReg->get(fileName);
+
+    if (!cfg)
+        throw Scripting::Exception("Configurable not found");
+
+    cfg->load();
+    return Register(1);
+}
+
+NMI_INVOKE(Root, toHitModel, "([n]): модель попадания и брони: 0 старый d20, 1 модель брони, -1 снова как в fight/to_hit; без аргумента не меняет; возвращает действующую модель")
+{
+    if (!args.empty()) {
+        int model = argnum2number(args, 1);
+
+        if (model < -1 || model > 1)
+            throw Scripting::IllegalArgumentException();
+
+        to_hit_model_override(model);
+    }
+
+    return Register(to_hit_model());
 }
 
 

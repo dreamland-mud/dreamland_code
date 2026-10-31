@@ -71,4 +71,9 @@ int wield_weight_cap( Character *ch, bool secondary );
            ((ch)->armor[type]                            \
             + (IS_AWAKE(ch) ? get_dex_app(ch).defensive : 0))
 
+/* Armor on the model 1 scale: positive, more is better, 0 for naked. A PC's
+ * armor[] rests at 100, a mob's at 0. Dex is evasion now, not armor. */
+#define GET_DEFENSE(ch,type)                        \
+           (((ch)->is_npc( ) ? 0 : 100) - (ch)->armor[type])
+
 #endif

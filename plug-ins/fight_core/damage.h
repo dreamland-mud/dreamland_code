@@ -72,12 +72,16 @@ public:
     void adjustDeathTime( );
     
     virtual void calcDamage( );
+    /** The whole protection chain, armor last. Every damage path that protects
+     *  runs this, so a new protection cannot miss one of them. */
+    void protectAll( );
     void protectMaterial( Object * );
     void protectSanctuary( );
     void protectAlign( );
     void protectTemperature( );
     void protectImmune( );
     void protectRazer( ); 
+    void protectArmor( );
     virtual void protectResistance( );
     virtual void protectPrayer( );
 
@@ -126,6 +130,9 @@ protected:
     virtual bool mprog_immune();
     virtual bool mprog_hit();
 
+    /** Attacker's hitroll as it pierces armor. No weapon skill outside melee. */
+    virtual double hitrollEff( ) const;
+
     void init(Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag);
 
 protected:
@@ -144,6 +151,9 @@ protected:
     
     // What to pass to the death handler as source of death.
     DLString deathReason;
+
+    // Armor the victim adds for this blow only (armor use).
+    int defenseBonus;
 };
 
 struct CharDeathEvent : public Event {
