@@ -81,6 +81,12 @@ int armor_coef_for_flags( int wearFlags );
  *  columns[4]. False while the wearlocation plugin is away. */
 bool armor_recompute( PCharacter *ch, int columns[4] );
 
+/** What hitroll and damroll should be from the worn gear and the affects on ch. */
+void roll_recompute( PCharacter *ch, int &hitroll, int &damroll );
+
+/** Log hitroll or damroll that drifted from roll_recompute, with what is worn. */
+void roll_drift_log( PCharacter *ch );
+
 /** Rebuild armor[] once per fight/to_hit.json armor_version, at load. */
 void recalc_armor_if_stale( PCharacter *ch );
 

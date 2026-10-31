@@ -48,6 +48,8 @@ Object *        create_object_org (obj_index_data *pObjIndex,short level,bool Co
 void                clone_object         ( Object *parent, Object *clone );
 
 void        affect_to_obj    ( Object *, const Affect *paf );
+/** affect_to_obj for an equip trigger: the wearer gets it from the affectsOnEquip that follows. */
+void        affect_to_obj_unapplied( Object *, const Affect *paf );
 void        affect_remove_obj( ::Object *, Affect *paf, bool verbose = false );
 void        affect_enhance   ( Object *obj, const Affect * );
 void        affect_modify    ( Character *ch, Affect *paf, bool fAdd );

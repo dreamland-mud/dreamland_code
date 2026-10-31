@@ -1,6 +1,7 @@
-/* recalc -- rebuild a player's armor[] from what is worn and the active affects.
+/* recalc -- rebuild a player's armor[], hitroll and damroll from what is worn and the
+ * active affects.
  *
- * Login already rebuilds armor[], so this is for an online character whose numbers
+ * Login already rebuilds them, so this is for an online character whose numbers
  * drifted, and for proving the recompute matches before armor_version is turned on.
  * A dry run by default: it prints the columns and writes nothing.
  */
@@ -20,8 +21,8 @@ CMDADM( recalc )
     DLString mode = args.getOneArgument( );
 
     if (name.empty( ) || (!mode.empty( ) && mode != "apply")) {
-        ch->pecho( "Usage: recalc <player>         show current and recomputed armor, write nothing" );
-        ch->pecho( "       recalc <player> apply   write the recomputed armor" );
+        ch->pecho( "Usage: recalc <player>         show current and recomputed armor and rolls, write nothing" );
+        ch->pecho( "       recalc <player> apply   write the recomputed armor and rolls" );
         return;
     }
 
@@ -43,6 +44,13 @@ CMDADM( recalc )
     for (int i = 0; i < 4; i++)
         buf << "  column " << i << ": " << victim->armor[i] << " -> " << columns[i]
             << (victim->armor[i] != columns[i] ? "  differs" : "") << "\r\n";
+
+    int hitroll, damroll;
+    roll_recompute( victim, hitroll, damroll );
+    buf << "  hitroll: " << victim->hitroll.getValue( ) << " -> " << hitroll
+        << (victim->hitroll != hitroll ? "  differs" : "") << "\r\n";
+    buf << "  damroll: " << victim->damroll.getValue( ) << " -> " << damroll
+        << (victim->damroll != damroll ? "  differs" : "") << "\r\n";
     ch->send_to( buf );
 
     if (mode != "apply") {
@@ -52,6 +60,9 @@ CMDADM( recalc )
 
     for (int i = 0; i < 4; i++)
         victim->armor[i] = columns[i];
+
+    victim->hitroll = hitroll;
+    victim->damroll = damroll;
 
     if (to_hit_config( ).armor_version > 0)
         armor_version_stamp( victim, to_hit_config( ).armor_version );

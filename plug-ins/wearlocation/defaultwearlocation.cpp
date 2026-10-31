@@ -152,6 +152,9 @@ bool DefaultWearlocation::equip( Object *obj )
     
     obj->wear_loc.assign( this );
     
+    // The item's affects are not on the wearer yet, and the wear_loc above already
+    // says they are: an equip trigger must not move stats through the character.
+    // Behaviors hang new affects with affect_to_obj_unapplied.
     triggersOnEquip( ch, obj );
 
     affectsOnEquip( ch, obj );

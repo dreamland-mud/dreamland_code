@@ -77,25 +77,25 @@ void QuestWeapon::equip(Character *ch)
         if (!good && feniaModifier(ch, fam, APPLY_STR, tier, mod)) {
             af.location = APPLY_STR;
             af.modifier = mod;
-            affect_to_obj(obj, &af);
+            affect_to_obj_unapplied(obj, &af);
         }
 
         if (!evil && feniaModifier(ch, fam, APPLY_DEX, tier, mod)) {
             af.location = APPLY_DEX;
             af.modifier = mod;
-            affect_to_obj(obj, &af);
+            affect_to_obj_unapplied(obj, &af);
         }
 
         if (feniaModifier(ch, fam, APPLY_HIT, tier, mod)) {
             af.location = APPLY_HIT;
             af.modifier = mod;
-            affect_to_obj(obj, &af);
+            affect_to_obj_unapplied(obj, &af);
         }
 
         if (feniaModifier(ch, fam, APPLY_MANA, tier, mod)) {
             af.location = APPLY_MANA;
             af.modifier = mod;
-            affect_to_obj(obj, &af);
+            affect_to_obj_unapplied(obj, &af);
         }
     }
 

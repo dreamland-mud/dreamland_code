@@ -80,7 +80,10 @@ void affect_remove_obj( Object *obj, Affect *paf, bool verbose )
             paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, obj), paf);
     }
 
-    if (obj->carried_by != NULL && obj->wear_loc != wear_none)
+    // A slot that gives no stats never added this affect to the carrier.
+    bool applied = obj->carried_by != NULL && obj->wear_loc->givesAffects( );
+
+    if (applied)
         affect_modify( obj->carried_by, paf, false );
 
     const FlagTable *table = paf->bitvector.getTable();
@@ -95,7 +98,7 @@ void affect_remove_obj( Object *obj, Affect *paf, bool verbose )
 
     obj->affected.remove(paf);
 
-    if (obj->carried_by != NULL && obj->wear_loc != wear_none) {
+    if (applied) {
         affect_check(obj->carried_by, paf);
 
         // The wearer's eqAffects cache reads stealth bits off instance affects
@@ -111,12 +114,8 @@ void affect_remove_obj( Object *obj, Affect *paf, bool verbose )
     AffectManager::getThis()->extract(paf);
 }
 
-void affect_to_obj( Object *obj, const Affect *paf )
+void affect_to_obj_unapplied( Object *obj, const Affect *paf )
 {
-    // Remove old affects given by this object to the carrier.
-    if (obj->carried_by) 
-        obj->wear_loc->affectsOnUnequip(obj->carried_by, obj);
-
     obj->affected.push_front(paf->clone());
 
     if (paf->bitvector.getTable() == &extra_flags) {
@@ -125,6 +124,15 @@ void affect_to_obj( Object *obj, const Affect *paf )
         if (obj->item_type == ITEM_WEAPON)
             obj->value4(obj->value4() | paf->bitvector);
     }
+}
+
+void affect_to_obj( Object *obj, const Affect *paf )
+{
+    // Remove old affects given by this object to the carrier.
+    if (obj->carried_by) 
+        obj->wear_loc->affectsOnUnequip(obj->carried_by, obj);
+
+    affect_to_obj_unapplied(obj, paf);
 
     // Reset updated affect back onto the carrier.
     if (obj->carried_by)

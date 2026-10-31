@@ -95,6 +95,7 @@
 #include "def.h"
 #include "l10n.h"
 #include "fenia_utils.h"
+#include "tohit.h"
 
 CLAN(invader);
 CLAN(none);
@@ -326,6 +327,8 @@ CMDRUNP( quit )
     dreamland->resetOption( DL_SAVE_OBJS );
 
     save_items( pch->in_room );
+
+    roll_drift_log( pch );
 
     /*
      * After extract_char the pch is no longer valid!
