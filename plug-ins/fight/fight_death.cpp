@@ -222,6 +222,10 @@ protected:
 
     void autoBlood( )
     {
+        // 'config noautoblood' opts out of both the flavour and the bloodlust gain.
+        if (IS_SET(killer->getPC( )->config, CONFIG_NOAUTOBLOOD))
+            return;
+
         if (desire_bloodlust->applicable( killer->getPC( ) )
         && !(IS_BLOODLESS(ch)))
         {
