@@ -13,6 +13,12 @@ XMLAttributeVisited::XMLAttributeVisited() : parsed(false)
 {
 }
 
+int XMLAttributeVisited::count() const
+{
+    parse();
+    return vnums.size();
+}
+
 void XMLAttributeVisited::parse() const
 {
     if (parsed)

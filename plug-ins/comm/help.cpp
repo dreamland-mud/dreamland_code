@@ -25,6 +25,8 @@
 #include "area.h"
 #include "areaquest.h"
 #include "commandmanager.h"
+#include "xmlattributevisited.h"
+#include "fenia_utils.h"
 
 /*---------------------------------------------------------------------------*
  * Help
@@ -1041,6 +1043,27 @@ static bool help_command_hint(Character *ch, const DLString &query)
     return true;
 }
 
+// Remember an article the player opened. Distinct ids, kept across remorts, so
+// that asking for one article over and over earns nothing.
+static void help_article_read(Character *ch, int id)
+{
+    if (id <= 0)
+        return;
+
+    XMLAttributeVisited::Pointer read =
+            ch->getPC()->getAttributes().getAttr<XMLAttributeVisited>("helpsread");
+
+    if (!read || !read->visit(id))
+        return;
+
+    int total = read->count();
+
+    if (total >= 100)
+        achievement(ch, "rtfm");
+    if (total >= 1000)
+        achievement(ch, "walking_manual");
+}
+
 CMDRUNP( help )
 {
     std::basic_ostringstream<char> buf;
@@ -1097,6 +1120,7 @@ CMDRUNP( help )
             HelpArticle::Pointer help = HelpFinder(ch, argall).get(number);
             if (help) {
                 page_to_char( help->getText( ch ).c_str( ), ch );
+                help_article_read(ch, help->getID());
                 return;
             }
             // No such nth match: search the word itself, so the player gets
@@ -1164,6 +1188,7 @@ CMDRUNP( help )
     // Exact match - bingo.
     if (articles.size() == 1) {
         page_to_char( articles.front()->getText( ch ).c_str( ), ch );
+        help_article_read(ch, articles.front()->getID());
         return;
     }
 
