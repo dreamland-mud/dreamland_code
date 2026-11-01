@@ -3414,10 +3414,18 @@ NMI_INVOKE( CharacterWrapper, savesChance, "(caster,level,dam_type[,dam_flag]): 
 }
 
 /*
- * Reference attacker for acChance: a normal-tier mob of the target's level. Mob profession
- * thac00/thac32 (no act class flags), hitroll = level (normal tier hitroll bonus 0),
- * weapon skill 100, strength hit bonus 0, it sees the target, the target stands awake.
+ * Reference attacker for acChance and armorReduction: a normal-tier mob of the target's
+ * level. Mob profession thac00/thac32 (no act class flags), hitroll = level (normal tier
+ * hitroll bonus 0), weapon skill 100 so the swing skill is 120 (WeaponOneHit: 20 + weapon
+ * skill), strength hit bonus 0, it sees the target, the target stands awake.
  */
+static const int AC_REF_SKILL = 120;
+
+static double ac_ref_hitroll_eff( int level )
+{
+    return level * AC_REF_SKILL / 100.0;
+}
+
 static int ac_miss_permille( Character *target )
 {
     int level = target->getModifyLevel( );
@@ -3427,7 +3435,7 @@ static int ac_miss_permille( Character *target )
 
     if (to_hit_model( ) == 1) {
         int classBase = max( 1, 20 - interpolate( level, thac00, thac32 ) );
-        double accuracy = to_hit_accuracy( classBase, level );
+        double accuracy = to_hit_accuracy( classBase, ac_ref_hitroll_eff( level ) );
         double evasion = to_hit_evasion( level, dexDefensive );
         return 1000 - (int)lround( to_hit_chance( accuracy, evasion ) * 1000 );
     }
@@ -3439,7 +3447,8 @@ static int ac_miss_permille( Character *target )
         thac0 = thac0 / 2;
     if (thac0 < -5)
         thac0 = -5 + (thac0 + 5) / 2;
-    thac0 -= level - level / 2;
+    thac0 -= (level - level / 2) * AC_REF_SKILL / 100;
+    thac0 += 5 * (100 - AC_REF_SKILL) / 100;
 
     static const int columns[] = { AC_PIERCE, AC_BASH, AC_SLASH };
     int misses = 0;
@@ -3457,10 +3466,27 @@ static int ac_miss_permille( Character *target )
     return (int)lround( misses * 1000.0 / (20 * 3) );
 }
 
-NMI_INVOKE( CharacterWrapper, acChance, "(): permille (0..1000) that a normal mob of this char's own level misses it with one melee swing, under the live hit model. Model 1: miss = 1000 - P, P = A^hit_pow / (A^hit_pow + E^hit_pow) clamped p_floor..p_cap (fight/to_hit.json), A = base_w x max(1, 20 - interpolate(Lv, mobile thac00, thac32)) + Lv, E = ev_level x Lv + ev_dex x (-dex defensive) x min(1, Lv/100), dex only while awake. Armor does not enter the miss chance under model 1 (it is damage reduction). Model 0: the legacy d20 against the pierce/bash/slash AC columns, averaged")
+NMI_INVOKE( CharacterWrapper, acChance, "(): permille (0..1000) that a normal mob of this char's own level misses it with one melee swing, under the live hit model. Model 1: miss = 1000 - P, P = A^hit_pow / (A^hit_pow + E^hit_pow) clamped p_floor..p_cap (fight/to_hit.json), A = base_w x max(1, 20 - interpolate(Lv, mobile thac00, thac32)) + 1.2 x Lv (hitroll Lv at swing skill 120), E = ev_level x Lv + ev_dex x (-dex defensive) x min(1, Lv/100), dex only while awake. Armor does not enter the miss chance under model 1 (it is damage reduction). Model 0: the legacy d20 against the pierce/bash/slash AC columns, averaged")
 {
     checkTarget();
     return Register(ac_miss_permille(target));
+}
+
+NMI_INVOKE( CharacterWrapper, armorReduction, "(): permille (0..1000) of melee damage this char's armor stops against a normal mob of its own level, under the live armor model. Model 1: the average over pierce, bash and slash of to_hit_reduction(GET_DEFENSE(column), Lv, 1.2 x Lv): K = dr_level x Lv + dr_pierce x 1.2 x Lv (the reference attacker's effective hitroll: hitroll Lv at swing skill 120), x = (armor/K)^dr_pow, stopped = x/(1+x) up to dr_cap, 0 for armor <= 0. No armor use bonus. Model 0: 0, legacy armor only dodges")
+{
+    checkTarget();
+
+    if (to_hit_model( ) != 1)
+        return Register(0);
+
+    static const int columns[] = { AC_PIERCE, AC_BASH, AC_SLASH };
+    int level = target->getModifyLevel( );
+    double sum = 0;
+
+    for (int type: columns)
+        sum += to_hit_reduction( GET_DEFENSE(target, type), level, ac_ref_hitroll_eff( level ) );
+
+    return Register((int)lround( sum / 3 * 1000 ));
 }
 
 NMI_INVOKE(CharacterWrapper, quaff, "(obj): получить эффекты от пилюли или зелья")
