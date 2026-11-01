@@ -6,10 +6,12 @@
 #include "jsoncpp/json/json.h"
 #include "configurable.h"
 #include "pcharacter.h"
+#include "pcharactermemory.h"
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
 #include "clanmanager.h"
 #include "clan.h"
+#include "profession.h"
 #include "player_utils.h"
 #include "helpmanager.h"
 #include "act.h"
@@ -1344,6 +1346,58 @@ static bool help_ach_answer(Character *ch, const DLString &query, bool prefix)
     return true;
 }
 
+/** A query that is exactly an automatic level title: the classes carrying it,
+ *  each linked to its article. Mortal levels, either sex, any language. */
+static bool help_title_answer(Character *ch, const DLString &query)
+{
+    static const lang_t langs[] = { LANG_RU, LANG_EN, LANG_UA };
+    static const int sexes[] = { SEX_MALE, SEX_FEMALE };
+    DLString q = help_ach_norm(query);
+    DLString title, classes;
+    PCharacterMemory::Pointer pcm(NEW);
+
+    if (q.size() < 3)
+        return false;
+
+    for (int p = 0; p < professionManager->size(); p++) {
+        Profession *prof = professionManager->find(p);
+        bool hit = false;
+
+        if (!prof->isPlayed())
+            continue;
+
+        for (int level = 1; level <= LEVEL_HERO && !hit; level++) {
+            pcm->setLevel(level);
+
+            for (int sex: sexes) {
+                pcm->setSex(sex);
+
+                for (lang_t lang: langs) {
+                    const DLString &candidate = prof->getTitle(*pcm, lang);
+
+                    if (help_ach_norm(candidate) == q) {
+                        title = candidate;
+                        hit = true;
+                    }
+                }
+            }
+        }
+
+        if (hit) {
+            if (!classes.empty())
+                classes += ", ";
+            classes += fmt(0, "{hh%s{x", prof->getNameFor(ch).c_str());
+        }
+    }
+
+    if (classes.empty())
+        return false;
+
+    ch->pecho(_("{W%1$s{x -- титул по уровню, класс: %2$s."), title.c_str(), classes.c_str());
+    bugTracker->reportNohelpAnswered(ch->getPC(), query, "title");
+    return true;
+}
+
 /** Logins of the API bots (dl_exec, dl_test) and of test characters. */
 static bool help_test_login(const DLString &login)
 {
@@ -1550,6 +1604,10 @@ CMDRUNP( help )
 
         // An exact achievement name is no typo either: it beats a guess.
         if (!nthMiss && help_ach_answer(ch, origArgument, false))
+            return;
+
+        // So is a class's level title.
+        if (!nthMiss && help_title_answer(ch, origArgument))
             return;
 
         bool commandShown = !nthMiss && help_command_hint(ch, origArgument);
