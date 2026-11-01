@@ -50,7 +50,10 @@ static DLString format_where_room( Character *ch, Room *room, bool areaAllowsPat
     // speedwalks carry a {x that lands before the clickable opens, so their
     // yellow comes from the client too.)
     //
-    // The single {x closes colour and hyper tag together.
+    // The single {x closes colour and hyper tag together, so a colour code inside
+    // the name itself (hitower's "{C--{x Коридор ...") would end the link early.
+    name.colourstrip( );
+
     ostringstream buf;
     buf << "{y{hc'path " << room->vnum << "'" << name << "{x";
     return buf.str( );
