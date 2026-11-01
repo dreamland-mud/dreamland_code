@@ -37,6 +37,7 @@
 #define OBJ_VNUM_BRAINS                     17
 
 #define OBJ_VNUM_POTION_VIAL             42
+#define OBJ_VNUM_MAGIC_JAR               93
 
 #define OBJ_VNUM_CORK 19 
 

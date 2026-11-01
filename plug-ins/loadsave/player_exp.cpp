@@ -21,6 +21,9 @@
 #include "stats_apply.h"
 #include "screenreader.h"
 #include "fenia_utils.h"
+#include "object.h"
+#include "string_utils.h"
+#include "vnum.h"
 
 #include "merc.h"
 #include "def.h"
@@ -46,6 +49,72 @@ static int count_available_skills(PCharacter *ch)
     return availCounter;
 }
 
+
+/*
+ *  Magic jar: who owns a PLR_NO_EXP
+ */
+bool Player::magicJarHoldsSoul(Object *jar, PCharacter *pch)
+{
+    // Prototype words ("jar", "сосуд", ...) are shared by every jar and must
+    // not make a jar claim a player who happens to be named like that.
+    StringList protoWords;
+    DLString protoArgs = String::toString(jar->pIndexData->keyword);
+    for (DLString w = protoArgs.getOneArgument(); !w.empty(); w = protoArgs.getOneArgument())
+        protoWords.push_back(w);
+
+    StringList names;
+    names.push_back(pch->getName());
+    for (int l = LANG_MIN; l < LANG_MAX; l++)
+        names.push_back(pch->getNameP('1', (lang_t)l).colourStrip());
+
+    DLString args = String::toString(jar->getKeyword());
+    for (DLString word = args.getOneArgument(); !word.empty(); word = args.getOneArgument()) {
+        bool protoWord = false;
+        for (auto &p: protoWords)
+            if (String::equalLess(word, p)) {
+                protoWord = true;
+                break;
+            }
+
+        if (protoWord)
+            continue;
+
+        for (auto &n: names)
+            if (!n.empty() && String::equalLess(word, n))
+                return true;
+    }
+
+    return false;
+}
+
+bool Player::soulIsJarred(PCharacter *pch)
+{
+    OBJ_INDEX_DATA *pJarIndex = get_obj_index(OBJ_VNUM_MAGIC_JAR);
+
+    if (!pJarIndex)
+        return false;
+
+    for (auto &jar: pJarIndex->instances)
+        if (magicJarHoldsSoul(jar, pch))
+            return true;
+
+    return false;
+}
+
+bool Player::checkSoulJar(PCharacter *pch)
+{
+    if (!IS_SET(pch->act, PLR_NO_EXP))
+        return false;
+
+    if (soulIsJarred(pch))
+        return true;
+
+    // The jar is gone without its extract hook freeing the soul: heal here,
+    // otherwise the player can neither gain exp nor quit.
+    REMOVE_BIT(pch->act, PLR_NO_EXP);
+    pch->pecho(_("Твоя душа возвращается к тебе."));
+    return false;
+}
 
 /*
  *  Gain experience
@@ -74,7 +143,7 @@ void Player::gainExp(PCharacter *pch, int gain)
         return;
     }
 
-    if (IS_SET(pch->act,PLR_NO_EXP)) {
+    if (checkSoulJar(pch)) {
         pch->pecho(_("Ты не можешь получать опыт, пока твой дух во власти противника."));
         return;
     }

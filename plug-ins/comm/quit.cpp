@@ -92,6 +92,7 @@
 #include "move_utils.h"
 #include "doors.h"
 #include "loadsave.h"
+#include "player_exp.h"
 #include "def.h"
 #include "l10n.h"
 #include "fenia_utils.h"
@@ -150,8 +151,9 @@ CMDRUNP( quit )
     fCount = fQuiet = fForced = fAuto = false;
     XMLStringAttribute::Pointer quitFlagsAttr = pch->getAttributes( ).findAttr<XMLStringAttribute>( "quit_flags" );
     if (quitFlagsAttr) {
+        // No save here: a refused quit would otherwise write the pfile on
+        // every lostlink sweep pulse. A quit that goes through saves below.
         pch->getAttributes( ).eraseAttribute( "quit_flags" );
-        pch->save( );
 
         DLString arg, args = quitFlagsAttr->getValue( );
         while (!( arg = args.getOneArgument( ) ).empty( )) {
@@ -214,7 +216,7 @@ CMDRUNP( quit )
 
     if (!fForced 
         && !pch->is_immortal( )
-        && IS_SET( pch->act, PLR_NO_EXP ))
+        && Player::checkSoulJar( pch ))
     {
         pch->pecho(_("Ты не можешь покинуть этот мир! Твой дух во власти противника."));
         return;
