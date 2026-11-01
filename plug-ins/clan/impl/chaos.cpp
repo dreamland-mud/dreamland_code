@@ -142,7 +142,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
         int mirrors,new_mirrors;
         Character *tmp_vict, *gch;
         DLString long_buf[LANG_MAX];
-        DLString short_buf;
+        DLString short_buf[LANG_MAX];
 
         if (victim->is_npc())
         {
@@ -192,8 +192,9 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 
         // A mirror image wears the doppelganged character's own name and title,
         // and both were baked in Russian only, so an EN or UA viewer read a
-        // Russian title in the room list. The login name itself is one string in
-        // every language, so short_buf stays as it was.
+        // Russian title in the room list. The short form takes the declinable
+        // name per language too: a Latin login in a Russian sentence gives the
+        // image away.
         for (int l = LANG_MIN; l < LANG_MAX; l++) {
                 lang_t lang = (lang_t)l;
 
@@ -202,7 +203,17 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
                         Player::title(tmp_vict->getPC( ), lang).c_str( ));
         }
 
-        short_buf = tmp_vict->getNameC();
+        PCharacter *pvict = tmp_vict->getPC( );
+
+        short_buf[LANG_RU] = pvict->getRussianName( ).getFullForm( );
+        if (short_buf[LANG_RU].empty( ))
+                short_buf[LANG_RU] = pvict->getName( );
+
+        short_buf[LANG_UA] = pvict->getUkrainianName( ).getFullForm( );
+        if (short_buf[LANG_UA].empty( ))
+                short_buf[LANG_UA] = short_buf[LANG_RU];
+
+        short_buf[LANG_EN] = pvict->getNameP( '1', LANG_EN );
 
         if ( ch == victim )
         {
@@ -233,7 +244,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
                 for (int l = LANG_MIN; l < LANG_MAX; l++) {
                         lang_t lang = (lang_t)l;
 
-                        mch->setShortDescr( short_buf, lang );
+                        mch->setShortDescr( short_buf[l], lang );
                         mch->setLongDescr( long_buf[l], lang );
                         mch->setKeyword( name, lang );
                 }
