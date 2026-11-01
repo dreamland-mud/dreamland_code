@@ -540,11 +540,18 @@ CONFIGURABLE_LOADED(config, affectpanel)
 // True if some active spell/skill affect owns this bit -- then the curated skill loop
 // renders it, and the raw columns below must stay silent to avoid a duplicate. Raw
 // columns therefore surface only bits granted without a spell (equipment, race).
+// An equipment set bonus doesn't count as an owner: its one chip names the set, not
+// the haste or flight it grants, so those bits still need their own raw chips.
 static bool bitOwnedBySpell( Character *ch, const FlagTable *table, bitstring_t bit )
 {
     for (auto &paf: ch->affected) {
         if (paf->bitvector.getTable( ) != table)
             continue;
+
+        Skill *skill = paf->type.getElement( );
+        if (skill != 0 && skill->getName( ).compare( 0, 4, "set " ) == 0)
+            continue;
+
         if (paf->bitvector.isSet( bit ))
             return true;
     }
