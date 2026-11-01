@@ -606,9 +606,9 @@ bool Walkment::confirmDrowning( Character *wch )
 
     drownWarned[wch->getID( )] = make_pair( now, to_room->vnum );
     msgEcho( wch, wch, lmsg( viewerLang( wch ),
-        "You can't breathe {hh2128underwater{x and may drown if you go on. If you are sure, repeat the command.",
-        "Ты не умеешь дышать {hh2128под водой{x и можешь погибнуть, если поплывешь дальше. Если уверен{Sfа{Sx, набери команду еще раз.",
-        "Ти не вмієш дихати {hh2128під водою{x і можеш загинути, якщо попливеш далі. Якщо впевнен{Sfа{Smий{Sx, набери команду ще раз." ) );
+        "You can't breathe {hh2128underwater{x and may drown if you go on. Every move underwater will take about twelve seconds. If you are sure, repeat the command.",
+        "Ты не умеешь дышать {hh2128под водой{x и можешь погибнуть, если поплывешь дальше. Каждый шаг под водой займет секунд двенадцать. Если уверен{Sfа{Sx, набери команду еще раз.",
+        "Ти не вмієш дихати {hh2128під водою{x і можеш загинути, якщо попливеш далі. Кожен рух під водою забиратиме секунд дванадцять. Якщо впевнен{Sfа{Smий{Sx, набери команду ще раз." ) );
     return false;
 }
 

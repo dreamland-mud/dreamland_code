@@ -456,8 +456,16 @@ void ExitsMovement::setWaitstate( )
         swimUnderwater( waittime );
     // Diving without gills is slow: about three drowning ticks per room.
     else if (fDrownConfirmed || (to_room->getSectorType( ) == SECT_UNDERWATER
-                                 && !ch->is_npc( ) && !IS_SET(boat_types, BOAT_SWIM)))
+                                 && !ch->is_npc( ) && !IS_SET(boat_types, BOAT_SWIM))) {
         waittime += 12 * dreamland->getPulsePerSecond( );
+
+        // The lag is silent otherwise, and players keep hammering the next move.
+        if (!ch->is_immortal( ))
+            ch->pecho( lmsg( viewerLang( ch ),
+                "Without gills you swim slowly underwater: you can move on in about twelve seconds.",
+                "Без жабр под водой ты плывешь медленно: двинуться дальше сможешь секунд через двенадцать.",
+                "Без зябер під водою ти пливеш повільно: рушити далі зможеш секунд за дванадцять." ) );
+    }
 
     ch->setWait( waittime );
 }
@@ -486,9 +494,10 @@ void ExitsMovement::swimUnderwater( int &waittime )
     }
 
     ch->pecho( lmsg( viewerLang( ch ),
-        "You swim a long way underwater, {Rchoking{x for air!",
-        "Ты долго плывешь под водой, {Rзадыхаясь{x от недостатка воздуха!",
-        "Ти довго пливеш під водою, {Rзадихаючись{x від нестачі повітря!" ) );
+        "You swim a long way underwater, {Rchoking{x for air! Catching your breath will take %d seconds.",
+        "Ты долго плывешь под водой, {Rзадыхаясь{x от недостатка воздуха! Отдышаться получится секунд через %d.",
+        "Ти довго пливеш під водою, {Rзадихаючись{x від нестачі повітря! Віддихатися вийде секунд за %d." ),
+        ticks * 4 );
 
     try {
         RawDamage( ch, ch, DAM_DROWNING, dam, "drowning" ).hit( true );
