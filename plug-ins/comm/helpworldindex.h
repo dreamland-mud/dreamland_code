@@ -56,7 +56,12 @@ HelpWorldHits help_world_lookup(const DLString &query, bool keywords);
 HelpWorldHits help_world_prefix_lookup(const DLString &query, bool keywords);
 
 /** Lowercase, colour-free, single-spaced, quotes and a leading English article
- *  removed: the form both the index keys and the query are reduced to. */
+ *  removed, ё folded into е: the form both the index keys and the query are
+ *  reduced to. */
 DLString help_world_normalize(const DLString &str);
+
+/** Fold ё/Ё into е/Е in place (KOI8 text), so "осёл" and "осел" meet. Every
+ *  help lookup applies it to both the query and what it is compared with. */
+DLString &help_fold_yo(DLString &str);
 
 #endif

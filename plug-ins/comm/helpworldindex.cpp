@@ -42,11 +42,21 @@ bool HelpWorldHits::empty() const
     return true;
 }
 
+DLString &help_fold_yo(DLString &str)
+{
+    // KOI8-U bytes: Ё 0xB3 / ё 0xA3 -> Е 0xE5 / е 0xC5. Byte literals, not
+    // 'ё': the source is UTF-8, where the letter takes two bytes.
+    str.substitute('\xB3', '\xE5');
+    str.substitute('\xA3', '\xC5');
+    return str;
+}
+
 DLString help_world_normalize(const DLString &str)
 {
     DLString s = str.colourStrip().toLower();
     s.substitute('\'', ' ');
     s.substitute('"', ' ');
+    help_fold_yo(s);
 
     DLString result, word;
     while (!(word = s.getOneArgument()).empty()) {
