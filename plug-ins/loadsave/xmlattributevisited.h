@@ -23,6 +23,9 @@ public:
     /** Remember vnum. True when it is a new room. */
     bool visit(int vnum);
 
+    /** How many vnums are remembered. */
+    int count() const;
+
     /** How many of the visited rooms are ordinary ones (see isOrdinary). */
     int countOrdinary() const;
 
