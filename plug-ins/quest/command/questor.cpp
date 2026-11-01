@@ -506,8 +506,9 @@ bool QuestScrollBehavior::isOwner( Character *ch ) const
     if (ch->is_npc())
         return false;
 
-    return !(ownerName.getValue( ) != ch->getPC()->getName( ) 
-            || ownerID.getValue( ) != ch->getID( ));
+    // A remort issues a new ID and a rename keeps it, so either match is the owner.
+    return ownerName.getValue( ) == ch->getPC()->getName( )
+            || ownerID.getValue( ) == ch->getID( );
 }
 
 bool QuestScrollBehavior::hasTrigger( const DLString &t )
