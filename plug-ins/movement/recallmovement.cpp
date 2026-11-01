@@ -11,6 +11,7 @@
 #include "loadsave.h"
 #include "affectflags.h"
 #include "skill_utils.h"
+#include "fenia_utils.h"
 #include "merc.h"
 
 #include "wrapperbase.h"
@@ -69,6 +70,9 @@ bool RecallMovement::applyFightingSkill( Character *wch, SkillReference &skill )
     skill->improve( wch, true );
     msgSelfParty( wch, "You flee the battlefield!", "Ты убегаешь с поля битвы!", "Ти тікаєш з поля бою!",
                    "%2$^C1 flees the battlefield!", "%2$^C1 убегает с поля битвы!", "%2$^C1 тікає з поля бою!" );
+    // A control id, not an achievement: the Fenia onAchievement handler treats
+    // it as leaving a fight, like flee and escape, and resets the never_ran tracker.
+    achievement( wch, "noflee_reset" );
     return true;
 }
 
