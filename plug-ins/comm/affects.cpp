@@ -31,7 +31,7 @@ enum {
 };
 
 struct AffectOutput {
-    AffectOutput( ) : unitMinutes(false), negative(false), viewer(0), lang(LANG_DEFAULT) { }
+    AffectOutput( ) : unitMinutes(false), negative(false), cooldown(false), viewer(0), lang(LANG_DEFAULT) { }
     AffectOutput( Affect *, Character *viewer );
 
     void format_affect( Affect * );
@@ -46,6 +46,7 @@ struct AffectOutput {
     list<DLString> lines;
     bool unitMinutes;
     bool negative;
+    bool cooldown;
     Character *viewer;
     lang_t lang;
 };
@@ -75,6 +76,7 @@ AffectOutput::AffectOutput( Affect *paf, Character *viewer )
     // Read-through to the skill that hangs this affect. A typeless affect
     // (sn < 0, "none") has no skill and is never flagged negative.
     negative = ((int)paf->type >= 0) && paf->type->isNegative( );
+    cooldown = ((int)paf->type >= 0) && paf->type->getWebColumn( ) == "cd";
 }
 
 void AffectOutput::show_affect( ostringstream &buf, int flags )
@@ -86,8 +88,9 @@ void AffectOutput::show_affect( ostringstream &buf, int flags )
     // permanence signal, so a cursed permanent affect is still red, not cyan.
     // Otherwise permanent affects (duration < 0), item-cast buffs included, read
     // cyan so a glance separates what holds while worn from what is ticking down.
-    // Matches the mudjs affect panel, which colors d<0 cyan (affectsItem.jsx).
-    const char *nameColor = negative ? "{R" : ((duration < 0) ? "{C" : "{Y");
+    // Reuse timers (web column "cd") read magenta: a timer running out is not a
+    // buff about to drop. Matches the mudjs affect panel (affectsItem.jsx).
+    const char *nameColor = negative ? "{R" : (cooldown ? "{M" : ((duration < 0) ? "{C" : "{Y"));
     if (lang == LANG_EN)
         f << nameColor << "%1$-18s{x";
     else
@@ -506,6 +509,7 @@ CMDRUNP( affects )
         ao.duration = -1;               // permanent while the item is worn
         ao.unitMinutes = false;
         ao.negative = skill->isNegative( );  // a gear-granted debuff still reads red
+        ao.cooldown = skill->getWebColumn( ) == "cd";
 
         // Effect lines from the granting items' prototype affects (the same
         // list rebuild_eq_affects reads), or the row is a bare name.
