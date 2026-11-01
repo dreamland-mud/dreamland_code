@@ -35,6 +35,7 @@
 #include "def.h"
 #include "l10n.h"
 #include "fenia_utils.h"
+#include "player_exp.h"
 
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
@@ -627,7 +628,7 @@ static void account_switch(PCharacter *ch, DLString &args)
     // command; if quit's guards change, update these in lockstep (or extract a shared
     // can-leave predicate then).
     if (!ch->is_immortal()) {
-        if (IS_SET(ch->act, PLR_NO_EXP)) {
+        if (Player::checkSoulJar(ch)) {
             ch->pecho(_("Ты не можешь покинуть этот мир! Твой дух во власти противника."));
             return;
         }
