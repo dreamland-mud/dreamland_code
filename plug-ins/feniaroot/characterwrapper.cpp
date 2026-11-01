@@ -157,6 +157,7 @@ GSN(dark_shroud);
 GSN(manacles);
 GSN(spellbane);
 GSN(holy_craft);
+PROF(mobile);
 GSN(charm_person);
 // The pet report's second-weapon special case and the combat-invalid set.
 GSN(second_weapon);
@@ -3410,6 +3411,56 @@ NMI_INVOKE( CharacterWrapper, savesChance, "(caster,level,dam_type[,dam_flag]): 
     }
 
     return Register(chance);
+}
+
+/*
+ * Reference attacker for acChance: a normal-tier mob of the target's level. Mob profession
+ * thac00/thac32 (no act class flags), hitroll = level (normal tier hitroll bonus 0),
+ * weapon skill 100, strength hit bonus 0, it sees the target, the target stands awake.
+ */
+static int ac_miss_permille( Character *target )
+{
+    int level = target->getModifyLevel( );
+    int thac00 = prof_mobile->getThac00( 0 );
+    int thac32 = prof_mobile->getThac32( 0 );
+    int dexDefensive = IS_AWAKE(target) ? get_dex_app( target ).defensive : 0;
+
+    if (to_hit_model( ) == 1) {
+        int classBase = max( 1, 20 - interpolate( level, thac00, thac32 ) );
+        double accuracy = to_hit_accuracy( classBase, level );
+        double evasion = to_hit_evasion( level, dexDefensive );
+        return 1000 - (int)lround( to_hit_chance( accuracy, evasion ) * 1000 );
+    }
+
+    // Legacy d20 (OneHit::calcTHAC0 / calcArmorClass with OLD_THAC): averaged over the
+    // pierce, bash and slash columns. 0 misses, 19 hits, 1..18 hit at dice >= thac0 - ac.
+    int thac0 = interpolate( level, thac00, thac32 );
+    if (thac0 < 0)
+        thac0 = thac0 / 2;
+    if (thac0 < -5)
+        thac0 = -5 + (thac0 + 5) / 2;
+    thac0 -= level - level / 2;
+
+    static const int columns[] = { AC_PIERCE, AC_BASH, AC_SLASH };
+    int misses = 0;
+
+    for (int type: columns) {
+        int ac = GET_AC(target, type) / 10;
+        if (ac < -20)
+            ac = ((ac + 20) * 2) / 3 - 20;
+
+        int need = thac0 - ac;
+        int hits = 1 + URANGE( 0, 19 - max( 1, need ), 18 );
+        misses += 20 - hits;
+    }
+
+    return (int)lround( misses * 1000.0 / (20 * 3) );
+}
+
+NMI_INVOKE( CharacterWrapper, acChance, "(): permille (0..1000) that a normal mob of this char's own level misses it with one melee swing, under the live hit model. Model 1: miss = 1000 - P, P = A^hit_pow / (A^hit_pow + E^hit_pow) clamped p_floor..p_cap (fight/to_hit.json), A = base_w x max(1, 20 - interpolate(Lv, mobile thac00, thac32)) + Lv, E = ev_level x Lv + ev_dex x (-dex defensive) x min(1, Lv/100), dex only while awake. Armor does not enter the miss chance under model 1 (it is damage reduction). Model 0: the legacy d20 against the pierce/bash/slash AC columns, averaged")
+{
+    checkTarget();
+    return Register(ac_miss_permille(target));
 }
 
 NMI_INVOKE(CharacterWrapper, quaff, "(obj): получить эффекты от пилюли или зелья")

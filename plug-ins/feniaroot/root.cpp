@@ -2167,6 +2167,11 @@ NMI_INVOKE(Root, savesChanceAt, "(victimLevel, castLevel, svs[, shift[, model]])
     return Register(saves_chance_at(victimLevel, castLevel, svs, shift, model));
 }
 
+NMI_INVOKE(Root, savesModel, "(): the saves model C++ actually rolls: 1 curve, 0 legacy. 0 also when fight/saves.json asks for 1 but a curve knob is missing or out of range")
+{
+    return Register(saves_model());
+}
+
 NMI_INVOKE(Root, toHitModel, "([n]): модель попадания и брони: 0 старый d20, 1 модель брони, -1 снова как в fight/to_hit; без аргумента не меняет; возвращает действующую модель")
 {
     if (!args.empty()) {
