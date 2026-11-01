@@ -15,6 +15,8 @@
 #define CHARACTER_H
 
 #include <sstream>
+#include <utility>
+#include <vector>
 #include <stdarg.h>
 
 #include "dlstring.h"
@@ -123,6 +125,8 @@ public:
 
     // various set-get methods 
     inline long long getID( ) const;
+    void addRoundDamage( const Character *victim, int dam );
+    void clearRoundDamage( );
     inline void setID( long long );
     
     inline bool isDead( ) const;
@@ -234,6 +238,7 @@ public:
     // public: cleared directly by the free function violence_update() in plug-ins/fight
     bool                          adrenaline_pending; // armed by setLastFightTime, fires one "calmed down" line when adrenaline decays
     int                           roundDamage; // total damage dealt this combat round; reset+summarized by violence_update for fightspam-OFF viewers
+    std::vector<std::pair<long long, int> > roundDamageOn; // the same total split by victim ID: a room-wide attack must not read as one hit
     unsigned int                  roundImmune; // damtype bits (1 << dam_type) the victim was immune to this round, for the same summary
     int                           fightEmptyStreak; // consecutive fightspam-OFF empty rounds (no damage summary), for the "You're fighting! >>>" indicator
     bool extracted;

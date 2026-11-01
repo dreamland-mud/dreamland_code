@@ -134,7 +134,7 @@ bool Damage::hit( bool show )
     // not reach a summary as well.
     if (dam > 0 && ch != 0
         && (ch->fighting != 0 || victim->fighting != 0 || fightspam_cast_depth > 0))
-        ch->roundDamage += dam;
+        ch->addRoundDamage( victim, dam );
 
     // Same summary, immune hits: the line says which damage types bounced off.
     if (immune && !blocked && ch != 0 && dam_type >= 0 && dam_type < 32

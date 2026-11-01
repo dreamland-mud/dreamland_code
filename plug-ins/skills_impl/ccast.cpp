@@ -323,8 +323,7 @@ CMDRUN( cast )
             // reset by violence_update, not by the round summary, so between
             // rounds it still holds last round's melee total, which the cast
             // would otherwise be added to and double-shown.
-            ch->roundDamage = 0;
-            ch->roundImmune = 0;
+            ch->clearRoundDamage( );
 
             if (!fForbidCasting) {
                 // Released on VictimDeathException too.

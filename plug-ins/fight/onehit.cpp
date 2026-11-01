@@ -99,7 +99,7 @@ void OneHit::hit( )
     // line and the summary then skips the attacker for having dealt "no" damage,
     // leaving a fightspam-OFF player watching their hp drop in silence.
     if (dam > 0 && ch != 0 && (ch->fighting != 0 || victim->fighting != 0))
-        ch->roundDamage += dam;
+        ch->addRoundDamage( victim, dam );
     if (immune && !blocked && ch != 0 && dam_type >= 0 && dam_type < 32
         && (ch->fighting != 0 || victim->fighting != 0))
         ch->roundImmune |= 1u << dam_type;
