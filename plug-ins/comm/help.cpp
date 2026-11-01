@@ -12,6 +12,7 @@
 #include "clanmanager.h"
 #include "clan.h"
 #include "profession.h"
+#include "grammar_entities_impl.h"
 #include "player_utils.h"
 #include "helpmanager.h"
 #include "act.h"
