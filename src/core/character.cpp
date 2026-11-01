@@ -122,8 +122,7 @@ void Character::init( )
     religion.assign( god_none );
     last_fight_time = 0;
     adrenaline_pending = false;
-    roundDamage = 0;
-    roundImmune = 0;
+    clearRoundDamage( );
     fightEmptyStreak = 0;
 
     extracted = false;
@@ -211,6 +210,26 @@ void Character::init( )
     trap.clear( );
 
     wrapper = 0;
+}
+
+void Character::addRoundDamage( const Character *victim, int dam )
+{
+    roundDamage += dam;
+
+    for (auto &entry: roundDamageOn)
+        if (entry.first == victim->getID( )) {
+            entry.second += dam;
+            return;
+        }
+
+    roundDamageOn.push_back( std::make_pair( victim->getID( ), dam ) );
+}
+
+void Character::clearRoundDamage( )
+{
+    roundDamage = 0;
+    roundDamageOn.clear( );
+    roundImmune = 0;
 }
 
 void Character::extract( )

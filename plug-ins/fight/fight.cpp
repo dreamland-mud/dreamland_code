@@ -375,9 +375,75 @@ static DLString round_immune_tag( Character *to, unsigned int mask )
     return fmt( to, _(" {D[{xиммунитет: %1$s{D]{x"), list.c_str( ) );
 }
 
+// One "<attacker> => <victim> [N]" line of the fightspam-OFF summary. Immune
+// hits are not tied to a victim, so they ride the line of the main target.
+struct RoundLine {
+    Character *vic;
+    int dam;
+    bool immune;
+};
+
+static bool round_victim_alive( Character *vic )
+{
+    return vic != 0 && !vic->extracted && vic->position != POS_DEAD && vic->max_hit > 0;
+}
+
+// Lines for what att dealt, per victim. Skips the dead, whose kill already
+// printed its own line. main = the target to hang immune tags on; a ranged
+// cast's target is in another room, so it is checked apart from att's room.
+static vector<RoundLine> round_lines( Character *att, Character *main )
+{
+    vector<RoundLine> lines;
+
+    for (auto &entry: att->roundDamageOn) {
+        Character *vic = 0;
+
+        if (main != 0 && !main->extracted && main->getID( ) == entry.first)
+            vic = main;
+        else
+            for (Character *rch = att->in_room->people; rch != 0; rch = rch->next_in_room)
+                if (rch->getID( ) == entry.first) {
+                    vic = rch;
+                    break;
+                }
+
+        if (round_victim_alive( vic ))
+            lines.push_back( { vic, entry.second, false } );
+    }
+
+    if (att->roundImmune != 0 && round_victim_alive( main )) {
+        bool found = false;
+
+        for (auto &line: lines)
+            if (line.vic == main) {
+                line.immune = true;
+                found = true;
+            }
+
+        if (!found)
+            lines.push_back( { main, 0, true } );
+    }
+
+    return lines;
+}
+
+static DLString round_line_tail( Character *to, Character *att, const RoundLine &line )
+{
+    int perc = line.dam * 100 / line.vic->max_hit;
+    char num[64];
+    snprintf( num, sizeof( num ), "{D[{x{%c%d{x{D]{x",
+              round_damage_colour( perc ), line.dam );
+
+    DLString tail = num;
+    if (line.immune)
+        tail << round_immune_tag( to, att->roundImmune );
+    return tail;
+}
+
 // After a combat round, fightspam-OFF players get one aggregated line per
-// participant in their room ("<attacker> => <victim> [N]"), shown only for real
-// damage (>0) against a still-living victim -- a kill already printed its line.
+// attacker and victim in their room ("<attacker> => <victim> [N]"), shown only
+// for real damage (>0) against a still-living victim -- a kill already printed
+// its line.
 // Pointer-safe: runs over the LIVE char_list after the hit loop (dead chars are
 // already extracted; the victim is read live as att->fighting).
 static void fightspam_round_summary( )
@@ -397,23 +463,16 @@ static void fightspam_round_summary( )
             if (att->extracted || (att->roundDamage <= 0 && att->roundImmune == 0))
                 continue;
 
-            Character *vic = att->fighting;
-            if (vic == 0 || vic->extracted || vic->position == POS_DEAD || vic->max_hit <= 0)
-                continue;
-            if (!ch->can_sense( att ) || !ch->can_sense( vic ))
-                continue;
+            for (auto &line: round_lines( att, att->fighting )) {
+                if (!ch->can_sense( att ) || !ch->can_sense( line.vic ))
+                    continue;
 
-            int perc = att->roundDamage * 100 / vic->max_hit;
-            char num[64];
-            snprintf( num, sizeof( num ), "{D[{x{%c%d{x{D]{x",
-                      round_damage_colour( perc ), att->roundDamage );
-
-            // Args in reference order (1=attacker, 2=victim, 3=number string) so
-            // the act formatter reads each va_arg with the right type.
-            DLString line = num;
-            line << round_immune_tag( ch, att->roundImmune );
-            ch->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, vic, line.c_str( ) );
-            anyLine = true;
+                // Args in reference order (1=attacker, 2=victim, 3=number string)
+                // so the act formatter reads each va_arg with the right type.
+                ch->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, line.vic,
+                           round_line_tail( ch, att, line ).c_str( ) );
+                anyLine = true;
+            }
         }
 
         if (anyLine) {
@@ -475,22 +534,12 @@ void fightspam_flush_between_rounds( Character *att, Character *victim )
     if (att == 0 || (att->roundDamage <= 0 && att->roundImmune == 0) || att->in_room == 0)
         return;
 
-    if (victim == 0 || victim->extracted || victim->position == POS_DEAD
-        || victim->max_hit <= 0)
-    {
-        att->roundDamage = 0; // nothing sensible to show, but still consume it
-        att->roundImmune = 0;
-        return;
-    }
-
-    int perc = att->roundDamage * 100 / victim->max_hit;
-    char num[64];
-    snprintf( num, sizeof( num ), "{D[{x{%c%d{x{D]{x",
-              round_damage_colour( perc ), att->roundDamage );
+    vector<RoundLine> lines = round_lines( att, victim );
 
     // A ranged cast lands in another room: show the line there as well.
     Room *rooms[2] = { att->in_room,
-                       victim->in_room && victim->in_room != att->in_room ? victim->in_room : 0 };
+                       victim && victim->in_room && victim->in_room != att->in_room
+                           ? victim->in_room : 0 };
 
     for (int r = 0; r < 2; r++) {
         if (rooms[r] == 0)
@@ -501,20 +550,21 @@ void fightspam_flush_between_rounds( Character *att, Character *victim )
                 continue;
             if (!IS_AWAKE(to) || IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM))
                 continue;
-            if (!to->can_sense( att ) || !to->can_sense( victim ))
-                continue;
 
-            // Args in reference order (1=attacker, 2=victim, 3=number) so the act
-            // formatter reads each va_arg with the right type -- same as the round
-            // summary line above.
-            DLString line = num;
-            line << round_immune_tag( to, att->roundImmune );
-            to->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, victim, line.c_str( ) );
+            for (auto &line: lines) {
+                if (!to->can_sense( att ) || !to->can_sense( line.vic ))
+                    continue;
+
+                // Args in reference order (1=attacker, 2=victim, 3=number) so the
+                // act formatter reads each va_arg with the right type -- same as
+                // the round summary line above.
+                to->pecho( _("%1$^C1 {C=>{x %2$C1 %3$s"), att, line.vic,
+                           round_line_tail( to, att, line ).c_str( ) );
+            }
         }
     }
 
-    att->roundDamage = 0;
-    att->roundImmune = 0;
+    att->clearRoundDamage( );
 }
 
 void violence_update()
@@ -532,8 +582,7 @@ void violence_update()
 
     // Reset per-round damage accumulators before the hit loop; summarized below.
     for (ch = char_list; ch != 0; ch = ch->next) {
-        ch->roundDamage = 0;
-        ch->roundImmune = 0;
+        ch->clearRoundDamage( );
         fighters.push_back(make_pair(ch, ch->getID()));
     }
 

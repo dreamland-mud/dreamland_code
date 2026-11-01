@@ -449,8 +449,7 @@ void mobile_update( )
             // player cast (bug 13343: gas breath dealt damage with no number).
             bool wasFighting = ( ch->fighting != 0 );
             if (wasFighting) {
-                ch->roundDamage = 0;
-                ch->roundImmune = 0;
+                ch->clearRoundDamage( );
             }
 
             mprog_special( ch );
