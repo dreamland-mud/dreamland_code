@@ -37,14 +37,12 @@
 #include "act.h"
 #include "string_utils.h"
 #include "vnum.h"
+#include "player_exp.h"
 #include "def.h"
 #include "l10n.h"
 
 
 PROF(none);
-
-#define OBJ_VNUM_MAGIC_JAR                93
-
 
 
 /*
@@ -52,7 +50,7 @@ PROF(none);
  */
 void MagicJar::get( Character *ch )
 {
-    if (!ch->is_npc( ) && String::contains(String::toString(obj->getKeyword()), ch->getPC()->getName())) {
+    if (!ch->is_npc( ) && Player::magicJarHoldsSoul(obj, ch->getPC())) {
         oldact(_("Вот это удача!"),ch,obj,0,TO_CHAR);
         extract_obj(obj);
     }
@@ -69,7 +67,7 @@ bool MagicJar::extract( bool fCount )
         if (wch->is_npc()) 
             continue;
 
-        if (String::contains(String::toString(obj->getKeyword()), wch->getPC()->getName()))
+        if (Player::magicJarHoldsSoul(obj, wch->getPC()))
         {
             if (IS_SET( wch->act, PLR_NO_EXP )) {
                 REMOVE_BIT(wch->act,PLR_NO_EXP);
