@@ -256,6 +256,53 @@ bool help_is_clan_article(const HelpArticle::Pointer &a)
         && clanManager->findByHelpId(a->getID()) != 0;
 }
 
+/** Text with its {hh<id> links and colour codes removed, a Flexer pad in
+ *  the nominative. */
+DLString help_plain_name(const DLString &text)
+{
+    DLString s;
+
+    for (size_t i = 0; i < text.size(); i++) {
+        if (text.compare(i, 3, "{hh") == 0) {
+            i += 3;
+            while (i < text.size() && isdigit((unsigned char)text[i]))
+                i++;
+            i--;
+            continue;
+        }
+        s += text[i];
+    }
+
+    s = s.colourStrip();
+    if (s.find('|') != DLString::npos)
+        s = russian_case(s, '1');
+    return s;
+}
+
+/** What a clan answers to as a clan, for "<clan> level": its key, its names,
+ *  short names and long names in every language, and the article's own
+ *  <keyword> field. Never the article's extras or auto keywords: those carry
+ *  generic words ("skills", "умения", "politics", rank titles) that belong to
+ *  other articles too, and "skills level" must stay theirs. False when the
+ *  article is no clan's own. */
+bool help_clan_identity(const HelpArticle::Pointer &a, vector<DLString> &out)
+{
+    static const lang_t langs[] = { LANG_EN, LANG_RU, LANG_UA };
+
+    if (!help_is_clan_article(a))
+        return false;
+
+    Clan *clan = clanManager->findByHelpId(a->getID());
+    out.push_back(clan->getName());
+    for (int l = 0; l < 3; l++) {
+        out.push_back(help_plain_name(clan->getNameFor(langs[l])));
+        out.push_back(help_plain_name(clan->getShortFor(langs[l])));
+        out.push_back(help_plain_name(clan->getLongNameFor(langs[l])));
+        out.push_back(a->keyword.get(langs[l]));
+    }
+    return true;
+}
+
 /** A {hh link whose visible text is the title: {hh followed by the digits alone
  *  renders an empty label, and a screen reader needs the words, not a number. */
 DLString help_link(int id, const DLString &title)
@@ -338,10 +385,7 @@ private:
             if (!shown->visible( ch ))
                 continue;
 
-            if (clansOnly && !help_is_clan_article(shown))
-                continue;
-
-            if (!articleMatches(*a, clansOnly))
+            if (clansOnly ? !clanMatches(shown) : !articleMatches(*a))
                 continue;
 
             bool seen = false;
@@ -355,21 +399,33 @@ private:
         }
     }
 
-    /** Every word of the lookup is the start of a keyword word, ё and е alike
-     *  on both sides. With clansOnly the lookup is the words before a trailing
-     *  level facet, and no facet filter applies. */
-    bool articleMatches(const HelpArticle::Pointer &a, bool clansOnly) const
+    /** The words before a trailing level facet, every one the start of a word
+     *  the clan answers to as a clan (help_clan_identity). */
+    bool clanMatches(const HelpArticle::Pointer &a) const
     {
-        const char *lookup;
+        vector<DLString> identity;
+        vector<DLString> words;
 
-        if (clansOnly)
-            lookup = clanRest.c_str();
-        else {
-            // If first keyword was something like "skill", look for remaining keywords within a certain label.
-            if (!preferredLabels.empty() && !a->labels.all.containsAny(preferredLabels))
-                return false;
-            lookup = preferredLabels.empty() ? args.c_str() : argRest.c_str();
-        }
+        if (!help_clan_identity(a, identity))
+            return false;
+        for (auto &name: identity)
+            split_words(name, words);
+
+        DLString all;
+        for (auto &w: words)
+            all += w + " ";
+        return is_name(clanRest.c_str(), all.c_str());
+    }
+
+    /** Every word of the lookup is the start of a keyword word, ё and е alike
+     *  on both sides. */
+    bool articleMatches(const HelpArticle::Pointer &a) const
+    {
+        // If first keyword was something like "skill", look for remaining keywords within a certain label.
+        if (!preferredLabels.empty() && !a->labels.all.containsAny(preferredLabels))
+            return false;
+
+        const char *lookup = preferredLabels.empty() ? args.c_str() : argRest.c_str();
 
         DLString fullKw = a->getAllKeywordsString() + " " + a->aka.toString();
         fullKw = fullKw.substitute('\'', "");
@@ -432,6 +488,7 @@ struct FuzzySearch {
         HelpArticle::Pointer article;
         DLString hint;      // what matched: a keyword word, or the flipped query
         Kind kind;
+        bool strong;        // anything but a weak substitution matched
     };
 
     FuzzySearch(Character *ch, const char *argument) : numeric(false), clansOnly(false)
@@ -481,6 +538,16 @@ struct FuzzySearch {
     bool hasResults() const
     {
         return !hits.empty();
+    }
+
+    /** A guess that matched something for real, not only by one substituted
+     *  letter in a four-letter word. */
+    bool hasStrongResults() const
+    {
+        for (auto &hit: hits)
+            if (hit.strong)
+                return true;
+        return false;
     }
 
     /** Suggestions for a mistyped id rather than for words. */
@@ -589,7 +656,7 @@ private:
             const HelpFinder::ArticleArray &found = finder.getArticles();
 
             for (size_t j = 0; j < found.size() && (int)hits.size() < MAX_RESULTS; j++)
-                hits.push_back(Hit{found[j], flipped, FLIP});
+                hits.push_back(Hit{found[j], flipped, FLIP, true});
 
             if (!hits.empty())
                 return true;
@@ -629,14 +696,20 @@ private:
                 continue;
             if (!labels.empty() && !self->labels.all.containsAny(labels))
                 continue;
-            if (clansOnly && !help_is_clan_article(shown))
-                continue;
 
             kwords.clear();
-            for (auto &kw: self->getAllKeywords())
-                split_words(kw, kwords);
-            for (auto &kw: self->aka)
-                split_words(kw, kwords);
+            if (clansOnly) {
+                vector<DLString> identity;
+                if (!help_clan_identity(shown, identity))
+                    continue;
+                for (auto &name: identity)
+                    split_words(name, kwords);
+            } else {
+                for (auto &kw: self->getAllKeywords())
+                    split_words(kw, kwords);
+                for (auto &kw: self->aka)
+                    split_words(kw, kwords);
+            }
 
             vector<int> best(n, 0);
             vector<DLString> hint(n);
@@ -772,8 +845,37 @@ private:
             if (full ? r.strong < (int)n
                      : r.strong + r.weak < need || (anyStrong && r.strong == 0))
                 continue;
-            hits.push_back(Hit{cands[r.cand].article, cands[r.cand].hint[r.hintWord], TEXT});
+            hits.push_back(Hit{cands[r.cand].article,
+                               unfoldHint(cands[r.cand].article, cands[r.cand].hint[r.hintWord]),
+                               TEXT, r.strong > 0});
         }
+    }
+
+    /** The keyword word as the article spells it: the scoring compares folded
+     *  words, so a hint that holds an е may stand for an ё ("гёк", not "гек").
+     *  Runs for the shown hits only. */
+    static DLString unfoldHint(const HelpArticle::Pointer &a, const DLString &hint)
+    {
+        if (hint.find_first_of("\xC5\xE5") == DLString::npos)
+            return hint;
+
+        vector<DLString> raw;
+        for (auto &kw: a->getAllKeywords()) {
+            DLString text = kw;
+            text.replaces("'", "");
+            text.replaces("\"", "");
+            text.toLower();
+            DLString word;
+            while (!(word = text.getOneArgument()).empty())
+                raw.push_back(word);
+        }
+
+        for (auto &w: raw) {
+            DLString folded = w;
+            if (help_fold_yo(folded) == hint)
+                return w;
+        }
+        return hint;
     }
 
     /** No article with this id: the registered, visible ids a typo away.
@@ -855,7 +957,7 @@ private:
         });
 
         for (size_t i = 0; i < found.size() && (int)i < MAX_RESULTS; i++)
-            hits.push_back(Hit{found[i].article, DLString::emptyString, NUMBER});
+            hits.push_back(Hit{found[i].article, DLString::emptyString, NUMBER, true});
     }
 
     vector<DLString> words;
@@ -1241,12 +1343,24 @@ static bool help_ach_answer(Character *ch, const DLString &query, bool prefix)
     return true;
 }
 
-/** A query that is exactly a player's name, the login or the name in any
- *  language: point at the profile. Immortals stay out, whatever whois shows. */
+/** Logins of the API bots (dl_exec, dl_test) and of test characters. */
+static bool help_test_login(const DLString &login)
+{
+    static const char *logins[] = { "Testbot", "Execbot", "Testchar", "Rokimantest", 0 };
+
+    for (int i = 0; logins[i]; i++)
+        if (login.toLower() == DLString(logins[i]).toLower())
+            return true;
+    return false;
+}
+
+/** A query that is exactly a player's name, three letters or more, the login
+ *  or the name in any language: point at the profile. Immortals stay out,
+ *  whatever whois shows. */
 static bool help_player_answer(Character *ch, const DLString &query)
 {
     DLString q = help_world_normalize(query);
-    if (q.size() < 2 || q.find(' ') != DLString::npos)
+    if (q.size() < 3 || q.find(' ') != DLString::npos)
         return false;
 
     static const lang_t langs[] = { LANG_EN, LANG_RU, LANG_UA };
@@ -1254,17 +1368,19 @@ static bool help_player_answer(Character *ch, const DLString &query)
 
     for (auto &p: PCharacterManager::getPCM()) {
         PCMemoryInterface *pci = p.second;
+        bool hit = help_world_normalize(pci->getName()) == q;
 
-        if (pci->getLevel() >= LEVEL_IMMORTAL)
+        for (int l = 0; !hit && l < 3; l++)
+            hit = help_world_normalize(pci->getNameP('1', langs[l])) == q;
+        if (!hit)
             continue;
 
-        if (help_world_normalize(pci->getName()) == q)
-            found = pci;
-        for (int l = 0; !found && l < 3; l++)
-            if (help_world_normalize(pci->getNameP('1', langs[l])) == q)
-                found = pci;
-        if (found)
-            break;
+        // Immortals stay out; so do the API bots and the test characters.
+        if (pci->getLevel() >= LEVEL_IMMORTAL || help_test_login(pci->getName()))
+            continue;
+
+        found = pci;
+        break;
     }
 
     if (!found)
@@ -1431,17 +1547,21 @@ CMDRUNP( help )
         if (!nthMiss && help_world_answer(ch, origArgument, false, true))
             return;
 
-        // An exact achievement or player name is no typo either: it beats a guess.
+        // An exact achievement name is no typo either: it beats a guess.
         if (!nthMiss && help_ach_answer(ch, origArgument, false))
-            return;
-
-        if (!nthMiss && help_player_answer(ch, origArgument))
             return;
 
         bool commandShown = !nthMiss && help_command_hint(ch, origArgument);
 
         if (origArgument.size() > 1) {
             FuzzySearch fs(ch, argument);
+
+            // A player's exact name, unless a guess matched something for real:
+            // short logins look like words, and an article beats a person.
+            if (!nthMiss && !commandShown && !fs.hasStrongResults()
+                    && help_player_answer(ch, origArgument))
+                return;
+
             if (fs.hasResults()) {
                 fs.printResults(ch);
                 // A text miss stays in nohelp.txt for analysis and the replay
