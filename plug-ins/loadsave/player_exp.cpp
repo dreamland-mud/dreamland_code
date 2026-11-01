@@ -20,6 +20,7 @@
 #include "act.h"
 #include "stats_apply.h"
 #include "screenreader.h"
+#include "fenia_utils.h"
 
 #include "merc.h"
 #include "def.h"
@@ -117,6 +118,10 @@ void Player::gainExp(PCharacter *pch, int gain)
     // A screen reader has no prompt bar to glance at: say how far the next level is.
     if (gain > 0 && uses_screenreader( pch ) && pch->getLevel( ) < LEVEL_HERO - 1)
         pch->pecho(_("До следующего уровня: %1$d очк%1$Iо|а|ов опыта."), pch->getExpToLevel( ));
+
+    // Earned exp only: a penalty that happens to land on the same spot is no luck.
+    if (gain > 0 && pch->getLevel( ) < LEVEL_HERO - 1 && pch->getExpToLevel( ) == 1)
+        achievement( pch, "one_xp_short" );
 }
 
 /*
