@@ -279,27 +279,34 @@ DLString help_plain_name(const DLString &text)
     return s;
 }
 
-/** What a clan answers to as a clan, for "<clan> level": its key, its names,
- *  short names and long names in every language, and the article's own
- *  <keyword> field. Never the article's extras or auto keywords: those carry
- *  generic words ("skills", "умения", "politics", rank titles) that belong to
- *  other articles too, and "skills level" must stay theirs. False when the
- *  article is no clan's own. */
+/** The words a clan answers to as a clan, for "<clan> level": its key, its
+ *  names and short names in every language, and the article's own <keyword>
+ *  field, each word three letters or more. Never the article's extras or auto
+ *  keywords, nor the long descriptive names: those carry generic words
+ *  ("skills", "умения", "politics", "магии", "order") that belong to other
+ *  articles too, and "skills level" must stay theirs. False when the article
+ *  is no clan's own. */
 bool help_clan_identity(const HelpArticle::Pointer &a, vector<DLString> &out)
 {
+    vector<DLString> names, words;
     static const lang_t langs[] = { LANG_EN, LANG_RU, LANG_UA };
 
     if (!help_is_clan_article(a))
         return false;
 
     Clan *clan = clanManager->findByHelpId(a->getID());
-    out.push_back(clan->getName());
+    names.push_back(clan->getName());
     for (int l = 0; l < 3; l++) {
-        out.push_back(help_plain_name(clan->getNameFor(langs[l])));
-        out.push_back(help_plain_name(clan->getShortFor(langs[l])));
-        out.push_back(help_plain_name(clan->getLongNameFor(langs[l])));
-        out.push_back(a->keyword.get(langs[l]));
+        names.push_back(help_plain_name(clan->getNameFor(langs[l])));
+        names.push_back(help_plain_name(clan->getShortFor(langs[l])));
+        names.push_back(a->keyword.get(langs[l]));
     }
+
+    for (auto &name: names)
+        split_words(name, words);
+    for (auto &w: words)
+        if (w.size() >= 3)
+            out.push_back(w);
     return true;
 }
 
@@ -403,13 +410,10 @@ private:
      *  the clan answers to as a clan (help_clan_identity). */
     bool clanMatches(const HelpArticle::Pointer &a) const
     {
-        vector<DLString> identity;
         vector<DLString> words;
 
-        if (!help_clan_identity(a, identity))
+        if (!help_clan_identity(a, words))
             return false;
-        for (auto &name: identity)
-            split_words(name, words);
 
         DLString all;
         for (auto &w: words)
@@ -699,11 +703,8 @@ private:
 
             kwords.clear();
             if (clansOnly) {
-                vector<DLString> identity;
-                if (!help_clan_identity(shown, identity))
+                if (!help_clan_identity(shown, kwords))
                     continue;
-                for (auto &name: identity)
-                    split_words(name, kwords);
             } else {
                 for (auto &kw: self->getAllKeywords())
                     split_words(kw, kwords);
