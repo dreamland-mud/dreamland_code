@@ -49,6 +49,11 @@
 *        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 
+#include <cmath>
+#include <vector>
+#include <jsoncpp/json/json.h>
+#include "configurable.h"
+
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
@@ -91,6 +96,8 @@
 #include "damage.h"
 #include "def.h"
 #include "l10n.h"
+#include "damageflags.h"
+#include "dl_math.h"
 
 CLAN(none);
 GSN(deafen);
@@ -118,25 +125,209 @@ static bool save_hint_once( Character *victim )
 }
 
 /*
+ * Saving throw models, fight/saves.json (docs/systems/SAVES_REWORK.md).
+ *
+ * Model 0: the legacy linear roll, kept bit for bit.
+ * Model 1: P = clamp(base + span * (1 - e^-r) + per_level * (Lv - Lc) + shifts, floor, ceiling),
+ *          r = svs / (tau * max(level_floor, Lv)), svs = -saving_throw. Level stays outside the
+ *          curve, so cast level always cuts through svs.
+ *
+ * A missing file, a missing "model" key, or any missing model 1 knob means model 0.
+ * Chances are permille everywhere: model 0 rolls number_percent() < save, which is
+ * exactly (save - 1) * 10 permille.
+ */
+struct saves_config_t {
+    saves_config_t() : model(0), curveValid(false), dispelValid(false) { }
+
+    int model;
+    bool curveValid;
+    bool dispelValid;
+
+    double base, span, perLevel, floor, ceiling, tau, levelFloor;
+    int shiftBase, shiftPerLevelDiv;
+    int charmPerCha, charmLowCha, charmLowChaPc;
+
+    int dispelBase, dispelPerLevel, dispelMin, dispelMax, dispelOwnDebuffPct;
+};
+
+static saves_config_t savesConfig;
+
+static bool saves_json_number(const Json::Value &obj, const char *key, double &out)
+{
+    if (!obj.isObject() || !obj.isMember(key) || !obj[key].isNumeric())
+        return false;
+
+    out = obj[key].asDouble();
+    return true;
+}
+
+static bool saves_json_int(const Json::Value &obj, const char *key, int &out)
+{
+    double d;
+    if (!saves_json_number(obj, key, d))
+        return false;
+
+    out = (int)d;
+    return true;
+}
+
+CONFIGURABLE_LOADED(fight, saves)
+{
+    saves_config_t cfg;
+    static const Json::Value nullValue;
+    const Json::Value &shift = value.isObject() && value.isMember("shift") ? value["shift"] : nullValue;
+    const Json::Value &charm = value.isObject() && value.isMember("charm") ? value["charm"] : nullValue;
+    const Json::Value &dispel = value.isObject() && value.isMember("dispel") ? value["dispel"] : nullValue;
+
+    cfg.curveValid = saves_json_number(value, "base", cfg.base)
+        && saves_json_number(value, "span", cfg.span)
+        && saves_json_number(value, "per_level", cfg.perLevel)
+        && saves_json_number(value, "floor", cfg.floor)
+        && saves_json_number(value, "ceiling", cfg.ceiling)
+        && saves_json_number(value, "tau", cfg.tau)
+        && saves_json_number(value, "level_floor", cfg.levelFloor)
+        && saves_json_int(shift, "base", cfg.shiftBase)
+        && saves_json_int(shift, "per_level_div", cfg.shiftPerLevelDiv)
+        && saves_json_int(charm, "per_cha", cfg.charmPerCha)
+        && saves_json_int(charm, "low_cha", cfg.charmLowCha)
+        && saves_json_int(charm, "low_cha_pc", cfg.charmLowChaPc)
+        && cfg.tau > 0 && cfg.levelFloor > 0 && cfg.shiftPerLevelDiv > 0
+        && cfg.floor <= cfg.ceiling;
+
+    cfg.dispelValid = saves_json_int(dispel, "base", cfg.dispelBase)
+        && saves_json_int(dispel, "per_level", cfg.dispelPerLevel)
+        && saves_json_int(dispel, "min", cfg.dispelMin)
+        && saves_json_int(dispel, "max", cfg.dispelMax)
+        && saves_json_int(dispel, "own_debuff_pct", cfg.dispelOwnDebuffPct)
+        && cfg.dispelMin <= cfg.dispelMax;
+
+    int model = 0;
+    if (saves_json_int(value, "model", model) && model == 1) {
+        if (cfg.curveValid)
+            cfg.model = 1;
+        else
+            LogStream::sendError() << "fight/saves: model 1 asked but a knob is missing, using model 0" << endl;
+    }
+
+    savesConfig = cfg;
+}
+
+int saves_model( )
+{
+    return savesConfig.model;
+}
+
+/** Model 0 clamp and permille: number_percent() < save lands for save - 1 rolls out of 100. */
+static int saves_legacy_permille( int save )
+{
+    save = URANGE( 5, save, 95 );
+    return (save - 1) * 10;
+}
+
+/** Fixed model 1 shift for resist, berserk, vulnerable and holy craft, in percent. */
+static int saves_shift( int mlevel )
+{
+    return savesConfig.shiftBase + mlevel / savesConfig.shiftPerLevelDiv;
+}
+
+/** Model 1 save chance before the clamp, in percent. svs: positive is better (-saving_throw). */
+static double saves_curve( int victimLevel, int castLevel, int svs )
+{
+    const saves_config_t &c = savesConfig;
+    double r = svs / (c.tau * max( c.levelFloor, (double)victimLevel ));
+
+    // A cursed victim (positive saving_throw) drives r below zero and e^-r up fast:
+    // anything under -1000% is the floor anyway, keep it in int range for the hooks.
+    return max( -1000.0, c.base + c.span * (1.0 - exp( -r )) + c.perLevel * (victimLevel - castLevel) );
+}
+
+static int saves_clamp_permille( double percent )
+{
+    percent = max( savesConfig.floor, min( savesConfig.ceiling, percent ) );
+    return (int)lround( percent * 10 );
+}
+
+int saves_chance_at( int victimLevel, int castLevel, int saving_throw, int shift, int model )
+{
+    if (model == 1 && savesConfig.curveValid)
+        return saves_clamp_permille( saves_curve( victimLevel, castLevel, -saving_throw ) + shift );
+
+    int save = 40 + (victimLevel - castLevel) * 4
+        - (saving_throw * 90) / max( 45, victimLevel ) + shift;
+    return saves_legacy_permille( save );
+}
+
+int saves_chance( short level, Character *victim, int dam_type, Character *ch, bitstring_t dam_flag, bool holyCraft )
+{
+    bool model1 = saves_model( ) == 1;
+    int mlevel = victim->getModifyLevel( );
+    int resist = immune_check( victim, dam_type, dam_flag );
+
+    if (resist == RESIST_IMMUNE)
+        return 1000;
+
+    // Legacy shifts are mlevel/5, model 1 shifts are shift_base + mlevel/per_level_div.
+    int shift = model1 ? saves_shift( mlevel ) : mlevel / 5;
+    int save = 0;
+
+    if (!model1)
+        save = 40 + (mlevel - level) * 4 -
+            (victim->saving_throw * 90) / max( 45, mlevel );
+
+    if (IS_AFFECTED(victim,AFF_BERSERK))
+        save += shift;
+
+    if (resist == RESIST_RESISTANT)
+        save += shift;
+    else if (resist == RESIST_VULNERABLE)
+        save -= shift;
+
+    if (holyCraft)
+        save -= shift;
+
+    if (dam_type == DAM_CHARM) {
+        int cha_vict = victim->getCurrStat(STAT_CHA);
+        int cha_diff = ch ? ch->getCurrStat(STAT_CHA) - cha_vict : 0;
+
+        if (model1) {
+            save -= cha_diff * savesConfig.charmPerCha;
+
+            if (!victim->is_npc( ) && cha_vict < savesConfig.charmLowCha)
+                save -= savesConfig.charmLowChaPc;
+        }
+        else {
+            save -= cha_diff * 2;
+
+            if (!victim->is_npc( ) && cha_vict < 18)
+                save -= mlevel / 5;
+        }
+    }
+
+    // Model 1: the shifts so far ride on the curve. Caster hooks see the running chance
+    // in percent either way and their edit is kept as a shift.
+    double curve = model1 ? saves_curve( mlevel, level, -victim->saving_throw ) : 0;
+    int running = model1 ? (int)lround( curve ) + save : save;
+    int before = running;
+
+    if (ch)
+        for (auto &paf: ch->affected.findAllWithHandler())
+            if (paf->type->getAffect())
+                paf->type->getAffect( )->onSaves(
+                    SpellTarget::Pointer(NEW, ch), paf, victim, running, dam_type);
+
+    if (!model1)
+        return saves_legacy_permille( running );
+
+    return saves_clamp_permille( curve + save + (running - before) );
+}
+
+/*
  * Compute a saving throw.
  * Negative apply's make saving throw better.
+ * The hint and holy craft rolls run before the chance, in the legacy order.
  */
 bool saves_spell( short level, Character *victim, int dam_type, Character *ch, bitstring_t dam_flag, bool verbose )
 {
-    int save;
-    int mlevel = victim->getModifyLevel( );
-
-    // average saves on lvl 100: -70, max saves per non-limit item: -5
-    // shooting for ~70-80% chance to save with "normal" saves
-    // new equation should be:
-    // save = (mlevel - level) * 4 - victim->saving_throw / mlevel * 100
-    
-    save = 40 + (mlevel - level) * 4 -
-        (victim->saving_throw * 90) / max( 45, mlevel );
-    
-    if (IS_AFFECTED(victim,AFF_BERSERK))
-        save += mlevel / 5;
-    
     switch(immune_check(victim, dam_type, dam_flag)) {
         case RESIST_IMMUNE:
             if (ch && verbose && save_hint_once( victim )) {
@@ -147,7 +338,6 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             }
             return true;
         case RESIST_RESISTANT:
-            save += mlevel / 5;
             if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )
                 && save_hint_once( victim )) {
                 if (ch != victim)
@@ -159,7 +349,6 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             }
             break;
         case RESIST_VULNERABLE:
-            save -= mlevel / 5;
             if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )
                 && save_hint_once( victim )) {
                 if (ch != victim)
@@ -171,31 +360,49 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             }
             break;
     }
-    
+
+    bool holyCraft = false;
+
     if (ch && IS_GOOD(ch) && IS_EVIL(victim))
         if (number_percent( ) < gsn_holy_craft->getEffective( ch )) {
-            save -= mlevel / 5;
+            holyCraft = true;
             gsn_holy_craft->improve( ch, true );
         }
 
-    if (dam_type == DAM_CHARM) {
-        int cha_vict = victim->getCurrStat(STAT_CHA);
-        int cha_diff = ch ? ch->getCurrStat(STAT_CHA) - cha_vict : 0;
-        
-        save -= cha_diff * 2;
+    int chance = saves_chance( level, victim, dam_type, ch, dam_flag, holyCraft );
 
-        if (!victim->is_npc( ) && cha_vict < 18)
-            save -= mlevel / 5;
-    }
-    
-    if (ch)
-        for (auto &paf: ch->affected.findAllWithHandler())
-            if (paf->type->getAffect())
-                paf->type->getAffect( )->onSaves(
-                    SpellTarget::Pointer(NEW, ch), paf, victim, save, dam_type);
+    if (saves_model( ) == 1)
+        return number_range( 1, 1000 ) <= chance;
 
-    save = URANGE( 5, save, 95 );
-    return number_percent( ) < save;
+    return number_percent( ) * 10 <= chance;
+}
+
+/*
+ * Fenia spell scripts in flight. A Fenia vict.saves_spell() call has no skill of its own,
+ * so under model 1 it takes DAMF_MAGIC or DAMF_PRAYER from the innermost running spell,
+ * decided the way savesSpell() decides it. A value stack, not a pointer chain into stack
+ * frames, so a scheduler thread that outlives its spell can never leave a dangling top.
+ */
+static std::vector<bitstring_t> savesSpellFlags;
+
+SavesSpellScope::SavesSpellScope( Spell *spell, Character *caster )
+{
+    bool prayer = spell && caster && spell->isPrayer( caster );
+    savesSpellFlags.push_back( prayer ? DAMF_PRAYER : DAMF_MAGIC );
+}
+
+SavesSpellScope::~SavesSpellScope( )
+{
+    if (!savesSpellFlags.empty( ))
+        savesSpellFlags.pop_back( );
+}
+
+bitstring_t saves_default_damflag( )
+{
+    if (saves_model( ) != 1 || savesSpellFlags.empty( ))
+        return DAMF_OTHER;
+
+    return savesSpellFlags.back( );
 }
 
 void attack_caster( Character *caster, Character *victim )
@@ -490,7 +697,14 @@ void spell_by_item( Character *ch, Object *obj, bool oathPaid, bool burned )
     }
 }
 
-bool savesDispel( int dis_level, int spell_level, int duration)
+/*
+ * Model 1 (fight/saves.json "dispel"): base + per_level per level of difference, clipped
+ * to min..max. An own debuff is an affect whose sources list the dispeller, sitting on
+ * somebody else: e.g. dispel affects cast on an enemy you put to sleep. Only the dispel
+ * part of the chance is scaled by own_debuff_pct, so your own debuffs come off less often.
+ * Fenia affects record a source only when the script sets af.source.
+ */
+bool savesDispel( int dis_level, int spell_level, int duration, bool ownDebuff )
 {
     int save;
 
@@ -498,18 +712,33 @@ bool savesDispel( int dis_level, int spell_level, int duration)
     if (duration == -2 ) return 1;
     if (duration == -1 ) spell_level += 5;
 
+    if (saves_model( ) == 1 && savesConfig.dispelValid) {
+        const saves_config_t &c = savesConfig;
+
+        save = c.dispelBase + (spell_level - dis_level) * c.dispelPerLevel;
+        save = URANGE( c.dispelMin, save, c.dispelMax );
+
+        if (ownDebuff)
+            save = 100 - (100 - save) * c.dispelOwnDebuffPct / 100;
+
+        return number_range( 1, 100 ) <= save;
+    }
+
     save = 50 + (spell_level - dis_level) * 5;
     save = URANGE( 5, save, 95 );
     return number_percent( ) < save;
 }
 
-bool checkDispel( int dis_level, Character *victim, int sn)
+bool checkDispel( int dis_level, Character *victim, int sn, Character *dispeller )
 {
     for (auto af: victim->affected.clone()) {
         if (af->type != sn) 
             continue;
 
-        if (!savesDispel(dis_level,af->level,af->duration)) {
+        bool ownDebuff = dispeller && dispeller != victim
+            && af->sources.contains( AffectSource( dispeller ) );
+
+        if (!savesDispel(dis_level,af->level,af->duration,ownDebuff)) {
             AffectHandler::Pointer handler = skillManager->find( sn )->getAffect( );
             
             if (handler) {

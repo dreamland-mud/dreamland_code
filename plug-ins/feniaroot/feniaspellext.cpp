@@ -214,7 +214,17 @@ NMI_INVOKE(FeniaSpellContext, checkDispel, "(skill): попробовать сб
 
     Character *myVict = arg2character(vict);
     Skill *skill = argnum2skill(args, 1);
-    return Register(checkDispel(level, myVict, skill->getIndex()));
+    // The dispeller, so saves model 1 can spare his own debuffs on an enemy.
+    // Null on caster-less runs or a dead caster: the dispel itself must still go through.
+    Character *myCh = 0;
+    if (saves_model() == 1 && ch.type != Register::NONE) {
+        try {
+            myCh = arg2character(ch);
+        } catch (const ::Exception &) {
+            myCh = 0;
+        }
+    }
+    return Register(checkDispel(level, myVict, skill->getIndex(), myCh));
 }
 
 NMI_INVOKE(FeniaSpellContext, damage, "([damtype,damflags]): нанести повреждения жертве, по умолчанию damtype и damflags берутся из профайла")

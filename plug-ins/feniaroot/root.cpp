@@ -41,6 +41,7 @@
 #include "act.h"
 #include "lang.h"
 #include "fight.h"
+#include "magic.h"
 #include "configurable.h"
 #include "json_utils_ext.h"
 #include "lasthost.h"
@@ -2133,13 +2134,14 @@ NMI_INVOKE(Root, config, "(name): read-only доступ до конфигура
     return JsonUtils::toRegister(cfg->getValue());
 }
 
-NMI_INVOKE(Root, configReload, "(name): перечитать с диска fight/to_hit, fight/mob_tiers, fight/item_value или fight/armor_profiles, с вызовом обработчика загрузки")
+NMI_INVOKE(Root, configReload, "(name): перечитать с диска fight/to_hit, fight/mob_tiers, fight/item_value, fight/armor_profiles или fight/saves, с вызовом обработчика загрузки")
 {
     DLString fileName = args2string(args);
 
     // Not every handler survives a broken file: weapon_names crashes the next reset.
     if (fileName != "fight/to_hit" && fileName != "fight/mob_tiers"
-        && fileName != "fight/item_value" && fileName != "fight/armor_profiles")
+        && fileName != "fight/item_value" && fileName != "fight/armor_profiles"
+        && fileName != "fight/saves")
         throw Scripting::Exception("This config does not reload at runtime");
 
     Configurable::Pointer cfg = configReg->get(fileName);
@@ -2149,6 +2151,20 @@ NMI_INVOKE(Root, configReload, "(name): перечитать с диска fight
 
     cfg->load();
     return Register(1);
+}
+
+NMI_INVOKE(Root, savesChanceAt, "(victimLevel, castLevel, svs[, shift[, model]]): saves vs spell chance in permille (0..1000) from bare numbers, no roll. svs = saving_throw as on the character (negative is better), shift = extra percent (resist, berserk...). model defaults to the live fight/saves model; 0 legacy, 1 curve")
+{
+    int victimLevel = argnum2number(args, 1);
+    int castLevel = argnum2number(args, 2);
+    int svs = argnum2number(args, 3);
+    int shift = args.size() > 3 ? argnum2number(args, 4) : 0;
+    int model = args.size() > 4 ? argnum2number(args, 5) : saves_model();
+
+    if (model < 0 || model > 1)
+        throw Scripting::IllegalArgumentException();
+
+    return Register(saves_chance_at(victimLevel, castLevel, svs, shift, model));
 }
 
 NMI_INVOKE(Root, toHitModel, "([n]): модель попадания и брони: 0 старый d20, 1 модель брони, -1 снова как в fight/to_hit; без аргумента не меняет; возвращает действующую модель")

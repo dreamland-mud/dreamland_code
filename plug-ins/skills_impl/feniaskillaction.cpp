@@ -20,6 +20,7 @@
 #include "room.h"
 #include "fight_exception.h"
 #include "fight.h"
+#include "magic.h"
 #include "act.h"
 #include "dl_math.h"
 #include "math_utils.h"
@@ -202,6 +203,7 @@ bool FeniaSkillActionHelper::executeSpellRun(DefaultSpell *spell, Character *ch,
 {
     bool rcIgnored;
     Scripting::Register ctx = createContext(spell, ch, spellTarget, level);
+    SavesSpellScope savesScope(spell, ch);
     // Figure out applicable runXXX method and call it, if defined on the spell wrapper.
     return executeMethod(spell, "run" + getMethodSuffix(spellTarget), ctx, rcIgnored);
 }
@@ -221,6 +223,7 @@ bool FeniaSkillActionHelper::executeCommandPreRun(DefaultSkillCommand *cmd, Char
 bool FeniaSkillActionHelper::executeSpellApply(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level, bool &rc)
 {
     Scripting::Register ctx = createContext(spell, ch, spellTarget, level);
+    SavesSpellScope savesScope(spell, ch);
     // Figure out applicable applyXXX method and call it, if defined on the spell wrapper.
     return executeMethod(spell, "apply" + getMethodSuffix(spellTarget), ctx, rc);
 }

@@ -62,6 +62,31 @@ class SpellTarget;
 class Spell;
 
 bool saves_spell( short level, Character *victim, int dam_type, Character *ch = NULL, bitstring_t dam_flag = 0, bool verbose = true );
+
+/** Effective saves model from fight/saves.json: 0 legacy, 1 curve. */
+int saves_model( );
+
+/** Save chance in permille as saves_spell rolls it: no RNG, no messages, no skill improve.
+ *  holyCraft = the caller's holy craft roll landed. Caster onSaves hooks are included. */
+int saves_chance( short level, Character *victim, int dam_type, Character *ch, bitstring_t dam_flag, bool holyCraft );
+
+/** Save chance in permille from bare numbers. saving_throw is the character field
+ *  (negative is better), shift is in percent. model 1 falls back to 0 if not configured. */
+int saves_chance_at( int victimLevel, int castLevel, int saving_throw, int shift, int model );
+
+/** While alive, a Fenia vict.saves_spell() without a dam_flag defaults to this spell's
+ *  DAMF_MAGIC or DAMF_PRAYER under saves model 1. Set around Fenia spell scripts. */
+class SavesSpellScope {
+public:
+    SavesSpellScope( Spell *spell, Character *caster );
+    ~SavesSpellScope( );
+    SavesSpellScope( const SavesSpellScope & ) = delete;
+    SavesSpellScope &operator = ( const SavesSpellScope & ) = delete;
+};
+
+/** DAMF_OTHER under model 0 or outside a spell script, else the running spell's flag. */
+bitstring_t saves_default_damflag( );
+
 void attack_caster( Character *caster, Character *victim );
 void area_message( Character *ch, const DLString &msg, bool everywhere );
 
@@ -89,8 +114,9 @@ bool spell_nocatch( ::Pointer<Spell> &spell, int level, Character *ch, ::Pointer
  *  only natural remedies on a pill still work. */
 void spell_by_item( Character *ch, Object *obj, bool oathPaid = false, bool burned = false );
 
-bool savesDispel( int dis_level, int spell_level, int duration);
-bool checkDispel( int dis_level, Character *victim, int sn);
+/** ownDebuff: the dispeller placed this affect on somebody else (fight/saves.json dispel.own_debuff_pct). */
+bool savesDispel( int dis_level, int spell_level, int duration, bool ownDebuff = false );
+bool checkDispel( int dis_level, Character *victim, int sn, Character *dispeller = 0 );
 
 bool         is_safe_spell( Character *ch, Character *victim, bool area );
 

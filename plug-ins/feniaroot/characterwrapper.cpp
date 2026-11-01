@@ -156,6 +156,7 @@ CLAN(shalafi);
 GSN(dark_shroud);
 GSN(manacles);
 GSN(spellbane);
+GSN(holy_craft);
 GSN(charm_person);
 // The pet report's second-weapon special case and the combat-invalid set.
 GSN(second_weapon);
@@ -3367,13 +3368,14 @@ NMI_INVOKE( CharacterWrapper, skill_one_hit, "(vict,skillName,damDivisor[,thacCo
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag[,verbose]]): спас-бросок против типа повреждения (.tables.damage_table) с флагом повреждения (.tables.damage_flags)")
+NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag[,verbose]]): saving throw against a damage type (.tables.damage_table) with a damage flag (.tables.damage_flags). No dam_flag: 'other' under saves model 0; under model 1 'magic' or 'prayer' of the running spell script (so res spell counts), 'other' outside one")
 {
     checkTarget();
     Character *caster = argnum2character(args, 1);
     int level = argnum2number(args, 2);
     int dam_type = argnum2flag(args, 3, damage_table);
-    int dam_flag = DAMF_OTHER;
+    // Model 0: DAMF_OTHER. Model 1: the running spell's magic/prayer flag, so res spell counts.
+    int dam_flag = saves_default_damflag();
     if (args.size() > 3)
         dam_flag = argnum2flag(args, 4, damage_flags);
 
@@ -3383,6 +3385,31 @@ NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag[,ve
         
 
     return Register(saves_spell(level, target, dam_type, caster, dam_flag, verbose));
+}
+
+NMI_INVOKE( CharacterWrapper, savesChance, "(caster,level,dam_type[,dam_flag]): permille (0..1000) that saves_spell with the same arguments saves; no roll, no messages. dam_flag defaults as in saves_spell. Holy craft counts at the caster's skill chance. Immune gives 1000")
+{
+    checkTarget();
+    Character *caster = argnum2character(args, 1);
+    int level = argnum2number(args, 2);
+    int dam_type = argnum2flag(args, 3, damage_table);
+    int dam_flag = saves_default_damflag();
+    if (args.size() > 3)
+        dam_flag = argnum2flag(args, 4, damage_flags);
+
+    int chance = saves_chance(level, target, dam_type, caster, dam_flag, false);
+
+    // saves_spell rolls holy craft as number_percent() < skill: weigh both outcomes.
+    if (caster && IS_GOOD(caster) && IS_EVIL(target)) {
+        int holyPct = URANGE(0, gsn_holy_craft->getEffective(caster) - 1, 100);
+
+        if (holyPct > 0) {
+            int withHoly = saves_chance(level, target, dam_type, caster, dam_flag, true);
+            chance = (chance * (100 - holyPct) + withHoly * holyPct) / 100;
+        }
+    }
+
+    return Register(chance);
 }
 
 NMI_INVOKE(CharacterWrapper, quaff, "(obj): получить эффекты от пилюли или зелья")
