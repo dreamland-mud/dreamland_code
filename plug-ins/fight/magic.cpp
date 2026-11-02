@@ -772,7 +772,10 @@ bool checkDispel( int dis_level, Character *victim, int sn, Character *dispeller
         if (af->type != sn) 
             continue;
 
+        // Decision 9 is about your own debuffs on the enemy: cancelling your own sleep
+        // or calm off a groupmate gets no penalty.
         bool ownDebuff = dispeller && dispeller != victim
+            && !is_same_group( dispeller, victim )
             && af->sources.contains( AffectSource( dispeller ) );
 
         if (!savesDispel(dis_level,af->level,af->duration,ownDebuff)) {
