@@ -53,6 +53,21 @@ int get_weapon_dice_size(Object *wield);
 /** Return average damage for a weapon. */
 int weapon_ave(Object *wield);
 
+/** Damage left on a worn weapon, per mille (1000 = pristine). Slides with condition
+ *  down to 800 at condition 0, the same share at every level so that heroes feel it
+ *  and newbies aren't crippled. Zero-cost items don't wear. */
+int weapon_wear_permille(Object *wield);
+
+/** Scale a damage roll by weapon_wear_permille. */
+int weapon_wear_apply(Object *wield, int dam);
+
+/** weapon_ave after wear. */
+int weapon_ave_worn(Object *wield);
+
+/** WEAPON_SHARP that still cuts: below half condition the edge is gone until repaired.
+ *  The flag itself stays. */
+bool weapon_sharp_now(Object *wield);
+
 /** Return average damage for a weapon prototype. */
 int weapon_ave(struct obj_index_data *pWield);
 

@@ -48,6 +48,7 @@
 #include "olc.h"
 #include "security.h"
 
+#include "tohit.h"
 #include "def.h"
 
 #define EDIT_OBJ(x, y) y = &obj
@@ -191,7 +192,7 @@ void OLCStateObject::commit()
                 o->level = obj.level;
             
             if(o->condition == original->condition)
-                o->condition = obj.condition;
+                obj_set_condition(o, obj.condition);
            
             for (int i = 0; i < 5; i++)
                 if (o->getsValueFromProto(i) && o->valueByIndex(i) == original->value[i])

@@ -92,6 +92,7 @@ void WeaponOneHit::damBase( )
     int weaponDamage = 0;
     if (wield) {
         weaponDamage = dice(get_weapon_dice_number(wield), get_weapon_dice_size(wield)) * skill / 100;
+        weaponDamage = weapon_wear_apply(wield, weaponDamage);
     }
 
     if (ch->is_npc()) {
@@ -101,7 +102,7 @@ void WeaponOneHit::damBase( )
         NPCharacter *nch = ch->getNPC();
         int handsAve = dice_ave(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
         int handsDamage = dice(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
-        int weaponAve = wield ? weapon_ave(wield) * skill / 100 : 0;
+        int weaponAve = wield ? weapon_ave_worn(wield) * skill / 100 : 0;
 
         if (handsAve > weaponAve)
             dam = handsDamage;
@@ -139,7 +140,7 @@ void WeaponOneHit::damApplyShield( )
 // sharpness!
 void WeaponOneHit::damApplySharp( )
 {
-    if (wield && IS_WEAPON_STAT(wield, WEAPON_SHARP))
+    if (wield && weapon_sharp_now(wield))
     {
         int percent = number_percent();
         if ( percent <= skill / 8 )

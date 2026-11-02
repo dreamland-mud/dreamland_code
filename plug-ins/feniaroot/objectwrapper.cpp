@@ -15,6 +15,7 @@
 #include "attacks.h"
 #include "wearloc_utils.h"
 #include "weapons.h"
+#include "tohit.h"
 #include "occupations.h"
 #include "behavior.h"
 #include "json_utils_ext.h"
@@ -280,7 +281,7 @@ NMI_GET( ObjectWrapper, condition , "состояние, от 0 [уж.] до 100
 NMI_SET( ObjectWrapper, condition , "состояние, от 0 [уж.] до 100")
 {
     checkTarget( );
-    target->condition = arg.toNumber( );
+    obj_set_condition( target, arg.toNumber( ) );
 }
 
 NMI_GET( ObjectWrapper, cost , "цена в серебре")
@@ -539,6 +540,29 @@ NMI_GET( ObjectWrapper, dice_size, "грани кубиков урона ору�
 {
     checkTarget();
     return Register( get_weapon_dice_size(target) );
+}
+
+NMI_GET( ObjectWrapper, effective_ave, "средний урон оружия с учетом аффектов и износа")
+{
+    checkTarget();
+    return Register( weapon_ave_worn(target) );
+}
+
+NMI_GET( ObjectWrapper, sharp_now, "оружие с флагом sharp, еще не затупленное износом")
+{
+    checkTarget();
+    return Register( weapon_sharp_now(target) );
+}
+
+NMI_INVOKE( ObjectWrapper, armorColumn, "(column): что дает сейчас колонка брони 0-3 с учетом износа")
+{
+    checkTarget( );
+    int column = args2number( args );
+
+    if (column < 0 || column > 3)
+        throw Scripting::Exception("Armor column out of range");
+
+    return Register( armor_worn_value( target, column ) );
 }
 
 NMI_GET( ObjectWrapper, attack_name, "англ название типа атаки оружия (таблица в коде attack_table)")

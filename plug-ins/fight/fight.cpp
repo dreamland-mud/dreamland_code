@@ -112,6 +112,7 @@
 #include "material.h"
 #include "def.h"
 #include "l10n.h"
+#include "tohit.h"
 
 GSN(area_attack);
 GSN(fifth_attack);
@@ -1022,7 +1023,7 @@ void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage )
     if (IS_SET( worn->extra_flags, ITEM_NOPURGE ))
         return;
 
-    worn->condition -= damage;
+    obj_set_condition( worn, worn->condition - damage );
 
     oldact(_("$o1 наносит повреждения $O3."), ch, wield, worn, TO_ROOM );
 
