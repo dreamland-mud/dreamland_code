@@ -38,6 +38,9 @@ GSN(shielding);
 GSN(garble);
 GSN(deafen);
 
+// Percent, rolled once for the voice and once for the hands: 44% of casts fail in all.
+static const int UNDERWATER_FUMBLE_CHANCE = 25;
+
 bool mprog_spell( Character *victim, Character *caster, Skill::Pointer skill, bool before );
 void mprog_cast( Character *caster, SpellTarget::Pointer target, Skill::Pointer skill, bool before );
 
@@ -243,9 +246,24 @@ CMDRUN( cast )
     
     if (ch->isAffected( gsn_deafen ) && number_percent( ) > 50) {
         ch->pecho(_("Глухота мешает тебе как следует произнести заклинание."));
-        ch->recho(_("Глухота мешает %1$C3 как следует произнести заклинание."), ch);        
+        ch->recho(_("Глухота мешает %1$C3 как следует произнести заклинание."), ch);
         return;
-    }    
+    }
+
+    // Water hurts both spell components, each with its own roll. Mobs are locals there.
+    if (!ch->is_npc( ) && ch->in_room->getSectorType( ) == SECT_UNDERWATER) {
+        if (number_percent( ) <= UNDERWATER_FUMBLE_CHANCE) {
+            ch->pecho(_("Вода глушит твой голос, и заклинание срывается."));
+            ch->recho(_("Вода глушит голос %1$C2, и заклинание срывается."), ch);
+            return;
+        }
+
+        if (number_percent( ) <= UNDERWATER_FUMBLE_CHANCE) {
+            ch->pecho(_("Под водой твои руки движутся слишком медленно, и заклинание срывается."));
+            ch->recho(_("Руки %1$C2 под водой движутся слишком медленно, и заклинание срывается."), ch);
+            return;
+        }
+    }
 
     if (HALF_SHADOW(ch)) {
         ch->pecho(_("Твоя тень поглощает всякую попытку сотворить заклинание."));
