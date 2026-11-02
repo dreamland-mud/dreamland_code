@@ -23,6 +23,8 @@ public:
 private:
     void writeOnWall( Character *, Object *, DLString & );
     void writeOnPaper( Character *, Object *, DLString & );
+    void copyToBuffer( Character *, Object *, ExtraDescription * );
+    void pasteFromBuffer( Character *, Object *, ExtraDescription *, const DLString &, bool );
     void usage( Character * );
 
     Object * findNail( Character * );

@@ -18,6 +18,9 @@
 #include "loadsave.h"
 #include "string_utils.h"
 #include "mudtags.h"
+#include "xmlpcstringeditor.h"
+#include "websocketrpc.h"
+#include "arg_utils.h"
 #include "def.h"
 #include "l10n.h"
 #include "fenia_utils.h"
@@ -135,7 +138,7 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
     cmd = arguments.getOneArgument( );
     cmd.stripWhiteSpace( );
     
-    if (cmd != "+" && cmd != "-" && cmd != "clear") {
+    if (cmd != "+" && cmd != "-" && cmd != "clear" && !arg_is_copy(cmd) && !arg_is_paste(cmd)) {
         usage( ch );
         return;
     }
@@ -155,6 +158,16 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
         ed = paper->getProperDescription();
     else
         ed = paper->extraDescriptions.findUnstrict(keyword);
+
+    if (arg_is_copy(cmd)) {
+        copyToBuffer( ch, paper, ed );
+        return;
+    }
+
+    if (arg_is_paste(cmd)) {
+        pasteFromBuffer( ch, paper, ed, keyword, fFace );
+        return;
+    }
 
     if (cmd == "+") {
         if (!ed) {
@@ -187,6 +200,58 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
                 oldact(_("Ты удаляешь последнюю строку с $o2 в разделе '$T'."), ch, paper, keyword.c_str( ), TO_CHAR );
         } 
     }
+}
+
+void CWrite::copyToBuffer( Character *ch, Object *paper, ExtraDescription *ed )
+{
+    if (!ch->getPC( ))
+        return;
+
+    if (!ed) {
+        oldact(_("Копировать с $o2 нечего."), ch, paper, 0, TO_CHAR );
+        return;
+    }
+
+    ch->getPC( )->getAttributes( ).getAttr<XMLAttributeEditorState>("edstate")
+        ->regs[0].split(paper->getExtraDescr(ed->keyword, LANG_DEFAULT));
+
+    if (is_websock(ch))
+        ch->pecho(_("Запись скопирована в буфер редактора, используй команду вебредактор для редактирования."));
+    else
+        ch->pecho(_("Запись скопирована в буфер редактора, однако пользоваться редактором можно только изнутри веб-клиента."));
+}
+
+void CWrite::pasteFromBuffer( Character *ch, Object *paper, ExtraDescription *ed, const DLString &keyword, bool fFace )
+{
+    if (!ch->getPC( ))
+        return;
+
+    DLString text = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
+
+    if (text.empty( )) {
+        ch->pecho(_("Буфер редактора пуст!"));
+        return;
+    }
+
+    if (text.size( ) >= MAX_STRING_LENGTH) {
+        ch->pecho(_("Слишком длинный текст."));
+        return;
+    }
+
+    if (!ed) {
+        if (fFace)
+            ed = paper->addProperDescription();
+        else
+            ed = paper->addExtraDescr(keyword, DLString::emptyString, LANG_DEFAULT);
+    }
+
+    mudtags_strip_web( text, ch );
+    paper->addExtraDescr(ed->keyword, text, LANG_DEFAULT);
+
+    if (fFace)
+        oldact(_("Ты переписываешь лицевую сторону $o2 из буфера редактора."), ch, paper, 0, TO_CHAR );
+    else
+        oldact(_("Ты переписываешь раздел '$T' на $o6 из буфера редактора."), ch, paper, keyword.c_str( ), TO_CHAR );
 }
 
 Object * CWrite::findNail( Character *ch )
