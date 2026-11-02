@@ -376,33 +376,4 @@ void use_potion( Character *ch, Object *obj )
 }
 
 
-// код прочистки желудка "двухпальцевым методом" ,)
-static void mprog_vomit( Character *ch )
-{
-    FENIA_VOID_CALL( ch, "Vomit", "C", ch );
-    FENIA_NDX_VOID_CALL( ch->getNPC( ), "Vomit", "CC", ch, ch );
-
-    for (Object *obj = ch->carrying; obj; obj = obj->next_content) {
-        FENIA_VOID_CALL( obj, "Vomit", "C", ch );
-        FENIA_NDX_VOID_CALL( obj, "Vomit", "OC", obj, ch );
-    }
-}
-
-CMDRUNP( vomit )
-{
-    if (!ch->is_npc( )) {
-        if (desire_bloodlust->applicable( ch->getPC( ) )) {
-            ch->pecho(_("Вампирам это, увы, недоступно."));
-            return;
-        }
-        
-        desire_hunger->vomit( ch->getPC( ) );
-        desire_thirst->vomit( ch->getPC( ) );
-    }
-
-    ch->recho(_("%1$^C1 засовыва%1$nет|ют пальцы в рот и начина%1$nет|ют блевать."), ch);
-	ch->pecho(_("Ты прочищаешь свой желудок двухпальцевым методом."));
-
-    mprog_vomit( ch );
-}
 
