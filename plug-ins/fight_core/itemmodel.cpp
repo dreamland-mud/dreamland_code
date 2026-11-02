@@ -82,6 +82,30 @@ double item_combat_points(double dmgPerRound, double controlShare, int level, bo
     return points;
 }
 
+/** item_value.json shared.<key> {level: [melee, caster]} at level; false when the
+ *  table is missing or holds no level, so the caller keeps its fallback. */
+static bool item_shared_by_level(const char *key, int level, bool caster, double &out)
+{
+    const Json::Value &table = item_value_object("shared", key);
+    if (!table.isObject())
+        return false;
+
+    int col = caster ? 1 : 0;
+    bool any = false;
+    for (auto const &k: table.getMemberNames()) {
+        const Json::Value &v = table[k];
+        if (DLString(k).isNumber() && v.isArray() && (int)v.size() > col && v[(Json::ArrayIndex)col].isNumeric()) {
+            any = true;
+            break;
+        }
+    }
+    if (!any)
+        return false;
+
+    out = item_points_by_level(table, level, col);
+    return true;
+}
+
 void item_weights(ItemWeights &w, bool caster, int acLevel)
 {
     const char *pf = caster ? "caster" : "melee";
@@ -95,6 +119,12 @@ void item_weights(ItemWeights &w, bool caster, int acLevel)
     w.dr           = item_value(pf, "damroll",      c ? 6.0 : 12.0);
     w.hr           = item_value(pf, "hitroll",      c ? 2.0 : 6.0);
     w.saves        = item_value(pf, "saves",        c ? 5.0 : 3.0);
+    // svs is worth very different amounts by level (spell share of incoming damage, band
+    // hp, where band svs sits on the saves curve): the level table wins over the flat one.
+    item_shared_by_level("saves_by_level", acLevel, caster, w.saves);
+    w.savesPerPct = 0;
+    item_shared_by_level("saves_pts_per_pct", acLevel, caster, w.savesPerPct);
+    w.valueLevel = acLevel;
     w.weaponWeight = item_value(pf, "weapon_weight", c ? 4.0 : 12.0);
     w.stat[0]      = item_value(pf, "str", c ? 1 : 3);
     w.stat[1]      = item_value(pf, "int", c ? 2 : 1);

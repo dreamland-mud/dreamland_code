@@ -4530,9 +4530,65 @@ struct GAGrantCtx {
     }
 };
 
+static bool ga_isSavesApply( int location )
+{
+    return location == APPLY_SAVES || location == APPLY_SAVING_ROD || location == APPLY_SAVING_PETRI
+        || location == APPLY_SAVING_BREATH || location == APPLY_SAVING_SPELL;
+}
+
+// The char's own saving_throw outside one wear slot (wear_flags without ITEM_TAKE):
+// without temporary affects (spell buffs and curses come and go, like ga_permaFlags)
+// and without the worn gear in that slot, which a candidate would replace. slot -1
+// keeps all gear (a set bonus stacks on top of it). Negative is better.
+static int ga_svsOutside( Character *target, int slot )
+{
+    int st = target->saving_throw;
+    for (auto &paf: target->affected)
+        if (paf->duration >= 0 && ga_isSavesApply( paf->location ))
+            st -= paf->modifier;
+    if (slot < 0)
+        return st;
+    for (::Object *wo = target->carrying; wo; wo = wo->next_content) {
+        if (wo->wear_loc == wear_none)
+            continue;
+        int ws = wo->pIndexData->wear_flags;
+        REMOVE_BIT( ws, ITEM_TAKE );
+        if (ws != slot)
+            continue;
+        for (auto &paf: wo->pIndexData->affected)
+            if (ga_isSavesApply( paf->location ))
+                st -= paf->modifier;
+        for (auto &paf: wo->affected)
+            if (ga_isSavesApply( paf->location ))
+                st -= paf->modifier;
+    }
+    return st;
+}
+
+// Points of an item's summed saves modifier (delta, negative = better). Saves model 1
+// with item_value.json saves_pts_per_pct: points per 1% x the real save chance the item
+// adds at the char's own svs outside its slot (equal-level caster, no shifts), so the
+// next point on a stacker is worth what it really buys and a swap within the slot is
+// priced by the exact chance it changes. Otherwise, or with no char: the par price.
+static double ga_svsPoints( Character *target, const GAWeights &w, int delta, int slot )
+{
+    if (delta == 0)
+        return 0;
+    if (target == 0 || saves_model( ) != 1 || w.savesPerPct <= 0)
+        return item_apply_points( APPLY_SAVES, delta, w );
+
+    int lvl = target->getModifyLevel( );
+    int st = ga_svsOutside( target, slot );
+    int before = saves_chance_at( lvl, lvl, st, 0, 1 );
+    int after = saves_chance_at( lvl, lvl, st + delta, 0, 1 );
+    return w.savesPerPct * (after - before) / 10.0;   // permille -> percent
+}
+
+// svsDelta: when given, the saves applies are summed there instead of priced one by one,
+// so the caller prices the item's whole svs at once on the saves curve (ga_svsPoints).
 static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6],
                             Character *target, bool worn, int itemLevel = -1,
-                            const GAGrantCtx *grants = 0 )
+                            const GAGrantCtx *grants = 0, int *svsDelta = 0 )
 {
     int m = af.modifier;
     double s0 = s;
@@ -4556,17 +4612,22 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     case APPLY_DEX: statDelta[3] += m; break;
     case APPLY_CON: statDelta[4] += m; break;
     case APPLY_CHA: statDelta[5] += m; break;
+    case APPLY_SAVES:
+    case APPLY_SAVING_ROD:
+    case APPLY_SAVING_PETRI:
+    case APPLY_SAVING_BREATH:
+    case APPLY_SAVING_SPELL:
+        if (svsDelta != 0)
+            *svsDelta += m;
+        else
+            s += item_apply_points( af.location, m, w );
+        break;
     // Plain applies: the shared base price (fight_core/itemmodel.cpp).
     case APPLY_HIT:
     case APPLY_MANA:
     case APPLY_HEAL_GAIN:
     case APPLY_DAMROLL:
     case APPLY_HITROLL:
-    case APPLY_SAVES:
-    case APPLY_SAVING_ROD:
-    case APPLY_SAVING_PETRI:
-    case APPLY_SAVING_BREATH:
-    case APPLY_SAVING_SPELL:
     case APPLY_AC:            // w.ac is level-scaled
     case APPLY_SPELL_LEVEL:   // ~0 with no spells (w.spellFactor)
     case APPLY_MOVE:
@@ -4767,11 +4828,22 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     int itemLevel = inst != 0 ? inst->level : (pProto != 0 ? pProto->level : -1);
     GAGrantCtx grants{ target, pProto, inst };
     const GAGrantCtx *gp = (target != 0 && pProto != 0) ? &grants : 0;
+    int svsDelta = 0;
     for (auto &paf: protoAff)
-        ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel, gp );
+        ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel, gp, &svsDelta );
     if (instAff != 0)
         for (auto &paf: *instAff)
-            ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel, gp );
+            ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel, gp, &svsDelta );
+    if (svsDelta != 0) {
+        int mySlot = -1;
+        if (pProto != 0) {
+            mySlot = pProto->wear_flags;
+            REMOVE_BIT( mySlot, ITEM_TAKE );
+        }
+        double pts = ga_svsPoints( target, w, svsDelta, mySlot );
+        ga_note( "saves", pts, svsDelta );
+        s += pts;
+    }
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
             continue;
@@ -6118,12 +6190,14 @@ static double ga_setValue( Character *target, SetBehavior *sb, const GAWeights &
     // char's level with the formula eqset applies (eqset uses the lowest
     // worn piece level instead, so a worn set can differ).
     int ref = sb->getRefLevel( );
+    int svsDelta = 0;
     for (auto &sa: sb->affects) {
         Affect af;
         sa.fillScaled( af, target->getLevel( ), ref );
         // A set bonus is a chase reward (candidate), so it gets the redundancy check too.
-        ga_accumAffect( af, w, s, statDelta, target, false );
+        ga_accumAffect( af, w, s, statDelta, target, false, -1, 0, &svsDelta );
     }
+    s += ga_svsPoints( target, w, svsDelta, -1 );
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
             continue;
@@ -6590,10 +6664,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     REMOVE_BIT( slotFilter, ITEM_TAKE );    // slot-browse mode: rank only this wear slot
     GAWeights w;
     if (profile == "melee" || profile == "agile" || profile == "hybrid") {
-        // saves: a melee's defence is hp/ac, not save-vs-spell, so a save point is
-        // worth less to it than to a caster. 3/pt (was 5) so a pure +save cloth no
-        // longer out-values real body armour (hp/hitroll/dex + armour class). The
-        // caster branch below keeps 5 -- a squishy caster leans on saves defensively.
+        // saves: priced by level (item_value.json shared.saves_by_level, the flat
+        // melee/caster saves as fallback) and, under saves model 1, at the char's own
+        // svs on the curve (ga_svsPoints).
         w.caster = false;   // weights: config/fight/item_value.json "melee", defaults = the old constants
     } else {                                    // caster (default)
         w.caster = true;    // weights: config/fight/item_value.json "caster"
