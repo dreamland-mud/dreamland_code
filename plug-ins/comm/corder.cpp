@@ -85,7 +85,7 @@ COMMAND(COrder, "order")
         Character *followerWorld = get_char_world(ch, argTarget, FFIND_FOLLOWER | FFIND_INVISIBLE);
         if (followerWorld) {
             ch->pecho(_("Твой последователь должен быть рядом с тобой."));
-            if (ch->getPC()->pet && followerWorld->getNPC() && ch->getPC()->pet == followerWorld->getNPC()) {
+            if (!ch->is_npc() && followerWorld->is_npc()) {
                 // Ask in the owner's language: the gtell line is echoed back as said.
                 interpret_raw(ch, "gtell", lmsg(Player::lang(ch), "where are you?", "где ты?", "де ти?"));
             }
