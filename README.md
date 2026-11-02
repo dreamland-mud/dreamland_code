@@ -9,6 +9,7 @@ DreamLand is a text multiplayer game (MUD) in the DikuMUD / ROM / Anatolia famil
 
 The README below is a quick start. The wiki has the rest:
 
+* [Fenia](https://github.com/dreamland-mud/dreamland_code/wiki/Fenia): the scripting language that runs most of the game, with its [triggers](https://github.com/dreamland-mud/dreamland_code/wiki/Fenia-Triggers) and the generated [API reference](https://dreamland.rocks/feniaapi.html)
 * [Local-Setup](https://github.com/dreamland-mud/dreamland_code/wiki/Local-Setup): environments, runtime layout, ports, logging in, what to rebuild after a change
 * [Local-Testing](https://github.com/dreamland-mud/dreamland_code/wiki/Local-Testing): how to check your change
 * [Troubleshooting](https://github.com/dreamland-mud/dreamland_code/wiki/Troubleshooting): if the server does not start
