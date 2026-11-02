@@ -57,6 +57,14 @@ void WeaponRandomizer::handleEvent(const type_index &eventType, const Event &eve
         eventItemEdited(static_cast<const ItemEditedEvent &>(event));
 }
 
+// Set by fread_obj when a saved item's Props line was corrupt: its old roll is
+// still on it as affects, so rolling again would stack a second one. Instance
+// only: getProperty() would fall back to the prototype.
+static bool item_props_lost(Object *obj)
+{
+    return obj->props.isObject() && obj->props.isMember("propsLost");
+}
+
 // Called from 'oedit commit'. Need to re-roll items that just became 'rand_stat'
 // and viceversa.
 void WeaponRandomizer::eventItemEdited(const ItemEditedEvent &event) const
@@ -64,6 +72,9 @@ void WeaponRandomizer::eventItemEdited(const ItemEditedEvent &event) const
     Object *obj = event.obj;
 
     if (obj->item_type != ITEM_WEAPON)
+        return;
+
+    if (item_props_lost(obj))
         return;
 
     if (IS_SET(obj->pIndexData->area->area_flag, AREA_SYSTEM))
@@ -106,6 +117,9 @@ void WeaponRandomizer::eventItemReset(const ItemResetEvent &event) const
 {
     Object *obj = event.obj;
     RESET_DATA *pReset = event.pReset;
+
+    if (item_props_lost(obj))
+        return;
 
     // The refit moved some 'random armor' pieces to these types: they keep their stats.
     bool wornType = obj->item_type == ITEM_ARMOR || obj->item_type == ITEM_JEWELRY
