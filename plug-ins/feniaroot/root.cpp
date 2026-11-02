@@ -2167,6 +2167,36 @@ NMI_INVOKE(Root, savesChanceAt, "(victimLevel, castLevel, svs[, shift[, model]])
     return Register(saves_chance_at(victimLevel, castLevel, svs, shift, model));
 }
 
+NMI_INVOKE(Root, savesModel, "(): the saves model C++ actually rolls: 1 curve, 0 legacy. 0 also when fight/saves.json asks for 1 but a curve knob is missing or out of range")
+{
+    return Register(saves_model());
+}
+
+NMI_INVOKE(Root, armorReductionAt, "(level, armor[, bash, slash]): permille (0..1000) of melee damage armor stops against a normal mob of the same level, as ch.armorReduction() computes it. armor on the model 1 scale, as score shows it (positive is better; from the raw fields a PC column is 100 - ch.armorN, a mob column -ch.armorN, N 0 pierce, 1 bash, 2 slash). One value counts for pierce, bash and slash; three values are pierce, bash, slash and the reductions are averaged. 0 under the legacy armor model")
+{
+    int level = argnum2number(args, 1);
+
+    if (args.size() < 2)
+        throw Scripting::NotEnoughArgumentsException();
+    if (args.size() != 2 && args.size() != 4)
+        throw Scripting::IllegalArgumentException();
+
+    if (to_hit_model() != 1)
+        return Register(0);
+
+    // The reference attacker of ch.armorReduction(): hitroll = level at swing skill 120.
+    double hitrollEff = level * 1.2;
+
+    if (args.size() == 2)
+        return Register((int)lround(to_hit_reduction(argnum2number(args, 2), level, hitrollEff) * 1000));
+
+    double sum = 0;
+    for (int i = 2; i <= 4; i++)
+        sum += to_hit_reduction(argnum2number(args, i), level, hitrollEff);
+
+    return Register((int)lround(sum / 3 * 1000));
+}
+
 NMI_INVOKE(Root, toHitModel, "([n]): модель попадания и брони: 0 старый d20, 1 модель брони, -1 снова как в fight/to_hit; без аргумента не меняет; возвращает действующую модель")
 {
     if (!args.empty()) {

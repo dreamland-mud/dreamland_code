@@ -125,12 +125,16 @@ static bool save_hint_once( Character *victim )
 }
 
 /*
- * Saving throw models, fight/saves.json (docs/systems/SAVES_REWORK.md).
+ * Saving throw models, fight/saves.json.
  *
  * Model 0: the legacy linear roll, kept bit for bit.
- * Model 1: P = clamp(base + span * (1 - e^-r) + per_level * (Lv - Lc) + shifts, floor, ceiling),
- *          r = svs / (tau * max(level_floor, Lv)), svs = -saving_throw. Level stays outside the
- *          curve, so cast level always cuts through svs.
+ * Model 1: a saturating curve. Every point of svs adds a little less than the one before,
+ *          the chance never reaches the ceiling, and the level gap is added outside the curve,
+ *          so cast level always cuts through svs:
+ *          P = clamp(base + span * (1 - e^-r) + per_level * (Lv - Lc) + shifts, floor, ceiling),
+ *          r = svs / (tau * max(level_floor, Lv)), svs = -saving_throw.
+ *          A cursed victim (saving_throw > 0) keeps the legacy linear penalty instead of the
+ *          exponential, which would fall off faster than today.
  *
  * A missing file, a missing "model" key, or any missing model 1 knob means model 0.
  * Chances are permille everywhere: model 0 rolls number_percent() < save, which is
@@ -145,7 +149,7 @@ struct saves_config_t {
 
     double base, span, perLevel, floor, ceiling, tau, levelFloor;
     int shiftBase, shiftPerLevelDiv;
-    int charmPerCha, charmLowCha, charmLowChaPc;
+    int charmPerCha, charmLowCha, charmLowChaBase, charmLowChaPerLevelDiv;
 
     int dispelBase, dispelPerLevel, dispelMin, dispelMax, dispelOwnDebuffPct;
 };
@@ -190,23 +194,30 @@ CONFIGURABLE_LOADED(fight, saves)
         && saves_json_int(shift, "per_level_div", cfg.shiftPerLevelDiv)
         && saves_json_int(charm, "per_cha", cfg.charmPerCha)
         && saves_json_int(charm, "low_cha", cfg.charmLowCha)
-        && saves_json_int(charm, "low_cha_pc", cfg.charmLowChaPc)
-        && cfg.tau > 0 && cfg.levelFloor > 0 && cfg.shiftPerLevelDiv > 0
-        && cfg.floor <= cfg.ceiling;
+        && saves_json_int(charm, "low_cha_pc_base", cfg.charmLowChaBase)
+        && saves_json_int(charm, "low_cha_pc_per_level_div", cfg.charmLowChaPerLevelDiv)
+        && cfg.span >= 0 && cfg.tau > 0 && cfg.levelFloor > 0
+        && cfg.shiftPerLevelDiv > 0 && cfg.charmLowChaPerLevelDiv > 0
+        && 0 <= cfg.floor && cfg.floor <= cfg.ceiling && cfg.ceiling <= 100;
 
     cfg.dispelValid = saves_json_int(dispel, "base", cfg.dispelBase)
         && saves_json_int(dispel, "per_level", cfg.dispelPerLevel)
         && saves_json_int(dispel, "min", cfg.dispelMin)
         && saves_json_int(dispel, "max", cfg.dispelMax)
         && saves_json_int(dispel, "own_debuff_pct", cfg.dispelOwnDebuffPct)
-        && cfg.dispelMin <= cfg.dispelMax;
+        && 0 <= cfg.dispelMin && cfg.dispelMin <= cfg.dispelMax && cfg.dispelMax <= 100
+        && 0 <= cfg.dispelOwnDebuffPct && cfg.dispelOwnDebuffPct <= 100;
 
     int model = 0;
     if (saves_json_int(value, "model", model) && model == 1) {
-        if (cfg.curveValid)
+        if (!cfg.curveValid)
+            LogStream::sendError() << "fight/saves: model 1 asked but a curve knob is missing or out of range, using model 0" << endl;
+        else {
             cfg.model = 1;
-        else
-            LogStream::sendError() << "fight/saves: model 1 asked but a knob is missing, using model 0" << endl;
+
+            if (!cfg.dispelValid)
+                LogStream::sendError() << "fight/saves: dispel block missing or out of range, savesDispel stays legacy" << endl;
+        }
     }
 
     savesConfig = cfg;
@@ -234,11 +245,17 @@ static int saves_shift( int mlevel )
 static double saves_curve( int victimLevel, int castLevel, int svs )
 {
     const saves_config_t &c = savesConfig;
-    double r = svs / (c.tau * max( c.levelFloor, (double)victimLevel ));
+    double svsPart;
 
-    // A cursed victim (positive saving_throw) drives r below zero and e^-r up fast:
-    // anything under -1000% is the floor anyway, keep it in int range for the hooks.
-    return max( -1000.0, c.base + c.span * (1.0 - exp( -r )) + c.perLevel * (victimLevel - castLevel) );
+    if (svs >= 0)
+        svsPart = c.span * (1.0 - exp( -svs / (c.tau * max( c.levelFloor, (double)victimLevel )) ));
+    else
+        // Cursed victim: the legacy term, integer division included, so curse and the like
+        // hurt exactly as much as under model 0.
+        svsPart = (svs * 90) / max( 45, victimLevel );
+
+    // Anything under -1000% is the floor anyway, keep it in int range for the hooks.
+    return max( -1000.0, c.base + svsPart + c.perLevel * (victimLevel - castLevel) );
 }
 
 static int saves_clamp_permille( double percent )
@@ -293,7 +310,7 @@ int saves_chance( short level, Character *victim, int dam_type, Character *ch, b
             save -= cha_diff * savesConfig.charmPerCha;
 
             if (!victim->is_npc( ) && cha_vict < savesConfig.charmLowCha)
-                save -= savesConfig.charmLowChaPc;
+                save -= savesConfig.charmLowChaBase + mlevel / savesConfig.charmLowChaPerLevelDiv;
         }
         else {
             save -= cha_diff * 2;
@@ -328,7 +345,15 @@ int saves_chance( short level, Character *victim, int dam_type, Character *ch, b
  */
 bool saves_spell( short level, Character *victim, int dam_type, Character *ch, bitstring_t dam_flag, bool verbose )
 {
-    switch(immune_check(victim, dam_type, dam_flag)) {
+    int resist = immune_check(victim, dam_type, dam_flag);
+
+    // Model 1 passes DAMF_MAGIC/DAMF_PRAYER on every spell save, so res/vuln spell can be
+    // what fires the hint. Then the damage noun would be wrong: name magic instead.
+    bool byMagic = saves_model( ) == 1
+        && (resist == RESIST_RESISTANT || resist == RESIST_VULNERABLE)
+        && immune_check(victim, dam_type, dam_flag & ~(DAMF_MAGIC|DAMF_PRAYER|DAMF_SPELL)) != resist;
+
+    switch(resist) {
         case RESIST_IMMUNE:
             if (ch && verbose && save_hint_once( victim )) {
                 if (ch != victim)
@@ -340,7 +365,13 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
         case RESIST_RESISTANT:
             if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )
                 && save_hint_once( victim )) {
-                if (ch != victim)
+                if (byMagic) {
+                    if (ch != victim)
+                        ch->pecho(_("Магия {1{Gочень слабо{2 влияет на %C4."), victim);
+                    else
+                        ch->pecho(_("Магия {1{Gочень слабо{2 влияет на тебя."));
+                }
+                else if (ch != victim)
                     ch->pecho(_("%^N1 {1{Gочень слабо{2 влияет на %C4."), 
                         damage_noun(dam_type, viewerLang(ch)).c_str(), victim);
                 else 
@@ -351,7 +382,13 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
         case RESIST_VULNERABLE:
             if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )
                 && save_hint_once( victim )) {
-                if (ch != victim)
+                if (byMagic) {
+                    if (ch != victim)
+                        ch->pecho(_("Магия {1{Rособо пагубно{2 влияет на %C4."), victim);
+                    else
+                        ch->pecho(_("Магия {1{Rособо пагубно{2 влияет на тебя."));
+                }
+                else if (ch != victim)
                     ch->pecho(_("%^N1 {1{Rособо пагубно{2 влияет на %C4."), 
                         damage_noun(dam_type, viewerLang(ch)).c_str(), victim);
                 else
@@ -735,7 +772,10 @@ bool checkDispel( int dis_level, Character *victim, int sn, Character *dispeller
         if (af->type != sn) 
             continue;
 
+        // Decision 9 is about your own debuffs on the enemy: cancelling your own sleep
+        // or calm off a groupmate gets no penalty.
         bool ownDebuff = dispeller && dispeller != victim
+            && !is_same_group( dispeller, victim )
             && af->sources.contains( AffectSource( dispeller ) );
 
         if (!savesDispel(dis_level,af->level,af->duration,ownDebuff)) {
