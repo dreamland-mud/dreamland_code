@@ -34,7 +34,16 @@ XMLClanRecord::XMLClanRecord()
 
 bool XMLAttributeClanRecords::handle( const RemortArguments &args )
 {
+    DLString office = clan_office( args.pch );
+
     clan_freeze( args.pch );
+
+    if (!office.empty( )) {
+        XMLClanRecord *rec = clan_record( args.pch, args.pch->getClan( )->getName( ), false );
+        if (rec)
+            rec->remortOffice.setValue( office );
+    }
+
     return RemortAttribute::handle( args );
 }
 
@@ -51,6 +60,7 @@ Scripting::Register XMLAttributeClanRecords::toRegister() const
         rec->setField(IdRef("tenure"), (int)(r.second.tenure.getValue() / 3600));
         rec->setField(IdRef("donated"), r.second.donated.getValue());
         rec->setField(IdRef("office"), r.second.office.getValue());
+        rec->setField(IdRef("remortOffice"), r.second.remortOffice.getValue());
         rec->setField(IdRef("totalDonated"), (int)r.second.totalDonated.getValue());
         recs->setField(r.first, recReg);
     }
@@ -254,10 +264,39 @@ void clan_freeze( PCMemoryInterface *pcm )
     rec->since.setValue( -1 );
 }
 
+static bool clan_has_leader( const Clan &clan )
+{
+    for (auto &p: PCharacterManager::getPCM( ))
+        if (p.second->getClan( ) == clan && clan_office( p.second ) == CLAN_OFFICE_LEADER)
+            return true;
+
+    return false;
+}
+
+/** Entering any clan uses up what remort remembered: only the clan it was held in gives it back. */
+static DLString clan_take_remort_office( PCMemoryInterface *pcm, const Clan &clan )
+{
+    DLString office;
+    XMLAttributeClanRecords::Pointer attr = pcm->getAttributes( ).findAttr<XMLAttributeClanRecords>( "clanrec" );
+
+    if (!attr)
+        return office;
+
+    for (auto &r: attr->records) {
+        if (r.first == clan.getName( ))
+            office = r.second.remortOffice.getValue( );
+
+        r.second.remortOffice.setValue( DLString::emptyString );
+    }
+
+    return office;
+}
+
 void clan_induct( PCMemoryInterface *pcm, const Clan &clan )
 {
     bool sameClan = (pcm->getClan( ) == clan);
     int rank = 0;
+    const char *notice = 0;
 
     if (!sameClan)
         clan_freeze( pcm );
@@ -280,11 +319,29 @@ void clan_induct( PCMemoryInterface *pcm, const Clan &clan )
         if (rec) {
             PCharacter *pc = dynamic_cast<PCharacter *>( pcm );
             rec->since.setValue( pc ? pc->age.getTrueTime( ) : -1 );
-            // Offices are granted anew; one left over from a path that skipped
-            // the freeze must not come back.
+            // Offices are granted anew, except the one remort took; one left over
+            // from a path that skipped the freeze must not come back.
             rec->office.setValue( DLString::emptyString );
+
+            DLString office = clan_take_remort_office( pcm, clan );
+
+            if (clan_is_reformed( clan ) && !office.empty( )) {
+                if (office == CLAN_OFFICE_RECRUITER) {
+                    notice = "{lE{WYou are a recruiter of your clan again.{lR{WТы снова рекрутер своего клана.{lU{WТи знову рекрутер свого клану.{lx{x";
+                } else if (clan_has_leader( clan )) {
+                    office = CLAN_OFFICE_RECRUITER;
+                    notice = "{lE{WYour clan has another leader now, so you return as a recruiter.{lR{WУ твоего клана теперь другой лидер, и ты возвращаешься рекрутером.{lU{WТвій клан тепер має іншого лідера, тож ти повертаєшся рекрутером.{lx{x";
+                } else {
+                    notice = "{lE{WYou are the leader of your clan again.{lR{WТы снова лидер своего клана.{lU{WТи знову лідер свого клану.{lx{x";
+                }
+
+                rec->office.setValue( office );
+            }
         }
     }
+
+    if (notice)
+        clan_notice( pcm, notice );
 }
 
 void clan_remove( PCMemoryInterface *pcm, bool bySelf )
@@ -405,6 +462,10 @@ static bool clan_decay_apply( PCMemoryInterface *pcm )
             }
             if (!rec.office.getValue( ).empty( )) {
                 rec.office.setValue( DLString::emptyString );
+                changed = true;
+            }
+            if (!rec.remortOffice.getValue( ).empty( )) {
+                rec.remortOffice.setValue( DLString::emptyString );
                 changed = true;
             }
             // Restart the count, the time before the break is gone.

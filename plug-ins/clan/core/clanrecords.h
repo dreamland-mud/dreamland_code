@@ -36,6 +36,8 @@ public:
     XML_VARIABLE XMLString office;
     /** Every qp ever given to this clan's treasury. Never reset. */
     XML_VARIABLE XMLLong totalDonated;
+    /** CLAN_OFFICE_* held when remort took the player out, until they enter a clan. */
+    XML_VARIABLE XMLStringNoEmpty remortOffice;
 };
 
 /** Per-clan records of a player (attribute 'clanrec'). Survives remort. */
@@ -91,13 +93,16 @@ DLString clan_set_office( PCMemoryInterface *pcm, const DLString &office );
 /** Bank tenure and, for a reformed clan, freeze rank and drop the office. Call before setClan. */
 void clan_freeze( PCMemoryInterface *pcm );
 
-/** Put the player into a clan. A reformed clan gets the frozen rank back. Doesn't save or announce. */
+/** Put the player into a clan. A reformed clan gets the frozen rank back, and the office if
+ *  remort took it (a leader whose seat was filled meanwhile comes back as a recruiter).
+ *  Tells the player about a returned office, doesn't save or announce otherwise. */
 void clan_induct( PCMemoryInterface *pcm, const Clan &clan );
 
 /** Take the player out of their clan (removeSelf or removeBy). Doesn't save or announce. */
 void clan_remove( PCMemoryInterface *pcm, bool bySelf );
 
-/** Offline for 180 days: ranks 5-8 drop to 4, tenure 0 on every record, offices cleared.
+/** Offline for 180 days: ranks 5-8 drop to 4, tenure 0 on every record, offices and
+ *  offices remembered from remort cleared.
  *  Immortals and online players are skipped. True if anything changed. */
 bool clan_decay( PCMemoryInterface *pcm, time_t now );
 
