@@ -1,232 +1,151 @@
-# DreamLand MUD, руководство разработчика
+# DreamLand MUD
 
-<p align="center">
-  <span>Pусский</span> |
-  <a href="https://github.com/dreamland-mud/dreamland_code/blob/master/README.en.md">English</a>
-</p>
-
----
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
 ![DreamLand MUD version](https://img.shields.io/badge/DreamLand%20MUD-v4.0-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
-[![Build Status](https://api.travis-ci.com/dreamland-mud/dreamland_code.svg?branch=master&status=unknown)](https://app.travis-ci.com/github/dreamland-mud/dreamland_code)
 [![Discord chat](https://img.shields.io/discord/969942531980808243.svg?label=Discord%20chat&style=flat)](https://discord.gg/fVtaeePyey)
 
-Как собирать и запускать:
-* Из-под Ubuntu 18.04, 20.04 (реальная или виртуальная машина): пользуйтесь инструкцией ниже.
-* Из-под Windows 10: следуя [этой инструкции](https://github.com/dreamland-mud/dreamland_code/wiki/WSL-and-VS-Code) для Windows Subsystem for Linux и редактора VS Code
-* Из-под окружения Docker: собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
-* Из-под онлайн сред разработки в браузере: [Goorm Online IDE](https://github.com/dreamland-mud/dreamland_code/wiki/Goorm-IDE) или же https://gitpod.io.
+DreamLand is a text multiplayer game (MUD) in the DikuMUD / ROM / Anatolia family, running since the 1990s. This repository is the server: a C++17 core library, about 50 plugins, and the Fenia scripting interpreter. Game data lives in [dreamland_world](https://github.com/dreamland-mud/dreamland_world), public Fenia scripts in [dreamland_fenia_public](https://github.com/dreamland-mud/dreamland_fenia_public), the web client in [mudjs](https://github.com/dreamland-mud/mudjs). You can play at https://dreamland.rocks/play or by telnet to dreamland.rocks:9000.
 
-**Содержание**
-* [Запуск локальной версии](#local)
-   * [Подготовка окружения](#env)
-   * [Сборка из исходников](#build)
-   * [Установка dreamland_world](#areas)
-   * [Запуск сервера](#run)
-   * [Просмотр логов](#logs)
-   * [Вход в мир](#telnet)
-* [Работа с репозиторием](#git)
-   * [Fork репозитория](#fork)
-   * [Внесение изменений](#push)
-   * [Pull requests](#pull)
-   * [Синхронизация с родительским репозиторием](#uptodate)
-* [Разработка](#dev)
-   * [Пересборка 'ядра'](#core)
-   * [Пересборка плагинов](#plugin)
-* [Wiki проекта](https://github.com/dreamland-mud/dreamland_code/wiki)
+The README below is a quick start. The wiki has the rest:
 
-## <a name="local">Запуск локальной версии</a>
+* [Local-Setup](https://github.com/dreamland-mud/dreamland_code/wiki/Local-Setup): environments, runtime layout, ports, logging in, what to rebuild after a change
+* [Local-Testing](https://github.com/dreamland-mud/dreamland_code/wiki/Local-Testing): how to check your change
+* [Troubleshooting](https://github.com/dreamland-mud/dreamland_code/wiki/Troubleshooting): if the server does not start
+* [Contribute](https://github.com/dreamland-mud/dreamland_code/wiki/Contribute): how to send a change
+* [Agent-Index](https://github.com/dreamland-mud/dreamland_code/wiki/Agent-Index): wiki map for tools and AI agents
 
-Эта инструкция по сборке была проверена на Ubuntu 18.04. Дримленд гарантированно собирается под **gcc 9.3** (или другой версией с поддержкой C++17).
+## Requirements
 
-Если вам удалось собрать под чем-то еще, пожалуйста, обновите это руководство. 
+Ubuntu 18.04 or 20.04 (real machine, VM, WSL 2 or a container) and gcc 9 or newer. The build uses gcc-only flags, so other compilers will not work. macOS is not supported, use Docker or a Linux VM.
 
-### <a name="env">Подготовка окружения</a>
-Установите компилятор и сопутствующие программы, а также библиотеки, от которых зависит код дримленд:
+This repository has `Dockerfile.localbuild` (Ubuntu 20.04 build container), `Dockerfile.localrun` (runtime container) and `Dockerfile.gitpod` with `.gitpod.yml` for Gitpod.
+
+### Build tools and libraries
+
 ```bash
 sudo apt-get update
-sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util libfl-dev bzip2
-sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
-sudo apt-get install -y locales && locale-gen uk_UA && update-locale
+sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util bzip2 perl
+sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev libfl-dev
+sudo apt-get install -y locales && sudo locale-gen uk_UA && sudo update-locale
 ```
 
-На Ubuntu 18.04, возможно, понадобится установить более свежую версию компилятора и сделать ее версией по умолчанию:
+The `uk_UA` locale is used for Cyrillic sorting. Without it the server starts but sorts Russian text wrongly.
+
+### Optional: gcc 9 on Ubuntu 18.04
+
+Ubuntu 18.04 ships gcc 7, which is too old (no `<filesystem>`). Do this after the packages above, so that the `g++` and `gcc` packages do not replace the alternatives links. To get gcc 9:
+
 ```bash
+sudo apt-get install -y software-properties-common
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 sudo apt-get update
-sudo apt-get install gcc-9 g++-9
-
+sudo apt-get install -y gcc-9 g++-9
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
-sudo update-alternatives --config gcc
 ```
 
-### <a name="build">Сборка из исходников</a>
-Склонируйте к себе либо главный репозиторий, либо свою собственную копию (fork) - о создании fork читайте ниже.
-Предположим, что исходники будут лежать в `/home/dreamland/dreamland_code`, тогда:
+Check with `g++ --version` before you run `configure`. If it still shows 7, run `export CC=gcc-9 CXX=g++-9` first.
+
+## Build and install
+
+Sources, build directory and runtime directory are three separate folders. Replace `/path/to/runtime` with your install location. The build directory `../objs` is also written as `/path/to/objs` below.
+
 ```bash
-mkdir /home/dreamland && cd /home/dreamland
 git clone https://github.com/dreamland-mud/dreamland_code.git
-```
-В каталоге с исходниками проинициализируйте конфигурационный скрипт и сборочные файлы, запустив
-```bash
 cd dreamland_code
 make -f Makefile.git
-```
-В дальнейшем эту команду запускать не нужно, разве что если изменится configure.ac.
-Приступаем к конфигурации и сборке. Для удобства все объектники будут в отдельном каталоге, чтобы не засорять исходники лишними файлами.
-Инсталяция дримленд также будет в отдельном каталоге runtime, где на этапе конфигурации будет создано дерево каталогов и скопированы нужные файлы. 
-В этом руководстве предполагается, что объектники лежат в `/home/dreamland/objs`, а инсталляция - в `/home/dreamland/runtime`. Измените пути в примерах согласно своей конфигурации.
-
-```bash
-mkdir /home/dreamland/objs && cd /home/dreamland/objs
-/home/dreamland/dreamland_code/configure --prefix=/home/dreamland/runtime
-```
-Для сборки и установки запустите команду:
-```bash
-make && make install
-```
-Если у вас несколько процессоров, будет выгодно распараллелить сборку, указав количество параллельных потоков, например:
-```bash
+mkdir ../objs && cd ../objs
+../dreamland_code/configure --prefix=/path/to/runtime
 make -j 4 && make install
 ```
 
-### <a name="areas">Установка dreamland_world</a>
-Склонируйте репозиторий `dreamland_world`, который содержит все конфигурационные файлы и некоторые зоны, а также репу `dreamland_fenia_public` с полезными скриптами на фене. 
+`make -f Makefile.git` generates the `configure` script. Run it again only when `configure.ac`, a `Makefile.am`, a `Makefile.inc` or an `.m4` file changes. `configure` also creates the runtime tree under the prefix: `bin`, `lib`, `libexec`, `etc/dreamland.xml`, the `var` folders, the Fenia database and two default administrator characters. It does not overwrite files that already exist. The first full build takes a while.
+
+## Download configuration and areas
+
 ```bash
-cd /home/dreamland/runtime
+cd /path/to/runtime
 git clone https://github.com/dreamland-mud/dreamland_world.git share/DL
 git clone https://github.com/dreamland-mud/dreamland_fenia_public.git share/DL/fenia/public
 ```
 
-Вот и всё, мир готов к запуску.
+`dreamland_world` holds the game configuration and a small set of sample zones in `areas.local`. The stock `etc/dreamland.xml` loads only those zones. See [Repositories](https://github.com/dreamland-mud/dreamland_code/wiki/Repositories) for how the pieces fit.
 
-### <a name="run">Запуск сервера</a>
+## Start the game
 
 ```bash
-cd  /home/dreamland/runtime
+cd /path/to/runtime
 ./bin/dreamland etc/dreamland.xml &
 ```
-### <a name="logs">Просмотр логов</a>
 
-Логи попадают в подкаталог `var/log` в каталоге runtime. Формат файла логов задается в `etc/dreamland.xml`, по умолчанию имя файла - это дата и время запуска. 
+With the stock `etc/dreamland.xml` there is no `logPattern` setting, so the log goes to standard output. To write log files instead, stop the server (see below) and add this line to `etc/dreamland.xml`. The server writes its in-memory copy of that file back every game tick and on shutdown, so an edit made while it runs is lost. Changes apply at the next start.
+
 ```xml
 <logPattern>var/log/%Y%m%d-%H%M%S.log</logPattern>
 ```
-Удалив эту строку из dreamland.xml, можно добиться вывода логов в stdout.
 
-### <a name="telnet">Вход в мир</a>
+Stop the server with SIGINT or SIGTERM (Ctrl-C in the foreground, or `kill %1` for the background job started above). The server rewrites `etc/dreamland.xml` while it runs, so expect that file to change in your tree. Always stop the server before you edit it.
 
-Изначально в мире есть только один персонаж, наделенный всеми полномочиями: Kadm, пароль KadmKadm. Остальных персонажей можно создать по мере необходимости. Мир доступен локально на нескольких портах:
+## Log in
 
-* 9001 - "задняя дверь" для быстрого доступа, минуя архивариуса. При входе через этот порт укажите в одной строке кодировку, логин и пароль, например: 0 Kadm KadmKadm.
-* 9000 - обычный вход, тут же можно создать нового персонажа.
-* 1234 - порт web-socket. Можете скачать клиент [mudjs](https://github.com/dreamland-mud/mudjs), установить его согласно инструкции и играть из браузера.
+| Port | Use |
+|---|---|
+| 9000 | Telnet with the normal login and character creation dialog |
+| 9001 | Telnet backdoor, login on one line |
+| 9127 | Telnet backdoor, local connections only |
+| 1234 | WebSocket, the protocol [mudjs](https://github.com/dreamland-mud/mudjs) speaks. The stock mudjs build connects only to dreamland.rocks, so use telnet locally (see [Client-Web-Development](https://github.com/dreamland-mud/dreamland_code/wiki/Client-Web-Development)) |
 
-Например: ```telnet localhost 9000``` или ```#connect localhost 9000``` в муд-клиенте. Вместо localhost может понадобиться указать IP-адрес виртуальной машины, на которой установлен и запущен муд-сервер.
+The backdoor ports expect one line with a codepage number from 1 to 7 first, then name and password. Number 7 is UTF-8:
 
----
-## <a name="git">Работа с репозиторием</a>
-
-### <a name="fork">Fork репозитория</a>
-
-Создайте свою собственную копию (fork) репозитория, нажав на кнопку Fork вверху [страницы](https://github.com/dreamland-mud/dreamland_code):
-![fork example](https://dreamland.rocks/img/git01.png)
-
-Ваша копия будет иметь путь https://github.com/yourname/dreamland_code:
-![fork example](https://dreamland.rocks/img/git02.png)
-
-Cклонируйте исходники к себе на машину, используя URL из Clone or download:
-![clone example](https://dreamland.rocks/img/git0211.png)
-например
-```bash
-git clone https://github.com/yourname/dreamland_code
+```text
+7 Kadm KadmKadm
 ```
 
-### <a name="push">Внесение изменений</a>
-Теперь вы можете вносить какие угодно изменения в свой fork, никак не влияя на основной репозиторий. Когда какая-то функциональность будет готова к вливанию обратно в основной репозиторий, нужно будет создать запрос (pull request), об этом ниже.
+Two characters exist after the first install, both level 107 with password `KadmKadm`. `Kadm` uses Russian commands and output. `Cadmus` uses English. Use them for local development only and never on a server other people can reach.
 
-Кратко опишем команды, которые понадобятся для внесения изменений в свой fork. Все это стандартные команды git, о которых можно прочитать во многих руководствах.
-1. Проверить, какие файлы изменились или добавились в локальной версии:
 ```bash
-git status
-```
-Просмотреть изменения подробно:
-```bash
-git diff
-```
-2. Добавить все измененные файлы в будущий commit:
-```bash
-git add .
-```
-Добавить файлы выборочно:
-```bash
-git add path/to/file
-```
-3. Создать commit и описать изменение. Описания рекомендуется делать понятные для тех, кто будет читать их через полгода.
-```bash
-git commit -m "Guys, I did a thing!"
-```
-Если нужно запустить встроенный редактор для создания описания (commit log):
-```bash
-git commit
-```
-4. Выпихнуть изменения на github:
-```bash
-git push
+telnet localhost 9000
 ```
 
-### <a name="pull">Pull requests</a>
-Настало время поделиться со всеми тем, над чем вы корпели так долго. 
-На странице вашего репозитория будет описано, на сколько коммитов вы опережаете родительский репозиторий, и появится кнопка для создания запроса New pull request:
-![pull example](https://dreamland.rocks/img/git04.png)
+If the server runs in a VM or container, use its address instead of `localhost`.
 
-Нажав на нее, можно будет просмотреть отличия между двумя ветками. Если между вашей и родительской версией нету конфликтов, вы увидите "Able to merge". Можно создавать pull request, нажав на кнопку Create:
-![pull example](https://dreamland.rocks/img/git05.png)
+Fenia scripts from `dreamland_fenia_public` load with `cs load public/<path>` from inside the game. For that to work, stop the server, set `feniaScriptDir` in `etc/dreamland.xml` to `share/DL/fenia`, and start it again. The stock value is `share/DL/fenia.local`. See [Fenia-Scripts](https://github.com/dreamland-mud/dreamland_code/wiki/Fenia-Scripts).
 
-### <a name="uptodate">Синхронизация с родительским репозиторием</a>
-Периодически приходится затаскивать изменения из главного репозитория в свой, чтобы всегда работать с последней версией.
-Один из способов это сделать такой:
+## Rebuild after a change
 
-В самом начале, как только склонировали репозиторий, добавьте себе еще один remote под названием upstream, который указывает на главный репозиторий:
+A change in one plugin:
+
 ```bash
-git remote add upstream https://github.com/dreamland-mud/dreamland_code.git 
-```
-Теперь каждый раз, когда хочется обновиться из главного репозитория, можно легко стянуть изменения из главного и наложить их на свою ветку master:
-```bash
-git fetch upstream
-git checkout master
-git merge upstream/master
-git push
-```
-
----
-
-## <a name="dev">Разработка</a>
-
-Несколько замечаний, которые могут облегчить жизнь при разработке.
-
-### <a name="core">Пересборка 'ядра'</a>
-Если вы внесли изменения в каталог src:
-* если поменялась только реализация (файлы с расширением .cpp), достаточно пересобрать только каталог src:
-```bash
-cd /home/dreamland/objs/src
+cd /path/to/objs/plug-ins/yourplugin
 make -j 4 && make install
 ```
-* если ваше изменение также повлияет и на плагины (например, поменялся заголовочный файл) - то нужно пересобрать вообще всё.  
-```bash
-cd /home/dreamland/objs
-make -j 4 && make install
-```
-Затем надо перезапустить dreamland (см. выше про запуск).
 
-### <a name="plugin">Пересборка плагинов</a>
-Пересоберите все измененные плагины:
+Then, inside the game:
+
+```text
+plugin reload changed
+```
+
+A change to `.cpp` files in `src/` only needs a rebuild of `src` and a server restart:
+
 ```bash
-cd /home/dreamland/objs/plug-ins/yourplugin
+cd /path/to/objs/src
 make -j 4 && make install
 ```
-Перегрузите все измененные плагины изнутри мира, набрав:
+
+A change to a header in `src/`, or to a header shared by plugins, needs a full build and a restart:
+
+```bash
+cd /path/to/objs
+make -j 4 && make install
 ```
-plug reload changed
-```
+
+Do not use `plugin reload` after a core header change. Restart the server instead. Details are on [Local-Setup](https://github.com/dreamland-mud/dreamland_code/wiki/Local-Setup).
+
+## Contributing
+
+Fork the repository, make your change on a branch, and open a pull request against `master`. See [Contribute](https://github.com/dreamland-mud/dreamland_code/wiki/Contribute) for the workflow and code style. Questions go to the [Discord](https://discord.gg/fVtaeePyey).
+
+## License
+
+GPLv3. See `LICENSE`.
