@@ -21,11 +21,11 @@ Editor::reg_t::split(const std::string &s)
 {
     clear( );
 
-    char buf[1024];
+    string line;
     istringstream is(s);
 
-    while( is.getline(buf, sizeof(buf)) )
-        push_back(buf);
+    while( getline(is, line) )
+        push_back(line);
 }
 
 string
@@ -559,10 +559,10 @@ Editor::undo_del(ipos_t h, ipos_t t)
 void 
 Editor::List::fromstream(istream &is)
 {
-    char buf[1024];
+    string line;
     
-    while( is.getline(buf, sizeof(buf)) )
-        insert(end(), string(buf));
+    while( getline(is, line) )
+        insert(end(), line);
 }
 
 void
