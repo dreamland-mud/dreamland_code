@@ -27,6 +27,10 @@ struct ItemWeights {
     double ac = 0, slevel = 0, level = 0, skillLevel = 0, skillLevelSkill = 0, move = 0, beats = 0;
     double spellFactor = 1.0;  // slevel discount for a char with few/no spells (0..1)
     double learnSkill = 0, learnGroup = 0, learnAll = 0;   // APPLY_LEARNED %, by scope
+    // Points per 1% save chance at valueLevel (item_value.json shared.saves_pts_per_pct),
+    // 0 when the table is missing. The sage's marginal svs price under saves model 1.
+    double savesPerPct = 0;
+    int valueLevel = -1;       // the level these weights were taken at (item_weights acLevel)
     // affect_flags the char already has for free (perma affects + worn gear OUTSIDE the
     // candidate's slot): a candidate re-granting one scores it 0. Sage-only.
     bitstring_t heldFlags = 0;
@@ -41,8 +45,9 @@ struct ItemWeights {
     bool heldOnWorn = false;
 };
 
-/** Fill the profile weights. acLevel is the level the AC weight is taken at:
- *  the asking char's level in the sage, the item's level for a base price. */
+/** Fill the profile weights. acLevel is the level the level-dependent weights (AC,
+ *  saves_by_level) are taken at: the asking char's level in the sage, the item's level
+ *  for a base price. */
 void item_weights(ItemWeights &w, bool caster, int acLevel);
 
 /** Value multiplier of +N% to one skill, item_value.json shared.learn_skill_value
