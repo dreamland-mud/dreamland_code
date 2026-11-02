@@ -2729,12 +2729,14 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     if (!strcmp(word, "Props")) {
                         DLString jsonString = fread_dlstring_to_eol(fp);
 
+                        // A bad blob loses only this item's props, never the whole file.
                         ostringstream errbuf;
-                        if (!JsonUtils::validate(jsonString, errbuf)) {
-                            throw Exception("fread_obj: invalid JSON for object " + DLString(obj->pIndexData->vnum));   
-                        }
+                        if (JsonUtils::validate(jsonString, errbuf))
+                            JsonUtils::fromString(jsonString, obj->props);
+                        else
+                            LogStream::sendError() << "fread_obj: invalid Props JSON for object "
+                                                   << obj->pIndexData->vnum << ", dropped: " << errbuf.str() << endl;
 
-                        JsonUtils::fromString(jsonString, obj->props);
                         fMatch = true;
                         break;
                     }
