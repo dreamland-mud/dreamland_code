@@ -11,6 +11,7 @@
 #include "character.h"
 
 #include "weapons.h"
+#include "loadsave.h"
 #include "math_utils.h"
 #include "autoflags.h"
 #include "itemflags.h"
@@ -170,6 +171,32 @@ int weapon_ave(Object *wield)
         return dice_ave(get_weapon_dice_number(wield), get_weapon_dice_size(wield));
     else
         return 0;
+}
+
+int weapon_wear_permille(Object *wield)
+{
+    if (wield->item_type != ITEM_WEAPON || wield->cost == 0)
+        return 1000;
+
+    return 1000 - 2 * URANGE(0, 100 - wield->condition, 100);
+}
+
+int weapon_wear_apply(Object *wield, int dam)
+{
+    return (dam * weapon_wear_permille(wield) + 500) / 1000;
+}
+
+int weapon_ave_worn(Object *wield)
+{
+    return weapon_wear_apply(wield, weapon_ave(wield));
+}
+
+bool weapon_sharp_now(Object *wield)
+{
+    if (wield->item_type != ITEM_WEAPON || !IS_WEAPON_STAT(wield, WEAPON_SHARP))
+        return false;
+
+    return wield->cost == 0 || wield->condition >= 50;
 }
 
 int weapon_ave(struct obj_index_data *pWield)

@@ -145,6 +145,38 @@ int armor_coef_for_flags( int wearFlags )
     return wear_flags_armor_coef_fn ? wear_flags_armor_coef_fn( wearFlags ) : 1;
 }
 
+int armor_worn_value( Object *obj, int column )
+{
+    int value = obj->valueByIndex( column );
+
+    // A cursed negative value stays as bad as it is.
+    if (obj->item_type != ITEM_ARMOR || obj->cost == 0 || value <= 0)
+        return value;
+
+    int lost = URANGE( 0, 100 - obj->condition, 100 );
+    int percent = 100 - 5 * (lost / 10);
+
+    return (value * percent + 50) / 100;
+}
+
+void obj_set_condition( Object *obj, int condition )
+{
+    Character *ch = obj->carried_by;
+    int coef = 0;
+    int before[4];
+
+    if (ch && obj->item_type == ITEM_ARMOR && wearloc_armor_coef_fn)
+        coef = wearloc_armor_coef_fn( obj->wear_loc.getElement( ) );
+
+    for (int i = 0; coef && i < 4; i++)
+        before[i] = armor_worn_value( obj, i );
+
+    obj->condition = condition;
+
+    for (int i = 0; coef && i < 4; i++)
+        ch->armor[i] -= coef * (armor_worn_value( obj, i ) - before[i]);
+}
+
 bool armor_recompute( PCharacter *ch, int columns[4] )
 {
     if (!wearloc_armor_coef_fn)
@@ -163,7 +195,7 @@ bool armor_recompute( PCharacter *ch, int columns[4] )
         if (obj->item_type == ITEM_ARMOR) {
             int coef = wearloc_armor_coef_fn( obj->wear_loc.getElement( ) );
             for (int i = 0; i < 4; i++)
-                columns[i] -= coef * obj->valueByIndex( i );
+                columns[i] -= coef * armor_worn_value( obj, i );
         }
 
         // The flavor slots and the backpack give nothing: same gate as equip.

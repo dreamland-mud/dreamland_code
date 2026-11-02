@@ -1267,7 +1267,7 @@ int UndefinedOneHit::getDestroyChance( Object *destroy )
     chance += (ch->getModifyLevel( ) - victim->getModifyLevel( )) / 5;
     chance += (wield->level - destroy->level) / 2;
 
-    if (IS_WEAPON_STAT(wield,WEAPON_SHARP))
+    if (weapon_sharp_now(wield))
         chance += 20;
 
     if (weapon_sn == gsn_axe) 

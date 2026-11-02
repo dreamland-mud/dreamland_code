@@ -34,6 +34,7 @@
 #include "material.h"
 #include "l10n.h"
 #include "fenia_utils.h"
+#include "tohit.h"
 
 WEARLOC(none);
 GSN(spellbane);
@@ -380,7 +381,7 @@ void DefaultWearlocation::triggersOnEquip( Character *ch, Object *obj )
 
     case ITEM_ARMOR:
         for (int i = 0; i < 4; i++)
-            ch->armor[i] -= armorCoef * obj->valueByIndex(i);
+            ch->armor[i] -= armorCoef * armor_worn_value(obj, i);
         break;
     }
 }
@@ -517,7 +518,7 @@ void DefaultWearlocation::triggersOnUnequip( Character *ch, Object *obj )
 
     case ITEM_ARMOR:
         for (int i = 0; i < 4; i++)
-            ch->armor[i] += armorCoef * obj->valueByIndex(i);
+            ch->armor[i] += armorCoef * armor_worn_value(obj, i);
         break;
     }
 }

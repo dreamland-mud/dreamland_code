@@ -77,6 +77,15 @@ extern WearFlagsArmorCoefFn wear_flags_armor_coef_fn;
 /** armorCoef of the best stat-giving slot these wear flags fit, 1 if unknown. */
 int armor_coef_for_flags( int wearFlags );
 
+/** What one AC column of an armor piece gives right now: the base value less 5%
+ *  per full 10 points of lost condition. Anything that adds or takes armor[] for
+ *  a worn piece must use this, armor[] is a running sum. Zero-cost items don't wear. */
+int armor_worn_value( Object *obj, int column );
+
+/** The one way to change the condition of a live object: keeps the wearer's armor[]
+ *  in step with armor_worn_value. */
+void obj_set_condition( Object *obj, int condition );
+
 /** What armor[] should be from the worn gear and the affects on ch, written into
  *  columns[4]. False while the wearlocation plugin is away. */
 bool armor_recompute( PCharacter *ch, int columns[4] );
