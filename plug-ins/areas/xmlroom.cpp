@@ -106,7 +106,20 @@ XMLResetList::toXML(XMLNode::Pointer &parent) const
             break;
         case 'P':
             child->setName("put");
-            child->insertAttribute("vnum", r->arg1);
+            // A put may pick at random from several vnums: write them all back,
+            // otherwise every save collapses the list to its first entry.
+            if (r->vnums.size() > 1) {
+                NumberSet vnums;
+                vnums.insert(r->vnums.begin(), r->vnums.end());
+                DLString list;
+                for (int v: vnums) {
+                    if (!list.empty())
+                        list += " ";
+                    list += DLString(v);
+                }
+                child->insertAttribute("vnum", list);
+            } else
+                child->insertAttribute("vnum", r->arg1);
             child->insertAttribute("in", r->arg3);
             child->insertAttribute("limit", r->arg2);
             child->insertAttribute("maxHere", r->arg4);
