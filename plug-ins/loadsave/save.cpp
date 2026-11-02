@@ -1201,8 +1201,10 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 }
 
                 if (!obj->props.empty()) {
+                    // An unterminated line would swallow the next key on read.
                     DLString jsonString = JsonUtils::toString(obj->props);
-                    fprintf(fp, "Props %s", jsonString.c_str());
+                    if (jsonString != JsonUtils::JSON_ERROR)
+                        fprintf(fp, "Props %s", jsonString.c_str());
                 }
 
                 if (obj->gram_gender != Grammar::MultiGender::UNDEF)
@@ -2370,7 +2372,7 @@ static void obj_refit_migrate( Object *obj )
         if (!from[i].isInt( ))
             return;
 
-    for (const char *mark: { "measure_m", "craft_picks", "tier", "enchanted" })
+    for (const char *mark: { "measure_m", "craft_picks", "tier", "enchanted", "propsLost" })
         if (!obj->getProperty( mark ).empty( ))
             return;
 
@@ -2381,6 +2383,21 @@ static void obj_refit_migrate( Object *obj )
     // The jewelry, clothing and treasure a prototype became have no AC columns.
     for (int i = 0; i < 4; i++)
         obj->valueByIndex( i, obj->item_type == ITEM_ARMOR ? obj->pIndexData->value[i] : 0 );
+}
+
+/*
+ * Props lost to a corrupt line must not read as a fresh item: the load hooks
+ * would re-roll a random weapon over its saved affects, refill a magic item and
+ * refit crafted armor. Pin the item as it stands.
+ */
+static void obj_props_lost( Object *obj )
+{
+    obj->props["propsLost"] = "true";
+    obj->props["keepOld"] = "true";
+
+    const Json::Value &protoProps = obj->pIndexData->props;
+    if (protoProps.isObject( ) && protoProps.isMember( "magic_rev" ))
+        obj->props["magic_rev"] = protoProps["magic_rev"];
 }
 
 void fread_obj( Character *ch, Room *room, FILE *fp )
@@ -2729,13 +2746,18 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     if (!strcmp(word, "Props")) {
                         DLString jsonString = fread_dlstring_to_eol(fp);
 
-                        // A bad blob loses only this item's props, never the whole file.
+                        // A bad blob costs this item its props, never the whole file.
+                        // The raw line goes to the log so it can be restored by hand.
                         ostringstream errbuf;
-                        if (JsonUtils::validate(jsonString, errbuf))
+                        if (JsonUtils::validate(jsonString, errbuf)) {
                             JsonUtils::fromString(jsonString, obj->props);
-                        else
+                        } else {
+                            jsonString.stripWhiteSpace();
                             LogStream::sendError() << "fread_obj: invalid Props JSON for object "
-                                                   << obj->pIndexData->vnum << ", dropped: " << errbuf.str() << endl;
+                                                   << obj->pIndexData->vnum << " [" << obj->getID() << "], dropped, raw: "
+                                                   << jsonString << endl;
+                            obj_props_lost( obj );
+                        }
 
                         fMatch = true;
                         break;

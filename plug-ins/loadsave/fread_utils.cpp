@@ -266,13 +266,16 @@ DLString fread_dlstring( FILE *fp )
 
 DLString fread_dlstring_to_eol( FILE *fp )
 {
-    char c;
+    int c;
     DLString s;
 
+    // A file cut mid-line must end the read, not append EOF forever.
     do
     {
         c = getc( fp );
-        s.append( c );
+        if (c == EOF)
+            return s;
+        s.append( (char)c );
     }
     while ( c != '\n' && c != '\r' );
 
