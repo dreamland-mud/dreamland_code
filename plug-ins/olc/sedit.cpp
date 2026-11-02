@@ -39,7 +39,7 @@ static const char * ED_SYNTAX = ""
 "    {y%!format 0 79{x - формат по ширине 79 с отступом 0\r\n"
 "    {yd{x - удалить текущую строку\r\n"
 "    {y{hcu{x - отменить действие (undo)\r\n"
-"Полное руководство {hlhttps://github.com/dreamland-mud/dreamland_code/wiki/ED{x.\r\n";
+"Полное руководство {hlhttps://github.com/dreamland-mud/dreamland_code/wiki/OLC-Line-Editor{x.\r\n";
 
 void OLCStringEditor::help()
 {
