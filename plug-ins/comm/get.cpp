@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "core/object.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
@@ -28,6 +30,8 @@ WEARLOC(none);
 /*
  *   GET OBJECT [[FROM] CONTAINER[:POCKET]]
  *   GET MOBILE [BY] OBJECT
+ *
+ * OBJECT and CONTAINER may be several words, no quotes needed.
  */
 
 /*
@@ -601,6 +605,179 @@ static Object * get_container_here( Character *ch, const DLString &argument )
     return 0;
 }
 
+/*
+ * Something 'get' can take out of, as opposed to the merely named-after-one
+ * items get_container_here steps over. A pocket suffix is split off into 'pocket'.
+ */
+static Object * find_get_holder( Character *ch, const DLString &arg, DLString &pocket )
+{
+    DLString name = arg;
+    Object *obj;
+
+    pocket = get_pocket_argument( name );
+
+    if (name.empty( ))
+        return 0;
+
+    if (!( obj = get_container_here( ch, name ) ))
+        obj = get_obj_here( ch, name );
+
+    if (obj && (is_container_like( obj ) || obj->item_type == ITEM_KEYRING))
+        return obj;
+
+    return 0;
+}
+
+static bool holder_has_item( Character *ch, const DLString &item, const DLString &holderArg )
+{
+    DLString pocket;
+    Object *holder = find_get_holder( ch, holderArg, pocket );
+
+    return holder && get_obj_list( ch, item, holder->contains, pocket );
+}
+
+static vector<DLString> split_words( DLString args )
+{
+    vector<DLString> words;
+    DLString word;
+
+    while (!( word = args.getOneArgument( ) ).empty( ))
+        words.push_back( word );
+
+    return words;
+}
+
+static DLString join_words( const vector<DLString> &words, size_t first, size_t last )
+{
+    DLString phrase;
+
+    for (size_t i = first; i < last; i++) {
+        if (!phrase.empty( ))
+            phrase << " ";
+        phrase << words[i];
+    }
+
+    return phrase;
+}
+
+// EN readers type 'get the sword'; RU and UA have no articles to strip.
+static vector<DLString> strip_articles( const vector<DLString> &words )
+{
+    vector<DLString> stripped;
+
+    for (auto &word: words)
+        if (!arg_oneof_strict( word, "a", "an", "the" ))
+            stripped.push_back( word );
+
+    return stripped;
+}
+
+static bool is_get_preposition( const DLString &word )
+{
+    return arg_is_from( word ) || arg_is_strict( word, "by" );
+}
+
+/*
+ * Try one reading of the words: everything before 'itemEnd' is the item,
+ * everything from 'holderStart' on is the holder. The holder must exist, and
+ * with 'needItem' it must also have the item inside.
+ */
+static bool try_get_split( Character *ch, const vector<DLString> &words,
+                           size_t itemEnd, size_t holderStart, bool needItem,
+                           DLString &argTarget, DLString &argContainer )
+{
+    DLString item = join_words( words, 0, itemEnd );
+    DLString holder = join_words( words, holderStart, words.size( ) );
+    DLString pocket;
+
+    if (needItem ? !holder_has_item( ch, item, holder ) : !find_get_holder( ch, holder, pocket ))
+        return false;
+
+    argTarget = item;
+    argContainer = holder;
+    return true;
+}
+
+/*
+ * 'get <word> <word> ...' for players who type what they see, like 'взять
+ * отрезанная нога скайсепа': the classic one-word parse would look for
+ * "отрезанная" inside the leg. Read-only, no progs fire here; the result only
+ * rewrites argTarget and argContainer for the command to act on.
+ *
+ * Whatever the classic parse could fulfil wins, so existing commands keep their
+ * meaning. Prepositions are tried right to left because item names contain them
+ * too: "письмо с печатью", "меч из стали". When nothing fits, the classic
+ * arguments stay, and with them its victim fallback and Fenia CantFetch hooks.
+ * 'unseen' then holds what to name in the not-here line, if not the second word.
+ */
+static void resolve_get_words( Character *ch, const vector<DLString> &rawWords,
+                               DLString &argTarget, DLString &argContainer, DLString &unseen )
+{
+    if (holder_has_item( ch, argTarget, argContainer ))
+        return;
+
+    vector<DLString> words = strip_articles( rawWords );
+    size_t count = words.size( );
+
+    if (count == 1) {
+        argTarget = words[0];
+        argContainer = "";
+        return;
+    }
+
+    if (count == 0)
+        return;
+
+    for (size_t i = count - 2; i >= 1; i--)
+        if (is_get_preposition( words[i] )
+            && try_get_split( ch, words, i, i + 1, true, argTarget, argContainer ))
+            return;
+
+    DLString phrase = join_words( words, 0, count );
+
+    if (get_obj_list( ch, phrase, ch->in_room->contents )) {
+        argTarget = phrase;
+        argContainer = "";
+        return;
+    }
+
+    for (size_t i = count - 1; i >= 1; i--)
+        if (try_get_split( ch, words, i, i, true, argTarget, argContainer ))
+            return;
+
+    // Nothing fits, but a holder named after a preposition gets the honest
+    // complaint: closed, or no such item in it.
+    bool hasPreposition = false;
+
+    for (size_t i = count - 2; i >= 1; i--)
+        if (is_get_preposition( words[i] )) {
+            hasPreposition = true;
+            if (try_get_split( ch, words, i, i + 1, false, argTarget, argContainer ))
+                return;
+        }
+
+    for (size_t i = count - 1; i >= 1; i--)
+        if (try_get_split( ch, words, i, i, false, argTarget, argContainer ))
+            return;
+
+    if (count > 2 && !hasPreposition)
+        unseen = phrase;
+}
+
+/*
+ * 'get all [from] <several words>': the classic parse would use only the first.
+ */
+static void resolve_get_all_words( Character *ch, const vector<DLString> &rawWords, DLString &argContainer )
+{
+    vector<DLString> words = strip_articles( rawWords );
+    size_t first = !words.empty( ) && is_get_preposition( words[0] ) ? 1 : 0;
+    DLString phrase = join_words( words, first, words.size( ) );
+    DLString pocket;
+
+    if (find_get_holder( ch, phrase, pocket ))
+        argContainer = phrase;
+}
+
 CMDRUNP( get )
 {
     Object *obj;
@@ -609,7 +786,7 @@ CMDRUNP( get )
     bool found;
     DLString origArguments = argument;
     DLString arguments = argument;
-    DLString argAllObj, argTarget, argContainer;
+    DLString argAllObj, argTarget, argContainer, argUnseen;
     bool all, allDot;
 
     argAllObj = arguments.getOneArgument();
@@ -642,6 +819,8 @@ CMDRUNP( get )
         allDot = false;
     }
 
+    vector<DLString> restWords = split_words( arguments );
+
     argContainer = arguments.getOneArgument();
     if (arg_is_from( argContainer ) || arg_is_strict(argContainer, "by"))
         argContainer = arguments.getOneArgument( );
@@ -651,6 +830,15 @@ CMDRUNP( get )
     {
         ch->pecho(_("Взять что?"));
         return;
+    }
+
+    if (!argContainer.empty( )) {
+        if (all || allDot) {
+            resolve_get_all_words( ch, restWords, argContainer );
+        } else {
+            restWords.insert( restWords.begin( ), argTarget );
+            resolve_get_words( ch, restWords, argTarget, argContainer, argUnseen );
+        }
     }
 
     if(argContainer.empty( ))
@@ -772,7 +960,7 @@ CMDRUNP( get )
             if (victim)
                 get_obj_on_victim( ch, victim, argContainer.c_str( ) );
             else
-                echo_not_here(ch, argContainer);
+                echo_not_here(ch, argUnseen.empty( ) ? argContainer : argUnseen);
             return;
         }
 
