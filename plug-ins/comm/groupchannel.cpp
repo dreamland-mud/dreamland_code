@@ -2,6 +2,8 @@
  *
  * ruffina, 2004
  */
+#include <list>
+
 #include "groupchannel.h"
 #include "replay.h"
 
@@ -65,9 +67,15 @@ void GroupChannel::triggers(Character *ch, const DLString &msg) const
     if (!ch->is_npc() && (!str_prefix(msg.c_str(), "where are you?")
                           || !str_prefix(msg.c_str(), "где ты?")
                           || !str_prefix(msg.c_str(), "де ти?"))) {
-        NPCharacter *pet = ch->getPC()->pet;
+        // Every mob of the group answers: a pet, a charmie, a summon, a groupmate's
+        // pet. Own followers count even when they were never grouped.
+        list<NPCharacter *> mobs;
 
-        if (!pet) {
+        for (Character *fch = char_list; fch != 0; fch = fch->next)
+            if (fch->is_npc() && (fch->master == ch || is_same_group(fch, ch)))
+                mobs.push_back(fch->getNPC());
+
+        if (mobs.empty()) {
             ch->pecho(_("На твой вопрос отвечать некому, у тебя нет {hh15питомца{x."));
             return;
         }
@@ -87,18 +95,23 @@ void GroupChannel::triggers(Character *ch, const DLString &msg) const
                                      lmsg(lang, "Master", "Хозяин", "Хазяїне"),
                                      lmsg(lang, "Mistress", "Хозяйка", "Хазяйко"));
 
-        if (pet->position > POS_SLEEPING) {
-            if (IS_AFFECTED(pet, AFF_BLIND)) {
-                tell_raw(ch, pet, _("%s, я ничего не вижу!"), master);
-            } else if (eyes_darkened(pet)) {
-                tell_raw(ch, pet, _("%s, тут слишком темно, я ничего не вижу!"), master);
+        for (auto &mob: mobs) {
+            // A groupmate's pet has no call to name the asker its master.
+            const char *addressee = mob->master == ch ? master : ch->getNameC();
+
+            if (mob->position > POS_SLEEPING) {
+                if (IS_AFFECTED(mob, AFF_BLIND)) {
+                    tell_raw(ch, mob, _("%s, я ничего не вижу!"), addressee);
+                } else if (eyes_darkened(mob)) {
+                    tell_raw(ch, mob, _("%s, тут слишком темно, я ничего не вижу!"), addressee);
+                } else {
+                    tell_raw(ch, mob, _("%s, я нахожусь в {hh%s{hx - %s"),
+                             addressee,
+                             mob->in_room->areaName(lang).c_str(), mob->in_room->getName(lang));
+                }
             } else {
-                tell_raw(ch, pet, _("%s, я нахожусь в {hh%s{hx - %s"),
-                         master,
-                         pet->in_room->areaName(lang).c_str(), pet->in_room->getName(lang));
+                ch->pecho(_("%1$^C1 не в состоянии ответить на твой вопрос."), mob);
             }
-        } else {
-            ch->pecho(_("Твой питомец не в состоянии ответить на твой вопрос.")); // dumb wording, for debugging
         }
     }
 }
