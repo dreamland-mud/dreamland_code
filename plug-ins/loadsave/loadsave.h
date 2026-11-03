@@ -42,6 +42,22 @@ NPCharacter *        create_mobile_nocount( mob_index_data * );
 NPCharacter *        create_mobile_org( mob_index_data *pMobIndex, int flags );
 void create_mob_affects(NPCharacter *mob);
 bool apply_mob_tier(NPCharacter *mob, int level, int tier);
+
+/** Does this G/E/O/P reset load obj vnum? A 'P' reset picks at random from
+ *  its vnums list, arg1 is only the first of them. A template so this header
+ *  needs no resets.h. */
+template <typename Reset>
+inline bool reset_loads_obj( const Reset *pReset, int vnum )
+{
+    if (pReset->command == 'P' && !pReset->vnums.empty( )) {
+        for (int v: pReset->vnums)
+            if (v == vnum)
+                return true;
+        return false;
+    }
+
+    return pReset->arg1 == vnum;
+}
 Object *        create_object        ( obj_index_data *pObjIndex, short level );
 Object *        create_object_nocount ( obj_index_data *pObjIndex, short level );
 Object *        create_object_org (obj_index_data *pObjIndex,short level,bool Count);

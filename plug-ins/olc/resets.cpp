@@ -127,7 +127,7 @@ struct filter_t {
         case 'E':
         case 'O':
         case 'P':
-            if (pObj && pReset->arg1 == vnum)
+            if (pObj && reset_loads_obj(pReset, vnum))
                 return true;
             break;
         }
@@ -246,6 +246,14 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
                         pReset->arg2,
                         pReset->arg4,
                         show_reset_rand(ch, iReset+1, pReset, pObj, pRoom).c_str());
+
+                // A put picks one of several vnums at random: list the others.
+                if (pReset->vnums.size( ) > 1) {
+                    buf << "                 or:";
+                    for (size_t v = 1; v < pReset->vnums.size( ); v++)
+                        buf << " " << web_cmd(ch, "oedit $1", DLString(pReset->vnums[v]));
+                    buf << "\n\r";
+                }
             }
             break;
 

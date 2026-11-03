@@ -6852,7 +6852,14 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             }
             if (cmd == 'R') { lastMob = 0; continue; }
             if (cmd == 'O') { ga_record( acq, a1, GA_PICKUP, 0, roomVnum, 0, roomMax, roomTier ); lastMob = 0; continue; }
-            if (cmd == 'P') { ga_record( acq, a1, GA_PICKUP, 0, roomVnum, 0, roomMax, roomTier ); continue; }
+            if (cmd == 'P') {
+                // A put picks one of several vnums at random: each is obtainable here.
+                if ((*pr)->vnums.empty( ))
+                    ga_record( acq, a1, GA_PICKUP, 0, roomVnum, 0, roomMax, roomTier );
+                for (int v: (*pr)->vnums)
+                    ga_record( acq, v, GA_PICKUP, 0, roomVnum, 0, roomMax, roomTier );
+                continue;
+            }
             if (cmd == 'G' || cmd == 'E') {
                 if (!lastMob)
                     continue;
