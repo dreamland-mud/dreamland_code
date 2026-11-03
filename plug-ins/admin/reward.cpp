@@ -30,12 +30,12 @@ void XMLAttributeGodReward::addReward( int qp, const DLString &reason )
     rewards.push_back( r );    
 }
 
-void XMLAttributeGodReward::listRewards(ostringstream &buf) const
+void XMLAttributeGodReward::listRewards(ostringstream &buf, Character *viewer) const
 {
     XMLVectorBase<XMLGodReward>::const_iterator r;
 
     for (r = rewards.begin( ); r!= rewards.end( ); r++) {
-        buf << "      " << fmt(0, _("{Y%1$d{x квестов%1$Iую|ые|ых единиц%1$Iу|ы|"), r->qp)
+        buf << "      " << fmt(viewer, _("{Y%1$d{x квестов%1$Iую|ые|ых единиц%1$Iу|ы|"), r->qp)
             << "  " << r->reason << endl;
     }
 }
@@ -45,8 +45,8 @@ void XMLAttributeGodReward::reward( PCharacter *ch )
     XMLVectorBase<XMLGodReward>::const_iterator r;
     ostringstream buf;
 
-    buf << "{CВ благодарность от богов ты получаешь:{x" << endl;
-    listRewards(buf);
+    buf << fmt(ch, _("{CВ благодарность от богов ты получаешь:{x")) << endl;
+    listRewards(buf, ch);
     ch->send_to(buf);
     remember_history_private(ch, buf.str());
     
