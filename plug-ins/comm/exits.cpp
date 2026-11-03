@@ -13,6 +13,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "screenreader.h"
 
 GSN(perception);
 BONUS(thief_skills);
@@ -95,6 +96,20 @@ static bool check_perception(Character *ch)
     } else {
         gsn_perception->improve(ch, false);
         return false;
+    }
+}
+
+/**
+ * Append one line per exit. Screen readers merge consecutive lines into one
+ * long utterance, so for them each line ends with a comma and the block with a period.
+ */
+static void append_exit_lines(ostringstream &buf, const StringList &lines, bool sr)
+{
+    for (size_t i = 0; i < lines.size(); i++) {
+        buf << lines[i];
+        if (sr)
+            buf << (i + 1 < lines.size() ? "," : ".");
+        buf << endl;
     }
 }
 
@@ -185,7 +200,6 @@ CMDRUNP( exits )
     DLString cmd;
     Room *room;
     PlayerConfig cfg;
-    bool found;
     int door;
     int hiddenExits = 0;
 
@@ -194,8 +208,11 @@ CMDRUNP( exits )
         return;
     }
 
-    found = false;
     cfg = ch->getConfig( );
+    bool sr = uses_screenreader(ch);
+    // Column padding is noise for a screen reader, it only adds a pause.
+    const char *pad = sr ? "%s" : "%-8s";
+    StringList lines;
 
     if (cfg.holy)
         buf << l(ch, "Видимые выходы из комнаты ") << ch->in_room->vnum << ":" << endl;
@@ -215,44 +232,40 @@ CMDRUNP( exits )
             continue;
         }
 
-        found = true;   
+        ostringstream line;
         ename = direction_word(viewerLang(ch), door, DIR_CASE_NOM);
         cmd = cmd_exit(ch, door, pexit);
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED|EX_LOCKED))
         {
-            buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - ";
+            line << "    {C" << fmt(0, web_cmd(ch, cmd, pad).c_str(), ename.c_str()) << "{x - ";
 
             if (room->isDark( ) && !cfg.holy && !ch->seesInDark( ))
-                buf << l(ch, "Дорога ведет в темноту и неизвестность...");
+                line << l(ch, "Дорога ведет в темноту и неизвестность...");
             else
-                buf << room->getName(viewerLang(ch));
-
-            if (cfg.holy)
-                buf << " (room " << room->vnum << ")";
-            
-            buf << endl;
+                line << room->getName(viewerLang(ch));
         }
         else {
             ename = "*" + ename + "*";
-            buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - "
-                << direction_doorname_langtext(pexit, '1').forLang(viewerLang(ch))
-                << " (" << (IS_SET(pexit->exit_info, EX_LOCKED) ? l(ch, "заперто") : l(ch, "закрыто")) << ")";
-
-            if (cfg.holy)
-                buf << " (room " << room->vnum << ")";
-            
-            buf << endl;
+            line << "    {C" << fmt(0, web_cmd(ch, cmd, pad).c_str(), ename.c_str()) << "{x - "
+                 << direction_doorname_langtext(pexit, '1').forLang(viewerLang(ch))
+                 << " (" << (IS_SET(pexit->exit_info, EX_LOCKED) ? l(ch, "заперто") : l(ch, "закрыто")) << ")";
         }
+
+        if (cfg.holy)
+            line << " (room " << room->vnum << ")";
+
+        lines.push_back(line.str());
     }
 
-    if (!found)
-        buf << "    " << l(ch, "нет") << endl;
+    if (lines.empty())
+        lines.push_back(DLString("    ") + l(ch, "нет"));
 
+    append_exit_lines(buf, lines, sr);
     ch->send_to( buf );
 
-    found = false;
     buf.str("");
+    lines.clear();
 
     for (auto &eexit: ch->in_room->extra_exits) {
         if (!(room = eexit->u1.to_room))
@@ -264,11 +277,11 @@ CMDRUNP( exits )
             continue;
         }
 
-        buf <<  "    {C" << cmd_extra_exit(ch, eexit, true) << "{x " << endl;
-        found = true;
+        lines.push_back("    {C" + cmd_extra_exit(ch, eexit, true) + "{x");
     }
 
-    if (found) {
+    if (!lines.empty()) {
+        append_exit_lines(buf, lines, sr);
         ch->pecho("\r\n%s", l(ch, "Дополнительные выходы:"));
         ch->send_to(buf);
     }
