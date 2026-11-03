@@ -122,7 +122,7 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
                 break; 
             case 'P':
                 // Found where the object is placed.
-                if (pReset->arg1 == vnum) {
+                if (reset_loads_obj(pReset, vnum)) {
                     OBJ_INDEX_DATA *in = get_obj_index( pReset->arg3 );
                     if (in && pReset->rand == RAND_NONE) {
                         // Return success.
