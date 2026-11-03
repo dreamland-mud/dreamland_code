@@ -301,6 +301,9 @@ static bool oprog_equip( Object *obj, Character *ch )
 
 static bool oprog_wear( Object *obj, Character *ch )
 {
+    if (behavior_trigger(obj, "Wear", "OC", obj, ch))
+        return true;
+
     FENIA_CALL( obj, "Wear", "C", ch )
     FENIA_NDX_CALL( obj, "Wear", "OC", obj, ch )
     BEHAVIOR_VOID_CALL( obj, wear, ch )

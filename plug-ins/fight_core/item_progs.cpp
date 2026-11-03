@@ -47,6 +47,10 @@ bool oprog_get( Object *obj, Character *ch )
         return true;
 
     aquest_trigger(obj, ch, "Get", "OC", obj, ch);
+
+    if (behavior_trigger(obj, "Get", "OC", obj, ch))
+        return true;
+
     FENIA_CALL( obj, "Get", "C", ch );
     FENIA_NDX_CALL( obj, "Get", "OC", obj, ch );
     BEHAVIOR_VOID_CALL( obj, get, ch );

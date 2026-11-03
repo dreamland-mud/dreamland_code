@@ -164,7 +164,7 @@ static bool rprog_smell( Room *room, Character *ch, char *argument )
 static bool mprog_smell( Character *victim, Character *ch, char *argument )
 {
     FENIA_CALL( victim, "Smell", "Cs", ch, argument );
-    FENIA_NDX_CALL( victim->getNPC( ), "Smell", "OCs", victim, ch, argument );
+    FENIA_NDX_CALL( victim->getNPC( ), "Smell", "CCs", victim, ch, argument );
     return false;
 }
 
