@@ -781,6 +781,22 @@ NMI_INVOKE( RoomWrapper, reset, "(): выполнить redit reset")
 /*---------------------------------------------------------
  * fenia traverse
  *--------------------------------------------------------*/
+/* Room::isCommon minus the clan and guild checks: a walker may cross the
+ * clan hall or guild room it belongs to, and canEnter rules on membership. */
+static bool openToWalker( Room *room )
+{
+    if (IS_SET(room->room_flags, ROOM_IMP_ONLY | ROOM_GODS_ONLY | ROOM_HEROES_ONLY | ROOM_NEWBIES_ONLY))
+        return false;
+
+    if (IS_SET(room->area->area_flag, AREA_WIZLOCK))
+        return false;
+
+    if (room->behavior && !room->behavior->isCommon( ))
+        return false;
+
+    return !room->isPetStorage( );
+}
+
 struct FeniaDoorFunc {
     FeniaDoorFunc( Character *w = 0, bitstring_t sa = 0, bitstring_t sd = 0 )
                   : walker( w ), sectorsAllow( sa ), sectorsDeny( sd )
@@ -800,9 +816,9 @@ struct FeniaDoorFunc {
         if (sectorsDeny != 0 && IS_SET(sectorsDeny, mysector))
             return false;
 
-        if (!toRoom->isCommon( ))
+        if (!(walker ? openToWalker( toRoom ) : toRoom->isCommon( )))
             return false;
-            
+
         if (walker && !walker->canEnter( toRoom ))
             return false;
         
