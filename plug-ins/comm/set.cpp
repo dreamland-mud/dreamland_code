@@ -223,7 +223,7 @@ void chg_mob_help(Character *ch, char *argument)
 
     buf << "Синтаксис:" << endl;
     while (tab_set_mob[i].name) {
-        buf << fmt(0, _("  {Cset{x mob {y%-8s{x {C<{xназвание{C>{x %s%s {C[{x %s {C]{x\n\r"),
+        buf << fmt(0, _("  {Cset{x char {y%-8s{x {C<{xназвание{C>{x %s%s {C[{x %s {C]{x\n\r"),
                 tab_set_mob[i].name,
                 tab_set_mob[i].inc_dec ? "[+/-]" : "     ",
                 IS_SET(tab_set_mob[i].DS, S_V) &&
