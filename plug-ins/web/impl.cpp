@@ -500,10 +500,17 @@ void CalendarWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &
  * To keep an internal/tracking affect out of the panel, say so: <webColumn>none</webColumn>.
  * "cd" holds reuse timers (the "you can do X again" affects): the client gives them
  * their own colour so they don't read as buffs.
+ * Each entry carries n (short label), d (ticks left) and, when it differs from n, f:
+ * the full affect name for the chip's tooltip. Raw bits name their skill in
+ * config/affectpanel.json ("skill"); without one the tooltip falls back to n.
  *------------------------------------------------------------------------*/
 
-// config/affectpanel.json -> column -> raw-bit key -> per-language label.
-static std::map<DLString, std::map<DLString, XMLMultiString> > affectPanelStore;
+// config/affectpanel.json -> column -> raw-bit key -> per-language label + skill name.
+struct AffectPanelEntry {
+    XMLMultiString label;
+    DLString skill;
+};
+static std::map<DLString, std::map<DLString, AffectPanelEntry> > affectPanelStore;
 
 CONFIGURABLE_LOADED(config, affectpanel)
 {
@@ -523,13 +530,15 @@ CONFIGURABLE_LOADED(config, affectpanel)
             if (!langs.isObject( ))
                 continue;
 
-            XMLMultiString ms;
+            AffectPanelEntry entry;
             for (const auto &le: LANGS) {
                 const Json::Value &s = langs[le.key];
                 if (s.isString( ))
-                    ms[le.lang] = s.asString( );
+                    entry.label[le.lang] = s.asString( );
             }
-            affectPanelStore[col][key] = ms;
+            if (langs["skill"].isString( ))
+                entry.skill = langs["skill"].asString( );
+            affectPanelStore[col][key] = entry;
         }
     }
 
@@ -558,17 +567,14 @@ static bool bitOwnedBySpell( Character *ch, const FlagTable *table, bitstring_t 
     return false;
 }
 
-static DLString affectPanelLabel( const DLString &col, const char *key, lang_t lang )
+static const AffectPanelEntry *affectPanelEntry( const DLString &col, const char *key )
 {
-    std::map<DLString, std::map<DLString, XMLMultiString> >::const_iterator c = affectPanelStore.find( col );
+    auto c = affectPanelStore.find( col );
     if (c == affectPanelStore.end( ))
-        return DLString::emptyString;
+        return 0;
 
-    std::map<DLString, XMLMultiString>::const_iterator k = c->second.find( key );
-    if (k == c->second.end( ))
-        return DLString::emptyString;
-
-    return k->second.getForLang( lang );
+    auto k = c->second.find( key );
+    return k == c->second.end( ) ? 0 : &k->second;
 }
 
 // Auto-fallback panel label when a skill has no curated <webLabel>: the first word of
@@ -592,7 +598,8 @@ struct AffectPanelColumns {
 
     // duration: remaining ticks; -1 = permanent. The client colors by it
     // (permanent = cyan, a couple ticks = yellow, 1 tick = red, else column base).
-    void add( const DLString &col, const DLString &label, int duration )
+    // full: the affect's full name for the tooltip, may be empty.
+    void add( const DLString &col, const DLString &label, const DLString &full, int duration )
     {
         if (col.empty( ) || col == "none" || label.empty( ))
             return;
@@ -602,9 +609,24 @@ struct AffectPanelColumns {
         Json::Value o;
         o["n"] = label.c_str( );
         o["d"] = duration;
+        if (!full.empty( ) && full != label)
+            o["f"] = full.c_str( );
         cols[col].append( o );
     }
 };
+
+// A raw engine bit: permanent, labelled from config/affectpanel.json. The skill name
+// resolves here, not at config load, so it doesn't depend on the load order.
+static void addRawBit( AffectPanelColumns &pc, const DLString &col, const char *key, Character *ch, lang_t lang )
+{
+    const AffectPanelEntry *entry = affectPanelEntry( col, key );
+    if (entry == 0)
+        return;
+
+    Skill *skill = skillManager->findExisting( entry->skill );
+    pc.add( col, entry->label.getForLang( lang ),
+            skill ? skill->getNameFor( ch ) : DLString::emptyString, -1 );
+}
 
 // Detect column: purely flag-based (ch->detection + AFF_INFRARED), labels from the store.
 static void addDetectColumn( AffectPanelColumns &pc, Character *ch, lang_t lang )
@@ -624,7 +646,7 @@ static void addDetectColumn( AffectPanelColumns &pc, Character *ch, lang_t lang 
     };
 
     if (IS_AFFECTED( ch, AFF_INFRARED ) && !bitOwnedBySpell( ch, &affect_flags, AFF_INFRARED ))
-        pc.add( DETECT, affectPanelLabel( DETECT, "infrared", lang ), -1 );
+        addRawBit( pc, DETECT, "infrared", ch, lang );
 
     Bitstring detection( ch->detection );
 
@@ -635,7 +657,7 @@ static void addDetectColumn( AffectPanelColumns &pc, Character *ch, lang_t lang 
             continue;
         if (bitOwnedBySpell( ch, &detect_flags, e.bit ))
             continue;
-        pc.add( DETECT, affectPanelLabel( DETECT, e.key, lang ), -1 );
+        addRawBit( pc, DETECT, e.key, ch, lang );
     }
 }
 
@@ -674,12 +696,12 @@ static void addAffFallbacks( AffectPanelColumns &pc, Character *ch, lang_t lang 
     // Not owned by any spell paf -> equipment/racial -> permanent (cyan).
     for (const auto &e: AFFS) {
         if (IS_AFFECTED( ch, e.bit ) && !bitOwnedBySpell( ch, &affect_flags, e.bit ))
-            pc.add( e.col, affectPanelLabel( e.col, e.key, lang ), -1 );
+            addRawBit( pc, e.col, e.key, ch, lang );
     }
 
     if ((IS_AFFECTED( ch, AFF_STUN ) && !bitOwnedBySpell( ch, &affect_flags, AFF_STUN ))
         || (IS_AFFECTED( ch, AFF_WEAK_STUN ) && !bitOwnedBySpell( ch, &affect_flags, AFF_WEAK_STUN )))
-        pc.add( MALAD, affectPanelLabel( MALAD, "stun", lang ), -1 );
+        addRawBit( pc, MALAD, "stun", ch, lang );
 }
 
 class AffectsWebPromptListener : public WebPromptListener {
@@ -723,7 +745,7 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
         if (label.empty( ))
             label = webAbbrev( skill->getNameFor( ch ) );
 
-        pc.add( col, label, paf->duration );
+        pc.add( col, label, skill->getNameFor( ch ), paf->duration );
     }
 
     // 1b) Gear-granted named affects (eqAffects: <affects registry="skill"> and
@@ -751,7 +773,7 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
         if (label.empty( ))
             label = webAbbrev( skill->getNameFor( ch ) );
 
-        pc.add( col, label, -1 );
+        pc.add( col, label, skill->getNameFor( ch ), -1 );
     }
 
     // 2) Detect column and 3) raw affect-flag fallbacks (no owning spell).
