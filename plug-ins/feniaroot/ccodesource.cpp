@@ -269,7 +269,7 @@ CMDADM( codesource )
         if (ch->isCoder( ))
             buf << endl
             << "Только для кодеров: " << endl
-            << "     {Wload{x <файл>          - загрузить сценарий из файла в каталоге share/DL/fenia" << endl
+            << "     {Wload{x <файл>          - загрузить сценарий из файла в каталоге " << dreamland->getFeniaScriptDir().getPath() << endl
             << "     {Wload all{x [<каталог>] - рекурсивно загрузить все сценарии из [под]каталога" << endl
             << "     {Wsave{x <номер>|<имя>   - сохранить сценарий на диск" << endl
             << "     {Wsave all{x             - сохранить все сценарии на диск" << endl

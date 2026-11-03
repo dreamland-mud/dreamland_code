@@ -202,7 +202,7 @@ struct editor_table_entry {
     {"room",   "redit"},
     {"object", "oedit"},
     {"mobile", "medit"},
-    {"help",   "hmedit"},
+    {"help",   "hedit"},
     {NULL, 0,}
 };
 

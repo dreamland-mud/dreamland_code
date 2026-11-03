@@ -7,7 +7,7 @@
   <bootVersion>1000</bootVersion>
   <dbPath>var/db</dbPath>
   <feniaDbDir>var/db/fenia</feniaDbDir>
-  <feniaScriptDir>share/DL/fenia.local</feniaScriptDir>
+  <feniaScriptDir>share/DL/fenia</feniaScriptDir>
   <feniaPublicScriptDir>share/DL/fenia/public</feniaPublicScriptDir>
   <immLogFile>var/log/immortals.log</immLogFile>
   <libexecPath>libexec</libexecPath>

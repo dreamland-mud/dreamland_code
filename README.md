@@ -110,7 +110,7 @@ telnet localhost 9000
 
 If the server runs in a VM or container, use its address instead of `localhost`.
 
-Fenia scripts from `dreamland_fenia_public` load with `cs load public/<path>` from inside the game. For that to work, stop the server, set `feniaScriptDir` in `etc/dreamland.xml` to `share/DL/fenia`, and start it again. The stock value is `share/DL/fenia.local`. See [Fenia-Scripts](https://github.com/dreamland-mud/dreamland_code/wiki/Fenia-Scripts).
+Fenia scripts from `dreamland_fenia_public` load with `cs load public/<path>` from inside the game: the stock `feniaScriptDir` is `share/DL/fenia`. An `etc/dreamland.xml` made from an older template may still say `share/DL/fenia.local`. Stop the server, change it, and start it again. See [Fenia-Scripts](https://github.com/dreamland-mud/dreamland_code/wiki/Fenia-Scripts).
 
 ## Rebuild after a change
 
