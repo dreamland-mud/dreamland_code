@@ -376,6 +376,9 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         pReset = new reset_data();
         pReset->command = 'R';
         pReset->arg1 = pRoom->vnum;
+        // Shuffle all six exits: the 'R' reset swaps doors arg3..arg2-1.
+        pReset->arg2 = DIR_SOMEWHERE;
+        pReset->arg3 = 0;
 
         add_reset(pRoom, pReset, -1);
         pRoom->areaIndex->changed = true;

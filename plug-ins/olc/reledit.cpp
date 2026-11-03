@@ -305,7 +305,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
     if (cmd.empty()) {
         stc("Формат:  reledit название\r\n", ch);
         stc("         reledit list\r\n", ch);
-        stc("         reledit tattoo\r\n", ch);
+        stc("         reledit mark\r\n", ch);
         stc("         reledit create новое_ключевое_слово\r\n", ch);
         return;
     }

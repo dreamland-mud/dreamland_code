@@ -1167,8 +1167,8 @@ static bool redit_purge(Room *pRoom, PCharacter *ch, char *argument)
     one_argument(argument, arg);
     if (!arg[0] || arg_is_help(arg)) {
         stc("Syntax: \n\rpurge all - destroy all objects and mobiles in the room\n\r"
-            "purge mobs - destroy all mobiles in the room\n\r"
-            "purge objs - destroy all objects in the room\n\r"
+            "purge mob - destroy all mobiles in the room\n\r"
+            "purge obj - destroy all objects in the room\n\r"
             "purge <name> - destroy obj or mob with given name\n\r", ch);
         return false;
     }
@@ -1189,7 +1189,7 @@ static bool redit_purge(Room *pRoom, PCharacter *ch, char *argument)
         if (( vch = get_char_room(ch, arg) )) 
             return redit_purge_mob(ch, vch);
 
-        stc("Жертва не найдена. Используй \"purge all|mobs|objs|<name>\"\n\r", ch);
+        stc("Жертва не найдена. Используй \"purge all|mob|obj|<name>\"\n\r", ch);
         return false;
     }
     
@@ -1225,21 +1225,10 @@ REDIT(purge, "уничтожить", "очистить комнату, унич�
 
 REDIT(move, "переместить", "переместить комнату в новую зону")
 {
-    RoomIndexData *roomToMove = getOriginal();
-    AreaIndexData *targetArea = AreaUtils::lookup(argument);
-
-    if (!targetArea) {
-        ptc(ch, "Зона '%s' не найдена.\r\n", argument);
-        return false;
-    }
-
-    if (!OLCState::can_edit(ch, targetArea)) {
-        ptc(ch, "У тебя недостаточно прав для редактирования зоны %d (%s).\n\r", targetArea->vnum, targetArea->getName().c_str());
-        return false;
-    }
-    
-    move(ch, roomToMove, targetArea);
-    return true;
+    // OLCStateRoom::move below is still a plan, not code: refuse instead of
+    // pretending the room moved and marking the area changed.
+    stc("Перенос комнаты в другую зону пока не реализован.\r\n", ch);
+    return false;
 }
 
 void OLCStateRoom::move(PCharacter* ch, RoomIndexData* roomToMove, AreaIndexData* targetArea)

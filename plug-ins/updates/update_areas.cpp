@@ -632,8 +632,8 @@ struct ResetRules {
             return;   
         }
 
-        // Reset everything in dungeons unless marked with RESET_NEVER.
-        if (IS_SET(pRoom->area->area_flag, AREA_DUNGEON))
+        // Reset everything in dungeons, and any line marked RESET_ALWAYS, unless marked with RESET_NEVER.
+        if (IS_SET(pRoom->area->area_flag, AREA_DUNGEON) || IS_SET(pReset->flags, RESET_ALWAYS))
             return;
 
         // Only create chests and their content if there's no one in the area or during 'redit reset'.
