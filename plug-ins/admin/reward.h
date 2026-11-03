@@ -10,6 +10,7 @@
 #include "xmlattribute.h"
 #include "xmlattributeplugin.h"
 
+class Character;
 class PCharacter;
 class XMLReward;
 
@@ -39,7 +40,7 @@ public:
         typedef ::Pointer<XMLAttributeGodReward> Pointer;
 
         void addReward( int qp, const DLString &reason );
-        void listRewards(ostringstream &buf) const;
+        void listRewards(ostringstream &buf, Character *viewer = 0) const;
         void reward( PCharacter * );
         bool isEmpty() const;
 
