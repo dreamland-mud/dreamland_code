@@ -111,10 +111,17 @@ public:
 
     void run( )
     {
+        if (!killer || !ch->is_npc( ) || killer->in_room != ch->in_room)
+            return;
+
+        findCorpse( );
+
+        // Groupmates glance in before the killer loots, whoever landed the blow:
+        // a charmed pet's kill shows its master the corpse too.
+        groupLook( );
+
         if (!applicable( ))
             return;
-        
-        findCorpse( );
 
         autoLook( );
         autoLoot( );
@@ -208,6 +215,23 @@ protected:
                 interpret_raw(killer, "look", "in %lld", corpse->getID());
             }
         }
+    }
+
+    void groupLook( )
+    {
+        if (!corpse || !corpse->contains)
+            return;
+
+        // Collect first: a look trigger may move someone out of the room list.
+        list<Character *> lookers;
+        for (Character *rch = killer->in_room->people; rch; rch = rch->next_in_room)
+            if (rch != killer && !rch->is_npc( ) && IS_AWAKE( rch ) && is_same_group( rch, killer ))
+                lookers.push_back( rch );
+
+        Room *room = killer->in_room;
+        for (auto &rch: lookers)
+            if (!rch->isDead( ) && rch->in_room == room && rch->can_see( corpse ))
+                interpret_raw(rch, "look", "in %lld", corpse->getID());
     }
 
     void autoGold( )
