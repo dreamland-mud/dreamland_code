@@ -51,6 +51,7 @@
 
 #include <cmath>
 #include <vector>
+#include <set>
 #include <jsoncpp/json/json.h>
 #include "configurable.h"
 
@@ -152,6 +153,10 @@ struct saves_config_t {
     int charmPerCha, charmLowCha, charmLowChaBase, charmLowChaPerLevelDiv;
 
     int dispelBase, dispelPerLevel, dispelMin, dispelMax, dispelOwnDebuffPct;
+
+    // boss_reroll: NPCs of tier 1..rerollMaxTier roll a failed save against these spells again.
+    int rerollMaxTier = 0;
+    std::set<DLString> rerollSpells;
 };
 
 static saves_config_t savesConfig;
@@ -208,6 +213,15 @@ CONFIGURABLE_LOADED(fight, saves)
         && 0 <= cfg.dispelMin && cfg.dispelMin <= cfg.dispelMax && cfg.dispelMax <= 100
         && 0 <= cfg.dispelOwnDebuffPct && cfg.dispelOwnDebuffPct <= 100;
 
+    const Json::Value &reroll = value.isObject() && value.isMember("boss_reroll") ? value["boss_reroll"] : nullValue;
+    if (saves_json_int(reroll, "max_tier", cfg.rerollMaxTier) && reroll["spells"].isArray()) {
+        for (const auto &s: reroll["spells"])
+            if (s.isString())
+                cfg.rerollSpells.insert(s.asString());
+    }
+    else
+        cfg.rerollMaxTier = 0;
+
     int model = 0;
     if (saves_json_int(value, "model", model) && model == 1) {
         if (!cfg.curveValid)
@@ -226,6 +240,18 @@ CONFIGURABLE_LOADED(fight, saves)
 int saves_model( )
 {
     return savesConfig.model;
+}
+
+bool saves_boss_reroll( Character *victim, const DLString &spellName )
+{
+    if (savesConfig.rerollMaxTier <= 0 || !victim->is_npc( ))
+        return false;
+
+    int tier = victim->getNPC( )->getTier( );
+    if (tier <= 0 || tier > savesConfig.rerollMaxTier)
+        return false;
+
+    return savesConfig.rerollSpells.count( spellName ) > 0;
 }
 
 /** Model 0 clamp and permille: number_percent() < save lands for save - 1 rolls out of 100. */

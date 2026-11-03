@@ -54,6 +54,7 @@
 #define _MAGIC_H_
 
 #include "bitstring.h"
+#include "dlstring.h"
 
 class Character;
 class Object;
@@ -65,6 +66,10 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch = 
 
 /** Effective saves model from fight/saves.json: 0 legacy, 1 curve. */
 int saves_model( );
+
+/** fight/saves.json boss_reroll: true if victim is an NPC of a top tier that rolls
+ *  a failed save against this spell a second time. */
+bool saves_boss_reroll( Character *victim, const DLString &spellName );
 
 /** Save chance in permille as saves_spell rolls it: no RNG, no messages, no skill improve.
  *  holyCraft = the caller's holy craft roll landed. Caster onSaves hooks are included. */

@@ -199,7 +199,10 @@ NMI_INVOKE(FeniaSpellContext, savesSpell, "([damtype,damflags]): уменьши�
     else
         damflags |= DAMF_MAGIC;
     
-    if (saves_spell(level, myVict, damtype, myCh, damflags)) {
+    // A legend shrugs off control spells more often: a failed save is rolled again, quietly.
+    if (saves_spell(level, myVict, damtype, myCh, damflags)
+        || (saves_boss_reroll(myVict, mySpell->getSkill()->getName())
+            && saves_spell(level, myVict, damtype, myCh, damflags, false))) {
         dam /= 2;
         return Register(true);
     }
