@@ -192,10 +192,15 @@ public:
         if (iargs.cmdName.empty( ))
             return false;
 
+        // Before the game (nanny) an unknown "command" is usually a name or
+        // a password typed at the wrong prompt: never write it to the log.
+        if (iargs.ch->desc && iargs.ch->desc->connected != CON_PLAYING)
+            return false;
+
         if (can_log_input(iargs))
             create_log_entry(iargs);
 
-        if (!iargs.ch->desc || iargs.ch->desc->connected != CON_PLAYING)
+        if (!iargs.ch->desc)
             return false;
             
         ostringstream buf; 
