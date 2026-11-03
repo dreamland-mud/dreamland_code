@@ -26,6 +26,7 @@ struct SkillInfo
     int real;
     int level; 
     int mana;
+    int moves;
     int adept;
     int maximum;
     int help_id;
@@ -272,6 +273,7 @@ void AllSkillsList::make( Character *ch )
         }
         
         info.mana = skill->getMana(ch);
+        info.moves = skill->getMoves(ch);
 
         if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
             info.help_id = skill->getSkillHelp()->getID();
@@ -313,10 +315,10 @@ void AllSkillsList::display( std::ostream & buf )
         << fmt(0, (bool_long_name ?
                        "%7s| %-30s| %-7s |%4s{W|{x " :
                        "%7s| %-18s| %-7s |%4s{W|{x "),
-                      l(ch, "Уровень"), l(ch, "Умение"), l(ch, "Изучено"), l(ch, "Мана") )
+                      l(ch, "Уровень"), l(ch, "Умение"), l(ch, "Изучено"), l(ch, "Цена") )
         << fmt(0, (bool_long_name ?
                        "" : "%-18s| %-7s |%4s"),
-                     l(ch, "Умение"), l(ch, "Изучено"), l(ch, "Мана"))
+                     l(ch, "Умение"), l(ch, "Изучено"), l(ch, "Цена"))
         << endl
         << (bool_long_name ?
             "{W-------+----------------------------------+---------+----+{x" : 
@@ -355,8 +357,12 @@ void AllSkillsList::display( std::ostream & buf )
         else
             buf << "   n/a   |";
 
+        // One 4-wide cost cell: mana, or moves marked with a letter (warrior
+        // skills cost moves, up to 200).
         if (info.mana > 0 && info.available)
             buf << fmt(0, bool_long_name ? " %3d" : " %-3d", info.mana );
+        else if (info.moves > 0 && info.available)
+            buf << fmt(0, info.moves < 100 ? " %2d%s" : "%3d%s", info.moves, l(ch, "ш"));
         else
             buf << "    ";
 
@@ -375,6 +381,8 @@ void AllSkillsList::display( std::ostream & buf )
 
     if (!firstColumn) 
         buf << "                   |         |" << endl;
+
+    buf << fmt(ch, _("Цена -- мана, или шаги с пометкой %1$s.\r\n"), l(ch, "ш"));
 
     buf << fmt(ch,
         _("Также используй фильтры "
