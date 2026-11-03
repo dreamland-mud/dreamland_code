@@ -482,10 +482,11 @@ void undig( Character *ch )
     ch->was_in_room = 0; 
     ch->ambushing.clear();
 
-    if (ch->position < POS_RESTING)
-        ch->position = POS_RESTING;
-        
-    oldact_p(_("Ты выкапываешься из земли."), ch, 0, 0, TO_CHAR, POS_DEAD); 
+    // Digging out is usually forced by a hit (damage.cpp), so come up on your feet.
+    if (ch->position < POS_STANDING)
+        ch->position = POS_STANDING;
+
+    oldact_p(_("Ты выкапываешься из земли."), ch, 0, 0, TO_CHAR, POS_DEAD);
     oldact(_("Земля шевелится, и $c1 выкапывается из своей могилы."), ch, 0, 0, TO_ROOM); 
     extract_grave( ch );
 }
