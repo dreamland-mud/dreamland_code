@@ -392,8 +392,8 @@ CMDRUNP( auction )
 
                             for (int i = 0; i < wearlocationManager->size( ); i++) {
                                 Wearlocation *loc = wearlocationManager->find( i );
-                                if (loc->matches( obj ) && !loc->getPurpose().empty())
-                                    purposes[loc->getPurpose( )] = true;
+                                if (loc->matches( obj ) && !loc->getPurpose( Player::displayLang(ch) ).empty())
+                                    purposes[loc->getPurpose( Player::displayLang(ch) )] = true;
                             }
                             for (p = purposes.begin( ); p != purposes.end( ); p++)
                                 ch->pecho( p->first.c_str( ) );
@@ -401,7 +401,7 @@ CMDRUNP( auction )
 
                         if  (obj->item_type == ITEM_WEAPON) {
                                 ch->pecho(_("Тип оружия: %s (%s), среднее повреждение %d."),
-                                           weapon_class.message(obj->value0() ).c_str( ),
+                                           weapon_class.message(obj->value0(), '1', Player::displayLang(ch) ).c_str( ),
                                            weapon_class.name( obj->value0() ).c_str( ),
                                            weapon_ave(obj));
                         }
