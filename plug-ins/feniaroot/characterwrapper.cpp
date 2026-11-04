@@ -6951,6 +6951,15 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         gaKatanas = own >= 2;
     }
     bool gaHandsFixed = gaBareHanded || gaKatanas;
+    // A two-handed weapon leaves no hand for a shield below SIZE_LARGE (race size, as
+    // ShieldWearloc::canWear checks it): shields leave the candidate pool, so the
+    // ceilings, percentile, chase list and slot browse never offer one. A held item
+    // still fits beside a two-hander (staff grip build).
+    Wearlocation *gaWieldSlot = wearlocationManager->findExisting( "wield" );
+    ::Object *gaWielded = gaWieldSlot ? gaWieldSlot->find( target ) : 0;
+    bool gaShieldBlocked = gaWielded != 0 && !target->is_npc( )
+                           && target->getRace( )->getSize( ) < SIZE_LARGE
+                           && IS_WEAPON_STAT( gaWielded, WEAPON_TWO_HANDS );
 
     // Worn gear: best score per slot-type (for the gap + percentile), plus every
     // vnum already worn (so we never recommend re-getting one).
@@ -7061,6 +7070,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         int slot = pObj->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
         if (slot == 0 && pObj->item_type != ITEM_LIGHT)
+            continue;
+        if (gaShieldBlocked && (slot & ITEM_WEAR_SHIELD))
             continue;
         // Already wearing this exact item: normally skip. Exception -- a SECOND copy
         // may fill the empty twin position of a paired slot (finger/neck/wrist, or a
@@ -7283,6 +7294,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         int slot = o->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
         if (slot == 0)
+            continue;
+        if (gaShieldBlocked && (slot & ITEM_WEAR_SHIELD))
             continue;
 
         int wearMod = target->getProfession( )->getWearModifier( o->item_type );
@@ -7961,7 +7974,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     bool gaGoGrip = false, gripWins = false;
     double gripScore = (om.pGrip + ga_offendRatio( om, target, gaPrimary )) * om.blowValue, gripKeep = 0;
     if (!gaHandsFixed && gripScore > 0) {
-        bool shieldFits = !(IS_WEAPON_STAT( gaPrimary, WEAPON_TWO_HANDS ) && target->getSize( ) < SIZE_LARGE);
+        bool shieldFits = !gaShieldBlocked;
         bool haveShield;
         double keepScore = keepSide( shieldFits, haveShield );
         gripKeep = keepScore;
