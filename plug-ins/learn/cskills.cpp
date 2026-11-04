@@ -15,6 +15,7 @@
 #include "act.h"
 #include "loadsave.h"
 #include "merc.h"
+#include "websocketrpc.h"
 
 #include "def.h"
 #include "l10n.h"
@@ -22,6 +23,7 @@
 struct SkillInfo 
 {
     DLString name;
+    DLString id;
     int learned;
     int real;
     int level; 
@@ -233,6 +235,7 @@ void AllSkillsList::make( Character *ch )
 
         // Start collecting skill details.
         info.name = skill->getNameFor( ch ).ruscase('1');
+        info.id = skill->getName( );
         info.real = skill->getEffective( ch );
         info.spell = spell && spell->isCasted();
         info.passive = skill->isPassive();
@@ -325,9 +328,34 @@ void AllSkillsList::display( std::ostream & buf )
             "{W-------+--------------------+---------+----+--------------------+---------+----{x")
         << endl;
 
+    WebList web(ch, "skills");
+
     // Draw the skill table.
     for (iterator i = begin( ); i != end( ); i++) {
         SkillInfo info = *i;
+
+        if (web.active( )) {
+            DLString label = !info.available
+                ? fmt(0, lmsg(viewerLang(ch), "%s, not available yet", "%s, пока недоступно", "%s, поки недоступно"),
+                      info.name.c_str( ))
+                : info.real != info.learned
+                ? fmt(0, "%s, %d%% (%d%%)", info.name.c_str( ), info.learned, info.real)
+                : fmt(0, "%s, %d%%", info.name.c_str( ), info.learned);
+            int row = web.row(label, info.id, DLString(info.level));
+            web.data(row, "level", info.level);
+            web.data(row, "available", info.available);
+            if (info.available) {
+                web.data(row, "learned", info.learned);
+                web.data(row, "real", info.real);
+                if (info.mana > 0)
+                    web.data(row, "mana", info.mana);
+                else if (info.moves > 0)
+                    web.data(row, "moves", info.moves);
+            }
+            DLString quoted = info.id.find(' ') == DLString::npos ? info.id : "'" + info.id + "'";
+            web.action(row, "practice", "practice " + quoted);
+            web.action(row, "help", info.help_id > 0 ? "help " + DLString(info.help_id) : "help " + info.id);
+        }
 
         if (info.level != prevLevel) {
             if (!firstColumn) {
@@ -381,6 +409,8 @@ void AllSkillsList::display( std::ostream & buf )
 
     if (!firstColumn) 
         buf << "                   |         |" << endl;
+
+    web.send( );
 
     buf << fmt(ch, _("Цена -- мана, или шаги с пометкой %1$s.\r\n"), l(ch, "ш"));
 

@@ -89,6 +89,10 @@ typedef std::vector<ViaRecord> ViaVector;
 #define OOB_EOR (C)
 /* MSP sound triggers: a telnet client answered DO MSP, or the web client. */
 #define OOB_MSP (D)
+/* Structured list frames (WebList), asked for by a client with list_subscribe.
+ * Kept on the connection like OOB_CHAT, so clients that ignore the frame
+ * (mudjs, the mobile client) never receive it. */
+#define OOB_LIST (E)
 
 struct WebSockState {
     int state;

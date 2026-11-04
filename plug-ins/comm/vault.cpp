@@ -44,6 +44,8 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "websocketrpc.h"
+#include "act.h"
 
 /*-------------------------------------------------------------------------
  * small helpers
@@ -314,7 +316,7 @@ static int vault_policy_reason( Object *obj )
 // One row. The [nn] index is a clickable {hc that sends '<prefix> get <n>'; the
 // label keeps the plain "[ n]" so telnet/screen-reader clients still read it.
 static void vault_show_entry( Character *ch, int num, const BankEntry &be, lang_t lang,
-                              const DLString &cmdPrefix )
+                              const DLString &cmdPrefix, WebList *web = 0 )
 {
     OBJ_INDEX_DATA *proto = get_obj_index( be.vnum );
 
@@ -329,6 +331,21 @@ static void vault_show_entry( Character *ch, int num, const BankEntry &be, lang_
     if ( vault_entry_foreign( ch, be ) )
         name = name + " {D[" + lmsg( lang, "owner", "владелец", "власник" )
                + ": " + vault_capitalize( be.owner ) + "]{x";
+
+    if ( web && web->active( ) ) {
+        DLString label = be.contents > 0
+            ? fmt( 0, lmsg( lang, "%d. %s, %s, %d items, level %d",
+                                  "%d. %s, %s, предметов: %d, ур. %d",
+                                  "%d. %s, %s, предметів: %d, рів. %d" ),
+                   num, name.c_str( ), typeName.c_str( ), be.contents, lvl )
+            : fmt( 0, lmsg( lang, "%d. %s, %s, level %d",
+                                  "%d. %s, %s, ур. %d",
+                                  "%d. %s, %s, рів. %d" ),
+                   num, name.c_str( ), typeName.c_str( ), lvl );
+        int row = web->row( label, DLString( num ) );
+        web->data( row, "level", lvl );
+        web->action( row, "get", cmdPrefix + " get " + DLString( num ) );
+    }
 
     if ( be.contents > 0 )
         ch->pecho( lmsg( lang,
@@ -348,7 +365,7 @@ static void vault_show_entry( Character *ch, int num, const BankEntry &be, lang_
 // {hc that sends '<prefix> filter <type>'. Built in the sorted (grouped) order.
 // Returns the composed, tag-carrying string; the caller pecho's it.
 static DLString vault_type_summary_line( const std::vector<BankEntry> &entries, lang_t lang,
-                                         const DLString &cmdPrefix )
+                                         const DLString &cmdPrefix, WebList *web = 0 )
 {
     std::vector< std::pair<DLString,int> > tally;   // (canonical type name, count), first-seen order
     for ( size_t i = 0; i < entries.size( ); i++ ) {
@@ -368,6 +385,14 @@ static DLString vault_type_summary_line( const std::vector<BankEntry> &entries, 
         buf << "{hc'" << cmdPrefix << " filter " << tally[k].first << "'"
             << vault_upper( vault_type_label( item_table.value( tally[k].first ), lang ) )
             << " (" << tally[k].second << "){x";
+
+        if ( web && web->active( ) ) {
+            DLString label = vault_type_label( item_table.value( tally[k].first ), lang )
+                             + " (" + DLString( tally[k].second ) + ")";
+            int row = web->row( label, tally[k].first,
+                                lmsg( lang, "filter by type", "фильтр по типу", "фільтр за типом" ) );
+            web->action( row, "filter", cmdPrefix + " filter " + tally[k].first );
+        }
     }
     return DLString( buf.str( ) );
 }
@@ -431,13 +456,16 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
             "У твоєму сховищі зберігається %d %Iпредмет|предмети|предметів:" ),
             (int)entries.size( ), (int)entries.size( ) );
 
+    WebList web( ch, "vault" );
+
     if ( entries.size( ) > 50 && !forceFull ) {
         ch->pecho( lmsg( lang,
             "Too many to list in full -- pick a type, or narrow with {y'%s find <word>'{x:",
             "Слишком много, чтобы показать все -- выбери тип или сузь через {y'%s найти <слово>'{x:",
             "Забагато, щоб показати все -- обери тип або звузь через {y'%s знайти <слово>'{x:" ),
             vault_say_prefix( cmdPrefix, lang ).c_str( ) );
-        ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix ).c_str( ) );
+        ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix, &web ).c_str( ) );
+        web.send( );
         ch->pecho( lmsg( lang,
             "({y'%s list'{x shows every entry.)",
             "({y'%s список'{x покажет все записи.)",
@@ -446,14 +474,15 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
     }
 
     for ( size_t i = 0; i < entries.size( ); i++ )
-        vault_show_entry( ch, (int)i + 1, entries[i], lang, cmdPrefix );
+        vault_show_entry( ch, (int)i + 1, entries[i], lang, cmdPrefix, &web );
 
     ch->pecho( lmsg( lang,
         "Use {y'%s get <number|name>'{x to take one out, {y'%s find <word>'{x to search. By type:",
         "Команда {y'%s взять <номер|название>'{x достанет предмет, {y'%s найти <слово>'{x -- поищет. По типу:",
         "Команда {y'%s взяти <номер|назва>'{x дістане предмет, {y'%s знайти <слово>'{x -- пошукає. За типом:" ),
         vault_say_prefix( cmdPrefix, lang ).c_str( ), vault_say_prefix( cmdPrefix, lang ).c_str( ) );
-    ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix ).c_str( ) );
+    ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix, &web ).c_str( ) );
+    web.send( );
 }
 
 /*-------------------------------------------------------------------------
@@ -470,8 +499,12 @@ static const char *WORDS_LIST[]   = { "list", "all", "список", "все", "
 static void vault_show_rows( Character *ch, const std::vector<BankEntry> &entries,
                              const std::vector<int> &hitIdx, lang_t lang, const DLString &cmdPrefix )
 {
+    WebList web( ch, "vault" );
+
     for ( size_t k = 0; k < hitIdx.size( ); k++ )
-        vault_show_entry( ch, hitIdx[k] + 1, entries[ hitIdx[k] ], lang, cmdPrefix );
+        vault_show_entry( ch, hitIdx[k] + 1, entries[ hitIdx[k] ], lang, cmdPrefix, &web );
+
+    web.send( );
 
     ch->pecho( lmsg( lang,
         "Take one out with {y'%s get <number>'{x.",

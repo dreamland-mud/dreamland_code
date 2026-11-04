@@ -1,7 +1,10 @@
+#include "json/json.h"
 #include "websocketrpc.h"
 #include "stringlist.h"
 #include "pcharacter.h"
 #include "descriptor.h"
+#include "merc.h"
+#include "def.h"
 
 /**
  * Create command tag in the form of [cmd=...,see=...,nonce=...],
@@ -81,4 +84,82 @@ DLString web_menu(const StringList &commands, const DLString &id, const DLString
         << "{Iw</m>{Ix";
 
     return buf.str();
+}
+
+WebList::WebList(Character *ch, const DLString &kind, const DLString &title)
+    : ch(ch), list(0)
+{
+    if (!is_websock(ch) || !IS_SET(ch->desc->oob_proto, OOB_LIST))
+        return;
+
+    list = new Json::Value;
+    (*list)["kind"] = kind;
+    (*list)["title"] = title.colourStrip();
+    (*list)["rows"] = Json::Value(Json::arrayValue);
+}
+
+WebList::~WebList()
+{
+    delete list;
+}
+
+int WebList::row(const DLString &label, const DLString &id, const DLString &section)
+{
+    if (!list)
+        return -1;
+
+    Json::Value r;
+    r["label"] = label.colourStrip();
+    if (!id.empty())
+        r["id"] = id;
+    if (!section.empty())
+        r["section"] = section.colourStrip();
+    r["actions"] = Json::Value(Json::arrayValue);
+    (*list)["rows"].append(r);
+    return (*list)["rows"].size() - 1;
+}
+
+void WebList::action(int row, const DLString &verb, const DLString &cmd)
+{
+    if (!list || row < 0)
+        return;
+
+    Json::Value a;
+    a["verb"] = verb;
+    a["cmd"] = cmd;
+    (*list)["rows"][row]["actions"].append(a);
+}
+
+void WebList::data(int row, const DLString &key, int value)
+{
+    if (list && row >= 0)
+        (*list)["rows"][row]["data"][key] = value;
+}
+
+void WebList::data(int row, const DLString &key, bool value)
+{
+    if (list && row >= 0)
+        (*list)["rows"][row]["data"][key] = value;
+}
+
+void WebList::data(int row, const DLString &key, const DLString &value)
+{
+    if (list && row >= 0)
+        (*list)["rows"][row]["data"][key] = value;
+}
+
+void WebList::send()
+{
+    if (!list)
+        return;
+
+    if (ch->desc) {
+        Json::Value frame;
+        frame["command"] = "list";
+        frame["args"][0] = *list;
+        ch->desc->writeWSCommand(frame);
+    }
+
+    delete list;
+    list = 0;
 }

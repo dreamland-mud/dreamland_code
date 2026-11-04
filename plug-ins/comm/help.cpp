@@ -36,6 +36,7 @@
 #include "commandmanager.h"
 #include "xmlattributevisited.h"
 #include "fenia_utils.h"
+#include "websocketrpc.h"
 
 /*---------------------------------------------------------------------------*
  * Help
@@ -1668,6 +1669,7 @@ CMDRUNP( help )
     buf << fmt(ch, _("По запросу '{C%1$s{x' найдено несколько разделов справки с такими номерами:"), origArgument.c_str()) << endl << endl;
     DLString lineFormat = "[{C{hh%5d{x] %s\r\n";
     int firstId = -1;
+    WebList web(ch, "help");
     for (unsigned int a = 0; a < articles.size(); a++) {
         auto help = articles[a];
         DLString title = help->getTitle(DLString::emptyString, Player::displayLang(ch));
@@ -1679,7 +1681,12 @@ CMDRUNP( help )
             firstId = help->getID();
 
         buf << fmt(0, lineFormat.c_str(), help->getID(), line.c_str());
+
+        int row = web.row(title, DLString(help->getID()));
+        web.action(row, "read", "help " + DLString(help->getID()));
     }
+
+    web.send();
 
     buf << endl
         << fmt(ch, _("Для уточнения поиска смотри справку по нужному номеру, например, {y{hcсправка %1$d{x."), firstId) << endl;

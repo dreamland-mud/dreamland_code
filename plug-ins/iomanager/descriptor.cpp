@@ -570,6 +570,13 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
         if (character && !character->is_npc())
             out["args"][0]["who"] = character->getNameC();
         writeWSCommand(out);
+    } else if(name == "list_subscribe") {
+        /* Character-less for the same reason as chat_subscribe: the frames are
+         * wanted by this client, whoever plays in it. "off" stops them. */
+        if (!args.empty() && args.front() == "off")
+            REMOVE_BIT(oob_proto, OOB_LIST);
+        else
+            SET_BIT(oob_proto, OOB_LIST);
     } else if(name == "ping") {
         /* Character-less too, and its only job is to prove the socket still
          * carries traffic in both directions. A phone that has been suspended
