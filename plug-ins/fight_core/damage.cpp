@@ -2,6 +2,7 @@
  * 
  * ruffina, 2004
  */
+#include <cmath>
 #include <string.h>
 
 #include "damage.h"
@@ -97,6 +98,13 @@ Damage::Damage( Affect *paf, Character *victim, int dam_type, int dam, bitstring
     init(attacker, victim, dam_type, dam, dam_flag);
 }
 
+/* The share of the blow armor let through, for the tiered mob damage log:
+ * multipliers after armor (position, critical strike) still apply to the
+ * raw blow, so the log divides the final damage by it. Kept out of the
+ * class so that plugins deriving from Damage keep their layout. */
+static const Damage *armorBlow = 0;
+static double armorBlowKeep = 1.0;
+
 void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag)
 {
     this->ch = ch;
@@ -110,6 +118,9 @@ void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitst
     blocked = false;
     deathReason = "damage";
     defenseBonus = 0;
+    // A new blow reusing a freed one's address must not inherit its raw value.
+    if (armorBlow == this)
+        armorBlow = 0;
 }
 
 int fightspam_cast_depth = 0;
@@ -523,6 +534,9 @@ double Damage::hitrollEff( ) const
 
 void Damage::protectArmor( )
 {
+    armorBlow = this;
+    armorBlowKeep = 1.0;
+
     if (to_hit_model( ) != 1 || dam <= 0 || dam_type < 0)
         return;
 
@@ -562,7 +576,10 @@ void Damage::protectArmor( )
     }
 
     // A bad dr_cap must not take a blow past zero: OneHit::hit would heal the victim.
+    int before = dam;
     dam -= (int)(dam * URANGE( 0.0, reduction, 0.99 ));
+    if (before > 0 && dam > 0)
+        armorBlowKeep = (double)dam / before;
 }
 
 /*-----------------------------------------------------------------------------
@@ -579,6 +596,9 @@ void Damage::inflictDamage( )
     int before = victim->hit;
     victim->hit -= dam;
     damagelog_record( ch, victim, dam, before );
+    int raw = armorBlow == this ? (int)lround( dam / armorBlowKeep ) : dam;
+    damagelog_record_taken( ch, victim, dam, raw, before );
+    armorBlow = 0;
     
     if (victim->is_immortal( ))
         victim->hit = max( (int)victim->hit, 1 );

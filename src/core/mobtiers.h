@@ -13,6 +13,8 @@
  *   "tiers": {                                   // required, keyed by number 1..10
  *     "7": { "name": "normal",
  *            "hp": 1.0, "dmg": 1.0, "ac": 1.0, "mana": 1.0,
+ *            "hp_boost": 1.0,                    // extra hp mult, ramping in linearly
+ *            "hp_boost_from": 0, "hp_boost_full": 0, // from x1 at _from to full at _full
  *            "hitroll": 0.0,                     // bonus per level (L/10 = 0.1)
  *            "saves": -0.05,                     // saving throw per level (-L/20)
  *            "stat_cap": 13,                     // + level * stat_cap_per_level
@@ -60,6 +62,8 @@ struct Tier {
     bool defined = false;
     std::string name;
     double hp = 1, dmg = 1, ac = 1, mana = 1;
+    double hpBoost = 1;
+    int hpBoostFrom = 0, hpBoostFull = 0;
     double hitroll = 0, saves = 0;
     double statCap = 13;
     int offEnabled = -1;

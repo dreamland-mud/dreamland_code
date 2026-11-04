@@ -54,6 +54,9 @@ static void readTier(const Json::Value &d, Tier &t)
     t.defined = true;
     t.name = d.get("name", "").asString();
     t.hp = d.get("hp", 1.0).asDouble();
+    t.hpBoost = d.get("hp_boost", 1.0).asDouble();
+    t.hpBoostFrom = d.get("hp_boost_from", 0).asInt();
+    t.hpBoostFull = d.get("hp_boost_full", 0).asInt();
     t.dmg = d.get("dmg", 1.0).asDouble();
     t.ac = d.get("ac", 1.0).asDouble();
     t.mana = d.get("mana", 1.0).asDouble();
@@ -297,7 +300,19 @@ Centres Config::centres(const MobInfo &mob) const
         styleHp = s->second.first;
         styleDmg = s->second.second;
     }
-    c.hp = std::max(1, (int)lround(baseHp.at(lvl) * t.hp * styleHp * classFactor(*this, "hp", mob.acts)));
+    // hp_boost ramps in from x1 at hp_boost_from to full at hp_boost_full,
+    // so no single level jumps; full <= from makes it a step at from.
+    double boost = 1.0;
+    if (t.hpBoostFull > t.hpBoostFrom) {
+        if (lvl >= t.hpBoostFull)
+            boost = t.hpBoost;
+        else if (lvl > t.hpBoostFrom)
+            boost = 1.0 + (t.hpBoost - 1.0) * (lvl - t.hpBoostFrom) / (t.hpBoostFull - t.hpBoostFrom);
+    }
+    else if (lvl >= t.hpBoostFrom)
+        boost = t.hpBoost;
+    double tierHp = t.hp * boost;
+    c.hp = std::max(1, (int)lround(baseHp.at(lvl) * tierHp * styleHp * classFactor(*this, "hp", mob.acts)));
     c.dmgAve = std::max(1, (int)lround(baseDmg.at(lvl) * t.dmg * styleDmg * classFactor(*this, "dmg", mob.acts)));
     c.hitrollBonus = (int)lround(lvl * t.hitroll);
     c.ac = (int)lround(baseAc.at(lvl) * t.ac * mob.formAc);
