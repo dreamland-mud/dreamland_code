@@ -508,7 +508,8 @@ static void do_score_args(Character *ch, const DLString &arg)
 
     if (stat >=0) {
         ch->pecho(_("%^N1 %d (%d), максимум %d."), 
-            stat_table.fields[stat].message, ch->perm_stat[stat], 
+            stat_table.message( stat_table.fields[stat].value, '1', viewerLanguage ).c_str( ),
+            ch->perm_stat[stat], 
             ch->getCurrStat(stat), pch->getMaxStat(stat));
         return;
     }
