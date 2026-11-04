@@ -57,7 +57,7 @@ bool Language::matchesSubstring( const DLString &str ) const
 
 const DLString& Language::getNameFor( Character *ch ) const
 {
-    return name.get(Player::lang(ch));
+    return getNameFor(Player::lang(ch));
 }
 
 const DLString& Language::getNameFor( lang_t lang ) const
@@ -286,7 +286,7 @@ void Language::improve( Character *ch, bool, Character *victim, int, int ) const
     PCSkillData &data = pch->getSkillData( getIndex( ) );
 
     data.learned++;
-    ch->pecho( _("Ты совершенствуешь свои познания в %^N6."), getNameFor(ch).c_str() );
+    ch->pecho( _("Ты совершенствуешь свои познания в %^N6."), getNamePad(Player::lang(ch)).c_str() );
 }
 
 AffectHandler::Pointer Language::getAffect( ) 
