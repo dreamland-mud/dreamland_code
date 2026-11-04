@@ -91,6 +91,7 @@
 #include "weapongenerator.h"
 #include "badnames.h"
 #include "wiznet.h"
+#include "infonet.h"
 #include "json_utils_ext.h"
 #include "fight_extract.h"
 #include "fight.h"
@@ -2330,12 +2331,15 @@ CMDWIZP( wizlock )
         dreamland->removeOption( opt );
         wiznet( 0, 0, 0, "%C1 removes wizlock.", ch );
         ch->pecho("Game un-wizlocked.");
+        // No actor: infonet stays silent when the actor is immortal.
+        infonet((Character *)0, 0, _("{CВести: {WВрата мира снова открыты, смертные могут входить.{x"));
     }
     else
     {
         dreamland->setOption( opt );
         wiznet( 0, 0, 0, "%C1 has wizlocked the game.", ch );
         ch->pecho("Game wizlocked.");
+        infonet((Character *)0, 0, _("{CВести: {WБоги закрыли врата мира, пока войти могут только бессмертные.{x"));
     }
 }
 
