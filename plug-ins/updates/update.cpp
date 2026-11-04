@@ -549,7 +549,13 @@ void char_update( )
         if (ch->is_npc( ))
             raceAff &= ~ch->getNPC( )->pIndexData->honouredAffDel( );
 
-        if ((ch->affected_by.getValue( ) & raceAff) != raceAff)
+        // A mob in or just out of a fight waits: otherwise a dispelled racial
+        // buff comes back on the next tick and dispel/cancel is futile. The
+        // "calmed down" branch of violence_update re-arms it once adrenaline
+        // settles.
+        bool mobInFight = ch->is_npc( ) && (ch->fighting || ch->is_adrenalined( ));
+
+        if (!mobInFight && (ch->affected_by.getValue( ) & raceAff) != raceAff)
             afprog_refresh( ch, true );
 
         // Perma-affects granted by a player's learned passive skills (perception
