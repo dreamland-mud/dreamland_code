@@ -32,8 +32,6 @@
 #include "def.h"
 #include "l10n.h"
 
-RELIG(fili);
-WEARLOC(tattoo);
 CLAN(battlerager);
 CLAN(ruler);
 GSN(manacles);
@@ -372,14 +370,6 @@ CMDRUN( split )
     {
          ch->pecho(_("Очень мудро."));
         return;
-    }
-
-    if (ch->getReligion() == god_fili) {
-        Object *tattoo = wearlocationManager->find(wear_tattoo)->find(ch);
-        if (tattoo) {
-            ch->pecho(_("%^O1 укоризненно вздрагивает, когда ты пытаешься поделиться прибылью с согруппниками."), tattoo);
-            return;
-        }
     }
 
     ch->silver        -= amount_silver;
