@@ -101,9 +101,10 @@ public:
     virtual bool matchesStrict( const DLString &str ) const;
     virtual bool matchesUnstrict( const DLString &str ) const;
     virtual bool matchesSubstring( const DLString &str ) const;
-    virtual const DLString& getNameFor( Character * ) const;
     // Nominative name in a tongue, pads stripped: polymorphic skill->getNameFor
     // callers (affect lines, questor scrolls, skill headers) print it raw.
+    // Declined %N messages take getNamePad instead.
+    virtual const DLString& getNameFor( Character * ) const;
     virtual const DLString& getNameFor( lang_t ) const;
     // Full declension pad for a given tongue.
     const DLString& getNamePad( lang_t ) const;
