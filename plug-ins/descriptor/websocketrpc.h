@@ -43,9 +43,9 @@ DLString web_menu(const StringList &commands, const DLString &id, const DLString
 /**
  * Structured copy of a list that a command prints, for web clients.
  * Sent as {"command": "list", "args": [list]} next to the usual text, so a client
- * can build a menu without parsing the text in every language. Non-web players
- * get nothing extra; check active() to skip building rows for them.
- * Format: docs/web-list-frame.md.
+ * can build a menu without parsing the text in every language. Only clients that
+ * sent list_subscribe (OOB_LIST) get it; check active() to skip building rows
+ * for everyone else. Format: wiki page Client-Web-Protocol.
  */
 class WebList {
 public:

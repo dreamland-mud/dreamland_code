@@ -3,6 +3,8 @@
 #include "stringlist.h"
 #include "pcharacter.h"
 #include "descriptor.h"
+#include "merc.h"
+#include "def.h"
 
 /**
  * Create command tag in the form of [cmd=...,see=...,nonce=...],
@@ -87,7 +89,7 @@ DLString web_menu(const StringList &commands, const DLString &id, const DLString
 WebList::WebList(Character *ch, const DLString &kind, const DLString &title)
     : ch(ch), list(0)
 {
-    if (!is_websock(ch))
+    if (!is_websock(ch) || !IS_SET(ch->desc->oob_proto, OOB_LIST))
         return;
 
     list = new Json::Value;
