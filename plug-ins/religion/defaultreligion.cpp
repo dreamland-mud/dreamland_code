@@ -232,6 +232,7 @@ DefaultReligion::DefaultReligion( )
                   races( raceManager ),
                   classes( professionManager ),
                   sex( SEX_MALE, &sex_table ),
+                  followerSex( SEX_EITHER, &sex_table ),
                   flags( 0, &religion_flags ),
                   minstat(&stat_table), maxstat(&stat_table),
                   clans(clanManager),
@@ -294,6 +295,9 @@ DLString DefaultReligion::reasonWhy(Character *ch) const
 
     if (align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
         return "align";
+
+    if (followerSex.getValue() != SEX_EITHER && ch->getSex() != followerSex.getValue())
+        return "sex";
 
     if (races.empty() && classes.empty())
         return OK;

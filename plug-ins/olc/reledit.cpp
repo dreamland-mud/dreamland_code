@@ -96,6 +96,9 @@ void OLCStateReligion::show( PCharacter *ch )
     ptc(ch, "Пол божества:      {C%s{x {D(? sex){x\r\n",
         sex_table.name(r->getSex()).c_str());
 
+    ptc(ch, "Пол последователей: {C%s{x {D(? sex){x\r\n",
+        sex_table.name(r->followerSex.getValue()).c_str());
+
     ptc(ch, "Описание:          {C%s{x  %s {D(desc help){x\r\n",
         r->getDescription().c_str(),
         web_edit_button(ch, "desc", "web").c_str());        
@@ -168,6 +171,11 @@ RELEDIT(russian, "русское", "установить русское имя �
 RELEDIT(sex, "пол", "установить пол божества")
 {
     return flagValueEdit(getOriginal()->sex);
+}
+
+RELEDIT(followersex, "полпоследователей", "ограничить по полу последователей (either -- любой)")
+{
+    return flagValueEdit(getOriginal()->followerSex);
 }
 
 RELEDIT(desc, "описание", "установить описание божества (русский падеж)")
