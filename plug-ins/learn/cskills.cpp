@@ -335,9 +335,11 @@ void AllSkillsList::display( std::ostream & buf )
         SkillInfo info = *i;
 
         if (web.active( )) {
-            DLString label = info.available
+            DLString label = !info.available
+                ? fmt(0, "%s, n/a", info.name.c_str( ))
+                : info.real != info.learned
                 ? fmt(0, "%s, %d%% (%d%%)", info.name.c_str( ), info.learned, info.real)
-                : fmt(0, "%s, n/a", info.name.c_str( ));
+                : fmt(0, "%s, %d%%", info.name.c_str( ), info.learned);
             int row = web.row(label, info.id, DLString(info.level));
             web.data(row, "level", info.level);
             web.data(row, "available", info.available);
