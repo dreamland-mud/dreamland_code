@@ -47,6 +47,9 @@ void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d )
 
         if (!gq->isLevelOK( ch ))
             continue;
+
+        if (gq->isHidden( ))
+            continue;
             
         if (gq->hasLevels( ))
             buf << fmt( ch, _("         Квест {Y\"%1$s\"{y (для {Y%2$d-%3$d{y уровней)"),
@@ -61,6 +64,7 @@ void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d )
     if (!buf.str( ).empty( )) {
         GQChannel::pecho( ch, l( ch, "\r\nГлобальные квесты, в которых ты можешь принять участие: "));
         GQChannel::pecho( ch, buf );
+        GQChannel::infoHint( ch );
     }
 
     CGQuest::gqprog_notify(ch->getPC());

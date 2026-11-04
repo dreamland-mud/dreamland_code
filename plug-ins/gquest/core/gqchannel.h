@@ -37,6 +37,10 @@ public:
     static void gecho( GlobalQuest *, const MultiMessage&, PCharacter *pch = NULL);
     static void gecho( const DLString& name, const MultiMessage&, PCharacter *pch = NULL);
     static void pecho( Character *, const DLString& );
+    /* Clickable 'gquest info' pointer, in the game only: the messengers can't
+     * run a command. infoHint() goes to everyone playing. */
+    static void infoHint( Character * );
+    static void infoHint( );
     static void pecho( Character *, ostringstream& );
 
     static const char * const BOLD;

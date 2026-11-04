@@ -41,7 +41,7 @@ public:
     virtual const DLString & getDisplayName( ) const;
 
     virtual void report( std::ostringstream &, PCharacter* ) const;
-    virtual void progress( std::ostringstream & ) const;
+    virtual void progress( std::ostringstream &, lang_t ) const;
 
     virtual void getQuestDescription( std::ostringstream &, Character * ) const;
     virtual void getQuestStartMessage( std::ostringstream & ) const;

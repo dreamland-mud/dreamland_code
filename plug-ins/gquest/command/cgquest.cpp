@@ -183,7 +183,7 @@ void CGQuest::doProgress( PCharacter *ch )
             buf << fmt( ch, _("{yКвест {Y\"%1$s\"{y (для всех уровней)"),
                         gqi->getQuestNameFor( ch ) )
                 << endl;
-        gq->progress( buf );
+        gq->progress( buf, viewerLang( ch ) );
         GQChannel::pecho( ch, buf );
     }
 

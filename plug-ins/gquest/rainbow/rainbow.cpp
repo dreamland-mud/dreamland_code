@@ -185,6 +185,7 @@ void RainbowGQuest::cleanup( )
 
 void RainbowGQuest::destroy( ) 
 {
+    echoFinalProgress( );
     cleanup( );
 
     switch (state.getValue( )) {
@@ -215,6 +216,7 @@ void RainbowGQuest::after( )
 {
     if (state == ST_INIT) {
         GQChannel::gecho( this, _( getScenario( )->getStartMsg( ) ) );
+        GQChannel::infoHint( );
         state = ST_RUNNING;
         playStartSound( );
     }
@@ -241,7 +243,7 @@ void RainbowGQuest::report( std::ostringstream &buf, PCharacter *ch ) const
             << endl;
 }
 
-void RainbowGQuest::progress( std::ostringstream &ostr ) const
+void RainbowGQuest::progress( std::ostringstream &ostr, lang_t lang ) const
 {
     int cnt;
     Character *ch;
@@ -258,7 +260,7 @@ void RainbowGQuest::progress( std::ostringstream &ostr ) const
         
         if (cnt > 0) {
             ostr << fmt(0, "%s%-15s %s%-4d%s",
-                         GQChannel::NORMAL, ch->getNameC( ),         
+                         GQChannel::NORMAL, ch->getPC( )->getNameP( '1', lang ).c_str( ),         
                          GQChannel::BOLD, cnt, GQChannel::NORMAL)
                  << endl;
         }

@@ -9,6 +9,9 @@
 #include "xmlattributegangsters.h"
 #include "gangchef.h"
 
+#include "mobbody.h"
+#include "skillreference.h"
+#include "mobtiers.h"
 #include "room.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -19,7 +22,60 @@
 #include "def.h"
 #include "l10n.h"
 
-bool GangChef::death( Character *killer ) 
+GSN(sanctuary);
+GSN(dark_shroud);
+GSN(stardust);
+GSN(resistance);
+
+static bool chef_shielded( NPCharacter *ch )
+{
+    return ch->isAffected( gsn_sanctuary ) || ch->isAffected( gsn_dark_shroud )
+        || ch->isAffected( gsn_stardust ) || ch->isAffected( gsn_resistance );
+}
+
+// The chef is the lair boss: boss-tier numbers and bits for the quest's top
+// level. The prototype has no level, so its derived numbers are level-0 ones,
+// and the gang member formula alone left the chef no tougher than his men.
+// The instance tier stays the prototype's on purpose: the chef's loot is the
+// bounty (onGangChefLoot), a boss tier would add tier loot on top of it.
+void GangChef::config( int level )
+{
+    GangMob::config( level );
+
+    const MobTiers::Config &tc = MobBody::tiers( );
+    int boss = tc.parse( "boss" );
+    if (!boss || !apply_mob_tier( ch, level, boss ))
+        return;
+
+    const MobTiers::Tier &row = tc.get( boss );
+    Body::NameSet aff( row.affAdd.begin( ), row.affAdd.end( ) );
+    Body::NameSet act( row.actAdd.begin( ), row.actAdd.end( ) );
+    Body::NameSet off( row.offAdd.begin( ), row.offAdd.end( ) );
+    bitstring_t affBits = MobBody::bits( &::affect_flags, aff );
+    bitstring_t actBits = MobBody::bits( &::act_flags, act );
+    bitstring_t offBits = MobBody::bits( &::off_flags, off );
+
+    SET_BIT( ch->act, (int)actBits );
+    SET_BIT( ch->off_flags, (int)offBits );
+    ch->baseBits[MOBSET_ACT] |= actBits;
+    ch->baseBits[MOBSET_OFF] |= offBits;
+
+    // Sanctuary and the like live as real affects, as create_mobile builds
+    // them (dark shroud for an evil chef), so they can be dispelled. Plain
+    // bits go to the base set; the affect ones never do, or affect_check
+    // would bring a dispelled shield back. create_mob_affects walks every
+    // affect bit, so it runs only while the chef has none of them yet.
+    bitstring_t fromAffects = affBits & AFF_FROM_AFFECTS;
+    ch->baseBits[MOBSET_AFF] |= affBits & ~(bitstring_t)AFF_FROM_AFFECTS;
+    SET_BIT( ch->affected_by, (int)(affBits & ~(bitstring_t)AFF_FROM_AFFECTS) );
+
+    if (fromAffects && !(ch->affected_by & AFF_FROM_AFFECTS) && !chef_shielded( ch )) {
+        SET_BIT( ch->affected_by, (int)fromAffects );
+        create_mob_affects( ch );
+    }
+}
+
+bool GangChef::death( Character *killer )
 {
     Gangsters *gquest = Gangsters::getThis( );
 

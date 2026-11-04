@@ -13,6 +13,7 @@ XML_OBJECT
 public:    
     typedef ::Pointer<GangChef> Pointer;
 
+    virtual void config( int );
     virtual bool spec( );
     virtual void fight( Character *, string command = "" );
     virtual bool death( Character * );
