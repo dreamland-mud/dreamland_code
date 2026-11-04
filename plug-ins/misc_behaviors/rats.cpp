@@ -23,6 +23,10 @@
 #include "def.h"
 #include "l10n.h"
 #include "fenia_utils.h"
+#include "religion.h"
+#include "wearloc_utils.h"
+
+RELIG(cradya);
 
 
 static Character * get_actor( Character *victim ) 
@@ -50,10 +54,14 @@ Rat::Rat( )
     timer.setValue( -1 );
 }
 
-// Rat pups are a first-life perk: remorted characters cannot buy them.
+// Rat pups are a first-life perk: remorted characters cannot buy them,
+// except Cradya's marked followers (mirrors Fenia utils/shop buyPet).
 bool Rat::purchase( Character *client, NPCharacter *keeper, const DLString &arguments, int quantity )
 {
-    if (!client->is_npc( ) && client->getPC( )->getRemorts( ).size( ) > 0) {
+    bool cradya = client->getReligion( ) == god_cradya
+                  && get_eq_char( client, wear_tattoo ) != 0;
+
+    if (!client->is_npc( ) && client->getPC( )->getRemorts( ).size( ) > 0 && !cradya) {
         client->pecho( _("Крысята доверяются только тем, кто живет свою первую жизнь.") );
         return false;
     }
