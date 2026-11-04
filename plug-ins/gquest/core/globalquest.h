@@ -13,6 +13,7 @@
 
 #include "schedulertask.h"
 #include "dreamland.h"
+#include "lang.h"
 
 #include "gqexceptions.h"
 #include "globalquestinfo.h"
@@ -51,7 +52,9 @@ public:
         
     
     virtual void report( std::ostringstream &, PCharacter* ) const = 0;
-    virtual void progress( std::ostringstream & ) const = 0;
+    /* One line per participant, names declined for lang. */
+    virtual void progress( std::ostringstream &, lang_t ) const = 0;
+    void echoFinalProgress( ) const;
     
     inline virtual const DLString& getQuestID( ) const;
     virtual void getQuestDescription( std::ostringstream &, Character * ) const = 0;
@@ -64,6 +67,7 @@ public:
 
     inline int getElapsedTime( ) const;
     inline int getRemainingTime( ) const;
+    inline int getRemainingSeconds( ) const;
     inline void setTotalTime( int );
     inline int getTotalTime( ) const;
     inline void setStartTime( );
@@ -108,6 +112,14 @@ inline int GlobalQuest::getElapsedTime( ) const
 inline int GlobalQuest::getRemainingTime( ) const
 {
     return getTotalTime( ) - getElapsedTime( );
+}
+
+// The quest is over when this reaches 0. getRemainingTime() rounds the elapsed
+// minutes down, so it hits 0 only at the nominal end and stays there for the
+// minute after it.
+inline int GlobalQuest::getRemainingSeconds( ) const
+{
+    return getTotalTime( ) * 60 - (dreamland->getCurrentTime( ) - startTime.getValue( ));
 }
 
 inline int GlobalQuest::getTotalTime( ) const

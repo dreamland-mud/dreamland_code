@@ -104,9 +104,12 @@ void GlobalQuestInfo::tryStart( const GlobalQuestInfo::Config &config )
             GQChannel::gecho( this, buf.str( ) );
     }
 
-    // A hidden quest is announced later (RainbowGQuest::after), trumpets go with it.
-    if (!gq->isHidden( ))
+    // A hidden quest is announced later (RainbowGQuest::after), trumpets
+    // and the info pointer go with it.
+    if (!gq->isHidden( )) {
+        GQChannel::infoHint( );
         gq->playStartSound( );
+    }
 
     gq->resume( );
     manager->saveRT( *gq );

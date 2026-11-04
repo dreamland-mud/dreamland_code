@@ -187,6 +187,7 @@ void InvasionGQuest::cleanup( bool performance )
 
 void InvasionGQuest::destroy( ) 
 {
+    echoFinalProgress( );
     cleanup( true );
     rewardLeader( );
 }
@@ -206,7 +207,7 @@ void InvasionGQuest::report( std::ostringstream &buf, PCharacter *ch ) const
     buf << "." << endl;
 }
 
-void InvasionGQuest::progress( std::ostringstream &ostr ) const
+void InvasionGQuest::progress( std::ostringstream &ostr, lang_t lang ) const
 {
     PCharacterMemoryList::const_iterator i;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
@@ -220,7 +221,7 @@ void InvasionGQuest::progress( std::ostringstream &ostr ) const
             continue;
 
         ostr << fmt(0, "%s%-15s %s%-4d%s",
-                     GQChannel::NORMAL, i->second->getName( ).c_str( ),         
+                     GQChannel::NORMAL, i->second->getNameP( '1', lang ).c_str( ),         
                      GQChannel::BOLD, attr->getKilled( ), GQChannel::NORMAL);
 
         ostr << endl;

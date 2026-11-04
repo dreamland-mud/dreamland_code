@@ -50,11 +50,12 @@ void GlobalQuest::suspend( )
 void GlobalQuest::resume( )
 {
     int time = getTaskTime( );
+    int secs = getRemainingSeconds( );
 
-    if (time < 0) 
+    if (time < 0 || secs <= 0) 
         scheduleDestroy( );
     else {
-        DLScheduler::getThis( )->putTaskInSecond( time * 60, GlobalQuest::Pointer( this ) );
+        DLScheduler::getThis( )->putTaskInSecond( min( time * 60, secs ), GlobalQuest::Pointer( this ) );
         GlobalQuestManager::getThis( )->activate( this );
     }
 }
@@ -98,11 +99,15 @@ void GlobalQuest::scheduleDestroy( )
 void GlobalQuest::after( )
 {
     int time = getTaskTime( );
+    int secs = getRemainingSeconds( );
 
-    if (time < 0) 
+    if (time < 0 || secs <= 0) 
         scheduleDestroy( );
     else {
+        // The last task lands exactly on the end of the quest, not up to a
+        // minute and a half past it.
         int offset = max(time * 60, Date::SECOND_IN_MINUTE - 1);
+        offset = min(offset, secs);
         DLScheduler::getThis( )->putTaskInSecond( offset, GlobalQuest::Pointer( this ) );
         GlobalQuestManager::getThis( )->saveRT( this );
     }
@@ -135,9 +140,30 @@ MultiMessage GlobalQuest::getStartBroadcast( ) const
     return MultiMessage( );
 }
 
+// Final standings, the same table as 'gquest progress', sent to the quest
+// channel before the winner is named. Call it before cleanup: rainbow counts
+// the pieces players still carry.
+void GlobalQuest::echoFinalProgress( ) const
+{
+    DLString text[LANG_MAX];
+
+    for (int lg = LANG_MIN; lg < LANG_MAX; lg++) {
+        ostringstream buf;
+        progress( buf, (lang_t)lg );
+        if (buf.str( ).empty( ))
+            return;
+
+        text[lg] = _("Итоги:").getMessage( (lang_t)lg ) + "\n" + buf.str( );
+        text[lg].stripRightWhiteSpace( );
+    }
+
+    GQChannel::gecho( const_cast<GlobalQuest *>( this ),
+                      MultiMessage( text[LANG_EN], text[LANG_RU], text[LANG_UA] ) );
+}
+
 void GlobalQuest::printRemainedTime( ostringstream &buf, Character *ch ) const
 {
-    int t = getRemainingTime( );
+    int t = getRemainingSeconds( ) / 60;
 
     if (t > 0)
         buf << fmt( ch, _("{Y%1$d{y минут%1$Iа|ы|"), t );

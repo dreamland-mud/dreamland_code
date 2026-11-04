@@ -272,6 +272,7 @@ void Gangsters::cleanup( bool performance )
 
 void Gangsters::destroy( ) 
 {
+    echoFinalProgress( );
     cleanup( true );
     
     switch (state.getValue( )) {
@@ -374,7 +375,7 @@ void Gangsters::report( std::ostringstream &buf, PCharacter *ch ) const
     }
 }
 
-void Gangsters::progress( std::ostringstream &buf ) const
+void Gangsters::progress( std::ostringstream &buf, lang_t lang ) const
 {
     PCharacterMemoryList::const_iterator i;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
@@ -388,7 +389,7 @@ void Gangsters::progress( std::ostringstream &buf ) const
             continue;
         
         buf << GQChannel::NORMAL
-            << fmt(0, "%-15s", i->second->getName( ).c_str( ) ) << " "
+            << fmt(0, "%-15s", i->second->getNameP( '1', lang ).c_str( ) ) << " "
             << GQChannel::BOLD << fmt(0, "%-4d", attr->getKilled( ) )
             << GQChannel::NORMAL << endl;
     }
@@ -728,6 +729,43 @@ void Gangsters::createThirdHint( )
 /*****************************************************************************/
 
 
+// Crime is no human monopoly. Human is listed thrice to stay the most common.
+static const char * const gangRaces[] = {
+    "human", "human", "human", "dwarf", "elf", "half-elf", "gnome", "hobbit",
+    "kender", "drow", "duergar", "goblin", "hobgoblin", "kobold", "urukhai", "felar"
+};
+
+// Same race swap as autoquest spawns: the race's body bits go on top of the
+// prototype's.
+static void gang_random_race( NPCharacter *mob )
+{
+    int n = sizeof( gangRaces ) / sizeof( gangRaces[0] );
+    Race *race = raceManager->findExisting( gangRaces[number_range( 0, n - 1 )] );
+
+    if (!race)
+        return;
+
+    mob->setRace( race->getName( ) );
+    mob->size = race->getSize( );
+    SET_BIT( mob->form, race->getForm( ) );
+    SET_BIT( mob->parts, race->getParts( ) );
+    SET_BIT( mob->vuln_flags, race->getVuln( ) );
+    SET_BIT( mob->detection, race->getDet( ) );
+    SET_BIT( mob->affected_by, race->getAff( ) );
+    SET_BIT( mob->imm_flags, race->getImm( ) );
+    SET_BIT( mob->res_flags, race->getRes( ) );
+    mob->wearloc.set( race->getWearloc( ) );
+
+    // affect_check restores the base bits when an affect wears off; the new
+    // race's bits must be among them or they drop off at the first expiry.
+    // Affect-made bits stay out, as create_mobile keeps them out.
+    mob->baseBits[MOBSET_AFF] |= (bitstring_t)race->getAff( ) & ~(bitstring_t)AFF_FROM_AFFECTS;
+    mob->baseBits[MOBSET_DET] |= (bitstring_t)race->getDet( );
+    mob->baseBits[MOBSET_IMM] |= (bitstring_t)race->getImm( );
+    mob->baseBits[MOBSET_RES] |= (bitstring_t)race->getRes( );
+    mob->baseBits[MOBSET_VULN] |= (bitstring_t)race->getVuln( );
+}
+
 NPCharacter * Gangsters::createMob( )
 {
     NPCharacter *ch;
@@ -739,6 +777,7 @@ NPCharacter * Gangsters::createMob( )
         throw MobileNotFoundException( vnum );
         
     ch = create_mobile( pMobIndex );
+    gang_random_race( ch );
     behavior->setChar( ch );
     behavior->config( number_range( minLevel, maxLevel ) );
     ch->behavior.setPointer( *behavior );

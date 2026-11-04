@@ -151,6 +151,21 @@ void GQChannel::gecho( const DLString& msg )
             }
 }
 
+void GQChannel::infoHint( Character *ch )
+{
+    if (dreamland->isShutdown( ))
+        return;
+
+    ch->pecho( _("{yПодробности: {y{hcгзадание инфо{x") );
+}
+
+void GQChannel::infoHint( )
+{
+    for (Descriptor *d = descriptor_list; d; d = d->next)
+        if (d->connected == CON_PLAYING && d->character)
+            infoHint( d->character );
+}
+
 void GQChannel::pecho( Character *ch, ostringstream& buf ) 
 {
     pecho( ch, buf.str( ) );
