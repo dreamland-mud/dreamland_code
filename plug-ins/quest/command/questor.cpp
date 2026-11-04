@@ -464,15 +464,15 @@ void QuestScrollBehavior::createDescription( PCharacter *ch )
             switch (flavour[i++]) {
             case 1:
                 bufSkill << fmtLang( lang, _("секрет мастерства '%1$s'"),
-                                     skill->getNameFor( lang ).c_str( ) );
+                                     skill->getNameFor( lang ).ruscase( '1' ).c_str( ) );
                 break;
             case 2:
                 bufSkill << fmtLang( lang, _("неизвестный тебе ранее трюк в искусстве '%1$s'"),
-                                     skill->getNameFor( lang ).c_str( ) );
+                                     skill->getNameFor( lang ).ruscase( '1' ).c_str( ) );
                 break;
             case 3:
                 bufSkill << fmtLang( lang, _("кое-что новое о '%1$s'"),
-                                     skill->getNameFor( lang ).c_str( ) );
+                                     skill->getNameFor( lang ).ruscase( '1' ).c_str( ) );
                 break;
             }
         }
@@ -542,7 +542,7 @@ bool QuestScrollBehavior::examine( Character *ch )
 
         if (!skill->canPractice( ch->getPC( ), tmpbuf )) {
             buf << fmt( ch, _("Ты не можешь сейчас улучшить свои познания в '%1$s'."),
-                        skill->getNameFor( ch ).c_str( ) ) << endl;
+                        skill->getNameFor( ch ).ruscase( '1' ).c_str( ) ) << endl;
             extract = false;
             continue;
         }
@@ -551,12 +551,12 @@ bool QuestScrollBehavior::examine( Character *ch )
 
         if (data.learned >= skill->getMaximum( ch )) {
             buf << fmt( ch, _("Искусство '%1$s' уже изучено тобой в совершенстве."),
-                        skill->getNameFor( ch ).c_str( ) ) << endl;
+                        skill->getNameFor( ch ).ruscase( '1' ).c_str( ) ) << endl;
             extract = false;
         }
         else {
             buf << fmt( ch, _("Ты узнаешь кое-что новое об искусстве '%1$s'!"),
-                        skill->getNameFor( ch ).c_str( ) ) << endl;
+                        skill->getNameFor( ch ).ruscase( '1' ).c_str( ) ) << endl;
             data.learned = URANGE( data.learned.getValue( ), 
                                    data.learned + s->second,
                                    skill->getMaximum( ch ));
