@@ -37,6 +37,7 @@
 #include "questor.h"
 #include "def.h"
 #include "l10n.h"
+#include "websocketrpc.h"
 
 #define OBJ_VNUM_QUEST_SCROLL 28109
 
@@ -685,14 +686,19 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         QuestList::const_iterator q;
         int index;
         ostringstream buf;
+        WebList web(client, "quest_request");
         buf << endl;
         for (index = 1, q = quests.begin(); q != quests.end(); index++, q++) {
             lang_t lang = viewerLang(client);
+
+            int row = web.row((*q)->getShortDescr(lang) + ", " + (*q)->getDifficulty(lang), DLString(index));
+            web.action(row, "request", "quest request " + DLString(index));
             buf << fmt(0, "     {W%2d{x. %-25s {D(%s){x \r\n",
                             index, (*q)->getShortDescr(lang).c_str(),
                             (*q)->getDifficulty(lang).c_str());
         }
         buf << endl;
+        web.send();
         client->send_to(buf);
 
         tell_raw(client, ch, _("Подробнее о каждом из них ты можешь прочитать в справке по теме '{W{hhвиды заданий{hx{G'."));
