@@ -1156,13 +1156,14 @@ void UndefinedOneHit::damApplyMasterHand()
 void UndefinedOneHit::damApplyReligion()
 {
     // Cradya followers get more damage from their pets, clan pets excluded.
+    // x1.6 lands the mark in the 4.5-5.5 M band with a tier 7 rat pup.
     if (ch->is_npc() 
             && ch->leader 
             && ch->leader->getReligion() == god_cradya
             && get_eq_char(ch->leader, wear_tattoo) != 0)
     {
         if (!area_is_clan(ch->getNPC()->pIndexData->area)) {         
-            dam = dam * 150 / 100;
+            dam = dam * 160 / 100;
         }
         return;
     }
