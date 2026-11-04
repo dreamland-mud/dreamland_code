@@ -5263,9 +5263,10 @@ struct GAGrantDef {
     // lightning needs outdoors and rain; grant_skill.nuke_cond), b = PvP control share
     // (grant_skill.nuke_pvp_share). GK_BUFF: a = uptime (grant_skill.buff_uptime),
     // b = the spell level below which the buff lasts 0 ticks. GK_SLEVEL: a = mean extra
-    // spell levels per cast. GK_PET: a = the pet's damage as a share of the char's
-    // round (grant_skill.pet_round_share), b = the mob vnum the spell summons (the
-    // vnum in spell/<name>/runArg; 0 = a charm, no vnum of its own).
+    // spell levels per cast. GK_PET: priced at its grant in fight/spell_value.json (the
+    // whole worth, PvE and PvP); a = only for a pet the table lacks, the pet's damage as
+    // a share of the char's round, b = the mob vnum the spell summons (the vnum in
+    // spell/<name>/runArg; 0 = a charm, no vnum of its own).
     double a, b;
     const char *ref;   // GK_BUFF: the worn_buff affix (item_affixes.json) it is priced as
 };
@@ -5294,9 +5295,11 @@ static const GAGrantDef ga_grantDefs[] = {
     { "spear",            GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
     { "staff",            GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
     { "whip",             GK_WEAPON,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
-    { "lesser golem",     GK_PET,        { 0, 0, 0, 0, 0 },          0.25, 21, 0 },
-    { "adamantite golem", GK_PET,        { 0, 0, 0, 0, 0 },          0.3,  24, 0 },
-    { "attract other",    GK_PET,        { 0, 0, 60, 60, 0 },        0.15, 0,  0 },
+    { "lesser golem",     GK_PET,        { 0, 0, 0, 0, 0 },          0,    21, 0 },
+    { "stone golem",      GK_PET,        { 0, 0, 0, 0, 0 },          0,    22, 0 },
+    { "iron golem",       GK_PET,        { 0, 0, 0, 0, 0 },          0,    23, 0 },
+    { "adamantite golem", GK_PET,        { 0, 0, 0, 0, 0 },          0,    24, 0 },
+    { "attract other",    GK_PET,        { 0, 0, 0, 0, 0 },          0.15, 0,  0 },
     { "circle",           GK_CIRCLE,     { 0, 0, 0, 0, 0 },          0,    0,  0 },
     { "ambush",           GK_AMBUSH,     { 77, 0, 230, 0, 0 },       0,    0,  0 },
     { "leadership",       GK_XP,         { 0, 0, 0, 0, 10 },         0,    0,  0 },
@@ -6126,8 +6129,14 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
                     }
                 }
             }
-            pve = item_combat_points( ga_gkSkill( "pet_round_share", *d, d->a ) * item_pc_round( lvl, caster ),
-                                      0, lvl, caster ) * use;
+            // A pet costs its grant in M from the spell value table, converted at the
+            // item level like a trigger_spells grant: the table knows a clay golem from
+            // an adamantite one. Only a pet the table lacks falls back to round share.
+            double grantM = magic_spell_grant( name );
+            if (grantM > 0)
+                pve = grantM * item_one_m( itemLevel, caster ) * use;
+            else
+                pve = item_combat_points( d->a * item_pc_round( lvl, caster ), 0, lvl, caster ) * use;
             break;
         }
         case GK_CIRCLE: {
