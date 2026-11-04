@@ -154,6 +154,10 @@ protected:
 
     // Armor the victim adds for this blow only (armor use).
     int defenseBonus;
+
+    // Damage over time from an affect (bleeding, poison...): a tick that
+    // protections cut to 0 prints nothing instead of a "miss".
+    bool fromAffect;
 };
 
 struct CharDeathEvent : public Event {

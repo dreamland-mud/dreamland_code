@@ -95,6 +95,7 @@ Damage::Damage( Affect *paf, Character *victim, int dam_type, int dam, bitstring
     }
 
     init(attacker, victim, dam_type, dam, dam_flag);
+    fromAffect = true;
 }
 
 void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag)
@@ -110,6 +111,7 @@ void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitst
     blocked = false;
     deathReason = "damage";
     defenseBonus = 0;
+    fromAffect = false;
 }
 
 int fightspam_cast_depth = 0;
@@ -141,7 +143,7 @@ bool Damage::hit( bool show )
         && (ch->fighting != 0 || victim->fighting != 0 || fightspam_cast_depth > 0))
         ch->roundImmune |= 1u << dam_type;
 
-    if (show)
+    if (show && !(fromAffect && dam == 0 && !immune))
         message( );
 
     if (dam == 0)
