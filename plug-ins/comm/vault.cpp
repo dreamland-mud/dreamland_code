@@ -389,7 +389,8 @@ static DLString vault_type_summary_line( const std::vector<BankEntry> &entries, 
         if ( web && web->active( ) ) {
             DLString label = vault_type_label( item_table.value( tally[k].first ), lang )
                              + " (" + DLString( tally[k].second ) + ")";
-            int row = web->row( label, tally[k].first );
+            int row = web->row( label, tally[k].first,
+                                lmsg( lang, "filter by type", "фильтр по типу", "фільтр за типом" ) );
             web->action( row, "filter", cmdPrefix + " filter " + tally[k].first );
         }
     }
