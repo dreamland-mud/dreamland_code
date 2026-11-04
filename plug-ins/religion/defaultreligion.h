@@ -111,6 +111,8 @@ public:
     XML_VARIABLE XMLGlobalBitvector  classes;
     XML_VARIABLE XMLPointerNoEmpty<ReligionHelp> help;
     XML_VARIABLE XMLEnumeration sex;
+    // Who may follow: SEX_EITHER for anyone, else only that sex (sex above is the god's own).
+    XML_VARIABLE XMLEnumerationNoEmpty followerSex;
     XML_VARIABLE GodLikes likes;
     XML_VARIABLE XMLFlagsNoEmpty flags;
     XML_VARIABLE XMLEnumerationArray minstat, maxstat;
