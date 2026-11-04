@@ -1550,6 +1550,7 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
 {
     ostringstream buf;
     lang_t lang = Player::lang(ch);
+    DLString hint;
 
     if (eyes_darkened( ch )) {
         ch->pecho( _("Здесь слишком темно... ") );
@@ -1616,7 +1617,8 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
 
         // For screenreader / colourless clients, list the examinable extras
         // (empty for everyone else).
-        buf << look_targets_hint( ch, room->getExtraDescr(), lang );
+        hint = look_targets_hint( ch, room->getExtraDescr(), lang );
+        buf << hint;
     }
 
     // 'autoexit' is a player option again: the exits line is read out loud on
@@ -1627,8 +1629,13 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         ch->send_to( buf );
         show_exits_to_char( ch, room );
     }
-    else
+    else {
+        // The hint line has no trailing newline of its own: without the exits
+        // line after it, the first item in the room would be glued onto it.
+        if (!hint.empty( ))
+            buf << endl;
         ch->send_to( buf );
+    }
     
     show_list_to_char( room->contents, ch, false, false );
     show_people_to_char( room->people, ch, fShowMount );
