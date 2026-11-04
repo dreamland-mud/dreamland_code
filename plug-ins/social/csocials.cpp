@@ -21,6 +21,7 @@
 #include "screenreader.h"
 #include "def.h"
 #include "l10n.h"
+#include "websocketrpc.h"
 
 static const int SOCIAL_NAME_WIDTH = 12;
 
@@ -58,6 +59,22 @@ CMDRUN( socials )
 
     SocialManager::LoadedList::const_iterator i;
     const SocialManager::LoadedList &socials = SocialManager::getThis( )->getElements( );
+
+    WebList web(ch, "socials");
+    for (i = socials.begin( ); web.active( ) && i != socials.end( ); i++) {
+        const Social *s = i->getConstPointer<Social>( );
+        DLString label = s->getName( );
+
+        if (showNative)
+            label += " (" + s->getNameFor( lang ) + ")";
+        label += " -- " + s->getShortDescFor( lang );
+
+        int row = web.row( label, s->getName( ) );
+        web.action( row, "do", s->getName( ) );
+        web.action( row, "social_at", s->getName( ) );
+        web.action( row, "help", "help " + s->getName( ) );
+    }
+    web.send( );
 
     // No table for a screen reader: one social per line, read straight through.
     if (uses_screenreader( ch )) {
