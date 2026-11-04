@@ -22,6 +22,7 @@
 
 #include "def.h"
 #include "l10n.h"
+#include "websocketrpc.h"
 
 /*
  * 'commands'
@@ -232,12 +233,19 @@ static const HelpArticle * command_article(Character *ch, Command::Pointer &cmd,
  *  Command object carries them, but they are the first thing a newbie needs. */
 static const char * INPUT_OPERATORS[] = { "?", "!", "\\", "|", NULL };
 
+struct WebCommandRow {
+    DLString label;
+    DLString id;
+    int help;
+};
+
 static void show_commands_by_categories( Character *ch )
 {
     ostringstream buf;
     lang_t lang = Player::displayLang(ch);
     ArticleByKeyword index;
     map<DLString, StringList> grouped;
+    map<DLString, vector<WebCommandRow> > webGrouped;
 
     index_articles(ch, index);
 
@@ -260,6 +268,7 @@ static void show_commands_by_categories( Character *ch )
 
         grouped[category].push_back(
             fmt(0, "{hh%d%s{hx", article->getID(), cmd->getNameFor(lang).c_str()));
+        webGrouped[category].push_back({ cmd->getNameFor(lang), cmd->getName(), article->getID() });
     }
 
     for (int i = 0; INPUT_OPERATORS[i]; i++) {
@@ -273,7 +282,10 @@ static void show_commands_by_categories( Character *ch )
 
         grouped[category].push_back(
             fmt(0, "{hh%d%s{hx", article->getID(), INPUT_OPERATORS[i]));
+        webGrouped[category].push_back({ INPUT_OPERATORS[i], INPUT_OPERATORS[i], article->getID() });
     }
+
+    WebList web(ch, "commands");
 
     buf << fmt(ch, _("{WКоманды{x по разделам справки:"))
         << endl << endl;
@@ -288,7 +300,14 @@ static void show_commands_by_categories( Character *ch )
 
         buf << "{c" << help_category_name(key, lang) << ":{x "
             << g->second.join(" ") << endl;
+
+        for (auto &r: webGrouped[key]) {
+            int row = web.row(r.label, r.id, help_category_name(key, lang));
+            web.action(row, "help", "help " + DLString(r.help));
+        }
     }
+
+    web.send();
 
     buf << endl
         << fmt(ch, _("Полный список с описаниями: {y{hcкоманды список{x. "
@@ -313,6 +332,8 @@ static void show_commands_list( Character *ch )
         << "-------------+----------------------------------------------+---------------"
         << endl;
 
+    WebList web(ch, "commands");
+
     for (auto &c: commandManager->getCommands()) {
         Command::Pointer cmd = *c;
         
@@ -331,7 +352,12 @@ static void show_commands_list( Character *ch )
                         hint.c_str(),
                         aliases.c_str() )
             << endl;
+
+        int row = web.row(hint.empty() ? name : name + ": " + hint, cmd->getName());
+        web.action(row, "help", "help " + cmd->getName());
     }
+
+    web.send();
 
     buf << endl
         << fmt(ch, _("Таблица по разделам: {y{hcкоманды{x. "
