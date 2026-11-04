@@ -27,7 +27,7 @@ public:
     virtual ~PluginManager( );
 
     void unloadAll( );
-    void loadAll( );
+    void loadAll( bool keepGoing = false );
 
     void reload( const DLString &n );
     void reloadAll( );

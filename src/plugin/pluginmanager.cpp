@@ -3,6 +3,7 @@
  * ruffina, Dream Land, 2005
  */
 #include <fstream>
+#include <sstream>
 #include <errno.h>
 
 #include "xmllist.h"
@@ -79,17 +80,43 @@ void PluginManager::unloadAll( )
         unload( begin( )->first );
 }
 
-void PluginManager::loadAll( ) 
+void PluginManager::loadAll( bool keepGoing ) 
 {
     XMLListBase<XMLString> autoexec;
     XMLFile file( getTablePath( ) + '/' + PROFILE_NAME, "", &autoexec);
+    list<DLString> failed;
     
     if (!file.load( ))
         throw PluginException( "autoexec", strerror( errno ) );
     
     while (!autoexec.empty( )) {
-        load( autoexec.front( ) );
+        const DLString name = autoexec.front( );
         autoexec.pop_front( );
+
+        if (!keepGoing) {
+            load( name );
+            continue;
+        }
+
+        // On a live reload one bad plugin (e.g. an undefined symbol against a
+        // stale [descriptor]) must not leave every later plugin unloaded: that
+        // took the reboot/exec/reload servlets down with it and left the game
+        // unmanageable. Skip it and keep loading; its dependents fail the same
+        // way and are skipped too. Boot keeps failing fast.
+        try {
+            load( name );
+        } catch (const std::exception &e) {
+            LogStream::sendError( ) << "Plugin [" << name << "] failed to load, skipped: " << e.what( ) << endl;
+            failed.push_back( name );
+        }
+    }
+
+    if (!failed.empty( )) {
+        ostringstream buf;
+        for (list<DLString>::const_iterator f = failed.begin( ); f != failed.end( ); f++)
+            buf << " [" << *f << "]";
+        LogStream::sendFatal( ) << "Plugin reload incomplete, " << failed.size( )
+                                << " plugin(s) not loaded:" << buf.str( ) << ". Reboot." << endl;
     }
 }
 
@@ -97,13 +124,13 @@ void PluginManager::loadAll( )
 void PluginManager::reload( const DLString &n ) 
 {
     unload( n );
-    loadAll( );
+    loadAll( true );
 }
 
 void PluginManager::reloadAll( ) 
 {
     unloadAll( );
-    loadAll( );
+    loadAll( true );
 }
 
 void PluginManager::reloadNonCritical( ) 
@@ -120,7 +147,7 @@ void PluginManager::reloadNonCritical( )
         todo.pop_front( );
     }
 
-    loadAll( );
+    loadAll( true );
 }
 
 void PluginManager::reloadChanged( ) 
@@ -140,7 +167,7 @@ void PluginManager::reloadChanged( )
         todo.pop_front( );
     }
 
-    loadAll( );
+    loadAll( true );
 }
 
 class PluginReloadAllRequest : public PluginReloadRequest {
