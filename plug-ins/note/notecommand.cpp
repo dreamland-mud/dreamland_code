@@ -31,6 +31,7 @@
 #include "mudtags.h"
 #include "def.h"
 #include "l10n.h"
+#include "websocketrpc.h"
 
 void NoteCommand::setThread(NoteThread::Pointer thread)
 {
@@ -412,6 +413,7 @@ void NoteCommand::doList( PCharacter *ch, DLString &argument ) const
     NoteThread::NoteList mynotes;
     NoteThread::NoteList::const_iterator i;
     time_t stamp = thread->getStamp( ch );
+    WebList web( ch, "notes" );
     
     for (i = thread->xnotes.begin( ); i != thread->xnotes.end( ); i++)
         if ((*i)->isNoteTo( ch ) || (*i)->isNoteFrom( ch ))
@@ -430,6 +432,11 @@ void NoteCommand::doList( PCharacter *ch, DLString &argument ) const
                 if (ch->isCoder() && (*i)->getFlags().getValue() != 0)
                     buf << "  {D[" << (*i)->getFlags().names() << "]{x";
                 buf << endl;
+
+                int row = web.row( DLString( cnt ) + ". " + (*i)->getFrom( ) + ": " + (*i)->getSubject( ),
+                                   DLString( cnt ) );
+                web.data( row, "unread", !hidden );
+                web.action( row, "read", getName( ) + " read " + DLString( cnt ) );
             }
         }
     }
@@ -440,8 +447,10 @@ void NoteCommand::doList( PCharacter *ch, DLString &argument ) const
     
     if (buf.str( ).empty( ))
         ch->pecho( _("Не найдено ни одного сообщения.") );
-    else
+    else {
+        web.send( );
         page_to_char( buf.str( ).c_str( ), ch );
+    }
 }
 
 void NoteCommand::doRemove( PCharacter *ch, DLString &arguments )
