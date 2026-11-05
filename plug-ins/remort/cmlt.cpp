@@ -31,6 +31,7 @@
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
+#include "grammar_entities_impl.h"
 
 COMMAND(CMlt, "mlt")
 {
@@ -154,10 +155,8 @@ void CMlt::doShowSelf( PCharacter *ch )
             // that shifts every later conversion onto the wrong slot.
             str << fmt( ch,
                         _("     %1$N1 %2$N1, переродил%3$Gось|ся|ась в возрасте %4$d %4$Iгода|лет|лет"),
-                        (ch->getSex( ) == SEX_FEMALE ?
-                              race->getFemaleName( ).c_str( )
-                            : race->getMaleName( ).c_str( )),
-                        professionManager->find( life.classCh )->getRusName( ).c_str( ),
+                        race->getNameFor( ch, ch ).c_str( ),
+                        professionManager->find( life.classCh )->getNameFor( ch ).c_str( ),
                         ch,
                         age )
                 << endl;
