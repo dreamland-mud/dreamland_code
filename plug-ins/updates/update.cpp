@@ -50,6 +50,7 @@
 *        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 #include <sys/time.h>
+#include <algorithm>
 #include <jsoncpp/json/json.h>
 
 #include "lastlogstream.h"
@@ -1155,7 +1156,44 @@ static void obj_spill_stones( Object *obj, const char *trigName )
         gprog(trigName, "O", obj);
 }
 
+static bool oprog_area_fenia( Object *obj )
+{
+    FENIA_CALL( obj, "Area", "" )
+    return false;
+}
+
+static bool oprog_area_ndx( Object *obj )
+{
+    FENIA_NDX_CALL( obj, "Area", "O", obj )
+    return false;
+}
+
+static bool oprog_area_behavior( Object *obj )
+{
+    BEHAVIOR_CALL( obj, area )
+    return false;
+}
+
+// Diagnostic (2026-11-05, Trello frsSs5Vw): split oprog_area into its four layers and
+// attribute cost per prototype vnum, to tell a per-object dispatch wall (cost spread
+// over every object) from a few prototypes running heavy Area handlers.
+static long g_os_btrig = 0, g_os_fenia = 0, g_os_ndx = 0, g_os_behavior = 0;
+static map<int, long> g_os_byVnum;
+
+static bool oprog_area_layers( Object *obj );
+
 static bool oprog_area( Object *obj )
+{
+    // The handler may extract obj, so read the vnum first.
+    int vnum = obj->pIndexData->vnum;
+    struct timeval tv0;
+    gettimeofday( &tv0, 0 );
+    bool rc = oprog_area_layers( obj );
+    g_os_byVnum[vnum] += ms_us_since( tv0 );
+    return rc;
+}
+
+static bool oprog_area_layers( Object *obj )
 {
     // Layer 1 (the proto behaviors' Fenia triggers) builds its whole arg list before it
     // ever checks whether a behavior handles "Area" -- pure per-tick churn for the many
@@ -1167,14 +1205,31 @@ static bool oprog_area( Object *obj )
     static Scripting::IdRef onAreaId("onArea");
     static Scripting::IdRef postAreaId("postArea");
 
-    if (behaviors_have_trigger(obj->pIndexData->behaviors, onAreaId, postAreaId))
-        if (behavior_trigger(obj, "Area", "O", obj))
-            return true;
+    struct timeval tv;
+    gettimeofday( &tv, 0 );
 
-    FENIA_CALL( obj, "Area", "" )
-    FENIA_NDX_CALL( obj, "Area", "O", obj )
-    BEHAVIOR_CALL( obj, area )
-    return false;
+    if (behaviors_have_trigger(obj->pIndexData->behaviors, onAreaId, postAreaId))
+        if (behavior_trigger(obj, "Area", "O", obj)) {
+            g_os_btrig += ms_us_since( tv );
+            return true;
+        }
+    g_os_btrig += ms_us_since( tv );
+
+    if (oprog_area_fenia( obj )) {
+        g_os_fenia += ms_us_since( tv );
+        return true;
+    }
+    g_os_fenia += ms_us_since( tv );
+
+    if (oprog_area_ndx( obj )) {
+        g_os_ndx += ms_us_since( tv );
+        return true;
+    }
+    g_os_ndx += ms_us_since( tv );
+
+    bool rc = oprog_area_behavior( obj );
+    g_os_behavior += ms_us_since( tv );
+    return rc;
 }
 
 /*
@@ -1258,6 +1313,8 @@ void obj_update( void )
     // the affect decrement -- to decide whether an oprog_area precompute is worth it.
     // Logged once per call (~60s); lightweight, two gettimeofday() per section.
     struct timeval dtv0, dtv1;
+    g_os_btrig = g_os_fenia = g_os_ndx = g_os_behavior = 0;
+    g_os_byVnum.clear();
     long usOprog = 0, usAffects = 0, objCount = 0;
 
     for ( obj = object_list; obj != 0; obj = obj_next )
@@ -1514,7 +1571,21 @@ void obj_update( void )
 
     LogStream::sendNotice( ) << "ObjStat: objs=" << objCount
         << " oprog_area=" << (usOprog / 1000) << "ms"
-        << " affects=" << (usAffects / 1000) << "ms" << endl;
+        << " affects=" << (usAffects / 1000) << "ms"
+        << " btrig=" << (g_os_btrig / 1000) << "ms"
+        << " fenia=" << (g_os_fenia / 1000) << "ms"
+        << " ndx=" << (g_os_ndx / 1000) << "ms"
+        << " behavior=" << (g_os_behavior / 1000) << "ms" << endl;
+
+    vector<pair<long, int> > top;
+    for (auto &v: g_os_byVnum)
+        top.push_back(make_pair(v.second, v.first));
+    size_t n = min<size_t>(10, top.size());
+    partial_sort(top.begin(), top.begin() + n, top.end(), greater<pair<long, int> >());
+    ostringstream buf;
+    for (size_t i = 0; i < n; i++)
+        buf << " " << top[i].second << "=" << top[i].first << "us";
+    LogStream::sendNotice( ) << "ObjStatTop:" << buf.str() << endl;
 }
 
 
