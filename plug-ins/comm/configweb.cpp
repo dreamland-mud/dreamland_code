@@ -61,7 +61,8 @@ CONFIGURABLE_DECL(config, settings)
  * Who asked, and how recently
  *------------------------------------------------------------------------*/
 
-/** Deltas go only to a client that has asked for the schema. A player who never
+/** Deltas go only to a client that has asked for the schema, except
+ *  screenreader (see web_config_changed). A player who never
  *  opens the dialog costs the server nothing on the wire, which is the whole
  *  reason the values do not ride on the prompt any more.
  *
