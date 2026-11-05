@@ -246,6 +246,7 @@ static void show_commands_by_categories( Character *ch )
     ArticleByKeyword index;
     map<DLString, StringList> grouped;
     map<DLString, vector<WebCommandRow> > webGrouped;
+    WebList web(ch, "commands");
 
     index_articles(ch, index);
 
@@ -268,7 +269,8 @@ static void show_commands_by_categories( Character *ch )
 
         grouped[category].push_back(
             fmt(0, "{hh%d%s{hx", article->getID(), cmd->getNameFor(lang).c_str()));
-        webGrouped[category].push_back({ cmd->getNameFor(lang), cmd->getName(), article->getID() });
+        if (web.active())
+            webGrouped[category].push_back({ cmd->getNameFor(lang), cmd->getName(), article->getID() });
     }
 
     for (int i = 0; INPUT_OPERATORS[i]; i++) {
@@ -282,10 +284,9 @@ static void show_commands_by_categories( Character *ch )
 
         grouped[category].push_back(
             fmt(0, "{hh%d%s{hx", article->getID(), INPUT_OPERATORS[i]));
-        webGrouped[category].push_back({ INPUT_OPERATORS[i], INPUT_OPERATORS[i], article->getID() });
+        if (web.active())
+            webGrouped[category].push_back({ INPUT_OPERATORS[i], INPUT_OPERATORS[i], article->getID() });
     }
-
-    WebList web(ch, "commands");
 
     buf << fmt(ch, _("{WКоманды{x по разделам справки:"))
         << endl << endl;
