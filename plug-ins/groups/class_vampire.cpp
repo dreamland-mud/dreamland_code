@@ -29,7 +29,6 @@
 #include "save.h"
 #include "magic.h"
 #include "fight.h"
-#include "chance.h"
 #include "occupations.h"
 #include "onehit.h"
 #include "onehit_weapon.h"
