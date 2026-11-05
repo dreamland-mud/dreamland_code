@@ -30,6 +30,10 @@ long interpret_serial( )
 InterpretActorGuard::InterpretActorGuard( Character *ch )
         : saved( current_actor )
 {
+    // Only an outermost command gets a new serial: typed input reaches commands
+    // through InterpretHandler, not interpret(), and a nested call keeps its parent's.
+    if (!saved)
+        current_serial++;
     current_actor = ch;
 }
 
@@ -60,7 +64,6 @@ bool interpret( Character *ch, const char *line )
         return false;
 
     if (iargs.pCommand->dispatch( iargs ) == RC_DISPATCH_OK) {
-        current_serial++;
         InterpretActorGuard guard( ch );
         iargs.pCommand->entryPoint( ch, iargs.cmdArgs );
     }
