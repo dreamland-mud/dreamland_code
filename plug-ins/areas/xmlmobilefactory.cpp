@@ -223,11 +223,9 @@ XMLMobileFactory::init(const mob_index_data *mob)
     reviewed.setValue(reviewed_names(mob->reviewed));
 
     // Tier-derived numbers are never written back (plan §3.6 item 6).
-    hit.omit = mana.omit = damage.omit = ac.omit = mob->numbersDerived;
-    if (mob->numbersDerived) {
-        hitroll.setValue(0);
-        wealth.setValue(0);
-    }
+    hit.omit = mana.omit = damage.omit = ac.omit = true;
+    hitroll.setValue(0);
+    wealth.setValue(0);
 }
 
 mob_index_data *
@@ -331,11 +329,10 @@ XMLMobileFactory::compat(mob_index_data *mob)
     mob->tierStyle = tierStyle.getValue();
     mob->reviewed = reviewed_mask(reviewed.getValue());
 
-    // Authored numbers lose to the tier curve once mob_tiers.json is loaded
-    // (decision 8). Counted here, logged once per area by the loader.
-    if (MobBody::tiers().loaded
-        && (hit.number || hit.type || hit.bonus || mana.number || mana.type || mana.bonus
-            || damage.number || damage.type || damage.bonus || hitroll.getValue() || wealth.getValue()
-            || ac.pierce || ac.bash || ac.slash || ac.exotic))
+    // Authored numbers always lose to the tier curve (decision 8). Counted
+    // here, logged once per area by the loader.
+    if (hit.number || hit.type || hit.bonus || mana.number || mana.type || mana.bonus
+        || damage.number || damage.type || damage.bonus || hitroll.getValue() || wealth.getValue()
+        || ac.pierce || ac.bash || ac.slash || ac.exotic)
         ignoredNumbers++;
 }

@@ -3,9 +3,8 @@
  *
  * Holds the two world configs (fight/mob_forms.json, fight/mob_tiers.json,
  * loaded by the race plugin) and converts between the name-based resolver
- * (body.h) and the engine's bit tables. Both configs are optional: while one is
- * absent the engine keeps today's behaviour for whatever depends on it
- * (legacy race bodies, authored numbers).
+ * (body.h) and the engine's bit tables. Both configs are required: every race
+ * body and every prototype's numbers come from them.
  */
 #ifndef MOBBODY_H
 #define MOBBODY_H
@@ -16,15 +15,13 @@
 
 struct FlagTable;
 
-/** True only while fight/mob_forms.json is loaded (see merc.h). */
-extern bool mob_body_model_active;
 class GlobalBitvector;
 
 namespace MobBody {
 
-/** fight/mob_forms.json. forms().loaded is false while the file is absent. */
+/** fight/mob_forms.json. forms().loaded is false only after a failed first load. */
 Body::Config &forms();
-/** fight/mob_tiers.json. tiers().loaded is false while the file is absent. */
+/** fight/mob_tiers.json. tiers().loaded is false only after a failed first load. */
 MobTiers::Config &tiers();
 
 /** Bumped on every (re)load of either config; resolved caches compare against it. */

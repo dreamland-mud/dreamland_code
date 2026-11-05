@@ -153,6 +153,38 @@ int main(int argc, char **argv)
         failures++;
     }
 
+    // Race level: the unique race (no <forms>) resolves to a bare body that keeps
+    // its race wearlocs, with no warnings. Its mobs skip the resolver (formless rule).
+    {
+        Input in;
+        in.race.wearlocsAdd.insert("neck");
+        Result r = resolve(cfg, in);
+        if (!r.forms.empty() || !r.parts.empty() || !r.warnings.empty()
+                || !r.wearlocs.count("neck") || r.movetype != "slink") {
+            cout << "FAIL empty form list: " << r.warnings.size() << " warnings, "
+                 << r.parts.size() << " parts, movetype " << r.movetype << endl;
+            failures++;
+        }
+        // A config that failed to load resolves too, never crashes.
+        r = resolve(Config(), in);
+        if (!r.wearlocs.count("neck")) {
+            cout << "FAIL empty form list on an unloaded config" << endl;
+            failures++;
+        }
+    }
+
+    // An unloaded tier config still yields usable (minimal) centres.
+    {
+        MobTiers::Config none;
+        MobTiers::MobInfo m;
+        m.level = 30;
+        MobTiers::Centres c = none.centres(m);
+        if (none.loaded || c.hp < 1 || c.dmgAve < 1) {
+            cout << "FAIL unloaded tier config centres: hp " << c.hp << " dmg " << c.dmgAve << endl;
+            failures++;
+        }
+    }
+
     int cases = 0;
     for (const char *file: { "archetypes.json", "races.json" }) {
         Json::Value fx;

@@ -138,7 +138,7 @@ NMI_GET( MobIndexWrapper, tierStyle, "стиль тира (fortress, brute) из
     checkTarget( ); 
     return Register( target->tierStyle );
 }
-NMI_GET( MobIndexWrapper, moveverb, "глагол движения тела (galloping, crawling...), пусто для старой модели расы") 
+NMI_GET( MobIndexWrapper, moveverb, "глагол движения тела (galloping, crawling...), пусто для расы без форм (unique)") 
 { 
     checkTarget( ); 
     return Register( target->moveverb );

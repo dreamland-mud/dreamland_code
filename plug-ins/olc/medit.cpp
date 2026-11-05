@@ -110,7 +110,6 @@ static void copy_reform_fields(mob_index_data &to, const mob_index_data &from)
     to.tierName = from.tierName;
     to.tierStyle = from.tierStyle;
     to.tier = from.tier;
-    to.bodyResolved = from.bodyResolved;
     to.wearloc.setRegistry(from.wearloc.getRegistry());
     to.wearloc.set(from.wearloc);
     to.offAllowed = from.offAllowed;
@@ -121,7 +120,6 @@ static void copy_reform_fields(mob_index_data &to, const mob_index_data &from)
     to.bloodless = from.bloodless;
     to.edible = from.edible;
     to.canHoldCards = from.canHoldCards;
-    to.numbersDerived = from.numbersDerived;
     to.saves = from.saves;
     to.statCap = from.statCap;
 }
@@ -435,9 +433,8 @@ MEDIT(show)
         mob.tierName.empty() ? "{D(по умолчанию){x" : "");
     if (!mob.tierStyle.empty())
         ptc(ch, "{CTier style{x:  [{W%s{x] {D(tierstyle){x\n\r", mob.tierStyle.c_str());
-    if (mob.numbersDerived)
-        ptc(ch, "{DЧисла ниже -- центры тира (fight/mob_tiers.json), правка не сохраняется. Спасброски [%d], кап параметров [%d].{x\n\r",
-            mob.saves, mob.statCap);
+    ptc(ch, "{DЧисла ниже -- центры тира (fight/mob_tiers.json), правка не сохраняется. Спасброски [%d], кап параметров [%d].{x\n\r",
+        mob.saves, mob.statCap);
 
     ptc(ch, "{CRace{x:        [{W%s{x] {D(? race){x Sex: [{W%s{x] {D(? sex_table){x Number: [{W%s{x]\n\r",
         mob.race.c_str(), 
@@ -491,17 +488,14 @@ MEDIT(show)
     ptc(ch, "{CMaterial:{x    [{W%s{x] {D(? material){x\n\r", mob.material.c_str());
     ptc(ch, "{CForm:{x        [{W%s{x] {D(? form_flags){x\n\r", form_flags.names(mob.form).c_str());
     ptc(ch, "{CParts:{x       [{W%s{x] {D(? part_flags){x\n\r", part_flags.names(mob.parts).c_str());
-    ptc(ch, "{CBody:{x        [{W%s{x] слоты [{W%s{x]\n\r",
-        mob.bodyResolved ? "из форм расы" : "старая модель расы", mob.wearloc.toString().c_str());
+    ptc(ch, "{CBody:{x        слоты [{W%s{x]\n\r", mob.wearloc.toString().c_str());
     // No %f here: the act formatters pull every vararg as a union, and a double
     // travels in an FP register, so %f reads garbage and the next %s crashes.
     // No %02d either: the formatter pads with spaces, not zeros.
-    if (mob.bodyResolved) {
-        int cents = mob.formAcPct % 100;
-        DLString acMult = DLString(mob.formAcPct / 100) + "." + (cents < 10 ? "0" : "") + DLString(cents);
-        ptc(ch, "             походка [{W%s{x] броня тела [{Wx%s{x] атаки разрешены [{W%s{x]\n\r",
-            mob.moveverb.c_str(), acMult.c_str(), off_flags.names(mob.offAllowed).c_str());
-    }
+    int cents = mob.formAcPct % 100;
+    DLString acMult = DLString(mob.formAcPct / 100) + "." + (cents < 10 ? "0" : "") + DLString(cents);
+    ptc(ch, "             походка [{W%s{x] броня тела [{Wx%s{x] атаки разрешены [{W%s{x]\n\r",
+        mob.moveverb.c_str(), acMult.c_str(), off_flags.names(mob.offAllowed).c_str());
     if (mob.reviewed)
         ptc(ch, "{CReviewed:{x    [{W%s{x] {D(reviewed){x\n\r", mob_reviewed_names(mob.reviewed).c_str());
 
@@ -1035,7 +1029,7 @@ MEDIT(tier)
     if (arg_is_strict(arg, "default")) {
         mob.tierName.clear();
     } else {
-        int t = tc.loaded ? tc.parse(arg) : MobTiers::Config().parse(arg);
+        int t = tc.parse(arg);
         if (!t && arg.isNumber()) {
             int n = arg.toInt();
             if (n >= MobTiers::TIER_BEST && n <= MobTiers::TIER_WORST)
@@ -1067,7 +1061,7 @@ MEDIT(tierstyle)
     if (arg_is_strict(arg, "none")) {
         mob.tierStyle.clear();
     } else {
-        if (tc.loaded && !tc.styles.count(arg)) {
+        if (!tc.styles.count(arg)) {
             stc("Нет такого стиля (fight/mob_tiers.json, styles).\n\r", ch);
             return false;
         }

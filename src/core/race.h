@@ -67,8 +67,6 @@ public:
     virtual DLString getNameFor( Character *looker, Character *me ) const;
 
     // Mob reform body model (plan docs/plans/mob-reform.md §3.4, §3.6 item 2).
-    /** True when the race describes its body with <forms> and mob_forms.json is loaded. */
-    virtual bool hasBodyForms( ) const;
     /** Forms, size, race add/del and move verb for the body resolver. */
     virtual void getBodyInput( Body::Input &, bool npc ) const;
     /** Race default damage type (weapon_flags), 0 when unset. */

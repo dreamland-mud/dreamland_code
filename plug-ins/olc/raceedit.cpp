@@ -138,33 +138,26 @@ void OLCStateRace::show( PCharacter *ch )
     ptc(ch, "Иммунитет:     {Y%s{x {D(imm){x\r\n", show_flag(r->imm).c_str());
     ptc(ch, "Сопротивл:     {Y%s{x {D(res){x\r\n", show_flag(r->res).c_str());
     ptc(ch, "Уязвимость:    {Y%s{x {D(vuln){x\r\n", show_flag(r->vuln).c_str());
-    ptc(ch, "Форма тела:    {Y%s{x {D(form){x\r\n", show_flag(r->form).c_str());
-    ptc(ch, "Части тела:    {Y%s{x {D(parts){x\r\n", show_flag(r->parts).c_str());
     ptc(ch, "Параметры:     {Y%s{x %s {D(stats help){x\r\n", 
             show_enum_array_web(r->stats).c_str(),
             web_edit_button(ch, "stats", "").c_str());
 
     ptc(ch, "Размер:        {Y%s{x {D(size){x\r\n", show_enum(r->size).c_str());
-    ptc(ch, "Слоты:         {Y%s{x {D(wearloc){x\r\n", r->wearloc.toString().c_str());
 
-    if (!r->forms.empty()) {
-        ptc(ch, "{WМодель тела{x:  формы [{Y%s{x] {D(forms)%s{x\r\n", r->forms.c_str(),
-            r->hasBodyForms() ? "" : " - mob_forms.json не загружен, действуют form/parts/wearloc");
-        ptc(ch, "  +части {Y%s{x {D(partsadd){x  -части {Y%s{x {D(partsdel){x\r\n",
-            show_flag(r->partsAdd).c_str(), show_flag(r->partsDel).c_str());
-        ptc(ch, "  -поведение {Y%s{x -атаки {Y%s{x -аффекты {Y%s{x -обнаружение {Y%s{x {D(actdel offdel affdel detdel){x\r\n",
-            show_flag(r->actDel).c_str(), show_flag(r->offDel).c_str(),
-            show_flag(r->affDel).c_str(), show_flag(r->detDel).c_str());
-        ptc(ch, "  -иммунитет {Y%s{x -сопротивл {Y%s{x -уязвимость {Y%s{x {D(immdel resdel vulndel){x\r\n",
-            show_flag(r->immDel).c_str(), show_flag(r->resDel).c_str(), show_flag(r->vulnDel).c_str());
-        if (r->hasBodyForms()) {
-            ptc(ch, "  {DИтог:{x части {G%s{x\r\n", show_flag(r->getParts()).c_str());
-            ptc(ch, "        формы {G%s{x\r\n", show_flag(r->getForm()).c_str());
-            ptc(ch, "        слоты {G%s{x\r\n", r->getWearloc().toString().c_str());
-            ptc(ch, "        атаки {G%s{x поведение {G%s{x\r\n",
-                show_flag(r->getOff()).c_str(), show_flag(r->getAct()).c_str());
-        }
-    }
+    ptc(ch, "{WМодель тела{x:  формы [{Y%s{x] {D(forms){x\r\n", r->forms.empty() ? "-" : r->forms.c_str());
+    ptc(ch, "  +части {Y%s{x {D(partsadd){x  -части {Y%s{x {D(partsdel){x\r\n",
+        show_flag(r->partsAdd).c_str(), show_flag(r->partsDel).c_str());
+    ptc(ch, "  -поведение {Y%s{x -атаки {Y%s{x -аффекты {Y%s{x -обнаружение {Y%s{x {D(actdel offdel affdel detdel){x\r\n",
+        show_flag(r->actDel).c_str(), show_flag(r->offDel).c_str(),
+        show_flag(r->affDel).c_str(), show_flag(r->detDel).c_str());
+    ptc(ch, "  -иммунитет {Y%s{x -сопротивл {Y%s{x -уязвимость {Y%s{x {D(immdel resdel vulndel){x\r\n",
+        show_flag(r->immDel).c_str(), show_flag(r->resDel).c_str(), show_flag(r->vulnDel).c_str());
+    ptc(ch, "  {DИтог:{x части {G%s{x\r\n", show_flag(r->getParts()).c_str());
+    ptc(ch, "        формы {G%s{x\r\n", show_flag(r->getForm()).c_str());
+    ptc(ch, "        слоты {G%s{x\r\n", r->getWearloc().toString().c_str());
+    ptc(ch, "        атаки {G%s{x поведение {G%s{x\r\n",
+        show_flag(r->getOff()).c_str(), show_flag(r->getAct()).c_str());
+
     ptc(ch, "Удар:          {Y%s{x {D(damtype){x  материал {Y%s{x {D(material){x\r\n",
         show_enum(r->damtype).c_str(), r->material.empty() ? "-" : r->material.c_str());
     ptc(ch, "Множители:     здоровье {Y%s{x {D(hpmult){x урон {Y%s{x {D(dmgmult){x  походка {Y%s{x {D(moveverb){x\r\n",
@@ -273,14 +266,6 @@ RACEEDIT(vuln, "уязвимость", "флаги уязвимости (? vuln_
 {
     return flagBitsEdit(getOriginal()->vuln);
 }
-RACEEDIT(form, "форма", "формы тела (? form_flags)")
-{
-    return flagBitsEdit(getOriginal()->form);
-}
-RACEEDIT(parts, "части", "части тела (? part_flags)")
-{
-    return flagBitsEdit(getOriginal()->parts);
-}
 RACEEDIT(forms, "формы", "модель тела: список форм из fight/mob_forms.json")
 {
     return editor(argument, getOriginal()->forms, ED_NO_NEWLINE);
@@ -348,10 +333,6 @@ RACEEDIT(spec, "спец", "спецфункция мобов расы, если
 RACEEDIT(size, "размер", "размеры (? size_table)")
 {
     return flagValueEdit(getOriginal()->size);
-}
-RACEEDIT(wearloc, "слоты", "слоты экипировки (? wearloc)")
-{
-    return globalBitvectorEdit<Wearlocation>(getOriginal()->wearloc);
 }
 RACEEDIT(affects, "воздействия", "список умений - воздействий на расе (? spell)")
 {

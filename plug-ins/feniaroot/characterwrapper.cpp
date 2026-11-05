@@ -279,11 +279,11 @@ NMI_SET( CharacterWrapper, tier, "задать тир экземпляру мо�
     target->getNPC()->tier = t;
 }
 
-NMI_GET( CharacterWrapper, normalHit, "здоровье обычного (normal) моба этого уровня по fight/mob_tiers.json, 0 для игроков и без файла тиров" )
+NMI_GET( CharacterWrapper, normalHit, "здоровье обычного (normal) моба этого уровня по fight/mob_tiers.json, 0 для игроков" )
 {
     checkTarget();
     const MobTiers::Config &tc = MobBody::tiers();
-    if (!target->is_npc() || !tc.loaded)
+    if (!target->is_npc())
         return Register( 0 );
     // Breath and other hp-scaled attacks read this instead of the mob's own hp,
     // so a tier makes a mob tougher without multiplying its burst damage too.
@@ -612,7 +612,7 @@ NMI_INVOKE( CharacterWrapper, setLevel, "(level): установить уров�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, applyTier, "(level, tier): числа моба как у свежего моба этого уровня и тира по fight/mob_tiers.json (hp, урон, хитролл, AC, мана, сейвы, кап статов); false без файла тиров" )
+NMI_INVOKE( CharacterWrapper, applyTier, "(level, tier): числа моба как у свежего моба этого уровня и тира по fight/mob_tiers.json (hp, урон, хитролл, AC, мана, сейвы, кап статов); всегда true" )
 {
     checkTarget();
     CHK_PC
@@ -620,7 +620,8 @@ NMI_INVOKE( CharacterWrapper, applyTier, "(level, tier): числа моба к�
     if (args.size( ) < 2)
         throw Scripting::NotEnoughArgumentsException( );
 
-    return Register( apply_mob_tier( target->getNPC( ), argnum2number( args, 1 ), argnum2number( args, 2 ) ) );
+    apply_mob_tier( target->getNPC( ), argnum2number( args, 1 ), argnum2number( args, 2 ) );
+    return Register( true );
 }
 
 NMI_GET( CharacterWrapper, short_descr, "короткое описание моба" )
@@ -6448,13 +6449,9 @@ static void ga_modelHitroll( Character *target, GAWeights &w )
 
     const MobTiers::Config &tc = MobBody::tiers( );
     int level = target->getModifyLevel( );
-    double mobArmor = 0;
-
-    if (tc.loaded) {
-        MobTiers::MobInfo mob;
-        mob.level = level;
-        mobArmor = -tc.centres( mob ).ac * 10;
-    }
+    MobTiers::MobInfo mob;
+    mob.level = level;
+    double mobArmor = -tc.centres( mob ).ac * 10;
 
     Wearlocation *wieldLoc = wearlocationManager->findExisting( "wield" );
     ::Object *wep = wieldLoc ? wieldLoc->find( target ) : 0;
