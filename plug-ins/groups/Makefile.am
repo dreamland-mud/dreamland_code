@@ -15,7 +15,6 @@ $(INCLUDES_SRC)
 
 libgenericskill_la_SOURCES = \
 impl_genericskill.cpp \
-chance.cpp \
 dreamskill.cpp \
 genericskill.cpp 
 
@@ -55,7 +54,6 @@ libgenericskill.la
 libclass_skills_la_SOURCES = \
 impl_classes.cpp \
 class_antipaladin.cpp \
-class_ninja.cpp \
 class_ranger.cpp \
 class_thief.cpp \
 class_vampire.cpp \

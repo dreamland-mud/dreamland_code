@@ -41,7 +41,6 @@
 #include "move_utils.h"
 #include "doors.h"
 #include "arg_utils.h"
-#include "chance.h"
 #include "exitsmovement.h"
 #include "keyhole.h"
 #include "string_utils.h"
