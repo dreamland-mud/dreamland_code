@@ -339,29 +339,29 @@ void XMLAttributeSpeedWalk::show(PCharacter *ch) const
         return;
     }
 
-    // Speedwalk is kept in enhanced mode: replace nnn with 3n.
+    // Speedwalk is kept in enhanced mode: replace nnn with 3n. A capital letter
+    // (run to the end) never takes a count, since 'run' refuses '2N', so each
+    // one is written out as is. That is also why collate_speedwalk() from the
+    // 'traverse' plugin can't be used here.
     DLString collated;
-    char last_letter = path.at(0);
-    int cnt = 0;
 
-    // TODO: use collate_speedwalk() from the 'traverse' plugin.
-    for (size_t i = 0; i < path.size(); i++) {
-        if (path.at(i) == last_letter && isSmallLetter(last_letter)) {
-            cnt++;
+    for (size_t i = 0; i < path.size(); ) {
+        char letter = path.at(i);
+        size_t next = i;
+
+        for (; next < path.size() && path.at(next) == letter; next++)
+            ;
+
+        if (isSmallLetter(letter)) {
+            if (next - i > 1) // Don't show '1n', just 'n'.
+                collated << (int)(next - i);
+            collated << letter;
         } else {
-            if (cnt > 1) // Don't show '1n', just 'n'.
-                collated << cnt;
-            collated << last_letter;
-            last_letter = path.at(i);
-            cnt = 1;
+            for (size_t k = i; k < next; k++)
+                collated << letter;
         }
-    }
 
-    // Add last remaining letter from the path.
-    if (isSmallLetter(last_letter)) {
-        if (cnt > 1)
-            collated << cnt;
-        collated << last_letter;
+        i = next;
     }
         
     if (ch->isCoder())

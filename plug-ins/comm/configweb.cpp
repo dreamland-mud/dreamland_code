@@ -240,7 +240,9 @@ void web_config_changed( PCharacter *ch, const DLString &key, const Json::Value 
     if (!ch || !config_web_playing(ch))
         return;
 
-    if (config_web_asked.count(ch->getName()) == 0)
+    // The screen reader switch also drives reading aids outside the dialog,
+    // so a client hears about it whether or not the dialog was ever opened.
+    if (config_web_asked.count(ch->getName()) == 0 && key != "screenreader")
         return;
 
     Json::Value body;
