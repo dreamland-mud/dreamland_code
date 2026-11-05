@@ -4592,6 +4592,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
                             const GAGrantCtx *grants = 0, int *svsDelta = 0 )
 {
     int m = af.modifier;
+    int noted = m;   // raw amount filed with the term; a skill boost files the headroom it uses
     double s0 = s;
     switch (af.location) {
     case APPLY_MANA_GAIN:
@@ -4667,12 +4668,16 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
         bool isSkill = !af.global.empty( ) && af.global.getRegistry( ) == skillManager;
         bool isGroup = !af.global.empty( ) && af.global.getRegistry( ) == skillGroupManager;
         if (isSkill) {
+            noted = 0;
             if (target != 0)
                 for (int sn: af.global.toArray( )) {
                     int eff = ga_skillBefore( target, sn, worn, m );
                     int room = 100 - eff;
-                    if (eff > 0 && room > 0)
-                        s += w.learnSkill * item_learn_skill_mult( sn ) * (m < room ? m : room);
+                    if (eff > 0 && room > 0) {
+                        int gain = m < room ? m : room;
+                        s += w.learnSkill * item_learn_skill_mult( sn ) * gain;
+                        noted = std::max( noted, gain );
+                    }
                 }
         }
         else if (isGroup) {
@@ -4686,6 +4691,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
                 for (int gi: af.global.toArray( ))
                     groups.insert( gi );
                 double perSkill = 0;
+                int perGain = 0;
                 bool owns = false;
                 for (int i = 0; i < skillManager->size( ); i++) {
                     Skill *sk = skillManager->find( i );
@@ -4699,13 +4705,22 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
                         continue;
                     owns = true;
                     int room = 100 - eff;
-                    if (room > 0)
-                        perSkill += w.learnSkill * item_learn_skill_mult( i ) * (m < room ? m : room);
+                    if (room > 0) {
+                        int gain = m < room ? m : room;
+                        perSkill += w.learnSkill * item_learn_skill_mult( i ) * gain;
+                        perGain = std::max( perGain, gain );
+                    }
                 }
                 if (owns) {
                     int cap = 25 + 3 * ga_remorts( target );
                     double flat = w.learnGroup * (m < cap ? m : cap);
-                    s += m > 0 && perSkill < flat ? perSkill : flat;
+                    if (m > 0 && perSkill < flat) {
+                        s += perSkill;
+                        noted = perGain;
+                    } else {
+                        s += flat;
+                        noted = m < cap ? m : cap;
+                    }
                 }
             }
         }
@@ -4717,7 +4732,7 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     }
     // APPLY_AGE: cosmetic in score, no combat effect -- deliberately unscored.
     }
-    ga_note( ga_termKey( af ), s - s0, m );
+    ga_note( ga_termKey( af ), s - s0, noted );
 
     // Flag affects: sanctuary/haste/stealth (affect_flags) and resist/immune/vuln
     // (res/imm/vuln_flags) live in the affect's bitvector, not location/modifier.
@@ -6328,8 +6343,9 @@ static Character * ga_rootCarrier( ::Object *o )
 // Difficulty band 0 easy / 1 medium / 2 hard / 3 deadly. Single source of truth: the
 // Fenia render only names and colours it. Quests are always medium. The guard is read
 // as guard level plus its tier's extra levels (ga_effGuard), and the tier sets a floor:
-// an elite is never easy, a champion is at least hard, a boss or a legend is deadly.
-// Deadly is also any fight 15+ effective levels above the char.
+// an elite is never easy, a champion is at least hard, a boss or a legend is deadly --
+// unless the char is 10+ levels above the boss's real level, where only the +40 band
+// math speaks. Deadly is also any fight 15+ effective levels above the char.
 static int ga_band( int method, int guard, int tier, int chLevel, int aggros, int doors, int fly )
 {
     if (method == GA_QUEST || method == GA_UNKNOWN)   // no known route -> not "easy"
@@ -6344,7 +6360,7 @@ static int ga_band( int method, int guard, int tier, int chLevel, int aggros, in
         band = 0;
     else
         band = 1;
-    int floor = tier <= 2 ? 3 : tier <= 3 ? 2 : tier <= 5 ? 1 : 0;
+    int floor = tier <= 2 ? (chLevel >= guard + 10 ? 0 : 3) : tier <= 3 ? 2 : tier <= 5 ? 1 : 0;
     return std::max( band, floor );
 }
 
