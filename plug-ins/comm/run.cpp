@@ -10,7 +10,10 @@
 #include "door_utils.h"
 
 
+#include "jsoncpp/json/json.h"
+
 #include "commandtemplate.h"
+#include "descriptor.h"
 #include "pcharacter.h"
 #include "room.h"
 #include "dlscheduler.h"
@@ -315,11 +318,26 @@ void SpeedWalkUpdateTask::after( )
  * XMLAttributeSpeedWalk 
  *----------------------------------------------------------------------------*/
 
+/** Tell a web client what is left of the run, so it can offer to resume it
+ *  without reading the text line. An empty path means the run is over. */
+static void run_web_send(PCharacter *ch, const DLString &collated)
+{
+    if (!ch->desc)
+        return;
+
+    Json::Value frame;
+    frame["command"] = "run_left";
+    frame["args"][0]["path"] = collated;
+    ch->desc->writeWSCommand(frame);
+}
+
 /** Display remaining path to the player, if any. */
 void XMLAttributeSpeedWalk::show(PCharacter *ch) const
 {
-    if (path.empty())
+    if (path.empty()) {
+        run_web_send(ch, DLString::emptyString);
         return;
+    }
 
     // Speedwalk is kept in enhanced mode: replace nnn with 3n.
     DLString collated;
@@ -351,6 +369,8 @@ void XMLAttributeSpeedWalk::show(PCharacter *ch) const
 
     if (!collated.empty())
         ch->pecho(_("Тебе оставалось бежать: {hs{c%s{x"), collated.c_str());
+
+    run_web_send(ch, collated);
 }
 
 char XMLAttributeSpeedWalk::getFirstCommand( ) const

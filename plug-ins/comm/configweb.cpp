@@ -547,8 +547,13 @@ void ConfigWebStateListener::run( int oldState, int newState, Descriptor *d )
     if (newState == CON_PLAYING) {
         Json::Value body;
         body["playing"] = 1;
-        if (pch)
+        if (pch) {
             body["who"] = pch->getName();
+            // A screen reader client switches its reading aids on from this
+            // without the dialog ever being opened. Read after the account
+            // config has landed: see the listener order in impl.cpp.
+            body["screenreader"] = IS_SET(pch->config, CONFIG_SCREENREADER) ? 1 : 0;
+        }
 
         config_web_send(d->character, "config_state", body);
         return;

@@ -79,6 +79,37 @@ static void json_lang_area( Json::Value &j, const char *key, AreaIndexData *pAre
     }
 }
 
+/** Same, for a set of flags such as the weapon's special attacks. */
+static void json_lang_flags( Json::Value &j, const char *key,
+                             const FlagTable &table, bitstring_t bits )
+{
+    static const lang_t langs[3] = { RU, EN, UA };
+    static const char * const suffix[3] = { "", "En", "Ua" };
+
+    for (int i = 0; i < 3; i++)
+        j[( DLString( key ) + suffix[i] ).c_str( )] = table.messages( bits, false, '1', langs[i] );
+}
+
+/** Armor class against each damage kind: the armor's own values plus any
+ *  armor class affect, signed so that more is better (an AC affect of -5 adds
+ *  5). Zero for anything that is not armor and has no such affect. */
+static void json_armor_class( Json::Value &j, OBJ_INDEX_DATA *pObj )
+{
+    static const char * const keys[4] = { "ac_pierce", "ac_bash", "ac_slash", "ac_exotic" };
+    int apply = 0;
+
+    for (auto &paf: pObj->affected)
+        if (paf->location == APPLY_AC)
+            apply -= paf->modifier;
+
+    for (int i = 0; i < 4; i++) {
+        int ac = apply;
+        if (pObj->item_type == ITEM_ARMOR)
+            ac += pObj->value[i];
+        j[keys[i]] = ac;
+    }
+}
+
 static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData *&pArea, XMLMultiString &where)
 {
     int mobVnum = -1;
@@ -442,13 +473,16 @@ public:
                 a["stat_con"] = con;
                 a["stat_cha"] = cha;
                 a["align"] = align;
+                json_armor_class(a, pObj);
             } else {
                 a["hr"] = a["dr"] = a["hp"] = 
                 a["mana"] = a["move"] = a["saves"] = 
                 a["stat_str"] = a["stat_int"] = 
                 a["stat_wis"] = a["stat_dex"] = 
                 a["stat_con"] = a["stat_cha"] = 
-                a["align"] = "-";
+                a["align"] = 
+                a["ac_pierce"] = a["ac_bash"] = 
+                a["ac_slash"] = a["ac_exotic"] = "-";
             }
 
             json_lang_area(a, "area", pArea);
@@ -495,7 +529,6 @@ public:
 
             // Format weapon class, special flags and damage.
             DLString weaponClass = weapon_class.name( pObj->value[0] );
-            DLString special = weapon_type2.messages( pObj->value[4] );
             int d1 = pObj->value[1];
             int d2 = pObj->value[2];
             int ave = weapon_ave(pObj);
@@ -557,7 +590,7 @@ public:
 
             // For 'noident' items only show a subset of fields.
             if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
-                w["special"] = special;
+                json_lang_flags(w, "special", weapon_type2, pObj->value[4]);
                 w["d1"] = d1;
                 w["d2"] = d2;
                 w["ave"] = ave;
@@ -573,7 +606,7 @@ public:
                 w["stat_con"] = con;
                 w["align"] = align;
             } else {
-                w["special"] = 
+                w["special"] = w["specialEn"] = w["specialUa"] = 
                 w["d1"] = w["d2"] = w["ave"] = 
                 w["hr"] = w["dr"] = w["hp"] = 
                 w["mana"] = w["saves"] = 
