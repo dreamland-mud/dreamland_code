@@ -78,10 +78,6 @@ GSN(wanted);
 
 #define MOB_VNUM_STALKER           15
 #define OBJ_VNUM_DEPUTY_BADGE      70
-#define OBJ_VNUM_RULER_SHIELD1     71
-#define OBJ_VNUM_RULER_SHIELD2     72
-#define OBJ_VNUM_RULER_SHIELD3     73
-#define OBJ_VNUM_RULER_SHIELD4     74
 
 /*--------------------------------------------------------------------------
  * Ruler's Old Man
@@ -1696,55 +1692,6 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
 
   obj_to_char(badge,ch);
   wear_obj( ch, badge, 0 );
-}
-
-
-
-
-SPELL_DECL(ShieldOfRuler);
-VOID_SPELL(ShieldOfRuler)::run( Character *ch, const DLString&, int sn, int level ) 
-{ 
-  int shield_vnum;
-  Object *shield;
-  Affect af;
-
-  if (level >= 71)
-    shield_vnum = OBJ_VNUM_RULER_SHIELD4;
-  else if (level >= 51)
-    shield_vnum = OBJ_VNUM_RULER_SHIELD3;
-  else if (level >= 31)
-    shield_vnum = OBJ_VNUM_RULER_SHIELD2;
-  else shield_vnum = OBJ_VNUM_RULER_SHIELD1;
-
-  shield = create_object( get_obj_index(shield_vnum), level );
-  shield->timer = level;
-  shield->cost  = 0;
-  obj_to_char(shield, ch);
-
-  af.type         = sn;
-  af.level        = level;
-  af.duration     = -1;
-
-  af.modifier     = ( level / 8 );
-  af.location = APPLY_HITROLL;
-  affect_to_obj( shield, &af);
-
-  af.location = APPLY_DAMROLL;
-  affect_to_obj( shield, &af);
-
-  af.modifier     = ( -level * 2 );
-  af.location = APPLY_AC;
-  affect_to_obj( shield, &af);
-
-  af.modifier     = ( max( 1, level /  30 ) );
-  af.location = APPLY_CHA;
-  affect_to_obj( shield, &af);
-
-  oldact_p(_("Ты взмахиваешь руками и создаешь $o4!"),
-         ch,shield,0,TO_CHAR,POS_RESTING);
-  oldact_p(_("$c1 взмахивает руками и создает $o4!"),
-         ch,shield,0,TO_ROOM,POS_RESTING);
-
 }
 
 

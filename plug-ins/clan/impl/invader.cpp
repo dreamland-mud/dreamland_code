@@ -48,7 +48,6 @@ GSN(energy_drain);
 GSN(fade);
 GSN(golden_aura);
 GSN(plague);
-GSN(shadow_cloak);
 GSN(shadow_shroud);
 GSN(soul_lust);
 GSN(spellbane);
@@ -101,93 +100,6 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, const DLString &args, int sn, int
     ch->in_room = victim->in_room;
     interpret_raw(ch, "look", "auto");
     ch->in_room = was_in;
-}
-
-SPELL_DECL(ShadowCloak);
-VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level)
-{
-    Affect af;
-    DLString msgChar, msgVict;
-
-    if (ch->is_npc() || victim->is_npc() || ch->getClan() != victim->getClan())
-    {
-        ch->pecho(_("Это заклинание ты можешь произнести только на члена твоего клана."));
-        return;
-    }
-
-    if (gsn_shadow_shroud->usable(ch))
-    {
-        msgVict = "Призрачная мантия окутывает тебя. Ты погружаешься во тьму.";
-        msgChar = "%2$C1 окутывается тьмой.";
-        sn = gsn_shadow_shroud;
-    }
-    else if (gsn_soul_lust->usable(ch))
-    {
-        msgVict = "В тебе загорается огонь, жаждущий душ ангелов.";
-        msgChar = "В %2$C6 загорается огонь, жаждущий душ ангелов.";
-        sn = gsn_soul_lust;
-    }
-    else
-    {
-        msgVict = "Призрачная мантия окутывает тебя.";
-        msgChar = "Призрачная мантия окутывает %2$C4.";
-    }
-
-    // A reformed clan's caster of the other archetype adds their variant on top of
-    // the one already worn. The cloak's own stats come with the first cast only.
-    bool addVariant = clan_is_reformed(*ch->getClan())
-        && ((sn == gsn_soul_lust && victim->affected.find(gsn_shadow_shroud))
-            || (sn == gsn_shadow_shroud && victim->affected.find(gsn_soul_lust)))
-        && !victim->isAffected(sn);
-
-    if (addVariant)
-    {
-        // The marker ends with the variant it joins, or it would outlive the
-        // cloak's stats and block a full recast until it ran out.
-        Affect *joined = victim->affected.find(sn == gsn_soul_lust ? gsn_shadow_shroud : gsn_soul_lust);
-
-        af.type = sn;
-        af.level = level;
-        af.duration = joined ? joined->duration.getValue( ) : 24;
-        affect_to_char(victim, &af);
-
-        victim->pecho(_(msgVict), ch, victim);
-        if (ch != victim)
-            ch->pecho(_(msgChar), ch, victim);
-        return;
-    }
-
-    if (victim->isAffected(gsn_soul_lust))
-    {
-        ch->pecho(ch == victim ? _("Жажда душ уже горит в тебе.") : _("Жажда душ уже горит в %C6."), victim);
-        return;
-    }
-
-    if (victim->isAffected(sn) || victim->isAffected(gsn_shadow_shroud) || victim->isAffected(gsn_shadow_cloak))
-    {
-        ch->pecho(ch == victim ? _("Призрачная мантия уже защищает тебя.") : _("Призрачная мантия уже защищает %C4."), victim);
-        return;
-    }   
-
-    af.type = sn;
-    af.level = level;
-    af.duration = 24;
-
-    af.bitvector.setTable(&detect_flags);
-    af.bitvector.setValue(DETECT_GOOD | DETECT_FADE);
-    af.location = APPLY_SAVING_SPELL;
-    af.modifier = (0 - level / 9);
-    affect_to_char(victim, &af);
-
-    af.bitvector.setTable(&affect_flags);
-    af.bitvector.setValue(IS_AFFECTED(victim, AFF_PROTECT_GOOD) ? 0 : AFF_PROTECT_GOOD);
-    af.modifier = (-level * 5 / 2);
-    af.location = APPLY_AC;
-    affect_to_char(victim, &af);
-
-    victim->pecho(_(msgVict), ch, victim);
-    if (ch != victim)
-        ch->pecho(_(msgChar), ch, victim);
 }
 
 SPELL_DECL(Shadowlife);
