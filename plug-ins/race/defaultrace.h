@@ -108,7 +108,6 @@ public:
 
     XML_VARIABLE XMLFlagsNoEmpty         det;
     XML_VARIABLE XMLFlagsNoEmpty         act;
-    XML_VARIABLE XMLFlagsNoEmpty         aff;
     XML_VARIABLE XMLFlagsNoEmpty         off;
     XML_VARIABLE XMLFlagsNoEmpty         imm, res, vuln;
     XML_VARIABLE XMLFlagsNoEmpty         form;
@@ -132,7 +131,7 @@ public:
 
     // Mob reform body model. With <forms> present and fight/mob_forms.json
     // loaded, <form>, <parts> and <wearloc> above are ignored, the act/aff/det/
-    // off/imm/res/vuln sets above are the race's own adds on top of its forms,
+    // off/imm/res/vuln sets are the race's own adds on top of its forms,
     // and the getters return the resolved body.
     XML_VARIABLE XMLStringNoEmpty  forms;
     XML_VARIABLE XMLFlagsNoEmpty   partsAdd, partsDel;
@@ -146,7 +145,13 @@ public:
     XML_VARIABLE XMLStringNoEmpty  spec;
 
 // MOC_SKIP_BEGIN
+    // Legacy affect bits implied by the 'affects' skill list, not stored in XML.
+    // Re-derived on every read path so raceedit 'affects' edits apply at once.
+    const Flags & derivedAff( ) const;
+
 protected:
+    mutable Flags aff;
+
     struct ResolvedBody {
         unsigned long generation = 0;
         Flags det, act, aff, off, imm, res, vuln, form, parts;

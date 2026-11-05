@@ -15,6 +15,7 @@
 
 #include "skillgroup.h"                                                       
 #include "skill.h"
+#include "skillreference.h"
 #include "skillmanager.h"
 #include "pcharacter.h"
 #include "player_utils.h"
@@ -33,6 +34,18 @@
 #include "def.h"
 
 using namespace std;
+
+GSN(faerie_fire);
+GSN(infravision);
+GSN(fly);
+GSN(curse);
+GSN(regeneration);
+GSN(sneak);
+GSN(hide);
+GSN(pass_door);
+GSN(protection_good);
+GSN(slow);
+GSN(swim);
 
 /*-------------------------------------------------------------------
  * RaceHelp 
@@ -337,7 +350,6 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
 DefaultRace::DefaultRace( ) : 
                 det( 0, &detect_flags ),
                 act( 0, &act_flags ),
-                aff( 0, &affect_flags ),
                 off( 0, &off_flags ),
                 imm( 0, &imm_flags ),
                 res( 0, &res_flags ),
@@ -359,7 +371,8 @@ DefaultRace::DefaultRace( ) :
                 immDel( 0, &imm_flags ),
                 resDel( 0, &res_flags ),
                 vulnDel( 0, &vuln_flags ),
-                damtype( DAMW_NONE, &weapon_flags )
+                damtype( DAMW_NONE, &weapon_flags ),
+                aff( 0, &affect_flags )
 {
 }
 
@@ -391,6 +404,7 @@ bool DefaultRace::matchesUnstrict( const DLString &str ) const
 
 void DefaultRace::loaded( )
 {
+    derivedAff( );
     raceManager->registrate( Pointer( this ) );
 
     if (help)
@@ -415,7 +429,39 @@ const Flags & DefaultRace::getAct( ) const
 }
 const Flags & DefaultRace::getAff( ) const
 {
-    return hasBodyForms( ) ? resolved( ).aff : aff;
+    return hasBodyForms( ) ? resolved( ).aff : derivedAff( );
+}
+
+/** Racial affects whose handler sets an affect bit, and that bit. */
+static const struct {
+    SkillReference *skill;
+    bitstring_t bit;
+} race_affect_bits[] = {
+    { &gsn_faerie_fire,     AFF_FAERIE_FIRE },
+    { &gsn_infravision,     AFF_INFRARED },
+    { &gsn_fly,             AFF_FLYING },
+    { &gsn_curse,           AFF_CURSE },
+    { &gsn_regeneration,    AFF_REGENERATION },
+    { &gsn_sneak,           AFF_SNEAK },
+    { &gsn_hide,            AFF_HIDE },
+    { &gsn_pass_door,       AFF_PASS_DOOR },
+    { &gsn_protection_good, AFF_PROTECT_GOOD },
+    { &gsn_slow,            AFF_SLOW },
+    { &gsn_swim,            AFF_SWIM },
+};
+
+const Flags & DefaultRace::derivedAff( ) const
+{
+    bitstring_t bits = 0;
+
+    for (auto &row: race_affect_bits) {
+        int sn = *row.skill;
+        if (affects.isSet( sn ))
+            bits |= row.bit;
+    }
+
+    aff.setValue( bits );
+    return aff;
 }
 const Flags & DefaultRace::getOff( ) const
 {
@@ -560,7 +606,7 @@ void DefaultRace::getBodyInput( Body::Input &in, bool npc ) const
     in.race.wearlocsAdd.insert( wa.begin( ), wa.end( ) );
     in.race.wearlocsDel.insert( wd.begin( ), wd.end( ) );
 
-    const XMLFlagsNoEmpty *adds[Body::BS_MAX] = { &act, &off, &aff, &det, &imm, &res, &vuln };
+    const Flags *adds[Body::BS_MAX] = { &act, &off, &derivedAff( ), &det, &imm, &res, &vuln };
     const XMLFlagsNoEmpty *dels[Body::BS_MAX] = { &actDel, &offDel, &affDel, &detDel, &immDel, &resDel, &vulnDel };
     for (int k = 0; k < Body::BS_MAX; k++) {
         in.race.bitsAdd[k] = MobBody::names( MobBody::bitSetTable( k ), adds[k]->getValue( ) );
