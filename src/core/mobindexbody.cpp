@@ -4,7 +4,8 @@
  *
  * resolveBody() builds the prototype's nine bit sets and wearlocs through the
  * body resolver (body.h): race forms and race add/del first, the prototype's
- * authored add/del last. A race with no <forms> resolves from its adds alone.
+ * authored add/del last. A race with no <forms> keeps the historical
+ * 'add | (race & ~del)' rule and its authored slots and off bits.
  *
  * Dels on aff/det/imm/res/vuln were dead for thirty years: the instance
  * re-ORed the race bits. They stay dead (now in the index itself, so the
@@ -119,6 +120,30 @@ static bool del_gated(int bitSet)
            || bitSet == Body::BS_RES || bitSet == Body::BS_VULN;
 }
 
+static const Flags &race_set(Race *race, int mobset)
+{
+    switch (mobset) {
+    case MOBSET_ACT:   return race->getAct();
+    case MOBSET_OFF:   return race->getOff();
+    case MOBSET_AFF:   return race->getAff();
+    case MOBSET_DET:   return race->getDet();
+    case MOBSET_IMM:   return race->getImm();
+    case MOBSET_RES:   return race->getRes();
+    case MOBSET_VULN:  return race->getVuln();
+    case MOBSET_FORM:  return race->getForm();
+    default:           return race->getParts();
+    }
+}
+
+/* A race with no <forms> (unique): its prototypes keep their authored bodies
+ * on purpose, their abilities are whatever the creature has written (help 329). */
+static bool race_formless(Race *race)
+{
+    Body::Input in;
+    race->getBodyInput(in, true);
+    return in.forms.empty();
+}
+
 /* Off bits a body may use by its parts and forms (plan §3.3b). */
 static Body::NameSet body_allowed_off(const Body::Result &r, int size)
 {
@@ -158,6 +183,34 @@ static Body::NameSet body_allowed_off(const Body::Result &r, int size)
 void mob_index_data::resolveBody()
 {
     Race *mobrace = raceManager->find(race);
+
+    if (race_formless(mobrace)) {
+        // add | (race & ~del), dead dels kept dead unless reviewed; slots,
+        // off bits and AC exactly as authored, no form or part rules.
+        for (int s = 0; s < MOBSET_MAX; s++) {
+            bitstring_t base = race_set(mobrace, s).getValue();
+            int bs = bitset_of(s);
+            bitstring_t del = bodyDel[s];
+            if (bs >= 0 && del_gated(bs) && !(reviewed & (1 << bs)))
+                del = 0;
+            bodyBits(s) = (int)(bodyAdd[s] | (base & ~del));
+        }
+        act |= ACT_IS_NPC;
+        wearloc.setRegistry(wearlocationManager);
+        wearloc.set(mobrace->getWearloc());
+        offAllowed = off_flags;
+        offSignature = 0;
+        movetype.clear();
+        moveverb.clear();
+        formAcPct = 100;
+        bloodless = IS_BLOODLESS(this);
+        edible = IS_EDIBLE_FORM(form);
+        canHoldCards = CAN_HOLD_CARDS(this);
+
+        for (int s = 0; s < MOBSET_MAX; s++)
+            bodySnapshot[s] = (unsigned int)bodyBits(s);
+        return;
+    }
 
     Body::Input in;
     mobrace->getBodyInput(in, true);
@@ -292,7 +345,8 @@ void mob_index_data::deriveNumbers()
     tier = tc.parse(tierName);
     if (!tier) {
         tier = tc.defaultTier;
-        if (!tierName.empty())
+        // A config that failed to load has already logged its one error.
+        if (!tierName.empty() && tc.loaded)
             LogStream::sendWarning() << "mob " << vnum << ": unknown tier '" << tierName << "', using default" << endl;
     }
 
@@ -303,7 +357,7 @@ void mob_index_data::deriveNumbers()
     m.tier = tier;
     m.formAc = formAcPct / 100.0;
     m.style = tierStyle;
-    if (!tierStyle.empty() && !tc.styles.count(tierStyle))
+    if (!tierStyle.empty() && tc.loaded && !tc.styles.count(tierStyle))
         LogStream::sendWarning() << "mob " << vnum << ": unknown tier style '" << tierStyle << "'" << endl;
     m.sentient = IS_SET(form, FORM_SENTIENT);
     m.acts = MobBody::names(&act_flags, (unsigned int)act);
@@ -355,13 +409,25 @@ void mob_index_data::deriveNumbers()
     }
 
     // Off bits granted by the tier on top of its count, as far as the body
-    // allows them. A slow body (worm, slug, zombie) never turns fast.
+    // allows them; a formless race takes them as is. A slow body (worm, slug,
+    // zombie) never turns fast either way.
+    bool formless = race_formless(mobrace);
     bitstring_t tierOffAdd = 0;
     if (!tierRow.offAdd.empty()) {
         Body::NameSet tierOff(tierRow.offAdd.begin(), tierRow.offAdd.end());
-        tierOffAdd = MobBody::bits(&::off_flags, tierOff) & (unsigned int)offAllowed;
+        tierOffAdd = MobBody::bits(&::off_flags, tierOff);
+        if (!formless)
+            tierOffAdd &= (unsigned int)offAllowed;
         if (IS_SET(affected_by, AFF_SLOW))
             tierOffAdd &= ~(bitstring_t)OFF_FAST;
+    }
+
+    if (formless) {
+        if (tierOffAdd) {
+            off_flags |= (int)tierOffAdd;
+            bodySnapshot[MOBSET_OFF] = (unsigned int)off_flags;
+        }
+        return;
     }
 
     bitstring_t enabled = enabled_off(this, tc.offCount(tier, vnum));
