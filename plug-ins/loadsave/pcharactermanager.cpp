@@ -491,7 +491,7 @@ static void pfDisownObjects( const DLString &name )
 
         if (top->in_room)
             itemRooms.insert( top->in_room );
-        else if (top->carried_by && top->carried_by->is_npc( ))
+        else if (top->carried_by && top->carried_by->is_npc( ) && top->carried_by->in_room)
             mobRooms.insert( top->carried_by->in_room );
 
         if (obj->isPersonalQuestReward( ) || obj->item_type == ITEM_CORPSE_PC)
