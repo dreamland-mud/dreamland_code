@@ -192,11 +192,6 @@ const PCRace * RaceManager::findUnstrictPC( const DLString &name )
 GLOBALREF_IMPL(Race, ' ')
 XMLGLOBALREF_IMPL(Race)
 
-bool Race::hasBodyForms( ) const
-{
-    return false;
-}
-
 void Race::getBodyInput( Body::Input &, bool ) const
 {
 }

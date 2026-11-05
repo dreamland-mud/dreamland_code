@@ -2,21 +2,18 @@
  * Mob reform: prototype body and numbers (plan docs/plans/mob-reform.md
  * §3.3b, §3.5, §3.6 items 3-6).
  *
- * resolveBody() builds the prototype's nine bit sets and wearlocs. A race with
- * <forms> goes through the body resolver (body.h) with the prototype's
- * authored add/del applied last. Any other race keeps the historical
- * 'add | (race & ~del)' rule.
+ * resolveBody() builds the prototype's nine bit sets and wearlocs through the
+ * body resolver (body.h): race forms and race add/del first, the prototype's
+ * authored add/del last. A race with no <forms> resolves from its adds alone.
  *
  * Dels on aff/det/imm/res/vuln were dead for thirty years: the instance
  * re-ORed the race bits. They stay dead (now in the index itself, so the
  * instance is a plain copy) until the prototype names the set in <reviewed>
  * (plan §5.3 step 7, decision 17).
  *
- * deriveNumbers() resolves the tier and, while fight/mob_tiers.json is loaded,
- * replaces the authored hit/mana/damage/hitroll/ac/wealth with the tier
- * centres, picks the enabled off bits (decision 39) and adds the tier's
- * affect bits (decision 56). Without the file the
- * authored numbers stay, as before the reform.
+ * deriveNumbers() resolves the tier, writes the tier centres into
+ * hit/mana/damage/hitroll/ac/wealth (authored numbers never count), picks the
+ * enabled off bits (decision 39) and adds the tier's affect bits (decision 56).
  */
 #include <algorithm>
 #include <cmath>
@@ -64,7 +61,9 @@ unsigned long long mob_index_data::bodyStamp()
     buf << '|';
     for (auto &w: wearNames)
         buf << w << ',';
-    buf << '|' << numbersDerived << '|';
+    // The 1 stands where the old numbersDerived flag was, true on every boot
+    // since mob_tiers.json landed: dropping it would void every saved stamp.
+    buf << '|' << 1 << '|';
     for (int i = 0; i < 3; i++)
         buf << hit[i] << ',' << mana[i] << ',' << damage[i] << ',';
     for (int i = 0; i < 4; i++)
@@ -120,21 +119,6 @@ static bool del_gated(int bitSet)
            || bitSet == Body::BS_RES || bitSet == Body::BS_VULN;
 }
 
-static const Flags &race_set(Race *race, int mobset)
-{
-    switch (mobset) {
-    case MOBSET_ACT:   return race->getAct();
-    case MOBSET_OFF:   return race->getOff();
-    case MOBSET_AFF:   return race->getAff();
-    case MOBSET_DET:   return race->getDet();
-    case MOBSET_IMM:   return race->getImm();
-    case MOBSET_RES:   return race->getRes();
-    case MOBSET_VULN:  return race->getVuln();
-    case MOBSET_FORM:  return race->getForm();
-    default:           return race->getParts();
-    }
-}
-
 /* Off bits a body may use by its parts and forms (plan §3.3b). */
 static Body::NameSet body_allowed_off(const Body::Result &r, int size)
 {
@@ -175,107 +159,81 @@ void mob_index_data::resolveBody()
 {
     Race *mobrace = raceManager->find(race);
 
-    if (!mobrace->hasBodyForms()) {
-        // Legacy body: add | (race & ~del), dead dels kept dead unless reviewed.
-        for (int s = 0; s < MOBSET_MAX; s++) {
-            bitstring_t base = race_set(mobrace, s).getValue();
-            int bs = bitset_of(s);
-            bitstring_t del = bodyDel[s];
-            if (bs >= 0 && del_gated(bs) && !(reviewed & (1 << bs)))
-                del = 0;
-            bodyBits(s) = (int)(bodyAdd[s] | (base & ~del));
-        }
-        act |= ACT_IS_NPC;
-        wearloc.setRegistry(wearlocationManager);
-        wearloc.set(mobrace->getWearloc());
-        bodyResolved = false;
-        offAllowed = off_flags;
-        offSignature = 0;
-        movetype.clear();
-        moveverb.clear();
-        formAcPct = 100;
-        // Same rule as IS_BLOODLESS, gated the same way.
-        bloodless = IS_SET(form, FORM_SKELETAL|FORM_CONSTRUCT|FORM_MIST)
-                    || (mob_body_model_active && !IS_SET(parts, PART_HEART)
-                        && !IS_SET(parts, PART_COLD_BLOOD) && !IS_SET(form, FORM_COLD_BLOOD));
-        edible = IS_EDIBLE_FORM(form);
-        canHoldCards = CAN_HOLD_CARDS(this);
-    } else {
-        Body::Input in;
-        mobrace->getBodyInput(in, true);
-        in.size = size_table.name(getSize());
+    Body::Input in;
+    mobrace->getBodyInput(in, true);
+    in.size = size_table.name(getSize());
 
-        Body::Mods &p = in.proto;
-        Body::NameSet fa = MobBody::names(&form_flags, bodyAdd[MOBSET_FORM]);
-        Body::NameSet fd = MobBody::names(&form_flags, bodyDel[MOBSET_FORM]);
-        p.formsAdd.assign(fa.begin(), fa.end());
-        p.formsDel.assign(fd.begin(), fd.end());
-        p.partsAdd = MobBody::names(&part_flags, bodyAdd[MOBSET_PARTS]);
-        p.partsDel = MobBody::names(&part_flags, bodyDel[MOBSET_PARTS]);
-        for (int s = 0; s < MOBSET_MAX; s++) {
-            int bs = bitset_of(s);
-            if (bs < 0)
-                continue;
-            p.bitsAdd[bs] = MobBody::names(MobBody::bitSetTable(bs), bodyAdd[s]);
-            if (!del_gated(bs) || (reviewed & (1 << bs)))
-                p.bitsDel[bs] = MobBody::names(MobBody::bitSetTable(bs), bodyDel[s]);
-        }
+    Body::Mods &p = in.proto;
+    Body::NameSet fa = MobBody::names(&form_flags, bodyAdd[MOBSET_FORM]);
+    Body::NameSet fd = MobBody::names(&form_flags, bodyDel[MOBSET_FORM]);
+    p.formsAdd.assign(fa.begin(), fa.end());
+    p.formsDel.assign(fd.begin(), fd.end());
+    p.partsAdd = MobBody::names(&part_flags, bodyAdd[MOBSET_PARTS]);
+    p.partsDel = MobBody::names(&part_flags, bodyDel[MOBSET_PARTS]);
+    for (int s = 0; s < MOBSET_MAX; s++) {
+        int bs = bitset_of(s);
+        if (bs < 0)
+            continue;
+        p.bitsAdd[bs] = MobBody::names(MobBody::bitSetTable(bs), bodyAdd[s]);
+        if (!del_gated(bs) || (reviewed & (1 << bs)))
+            p.bitsDel[bs] = MobBody::names(MobBody::bitSetTable(bs), bodyDel[s]);
+    }
 
-        Body::Result r = Body::resolve(MobBody::forms(), in);
+    // Same silence as DefaultRace::resolved() while the config failed to load.
+    Body::Result r = Body::resolve(MobBody::forms(), in);
+    if (MobBody::forms().loaded)
         for (auto &w: r.warnings)
             LogStream::sendWarning() << "mob " << vnum << " (" << race << "): " << w << endl;
 
-        MobBody::Engine e;
-        e.fromResult(r);
-        form = (int)e.form;
-        parts = (int)e.parts;
-        act = (int)e.bits[Body::BS_ACT] | ACT_IS_NPC;
-        off_flags = (int)e.bits[Body::BS_OFF];
-        affected_by = (int)e.bits[Body::BS_AFF];
-        detection = (int)e.bits[Body::BS_DET];
-        imm_flags = (int)e.bits[Body::BS_IMM];
-        res_flags = (int)e.bits[Body::BS_RES];
-        vuln_flags = (int)e.bits[Body::BS_VULN];
-        // Immunity always wins in immune_resolve, so a res/vuln bit on top of
-        // the same imm bit (eyeless undead: imm light from the body, vuln
-        // light from the race) only makes affects list both.
-        res_flags &= ~imm_flags;
-        vuln_flags &= ~imm_flags;
-        MobBody::wearlocs(e.wearlocNames, wearloc);
-        bodyResolved = true;
-        movetype = e.movetype;
-        moveverb = e.moveverb;
-        formAcPct = (int)lround(e.formAc * 100);
-        bloodless = e.bloodless;
-        edible = e.edible;
-        canHoldCards = e.canHoldCards;
+    MobBody::Engine e;
+    e.fromResult(r);
+    form = (int)e.form;
+    parts = (int)e.parts;
+    act = (int)e.bits[Body::BS_ACT] | ACT_IS_NPC;
+    off_flags = (int)e.bits[Body::BS_OFF];
+    affected_by = (int)e.bits[Body::BS_AFF];
+    detection = (int)e.bits[Body::BS_DET];
+    imm_flags = (int)e.bits[Body::BS_IMM];
+    res_flags = (int)e.bits[Body::BS_RES];
+    vuln_flags = (int)e.bits[Body::BS_VULN];
+    // Immunity always wins in immune_resolve, so a res/vuln bit on top of
+    // the same imm bit (eyeless undead: imm light from the body, vuln
+    // light from the race) only makes affects list both.
+    res_flags &= ~imm_flags;
+    vuln_flags &= ~imm_flags;
+    MobBody::wearlocs(e.wearlocNames, wearloc);
+    movetype = e.movetype;
+    moveverb = e.moveverb;
+    formAcPct = (int)lround(e.formAc * 100);
+    bloodless = e.bloodless;
+    edible = e.edible;
+    canHoldCards = e.canHoldCards;
 
-        // Allowed off bits (decision 39): what the body can do, plus what the
-        // forms and the race add, minus what a form or the race forbids. The
-        // prototype's own off add/del are applied on top in deriveNumbers().
-        Body::NameSet allowed = body_allowed_off(r, getSize());
-        Body::Input raceOnly = in;
-        raceOnly.proto.bitsAdd[Body::BS_OFF].clear();
-        raceOnly.proto.bitsDel[Body::BS_OFF].clear();
-        Body::Result rr = Body::resolve(MobBody::forms(), raceOnly);
-        allowed.insert(rr.bits[Body::BS_OFF].begin(), rr.bits[Body::BS_OFF].end());
-        for (auto &f: rr.forms) {
-            auto fi = MobBody::forms().forms.find(f);
-            if (fi != MobBody::forms().forms.end())
-                for (auto &d: fi->second.bitsDel[Body::BS_OFF])
-                    allowed.erase(d);
-        }
-        for (auto &d: in.race.bitsDel[Body::BS_OFF])
-            allowed.erase(d);
-        offAllowed = (int)MobBody::bits(&::off_flags, allowed);
-
-        // Signature bits of the race body stay on whatever the tier picks.
-        Body::NameSet sig;
-        for (auto &b: rr.bits[Body::BS_OFF])
-            if (MobBody::tiers().offSignature.count(b) && allowed.count(b))
-                sig.insert(b);
-        offSignature = (int)MobBody::bits(&::off_flags, sig);
+    // Allowed off bits (decision 39): what the body can do, plus what the
+    // forms and the race add, minus what a form or the race forbids. The
+    // prototype's own off add/del are applied on top in deriveNumbers().
+    Body::NameSet allowed = body_allowed_off(r, getSize());
+    Body::Input raceOnly = in;
+    raceOnly.proto.bitsAdd[Body::BS_OFF].clear();
+    raceOnly.proto.bitsDel[Body::BS_OFF].clear();
+    Body::Result rr = Body::resolve(MobBody::forms(), raceOnly);
+    allowed.insert(rr.bits[Body::BS_OFF].begin(), rr.bits[Body::BS_OFF].end());
+    for (auto &f: rr.forms) {
+        auto fi = MobBody::forms().forms.find(f);
+        if (fi != MobBody::forms().forms.end())
+            for (auto &d: fi->second.bitsDel[Body::BS_OFF])
+                allowed.erase(d);
     }
+    for (auto &d: in.race.bitsDel[Body::BS_OFF])
+        allowed.erase(d);
+    offAllowed = (int)MobBody::bits(&::off_flags, allowed);
+
+    // Signature bits of the race body stay on whatever the tier picks.
+    Body::NameSet sig;
+    for (auto &b: rr.bits[Body::BS_OFF])
+        if (MobBody::tiers().offSignature.count(b) && allowed.count(b))
+            sig.insert(b);
+    offSignature = (int)MobBody::bits(&::off_flags, sig);
 
     for (int s = 0; s < MOBSET_MAX; s++)
         bodySnapshot[s] = (unsigned int)bodyBits(s);
@@ -331,15 +289,11 @@ void mob_index_data::deriveNumbers()
 {
     const MobTiers::Config &tc = MobBody::tiers();
 
-    tier = tc.loaded ? tc.parse(tierName) : 0;
-    if (!tier)
-        tier = tc.loaded ? tc.defaultTier : MobTiers::TIER_NORMAL;
-    if (!tierName.empty() && tc.loaded && !tc.parse(tierName))
-        LogStream::sendWarning() << "mob " << vnum << ": unknown tier '" << tierName << "', using default" << endl;
-
-    if (!tc.loaded) {
-        numbersDerived = false;
-        return;
+    tier = tc.parse(tierName);
+    if (!tier) {
+        tier = tc.defaultTier;
+        if (!tierName.empty())
+            LogStream::sendWarning() << "mob " << vnum << ": unknown tier '" << tierName << "', using default" << endl;
     }
 
     Race *mobrace = raceManager->find(race);
@@ -382,7 +336,6 @@ void mob_index_data::deriveNumbers()
     wealth = (int)c.wealth;
     saves = c.saves;
     statCap = c.statCap;
-    numbersDerived = true;
 
     // Affect bits granted by the tier (item 56: sanctuary from elite up), on top
     // of the body. resolveBody() always runs first, so a tier change never stacks.
@@ -401,29 +354,21 @@ void mob_index_data::deriveNumbers()
         bodySnapshot[MOBSET_ACT] = (unsigned int)act;
     }
 
-    // Off bits granted by the tier on top of its count. A body model knows what
-    // the body can do; a legacy body takes them as is. A slow body (worm, slug,
-    // zombie) never turns fast either way.
+    // Off bits granted by the tier on top of its count, as far as the body
+    // allows them. A slow body (worm, slug, zombie) never turns fast.
     bitstring_t tierOffAdd = 0;
     if (!tierRow.offAdd.empty()) {
         Body::NameSet tierOff(tierRow.offAdd.begin(), tierRow.offAdd.end());
-        tierOffAdd = MobBody::bits(&::off_flags, tierOff);
-        if (bodyResolved)
-            tierOffAdd &= (unsigned int)offAllowed;
+        tierOffAdd = MobBody::bits(&::off_flags, tierOff) & (unsigned int)offAllowed;
         if (IS_SET(affected_by, AFF_SLOW))
             tierOffAdd &= ~(bitstring_t)OFF_FAST;
     }
 
-    if (bodyResolved) {
-        bitstring_t enabled = enabled_off(this, tc.offCount(tier, vnum));
-        enabled |= (unsigned int)offSignature;
-        enabled |= tierOffAdd;
-        enabled |= bodyAdd[MOBSET_OFF];
-        enabled &= ~bodyDel[MOBSET_OFF];
-        off_flags = (int)enabled;
-        bodySnapshot[MOBSET_OFF] = (unsigned int)off_flags;
-    } else if (tierOffAdd) {
-        off_flags |= (int)tierOffAdd;
-        bodySnapshot[MOBSET_OFF] = (unsigned int)off_flags;
-    }
+    bitstring_t enabled = enabled_off(this, tc.offCount(tier, vnum));
+    enabled |= (unsigned int)offSignature;
+    enabled |= tierOffAdd;
+    enabled |= bodyAdd[MOBSET_OFF];
+    enabled &= ~bodyDel[MOBSET_OFF];
+    off_flags = (int)enabled;
+    bodySnapshot[MOBSET_OFF] = (unsigned int)off_flags;
 }

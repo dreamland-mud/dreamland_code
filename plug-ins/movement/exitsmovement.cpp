@@ -711,7 +711,7 @@ int ExitsMovement::adjustMoveVerb( Character *wch, int mt )
         else if (IS_SET(wch->parts, PART_TWO_HOOVES))
             verb = "clattering";
     }
-    else if ((mt == MOVETYPE_WALK || mt == MOVETYPE_SLINK) && pIndex->bodyResolved)
+    else if (mt == MOVETYPE_WALK || mt == MOVETYPE_SLINK)
         verb = pIndex->moveverb;
 
     int row = movetype_text_lookup( verb.c_str( ) );

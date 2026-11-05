@@ -457,7 +457,6 @@ static void abc_body(Character *ch, DLString &args)
             DLString head = "[" + web_cmd(ch, "medit $1", "%5d") + "] %-18.18N1 {g"
                             + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x";
             buf << fmt(0, head.c_str(), pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race.c_str())
-                << (pMob->bodyResolved ? "" : " {D(legacy race){x")
                 << line.str() << endl;
         }
         cnt++;

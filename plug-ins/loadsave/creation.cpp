@@ -270,14 +270,11 @@ static int roll_centre(int centre, double variance)
 /*
  * Mob reform: give an existing mob the numbers a fresh spawn of this level and
  * tier would roll (summons, quest mobs, pets: Fenia .tmp.mob.config). Same
- * centres and variance as create_mobile_org; false while mob_tiers.json is
- * absent, so the caller keeps its own formula.
+ * centres and variance as create_mobile_org.
  */
-bool apply_mob_tier(NPCharacter *mob, int level, int tier)
+void apply_mob_tier(NPCharacter *mob, int level, int tier)
 {
     const MobTiers::Config &tc = MobBody::tiers();
-    if (!tc.loaded)
-        return false;
 
     level = max(1, level);
     MobTiers::MobInfo m;
@@ -312,7 +309,6 @@ bool apply_mob_tier(NPCharacter *mob, int level, int tier)
         mob->armor[i] = c.ac * 10;
     for (int i = 0; i < stat_table.size; i++)
         mob->perm_stat[i] = min(BASE_STAT, c.statCap);
-    return true;
 }
 
 NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
@@ -364,24 +360,18 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
     mob->alignment = pMobIndex->alignment;
     mob->setLevel(pMobIndex->level);
 
-    if (pMobIndex->numbersDerived) {
-        // Tier centres in the index, a fresh roll on every spawn (decision 8).
-        const MobTiers::Config &tc = MobBody::tiers();
-        int hpCentre = pMobIndex->hit[DICE_NUMBER] * (pMobIndex->hit[DICE_TYPE] + 1) / 2 + pMobIndex->hit[DICE_BONUS];
-        int dicesAve = pMobIndex->damage[DICE_NUMBER] * (pMobIndex->damage[DICE_TYPE] + 1) / 2;
-        int damCentre = dicesAve + pMobIndex->damage[DICE_BONUS];
+    // Tier centres in the index, a fresh roll on every spawn (decision 8).
+    const MobTiers::Config &tc = MobBody::tiers();
+    int hpCentre = pMobIndex->hit[DICE_NUMBER] * (pMobIndex->hit[DICE_TYPE] + 1) / 2 + pMobIndex->hit[DICE_BONUS];
+    int dicesAve = pMobIndex->damage[DICE_NUMBER] * (pMobIndex->damage[DICE_TYPE] + 1) / 2;
+    int damCentre = dicesAve + pMobIndex->damage[DICE_BONUS];
 
-        mob->hitroll = roll_centre(mob->getRealLevel() + pMobIndex->hitroll, tc.var("hitroll"));
-        mob->damroll = roll_centre(damCentre, tc.var("dmg")) - dicesAve;
-        mob->max_hit = max(1, roll_centre(hpCentre, tc.var("hp")));
-        mob->max_mana = max(0, roll_centre(pMobIndex->mana[DICE_BONUS], tc.var("mana")));
-        mob->saving_throw = roll_centre(pMobIndex->saves, tc.var("saves"));
-    } else {
-        mob->hitroll = mob->getRealLevel() + pMobIndex->hitroll;
-        mob->damroll = pMobIndex->damage[DICE_BONUS];
-        mob->max_hit = dice(pMobIndex->hit[DICE_NUMBER], pMobIndex->hit[DICE_TYPE]) + pMobIndex->hit[DICE_BONUS];
-        mob->max_mana = dice(pMobIndex->mana[DICE_NUMBER], pMobIndex->mana[DICE_TYPE]) + pMobIndex->mana[DICE_BONUS];
-    }
+    mob->hitroll = roll_centre(mob->getRealLevel() + pMobIndex->hitroll, tc.var("hitroll"));
+    mob->damroll = roll_centre(damCentre, tc.var("dmg")) - dicesAve;
+    mob->max_hit = max(1, roll_centre(hpCentre, tc.var("hp")));
+    mob->max_mana = max(0, roll_centre(pMobIndex->mana[DICE_BONUS], tc.var("mana")));
+    mob->saving_throw = roll_centre(pMobIndex->saves, tc.var("saves"));
+
     mob->hit = mob->max_hit;
     mob->mana = mob->max_mana;
     mob->max_move = 200 + 16 * mob->getRealLevel(); // 2 times more than best-trained pc
@@ -461,7 +451,7 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
         mob->perm_stat[i] = BASE_STAT;
 
     // Tier stat cap (replaces the Fenia onInit fix_stats cap, plan §3.5).
-    if (pMobIndex->numbersDerived && pMobIndex->statCap > 0)
+    if (pMobIndex->statCap > 0)
         for (i = 0; i < stat_table.size; i++)
             mob->perm_stat[i] = min(mob->perm_stat[i], pMobIndex->statCap);
 

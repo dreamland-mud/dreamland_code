@@ -1,11 +1,10 @@
 /*
  * Mob reform: loaders for fight/mob_forms.json and fight/mob_tiers.json.
  *
- * Both files are optional. While one is absent (master's world has neither
- * until the data phase) the engine logs it and keeps today's behaviour: races
- * without <forms> and every race while mob_forms.json is missing keep their
- * authored bodies, and prototypes keep their authored numbers while
- * mob_tiers.json is missing. A broken edit never replaces a working config.
+ * Both files are required: every race body goes through the resolver and every
+ * prototype takes its numbers from the tier curve. A missing or broken file at
+ * first load is an error, and the game runs on empty configs (bare bodies, 1 hp
+ * mobs) until it is fixed. A broken edit never replaces a working config.
  *
  * Fenia reads both through .config("fight/mob_forms") / .config("fight/mob_tiers").
  */
@@ -21,13 +20,12 @@ CONFIGURABLE_LOADED(fight, mob_forms)
 
     if (cfg.fromJson(value, error)) {
         MobBody::forms() = cfg;
-        mob_body_model_active = true;
         LogStream::sendNotice() << "mob_forms: " << cfg.forms.size() << " forms, "
                                 << cfg.parts.size() << " parts loaded." << endl;
     } else if (MobBody::forms().loaded) {
         LogStream::sendError() << "mob_forms: " << error << ", keeping the previous config." << endl;
     } else {
-        LogStream::sendNotice() << "mob_forms: " << error << ", races keep their authored bodies." << endl;
+        LogStream::sendError() << "mob_forms: " << error << ", no config loaded: every body resolves empty." << endl;
     }
 
     MobBody::touch();
@@ -45,7 +43,7 @@ CONFIGURABLE_LOADED(fight, mob_tiers)
     } else if (MobBody::tiers().loaded) {
         LogStream::sendError() << "mob_tiers: " << error << ", keeping the previous config." << endl;
     } else {
-        LogStream::sendNotice() << "mob_tiers: " << error << ", mobs keep their authored numbers." << endl;
+        LogStream::sendError() << "mob_tiers: " << error << ", no config loaded: every mob gets minimal numbers." << endl;
     }
 
     MobBody::touch();

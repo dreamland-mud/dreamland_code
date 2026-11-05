@@ -227,73 +227,19 @@ int LevelAdaptivePet::getLevel( Character *client ) const
 
 void LevelAdaptivePet::config( PCharacter *client, NPCharacter *pet ) const
 {
-    int level, ave;
+    int level;
     
     Pet::config( client, pet );
 
     level = getLevel( client );
     pet->setLevel( level );
 
-    // The pet grows by the same tier ruler as every mob of its level; the old
-    // ladder below is only the fallback while mob_tiers.json is absent.
+    // The pet grows by the same tier ruler as every mob of its level.
     // Caster bits go first: the tier centres read the class acts.
     if (level <= 20)
         REMOVE_BIT( pet->act, ACT_CLERIC|ACT_MAGE );
 
-    if (apply_mob_tier( pet, level, pet->getTier( ) ))
-        return;
-
-    if (level <= 13)            pet->hit = level * number_range( 12, 13 );
-    else if (level <= 21)   pet->hit = level * number_range( 16, 18 );
-    else if (level <= 32)   pet->hit = level * number_range( 25, 30 );
-    else if (level <= 40)   pet->hit = level * number_range( 39, 45 );
-    else if (level <= 50)   pet->hit = level * number_range( 49, 53 );
-    else                    pet->hit = level * number_range( level * 2, level * 2 + 10 );
-    pet->max_hit = pet->hit;
-
-    pet->hitroll = number_range( level, level * 2 );
-
-    if (level <= 12)            ave = number_range( 2, 5 );
-    else if (level <= 22)   ave = number_range( 6, 9 );
-    else if (level <= 32)   ave = number_range( 9, 13 );
-    else if (level <= 42)   ave = number_range( 14, 22 );
-    else if (level <= 65)   ave = number_range( 23, 25 );
-    else if (level <= 75)   ave = number_range( 33, 35 );
-    else if (level <= 90)   ave = number_range( 43, 45 );
-    else                    ave = number_range( 50, 52 );
-    
-    pet->damage[DICE_NUMBER] = (int) ::sqrt( 2 * ave );
-    pet->damage[DICE_TYPE]   = pet->damage[DICE_NUMBER];
-    pet->damroll = number_fuzzy( level / 2 );
-    
-    pet->saving_throw = -level / 2;
-    
-    for (int i = 0; i < 4; i++)
-        pet->armor[i] = - 5 * number_fuzzy( level );
-
-    if (pet->getRealLevel( ) <= 20) {
-        REMOVE_BIT( pet->act, ACT_CLERIC|ACT_MAGE );
-    }
-
-    // Mana is a caster resource: fight/magic.cpp is the only thing that spends a
-    // mob's mana, and ai/caster.cpp only ever picks ACT_CLERIC/ACT_MAGE mobs to
-    // cast. The ladder below used to run for every pet, so a warrior pet was sold
-    // with a mage-sized pool it could never touch. Decided after the bits above,
-    // because a pet at or below level 20 loses its caster bits right there.
-    if (IS_SET( pet->act, ACT_CLERIC|ACT_MAGE )) {
-        if (level < 20)         pet->mana = number_fuzzy( 100 );
-        else if (level < 50)    pet->mana = number_fuzzy( 500 );
-        else if (level < 80)    pet->mana = number_fuzzy( 800 );
-        else                    pet->mana = number_fuzzy( 1000 );
-
-        pet->max_mana = pet->mana + level * 10;
-        pet->mana = pet->max_mana;
-    }
-    else {
-        pet->mana = pet->max_mana = 0;
-    }
-
-    pet->move = pet->max_move = max(100, level * 10);
+    apply_mob_tier( pet, level, pet->getTier( ) );
 }
 
 /*----------------------------------------------------------------------

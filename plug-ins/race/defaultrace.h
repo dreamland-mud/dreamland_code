@@ -97,7 +97,6 @@ public:
     virtual const DLString & getUkrainianName( ) const; // wire UA name into gref matching
     virtual DLString getNameFor( Character *looker, Character *me ) const;
 
-    virtual bool hasBodyForms( ) const;
     virtual void getBodyInput( Body::Input &, bool npc ) const;
     virtual int getDamType( ) const;
     virtual const DLString & getMaterial( ) const;
@@ -110,11 +109,8 @@ public:
     XML_VARIABLE XMLFlagsNoEmpty         act;
     XML_VARIABLE XMLFlagsNoEmpty         off;
     XML_VARIABLE XMLFlagsNoEmpty         imm, res, vuln;
-    XML_VARIABLE XMLFlagsNoEmpty         form;
-    XML_VARIABLE XMLFlagsNoEmpty         parts;
     XML_VARIABLE XMLEnumerationArray     stats; 
     XML_VARIABLE XMLEnumerationNoEmpty   size;
-    XML_VARIABLE XMLGlobalBitvector      wearloc;
     XML_VARIABLE XMLGlobalBitvector      affects;
 
     XML_VARIABLE XMLGlobalBitvector      hunts, donates;
@@ -129,10 +125,10 @@ public:
 
     XML_VARIABLE XMLPointerNoEmpty<RaceHelp> help;
 
-    // Mob reform body model. With <forms> present and fight/mob_forms.json
-    // loaded, <form>, <parts> and <wearloc> above are ignored, the act/aff/det/
-    // off/imm/res/vuln sets are the race's own adds on top of its forms,
-    // and the getters return the resolved body.
+    // Mob reform body model. The act/det/off/imm/res/vuln sets above and the
+    // aff bits from derivedAff() are the race's own adds on top of its forms,
+    // and the getters return the resolved body. A race with no <forms>
+    // resolves from its adds alone.
     XML_VARIABLE XMLStringNoEmpty  forms;
     XML_VARIABLE XMLFlagsNoEmpty   partsAdd, partsDel;
     XML_VARIABLE XMLStringNoEmpty  wearlocAdd, wearlocDel;

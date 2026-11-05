@@ -9,8 +9,6 @@
 #include "mobbody.h"
 #include "merc.h"
 
-bool mob_body_model_active = false;
-
 namespace MobBody {
 
 static Body::Config formsConfig;

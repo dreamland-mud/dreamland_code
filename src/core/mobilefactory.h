@@ -100,16 +100,12 @@ struct mob_index_data
     int                tier;
     // Authored <tierStyle> (fight/mob_tiers.json "styles"), empty = none.
     DLString           tierStyle;
-    // Body: true when it came from the resolver (race with <forms>), else legacy.
-    bool               bodyResolved;
     GlobalBitvector    wearloc;
     int                offAllowed;     // off bits the body may use (item 39)
     int                offSignature;   // race-body off bits always on (Kit 2026-10-05)
     DLString           movetype, moveverb;
     int                formAcPct;      // form AC factor x100
     bool               bloodless, edible, canHoldCards;
-    // Numbers: true when hit/mana/damage/hitroll/ac/wealth are tier centres.
-    bool               numbersDerived;
     int                saves;
     int                statCap;
 

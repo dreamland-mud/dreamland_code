@@ -77,7 +77,6 @@ mob_index_data::mob_index_data( )
         bodyAdd[i] = bodyDel[i] = bodySnapshot[i] = 0;
     reviewed = 0;
     tier = MobTiers::TIER_NORMAL;
-    bodyResolved = false;
     wearloc.setRegistry(wearlocationManager);
     offAllowed = 0;
     offSignature = 0;
@@ -85,7 +84,6 @@ mob_index_data::mob_index_data( )
     bloodless = false;
     edible = true;
     canHoldCards = false;
-    numbersDerived = false;
     saves = 0;
     statCap = 0;
 }

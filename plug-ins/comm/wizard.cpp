@@ -1187,11 +1187,7 @@ static bool has_nopost(Character *ch)
         buf << "Тир: " << MobBody::tiers( ).name( tier );
         if (tier != pIndex->tier)
             buf << " (прототип " << MobBody::tiers( ).name( pIndex->tier ) << ")";
-        buf
-            << (pIndex->numbersDerived ? " (числа от тира)" : " (числа из зоны)")
-            << "  Тело: " << (pIndex->bodyResolved ? "формы расы" : "старая модель")
-            << "  Походка: " << (pIndex->bodyResolved ? pIndex->moveverb.c_str() : "-")
-            << endl;
+        buf << "  Походка: " << pIndex->moveverb << endl;
     }
 
     buf << "Золото: " << victim->gold << "  "

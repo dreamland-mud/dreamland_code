@@ -354,11 +354,8 @@ DefaultRace::DefaultRace( ) :
                 imm( 0, &imm_flags ),
                 res( 0, &res_flags ),
                 vuln( 0, &vuln_flags ),
-                form( 0, &form_flags ),
-                parts( 0, &part_flags ),
                 stats( &stat_table ),
                 size( SIZE_MEDIUM, &size_table ),
-                wearloc( wearlocationManager ),
                 affects( skillManager ),
                 hunts( raceManager ),
                 donates( raceManager ),
@@ -421,15 +418,15 @@ void DefaultRace::unloaded( )
 
 const Flags & DefaultRace::getDet( ) const
 {
-    return hasBodyForms( ) ? resolved( ).det : det;
+    return resolved( ).det;
 }
 const Flags & DefaultRace::getAct( ) const
 {
-    return hasBodyForms( ) ? resolved( ).act : act;
+    return resolved( ).act;
 }
 const Flags & DefaultRace::getAff( ) const
 {
-    return hasBodyForms( ) ? resolved( ).aff : derivedAff( );
+    return resolved( ).aff;
 }
 
 /** Racial affects whose handler sets an affect bit, and that bit. */
@@ -465,27 +462,27 @@ const Flags & DefaultRace::derivedAff( ) const
 }
 const Flags & DefaultRace::getOff( ) const
 {
-    return hasBodyForms( ) ? resolved( ).off : off;
+    return resolved( ).off;
 }
 const Flags & DefaultRace::getImm( ) const
 {
-    return hasBodyForms( ) ? resolved( ).imm : imm;
+    return resolved( ).imm;
 }
 const Flags & DefaultRace::getRes( ) const
 {
-    return hasBodyForms( ) ? resolved( ).res : res;
+    return resolved( ).res;
 }
 const Flags & DefaultRace::getVuln( ) const
 {
-    return hasBodyForms( ) ? resolved( ).vuln : vuln;
+    return resolved( ).vuln;
 }
 const Flags & DefaultRace::getForm( ) const
 {
-    return hasBodyForms( ) ? resolved( ).form : form;
+    return resolved( ).form;
 }
 const Flags & DefaultRace::getParts( ) const
 {
-    return hasBodyForms( ) ? resolved( ).parts : parts;
+    return resolved( ).parts;
 }
 
 const EnumerationArray & DefaultRace::getStats( ) const 
@@ -495,7 +492,7 @@ const EnumerationArray & DefaultRace::getStats( ) const
 
 const GlobalBitvector & DefaultRace::getWearloc( ) const
 {
-    return hasBodyForms( ) ? resolved( ).wearloc : wearloc;
+    return resolved( ).wearloc;
 }
 
 const GlobalBitvector & DefaultRace::getAffects( ) const
@@ -584,11 +581,6 @@ Flags DefaultRace::getAttitude( const Race &race ) const
 /*------------------------------------------------------------------
  * DefaultRace: mob reform body model
  *------------------------------------------------------------------*/
-bool DefaultRace::hasBodyForms( ) const
-{
-    return !forms.empty( ) && MobBody::forms( ).loaded;
-}
-
 void DefaultRace::getBodyInput( Body::Input &in, bool npc ) const
 {
     StringList words( forms.getValue( ) );
@@ -626,9 +618,12 @@ const DefaultRace::ResolvedBody & DefaultRace::resolved( ) const
     Body::Input in;
     getBodyInput( in, !isPC( ) );
 
+    // Without a loaded config every form is unknown; the loader has already
+    // logged that once, so the per-race warnings would only be noise.
     Body::Result r = Body::resolve( MobBody::forms( ), in );
-    for (auto &w: r.warnings)
-        LogStream::sendWarning( ) << "race " << getName( ) << ": " << w << endl;
+    if (MobBody::forms( ).loaded)
+        for (auto &w: r.warnings)
+            LogStream::sendWarning( ) << "race " << getName( ) << ": " << w << endl;
 
     MobBody::Engine e;
     e.fromResult( r );

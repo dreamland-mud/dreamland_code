@@ -44,8 +44,10 @@ void GangChef::config( int level )
 
     const MobTiers::Config &tc = MobBody::tiers( );
     int boss = tc.parse( "boss" );
-    if (!boss || !apply_mob_tier( ch, level, boss ))
+    if (!boss)
         return;
+
+    apply_mob_tier( ch, level, boss );
 
     const MobTiers::Tier &row = tc.get( boss );
     Body::NameSet aff( row.affAdd.begin( ), row.affAdd.end( ) );
