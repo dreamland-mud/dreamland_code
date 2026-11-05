@@ -37,6 +37,11 @@
 #include "save_bank.h"
 #include "fenia_utils.h"
 #include "dlfilestream.h"
+#include "object.h"
+#include "room.h"
+#include "save.h"
+#include "loadsave.h"
+#include <set>
 #include <jsoncpp/json/json.h>
 
 void fread_to_end_string( FILE *pfile );
@@ -458,6 +463,49 @@ static void pfRememberDeleted( const DLString &name, const DLString &nonce, time
     }
 }
 
+/*
+ * Ownership is just the owner's name string (Object::hasOwner), so objects left
+ * in the world by a deleted character would answer to anyone who later takes
+ * the same name. Personal quest rewards and PC corpses are destroyed (they are
+ * worthless to anyone else and the freed name must not inherit them), the rest
+ * become ownerless. Rooms and mob carriers are re-saved, as rename does.
+ * Only the delete path calls this: remort keeps the name and its items.
+ */
+static void pfDisownObjects( const DLString &name )
+{
+    std::vector<Object *> owned;
+    for (Object *obj = object_list; obj != 0; obj = obj->next)
+        if (obj->getOwner( ) ^ name)
+            owned.push_back( obj );
+
+    std::set<Room *> itemRooms, mobRooms;
+
+    for (auto obj: owned) {
+        // Already gone with an extracted container, or the pooled struct was reused.
+        if (obj->extracted || !(obj->getOwner( ) ^ name))
+            continue;
+
+        Object *top = obj;
+        while (top->in_obj)
+            top = top->in_obj;
+
+        if (top->in_room)
+            itemRooms.insert( top->in_room );
+        else if (top->carried_by && top->carried_by->is_npc( ))
+            mobRooms.insert( top->carried_by->in_room );
+
+        if (obj->isPersonalQuestReward( ) || obj->item_type == ITEM_CORPSE_PC)
+            extract_obj( obj );
+        else
+            obj->setOwner( DLString::emptyString );
+    }
+
+    for (auto room: itemRooms)
+        save_items( room );
+    for (auto room: mobRooms)
+        save_mobs( room );
+}
+
 bool PCharacterManager::pfDelete ( const DLString& playerName )
 {
     DLString name = playerName.toLower( );
@@ -496,6 +544,8 @@ bool PCharacterManager::pfDelete ( const DLString& playerName )
     // Drop the object-bank cell tree too, so a freed name can't inherit the
     // deleted character's stored items (and dead hoards don't linger on disk).
     bank_drop_owner( "player", name );
+
+    pfDisownObjects( name );
 
     // Retired with the same nonce as the pfile, never loaded again.
     web_char_files_move( name, name, ".delete." + nonce );
