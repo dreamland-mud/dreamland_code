@@ -16,6 +16,7 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "websocketrpc.h"
+#include "screenreader.h"
 
 #include "def.h"
 #include "l10n.h"
@@ -311,7 +312,11 @@ void AllSkillsList::display( std::ostream & buf )
     int bool_long_name = 0;
     if ( tmp_max > 19 ) bool_long_name = 1;
 
+    // A screen reader gets one skill per line under its level, no table.
+    bool screenreader = uses_screenreader( ch );
+
     // Draw the header. 
+    if (!screenreader)
     buf << "{W=========================================================="
         << (bool_long_name ? "{x" : "====================={x")
         << endl
@@ -355,6 +360,31 @@ void AllSkillsList::display( std::ostream & buf )
             DLString quoted = info.id.find(' ') == DLString::npos ? info.id : "'" + info.id + "'";
             web.action(row, "practice", "practice " + quoted);
             web.action(row, "help", info.help_id > 0 ? "help " + DLString(info.help_id) : "help " + info.id);
+        }
+
+        if (screenreader) {
+            if (info.level != prevLevel)
+                buf << fmt(0, "%s %d:", l(ch, "Уровень"), info.level) << endl;
+
+            if (info.help_id > 0)
+                buf << "{hh" << info.help_id << " ";
+            buf << "{c" << info.name << "{x";
+
+            if (!info.available)
+                buf << lmsg(viewerLang(ch), ", not available yet", ", пока недоступно", ", поки недоступно");
+            else if (info.real != info.learned)
+                buf << fmt(0, ", %d%% (%d%%)", info.learned, info.real);
+            else
+                buf << fmt(0, ", %d%%", info.learned);
+
+            if (info.mana > 0 && info.available)
+                buf << fmt(0, lmsg(viewerLang(ch), ", %d mana", ", мана %d", ", мана %d"), info.mana);
+            else if (info.moves > 0 && info.available)
+                buf << fmt(0, lmsg(viewerLang(ch), ", %d moves", ", шаги %d", ", кроки %d"), info.moves);
+
+            buf << endl;
+            prevLevel = info.level;
+            continue;
         }
 
         if (info.level != prevLevel) {
@@ -412,7 +442,8 @@ void AllSkillsList::display( std::ostream & buf )
 
     web.send( );
 
-    buf << fmt(ch, _("Цена -- мана, или шаги с пометкой %1$s.\r\n"), l(ch, "ш"));
+    if (!screenreader)
+        buf << fmt(ch, _("Цена -- мана, или шаги с пометкой %1$s.\r\n"), l(ch, "ш"));
 
     buf << fmt(ch,
         _("Также используй фильтры "
