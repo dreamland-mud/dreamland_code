@@ -10,7 +10,10 @@
 #include "door_utils.h"
 
 
+#include "jsoncpp/json/json.h"
+
 #include "commandtemplate.h"
+#include "descriptor.h"
 #include "pcharacter.h"
 #include "room.h"
 #include "dlscheduler.h"
@@ -315,35 +318,50 @@ void SpeedWalkUpdateTask::after( )
  * XMLAttributeSpeedWalk 
  *----------------------------------------------------------------------------*/
 
+/** Tell a web client what is left of the run, so it can offer to resume it
+ *  without reading the text line. An empty path means the run is over. */
+static void run_web_send(PCharacter *ch, const DLString &collated)
+{
+    if (!ch->desc)
+        return;
+
+    Json::Value frame;
+    frame["command"] = "run_left";
+    frame["args"][0]["path"] = collated;
+    ch->desc->writeWSCommand(frame);
+}
+
 /** Display remaining path to the player, if any. */
 void XMLAttributeSpeedWalk::show(PCharacter *ch) const
 {
-    if (path.empty())
+    if (path.empty()) {
+        run_web_send(ch, DLString::emptyString);
         return;
-
-    // Speedwalk is kept in enhanced mode: replace nnn with 3n.
-    DLString collated;
-    char last_letter = path.at(0);
-    int cnt = 0;
-
-    // TODO: use collate_speedwalk() from the 'traverse' plugin.
-    for (size_t i = 0; i < path.size(); i++) {
-        if (path.at(i) == last_letter && isSmallLetter(last_letter)) {
-            cnt++;
-        } else {
-            if (cnt > 1) // Don't show '1n', just 'n'.
-                collated << cnt;
-            collated << last_letter;
-            last_letter = path.at(i);
-            cnt = 1;
-        }
     }
 
-    // Add last remaining letter from the path.
-    if (isSmallLetter(last_letter)) {
-        if (cnt > 1)
-            collated << cnt;
-        collated << last_letter;
+    // Speedwalk is kept in enhanced mode: replace nnn with 3n. A capital letter
+    // (run to the end) never takes a count, since 'run' refuses '2N', so each
+    // one is written out as is. That is also why collate_speedwalk() from the
+    // 'traverse' plugin can't be used here.
+    DLString collated;
+
+    for (size_t i = 0; i < path.size(); ) {
+        char letter = path.at(i);
+        size_t next = i;
+
+        for (; next < path.size() && path.at(next) == letter; next++)
+            ;
+
+        if (isSmallLetter(letter)) {
+            if (next - i > 1) // Don't show '1n', just 'n'.
+                collated << (int)(next - i);
+            collated << letter;
+        } else {
+            for (size_t k = i; k < next; k++)
+                collated << letter;
+        }
+
+        i = next;
     }
         
     if (ch->isCoder())
@@ -351,6 +369,8 @@ void XMLAttributeSpeedWalk::show(PCharacter *ch) const
 
     if (!collated.empty())
         ch->pecho(_("Тебе оставалось бежать: {hs{c%s{x"), collated.c_str());
+
+    run_web_send(ch, collated);
 }
 
 char XMLAttributeSpeedWalk::getFirstCommand( ) const

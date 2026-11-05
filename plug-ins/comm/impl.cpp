@@ -34,9 +34,11 @@ extern "C"
                 SO::PluginList ppl;
             
                 Plugin::registerPlugin<ConfigCommand>( ppl );
+                // Listeners run in this order. The account config goes onto the
+                // character first, so config_state reports what the player has.
+                Plugin::registerPlugin<AccountConfigLoginListener>( ppl );
                 Plugin::registerPlugin<ConfigWebStateListener>( ppl );
                 Plugin::registerPlugin<ChatWebStateListener>( ppl );
-                Plugin::registerPlugin<AccountConfigLoginListener>( ppl );
 
                 Plugin::registerPlugin<SpeedWalkUpdateTask>( ppl );
                 Plugin::registerPlugin<SandboxReaper>( ppl );

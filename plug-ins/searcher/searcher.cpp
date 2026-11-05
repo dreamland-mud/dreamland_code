@@ -31,6 +31,7 @@
 #include "weapontier.h"
 #include "weapons.h"
 #include "loadsave.h"
+#include "tohit.h"
 #include "occupations.h"
 #include "profiler.h"
 
@@ -48,34 +49,57 @@ static void csv_escape( DLString &name ) {
 //    name.replaces( "\'", "\\\'");
 }
 
+/** The languages every display field is dumped in, and their key suffixes. */
+static const lang_t dump_langs[3] = { RU, EN, UA };
+static const char * const dump_suffix[3] = { "", "En", "Ua" };
+
 /** Emit a display string in all three languages. The bare key keeps its historic
  *  Russian value so existing consumers of the dump keep working; 'keyEn'/'keyUa'
  *  are additions. Empty EN/UA fall back to RU inside getForLang. */
 static void json_lang_string( Json::Value &j, const char *key,
                               const XMLMultiString &src, bool lower = false )
 {
-    static const lang_t langs[3] = { RU, EN, UA };
-    static const char * const suffix[3] = { "", "En", "Ua" };
-
     for (int i = 0; i < 3; i++) {
-        DLString v = src.getForLang( langs[i] ).ruscase( '1' );
+        DLString v = src.getForLang( dump_langs[i] ).ruscase( '1' );
         if (lower)
             v.toLower( );
         csv_escape( v );
-        j[( DLString( key ) + suffix[i] ).c_str( )] = v;
+        j[( DLString( key ) + dump_suffix[i] ).c_str( )] = v;
     }
 }
 
 /** Same, for area names, which have their own per-language accessor. */
 static void json_lang_area( Json::Value &j, const char *key, AreaIndexData *pArea )
 {
-    static const lang_t langs[3] = { RU, EN, UA };
-    static const char * const suffix[3] = { "", "En", "Ua" };
-
     for (int i = 0; i < 3; i++) {
-        DLString v = pArea->getName( langs[i] );
+        DLString v = pArea->getName( dump_langs[i] );
         csv_escape( v );
-        j[( DLString( key ) + suffix[i] ).c_str( )] = v;
+        j[( DLString( key ) + dump_suffix[i] ).c_str( )] = v;
+    }
+}
+
+/** Same, for a set of flags such as the weapon's special attacks. */
+static void json_lang_flags( Json::Value &j, const char *key,
+                             const FlagTable &table, bitstring_t bits )
+{
+    for (int i = 0; i < 3; i++)
+        j[( DLString( key ) + dump_suffix[i] ).c_str( )] = table.messages( bits, false, '1', dump_langs[i] );
+}
+
+/** Armor class against each damage kind as the wearer gets it: the armor's
+ *  values times its slot's armorCoef, the way equip adds them, plus the AC
+ *  affects, which count 1:1. Signed so that more is better: an AC affect of -5
+ *  adds 5. For random armor the prototype values are only the floor of a roll. */
+static void json_armor_class( Json::Value &j, OBJ_INDEX_DATA *pObj, int acApply )
+{
+    static const char * const keys[4] = { "ac_pierce", "ac_bash", "ac_slash", "ac_exotic" };
+    int coef = armor_coef_for_flags( pObj->wear_flags );
+
+    for (int i = 0; i < 4; i++) {
+        int ac = -acApply;
+        if (pObj->item_type == ITEM_ARMOR)
+            ac += pObj->value[i] * coef;
+        j[keys[i]] = ac;
     }
 }
 
@@ -343,7 +367,7 @@ public:
         
             // Find all bonuses.
             int hr=0, dr=0, hp=0, svs=0, mana=0, move=0;
-            int str=0, inta=0, wis=0, dex=0, con=0, cha=0;
+            int str=0, inta=0, wis=0, dex=0, con=0, cha=0, ac=0;
             DLString aff,det,imm,res,vuln;
             DLString align;
 
@@ -362,6 +386,7 @@ public:
                 case APPLY_MOVE: move+=m; break;
                 case APPLY_HITROLL: hr+=m; break;
                 case APPLY_DAMROLL: dr+=m; break;
+                case APPLY_AC: ac+=m; break;
                 case APPLY_SAVES:         
                 case APPLY_SAVING_ROD:    
                 case APPLY_SAVING_PETRI:  
@@ -401,7 +426,7 @@ public:
             if (wear == ITEM_HOLD) {
                 useless = str == 0 && inta == 0 && wis == 0 && dex == 0 && con == 0 && cha == 0
                     && hp == 0 && mana == 0 && move == 0 && hr == 0 && dr == 0
-                    && svs == 0;
+                    && svs == 0 && ac == 0;
                 // TODO check affects
             }
 
@@ -442,18 +467,22 @@ public:
                 a["stat_con"] = con;
                 a["stat_cha"] = cha;
                 a["align"] = align;
+                json_armor_class(a, pObj, ac);
             } else {
                 a["hr"] = a["dr"] = a["hp"] = 
                 a["mana"] = a["move"] = a["saves"] = 
                 a["stat_str"] = a["stat_int"] = 
                 a["stat_wis"] = a["stat_dex"] = 
                 a["stat_con"] = a["stat_cha"] = 
-                a["align"] = "-";
+                a["align"] = 
+                a["ac_pierce"] = a["ac_bash"] = 
+                a["ac_slash"] = a["ac_exotic"] = "-";
             }
 
             json_lang_area(a, "area", pArea);
             json_lang_string(a, "where", where);
             a["limit"] = pObj->limit;
+            a["random"] = item_is_random_armor(pObj) ? 1 : 0;
             dump.append(a);
         }
 
@@ -495,7 +524,6 @@ public:
 
             // Format weapon class, special flags and damage.
             DLString weaponClass = weapon_class.name( pObj->value[0] );
-            DLString special = weapon_type2.messages( pObj->value[4] );
             int d1 = pObj->value[1];
             int d2 = pObj->value[2];
             int ave = weapon_ave(pObj);
@@ -557,7 +585,7 @@ public:
 
             // For 'noident' items only show a subset of fields.
             if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
-                w["special"] = special;
+                json_lang_flags(w, "special", weapon_type2, pObj->value[4]);
                 w["d1"] = d1;
                 w["d2"] = d2;
                 w["ave"] = ave;
@@ -573,7 +601,7 @@ public:
                 w["stat_con"] = con;
                 w["align"] = align;
             } else {
-                w["special"] = 
+                w["special"] = w["specialEn"] = w["specialUa"] = 
                 w["d1"] = w["d2"] = w["ave"] = 
                 w["hr"] = w["dr"] = w["hp"] = 
                 w["mana"] = w["saves"] = 

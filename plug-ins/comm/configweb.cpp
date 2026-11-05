@@ -61,7 +61,8 @@ CONFIGURABLE_DECL(config, settings)
  * Who asked, and how recently
  *------------------------------------------------------------------------*/
 
-/** Deltas go only to a client that has asked for the schema. A player who never
+/** Deltas go only to a client that has asked for the schema, except
+ *  screenreader (see web_config_changed). A player who never
  *  opens the dialog costs the server nothing on the wire, which is the whole
  *  reason the values do not ride on the prompt any more.
  *
@@ -240,7 +241,9 @@ void web_config_changed( PCharacter *ch, const DLString &key, const Json::Value 
     if (!ch || !config_web_playing(ch))
         return;
 
-    if (config_web_asked.count(ch->getName()) == 0)
+    // The screen reader switch also drives reading aids outside the dialog,
+    // so a client hears about it whether or not the dialog was ever opened.
+    if (config_web_asked.count(ch->getName()) == 0 && key != "screenreader")
         return;
 
     Json::Value body;
@@ -547,8 +550,13 @@ void ConfigWebStateListener::run( int oldState, int newState, Descriptor *d )
     if (newState == CON_PLAYING) {
         Json::Value body;
         body["playing"] = 1;
-        if (pch)
+        if (pch) {
             body["who"] = pch->getName();
+            // A screen reader client switches its reading aids on from this
+            // without the dialog ever being opened. Read after the account
+            // config has landed: see the listener order in impl.cpp.
+            body["screenreader"] = IS_SET(pch->config, CONFIG_SCREENREADER) ? 1 : 0;
+        }
 
         config_web_send(d->character, "config_state", body);
         return;
