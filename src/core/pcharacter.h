@@ -248,6 +248,7 @@ public:
     virtual int getCurrStat( int );
     int getMaxStat( int );
     int getMaxTrain( int );
+    int getRemortStatCap( );
     
     // misc
     virtual bool is_vampire( ) const;

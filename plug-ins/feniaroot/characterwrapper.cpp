@@ -927,7 +927,8 @@ static int remort_bonus_max( PCharacter *pch, const DLString &kind )
 
     int stat = remort_stat_index( kind );
     if (stat >= 0)
-        return MAX_STAT_REMORT - pch->getMaxStat( stat );
+        return std::max( 0, std::min( pch->getRemortStatCap( ) - pch->getRemorts( ).stats[stat].getValue( ),
+                            MAX_STAT - pch->getMaxStat( stat ) ) );
 
     return 0;
 }

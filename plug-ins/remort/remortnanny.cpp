@@ -32,13 +32,19 @@ static void update_remort_bonuses(PCharacter *ch)
     for (int i = 0; i < stat_table.size; i++) {
         int max_stat = ch->getMaxTrain(i);
         int bonus_stat = ch->getRemorts().stats[i];
-        int diff = max_stat + bonus_stat - MAX_STAT;
+        int cap = ch->getRemortStatCap();
+        int room = std::max(0, MAX_STAT - max_stat);
+        int diff = bonus_stat - std::min(cap, room);
 
         if (diff > 0) {
-            notice("Fixing remort bonus for %s: %s bonus was %d, current max is %d, diff %d",
-                    ch->getName().c_str(), stat_table.name(i).c_str(), bonus_stat, max_stat, diff);
-            ch->pecho(_("{cУ твоей расы теперь выше параметр '%s', тебе нет нужды покупать его дополнительно за реморты.{x"),
-                       stat_table.message(i).c_str());
+            notice("Fixing remort bonus for %s: %s bonus was %d, current max is %d, cap %d, diff %d",
+                    ch->getName().c_str(), stat_table.name(i).c_str(), bonus_stat, max_stat, cap, diff);
+            if (room < cap)
+                ch->pecho(_("{cУ твоей расы теперь выше параметр '%s', тебе нет нужды покупать его дополнительно за реморты.{x"),
+                           stat_table.message(i).c_str());
+            else
+                ch->pecho(_("{cБонус за реморты теперь поднимает параметр не больше чем на %d выше максимума твоей расы и класса. Лишние покупки параметра '%s' можно снова потратить у Бабы Яги.{x"),
+                           cap, stat_table.message(i).c_str());
             ch->getRemorts().stats[i] -= diff;
             ch->getRemorts().points += 10 * diff;
         }
