@@ -153,8 +153,8 @@ int main(int argc, char **argv)
         failures++;
     }
 
-    // Every race goes through the resolver, the unique race with no <forms> at
-    // all: a bare body that keeps its race wearlocs, with no warnings.
+    // Race level: the unique race (no <forms>) resolves to a bare body that keeps
+    // its race wearlocs, with no warnings. Its mobs skip the resolver (formless rule).
     {
         Input in;
         in.race.wearlocsAdd.insert("neck");
