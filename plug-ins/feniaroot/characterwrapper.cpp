@@ -6344,13 +6344,16 @@ static Character * ga_rootCarrier( ::Object *o )
 // Fenia render only names and colours it. Quests are always medium. The guard is read
 // as guard level plus its tier's extra levels (ga_effGuard), and the tier sets a floor:
 // an elite is never easy, a champion is at least hard, a boss or a legend is deadly --
-// unless the char is 10+ levels above the boss's real level, where only the +40 band
-// math speaks. Deadly is also any fight 15+ effective levels above the char.
+// unless the char is 10+ levels above the boss's real level. A boss's +40 also shrinks
+// by 2 per level the char stands above it, so an outlevelled boss stops reading deadly.
+// Deadly is also any fight 15+ effective levels above the char.
 static int ga_band( int method, int guard, int tier, int chLevel, int aggros, int doors, int fly )
 {
     if (method == GA_QUEST || method == GA_UNKNOWN)   // no known route -> not "easy"
         return 1;
     int eff = ga_effGuard( guard, tier );
+    if (tier <= 2 && chLevel > guard)
+        eff = guard + std::max( 0, ga_tierLevels( tier ) - 2 * (chLevel - guard) );
     int band;
     if (eff >= chLevel + 15)
         band = 3;
