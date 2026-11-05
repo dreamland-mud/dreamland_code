@@ -33,6 +33,7 @@
 #include "l10n.h"
 #include "dreamland.h"
 #include "dlfilestream.h"
+#include "screenreader.h"
 
 static const DLString WHO = "who";
 
@@ -272,6 +273,16 @@ static DLString who_cmd_format_offline( PCharacter *ch, PCMemoryInterface *victi
 
     DLString name = Player::displayLang(ch) != LANG_EN && !victim->getRussianName().getFullForm().empty()
         ? victim->getRussianName().decline('1') : victim->getName();
+
+    // A screen reader can't see the star's colour: say the status in words.
+    if (uses_screenreader(ch)) {
+        lang_t lang = Player::displayLang(ch);
+        const char *word = status == "online" ? lmsg(lang, "online", "в сети", "у мережі")
+                         : status == "idle" ? lmsg(lang, "away", "отошел", "відійшов")
+                         : lmsg(lang, "busy", "занят", "зайнятий");
+        return fmt(0, "{W%s{x (Discord, %s)\r\n", name.c_str(), word);
+    }
+
     buf << "{W" << name << "  {D(Discord){x" << endl;        
     
     return buf.str();
@@ -356,6 +367,84 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
 }
 
 
+/** Collapse the padding of a fixed-width column into single spaces. */
+static DLString who_squeeze( const DLString &text )
+{
+    DLString out;
+    bool space = false;
+
+    for (char c: text) {
+        if (c == ' ') {
+            space = !out.empty( );
+            continue;
+        }
+        if (space)
+            out += ' ';
+        space = false;
+        out += c;
+    }
+    return out;
+}
+
+/** One line of 'who' for a screen reader: name and title first, then the
+ *  same details as the table, separated by commas instead of padded columns. */
+static DLString who_cmd_format_char_sr( PCharacter *ch, PCharacter *victim, DLString arg )
+{
+    DLString arg1 = arg.getOneArgument( );
+    DLString arg2 = arg.getOneArgument( );
+    std::basic_ostringstream<char> buf;
+    lang_t lang = Player::displayLang( ch );
+
+    bool pk = victim != ch
+        && !victim->is_immortal( )
+        && victim->getModifyLevel( ) >= PK_MIN_LEVEL
+        && !is_safe_nomessage( ch, victim );
+    if (!pk && (arg_is_pk( arg1 ) || arg_is_pk( arg2 )))
+        return "";
+
+    bool coder = victim->getAttributes().isAvailable("coder");
+    if (victim->getLevel( ) > LEVEL_HERO
+            || (coder && ch->isCoder( ) && victim->getLevel( ) >= LEVEL_HERO))
+        buf << "{C";
+    else
+        buf << "{W";
+
+    DLString descr = ch->seeName( victim );
+    if (arg_is_strict(arg1, "nopretitle") || arg_is_strict(arg2, "nopretitle"))
+        descr = victim->toNoun( ch )->decline('1');
+
+    webManipManager->decorateCharacter( buf, descr, victim, ch );
+    buf << "{x " << Player::title(victim, lang) << "{x";
+
+    DLString who = who_squeeze( who_cmd_left_column( ch, victim ) );
+    if (!who.empty( ))
+        buf << ", " << who;
+
+    if (pk)
+        buf << ", {rPK{x";
+
+    if (!victim->getClan( )->isHidden( ) && victim->get_trust() < LEVEL_IMMORTAL) {
+        const Clan &clan = *victim->getClan( );
+
+        buf << ", {x[{" << clan.getColor( ) << clan.getShortName( ).at( 0 ) << "{x]";
+        if (clan.isLeader( victim ))
+            buf << "{R({CL{R){x";
+        else if (clan.isRecruiter( victim ))
+            buf << "{R({CR{R){x";
+    }
+
+    int remorts = victim->getRemorts( ).size( );
+    if (remorts)
+        buf << ", " << fmt(0, lmsg(lang, "remorts %d", "перерождений %d", "перероджень %d"), remorts);
+
+    DLString flags = who_cmd_flags( victim );
+    if (!flags.empty( ))
+        buf << ", " << flags;
+
+    buf << endl;
+    return buf.str( );
+}
+
 /*-------------------------------------------------------------------------
  * 'who' command.
  *------------------------------------------------------------------------*/
@@ -389,8 +478,10 @@ CMDRUN(who)
 
     if (online_count > 0)
         buf << fmt(ch, _("Сейчас в мире {W%1$d{w игрок%1$I|а|ов:"), online_count) << endl;
+    bool screenreader = uses_screenreader(ch);
     for (const auto &victim: online)
-        buf << who_cmd_format_char(pch, victim, arguments);
+        buf << (screenreader ? who_cmd_format_char_sr(pch, victim, arguments)
+                             : who_cmd_format_char(pch, victim, arguments));
 
     if (offline_count > 0)
         buf << endl << fmt(ch, _("Еще {W%1$d{w игрок%1$I|а|ов слыш%1$Iит|ат|ат общие каналы:"), offline_count) << endl;
