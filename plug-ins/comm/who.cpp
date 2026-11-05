@@ -175,10 +175,9 @@ static DLString who_rank_cell( PCharacter *viewer, PCharacter *vict, const char 
     return buf.str( );
 }
 
-/** Format left column of the 'who' output, with race/class/clan. */
-static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict) 
+/** Immortal and coder ranks for the 'who' left column, or an empty string. */
+static DLString who_cmd_rank(PCharacter *ch, PCharacter *vict)
 {
-    std::basic_ostringstream<char> buf, tmp;
     bool coder = vict->getAttributes().isAvailable("coder");
 
     if (coder && ch->isCoder( ) && vict->getLevel( ) >= LEVEL_HERO)
@@ -186,20 +185,29 @@ static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict)
         return who_rank_cell( ch, vict, "{C", "Coder", "Coder", "КОДЕР", "КОДЕРША", "Кодер", "Кодерка" );
 
     switch (vict->getLevel( )) {
-    case MAX_LEVEL - 0: buf << who_rank_cell( ch, vict, "{W", "Implementor", "Implementor", "ДЕМИУРГ", "ДЕМИУРГИНЯ", "Деміург", "Деміургиня" ); break;
-    case MAX_LEVEL - 1: buf << who_rank_cell( ch, vict, "{C", "Creator", "Creator", "ТВОРЯЩИЙ", "ТВОРЯЩАЯ", "Творець", "Творчиня" ); break;
-    case MAX_LEVEL - 2: buf << who_rank_cell( ch, vict, "{C", "Supreme", "Supreme", "ТВОРЯЩИЙ", "ТВОРЯЩАЯ", "Верховний", "Верховна" ); break;
-    case MAX_LEVEL - 3: buf << who_rank_cell( ch, vict, "{C", "Deity", "Deity", "ТВОРЯЩИЙ", "ТВОРЯЩАЯ", "Божество", "Божество" ); break;
-    case MAX_LEVEL - 4: buf << who_rank_cell( ch, vict, "{C", "God", "Goddess", "БОГ", "БОГИНЯ", "Бог", "Богиня" ); break;
-    case MAX_LEVEL - 5: buf << who_rank_cell( ch, vict, "{G", "Immortal", "Immortal", "БЕССМЕРТНЫЙ", "БЕССМЕРТНАЯ", "Безсмертний", "Безсмертна" ); break;
-    case MAX_LEVEL - 6: buf << who_rank_cell( ch, vict, "{G", "Demigod", "Demigod", "ПОЛУБОГ", "ПОЛУБОГИНЯ", "Напівбог", "Напівбогиня" ); break;
-    case MAX_LEVEL - 7: buf << who_rank_cell( ch, vict, "{G", "Angel", "Angel", "АНГЕЛ", "АНГЕЛ", "Янгол", "Янгол" ); break;
-    case MAX_LEVEL - 8: buf << who_rank_cell( ch, vict, "{G", "Avatar", "Avatar", "АВАТАР", "АВАТАР", "Аватар", "Аватар" ); break;
-    case MAX_LEVEL - 9: buf << who_rank_cell( ch, vict, vict->getSex( ) == SEX_FEMALE ? "{y" : "{G", "Legendary", "Legendary", "ЛЕГЕНДАРНЫЙ", "ЛЕГЕНДАРНАЯ", "Легендарний", "Легендарна" ); break;
+    case MAX_LEVEL - 0: return who_rank_cell( ch, vict, "{W", "Implementor", "Implementor", "ДЕМИУРГ", "ДЕМИУРГИНЯ", "Деміург", "Деміургиня" );
+    case MAX_LEVEL - 1: return who_rank_cell( ch, vict, "{C", "Creator", "Creator", "ТВОРЯЩИЙ", "ТВОРЯЩАЯ", "Творець", "Творчиня" );
+    case MAX_LEVEL - 2: return who_rank_cell( ch, vict, "{C", "Supreme", "Supreme", "ТВОРЯЩИЙ", "ТВОРЯЩАЯ", "Верховний", "Верховна" );
+    case MAX_LEVEL - 3: return who_rank_cell( ch, vict, "{C", "Deity", "Deity", "ТВОРЯЩИЙ", "ТВОРЯЩАЯ", "Божество", "Божество" );
+    case MAX_LEVEL - 4: return who_rank_cell( ch, vict, "{C", "God", "Goddess", "БОГ", "БОГИНЯ", "Бог", "Богиня" );
+    case MAX_LEVEL - 5: return who_rank_cell( ch, vict, "{G", "Immortal", "Immortal", "БЕССМЕРТНЫЙ", "БЕССМЕРТНАЯ", "Безсмертний", "Безсмертна" );
+    case MAX_LEVEL - 6: return who_rank_cell( ch, vict, "{G", "Demigod", "Demigod", "ПОЛУБОГ", "ПОЛУБОГИНЯ", "Напівбог", "Напівбогиня" );
+    case MAX_LEVEL - 7: return who_rank_cell( ch, vict, "{G", "Angel", "Angel", "АНГЕЛ", "АНГЕЛ", "Янгол", "Янгол" );
+    case MAX_LEVEL - 8: return who_rank_cell( ch, vict, "{G", "Avatar", "Avatar", "АВАТАР", "АВАТАР", "Аватар", "Аватар" );
+    case MAX_LEVEL - 9: return who_rank_cell( ch, vict, vict->getSex( ) == SEX_FEMALE ? "{y" : "{G", "Legendary", "Legendary", "ЛЕГЕНДАРНЫЙ", "ЛЕГЕНДАРНАЯ", "Легендарний", "Легендарна" );
     }
 
-    if (!buf.str( ).empty( ))
-        return buf.str( );
+    return DLString::emptyString;
+}
+
+/** Format left column of the 'who' output, with race/class/clan. */
+static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict)
+{
+    std::basic_ostringstream<char> buf, tmp;
+
+    DLString rank = who_cmd_rank( ch, vict );
+    if (!rank.empty( ))
+        return rank;
 
     /* Level */
     if (can_see_level(ch, vict)) {
@@ -211,13 +219,13 @@ static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict)
 
     buf << fmt(0, "%3s", tmp.str( ).c_str( ) );
     tmp.str( "" );
-    
+
     /* Race */
     tmp << vict->getRace( )->getPC( )->getWhoNameFor( ch );
 
     if (tmp.str( ).size( ) < 4)
         buf << "  " << fmt(0, "%-4s", tmp.str( ).c_str( ) );
-    else 
+    else
         buf << " " << fmt(0, "%-5s", tmp.str( ).c_str( ) );
 
     tmp.str( "" );
@@ -230,177 +238,79 @@ static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict)
     return buf.str( );
 }
 
-/** Format flags near the player name in 'who' command. */
-static DLString who_cmd_flags(PCharacter *victim) 
+/** One flag near the player name: the table's coloured letter, and the words
+ *  a screen reader gets instead. */
+struct WhoFlag {
+    const char *code;
+    const char *en, *ru, *ua;
+};
+
+/** Flags of a player in 'who', in the order the table shows them. */
+static list<WhoFlag> who_flags(PCharacter *victim)
 {
-    std::basic_ostringstream<char> buf, result;
+    list<WhoFlag> flags;
     XMLAttributes *attrs = &victim->getAttributes( );
 
-    if (IS_SET( victim->comm, COMM_AFK ))  buf << "{CA";
-    if (victim->incog_level >= LEVEL_HERO) buf << "{DI";
-    if (victim->invis_level >= LEVEL_HERO) buf << "{DW";
-    if (IS_KILLER( victim ))               buf << "{RK";
-    if (IS_THIEF( victim ))                buf << "{RT";
-    if (IS_SLAIN( victim ))                buf << "{DS";
-    if (IS_GHOST( victim ))                buf << "{DG";
-    if (IS_DEATH_TIME( victim ))           buf << "{DP";
-    if (IS_VIOLENT( victim ))              buf << "{BV";
-    if (IS_SET( victim->act, PLR_WANTED))  buf << "{RW";
-    if (victim->isAffected(gsn_manacles)) buf << "{mM";
-    if (victim->isAffected(gsn_jail ))   buf << "{mJ";
-    if (!IS_SET( victim->act, PLR_CONFIRMED ) && victim->getRemorts( ).size( ) == 0) buf << "{gU";
-    if (attrs->isAvailable("nochannel"))   buf << "{mN";
-    if (attrs->isAvailable( "nopost" ))    buf << "{mP";
-    if (attrs->isAvailable( "teacher" ))   buf << "{gT";
+    if (IS_SET( victim->comm, COMM_AFK ))  flags.push_back({ "{CA", "AFK", "AFK", "AFK" });
+    if (victim->incog_level >= LEVEL_HERO) flags.push_back({ "{DI", "incognito", "инкогнито", "інкогніто" });
+    if (victim->invis_level >= LEVEL_HERO) flags.push_back({ "{DW", "invisibility", "невидимость", "невидимість" });
+    if (IS_KILLER( victim ))               flags.push_back({ "{RK", "killer", "убийца", "вбивця" });
+    if (IS_THIEF( victim ))                flags.push_back({ "{RT", "thief", "вор", "злодій" });
+    if (IS_SLAIN( victim ))                flags.push_back({ "{DS", "slain by a player", "смерть от игрока", "смерть від гравця" });
+    if (IS_GHOST( victim ))                flags.push_back({ "{DG", "ghost", "призрак", "привид" });
+    if (IS_DEATH_TIME( victim ))           flags.push_back({ "{DP", "protected by the gods", "под защитой богов", "під захистом богів" });
+    if (IS_VIOLENT( victim ))              flags.push_back({ "{BV", "attacked a player", "нападение на игрока", "напад на гравця" });
+    if (IS_SET( victim->act, PLR_WANTED))  flags.push_back({ "{RW", "wanted", "в розыске", "у розшуку" });
+    if (victim->isAffected(gsn_manacles)) flags.push_back({ "{mM", "in manacles", "в кандалах", "у кайданах" });
+    if (victim->isAffected(gsn_jail ))   flags.push_back({ "{mJ", "in prison", "в тюрьме", "у в'язниці" });
+    if (!IS_SET( victim->act, PLR_CONFIRMED ) && victim->getRemorts( ).size( ) == 0)
+        flags.push_back({ "{gU", "description not confirmed", "описание не подтверждено", "опис не підтверджено" });
+    if (attrs->isAvailable("nochannel"))   flags.push_back({ "{mN", "no right to speak", "без права голоса", "без права голосу" });
+    if (attrs->isAvailable( "nopost" ))    flags.push_back({ "{mP", "no right to write", "без права писать", "без права писати" });
+    if (attrs->isAvailable( "teacher" ))   flags.push_back({ "{gT", "teacher", "учитель", "вчитель" });
 
-    if (!buf.str( ).empty( )) 
+    return flags;
+}
+
+/** Format flags near the player name in 'who' command. */
+static DLString who_cmd_flags(PCharacter *victim)
+{
+    std::basic_ostringstream<char> buf, result;
+
+    for (auto &f: who_flags( victim ))
+        buf << f.code;
+
+    if (!buf.str( ).empty( ))
         result << "{x(" << buf.str( ) << "{x)";
 
     return result.str( );
 }
 
-/** Format offline players for the 'who' command. */
-static DLString who_cmd_format_offline( PCharacter *ch, PCMemoryInterface *victim ) 
+/** Whether 'who' marks the victim (PK) for this viewer. */
+static bool who_is_pk_target(PCharacter *ch, PCharacter *victim)
 {
-    ostringstream buf;
-    Json::Value discord;
-
-    get_json_attribute(victim, "discord", discord);
-
-    DLString status = discord["status"].asString(); 
-    DLString color = status == "online" ? "G" : (status == "idle" ? "Y" : "R");
-    buf << " {" << color << "*{x ";
-
-    DLString name = Player::displayLang(ch) != LANG_EN && !victim->getRussianName().getFullForm().empty()
-        ? victim->getRussianName().decline('1') : victim->getName();
-
-    // A screen reader can't see the star's colour: say the status in words.
-    if (uses_screenreader(ch)) {
-        lang_t lang = Player::displayLang(ch);
-        const char *word = status == "online" ? lmsg(lang, "online", "в сети", "у мережі")
-                         : status == "idle" ? lmsg(lang, "away", "отошел", "відійшов")
-                         : lmsg(lang, "busy", "занят", "зайнятий");
-        return fmt(0, "{W%s{x (Discord, %s)\r\n", name.c_str(), word);
-    }
-
-    buf << "{W" << name << "  {D(Discord){x" << endl;        
-    
-    return buf.str();
-}
-
-/** Format one line of 'who' command. */
-static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLString arg)
-{
-    DLString result;
-    DLString arg1 = arg.getOneArgument( );
-    DLString arg2 = arg.getOneArgument( );
-    std::basic_ostringstream<char> buf, tmp;
-
-    /* Level, Race, Class */
-    buf << "{x|" << who_cmd_left_column( ch, victim ) << "{x|";
-        
-    /* PK */
     // Report [553]: neither yourself nor an immortal is ever a real PK target
     // (is_safe(ch,ch) is false by definition, and gods can't be attacked), so
-    // don't tag them (PK) here, and drop them from the 'who pk' filter below.
-    if (victim != ch
-        && !victim->is_immortal( )
-        && victim->getModifyLevel( ) >= PK_MIN_LEVEL
-        && !is_safe_nomessage( ch, victim ))
-        tmp << "{x({rPK{x)";
-    else if (arg_is_pk( arg1 ) || arg_is_pk( arg2 ))
-        return "";
-
-
-
-    buf << fmt(0, "%4s", tmp.str( ).c_str( ) );
-    tmp.str( "" );
-
-    /* Clan, (R) (L) */
-    if (!victim->getClan( )->isHidden( ) && victim->get_trust() < LEVEL_IMMORTAL) {
-        const Clan &clan = *victim->getClan( );
-
-        tmp << "{x[{" << clan.getColor( ) << clan.getShortName( ).at( 0 ) << "{x]";
-        
-        if (clan.isLeader( victim ))
-            tmp << "{R({CL{R){x";
-        else if (clan.isRecruiter( victim ))
-            tmp << "{R({CR{R){x";
-        else 
-            tmp << "   ";
-    } 
-    
-    buf << fmt(0, "%6s", tmp.str( ).c_str( ) );
-    tmp.str( "" );
-   
-    /* Remorts */
-    int remorts = victim->getRemorts( ).size( );
-    if (remorts) {
-        if (remorts < 10)
-                tmp << " {W({M" + DLString(remorts) + "{W)";
-        else
-                tmp << "{W({M" + DLString(remorts) + "{W)";
-    }
-    
-    buf << fmt(0, "%4s", tmp.str( ).c_str( ) );
-    tmp.str( "" );
-
-    /* Flags */
-    buf << fmt(0, "%9s", who_cmd_flags(victim).c_str( ) );
-
-    /* Pretitle, Name, Title */
-    bool coder = victim->getAttributes().isAvailable("coder");
-    if (victim->getLevel( ) > LEVEL_HERO 
-            || (coder && ch->isCoder( ) && victim->getLevel( ) >= LEVEL_HERO))
-        buf << "{C";
-    else
-        buf << "{W";
-   
-    DLString descr = ch->seeName( victim );
-    if (arg_is_strict(arg1, "nopretitle") || arg_is_strict(arg2, "nopretitle"))
-        descr = victim->toNoun( ch )->decline('1');
-
-    webManipManager->decorateCharacter( buf, descr, victim, ch );
-    buf << "{x " << Player::title(victim, Player::displayLang(ch)) << "{x" << endl;
-
-    return buf.str( );
-}
-
-
-/** Collapse the padding of a fixed-width column into single spaces. */
-static DLString who_squeeze( const DLString &text )
-{
-    DLString out;
-    bool space = false;
-
-    for (char c: text) {
-        if (c == ' ') {
-            space = !out.empty( );
-            continue;
-        }
-        if (space)
-            out += ' ';
-        space = false;
-        out += c;
-    }
-    return out;
-}
-
-/** One line of 'who' for a screen reader: name and title first, then the
- *  same details as the table, separated by commas instead of padded columns. */
-static DLString who_cmd_format_char_sr( PCharacter *ch, PCharacter *victim, DLString arg )
-{
-    DLString arg1 = arg.getOneArgument( );
-    DLString arg2 = arg.getOneArgument( );
-    std::basic_ostringstream<char> buf;
-    lang_t lang = Player::displayLang( ch );
-
-    bool pk = victim != ch
+    // don't tag them (PK) here, and drop them from the 'who pk' filter.
+    return victim != ch
         && !victim->is_immortal( )
         && victim->getModifyLevel( ) >= PK_MIN_LEVEL
         && !is_safe_nomessage( ch, victim );
-    if (!pk && (arg_is_pk( arg1 ) || arg_is_pk( arg2 )))
-        return "";
+}
+
+/** The clan 'who' shows for the victim, or 0 when it is hidden. */
+static const Clan * who_visible_clan(PCharacter *victim)
+{
+    if (victim->getClan( )->isHidden( ) || victim->get_trust() >= LEVEL_IMMORTAL)
+        return 0;
+
+    return &*victim->getClan( );
+}
+
+/** Pretitle, name and title, coloured as in the table, without a line end. */
+static DLString who_name_title(PCharacter *ch, PCharacter *victim, const DLString &arg1, const DLString &arg2)
+{
+    std::basic_ostringstream<char> buf;
 
     bool coder = victim->getAttributes().isAvailable("coder");
     if (victim->getLevel( ) > LEVEL_HERO
@@ -414,36 +324,149 @@ static DLString who_cmd_format_char_sr( PCharacter *ch, PCharacter *victim, DLSt
         descr = victim->toNoun( ch )->decline('1');
 
     webManipManager->decorateCharacter( buf, descr, victim, ch );
-    buf << "{x " << Player::title(victim, lang) << "{x";
+    buf << "{x " << Player::title(victim, Player::displayLang(ch)) << "{x";
+    return buf.str( );
+}
 
-    DLString who = who_squeeze( who_cmd_left_column( ch, victim ) );
-    if (!who.empty( ))
-        buf << ", " << who;
+/** Format offline players for the 'who' command. */
+static DLString who_cmd_format_offline( PCharacter *ch, PCMemoryInterface *victim )
+{
+    ostringstream buf;
+    Json::Value discord;
+
+    get_json_attribute(victim, "discord", discord);
+
+    DLString status = discord["status"].asString();
+    DLString name = Player::displayLang(ch) != LANG_EN && !victim->getRussianName().getFullForm().empty()
+        ? victim->getRussianName().decline('1') : victim->getName();
+
+    // A screen reader can't see the star's colour: say the status in words.
+    if (uses_screenreader(ch)) {
+        lang_t lang = Player::displayLang(ch);
+        const char *word = status == "online" ? lmsg(lang, "online", "в сети", "у мережі")
+                         : status == "idle" ? lmsg(lang, "away", "не на месте", "не на місці")
+                         : lmsg(lang, "busy", "занят", "зайнятий");
+        return fmt(0, "{W%s{x (Discord, %s)\r\n", name.c_str(), word);
+    }
+
+    DLString color = status == "online" ? "G" : (status == "idle" ? "Y" : "R");
+    buf << " {" << color << "*{x ";
+    buf << "{W" << name << "  {D(Discord){x" << endl;
+
+    return buf.str();
+}
+
+/** Format one line of 'who' command. */
+static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLString arg)
+{
+    DLString arg1 = arg.getOneArgument( );
+    DLString arg2 = arg.getOneArgument( );
+    std::basic_ostringstream<char> buf, tmp;
+
+    /* Level, Race, Class */
+    buf << "{x|" << who_cmd_left_column( ch, victim ) << "{x|";
+
+    /* PK */
+    if (who_is_pk_target( ch, victim ))
+        tmp << "{x({rPK{x)";
+    else if (arg_is_pk( arg1 ) || arg_is_pk( arg2 ))
+        return "";
+
+    buf << fmt(0, "%4s", tmp.str( ).c_str( ) );
+    tmp.str( "" );
+
+    /* Clan, (R) (L) */
+    if (const Clan *clan = who_visible_clan( victim )) {
+        tmp << "{x[{" << clan->getColor( ) << clan->getShortName( ).at( 0 ) << "{x]";
+
+        if (clan->isLeader( victim ))
+            tmp << "{R({CL{R){x";
+        else if (clan->isRecruiter( victim ))
+            tmp << "{R({CR{R){x";
+        else
+            tmp << "   ";
+    }
+
+    buf << fmt(0, "%6s", tmp.str( ).c_str( ) );
+    tmp.str( "" );
+
+    /* Remorts */
+    int remorts = victim->getRemorts( ).size( );
+    if (remorts) {
+        if (remorts < 10)
+                tmp << " {W({M" + DLString(remorts) + "{W)";
+        else
+                tmp << "{W({M" + DLString(remorts) + "{W)";
+    }
+
+    buf << fmt(0, "%4s", tmp.str( ).c_str( ) );
+    tmp.str( "" );
+
+    /* Flags */
+    buf << fmt(0, "%9s", who_cmd_flags(victim).c_str( ) );
+
+    /* Pretitle, Name, Title */
+    buf << who_name_title( ch, victim, arg1, arg2 ) << endl;
+
+    return buf.str( );
+}
+
+/** One line of 'who' for a screen reader: name and title first, then the same
+ *  details as the table in words, separated by commas. What the table hides
+ *  from this viewer stays hidden. */
+static DLString who_cmd_format_char_sr( PCharacter *ch, PCharacter *victim, DLString arg )
+{
+    DLString arg1 = arg.getOneArgument( );
+    DLString arg2 = arg.getOneArgument( );
+    std::basic_ostringstream<char> buf;
+    lang_t lang = Player::displayLang( ch );
+
+    bool pk = who_is_pk_target( ch, victim );
+    if (!pk && (arg_is_pk( arg1 ) || arg_is_pk( arg2 )))
+        return "";
+
+    buf << who_name_title( ch, victim, arg1, arg2 );
+
+    /* Rank, or level, race and class in full */
+    DLString rank = who_cmd_rank( ch, victim );
+    if (!rank.empty( )) {
+        // The rank cell is padded to the column width: drop the padding.
+        DLString word;
+        for (char c: rank)
+            if (c != ' ')
+                word += c;
+        buf << ", " << word;
+    } else {
+        buf << ", ";
+        if (can_see_level( ch, victim ))
+            buf << fmt(0, lmsg(lang, "level %d", "уровень %d", "рівень %d"), victim->getLevel( )) << " ";
+        buf << victim->getRace( )->getNameFor( ch, victim );
+        if (can_see_profession( ch, victim ))
+            buf << " " << victim->getProfession( )->getNameFor( ch );
+    }
 
     if (pk)
         buf << ", {rPK{x";
 
-    if (!victim->getClan( )->isHidden( ) && victim->get_trust() < LEVEL_IMMORTAL) {
-        const Clan &clan = *victim->getClan( );
-
-        buf << ", {x[{" << clan.getColor( ) << clan.getShortName( ).at( 0 ) << "{x]";
-        if (clan.isLeader( victim ))
-            buf << "{R({CL{R){x";
-        else if (clan.isRecruiter( victim ))
-            buf << "{R({CR{R){x";
+    if (const Clan *clan = who_visible_clan( victim )) {
+        buf << ", " << lmsg(lang, "clan", "клан", "клан") << " {" << clan->getColor( ) << clan->getNameFor( lang ) << "{x";
+        if (clan->isLeader( victim ))
+            buf << " " << lmsg(lang, "leader", "лидер", "лідер");
+        else if (clan->isRecruiter( victim ))
+            buf << " " << lmsg(lang, "recruiter", "вербовщик", "вербувальник");
     }
 
     int remorts = victim->getRemorts( ).size( );
     if (remorts)
         buf << ", " << fmt(0, lmsg(lang, "remorts %d", "перерождений %d", "перероджень %d"), remorts);
 
-    DLString flags = who_cmd_flags( victim );
-    if (!flags.empty( ))
-        buf << ", " << flags;
+    for (auto &f: who_flags( victim ))
+        buf << ", " << lmsg(lang, f.en, f.ru, f.ua);
 
     buf << endl;
     return buf.str( );
 }
+
 
 /*-------------------------------------------------------------------------
  * 'who' command.
