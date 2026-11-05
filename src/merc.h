@@ -91,7 +91,8 @@
  * Per-class stuff.
  */
 #define MAX_STAT 28
-#define MAX_STAT_REMORT 25
+#define REMORT_STAT_BONUS 3        // remort bonus lifts a stat at most this far above the train cap
+#define REMORT_STAT_BONUS_HUMAN 5
 #define MIN_STAT 3        
 #define BASE_STAT 20        
 

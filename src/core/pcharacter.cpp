@@ -1031,14 +1031,14 @@ int PCharacter::getMaxStat( int i )
     if (getRealLevel( ) > LEVEL_IMMORTAL)
         return MAX_STAT;
 
-    int maxTrain = getMaxTrain( i );
-    int remortBonus = remorts.stats[i].getValue( );
+    int remortBonus = min( remorts.stats[i].getValue( ), getRemortStatCap( ) );
 
-    int maxStat = maxTrain > MAX_STAT_REMORT ? maxTrain //greater than 25 without remorts? then take it
-    : maxTrain+remortBonus > MAX_STAT_REMORT ? MAX_STAT_REMORT //remort bonus can't give more than 25
-    : maxTrain+remortBonus; //if less than or equal to 25 - take train+remorts
+    return URANGE( MIN_STAT, getMaxTrain( i ) + remortBonus, MAX_STAT );
+}
 
-    return URANGE( MIN_STAT, maxStat, MAX_STAT );
+int PCharacter::getRemortStatCap( )
+{
+    return getRace( )->getName( ) == "human" ? REMORT_STAT_BONUS_HUMAN : REMORT_STAT_BONUS;
 }
 
 int PCharacter::getMaxTrain( int i ) 
