@@ -9269,6 +9269,20 @@ NMI_INVOKE(CharacterWrapper, menu, "([number, action[, number, action]]): очи
     return Register();
 }
 
+NMI_INVOKE(CharacterWrapper, menuAdd, "(number, action): добавить пункт меню без вывода списка, для вариантов, которые скрипт печатает сам")
+{
+    checkTarget( );
+    CHK_NPC
+
+    if (args.size() != 2)
+        throw Scripting::NotEnoughArgumentsException( );
+
+    DLString choice = arg2number(args.front());
+    DLString action = arg2string(args.back());
+    Player::menuSet(target->getPC(), choice, action);
+    return Register();
+}
+
 NMI_INVOKE(CharacterWrapper, hash, "(mod): вернуть ключ к хеш-таблице по модулю mod")
 {
     checkTarget();
