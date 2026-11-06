@@ -1,4 +1,5 @@
 #include <sstream>
+#include <cstring>
 #include "player_menu.h"
 #include "pcharacter.h"
 #include "register-impl.h"
@@ -7,10 +8,16 @@
 #include "commandinterpreter.h"
 #include "descriptor.h"
 #include "l10n.h"
+#include "arg_utils.h"
+#include "dreamland.h"
+#include "room.h"
 
 using namespace std;
 
 static const DLString MENU_ATTR = "menu";
+// Where and when a script-printed menu (menuAdd) was set: room, time.
+static const DLString GUARD_ATTR = "menuguard";
+static const int GUARD_SECONDS = 600;
 
 void Player::menuSet(PCharacter* pch, const Integer& choice, const DLString& action)
 {
@@ -20,6 +27,37 @@ void Player::menuSet(PCharacter* pch, const Integer& choice, const DLString& act
 void Player::menuClear(PCharacter* pch)
 {
     pch->getAttributes().eraseAttribute(MENU_ATTR);
+    pch->getAttributes().eraseAttribute(GUARD_ATTR);
+}
+
+// A menu item whose options the script printed itself (quest dialogs). It
+// only answers in the room it was set in and for GUARD_SECONDS: an option
+// left unanswered, or answered by typing it, must not be replayed by a bare
+// number typed later somewhere else.
+void Player::menuSetGuarded(PCharacter* pch, const Integer& choice, const DLString& action)
+{
+    menuSet(pch, choice, action);
+    set_map_attribute_value(pch, GUARD_ATTR, "room", DLString(pch->in_room ? pch->in_room->vnum : 0));
+    set_map_attribute_value(pch, GUARD_ATTR, "time", DLString((long)dreamland->getCurrentTime()));
+}
+
+static bool menu_is_stale(PCharacter* pch)
+{
+    if (!pch->getAttributes().isAvailable(GUARD_ATTR))
+        return false;
+
+    DLString room = get_map_attribute_value(pch, GUARD_ATTR, "room");
+    DLString time = get_map_attribute_value(pch, GUARD_ATTR, "time");
+
+    if (!pch->in_room || room != DLString(pch->in_room->vnum))
+        return true;
+
+    // A hand-edited pfile must not throw from inside the interpreter.
+    try {
+        return dreamland->getCurrentTime() - time.toLong() > GUARD_SECONDS;
+    } catch (const ::Exception &e) {
+        return true;
+    }
 }
 
 bool Player::menuAvailable(PCharacter* pch)
@@ -75,26 +113,75 @@ void MenuInterpretLayer::putInto( )
     interp->put( this, CMDP_FIND, CMD_PRIO_FIRST + 1 );
 }
 
+// Menu choice from a typed word: "2", or dictated "2." / "два" / "two".
+// 0 when the word is not a choice.
+static int menu_choice_number(DLString word)
+{
+    static const char *keywords[] = { "one", "two", "three", "four", 0 };
+    Integer choice;
+
+    word.toLower();
+    while (!word.empty() && strchr(".,!?;:", word.at(word.length() - 1)))
+        word.erase(word.length() - 1);
+
+    if (Integer::tryParse(choice, word))
+        return choice.getValue();
+
+    for (int i = 0; keywords[i]; i++)
+        if (arg_is_strict(word, keywords[i]))
+            return i + 1;
+
+    return 0;
+}
+
 bool MenuInterpretLayer::process( InterpretArguments &iargs )
 {
     Character *ch = iargs.d ? iargs.d->character : 0;
-    Integer choice;
 
     if (!ch || ch->is_npc())
         return true;
 
     PCharacter *pch = ch->getPC();
 
-    // Input is something other than ^[0-9]+$
-    if (!iargs.cmdArgs.empty() || !Integer::tryParse(choice, iargs.cmdName)) {
+    // A pasted option line "[ANSWER 2]: say hi" splits into "[" and the rest:
+    // run what follows the label, menu or not.
+    if (iargs.cmdName == "[") {
+        DLString::size_type pos = iargs.cmdArgs.find("]:");
+        if (pos != DLString::npos && pos < 32) {
+            DLString rest = iargs.cmdArgs.substr(pos + 2);
+            rest.stripWhiteSpace();
+            if (!rest.empty()) {
+                iargs.line = rest;
+                iargs.splitLine();
+                // The pasted line is the answer: the menu is used up.
+                Player::menuClear(pch);
+            }
+        }
         return true;
     }
 
     if (!Player::menuAvailable(pch))
         return true;
 
+    if (menu_is_stale(pch)) {
+        Player::menuClear(pch);
+        return true;
+    }
+
+    // "answer 2", "відповідь 2": the label word in front of the number.
+    DLString word = iargs.cmdName;
+    if (!iargs.cmdArgs.empty()) {
+        if (!arg_is_strict(DLString(iargs.cmdName).toLower(), "answer") || iargs.cmdArgs.find(' ') != DLString::npos)
+            return true;
+        word = iargs.cmdArgs;
+    }
+
+    int choice = menu_choice_number(word);
+    if (choice <= 0)
+        return true;
+
     // This choice is not from the latest menu.
-    DLString menuAction = Player::menuGet(pch, choice);
+    DLString menuAction = Player::menuGet(pch, Integer(choice));
 
     if (menuAction.empty()) {
         ch->pecho(_("{RТакого варианта не было в списке.{x\n"));            
@@ -110,4 +197,3 @@ bool MenuInterpretLayer::process( InterpretArguments &iargs )
     Player::menuClear(pch);
     return true;
 }
-

@@ -16,6 +16,8 @@ namespace Scripting {
 namespace Player {
     void menuSet(PCharacter *pch, const Integer &choice, const DLString &action);
 
+    void menuSetGuarded(PCharacter *pch, const Integer &choice, const DLString &action);
+
     const DLString & menuGet(PCharacter *pch, const Integer &choice);
 
     void menuClear(PCharacter *pch);
