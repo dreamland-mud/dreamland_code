@@ -107,7 +107,8 @@ void GlobalQuestInfo::tryStart( const GlobalQuestInfo::Config &config )
     // A hidden quest is announced later (RainbowGQuest::after), trumpets
     // and the info pointer go with it.
     if (!gq->isHidden( )) {
-        GQChannel::infoHint( );
+        if (gq->startInfoHint( ))
+            GQChannel::infoHint( );
         gq->playStartSound( );
     }
 

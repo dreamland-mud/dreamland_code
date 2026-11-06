@@ -3,6 +3,8 @@
  * ruffina, 2003
  */
 
+#include <algorithm>
+
 #include "globalquest.h"
 #include "globalquestmanager.h"
 #include "gqchannel.h"
@@ -142,7 +144,8 @@ MultiMessage GlobalQuest::getStartBroadcast( ) const
 
 // Final standings, the same table as 'gquest progress', sent to the quest
 // channel before the winner is named. Call it before cleanup: rainbow counts
-// the pieces players still carry.
+// the pieces players still carry. A lone participant gets no table: the
+// winner announcement already names them.
 void GlobalQuest::echoFinalProgress( ) const
 {
     DLString text[LANG_MAX];
@@ -150,7 +153,8 @@ void GlobalQuest::echoFinalProgress( ) const
     for (int lg = LANG_MIN; lg < LANG_MAX; lg++) {
         ostringstream buf;
         progress( buf, (lang_t)lg );
-        if (buf.str( ).empty( ))
+        DLString rows = buf.str( );
+        if (std::count( rows.begin( ), rows.end( ), '\n' ) < 2)
             return;
 
         text[lg] = _("Итоги:").getMessage( (lang_t)lg ) + "\n" + buf.str( );

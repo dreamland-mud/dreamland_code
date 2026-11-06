@@ -64,6 +64,8 @@ public:
      * start line interpolates a level range). A quest whose start message is
      * pure flavor (invasion scenarios) overrides this to return a MultiMessage. */
     virtual MultiMessage getStartBroadcast( ) const;
+    /* False when the start broadcast already says everything 'gquest info' would. */
+    virtual bool startInfoHint( ) const { return true; }
 
     inline int getElapsedTime( ) const;
     inline int getRemainingTime( ) const;

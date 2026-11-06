@@ -3,6 +3,8 @@
  * ruffina, 2003
  */
 
+#include <algorithm>
+
 #include "dlscheduler.h"
 #include "race.h"
 #include "pcrace.h"
@@ -270,9 +272,10 @@ void Gangsters::cleanup( bool performance )
         killerInLair->pecho(_("{WВещи, оставшиеся на полу, отправлены в бюро находок.{x"));
 }
 
+// The final standings ride on the outcome line (gangScoreLine) instead of a
+// separate 'Results' table.
 void Gangsters::destroy( ) 
 {
-    echoFinalProgress( );
     cleanup( true );
     
     switch (state.getValue( )) {
@@ -399,7 +402,7 @@ void Gangsters::getQuestDescription( std::ostringstream &buf, Character *viewer 
 {
     lang_t lang = viewerLang( viewer );
 
-    buf << getStartBroadcast( ).getMessage( lang ) << endl
+    buf << getLevelsMessage( ).getMessage( lang ) << endl
         << getHint( lang ) << endl;
 }
 
@@ -440,7 +443,7 @@ void Gangsters::getQuestStartMessage( std::ostringstream &buf ) const
         << " уровней для уничтожения бандитов и их главаря.";
 }
 
-MultiMessage Gangsters::getStartBroadcast( ) const
+MultiMessage Gangsters::getLevelsMessage( ) const
 {
     std::basic_ostringstream<char> levels;
     levels << minLevel << "-" << maxLevel;
@@ -452,42 +455,84 @@ MultiMessage Gangsters::getStartBroadcast( ) const
     return MultiMessage( en, ru, ua );
 }
 
+// One line at start: who is wanted and where the bandits were first seen.
+MultiMessage Gangsters::getStartBroadcast( ) const
+{
+    MultiMessage levels = getLevelsMessage( );
+    DLString text[LANG_MAX];
+
+    for (int lg = LANG_MIN; lg < LANG_MAX; lg++) {
+        text[lg] = levels.getMessage( (lang_t)lg );
+        const DLString &hint = getHint( (lang_t)lg );
+        if (!hint.empty( ))
+            text[lg] += " " + hint;
+    }
+
+    return MultiMessage( text[LANG_EN], text[LANG_RU], text[LANG_UA] );
+}
+
 /*****************************************************************************/
 
 /*
  *  rewards
  */
 
+typedef std::vector<std::pair<PCMemoryInterface *, int> > GangScores;
+
+// Everyone who killed at least one bandit, best first.
+static GangScores gangScores( const DLString &questID )
+{
+    GangScores scores;
+    const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
+
+    for (auto i = pcm.begin( ); i != pcm.end( ); i++) {
+        XMLAttributeGangsters::Pointer attr;
+
+        attr = i->second->getAttributes( ).findAttr<XMLAttributeGangsters>( questID );
+        if (attr && attr->getKilled( ) > 0)
+            scores.push_back( std::make_pair( i->second, attr->getKilled( ) ) );
+    }
+
+    std::stable_sort( scores.begin( ), scores.end( ),
+        []( const GangScores::value_type &a, const GangScores::value_type &b ) {
+            return a.second > b.second;
+        } );
+    return scores;
+}
+
+// " Bandits slain: Kirke 5, Dred 3." for the outcome line; empty for a lone
+// hunter, whom the outcome line already names.
+static DLString gangScoreLine( const GangScores &scores, lang_t lang )
+{
+    if (scores.size( ) < 2)
+        return DLString::emptyString;
+
+    std::basic_ostringstream<char> list;
+    for (auto s = scores.begin( ); s != scores.end( ); s++) {
+        if (s != scores.begin( ))
+            list << ", ";
+        list << s->first->getNameP( '1', lang ) << " " << s->second;
+    }
+
+    DLString line = _("Убито бандитов: %1$s.").getMessage( lang );
+    line.replaces( "%1$s", list.str( ) );
+    return " " + line;
+}
+
 void Gangsters::rewardLeader( )
 {
-    PCharacterMemoryList::const_iterator i;
-    const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
-    std::list<PCMemoryInterface *> leaders;
-    int max = 0, killed;
+    GangScores scores = gangScores( getQuestID( ) );
 
-    for (i = pcm.begin( ); i != pcm.end( ); i++) {
-        XMLAttributeGangsters::Pointer attr;
-        
-        attr = i->second->getAttributes( ).findAttr<XMLAttributeGangsters>( getQuestID( ) );
-        
-        if (!attr) 
-            continue;
-
-        killed = attr->getKilled( );
-        if (killed && killed > max) {
-            max = killed;
-            leaders.clear( );
-            leaders.push_back( i->second );
-        } else if (killed && killed == max)
-            leaders.push_back( i->second );
-    }
-    
-    GQChannel::gecho( this, _("Главаря шайки так никто и не убил.") );
-
-    if (leaders.empty( )) {
-        GQChannel::gecho( this, _("Более того, ни один бандит не пострадал.") );
+    if (scores.empty( )) {
+        GQChannel::gecho( this, _("Главаря шайки так никто и не убил, и ни один бандит не пострадал.") );
         return;
     }
+
+    int max = scores.front( ).second;
+    std::list<PCMemoryInterface *> leaders;
+    for (auto &sc: scores)
+        if (sc.second == max)
+            leaders.push_back( sc.first );
 
     XMLReward reward;
 
@@ -499,34 +544,39 @@ void Gangsters::rewardLeader( )
     reward.reason[LANG_UA] = "За вбивство найбільшої кількості бандитів ти отримуєш: ";
     reward.id = getQuestID( );
 
+    // A lone hunter gets the count in the leader line; otherwise the score
+    // line carries every count.
     MultiMessage frame;
-    if (leaders.size( ) == 1)
-        frame = _("Самый лучший охотник за бандитами:");
+    if (scores.size( ) == 1)
+        frame = _("Лучший охотник за бандитами: %1$s (%2$s).");
+    else if (leaders.size( ) == 1)
+        frame = _("Лучший охотник за бандитами: %1$s.");
     else
-        frame = _("Самые успешные охотники за бандитами:");
+        frame = _("Лучшие охотники за бандитами: %1$s.");
 
-    // Player names decline per language (EN gets the Latin login name), so the
-    // roll-call is composed once per language instead of once for everyone.
-    std::basic_ostringstream<char> roll[LANG_MAX];
-    for (int lg = LANG_MIN; lg < LANG_MAX; lg++)
-        roll[lg] << frame.getMessage( (lang_t)lg ) << GQChannel::BOLD;
+    MultiMessage nobody = _("Главаря шайки так никто и не убил.");
+    DLString text[LANG_MAX];
 
-    while (!leaders.empty( )) {
-        PCMemoryInterface *pci = leaders.back( );
-        leaders.pop_back( );
-
-        for (int lg = LANG_MIN; lg < LANG_MAX; lg++) {
-            roll[lg] << " " << pci->getNameP( '1', (lang_t)lg );
-            if (!leaders.empty( ))
-                roll[lg] << ",";
+    for (int lg = LANG_MIN; lg < LANG_MAX; lg++) {
+        std::basic_ostringstream<char> names;
+        for (auto l = leaders.begin( ); l != leaders.end( ); l++) {
+            if (l != leaders.begin( ))
+                names << ", ";
+            names << GQChannel::BOLD << (*l)->getNameP( '1', (lang_t)lg ) << GQChannel::NORMAL;
         }
 
+        DLString line = frame.getMessage( (lang_t)lg );
+        line.replaces( "%1$s", names.str( ) );
+        line.replaces( "%2$s", DLString( max ) );
+        text[lg] = nobody.getMessage( (lang_t)lg ) + " " + line + gangScoreLine( scores, (lang_t)lg );
+    }
+
+    for (auto pci: leaders) {
         log("reward leader " << pci->getName( ));
         GlobalQuestManager::getThis( )->rewardChar( pci, reward );
     }
 
-    GQChannel::gecho( this,
-        MultiMessage( roll[LANG_EN].str( ), roll[LANG_RU].str( ), roll[LANG_UA].str( ) ) );
+    GQChannel::gecho( this, MultiMessage( text[LANG_EN], text[LANG_RU], text[LANG_UA] ) );
 }
 
 void Gangsters::rewardChefKiller( )
@@ -548,14 +598,18 @@ void Gangsters::rewardChefKiller( )
     // Verb agreement is language-specific (EN has none), so the sentence is
     // composed per language around one catalog frame; %2$s is the gender ending.
     MultiMessage frame = _("{Y%1$s{y уничтожил%2$s главаря шайки!");
+    GangScores scores = gangScores( getQuestID( ) );
     DLString en = frame.getMessage( LANG_EN );
     en.replaces( "%1$s", pci->getNameP( '1', LANG_EN ) );
+    en += gangScoreLine( scores, LANG_EN );
     DLString ru = frame.getMessage( LANG_RU );
     ru.replaces( "%1$s", pci->getNameP( '1', LANG_RU ) );
     ru.replaces( "%2$s", GET_SEX( pci, "", "о", "а" ) );
+    ru += gangScoreLine( scores, LANG_RU );
     DLString ua = frame.getMessage( LANG_UA );
     ua.replaces( "%1$s", pci->getNameP( '1', LANG_UA ) );
     ua.replaces( "%2$s", GET_SEX( pci, "в", "ло", "ла" ) );
+    ua += gangScoreLine( scores, LANG_UA );
 
     GQChannel::gecho( this, MultiMessage( en, ru, ua ) );
 
@@ -565,7 +619,14 @@ void Gangsters::rewardChefKiller( )
 
 void Gangsters::rewardNobody( ) 
 {
-    GQChannel::gecho( this, _("Шефа банды убила противоборствующая группировка.") );
+    GangScores scores = gangScores( getQuestID( ) );
+    MultiMessage frame = _("Шефа банды убила противоборствующая группировка.");
+    DLString text[LANG_MAX];
+
+    for (int lg = LANG_MIN; lg < LANG_MAX; lg++)
+        text[lg] = frame.getMessage( (lang_t)lg ) + gangScoreLine( scores, (lang_t)lg );
+
+    GQChannel::gecho( this, MultiMessage( text[LANG_EN], text[LANG_RU], text[LANG_UA] ) );
 }
 
 void Gangsters::rewardMobKiller( PCharacter *killer, Character *mob )
