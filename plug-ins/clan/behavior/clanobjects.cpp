@@ -122,14 +122,12 @@ void ClanItem::give( Character *from, Character *mob )
     get( mob );
 }
 
+// Sacrilege: the punishment, messages and news live in Fenia (global
+// onSacrilege). The sacrifice code then destroys the relic without a payout
+// and the clan area respawns it on its altar.
 bool ClanItem::sac( Character *ch ) 
 { 
-    oldact(_("{RБОГИ В ГНЕВЕ!{x"),ch,0,0,TO_ALL);
-    achievement( ch, "sacrilege" );
-
-    rawdamage( ch, ch, DAM_HOLY, ch->hit - 10, true, "gods" );
-    ch->gold = 0;
-
+    gprog("onSacrilege", "COs", ch, obj, clan->getName().c_str());
     return false;
 }
 
