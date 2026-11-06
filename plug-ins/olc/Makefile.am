@@ -31,6 +31,8 @@ raceedit.cpp \
 qedit.cpp \
 bedit.cpp \
 reditservlet.cpp \
+oeditservlet.cpp \
+olcservlet.cpp \
 capturebufferhandler.cpp
 
 libolc_la_MOC = \
