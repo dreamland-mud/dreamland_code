@@ -1022,38 +1022,35 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
         isTop[i] = (*pool[i].affix)["top"].asBool();
     int topMax = (int)item_value("measure", "top_max", 1000);
     double topRepeat = item_value("measure", "top_repeat_weight", 1);
+    // Points one stack of each pick adds to a capped apply family: its own apply
+    // when it sits in one of the given sections (any unit/mult/mod form), plus
+    // the matching applies of a pack. sign -1 for applies where negative is
+    // better (saves). Penalties never count against a cap.
+    auto capPoints = [&](const std::set<DLString> &names, const std::set<DLString> &sections, int sign) {
+        std::vector<int> pts(pool.size(), 0);
+        for (int i = 0; i < (int)pool.size(); i++) {
+            if (pool[i].price <= 0)
+                continue;
+            const Json::Value &affix = *pool[i].affix;
+            if (sections.count(pool[i].section) && names.count(pool[i].norm))
+                pts[i] = max(0, sign * modifier(affix, 1));
+            else if (affix.isMember("affects"))
+                for (auto const &one: affix["affects"])
+                    if (one.isMember("apply") && names.count(one["apply"].asString()))
+                        pts[i] += max(0, sign * modifier(one, 1));
+        }
+        return pts;
+    };
     // measure.primary_stat_cap: at most this many points of str/int/wis/dex/con/cha
     // per item, summed over every affix and stack (Kit 2026-10-27: +5).
     static const std::set<DLString> primaryNames = { "str", "int", "wis", "dex", "con", "cha" };
-    std::vector<int> statPts(pool.size(), 0);
-    for (int i = 0; i < (int)pool.size(); i++) {
-        if (pool[i].price <= 0)
-            continue;
-        const Json::Value &affix = *pool[i].affix;
-        if (pool[i].section == "primary_stats" && primaryNames.count(pool[i].norm))
-            statPts[i] = max(0, modifier(affix, 1));
-        else if (affix.isMember("affects"))
-            for (auto const &one: affix["affects"])
-                if (one.isMember("apply") && primaryNames.count(one["apply"].asString()))
-                    statPts[i] += max(0, modifier(one, 1));
-    }
+    std::vector<int> statPts = capPoints(primaryNames, { "primary_stats" }, 1);
     int statCap = (int)item_value("measure", "primary_stat_cap", 1000);
     // measure.saves_cap_per_level: at most round(level x this) points of saves per
     // item, summed over every save apply, affix and stack (Kit 2026-11-06).
     // A missing key leaves saves uncapped.
     static const std::set<DLString> saveNames = { "saves", "saving_spell", "saving_breath", "saving_rod", "saving_petri" };
-    std::vector<int> svsPts(pool.size(), 0);
-    for (int i = 0; i < (int)pool.size(); i++) {
-        if (pool[i].price <= 0)
-            continue;
-        const Json::Value &affix = *pool[i].affix;
-        if (saveNames.count(pool[i].norm) && affix.isMember("unit"))
-            svsPts[i] = max(0, -modifier(affix, 1));
-        else if (affix.isMember("affects"))
-            for (auto const &one: affix["affects"])
-                if (one.isMember("apply") && saveNames.count(one["apply"].asString()))
-                    svsPts[i] += max(0, -modifier(one, 1));
-    }
+    std::vector<int> svsPts = capPoints(saveNames, { "affects_by_level", "armor_stats", "primary_stats" }, -1);
     double svsPerLevel = item_value("measure", "saves_cap_per_level", 0);
     int svsCap = svsPerLevel > 0 ? max(1, (int)std::round(obj->level * svsPerLevel)) : 1000000;
     auto capsFit = [&](int i, int stat, int svs) {
