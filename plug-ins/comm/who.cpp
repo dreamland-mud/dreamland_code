@@ -307,8 +307,9 @@ static const Clan * who_visible_clan(PCharacter *victim)
     return &*victim->getClan( );
 }
 
-/** Pretitle, name and title, coloured as in the table, without a line end. */
-static DLString who_name_title(PCharacter *ch, PCharacter *victim, const DLString &arg1, const DLString &arg2)
+/** Pretitle, name and title, coloured as in the table, without a line end.
+ *  Compact form (screen reader) trims the title and drops it when empty. */
+static DLString who_name_title(PCharacter *ch, PCharacter *victim, const DLString &arg1, const DLString &arg2, bool compact = false)
 {
     std::basic_ostringstream<char> buf;
 
@@ -324,7 +325,15 @@ static DLString who_name_title(PCharacter *ch, PCharacter *victim, const DLStrin
         descr = victim->toNoun( ch )->decline('1');
 
     webManipManager->decorateCharacter( buf, descr, victim, ch );
-    buf << "{x " << Player::title(victim, Player::displayLang(ch)) << "{x";
+    DLString title = Player::title(victim, Player::displayLang(ch));
+    if (!compact)
+        buf << "{x " << title << "{x";
+    else {
+        title.stripWhiteSpace( );
+        buf << "{x";
+        if (!title.colourStrip( ).stripWhiteSpace( ).empty( ))
+            buf << " " << title << "{x";
+    }
     return buf.str( );
 }
 
@@ -425,7 +434,7 @@ static DLString who_cmd_format_char_sr( PCharacter *ch, PCharacter *victim, DLSt
     if (!pk && (arg_is_pk( arg1 ) || arg_is_pk( arg2 )))
         return "";
 
-    buf << who_name_title( ch, victim, arg1, arg2 );
+    buf << who_name_title( ch, victim, arg1, arg2, true );
 
     /* Rank, or level, race and class in full */
     DLString rank = who_cmd_rank( ch, victim );
