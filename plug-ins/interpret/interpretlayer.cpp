@@ -35,7 +35,9 @@ void InterpretArguments::splitLine( )
 {
     const char *arg;
 
-    line.stripLeftWhiteSpace( );
+    // Both ends: a trailing space after the last argument ('buy 5 ') would
+    // otherwise reach the command and stop it from reading a number.
+    line.stripWhiteSpace( );
     arg = line.c_str( );
     
     if (line.empty( )) {
