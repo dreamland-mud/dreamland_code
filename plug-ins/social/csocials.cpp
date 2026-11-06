@@ -22,6 +22,10 @@
 #include "def.h"
 #include "l10n.h"
 #include "websocketrpc.h"
+#include "arg_utils.h"
+
+#include <algorithm>
+#include <vector>
 
 static const int SOCIAL_NAME_WIDTH = 12;
 
@@ -57,12 +61,24 @@ CMDRUN( socials )
     // A second name column only says something where it differs from it.
     bool showNative = (lang != LANG_EN);
 
-    SocialManager::LoadedList::const_iterator i;
-    const SocialManager::LoadedList &socials = SocialManager::getThis( )->getElements( );
+    // Load order by default; `socials rus` (or ua) sorts by the native-name
+    // column instead. compareRussian, because byte order scrambles KOI8 Cyrillic.
+    vector<const Social *> socials;
+    for (auto &e: SocialManager::getThis( )->getElements( ))
+        socials.push_back( e.getConstPointer<Social>( ) );
+
+    DLString arg = DLString( constArguments ).getOneArgument( );
+    if (showNative && arg_oneof( arg, "rus", "рус", "ua", "укр" ))
+        std::sort( socials.begin( ), socials.end( ),
+                   [lang]( const Social *a, const Social *b ) {
+                       return a->getNameFor( lang ).compareRussian( b->getNameFor( lang ) ) < 0;
+                   } );
+
+    vector<const Social *>::const_iterator i;
 
     WebList web(ch, "socials");
     for (i = socials.begin( ); web.active( ) && i != socials.end( ); i++) {
-        const Social *s = i->getConstPointer<Social>( );
+        const Social *s = *i;
         DLString label = s->getName( );
 
         if (showNative)
@@ -79,7 +95,7 @@ CMDRUN( socials )
     // No table for a screen reader: one social per line, read straight through.
     if (uses_screenreader( ch )) {
         for (i = socials.begin( ); i != socials.end( ); i++) {
-            const Social *s = i->getConstPointer<Social>( );
+            const Social *s = *i;
 
             buf << "{hh" << s->getName( ) << "{hx";
             if (showNative)
@@ -107,7 +123,7 @@ CMDRUN( socials )
             << "{W-------------+-----------------------------------------------------------------{x" << endl;
 
     for (i = socials.begin( ); i != socials.end( ); i++) {
-        const Social *s = i->getConstPointer<Social>( );
+        const Social *s = *i;
 
         buf << " {c" << social_link( s->getName( ) ) << "{x{W|{x ";
 
