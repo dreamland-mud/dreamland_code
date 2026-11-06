@@ -40,6 +40,7 @@ public:
     virtual void getQuestDescription( std::ostringstream &, Character * ) const;
     virtual void getQuestStartMessage( std::ostringstream & ) const;
     virtual MultiMessage getStartBroadcast( ) const;
+    virtual bool startInfoHint( ) const { return false; }
 
     inline static Gangsters* getThis( );
 
@@ -57,6 +58,7 @@ protected:
     void rewardNobody( );
     void rewardMobKiller( PCharacter *, Character * );
 
+    MultiMessage getLevelsMessage( ) const;
     const DLString & getHint( lang_t ) const;
     void setHint( const MultiMessage & );
     void appendHint( const MultiMessage & );
