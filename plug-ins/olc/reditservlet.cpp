@@ -3,6 +3,7 @@
 #include "servlet.h"
 #include "servlet_utils.h"
 #include "capturebufferhandler.h"
+#include "olcservlet.h"
 #include "xmlroom.h"
 #include "redit.h"
 #include "olc.h"
@@ -39,38 +40,6 @@ static IconvMap koi2utf("koi8-u", "utf-8");
  *   Response (200):
  *     Name changed.
  */
-
-/** Set up a temporary PCharacter + Descriptor with a capture buffer for collecting output. */
-static PCharacter * servlet_setup_char(Room *room, CaptureBufferHandler *&capture)
-{
-    capture = new CaptureBufferHandler();
-
-    Descriptor *d = new Descriptor();
-    d->buffer_handler.setPointer(capture);
-    d->connected = CON_PLAYING;
-
-    PCharacter *ch = new PCharacter();
-    ch->setName("ServletBot");
-    ch->setSecurity(110);
-    ch->desc = d;
-    d->character = ch;
-    ch->in_room = room;
-
-    return ch;
-}
-
-/** Tear down the temporary PCharacter + Descriptor created by servlet_setup_char. */
-static void servlet_cleanup_char(PCharacter *ch)
-{
-    Descriptor *d = ch->desc;
-    ch->desc = 0;
-    ch->in_room = 0;
-    if (d) {
-        d->character = 0;
-        delete d;
-    }
-    delete ch;
-}
 
 /** Build an XML representation of room fields using the built-in XMLRoom serializer. */
 static DLString room_to_xml(RoomIndexData *pRoom)
@@ -117,11 +86,11 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
     }
 
     CaptureBufferHandler *capture;
-    PCharacter *ch = servlet_setup_char(roomInstance, capture);
+    PCharacter *ch = olc_servlet_setup_char(roomInstance, capture);
 
     // Handle 'get' — return room fields as XML.
     if (subcmd == "get") {
-        servlet_cleanup_char(ch);
+        olc_servlet_cleanup_char(ch);
         servlet_response_200(response, room_to_xml(pRoom));
         return;
     }
@@ -144,7 +113,7 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
         // Verify the subcommand exists before dispatching.
         CommandBase::Pointer cmd = sr->findCommand(ch, subcmd);
         if (!cmd) {
-            servlet_cleanup_char(ch);
+            olc_servlet_cleanup_char(ch);
             servlet_response_400(response, "Unknown redit subcommand: " + subcmd);
             return;
         }
@@ -160,7 +129,7 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
 
     // Collect output before cleanup, as capture is owned by the descriptor.
     DLString output = koi2utf(capture->getString());
-    servlet_cleanup_char(ch);
+    olc_servlet_cleanup_char(ch);
 
     servlet_response_200(response, output);
 }
