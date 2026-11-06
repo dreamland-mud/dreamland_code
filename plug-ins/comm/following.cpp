@@ -26,6 +26,8 @@
 #include "follow_utils.h"
 #include "loadsave.h"
 #include "interp.h"
+#include "screenreader.h"
+#include "player_utils.h"
 
 #include "act.h"
 #include "merc.h"
@@ -38,15 +40,49 @@ GSN(manacles);
 GSN(charm_person);
 PROF(mobile);
 
-/* A pet's class tag for the group list: the first real profession its act
- * flags or prototype give it (MobileProfession::toVector), blank if none. */
-static DLString npc_who_name( Character *ch, Character *gch )
+/* A pet's class for the group list: the first real profession its act
+ * flags or prototype give it (MobileProfession::toVector), null if none. */
+static Profession * npc_profession( Character *gch )
 {
     GlobalBitvector profs = gch->getProfession( )->toVector( gch );
     for (int p = 0; p < professionManager->size( ); p++)
         if (p != prof_mobile->getIndex( ) && profs.isSet( p ))
-            return professionManager->find( p )->getWhoNameFor( ch );
-    return "";
+            return professionManager->find( p );
+    return 0;
+}
+
+/* One group member as a sentence for screen readers: no columns to line up,
+ * the class in full and every number named. charmLeft is a pet's charm timer
+ * in hours, negative when there is no countdown, as in the column view. */
+static void group_line_sr( Character *ch, Character *gch, Profession *prof, int charmLeft )
+{
+    lang_t lang = Player::displayLang( ch );
+    DLString line = ch->sees( gch, '1' ).upperFirstCharacter( ) + "{x, ";
+
+    line += fmt( ch, lmsg( lang, "level %d", "уровень %d", "рівень %d" ), gch->getRealLevel( ) );
+    if (prof && prof->isValid( ))
+        line += " " + prof->getNameFor( ch ).ruscase( '1' );
+
+    line += fmt( ch, lmsg( lang, ", health %d of %d, mana %d of %d, moves %d of %d",
+                                 ", здоровье %d из %d, мана %d из %d, шаги %d из %d",
+                                 ", здоров'я %d з %d, мана %d з %d, кроки %d з %d" ),
+                 gch->hit.getValue( ), gch->max_hit.getValue( ),
+                 gch->mana.getValue( ), gch->max_mana.getValue( ),
+                 gch->move.getValue( ), gch->max_move.getValue( ) );
+
+    // Heroes and immortals have no next level to count down to.
+    if (!gch->is_npc( ) && gch->getLevel( ) < LEVEL_HERO - 1)
+        line += fmt( ch, lmsg( lang, ", %1$d experience point%1$gs||s to level",
+                                     ", до уровня %1$d очк%1$Iо|а|ов опыта",
+                                     ", до рівня %1$d очк%1$Iо|а|ів досвіду" ),
+                     gch->getPC( )->getExpToLevel( ) );
+
+    if (charmLeft >= 0)
+        line += fmt( ch, lmsg( lang, ", charmed for %1$d more hour%1$gs||s",
+                                     ", очарование ещё %1$d час%1$I|а|ов",
+                                     ", зачарування ще %1$d годин%1$Iу|и|" ), charmLeft );
+
+    ch->pecho( "%s", line.c_str( ) );
 }
 
 static bool check_mutual_induct( Character *ch, Character *victim, ClanReference &clan )
@@ -153,18 +189,27 @@ CMDRUN( group )
 
         leader = (ch->leader != 0) ? ch->leader : ch;
         ch->pecho( _("Группа %s:"), ch->sees(leader,'2').c_str( ) );
+        bool sr = uses_screenreader( ch );
 
         for (Character *gch = char_list; gch != 0; gch = gch->next )
             if (is_same_group( gch, ch )) {
-                if (gch->is_npc( )) {
-                    // Show how long a charmed pet stays charmed (its charm timer).
-                    int charmLeft = -1;
+                // Show how long a charmed pet stays charmed (its charm timer).
+                int charmLeft = -1;
+                if (gch->is_npc( ))
                     for (auto &paf: gch->affected)
                         if (paf->type.getName( ) == gsn_charm_person->getName( )) {
                             charmLeft = paf->duration.getValue( );
                             break;
                         }
-                    DLString whoName = npc_who_name( ch, gch );
+
+                Profession *prof = gch->is_npc( ) ? npc_profession( gch ) : &*gch->getProfession( );
+                if (sr) {
+                    group_line_sr( ch, gch, prof, charmLeft );
+                    continue;
+                }
+
+                if (gch->is_npc( )) {
+                    DLString whoName = prof ? prof->getWhoNameFor( ch ) : "";
                     if (charmLeft >= 0)
                         ch->pecho( "[%3d %3s] %-16.16s{x %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv  charm:%d",
                             gch->getRealLevel( ),
@@ -186,7 +231,7 @@ CMDRUN( group )
                 else
                     ch->pecho( "[%3d %3s] %-16.16s %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv %5d xp",
                         gch->getRealLevel( ), 
-                        gch->getProfession( )->getWhoNameFor( ch ).c_str( ),
+                        prof->getWhoNameFor( ch ).c_str( ),
                         ch->sees( gch, '1' ).c_str( ),
                         gch->hit.getValue( ), gch->max_hit.getValue( ), 
                         gch->mana.getValue( ), gch->max_mana.getValue( ),
