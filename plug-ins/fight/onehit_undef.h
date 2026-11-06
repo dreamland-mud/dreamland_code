@@ -9,14 +9,13 @@
 
 /**
  * Set by kill/murder around the opening multi_hit and consumed by that attacker's
- * first landed hit: a mounted lance charge and a fade+ ambush.
+ * first landed hit: a mounted lance charge.
  */
 extern Character *charge_attacker;
-extern Character *ambush_attacker;
 
-/** Resets both opener markers when the opening round ends, however it ends. */
+/** Resets the opener marker when the opening round ends, however it ends. */
 struct OpenerGuard {
-    OpenerGuard( Character *charge, Character *ambush );
+    OpenerGuard( Character *charge );
     ~OpenerGuard( );
 };
 
@@ -51,7 +50,6 @@ protected:
     void damApplyDeathblow( );
     void damApplySoulLust( );
     void damApplyMounted( );
-    void damApplyFadeOpener( );
     void msgOpeners( );
     void damEffectDeathblowStun( );
     void damApplyReligion();
@@ -73,7 +71,6 @@ protected:
 
     bool deathblowStun;
     bool charged;
-    bool ambushed;
     bool offEnd;          // the staff's other end, struck from the grip (fight.cpp staff_offend_hit)
 };
 

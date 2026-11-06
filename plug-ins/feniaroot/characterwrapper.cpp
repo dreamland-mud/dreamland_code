@@ -47,6 +47,7 @@
 #include "occupations.h"
 #include "follow_utils.h"
 #include "interp.h"
+#include "fadeopener.h"
 #include "comm.h"
 #include "save.h"
 #include "player_exp.h"
@@ -1678,6 +1679,16 @@ NMI_GET(CharacterWrapper, last_fight_delay, "задержка после боя 
 {
     checkTarget();
     return (int)target->getLastFightDelay();
+}
+
+NMI_GET(CharacterWrapper, fadeBroken, "true, если команду, которую персонаж выполняет прямо сейчас, он начал, прячась в тени (fade)")
+{
+    checkTarget();
+    // The serial ties the record to the command that made it; the actor check
+    // rules out a combat round or tick, which run outside any command.
+    return fade_broken_by == target
+        && fade_broken_serial == interpret_serial()
+        && interpret_actor() == target;
 }
 
 NMI_GET(CharacterWrapper, adrenaline, "полна ли кровь адреналина")

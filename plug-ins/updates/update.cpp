@@ -1808,8 +1808,14 @@ void aggr_update( )
         check_bloodthirst( ch );
 
         if (!ch->ambushing.empty()) {
-            gsn_ambush->getCommand( )->apply( ch );
-            gsn_bonedagger->getCommand( )->apply( ch );
+            // A sprung ambush can kill either side; the Fenia apply lets the
+            // death through, so it stops here instead of unwinding the tick.
+            try {
+                gsn_ambush->getCommand( )->apply( ch );
+                gsn_bonedagger->getCommand( )->apply( ch );
+            } catch (const VictimDeathException &) {
+                continue;
+            }
         }
         
         if (ch->in_room->area->empty)

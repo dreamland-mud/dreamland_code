@@ -114,7 +114,7 @@ RELIG(deimos);
 UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command, bool offEnd )
             : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
               WeaponOneHit( ch, victim, secondary, command ),
-              deathblowStun( false ), charged( false ), ambushed( false ), offEnd( offEnd )
+              deathblowStun( false ), charged( false ), offEnd( offEnd )
 {
     deathReason = offEnd ? "staff offend" : "melee";
 }
@@ -219,7 +219,6 @@ void UndefinedOneHit::calcDamage( )
     damApplyDeathblow( );
     damApplySoulLust( );
     damApplyMounted( );
-    damApplyFadeOpener( );
     damApplyCounter( );
     damApplyReligion();
 
@@ -896,18 +895,15 @@ void UndefinedOneHit::damApplySoulLust( )
 }
 
 Character *charge_attacker = 0;
-Character *ambush_attacker = 0;
 
-OpenerGuard::OpenerGuard( Character *charge, Character *ambush )
+OpenerGuard::OpenerGuard( Character *charge )
 {
     charge_attacker = charge;
-    ambush_attacker = ambush;
 }
 
 OpenerGuard::~OpenerGuard( )
 {
     charge_attacker = 0;
-    ambush_attacker = 0;
 }
 
 static Character *round_striker = 0;
@@ -957,21 +953,6 @@ void UndefinedOneHit::damApplyMounted( )
     }
 }
 
-// fade+: the first landed hit of kill or murder started out of fade.
-void UndefinedOneHit::damApplyFadeOpener( )
-{
-    if (ambush_attacker != ch)
-        return;
-
-    ambush_attacker = 0;
-
-    if (!clan_char_owns( ch, "fade+" ))
-        return;
-
-    ambushed = true;
-    dam += dam / 2;
-}
-
 // After canDamage: only a hit that got past parry and dodge announces its opener.
 void UndefinedOneHit::msgOpeners( )
 {
@@ -979,12 +960,6 @@ void UndefinedOneHit::msgOpeners( )
         oldact(_("Ты на полном скаку таранишь $C4 копьем!"), ch, 0, victim, TO_CHAR);
         oldact(_("$c1 на полном скаку таранит тебя копьем!"), ch, 0, victim, TO_VICT);
         oldact(_("$c1 на полном скаку таранит $C4 копьем!"), ch, 0, victim, TO_NOTVICT);
-    }
-
-    if (ambushed) {
-        oldact(_("Ты наносишь удар прямо из тени!"), ch, 0, victim, TO_CHAR);
-        oldact(_("$c1 бьет тебя прямо из тени!"), ch, 0, victim, TO_VICT);
-        oldact(_("$c1 бьет $C4 прямо из тени!"), ch, 0, victim, TO_NOTVICT);
     }
 }
 
