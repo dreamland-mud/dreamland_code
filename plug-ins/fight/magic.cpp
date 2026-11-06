@@ -300,6 +300,28 @@ int saves_chance_at( int victimLevel, int castLevel, int saving_throw, int shift
     return saves_legacy_permille( save );
 }
 
+bool is_save_apply( int location )
+{
+    return location == APPLY_SAVES || location == APPLY_SAVING_ROD || location == APPLY_SAVING_PETRI
+        || location == APPLY_SAVING_BREATH || location == APPLY_SAVING_SPELL;
+}
+
+int saves_own_level_permille( int level, int saving_throw )
+{
+    if (saves_model( ) != 1)
+        return -1;
+    int lvl = std::max( 1, level );
+    return saves_chance_at( lvl, lvl, saving_throw, 0, 1 );
+}
+
+DLString saves_permille_text( int permille )
+{
+    int d = abs( permille );
+    if (d < 10)
+        return "<1";
+    return DLString( d / 10 ) + "." + DLString( d % 10 );
+}
+
 int saves_chance( short level, Character *victim, int dam_type, Character *ch, bitstring_t dam_flag, bool holyCraft )
 {
     bool model1 = saves_model( ) == 1;

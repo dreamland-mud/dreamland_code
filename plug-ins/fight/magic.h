@@ -75,6 +75,17 @@ bool saves_boss_reroll( Character *victim, const DLString &spellName );
  *  holyCraft = the caller's holy craft roll landed. Caster onSaves hooks are included. */
 int saves_chance( short level, Character *victim, int dam_type, Character *ch, bitstring_t dam_flag, bool holyCraft );
 
+/** The five applies that all feed saving_throw. */
+bool is_save_apply( int location );
+
+/** Chance in permille to resist a spell cast at one's own level with this
+ *  saving_throw, on the model 1 curve; -1 off the curve (model 0). Players see
+ *  saves only this way (Kit 2026-11-06). */
+int saves_own_level_permille( int level, int saving_throw );
+
+/** A permille change as players read it: "1.5", or "<1" under 1%. Sign dropped. */
+DLString saves_permille_text( int permille );
+
 /** Save chance in permille from bare numbers. saving_throw is the character field
  *  (negative is better), shift is in percent. model 1 falls back to 0 if not configured. */
 int saves_chance_at( int victimLevel, int castLevel, int saving_throw, int shift, int model );

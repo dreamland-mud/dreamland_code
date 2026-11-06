@@ -113,7 +113,11 @@ void AffectOutput::show_affect( ostringstream &buf, int flags )
                     f << "                        ";
             }
 
-            f << "{y " << *l;
+            // Lines are finished text, but f becomes a format string below:
+            // a bare % in them (heal gain "20%", saves "1.5%") must survive it.
+            DLString line = *l;
+            line.replaces( "%", "%%" );
+            f << "{y " << line;
         }
 
     if (IS_SET(flags, FSHOW_TIME)) {
@@ -143,12 +147,6 @@ void AffectOutput::format_affect( Affect *paf )
         lines.push_back( l );
 }
 
-static bool is_save_apply( int location )
-{
-    return location == APPLY_SAVES || location == APPLY_SAVING_ROD || location == APPLY_SAVING_PETRI
-        || location == APPLY_SAVING_BREATH || location == APPLY_SAVING_SPELL;
-}
-
 /** Saves read as the change in the chance to resist a spell of one's own level,
  *  never as a raw number (Kit 2026-11-06): the same -5 is a lot at level 20 and
  *  next to nothing on top of 150 saves. The affect is already counted in the
@@ -157,11 +155,8 @@ static DLString save_apply_line( Affect *paf, Character *subject, lang_t lang )
 {
     int lvl = subject->getModifyLevel( );
     int st = subject->saving_throw;
-    int d = saves_chance_at( lvl, lvl, st, 0, 1 ) - saves_chance_at( lvl, lvl, st - paf->modifier, 0, 1 );
+    DLString num = saves_permille_text( saves_own_level_permille( lvl, st ) - saves_own_level_permille( lvl, st - paf->modifier ) );
     bool better = paf->modifier < 0;
-
-    d = abs( d );
-    DLString num = d < 10 ? DLString( "<1" ) : fmt( 0, "%d.%d", d / 10, d % 10 );
 
     if (better)
         return fmt( 0, _("улучшает {mшанс устоять перед заклинаниями{y на {m%1$s%%{y").getMessage( lang ).c_str( ), num.c_str( ) );

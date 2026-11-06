@@ -855,10 +855,10 @@ Json::Value ParamsWebPromptListener::jsonParam2( Descriptor *d, Character *ch )
     // Armor class (pierce only) and saves.
     p2["a"] = DLString(to_hit_shown_armor(ch, AC_PIERCE));
     // Mortals see saves as the chance to resist a spell of their level (Kit 2026-11-06).
-    if (!ch->is_immortal( ) && saves_model( ) == 1) {
-        int lvl = ch->getModifyLevel( );
-        p2["s"] = DLString( saves_chance_at( lvl, lvl, ch->saving_throw, 0, 1 ) / 10 ) + "%";
-    } else
+    int savesPm = ch->is_immortal( ) ? -1 : saves_own_level_permille( ch->getModifyLevel( ), ch->saving_throw );
+    if (savesPm >= 0)
+        p2["s"] = DLString( savesPm / 10 ) + "%";
+    else
         p2["s"] = DLString(ch->saving_throw);
     // Position and flying status.
     p2["pos"] = position_table.name(ch->position);

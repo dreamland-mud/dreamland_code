@@ -50,10 +50,10 @@ PROF(samurai);
  *  where the roll pins to its clamps (Kit 2026-11-06). -1 = show the raw number. */
 static int score_saves_pct( Character *ch )
 {
-    if (ch->is_immortal( ) || saves_model( ) != 1)
+    if (ch->is_immortal( ))
         return -1;
-    int lvl = ch->getModifyLevel( );
-    return saves_chance_at( lvl, lvl, ch->saving_throw, 0, 1 ) / 10;
+    int pm = saves_own_level_permille( ch->getModifyLevel( ), ch->saving_throw );
+    return pm < 0 ? -1 : pm / 10;
 }
 
 static DLString show_money( Character *ch, int g, int s )
@@ -284,7 +284,7 @@ static void score_prose( Character *ch )
         buf << fmt(ch, _("Точность: {C%d{x  Урон: {C%d{x  Защита от заклинаний: {C%d{x\n\r"),
                     ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
     else
-        buf << fmt(ch, _("Точность: {C%1$d{x  Урон: {C%2$d{x  Шанс устоять перед заклинанием: {C%3$d%%{x\n\r"),
+        buf << fmt(ch, _("Точность: {C%1$d{x  Урон: {C%2$d{x  Шанс устоять перед заклинанием твоего уровня: {C%3$d%%{x\n\r"),
                     ch->hitroll.getValue( ), ch->damroll.getValue( ), savesPct );
 
     buf << fmt(ch, _("У тебя %s натура.  "), align_name( ch, viewerLang(ch) ).ruscase( '1' ).c_str( ) );
