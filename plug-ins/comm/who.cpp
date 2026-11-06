@@ -440,16 +440,16 @@ static DLString who_cmd_format_char_sr( PCharacter *ch, PCharacter *victim, DLSt
         buf << ", ";
         if (can_see_level( ch, victim ))
             buf << fmt(0, lmsg(lang, "level %d", "уровень %d", "рівень %d"), victim->getLevel( )) << " ";
-        buf << victim->getRace( )->getNameFor( ch, victim );
+        buf << victim->getRace( )->getNameFor( ch, victim ).ruscase('1');
         if (can_see_profession( ch, victim ))
-            buf << " " << victim->getProfession( )->getNameFor( ch );
+            buf << " " << victim->getProfession( )->getNameFor( ch ).ruscase('1');
     }
 
     if (pk)
         buf << ", {rPK{x";
 
     if (const Clan *clan = who_visible_clan( victim )) {
-        buf << ", " << lmsg(lang, "clan", "клан", "клан") << " {" << clan->getColor( ) << clan->getNameFor( lang ) << "{x";
+        buf << ", " << lmsg(lang, "clan", "клан", "клан") << " {" << clan->getColor( ) << clan->getNameFor( lang ).ruscase('1') << "{x";
         if (clan->isLeader( victim ))
             buf << " " << lmsg(lang, "leader", "лидер", "лідер");
         else if (clan->isRecruiter( victim ))
