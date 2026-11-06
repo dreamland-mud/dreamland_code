@@ -188,9 +188,9 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
 }
 
 AFFECT_DECL(Prevent);
-VOID_AFFECT(Prevent)::toStream( ostringstream &buf, Affect *paf ) 
+VOID_AFFECT(Prevent)::toStream( ostringstream &buf, Affect *paf, Character *looker ) 
 {
-    buf << fmt( 0, _("Местность на {W%1$d{x ча%1$Iс|са|сов защищена от мин и пневмопочты Артели."), paf->duration )
+    buf << fmt( looker, _("Местность на {W%1$d{x ча%1$Iс|са|сов защищена от мин и пневмопочты Артели."), paf->duration )
         << endl;
 }
 

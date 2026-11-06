@@ -69,18 +69,14 @@ bool Pet::area( )
     }
     
 
-    DLString msg = fmt(0, _("Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и "), ch);
     if (is_flying(ch))
-        msg = msg + fmt(0, _("улета%1$nет|ют "), ch);
+        ch->recho(_("Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и улета%1$nет|ют восвояси."), ch);
     else if (RoomUtils::isWater(ch->in_room))
-        msg = msg + fmt(0, _("уплыва%1$nет|ют "), ch);
+        ch->recho(_("Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и уплыва%1$nет|ют восвояси."), ch);
     else if (!Char::hasLegs(ch))
-        msg = msg + fmt(0, _("уполза%1$nет|ют "), ch);
+        ch->recho(_("Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и уполза%1$nет|ют восвояси."), ch);
     else
-        msg = msg + fmt(0, _("уход%1$nит|ят "), ch);
-
-    msg = msg + "восвояси.";
-    ch->recho(msg.c_str());
+        ch->recho(_("Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и уход%1$nит|ят восвояси."), ch);
     LogStream::sendNotice() 
         << "PET_EXTRACT: Extracting " << ch->getID() << " [" << ch->getNPC()->pIndexData->vnum << "] "
         << " in room " << ch->in_room->vnum << endl;

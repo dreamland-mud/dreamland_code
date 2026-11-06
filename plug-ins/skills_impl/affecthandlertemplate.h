@@ -14,9 +14,9 @@ template <const char *&tn>
 struct AffectHandlerTemplate : public DefaultAffectHandler, public ClassSelfRegistratorPlugin<tn> {
     typedef ::Pointer<AffectHandlerTemplate> Pointer;
 
-    virtual void toStream( ostringstream &buf, Affect *af ) 
+    virtual void toStream( ostringstream &buf, Affect *af, Character *looker ) 
     {
-        DefaultAffectHandler::toStream( buf, af );
+        DefaultAffectHandler::toStream( buf, af, looker );
     }
     virtual void remove( Character * ch ) 
     { 

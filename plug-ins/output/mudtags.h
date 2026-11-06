@@ -34,5 +34,12 @@ void mudtags_convert( const char *text, std::ostringstream &out, int flags, Char
  */
 void mudtags_strip_web( DLString &text, Character *ch );
 
+/**
+ * One line in all three languages, {lE..{lR..{lU..{lx: each listener sees their own
+ * section when it reaches them through a channel (yell, clan talk) or any output.
+ * Colour is stripped from every part, since a {x inside a section ends it.
+ */
+DLString mudtags_lang_line( const DLString &en, const DLString &ru, const DLString &ua );
+
 #endif
 

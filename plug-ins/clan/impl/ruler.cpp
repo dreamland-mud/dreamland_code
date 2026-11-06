@@ -55,6 +55,42 @@
 #include "accountmanager.h"
 #include "clanrecords.h"
 #include "fenia_utils.h"
+#include "mudtags.h"
+
+// A ruler guard's alert on the ruler clan channel: where the criminal was seen.
+static void ruler_guard_alert( Character *ch, Character *victim )
+{
+    Room *r = ch->in_room;
+    DLString line = mudtags_lang_line(
+        fmtLang(LANG_EN, _("ВНИМАНИЕ!!! %s находится %s в районе %s"), victim->getNameC(),
+            r->getName(LANG_EN), r->areaName(LANG_EN).c_str()),
+        fmtLang(LANG_RU, _("ВНИМАНИЕ!!! %s находится %s в районе %s"), victim->getNameC(),
+            r->getName(LANG_RU), r->areaName(LANG_RU).c_str()),
+        fmtLang(LANG_UA, _("ВНИМАНИЕ!!! %s находится %s в районе %s"), victim->getNameC(),
+            r->getName(LANG_UA), r->areaName(LANG_UA).c_str()));
+    interpret_raw(ch, "cb", "%s", line.c_str());
+}
+
+// "NAME CRIMINAL! PROTECT THE INNOCENT!!..." yelled to the area, in every listener's language.
+static void ruler_guard_yell_criminal( Character *ch, Character *victim, bool criminal )
+{
+    const char *name = victim->getNameC();
+    DLString msg = mudtags_lang_line(
+        fmtLang(LANG_EN, _("%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"), name, criminal ? "CRIMINAL" : ""),
+        fmtLang(LANG_RU, _("%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"), name, criminal ? "ПРЕСТУПНИК" : ""),
+        fmtLang(LANG_UA, _("%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"), name, criminal ? "ЗЛОЧИНЕЦЬ" : ""));
+    do_yell( ch, msg.c_str() );
+}
+
+static void ruler_guard_yell_bandit( Character *ch, Character *victim )
+{
+    const char *name = victim->getNameC();
+    DLString msg = mudtags_lang_line(
+        fmtLang(LANG_EN, _("%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"), name),
+        fmtLang(LANG_RU, _("%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"), name),
+        fmtLang(LANG_UA, _("%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"), name));
+    do_yell( ch, msg.c_str() );
+}
 
 
 CLAN(chaos);
@@ -191,10 +227,10 @@ bool ClanGuardRulerJailer::specFight( )
     Character *victim;
     Character *v_next;
     Character *ech;
-    const char *crime;
+    bool criminal;
 
     ech      = 0;
-    crime    = "";
+    criminal = false;
 
     for ( victim = ch->in_room->people; victim != 0; victim = v_next )
     {
@@ -205,7 +241,7 @@ bool ClanGuardRulerJailer::specFight( )
                             || ( victim->isAffected(gsn_jail )
                                     && !victim->isAffected(gsn_manacles ) ) ) )
             {
-                    crime = "CRIMINAL";
+                    criminal = true;
                     break;
             }
     
@@ -221,18 +257,13 @@ bool ClanGuardRulerJailer::specFight( )
     if ( victim != 0 )
     {
             ch->setClan( clan_ruler );
-            interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
-                            victim->getNameC(), 
-                            ch->in_room->getName(),
-                            ch->in_room->areaName().c_str());
+            ruler_guard_alert(ch, victim);
 
 
             if ( ( ch->getModifyLevel() + 8 > victim->getModifyLevel() )
                     && !is_safe_nomessage ( ch, victim ) )
             {
-                    DLString msg = fmt(0, _("%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"),
-                            victim->getNameC(), crime );
-                    do_yell( ch, msg.c_str() );
+                    ruler_guard_yell_criminal( ch, victim, criminal );
                     multi_hit( ch, victim , "murder" );
             }
             else
@@ -1530,17 +1561,12 @@ bool RulerSpecialGuard::specFight( )
         return false;
 
     ch->setClan( clan_ruler );
-    interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
-                    victim->getNameC(), 
-                    ch->in_room->getName(), 
-                    ch->in_room->areaName().c_str());
+    ruler_guard_alert(ch, victim);
 
     if ( ( ch->getModifyLevel() + 20 > victim->getModifyLevel() )
             && !is_safe_nomessage ( ch, victim ) )
     {
-        DLString msg = fmt(0, _("%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!"),
-                victim->getNameC() );
-        do_yell( ch, msg.c_str() );
+        ruler_guard_yell_bandit( ch, victim );
         multi_hit( ch, victim , "murder" );
     }
     else

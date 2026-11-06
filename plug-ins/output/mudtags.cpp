@@ -1073,6 +1073,11 @@ void mudtags_convert( const char *text, ostringstream &out, int flags, Character
 // resolved once here with the speaker's ch, so collapsing lang tags here would freeze the
 // message to the speaker's language; instead they ride through to each listener's own
 // send_to render. ch is the speaker: a real viewer, so an injected {I/{L can't deref.
+DLString mudtags_lang_line( const DLString &en, const DLString &ru, const DLString &ua )
+{
+    return "{lE" + en.colourStrip( ) + "{lR" + ru.colourStrip( ) + "{lU" + ua.colourStrip( ) + "{lx";
+}
+
 void mudtags_strip_web( DLString &text, Character *ch )
 {
     ostringstream buf;
