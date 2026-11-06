@@ -1228,18 +1228,28 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
     // Notify various attributes about player death, e.g. quest data.
     victim->getPC( )->getAttributes( ).handleEvent( DeathArguments( victim->getPC( ), ch ) );
 
+    // Read before extract_dead_player moves the victim to the altar.
+    bool sparring = victim->in_room
+        && IS_SET(victim->in_room->areaIndex()->area_flag, AREA_SPARRING);
+
     // Reset player and move them to the altar.    
     extract_dead_player( victim->getPC( ), FEXTRACT_COUNT );
 
-    wanted_poster_paid( ch, victim );
-    loyalty_gain( ch, victim );
+    if (!sparring) {
+        wanted_poster_paid( ch, victim );
+        loyalty_gain( ch, victim );
+    }
 
     ghost_gain( victim );
     
     corpse_reequip( victim );
 
     // Player kills another player: flag and clan stats gain.
-    if (ch && !ch->is_npc() && ch != victim) {
+    // Sparring areas keep only the victim's post-death protection.
+    if (ch && !ch->is_npc() && ch != victim && sparring) {
+        set_slain( victim );
+    }
+    else if (ch && !ch->is_npc() && ch != victim) {
         set_killer( ch );
         set_slain( victim );
         ch->getClan( )->handleVictory( ch->getPC( ), victim->getPC( ) );
