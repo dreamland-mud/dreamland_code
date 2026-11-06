@@ -1031,9 +1031,9 @@ void Damage::msgEchoImpl(Character *to, const DLString &fmt, lang_t lang, va_lis
 
     buf << msgPunct();
 
-    // show explicit damage numbers for old damage config
-    // not for newbies -- not enabled by default
-    if (pc && !newdmg)
+    // [N] after each hit is its own toggle ('config numbers'), independent of
+    // the damage scale; seeded from the scale once at login (PCharacterManager::load).
+    if (pc && IS_SET(pc->config, CONFIG_DAMNUMBERS))
         buf << " {D[{Y%1$d{D]{x";
 
     to->vpecho(buf.str().c_str(), va);
