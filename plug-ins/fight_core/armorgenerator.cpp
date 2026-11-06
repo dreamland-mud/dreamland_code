@@ -65,6 +65,15 @@ bool armor_slot_exists(const DLString &slot)
             && armor_names.isMember(slot) && armor_names[slot].isArray();
 }
 
+bool armor_slot_is_shell(const DLString &slot)
+{
+    static const char *shell[] = { "head", "body", "arms", "hands", "legs", "feet", "shield" };
+    for (auto s: shell)
+        if (slot == s)
+            return true;
+    return false;
+}
+
 /** Proc chance per combat round by the affix's tier floor (Kit 2026-10-02):
  *  rare 3%, epic 5%, legendary 8%. */
 static int proc_chance(int tierFloor)
@@ -1521,7 +1530,7 @@ void ArmorGenerator::assignAC()
     // keepIdentity: rings, cloaks, belts and the like keep their own AC; on the
     // seven armor slots the rolled AC only ever raises the item's own.
     if (keepName) {
-        if (!armor_slot_exists(slot))
+        if (!armor_slot_is_shell(slot))
             return;
         // The roll keeps its budget and takes the piece's construction, or a flat
         // roll would flatten the profile the item's own columns were refit to.

@@ -1639,7 +1639,7 @@ NMI_INVOKE(Root, randomWeaponTier, "(bestTier[, legendaryPerMille]): случа�
     return Register(random_weapon_tier(bestTier, legendaryPerMille));
 }
 
-NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spells, boss]): случайная броня на базовом прототипе: slot head|body|arms|hands|legs|feet|shield, profile caster берет цены аффиксов для кастера; damtype и spells (через запятую) убитого босса дают легендарке его signature-аффикс, boss -- сам босс, по нему названа легендарка с сигнатурой; true если удалось")
+NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spells, boss]): случайная броня на базовом прототипе: slot head|body|arms|hands|legs|feet|shield или neck|finger|wrist|ears|float|hold|about|waist (любой ключ fight/armor_names.json), profile caster берет цены аффиксов для кастера; damtype и spells (через запятую) убитого босса дают легендарке его signature-аффикс, boss -- сам босс, по нему названа легендарка с сигнатурой; true если удалось")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
