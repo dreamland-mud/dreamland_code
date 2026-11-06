@@ -9269,7 +9269,7 @@ NMI_INVOKE(CharacterWrapper, menu, "([number, action[, number, action]]): очи
     return Register();
 }
 
-NMI_INVOKE(CharacterWrapper, menuAdd, "(number, action): добавить пункт меню без вывода списка, для вариантов, которые скрипт печатает сам")
+NMI_INVOKE(CharacterWrapper, menuAdd, "(number, action): добавить пункт меню без вывода списка, для вариантов, которые скрипт печатает сам; действует только в этой комнате и 10 минут")
 {
     checkTarget( );
     CHK_NPC
@@ -9279,7 +9279,7 @@ NMI_INVOKE(CharacterWrapper, menuAdd, "(number, action): добавить пун
 
     DLString choice = arg2number(args.front());
     DLString action = arg2string(args.back());
-    Player::menuSet(target->getPC(), choice, action);
+    Player::menuSetGuarded(target->getPC(), choice, action);
     return Register();
 }
 

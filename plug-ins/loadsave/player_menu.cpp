@@ -9,10 +9,15 @@
 #include "descriptor.h"
 #include "l10n.h"
 #include "arg_utils.h"
+#include "dreamland.h"
+#include "room.h"
 
 using namespace std;
 
 static const DLString MENU_ATTR = "menu";
+// Where and when a script-printed menu (menuAdd) was set: room, time.
+static const DLString GUARD_ATTR = "menuguard";
+static const int GUARD_SECONDS = 600;
 
 void Player::menuSet(PCharacter* pch, const Integer& choice, const DLString& action)
 {
@@ -22,6 +27,32 @@ void Player::menuSet(PCharacter* pch, const Integer& choice, const DLString& act
 void Player::menuClear(PCharacter* pch)
 {
     pch->getAttributes().eraseAttribute(MENU_ATTR);
+    pch->getAttributes().eraseAttribute(GUARD_ATTR);
+}
+
+// A menu item whose options the script printed itself (quest dialogs). It
+// only answers in the room it was set in and for GUARD_SECONDS: an option
+// left unanswered, or answered by typing it, must not be replayed by a bare
+// number typed later somewhere else.
+void Player::menuSetGuarded(PCharacter* pch, const Integer& choice, const DLString& action)
+{
+    menuSet(pch, choice, action);
+    set_map_attribute_value(pch, GUARD_ATTR, "room", DLString(pch->in_room ? pch->in_room->vnum : 0));
+    set_map_attribute_value(pch, GUARD_ATTR, "time", DLString((long)dreamland->getCurrentTime()));
+}
+
+static bool menu_is_stale(PCharacter* pch)
+{
+    if (!pch->getAttributes().isAvailable(GUARD_ATTR))
+        return false;
+
+    DLString room = get_map_attribute_value(pch, GUARD_ATTR, "room");
+    DLString time = get_map_attribute_value(pch, GUARD_ATTR, "time");
+
+    if (!pch->in_room || room != DLString(pch->in_room->vnum))
+        return true;
+
+    return !time.isNumber() || dreamland->getCurrentTime() - time.toLong() > GUARD_SECONDS;
 }
 
 bool Player::menuAvailable(PCharacter* pch)
@@ -117,6 +148,8 @@ bool MenuInterpretLayer::process( InterpretArguments &iargs )
             if (!rest.empty()) {
                 iargs.line = rest;
                 iargs.splitLine();
+                // The pasted line is the answer: the menu is used up.
+                Player::menuClear(pch);
             }
         }
         return true;
@@ -125,10 +158,15 @@ bool MenuInterpretLayer::process( InterpretArguments &iargs )
     if (!Player::menuAvailable(pch))
         return true;
 
+    if (menu_is_stale(pch)) {
+        Player::menuClear(pch);
+        return true;
+    }
+
     // "answer 2", "відповідь 2": the label word in front of the number.
     DLString word = iargs.cmdName;
     if (!iargs.cmdArgs.empty()) {
-        if (!arg_is_strict(iargs.cmdName.toLower(), "answer") || iargs.cmdArgs.find(' ') != DLString::npos)
+        if (!arg_is_strict(DLString(iargs.cmdName).toLower(), "answer") || iargs.cmdArgs.find(' ') != DLString::npos)
             return true;
         word = iargs.cmdArgs;
     }
