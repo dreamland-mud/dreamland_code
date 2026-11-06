@@ -1022,22 +1022,40 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
         isTop[i] = (*pool[i].affix)["top"].asBool();
     int topMax = (int)item_value("measure", "top_max", 1000);
     double topRepeat = item_value("measure", "top_repeat_weight", 1);
+    // Points one stack of each pick adds to a capped apply family: its own apply
+    // when it sits in one of the given sections (any unit/mult/mod form), plus
+    // the matching applies of a pack. sign -1 for applies where negative is
+    // better (saves). Penalties never count against a cap.
+    auto capPoints = [&](const std::set<DLString> &names, const std::set<DLString> &sections, int sign) {
+        std::vector<int> pts(pool.size(), 0);
+        for (int i = 0; i < (int)pool.size(); i++) {
+            if (pool[i].price <= 0)
+                continue;
+            const Json::Value &affix = *pool[i].affix;
+            if (sections.count(pool[i].section) && names.count(pool[i].norm))
+                pts[i] = max(0, sign * modifier(affix, 1));
+            else if (affix.isMember("affects"))
+                for (auto const &one: affix["affects"])
+                    if (one.isMember("apply") && names.count(one["apply"].asString()))
+                        pts[i] += max(0, sign * modifier(one, 1));
+        }
+        return pts;
+    };
     // measure.primary_stat_cap: at most this many points of str/int/wis/dex/con/cha
     // per item, summed over every affix and stack (Kit 2026-10-27: +5).
     static const std::set<DLString> primaryNames = { "str", "int", "wis", "dex", "con", "cha" };
-    std::vector<int> statPts(pool.size(), 0);
-    for (int i = 0; i < (int)pool.size(); i++) {
-        if (pool[i].price <= 0)
-            continue;
-        const Json::Value &affix = *pool[i].affix;
-        if (pool[i].section == "primary_stats" && primaryNames.count(pool[i].norm))
-            statPts[i] = max(0, modifier(affix, 1));
-        else if (affix.isMember("affects"))
-            for (auto const &one: affix["affects"])
-                if (one.isMember("apply") && primaryNames.count(one["apply"].asString()))
-                    statPts[i] += max(0, modifier(one, 1));
-    }
+    std::vector<int> statPts = capPoints(primaryNames, { "primary_stats" }, 1);
     int statCap = (int)item_value("measure", "primary_stat_cap", 1000);
+    // measure.saves_cap_per_level: at most round(level x this) points of saves per
+    // item, summed over every save apply, affix and stack (Kit 2026-11-06).
+    // A missing key leaves saves uncapped.
+    static const std::set<DLString> saveNames = { "saves", "saving_spell", "saving_breath", "saving_rod", "saving_petri" };
+    std::vector<int> svsPts = capPoints(saveNames, { "affects_by_level", "armor_stats", "primary_stats" }, -1);
+    double svsPerLevel = item_value("measure", "saves_cap_per_level", 0);
+    int svsCap = svsPerLevel > 0 ? max(1, (int)std::round(obj->level * svsPerLevel)) : 1000000;
+    auto capsFit = [&](int i, int stat, int svs) {
+        return stat + statPts[i] <= statCap && svs + svsPts[i] <= svsCap;
+    };
 
     std::vector<int> coreChance;
     // A crafted piece already carries the crafter's fixed stats: no core picks.
@@ -1099,7 +1117,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
     // Three tries; the one closest to the window wins.
     for (int attempt = 0; attempt < 3; attempt++) {
         std::map<int, int> picked;
-        int total = 0, penalty = 0, negatives = 0, positives = 0, statSpent = 0, tops = 0, statSum = 0;
+        int total = 0, penalty = 0, negatives = 0, positives = 0, statSpent = 0, tops = 0, statSum = 0, svsSum = 0;
         std::vector<int> weightNow(pool.size(), 0);
         int target = number_range(minM, maxM);
         int count = number_range(minAffixes, maxAffixes);
@@ -1113,6 +1131,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
             picked[i] = n;
             total += pool[i].price * n;
             statSum += statPts[i] * n;
+            svsSum += svsPts[i] * n;
             if (isStat[i])
                 statSpent += pool[i].price * n;
             if (pool[i].price < 0) {
@@ -1134,7 +1153,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
                 weightNow[i] = pool[i].weight;
                 if (!isCore[i] || pool[i].sigOnly || picked.count(i) || total + pool[i].price > maxM)
                     continue;
-                if (statSum + statPts[i] > statCap)
+                if (!capsFit(i, statSum, svsSum))
                     continue;
                 if (conflicts(pool[i], picked))
                     continue;
@@ -1147,6 +1166,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
             positives++;
             total += pool[pick].price;
             statSum += statPts[pick];
+            svsSum += svsPts[pick];
             if (isStat[pick])
                 statSpent += pool[pick].price;
         }
@@ -1166,7 +1186,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
                     continue;
                 if (total + c.price > maxM)
                     continue;
-                if (statSum + statPts[i] > statCap)
+                if (!capsFit(i, statSum, svsSum))
                     continue;
                 if (c.price < 0 && penalty + c.price < worstPenalty)
                     continue;
@@ -1203,6 +1223,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
             picked[i] = 1;
             total += pool[i].price;
             statSum += statPts[i];
+            svsSum += svsPts[i];
             if (isStat[i])
                 statSpent += pool[i].price;
             if (floorExempt[i])
@@ -1216,7 +1237,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
                 const Candidate &c = pool[p.first];
                 if (c.sigOnly || c.price <= 0 || p.second >= c.stack || total + c.price > maxM)
                     continue;
-                if (statSum + statPts[p.first] > statCap)
+                if (!capsFit(p.first, statSum, svsSum))
                     continue;
                 weightNow[p.first] = c.weight;
                 eligible.push_back(p.first);
@@ -1227,6 +1248,7 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
             picked[i]++;
             total += pool[i].price;
             statSum += statPts[i];
+            svsSum += svsPts[i];
         }
 
         int distance = total < minM ? minM - total : (total > maxM ? total - maxM : 0);
