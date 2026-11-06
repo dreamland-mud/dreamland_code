@@ -35,7 +35,20 @@
 #include "occupations.h"
 #include "profiler.h"
 
+#include "magic.h"
 #include "def.h"
+
+/** What an item's saves do to the chance to resist a spell, in permille, for a
+ *  char of the item's level with no other saves against a caster of that level
+ *  (model 1 curve, positive = better; 0 off the curve). The web and the public
+ *  item search show this as a percent instead of the raw number. */
+static int searcher_saves_pm( int level, int svs )
+{
+    if (svs == 0 || saves_model( ) != 1)
+        return 0;
+    int lvl = max( 1, level );
+    return saves_chance_at( lvl, lvl, svs, 0, 1 ) - saves_chance_at( lvl, lvl, 0, 0, 1 );
+}
 
 static IconvMap koi2utf("koi8-u", "utf-8");
 
@@ -460,6 +473,7 @@ public:
                 a["mana"] = mana;
                 a["move"] = move;
                 a["saves"] = svs;
+                a["saves_pm"] = searcher_saves_pm( pObj->level, svs );
                 a["stat_str"] = str;
                 a["stat_int"] = inta;
                 a["stat_wis"] = wis;
@@ -594,6 +608,7 @@ public:
                 w["hp"] = hp;
                 w["mana"] = mana;
                 w["saves"] = svs;
+                w["saves_pm"] = searcher_saves_pm( pObj->level, svs );
                 w["stat_str"] = str;
                 w["stat_int"] = inta;
                 w["stat_wis"] = wis;

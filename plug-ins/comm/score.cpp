@@ -25,6 +25,7 @@
 #include "arg_utils.h"
 #include "stats_apply.h"
 #include "tohit.h"
+#include "magic.h"
 #include "mudtags.h"
 #include "string_utils.h"
 #include "char_weight.h"
@@ -44,6 +45,17 @@ PROF(samurai);
  * the coin-count placeholder follows whichever number is actually present.
  * fmt's first argument was NULL, i.e. no viewer at all, so even the Russian
  * plural forms were resolved blind; it is the caller's character now. */
+/** Mortals see saves as the chance to resist a spell of their own level, in
+ *  percent; the raw saving_throw is for immortals and for the legacy model,
+ *  where the roll pins to its clamps (Kit 2026-11-06). -1 = show the raw number. */
+static int score_saves_pct( Character *ch )
+{
+    if (ch->is_immortal( ) || saves_model( ) != 1)
+        return -1;
+    int lvl = ch->getModifyLevel( );
+    return saves_chance_at( lvl, lvl, ch->saving_throw, 0, 1 ) / 10;
+}
+
 static DLString show_money( Character *ch, int g, int s )
 {
     if (g > 0 && s > 0)
@@ -267,8 +279,13 @@ static void score_prose( Character *ch )
             to_hit_shown_armor(ch, AC_BASH),
             to_hit_shown_armor(ch, AC_SLASH),
             to_hit_shown_armor(ch, AC_EXOTIC));
-    buf << fmt(ch, _("Точность: {C%d{x  Урон: {C%d{x  Защита от заклинаний: {C%d{x\n\r"),
-                ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
+    int savesPct = score_saves_pct( ch );
+    if (savesPct < 0)
+        buf << fmt(ch, _("Точность: {C%d{x  Урон: {C%d{x  Защита от заклинаний: {C%d{x\n\r"),
+                    ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
+    else
+        buf << fmt(ch, _("Точность: {C%1$d{x  Урон: {C%2$d{x  Шанс устоять перед заклинанием: {C%3$d%%{x\n\r"),
+                    ch->hitroll.getValue( ), ch->damroll.getValue( ), savesPct );
 
     buf << fmt(ch, _("У тебя %s натура.  "), align_name( ch, viewerLang(ch) ).ruscase( '1' ).c_str( ) );
     
@@ -551,7 +568,11 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     }
     if (arg_is(arg, "saves")) {
-        ch->pecho(_("Защита от заклинаний %d."), ch->saving_throw);
+        int savesPct = score_saves_pct( ch );
+        if (savesPct < 0)
+            ch->pecho(_("Защита от заклинаний %d."), ch->saving_throw);
+        else
+            ch->pecho(_("Шанс устоять перед заклинанием твоего уровня: %1$d%%."), savesPct);
         return;
     }
    
@@ -793,7 +814,7 @@ _("     %s| %sВещи          :{x     %3d/%-4d        %sЗащита от ук
 "     | %sВес           :{x  %6d/%-8d    %sЗащита от ударов:{x   %-5d   %s|\n\r"
 "     | %sЗолото        :{Y %-10d          %sЗащита от разрезов:{x %-5d   %s|\n\r"
 "     | %sСеребро       :{W %-10d          %sЗащита от экзотики:{x %-5d   %s|\n\r"
-"     | %sЕдиниц опыта  :{x %-6d              %sЗащита от заклинаний:{x %4d  %s|"),
+"     | %sЕдиниц опыта  :{x %-6d              %sЗащита от заклинаний:{x %4s  %s|"),
         CLR_FRAME,
         CLR_CAPT,
         ch->carry_number, Char::canCarryNumber(ch),
@@ -822,7 +843,7 @@ _("     %s| %sВещи          :{x     %3d/%-4d        %sЗащита от ук
         CLR_CAPT,
         ch->exp.getValue( ),
         CLR_CAPT,
-        ch->saving_throw.getValue( ),
+        (score_saves_pct( ch ) < 0 ? DLString( ch->saving_throw.getValue( ) ) : DLString( score_saves_pct( ch ) ) + "%").c_str( ),
         CLR_FRAME);
 
     ch->pecho( 
