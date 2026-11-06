@@ -1639,7 +1639,7 @@ NMI_INVOKE(Root, randomWeaponTier, "(bestTier[, legendaryPerMille]): случа�
     return Register(random_weapon_tier(bestTier, legendaryPerMille));
 }
 
-NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spells, boss]): случайная броня на базовом прототипе: slot head|body|arms|hands|legs|feet|shield или neck|finger|wrist|ears|float|hold|about|waist (любой ключ fight/armor_names.json), profile caster берет цены аффиксов для кастера; damtype и spells (через запятую) убитого босса дают легендарке его signature-аффикс, boss -- сам босс, по нему названа легендарка с сигнатурой; true если удалось")
+NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spells, boss]): случайная броня на базовом прототипе (armor, jewelry, clothing или treasure; AC только у armor): slot head|body|arms|hands|legs|feet|shield или neck|finger|wrist|ears|float|hold|about|waist (любой ключ fight/armor_names.json), profile caster берет цены аффиксов для кастера; damtype и spells (через запятую) убитого босса дают легендарке его signature-аффикс, boss -- сам босс, по нему названа легендарка с сигнатурой; true если удалось")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
@@ -1658,8 +1658,8 @@ NMI_INVOKE(Root, randomizeArmor, "(obj, ch, tier, slot[, profile, damtype, spell
 
     Character *sigBoss = args.size() > 7 ? argnum2character(args, 8) : 0;
 
-    if (obj->item_type != ITEM_ARMOR)
-        throw Scripting::Exception("Item is not armor for randomize.");
+    if (!armor_item_type_ok(obj->item_type))
+        throw Scripting::Exception("Item is not armor, jewelry, clothing or treasure for randomize.");
     if (tier < BEST_TIER || tier > WORST_TIER)
         throw Scripting::Exception("Invalid armor tier.");
     if (!armor_slot_exists(slot))

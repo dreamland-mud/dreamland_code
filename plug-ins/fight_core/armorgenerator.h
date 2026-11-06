@@ -22,6 +22,10 @@ bool armor_slot_exists(const DLString &slot);
  *  A hand-made piece in any other slot keeps its own AC on a reroll. */
 bool armor_slot_is_shell(const DLString &slot);
 
+/** An item type the armor generator dresses: armor, jewelry, clothing or
+ *  treasure (non-armor pieces roll stats, never AC). */
+bool armor_item_type_ok(int itemType);
+
 /** The whole fight/item_affixes.json, for the weapon side of the pool. */
 const Json::Value & item_affixes_config();
 

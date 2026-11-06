@@ -74,6 +74,12 @@ bool armor_slot_is_shell(const DLString &slot)
     return false;
 }
 
+bool armor_item_type_ok(int itemType)
+{
+    return itemType == ITEM_ARMOR || itemType == ITEM_JEWELRY
+            || itemType == ITEM_CLOTHING || itemType == ITEM_TREASURE;
+}
+
 /** Proc chance per combat round by the affix's tier floor (Kit 2026-10-02):
  *  rare 3%, epic 5%, legendary 8%. */
 static int proc_chance(int tierFloor)
