@@ -15,8 +15,16 @@
 class Object;
 class PCharacter;
 
-/** The seven armor slots the generator knows, in armor_names.json order. */
+/** A slot armor_names.json has nouns for: the generator can make a piece from scratch. */
 bool armor_slot_exists(const DLString &slot);
+
+/** One of the seven body-armor slots (head body arms hands legs feet shield).
+ *  A hand-made piece in any other slot keeps its own AC on a reroll. */
+bool armor_slot_is_shell(const DLString &slot);
+
+/** An item type the armor generator dresses: armor, jewelry, clothing or
+ *  treasure (non-armor pieces roll stats, never AC). */
+bool armor_item_type_ok(int itemType);
 
 /** The whole fight/item_affixes.json, for the weapon side of the pool. */
 const Json::Value & item_affixes_config();
