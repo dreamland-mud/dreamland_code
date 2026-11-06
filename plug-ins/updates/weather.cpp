@@ -150,6 +150,47 @@ static const char * month_name_for( lang_t lang, int m )
     }
 }
 
+// Bonus names are RU-only data (nameRus), so the calendar names each bonus per
+// viewer from this table: the colour legend and the screenreader list share it.
+static const struct bonus_label {
+    const char *key, color, *en, *ru, *ua;
+} bonus_labels[] = {
+    { "experience",   'c', "more experience for kills",  "больше опыта за убийства",  "більше досвіду за вбивства" },
+    { "mana",         'b', "less mana cost",             "меньше расход маны",        "менша витрата мани" },
+    { "learning",     'G', "faster skill practice",      "быстрее прокачка умений",   "швидше вивчення умінь" },
+    { "black friday", 'D', "lower prices",               "низкие цены",               "нижчі ціни" },
+    { "thief skills", 'M', "better thieving skills",     "удачнее воровские навыки",  "вдаліші злодійські навички" },
+    { "pet day",      'g', "creatures improve their stats faster", "существа быстрее улучшают параметры", "істоти швидше покращують параметри" },
+};
+
+static DLString bonus_name_for( lang_t lang, Bonus *bonus )
+{
+    for (const auto &b: bonus_labels)
+        if (bonus->getName() == b.key)
+            return lmsg(lang, b.en, b.ru, b.ua);
+    return bonus->getRussianName();
+}
+
+// "Colour legend: X: today, X: more experience for kills, ..." three entries a line.
+static DLString calendar_legend( lang_t lang )
+{
+    ostringstream buf;
+    buf << lmsg(lang, "{WColour legend{x: ", "{WУсловные обозначения цветом{x: ", "{WКольорові позначення{x: ")
+        << endl << "         {RX{x: " << lmsg(lang, "today", "сегодня", "сьогодні");
+
+    int n = 1;
+    for (const auto &b: bonus_labels) {
+        if (n % 3 == 0)
+            buf << "," << endl << "         ";
+        else
+            buf << ", ";
+        buf << "{" << b.color << "X{x: " << lmsg(lang, b.en, b.ru, b.ua);
+        n++;
+    }
+    buf << endl;
+    return buf.str();
+}
+
 // Season genitive adjective ("of the winter month") in the viewer's language.
 static const char * season_adjective( lang_t lang, const season_info &s )
 {
@@ -923,7 +964,7 @@ struct Calendar {
             if (!bonus->isActive(ch, time_info))
                 continue;
 
-            active << "  -- " << bonus->getRussianName();
+            active << "  -- " << bonus_name_for(lang, bonus);
 
             PCBonusData &data = ch->getBonuses().get(bn);
             if (data.start <= today && today <= data.end) {
@@ -931,13 +972,15 @@ struct Calendar {
                 int end_day   = data.end % 35;
                 int end_month = (data.end / 35) % 17;
                 if (days_left == 0) {
-                    active << " (до конца дня)";
+                    active << lmsg(lang, " (until the end of the day)", " (до конца дня)", " (до кінця дня)");
                 } else {
-                    active << fmt(0, _(": осталось %1$d дн%1$Iень|я|ей (до %2$d числа месяца %3$s)"),
-                                  (int)days_left, end_day + 1, month_table[end_month].name);
+                    active << fmt(ch, _(": осталось %1$d дн%1$Iень|я|ей (до %2$d числа месяца %3$s)"),
+                                  (int)days_left, end_day + 1, month_name_for(lang, end_month));
                 }
             } else {
-                active << " (общий, действует сегодня для всех)";
+                active << lmsg(lang, " (global, active today for everyone)",
+                                     " (общий, действует сегодня для всех)",
+                                     " (загальний, діє сьогодні для всіх)");
             }
             active << "." << endl;
         }
@@ -969,11 +1012,11 @@ struct Calendar {
                 if (!bonus->isActive(ch, future_ti))
                     continue;
 
-                upcoming << "  -- " << bonus->getRussianName()
-                         << fmt(0, _(": через %1$d дн%1$Iень|я|ей (%2$d числа месяца %3$s)"),
+                upcoming << "  -- " << bonus_name_for(lang, bonus)
+                         << fmt(ch, _(": через %1$d дн%1$Iень|я|ей (%2$d числа месяца %3$s)"),
                                 days_ahead,
                                 future_ti.day + 1,
-                                month_table[future_ti.month].name)
+                                month_name_for(lang, future_ti.month))
                          << "." << endl;
                 break;
             }
@@ -1068,21 +1111,7 @@ CMDRUN( calendar )
         calendar.draw_screenreader(buf);
     } else {
         calendar.draw(buf);
-        buf << lmsg(lang,
-            "{WColour legend{x: \n"
-            "         {RX{x: today, {cX{x: more experience for kills, {bX{x: less mana cost,\n"
-            "         {GX{x: faster skill practice, {DX{x: lower prices, {MX{x: better thieving skills,\n"
-            "         {gX{x: creatures improve their stats faster\n",
-
-            "{WУсловные обозначения цветом{x: \n"
-            "         {RX{x: сегодня, {cX{x: больше опыта за убийства, {bX{x: меньше расход маны,\n"
-            "         {GX{x: быстрее прокачка умений, {DX{x: низкие цены, {MX{x: удачнее воровские навыки,\n"
-            "         {gX{x: существа быстрее улучшают параметры\n",
-
-            "{WКольорові позначення{x: \n"
-            "         {RX{x: сьогодні, {cX{x: більше досвіду за вбивства, {bX{x: менша витрата мани,\n"
-            "         {GX{x: швидше вивчення умінь, {DX{x: нижчі ціни, {MX{x: вдаліші злодійські навички,\n"
-            "         {gX{x: істоти швидше покращують параметри\n");
+        buf << calendar_legend(lang);
     }
     ch->send_to(buf);
 }

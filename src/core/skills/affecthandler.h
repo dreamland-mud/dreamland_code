@@ -66,7 +66,7 @@ public:
     virtual void dispel( Character * );
     virtual void look( Character *, Character *, Affect * );
     virtual bool smell( Character *, Character *, Affect * );
-    virtual void toStream( ostringstream &, Affect * );
+    virtual void toStream( ostringstream &, Affect *, Character *looker );
     virtual void saves( Character *, Character *, int &, int, Affect * );
     virtual void stopfol( Character *, Affect * );
 

@@ -65,7 +65,7 @@ void AffectHandler::dispel( Character *ch )
 {
 }
 
-void AffectHandler::toStream( ostringstream &, Affect * ) 
+void AffectHandler::toStream( ostringstream &, Affect *, Character * ) 
 {
 }
 
@@ -374,7 +374,7 @@ DLString AffectHandler::onDescr(const SpellTarget::Pointer &target, Affect *paf,
     // Call legacy affect handler that could append a new line to the description.
     ostringstream buf;
     buf << description;
-    toStream(buf, paf);
+    toStream(buf, paf, ch);
 
     return buf.str();
 }

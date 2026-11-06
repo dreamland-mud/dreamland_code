@@ -272,9 +272,9 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 
 
 AFFECT_DECL(Randomizer);
-VOID_AFFECT(Randomizer)::toStream( ostringstream &buf, Affect *paf ) 
+VOID_AFFECT(Randomizer)::toStream( ostringstream &buf, Affect *paf, Character *looker ) 
 {
-    buf << fmt( 0, _("Окружающее тебя пространство на ближайш%1$Iий|ие|ие {W%1$d{x "
+    buf << fmt( looker, _("Окружающее тебя пространство на ближайш%1$Iий|ие|ие {W%1$d{x "
                    "ча%1$Iс|са|сов попало под власть Хаоса!"), paf->duration ) 
         << endl;
 }
