@@ -12,6 +12,7 @@
 #include "affectflags.h"
 #include "profflags.h"
 #include "fight.h"
+#include "magic.h"
 #include "mudtags.h"
 #include "loadsave.h"
 #include "act.h"
@@ -31,7 +32,7 @@ enum {
 };
 
 struct AffectOutput {
-    AffectOutput( ) : unitMinutes(false), negative(false), cooldown(false), viewer(0), lang(LANG_DEFAULT) { }
+    AffectOutput( ) : unitMinutes(false), negative(false), cooldown(false), viewer(0), subject(0), lang(LANG_DEFAULT) { }
     AffectOutput( Affect *, Character *viewer );
 
     void format_affect( Affect * );
@@ -48,6 +49,7 @@ struct AffectOutput {
     bool negative;
     bool cooldown;
     Character *viewer;
+    Character *subject;     // whose affects these are: save lines read against its saves
     lang_t lang;
 };
 
@@ -58,6 +60,7 @@ struct ShadowAffectOutput : public AffectOutput {
 ShadowAffectOutput::ShadowAffectOutput( int shadow, Character *viewer )
 {
     this->viewer = viewer;
+    subject = 0;
     lang = Player::displayLang( viewer );
     duration = shadow * 4;
     name = _("вторая тень").getMessage( lang );
@@ -68,6 +71,7 @@ ShadowAffectOutput::ShadowAffectOutput( int shadow, Character *viewer )
 AffectOutput::AffectOutput( Affect *paf, Character *viewer )
 {
     this->viewer = viewer;
+    subject = 0;
     lang = Player::displayLang( viewer );
     type = paf->type;
     name = paf->type->getNameFor( viewer );
@@ -109,7 +113,11 @@ void AffectOutput::show_affect( ostringstream &buf, int flags )
                     f << "                        ";
             }
 
-            f << "{y " << *l;
+            // Lines are finished text, but f becomes a format string below:
+            // a bare % in them (heal gain "20%", saves "1.5%") must survive it.
+            DLString line = *l;
+            line.replaces( "%", "%%" );
+            f << "{y " << line;
         }
 
     if (IS_SET(flags, FSHOW_TIME)) {
@@ -139,9 +147,28 @@ void AffectOutput::format_affect( Affect *paf )
         lines.push_back( l );
 }
 
+/** Saves read as the change in the chance to resist a spell of one's own level,
+ *  never as a raw number (Kit 2026-11-06): the same -5 is a lot at level 20 and
+ *  next to nothing on top of 150 saves. The affect is already counted in the
+ *  subject's saving_throw, so the change is with it vs without it. */
+static DLString save_apply_line( Affect *paf, Character *subject, lang_t lang )
+{
+    int lvl = subject->getModifyLevel( );
+    int st = subject->saving_throw;
+    DLString num = saves_permille_text( saves_own_level_permille( lvl, st ) - saves_own_level_permille( lvl, st - paf->modifier ) );
+    bool better = paf->modifier < 0;
+
+    if (better)
+        return fmt( 0, _("улучшает {mшанс устоять перед заклинаниями{y на {m%1$s%%{y").getMessage( lang ).c_str( ), num.c_str( ) );
+    return fmt( 0, _("ухудшает {mшанс устоять перед заклинаниями{y на {m%1$s%%{y").getMessage( lang ).c_str( ), num.c_str( ) );
+}
+
 DLString AffectOutput::format_affect_location( Affect *paf )
 {
     DLString buf;
+
+    if (is_save_apply( paf->location ) && paf->modifier != 0 && subject && saves_model( ) == 1)
+        return save_apply_line( paf, subject, lang );
     
     if (paf->location != APPLY_NONE) 
         switch (paf->location) {
@@ -476,8 +503,10 @@ CMDRUNP( affects )
     PermanentAffects permAff(ch, viewer);
 
     for (auto &paf: ch->affected) {
-        if (output.empty( ) || output.back( ).type != paf->type)
+        if (output.empty( ) || output.back( ).type != paf->type) {
             output.push_back( AffectOutput( paf, viewer ) );
+            output.back( ).subject = ch;
+        }
 
         output.back( ).format_affect( paf );
     }
@@ -503,6 +532,7 @@ CMDRUNP( affects )
 
         AffectOutput ao;
         ao.viewer = viewer;
+        ao.subject = ch;
         ao.lang = Player::displayLang( viewer );
         ao.type = sn;
         ao.name = skill->getNameFor( viewer );

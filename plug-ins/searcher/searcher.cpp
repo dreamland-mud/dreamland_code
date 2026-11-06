@@ -35,7 +35,21 @@
 #include "occupations.h"
 #include "profiler.h"
 
+#include "magic.h"
 #include "def.h"
+
+/** What an item's saves do to the chance to resist a spell, in permille, for a
+ *  char of the item's level with no other saves against a caster of that level
+ *  (positive = better). The web and the public item search show this as a
+ *  percent instead of the raw number; nothing is dumped off the curve or for an
+ *  item without saves, so they fall back to the raw number. */
+static void searcher_saves_pm( Json::Value &row, int level, int svs )
+{
+    int with = saves_own_level_permille( level, svs );
+    if (svs == 0 || with < 0)
+        return;
+    row["saves_pm"] = with - saves_own_level_permille( level, 0 );
+}
 
 static IconvMap koi2utf("koi8-u", "utf-8");
 
@@ -387,11 +401,7 @@ public:
                 case APPLY_HITROLL: hr+=m; break;
                 case APPLY_DAMROLL: dr+=m; break;
                 case APPLY_AC: ac+=m; break;
-                case APPLY_SAVES:         
-                case APPLY_SAVING_ROD:    
-                case APPLY_SAVING_PETRI:  
-                case APPLY_SAVING_BREATH: 
-                case APPLY_SAVING_SPELL:  svs+=m; break;
+                default: if (is_save_apply( paf->location )) svs += m; break;
                 }
                 
                 const FlagTable *table = paf->bitvector.getTable();
@@ -460,6 +470,7 @@ public:
                 a["mana"] = mana;
                 a["move"] = move;
                 a["saves"] = svs;
+                searcher_saves_pm( a, pObj->level, svs );
                 a["stat_str"] = str;
                 a["stat_int"] = inta;
                 a["stat_wis"] = wis;
@@ -551,11 +562,7 @@ public:
                 case APPLY_HITROLL: hr+=m; break;
                 case APPLY_DAMROLL: dr+=m; break;
                 case APPLY_SIZE: size+=m; break;
-                case APPLY_SAVES:         
-                case APPLY_SAVING_ROD:    
-                case APPLY_SAVING_PETRI:  
-                case APPLY_SAVING_BREATH: 
-                case APPLY_SAVING_SPELL:  svs+=m; break;
+                default: if (is_save_apply( paf->location )) svs += m; break;
                 }
             }
             
@@ -594,6 +601,7 @@ public:
                 w["hp"] = hp;
                 w["mana"] = mana;
                 w["saves"] = svs;
+                searcher_saves_pm( w, pObj->level, svs );
                 w["stat_str"] = str;
                 w["stat_int"] = inta;
                 w["stat_wis"] = wis;
