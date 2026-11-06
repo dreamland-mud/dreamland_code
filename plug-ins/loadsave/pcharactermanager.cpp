@@ -749,6 +749,16 @@ bool PCharacterManager::load( PCharacter* pc )
         pc->getAttributes( ).getAttr<XMLStringAttribute>( "lang" )->setValue( seed );
     }
 
+    // One-time seed of the 'numbers' toggle: damage numbers used to come with
+    // the absolute scale (newdamage off), so keep them for those players.
+    // A string marker, not the bit itself, so turning numbers off sticks.
+    auto dmgAttr = pc->getAttributes( ).findAttr<XMLStringAttribute>( "damnumbers_seeded" );
+    if (!dmgAttr || dmgAttr->getValue( ).empty( )) {
+        if (!IS_SET(pc->config, CONFIG_NEWDAMAGE))
+            SET_BIT(pc->config, CONFIG_DAMNUMBERS);
+        pc->getAttributes( ).getAttr<XMLStringAttribute>( "damnumbers_seeded" )->setValue( "1" );
+    }
+
     return true;
 }
 
