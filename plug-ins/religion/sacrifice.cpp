@@ -502,6 +502,12 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
     pch->save();
 }
 
+static bool is_clan_relic( Object *obj )
+{
+    return obj->behavior
+           && DLString("ClanItem").strPrefix(obj->behavior->getType());
+}
+
 static bool can_sacrifice( Character *ch, Object *obj, bool needSpam ) 
 {
     if (!ch->can_see( obj ))
@@ -513,7 +519,14 @@ static bool can_sacrifice( Character *ch, Object *obj, bool needSpam )
         return false;
     }
 
-    if (!obj->can_wear(ITEM_TAKE) || IS_SET(obj->extra_flags, ITEM_NOSAC|ITEM_NOPURGE)) {
+    // A clan relic is nopurge, yet an explicit 'sac <relic>' is sacrilege
+    // (ClanItem::sac): it sends the relic home and the gods smite the offender.
+    // 'sac all' (needSpam false) never picks a relic up by accident.
+    bool sacrilege = needSpam && is_clan_relic(obj)
+                     && !IS_SET(obj->extra_flags, ITEM_NOSAC);
+
+    if (!obj->can_wear(ITEM_TAKE)
+        || (!sacrilege && IS_SET(obj->extra_flags, ITEM_NOSAC|ITEM_NOPURGE))) {
         if (needSpam) 
             ch->pecho( _("%1$^O1 не подлеж%1$nит|ат жертвоприношению."), obj );
         return false;
@@ -602,8 +615,11 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
         }
     }
 
+    // Sacrilege pays nothing: -1 also skips the payout messages.
+    bool relic = is_clan_relic(obj);
+
     if (oprog_sac( obj, ch ))
-        return silver;
+        return relic ? -1 : silver;
 
     if (rescue_nosac_items(obj, ch->in_room)) {
         if (needSpam) {
@@ -613,7 +629,7 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
         }
     }
     extract_obj( obj );
-    return silver;
+    return relic ? -1 : silver;
 }
 
 /*
