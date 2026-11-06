@@ -4,6 +4,7 @@
  * logic based on interpret() from DreamLand 2.0
  */
 #include "fadeopener.h"
+#include "interp.h"
 #include <string.h>
 #include "command.h"
 #include "commandhelp.h"
@@ -267,10 +268,18 @@ int Command::dispatch( const InterpretArguments &iargs )
 }
 
 Character *fade_broken_by = 0;
+long fade_broken_serial = 0;
 
 void Command::visualize( Character *ch )
 {
-    fade_broken_by = (!getExtra( ).isSet( CMD_KEEP_HIDE ) && IS_AFFECTED( ch, AFF_FADE )) ? ch : 0;
+    // Recorded for keep_hide commands too: assassinate, cleave and strangle keep
+    // fade until set_fighting, which comes after their kill roll. A nested
+    // dispatch (order, a script's interpret) leaves the outer command's record
+    // alone; an outermost one runs under the next serial (InterpretActorGuard).
+    if (!interpret_actor( )) {
+        fade_broken_by = IS_AFFECTED( ch, AFF_FADE ) ? ch : 0;
+        fade_broken_serial = interpret_serial( ) + 1;
+    }
 
     if (!getExtra( ).isSet( CMD_KEEP_HIDE ))
         strip_hide_and_fade(ch);

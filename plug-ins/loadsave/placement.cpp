@@ -639,8 +639,26 @@ void strip_invisibility(Character *ch)
 void strip_improved_invisibility(Character *ch)
 {
    if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
-        bool showMessage = ch->affected.findAllWithBits(&affect_flags, AFF_IMP_INVIS).empty();
-        affect_bit_strip(ch, &affect_flags, AFF_IMP_INVIS, true);
+        list<Affect *> owners = ch->affected.findAllWithBits(&affect_flags, AFF_IMP_INVIS);
+        bool showMessage = owners.empty();
+
+        // fade+ puts imp_invis on the fade affect itself: that one goes with
+        // fade (strip_hide_and_fade), with its own "out of the shadows" line.
+        list<int> typesToRemove;
+        bool keptByFade = false;
+        for (auto &paf: owners) {
+            if (paf->bitvector & AFF_FADE)
+                keptByFade = true;
+            else
+                typesToRemove.push_back(paf->type);
+        }
+
+        for (auto &type: typesToRemove)
+            affect_strip(ch, type, true);
+
+        if (keptByFade)
+            return;
+
         REMOVE_BIT(ch->affected_by,  AFF_IMP_INVIS);
 
         // For mobs, if invisibility is gained via a bit.

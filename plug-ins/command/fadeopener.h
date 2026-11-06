@@ -4,10 +4,12 @@
 class Character;
 
 /**
- * The character whose command is being dispatched right now, if it came out of
- * fade to run it (Command::visualize strips fade first). murder reads it to
- * grant a fade+ opener, since fade is already gone by the time it runs.
+ * The character whose outermost command was dispatched while faded, and the
+ * interpret_serial() that command runs under. Fenia reads the pair as
+ * ch.fadeBroken (fade+ sudden death reroll): by the time a skill rolls, fade
+ * is either stripped already (Command::visualize) or about to be (set_fighting).
  */
 extern Character *fade_broken_by;
+extern long fade_broken_serial;
 
 #endif
