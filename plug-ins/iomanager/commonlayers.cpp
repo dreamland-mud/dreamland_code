@@ -26,6 +26,7 @@
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 const char *ttype_name( int ttype );
 
@@ -201,6 +202,10 @@ public:
             create_log_entry(iargs);
 
         if (!iargs.ch->desc)
+            return false;
+
+        // Lets Fenia answer input that matched no command (bare menu numbers etc).
+        if (gprog("onUnknownCommand", "Css", iargs.ch, iargs.cmdName.c_str(), iargs.cmdArgs.c_str()))
             return false;
             
         ostringstream buf; 

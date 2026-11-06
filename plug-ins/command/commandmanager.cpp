@@ -349,6 +349,21 @@ bool CommandManager::process( InterpretArguments &iargs )
 {
     iargs.pCommand = multiCommands.chooseCommand( iargs.ch, iargs.cmdName );
 
+    // Voice dictation glues punctuation to the command word ("list." or
+    // "reply, hi"): retry without it, unless nothing but punctuation is left.
+    if (!iargs.pCommand) {
+        DLString stripped = iargs.cmdName;
+        size_t end = stripped.find_last_not_of( ".,!?;:" );
+
+        if (end != DLString::npos && end + 1 < stripped.size( )) {
+            stripped.erase( end + 1 );
+            iargs.pCommand = multiCommands.chooseCommand( iargs.ch, stripped );
+
+            if (iargs.pCommand)
+                iargs.cmdName = stripped;
+        }
+    }
+
     if (iargs.pCommand) 
         iargs.advance();
     else if (iargs.cmdName.size() >= 3) 
