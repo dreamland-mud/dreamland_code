@@ -52,7 +52,12 @@ static bool menu_is_stale(PCharacter* pch)
     if (!pch->in_room || room != DLString(pch->in_room->vnum))
         return true;
 
-    return !time.isNumber() || dreamland->getCurrentTime() - time.toLong() > GUARD_SECONDS;
+    // A hand-edited pfile must not throw from inside the interpreter.
+    try {
+        return dreamland->getCurrentTime() - time.toLong() > GUARD_SECONDS;
+    } catch (const ::Exception &e) {
+        return true;
+    }
 }
 
 bool Player::menuAvailable(PCharacter* pch)
