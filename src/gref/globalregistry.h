@@ -82,6 +82,16 @@ public:
         
         if (name.empty( ))
             return NULL;
+
+        // Exact English name: answer from the index. The linear scan below
+        // builds lowercased copies of three names per element and costs up to
+        // ~2ms on the skill table, which every Fenia call taking a skill by
+        // name (isAffected, affectStrip...) pays. An index hit is the same
+        // element the scan would return, unless an earlier element's RU/UA
+        // name equalled this English name, which no registry has.
+        Indexes::const_iterator ix = indexes.find( name );
+        if (ix != indexes.end( ) && goodIndex( ix->second ))
+            return (Elem *)*table[ix->second];
             
         for (i = 0; i < table.size( ); i++) 
             if (table[i]->matchesStrict( name ))
