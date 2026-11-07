@@ -98,6 +98,7 @@ public:
     virtual DLString getNameFor( Character *looker, Character *me ) const;
 
     virtual void getBodyInput( Body::Input &, bool npc ) const;
+    virtual std::vector<int> getAttacks( ) const;
     virtual int getDamType( ) const;
     virtual const DLString & getMaterial( ) const;
     virtual double getHpMult( ) const;
@@ -133,7 +134,7 @@ public:
     XML_VARIABLE XMLFlagsNoEmpty   partsAdd, partsDel;
     XML_VARIABLE XMLStringNoEmpty  wearlocAdd, wearlocDel;
     XML_VARIABLE XMLFlagsNoEmpty   actDel, offDel, affDel, detDel, immDel, resDel, vulnDel;
-    XML_VARIABLE XMLEnumerationNoEmpty damtype;
+    XML_VARIABLE XMLStringNoEmpty  attacks;
     XML_VARIABLE XMLStringNoEmpty  material;
     XML_VARIABLE XMLStringNoEmpty  hpMult, dmgMult;
     XML_VARIABLE XMLStringNoEmpty  moveverb;

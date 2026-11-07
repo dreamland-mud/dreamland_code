@@ -253,6 +253,10 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
             in << help_meta_line(l(ch, "Классы"), classes.str( )) << endl;
         }
 
+        DLString imm = imm_flags.messages( r->getImm( ), true, '1', vlang );
+        if (!imm.empty( )) {
+            in << help_meta_line(l(ch, "Невосприимчивы"), DLString(l(ch, "к ")) + imm) << endl;
+        }
         DLString res = imm_flags.messages( r->getRes( ), true, '1', vlang );
         if (!res.empty( )) {
             in << help_meta_line(l(ch, "Устойчивы"), DLString(l(ch, "к ")) + res) << endl;
@@ -368,7 +372,6 @@ DefaultRace::DefaultRace( ) :
                 immDel( 0, &imm_flags ),
                 resDel( 0, &res_flags ),
                 vulnDel( 0, &vuln_flags ),
-                damtype( DAMW_NONE, &weapon_flags ),
                 aff( 0, &affect_flags )
 {
 }
@@ -401,6 +404,11 @@ bool DefaultRace::matchesUnstrict( const DLString &str ) const
 
 void DefaultRace::loaded( )
 {
+    StringList words( attacks.getValue( ) );
+    for (auto &w: words)
+        if (weapon_flags.value( w ) == NO_FLAG)
+            LogStream::sendWarning( ) << "race " << getName( ) << ": unknown attack '" << w << "'" << endl;
+
     derivedAff( );
     raceManager->registrate( Pointer( this ) );
 
@@ -642,9 +650,25 @@ const DefaultRace::ResolvedBody & DefaultRace::resolved( ) const
     return body;
 }
 
+/** Words of <attacks> that name an attack (weapon_flags), in the authored order. */
+std::vector<int> DefaultRace::getAttacks( ) const
+{
+    std::vector<int> result;
+    StringList words( attacks.getValue( ) );
+
+    for (auto &w: words) {
+        int value = weapon_flags.value( w );
+        if (value != NO_FLAG && value != DAMW_NONE)
+            result.push_back( value );
+    }
+
+    return result;
+}
+
 int DefaultRace::getDamType( ) const
 {
-    return damtype.getValue( );
+    std::vector<int> list = getAttacks( );
+    return list.empty( ) ? DAMW_NONE : list.front( );
 }
 
 const DLString & DefaultRace::getMaterial( ) const

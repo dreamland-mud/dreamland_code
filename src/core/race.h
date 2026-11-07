@@ -5,6 +5,7 @@
 #ifndef RACE_H
 #define RACE_H
 
+#include <vector>
 #include "oneallocate.h"
 #include "bitstring.h"
 #include "globalregistryelement.h"
@@ -69,7 +70,9 @@ public:
     // Mob reform body model (plan docs/plans/mob-reform.md §3.4, §3.6 item 2).
     /** Forms, size, race add/del and move verb for the body resolver. */
     virtual void getBodyInput( Body::Input &, bool npc ) const;
-    /** Race default damage type (weapon_flags), 0 when unset. */
+    /** Race attack types (weapon_flags values), primary physical attack first. */
+    virtual std::vector<int> getAttacks( ) const;
+    /** Race default damage type: the first race attack, 0 when the race has none. */
     virtual int getDamType( ) const;
     virtual const DLString & getMaterial( ) const;
     virtual double getHpMult( ) const;
