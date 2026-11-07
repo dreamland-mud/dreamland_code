@@ -242,9 +242,11 @@ std::vector<int> mob_index_attacks(const mob_index_data *pMobIndex)
     std::vector<DLString> kw = attack_name_words(pMobIndex->keyword.get(LANG_EN));
     words.insert(words.end(), kw.begin(), kw.end());
 
-    // The builder's breath spec says the element outright; spec_breath_any breathes them all.
+    // The builder's breath spec says the element outright. spec_breath_any
+    // defers to a colour word in the name and keeps every member without one.
     int breath = attack_breath_spec(pMobIndex->spec_fun.name);
-    bool all = pMobIndex->spec_fun.name == "spec_breath_any";
+    bool breathAny = pMobIndex->spec_fun.name == "spec_breath_any";
+    bool all = false;
     for (auto &w: words)
         if (attack_all_word(w))
             all = true;
@@ -253,15 +255,20 @@ std::vector<int> mob_index_attacks(const mob_index_data *pMobIndex)
     bitstring_t ownImm = pMobIndex->bodyAdd[MOBSET_IMM] & ~race->getImm().getValue();
 
     for (auto &group: race->getAttacks()) {
-        if (group.size() == 1 || all) {
-            result.insert(result.end(), group.begin(), group.end());
+        if (group.size() == 1) {
+            result.push_back(group.front());
             continue;
         }
 
         int pick = attack_member_of_class(group, breath);
 
-        for (size_t i = 0; pick < 0 && i < words.size(); i++)
+        for (size_t i = 0; pick < 0 && !all && i < words.size(); i++)
             pick = attack_member_of_class(group, attack_element_word(words[i]));
+
+        if (pick < 0 && (all || breathAny)) {
+            result.insert(result.end(), group.begin(), group.end());
+            continue;
+        }
 
         for (size_t i = 0; pick < 0 && i < group.size(); i++) {
             bitstring_t bit = immune_bit(attack_damage(group[i]));
