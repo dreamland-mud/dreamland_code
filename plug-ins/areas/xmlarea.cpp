@@ -12,6 +12,7 @@
 #include "feniamanager.h"
 #include "fileformatexception.h"
 #include "room.h"
+#include "mobextras.h"
 #include "merc.h"
 #include "string_utils.h"
 #include "dreamland.h"
@@ -282,8 +283,7 @@ XMLArea::load_mobiles(AreaIndexData *a)
         MOB_INDEX_DATA *pMobIndex = mit->second.compat( );
         pMobIndex->vnum = vnum;
         pMobIndex->area = a;
-        pMobIndex->resolveBody( );
-        pMobIndex->deriveNumbers( );
+        mob_index_rebuild( pMobIndex );
 
         iHash = vnum % MAX_KEY_HASH;
         pMobIndex->next = mob_index_hash[iHash];

@@ -94,6 +94,11 @@ struct mob_index_data
     bitstring_t        bodyDel[MOBSET_MAX];
     // Body bits as resolveBody/deriveNumbers left them, to spot later direct edits.
     bitstring_t        bodySnapshot[MOBSET_MAX];
+    // Random extra imm/res/vuln bits of a champion+ tier (fight_core
+    // mob_index_random_extras, MOB_DEFENSES_AND_LEGENDS.md D4), already ORed
+    // into imm/res/vuln_flags and the snapshot. Kept apart for medit/stat and
+    // the saved-mobile stamp. Zero for every other set.
+    bitstring_t        randomExtra[MOBSET_MAX];
     // Bit sets (Body::BitSet order act..vuln) whose authored dels are honoured,
     // and for imm/res/vuln also the adds: <reviewed>.
     int                reviewed;
@@ -120,7 +125,8 @@ struct mob_index_data
     /** Saved-mobile stamp (BodyVer): a 64-bit hash of everything a saved
      *  instance's body and numbers were built from -- the prototype's level,
      *  tier, race, resolved body and centre numbers. Never the instance level,
-     *  which growth raises (decision 36). */
+     *  which growth raises (decision 36), nor the random extras, which the
+     *  monthly reshuffle changes and the index supplies on load anyway. */
     unsigned long long bodyStamp();
     /** The index field holding one bit set (act, off_flags, ..., parts). */
     int &bodyBits(int mobset);

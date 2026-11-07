@@ -15,6 +15,7 @@ $(INCLUDES_SRC) \
 libfight_core_la_SOURCES = \
 damageflags.cpp \
 attacks.cpp \
+mobextras.cpp \
 impl.cpp \
 fight_position.cpp \
 fight_exception.cpp \

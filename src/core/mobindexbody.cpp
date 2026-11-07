@@ -17,6 +17,9 @@
  * (docs/systems/MOB_DEFENSES_AND_LEGENDS.md D1). asave keeps writing them.
  * Unique (formless) races are exempt: their prototypes decide (help 329).
  *
+ * Champion+ random extra imm/res/vuln (D4) come after both, from fight_core
+ * mob_index_rebuild(); resolveBody() clears the previous roll.
+ *
  * deriveNumbers() resolves the tier, writes the tier centres into
  * hit/mana/damage/hitroll/ac/wealth (authored numbers never count), picks the
  * enabled off bits (decision 39) and adds the tier's affect bits (decision 56).
@@ -59,7 +62,7 @@ unsigned long long mob_index_data::bodyStamp()
     // race files come off the disk.
     buf << level << '|' << tier << '|' << race << '|' << getSize() << '|';
     for (int s = 0; s < MOBSET_MAX; s++)
-        buf << bodyBits(s) << ',';
+        buf << (int)((unsigned int)bodyBits(s) & ~randomExtra[s]) << ',';
     std::set<DLString> wearNames;
     if (wearloc.getRegistry())
         for (int ndx: wearloc.toArray())
@@ -105,6 +108,12 @@ void mob_index_data::bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) co
     bitstring_t now = (unsigned int)const_cast<mob_index_data *>(this)->bodyBits(mobset);
     bitstring_t on = now & ~bodySnapshot[mobset];
     bitstring_t off = bodySnapshot[mobset] & ~now;
+
+    // Random tier extras are not authored: switching one off neither writes a
+    // del nor drops an authored add of the same bit (an unreviewed one can
+    // coincide), and the next rebuild rolls it back in.
+    on &= ~randomExtra[mobset];
+    off &= ~randomExtra[mobset];
 
     // Imm/res/vuln: switching off a bit only the prototype's own add gave
     // just drops the add, a del there would land in XML on a bit the race
@@ -168,9 +177,7 @@ static const Flags &race_set(Race *race, int mobset)
     }
 }
 
-/* A race with no <forms> (unique): its prototypes keep their authored bodies
- * on purpose, their abilities are whatever the creature has written (help 329). */
-static bool race_formless(Race *race)
+bool MobBody::raceFormless(Race *race)
 {
     Body::Input in;
     race->getBodyInput(in, true);
@@ -181,7 +188,7 @@ bool mob_index_data::addGated(int bitSet) const
 {
     if (!add_gated(bitSet) || (reviewed & (1 << bitSet)))
         return false;
-    return !race_formless(raceManager->find(race));
+    return !MobBody::raceFormless(raceManager->find(race));
 }
 
 /* Off bits a body may use by its parts and forms (plan §3.3b). */
@@ -224,7 +231,12 @@ void mob_index_data::resolveBody()
 {
     Race *mobrace = raceManager->find(race);
 
-    if (race_formless(mobrace)) {
+    // The bit sets are rebuilt from scratch below; the extras, if any, come back
+    // with mob_index_random_extras() after deriveNumbers().
+    for (int s = 0; s < MOBSET_MAX; s++)
+        randomExtra[s] = 0;
+
+    if (MobBody::raceFormless(mobrace)) {
         // add | (race & ~del), dead dels kept dead unless reviewed, adds always
         // count (the prototype decides, help 329); slots,
         // off bits and AC exactly as authored, no form or part rules.
@@ -453,7 +465,7 @@ void mob_index_data::deriveNumbers()
     // Off bits granted by the tier on top of its count, as far as the body
     // allows them; a formless race takes them as is. A slow body (worm, slug,
     // zombie) never turns fast either way.
-    bool formless = race_formless(mobrace);
+    bool formless = MobBody::raceFormless(mobrace);
     bitstring_t tierOffAdd = 0;
     if (!tierRow.offAdd.empty()) {
         Body::NameSet tierOff(tierRow.offAdd.begin(), tierRow.offAdd.end());
