@@ -30,6 +30,7 @@
 #include <commandmanager.h>
 #include "profession.h"
 #include "race.h"
+#include "mobbody.h"
 #include "clanreference.h"
 #include "room.h"
 
@@ -371,6 +372,7 @@ static void abc_body(Character *ch, DLString &args)
             if (setArg != abc_set_names[s] || !abc_set_gated(s))
                 continue;
 
+            bitstring_t before = (unsigned int)pMob->bodyBits(s);
             if (mode == "keep")
                 pMob->reviewed |= 1 << abc_reviewed_bit(s);
             else
@@ -381,6 +383,11 @@ static void abc_body(Character *ch, DLString &args)
             pMob->area->changed = true;
             ch->pecho("Mob %d: %s dels %s.", vnum.getValue(), setArg.c_str(),
                       mode == "keep" ? "now apply" : "dropped");
+            // Reviewed imm/res/vuln also switches the authored adds on.
+            bitstring_t alive = pMob->aliveAdds(s, before);
+            if (mode == "keep" && alive)
+                ch->pecho("Mob %d: %s adds now apply too: [%s].", vnum.getValue(), setArg.c_str(),
+                          MobBody::bitSetTable(abc_reviewed_bit(s))->names(alive).c_str());
             DLString again = "body dels";
             abc_body(ch, again);
             return;

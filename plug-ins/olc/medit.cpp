@@ -86,6 +86,52 @@ static DLString mob_reviewed_names(int mask)
     return buf.empty() ? DLString("-") : buf;
 }
 
+/*
+ * Imm/res/vuln adds count only under <reviewed>, unique races exempt
+ * (mob_index_data::addGated). The authored
+ * adds of an unreviewed set, including bits toggled on in this session, that
+ * the race and forms do not give anyway: written by asave, not in effect.
+ */
+static bitstring_t mob_dead_adds(const mob_index_data &m, int mobset, int bitSet)
+{
+    if (!m.addGated(bitSet))
+        return 0;
+    bitstring_t add, del;
+    m.bodyDiff(mobset, add, del);
+    return add & ~m.bodySnapshot[mobset];
+}
+
+static void mob_dead_adds_warn(PCharacter *ch, const mob_index_data &m, int mobset, int bitSet, const FlagTable &table)
+{
+    bitstring_t dead = mob_dead_adds(m, mobset, bitSet);
+    if (!dead)
+        return;
+    ptc(ch, "{RВнимание:{x добавления [{W%s{x] не действуют: набор %s не проверен. "
+            "Включить: {yreviewed %s{x (команда задает весь список). "
+            "Убрать такое добавление: сначала включить, потом снять флаг.\n\r",
+        table.names(dead).c_str(), Body::bitSetNames[bitSet],
+        mob_reviewed_names(m.reviewed | (1 << bitSet)).c_str());
+}
+
+static void mob_dead_adds_show(PCharacter *ch, const mob_index_data &m, int mobset, int bitSet, const FlagTable &table)
+{
+    bitstring_t dead = mob_dead_adds(m, mobset, bitSet);
+    if (dead)
+        ptc(ch, "             {Dnot reviewed, not in effect: [%s] (reviewed ... %s){x\n\r",
+            table.names(dead).c_str(), Body::bitSetNames[bitSet]);
+}
+
+/* After a race change: adds that died (the dead-adds warning) or came alive. */
+static void mob_race_adds_report(PCharacter *ch, const mob_index_data &m, int mobset, int bitSet,
+                                 const FlagTable &table, int was)
+{
+    mob_dead_adds_warn(ch, m, mobset, bitSet, table);
+    bitstring_t alive = m.aliveAdds(mobset, (unsigned int)was);
+    if (alive)
+        ptc(ch, "Добавления %s [{W%s{x] теперь действуют.\n\r",
+            Body::bitSetNames[bitSet], table.names(alive).c_str());
+}
+
 static void refresh_body(mob_index_data &m)
 {
     for (int s = 0; s < MOBSET_MAX; s++) {
@@ -478,8 +524,11 @@ MEDIT(show)
         position_table.name(mob.default_pos).c_str());
 
     ptc(ch, "{CImm:{x         [{W%s{x] {D(? imm_flags){x\n\r", imm_flags.names(mob.imm_flags).c_str());
+    mob_dead_adds_show(ch, mob, MOBSET_IMM, Body::BS_IMM, imm_flags);
     ptc(ch, "{CRes:{x         [{W%s{x] {D(? res_flags){x\n\r", res_flags.names(mob.res_flags).c_str());
+    mob_dead_adds_show(ch, mob, MOBSET_RES, Body::BS_RES, res_flags);
     ptc(ch, "{CVuln:{x        [{W%s{x] {D(? vuln_flags){x\n\r", vuln_flags.names(mob.vuln_flags).c_str());
+    mob_dead_adds_show(ch, mob, MOBSET_VULN, Body::BS_VULN, vuln_flags);
     ptc(ch, "{COff:{x         [{W%s{x] {D(? off_flags){x\n\r", off_flags.names(mob.off_flags).c_str());
     ptc(ch, "{CSize:{x        [{W%s{x] (расовый {g%s{x) {D(? size_table){x\n\r", 
         size_table.name(mob.size).c_str(), 
@@ -972,17 +1021,23 @@ MEDIT(part)
 
 MEDIT(imm)
 {
-    return flagBitsEdit(imm_flags, mob.imm_flags);
+    bool rc = flagBitsEdit(imm_flags, mob.imm_flags);
+    mob_dead_adds_warn(ch, mob, MOBSET_IMM, Body::BS_IMM, imm_flags);
+    return rc;
 }
 
 MEDIT(res)
 {
-    return flagBitsEdit(res_flags, mob.res_flags);
+    bool rc = flagBitsEdit(res_flags, mob.res_flags);
+    mob_dead_adds_warn(ch, mob, MOBSET_RES, Body::BS_RES, res_flags);
+    return rc;
 }
 
 MEDIT(vuln)
 {
-    return flagBitsEdit(vuln_flags, mob.vuln_flags);
+    bool rc = flagBitsEdit(vuln_flags, mob.vuln_flags);
+    mob_dead_adds_warn(ch, mob, MOBSET_VULN, Body::BS_VULN, vuln_flags);
+    return rc;
 }
 
 MEDIT(material)
@@ -1079,7 +1134,8 @@ MEDIT(reviewed)
 
     if (args.empty()) {
         ptc(ch, "Проверено: [%s]. Синтаксис: reviewed <aff|det|imm|res|vuln|none> ... -- "
-                "удаления (del) этих наборов начинают действовать.\n\r",
+                "удаления (del) этих наборов начинают действовать, а для imm/res/vuln "
+                "и добавления (add).\n\r",
             mob_reviewed_names(mob.reviewed).c_str());
         return false;
     }
@@ -1125,8 +1181,13 @@ MEDIT(race)
             mob.parts &= ~old_race->getParts( );
 */            
 
+            int wasImm = mob.imm_flags, wasRes = mob.res_flags, wasVuln = mob.vuln_flags;
             mob.race = race->getName();
             refresh_body(mob);
+            // To or from a unique race the authored imm/res/vuln adds die or revive.
+            mob_race_adds_report(ch, mob, MOBSET_IMM, Body::BS_IMM, imm_flags, wasImm);
+            mob_race_adds_report(ch, mob, MOBSET_RES, Body::BS_RES, res_flags, wasRes);
+            mob_race_adds_report(ch, mob, MOBSET_VULN, Body::BS_VULN, vuln_flags, wasVuln);
 
 /*
             mob.off_flags |= race->getOff( );

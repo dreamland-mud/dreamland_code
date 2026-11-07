@@ -12,6 +12,11 @@
  * instance is a plain copy) until the prototype names the set in <reviewed>
  * (plan §5.3 step 7, decision 17).
  *
+ * Adds on imm/res/vuln count only under <reviewed> too: unreviewed, the
+ * defenses are race + forms, so a race help is what the player prepares for
+ * (docs/systems/MOB_DEFENSES_AND_LEGENDS.md D1). asave keeps writing them.
+ * Unique (formless) races are exempt: their prototypes decide (help 329).
+ *
  * deriveNumbers() resolves the tier, writes the tier centres into
  * hit/mana/damage/hitroll/ac/wealth (authored numbers never count), picks the
  * enabled off bits (decision 39) and adds the tier's affect bits (decision 56).
@@ -80,6 +85,16 @@ unsigned long long mob_index_data::bodyStamp()
     return h;
 }
 
+static const Flags &race_set(Race *race, int mobset);
+static int bitset_of(int mobset);
+static bool add_gated(int bitSet);
+
+bitstring_t mob_index_data::aliveAdds(int mobset, bitstring_t before) const
+{
+    bitstring_t now = (unsigned int)const_cast<mob_index_data *>(this)->bodyBits(mobset);
+    return now & ~before & bodyAdd[mobset];
+}
+
 bitstring_t mob_index_data::honouredAffDel() const
 {
     return (reviewed & (1 << Body::BS_AFF)) ? bodyDel[MOBSET_AFF] : 0;
@@ -91,8 +106,20 @@ void mob_index_data::bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) co
     bitstring_t on = now & ~bodySnapshot[mobset];
     bitstring_t off = bodySnapshot[mobset] & ~now;
 
+    // Imm/res/vuln: switching off a bit only the prototype's own add gave
+    // just drops the add, a del there would land in XML on a bit the race
+    // never had. Other sets keep the del: on off/aff/act the tier or the
+    // body can pick the bit again, and only the del beats that.
+    bitstring_t ownOff = 0;
+    int bs = bitset_of(mobset);
+    if (bs >= 0 && add_gated(bs)) {
+        Race *mobrace = raceManager->find(race);
+        bitstring_t base = mobrace ? race_set(mobrace, mobset).getValue() : 0;
+        ownOff = off & bodyAdd[mobset] & ~base;
+    }
+
     add = (bodyAdd[mobset] | on) & ~off;
-    del = (bodyDel[mobset] | off) & ~on;
+    del = (bodyDel[mobset] | (off & ~ownOff)) & ~on;
 
     if (mobset == MOBSET_ACT)
         add &= ~(bitstring_t)ACT_IS_NPC;
@@ -120,6 +147,12 @@ static bool del_gated(int bitSet)
            || bitSet == Body::BS_RES || bitSet == Body::BS_VULN;
 }
 
+/* Adds on these sets are honoured only for reviewed prototypes. */
+static bool add_gated(int bitSet)
+{
+    return bitSet == Body::BS_IMM || bitSet == Body::BS_RES || bitSet == Body::BS_VULN;
+}
+
 static const Flags &race_set(Race *race, int mobset)
 {
     switch (mobset) {
@@ -142,6 +175,13 @@ static bool race_formless(Race *race)
     Body::Input in;
     race->getBodyInput(in, true);
     return in.forms.empty();
+}
+
+bool mob_index_data::addGated(int bitSet) const
+{
+    if (!add_gated(bitSet) || (reviewed & (1 << bitSet)))
+        return false;
+    return !race_formless(raceManager->find(race));
 }
 
 /* Off bits a body may use by its parts and forms (plan §3.3b). */
@@ -185,7 +225,8 @@ void mob_index_data::resolveBody()
     Race *mobrace = raceManager->find(race);
 
     if (race_formless(mobrace)) {
-        // add | (race & ~del), dead dels kept dead unless reviewed; slots,
+        // add | (race & ~del), dead dels kept dead unless reviewed, adds always
+        // count (the prototype decides, help 329); slots,
         // off bits and AC exactly as authored, no form or part rules.
         for (int s = 0; s < MOBSET_MAX; s++) {
             bitstring_t base = race_set(mobrace, s).getValue();
@@ -227,7 +268,8 @@ void mob_index_data::resolveBody()
         int bs = bitset_of(s);
         if (bs < 0)
             continue;
-        p.bitsAdd[bs] = MobBody::names(MobBody::bitSetTable(bs), bodyAdd[s]);
+        if (!addGated(bs))
+            p.bitsAdd[bs] = MobBody::names(MobBody::bitSetTable(bs), bodyAdd[s]);
         if (!del_gated(bs) || (reviewed & (1 << bs)))
             p.bitsDel[bs] = MobBody::names(MobBody::bitSetTable(bs), bodyDel[s]);
     }
