@@ -114,6 +114,7 @@ protected:
     virtual bool checkRoomClient( PCharacter *, Room * );
     virtual bool victimNeedsExits( ) const { return !selectParams.allowNoExits; }
     virtual bool victimRefusesNoTrack( ) const { return !selectParams.allowNoTrack; }
+    virtual bool victimNeedsPath( ) const { return !selectParams.allowUnreachable; }
 
     bool passesParams( PCharacter *, NPCharacter * );
 

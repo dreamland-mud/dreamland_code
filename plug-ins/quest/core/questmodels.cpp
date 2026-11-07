@@ -572,7 +572,7 @@ NPCharacter * VictimQuestModel::getRandomVictim( PCharacter *pch )
     if (!result)
         throw QuestCannotStartException( );
 
-    if (!targetRoomAccessible(pch, result->in_room))
+    if (victimNeedsPath( ) && !targetRoomAccessible(pch, result->in_room))
         throw QuestCannotStartException( );
 
     return result;    

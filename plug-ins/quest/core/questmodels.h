@@ -114,6 +114,7 @@ class VictimQuestModel : public virtual MobileQuestModel {
 protected:
     virtual bool checkMobileVictim( PCharacter *, NPCharacter * );
     virtual bool victimRefusesNoTrack( ) const { return true; }
+    virtual bool victimNeedsPath( ) const { return true; }
     void findVictims( PCharacter *, MobileList & );
     void findVictims( PCharacter *, MobIndexMap & );
     NPCharacter * getRandomVictim( PCharacter * );
