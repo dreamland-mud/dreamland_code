@@ -74,7 +74,7 @@ mob_index_data::mob_index_data( )
     area = NULL;
 
     for (int i = 0; i < MOBSET_MAX; i++)
-        bodyAdd[i] = bodyDel[i] = bodySnapshot[i] = 0;
+        bodyAdd[i] = bodyDel[i] = bodySnapshot[i] = randomExtra[i] = 0;
     reviewed = 0;
     tier = MobTiers::TIER_NORMAL;
     wearloc.setRegistry(wearlocationManager);

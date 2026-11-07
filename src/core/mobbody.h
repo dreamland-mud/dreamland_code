@@ -16,6 +16,7 @@
 struct FlagTable;
 
 class GlobalBitvector;
+class Race;
 
 namespace MobBody {
 
@@ -27,6 +28,15 @@ MobTiers::Config &tiers();
 /** Bumped on every (re)load of either config; resolved caches compare against it. */
 unsigned long generation();
 void touch();
+
+/** A race with no <forms> (unique): its prototypes keep their authored bodies
+ *  on purpose, their abilities are whatever the creature has written (help 329). */
+bool raceFormless(Race *race);
+
+/** Salt of the random extras: year * 12 + month of the first call. Fixed for
+ *  the process, so the extras reshuffle at the first boot of a calendar month
+ *  and an OLC re-derive later in the run rolls the same as boot did. */
+int monthSalt();
 
 /** Engine bit table of a resolver bit set (act_flags, off_flags, ...). */
 const FlagTable *bitSetTable(int bitSet);

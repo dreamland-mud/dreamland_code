@@ -319,7 +319,7 @@ XMLMobileFactory::compat(mob_index_data *mob)
 
     // Mob reform: authored diffs, tier and reviewed sets. The body and the
     // numbers are built by the caller once the vnum is known
-    // (resolveBody + deriveNumbers).
+    // (mob_index_rebuild in fight_core).
     const XMLFlagsDiff *sets[MOBSET_MAX] = { &act, &off, &aff, &detection, &imm, &res, &vuln, &form, &parts };
     for (int s = 0; s < MOBSET_MAX; s++) {
         mob->bodyAdd[s] = sets[s]->add;

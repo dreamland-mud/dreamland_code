@@ -1289,6 +1289,15 @@ static bool has_nopost(Character *ch)
     if (victim->vuln_flags)
         buf << "Уязвимости: " << vuln_flags.names(victim->vuln_flags) << endl;
 
+    // Random tier extras of the prototype (champion+, reshuffled monthly), part of the sets above.
+    if (npc) {
+        const bitstring_t *rx = npc->pIndexData->randomExtra;
+        if (rx[MOBSET_IMM] || rx[MOBSET_RES] || rx[MOBSET_VULN])
+            buf << "Случайные от ранга (на месяц): imm [" << imm_flags.names(rx[MOBSET_IMM])
+                << "] res [" << res_flags.names(rx[MOBSET_RES])
+                << "] vuln [" << vuln_flags.names(rx[MOBSET_VULN]) << "]" << endl;
+    }
+
     if (victim->detection)
         buf << "Видит: " <<  detect_flags.names(victim->detection) << endl;
     

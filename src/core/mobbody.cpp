@@ -2,6 +2,7 @@
  * Mob reform: engine side of the body model, see mobbody.h.
  */
 #include <set>
+#include <ctime>
 #include "logstream.h"
 #include "flagtable.h"
 #include "globalbitvector.h"
@@ -33,6 +34,18 @@ unsigned long generation()
 void touch()
 {
     configGeneration++;
+}
+
+int monthSalt()
+{
+    static int salt = 0;
+    if (!salt) {
+        time_t now = time(0);
+        struct tm tmNow;
+        localtime_r(&now, &tmNow);
+        salt = (tmNow.tm_year + 1900) * 12 + tmNow.tm_mon;
+    }
+    return salt;
 }
 
 static void warnOnce(const std::string &what)

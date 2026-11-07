@@ -25,6 +25,9 @@
  *            "aff_add": [ "sanctuary" ],         // affect bits the tier grants (item 56)
  *            "off_add": [ "fast" ],              // off bits on top of the count, body-allowed, never on a slow body
  *            "act_add": [ "warrior" ],           // act bits for non-casters (decision 72)
+ *            "random_res": 2,                    // random extra defenses from random_pool, by vnum
+ *            "random_imm_pct": 10,               // chance per extra to be an immunity, one per mob
+ *            "random_vuln": 0,                   // random extra vulns from the same pool
  *            "word": { "en": "...", "ru": "...", "ua": "..." } },
  *     ... missing numbers are interpolated between their neighbours
  *   },
@@ -41,8 +44,11 @@
  *   "caster_vnums": [ ],
  *   "off_priority": { "warrior": [...], "thief": [...], "mage": [...], "cleric": [...],
  *                     "sentient": [...], "animal": [...] },
- *   "off_signature": [ "tail", "area_attack", ... ] // race-body off bits always on, whatever the tier
+ *   "off_signature": [ "tail", "area_attack", ... ], // race-body off bits always on, whatever the tier
+ *   "random_pool": [ "fire", "cold", ... ]       // imm_flags names the random extras draw from
  * }
+ *
+ * Random extras are a defined tier's own: an interpolated tier never gets them.
  */
 #ifndef MOBTIERS_H
 #define MOBTIERS_H
@@ -78,6 +84,10 @@ struct Tier {
     // Decision 72: off bits the tier enables when the body allows them (fast,
     // a slow form forbids it), and act bits for non-casters (warrior = extra attacks).
     std::vector<std::string> offAdd, actAdd;
+    // Random extra defenses per prototype (MOB_DEFENSES_AND_LEGENDS.md D4):
+    // resists drawn from Config::randomPool, each an immunity at randomImmPct
+    // (one at most), then randomVuln vulns from what is left of the pool.
+    int randomRes = 0, randomImmPct = 0, randomVuln = 0;
     std::map<std::string, std::string> word;
 };
 
@@ -124,6 +134,8 @@ struct Config {
     // Boss styles (Kit 2026-10-02): "fortress" fat but mild, "brute" deadly
     // but thin. hp and damage multipliers on top of the tier.
     std::map<std::string, std::pair<double, double> > styles;
+    // imm_flags names the random extras draw from, in file order.
+    std::vector<std::string> randomPool;
 
     bool fromJson(const Json::Value &value, std::string &error);
     void clear();

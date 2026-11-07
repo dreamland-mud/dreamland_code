@@ -12,7 +12,8 @@ plugin_INCLUDES = $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/iomanager \
 -I$(top_srcdir)/plug-ins/loadsave \
--I$(top_srcdir)/plug-ins/movement
+-I$(top_srcdir)/plug-ins/movement \
+-I$(top_srcdir)/plug-ins/fight_core
 
 libareas_la_SOURCES = \
 fixarea.cpp \
@@ -34,6 +35,7 @@ libareas_la_LIBADD = \
 ../help/libhelp.la \
 ../system/libscheduler_task_round.la \
 ../movement/libmovement.la \
+../fight_core/libfight_core.la \
 ../iomanager/libiomanager.la \
 -ljsoncpp
 

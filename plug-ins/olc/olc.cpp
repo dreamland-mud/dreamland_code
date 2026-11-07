@@ -58,6 +58,7 @@
 #include "move_utils.h"
 #include "doors.h"
 #include "weapontier.h"
+#include "mobextras.h"
 #include "loadsave.h"
 #include "vnum.h"
 
@@ -378,8 +379,7 @@ static void abc_body(Character *ch, DLString &args)
             else
                 pMob->bodyDel[s] = 0;
 
-            pMob->resolveBody();
-            pMob->deriveNumbers();
+            mob_index_rebuild(pMob);
             pMob->area->changed = true;
             ch->pecho("Mob %d: %s dels %s.", vnum.getValue(), setArg.c_str(),
                       mode == "keep" ? "now apply" : "dropped");

@@ -6,6 +6,7 @@
 
 #include "medit.h"
 #include "mobbody.h"
+#include "mobextras.h"
 #include "stringlist.h"
 
 
@@ -140,8 +141,7 @@ static void refresh_body(mob_index_data &m)
         m.bodyAdd[s] = add;
         m.bodyDel[s] = del;
     }
-    m.resolveBody();
-    m.deriveNumbers();
+    mob_index_rebuild(&m);
 }
 
 /* Copy the mob reform state of one index into another. */
@@ -151,6 +151,7 @@ static void copy_reform_fields(mob_index_data &to, const mob_index_data &from)
         to.bodyAdd[s] = from.bodyAdd[s];
         to.bodyDel[s] = from.bodyDel[s];
         to.bodySnapshot[s] = from.bodySnapshot[s];
+        to.randomExtra[s] = from.randomExtra[s];
     }
     to.reviewed = from.reviewed;
     to.tierName = from.tierName;
@@ -529,6 +530,11 @@ MEDIT(show)
     mob_dead_adds_show(ch, mob, MOBSET_RES, Body::BS_RES, res_flags);
     ptc(ch, "{CVuln:{x        [{W%s{x] {D(? vuln_flags){x\n\r", vuln_flags.names(mob.vuln_flags).c_str());
     mob_dead_adds_show(ch, mob, MOBSET_VULN, Body::BS_VULN, vuln_flags);
+    if (mob.randomExtra[MOBSET_IMM] || mob.randomExtra[MOBSET_RES] || mob.randomExtra[MOBSET_VULN])
+        ptc(ch, "             {Drandom tier extras, part of the above, reshuffled monthly, never saved:{x imm [{W%s{x] res [{W%s{x] vuln [{W%s{x]\n\r",
+            imm_flags.names(mob.randomExtra[MOBSET_IMM]).c_str(),
+            res_flags.names(mob.randomExtra[MOBSET_RES]).c_str(),
+            vuln_flags.names(mob.randomExtra[MOBSET_VULN]).c_str());
     ptc(ch, "{COff:{x         [{W%s{x] {D(? off_flags){x\n\r", off_flags.names(mob.off_flags).c_str());
     ptc(ch, "{CSize:{x        [{W%s{x] (расовый {g%s{x) {D(? size_table){x\n\r", 
         size_table.name(mob.size).c_str(), 

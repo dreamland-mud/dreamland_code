@@ -75,6 +75,9 @@ static void readTier(const Json::Value &d, Tier &t)
     t.xp = d.get("xp", 1.0).asDouble();
     t.xpMinLevel = d.get("xp_min_level", 0).asInt();
     t.gold = d.get("gold", 1.0).asDouble();
+    t.randomRes = d.get("random_res", 0).asInt();
+    t.randomImmPct = d.get("random_imm_pct", 0).asInt();
+    t.randomVuln = d.get("random_vuln", 0).asInt();
     auto readList = [&d](const char *key, std::vector<std::string> &out) {
         const Json::Value &v = d[key];
         if (v.isArray())
@@ -98,6 +101,7 @@ static Tier blend(const Tier &a, const Tier &b, double f)
     t.defined = false;
     t.name.clear();
     t.word.clear();
+    t.randomRes = t.randomImmPct = t.randomVuln = 0;
     t.hp = mix(a.hp, b.hp);
     t.hpBoost = mix(a.hpBoost, b.hpBoost);
     // The ramp levels come from the side that has a ramp: a row without one
@@ -242,6 +246,11 @@ bool Config::fromJson(const Json::Value &value, std::string &error)
     if (os.isArray())
         for (const auto &e: os)
             offSignature.insert(e.asString());
+
+    const Json::Value &rp = value["random_pool"];
+    if (rp.isArray())
+        for (const auto &e: rp)
+            randomPool.push_back(e.asString());
 
     loaded = true;
     return true;

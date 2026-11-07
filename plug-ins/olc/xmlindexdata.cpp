@@ -20,6 +20,7 @@
 #include "olcstate.h"
 #include "olc.h"
 #include "affect.h"
+#include "mobextras.h"
 
 #include "def.h"
 
@@ -105,8 +106,7 @@ XMLMobIndexData::fromXML( const XMLNode::Pointer& parent)
 
     vnum = parent->getAttribute( "vnum" ).toInt( );
     area = OLCState::get_vnum_area(vnum);
-    resolveBody( );
-    deriveNumbers( );
+    mob_index_rebuild( this );
 }
 
 bool
