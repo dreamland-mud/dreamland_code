@@ -12,6 +12,10 @@
  * instance is a plain copy) until the prototype names the set in <reviewed>
  * (plan §5.3 step 7, decision 17).
  *
+ * Adds on imm/res/vuln count only under <reviewed> too: unreviewed, the
+ * defenses are race + forms, so a race help is what the player prepares for
+ * (docs/systems/MOB_DEFENSES_AND_LEGENDS.md D1). asave keeps writing them.
+ *
  * deriveNumbers() resolves the tier, writes the tier centres into
  * hit/mana/damage/hitroll/ac/wealth (authored numbers never count), picks the
  * enabled off bits (decision 39) and adds the tier's affect bits (decision 56).
@@ -120,6 +124,12 @@ static bool del_gated(int bitSet)
            || bitSet == Body::BS_RES || bitSet == Body::BS_VULN;
 }
 
+/* Adds on these sets are honoured only for reviewed prototypes. */
+static bool add_gated(int bitSet)
+{
+    return bitSet == Body::BS_IMM || bitSet == Body::BS_RES || bitSet == Body::BS_VULN;
+}
+
 static const Flags &race_set(Race *race, int mobset)
 {
     switch (mobset) {
@@ -185,15 +195,18 @@ void mob_index_data::resolveBody()
     Race *mobrace = raceManager->find(race);
 
     if (race_formless(mobrace)) {
-        // add | (race & ~del), dead dels kept dead unless reviewed; slots,
+        // add | (race & ~del), dead adds and dels kept dead unless reviewed; slots,
         // off bits and AC exactly as authored, no form or part rules.
         for (int s = 0; s < MOBSET_MAX; s++) {
             bitstring_t base = race_set(mobrace, s).getValue();
             int bs = bitset_of(s);
+            bitstring_t add = bodyAdd[s];
             bitstring_t del = bodyDel[s];
+            if (bs >= 0 && add_gated(bs) && !(reviewed & (1 << bs)))
+                add = 0;
             if (bs >= 0 && del_gated(bs) && !(reviewed & (1 << bs)))
                 del = 0;
-            bodyBits(s) = (int)(bodyAdd[s] | (base & ~del));
+            bodyBits(s) = (int)(add | (base & ~del));
         }
         act |= ACT_IS_NPC;
         wearloc.setRegistry(wearlocationManager);
@@ -227,7 +240,8 @@ void mob_index_data::resolveBody()
         int bs = bitset_of(s);
         if (bs < 0)
             continue;
-        p.bitsAdd[bs] = MobBody::names(MobBody::bitSetTable(bs), bodyAdd[s]);
+        if (!add_gated(bs) || (reviewed & (1 << bs)))
+            p.bitsAdd[bs] = MobBody::names(MobBody::bitSetTable(bs), bodyAdd[s]);
         if (!del_gated(bs) || (reviewed & (1 << bs)))
             p.bitsDel[bs] = MobBody::names(MobBody::bitSetTable(bs), bodyDel[s]);
     }

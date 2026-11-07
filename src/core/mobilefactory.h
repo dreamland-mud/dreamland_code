@@ -88,12 +88,14 @@ struct mob_index_data
 
     // Mob reform (plan docs/plans/mob-reform.md §3.5, §3.6 items 3-6).
     // Authored add/del per bit set, kept so asave writes back what the builder
-    // wrote even where the instance ignores it (unreviewed dels, item 17).
+    // wrote even where the instance ignores it (unreviewed dels, item 17;
+    // unreviewed imm/res/vuln adds).
     bitstring_t        bodyAdd[MOBSET_MAX];
     bitstring_t        bodyDel[MOBSET_MAX];
     // Body bits as resolveBody/deriveNumbers left them, to spot later direct edits.
     bitstring_t        bodySnapshot[MOBSET_MAX];
-    // Bit sets (Body::BitSet order act..vuln) whose authored dels are honoured: <reviewed>.
+    // Bit sets (Body::BitSet order act..vuln) whose authored dels are honoured,
+    // and for imm/res/vuln also the adds: <reviewed>.
     int                reviewed;
     // Authored <tier> (name or 1-10, empty = default) and the resolved number.
     DLString           tierName;
