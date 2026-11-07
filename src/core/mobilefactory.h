@@ -130,6 +130,8 @@ struct mob_index_data
     bitstring_t honouredAffDel() const;
     /** True if the authored adds of this Body::BitSet are ignored: imm/res/vuln not in <reviewed>, race not unique. */
     bool addGated(int bitSet) const;
+    /** Authored adds of a MOBSET_ set in effect now that were not in 'before' (bits before a re-resolve). */
+    bitstring_t aliveAdds(int mobset, bitstring_t before) const;
 
     /** Return props value for the key (props[key] or props["xxx"][key]). */
     DLString getProperty(const DLString &key) const;

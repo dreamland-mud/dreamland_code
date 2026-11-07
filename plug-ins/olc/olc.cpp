@@ -384,7 +384,7 @@ static void abc_body(Character *ch, DLString &args)
             ch->pecho("Mob %d: %s dels %s.", vnum.getValue(), setArg.c_str(),
                       mode == "keep" ? "now apply" : "dropped");
             // Reviewed imm/res/vuln also switches the authored adds on.
-            bitstring_t alive = (unsigned int)pMob->bodyBits(s) & ~before & pMob->bodyAdd[s];
+            bitstring_t alive = pMob->aliveAdds(s, before);
             if (mode == "keep" && alive)
                 ch->pecho("Mob %d: %s adds now apply too: [%s].", vnum.getValue(), setArg.c_str(),
                           MobBody::bitSetTable(abc_reviewed_bit(s))->names(alive).c_str());

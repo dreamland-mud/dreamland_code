@@ -86,6 +86,14 @@ unsigned long long mob_index_data::bodyStamp()
 }
 
 static const Flags &race_set(Race *race, int mobset);
+static int bitset_of(int mobset);
+static bool add_gated(int bitSet);
+
+bitstring_t mob_index_data::aliveAdds(int mobset, bitstring_t before) const
+{
+    bitstring_t now = (unsigned int)const_cast<mob_index_data *>(this)->bodyBits(mobset);
+    return now & ~before & bodyAdd[mobset];
+}
 
 bitstring_t mob_index_data::honouredAffDel() const
 {
@@ -98,11 +106,17 @@ void mob_index_data::bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) co
     bitstring_t on = now & ~bodySnapshot[mobset];
     bitstring_t off = bodySnapshot[mobset] & ~now;
 
-    // Switching off a bit only the prototype's own add gave just drops the
-    // add: a del there would land in XML on a bit the race never had.
-    Race *mobrace = raceManager->find(race);
-    bitstring_t base = mobrace ? race_set(mobrace, mobset).getValue() : 0;
-    bitstring_t ownOff = off & bodyAdd[mobset] & ~base;
+    // Imm/res/vuln: switching off a bit only the prototype's own add gave
+    // just drops the add, a del there would land in XML on a bit the race
+    // never had. Other sets keep the del: on off/aff/act the tier or the
+    // body can pick the bit again, and only the del beats that.
+    bitstring_t ownOff = 0;
+    int bs = bitset_of(mobset);
+    if (bs >= 0 && add_gated(bs)) {
+        Race *mobrace = raceManager->find(race);
+        bitstring_t base = mobrace ? race_set(mobrace, mobset).getValue() : 0;
+        ownOff = off & bodyAdd[mobset] & ~base;
+    }
 
     add = (bodyAdd[mobset] | on) & ~off;
     del = (bodyDel[mobset] | (off & ~ownOff)) & ~on;
