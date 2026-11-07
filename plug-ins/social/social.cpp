@@ -433,6 +433,11 @@ bool Social::reaction( Character *ch, Character *victim, const DLString &arg )
     if (!victim || victim == ch)
         return false;
 
+    if (!ch->is_npc( ) && victim->is_npc( )
+        && !victim->form.isSet( FORM_SENTIENT )
+        && !msgCharBeastHint.emptyValues( ))
+        ch->pecho( social_msg( msgCharBeastHint ) );
+
     if (ch->is_npc( ) || !victim->is_npc( ) || victim->desc)
         return false;
         

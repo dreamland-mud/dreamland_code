@@ -146,6 +146,11 @@ public:
     XML_VARIABLE XMLMultiString  msgCharObj;
     XML_VARIABLE XMLMultiString  msgOthersObj;
 
+    /* Optional line shown only to the actor when the social lands on an
+     * animal (NPC without FORM_SENTIENT): points from an intimate social
+     * to the tame one meant for beasts. */
+    XML_VARIABLE XMLMultiString  msgCharBeastHint;
+
     XML_VARIABLE XMLStringList aliases;
 
     XML_VARIABLE XMLEnumeration position;
