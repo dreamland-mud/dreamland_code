@@ -259,6 +259,37 @@ int main(int argc, char **argv)
                      << " hitroll " << c.hitrollBonus << endl;
                 failures++;
             }
+            // hp_boost ramps in from L45 to L65: L55 is halfway (x1.125), and
+            // past the last curve point (L105) the curve holds its last value.
+            m.level = 55;
+            c = tc.centres(m);
+            if (c.hp != (int)lround(5610 * 7.0 * 1.125 * 0.85)) {
+                cout << "FAIL tier centres L55 boss mage hp_boost: hp " << c.hp << endl;
+                failures++;
+            }
+            m.level = 170;
+            c = tc.centres(m);
+            if (c.hp != (int)lround(26355 * 7.0 * 1.25 * 0.85) || c.dmgAve != (int)lround(256 * 2.5)) {
+                cout << "FAIL tier centres L170 boss mage clamp: hp " << c.hp << " dmg " << c.dmgAve << endl;
+                failures++;
+            }
+            m.tier = tc.parse("normal"); m.acts.clear(); m.level = 120;
+            c = tc.centres(m);
+            if (c.hp != 26355 || c.dmgAve != 256) {
+                cout << "FAIL tier centres L120 normal clamp: hp " << c.hp << " dmg " << c.dmgAve << endl;
+                failures++;
+            }
+            // tier 2 blends boss (ramp L45-L65) and champion (none): the ramp
+            // levels come from the boss side, so L5 gets no boost
+            m.tier = 2; m.level = 5;
+            c = tc.centres(m);
+            int hp5 = c.hp;
+            m.level = 65;
+            c = tc.centres(m);
+            if (hp5 != (int)lround(65 * 5.25) || c.hp != (int)lround(8710 * 5.25 * 1.125)) {
+                cout << "FAIL tier 2 blended hp_boost: L5 hp " << hp5 << " L65 hp " << c.hp << endl;
+                failures++;
+            }
             if (tc.parse("6") != 6 || fabs(tc.get(6).hp - 1.4) > 0.001 || tc.parse("nonsense") != 0
                     || tc.offCount(7, 3) != 2 || tc.offCount(7, 4) != 1 || tc.offCount(1, 4) != -1) {
                 cout << "FAIL tier parse/interpolation/offCount" << endl;

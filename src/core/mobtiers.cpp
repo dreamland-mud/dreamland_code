@@ -25,12 +25,19 @@ double Curve::at(int lvl) const
             return value[i-1] + (value[i] - value[i-1]) * (lvl - level[i-1]) / span;
         }
 
-    // Past the last point: keep the slope of the last segment (levels above
-    // 100 exist, the corpus goes to 170).
-    double span = level[n-1] - level[n-2];
-    if (span <= 0)
-        return value[n-1];
-    return value[n-1] + (value[n-1] - value[n-2]) * (lvl - level[n-1]) / span;
+    // Past the last point: hold the last value. Extrapolating the last slope
+    // blew up mobs above L105 (the corpus goes to 170) who only ever fight
+    // L100 heroes; give a curve an explicit point where it should keep rising.
+    return value[n-1];
+}
+
+double Tier::hpBoostAt(int lvl) const
+{
+    if (hpBoost == 1 || lvl <= hpBoostFrom)
+        return 1;
+    if (lvl >= hpBoostFull)
+        return hpBoost;
+    return 1 + (hpBoost - 1) * (lvl - hpBoostFrom) / (double)(hpBoostFull - hpBoostFrom);
 }
 
 static void readCurve(const Json::Value &base, const char *key, Curve &c)
@@ -54,6 +61,9 @@ static void readTier(const Json::Value &d, Tier &t)
     t.defined = true;
     t.name = d.get("name", "").asString();
     t.hp = d.get("hp", 1.0).asDouble();
+    t.hpBoost = d.get("hp_boost", 1.0).asDouble();
+    t.hpBoostFrom = d.get("hp_boost_from", 0).asInt();
+    t.hpBoostFull = d.get("hp_boost_full", 0).asInt();
     t.dmg = d.get("dmg", 1.0).asDouble();
     t.ac = d.get("ac", 1.0).asDouble();
     t.mana = d.get("mana", 1.0).asDouble();
@@ -89,6 +99,18 @@ static Tier blend(const Tier &a, const Tier &b, double f)
     t.name.clear();
     t.word.clear();
     t.hp = mix(a.hp, b.hp);
+    t.hpBoost = mix(a.hpBoost, b.hpBoost);
+    // The ramp levels come from the side that has a ramp: a row without one
+    // carries 0/0, which would turn the mixed boost into a flat one from L1.
+    bool ra = a.hpBoost != 1, rb = b.hpBoost != 1;
+    if (ra && rb) {
+        t.hpBoostFrom = (int)lround(mix(a.hpBoostFrom, b.hpBoostFrom));
+        t.hpBoostFull = (int)lround(mix(a.hpBoostFull, b.hpBoostFull));
+    } else {
+        const Tier &r = ra ? a : b;
+        t.hpBoostFrom = (ra || rb) ? r.hpBoostFrom : 0;
+        t.hpBoostFull = (ra || rb) ? r.hpBoostFull : 0;
+    }
     t.dmg = mix(a.dmg, b.dmg);
     t.ac = mix(a.ac, b.ac);
     t.mana = mix(a.mana, b.mana);
@@ -297,7 +319,7 @@ Centres Config::centres(const MobInfo &mob) const
         styleHp = s->second.first;
         styleDmg = s->second.second;
     }
-    c.hp = std::max(1, (int)lround(baseHp.at(lvl) * t.hp * styleHp * classFactor(*this, "hp", mob.acts)));
+    c.hp = std::max(1, (int)lround(baseHp.at(lvl) * t.hp * t.hpBoostAt(lvl) * styleHp * classFactor(*this, "hp", mob.acts)));
     c.dmgAve = std::max(1, (int)lround(baseDmg.at(lvl) * t.dmg * styleDmg * classFactor(*this, "dmg", mob.acts)));
     c.hitrollBonus = (int)lround(lvl * t.hitroll);
     c.ac = (int)lround(baseAc.at(lvl) * t.ac * mob.formAc);

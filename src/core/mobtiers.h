@@ -13,6 +13,8 @@
  *   "tiers": {                                   // required, keyed by number 1..10
  *     "7": { "name": "normal",
  *            "hp": 1.0, "dmg": 1.0, "ac": 1.0, "mana": 1.0,
+ *            "hp_boost": 1.25, "hp_boost_from": 45, "hp_boost_full": 65,
+ *                                                // extra hp mult, 1 up to _from, linear to the full boost at _full
  *            "hitroll": 0.0,                     // bonus per level (L/10 = 0.1)
  *            "saves": -0.05,                     // saving throw per level (-L/20)
  *            "stat_cap": 13,                     // + level * stat_cap_per_level
@@ -28,7 +30,8 @@
  *   },
  *   "stat_cap_per_level": 0.25,
  *   "variance": { "hp": 0.15, "dmg": 0.15, "hitroll": 0.10, "saves": 0.10, "mana": 0.20 },
- *   "base": {                                    // required: points of a piecewise-linear curve
+ *   "base": {                                    // required: points of a piecewise-linear curve,
+ *                                                // held flat past the last point
  *     "level":  [ 1, 5, 15, ... ],
  *     "hp":     [ ... ], "dmg": [ ... ], "ac": [ ... ], "mana": [ ... ], "wealth": [ ... ]
  *   },
@@ -60,6 +63,10 @@ struct Tier {
     bool defined = false;
     std::string name;
     double hp = 1, dmg = 1, ac = 1, mana = 1;
+    // hp multiplier ramping linearly from 1 at hpBoostFrom to hpBoost at hpBoostFull
+    double hpBoost = 1;
+    int hpBoostFrom = 0, hpBoostFull = 0;
+    double hpBoostAt(int lvl) const;
     double hitroll = 0, saves = 0;
     double statCap = 13;
     int offEnabled = -1;
