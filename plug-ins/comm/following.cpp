@@ -71,7 +71,7 @@ static void group_line_sr( Character *ch, Character *gch, Profession *prof, int 
                  gch->move.getValue( ), gch->max_move.getValue( ) );
 
     // Heroes and immortals have no next level to count down to.
-    if (!gch->is_npc( ) && gch->getLevel( ) < LEVEL_HERO - 1)
+    if (!gch->is_npc( ) && gch->getRealLevel( ) < LEVEL_HERO - 1)
         line += fmt( ch, lmsg( lang, ", %1$d experience point%1$gs||s to level",
                                      ", до уровня %1$d очк%1$Iо|а|ов опыта",
                                      ", до рівня %1$d очк%1$Iо|а|ів досвіду" ),
