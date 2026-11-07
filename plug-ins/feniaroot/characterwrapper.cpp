@@ -3360,10 +3360,19 @@ NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype,damflags[,sho
     return ::damage_nocatch(target, victim, dam, skill->getIndex( ), dam_type, show, damflags);
 }
 
-NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один удар оружием" )
+NMI_INVOKE( CharacterWrapper, one_hit, "(vict[, attack]): нанести vict один удар оружием; attack (имя из .tables.weapon_flags) меняет тип атаки этого удара, урон, точность и защиты как у обычного удара" )
 {
     checkTarget();
-    Character *victim = args2character(args);
+    Character *victim = argnum2character(args, 1);
+
+    if (args.size() > 1) {
+        int attack = argnum2flag(args, 2, weapon_flags);
+        if (attack <= 0 || attack >= weapon_flags.size)
+            throw Scripting::Exception(argnum(args, 2).toString() + ": attack does not exist.");
+        ::one_hit_attack(target, victim, attack);
+        return Register();
+    }
+
     ::one_hit(target, victim);
     return Register();
 }

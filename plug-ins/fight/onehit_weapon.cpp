@@ -52,6 +52,12 @@ WeaponOneHit::WeaponOneHit( Character *ch, Character *victim, bool secondary, st
     weaponSkill = NULL;
     wield = NULL;
     attack = 0;
+    attackOverride = -1;
+}
+
+void WeaponOneHit::setAttack( int attack )
+{
+    attackOverride = attack;
 }
 
 void WeaponOneHit::init( )
@@ -69,6 +75,9 @@ void WeaponOneHit::init( )
         attack = get_weapon_attack(wield);
     else 
         attack = ch->dam_type;
+
+    if (attackOverride >= 0)
+        attack = attackOverride;
 
     dam_type = attack_table[attack].damage;
     
