@@ -196,6 +196,15 @@ static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, XMLMult
     return false;
 }
 
+/* An area players can't browse: clan halls, and hidden, system or wizlocked
+ * zones. Objects are checked by both the area that owns the prototype and the
+ * area that resets it, so limbo blanks reset elsewhere (rand_all stubs) stay out. */
+static bool area_unlisted(AreaIndexData *pArea)
+{
+    return pArea == 0 || area_is_clan(pArea)
+        || IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN|AREA_SYSTEM);
+}
+
 static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AreaIndexData *&pArea, XMLMultiString &where )
 {
     // First look for obj resets in the same area it's from.
@@ -308,9 +317,7 @@ public:
         for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
             if (!pMob->behavior)
                 continue;
-            if (area_is_clan(pMob->area))
-                continue;
-            if (IS_SET(pMob->area->area_flag, AREA_SYSTEM))
+            if (area_unlisted(pMob->area))
                 continue;
 
             DLString type = pMob->behavior->getFirstNode()->getAttribute(XMLNode::ATTRIBUTE_TYPE);
@@ -449,9 +456,7 @@ public:
             useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
-            if (area_is_clan(pArea))
-                continue;
-            if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
+            if (area_unlisted(pArea) || area_unlisted(pObj->area))
                 continue;
 
 
@@ -578,9 +583,7 @@ public:
             bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
-            if (area_is_clan(pArea))
-                continue;
-            if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
+            if (area_unlisted(pArea) || area_unlisted(pObj->area))
                 continue;
 
 
@@ -711,9 +714,7 @@ public:
             bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
-            if (area_is_clan(pArea))
-                continue;
-            if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
+            if (area_unlisted(pArea) || area_unlisted(pObj->area))
                 continue;
 
                 
