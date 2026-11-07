@@ -31,9 +31,34 @@ int immune_resolve( int res )
     return res;
 }
 
+bitstring_t immune_bit( int dam_type )
+{
+    /* VULN etc. bits must ALL be the same for this to work */
+    switch (dam_type)
+    {
+        case(DAM_BASH):                return IMM_BASH;
+        case(DAM_PIERCE):        return IMM_PIERCE;
+        case(DAM_SLASH):        return IMM_SLASH;
+        case(DAM_FIRE):                return IMM_FIRE;
+        case(DAM_COLD):                return IMM_COLD;
+        case(DAM_LIGHTNING):        return IMM_LIGHTNING;
+        case(DAM_ACID):                return IMM_ACID;
+        case(DAM_POISON):        return IMM_POISON;
+        case(DAM_NEGATIVE):        return IMM_NEGATIVE;
+        case(DAM_HOLY):                return IMM_HOLY;
+        case(DAM_ENERGY):        return IMM_ENERGY;
+        case(DAM_MENTAL):        return IMM_MENTAL;
+        case(DAM_DISEASE):        return IMM_DISEASE;
+        case(DAM_DROWNING):        return IMM_DROWNING;
+        case(DAM_LIGHT):        return IMM_LIGHT;
+        case(DAM_CHARM):        return IMM_CHARM;
+        case(DAM_SOUND):        return IMM_SOUND;
+        default:                return 0;
+    }
+}
+
 int immune_check(Character *ch, int dam_type, bitstring_t dam_flag)
 {
-    bitstring_t bit;
     int res;
 
     res = RESIST_NORMAL;
@@ -56,30 +81,7 @@ int immune_check(Character *ch, int dam_type, bitstring_t dam_flag)
     if (IS_SET(dam_flag, DAMF_WATER))
         immune_from_flags( ch, IMM_DROWNING, res );
 
-    /* set bits to check -- VULN etc. must ALL be the same or this will fail */
-    switch (dam_type)
-    {
-        case(DAM_BASH):                bit = IMM_BASH;                break;
-        case(DAM_PIERCE):        bit = IMM_PIERCE;        break;
-        case(DAM_SLASH):        bit = IMM_SLASH;        break;
-        case(DAM_FIRE):                bit = IMM_FIRE;                break;
-        case(DAM_COLD):                bit = IMM_COLD;                break;
-        case(DAM_LIGHTNING):        bit = IMM_LIGHTNING;        break;
-        case(DAM_ACID):                bit = IMM_ACID;                break;
-        case(DAM_POISON):        bit = IMM_POISON;        break;
-        case(DAM_NEGATIVE):        bit = IMM_NEGATIVE;        break;
-        case(DAM_HOLY):                bit = IMM_HOLY;                break;
-        case(DAM_ENERGY):        bit = IMM_ENERGY;        break;
-        case(DAM_MENTAL):        bit = IMM_MENTAL;        break;
-        case(DAM_DISEASE):        bit = IMM_DISEASE;        break;
-        case(DAM_DROWNING):        bit = IMM_DROWNING;        break;
-        case(DAM_LIGHT):        bit = IMM_LIGHT;        break;
-        case(DAM_CHARM):        bit = IMM_CHARM;        break;
-        case(DAM_SOUND):        bit = IMM_SOUND;        break;
-        default:                bit = 0;                break;
-    }
-    
-    immune_from_flags( ch, bit, res );
+    immune_from_flags( ch, immune_bit( dam_type ), res );
     
     int result =  immune_resolve( res );
 #ifdef DEBUG    

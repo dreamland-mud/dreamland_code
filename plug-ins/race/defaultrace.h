@@ -98,7 +98,9 @@ public:
     virtual DLString getNameFor( Character *looker, Character *me ) const;
 
     virtual void getBodyInput( Body::Input &, bool npc ) const;
-    virtual std::vector<int> getAttacks( ) const;
+    virtual std::vector<std::vector<int> > getAttacks( ) const;
+    /** Parse an <attacks> string into slots; the first unknown name lands in 'unknown'. */
+    static std::vector<std::vector<int> > parseAttacks( const DLString &text, DLString &unknown );
     virtual int getDamType( ) const;
     virtual const DLString & getMaterial( ) const;
     virtual double getHpMult( ) const;

@@ -7,7 +7,6 @@
 #include "hedit.h"
 
 #include "util/regexp.h"
-#include "stringlist.h"
 #include "skill.h"
 #include "skillreference.h"
 #include "wearlocation.h"
@@ -307,15 +306,14 @@ RACEEDIT(vulndel, "уязвимостьубрать", "модель тела: у
 {
     return flagBitsEdit(getOriginal()->vulnDel);
 }
-RACEEDIT(attacks, "удары", "типы ударов мобов расы через пробел, первый -- основной физический (? weapon_flags)")
+RACEEDIT(attacks, "удары", "типы ударов мобов расы через пробел, первый -- основной физический, a|b|c -- моб берет один из группы (? weapon_flags)")
 {
-    DLString args( argument );
-    StringList words( args );
-    for (auto &w: words)
-        if (weapon_flags.value( w ) == NO_FLAG) {
-            stc(DLString("Неизвестный тип удара '") + w + "', список: {y? weapon_flags{x.\r\n", ch);
-            return false;
-        }
+    DLString unknown;
+    DefaultRace::parseAttacks( argument, unknown );
+    if (!unknown.empty( )) {
+        stc(DLString("Неизвестный тип удара '") + unknown + "', список: {y? weapon_flags{x.\r\n", ch);
+        return false;
+    }
 
     return editor(argument, getOriginal()->attacks, ED_NO_NEWLINE);
 }

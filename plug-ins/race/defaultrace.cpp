@@ -404,10 +404,12 @@ bool DefaultRace::matchesUnstrict( const DLString &str ) const
 
 void DefaultRace::loaded( )
 {
-    StringList words( attacks.getValue( ) );
-    for (auto &w: words)
-        if (weapon_flags.value( w ) == NO_FLAG)
-            LogStream::sendWarning( ) << "race " << getName( ) << ": unknown attack '" << w << "'" << endl;
+    DLString unknown;
+    std::vector<std::vector<int> > slots = parseAttacks( attacks.getValue( ), unknown );
+    if (!unknown.empty( ))
+        LogStream::sendWarning( ) << "race " << getName( ) << ": unknown attack '" << unknown << "'" << endl;
+    if (!slots.empty( ) && slots.front( ).size( ) > 1)
+        LogStream::sendWarning( ) << "race " << getName( ) << ": first attack must be a single physical attack, not a group" << endl;
 
     derivedAff( );
     raceManager->registrate( Pointer( this ) );
@@ -650,25 +652,42 @@ const DefaultRace::ResolvedBody & DefaultRace::resolved( ) const
     return body;
 }
 
-/** Words of <attacks> that name an attack (weapon_flags), in the authored order. */
-std::vector<int> DefaultRace::getAttacks( ) const
+/** Space-separated slots of weapon_flags names, a slot 'a|b|c' is a choice group.
+ *  Unknown names are skipped (the first one goes to 'unknown'), empty slots dropped. */
+std::vector<std::vector<int> > DefaultRace::parseAttacks( const DLString &text, DLString &unknown )
 {
-    std::vector<int> result;
-    StringList words( attacks.getValue( ) );
+    std::vector<std::vector<int> > slots;
+    StringList words( text );
 
     for (auto &w: words) {
-        int value = weapon_flags.value( w );
-        if (value != NO_FLAG && value != DAMW_NONE)
-            result.push_back( value );
+        std::vector<int> slot;
+
+        for (auto &name: w.split( "|" )) {
+            int value = weapon_flags.value( name );
+            if (value == NO_FLAG) {
+                if (unknown.empty( ))
+                    unknown = name;
+            } else if (value != DAMW_NONE)
+                slot.push_back( value );
+        }
+
+        if (!slot.empty( ))
+            slots.push_back( slot );
     }
 
-    return result;
+    return slots;
+}
+
+std::vector<std::vector<int> > DefaultRace::getAttacks( ) const
+{
+    DLString unknown;
+    return parseAttacks( attacks.getValue( ), unknown );
 }
 
 int DefaultRace::getDamType( ) const
 {
-    std::vector<int> list = getAttacks( );
-    return list.empty( ) ? DAMW_NONE : list.front( );
+    std::vector<std::vector<int> > slots = getAttacks( );
+    return slots.empty( ) ? DAMW_NONE : slots.front( ).front( );
 }
 
 const DLString & DefaultRace::getMaterial( ) const

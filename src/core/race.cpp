@@ -196,9 +196,9 @@ void Race::getBodyInput( Body::Input &, bool ) const
 {
 }
 
-std::vector<int> Race::getAttacks( ) const
+std::vector<std::vector<int> > Race::getAttacks( ) const
 {
-    return std::vector<int>( );
+    return std::vector<std::vector<int> >( );
 }
 
 int Race::getDamType( ) const

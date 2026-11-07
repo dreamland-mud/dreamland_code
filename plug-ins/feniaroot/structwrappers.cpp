@@ -608,12 +608,19 @@ NMI_GET( RaceWrapper, imm, "врожденный иммунитет (табли�
     return Scripting::Register( (int) raceManager->find( name )->getImm( ).getValue( ) );
 }
 
-NMI_GET( RaceWrapper, attacks, "список типов ударов расы (имена из .tables.weapon_flags), первый -- основной физический" )
+NMI_GET( RaceWrapper, attacks, "список типов ударов расы (имена из .tables.weapon_flags), первый -- основной физический; группа выбора как 'a|b|c', моб берет один (см. mob index attacks)" )
 {
     RegList::Pointer rc(NEW);
 
-    for (int value: raceManager->find( name )->getAttacks( ))
-        rc->push_back( Scripting::Register( weapon_flags.name( value ) ) );
+    for (auto &slot: raceManager->find( name )->getAttacks( )) {
+        DLString names;
+        for (int value: slot) {
+            if (!names.empty( ))
+                names += "|";
+            names += weapon_flags.name( value );
+        }
+        rc->push_back( Scripting::Register( names ) );
+    }
 
     return ::wrap(rc);
 }
