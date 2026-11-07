@@ -694,6 +694,16 @@ NMI_SET( QuestSelectWrapper, allowNoExits, "брать в жертвы мобо�
     params.allowNoExits = arg.toBoolean( );
 }
 
+NMI_GET( QuestSelectWrapper, allowUnreachable, "брать в жертвы мобов, до которых от квестора не дойти пешком (дверь, портал)" )
+{
+    return Register( params.allowUnreachable );
+}
+
+NMI_SET( QuestSelectWrapper, allowUnreachable, "брать в жертвы мобов, до которых от квестора не дойти пешком (дверь, портал)" )
+{
+    params.allowUnreachable = arg.toBoolean( );
+}
+
 NMI_INVOKE( QuestSelectWrapper, addVnum, "(vnum): добавить внум прототипа в список допустимых" )
 {
     const Register &reg = argnum( args, 1 );

@@ -26,7 +26,8 @@ struct QuestSelectParams {
           maxLevel( 0 ), minTier( 0 ), tierOffset( 0 ),
           noCaster( false ), visible( false ),
           carriedByNpc( false ), requireActFlag( 0 ), roomNoCast( false ),
-          allowNoTrack( false ), allowNoExits( false )
+          allowNoTrack( false ), allowNoExits( false ),
+          allowUnreachable( false )
     {
     }
 
@@ -104,11 +105,14 @@ struct QuestSelectParams {
                                 *   make the same quest behave differently per
                                 *   reader. */
 
-    /** Victim filters the C++ models always applied, lifted. Boss Hunt sets both:
-     *  many bosses are notrack (snipe protection lives in the mob AI, not in quest
-     *  selection), and some lairs are reached only by a portal or a one-way exit. */
+    /** Victim filters the C++ models always applied, lifted. Boss Hunt sets all
+     *  three: many bosses are notrack (snipe protection lives in the mob AI, not in
+     *  quest selection), some lairs are reached only by a portal or a one-way exit,
+     *  and some only by a scripted way in that no door-and-portal walk can find. */
     bool allowNoTrack;      /**< accept ACT_NOTRACK victims */
     bool allowNoExits;      /**< accept victims in rooms with no normal exits */
+    bool allowUnreachable;  /**< skip the questor-to-victim path check: lairs
+                             *   reached by a scripted way in, not a door */
 };
 
 #endif
