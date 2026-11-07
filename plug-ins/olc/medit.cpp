@@ -87,13 +87,14 @@ static DLString mob_reviewed_names(int mask)
 }
 
 /*
- * Imm/res/vuln adds count only under <reviewed> (resolveBody). The authored
+ * Imm/res/vuln adds count only under <reviewed>, unique races exempt
+ * (mob_index_data::addGated). The authored
  * adds of an unreviewed set, including bits toggled on in this session, that
  * the race and forms do not give anyway: written by asave, not in effect.
  */
 static bitstring_t mob_dead_adds(const mob_index_data &m, int mobset, int bitSet)
 {
-    if (m.reviewed & (1 << bitSet))
+    if (!m.addGated(bitSet))
         return 0;
     bitstring_t add, del;
     m.bodyDiff(mobset, add, del);

@@ -128,6 +128,8 @@ struct mob_index_data
     void bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) const;
     /** Aff bits the body resolver actually removed: authored dels, honoured only under <reviewed>aff. */
     bitstring_t honouredAffDel() const;
+    /** True if the authored adds of this Body::BitSet are ignored: imm/res/vuln not in <reviewed>, race not unique. */
+    bool addGated(int bitSet) const;
 
     /** Return props value for the key (props[key] or props["xxx"][key]). */
     DLString getProperty(const DLString &key) const;
