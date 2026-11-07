@@ -112,6 +112,7 @@ void OLCStateSocial::show( PCharacter *ch )
     ptc(ch, "othersVictimObj:  %s  %s\r\n", web_edit_button(ch, "othersVictimObj", "web").c_str(), s->msgOthersVictimObj.get(lang).c_str());
     ptc(ch, "charObj:          %s  %s\r\n", web_edit_button(ch, "charObj", "web").c_str(), s->msgCharObj.get(lang).c_str());
     ptc(ch, "othersObj:        %s  %s\r\n", web_edit_button(ch, "othersObj", "web").c_str(), s->msgOthersObj.get(lang).c_str());
+    ptc(ch, "beastHint:        %s  %s\r\n", web_edit_button(ch, "beastHint", "web").c_str(), s->msgCharBeastHint.get(lang).c_str());
 
     ptc(ch, "\r\n{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");                    
 }
@@ -231,6 +232,11 @@ SOCEDIT(charObj, "", "поле msgCharObj")
 SOCEDIT(othersObj, "", "поле msgOthersObj")
 {
     return editor(argument, getOriginal()->msgOthersObj[getLang()], ED_NO_NEWLINE);
+}
+
+SOCEDIT(beastHint, "", "поле msgCharBeastHint: подсказка актеру, если социал применен на зверя")
+{
+    return editor(argument, getOriginal()->msgCharBeastHint[getLang()], ED_NO_NEWLINE);
 }
 
 
