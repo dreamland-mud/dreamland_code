@@ -14,6 +14,9 @@
 #include "def.h"
 #include "l10n.h"
 #include "screenreader.h"
+#include "player_utils.h"
+
+DLString exit_description_text( Character *ch, EXIT_DATA *pexit );
 
 GSN(perception);
 BONUS(thief_skills);
@@ -100,16 +103,29 @@ static bool check_perception(Character *ch)
 }
 
 /**
- * Append one line per exit. Screen readers merge consecutive lines into one
- * long utterance, so for them each line ends with a comma and the block with a period.
+ * Append one line per exit, each followed by its 'look <direction>' text, if any.
+ * Screen readers merge consecutive lines into one long utterance, so for them each
+ * exit line ends with a comma and the block with a period. The description is a
+ * sentence with its own punctuation and goes unindented for them: padding is a pause.
  */
-static void append_exit_lines(ostringstream &buf, const StringList &lines, bool sr)
+static void append_exit_lines(ostringstream &buf, const StringList &lines, const StringList &descrs, bool sr)
 {
     for (size_t i = 0; i < lines.size(); i++) {
         buf << lines[i];
         if (sr)
             buf << (i + 1 < lines.size() ? "," : ".");
         buf << endl;
+
+        if (i >= descrs.size() || descrs[i].empty())
+            continue;
+
+        for (auto &descrLine: descrs[i].split("\n")) {
+            DLString text = descrLine;
+            text.stripWhiteSpace();
+            if (text.empty())
+                continue;
+            buf << (sr ? "" : "        ") << text << "{x" << endl;
+        }
     }
 }
 
@@ -212,7 +228,7 @@ CMDRUNP( exits )
     bool sr = uses_screenreader(ch);
     // Column padding is noise for a screen reader, it only adds a pause.
     const char *pad = sr ? "%s" : "%-8s";
-    StringList lines;
+    StringList lines, descrs;
 
     if (cfg.holy)
         buf << l(ch, "Видимые выходы из комнаты ") << ch->in_room->vnum << ":" << endl;
@@ -256,16 +272,18 @@ CMDRUNP( exits )
             line << " (room " << room->vnum << ")";
 
         lines.push_back(line.str());
+        descrs.push_back(exit_description_text(ch, pexit));
     }
 
     if (lines.empty())
         lines.push_back(DLString("    ") + l(ch, "нет"));
 
-    append_exit_lines(buf, lines, sr);
+    append_exit_lines(buf, lines, descrs, sr);
     ch->send_to( buf );
 
     buf.str("");
     lines.clear();
+    descrs.clear();
 
     for (auto &eexit: ch->in_room->extra_exits) {
         if (!(room = eexit->u1.to_room))
@@ -278,10 +296,12 @@ CMDRUNP( exits )
         }
 
         lines.push_back("    {C" + cmd_extra_exit(ch, eexit, true) + "{x");
+        // Same text 'look <extra exit>' shows.
+        descrs.push_back(eexit->description.getForLang(Player::lang(ch)));
     }
 
     if (!lines.empty()) {
-        append_exit_lines(buf, lines, sr);
+        append_exit_lines(buf, lines, descrs, sr);
         ch->pecho("\r\n%s", l(ch, "Дополнительные выходы:"));
         ch->send_to(buf);
     }
