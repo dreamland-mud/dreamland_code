@@ -112,6 +112,8 @@ struct attack_type        attack_table        []                =
     { "disease",      "чумные миазмы",              DAM_DISEASE,      MultiGender::PLURAL},
     { "charm",      "неотразимость",              DAM_CHARM,      MultiGender::FEMININE},
     { "sound",      "звуковая волна",              DAM_SOUND,      MultiGender::FEMININE},
+    { "scorch",      "опаляющий удар",              DAM_FIRE,      MultiGender::MASCULINE},
+    { "toxin",      "ядовитый удар",              DAM_POISON,      MultiGender::MASCULINE},
     { 0,                0,                        0                }
 };
 
