@@ -34,9 +34,9 @@ int attack_damage(int attack);
  * group resolved to one member, deterministically. In order: the breath spec
  * (spec_breath_fire/frost/lightning/acid/gas), an element word in the EN
  * short description or keywords (prismatic, rainbow, chromatic and tiamat
- * keep every member; with spec_breath_any and no word, every member too),
- * the prototype's own element immunity (race
- * defaults excluded), its authored dam_type, a vnum hash. */
+ * keep every member), the prototype's own element immunity (race defaults
+ * excluded; past it spec_breath_any keeps every member), its authored
+ * dam_type, a vnum hash. */
 std::vector<int> mob_index_attacks(const mob_index_data *pMobIndex);
 
 #endif
