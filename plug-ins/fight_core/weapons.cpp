@@ -9,6 +9,9 @@
 #include "skillreference.h"
 #include "core/object.h"
 #include "character.h"
+#include "npcharacter.h"
+#include "mobilefactory.h"
+#include "skillmanager.h"
 
 #include "weapons.h"
 #include "loadsave.h"
@@ -189,6 +192,27 @@ int weapon_wear_apply(Object *wield, int dam)
 int weapon_ave_worn(Object *wield)
 {
     return weapon_wear_apply(wield, weapon_ave(wield));
+}
+
+int weapon_hit_skill(Character *ch, Object *wield)
+{
+    return 20 + skillManager->find(get_weapon_sn(wield))->getEffective(ch);
+}
+
+bool npc_hands_win(Character *ch, Object *wield, int skill)
+{
+    if (!ch->is_npc() || !wield || wield->item_type != ITEM_WEAPON)
+        return false;
+
+    NPCharacter *nch = ch->getNPC();
+    int handsAve = dice_ave(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
+
+    return handsAve > weapon_ave_worn(wield) * skill / 100;
+}
+
+bool npc_hands_win(Character *ch, Object *wield)
+{
+    return npc_hands_win(ch, wield, weapon_hit_skill(ch, wield));
 }
 
 bool weapon_sharp_now(Object *wield)

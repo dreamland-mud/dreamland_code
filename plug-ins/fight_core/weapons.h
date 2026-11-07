@@ -68,6 +68,16 @@ int weapon_ave_worn(Object *wield);
  *  The flag itself stays. */
 bool weapon_sharp_now(Object *wield);
 
+/** Hit skill of a swing with this weapon (null = bare hands): 20 + effective
+ *  weapon skill, the factor weapon damage is scaled by. */
+int weapon_hit_skill(Character *ch, Object *wield);
+
+/** An NPC swinging this weapon at this hit skill does more average damage with
+ *  its own hands dice than with the weapon, so it hits with the hands: their
+ *  damage and its own dam_type. False for PCs, no wield or a non-weapon. */
+bool npc_hands_win(Character *ch, Object *wield, int skill);
+bool npc_hands_win(Character *ch, Object *wield);
+
 /** Return average damage for a weapon prototype. */
 int weapon_ave(struct obj_index_data *pWield);
 

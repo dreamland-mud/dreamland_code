@@ -63,9 +63,10 @@ void WeaponOneHit::init( )
 
     weapon_sn = get_weapon_sn( wield );
     weaponSkill = skillManager->find( weapon_sn );
-    skill = 20 + weaponSkill->getEffective( ch );
-    
-    if (wield) 
+    skill = weapon_hit_skill( ch, wield );
+
+    // A mob whose bare hands out-hit its weapon swings the hands, type and all.
+    if (wield && !npc_hands_win( ch, wield, skill ))
         attack = get_weapon_attack(wield);
     else 
         attack = ch->dam_type;
@@ -96,16 +97,11 @@ void WeaponOneHit::damBase( )
     }
 
     if (ch->is_npc()) {
-        // Calculate and compare mob ave damage from a wielded weapon dices or from bare hands.
-        // NPCs get the best damage of the two.
-
+        // NPCs get the best damage of a wielded weapon and their bare hands.
         NPCharacter *nch = ch->getNPC();
-        int handsAve = dice_ave(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
-        int handsDamage = dice(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
-        int weaponAve = wield ? weapon_ave_worn(wield) * skill / 100 : 0;
 
-        if (handsAve > weaponAve)
-            dam = handsDamage;
+        if (!wield || npc_hands_win( ch, wield, skill ))
+            dam = dice(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
         else
             dam = weaponDamage;
 

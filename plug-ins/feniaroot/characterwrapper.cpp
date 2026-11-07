@@ -576,6 +576,26 @@ NMI_GET( CharacterWrapper, attack_damage, "название типа повре�
     return damage_table.name(attack_table[target->dam_type].damage);
 }
 
+NMI_GET( CharacterWrapper, blow_damage, "название типа повреждения основного удара: от оружия, или собственный у моба, если голые руки бьют сильнее (таблица .tables.damage_table)")
+{
+    checkTarget();
+
+    ::Object *wield = get_wield(target, false);
+    int attack;
+
+    if (wield && wield->item_type == ITEM_WEAPON && !npc_hands_win(target, wield))
+        attack = get_weapon_attack(wield);
+    else
+        attack = target->dam_type;
+
+    int dam_type = attack_table[attack].damage;
+
+    if (dam_type == -1)
+        dam_type = DAM_BASH;
+
+    return damage_table.name(dam_type);
+}
+
 NMI_SET( CharacterWrapper, damage_number, "повреждения моба: сколько раз кидать кубик" )
 {
     checkTarget( );
