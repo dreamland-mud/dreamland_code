@@ -32,6 +32,9 @@ void        multi_hit_nocatch( Character *ch, Character *victim, string command 
 bool        next_attack( Character *ch, Character *victim, Skill &skill, int coef );
 void        one_hit( Character *ch, Character* victim, bool secondary = false, string command = "" );
 void        one_hit_nocatch( Character *ch, Character* victim, bool secondary = false, string command = "" );
+/* One primary-hand swing as attack (weapon_flags value): weapon dice, procs,
+ * hit roll and defenses as usual, only the attack type and its noun differ. */
+void        one_hit_attack( Character *ch, Character* victim, int attack );
 bool        damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag);
 bool        damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag);
 bool        damage( Affect *paf, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag);

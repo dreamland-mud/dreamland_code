@@ -13,6 +13,10 @@ public:
     WeaponOneHit( Character *ch, Character *victim, bool secondary, string command = "" );
     
     virtual void init( );
+
+    /* Swing as this attack (weapon_flags value) instead of the weapon's or
+     * the bare hands': only the attack type, its damage class and noun change. */
+    void setAttack( int attack );
     
     virtual void calcDamage( );
     virtual void postDamageEffects( );
@@ -36,6 +40,7 @@ protected:
     int weapon_sn;
     Skill *weaponSkill;
     int attack;
+    int attackOverride;
 
 private:
     virtual void msgOutput( Character *, const char * );

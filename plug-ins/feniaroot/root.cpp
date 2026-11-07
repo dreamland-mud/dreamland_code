@@ -48,6 +48,7 @@
 #include "roomutils.h"
 #include "merc.h"
 #include "damageflags.h"
+#include "attacks.h"
 #include "loadsave.h"
 #include "calendar_utils.h"
 #include "material-table.h"
@@ -377,6 +378,18 @@ NMI_INVOKE( Root, get_area_index , "(filename): возвращает зону с
     AreaIndexData *pArea = ::get_area_index(args2string(args));
     
     return WrapperManager::getThis( )->getWrapper( pArea ); 
+}
+
+NMI_INVOKE( Root, attackDamage, "(attack): тип повреждения (имя из .tables.damage_table) атаки attack (имя или число из .tables.weapon_flags), как у удара этой атакой")
+{
+    int attack = argnum2flag(args, 1, weapon_flags);
+    if (attack < 0 || attack >= weapon_flags.size)
+        throw Scripting::Exception(argnum(args, 1).toString() + ": attack does not exist.");
+
+    int dam = ::attack_damage(attack);
+    if (dam == -1)
+        dam = DAM_BASH;
+    return Register( damage_table.name(dam) );
 }
 
 NMI_INVOKE( Root, min, "(a, b): минимальное из двух чисел a и b") 

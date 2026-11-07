@@ -947,6 +947,17 @@ void one_hit_nocatch( Character *ch, Character *victim, bool secondary, string c
     UndefinedOneHit( ch, victim, secondary, command ).hit( );
 }
 
+void one_hit_attack( Character *ch, Character *victim, int attack )
+{
+    try {
+        UndefinedOneHit hit( ch, victim, false );
+        hit.setAttack( attack );
+        hit.hit( );
+    }
+    catch (const VictimDeathException& e) {
+    }
+}
+
 void one_hit( Character *ch, Character *victim, bool secondary, string command )
 {
     try {
