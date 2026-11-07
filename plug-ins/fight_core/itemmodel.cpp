@@ -381,7 +381,9 @@ double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstr
  * broad channels; bash/pierce/slash are their measured share of the weapon channel;
  * elementals are danger-tiered (fire worst; negative/mental/energy nukes; the rest at
  * the floor). res = imm/3, vuln = -imm/2, floor 10/30/-20. spell == magic == prayer:
- * counted once. DAMTYPE_MODEL.md.
+ * counted once. The champion+ strike mix (element/none blows) moves ~15% of
+ * those fights off physical: weapon/bash/pierce/slash -4%, energy/negative/fire
+ * up. DAMTYPE_MODEL.md.
  */
 struct ResValue {
     bitstring_t mask;
@@ -390,14 +392,14 @@ struct ResValue {
 };
 
 static const ResValue res_values[] = {
-    { IMM_WEAPON,                         "weapon",    140, 420, -210 },
+    { IMM_WEAPON,                         "weapon",    135, 404, -202 },
     { IMM_SPELL | IMM_MAGIC | IMM_PRAYER, "spell",     50,  150, -75 },
-    { IMM_BASH,                           "bash",      72,  216, -108 },
-    { IMM_PIERCE,                         "pierce",    34,  103, -52 },
-    { IMM_SLASH,                          "slash",     33,  100, -50 },
-    { IMM_FIRE,                           "fire",      23,  70,  -35 },
-    { IMM_ENERGY,                         "energy",    17,  50,  -25 },
-    { IMM_NEGATIVE,                       "negative",  17,  50,  -25 },
+    { IMM_BASH,                           "bash",      69,  208, -104 },
+    { IMM_PIERCE,                         "pierce",    33,  99,  -50 },
+    { IMM_SLASH,                          "slash",     32,  96,  -48 },
+    { IMM_FIRE,                           "fire",      25,  74,  -37 },
+    { IMM_ENERGY,                         "energy",    18,  55,  -28 },
+    { IMM_NEGATIVE,                       "negative",  18,  55,  -28 },
     { IMM_LIGHTNING,                      "lightning", 13,  40,  -20 },
     { IMM_ACID,                           "acid",      13,  40,  -20 },
     { IMM_HOLY,                           "holy",      13,  40,  -20 },
