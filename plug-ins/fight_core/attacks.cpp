@@ -189,6 +189,17 @@ static int attack_element_word(const DLString &word)
     return DAM_NONE;
 }
 
+/* Damage class of a breath spec, DAM_NONE for any other spec. */
+static int attack_breath_spec(const DLString &spec)
+{
+    if (spec == "spec_breath_fire")      return DAM_FIRE;
+    if (spec == "spec_breath_frost")     return DAM_COLD;
+    if (spec == "spec_breath_lightning") return DAM_LIGHTNING;
+    if (spec == "spec_breath_acid")      return DAM_ACID;
+    if (spec == "spec_breath_gas")       return DAM_POISON;
+    return DAM_NONE;
+}
+
 static bool attack_all_word(const DLString &word)
 {
     return word == "prismatic" || word == "rainbow" || word == "chromatic" || word == "tiamat";
@@ -231,7 +242,9 @@ std::vector<int> mob_index_attacks(const mob_index_data *pMobIndex)
     std::vector<DLString> kw = attack_name_words(pMobIndex->keyword.get(LANG_EN));
     words.insert(words.end(), kw.begin(), kw.end());
 
-    bool all = false;
+    // The builder's breath spec says the element outright; spec_breath_any breathes them all.
+    int breath = attack_breath_spec(pMobIndex->spec_fun.name);
+    bool all = pMobIndex->spec_fun.name == "spec_breath_any";
     for (auto &w: words)
         if (attack_all_word(w))
             all = true;
@@ -245,7 +258,7 @@ std::vector<int> mob_index_attacks(const mob_index_data *pMobIndex)
             continue;
         }
 
-        int pick = -1;
+        int pick = attack_member_of_class(group, breath);
 
         for (size_t i = 0; pick < 0 && i < words.size(); i++)
             pick = attack_member_of_class(group, attack_element_word(words[i]));

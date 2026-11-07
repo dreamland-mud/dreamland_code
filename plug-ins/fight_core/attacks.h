@@ -31,7 +31,9 @@ const DLString & attack_noun_ua(int index);
 int attack_damage(int attack);
 
 /* A prototype's concrete attacks: its race attack slots with every 'a|b|c'
- * group resolved to one member, deterministically. In order: an element word
+ * group resolved to one member, deterministically. In order: the breath spec
+ * (spec_breath_fire/frost/lightning/acid/gas; spec_breath_any keeps every
+ * member), an element word
  * in the EN short description or keywords (prismatic, rainbow, chromatic and
  * tiamat keep every member), the prototype's own element immunity (race
  * defaults excluded), its authored dam_type, a vnum hash. */
