@@ -60,6 +60,10 @@ struct Tier {
     bool defined = false;
     std::string name;
     double hp = 1, dmg = 1, ac = 1, mana = 1;
+    // hp multiplier ramping linearly from 1 at hpBoostFrom to hpBoost at hpBoostFull
+    double hpBoost = 1;
+    int hpBoostFrom = 0, hpBoostFull = 0;
+    double hpBoostAt(int lvl) const;
     double hitroll = 0, saves = 0;
     double statCap = 13;
     int offEnabled = -1;
