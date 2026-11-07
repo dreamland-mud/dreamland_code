@@ -121,6 +121,17 @@ static void mob_dead_adds_show(PCharacter *ch, const mob_index_data &m, int mobs
             table.names(dead).c_str(), Body::bitSetNames[bitSet]);
 }
 
+/* After a race change: adds that died (the dead-adds warning) or came alive. */
+static void mob_race_adds_report(PCharacter *ch, const mob_index_data &m, int mobset, int bitSet,
+                                 const FlagTable &table, int was, int now)
+{
+    mob_dead_adds_warn(ch, m, mobset, bitSet, table);
+    bitstring_t alive = (bitstring_t)(unsigned int)now & ~(bitstring_t)(unsigned int)was & m.bodyAdd[mobset];
+    if (alive)
+        ptc(ch, "Добавления %s [{W%s{x] теперь действуют.\n\r",
+            Body::bitSetNames[bitSet], table.names(alive).c_str());
+}
+
 static void refresh_body(mob_index_data &m)
 {
     for (int s = 0; s < MOBSET_MAX; s++) {
@@ -1123,7 +1134,8 @@ MEDIT(reviewed)
 
     if (args.empty()) {
         ptc(ch, "Проверено: [%s]. Синтаксис: reviewed <aff|det|imm|res|vuln|none> ... -- "
-                "удаления (del) этих наборов начинают действовать.\n\r",
+                "удаления (del) этих наборов начинают действовать, а для imm/res/vuln "
+                "и добавления (add).\n\r",
             mob_reviewed_names(mob.reviewed).c_str());
         return false;
     }
@@ -1169,8 +1181,13 @@ MEDIT(race)
             mob.parts &= ~old_race->getParts( );
 */            
 
+            int wasImm = mob.imm_flags, wasRes = mob.res_flags, wasVuln = mob.vuln_flags;
             mob.race = race->getName();
             refresh_body(mob);
+            // To or from a unique race the authored imm/res/vuln adds die or revive.
+            mob_race_adds_report(ch, mob, MOBSET_IMM, Body::BS_IMM, imm_flags, wasImm, mob.imm_flags);
+            mob_race_adds_report(ch, mob, MOBSET_RES, Body::BS_RES, res_flags, wasRes, mob.res_flags);
+            mob_race_adds_report(ch, mob, MOBSET_VULN, Body::BS_VULN, vuln_flags, wasVuln, mob.vuln_flags);
 
 /*
             mob.off_flags |= race->getOff( );

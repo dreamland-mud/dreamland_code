@@ -85,6 +85,8 @@ unsigned long long mob_index_data::bodyStamp()
     return h;
 }
 
+static const Flags &race_set(Race *race, int mobset);
+
 bitstring_t mob_index_data::honouredAffDel() const
 {
     return (reviewed & (1 << Body::BS_AFF)) ? bodyDel[MOBSET_AFF] : 0;
@@ -96,8 +98,14 @@ void mob_index_data::bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) co
     bitstring_t on = now & ~bodySnapshot[mobset];
     bitstring_t off = bodySnapshot[mobset] & ~now;
 
+    // Switching off a bit only the prototype's own add gave just drops the
+    // add: a del there would land in XML on a bit the race never had.
+    Race *mobrace = raceManager->find(race);
+    bitstring_t base = mobrace ? race_set(mobrace, mobset).getValue() : 0;
+    bitstring_t ownOff = off & bodyAdd[mobset] & ~base;
+
     add = (bodyAdd[mobset] | on) & ~off;
-    del = (bodyDel[mobset] | off) & ~on;
+    del = (bodyDel[mobset] | (off & ~ownOff)) & ~on;
 
     if (mobset == MOBSET_ACT)
         add &= ~(bitstring_t)ACT_IS_NPC;
