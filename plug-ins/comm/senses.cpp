@@ -21,6 +21,7 @@
 #include "room.h"
 #include "core/object.h"
 #include "liquid.h"
+#include "wearloc_utils.h"
 #include "affect.h"
 
 #include "act.h"
@@ -74,7 +75,11 @@ CMDRUNP( listen )
     if ( ( obj = get_obj_wear_carry( ch, arg, 0 ) ) 
          || ( obj = get_obj_room( ch, arg ) ))
     {
-        if (obj->carried_by == ch) {
+        if (obj->carried_by == ch && obj->wear_loc != wear_none) {
+            oldact(_("Ты прислушиваешься к $o3 на себе."), ch, obj, 0, TO_CHAR);
+            oldact(_("$c1 прислушивается к $o3 на себе."), ch, obj, 0, TO_ROOM);
+        }
+        else if (obj->carried_by == ch) {
             oldact(_("Ты подносишь к уху $o4 и прислушиваешься."), ch, obj, 0, TO_CHAR);
             oldact(_("$c1 подносит к уху $o4 и прислушивается."), ch, obj, 0, TO_ROOM);
         }
