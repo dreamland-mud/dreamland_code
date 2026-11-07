@@ -158,8 +158,8 @@ void OLCStateRace::show( PCharacter *ch )
     ptc(ch, "        атаки {G%s{x поведение {G%s{x\r\n",
         show_flag(r->getOff()).c_str(), show_flag(r->getAct()).c_str());
 
-    ptc(ch, "Удар:          {Y%s{x {D(damtype){x  материал {Y%s{x {D(material){x\r\n",
-        show_enum(r->damtype).c_str(), r->material.empty() ? "-" : r->material.c_str());
+    ptc(ch, "Удары:         {Y%s{x {D(attacks){x  материал {Y%s{x {D(material){x\r\n",
+        r->attacks.empty() ? "-" : r->attacks.c_str(), r->material.empty() ? "-" : r->material.c_str());
     ptc(ch, "Множители:     здоровье {Y%s{x {D(hpmult){x урон {Y%s{x {D(dmgmult){x  походка {Y%s{x {D(moveverb){x\r\n",
         r->hpMult.empty() ? "1.0" : r->hpMult.c_str(),
         r->dmgMult.empty() ? "1.0" : r->dmgMult.c_str(),
@@ -306,9 +306,16 @@ RACEEDIT(vulndel, "уязвимостьубрать", "модель тела: у
 {
     return flagBitsEdit(getOriginal()->vulnDel);
 }
-RACEEDIT(damtype, "удар", "тип удара по умолчанию для мобов расы (? weapon_flags)")
+RACEEDIT(attacks, "удары", "типы ударов мобов расы через пробел, первый -- основной физический, a|b|c -- моб берет один из группы (? weapon_flags)")
 {
-    return flagValueEdit(getOriginal()->damtype);
+    DLString unknown;
+    DefaultRace::parseAttacks( argument, unknown );
+    if (!unknown.empty( )) {
+        stc(DLString("Неизвестный тип удара '") + unknown + "', список: {y? weapon_flags{x.\r\n", ch);
+        return false;
+    }
+
+    return editor(argument, getOriginal()->attacks, ED_NO_NEWLINE);
 }
 RACEEDIT(material, "материал", "материал тела по умолчанию для мобов расы")
 {

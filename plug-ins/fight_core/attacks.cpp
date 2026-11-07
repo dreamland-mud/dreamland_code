@@ -52,6 +52,9 @@
 #include "configurable.h"
 #include "attacks.h"
 #include "damageflags.h"
+#include "immunity.h"
+#include "mobilefactory.h"
+#include "race.h"
 #include "grammar_entities_impl.h"
 #include "merc.h"
 #include "def.h"
@@ -112,6 +115,8 @@ struct attack_type        attack_table        []                =
     { "disease",      "чумные миазмы",              DAM_DISEASE,      MultiGender::PLURAL},
     { "charm",      "неотразимость",              DAM_CHARM,      MultiGender::FEMININE},
     { "sound",      "звуковая волна",              DAM_SOUND,      MultiGender::FEMININE},
+    { "scorch",      "опаляющий удар",              DAM_FIRE,      MultiGender::MASCULINE},
+    { "toxin",      "ядовитый удар",              DAM_POISON,      MultiGender::MASCULINE},
     { 0,                0,                        0                }
 };
 
@@ -151,3 +156,147 @@ const DLString & attack_noun_ua(int index)
     return DLString::emptyString;
 }
 
+
+int attack_damage(int attack)
+{
+    static int size = -1;
+
+    if (size < 0)
+        for (size = 0; attack_table[size].name; size++)
+            ;
+
+    return (attack >= 0 && attack < size) ? attack_table[attack].damage : DAM_NONE;
+}
+
+/* Element words a builder puts in a coloured monster's name, by damage class. */
+static int attack_element_word(const DLString &word)
+{
+    static const struct { const char *word; int damage; } words[] = {
+        { "red", DAM_FIRE }, { "brass", DAM_FIRE }, { "gold", DAM_FIRE }, { "golden", DAM_FIRE },
+        { "fire", DAM_FIRE }, { "flame", DAM_FIRE },
+        { "white", DAM_COLD }, { "silver", DAM_COLD }, { "ice", DAM_COLD }, { "frost", DAM_COLD },
+        { "cold", DAM_COLD },
+        { "blue", DAM_LIGHTNING }, { "bronze", DAM_LIGHTNING }, { "storm", DAM_LIGHTNING },
+        { "cloud", DAM_LIGHTNING }, { "lightning", DAM_LIGHTNING },
+        { "black", DAM_ACID }, { "copper", DAM_ACID }, { "shadow", DAM_ACID }, { "acid", DAM_ACID },
+        { "green", DAM_POISON }, { "poison", DAM_POISON },
+        { 0, DAM_NONE }
+    };
+
+    for (int i = 0; words[i].word; i++)
+        if (word == words[i].word)
+            return words[i].damage;
+    return DAM_NONE;
+}
+
+/* Damage class of a breath spec, DAM_NONE for any other spec. */
+static int attack_breath_spec(const DLString &spec)
+{
+    if (spec == "spec_breath_fire")      return DAM_FIRE;
+    if (spec == "spec_breath_frost")     return DAM_COLD;
+    if (spec == "spec_breath_lightning") return DAM_LIGHTNING;
+    if (spec == "spec_breath_acid")      return DAM_ACID;
+    if (spec == "spec_breath_gas")       return DAM_POISON;
+    return DAM_NONE;
+}
+
+static bool attack_all_word(const DLString &word)
+{
+    return word == "prismatic" || word == "rainbow" || word == "chromatic" || word == "tiamat";
+}
+
+/* Lowercase Latin words of a text, colour codes stripped. */
+static std::vector<DLString> attack_name_words(const DLString &text)
+{
+    std::vector<DLString> result;
+    DLString plain = text.colourStrip();
+    DLString word;
+
+    for (size_t i = 0; i <= plain.size(); i++) {
+        char c = i < plain.size() ? plain[i] : ' ';
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            word += (char)(c >= 'A' && c <= 'Z' ? c - 'A' + 'a' : c);
+        } else if (!word.empty()) {
+            result.push_back(word);
+            word.clear();
+        }
+    }
+    return result;
+}
+
+static int attack_member_of_class(const std::vector<int> &group, int damage)
+{
+    if (damage == DAM_NONE)
+        return -1;
+    for (size_t i = 0; i < group.size(); i++)
+        if (attack_damage(group[i]) == damage)
+            return (int)i;
+    return -1;
+}
+
+std::vector<int> mob_index_attacks(const mob_index_data *pMobIndex)
+{
+    std::vector<int> result;
+    Race *race = raceManager->find(pMobIndex->race);
+    std::vector<DLString> words = attack_name_words(pMobIndex->short_descr.get(LANG_EN));
+    std::vector<DLString> kw = attack_name_words(pMobIndex->keyword.get(LANG_EN));
+    words.insert(words.end(), kw.begin(), kw.end());
+
+    // The builder's breath spec says the element outright. spec_breath_any
+    // defers to a colour word in the name, then to own immunity, and keeps
+    // every member without either.
+    int breath = attack_breath_spec(pMobIndex->spec_fun.name);
+    bool breathAny = pMobIndex->spec_fun.name == "spec_breath_any";
+    bool all = false;
+    for (auto &w: words)
+        if (attack_all_word(w))
+            all = true;
+
+    // Own immunity only: the race default (dragons: fire) says nothing about this one.
+    bitstring_t ownImm = pMobIndex->bodyAdd[MOBSET_IMM] & ~race->getImm().getValue();
+
+    for (auto &group: race->getAttacks()) {
+        if (group.size() == 1) {
+            result.push_back(group.front());
+            continue;
+        }
+
+        int pick = attack_member_of_class(group, breath);
+
+        for (size_t i = 0; pick < 0 && !all && i < words.size(); i++)
+            pick = attack_member_of_class(group, attack_element_word(words[i]));
+
+        if (pick < 0 && all) {
+            result.insert(result.end(), group.begin(), group.end());
+            continue;
+        }
+
+        for (size_t i = 0; pick < 0 && i < group.size(); i++) {
+            bitstring_t bit = immune_bit(attack_damage(group[i]));
+            if (bit && (ownImm & bit))
+                pick = (int)i;
+        }
+
+        if (pick < 0 && breathAny) {
+            result.insert(result.end(), group.begin(), group.end());
+            continue;
+        }
+
+        for (size_t i = 0; pick < 0 && i < group.size(); i++)
+            if (group[i] == pMobIndex->dam_type)
+                pick = (int)i;
+
+        if (pick < 0)
+            pick = attack_member_of_class(group, attack_damage(pMobIndex->dam_type));
+
+        if (pick < 0) {
+            // Knuth multiplicative hash: neighbouring vnums don't step through the group in order.
+            unsigned int h = (unsigned int)pMobIndex->vnum * 2654435761u;
+            pick = (int)((h >> 16) % group.size());
+        }
+
+        result.push_back(group[pick]);
+    }
+
+    return result;
+}

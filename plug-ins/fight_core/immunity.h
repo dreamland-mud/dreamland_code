@@ -14,6 +14,8 @@ class Character;
 #define RESIST_RESISTANT  (B)
 #define RESIST_IMMUNE     (C)
 
+/** The imm/res/vuln bit a damage class (DAM_*) hits, 0 when none. */
+bitstring_t immune_bit( int dam_type );
 int  immune_check(Character *ch, int dam_type, bitstring_t dam_flag = 0);
 void immune_from_flags( Character *ch, bitstring_t bit, int &res );
 int  immune_resolve( int res );

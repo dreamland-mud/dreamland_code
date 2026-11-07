@@ -24,6 +24,7 @@
 #include "wrap_utils.h"
 
 #include "mobbody.h"
+#include "attacks.h"
 #include "def.h"
 
 
@@ -142,6 +143,16 @@ NMI_GET( MobIndexWrapper, moveverb, "глагол движения тела (gal
 { 
     checkTarget( ); 
     return Register( target->moveverb );
+}
+NMI_GET( MobIndexWrapper, attacks, "типы ударов прототипа (имена из .tables.weapon_flags): удары расы, группа 'a|b|c' сведена к одному по имени, иммунитету, dam_type или внуму") 
+{ 
+    checkTarget( ); 
+    RegList::Pointer rc(NEW);
+
+    for (int value: mob_index_attacks( target ))
+        rc->push_back( Register( weapon_flags.name( value ) ) );
+
+    return ::wrap(rc);
 }
 NMI_GET( MobIndexWrapper, offAllowed, "флаги атак, которые тело может использовать (таблица .tables.off_flags)") 
 { 

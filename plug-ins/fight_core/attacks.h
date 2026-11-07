@@ -5,9 +5,11 @@
 #ifndef ATTACKS_H
 #define ATTACKS_H
 
+#include <vector>
 #include "grammar_entities.h"
 
 class DLString;
+struct mob_index_data;
 
 struct attack_type
 {
@@ -24,5 +26,17 @@ extern struct attack_type        attack_table        [];
  * cell is unset (caller falls back to the RU noun). */
 const DLString & attack_noun_en(int index);
 const DLString & attack_noun_ua(int index);
+
+/* Damage class (DAM_*) of an attack (weapon_flags value), DAM_NONE when out of range. */
+int attack_damage(int attack);
+
+/* A prototype's concrete attacks: its race attack slots with every 'a|b|c'
+ * group resolved to one member, deterministically. In order: the breath spec
+ * (spec_breath_fire/frost/lightning/acid/gas), an element word in the EN
+ * short description or keywords (prismatic, rainbow, chromatic and tiamat
+ * keep every member), the prototype's own element immunity (race defaults
+ * excluded; past it spec_breath_any keeps every member), its authored
+ * dam_type, a vnum hash. */
+std::vector<int> mob_index_attacks(const mob_index_data *pMobIndex);
 
 #endif

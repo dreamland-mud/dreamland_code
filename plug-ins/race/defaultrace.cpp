@@ -253,6 +253,10 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
             in << help_meta_line(l(ch, "Классы"), classes.str( )) << endl;
         }
 
+        DLString imm = imm_flags.messages( r->getImm( ), true, '1', vlang );
+        if (!imm.empty( )) {
+            in << help_meta_line(l(ch, "Невосприимчивы"), DLString(l(ch, "к ")) + imm) << endl;
+        }
         DLString res = imm_flags.messages( r->getRes( ), true, '1', vlang );
         if (!res.empty( )) {
             in << help_meta_line(l(ch, "Устойчивы"), DLString(l(ch, "к ")) + res) << endl;
@@ -368,7 +372,6 @@ DefaultRace::DefaultRace( ) :
                 immDel( 0, &imm_flags ),
                 resDel( 0, &res_flags ),
                 vulnDel( 0, &vuln_flags ),
-                damtype( DAMW_NONE, &weapon_flags ),
                 aff( 0, &affect_flags )
 {
 }
@@ -401,6 +404,13 @@ bool DefaultRace::matchesUnstrict( const DLString &str ) const
 
 void DefaultRace::loaded( )
 {
+    DLString unknown;
+    std::vector<std::vector<int> > slots = parseAttacks( attacks.getValue( ), unknown );
+    if (!unknown.empty( ))
+        LogStream::sendWarning( ) << "race " << getName( ) << ": unknown attack '" << unknown << "'" << endl;
+    if (!slots.empty( ) && slots.front( ).size( ) > 1)
+        LogStream::sendWarning( ) << "race " << getName( ) << ": first attack must be a single physical attack, not a group" << endl;
+
     derivedAff( );
     raceManager->registrate( Pointer( this ) );
 
@@ -642,9 +652,42 @@ const DefaultRace::ResolvedBody & DefaultRace::resolved( ) const
     return body;
 }
 
+/** Space-separated slots of weapon_flags names, a slot 'a|b|c' is a choice group.
+ *  Unknown names are skipped (the first one goes to 'unknown'), empty slots dropped. */
+std::vector<std::vector<int> > DefaultRace::parseAttacks( const DLString &text, DLString &unknown )
+{
+    std::vector<std::vector<int> > slots;
+    StringList words( text );
+
+    for (auto &w: words) {
+        std::vector<int> slot;
+
+        for (auto &name: w.split( "|" )) {
+            int value = weapon_flags.value( name );
+            if (value == NO_FLAG) {
+                if (unknown.empty( ))
+                    unknown = name;
+            } else if (value != DAMW_NONE)
+                slot.push_back( value );
+        }
+
+        if (!slot.empty( ))
+            slots.push_back( slot );
+    }
+
+    return slots;
+}
+
+std::vector<std::vector<int> > DefaultRace::getAttacks( ) const
+{
+    DLString unknown;
+    return parseAttacks( attacks.getValue( ), unknown );
+}
+
 int DefaultRace::getDamType( ) const
 {
-    return damtype.getValue( );
+    std::vector<std::vector<int> > slots = getAttacks( );
+    return slots.empty( ) ? DAMW_NONE : slots.front( ).front( );
 }
 
 const DLString & DefaultRace::getMaterial( ) const
