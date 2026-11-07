@@ -109,6 +109,12 @@ void mob_index_data::bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) co
     bitstring_t on = now & ~bodySnapshot[mobset];
     bitstring_t off = bodySnapshot[mobset] & ~now;
 
+    // Random tier extras are not authored: switching one off neither writes a
+    // del nor drops an authored add of the same bit (an unreviewed one can
+    // coincide), and the next rebuild rolls it back in.
+    on &= ~randomExtra[mobset];
+    off &= ~randomExtra[mobset];
+
     // Imm/res/vuln: switching off a bit only the prototype's own add gave
     // just drops the add, a del there would land in XML on a bit the race
     // never had. Other sets keep the del: on off/aff/act the tier or the

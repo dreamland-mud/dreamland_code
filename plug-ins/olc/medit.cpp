@@ -104,6 +104,13 @@ static bitstring_t mob_dead_adds(const mob_index_data &m, int mobset, int bitSet
 
 static void mob_dead_adds_warn(PCharacter *ch, const mob_index_data &m, int mobset, int bitSet, const FlagTable &table)
 {
+    bitstring_t now = (unsigned int)const_cast<mob_index_data &>(m).bodyBits(mobset);
+    bitstring_t randomOff = m.randomExtra[mobset] & ~now;
+    if (randomOff)
+        ptc(ch, "{RВнимание:{x [{W%s{x] -- случайная добавка ранга, она не сохраняется и вернется при следующей пересборке. "
+                "Чтобы убрать ее насовсем, отметь набор: {yreviewed %s{x.\n\r",
+            table.names(randomOff).c_str(), mob_reviewed_names(m.reviewed | (1 << bitSet)).c_str());
+
     bitstring_t dead = mob_dead_adds(m, mobset, bitSet);
     if (!dead)
         return;
