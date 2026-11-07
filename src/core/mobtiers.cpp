@@ -100,6 +100,17 @@ static Tier blend(const Tier &a, const Tier &b, double f)
     t.word.clear();
     t.hp = mix(a.hp, b.hp);
     t.hpBoost = mix(a.hpBoost, b.hpBoost);
+    // The ramp levels come from the side that has a ramp: a row without one
+    // carries 0/0, which would turn the mixed boost into a flat one from L1.
+    bool ra = a.hpBoost != 1, rb = b.hpBoost != 1;
+    if (ra && rb) {
+        t.hpBoostFrom = (int)lround(mix(a.hpBoostFrom, b.hpBoostFrom));
+        t.hpBoostFull = (int)lround(mix(a.hpBoostFull, b.hpBoostFull));
+    } else {
+        const Tier &r = ra ? a : b;
+        t.hpBoostFrom = (ra || rb) ? r.hpBoostFrom : 0;
+        t.hpBoostFull = (ra || rb) ? r.hpBoostFull : 0;
+    }
     t.dmg = mix(a.dmg, b.dmg);
     t.ac = mix(a.ac, b.ac);
     t.mana = mix(a.mana, b.mana);
