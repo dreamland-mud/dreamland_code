@@ -1693,6 +1693,24 @@ static void do_look_character( Character *ch, Character *victim )
     mprog_look(ch, victim);
 }
 
+/**
+ * The 'look <direction>' text of an exit in the reader's language, empty if none.
+ * Shared with the 'exits' command so both show the same words.
+ */
+DLString exit_description_text( Character *ch, EXIT_DATA *pexit )
+{
+    const DLString &text = pexit->description.getForLang(Player::lang(ch));
+    if (text.empty())
+        return text;
+
+    // Decorate "(sign)" markers in the exit description for web clients,
+    // resolving them against the room's extra descriptions -- so (runes)
+    // carved on a door become clickable, same as markers in the room body.
+    ostringstream ebuf;
+    webManipManager->decorateExtraDescr( ebuf, text.c_str( ), ch->in_room->getExtraDescr( ), ch, /*decorateExits=*/true );
+    return ebuf.str();
+}
+
 static bool do_look_direction( Character *ch, const char *arg1 )
 {
     EXIT_DATA *pexit;
@@ -1709,14 +1727,9 @@ static bool do_look_direction( Character *ch, const char *arg1 )
             return true;
     }
 
-    lang_t lang = Player::lang(ch);
-    if (!pexit->description.getForLang(lang).empty()) {
-            // Decorate "(sign)" markers in the exit description for web clients,
-            // resolving them against the room's extra descriptions -- so (runes)
-            // carved on a door become clickable, same as markers in the room body.
-            ostringstream ebuf;
-            webManipManager->decorateExtraDescr( ebuf, pexit->description.getForLang(lang).c_str( ), ch->in_room->getExtraDescr( ), ch, /*decorateExits=*/true );
-            ch->send_to( ebuf );
+    DLString descr = exit_description_text( ch, pexit );
+    if (!descr.empty()) {
+            ch->send_to( descr );
             ch->pecho("");
     }
     else
