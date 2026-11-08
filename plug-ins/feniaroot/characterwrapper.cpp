@@ -4921,10 +4921,13 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
         if (eff > 0)
             weaponSwing = w.weaponWeight * eff;   // one swing's score; its combathits reuse it.
         // Weapon flags at the generator's price, x the alignment fit, only for a
-        // weapon the char can swing (its flags fire on hits).
+        // weapon the char can swing (its flags fire on hits). The price is a melee
+        // price, so scale it by this profile's weapon weight against melee's, like
+        // the dice: a caster's swings are worth a third, and so are their procs.
         if (eff > 0) {
             int wflags = inst != 0 ? inst->value4( ) : pProto->value[4];
-            double pts = item_weapon_flag_points( wflags, itemLevel, w.caster, target );
+            double flagScale = w.weaponWeight / max( 0.1, item_value( "melee", "weapon_weight", 12.0 ) );
+            double pts = item_weapon_flag_points( wflags, itemLevel, w.caster, target ) * flagScale;
             ga_note( "weapon_flags", pts, wflags );
             s += pts;
         }
