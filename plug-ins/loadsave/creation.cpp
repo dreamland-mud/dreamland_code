@@ -311,6 +311,19 @@ void apply_mob_tier(NPCharacter *mob, int level, int tier)
         mob->perm_stat[i] = min(BASE_STAT, c.statCap);
 }
 
+/*
+ * A level-adaptive shop pet at the buyer's level: the pet shop on purchase and
+ * the pet loader after a body-stamp change. Caster bits go first, the tier
+ * centres read the class acts.
+ */
+void apply_pet_level(NPCharacter *pet, int level)
+{
+    if (level <= 20)
+        REMOVE_BIT( pet->act, ACT_CLERIC|ACT_MAGE );
+
+    apply_mob_tier(pet, level, pet->getTier());
+}
+
 NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
 {
     NPCharacter *mob;

@@ -77,6 +77,7 @@
 #include "objectbehaviormanager.h"
 
 #include "feniamanager.h"
+#include "wrapperbase.h"
 
 #include "json_utils_ext.h"
 #include "pcharactermanager.h"
@@ -739,6 +740,23 @@ static void apply_saved_mob(NPCharacter *mob, SavedMobState &st)
     st.affects.clear();
 }
 
+/* A pet whose prototype is a level-adaptive shop pet got its level from the
+ * buyer, so a stamp mismatch must not reset it to the prototype's. Matched by
+ * name: loadsave can't see the petshop/misc_behaviors classes. Fenia callMob
+ * summons (callTier field) are left to utils/mob: charm reconfigCalled. */
+static bool pet_level_is_bought(NPCharacter *pet)
+{
+    if (!pet->behavior)
+        return false;
+
+    DLString type = pet->behavior->getType();
+    if (type != "LevelAdaptivePet" && type != "Rat")
+        return false;
+
+    WrapperBase *wbase = pet->getWrapper();
+    return !wbase || !wbase->hasField("callTier");
+}
+
 /* fread_pet End. Pets write numbers and act/aff/det/wearloc whole and keep
  * their affects in those numbers (no affect_modify on load); a stamp mismatch
  * (or no stamp) re-derives from the prototype, so the affects then have to be
@@ -757,6 +775,9 @@ static void apply_saved_pet(NPCharacter *pet, SavedMobState &st)
         if (st.petWear)
             pet->wearloc.fromString(st.petWearV);
         apply_saved_numbers(pet, st);
+    }
+    else if (st.hasLevel && pet_level_is_bought(pet)) {
+        apply_pet_level(pet, st.levelV);
     }
 
     for (auto &af: st.affects) {
@@ -1782,6 +1803,10 @@ void fread_pet( PCharacter *ch, FILE *fp )
 
              case 'E':
                  if (!strcmp(word, "End")) {
+                     // Linked first: apply_saved_pet reads Fenia fields.
+                     if (FeniaManager::wrapperManager)
+                         FeniaManager::wrapperManager->linkWrapper(pet);
+
                      apply_saved_pet(pet, saved);
                      pet->leader = ch;
                      pet->master = ch;
@@ -1795,9 +1820,6 @@ void fread_pet( PCharacter *ch, FILE *fp )
                          pet->mana += (pet->max_mana - pet->mana) * percent / 100;
                          pet->move += (pet->max_move - pet->move) * percent / 100;
                      }
-
-                     if (FeniaManager::wrapperManager)
-                         FeniaManager::wrapperManager->linkWrapper(pet);
 
                      LogStream::sendNotice() << "LOAD " << ch->getName() << " pet " << pet->getID() << " [" << pet->pIndexData->vnum << "]" << endl;    
                      return;
