@@ -210,7 +210,8 @@ WEBMANIP_RUN(decorateMobile)
         if (mob_has_behavior(victim, bhv_healer)
             || mob_has_behavior(victim, bhv_blacksmith)
             || mob_has_behavior(victim, bhv_enchanter)
-            || mob_has_behavior(victim, bhv_sage))
+            || mob_has_behavior(victim, bhv_sage)
+            || mob_is_jeweler(victim))
             manips.addLocal("service", "");
 
         if (mob_has_occupation(victim, OCC_SHOPPER)) 

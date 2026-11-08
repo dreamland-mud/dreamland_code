@@ -31,6 +31,10 @@ bool mob_has_occupation( NPCharacter *, const DLString & );
 bool mob_has_occupation( NPCharacter *, int );
 bool mob_has_behavior(NPCharacter *, BehaviorReference &bhv);
 
+// Jewelers (props "jeweler") repair jewelry and treasure: Fenia .tmp.mob.canRepair.
+bool mob_is_jeweler( NPCharacter * );
+NPCharacter * find_jeweler_mob( Room * );
+
 // Fenia shops: a keeper is a mob proto with the bedit 'shopper' behavior, its
 // stock and buys live in props["shopper"] (utils/shop).
 bool mob_index_is_shopper( MOB_INDEX_DATA * );
