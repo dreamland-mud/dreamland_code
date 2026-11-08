@@ -42,6 +42,7 @@ NPCharacter *        create_mobile_nocount( mob_index_data * );
 NPCharacter *        create_mobile_org( mob_index_data *pMobIndex, int flags );
 void create_mob_affects(NPCharacter *mob);
 void apply_mob_tier(NPCharacter *mob, int level, int tier);
+void apply_pet_level(NPCharacter *pet, int level);
 
 /** Does this G/E/O/P reset load obj vnum? A 'P' reset picks at random from
  *  its vnums list, arg1 is only the first of them. A template so this header

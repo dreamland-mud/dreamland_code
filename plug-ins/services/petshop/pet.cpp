@@ -228,14 +228,9 @@ void LevelAdaptivePet::config( PCharacter *client, NPCharacter *pet ) const
     Pet::config( client, pet );
 
     level = getLevel( client );
-    pet->setLevel( level );
 
     // The pet grows by the same tier ruler as every mob of its level.
-    // Caster bits go first: the tier centres read the class acts.
-    if (level <= 20)
-        REMOVE_BIT( pet->act, ACT_CLERIC|ACT_MAGE );
-
-    apply_mob_tier( pet, level, pet->getTier( ) );
+    apply_pet_level( pet, level );
 }
 
 /*----------------------------------------------------------------------
