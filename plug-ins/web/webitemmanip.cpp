@@ -416,7 +416,9 @@ WEBMANIP_RUN(decorateItem)
                     manips.addAll( "drop", item );
             }
 
-            if (find_mob_with_behavior( ch->in_room, bhv_blacksmith ))
+            if (find_mob_with_behavior( ch->in_room, bhv_blacksmith )
+                || ((item->item_type == ITEM_JEWELRY || item->item_type == ITEM_TREASURE)
+                    && find_jeweler_mob( ch->in_room )))
                 manips.addLocal( "service", "починка $" );
 
             if (find_mob_with_behavior( ch->in_room, bhv_sage )) 

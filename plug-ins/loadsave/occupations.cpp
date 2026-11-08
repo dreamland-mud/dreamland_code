@@ -205,6 +205,22 @@ bool mob_has_behavior(NPCharacter *mob, BehaviorReference& bhv)
     return false;
 }
 
+// Mirrors Fenia .tmp.mob.isJeweler: a "jeweler" key in the prototype props.
+bool mob_is_jeweler( NPCharacter *mob )
+{
+    const Json::Value &props = mob->pIndexData->props;
+    return props.isObject( ) && props.isMember( "jeweler" );
+}
+
+NPCharacter * find_jeweler_mob( Room *room )
+{
+    for (Character *rch = room->people; rch; rch = rch->next_in_room)
+        if (rch->is_npc( ) && mob_is_jeweler( rch->getNPC( ) ))
+            return rch->getNPC( );
+
+    return NULL;
+}
+
 NPCharacter * find_attracted_mob( Character *ch, int occType )
 {
     NPCharacter *mob = NULL;
