@@ -343,9 +343,9 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     skillList(l(ch, "Знание древних языков"), lang);
     in << "%RESUME%";
 
-    // The %H% keyword and the [reference] below need the formatter, hence the
+    // The %H% keyword and the help link below need the formatter, hence the
     // RESUME above rather than one fence around everything.
-    in << endl << "Подробнее о значении каждого параметра читай %H% [расовые особенности]." << endl;
+    in << endl << l(ch, "Подробнее о значении каждого параметра читай %H% {hh24расовые особенности{x.") << endl;
 }
 
 /* ------------------------------------------------------------------
