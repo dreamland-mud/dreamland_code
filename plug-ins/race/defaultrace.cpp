@@ -345,7 +345,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
 
     // The %H% keyword and the help link below need the formatter, hence the
     // RESUME above rather than one fence around everything.
-    in << endl << l(ch, "Подробнее о значении каждого параметра читай в %H% {hh24расовые особенности{x.") << endl;
+    in << endl << l(ch, "Подробнее о значении каждого параметра читай %H% {hh24расовые особенности{x.") << endl;
 }
 
 /* ------------------------------------------------------------------
