@@ -4970,6 +4970,8 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
         s += pts;
         DLString mat = inst != 0 ? DLString( inst->getMaterial( ) ) : DLString( pProto->material );
         pts = item_material_points( mat, itemLevel, w.caster ) * item_fit_material( target, mat );
+        if (target != 0 && material_cold_iron_pins( target, mat.c_str( ), w.heldImm, w.heldRes ))
+            pts = 0;
         ga_note( "material", pts, 0 );
         s += pts;
     }
@@ -7136,6 +7138,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // would be refused at wear time.
         if (badMaterials != 0 && material_is_typed( pObj->material.c_str( ), badMaterials ))
             continue;
+        // Cold iron pins a faery down (no blink): never advise iron or steel to one
+        // whose race, permanent affects or worn gear give no iron res/imm.
+        if (material_cold_iron_pins( target, pObj->material.c_str( ), immAll, resAll ))
+            continue;
 
         // First-life gear (shared.first_life_only) slips off a remorted wearer
         // (its Fenia onCantEquip), so it is never advised after a remort.
@@ -7324,6 +7330,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (IS_SET(o->extra_flags, ITEM_ANTI_GOOD)    && IS_GOOD(target))    continue;
         if (IS_SET(o->extra_flags, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(target)) continue;
         if (badMaterials != 0 && material_is_typed( o->getMaterial( ).c_str( ), badMaterials ))
+            continue;
+        if (material_cold_iron_pins( target, o->getMaterial( ).c_str( ), immAll, resAll ))
             continue;
         if (IS_SET(o->wear_flags, ITEM_WEAR_HORSE)  && horseLoc  && !target->getWearloc( ).isSet( horseLoc ))  continue;
         if (IS_SET(o->wear_flags, ITEM_WEAR_HOOVES) && hoovesLoc && !target->getWearloc( ).isSet( hoovesLoc )) continue;

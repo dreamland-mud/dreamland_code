@@ -5,6 +5,7 @@
 #include "stringlist.h"
 #include "core/object.h"
 #include "character.h"
+#include "race.h"
 
 #include "merc.h"
 
@@ -31,6 +32,7 @@ void material_t::fromJson(const Json::Value &value)
 }
 
 PROF(druid);
+RACE(faery);
 
 json_vector<material_t> material_table;
 CONFIGURABLE_LOADED(fight, material)
@@ -69,6 +71,23 @@ static void
 material_parse( Object *obj,  vector<const material_t *> &result )
 {
     material_parse(obj->getMaterial().c_str(), result);
+}
+
+bool material_cold_iron_pins( Character *ch, const char *materials, bitstring_t imm, bitstring_t res )
+{
+    if (ch->is_npc( ) || ch->is_immortal( ) || ch->getRace( ) != race_faery)
+        return false;
+    if (IS_SET( imm, IMM_IRON ) || IS_SET( res, RES_IRON ))
+        return false;
+
+    vector<const material_t *> result;
+    material_parse( materials, result );
+
+    for (auto &mat: result)
+        if (mat->name == "iron" || mat->name == "steel")
+            return true;
+
+    return false;
 }
 
 bool material_is_typed( Object *obj, int type )
