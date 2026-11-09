@@ -20,10 +20,13 @@ static IconvMap koi2utf("koi8-u", "utf-8");
  * Servlet for /redit API endpoint.
  * Executes redit subcommands on a given room and returns captured output.
  * Auth: bottype=telegram, token=<secret token>
- * Args: vnum (room vnum), cmd (subcommand name), arguments (subcommand args)
+ * Args: vnum (room vnum), cmd (subcommand name), arguments (subcommand args),
+ *       text (optional: editor buffer contents for a 'paste' subcommand)
  *
- * Interactive editor modes (sedit, webedit) are safe to invoke but will
- * have no effect — the temporary OLCState is destroyed after each request.
+ * Interactive editor modes (sedit, webedit) are safe to invoke but have no
+ * effect: the temporary OLCState is destroyed after each request. Multi-line
+ * fields go through 'paste' with text instead ('rudesc paste',
+ * 'north rudesc paste', 'ed paste <keyword>').
  *
  * Example: get room data as XML
  *   curl -s 'http://localhost:1235/redit' \
@@ -64,13 +67,15 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
         return;
 
     // Extract parameters.
-    DLString vnumStr, subcmd, arguments;
+    DLString vnumStr, subcmd, arguments, text;
     if (!servlet_get_arg(params, response, "vnum", vnumStr))
         return;
     if (!servlet_get_arg(params, response, "cmd", subcmd))
         return;
     // arguments are optional
     servlet_get_arg(params, "arguments", arguments);
+    // text is optional: seeds the editor buffer for a "paste" subcommand
+    bool hasText = servlet_get_arg(params, "text", text);
 
     int vnum = vnumStr.toInt();
     RoomIndexData *pRoom = get_room_index(vnum);
@@ -87,6 +92,8 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
 
     CaptureBufferHandler *capture;
     PCharacter *ch = olc_servlet_setup_char(roomInstance, capture);
+    if (hasText)
+        olc_servlet_seed_buffer(ch, text);
 
     // Handle 'get' — return room fields as XML.
     if (subcmd == "get") {
@@ -103,7 +110,9 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
         // which sets up 'owner' and internal state needed by edit methods.
         OLCStateRoom::Pointer sr(NEW);
         sr->room.setValue(pRoom->vnum);
-        sr->originalRoom.setValue(pRoom->vnum);
+        // No original room: OLCStateRoom::detach (reached via 'done' or a
+        // throwing subcommand) then returns early instead of moving the actor.
+        sr->originalRoom.setValue(0);
 
         // Build full command line: "subcmd arguments"
         DLString cmdLine = subcmd;
@@ -115,6 +124,13 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
         if (!cmd) {
             olc_servlet_cleanup_char(ch);
             servlet_response_400(response, "Unknown redit subcommand: " + subcmd);
+            return;
+        }
+
+        DLString refusal = olc_servlet_refusal(cmd->getName(), arguments, hasText);
+        if (!refusal.empty()) {
+            olc_servlet_cleanup_char(ch);
+            servlet_response_400(response, refusal);
             return;
         }
 

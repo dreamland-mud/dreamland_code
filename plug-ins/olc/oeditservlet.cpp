@@ -19,10 +19,12 @@ static IconvMap koi2utf("koi8-u", "utf-8");
  * Servlet for /oedit API endpoint: runs one oedit subcommand on an object
  * prototype and returns the captured output. Each request is its own editing
  * session (copy prototype -> run subcommand -> commit), so commands that open
- * the multi-line string editor have no effect.
+ * the interactive string editor have no effect: send the text in 'text' and
+ * use the 'paste' form instead ('ed paste <keyword>', 'rued paste <keyword>').
  * Auth: bottype=telegram, token=<secret token>
  * Args: vnum (object vnum), cmd (subcommand name, 'show' is read-only),
- *       arguments (subcommand args)
+ *       arguments (subcommand args), text (optional: editor buffer contents
+ *       for a 'paste' subcommand)
  *
  * Example: drop affect #1 from object 30235
  *   curl -s 'http://localhost:1235/oedit' \
@@ -42,18 +44,14 @@ static void oedit_servlet(HttpRequest &request, HttpResponse &response)
     if (!servlet_auth_ops(params, response))
         return;
 
-    DLString vnumStr, subcmd, arguments;
+    DLString vnumStr, subcmd, arguments, text;
     if (!servlet_get_arg(params, response, "vnum", vnumStr))
         return;
     if (!servlet_get_arg(params, response, "cmd", subcmd))
         return;
     servlet_get_arg(params, "arguments", arguments);
-
-    // 'done' and 'cancel' would detach the state themselves.
-    if (subcmd == "done" || subcmd == "cancel") {
-        servlet_response_400(response, "Every /oedit call commits on its own, no " + subcmd + " needed");
-        return;
-    }
+    // text is optional: seeds the editor buffer for a "paste" subcommand
+    bool hasText = servlet_get_arg(params, "text", text);
 
     int vnum = vnumStr.toInt();
     OBJ_INDEX_DATA *pObj = vnum > 0 ? get_obj_index(vnum) : 0;
@@ -70,6 +68,8 @@ static void oedit_servlet(HttpRequest &request, HttpResponse &response)
 
     CaptureBufferHandler *capture;
     PCharacter *ch = olc_servlet_setup_char(limbo, capture);
+    if (hasText)
+        olc_servlet_seed_buffer(ch, text);
 
     OLCStateObject::Pointer oe(NEW, pObj);
 
@@ -77,6 +77,13 @@ static void oedit_servlet(HttpRequest &request, HttpResponse &response)
     if (!cmd) {
         olc_servlet_cleanup_char(ch);
         servlet_response_400(response, "Unknown oedit subcommand: " + subcmd);
+        return;
+    }
+
+    DLString refusal = olc_servlet_refusal(cmd->getName(), arguments, hasText);
+    if (!refusal.empty()) {
+        olc_servlet_cleanup_char(ch);
+        servlet_response_400(response, refusal);
         return;
     }
 
