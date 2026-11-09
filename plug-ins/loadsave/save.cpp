@@ -1080,6 +1080,48 @@ void fwrite_obj( Character *ch, Object *obj, FILE *fp, int iNest )
 }
 
 
+/* A key with value0 0 rots when its holder leaves the game, not on every save:
+ * an autosave or `save` only leaves it out of the pfile, so it survives the
+ * session (a crash still loses it). */
+static bool obj_rots_on_quit( Object *obj )
+{
+    return obj->item_type == ITEM_KEY && obj->value0( ) == 0;
+}
+
+static void obj_crumble( Character *ch, Object *obj )
+{
+    ch->pecho(_("%1$#^O1 рассыпа%1$#nется|ются трухой!"), obj);
+    extract_obj( obj );
+}
+
+static void rot_list_on_quit( Character *ch, Object *list )
+{
+    Object *obj_next;
+
+    for (Object *obj = list; obj != 0; obj = obj_next) {
+        obj_next = obj->next_content;
+
+        // Mirror fwrite_obj_0: what is never written is never crumbled either.
+        if (IS_SET(obj->pIndexData->area->area_flag, AREA_NOSAVEDROP)
+            || IS_SET(obj->extra_flags, ITEM_NOSAVEDROP))
+            continue;
+
+        if (obj->contains)
+            rot_list_on_quit( ch, obj->contains );
+
+        if (obj_rots_on_quit( obj ) && !obj->hasOwner( ch ) && obj->mustDisappear( ch ))
+            obj_crumble( ch, obj );
+    }
+}
+
+void rot_items_on_quit( Character *ch )
+{
+    if (ch->is_npc( ) || ch->is_immortal( ))
+        return;
+
+    rot_list_on_quit( ch, ch->carrying );
+}
+
 void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
 {
     /*
@@ -1103,8 +1145,11 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
         {
             if (!obj->hasOwner( ch ) && obj->mustDisappear( ch ))
             {
-                ch->pecho(_("%1$#^O1 рассыпа%1$#nется|ются трухой!"), obj);
-                extract_obj( obj );
+                // Rots at quit (rot_items_on_quit): not saved, not destroyed yet.
+                if (obj_rots_on_quit( obj ))
+                    return;
+
+                obj_crumble( ch, obj );
                 return;
             }
 

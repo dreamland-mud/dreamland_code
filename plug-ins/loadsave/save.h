@@ -33,6 +33,10 @@ void fwrite_obj( Character *ch,  Object  *obj, FILE *fp, int iNest );
 void fwrite_obj_0( Character *ch,  Object  *obj, FILE *fp, int iNest );
 void fwrite_pet( NPCharacter *pet, FILE *fp);
 
+/** The char is leaving the game for good (quit, account switch): crumble the items
+ *  that rot on quit rather than on every save (keys with value0 0). */
+void rot_items_on_quit( Character *ch );
+
 NPCharacter * fread_mob( FILE *fp );
 void fread_char( PCharacter *ch,  FILE *fp );
 void fread_pet( PCharacter *ch,  FILE *fp );
