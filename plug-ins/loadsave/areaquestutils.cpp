@@ -15,6 +15,7 @@
 #include "areaquest.h"
 #include "xmlattributeareaquest.h"
 #include "fenia_utils.h"
+#include "commonattributes.h"
 #include "dreamland.h"
 #include "merc.h"
 #include "def.h"
@@ -231,7 +232,9 @@ bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuest
 
     // Standard 1 hour delay after 'q cancel' for non-onboarding quests.
     // Callers can ignore this one gate to ask "would ch qualify if not for the cooldown?".
-    if (!ignoreCancelCooldown && qdata.timecancel > 0 && !q->flags.isSet(AQUEST_ONBOARDING)) {
+    // A mortal test character (string attribute "questtester") retries at once.
+    if (!ignoreCancelCooldown && qdata.timecancel > 0 && !q->flags.isSet(AQUEST_ONBOARDING)
+        && get_string_attribute(ch, "questtester").empty()) {
         if (dreamland->getCurrentTime() - qdata.timecancel < Date::SECOND_IN_HOUR)
             return false;
     }
