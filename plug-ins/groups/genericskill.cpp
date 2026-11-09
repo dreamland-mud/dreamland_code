@@ -396,7 +396,10 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
         << printWaitAndMana(ch);
 
     if (!visible( ch )) {
-        if (!classes.empty() && ch->getProfession() != prof_none)
+        const SkillClassInfo *sci = getSubclassInfo( ch );
+        if (sci && sci->getLevel( ) < 0)
+            buf << pad << l(ch, "Недоступно для твоего подкласса.") << endl;
+        else if (!classes.empty() && ch->getProfession() != prof_none)
             buf << pad << l(ch, "Недоступно для твоего класса или характера.") << endl;
         fillRacesClassesInfo();
         return;

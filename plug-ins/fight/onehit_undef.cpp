@@ -73,6 +73,7 @@ GSN(axe);
 GSN(bash);
 GSN(bat_swarm);
 GSN(cavalry);
+GSN(berserk);
 GSN(blind_fighting);
 GSN(blood_frenzy);
 GSN(blink);
@@ -766,7 +767,7 @@ void UndefinedOneHit::damEffectMasterStaff( )
 /*
  * Below half health some fighters hit harder: the samurai with fudoshin
  * (up to +20%, switched off by shame, hazukure) and the berserker in a blood
- * frenzy (up to +25%, only while the frenzy affect is on).
+ * frenzy (up to +25%, only while both the frenzy marker and berserk are on).
  */
 void UndefinedOneHit::damApplyLowHp( )
 {
@@ -781,7 +782,10 @@ void UndefinedOneHit::damApplyLowHp( )
     if (gsn_fudoshin->usable( ch, false ) && !ch->isAffected( gsn_hazukure ))
         damApplyLowHpBand( &*gsn_fudoshin, pct, 20 );
 
-    if (ch->isAffected( gsn_blood_frenzy ) && gsn_blood_frenzy->usable( ch, false ))
+    // The frenzy marker counts only while the rage itself is on: fear or
+    // calm can end berserk before the marker runs out.
+    if (ch->isAffected( gsn_blood_frenzy ) && ch->isAffected( gsn_berserk )
+            && gsn_blood_frenzy->usable( ch, false ))
         damApplyLowHpBand( &*gsn_blood_frenzy, pct, 25 );
 }
 
