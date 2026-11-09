@@ -6293,8 +6293,8 @@ struct GAPathComplete {
 // meets: aggressive mobs that reset along it, locked doors crossed, and whether
 // any room needs flight. 0/0/0 for no/unreachable destination. Reset-prototype
 // view (stable), not live wandering mobs. Only mobs that would actually aggress
-// THIS char count (aggression.cpp canAggressNormal): a mob 6+ levels below the
-// char never aggresses, and nothing aggresses a vampire.
+// THIS char count (Fenia .tmp.brain.aggroPrey): a mob 6+ levels below the
+// char or 21+ above it never aggresses, and nothing aggresses a vampire.
 static void ga_pathcost( Room *start, int destVnum, int chLevel, bool isVampire, int &aggros, int &doors, int &fly )
 {
     aggros = 0; doors = 0; fly = 0;
@@ -6325,7 +6325,7 @@ static void ga_pathcost( Room *start, int destVnum, int chLevel, bool isVampire,
             for (ResetList::iterator pr = rm->pIndexData->resets.begin( ); pr != rm->pIndexData->resets.end( ); pr++)
                 if ((*pr)->command == 'M') {
                     MOB_INDEX_DATA *m = get_mob_index( (*pr)->arg1 );
-                    if (m && IS_SET(m->act, ACT_AGGRESSIVE) && m->level >= chLevel - 5)
+                    if (m && IS_SET(m->act, ACT_AGGRESSIVE) && m->level >= chLevel - 5 && m->level <= chLevel + 20)
                         aggros++;
                 }
     }

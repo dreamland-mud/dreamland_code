@@ -101,33 +101,13 @@ bool BasicMobileBehavior::canAggress( Character *victim )
 }
 
 /*
- * normal aggression, from ACT_AGGRESSIVE bit
+ * normal aggression, from ACT_AGGRESSIVE bit: the engine gates only. The
+ * aggro rules (level band, vampires, good on good, citizens) are Fenia's
+ * .tmp.brain.aggroPrey, asked through onAggressAI kind "normal".
  */
 bool BasicMobileBehavior::canAggressNormal( Character *victim )
 {
-    int recall;
-    AreaIndexData *area;
-    
-    if (!canAggress( victim ))
-        return false;
-
-    if (ch->getModifyLevel() < victim->getModifyLevel() - 5)
-        return false;
-
-    if (victim->getProfession( ) == prof_vampire) /* do not attack vampires */
-        return false;
-
-    if (IS_GOOD(ch) && IS_GOOD(victim)) /* good vs good :( */
-        return false;
-    
-    /* do not attack co-citizens */
-    area = ch->getNPC()->pIndexData->area;
-    recall = victim->getPC( )->getHometown( )->getRecall( );
-
-    if (area->min_vnum <= recall && recall <= area->max_vnum)
-        return false;
-
-    return true;
+    return canAggress( victim );
 }
 
 bool BasicMobileBehavior::aggressNormal( )
