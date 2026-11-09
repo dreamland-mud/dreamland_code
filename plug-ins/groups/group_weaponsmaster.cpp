@@ -45,6 +45,7 @@
 #include "loadsave.h"
 #include "act.h"
 #include "interp.h"
+#include "fenia_utils.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -181,8 +182,10 @@ SKILL_RUNP( lash )
             chance = 0;
         
         try {
+            // onKnockdown (Fenia) may keep the victim standing: stand fast.
             if (damage_nocatch(ch,victim,dam,gsn_lash, DAM_BASH, true, DAMF_WEAPON)
-                && number_percent( ) < chance) 
+                && number_percent( ) < chance
+                && !gprog("onKnockdown", "CC", victim, ch))
             {
                 oldact(_("$c1 подсекает тебя своим хлыстом!!"), ch, NULL, victim, TO_VICT);
                 oldact(_("Ты подсекаешь $C4 своим хлыстом!"), ch, NULL, victim, TO_CHAR);
