@@ -45,6 +45,7 @@
 #include "act.h"
 
 #include "configurable.h"
+#include "itemflags.h"
 #include "chargedprops.h"
 #include "magicitemgenerator.h"
 #include "spell.h"
@@ -764,10 +765,60 @@ void UndefinedOneHit::damEffectMasterStaff( )
     spell_nocatch( spell, level, ch, target, 0 );
 }
 
+// Warrior subclass gates and weapon rules (fight/subclasses.json). Fenia
+// reads the whole file (dreamland_fenia "utils/subclass"); the engine reads
+// only the berserker weapon rule, for the blood frenzy band below. The skill
+// gate itself is the <subclasses> nodes of each skill (GenericSkill).
+static Json::Value subclassesConfig;
+CONFIGURABLE_LOADED(fight, subclasses)
+{
+    subclassesConfig = value;
+}
+
+// One weapon against a subclass weapon_classes list (any class when the list
+// is missing). Same rule as Fenia .tmp.subclass.weaponFits for the keys the
+// berserker uses.
+static bool subclass_weapon_fits( const Json::Value &rules, Object *obj )
+{
+    if (!obj || obj->item_type != ITEM_WEAPON)
+        return false;
+
+    const Json::Value &classes = rules["weapon_classes"];
+    if (!classes.isArray( ))
+        return true;
+
+    DLString wclass = weapon_class.name( get_weapon_class( obj ) );
+    for (auto &c: classes)
+        if (c.asString( ) == wclass)
+            return true;
+
+    return false;
+}
+
+// Does ch hold the weapons of the berserker right now: a fitting main hand
+// and, when the record says dual, a fitting second weapon too. Read at every
+// hit, so a weapon swap mid-rage drops the band at once.
+static bool berserker_weapons_ok( Character *ch )
+{
+    const Json::Value &rules = subclassesConfig["berserker"];
+    if (!rules.isObject( ))
+        return false;
+
+    if (!subclass_weapon_fits( rules, get_eq_char( ch, wear_wield ) ))
+        return false;
+
+    Object *second = get_eq_char( ch, wear_second_wield );
+    if (second)
+        return subclass_weapon_fits( rules, second );
+
+    return !rules["dual"].asBool( );
+}
+
 /*
  * Below half health some fighters hit harder: the samurai with fudoshin
- * (up to +20%, switched off by shame, hazukure) and the berserker in a blood
- * frenzy (up to +25%, only while both the frenzy marker and berserk are on).
+ * and the berserker in a blood frenzy, the same band up to +20% for both.
+ * Shame (hazukure) switches fudoshin off; the frenzy counts only while the
+ * frenzy marker and berserk are both on and the berserker weapons are in hand.
  */
 void UndefinedOneHit::damApplyLowHp( )
 {
@@ -785,8 +836,9 @@ void UndefinedOneHit::damApplyLowHp( )
     // The frenzy marker counts only while the rage itself is on: fear or
     // calm can end berserk before the marker runs out.
     if (ch->isAffected( gsn_blood_frenzy ) && ch->isAffected( gsn_berserk )
-            && gsn_blood_frenzy->usable( ch, false ))
-        damApplyLowHpBand( &*gsn_blood_frenzy, pct, 25 );
+            && gsn_blood_frenzy->usable( ch, false )
+            && berserker_weapons_ok( ch ))
+        damApplyLowHpBand( &*gsn_blood_frenzy, pct, 20 );
 }
 
 /*

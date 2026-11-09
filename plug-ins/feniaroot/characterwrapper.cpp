@@ -3360,20 +3360,21 @@ NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype,damflags[,sho
     return ::damage_nocatch(target, victim, dam, skill->getIndex( ), dam_type, show, damflags);
 }
 
-NMI_INVOKE( CharacterWrapper, one_hit, "(vict[, attack]): нанести vict один удар оружием; attack (имя из .tables.weapon_flags) меняет тип атаки этого удара, урон, точность и защиты как у обычного удара" )
+NMI_INVOKE( CharacterWrapper, one_hit, "(vict[, attack[, secondary]]): нанести vict один удар оружием; attack (имя из .tables.weapon_flags, \"\" -- атака самого оружия) меняет тип атаки этого удара, урон, точность и защиты как у обычного удара; secondary true -- удар вторым оружием" )
 {
     checkTarget();
     Character *victim = argnum2character(args, 1);
+    bool secondary = args.size() > 2 ? argnum2boolean(args, 3) : false;
 
-    if (args.size() > 1) {
+    if (args.size() > 1 && !argnum(args, 2).toString().empty()) {
         int attack = argnum2flag(args, 2, weapon_flags);
         if (attack <= 0 || attack >= weapon_flags.size)
             throw Scripting::Exception(argnum(args, 2).toString() + ": attack does not exist.");
-        ::one_hit_attack(target, victim, attack);
+        ::one_hit_attack(target, victim, attack, secondary);
         return Register();
     }
 
-    ::one_hit(target, victim);
+    ::one_hit(target, victim, secondary);
     return Register();
 }
 
@@ -3687,16 +3688,6 @@ NMI_INVOKE( CharacterWrapper, affectPermanent, "(skillName[,obj]): сделат�
                 paf->sources.add( src );
         }
     return Register( );
-}
-
-NMI_INVOKE( CharacterWrapper, checkDispel, "(skillName, level[, dispeller]): попытка сбить с персонажа аффект skillName, как заклинание снятия уровня level (постоянные держатся крепче, -2 не снимаются); true если аффект снят. Для умений и ИИ вне контекста заклинания" )
-{
-    checkTarget( );
-    Skill *skill = argnum2skill(args, 1);
-    int level = argnum2number(args, 2);
-    Character *dispeller = args.size( ) > 2 ? argnum2character(args, 3) : 0;
-
-    return Register( checkDispel( level, target, skill->getIndex( ), dispeller ) );
 }
 
 NMI_INVOKE( CharacterWrapper, affectReplace, "(.Affect): удалить все аффекты этого типа и повесить новый" )
