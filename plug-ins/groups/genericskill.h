@@ -67,6 +67,7 @@ public:
 protected:
     bool availableForAll( ) const;
     const SkillClassInfo * getClassInfo( CharacterMemoryInterface * ) const;
+    const SkillClassInfo * getSubclassInfo( CharacterMemoryInterface * ) const;
     bool hasRaceBonus( CharacterMemoryInterface * ) const;
 
     XML_VARIABLE XMLGlobalBitvector group;
@@ -74,6 +75,10 @@ protected:
 
     XML_VARIABLE XMLGlobalBitvector raceBonuses;
     XML_VARIABLE Classes classes;
+    // Warrior subclasses (PC string attribute "subclass"): a node named after
+    // the subclass gives the skill at its level, a node with level -1 bans it.
+    // Kept apart from <classes> so profession lookups never see these names.
+    XML_VARIABLE Classes subclasses;
 
     XML_VARIABLE XMLBooleanNoFalse hidden;
 };

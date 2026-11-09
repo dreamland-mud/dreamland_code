@@ -74,6 +74,7 @@ GSN(bash);
 GSN(bat_swarm);
 GSN(cavalry);
 GSN(blind_fighting);
+GSN(blood_frenzy);
 GSN(blink);
 GSN(critical_strike);
 GSN(cross_block);
@@ -214,7 +215,7 @@ void UndefinedOneHit::calcDamage( )
     damApplyMasterSword( );
     damApplyMasterStaff( );
     damApplyDamroll( );
-    damApplyFudoshin( );
+    damApplyLowHp( );
     damApplyAttitude( );
     damApplyDeathblow( );
     damApplySoulLust( );
@@ -763,11 +764,11 @@ void UndefinedOneHit::damEffectMasterStaff( )
 }
 
 /*
- * Fudoshin: a samurai below half health hits harder. The bonus grows
- * linearly from nothing at 50% hp to +20% at 10% hp and stays there below,
- * scaled by how well the skill is learned. Shame (hazukure) switches it off.
+ * Below half health some fighters hit harder: the samurai with fudoshin
+ * (up to +20%, switched off by shame, hazukure) and the berserker in a blood
+ * frenzy (up to +25%, only while the frenzy affect is on).
  */
-void UndefinedOneHit::damApplyFudoshin( )
+void UndefinedOneHit::damApplyLowHp( )
 {
     if (ch->is_npc( ) || ch->max_hit <= 0)
         return;
@@ -777,12 +778,22 @@ void UndefinedOneHit::damApplyFudoshin( )
     if (pct >= 50)
         return;
 
-    if (!gsn_fudoshin->usable( ch, false ) || ch->isAffected( gsn_hazukure ))
-        return;
+    if (gsn_fudoshin->usable( ch, false ) && !ch->isAffected( gsn_hazukure ))
+        damApplyLowHpBand( &*gsn_fudoshin, pct, 20 );
 
-    int band = 50 - max( pct, 10 ); // 0..40
-    dam += dam * band * gsn_fudoshin->getEffective( ch ) / 20000;
-    gsn_fudoshin->improve( ch, true, victim );
+    if (ch->isAffected( gsn_blood_frenzy ) && gsn_blood_frenzy->usable( ch, false ))
+        damApplyLowHpBand( &*gsn_blood_frenzy, pct, 25 );
+}
+
+/*
+ * The low health band: nothing at 50% hp, growing linearly to +cap percent at
+ * 10% hp and flat below, scaled by how well the skill is learned.
+ */
+void UndefinedOneHit::damApplyLowHpBand( Skill *skill, int pct, int cap )
+{
+    long long band = 50 - max( pct, 10 ); // 0..40
+    dam += (int)( (long long)dam * band * skill->getEffective( ch ) * cap / 400000 );
+    skill->improve( ch, true, victim );
 }
 
 void UndefinedOneHit::damEffectMasterSword( ) 

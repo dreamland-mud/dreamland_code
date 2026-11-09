@@ -80,6 +80,11 @@ CONFIGURABLE_DECL(fight, combat_ai)
 // combat_ai.json so hot combat_ai reads stay small. Read only by Fenia.
 CONFIGURABLE_DECL(fight, boss_mods)
 
+// Warrior subclass gates and weapon rules (fight/subclasses.json). Read only
+// by Fenia: see dreamland_fenia "utils/subclass". The skill gate itself is
+// the <subclasses> nodes of each skill (GenericSkill::getSubclassInfo).
+CONFIGURABLE_DECL(fight, subclasses)
+
 enum {
     LOOT_DESTROY,
     LOOT_DROP,
