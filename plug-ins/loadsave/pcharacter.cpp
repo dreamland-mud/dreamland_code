@@ -91,6 +91,7 @@ GSN(explode);
 GSN(tameshigiri);
 GSN(counter);
 GSN(iaido);
+GSN(riposte);
 
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
@@ -430,6 +431,8 @@ bool PCharacter::load( )
     skill_exchange( this, gsn_enchant_sword, gsn_temper);
     skill_exchange( this, gsn_explode, gsn_tameshigiri);
     skill_exchange( this, gsn_counter, gsn_iaido);
+    // A fencer's counter turns into riposte (subclass ban/gain, GenericSkill).
+    skill_exchange( this, gsn_counter, gsn_riposte);
 
     skill_merge(this, gsn_harm, gsn_cause_critical, gsn_cause_light, gsn_cause_critical);
     skill_merge(this, gsn_heal, gsn_cure_critical, gsn_cure_light, gsn_cure_critical);
