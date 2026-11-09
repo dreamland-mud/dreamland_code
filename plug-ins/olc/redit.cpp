@@ -809,7 +809,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
     }
 
     if (DLString("desc").strSuffix(cmd)) {
-        if (arg[0] == '\0') {
+        if (arg[0] == '\0' || arg_is_paste(arg)) {
             if (!pRoom->exit[door]) {
                 stc("REdit:  Door doesn't exist.\n\r", ch);
                 return false;
@@ -817,8 +817,11 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
 
             lang_t lang = cmd == "desc" ? EN : (cmd == "uadesc" ? UA : RU);
 
-            if(!sedit(pRoom->exit[door]->description[lang]))
-                return false;
+            if (arg[0] == '\0') {
+                if(!sedit(pRoom->exit[door]->description[lang]))
+                    return false;
+            } else
+                editorPaste(pRoom->exit[door]->description[lang]);
 
             pRoom->room->exit[door]->description[lang] = pRoom->exit[door]->description[lang];
 
@@ -826,7 +829,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
             return true;
         }
 
-        stc("Syntax:  [direction] desc\n\r", ch);
+        stc("Syntax:  [direction] desc [paste]\n\r", ch);
         return false;
     }
     return false;

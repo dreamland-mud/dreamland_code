@@ -32,6 +32,7 @@ qedit.cpp \
 bedit.cpp \
 reditservlet.cpp \
 oeditservlet.cpp \
+meditservlet.cpp \
 olcservlet.cpp \
 capturebufferhandler.cpp
 
