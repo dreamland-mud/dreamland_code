@@ -28,6 +28,7 @@
 #include "skillsflags.h"
 #include "wearlocation.h"
 #include "char_weight.h"
+#include "commonattributes.h"
 
 WEARLOC(wield);
 
@@ -39,6 +40,7 @@ GenericSkill::GenericSkill( )
                 : group(skillGroupManager),
                   raceBonuses(raceManager),
                   classes( false ),
+                  subclasses( false ),
                   hidden( false )
 
 {
@@ -120,6 +122,13 @@ bool GenericSkill::visible( CharacterMemoryInterface *mem ) const
 
     if (!checkAlignEthos(ch))
         return false;
+
+    // A subclass node decides before race bonuses and lent copies, so a ban
+    // holds against a dwarf's racial berserk or a religion's lent parry.
+    // Learned percent is never touched: dropping the attribute restores all.
+    const SkillClassInfo *sci = getSubclassInfo( mem );
+    if (sci)
+        return sci->getLevel( ) >= 0 && sci->visible( );
 
     if (hasRaceBonus(mem))
         return true;
@@ -387,7 +396,10 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
         << printWaitAndMana(ch);
 
     if (!visible( ch )) {
-        if (!classes.empty() && ch->getProfession() != prof_none)
+        const SkillClassInfo *sci = getSubclassInfo( ch );
+        if (sci && sci->getLevel( ) < 0)
+            buf << pad << l(ch, "Недоступно для твоего подкласса.") << endl;
+        else if (!classes.empty() && ch->getProfession() != prof_none)
             buf << pad << l(ch, "Недоступно для твоего класса или характера.") << endl;
         fillRacesClassesInfo();
         return;
@@ -455,8 +467,40 @@ GenericSkill::getClassInfo( CharacterMemoryInterface *ch ) const
             bestClass = &iter->second;
         }
     }
-    
+
+    // A subclass gain counts as one more class; a ban (level -1) never does.
+    const SkillClassInfo *sci = getSubclassInfo( ch );
+    if (sci && sci->getLevel( ) >= 0 && sci->getLevel( ) < minLevel)
+        bestClass = sci;
+
     return bestClass;
+}
+
+/*
+ * The node of this skill for the player's subclass (PC string attribute
+ * "subclass"), or null: NPCs, no subclass, or a subclass this skill doesn't
+ * mention. An unknown subclass name therefore neither bans nor gives anything.
+ */
+const SkillClassInfo *
+GenericSkill::getSubclassInfo( CharacterMemoryInterface *ch ) const
+{
+    // Cheapest test first: almost no skill has subclass nodes.
+    if (subclasses.empty( ))
+        return 0;
+
+    PCMemoryInterface *pcm = ch->getPCM( );
+    if (!pcm)
+        return 0;
+
+    const DLString &name = get_string_attribute( pcm, "subclass" );
+    if (name.empty( ))
+        return 0;
+
+    Classes::const_iterator iter = subclasses.find( name );
+    if (iter == subclasses.end( ))
+        return 0;
+
+    return &iter->second;
 }
 
 

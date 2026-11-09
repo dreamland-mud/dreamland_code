@@ -3689,6 +3689,16 @@ NMI_INVOKE( CharacterWrapper, affectPermanent, "(skillName[,obj]): сделат�
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, checkDispel, "(skillName, level[, dispeller]): попытка сбить с персонажа аффект skillName, как заклинание снятия уровня level (постоянные держатся крепче, -2 не снимаются); true если аффект снят. Для умений и ИИ вне контекста заклинания" )
+{
+    checkTarget( );
+    Skill *skill = argnum2skill(args, 1);
+    int level = argnum2number(args, 2);
+    Character *dispeller = args.size( ) > 2 ? argnum2character(args, 3) : 0;
+
+    return Register( checkDispel( level, target, skill->getIndex( ), dispeller ) );
+}
+
 NMI_INVOKE( CharacterWrapper, affectReplace, "(.Affect): удалить все аффекты этого типа и повесить новый" )
 {
     checkTarget( );

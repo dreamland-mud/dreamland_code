@@ -46,7 +46,8 @@ protected:
     void damApplyMasterHand( );
     void damApplyMasterSword( );
     void damApplyMasterStaff( );
-    void damApplyFudoshin( );
+    void damApplyLowHp( );
+    void damApplyLowHpBand( Skill *, int, int );
     void damApplyDeathblow( );
     void damApplySoulLust( );
     void damApplyMounted( );

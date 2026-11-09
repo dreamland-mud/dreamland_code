@@ -133,6 +133,8 @@ CMDRUN( remort )
     /* notify attributes */
     pch->getAttributes( ).handleEvent( RemortArguments( pch, &newAttributes ) );
     newAttributes.getAttr<XMLEmptyAttribute>( "remorting" );
+    // A warrior subclass is chosen anew every life: the trial is replayed.
+    newAttributes.eraseAttribute( "subclass" );
     new_ch->setAttributes( newAttributes );
 
     /* Personal hero quest-reward gear survives a remort: move it to the Lost and
