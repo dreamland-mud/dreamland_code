@@ -4083,10 +4083,6 @@ static double ga_statgain( int base, int delta, int cap )
 // ga_score's stat[] weight order (str,int,wis,dex,con,cha) -> STAT_ index.
 static const int ga_statMap[6] = { STAT_STR, STAT_INT, STAT_WIS, STAT_DEX, STAT_CON, STAT_CHA };
 
-// A prototype carrying any Fenia trigger (onUse/onGet/onExamine/...) is almost
-// always special, high-value gear, so ga_score gives it a flat boost.
-// shared.trigger_bonus_skip in item_value.json lists vnums whose scripts are
-// housekeeping only (owner checks, anti-duplicate), not power.
 // Is vnum listed in the item_value.json shared array `key`?
 static bool ga_vnumListed( const char *key, int vnum )
 {
@@ -4098,25 +4094,11 @@ static bool ga_vnumListed( const char *key, int vnum )
     return false;
 }
 
-static bool ga_hasFeniaTriggers( obj_index_data *pObj )
-{
-    if (pObj->wrapper == 0)
-        return false;
-    if (ga_vnumListed( "trigger_bonus_skip", pObj->vnum ))
-        return false;
-    WrapperBase *w = get_wrapper( pObj->wrapper );
-    if (w == 0)
-        return false;
-    StringSet triggers, misc;
-    w->collectTriggers( triggers, misc );
-    return !triggers.empty( );
-}
-
 // Spells a prototype's onEquip script casts on its wearer for as long as it is
 // worn (shared.trigger_spells in item_value.json, {vnum: [spell, ...]}), summed
 // at their worn price in M; a "grant:<skill>" entry is a skill the script lends
 // (giveTemporary), at its grant price. The affect loop cannot see a script-cast affect, so
-// without this a transform amulet scored as the flat trigger bonus. A worn spell the
+// without this a transform amulet scored nothing. A worn spell the
 // char can cast itself is worth 10%, as for the item flags (ga_canSelfCast).
 static bool ga_canSelfCast( Character *target, const char *name );
 
@@ -4235,7 +4217,7 @@ double spell_proc_tier_value( const DLString &spellName, int level );
 //    grant (a belt, a ring) is scored on the wearer's current weapon; with no usable
 //    weapon it falls back to _hit_value (a reference hit at the ref level, _global- and
 //    level-scaled like a spell). A multi_hit is a whole extra round, _round_attacks swings.
-// Returns 0 for an item that declares neither -- ga_score then keeps the flat +50.
+// Returns 0 for an item that declares neither.
 // COMBAT_PROC_SCORING.md.
 static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::Object *inst = 0,
                             int modelLevel = -1, bool caster = false )
@@ -4276,8 +4258,7 @@ static double ga_procScore( obj_index_data *pObj, double weaponSwing = -1.0, ::O
 
                 // Explicit override wins (spells whose worth does not follow their
                 // tier); otherwise derive from the spell's damage tier at the
-                // reference level, discounted for an average save. Neither -> skip
-                // (the flat +50 fallback in ga_score still covers "it triggers").
+                // reference level, discounted for an average save. Neither -> skip.
                 double v = spell_combat_value( spellName );
                 if (v <= 0)
                     v = spell_proc_tier_value( spellName, ref ) * spell_combat_save_factor( );
@@ -4993,17 +4974,11 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     }
     t0 = s;
     // Combat spell-procs get scored on what they actually cast (value table x
-    // proc chance x item level). That supersedes the flat +50, which was only a
-    // stand-in for "this triggers something good in a fight" -- the proc IS that
-    // trigger. Non-proc Fenia-triggered gear keeps the +50.
+    // proc chance x item level). A Fenia trigger by itself is worth nothing: what
+    // a script gives must be declared (procs, trigger_spells, grantskills).
     double procScore = ga_procScore( pProto, weaponSwing, inst, itemLevel, w.caster );
     if (procScore > 0)
         s += procScore;
-    // A generated item's base vnum carries the shared worn-buff onEquip: that is
-    // not "special gear", its worth was scored above.
-    // A script-cast worn spell was likewise scored above, at its own price.
-    else if (ga_hasFeniaTriggers( pProto ) && !generated && triggerM <= 0)
-        s += 50;   // Fenia-triggered gear is almost always very good.
     // Taught skills, priced for this char (0 for an item that teaches nothing). Filed
     // under "special" with the procs: the sage's render names that key.
     s += ga_grantsValue( target, w, pProto, inst, worn, weaponSwing, itemLevel );
@@ -8255,8 +8230,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (protectedSlots & byOpt[k].slot)
             continue;
         // No known route (not a quest reward, no reset/shop source): can't tell the
-        // char how to get it, so never put it on the chase list. Fenia-triggered gear
-        // gets a flat score boost, which can float an unobtainable downgrade up here.
+        // char how to get it, so never put it on the chase list.
         if (byOpt[k].acq.method == GA_UNKNOWN)
             continue;
         // Boss cap (OPTIMAL list only -- the finest/dream list still shows these):

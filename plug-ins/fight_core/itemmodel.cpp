@@ -582,8 +582,16 @@ double item_material_points(const DLString &material, int level, bool caster)
 {
     if (material.empty())
         return 0;
-    return item_value("materials", material.c_str(), 0, caster ? 1 : 0)
-         + item_points_by_level(item_value_object("materials_combat", material.c_str()), level);
+    // The flat durability price is in points at materials_ref_level: scale it by
+    // one M at the item's level, so it weighs on cheap gear as much as on dear gear.
+    double flat = item_value("materials", material.c_str(), 0, caster ? 1 : 0);
+    if (flat != 0) {
+        int ref = (int)item_value("shared", "materials_ref_level", 50);
+        double refM = item_one_m(ref, caster);
+        if (refM > 0)
+            flat *= item_one_m(level, caster) / refM;
+    }
+    return flat + item_points_by_level(item_value_object("materials_combat", material.c_str()), level);
 }
 
 double item_wornbuff_points(const DLString &buff, int level, bool caster)

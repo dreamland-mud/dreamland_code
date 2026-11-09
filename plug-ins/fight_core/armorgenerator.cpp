@@ -538,8 +538,7 @@ bool ItemAffixRoller::modelPoints(const DLString &secName, const Json::Value &af
         return true;
     }
     if (secName == "material" || secName == "weapon_material") {
-        points = item_value("materials", value.c_str(), 0, col)
-               + item_points_by_level(item_value_object("materials_combat", value.c_str()), obj->level);
+        points = item_material_points(value, obj->level, isCaster);
         return true;
     }
 
