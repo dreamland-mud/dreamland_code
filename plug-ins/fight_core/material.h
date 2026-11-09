@@ -5,6 +5,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include "bitstring.h"
+
 class Object;
 class Character;
 
@@ -13,6 +15,12 @@ bool material_is_typed( const char *, int );
 
 /** Material types this character can never wear or wield, e.g. metal for druids. */
 int material_types_forbidden( Character * );
+
+/** Would iron or steel among these materials pin this char down? A mortal faery
+ *  wearing or wielding cold iron can't blink, unless imm/res (the char's imm_flags /
+ *  res_flags to test against) hold iron. Mirrors the Fenia predicate
+ *  .tmp.object.wearsColdIron used by skillcommand/blink/run. */
+bool material_cold_iron_pins( Character *ch, const char *materials, bitstring_t imm, bitstring_t res );
 
 bool material_is_flagged( Object *, int );
 bool material_is_flagged( const char *, int );
