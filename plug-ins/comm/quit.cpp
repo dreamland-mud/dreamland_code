@@ -288,6 +288,8 @@ CMDRUNP( quit )
      * pet's items and no follower is written out wearing set bonuses. */
     gprog( "onLeaveWorld", "Cs", (Character *)pch, "quit" );
 
+    rot_items_on_quit( pch );
+
     interpret_raw( pch, "save", "" );
 
     /* Past every refusal gate (fighting, adrenaline, ...), so this quit is really

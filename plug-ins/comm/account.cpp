@@ -12,6 +12,7 @@
 #include "accountaudit.h"
 #include "commonattributes.h"
 #include "pcharactermanager.h"
+#include "save.h"
 #include "npcharacter.h"
 #include "descriptor.h"
 #include "descriptorstatemanager.h"
@@ -692,6 +693,7 @@ static void account_switch(PCharacter *ch, DLString &args)
     // never touch it again; use d/alt/altName/id.
     // Same leave-world hook as quit, before the save (pet pack, follower gear).
     gprog("onLeaveWorld", "Cs", (Character *)ch, "switch");
+    rot_items_on_quit(ch);
     ch->save();
     PCharacterManager::quit(ch);
     resume_token_clear(ch);
