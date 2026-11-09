@@ -39,6 +39,7 @@ GSN(circle);
 GSN(ambush);
 GSN(assassinate);
 GSN(iaido);
+GSN(lunge);
 WEARLOC(shield);
 GROUP(draconian);
 
@@ -145,7 +146,7 @@ bool SkillDamage::iaidoDraws( )
  * hit in full. The chance, messages and the wear on the shield live in Fenia,
  * skillcommand/shield block/run; a negative level there means "not a melee
  * blow, worth -level damage". Damage over time, self-inflicted damage, blows
- * from behind and damage a shield cannot stop never ask.
+ * from behind, the fencer's lunge and damage a shield cannot stop never ask.
  */
 bool SkillDamage::shieldBlocks( )
 {
@@ -164,8 +165,9 @@ bool SkillDamage::shieldBlocks( )
         return false;
     }
 
+    // Blows from behind, and the fencer's lunge, a thrust past the rim.
     if (sn == gsn_backstab || sn == gsn_dual_backstab || sn == gsn_circle
-        || sn == gsn_ambush || sn == gsn_assassinate)
+        || sn == gsn_ambush || sn == gsn_assassinate || sn == gsn_lunge)
         return false;
 
     return gsn_shield_block->getCommand( )->apply( ch, victim, -dam );
