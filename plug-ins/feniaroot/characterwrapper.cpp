@@ -4977,6 +4977,9 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
         pts = item_material_points( mat, itemLevel, w.caster ) * item_fit_material( target, mat );
         if (target != 0 && material_cold_iron_pins( target, mat.c_str( ), w.heldImm, w.heldRes ))
             pts = 0;
+        // Limited and nopurge items never decay, so their material buys no durability.
+        if (pProto->limit > 0 || IS_SET( extras, ITEM_NOPURGE ))
+            pts = 0;
         ga_note( "material", pts, 0 );
         s += pts;
     }
