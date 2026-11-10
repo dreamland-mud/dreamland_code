@@ -817,28 +817,36 @@ static bool berserker_weapons_ok( Character *ch )
 /*
  * Below half health some fighters hit harder: the samurai with fudoshin
  * and the berserker in a blood frenzy, the same band up to +20% for both.
- * Shame (hazukure) switches fudoshin off; the frenzy counts only while the
- * frenzy marker and berserk are both on and the berserker weapons are in hand.
+ * The frenzy also adds blood_frenzy.dam_pct percent at any health
+ * (fight/subclasses.json). Shame (hazukure) switches fudoshin off; the
+ * frenzy counts only while the frenzy marker and berserk are both on and
+ * the berserker weapons are in hand.
  */
 void UndefinedOneHit::damApplyLowHp( )
 {
     if (ch->is_npc( ) || ch->max_hit <= 0)
         return;
 
-    // Cheapest test first: every player weapon hit in the game passes here.
     int pct = ch->hit * 100 / ch->max_hit;
-    if (pct >= 50)
-        return;
 
-    if (gsn_fudoshin->usable( ch, false ) && !ch->isAffected( gsn_hazukure ))
+    if (pct < 50 && gsn_fudoshin->usable( ch, false ) && !ch->isAffected( gsn_hazukure ))
         damApplyLowHpBand( &*gsn_fudoshin, pct, 20 );
 
     // The frenzy marker counts only while the rage itself is on: fear or
     // calm can end berserk before the marker runs out.
-    if (ch->isAffected( gsn_blood_frenzy ) && ch->isAffected( gsn_berserk )
-            && gsn_blood_frenzy->usable( ch, false )
-            && berserker_weapons_ok( ch ))
+    if (!ch->isAffected( gsn_blood_frenzy ) || !ch->isAffected( gsn_berserk )
+            || !gsn_blood_frenzy->usable( ch, false )
+            || !berserker_weapons_ok( ch ))
+        return;
+
+    int flat = subclassesConfig["berserker"]["blood_frenzy"]["dam_pct"].asInt( );
+    if (flat > 0)
+        dam += (int)( (long long)dam * flat * gsn_blood_frenzy->getEffective( ch ) / 10000 );
+
+    if (pct < 50)
         damApplyLowHpBand( &*gsn_blood_frenzy, pct, 20 );
+    else
+        gsn_blood_frenzy->improve( ch, true, victim );
 }
 
 /*
