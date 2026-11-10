@@ -558,6 +558,12 @@ static bool is_container_like( Object *obj )
            || obj->item_type == ITEM_CORPSE_PC;
 }
 
+// Anything 'get' can take out of.
+static bool is_get_holder( Object *obj )
+{
+    return is_container_like( obj ) || obj->item_type == ITEM_KEYRING;
+}
+
 /*
  * Find a container by name, searching inventory, then equipment, then the room
  * -- the same order and visibility rules as get_obj_here, but skipping
@@ -622,7 +628,7 @@ static Object * find_get_holder( Character *ch, const DLString &arg, DLString &p
     if (!( obj = get_container_here( ch, name ) ))
         obj = get_obj_here( ch, name );
 
-    if (obj && (is_container_like( obj ) || obj->item_type == ITEM_KEYRING))
+    if (obj && is_get_holder( obj ))
         return obj;
 
     return 0;
@@ -820,6 +826,11 @@ CMDRUNP( get )
     }
 
     vector<DLString> restWords = split_words( arguments );
+    bool byGiven = false;
+
+    for (auto &word: restWords)
+        if (arg_is_strict( word, "by" ))
+            byGiven = true;
 
     argContainer = arguments.getOneArgument();
     if (arg_is_from( argContainer ) || arg_is_strict(argContainer, "by"))
@@ -934,8 +945,8 @@ CMDRUNP( get )
          *  get all [from] <container>[:<pocket>]
          *  get all.<name> [from] <container>[:<pocket>]
          *  get all.'<names list>' [from] <container>[:<pocket>]
-         *  or if container not found:
-         *  get <victim> by <name>
+         *  or, see the victim block below:
+         *  get <victim> [by] <name>
          */
 
         // Disallow 'get <name> all.<container>' syntax.
@@ -952,15 +963,42 @@ CMDRUNP( get )
         if ( !( container = get_container_here( ch, argContainer ) ) )
             container = get_obj_here( ch, argContainer );
 
-        // Container not found, assume 'get <victim> by <name>' syntax.
+        // 'get <victim> by <name>': grabbing a pet by its collar. With 'by'
+        // typed, a victim wearing such an item beats any container, the
+        // player's own or the room's. With 'by' typed and nothing to take out
+        // of, the victim gets the grab or its "has nothing like that" line.
+        // Without 'by', the victim reading is a fallback for a missing
+        // object, or for a non-holder one when the victim wears the item.
+        // Never yourself, and never for all./N* forms.
+        Character *named = 0, *victim = 0;
+
+        if (!all && !allDot) {
+            named = get_char_room( ch, argTarget );
+            if (named != ch)
+                victim = named;
+        }
+
+        if (victim
+            && ((byGiven && get_obj_wear_victim( victim, argContainer, ch ))
+                || !container
+                || (byGiven && !is_get_holder( container ))
+                || (!is_get_holder( container ) && get_obj_wear_victim( victim, argContainer, ch ))))
+        {
+            get_obj_on_victim( ch, victim, argContainer.c_str( ) );
+            return;
+        }
+
+        // 'by' typed at a non-holder: a character was meant, and is not here.
+        if (byGiven && !named && container && !is_get_holder( container )
+            && !all && !allDot)
+        {
+            echo_not_here(ch, argTarget);
+            return;
+        }
+
         if ( !container )
         {
-            Character *victim = get_char_room( ch, argTarget );
-            
-            if (victim)
-                get_obj_on_victim( ch, victim, argContainer.c_str( ) );
-            else
-                echo_not_here(ch, argUnseen.empty( ) ? argContainer : argUnseen);
+            echo_not_here(ch, argUnseen.empty( ) ? argContainer : argUnseen);
             return;
         }
 
