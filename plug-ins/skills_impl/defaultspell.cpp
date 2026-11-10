@@ -932,13 +932,22 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 
 bool DefaultSpell::checkPosition( Character *ch ) const
 {
-    if (ch->position < position.getValue( )) {
-        const Skill *theSkill = skill.getPointer();
+    const Skill *theSkill = skill.getPointer();
+    int pos = ch->position.getValue( );
+
+    // No buffing in a fight. A defender keeps POS_STANDING for the whole fight
+    // (set_fighting(victim, ch, false) never promotes it), so the position
+    // alone lets stand-only buffs through: autobuff spells need this explicit
+    // fighting check. Other stand spells keep the plain position rule.
+    if (ch->fighting && pos > POS_FIGHTING && theSkill->isAutobuff( ))
+        pos = POS_FIGHTING;
+
+    if (pos < position.getValue( )) {
         // Position-appropriate refusal. The old code printed the "during combat"
         // line for EVERY too-low position, so resting/sitting/sleeping casters were
         // told they were fighting. Mirror Command::checkPosition's per-position
         // messages (naming the spell via %K1).
-        switch (ch->position.getValue( )) {
+        switch (pos) {
             case POS_FIGHTING:
                 ch->pecho(_("Заклинание '%K1' нельзя использовать во время сражения."), theSkill);
                 break;
