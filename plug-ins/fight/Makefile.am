@@ -12,6 +12,7 @@ onehit.cpp \
 onehit_undef.cpp \
 onehit_weapon.cpp \
 pvp.cpp \
+subclass.cpp \
 impl.cpp
 
 

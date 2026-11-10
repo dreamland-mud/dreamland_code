@@ -146,6 +146,7 @@
 #include "basicskill.h"
 #include "dreamland.h"
 #include "attacks.h"
+#include "subclass.h"
 
 RELIG(none);   // god_none sentinel for the gear-advisor tattoo-slot filter
 // Item-granted skill pricing: Flowers never fight players, a Battlerager can't blink,
@@ -4029,10 +4030,14 @@ static int ga_candValue4( const GACand &c )
 // The body can fight with an off-hand weapon at all: the second-weapon skill is usable,
 // the char has the off-hand wear location (some shapeshifts lose it), and has hands and
 // both wrists -- second_weapon_hit (fight.cpp) skips the off-hand swing without them.
+// A warrior subclass that keeps the off hand free of a weapon (the fencer's single
+// sword, the sentinel's shield arm) has one weapon position, whatever its skills say.
 static bool ga_dualBody( Character *ch )
 {
     Skill *sk = skillManager->findExisting( "second weapon" );
     if (sk == 0 || !sk->usable( ch, false ))
+        return false;
+    if (subclass_one_hand( subclass_rules( ch ) ))
         return false;
     const char *locs[] = { "second_wield", "hands", "wrist_l", "wrist_r" };
     for (int i = 0; i < 4; i++) {
@@ -6978,6 +6983,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     bool gaShieldBlocked = gaWielded != 0 && !target->is_npc( )
                            && target->getRace( )->getSize( ) < SIZE_LARGE
                            && IS_WEAPON_STAT( gaWielded, WEAPON_TWO_HANDS );
+    // A warrior subclass (fight/subclasses.json) bars the weapons its rules reject
+    // and, with no_shield, every shield: both leave the candidate pool like an
+    // unskilled weapon does, so they never rank, chase or set a slot ceiling.
+    const Json::Value &gaSubclass = subclass_rules( target );
+    bool gaSubclassed = gaSubclass.isObject( );
+    if (gaSubclassed && gaSubclass["no_shield"].asBool( ))
+        gaShieldBlocked = true;
 
     // Worn gear: best score per slot-type (for the gap + percentile), plus every
     // vnum already worn (so we never recommend re-getting one).
@@ -7192,6 +7204,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             && target->getSkill( get_weapon_sn( pObj ) ) == 0
             && !ga_clericCanCompound( target, pObj ))
             continue;
+        if (gaSubclassed && pObj->item_type == ITEM_WEAPON
+            && !subclass_weapon_fits( gaSubclass, pObj ))
+            continue;
 
         // Redundancy set for THIS candidate: perma + worn items in OTHER slots (never
         // the slot it would replace). Empty slot -> nothing to exclude, use heldAll.
@@ -7339,6 +7354,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (!w.caster && o->item_type == ITEM_WEAPON
             && target->getSkill( get_weapon_sn( o ) ) == 0
             && !ga_clericCanCompound( target, o ))
+            continue;
+        if (gaSubclassed && o->item_type == ITEM_WEAPON
+            && !subclass_weapon_fits( gaSubclass, o ))
             continue;
 
         {
