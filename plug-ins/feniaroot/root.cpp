@@ -2233,9 +2233,17 @@ NMI_INVOKE(Root, help, "(id[, ch]): вернуть текст статьи сп�
     if (article.isEmpty())
         throw Scripting::Exception("Help article with this ID not found");
 
-    Character *ch = args.size( ) > 1 ? argnum2character(args, 2) : 0;
-    DLString text = article->getText(ch);
-    return Register(text);
+    if (args.size( ) > 1)
+        return Register(article->getText(argnum2character(args, 2)));
+
+    // Skill and class helps read their viewer unconditionally: a null ch
+    // segfaults. Without one, read as the web help dump does.
+    PCharacter dummy;
+    dummy.setName("Kadm");
+    dummy.setRussianName("Кадм||а|у|а|ом|е");
+    dummy.setLevel(1);
+    dummy.setSex(SEX_MALE);
+    return Register(article->getText(&dummy));
 }
 
 NMI_INVOKE(Root, finger, "(ip): список (.List) имен персонажей, заходивших с этого IP адреса")
