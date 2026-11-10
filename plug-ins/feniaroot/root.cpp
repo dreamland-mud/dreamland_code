@@ -44,6 +44,7 @@
 #include "magic.h"
 #include "configurable.h"
 #include "json_utils_ext.h"
+#include "subclass.h"
 #include "lasthost.h"
 #include "roomutils.h"
 #include "merc.h"
@@ -1995,6 +1996,18 @@ NMI_INVOKE(Root, itemWeight, "(obj[, heft]): вес предмета или пр
     DLString heft = args.size( ) > 1 ? argnum2string( args, 2 ) : DLString::emptyString;
 
     return Register( obj ? item_weight( obj, heft ) : item_weight( pObj, heft ) );
+}
+
+NMI_INVOKE(Root, subclassWeaponFits, "(rules, obj): подходит ли оружие или прототип obj под правила оружия записи подкласса rules (запись .config(\"fight/subclasses\")): класс, тип повреждения, флаги, одноручность; false для не-оружия")
+{
+    Json::Value rules = JsonUtils::fromRegister( argnum( args, 1 ) );
+    if (!rules.isObject( ))
+        throw Scripting::Exception("rules: a subclass record expected");
+    ::Object *obj;
+    obj_index_data *pObj;
+    arg2item_or_proto( argnum( args, 2 ), obj, pObj );
+
+    return Register( obj ? subclass_weapon_fits( rules, obj ) : subclass_weapon_fits( rules, pObj ) );
 }
 
 NMI_INVOKE(Root, itemAutoCost, "(obj): цена прототипа (или прототипа предмета) по модели цены, в серебре: min(cap, база + 7 x M x level), без учета <cost> из файла зоны")
