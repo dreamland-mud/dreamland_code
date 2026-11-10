@@ -932,13 +932,20 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 
 bool DefaultSpell::checkPosition( Character *ch ) const
 {
-    if (ch->position < position.getValue( )) {
+    int pos = ch->position.getValue( );
+
+    // A victim who hasn't swung back yet keeps POS_STANDING while ch->fighting
+    // is already set: count that as fighting, or stand-only spells slip through.
+    if (ch->fighting && pos > POS_FIGHTING)
+        pos = POS_FIGHTING;
+
+    if (pos < position.getValue( )) {
         const Skill *theSkill = skill.getPointer();
         // Position-appropriate refusal. The old code printed the "during combat"
         // line for EVERY too-low position, so resting/sitting/sleeping casters were
         // told they were fighting. Mirror Command::checkPosition's per-position
         // messages (naming the spell via %K1).
-        switch (ch->position.getValue( )) {
+        switch (pos) {
             case POS_FIGHTING:
                 ch->pecho(_("Заклинание '%K1' нельзя использовать во время сражения."), theSkill);
                 break;
