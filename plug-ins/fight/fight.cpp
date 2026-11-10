@@ -820,7 +820,7 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
     }
 }
 
-bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
+int next_attack_chance( Character *ch, Skill &skill, int coef )
 {
     int chance = skill.getEffective( ch ) / coef;
 
@@ -828,6 +828,33 @@ bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
         chance = chance * 3 / 4;
     
     chance+= skill_level_bonus(skill, ch);
+    return chance;
+}
+
+/*
+ * Roll second..fifth attack the way a round does (each independently, at its
+ * round coef) and count the hits. No improve: scripted rounds (bladestorm)
+ * must not train the attack skills.
+ */
+int roll_extra_attacks( Character *ch )
+{
+    int hits = 0;
+
+    if (number_percent( ) < next_attack_chance( ch, *gsn_second_attack, 2 ))
+        hits++;
+    if (number_percent( ) < next_attack_chance( ch, *gsn_third_attack, 3 ))
+        hits++;
+    if (number_percent( ) < next_attack_chance( ch, *gsn_fourth_attack, 3 ))
+        hits++;
+    if (number_percent( ) < next_attack_chance( ch, *gsn_fifth_attack, 3 ))
+        hits++;
+
+    return hits;
+}
+
+bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
+{
+    int chance = next_attack_chance( ch, skill, coef );
 
     if (number_percent( ) < chance) {
         one_hit_nocatch( ch, victim );

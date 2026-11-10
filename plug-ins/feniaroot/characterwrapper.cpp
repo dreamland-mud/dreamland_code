@@ -3361,6 +3361,12 @@ NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype,damflags[,sho
     return ::damage_nocatch(target, victim, dam, skill->getIndex( ), dam_type, show, damflags);
 }
 
+NMI_INVOKE( CharacterWrapper, extra_attacks, "(): бросить second..fifth attack, как в раунде боя (без улучшения умений), и вернуть, сколько сработало (0-4)" )
+{
+    checkTarget();
+    return Register( ::roll_extra_attacks(target) );
+}
+
 NMI_INVOKE( CharacterWrapper, one_hit, "(vict[, attack[, secondary]]): нанести vict один удар оружием; attack (имя из .tables.weapon_flags, \"\" -- атака самого оружия) меняет тип атаки этого удара, урон, точность и защиты как у обычного удара; secondary true -- удар вторым оружием" )
 {
     checkTarget();

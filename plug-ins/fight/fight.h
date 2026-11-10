@@ -30,6 +30,8 @@ void        violence_update( );
 void        multi_hit( Character *ch, Character *victim, string command = "" );
 void        multi_hit_nocatch( Character *ch, Character *victim, string command = "" );
 bool        next_attack( Character *ch, Character *victim, Skill &skill, int coef );
+int         next_attack_chance( Character *ch, Skill &skill, int coef );
+int         roll_extra_attacks( Character *ch );
 void        one_hit( Character *ch, Character* victim, bool secondary = false, string command = "" );
 void        one_hit_nocatch( Character *ch, Character* victim, bool secondary = false, string command = "" );
 /* One primary-hand swing as attack (weapon_flags value): weapon dice, procs,
