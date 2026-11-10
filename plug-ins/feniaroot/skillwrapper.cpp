@@ -323,12 +323,28 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): при
 
     // Create and save temporary skill data.
     PCSkillData &data = ch->getSkillData(skill->getIndex());
+    int oldOrigin = data.origin.getValue();
+    long oldStart = data.start.getValue();
+    long oldEnd = data.end.getValue();
+    int oldLearned = data.learned.getValue();
+
     data.origin = origin;
     data.start = today;
     data.end = end;
     data.learned = learned;
 
-    return skill->available(ch); // check again if became available, as align restrictions may prevent it
+    // A generic skill counts a lent copy at the char's own level, so it is
+    // still unavailable only when the skill shuts the char out (align/ethos,
+    // a warrior subclass ban); some skill types ignore lent copies outright.
+    // Put the old record back then, or a practiced percent is lost.
+    if (skill->available(ch))
+        return Register(true);
+
+    data.origin = oldOrigin;
+    data.start = oldStart;
+    data.end = oldEnd;
+    data.learned = oldLearned;
+    return Register(false);
 }
 
 NMI_INVOKE( SkillWrapper, removeTemporary, "(ch[,origin]): очистить временное умение у персонажа, помеченное как origin (.tables.skill_origin_table). Вернет true, если было что очищать.")
