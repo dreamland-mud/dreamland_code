@@ -6974,20 +6974,25 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         gaKatanas = own >= 2;
     }
     bool gaHandsFixed = gaBareHanded || gaKatanas;
+    // A warrior subclass (fight/subclasses.json) bars the weapons its rules reject
+    // and, with no_shield, every shield: both leave the candidate pool like an
+    // unskilled weapon does, so they never rank, chase or set a slot ceiling. A
+    // barred item the char still wears is on its way out: it sets no bar, earns
+    // no percentile credit, owns no flags and keeps no set together, so a legal
+    // pick reads as a fill of an empty hand (subclass_bars_hand_item).
+    const Json::Value &gaSubclass = subclass_rules( target );
+    bool gaSubclassed = gaSubclass.isObject( );
     // A two-handed weapon leaves no hand for a shield below SIZE_LARGE (race size, as
     // ShieldWearloc::canWear checks it): shields leave the candidate pool, so the
     // ceilings, percentile, chase list and slot browse never offer one. A held item
-    // still fits beside a two-hander (staff grip build).
+    // still fits beside a two-hander (staff grip build). A two-hander the subclass
+    // bars blocks nothing: it is not the char's to keep.
     Wearlocation *gaWieldSlot = wearlocationManager->findExisting( "wield" );
     ::Object *gaWielded = gaWieldSlot ? gaWieldSlot->find( target ) : 0;
     bool gaShieldBlocked = gaWielded != 0 && !target->is_npc( )
                            && target->getRace( )->getSize( ) < SIZE_LARGE
-                           && IS_WEAPON_STAT( gaWielded, WEAPON_TWO_HANDS );
-    // A warrior subclass (fight/subclasses.json) bars the weapons its rules reject
-    // and, with no_shield, every shield: both leave the candidate pool like an
-    // unskilled weapon does, so they never rank, chase or set a slot ceiling.
-    const Json::Value &gaSubclass = subclass_rules( target );
-    bool gaSubclassed = gaSubclass.isObject( );
+                           && IS_WEAPON_STAT( gaWielded, WEAPON_TWO_HANDS )
+                           && !subclass_bars_hand_item( gaSubclass, gaWielded, false );
     if (gaSubclassed && gaSubclass["no_shield"].asBool( ))
         gaShieldBlocked = true;
 
@@ -7004,6 +7009,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // Hair, tail and the personal slot hold any trinket for show and give no
         // stats: a doll worn there is not the char's hold-slot item to replace.
         if (!o->wear_loc->givesAffects( ))
+            continue;
+        if (subclass_bars_hand_item( gaSubclass, o, o->wear_loc == wear_second_wield ))
             continue;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
@@ -7416,7 +7423,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         };
         std::map<int,std::vector<GAOnce>> pool;
         for (::Object *o = target->carrying; o; o = o->next_content) {
-            if (!ga_wornCounts( o ))
+            if (!ga_wornCounts( o ) || subclass_bars_hand_item( gaSubclass, o, o->wear_loc == wear_second_wield ))
                 continue;
             int slot = o->pIndexData->wear_flags;
             REMOVE_BIT( slot, ITEM_TAKE );
@@ -7612,7 +7619,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // its armour slots from upgrades either.
     std::map<int,int> wornSetMask;
     for (::Object *o = target->carrying; o; o = o->next_content) {
-        if (!ga_wornCounts( o ))
+        if (!ga_wornCounts( o ) || subclass_bars_hand_item( gaSubclass, o, o->wear_loc == wear_second_wield ))
             continue;
         int slot = o->pIndexData->wear_flags;
         REMOVE_BIT( slot, ITEM_TAKE );
@@ -7859,6 +7866,14 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     ::Object *gaOffhand = gaOffLoc    ? gaOffLoc->find( target )    : 0;
     ::Object *gaShield  = gaShieldLoc ? gaShieldLoc->find( target ) : 0;
     ::Object *gaHold    = gaHoldLoc   ? gaHoldLoc->find( target )   : 0;
+    // A left-hand item the subclass bars counts as gone: no worn value to beat, and
+    // the dual verdict never names it as the off-hand to keep or replace.
+    ::Object *gaOffhandWorn = gaOffhand;   // what the off hand really holds
+    if (subclass_bars_hand_item( gaSubclass, gaOffhand, true ))
+        gaOffhand = 0;
+    if (subclass_bars_hand_item( gaSubclass, gaShield, false ))
+        gaShield = 0;
+    bool gaPrimaryBarred = subclass_bars_hand_item( gaSubclass, gaPrimary, false );
     bool gaHuge = target->getRace( )->getSize( ) >= SIZE_HUGE;
     GAOffhand om = ga_offhandModel( target, w, gaPrimary );
 
@@ -7990,9 +8005,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
 
                 if (pickBetter) {
                     GACand pick = *bestOff;
-                    int rv = gaOffhand != 0 ? gaOffhand->pIndexData->vnum : 0;
+                    int rv = gaOffhandWorn != 0 ? gaOffhandWorn->pIndexData->vnum : 0;
                     dEntry = ga_buildEntry( pick, msm, chLevel, isVampire, pathCache,
-                                            bestOffVal - offWornVal, gaOffhand == 0, rv );
+                                            bestOffVal - offWornVal, gaOffhandWorn == 0, rv );
                 }
                 dState = 2;
             }
@@ -8015,7 +8030,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // a shield (ShieldWearloc::canWear), so its keep side is the held item alone.
     bool gaGoGrip = false, gripWins = false;
     double gripScore = (om.pGrip + ga_offendRatio( om, target, gaPrimary )) * om.blowValue, gripKeep = 0;
-    if (!gaHandsFixed && gripScore > 0) {
+    // No grip build for a subclass that bars the staff in hand or needs a shield on
+    // that arm (the sentinel): the left hand is not the char's to leave empty.
+    bool gaGripBarred = gaSubclassed && (gaPrimaryBarred || gaSubclass["shield"].asBool( ));
+    if (!gaHandsFixed && !gaGripBarred && gripScore > 0) {
         bool shieldFits = !gaShieldBlocked;
         bool haveShield;
         double keepScore = keepSide( shieldFits, haveShield );
@@ -8073,13 +8091,17 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
             Wearlocation *offLoc   = wearlocationManager->findExisting( "second_wield" );
             ::Object *primary = wieldLoc ? wieldLoc->find( target ) : 0;
             ::Object *offhand = offLoc   ? offLoc->find( target )   : 0;
+            // A weapon the subclass bars still takes its hand but is worth nothing there:
+            // any legal pick replaces it.
             if (primary != 0) {
-                double psc = ga_score( target, primary, w, rawStat, capStat, true );
+                double psc = subclass_bars_hand_item( gaSubclass, primary, false ) ? 0.0
+                           : ga_score( target, primary, w, rawStat, capStat, true );
                 wornScores.push_back( psc );
                 if (wornMinVnum == 0 || psc < wornMinScore) { wornMinScore = psc; wornMinVnum = primary->pIndexData->vnum; }
             }
             if (offhand != 0) {
-                double osc = ga_score( target, offhand, w, rawStat, capStat, true );
+                double osc = subclass_bars_hand_item( gaSubclass, offhand, true ) ? 0.0
+                           : ga_score( target, offhand, w, rawStat, capStat, true );
                 wornScores.push_back( osc );
                 if (wornMinVnum == 0 || osc < wornMinScore) { wornMinScore = osc; wornMinVnum = offhand->pIndexData->vnum; }
             }
@@ -8102,7 +8124,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                 REMOVE_BIT( ws, ITEM_TAKE );
                 if ((ws & slotFilter) == 0)
                     continue;
-                double osc = ga_score( target, o, w, rawStat, capStat, true );
+                double osc = subclass_bars_hand_item( gaSubclass, o, o->wear_loc == wear_second_wield ) ? 0.0
+                           : ga_score( target, o, w, rawStat, capStat, true );
                 wornScores.push_back( osc );
                 if (wornMinVnum == 0 || osc < wornMinScore) { wornMinScore = osc; wornMinVnum = o->pIndexData->vnum; }
             }
@@ -8116,7 +8139,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // (ga_offhandValue) instead of as a second primary. An off-hand fill used to show
         // its whole primary score as the gain, 2-3x what the off-hand actually swings.
         if (wieldBrowse && capacity >= 2) {
-            double psc = gaPrimary != 0 ? ga_score( target, gaPrimary, w, rawStat, capStat, true ) : 0.0;
+            double psc = gaPrimary != 0 && !gaPrimaryBarred ? ga_score( target, gaPrimary, w, rawStat, capStat, true ) : 0.0;
             struct GAWieldOpt { GACand c; double gain; bool fills; int rv; };
             std::vector<GAWieldOpt> opts;
             for (int pass = 0; pass < 2; pass++) {
@@ -8140,8 +8163,8 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
                         if (!any || g > best) {
                             best = g;
                             any = true;
-                            fills = gaOffhand == 0;
-                            rv = gaOffhand != 0 ? gaOffhand->pIndexData->vnum : 0;
+                            fills = gaOffhandWorn == 0;
+                            rv = gaOffhandWorn != 0 ? gaOffhandWorn->pIndexData->vnum : 0;
                         }
                     }
                     // Same bars as the generic path: a fill of an empty hand passes

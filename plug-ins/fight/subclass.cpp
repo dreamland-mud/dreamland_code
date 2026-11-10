@@ -100,3 +100,12 @@ bool subclass_one_hand( const Json::Value &rules )
 {
     return rules["single"].asBool( ) || rules["shield"].asBool( );
 }
+
+bool subclass_bars_hand_item( const Json::Value &rules, Object *obj, bool offHand )
+{
+    if (!obj || !rules.isObject( ))
+        return false;
+    if (obj->item_type == ITEM_WEAPON)
+        return (offHand && subclass_one_hand( rules )) || !subclass_weapon_fits( rules, obj );
+    return rules["no_shield"].asBool( ) && IS_SET( obj->pIndexData->wear_flags, ITEM_WEAR_SHIELD );
+}
