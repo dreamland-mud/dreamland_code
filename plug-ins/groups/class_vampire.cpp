@@ -43,6 +43,7 @@
 #include "skill_utils.h"
 #include "l10n.h"
 #include "fenia_utils.h"
+#include "logstream.h"
 
 PROF(vampire);
 DESIRE(bloodlust);
@@ -148,30 +149,60 @@ void VampiricBiteOneHit::calcTHAC0( )
     thac0 -= 10 * (100 - gsn_vampiric_bite->getEffective( ch ));
 }
 
+/*
+ * A vampire is about to heal on victim's blood. The Fenia global trigger
+ * onBloodDrink (dreamland_fenia global/onBloodDrink: alcohol in the blood)
+ * may take the feeding over: true means the blood does not heal. The handler
+ * can kill the vampire: fDead is set then, and the vampire must not be touched.
+ */
+static bool blood_drink_trigger( Character *ch, Character *victim, bool &fDead )
+{
+    fDead = false;
+
+    try {
+        return gprog_nocatch( "onBloodDrink", "CC", ch, victim );
+    }
+    catch (const VictimDeathException &) {
+        fDead = true;
+        return true;
+    }
+    catch (const ::Exception &e) {
+        LogStream::sendError( ) << "onBloodDrink: " << e.what( ) << endl;
+        return false;
+    }
+}
+
 void VampiricBiteOneHit::postDamageEffects( )
 {
 
     if(!IS_BLOODLESS (victim)){
 
-    // vampiric bite gives hp/mana to ch from victim
-    int hit_ga, mana_ga;
-
-    if ( !IS_COLD_BLOODED( victim ) ) {
-        hit_ga = min( (orig_dam / 2 ), (int)victim->max_hit );
-        mana_ga = min( (orig_dam / 2 ), (int)victim->max_mana );
-    ch->pecho(_("Твое здоровье и энергия восполняются, когда ты высасываешь кровь из противника."));
+    bool fDead;
+    if (blood_drink_trigger( ch, victim, fDead )) {
+        if (fDead)
+            throw VictimDeathException( );
     }
     else {
-        hit_ga = min( (orig_dam / 10 ), (int)victim->max_hit );
-        mana_ga = min( (orig_dam / 10 ), (int)victim->max_mana );
-    ch->pecho(_("Ты с отвращением высасываешь кровь, {cхолодную{x как сердца разработчиков."));
-    }
+        // vampiric bite gives hp/mana to ch from victim
+        int hit_ga, mana_ga;
 
-    ch->hit   += hit_ga;
-    ch->hit   =  min( ch->hit , ch->max_hit);
-    ch->mana  += mana_ga;
-    ch->mana  =  min( ch->mana , ch->max_mana);
-    update_pos( ch );
+        if ( !IS_COLD_BLOODED( victim ) ) {
+            hit_ga = min( (orig_dam / 2 ), (int)victim->max_hit );
+            mana_ga = min( (orig_dam / 2 ), (int)victim->max_mana );
+        ch->pecho(_("Твое здоровье и энергия восполняются, когда ты высасываешь кровь из противника."));
+        }
+        else {
+            hit_ga = min( (orig_dam / 10 ), (int)victim->max_hit );
+            mana_ga = min( (orig_dam / 10 ), (int)victim->max_mana );
+        ch->pecho(_("Ты с отвращением высасываешь кровь, {cхолодную{x как сердца разработчиков."));
+        }
+
+        ch->hit   += hit_ga;
+        ch->hit   =  min( ch->hit , ch->max_hit);
+        ch->mana  += mana_ga;
+        ch->mana  =  min( ch->mana , ch->max_mana);
+        update_pos( ch );
+    }
 
     // corrupt victim
     Affect af;
@@ -342,11 +373,18 @@ void sucking(Character *ch, Character *victim)
         mana_gain = std::min(slevel * 1, (int)victim->max_hit);
     }
 
-    ch->hit += hp_gain;
-    ch->hit = std::min(ch->hit, ch->max_hit);
-    ch->mana += mana_gain;
-    ch->mana = std::min(ch->mana, ch->max_mana);
-    update_pos(ch);
+    bool fDead;
+    if (blood_drink_trigger(ch, victim, fDead)) {
+        if (fDead)
+            return;
+    }
+    else {
+        ch->hit += hp_gain;
+        ch->hit = std::min(ch->hit, ch->max_hit);
+        ch->mana += mana_gain;
+        ch->mana = std::min(ch->mana, ch->max_mana);
+        update_pos(ch);
+    }
 
     victim->position = POS_STANDING;
 

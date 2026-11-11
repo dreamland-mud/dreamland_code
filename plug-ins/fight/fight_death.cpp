@@ -80,6 +80,11 @@ CONFIGURABLE_DECL(fight, combat_ai)
 // combat_ai.json so hot combat_ai reads stay small. Read only by Fenia.
 CONFIGURABLE_DECL(fight, boss_mods)
 
+// Drugs and alcohol (fight/drugs.json): stages, dependence, remedies.
+// Read only by Fenia, through .config("fight/drugs"): see dreamland_fenia
+// "utils/drugs".
+CONFIGURABLE_DECL(fight, drugs)
+
 enum {
     LOOT_DESTROY,
     LOOT_DROP,

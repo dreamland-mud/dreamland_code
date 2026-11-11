@@ -7,6 +7,7 @@
 #include "commandmanager.h"
 #include "skillreference.h"
 #include "pcharacter.h"
+#include "affect.h"
 
 #include "mudtags.h"
 
@@ -23,6 +24,65 @@
 static const DLString CHANNELS_L10N_FILE = "commands/channels.xml";
 
 GSN(garble);
+GSN(slurred_speech);
+
+/*-----------------------------------------------------------------------
+ * Drunk speech
+ *-----------------------------------------------------------------------*/
+static const int SLUR_MAX_PCT = 40;
+
+int slur_percent( Character *ch )
+{
+    Affect *paf = ch->affected.find( gsn_slurred_speech );
+
+    if (!paf)
+        return 0;
+
+    return URANGE( 0, (int)paf->modifier, SLUR_MAX_PCT );
+}
+
+// A KOI8 letter: Latin, Russian (0xC0 and up) or the Ukrainian ones below it.
+static bool slur_letter( char c )
+{
+    unsigned char u = (unsigned char)c;
+
+    if ((u >= 'a' && u <= 'z') || (u >= 'A' && u <= 'Z') || u >= 0xC0)
+        return true;
+
+    switch (u) {
+    case 0xA4: case 0xA6: case 0xA7: case 0xAD:
+    case 0xB4: case 0xB6: case 0xB7: case 0xBD:
+        return true;
+    }
+
+    return false;
+}
+
+DLString slur_text( const DLString &src, int pct )
+{
+    DLString out;
+
+    for (DLString::size_type i = 0; i < src.size( ); i++) {
+        char c = src[i];
+
+        if (!slur_letter( c ) || number_percent( ) > pct) {
+            out += c;
+            continue;
+        }
+
+        if (i + 1 < src.size( ) && slur_letter( src[i + 1] ) && chance( 50 )) {
+            out += src[i + 1];
+            out += c;
+            i++;
+        }
+        else {
+            out += c;
+            out += c;
+        }
+    }
+
+    return out;
+}
 
 /*-----------------------------------------------------------------------
  * CommunicationChannel
@@ -64,11 +124,20 @@ void CommunicationChannel::applyGarble( Character *ch, DLString &msg ) const
     if (!garble)
         return;
 
-    if (!ch->isAffected( gsn_garble ))
+    bool fGarble = ch->isAffected( gsn_garble );
+    int slur = fGarble ? 0 : slur_percent( ch );
+
+    if (!fGarble && slur <= 0)
         return;
     
     mudtags_convert( msg.c_str( ), srcStream, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, 0 );
     DLString srcString = srcStream.str( );
+
+    if (!fGarble) {
+        msg = slur_text( srcString, slur );
+        return;
+    }
+
     src = srcString.c_str( );
     dst = result;
 
