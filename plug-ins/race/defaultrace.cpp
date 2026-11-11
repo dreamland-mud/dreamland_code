@@ -35,17 +35,6 @@
 
 using namespace std;
 
-GSN(faerie_fire);
-GSN(infravision);
-GSN(fly);
-GSN(curse);
-GSN(regeneration);
-GSN(sneak);
-GSN(hide);
-GSN(pass_door);
-GSN(protection_good);
-GSN(slow);
-GSN(swim);
 
 /*-------------------------------------------------------------------
  * RaceHelp 
@@ -439,35 +428,9 @@ const Flags & DefaultRace::getAff( ) const
     return resolved( ).aff;
 }
 
-/** Racial affects whose handler sets an affect bit, and that bit. */
-static const struct {
-    SkillReference *skill;
-    bitstring_t bit;
-} race_affect_bits[] = {
-    { &gsn_faerie_fire,     AFF_FAERIE_FIRE },
-    { &gsn_infravision,     AFF_INFRARED },
-    { &gsn_fly,             AFF_FLYING },
-    { &gsn_curse,           AFF_CURSE },
-    { &gsn_regeneration,    AFF_REGENERATION },
-    { &gsn_sneak,           AFF_SNEAK },
-    { &gsn_hide,            AFF_HIDE },
-    { &gsn_pass_door,       AFF_PASS_DOOR },
-    { &gsn_protection_good, AFF_PROTECT_GOOD },
-    { &gsn_slow,            AFF_SLOW },
-    { &gsn_swim,            AFF_SWIM },
-};
-
 const Flags & DefaultRace::derivedAff( ) const
 {
-    bitstring_t bits = 0;
-
-    for (auto &row: race_affect_bits) {
-        int sn = *row.skill;
-        if (affects.isSet( sn ))
-            bits |= row.bit;
-    }
-
-    aff.setValue( bits );
+    aff.setValue( affect_trait_bits( affects ) );
     return aff;
 }
 const Flags & DefaultRace::getOff( ) const

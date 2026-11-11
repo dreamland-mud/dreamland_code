@@ -8,6 +8,52 @@
 #include "race.h"
 #include "body.h"
 #include "pcrace.h"
+#include "skillreference.h"
+#include "merc.h"
+#include "def.h"
+
+GSN(faerie_fire);
+GSN(infravision);
+GSN(fly);
+GSN(curse);
+GSN(regeneration);
+GSN(sneak);
+GSN(hide);
+GSN(pass_door);
+GSN(protection_good);
+GSN(slow);
+GSN(swim);
+
+/** Trait affects whose handler sets an affect bit, and that bit. */
+static const struct {
+    SkillReference *skill;
+    bitstring_t bit;
+} affect_trait_table[] = {
+    { &gsn_faerie_fire,     AFF_FAERIE_FIRE },
+    { &gsn_infravision,     AFF_INFRARED },
+    { &gsn_fly,             AFF_FLYING },
+    { &gsn_curse,           AFF_CURSE },
+    { &gsn_regeneration,    AFF_REGENERATION },
+    { &gsn_sneak,           AFF_SNEAK },
+    { &gsn_hide,            AFF_HIDE },
+    { &gsn_pass_door,       AFF_PASS_DOOR },
+    { &gsn_protection_good, AFF_PROTECT_GOOD },
+    { &gsn_slow,            AFF_SLOW },
+    { &gsn_swim,            AFF_SWIM },
+};
+
+bitstring_t affect_trait_bits( const GlobalBitvector &affects )
+{
+    bitstring_t bits = 0;
+
+    for (auto &row: affect_trait_table) {
+        int sn = *row.skill;
+        if (affects.isSet( sn ))
+            bits |= row.bit;
+    }
+
+    return bits;
+}
 
 /*-------------------------------------------------------------------
  * Race
