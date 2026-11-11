@@ -42,7 +42,6 @@ public:
     virtual bool isActive( PCharacter * );
 
     virtual bool canEat( PCharacter * );
-    virtual bool canDrink( PCharacter * );
 
     // True when this desire is at its cap, so drinking/eating for it is wasted.
     virtual bool isFull( PCharacter * ) const;

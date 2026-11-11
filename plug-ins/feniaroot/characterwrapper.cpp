@@ -9006,24 +9006,6 @@ NMI_INVOKE( CharacterWrapper, drinkLiquid, "(liqIndex,amount): применит�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, canDrink, "(): можно ли пить сейчас; false если желание мешает (напр. слишком пьян). Само печатает причину отказа." )
-{
-    checkTarget( );
-
-    if (target->is_npc( ))
-        return Register( true );
-
-    PCharacter *pch = target->getPC( );
-    // Mirror CMDRUN(drink)'s canDrink gate over all desires; only DrunkDesire
-    // actually blocks (and pechos "*ИК*"), the rest return true silently.
-    if (!desire_thirst->canDrink( pch )) return Register( false );
-    if (!desire_drunk->canDrink( pch )) return Register( false );
-    if (!desire_hunger->canDrink( pch )) return Register( false );
-    if (!desire_bloodlust->canDrink( pch )) return Register( false );
-
-    return Register( true );
-}
-
 NMI_INVOKE( CharacterWrapper, drinkWasted, "(liqIndex): true если ВСЕ желания, что поит эта жидкость, уже заполнены -- глоток впустую (жажда/голод/алкоголь с запасом -> false)" )
 {
     checkTarget( );
@@ -9042,7 +9024,7 @@ NMI_INVOKE( CharacterWrapper, drinkWasted, "(liqIndex): true если ВСЕ ж�
 
     // Not wasted if the liquid feeds ANY applicable desire that still has room:
     // covers thirst-not-full, hunger-feeding drinks (milk/juice), and alcohol
-    // (drunk below cap; a maxed drunk already stopped drink() at canDrink).
+    // (drunk below cap).
     //   `feeds` guards the vacuous case: a liquid that feeds NO applicable desire
     // -- salt water/ink/swill (thirst <= 0), blood for a mortal, anything but blood
     // for a vampire -- is NOT wasted; it is a drinkable trap/flavor, let it through.

@@ -52,7 +52,6 @@ public:
 
     virtual bool isActive( PCharacter * );
     virtual bool applicable( PCharacter * );
-    virtual bool canDrink( PCharacter * );
 protected:
     virtual int getUpdateAmount( PCharacter * );
 };
