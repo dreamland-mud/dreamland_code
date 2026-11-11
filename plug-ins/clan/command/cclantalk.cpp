@@ -29,6 +29,7 @@
 #include "descriptor.h"
 #include "mudtags.h"
 #include "chatframe.h"
+#include "communicationchannel.h"
 #include "act.h"
 
 #include "merc.h"
@@ -153,11 +154,19 @@ COMMAND(CClanTalk, "cb")
                 && !d->character->isAffected(gsn_deafen))
         {
             char msg_str[MAX_INPUT_LENGTH];
+            int slur;
 
             if (ch->isAffected(gsn_garble)) {
                 ostringstream out;
                 mudtags_convert( argument.c_str( ), out, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, d->character );
                 garble( out.str( ).c_str( ), msg_str );
+            }
+            else if ((slur = slur_percent( ch )) > 0) {
+                ostringstream out;
+                mudtags_convert( argument.c_str( ), out, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, d->character );
+                DLString slurred = slur_text( out.str( ), slur );
+                strncpy( msg_str, slurred.c_str( ), MAX_INPUT_LENGTH - 1 );
+                msg_str[MAX_INPUT_LENGTH - 1] = 0;
             }
             else
                 strcpy( msg_str, argument.c_str( ) );

@@ -9,6 +9,14 @@
 #include "xmlenumeration.h"
 #include "command.h"
 
+/** Percent of letters a drunk tongue trips over: the modifier of the
+ *  'slurred speech' affect (Fenia utils/drugs), capped at 40. 0 when sober. */
+int slur_percent( Character *ch );
+
+/** Slur plain text (no color tags): each letter, with pct percent chance,
+ *  swaps with the next letter or is said twice. */
+DLString slur_text( const DLString &src, int pct );
+
 class CommunicationChannel : public virtual Command {
 XML_OBJECT
 public:
