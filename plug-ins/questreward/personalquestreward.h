@@ -19,27 +19,33 @@ public:
 
         virtual void get( Character * );
 
-        // Stat-bearing personal rewards (girth, ring, weapon) stamp the item to
-        // the wearer's level and hang level-scaled affects on every wear. The
-        // numbers live in Fenia (.tmp.questreward), the plumbing stays here.
-        // Base equip() drives the shared girth/ring path; QuestWeapon overrides
-        // it for its conditional affects and weapon generator. A reward family
-        // with an empty questFamily() (the base class) has no stats and equip()
-        // is a no-op.
+        // Stat-bearing personal rewards (girth, ring, weapon, bag) stamp the
+        // item to the wearer's level and rebuild it on every wear. The numbers
+        // live in Fenia (.tmp.questreward), the plumbing stays here: shape()
+        // writes the item's values first, then every candidate apply location
+        // is upserted from modifier(). A reward family with an empty
+        // questFamily() (the base class) has no stats and equip() is a no-op.
         virtual void equip( Character * );
 
-        // "girth" | "ring" | "weapon" | "" (no stats). Selects the Fenia formula.
+        // "girth" | "ring" | "weapon" | "bag" | "" (no stats). Selects the Fenia formula.
         virtual DLString questFamily( ) const;
 
         // Upgrade tier stored on the instance as the "questTier" object property
         // (absent -> 0 = T0). Shared with RefitQuestArticle's fee calc.
         static int questTier( ::Object * );
 
-        // Ask .tmp.questreward.modifier(ch, fam, loc, tier) for one apply
-        // location. Returns true and fills 'out' on success; returns false if
-        // the Fenia module is missing or errors, so callers can leave an
-        // existing affect untouched instead of zeroing worn gear.
-        static bool feniaModifier( Character *ch, const DLString &fam, int loc, int tier, int &out );
+protected:
+        // Ask .tmp.questreward.modifier(ch, obj, fam, loc, tier) for one apply
+        // location. Returns true and fills 'out' on a number; returns false on
+        // null (a location the family does not own) or if the Fenia module is
+        // missing or errors, so callers leave an existing affect untouched
+        // instead of zeroing worn gear.
+        bool feniaModifier( Character *ch, const DLString &fam, int loc, int tier, int &out );
+
+        // Call .tmp.questreward.shape(ch, obj, fam, tier): item values that
+        // are not char stats (a weapon's dice and flags). A missing function is
+        // not an error: families without a shape skip it.
+        void feniaShape( Character *ch, const DLString &fam, int tier );
 };
 
 #endif

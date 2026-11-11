@@ -1953,6 +1953,32 @@ NMI_INVOKE(Root, weaponBaseRoll, "(tier, level, wclass): базовый hitroll/
     return Register(WeaponCalculator(tier, level, wclass).getDamroll());
 }
 
+NMI_INVOKE(Root, weaponBase, "(tier, level, wclass, shareMille): базовые value1, value2, hitroll и damroll оружия класса wclass (число из .tables.weapon_class) этого tier и уровня по таблицам генератора (List из 4 чисел); shareMille -- доля двуручного в тысячных (1000 одноручное, 1750 двуручное): множит средний урон и damroll, hitroll нет")
+{
+    int tier = argnum2number(args, 1);
+    int level = URANGE(1, argnum2number(args, 2), MAX_LEVEL);
+    int wclass = argnum2number(args, 3);
+    int share = argnum2number(args, 4);
+
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid weapon tier.");
+    if (weapon_class.name(wclass).empty())
+        throw Scripting::Exception("Unknown weapon class.");
+    if (share <= 0)
+        throw Scripting::Exception("Bad two-hand share.");
+
+    // Same shape as a generated weapon's refit base (weapon_refit_base): the
+    // share scales the dice average and damroll, hitroll stays one-handed.
+    float mult = share / 1000.0f;
+    WeaponCalculator calc(tier, level, wclass, 0, mult);
+    RegList::Pointer list(NEW);
+    list->push_back(Register(calc.getValue1()));
+    list->push_back(Register(calc.getValue2()));
+    list->push_back(Register(WeaponCalculator(tier, level, wclass).getDamroll()));
+    list->push_back(Register((int)(WeaponCalculator(tier, level, wclass).getDamroll() * mult)));
+    return wrap(list);
+}
+
 // Gear-sage scorer in characterwrapper.cpp, shared with gearAdvice.
 double ga_item_points( ::Object *o, bool caster );
 double ga_item_score( Character *target, ::Object *o, bool caster );
@@ -1972,6 +1998,27 @@ NMI_INVOKE(Root, itemPoints, "(obj, profile): базовая ценность п
     DLString profile = argnum2string(args, 2);
 
     return Register((int)std::round(ga_item_points(obj, profile == "caster")));
+}
+
+NMI_INVOKE(Root, itemApplyPoints, "(apply, modifier, level, profile): очки оценки одного аффекта: apply из .tables.apply_flags с модификатором modifier по весам модели (fight/item_value.json) на уровне level, округлено; передай modifier x100, чтобы получить сотые доли очка; profile caster|melee")
+{
+    int location = argnum2number(args, 1);
+    int modifier = argnum2number(args, 2);
+    int level = URANGE(1, argnum2number(args, 3), MAX_LEVEL);
+    DLString profile = argnum2string(args, 4);
+
+    ItemWeights w;
+    item_weights(w, profile == "caster", level);
+    return Register((int)std::round(item_apply_points(location, modifier, w)));
+}
+
+NMI_INVOKE(Root, itemFlagPoints, "(flags, level, profile): очки оценки флагов оружия flags (маска из .tables.weapon_type2) на уровне level по item_affixes.json flag.points_by_level, без поправки на персонажа, округлено; profile caster|melee")
+{
+    int flags = argnum2number(args, 1);
+    int level = URANGE(1, argnum2number(args, 2), MAX_LEVEL);
+    DLString profile = argnum2string(args, 3);
+
+    return Register((int)std::round(item_weapon_flag_points(flags, level, profile == "caster")));
 }
 
 // An object or a prototype from one argument (gearTerms does the same).
