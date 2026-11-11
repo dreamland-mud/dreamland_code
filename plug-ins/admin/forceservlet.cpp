@@ -8,6 +8,7 @@
 #include "interp.h"
 #include "pluginmanager.h"
 #include "arg_utils.h"
+#include "cplugin.h"
 #include <jsoncpp/json/json.h>
 
 static IconvMap koi2utf("koi8-u", "utf-8");
@@ -202,6 +203,8 @@ SERVLET_HANDLE(api_reload, "/reload")
         servlet_response_404(response, "Unknown reload target '" + what + "' (use most|all|changed|<plugin>)");
         return;
     }
+
+    plugin_reload_warning();
 
     Json::Value body;
     body["requested"] = what.c_str();
