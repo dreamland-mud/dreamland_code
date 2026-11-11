@@ -40,7 +40,11 @@ CMDRUNP( unlock )
 
     bool canBeDoor = direction_lookup(arg) >= 0;
 
-    if (!canBeDoor && ( obj = get_obj_here( ch, arg ) ) != 0 )
+    // A non-closable object named like an extra exit must not hide the exit.
+    obj = canBeDoor ? 0 : get_obj_here( ch, arg );
+    peexit = find_extra_exit_here( ch, arg );
+
+    if (obj && (obj_is_closable( obj ) || !peexit))
     {
         // portal stuff
         if ( obj->item_type == ITEM_PORTAL )
@@ -163,8 +167,7 @@ CMDRUNP( unlock )
         return;
     }
 
-    if ((peexit = ch->in_room->extra_exits.find(arg))
-            && ch->can_see( peexit ) )
+    if (peexit)
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
         {
