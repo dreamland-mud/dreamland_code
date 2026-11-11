@@ -457,7 +457,8 @@ WEBMANIP_RUN(decorateItem)
         if (magicUse || has_trigger_use( item, triggers ))
             manips.add( "use" );
 
-        if (item->wear_loc == wear_none && gsn_lore->usable( ch )) 
+        // lore takes obj_carry, which finds worn items too.
+        if (gsn_lore->usable( ch ))
             manips.add( "lore" );
     } 
     // Other character's inventory or equipment:
