@@ -117,8 +117,11 @@ public:
     void slay( );
     void associate( Character * );
 
-    int writeFd(const unsigned char *buf, int len);
+    int writeFd(const unsigned char *buf, int len, bool capped = true);
     int writeFd(const char *buf);
+    /** Push queued wire bytes to the socket: -1 on a dead socket, else bytes still queued. */
+    int flushPending( );
+    bool hasPendingOutput( ) const { return !pendingOut.empty( ); }
     int writeWebSock(unsigned char opcode, const unsigned char *txt, int length);
     int writeWSCommand(const Json::Value &val);
     int writeWSCommand(const DLString &name, const std::vector<DLString> &args);
@@ -146,6 +149,7 @@ private:
     int inputChar(unsigned char);
     int inputTelnet(unsigned char);
     bool checkStopSymbol();
+    int sendSome(const unsigned char *buf, int len);
      
 public:
     Descriptor *        next;
@@ -186,6 +190,9 @@ public:
     // When to send the telnet login greeting if the client has not said what
     // it is yet (0 = sent or not due). See NannyHandler::init.
     time_t              greeting_due;
+    // Wire bytes the socket has not accepted yet, sent before anything newer.
+    // Append new members at the end: older offsets stay put.
+    std::string         pendingOut;
     bool wsHandleNeg(unsigned char *buf, int rc);
     bool wsHandleFrame(unsigned char *buf, int rc);
     bool wsHandlePassThrough(unsigned char *buf, int rc);
