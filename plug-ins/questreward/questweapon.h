@@ -16,7 +16,6 @@ public:
         typedef ::Pointer<QuestWeapon> Pointer;
 
         virtual void wear( Character * );
-        virtual void equip( Character * );
         virtual DLString questFamily( ) const;
 };
 
