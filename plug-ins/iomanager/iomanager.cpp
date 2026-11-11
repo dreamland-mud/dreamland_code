@@ -223,6 +223,7 @@ IOManager::kick(Descriptor *d)
     FD_CLR( d->descriptor, &out_set );
 
     d->outtop = 0;
+    d->pendingOut.clear( );
     d->close( );
 }
 
@@ -322,9 +323,13 @@ IOManager::ioWrite()
         if (!FD_ISSET(d->descriptor, &out_set))
             continue;
 
-        if (d->fcommand || d->outtop > 0)
+        if (d->fcommand || d->outtop > 0) {
             if (!process_output( d, true ))
                 kick(d);
+        }
+        // Only a leftover queue: drain it without busting another prompt.
+        else if (d->hasPendingOutput( ) && d->flushPending( ) < 0)
+            kick(d);
     }
 }
 

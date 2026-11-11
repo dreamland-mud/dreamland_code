@@ -65,41 +65,26 @@ bool process_output( Descriptor *d, bool fPrompt )
             d->handle_input.front( )->prompt(d);
 
     /*
+     * Wire bytes a stalled socket did not take last time go out first.
+     */
+    if (d->flushPending( ) < 0)
+        return false;
+
+    /*
      * Short-circuit if nothing to write.
      */
 
     if (!d->outtop)
         return true;
 
-    /*
-     * OS-dependent output.
-     */
-    // writeRaw returns the number of bytes it consumed, or -1 once the socket
-    // is gone (or the compression stream has failed). Keeping that in a bool
-    // made every failure read back as success, since -1 converts to true, so
-    // ioWrite() never reached kick() and a dead descriptor went on being
-    // written to every pulse for as long as the server stayed up.
-    int written = d->writeRaw((const unsigned char*)d->outbuf, d->outtop);
-
-    if (written < 0)
+    // writeRaw returns -1 once the socket is gone (or the compression stream
+    // has failed); a dead descriptor must reach kick() instead of being written
+    // to every pulse. Anything the socket cannot take right now is kept in the
+    // descriptor's output queue (writeFd), so outbuf is always fully consumed.
+    if (d->writeRaw((const unsigned char*)d->outbuf, d->outtop) < 0)
         return false;
 
-    // A short write means the socket took only part of the buffer. On the raw
-    // and MCCP paths writeRaw returns bytes consumed FROM outbuf (bytes sent on
-    // the raw path, bytes fed to the compressor on the MCCP path), so keep the
-    // unsent tail and let the next pulse retry it instead of dropping a
-    // screenful of text on a briefly stalled link. write_to_buffer caps outbuf
-    // at 6*32000 and closes the descriptor on overflow, so a permanently stuck
-    // link still terminates. On the WebSocket path writeRaw returns
-    // frame-payload bytes -- a different unit -- and a half-sent frame is
-    // unrecoverable at this layer, so keep the old drop-the-buffer behaviour
-    // for WS; the real fix there is a descriptor output queue, tracked apart.
-    if (d->websock.state != WS_ESTABLISHED && written < d->outtop) {
-        memmove(d->outbuf, d->outbuf + written, d->outtop - written);
-        d->outtop -= written;
-    } else {
-        d->outtop = 0;
-    }
+    d->outtop = 0;
 
     return true;
 }

@@ -214,8 +214,16 @@ Descriptor::writeFd(const char *txt)
     return writeFd((const unsigned char *)txt, strlen(txt));
 }
 
+// A link that stays stalled this long is dead for practical purposes: drop it
+// rather than let the queue grow without bound. Same order of magnitude as the
+// outbuf cap in write_to_buffer.
+static const size_t PENDING_OUT_MAX = 256 * 1024;
+
+// One non-blocking pass of send(): bytes accepted by the kernel, or -1 when the
+// socket is really broken. A full kernel buffer is not a dead peer: the caller
+// queues the rest and retries next pulse.
 int
-Descriptor::writeFd(const unsigned char *txt, int length)
+Descriptor::sendSome(const unsigned char *txt, int length)
 {
     int iStart;
     int nWrite = 0;
@@ -225,11 +233,6 @@ Descriptor::writeFd(const unsigned char *txt, int length)
         nWrite = ::send( descriptor, (const char*)txt + iStart, nBlock, 0 );
 
         if ( nWrite < 0 ) {
-            // A full kernel buffer is not a dead peer. These sockets are
-            // non-blocking (init_descriptor sets FNDELAY), the read path
-            // already treats EWOULDBLOCK as "come back next pulse", and the
-            // caller drops the descriptor on -1 -- so reporting a failure here
-            // would disconnect a player whose buffer merely happened to fill.
             if ( errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR )
                 return iStart;
 
@@ -237,13 +240,59 @@ Descriptor::writeFd(const unsigned char *txt, int length)
             return -1;
         }
 
-        // send() made no progress: `iStart += nWrite` would never advance and
-        // this loop would spin forever, taking the whole game loop with it.
+        // No progress: stop instead of spinning the whole game loop.
         if ( nWrite == 0 )
             return iStart;
     }
 
     return iStart;
+}
+
+// Every byte bound for the socket goes through here, so a partial send never
+// loses or reorders anything: whatever the kernel does not take is queued and
+// flushed first on the next pulse. Callers that write a unit in pieces (a
+// WebSocket header, then its payload) therefore stay contiguous on the wire.
+// Returns length (all accepted) or -1 when the descriptor should be dropped.
+int
+Descriptor::writeFd(const unsigned char *txt, int length)
+{
+    if (length <= 0)
+        return 0;
+
+    int sent = 0;
+
+    if (pendingOut.empty( )) {
+        sent = sendSome(txt, length);
+        if (sent < 0)
+            return -1;
+    }
+
+    if (sent < length) {
+        if (pendingOut.size( ) + (length - sent) > PENDING_OUT_MAX) {
+            // Keep the queue as is: dropping its middle would corrupt the
+            // stream, and -1 gets the descriptor kicked, which clears it.
+            LogStream::sendWarning( ) << "Descriptor::writeFd(" << descriptor << "): output queue overflow, dropping" << endl;
+            return -1;
+        }
+
+        pendingOut.append((const char *)txt + sent, length - sent);
+    }
+
+    return length;
+}
+
+int
+Descriptor::flushPending( )
+{
+    if (pendingOut.empty( ))
+        return 0;
+
+    int sent = sendSome((const unsigned char *)pendingOut.data( ), pendingOut.size( ));
+    if (sent < 0)
+        return -1;
+
+    pendingOut.erase(0, sent);
+    return pendingOut.size( );
 }
 
 int
