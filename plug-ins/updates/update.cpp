@@ -545,10 +545,14 @@ void char_update( )
         // with a Fenia call per granted affect.
         bitstring_t raceAff = ch->getRace( )->getAff( ).getValue( );
 
-        // A prototype that removed a race bit from its body (reviewed aff del)
+        // A prototype's own <affects> traits re-arm the same way, and a
+        // prototype that removed a race bit from its body (reviewed aff del)
         // must not trip the refresh on every tick for the bit it gave up.
-        if (ch->is_npc( ))
-            raceAff &= ~ch->getNPC( )->pIndexData->honouredAffDel( );
+        if (ch->is_npc( )) {
+            MOB_INDEX_DATA *pMobIndex = ch->getNPC( )->pIndexData;
+            raceAff |= affect_trait_bits( pMobIndex->affects );
+            raceAff &= ~pMobIndex->honouredAffDel( );
+        }
 
         // A mob in or just out of a fight waits: otherwise a dispelled racial
         // buff comes back on the next tick and dispel/cancel is futile. The

@@ -112,4 +112,9 @@ inline RaceManager * RaceManager::getThis( )
 GLOBALREF_DECL(Race)
 XMLGLOBALREF_DECL(Race)
 
+// Legacy affect bits implied by a race or prototype <affects> skill list:
+// the traits whose onRefresh installs a bit. Feeds the race aff mask and the
+// per-tick re-arm gate in char_update.
+bitstring_t affect_trait_bits( const GlobalBitvector &affects );
+
 #endif
