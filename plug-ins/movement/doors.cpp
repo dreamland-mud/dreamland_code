@@ -155,8 +155,8 @@ bool obj_is_closable( Object *obj )
 /*
  * Objects in reach and the room's extra exits share one N.keyword count,
  * objects first: with one book carried, "2.book" is the first visible
- * extra exit called "book". N at or below the object count names an
- * object, so no exit is returned. A plain "book" (or "1.book") returns
+ * extra exit called "book". For N >= 2, N at or below the object count
+ * names an object, so no exit is returned. A plain "book" (or "1.book") returns
  * the first matching exit regardless of objects; the caller decides
  * whether an object wins.
  */
@@ -172,19 +172,24 @@ EXTRA_EXIT_DATA * find_extra_exit_here( Character *ch, const char *argument )
         return 0;
 
     if (number > 1) {
-        int objects = 0;
-
-        for (int k = 1; k <= number; k++) {
-            snprintf( buf, sizeof(buf), "%d.%s", k, keyword );
-            if (!get_obj_here( ch, buf ))
-                break;
-            objects = k;
-        }
-
-        if (objects >= number)
+        // The Nth object exists: N names it, not an exit.
+        if (get_obj_here( ch, argument ))
             return 0;
 
-        number -= objects;
+        // Fewer than N objects: count them. "k.keyword" hits for every k up
+        // to the count and misses above it, so a binary search over k keeps
+        // a huge N in a cluttered room to a few dozen scans.
+        int lo = 0, hi = number;   // k=lo hits (k=0 trivially), k=hi misses
+        while (hi - lo > 1) {
+            int mid = lo + (hi - lo) / 2;
+            snprintf( buf, sizeof(buf), "%d.%s", mid, keyword );
+            if (get_obj_here( ch, buf ))
+                lo = mid;
+            else
+                hi = mid;
+        }
+
+        number -= lo;
     }
 
     // ExtraExitList::find returns the first match only: walk a copy,
