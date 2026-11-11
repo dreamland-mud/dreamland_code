@@ -101,8 +101,8 @@ SKILL_RUNP( searchstones )
     mlevel = ch->getModifyLevel( );
     count = number_range( 5, 5 + mlevel / 30 );
 
-    oldact(_("Ты подбираешь с земли $t."), ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_CHAR );
-    oldact(_("$c1 подбирает с земли $t."), ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_ROOM );
+    oldact(_("Ты подбираешь с земли несколько камней."), ch, 0, 0, TO_CHAR );
+    oldact(_("$c1 подбирает с земли несколько камней."), ch, 0, 0, TO_ROOM );
     
     for (int i = 0; i < count; i++) {
         stone = create_stone( mlevel );
