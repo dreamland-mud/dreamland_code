@@ -24,6 +24,7 @@
 #include "l10n.h"
 #include "fenia_utils.h"
 #include "follow_utils.h"
+#include "player_utils.h"
 
 WEARLOC(none);
 
@@ -314,6 +315,33 @@ static bool get_obj( Character *ch, Object *obj, bool echo = true )
         return true;
 
     return false;
+}
+
+/*
+ * A single 'get' of a written sheet of paper reads it at once, like a glance
+ * at what you just picked up. Bulk 'get all' stays silent: no wall of notes.
+ */
+static void read_picked_paper( Character *ch, Object *obj )
+{
+    if (obj->extracted || obj->carried_by != ch || obj->item_type != ITEM_PARCHMENT)
+        return;
+
+    if (ch->is_npc( ) || eyes_blinded( ch ))
+        return;
+
+    ExtraDescription *ed = obj->getProperDescription( );
+    if (!ed)
+        return;
+
+    const DLString &text = ed->description.getForLang( Player::lang( ch ) );
+    if (text.empty( ))
+        return;
+
+    ch->pecho( _("На %O6 написано:"), obj );
+    // Same framing as 'read' (look.cpp ExtraDescList::output).
+    ostringstream buf;
+    buf << "{x" << text << endl;
+    ch->send_to( buf );
 }
 
 /*
@@ -864,8 +892,8 @@ CMDRUNP( get )
                 echo_not_here(ch, argTarget);
 
             } else {
-                if (can_get_obj( ch, obj ) == GET_OBJ_OK)
-                    get_obj( ch, obj );
+                if (can_get_obj( ch, obj ) == GET_OBJ_OK && !get_obj( ch, obj ))
+                    read_picked_paper( ch, obj );
             }
         }
         else
@@ -1018,8 +1046,8 @@ CMDRUNP( get )
             if (!oprog_can_fetch( ch, container, obj, pocket ))
                 return;
 
-            if (can_get_obj( ch, obj ) == GET_OBJ_OK)
-                get_obj_container( ch, obj, container );
+            if (can_get_obj( ch, obj ) == GET_OBJ_OK && !get_obj_container( ch, obj, container ))
+                read_picked_paper( ch, obj );
         }
         else {
             /*
