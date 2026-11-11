@@ -144,3 +144,61 @@ bool open_portal( Character *ch, Object *obj )
     return true;
 }
 
+
+bool obj_is_closable( Object *obj )
+{
+    return obj->item_type == ITEM_PORTAL
+           || obj->item_type == ITEM_CONTAINER
+           || obj->item_type == ITEM_DRINK_CON;
+}
+
+/*
+ * Objects in reach and the room's extra exits share one N.keyword count,
+ * objects first: with one book carried, "2.book" is the first visible
+ * extra exit called "book". N at or below the object count names an
+ * object, so no exit is returned. A plain "book" (or "1.book") returns
+ * the first matching exit regardless of objects; the caller decides
+ * whether an object wins.
+ */
+EXTRA_EXIT_DATA * find_extra_exit_here( Character *ch, const char *argument )
+{
+    char buf[MAX_INPUT_LENGTH], keyword[MAX_INPUT_LENGTH];
+
+    strncpy( buf, argument, sizeof(buf) - 1 );
+    buf[sizeof(buf) - 1] = '\0';
+    int number = number_argument( buf, keyword );
+
+    if (number < 1 || keyword[0] == '\0')
+        return 0;
+
+    if (number > 1) {
+        int objects = 0;
+
+        for (int k = 1; k <= number; k++) {
+            snprintf( buf, sizeof(buf), "%d.%s", k, keyword );
+            if (!get_obj_here( ch, buf ))
+                break;
+            objects = k;
+        }
+
+        if (objects >= number)
+            return 0;
+
+        number -= objects;
+    }
+
+    // ExtraExitList::find returns the first match only: walk a copy,
+    // dropping each hit, to reach the Nth visible one.
+    ExtraExitList candidates = ch->in_room->extra_exits;
+    DLString kw( keyword );
+    EXTRA_EXIT_DATA *peexit;
+
+    while ((peexit = candidates.find( kw ))) {
+        if (ch->can_see( peexit ) && --number == 0)
+            return peexit;
+
+        candidates.remove( peexit );
+    }
+
+    return 0;
+}

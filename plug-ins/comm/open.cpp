@@ -140,7 +140,11 @@ CMDRUNP( open )
         return;
     }
 
-    if (!canBeDoor && ( obj = get_obj_here( ch, arg ) ) != 0 )
+    // A non-closable object named like an extra exit must not hide the exit.
+    obj = canBeDoor ? 0 : get_obj_here( ch, arg );
+    peexit = find_extra_exit_here( ch, arg );
+
+    if (obj && (obj_is_closable( obj ) || !peexit))
     {
         bool changed = false;
         
@@ -168,8 +172,7 @@ CMDRUNP( open )
         return;
     }
 
-    if ((peexit = ch->in_room->extra_exits.find(arg))
-            && ch->can_see( peexit ) )
+    if (peexit)
     {
         open_door_extra( ch, DIR_SOMEWHERE, (void *)peexit );
         return;
