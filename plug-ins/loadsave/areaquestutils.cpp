@@ -351,7 +351,11 @@ bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLString &tr
                     && aquest_can_participate(ch, q, qdata, /*ignoreCancelCooldown*/ true)
                     && aqprog_canstart(ch, q) == DLString::emptyString)
                 {
-                    gprog("onQuestCooldown", "CQ", ch, q);
+                    // Whole minutes left on the cooldown, rounded up so the player
+                    // never comes back a minute too early.
+                    int left = Date::SECOND_IN_HOUR - (dreamland->getCurrentTime() - qdata.timecancel);
+                    int minutes = (left + 59) / 60;
+                    gprog("onQuestCooldown", "CQi", ch, q, minutes);
                 }
 
                 continue;
