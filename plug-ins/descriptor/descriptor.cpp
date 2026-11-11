@@ -136,10 +136,15 @@ Descriptor::writeWebSock(unsigned char opcode, const unsigned char *txt, int len
         *(uint64_t*)(hdr+2) = htonll((uint64_t)length);
         hdrLen = 10;
     }
-    if(writeFd(hdr, hdrLen) < 0)
+    // One writeFd call per frame: the output queue takes or refuses a write
+    // whole, so a header can never reach the wire without its payload.
+    std::string frame((const char *)hdr, hdrLen);
+    frame.append((const char *)txt, length);
+
+    if (writeFd((const unsigned char *)frame.data( ), frame.size( )) < 0)
         return -1;
 
-    return writeFd(txt, length);
+    return length;
 }
 
 
@@ -250,9 +255,10 @@ Descriptor::sendSome(const unsigned char *txt, int length)
 
 // Every byte bound for the socket goes through here, so a partial send never
 // loses or reorders anything: whatever the kernel does not take is queued and
-// flushed first on the next pulse. Callers that write a unit in pieces (a
-// WebSocket header, then its payload) therefore stay contiguous on the wire.
-// Returns length (all accepted) or -1 when the descriptor should be dropped.
+// flushed first on the next pulse. A write is taken or refused whole: the cap
+// applies only when appending to an existing backlog, and then nothing of the
+// write is sent. Callers must hand over a protocol unit (a whole WebSocket
+// frame) in one call. Returns length, or -1 on a dead socket or overflow.
 int
 Descriptor::writeFd(const unsigned char *txt, int length)
 {
@@ -266,17 +272,16 @@ Descriptor::writeFd(const unsigned char *txt, int length)
         if (sent < 0)
             return -1;
     }
-
-    if (sent < length) {
-        if (pendingOut.size( ) + (length - sent) > PENDING_OUT_MAX) {
-            // Keep the queue as is: dropping its middle would corrupt the
-            // stream, and -1 gets the descriptor kicked, which clears it.
-            LogStream::sendWarning( ) << "Descriptor::writeFd(" << descriptor << "): output queue overflow, dropping" << endl;
-            return -1;
-        }
-
-        pendingOut.append((const char *)txt + sent, length - sent);
+    else if (pendingOut.size( ) + length > PENDING_OUT_MAX) {
+        // Refuse this write and keep the queue intact: dropping its middle
+        // would corrupt the stream. process_output kicks on -1; callers that
+        // ignore it just lose this one whole unit.
+        LogStream::sendWarning( ) << "Descriptor::writeFd(" << descriptor << "): output queue overflow, dropping" << endl;
+        return -1;
     }
+
+    if (sent < length)
+        pendingOut.append((const char *)txt + sent, length - sent);
 
     return length;
 }
@@ -301,20 +306,13 @@ Descriptor::processMccp( )
     int len = out_compress->next_out - out_compress_buf;
 
     if (len > 0) {
-        int written = writeSock(out_compress_buf, len);
+        // writeSock takes the whole buffer (the output queue keeps what the
+        // socket cannot send yet) or fails.
+        if (writeSock(out_compress_buf, len) < 0)
+            return -1;
 
-        if(written < 0)
-            return written;
-
-        if (!written)
-            return 0;
-
-        if (written < len)
-            memmove(out_compress_buf, out_compress_buf + written, len - written);
-
-        out_compress->next_out = out_compress_buf + len - written;
-        
-        return written;
+        out_compress->next_out = out_compress_buf;
+        return len;
     }
     return 0;
 }
@@ -352,13 +350,9 @@ Descriptor::writeMccp(const unsigned char *txt, int length)
             if (rc < 0)
                 return -1;
             else if (rc == 0)
-                // The socket accepted nothing, and nothing in this loop can
-                // change that: a full compress buffer leaves avail_out at 0,
-                // which skips deflate, which leaves avail_in where it is. A
-                // break only leaves the inner loop, so the outer one would spin
-                // on an unchanged state and take the whole game loop with it.
-                // Give up on the call instead; processMccp keeps the compressed
-                // residue buffered and the next pulse retries it.
+                // Deflate emitted nothing. Guard against spinning the game
+                // loop on an unchanged state should that ever coincide with
+                // pending input.
                 return length - out_compress->avail_in;
         } while(out_compress->avail_out == 0);
     }

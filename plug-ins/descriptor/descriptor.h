@@ -171,8 +171,6 @@ public:
     char *                outbuf;
     int                        outsize;
     int                        outtop;
-    /** Wire bytes the socket has not accepted yet, sent before anything newer. */
-    std::string         pendingOut;
     int                 oob_proto;
 
     unsigned char       compressing;
@@ -192,6 +190,9 @@ public:
     // When to send the telnet login greeting if the client has not said what
     // it is yet (0 = sent or not due). See NannyHandler::init.
     time_t              greeting_due;
+    // Wire bytes the socket has not accepted yet, sent before anything newer.
+    // Kept after the older members so adding it did not shift their offsets.
+    std::string         pendingOut;
     bool wsHandleNeg(unsigned char *buf, int rc);
     bool wsHandleFrame(unsigned char *buf, int rc);
     bool wsHandlePassThrough(unsigned char *buf, int rc);
