@@ -397,7 +397,7 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     servlet_response_200_json(response, body);
 }
 
-// A roster entry for the login UI: the character's name plus its level and class,
+// A roster entry for the login UI: the character's name plus its level, remort count and class,
 // read from the offline memory index (no pfile load -- allList is in RAM from
 // boot). Class ships as {en,ru,ua} so the language-switchable login panel can label
 // it in the player's chosen tongue. A listed name with no loadable memory (a
@@ -411,6 +411,7 @@ Json::Value account_roster_entry(const DLString &name)
     PCMemoryInterface *pci = PCharacterManager::find(name);
     if (pci != 0) {
         entry["level"] = pci->getLevel();
+        entry["remorts"] = (int)pci->getRemorts().size();
 
         // getRusName/getUaName are Flexer declension pads ("паладин||а|у|а|ом|і"),
         // not display strings -- resolve the nominative (ruscase '1' parses the pad
