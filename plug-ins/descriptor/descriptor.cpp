@@ -258,9 +258,11 @@ Descriptor::sendSome(const unsigned char *txt, int length)
 // flushed first on the next pulse. A write is taken or refused whole: the cap
 // applies only when appending to an existing backlog, and then nothing of the
 // write is sent. Callers must hand over a protocol unit (a whole WebSocket
-// frame) in one call. Returns length, or -1 on a dead socket or overflow.
+// frame) in one call. capped=false skips the cap for pieces of a unit the
+// caller already admitted (writeMccp's compressed chunks). Returns length, or
+// -1 on a dead socket or overflow.
 int
-Descriptor::writeFd(const unsigned char *txt, int length)
+Descriptor::writeFd(const unsigned char *txt, int length, bool capped)
 {
     if (length <= 0)
         return 0;
@@ -272,7 +274,7 @@ Descriptor::writeFd(const unsigned char *txt, int length)
         if (sent < 0)
             return -1;
     }
-    else if (pendingOut.size( ) + length > PENDING_OUT_MAX) {
+    else if (capped && pendingOut.size( ) + length > PENDING_OUT_MAX) {
         // Refuse this write and keep the queue intact: dropping its middle
         // would corrupt the stream. process_output kicks on -1; callers that
         // ignore it just lose this one whole unit.
@@ -306,9 +308,10 @@ Descriptor::processMccp( )
     int len = out_compress->next_out - out_compress_buf;
 
     if (len > 0) {
-        // writeSock takes the whole buffer (the output queue keeps what the
-        // socket cannot send yet) or fails.
-        if (writeSock(out_compress_buf, len) < 0)
+        // Uncapped: writeMccp already admitted the whole unit, and refusing a
+        // chunk of it would cut the decompressed stream mid-unit. The output
+        // queue keeps what the socket cannot send yet.
+        if (writeFd(out_compress_buf, len, false) < 0)
             return -1;
 
         out_compress->next_out = out_compress_buf;
@@ -322,6 +325,10 @@ Descriptor::writeMccp(const unsigned char *txt, int length)
 {
     if(!out_compress)
         return writeSock(txt, length);
+
+    // Admit or refuse the unit whole, before deflate consumes any of it.
+    if (!pendingOut.empty( ) && pendingOut.size( ) + length > PENDING_OUT_MAX)
+        return -1;
 
     out_compress->next_in = (unsigned char *)txt;
     out_compress->avail_in = length;

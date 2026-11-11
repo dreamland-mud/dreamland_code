@@ -117,7 +117,7 @@ public:
     void slay( );
     void associate( Character * );
 
-    int writeFd(const unsigned char *buf, int len);
+    int writeFd(const unsigned char *buf, int len, bool capped = true);
     int writeFd(const char *buf);
     /** Push queued wire bytes to the socket: -1 on a dead socket, else bytes still queued. */
     int flushPending( );
@@ -191,7 +191,7 @@ public:
     // it is yet (0 = sent or not due). See NannyHandler::init.
     time_t              greeting_due;
     // Wire bytes the socket has not accepted yet, sent before anything newer.
-    // Kept after the older members so adding it did not shift their offsets.
+    // Append new members at the end: older offsets stay put.
     std::string         pendingOut;
     bool wsHandleNeg(unsigned char *buf, int rc);
     bool wsHandleFrame(unsigned char *buf, int rc);

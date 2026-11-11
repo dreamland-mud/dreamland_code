@@ -78,9 +78,10 @@ bool process_output( Descriptor *d, bool fPrompt )
         return true;
 
     // writeRaw returns -1 once the socket is gone, the compression stream
-    // has failed or the output queue overflowed; a dead descriptor must reach kick() instead of being written
-    // to every pulse. Anything the socket cannot take right now is kept in the
-    // descriptor's output queue (writeFd), so outbuf is always fully consumed.
+    // has failed or the output queue overflowed: a dead descriptor must reach
+    // kick() instead of being written to every pulse. Anything the socket
+    // cannot take right now is kept in the descriptor's output queue
+    // (writeFd), so outbuf is always fully consumed.
     if (d->writeRaw((const unsigned char*)d->outbuf, d->outtop) < 0)
         return false;
 
