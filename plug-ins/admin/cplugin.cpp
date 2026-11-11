@@ -41,6 +41,22 @@ public:
     }
 };
             
+/**
+ * Warns everyone in the game that a plugin reload is about to freeze the world.
+ * Called when the request is queued: the command/servlet runs inside the
+ * scheduler tick before SCDP_IOWRITE, while the reload itself runs after the
+ * tick, so the message is flushed before the lag starts.
+ */
+void plugin_reload_warning( )
+{
+    for (Descriptor *d = descriptor_list; d; d = d->next)
+        if (d->connected == CON_PLAYING && d->character)
+            d->character->pecho(
+                "{lE{YThe world freezes: the gods are reshaping reality. Expect some lag.{lR"
+                "{YМир замирает: боги перекраивают реальность. Возможна задержка.{lU"
+                "{YСвіт завмирає: боги перекроюють реальність. Можлива затримка.{lx{x");
+}
+
 void CPlugin::initialization( )
 {
     if (descriptor_list)
@@ -70,11 +86,13 @@ COMMAND(CPlugin, "plugin")
     else if(arg_is(arg, "load")) {
         PluginManager *manager = PluginManager::getThis( );
         manager->setReloadOneRequest(arguments, 1);
+        plugin_reload_warning( );
         ch->pecho( "Requesting load for plugin [%s].", arg.c_str( ) );
 
     } else if(arg_is(arg, "unload")) {
         PluginManager *manager = PluginManager::getThis( );
         manager->setReloadOneRequest(arguments, 2);
+        plugin_reload_warning( );
         ch->pecho( "Requesting unload for plugin [%s].", arg.c_str( ) );
 
     } else
@@ -118,18 +136,22 @@ void CPlugin::doReload( Character *ch, DLString arg )
         usage( ch );
     else if (arg_is_all(arg)) {
         manager->setReloadAllRequest( );
+        plugin_reload_warning( );
         ch->pecho("Requesting plugins reload.");
 
     } else if (arg_is_strict(arg, "most")) {
         manager->setReloadNonCriticalRequest( );
+        plugin_reload_warning( );
         ch->pecho("Requesting reload of all plugins except for [descriptor].");
 
     } else if (arg_is_strict(arg, "changed")) {
         manager->setReloadChangedRequest( );
+        plugin_reload_warning( );
         ch->pecho("Requesting changed plugins reload.");
 
     } else if (manager->isAvailable( arg )) {
         manager->setReloadOneRequest( arg );
+        plugin_reload_warning( );
         ch->pecho( "Requesting reload for plugin [%s].", arg.c_str( ) );
 
     } else

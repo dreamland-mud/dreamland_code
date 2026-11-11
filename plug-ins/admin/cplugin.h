@@ -30,4 +30,7 @@ private:
 };
 
 
+/** Global echo: a plugin reload is queued and the world is about to lag. */
+void plugin_reload_warning( );
+
 #endif
