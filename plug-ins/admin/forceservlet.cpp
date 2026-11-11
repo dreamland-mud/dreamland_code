@@ -8,7 +8,7 @@
 #include "interp.h"
 #include "pluginmanager.h"
 #include "arg_utils.h"
-#include "cplugin.h"
+#include "reloadwarning.h"
 #include <jsoncpp/json/json.h>
 
 static IconvMap koi2utf("koi8-u", "utf-8");
