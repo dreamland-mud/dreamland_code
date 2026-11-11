@@ -786,10 +786,10 @@ static bool berserker_weapons_ok( Character *ch )
 }
 
 /*
- * Below half health some fighters hit harder: the samurai with fudoshin
- * and the berserker in a blood frenzy, the same band up to +20% for both.
- * The frenzy also adds blood_frenzy.dam_pct percent at any health
- * (fight/subclasses.json). Shame (hazukure) switches fudoshin off; the
+ * Wounded fighters hit harder: the samurai with fudoshin below half health,
+ * the berserker in a blood frenzy below full health (blood_frenzy.band_from
+ * and band_cap, fight/subclasses.json). The frenzy also adds
+ * blood_frenzy.dam_pct percent at any health. Shame (hazukure) switches fudoshin off; the
  * frenzy counts only while the frenzy marker and berserk are both on and
  * the berserker weapons are in hand.
  */
@@ -801,7 +801,7 @@ void UndefinedOneHit::damApplyLowHp( )
     int pct = ch->hit * 100 / ch->max_hit;
 
     if (pct < 50 && gsn_fudoshin->usable( ch, false ) && !ch->isAffected( gsn_hazukure ))
-        damApplyLowHpBand( &*gsn_fudoshin, pct, 20 );
+        damApplyLowHpBand( &*gsn_fudoshin, pct, 50, 20 );
 
     // The frenzy marker counts only while the rage itself is on: fear or
     // calm can end berserk before the marker runs out.
@@ -810,24 +810,30 @@ void UndefinedOneHit::damApplyLowHp( )
             || !berserker_weapons_ok( ch ))
         return;
 
-    int flat = subclass_rules( "berserker" )["blood_frenzy"]["dam_pct"].asInt( );
+    const Json::Value &frenzy = subclass_rules( "berserker" )["blood_frenzy"];
+    int flat = frenzy["dam_pct"].asInt( );
     if (flat > 0)
         dam += (int)( (long long)dam * flat * gsn_blood_frenzy->getEffective( ch ) / 10000 );
 
-    if (pct < 50)
-        damApplyLowHpBand( &*gsn_blood_frenzy, pct, 20 );
+    int from = frenzy["band_from"].asInt( );
+    if (pct < from)
+        damApplyLowHpBand( &*gsn_blood_frenzy, pct, from, frenzy["band_cap"].asInt( ) );
     else
         gsn_blood_frenzy->improve( ch, true, victim );
 }
 
 /*
- * The low health band: nothing at 50% hp, growing linearly to +cap percent at
- * 10% hp and flat below, scaled by how well the skill is learned.
+ * The low health band: nothing at from% hp, growing linearly to +cap percent
+ * at 10% hp and flat below, scaled by how well the skill is learned.
  */
-void UndefinedOneHit::damApplyLowHpBand( Skill *skill, int pct, int cap )
+void UndefinedOneHit::damApplyLowHpBand( Skill *skill, int pct, int from, int cap )
 {
-    long long band = 50 - max( pct, 10 ); // 0..40
-    dam += (int)( (long long)dam * band * skill->getEffective( ch ) * cap / 400000 );
+    long long span = from - 10;
+    if (span <= 0 || cap <= 0)
+        return;
+
+    long long band = from - max( pct, 10 ); // 0..span
+    dam += (int)( (long long)dam * band * skill->getEffective( ch ) * cap / ( span * 10000 ) );
     skill->improve( ch, true, victim );
 }
 

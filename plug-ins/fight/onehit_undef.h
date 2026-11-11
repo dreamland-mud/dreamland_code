@@ -47,7 +47,7 @@ protected:
     void damApplyMasterSword( );
     void damApplyMasterStaff( );
     void damApplyLowHp( );
-    void damApplyLowHpBand( Skill *, int, int );
+    void damApplyLowHpBand( Skill *, int, int, int );
     void damApplyDeathblow( );
     void damApplySoulLust( );
     void damApplyMounted( );
