@@ -6,6 +6,7 @@
 #include <string.h>
 #include <jsoncpp/json/json.h>
 
+#include "player_utils.h"
 #include "defaultspell.h"
 #include "configurable.h"
 #include "skillreference.h"
@@ -1091,7 +1092,14 @@ void DefaultSpell::baneAround( Character *ch, int failChance, int dam ) const
     if (ch->is_npc( ) && !IS_CHARMED(ch))
         return;
 
+    // A newbie's buff near a battlerager is no challenge to him: only a newbie
+    // already in a fight with him gets the aura's answer.
+    bool newbie = !ch->is_npc( ) && Player::isNewbie( ch->getPC( ) );
+
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {
+        if (newbie && ch->fighting != rch && rch->fighting != ch)
+            continue;
+
         baneAction( ch, rch, failChance, dam );
     }
 }
