@@ -18,7 +18,6 @@
 
 #include "def.h"
 #include "l10n.h"
-#include "fenia_utils.h"
 
 RELIG(karmina);
 GSN(hunger);
@@ -128,17 +127,6 @@ bool DrunkDesire::applicable( PCharacter *ch )
 bool DrunkDesire::isActive( PCharacter *ch )
 {
     return applicable( ch ) && ch->desires[getIndex( )] > activeLimit;
-}
-
-bool DrunkDesire::canDrink( PCharacter *ch )
-{
-    if (isActive( ch )) {
-        ch->pecho( _("Ты проносишь мимо рта... *ИК*") );
-        achievement( ch, "missed_the_mouth" );
-        return false;
-    }
-
-    return true;
 }
 
 /*

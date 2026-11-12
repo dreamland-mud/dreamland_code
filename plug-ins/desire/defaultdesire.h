@@ -43,7 +43,6 @@ public:
     virtual bool isActive( PCharacter * );
 
     virtual bool canEat( PCharacter * );
-    virtual bool canDrink( PCharacter * );
     virtual bool isFull( PCharacter * ) const;
 
 

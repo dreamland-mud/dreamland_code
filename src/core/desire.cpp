@@ -65,10 +65,6 @@ bool Desire::canEat( PCharacter * )
 {
     return true;
 }
-bool Desire::canDrink( PCharacter * )
-{
-    return true;
-}
 
 bool Desire::isFull( PCharacter * ) const
 {

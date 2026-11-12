@@ -45,11 +45,6 @@ void DefaultDesire::unloaded( )
 /*-------------------------------------------------------------------
  * actions
  *------------------------------------------------------------------*/
-bool DefaultDesire::canDrink( PCharacter *ch )
-{
-    return true;
-}
-
 bool DefaultDesire::isFull( PCharacter *ch ) const
 {
     return ch->desires[getIndex( )] >= maxValue;
