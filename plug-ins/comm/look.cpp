@@ -278,7 +278,10 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     
     if (fShort)
     {
-        buf << "{" << CLR_OBJ(ch) << wearloc->displayName(ch, obj, lang) << "{x";
+        DLString name = wearloc->displayName(ch, obj, lang);
+        if (uses_screenreader(ch))
+            name = screenreader_clean_name(name);
+        buf << "{" << CLR_OBJ(ch) << name << "{x";
 
         if (obj->pIndexData->vnum > 5)        /* money, gold, etc */
             if (obj->condition <= 99 )

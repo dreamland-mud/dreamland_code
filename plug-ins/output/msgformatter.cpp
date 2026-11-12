@@ -11,6 +11,7 @@
 #include "skill.h"
 #include "merc.h"
 
+#include "screenreader.h"
 #include "def.h"
 
 MsgFormatter::MsgFormatter(Character *to)
@@ -303,6 +304,8 @@ again:
             case 'O':
                 nounFlags = (alternative ? 0 : FMT_INVIS);
                 noun = argNoun(nounFlags)->decline(*f);
+                if (uses_screenreader(to))
+                    noun = screenreader_clean_name(noun);
                 // Fence the object noun in push/pop colour so its own colour
                 // codes (a tier tint, an unclosed {R...) cannot bleed into the
                 // rest of the sentence. {1 remembers the colour active here, {2
