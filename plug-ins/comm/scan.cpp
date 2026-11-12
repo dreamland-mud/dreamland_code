@@ -156,12 +156,19 @@ CMDRUNP(scan)
     if (arg1[0] == '\0')
     {
         oldact(_("$c1 осматривает все вокруг."), ch, 0, 0, TO_ROOM);
-        buf << lmsg(viewerLang(ch), "Looking around, you see:", "Осмотревшись, ты видишь:", "Роздивившись, ти бачиш:") << endl;
         scan_people(ch->in_room, ch, 0, -1, true, buf);
 
         for (door = 0; door < DIR_SOMEWHERE; door++)
             scan_room(ch->in_room, ch, 1, door, true, buf);
 
+        if (buf.str().empty()) {
+            ch->pecho(lmsg(viewerLang(ch), "Looking around, you see nothing of note.",
+                           "Осмотревшись, ты не видишь ничего особенного.",
+                           "Роздивившись, ти не бачиш нічого особливого."));
+            return;
+        }
+
+        ch->pecho(lmsg(viewerLang(ch), "Looking around, you see:", "Осмотревшись, ты видишь:", "Роздивившись, ти бачиш:"));
         ch->send_to(buf);
         return;
     }
