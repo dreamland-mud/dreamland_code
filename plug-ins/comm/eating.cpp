@@ -33,6 +33,7 @@
 #include "def.h"
 #include "l10n.h"
 #include "fenia_utils.h"
+#include "../loadsave/behavior_utils.h"
 
 GSN(none);
 GSN(manacles);
@@ -50,6 +51,9 @@ PROF(druid);
 
 static bool oprog_eat( Object *obj, Character *ch )
 {
+    if (behavior_trigger(obj, "Eat", "OC", obj, ch))
+        return true;
+
     FENIA_CALL( obj, "Eat", "C", ch );
     FENIA_NDX_CALL( obj, "Eat", "OC", obj, ch );
     return false;
