@@ -118,8 +118,7 @@ protected:
     int modifier(const Json::Value &affix, int count) const;
 
     /** One item model (fight_core/itemmodel.h): the affix's base points at the
-     *  item level, false for a section the model does not price (those keep their
-     *  price_melee / price_caster). */
+     *  item level, false for a section the model does not price (those cost 0). */
     bool modelPoints(const DLString &secName, const Json::Value &affix, double &points) const;
     /** Points -> centi-M at the item level for the roller's profile and slot. */
     int modelPrice(double points) const;

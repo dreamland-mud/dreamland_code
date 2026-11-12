@@ -36,7 +36,7 @@ struct WeaponGenerator {
     WeaponGenerator & randomTier(int bestTier, int legendaryPerMille = 0);
     WeaponGenerator & addRequirement(const DLString &req) { this->required.insert(req); return *this; }
     WeaponGenerator & addForbidden(const DLString &fbd) { this->forbidden.insert(fbd); return *this; }
-    /** Price affixes for a caster killer (item_affixes.json price_caster). */
+    /** Price affixes on the item model's caster profile. */
     WeaponGenerator & caster(bool caster) { this->isCaster = caster; return *this; }
     /** A crafted weapon: the affix window in centi-M as given, no level curve. */
     WeaponGenerator & craftWindow(int minCm, int maxCm) { this->craftMin = minCm; this->craftMax = maxCm; return *this; }

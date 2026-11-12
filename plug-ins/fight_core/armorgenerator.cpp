@@ -431,7 +431,7 @@ int ItemAffixRoller::candidatePrice(const DLString &secName, const Json::Value &
     if (modelPoints(secName, affix, points))
         return modelPrice(points);
 
-    return (isCaster ? affix["price_caster"] : affix["price_melee"]).asInt();
+    return 0;
 }
 
 static double table_points(const DLString &table, const DLString &bitNames, bool caster, int level)
