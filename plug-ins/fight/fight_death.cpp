@@ -1113,19 +1113,27 @@ static void wanted_poster_paid( Character *ch, Character *victim )
         achievement( poster, "wanted" );
 }
 
-// Killing a wanted players increases your loyalty.
+// Killing a wanted player or a thief increases your loyalty.
+// The thief flag is cleared on payout, so one theft pays out once.
 static void loyalty_gain( Character *ch, Character *victim )
 {
     if (!ch)
         return;
 
-    if (!IS_SET(victim->act, PLR_WANTED))
+    bool wanted = IS_SET(victim->act, PLR_WANTED);
+    bool thief = IS_THIEF(victim);
+
+    if (!wanted && !thief)
         return;
     
-    if (!ch->is_npc( ))
-        ch->getPC( )->setLoyalty(min ( ch->getPC( )->getLoyalty()+25, 1000 ));
+    if (!ch->is_npc( ) && ch != victim) {
+        ch->getPC( )->setLoyalty(min ( ch->getPC( )->getLoyalty()+100, 1000 ));
+
+        if (thief)
+            REMOVE_THIEF( victim );
+    }
     
-    if (victim->getPC( )->getLoyalty() > -900)
+    if (wanted && victim->getPC( )->getLoyalty() > -900)
         REMOVE_BIT(victim->act, PLR_WANTED);
 }
 
