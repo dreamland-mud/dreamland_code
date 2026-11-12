@@ -32,6 +32,9 @@ AreaQuest *get_area_quest(const Integer& questId);
 AreaQuest *get_area_quest(int questId);
 
 bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuestData &qdata, bool ignoreCancelCooldown = false);
+// When a once-a-day quest finished less than a day ago may start again, or 0
+// when the daily limit does not hold it now.
+long aquest_daily_open_at(AreaQuest *q, const AreaQuestData &qdata);
 bool aquest_can_participate_ever(PCMemoryInterface *pci, AreaQuest *q);
 // Online players only: the quest's onCanEverStart says it is out of reach this life.
 bool aquest_closed_this_life(PCMemoryInterface *pci, AreaQuest *q);
