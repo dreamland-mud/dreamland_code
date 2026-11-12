@@ -2,6 +2,8 @@
 #include "descriptor.h"
 #include "pcharacter.h"
 #include "merc.h"
+#include "dl_ctype.h"
+#include "dlstring.h"
 #include "def.h"
 
 bool uses_screenreader(Descriptor *d)
@@ -21,4 +23,100 @@ bool uses_screenreader(Character *ch)
         return true;
 
     return false;
+}
+
+// Punctuation that may stay at the edge of a word: "(glowing)", "sword,".
+static bool is_edge_punct(char c)
+{
+    return c == '(' || c == ')' || c == '"' || c == '\'' || c == '.'
+        || c == ',' || c == '!' || c == '?' || c == ':';
+}
+
+// Punctuation that may stay inside a word: "fire-proof", "it's".
+static bool is_inner_punct(char c)
+{
+    return c == '-' || c == '\'' || c == '.';
+}
+
+// One space-separated word. Colour codes ({X, two bytes) always survive,
+// symbols are trimmed from the edges and dropped from the middle. A word
+// without letters or digits leaves only its colour codes behind.
+static DLString clean_word(const DLString &word, bool &hasText)
+{
+    int first = -1, last = -1;
+    for (size_t i = 0; i < word.size(); i++) {
+        if (word[i] == '{') {
+            i++;
+            continue;
+        }
+        if (dl_isalnum(word[i])) {
+            if (first < 0)
+                first = i;
+            last = i;
+        }
+    }
+
+    hasText = first >= 0;
+
+    DLString out;
+    for (size_t i = 0; i < word.size(); i++) {
+        char c = word[i];
+        if (c == '{') {
+            out += c;
+            if (i + 1 < word.size())
+                out += word[++i];
+            continue;
+        }
+        if (!hasText)
+            continue;
+        if (dl_isalnum(c))
+            out += c;
+        else if ((int)i < first || (int)i > last) {
+            if (is_edge_punct(c))
+                out += c;
+        }
+        else if (is_inner_punct(c))
+            out += c;
+    }
+    return out;
+}
+
+DLString screenreader_clean_name(const DLString &name)
+{
+    DLString result, pending, word;
+    bool anyText = false;
+
+    for (size_t i = 0; i <= name.size(); i++) {
+        if (i < name.size() && !dl_isspace(name[i])) {
+            word += name[i];
+            if (name[i] == '{' && i + 1 < name.size())
+                word += name[++i];
+            continue;
+        }
+
+        if (word.empty())
+            continue;
+
+        bool hasText;
+        DLString cleaned = clean_word(word, hasText);
+        word.clear();
+
+        if (!hasText) {
+            pending += cleaned;
+            continue;
+        }
+
+        if (anyText)
+            result += ' ';
+        result += pending;
+        result += cleaned;
+        pending.clear();
+        anyText = true;
+    }
+
+    if (!anyText)
+        return name;
+
+    result += pending;
+    return result;
 }
