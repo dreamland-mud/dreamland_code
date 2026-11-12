@@ -32,15 +32,17 @@ static bool is_edge_punct(char c)
         || c == ',' || c == '!' || c == '?' || c == ':';
 }
 
-// Punctuation that may stay inside a word: "fire-proof", "it's".
+// Punctuation that may stay inside a word: "fire-proof", "it's", "Blizzard(TM)".
 static bool is_inner_punct(char c)
 {
-    return c == '-' || c == '\'' || c == '.';
+    return c == '-' || c == '\'' || c == '.' || c == '(' || c == ')';
 }
 
 // One space-separated word. Colour codes ({X, two bytes) always survive,
 // symbols are trimmed from the edges and dropped from the middle. A word
 // without letters or digits leaves only its colour codes behind.
+// Three-byte tags ({IS, {lr, {Sf) keep their third char as plain text: it is
+// alnum, so it is never dropped and the tag stays intact.
 static DLString clean_word(const DLString &word, bool &hasText)
 {
     int first = -1, last = -1;
