@@ -83,6 +83,13 @@ void LanguageCommand::run( Character *ach, const DLString &constArguments )
         return;
     }
 
+    // keep_hide also exempts a command from the engine stun gate (Command::dispatch),
+    // so put it back here for everything but reading the word list.
+    if (IS_AFFECTED(ch, AFF_STUN) && !arg_is_list( arg )) {
+        ch->pecho( _("Ты не в состоянии сделать это.") );
+        return;
+    }
+
     if (arg.empty( )) {
         ch->pecho( _("Что ты хочешь произнести на %^N6?"), language->getNamePad( Player::lang(ch) ).c_str( ) );
         return;
@@ -281,6 +288,10 @@ void LanguageCommand::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) 
     
     if (!language->usable( ch, true ))
         return;
+
+    // The command keeps hide (list/sense/remember/forget are silent), but a word
+    // spoken aloud, even a garbled one, gives the speaker away.
+    strip_hide_and_fade( ch );
 
     if (!rage_magic_allowed( ch, RAGE_LANGUAGE )) {
         rage_magic_refuse( ch );
@@ -672,7 +683,9 @@ void LanguageCommand::doRemember( PCharacter *ch, const DLString &arg ) const
     
     Word word;
     if (!language->locateWord( word, ch, arg )) {
-        ch->pecho(_("Это слово не существует."));
+        // Dreamed words are per-player: a word heard from someone else's
+        // dream is real, it just isn't ours to recall.
+        ch->pecho(_("Ты не можешь вспомнить такого слова: возможно, оно приснилось кому-то другому."));
         return;
     }
 
