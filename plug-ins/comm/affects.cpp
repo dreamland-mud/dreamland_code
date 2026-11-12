@@ -147,8 +147,8 @@ void AffectOutput::format_affect( Affect *paf )
         lines.push_back( l );
 }
 
-/** Saves read as the change in the chance to resist a spell of one's own level,
- *  never as a raw number (Kit 2026-11-06): the same -5 is a lot at level 20 and
+/** Saves read first as the change in the chance to resist a spell of one's own level,
+ *  with the raw number only in brackets (Kit 2026-11-06): the same -5 is a lot at level 20 and
  *  next to nothing on top of 150 saves. The affect is already counted in the
  *  subject's saving_throw, so the change is with it vs without it. */
 static DLString save_apply_line( Affect *paf, Character *subject, lang_t lang )
@@ -157,10 +157,12 @@ static DLString save_apply_line( Affect *paf, Character *subject, lang_t lang )
     int st = subject->saving_throw;
     DLString num = saves_permille_text( saves_own_level_permille( lvl, st ) - saves_own_level_permille( lvl, st - paf->modifier ) );
     bool better = paf->modifier < 0;
+    // The raw modifier rides in brackets after the percent, for players who sum their gear by hand.
+    DLString raw = fmt( 0, " [%1$d]", paf->modifier );
 
     if (better)
-        return fmt( 0, _("улучшает {mшанс устоять перед заклинаниями{y на {m%1$s%%{y").getMessage( lang ).c_str( ), num.c_str( ) );
-    return fmt( 0, _("ухудшает {mшанс устоять перед заклинаниями{y на {m%1$s%%{y").getMessage( lang ).c_str( ), num.c_str( ) );
+        return fmt( 0, _("улучшает {mшанс устоять перед заклинаниями{y на {m%1$s%%{y").getMessage( lang ).c_str( ), num.c_str( ) ) + raw;
+    return fmt( 0, _("ухудшает {mшанс устоять перед заклинаниями{y на {m%1$s%%{y").getMessage( lang ).c_str( ), num.c_str( ) ) + raw;
 }
 
 DLString AffectOutput::format_affect_location( Affect *paf )

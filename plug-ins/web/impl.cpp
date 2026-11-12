@@ -862,7 +862,11 @@ Json::Value ParamsWebPromptListener::jsonParam2( Descriptor *d, Character *ch )
         p2["s"] = DLString(ch->saving_throw);
     // Position and flying status.
     p2["pos"] = position_table.name(ch->position);
-    p2["posf"] = position_flags.names(ch->posFlags);
+    // Away-from-keyboard rides along as a position flag, so prompt scripts can tell it apart.
+    DLString posf = position_flags.names(ch->posFlags);
+    if (!ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "afk" ))
+        posf = posf.empty( ) ? DLString("afk") : posf + " afk";
+    p2["posf"] = posf;
     return p2;
 }
 
