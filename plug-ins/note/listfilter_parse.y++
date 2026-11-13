@@ -78,7 +78,7 @@ str_expr:
     |	T_FROM			    { $$ = lfParam.from;	}
     |	T_TO			    { $$ = lfParam.note->getRecipient( );}
     |	T_SUBJ			    { $$ = lfParam.note->getSubject( );	}
-    |	T_TEXT			    { $$ = lfParam.note->getText( );	}
+    |	T_TEXT			    { $$ = lfParam.text;	}
     ;
 
 %%

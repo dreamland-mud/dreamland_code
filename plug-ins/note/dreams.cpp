@@ -150,9 +150,16 @@ void XMLAttributeDream::run( PCharacter *ch )
         // the whole archive once and then stops, as dreams always did.
         const Note *note = dreamThread->getNextUnreadNote( ch );
 
-        if (note)
+        if (note) {
+            // A caught-up sleeper's cursor sits right before this dream: step
+            // it over so tomorrow's rerun is not the same dream again. Never
+            // jump it further, or a new character loses the archive reruns.
+            if (dreamThread->findNextNote( ch, lastDreamID ) == note)
+                lastDreamID = note->getID( );
+
             ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" )
                 ->updateStamp( dreamThread, note );
+        }
         else {
             note = dreamThread->findNextNote( ch, lastDreamID );
 

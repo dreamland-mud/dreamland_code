@@ -426,7 +426,7 @@ void NoteCommand::doList( PCharacter *ch, DLString &argument ) const
             bool hidden = thread->isNoteHidden( *i, ch, stamp );
             DLString from = thread->getNoteFrom( *i, ch );
 
-            if (listfilter_parse( ch, cnt, last, *i, from, hidden, argument.c_str( ) )) {
+            if (listfilter_parse( ch, cnt, last, *i, from, thread->getNoteText( *i, ch ), hidden, argument.c_str( ) )) {
                 buf << "[" << cnt 
                     << (hidden ? " " : "N") << "] " 
                     << from << ": " << (*i)->getSubject( ) << "{x";

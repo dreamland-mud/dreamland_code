@@ -70,7 +70,8 @@ L	    ([A-Za-z]|{RL})
 
 
 bool listfilter_parse( PCharacter *ch, int cnt, int last, const Note *note,
-		       const DLString &from, bool hidden, const char *args )
+		       const DLString &from, const DLString &text,
+		       bool hidden, const char *args )
 {
     YY_BUFFER_STATE yybuf;
     
@@ -81,6 +82,7 @@ bool listfilter_parse( PCharacter *ch, int cnt, int last, const Note *note,
     lfParam.last = last;
     lfParam.note = note;
     lfParam.from = from;
+    lfParam.text = text;
     lfParam.hidden = hidden;
 
     if (listfilter_yyparse( ) != 0) {
