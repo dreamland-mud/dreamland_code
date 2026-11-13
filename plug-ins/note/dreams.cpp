@@ -36,10 +36,14 @@ DreamThread::~DreamThread( )
 void DreamThread::getUnreadMessage( PCharacter *ch, int count, ostringstream &buf ) const
 {
     // Example: Смертным приснили {W10{x новых снов ('{yсон{x').
-    if (ch->is_immortal( ))
-        buf << fmt( ch, _("Смертным приснили {W%1$d{x нов%1$Iый|ых|ых с%1$Iон|на|нов ('{yсон{x')."), count ) << endl;
-    else
-        buf << fmt( ch, _("Тебя ожида%1$Iет|ют|ют {W%1$d{x непросмотренн%1$Iый|ых|ых с%1$Iон|на|нов ('{hc{yсон{x')."), count ) << endl;
+    buf << fmt( ch, _("Смертным приснили {W%1$d{x нов%1$Iый|ых|ых с%1$Iон|на|нов ('{yсон{x')."), count ) << endl;
+}
+
+/* Mortals meet new dreams only in their sleep or in 'dream list': no login
+ * count, no crystal-orb ping, no 'unread next'. Gods are told as before. */
+bool DreamThread::announcesUnread( PCharacter *ch ) const
+{
+    return ch->is_immortal( );
 }
 
 /* Catalog file-key for the text of every dream. The dreams live in the note

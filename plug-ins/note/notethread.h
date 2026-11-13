@@ -143,6 +143,10 @@ public:
     virtual DLString getNoteFrom( const Note *, PCharacter * ) const;
     virtual DLString getNoteText( const Note *, PCharacter * ) const;
 
+    /** Whether unread notes of this thread are announced to this reader:
+     *  login count, crystal-orb ping, 'unread next'. */
+    virtual bool announcesUnread( PCharacter * ) const { return true; }
+
     int countSpool( PCharacter * ) const;
     virtual bool hasFlooredBacklog( PCharacter * ) const;
     const Note * getNextUnreadNote( PCharacter * ) const;

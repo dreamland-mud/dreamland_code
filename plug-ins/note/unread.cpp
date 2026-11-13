@@ -47,7 +47,7 @@ void Unread::doSpool( PCharacter *ch, bool fVerbose )
     const NoteManager::Threads &th = NoteManager::getThis( )->getThreads( );
 
     for (i = th.begin( ); i != th.end( ); i++) {
-        int count = i->second->countSpool( ch );
+        int count = i->second->announcesUnread( ch ) ? i->second->countSpool( ch ) : 0;
 
         if (count > 0)
             i->second->getUnreadMessage( ch, count, buf );
@@ -90,6 +90,9 @@ void Unread::doNext( PCharacter *ch )
     time_t minStamp = 2000000000, stamp;
 
     for (i = th.begin( ); i != th.end( ); i++) {
+        if (!i->second->announcesUnread( ch ))
+            continue;
+
         const Note *note = i->second->getNextUnreadNote( ch );
 
         if (note) {

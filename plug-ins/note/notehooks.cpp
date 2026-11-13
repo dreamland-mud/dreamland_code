@@ -157,7 +157,7 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
         if (victim->getName() == note.getAuthor())
             continue;
         
-        if (!thread.canRead( victim ))
+        if (!thread.canRead( victim ) || !thread.announcesUnread( victim ))
             continue;
 
         if (!note.isNoteTo( victim ))
@@ -171,7 +171,7 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
         // readers read a run of spaces out loud.
         for (i = threads.begin( ); i != threads.end( ); i++) {
             const NoteThread &th = **i->second;
-            int count = th.countSpool( victim );
+            int count = th.announcesUnread( victim ) ? th.countSpool( victim ) : 0;
 
             if (count <= 0)
                 continue;
