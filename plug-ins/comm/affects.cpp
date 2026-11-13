@@ -158,7 +158,7 @@ static DLString save_apply_line( Affect *paf, Character *subject, lang_t lang )
     DLString num = saves_permille_text( saves_own_level_permille( lvl, st ) - saves_own_level_permille( lvl, st - paf->modifier ) );
     bool better = paf->modifier < 0;
     // The raw modifier rides in brackets after the percent, for players who sum their gear by hand.
-    DLString raw = fmt( 0, " [%1$d]", paf->modifier );
+    DLString raw = fmt( 0, " {D[%1$d]{y", paf->modifier );
 
     if (better)
         return fmt( 0, _("улучшает {mшанс устоять перед заклинаниями{y на {m%1$s%%{y").getMessage( lang ).c_str( ), num.c_str( ) ) + raw;
