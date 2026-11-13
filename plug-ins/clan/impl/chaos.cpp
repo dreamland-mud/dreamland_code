@@ -93,8 +93,29 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
 
 
 SPELL_DECL(Doppelganger);
-VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
+/*
+ * Is ch anywhere on victim's guise chain, not just at its end? Copying someone
+ * who already (indirectly) wears ch's face would close a loop, and
+ * Character::getDoppel recurses down the chain with no cycle guard.
+ */
+static bool doppel_chain_has( Character *victim, Character *ch )
+{
+    Character *c = victim;
+
+    for (int depth = 0; c && depth < 16; depth++) {
+        if (c == ch)
+            return true;
+        if (!c->doppel || !c->isAffected( gsn_doppelganger ))
+            return false;
+        c = c->doppel;
+    }
+
+    // A chain this long is broken already: refuse rather than extend it.
+    return c != 0;
+}
+
+VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int level )
+{
   Affect af;
 
   if (ch->is_npc() || victim->is_npc())
@@ -109,7 +130,7 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
       return;
     }
 
-  if (victim->is_immortal() || victim->getDoppel( ) == ch)
+  if (victim->is_immortal() || doppel_chain_has( victim, ch ))
     {
       ch->pecho(_("Ну..Ну..."));
       return;
