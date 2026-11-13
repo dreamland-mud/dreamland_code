@@ -22,6 +22,7 @@ struct ListFilterParam {
     PCharacter *ch;
     int cnt, last;
     const Note *note;
+    DLString from;
     bool hidden, result;
 };
 extern ListFilterParam lfParam;
@@ -29,5 +30,5 @@ extern ListFilterParam lfParam;
 int listfilter_yyparse( );
 
 bool listfilter_parse( PCharacter *ch, int cnt, int last, const Note *note,
-                       bool hidden, const char *args );
+                       const DLString &from, bool hidden, const char *args );
 #endif

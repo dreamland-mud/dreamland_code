@@ -241,6 +241,16 @@ bool NoteThread::hasFlooredBacklog( PCharacter *ch ) const
     return false;
 }
 
+DLString NoteThread::getNoteFrom( const Note *note, PCharacter * ) const
+{
+    return note->getFrom( );
+}
+
+DLString NoteThread::getNoteText( const Note *note, PCharacter * ) const
+{
+    return note->getText( );
+}
+
 int NoteThread::countSpool( PCharacter *ch ) const
 {
     NoteList::const_iterator i;
@@ -324,7 +334,7 @@ void NoteThread::showNoteToChar( PCharacter *ch, const Note *note ) const
 {
     ostringstream buf;
 
-    note->toStream( getNoteNumber( ch, note ), buf );
+    note->toStream( getNoteNumber( ch, note ), buf, getNoteFrom( note, ch ), getNoteText( note, ch ) );
     page_to_char( buf.str( ).c_str( ), ch );
     ch->getAttributes( ).getAttr<XMLAttributeLastRead>( 
                         "lastread" )->updateStamp( this, note );

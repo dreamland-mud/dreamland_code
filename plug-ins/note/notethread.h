@@ -137,8 +137,14 @@ public:
      *  when a thread has not declared one. */
     int getGenderFor( lang_t ) const;
 
+    /** What this reader sees as the sender and the body of a note. Plain
+     *  boards show them as written; dreams hide the sender from mortals and
+     *  translate the body. */
+    virtual DLString getNoteFrom( const Note *, PCharacter * ) const;
+    virtual DLString getNoteText( const Note *, PCharacter * ) const;
+
     int countSpool( PCharacter * ) const;
-    bool hasFlooredBacklog( PCharacter * ) const;
+    virtual bool hasFlooredBacklog( PCharacter * ) const;
     const Note * getNextUnreadNote( PCharacter * ) const;
     void showNoteToChar( PCharacter *, const Note * ) const;
     const Note * findNote( time_t ) const;
