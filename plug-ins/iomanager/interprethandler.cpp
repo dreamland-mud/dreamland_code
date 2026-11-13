@@ -635,6 +635,21 @@ void InterpretHandler::close( Descriptor *d )
     if (!ch)
         return;
 
+    // A link drop inside a switched body hands the socket back to the player's
+    // own body first, so the player goes link-dead as usual. With the links left
+    // in place, return/extract skip a body with no desc and web resume, entry
+    // tokens and account switch refuse the twin (the telnet nanny follows
+    // switchedTo into the mob instead), leaving the switch stuck until reboot.
+    NPCharacter *mob = ch->getNPC( );
+    if (mob && mob->switchedFrom) {
+        PCharacter *pch = mob->switchedFrom;
+        d->associate( pch );
+        pch->switchedTo = 0;
+        mob->switchedFrom = 0;
+        mob->desc = 0;
+        ch = pch;
+    }
+
     oldact(_("$c1 потеря$gло|л|ла связь с этим миром."), ch, 0, 0, TO_ROOM );
     wiznet( WIZ_LINKS, 0, ch->get_trust( ), "Net death has claimed %C1.", ch );
     ch->desc = 0;

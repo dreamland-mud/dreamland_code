@@ -118,7 +118,8 @@ bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool
 // Translate colour coding (tier, unusual item) into auras when screenreader is on or colours are off.
 static void format_screenreader_flags(Object *obj, ostringstream &buf, Character *ch)
 {
-    if (ch->is_npc())
+    // getPC() is the controlling player for a possessed body.
+    if (!ch->getPC())
         return;
 
     if (!uses_screenreader(ch) && ch->getPC()->getConfig().color)
@@ -146,7 +147,7 @@ static void format_screenreader_flags(Object *obj, ostringstream &buf, Character
 // (see the fShort branch below); screenreader/no-colour viewers get this tag instead.
 static void format_socket_mark(Object *obj, ostringstream &buf, Character *ch)
 {
-    if (ch->is_npc())
+    if (!ch->getPC())
         return;
 
     if (!uses_screenreader(ch) && ch->getPC()->getConfig().color)
@@ -289,7 +290,7 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
 
         // Jeweler sockets, sighted players: coloured stars next to the short name.
         // Screenreader/no-colour viewers get format_socket_mark's tag instead (above).
-        if (!ch->is_npc() && !uses_screenreader(ch) && ch->getPC()->getConfig().color) {
+        if (ch->getPC() && !uses_screenreader(ch) && ch->getPC()->getConfig().color) {
             DLString sockets = obj->getProperty("sockets");
             if (!sockets.empty() && sockets != "0") {
                 DLString socketstr = obj->getProperty("socketstr");
@@ -1487,7 +1488,7 @@ static DLString pick_display_keyword( const DLString &keywords, lang_t lang )
 // deliberately absent from the visible text.
 static DLString look_targets_hint( Character *ch, const ExtraDescrList &edList, lang_t lang )
 {
-    if (ch->is_npc( ))
+    if (!ch->getPC( ))
         return DLString::emptyString;
     if (!uses_screenreader( ch ) && ch->getPC( )->getConfig( ).color)
         return DLString::emptyString;
