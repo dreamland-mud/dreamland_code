@@ -473,7 +473,7 @@ public:
         }
         pickAffixes(lo, hi, t.worst_penalty_m, t.min_affixes_m,
                     t.max_affixes_m > 0 ? t.max_affixes_m + maxAffixesBonus : 0,
-                    t.max_negatives_m, forced);
+                    t.max_negatives_m, forced, craftRoll ? craftAttempts() : 3);
 
         for (auto const &p: chosen)
             applyOne(pool[p.first], p.second);
