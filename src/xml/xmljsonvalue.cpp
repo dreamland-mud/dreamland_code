@@ -7,6 +7,11 @@ XMLJsonValue::XMLJsonValue()
 
 bool XMLJsonValue::toXML(XMLNode::Pointer& parent) const
 {
+    // No node for null: a missing node reads back as null anyway, and
+    // writing "null" put churn on every prototype without props.
+    if (isNull())
+        return false;
+
     XMLNode::Pointer node(NEW);
     
     node->setType(XMLNode::XML_TEXT);
