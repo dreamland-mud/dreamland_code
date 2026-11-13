@@ -19,7 +19,10 @@ bool uses_screenreader(Character *ch)
     if (ch->desc && ch->desc->telnet.ttype == TTYPE_LYNTIN)
         return true;
 
-    if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_SCREENREADER))
+    // getPC() is the switched-from player for a possessed mob, so the
+    // player's own screenreader setting follows them into the body.
+    const PCharacter *pc = ch->getPC();
+    if (pc && IS_SET(pc->config, CONFIG_SCREENREADER))
         return true;
 
     return false;
