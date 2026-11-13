@@ -210,4 +210,10 @@ public:
 
 extern Descriptor *descriptor_list;
 
+class PCharacter;
+/* Break pch's switch into a mob: the mob's socket goes back to pch unless pch
+ * already has a newer one, and both links are cleared either way. Returns true
+ * if the socket moved to pch. */
+bool char_unswitch( PCharacter *pch );
+
 #endif

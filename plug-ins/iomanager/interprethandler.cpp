@@ -14,6 +14,7 @@
 #include "colour.h"
 #include "telnet.h"
 #include "interprethandler.h"
+#include "descriptor.h"
 #include "outofband.h"
 #include "resume.h"
 #include "webprompt.h"
@@ -632,21 +633,20 @@ void InterpretHandler::close( Descriptor *d )
 {
     Character *ch = d->character;
 
-    if (!ch)
+    // A stale descriptor closing after a takeover must not touch the body
+    // a newer descriptor now owns.
+    if (!ch || ch->desc != d)
         return;
 
     // A link drop inside a switched body hands the socket back to the player's
-    // own body first, so the player goes link-dead as usual. With the links left
-    // in place, return/extract skip a body with no desc and web resume, entry
-    // tokens and account switch refuse the twin (the telnet nanny follows
-    // switchedTo into the mob instead), leaving the switch stuck until reboot.
+    // own body first, so the player goes link-dead as usual instead of leaving
+    // the switch stuck on a desc-less mob. If the body already has a newer
+    // session, only the switch is broken and that session is left alone.
     NPCharacter *mob = ch->getNPC( );
     if (mob && mob->switchedFrom) {
         PCharacter *pch = mob->switchedFrom;
-        d->associate( pch );
-        pch->switchedTo = 0;
-        mob->switchedFrom = 0;
-        mob->desc = 0;
+        if (!char_unswitch( pch ))
+            return;
         ch = pch;
     }
 

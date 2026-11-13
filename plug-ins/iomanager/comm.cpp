@@ -258,6 +258,10 @@ Descriptor * descriptor_find_named( Descriptor *myD, const DLString &myName, int
         if (state != -1 && d->connected != state)
             continue;
 
+        // A socket left on a plain mob has no player name to match.
+        if (!d->character->getPC( ))
+            continue;
+
         name = d->character->getPC( )->getName( );
 
         if (name ^ myName)

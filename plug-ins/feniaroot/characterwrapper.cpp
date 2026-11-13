@@ -29,6 +29,7 @@
 #include "morphology.h"
 #include "desire.h"
 #include "npcharacter.h"
+#include "descriptor.h"
 #include "race.h"
 #include "raceflags.h"
 #include "object.h"
@@ -8875,10 +8876,7 @@ NMI_INVOKE( CharacterWrapper, switchFrom, "(): выселиться из моб�
 
     wiznet( WIZ_SWITCHES, WIZ_SECURE, target->get_trust( ), "%C1 returns from %C2.", target->getNPC( )->switchedFrom, target );
     
-    target->desc->associate( target->getNPC( )->switchedFrom );
-    target->getNPC( )->switchedFrom->switchedTo = 0;
-    target->getNPC( )->switchedFrom = 0;
-    target->desc = 0;
+    char_unswitch( target->getNPC( )->switchedFrom );
 
     return Register( );
 }
