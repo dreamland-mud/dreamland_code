@@ -464,7 +464,13 @@ int BasicSkill::getMoves(Character *ch) const
         return move;
 
     // Level-discounted for players below 50; slook shows this same number.
-    return move_cost_discount(ch, move.getValue(), true);
+    int cost = move_cost_discount(ch, move.getValue(), true);
+
+    // The altar mana blessing covers stamina too, so it also helps melee.
+    if (!ch->is_npc() && bonus_mana->isActive(ch->getPC(), time_info))
+        cost /= 2;
+
+    return cost;
 }
 
 int BasicSkill::getHealthPenalty() const
