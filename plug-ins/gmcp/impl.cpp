@@ -155,9 +155,31 @@ static Json::Value discord_status( PCharacter *ch )
 }
 
 /*
+ * Char.Combat: who the player is fighting and how healthy it looks, for a client
+ * enemy gauge. The name is the one the output path prints for this viewer: an
+ * unseen opponent is "someone", a doppelganger is whoever it pretends to be.
+ * Health is the same number the %o prompt code and the "fight" field show.
+ * Out of combat it is just {"fighting":false}.
+ */
+static Json::Value combat_status( Character *ch )
+{
+    Json::Value combat;
+    Character *victim = ch->fighting;
+
+    combat["fighting"] = victim != 0;
+    if (!victim)
+        return combat;
+
+    combat["name"] = victim->toNoun( ch, FMT_INVIS | FMT_DOPPEL )->decline( '1' ).colourStrip( );
+    combat["health"] = max( 0, HEALTH(victim) );
+    return combat;
+}
+
+/*
  * The structured prompt the web client gets, for Mudlet and other GMCP clients:
  * Char.Vitals with the conventional keys, so a bare client can draw gauges,
- * Dreamland.Prompt with everything else, and the Discord status when it changes.
+ * Dreamland.Prompt with everything else, and the Discord status and Char.Combat
+ * when they change.
  */
 GMCPCOMMAND_RUN(prompt)
 {
@@ -187,9 +209,16 @@ GMCPCOMMAND_RUN(prompt)
     WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
     Json::Value changed;
     attr->updateIfNew( "discord", discord_status( ch->getPC( ) ), changed );
+    // Combat start, target switch, opponent health and the end of the fight all
+    // surface here as a changed value: one message per change, whatever path
+    // (kill, flee, rescue, death) moved ch->fighting.
+    attr->updateIfNew( "gmcp_combat", combat_status( ch ), changed );
 
     if (changed.isMember( "discord" ))
         send(args.d, "External.Discord", "Status", json_to_string(changed["discord"]));
+
+    if (changed.isMember( "gmcp_combat" ))
+        send(args.d, "Char", "Combat", json_to_string(changed["gmcp_combat"]));
 }
 
 /*
