@@ -66,10 +66,14 @@ static void format_where( Character *ch, Character *victim, bool areaAllowsPath 
     // Never tag yourself: is_safe_nomessage(ch, ch) returns false (ch == victim),
     // which without this guard reads as "PK-eligible" and prints (PK) against your
     // own line in `where` (bug #3314).
+    // A player doppelganging a mob shows as that mob, and a mob is never (PK).
+    Character *guise = victim->getDoppel( ch );
+
     fPK = (victim != ch
             && !victim->is_npc( )
+            && !guise->is_npc( )
             && victim->getModifyLevel( ) >= PK_MIN_LEVEL
-            && !is_safe_nomessage( ch, victim->getDoppel( ch ) ));
+            && !is_safe_nomessage( ch, guise ));
     fAfk = IS_SET(victim->comm, COMM_AFK);
 
     // The room name is the last column, so its old %-42s width only ever added

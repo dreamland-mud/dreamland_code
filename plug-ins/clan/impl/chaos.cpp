@@ -97,11 +97,23 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 { 
   Affect af;
 
-  if (ch->is_npc() || victim->is_npc())
+  // Mobs are fair game too, but not mirror images: an image wears its owner's
+  // guise, so copying a level-1 mirror would steal a player's face past the save.
+  if (ch->is_npc() || victim->is_mirror())
     {
      oldact(_("Ты не можешь подражать $C3."),ch,0,victim,TO_CHAR);
      return;
    }
+
+  // A prop mob without a short description is left out of the room list,
+  // and so would be anyone wearing its guise.
+  if (victim->is_npc()) {
+      DLString shortDescr = victim->getNPC()->getShortDescr(LANG_DEFAULT).colourStrip();
+      if (shortDescr.stripWhiteSpace().empty()) {
+          oldact(_("Ты не можешь подражать $C3."),ch,0,victim,TO_CHAR);
+          return;
+      }
+  }
 
   if (ch == victim || ch->getDoppel( ) == victim)
     {
@@ -195,25 +207,40 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
         // Russian title in the room list. The short form takes the declinable
         // name per language too: a Latin login in a Russian sentence gives the
         // image away.
-        for (int l = LANG_MIN; l < LANG_MAX; l++) {
-                lang_t lang = (lang_t)l;
-
-                long_buf[l] = fmtLang(lang, _("{W%s{x%s здесь.\n\r"),
-                        tmp_vict->getNameP( '1', lang ).c_str(),
-                        Player::title(tmp_vict->getPC( ), lang).c_str( ));
-        }
-
+        // The owner may be doppelganging a mob: then the images wear the mob's
+        // short, long and keywords, and there is no player name or title to read.
+        NPCharacter *nvict = tmp_vict->getNPC( );
         PCharacter *pvict = tmp_vict->getPC( );
 
-        short_buf[LANG_RU] = pvict->getRussianName( ).getFullForm( );
-        if (short_buf[LANG_RU].empty( ))
-                short_buf[LANG_RU] = pvict->getName( );
+        if (nvict) {
+                for (int l = LANG_MIN; l < LANG_MAX; l++) {
+                        lang_t lang = (lang_t)l;
 
-        short_buf[LANG_UA] = pvict->getUkrainianName( ).getFullForm( );
-        if (short_buf[LANG_UA].empty( ))
-                short_buf[LANG_UA] = short_buf[LANG_RU];
+                        short_buf[l] = nvict->getShortDescr( lang );
+                        long_buf[l] = nvict->getLongDescr( lang );
+                        if (long_buf[l].empty( ))
+                                long_buf[l] = nvict->getLongDescr( LANG_DEFAULT );
+                }
+        }
+        else {
+                for (int l = LANG_MIN; l < LANG_MAX; l++) {
+                        lang_t lang = (lang_t)l;
 
-        short_buf[LANG_EN] = pvict->getNameP( '1', LANG_EN );
+                        long_buf[l] = fmtLang(lang, _("{W%s{x%s здесь.\n\r"),
+                                tmp_vict->getNameP( '1', lang ).c_str(),
+                                Player::title(pvict, lang).c_str( ));
+                }
+
+                short_buf[LANG_RU] = pvict->getRussianName( ).getFullForm( );
+                if (short_buf[LANG_RU].empty( ))
+                        short_buf[LANG_RU] = pvict->getName( );
+
+                short_buf[LANG_UA] = pvict->getUkrainianName( ).getFullForm( );
+                if (short_buf[LANG_UA].empty( ))
+                        short_buf[LANG_UA] = short_buf[LANG_RU];
+
+                short_buf[LANG_EN] = pvict->getNameP( '1', LANG_EN );
+        }
 
         if ( ch == victim )
         {
@@ -239,14 +266,12 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
                 mch = create_mobile( get_mob_index(MOB_VNUM_MIRROR_IMAGE) );
                 SET_BIT(mch->affected_by ,AFF_SNEAK);
 
-                DLString name( tmp_vict->getNameC() );
-
                 for (int l = LANG_MIN; l < LANG_MAX; l++) {
                         lang_t lang = (lang_t)l;
 
                         mch->setShortDescr( short_buf[l], lang );
                         mch->setLongDescr( long_buf[l], lang );
-                        mch->setKeyword( name, lang );
+                        mch->setKeyword( nvict ? nvict->getKeyword( lang ) : DLString( tmp_vict->getNameC() ), lang );
                 }
 
                 mch->setDescription( tmp_vict->getDescription( ) );
