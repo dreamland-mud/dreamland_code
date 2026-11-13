@@ -175,12 +175,15 @@ void extract_char( Character *ch, bool count )
 
     /*paranoid*/
     if (!npc && pc->switchedTo && pc->switchedTo->desc) {
-        pc->switchedTo->desc->close( );
-        pc->switchedTo->switchedFrom = 0;
-        pc->switchedTo = 0;
+        // close() unswitches both sides itself when an InterpretHandler is on the
+        // descriptor, so hold the mob: pc->switchedTo may be null right after.
+        NPCharacter *mob = pc->switchedTo;
         LogStream::sendError() 
-            << "attempt to extract original PCwhile in switch: " 
+            << "attempt to extract original PC while in switch: " 
             << pc->getNameC() << endl;
+        mob->desc->close( );
+        mob->switchedFrom = 0;
+        pc->switchedTo = 0;
     }
 
     char_from_list( ch, &char_list );
