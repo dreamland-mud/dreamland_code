@@ -110,6 +110,9 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
     /* already playing - reconnect or reanimate */
     if (( pch = pcm->getPlayer( ) )) {
         oldState = CON_BREAK_CONNECT;
+        // Switched with the old socket still alive on the mob: unswitch first,
+        // so the socket comes back to the PC and the takeover below closes it.
+        char_unswitch( pch );
         takeover = pch->desc != 0;
         if (pch->desc)
             pch->desc->close( );

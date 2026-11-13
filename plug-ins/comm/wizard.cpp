@@ -1966,10 +1966,7 @@ CMDWIZP( return )
             "%C1 returns from %C2.", mob->switchedFrom, mob );
     
     PCharacter *pch = mob->switchedFrom;
-    mob->desc->associate( mob->switchedFrom );
-    mob->switchedFrom->switchedTo = 0;
-    mob->switchedFrom = 0;
-    mob->desc = 0;
+    char_unswitch( pch );
 
     pch->getAttributes().handleEvent(AfkArguments(pch, false));
 }

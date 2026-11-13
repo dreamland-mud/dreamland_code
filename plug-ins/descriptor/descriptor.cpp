@@ -20,6 +20,8 @@
 #include "dlfilestream.h"
 
 #include "descriptor.h"
+#include "pcharacter.h"
+#include "npcharacter.h"
 #include "telnet.h"
 
 
@@ -71,7 +73,9 @@ Descriptor::close( )
     for (handle_input_t::iterator h = handle_input.begin( ); h != handle_input.end( ); h++)
         (*h)->close( this );
 
-    if(character)
+    // A takeover may already have handed the body to a newer descriptor:
+    // only detach it if it is still ours.
+    if (character && character->desc == this)
         character->desc = NULL;
 
     character = NULL;
@@ -107,6 +111,25 @@ void Descriptor::associate( Character *ch )
 {
     ch->desc = this;
     character = ch;
+}
+
+bool char_unswitch( PCharacter *pch )
+{
+    NPCharacter *mob = pch->switchedTo;
+    bool moved = false;
+
+    if (!mob)
+        return false;
+
+    if (mob->desc && !pch->desc) {
+        mob->desc->associate( pch );
+        moved = true;
+    }
+
+    mob->desc = 0;
+    mob->switchedFrom = 0;
+    pch->switchedTo = 0;
+    return moved;
 }
 
 #define htonll(p) bswap_64(p)

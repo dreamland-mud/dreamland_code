@@ -447,6 +447,10 @@ NMI_INVOKE( NannyHandler, reconnect, "" )
     
     d = ch->desc;
     d->handle_input.front( )->close( d );
+    // A switch left behind with no socket on the mob would follow the
+    // player into their own body.
+    if (!twin->is_npc( ))
+        char_unswitch( twin->getPC( ) );
     d->associate( twin );
     InterpretHandler::init( d );
     // This front-door reconnect now owns the character, so any web resume token
@@ -476,6 +480,8 @@ NMI_INVOKE( NannyHandler, reanimate, "" )
         
         d = ch->desc;
         d->handle_input.front( )->close( d );
+        if (!twin->is_npc( ))
+            char_unswitch( twin->getPC( ) );
         d->associate( twin );
         InterpretHandler::init( d );
         // See reconnect: a front-door takeover invalidates any web resume token.
