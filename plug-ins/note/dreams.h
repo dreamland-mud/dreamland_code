@@ -25,6 +25,10 @@ public:
     
     virtual void getUnreadMessage( PCharacter *, int, ostringstream & ) const;
     virtual bool canWrite( const PCharacter * ) const;
+    virtual DLString getNoteFrom( const Note *, PCharacter * ) const;
+    virtual DLString getNoteText( const Note *, PCharacter * ) const;
+    virtual bool hasFlooredBacklog( PCharacter * ) const;
+    virtual bool announcesUnread( PCharacter * ) const;
 
 protected:
     static const DLString THREAD_NAME;    

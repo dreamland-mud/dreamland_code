@@ -56,24 +56,24 @@ inline bool argIsPlayer( const DLString &arg, const PCMemoryInterface *pcm )
 }
 
 
-void Note::toStream( int vnum, ostringstream &buf ) const
+void Note::toStream( int vnum, ostringstream &buf, const DLString &from, const DLString &text ) const
 {
     buf << "[" << vnum << "] "
-        << "{C" << getFrom( ) << "{x: "
+        << "{C" << from << "{x: "
         << getSubject( ) << "{x" << endl
         << getDate( ).getTimeAsString( ) << endl
         << "To: " << getRecipient( ) << "{x" << endl
-        << getText( ) << "{x" << endl;
+        << text << "{x" << endl;
 }
 
-void Note::toForwardStream( ostringstream &buf ) const
+void Note::toForwardStream( ostringstream &buf, const DLString &from, const DLString &text ) const
 {
     buf << ">>> Start of original message <<<" << endl
-        << ">>> " << getFrom( ) << "{x: " << getSubject( ) << "{x" << endl
+        << ">>> " << from << "{x: " << getSubject( ) << "{x" << endl
         << ">>> " << getDate( ).getTimeAsString( ) << endl
         << ">>> To: " << getRecipient( ) << "{x" << endl
         << endl
-        << getText( ) << "{x" << endl
+        << text << "{x" << endl
         << ">>> End of original message <<<" << endl;
 }
 

@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "dreams.h"
+#include "noteattrs.h"
 #include "logstream.h"
 #include "dlscheduler.h"
 #include "pcharacter.h"
@@ -38,6 +39,44 @@ void DreamThread::getUnreadMessage( PCharacter *ch, int count, ostringstream &bu
     buf << fmt( ch, _("Смертным приснили {W%1$d{x нов%1$Iый|ых|ых с%1$Iон|на|нов ('{yсон{x')."), count ) << endl;
 }
 
+/* Mortals meet new dreams only in their sleep or in 'dream list': no login
+ * count, no crystal-orb ping, no 'unread next'. Gods are told as before. */
+bool DreamThread::announcesUnread( PCharacter *ch ) const
+{
+    return ch->is_immortal( );
+}
+
+/* Catalog file-key for the text of every dream. The dreams live in the note
+ * database, not in this source file, so they are keyed under a name of their
+ * own rather than a __FILE__ -- see config/translations/notes.json. */
+static const DLString DREAM_L10N_FILE = "notes/dream";
+
+/* A dream never tells a mortal who sent it, not even when they read it again
+ * from the list. Gods still see the author. */
+DLString DreamThread::getNoteFrom( const Note *note, PCharacter *ch ) const
+{
+    if (ch->is_immortal( ))
+        return NoteThread::getNoteFrom( note, ch );
+
+    return l( ch, "Фабрика грез" );
+}
+
+// Dreams are DATA, not a literal, so they cannot carry an _() wrapper --
+// key the whole body under a catalog file of its own instead. Anything
+// the catalog does not know (every dream a god writes from now on)
+// falls back to its Russian text, byte for byte.
+DLString DreamThread::getNoteText( const Note *note, PCharacter *ch ) const
+{
+    return MultiMessage( note->getText( ), DREAM_L10N_FILE ).getMessage( ch );
+}
+
+/* Old dreams are reruns, not a backlog: never nag a player with the
+ * 'readall' banner because of them. */
+bool DreamThread::hasFlooredBacklog( PCharacter * ) const
+{
+    return false;
+}
+
 bool DreamThread::canWrite( const PCharacter *ch ) const
 {
     if (!NoteThread::canWrite( ch ))
@@ -45,11 +84,6 @@ bool DreamThread::canWrite( const PCharacter *ch ) const
 
     return !ch->getAttributes( ).isAvailable( "nochannel" );
 }
-
-/* Catalog file-key for the text of every dream. The dreams live in the note
- * database, not in this source file, so they are keyed under a name of their
- * own rather than a __FILE__ -- see config/translations/notes.json. */
-static const DLString DREAM_L10N_FILE = "notes/dream";
 
 /*-----------------------------------------------------------------------
  * XMLAttributeDream
@@ -83,15 +117,11 @@ void XMLAttributeDream::setLines( const DLString &text )
 void XMLAttributeDream::run( PCharacter *ch )
 {
     /*
-     * wake up, cleanup and remember last dream.
+     * wake up and cleanup.
      * if woke up/fall asleep again too quickly, same dream will continue
      */
     if (ch->position != POS_SLEEPING) {
-        if (currentDreamID) {
-            lastDreamID = currentDreamID;
-            currentDreamID = 0;
-        }
-
+        currentDreamID = 0;
         sleepTime = 0;
         lines.clear( );
         return;
@@ -114,18 +144,32 @@ void XMLAttributeDream::run( PCharacter *ch )
         if (now - sleepTime < number_range( 1, 5 ))
             return;
     
-        const Note *note = dreamThread->findNextNote( ch, lastDreamID );
+        // Unseen dreams first, oldest of them first, and each one counts as
+        // read the moment it starts (the same stamp 'dream read' moves).
+        // Once nothing is unseen, fall back to the rerun cursor, which walks
+        // the whole archive once and then stops, as dreams always did.
+        const Note *note = dreamThread->getNextUnreadNote( ch );
 
-        if (!note)
-            return;
+        if (note) {
+            // A caught-up sleeper's cursor sits right before this dream: step
+            // it over so tomorrow's rerun is not the same dream again. Never
+            // jump it further, or a new character loses the archive reruns.
+            if (dreamThread->findNextNote( ch, lastDreamID ) == note)
+                lastDreamID = note->getID( );
 
-        // Dreams are DATA, not a literal, so they cannot carry an _() wrapper --
-        // key the whole body under a catalog file of its own instead. Anything
-        // the catalog does not know (every dream a god writes from now on)
-        // falls back to its Russian text, byte for byte. Everyone who sleeps
-        // sees the dreams addressed to 'all', so a newbie's first night on the
-        // Galeon was a Russian one whatever language they had chosen.
-        setLines( MultiMessage( note->getText( ), DREAM_L10N_FILE ).getMessage( ch ) );
+            ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" )
+                ->updateStamp( dreamThread, note );
+        }
+        else {
+            note = dreamThread->findNextNote( ch, lastDreamID );
+
+            if (!note)
+                return;
+
+            lastDreamID = note->getID( );
+        }
+
+        setLines( dreamThread->getNoteText( note, ch ) );
         currentDreamID = note->getID( );
         LogStream::sendNotice( ) 
             << ch->getName( ) << " sees a dream from " << note->getAuthor( ) 

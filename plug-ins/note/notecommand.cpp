@@ -360,7 +360,7 @@ void NoteCommand::doCopy( PCharacter *ch, DLString &arguments ) const
 
             if (note) {
                 ostringstream ostr;
-                note->toStream(arg.toInt( ), ostr);
+                note->toStream(arg.toInt( ), ostr, thread->getNoteFrom( note, ch ), thread->getNoteText( note, ch ));
                 ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")
                     ->regs[0].split(ostr.str( ));
                 ch->pecho( "Ok." );
@@ -424,16 +424,17 @@ void NoteCommand::doList( PCharacter *ch, DLString &argument ) const
         
         for (cnt = 0, i = mynotes.begin( ); i != mynotes.end( ); i++, cnt++) {
             bool hidden = thread->isNoteHidden( *i, ch, stamp );
+            DLString from = thread->getNoteFrom( *i, ch );
 
-            if (listfilter_parse( ch, cnt, last, *i, hidden, argument.c_str( ) )) {
+            if (listfilter_parse( ch, cnt, last, *i, from, thread->getNoteText( *i, ch ), hidden, argument.c_str( ) )) {
                 buf << "[" << cnt 
                     << (hidden ? " " : "N") << "] " 
-                    << (*i)->getFrom( ) << ": " << (*i)->getSubject( ) << "{x";
+                    << from << ": " << (*i)->getSubject( ) << "{x";
                 if (ch->isCoder() && (*i)->getFlags().getValue() != 0)
                     buf << "  {D[" << (*i)->getFlags().names() << "]{x";
                 buf << endl;
 
-                int row = web.row( DLString( cnt ) + ". " + (*i)->getFrom( ) + ": " + (*i)->getSubject( ),
+                int row = web.row( DLString( cnt ) + ". " + from + ": " + (*i)->getSubject( ),
                                    DLString( cnt ) );
                 web.data( row, "unread", !hidden );
                 web.action( row, "read", getName( ) + " read " + DLString( cnt ) );
@@ -613,7 +614,7 @@ void NoteCommand::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr,
     }
 
     note = attr->makeNote( ch, *thread );
-    orig->toForwardStream( buf );
+    orig->toForwardStream( buf, thread->getNoteFrom( orig, ch ), thread->getNoteText( orig, ch ) );
     note->addLine( buf.str( ) );
     ch->pecho( "Ok." );
 }

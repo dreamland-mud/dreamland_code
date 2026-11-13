@@ -48,8 +48,10 @@ public:
     inline void setDate( );
     inline void setDate( int );
     
-    void toStream( int, ostringstream & ) const;
-    void toForwardStream( ostringstream & ) const;
+    // 'from' and 'text' come from the thread (NoteThread::getNoteFrom/getNoteText),
+    // which may hide the sender or translate the body for this reader.
+    void toStream( int, ostringstream &, const DLString &from, const DLString &text ) const;
+    void toForwardStream( ostringstream &, const DLString &from, const DLString &text ) const;
     
     inline bool operator < (const Note & ) const;
 
