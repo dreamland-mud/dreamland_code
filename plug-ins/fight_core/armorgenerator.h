@@ -92,7 +92,9 @@ protected:
      *  taken first and ignore the window and the caps: a class or name that
      *  requires an affix, a crafted material's own affix, a refit replay. */
     void pickAffixes(int minM, int maxM, int worstPenalty, int minAffixes, int maxAffixes, int maxNegatives,
-                     const std::map<int, int> &forced);
+                     const std::map<int, int> &forced, int attempts = 3);
+    /** Tries a craft roll gets to land inside its window: measure.craft_roll_attempts. */
+    static int craftAttempts();
     /** "section:value[:stacks]" words, space separated, to pool indexes. Words
      *  that are not in this item's pool are dropped: the fill rolls in their place. */
     std::map<int, int> resolveForced(const DLString &spec) const;

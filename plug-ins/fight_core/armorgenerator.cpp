@@ -193,7 +193,8 @@ bool ArmorGenerator::run()
 
     const weapon_tier_t &t = weapon_tier_table[tier - 1];
     if (crafted) {
-        pickAffixes(craftMin, craftMax, t.worst_penalty_m, t.min_affixes_m, t.max_affixes_m, t.max_negatives_m, forced);
+        pickAffixes(craftMin, craftMax, t.worst_penalty_m, t.min_affixes_m, t.max_affixes_m, t.max_negatives_m, forced,
+                    craftAttempts());
     } else {
         double curve = windowCurve();
         pickAffixes((int)(t.min_m * curve), (int)(t.max_m * curve), t.worst_penalty_m, t.min_affixes_m,
@@ -1005,9 +1006,17 @@ DLString ItemAffixRoller::picksSpec() const
  *  2026-10-02: an item with 15 crumbs has no character). To reach the budget
  *  inside the cap, a step prefers picks worth at least half of what each free
  *  slot still has to carry; restacking an affix already taken is always open. */
-void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minAffixesM, int maxAffixesM,
-                                  int maxNegativesM, const std::map<int, int> &forced)
+int ItemAffixRoller::craftAttempts()
 {
+    return max(1, (int)item_value("measure", "craft_roll_attempts", 15));
+}
+
+void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minAffixesM, int maxAffixesM,
+                                  int maxNegativesM, const std::map<int, int> &forced, int attempts)
+{
+    // A refit replay (window 0..0) only re-applies its forced picks.
+    if (maxM <= 0)
+        attempts = 1;
     std::map<int, int> best;
     int bestDistance = -1, bestTotal = 0;
 
@@ -1128,8 +1137,9 @@ void ItemAffixRoller::pickAffixes(int minM, int maxM, int worstPenalty, int minA
     // is a plain weighted draw: no preference for dear affixes and no hunt for
     // the best fit, so items differ from each other.
     // Stacks of what was drawn then fill the budget towards a random target.
-    // Three tries; the one closest to the window wins.
-    for (int attempt = 0; attempt < 3; attempt++) {
+    // A few tries (loot 3, a craft more: its window is narrow and often high);
+    // the first inside the window wins, else the closest.
+    for (int attempt = 0; attempt < attempts; attempt++) {
         std::map<int, int> picked;
         int total = 0, penalty = 0, negatives = 0, positives = 0, statSpent = 0, tops = 0, statSum = 0, svsSum = 0;
         std::vector<int> weightNow(pool.size(), 0);
