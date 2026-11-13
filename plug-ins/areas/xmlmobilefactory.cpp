@@ -208,15 +208,18 @@ XMLMobileFactory::init(const mob_index_data *mob)
     JsonUtils::copy(props, mob->props);
 
     // props.olc.*Confirmed are retired (decision 12): never written again.
-    Json::Value &olc = props["olc"];
-    if (olc.isObject()) {
-        for (auto &key: olc.getMemberNames())
-            if (key.size() > 9 && key.compare(key.size() - 9, 9, "Confirmed") == 0)
-                olc.removeMember(key);
-        if (olc.empty())
+    // Look before indexing: props["olc"] on a null value turns it into {}.
+    if (props.isObject() && props.isMember("olc")) {
+        Json::Value &olc = props["olc"];
+        if (olc.isObject()) {
+            for (auto &key: olc.getMemberNames())
+                if (key.size() > 9 && key.compare(key.size() - 9, 9, "Confirmed") == 0)
+                    olc.removeMember(key);
+            if (olc.empty())
+                props.removeMember("olc");
+        } else if (olc.isNull())
             props.removeMember("olc");
-    } else if (olc.isNull())
-        props.removeMember("olc");
+    }
 
     tier.setValue(mob->tierName);
     tierStyle.setValue(mob->tierStyle);
