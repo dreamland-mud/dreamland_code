@@ -476,9 +476,15 @@ void mob_index_data::deriveNumbers()
             tierOffAdd &= ~(bitstring_t)OFF_FAST;
     }
 
+    // Backstab is the thief's: no body, tier or prototype add gives it to
+    // anyone else (an off bit alone made bosses knife hoarders and ambushers).
+    bool thief = IS_SET(act, ACT_THIEF);
+
     if (formless) {
-        if (tierOffAdd) {
+        if (tierOffAdd || (!thief && IS_SET(off_flags, OFF_BACKSTAB))) {
             off_flags |= (int)tierOffAdd;
+            if (!thief)
+                REMOVE_BIT(off_flags, OFF_BACKSTAB);
             bodySnapshot[MOBSET_OFF] = (unsigned int)off_flags;
         }
         return;
@@ -489,6 +495,8 @@ void mob_index_data::deriveNumbers()
     enabled |= tierOffAdd;
     enabled |= bodyAdd[MOBSET_OFF];
     enabled &= ~bodyDel[MOBSET_OFF];
+    if (!thief)
+        enabled &= ~(bitstring_t)OFF_BACKSTAB;
     off_flags = (int)enabled;
     bodySnapshot[MOBSET_OFF] = (unsigned int)off_flags;
 }
