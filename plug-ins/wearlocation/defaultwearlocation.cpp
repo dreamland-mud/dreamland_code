@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include <set>
+#include <map>
 
 #include "logstream.h"
 #include "defaultwearlocation.h"
@@ -19,6 +20,8 @@
 #include "room.h"
 #include "affect.h"
 #include "character.h"
+#include "pcharacter.h"
+#include "affectflags.h"
 #include "core/object.h"
 
 #include "damage_impl.h"
@@ -652,6 +655,81 @@ const DLString &DefaultWearlocation::getMsgRoomWear(Object *obj) const
     return msgRoomWear;
 }
 
+// A newbie is told what the piece just gave them, one line per plain stat
+// bonus, so the numbers on the score sheet have a visible cause. Only the wear
+// command path (F_WEAR_VERBOSE): login, reset and Fenia equip stay silent.
+// Same affect lists affectsOnEquip applies: prototype plus instance.
+static void newbie_wear_bonuses( Character *ch, Object *obj )
+{
+    if (ch->is_npc( ) || !obj->wear_loc->givesAffects( ) || !Player::isNewbie( ch->getPC( ) ))
+        return;
+
+    // Summed per location, in the order the item lists them. Every save apply
+    // feeds the same stat, so they print as one "saves" line.
+    std::vector<int> order;
+    std::map<int, int> sums;
+    auto collect = [&]( Affect *paf ) {
+        int loc = paf->location;
+        switch (loc) {
+        case APPLY_STR: case APPLY_DEX: case APPLY_INT: case APPLY_WIS:
+        case APPLY_CON: case APPLY_CHA:
+        case APPLY_HIT: case APPLY_MANA: case APPLY_MOVE:
+        case APPLY_HITROLL: case APPLY_DAMROLL: case APPLY_AC:
+            break;
+        case APPLY_SAVES: case APPLY_SAVING_ROD: case APPLY_SAVING_PETRI:
+        case APPLY_SAVING_BREATH: case APPLY_SAVING_SPELL:
+            loc = APPLY_SAVES;
+            break;
+        default:
+            return;
+        }
+        if (paf->modifier == 0)
+            return;
+        if (sums.find( loc ) == sums.end( ))
+            order.push_back( loc );
+        sums[loc] += paf->modifier;
+    };
+
+    for (auto &paf: obj->pIndexData->affected)
+        collect( paf );
+    for (auto &paf: obj->affected)
+        collect( paf );
+
+    lang_t lang = viewerLang( ch );
+
+    for (int loc: order) {
+        int mod = sums[loc];
+        if (mod == 0)
+            continue;
+
+        // Lower is better for armor class and saves, players only see the good-is-up scale.
+        if (loc == APPLY_AC) {
+            if (mod < 0)
+                ch->pecho( _("Это улучшает тебе броню на %1$d."), -mod );
+            else
+                ch->pecho( _("Это ухудшает тебе броню на %1$d."), mod );
+            continue;
+        }
+
+        DLString name = apply_flags.message( loc, '1', lang );
+
+        // A save modifier is not a number a player can read on its own; the
+        // identify card turns it into a percent. Here only the direction.
+        if (loc == APPLY_SAVES) {
+            if (mod < 0)
+                ch->pecho( _("Это улучшает тебе %1$s."), name.c_str( ) );
+            else
+                ch->pecho( _("Это ухудшает тебе %1$s."), name.c_str( ) );
+            continue;
+        }
+
+        if (mod > 0)
+            ch->pecho( _("Это улучшает тебе %1$s на %2$d."), name.c_str( ), mod );
+        else
+            ch->pecho( _("Это ухудшает тебе %1$s на %2$d."), name.c_str( ), -mod );
+    }
+}
+
 bool DefaultWearlocation::wearAtomic( Character *ch, Object *obj, int flags )
 {
     if (canWear( ch, flags )) {
@@ -665,7 +743,8 @@ bool DefaultWearlocation::wearAtomic( Character *ch, Object *obj, int flags )
         }
 
         triggersOnWear(ch, obj);
-        equip( obj );
+        if (equip( obj ) && IS_SET(flags, F_WEAR_VERBOSE))
+            newbie_wear_bonuses( ch, obj );
         return true;
     }
 
