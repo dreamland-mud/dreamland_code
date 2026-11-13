@@ -2100,6 +2100,49 @@ CMDWIZP( load )
 
 
 
+/*
+ * Wipe all NPCs and objects in ch's room. With force, NOPURGE flags are
+ * ignored too. Players and mobs someone is switched into are never touched.
+ */
+static void purge_room( Character *ch, bool force )
+{
+    Character *victim, *vnext;
+    Object *obj, *obj_next;
+
+    dreamland->removeOption( DL_SAVE_MOBS );
+    dreamland->removeOption( DL_SAVE_OBJS );
+
+    for ( victim = ch->in_room->people; victim != 0; victim = vnext )
+    {
+        vnext = victim->next_in_room;
+
+        if (!victim->is_npc() || victim == ch || victim->desc != 0)
+            continue;
+
+        if (!force && IS_SET(victim->act, ACT_NOPURGE))
+            continue;
+
+        extract_char( victim );
+    }
+
+    for ( obj = ch->in_room->contents; obj != 0; obj = obj_next )
+    {
+        obj_next = obj->next_content;
+
+        if (!force && IS_OBJ_STAT(obj, ITEM_NOPURGE))
+            continue;
+
+        extract_obj( obj );
+    }
+
+    oldact(_("$c1 изничтожает все в комнате!"), ch, 0, 0, TO_ROOM);
+    ch->pecho(_("Готово."));
+    dreamland->resetOption( DL_SAVE_MOBS );
+    dreamland->resetOption( DL_SAVE_OBJS );
+    save_items( ch->in_room );
+    save_mobs( ch->in_room );
+}
+
 CMDWIZP( purge )
 {
     char arg[MAX_INPUT_LENGTH];
@@ -2110,34 +2153,17 @@ CMDWIZP( purge )
 
     if ( arg[0] == '\0' )
     {
-        /* 'purge' */
-        Character *vnext;
-        Object  *obj_next;
-        
-        dreamland->removeOption( DL_SAVE_MOBS );
-        dreamland->removeOption( DL_SAVE_OBJS );
+        purge_room( ch, false );
+        return;
+    }
 
-        for ( victim = ch->in_room->people; victim != 0; victim = vnext )
-        {
-            vnext = victim->next_in_room;
-            if ( victim->is_npc() && !IS_SET(victim->act,ACT_NOPURGE)
-            &&   victim != ch /* safety precaution */ )
-                extract_char( victim );
-        }
+    if (arg_is_all( arg ))
+    {
+        int vnum = ch->in_room->vnum;
 
-        for ( obj = ch->in_room->contents; obj != 0; obj = obj_next )
-        {
-            obj_next = obj->next_content;
-            if (!IS_OBJ_STAT(obj,ITEM_NOPURGE))
-              extract_obj( obj );
-        }
-
-        oldact(_("$c1 изничтожает все в комнате!"), ch, 0, 0, TO_ROOM);
-        ch->pecho(_("Готово."));
-        dreamland->resetOption( DL_SAVE_MOBS );
-        dreamland->resetOption( DL_SAVE_OBJS );
-        save_items( ch->in_room );
-        save_mobs( ch->in_room );
+        purge_room( ch, true );
+        wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), "%C1 purges ALL in room %d.", ch, vnum );
+        LogStream::sendNotice( ) << ch->getNameC( ) << " purge all in room " << vnum << endl;
         return;
     }
 
