@@ -514,7 +514,20 @@ bool FeniaQuest::passesParams( PCharacter *pch, NPCharacter *mob )
     if (p.maxLevel > 0 && mob->getRealLevel( ) > p.maxLevel)
         return false;
 
-    if (p.noCaster && mob->getProfession( )->getFlags( mob ).isSet( PROF_CASTER ))
+    if (p.noCaster || p.casterOnly) {
+        bool caster = mob->getProfession( )->getFlags( mob ).isSet( PROF_CASTER );
+
+        if (p.noCaster && caster)
+            return false;
+
+        if (p.casterOnly && !caster)
+            return false;
+    }
+
+    if (p.requireAlign > 0 && !IS_GOOD( mob ))
+        return false;
+
+    if (p.requireAlign < 0 && !IS_EVIL( mob ))
         return false;
 
     if (p.visible && !isMobileVisible( mob, pch ))
@@ -534,11 +547,15 @@ bool FeniaQuest::passesParams( PCharacter *pch, NPCharacter *mob )
         return false;
 
     // ANY of the require* that are set is enough, which is StealQuest::isThief's
-    // shape: act flag OR behavior OR a name the scenario keeps for itself.
-    if (p.requireActFlag != 0 || !p.requireBehavior.empty( )) {
+    // shape: act flag OR behavior OR a name the scenario keeps for itself. The
+    // form joins the same OR: "undead or construct" is an act flag or a body.
+    if (p.requireActFlag != 0 || !p.requireBehavior.empty( ) || p.requireForm != 0) {
         bool matched = false;
 
         if (p.requireActFlag != 0 && IS_SET( mob->act, p.requireActFlag ))
+            matched = true;
+
+        if (!matched && p.requireForm != 0 && IS_SET( mob->form, p.requireForm ))
             matched = true;
 
         if (!matched && !p.requireBehavior.empty( )) {
@@ -583,6 +600,10 @@ bool FeniaQuest::checkItem( PCharacter *pch, ::Object *obj )
     // back would strand the scenario in the middle of building its quest. Not a
     // knob: there is no case for wanting one.
     if (obj->behavior && obj->behavior->getType( ) != basicName)
+        return false;
+
+    if (!selectParams.itemTypes.empty( )
+        && selectParams.itemTypes.count( obj->item_type ) == 0)
         return false;
 
     if (selectParams.visible && !isItemVisible( obj, pch ))

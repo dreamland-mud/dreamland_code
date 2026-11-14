@@ -1717,6 +1717,11 @@ NMI_GET( ReligionWrapper, followerSex, "пол последователей ил
     return Register((int)getTarget()->followerSex.getValue());
 }
 
+NMI_GET( ReligionWrapper, paths, "Пути божества: ключи через пробел (light dark reason rage order chaos nature society freedom) или пустая строка" ) 
+{
+    return Register(getTarget()->paths.getValue());
+}
+
 NMI_GET( ReligionWrapper, tattooVnum, "vnum объекта-знака религии" ) 
 {
     return Register(getTarget()->tattooVnum);
