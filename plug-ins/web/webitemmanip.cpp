@@ -303,6 +303,10 @@ static bool has_trigger_smell( Object *obj, const StringSet &triggers )
 
 static bool has_trigger_use( Object *obj, const StringSet &triggers )
 {
+    // Food and pills already get 'eat' (drug doses: onEat), a bare 'use' would duplicate it.
+    if (obj->item_type == ITEM_FOOD || obj->item_type == ITEM_PILL)
+        return false;
+
     return triggers.count("use") > 0;
 }
 
