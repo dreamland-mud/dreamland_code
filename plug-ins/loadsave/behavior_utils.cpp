@@ -8,6 +8,7 @@
 #include "object.h"
 #include "npcharacter.h"
 #include "room.h"
+#include "itemflags.h"
 
 list<Register> behavior_trigger_with_result(GlobalBitvector &behaviors, const DLString &trigType, const RegisterList &trigArgs)
 {
@@ -150,6 +151,19 @@ bool behavior_trigger(Character *ch, const DLString &trigType, const char *fmt, 
 	return reglist_to_bool(regList);
 }
 
+// Behaviors an object has by its kind rather than by its prototype: every
+// axe-class weapon (raw value0, the class it IS) is a lumberjack axe, so random,
+// hero and crafted axes chop without listing vnums. The behavior script decides
+// what each axe may do (two-handers fell trees, any axe hacks wood).
+// Returns null when the object has nothing beyond its prototype's list.
+static Behavior *implicit_behavior(Object *obj)
+{
+	if (obj->item_type != ITEM_WEAPON || obj->value0() != WEAPON_AXE)
+		return 0;
+
+	return behaviorManager->findExisting("axe lumberjack");
+}
+
 bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ...)
 {
 	// A trigger fired earlier in the same tick can extract this very object
@@ -160,7 +174,16 @@ bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ..
 	va_list ap;
 	va_start(ap, fmt);
 
-	auto regList = behavior_trigger_with_result(obj->pIndexData->behaviors, trigType, fmt, ap);
+	list<Register> regList;
+	Behavior *implicit = implicit_behavior(obj);
+
+	if (implicit && !obj->pIndexData->behaviors.isSet(*implicit)) {
+		GlobalBitvector behaviors = obj->pIndexData->behaviors;
+		behaviors.set(*implicit);
+		regList = behavior_trigger_with_result(behaviors, trigType, fmt, ap);
+	} else {
+		regList = behavior_trigger_with_result(obj->pIndexData->behaviors, trigType, fmt, ap);
+	}
 
 	va_end(ap);
 	return reglist_to_bool(regList);
