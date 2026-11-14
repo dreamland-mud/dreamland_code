@@ -433,7 +433,7 @@ NMI_GET( ObjectWrapper, personal, "установить или вернуть а
     return Register();
 }
 
-NMI_INVOKE( ObjectWrapper, questRewardRefresh, "(ch): пересобрать ненадетую личную награду под ch (уровень, значения, аффекты), как при надевании; false, если это не личная награда" )
+NMI_INVOKE( ObjectWrapper, questRewardRefresh, "(ch): пересобрать ненадетую личную награду под ch (уровень, значения, аффекты), как при надевании; false, если это не личная награда со свойствами" )
 {
     checkTarget();
     Character *ch = argnum2character(args, 1);
@@ -445,7 +445,7 @@ NMI_INVOKE( ObjectWrapper, questRewardRefresh, "(ch): пересобрать н�
         return Register(false);
 
     PersonalQuestReward *reward = target->behavior.getDynamicPointer<PersonalQuestReward>();
-    if (!reward)
+    if (!reward || reward->questFamily().empty())
         return Register(false);
 
     // Unworn, so equip() only rewrites the item: its affects are hung
