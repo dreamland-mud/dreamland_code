@@ -38,6 +38,8 @@
 #include "def.h"
 #include "l10n.h"
 #include "websocketrpc.h"
+#include "fenia_utils.h"
+#include "dreamland.h"
 
 #define OBJ_VNUM_QUEST_SCROLL 28109
 
@@ -137,6 +139,13 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     
     time = quest->getNextTime( client );
     qdata = attributes->getAttr<XMLAttributeQuestData>( "questdata" );
+
+    // Quests taken before startTime existed have it at 0. Partial turn-ins
+    // don't count: an empty hand-in right after taking would be free.
+    if (quest->isComplete( ) && qdata->getStartTime( ) > 0
+        && dreamland->getCurrentTime( ) - qdata->getStartTime( ) <= 30)
+        achievement( client, "blitz_errand" );
+
     qdata->setTime( time );
     qdata->rememberVictory( quest->getName( ) );
     if (client->getClan() == clan_flowers)
