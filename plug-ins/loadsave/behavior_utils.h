@@ -9,6 +9,7 @@ class Character;
 class Room;
 class DLString;
 class GlobalBitvector;
+class Behavior;
 
 /** Directly call a trigger with arguments defined for these behaviors. */
 list<Scripting::Register> behavior_trigger_with_result(GlobalBitvector &behaviors, const DLString &trigType, const Scripting::RegisterList &trigArgs);
@@ -19,6 +20,10 @@ list<Scripting::Register> behavior_trigger_with_result(GlobalBitvector &behavior
  *  dispatch fires on), so there is no cache and nothing to invalidate. Pass the two
  *  trigger ids pre-resolved (e.g. a hoisted static IdRef) to avoid a lex lookup per call. */
 bool behaviors_have_trigger(GlobalBitvector &behaviors, const Scripting::Register &onId, const Scripting::Register &postId);
+
+/** Behavior an object answers 'use' with by its kind rather than its prototype
+ *  (any axe chops wood), or null. behavior_trigger(obj, "Use") adds it. */
+Behavior *object_implicit_use_behavior(Object *obj);
 
 /** For each behavior assigned in OBJ_INDEX_DATA call trigType trigger with arguments. */
 bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ...);
