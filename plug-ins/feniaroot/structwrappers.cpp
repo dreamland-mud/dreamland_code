@@ -802,6 +802,11 @@ NMI_GET( WearlocWrapper, ribName, "название слота с падежам
     return getTarget()->getRibName();
 }
 
+NMI_INVOKE( WearlocWrapper, getRibName, "(lang): название слота с падежами (как ribName) на языке lang (0=en,1=ru,2=ua)" )
+{
+    return Scripting::Register( getTarget()->getRibName( argnum2lang(args, 1) ) );
+}
+
 NMI_GET( WearlocWrapper, nameRus, "название слота с падежами (то же что ribName)" ) 
 {
     return getTarget()->getRussianName();
