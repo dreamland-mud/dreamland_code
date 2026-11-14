@@ -121,7 +121,7 @@ NMI_INVOKE( AutoQuestWrapper, getDifficulty, "(lang): сложность на я
  * rule (cooldown, confirmation, the giver's own mood) to the calling script,
  * which knows its giver. The one rule kept here is the one nobody may skip:
  * a player holds a single quest. */
-NMI_INVOKE( AutoQuestWrapper, start, "(ch, giver): выдать игроку ch задание этого типа от моба giver (onCreate получит giver вместо квестора); задание игрока или null, если у ch уже есть задание или сценарий отказал" )
+NMI_INVOKE( AutoQuestWrapper, start, "(ch, giver): выдать игроку ch задание этого типа от моба giver (onCreate получит giver вместо квестора); задание игрока или null, если у ch уже есть задание или сценарий отказал (тогда 1-3 минуты ожидания, как у квестора)" )
 {
     QuestRegistratorBase *reg = getTarget( );
     PCharacter *pch = argnum2player( args, 1 );
@@ -138,6 +138,9 @@ NMI_INVOKE( AutoQuestWrapper, start, "(ch, giver): выдать игроку ch 
     try {
         quest = reg->createQuest( pch, giver );
     } catch (const QuestCannotStartException &) {
+        // The questor's delay_noquest: a refusal costs a short wait, so a
+        // giver asked again and again does not walk the world each time.
+        attributes.getAttr<XMLAttributeQuestData>( "questdata" )->setTime( number_range( 1, 3 ) );
         return Register( );
     }
 
