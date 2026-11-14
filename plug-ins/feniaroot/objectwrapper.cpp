@@ -924,6 +924,14 @@ NMI_INVOKE( ObjectWrapper, affectStrip, "(skill[,verbose]): снять с пре
     bool verbose = args.size() > 1 ? argnum2boolean(args, 2) : false;
 
     affect_strip(target, skill->getIndex(), verbose);
+
+    // An affect hung with type -1 (personal quest rewards, OLC, a typeless
+    // .Affect()) reads as "none" in Fenia, so "none" strips those too.
+    if (skill->getName() == "none")
+        for (auto &paf: target->affected.clone())
+            if ((int)paf->type < 0)
+                affect_remove_obj(target, paf, verbose);
+
     return Register( );
 }
 
