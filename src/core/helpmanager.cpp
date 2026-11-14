@@ -239,11 +239,12 @@ static const struct {
 } CATEGORY_FALLBACK[] = {
     { "spell",        "magic"   },
     { "social",       "socials" },
+    { "mobrace",      "world"   },
     { "race",         "races"   },
     { "raceaptitude", "races"   },
     { "religion",     "gods"    },
     { "class",        "classes" },
-    { "skillgroup",   "classes" },
+    { "skillgroup",   "skills"  },
     { "craft",        "items"   },
     { "craftskill",   "items"   },
     { "item",         "items"   },
