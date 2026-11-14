@@ -19,6 +19,7 @@
 #include "fight.h"
 #include "loadsave.h"
 #include "act.h"
+#include "dreamland.h"
 #include "def.h"
 #include "l10n.h"
 
@@ -98,6 +99,11 @@ bool GangChef::death( Character *killer )
         gquest->state = Gangsters::ST_CHEF_KILLED;                
         gquest->chefKiller = killer->getNameC( );
         createBounty(killer);
+
+        // getStartTime is the tick the quest was announced; an NPC actor
+        // (no PC master) is ignored by achievement() itself.
+        if (dreamland->getCurrentTime( ) - gquest->getStartTime( ) <= 60)
+            achievement( killer, "gang_blitz" );
     }
     
     gquest->scheduleDestroy( );

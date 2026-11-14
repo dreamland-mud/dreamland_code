@@ -42,6 +42,7 @@ public:
     void rememberLastQuest(const DLString &);
     int getLastQuestCount(const DLString &) const;
     void setStartTime();
+    inline long long getStartTime() const { return startTime.getValue(); }
     bool takesTooLong() const;
 
 protected:
