@@ -17,6 +17,7 @@
 #include "behavior.h"
 #include "area.h"
 #include "flagtable.h"
+#include "stringlist.h"
 
 #include "merc.h"
 #include "def.h"
@@ -654,6 +655,43 @@ NMI_SET( QuestSelectWrapper, noCaster, "не брать в цели заклин
     params.noCaster = arg.toBoolean( );
 }
 
+NMI_GET( QuestSelectWrapper, casterOnly, "брать в цели только заклинателей" )
+{
+    return Register( params.casterOnly );
+}
+
+NMI_SET( QuestSelectWrapper, casterOnly, "брать в цели только заклинателей" )
+{
+    params.casterOnly = arg.toBoolean( );
+}
+
+NMI_GET( QuestSelectWrapper, requireAlign, "натура цели: good, evil или пустая строка для любой" )
+{
+    if (params.requireAlign > 0)
+        return Register( "good" );
+
+    if (params.requireAlign < 0)
+        return Register( "evil" );
+
+    return Register( DLString::emptyString );
+}
+
+NMI_SET( QuestSelectWrapper, requireAlign, "натура цели: good, evil или пустая строка для любой" )
+{
+    DLString name = arg.toString( );
+
+    // A word, not a number, so "evil" cannot be mistyped into a sign error.
+    // Anything else throws: "neutral" would otherwise read as "any".
+    if (name.empty( ))
+        params.requireAlign = 0;
+    else if (name == "good")
+        params.requireAlign = 1;
+    else if (name == "evil")
+        params.requireAlign = -1;
+    else
+        throw Scripting::Exception( "requireAlign wants good, evil or an empty string: " + name );
+}
+
 NMI_GET( QuestSelectWrapper, visible, "цель должна быть видима герою прямо сейчас" )
 {
     return Register( params.visible );
@@ -790,6 +828,65 @@ NMI_SET( QuestSelectWrapper, requireBehavior, "поведение, которо�
         throw Scripting::Exception( "No such behavior: " + name );
 
     params.requireBehavior = name;
+}
+
+NMI_GET( QuestSelectWrapper, requireForm, "форма тела, хотя бы одна из которых обязана быть у цели, можно несколько через пробел (см. .tables.form_flags); вместе с requireActFlag и requireBehavior достаточно ЛЮБОГО" )
+{
+    if (params.requireForm <= 0)
+        return Register( DLString::emptyString );
+
+    return Register( form_flags.names( params.requireForm ) );
+}
+
+NMI_SET( QuestSelectWrapper, requireForm, "форма тела, хотя бы одна из которых обязана быть у цели, можно несколько через пробел (см. .tables.form_flags); вместе с requireActFlag и requireBehavior достаточно ЛЮБОГО" )
+{
+    DLString name = arg.toString( );
+
+    if (name.empty( )) {
+        params.requireForm = 0;
+        return;
+    }
+
+    // NO_FLAG check for the same reason as requireActFlag: a typo must throw,
+    // not turn into a mask with stray bits.
+    bitstring_t bit = form_flags.bitstring( name, false );
+
+    if (bit == NO_FLAG || bit <= 0)
+        throw Scripting::Exception( "No such form flag: " + name );
+
+    params.requireForm = bit;
+}
+
+NMI_GET( QuestSelectWrapper, itemTypes, "типы предметов для randomItem через пробел (см. .tables.item_table), пустая строка -- любые; зелья, ключи, карты и деньги не берутся никогда" )
+{
+    StringList names;
+
+    for (std::set<int>::const_iterator t = params.itemTypes.begin( ); t != params.itemTypes.end( ); t++)
+        names.push_back( item_table.name( *t ) );
+
+    return Register( names.join( " " ) );
+}
+
+NMI_SET( QuestSelectWrapper, itemTypes, "типы предметов для randomItem через пробел (см. .tables.item_table), пустая строка -- любые; зелья, ключи, карты и деньги не берутся никогда" )
+{
+    DLString line = arg.toString( );
+    std::set<int> types;
+
+    // Built aside and swapped in, so a typo in the third name leaves the knob
+    // as it was rather than half set.
+    for (auto &name: line.split( " " )) {
+        if (name.empty( ))
+            continue;
+
+        int type = item_table.value( name, false );
+
+        if (type == NO_FLAG)
+            throw Scripting::Exception( "No such item type: " + name );
+
+        types.insert( type );
+    }
+
+    params.itemTypes = types;
 }
 
 NMI_GET( QuestSelectWrapper, roomNoCast, "не брать комнаты с флагом ROOM_NO_CAST" )

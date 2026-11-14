@@ -24,8 +24,10 @@ struct QuestSelectParams {
     QuestSelectParams( )
         : levelDiffSet( false ), levelDiffMin( 0 ), levelDiffMax( 0 ),
           maxLevel( 0 ), minTier( 0 ), tierOffset( 0 ),
-          noCaster( false ), visible( false ),
-          carriedByNpc( false ), requireActFlag( 0 ), roomNoCast( false ),
+          noCaster( false ), casterOnly( false ), requireAlign( 0 ),
+          visible( false ),
+          carriedByNpc( false ), requireActFlag( 0 ), requireForm( 0 ),
+          roomNoCast( false ),
           allowNoTrack( false ), allowNoExits( false ),
           allowUnreachable( false )
     {
@@ -57,6 +59,15 @@ struct QuestSelectParams {
 
     /** Skip spellcasters. KillQuest's hardest mode refuses them. */
     bool noCaster;
+
+    /** The opposite: spellcasters only. The Rage rite of a religion sends the
+     *  hero after a caster. Setting both is legal and selects nothing. */
+    bool casterOnly;
+
+    /** Candidate's alignment: 1 good only, -1 evil only, 0 any. The Light and
+     *  Dark rites. Applied on top of the victim model's own rule, which already
+     *  refuses a victim of the hero's alignment. */
+    int requireAlign;
 
     /** Require that the hero can actually see the candidate right now. Reports
      *  29108 and 30879: quest loot and quest targets nobody could see, so the
@@ -91,6 +102,16 @@ struct QuestSelectParams {
      *  the scenario's own list. The third is scenario data and stays in Fenia. */
     bitstring_t requireActFlag;
     DLString requireBehavior;
+
+    /** Candidate's body must carry ANY of these form bits. Joins the OR above:
+     *  the Nature rite wants undead (an act flag) or constructs (a form), and
+     *  "act flag OR form" is exactly how that reads. */
+    bitstring_t requireForm;
+
+    /** Item must be one of these item types; empty for any. The Reason rite
+     *  asks for wands, staves and scrolls. ItemQuestModel::checkItem still
+     *  refuses potions, keys, maps and money underneath, whatever is set here. */
+    std::set<int> itemTypes;
 
     /** Room filters. They apply wherever a client room is judged: picking a room
      *  directly with `clientRoom`/`distantRoom`, AND picking a mob, since
