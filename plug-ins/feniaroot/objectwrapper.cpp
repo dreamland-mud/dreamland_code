@@ -433,6 +433,27 @@ NMI_GET( ObjectWrapper, personal, "установить или вернуть а
     return Register();
 }
 
+NMI_INVOKE( ObjectWrapper, questRewardRefresh, "(ch): пересобрать ненадетую личную награду под ch (уровень, значения, аффекты), как при надевании; false, если это не личная награда со свойствами" )
+{
+    checkTarget();
+    Character *ch = argnum2character(args, 1);
+
+    if (target->wear_loc != wear_none)
+        throw Scripting::Exception("object is equipped");
+
+    if (!target->behavior)
+        return Register(false);
+
+    PersonalQuestReward *reward = target->behavior.getDynamicPointer<PersonalQuestReward>();
+    if (!reward || reward->questFamily().empty())
+        return Register(false);
+
+    // Unworn, so equip() only rewrites the item: its affects are hung
+    // unapplied and reach a wearer on the next wear.
+    reward->equip(ch);
+    return Register(true);
+}
+
 NMI_SET( ObjectWrapper, personal, "установить или вернуть англ. имя собственника для личной вещи (или null)")
 {
     checkTarget();
