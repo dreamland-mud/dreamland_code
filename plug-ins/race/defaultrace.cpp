@@ -40,6 +40,7 @@ using namespace std;
  * RaceHelp 
  *------------------------------------------------------------------*/
 static const DLString LABEL_RACE = "race";
+static const DLString LABEL_MOBRACE = "mobrace";
 const DLString RaceHelp::TYPE = "RaceHelp";
 GROUP(ancient_languages);
 
@@ -61,6 +62,9 @@ void RaceHelp::setRace( DefaultRace::Pointer race )
     if (!race->getFemaleNameUa( ).empty( ) && race->getFemaleNameUa( ) != race->getMaleNameUa( ))
         addAutoKeyword( race->getFemaleNameUa( ).ruscase( '1' ) );
     labels.addTransient(LABEL_RACE);
+    // Non-player races go to the world shelf, not the playable races one.
+    if (!race->isPC( ))
+        labels.addTransient(LABEL_MOBRACE);
 
     helpManager->registrate( Pointer( this ) );
 }
