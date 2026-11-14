@@ -8,6 +8,7 @@
 #include "object.h"
 #include "npcharacter.h"
 #include "room.h"
+#include "itemflags.h"
 
 list<Register> behavior_trigger_with_result(GlobalBitvector &behaviors, const DLString &trigType, const RegisterList &trigArgs)
 {
@@ -150,6 +151,28 @@ bool behavior_trigger(Character *ch, const DLString &trigType, const char *fmt, 
 	return reglist_to_bool(regList);
 }
 
+// Every axe (by its effective class, so hero and reclassed weapons count) chops
+// wood through the 'axe lumberjack' behavior without listing vnums. A prototype
+// behavior that handles use itself (the lumberjack protos, the Artificer
+// multitool) keeps it. Only the Use trigger goes this way: per-tick triggers
+// stay free for plain axes.
+Behavior *object_implicit_use_behavior(Object *obj)
+{
+	static Scripting::IdRef onUseId("onUse");
+	static Scripting::IdRef postUseId("postUse");
+
+	if (!obj->pIndexData || obj->item_type != ITEM_WEAPON)
+		return 0;
+
+	if (obj->affectedValue(APPLY_WEAPON_CLASS, obj->value0(), true) != WEAPON_AXE)
+		return 0;
+
+	if (behaviors_have_trigger(obj->pIndexData->behaviors, onUseId, postUseId))
+		return 0;
+
+	return behaviorManager->findExisting("axe lumberjack");
+}
+
 bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ...)
 {
 	// A trigger fired earlier in the same tick can extract this very object
@@ -160,7 +183,19 @@ bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ..
 	va_list ap;
 	va_start(ap, fmt);
 
-	auto regList = behavior_trigger_with_result(obj->pIndexData->behaviors, trigType, fmt, ap);
+	list<Register> regList;
+	Behavior *implicit = 0;
+
+	if (trigType == "Use")
+		implicit = object_implicit_use_behavior(obj);
+
+	if (implicit) {
+		GlobalBitvector behaviors = obj->pIndexData->behaviors;
+		behaviors.set(*implicit);
+		regList = behavior_trigger_with_result(behaviors, trigType, fmt, ap);
+	} else {
+		regList = behavior_trigger_with_result(obj->pIndexData->behaviors, trigType, fmt, ap);
+	}
 
 	va_end(ap);
 	return reglist_to_bool(regList);

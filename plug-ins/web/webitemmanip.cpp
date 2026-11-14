@@ -18,6 +18,7 @@
 #include "commandmanager.h"
 #include "mobilebehavior.h"
 #include "core/behavior/behavior_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "skillreference.h"
 #include "core/object.h"
 #include "pcharacter.h"
@@ -348,6 +349,8 @@ WEBMANIP_RUN(decorateItem)
     const DLString &pocket = myArgs.pocket;
     int combined = myArgs.combined;
     StringSet triggers = trigger_labels(item);
+    if (object_implicit_use_behavior(item))
+        triggers.insert("use");
 
     ItemManipList manips( item, descr );
     manips.lang = viewerLang( ch );
