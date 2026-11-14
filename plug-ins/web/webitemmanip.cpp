@@ -40,6 +40,7 @@ GSN(lore);
 GSN(steal);
 BHV(sage);
 BHV(blacksmith);
+BHV(drug);
 
 
 /*
@@ -303,6 +304,11 @@ static bool has_trigger_smell( Object *obj, const StringSet &triggers )
 
 static bool has_trigger_use( Object *obj, const StringSet &triggers )
 {
+    // Drug food is taken with 'eat' (behavior drug, onEat); its onUse only
+    // says so, so don't offer it in the menu.
+    if (obj->item_type == ITEM_FOOD && obj->pIndexData->behaviors.isSet(bhv_drug))
+        return false;
+
     return triggers.count("use") > 0;
 }
 
