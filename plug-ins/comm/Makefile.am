@@ -72,6 +72,7 @@ vault.cpp \
 webblob.cpp \
 webscript.cpp \
 webtriggers.cpp \
+webzonequests.cpp \
 webaliases.cpp \
 webmacros.cpp \
 execservlet.cpp \

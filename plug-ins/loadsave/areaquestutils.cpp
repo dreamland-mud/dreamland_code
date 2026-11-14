@@ -210,6 +210,18 @@ DLString aquest_find_latest(PCMemoryInterface* ch)
 }
 
 // Return true if ch passes all requirements to participate in this quest
+long aquest_daily_open_at(AreaQuest *q, const AreaQuestData &qdata)
+{
+    if (!q->oncePerDay || qdata.timeend <= 0)
+        return 0;
+
+    long now = dreamland->getCurrentTime();
+    if (now - qdata.timeend >= Date::SECOND_IN_DAY)
+        return 0;
+
+    return qdata.timeend + Date::SECOND_IN_DAY;
+}
+
 bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuestData &qdata, bool ignoreCancelCooldown)
 {
     // Too old?
@@ -225,10 +237,8 @@ bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuest
         return false;
 
     // A day hasn't passed yet?
-    if (q->oncePerDay) {
-        if (qdata.timeend > 0 && (dreamland->getCurrentTime() - qdata.timeend < Date::SECOND_IN_DAY))
-            return false;
-    }
+    if (aquest_daily_open_at(q, qdata) > 0)
+        return false;
 
     // Standard 1 hour delay after 'q cancel' for non-onboarding quests.
     // Callers can ignore this one gate to ask "would ch qualify if not for the cooldown?".
