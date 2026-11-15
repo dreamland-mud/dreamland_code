@@ -73,13 +73,21 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
         return;
     }
 
-    if ( victim->carry_number + obj->getNumber( ) > Char::canCarryNumber(victim) )
+    // Food handed to your own pet skips the carry limits, so a pet that
+    // carries nothing can still be fed with a plain give: the Fenia onGive
+    // hook (global/onGive/feed) eats it or hands it back, and whatever is
+    // still on the pet after the give triggers comes back below.
+    bool fPetFood = obj->item_type == ITEM_FOOD
+                    && !ch->is_npc( ) && victim->is_npc( )
+                    && ch->getPC( )->pet == victim->getNPC( );
+
+    if ( !fPetFood && victim->carry_number + obj->getNumber( ) > Char::canCarryNumber(victim) )
     {
 		ch->pecho( _("%1$^C1 не мо%1$nжет|гут нести столько вещей."), victim );
         return;
     }
 
-    if (Char::getCarryWeight(victim) + obj->getWeight( ) > Char::canCarryWeight(victim) )
+    if ( !fPetFood && Char::getCarryWeight(victim) + obj->getWeight( ) > Char::canCarryWeight(victim) )
     {
 		ch->pecho( _("%1$^C1 не мо%1$nжет|гут нести такую тяжесть."), victim );
         return;
@@ -141,7 +149,17 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
         break;
     }
     
-    omprog_give( obj, ch, victim );
+    if (omprog_give( obj, ch, victim ))
+        return;
+
+    // Pets carry nothing: food the triggers did not take goes back.
+    if (fPetFood && obj->carried_by == victim
+        && !ch->isDead( ) && !victim->isDead( ) && ch->in_room == victim->in_room)
+    {
+        obj_from_char( obj );
+        obj_to_char( obj, ch );
+        ch->pecho( _("%1$^C1 не мо%1$nжет|гут нести столько вещей."), victim );
+    }
 }
 
 // 'give all <victim>' / 'give all.thing <victim>' (same for 'present'). The
