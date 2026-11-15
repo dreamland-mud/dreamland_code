@@ -26,11 +26,25 @@
 #include "morphology.h"
 #include "l10n.h"
 #include "player_utils.h"
+#include "../loadsave/behavior_utils.h"
 
 static bool mprog_cantorder(Character *victim, Character *master, const char *cmdName, const char *cmdArgs)
 {
     FENIA_CALL(victim, "CantOrder", "Css", master, cmdName, cmdArgs);
     FENIA_NDX_CALL(victim->getNPC(), "CantOrder", "CCss", victim, master, cmdName, cmdArgs);
+    return false;
+}
+
+// The order text as typed, before it is read as a command: a follower may take
+// words of its own (a Beastmaster pet's 'guard', 'hunt', 'heel' stances, Fenia
+// behavior pet). True: the order was taken, and the handler told the master.
+static bool mprog_preorder(Character *victim, Character *master, const char *text)
+{
+    if (behavior_trigger(victim, "PreOrder", "CCs", victim, master, text))
+        return true;
+
+    FENIA_CALL(victim, "PreOrder", "Cs", master, text);
+    FENIA_NDX_CALL(victim->getNPC(), "PreOrder", "CCs", victim, master, text);
     return false;
 }
 
@@ -95,6 +109,9 @@ COMMAND(COrder, "order")
 
         return;
     }
+
+    if (mprog_preorder(victim, ch, argOrder.c_str()))
+        return;
 
     // Lookup a matching command.
     interpretOrder( victim, iargs, argOrder );

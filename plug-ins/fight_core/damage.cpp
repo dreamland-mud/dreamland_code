@@ -344,7 +344,9 @@ void Damage::adjustVisibility( )
 }
 
 /*
- * If victim is charmed, ch might attack victim's master.
+ * If victim is charmed, ch might attack victim's master. The cheap gates stay
+ * here so Fenia is asked only for a mob hitting a charmed NPC whose master
+ * stands awake in the room.
  */
 bool Damage::adjustMasterAttack( )
 {
@@ -373,20 +375,14 @@ bool Damage::adjustMasterAttack( )
     if (victim->master->in_room != ch->in_room)
         return false;
 
-    int roll;
-    if (ch->can_see(victim->master))
-        roll = number_bits(3); // 1 in 8
-    else
-        roll = number_bits(4); // 1 in 16
-    
-    if (roll == 0)
-    {
-        stop_fighting( ch, false );
-        set_fighting( ch, victim->master );
-        return true;
-    }
-    
-    return false;
+    // The odds and the pet's hold live in Fenia (.tmp.cai.masterSwitch, global
+    // onMasterSwitch). The switch stays here: fighting has no Fenia setter.
+    if (!gprog("onMasterSwitch", "CC", ch, victim))
+        return false;
+
+    stop_fighting( ch, false );
+    set_fighting( ch, victim->master );
+    return true;
 }
 
 /*-----------------------------------------------------------------------------
