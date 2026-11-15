@@ -194,8 +194,8 @@ protected:
  */
 public:
     virtual bool assist( Character *, Character * );
-    // Last virtual of the class on purpose: no primary base, so every declared
-    // virtual owns a vtable slot in order, and the older ones keep their offsets.
+    // Last virtual of the class on purpose: this class's own slots keep their
+    // offsets. Virtuals added by subclasses still shift, so reload with 'most'.
     virtual void stopfol( Character *master );
 protected:
     bool assistOffense( Character *, Character * );

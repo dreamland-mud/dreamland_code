@@ -166,14 +166,15 @@ void behavior_notify(Character *ch, const DLString &trigType, const char *fmt, .
 	va_end(ap);
 }
 
-ExtractWatch::ExtractWatch(Character *ch)
-	: ch(ch), room(ch->in_room), id(ch->getID())
+ExtractWatch::ExtractWatch(Character *ch, bool countExtracting)
+	: ch(ch), room(ch->in_room), id(ch->getID()),
+	  wasExtracting(!countExtracting && ch->extracted)
 {
 }
 
 bool ExtractWatch::gone() const
 {
-	return ch->extracted || (room && !ch->in_room) || ch->getID() != id;
+	return (ch->extracted && !wasExtracting) || (room && !ch->in_room) || ch->getID() != id;
 }
 
 // Every axe (by its effective class, so hero and reclassed weapons count) chops

@@ -40,16 +40,20 @@ void behavior_notify(Character *ch, const DLString &trigType, const char *fmt, .
  *  and the object goes back to the pool for the next mob created. So a char that
  *  had a room and lost it is gone, and so is one whose ID changed (the handler
  *  extracted it, then created a mob that got the same object). Once gone() is
- *  true only the old pointer value may be used, never the object. */
+ *  true only the old pointer value may be used, never the object.
+ *  A char already being extracted when the watch is armed (stopfol fired from
+ *  extract_char) only counts as gone once it is recycled, so its handlers still
+ *  run; countExtracting = true makes any extracted flag count, the ai_trigger rule. */
 class ExtractWatch {
 public:
-    ExtractWatch(Character *ch);
+    ExtractWatch(Character *ch, bool countExtracting = false);
     bool gone() const;
 
 private:
     Character *ch;
     Room *room;
     long long id;
+    bool wasExtracting;
 };
 
 /** For each behavior assigned in RoomIndexData call trigType trigger with arguments. */

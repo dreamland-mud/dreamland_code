@@ -104,7 +104,7 @@ int ai_trigger(bool fCombat, Character *mob, const char *trigName, const char *f
     if (!gprog_registered(trigName))
         return AI_UNHANDLED;
 
-    ExtractWatch watch( mob );
+    ExtractWatch watch( mob, true );
 
     va_list ap;
     va_start(ap, fmt);
