@@ -293,6 +293,9 @@ CMDRUNP( examine )
         if (!desc.empty( )) {
             ostringstream descBuf;
             webManipManager->decorateExtraDescr( descBuf, desc.c_str( ), obj->pIndexData->extraDescriptions, ch );
+            // A one-line description has no line break of its own.
+            if (desc.at( desc.size( ) - 1 ) != '\n')
+                descBuf << endl;
             ch->send_to( descBuf );
         }
     }
