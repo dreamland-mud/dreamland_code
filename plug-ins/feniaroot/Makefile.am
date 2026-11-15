@@ -90,7 +90,6 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/clan/behavior \
 -I$(top_srcdir)/plug-ins/services/core \
 -I$(top_srcdir)/plug-ins/languages/core \
--I$(top_srcdir)/plug-ins/services/petshop \
 -I/usr/include/jsoncpp \
 -I$(top_srcdir)/plug-ins/servlets \
 -I$(top_srcdir)/plug-ins/quest/core \
@@ -111,7 +110,6 @@ $(LIBADD_AI) \
 ../clan/behavior/libclan_behavior.la \
 ../skills_impl/libskills_impl.la \
 ../services/core/libservices_core.la \
-../services/petshop/libservices_petshop.la \
 ../languages/core/liblanguages_core.la \
 ../quest/core/libquest_core.la \
 -ljsoncpp

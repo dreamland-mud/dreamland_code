@@ -838,15 +838,7 @@ MEDIT(oldbehavior)
         return false;
     }
 
-    if (arg == "pet") {
-        static const DLString petType( "Pet" );
-        type = petType;
-    }
-    else if (arg == "leveladaptivepet") {
-        static const DLString petType( "LevelAdaptivePet" );
-        type = petType;
-    }
-    else if (arg == "trainer") {
+    if (arg == "trainer") {
         static const DLString trainerType( "Trainer" );
         type = trainerType;
     }
@@ -855,8 +847,8 @@ MEDIT(oldbehavior)
         type = savedCreatureType;
     }
     else { 
-        // Shop keepers are bedit 'shopper' plus shopedit now.
-        stc("Допустимые значения поведения: savedcreature, pet, leveladaptivepet, trainer.\r\n", ch);
+        // Shop keepers are bedit 'shopper' plus shopedit now, shop pets bedit 'pet'.
+        stc("Допустимые значения поведения: savedcreature, trainer.\r\n", ch);
         return false;
     }
 

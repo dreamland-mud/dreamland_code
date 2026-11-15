@@ -10,7 +10,6 @@
 #include "merc.h"
 #include "json_utils_ext.h"
 #include "loadsave.h"
-#include "pet.h"
 #include "behavior.h"
 #include "string_utils.h"
 
@@ -379,25 +378,6 @@ NMI_INVOKE(MobIndexWrapper, create, "(): создать экземпляр мо�
     checkTarget( );
     mob = create_mobile( target );
     char_to_room( mob, get_room_instance( ROOM_VNUM_FENIA_STORAGE ) );
-    return WrapperManager::getThis( )->getWrapper( mob ); 
-}
-
-NMI_INVOKE(MobIndexWrapper, createFor, "(ch): создать экземпляр пета по уровню игрока ch")
-{
-    NPCharacter *mob;
-    checkTarget();
-
-    if (!target->behavior || target->behavior->getFirstNode( )->getAttribute(XMLNode::ATTRIBUTE_TYPE) != "LevelAdaptivePet")
-        throw Scripting::Exception("This mob is not a pet");
-
-    PCharacter *client = args2player(args);
-    mob = create_mobile( target );            
-    char_to_room( mob, get_room_instance( ROOM_VNUM_FENIA_STORAGE ) );        
-
-    LevelAdaptivePet::Pointer pet = mob->behavior.getDynamicPointer<LevelAdaptivePet>();
-    if (pet)
-        pet->config(client, pet->getChar());
-        
     return WrapperManager::getThis( )->getWrapper( mob ); 
 }
 

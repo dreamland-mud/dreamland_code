@@ -5,10 +5,10 @@
 #ifndef PETQUESTOR_H 
 #define PETQUESTOR_H 
 
-#include "pet.h"
+#include "basicmobilebehavior.h"
 #include "questor.h"
 
-class PetQuestor : public Questor, public Pet {
+class PetQuestor : public Questor, public virtual BasicMobileDestiny {
 XML_OBJECT
 public:
         typedef ::Pointer<PetQuestor> Pointer;

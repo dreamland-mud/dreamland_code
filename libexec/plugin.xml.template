@@ -36,7 +36,6 @@
 	<node>generic_notes</node>
 	<node>languages_impl</node>
 	<node>religion</node>
-	<node>services_petshop</node>
 	<node>web</node>
 	<node>craft</node>
 	<node>gmcp</node>

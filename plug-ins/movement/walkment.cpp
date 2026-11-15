@@ -306,7 +306,7 @@ bool Walkment::canControlHorse( )
     }
    
     // Knight horses are the only ones requiring special handling skill ('riding').
-    // The occupation comes from the C++ RideablePet or the 'battlehorse' behavior.
+    // The occupation comes from the 'battlehorse' behavior.
     bool needsRidingSkill = horse->is_npc()
             && mob_has_occupation(horse->getNPC(), OCC_BATTLEHORSE);
 

@@ -131,6 +131,45 @@ bool mob_has_occupation( NPCharacter *mob, int occType )
            && IS_SET(mob->behavior->getOccupation( ), (1 << occType) );
 }
 
+// 'rat god' has a space, so no BHV() for the three of them.
+static BehaviorReference bhv_pet( "pet" );
+static BehaviorReference bhv_rat( "rat" );
+static BehaviorReference bhv_rat_god( "rat god" );
+
+bool mob_index_has_pet_destiny( MOB_INDEX_DATA *pMob )
+{
+    return pMob->behaviors.isSet( bhv_pet )
+        || pMob->behaviors.isSet( bhv_rat )
+        || pMob->behaviors.isSet( bhv_rat_god );
+}
+
+/** A behavior prop flag as medit or Fenia may store it. */
+static bool json_truthy( const Json::Value &v )
+{
+    if (v.isBool( ))
+        return v.asBool( );
+    if (v.isNumeric( ))
+        return v.asDouble( ) != 0;
+    if (v.isString( )) {
+        std::string s = v.asString( );
+        return s == "true" || s == "1";
+    }
+    return false;
+}
+
+bool mob_index_pet_adaptive( MOB_INDEX_DATA *pMob )
+{
+    if (pMob->behaviors.isSet( bhv_rat ))
+        return true;
+
+    // isMember first: a non-const operator[] would add an empty key to the proto.
+    if (!pMob->behaviors.isSet( bhv_pet ) || !pMob->props.isObject( ) || !pMob->props.isMember( "pet" ))
+        return false;
+
+    const Json::Value &cfg = pMob->props["pet"];
+    return cfg.isObject( ) && cfg.isMember( "adaptive" ) && json_truthy( cfg["adaptive"] );
+}
+
 bool mob_index_is_shopper( MOB_INDEX_DATA *pMob )
 {
     int ndx = occ_behavior_index( OCC_SHOPPER );

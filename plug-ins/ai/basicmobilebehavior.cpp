@@ -146,10 +146,12 @@ bool BasicMobileBehavior::isSaved( ) const
     return false;
 }
 
-// Shop keepers can't be charmed, summoned or picked as quest targets.
+// Shop keepers, shop pets, rats and the Rat God can't be charmed, summoned
+// or picked as quest targets.
 bool BasicMobileBehavior::hasDestiny( )
 {
-    return mob_has_occupation( ch, OCC_SHOPPER );
+    return mob_has_occupation( ch, OCC_SHOPPER )
+        || mob_index_has_pet_destiny( ch->pIndexData );
 }
 
 int BasicMobileBehavior::getOccupation( )

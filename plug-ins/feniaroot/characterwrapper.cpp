@@ -86,7 +86,6 @@
 #include "xmlattributerestring.h"
 #include "commonattributes.h"
 #include "player_menu.h"
-#include "pet.h"
 #include "recipeflags.h"
 #include "damageflags.h"
 #include "act.h"
@@ -8699,47 +8698,12 @@ NMI_INVOKE( CharacterWrapper, add_charmed, "(victim,time): очаровать vi
     return Register( );
 }
 
-NMI_GET( CharacterWrapper, cppBehavior, "тип C++-поведения моба (например BasicMobileBehavior, Pet, RideablePet) или пустая строка, если его нет" )
+NMI_GET( CharacterWrapper, cppBehavior, "тип C++-поведения моба (например BasicMobileBehavior, Questor) или пустая строка, если его нет" )
 {
     checkTarget( );
     if (!target->is_npc( ) || !target->getNPC( )->behavior)
         return Register( "" );
     return Register( target->getNPC( )->behavior->getType( ) );
-}
-
-// Pet shop helpers: the target is a pet waiting in a shop storage room, the
-// argument is the buyer. Level, price and hand-over follow the pet's C++ class.
-static Pet::Pointer storage_pet( Character *target )
-{
-    Pet::Pointer bhv;
-    if (target->is_npc( ) && target->getNPC( )->behavior)
-        bhv = target->getNPC( )->behavior.getDynamicPointer<Pet>( );
-    if (!bhv)
-        throw Scripting::Exception( "not a pet for sale" );
-    return bhv;
-}
-
-NMI_INVOKE( CharacterWrapper, petLevel, "(buyer): уровень, с которым этот пет из зоомагазина достанется покупателю" )
-{
-    checkTarget( );
-    Character *buyer = argnum2character( args, 1 );
-    return Register( storage_pet( target )->getLevel( buyer ) );
-}
-
-NMI_INVOKE( CharacterWrapper, petPrice, "(buyer): цена этого пета из зоомагазина для покупателя в серебре, без торга" )
-{
-    checkTarget( );
-    Character *buyer = argnum2character( args, 1 );
-    return Register( storage_pet( target )->toSilver( buyer ) );
-}
-
-NMI_INVOKE( CharacterWrapper, petCreate, "(buyer): создать покупателю копию этого пета из зоомагазина (зачаровать, сделать последователем, скакуна -- без зачарования), вернуть нового моба" )
-{
-    checkTarget( );
-    Character *buyer = argnum2character( args, 1 );
-    if (buyer->is_npc( ))
-        throw Scripting::Exception( "pets are sold to players only" );
-    return wrap( storage_pet( target )->createFor( buyer->getPC( ) ) );
 }
 
 NMI_INVOKE( CharacterWrapper, add_pet, "(pet): добавить пета нам в последователи" )
@@ -8756,12 +8720,6 @@ NMI_INVOKE( CharacterWrapper, add_pet, "(pet): добавить пета нам 
     if (!pet->is_npc( ))
         throw Scripting::Exception( "NPC field requested on PC" ); 
     
-    if (pet->getNPC( )->behavior) {
-        Pet::Pointer bhv = pet->getNPC( )->behavior.getDynamicPointer<Pet>( );
-        if (bhv)
-            bhv->config( target->getPC( ), pet->getNPC( ) );
-    }
-
     if (pet->master)
         follower_stop(pet);
 

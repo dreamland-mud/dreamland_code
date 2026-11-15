@@ -72,6 +72,7 @@
 #include "skillreference.h"
 
 #include "mobilebehavior.h"
+#include "occupations.h"
 #include "mobilebehaviormanager.h"
 #include "objectbehavior.h"
 #include "objectbehaviormanager.h"
@@ -741,11 +742,12 @@ static void apply_saved_mob(NPCharacter *mob, SavedMobState &st)
     st.affects.clear();
 }
 
-/* A pet whose prototype is a level-adaptive shop pet got its level from the
- * buyer, so a stamp mismatch must not reset it to the prototype's. Matched by
- * name: loadsave can't see the petshop/misc_behaviors classes. Fenia shop pets
- * mark themselves with the wrapper field petAdaptive. Fenia callMob summons
- * (callTier field) are left to utils/mob: charm reconfigCalled. */
+/* A shop pet that took its buyer's level must not be reset to the
+ * prototype's on a stamp mismatch. Fenia shop pets mark themselves with the
+ * wrapper field petAdaptive. Pets bought before that field existed are known
+ * by their prototype: the 'rat' behavior or 'pet' with props pet.adaptive.
+ * Fenia callMob summons (callTier field) are left to utils/mob: charm
+ * reconfigCalled. */
 static bool pet_level_is_bought(NPCharacter *pet)
 {
     WrapperBase *wbase = pet->getWrapper();
@@ -760,11 +762,7 @@ static bool pet_level_is_bought(NPCharacter *pet)
         }
     }
 
-    if (!pet->behavior)
-        return false;
-
-    DLString type = pet->behavior->getType();
-    if (type != "LevelAdaptivePet" && type != "Rat")
+    if (!mob_index_pet_adaptive(pet->pIndexData))
         return false;
 
     return !wbase || !wbase->hasField("callTier");

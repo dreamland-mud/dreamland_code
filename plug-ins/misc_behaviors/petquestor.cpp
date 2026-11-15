@@ -36,7 +36,7 @@ bool PetQuestor::specIdle( )
 
 void PetQuestor::stopfol( Character *master ) 
 {
-    Pet::stopfol( master );
+    BasicMobileDestiny::stopfol( master );
 
     if (timer == -1) {
         timer = 5; 

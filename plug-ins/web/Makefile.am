@@ -24,7 +24,6 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/clan/core \
 -I$(top_srcdir)/plug-ins/quest/core \
 -I$(top_srcdir)/plug-ins/services/core \
--I$(top_srcdir)/plug-ins/services/petshop \
 -I$(top_srcdir)/plug-ins/skills_impl \
 -I$(top_srcdir)/plug-ins/groups \
 -I$(top_srcdir)/plug-ins/help \
@@ -45,7 +44,6 @@ $(LIBADD_AI) \
 ../groups/libgenericskill.la \
 ../quest/core/libquest_core.la \
 ../services/core/libservices_core.la \
-../services/petshop/libservices_petshop.la \
 -ljsoncpp
 
 AM_CPPFLAGS += $(plugin_INCLUDES)
