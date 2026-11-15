@@ -40,6 +40,7 @@
 #include "websocketrpc.h"
 #include "fenia_utils.h"
 #include "dreamland.h"
+#include "msp.h"
 
 #define OBJ_VNUM_QUEST_SCROLL 28109
 
@@ -108,6 +109,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     }
 
     tell_raw( client, ch,  _("Поздравляю с выполнением задания!") );
+    msp_sound( client, "alert/quest", 100, 1, 60 );
 
     // Issue reward only for quests that allow players to gain quest points.
     if (reward->points > 0) {

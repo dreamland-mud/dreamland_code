@@ -28,6 +28,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "msp.h"
 
 CLAN(none);
 PROF(samurai);
@@ -174,6 +175,10 @@ void Player::gainExp(PCharacter *pch, int gain)
         send_telegram_level(pch);
 
         advanceLevel(pch);
+
+        // Here, not in advanceLevel: the imm 'advance' command and the web
+        // sandbox call that once per level in a loop and would ring 50 times.
+        msp_sound( pch, "alert/achievement", 100, 1, 60 );
 
         // Notify about any new skills gained due to the level advancement.
         int thisLevelSkillCount = count_available_skills(pch);

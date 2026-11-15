@@ -56,6 +56,7 @@
 #include "clanrecords.h"
 #include "fenia_utils.h"
 #include "mudtags.h"
+#include "msp.h"
 
 // A ruler guard's alert on the ruler clan channel: where the criminal was seen.
 static void ruler_guard_alert( Character *ch, Character *victim )
@@ -649,6 +650,7 @@ SKILL_RUNP( wanted )
                                 SET_BIT(victim->act, PLR_WANTED);
                                 oldact(_("$c1 теперь в РОЗЫСКЕ!!!"),victim, 0, ch, TO_NOTVICT);
                                 victim->pecho(_("Ты теперь в РОЗЫСКЕ!!!"));
+                                msp_sound( victim, "alert/raid", 100, 1, 80 );
                                 if ( !victim->is_npc() ) {
                                         victim->getPC( )->setLoyalty( max ( victim->getPC( )->getLoyalty() - 50, -1000));
                                         // The poster's author, credited at the victim's death (fight_death.cpp).

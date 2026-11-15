@@ -16,6 +16,7 @@
 #include "descriptor.h"
 #include "arg_utils.h"
 #include "l10n.h"
+#include "msp.h"
 
 HOMETOWN(moehewa);
 
@@ -40,7 +41,7 @@ COMMAND(Unread, "unread")
         doNext( pch );
 }
 
-void Unread::doSpool( PCharacter *ch, bool fVerbose )
+bool Unread::doSpool( PCharacter *ch, bool fVerbose )
 {
     ostringstream buf;
     NoteManager::Threads::const_iterator i;
@@ -57,9 +58,13 @@ void Unread::doSpool( PCharacter *ch, bool fVerbose )
         if (!fVerbose)
             ch->pecho("");
         ch->send_to( buf );
+        return true;
     }
-    else if (fVerbose)
+
+    if (fVerbose)
         ch->pecho(_("У тебя нет непрочитанных сообщений."));
+
+    return false;
 }
 
 
@@ -154,7 +159,9 @@ void UnreadListener::run( int oldState, int newState, Descriptor *d )
 
     // Do 'unread' for everyone on login
     if (newState == CON_PLAYING) {
-        Unread::doSpool( ch, false );
+        if (Unread::doSpool( ch, false ))
+            msp_sound( d, "ui/notify", 100, 1, 50 );
+
         Unread::doUnfinished( ch );
 
         // If the two-month spool floor (NoteThread::getStamp) actually hid unread

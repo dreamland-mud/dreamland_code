@@ -21,7 +21,8 @@ public:
         virtual void run( Character *, const DLString & );
         
         static void doNext( PCharacter * );
-        static void doSpool( PCharacter *, bool );
+        /** Print the unread summary; true when there was anything unread. */
+        static bool doSpool( PCharacter *, bool );
         static void doUnfinished( PCharacter * );
 
 private:
