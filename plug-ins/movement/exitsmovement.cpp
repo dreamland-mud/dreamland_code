@@ -576,6 +576,15 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
         if (IS_AFFECTED(wch, AFF_SNEAK | AFF_CAMOUFLAGE) && movetypes[mt].sneak)
             return;
 
+        // Under water everyone swims: no trotting bears down there. Text
+        // only, after the sneak check above, so sneakers stay silent; a ghost,
+        // a fleeing and a crawling mover keep their own words.
+        bool underwater = from_room->getSectorType( ) == SECT_UNDERWATER
+                          || to_room->getSectorType( ) == SECT_UNDERWATER;
+        if (underwater && !IS_GHOST( wch )
+            && mt != MOVETYPE_FLEE && movetype != MOVETYPE_CRAWL)
+            mt = MOVETYPE_SWIMMING;
+
         const movetype_t &mv = movetypes[mt];
         int revdoor = dirs[door].rev;
 
@@ -599,7 +608,7 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
               << (fLeaving ? direction_word(LANG_UA, door, DIR_CASE_TO)
                            : direction_word(LANG_UA, revdoor, DIR_CASE_FROM));
 
-        if ((mt == MOVETYPE_SWIMMING || mt == MOVETYPE_WATER_WALK) && boat) {
+        if ((mt == MOVETYPE_SWIMMING || mt == MOVETYPE_WATER_WALK) && boat && !underwater) {
             int ncase = 0;
             DLString partRu, partEn, partUa;
             DLString prepRu, prepEn, prepUa;
@@ -651,12 +660,6 @@ int ExitsMovement::adjustMovetype( Character *wch )
 {
     if (IS_GHOST( wch ))
         return MOVETYPE_FLYING;
-
-    // Under water everyone swims: no trotting bears or flying bats down
-    // there. Fleeing and sneaking keep their own words.
-    if ((from_room->getSectorType() == SECT_UNDERWATER || to_room->getSectorType() == SECT_UNDERWATER)
-        && movetype != MOVETYPE_FLEE && movetype != MOVETYPE_CRAWL)
-        return MOVETYPE_SWIMMING;
 
     if (from_room->getSectorType() == SECT_WATER_NOSWIM || to_room->getSectorType() == SECT_WATER_NOSWIM) {
         // boat_types and boat describe how the PARTY gets across: for a pet
