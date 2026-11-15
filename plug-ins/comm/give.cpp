@@ -73,13 +73,20 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
         return;
     }
 
-    if ( victim->carry_number + obj->getNumber( ) > Char::canCarryNumber(victim) )
+    // Food handed to your own pet skips the carry limits: the Fenia onGive
+    // hook (global/onGive/feed) either eats it or hands it straight back, so
+    // even a pet that carries nothing can be fed with a plain give.
+    bool fPetFood = obj->item_type == ITEM_FOOD
+                    && !ch->is_npc( ) && victim->is_npc( )
+                    && ch->getPC( )->pet == victim->getNPC( );
+
+    if ( !fPetFood && victim->carry_number + obj->getNumber( ) > Char::canCarryNumber(victim) )
     {
 		ch->pecho( _("%1$^C1 не мо%1$nжет|гут нести столько вещей."), victim );
         return;
     }
 
-    if (Char::getCarryWeight(victim) + obj->getWeight( ) > Char::canCarryWeight(victim) )
+    if ( !fPetFood && Char::getCarryWeight(victim) + obj->getWeight( ) > Char::canCarryWeight(victim) )
     {
 		ch->pecho( _("%1$^C1 не мо%1$nжет|гут нести такую тяжесть."), victim );
         return;
