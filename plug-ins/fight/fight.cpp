@@ -1116,13 +1116,14 @@ void damapply_class(Character *ch, int &dam)
     if (ch->is_npc())
         return;
 
-    int div;        
+    int div;
+    Flags archetype = ch->getProfession( )->getFlags( ch );
    
-    if (ch->getProfession( )->getFlags( ).isSet(PROF_HYBRID))
+    if (archetype.isSet(PROF_HYBRID))
         div = 130; 
-    else if (ch->getProfession( )->getFlags( ).isSet(PROF_AGILE))
+    else if (archetype.isSet(PROF_AGILE))
         div = 110;
-    else if (!ch->getProfession( )->getFlags( ).isSet(PROF_CASTER))
+    else if (!archetype.isSet(PROF_CASTER))
         div = 100;   
     else 
         return;
