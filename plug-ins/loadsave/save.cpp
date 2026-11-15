@@ -72,7 +72,7 @@
 #include "skillreference.h"
 
 #include "mobilebehavior.h"
-#include "../loadsave/behavior_utils.h"
+#include "occupations.h"
 #include "mobilebehaviormanager.h"
 #include "objectbehavior.h"
 #include "objectbehaviormanager.h"

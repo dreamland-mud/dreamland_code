@@ -199,38 +199,6 @@ Behavior *object_implicit_use_behavior(Object *obj)
 	return behaviorManager->findExisting("axe lumberjack");
 }
 
-/** A behavior prop flag as medit or Fenia may store it. */
-static bool json_truthy(const Json::Value &v)
-{
-	if (v.isBool())
-		return v.asBool();
-	if (v.isNumeric())
-		return v.asDouble() != 0;
-	if (v.isString()) {
-		std::string s = v.asString();
-		return s == "true" || s == "1";
-	}
-	return false;
-}
-
-bool mob_index_pet_adaptive(struct mob_index_data *pMob)
-{
-	Behavior *rat = behaviorManager->findExisting("rat");
-	if (rat && pMob->behaviors.isSet(rat->getIndex()))
-		return true;
-
-	Behavior *pet = behaviorManager->findExisting("pet");
-	if (!pet || !pMob->behaviors.isSet(pet->getIndex()))
-		return false;
-
-	const Json::Value &props = pMob->props;
-	if (!props.isObject() || !props.isMember("pet"))
-		return false;
-
-	const Json::Value &cfg = props["pet"];
-	return cfg.isObject() && cfg.isMember("adaptive") && json_truthy(cfg["adaptive"]);
-}
-
 bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ...)
 {
 	// A trigger fired earlier in the same tick can extract this very object

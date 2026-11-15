@@ -34,7 +34,6 @@
 #include "tohit.h"
 #include "occupations.h"
 #include "behavior.h"
-#include "../loadsave/behavior_utils.h"
 #include "profiler.h"
 
 #include "magic.h"

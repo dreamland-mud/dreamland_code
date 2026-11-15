@@ -10,7 +10,6 @@ class Room;
 class DLString;
 class GlobalBitvector;
 class Behavior;
-struct mob_index_data;
 
 /** Directly call a trigger with arguments defined for these behaviors. */
 list<Scripting::Register> behavior_trigger_with_result(GlobalBitvector &behaviors, const DLString &trigType, const Scripting::RegisterList &trigArgs);
@@ -25,11 +24,6 @@ bool behaviors_have_trigger(GlobalBitvector &behaviors, const Scripting::Registe
 /** Behavior an object answers 'use' with by its kind rather than its prototype
  *  (any axe chops wood), or null. behavior_trigger(obj, "Use") adds it. */
 Behavior *object_implicit_use_behavior(Object *obj);
-
-/** Does a pet of this prototype take its buyer's level? True for the 'rat'
- *  behavior and for 'pet' with props pet.adaptive set (bool, non-zero number
- *  or the string "true" / "1"). */
-bool mob_index_pet_adaptive(struct mob_index_data *pMob);
 
 /** For each behavior assigned in OBJ_INDEX_DATA call trigType trigger with arguments. */
 bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ...);
