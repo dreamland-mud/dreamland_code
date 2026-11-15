@@ -77,6 +77,7 @@
 #include "race.h"
 #include "affect.h"
 #include "pcharacter.h"
+#include "msp.h"
 #include "npcharacter.h"
 #include "core/object.h"
 #include "liquid.h"
@@ -1991,10 +1992,14 @@ void track_update( )
 void check_reboot( void )
 {
     Descriptor *d;
+    // Bell on the first warning of a countdown and on the last minute only,
+    // so a 15-minute countdown does not ring every tick.
+    static bool rebootBellRung = false;
 
     switch(dreamland->getRebootCounter( ))
     {
     case -1:
+        rebootBellRung = false;
         break;
     case 0:
         // Discord is English, Telegram is Ukrainian.
@@ -2015,11 +2020,16 @@ void check_reboot( void )
             // hardcoded Russian name passed through %s, so it stayed Cyrillic for
             // every viewer no matter what language the rest resolved to.
             // per-viewer: each player's pecho resolves the MultiMessage in their own language
+            bool bell = !rebootBellRung || counter == 1;
+            rebootBellRung = true;
             for (d = descriptor_list; d != 0; d = d->next)
-                if (d->connected == CON_PLAYING && d->character)
+                if (d->connected == CON_PLAYING && d->character) {
                     d->character->pecho(
                         _("{RВнимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!{x"),
                         counter );
+                    if (bell)
+                        msp_sound( d, "alert/bell", 100, 1, 90 );
+                }
             if (counter == 5) {
                 MultiMessage warn = _("Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!");
                 send_to_discord_stream(":red_circle: " + fmtLang(LANG_EN, warn, counter));
