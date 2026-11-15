@@ -85,6 +85,11 @@ CONFIGURABLE_DECL(fight, boss_mods)
 // "utils/drugs".
 CONFIGURABLE_DECL(fight, drugs)
 
+// Law-abidance (fight/law.json): ethos scaling, bands, wanted-clear lines.
+// Read only by Fenia, through .config("fight/law"): see dreamland_fenia
+// "utils/law".
+CONFIGURABLE_DECL(fight, law)
+
 enum {
     LOOT_DESTROY,
     LOOT_DROP,
@@ -1113,30 +1118,6 @@ static void wanted_poster_paid( Character *ch, Character *victim )
         achievement( poster, "wanted" );
 }
 
-// Killing a wanted player or a thief increases your loyalty.
-// The thief flag is cleared on payout, so one theft pays out once.
-static void loyalty_gain( Character *ch, Character *victim )
-{
-    if (!ch)
-        return;
-
-    bool wanted = IS_SET(victim->act, PLR_WANTED);
-    bool thief = IS_THIEF(victim);
-
-    if (!wanted && !thief)
-        return;
-    
-    if (!ch->is_npc( ) && ch != victim) {
-        ch->getPC( )->setLoyalty(min ( ch->getPC( )->getLoyalty()+100, 1000 ));
-
-        if (thief)
-            REMOVE_THIEF( victim );
-    }
-    
-    if (wanted && victim->getPC( )->getLoyalty() > -900)
-        REMOVE_BIT(victim->act, PLR_WANTED);
-}
-
 static bool mprog_death( Character *victim, Character *killer )
 {
     aquest_trigger(victim, killer, "Death", "CC", victim, killer);
@@ -1248,10 +1229,13 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
     // Reset player and move them to the altar.    
     extract_dead_player( victim->getPC( ), FEXTRACT_COUNT );
 
-    if (!sparring) {
+    if (!sparring)
         wanted_poster_paid( ch, victim );
-        loyalty_gain( ch, victim );
-    }
+
+    // The death is certain and its penalties, corpse and wanted-loot rules are
+    // done: law-abidance rewards and the wanted/thief marks are Fenia's
+    // (global/onPostDeath/law). Player victims only.
+    gprog("onPostDeath", "CCsi", victim, ch, label.c_str(), (int)sparring);
 
     ghost_gain( victim );
     
