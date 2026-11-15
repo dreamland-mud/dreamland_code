@@ -194,6 +194,11 @@ NMI_GET( MobIndexWrapper, form, "флаги формы тела прототип
     checkTarget( );
     return target->form;
 }
+NMI_GET( MobIndexWrapper, act, "act флаги прототипа (таблица .tables.act_flags); у инстанса бывают другие")
+{
+    checkTarget( );
+    return target->act;
+}
 NMI_GET( MobIndexWrapper, imm_flags , "флаги иммунитета (таблица .tables.imm_flags)")
 {
     checkTarget( );

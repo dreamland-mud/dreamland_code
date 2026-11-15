@@ -1605,9 +1605,9 @@ NMI_GET( BonusWrapper, color, "буква цвета в календаре" )
 }
 
 
-NMI_INVOKE( BonusWrapper, active, "(ch): вернет true если бонус сейчас активен")
+NMI_INVOKE( BonusWrapper, active, "([ch]): вернет true если бонус сейчас активен; без ch -- только календарный, для всех")
 {
-    PCharacter *ch = argnum2player(args, 1);
+    PCharacter *ch = args.empty() ? NULL : argnum2player(args, 1);
     return getTarget()->isActive(ch, time_info);
 }
 
