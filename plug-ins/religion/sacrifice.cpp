@@ -385,6 +385,40 @@ static void altar_clear(Object *altar)
     }
 }
 
+// A sacrifice names a deity and a where-noun as plain strings, so a single
+// recho would format them once in the actor's language for every observer.
+// These resolve both in each observer's own language.
+static const char *deity_name_for(Character *ch, lang_t lang)
+{
+    if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
+        return lmsg(lang,
+                    "the gods",
+                    "бог|и|ов|ам|ов|ами|ах",
+                    "бог|и|ів|ам|ів|ами|ах");
+
+    return (*ch->getPC()->getReligion()).getNameFor(lang).c_str();
+}
+
+static const char *where_for(Room *room, lang_t lang)
+{
+    const terrain_t &terr = terrains[room->getSectorType()];
+
+    if (lang == LANG_EN)
+        return terr.whereEn;
+    if (lang == LANG_UA)
+        return terr.whereUa;
+    return terr.where;
+}
+
+// Everyone else in the room who would get a recho from ch, with their language.
+template <typename Say>
+static void echo_others(Character *ch, Say say)
+{
+    for (Character *to = ch->in_room->people; to; to = to->next_in_room)
+        if (to != ch && to->position >= POS_RESTING && to->can_sense(ch))
+            say(to, viewerLang(to));
+}
+
 void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
 {
     if (ch->is_npc()) {
@@ -467,7 +501,9 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
     if (offering.smites()) {
         ch->pecho(_("{R%^N1 гневается на тебя за попытку принести в жертву %s!{x"),
                        rname, offering.getSmiteMessage().c_str());
-        ch->recho(_("Гнев %^N2 обрушивается на %C4!"), rname, ch);
+        echo_others(ch, [&](Character *to, lang_t lg) {
+            to->pecho(_("Гнев %^N2 обрушивается на %C4!"), deity_name_for(ch, lg), ch);
+        });
         rawdamage(ch, ch, DAM_OTHER, ch->hit / 4, false, "gods");
         ch->pecho(_("Это было действительно {rБОЛЬНО{x!")); 
         altar_clear(altar);
@@ -610,7 +646,9 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
             ch->recho(_("%^C1 выбрасывает %O4 прочь."), ch, obj);
             wiznet( WIZ_SACCING, 0, 0, "%^C1 выбрасывает %O4 прочь.", ch, obj );
         } else {
-            ch->recho(_("%^C1 приносит %O4 в жертву %N3."), ch, obj, rname);
+            echo_others(ch, [&](Character *to, lang_t lg) {
+                to->pecho(_("%^C1 приносит %O4 в жертву %N3."), ch, obj, deity_name_for(ch, lg));
+            });
             wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит %O4 в жертву %N3.", ch, obj, rname );
         }
     }
@@ -670,7 +708,9 @@ CMDRUNP( sacrifice )
             ch->recho(_("%^C1 предлагает себя в жертву пустоте, но слышит в ответ тактичное молчание."), ch);
             ch->pecho(_("Ты предлагаешь себя в жертву пустоте и слышишь в ответ лишь тактичное молчание."));
         } else {
-            ch->recho(_("%^C1 предлагает себя в жертву %N3, но слышит в ответ тактичное молчание."), ch, rname);
+            echo_others(ch, [&](Character *to, lang_t lg) {
+                to->pecho(_("%^C1 предлагает себя в жертву %N3, но слышит в ответ тактичное молчание."), ch, deity_name_for(ch, lg));
+            });
             ch->pecho(_("Ты предлагаешь себя в жертву %N3, но слышишь в ответ лишь тактичное молчание."), rname);
         }
         return;
@@ -706,23 +746,17 @@ CMDRUNP( sacrifice )
             return;
         }
 
-        // where-noun in the actor's language (mirrors examine.cpp); the bare
-        // .where leaked RU ("everything that is на полу") to EN/UA players.
-        const terrain_t &sacTerr = terrains[ch->in_room->getSectorType()];
-        lang_t wlang = viewerLang(ch);
-        const char *where;
-        if (wlang == LANG_EN)
-            where = sacTerr.whereEn;
-        else if (wlang == LANG_UA)
-            where = sacTerr.whereUa;
-        else
-            where = sacTerr.where;
+        const char *where = where_for(ch->in_room, viewerLang(ch));
         if (godless) {
-            ch->recho(_("%^C1 выбрасывает прочь все, что находится %s."), ch, where);
+            echo_others(ch, [&](Character *to, lang_t lg) {
+                to->pecho(_("%^C1 выбрасывает прочь все, что находится %s."), ch, where_for(ch->in_room, lg));
+            });
             ch->pecho(_("Ты выбрасываешь прочь все, что находится %s."), where);
             wiznet( WIZ_SACCING, 0, 0, "%^C1 выбрасывает прочь все, что находится %s в %s.", ch, where, ch->in_room->getName() );
         } else {
-            ch->recho(_("%^C1 приносит в жертву %N3 все, что находится %s."), ch, rname, where);
+            echo_others(ch, [&](Character *to, lang_t lg) {
+                to->pecho(_("%^C1 приносит в жертву %N3 все, что находится %s."), ch, deity_name_for(ch, lg), where_for(ch->in_room, lg));
+            });
             ch->pecho(_("Ты приносишь в жертву %N3 все, что находится %s."), rname, where);
             wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит в жертву %N3 все, что находится %s в %s.", ch, rname, where, ch->in_room->getName() );
         }
@@ -755,7 +789,9 @@ CMDRUNP( sacrifice )
     if (mana_gain != -1 ) {
         ch->mana += mana_gain;
         ch->pecho(_("Ты устраиваешь торжественное сожжение во славу %1$N3, восстанавливая %2$d очк%2$Iо|а|ов энергии."), rname, mana_gain);
-        ch->recho(_("%^C1 устраивает торжественное сожжение во славу %N3, восстанавливая энергию."), ch, rname);
+        echo_others(ch, [&](Character *to, lang_t lg) {
+            to->pecho(_("%^C1 устраивает торжественное сожжение во славу %N3, восстанавливая энергию."), ch, deity_name_for(ch, lg));
+        });
     }
 
     if (silver > 0) {
