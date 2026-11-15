@@ -59,6 +59,7 @@ const int WORD_PREFIX = 90;     // query word of PREFIX_MIN+ letters starts a ke
 const int WORD_FUZZY = 80;      // minus FUZZY_STEP per edit
 const int WORD_STEM = 70;       // long common prefix (inflection), minus the unshared tail
 const int WORD_WEAK = 1;        // a 4-letter substitution: ranks below every other match
+const int WORD_FPREF = 2;       // typo plus truncation (резеденц -> резиденция): just above WORD_WEAK
 const int FUZZY_STEP = 15;
 const int DF_BONUS = 50;        // divided by the number of articles the word matched: rare words win
 const int MULTI_MIN_WORDS = 2;  // union results need this many matched words when the query has 3+
@@ -68,6 +69,7 @@ const size_t STEM_MIN_PREFIX = 5;
 const size_t STEM_ABBR_PREFIX = 4;
 const size_t FUZZY_MIN_LEN = 5;   // shorter query words get no free edit (шлем/шлеп, моба/мова)
 const size_t SHORT_TYPO_LEN = 4;  // ... except a swap or a plural letter, and a weak substitution
+const size_t FPREF_MIN_LEN = 6;   // a word this long may sit one edit off a keyword's prefix; shorter is noise
 const size_t FLIP_MIN_LEN = 3;    // every word this long before a layout flip is tried (уф -> ea)
 const size_t MAX_WORDS = 8;       // a pasted sentence costs no more than a short question
 const size_t NUMBER_MAX_DIGITS = 6;
@@ -158,6 +160,19 @@ int word_score(const DLString &q, const DLString &k, bool glued = false)
         int sc = max(WORD_STEM - (int)(max(q.size(), k.size()) - p), WORD_WEAK + 1);
         if (sc > best)
             best = sc;
+    }
+
+    // A typo inside a truncated word (восоеди -> воссоединиться): one edit
+    // against a keyword prefix of about the same length, the last resort.
+    if (best == 0 && !glued && q.size() >= FPREF_MIN_LEN && k.size() > q.size()) {
+        for (size_t m = q.size() - 1; m <= q.size() + 1; m++) {
+            if (m >= k.size())
+                break;
+            if (levenshtein(q, k.substr(0, m), 1, 1, 1, 1) <= 1) {
+                best = WORD_FPREF;
+                break;
+            }
+        }
     }
 
     return best;
