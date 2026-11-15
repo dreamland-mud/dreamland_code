@@ -39,6 +39,7 @@
 
 #include "websocketrpc.h"
 #include "nannyhandler.h"
+#include "iomanager.h"
 #include "mssp.h"
 #include "feniamanager.h"
 #include "wrappermanagerbase.h"
@@ -611,6 +612,33 @@ NMI_INVOKE( NannyHandler, mintPendingLink, "" )
 }
 
 /*
+ * A login session that holds a name only because its player walked away mid-creation:
+ * a phone that locks drops the websocket without a FIN, and the server keeps the
+ * descriptor until the hourly login sweep. Such a holder blocks every retry of the
+ * same name with "already connected". It counts as abandoned when it is still in the
+ * nanny, has no saved character (a new char reaches allList only at link), is not
+ * mid-remort (closing that would extract a life) and has been silent for
+ * STALE_CREATION_IDLE seconds -- so a player actively creating keeps the name.
+ */
+static const int STALE_CREATION_IDLE = 120;
+
+static bool is_stale_creation( Descriptor *d )
+{
+    if (d->connected != CON_NANNY)
+        return false;
+
+    PCharacter *pc = d->character->getPC( );
+
+    if (PCharacterManager::find( pc->getName( ) ))
+        return false;
+
+    if (pc->getAttributes( ).isAvailable( "remorting" ))
+        return false;
+
+    return IOManager::getThis( )->idleSeconds( d ) >= STALE_CREATION_IDLE;
+}
+
+/*
  * Login-name availability, shared with the /newui web-creation front (the
  * character-less `check_name` WS command in Descriptor::wsHandlePayload). Mirrors the
  * availability half of the nanny's name step so the form's inline result cannot
@@ -664,7 +692,8 @@ DLString nanny_check_login_name(const DLString &rawName)
         // (initial е -> Ye vs E, a few UA letters) and this hint then silently misses --
         // harmless, because the authoritative online-collision guard is ackName ->
         // checkName (descriptor_find_named on the real login) at submit, not this pre-check.
-        if (descriptor_find_named(NULL, String::translitToLatin(name)))
+        Descriptor *holder = descriptor_find_named(NULL, String::translitToLatin(name));
+        if (holder && !is_stale_creation(holder))
             return "online";
         if (PCharacterManager::find(name) != 0)
             return "exists";
@@ -674,7 +703,8 @@ DLString nanny_check_login_name(const DLString &rawName)
     // All-Latin name.
     if (!badNames->checkName(name).empty())
         return "reserved";
-    if (descriptor_find_named(NULL, name))
+    Descriptor *holder = descriptor_find_named(NULL, name);
+    if (holder && !is_stale_creation(holder))
         return "online";
     if (PCharacterManager::find(name) != 0)
         return "exists";
@@ -696,8 +726,18 @@ NMI_INVOKE( NannyHandler, checkName, "" )
     if (!(rc = badNames->checkName(name)).empty())
         return rc;
 
-    if (descriptor_find_named( NULL, name ))
-        return "already_connected";
+    // Close abandoned creations holding the name (that extracts their unfinished
+    // character); a live holder still wins. close() nulls d->character, so the
+    // next lookup moves past the closed one.
+    Descriptor *d;
+    while (( d = descriptor_find_named( NULL, name ) )) {
+        if (!is_stale_creation( d ))
+            return "already_connected";
+
+        LogStream::sendNotice( ) << "Nanny: closing abandoned creation of " << name
+                                 << " on descriptor " << d->descriptor << " from " << d->host << endl;
+        IOManager::getThis( )->kickDescriptor( d );
+    }
 
     return DLString::emptyString;
 }
