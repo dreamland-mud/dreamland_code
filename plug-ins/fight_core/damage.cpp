@@ -168,6 +168,11 @@ bool Damage::mprog_hit()
     FENIA_CALL( victim, "Hit", "CisO", ch, dam, damType.c_str( ), NULL );
     FENIA_NDX_CALL( victim->getNPC( ), "Hit", "CCisO", victim, ch, dam, damType.c_str( ), NULL );
 
+    // Skins and thorns answer blows, not damage over time: a bleed or poison
+    // tick must not spend a stone skin charge or prick the affect's owner.
+    if (fromAffect)
+        return false;
+
     for (auto &paf: victim->affected.findAllWithHandler())
         if (paf->type->getAffect() && paf->type->getAffect()->onHit(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), NULL))
             return true;
