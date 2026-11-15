@@ -1,3 +1,2 @@
 SUBDIRS = \
-core \
-petshop 
+core

@@ -4,7 +4,6 @@
  */
 
 #include "so.h"
-#include "xmlattributeplugin.h"
 #include "areabehaviorplugin.h"
 #include "mobilebehaviorplugin.h"
 #include "objectbehaviorplugin.h"
@@ -12,7 +11,6 @@
 #include "npcharacter.h"
 
 #include "midgaardfountain.h"
-#include "rats.h"
 #include "ofcolguards.h"
 #include "petquestor.h"
 
@@ -72,10 +70,6 @@ extern "C"
         Plugin::registerPlugin<ObjectBehaviorRegistrator<MidgaardFountain> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<PetQuestor> >( ppl );
         
-        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeRats> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<Rat> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<RatGod> >( ppl );
-
         Plugin::registerPlugin<MobileBehaviorRegistrator<OfcolMarshal> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<OfcolGuard> >( ppl );
 

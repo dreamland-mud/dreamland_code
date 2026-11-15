@@ -34,6 +34,7 @@
 #include "tohit.h"
 #include "occupations.h"
 #include "behavior.h"
+#include "../loadsave/behavior_utils.h"
 #include "profiler.h"
 
 #include "magic.h"
@@ -53,21 +54,6 @@ static void searcher_saves_pm( Json::Value &row, int level, int svs )
 }
 
 static IconvMap koi2utf("koi8-u", "utf-8");
-
-/** A behavior prop flag as medit or Fenia may store it: bool, non-zero number,
- *  or the string "true" / "1". */
-static bool json_truthy( const Json::Value &v )
-{
-    if (v.isBool( ))
-        return v.asBool( );
-    if (v.isNumeric( ))
-        return v.asDouble( ) != 0;
-    if (v.isString( )) {
-        std::string s = v.asString( );
-        return s == "true" || s == "1";
-    }
-    return false;
-}
 
 GSN(none);
 
@@ -329,8 +315,8 @@ public:
         ostringstream buf;
         Json::Value dump;
 
-        // Shop pets are either the C++ Pet family (old prototypes) or carry the
-        // Fenia 'pet' / 'rat' behaviors. Indexes resolved once: findExisting is slow.
+        // Shop pets carry the Fenia 'pet' or 'rat' behavior.
+        // Indexes resolved once: findExisting is slow.
         Behavior *petBhv = behaviorManager->findExisting("pet");
         Behavior *ratBhv = behaviorManager->findExisting("rat");
         int petNdx = petBhv ? petBhv->getIndex() : -1;
@@ -343,23 +329,12 @@ public:
 
             bool fenPet = petNdx >= 0 && pMob->behaviors.isSet(petNdx);
             bool fenRat = ratNdx >= 0 && pMob->behaviors.isSet(ratNdx);
-
-            DLString type;
-            if (pMob->behavior)
-                type = pMob->behavior->getFirstNode()->getAttribute(XMLNode::ATTRIBUTE_TYPE);
-            bool cppPet = type.find("Pet") != DLString::npos || type == "Rat";
-
-            if (!cppPet && !fenPet && !fenRat)
+            if (!fenPet && !fenRat)
                 continue;
 
             // Level-adaptive pets take the buyer's level: the export shows -1.
-            bool adaptive = type == "LevelAdaptivePet" || type == "Rat" || fenRat;
-            if (fenPet && pMob->props.isObject() && pMob->props.isMember("pet")) {
-                const Json::Value &cfg = pMob->props["pet"];
-                if (cfg.isObject() && cfg.isMember("adaptive") && json_truthy(cfg["adaptive"]))
-                    adaptive = true;
-            }
-            
+            bool adaptive = mob_index_pet_adaptive(pMob);
+
             Json::Value pet;
             pet["vnum"] = pMob->vnum;
             json_lang_string(pet, "name", pMob->short_descr);
