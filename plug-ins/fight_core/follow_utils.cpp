@@ -12,6 +12,7 @@
 #include "affecthandler.h"
 #include "affect.h"
 #include "core/behavior/behavior_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "room.h"
@@ -73,6 +74,10 @@ static void afprog_stopfol( Character *ch )
 
 static bool mprog_stopfol( Character *ch, Character *master )
 {
+    // Notification only: its result is ignored so the C++ stopfol below
+    // (last charm time, saved creature cleanup) always runs.
+    behavior_trigger( ch, "Stopfol", "CC", ch, master );
+
     FENIA_CALL( ch, "Stopfol", "C", master );
     FENIA_NDX_CALL( ch->getNPC( ), "Stopfol", "CC", ch, master );
     BEHAVIOR_VOID_CALL( ch->getNPC( ), stopfol, master );

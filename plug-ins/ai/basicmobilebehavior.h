@@ -44,6 +44,7 @@ public:
     virtual bool area( );
     virtual bool spell( Character *caster, int, bool ); 
     virtual bool kill( Character * );
+    virtual void stopfol( Character *master );
     virtual bool extractNotify( Character *, bool, bool );
     virtual bool isSaved( ) const;
     virtual bool hasDestiny( );

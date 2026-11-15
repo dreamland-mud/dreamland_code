@@ -325,6 +325,15 @@ void BasicMobileBehavior::unsetLastCharmTime()
     lastCharmTime = 0;
 }
 
+/* A pet that leaves its owner (abandoned, released, owner gone) stays out of
+ * the mob AI for a while, as if just uncharmed. Only the owner's pet: a charmie
+ * whose charm breaks must turn on its charmer at once. */
+void BasicMobileBehavior::stopfol( Character *master )
+{
+    if (master && !master->is_npc( ) && master->getPC( )->pet == ch)
+        setLastCharmTime( );
+}
+
 /*
  * BasicMobileBehavior - returning to home position 
  */

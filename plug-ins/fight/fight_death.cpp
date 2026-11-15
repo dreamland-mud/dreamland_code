@@ -25,6 +25,7 @@
 #include "fenia_utils.h"
 #include "string_utils.h"
 #include "core/behavior/behavior_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "schedulertask.h"
 #include "dlscheduler.h"
 #include "pcharacter.h"
@@ -1186,6 +1187,12 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
         return;
 
     // From this point on the death has certainly happened.
+
+    // Mob behaviors hear about the death only once nothing can cancel it, so a
+    // handler never acts on a death that did not happen. Notification only.
+    behavior_trigger( victim, "Death", "CC", victim, ch );
+    if (victim->extracted)
+        return;
 
     // A charmed pet or servant dealt the blow that felled a boss.
     if (realKiller && realKiller != ch && victim->is_npc() && victim->getNPC()->getTier() <= 2)
