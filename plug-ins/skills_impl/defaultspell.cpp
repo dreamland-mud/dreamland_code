@@ -385,10 +385,15 @@ void DefaultSpell::utterPrayer(Character *ch)
         ch->pecho(_("Ты неумело молишься, прося богов о помощи."));  
         ch->recho(_("%^C1 неумело молится, прося богов о помощи."), ch); 
     } else {
-        // getNameFor(ch) is per-viewer (EN latin shortDescr / RU nameRus / UA nameUa);
-        // getRussianName() leaked the Cyrillic name to EN/UA players ("prayer to Мефисто").
-        ch->pecho(_("Ты возносишь молитву %N3."), ch->getReligion()->getNameFor(ch).c_str());
-        ch->recho(_("%^C1 возносит молитву %N3."), ch, ch->getReligion()->getNameFor(ch).c_str());
+        // getNameFor(viewer) picks the god's name in the viewer's language. recho would
+        // resolve it once for the caster and leak it to every onlooker, so each onlooker
+        // gets their own line, with recho's filters (awake, can sense the caster).
+        ReligionReference &god = ch->getReligion();
+        ch->pecho(_("Ты возносишь молитву %N3."), god->getNameFor(ch).c_str());
+
+        for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
+            if (rch != ch && rch->position >= POS_RESTING && rch->can_sense(ch))
+                rch->pecho(_("%^C1 возносит молитву %N3."), ch, god->getNameFor(rch).c_str());
     }
 }
 
