@@ -2167,6 +2167,22 @@ void idle_update( PCharacter *ch )
     // 'autoafk' config option retired -- vanishing no longer forces afk.
 }
 
+/*
+ * MSP: ring when a protective state ends on its own. Compares the bits after
+ * affect_check re-applied the remaining sources, so a second source (another
+ * affect, worn gear, the race) that keeps the flag up stays silent.
+ */
+static void msp_wearoff( Character *ch, bitstring_t before )
+{
+    static const bitstring_t protective = AFF_FLYING | AFF_SANCTUARY | AFF_INVISIBLE;
+
+    if (ch->isDead( ) || ch->dying)
+        return;
+
+    if (before & ~ch->affected_by.getValue( ) & protective)
+        msp_sound( ch, "alert/bell", 100, 1, 70 );
+}
+
 void char_update_affects( Character *ch )
 {
     AffectList affects = ch->affected.clone();
@@ -2198,7 +2214,11 @@ void char_update_affects( Character *ch )
                     if (paf->type->getAffect( )) 
                         paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, ch), paf );
 
+                bitstring_t before = ch->affected_by.getValue( );
+
                 affect_remove( ch, paf );
+
+                msp_wearoff( ch, before );
             }
         }
     }
