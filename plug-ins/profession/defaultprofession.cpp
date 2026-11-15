@@ -12,6 +12,7 @@
 #include "player_utils.h"
 #include "skillmanager.h"
 #include "skill.h"
+#include "skillreference.h"
 #include "skillgroup.h"
 #include "alignment.h"
 #include "room.h"
@@ -23,6 +24,7 @@
 GROUP(ancient_languages);
 GROUP(card_pack);
 GROUP(tattoo_master);
+GSN(shapeshift);
 
 static const DLString LABEL_CLASS = "class";
 
@@ -467,8 +469,19 @@ int DefaultProfession::getManaRate( ) const
 {
     return manaRate.getValue( );
 }
-Flags DefaultProfession::getFlags( CharacterMemoryInterface * ) const
+Flags DefaultProfession::getFlags( CharacterMemoryInterface *mem ) const
 {
+    // A shapeshifted druid fights as a beast, not as a caster: melee class
+    // damage, melee AI targeting, melee flee odds while the form lasts.
+    Character *ch = dynamic_cast<Character *>( mem );
+
+    if (ch && flags.isSet( PROF_CASTER ) && ch->isAffected( gsn_shapeshift )) {
+        Flags f = flags;
+        f.removeBit( PROF_CASTER );
+        f.setBit( PROF_MELEE );
+        return f;
+    }
+
     return flags;
 }
 int DefaultProfession::getPoints( ) const

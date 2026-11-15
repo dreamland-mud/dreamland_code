@@ -203,7 +203,9 @@ void WeaponRandomizer::adjustTimer(Object *obj) const
     if (obj->timer > 0)
         return;
 
-    if (obj->getProperty("tier").empty())
+    // Non-numeric tiers (shapeshift claws: "natural") only mark an instance
+    // that owns its dice; they have no generator timer.
+    if (!obj->getProperty("tier").isNumber())
         return;
 
     WeaponGenerator gen;
