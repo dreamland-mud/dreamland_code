@@ -1,4 +1,5 @@
 #include "core/behavior/behavior_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "fenia_utils.h"
 #include "behavior.h"
 #include "lex.h"
@@ -149,6 +150,31 @@ bool behavior_trigger(Character *ch, const DLString &trigType, const char *fmt, 
 
 	va_end(ap);
 	return reglist_to_bool(regList);
+}
+
+void behavior_notify(Character *ch, const DLString &trigType, const char *fmt, ...)
+{
+	if (!ch->is_npc())
+		return;
+
+	va_list ap;
+	va_start(ap, fmt);
+
+	// Catches and croaks script errors itself; the results are dropped unread.
+	behavior_trigger_with_result(ch->getNPC()->pIndexData->behaviors, trigType, fmt, ap);
+
+	va_end(ap);
+}
+
+ExtractWatch::ExtractWatch(Character *ch, bool countExtracting)
+	: ch(ch), room(ch->in_room), id(ch->getID()),
+	  wasExtracting(!countExtracting && ch->extracted)
+{
+}
+
+bool ExtractWatch::gone() const
+{
+	return (ch->extracted && !wasExtracting) || (room && !ch->in_room) || ch->getID() != id;
 }
 
 // Every axe (by its effective class, so hero and reclassed weapons count) chops

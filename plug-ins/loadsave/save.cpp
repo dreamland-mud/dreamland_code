@@ -78,6 +78,7 @@
 
 #include "feniamanager.h"
 #include "wrapperbase.h"
+#include "register-impl.h"
 
 #include "json_utils_ext.h"
 #include "pcharactermanager.h"
@@ -742,10 +743,23 @@ static void apply_saved_mob(NPCharacter *mob, SavedMobState &st)
 
 /* A pet whose prototype is a level-adaptive shop pet got its level from the
  * buyer, so a stamp mismatch must not reset it to the prototype's. Matched by
- * name: loadsave can't see the petshop/misc_behaviors classes. Fenia callMob
- * summons (callTier field) are left to utils/mob: charm reconfigCalled. */
+ * name: loadsave can't see the petshop/misc_behaviors classes. Fenia shop pets
+ * mark themselves with the wrapper field petAdaptive. Fenia callMob summons
+ * (callTier field) are left to utils/mob: charm reconfigCalled. */
 static bool pet_level_is_bought(NPCharacter *pet)
 {
+    WrapperBase *wbase = pet->getWrapper();
+
+    if (wbase && wbase->hasField("petAdaptive")) {
+        try {
+            static Scripting::IdRef petAdaptiveId( "petAdaptive" );
+            Scripting::Register adaptive = wbase->getField( petAdaptiveId );
+            if (adaptive.type == Scripting::Register::NUMBER && adaptive.toBoolean( ))
+                return true;
+        } catch (const ::Exception &) {
+        }
+    }
+
     if (!pet->behavior)
         return false;
 
@@ -753,7 +767,6 @@ static bool pet_level_is_bought(NPCharacter *pet)
     if (type != "LevelAdaptivePet" && type != "Rat")
         return false;
 
-    WrapperBase *wbase = pet->getWrapper();
     return !wbase || !wbase->hasField("callTier");
 }
 

@@ -12,6 +12,7 @@
 #include "affecthandler.h"
 #include "affect.h"
 #include "core/behavior/behavior_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "room.h"
@@ -73,6 +74,13 @@ static void afprog_stopfol( Character *ch )
 
 static bool mprog_stopfol( Character *ch, Character *master )
 {
+    // Notification only: the C++ stopfol below (last charm time, saved
+    // creature cleanup) runs unless the handler extracted the mob.
+    ExtractWatch watch( ch );
+    behavior_notify( ch, "Stopfol", "CC", ch, master );
+    if (watch.gone( ))
+        return true;
+
     FENIA_CALL( ch, "Stopfol", "C", master );
     FENIA_NDX_CALL( ch->getNPC( ), "Stopfol", "CC", ch, master );
     BEHAVIOR_VOID_CALL( ch->getNPC( ), stopfol, master );
@@ -127,7 +135,16 @@ void follower_clear( Character * ch, bool verbose )
     ch->master = NULL;
     ch->leader = NULL;
     
+    ExtractWatch watch( ch );
     mprog_stopfol( ch, master );
+
+    // A Stopfol handler may extract the mob (a rat leaving for good). The
+    // object is back in the pool: drop the owner's pointer and touch nothing.
+    if (watch.gone( )) {
+        if (!master->is_npc( ) && master->getPC( )->pet == ch)
+            master->getPC( )->pet = NULL;
+        return;
+    }
 
     if (!ch->is_npc( )) 
         return;

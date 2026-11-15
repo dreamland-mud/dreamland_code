@@ -194,6 +194,9 @@ protected:
  */
 public:
     virtual bool assist( Character *, Character * );
+    // Last virtual of the class on purpose: this class's own slots keep their
+    // offsets. Virtuals added by subclasses still shift, so reload with 'most'.
+    virtual void stopfol( Character *master );
 protected:
     bool assistOffense( Character *, Character * );
     bool canAssistOffense( Character *, Character * );

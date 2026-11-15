@@ -33,6 +33,7 @@
 #include "loadsave.h"
 #include "tohit.h"
 #include "occupations.h"
+#include "behavior.h"
 #include "profiler.h"
 
 #include "magic.h"
@@ -52,6 +53,21 @@ static void searcher_saves_pm( Json::Value &row, int level, int svs )
 }
 
 static IconvMap koi2utf("koi8-u", "utf-8");
+
+/** A behavior prop flag as medit or Fenia may store it: bool, non-zero number,
+ *  or the string "true" / "1". */
+static bool json_truthy( const Json::Value &v )
+{
+    if (v.isBool( ))
+        return v.asBool( );
+    if (v.isNumeric( ))
+        return v.asDouble( ) != 0;
+    if (v.isString( )) {
+        std::string s = v.asString( );
+        return s == "true" || s == "1";
+    }
+    return false;
+}
 
 GSN(none);
 
@@ -313,21 +329,41 @@ public:
         ostringstream buf;
         Json::Value dump;
 
+        // Shop pets are either the C++ Pet family (old prototypes) or carry the
+        // Fenia 'pet' / 'rat' behaviors. Indexes resolved once: findExisting is slow.
+        Behavior *petBhv = behaviorManager->findExisting("pet");
+        Behavior *ratBhv = behaviorManager->findExisting("rat");
+        int petNdx = petBhv ? petBhv->getIndex() : -1;
+        int ratNdx = ratBhv ? ratBhv->getIndex() : -1;
+
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
-            if (!pMob->behavior)
-                continue;
             if (area_unlisted(pMob->area))
                 continue;
 
-            DLString type = pMob->behavior->getFirstNode()->getAttribute(XMLNode::ATTRIBUTE_TYPE);
-            if (type.find("Pet") == DLString::npos && type != "Rat")
+            bool fenPet = petNdx >= 0 && pMob->behaviors.isSet(petNdx);
+            bool fenRat = ratNdx >= 0 && pMob->behaviors.isSet(ratNdx);
+
+            DLString type;
+            if (pMob->behavior)
+                type = pMob->behavior->getFirstNode()->getAttribute(XMLNode::ATTRIBUTE_TYPE);
+            bool cppPet = type.find("Pet") != DLString::npos || type == "Rat";
+
+            if (!cppPet && !fenPet && !fenRat)
                 continue;
+
+            // Level-adaptive pets take the buyer's level: the export shows -1.
+            bool adaptive = type == "LevelAdaptivePet" || type == "Rat" || fenRat;
+            if (fenPet && pMob->props.isObject() && pMob->props.isMember("pet")) {
+                const Json::Value &cfg = pMob->props["pet"];
+                if (cfg.isObject() && cfg.isMember("adaptive") && json_truthy(cfg["adaptive"]))
+                    adaptive = true;
+            }
             
             Json::Value pet;
             pet["vnum"] = pMob->vnum;
             json_lang_string(pet, "name", pMob->short_descr);
-            pet["level"] = (type == "LevelAdaptivePet" || type == "Rat" ? -1 : pMob->level);
+            pet["level"] = (adaptive ? -1 : pMob->level);
             pet["act"] = act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_NOWHERE));
             pet["aff"] = affect_flags.names(REMOVE_BIT(pMob->affected_by, AFF_INFRARED));
             pet["off"] = off_flags.names(REMOVE_BIT(pMob->off_flags, ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE|OFF_FADE));
