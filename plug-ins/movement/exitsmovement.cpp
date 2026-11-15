@@ -652,6 +652,12 @@ int ExitsMovement::adjustMovetype( Character *wch )
     if (IS_GHOST( wch ))
         return MOVETYPE_FLYING;
 
+    // Under water everyone swims: no trotting bears or flying bats down
+    // there. Fleeing and sneaking keep their own words.
+    if ((from_room->getSectorType() == SECT_UNDERWATER || to_room->getSectorType() == SECT_UNDERWATER)
+        && movetype != MOVETYPE_FLEE && movetype != MOVETYPE_CRAWL)
+        return MOVETYPE_SWIMMING;
+
     if (from_room->getSectorType() == SECT_WATER_NOSWIM || to_room->getSectorType() == SECT_WATER_NOSWIM) {
         // boat_types and boat describe how the PARTY gets across: for a pet
         // they are the master's (see Walkment::Walkment). That is right for
