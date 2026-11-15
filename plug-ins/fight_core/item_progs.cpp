@@ -16,6 +16,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 /* RT part of the corpse looting code */
 static bool oprog_get_money( Character *ch, Object *obj )
@@ -138,6 +139,14 @@ bool omprog_give( Object *obj, Character *ch, Character *victim )
     BEHAVIOR_VOID_CALL( victim->getNPC( ), give, ch, obj );        
     if (obj->carried_by != victim)
         return true;
+
+    // Last word for any NPC, after every specific trigger above had its say:
+    // e.g. a bought pet eats food its owner hands it (global/onGive).
+    if (victim->is_npc( )) {
+        gprog("onGive", "CCO", victim, ch, obj);
+        if (obj->carried_by != victim)
+            return true;
+    }
         
     return oprog_get( obj, victim );
 }
