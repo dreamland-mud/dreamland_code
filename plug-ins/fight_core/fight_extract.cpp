@@ -12,6 +12,7 @@
 #include "descriptor.h"
 #include "follow_utils.h"
 #include "fight_extract.h"
+#include "../loadsave/behavior_utils.h"
 #include "damagelog.h"
 #include "fight_position.h"
 #include "interp.h"
@@ -52,12 +53,16 @@ void nuke_pets( PCharacter *ch, int flags )
     if (!pet)
         return;
 
+    // A Stopfol handler may have extracted the pet already: never twice.
+    ExtractWatch watch( pet );
     follower_stop(pet);
     
-    if (IS_SET(flags, FEXTRACT_TOTAL))
-        extract_char( pet, IS_SET(flags, FEXTRACT_COUNT));
-    else
-        pet->setDead( );
+    if (!watch.gone( )) {
+        if (IS_SET(flags, FEXTRACT_TOTAL))
+            extract_char( pet, IS_SET(flags, FEXTRACT_COUNT));
+        else
+            pet->setDead( );
+    }
 
     ch->pet = NULL;
 }

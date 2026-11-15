@@ -54,6 +54,21 @@ static void searcher_saves_pm( Json::Value &row, int level, int svs )
 
 static IconvMap koi2utf("koi8-u", "utf-8");
 
+/** A behavior prop flag as medit or Fenia may store it: bool, non-zero number,
+ *  or the string "true" / "1". */
+static bool json_truthy( const Json::Value &v )
+{
+    if (v.isBool( ))
+        return v.asBool( );
+    if (v.isNumeric( ))
+        return v.asDouble( ) != 0;
+    if (v.isString( )) {
+        std::string s = v.asString( );
+        return s == "true" || s == "1";
+    }
+    return false;
+}
+
 GSN(none);
 
 using namespace std;
@@ -341,7 +356,7 @@ public:
             bool adaptive = type == "LevelAdaptivePet" || type == "Rat" || fenRat;
             if (fenPet && pMob->props.isObject() && pMob->props.isMember("pet")) {
                 const Json::Value &cfg = pMob->props["pet"];
-                if (cfg.isObject() && cfg.isMember("adaptive") && cfg["adaptive"].isBool() && cfg["adaptive"].asBool())
+                if (cfg.isObject() && cfg.isMember("adaptive") && json_truthy(cfg["adaptive"]))
                     adaptive = true;
             }
             

@@ -44,7 +44,6 @@ public:
     virtual bool area( );
     virtual bool spell( Character *caster, int, bool ); 
     virtual bool kill( Character * );
-    virtual void stopfol( Character *master );
     virtual bool extractNotify( Character *, bool, bool );
     virtual bool isSaved( ) const;
     virtual bool hasDestiny( );
@@ -195,6 +194,9 @@ protected:
  */
 public:
     virtual bool assist( Character *, Character * );
+    // Last virtual of the class on purpose: no primary base, so every declared
+    // virtual owns a vtable slot in order, and the older ones keep their offsets.
+    virtual void stopfol( Character *master );
 protected:
     bool assistOffense( Character *, Character * );
     bool canAssistOffense( Character *, Character * );

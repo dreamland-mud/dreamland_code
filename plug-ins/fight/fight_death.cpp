@@ -1189,9 +1189,12 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
     // From this point on the death has certainly happened.
 
     // Mob behaviors hear about the death only once nothing can cancel it, so a
-    // handler never acts on a death that did not happen. Notification only.
-    behavior_trigger( victim, "Death", "CC", victim, ch );
-    if (victim->extracted)
+    // handler never acts on a death that did not happen. Notification only, but
+    // a handler that extracted the victim ends the death here: the object is
+    // back in the pool.
+    ExtractWatch victimWatch( victim );
+    behavior_notify( victim, "Death", "CC", victim, ch );
+    if (victimWatch.gone( ))
         return;
 
     // A charmed pet or servant dealt the blow that felled a boss.
