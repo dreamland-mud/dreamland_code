@@ -19,6 +19,7 @@
 #include "npcharacter.h"
 #include "pcharactermanager.h"
 #include "object.h"
+#include "wearlocation.h"
 #include "affect.h"
 #include "skillreference.h"
 #include "spell.h"
@@ -29,6 +30,8 @@
 
 #include "vnum.h"
 #include "def.h"
+
+WEARLOC(none);
 
 GSN(sanctuary);
 GSN(stardust);
@@ -298,6 +301,10 @@ bool PCharacter::load( )
 
     // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
     char_to_room(this, get_room_instance(ROOM_VNUM_LIMBO));
+
+    // The pet is the last section before #END: every object after it is
+    // what the pet wears (fwrite_pet).
+    bool petRead = false, petKept = true;
    
     for ( ; ; ) {
         char letter;
@@ -320,9 +327,16 @@ bool PCharacter::load( )
             PCharacterManager::load( this );
             fread_char( this, fp );
         }
-        else if ( !strcmp( word, "OBJECT" ) ) fread_obj  ( this, NULL, fp );
-        else if ( !strcmp( word, "O"      ) ) fread_obj  ( this, NULL, fp );
-        else if ( !strcmp( word, "PET"    ) ) fread_pet  ( this, fp );
+        else if ( !strcmp( word, "OBJECT" ) || !strcmp( word, "O" ) ) {
+            if (petRead && pet)
+                fread_obj( pet, NULL, fp );
+            else
+                fread_obj( this, NULL, fp );
+        }
+        else if ( !strcmp( word, "PET"    ) ) {
+            petKept = fread_pet( this, fp );
+            petRead = true;
+        }
         else if ( !strcmp( word, "MLT"    ) ) fread_mlt  ( this, fp );
         else if ( !strcmp( word, "END"    ) ) break;
         else
@@ -332,6 +346,14 @@ bool PCharacter::load( )
             break;
         }
     }
+
+    // Numbers re-derived from the prototype hold nothing the pet wore, so
+    // its gear comes back unworn and applied nowhere: the login trigger
+    // (Fenia global/onConnect/petreconfig) puts the collar back on for real.
+    if (pet && !petKept)
+        for (Object *obj = pet->carrying; obj != 0; obj = obj->next_content)
+            if (obj->wear_loc != wear_none)
+                obj->wear_loc.assign( wear_none );
 
     // lastAccessTime is stamped on every save, so this is the time since the profile was written.
     time_t lastSave = getLastAccessTime( ).getTime( );

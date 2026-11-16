@@ -327,8 +327,12 @@ static bool oprog_remove( Object *obj, Character *ch )
 bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
 {
     // Backstop for the paths that skip canWear (Fenia obj.equip, equip_char,
-    // corpse re-equip). Arrows still stick in a pet.
-    if (wear_is_owned_pet( ch ) && getName( ) != "stuck_in")
+    // corpse re-equip). Arrows still stick in a pet. A pet wears a collar on
+    // neck_1 and nothing else, and a collar goes on nothing but a pet.
+    if (wear_is_owned_pet( ch ) && getName( ) != "stuck_in" && !wear_pet_allows( ch, obj, this ))
+        return false;
+
+    if (wear_is_pet_collar( obj ) && !wear_pet_allows( ch, obj, this ))
         return false;
 
     if (obj->isAntiAligned( ch )) {
@@ -758,10 +762,23 @@ bool DefaultWearlocation::canWear( Character *ch, int flags )
 
 int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 {
-    if (wear_is_owned_pet( ch )) {
-        if (IS_SET(flags, F_WEAR_VERBOSE))
-            echo_master(ch, _("Питомцы не носят снаряжения."));
-        return RC_WEAR_PET;
+    if (wear_is_owned_pet( ch ) || wear_is_pet_collar( obj )) {
+        if (!wear_pet_allows( ch, obj, this )) {
+            if (IS_SET(flags, F_WEAR_VERBOSE)) {
+                if (wear_is_owned_pet( ch ))
+                    echo_master(ch, _("Питомцы не носят снаряжения, только ошейник."));
+                else
+                    echo_master(ch, _("%1$^O1 -- это ошейник, его носят только питомцы."), obj);
+            }
+            return RC_WEAR_PET;
+        }
+
+        // One collar: a second one must not slip onto the pair slot.
+        if (find( ch ) && !IS_SET(flags, F_WEAR_REPLACE)) {
+            if (IS_SET(flags, F_WEAR_VERBOSE))
+                echo_master(ch, _("%1$^C1 уже нос%1$nит|ят ошейник."), ch);
+            return RC_WEAR_CONFLICT;
+        }
     }
 
     int wear_level = get_wear_level( ch, obj );

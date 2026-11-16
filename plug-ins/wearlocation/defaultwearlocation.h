@@ -128,9 +128,16 @@ int DefaultWearlocation::getDestroyChance( ) const
 {
     return destroyChance.getValue( );
 }
-// True for a player's own pet (PCharacter::pet). Pets wear nothing: a pet's
-// pfile keeps no items, so anything it wore was lost at the next relog with
-// its bonuses baked into the saved numbers. Defined in misc_wearlocs.cpp.
+// True for a player's own pet (PCharacter::pet). Pets wear nothing but a
+// collar. Defined in misc_wearlocs.cpp.
 bool wear_is_owned_pet( Character *ch );
+
+// The object's prototype has behavior "collar" (crafted pet collars).
+bool wear_is_pet_collar( Object *obj );
+
+// The one thing a pet may wear: a collar, on neck_1. A collar goes nowhere
+// else. The pet's pfile block saves it (fwrite_pet), its stats are real
+// affects on the object, fitted to the pet's level by the Fenia behavior.
+bool wear_pet_allows( Character *ch, Object *obj, Wearlocation *loc );
 
 #endif
