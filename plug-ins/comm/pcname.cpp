@@ -224,11 +224,22 @@ static DLString pet_name_taken( const DLString &word, const DLString &latin )
     return DLString::emptyString;
 }
 
+// A language slot typed in full. arg_oneof below matches prefixes, so a pet
+// addressed as 'р' or 'u' would be read as a language: the pet trigger gets
+// every other first word, and the prefixes still reach the slots when no pet
+// answers.
 static bool arg_is_name_lang( const DLString &arg )
 {
-    return arg_oneof( arg, "en", "англ", "английский" )
-        || arg_oneof( arg, "ua", "укр", "украинский", "українська" )
-        || arg_oneof( arg, "ru", "рус", "русский" );
+    static const char *langs[] = {
+        "en", "англ", "английский",
+        "ua", "укр", "украинский", "українська",
+        "ru", "рус", "русский", 0
+    };
+
+    for (int i = 0; langs[i]; i++)
+        if (String::equalLess( arg, langs[i] ))
+            return true;
+    return false;
 }
 
 CMDRUNP( pcname )

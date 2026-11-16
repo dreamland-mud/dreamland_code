@@ -8,6 +8,7 @@
 #include "logstream.h"
 #include "dl_ctype.h"
 #include "string_utils.h"
+#include "dl_strings.h"
 #include "merc.h"
 #include "loadsave.h"
 #include "religion.h"
@@ -90,13 +91,21 @@ DLString BadNames::checkRussianName( const DLString &name ) const
     return DLString::emptyString;
 }
 
+// The Cyrillic god names are declension pads ("Крад|я|и|е|ю|ей|е"): compare
+// a Cyrillic name against their nominatives, RU and UA, not the raw pad.
 bool BadNames::nameReligion(const DLString &name, bool fRussian) const
 {
     for (int i = 0; i < religionManager->size(); i++) {
         Religion *rel = religionManager->find(i);
-        DLString godName = fRussian ? rel->getRussianName() : rel->getName();
 
-        if (String::equalLess(name, godName))
+        if (!fRussian) {
+            if (String::equalLess(name, rel->getName()))
+                return false;
+            continue;
+        }
+
+        if (String::equalLess(name, russian_case(rel->getNameFor(LANG_RU), '1'))
+            || String::equalLess(name, russian_case(rel->getNameFor(LANG_UA), '1')))
             return false;
     }
 
