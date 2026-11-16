@@ -21,6 +21,34 @@ bool msp_sound( Descriptor *d, const DLString &name, int volume = 100, int loops
 /** The same for a player's own connection; false for mobs and the linkless. */
 bool msp_sound( Character *ch, const DLString &name, int volume = 100, int loops = 1, int priority = 50 );
 
+/** msp_sound for an alert that an affect landing on ch sends (blind, poison,
+ *  charmed, malediction), at full volume. Every open MspAlertWatch on ch's
+ *  connection counts it. */
+bool msp_affect_alert( Character *ch, const DLString &name, int priority );
+
+/**
+ * While alive, counts the affect alerts sent to one connection. A cast opens
+ * one on its victim so a curse that lands plays its alert alone, not the alert
+ * and the cast sound in the same breath. Scopes nest; a null connection never
+ * hears anything.
+ */
+class MspAlertWatch {
+public:
+    MspAlertWatch( Descriptor *d );
+    ~MspAlertWatch( );
+    MspAlertWatch( const MspAlertWatch & ) = delete;
+    MspAlertWatch &operator = ( const MspAlertWatch & ) = delete;
+
+    bool heard( ) const { return alerts > 0; }
+
+private:
+    friend bool msp_affect_alert( Character *, const DLString &, int );
+
+    Descriptor *d;
+    int alerts;
+    MspAlertWatch *prev;
+};
+
 /**
  * Queue an MSP !!MUSIC line looping a library track forever (L=-1, C=1), e.g.
  * "ambient/rain"; an empty name sends !!MUSIC(Off). Telnet clients only get

@@ -174,6 +174,7 @@ CMDRUN( cast )
     if (IS_SET(ch->in_room->room_flags,ROOM_NO_CAST)) {
         ch->pecho(_("Эта местность поглощает и блокирует твое заклинание."));
         ch->recho(_("%1$^C1 пыта%1$nется|ются сотворить заклинание, но что-то в этой местности блокирует %1$P2."), ch);
+        spell_fizzle_sound( ch );
         return;
     }
 
@@ -235,18 +236,21 @@ CMDRUN( cast )
     if (ch->isAffected( gsn_shielding ) && number_percent( ) > 50) {
         ch->pecho(_("Ты пытаешься сотворить заклинание, но изолирующий экран блокирует тебя."));
         ch->recho(_("%1$^C1 пыта%1$nется|ются сотворить заклинание, но изолирующий экран блокирует %1$P2."), ch);
+        spell_fizzle_sound( ch );
         return;
     }
 
     if (ch->isAffected( gsn_garble ) && number_percent( ) > 50) {
         ch->pecho(_("Твой язык заплетается, и ты не можешь как следует произнести заклинание."));
         ch->recho(_("Язык %1$C2 заплетается, и %1$P1 не мо%1$nжет|гут как следует произнести заклинание."), ch);        
+        spell_fizzle_sound( ch );
         return;
     }
     
     if (ch->isAffected( gsn_deafen ) && number_percent( ) > 50) {
         ch->pecho(_("Глухота мешает тебе как следует произнести заклинание."));
         ch->recho(_("Глухота мешает %1$C3 как следует произнести заклинание."), ch);
+        spell_fizzle_sound( ch );
         return;
     }
 
@@ -255,12 +259,14 @@ CMDRUN( cast )
         if (number_percent( ) <= UNDERWATER_FUMBLE_CHANCE) {
             ch->pecho(_("Вода глушит твой голос, и заклинание срывается."));
             ch->recho(_("Вода глушит голос %1$C2, и заклинание срывается."), ch);
+            spell_fizzle_sound( ch );
             return;
         }
 
         if (number_percent( ) <= UNDERWATER_FUMBLE_CHANCE) {
             ch->pecho(_("Под водой твои руки движутся слишком медленно, и заклинание срывается."));
             ch->recho(_("Руки %1$C2 под водой движутся слишком медленно, и заклинание срывается."), ch);
+            spell_fizzle_sound( ch );
             return;
         }
     }
@@ -268,12 +274,14 @@ CMDRUN( cast )
     if (HALF_SHADOW(ch)) {
         ch->pecho(_("Твоя тень поглощает всякую попытку сотворить заклинание."));
         ch->recho(_("%1$^C1 пыта%1$nется|ются сотворить заклинание, но тень не дает %1$P3 сосредоточиться."), ch);
+        spell_fizzle_sound( ch );
         return;
     }
 
     if (ch->death_ground_delay > 0 && ch->trap.isSet( TF_NO_CAST )) {
         ch->pecho(_("Ловушка, в которой ты оказал%1$Gось|ся|ась, препятствует сотворению заклинаний."), ch);
         ch->recho(_("%1$^C1 пыта%1$nется|ются сотворить заклинание, но ловушка мешает %1$P3 сосредоточиться."), ch);
+        spell_fizzle_sound( ch );
         return;
     }
 
@@ -289,8 +297,10 @@ CMDRUN( cast )
             set_violent( ch, victim, false );
     }
      
-    if (spell->spellbane( ch, victim ))
+    if (spell->spellbane( ch, victim )) {
+        spell_fizzle_sound( ch );
         return;
+    }
 
     // 'config nobuff': the target (or their pet's owner) refuses beneficial spells
     // from third-party players. Refuse after utter (words are spoken) but before
@@ -305,6 +315,7 @@ CMDRUN( cast )
     if (number_percent( ) > skill->getEffective( ch )) {
         ch->pecho(_("Ты пытаешься сотворить заклинание '{W%K1{x', но {rтеряешь концентрацию и терпишь неудачу{x."), *skill);
         ch->recho(_("%1$^C1 пыта%1$nется|ются сотворить заклинание, но теря%1$nет|ют концентрацию и терп%1$nит|ят неудачу."), ch);
+        spell_fizzle_sound( ch );
 
         skill->improve( ch, false, victim );
         ch->mana -= mana / 2;
@@ -350,7 +361,9 @@ CMDRUN( cast )
                     ~CastDepthGuard( ) { fightspam_cast_depth--; }
                 } castDepthGuard;
 
+                SpellSound sound( spell.getPointer( ), ch, target );
                 spell->run( ch, target, slevel );
+                sound.landed( );
             }
 
             if (victim)

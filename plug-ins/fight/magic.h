@@ -55,6 +55,7 @@
 
 #include "bitstring.h"
 #include "dlstring.h"
+#include "msp.h"
 
 class Character;
 class Object;
@@ -115,6 +116,33 @@ void area_message( Character *ch, const DLString &msg, bool everywhere );
 #define    FSPELL_ATTACK_CASTER (G)
 #define    FSPELL_CHECK_SAFE    (H)
 #define    FSPELL_CHECK_GROUP   (I)
+#define    FSPELL_SOUND         (J)
+
+/**
+ * The cast sound from spell/sounds.json: one per cast, never per bolt or per
+ * victim of a room spell. Build it right before spell->run: the caster hears
+ * it at once, and so do awake players in the room when the spell covers the
+ * room or the caster is in their group. Call landed() after run: an awake
+ * player victim hears it then, unless the spell already rang an affect alert
+ * for them. Spells missing from the map are silent.
+ */
+class SpellSound {
+public:
+    SpellSound( Spell *spell, Character *ch, ::Pointer<SpellTarget> target, bool audible = true );
+    SpellSound( const SpellSound & ) = delete;
+    SpellSound &operator = ( const SpellSound & ) = delete;
+
+    void landed( );
+
+private:
+    DLString slot;
+    bool unique;
+    Character *victim;
+    MspAlertWatch victimAlerts;
+};
+
+/** A cast that failed or was blocked: spell/sounds.json "fizzle", caster only. */
+void spell_fizzle_sound( Character *ch );
 
 bool spell( int sn, int level, Character *ch, ::Pointer<SpellTarget>, int flags = 0 );
 bool spell( int sn, int level, Character *ch, Character *victim, int flags = 0 );

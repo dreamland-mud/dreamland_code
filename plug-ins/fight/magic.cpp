@@ -51,6 +51,7 @@
 
 #include <cmath>
 #include <vector>
+#include <map>
 #include <set>
 #include <jsoncpp/json/json.h>
 #include "configurable.h"
@@ -524,6 +525,113 @@ void area_message( Character *ch, const DLString &msg, bool everywhere )
     }
 }
 
+/*
+ * Spell sounds (spell/sounds.json): "spells" maps a skill name to a library
+ * slot, "unique" lists the slots of signature spells, "fizzle" is the failed
+ * cast. The client picks a variant of each slot, so only base names live here.
+ */
+struct SpellSoundsConfig {
+    std::map<DLString, DLString> slots;
+    std::set<DLString> unique;
+    DLString fizzle;
+};
+
+static SpellSoundsConfig spellSounds;
+
+CONFIGURABLE_LOADED(spell, sounds)
+{
+    SpellSoundsConfig cfg;
+
+    if (value.isObject( )) {
+        const Json::Value &spells = value["spells"];
+        if (spells.isObject( ))
+            for (const auto &name: spells.getMemberNames( ))
+                if (spells[name].isString( ))
+                    cfg.slots[name] = spells[name].asString( );
+
+        const Json::Value &unique = value["unique"];
+        if (unique.isArray( ))
+            for (const auto &u: unique)
+                if (u.isString( ))
+                    cfg.unique.insert( u.asString( ) );
+
+        if (value["fizzle"].isString( ))
+            cfg.fizzle = value["fizzle"].asString( );
+    }
+
+    spellSounds = cfg;
+}
+
+/* Volumes: the caster hears every own cast, so softer than the victim, for
+ * whom the sound is the news. Priorities decide which sound the client's one
+ * spell voice keeps when two arrive together. */
+static const int SPELL_SOUND_VOL_CASTER = 70;
+static const int SPELL_SOUND_VOL_VICTIM = 100;
+static const int SPELL_SOUND_VOL_ROOM = 60;
+static const int SPELL_SOUND_PRIO_OWN = 40;
+static const int SPELL_SOUND_PRIO_VICTIM = 50;
+static const int SPELL_SOUND_PRIO_UNIQUE = 60;
+static const int SPELL_SOUND_PRIO_FIZZLE = 30;
+
+static DLString spell_sound_slot( Spell *spell )
+{
+    auto s = spellSounds.slots.find( spell->getSkill( )->getName( ) );
+    return s == spellSounds.slots.end( ) ? DLString::emptyString : s->second;
+}
+
+/* The player the spell is aimed at, other than the caster. */
+static Character * spell_sound_victim( const DLString &slot, Character *ch, SpellTarget::Pointer target )
+{
+    if (slot.empty( ) || target->type != SpellTarget::CHAR)
+        return 0;
+
+    Character *victim = target->victim;
+    if (!victim || victim == ch || victim->is_npc( ) || !victim->desc)
+        return 0;
+
+    return victim;
+}
+
+SpellSound::SpellSound( Spell *spell, Character *ch, SpellTarget::Pointer target, bool audible )
+    : slot( audible ? spell_sound_slot( spell ) : DLString::emptyString ),
+      unique( spellSounds.unique.count( slot ) > 0 ),
+      victim( spell_sound_victim( slot, ch, target ) ),
+      victimAlerts( victim ? victim->desc : 0 )
+{
+    if (slot.empty( ))
+        return;
+
+    int priority = unique ? SPELL_SOUND_PRIO_UNIQUE : SPELL_SOUND_PRIO_OWN;
+    bool roomWide = target->type == SpellTarget::ROOM;
+
+    msp_sound( ch, slot, SPELL_SOUND_VOL_CASTER, 1, priority );
+
+    // Bystanders hear what reaches them too (a room spell) and their own
+    // group's casts; any other cast in a crowded fight stays text only.
+    for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {
+        if (rch == ch || rch == target->victim || rch->is_npc( ) || !IS_AWAKE(rch))
+            continue;
+
+        if (roomWide || is_same_group( rch, ch ))
+            msp_sound( rch, slot, SPELL_SOUND_VOL_ROOM, 1, priority );
+    }
+}
+
+void SpellSound::landed( )
+{
+    if (!victim || victimAlerts.heard( ) || !IS_AWAKE(victim))
+        return;
+
+    msp_sound( victim, slot, SPELL_SOUND_VOL_VICTIM, 1,
+               unique ? SPELL_SOUND_PRIO_UNIQUE : SPELL_SOUND_PRIO_VICTIM );
+}
+
+void spell_fizzle_sound( Character *ch )
+{
+    if (!spellSounds.fizzle.empty( ))
+        msp_sound( ch, spellSounds.fizzle, SPELL_SOUND_VOL_CASTER, 1, SPELL_SOUND_PRIO_FIZZLE );
+}
+
 bool mprog_spell( Character *victim, Character *caster, Skill::Pointer skill, bool before )
 {
     const char *sname = skill->getName().c_str();
@@ -600,9 +708,14 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
             return false;
     }
 
+    // Scrolls, wands and spoken casts sound; weapon procs and quiet script casts don't.
+    bool audible = IS_SET(flags, FSPELL_VERBOSE | FSPELL_SOUND);
+
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_CAST)) {
         ch->pecho(_("Эта местность поглощает и блокирует твое заклинание."));
         ch->recho(_("%1$^C1 пыта%1$nется|ются сотворить заклинание, но что-то в этой местности блокирует %1$P2."), ch);
+        if (audible)
+            spell_fizzle_sound( ch );
         return false;
     }
 
@@ -638,8 +751,11 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
             return false;
     }
 
-    if (IS_SET(flags, FSPELL_BANE) && spell->spellbane( ch, target->victim ))
+    if (IS_SET(flags, FSPELL_BANE) && spell->spellbane( ch, target->victim )) {
+        if (audible)
+            spell_fizzle_sound( ch );
         return false;
+    }
    
     if (!IS_SET(flags, FSPELL_NOTRIGGER)) {
         if (target->type == SpellTarget::CHAR && target->victim)
@@ -648,8 +764,11 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
         mprog_cast( ch, target, skill, true );
     }
 
-    if (!fForbidCasting)
+    if (!fForbidCasting) {
+        SpellSound sound( spell.getPointer( ), ch, target, audible );
         spell->run( ch, target, level );
+        sound.landed( );
+    }
 
     if (!IS_SET(flags, FSPELL_NOTRIGGER)) {
         if (target->type == SpellTarget::CHAR && target->victim)

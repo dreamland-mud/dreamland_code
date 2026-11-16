@@ -478,23 +478,23 @@ static void affect_sound( Character *ch, Affect *paf, const AffectSoundBefore &b
     bool newSkill = !b.skill && ch->isAffected( paf->type );
 
     if ((!b.blind && IS_AFFECTED(ch, AFF_BLIND)) || (newSkill && paf->type == gsn_deafen)) {
-        msp_sound( ch, "alert/blind", 100, 1, 70 );
+        msp_affect_alert( ch, "alert/blind", 70 );
         return;
     }
 
     if (!b.poison && IS_AFFECTED(ch, AFF_POISON)) {
-        msp_sound( ch, "alert/poison", 100, 1, 70 );
+        msp_affect_alert( ch, "alert/poison", 70 );
         return;
     }
 
     if ((!b.charm && IS_AFFECTED(ch, AFF_CHARM)) || (!b.sleep && IS_AFFECTED(ch, AFF_SLEEP))) {
-        msp_sound( ch, "alert/charmed", 100, 1, 75 );
+        msp_affect_alert( ch, "alert/charmed", 75 );
         return;
     }
 
     Skill *skill = paf->type.getElement( );
     if (newSkill && skill && skill->hasGroup( group_maladictions ))
-        msp_sound( ch, "alert/malediction", 100, 1, 70 );
+        msp_affect_alert( ch, "alert/malediction", 70 );
 }
 
 static void affect_add( Character *ch, Affect *paf )

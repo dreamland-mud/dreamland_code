@@ -83,6 +83,32 @@ bool msp_sound( Character *ch, const DLString &name, int volume, int loops, int 
     return msp_sound( ch->desc, name, volume, loops, priority );
 }
 
+/* Innermost open watch; each links to the one it shadows. */
+static MspAlertWatch *alertWatches = 0;
+
+MspAlertWatch::MspAlertWatch( Descriptor *d )
+    : d( d ), alerts( 0 ), prev( alertWatches )
+{
+    alertWatches = this;
+}
+
+MspAlertWatch::~MspAlertWatch( )
+{
+    alertWatches = prev;
+}
+
+bool msp_affect_alert( Character *ch, const DLString &name, int priority )
+{
+    if (!msp_sound( ch, name, 100, 1, priority ))
+        return false;
+
+    for (MspAlertWatch *w = alertWatches; w; w = w->prev)
+        if (w->d == ch->desc)
+            w->alerts++;
+
+    return true;
+}
+
 bool msp_music( Descriptor *d, const DLString &name, int volume )
 {
     if (!msp_enabled( d ) || (!name.empty( ) && !valid_name( name )))
