@@ -5,6 +5,7 @@
 #include "directions.h"
 
 #include "room.h"
+#include "hidetrackshook.h"
 #include "pcharacter.h"
 #include "core/object.h"
 
@@ -17,6 +18,16 @@
  */
 const unsigned int RoomHistory::MAX_SIZE = 10;
 
+HideTracksHook hide_tracks_hook = 0;
+
+/** Players leave footprints, except a Beastmaster who hides this step. */
+static bool leaves_footprint( Character *ch )
+{
+    if (ch->is_npc( ))
+        return false;
+    return !hide_tracks_hook || !hide_tracks_hook( ch );
+}
+
 static RoomHistoryEntry footprint( Character *ch, int door, long long portal, extra_exit_data *eexit )
 {
     return RoomHistoryEntry( ch->getPC()->getName( ),
@@ -26,7 +37,7 @@ static RoomHistoryEntry footprint( Character *ch, int door, long long portal, ex
 
 void RoomHistory::record( Character *ch, int door )
 {
-    if (ch->is_npc( ) || door < 0 || door >= DIR_SOMEWHERE)
+    if (door < 0 || door >= DIR_SOMEWHERE || !leaves_footprint( ch ))
         return;
 
     erase( );
@@ -35,7 +46,7 @@ void RoomHistory::record( Character *ch, int door )
 
 void RoomHistory::record( Character *ch, Object *portal )
 {
-    if (ch->is_npc( ) || !portal)
+    if (!portal || !leaves_footprint( ch ))
         return;
 
     erase( );
@@ -44,7 +55,7 @@ void RoomHistory::record( Character *ch, Object *portal )
 
 void RoomHistory::record( Character *ch, extra_exit_data *eexit )
 {
-    if (ch->is_npc( ) || !eexit)
+    if (!eexit || !leaves_footprint( ch ))
         return;
 
     erase( );
