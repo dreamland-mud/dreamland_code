@@ -809,8 +809,6 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
 
         fprintf(fp,"Vnum %d\n",pet->pIndexData->vnum);
 
-        fprintf(fp,"Name %s~\n", pet->getNameC() );
-
         if (pet->in_room && pet->master && pet->master->in_room != pet->in_room)
             fprintf(fp,"Room %d\n", pet->in_room->vnum);
             
@@ -1718,6 +1716,48 @@ void fread_char( PCharacter *ch, FILE *fp )
         FeniaManager::wrapperManager->linkWrapper( ch );
 }
 
+/* Settle a loaded pet's instance keyword once ShortDesc, Keyword and the
+ * legacy 'Name' line are all read. Saves before 2024-10 kept the keyword only
+ * in Name, as a mixed EN+RU string. Later saves wrote the RU nominative of the
+ * short descr there, and reading it back as a keyword left an RU-only keyword
+ * that shadows the prototype's EN/UA keywords and was saved as 'Keyword ru'.
+ * A keyword that is nothing but such a nominative (the current one, or the one
+ * the Name line recorded) is dropped, so the pet falls back to its prototype. */
+static bool keyword_en_ru_equal(const XMLMultiString &a, const XMLMultiString &b)
+{
+    return a.get(EN) == b.get(EN) && a.get(RU) == b.get(RU);
+}
+
+static void fread_pet_settle_keyword(NPCharacter *pet, bool hasLegacyName, const DLString &legacyName, bool keywordRead)
+{
+    DLString nominative = pet->getNameP('1');
+    XMLMultiString fromName;
+
+    if (hasLegacyName)
+        fromName.fromMixedString(legacyName);
+
+    if (keywordRead) {
+        XMLMultiString fromNominative;
+        fromNominative.fromMixedString(nominative);
+
+        const XMLMultiString &keyword = pet->getRealKeyword();
+        if (keyword == fromNominative || (hasLegacyName && keyword == fromName)) {
+            pet->setKeyword(XMLMultiString());
+            pet->updateCachedNouns();
+        }
+        return;
+    }
+
+    if (!hasLegacyName || legacyName == nominative)
+        return;
+
+    if (keyword_en_ru_equal(fromName, pet->pIndexData->keyword))
+        return;
+
+    pet->setKeyword(fromName);
+    pet->updateCachedNouns();
+}
+
 /* load a pet from the forgotten reaches */
 void fread_pet( PCharacter *ch, FILE *fp )
 {
@@ -1728,6 +1768,8 @@ void fread_pet( PCharacter *ch, FILE *fp )
     DLString value;
     lang_t lang;
     bitstring_t create_flags = FCREATE_NOAFFECTS | FCREATE_NOCOUNT;
+    DLString legacyName;
+    bool hasLegacyName = false, keywordRead = false;
 
     /* first entry had BETTER be the vnum or we barf */
     word = feof(fp) ? "End" : fread_word(fp);
@@ -1859,6 +1901,8 @@ void fread_pet( PCharacter *ch, FILE *fp )
 
              case 'E':
                  if (!strcmp(word, "End")) {
+                     fread_pet_settle_keyword(pet, hasLegacyName, legacyName, keywordRead);
+
                      // Linked first: apply_saved_pet reads Fenia fields.
                      if (FeniaManager::wrapperManager)
                          FeniaManager::wrapperManager->linkWrapper(pet);
@@ -1915,6 +1959,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
             if (!strcmp(word, "Keyword")) {
                 fread_multistring(fp, value, lang);
                 pet->setKeyword(value, lang);
+                keywordRead = true;
                 fMatch = true;
                 break;
             }
@@ -1943,9 +1988,11 @@ void fread_pet( PCharacter *ch, FILE *fp )
                 break;
 
             case 'N':
+                // Applied at End, once ShortDesc and Keyword are known.
                 if ( !strcmp( word, "Name" ) )
                 {
-                    pet->setKeyword(fread_mixed_multistring(fp));
+                    legacyName = fread_dlstring(fp);
+                    hasLegacyName = true;
                     fMatch = true;
                     break;
                 }
