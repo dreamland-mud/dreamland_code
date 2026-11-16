@@ -55,6 +55,7 @@
 #include <set>
 #include <jsoncpp/json/json.h>
 #include "configurable.h"
+#include "descriptor.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -545,9 +546,16 @@ CONFIGURABLE_LOADED(spell, sounds)
     if (value.isObject( )) {
         const Json::Value &spells = value["spells"];
         if (spells.isObject( ))
-            for (const auto &name: spells.getMemberNames( ))
-                if (spells[name].isString( ))
-                    cfg.slots[name] = spells[name].asString( );
+            for (const auto &name: spells.getMemberNames( )) {
+                // Cast sounds play on the client's spell voice; an alert or
+                // combat slot here would fake a status cue, so refuse it.
+                DLString slot = spells[name].isString( ) ? spells[name].asString( ) : "";
+                if (slot.find( "spell/" ) != 0) {
+                    LogStream::sendError( ) << "spell/sounds: skipping '" << name << "', slot '" << slot << "' is not spell/..." << endl;
+                    continue;
+                }
+                cfg.slots[name] = slot;
+            }
 
         const Json::Value &unique = value["unique"];
         if (unique.isArray( ))
@@ -579,51 +587,61 @@ static DLString spell_sound_slot( Spell *spell )
     return s == spellSounds.slots.end( ) ? DLString::emptyString : s->second;
 }
 
-/* The player the spell is aimed at, other than the caster. */
-static Character * spell_sound_victim( const DLString &slot, Character *ch, SpellTarget::Pointer target )
-{
-    if (slot.empty( ) || target->type != SpellTarget::CHAR)
-        return 0;
-
-    Character *victim = target->victim;
-    if (!victim || victim == ch || victim->is_npc( ) || !victim->desc)
-        return 0;
-
-    return victim;
-}
-
 SpellSound::SpellSound( Spell *spell, Character *ch, SpellTarget::Pointer target, bool audible )
-    : slot( audible ? spell_sound_slot( spell ) : DLString::emptyString ),
-      unique( spellSounds.unique.count( slot ) > 0 ),
-      victim( spell_sound_victim( slot, ch, target ) ),
-      victimAlerts( victim ? victim->desc : 0 )
+    : slot( audible ? spell_sound_slot( spell ) : DLString::emptyString )
 {
     if (slot.empty( ))
         return;
 
-    int priority = unique ? SPELL_SOUND_PRIO_UNIQUE : SPELL_SOUND_PRIO_OWN;
-    bool roomWide = target->type == SpellTarget::ROOM;
+    bool unique = spellSounds.unique.count( slot ) > 0;
+    int ownPriority = unique ? SPELL_SOUND_PRIO_UNIQUE : SPELL_SOUND_PRIO_OWN;
 
-    msp_sound( ch, slot, SPELL_SOUND_VOL_CASTER, 1, priority );
+    msp_sound( ch, slot, SPELL_SOUND_VOL_CASTER, 1, ownPriority );
+
+    Character *victim = target->type == SpellTarget::CHAR ? target->victim : 0;
+    if (victim && victim != ch && !victim->is_npc( ) && victim->desc)
+        listeners.push_back( { victim->desc, victim, SPELL_SOUND_VOL_VICTIM,
+                               unique ? SPELL_SOUND_PRIO_UNIQUE : SPELL_SOUND_PRIO_VICTIM } );
 
     // Bystanders hear what reaches them too (a room spell) and their own
     // group's casts; any other cast in a crowded fight stays text only.
+    bool roomWide = target->type == SpellTarget::ROOM;
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {
-        if (rch == ch || rch == target->victim || rch->is_npc( ) || !IS_AWAKE(rch))
+        if (rch == ch || rch == victim || rch->is_npc( ) || !rch->desc)
             continue;
 
         if (roomWide || is_same_group( rch, ch ))
-            msp_sound( rch, slot, SPELL_SOUND_VOL_ROOM, 1, priority );
+            listeners.push_back( { rch->desc, rch, SPELL_SOUND_VOL_ROOM, ownPriority } );
     }
+
+    for (auto &l: listeners)
+        alerts.add( l.d );
 }
 
+static bool descriptor_alive( Descriptor *d )
+{
+    for (Descriptor *x = descriptor_list; x; x = x->next)
+        if (x == d)
+            return true;
+
+    return false;
+}
+
+/* Run may kill, move or disconnect a listener, so the stored pointers are
+ * only compared: the character is reached through a connection that is still
+ * open and still plays the same character. */
 void SpellSound::landed( )
 {
-    if (!victim || victimAlerts.heard( ) || !IS_AWAKE(victim))
-        return;
+    for (auto &l: listeners) {
+        if (alerts.heard( l.d ) || !descriptor_alive( l.d ))
+            continue;
 
-    msp_sound( victim, slot, SPELL_SOUND_VOL_VICTIM, 1,
-               unique ? SPELL_SOUND_PRIO_UNIQUE : SPELL_SOUND_PRIO_VICTIM );
+        Character *lch = l.d->character;
+        if (lch != l.ch || !IS_AWAKE(lch))
+            continue;
+
+        msp_sound( l.d, slot, l.volume, 1, l.priority );
+    }
 }
 
 void spell_fizzle_sound( Character *ch )

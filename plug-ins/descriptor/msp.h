@@ -1,6 +1,7 @@
 #ifndef MSP_H
 #define MSP_H
 
+#include <set>
 #include "dlstring.h"
 
 class Descriptor;
@@ -27,25 +28,25 @@ bool msp_sound( Character *ch, const DLString &name, int volume = 100, int loops
 bool msp_affect_alert( Character *ch, const DLString &name, int priority );
 
 /**
- * While alive, counts the affect alerts sent to one connection. A cast opens
- * one on its victim so a curse that lands plays its alert alone, not the alert
- * and the cast sound in the same breath. Scopes nest; a null connection never
- * hears anything.
+ * While alive, notes which of the added connections got an affect alert. A
+ * cast opens one on its listeners so a curse that lands plays its alert alone,
+ * not the alert and the cast sound in the same breath. Scopes nest. Pointers
+ * are only compared, never followed.
  */
 class MspAlertWatch {
 public:
-    MspAlertWatch( Descriptor *d );
+    MspAlertWatch( );
     ~MspAlertWatch( );
     MspAlertWatch( const MspAlertWatch & ) = delete;
     MspAlertWatch &operator = ( const MspAlertWatch & ) = delete;
 
-    bool heard( ) const { return alerts > 0; }
+    void add( Descriptor *d ) { watched.insert( d ); }
+    bool heard( Descriptor *d ) const { return alerted.count( d ) > 0; }
 
 private:
     friend bool msp_affect_alert( Character *, const DLString &, int );
 
-    Descriptor *d;
-    int alerts;
+    std::set<Descriptor *> watched, alerted;
     MspAlertWatch *prev;
 };
 

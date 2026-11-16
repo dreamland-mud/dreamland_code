@@ -55,6 +55,7 @@
 
 #include "bitstring.h"
 #include "dlstring.h"
+#include <vector>
 #include "msp.h"
 
 class Character;
@@ -121,10 +122,10 @@ void area_message( Character *ch, const DLString &msg, bool everywhere );
 /**
  * The cast sound from spell/sounds.json: one per cast, never per bolt or per
  * victim of a room spell. Build it right before spell->run: the caster hears
- * it at once, and so do awake players in the room when the spell covers the
- * room or the caster is in their group. Call landed() after run: an awake
- * player victim hears it then, unless the spell already rang an affect alert
- * for them. Spells missing from the map are silent.
+ * it at once. Call landed() after run: the player victim, and players in the
+ * caster's room when the spell covers the room or the caster is in their
+ * group, hear it then if still awake and the spell rang no affect alert for
+ * them. Spells missing from the map are silent.
  */
 class SpellSound {
 public:
@@ -135,10 +136,15 @@ public:
     void landed( );
 
 private:
+    struct Listener {
+        Descriptor *d;
+        Character *ch;
+        int volume, priority;
+    };
+
     DLString slot;
-    bool unique;
-    Character *victim;
-    MspAlertWatch victimAlerts;
+    std::vector<Listener> listeners;
+    MspAlertWatch alerts;
 };
 
 /** A cast that failed or was blocked: spell/sounds.json "fizzle", caster only. */
