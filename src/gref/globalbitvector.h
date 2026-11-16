@@ -54,6 +54,10 @@ public:
 
     inline void set( unsigned int ndx )
     {
+        // GlobalRegistryBase::lookup("") returns -1.
+        if (ndx == (unsigned int)-1)
+            return;
+
         if (ndx >= bits.size( ))
             bits.resize( ndx + 1, false );
 

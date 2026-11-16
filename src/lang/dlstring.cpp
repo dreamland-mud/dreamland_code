@@ -272,7 +272,7 @@ DLString DLString::getOneArgument( )
     while (i != end( ) && dl_isspace( *i ))
         i++;
 
-    // Consume trailing spaces too, or a 'while (!str.empty())' caller loops forever.
+    // A whitespace-only string must be consumed too, or a 'while (!str.empty())' caller loops forever.
     if(i == end( )) {
         clear( );
         return "";

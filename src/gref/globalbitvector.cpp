@@ -41,6 +41,9 @@ void GlobalBitvector::fromString( const DLString &source )
 
     while (!arguments.empty( )) {
         arg = arguments.getOneArgument( );
+        if (arg.empty( ))
+            continue;
+
         set( registry->lookup( arg ) );
     }
 }

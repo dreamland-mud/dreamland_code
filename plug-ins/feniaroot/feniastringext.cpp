@@ -96,6 +96,7 @@ NMI_INVOKE(FeniaString, arguments, "(): разбивает строку на с�
 {
     RegList::Pointer arguments(NEW);
     DLString str = *this;
+    str.stripWhiteSpace();
 
     while (!str.empty()) {
         arguments->push_back(
