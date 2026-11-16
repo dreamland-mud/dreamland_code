@@ -362,7 +362,12 @@ CMDRUN( cast )
                 } castDepthGuard;
 
                 SpellSound sound( spell.getPointer( ), ch, target );
-                spell->run( ch, target, slevel );
+                try {
+                    spell->run( ch, target, slevel );
+                } catch (const VictimDeathException &) {
+                    sound.landed( true );
+                    throw;
+                }
                 sound.landed( );
             }
 

@@ -598,7 +598,7 @@ SpellSound::SpellSound( Spell *spell, Character *ch, SpellTarget::Pointer target
 
     msp_sound( ch, slot, SPELL_SOUND_VOL_CASTER, 1, ownPriority );
 
-    Character *victim = target->type == SpellTarget::CHAR ? target->victim : 0;
+    victim = target->type == SpellTarget::CHAR ? target->victim : 0;
     if (victim && victim != ch && !victim->is_npc( ) && victim->desc)
         listeners.push_back( { victim->desc, victim, SPELL_SOUND_VOL_VICTIM,
                                unique ? SPELL_SOUND_PRIO_UNIQUE : SPELL_SOUND_PRIO_VICTIM } );
@@ -630,9 +630,12 @@ static bool descriptor_alive( Descriptor *d )
 /* Run may kill, move or disconnect a listener, so the stored pointers are
  * only compared: the character is reached through a connection that is still
  * open and still plays the same character. */
-void SpellSound::landed( )
+void SpellSound::landed( bool victimDied )
 {
     for (auto &l: listeners) {
+        if (victimDied && l.ch == victim)
+            continue;
+
         if (alerts.heard( l.d ) || !descriptor_alive( l.d ))
             continue;
 
@@ -784,7 +787,12 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
 
     if (!fForbidCasting) {
         SpellSound sound( spell.getPointer( ), ch, target, audible );
-        spell->run( ch, target, level );
+        try {
+            spell->run( ch, target, level );
+        } catch (const VictimDeathException &) {
+            sound.landed( true );
+            throw;
+        }
         sound.landed( );
     }
 

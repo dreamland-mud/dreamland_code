@@ -133,7 +133,9 @@ public:
     SpellSound( const SpellSound & ) = delete;
     SpellSound &operator = ( const SpellSound & ) = delete;
 
-    void landed( );
+    /** Send the deferred sounds. On a killing cast the dead victim is
+     *  skipped: they get the death knell, the room still hears the blow. */
+    void landed( bool victimDied = false );
 
 private:
     struct Listener {
@@ -143,6 +145,7 @@ private:
     };
 
     DLString slot;
+    Character *victim = 0; // compared only, never dereferenced after run
     std::vector<Listener> listeners;
     MspAlertWatch alerts;
 };
