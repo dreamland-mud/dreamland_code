@@ -22,4 +22,13 @@ int signum(float x);
 /** Return given percentage of the original. */
 int percentage(int original, int percent);
 
+/** Skill lag can be cut by at most this many percent, however many sources stack. */
+static const int SKILL_BEATS_FLOOR = -50;
+
+/** Effective skill lag modifier: the raw mod_beats sum, floored. Slows stay uncapped. */
+inline int skill_beats_mod(int mod)
+{
+    return mod < SKILL_BEATS_FLOOR ? SKILL_BEATS_FLOOR : mod;
+}
+
 #endif
