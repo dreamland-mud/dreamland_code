@@ -23,6 +23,8 @@
 #include "commandtemplate.h"
 #include "morphology.h"
 #include "dl_ctype.h"
+#include "badnames.h"
+#include "fenia_utils.h"
 #include "merc.h"
 #include "def.h"
 #include <arg_utils.h>
@@ -199,6 +201,47 @@ static void name_show( PCharacter *pch )
     pch->send_to( buf );
 }
 
+// Is a pet name taken: reserved or legendary in badnames.xml, a god's name,
+// or another player's login, as typed or romanised. "" when free, else
+// "reserved" or "player". Mob keywords are not checked: a pet may share a
+// common word with some mob (the nanny check for player names refuses those).
+static DLString pet_name_taken( const DLString &word, const DLString &latin )
+{
+    bool cyr = String::hasCyrillic( word );
+
+    if (badNames) {
+        if (!badNames->nameReserved( word ) || !badNames->nameLegendary( word )
+            || !badNames->nameReligion( word, cyr ))
+            return "reserved";
+        if (cyr && (!badNames->nameReserved( latin ) || !badNames->nameLegendary( latin )
+                    || !badNames->nameReligion( latin, false )))
+            return "reserved";
+    }
+
+    if (PCharacterManager::find( word ) || (cyr && PCharacterManager::find( latin )))
+        return "player";
+
+    return DLString::emptyString;
+}
+
+// A language slot typed in full. arg_oneof below matches prefixes, so a pet
+// addressed as 'р' or 'u' would be read as a language: the pet trigger gets
+// every other first word, and the prefixes still reach the slots when no pet
+// answers.
+static bool arg_is_name_lang( const DLString &arg )
+{
+    static const char *langs[] = {
+        "en", "англ", "английский",
+        "ua", "укр", "украинский", "українська",
+        "ru", "рус", "русский", 0
+    };
+
+    for (int i = 0; langs[i]; i++)
+        if (String::equalLess( arg, langs[i] ))
+            return true;
+    return false;
+}
+
 CMDRUNP( pcname )
 {
     PCharacter *pch = ch->getPC( );
@@ -211,6 +254,20 @@ CMDRUNP( pcname )
     if (sub.empty( ) || arg_is_show( sub )) {
         name_show( pch );
         return;
+    }
+
+    // 'name <pet> <word>': the owner names their own pet. The rules, the
+    // messages and the renaming live in Fenia (global/onPetName, utils/pet);
+    // the engine only knows badnames and the player list. False: nobody here
+    // by that name, read on as a language slot.
+    if (!arg_is_name_lang( sub )) {
+        DLString word = args;
+        word.stripWhiteSpace( );
+        DLString latin = String::translitToLatin( word );
+        DLString taken = pet_name_taken( word, latin );
+
+        if (gprog( "onPetName", "Cssss", ch, sub.c_str( ), word.c_str( ), latin.c_str( ), taken.c_str( ) ))
+            return;
     }
 
     if (pch->getLevel( ) < NAME_EDIT_LEVEL) {
