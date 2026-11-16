@@ -425,14 +425,6 @@ WEBMANIP_RUN(decorateItem)
                     manips.addAll( "drop", item );
             }
 
-            if (find_mob_with_behavior( ch->in_room, bhv_blacksmith )
-                || ((item->item_type == ITEM_JEWELRY || item->item_type == ITEM_TREASURE)
-                    && find_jeweler_mob( ch->in_room )))
-                manips.addLocal( "service", "починка $" );
-
-            if (find_mob_with_behavior( ch->in_room, bhv_sage )) 
-                manips.addLocal( "service", "опознание $" );
-
             if (has_trade_triggers( item, ch )) {
                 manips.addLocal( "sell" );
                 manips.addLocal( "value" );
@@ -442,6 +434,15 @@ WEBMANIP_RUN(decorateItem)
         else {
             manips.add( "remove" );
         }
+
+        // Repair and identify services take obj_carry, which finds worn items too.
+        if (find_mob_with_behavior( ch->in_room, bhv_blacksmith )
+            || ((item->item_type == ITEM_JEWELRY || item->item_type == ITEM_TREASURE)
+                && find_jeweler_mob( ch->in_room )))
+            manips.addLocal( "service", "починка $" );
+
+        if (find_mob_with_behavior( ch->in_room, bhv_sage )) 
+            manips.addLocal( "service", "опознание $" );
 
         if (has_trigger_open( item ))
             manips.add( "open" );
