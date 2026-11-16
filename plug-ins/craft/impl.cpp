@@ -14,6 +14,8 @@
 #include "craftwearloc.h"
 #include "dl_math.h"
 #include "l10n.h"
+#include "pcharacter.h"
+#include "hidetrackshook.h"
 
 TABLE_LOADER(CraftProfessionLoader, "craft-professions", "CraftProfession");
 TABLE_LOADER(CraftWearlocLoader, "craft-wearlocs", "Wearlocation");
@@ -47,6 +49,43 @@ public:
 };
 
 
+/*
+ * A Beastmaster from craft level 5 leaves no footprint on (L - 4) * 17
+ * percent of steps, on every step at 10. Runs on every player step, so it
+ * only reads the attribute, never creates it. One ruler: the Fenia twin used
+ * by the steam compass, .tmp.pet.hidesTracks (dreamland_fenia utils/pet: ai),
+ * hardcodes the same 5 and 17. Change both together.
+ */
+static bool beastmaster_hides_tracks( Character *ch )
+{
+    if (ch->is_npc( ))
+        return false;
+
+    XMLAttributeCraft::Pointer attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeCraft>( "craft" );
+    if (!attr)
+        return false;
+
+    int lvl = attr->proficiencyLevel( "beastmaster" );
+    if (lvl < 5)
+        return false;
+
+    return number_percent( ) <= min( 100, (lvl - 4) * 17 );
+}
+
+/** Plugs the Beastmaster's hidden trail into movement while this library is loaded. */
+class CraftHideTracksPlugin : public Plugin {
+public:
+    virtual void initialization( )
+    {
+        hide_tracks_hook = &beastmaster_hides_tracks;
+    }
+
+    virtual void destruction( )
+    {
+        hide_tracks_hook = 0;
+    }
+};
+
 extern "C"
 {
     SO::PluginList initialize_craft( ) {
@@ -59,6 +98,7 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<CraftTattooWearloc> >( ppl );
         Plugin::registerPlugin<CraftWearlocLoader>( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCraft> >( ppl );
+        Plugin::registerPlugin<CraftHideTracksPlugin>( ppl );
         
         return ppl;
     }

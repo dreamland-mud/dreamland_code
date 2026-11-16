@@ -5,6 +5,7 @@
 #include "directions.h"
 
 #include "room.h"
+#include "hidetrackshook.h"
 #include "pcharacter.h"
 #include "core/object.h"
 
@@ -16,6 +17,13 @@
  * RoomHistory 
  */
 const unsigned int RoomHistory::MAX_SIZE = 10;
+
+HideTracksHook hide_tracks_hook = 0;
+
+bool hides_tracks_step( Character *ch )
+{
+    return hide_tracks_hook && hide_tracks_hook( ch );
+}
 
 static RoomHistoryEntry footprint( Character *ch, int door, long long portal, extra_exit_data *eexit )
 {
