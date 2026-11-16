@@ -39,8 +39,7 @@ public:
 };
 
 class XMLAttributeCraft: public XMLVariableContainer, 
-                         public virtual AttributeEventHandler<ScoreArguments>,
-                         public virtual AttributeEventHandler<WhoisArguments>
+                         public virtual AttributeEventHandler<ScoreArguments>
 {
 XML_OBJECT
 public:
@@ -51,7 +50,6 @@ public:
         virtual ~XMLAttributeCraft( );
         
         virtual bool handle( const ScoreArguments &args ); 
-        virtual bool handle( const WhoisArguments &args ); 
         virtual Scripting::Register toRegister() const;
 
         int proficiencyLevel(const DLString &profName) const;

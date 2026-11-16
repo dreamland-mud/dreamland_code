@@ -1,4 +1,3 @@
-#include "stringlist.h"
 #include "grammar_entities_impl.h"
 #include "craftattribute.h"
 #include "idcontainer.h"
@@ -19,33 +18,6 @@ XMLAttributeCraft::~XMLAttributeCraft( )
 {
 }
 
-
-bool XMLAttributeCraft::handle( const WhoisArguments &args )
-{
-    ostringstream buf;
-
-    if (proficiency.empty())
-        return false;
-
-    buf << l(args.looker, "владеет профессиями: ");
-
-    StringList pnames;
-    Proficiency::const_iterator p;
-    for (p = proficiency.begin(); p != proficiency.end(); p++) {
-        // Level 0 = parked or wiped (Fenia craftFrozen, Path-bound crafts).
-        if (p->second.level <= 0)
-            continue;
-        CraftProfession::Pointer prof = craftProfessionManager->get(p->first);
-        if (prof)
-            pnames.push_back(prof->getNameFor(args.looker));
-    }
-    buf << pnames.join(", ");
-    
-    if (!pnames.empty())
-        args.lines.push_back( buf.str() );
-
-    return !pnames.empty();
-}
 
 bool XMLAttributeCraft::handle( const ScoreArguments &args )
 {
