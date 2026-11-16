@@ -127,6 +127,7 @@ GSN(dark_shroud);
 GSN(protection_heat);
 GSN(spear);
 GSN(spellbane);
+GSN(stardust);
 
 #define PULSE_SAVING                  ( 5 * dreamland->getPulsePerSecond( ))
 #define PULSE_WATER_FLOAT          ( 4 * dreamland->getPulsePerSecond( ))
@@ -1618,6 +1619,7 @@ void update_handler( void )
     static  int     pulse_raffect;        // 13 sec
     static  int     pulse_saving;         // 5 sec
     static  int     pulse_track;          // 7 sec
+    static  int     pulse_ambience = 4;   // 1 sec; MSP background loops, cheap per player
 
     bool heavy = false; // Did we have a time-consuming update this pulse?
 
@@ -1689,6 +1691,14 @@ void update_handler( void )
 
         LastLogStream::send( ) <<  "Room affects update"  << endl;
         room_affect_update( );
+    }
+
+    if ( --pulse_ambience <= 0 )
+    {
+        pulse_ambience = dreamland->getPulsePerSecond( );
+
+        LastLogStream::send( ) <<  "Ambience update"  << endl;
+        ambience_update( );
     }
 
     char_update_lostlink();
@@ -2028,7 +2038,7 @@ void check_reboot( void )
                         _("{RВнимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!{x"),
                         counter );
                     if (bell)
-                        msp_sound( d, "alert/bell", 100, 1, 90 );
+                        msp_sound( d, "alert/reboot", 100, 1, 90 );
                 }
             if (counter == 5) {
                 MultiMessage warn = _("Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!");
@@ -2168,19 +2178,30 @@ void idle_update( PCharacter *ch )
 }
 
 /*
- * MSP: ring when a protective state ends on its own. Compares the bits after
- * affect_check re-applied the remaining sources, so a second source (another
- * affect, worn gear, the race) that keeps the flag up stays silent.
+ * MSP: a sound when a protective state ends on its own. Compares the bits
+ * after affect_check re-applied the remaining sources, so a second source
+ * (another affect, worn gear, the race) that keeps the flag up stays silent.
+ * A fallen shield (sanctuary and its kin) has its own sound: it changes how
+ * the next blow lands, while losing flight or invisibility is news of a
+ * different kind.
  */
-static void msp_wearoff( Character *ch, bitstring_t before )
+static void msp_wearoff( Character *ch, bitstring_t before, int sn )
 {
-    static const bitstring_t protective = AFF_FLYING | AFF_SANCTUARY | AFF_INVISIBLE;
+    static const bitstring_t shields = AFF_SANCTUARY;
+    static const bitstring_t cloaks = AFF_FLYING | AFF_INVISIBLE | AFF_IMP_INVIS;
 
     if (ch->isDead( ) || ch->dying)
         return;
 
-    if (before & ~ch->affected_by.getValue( ) & protective)
-        msp_sound( ch, "alert/bell", 100, 1, 70 );
+    bitstring_t lost = before & ~ch->affected_by.getValue( );
+
+    // Shields that are skills of their own, not an affect bit.
+    bool shieldSkill = (sn == gsn_dark_shroud || sn == gsn_stardust) && !ch->isAffected( sn );
+
+    if ((lost & shields) || shieldSkill)
+        msp_sound( ch, "alert/shielddown", 100, 1, 70 );
+    else if (lost & cloaks)
+        msp_sound( ch, "alert/wearoff", 100, 1, 70 );
 }
 
 void char_update_affects( Character *ch )
@@ -2215,10 +2236,11 @@ void char_update_affects( Character *ch )
                         paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, ch), paf );
 
                 bitstring_t before = ch->affected_by.getValue( );
+                int sn = paf->type;
 
                 affect_remove( ch, paf );
 
-                msp_wearoff( ch, before );
+                msp_wearoff( ch, before, sn );
             }
         }
     }

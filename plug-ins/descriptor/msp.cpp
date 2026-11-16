@@ -1,4 +1,5 @@
 #include <sstream>
+#include <set>
 
 #include "msp.h"
 #include "descriptor.h"
@@ -38,6 +39,21 @@ static int clamp( int v, int lo, int hi )
     return v < lo ? lo : (v > hi ? hi : v);
 }
 
+/* The trigger must start a line. The server ends lines with "\n\r", and
+ * the web client takes a line start after either character. */
+static void line_start( Descriptor *d, std::ostringstream &buf )
+{
+    if (d->outtop > 0 && d->outbuf[d->outtop - 1] != '\n' && d->outbuf[d->outtop - 1] != '\r')
+        buf << "\n\r";
+}
+
+/* MSP's T= field: the name's first path segment. */
+static DLString sound_type( const DLString &name )
+{
+    DLString::size_type slash = name.find( '/' );
+    return slash == DLString::npos ? DLString( "alert" ) : name.substr( 0, slash );
+}
+
 bool msp_sound( Descriptor *d, const DLString &name, int volume, int loops, int priority )
 {
     if (!msp_enabled( d ) || !valid_name( name ))
@@ -49,19 +65,11 @@ bool msp_sound( Descriptor *d, const DLString &name, int volume, int loops, int 
         loops = 1;
     priority = clamp( priority, 0, 100 );
 
-    DLString::size_type slash = name.find( '/' );
-    DLString type = slash == DLString::npos ? DLString( "alert" ) : name.substr( 0, slash );
-
     std::ostringstream buf;
-
-    /* The trigger must start a line. The server ends lines with "\n\r", and
-     * the web client takes a line start after either character. */
-    if (d->outtop > 0 && d->outbuf[d->outtop - 1] != '\n' && d->outbuf[d->outtop - 1] != '\r')
-        buf << "\n\r";
-
+    line_start( d, buf );
     buf << "!!SOUND(" << name << ".mp3"
         << " V=" << volume << " L=" << loops << " P=" << priority
-        << " T=" << type << " U=" << MSP_URL << ")\n\r";
+        << " T=" << sound_type( name ) << " U=" << MSP_URL << ")\n\r";
 
     d->send( buf.str( ).c_str( ) );
     return true;
@@ -73,4 +81,41 @@ bool msp_sound( Character *ch, const DLString &name, int volume, int loops, int 
         return false;
 
     return msp_sound( ch->desc, name, volume, loops, priority );
+}
+
+bool msp_music( Descriptor *d, const DLString &name, int volume )
+{
+    if (!msp_enabled( d ) || (!name.empty( ) && !valid_name( name )))
+        return false;
+
+    std::ostringstream buf;
+    line_start( d, buf );
+
+    if (name.empty( ))
+        buf << "!!MUSIC(Off)\n\r";
+    else
+        /* C=1: a client already playing this track keeps playing it instead of
+         * restarting, so resending the same loop costs nothing audible. */
+        buf << "!!MUSIC(" << name << ".mp3"
+            << " V=" << clamp( volume, 0, 100 ) << " L=-1 C=1"
+            << " T=" << sound_type( name ) << " U=" << MSP_URL << ")\n\r";
+
+    d->send( buf.str( ).c_str( ) );
+    return true;
+}
+
+/* Connections whose client (re)announced MSP since the last ambience pass.
+ * Lives here and not in the updates plugin because the handshake code
+ * (iomanager) cannot reach that plugin, while both link this one. Pointers
+ * are only compared, never followed, and ~Descriptor drops its own. */
+static std::set<Descriptor *> ambienceReset;
+
+void msp_ambience_reset( Descriptor *d )
+{
+    ambienceReset.insert( d );
+}
+
+bool msp_ambience_take_reset( Descriptor *d )
+{
+    return ambienceReset.erase( d ) > 0;
 }

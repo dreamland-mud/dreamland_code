@@ -140,19 +140,45 @@ void stand_up_after_round( Character *victim )
  * MSP sound when a player enters a fight, at most once a minute: a brawl that
  * stops and restarts every round (flee, a new target) is still one fight.
  */
+static std::map<long long, time_t> lastFightStart;
+
+static bool fight_sound_due( std::map<long long, time_t> &last, Character *ch )
+{
+    if (ch->is_npc( ) || !ch->desc)
+        return false;
+
+    time_t &t = last[ch->getID( )];
+    if (dreamland->getCurrentTime( ) - t < 60)
+        return false;
+
+    t = dreamland->getCurrentTime( );
+    return true;
+}
+
 static void sound_fight_start( Character *ch )
 {
-    static std::map<long long, time_t> lastStart;
+    if (fight_sound_due( lastFightStart, ch ))
+        msp_sound( ch, "combat/start", 100, 1, 50 );
+}
 
-    if (ch->is_npc( ) || !ch->desc)
+/*
+ * A player attacked by another player hears an alarm instead of
+ * combat/start: it means a possible death with loot at stake, not another
+ * mob. Its own minute is kept apart so a mob fight a moment ago can't swallow
+ * it, and it stamps the combat/start minute too, so the victim's own entry
+ * into the fight right after doesn't add a second cue.
+ */
+void sound_pk_attacked( Character *ch, Character *victim )
+{
+    static std::map<long long, time_t> lastPk;
+
+    if (ch == victim || ch->is_npc( ) || victim->is_npc( ))
         return;
 
-    time_t &last = lastStart[ch->getID( )];
-    if (dreamland->getCurrentTime( ) - last < 60)
-        return;
-
-    last = dreamland->getCurrentTime( );
-    msp_sound( ch, "combat/start", 100, 1, 50 );
+    if (fight_sound_due( lastPk, victim )) {
+        lastFightStart[victim->getID( )] = dreamland->getCurrentTime( );
+        msp_sound( victim, "alert/pk", 100, 1, 80 );
+    }
 }
 
 /*

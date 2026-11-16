@@ -27,5 +27,6 @@ void obj_update( );
 void mobile_update( );
 void track_update( );
 void player_update( );
+void ambience_update( );
 
 #endif

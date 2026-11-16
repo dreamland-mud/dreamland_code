@@ -58,4 +58,7 @@ extern const struct season_info season_table [];
 /** Return English name of the current season. */
 DLString season();
 
+/** True in the winter months, when precipitation falls as snow. */
+bool season_is_winter( );
+
 #endif

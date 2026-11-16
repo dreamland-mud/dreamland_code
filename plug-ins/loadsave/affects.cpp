@@ -30,6 +30,8 @@ GSN(hide);
 GSN(fade);
 GSN(invisibility);
 GSN(improved_invis);
+GSN(deafen);
+GROUP(maladictions);
 
 Affect * Affect::clone() const
 {
@@ -443,9 +445,59 @@ void affect_check(Character *ch, Affect *affect)
 }
 
 /*
- * Give an affect to a char.
+ * MSP: what a character was under before an affect landed, so a sound plays
+ * only the moment a state begins and never on a refresh of it.
  */
-void affect_to_char( Character *ch, Affect *paf )
+struct AffectSoundBefore {
+    bool blind, poison, charm, sleep, skill;
+};
+
+static AffectSoundBefore affect_sound_before( Character *ch, Affect *paf )
+{
+    AffectSoundBefore b;
+
+    b.blind = IS_AFFECTED(ch, AFF_BLIND);
+    b.poison = IS_AFFECTED(ch, AFF_POISON);
+    b.charm = IS_AFFECTED(ch, AFF_CHARM);
+    b.sleep = IS_AFFECTED(ch, AFF_SLEEP);
+    b.skill = ch->isAffected( paf->type );
+    return b;
+}
+
+/*
+ * One sound per application, the most urgent first: losing a sense, then
+ * poison, then losing control of yourself, then any other curse. The
+ * malediction catch-all only counts a skill the character wasn't already
+ * under, so a second curse stacking on the first stays quiet.
+ */
+static void affect_sound( Character *ch, Affect *paf, const AffectSoundBefore &b )
+{
+    if (ch->is_npc( ) || !ch->desc)
+        return;
+
+    bool newSkill = !b.skill && ch->isAffected( paf->type );
+
+    if ((!b.blind && IS_AFFECTED(ch, AFF_BLIND)) || (newSkill && paf->type == gsn_deafen)) {
+        msp_sound( ch, "alert/blind", 100, 1, 70 );
+        return;
+    }
+
+    if (!b.poison && IS_AFFECTED(ch, AFF_POISON)) {
+        msp_sound( ch, "alert/poison", 100, 1, 70 );
+        return;
+    }
+
+    if ((!b.charm && IS_AFFECTED(ch, AFF_CHARM)) || (!b.sleep && IS_AFFECTED(ch, AFF_SLEEP))) {
+        msp_sound( ch, "alert/charmed", 100, 1, 75 );
+        return;
+    }
+
+    Skill *skill = paf->type.getElement( );
+    if (newSkill && skill && skill->hasGroup( group_maladictions ))
+        msp_sound( ch, "alert/malediction", 100, 1, 70 );
+}
+
+static void affect_add( Character *ch, Affect *paf )
 {
         bool need_saving = false;
 
@@ -456,21 +508,21 @@ void affect_to_char( Character *ch, Affect *paf )
                 && paf->bitvector.isSet(AFF_CHARM)
                 && ch->in_room;
 
-        bool wasBlind = IS_AFFECTED(ch, AFF_BLIND);
-        bool wasPoisoned = IS_AFFECTED(ch, AFF_POISON);
-
         affect_modify( ch, paf, true );
-
-        // MSP: only the moment the state begins, not a refresh of it.
-        if (!wasBlind && IS_AFFECTED(ch, AFF_BLIND))
-            msp_sound( ch, "alert/blind", 100, 1, 70 );
-        else if (!wasPoisoned && IS_AFFECTED(ch, AFF_POISON))
-            msp_sound( ch, "alert/poison", 100, 1, 70 );
 
         if ( need_saving )
                 save_mobs( ch->in_room );
+}
 
-        return;
+/*
+ * Give an affect to a char.
+ */
+void affect_to_char( Character *ch, Affect *paf )
+{
+    AffectSoundBefore before = affect_sound_before( ch, paf );
+
+    affect_add( ch, paf );
+    affect_sound( ch, paf, before );
 }
 
 /*
@@ -564,6 +616,9 @@ void affect_bit_strip(Character *ch, const FlagTable *table, int bits, bool verb
  */
 void affect_join( Character *ch, Affect *paf )
 {
+    // Taken before the old copy goes, so a refresh is not heard as a new state.
+    AffectSoundBefore before = affect_sound_before( ch, paf );
+
     for (auto &paf_old: ch->affected)
     {
         if ( paf_old->type == paf->type )
@@ -581,7 +636,8 @@ void affect_join( Character *ch, Affect *paf )
         }
     }
 
-    affect_to_char( ch, paf );
+    affect_add( ch, paf );
+    affect_sound( ch, paf, before );
 }
 
 
