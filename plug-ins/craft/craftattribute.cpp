@@ -32,6 +32,9 @@ bool XMLAttributeCraft::handle( const WhoisArguments &args )
     StringList pnames;
     Proficiency::const_iterator p;
     for (p = proficiency.begin(); p != proficiency.end(); p++) {
+        // Level 0 = parked or wiped (Fenia craftFrozen, Path-bound crafts).
+        if (p->second.level <= 0)
+            continue;
         CraftProfession::Pointer prof = craftProfessionManager->get(p->first);
         if (prof)
             pnames.push_back(prof->getNameFor(args.looker));
@@ -52,6 +55,8 @@ bool XMLAttributeCraft::handle( const ScoreArguments &args )
     Proficiency::const_iterator p;
 
     for (p = proficiency.begin(); p != proficiency.end(); p++) {
+        if (p->second.level <= 0)
+            continue;
         CraftProfession::Pointer prof = craftProfessionManager->get(p->first);
         if (prof) {
             ostringstream buf;
