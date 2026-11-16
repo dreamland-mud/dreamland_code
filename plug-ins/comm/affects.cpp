@@ -18,6 +18,7 @@
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
+#include "math_utils.h"
 
 RELIG(none);
 
@@ -437,7 +438,10 @@ struct PermanentAffects {
                        my_mgain > 0 ? "C" : "r",
                        abs(my_mgain), (my_mgain > 0 ? _("быстрее") : _("медленнее")).getMessage(Player::displayLang(ch)).c_str());
 
-        if (my_beats != 0)
+        if (my_beats < SKILL_BEATS_FLOOR)
+            ch->pecho(_("Задержки от всех умений у тебя на {C%d%%{x короче (это предел, без него было бы %d%%)."),
+                       -SKILL_BEATS_FLOOR, -my_beats);
+        else if (my_beats != 0)
             ch->pecho(_("Задержки от всех умений у тебя на {%s%d%%{x %s."),
                        my_beats > 0 ? "r" : "C",
                        abs(my_beats), (my_beats > 0 ? _("длиннее") : _("короче")).getMessage(Player::displayLang(ch)).c_str());

@@ -428,7 +428,7 @@ HelpArticlePointer BasicSkill::getSkillHelp( ) const
 
 int BasicSkill::getBeats(Character *ch) const
 {
-    return ch ? percentage(beats, ch->mod_beats) : beats.getValue();
+    return ch ? percentage(beats, skill_beats_mod(ch->mod_beats)) : beats.getValue();
 }
 
 int BasicSkill::getMana(Character *ch) const

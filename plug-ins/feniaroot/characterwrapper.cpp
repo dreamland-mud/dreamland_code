@@ -147,6 +147,7 @@
 #include "dreamland.h"
 #include "attacks.h"
 #include "subclass.h"
+#include "math_utils.h"
 
 RELIG(none);   // god_none sentinel for the gear-advisor tattoo-slot filter
 // Item-granted skill pricing: Flowers never fight players, a Battlerager can't blink,
@@ -4611,11 +4612,54 @@ static double ga_svsPoints( Character *target, const GAWeights &w, int delta, in
     return w.savesPerPct * (after - before) / 10.0;   // permille -> percent
 }
 
+// The char's own mod_beats outside one wear slot, same rules as ga_svsOutside: no
+// temporary affects (haste, fervor come and go), no worn gear in that slot.
+static int ga_beatsOutside( Character *target, int slot )
+{
+    int b = target->mod_beats;
+    for (auto &paf: target->affected)
+        if (paf->duration >= 0 && paf->location == APPLY_BEATS)
+            b -= paf->modifier;
+    if (slot < 0)
+        return b;
+    for (::Object *wo = target->carrying; wo; wo = wo->next_content) {
+        if (wo->wear_loc == wear_none)
+            continue;
+        int ws = wo->pIndexData->wear_flags;
+        REMOVE_BIT( ws, ITEM_TAKE );
+        if (ws != slot)
+            continue;
+        for (auto &paf: wo->pIndexData->affected)
+            if (paf->location == APPLY_BEATS)
+                b -= paf->modifier;
+        for (auto &paf: wo->affected)
+            if (paf->location == APPLY_BEATS)
+                b -= paf->modifier;
+    }
+    return b;
+}
+
+// Points of an item's summed skill lag modifier. Lag is floored at SKILL_BEATS_FLOOR
+// (math_utils.h), so only the part that moves the char's effective modifier from its
+// base outside the slot counts: lag gear past the floor scores 0. No char: par price.
+static double ga_beatsPoints( Character *target, const GAWeights &w, int delta, int slot )
+{
+    if (delta == 0)
+        return 0;
+    if (target == 0)
+        return item_apply_points( APPLY_BEATS, delta, w );
+    int base = ga_beatsOutside( target, slot );
+    return item_apply_points( APPLY_BEATS,
+                              skill_beats_mod( base + delta ) - skill_beats_mod( base ), w );
+}
+
 // svsDelta: when given, the saves applies are summed there instead of priced one by one,
 // so the caller prices the item's whole svs at once on the saves curve (ga_svsPoints).
+// beatsDelta: the same for skill lag (ga_beatsPoints).
 static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int statDelta[6],
                             Character *target, bool worn, int itemLevel = -1,
-                            const GAGrantCtx *grants = 0, int *svsDelta = 0 )
+                            const GAGrantCtx *grants = 0, int *svsDelta = 0,
+                            int *beatsDelta = 0 )
 {
     int m = af.modifier;
     int noted = m;   // raw amount filed with the term; a skill boost files the headroom it uses
@@ -4659,8 +4703,13 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     case APPLY_AC:            // w.ac is level-scaled
     case APPLY_SPELL_LEVEL:   // ~0 with no spells (w.spellFactor)
     case APPLY_MOVE:
-    case APPLY_BEATS:
         s += item_apply_points( af.location, m, w );
+        break;
+    case APPLY_BEATS:
+        if (beatsDelta != 0)
+            *beatsDelta += m;
+        else
+            s += item_apply_points( af.location, m, w );
         break;
     // +N levels: scope-split like APPLY_LEARNED -- one named skill < a group < all --
     // and capability-gated: +level to a skill the char can't use or a group it doesn't
@@ -4870,20 +4919,25 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     int itemLevel = inst != 0 ? inst->level : (pProto != 0 ? pProto->level : -1);
     GAGrantCtx grants{ target, pProto, inst };
     const GAGrantCtx *gp = (target != 0 && pProto != 0) ? &grants : 0;
-    int svsDelta = 0;
+    int svsDelta = 0, beatsDelta = 0;
     for (auto &paf: protoAff)
-        ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel, gp, &svsDelta );
+        ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel, gp, &svsDelta, &beatsDelta );
     if (instAff != 0)
         for (auto &paf: *instAff)
-            ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel, gp, &svsDelta );
+            ga_accumAffect( *paf, w, s, statDelta, target, worn, itemLevel, gp, &svsDelta, &beatsDelta );
+    int mySlot = -1;
+    if (pProto != 0) {
+        mySlot = pProto->wear_flags;
+        REMOVE_BIT( mySlot, ITEM_TAKE );
+    }
     if (svsDelta != 0) {
-        int mySlot = -1;
-        if (pProto != 0) {
-            mySlot = pProto->wear_flags;
-            REMOVE_BIT( mySlot, ITEM_TAKE );
-        }
         double pts = ga_svsPoints( target, w, svsDelta, mySlot );
         ga_note( "saves", pts, svsDelta );
+        s += pts;
+    }
+    if (beatsDelta != 0) {
+        double pts = ga_beatsPoints( target, w, beatsDelta, mySlot );
+        ga_note( "beats", pts, beatsDelta );
         s += pts;
     }
     for (int k = 0; k < 6; k++) {
@@ -6243,14 +6297,15 @@ static double ga_setValue( Character *target, SetBehavior *sb, const GAWeights &
     // char's level with the formula eqset applies (eqset uses the lowest
     // worn piece level instead, so a worn set can differ).
     int ref = sb->getRefLevel( );
-    int svsDelta = 0;
+    int svsDelta = 0, beatsDelta = 0;
     for (auto &sa: sb->affects) {
         Affect af;
         sa.fillScaled( af, target->getLevel( ), ref );
         // A set bonus is a chase reward (candidate), so it gets the redundancy check too.
-        ga_accumAffect( af, w, s, statDelta, target, false, -1, 0, &svsDelta );
+        ga_accumAffect( af, w, s, statDelta, target, false, -1, 0, &svsDelta, &beatsDelta );
     }
     s += ga_svsPoints( target, w, svsDelta, -1 );
+    s += ga_beatsPoints( target, w, beatsDelta, -1 );
     for (int k = 0; k < 6; k++) {
         if (statDelta[k] == 0 || w.stat[k] == 0)
             continue;
