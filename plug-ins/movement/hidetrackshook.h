@@ -11,4 +11,11 @@ class Character;
 typedef bool (*HideTracksHook)( Character * );
 extern HideTracksHook hide_tracks_hook;
 
+/**
+ * True: ch's own step leaves no footprint. Only movement asks this, around
+ * RoomHistory::record: trails laid for mob pursuit (shot, Fenia trackRecord)
+ * are always written.
+ */
+bool hides_tracks_step( Character *ch );
+
 #endif

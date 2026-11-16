@@ -8,6 +8,7 @@
 #include "movetypes.h"
 #include "move_utils.h"
 #include "doors.h"
+#include "hidetrackshook.h"
 #include "loadsave.h"
 
 #include "feniamanager.h"
@@ -754,6 +755,9 @@ int ExitsMovement::moveOneFollower( Character *wch, Character *fch )
 void ExitsMovement::place( Character *wch )
 {
     Walkment::place( wch );
+
+    if (hides_tracks_step( wch ))
+        return;
 
     if (peexit)
         from_room->history.record( wch, peexit );

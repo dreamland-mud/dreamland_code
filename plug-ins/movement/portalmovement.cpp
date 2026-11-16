@@ -4,6 +4,7 @@
  */
 #include "portalmovement.h"
 #include "move_utils.h"
+#include "hidetrackshook.h"
 
 #include "feniamanager.h"
 #include "wrapperbase.h"
@@ -209,7 +210,9 @@ void PortalMovement::place( Character *wch )
     }
 
     Walkment::place( wch );
-    from_room->history.record( wch, portal );
+
+    if (!hides_tracks_step( wch ))
+        from_room->history.record( wch, portal );
 }
 
 bool PortalMovement::moveAtomic( )

@@ -52,8 +52,9 @@ public:
 /*
  * A Beastmaster from craft level 5 leaves no footprint on (L - 4) * 17
  * percent of steps, on every step at 10. Runs on every player step, so it
- * only reads the attribute, never creates it. Fenia twin, used by the steam
- * compass: .tmp.pet.hidesTracks (dreamland_fenia utils/pet: ai).
+ * only reads the attribute, never creates it. One ruler: the Fenia twin used
+ * by the steam compass, .tmp.pet.hidesTracks (dreamland_fenia utils/pet: ai),
+ * hardcodes the same 5 and 17. Change both together.
  */
 static bool beastmaster_hides_tracks( Character *ch )
 {
