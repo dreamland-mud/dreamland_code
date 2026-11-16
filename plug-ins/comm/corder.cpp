@@ -27,6 +27,7 @@
 #include "l10n.h"
 #include "player_utils.h"
 #include "../loadsave/behavior_utils.h"
+#include "fenia_utils.h"
 
 static bool mprog_cantorder(Character *victim, Character *master, const char *cmdName, const char *cmdArgs)
 {
@@ -36,11 +37,16 @@ static bool mprog_cantorder(Character *victim, Character *master, const char *cm
 }
 
 // The order text as typed, before it is read as a command: a follower may take
-// words of its own (a Beastmaster pet's 'guard', 'hunt', 'heel' stances, Fenia
-// behavior pet). True: the order was taken, and the handler told the master.
+// words of its own (a Beastmaster's 'guard', 'hunt', 'heel' stances). Shop pets
+// take them from behavior pet; every other follower (a tamed wolf, a zombie, a
+// charmed guard) from the global onPreOrder trigger, since behaviors dispatch
+// from the prototype only. True: the order was taken, and the handler told the master.
 static bool mprog_preorder(Character *victim, Character *master, const char *text)
 {
     if (behavior_trigger(victim, "PreOrder", "CCs", victim, master, text))
+        return true;
+
+    if (gprog("onPreOrder", "CCs", victim, master, text))
         return true;
 
     FENIA_CALL(victim, "PreOrder", "Cs", master, text);
