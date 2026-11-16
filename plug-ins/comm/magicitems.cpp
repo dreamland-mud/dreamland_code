@@ -125,6 +125,7 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
 
     if (number_percent( ) >= gsn_scrolls->getEffective( ch )) {
         oldact(_("Ты не совлада$gло|л|ла с произношением."), ch, 0, 0, TO_CHAR);
+        spell_fizzle_sound( ch );
         gsn_scrolls->improve( ch, false );
         return;
     }
@@ -132,7 +133,7 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
     gsn_scrolls->improve( ch, true );
 
     try {
-        bitstring_t recite_flags = FSPELL_BANE|FSPELL_CHECK_SAFE|FSPELL_ATTACK_CASTER;
+        bitstring_t recite_flags = FSPELL_BANE|FSPELL_CHECK_SAFE|FSPELL_ATTACK_CASTER|FSPELL_SOUND;
 
         int slevel;
         slevel = scroll->value0() + skill_level_bonus(*gsn_scrolls, ch);
@@ -236,15 +237,16 @@ void use_staff( Character *ch, Object *staff, const DLString &argument )
         if ( number_percent( ) >= gsn_staff->getEffective( ch ))
         {
             oldact(_("Ты не смо$gгло|г|гла активировать $o4."),ch,staff,0,TO_CHAR);
+            spell_fizzle_sound( ch );
             oldact(_("...и ничего не происходит."),ch,0,0,TO_ROOM);
             gsn_staff->improve( ch, false );
         }
         else {
             try {
                 if (IS_SET( t, TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ ))
-                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, DLString::emptyString), 0);
+                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, DLString::emptyString), FSPELL_SOUND);
                 else
-                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, ch->in_room), 0);
+                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, ch->in_room), FSPELL_SOUND);
             } catch (const VictimDeathException &e) {
             }
 
@@ -326,11 +328,12 @@ static bool zap_cast( Character *ch, Object *wand, Spell::Pointer &spell, int sl
                 ch,wand,0,TO_CHAR,POS_RESTING);
         oldact_p(_("Усиленные манипуляции $c2 с $o5 приводят лишь к дыму и искрам."),
                 ch,wand,0,TO_ROOM,POS_RESTING);
+        spell_fizzle_sound( ch );
         skill.improve( ch, false, victim );
     }
     else {
         try {
-            bitstring_t zap_flags = FSPELL_CHECK_SAFE|FSPELL_BANE|FSPELL_ATTACK_CASTER;
+            bitstring_t zap_flags = FSPELL_CHECK_SAFE|FSPELL_BANE|FSPELL_ATTACK_CASTER|FSPELL_SOUND;
             
             if (::spell_nocatch(spell, slevel, ch, target, zap_flags))
                 if (spell->getSpellType( ) == SPELL_OFFENSIVE)

@@ -1,6 +1,7 @@
 #ifndef MSP_H
 #define MSP_H
 
+#include <set>
 #include "dlstring.h"
 
 class Descriptor;
@@ -20,6 +21,34 @@ bool msp_sound( Descriptor *d, const DLString &name, int volume = 100, int loops
 
 /** The same for a player's own connection; false for mobs and the linkless. */
 bool msp_sound( Character *ch, const DLString &name, int volume = 100, int loops = 1, int priority = 50 );
+
+/** msp_sound for an alert that an affect landing on ch sends (blind, poison,
+ *  charmed, malediction), at full volume. Every open MspAlertWatch on ch's
+ *  connection counts it. */
+bool msp_affect_alert( Character *ch, const DLString &name, int priority );
+
+/**
+ * While alive, notes which of the added connections got an affect alert. A
+ * cast opens one on its listeners so a curse that lands plays its alert alone,
+ * not the alert and the cast sound in the same breath. Scopes nest. Pointers
+ * are only compared, never followed.
+ */
+class MspAlertWatch {
+public:
+    MspAlertWatch( );
+    ~MspAlertWatch( );
+    MspAlertWatch( const MspAlertWatch & ) = delete;
+    MspAlertWatch &operator = ( const MspAlertWatch & ) = delete;
+
+    void add( Descriptor *d ) { watched.insert( d ); }
+    bool heard( Descriptor *d ) const { return alerted.count( d ) > 0; }
+
+private:
+    friend bool msp_affect_alert( Character *, const DLString &, int );
+
+    std::set<Descriptor *> watched, alerted;
+    MspAlertWatch *prev;
+};
 
 /**
  * Queue an MSP !!MUSIC line looping a library track forever (L=-1, C=1), e.g.
