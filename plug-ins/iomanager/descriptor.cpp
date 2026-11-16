@@ -28,6 +28,7 @@
 #include "outofband.h"
 #include "backdoorhandler.h"
 #include "mssp.h"
+#include "msp.h"
 
 
 #include "dreamland.h"
@@ -285,6 +286,7 @@ int Descriptor::inputTelnet( unsigned char i )
                     break;
                 case TELOPT_MSP:
                     SET_BIT(oob_proto, OOB_MSP);
+                    msp_ambience_reset(this);
                     break;
                 case TELOPT_TM:
                     // Sent after IAC IP/AO (e.g. Ctrl-C): the client drops all
@@ -759,6 +761,9 @@ sendVersion(Descriptor *d)
     msp["command"] = "msp";
     msp["args"][0] = true;
     d->writeWSCommand(msp);
+
+    // The client dropped its ambience along with everything else: resend it.
+    msp_ambience_reset(d);
 }
 
 bool 

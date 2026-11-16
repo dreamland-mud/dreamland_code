@@ -29,6 +29,10 @@ void stand_up_after_round( Character *victim );
 
 void update_pos( Character *victim );
 
+/** MSP alarm for a player that another player just attacked; plays at most
+ *  once a minute and takes the place of the victim's combat/start. */
+void sound_pk_attacked( Character *ch, Character *victim );
+
 void        set_violent( Character *ch, Character *victim, bool fAlways );
 void        set_thief( Character *ch );
 void        set_ghost( Character *ch );

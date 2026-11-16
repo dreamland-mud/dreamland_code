@@ -60,6 +60,7 @@
 #include "vnum.h"
 #include "def.h"
 #include "l10n.h"
+#include "msp.h"
 
 using namespace std;
 
@@ -1187,6 +1188,17 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
         return;
 
     // From this point on the death has certainly happened.
+
+    // MSP, before any extract or relocation takes the victim's descriptor
+    // away: the fallen hear their death, and a player who felled a legend,
+    // boss or champion (a pet's kill counts for its master) hears the win.
+    if (!victim->is_npc( ))
+        msp_sound( victim, "combat/death", 100, 1, 100 );
+    else if (ch && ch != victim && !ch->is_npc( )) {
+        int tier = victim->getNPC( )->getTier( );
+        if (tier >= 1 && tier <= 3)
+            msp_sound( ch, "combat/kill", 100, 1, 80 );
+    }
 
     // Mob behaviors hear about the death only once nothing can cancel it, so a
     // handler never acts on a death that did not happen. Notification only, but

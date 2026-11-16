@@ -38,7 +38,6 @@
 
 #include "messengers.h"
 #include "l10n.h"
-#include "msp.h"
 #include "fenia_utils.h"
 #include "lang.h"
 
@@ -374,14 +373,9 @@ DLString season()
     return season_table[this_season].name;
 }
 
-/* MSP ambient cue for a sky event, empty when the event has none. */
-static const char * weather_sound( const DLString &eventId )
+bool season_is_winter( )
 {
-    if (eventId == "precip_start")
-        return "ambient/rain";
-    if (eventId == "lightning_start")
-        return "ambient/wind";
-    return "";
+    return month_table[time_info.month].season == SEASON_WINTER;
 }
 
 /*
@@ -397,8 +391,6 @@ static void weather_broadcast( const DLString &eventId, int noFlag )
     if (msg == 0)
         return;
 
-    DLString sound = weather_sound( eventId );
-
     for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
         if (d->connected != CON_PLAYING)
             continue;
@@ -410,9 +402,6 @@ static void weather_broadcast( const DLString &eventId, int noFlag )
             && !IS_SET( ch->in_room->room_flags, noFlag ))
         {
             ch->send_to( msg->getForLang( viewerLang( ch ) ) + "\r\n" );
-
-            if (!sound.empty( ))
-                msp_sound( d, sound, 100, 1, 30 );
         }
     }
 }

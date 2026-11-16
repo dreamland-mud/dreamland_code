@@ -12,6 +12,7 @@
 #include "screenreader.h"
 #include "act.h"
 #include "multimessage.h"
+#include "msp.h"
 #include "merc.h"
 
 #include "def.h"
@@ -218,6 +219,11 @@ void DefaultDesire::gain( PCharacter *ch, int value )
     // Feel hunger for the first time, print start message.
     if (wasActive != isActive( ch )) {
         ptc( ch, msgStart.getForLang(lang) );
+
+        // MSP once on the way in, not every tick of it. Bloodlust and drink
+        // share this class but are not needs to go and fix.
+        if (getName( ) == "hunger" || getName( ) == "thirst")
+            msp_sound( ch, "alert/hunger", 100, 1, 50 );
         return;
     }
 

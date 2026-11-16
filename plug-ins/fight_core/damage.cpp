@@ -290,6 +290,11 @@ static void rprog_attack( Character *ch, Character *victim )
 void Damage::adjustFighting( )
 {
     if (ch != victim && victim->position > POS_STUNNED) {
+        // Here and not in set_fighting: only this spot knows who swung first,
+        // and it runs before the victim's set_fighting plays combat/start.
+        if (ch->fighting != victim)
+            sound_pk_attacked( ch, victim );
+
         // Do not put the victim on their feet here. Someone caught lying, sitting or
         // asleep takes the attacker's whole round at the position penalty, and gets up
         // at the end of it -- see stand_up_after_round.

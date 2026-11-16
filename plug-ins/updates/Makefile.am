@@ -5,6 +5,7 @@ update.cpp \
 update_params.cpp \
 update_areas.cpp \
 weather.cpp \
+ambience.cpp \
 impl.cpp 
 
 include $(top_srcdir)/src/Makefile.inc

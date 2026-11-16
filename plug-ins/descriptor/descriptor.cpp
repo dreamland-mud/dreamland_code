@@ -23,6 +23,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "telnet.h"
+#include "msp.h"
 
 
 #include "def.h"
@@ -48,6 +49,10 @@ Descriptor::~Descriptor()
 {
     if(outbuf)
         free(outbuf);
+
+    // A new connection may reuse this address: don't hand it our pending
+    // ambience resend.
+    msp_ambience_take_reset( this );
 }
 
 void 

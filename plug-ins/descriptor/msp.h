@@ -21,4 +21,18 @@ bool msp_sound( Descriptor *d, const DLString &name, int volume = 100, int loops
 /** The same for a player's own connection; false for mobs and the linkless. */
 bool msp_sound( Character *ch, const DLString &name, int volume = 100, int loops = 1, int priority = 50 );
 
+/**
+ * Queue an MSP !!MUSIC line looping a library track forever (L=-1, C=1), e.g.
+ * "ambient/rain"; an empty name sends !!MUSIC(Off). Telnet clients only get
+ * one music channel, so the ambience pass picks a single track for them.
+ */
+bool msp_music( Descriptor *d, const DLString &name, int volume = 60 );
+
+/** The client on this connection just (re)announced MSP and forgot whatever
+ *  ambience it played: the next ambience pass must resend it. */
+void msp_ambience_reset( Descriptor *d );
+
+/** True once per msp_ambience_reset for this connection. */
+bool msp_ambience_take_reset( Descriptor *d );
+
 #endif

@@ -3358,7 +3358,14 @@ NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype,damflags[,sho
     bitstring_t damflags = argnum2flag(args, 5, damage_flags);
     bool show = args.size() > 5 ? argnum2boolean(args, 6) : true;
 
-    return ::damage_nocatch(target, victim, dam, skill->getIndex( ), dam_type, show, damflags);
+    Register rc = ::damage_nocatch(target, victim, dam, skill->getIndex( ), dam_type, show, damflags);
+
+    // Fenia combat skills miss by dealing 0 here, so the attacker hears the
+    // whiff; plain melee misses never pass through and stay silent.
+    if (dam == 0 && show && target != victim)
+        msp_sound( target, "combat/miss", 100, 1, 40 );
+
+    return rc;
 }
 
 NMI_INVOKE( CharacterWrapper, extra_attacks, "(): бросить second..fifth attack, как в раунде боя (без улучшения умений), и вернуть, сколько сработало (0-4)" )
@@ -3396,6 +3403,11 @@ NMI_INVOKE( CharacterWrapper, skill_one_hit, "(vict,skillName,damDivisor[,thacCo
     bool miss = args.size( ) > 5 ? argnum2boolean(args, 6) : false;
 
     ::skill_one_hit_nocatch(target, victim, skill, damDivisor, thacCoeff, applyCounter, miss);
+
+    // A scripted skill strike that missed: same cue as a 0-damage damage().
+    if (miss && target != victim)
+        msp_sound( target, "combat/miss", 100, 1, 40 );
+
     return Register();
 }
 
