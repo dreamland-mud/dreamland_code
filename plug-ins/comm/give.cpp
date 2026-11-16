@@ -73,11 +73,12 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
         return;
     }
 
-    // Food handed to your own pet skips the carry limits, so a pet that
-    // carries nothing can still be fed with a plain give: the Fenia onGive
-    // hook (global/onGive/feed) eats it or hands it back, and whatever is
-    // still on the pet after the give triggers comes back below.
-    bool fPetFood = obj->item_type == ITEM_FOOD
+    // Food or a drink handed to your own pet skips the carry limits, so a
+    // pet that carries nothing can still be fed with a plain give: the Fenia
+    // onGive hook (global/onGive/feed) eats it, lets it drink a sip of beer
+    // or hands it back, and whatever is still on the pet after the give
+    // triggers comes back below.
+    bool fPetFood = (obj->item_type == ITEM_FOOD || obj->item_type == ITEM_DRINK_CON)
                     && !ch->is_npc( ) && victim->is_npc( )
                     && ch->getPC( )->pet == victim->getNPC( );
 
@@ -152,7 +153,7 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
     if (omprog_give( obj, ch, victim ))
         return;
 
-    // Pets carry nothing: food the triggers did not take goes back.
+    // Pets carry nothing: food or a drink the triggers did not take goes back.
     if (fPetFood && obj->carried_by == victim
         && !ch->isDead( ) && !victim->isDead( ) && ch->in_room == victim->in_room)
     {
