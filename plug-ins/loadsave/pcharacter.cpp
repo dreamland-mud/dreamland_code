@@ -348,12 +348,20 @@ bool PCharacter::load( )
     }
 
     // Numbers re-derived from the prototype hold nothing the pet wore, so
-    // its gear comes back unworn and applied nowhere: the login trigger
-    // (Fenia global/onConnect/petreconfig) puts the collar back on for real.
-    if (pet && !petKept)
-        for (Object *obj = pet->carrying; obj != 0; obj = obj->next_content)
-            if (obj->wear_loc != wear_none)
-                obj->wear_loc.assign( wear_none );
+    // its gear goes to the owner's pack, unworn and marked: the login trigger
+    // (Fenia global/onConnect/petreconfig) tries to put it back on the pet
+    // for real, and says so when it no longer fits. In the owner's pack the
+    // collar is saved whatever happens before that.
+    if (pet && !petKept) {
+        Object *obj, *obj_next;
+        for (obj = pet->carrying; obj != 0; obj = obj_next) {
+            obj_next = obj->next_content;
+            obj->wear_loc.assign( wear_none );
+            obj_from_char( obj );
+            obj_to_char( obj, this );
+            obj->setProperty( "petGear", "1" );
+        }
+    }
 
     // lastAccessTime is stamped on every save, so this is the time since the profile was written.
     time_t lastSave = getLastAccessTime( ).getTime( );
@@ -363,8 +371,10 @@ bool PCharacter::load( )
             obj_charge_offline_time( carrying, minutes );
             affects_charge_offline_time( affected, minutes, true );
 
-            if (pet)
+            if (pet) {
                 affects_charge_offline_time( pet->affected, minutes, true );
+                obj_charge_offline_time( pet->carrying, minutes );
+            }
         }
     }
 

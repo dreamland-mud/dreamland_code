@@ -773,6 +773,15 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
             return RC_WEAR_PET;
         }
 
+        // The collar goes on neck_1 itself, never on its pair: a body with
+        // neck_2 only would pass the pair check below, and equip would then
+        // refuse it in silence after wear reported success.
+        if (!matches( ch )) {
+            if (IS_SET(flags, F_WEAR_VERBOSE))
+                echo_master(ch, _("%1$^C3 некуда надеть ошейник: у %1$Gнего|него|нее|них нет шеи."), ch);
+            return RC_WEAR_NORIB;
+        }
+
         // One collar: a second one must not slip onto the pair slot.
         if (find( ch ) && !IS_SET(flags, F_WEAR_REPLACE)) {
             if (IS_SET(flags, F_WEAR_VERBOSE))

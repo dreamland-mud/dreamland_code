@@ -264,12 +264,21 @@ CMDRUNP( wear )
     obj_from_char( obj );
     obj_to_char( obj, victim );
     
-    if (wear_obj( victim, obj, 0 ) != RC_WEAR_OK) {
+    int rc = wear_obj( victim, obj, 0 );
+    if (rc != RC_WEAR_OK) {
         if (obj->carried_by == victim) {
             obj_from_char( obj );
             obj_to_char( obj, ch );
         }
-        oldact(_("Ты пытаешься надеть $o4 на $C4, но безуспешно."), ch, obj, victim, TO_CHAR);
+        // A collar on a pet: say why, the generic line hides it.
+        if (wear_is_owned_pet( victim ) && rc == RC_WEAR_YOUNG)
+            ch->pecho(_("%1$^C1 еще не дорос%1$Gло||ла|ли до %2$O2."), victim, obj);
+        else if (wear_is_owned_pet( victim ) && rc == RC_WEAR_CONFLICT)
+            ch->pecho(_("%1$^C1 уже нос%1$nит|ят ошейник."), victim);
+        else if (wear_is_owned_pet( victim ) && rc == RC_WEAR_NORIB)
+            ch->pecho(_("%1$^C3 некуда надеть ошейник: у %1$Gнего|него|нее|них нет шеи."), victim);
+        else
+            oldact(_("Ты пытаешься надеть $o4 на $C4, но безуспешно."), ch, obj, victim, TO_CHAR);
         oldact(_("$c1 пытается надеть на тебя $o4, но не может."), ch, obj, victim, TO_VICT);
         oldact(_("$c1 пытается надеть на $C4 $o4, но не может."), ch, obj, victim, TO_NOTVICT);
         return;
