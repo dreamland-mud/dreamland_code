@@ -771,8 +771,9 @@ static bool pet_level_is_bought(NPCharacter *pet)
 /* fread_pet End. Pets write numbers and act/aff/det/wearloc whole and keep
  * their affects in those numbers (no affect_modify on load); a stamp mismatch
  * (or no stamp) re-derives from the prototype, so the affects then have to be
- * applied for real (decision 36). */
-static void apply_saved_pet(NPCharacter *pet, SavedMobState &st)
+ * applied for real (decision 36). True if the saved numbers were kept: they
+ * already hold what the pet's worn collar gives. */
+static bool apply_saved_pet(NPCharacter *pet, SavedMobState &st)
 {
     bool keep = st.stampMatches(pet->pIndexData);
 
@@ -800,6 +801,7 @@ static void apply_saved_pet(NPCharacter *pet, SavedMobState &st)
         }
     }
     st.affects.clear();
+    return keep;
 }
 
 /* write a pet */
@@ -891,6 +893,14 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
             fwrite_affect( "Affc", fp, paf );
 
         fprintf(fp,"End\n");
+
+        // What the pet wears (its collar) follows the block: the loader hands
+        // every #O after #PET to the pet (PCharacter::load). The numbers above
+        // already hold what it gives, and loading a worn object applies
+        // nothing, so a kept pet comes back exact. Its unworn pack stays out.
+        for (Object *obj = pet->carrying; obj != 0; obj = obj->next_content)
+            if (obj->wear_loc->givesAffects( ))
+                fwrite_obj_0( pet, obj, fp, 0 );
         return;
 }
 
@@ -1758,8 +1768,9 @@ static void fread_pet_settle_keyword(NPCharacter *pet, bool hasLegacyName, const
     pet->updateCachedNouns();
 }
 
-/* load a pet from the forgotten reaches */
-void fread_pet( PCharacter *ch, FILE *fp )
+/* load a pet from the forgotten reaches. True if its saved numbers were
+ * kept (body stamp matched), false if they were re-derived from the prototype. */
+bool fread_pet( PCharacter *ch, FILE *fp )
 {
     const char *word;
     NPCharacter *pet;
@@ -1907,7 +1918,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
                      if (FeniaManager::wrapperManager)
                          FeniaManager::wrapperManager->linkWrapper(pet);
 
-                     apply_saved_pet(pet, saved);
+                     bool kept = apply_saved_pet(pet, saved);
                      pet->leader = ch;
                      pet->master = ch;
                      ch->pet = pet;
@@ -1922,7 +1933,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
                      }
 
                      LogStream::sendNotice() << "LOAD " << ch->getName() << " pet " << pet->getID() << " [" << pet->pIndexData->vnum << "]" << endl;    
-                     return;
+                     return kept;
                  }
                  KEY("Exp", pet->exp, fread_number(fp));
                  break;

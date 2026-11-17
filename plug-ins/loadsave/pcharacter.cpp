@@ -19,6 +19,7 @@
 #include "npcharacter.h"
 #include "pcharactermanager.h"
 #include "object.h"
+#include "wearlocation.h"
 #include "affect.h"
 #include "skillreference.h"
 #include "spell.h"
@@ -29,6 +30,8 @@
 
 #include "vnum.h"
 #include "def.h"
+
+WEARLOC(none);
 
 GSN(sanctuary);
 GSN(stardust);
@@ -298,6 +301,10 @@ bool PCharacter::load( )
 
     // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
     char_to_room(this, get_room_instance(ROOM_VNUM_LIMBO));
+
+    // The pet is the last section before #END: every object after it is
+    // what the pet wears (fwrite_pet).
+    bool petRead = false, petKept = true;
    
     for ( ; ; ) {
         char letter;
@@ -320,9 +327,16 @@ bool PCharacter::load( )
             PCharacterManager::load( this );
             fread_char( this, fp );
         }
-        else if ( !strcmp( word, "OBJECT" ) ) fread_obj  ( this, NULL, fp );
-        else if ( !strcmp( word, "O"      ) ) fread_obj  ( this, NULL, fp );
-        else if ( !strcmp( word, "PET"    ) ) fread_pet  ( this, fp );
+        else if ( !strcmp( word, "OBJECT" ) || !strcmp( word, "O" ) ) {
+            if (petRead && pet)
+                fread_obj( pet, NULL, fp );
+            else
+                fread_obj( this, NULL, fp );
+        }
+        else if ( !strcmp( word, "PET"    ) ) {
+            petKept = fread_pet( this, fp );
+            petRead = true;
+        }
         else if ( !strcmp( word, "MLT"    ) ) fread_mlt  ( this, fp );
         else if ( !strcmp( word, "END"    ) ) break;
         else
@@ -330,6 +344,22 @@ bool PCharacter::load( )
             LogStream::sendError( ) 
                 << METHOD << ": bad section " << word << endl;
             break;
+        }
+    }
+
+    // Numbers re-derived from the prototype hold nothing the pet wore, so
+    // its gear goes to the owner's pack, unworn and marked: the login trigger
+    // (Fenia global/onConnect/petreconfig) tries to put it back on the pet
+    // for real, and says so when it no longer fits. In the owner's pack the
+    // collar is saved whatever happens before that.
+    if (pet && !petKept) {
+        Object *obj, *obj_next;
+        for (obj = pet->carrying; obj != 0; obj = obj_next) {
+            obj_next = obj->next_content;
+            obj->wear_loc.assign( wear_none );
+            obj_from_char( obj );
+            obj_to_char( obj, this );
+            obj->setProperty( "petGear", "1" );
         }
     }
 
@@ -341,8 +371,10 @@ bool PCharacter::load( )
             obj_charge_offline_time( carrying, minutes );
             affects_charge_offline_time( affected, minutes, true );
 
-            if (pet)
+            if (pet) {
                 affects_charge_offline_time( pet->affected, minutes, true );
+                obj_charge_offline_time( pet->carrying, minutes );
+            }
         }
     }
 

@@ -60,8 +60,22 @@ void nuke_pets( PCharacter *ch, int flags )
     if (!watch.gone( )) {
         if (IS_SET(flags, FEXTRACT_TOTAL))
             extract_char( pet, IS_SET(flags, FEXTRACT_COUNT));
-        else
+        else {
+            // The owner died (extract_dead_player) and the pet goes with
+            // them. What it still carries (its collar, when Fenia nukeFollower
+            // did not run) stays on the floor instead of leaving with it.
+            if (pet->in_room) {
+                Object *obj, *obj_next;
+                for (obj = pet->carrying; obj != 0; obj = obj_next) {
+                    obj_next = obj->next_content;
+                    if (IS_SET(obj->extra_flags, ITEM_NOSAVEDROP))
+                        continue;
+                    obj_from_char( obj );
+                    obj_to_room( obj, pet->in_room );
+                }
+            }
             pet->setDead( );
+        }
     }
 
     ch->pet = NULL;

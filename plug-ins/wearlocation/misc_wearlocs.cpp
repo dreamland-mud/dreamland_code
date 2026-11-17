@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "misc_wearlocs.h"
+#include "behavior.h"
 #include "wearloc_utils.h"
 
 #include "skillreference.h"
@@ -593,4 +594,19 @@ bool wear_is_owned_pet(Character *ch)
            && ch->master != 0
            && !ch->master->is_npc( )
            && ch->master->getPC( )->pet == ch;
+}
+
+BHV(collar);
+
+bool wear_is_pet_collar(Object *obj)
+{
+    return obj != 0 && obj->pIndexData != 0
+           && obj->pIndexData->behaviors.isSet( bhv_collar );
+}
+
+bool wear_pet_allows(Character *ch, Object *obj, Wearlocation *loc)
+{
+    return wear_is_owned_pet( ch )
+           && wear_is_pet_collar( obj )
+           && loc != 0 && wear_neck_1 == loc;
 }

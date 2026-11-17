@@ -39,7 +39,7 @@ void rot_items_on_quit( Character *ch );
 
 NPCharacter * fread_mob( FILE *fp );
 void fread_char( PCharacter *ch,  FILE *fp );
-void fread_pet( PCharacter *ch,  FILE *fp );
+bool fread_pet( PCharacter *ch,  FILE *fp );
 void fread_mlt( PCharacter *ch, FILE *fp );
 void fread_obj( Character *ch,  Room *room, FILE *fp );
 

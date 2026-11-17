@@ -15,6 +15,7 @@
 #include "lex.h"
 
 #include "core/behavior/behavior_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "room.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -104,6 +105,9 @@ static void whole_object_argument( char *cArg, char *argObj )
 
 static bool oprog_can_dress(Object *obj, Character *ch, Character *victim)
 {
+    if (behavior_trigger(obj, "CanDress", "OCC", obj, ch, victim))
+        return true;
+
     FENIA_CALL( obj, "CanDress", "CC", ch, victim )
     FENIA_NDX_CALL( obj, "CanDress", "OCC", obj, ch, victim )
     BEHAVIOR_CALL(obj, canDress, ch, victim)
@@ -142,12 +146,10 @@ CMDRUNP( wear )
         return;
     }
 
-    // One line for 'order pet wear all', not a refusal per item.
-    if (wear_is_owned_pet( ch )) {
-        echo_master(ch, _("Питомцы не носят снаряжения."));
-        return;
-    }
-    
+    // A pet wears its collar and nothing else (wear_pet_allows): the
+    // refusals for anything else come after the object lookup below.
+    bool petActor = wear_is_owned_pet( ch );
+
     if (arg_is_to( argTo ) || arg_is_in( argTo ) || arg_is_on(argTo)) {
         if (arg_is(argVict, "hair")) {
             fHair = true;
@@ -165,10 +167,6 @@ CMDRUNP( wear )
             oldact(_("$C1 в состоянии одеться са$Gмо|м|ма!"), ch, 0, victim, TO_CHAR);
             return;
         }
-        else if (wear_is_owned_pet( victim )) {
-            ch->pecho(_("%1$^C1 не стан%1$nет|ут ничего надевать: питомцы не носят снаряжения."), victim);
-            return;
-        }
     }
     else 
         whole_object_argument( cArg, argObj );
@@ -181,21 +179,44 @@ CMDRUNP( wear )
             return;
         }
         
+        // One line for 'order pet wear all', not a refusal per item.
+        bool petWore = false;
+
         try {
             for (obj = ch->carrying; obj != 0; obj = obj_next) {
                 obj_next = obj->next_content;
                 
-                if (obj->wear_loc == wear_none && ch->can_see( obj ))
-                    wear_obj( ch, obj, F_WEAR_VERBOSE );
+                if (obj->wear_loc != wear_none || !ch->can_see( obj ))
+                    continue;
+
+                if (petActor) {
+                    if (!wear_pet_allows( ch, obj, wear_neck_1.getElement( ) ))
+                        continue;
+                    petWore = true;
+                }
+
+                wear_obj( ch, obj, F_WEAR_VERBOSE );
             }
         } catch (const VictimDeathException &) {
         }
 
+        if (petActor && !petWore)
+            echo_master(ch, _("Питомцы не носят снаряжения, только ошейник."));
         return;
     }
     
     if (( obj = get_obj_carry( ch, argObj ) ) == 0) {
         echo_master(ch, _("У тебя нет этого."));
+        return;
+    }
+
+    if (petActor && !wear_pet_allows( ch, obj, wear_neck_1.getElement( ) )) {
+        echo_master(ch, _("Питомцы не носят снаряжения, только ошейник."));
+        return;
+    }
+
+    if (victim != ch && wear_is_owned_pet( victim ) && !wear_pet_allows( victim, obj, wear_neck_1.getElement( ) )) {
+        ch->pecho(_("%1$^C1 не стан%1$nет|ут это надевать: питомцы носят только ошейник."), victim);
         return;
     }
 
@@ -243,12 +264,21 @@ CMDRUNP( wear )
     obj_from_char( obj );
     obj_to_char( obj, victim );
     
-    if (wear_obj( victim, obj, 0 ) != RC_WEAR_OK) {
+    int rc = wear_obj( victim, obj, 0 );
+    if (rc != RC_WEAR_OK) {
         if (obj->carried_by == victim) {
             obj_from_char( obj );
             obj_to_char( obj, ch );
         }
-        oldact(_("Ты пытаешься надеть $o4 на $C4, но безуспешно."), ch, obj, victim, TO_CHAR);
+        // A collar on a pet: say why, the generic line hides it.
+        if (wear_is_owned_pet( victim ) && rc == RC_WEAR_YOUNG)
+            ch->pecho(_("%1$^C1 еще не дорос%1$Gло||ла|ли до %2$O2."), victim, obj);
+        else if (wear_is_owned_pet( victim ) && rc == RC_WEAR_CONFLICT)
+            ch->pecho(_("%1$^C1 уже нос%1$nит|ят ошейник."), victim);
+        else if (wear_is_owned_pet( victim ) && rc == RC_WEAR_NORIB)
+            ch->pecho(_("%1$^C3 некуда надеть ошейник: у %1$Gнего|него|нее|них нет шеи."), victim);
+        else
+            oldact(_("Ты пытаешься надеть $o4 на $C4, но безуспешно."), ch, obj, victim, TO_CHAR);
         oldact(_("$c1 пытается надеть на тебя $o4, но не может."), ch, obj, victim, TO_VICT);
         oldact(_("$c1 пытается надеть на $C4 $o4, но не может."), ch, obj, victim, TO_NOTVICT);
         return;
@@ -349,7 +379,9 @@ CMDRUNP( remove )
         return;
     }
 
-    if (!obj->behavior || !obj->behavior->canDress( ch, victim )) {
+    // The collar behavior answers for a pet's collar (behaviors/collar/onCanDress).
+    if (!behavior_trigger(obj, "CanDress", "OCC", obj, ch, victim)
+        && (!obj->behavior || !obj->behavior->canDress( ch, victim ))) {
         echo_master(ch, _("Ты не сможешь снять %O4 с %C2."), obj, victim);
         return;
     }
