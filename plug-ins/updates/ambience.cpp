@@ -4,8 +4,7 @@
  * Once a second each playing connection gets its set of layers (weather,
  * city by day or night, birds or crickets, desert, air, cave, dungeon,
  * stream, sea, underwater, campfire) and its fight music recomputed, and only
- * a change goes out. Music is music/boss against a tier 1-3 NPC and
- * music/fight in any other fight; boss wins when both apply. The web client
+ * a change goes out. Any fight plays music/fight. The web client
  * mixes every layer and takes them as one 'ambience' frame; a telnet MSP
  * client has a single music channel, so it gets one !!MUSIC track picked by
  * priority, music first.
@@ -19,7 +18,6 @@
 #include "msp.h"
 #include "descriptor.h"
 #include "character.h"
-#include "npcharacter.h"
 #include "room.h"
 #include "roomutils.h"
 #include "move_utils.h"
@@ -93,12 +91,11 @@ const LayerName telnetOrder[] = {
     { LAYER_FIRE,        "ambient/fire" },
 };
 
-const char *BOSS_MUSIC = "music/boss";
 const char *FIGHT_MUSIC = "music/fight";
 const char *NO_MUSIC = "";
 
-/* Seconds a track outlives its fight: a boss that stops for a round
- * (a flee, a re-target) should not cut the track off and restart it. */
+/* Seconds the music outlives the fight: a pause for a round (a flee, a
+ * re-target) should not cut the track off and restart it. */
 const time_t FIGHT_HOLD = 6;
 
 /* Nothing sent yet: differs from every real layer mask, so the first pass
@@ -108,37 +105,12 @@ const int MASK_UNKNOWN = -1;
 struct AmbienceState {
     int mask;           // layers last sent
     const char *music;  // track last sent, one of the *_MUSIC constants
-    time_t bossUntil;   // boss music holds until then
     time_t fightUntil;  // fight music holds until then
     unsigned long pass; // last pass that saw this connection eligible
 };
 
 std::map<Descriptor *, AmbienceState> states;
 unsigned long passCounter = 0;
-
-/* Legend, boss and champion: the fights that earn their own music. */
-bool is_music_tier( Character *c )
-{
-    NPCharacter *npc = c->getNPC( );
-    if (!npc)
-        return false;
-
-    int tier = npc->getTier( );
-    return tier >= 1 && tier <= 3;
-}
-
-bool in_boss_fight( Character *ch )
-{
-    if (ch->fighting && is_music_tier( ch->fighting ))
-        return true;
-
-    // A boss beating on someone who hasn't swung back yet.
-    for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
-        if (rch->fighting == ch && is_music_tier( rch ))
-            return true;
-
-    return false;
-}
 
 bool in_any_fight( Character *ch )
 {
@@ -263,7 +235,7 @@ void ambience_update( )
 
         std::map<Descriptor *, AmbienceState>::iterator it = states.find( d );
         if (it == states.end( )) {
-            AmbienceState fresh = { MASK_UNKNOWN, NO_MUSIC, 0, 0, 0 };
+            AmbienceState fresh = { MASK_UNKNOWN, NO_MUSIC, 0, 0 };
             it = states.insert( std::make_pair( d, fresh ) ).first;
         }
 
@@ -272,15 +244,9 @@ void ambience_update( )
 
         if (in_any_fight( ch ))
             st.fightUntil = now + FIGHT_HOLD;
-        if (in_boss_fight( ch ))
-            st.bossUntil = now + FIGHT_HOLD;
 
         int mask = compute_layers( ch, winter );
-        const char *music = NO_MUSIC;
-        if (now < st.bossUntil)
-            music = BOSS_MUSIC;
-        else if (now < st.fightUntil)
-            music = FIGHT_MUSIC;
+        const char *music = now < st.fightUntil ? FIGHT_MUSIC : NO_MUSIC;
 
         // Music always holds one of the constants above, so pointers compare.
         if (mask == st.mask && music == st.music)
