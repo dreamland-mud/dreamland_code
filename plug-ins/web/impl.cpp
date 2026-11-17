@@ -62,6 +62,8 @@
 #include "helprelated.h"
 #include "so.h"
 #include "magic.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
 #include "def.h"
 
 static const DLString EXITS = "exits";
@@ -616,6 +618,35 @@ struct AffectPanelColumns {
     }
 };
 
+// Druid shapeshift form ("bear", "lizard", "wolverine"), or empty when not shifted.
+// The form lives only in the Fenia field ch.druid_form (skillcommand/shapeshift),
+// so read it off the wrapper; the shapeshift affect gates it so a stale field
+// left behind by a crash can't paint anything.
+static DLString shapeshiftForm( Character *ch )
+{
+    static const DLString SHAPESHIFT = "shapeshift";
+    bool shifted = false;
+    for (auto &paf: ch->affected) {
+        Skill *skill = paf->type.getElement( );
+        if (skill != 0 && skill->getName( ) == SHAPESHIFT) { shifted = true; break; }
+    }
+    if (!shifted || !ch->wrapper)
+        return DLString::emptyString;
+
+    WrapperBase *base = get_wrapper( ch->wrapper );
+    if (!base)
+        return DLString::emptyString;
+
+    try {
+        static Scripting::IdRef formId( "druid_form" );
+        Scripting::Register form = base->getField( formId );
+        if (form.type == Scripting::Register::STRING)
+            return form.toString( );
+    } catch (const ::Exception &) {
+    }
+    return DLString::emptyString;
+}
+
 // A raw engine bit: permanent, labelled from config/affectpanel.json. The skill name
 // resolves here, not at config load, so it doesn't depend on the load order.
 static void addRawBit( AffectPanelColumns &pc, const DLString &col, const char *key, Character *ch, lang_t lang )
@@ -720,6 +751,14 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
 
     AffectPanelColumns pc;
 
+    // Druid form: mudjs paints a green vignette while it is set, and the
+    // shapeshift chip names the form (config/affectpanel.json "shape").
+    // Sent on every prompt, empty when not shifted: the client merges prompt
+    // frames, so an absent key would keep the last form forever.
+    DLString form = shapeshiftForm( ch );
+    prompt["shape"] = form.c_str( );
+    const AffectPanelEntry *formEntry = form.empty( ) ? 0 : affectPanelEntry( "shape", form.c_str( ) );
+
     // 1) Skill-applied affects: column + label from the skill profile, else auto-derived.
     for (auto &paf: ch->affected) {
         Skill *skill = paf->type.getElement( );
@@ -743,10 +782,18 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
         }
 
         DLString label = skill->getWebLabel( lang );
+        DLString full = skill->getNameFor( ch );
+        if (formEntry && skill->getName( ) == "shapeshift") {
+            DLString formLabel = formEntry->label.getForLang( lang );
+            if (!formLabel.empty( )) {
+                full = full + ": " + formLabel;
+                label = formLabel;
+            }
+        }
         if (label.empty( ))
-            label = webAbbrev( skill->getNameFor( ch ) );
+            label = webAbbrev( full );
 
-        pc.add( col, label, skill->getNameFor( ch ), paf->duration );
+        pc.add( col, label, full, paf->duration );
     }
 
     // 1b) Gear-granted named affects (eqAffects: <affects registry="skill"> and
