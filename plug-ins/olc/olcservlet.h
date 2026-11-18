@@ -7,7 +7,7 @@ class CaptureBufferHandler;
 class DLString;
 struct RoomIndexData;
 
-/** Synthetic security-110 actor for the OLC API servlets (/redit, /oedit).
+/** Synthetic security-110 actor for the OLC API servlet (/olc).
  *  It is never registered in char_list: OLC subcommands don't move or
  *  re-attach their actor, so a detached char is enough. Output goes to capture. */
 PCharacter * olc_servlet_setup_char(Room *room, CaptureBufferHandler *&capture);
