@@ -158,6 +158,43 @@ bool OLCStateArea::checkOverlap(int lower, int upper)
     return true;
 }
 
+DLString OLCStateArea::commitRefusal() const
+{
+    AreaIndexData *original = AreaUtils::getByVnum(vnum);
+    int lower = min_vnum.getValue(), upper = max_vnum.getValue();
+
+    for (area_file *f = area_file_list; f; f = f->next)
+        if (f->area && f->area != original && f->file_name == file_name.getValue())
+            return "Area " + DLString(f->area->vnum) + " already saves into " + file_name.getValue();
+
+    // Only a new range is checked: an old area with strays outside its
+    // range stays editable.
+    if (!original || (lower == original->min_vnum && upper == original->max_vnum))
+        return DLString::emptyString;
+
+    // XMLArea::init saves only the prototypes inside the range.
+    for (auto &r: original->roomIndexes)
+        if (r.first < lower || r.first > upper)
+            return "Room " + DLString(r.first) + " would fall outside vnums "
+                   + DLString(lower) + "-" + DLString(upper);
+
+    for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next)
+            if (pMob->area == original && !IS_SET(pMob->act, ACT_DELETED)
+                && (pMob->vnum < lower || pMob->vnum > upper))
+                return "Mobile " + DLString(pMob->vnum) + " would fall outside vnums "
+                       + DLString(lower) + "-" + DLString(upper);
+
+    for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next)
+            if (pObj->area == original && !IS_SET(pObj->extra_flags, ITEM_DELETED)
+                && (pObj->vnum < lower || pObj->vnum > upper))
+                return "Object " + DLString(pObj->vnum) + " would fall outside vnums "
+                       + DLString(lower) + "-" + DLString(upper);
+
+    return DLString::emptyString;
+}
+
 DLString OLCStateArea::getJournalKind( ) const
 {
     return "area";
@@ -267,18 +304,24 @@ static AreaQuest * arg_areaquest(const DLString &arg, AreaIndexData *pArea)
     return 0;
 }
 
+int OLCStateArea::nextQuestVnum(AreaIndexData *original, const std::set<int> *skip)
+{
+    for (int v = original->min_vnum; v <= original->max_vnum; v++)
+        if (v > 0 && areaQuests.find(v) == areaQuests.end() && (!skip || !skip->count(v)))
+            return v;
+
+    return -1;
+}
+
 AreaQuest * OLCStateArea::questCreate(PCharacter *ch, AreaIndexData *original, const DLString &argVnum)
 {
     Integer vnum;
 
     // 'quest create' - assign next free vnum
     if (argVnum.empty()) {
-        for (vnum = original->min_vnum; vnum <= original->max_vnum; vnum++) {
-            if (original->questMap.find(vnum) == original->questMap.end())
-                break;
-        }
+        vnum = nextQuestVnum(original);
 
-        if (vnum > original->max_vnum) {
+        if (vnum < 0) {
             ptc(ch, "В зоне не осталось свободного внума для квеста.\r\n");
             return 0;
         }

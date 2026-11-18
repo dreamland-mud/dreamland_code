@@ -20,7 +20,8 @@ enum OlcPolicy {
  * An op is a JSON object (strings UTF-8). Kinds and actions:
  *   room | mob | obj, by "vnum":
  *     get     compact JSON in "data" (the area save serializer's fields),
- *             "fields": [...] picks top-level keys; "format": "xml" gives "xml"
+ *             "fields": [...] picks top-level keys; "format": "xml" gives "xml".
+ *             A room answers "xml" unless "fields" or "format": "json" is given
  *     create  "vnum": <n> or "next" with "area": <area vnum>; "ref": "name"
  *             lets later ops say "$name" for the new vnum
  *     set     "field" + "value" [+ "lang" en|ru|ua]: a text field (name,
@@ -29,18 +30,20 @@ enum OlcPolicy {
  *             empties it; any other field runs as "<field> <value>"
  *     cmd     one editor subcommand line in "cmd" (+ "text" for a paste form)
  *     delete  the prototype (mob/obj: tombstone until the next save; room:
- *             refused while anybody or anything is in it, it has resets, or an
- *             exit or reset elsewhere leads to it), or one part of it:
+ *             refused while anybody or anything is in it, it has resets, an
+ *             exit or reset elsewhere leads to it, or a room editor is open on
+ *             it or came from it), or one part of it:
  *             "exit": <dir> [+ "unlink": true], "eexit": <keyword>, "ed": <keyword>
  *     put     "xml": a whole prototype as the area file writes it; mob and obj
  *             are replaced or created, a room only created under a free vnum
  *   reset, by room "vnum":
  *     get, add ("mob" + "max", "maxRoom" | "obj" + "to": room | inside (+
- *     "container", "limit", "count") | <wearloc>; "after": <n> places it),
+ *     "container", "limit" (0 = no limit), "count") | <wearloc>; "after": <n> places it),
  *     delete ("number"), set ("number", "field": flag|rand|tier|wearloc,
  *     "value"), randomize (shuffle exits)
  *   area, by area "vnum": get, set, cmd (names, levels, vnums, flags, authors,
- *     speedwalk, 'reset'...)
+ *     speedwalk, 'reset'...); a new vnum range that leaves out a live
+ *     prototype, or a file another area saves into, is refused
  *   quest, by quest "vnum": get, create ("vnum" | "next" + "area"), set, cmd,
  *     delete, step ("step": <n> | "add", "begin"/"end": {type, vnum, trigger},
  *     "info": {en, ru, ua}, "qp", "gold", "exp", "item", "delete": true)

@@ -6,6 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <utility>
+#include <functional>
 
 #include "olcops.h"
 #include "olcservlet.h"
@@ -16,6 +17,7 @@
 #include "aedit.h"
 #include "qedit.h"
 #include "resetops.h"
+#include "wearlocation.h"
 #include "olc.h"
 #include "xmlroom.h"
 #include "xmlarea.h"
@@ -362,7 +364,8 @@ static bool additive_behaviors(const GlobalBitvector &current, DLString &argumen
 template <typename State>
 static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &line,
                          const GlobalBitvector &behaviors, Json::Value &res, DLString &error,
-                         bool commitAlways = true)
+                         bool commitAlways = true,
+                         std::function<DLString()> commitRefusal = nullptr)
 {
     CommandBase::Pointer cmd = state->findCommand(ctx.ch, line.cmdName);
     if (!cmd) {
@@ -407,16 +410,28 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
 
     std::string::size_type mark = capture_mark(ctx);
 
+    DLString refusal;
+
     state->OLCState::attach(ctx.ch);
     try {
         state->handle(ctx.ch->desc, &buf[0]);
-        if (name != "show" && (commitAlways || state->lastChanged))
-            state->commit();
+        if (name != "show" && (commitAlways || state->lastChanged)) {
+            if (commitRefusal)
+                refusal = commitRefusal();
+            if (refusal.empty())
+                state->commit();
+        }
     } catch (...) {
         state->OLCState::detach(ctx.ch);
         throw;
     }
     state->OLCState::detach(ctx.ch);
+
+    // The state is a copy: dropping it uncommitted changes nothing.
+    if (!refusal.empty()) {
+        error = refusal;
+        return false;
+    }
 
     res["changed"] = res.isMember("changed") && res["changed"].asBool() ? true : state->lastChanged;
 
@@ -762,9 +777,10 @@ static DLString node_xml(XMLNode::Pointer node)
 }
 
 static bool get_result(OlcOpContext &ctx, const Json::Value &op, XMLNode::Pointer node,
-                       const Json::Value &extra, Json::Value &res, DLString &error)
+                       const Json::Value &extra, Json::Value &res, DLString &error,
+                       const char *defaultFormat = "json")
 {
-    DLString format = "json";
+    DLString format = defaultFormat;
     if (!op_string(op, "format", format, error))
         return false;
 
@@ -939,6 +955,12 @@ static bool op_put(OlcOpContext &ctx, const DLString &kind, int vnum, const Json
         return false;
     }
 
+    // A new vnum gets its rights check from create_vnum below.
+    if (exists && !OLCState::can_edit(ctx.ch, vnum)) {
+        error = "You can't build at vnum " + DLString(vnum);
+        return false;
+    }
+
     if (!exists && !is_planned(ctx, kind, vnum)) {
         if (create_vnum(ctx, kind, 0, DLString(vnum), error) < 0)
             return false;
@@ -960,6 +982,9 @@ static bool op_put(OlcOpContext &ctx, const DLString &kind, int vnum, const Json
         state->obj.fromXML(node);
         if (ctx.dryRun)
             return true;
+        // A runtime counter, not in the XML: commit would zero it.
+        if (exists)
+            state->obj.reset_num = get_obj_index(vnum)->reset_num;
         state->commit();
     }
     else {
@@ -1126,8 +1151,6 @@ static int count_quest_steps_on(const DLString &type, int vnum)
     return cnt;
 }
 
-static const char *dirNames[] = { "north", "east", "south", "west", "up", "down", 0 };
-
 /** delete with 'exit', 'eexit' or 'ed': the editor's own delete subcommand. */
 static bool op_delete_part(const DLString &kind, const Json::Value &op, OlcOpLine &line, DLString &error)
 {
@@ -1149,12 +1172,7 @@ static bool op_delete_part(const DLString &kind, const Json::Value &op, OlcOpLin
             return false;
         }
 
-        bool known = false;
-        for (int i = 0; dirNames[i]; i++)
-            if (exitDir == dirNames[i])
-                known = true;
-
-        if (!known) {
+        if (!olc_is_direction(exitDir)) {
             error = "exit must be north, east, south, west, up or down";
             return false;
         }
@@ -1195,6 +1213,11 @@ static bool op_delete(OlcOpContext &ctx, const DLString &kind, int vnum, const J
     std::string::size_type mark = capture_mark(ctx);
 
     if (kind == "room") {
+        if (!OLCState::can_edit(ctx.ch, vnum)) {
+            error = "You can't build in room " + DLString(vnum);
+            return false;
+        }
+
         RoomIndexData *pRoom = get_room_index(vnum);
         error = OLCStateRoom::deleteRefusal(pRoom);
         if (!error.empty())
@@ -1203,6 +1226,9 @@ static bool op_delete(OlcOpContext &ctx, const DLString &kind, int vnum, const J
         int steps = count_quest_steps_on("room", vnum);
         if (steps > 0)
             op_warning(ctx, "room " + DLString(vnum) + " is a target of " + DLString(steps) + " area quest step(s)");
+
+        if ((pRoom->room && pRoom->room->wrapper) || !pRoom->behaviors.empty() || pRoom->behavior)
+            op_warning(ctx, "room " + DLString(vnum) + " has Fenia triggers or behaviors: scripts that name it lose it");
 
         if (ctx.dryRun)
             return true;
@@ -1274,7 +1300,10 @@ static bool prototype_op(OlcOpContext &ctx, const DLString &kind, const DLString
             XMLRoom xr;
             xr.init(pRoom);
             extra["area"] = pRoom->areaIndex->vnum;
-            return get_result(ctx, op, to_node(xr, "room"), extra, res, error);
+            // Phase 0 answered a room get with xml, and older dl_redit
+            // clients read only that: json is opt-in via fields or format.
+            const char *defaultFormat = op.isMember("fields") ? "json" : "xml";
+            return get_result(ctx, op, to_node(xr, "room"), extra, res, error, defaultFormat);
         }
 
         if (kind == "mob") {
@@ -1419,10 +1448,25 @@ static bool reset_op(OlcOpContext &ctx, const DLString &action, int vnum, const 
             }
 
             if (to == "inside") {
+                // limit 0 = no limit, as in the reset loop.
                 if (!op_number(ctx, op, "container", container, error)
-                    || !op_number_or(ctx, op, "limit", limit, 1, error)
+                    || !op_number_or(ctx, op, "limit", limit, 1, error, 0)
                     || !op_number_or(ctx, op, "count", count, 1, error))
                     return false;
+
+                OBJ_INDEX_DATA *pContainer = get_obj_index(container);
+                if (!pContainer && !is_planned(ctx, "obj", container)) {
+                    error = "container " + DLString(container) + " not found";
+                    return false;
+                }
+                if (pContainer && pContainer->item_type != ITEM_CONTAINER) {
+                    error = "obj " + DLString(container) + " is not a container";
+                    return false;
+                }
+            }
+            else if (to != "room" && !wearlocationManager->findExisting(to)) {
+                error = "unknown wearloc '" + to + "', see olchelp wearloc";
+                return false;
             }
 
             journalCmd = "add obj";
@@ -1445,6 +1489,11 @@ static bool reset_op(OlcOpContext &ctx, const DLString &action, int vnum, const 
 
         if (field == "tier" && !value.isNumber()) {
             error = "tier must be a number";
+            return false;
+        }
+
+        if (field == "wearloc" && !wearlocationManager->findExisting(value)) {
+            error = "unknown wearloc '" + value + "', see olchelp wearloc";
             return false;
         }
 
@@ -1567,7 +1616,18 @@ static bool area_op(OlcOpContext &ctx, const DLString &action, int vnum, const J
     ctx.ch->in_room = limbo;
 
     OLCStateArea::Pointer state(NEW, pArea);
-    return run_on_state(state, ctx, line, GlobalBitvector(), res, error, false);
+    CommandBase::Pointer cmd = state->findCommand(ctx.ch, line.cmdName);
+    bool repop = cmd && cmd->getName() == "reset";
+
+    if (!run_on_state(state, ctx, line, GlobalBitvector(), res, error, false,
+                      [state]() { return state->commitRefusal(); }))
+        return false;
+
+    // A repop edits nothing, so the state never journals it.
+    if (repop && !ctx.dryRun)
+        op_journal(ctx, "area", vnum, "reset", "");
+
+    return true;
 }
 
 /*--------------------------------------------------------------------------
@@ -1604,10 +1664,8 @@ static bool quest_create(OlcOpContext &ctx, const Json::Value &op, Json::Value &
 
     if (ctx.dryRun) {
         if (arg == "next") {
-            for (vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++)
-                if (vnum > 0 && pArea->questMap.find(vnum) == pArea->questMap.end() && !planned.count(vnum))
-                    break;
-            if (vnum > pArea->max_vnum) {
+            vnum = OLCStateArea::nextQuestVnum(pArea, &planned);
+            if (vnum < 0) {
                 error = "No free quest vnum left in area " + DLString(pArea->vnum);
                 return false;
             }
@@ -1772,6 +1830,8 @@ static bool quest_step(OlcOpContext &ctx, AreaQuest *q, int vnum, const Json::Va
         if (ctx.dryRun)
             return true;
 
+        // From here on the quest has changed, even if a later line fails.
+        ctx.quests.insert(vnum);
         stepArg = DLString((int)q->steps.size() - 1);
         lines.clear();
         if (!step_lines(ctx, op, stepArg, lines, error))
@@ -1782,11 +1842,14 @@ static bool quest_step(OlcOpContext &ctx, AreaQuest *q, int vnum, const Json::Va
 
     for (auto &line: lines) {
         OLCStateAreaQuest::Pointer s(NEW, q);
-        if (!run_on_state(s, ctx, line, GlobalBitvector(), res, error, false))
+        bool ok = run_on_state(s, ctx, line, GlobalBitvector(), res, error, false);
+        // Earlier lines of this op stay applied: check the pairing either way.
+        if (!ctx.dryRun && s->lastChanged)
+            ctx.quests.insert(vnum);
+        if (!ok)
             return false;
     }
 
-    ctx.quests.insert(vnum);
     return true;
 }
 

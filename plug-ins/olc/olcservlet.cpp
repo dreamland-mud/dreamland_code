@@ -11,6 +11,7 @@
 #include "servlet_utils.h"
 #include "olcops.h"
 #include "vnum.h"
+#include "directions.h"
 
 PCharacter * olc_servlet_setup_char(Room *room, CaptureBufferHandler *&capture)
 {
@@ -47,12 +48,10 @@ void olc_servlet_seed_buffer(PCharacter *ch, const DLString &text)
     ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(text);
 }
 
-static bool is_direction(const DLString &cmdName)
+bool olc_is_direction(const DLString &name)
 {
-    static const char *dirNames[] = { "north", "east", "south", "west", "up", "down", 0 };
-
-    for (int i = 0; dirNames[i]; i++)
-        if (cmdName == dirNames[i])
+    for (int door = 0; door < DIR_SOMEWHERE; door++)
+        if (name == dirs[door].name)
             return true;
 
     return false;
@@ -75,7 +74,7 @@ DLString olc_servlet_refusal(const DLString &cmdName, const DLString &arguments,
     DLString args = arguments;
     DLString word = args.getOneArgument();
 
-    if (is_direction(cmdName)) {
+    if (olc_is_direction(cmdName)) {
         // A bare direction moves the actor through the exit.
         if (word.empty())
             return cmdName + " needs arguments: a bare direction would move the actor";

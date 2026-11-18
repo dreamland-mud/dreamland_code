@@ -11,6 +11,7 @@
 #include "xmlstring.h"
 #include "xmlflags.h"
 #include "xmlmultistring.h"
+#include <set>
 
 class AreaQuest;
 
@@ -32,9 +33,15 @@ public:
     virtual int getJournalVnum( ) const;
 
     bool checkOverlap(int lower, int upper);
+    /** Why committing this state would lose data on the next save: the vnum
+     *  range leaves out a live prototype of the area, or another area already
+     *  saves into file_name. Empty when it is safe. */
+    DLString commitRefusal() const;
 
     /** 'quest create [<vnum>]': a new empty quest in the area, the first free
      *  vnum of its range when argVnum is empty. 0 with the reason told to ch. */
+    /** First vnum of the area's range no quest uses and skip doesn't hold, or -1. */
+    static int nextQuestVnum(AreaIndexData *original, const std::set<int> *skip = 0);
     static AreaQuest *questCreate(PCharacter *ch, AreaIndexData *original, const DLString &argVnum);
     /** 'quest delete <vnum>'. The quest's Fenia handlers stay: 'cs search <vnum>'. */
     static bool questDelete(PCharacter *ch, AreaIndexData *original, const DLString &arg);

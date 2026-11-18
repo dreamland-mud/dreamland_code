@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "qedit.h"
+#include "fenia_utils.h"
 
 #include "util/regexp.h"
 #include "olc.h"
@@ -250,18 +251,6 @@ static DLString show_step_reward(PCharacter *ch, const QuestStep::Pointer &step)
     return buf.str();
 }
 
-// The trigger kind without its 'on'/'post' prefix: onSpeech ends a step,
-// postSpeech starts the next one.
-static DLString step_trigger_kind(const DLString &trigger, const char *prefix)
-{
-    DLString p = prefix;
-
-    if (trigger.size() >= p.size() && trigger.substr(0, p.size()) == p)
-        return trigger.substr(p.size());
-
-    return trigger;
-}
-
 int qedit_step_pairing(AreaQuest *q, int s)
 {
     if (s < 0 || s + 1 >= (int)q->steps.size())
@@ -276,7 +265,7 @@ int qedit_step_pairing(AreaQuest *q, int s)
         result |= STEP_PAIR_TARGET;
 
     // onSpeech ends this step, postSpeech begins the next.
-    if (step_trigger_kind(step->endTrigger, "on") != step_trigger_kind(nextStep->beginTrigger, "post"))
+    if (trigger_type(step->endTrigger) != trigger_type(nextStep->beginTrigger))
         result |= STEP_PAIR_TRIGGER;
 
     return result;
