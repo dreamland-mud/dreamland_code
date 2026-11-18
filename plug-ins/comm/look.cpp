@@ -86,6 +86,7 @@ GSN(stardust);
 GSN(rainbow_shield);
 GSN(demonic_mantle);
 GSN(shapeshift);
+GSN(steal);
 GSN(manacles);
 GSN(jail);
 GSN(dark_shroud);
@@ -191,6 +192,18 @@ static void format_personal_mark(Object *obj, ostringstream &buf, Character *ch)
     buf << lmsg(Player::lang(ch), "({YPersonal{x) ", "({YЛичное{x) ", "({YОсобисте{x) ");
 }
 
+// Thieves recognise goods that changed hands through the steal skill.
+static void format_stolen_mark(Object *obj, ostringstream &buf, Character *ch)
+{
+    if (obj->getProperty("stolen").empty())
+        return;
+
+    if (!gsn_steal->usable(ch))
+        return;
+
+    buf << lmsg(Player::lang(ch), "({rStolen{x) ", "({rКраденое{x) ", "({rКрадене{x) ");
+}
+
 static void oprog_show(Object *obj, Character *ch, ostringstream &buf)
 {
     if (obj->behavior)
@@ -232,6 +245,8 @@ static DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
         format_loot_mark(obj, buf, ch);
 
         format_personal_mark(obj, buf, ch);
+
+        format_stolen_mark(obj, buf, ch);
 
         oprog_show(obj, ch, buf);
 
