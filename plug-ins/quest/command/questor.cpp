@@ -647,6 +647,8 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     if (attr->getTime( ) > 0) {
         tell_fmt( _("Ты очень отваж%1$Gно|ен|на, %1$C1, но дай шанс кому-нибудь еще."), client, ch );
         tell_fmt( _("Приходи через {Y%3$d{G мину%3$Iту|ты|т, когда истечет твое {y{hcквест время{x."), client, ch, attr->getTime() );
+        // Something to do while the timer runs out: open area quests.
+        gprog_request_hint(ch, client);
         return;
     }
     
