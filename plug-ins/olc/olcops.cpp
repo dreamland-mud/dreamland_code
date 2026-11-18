@@ -550,7 +550,9 @@ static bool apply_one(OlcOpContext &ctx, const Json::Value &op, Json::Value &res
         }
 
         if (action == "get") {
-            res["xml"] = olc_room_to_xml(pRoom);
+            // XMLDocument::save writes UTF-8, and the response converts the
+            // whole JSON from KOI8: bring the XML to KOI8 like every other field.
+            res["xml"] = utf2koi(olc_room_to_xml(pRoom));
             return true;
         }
 
