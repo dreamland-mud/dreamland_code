@@ -43,6 +43,25 @@
 PROF(samurai);
 GSN(mortal_strike);
 
+/*
+ * The opening round of kill/murder runs outside violence_update. A fightspam-OFF
+ * attacker sees no per-hit line, and the next round resets roundDamage before
+ * its summary prints, so the opener's damage number was lost. Baseline before
+ * the round and flush it right after, as ccast.cpp does for spells.
+ */
+static void opener_round( Character *ch, Character *victim )
+{
+    ch->clearRoundDamage( );
+
+    {
+        OpenerGuard opener( ch );
+        multi_hit( ch, victim, "murder" );
+    }
+
+    if (!ch->extracted && ch->fighting)
+        fightspam_flush_between_rounds( ch, ch->fighting );
+}
+
 CMDRUN( kill )
 {
     Character *victim;
@@ -96,8 +115,7 @@ CMDRUN( kill )
     if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;
 
-    OpenerGuard opener( ch );
-    multi_hit( ch, victim, "murder" );
+    opener_round( ch, victim );
 }
 
 CMDRUN( murder )
@@ -150,8 +168,7 @@ CMDRUN( murder )
     if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;
 
-    OpenerGuard opener( ch );
-    multi_hit( ch, victim , "murder" );
+    opener_round( ch, victim );
 }
 
 
