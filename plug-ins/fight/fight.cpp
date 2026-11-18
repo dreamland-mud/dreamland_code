@@ -568,6 +568,8 @@ void fightspam_flush_between_rounds( Character *att, Character *victim )
     att->clearRoundDamage( );
 }
 
+int fightspam_round_depth = 0;
+
 void violence_update()
 {
     ProfilerBlock profiler("violence_update", 100);
@@ -580,6 +582,12 @@ void violence_update()
     // the rest of the list lost its round. Walk a snapshot instead. Extracted chars go back to a
     // pool with their ID reset, so a changed ID means "gone, skip him".
     vector<pair<Character *, long long> > fighters;
+
+    // Released on any exit, exceptions included.
+    struct RoundDepthGuard {
+        RoundDepthGuard( ) { fightspam_round_depth++; }
+        ~RoundDepthGuard( ) { fightspam_round_depth--; }
+    } roundDepthGuard;
 
     // Reset per-round damage accumulators before the hit loop; summarized below.
     for (ch = char_list; ch != 0; ch = ch->next) {
