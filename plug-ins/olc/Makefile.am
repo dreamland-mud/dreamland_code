@@ -34,6 +34,7 @@ reditservlet.cpp \
 oeditservlet.cpp \
 meditservlet.cpp \
 olcservlet.cpp \
+olcops.cpp \
 capturebufferhandler.cpp
 
 libolc_la_MOC = \

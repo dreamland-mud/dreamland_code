@@ -44,18 +44,6 @@ static IconvMap koi2utf("koi8-u", "utf-8");
  *     Name changed.
  */
 
-/** Build an XML representation of room fields using the built-in XMLRoom serializer. */
-static DLString room_to_xml(RoomIndexData *pRoom)
-{
-    XMLStreamableBase<XMLRoom> it("room");
-    ostringstream os;
-
-    it.init(pRoom);
-    it.toStream(os);
-
-    return os.str();
-}
-
 static void redit_servlet(HttpRequest &request, HttpResponse &response)
 {
     Json::Value params;
@@ -98,7 +86,7 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
     // Handle 'get' — return room fields as XML.
     if (subcmd == "get") {
         olc_servlet_cleanup_char(ch);
-        servlet_response_200(response, room_to_xml(pRoom));
+        servlet_response_200(response, olc_room_to_xml(pRoom));
         return;
     }
 
@@ -137,6 +125,7 @@ static void redit_servlet(HttpRequest &request, HttpResponse &response)
         // Push OLCState onto handle_input so OLCInterpretLayer can find it
         // during command dispatch, then remove it after.
         // Use base OLCState::detach to avoid OLCStateRoom::detach's transfer_char.
+        sr->journalSource = "servlet";
         sr->OLCState::attach(ch);
         sr->handle(ch->desc, const_cast<char *>(cmdLine.c_str()));
         sr->commit();

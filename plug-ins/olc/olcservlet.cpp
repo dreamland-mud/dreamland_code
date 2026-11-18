@@ -5,6 +5,12 @@
 #include "merc.h"
 #include "sedit.h"
 #include "arg_utils.h"
+#include "xmlroom.h"
+#include "room.h"
+#include "servlet.h"
+#include "servlet_utils.h"
+#include "olcops.h"
+#include "vnum.h"
 
 PCharacter * olc_servlet_setup_char(Room *room, CaptureBufferHandler *&capture)
 {
@@ -88,4 +94,89 @@ DLString olc_servlet_refusal(const DLString &cmdName, const DLString &arguments,
         return "A paste subcommand needs args.text";
 
     return DLString::emptyString;
+}
+
+DLString olc_room_to_xml(RoomIndexData *pRoom)
+{
+    XMLStreamableBase<XMLRoom> it("room");
+    ostringstream os;
+
+    it.init(pRoom);
+    it.toStream(os);
+
+    return os.str();
+}
+
+/**
+ * Servlet for /olc: a batch of typed OLC ops (see OlcOps in olcops.h).
+ * Auth: bottype=telegram, token=<ops token>
+ * Args: ops (array), dryRun (bool), verbose (bool: editor echo for every op),
+ *       profile (immortal|agent, default agent), actor (name for the journal)
+ *
+ * Example: Russian room name and an object short description in one batch
+ *   curl -s 'http://localhost:1235/olc' -d '{"token":"<secret>","bottype":"telegram","args":{"ops":[
+ *     {"kind":"room","action":"set","vnum":3001,"field":"name","lang":"ru","value":"..."},
+ *     {"kind":"obj","action":"cmd","vnum":3010,"cmd":"level 5"}]}}'
+ *   Response (200, JSON): {"ok":true,"changed":[{"kind":"room","vnum":3001},...],
+ *     "errors":[],"warnings":[],"results":[{"op":0,"ok":true,"changed":true,...}],"skipped":0}
+ *
+ * Areas are marked changed like an interactive edit; 'asave changed' or the
+ * minute autosave writes them to disk.
+ */
+static void olc_ops_servlet(HttpRequest &request, HttpResponse &response)
+{
+    Json::Value params;
+
+    if (!servlet_parse_params(request, response, params))
+        return;
+
+    if (!servlet_auth_ops(params, response))
+        return;
+
+    const Json::Value &args = params["args"];
+    if (!args.isObject() || !args.isMember("ops")) {
+        servlet_response_400(response, "Required parameter args.ops not found");
+        return;
+    }
+
+    DLString profile = "agent";
+    servlet_get_arg(params, "profile", profile);
+
+    OlcPolicy policy;
+    if (!OlcOps::policyLookup(profile, policy)) {
+        servlet_response_400(response, "args.profile must be immortal, agent or player");
+        return;
+    }
+
+    bool dryRun = args.isMember("dryRun") && args["dryRun"].isBool() && args["dryRun"].asBool();
+    bool verbose = args.isMember("verbose") && args["verbose"].isBool() && args["verbose"].asBool();
+
+    Room *limbo = get_room_instance(ROOM_VNUM_LIMBO);
+    if (!limbo) {
+        servlet_response_404(response, "Limbo room instance not found");
+        return;
+    }
+
+    CaptureBufferHandler *capture;
+    PCharacter *ch = olc_servlet_setup_char(limbo, capture);
+
+    DLString actor;
+    if (servlet_get_arg(params, "actor", actor))
+        ch->setName(actor);
+
+    Json::Value result;
+    try {
+        result = OlcOps::apply(ch, args["ops"], policy, dryRun, verbose);
+    } catch (...) {
+        olc_servlet_cleanup_char(ch);
+        throw;
+    }
+
+    olc_servlet_cleanup_char(ch);
+    servlet_response_200_json(response, result);
+}
+
+SERVLET_HANDLE(cmd_olc, "/olc")
+{
+    olc_ops_servlet(request, response);
 }

@@ -1661,3 +1661,13 @@ void OLCStateMobile::changed( PCharacter *ch )
         mob.area->changed = true;
 }
 
+DLString OLCStateMobile::getJournalKind( ) const
+{
+    return "mob";
+}
+
+int OLCStateMobile::getJournalVnum( ) const
+{
+    return mob.vnum;
+}
+

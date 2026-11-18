@@ -19,6 +19,8 @@ public:
 
     virtual void commit( );
     virtual void changed( PCharacter * );
+    virtual DLString getJournalKind( ) const;
+    virtual int getJournalVnum( ) const;
 
     void attach(PCharacter *ch, RoomIndexData *pRoom);
     virtual void detach(PCharacter *ch);
