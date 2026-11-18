@@ -73,6 +73,10 @@ protected:
 
     void echo( PCharacter *, const DLString &, const DLString &, const DLString & = "" ) const;
 
+    static bool isNoteArg( const DLString & );
+    const Note * findNoteArg( PCharacter *, const DLString & ) const;
+    void echoNoteNotFound( PCharacter *, const DLString & ) const;
+
     ::Pointer<NoteThread> thread;
 };
 
@@ -159,6 +163,9 @@ public:
 protected:
     bool isNoteHidden( const Note *, PCharacter *, time_t ) const;
     const Note * getNoteAtPosition( PCharacter *, int  ) const;
+    /** The note with this stable id, if this reader can see it at all
+     *  (same visibility as getNoteAtPosition). */
+    const Note * getNoteById( PCharacter *, time_t ) const;
     int getNoteNumber( PCharacter *, const Note * ) const;
     time_t getStamp( PCharacter * ) const;
     time_t spoolFloor( ) const;

@@ -199,16 +199,47 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
 }
 
 /**
+ * A note argument is either the reader's own list number ('158') or the
+ * note's stable id ('#1731000000'), which is the same for every reader
+ * and so can be quoted to others.
+ */
+bool NoteCommand::isNoteArg( const DLString &arg )
+{
+    if (!arg.empty( ) && arg.at( 0 ) == '#')
+        return DLString( arg.substr( 1 ) ).isNumber( );
+
+    return arg.isNumber( );
+}
+
+/** Throws ExceptionBadType on a number that doesn't fit. */
+const Note * NoteCommand::findNoteArg( PCharacter *ch, const DLString &arg ) const
+{
+    if (arg.at( 0 ) == '#')
+        return thread->getNoteById( ch, DLString( arg.substr( 1 ) ).toLong( ) );
+
+    return thread->getNoteAtPosition( ch, arg.toInt( ) );
+}
+
+/** The same answer for a missing id and for a note this reader can't see. */
+void NoteCommand::echoNoteNotFound( PCharacter *ch, const DLString &arg ) const
+{
+    if (arg.at( 0 ) == '#')
+        ch->pecho( _("Не найдено %N2 с таким номером."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
+    else
+        ch->pecho( _("Так много %N2 еще не написали."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
+}
+
+/**
  * Coder command:
  * '<note> flag <id> <flags>' - sets specified flag on a note with given number.
  * Note bucket is not saved, run '<note> save' to do so.
  */
 void NoteCommand::doFlag(PCharacter *ch, DLString &arguments )
 {
-    Integer noteId;
     DLString arg = arguments.getOneArgument( );
+    const Note *cnote;
     
-    if (!Integer::tryParse(noteId, arg)) {
+    if (!isNoteArg(arg)) {
         if (arg.empty())
             ch->pecho(_("Укажите номер письма."));
         else
@@ -217,9 +248,15 @@ void NoteCommand::doFlag(PCharacter *ch, DLString &arguments )
         return;
     }
 
-    const Note *cnote = thread->getNoteAtPosition( ch, noteId );
+    try {
+        cnote = findNoteArg( ch, arg );
+    } catch (const ExceptionBadType& e) {
+        ch->pecho( _("Неправильный номер письма.") );
+        return;
+    }
+
     if (!cnote) {
-        ch->pecho( _("Так много %N2 еще не написали."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
+        echoNoteNotFound( ch, arg );
         return;
     }
         
@@ -237,7 +274,7 @@ void NoteCommand::doFlag(PCharacter *ch, DLString &arguments )
 
     note->setFlags(flags);
     ch->pecho(_("%^N3 номер %d установлены флаги %s."), 
-            thread->getThreadNameFor( viewerLang( ch ) ).c_str(), noteId.getValue(), note->getFlags().names().c_str());
+            thread->getThreadNameFor( viewerLang( ch ) ).c_str(), thread->getNoteNumber( ch, note ), note->getFlags().names().c_str());
     ch->pecho(_("Используйте команду '%s save' для сохранения изменений на диск."), getName().c_str());
 }
 
@@ -354,18 +391,18 @@ void NoteCommand::doCopy( PCharacter *ch, DLString &arguments ) const
         return;
     }
  
-    if (arg.isNumber( )) {
+    if (isNoteArg( arg )) {
         try {
-            note = thread->getNoteAtPosition( ch, arg.toInt( ) );
+            note = findNoteArg( ch, arg );
 
             if (note) {
                 ostringstream ostr;
-                note->toStream(arg.toInt( ), ostr, thread->getNoteFrom( note, ch ), thread->getNoteText( note, ch ));
+                note->toStream(thread->getNoteNumber( ch, note ), ostr, thread->getNoteFrom( note, ch ), thread->getNoteText( note, ch ));
                 ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")
                     ->regs[0].split(ostr.str( ));
                 ch->pecho( "Ok." );
             } else
-                ch->pecho( _("Так много %N2 еще не написали."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
+                echoNoteNotFound( ch, arg );
                 
         } catch (const ExceptionBadType& e) {
             ch->pecho( _("Неправильный номер письма.") );
@@ -389,14 +426,14 @@ void NoteCommand::doRead( PCharacter *ch, DLString &arguments ) const
         else
             ch->pecho( _("У тебя нет непрочитанных %N2."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
     }
-    else if (arg.isNumber( )) {
+    else if (isNoteArg( arg )) {
         try {
-            note = thread->getNoteAtPosition( ch, arg.toInt( ) );
+            note = findNoteArg( ch, arg );
 
             if (note)
                 thread->showNoteToChar( ch, note );
             else
-                ch->pecho( _("Так много %N2 еще не написали."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
+                echoNoteNotFound( ch, arg );
                 
         } catch (const ExceptionBadType& e) {
             ch->pecho( _("Неправильный номер письма.") );
@@ -428,7 +465,8 @@ void NoteCommand::doList( PCharacter *ch, DLString &argument ) const
 
             if (listfilter_parse( ch, cnt, last, *i, from, thread->getNoteText( *i, ch ), hidden, argument.c_str( ) )) {
                 buf << "[" << cnt 
-                    << (hidden ? " " : "N") << "] " 
+                    << (hidden ? " " : "N") << "] #" 
+                    << (*i)->getID( ) << " "
                     << from << ": " << (*i)->getSubject( ) << "{x";
                 if (ch->isCoder() && (*i)->getFlags().getValue() != 0)
                     buf << "  {D[" << (*i)->getFlags().names() << "]{x";
@@ -459,13 +497,13 @@ void NoteCommand::doRemove( PCharacter *ch, DLString &arguments )
     const Note *note;
     DLString arg = arguments.getOneArgument( );
     
-    if (!arg.isNumber( )) {
+    if (!isNoteArg( arg )) {
         ch->pecho( _("Удалить какой номер?") );
         return;
     }
 
     try {
-        note = thread->getNoteAtPosition( ch, arg.toInt( ) );
+        note = findNoteArg( ch, arg );
 
         if (note) {
             if (ch->get_trust( ) < CREATOR && note->getAuthor( ) != ch->getName( ))
@@ -479,7 +517,7 @@ void NoteCommand::doRemove( PCharacter *ch, DLString &arguments )
             }
         }
         else
-            ch->pecho( _("Так много %N2 еще не написали."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
+            echoNoteNotFound( ch, arg );
     } 
     catch (const ExceptionBadType& e) {
         ch->pecho( _("Неправильный номер письма.") );
@@ -493,23 +531,22 @@ void NoteCommand::doUncatchup( PCharacter *ch, DLString &arguments ) const
     
     attr = ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" );
 
-    if (!arg.isNumber( )) {
+    if (!isNoteArg( arg )) {
         attr->setStamp( *thread, 0 );
         ch->pecho( _("Все %N1 помечены как непрочитанные."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
         return;
     }
 
     try {
-        int vnum = arg.toInt( );
-        const Note *note = thread->getNoteAtPosition( ch, vnum );
+        const Note *note = findNoteArg( ch, arg );
         
         if (note) {
             attr->setStamp( *thread, note->getID( ) );
             ch->pecho( _("Все %N2, начиная с номера %d, помечены как непрочитанные."), 
-                        thread->getMltNameFor( viewerLang( ch ) ).c_str( ), vnum );
+                        thread->getMltNameFor( viewerLang( ch ) ).c_str( ), thread->getNoteNumber( ch, note ) );
         }
         else
-            ch->pecho( _("Так много %N2 еще не написали."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
+            echoNoteNotFound( ch, arg );
     }
     catch (const ExceptionBadType& e) {
         ch->pecho( _("Неправильный номер письма.") );
@@ -595,13 +632,13 @@ void NoteCommand::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr,
     ostringstream buf;
     DLString arg = arguments.getOneArgument( );
     
-    if (!arg.isNumber( )) {
+    if (!isNoteArg( arg )) {
         ch->pecho( _("Перенаправить какой номер?") );
         return;
     }
 
     try {
-        orig = thread->getNoteAtPosition( ch, arg.toInt( ) );
+        orig = findNoteArg( ch, arg );
     } 
     catch (const ExceptionBadType& e) {
         ch->pecho( _("Неправильный номер письма.") );
@@ -609,7 +646,7 @@ void NoteCommand::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr,
     }
 
     if (!orig) {
-        ch->pecho( _("Так много %N2 еще не написали."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
+        echoNoteNotFound( ch, arg );
         return;
     }
 
