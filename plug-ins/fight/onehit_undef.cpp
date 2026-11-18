@@ -118,7 +118,7 @@ RELIG(deimos);
 UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command, bool offEnd )
             : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
               WeaponOneHit( ch, victim, secondary, command ),
-              deathblowStun( false ), charged( false ), offEnd( offEnd )
+              deathblowStun( false ), charged( false ), stirrups( false ), offEnd( offEnd )
 {
     deathReason = offEnd ? "staff offend" : "melee";
 }
@@ -985,23 +985,30 @@ void UndefinedOneHit::damApplyMounted( )
     if (!MOUNTED( ch ) || !ch->mount->is_npc( ))
         return;
 
-    if (gsn_cavalry->usable( ch, false ) && clan_char_owns( ch, "cavalry" ))
-        dam += dam * gsn_cavalry->getEffective( ch ) * 15 / 10000;
+    int cavalry = 0;
+    if (gsn_cavalry->usable( ch, false ) && clan_char_owns( ch, "cavalry" )) {
+        cavalry = gsn_cavalry->getEffective( ch );
+        dam += dam * cavalry * 15 / 10000;
+    }
 
-    if (!wield || get_weapon_class( wield ) != WEAPON_LANCE)
-        return;
+    if (wield && get_weapon_class( wield ) == WEAPON_LANCE
+        && gsn_lance->usable( ch, false ) && clan_char_owns( ch, "lance" ))
+    {
+        dam += dam / 5;
 
-    if (!gsn_lance->usable( ch, false ) || !clan_char_owns( ch, "lance" ))
-        return;
+        if (charge_attacker == ch && !secondary) {
+            charge_attacker = 0;
+            charged = true;
+            dam *= 2;
+            // A kill by this blow reads "lance" in onDeath (achievement lanced).
+            deathReason = "lance";
+        }
+    }
 
-    dam += dam / 5;
-
-    if (charge_attacker == ch && !secondary) {
-        charge_attacker = 0;
-        charged = true;
-        dam *= 2;
-        // A kill by this blow reads "lance" in onDeath (achievement lanced).
-        deathReason = "lance";
+    // Rising in the stirrups: a weapon blow now and then lands harder. Never on top of the charge.
+    if (cavalry > 0 && wield && !charged && number_percent( ) <= cavalry / 10) {
+        stirrups = true;
+        dam = dam * 3 / 2;
     }
 }
 
@@ -1012,6 +1019,11 @@ void UndefinedOneHit::msgOpeners( )
         oldact(_("Ты на полном скаку таранишь $C4 копьем!"), ch, 0, victim, TO_CHAR);
         oldact(_("$c1 на полном скаку таранит тебя копьем!"), ch, 0, victim, TO_VICT);
         oldact(_("$c1 на полном скаку таранит $C4 копьем!"), ch, 0, victim, TO_NOTVICT);
+    }
+
+    if (stirrups) {
+        ch->pecho(POS_RESTING, _("Ты привстаешь в стременах и обрушиваешь удар на %2$C4!"), ch, victim);
+        victim->pecho(POS_RESTING, _("%1$^C1 привста%1$nет|ют в стременах и обрушива%1$nет|ют на тебя удар!"), ch, victim);
     }
 }
 
