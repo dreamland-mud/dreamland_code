@@ -156,10 +156,17 @@ REDIT(copy, "копировать", "скопировать описания, п
     // Either order: 'copy desc 3001' as in oedit/medit, or 'copy 3001 desc'.
     DLString vnumArg = arg1.isNumber() ? arg1 : arg2;
     DLString what = arg1.isNumber() ? arg2 : arg1;
-    bool all = arg_is(what, "all");
-    bool copyDesc = all || arg_is(what, "desc");
-    bool copyParam = all || arg_is(what, "param");
-    bool copyBhv = all || arg_is(what, "behavior");
+    // One mode only, first match wins as in oedit/medit: a short prefix
+    // such as Cyrillic 'п' matches both param and behavior synonyms.
+    bool copyDesc = false, copyParam = false, copyBhv = false;
+    if (arg_is(what, "all"))
+        copyDesc = copyParam = copyBhv = true;
+    else if (arg_is(what, "desc"))
+        copyDesc = true;
+    else if (arg_is(what, "param"))
+        copyParam = true;
+    else if (arg_is(what, "behavior"))
+        copyBhv = true;
 
     EDIT_ROOM(ch, pRoom);
 
