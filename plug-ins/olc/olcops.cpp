@@ -1,5 +1,9 @@
 #include <time.h>
+#include <ctype.h>
+#include <list>
+#include <map>
 #include <set>
+#include <sstream>
 #include <vector>
 #include <utility>
 
@@ -9,7 +13,18 @@
 #include "redit.h"
 #include "medit.h"
 #include "oedit.h"
+#include "aedit.h"
+#include "qedit.h"
+#include "resetops.h"
 #include "olc.h"
+#include "xmlroom.h"
+#include "xmlarea.h"
+#include "xmlmobilefactory.h"
+#include "xmlobjectfactory.h"
+#include "xmldocument.h"
+#include "exceptionxmlerror.h"
+#include "areautils.h"
+#include "areaquest.h"
 #include "pcharacter.h"
 #include "room.h"
 #include "descriptor.h"
@@ -199,6 +214,14 @@ struct OlcOpContext {
     OlcPolicy policy;
     bool dryRun;
     bool verbose;
+    int opIndex;
+    // Vnums of this batch's creates by their 'ref' name, for "$name" in later ops.
+    std::map<DLString, int> refs;
+    // Dry run: the vnums this batch's creates would take, per kind.
+    std::map<DLString, std::set<int> > planned;
+    // Quests whose steps this batch touched, checked for step pairing at the end.
+    std::set<int> quests;
+    Json::Value *warnings;
 };
 
 /** The parsed op, every string already KOI8. */
@@ -208,7 +231,57 @@ struct OlcOpLine {
     DLString arguments;
     DLString text;
     bool hasText;
+
+    OlcOpLine() : hasText(false) { }
 };
+
+static void op_warning(OlcOpContext &ctx, const DLString &text)
+{
+    ctx.warnings->append("#" + DLString(ctx.opIndex) + ": " + text);
+}
+
+static void op_journal(OlcOpContext &ctx, const DLString &kind, int vnum,
+                       const DLString &cmd, const DLString &args)
+{
+    olc_journal(ctx.ch->getName(), OlcOps::policyName(ctx.policy), "api", kind, vnum, cmd, args);
+}
+
+static std::string::size_type capture_mark(OlcOpContext &ctx)
+{
+    return ctx.capture ? ctx.capture->getString().size() : 0;
+}
+
+static DLString captured(OlcOpContext &ctx, std::string::size_type mark)
+{
+    if (!ctx.capture)
+        return DLString::emptyString;
+
+    DLString out = DLString(ctx.capture->getString().substr(mark)).colourStrip();
+    out.stripWhiteSpace();
+    return out;
+}
+
+/** Result of an editor function that talks to the actor: false is a failed op
+ *  in the editor's own words. */
+static bool direct_result(OlcOpContext &ctx, bool ok, std::string::size_type mark,
+                          Json::Value &res, DLString &error)
+{
+    DLString out = captured(ctx, mark);
+
+    res["changed"] = ok;
+    if (ctx.verbose && !out.empty())
+        res["output"] = out;
+
+    if (!ok)
+        error = out.empty() ? DLString("Refused") : out;
+
+    return ok;
+}
+
+static bool is_planned(OlcOpContext &ctx, const DLString &kind, int vnum)
+{
+    return ctx.dryRun && ctx.planned[kind].count(vnum) > 0;
+}
 
 // The editors' 'behaviors X' replaces the whole list and drops the props of
 // every behavior it removes. Over the API it is additive: 'X' adds,
@@ -282,10 +355,14 @@ static bool additive_behaviors(const GlobalBitvector &current, DLString &argumen
 }
 
 /** Run one subcommand line on a fresh editor state, the way the servlets do:
- *  base attach (no char-side state to restore), handle, commit, base detach. */
+ *  base attach (no char-side state to restore), handle, commit, base detach.
+ *  Room, mob and object states commit after every subcommand but 'show' (their
+ *  handlers may edit without reporting it); area and quest states only after a
+ *  change, since their commit has side effects of its own. */
 template <typename State>
 static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &line,
-                         const GlobalBitvector &behaviors, Json::Value &res, DLString &error)
+                         const GlobalBitvector &behaviors, Json::Value &res, DLString &error,
+                         bool commitAlways = true)
 {
     CommandBase::Pointer cmd = state->findCommand(ctx.ch, line.cmdName);
     if (!cmd) {
@@ -297,6 +374,12 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
 
     if (!line.requiredName.empty() && name != line.requiredName) {
         error = "No '" + line.requiredName + "' field on " + state->getJournalKind();
+        return false;
+    }
+
+    // 'quest' attaches a quest editor that nobody would commit.
+    if (name == "quest" && state->getJournalKind() == "area") {
+        error = "Area quests are kind quest ops: create, set, step, delete";
         return false;
     }
 
@@ -322,12 +405,12 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
     std::vector<char> buf(cmdLine.begin(), cmdLine.end());
     buf.push_back(0);
 
-    std::string::size_type mark = ctx.capture ? ctx.capture->getString().size() : 0;
+    std::string::size_type mark = capture_mark(ctx);
 
     state->OLCState::attach(ctx.ch);
     try {
         state->handle(ctx.ch->desc, &buf[0]);
-        if (name != "show")
+        if (name != "show" && (commitAlways || state->lastChanged))
             state->commit();
     } catch (...) {
         state->OLCState::detach(ctx.ch);
@@ -335,7 +418,7 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
     }
     state->OLCState::detach(ctx.ch);
 
-    res["changed"] = state->lastChanged;
+    res["changed"] = res.isMember("changed") && res["changed"].asBool() ? true : state->lastChanged;
 
     DLString output;
     if (ctx.capture)
@@ -352,6 +435,36 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
     }
 
     return true;
+}
+
+/** "$name" of an earlier create's ref becomes its vnum. */
+static void expand_refs(OlcOpContext &ctx, DLString &s)
+{
+    if (ctx.refs.empty() || s.find('$') == DLString::npos)
+        return;
+
+    DLString out;
+    DLString::size_type i = 0;
+
+    while (i < s.size()) {
+        if (s[i] == '$') {
+            DLString::size_type j = i + 1;
+            while (j < s.size() && (isalnum((unsigned char)s[j]) || s[j] == '_'))
+                j++;
+
+            auto r = ctx.refs.find(s.substr(i + 1, j - i - 1));
+            if (j > i + 1 && r != ctx.refs.end()) {
+                out += DLString(r->second);
+                i = j;
+                continue;
+            }
+        }
+
+        out += s[i];
+        i++;
+    }
+
+    s = out;
 }
 
 static bool op_string(const Json::Value &op, const char *key, DLString &out, DLString &error)
@@ -377,29 +490,59 @@ static bool op_string(const Json::Value &op, const char *key, DLString &out, DLS
     return false;
 }
 
-static bool op_vnum(const Json::Value &op, int &vnum, DLString &error)
+static bool op_bool(const Json::Value &op, const char *key)
 {
-    const Json::Value &v = op["vnum"];
+    return op.isMember(key) && op[key].isBool() && op[key].asBool();
+}
+
+/** A number, a numeric string or "$ref". minValue guards the index lookups:
+ *  a negative vnum reaching them crashes the server. */
+static bool op_number(OlcOpContext &ctx, const Json::Value &op, const char *key, int &out,
+                      DLString &error, int minValue = 1)
+{
+    const Json::Value &v = op[key];
 
     if (v.isInt())
-        vnum = v.asInt();
+        out = v.asInt();
+    else if (v.isString() && !v.asString().empty() && v.asString()[0] == '$') {
+        DLString ref = v.asString().substr(1);
+        auto r = ctx.refs.find(ref);
+        if (r == ctx.refs.end()) {
+            error = DLString(key) + ": no create with ref '" + ref + "' earlier in this batch";
+            return false;
+        }
+        out = r->second;
+    }
     else if (v.isString() && DLString(v.asString()).isNumber())
-        vnum = DLString(v.asString()).toInt();
+        out = DLString(v.asString()).toInt();
     else {
-        error = "vnum is required and must be a number";
+        error = DLString(key) + " is required and must be a number";
         return false;
     }
 
-    // A negative vnum reaching the index lookups crashes the server.
-    if (vnum <= 0) {
-        error = "vnum must be positive";
+    if (out < minValue) {
+        error = DLString(key) + " must be at least " + DLString(minValue);
         return false;
     }
 
     return true;
 }
 
-static const char *textFields[] = { "name", "short", "long", "desc", "sound", "smell", 0 };
+static bool op_number_or(OlcOpContext &ctx, const Json::Value &op, const char *key, int &out,
+                         int dflt, DLString &error, int minValue = 1)
+{
+    if (!op.isMember(key)) {
+        out = dflt;
+        return true;
+    }
+
+    return op_number(ctx, op, key, out, error, minValue);
+}
+
+static const char *textFields[] = {
+    "name", "short", "long", "desc", "sound", "smell",
+    "message", "speedwalk", "preposition", "title", 0
+};
 
 static bool is_text_field(const DLString &field)
 {
@@ -410,7 +553,8 @@ static bool is_text_field(const DLString &field)
 }
 
 /** Turn a 'cmd' or 'set' op into a subcommand line. */
-static bool op_line(const Json::Value &op, const DLString &action, OlcOpLine &line, DLString &error)
+static bool op_line(OlcOpContext &ctx, const Json::Value &op, const DLString &action,
+                    OlcOpLine &line, DLString &error)
 {
     line.hasText = false;
 
@@ -418,6 +562,8 @@ static bool op_line(const Json::Value &op, const DLString &action, OlcOpLine &li
         DLString cmd;
         if (!op_string(op, "cmd", cmd, error) || !op_string(op, "text", line.text, error))
             return false;
+
+        expand_refs(ctx, cmd);
 
         // getOneArgument trims only the left side: a desc set inline keeps
         // its trailing newline, as in game.
@@ -456,7 +602,7 @@ static bool op_line(const Json::Value &op, const DLString &action, OlcOpLine &li
         base = field.substr(2);
     }
 
-    bool clear = op.isMember("clear") && op["clear"].isBool() && op["clear"].asBool();
+    bool clear = op_bool(op, "clear");
 
     if (is_text_field(base)) {
         DLString prefix;
@@ -504,11 +650,1252 @@ static bool op_line(const Json::Value &op, const DLString &action, OlcOpLine &li
         return false;
     }
 
+    expand_refs(ctx, value);
+
     line.cmdName = field;
     line.requiredName = field;
     line.arguments = value;
     return true;
 }
+
+/*--------------------------------------------------------------------------
+ * Reads: the save serializers' XML tree as compact JSON
+ *-------------------------------------------------------------------------*/
+
+static bool is_element(const XMLNode::Pointer &n)
+{
+    return n->getType() == XMLNode::XML_NODE || n->getType() == XMLNode::XML_LEAF;
+}
+
+static bool has_elements(const XMLNode::Pointer &n)
+{
+    for (auto &k: n->getNodeList())
+        if (is_element(k))
+            return true;
+    return false;
+}
+
+static DLString node_text(const XMLNode::Pointer &n)
+{
+    DLString text;
+
+    for (auto &k: n->getNodeList())
+        if (!is_element(k))
+            text += k->getCData();
+
+    return text;
+}
+
+/** Text-only element: a string. Otherwise an object of attributes and child
+ *  elements; a repeated child becomes an array, and the per-language siblings
+ *  of a multi-string (<name l="ru">) fold into one {en, ru, ua} object. */
+static Json::Value xml_node_json(const XMLNode::Pointer &node)
+{
+    const XMLNode::AttributeListType &attrs = node->getAttributes();
+
+    if (!has_elements(node) && attrs.empty())
+        return Json::Value(node_text(node));
+
+    Json::Value obj(Json::objectValue);
+
+    for (auto &a: attrs)
+        obj[a.first] = a.second;
+
+    DLString text = node_text(node);
+    if (!text.empty())
+        obj["text"] = text;
+
+    std::set<DLString> arrays;
+
+    for (auto &k: node->getNodeList()) {
+        if (!is_element(k))
+            continue;
+
+        const DLString &name = k->getName();
+
+        if (k->getAttributes().size() == 1 && k->hasAttribute("l") && !has_elements(k)
+            && (!obj.isMember(name) || (obj[name].isObject() && !arrays.count(name))))
+        {
+            obj[name][k->getAttribute("l")] = node_text(k);
+            continue;
+        }
+
+        Json::Value v = xml_node_json(k);
+
+        if (!obj.isMember(name)) {
+            obj[name] = v;
+            continue;
+        }
+
+        if (!arrays.count(name)) {
+            Json::Value first = obj[name];
+            obj[name] = Json::Value(Json::arrayValue);
+            obj[name].append(first);
+            arrays.insert(name);
+        }
+
+        obj[name].append(v);
+    }
+
+    return obj;
+}
+
+template <typename Serializer>
+static XMLNode::Pointer to_node(const Serializer &x, const char *name)
+{
+    XMLNode::Pointer node(NEW);
+    node->setName(name);
+    x.toXML(node);
+    return node;
+}
+
+/** The node as an XML document, in KOI8 like every other result string:
+ *  XMLDocument::save writes UTF-8 and the response converts the whole JSON. */
+static DLString node_xml(XMLNode::Pointer node)
+{
+    XMLDocument::Pointer root(NEW);
+    ostringstream os;
+
+    root->appendChild(node);
+    root->save(os);
+    return utf2koi(os.str());
+}
+
+static bool get_result(OlcOpContext &ctx, const Json::Value &op, XMLNode::Pointer node,
+                       const Json::Value &extra, Json::Value &res, DLString &error)
+{
+    DLString format = "json";
+    if (!op_string(op, "format", format, error))
+        return false;
+
+    if (format == "xml") {
+        res["xml"] = node_xml(node);
+        return true;
+    }
+
+    if (format != "json") {
+        error = "format must be json or xml";
+        return false;
+    }
+
+    Json::Value data = xml_node_json(node);
+    if (!data.isObject())
+        data = Json::Value(Json::objectValue);
+
+    for (auto &key: extra.getMemberNames())
+        data[key] = extra[key];
+
+    if (op.isMember("fields")) {
+        const Json::Value &fields = op["fields"];
+        if (!fields.isArray()) {
+            error = "fields must be an array of top-level field names";
+            return false;
+        }
+
+        Json::Value picked(Json::objectValue);
+        for (auto &f: fields) {
+            if (!f.isString()) {
+                error = "fields must be an array of top-level field names";
+                return false;
+            }
+            if (data.isMember(f.asString()))
+                picked[f.asString()] = data[f.asString()];
+        }
+        data = picked;
+    }
+
+    res["data"] = data;
+    return true;
+}
+
+/*--------------------------------------------------------------------------
+ * Whole-node writes
+ *-------------------------------------------------------------------------*/
+
+/** The root element of op's xml. doc owns the tree: nodes point back at
+ *  their parent, so it lives as long as the caller uses the node. */
+static XMLNode::Pointer parse_xml(const Json::Value &op, XMLDocument::Pointer &doc, DLString &error)
+{
+    if (!op["xml"].isString()) {
+        error = "xml is required for action put";
+        return XMLNode::Pointer();
+    }
+
+    // toKoi checks every character has a KOI8 form; the parser itself reads
+    // UTF-8 (the default prolog encoding) and decodes to KOI8.
+    DLString koi;
+    if (!OlcOps::toKoi(op["xml"].asString(), koi, error)) {
+        error = "xml: " + error;
+        return XMLNode::Pointer();
+    }
+
+    std::istringstream is(koi2utf(koi));
+    doc = XMLDocument::Pointer(NEW);
+
+    try {
+        doc->load(is);
+    } catch (const ExceptionXMLError &e) {
+        error = DLString("xml: ") + e.what();
+        return XMLNode::Pointer();
+    }
+
+    for (auto &n: doc->getNodeList())
+        if (is_element(n))
+            return n;
+
+    error = "xml has no root element";
+    return XMLNode::Pointer();
+}
+
+static int ndx_type(const DLString &kind)
+{
+    if (kind == "mob")
+        return OLC_NDX_MOB;
+    if (kind == "obj")
+        return OLC_NDX_OBJ;
+    return OLC_NDX_ROOM;
+}
+
+static bool index_exists(const DLString &kind, int vnum)
+{
+    if (kind == "mob")
+        return get_mob_index(vnum) != 0;
+    if (kind == "obj")
+        return get_obj_index(vnum) != 0;
+    if (kind == "room")
+        return get_room_index(vnum) != 0;
+    return false;
+}
+
+/** The checks of 'create <vnum>|next' in the editor's own words. */
+static int create_vnum(OlcOpContext &ctx, const DLString &kind, AreaIndexData *nextArea,
+                       const DLString &arg, DLString &error)
+{
+    std::string::size_type mark = capture_mark(ctx);
+    int vnum = olc_create_vnum(ctx.ch, nextArea, arg.c_str(), ndx_type(kind),
+                               ctx.dryRun ? &ctx.planned[kind] : 0);
+
+    if (vnum < 0) {
+        error = captured(ctx, mark);
+        if (error.empty())
+            error = "Refused";
+    }
+
+    return vnum;
+}
+
+/** A room from XML may only point at rooms, mobs and objects that exist. */
+static bool room_xml_refusal(OlcOpContext &ctx, XMLRoom &xr, int vnum, DLString &error)
+{
+    for (auto &e: xr.exits) {
+        int target = e.second.target.getValue();
+        if (target != vnum && (target <= 0 || (!get_room_index(target) && !is_planned(ctx, "room", target)))) {
+            error = "Exit " + e.first + " leads to room " + DLString(target) + ", which doesn't exist";
+            return false;
+        }
+    }
+
+    for (auto &e: xr.extraExits) {
+        int target = e.second.target.getValue();
+        if (target != vnum && (target <= 0 || (!get_room_index(target) && !is_planned(ctx, "room", target)))) {
+            error = "Extra exit " + e.first + " leads to room " + DLString(target) + ", which doesn't exist";
+            return false;
+        }
+    }
+
+    for (auto &r: xr.resets) {
+        bool mob = r.command == 'M';
+        bool obj = r.command == 'O' || r.command == 'P' || r.command == 'G' || r.command == 'E';
+
+        if ((mob || obj) && (r.arg1 <= 0 || !index_exists(mob ? "mob" : "obj", r.arg1))) {
+            error = DLString("A reset loads ") + (mob ? "mob " : "obj ") + DLString(r.arg1) + ", which doesn't exist";
+            return false;
+        }
+
+        if (r.command == 'P' && (r.arg3 <= 0 || !get_obj_index(r.arg3))) {
+            error = "A reset puts an item into obj " + DLString(r.arg3) + ", which doesn't exist";
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool op_put(OlcOpContext &ctx, const DLString &kind, int vnum, const Json::Value &op,
+                   Json::Value &res, DLString &error)
+{
+    XMLDocument::Pointer doc;
+    XMLNode::Pointer node = parse_xml(op, doc, error);
+    if (!node)
+        return false;
+
+    // The op's vnum wins over whatever the XML says.
+    node->insertAttribute("vnum", DLString(vnum));
+
+    bool exists = index_exists(kind, vnum);
+
+    if (kind == "room" && (exists || is_planned(ctx, kind, vnum))) {
+        error = "put replaces whole rooms only under a free vnum for now: edit a live room with set/cmd ops";
+        return false;
+    }
+
+    if (!exists && !is_planned(ctx, kind, vnum)) {
+        if (create_vnum(ctx, kind, 0, DLString(vnum), error) < 0)
+            return false;
+
+        // The rest of a dry run sees the prototype this put would create.
+        if (ctx.dryRun)
+            ctx.planned[kind].insert(vnum);
+    }
+
+    if (kind == "mob") {
+        OLCStateMobile::Pointer state(NEW, vnum);
+        state->mob.fromXML(node);
+        if (ctx.dryRun)
+            return true;
+        state->commit();
+    }
+    else if (kind == "obj") {
+        OLCStateObject::Pointer state(NEW, vnum);
+        state->obj.fromXML(node);
+        if (ctx.dryRun)
+            return true;
+        state->commit();
+    }
+    else {
+        XMLRoom xr;
+        xr.fromXML(node);
+
+        if (!room_xml_refusal(ctx, xr, vnum, error))
+            return false;
+
+        if (ctx.dryRun)
+            return true;
+
+        RoomIndexData *pRoom = xr.compat(vnum);
+        OLCStateRoom::registerRoom(pRoom);
+
+        // Boot resolves every exit after the whole world loads; this room
+        // joins a world that is already there.
+        Room *room = pRoom->room;
+        for (int door = 0; door < DIR_SOMEWHERE; door++)
+            if (room->exit[door])
+                room->exit[door]->resolve();
+        for (auto &eexit: room->extra_exits)
+            eexit->resolve();
+    }
+
+    OLCState::get_vnum_area(vnum)->changed = true;
+    op_journal(ctx, kind, vnum, "put", exists ? "replace" : "new");
+    res["changed"] = true;
+    return true;
+}
+
+/*--------------------------------------------------------------------------
+ * Prototype kinds: room, mob, obj
+ *-------------------------------------------------------------------------*/
+
+/** 'area': an area vnum, for 'next' and for a quest. 0 when absent. */
+static bool op_area(OlcOpContext &ctx, const Json::Value &op, AreaIndexData *&pArea, DLString &error)
+{
+    pArea = 0;
+
+    if (!op.isMember("area"))
+        return true;
+
+    int avnum;
+    if (!op_number(ctx, op, "area", avnum, error, 0))
+        return false;
+
+    pArea = AreaUtils::getByVnum(avnum);
+    if (!pArea) {
+        error = "Area vnum " + DLString(avnum) + " not found";
+        return false;
+    }
+
+    if (!OLCState::can_edit(ctx.ch, pArea)) {
+        error = "You can't build in area " + DLString(avnum);
+        return false;
+    }
+
+    return true;
+}
+
+/** 'vnum' of a create: a number or "next" with 'area'. Fills arg for olc_create_vnum. */
+static bool op_create_arg(OlcOpContext &ctx, const Json::Value &op, DLString &arg,
+                          AreaIndexData *&pArea, DLString &error)
+{
+    if (!op_area(ctx, op, pArea, error))
+        return false;
+
+    if (op["vnum"].isString() && op["vnum"].asString() == "next") {
+        if (!pArea) {
+            error = "vnum next needs an area (the area's vnum)";
+            return false;
+        }
+        arg = "next";
+        return true;
+    }
+
+    int vnum;
+    if (!op_number(ctx, op, "vnum", vnum, error))
+        return false;
+
+    if (pArea && (vnum < pArea->min_vnum || vnum > pArea->max_vnum)) {
+        error = "vnum " + DLString(vnum) + " is outside area " + DLString(pArea->vnum)
+                + " (" + DLString(pArea->min_vnum) + "-" + DLString(pArea->max_vnum) + ")";
+        return false;
+    }
+
+    arg = DLString(vnum);
+    return true;
+}
+
+static bool op_create(OlcOpContext &ctx, const DLString &kind, const Json::Value &op,
+                      Json::Value &res, int &vnum, DLString &error)
+{
+    DLString arg, ref;
+    AreaIndexData *pArea;
+
+    if (!op_create_arg(ctx, op, arg, pArea, error) || !op_string(op, "ref", ref, error))
+        return false;
+
+    if (!ref.empty() && ctx.refs.count(ref)) {
+        error = "ref '" + ref + "' is already used in this batch";
+        return false;
+    }
+
+    vnum = create_vnum(ctx, kind, pArea, arg, error);
+    if (vnum < 0)
+        return false;
+
+    res["vnum"] = vnum;
+    if (!ref.empty())
+        ctx.refs[ref] = vnum;
+
+    if (ctx.dryRun) {
+        ctx.planned[kind].insert(vnum);
+        return true;
+    }
+
+    if (kind == "room") {
+        OLCStateRoom::createRoom(vnum);
+    }
+    else if (kind == "mob") {
+        OLCStateMobile::Pointer state(NEW, vnum);
+        state->commit();
+    }
+    else {
+        OLCStateObject::Pointer state(NEW, vnum);
+        state->commit();
+    }
+
+    OLCState::get_vnum_area(vnum)->changed = true;
+    op_journal(ctx, kind, vnum, "create", arg);
+    res["changed"] = true;
+    return true;
+}
+
+/** How many resets load this mob or object, for a delete warning. */
+static int count_resets_of(const DLString &kind, int vnum)
+{
+    int cnt = 0;
+
+    for (auto &r: roomIndexMap)
+        for (auto &reset: r.second->resets) {
+            if (kind == "mob" && reset->command == 'M' && reset->arg1 == vnum)
+                cnt++;
+            else if (kind == "obj" && reset->command != 'M' && reset->command != 'R'
+                     && (reset->arg1 == vnum || (reset->command == 'P' && reset->arg3 == vnum)))
+                cnt++;
+        }
+
+    return cnt;
+}
+
+static int count_quest_steps_on(const DLString &type, int vnum)
+{
+    DLString v(vnum);
+    int cnt = 0;
+
+    for (auto &q: areaQuests)
+        for (auto &s: q.second->steps)
+            if ((s->beginType == type && s->beginValue == v) || (s->endType == type && s->endValue == v))
+                cnt++;
+
+    return cnt;
+}
+
+static const char *dirNames[] = { "north", "east", "south", "west", "up", "down", 0 };
+
+/** delete with 'exit', 'eexit' or 'ed': the editor's own delete subcommand. */
+static bool op_delete_part(const DLString &kind, const Json::Value &op, OlcOpLine &line, DLString &error)
+{
+    DLString exitDir, eexit, ed;
+
+    if (!op_string(op, "exit", exitDir, error) || !op_string(op, "eexit", eexit, error)
+        || !op_string(op, "ed", ed, error))
+        return false;
+
+    int parts = !exitDir.empty() + !eexit.empty() + !ed.empty();
+    if (parts > 1) {
+        error = "delete takes one of exit, eexit, ed";
+        return false;
+    }
+
+    if (!exitDir.empty()) {
+        if (kind != "room") {
+            error = "exit is for rooms";
+            return false;
+        }
+
+        bool known = false;
+        for (int i = 0; dirNames[i]; i++)
+            if (exitDir == dirNames[i])
+                known = true;
+
+        if (!known) {
+            error = "exit must be north, east, south, west, up or down";
+            return false;
+        }
+
+        // 'delete' takes the exit away on both sides, 'unlink' on this side only.
+        line.cmdName = exitDir;
+        line.requiredName = exitDir;
+        line.arguments = op_bool(op, "unlink") ? "unlink" : "delete";
+        return true;
+    }
+
+    if (!eexit.empty()) {
+        if (kind != "room") {
+            error = "eexit is for rooms";
+            return false;
+        }
+        line.cmdName = line.requiredName = "eexit";
+        line.arguments = "delete " + eexit;
+        return true;
+    }
+
+    if (!ed.empty()) {
+        if (kind == "mob") {
+            error = "mobiles have no extra descriptions";
+            return false;
+        }
+        line.cmdName = line.requiredName = "ed";
+        line.arguments = "delete " + ed;
+        return true;
+    }
+
+    return true;
+}
+
+static bool op_delete(OlcOpContext &ctx, const DLString &kind, int vnum, const Json::Value &op,
+                      Json::Value &res, DLString &error)
+{
+    std::string::size_type mark = capture_mark(ctx);
+
+    if (kind == "room") {
+        RoomIndexData *pRoom = get_room_index(vnum);
+        error = OLCStateRoom::deleteRefusal(pRoom);
+        if (!error.empty())
+            return false;
+
+        int steps = count_quest_steps_on("room", vnum);
+        if (steps > 0)
+            op_warning(ctx, "room " + DLString(vnum) + " is a target of " + DLString(steps) + " area quest step(s)");
+
+        if (ctx.dryRun)
+            return true;
+
+        OLCStateRoom::unregisterRoom(pRoom);
+        op_journal(ctx, kind, vnum, "delete", "");
+        res["changed"] = true;
+        return true;
+    }
+
+    int resets = count_resets_of(kind, vnum);
+    if (resets > 0)
+        op_warning(ctx, kind + " " + DLString(vnum) + " is still loaded by " + DLString(resets) + " reset(s)");
+
+    int steps = count_quest_steps_on(kind, vnum);
+    if (steps > 0)
+        op_warning(ctx, kind + " " + DLString(vnum) + " is a target of " + DLString(steps) + " area quest step(s)");
+
+    if (ctx.dryRun)
+        return true;
+
+    DLString arg(vnum);
+    bool ok;
+    if (kind == "mob")
+        ok = OLCStateMobile::markDeleted(ctx.ch, arg.c_str()) != 0;
+    else
+        ok = OLCStateObject::markDeleted(ctx.ch, arg.c_str()) != 0;
+
+    if (ok)
+        op_journal(ctx, kind, vnum, "delete", "");
+
+    return direct_result(ctx, ok, mark, res, error);
+}
+
+static bool prototype_op(OlcOpContext &ctx, const DLString &kind, const DLString &action,
+                         int vnum, const Json::Value &op, Json::Value &res, DLString &error)
+{
+    if (action == "put")
+        return op_put(ctx, kind, vnum, op, res, error);
+
+    OlcOpLine line;
+    bool part = false;
+
+    if (action == "delete") {
+        if (!op_delete_part(kind, op, line, error))
+            return false;
+        part = !line.cmdName.empty();
+    }
+    else if (action == "cmd" || action == "set") {
+        if (!op_line(ctx, op, action, line, error))
+            return false;
+    }
+
+    // Ops on a vnum this dry run would create: parsed, nothing to resolve yet.
+    if (is_planned(ctx, kind, vnum))
+        return true;
+
+    if (!index_exists(kind, vnum)) {
+        error = kind + " vnum " + DLString(vnum) + " not found";
+        return false;
+    }
+
+    if (action == "get") {
+        Json::Value extra(Json::objectValue);
+        extra["vnum"] = vnum;
+
+        if (kind == "room") {
+            RoomIndexData *pRoom = get_room_index(vnum);
+            XMLRoom xr;
+            xr.init(pRoom);
+            extra["area"] = pRoom->areaIndex->vnum;
+            return get_result(ctx, op, to_node(xr, "room"), extra, res, error);
+        }
+
+        if (kind == "mob") {
+            MOB_INDEX_DATA *pMob = get_mob_index(vnum);
+            XMLMobileFactory f;
+            f.init(pMob);
+            if (pMob->area)
+                extra["area"] = pMob->area->vnum;
+            return get_result(ctx, op, to_node(f, "mobile"), extra, res, error);
+        }
+
+        OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
+        XMLObjectFactory f;
+        f.init(pObj);
+        if (pObj->area)
+            extra["area"] = pObj->area->vnum;
+        return get_result(ctx, op, to_node(f, "object"), extra, res, error);
+    }
+
+    if (action == "delete" && !part)
+        return op_delete(ctx, kind, vnum, op, res, error);
+
+    if (kind == "room") {
+        RoomIndexData *pRoom = get_room_index(vnum);
+        Room *room = get_room_instance(vnum);
+        if (!room) {
+            error = "Room vnum " + DLString(vnum) + " has no instance";
+            return false;
+        }
+
+        // Room subcommands edit the prototype of the room the actor stands in.
+        ctx.ch->in_room = room;
+
+        OLCStateRoom::Pointer sr(NEW);
+        sr->room.setValue(vnum);
+        // No original room: a throwing subcommand's detach returns early
+        // instead of moving the actor.
+        sr->originalRoom.setValue(0);
+        return run_on_state(sr, ctx, line, pRoom->behaviors, res, error);
+    }
+
+    Room *limbo = get_room_instance(ROOM_VNUM_LIMBO);
+    if (!limbo) {
+        error = "Limbo room instance not found";
+        return false;
+    }
+    ctx.ch->in_room = limbo;
+
+    if (kind == "mob") {
+        MOB_INDEX_DATA *pMob = get_mob_index(vnum);
+        if (!pMob->area) {
+            error = "Mobile vnum " + DLString(vnum) + " has no area";
+            return false;
+        }
+
+        OLCStateMobile::Pointer state(NEW, pMob);
+        return run_on_state(state, ctx, line, pMob->behaviors, res, error);
+    }
+
+    OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
+    if (!pObj->area) {
+        error = "Object vnum " + DLString(vnum) + " has no area";
+        return false;
+    }
+
+    OLCStateObject::Pointer state(NEW, pObj);
+    return run_on_state(state, ctx, line, pObj->behaviors, res, error);
+}
+
+/*--------------------------------------------------------------------------
+ * Resets, addressed by room vnum
+ *-------------------------------------------------------------------------*/
+
+static bool reset_op(OlcOpContext &ctx, const DLString &action, int vnum, const Json::Value &op,
+                     Json::Value &res, DLString &error)
+{
+    if (action == "get") {
+        if (is_planned(ctx, "room", vnum))
+            return true;
+
+        RoomIndexData *pRoom = get_room_index(vnum);
+        if (!pRoom) {
+            error = "Room vnum " + DLString(vnum) + " not found";
+            return false;
+        }
+
+        XMLRoom xr;
+        xr.init(pRoom);
+        Json::Value fields(Json::arrayValue);
+        fields.append("resets");
+        Json::Value getOp = op;
+        if (!getOp.isMember("fields"))
+            getOp["fields"] = fields;
+
+        Json::Value extra(Json::objectValue);
+        extra["vnum"] = vnum;
+        return get_result(ctx, getOp, to_node(xr, "room"), extra, res, error);
+    }
+
+    int number = 0, after = -1;
+    DLString journalCmd, journalArgs;
+
+    if (action == "delete" || action == "set") {
+        if (!op_number(ctx, op, "number", number, error))
+            return false;
+    }
+
+    if (action == "add" && !op_number_or(ctx, op, "after", after, -1, error, 0))
+        return false;
+
+    int mobVnum = 0, objVnum = 0, maxArea = 1, maxRoom = 1, container = 0, limit = 1, count = 1;
+    DLString to = "room", field, value;
+
+    if (action == "add") {
+        bool hasMob = op.isMember("mob"), hasObj = op.isMember("obj");
+
+        if (hasMob == hasObj) {
+            error = "add takes mob or obj";
+            return false;
+        }
+
+        if (hasMob) {
+            if (!op_number(ctx, op, "mob", mobVnum, error)
+                || !op_number_or(ctx, op, "max", maxArea, 1, error)
+                || !op_number_or(ctx, op, "maxRoom", maxRoom, 1, error))
+                return false;
+
+            if (!get_mob_index(mobVnum) && !is_planned(ctx, "mob", mobVnum)) {
+                error = "mob " + DLString(mobVnum) + " not found";
+                return false;
+            }
+
+            journalCmd = "add mob";
+            journalArgs = DLString(mobVnum) + " " + DLString(maxArea) + " " + DLString(maxRoom);
+        } else {
+            if (!op_number(ctx, op, "obj", objVnum, error) || !op_string(op, "to", to, error))
+                return false;
+
+            if (!get_obj_index(objVnum) && !is_planned(ctx, "obj", objVnum)) {
+                error = "obj " + DLString(objVnum) + " not found";
+                return false;
+            }
+
+            if (to == "inside") {
+                if (!op_number(ctx, op, "container", container, error)
+                    || !op_number_or(ctx, op, "limit", limit, 1, error)
+                    || !op_number_or(ctx, op, "count", count, 1, error))
+                    return false;
+            }
+
+            journalCmd = "add obj";
+            journalArgs = DLString(objVnum) + " " + to;
+        }
+    }
+    else if (action == "set") {
+        if (!op_string(op, "field", field, error) || !op_string(op, "value", value, error))
+            return false;
+
+        if (field != "flag" && field != "rand" && field != "tier" && field != "wearloc") {
+            error = "field must be flag, rand, tier or wearloc";
+            return false;
+        }
+
+        if (value.empty()) {
+            error = "value is required for action set";
+            return false;
+        }
+
+        if (field == "tier" && !value.isNumber()) {
+            error = "tier must be a number";
+            return false;
+        }
+
+        journalCmd = DLString(number) + " " + field;
+        journalArgs = value;
+    }
+    else if (action == "delete") {
+        journalCmd = DLString(number) + " delete";
+    }
+    else if (action == "randomize") {
+        journalCmd = "randomize exits";
+    }
+    else {
+        error = "reset action must be get, add, set, delete or randomize";
+        return false;
+    }
+
+    if (is_planned(ctx, "room", vnum))
+        return true;
+
+    RoomIndexData *pRoom = get_room_index(vnum);
+    if (!pRoom || !pRoom->room) {
+        error = "Room vnum " + DLString(vnum) + " not found";
+        return false;
+    }
+
+    if (!OLCState::can_edit(ctx.ch, vnum)) {
+        error = "You can't build in room " + DLString(vnum);
+        return false;
+    }
+
+    if (number > (int)pRoom->resets.size()) {
+        error = "Room " + DLString(vnum) + " has " + DLString((int)pRoom->resets.size()) + " reset(s)";
+        return false;
+    }
+
+    if (ctx.dryRun)
+        return true;
+
+    // The reset handlers answer the room the actor stands in.
+    ctx.ch->in_room = pRoom->room;
+
+    std::string::size_type mark = capture_mark(ctx);
+    bool ok;
+
+    if (action == "add" && mobVnum > 0)
+        ok = reset_add_mob(ctx.ch, pRoom, after, mobVnum, maxArea, maxRoom);
+    else if (action == "add" && to == "room")
+        ok = reset_add_obj_room(ctx.ch, pRoom, after, objVnum);
+    else if (action == "add" && to == "inside")
+        ok = reset_add_obj_inside(ctx.ch, pRoom, after, objVnum, container, limit, count);
+    else if (action == "add")
+        ok = reset_add_obj_wear(ctx.ch, pRoom, after, objVnum, to);
+    else if (action == "delete")
+        ok = reset_delete(ctx.ch, pRoom, number);
+    else if (action == "randomize")
+        ok = reset_randomize_exits(ctx.ch, pRoom);
+    else if (field == "flag")
+        ok = reset_toggle_flags(ctx.ch, pRoom, number, value);
+    else if (field == "rand")
+        ok = reset_set_rand(ctx.ch, pRoom, number, value);
+    else if (field == "tier")
+        ok = reset_set_tier(ctx.ch, pRoom, number, value.toInt());
+    else
+        ok = reset_set_wearloc(ctx.ch, pRoom, number, value);
+
+    if (ok)
+        op_journal(ctx, "reset", vnum, journalCmd, journalArgs);
+
+    return direct_result(ctx, ok, mark, res, error);
+}
+
+/*--------------------------------------------------------------------------
+ * Area header
+ *-------------------------------------------------------------------------*/
+
+static bool area_op(OlcOpContext &ctx, const DLString &action, int vnum, const Json::Value &op,
+                    Json::Value &res, DLString &error)
+{
+    if (action != "get" && action != "cmd" && action != "set") {
+        error = "area action must be get, cmd or set";
+        return false;
+    }
+
+    OlcOpLine line;
+    if (action != "get" && !op_line(ctx, op, action, line, error))
+        return false;
+
+    AreaIndexData *pArea = AreaUtils::getByVnum(vnum);
+    if (!pArea) {
+        error = "Area vnum " + DLString(vnum) + " not found";
+        return false;
+    }
+
+    if (!OLCState::can_edit(ctx.ch, pArea)) {
+        error = "You can't build in area " + DLString(vnum);
+        return false;
+    }
+
+    if (action == "get") {
+        XMLAreaHeader header;
+        header.init(pArea);
+
+        Json::Value extra(Json::objectValue);
+        extra["vnum"] = vnum;
+        extra["file"] = pArea->area_file->file_name;
+        extra["changed"] = pArea->changed;
+        Json::Value quests(Json::arrayValue);
+        for (auto &q: pArea->quests)
+            quests.append(q->vnum.getValue());
+        extra["quests"] = quests;
+        return get_result(ctx, op, to_node(header, "areadata"), extra, res, error);
+    }
+
+    Room *limbo = get_room_instance(ROOM_VNUM_LIMBO);
+    if (!limbo) {
+        error = "Limbo room instance not found";
+        return false;
+    }
+    ctx.ch->in_room = limbo;
+
+    OLCStateArea::Pointer state(NEW, pArea);
+    return run_on_state(state, ctx, line, GlobalBitvector(), res, error, false);
+}
+
+/*--------------------------------------------------------------------------
+ * Area quests
+ *-------------------------------------------------------------------------*/
+
+static bool quest_create(OlcOpContext &ctx, const Json::Value &op, Json::Value &res,
+                         int &vnum, DLString &error)
+{
+    DLString arg, ref;
+    AreaIndexData *pArea;
+
+    if (!op_create_arg(ctx, op, arg, pArea, error) || !op_string(op, "ref", ref, error))
+        return false;
+
+    if (!ref.empty() && ctx.refs.count(ref)) {
+        error = "ref '" + ref + "' is already used in this batch";
+        return false;
+    }
+
+    if (!pArea) {
+        pArea = OLCState::get_vnum_area(arg.toInt());
+        if (!pArea) {
+            error = "Quest vnum " + arg + " is in no area";
+            return false;
+        }
+        if (!OLCState::can_edit(ctx.ch, pArea)) {
+            error = "You can't build in area " + DLString(pArea->vnum);
+            return false;
+        }
+    }
+
+    std::set<int> &planned = ctx.planned["quest"];
+
+    if (ctx.dryRun) {
+        if (arg == "next") {
+            for (vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++)
+                if (vnum > 0 && pArea->questMap.find(vnum) == pArea->questMap.end() && !planned.count(vnum))
+                    break;
+            if (vnum > pArea->max_vnum) {
+                error = "No free quest vnum left in area " + DLString(pArea->vnum);
+                return false;
+            }
+        } else {
+            vnum = arg.toInt();
+            if (areaQuests.find(vnum) != areaQuests.end() || planned.count(vnum)) {
+                error = "Quest " + DLString(vnum) + " already exists";
+                return false;
+            }
+        }
+
+        planned.insert(vnum);
+    } else {
+        std::string::size_type mark = capture_mark(ctx);
+        AreaQuest *q = OLCStateArea::questCreate(ctx.ch, pArea, arg == "next" ? DLString::emptyString : arg);
+
+        if (!direct_result(ctx, q != 0, mark, res, error))
+            return false;
+
+        vnum = q->vnum.getValue();
+        op_journal(ctx, "quest", vnum, "create", arg);
+        ctx.quests.insert(vnum);
+    }
+
+    res["vnum"] = vnum;
+    if (!ref.empty())
+        ctx.refs[ref] = vnum;
+    return true;
+}
+
+static bool step_end_lines(OlcOpContext &ctx, const Json::Value &op, const char *which,
+                           const DLString &stepArg, std::vector<OlcOpLine> &lines, DLString &error)
+{
+    if (!op.isMember(which))
+        return true;
+
+    const Json::Value &part = op[which];
+    if (!part.isObject()) {
+        error = DLString(which) + " must be an object {type, vnum, trigger}";
+        return false;
+    }
+
+    DLString type, trigger;
+    int target = 0;
+
+    if (!op_string(part, "type", type, error) || !op_string(part, "trigger", trigger, error))
+        return false;
+
+    if (part.isMember("vnum") && !op_number(ctx, part, "vnum", target, error))
+        return false;
+
+    DLString prefix = "step " + stepArg + " " + which + " ";
+    OlcOpLine line;
+    line.cmdName = line.requiredName = "step";
+
+    // Type first: changing it drops the old trigger, which the editor then
+    // checks the new trigger name against.
+    if (!type.empty()) {
+        line.arguments = stepArg + " " + which + " type " + type;
+        lines.push_back(line);
+    }
+    if (target > 0) {
+        line.arguments = stepArg + " " + which + " vnum " + DLString(target);
+        lines.push_back(line);
+    }
+    if (!trigger.empty()) {
+        line.arguments = stepArg + " " + which + " trig " + trigger;
+        lines.push_back(line);
+    }
+
+    return true;
+}
+
+/** One step's edits as qedit 'step' lines. "step": "add" appends a step first. */
+static bool step_lines(OlcOpContext &ctx, const Json::Value &op, const DLString &stepArg,
+                       std::vector<OlcOpLine> &lines, DLString &error)
+{
+    OlcOpLine line;
+    line.cmdName = line.requiredName = "step";
+
+    if (op_bool(op, "delete")) {
+        line.arguments = stepArg + " del";
+        lines.push_back(line);
+        return true;
+    }
+
+    if (!step_end_lines(ctx, op, "begin", stepArg, lines, error)
+        || !step_end_lines(ctx, op, "end", stepArg, lines, error))
+        return false;
+
+    if (op.isMember("info")) {
+        const Json::Value &info = op["info"];
+        if (!info.isObject()) {
+            error = "info must be an object {en, ru, ua}";
+            return false;
+        }
+
+        static const char *langs[] = { "en", "ru", "ua", 0 };
+        for (int i = 0; langs[i]; i++) {
+            if (!info.isMember(langs[i]))
+                continue;
+
+            OlcOpLine paste = line;
+            if (!op_string(info, langs[i], paste.text, error))
+                return false;
+            paste.arguments = stepArg + " " + langs[i] + " paste";
+            paste.hasText = true;
+            lines.push_back(paste);
+        }
+    }
+
+    static const char *rewards[] = { "qp", "gold", "exp", "item", 0 };
+    for (int i = 0; rewards[i]; i++) {
+        if (!op.isMember(rewards[i]))
+            continue;
+
+        int amount;
+        if (!op_number(ctx, op, rewards[i], amount, error, 0))
+            return false;
+        line.arguments = stepArg + " " + rewards[i] + " " + DLString(amount);
+        lines.push_back(line);
+    }
+
+    return true;
+}
+
+static bool quest_step(OlcOpContext &ctx, AreaQuest *q, int vnum, const Json::Value &op,
+                       Json::Value &res, DLString &error)
+{
+    DLString stepArg;
+    bool add = op["step"].isString() && op["step"].asString() == "add";
+
+    if (!add) {
+        int step;
+        if (!op_number(ctx, op, "step", step, error, 0))
+            return false;
+        if (q && step >= (int)q->steps.size()) {
+            error = "Quest " + DLString(vnum) + " has " + DLString((int)q->steps.size()) + " step(s), counted from 0";
+            return false;
+        }
+        stepArg = DLString(step);
+    }
+
+    // Lines are built against the final step number; for an added step that
+    // is only known after 'step add' runs.
+    std::vector<OlcOpLine> lines;
+    if (!step_lines(ctx, op, add ? DLString("0") : stepArg, lines, error))
+        return false;
+
+    if (!q)
+        return true;
+
+    OLCStateAreaQuest::Pointer state(NEW, q);
+
+    if (add) {
+        OlcOpLine addLine;
+        addLine.cmdName = addLine.requiredName = "step";
+        addLine.arguments = "add";
+        if (!run_on_state(state, ctx, addLine, GlobalBitvector(), res, error, false))
+            return false;
+
+        if (ctx.dryRun)
+            return true;
+
+        stepArg = DLString((int)q->steps.size() - 1);
+        lines.clear();
+        if (!step_lines(ctx, op, stepArg, lines, error))
+            return false;
+    }
+
+    res["step"] = stepArg.toInt();
+
+    for (auto &line: lines) {
+        OLCStateAreaQuest::Pointer s(NEW, q);
+        if (!run_on_state(s, ctx, line, GlobalBitvector(), res, error, false))
+            return false;
+    }
+
+    ctx.quests.insert(vnum);
+    return true;
+}
+
+static bool quest_op(OlcOpContext &ctx, const DLString &action, const Json::Value &op,
+                     Json::Value &res, int &vnum, DLString &error)
+{
+    if (action == "create")
+        return quest_create(ctx, op, res, vnum, error);
+
+    if (!op_number(ctx, op, "vnum", vnum, error))
+        return false;
+    res["vnum"] = vnum;
+
+    if (action != "get" && action != "cmd" && action != "set" && action != "step" && action != "delete") {
+        error = "quest action must be get, create, cmd, set, step or delete";
+        return false;
+    }
+
+    OlcOpLine line;
+    if ((action == "cmd" || action == "set") && !op_line(ctx, op, action, line, error))
+        return false;
+
+    AreaQuest *q = 0;
+    auto qi = areaQuests.find(vnum);
+    if (qi != areaQuests.end())
+        q = qi->second;
+
+    if (!q && !is_planned(ctx, "quest", vnum)) {
+        error = "Quest vnum " + DLString(vnum) + " not found";
+        return false;
+    }
+
+    if (q && !OLCState::can_edit(ctx.ch, q->pAreaIndex)) {
+        error = "You can't build in area " + DLString(q->pAreaIndex->vnum);
+        return false;
+    }
+
+    if (action == "step")
+        return quest_step(ctx, q, vnum, op, res, error);
+
+    if (!q)
+        return true;
+
+    if (action == "get") {
+        Json::Value extra(Json::objectValue);
+        extra["vnum"] = vnum;
+        extra["area"] = q->pAreaIndex->vnum;
+        return get_result(ctx, op, to_node(*q, "quest"), extra, res, error);
+    }
+
+    if (action == "delete") {
+        op_warning(ctx, "the Fenia handlers of quest " + DLString(vnum)
+                        + " stay: annul them first, 'cs search " + DLString(vnum) + "'");
+        if (ctx.dryRun)
+            return true;
+
+        std::string::size_type mark = capture_mark(ctx);
+        bool ok = OLCStateArea::questDelete(ctx.ch, q->pAreaIndex, DLString(vnum));
+        if (ok)
+            op_journal(ctx, "quest", vnum, "delete", "");
+        return direct_result(ctx, ok, mark, res, error);
+    }
+
+    Room *limbo = get_room_instance(ROOM_VNUM_LIMBO);
+    if (!limbo) {
+        error = "Limbo room instance not found";
+        return false;
+    }
+    ctx.ch->in_room = limbo;
+
+    OLCStateAreaQuest::Pointer state(NEW, q);
+    if (!run_on_state(state, ctx, line, GlobalBitvector(), res, error, false))
+        return false;
+
+    ctx.quests.insert(vnum);
+    return true;
+}
+
+/** Steps of a quest this batch touched that break the pairing rule. */
+static void quest_pairing_warnings(OlcOpContext &ctx)
+{
+    for (int vnum: ctx.quests) {
+        auto qi = areaQuests.find(vnum);
+        if (qi == areaQuests.end())
+            continue;
+
+        AreaQuest *q = qi->second;
+
+        for (int s = 0; s + 1 < (int)q->steps.size(); s++) {
+            int pairing = qedit_step_pairing(q, s);
+            auto &step = q->steps[s];
+            auto &next = q->steps[s + 1];
+            DLString where = "quest " + DLString(vnum) + " step " + DLString(s) + " -> " + DLString(s + 1);
+
+            if (pairing & STEP_PAIR_TARGET)
+                ctx.warnings->append(where + ": ends on " + step->endType + " " + step->endValue
+                                     + ", the next step begins on " + next->beginType + " " + next->beginValue);
+
+            if (pairing & STEP_PAIR_TRIGGER)
+                ctx.warnings->append(where + ": ends with " + step->endTrigger
+                                     + ", the next step begins with " + next->beginTrigger
+                                     + " (an onX end pairs with a postX begin)");
+        }
+    }
+}
+
+/*--------------------------------------------------------------------------
+ * Dispatch
+ *-------------------------------------------------------------------------*/
 
 static bool apply_one(OlcOpContext &ctx, const Json::Value &op, Json::Value &res,
                       DLString &kind, int &vnum, DLString &error)
@@ -525,91 +1912,47 @@ static bool apply_one(OlcOpContext &ctx, const Json::Value &op, Json::Value &res
     if (action.empty())
         action = "cmd";
 
-    if (kind != "room" && kind != "mob" && kind != "obj") {
-        error = "kind must be room, mob or obj";
-        return false;
-    }
-
-    if (action != "get" && action != "cmd" && action != "set") {
-        error = "action must be get, cmd or set";
-        return false;
-    }
-
-    if (!op_vnum(op, vnum, error))
-        return false;
-
     res["kind"] = kind;
+
+    if (kind == "quest")
+        return quest_op(ctx, action, op, res, vnum, error);
+
+    bool prototype = kind == "room" || kind == "mob" || kind == "obj";
+
+    if (!prototype && kind != "area" && kind != "reset") {
+        error = "kind must be room, mob, obj, reset, area or quest";
+        return false;
+    }
+
+    if (prototype && action == "create") {
+        if (!op_create(ctx, kind, op, res, vnum, error))
+            return false;
+        return true;
+    }
+
+    if (prototype && action != "get" && action != "cmd" && action != "set"
+        && action != "delete" && action != "put")
+    {
+        error = kind + " action must be get, create, cmd, set, delete or put";
+        return false;
+    }
+
+    if (!op_number(ctx, op, "vnum", vnum, error, kind == "area" ? 0 : 1))
+        return false;
+
     res["vnum"] = vnum;
 
-    if (kind == "room") {
-        RoomIndexData *pRoom = get_room_index(vnum);
-        Room *room = pRoom ? get_room_instance(vnum) : 0;
-        if (!room) {
-            error = "Room vnum " + DLString(vnum) + " not found";
-            return false;
-        }
+    if (kind == "area")
+        return area_op(ctx, action, vnum, op, res, error);
 
-        if (action == "get") {
-            // XMLDocument::save writes UTF-8, and the response converts the
-            // whole JSON from KOI8: bring the XML to KOI8 like every other field.
-            res["xml"] = utf2koi(olc_room_to_xml(pRoom));
-            return true;
-        }
+    if (kind == "reset")
+        return reset_op(ctx, action, vnum, op, res, error);
 
-        OlcOpLine line;
-        if (!op_line(op, action, line, error))
-            return false;
-
-        // Room subcommands edit the prototype of the room the actor stands in.
-        ctx.ch->in_room = room;
-
-        OLCStateRoom::Pointer sr(NEW);
-        sr->room.setValue(vnum);
-        // No original room: a throwing subcommand's detach returns early
-        // instead of moving the actor.
-        sr->originalRoom.setValue(0);
-        return run_on_state(sr, ctx, line, pRoom->behaviors, res, error);
-    }
-
-    if (action == "get") {
-        error = "get is rooms only for now, use action cmd with 'show'";
-        return false;
-    }
-
-    OlcOpLine line;
-    if (!op_line(op, action, line, error))
-        return false;
-
-    Room *limbo = get_room_instance(ROOM_VNUM_LIMBO);
-    if (!limbo) {
-        error = "Limbo room instance not found";
-        return false;
-    }
-    ctx.ch->in_room = limbo;
-
-    if (kind == "mob") {
-        MOB_INDEX_DATA *pMob = get_mob_index(vnum);
-        if (!pMob || !pMob->area) {
-            error = "Mobile vnum " + DLString(vnum) + " not found";
-            return false;
-        }
-
-        OLCStateMobile::Pointer state(NEW, pMob);
-        return run_on_state(state, ctx, line, pMob->behaviors, res, error);
-    }
-
-    OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
-    if (!pObj || !pObj->area) {
-        error = "Object vnum " + DLString(vnum) + " not found";
-        return false;
-    }
-
-    OLCStateObject::Pointer state(NEW, pObj);
-    return run_on_state(state, ctx, line, pObj->behaviors, res, error);
+    return prototype_op(ctx, kind, action, vnum, op, res, error);
 }
 
 Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
-                          OlcPolicy policy, bool dryRun, bool verbose)
+                          OlcPolicy policy, bool dryRun, bool verbose, bool save)
 {
     Json::Value result;
     result["ok"] = true;
@@ -617,7 +1960,7 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
     result["profile"] = policyName(policy);
     result["changed"] = Json::Value(Json::arrayValue);
     result["errors"] = Json::Value(Json::arrayValue);
-    // Validators (phase 2) report here.
+    // Structural findings; the validators (phase 2) report here too.
     result["warnings"] = Json::Value(Json::arrayValue);
     result["results"] = Json::Value(Json::arrayValue);
     result["skipped"] = 0;
@@ -649,6 +1992,8 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
     ctx.policy = policy;
     ctx.dryRun = dryRun;
     ctx.verbose = verbose;
+    ctx.opIndex = 0;
+    ctx.warnings = &result["warnings"];
 
     std::set<std::pair<DLString, int> > changed;
     Json::Value::ArrayIndex i;
@@ -660,6 +2005,7 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
         int vnum = 0;
 
         res["op"] = (int)i;
+        ctx.opIndex = (int)i;
 
         bool ok;
         // One bad op (an out of range number, a throwing handler) must not
@@ -673,11 +2019,14 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
         res["ok"] = ok;
         result["results"].append(res);
 
+        // A reset edit changes its room; a quest step, its quest.
+        DLString changedKind = kind == "reset" ? DLString("room") : kind;
+
         if (res.isMember("changed") && res["changed"].asBool()
-            && changed.insert(std::make_pair(kind, vnum)).second)
+            && changed.insert(std::make_pair(changedKind, vnum)).second)
         {
             Json::Value c;
-            c["kind"] = kind;
+            c["kind"] = changedKind;
             c["vnum"] = vnum;
             result["changed"].append(c);
         }
@@ -691,14 +2040,33 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
         result["errors"].append(err);
         result["ok"] = false;
 
-        bool cont = op.isObject() && op.isMember("continueOnError") && op["continueOnError"].isBool()
-                    && op["continueOnError"].asBool();
-        if (!cont) {
+        if (!op_bool(op, "continueOnError")) {
             i++;
             break;
         }
     }
 
     result["skipped"] = (int)(ops.size() - i);
+
+    if (!dryRun)
+        quest_pairing_warnings(ctx);
+
+    if (save && !dryRun && !result["changed"].empty()) {
+        std::list<AreaIndexData *> saved;
+        int failed = save_changed_areas(actor, saved);
+
+        result["saved"] = Json::Value(Json::arrayValue);
+        for (auto &pArea: saved)
+            result["saved"].append(pArea->area_file->file_name);
+
+        if (failed > 0) {
+            Json::Value err;
+            err["op"] = -1;
+            err["error"] = "asave changed: " + DLString(failed) + " area(s) failed to save";
+            result["errors"].append(err);
+            result["ok"] = false;
+        }
+    }
+
     return result;
 }

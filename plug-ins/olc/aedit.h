@@ -12,6 +12,8 @@
 #include "xmlflags.h"
 #include "xmlmultistring.h"
 
+class AreaQuest;
+
 class OLCStateArea : public OLCStateTemplate<OLCStateArea>,
                      public virtual OLCState
 {
@@ -26,7 +28,16 @@ public:
     virtual void commit();
     virtual void changed( PCharacter * );
 
+    virtual DLString getJournalKind( ) const;
+    virtual int getJournalVnum( ) const;
+
     bool checkOverlap(int lower, int upper);
+
+    /** 'quest create [<vnum>]': a new empty quest in the area, the first free
+     *  vnum of its range when argVnum is empty. 0 with the reason told to ch. */
+    static AreaQuest *questCreate(PCharacter *ch, AreaIndexData *original, const DLString &argVnum);
+    /** 'quest delete <vnum>'. The quest's Fenia handlers stay: 'cs search <vnum>'. */
+    static bool questDelete(PCharacter *ch, AreaIndexData *original, const DLString &arg);
 
     XML_VARIABLE XMLInteger vnum, security;
     XML_VARIABLE XMLInteger low_range, high_range, min_vnum, max_vnum;

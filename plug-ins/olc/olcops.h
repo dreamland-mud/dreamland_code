@@ -17,33 +17,54 @@ enum OlcPolicy {
 /**
  * Typed, non-interactive OLC operations over the existing editors.
  *
- * An op is a JSON object (strings UTF-8):
- *   kind    "room" | "mob" | "obj"
- *   action  "get"  room XML (rooms only)
- *           "cmd"  one editor subcommand line in "cmd", e.g. "sector forest"
- *           "set"  "field" + "value" [+ "lang" en|ru|ua]: a text field
- *                  (name, short, long, desc, sound, smell, also as rudesc,
- *                  uaname...) goes through paste, "clear": true empties it;
- *                  any other field runs as "<field> <value>"
- *   vnum    prototype vnum
- *   text    optional editor buffer for a "cmd" paste subcommand
+ * An op is a JSON object (strings UTF-8). Kinds and actions:
+ *   room | mob | obj, by "vnum":
+ *     get     compact JSON in "data" (the area save serializer's fields),
+ *             "fields": [...] picks top-level keys; "format": "xml" gives "xml"
+ *     create  "vnum": <n> or "next" with "area": <area vnum>; "ref": "name"
+ *             lets later ops say "$name" for the new vnum
+ *     set     "field" + "value" [+ "lang" en|ru|ua]: a text field (name,
+ *             short, long, desc, sound, smell, message, speedwalk, preposition,
+ *             title, also as rudesc, uaname...) goes through paste, "clear": true
+ *             empties it; any other field runs as "<field> <value>"
+ *     cmd     one editor subcommand line in "cmd" (+ "text" for a paste form)
+ *     delete  the prototype (mob/obj: tombstone until the next save; room:
+ *             refused while anybody or anything is in it, it has resets, or an
+ *             exit or reset elsewhere leads to it), or one part of it:
+ *             "exit": <dir> [+ "unlink": true], "eexit": <keyword>, "ed": <keyword>
+ *     put     "xml": a whole prototype as the area file writes it; mob and obj
+ *             are replaced or created, a room only created under a free vnum
+ *   reset, by room "vnum":
+ *     get, add ("mob" + "max", "maxRoom" | "obj" + "to": room | inside (+
+ *     "container", "limit", "count") | <wearloc>; "after": <n> places it),
+ *     delete ("number"), set ("number", "field": flag|rand|tier|wearloc,
+ *     "value"), randomize (shuffle exits)
+ *   area, by area "vnum": get, set, cmd (names, levels, vnums, flags, authors,
+ *     speedwalk, 'reset'...)
+ *   quest, by quest "vnum": get, create ("vnum" | "next" + "area"), set, cmd,
+ *     delete, step ("step": <n> | "add", "begin"/"end": {type, vnum, trigger},
+ *     "info": {en, ru, ua}, "qp", "gold", "exp", "item", "delete": true)
  *   continueOnError  optional, keep going when this op fails
  *
- * Each op attaches a fresh editor state, runs one subcommand, commits and
- * detaches, exactly as the /redit, /medit, /oedit servlets do.
+ * Editing ops attach a fresh editor state, run one subcommand, commit and
+ * detach, exactly as the /redit, /medit, /oedit servlets do. Every applied op
+ * goes to the journal.
  *
  * Returns {ok, dryRun, changed[{kind,vnum}], errors[{op,error}], warnings[],
- * results[{op, ok, changed, xml?, output?}], skipped}. Strings in the result
- * are KOI8, as everywhere inside the engine.
+ * results[{op, ok, kind, vnum, changed, data? | xml?, output?}], skipped,
+ * saved[]?}. Strings in the result are KOI8, as everywhere inside the engine.
+ * Warnings name structural trouble the batch left, such as quest steps that
+ * break the pairing rule.
  *
  * dryRun applies nothing: room subcommands edit the prototype in place, so
  * there is no copy to try them on. A dry run parses every op, resolves the
- * vnum and the subcommand and runs the refusals, then stops.
+ * vnums (a create reserves its vnum for the rest of the batch) and runs the
+ * refusals, then stops. save writes every changed area after a real batch.
  */
 class OlcOps {
 public:
     static Json::Value apply(PCharacter *actor, const Json::Value &ops,
-                             OlcPolicy policy, bool dryRun, bool verbose);
+                             OlcPolicy policy, bool dryRun, bool verbose, bool save);
 
     static const char * policyName(OlcPolicy policy);
     static bool policyLookup(const DLString &name, OlcPolicy &policy);

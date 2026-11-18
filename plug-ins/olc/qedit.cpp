@@ -72,6 +72,16 @@ void OLCStateAreaQuest::statePrompt(Descriptor *d)
     d->send( "Quest> " );
 }
 
+DLString OLCStateAreaQuest::getJournalKind( ) const
+{
+    return "quest";
+}
+
+int OLCStateAreaQuest::getJournalVnum( ) const
+{
+    return vnum.getValue();
+}
+
 void OLCStateAreaQuest::changed( PCharacter *ch )
 {
     isChanged = true;
@@ -240,25 +250,50 @@ static DLString show_step_reward(PCharacter *ch, const QuestStep::Pointer &step)
     return buf.str();
 }
 
+// The trigger kind without its 'on'/'post' prefix: onSpeech ends a step,
+// postSpeech starts the next one.
+static DLString step_trigger_kind(const DLString &trigger, const char *prefix)
+{
+    DLString p = prefix;
+
+    if (trigger.size() >= p.size() && trigger.substr(0, p.size()) == p)
+        return trigger.substr(p.size());
+
+    return trigger;
+}
+
+int qedit_step_pairing(AreaQuest *q, int s)
+{
+    if (s < 0 || s + 1 >= (int)q->steps.size())
+        return STEP_PAIR_OK;
+
+    auto &step = q->steps[s];
+    auto &nextStep = q->steps[s+1];
+    int result = STEP_PAIR_OK;
+
+    // Both triggers sit on the same mob/obj/room.
+    if (step->endType != nextStep->beginType || step->endValue != nextStep->beginValue)
+        result |= STEP_PAIR_TARGET;
+
+    // onSpeech ends this step, postSpeech begins the next.
+    if (step_trigger_kind(step->endTrigger, "on") != step_trigger_kind(nextStep->beginTrigger, "post"))
+        result |= STEP_PAIR_TRIGGER;
+
+    return result;
+}
+
 // Display any warnings for this step, such as mismatched begin/end triggers
 static DLString show_step_errors(PCharacter *ch, AreaQuest *q, int s)
 { 
     ostringstream buf;
-    auto &step = q->steps[s];
+    int pairing = qedit_step_pairing(q, s);
 
-    if (s == q->steps.size() - 1)
-        return DLString::emptyString;
-
-    auto &nextStep = q->steps[s+1];
-
-    // Check that triggers are on the same mob/obj
-    if (step->endType != nextStep->beginType || step->endValue != nextStep->beginValue)
+    if (pairing & STEP_PAIR_TARGET)
         buf << "{RОшибка: не совпадает цель у тригеров конца этого шага и начала следующего." << endl;
 
-    // Check for onSpeech/postSpeech pairs
-    if (step->endTrigger.substr(2) != nextStep->beginTrigger.substr(4))
-        buf << "{RОшибка: не совпадает тип тригеров конца этого шага (" << step->endTrigger << ") " 
-            << "и начала следующего (" << nextStep->beginTrigger << ")." << endl;
+    if (pairing & STEP_PAIR_TRIGGER)
+        buf << "{RОшибка: не совпадает тип тригеров конца этого шага (" << q->steps[s]->endTrigger << ") " 
+            << "и начала следующего (" << q->steps[s+1]->beginTrigger << ")." << endl;
 
     return buf.str();
 }

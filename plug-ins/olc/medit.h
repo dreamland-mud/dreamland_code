@@ -23,6 +23,10 @@ public:
 
     virtual void commit( );
     virtual void changed( PCharacter * );
+
+    /** 'delete <vnum>': flag the prototype for removal on the next area save.
+     *  Returns it, or 0 with the reason told to ch. */
+    static MOB_INDEX_DATA *markDeleted( PCharacter *, const char * );
     virtual DLString getJournalKind( ) const;
     virtual int getJournalVnum( ) const;
 

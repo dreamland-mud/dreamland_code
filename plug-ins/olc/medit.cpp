@@ -622,32 +622,10 @@ MEDIT(props)
 
 MEDIT(create)
 {
-    AreaIndexData *pArea;
-    int value;
+    int value = olc_create_vnum(ch, ch->in_room->areaIndex(), argument, OLC_NDX_MOB);
 
-    value = atoi(argument);
-    if (argument[0] == '\0' || value == 0) {
-        stc("Syntax:  medit create [vnum]\n\r", ch);
+    if (value < 0)
         return false;
-    }
-
-    pArea = get_vnum_area(value);
-
-    if (!pArea) {
-        stc("OLCStateMobile:  That vnum is not assigned an area.\n\r", ch);
-        return false;
-    }
-
-    if (!can_edit( ch, value )) {
-        stc("OLCStateMobile:  Vnum in an area you cannot build in.\n\r", ch);
-        return false;
-    }
-
-    if (get_mob_index(value)) {
-        stc("OLCStateMobile:  Mobile vnum already exists.\n\r", ch);
-        return false;
-    }
-
 
     Pointer me(NEW, value);
     me->attach(ch);
@@ -656,46 +634,53 @@ MEDIT(create)
     return true;
 }
 
-MEDIT(delete)
+// Flag the prototype for removal. It stays in memory (and live instances
+// survive) until the next boot; XMLArea::init drops ACT_DELETED prototypes
+// when writing the area to disk, so 'asave' makes it stick.
+MOB_INDEX_DATA * OLCStateMobile::markDeleted(PCharacter *ch, const char *argument)
 {
-    AreaIndexData *pArea;
     int value;
 
-    value = atoi(argument);
-    if (argument[0] == '\0' || value == 0) {
-        stc("Syntax:  medit delete [vnum]\n\r", ch);
-        return false;
+    if (!is_number(argument) || (value = atoi(argument)) <= 0) {
+        stc("Syntax:  medit delete <vnum>\n\r", ch);
+        return 0;
     }
 
-    pArea = get_vnum_area(value);
-
+    AreaIndexData *pArea = get_vnum_area(value);
     if (!pArea) {
-        stc("OLCStateMobile:  That vnum is not assigned an area.\n\r", ch);
-        return false;
+        stc("MEdit:  That vnum is not assigned an area.\n\r", ch);
+        return 0;
     }
 
     if (!can_edit( ch, value )) {
-        stc("OLCStateMobile:  Vnum in an area you cannot build in.\n\r", ch);
-        return false;
+        stc("MEdit:  Vnum in an area you cannot build in.\n\r", ch);
+        return 0;
     }
 
-    // Mirror 'oedit delete': flag the prototype for removal. It stays in memory
-    // (and live instances survive) until the next boot; XMLArea::init drops
-    // ACT_DELETED prototypes when writing the area to disk, so 'asave' makes it stick.
     MOB_INDEX_DATA *pMob = get_mob_index(value);
     if (!pMob) {
         ptc(ch, "Моб %d не найден.\n\r", value);
-        return false;
+        return 0;
     }
 
     pArea->changed = true;
     SET_BIT(pMob->act, ACT_DELETED);
+    ptc(ch, "[%u] (%N1) помечен к удалению.\n\r", pMob->vnum, pMob->getShortDescr(LANG_DEFAULT));
+    return pMob;
+}
+
+MEDIT(delete)
+{
+    MOB_INDEX_DATA *pMob = markDeleted(ch, argument);
+
+    if (!pMob)
+        return false;
+
     // If we're deleting the mob currently open in this editor, flag the in-memory
     // snapshot too -- otherwise commit() (on 'done') writes the pre-delete snapshot
     // back over the prototype and silently clears the flag.
-    if (value == mob.vnum)
+    if (pMob->vnum == mob.vnum)
         SET_BIT(mob.act, ACT_DELETED);
-    ptc(ch, "[%u] (%N1) помечен к удалению.\n\r", pMob->vnum, pMob->getShortDescr(LANG_DEFAULT));
     return true;
 }
 
@@ -1426,7 +1411,6 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 {
     NPCharacter *mob;
     MOB_INDEX_DATA *pMob;
-    AreaIndexData *pArea;
     int value;
     char arg1[MAX_STRING_LENGTH];
 
@@ -1455,37 +1439,9 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
     else if (arg_is_strict(arg1, "create")) {
-        if (arg_is_strict(argument, "next")) {
-            value = next_mob_index(ch, ch->in_room->pIndexData);
-            if (value < 0) {
-                ch->pecho("Все внумы в этой зоне уже заняты!");
-                return;
-            }
-        }
-        else
-            value = atoi(argument);
-
-        if (arg1[0] == '\0' || value <= 0) {
-            stc("Syntax:  edit mobile create <vnum>|next\n\r", ch);
+        value = olc_create_vnum(ch, ch->in_room->areaIndex(), argument, OLC_NDX_MOB);
+        if (value < 0)
             return;
-        }
-
-        pArea = OLCState::get_vnum_area(value);
-
-        if (!pArea) {
-            stc("MEdit:  That vnum is not assigned an area.\n\r", ch);
-            return;
-        }
-
-        if (!OLCState::can_edit( ch, value )) {
-            stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
-            return;
-        }
-        
-        if (get_mob_index(value)) {
-            stc("OLCStateMobile:  Mobile vnum already exists.\n\r", ch);
-            return;
-        }
 
         OLCStateMobile::Pointer me(NEW, value);
         me->attach(ch);
@@ -1494,31 +1450,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     else if (arg_is_strict(arg1, "delete")) {
         // Top-level delete: no editor attached, so nothing can write a stale
         // snapshot back over the flag (see the in-editor MEDIT(delete) guard).
-        value = atoi(argument);
-        if (argument[0] == '\0' || value == 0) {
-            stc("Syntax:  medit delete <vnum>\n\r", ch);
-            return;
-        }
-
-        pArea = OLCState::get_vnum_area(value);
-        if (!pArea) {
-            stc("MEdit:  That vnum is not assigned an area.\n\r", ch);
-            return;
-        }
-        if (!OLCState::can_edit( ch, value )) {
-            stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
-            return;
-        }
-
-        pMob = get_mob_index(value);
-        if (!pMob) {
-            ptc(ch, "Моб %d не найден.\n\r", value);
-            return;
-        }
-
-        pArea->changed = true;
-        SET_BIT(pMob->act, ACT_DELETED);
-        ptc(ch, "[%u] (%N1) помечен к удалению.\n\r", pMob->vnum, pMob->getShortDescr(LANG_DEFAULT));
+        OLCStateMobile::markDeleted(ch, argument);
         return;
     } else if(arg_is_strict(arg1, "show")) {
         if(!*argument || !is_number(argument)) {
