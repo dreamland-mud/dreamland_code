@@ -212,7 +212,7 @@ struct OlcOpLine {
 
 // The editors' 'behaviors X' replaces the whole list and drops the props of
 // every behavior it removes. Over the API it is additive: 'X' adds,
-// '-X' removes, '= X Y' replaces the list as typed. Props of the behaviors
+// '-X' (or -'x y', '-x y') removes, '= X Y' replaces the list as typed. Props of the behaviors
 // that stay are untouched by editBehaviors, so nothing needs restoring.
 static bool additive_behaviors(const GlobalBitvector &current, DLString &arguments, DLString &error)
 {
@@ -231,10 +231,27 @@ static bool additive_behaviors(const GlobalBitvector &current, DLString &argumen
     std::set<int> final = current.toSet();
     DLString word;
 
-    while (!(word = args.getOneArgument()).empty()) {
-        bool remove = word.at(0) == '-';
+    for (;;) {
+        args.stripLeftWhiteSpace();
+        if (args.empty())
+            break;
+
+        // Both -'random weapon' and '-random weapon' remove: getOneArgument
+        // honours a quote only as the first character of a word.
+        bool remove = args.at(0) == '-';
         if (remove)
+            args.erase(0, 1);
+
+        word = args.getOneArgument();
+        if (!remove && !word.empty() && word.at(0) == '-') {
+            remove = true;
             word.erase(0, 1);
+        }
+
+        if (word.empty()) {
+            error = "Behavior name missing after '-'";
+            return false;
+        }
 
         Behavior *bhv = behaviorManager->findExisting(word);
         if (!bhv)
@@ -308,9 +325,14 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
     std::string::size_type mark = ctx.capture ? ctx.capture->getString().size() : 0;
 
     state->OLCState::attach(ctx.ch);
-    state->handle(ctx.ch->desc, &buf[0]);
-    if (name != "show")
-        state->commit();
+    try {
+        state->handle(ctx.ch->desc, &buf[0]);
+        if (name != "show")
+            state->commit();
+    } catch (...) {
+        state->OLCState::detach(ctx.ch);
+        throw;
+    }
     state->OLCState::detach(ctx.ch);
 
     res["changed"] = state->lastChanged;
@@ -359,7 +381,7 @@ static bool op_vnum(const Json::Value &op, int &vnum, DLString &error)
 {
     const Json::Value &v = op["vnum"];
 
-    if (v.isIntegral())
+    if (v.isInt())
         vnum = v.asInt();
     else if (v.isString() && DLString(v.asString()).isNumber())
         vnum = DLString(v.asString()).toInt();
@@ -397,9 +419,10 @@ static bool op_line(const Json::Value &op, const DLString &action, OlcOpLine &li
         if (!op_string(op, "cmd", cmd, error) || !op_string(op, "text", line.text, error))
             return false;
 
+        // getOneArgument trims only the left side: a desc set inline keeps
+        // its trailing newline, as in game.
         line.arguments = cmd;
         line.cmdName = line.arguments.getOneArgument();
-        line.arguments.stripWhiteSpace();
         line.hasText = !line.text.empty();
 
         if (line.cmdName.empty()) {
@@ -419,7 +442,23 @@ static bool op_line(const Json::Value &op, const DLString &action, OlcOpLine &li
         return false;
     }
 
-    if (is_text_field(field)) {
+    // 'rudesc' / 'uaname' name the language in the field itself.
+    DLString base = field;
+    if (field.size() > 2 && (field.substr(0, 2) == "ru" || field.substr(0, 2) == "ua")
+        && is_text_field(field.substr(2)))
+    {
+        DLString fieldLang = field.substr(0, 2);
+        if (!lang.empty() && lang != fieldLang) {
+            error = "field " + field + " and lang " + lang + " disagree";
+            return false;
+        }
+        lang = fieldLang;
+        base = field.substr(2);
+    }
+
+    bool clear = op.isMember("clear") && op["clear"].isBool() && op["clear"].asBool();
+
+    if (is_text_field(base)) {
         DLString prefix;
         if (lang.empty() || lang == "en")
             prefix = "";
@@ -430,17 +469,38 @@ static bool op_line(const Json::Value &op, const DLString &action, OlcOpLine &li
             return false;
         }
 
-        // Through paste, so a value like 'copy' or 'web' is never read as an editor keyword.
-        line.cmdName = prefix + field;
+        if (value.empty() && !clear) {
+            error = "value is empty: send clear:true to empty the field";
+            return false;
+        }
+
+        if (!value.empty() && clear) {
+            error = "clear:true takes no value";
+            return false;
+        }
+
+        // Through paste, so a value like 'copy' or 'web' is never read as an
+        // editor keyword. An empty buffer pasted on purpose clears the field.
+        line.cmdName = prefix + base;
         line.requiredName = line.cmdName;
         line.arguments = "paste";
         line.text = value;
-        line.hasText = !value.empty();
+        line.hasText = true;
         return true;
     }
 
     if (!lang.empty()) {
         error = field + " has no language variants";
+        return false;
+    }
+
+    if (clear) {
+        error = "clear:true is for text fields; other fields take their own value, e.g. 'clear' or 'none'";
+        return false;
+    }
+
+    if (value.empty()) {
+        error = "value is required for action set";
         return false;
     }
 
@@ -599,7 +659,15 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
 
         res["op"] = (int)i;
 
-        bool ok = apply_one(ctx, op, res, kind, vnum, error);
+        bool ok;
+        // One bad op (an out of range number, a throwing handler) must not
+        // lose the report of the ops already committed before it.
+        try {
+            ok = apply_one(ctx, op, res, kind, vnum, error);
+        } catch (const std::exception &e) {
+            ok = false;
+            error = DLString("Internal error: ") + e.what();
+        }
         res["ok"] = ok;
         result["results"].append(res);
 

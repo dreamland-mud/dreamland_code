@@ -19,8 +19,9 @@ void olc_servlet_cleanup_char(PCharacter *ch);
 void olc_servlet_seed_buffer(PCharacter *ch, const DLString &text);
 
 /** Non-empty error text when a resolved subcommand must not run over the API:
- *  done/cancel, create, a bare direction (would move the actor), or a paste
- *  without text (would paste an empty buffer and wipe the field). */
+ *  done/cancel, create, a bare direction (would move the actor), a paste
+ *  without text (would paste an empty buffer and wipe the field), or a line
+ *  longer than an input line (overflows the handlers' fixed buffers). */
 DLString olc_servlet_refusal(const DLString &cmdName, const DLString &arguments, bool hasText);
 
 /** Room prototype fields as XML, the built-in XMLRoom serializer (KOI8). */

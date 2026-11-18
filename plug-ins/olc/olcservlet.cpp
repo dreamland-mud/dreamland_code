@@ -60,6 +60,11 @@ static bool is_direction(const DLString &cmdName)
 
 DLString olc_servlet_refusal(const DLString &cmdName, const DLString &arguments, bool hasText)
 {
+    // OLCCommand::entryPoint and the handlers copy the line into fixed char
+    // buffers; in game the descriptor caps a line, over the API nothing does.
+    if (cmdName.size() + 1 + arguments.size() >= MAX_INPUT_LENGTH)
+        return "Too long for a command line, send the body in text and use the paste form";
+
     if (cmdName == "done" || cmdName == "cancel")
         return "Every call commits on its own, no " + cmdName + " needed";
 

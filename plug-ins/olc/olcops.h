@@ -22,7 +22,8 @@ enum OlcPolicy {
  *   action  "get"  room XML (rooms only)
  *           "cmd"  one editor subcommand line in "cmd", e.g. "sector forest"
  *           "set"  "field" + "value" [+ "lang" en|ru|ua]: a text field
- *                  (name, short, long, desc, sound, smell) goes through paste,
+ *                  (name, short, long, desc, sound, smell, also as rudesc,
+ *                  uaname...) goes through paste, "clear": true empties it;
  *                  any other field runs as "<field> <value>"
  *   vnum    prototype vnum
  *   text    optional editor buffer for a "cmd" paste subcommand

@@ -191,7 +191,9 @@ public:
             try {
                 if (((*state)->*method)( pch, args )) {
                     state->changed( pch );
-                    state->journal( pch, getName( ), argsCopy );
+                    // 'done' returns true without editing anything.
+                    if (getName( ) != "done")
+                        state->journal( pch, getName( ), argsCopy );
                 }
             } catch (const Exception &e) {
                 LogStream::sendError() << "OLC " << e.what() << endl;
