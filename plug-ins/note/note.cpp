@@ -58,7 +58,7 @@ inline bool argIsPlayer( const DLString &arg, const PCMemoryInterface *pcm )
 
 void Note::toStream( int vnum, ostringstream &buf, const DLString &from, const DLString &text ) const
 {
-    buf << "[" << vnum << "] "
+    buf << "[" << vnum << "] #" << getID( ) << " "
         << "{C" << from << "{x: "
         << getSubject( ) << "{x" << endl
         << getDate( ).getTimeAsString( ) << endl

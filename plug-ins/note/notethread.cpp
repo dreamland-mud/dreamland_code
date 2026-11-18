@@ -297,6 +297,17 @@ const Note * NoteThread::getNoteAtPosition( PCharacter *ch, int anum ) const
     return NULL;
 }
 
+const Note * NoteThread::getNoteById( PCharacter *ch, time_t id ) const
+{
+    NoteList::const_iterator i;
+
+    for (i = xnotes.begin( ); i != xnotes.end( ); i++) 
+        if ((*i)->getID( ) == id && ((*i)->isNoteTo( ch ) || (*i)->isNoteFrom( ch )))
+            return *i;
+
+    return NULL;
+}
+
 const NoteThread::NoteList & NoteThread::getNoteList( ) const
 {
     return xnotes;
