@@ -8,6 +8,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "skill_sound.h"
 
 void open_door_extra ( Character *ch, int door, void *pexit )
 {
@@ -106,6 +107,7 @@ void unlock_door( Character *ch, int door )
     ch->recho(_("%^C1 отпирает %O5 и открывает %w."), ch, key, &doorname);
 
     REMOVE_BIT(pexit->exit_info, EX_LOCKED | EX_CLOSED);
+    skill_sound( ch, 0, "skill/lockpick" );
 
     // unlock the other side
     if ((pexit_rev = direction_reverse(room, door)))

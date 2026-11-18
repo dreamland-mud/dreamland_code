@@ -18,6 +18,7 @@
 #include "merc.h"
 
 #include "def.h"
+#include "skill_sound.h"
 
 GSN(clanrecall);
 CLAN(none);
@@ -144,7 +145,8 @@ protected:
  */
 SKILL_RUNP( clanrecall )
 {
-    ClanRecallMovement( ch ).move( );
+    if (ClanRecallMovement( ch ).move( ) == RC_MOVE_OK)
+        skill_sound( ch, 0, "spell/travel" );
 }
 
 template <> 

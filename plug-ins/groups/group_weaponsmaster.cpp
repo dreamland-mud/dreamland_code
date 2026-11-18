@@ -48,6 +48,7 @@
 #include "fenia_utils.h"
 #include "def.h"
 #include "l10n.h"
+#include "skill_sound.h"
 
 RELIG(godiva);
 GSN(lash);
@@ -167,6 +168,7 @@ SKILL_RUNP( lash )
         int dam;
 
         gsn_lash->improve( ch, true, victim );
+        skill_sound( ch, victim, "spell/whip" );
         victim->setWait( gsn_lash->getBeats(victim) );
 
         dam = ch->damroll;

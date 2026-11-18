@@ -61,6 +61,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "skill_sound.h"
 
 GSN(backguard);
 GSN(backstab);
@@ -85,6 +86,7 @@ public:
     CircleOneHit( Character *ch, Character *victim );
 
     virtual void calcDamage( );
+    virtual void priorDamageEffects( );
 };
 
 CircleOneHit::CircleOneHit( Character *ch, Character *victim )
@@ -104,6 +106,13 @@ void CircleOneHit::calcDamage( )
     damApplyCounter( );
 
     WeaponOneHit::calcDamage( );
+}
+
+/* Only a blow that lands gets here: a roll to hit can still miss. */
+void CircleOneHit::priorDamageEffects( )
+{
+    skill_sound( ch, victim, "skill/stab" );
+    WeaponOneHit::priorDamageEffects( );
 }
 
 /*
@@ -312,6 +321,7 @@ SKILL_RUNP( forge )
 
         oldact(_("Ты изготавливаешь $o4 из $O2."), ch, dup, blank, TO_CHAR );
         oldact(_("$c1 изготавливает $o4."), ch, key, 0, TO_ROOM );
+        skill_sound( ch, 0, "skill/file" );
 
         gsn_key_forgery->improve( ch, true );
         extract_obj( blank );
@@ -343,6 +353,7 @@ SKILL_RUNP( forge )
 
         oldact(_("$o1 в твоих умелых руках постепенно превращается в отмычку для $N2."), ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
         oldact(_("$c1 проделывает манипуляции с $o5."), ch, blank, 0, TO_ROOM );
+        skill_sound( ch, 0, "skill/file" );
 
         // A branded lockpick keeps its owner's name for good, so the old
         // LANG_DEFAULT-only write meant an EN or UA thief carried a Russian item

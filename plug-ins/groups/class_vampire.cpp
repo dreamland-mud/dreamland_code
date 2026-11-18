@@ -42,6 +42,7 @@
 #include "def.h"
 #include "skill_utils.h"
 #include "l10n.h"
+#include "skill_sound.h"
 #include "fenia_utils.h"
 #include "logstream.h"
 
@@ -295,6 +296,7 @@ SKILL_RUNP( grave )
 
     oldact(_("$c1 выкапывает себе могилку и устраивается в ней со всеми удобствами."), ch, 0, 0, TO_ROOM);
     oldact(_("Ты выкапываешь себе могилку и устраиваешься в ней со всеми удобствами."), ch, 0, 0, TO_CHAR);
+    skill_sound( ch, 0, "skill/dig", true );
     gsn_grave->improve( ch, true );
 
     if (number_percent( ) < 2) {
@@ -675,6 +677,7 @@ SKILL_APPLY( bonedagger )
         oldact(_("$c1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!"), ch, 0, vch, TO_VICT);
         oldact(_("$c1 приковывает тень $C2 костяным ножом к земле!"), ch, 0, vch, TO_NOTVICT);
         oldact(_("Ты приковываешь тень $C2 костяным ножом к земле!"), ch, 0, vch, TO_CHAR);
+        skill_sound( ch, vch, "skill/stab" );
 
         af.type = gsn_bonedagger;
         af.level = ch->getModifyLevel( );

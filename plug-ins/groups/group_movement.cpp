@@ -53,6 +53,7 @@
 #include "def.h"
 #include "skill_utils.h"
 #include "l10n.h"
+#include "skill_sound.h"
 
 CLAN(battlerager);
 
@@ -178,7 +179,8 @@ protected:
 
 SKILL_RUNP( recall )
 {
-    TempleRecallMovement( ch ).move( );
+    if (TempleRecallMovement( ch ).move( ) == RC_MOVE_OK)
+        skill_sound( ch, 0, "spell/travel" );
 }
 
 

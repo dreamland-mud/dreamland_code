@@ -15,6 +15,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "skill_sound.h"
 
 CMDRUNP( unlock )
 {
@@ -78,6 +79,7 @@ CMDRUNP( unlock )
 
             obj->value1(obj->value1() & ~EX_LOCKED);
             obj->value1(obj->value1() & ~EX_CLOSED);
+            skill_sound( ch, 0, "skill/lockpick" );
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
@@ -109,6 +111,7 @@ CMDRUNP( unlock )
 
                 obj->value1(obj->value1() & ~CONT_LOCKED);
                 obj->value1(obj->value1() & ~CONT_CLOSED);
+                skill_sound( ch, 0, "skill/lockpick" );
 
             } else if (!canLock && obj->value2() <= 0) {
                 ch->pecho(_("%^O1 -- чья-то личная собственность, ключ есть только у хозяина или хозяйки."), obj);
@@ -197,6 +200,7 @@ CMDRUNP( unlock )
         ch->recho(_("%^C1 отпирает %O5 и открывает %N4."), ch, key, peexit->short_desc_from.getForLang(viewerLang(ch)).c_str());
 
         REMOVE_BIT(peexit->exit_info, EX_LOCKED | EX_CLOSED);
+        skill_sound( ch, 0, "skill/lockpick" );
 
         return;
     }
