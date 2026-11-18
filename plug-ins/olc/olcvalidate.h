@@ -62,8 +62,9 @@ struct OlcFinding {
     DLString field;
     DLString lang;
     DLString message;    // KOI8, like every engine string
+    bool audit;          // set by the caller: a 'validate' op named this prototype
 
-    OlcFinding() : vnum(0) { }
+    OlcFinding() : vnum(0), audit(false) { }
 };
 
 typedef std::vector<OlcFinding> OlcFindings;
@@ -76,8 +77,9 @@ void olc_validate_area(AreaIndexData *pArea, OlcFindings &out);
 /** The header and every room, mob and object prototype of the area. */
 void olc_validate_area_all(AreaIndexData *pArea, OlcFindings &out);
 
-/** A resolved editor subcommand that sets a numeric or power field: the player
- *  profile may not run it (phase 5 replaces this with a whitelist). */
+/** A resolved editor subcommand that sets a numeric or power field. Unreachable
+ *  while OlcOps::apply refuses the player profile; phase 5 replaces this
+ *  blacklist with a whitelist. */
 bool olc_power_field(const DLString &cmdName);
 
 #endif

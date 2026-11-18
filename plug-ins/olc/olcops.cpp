@@ -1,4 +1,5 @@
 #include <time.h>
+#include <algorithm>
 #include <ctype.h>
 #include <list>
 #include <map>
@@ -2004,8 +2005,10 @@ static int severity_rank(const DLString &severity)
 }
 
 /** Runs the chain on every prototype the batch changed and every one a
- *  'validate' op named, applies the profile and fills findings[] and
- *  findingsSummary. Returns the number of errors. */
+ *  'validate' op named, applies the profile and fills findingsSummary, and
+ *  findings[]: what 'validate' named always, the rest of an edit batch only
+ *  with verbose or strict (legacy prototypes carry a backlog of warnings that
+ *  would ride along with every typo fix). Returns the number of errors. */
 static int run_validators(OlcOpContext &ctx, const std::set<std::pair<DLString, int> > &changed,
                           bool strict, Json::Value &result)
 {
@@ -2018,6 +2021,7 @@ static int run_validators(OlcOpContext &ctx, const std::set<std::pair<DLString, 
     for (auto &t: targets) {
         const DLString &kind = t.first;
         int vnum = t.second;
+        size_t from = findings.size();
 
         // A deleted prototype is gone or a tombstone: nothing to check.
         if (kind == "room" && vnum > 0)
@@ -2033,6 +2037,10 @@ static int run_validators(OlcOpContext &ctx, const std::set<std::pair<DLString, 
             else
                 olc_validate_area(pArea, findings);
         }
+
+        if (ctx.validate.count(t))
+            for (size_t k = from; k < findings.size(); k++)
+                findings[k].audit = true;
     }
 
     // The profile decides what a finding means: the player profile and a
@@ -2065,7 +2073,9 @@ static int run_validators(OlcOpContext &ctx, const std::set<std::pair<DLString, 
         DLString key = f.severity + " " + f.check;
         summary[key] = summary.isMember(key) ? summary[key].asInt() + 1 : 1;
 
-        if ((f.severity == "info" && !ctx.verbose) || list.size() >= cap) {
+        if ((f.severity == "info" && !ctx.verbose) || list.size() >= cap
+            || (!f.audit && !ctx.verbose && !strict))
+        {
             hidden++;
             continue;
         }
@@ -2189,6 +2199,19 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
         return result;
     }
 
+    // The player profile waits for phase 5 and its field whitelist. The player
+    // gates below (powerFields, put/delete/area/reset/quest refusals) are a
+    // blacklist and stay unreachable until P5 replaces them with the whitelist.
+    if (policy == OLC_POLICY_PLAYER) {
+        Json::Value err;
+        err["op"] = -1;
+        err["error"] = "the player profile is not available until phase 5";
+        result["errors"].append(err);
+        result["ok"] = false;
+        result["skipped"] = (int)ops.size();
+        return result;
+    }
+
     OlcOpContext ctx;
     ctx.ch = actor;
     ctx.capture = actor->desc
@@ -2267,6 +2290,10 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
         result["errors"].append(err);
         result["ok"] = false;
     }
+
+    // Say so explicitly when a requested save did not run.
+    if (save && !dryRun && validationErrors > 0)
+        result["saved"] = Json::Value(Json::arrayValue);
 
     if (save && !dryRun && validationErrors == 0 && !result["changed"].empty()) {
         std::list<AreaIndexData *> saved;

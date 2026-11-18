@@ -116,8 +116,10 @@ DLString olc_room_to_xml(RoomIndexData *pRoom)
  * Auth: bottype=telegram, token=<ops token>
  * Args: ops (array), dryRun (bool), verbose (bool: editor echo for every op,
  *       info findings), save (bool: 'asave changed' after the batch),
- *       strict (bool: agent profile, validator warnings become errors),
- *       profile (immortal|agent|player, default agent), actor (name for the journal)
+ *       strict (bool: agent profile, validator warnings become errors and every
+ *       finding is listed),
+ *       profile (immortal|agent, default agent; player is refused until phase 5),
+ *       actor (name for the journal)
  *
  * Example: Russian room name and an object short description in one batch
  *   curl -s 'http://localhost:1235/olc' -d '{"token":"<secret>","bottype":"telegram","args":{"ops":[

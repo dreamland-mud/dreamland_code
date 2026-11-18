@@ -7,9 +7,8 @@
 class PCharacter;
 
 /** Who an op batch runs for; it decides what a validator finding means
- *  (olcvalidate.h): immortal = warning, agent = warning or error with strict,
- *  player = error, plus no numeric/power fields and no put, area, reset or
- *  quest writes (phase 5 replaces that with a whitelist). */
+ *  (olcvalidate.h): immortal = warning, agent = warning or error with strict.
+ *  player is refused until phase 5 brings its field whitelist. */
 enum OlcPolicy {
     OLC_POLICY_IMMORTAL,
     OLC_POLICY_AGENT,
@@ -67,9 +66,11 @@ enum OlcPolicy {
  *
  * Validators: after the ops, every prototype the batch changed (a reset counts
  * as its room, an area op as the area header) and every one a 'validate' op
- * named goes through the chain in olcvalidate.h. Info findings are listed only
- * with verbose, the list is capped (summary counts all). Any finding the
- * profile makes an error turns ok false and skips save. There is no rollback:
+ * named goes through the chain in olcvalidate.h. findingsSummary counts every
+ * finding; findings[] lists those of 'validate' targets, and those of edited
+ * prototypes only with verbose or strict. Info findings need verbose, the list
+ * is capped. Any finding the profile makes an error turns ok false and skips
+ * save (saved: [] when save was asked for). There is no rollback:
  * the editors apply in place, so the edits stay in memory and the autosave
  * writes them like any other change.
  *

@@ -276,7 +276,8 @@ static void check_mixed_script(OlcCheck &c, const DLString &field, const DLStrin
     c.flag("text.mixed_script", field, lang, "Latin and Cyrillic letters in one word: " + list);
 }
 
-/** text.colour: the last colour opened is reset before the end. Visibility
+/** text.colour: the last colour opened is reset before the end ({x, {X or a
+ *  {2 restore; {w is plain white, a colour like any other). Visibility
  *  tags ({l {n {s {A {S {T {I {F {h) take one parameter character and are no colour. */
 static void check_colour(OlcCheck &c, const DLString &field, const DLString &lang, const DLString &text)
 {
@@ -296,11 +297,11 @@ static void check_colour(OlcCheck &c, const DLString &field, const DLString &lan
             i++;
             continue;
         }
-        if (t == 'x' || t == 'X' || t == 'w' || t == '2') {
+        if (t == 'x' || t == 'X' || t == '2') {
             open = false;
             continue;
         }
-        if (strchr("bcgmryBCGMRWYD", t)) {
+        if (strchr("bcgmrwyBCGMRWYD", t)) {
             open = true;
             last = t;
         }
@@ -958,8 +959,9 @@ void olc_validate_area_all(AreaIndexData *pArea, OlcFindings &out)
  *-------------------------------------------------------------------------*/
 
 // Resolved editor subcommands (redit/medit/oedit OLC_CMD names) that set a
-// number, a flag, a power source or code. Conservative on purpose: phase 5
-// replaces this list with a whitelist of what a player may build.
+// number, a flag, a power source or code. Unreachable for now: OlcOps::apply
+// refuses the player profile until phase 5, which replaces this blacklist
+// with a whitelist (a blacklist leaks: delete, purge, exits, sex...).
 static const char *powerFields[] = {
     "level", "hitdice", "manadice", "damdice", "ac", "hitroll", "wealth",
     "tier", "tierstyle", "affects", "noaffects", "oaff", "detection",
