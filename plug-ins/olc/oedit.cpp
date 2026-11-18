@@ -827,33 +827,46 @@ OEDIT(cost)
     return numberEdit(0, 1000000, obj.xml_cost);
 }
 
-OEDIT(create)
+// Flag the prototype for removal: XMLArea::init leaves ITEM_DELETED
+// prototypes out of the area file on the next save.
+OBJ_INDEX_DATA * OLCStateObject::markDeleted(PCharacter *ch, const char *argument)
 {
-    AreaIndexData *pArea;
     int value;
 
-    value = atoi(argument);
-    if (argument[0] == '\0' || value == 0) {
-        stc("Syntax:  oedit create [vnum]\n\r", ch);
-        return false;
+    if (!is_number(argument) || (value = atoi(argument)) <= 0) {
+        stc("Syntax:  edit object delete <vnum>\n\r", ch);
+        return 0;
     }
 
-    pArea = get_vnum_area(value);
+    AreaIndexData *pArea = get_vnum_area(value);
     if (!pArea) {
         stc("OEdit:  That vnum is not assigned an area.\n\r", ch);
-        return false;
+        return 0;
     }
 
     if (!can_edit(ch, value)) {
         stc("OEdit:  Vnum in an area you cannot build in.\n\r", ch);
-        return false;
+        return 0;
     }
 
-    if (get_obj_index(value)) {
-        stc("OEdit:  Object vnum already exists.\n\r", ch);
-        return false;
+    OBJ_INDEX_DATA *obji = get_obj_index(value);
+    if (!obji) {
+        ptc(ch, "Предмет %d не найден.\n\r", value);
+        return 0;
     }
 
+    pArea->changed = true;
+    SET_BIT(obji->extra_flags, ITEM_DELETED);
+    ptc(ch, "[%u] (%N1) помечен к удалению.\n\r", obji->vnum, obji->getShortDescr(LANG_DEFAULT));
+    return obji;
+}
+
+OEDIT(create)
+{
+    int value = olc_create_vnum(ch, ch->in_room->areaIndex(), argument, OLC_NDX_OBJ);
+
+    if (value < 0)
+        return false;
 
     Pointer oe(NEW, value);
     oe->attach( ch );
@@ -1113,7 +1126,6 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 {
     Object *obj;
     OBJ_INDEX_DATA *pObj;
-    AreaIndexData *pArea;
     char arg1[MAX_STRING_LENGTH];
     int value;
 
@@ -1141,71 +1153,15 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         oe->findCommand(ch, "show")->entryPoint(ch, "");
         return;
     } else if (arg_is_strict(arg1, "create")) {
-        if (arg_is_strict(argument, "next")) {
-            value = next_obj_index(ch, ch->in_room->pIndexData);
-            if (value < 0) {
-                ch->pecho("Все внумы в этой зоне уже заняты!");
-                return;
-            }
-        }
-        else
-            value = atoi(argument);
-
-        if (argument[0] == '\0' || value <= 0) {
-            stc("Syntax:  edit object create <vnum>|next\n\r", ch);
+        value = olc_create_vnum(ch, ch->in_room->areaIndex(), argument, OLC_NDX_OBJ);
+        if (value < 0)
             return;
-        }
-
-        pArea = OLCState::get_vnum_area(value);
-
-        if (!pArea) {
-            stc("OEdit:  That vnum is not assigned an area.\n\r", ch);
-            return;
-        }
-
-        if (!OLCState::can_edit(ch, value)) {
-            stc("У тебя недостаточно прав для редактирования предметов.\n\r", ch);
-            return;
-        }
-
-        if (get_obj_index(value)) {
-            stc("OEdit:  Object vnum already exists.\n\r", ch);
-            return;
-        }
 
         OLCStateObject::Pointer oe(NEW, value);
         oe->attach(ch);
         return;
     } else if (arg_is_strict(arg1, "delete")) {
-        OBJ_INDEX_DATA *obji = NULL;
-
-        value = atoi(argument);
-        if (argument[0] == '\0' || value == 0) {
-            stc("Syntax:  edit object delete [vnum]\n\r", ch);
-            return;
-        }
-
-        pArea = OLCState::get_vnum_area(value);
-
-        if (!pArea) {
-            stc("OEdit:  That vnum is not assigned an area.\n\r", ch);
-            return;
-        }
-
-        if (!OLCState::can_edit(ch, value)) {
-            stc("У тебя недостаточно прав для редактирования предметов.\n\r", ch);
-            return;
-        }
-
-        obji = get_obj_index(value);
-
-        if (obji) {
-            pArea->changed = true;
-            SET_BIT(obji->extra_flags, ITEM_DELETED);
-            ptc(ch, "[%u] (%N1) помечен к удалению.\n\r", obji->vnum, obji->getShortDescr(LANG_DEFAULT));
-        }
-        else
-            ptc(ch, "Предмет %d не найден.\n\r", value);
+        OLCStateObject::markDeleted(ch, argument);
         return;
 
     } else if(arg_is_strict(arg1, "show")) {

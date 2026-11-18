@@ -10,6 +10,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdarg.h>
+#include <algorithm>
 
 #include <config.h>
 
@@ -42,6 +43,9 @@
 #include "olc.h"
 #include "security.h"
 #include "feniatriggers.h"
+#include "hometown.h"
+#include "vnum.h"
+#include "descriptor.h"
 
 #include "def.h"
 
@@ -863,54 +867,143 @@ REDIT(rued, "экстра", "редактор экстра-описаний (ed 
 RoomIndexData *
 OLCStateRoom::redit_create(PCharacter *ch, char *argument)
 {
-    AreaIndexData *pArea;
-    RoomIndexData *pRoom;
-    int value;
+    int value = olc_create_vnum(ch, ch->in_room->areaIndex(), argument, OLC_NDX_ROOM);
 
-    EDIT_ROOM(ch, pRoom);
-
-    if(arg_is_strict(argument, "next")) {
-        value = next_room(ch, pRoom);
-        if (value < 0) {
-            ch->pecho("Все внумы в этой зоне уже заняты!");
-            return 0;
-        }
-    } else
-        value = atoi(argument);
-
-    if (argument[0] == '\0' || value <= 0) {
-        stc("Syntax:  create <vnum>\n\r", ch);
-        stc("         create next\n\r", ch);
+    if (value < 0)
         return 0;
-    }
 
-    pArea = get_vnum_area(value);
-    if (!pArea) {
-        stc("REdit:  That vnum is not assigned an area.\n\r", ch);
-        return 0;
-    }
-
-    if (!can_edit(ch, value)) {
-        stc("REdit:  Vnum in an area you cannot build in.\n\r", ch);
-        return 0;
-    }
-
-    if (get_room_index(value)) {
-        stc("REdit:  Room vnum already exists.\n\r", ch);
-        return 0;
-    }
-
-    pRoom = new RoomIndexData;
-    pRoom->vnum = value;
-    pRoom->areaIndex = get_vnum_area(value);
-
-    roomIndexMap[value] = pRoom;
-    pRoom->areaIndex->roomIndexes[value] = pRoom;
-
-    pRoom->create();
+    RoomIndexData *pRoom = createRoom(value);
 
     stc("Room created.\n\r", ch);
     return pRoom;
+}
+
+RoomIndexData * OLCStateRoom::createRoom(int vnum)
+{
+    RoomIndexData *pRoom = new RoomIndexData;
+    pRoom->vnum = vnum;
+    registerRoom(pRoom);
+    return pRoom;
+}
+
+void OLCStateRoom::registerRoom(RoomIndexData *pRoom)
+{
+    pRoom->areaIndex = get_vnum_area(pRoom->vnum);
+
+    roomIndexMap[pRoom->vnum] = pRoom;
+    pRoom->areaIndex->roomIndexes[pRoom->vnum] = pRoom;
+
+    pRoom->create();
+}
+
+// Rooms the engine or the world config names by vnum.
+static bool room_is_named_in_config(int vnum)
+{
+    static const int fixed[] = {
+        ROOM_VNUM_LIMBO, ROOM_VNUM_JAIL, ROOM_VNUM_REMORT, ROOM_VNUM_CHAT,
+        ROOM_VNUM_TEMPLE, ROOM_VNUM_ALTAR, ROOM_VNUM_HARBOUR,
+        ROOM_VNUM_BUREAU_1, ROOM_VNUM_BUREAU_2, ROOM_VNUM_BUREAU_3, 0
+    };
+
+    for (int i = 0; fixed[i]; i++)
+        if (fixed[i] == vnum)
+            return true;
+
+    for (int i = 0; i < hometownManager->size(); i++) {
+        Hometown *h = hometownManager->find(i);
+        if (h && (h->getRecall() == vnum || h->getAltar() == vnum || h->getPit() == vnum))
+            return true;
+    }
+
+    return false;
+}
+
+DLString OLCStateRoom::deleteRefusal(RoomIndexData *pRoom)
+{
+    int vnum = pRoom->vnum;
+    Room *room = pRoom->room;
+
+    if (room_is_named_in_config(vnum))
+        return "Room " + DLString(vnum) + " is a fixed engine or hometown room";
+
+    if (room && room->people)
+        return "Somebody is in room " + DLString(vnum) + ", move them out first";
+
+    if (room && room->contents)
+        return "Room " + DLString(vnum) + " has objects on the floor, purge them first";
+
+    if (!pRoom->resets.empty())
+        return "Room " + DLString(vnum) + " has resets, delete them first";
+
+    // redit 'done' moves the builder back to originalRoom and won't detach
+    // when that room is gone.
+    for (Descriptor *d = descriptor_list; d; d = d->next)
+        for (auto &h: d->handle_input) {
+            OLCStateRoom::Pointer sr = h.getDynamicPointer<OLCStateRoom>();
+            if (sr && (sr->originalRoom.getValue() == vnum || sr->room.getValue() == vnum))
+                return "A room editor is open on room " + DLString(vnum) + " or came from it";
+        }
+
+    for (auto &r: roomIndexMap) {
+        RoomIndexData *other = r.second;
+
+        if (other == pRoom)
+            continue;
+
+        for (int door = 0; door < DIR_SOMEWHERE; door++)
+            if (other->exit[door] && other->exit[door]->u1.vnum == vnum)
+                return "Room " + DLString(other->vnum) + " has an exit "
+                       + dirs[door].name + " to it, delete that exit first";
+
+        for (auto &eexit: other->extra_exits)
+            if (eexit->u1.vnum == vnum)
+                return "Room " + DLString(other->vnum) + " has an extra exit '"
+                       + String::toString(eexit->keyword) + "' to it, delete it first";
+
+        for (auto &reset: other->resets)
+            if ((reset->command == 'M' || reset->command == 'O') && reset->arg3 == vnum)
+                return "A reset in room " + DLString(other->vnum) + " loads into it";
+    }
+
+    return DLString::emptyString;
+}
+
+void OLCStateRoom::unregisterRoom(RoomIndexData *pRoom)
+{
+    // Prototype and instance stay allocated: Fenia wrappers, footprints and
+    // room affects may still hold the pointers. Nothing finds the room by vnum
+    // any more, and the next area save leaves it out of the file.
+    roomIndexMap.erase(pRoom->vnum);
+    pRoom->areaIndex->roomIndexes.erase(pRoom->vnum);
+    pRoom->areaIndex->changed = true;
+
+    Room *room = pRoom->room;
+    if (!room)
+        return;
+
+    if (room->area)
+        room->area->rooms.erase(pRoom->vnum);
+
+    // Every random-room picker, update loop and trigger dispatch walks
+    // roomInstances or roomAffected: out of both, the room is never handed
+    // out again. The flags and the dropped exits cover a pointer someone
+    // kept: nobody can enter it and nothing leads out of it.
+    auto it = std::find(roomInstances.begin(), roomInstances.end(), room);
+    if (it != roomInstances.end())
+        roomInstances.erase(it);
+    for (unsigned int i = 0; i < roomInstances.size(); i++)
+        roomInstances[i]->position = i;
+    room->position = -1;
+    roomAffected.erase(room);
+
+    SET_BIT(room->room_flags, ROOM_IMP_ONLY|ROOM_NO_QUEST|ROOM_NO_MOB|ROOM_NO_VANISH|ROOM_NOWHERE);
+    for (int door = 0; door < DIR_SOMEWHERE; door++)
+        room->exit[door] = 0;
+    room->extra_exits.clear();
+
+    // A room created later under this vnum relinks the vnum's Fenia wrapper
+    // to itself; the ghost must not dispatch through it too.
+    room->wrapper = 0;
 }
 
 REDIT(create, "создать", "создать комнату с указанным внумом или next")

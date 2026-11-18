@@ -76,37 +76,28 @@ WEARLOC(sheath);
 using namespace std;
 
 
-enum {
-    NDX_ROOM,
-    NDX_OBJ,
-    NDX_MOB,
-};
-
-static int next_index_data( Character *ch, RoomIndexData *r, int ndx_type )
+int next_index_in_area( Character *ch, AreaIndexData *pArea, int ndx_type, const std::set<int> *skip )
 {
-    AreaIndexData *pArea;
-    
-    if (!r)
-        return -1;
-
-    pArea = r->areaIndex;
     if (!pArea)
         return -1;
 
     for (int i = pArea->min_vnum; i <= pArea->max_vnum; i++) {
-        if (!OLCState::can_edit( ch, i ))
+        if (i <= 0 || !OLCState::can_edit( ch, i ))
+            continue;
+
+        if (skip && skip->count( i ))
             continue;
 
         switch (ndx_type) {
-        case NDX_ROOM:
+        case OLC_NDX_ROOM:
             if (!get_room_index( i ))
                 return i;
             break;
-        case NDX_OBJ:
+        case OLC_NDX_OBJ:
             if (!get_obj_index( i ))
                 return i;
             break;
-        case NDX_MOB:
+        case OLC_NDX_MOB:
             if (!get_mob_index( i ))
                 return i;
             break;
@@ -115,20 +106,65 @@ static int next_index_data( Character *ch, RoomIndexData *r, int ndx_type )
 
     return -1;
 }
-    
+
 int next_room( Character *ch, RoomIndexData *r )
 {
-    return next_index_data( ch, r, NDX_ROOM );
+    return r ? next_index_in_area( ch, r->areaIndex, OLC_NDX_ROOM ) : -1;
 }
 
 int next_obj_index( Character *ch, RoomIndexData *r )
 {
-    return next_index_data( ch, r, NDX_OBJ );
+    return r ? next_index_in_area( ch, r->areaIndex, OLC_NDX_OBJ ) : -1;
 }
 
 int next_mob_index( Character *ch, RoomIndexData *r )
 {
-    return next_index_data( ch, r, NDX_MOB );
+    return r ? next_index_in_area( ch, r->areaIndex, OLC_NDX_MOB ) : -1;
+}
+
+int olc_create_vnum( Character *ch, AreaIndexData *nextArea, const char *argument, int ndx_type,
+                     const std::set<int> *skip )
+{
+    int value;
+
+    if (arg_is_strict(argument, "next")) {
+        value = next_index_in_area( ch, nextArea, ndx_type, skip );
+        if (value < 0) {
+            ch->pecho("Все внумы в этой зоне уже заняты!");
+            return -1;
+        }
+    } else {
+        // A negative vnum reaching the index lookups crashes the server.
+        if (!is_number(argument) || (value = atoi(argument)) <= 0) {
+            stc("Syntax:  create <vnum>|next\n\r", ch);
+            return -1;
+        }
+    }
+
+    if (!OLCState::get_vnum_area(value)) {
+        stc("OLC:  That vnum is not assigned an area.\n\r", ch);
+        return -1;
+    }
+
+    if (!OLCState::can_edit( ch, value )) {
+        stc("OLC:  Vnum in an area you cannot build in.\n\r", ch);
+        return -1;
+    }
+
+    bool exists = (ndx_type == OLC_NDX_ROOM && get_room_index( value ))
+                  || (ndx_type == OLC_NDX_OBJ && get_obj_index( value ))
+                  || (ndx_type == OLC_NDX_MOB && get_mob_index( value ));
+    if (exists) {
+        stc("OLC:  That vnum already exists.\n\r", ch);
+        return -1;
+    }
+
+    if (skip && skip->count( value )) {
+        stc("OLC:  That vnum is already taken earlier in this batch.\n\r", ch);
+        return -1;
+    }
+
+    return value;
 }
 
 const char *

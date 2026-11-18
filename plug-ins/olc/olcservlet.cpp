@@ -11,6 +11,7 @@
 #include "servlet_utils.h"
 #include "olcops.h"
 #include "vnum.h"
+#include "directions.h"
 
 PCharacter * olc_servlet_setup_char(Room *room, CaptureBufferHandler *&capture)
 {
@@ -47,12 +48,10 @@ void olc_servlet_seed_buffer(PCharacter *ch, const DLString &text)
     ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(text);
 }
 
-static bool is_direction(const DLString &cmdName)
+bool olc_is_direction(const DLString &name)
 {
-    static const char *dirNames[] = { "north", "east", "south", "west", "up", "down", 0 };
-
-    for (int i = 0; dirNames[i]; i++)
-        if (cmdName == dirNames[i])
+    for (int door = 0; door < DIR_SOMEWHERE; door++)
+        if (name == dirs[door].name)
             return true;
 
     return false;
@@ -68,14 +67,14 @@ DLString olc_servlet_refusal(const DLString &cmdName, const DLString &arguments,
     if (cmdName == "done" || cmdName == "cancel")
         return "Every call commits on its own, no " + cmdName + " needed";
 
-    // create attaches a second editing state that nobody commits.
+    // The editors' create attaches a second editing state that nobody commits.
     if (cmdName == "create")
-        return "create is not supported over the API, use it in game";
+        return "create is an action of its own over the API: {action: create}";
 
     DLString args = arguments;
     DLString word = args.getOneArgument();
 
-    if (is_direction(cmdName)) {
+    if (olc_is_direction(cmdName)) {
         // A bare direction moves the actor through the exit.
         if (word.empty())
             return cmdName + " needs arguments: a bare direction would move the actor";
@@ -116,6 +115,7 @@ DLString olc_room_to_xml(RoomIndexData *pRoom)
  * Servlet for /olc: a batch of typed OLC ops (see OlcOps in olcops.h).
  * Auth: bottype=telegram, token=<ops token>
  * Args: ops (array), dryRun (bool), verbose (bool: editor echo for every op),
+ *       save (bool: 'asave changed' after the batch),
  *       profile (immortal|agent, default agent), actor (name for the journal)
  *
  * Example: Russian room name and an object short description in one batch
@@ -125,8 +125,8 @@ DLString olc_room_to_xml(RoomIndexData *pRoom)
  *   Response (200, JSON): {"ok":true,"changed":[{"kind":"room","vnum":3001},...],
  *     "errors":[],"warnings":[],"results":[{"op":0,"ok":true,"changed":true,...}],"skipped":0}
  *
- * Areas are marked changed like an interactive edit; 'asave changed' or the
- * minute autosave writes them to disk.
+ * Areas are marked changed like an interactive edit; save, 'asave changed' or
+ * the minute autosave writes them to disk.
  */
 static void olc_ops_servlet(HttpRequest &request, HttpResponse &response)
 {
@@ -155,6 +155,7 @@ static void olc_ops_servlet(HttpRequest &request, HttpResponse &response)
 
     bool dryRun = args.isMember("dryRun") && args["dryRun"].isBool() && args["dryRun"].asBool();
     bool verbose = args.isMember("verbose") && args["verbose"].isBool() && args["verbose"].asBool();
+    bool save = args.isMember("save") && args["save"].isBool() && args["save"].asBool();
 
     Room *limbo = get_room_instance(ROOM_VNUM_LIMBO);
     if (!limbo) {
@@ -171,7 +172,7 @@ static void olc_ops_servlet(HttpRequest &request, HttpResponse &response)
 
     Json::Value result;
     try {
-        result = OlcOps::apply(ch, args["ops"], policy, dryRun, verbose);
+        result = OlcOps::apply(ch, args["ops"], policy, dryRun, verbose, save);
     } catch (...) {
         olc_servlet_cleanup_char(ch);
         throw;

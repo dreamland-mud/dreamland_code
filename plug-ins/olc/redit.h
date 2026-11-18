@@ -30,6 +30,14 @@ public:
 
     bool change_exit(PCharacter *, const char *, int);
     static RoomIndexData *redit_create(PCharacter *, char *);
+    /** An empty room under a vnum olc_create_vnum has cleared. */
+    static RoomIndexData *createRoom(int vnum);
+    /** Put a new prototype into the room maps and create its instance. */
+    static void registerRoom(RoomIndexData *);
+    /** Why the room can't be deleted now, or an empty string. */
+    static DLString deleteRefusal(RoomIndexData *);
+    /** Remove the room from every vnum lookup and mark its area changed. */
+    static void unregisterRoom(RoomIndexData *);
     static void show(PCharacter *ch, RoomIndexData *, bool showWeb);
     static void move(PCharacter *ch, RoomIndexData *roomToMove, AreaIndexData *targetArea);
 

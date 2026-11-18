@@ -23,6 +23,8 @@ void olc_servlet_seed_buffer(PCharacter *ch, const DLString &text);
  *  without text (would paste an empty buffer and wipe the field), or a line
  *  longer than an input line (overflows the handlers' fixed buffers). */
 DLString olc_servlet_refusal(const DLString &cmdName, const DLString &arguments, bool hasText);
+/** One of the six exit names (north ... down), as redit takes them. */
+bool olc_is_direction(const DLString &name);
 
 /** Room prototype fields as XML, the built-in XMLRoom serializer. UTF-8:
  *  XMLDocument::save converts on output. */

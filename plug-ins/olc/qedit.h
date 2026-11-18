@@ -19,6 +19,8 @@ public:
 
     virtual void commit();
     virtual void changed( PCharacter * );
+    virtual DLString getJournalKind( ) const;
+    virtual int getJournalVnum( ) const;
     void show( PCharacter * );
 
     XML_VARIABLE XMLInteger vnum;
@@ -34,6 +36,15 @@ private:
     
     XML_VARIABLE XMLBoolean isChanged;
 };
+
+/** Step pairing rule: the end of step s and the begin of step s+1 sit on the
+ *  same target, and an onX end pairs with a postX begin. Bits of what breaks. */
+enum {
+    STEP_PAIR_OK = 0,
+    STEP_PAIR_TARGET = 1,
+    STEP_PAIR_TRIGGER = 2
+};
+int qedit_step_pairing(AreaQuest *q, int s);
 
 #define AQEDIT(C, cname, help) OLC_CMD(OLCStateAreaQuest, C, cname, help)
 

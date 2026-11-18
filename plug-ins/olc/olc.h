@@ -6,6 +6,8 @@
 #ifndef __OLC_H__
 #define __OLC_H__
 
+#include <list>
+#include <set>
 #include "onlinecreation.h"
 #include "descriptor.h"
 #include "multimessage.h"
@@ -33,6 +35,28 @@ const char * get_skill_name( int sn, bool verbose = true );
 void ptc(Character *c, const char *fmt, ...);
 /* Trilinguality (Trello 2594, Phase 4): resolve for the single viewer `c`. */
 void ptc(Character *c, const MultiMessage &fmt, ...);
+
+enum {
+    OLC_NDX_ROOM,
+    OLC_NDX_OBJ,
+    OLC_NDX_MOB,
+};
+
+/** First free vnum of the given index type in pArea that ch can build in, or -1.
+ *  Vnums in skip count as taken (a dry run's planned creates). */
+int next_index_in_area( Character *ch, AreaIndexData *pArea, int ndx_type,
+                        const std::set<int> *skip = 0 );
+
+/** Resolve the argument of 'create <vnum>|next' for a new room, mob or object:
+ *  a free vnum inside an area ch can build in, or -1 with the reason told to ch.
+ *  'next' takes the first free vnum of nextArea. Every create path, in game and
+ *  over the API, goes through here. */
+int olc_create_vnum( Character *ch, AreaIndexData *nextArea, const char *argument, int ndx_type,
+                     const std::set<int> *skip = 0 );
+
+/** 'asave changed': write every changed area ch can build in. Returns the
+ *  number of areas that failed to save, the saved ones go to 'saved'. */
+int save_changed_areas( Character *ch, std::list<AreaIndexData *> &saved );
 
 int next_obj_index( Character *ch, RoomIndexData *r );
 int next_room( Character *ch, RoomIndexData *r );

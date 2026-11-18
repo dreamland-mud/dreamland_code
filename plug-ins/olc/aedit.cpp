@@ -158,6 +158,53 @@ bool OLCStateArea::checkOverlap(int lower, int upper)
     return true;
 }
 
+DLString OLCStateArea::commitRefusal() const
+{
+    AreaIndexData *original = AreaUtils::getByVnum(vnum);
+    int lower = min_vnum.getValue(), upper = max_vnum.getValue();
+
+    for (area_file *f = area_file_list; f; f = f->next)
+        if (f->area && f->area != original && f->file_name == file_name.getValue())
+            return "Area " + DLString(f->area->vnum) + " already saves into " + file_name.getValue();
+
+    // Only a new range is checked: an old area with strays outside its
+    // range stays editable.
+    if (!original || (lower == original->min_vnum && upper == original->max_vnum))
+        return DLString::emptyString;
+
+    // XMLArea::init saves only the prototypes inside the range.
+    for (auto &r: original->roomIndexes)
+        if (r.first < lower || r.first > upper)
+            return "Room " + DLString(r.first) + " would fall outside vnums "
+                   + DLString(lower) + "-" + DLString(upper);
+
+    for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next)
+            if (pMob->area == original && !IS_SET(pMob->act, ACT_DELETED)
+                && (pMob->vnum < lower || pMob->vnum > upper))
+                return "Mobile " + DLString(pMob->vnum) + " would fall outside vnums "
+                       + DLString(lower) + "-" + DLString(upper);
+
+    for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next)
+            if (pObj->area == original && !IS_SET(pObj->extra_flags, ITEM_DELETED)
+                && (pObj->vnum < lower || pObj->vnum > upper))
+                return "Object " + DLString(pObj->vnum) + " would fall outside vnums "
+                       + DLString(lower) + "-" + DLString(upper);
+
+    return DLString::emptyString;
+}
+
+DLString OLCStateArea::getJournalKind( ) const
+{
+    return "area";
+}
+
+int OLCStateArea::getJournalVnum( ) const
+{
+    return vnum.getValue();
+}
+
 void OLCStateArea::changed( PCharacter *ch )
 {
     AreaIndexData *original = AreaUtils::getByVnum(vnum);    
@@ -257,6 +304,77 @@ static AreaQuest * arg_areaquest(const DLString &arg, AreaIndexData *pArea)
     return 0;
 }
 
+int OLCStateArea::nextQuestVnum(AreaIndexData *original, const std::set<int> *skip)
+{
+    for (int v = original->min_vnum; v <= original->max_vnum; v++)
+        if (v > 0 && areaQuests.find(v) == areaQuests.end() && (!skip || !skip->count(v)))
+            return v;
+
+    return -1;
+}
+
+AreaQuest * OLCStateArea::questCreate(PCharacter *ch, AreaIndexData *original, const DLString &argVnum)
+{
+    Integer vnum;
+
+    // 'quest create' - assign next free vnum
+    if (argVnum.empty()) {
+        vnum = nextQuestVnum(original);
+
+        if (vnum < 0) {
+            ptc(ch, "В зоне не осталось свободного внума для квеста.\r\n");
+            return 0;
+        }
+
+    } // 'quest create <vnum>' - check if vnum is valid
+    else if (!argVnum.isNumber() || !Integer::tryParse(vnum, argVnum)) {
+        ptc(ch, "Формат: quest create [номер]\r\n");
+        return 0;
+    }
+
+    if (vnum < original->min_vnum || vnum > original->max_vnum) {
+        ptc(ch, "Номер квеста должен лежать в диапазоне от %d до %d.\r\n",
+            original->min_vnum, original->max_vnum);
+        return 0;
+    }
+
+    // Quest vnums are global: a second quest under the same number would
+    // replace the first one in areaQuests and orphan it.
+    if (areaQuests.find(vnum) != areaQuests.end()) {
+        ptc(ch, "Квест %d уже существует.\r\n", vnum.getValue());
+        return 0;
+    }
+
+    AreaQuest::XMLPointer newQuest(NEW);
+    newQuest->vnum.setValue(vnum);
+    newQuest->pAreaIndex = original;
+
+    original->questMap[vnum] = *newQuest;
+    original->quests.push_back(newQuest);
+    areaQuests[vnum] = *newQuest;
+    original->changed = true;
+
+    return *newQuest;
+}
+
+bool OLCStateArea::questDelete(PCharacter *ch, AreaIndexData *original, const DLString &arg)
+{
+    AreaQuest *q = arg_areaquest(arg, original);
+
+    if (!q) {
+        ptc(ch, "Квест по номеру %s не определен.\r\n", arg.c_str());
+        return false;
+    }
+
+    original->questMap.erase(q->vnum.getValue());
+    areaQuests.erase(q->vnum.getValue());
+    original->quests.remove(q);
+    original->changed = true;
+
+    ptc(ch, "Квест удален!\r\n");
+    return true;
+}
+
 AEDIT(quest, "квест", "редактировать квесты в зоне")
 {
     AreaIndexData *original = AreaUtils::getByVnum(vnum);
@@ -270,64 +388,19 @@ AEDIT(quest, "квест", "редактировать квесты в зоне"
 
     // 'quest create' 'quest create 2300'
     if (arg_is(arg, "create")) {
-        DLString argVnum = args.getOneArgument();
-        Integer vnum;
-
-        // 'quest create' - assign next free vnum
-        if (argVnum.empty()) {
-            for (vnum = original->min_vnum; vnum <= original->max_vnum; vnum++) {
-                if (original->questMap.find(vnum) == original->questMap.end())
-                    break;
-            }
-
-            if (vnum > original->max_vnum) {
-                ptc(ch, "В зоне не осталось свободного внума для квеста.\r\n");
-                return false;
-            }
-
-        } // 'quest create <vnum>' - check if vnum is valid
-        else if (!argVnum.isNumber() || !Integer::tryParse(vnum, argVnum)) {
-            ptc(ch, "Формат: quest create [номер]\r\n");
+        AreaQuest *newQuest = questCreate(ch, original, args.getOneArgument());
+        if (!newQuest)
             return false;
-        }
 
-        if (vnum < original->min_vnum || vnum > original->max_vnum) {
-            ptc(ch, "Номер квеста должен лежать в диапазоне от %d до %d.\r\n",
-                original->min_vnum, original->max_vnum);
-            return false;
-        }
-
-        AreaQuest::XMLPointer newQuest(NEW);
-        newQuest->vnum.setValue(vnum);
-        newQuest->pAreaIndex = original;
-
-        original->questMap[vnum] = *newQuest;
-        original->quests.push_back(newQuest);
-        areaQuests[vnum] = *newQuest;
-
-        OLCStateAreaQuest::Pointer qedit(NEW, *newQuest);
+        OLCStateAreaQuest::Pointer qedit(NEW, newQuest);
         qedit->attach(ch);
         qedit->show(ch);
         return true;
     }   
 
     // 'quest delete 2300'
-    if (arg_is(arg, "del")) {
-        arg = args.getOneArgument();
-        AreaQuest *q = arg_areaquest(arg, original);
-
-        if (!q) {
-            ptc(ch, "Квест по номеру %s не определен.\r\n", arg.c_str());
-            return false;
-        }
-
-        original->questMap.erase(q->vnum.getValue());
-        areaQuests.erase(q->vnum.getValue());
-        original->quests.remove(q);
-
-        ptc(ch, "Квест удален!\r\n");
-        return true;
-    }
+    if (arg_is(arg, "del"))
+        return questDelete(ch, original, args.getOneArgument());
 
     // 'quest 2300'
     if (arg.isNumber()) {

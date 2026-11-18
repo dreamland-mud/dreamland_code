@@ -16,6 +16,7 @@
 #include "update_areas.h"
 #include "wearloc_utils.h"
 #include "merc.h"
+#include "resetops.h"
 
 #include "def.h"
 
@@ -325,18 +326,248 @@ static void add_reset(RoomIndexData * room, RESET_DATA * pReset, int index)
     room->resets.insert(room->resets.begin() + index, pReset);
 }
 
-static int find_reset(RoomIndexData *pRoom, const char *arg)
+/** The reset under its 1-based number, or 0 with the reason told to ch. */
+static RESET_DATA * find_reset(Character *ch, RoomIndexData *pRoom, int number)
 {
-    int insert_loc = atoi(arg);
+    if (number < 1 || number > (int)pRoom->resets.size()) {
+        stc("Reset with this number not found.\r\n", ch);
+        return 0;
+    }
 
-    if (pRoom->resets.empty())
-        return -1;
+    return pRoom->resets.at(number - 1);
+}
 
-    insert_loc--;
-    if (insert_loc < 0 || insert_loc >= (int)pRoom->resets.size())
-        return -1;
+static bool reset_added(Character *ch, RoomIndexData *pRoom, int after, RESET_DATA *pReset)
+{
+    add_reset(pRoom, pReset, after);
+    pRoom->areaIndex->changed = true;
+    stc("Reset added.\n\r", ch);
+    return true;
+}
 
-    return insert_loc;
+bool reset_add_mob(Character *ch, RoomIndexData *pRoom, int after, int vnum, int maxArea, int maxRoom)
+{
+    // A negative vnum reaching the index lookups crashes the server.
+    if (vnum <= 0 || get_mob_index(vnum) == NULL) {
+        stc("Монстр не существует.\n\r", ch);
+        return false;
+    }
+
+    RESET_DATA *pReset = new reset_data();
+    pReset->command = 'M';
+    pReset->arg1 = vnum;
+    pReset->arg2 = maxArea;
+    pReset->arg3 = pRoom->vnum;
+    pReset->arg4 = maxRoom;
+    return reset_added(ch, pRoom, after, pReset);
+}
+
+bool reset_add_obj_room(Character *ch, RoomIndexData *pRoom, int after, int vnum)
+{
+    if (vnum <= 0 || get_obj_index(vnum) == NULL) {
+        stc("Предметов с таким номером не существует.\n\r", ch);
+        return false;
+    }
+
+    RESET_DATA *pReset = new reset_data();
+    pReset->command = 'O';
+    pReset->arg1 = vnum;
+    pReset->arg2 = 0;
+    pReset->arg3 = pRoom->vnum;
+    pReset->arg4 = 0;
+    return reset_added(ch, pRoom, after, pReset);
+}
+
+bool reset_add_obj_inside(Character *ch, RoomIndexData *pRoom, int after, int vnum,
+                          int container, int limit, int count)
+{
+    if (vnum <= 0 || get_obj_index(vnum) == NULL) {
+        stc("Предметов с таким номером не существует.\n\r", ch);
+        return false;
+    }
+
+    OBJ_INDEX_DATA *pContainer = container > 0 ? get_obj_index(container) : 0;
+    if (!pContainer || pContainer->item_type != ITEM_CONTAINER) {
+        stc("Предмет не является контейнером.\n\r", ch);
+        return false;
+    }
+
+    RESET_DATA *pReset = new reset_data();
+    pReset->command = 'P';
+    pReset->arg1 = vnum;
+    pReset->arg2 = limit;
+    pReset->arg3 = container;
+    pReset->arg4 = count;
+    pReset->vnums.push_back(pReset->arg1);
+    return reset_added(ch, pRoom, after, pReset);
+}
+
+bool reset_add_obj_wear(Character *ch, RoomIndexData *pRoom, int after, int vnum, const DLString &wearloc)
+{
+    Wearlocation *wl = wearlocationManager->findExisting(wearloc);
+    if (!wl) {
+        stc("Resets: 'olchelp wearloc'\n\r", ch);
+        return false;
+    }
+
+    if (vnum <= 0 || get_obj_index(vnum) == NULL) {
+        stc("Предметов с таким номером не существует.\n\r", ch);
+        return false;
+    }
+
+    RESET_DATA *pReset = new reset_data();
+    pReset->arg1 = vnum;
+    pReset->arg3 = wl->getIndex( );
+    pReset->command = pReset->arg3 == wear_none ? 'G' : 'E';
+    return reset_added(ch, pRoom, after, pReset);
+}
+
+bool reset_delete(Character *ch, RoomIndexData *pRoom, int number)
+{
+    RESET_DATA *pReset = find_reset(ch, pRoom, number);
+    if (!pReset)
+        return false;
+
+    pRoom->resets.erase(pRoom->resets.begin() + (number - 1));
+    ddeallocate(pReset);
+    pRoom->areaIndex->changed = true;
+    stc("Reset deleted.\n\r", ch);
+    return true;
+}
+
+bool reset_toggle_flags(Character *ch, RoomIndexData *pRoom, int number, const DLString &flagNames)
+{
+    RESET_DATA *pReset = find_reset(ch, pRoom, number);
+    if (!pReset)
+        return false;
+
+    bitnumber_t flags = reset_flags.bitstring(flagNames, false);
+    if (flags == NO_FLAG) {
+        stc("Flags not found, see {y{hcolchelp reset_flags{x.\r\n", ch);
+        return false;
+    }
+
+    pReset->flags.toggleBit(flags);
+
+    if (pReset->flags.getValue() != 0)
+        ptc(ch, "Flags for reset {W%d{x toggled to {g%s{x.\r\n", number, pReset->flags.names().c_str());
+    else
+        ptc(ch, "Flags for reset {W%d{x cleared.\r\n", number);
+
+    pRoom->areaIndex->changed = true;
+    return true;
+}
+
+bool reset_set_rand(Character *ch, RoomIndexData *pRoom, int number, const DLString &randName)
+{
+    RESET_DATA *pReset = find_reset(ch, pRoom, number);
+    if (!pReset)
+        return false;
+
+    int rand = rand_table.value(randName, false);
+    if (rand == NO_FLAG) {
+        stc("Rand value no found, see {y{hcolchelp rand_table{x.\r\n", ch);
+        return false;
+    }
+
+    pReset->rand.setValue(rand);
+    ptc(ch, "Rand value for reset {W%d{x set to {g%s{x.\r\n", number, pReset->rand.name().c_str());
+
+    if (pReset->bestTier <= 0) {
+        pReset->bestTier = DEFAULT_TIER;
+        ptc(ch, "Best tier for reset {W%d{x changed to {g%d{x.\r\n", number, pReset->bestTier);
+    }
+
+    if (pReset->command == 'E') {
+        if (pReset->rand != RAND_NONE && pReset->arg3 == wear_wield) {
+            pReset->arg3 = wear_sheath;
+            stc("Changed wearlocation from 'wield' to 'sheath'.\r\n", ch);
+        } else if (pReset->rand == RAND_NONE && pReset->arg3 == wear_sheath) {
+            pReset->arg3 = wear_wield;
+            stc("Changed wearlocation from 'sheath' to 'wield'.\r\n", ch);
+        }
+    }
+
+    pRoom->areaIndex->changed = true;
+    return true;
+}
+
+bool reset_set_tier(Character *ch, RoomIndexData *pRoom, int number, int tier)
+{
+    RESET_DATA *pReset = find_reset(ch, pRoom, number);
+    if (!pReset)
+        return false;
+
+    if (tier < BEST_TIER || tier > WORST_TIER) {
+        ptc(ch, "Tier must be a number from %d to %d.\r\n", BEST_TIER, WORST_TIER);
+        return false;
+    }
+
+    pReset->bestTier = tier;
+    ptc(ch, "Best tier for reset {W%d{x set to {g%d{x.\r\n", number, tier);
+    pRoom->areaIndex->changed = true;
+    return true;
+}
+
+bool reset_set_wearloc(Character *ch, RoomIndexData *pRoom, int number, const DLString &wearlocName)
+{
+    RESET_DATA *pReset = find_reset(ch, pRoom, number);
+    if (!pReset)
+        return false;
+
+    if (pReset->command != 'E' && pReset->command != 'G') {
+        ptc(ch, "Reset has to be a mob equipment or inventory reset.\r\n");
+        return false;
+    }
+
+    Wearlocation *wearloc = wearlocationManager->findExisting(wearlocName);
+    if (!wearloc) {
+        ptc(ch, "Wearloc slot '%s' not found, see {y{hcolchelp wearloc{x for a full list.\r\n", wearlocName.c_str());
+        return false;
+    }
+
+    pReset->arg3 = wearloc->getIndex();
+    ptc(ch, "Wearloc for %d is now %s.\r\n", number, wearloc->getName().c_str());
+
+    if (pReset->arg3 == wear_none) {
+        if (pReset->command == 'E') {
+            pReset->command = 'G';
+            ptc(ch, "Also changing reset type from 'equip' to 'inventory'.\r\n");
+        }
+    } else if (pReset->command == 'G') {
+        pReset->command = 'E';
+        ptc(ch, "Also changing reset type from 'inventory' to 'equip'.\r\n");
+    }
+
+    pRoom->areaIndex->changed = true;
+    return true;
+}
+
+bool reset_randomize_exits(Character *ch, RoomIndexData *pRoom)
+{
+    for (auto &reset: pRoom->resets) {
+        if (reset->command == 'R') {
+            stc("Exits in this room are already randomized.\n\r", ch);
+            return false;
+        }
+    }
+
+    RESET_DATA *pReset = new reset_data();
+    pReset->command = 'R';
+    pReset->arg1 = pRoom->vnum;
+    // Shuffle all six exits: the 'R' reset swaps doors arg3..arg2-1.
+    pReset->arg2 = DIR_SOMEWHERE;
+    pReset->arg3 = 0;
+
+    add_reset(pRoom, pReset, -1);
+    pRoom->areaIndex->changed = true;
+    stc("Room exits will be randomized.\n\r", ch);
+    return true;
+}
+
+static int number_or(const char *arg, int dflt)
+{
+    return is_number(arg) ? atoi(arg) : dflt;
 }
 
 CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
@@ -349,7 +580,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     char arg5[MAX_INPUT_LENGTH];
     char arg6[MAX_INPUT_LENGTH];
     char arg7[MAX_INPUT_LENGTH];
-    RESET_DATA *pReset = NULL;
+    RoomIndexData *pRoom = ch->in_room->pIndexData;
 
     argument = one_argument(argument, arg1);
     
@@ -359,9 +590,9 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     if (arg1[0] == '\0') {
-        if (!ch->in_room->pIndexData->resets.empty()) {
+        if (!pRoom->resets.empty()) {
             ostringstream buf;
-            display_resets(buf, ch, ch->in_room->pIndexData, filter_t());
+            display_resets(buf, ch, pRoom, filter_t());
             ch->send_to(buf);
         } else {
             stc("No resets in this room.\n\r", ch);
@@ -372,25 +603,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     // Randomize exits.
     if (arg_is(arg1, "void")) {
-        RoomIndexData *pRoom = ch->in_room->pIndexData;
-
-        for (auto &reset: pRoom->resets) {
-            if (reset->command == 'R') {
-                stc("Exits in this room are already randomized.\n\r", ch);
-                return;
-            }
-        }
-
-        pReset = new reset_data();
-        pReset->command = 'R';
-        pReset->arg1 = pRoom->vnum;
-        // Shuffle all six exits: the 'R' reset swaps doors arg3..arg2-1.
-        pReset->arg2 = DIR_SOMEWHERE;
-        pReset->arg3 = 0;
-
-        add_reset(pRoom, pReset, -1);
-        pRoom->areaIndex->changed = true;
-        stc("Room exits will be randomized.\n\r", ch);
+        reset_randomize_exits(ch, pRoom);
         return;
     }
 
@@ -443,46 +656,15 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     argument = one_argument(argument, arg2);
 
     if (is_number(arg1)) {
-        RoomIndexData *pRoom = ch->in_room->pIndexData;
+        int number = atoi(arg1);
 
         if (arg_is_strict(arg2, "delete")) {
-            int insert_loc = find_reset(pRoom, arg1);
-
-            if (insert_loc < 0) {
-                stc("Reset with this number not found.\r\n", ch);
-                return;
-            }
-
-            pReset = pRoom->resets.at(insert_loc);
-            pRoom->resets.erase(pRoom->resets.begin() + insert_loc);
-            ddeallocate(pReset);
-            pRoom->areaIndex->changed = true;
-            stc("Reset deleted.\n\r", ch);
+            reset_delete(ch, pRoom, number);
             return;
         }
 
         if (arg_is(arg2, "flag")) {
-            int insert_loc = find_reset(pRoom, arg1);
-            if (insert_loc < 0) {
-                stc("Reset with this number not found.\r\n", ch);
-                return;
-            }
-
-            pReset = pRoom->resets.at(insert_loc);
-            bitnumber_t flags = reset_flags.bitstring(argument, false);
-            if (flags == NO_FLAG) {
-                stc("Flags not found, see {y{hcolchelp reset_flags{x.\r\n", ch);
-                return;
-            }
-
-            pReset->flags.toggleBit(flags);
-
-            if (pReset->flags.getValue() != 0)
-                ptc(ch, "Flags for reset {W%d{x toggled to {g%s{x.\r\n", insert_loc+1, pReset->flags.names().c_str());
-            else
-                ptc(ch, "Flags for reset {W%d{x cleared.\r\n", insert_loc+1);
-
-            pRoom->areaIndex->changed = true;
+            reset_toggle_flags(ch, pRoom, number, argument);
             return;
         }
 
@@ -490,97 +672,20 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         argument = one_argument(argument, arg4);
 
         if (arg_is(arg2, "rand")) {
-            int insert_loc = find_reset(pRoom, arg1);
-            if (insert_loc < 0) {
-                stc("Reset with this number not found.\r\n", ch);
-                return;
-            }
-
-            pReset = pRoom->resets.at(insert_loc);
-            int rand = rand_table.value(arg3, false);
-            if (rand == NO_FLAG) {
-                stc("Rand value no found, see {y{hcolchelp rand_table{x.\r\n", ch);
-                return;
-            }
-
-            pReset->rand.setValue(rand);            
-            ptc(ch, "Rand value for reset {W%d{x set to {g%s{x.\r\n", insert_loc+1, pReset->rand.name().c_str());
-
-            if (pReset->bestTier <= 0) {
-                pReset->bestTier = DEFAULT_TIER;
-                ptc(ch, "Best tier for reset {W%d{x changed to {g%d{x.\r\n", insert_loc+1, pReset->bestTier);
-            }
-
-            if (pReset->command == 'E') {
-                if (pReset->rand != RAND_NONE && pReset->arg3 == wear_wield) {
-                    pReset->arg3 = wear_sheath;
-                    stc("Changed wearlocation from 'wield' to 'sheath'.\r\n", ch);
-                } else if (pReset->rand == RAND_NONE && pReset->arg3 == wear_sheath) {
-                    pReset->arg3 = wear_wield;
-                    stc("Changed wearlocation from 'sheath' to 'wield'.\r\n", ch);
-                }
-            }
-
-            pRoom->areaIndex->changed = true;
-            __do_resets(ch, const_cast<char *>(""));
+            if (reset_set_rand(ch, pRoom, number, arg3))
+                __do_resets(ch, const_cast<char *>(""));
             return;
         }
 
         if (arg_is(arg2, "tier")) {
-            int insert_loc = find_reset(pRoom, arg1);
-            if (insert_loc < 0) {
-                stc("Reset with this number not found.\r\n", ch);
-                return;
-            }
-
-            int tier = atoi(arg3);
-            if (tier < BEST_TIER || tier > WORST_TIER) {
-                ptc(ch, "Tier must be a number from %d to %d.\r\n", BEST_TIER, WORST_TIER);
-                return;
-            }
-
-            pReset = pRoom->resets.at(insert_loc);
-            pReset->bestTier = tier;
-            ptc(ch, "Best tier for reset {W%d{x set to {g%d{x.\r\n", insert_loc+1, tier);
-            pRoom->areaIndex->changed = true;
-            __do_resets(ch, const_cast<char *>(""));
+            if (reset_set_tier(ch, pRoom, number, atoi(arg3)))
+                __do_resets(ch, const_cast<char *>(""));
             return;
         }
 
         if (arg_is(arg2, "wearloc")) {
-            int insert_loc = find_reset(pRoom, arg1);
-            if (insert_loc < 0) {
-                stc("Reset with this number not found.\r\n", ch);
-                return;
-            }
-
-            pReset = pRoom->resets.at(insert_loc);
-            if (pReset->command != 'E' && pReset->command != 'G') {
-                ptc(ch, "Reset has to be a mob equipment or inventory reset.\r\n");
-                return;
-            }
-
-            Wearlocation *wearloc = wearlocationManager->findExisting(arg3);
-            if (!wearloc) {
-                ptc(ch, "Wearloc slot '%s' not found, see {y{hcolchelp wearloc{x for a full list.\r\n", argument);
-                return;
-            }
-
-            pReset->arg3 = wearloc->getIndex();
-            ptc(ch, "Wearloc for %d is now %s.\r\n", insert_loc+1, wearloc->getName().c_str());
-
-            if (pReset->arg3 == wear_none) {                
-                if (pReset->command == 'E') {
-                    pReset->command = 'G';
-                    ptc(ch, "Also changing reset type from 'equip' to 'inventory'.\r\n");
-                }
-            } else if (pReset->command == 'G') {
-                pReset->command = 'E';
-                ptc(ch, "Also changing reset type from 'inventory' to 'equip'.\r\n");
-            }
-
-            pRoom->areaIndex->changed = true;
-            __do_resets(ch, const_cast<char *>(""));
+            if (reset_set_wearloc(ch, pRoom, number, arg3))
+                __do_resets(ch, const_cast<char *>(""));
             return;
         }
 
@@ -588,70 +693,19 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         argument = one_argument(argument, arg6);
         argument = one_argument(argument, arg7);
 
-        if ((arg_is_strict(arg2, "mob") && is_number(arg3))
-                 || (arg_is_strict(arg2, "obj") && is_number(arg3))) {
-            if (arg_is_strict(arg2, "mob")) {
-                pReset = new reset_data();
-                pReset->command = 'M';
-                if (get_mob_index(is_number(arg3) ? atoi(arg3) : 1) == NULL) {
-                    stc("Монстр не существует.\n\r", ch);
-                    return;
-                }
-                pReset->arg1 = atoi(arg3);
-                pReset->arg2 = is_number(arg4) ? atoi(arg4) : 1;        /* Max # */
-                pReset->arg3 = ch->in_room->vnum;
-                pReset->arg4 = is_number(arg5) ? atoi(arg5) : 1;        /* Min # */
-            }
-            else if (arg_is_strict(arg2, "obj")) {
-                pReset = new reset_data();
-                pReset->arg1 = atoi(arg3);
-                if (!str_prefix(arg4, "inside")) {
-                    pReset->command = 'P';
-                    pReset->arg2 = 0;
-                    if ((get_obj_index(is_number(arg5) ? atoi(arg5) : 1))->item_type != ITEM_CONTAINER) {
-                        stc("Предмет не является контейнером.\n\r", ch);
-                        return;
-                    }
-                    pReset->arg2 = is_number(arg6) ? atoi(arg6) : 1;
-                    pReset->arg3 = is_number(arg5) ? atoi(arg5) : 1;
-                    pReset->arg4 = is_number(arg7) ? atoi(arg7) : 1;
-                    pReset->vnums.push_back(pReset->arg1);
-                }
-                else if (arg_is_strict(arg4, "room")) {
-                    pReset = new reset_data();
-                    pReset->command = 'O';
-                    if (get_obj_index(atoi(arg3)) == NULL) {
-                        stc("Предметов с таким номером не существует.\n\r", ch);
-                        return;
-                    }
-                    pReset->arg1 = atoi(arg3);
-                    pReset->arg2 = 0;
-                    pReset->arg3 = ch->in_room->vnum;
-                    pReset->arg4 = 0;
-                }
-                else {
-                    Wearlocation *wl;
-                    
-                    if (!( wl = wearlocationManager->findExisting( arg4 ) )) {
-                        stc("Resets: 'olchelp wearloc'\n\r", ch);
-                        return;
-                    }
-                    pReset = new reset_data();
-                    if (get_obj_index(atoi(arg3)) == NULL) {
-                        stc("Предметов с таким номером не существует.\n\r", ch);
-                        return;
-                    }
-                    pReset->arg1 = atoi(arg3);
-                    pReset->arg3 = wl->getIndex( );
-                    if (pReset->arg3 == wear_none)
-                        pReset->command = 'G';
-                    else
-                        pReset->command = 'E';
-                }
-            }
-            add_reset(ch->in_room->pIndexData, pReset, atoi(arg1));
-            pRoom->areaIndex->changed = true;
-            stc("Reset added.\n\r", ch);
+        if (arg_is_strict(arg2, "mob") && is_number(arg3)) {
+            reset_add_mob(ch, pRoom, number, atoi(arg3), number_or(arg4, 1), number_or(arg5, 1));
+            return;
+        }
+
+        if (arg_is_strict(arg2, "obj") && is_number(arg3) && arg4[0] != '\0') {
+            if (!str_prefix(arg4, "inside"))
+                reset_add_obj_inside(ch, pRoom, number, atoi(arg3), number_or(arg5, 0),
+                                     number_or(arg6, 1), number_or(arg7, 1));
+            else if (arg_is_strict(arg4, "room"))
+                reset_add_obj_room(ch, pRoom, number, atoi(arg3));
+            else
+                reset_add_obj_wear(ch, pRoom, number, atoi(arg3), arg4);
             return;
         }
     }
