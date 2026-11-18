@@ -601,7 +601,9 @@ static bool item_is_sold(Object *obj)
 }
 
 // A carried item takes its carrier's level (capped like death drops), a chest
-// or floor item the area's level window rather than the whole 1..100.
+// or floor item the area's level window rather than the whole 1..100. An area
+// with no window (0/0: newbie and system zones) gets level 1, never a roll up to
+// 100: a missing window must not put hero loot into a newbie chest.
 static int reset_level(Object *obj)
 {
     if (item_is_sold( obj ))
@@ -616,6 +618,11 @@ static int reset_level(Object *obj)
         AreaIndexData *area = room->areaIndex( );
         if (area->low_range > 0 && area->high_range >= area->low_range)
             return number_range( area->low_range, std::min( area->high_range, LEVEL_MORTAL ) );
+
+        LogStream::sendNotice( ) << "random magic: area " << area->area_file->file_name
+                                 << " has no level range, obj " << obj->pIndexData->vnum
+                                 << " in room " << room->vnum << " gets level 1" << endl;
+        return 1;
     }
 
     return number_range( 1, LEVEL_MORTAL );
