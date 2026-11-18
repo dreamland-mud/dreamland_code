@@ -19,6 +19,7 @@
 #include "interp.h"
 #include "arg_utils.h"
 #include "websocketrpc.h"
+#include "stringlist.h"
 #include "olcops.h"
 
 
@@ -1150,4 +1151,24 @@ DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, co
         return web_edit_button(ch, editor, args);
     else
         return DLString::emptyString;
+}
+
+DLString flag_table_all_names(const FlagTable &table)
+{
+    StringList names;
+    for (int i = 0; i < table.size; i++)
+        names.push_back(table.fields[i].name);
+    return names.join(" ");
+}
+
+DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label)
+{
+    if (!showWeb)
+        return label;
+
+    StringList commands;
+    for (int i = 0; i < table.size; i++)
+        commands.push_back("$ " + DLString(table.fields[i].name));
+
+    return web_menu(commands, cmd, label);
 }

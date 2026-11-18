@@ -46,6 +46,8 @@
 #include "hometown.h"
 #include "vnum.h"
 #include "descriptor.h"
+#include "stringlist.h"
+#include "json_utils.h"
 
 #include "def.h"
 
@@ -142,6 +144,85 @@ REDIT(sector, "местность", "установить тип местнос�
     }
 
     return false;
+}
+
+// Declared early on purpose: later commands win short prefixes, so 'co' still means 'commands'.
+REDIT(copy, "копировать", "скопировать описания, параметры или поведения другой комнаты (copy help)")
+{
+    RoomIndexData *pRoom, *source;
+    DLString args = argument;
+    DLString vnumArg = args.getOneArgument();
+    DLString what = args.getOneArgument();
+    bool all = what.empty() || arg_is(what, "all");
+    bool copyDesc = all || arg_is(what, "desc");
+    bool copyParam = all || arg_is(what, "param");
+    bool copyBhv = all || arg_is(what, "behavior");
+
+    EDIT_ROOM(ch, pRoom);
+
+    if (!vnumArg.isNumber() || (!copyDesc && !copyParam && !copyBhv)) {
+        stc("Syntax:\r\n"
+            "  copy <vnum> desc     -- name, description, smell, sound and extra descriptions, all languages.\r\n"
+            "  copy <vnum> param    -- sector, flags, heal and mana rate, clan, guilds, liquid.\r\n"
+            "  copy <vnum> behavior -- behaviors and their props.\r\n"
+            "  copy <vnum> [all]    -- all of the above.\r\n"
+            "Exits, resets and Fenia triggers are never copied.\r\n", ch);
+        return false;
+    }
+
+    source = get_room_index(vnumArg.toInt());
+    if (!source) {
+        stc("Room not found.\r\n", ch);
+        return false;
+    }
+
+    if (source == pRoom) {
+        stc("That is this room.\r\n", ch);
+        return false;
+    }
+
+    StringList copied;
+
+    if (copyDesc) {
+        pRoom->name = source->name;
+        pRoom->description = source->description;
+        pRoom->smell = source->smell;
+        pRoom->sound = source->sound;
+
+        pRoom->extraDescriptions.deallocate();
+        for (auto &ed: source->extraDescriptions) {
+            ExtraDescription *myed = new ExtraDescription();
+            myed->keyword = ed->keyword;
+            myed->description = ed->description;
+            pRoom->extraDescriptions.push_back(myed);
+        }
+
+        copied.push_back("descriptions");
+    }
+
+    if (copyParam) {
+        pRoom->room_flags = source->room_flags;
+        pRoom->sector_type = source->sector_type;
+        pRoom->heal_rate = source->heal_rate;
+        pRoom->mana_rate = source->mana_rate;
+        pRoom->clan.assign(source->clan);
+        pRoom->guilds.clear();
+        pRoom->guilds.set(source->guilds);
+        pRoom->liquid.assign(source->liquid);
+        copied.push_back("parameters");
+    }
+
+    if (copyBhv) {
+        pRoom->behaviors.clear();
+        pRoom->behaviors.set(source->behaviors);
+        pRoom->props.clear();
+        JsonUtils::copy(pRoom->props, source->props);
+        copied.push_back("behaviors");
+    }
+
+    ptc(ch, "Copied %s from room [%d] %s{x.\r\n",
+        copied.join(", ").c_str(), source->vnum, source->name.get(LANG_DEFAULT).c_str());
+    return true;
 }
 
 /*

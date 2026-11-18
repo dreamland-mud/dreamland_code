@@ -278,7 +278,8 @@ OEDIT(show)
     ptc(ch, "Type:     [%s] {D(? item_table){x\n\r", item_table.name(pObj->item_type).c_str());
     ptc(ch, "Level:    [%5d]\n\r", pObj->level);    
     ptc(ch, "Limit:    [%5d]\n\r", pObj->limit);
-    ptc(ch, "Wear:     [%s] {D(? wear_flags){x\n\r", wear_flags.names(pObj->wear_flags).c_str());
+    ptc(ch, "Wear:     [%s] {D(wear; ? wear_flags){x\n\r",
+            web_flag_menu(showWeb, wear_flags, "wear", wear_flags.names(pObj->wear_flags)).c_str());
     ptc(ch, "Extra:    [%s] {D(? extra_flags){x\n\r", extra_flags.names(pObj->extra_flags).c_str());
     ptc(ch, "Material: [%s] {D(? material){x\n\r", pObj->material.c_str());
     ptc(ch, "Smell:    [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
@@ -898,6 +899,11 @@ OEDIT(extra)
 
 OEDIT(wear)
 {
+    // Every choice as plain text for telnet and screen readers; web clients
+    // also get them as a menu on the Wear line of 'show'.
+    if (!*argument)
+        ptc(ch, "Wear flags: %s\r\n", flag_table_all_names(wear_flags).c_str());
+
     return flagBitsEdit(wear_flags, obj.wear_flags);
 }
 
@@ -1014,52 +1020,105 @@ OEDIT(copy)
     return true;
 }
 
+// Where the prototype is reset, grouped by reset type: on the floor, inside a
+// container, in a mob's inventory, worn by a mob, in a Fenia shop's stock.
+// Mobs with the shopper behavior are marked: what they carry is for sale.
 OEDIT(list)
 {
-    int cnt;
-    RoomIndexData *pRoom;
     OBJ_INDEX_DATA *pObj;
-    ostringstream buffer;
-    
+    ostringstream floor, container, inventory, equip, stock;
+    int cnt = 0;
+
     EDIT_OBJ(ch, pObj);
-    
-    buffer << fmt(0, "Resets for object [{W%d{x] ({g%N1{x):\n\r",
-            pObj->vnum, 
-            pObj->getShortDescr(LANG_DEFAULT));
-    
-    cnt = 0;
+
     for (auto &r: roomIndexMap) {
-        pRoom = r.second;
-        for(auto &pReset: pRoom->resets)
-            switch(pReset->command) {
-                case 'M': {
-                    // A Fenia shop keeper sells its props stock, no G reset needed.
-                    MOB_INDEX_DATA *pMob = get_mob_index( pReset->arg1 );
-                    if (!pMob)
-                        break;
-                    list<int> stock = mob_index_shop_stock( pMob );
-                    if (std::find( stock.begin( ), stock.end( ), pObj->vnum ) != stock.end( )) {
-                        buffer << fmt(0, "{Gshop{x of [{W%d{x] in room [{W%d{x] ({g%s{x)\n\r",
-                                pMob->vnum, pRoom->vnum, pRoom->name.get(LANG_DEFAULT).c_str());
-                        cnt++;
-                    }
+        RoomIndexData *pRoom = r.second;
+        MOB_INDEX_DATA *lastMob = 0;
+        DLString inRoom = fmt(0, "in room [%s] {g%s{x",
+                web_cmd(ch, "redit $1", DLString(pRoom->vnum)).c_str(),
+                pRoom->name.get(LANG_DEFAULT).c_str());
+
+        for (auto &pReset: pRoom->resets) {
+            switch (pReset->command) {
+            case 'M': {
+                lastMob = get_mob_index(pReset->arg1);
+                if (!lastMob || !mob_index_is_shopper(lastMob))
                     break;
+
+                // A Fenia shop keeper sells its props stock, no G reset needed.
+                list<int> shopStock = mob_index_shop_stock(lastMob);
+                if (std::find(shopStock.begin(), shopStock.end(), pObj->vnum) != shopStock.end()) {
+                    stock << fmt(0, "  [%s] {g%N1{x %s\n\r",
+                            web_cmd(ch, "medit $1", DLString(lastMob->vnum)).c_str(),
+                            lastMob->getShortDescr(LANG_DEFAULT), inRoom.c_str());
+                    cnt++;
                 }
-                case 'G':
-                case 'E':
-                case 'O':
-                case 'P':
-                    if (reset_loads_obj(pReset, pObj->vnum)) {
-                        buffer << fmt(0, "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
-                                pReset->command, pRoom->vnum, pRoom->name.get(LANG_DEFAULT).c_str());
-                        cnt++;
-                    }
+                break;
             }
+
+            case 'O':
+                if (reset_loads_obj(pReset, pObj->vnum)) {
+                    floor << "  " << inRoom << "\n\r";
+                    cnt++;
+                }
+                break;
+
+            case 'P':
+                if (reset_loads_obj(pReset, pObj->vnum)) {
+                    OBJ_INDEX_DATA *pContainer = get_obj_index(pReset->arg3);
+                    container << fmt(0, "  [%s] {g%N1{x %s\n\r",
+                            web_cmd(ch, "oedit $1", DLString(pReset->arg3)).c_str(),
+                            pContainer ? pContainer->getShortDescr(LANG_DEFAULT) : "?",
+                            inRoom.c_str());
+                    cnt++;
+                }
+                break;
+
+            case 'G':
+            case 'E': {
+                if (!reset_loads_obj(pReset, pObj->vnum))
+                    break;
+
+                DLString mob = "  [?] (no mob)";
+                if (lastMob)
+                    mob = fmt(0, "  [%s] {g%N1{x%s",
+                            web_cmd(ch, "medit $1", DLString(lastMob->vnum)).c_str(),
+                            lastMob->getShortDescr(LANG_DEFAULT),
+                            mob_index_is_shopper(lastMob) ? " {Gshopkeeper{x" : "");
+
+                if (pReset->command == 'G') {
+                    inventory << mob << " " << inRoom << "\n\r";
+                } else {
+                    Wearlocation *wearloc = wearlocationManager->find(pReset->arg3);
+                    equip << mob << " on " << (wearloc ? wearloc->getName() : DLString("?"))
+                          << " " << inRoom << "\n\r";
+                }
+                cnt++;
+                break;
+            }
+            }
+        }
     }
 
+    ostringstream buffer;
+    buffer << fmt(0, "Resets for object [{W%d{x] ({g%N1{x):\n\r",
+            pObj->vnum, pObj->getShortDescr(LANG_DEFAULT));
+
+    struct { const char *title; ostringstream *lines; } groups[] = {
+        { "On the floor (O)", &floor },
+        { "Inside a container (P)", &container },
+        { "In mob inventory (G)", &inventory },
+        { "Worn by a mob (E)", &equip },
+        { "In a shop's stock", &stock },
+    };
+
+    for (auto &g: groups)
+        if (!g.lines->str().empty())
+            buffer << "{W" << g.title << ":{x\n\r" << g.lines->str();
+
     buffer << fmt(0, "Total {W%d{x resets found.\n\r", cnt);
-    
-    page_to_char( buffer.str( ).c_str( ), ch );
+
+    page_to_char(buffer.str().c_str(), ch);
     return false;
 }
 

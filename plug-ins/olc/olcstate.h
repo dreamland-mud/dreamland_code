@@ -237,6 +237,11 @@ public:
 };    
 
 extern DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args);
+/** Every name in a flag table, space-separated. */
+extern DLString flag_table_all_names(const FlagTable &table);
+/** A field value as a web drop-down of every flag in the table: picking one sends
+ *  '<cmd> <flag>'. Telnet and showWeb=false see only the label. */
+extern DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label);
 
 #define OLC_STATE(State) \
 template <> \
