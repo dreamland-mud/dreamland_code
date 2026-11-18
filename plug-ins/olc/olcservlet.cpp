@@ -114,16 +114,18 @@ DLString olc_room_to_xml(RoomIndexData *pRoom)
 /**
  * Servlet for /olc: a batch of typed OLC ops (see OlcOps in olcops.h).
  * Auth: bottype=telegram, token=<ops token>
- * Args: ops (array), dryRun (bool), verbose (bool: editor echo for every op),
- *       save (bool: 'asave changed' after the batch),
- *       profile (immortal|agent, default agent), actor (name for the journal)
+ * Args: ops (array), dryRun (bool), verbose (bool: editor echo for every op,
+ *       info findings), save (bool: 'asave changed' after the batch),
+ *       strict (bool: agent profile, validator warnings become errors),
+ *       profile (immortal|agent|player, default agent), actor (name for the journal)
  *
  * Example: Russian room name and an object short description in one batch
  *   curl -s 'http://localhost:1235/olc' -d '{"token":"<secret>","bottype":"telegram","args":{"ops":[
  *     {"kind":"room","action":"set","vnum":3001,"field":"name","lang":"ru","value":"..."},
  *     {"kind":"obj","action":"cmd","vnum":3010,"cmd":"level 5"}]}}'
  *   Response (200, JSON): {"ok":true,"changed":[{"kind":"room","vnum":3001},...],
- *     "errors":[],"warnings":[],"results":[{"op":0,"ok":true,"changed":true,...}],"skipped":0}
+ *     "errors":[],"warnings":[],"findings":[],"findingsSummary":{},
+ *     "results":[{"op":0,"ok":true,"changed":true,...}],"skipped":0}
  *
  * Areas are marked changed like an interactive edit; save, 'asave changed' or
  * the minute autosave writes them to disk.
@@ -156,6 +158,7 @@ static void olc_ops_servlet(HttpRequest &request, HttpResponse &response)
     bool dryRun = args.isMember("dryRun") && args["dryRun"].isBool() && args["dryRun"].asBool();
     bool verbose = args.isMember("verbose") && args["verbose"].isBool() && args["verbose"].asBool();
     bool save = args.isMember("save") && args["save"].isBool() && args["save"].asBool();
+    bool strict = args.isMember("strict") && args["strict"].isBool() && args["strict"].asBool();
 
     Room *limbo = get_room_instance(ROOM_VNUM_LIMBO);
     if (!limbo) {
@@ -172,7 +175,7 @@ static void olc_ops_servlet(HttpRequest &request, HttpResponse &response)
 
     Json::Value result;
     try {
-        result = OlcOps::apply(ch, args["ops"], policy, dryRun, verbose, save);
+        result = OlcOps::apply(ch, args["ops"], policy, dryRun, verbose, save, strict);
     } catch (...) {
         olc_servlet_cleanup_char(ch);
         throw;

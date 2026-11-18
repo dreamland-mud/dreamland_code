@@ -9,6 +9,7 @@
 #include <functional>
 
 #include "olcops.h"
+#include "olcvalidate.h"
 #include "olcservlet.h"
 #include "capturebufferhandler.h"
 #include "redit.h"
@@ -223,6 +224,8 @@ struct OlcOpContext {
     std::map<DLString, std::set<int> > planned;
     // Quests whose steps this batch touched, checked for step pairing at the end.
     std::set<int> quests;
+    // Prototypes a 'validate' op named; area vnums mean every prototype of the area.
+    std::set<std::pair<DLString, int> > validate;
     Json::Value *warnings;
 };
 
@@ -377,6 +380,11 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
 
     if (!line.requiredName.empty() && name != line.requiredName) {
         error = "No '" + line.requiredName + "' field on " + state->getJournalKind();
+        return false;
+    }
+
+    if (ctx.policy == OLC_POLICY_PLAYER && olc_power_field(name)) {
+        error = "The player profile can't set " + name + ": numbers, flags, power and code stay with builders";
         return false;
     }
 
@@ -1957,6 +1965,131 @@ static void quest_pairing_warnings(OlcOpContext &ctx)
 }
 
 /*--------------------------------------------------------------------------
+ * Validators (olcvalidate.h)
+ *-------------------------------------------------------------------------*/
+
+/** 'validate': names a prototype, or an area for all of its prototypes, for the
+ *  validator chain at the end of the batch. Reads only: no journal line. */
+static bool validate_op(OlcOpContext &ctx, const DLString &kind, const Json::Value &op,
+                        Json::Value &res, int &vnum, DLString &error)
+{
+    if (kind != "room" && kind != "mob" && kind != "obj" && kind != "area") {
+        error = "validate is for room, mob, obj and area";
+        return false;
+    }
+
+    if (!op_number(ctx, op, "vnum", vnum, error, kind == "area" ? 0 : 1))
+        return false;
+
+    res["vnum"] = vnum;
+
+    bool exists = kind == "area" ? AreaUtils::getByVnum(vnum) != 0 : index_exists(kind, vnum);
+    if (!exists) {
+        error = kind + " " + DLString(vnum) + " not found";
+        return false;
+    }
+
+    ctx.validate.insert(std::make_pair(kind, vnum));
+    res["changed"] = false;
+    return true;
+}
+
+static int severity_rank(const DLString &severity)
+{
+    if (severity == "error")
+        return 0;
+    if (severity == "warning")
+        return 1;
+    return 2;
+}
+
+/** Runs the chain on every prototype the batch changed and every one a
+ *  'validate' op named, applies the profile and fills findings[] and
+ *  findingsSummary. Returns the number of errors. */
+static int run_validators(OlcOpContext &ctx, const std::set<std::pair<DLString, int> > &changed,
+                          bool strict, Json::Value &result)
+{
+    std::set<std::pair<DLString, int> > targets = ctx.validate;
+    targets.insert(changed.begin(), changed.end());
+
+    OlcFindings findings;
+    std::set<int> areasDone;
+
+    for (auto &t: targets) {
+        const DLString &kind = t.first;
+        int vnum = t.second;
+
+        // A deleted prototype is gone or a tombstone: nothing to check.
+        if (kind == "room" && vnum > 0)
+            olc_validate_room(get_room_index(vnum), findings);
+        else if (kind == "mob" && vnum > 0)
+            olc_validate_mob(get_mob_index(vnum), findings);
+        else if (kind == "obj" && vnum > 0)
+            olc_validate_obj(get_obj_index(vnum), findings);
+        else if (kind == "area" && vnum >= 0 && areasDone.insert(vnum).second) {
+            AreaIndexData *pArea = AreaUtils::getByVnum(vnum);
+            if (ctx.validate.count(t))
+                olc_validate_area_all(pArea, findings);
+            else
+                olc_validate_area(pArea, findings);
+        }
+    }
+
+    // The profile decides what a finding means: the player profile and a
+    // strict agent batch refuse on any warning, everyone else is told.
+    bool hard = ctx.policy == OLC_POLICY_PLAYER || (ctx.policy == OLC_POLICY_AGENT && strict);
+    int errors = 0;
+
+    for (auto &f: findings) {
+        if (hard && f.severity == "warning")
+            f.severity = "error";
+        if (f.severity == "error")
+            errors++;
+    }
+
+    std::stable_sort(findings.begin(), findings.end(),
+                     [](const OlcFinding &a, const OlcFinding &b) {
+                         return severity_rank(a.severity) < severity_rank(b.severity);
+                     });
+
+    // Terse by default: info only with verbose, and a cap on the list. The
+    // summary always counts everything.
+    const size_t cap = ctx.verbose ? 2000 : 200;
+    Json::Value &list = result["findings"];
+    Json::Value &summary = result["findingsSummary"];
+    list = Json::Value(Json::arrayValue);
+    summary = Json::Value(Json::objectValue);
+    int hidden = 0;
+
+    for (auto &f: findings) {
+        DLString key = f.severity + " " + f.check;
+        summary[key] = summary.isMember(key) ? summary[key].asInt() + 1 : 1;
+
+        if ((f.severity == "info" && !ctx.verbose) || list.size() >= cap) {
+            hidden++;
+            continue;
+        }
+
+        Json::Value j;
+        j["severity"] = f.severity;
+        j["check"] = f.check;
+        j["kind"] = f.kind;
+        j["vnum"] = f.vnum;
+        if (!f.field.empty())
+            j["field"] = f.field;
+        if (!f.lang.empty())
+            j["lang"] = f.lang;
+        j["message"] = f.message;
+        list.append(j);
+    }
+
+    if (hidden > 0)
+        result["findingsHidden"] = hidden;
+
+    return errors;
+}
+
+/*--------------------------------------------------------------------------
  * Dispatch
  *-------------------------------------------------------------------------*/
 
@@ -1977,10 +2110,28 @@ static bool apply_one(OlcOpContext &ctx, const Json::Value &op, Json::Value &res
 
     res["kind"] = kind;
 
+    bool prototype = kind == "room" || kind == "mob" || kind == "obj";
+
+    if (action == "validate")
+        return validate_op(ctx, kind, op, res, vnum, error);
+
+    if (ctx.policy == OLC_POLICY_PLAYER && action != "get") {
+        if (!prototype) {
+            error = "The player profile only reads " + kind + " (get)";
+            return false;
+        }
+        if (action == "put") {
+            error = "The player profile can't put whole prototypes";
+            return false;
+        }
+        if (action == "delete" && !op.isMember("exit") && !op.isMember("eexit") && !op.isMember("ed")) {
+            error = "The player profile deletes parts only: exit, eexit or ed";
+            return false;
+        }
+    }
+
     if (kind == "quest")
         return quest_op(ctx, action, op, res, vnum, error);
-
-    bool prototype = kind == "room" || kind == "mob" || kind == "obj";
 
     if (!prototype && kind != "area" && kind != "reset") {
         error = "kind must be room, mob, obj, reset, area or quest";
@@ -1996,7 +2147,7 @@ static bool apply_one(OlcOpContext &ctx, const Json::Value &op, Json::Value &res
     if (prototype && action != "get" && action != "cmd" && action != "set"
         && action != "delete" && action != "put")
     {
-        error = kind + " action must be get, create, cmd, set, delete or put";
+        error = kind + " action must be get, create, cmd, set, delete, put or validate";
         return false;
     }
 
@@ -2015,15 +2166,16 @@ static bool apply_one(OlcOpContext &ctx, const Json::Value &op, Json::Value &res
 }
 
 Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
-                          OlcPolicy policy, bool dryRun, bool verbose, bool save)
+                          OlcPolicy policy, bool dryRun, bool verbose, bool save, bool strict)
 {
     Json::Value result;
     result["ok"] = true;
     result["dryRun"] = dryRun;
     result["profile"] = policyName(policy);
+    result["strict"] = strict;
     result["changed"] = Json::Value(Json::arrayValue);
     result["errors"] = Json::Value(Json::arrayValue);
-    // Structural findings; the validators (phase 2) report here too.
+    // Op-level notes (quest step pairing...); the validators answer in findings.
     result["warnings"] = Json::Value(Json::arrayValue);
     result["results"] = Json::Value(Json::arrayValue);
     result["skipped"] = 0;
@@ -2034,17 +2186,6 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
         err["error"] = "ops must be a non-empty array";
         result["errors"].append(err);
         result["ok"] = false;
-        return result;
-    }
-
-    // The player profile needs its field whitelist and validators first.
-    if (policy == OLC_POLICY_PLAYER) {
-        Json::Value err;
-        err["op"] = -1;
-        err["error"] = "the player profile is not available yet";
-        result["errors"].append(err);
-        result["ok"] = false;
-        result["skipped"] = (int)ops.size();
         return result;
     }
 
@@ -2114,7 +2255,20 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
     if (!dryRun)
         quest_pairing_warnings(ctx);
 
-    if (save && !dryRun && !result["changed"].empty()) {
+    // A dry run changed nothing: only what 'validate' ops named is checked.
+    int validationErrors = run_validators(ctx, dryRun ? std::set<std::pair<DLString, int> >() : changed,
+                                          strict, result);
+
+    if (validationErrors > 0) {
+        Json::Value err;
+        err["op"] = -1;
+        err["error"] = DLString(validationErrors) + " validator error(s), see findings"
+                       + (save && !dryRun ? ": save skipped; no rollback, the edits stay applied and the autosave still writes them" : "");
+        result["errors"].append(err);
+        result["ok"] = false;
+    }
+
+    if (save && !dryRun && validationErrors == 0 && !result["changed"].empty()) {
         std::list<AreaIndexData *> saved;
         int failed = save_changed_areas(actor, saved);
 
