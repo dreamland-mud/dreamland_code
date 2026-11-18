@@ -14,6 +14,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "skill_sound.h"
 
 GSN(golden_eye);
 GSN(pick_lock);
@@ -216,6 +217,7 @@ bool Keyhole::doPick( const DLString &arg )
     }
     
     unlock( );
+    skill_sound( ch, 0, "skill/lockpick" );
 
     gsn_pick_lock->improve( ch, true );
     record( lockpick );

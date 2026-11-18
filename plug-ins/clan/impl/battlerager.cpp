@@ -47,6 +47,7 @@
 #include "skill_utils.h"
 #include "clanownshook.h"
 #include "l10n.h"
+#include "skill_sound.h"
 
 using std::max;
 using std::min;
@@ -328,6 +329,7 @@ SKILL_RUNP( truesight )
 
       oldact(_("Ты зорко смотришь вокруг!"),ch,0,0,TO_CHAR);
       oldact(_("$c1 смотрит более зорко."),ch,0,0,TO_ROOM);
+      skill_sound( ch, 0, "spell/glimmer" );
       gsn_truesight->improve( ch, true );
     }
   else
@@ -426,6 +428,7 @@ static void bandage_first_aid( Character *ch )
 
     bandage_use_cloth( ch );
     bandage_stop_bleeding( ch );
+    skill_sound( ch, 0, "skill/bandage" );
     ch->setWaitViolence( 1 );
 }
 
@@ -488,6 +491,7 @@ void BandageCommand::run( Character* ch, char *argument )
 
                 ch->pecho( _("Ты накладываешь повязку на свою рану!") );
                 oldact(_("$c1 перевязывает свои раны."),ch,0,0,TO_ROOM);
+                skill_sound( ch, 0, "skill/bandage" );
                 gsn_bandage->improve( ch, true );
                 bandage_use_cloth( ch );
                 bandage_stop_bleeding( ch );

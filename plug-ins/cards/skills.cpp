@@ -29,6 +29,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "skill_sound.h"
 
 GSN(sconce);
 GSN(joker);
@@ -175,6 +176,7 @@ public:
             oldact(_("Твоя {Rшутка{x над $C5 удалась!"),ch,0,victim,TO_CHAR);
             oldact(_("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x над $C5!"),ch,0,victim,TO_NOTVICT);
             oldact_p(_("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x!"),ch,0,victim,TO_VICT,POS_DEAD);
+            skill_sound( ch, 0, "skill/assassinate" );
 
             gsn_joker->improve( ch, true, victim );
 
