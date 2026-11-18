@@ -24,7 +24,8 @@ void olc_servlet_seed_buffer(PCharacter *ch, const DLString &text);
  *  longer than an input line (overflows the handlers' fixed buffers). */
 DLString olc_servlet_refusal(const DLString &cmdName, const DLString &arguments, bool hasText);
 
-/** Room prototype fields as XML, the built-in XMLRoom serializer (KOI8). */
+/** Room prototype fields as XML, the built-in XMLRoom serializer. UTF-8:
+ *  XMLDocument::save converts on output. */
 DLString olc_room_to_xml(RoomIndexData *pRoom);
 
 #endif
