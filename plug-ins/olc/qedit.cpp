@@ -265,7 +265,9 @@ int qedit_step_pairing(AreaQuest *q, int s)
         result |= STEP_PAIR_TARGET;
 
     // onSpeech ends this step, postSpeech begins the next.
-    if (trigger_type(step->endTrigger) != trigger_type(nextStep->beginTrigger))
+    if (!DLString("on").strPrefix(step->endTrigger)
+        || !DLString("post").strPrefix(nextStep->beginTrigger)
+        || trigger_type(step->endTrigger) != trigger_type(nextStep->beginTrigger))
         result |= STEP_PAIR_TRIGGER;
 
     return result;
