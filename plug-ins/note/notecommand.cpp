@@ -252,6 +252,7 @@ void NoteCommand::doFlag(PCharacter *ch, DLString &arguments )
         cnote = findNoteArg( ch, arg );
     } catch (const ExceptionBadType& e) {
         ch->pecho( _("Неправильный номер письма.") );
+        ch->pecho( _("Использование: %s flag <number> <flags to set|none>"), thread->getName( ).c_str( ) );
         return;
     }
 
@@ -465,8 +466,7 @@ void NoteCommand::doList( PCharacter *ch, DLString &argument ) const
 
             if (listfilter_parse( ch, cnt, last, *i, from, thread->getNoteText( *i, ch ), hidden, argument.c_str( ) )) {
                 buf << "[" << cnt 
-                    << (hidden ? " " : "N") << "] #" 
-                    << (*i)->getID( ) << " "
+                    << (hidden ? " " : "N") << "] " 
                     << from << ": " << (*i)->getSubject( ) << "{x";
                 if (ch->isCoder() && (*i)->getFlags().getValue() != 0)
                     buf << "  {D[" << (*i)->getFlags().names() << "]{x";
@@ -531,9 +531,14 @@ void NoteCommand::doUncatchup( PCharacter *ch, DLString &arguments ) const
     
     attr = ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" );
 
-    if (!isNoteArg( arg )) {
+    if (arg.empty( )) {
         attr->setStamp( *thread, 0 );
         ch->pecho( _("Все %N1 помечены как непрочитанные."), thread->getMltNameFor( viewerLang( ch ) ).c_str( ) );
+        return;
+    }
+
+    if (!isNoteArg( arg )) {
+        ch->pecho( _("Неправильный номер письма.") );
         return;
     }
 
