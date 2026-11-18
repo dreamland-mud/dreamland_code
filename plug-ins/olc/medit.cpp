@@ -513,7 +513,7 @@ MEDIT(show)
     ptc(ch, "{CWealth:{x      [{W%10d{x]  {CAlign{x: [{W%5d{x]\n\r",
         mob.wealth, mob.alignment);
 
-    ptc(ch, "{CHitroll:{x     [{W%5d{x]  {CDamage{x: [{W%10s{x] {D(? weapon_flags){x\n\r",
+    ptc(ch, "{CHitroll:{x     [{W%5d{x]  {CDamtype{x: [{W%10s{x] {D(damtype; ? weapon_flags){x\n\r",
         mob.hitroll, weapon_flags.name(mob.dam_type).c_str( ));
 
     ptc(ch, "{CArmor{x:       [{Wpierce: %d  bash: %d  slash: %d  magic: %d{x] {D(? ac_type){x\n\r",
@@ -1340,10 +1340,6 @@ MEDIT(dump)
     return false;
 }
 
-/*
- * XXX: theoretically, can be used to peek stats of mobiles 
- * that you have no right to edit
- */
 MEDIT(copy)
 {
     MOB_INDEX_DATA *original;
@@ -1379,6 +1375,11 @@ MEDIT(copy)
 
     if (original == NULL) {
         ch->pecho("Mobile not found.\r\n");
+        return false;
+    }
+
+    if (!OLCState::can_edit(ch, original->vnum)) {
+        stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
         return false;
     }
     

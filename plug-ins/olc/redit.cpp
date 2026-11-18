@@ -46,6 +46,8 @@
 #include "hometown.h"
 #include "vnum.h"
 #include "descriptor.h"
+#include "stringlist.h"
+#include "json_utils.h"
 
 #include "def.h"
 
@@ -142,6 +144,102 @@ REDIT(sector, "местность", "установить тип местнос�
     }
 
     return false;
+}
+
+// Declared early on purpose: later commands win short prefixes, so 'co' still means 'commands'.
+REDIT(copy, "копировать", "скопировать описания, параметры или поведения другой комнаты (copy help)")
+{
+    RoomIndexData *pRoom, *source;
+    DLString args = argument;
+    DLString arg1 = args.getOneArgument();
+    DLString arg2 = args.getOneArgument();
+    // Either order: 'copy desc 3001' as in oedit/medit, or 'copy 3001 desc'.
+    DLString vnumArg = arg1.isNumber() ? arg1 : arg2;
+    DLString what = arg1.isNumber() ? arg2 : arg1;
+    // One mode only, first match wins as in oedit/medit: a short prefix
+    // such as Cyrillic 'п' matches both param and behavior synonyms.
+    bool copyDesc = false, copyParam = false, copyBhv = false;
+    if (arg_is(what, "all"))
+        copyDesc = copyParam = copyBhv = true;
+    else if (arg_is(what, "desc"))
+        copyDesc = true;
+    else if (arg_is(what, "param"))
+        copyParam = true;
+    else if (arg_is(what, "behavior"))
+        copyBhv = true;
+
+    EDIT_ROOM(ch, pRoom);
+
+    if (!vnumArg.isNumber() || (!copyDesc && !copyParam && !copyBhv)) {
+        stc("Syntax:\r\n"
+            "  copy desc <vnum>     -- name, description, smell, sound and extra descriptions, all languages.\r\n"
+            "  copy param <vnum>    -- sector, flags, heal and mana rate, clan, guilds, liquid.\r\n"
+            "  copy behavior <vnum> -- behaviors and their props.\r\n"
+            "  copy all <vnum>      -- all of the above.\r\n"
+            "The order 'copy <vnum> <mode>' works too.\r\n"
+            "Exits, resets and Fenia triggers are never copied.\r\n"
+            "This edits the room directly: there is no undo.\r\n", ch);
+        return false;
+    }
+
+    source = get_room_index(vnumArg.toInt());
+    if (!source) {
+        stc("Room not found.\r\n", ch);
+        return false;
+    }
+
+    if (!OLCState::can_edit(ch, source->vnum)) {
+        ptc(ch, "У тебя недостаточно прав для редактирования комнаты %d.\n\r", source->vnum);
+        return false;
+    }
+
+    if (source == pRoom) {
+        stc("That is this room.\r\n", ch);
+        return false;
+    }
+
+    StringList copied;
+
+    if (copyDesc) {
+        pRoom->name = source->name;
+        pRoom->description = source->description;
+        pRoom->smell = source->smell;
+        pRoom->sound = source->sound;
+
+        pRoom->extraDescriptions.deallocate();
+        for (auto &ed: source->extraDescriptions) {
+            ExtraDescription *myed = new ExtraDescription();
+            myed->keyword = ed->keyword;
+            myed->description = ed->description;
+            pRoom->extraDescriptions.push_back(myed);
+        }
+
+        copied.push_back("descriptions");
+    }
+
+    if (copyParam) {
+        pRoom->room_flags = source->room_flags;
+        pRoom->sector_type = source->sector_type;
+        pRoom->heal_rate = source->heal_rate;
+        pRoom->mana_rate = source->mana_rate;
+        pRoom->clan.assign(source->clan);
+        pRoom->guilds.clear();
+        pRoom->guilds.set(source->guilds);
+        pRoom->liquid.assign(source->liquid);
+        copied.push_back("parameters");
+    }
+
+    if (copyBhv) {
+        pRoom->behaviors.clear();
+        pRoom->behaviors.set(source->behaviors);
+        pRoom->props.clear();
+        JsonUtils::copy(pRoom->props, source->props);
+        copied.push_back("behaviors");
+    }
+
+    ptc(ch, "Copied %s from room [%d] %s{x.\r\n",
+        copied.join(", ").c_str(), source->vnum, source->name.get(LANG_DEFAULT).c_str());
+    return true;
 }
 
 /*
