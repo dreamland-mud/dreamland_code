@@ -1170,5 +1170,6 @@ DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd
     for (int i = 0; i < table.size; i++)
         commands.push_back("$ " + DLString(table.fields[i].name));
 
-    return web_menu(commands, cmd, label);
+    // An empty label would leave nothing to click on.
+    return web_menu(commands, cmd, label.empty() ? DLString("none") : label);
 }

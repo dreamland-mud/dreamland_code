@@ -151,9 +151,12 @@ REDIT(copy, "копировать", "скопировать описания, п
 {
     RoomIndexData *pRoom, *source;
     DLString args = argument;
-    DLString vnumArg = args.getOneArgument();
-    DLString what = args.getOneArgument();
-    bool all = what.empty() || arg_is(what, "all");
+    DLString arg1 = args.getOneArgument();
+    DLString arg2 = args.getOneArgument();
+    // Either order: 'copy desc 3001' as in oedit/medit, or 'copy 3001 desc'.
+    DLString vnumArg = arg1.isNumber() ? arg1 : arg2;
+    DLString what = arg1.isNumber() ? arg2 : arg1;
+    bool all = arg_is(what, "all");
     bool copyDesc = all || arg_is(what, "desc");
     bool copyParam = all || arg_is(what, "param");
     bool copyBhv = all || arg_is(what, "behavior");
@@ -162,17 +165,24 @@ REDIT(copy, "копировать", "скопировать описания, п
 
     if (!vnumArg.isNumber() || (!copyDesc && !copyParam && !copyBhv)) {
         stc("Syntax:\r\n"
-            "  copy <vnum> desc     -- name, description, smell, sound and extra descriptions, all languages.\r\n"
-            "  copy <vnum> param    -- sector, flags, heal and mana rate, clan, guilds, liquid.\r\n"
-            "  copy <vnum> behavior -- behaviors and their props.\r\n"
-            "  copy <vnum> [all]    -- all of the above.\r\n"
-            "Exits, resets and Fenia triggers are never copied.\r\n", ch);
+            "  copy desc <vnum>     -- name, description, smell, sound and extra descriptions, all languages.\r\n"
+            "  copy param <vnum>    -- sector, flags, heal and mana rate, clan, guilds, liquid.\r\n"
+            "  copy behavior <vnum> -- behaviors and their props.\r\n"
+            "  copy all <vnum>      -- all of the above.\r\n"
+            "The order 'copy <vnum> <mode>' works too.\r\n"
+            "Exits, resets and Fenia triggers are never copied.\r\n"
+            "This edits the room directly: there is no undo.\r\n", ch);
         return false;
     }
 
     source = get_room_index(vnumArg.toInt());
     if (!source) {
         stc("Room not found.\r\n", ch);
+        return false;
+    }
+
+    if (!OLCState::can_edit(ch, source->vnum)) {
+        ptc(ch, "У тебя недостаточно прав для редактирования комнаты %d.\n\r", source->vnum);
         return false;
     }
 

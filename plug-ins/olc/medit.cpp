@@ -1340,10 +1340,6 @@ MEDIT(dump)
     return false;
 }
 
-/*
- * XXX: theoretically, can be used to peek stats of mobiles 
- * that you have no right to edit
- */
 MEDIT(copy)
 {
     MOB_INDEX_DATA *original;
@@ -1379,6 +1375,11 @@ MEDIT(copy)
 
     if (original == NULL) {
         ch->pecho("Mobile not found.\r\n");
+        return false;
+    }
+
+    if (!OLCState::can_edit(ch, original->vnum)) {
+        stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
         return false;
     }
     

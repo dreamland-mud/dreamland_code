@@ -954,10 +954,6 @@ OEDIT(condition)
     return numberEdit(0, 100, obj.condition); 
 }
 
-/*
- * XXX: theoretically, can be used to peek stats of items 
- * that you have no right to edit
- */
 OEDIT(copy)
 {
     OBJ_INDEX_DATA *original;
@@ -993,6 +989,11 @@ OEDIT(copy)
 
     if (original == NULL) {
         ch->pecho("Object not found.\r\n");
+        return false;
+    }
+
+    if (!OLCState::can_edit(ch, original->vnum)) {
+        stc("У тебя недостаточно прав для редактирования предметов.\n\r", ch);
         return false;
     }
     
@@ -1034,9 +1035,12 @@ OEDIT(list)
     for (auto &r: roomIndexMap) {
         RoomIndexData *pRoom = r.second;
         MOB_INDEX_DATA *lastMob = 0;
-        DLString inRoom = fmt(0, "in room [%s] {g%s{x",
-                web_cmd(ch, "redit $1", DLString(pRoom->vnum)).c_str(),
-                pRoom->name.get(LANG_DEFAULT).c_str());
+        // Built only for a matching reset: most rooms have none.
+        auto inRoom = [&]() {
+            return fmt(0, "in room [%s] {g%s{x",
+                    web_cmd(ch, "redit $1", DLString(pRoom->vnum)).c_str(),
+                    pRoom->name.get(LANG_DEFAULT).c_str());
+        };
 
         for (auto &pReset: pRoom->resets) {
             switch (pReset->command) {
@@ -1050,7 +1054,7 @@ OEDIT(list)
                 if (std::find(shopStock.begin(), shopStock.end(), pObj->vnum) != shopStock.end()) {
                     stock << fmt(0, "  [%s] {g%N1{x %s\n\r",
                             web_cmd(ch, "medit $1", DLString(lastMob->vnum)).c_str(),
-                            lastMob->getShortDescr(LANG_DEFAULT), inRoom.c_str());
+                            lastMob->getShortDescr(LANG_DEFAULT), inRoom().c_str());
                     cnt++;
                 }
                 break;
@@ -1058,7 +1062,7 @@ OEDIT(list)
 
             case 'O':
                 if (reset_loads_obj(pReset, pObj->vnum)) {
-                    floor << "  " << inRoom << "\n\r";
+                    floor << "  " << inRoom() << "\n\r";
                     cnt++;
                 }
                 break;
@@ -1069,7 +1073,7 @@ OEDIT(list)
                     container << fmt(0, "  [%s] {g%N1{x %s\n\r",
                             web_cmd(ch, "oedit $1", DLString(pReset->arg3)).c_str(),
                             pContainer ? pContainer->getShortDescr(LANG_DEFAULT) : "?",
-                            inRoom.c_str());
+                            inRoom().c_str());
                     cnt++;
                 }
                 break;
@@ -1087,11 +1091,11 @@ OEDIT(list)
                             mob_index_is_shopper(lastMob) ? " {Gshopkeeper{x" : "");
 
                 if (pReset->command == 'G') {
-                    inventory << mob << " " << inRoom << "\n\r";
+                    inventory << mob << " " << inRoom() << "\n\r";
                 } else {
                     Wearlocation *wearloc = wearlocationManager->find(pReset->arg3);
                     equip << mob << " on " << (wearloc ? wearloc->getName() : DLString("?"))
-                          << " " << inRoom << "\n\r";
+                          << " " << inRoom() << "\n\r";
                 }
                 cnt++;
                 break;
