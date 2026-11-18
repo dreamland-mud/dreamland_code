@@ -1022,9 +1022,8 @@ void UndefinedOneHit::msgOpeners( )
     }
 
     if (stirrups) {
-        ch->pecho(_("Ты привстаешь в стременах и обрушиваешь удар на %2$C4!"), ch, victim);
-        victim->pecho(_("%1$^C1 привста%1$nет|ют в стременах и обрушива%1$nет|ют на тебя удар!"), ch, victim);
-        ch->recho(victim, _("%1$^C1 привста%1$nет|ют в стременах и обрушива%1$nет|ют удар на %2$C4!"), ch, victim);
+        ch->pecho(POS_RESTING, _("Ты привстаешь в стременах и обрушиваешь удар на %2$C4!"), ch, victim);
+        victim->pecho(POS_RESTING, _("%1$^C1 привста%1$nет|ют в стременах и обрушива%1$nет|ют на тебя удар!"), ch, victim);
     }
 }
 
