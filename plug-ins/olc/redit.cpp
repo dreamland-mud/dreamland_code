@@ -154,17 +154,24 @@ REDIT(sector, "местность", "установить тип местнос�
  * The vnum stays plain text; web clients get it as a button that opens the editor.
  */
 
-// Optional trailing area argument: vnum or file name, default is the room's area.
+// Optional trailing area argument (vnum or file name). It counts only as one last token
+// that resolves to an area; anything else keeps the old behaviour: current room's area,
+// extra words ignored. Listing needs the same rights as editing the area.
 static AreaIndexData * olc_list_area(PCharacter *ch, const char *argument)
 {
     DLString arg = DLString(argument).stripWhiteSpace();
+    AreaIndexData *pArea = 0;
 
-    if (arg.empty())
-        return ch->in_room->areaIndex();
+    if (!arg.empty() && arg.find_first_of(" \t") == DLString::npos)
+        pArea = AreaUtils::lookup(arg);
 
-    AreaIndexData *pArea = AreaUtils::lookup(arg);
     if (!pArea)
-        ptc(ch, "Зона '%s' не найдена, укажи ее номер или имя файла.\n\r", arg.c_str());
+        pArea = ch->in_room->areaIndex();
+
+    if (!OLCState::can_edit(ch, pArea)) {
+        ptc(ch, "У тебя недостаточно прав для редактирования зоны %d (%s).\n\r", pArea->vnum, pArea->getName().c_str());
+        return 0;
+    }
 
     return pArea;
 }

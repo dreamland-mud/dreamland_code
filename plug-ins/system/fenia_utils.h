@@ -47,8 +47,9 @@ StringSet trigger_labels(Object *obj);
 /** Labelled lines listing the onXXX/postXXX triggers and the other methods
  *  defined on a wrapper; empty when it has none or the wrapper is null.
  *  A non-empty 'cmd' (e.g. "fenia $1") turns every name into a web button,
- *  'hint' is appended to the triggers line. */
-DLString wrapper_triggers_lines(Character *ch, WrapperBase *wrapper, const DLString &cmd, const DLString &hint);
+ *  'hint' is appended to the triggers line. With 'functionsOnly' the methods
+ *  line skips guts that hold data rather than a function. */
+DLString wrapper_triggers_lines(Character *ch, WrapperBase *wrapper, const DLString &cmd, const DLString &hint, bool functionsOnly);
 
 // Return name of this trigger w/o 'on' or 'post' prefix
 DLString trigger_type(const DLString &constTrigger);

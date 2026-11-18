@@ -588,11 +588,11 @@ CMDWIZP( goto )
  */
 static void stat_fenia_lines( Character *ch, Scripting::Object *instance, Scripting::Object *proto, ostringstream &buf )
 {
-    DLString lines = wrapper_triggers_lines( ch, get_wrapper( instance ), "", "" );
+    DLString lines = wrapper_triggers_lines( ch, get_wrapper( instance ), "", "", true );
     if (!lines.empty( ))
         buf << fmt( ch, _("{WFenia на экземпляре:{x\n") ) << lines;
 
-    lines = wrapper_triggers_lines( ch, get_wrapper( proto ), "", "" );
+    lines = wrapper_triggers_lines( ch, get_wrapper( proto ), "", "", false );
     if (!lines.empty( ))
         buf << fmt( ch, _("{WFenia на прототипе:{x\n") ) << lines;
 }
@@ -618,8 +618,11 @@ static DLString obj_location( Character *ch, Object *obj )
         buf << fmt( ch, _("на полу в %s [Комната %d]"),
                     in_obj->in_room->getName( ),
                     in_obj->in_room->vnum );
-    else
+    else {
         buf << fmt( ch, _("черт его знает где") );
+        if (obj->in_obj == 0)
+            buf << ".";
+    }
 
     if (obj->in_obj != 0) {
         buf << fmt( ch, _(", внутри:") );
@@ -645,7 +648,8 @@ static DLString stat_number_link( Character *ch, const char *kind, long long id,
  * 'stat obj <vnum>' and 'stat mob <vnum>': the loaded instances of that
  * prototype. A single one is shown right away, several are listed, and
  * 'N.<vnum>' picks the Nth of the list. Returns false when the argument is not
- * a vnum (a name, or a 10+ digit entity id), so the caller searches as before.
+ * a prototype vnum (a name, a numeric keyword, or a 10+ digit entity id), so the
+ * caller searches as before.
  */
 static bool stat_by_vnum( Character *ch, const char *argument, bool fObj )
 {
@@ -663,6 +667,10 @@ static bool stat_by_vnum( Character *ch, const char *argument, bool fObj )
 
     int vnum = atoi( word );
     if (vnum <= 0)
+        return false;
+
+    // No such prototype: a numeric keyword, let the name search have it.
+    if (fObj ? get_obj_index( vnum ) == 0 : get_mob_index( vnum ) == 0)
         return false;
 
     const char *kind = fObj ? "obj" : "mob";
@@ -684,17 +692,10 @@ static bool stat_by_vnum( Character *ch, const char *argument, bool fObj )
     int count = fObj ? objs.size( ) : mobs.size( );
 
     if (count == 0) {
-        bool hasProto = fObj ? get_obj_index( vnum ) != 0 : get_mob_index( vnum ) != 0;
-
-        if (!hasProto) {
-            ch->pecho( _("Прототипа с номером %d нет."), vnum );
-        }
-        else {
-            DLString editCmd;
-            editCmd << (fObj ? "oedit " : "medit ") << vnum;
-            ch->pecho( _("Ни одного экземпляра [%d] сейчас нет в мире. Прототип: %s"),
-                       vnum, web_cmd( ch, editCmd, editCmd ).c_str( ) );
-        }
+        DLString editCmd;
+        editCmd << (fObj ? "oedit " : "medit ") << vnum;
+        ch->pecho( _("Ни одного экземпляра [%d] сейчас нет в мире. Прототип: %s"),
+                   vnum, web_cmd( ch, editCmd, editCmd ).c_str( ) );
         return true;
     }
 

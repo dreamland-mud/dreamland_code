@@ -221,13 +221,23 @@ static void wrapper_names_line(ostringstream &buf, Character *ch, const StringSe
     buf << hint << endl;
 }
 
-DLString wrapper_triggers_lines(Character *ch, WrapperBase *wrapper, const DLString &cmd, const DLString &hint)
+DLString wrapper_triggers_lines(Character *ch, WrapperBase *wrapper, const DLString &cmd, const DLString &hint, bool functionsOnly)
 {
     StringSet triggers, misc;
     ostringstream buf;
 
     if (wrapper)
         wrapper->collectTriggers(triggers, misc);
+
+    // Instance wrappers keep persistent data fields among their guts: those are not methods.
+    if (functionsOnly) {
+        Register prog;
+        for (auto m = misc.begin(); m != misc.end(); )
+            if (wrapper->triggerFunction(Scripting::IdRef(*m), prog))
+                m++;
+            else
+                m = misc.erase(m);
+    }
 
     wrapper_names_line(buf, ch, triggers, "{gАктивные триггеры{x:    ", cmd, hint);
     wrapper_names_line(buf, ch, misc, "{gАктивные методы{x:      ", cmd, DLString::emptyString);
