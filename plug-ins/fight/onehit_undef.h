@@ -72,6 +72,7 @@ protected:
 
     bool deathblowStun;
     bool charged;
+    bool stirrups;        // cavalry: rose in the stirrups for a harder blow
     bool offEnd;          // the staff's other end, struck from the grip (fight.cpp staff_offend_hit)
 };
 
