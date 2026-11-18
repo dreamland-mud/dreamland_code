@@ -265,8 +265,10 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     if (!feniaOverride)
         Command::run( ch, args );
 
-    if (betweenRounds && !ch->extracted)
-        fightspam_flush_between_rounds( ch, ch->fighting ? ch->fighting : target.vict );
+    // Only the live fight target: a PC killed by the skill is already standing
+    // at the altar and must not get a line there.
+    if (betweenRounds && !ch->extracted && ch->fighting)
+        fightspam_flush_between_rounds( ch, ch->fighting );
 
     // Potentially aggressive command, mark player as actively fighting.
     // Happens after 'run' because some skills (p.ex. camouflage) depend on last fight time delay.
