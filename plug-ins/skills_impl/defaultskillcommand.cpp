@@ -15,6 +15,7 @@
 #include "fight_position.h"
 #include "directions.h"
 #include "loadsave.h"
+#include "fight.h"
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
@@ -248,12 +249,24 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
 
     ch->setWait(skill->getBeats(ch));
 
+    // A skill used between rounds (an opener like bash or backstab, or a kick
+    // mid-fight) deals damage that a fightspam-OFF viewer never sees: the per-hit
+    // line is hidden and the next round resets roundDamage before its summary.
+    // Baseline and flush it, as ccast.cpp does for spells. Inside a round (mob AI)
+    // the round's own summary covers it.
+    bool betweenRounds = (fightspam_round_depth == 0);
+    if (betweenRounds)
+        ch->clearRoundDamage( );
+
     // See if there is 'run' method override in Fenia. 
     bool feniaOverride = FeniaSkillActionHelper::executeCommandRun(this, ch, target);
 
     // Fall back to the old implementation.
     if (!feniaOverride)
         Command::run( ch, args );
+
+    if (betweenRounds && !ch->extracted)
+        fightspam_flush_between_rounds( ch, ch->fighting ? ch->fighting : target.vict );
 
     // Potentially aggressive command, mark player as actively fighting.
     // Happens after 'run' because some skills (p.ex. camouflage) depend on last fight time delay.

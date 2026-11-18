@@ -47,6 +47,9 @@ void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage)
 /* fightspam-OFF: flush damage dealt between rounds (a cast/proc) as one summary
  * line now, before violence_update's per-round reset drops it. victim = target. */
 void        fightspam_flush_between_rounds( Character *att, Character *victim );
+/* >0 while violence_update runs its hit loop and summary: damage dealt then is
+ * summarized by the round itself, so callers must not flush it on their own. */
+extern int  fightspam_round_depth;
 int        move_dec( Character *ch );
 /* Below level 50 a player pays (level+15)/65 of a move cost, full price from 50 on.
  * roundUp: ceil (a shown, deterministic cost); otherwise the fraction is rolled. */
