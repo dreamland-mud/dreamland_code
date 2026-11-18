@@ -120,6 +120,9 @@ bool BasicMobileBehavior::specAdrenaline( )
 
 bool BasicMobileBehavior::specIdle( )
 {
+    if (doFlyUp( ))
+        return true;
+
     if (doInvis())
         return true;
 
@@ -130,6 +133,26 @@ bool BasicMobileBehavior::specIdle( )
         return true;
 
     return false;
+}
+
+// A free mob knocked out of the air (smash, grab, tornado) has nobody to type
+// 'fly up' for it: it takes off again on an idle tick, i.e. once the 15-minute
+// adrenaline window after its last fight has passed. Only while it still flies
+// by nature: a mob that lost its wings stays down even if an expiring affect
+// restores its flying bit. A charmed pet keeps whatever its master ordered.
+bool BasicMobileBehavior::doFlyUp( )
+{
+    if (!ch->posFlags.isSet(POS_FLY_DOWN))
+        return false;
+
+    if (!IS_AFFECTED(ch, AFF_FLYING) || IS_CHARMED(ch) || RIDDEN(ch) || ch->wait > 0)
+        return false;
+
+    if (IS_SET(ch->getNPC( )->baseBits[MOBSET_PARTS], PART_WINGS) && !IS_SET(ch->parts, PART_WINGS))
+        return false;
+
+    interpret_cmd(ch, "fly", "up");
+    return !ch->extracted && !ch->posFlags.isSet(POS_FLY_DOWN);
 }
 
 // Reset native invisibility state if not in battle.

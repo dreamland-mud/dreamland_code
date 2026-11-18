@@ -135,6 +135,7 @@ protected:
     virtual bool specIdle( );
 
     bool doInvis();    
+    bool doFlyUp( );
     bool doCallHelp( );
     bool doHeal( );
     bool doPickWeapon( );
