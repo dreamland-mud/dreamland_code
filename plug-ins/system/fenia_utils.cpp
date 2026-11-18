@@ -9,6 +9,7 @@
 #include "fenia_utils.h"
 #include "character.h"
 #include "merc.h"
+#include "websocketrpc.h"
 #include "def.h"
 
 using namespace Scripting;
@@ -207,6 +208,41 @@ DLString trigger_type(const DLString& constTrigger)
     return trig;
 }
 
+
+static void wrapper_names_line(ostringstream &buf, Character *ch, const StringSet &names,
+                               const char *label, const DLString &cmd, const DLString &hint)
+{
+    if (names.empty())
+        return;
+
+    buf << label;
+    for (auto &n: names)
+        buf << (cmd.empty() ? n : web_cmd(ch, cmd, n)) << " ";
+    buf << hint << endl;
+}
+
+DLString wrapper_triggers_lines(Character *ch, WrapperBase *wrapper, const DLString &cmd, const DLString &hint, bool functionsOnly)
+{
+    StringSet triggers, misc;
+    ostringstream buf;
+
+    if (wrapper)
+        wrapper->collectTriggers(triggers, misc);
+
+    // Instance wrappers keep persistent data fields among their guts: those are not methods.
+    if (functionsOnly) {
+        Register prog;
+        for (auto m = misc.begin(); m != misc.end(); )
+            if (wrapper->triggerFunction(Scripting::IdRef(*m), prog))
+                m++;
+            else
+                m = misc.erase(m);
+    }
+
+    wrapper_names_line(buf, ch, triggers, "{gАктивные триггеры{x:    ", cmd, hint);
+    wrapper_names_line(buf, ch, misc, "{gАктивные методы{x:      ", cmd, DLString::emptyString);
+    return buf.str();
+}
 
 StringSet trigger_labels(::Object* obj)
 {

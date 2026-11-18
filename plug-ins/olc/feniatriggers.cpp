@@ -202,19 +202,7 @@ void FeniaTriggerLoader::showTriggers(PCharacter *ch, WrapperBase *wrapper, cons
         wrapper->collectTriggers(activeTriggers, miscMethods);
 
     // Display active ones.
-    if (!activeTriggers.empty()) {
-        buf << "{gАктивные триггеры{x:    ";
-        for (auto &t: activeTriggers)
-            buf << web_cmd(ch, "fenia $1", t) << " ";
-        buf << "{D(fenia <trig> [clear]){x" << endl;
-    }
-
-     if (!miscMethods.empty()) {
-        buf << "{gАктивные методы{x:      ";
-        for (auto &t: miscMethods)
-            buf << web_cmd(ch, "fenia $1", t) << " ";
-        buf << endl;    
-    }
+    buf << wrapper_triggers_lines(ch, wrapper, "fenia $1", "{D(fenia <trig> [clear]){x", false);
     
     // Display remaining available triggers.
     if (!availableTriggers.empty()) {
