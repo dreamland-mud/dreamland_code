@@ -23,6 +23,8 @@ public:
 
     virtual void commit( );
     virtual void changed( PCharacter * );
+    virtual DLString getJournalKind( ) const;
+    virtual int getJournalVnum( ) const;
 
     XML_VARIABLE XMLMobIndexData mob;
 

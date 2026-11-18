@@ -103,6 +103,16 @@ OLCStateRoom::changed( PCharacter *ch )
     ch->in_room->areaIndex()->changed = true;
 }
 
+DLString OLCStateRoom::getJournalKind( ) const
+{
+    return "room";
+}
+
+int OLCStateRoom::getJournalVnum( ) const
+{
+    return room.getValue();
+}
+
 /*-------------------------------------------------------------------------
  * state level commands
  *-------------------------------------------------------------------------*/

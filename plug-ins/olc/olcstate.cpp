@@ -19,6 +19,7 @@
 #include "interp.h"
 #include "arg_utils.h"
 #include "websocketrpc.h"
+#include "olcops.h"
 
 
 /*--------------------------------------------------------------------------
@@ -112,8 +113,26 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
 /*--------------------------------------------------------------------------
  * OLCState 
  *-------------------------------------------------------------------------*/
-OLCState::OLCState() : owner(0), inSedit(false), strEditor(*this)
+OLCState::OLCState() : lastChanged(false), journalProfile("immortal"), journalSource("editor"),
+                       owner(0), inSedit(false), strEditor(*this)
 {
+}
+
+void OLCState::journal( PCharacter *ch, const DLString &cmd, const DLString &args )
+{
+    lastChanged = true;
+    olc_journal(ch->getName(), journalProfile, journalSource,
+                getJournalKind(), getJournalVnum(), cmd, args);
+}
+
+DLString OLCState::getJournalKind( ) const
+{
+    return "olc";
+}
+
+int OLCState::getJournalVnum( ) const
+{
+    return 0;
 }
 
 OLCState::Pointer OLCState::getOLCState(Descriptor *d)

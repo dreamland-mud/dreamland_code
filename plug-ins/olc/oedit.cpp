@@ -1262,3 +1262,13 @@ void OLCStateObject::changed( PCharacter *ch )
         obj.area->changed = true;
 }
 
+DLString OLCStateObject::getJournalKind( ) const
+{
+    return "obj";
+}
+
+int OLCStateObject::getJournalVnum( ) const
+{
+    return obj.vnum;
+}
+

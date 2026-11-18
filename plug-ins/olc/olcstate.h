@@ -92,6 +92,20 @@ public:
     /** returns corresponding area pointer for mob/room/obj vnum */
     static AreaIndexData *get_vnum_area( int );
 
+    /** Op journal entry for a subcommand that changed something. Typed in
+     *  game or run by OlcOps, every edit lands in the same journal. */
+    void journal( PCharacter *, const DLString &cmd, const DLString &args );
+
+    /** What this editor edits, for the journal: "room", 3001. Editors that
+     *  don't override it are journaled as "olc", 0. */
+    virtual DLString getJournalKind( ) const;
+    virtual int getJournalVnum( ) const;
+
+    /** Set by journal(): the last subcommand changed the edited entity. */
+    bool lastChanged;
+    /** Journal profile and source: "immortal"/"editor" in game, OlcOps sets its own. */
+    DLString journalProfile, journalSource;
+
 protected:
     virtual void statePrompt( Descriptor *d ) = 0;
     virtual void changed( PCharacter * ) = 0;
@@ -171,9 +185,16 @@ public:
             state->lastCmd.setValue( getName( ) );
             state->lastArgs.setValue( args );
 
+            // Handlers tokenize args in place: keep a copy for the journal.
+            DLString argsCopy = args;
+
             try {
-                if (((*state)->*method)( pch, args ))
+                if (((*state)->*method)( pch, args )) {
                     state->changed( pch );
+                    // 'done' returns true without editing anything.
+                    if (getName( ) != "done")
+                        state->journal( pch, getName( ), argsCopy );
+                }
             } catch (const Exception &e) {
                 LogStream::sendError() << "OLC " << e.what() << endl;
                 pch->pecho(e.what());

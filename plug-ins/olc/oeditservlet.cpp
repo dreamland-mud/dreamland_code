@@ -92,6 +92,7 @@ static void oedit_servlet(HttpRequest &request, HttpResponse &response)
         cmdLine += " " + arguments;
 
     // Base attach/detach: OLCStateObject has no char-side state to restore.
+    oe->journalSource = "servlet";
     oe->OLCState::attach(ch);
     oe->handle(ch->desc, const_cast<char *>(cmdLine.c_str()));
     if (subcmd != "show")
