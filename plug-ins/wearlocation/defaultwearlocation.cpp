@@ -851,7 +851,9 @@ void DefaultWearlocation::display( Character *ch, Wearlocation::DisplayList &eq,
             found = true;
         }
 
-    if (!found && displayAlways && matches( ch ))
+    // An empty slot blocked by whatever occupies its conflict slot (shield or
+    // hold under a second weapon) can't take anything, so don't list it as free.
+    if (!found && displayAlways && matches( ch ) && !conflict->find( ch ))
         eq.push_back( make_pair( displayLocation(ch, NULL, lang), (Object *)NULL ) );
 }
 
