@@ -118,6 +118,7 @@
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 using std::min;
 
@@ -130,6 +131,7 @@ CMDLOADER_DECL(wizard)
 void do_rstat                ( Character *, char * );
 void do_mstat                ( Character *, Character * );
 void do_ostat                ( Character *, char * );
+static void ostat_show        ( Character *, Object * );
 void do_mfind                ( Character *, char * );
 void do_ofind                ( Character *, char * );
 void do_tfind                ( Character *, char * );
@@ -580,6 +582,162 @@ CMDWIZP( goto )
 
 /* RT to replace the 3 stat commands */
 
+/*
+ * Fenia triggers and methods on an instance and on its prototype, as the
+ * editors show them for the prototype alone.
+ */
+static void stat_fenia_lines( Character *ch, Scripting::Object *instance, Scripting::Object *proto, ostringstream &buf )
+{
+    DLString lines = wrapper_triggers_lines( ch, get_wrapper( instance ), "", "" );
+    if (!lines.empty( ))
+        buf << fmt( ch, _("{WFenia на экземпляре:{x\n") ) << lines;
+
+    lines = wrapper_triggers_lines( ch, get_wrapper( proto ), "", "" );
+    if (!lines.empty( ))
+        buf << fmt( ch, _("{WFenia на прототипе:{x\n") ) << lines;
+}
+
+/*
+ * Where an object is: who holds it or which room it lies in, with the room
+ * vnum, then the containers it is nested in, innermost first. No newline.
+ */
+static DLString obj_location( Character *ch, Object *obj )
+{
+    ostringstream buf;
+    Object *in_obj;
+
+    for (in_obj = obj; in_obj->in_obj != 0; in_obj = in_obj->in_obj)
+        ;
+
+    if (in_obj->carried_by != 0 && ch->can_see( in_obj->carried_by )
+            && in_obj->carried_by->in_room != 0)
+        buf << fmt( ch, _("в руках у %s [Комната %d]"),
+                    ch->sees( in_obj->carried_by, '2' ).c_str( ),
+                    in_obj->carried_by->in_room->vnum );
+    else if (in_obj->in_room != 0 && ch->can_see( in_obj->in_room ))
+        buf << fmt( ch, _("на полу в %s [Комната %d]"),
+                    in_obj->in_room->getName( ),
+                    in_obj->in_room->vnum );
+    else
+        buf << fmt( ch, _("черт его знает где") );
+
+    if (obj->in_obj != 0) {
+        buf << fmt( ch, _(", внутри:") );
+        for (in_obj = obj->in_obj; in_obj != 0; in_obj = in_obj->in_obj)
+            buf << fmt( 0, " %N1 [%d]%s",
+                        in_obj->getShortDescr( LANG_DEFAULT ).c_str( ),
+                        in_obj->pIndexData->vnum,
+                        in_obj->in_obj != 0 ? "," : "" );
+    }
+
+    return buf.str( );
+}
+
+/* A list number that runs 'stat <kind> <entity id>' when clicked in the web client. */
+static DLString stat_number_link( Character *ch, const char *kind, long long id, int number )
+{
+    DLString cmd;
+    cmd << "stat " << kind << " " << id;
+    return web_cmd( ch, cmd, fmt( 0, "%3d)", number ) );
+}
+
+/*
+ * 'stat obj <vnum>' and 'stat mob <vnum>': the loaded instances of that
+ * prototype. A single one is shown right away, several are listed, and
+ * 'N.<vnum>' picks the Nth of the list. Returns false when the argument is not
+ * a vnum (a name, or a 10+ digit entity id), so the caller searches as before.
+ */
+static bool stat_by_vnum( Character *ch, const char *argument, bool fObj )
+{
+    static const unsigned int MAX_LISTED = 100;
+    char arg[MAX_INPUT_LENGTH], word[MAX_INPUT_LENGTH];
+
+    strncpy( arg, DLString( argument ).stripWhiteSpace( ).c_str( ), sizeof( arg ) - 1 );
+    arg[sizeof( arg ) - 1] = '\0';
+
+    bool fPick = strchr( arg, '.' ) != 0;
+    int number = number_argument( arg, word );
+
+    if (!is_number( word ) || strlen( word ) >= 10)
+        return false;
+
+    int vnum = atoi( word );
+    if (vnum <= 0)
+        return false;
+
+    const char *kind = fObj ? "obj" : "mob";
+    vector<Object *> objs;
+    vector<Character *> mobs;
+
+    if (fObj) {
+        for (Object *obj = object_list; obj != 0; obj = obj->next)
+            if (obj->pIndexData->vnum == vnum && ch->can_see( obj ))
+                objs.push_back( obj );
+    }
+    else {
+        for (Character *wch = char_list; wch != 0; wch = wch->next)
+            if (wch->is_npc( ) && wch->getNPC( )->pIndexData->vnum == vnum
+                    && wch->in_room != 0 && ch->can_see( wch ))
+                mobs.push_back( wch );
+    }
+
+    int count = fObj ? objs.size( ) : mobs.size( );
+
+    if (count == 0) {
+        bool hasProto = fObj ? get_obj_index( vnum ) != 0 : get_mob_index( vnum ) != 0;
+
+        if (!hasProto) {
+            ch->pecho( _("Прототипа с номером %d нет."), vnum );
+        }
+        else {
+            DLString editCmd;
+            editCmd << (fObj ? "oedit " : "medit ") << vnum;
+            ch->pecho( _("Ни одного экземпляра [%d] сейчас нет в мире. Прототип: %s"),
+                       vnum, web_cmd( ch, editCmd, editCmd ).c_str( ) );
+        }
+        return true;
+    }
+
+    if (fPick || count == 1) {
+        if (number < 1 || number > count) {
+            ch->pecho( _("Экземпляров [%d] в мире: %d."), vnum, count );
+            return true;
+        }
+
+        if (fObj)
+            ostat_show( ch, objs[number - 1] );
+        else
+            do_mstat( ch, mobs[number - 1] );
+        return true;
+    }
+
+    ostringstream buf;
+    buf << fmt( ch, _("Экземпляров [%d] в мире: %d. Выбрать: stat %s N.%d\n\r"), vnum, count, kind, vnum );
+
+    for (int i = 0; i < count && i < (int)MAX_LISTED; i++) {
+        if (fObj) {
+            Object *obj = objs[i];
+            buf << stat_number_link( ch, kind, obj->getID( ), i + 1 )
+                << fmt( 0, " %N1{x ", obj->getShortDescr( LANG_DEFAULT ).c_str( ) )
+                << obj_location( ch, obj ) << "\n\r";
+        }
+        else {
+            Character *mob = mobs[i];
+            buf << stat_number_link( ch, kind, mob->getID( ), i + 1 )
+                << fmt( 0, " %s{x [%d] %s\n\r",
+                        mob->getNameP( '1' ).c_str( ),
+                        mob->in_room->vnum,
+                        mob->in_room->getName( ) );
+        }
+    }
+
+    if (count > (int)MAX_LISTED)
+        buf << fmt( ch, _("... и еще %d.\n\r"), count - (int)MAX_LISTED );
+
+    page_to_char( buf.str( ).c_str( ), ch );
+    return true;
+}
+
 CMDWIZP( stat )
 {
    char arg[MAX_INPUT_LENGTH];
@@ -594,8 +752,8 @@ CMDWIZP( stat )
    {
         ch->pecho(_("Формат:"));
         ch->pecho("  stat <name>");
-        ch->pecho("  stat obj <name>");
-        ch->pecho("  stat mob <name>");
+        ch->pecho("  stat obj <name|vnum|N.vnum>");
+        ch->pecho("  stat mob <name|vnum|N.vnum>");
         ch->pecho("  stat room <number>");
         return;
    }
@@ -608,7 +766,8 @@ CMDWIZP( stat )
 
    if (arg_is_strict(arg, "obj"))
    {
-        do_ostat(ch,string);
+        if (!stat_by_vnum(ch, string, true))
+            do_ostat(ch,string);
         return;
    }
     
@@ -620,6 +779,9 @@ CMDWIZP( stat )
            ch->pecho(_("Stat на кого?"));
            return;
         }
+
+        if (fMob && stat_by_vnum(ch, string, false))
+            return;
         
         victim =  fChar ? get_player_world( ch, string ) : get_char_world( ch, string );
         if (!victim) {
@@ -906,8 +1068,6 @@ static void format_affect(Affect *paf, ostringstream &buf)
 {
         char arg[MAX_INPUT_LENGTH];
         Object *obj;
-        Liquid *liquid;
-        ostringstream buf;
 
         one_argument( argument, arg );
 
@@ -922,6 +1082,14 @@ static void format_affect(Affect *paf, ostringstream &buf)
                 ch->pecho(_("Ни на земле, ни в небесах не найдено. Увы и ах."));
                 return;
         }
+
+        ostat_show( ch, obj );
+}
+
+static void ostat_show( Character *ch, Object *obj )
+{
+        Liquid *liquid;
+        ostringstream buf;
 
         buf << fmt(0, "Name(s): %s\n\r", String::toString(obj->getKeyword()).c_str() );
 
@@ -1101,6 +1269,8 @@ static void format_affect(Affect *paf, ostringstream &buf)
     } else {
        buf << endl;
     }
+
+    stat_fenia_lines( ch, obj->wrapper, obj->pIndexData->wrapper, buf );
 
     buf << "Свойства: ";
     
@@ -1353,6 +1523,8 @@ static bool has_nopost(Character *ch)
         buf << "Поведение: [" << npc->behavior->getType( ) << "]" << endl;
         npc->behavior.toStream( buf );
     }
+
+    stat_fenia_lines( ch, victim->wrapper, npc ? npc->pIndexData->wrapper : 0, buf );
     
     page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -1514,10 +1686,12 @@ static DLString find_name_argument( const char *argument )
         return;
     }
     
+    DLString lineFormat = "[" + web_cmd(ch, "oedit $1", "%5d") + "] %N1\n";
+
     for (int i=0; i<MAX_KEY_HASH; i++)
         for(OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) 
             if (pObj->item_type == type) {
-                buf << fmt(0, "[%5d] %N1\n",
+                buf << fmt(0, lineFormat.c_str(),
                                  pObj->vnum,
                                 pObj->getShortDescr(LANG_DEFAULT));
             }
@@ -1569,8 +1743,7 @@ CMDWIZP( owhere )
 {
     ostringstream buffer;
     Object *obj;
-    Object *in_obj;
-    bool found = false;;
+    bool found = false;
     int number = 0, max_found = 200;
     int vnum = -1;
 
@@ -1603,28 +1776,10 @@ CMDWIZP( owhere )
         found = true;
         number++;
 
-        for ( in_obj = obj; in_obj->in_obj != 0; in_obj = in_obj->in_obj )
-                ;
+        buffer << stat_number_link( ch, "obj", obj->getID( ), number )
+               << fmt( 0, " %N1{x ", obj->getShortDescr( LANG_DEFAULT ).c_str( ) )
+               << obj_location( ch, obj ) << "\n\r";
 
-        if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by)
-                && in_obj->carried_by->in_room != 0 )
-                buffer << fmt(0, _("%3d) %N1 в руках у %s [Комната %d]\n\r"),
-                        number,
-                        obj->getShortDescr( LANG_DEFAULT ).c_str( ),
-                        ch->sees(in_obj->carried_by, '2').c_str(),
-                        in_obj->carried_by->in_room->vnum );
-        else if ( in_obj->in_room != 0 && ch->can_see(in_obj->in_room) )
-                buffer << fmt(0, _("%3d) %N1 на полу в %s [Комната %d]\n\r"),
-                        number,
-                        obj->getShortDescr( LANG_DEFAULT ).c_str( ),
-                        in_obj->in_room->getName(),
-                        in_obj->in_room->vnum );
-        else
-               buffer << fmt(0, _("%3d) %N1 черт его знает где.\n\r"),
-                        number,
-                        obj->getShortDescr(LANG_DEFAULT).c_str( ) );
-
-    
         if ( number >= max_found )
             break;
     }

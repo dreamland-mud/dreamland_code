@@ -144,129 +144,185 @@ REDIT(sector, "местность", "установить тип местнос�
     return false;
 }
 
-REDIT(rlist, "ксписок", "список всех комнат в данной арии")
+/*
+ * rlist, mlist and olist: shared by the redit subcommands and the top-level
+ * commands of the same name, so they work from anywhere.
+ *
+ * Names are cut by fmt precision, which counts visible characters and never
+ * splits a colour code, but it does drop whatever code sat past the cut, the
+ * closing {x included. Every name is therefore followed by its own {x.
+ * The vnum stays plain text; web clients get it as a button that opens the editor.
+ */
+
+// Optional trailing area argument: vnum or file name, default is the room's area.
+static AreaIndexData * olc_list_area(PCharacter *ch, const char *argument)
 {
-    AreaIndexData *pArea;
-    ostringstream buf;
-    char arg[MAX_INPUT_LENGTH];
-    int col = 0;
+    DLString arg = DLString(argument).stripWhiteSpace();
 
-    one_argument(argument, arg);
+    if (arg.empty())
+        return ch->in_room->areaIndex();
 
-    pArea = ch->in_room->areaIndex();
+    AreaIndexData *pArea = AreaUtils::lookup(arg);
+    if (!pArea)
+        ptc(ch, "Зона '%s' не найдена, укажи ее номер или имя файла.\n\r", arg.c_str());
+
+    return pArea;
+}
+
+// Count one entry and break the line after every 'columns' of them; olc_list_end closes a partial row.
+static void olc_list_column(ostringstream &buf, int &col, int columns)
+{
+    if (++col % columns == 0)
+        buf << endl;
+}
+
+static void olc_list_end(ostringstream &buf, int col, int columns)
+{
+    if (col % columns != 0)
+        buf << endl;
+}
+
+static void olc_list_rooms(PCharacter *ch, const char *argument)
+{
+    AreaIndexData *pArea = olc_list_area(ch, argument);
+    if (!pArea)
+        return;
 
     if (pArea->roomIndexes.empty( )) {
         stc("Комната(комнаты) в этой арии не обнаружены.\n\r", ch);
-        return false;
+        return;
     }
+
+    ostringstream buf;
+    DLString vnumLink = "[" + web_cmd(ch, "redit $1", "%5d") + "] ";
+    int col = 0;
 
     for (auto &i: pArea->roomIndexes) {
         RoomIndexData *pRoomIndex = i.second;
 
-        buf << fmt( 0, "[%7d] %-17.17s",
-                       pRoomIndex->vnum,
-                       pRoomIndex->name );
-
-        if (++col % 3 == 0)
-            buf << endl;
+        buf << fmt(0, vnumLink.c_str(), pRoomIndex->vnum);
+        buf << fmt(0, "%-17.17s{x ", pRoomIndex->name.get(LANG_DEFAULT).c_str());
+        olc_list_column(buf, col, 3);
     }
 
-    if (col % 3 != 0)
-        buf << endl;
-
+    olc_list_end(buf, col, 3);
     page_to_char(buf.str( ).c_str( ), ch);
+}
+
+static void olc_list_mobs(PCharacter *ch, char *argument)
+{
+    char arg[MAX_INPUT_LENGTH];
+
+    if (!*argument) {
+        stc("Синтаксис:  mlist <all/имя> [номер зоны/имя файла зоны]\n\r", ch);
+        return;
+    }
+
+    argument = one_argument(argument, arg);
+    AreaIndexData *pArea = olc_list_area(ch, argument);
+    if (!pArea)
+        return;
+
+    ostringstream buf;
+    DLString vnumLink = "[" + web_cmd(ch, "medit $1", "%5d") + "] ";
+    bool fAll = arg_is_all(arg);
+    int col = 0;
+
+    for (int vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++) {
+        MOB_INDEX_DATA *pMobIndex = get_mob_index(vnum);
+
+        if (pMobIndex && (fAll || mob_index_has_name(pMobIndex, arg))) {
+            buf << fmt(0, vnumLink.c_str(), pMobIndex->vnum);
+            buf << fmt(0, "%-17.17N1{x ", pMobIndex->getShortDescr(LANG_DEFAULT));
+            olc_list_column(buf, col, 3);
+        }
+    }
+
+    if (col == 0) {
+        stc("Монстр(ы) в этой арии не найдены.\n\r", ch);
+        return;
+    }
+
+    olc_list_end(buf, col, 3);
+    page_to_char(buf.str( ).c_str( ), ch);
+}
+
+static void olc_list_objs(PCharacter *ch, char *argument)
+{
+    char arg[MAX_INPUT_LENGTH];
+
+    if (!*argument) {
+        stc("Синтаксис:  olist <all/имя/тип_предмета> [номер зоны/имя файла зоны]\n\r", ch);
+        return;
+    }
+
+    argument = one_argument(argument, arg);
+    AreaIndexData *pArea = olc_list_area(ch, argument);
+    if (!pArea)
+        return;
+
+    ostringstream buf;
+    DLString vnumLink = "[" + web_cmd(ch, "oedit $1", "%5d") + "] ";
+    bool fAll = arg_is_all(arg);
+    int col = 0;
+
+    for (int vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++) {
+        OBJ_INDEX_DATA *pObjIndex = get_obj_index(vnum);
+
+        if (pObjIndex
+            && (fAll 
+                || obj_index_has_name(pObjIndex, arg)
+                || item_table.value( arg ) == pObjIndex->item_type))
+        {
+            buf << fmt(0, vnumLink.c_str(), pObjIndex->vnum);
+            buf << fmt(0, "%-30.30N1{x ", pObjIndex->getShortDescr(LANG_DEFAULT));
+            olc_list_column(buf, col, 2);
+        }
+    }
+
+    if (col == 0) {
+        stc("Предмет(предметы) в этой арии не найдены.\n\r", ch);
+        return;
+    }
+
+    olc_list_end(buf, col, 2);
+    page_to_char(buf.str( ).c_str( ), ch);
+}
+
+REDIT(rlist, "ксписок", "список всех комнат в данной арии")
+{
+    olc_list_rooms(ch, argument);
     return false;
 }
 
 REDIT(mlist, "мсписок", "список всех мобов в данной арии, по имени или all")
 {
-    MOB_INDEX_DATA *pMobIndex;
-    AreaIndexData *pArea;
-    ostringstream buf1;
-    char arg[MAX_INPUT_LENGTH];
-    bool fAll, found;
-    int vnum;
-    int col = 0;
-
-    if(!*argument) {
-        stc("Синтаксис:  mlist <all/имя>\n\r", ch);
-        return false;
-    }
-
-    one_argument(argument, arg);
-    pArea = ch->in_room->areaIndex();
-    fAll = arg_is_all(arg);
-    found = false;
-
-    for (vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++) {
-        if ((pMobIndex = get_mob_index(vnum)) != NULL) {
-            if (fAll || mob_index_has_name(pMobIndex, arg)) {
-                found = true;
-                buf1 << fmt( 0, "[%5d] ", pMobIndex->vnum );
-                buf1 << fmt( 0,  "%-17.17N1{x ", pMobIndex->getShortDescr(LANG_DEFAULT));
-                if (++col % 3 == 0)
-                    buf1 << endl;
-            }
-        }
-    }
-
-    if (!found) {
-        stc("Монстр(ы) в этой арии не найдены.\n\r", ch);
-        return false;
-    }
-
-    if (col % 3 != 0)
-        buf1 << endl;
-
-    page_to_char(buf1.str( ).c_str( ), ch);
+    olc_list_mobs(ch, argument);
     return false;
 }
 
 REDIT(olist, "псписок", "список всех предметов в данной арии, по имени, типу или all")
 {
-    OBJ_INDEX_DATA *pObjIndex;
-    AreaIndexData *pArea;
-    ostringstream buf1;
-    char arg[MAX_INPUT_LENGTH];
-    bool fAll, found;
-    int vnum;
-    int col = 0;
-
-    if(!*argument) {
-        stc("Синтаксис:  olist <all/имя/тип_предмета>\n\r", ch);
-        return false;
-    }
-
-    one_argument(argument, arg);
-    pArea = ch->in_room->areaIndex();
-    fAll = arg_is_all(arg);
-    found = false;
-
-    for (vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++) {
-        if ((pObjIndex = get_obj_index(vnum))) {
-            if (fAll 
-                || obj_index_has_name(pObjIndex, arg)
-                || item_table.value( arg ) == pObjIndex->item_type) 
-            {
-                found = true;
-                buf1 << fmt( 0, "[%5d] ", pObjIndex->vnum);
-                buf1 << fmt( 0, "%-30.30N1{x ", pObjIndex->getShortDescr(LANG_DEFAULT));
-                if (++col % 2 == 0)
-                    buf1 << endl;
-            }
-        }
-    }
-
-    if (!found) {
-        stc("Предмет(предметы) в этой арии не найдены.\n\r", ch);
-        return false;
-    }
-
-    if (col % 3 != 0)
-        buf1 << endl;
-
-    page_to_char(buf1.str( ).c_str( ), ch);
+    olc_list_objs(ch, argument);
     return false;
+}
+
+CMD(rlist, 50, "", POS_DEAD, 103, LOG_NORMAL,
+        "List all rooms in an area.")
+{
+    olc_list_rooms(ch, argument);
+}
+
+CMD(mlist, 50, "", POS_DEAD, 103, LOG_NORMAL,
+        "List mobiles in an area by name or all.")
+{
+    olc_list_mobs(ch, argument);
+}
+
+CMD(olist, 50, "", POS_DEAD, 103, LOG_NORMAL,
+        "List objects in an area by name, item type or all.")
+{
+    olc_list_objs(ch, argument);
 }
 
 void

@@ -44,6 +44,12 @@ bool fenia_trigger(Scripting::Register &rc, const DLString &trigName, const Scri
 // Collect all triggers on obj/indexdata/behaviors in the form of "use", "equip" etc.
 StringSet trigger_labels(Object *obj);
 
+/** Labelled lines listing the onXXX/postXXX triggers and the other methods
+ *  defined on a wrapper; empty when it has none or the wrapper is null.
+ *  A non-empty 'cmd' (e.g. "fenia $1") turns every name into a web button,
+ *  'hint' is appended to the triggers line. */
+DLString wrapper_triggers_lines(Character *ch, WrapperBase *wrapper, const DLString &cmd, const DLString &hint);
+
 // Return name of this trigger w/o 'on' or 'post' prefix
 DLString trigger_type(const DLString &constTrigger);
 
