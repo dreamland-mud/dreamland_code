@@ -202,6 +202,11 @@ static InflectedString player_name(lang_t lang)
 
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
         PCMemoryInterface *pc = i->second;
+
+        // Level 1 profiles are mostly abandoned newbies and bot names.
+        if (pc->getLevel() <= 1)
+            continue;
+
         const DLString &rname = pc->getRussianName().getFullForm();
 
         // A declined example only means something in a language that declines;
