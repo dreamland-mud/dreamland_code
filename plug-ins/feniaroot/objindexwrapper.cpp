@@ -222,6 +222,12 @@ NMI_GET( ObjIndexWrapper, wear_flags, "куда надевается предм�
     return Register( target->wear_flags);
 }
 
+NMI_GET( ObjIndexWrapper, extra_flags, "дополнительные флаги прототипа (таблица .tables.extra_flags)")
+{
+    checkTarget( );
+    return Register( target->extra_flags);
+}
+
 NMI_GET( ObjIndexWrapper, gender, "грамматический род и число (n, m, f, p или null)")
 {
     checkTarget( );
