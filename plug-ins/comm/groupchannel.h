@@ -21,7 +21,7 @@ public:
     virtual bool saveCommand() const;
 
 protected:
-    virtual void postOutput( Character *outputTo, const DLString &message ) const;
+    virtual void postOutput( Character *outputTo, const DLString &message, Character *speaker ) const;
     virtual DLString webKind( ) const;
     virtual void findListeners( Character *, Listeners & ) const;
     virtual bool isGlobalListener( Character *, Character * ) const;

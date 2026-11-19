@@ -129,10 +129,10 @@ bool GroupChannel::canTalkGlobally( Character *ch ) const
     return true;
 }
 
-void GroupChannel::postOutput( Character *outputTo, const DLString &message ) const
+void GroupChannel::postOutput( Character *outputTo, const DLString &message, Character *speaker ) const
 {
     if (outputTo->getPC( ))
-        remember_history_near( outputTo->getPC( ), message );
+        remember_history_near( outputTo->getPC( ), message, speaker );
 }
 
 DLString GroupChannel::webKind( ) const

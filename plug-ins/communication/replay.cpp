@@ -5,6 +5,9 @@
 #include "replay.h"
 #include "commonattributes.h"
 #include "pcharacter.h"
+#include "loadsave.h"
+#include "merc.h"
+#include "def.h"
 #include "dreamland.h"
 #include "arg_utils.h"
 #include "l10n.h"
@@ -90,22 +93,33 @@ static void remember_one_message( PCharacter *ch, const DLString &msg, const DLS
         attr->resize( MAX_HISTORY_SIZE );
 }
 
-void remember_history_public( PCharacter *ch, const DLString &msg )
+/** Mob chatter (questors, guards, shopkeepers) stays in its own history but
+ *  is kept out of 'replay all', which is for players, their pets and
+ *  immortals speaking through a switched mob. */
+static bool goes_to_all( Character *speaker )
+{
+    return !speaker || !speaker->is_npc( ) || IS_CHARMED(speaker) || speaker->desc;
+}
+
+void remember_history_public( PCharacter *ch, const DLString &msg, Character *speaker )
 {
     remember_one_message( ch, msg, ATTR_PUBLIC );
-    remember_one_message( ch, msg, ATTR_ALL );
+    if (goes_to_all( speaker ))
+        remember_one_message( ch, msg, ATTR_ALL );
 }
 
-void remember_history_private( PCharacter *ch, const DLString &msg )
+void remember_history_private( PCharacter *ch, const DLString &msg, Character *speaker )
 {
     remember_one_message( ch, msg, ATTR_PRIVATE );
-    remember_one_message( ch, msg, ATTR_ALL );
+    if (goes_to_all( speaker ))
+        remember_one_message( ch, msg, ATTR_ALL );
 }
 
-void remember_history_near( PCharacter *ch, const DLString &msg )
+void remember_history_near( PCharacter *ch, const DLString &msg, Character *speaker )
 {
     remember_one_message( ch, msg, ATTR_NEAR );
-    remember_one_message( ch, msg, ATTR_ALL );
+    if (goes_to_all( speaker ))
+        remember_one_message( ch, msg, ATTR_ALL );
 }
 
 

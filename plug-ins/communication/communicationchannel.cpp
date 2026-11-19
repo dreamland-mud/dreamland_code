@@ -229,7 +229,7 @@ DLString CommunicationChannel::webArea( Character *to, Character *from ) const
     return DLString::emptyString;
 }
 
-void CommunicationChannel::postOutput( Character *outputTo, const DLString &message ) const
+void CommunicationChannel::postOutput( Character *outputTo, const DLString &message, Character *speaker ) const
 {
 }
 

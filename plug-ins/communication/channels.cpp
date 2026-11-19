@@ -166,9 +166,9 @@ DLString PageChannel::outputVict( Character *ch, Character *victim,
     return message;
 }
 
-void PageChannel::postOutput( Character *outputTo, const DLString &message ) const
+void PageChannel::postOutput( Character *outputTo, const DLString &message, Character *speaker ) const
 {
-    PersonalChannel::postOutput( outputTo, message );
+    PersonalChannel::postOutput( outputTo, message, speaker );
 }
 
 DLString PageChannel::webKind( ) const

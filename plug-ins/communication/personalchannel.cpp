@@ -46,8 +46,8 @@ void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLSt
     if (!victim->is_npc())
         victim->getPC()->getAttributes().getAttr<ReplayAttribute>("replay")->addMessage(messageVict);
 
-    postOutput(victim, messageVict);
-    postOutput(ch, messageChar);
+    postOutput(victim, messageVict, ch);
+    postOutput(ch, messageChar, ch);
 
     // THE ONE PLACE WHERE A FRAME DOES NOT MIRROR THE CONSOLE. On the deferred
     // path the console writes NEITHER copy: there is nowhere to tell the
@@ -194,7 +194,7 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
     
     if (needOutputChar( ch )) {
         ch->pecho(messageChar);
-        postOutput(ch, messageChar);
+        postOutput(ch, messageChar, ch);
         // On a personal channel the outgoing copy has a counterpart: who it was
         // said to. A panel threads both halves of a conversation by it.
         if (chat_subscribed( ch ))
@@ -203,7 +203,7 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
 
     if (needOutputVict( ch, victim )) {
         victim->pecho(messageVict);
-        postOutput(victim, messageVict);
+        postOutput(victim, messageVict, ch);
         if (chat_subscribed( victim ))
             chat_emit(victim, ch, false, getName( ), webKind( ), messageVict);
     }
@@ -282,10 +282,10 @@ bool PersonalChannel::needOutputVict( Character *ch, Character *victim ) const
     return ch != victim;
 }
 
-void PersonalChannel::postOutput( Character *outputTo, const DLString &message ) const
+void PersonalChannel::postOutput( Character *outputTo, const DLString &message, Character *speaker ) const
 {
     if (!outputTo->is_npc())
-        remember_history_private( outputTo->getPC( ), message );
+        remember_history_private( outputTo->getPC( ), message, speaker );
 }
 
 DLString PersonalChannel::webKind( ) const

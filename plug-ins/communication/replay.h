@@ -13,12 +13,13 @@
 
 using namespace std;
 
+class Character;
 class PCharacter;
 class DLString;
 
-void remember_history_public( PCharacter *ch, const DLString &msg );
-void remember_history_private( PCharacter *ch, const DLString &msg );
-void remember_history_near( PCharacter *ch, const DLString &msg );
+void remember_history_public( PCharacter *ch, const DLString &msg, Character *speaker = 0 );
+void remember_history_private( PCharacter *ch, const DLString &msg, Character *speaker = 0 );
+void remember_history_near( PCharacter *ch, const DLString &msg, Character *speaker = 0 );
 
 bool replay_history_all( ostringstream &buf, PCharacter *ch, int limit );
 bool replay_history_public( ostringstream &buf, PCharacter *ch, int limit );

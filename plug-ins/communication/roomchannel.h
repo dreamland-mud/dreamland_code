@@ -16,7 +16,7 @@ public:
 
 protected:
     virtual void findListeners( Character *, Listeners & ) const;
-    virtual void postOutput( Character *outputTo, const DLString &message ) const;
+    virtual void postOutput( Character *outputTo, const DLString &message, Character *speaker ) const;
     virtual DLString webKind( ) const;
 };
 

@@ -25,10 +25,10 @@ void RoomChannel::findListeners( Character *ch, Listeners &listeners ) const
             listeners.push_back( rch );
 }
 
-void RoomChannel::postOutput( Character *outputTo, const DLString &message ) const
+void RoomChannel::postOutput( Character *outputTo, const DLString &message, Character *speaker ) const
 {
     if (!outputTo->is_npc())
-        remember_history_near( outputTo->getPC( ), message );
+        remember_history_near( outputTo->getPC( ), message, speaker );
 }
 
 DLString RoomChannel::webKind( ) const
