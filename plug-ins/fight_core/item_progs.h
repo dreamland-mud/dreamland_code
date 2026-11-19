@@ -10,6 +10,9 @@ bool oprog_get( Object *obj, Character *ch );
 
 bool oprog_drop( Object *obj, Character *ch );
 
+// Food or a pill went down; true keeps the object.
+bool oprog_eat( Object *obj, Character *ch );
+
 // Asks the item's affects whether it may change hands at all. Runs before the
 // item moves, so a veto leaves both characters exactly as they were.
 bool oprog_give_blocked( Object *obj, Character *ch, Character *victim );

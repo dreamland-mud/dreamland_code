@@ -27,7 +27,6 @@ showtable.cpp \
 who.cpp \
 profileservlet.cpp \
 writing.cpp \
-eating.cpp \
 communication.cpp \
 description.cpp \
 senses.cpp \
@@ -85,7 +84,6 @@ corder.h \
 run.h \
 writing.h \
 groupchannel.h \
-eating.h \
 pcname.h
 
 include $(top_srcdir)/src/Makefile.inc

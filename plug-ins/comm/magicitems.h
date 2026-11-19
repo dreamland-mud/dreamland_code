@@ -9,9 +9,9 @@ class Object;
 /*
  * Potions, scrolls, wands and staves have no commands of their own:
  * 'use' resolves the item and hands it to one of these. Charged items
- * (props "charged") of any type go to use_charged.
+ * (props "charged") of any type go to use_charged. Pills are use_pill in
+ * fight/magic.h: the Fenia 'eat' command swallows them too.
  */
-void use_pill( Character *ch, Object *pill );
 void use_potion( Character *ch, Object *potion );
 void use_scroll( Character *ch, Object *scroll, const DLString &args );
 void use_wand( Character *ch, Object *wand, const DLString &args );

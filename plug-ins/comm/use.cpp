@@ -13,6 +13,7 @@
 #include "loadsave.h"
 #include "l10n.h"
 #include "magicitems.h"
+#include "magic.h"
 #include "chargedprops.h"
 
 /*

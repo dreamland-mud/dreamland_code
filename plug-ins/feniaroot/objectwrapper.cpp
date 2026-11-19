@@ -1085,6 +1085,13 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
         return oprog_drop(target, ch);
     }
 
+    // "Eat" runs the 'eat' chain: the Eat behavior, then instance and proto
+    // triggers. True keeps the object.
+    if (trigName == "Eat") {
+        Character *ch = argnum2character(trigArgs, 1);
+        return oprog_eat(target, ch);
+    }
+
     // Get obj index data wrapper.
     WrapperBase *proto = get_wrapper(target->pIndexData->wrapper);
 

@@ -101,11 +101,15 @@
 #include "l10n.h"
 #include "damageflags.h"
 #include "dl_math.h"
+#include "desire.h"
+#include "skill_utils.h"
+#include "item_progs.h"
 
 CLAN(none);
 GSN(deafen);
 GSN(garble);
 GSN(holy_craft);
+GSN(manacles);
 GSN(shielding);
 GSN(spell_craft);
 
@@ -929,6 +933,56 @@ void spell_by_item( Character *ch, Object *obj, bool oathPaid, bool burned )
             break;
         }
     }
+}
+
+/*
+ * Swallow a pill: the Fenia 'eat' command (ch.usePill) and 'use'. Natural
+ * remedies work for everyone, Battleragers included; other spells on a pill
+ * are magic to the oath.
+ */
+void use_pill( Character *ch, Object *obj )
+{
+    bool magic = rage_pill_magic( obj );
+
+    if (!ch->is_immortal( )) {
+        if (ch->isAffected( gsn_manacles )) {
+            ch->pecho(_("Ты не можешь принимать снадобья в кандалах."));
+            return;
+        }
+
+        if (magic && !rage_magic_allowed( ch, RAGE_POTION )) {
+            rage_magic_refuse( ch );
+            return;
+        }
+
+        if (!ch->is_npc( ))
+            for (int i = 0; i < desireManager->size( ); i++)
+                if (!desireManager->find( i )->canEat( ch->getPC( ) ))
+                    return;
+
+        if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
+            ch->pecho(_("Тебе надо подрасти, чтобы заглотить это."));
+            return;
+        }
+    }
+
+    oldact(_("$c1 ест $o4."),  ch, obj, 0, TO_ROOM);
+    oldact(_("Ты ешь $o4."), ch, obj, 0, TO_CHAR);
+    if (ch->fighting != 0)
+        ch->setWaitViolence( 3 );
+
+    if (!rage_member( ch ))
+        spell_by_item( ch, obj );
+    else
+        spell_by_item( ch, obj, true, magic && rage_own_magic( ch ) );
+
+    if (ch->is_adrenalined( ) || ch->fighting)
+        ch->setWaitViolence( 2 );
+
+    if (oprog_eat( obj, ch ))
+        return;
+
+    extract_obj( obj );
 }
 
 /*

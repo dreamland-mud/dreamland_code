@@ -8976,15 +8976,43 @@ NMI_INVOKE( CharacterWrapper, sound, "(name[, volume, loops, priority]): MSP-з�
     return Register( msp_sound( target->desc, argnum2string( args, 1 ), volume, loops, priority ) );
 }
 
-NMI_INVOKE( CharacterWrapper, eat, "(ob): заполнить желудок так, будто obj был съеден" )
+NMI_INVOKE( CharacterWrapper, eat, "(obj|amount): заполнить желудок так, будто obj (еда) был съеден, или на amount (как от еды с value0 = amount/2); у мобов ничего не делает" )
 {
     checkTarget( );
-    ::Object *obj = arg2item( args.front( ) );
 
-    if (obj->item_type == ITEM_FOOD) {
-        desire_hunger->eat( target->getPC( ), obj->value0() * 2 );
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+
+    if (target->is_npc( ))
+        return Register( );
+
+    int amount = 0;
+    if (args.front( ).type == Register::NUMBER)
+        amount = args.front( ).toNumber( );
+    else {
+        ::Object *obj = arg2item( args.front( ) );
+        if (obj->item_type == ITEM_FOOD)
+            amount = obj->value0() * 2;
     }
 
+    if (amount > 0)
+        desire_hunger->eat( target->getPC( ), amount );
+
+    return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, usePill, "(obj): проглотить пилюлю obj из инвентаря, как 'use': кандалы, клятва Ярости, уровень, заклинания, триггеры Eat; пилюля исчезает" )
+{
+    checkTarget( );
+    ::Object *obj = argnum2item( args, 1 );
+
+    if (obj->item_type != ITEM_PILL)
+        throw Scripting::Exception( "Object is not a pill" );
+
+    if (obj->carried_by != target)
+        throw Scripting::Exception( "Pill is not carried by this character" );
+
+    use_pill( target, obj );
     return Register( );
 }
 
