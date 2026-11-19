@@ -1087,7 +1087,7 @@ NMI_GET( ClanWrapper, leaderName, "имя лидера клана после р�
     return Register( );
 }
 
-NMI_GET( ClanWrapper, enemies, "список (List) кланов-врагов (структуры .Clan) из профиля клана" )
+NMI_GET( ClanWrapper, enemies, "список (List) кланов-врагов (структуры .Clan) из профиля этого клана; связь односторонняя, для взаимной вражды проверяй оба клана" )
 {
     Clan *clan = clanManager->find( name );
     RegList::Pointer rc( NEW );
