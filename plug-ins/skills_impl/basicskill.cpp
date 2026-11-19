@@ -711,6 +711,11 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
             targets << fmt(ch, _(" или по направлению (дальнобойное, дальность %1$d)"), range);
 
         outputLines.push_back(fmt(ch, _("Цель: {W%1$s{x. "), targets.c_str()));
+
+        if (range > 0)
+            outputLines.push_back(fmt(ch, _("Формат: {W%1$s '%2$s' <%3$s>.<%4$s>{x. "),
+                                      l(ch, "колдовать"), getNameFor(ch).c_str(),
+                                      l(ch, "направление"), l(ch, "жертва")));
     }
 
     // A skill with its own command: the target its argument parser demands.
