@@ -610,7 +610,7 @@ void Damage::soundDamage( int before )
         if (before >= low && victim->hit < low)
             msp_sound( victim, "alert/lowhp", 100, 1, 80 );
         else if (dam > victim->max_hit / 5 && ch != victim)
-            msp_sound( victim, "combat/hurt", 100, 1, 60 );
+            msp_sound( victim, msp_voice( "combat/hurt", victim ), 100, 1, 60 );
 
         // A boss's blow worth the hurt sound, survived on the last 5%.
         if (dam > victim->max_hit / 5 && ch != victim && ch->is_npc()

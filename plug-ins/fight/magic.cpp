@@ -596,9 +596,13 @@ SpellSound::SpellSound( Spell *spell, Character *ch, SpellTarget::Pointer target
     bool unique = spellSounds.unique.count( slot ) > 0;
     int ownPriority = unique ? SPELL_SOUND_PRIO_UNIQUE : SPELL_SOUND_PRIO_OWN;
 
+    // A scream is the victim's voice, the same for everyone who hears it.
+    victim = target->type == SpellTarget::CHAR ? target->victim : 0;
+    if (victim)
+        slot = msp_voice( slot, victim );
+
     msp_sound( ch, slot, SPELL_SOUND_VOL_CASTER, 1, ownPriority );
 
-    victim = target->type == SpellTarget::CHAR ? target->victim : 0;
     if (victim && victim != ch && !victim->is_npc( ) && victim->desc)
         listeners.push_back( { victim->desc, victim, SPELL_SOUND_VOL_VICTIM,
                                unique ? SPELL_SOUND_PRIO_UNIQUE : SPELL_SOUND_PRIO_VICTIM } );
