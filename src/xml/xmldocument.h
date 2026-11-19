@@ -62,6 +62,12 @@ public:
                 else return *nodes.begin( );
         }
         
+        /** Write ASCII ' between Cyrillic letters as U+02BC (area files). */
+        inline void setModifierApostrophe( bool on )
+        {
+                modifierApostrophe = on;
+        }
+
         void save( ostream& ) const ;
         void load( istream& ) ;
 private:
@@ -71,6 +77,7 @@ private:
 private:
         DLString encoding;
         DLString version;
+        bool modifierApostrophe;
 };
 
 #endif

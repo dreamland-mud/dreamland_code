@@ -385,6 +385,7 @@ XMLArea::save(area_file *af)
     node->setName("area");
     
     XMLDocument::Pointer doc(NEW);
+    doc->setModifierApostrophe(true);
     doc->appendChild(node);
     
     DLFileRead areaFile( dreamland->getAreaDir( ), af->file_name, ".xml" );

@@ -221,6 +221,8 @@ XMLRoom::compat(int vnum)
     room->vnum = vnum;
     room->name = name;
     room->description = description;
+    room->smell = smell;
+    room->sound = sound;
     room->room_flags = flags.getValue( );
     room->sector_type = sector.getValue( );
     room->mana_rate = manaRate.getValue( );

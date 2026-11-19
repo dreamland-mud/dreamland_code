@@ -23,6 +23,7 @@
 #include "onlinecreation.h"
 #include "security.h"
 
+#include "dreamland.h"
 #include "dlscheduler.h"
 #include "schedulertaskroundplugin.h"
 #include "plugininitializer.h"
@@ -38,6 +39,7 @@
 #include "def.h"
 
 bool save_xmlarea(struct area_file *af, Character *ch);
+void save_xmlarea_list( );
 
 // Automatically save all areas marked as 'changed' every minute.
 class SaveChangedAreasTask : public SchedulerTaskRoundPlugin {
@@ -71,6 +73,55 @@ public:
     }
 };
 
+/*
+ * Round-trip gate: with the 'roundtrip' boot option the server loads the
+ * world, writes every area file back once and shuts down. A diff against
+ * the loaded files shows what the serializer does not give back. Runs at
+ * boot only, after the areas are loaded and fixed (SCDP_BOOT + 5, + 6) and
+ * the item economy pass (+ 7), before players and saved rooms (+ 10, + 20).
+ */
+class RoundTripSaveTask : public SchedulerTaskRoundPlugin {
+public:
+    typedef ::Pointer<RoundTripSaveTask> Pointer;
+
+    virtual void run( )
+    {
+        if (DLScheduler::getThis( )->getCurrentTick( ) != 0)
+            return;
+
+        if (!dreamland->hasOption( DL_ROUNDTRIP ))
+            return;
+
+        int total = 0, failed = 0;
+
+        save_xmlarea_list( );
+
+        // One broken area must not stop the rest: the gate wants every file.
+        for (struct area_file *af = area_file_list; af; af = af->next) {
+            total++;
+            try {
+                if (!save_xmlarea( af, 0 ))
+                    failed++;
+            } catch (const std::exception &e) {
+                LogStream::sendError( )
+                    << "Round trip: " << af->file_name << ": " << e.what( ) << endl;
+                failed++;
+            }
+        }
+
+        LogStream::sendNotice( )
+            << "Round trip: saved " << (total - failed) << " of " << total
+            << " area files, " << failed << " failed. Shutting down." << endl;
+
+        dreamland->shutdown( );
+    }
+
+    virtual int getPriority( ) const
+    {
+        return SCDP_BOOT + 8;
+    }
+};
+
 extern "C"
 {
     SO::PluginList initialize_olc( )
@@ -97,6 +148,7 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<XMLVnumRange> >( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeOLC> >( ppl );
         Plugin::registerPlugin<SaveChangedAreasTask>( ppl );
+        Plugin::registerPlugin<RoundTripSaveTask>( ppl );
 
         return ppl;
     }
