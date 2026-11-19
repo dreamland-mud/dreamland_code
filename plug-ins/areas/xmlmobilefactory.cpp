@@ -219,6 +219,10 @@ XMLMobileFactory::init(const mob_index_data *mob)
                 props.removeMember("olc");
         } else if (olc.isNull())
             props.removeMember("olc");
+
+        // An object emptied here would be written as <props>{}</props>.
+        if (props.empty())
+            static_cast<Json::Value &>(props) = Json::Value();
     }
 
     tier.setValue(mob->tierName);
