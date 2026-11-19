@@ -22,6 +22,11 @@ bool msp_sound( Descriptor *d, const DLString &name, int volume = 100, int loops
 /** The same for a player's own connection; false for mobs and the linkless. */
 bool msp_sound( Character *ch, const DLString &name, int volume = 100, int loops = 1, int priority = 50 );
 
+/** The library slot for a sound voiced by ch (a scream, a grunt): slot +
+ *  "_female" for a female ch when that slot has a female recording, else slot
+ *  unchanged. Old web clients without the asset fall back to the base slot. */
+DLString msp_voice( const DLString &slot, Character *ch );
+
 /** msp_sound for an alert that an affect landing on ch sends (blind, poison,
  *  charmed, malediction), at full volume. Every open MspAlertWatch on ch's
  *  connection counts it. */

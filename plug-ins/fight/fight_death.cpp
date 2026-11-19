@@ -1197,7 +1197,7 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
     else if (ch && ch != victim && !ch->is_npc( )) {
         int tier = victim->getNPC( )->getTier( );
         if (tier >= 1 && tier <= 3)
-            msp_sound( ch, "combat/kill", 100, 1, 80 );
+            msp_sound( ch, msp_voice( "combat/kill", victim ), 100, 1, 80 );
     }
 
     // Mob behaviors hear about the death only once nothing can cancel it, so a

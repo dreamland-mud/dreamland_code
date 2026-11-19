@@ -4,6 +4,7 @@
 #include "msp.h"
 #include "descriptor.h"
 #include "character.h"
+#include "merc.h"
 #include "def.h"
 
 /* The web client serves the library here, and Mudlet downloads from the same
@@ -81,6 +82,16 @@ bool msp_sound( Character *ch, const DLString &name, int volume, int loops, int 
         return false;
 
     return msp_sound( ch->desc, name, volume, loops, priority );
+}
+
+DLString msp_voice( const DLString &slot, Character *ch )
+{
+    static const std::set<DLString> voiced = { "combat/hurt", "combat/kill", "spell/harm" };
+
+    if (ch && ch->getSex( ) == SEX_FEMALE && voiced.count( slot ))
+        return slot + "_female";
+
+    return slot;
 }
 
 /* Innermost open watch; each links to the one it shadows. */
