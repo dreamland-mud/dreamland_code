@@ -119,7 +119,7 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
     const char *where;
     lang_t elang = viewerLang(ch);
     if (obj->in_room) {
-        const terrain_t &t = terrains[obj->in_room->getSectorType()];
+        const terrain_t &t = room_terrain(obj->in_room);
         if (elang == LANG_EN)
             where = t.whereEn;
         else if (elang == LANG_UA)

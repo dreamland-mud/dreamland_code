@@ -229,7 +229,7 @@ void use_staff( Character *ch, Object *staff, const DLString &argument )
             return;
     }
     else if (staff->value2() > 0) {
-        const char *terrain = terrains[ch->in_room->getSectorType()].hit;
+        const char *terrain = room_terrain(ch->in_room).hit;
         
         oldact(_("$c1 ударяет $o5 $T."), ch, staff, terrain, TO_ROOM );
         oldact(_("Ты ударяешь $o5 $T."), ch, staff, terrain, TO_CHAR );

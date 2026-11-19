@@ -1087,6 +1087,20 @@ NMI_GET( ClanWrapper, leaderName, "имя лидера клана после р�
     return Register( );
 }
 
+NMI_GET( ClanWrapper, enemies, "список (List) кланов-врагов (структуры .Clan) из профиля этого клана; связь односторонняя, для взаимной вражды проверяй оба клана" )
+{
+    Clan *clan = clanManager->find( name );
+    RegList::Pointer rc( NEW );
+
+    for (int i = 0; i < clanManager->size( ); i++) {
+        Clan *other = clanManager->find( i );
+        if (other && other->isValid( ) && clan->isEnemy( *other ))
+            rc->push_back( ClanWrapper::wrap( other->getName( ) ) );
+    }
+
+    return ::wrap( rc );
+}
+
 static PCMemoryInterface * arg2player( const RegisterList &args, int num )
 {
     PCMemoryInterface *pcm = PCharacterManager::find( argnum2string( args, num ) );

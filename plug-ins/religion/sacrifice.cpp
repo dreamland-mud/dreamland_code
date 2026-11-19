@@ -365,7 +365,7 @@ protected:
 static void altar_clear(Object *altar)
 {
     Object *obj, *obj_next;
-    const char *fall = terrains[altar->in_room->getSectorType()].fall;
+    const char *fall = room_terrain(altar->in_room).fall;
 
     for (obj = altar->contains; obj; obj = obj_next) {
         obj_next = obj->next_content;
@@ -401,7 +401,7 @@ static const char *deity_name_for(Character *ch, lang_t lang)
 
 static const char *where_for(Room *room, lang_t lang)
 {
-    const terrain_t &terr = terrains[room->getSectorType()];
+    const terrain_t &terr = room_terrain(room);
 
     if (lang == LANG_EN)
         return terr.whereEn;
@@ -661,7 +661,7 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 
     if (rescue_nosac_items(obj, ch->in_room)) {
         if (needSpam) {
-            const char *fall = terrains[ch->in_room->getSectorType()].fall;
+            const char *fall = room_terrain(ch->in_room).fall;
             ch->recho(_("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s."), obj, fall);
             ch->pecho(_("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s."), obj, fall);
         }

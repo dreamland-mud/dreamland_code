@@ -7,6 +7,7 @@
 
 class Object;
 class Character;
+class Room;
 
 struct terrain_t {
     int sector;
@@ -20,6 +21,9 @@ struct terrain_t {
 };
 
 extern const struct terrain_t terrains [];
+
+// Surface of a room: the sector row, or an area-specific override (ship decks).
+const terrain_t & room_terrain( Room *room );
 
 enum {
     BOAT_NONE = 0,
