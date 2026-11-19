@@ -30,6 +30,7 @@
 #include "characterwrapper.h"
 #include "wrappermanager.h"
 #include "regcontainer.h"
+#include "idcontainer.h"
 #include "lex.h"
 #include "reglist.h"
 #include "wrap_utils.h"
@@ -37,6 +38,7 @@
 #include "subr.h"
 #include "update_areas.h"
 #include "roomtraverse.h"
+#include "terrains.h"
 #include "def.h"
 
 using namespace std;
@@ -237,6 +239,29 @@ NMI_GET( RoomWrapper, sector_type , "значение типа местност�
 {
     checkTarget( );
     return Register( target->getSectorType() );
+}
+
+NMI_GET( RoomWrapper, terrain, "поверхность комнаты по типу местности (палуба на кораблях): Map с полями move, wait, hit (об что ударяется), fall (куда падает), where/whereEn/whereUa (где лежит)" )
+{
+    checkTarget( );
+
+    int sector = target->getSectorType( );
+    if (sector < 0 || sector >= SECT_MAX)
+        return Register( );
+
+    const terrain_t &t = room_terrain( target );
+    Register rc = Register::handler<IdContainer>( );
+    IdContainer *map = rc.toHandler( ).getDynamicPointer<IdContainer>( );
+
+    map->setField( IdRef( "move" ), Register( t.move ) );
+    map->setField( IdRef( "wait" ), Register( t.wait ) );
+    map->setField( IdRef( "hit" ), Register( t.hit ) );
+    map->setField( IdRef( "fall" ), Register( t.fall ) );
+    map->setField( IdRef( "where" ), Register( t.where ) );
+    map->setField( IdRef( "whereEn" ), Register( t.whereEn ) );
+    map->setField( IdRef( "whereUa" ), Register( t.whereUa ) );
+
+    return rc;
 }
 
 NMI_GET( RoomWrapper, affected_by, "биты аффектов на комнате (таблица .tables.affect_flags)" )

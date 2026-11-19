@@ -3544,7 +3544,7 @@ NMI_INVOKE(CharacterWrapper, quaff, "(obj): получить эффекты от
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane[,verbose]]]): скастовать заклинания на всю комнату, на vict или с аргументом")
+NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|obj|argument[,spellbane[,verbose]]]): скастовать заклинания на всю комнату, на vict, на предмет obj или с аргументом")
 {
     checkTarget( );
 
@@ -3571,6 +3571,15 @@ NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane
         spell( skill->getIndex( ), level, target, const_cast<char *>(arg) );
         return Register();
     } 
+
+    // Object target spell: spellbane and verbose flags only apply to characters.
+    if (arg3.type == Register::OBJECT) {
+        ObjectWrapper *objWrap = arg3.toHandler().getDynamicPointer<ObjectWrapper>();
+        if (objWrap) {
+            spell( skill->getIndex( ), level, target, objWrap->getTarget( ) );
+            return Register();
+        }
+    }
 
     // Character target spell.    
     Character *victim = argnum2character(args, 3);

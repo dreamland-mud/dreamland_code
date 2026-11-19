@@ -7,6 +7,8 @@
 
 #include "pcharacter.h"
 #include "object.h"
+#include "room.h"
+#include "area.h"
 
 #include "merc.h"
 #include "def.h"
@@ -28,6 +30,30 @@ const struct terrain_t terrains [SECT_MAX] = {
  { SECT_DESERT,       6,  1, "об песок",    "на песок", "на песке",  "on the sand",   "на піску"   },  // desert
  { SECT_UNUSED,       6,  1, "об землю",    "на землю", "на дне",    "on the bottom", "на дні"     },  // underwater
 };
+
+// Areas whose rooms of a given sector have a different surface. Ships are
+// built from city rooms, so without this they read as pavement and floor.
+static const struct {
+    const char *areaFile;
+    terrain_t terrain;
+} terrain_overrides [] = {
+/*  area            type        move wait  hit            fall          where         whereEn         whereUa */
+ { "galeon.are", { SECT_CITY,   2,  0,  "об палубу",   "на палубу",  "на палубе",  "on the deck",  "на палубі" } },
+};
+
+const terrain_t & room_terrain( Room *room )
+{
+    int sector = room->getSectorType( );
+    AreaIndexData *area = room->areaIndex( );
+
+    if (area && area->area_file) {
+        for (auto &o: terrain_overrides)
+            if (o.terrain.sector == sector && area->area_file->file_name == o.areaFile)
+                return o.terrain;
+    }
+
+    return terrains[sector];
+}
 
 /*-----------------------------------------------------------------------------
  * boats
