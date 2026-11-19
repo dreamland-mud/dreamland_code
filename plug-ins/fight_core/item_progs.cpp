@@ -93,6 +93,20 @@ bool oprog_drop( Object *obj, Character *ch )
 }
 
 /*
+ * Something was eaten: a pill (use_pill) or food (the Fenia 'eat' command, via
+ * obj.trigger("Eat")). The stomach is already filled. True keeps the object.
+ */
+bool oprog_eat( Object *obj, Character *ch )
+{
+    if (behavior_trigger(obj, "Eat", "OC", obj, ch))
+        return true;
+
+    FENIA_CALL( obj, "Eat", "C", ch );
+    FENIA_NDX_CALL( obj, "Eat", "OC", obj, ch );
+    return false;
+}
+
+/*
  * A whole hand-over: area quests, behaviors and both sides' Fenia triggers each
  * get a say, and any of them may take the item back, which is what every
  * `obj->carried_by != victim` bail-out is checking. Lives here rather than in

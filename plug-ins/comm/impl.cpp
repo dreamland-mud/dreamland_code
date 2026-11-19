@@ -22,7 +22,6 @@
 #include "chatweb.h"
 #include "run.h"
 #include "writing.h"
-#include "eating.h"
 #include "pcname.h"
 #include "sandboxservlet.h"
 #include "so.h"
@@ -47,8 +46,6 @@ extern "C"
                 Plugin::registerPlugin<COrder>( ppl );
                 Plugin::registerPlugin<CWrite>( ppl );
                 
-                Plugin::registerPlugin<CEat>( ppl );
-
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeNameForm> >( ppl );
                 Plugin::registerPlugin<NameFormLoginListener>( ppl );
 

@@ -630,6 +630,25 @@ NMI_GET( RaceWrapper, form, "формы тела (таблица .tables.form_fl
     return Scripting::Register( (int) raceManager->find( name )->getForm( ).getValue( ) );
 }
 
+NMI_INVOKE( RaceWrapper, attitude, "(race): отношение этой расы к race (.Race или имя): биты .tables.race_flags (hunts -- охотится, donates, hates)" )
+{
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+
+    const Register &arg = args.front( );
+    DLString otherName;
+    if (arg.type == Register::STRING)
+        otherName = arg.toString( );
+    else
+        otherName = wrapper_cast<RaceWrapper>( arg )->name;
+
+    Race *other = raceManager->findExisting( otherName );
+    if (!other)
+        throw Scripting::Exception( otherName + ": race not found" );
+
+    return Register( (int) raceManager->find( name )->getAttitude( *other ).getValue( ) );
+}
+
 NMI_GET( RaceWrapper, parts, "части тела (таблица .tables.part_flags)" ) 
 {
     return Scripting::Register( (int) raceManager->find( name )->getParts( ).getValue( ) );

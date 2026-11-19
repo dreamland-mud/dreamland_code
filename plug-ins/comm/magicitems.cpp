@@ -12,6 +12,9 @@
  *    Andreyanov Aleksandr {Manwe}                                         *
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
+#include "wrapperbase.h"
+#include "wrappertarget.h"
+#include "rageoath.h"
 #include "skill.h"
 #include "skillmanager.h"
 #include "spell.h"
@@ -49,6 +52,7 @@ GSN(scrolls);
 GSN(wands);
 GSN(staff);
 GSN(none);
+PROF(druid);
 
 /*
  * Scrolls, staves and wands are all used via the 'use' command (comm/use.cpp).
@@ -462,4 +466,47 @@ void use_charged( Character *ch, Object *obj, const DLString &argument )
     else {
         ch->pecho( _("%1$^O1 тускне%1$nет|ют: заряды кончились."), obj );
     }
+}
+
+static bool oprog_quaff( Object *obj, Character *ch )
+{
+    FENIA_CALL( obj, "Quaff", "C", ch );
+    FENIA_NDX_CALL( obj, "Quaff", "OC", obj, ch );
+    return false;
+}
+
+/*
+ * Drink a potion, called from 'use'. Potions are synthetic magic: the Battlerager
+ * oath refuses them at every rank, druids won't touch them.
+ */
+void use_potion( Character *ch, Object *obj )
+{
+    if (rage_member( ch )) {
+        rage_magic_refuse( ch );
+        return;
+    }
+
+    if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
+        ch->pecho(_("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить её."), ch);
+        return;
+    }
+    
+    if (ch->getProfession( ) == prof_druid) {
+        ch->pecho(_("Ты не хочешь осквернять свое тело синтетикой."));
+        return;        
+    }
+    
+    oldact(_("$c1 осушает $o4."), ch, obj, 0, TO_ROOM);
+    oldact(_("Ты осушаешь $o4."), ch, obj, 0 ,TO_CHAR);
+    
+    if (oprog_quaff( obj, ch ))
+        return;
+
+    spell_by_item( ch, obj );
+
+    if (ch->is_adrenalined( ) || ch->fighting)
+         ch->setWaitViolence( 2 );
+    
+    extract_obj( obj );
+    obj_to_char( create_object(get_obj_index(OBJ_VNUM_POTION_VIAL),0),ch);
 }

@@ -166,6 +166,7 @@ bool spell_nocatch( ::Pointer<Spell> &spell, int level, Character *ch, ::Pointer
 /** oathPaid: a Battlerager paid the oath for this item. burned: the oath burned its magic,
  *  only natural remedies on a pill still work. */
 void spell_by_item( Character *ch, Object *obj, bool oathPaid = false, bool burned = false );
+void use_pill( Character *ch, Object *pill );
 
 /** ownDebuff: the dispeller placed this affect on somebody else (fight/saves.json dispel.own_debuff_pct). */
 bool savesDispel( int dis_level, int spell_level, int duration, bool ownDebuff = false );
