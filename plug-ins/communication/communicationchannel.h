@@ -51,7 +51,7 @@ protected:
     virtual DLString outputVict( Character *, Character *, const DLString &, const DLString & ) const;
     virtual DLString outputChar( Character *, Character *, const DLString &, const DLString & ) const;
     virtual DLString outputSelf( Character *, const DLString &, const DLString & ) const;
-    virtual void postOutput( Character *outputTo, const DLString &message ) const;
+    virtual void postOutput( Character *outputTo, const DLString &message, Character *speaker ) const;
 
     /** The coarse bucket a chat frame from this channel carries: room,
      *  personal, area, world, race, group. A panel files a channel it has

@@ -33,9 +33,9 @@ void WorldChannel::findListeners( Character *ch, Listeners &listeners ) const
 
 }
 
-void WorldChannel::postOutput( Character *outputTo, const DLString &message ) const
+void WorldChannel::postOutput( Character *outputTo, const DLString &message, Character *speaker ) const
 {
     if (!outputTo->is_npc())
-        remember_history_public( outputTo->getPC( ), message );
+        remember_history_public( outputTo->getPC( ), message, speaker );
 }
 

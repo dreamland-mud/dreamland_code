@@ -61,10 +61,10 @@ void AreaChannel::triggers( Character *ch, const DLString &msg ) const
         WorldChannel::triggers( ch, msg );
 }
 
-void AreaChannel::postOutput( Character *outputTo, const DLString &message ) const
+void AreaChannel::postOutput( Character *outputTo, const DLString &message, Character *speaker ) const
 {
     if (!outputTo->is_npc())
-        remember_history_near( outputTo->getPC( ), message );
+        remember_history_near( outputTo->getPC( ), message, speaker );
 }
 
 DLString AreaChannel::webKind( ) const

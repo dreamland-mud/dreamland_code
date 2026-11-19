@@ -30,7 +30,7 @@ protected:
 
     virtual bool needOutputVict( Character *, Character * ) const;
     virtual bool needOutputChar( Character * ) const;
-    virtual void postOutput( Character *outputTo, const DLString &message ) const;
+    virtual void postOutput( Character *outputTo, const DLString &message, Character *speaker ) const;
     virtual DLString webKind( ) const;
 
     void tellToBuffer( Character *, Character *, const DLString &, const DLString & ) const;

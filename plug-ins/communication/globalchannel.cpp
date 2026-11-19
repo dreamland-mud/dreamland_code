@@ -102,7 +102,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
         DLString outSelf = argGarbled;
         DLString message = outputSelf( ch, fmtSelf, outSelf );
         ch->pecho(message);
-        postOutput(ch, message);
+        postOutput(ch, message, ch);
         // The speaker's own copy: no counterpart on an undirected channel.
         //
         // Asked first, because the arguments are not free: webArea() builds the
@@ -125,7 +125,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 
             DLString message = outputVict( ch, victim, fmtVict, outVict );
             victim->pecho(message);
-            postOutput(victim, message);
+            postOutput(victim, message, ch);
             // Everything that could silence this listener -- the channel's own
             // switch, quiet, the deafen spell, trust, position, the isolator --
             // was decided in isGlobalListener before they got here, so a frame
