@@ -3,8 +3,10 @@
  * ruffina, 2004
  */
 #include <pcharacter.h>
+#include <npcharacter.h>
 #include <object.h>
 #include <string.h>
+#include <set>
 
 #include "room.h"
 #include "aedit.h"
@@ -24,6 +26,7 @@
 #include "save.h"
 #include "dreamland.h"
 #include "loadsave.h"
+#include "wiznet.h"
 #include "interp.h"
 #include "act.h"
 
@@ -427,11 +430,13 @@ AEDIT(quest, "квест", "редактировать квесты в зоне"
 }
 
 /*
- * 'reset purge': what a fresh reset of a room may sweep away. Players and
- * everything tied to them stay: their pets, charmies and followers, their
- * mounts, mobs carrying an owned item, PC corpses, owned and limited objects
- * and any container holding one. NOPURGE mobs and objects stay as with
- * a plain 'purge'.
+ * 'reset purge': what a fresh reset of a room may sweep away. A mob goes only
+ * when a reset of this area can bring its prototype back; it stays when a
+ * player is its master, leader or rider, when it is NOPURGE or switched into,
+ * or when anything it carries is kept by the object rule. An object stays
+ * when it is a PC corpse, owned, limited, NOPURGE, or holds such an object.
+ * Masterless player summons with unowned gear stay only through the first
+ * rule; ownerless floor stashes go.
  */
 static bool reset_purge_keeps_obj(Object *obj)
 {
@@ -448,9 +453,26 @@ static bool reset_purge_keeps_obj(Object *obj)
     return false;
 }
 
-static bool reset_purge_keeps_mob(Character *rch)
+/** Mob prototypes an 'M' reset in this area loads. */
+static std::set<int> reset_purge_mob_vnums(AreaIndexData *pArea)
+{
+    std::set<int> vnums;
+
+    for (auto &r: pArea->roomIndexes)
+        for (auto &pReset: r.second->resets)
+            if (pReset->command == 'M')
+                vnums.insert(pReset->arg1);
+
+    return vnums;
+}
+
+static bool reset_purge_keeps_mob(Character *rch, const std::set<int> &resetMobs)
 {
     if (!rch->is_npc() || rch->desc != 0 || IS_SET(rch->act, ACT_NOPURGE))
+        return true;
+
+    // Nothing brings it back: a summon, a quest mob, a wanderer from elsewhere.
+    if (!resetMobs.count(rch->getNPC()->pIndexData->vnum))
         return true;
 
     if ((rch->master && !rch->master->is_npc())
@@ -459,11 +481,23 @@ static bool reset_purge_keeps_mob(Character *rch)
         return true;
 
     for (Object *obj = rch->carrying; obj; obj = obj->next_content)
-        if (!obj->getOwner().empty())
+        if (reset_purge_keeps_obj(obj))
             return true;
 
     return false;
 }
+
+/** Saving of mobs and objects off for the sweep, back on however it ends. */
+struct ResetPurgeNoSave {
+    ResetPurgeNoSave() {
+        dreamland->removeOption(DL_SAVE_MOBS);
+        dreamland->removeOption(DL_SAVE_OBJS);
+    }
+    ~ResetPurgeNoSave() {
+        dreamland->resetOption(DL_SAVE_MOBS);
+        dreamland->resetOption(DL_SAVE_OBJS);
+    }
+};
 
 /** A room with a player in it, linkdead or switched into a mob. */
 static bool reset_purge_has_player(Room *room)
@@ -474,7 +508,7 @@ static bool reset_purge_has_player(Room *room)
     return false;
 }
 
-static void reset_purge_room(Room *room, int &mobs, int &objs)
+static void reset_purge_room(Room *room, const std::set<int> &resetMobs, int &mobs, int &objs)
 {
     // Candidates first, extraction after: a mob's or item's scripts may
     // extract or recycle another one while the room lists change under us.
@@ -482,7 +516,7 @@ static void reset_purge_room(Room *room, int &mobs, int &objs)
     vector<ExtractWatch> watches;
 
     for (Character *rch = room->people; rch; rch = rch->next_in_room)
-        if (!reset_purge_keeps_mob(rch))
+        if (!reset_purge_keeps_mob(rch, resetMobs))
             victims.push_back(rch);
 
     for (auto &v: victims)
@@ -528,24 +562,23 @@ AEDIT(reset, "сбросить", "сбросить арию, обновив вс
 
     int skipped = 0, mobs = 0, objs = 0;
     list<Room *> purged;
+    std::set<int> resetMobs = reset_purge_mob_vnums(original);
 
-    dreamland->removeOption(DL_SAVE_MOBS);
-    dreamland->removeOption(DL_SAVE_OBJS);
+    {
+        ResetPurgeNoSave noSave;
 
-    for (auto &r: original->area->rooms) {
-        Room *room = r.second;
+        for (auto &r: original->area->rooms) {
+            Room *room = r.second;
 
-        if (reset_purge_has_player(room)) {
-            skipped++;
-            continue;
+            if (reset_purge_has_player(room)) {
+                skipped++;
+                continue;
+            }
+
+            reset_purge_room(room, resetMobs, mobs, objs);
+            purged.push_back(room);
         }
-
-        reset_purge_room(room, mobs, objs);
-        purged.push_back(room);
     }
-
-    dreamland->resetOption(DL_SAVE_MOBS);
-    dreamland->resetOption(DL_SAVE_OBJS);
 
     for (auto &room: purged) {
         save_items(room);
@@ -554,6 +587,7 @@ AEDIT(reset, "сбросить", "сбросить арию, обновив вс
 
     reset_area(original->area, FRESET_ALWAYS);
 
+    wiznet(WIZ_LOAD, WIZ_SECURE, ch->get_trust(), "%C1 purges and resets area %d.", ch, original->vnum);
     LogStream::sendNotice() << ch->getNameC() << " aedit reset purge area " << original->vnum
                             << ": " << mobs << " mobs, " << objs << " objects, "
                             << skipped << " rooms with players skipped" << endl;

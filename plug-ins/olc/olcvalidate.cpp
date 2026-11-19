@@ -16,6 +16,7 @@
 #include "skill.h"
 #include "skillmanager.h"
 #include "itemeconomy.h"
+#include "itemutils.h"
 #include "armorgenerator.h"
 #include "weapontier.h"
 #include "magicitemgenerator.h"
@@ -904,6 +905,42 @@ static void check_obj_power(OlcCheck &c, obj_index_data *pObj)
     }
 }
 
+/** structure.furniture_msg: props.furniture messages are format strings of
+ *  pecho/recho(fmt, obj, ch). bodyposition ignores an unsafe one; say so. */
+static void check_furniture_msgs(OlcCheck &c, obj_index_data *pObj)
+{
+    const Json::Value &props = pObj->props;
+    if (!props.isObject() || !props.isMember(Item::FURNITURE_PROPS))
+        return;
+
+    const Json::Value &msgs = props[Item::FURNITURE_PROPS];
+    if (!msgs.isObject()) {
+        c.flag("structure.furniture_msg", "props furniture", "", "not an object of tag: text");
+        return;
+    }
+
+    for (auto it = msgs.begin(); it != msgs.end(); it++) {
+        DLString tag = it.key().asString();
+        DLString field = "props furniture " + tag;
+        bool known = false;
+
+        for (int i = 0; Item::furnitureMsgTags[i]; i++)
+            if (tag == Item::furnitureMsgTags[i])
+                known = true;
+
+        if (!known) {
+            c.flag("structure.furniture_msg", field, "", "unknown tag, bodyposition never reads it");
+            continue;
+        }
+
+        DLString error;
+        if (!(*it).isString())
+            c.flag("structure.furniture_msg", field, "", "not a string");
+        else if (!Item::furnitureMsgValid((*it).asString(), error))
+            c.flag("structure.furniture_msg", field, "", "unsafe format, ignored in game: " + error);
+    }
+}
+
 void olc_validate_obj(obj_index_data *pObj, OlcFindings &out)
 {
     if (!pObj || IS_SET(pObj->extra_flags, ITEM_DELETED))
@@ -924,6 +961,7 @@ void olc_validate_obj(obj_index_data *pObj, OlcFindings &out)
     check_eds(c, pObj->extraDescriptions);
     check_kw_in_long(c, "long", pObj->keyword, pObj->description);
     check_obj_power(c, pObj);
+    check_furniture_msgs(c, pObj);
 }
 
 void olc_validate_area(AreaIndexData *pArea, OlcFindings &out)
@@ -1024,7 +1062,7 @@ static const char *powerFields[] = {
     "addaffect", "delaffect", "addgrant", "random",
     "value0", "value1", "value2", "value3", "value4", "v0", "v1", "v2", "v3", "v4",
     "cost", "weight", "type", "extra", "wear", "limit", "condition", "material",
-    "behaviors", "oldbehavior", "props", "fenia", "copy",
+    "behaviors", "oldbehavior", "props", "msg", "fenia", "copy",
     "flags", "sector", "heal", "mana", "liquid",
     0
 };

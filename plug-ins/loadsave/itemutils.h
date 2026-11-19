@@ -21,8 +21,14 @@ namespace Item {
     extern const char *FURNITURE_PROPS;
     /** Every tag bodyposition looks up, null-terminated. */
     extern const char *furnitureMsgTags[];
-    /** The prototype props message for a tag, empty if none. */
+    /** The prototype props message for a tag, empty if none or if it is not
+     *  a safe format string (furnitureMsgValid). */
     DLString furnitureMsgProp(const obj_index_data *pObj, const char *tag);
+    /** A furniture message is the format of pecho/recho(fmt, obj, ch): only
+     *  %1$ (the object) and %2$ (the character) with a noun conversion
+     *  (C O P T + case digit, G n + forms), and %%, are allowed. Anything
+     *  else reads past the two varargs. On false, error says why. */
+    bool furnitureMsgValid(const DLString &msg, DLString &error);
 
     bool canDrop( Character *ch, Object *obj, bool verbose = false);
 }

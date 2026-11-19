@@ -32,6 +32,9 @@ class Character;
  *                           languages and empty in others
  *   structure.kw_collision  a room ED and an extra exit share a keyword word:
  *                           'look' can reach only one of them
+ *   structure.furniture_msg  props.furniture: an unknown tag, a non-string, or
+ *                           a message unsafe as a pecho/recho format
+ *                           (Item::furnitureMsgValid); the game ignores it
  *   structure.eexit_msg     extra exit movement messages (scripts/lint-extra-exits.py):
  *                           %4 with no noun, a case the noun pad lacks, an
  *                           unnumbered placeholder, a trailing full stop, a RU

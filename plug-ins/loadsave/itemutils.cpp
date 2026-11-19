@@ -45,7 +45,60 @@ DLString Item::furnitureMsgProp(const obj_index_data *pObj, const char *tag)
     if (!msgs.isObject() || !msgs.isMember(tag) || !msgs[tag].isString())
         return DLString::emptyString;
 
-    return msgs[tag].asString();
+    DLString msg = msgs[tag].asString(), error;
+    if (!furnitureMsgValid(msg, error))
+        return DLString::emptyString;
+
+    return msg;
+}
+
+// Mirrors the MsgFormatter::run grammar (plug-ins/output/msgformatter.cpp),
+// restricted to what is safe with exactly two noun-holder varargs.
+bool Item::furnitureMsgValid(const DLString &msg, DLString &error)
+{
+    const char *s = msg.c_str();
+
+    for (size_t i = 0; s[i]; i++) {
+        if (s[i] != '%')
+            continue;
+
+        if (s[i + 1] == '%') {
+            i++;
+            continue;
+        }
+
+        if ((s[i + 1] != '1' && s[i + 1] != '2') || s[i + 2] != '$') {
+            error = "после % допустимы только %1$ (предмет), %2$ (персонаж) или %%";
+            return false;
+        }
+
+        size_t j = i + 3;
+        if (s[j] == '#')
+            j++;
+        while (s[j] == '^' || s[j] == '_')
+            j++;
+
+        char cvt = s[j];
+        switch (cvt) {
+        case 'C': case 'O': case 'P': case 'T': {
+            char maxCase = (cvt == 'T' ? '8' : '7');
+            if (s[j + 1] < '1' || s[j + 1] > maxCase) {
+                error = DLString("после %N$") + cvt + " нужна цифра падежа";
+                return false;
+            }
+            i = j + 1;
+            break;
+        }
+        case 'G': case 'n':
+            i = j;
+            break;
+        default:
+            error = "допустимые подстановки: C, O, P, T с падежом, G и n с формами";
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bitstring_t Item::furnitureMaxPeople(Object *obj)
