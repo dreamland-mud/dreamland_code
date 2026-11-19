@@ -21,22 +21,104 @@
 #include "xmlparser.h"
 #include "logstream.h"
 #include "iconvmap.h"
+#include "dl_ctype.h"
 
 IconvMap koi2utf("koi8-u", "utf-8");
 
 XMLDocument::XMLDocument( )
         : encoding( DEFAULT_ENCODING ),
-                version( DEFAULT_VERSION )
+                version( DEFAULT_VERSION ),
+                modifierApostrophe( false )
 {
 }
 
+/*
+ * Nearest character left of i, skipping colour codes ({ plus one character)
+ * and inflection pipes. Returns 0 at the start of the string.
+ */
+static char apostrophe_left( const DLString &str, size_t i )
+{
+    size_t j = i;
+
+    while (j > 0) {
+        j--;
+        if (j >= 1 && str[j - 1] == '{') {
+            j--;
+            continue;
+        }
+        if (str[j] == '|')
+            continue;
+        return str[j];
+    }
+
+    return 0;
+}
+
+/* Same to the right. A lone { at the very end is an ordinary character. */
+static char apostrophe_right( const DLString &str, size_t i )
+{
+    size_t j = i + 1;
+
+    while (j < str.size( )) {
+        if (str[j] == '{' && j + 1 < str.size( )) {
+            j += 2;
+            continue;
+        }
+        if (str[j] == '|') {
+            j++;
+            continue;
+        }
+        return str[j];
+    }
+
+    return 0;
+}
+
+/*
+ * Area files spell the Ukrainian apostrophe as U+02BC. Load turns it into an
+ * ASCII ' (iconvmap.cpp, KOI8-U has no such character), so the save puts it
+ * back: an ASCII ' between two Cyrillic letters, colour codes and pipes
+ * skipped. Quotes and English text keep the ASCII one. Works on KOI8 bytes.
+ */
+static bool is_modifier_apostrophe( const DLString &str, size_t i )
+{
+    if (str[i] != '\'')
+        return false;
+
+    char l = apostrophe_left( str, i );
+    char r = apostrophe_right( str, i );
+    return l && r && dl_is_cyrillic( l ) && dl_is_cyrillic( r );
+}
+
+/*
+ * U+02BC is not a KOI8-U character, so it cannot go through koi2utf. The
+ * string is cut at each such apostrophe, every piece is converted on its own
+ * and the UTF-8 bytes of U+02BC are glued in between. KOI8-U is a stateless
+ * single-byte charset, so converting the pieces equals converting the whole.
+ */
 DLString XMLDocument::encode(const DLString &str) const
 {
-    if(encoding == "UTF-8") {
-        return DLString(koi2utf(str));
-    } else {
+    if (encoding != "UTF-8")
         return str;
+
+    if (!modifierApostrophe || str.find( '\'' ) == DLString::npos)
+        return DLString(koi2utf(str));
+
+    static const char *const MODIFIER_APOSTROPHE_UTF8 = "\xCA\xBC";
+    std::string out;
+    size_t start = 0;
+
+    for (size_t i = 0; i < str.size( ); i++) {
+        if (!is_modifier_apostrophe( str, i ))
+            continue;
+
+        out += koi2utf(str.substr( start, i - start ));
+        out += MODIFIER_APOSTROPHE_UTF8;
+        start = i + 1;
     }
+
+    out += koi2utf(str.substr( start ));
+    return DLString(out);
 }
 
 /*

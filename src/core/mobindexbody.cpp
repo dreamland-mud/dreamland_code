@@ -130,8 +130,12 @@ void mob_index_data::bodyDiff(int mobset, bitstring_t &add, bitstring_t &del) co
     add = (bodyAdd[mobset] | on) & ~off;
     del = (bodyDel[mobset] | (off & ~ownOff)) & ~on;
 
-    if (mobset == MOBSET_ACT)
+    // npc is forced back on every rebuild, so neither an add nor a del of it
+    // carries meaning: keep both out of the XML.
+    if (mobset == MOBSET_ACT) {
         add &= ~(bitstring_t)ACT_IS_NPC;
+        del &= ~(bitstring_t)ACT_IS_NPC;
+    }
 }
 
 /* Body::BitSet index for a MOBSET_ set, -1 for form and parts. */
