@@ -195,7 +195,7 @@ static void update_killed(PCharacter *pc)
 
 static void clear_fenia_skills( PCharacter *ch )
 {
-    PCSkills skills = ch->getSkills();
+    PCSkills &skills = ch->getSkills();
     PCSkills::iterator s;
     
     for (s = skills.begin(); s != skills.end(); s++)
