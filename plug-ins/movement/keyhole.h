@@ -15,6 +15,12 @@ struct exit_data;
 struct extra_exit_data;
 class Room;
 
+/** Every prototype lock a key opens, as plain lines: room exits and extra
+ *  exits whose key is keyVnum (room vnum as a web button to redit), container
+ *  and portal prototypes keyed to it (vnum as a button to oedit). A linear
+ *  scan of the room and object prototypes, for oedit show and stat obj. */
+DLString key_proto_locks(Character *ch, int keyVnum);
+
 class Keyhole : public virtual DLObject {
 public:
     typedef ::Pointer<Keyhole> Pointer;

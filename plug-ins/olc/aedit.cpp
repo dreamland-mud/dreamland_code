@@ -19,6 +19,11 @@
 #include "arg_utils.h"
 #include "areautils.h"
 #include "update_areas.h"
+#include "fight_extract.h"
+#include "behavior_utils.h"
+#include "save.h"
+#include "dreamland.h"
+#include "loadsave.h"
 #include "interp.h"
 #include "act.h"
 
@@ -421,18 +426,140 @@ AEDIT(quest, "квест", "редактировать квесты в зоне"
     return false;
 }
 
-AEDIT(reset, "сбросить", "сбросить арию, обновив всех мобов, предметы и двери")
+/*
+ * 'reset purge': what a fresh reset of a room may sweep away. Players and
+ * everything tied to them stay: their pets, charmies and followers, their
+ * mounts, mobs carrying an owned item, PC corpses, owned and limited objects
+ * and any container holding one. NOPURGE mobs and objects stay as with
+ * a plain 'purge'.
+ */
+static bool reset_purge_keeps_obj(Object *obj)
+{
+    if (obj->item_type == ITEM_CORPSE_PC
+        || !obj->getOwner().empty()
+        || obj->pIndexData->limit != -1
+        || IS_OBJ_STAT(obj, ITEM_NOPURGE))
+        return true;
+
+    for (Object *in = obj->contains; in; in = in->next_content)
+        if (reset_purge_keeps_obj(in))
+            return true;
+
+    return false;
+}
+
+static bool reset_purge_keeps_mob(Character *rch)
+{
+    if (!rch->is_npc() || rch->desc != 0 || IS_SET(rch->act, ACT_NOPURGE))
+        return true;
+
+    if ((rch->master && !rch->master->is_npc())
+        || (rch->leader && !rch->leader->is_npc())
+        || (rch->mount && !rch->mount->is_npc()))
+        return true;
+
+    for (Object *obj = rch->carrying; obj; obj = obj->next_content)
+        if (!obj->getOwner().empty())
+            return true;
+
+    return false;
+}
+
+/** A room with a player in it, linkdead or switched into a mob. */
+static bool reset_purge_has_player(Room *room)
+{
+    for (Character *rch = room->people; rch; rch = rch->next_in_room)
+        if (!rch->is_npc() || rch->desc != 0)
+            return true;
+    return false;
+}
+
+static void reset_purge_room(Room *room, int &mobs, int &objs)
+{
+    // Candidates first, extraction after: a mob's or item's scripts may
+    // extract or recycle another one while the room lists change under us.
+    vector<Character *> victims;
+    vector<ExtractWatch> watches;
+
+    for (Character *rch = room->people; rch; rch = rch->next_in_room)
+        if (!reset_purge_keeps_mob(rch))
+            victims.push_back(rch);
+
+    for (auto &v: victims)
+        watches.push_back(ExtractWatch(v, true));
+
+    for (size_t i = 0; i < victims.size(); i++)
+        if (!watches[i].gone() && victims[i]->in_room == room) {
+            extract_char(victims[i]);
+            mobs++;
+        }
+
+    // Collected after the mobs: what they dropped is judged too.
+    vector<pair<Object *, long long> > items;
+
+    for (Object *obj = room->contents; obj; obj = obj->next_content)
+        if (!reset_purge_keeps_obj(obj))
+            items.push_back(make_pair(obj, obj->getID()));
+
+    for (auto &it: items) {
+        Object *obj = it.first;
+        if (obj->extracted || obj->in_room != room || obj->getID() != it.second)
+            continue;
+        extract_obj(obj);
+        objs++;
+    }
+}
+
+AEDIT(reset, "сбросить", "сбросить арию, обновив всех мобов, предметы и двери; reset purge -- с очисткой комнат без игроков")
 {
     AreaIndexData *original = AreaUtils::getByVnum(vnum);
 
-    if (original) {
+    if (!original) {
+        stc("Создание арии не завершено - нечего сбрасывать.\n\r", ch);
+        return false;
+    }
+
+    if (!arg_oneof_strict(argument, "purge", "очистить")) {
         // FIXME reset either all instances or the current one.
         reset_area(original->area, FRESET_ALWAYS);
         stc("Ария сброшена.\n\r", ch);
         return false;
     }
 
-    stc("Создание арии не завершено - нечего сбрасывать.\n\r", ch);
+    int skipped = 0, mobs = 0, objs = 0;
+    list<Room *> purged;
+
+    dreamland->removeOption(DL_SAVE_MOBS);
+    dreamland->removeOption(DL_SAVE_OBJS);
+
+    for (auto &r: original->area->rooms) {
+        Room *room = r.second;
+
+        if (reset_purge_has_player(room)) {
+            skipped++;
+            continue;
+        }
+
+        reset_purge_room(room, mobs, objs);
+        purged.push_back(room);
+    }
+
+    dreamland->resetOption(DL_SAVE_MOBS);
+    dreamland->resetOption(DL_SAVE_OBJS);
+
+    for (auto &room: purged) {
+        save_items(room);
+        save_mobs(room);
+    }
+
+    reset_area(original->area, FRESET_ALWAYS);
+
+    LogStream::sendNotice() << ch->getNameC() << " aedit reset purge area " << original->vnum
+                            << ": " << mobs << " mobs, " << objs << " objects, "
+                            << skipped << " rooms with players skipped" << endl;
+
+    ptc(ch, "Ария очищена и сброшена. Убрано мобов: %d, предметов: %d. Пропущено комнат с игроками: %d.\n\r",
+        mobs, objs, skipped);
     return false;
 }
 

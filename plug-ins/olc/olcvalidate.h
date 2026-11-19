@@ -8,6 +8,7 @@ struct RoomIndexData;
 struct mob_index_data;
 struct obj_index_data;
 struct AreaIndexData;
+class Character;
 
 /**
  * OLC validators (docs/plans/OLC_REVAMP.md 3.1): a chain of pure reads over a
@@ -76,6 +77,12 @@ void olc_validate_obj(obj_index_data *pObj, OlcFindings &out);
 void olc_validate_area(AreaIndexData *pArea, OlcFindings &out);
 /** The header and every room, mob and object prototype of the area. */
 void olc_validate_area_all(AreaIndexData *pArea, OlcFindings &out);
+
+/** Runs the chain on one prototype after an editor's 'done' and prints its
+ *  warnings as plain lines (the immortal profile: info is left out). Prints
+ *  nothing for a clean prototype; never changes or blocks anything.
+ *  kind: room | mob | obj. */
+void olc_validate_print(Character *ch, const DLString &kind, int vnum);
 
 /** A resolved editor subcommand that sets a numeric or power field. Unreachable
  *  while OlcOps::apply refuses the player profile; phase 5 replaces this

@@ -20,6 +20,34 @@ bitstring_t Item::furnitureFlags(Object *obj)
     }
 }    
  
+const char *Item::FURNITURE_PROPS = "furniture";
+
+const char *Item::furnitureMsgTags[] = {
+    "msgSitChar", "msgSitRoom",
+    "msgSitRestChar", "msgSitRestRoom",
+    "msgRestChar", "msgRestRoom",
+    "msgSleepChar", "msgSleepRoom",
+    "msgStandChar", "msgStandRoom",
+    "msgWakeRestChar", "msgWakeRestRoom",
+    "msgWakeSitChar", "msgWakeSitRoom",
+    "msgWakeStandChar", "msgWakeStandRoom",
+    0
+};
+
+DLString Item::furnitureMsgProp(const obj_index_data *pObj, const char *tag)
+{
+    const Json::Value &props = pObj->props;
+
+    if (!props.isObject() || !props.isMember(FURNITURE_PROPS))
+        return DLString::emptyString;
+
+    const Json::Value &msgs = props[FURNITURE_PROPS];
+    if (!msgs.isObject() || !msgs.isMember(tag) || !msgs[tag].isString())
+        return DLString::emptyString;
+
+    return msgs[tag].asString();
+}
+
 bitstring_t Item::furnitureMaxPeople(Object *obj)
 {
     switch (obj->item_type) {

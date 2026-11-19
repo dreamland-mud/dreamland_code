@@ -3,6 +3,7 @@
 #include <set>
 
 #include "olcvalidate.h"
+#include "character.h"
 #include "room.h"
 #include "area.h"
 #include "exits.h"
@@ -460,6 +461,11 @@ static void check_kw_in_long(OlcCheck &c, const DLString &field,
             continue;
 
         std::vector<DLString> kws = long_words(kw), lws = long_words(lg);
+        // A keyword with no word in it ("-", the placeholder for an object
+        // never meant to be picked up by name) has nothing to look for.
+        if (kws.empty())
+            continue;
+
         bool found = false;
         for (auto &k: kws)
             for (auto &l: lws)
@@ -952,6 +958,53 @@ void olc_validate_area_all(AreaIndexData *pArea, OlcFindings &out)
         for (obj_index_data *pObj = obj_index_hash[h]; pObj; pObj = pObj->next)
             if (pObj->area == pArea)
                 olc_validate_obj(pObj, out);
+}
+
+/*--------------------------------------------------------------------------
+ * Editor 'done'
+ *-------------------------------------------------------------------------*/
+void olc_validate_print(Character *ch, const DLString &kind, int vnum)
+{
+    static const size_t maxLines = 20;
+    OlcFindings findings;
+
+    if (vnum <= 0)
+        return;
+
+    if (kind == "room")
+        olc_validate_room(get_room_index(vnum), findings);
+    else if (kind == "mob")
+        olc_validate_mob(get_mob_index(vnum), findings);
+    else if (kind == "obj")
+        olc_validate_obj(get_obj_index(vnum), findings);
+
+    // The immortal profile: warnings are told, info stays out.
+    OlcFindings warnings;
+    for (auto &f: findings)
+        if (f.severity == "warning")
+            warnings.push_back(f);
+
+    if (warnings.empty())
+        return;
+
+    ostringstream buf;
+    buf << "{YПроверка [" << vnum << "]: замечаний " << warnings.size()
+        << ". Сохранено как есть.{x" << endl;
+
+    for (size_t i = 0; i < warnings.size() && i < maxLines; i++) {
+        const OlcFinding &f = warnings[i];
+        buf << "  " << f.check;
+        if (!f.field.empty())
+            buf << ", " << f.field;
+        if (!f.lang.empty())
+            buf << ", " << f.lang;
+        buf << ": " << f.message << "{x" << endl;
+    }
+
+    if (warnings.size() > maxLines)
+        buf << "  ... и еще " << (warnings.size() - maxLines) << "." << endl;
+
+    ch->send_to(buf);
 }
 
 /*--------------------------------------------------------------------------
