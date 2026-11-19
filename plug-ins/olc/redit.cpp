@@ -41,6 +41,7 @@
 #include "redit.h"
 #include "eeedit.h"
 #include "olc.h"
+#include "olcvalidate.h"
 #include "security.h"
 #include "feniatriggers.h"
 #include "hometown.h"
@@ -1527,6 +1528,7 @@ REDIT(commands, "команды", "показать список встроен�
 REDIT(done, "готово", "выйти из редактора (не забывайте про asave changed)")
 {
     commit();
+    olc_validate_print(ch, "room", room.getValue());
     detach(ch);
     return true;
 }

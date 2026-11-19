@@ -30,34 +30,39 @@ static bool mprog_wake(Character *ch, Character *waker)
     return false;
 }
 
+// A furniture message: a Fenia field on the instance, then on the prototype,
+// then the prototype props set with oedit 'msg'.
 static DLString oprog_msg(Object *obj, const char *tag)
 {
     DLString msg;
-    Scripting::IdRef ID_MSG(tag);
-    Scripting::Register regObj, regObjIndex;
 
-    if (!FeniaManager::wrapperManager)
-        return msg;
+    if (FeniaManager::wrapperManager) {
+        Scripting::IdRef ID_MSG(tag);
+        Scripting::Register regObj, regObjIndex;
 
-    regObj = FeniaManager::wrapperManager->getWrapper(obj);
-    regObjIndex = FeniaManager::wrapperManager->getWrapper(obj->pIndexData);
+        regObj = FeniaManager::wrapperManager->getWrapper(obj);
+        regObjIndex = FeniaManager::wrapperManager->getWrapper(obj->pIndexData);
 
-    auto getMessage = [&](const Scripting::Register &reg) -> DLString {
-        try
-        {
-            if (reg.type != Scripting::Register::NONE)
-                return reg.toString();
-        }
-        catch (const Exception &e)
-        {
-            LogStream::sendWarning() << e.what() << endl;
-        }
-        return DLString::emptyString;
-    };
+        auto getMessage = [&](const Scripting::Register &reg) -> DLString {
+            try
+            {
+                if (reg.type != Scripting::Register::NONE)
+                    return reg.toString();
+            }
+            catch (const Exception &e)
+            {
+                LogStream::sendWarning() << e.what() << endl;
+            }
+            return DLString::emptyString;
+        };
 
-    msg = getMessage(*regObj[ID_MSG]);
+        msg = getMessage(*regObj[ID_MSG]);
+        if (msg.empty())
+            msg = getMessage(*regObjIndex[ID_MSG]);
+    }
+
     if (msg.empty())
-        msg = getMessage(*regObjIndex[ID_MSG]);
+        msg = Item::furnitureMsgProp(obj->pIndexData, tag);
 
     return msg;
 }

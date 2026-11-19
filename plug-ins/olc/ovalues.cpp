@@ -40,24 +40,24 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         break;
     
     case ITEM_SPELLBOOK:
-        ptc(ch, "[v0] Total pages       : [%d]\n\r", obj->value[0]);
-        ptc(ch, "[v1] Used pages        : [%d]\n\r", obj->value[1]);
-        ptc(ch, "[v2] Max spell quality : [%d]\n\r", obj->value[2]);
-        ptc(ch, "[v3] Spell to learn    : %s {D(? spells){x\n\r", get_skill_name( obj->value[3] ));
-        ptc(ch, "[v4] Spell to learn    : %s\n\r", get_skill_name( obj->value[4] ));
+        ptc(ch, "[v0] Всего страниц     : [%d]\n\r", obj->value[0]);
+        ptc(ch, "[v1] Занято страниц    : [%d]\n\r", obj->value[1]);
+        ptc(ch, "[v2] Макс. качество    : [%d]\n\r", obj->value[2]);
+        ptc(ch, "[v3] Заклинание        : %s {D(? spells){x\n\r", get_skill_name( obj->value[3] ));
+        ptc(ch, "[v4] Заклинание        : %s\n\r", get_skill_name( obj->value[4] ));
         break;
 
     case ITEM_TEXTBOOK:
-        ptc(ch, "[v0] Total pages       : [%d]\n\r", obj->value[0]);
-        ptc(ch, "[v1] Used pages        : [%d]\n\r", obj->value[1]);
-        ptc(ch, "[v2] Max skill quality : [%d]\n\r", obj->value[2]);
-        ptc(ch, "[v3] Skill to learn    : %s {D(? spells){x\n\r", get_skill_name( obj->value[3] ));
-        ptc(ch, "[v4] Skill to learn    : %s\n\r", get_skill_name( obj->value[4] ));
+        ptc(ch, "[v0] Всего страниц     : [%d]\n\r", obj->value[0]);
+        ptc(ch, "[v1] Занято страниц    : [%d]\n\r", obj->value[1]);
+        ptc(ch, "[v2] Макс. качество    : [%d]\n\r", obj->value[2]);
+        ptc(ch, "[v3] Умение            : %s {D(? spells){x\n\r", get_skill_name( obj->value[3] ));
+        ptc(ch, "[v4] Умение            : %s\n\r", get_skill_name( obj->value[4] ));
         break;
 
     case ITEM_RECIPE:
-        ptc(ch, "[v0] Recipe flags      : %s {D(? recipe_flags){x\r\n", recipe_flags.names(obj->value[0]).c_str());
-        ptc(ch, "[v2] Complexity        : [%d]\r\n", obj->value[2]);
+        ptc(ch, "[v0] Флаги рецепта     : %s {D(? recipe_flags){x\r\n", recipe_flags.names(obj->value[0]).c_str());
+        ptc(ch, "[v2] Сложность         : [%d]\r\n", obj->value[2]);
         break;
 
     case ITEM_MAP:
@@ -70,31 +70,31 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         break;
 
     case ITEM_KEYRING:
-        ptc(ch, "[v0] Max key count: [%d]\n\r", obj->value[0]);
+        ptc(ch, "[v0] Макс. ключей: [%d]\n\r", obj->value[0]);
         break;
 
     case ITEM_LOCKPICK:
         ptc(ch, "[v0] %s [%d]\n\r", 
             (obj->value[0] == Keyhole::LOCK_VALUE_MULTI ? 
-                    "Opens all locks" : 
+                    "Открывает все замки" : 
              obj->value[0] == Keyhole::LOCK_VALUE_BLANK ? 
-                    "Used as a blank for key forgery" :
-                    "Opens locks of type"),
+                    "Заготовка для подделки ключа" :
+                    "Открывает замки типа"),
             obj->value[0]);
-        ptc(ch, "[v1] Quality [%d]\n\r", obj->value[1]);
+        ptc(ch, "[v1] Качество [%d]\n\r", obj->value[1]);
         break;
 
     case ITEM_LIGHT:
-        ptc(ch, "[v2] Light:  [%d]\n\r", obj->value[2]);
+        ptc(ch, "[v2] Свет, часов: [%d]\n\r", obj->value[2]);
         break;
 
     case ITEM_WAND:
     case ITEM_STAFF:
         ptc(ch, 
-                  "[v0] Level:          [%d]\n\r"
-                  "[v1] Charges Total:  [%d]\n\r"
-                  "[v2] Charges Left:   [%d]\n\r"
-                  "[v3] Spell:          %s {D(? spells){x\n\r",
+                  "[v0] Уровень:          [%d]\n\r"
+                  "[v1] Всего зарядов:    [%d]\n\r"
+                  "[v2] Осталось зарядов: [%d]\n\r"
+                  "[v3] Заклинание:       %s {D(? spells){x\n\r",
                   obj->value[0],
                   obj->value[1],
                   obj->value[2],
@@ -103,11 +103,11 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_PORTAL:
         ptc(ch, 
-                  "[v0] Charges:        [%d]\n\r"
-                  "[v1] Exit Flags:     %s {D(? exit_flags){x\n\r"
-                  "[v2] Portal Flags:   %s {D(? portal_flags){x\n\r"
-                  "[v3] Goes to (vnum): [%d]\n\r"
-                  "[v4] Has key(vnum):  [%d]\n\r",
+                  "[v0] Заряды:         [%d]\n\r"
+                  "[v1] Флаги выхода:   %s {D(? exit_flags){x\n\r"
+                  "[v2] Флаги портала:  %s {D(? portal_flags){x\n\r"
+                  "[v3] Ведет в (внум): [%d]\n\r"
+                  "[v4] Ключ (внум):    [%d]\n\r",
                   obj->value[0],
                   exit_flags.names(obj->value[1]).c_str(),
                   portal_flags.names(obj->value[2]).c_str(),
@@ -116,11 +116,11 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_FURNITURE:
         ptc(ch, 
-                  "[v0] Max people:      [%d]\n\r"
-                  "[v1] Max weight:      [%d]\n\r"
-                  "[v2] Furniture Flags: %s {D(? furniture_flags){x\n\r"
-                  "[v3] Heal bonus:      [%d]\n\r"
-                  "[v4] Mana bonus:      [%d]\n\r",
+                  "[v0] Макс. людей:     [%d]\n\r"
+                  "[v1] Макс. вес:       [%d]\n\r"
+                  "[v2] Флаги мебели:    %s {D(? furniture_flags){x\n\r"
+                  "[v3] Бонус здоровья:  [%d]\n\r"
+                  "[v4] Бонус маны:      [%d]\n\r",
                   obj->value[0],
                   obj->value[1],
                   furniture_flags.names(obj->value[2]).c_str(),
@@ -132,11 +132,11 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
     case ITEM_POTION:
     case ITEM_PILL:
         ptc(ch, 
-                  "[v0] Level:  [%d]\n\r"
-                  "[v1] Spell:  %s {D(? spells){x\n\r"
-                  "[v2] Spell:  %s\n\r"
-                  "[v3] Spell:  %s\n\r"
-                  "[v4] Spell:  %s\n\r",
+                  "[v0] Уровень:     [%d]\n\r"
+                  "[v1] Заклинание:  %s {D(? spells){x\n\r"
+                  "[v2] Заклинание:  %s\n\r"
+                  "[v3] Заклинание:  %s\n\r"
+                  "[v4] Заклинание:  %s\n\r",
                   obj->value[0],
                   get_skill_name( obj->value[1] ),
                   get_skill_name( obj->value[2] ),
@@ -146,10 +146,10 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_ARMOR:
         ptc(ch, 
-                  "[v0] Ac pierce       [%d]\n\r"
-                  "[v1] Ac bash         [%d]\n\r"
-                  "[v2] Ac slash        [%d]\n\r"
-                  "[v3] Ac exotic       [%d]\n\r",
+                  "[v0] AC колющее      [%d]\n\r"
+                  "[v1] AC удар         [%d]\n\r"
+                  "[v2] AC режущее      [%d]\n\r"
+                  "[v3] AC экзотика     [%d]\n\r",
                   obj->value[0],
                   obj->value[1],
                   obj->value[2],
@@ -188,7 +188,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
             obj->value[0],
             container_flags.names(obj->value[1]).c_str(),
             obj->value[2],
-            pKey ? pKey->getShortDescr(LANG_DEFAULT) : "none",
+            pKey ? pKey->getShortDescr(LANG_DEFAULT) : "нет",
             obj->value[3],
             obj->value[4]);
         break;
@@ -210,11 +210,11 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_FOUNTAIN:
         ptc(ch, 
-            "[v0] Liquid Total: [%d]\n\r"
-            "[v1] Liquid Left:  [%d]\n\r"
-            "[v2] Liquid:       %s (%s) {D(? liquid){x\n\r"
-            "[v3] Max people:      [%d]\n\r"
-            "[v4] Furniture Flags: %s {D(? furniture_flags){x\n\r",
+            "[v0] Всего жидкости:  [%d]\n\r"
+            "[v1] Налито жидкости: [%d]\n\r"
+            "[v2] Тип жидкости:    %s (%s) {D(? liquid){x\n\r"
+            "[v3] Макс. людей:     [%d]\n\r"
+            "[v4] Флаги мебели:    %s {D(? furniture_flags){x\n\r",
             obj->value[0],
             obj->value[1],
             liquidManager->find( obj->value[2] )->getName( ).c_str( ),
@@ -225,17 +225,17 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_FOOD:
         ptc(ch,
-            "[v0] Food hours: [%d]\n\r"
-            "[v1] Full hours: [%d]\n\r"
-            "[v3] Poisoned:   %s\n\r",
+            "[v0] Сытость, часов:    [%d]\n\r"
+            "[v1] Насыщение, часов:  [%d]\n\r"
+            "[v3] Отравлено:         %s\n\r",
             obj->value[0],
             obj->value[1],
-            obj->value[3] != 0 ? "Yes" : "No");
+            obj->value[3] != 0 ? "да" : "нет");
         break;
 
     case ITEM_MONEY:
-        ptc(ch, "[v0] Silver:   [%d]\n\r", obj->value[0]);
-        ptc(ch, "[v1] Gold:     [%d]\n\r", obj->value[1]);
+        ptc(ch, "[v0] Серебро:  [%d]\n\r", obj->value[0]);
+        ptc(ch, "[v1] Золото:   [%d]\n\r", obj->value[1]);
         break;
 
     }
@@ -247,30 +247,30 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 
     switch (pObj->item_type) {
     default:
-        stc("Value not used.\n\r", ch);
+        stc("Это значение не используется.\n\r", ch);
         return false;
    
    case ITEM_SPELLBOOK:
    case ITEM_TEXTBOOK:
         switch (value_num) {
         default:
-            stc("Value not used\r\n\r", ch);
+            stc("Это значение не используется.\r\n", ch);
             return false;
         case 0:
-            stc("Total number of pages set\r\n\r", ch);
+            stc("Число страниц установлено.\r\n", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
-            stc("Number of used pages set\r\n\r", ch);
+            stc("Число занятых страниц установлено.\r\n", ch);
             pObj->value[1] = atoi(argument);
             break;
         case 2:
-            stc("Max spell/skill quality set\r\n\r", ch);
+            stc("Макс. качество установлено.\r\n", ch);
             pObj->value[2] = atoi(argument);
             break;
         case 3:
         case 4:
-            stc("Skill/spell to learn set.\r\n\r", ch);
+            stc("Изучаемое умение или заклинание установлено.\r\n", ch);
             pObj->value[value_num] = skill_lookup(argument);
             break;
         }
@@ -280,7 +280,7 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
         switch (value_num) {
             int value;
         default:
-            stc("Value not used\r\n\r", ch);
+            stc("Это значение не используется.\r\n", ch);
             return false;
         case 0:
             if ((value = recipe_flags.bitstring( argument )) != NO_FLAG)
@@ -289,10 +289,10 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
                 show_help(ch, "recipe");
                 return false;
             }
-            stc("Recipe flags toggled.\n\r\n\r", ch);
+            stc("Флаги рецепта переключены.\n\r", ch);
             break;
         case 2:
-            stc("Recipe complexity set.\r\n", ch);
+            stc("Сложность рецепта установлена.\r\n", ch);
             pObj->value[2] = atoi(argument);
             break;
         }
@@ -303,14 +303,14 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
             int i;
 
         default:
-            stc("Value not used.\n\r", ch);
+            stc("Это значение не используется.\n\r", ch);
             return false;
         case 0: 
             i = atoi( argument );
             if (i)
-                stc("Will not rot in inventory.\n\r", ch);
+                stc("Не исчезает в руках.\n\r", ch);
             else 
-                stc("Will rot in inventory.\n\r", ch);
+                stc("Исчезает в руках.\n\r", ch);
 
             pObj->value[0] = i;
             break;
@@ -319,11 +319,11 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
     case ITEM_KEYRING: 
         switch (value_num) {
         default:
-            stc("Value not used.\n\r", ch);
+            stc("Это значение не используется.\n\r", ch);
             return false;
         case 0: 
             pObj->value[0] = atoi( argument );
-            ptc(ch, "The keyring will hold maximum %d keys.\n\r", pObj->value[0]);
+            ptc(ch, "На кольцо поместится не больше %d ключей.\n\r", pObj->value[0]);
         }
         break;
     case ITEM_LOCKPICK: 
@@ -331,32 +331,32 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
         int i;
 
         default:
-            stc("Value not used.\n\r", ch);
+            stc("Это значение не используется.\n\r", ch);
             return false;
         case 0: 
             i = atoi( argument );
             
             if (i == Keyhole::LOCK_VALUE_MULTI)
-                stc("The lockpick will open any type of lock.\n\r", ch);
+                stc("Отмычка откроет замок любого типа.\n\r", ch);
             else if (i == Keyhole::LOCK_VALUE_BLANK)
-                stc("This will be a blank for a lockpick.\n\r", ch);
+                stc("Это будет заготовка для отмычки.\n\r", ch);
             else if (i < 0 || i >= Keyhole::MAX_KEY_TYPES) {
-                stc("Invalid lock type.\n\r", ch);
+                stc("Неверный тип замка.\n\r", ch);
                 return false;
             }
             else
-                ptc(ch, "The lockpick will open locks of type %d.\n\r", i);
+                ptc(ch, "Отмычка откроет замки типа %d.\n\r", i);
 
             pObj->value[0] = i;
             break;
         case 1: 
             i = atoi( argument );
             if (i < 0 || i > 100) {
-                stc("Invalid quality, valid range 0..100.\n\r", ch);
+                stc("Неверное качество, допустимо 0..100.\n\r", ch);
                 return false;
             }
             
-            ptc(ch, "The lockpick quality set to %d%%.\n\r", i);
+            ptc(ch, "Качество отмычки: %d%%.\n\r", i);
             pObj->value[1] = i;
             break;
         }
@@ -366,27 +366,27 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
         int i;
 
         default:
-            stc("Value not used.\n\r", ch);
+            stc("Это значение не используется.\n\r", ch);
             return false;
         case 0: 
             i = atoi( argument );
             if (i) {
                 if (i == 1)
-                    stc("Key will not rot in inventory.\n\r", ch);
+                    stc("Ключ не исчезает в руках.\n\r", ch);
                 else
-                    ptc(ch, "Key will be kept in inventory for %d minutes.\r\n", i);
+                    ptc(ch, "Ключ продержится в руках %d минут.\r\n", i);
             }
             else 
-                stc("Key will rot in inventory.\n\r", ch);
+                stc("Ключ исчезает в руках.\n\r", ch);
 
             pObj->value[0] = i;
             break;
         case 1: 
             i = atoi( argument );
             if (i)
-                stc("Key will rot on the ground.\n\r", ch);
+                stc("Ключ исчезает на земле.\n\r", ch);
             else 
-                stc("Key will not rot on the ground.\n\r", ch);
+                stc("Ключ не исчезает на земле.\n\r", ch);
 
             pObj->value[1] = i;
             break;
@@ -399,7 +399,7 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_LIGHT");
             return false;
         case 2:
-            stc("HOURS OF LIGHT SET.\n\r\n\r", ch);
+            stc("Часы света установлены.\n\r", ch);
             pObj->value[2] = atoi(argument);
             break;
         }
@@ -411,19 +411,19 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_STAFF_WAND");
             return false;
         case 0:
-            stc("SPELL LEVEL SET.\n\r\n\r", ch);
+            stc("Уровень заклинания установлен.\n\r", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
-            stc("TOTAL NUMBER OF CHARGES SET.\n\r\n\r", ch);
+            stc("Всего зарядов установлено.\n\r", ch);
             pObj->value[1] = atoi(argument);
             break;
         case 2:
-            stc("CURRENT NUMBER OF CHARGES SET.\n\r\n\r", ch);
+            stc("Осталось зарядов установлено.\n\r", ch);
             pObj->value[2] = atoi(argument);
             break;
         case 3:
-            stc("SPELL TYPE SET.\n\r", ch);
+            stc("Заклинание установлено.\n\r", ch);
             pObj->value[3] = skill_lookup(argument);
             break;
         }
@@ -436,23 +436,23 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_SCROLL_POTION_PILL");
             return false;
         case 0:
-            stc("SPELL LEVEL SET.\n\r\n\r", ch);
+            stc("Уровень заклинания установлен.\n\r", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
-            stc("SPELL TYPE 1 SET.\n\r\n\r", ch);
+            stc("Заклинание 1 установлено.\n\r", ch);
             pObj->value[1] = skill_lookup(argument);
             break;
         case 2:
-            stc("SPELL TYPE 2 SET.\n\r\n\r", ch);
+            stc("Заклинание 2 установлено.\n\r", ch);
             pObj->value[2] = skill_lookup(argument);
             break;
         case 3:
-            stc("SPELL TYPE 3 SET.\n\r\n\r", ch);
+            stc("Заклинание 3 установлено.\n\r", ch);
             pObj->value[3] = skill_lookup(argument);
             break;
         case 4:
-            stc("SPELL TYPE 4 SET.\n\r\n\r", ch);
+            stc("Заклинание 4 установлено.\n\r", ch);
             pObj->value[4] =  skill_lookup(argument);
             break;
         }
@@ -463,19 +463,19 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_ARMOR");
             return false;
         case 0:
-            stc("AC PIERCE SET.\n\r\n\r", ch);
+            stc("AC против колющего установлен.\n\r", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
-            stc("AC BASH SET.\n\r\n\r", ch);
+            stc("AC против удара установлен.\n\r", ch);
             pObj->value[1] = atoi(argument);
             break;
         case 2:
-            stc("AC SLASH SET.\n\r\n\r", ch);
+            stc("AC против режущего установлен.\n\r", ch);
             pObj->value[2] = atoi(argument);
             break;
         case 3:
-            stc("AC EXOTIC SET.\n\r\n\r", ch);
+            stc("AC против экзотики установлен.\n\r", ch);
             pObj->value[3] = atoi(argument);
             break;
         }
@@ -487,19 +487,19 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_WEAPON");
             return false;
         case 0:
-            stc("WEAPON CLASS SET.\n\r\n\r", ch);
+            stc("Вид оружия установлен.\n\r", ch);
             pObj->value[0] = weapon_class.value( argument );
             break;
         case 1:
-            stc("NUMBER OF DICE SET.\n\r\n\r", ch);
+            stc("Число бросков кубика установлено.\n\r", ch);
             pObj->value[1] = atoi(argument);
             break;
         case 2:
-            stc("TYPE OF DICE SET.\n\r\n\r", ch);
+            stc("Число граней кубика установлено.\n\r", ch);
             pObj->value[2] = atoi(argument);
             break;
         case 3:
-            stc("WEAPON TYPE SET.\n\r\n\r", ch);
+            stc("Тип удара установлен.\n\r", ch);
             pObj->value[3] = weapon_flags.value( argument );
             break;
         case 4:
@@ -509,7 +509,7 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
                 show_help(ch, "weapon_type2");
                 return false;
             }
-            stc("Special weapon type toggled.\n\r\n\r", ch);
+            stc("Флаги оружия переключены.\n\r", ch);
             break;
         }
         break;
@@ -520,7 +520,7 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_PORTAL");
             return false;
         case 0:
-            stc("CHARGES SET.\n\r\n\r", ch);
+            stc("Заряды установлены.\n\r", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
@@ -530,7 +530,7 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
                 show_help(ch, "exit");
                 return false;
             }
-            stc("Exit flags toggled.\n\r\n\r", ch);
+            stc("Флаги выхода переключены.\n\r", ch);
             break;
         case 2:
             if ((value = portal_flags.bitstring( argument )) != NO_FLAG)
@@ -539,14 +539,14 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
                 show_help(ch, "portal");
                 return false;
             }
-            stc("Portal flags toggled.\n\r\n\r", ch);
+            stc("Флаги портала переключены.\n\r", ch);
             break;
         case 3:
-            stc("EXIT VNUM SET.\n\r\n\r", ch);
+            stc("Внум выхода установлен.\n\r", ch);
             pObj->value[3] = atoi(argument);
             break;
         case 4:
-            stc("Key vnum set.\n\r\n\r", ch);
+            stc("Внум ключа установлен.\n\r", ch);
             pObj->value[4] = atoi(argument);
         }
         break;
@@ -557,11 +557,11 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_FURNITURE");
             return false;
         case 0:
-            stc("NUMBER OF PEOPLE SET.\n\r\n\r", ch);
+            stc("Макс. людей установлено.\n\r", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
-            stc("MAX WEIGHT SET.\n\r\n\r", ch);
+            stc("Макс. вес установлен.\n\r", ch);
             pObj->value[1] = atoi(argument);
             break;
         case 2:
@@ -571,14 +571,14 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
                 show_help(ch, "furniture");
                 return false;
             }
-            stc("Furniture flags toggled.\n\r\n\r", ch);
+            stc("Флаги мебели переключены.\n\r", ch);
             break;
         case 3:
-            stc("HEAL BONUS SET.\n\r\n\r", ch);
+            stc("Бонус здоровья установлен.\n\r", ch);
             pObj->value[3] = atoi(argument);
             break;
         case 4:
-            stc("MANA BONUS SET.\n\r\n\r", ch);
+            stc("Бонус маны установлен.\n\r", ch);
             pObj->value[4] = atoi(argument);
             break;
         }
@@ -591,7 +591,7 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_CONTAINER");
             return false;
         case 0:
-            stc("CAPACITY SET.\n\r\n\r", ch);
+            stc("Вместимость установлена.\n\r", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
@@ -602,28 +602,28 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
                 show_help(ch, "container");
                 return false;
             }
-            stc("Container flags toggled.\n\r\n\r", ch);
+            stc("Флаги контейнера переключены.\n\r", ch);
             break;
         case 2:
             if (atoi(argument) > 0) {
                 if (!get_obj_index(atoi(argument))) {
-                    stc("THERE IS NO SUCH ITEM.\n\r\n\r", ch);
+                    stc("Такого предмета нет.\n\r", ch);
                     return false;
                 }
                 if (get_obj_index(atoi(argument))->item_type != ITEM_KEY) {
-                    stc("THAT ITEM IS NOT A KEY.\n\r\n\r", ch);
+                    stc("Этот предмет не ключ.\n\r", ch);
                     return false;
                 }
             }
-            stc("CONTAINER KEY SET.\n\r\n\r", ch);
+            stc("Ключ контейнера установлен.\n\r", ch);
             pObj->value[2] = atoi(argument);
             break;
         case 3:
-            stc("CONTAINER MAX WEIGHT SET.\n\r", ch);
+            stc("Макс. вес контейнера установлен.\n\r", ch);
             pObj->value[3] = atoi(argument);
             break;
         case 4:
-            stc("WEIGHT MULTIPLIER SET.\n\r\n\r", ch);
+            stc("Коэф. снижения веса установлен.\n\r", ch);
             pObj->value[4] = atoi(argument);
             break;
         }
@@ -645,11 +645,11 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
             break;
         case 2:
             if (!( liq = liquidManager->findExisting( argument ) )) {
-                stc("Invalid liquid name, use '? liquid'.\r\n", ch);
+                stc("Нет такой жидкости, смотри '? liquid'.\r\n", ch);
                 return false;
             }
             pObj->value[2] = liq->getIndex( );
-            stc("LIQUID TYPE SET.\n\r\n\r", ch);
+            stc("Тип жидкости установлен.\n\r", ch);
             break;
         case 3:
             if ((value = drink_flags.bitstring( argument )) != NO_FLAG)
@@ -658,10 +658,10 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
                 show_help(ch, "drink");
                 return false;
             }
-            stc("Drink-container flags toggled.\n\r\n\r", ch);
+            stc("Флаги сосуда переключены.\n\r", ch);
             break;
         case 4:
-            stc("Corkscrew vnum set.\n\r\n\r", ch);
+            stc("Внум пробки установлен.\n\r", ch);
             pObj->value[4] = atoi(argument);
             break;
         }
@@ -683,14 +683,14 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
             break;
         case 2:
             if (!( liq = liquidManager->findExisting( argument ) )) {
-                stc("Invalid liquid name, use '? liquid'.\r\n", ch);
+                stc("Нет такой жидкости, смотри '? liquid'.\r\n", ch);
                 return false;
             }
             pObj->value[2] = liq->getIndex( );
-            stc("LIQUID TYPE SET.\n\r\n\r", ch);
+            stc("Тип жидкости установлен.\n\r", ch);
             break;
         case 3:
-            stc("NUMBER OF PEOPLE SET.\n\r\n\r", ch);
+            stc("Макс. людей установлено.\n\r", ch);
             pObj->value[3] = atoi(argument);
             break;
         case 4:
@@ -700,7 +700,7 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
                 show_help(ch, "furniture");
                 return false;
             }
-            stc("Furniture flags toggled.\n\r\n\r", ch);
+            stc("Флаги мебели переключены.\n\r", ch);
             break;
         }
         break;
@@ -710,15 +710,15 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_FOOD");
             return false;
         case 0:
-            stc("HOURS OF FOOD SET.\n\r\n\r", ch);
+            stc("Сытость установлена.\n\r", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
-            stc("HOURS OF FULL SET.\n\r\n\r", ch);
+            stc("Насыщение установлено.\n\r", ch);
             pObj->value[1] = atoi(argument);
             break;
         case 3:
-            stc("POISON VALUE TOGGLED.\n\r\n\r", ch);
+            stc("Отравление переключено.\n\r", ch);
             pObj->value[3] = (pObj->value[3] == 0) ? 1 : 0;
             break;
         }
@@ -729,11 +729,11 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_MONEY");
             return false;
         case 0:
-            stc("SILVER AMOUNT SET.\n\r\n\r", ch);
+            stc("Серебро установлено.\n\r", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
-            stc("GOLD AMOUNT SET.\n\r\n\r", ch);
+            stc("Золото установлено.\n\r", ch);
             pObj->value[1] = atoi(argument);
             break;
         }

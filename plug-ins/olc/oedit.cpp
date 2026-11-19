@@ -46,6 +46,9 @@
 #include "itemeconomy.h"
 
 #include "olc.h"
+#include "olcvalidate.h"
+#include "itemutils.h"
+#include "keyhole.h"
 #include "security.h"
 
 #include "tohit.h"
@@ -56,6 +59,12 @@
 OLC_STATE(OLCStateObject);
 
 BHV(random_weapon);
+
+// Furniture as bodyposition sees it: sit/rest/sleep on furniture and fountains.
+static bool is_furniture(OBJ_INDEX_DATA *pObj)
+{
+    return pObj->item_type == ITEM_FURNITURE || pObj->item_type == ITEM_FOUNTAIN;
+}
 
 OLCStateObject::OLCStateObject( )
 {
@@ -367,6 +376,17 @@ OEDIT(show)
         stc("{D        ? apply_flags{x\r\n", ch);
 
     show_obj_values(ch, pObj);
+
+    if (pObj->item_type == ITEM_KEY)
+        ch->send_to(key_proto_locks(ch, pObj->vnum));
+
+    if (is_furniture(pObj)) {
+        int set = 0, total = 0;
+        for (int i = 0; Item::furnitureMsgTags[i]; i++, total++)
+            if (!Item::furnitureMsgProp(pObj, Item::furnitureMsgTags[i]).empty())
+                set++;
+        ptc(ch, "Сообщения мебели: %d из %d {D(msg){x\n\r", set, total);
+    }
 
     if (pObj->behavior) {
         try {
@@ -737,6 +757,109 @@ OEDIT(rusmell)
 OEDIT(props)
 {
     return editProps(obj.behaviors, obj.props, argument);
+}
+
+// Furniture messages kept in props (Item::FURNITURE_PROPS), saved with the
+// area. The tag list and checks live here, the write goes through 'prop'.
+// Registered before 'material' so a bare 'm' still means material.
+OEDIT(msg)
+{
+    OBJ_INDEX_DATA *pObj;
+    DLString args = argument;
+    DLString tagArg = args.getOneArgument();
+    DLString text = args.stripWhiteSpace();
+    const char *tag = 0;
+
+    EDIT_OBJ(ch, pObj);
+
+    if (!is_furniture(pObj)) {
+        stc("Сообщения мебели бывают только у предметов типа furniture и fountain.\r\n", ch);
+        return false;
+    }
+
+    if (tagArg.empty()) {
+        ostringstream buf;
+        buf << "Сообщения мебели {D(msg <тег> <текст>, msg <тег> clear){x" << endl
+            << "В тексте %1$ -- этот предмет, %2$ -- персонаж, с падежом или формами: %2$^C1, %1$O4, %2$Gо|ел|ла. Поле Fenia с тем же именем на предмете или прототипе важнее." << endl;
+        for (int i = 0; Item::furnitureMsgTags[i]; i++) {
+            DLString msg = Item::furnitureMsgProp(pObj, Item::furnitureMsgTags[i]);
+            buf << "  " << Item::furnitureMsgTags[i] << ": "
+                << (msg.empty() ? DLString("(нет)") : msg + "{x") << endl;
+        }
+        ch->send_to(buf);
+        return false;
+    }
+
+    // The full tag or the part after "msg", in any case: msgSitChar, sitchar.
+    for (int i = 0; Item::furnitureMsgTags[i]; i++) {
+        const char *t = Item::furnitureMsgTags[i];
+        if (!strcasecmp(tagArg.c_str(), t) || !strcasecmp(tagArg.c_str(), t + 3)) {
+            tag = t;
+            break;
+        }
+    }
+
+    if (!tag) {
+        ptc(ch, "Нет такого тега: %s. Список тегов: msg\r\n", tagArg.c_str());
+        return false;
+    }
+
+    if (text.empty()) {
+        ptc(ch, "Использование: msg %s <текст> или msg %s clear\r\n", tag, tag);
+        return false;
+    }
+
+    // The web editor pastes back through 'prop', which knows its own syntax.
+    if (arg_is_web(text)) {
+        ptc(ch, "Для веб-редактора: prop %s %s web\r\n", Item::FURNITURE_PROPS, tag);
+        return false;
+    }
+
+    Json::Value &props = obj.props;
+    if (!props.isNull() && !props.isObject()) {
+        stc("Свойства (props) этого предмета не объект JSON, сообщение некуда сохранить.\r\n", ch);
+        return false;
+    }
+
+    bool wasNull = props.isNull();
+    if (props.isMember(Item::FURNITURE_PROPS) && !props[Item::FURNITURE_PROPS].isObject())
+        props[Item::FURNITURE_PROPS] = Json::Value(Json::objectValue);
+
+    bool clear = arg_is_clear(text);
+    DLString error;
+    if (!clear && !arg_is_paste(text) && !Item::furnitureMsgValid(text, error)) {
+        ptc(ch, "Сообщение не сохранено: %s.\r\n", error.c_str());
+        return false;
+    }
+
+    Json::Value old;
+    if (props.isMember(Item::FURNITURE_PROPS) && props[Item::FURNITURE_PROPS].isObject()
+        && props[Item::FURNITURE_PROPS].isMember(tag))
+        old = props[Item::FURNITURE_PROPS][tag];
+
+    DLString propArgs;
+    propArgs << Item::FURNITURE_PROPS << " " << tag << " " << (clear ? DLString("del") : text);
+    bool changed = editProps(obj.behaviors, props, propArgs, true);
+
+    // A pasted text is only known after the paste: check it the same way.
+    Json::Value &msgs = props[Item::FURNITURE_PROPS];
+    if (changed && msgs.isObject() && msgs.isMember(tag)
+        && (!msgs[tag].isString() || !Item::furnitureMsgValid(msgs[tag].asString(), error)))
+    {
+        if (old.isNull())
+            msgs.removeMember(tag);
+        else
+            msgs[tag] = old;
+        ptc(ch, "Сообщение не сохранено: %s.\r\n", error.empty() ? "это не строка" : error.c_str());
+        changed = false;
+    }
+
+    if (msgs.isNull() || (msgs.isObject() && msgs.empty()))
+        props.removeMember(Item::FURNITURE_PROPS);
+    if (wasNull && props.empty())
+        props = Json::Value();
+
+    return changed;
 }
 
 bool set_value(Character * ch, OBJ_INDEX_DATA * pObj, char *argument, int value)
@@ -1161,6 +1284,7 @@ OEDIT(commands)
 OEDIT(done) 
 {
     commit();
+    olc_validate_print(ch, "obj", obj.vnum);
     detach(ch);
     return true;
 }

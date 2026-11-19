@@ -29,6 +29,7 @@
 #include "json_utils_ext.h"
 
 #include "olc.h"
+#include "olcvalidate.h"
 #include "security.h"
 #include "feniatriggers.h"
 
@@ -1318,6 +1319,7 @@ MEDIT(commands)
 MEDIT(done) 
 {
     commit();
+    olc_validate_print(ch, "mob", mob.vnum);
     detach(ch);
     return true;
 }

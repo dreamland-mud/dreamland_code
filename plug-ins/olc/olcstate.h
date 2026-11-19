@@ -149,7 +149,9 @@ protected:
     bool editor(const char *argument, XMLStringList &values, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, XMLJsonValue &value, editor_flags flags = ED_NO_FLAG);
     bool editBehaviors(GlobalBitvector &behaviors, Json::Value &props);
-    bool editProps(GlobalBitvector &behaviors, Json::Value &props, const DLString &arguments);
+    /** quiet: no warning when the props key is not a behavior name (callers
+     *  that own a fixed non-behavior key, like oedit 'msg'). */
+    bool editProps(GlobalBitvector &behaviors, Json::Value &props, const DLString &arguments, bool quiet = false);
     
     Descriptor *owner;
     XML_VARIABLE XMLBoolean inSedit;

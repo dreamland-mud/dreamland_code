@@ -14,6 +14,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "websocketrpc.h"
 #include "skill_sound.h"
 
 GSN(golden_eye);
@@ -80,6 +81,59 @@ Keyhole::Pointer Keyhole::locate( Character *ch, Object *key )
     }
 
     return null;
+}
+
+DLString key_proto_locks( Character *ch, int keyVnum )
+{
+    ostringstream buf;
+    int cnt = 0;
+
+    if (keyVnum <= 0)
+        return DLString::emptyString;
+
+    for (auto &r: roomIndexMap) {
+        RoomIndexData *pRoom = r.second;
+        // Built only for a matching exit: most rooms have none.
+        auto where = [&]() {
+            DLString w;
+            w << "  комната [" << web_cmd( ch, "redit $1", DLString( pRoom->vnum ) ) << "] "
+              << pRoom->name.get( LANG_DEFAULT ) << "{x, ";
+            return w;
+        };
+
+        for (int d = 0; d < DIR_SOMEWHERE; d++)
+            if (pRoom->exit[d] && pRoom->exit[d]->key == keyVnum) {
+                buf << where( ) << "дверь " << dirs[d].name << endl;
+                cnt++;
+            }
+
+        for (auto &ex: pRoom->extra_exits)
+            if (ex->key == keyVnum) {
+                buf << where( ) << "доп. выход " << ex->keyword.get( LANG_DEFAULT ) << "{x" << endl;
+                cnt++;
+            }
+    }
+
+    for (int h = 0; h < MAX_KEY_HASH; h++)
+        for (OBJ_INDEX_DATA *pObj = obj_index_hash[h]; pObj; pObj = pObj->next) {
+            const char *what = 0;
+
+            if (pObj->item_type == ITEM_CONTAINER && pObj->value[2] == keyVnum)
+                what = "контейнер";
+            else if (pObj->item_type == ITEM_PORTAL && pObj->value[4] == keyVnum)
+                what = "портал";
+            else
+                continue;
+
+            buf << "  " << what << " [" << web_cmd( ch, "oedit $1", DLString( pObj->vnum ) ) << "] "
+                << pObj->getShortDescr( LANG_DEFAULT ) << "{x" << endl;
+            cnt++;
+        }
+
+    if (cnt == 0)
+        return "Этим ключом не запирается ни одна дверь, контейнер или портал.\r\n";
+
+    return "Этот ключ отпирает:\r\n" + buf.str( );
 }
 
 Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )

@@ -116,6 +116,7 @@
 #include "doors.h"
 #include "string_utils.h"
 #include "act.h"
+#include "keyhole.h"
 #include "def.h"
 #include "l10n.h"
 #include "fenia_utils.h"
@@ -1222,6 +1223,10 @@ static void ostat_show( Character *ch, Object *obj )
                 }
                 break;
         
+        case ITEM_KEY:
+                buf << key_proto_locks( ch, obj->pIndexData->vnum );
+                break;
+
         case ITEM_CORPSE_PC:
         case ITEM_CORPSE_NPC:
                 buf << fmt(0, _("Стейков: %d, Уровень: %d, Части тела: '%s', Vnum: %d\r\n"),

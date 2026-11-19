@@ -1063,7 +1063,7 @@ bool OLCState::editBehaviors(GlobalBitvector &behaviors, Json::Value &props)
     return true;
 }
 
-bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const DLString &arguments)
+bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const DLString &arguments, bool quiet)
 {
     DLString args = arguments;
     DLString bhvNameWithUnderscore = args.getOneArgument();
@@ -1081,7 +1081,8 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
     Behavior *bhv = behaviorManager->findExisting(bhvName);
     if (!bhv) {
         // Random property on obj index data
-        ptc(ch, "{RВнимание: поведение '%s' не существует, устанавливаю props с произвольным именем.{x\r\n", bhvName.c_str());
+        if (!quiet)
+            ptc(ch, "{RВнимание: поведение '%s' не существует, устанавливаю props с произвольным именем.{x\r\n", bhvName.c_str());
 
     }
     else {
