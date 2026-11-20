@@ -4705,7 +4705,6 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
         break;
     // Plain applies: the shared base price (fight_core/itemmodel.cpp).
     case APPLY_HIT:
-    case APPLY_MANA:
     case APPLY_HEAL_GAIN:
     case APPLY_DAMROLL:
     case APPLY_HITROLL:
@@ -4713,6 +4712,11 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
     case APPLY_SPELL_LEVEL:   // ~0 with no spells (w.spellFactor)
     case APPLY_MOVE:
         s += item_apply_points( af.location, m, w );
+        break;
+    // Mana is priced for a mana_ref_pool pool: the same +N is a smaller share of a
+    // big pool (w.manaScale <= 1, both signs).
+    case APPLY_MANA:
+        s += item_apply_points( af.location, m, w ) * w.manaScale;
         break;
     case APPLY_BEATS:
         if (beatsDelta != 0)
@@ -4839,16 +4843,25 @@ static void ga_accumAffect( const Affect &af, const GAWeights &w, double &s, int
             Skill *sk = skillManager->findExisting( spell );
             return sk != 0 && grants->held( sk );
         };
-        if (ft == &affect_flags)
-            s += item_flag_points( bits, w.caster, target, held ? w.heldFlags : 0, itemLevel, selfCast );
+        // Mitigation (resists, sanctuary, protection) is priced in shares of incoming
+        // damage for a mitigation_ref_hp char: w.mitScale lifts it for a bigger pool.
+        if (ft == &affect_flags) {
+            bitstring_t heldF = held ? w.heldFlags : 0;
+            bitstring_t mitBits = bits & (AFF_SANCTUARY | AFF_PROTECT_EVIL | AFF_PROTECT_GOOD);
+            bitstring_t restBits = bits & ~mitBits;
+            if (mitBits != 0)
+                s += item_flag_points( mitBits, w.caster, target, heldF, itemLevel, selfCast ) * w.mitScale;
+            if (restBits != 0)
+                s += item_flag_points( restBits, w.caster, target, heldF, itemLevel, selfCast );
+        }
         else if (ft == &detect_flags)
             s += item_detect_points( bits, w.caster, target, selfCast );
         // A resist the char already owns outside this slot adds nothing
         // (decision 6). Same gate as heldFlags: candidates, or worn with heldOnWorn.
         else if (kind >= 0 && held && target != 0)
-            s += item_res_points_fit( bits, kind, w.heldImm, w.heldRes );
+            s += item_res_points_fit( bits, kind, w.heldImm, w.heldRes ) * w.mitScale;
         else if (kind >= 0)
-            s += ga_resValue( bits, kind );
+            s += ga_resValue( bits, kind ) * w.mitScale;
         // Keyed by table and bits, so the render can name them via .tables.X.messages.
         const char *tab = ft == &affect_flags ? "affect_flags" : ft == &detect_flags ? "detect_flags"
                         : kind == 0 ? "res_flags" : kind == 1 ? "imm_flags" : kind == 2 ? "vuln_flags" : 0;
@@ -6529,6 +6542,24 @@ static double ga_curWeaponSwing( Character *target, const GAWeights &w )
     return -1.0;
 }
 
+// Per-char price scales, the same for worn and candidate items in one call. The
+// defense prices assume a mitigation_ref_hp char (1% of damage removed = 6 pts =
+// 6 hp there), so a bigger hp pool lifts them; +-mana is priced for a mana_ref_pool
+// pool, so a bigger pool shrinks it. item_value.json shared, compiled default 600.
+static void ga_poolScales( Character *target, GAWeights &w )
+{
+    w.mitScale = 1.0;
+    w.manaScale = 1.0;
+    if (target == 0)
+        return;
+    double refHp = item_value( "shared", "mitigation_ref_hp", 600 );
+    double refMana = item_value( "shared", "mana_ref_pool", 600 );
+    if (refHp > 0)
+        w.mitScale = max( 1.0, (int)target->max_hit / refHp );
+    if (refMana > 0)
+        w.manaScale = min( 1.0, refMana / max( 1, (int)target->max_mana ) );
+}
+
 // Under the armor model hitroll is worth what it adds to this char's blows against a
 // normal mob of its level: a lot while it is short of the evasion curve, little past it.
 // c4.py scale: 20 pts per hitroll at HR 63 and L100, 3 at 166, 1.6 at 254, which is
@@ -6686,6 +6717,7 @@ static void ga_itemContext( Character *target, int mySlot, ::Object *self, bool 
 {
     w.caster = caster;
     item_weights( w, caster, target->getRealLevel( ) );
+    ga_poolScales( target, w );
     ga_modelHitroll( target, w );
     w.spellFactor = ga_spellFactor( target );
     w.curWeaponSwing = ga_curWeaponSwing( target, w );
@@ -6792,6 +6824,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // (fight_core/itemmodel.cpp item_weights). Melee values weapon output like its
     // damroll; a caster well under it.
     item_weights( w, w.caster, target->getRealLevel( ) );
+    ga_poolScales( target, w );
     ga_modelHitroll( target, w );
 
     w.curWeaponSwing = ga_curWeaponSwing( target, w );
