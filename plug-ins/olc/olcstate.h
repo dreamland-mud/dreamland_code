@@ -103,6 +103,8 @@ public:
 
     /** Set by journal(): the last subcommand changed the edited entity. */
     bool lastChanged;
+    /** Set by journal(), cleared when 'done' journals: edits not yet committed. */
+    bool pendingDone;
     /** Journal profile and source: "immortal"/"editor" in game, OlcOps sets its own. */
     DLString journalProfile, journalSource;
 
@@ -193,9 +195,15 @@ public:
             try {
                 if (((*state)->*method)( pch, args )) {
                     state->changed( pch );
-                    // 'done' returns true without editing anything.
+                    // 'done' edits nothing itself, but it is the moment a telnet
+                    // editor's copy reaches the prototype: journal it once per
+                    // edit run, so the area pusher sees the save it triggers.
                     if (getName( ) != "done")
                         state->journal( pch, getName( ), argsCopy );
+                    else if (state->pendingDone) {
+                        state->journal( pch, getName( ), "" );
+                        state->pendingDone = false;
+                    }
                 }
             } catch (const Exception &e) {
                 LogStream::sendError() << "OLC " << e.what() << endl;

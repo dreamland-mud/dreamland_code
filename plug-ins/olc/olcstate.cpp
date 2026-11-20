@@ -114,7 +114,7 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
 /*--------------------------------------------------------------------------
  * OLCState 
  *-------------------------------------------------------------------------*/
-OLCState::OLCState() : lastChanged(false), journalProfile("immortal"), journalSource("editor"),
+OLCState::OLCState() : lastChanged(false), pendingDone(false), journalProfile("immortal"), journalSource("editor"),
                        owner(0), inSedit(false), strEditor(*this)
 {
 }
@@ -122,6 +122,7 @@ OLCState::OLCState() : lastChanged(false), journalProfile("immortal"), journalSo
 void OLCState::journal( PCharacter *ch, const DLString &cmd, const DLString &args )
 {
     lastChanged = true;
+    pendingDone = true;
     olc_journal(ch->getName(), journalProfile, journalSource,
                 getJournalKind(), getJournalVnum(), cmd, args);
 }
