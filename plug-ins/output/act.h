@@ -93,6 +93,9 @@ void tell_raw( Character *ch, NPCharacter *talker, const MultiMessage &format, .
  * languages into an explicit MultiMessage and lets vecho(MM) resolve per
  * recipient. */
 void say_fmt( const MultiMessage &, ... );
+/* yell_fmt: a mob or player yell heard across the area, in the yell channel's
+ * frame, resolved per listener. First vararg is the yeller (%1 in content). */
+void yell_fmt( const MultiMessage &, ... );
 
 /** Display newbie hint message. */
 void hint_fmt(Character *ch, const char *format, ...);
