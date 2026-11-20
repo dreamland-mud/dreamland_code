@@ -41,6 +41,8 @@ public:
     bool openEditor(PCharacter *ch, WrappedCommand *cmd, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, AreaQuest *q, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin, const DLString &constArguments) const;
+    /** Quest finale: post trigger one step past the last, on the last step's end target. */
+    bool openFinaleEditor(PCharacter *ch, AreaQuest *q, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, DefaultBehavior *bhv, const DLString &constArguments) const;
 
     void showTriggers(PCharacter *ch, DefaultSpell *spell) const;
@@ -54,6 +56,9 @@ public:
 
 protected:
     bool editExisting(Character *ch, Scripting::Register &retval) const;
+    bool openQuestEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin,
+                         const DLString &type, const DLString &vnum, const DLString &trigName,
+                         const DLString &constArguments) const;
     bool findExample(Character *ch, const DLString &methodName, const DLString &indexType, DLString &tmpl) const;
     void loadFolder(const DLString &indexType);
     bool checkWebsock(Character *ch) const;

@@ -411,9 +411,17 @@ bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLString &tr
 			qdata.advance();
 
 			if (qdata.step >= q->steps.size()) {
+                int finaleStep = qdata.step;
 				qdata.complete();
                 // Call global Fenia trigger to say congrats etc
-                gprog("onQuestComplete", "CQ", ch, q);           
+                gprog("onQuestComplete", "CQ", ch, q);
+
+                // Optional finale: a post trigger one step past the last, on the last step's
+                // end target (q<N>_step<count>_begin_postX), plays the closing scene.
+                MethodLabel *finaleMethod = aquest_method_for_step_and_stage(methodsByStep, finaleStep, "begin");
+                if (finaleMethod && finaleMethod->trigType == trigType && finaleMethod->trigPrefix == "post")
+                    aquest_method_call(wrapperBase, *finaleMethod, progArgs);
+
                 continue;
             }
 

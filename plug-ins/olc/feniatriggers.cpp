@@ -20,6 +20,7 @@
 #include "damageflags.h"
 #include "arg_utils.h"
 #include "areaquestutils.h"
+#include "qedit.h"
 #include "behaviorloader.h"
 #include "merc.h"
 
@@ -708,6 +709,27 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer 
     DLString vnum = isBegin ? thisStep->beginValue : thisStep->endValue;
     DLString trigName = isBegin ? thisStep->beginTrigger : thisStep->endTrigger;
 
+    return openQuestEditor(ch, q, s, isBegin, type, vnum, trigName, constArguments);
+}
+
+bool FeniaTriggerLoader::openFinaleEditor(PCharacter *ch, AreaQuest *q, const DLString &constArguments) const
+{
+    DLString trigName = aquest_finale_trigger(q);
+    if (trigName.empty()) {
+        if (constArguments != "kill")
+            ch->pecho("Финал возможен, только если последний шаг заканчивается on-триггером.");
+        return false;
+    }
+
+    const QuestStep::XMLPointer &lastStep = q->steps.back();
+    return openQuestEditor(ch, q, Integer((int)q->steps.size()), true,
+                           lastStep->endType, lastStep->endValue, trigName, constArguments);
+}
+
+bool FeniaTriggerLoader::openQuestEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin,
+                                         const DLString &type, const DLString &vnum, const DLString &trigName,
+                                         const DLString &constArguments) const
+{
     DLString methodId = aquest_method_id(q, s, isBegin, trigName);
     Register wrapper = get_wrapper_for_index_data(vnum.toInt(), type);
     Register method = findMethodOnWrapper(wrapper, methodId);
