@@ -338,9 +338,9 @@ public:
             pet["vnum"] = pMob->vnum;
             json_lang_string(pet, "name", pMob->short_descr);
             pet["level"] = (adaptive ? -1 : pMob->level);
-            pet["act"] = act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_NOWHERE));
-            pet["aff"] = affect_flags.names(REMOVE_BIT(pMob->affected_by, AFF_INFRARED));
-            pet["off"] = off_flags.names(REMOVE_BIT(pMob->off_flags, ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE|OFF_FADE));
+            pet["act"] = act_flags.names(pMob->act & ~(ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_NOWHERE));
+            pet["aff"] = affect_flags.names(pMob->affected_by & ~(AFF_INFRARED));
+            pet["off"] = off_flags.names(pMob->off_flags & ~(ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE|OFF_FADE));
             json_lang_area(pet, "area", pMob->area);
             dump.append(pet);
         }
