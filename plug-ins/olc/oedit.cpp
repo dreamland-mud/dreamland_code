@@ -54,6 +54,9 @@
 #include "tohit.h"
 #include "def.h"
 
+// Boot loader normalizer (plug-ins/areas): an editor save must match what a boot loads.
+DLString format_longdescr(const DLString &longdescr);
+
 #define EDIT_OBJ(x, y) y = &obj
 
 OLC_STATE(OLCStateObject);
@@ -211,6 +214,7 @@ void OLCStateObject::commit()
     original->keyword = obj.keyword;
     original->short_descr = obj.short_descr;
     original->description = obj.description;
+    original->description[RU] = format_longdescr(obj.description[RU]);
     original->sound        = obj.sound;
     original->smell        = obj.smell;
     original->vnum         = obj.vnum;

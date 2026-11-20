@@ -35,6 +35,9 @@
 
 #include "def.h"
 
+// Boot loader normalizer (plug-ins/areas): an editor save must match what a boot loads.
+DLString format_longdescr(const DLString &longdescr);
+
 OLC_STATE(OLCStateMobile);
 
 // Remove after 'medit convert' removal
@@ -395,6 +398,7 @@ void OLCStateMobile::commit()
     original->keyword = mob.keyword;
     original->short_descr = mob.short_descr;
     original->long_descr = mob.long_descr;
+    original->long_descr[RU] = format_longdescr(mob.long_descr[RU]);
     original->description = mob.description;
     original->spec_fun.name    = mob.spec_fun.name;
     original->spec_fun.func    = spec_lookup( mob.spec_fun.name.c_str() );
