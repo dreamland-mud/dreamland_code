@@ -476,25 +476,26 @@ bool OLCStateAreaQuest::parseStepNumber(PCharacter *ch, const DLString &arg, Int
     return false;
 }
 
+AQEDIT(fenia, "феня", "редактировать тригера")
+{
+    feniaTriggers->openEditor(ch, getOriginal(), argument);
+    return false;
+}
+
 AQEDIT(finale, "финал", "сценарий после завершения квеста")
 {
     AreaQuest *q = getOriginal();
     DLString args = argument;
 
-    if (arg_is_help(args)) {
-        ch->pecho("finale - открыть редактор финальной сцены (post-триггер на цели конца последнего шага,");
-        ch->pecho("         срабатывает сразу после завершения квеста, когда награды уже выданы)");
-        ch->pecho("finale clear - удалить финальную сцену");
+    if (args.empty() || arg_is_clear(args)) {
+        feniaTriggers->openFinaleEditor(ch, q, args);
         return false;
     }
 
-    feniaTriggers->openFinaleEditor(ch, q, args);
-    return false;
-}
-
-AQEDIT(fenia, "феня", "редактировать тригера")
-{
-    feniaTriggers->openEditor(ch, getOriginal(), argument);
+    ch->pecho("finale - открыть редактор финальной сцены (post-триггер на цели конца последнего шага,");
+    ch->pecho("         срабатывает сразу после завершения квеста, когда награды уже выданы)");
+    ch->pecho("finale clear - удалить финальную сцену");
+    ch->pecho("Если на том же событии стартует следующий квест цепочки, его сцена пойдет одновременно с финалом.");
     return false;
 }
 
@@ -575,15 +576,14 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
 
     // 'step 3 del'
     if (arg_is(cmd, "del")) {
-        // Deleting the last step: its begin trigger would land in the finale slot, and the
-        // old finale would dangle one step past the end. Remove both.
-        if (step == (int)q->steps.size() - 1) {
-            feniaTriggers->openFinaleEditor(ch, q, "kill");
+        // Any delete shifts the step count, so the old finale would dangle one past the
+        // end. Deleting the last step: its begin would also land in the finale slot.
+        feniaTriggers->openFinaleEditor(ch, q, "kill");
+        if (step == (int)q->steps.size() - 1)
             clear_step_begin_trigger(ch, q, step);
-        }
 
         q->steps.erase(q->steps.begin() + step);
-        ch->pecho("Шаг %d удален. Не забудь почистить старые тригера ({y{hccs search %d{x).", 
+        ch->pecho("Шаг %d удален. Номера шагов в тригерах сдвинулись: почисти старые ({y{hccs search %d{x) и проверь строку Финал.", 
                   step.getValue(), q->vnum.getValue());
         show_steps(ch, q);
         return true;
