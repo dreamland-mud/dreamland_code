@@ -180,4 +180,9 @@ double item_fit_material(Character *ch, const DLString &material);
  *  worth x2 to a good one, vampiric only to an evil one. Multiplier. */
 double item_fit_alignment(Character *ch, const DLString &weaponFlag);
 
+/** Worn spell alignment clause: item_value.json shared.spell_align {spell: [lo, hi]
+ *  or [[lo, hi], ...]} lists spells whose effect works only inside those alignment
+ *  bands (dark shroud: evil only). 0 outside, 1 inside, unlisted spell or no ch. */
+double item_fit_spell(Character *ch, const char *spell);
+
 #endif

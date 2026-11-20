@@ -364,6 +364,9 @@ double item_flag_points(bitstring_t bits, bool caster, Character *target, bitstr
         // Curses still count: nobody "already has" a curse as a boon.
         if (base > 0 && IS_SET(heldFlags, fv.flag))
             continue;
+        // A boon whose effect the char's alignment shuts off is worth nothing.
+        if (base > 0 && fv.spell != 0)
+            base *= item_fit_spell(target, fv.spell);
         if (fv.spell != 0 && target != 0 && selfCast(fv.spell))
             s += base * 0.1;
         else
@@ -503,6 +506,31 @@ double item_fit_alignment(Character *ch, const DLString &weaponFlag)
     if (weaponFlag == "vampiric")
         return IS_EVIL(ch) ? 1.0 : 0.0;
     return 1.0;
+}
+
+static bool align_in_band(int align, const Json::Value &band)
+{
+    return band.isArray() && band.size() == 2
+        && align >= band[0u].asInt() && align <= band[1u].asInt();
+}
+
+double item_fit_spell(Character *ch, const char *spell)
+{
+    if (ch == 0 || spell == 0)
+        return 1.0;
+    const Json::Value &map = item_value_object("shared", "spell_align");
+    if (!map.isObject() || !map.isMember(spell))
+        return 1.0;
+    // [lo, hi] (the affix align convention) or a list of such bands.
+    const Json::Value &bands = map[spell];
+    int align = ch->getAlignment();
+    if (bands.isArray() && bands.size() > 0 && bands[0u].isArray()) {
+        for (auto const &band: bands)
+            if (align_in_band(align, band))
+                return 1.0;
+        return 0.0;
+    }
+    return align_in_band(align, bands) ? 1.0 : 0.0;
 }
 
 /*

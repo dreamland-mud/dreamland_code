@@ -4133,7 +4133,8 @@ static bool ga_vnumListed( const char *key, int vnum )
 // at their worn price in M; a "grant:<skill>" entry is a skill the script lends
 // (giveTemporary), at its grant price. The affect loop cannot see a script-cast affect, so
 // without this a transform amulet scored nothing. A worn spell the
-// char can cast itself is worth 10%, as for the item flags (ga_canSelfCast).
+// char can cast itself is worth 10%, as for the item flags (ga_canSelfCast); one
+// the char's alignment shuts off (shared.spell_align) is worth nothing.
 static bool ga_canSelfCast( Character *target, const char *name );
 
 static double ga_triggerSpellsM( obj_index_data *pObj, Character *target )
@@ -4153,7 +4154,8 @@ static double ga_triggerSpellsM( obj_index_data *pObj, Character *target )
             if (name.compare( 0, 6, "grant:" ) == 0)
                 m += std::max( 0.0, magic_spell_grant( name.substr( 6 ) ) );
             else {
-                double worn = std::max( 0.0, magic_spell_worn( name ) );
+                double worn = std::max( 0.0, magic_spell_worn( name ) )
+                            * item_fit_spell( target, name.c_str( ) );
                 if (ga_canSelfCast( target, name.c_str( ) ))
                     worn *= 0.1;
                 m += worn;
@@ -5050,7 +5052,8 @@ static double ga_scoreCore( Character *target, const GAWeights &w,
     if (generated) {
         DLString buff = inst->getProperty( "wornbuff" );
         if (!buff.empty( )) {
-            double pts = item_wornbuff_points( buff, inst->level, w.caster );
+            double pts = item_wornbuff_points( buff, inst->level, w.caster )
+                       * item_fit_spell( target, buff.c_str( ) );
             if (ga_canSelfCast( target, buff.c_str( ) ))
                 pts *= 0.1;
             s += pts;
@@ -6212,6 +6215,7 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
                     break;
             }
             pve = item_wornbuff_points( d->ref, lvl, caster )
+                * item_fit_spell( target, d->ref )
                 * ga_gkSkill( "buff_uptime", *d, d->a ) * use;
             if (target != 0) {
                 Skill *self = skillManager->findExisting( d->ref );
