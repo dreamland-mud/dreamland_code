@@ -43,6 +43,11 @@ struct ItemWeights {
     // Apply heldFlags/heldImm/heldRes to a WORN item too. Off for advice deltas (the worn
     // baseline keeps full price); on only for the percentile's flag-once kit totals.
     bool heldOnWorn = false;
+    // Per-char price scales, sage-only (1.0 = no char, the generators' view):
+    // mitScale lifts res/imm/vuln, sanctuary and protection for a pool above
+    // shared.mitigation_ref_hp; manaScale shrinks +-mana for a pool above
+    // shared.mana_ref_pool.
+    double mitScale = 1.0, manaScale = 1.0;
 };
 
 /** Fill the profile weights. acLevel is the level the level-dependent weights (AC,
