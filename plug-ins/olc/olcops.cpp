@@ -940,6 +940,11 @@ static int create_vnum(OlcOpContext &ctx, const DLString &kind, AreaIndexData *n
 
 static bool room_target_known(OlcOpContext &ctx, int target)
 {
+    // -1 is what the serializer writes for an exit with no room behind it
+    // (xmlmisc.cpp); boot loads it as a dead-end exit, so put must too.
+    if (target == -1)
+        return true;
+
     return target > 0
            && (get_room_index(target) || is_planned(ctx, "room", target) || ctx.batchRooms.count(target));
 }
