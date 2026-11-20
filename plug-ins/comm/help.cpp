@@ -361,7 +361,10 @@ struct HelpFinder {
                 HelpArticle::Pointer target = exact->getAliasTarget();
                 if (target)
                     exact = target;
-                articles.push_back(exact);
+                // By number too: a hidden god's or an immortal article must not
+                // open for whoever guesses its id.
+                if (exact->visible(ch))
+                    articles.push_back(exact);
             }
             return;
         }
