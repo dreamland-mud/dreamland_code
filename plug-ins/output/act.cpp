@@ -22,6 +22,7 @@
 #include "pcrace.h"
 #include "object.h"
 #include "room.h"
+#include "area.h"
 #include "skill.h"
 
 #include "descriptor.h"
@@ -583,6 +584,54 @@ void say_fmt( const MultiMessage &content, ... )
 
         const MultiMessage &mm = (to == teller.ch) ? toChar : toRoom;
         say_fmt_frame(to, teller.ch, vfmt(to, mm.getMessage(to).c_str(), ap0));
+    }
+
+    va_end( ap );
+    va_end( ap0 );
+}
+
+void yell_fmt( const MultiMessage &content, ... )
+{
+    va_list ap, ap0;
+    typedef union { Character *ch; } arg_t;
+    arg_t yeller;
+
+    // Same frames as the yell channel (channels.json), composed per language
+    // like say_fmt. The channel takes one finished string, so it can't carry
+    // content that resolves for each listener.
+    MultiMessage toArea(
+        DLString("%1$^C1 yell%1$ns| piercingly '{Y")           + content.getMessage(LANG_EN) + "{x'",
+        DLString("%1$^C1 пронзительно крич%1$nит|ат '{Y")      + content.getMessage(LANG_RU) + "{x'",
+        DLString("%1$^C1 пронизливо крич%1$nить|ать '{Y")      + content.getMessage(LANG_UA) + "{x'");
+    MultiMessage toChar(
+        DLString("You yell piercingly '{Y")                    + content.getMessage(LANG_EN) + "{x'",
+        DLString("Ты пронзительно кричишь '{Y")                + content.getMessage(LANG_RU) + "{x'",
+        DLString("Ти пронизливо кричиш '{Y")                   + content.getMessage(LANG_UA) + "{x'");
+
+    va_start( ap, content );
+    va_copy( ap0, ap );
+    yeller = va_arg(ap, arg_t);
+
+    Room *room = yeller.ch->in_room;
+
+    if (room) {
+        // Who hears it: the area, awake, as Fenia room.zecho does.
+        for (Character *to = char_list; to; to = to->next) {
+            if (!to->in_room || to->in_room->area != room->area)
+                continue;
+            if (to->position < POS_RESTING)
+                continue;
+
+            bool own = (to == yeller.ch);
+            const MultiMessage &mm = own ? toChar : toArea;
+            DLString line = vfmt(to, mm.getMessage(to).c_str(), ap0);
+
+            to->pecho(line);
+
+            if (chat_subscribed(to))
+                chat_emit(to, own ? 0 : yeller.ch, own, "yell", "area", line,
+                          room->areaIndex( )->getName(viewerLang(to), '1'));
+        }
     }
 
     va_end( ap );

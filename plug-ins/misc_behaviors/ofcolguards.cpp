@@ -9,7 +9,6 @@
 #include "skillreference.h"
 
 #include "act.h"
-#include "interp.h"
 #include "fight.h"
 #include "merc.h"
 
@@ -31,7 +30,7 @@ bool OfcolMarshal::specFight( )
     if (number_percent() < 25) 
         return BasicMobileDestiny::specFight();
    
-    do_yell( ch, "Охрана! На помощь!" );
+    yell_fmt( _("Охрана! На помощь!"), ch );
 
     if (ch->isAffected( gsn_garble ))
         return true;
@@ -82,7 +81,7 @@ bool OfcolMarshal::specFight( )
             for(i=0;i<stat_table.size;i++)
                 mob->perm_stat[i] = 23;
 
-            do_say(mob, "Диана, я иду на помощь...");
+            say_fmt( _("Диана, я иду на помощь..."), mob );
             multi_hit( mob, ch->fighting , "murder" );
         }
         else {
@@ -90,9 +89,9 @@ bool OfcolMarshal::specFight( )
 
             if (!guard->path.empty( )) {
                 if (number_percent() < 25)
-                    do_yell(mob, "Держись Диана! Я иду на помощь!");
+                    yell_fmt( _("Держись, Диана! Я иду на помощь!"), mob );
                 else
-                    do_say(mob, "Диане необходима моя помощь.");
+                    say_fmt( _("Диане необходима моя помощь."), mob );
 
                 guard->makeOneStep( );
             }
@@ -115,8 +114,7 @@ bool OfcolGuard::specFight()
     if (!ch->fighting || ch->fighting->isDead())
         return BasicMobileDestiny::specFight();
 
-    interpret_raw( ch, "yell", "Стража на помощь! %s убивает меня.", 
-                  ch->fighting->getNameP( '1' ).c_str( ) );
+    yell_fmt( _("Стража, на помощь! %2$^C1 убивает меня."), ch, ch->fighting );
    
     for (ach = char_list; ach != 0; ach = ach_next)
     {
@@ -148,8 +146,7 @@ bool OfcolGuard::specFight()
             continue;
 
         if (ch->in_room == mob->in_room) {
-            interpret_raw( mob, "say", "Теперь, %s, ты поплатишься за нападение на стражника.",
-                           ch->fighting->getNameP( '1' ).c_str( ) );
+            say_fmt( _("Теперь, %2$C1, ты поплатишься за нападение на стражника."), mob, ch->fighting );
             multi_hit( mob, ch->fighting , "murder" );
         }
         else {
@@ -157,9 +154,9 @@ bool OfcolGuard::specFight()
 
             if (!guard->path.empty( )) {
                 if (number_percent() < 25)
-                    do_yell(mob, "Держись стражник! Я иду на помощь.");
+                    yell_fmt( _("Держись, стражник! Я иду на помощь."), mob );
                 else
-                    do_say(mob, "Страже необходима моя помощь.");
+                    say_fmt( _("Страже необходима моя помощь."), mob );
 
                 guard->makeOneStep( );
             }
