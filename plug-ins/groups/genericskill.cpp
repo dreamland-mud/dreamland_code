@@ -293,6 +293,9 @@ int GenericSkill::getLearned( Character *ch ) const
    
     if (hasRaceBonus(pch))
         percent = 100;
+
+    // A Fenia grant over a practiced skill lifts it for the session only.
+    percent = std::max( percent, pch->getSkillData( getIndex( ) ).feniaFloor );
     
     return URANGE( 1, percent, 100 );
 }

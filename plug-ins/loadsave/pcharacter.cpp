@@ -198,9 +198,11 @@ static void clear_fenia_skills( PCharacter *ch )
     PCSkills &skills = ch->getSkills();
     PCSkills::iterator s;
     
-    for (s = skills.begin(); s != skills.end(); s++)
+    for (s = skills.begin(); s != skills.end(); s++) {
         if (s->origin == SKILL_FENIA)
             s->clear();
+        s->feniaFloor = 0;
+    }
 }
 
 void PCharacter::updateSkills( )

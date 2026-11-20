@@ -29,6 +29,12 @@ public:
         XML_VARIABLE XMLEnumeration origin;
         XML_VARIABLE XMLLongNoEmpty start;
         XML_VARIABLE XMLLongNoEmpty end;
+
+        // Session-only floor on a practiced skill's learned percent, set by a
+        // Fenia grant over a skill the char already knows (giveTemporary with
+        // overNative). Never saved: Fenia grants are re-applied at login, and
+        // the practiced percent in 'learned' is never touched.
+        int feniaFloor;
     
         bool isValid() const;
         bool isTemporary() const;
